@@ -163,7 +163,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
    * create and eventually open a form containing the wizard.<br>
    * this method may be overwritten to provide an own wizard representation
    * form.
-   * 
+   *
    * @return
    * @throws ProcessingException
    */
@@ -182,7 +182,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
    * used for example to decorate the step
    * labels and description depending on the current state or to decorate the
    * current wizard form in {@link #getWizardForm()}
-   * 
+   *
    * @throws ProcessingException
    */
   @ConfigOperation
@@ -307,7 +307,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
    * This is a delegate methode that is normally called by the wizard status
    * field (html field) in the {@link IWizardContainerForm} whenever a link is
    * clicked.
-   * 
+   *
    * @param url
    * @param path
    *          {@link URL#getPath()}
@@ -377,7 +377,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
 
   /**
    * Used to manage wizard steps i.e. to add/remove wizard steps
-   * 
+   *
    * @param steps
    *          live and mutable list of configured steps, not yet initialized
    *          and added to the step list
@@ -618,7 +618,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
       return -1;
     }
     for (int i = 0; i < m_stepList.size(); i++) {
-      if (m_stepList.get(i) == step) {
+      if (m_stepList.get(i).equals(step)) {
         return i;
       }
     }
@@ -1141,7 +1141,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
    * This is a delegate methode that is normally called by the wizard status
    * field (html field) in the {@link IWizardContainerForm} whenever a link is
    * clicked.
-   * 
+   *
    * @param url
    * @param path
    *          {@link URL#getPath()}
