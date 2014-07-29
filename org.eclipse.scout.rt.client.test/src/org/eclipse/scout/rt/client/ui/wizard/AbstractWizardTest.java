@@ -22,7 +22,7 @@ import org.junit.Test;
 public class AbstractWizardTest {
 
   /**
-   * Before bug XXX {@link AbstractWizard#getStepIndex(IWizardStep)} compared the steps by comparing their identity
+   * Before bug 440621 {@link AbstractWizard#getStepIndex(IWizardStep)} compared the steps by comparing their identity
    * <code>==</code>. The new logic should compare two {@link IWizardStep}s by using the <code>equals()</code> method.
    */
   @Test
