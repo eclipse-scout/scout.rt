@@ -581,7 +581,7 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId {
   void markSaved();
 
   /**
-   * true if the field contains data (semantics)
+   * true if the field does not contain data (semantics)
    */
   boolean isEmpty();
 
