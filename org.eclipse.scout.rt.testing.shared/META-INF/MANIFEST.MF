@@ -10,6 +10,7 @@ Require-Bundle: org.eclipse.core.runtime;bundle-version="[3.6.0,4.0.0)",
  org.eclipse.scout.rt.testing.commons;bundle-version="[4.1.0,4.2.0)"
 Export-Package: org.eclipse.scout.rt.testing.shared,
  org.eclipse.scout.rt.testing.shared.runner,
+ org.eclipse.scout.rt.testing.shared.runner.parameterized,
  org.eclipse.scout.rt.testing.shared.services.common.code,
  org.eclipse.scout.rt.testing.shared.services.common.exceptionhandler,
  org.eclipse.scout.rt.testing.shared.services.lookup
@@ -19,4 +20,5 @@ Import-Package: junit.framework;version="[4.9.0,5.0.0)",
  org.apache.tools.ant.taskdefs.optional.junit;version="[0.0.0,2.0.0)",
  org.junit;version="[4.9.0,5.0.0)",
  org.junit.runner;version="[4.9.0,5.0.0)",
+ org.junit.runners;version="[4.9.0,5.0.0)",
  org.junit.runners.model;version="[4.9.0,5.0.0)"
