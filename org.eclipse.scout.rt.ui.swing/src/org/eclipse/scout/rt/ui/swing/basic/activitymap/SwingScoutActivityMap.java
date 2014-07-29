@@ -40,6 +40,7 @@ import org.eclipse.scout.rt.ui.swing.ext.MouseClickedBugFix;
 import org.eclipse.scout.rt.ui.swing.ext.activitymap.ActivityMapSelectionEvent;
 import org.eclipse.scout.rt.ui.swing.ext.activitymap.ActivityMapSelectionListener;
 import org.eclipse.scout.rt.ui.swing.ext.activitymap.JActivityMap;
+import org.eclipse.scout.rt.ui.swing.form.fields.plannerfield.SwingScoutPlannerField;
 
 public class SwingScoutActivityMap extends SwingScoutComposite<IActivityMap<?, ?>> {
   private JScrollPane m_swingScrollPane;
@@ -48,11 +49,11 @@ public class SwingScoutActivityMap extends SwingScoutComposite<IActivityMap<?, ?
    */
   private JTable m_metricsTable;
   private ActivityMapListener m_scoutListener;
+  private SwingScoutPlannerField m_swingPlannerField;
 
   public SwingScoutActivityMap(JTable metricsTable) {
     // the master table is defining our header height and row heights
     m_metricsTable = metricsTable;
-    //keep empty
   }
 
   @Override
@@ -246,10 +247,19 @@ public class SwingScoutActivityMap extends SwingScoutComposite<IActivityMap<?, ?
     return m_swingScrollPane;
   }
 
+  public void setSwingPlannerField(SwingScoutPlannerField swingScoutPlannerField) {
+    m_swingPlannerField = swingScoutPlannerField;
+  }
+
+  public SwingScoutPlannerField getSwingPlannerField() {
+    return m_swingPlannerField;
+  }
+
   private void setTimeScaleFromScout(TimeScale scale) {
     getSwingActivityMap().setColumnModel(new SwingActivityMapColumnModel(scale));
     // re-set selection
     setSelectionFromScout();
+    getSwingPlannerField().updateSelectedDatesInMiniCalendar();
   }
 
   private void setResourceIdsFromScout() {

@@ -28,6 +28,7 @@ import javax.swing.JScrollBar;
 import javax.swing.JSplitPane;
 import javax.swing.table.JTableHeader;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.rt.client.ui.basic.activitymap.IActivityMap;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -78,6 +79,7 @@ public class SwingScoutPlannerField extends SwingScoutFieldComposite<IPlannerFie
     }
     m_activityMapComposite = new SwingScoutActivityMap(m_resourceTableComposite.getSwingTable());
     m_activityMapComposite.createField(getScoutObject().getActivityMap(), getSwingEnvironment());
+    m_activityMapComposite.setSwingPlannerField(this);
     m_hsplit = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, m_resourceTableComposite.getSwingScrollPane(), m_activityMapComposite.getSwingScrollPane());
     m_hsplit.setBorder(null);
     m_hsplit.setDividerLocation(getScoutObject().getSplitterPosition());
@@ -168,11 +170,7 @@ public class SwingScoutPlannerField extends SwingScoutFieldComposite<IPlannerFie
           m_miniDateChooser[i - 1].setChildCalendar(m_miniDateChooser[i]);
         }
       }
-      // set selection on first calendar
-      Date[] days = m_activityMapComposite.getScoutActivityMap().getDays();
-      if (m_miniDateChooser.length > 0) {
-        m_miniDateChooser[0].setSelectedDates(days);
-      }
+      updateSelectedDatesInMiniCalendar();
     }
   }
 
@@ -184,6 +182,24 @@ public class SwingScoutPlannerField extends SwingScoutFieldComposite<IPlannerFie
 
   protected void setSplitterLocation(int splitterLocation) {
     m_hsplit.setDividerLocation(splitterLocation);
+  }
+
+  public DateChooser[] getMiniCalendar() {
+    return m_miniDateChooser;
+  }
+
+  /**
+   * Updates the selected dates in the miniCalendar. The selected dates from the ActivityMap are synchronized to the
+   * miniCalendars.
+   *
+   * @since 4.1.0
+   */
+  public void updateSelectedDatesInMiniCalendar() {
+    // set selection on first calendar
+    Date[] days = m_activityMapComposite.getScoutActivityMap().getDays();
+    if (CollectionUtility.hasElements(m_miniDateChooser)) {
+      m_miniDateChooser[0].setSelectedDates(days);
+    }
   }
 
   /**
