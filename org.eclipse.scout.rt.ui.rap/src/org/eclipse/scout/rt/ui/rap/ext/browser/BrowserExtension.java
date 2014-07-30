@@ -22,11 +22,18 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
+import org.eclipse.scout.rt.ui.rap.basic.IRwtScoutComposite;
+import org.eclipse.scout.rt.ui.rap.basic.RwtScoutComposite;
+import org.eclipse.scout.rt.ui.rap.basic.table.RwtScoutTable;
+import org.eclipse.scout.rt.ui.rap.ext.table.TableViewerEx;
 import org.eclipse.scout.rt.ui.rap.html.HtmlAdapter;
 import org.eclipse.scout.rt.ui.rap.html.IHyperlinkProcessor;
+import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.BrowserFunction;
 import org.eclipse.swt.browser.LocationListener;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 
 /**
  * Adds hyperlink callback support as in normal swt to the rwt browser<br/>
@@ -69,8 +76,12 @@ public class BrowserExtension {
 
   private BrowserFunction createLocalHyperlinkFunction() {
     return new BrowserFunction(m_browser, getHyperlinkFunctionName()) {
+
       @Override
       public Object function(Object[] arguments) {
+
+        storeValueOfCurrentlyFocusedFieldIntoScoutModel();
+
         String localUrl = m_hyperlinkMap.get(arguments[0]);
         if (localUrl == null) {
           LOG.error("Hyperlink could not be activated. No url specified.");
@@ -83,6 +94,63 @@ public class BrowserExtension {
 
         m_hyperlinkCallback.execute(localUrl);
 
+        return null;
+      }
+
+      /**
+       * When clicking on a hyperlink in RAP's Browser widget there is no focus lost event (see bugzilla 436693).
+       * Accordingly, the value of the current field will not be stored into the Scout model.
+       * This means we have to manually make sure that the value in the currently focused field is stored into the
+       * Scout model. We take the following actions:
+       * <ol>
+       * <li>Run the inputVerfier on the control
+       * <li>Check if the control is a cellEditor, and if so, find the corresponding table and tell her to close the
+       * cell editor
+       * </ol>
+       * TODO Note: this workaround can be removed when bug 436693 is resolved.
+       * 
+       * @since 4.1.0 (backported)
+       */
+      private void storeValueOfCurrentlyFocusedFieldIntoScoutModel() {
+        Control currentlyFocusedControl = Display.getCurrent().getFocusControl();
+        RwtUtility.runUiInputVerifier(currentlyFocusedControl);
+        if (isCellEditor(currentlyFocusedControl)) {
+          RwtScoutTable table = findTableForControl(currentlyFocusedControl);
+          TableViewerEx ex = (TableViewerEx) ((RwtScoutTable) table).getUiTableViewer();
+          if (ex.isCellEditorActive()) {
+            ex.applyEditorValue();
+          }
+        }
+      }
+
+      /**
+       * Returns <code>true</code> if the Control is a cellEditor
+       * 
+       * @since 4.1.0 (backported)
+       */
+      private boolean isCellEditor(final Control c) {
+        return findTableForControl(c) != null;
+      }
+
+      /**
+       * This method tries to find the {@link RwtScoutTable} for the given control.
+       * It checks if the given control is registered to a RwtScoutTable. If so, the table is returned. If not, the
+       * control's parents are checked. If no table is found, the method returns <code>null</code>
+       * 
+       * @since 4.1.0 (backported)
+       */
+      private RwtScoutTable findTableForControl(final Control originalControl) {
+        Control currentControl = originalControl;
+        IRwtScoutComposite rwtComposite;
+        while (currentControl != null) {
+          rwtComposite = RwtScoutComposite.getCompositeOnWidget(currentControl);
+          if (rwtComposite != null && rwtComposite instanceof RwtScoutTable) {
+            return (RwtScoutTable) rwtComposite;
+          }
+          else {
+            currentControl = currentControl.getParent();
+          }
+        }
         return null;
       }
     };
