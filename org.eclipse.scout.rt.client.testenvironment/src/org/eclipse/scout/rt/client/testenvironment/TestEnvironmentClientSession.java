@@ -16,6 +16,7 @@ import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.servicetunnel.http.IClientServiceTunnel;
 import org.eclipse.scout.rt.client.testenvironment.ui.desktop.TestEnvironmentDesktop;
+import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 
 /**
  * {@link IClientSession} for Client Test Environment
@@ -23,6 +24,8 @@ import org.eclipse.scout.rt.client.testenvironment.ui.desktop.TestEnvironmentDes
  * @author jbr
  */
 public class TestEnvironmentClientSession extends AbstractClientSession {
+
+  private IDesktop m_testDesktop;
 
   public TestEnvironmentClientSession() {
     super(true);
@@ -51,5 +54,28 @@ public class TestEnvironmentClientSession extends AbstractClientSession {
   @Override
   public void setServiceTunnel(IClientServiceTunnel tunnel) {
     super.setServiceTunnel(tunnel);
+  }
+
+  @Override
+  public IDesktop getDesktop() {
+    if (m_testDesktop == null) {
+      return super.getDesktop();
+    }
+    else {
+      return m_testDesktop;
+    }
+  }
+
+  /**
+   * Replace the desktop with an other instance ({@link #m_testDesktop}). Can be used to install a mock or a spy.
+   * Unlike {@link #setDesktop(IDesktop)} it will not check if the desktop is already active.
+   * If a test desktop ({@link #m_testDesktop}) is set, {@link #getDesktop()} will return this instance.
+   * Do not forget to set the test desktop to null at the end of your test.
+   * 
+   * @param desktop
+   *          the test desktop
+   */
+  public void replaceDesktop(IDesktop desktop) {
+    m_testDesktop = desktop;
   }
 }
