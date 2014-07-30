@@ -11,7 +11,9 @@
 package org.eclipse.scout.rt.client.ui.messagebox;
 
 import java.beans.PropertyChangeListener;
-import java.lang.reflect.Array;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.EventListener;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -90,6 +92,17 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
   /**
    * Convenience function for simple delete confirmation message box
    * 
+   * @param items
+   *          a list of multiple items
+   * @since Scout 4.0.1
+   */
+  public static boolean showDeleteConfirmationMessage(Collection<?> items) {
+    return showDeleteConfirmationMessage(null, items);
+  }
+
+  /**
+   * Convenience function for simple delete confirmation message box
+   * 
    * @param itemType
    *          display text in plural such as "Persons", "Relations", "Tickets",
    *          ...
@@ -97,28 +110,49 @@ public class MessageBox extends AbstractPropertyObserver implements IMessageBox 
    *          one item or array of multiple items
    */
   public static boolean showDeleteConfirmationMessage(String itemType, Object items) {
-    Object array;
     if (items == null) {
-      array = new Object[0];
+      return showDeleteConfirmationMessage(itemType, Collections.emptyList());
     }
-    else if (items.getClass().isArray()) {
-      array = items;
+    else if (items instanceof Object[]) {
+      return showDeleteConfirmationMessage(itemType, Arrays.asList((Object[]) items));
+    }
+    else if (items instanceof Collection) {
+      return showDeleteConfirmationMessage(itemType, (Collection) items);
     }
     else {
-      array = new Object[]{items};
+      return showDeleteConfirmationMessage(itemType, Collections.singletonList(items));
     }
+  }
+
+  /**
+   * Convenience function for simple delete confirmation message box
+   * 
+   * @param itemType
+   *          display text in plural such as "Persons", "Relations", "Tickets",
+   *          ...
+   * @param items
+   *          a list of multiple items
+   * @since Scout 4.0.1
+   */
+  public static boolean showDeleteConfirmationMessage(String itemType, Collection<?> items) {
     StringBuilder t = new StringBuilder();
-    int n = Array.getLength(array);
-    for (int i = 0; i < n; i++) {
-      if (i < 10 || i == n - 1) {
-        t.append("- ");
-        t.append(StringUtility.emptyIfNull(Array.get(array, i)));
-        t.append("\n");
-      }
-      else if (i == 10) {
-        t.append("  ...\n");
-      }
-      else {
+
+    int n = 0;
+    if (items != null) {
+      n = items.size();
+      int i = 0;
+      for (Object item : items) {
+        if (i < 10 || i == n - 1) {
+          t.append("- ");
+          t.append(StringUtility.emptyIfNull(item));
+          t.append("\n");
+        }
+        else if (i == 10) {
+          t.append("  ...\n");
+        }
+        else {
+        }
+        i++;
       }
     }
     //
