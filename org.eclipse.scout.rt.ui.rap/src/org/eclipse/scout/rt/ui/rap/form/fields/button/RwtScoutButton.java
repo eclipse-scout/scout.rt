@@ -41,6 +41,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
@@ -345,7 +346,12 @@ public class RwtScoutButton<T extends IButton> extends RwtScoutFieldComposite<T>
 
   protected void requestPopupFromScout() {
     if (getContextMenu() != null) {
-      getContextMenu().getUiMenu().setVisible(true);
+      Menu uiMenu = getContextMenu().getUiMenu();
+      Point loc = Display.getCurrent().map(m_menuMarkerComposite.getMarkerLabel(), null, getUiField().getLocation());
+      loc.x += m_menuMarkerComposite.getMarkerLabel().getSize().x / 2;
+      loc.y += m_menuMarkerComposite.getMarkerLabel().getSize().y / 2;
+      uiMenu.setLocation(RwtMenuUtility.getMenuLocation(getScoutObject().getContextMenu().getChildActions(), uiMenu, loc, getUiEnvironment()));
+      uiMenu.setVisible(true);
     }
   }
 
