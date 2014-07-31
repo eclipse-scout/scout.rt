@@ -48,6 +48,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
@@ -201,7 +202,7 @@ public abstract class AbstractListBox<T> extends AbstractValueField<Set<T>> impl
    * ITable.addRows()
    * <p>
    * For most cases the override of just {@link #execLoadTableData()} is sufficient
-   * 
+   *
    * <pre>
    * List<ILookupRow<T>> data=execLoadTableData();
    * List<ITableRow> rows=new ArrayList();
@@ -676,6 +677,12 @@ public abstract class AbstractListBox<T> extends AbstractValueField<Set<T>> impl
   @Override
   public void checkKeys(Collection<? extends T> keys) {
     setValue(CollectionUtility.<T> hashSetWithoutNullElements(keys));
+  }
+
+  @Override
+  public void setFormInternal(IForm form) {
+    super.setFormInternal(form);
+    getListBoxFilterBox().setFormInternal(form);
   }
 
   @Override

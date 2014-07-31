@@ -14,12 +14,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractRadioButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IRadioButton;
 import org.eclipse.scout.rt.client.ui.form.fields.labelfield.AbstractLabelField;
@@ -34,7 +36,7 @@ import org.junit.runner.RunWith;
 
 /**
  * Test for {@link AbstractRadioButtonGroup}
- * 
+ *
  * @since 4.0.0-M7
  */
 @RunWith(ScoutClientTestRunner.class)
@@ -148,6 +150,16 @@ public class AbstractRadioButtonGroupTest {
     assertEquals(new P_CompanyLookupCall(), lookupGroup.getLookupCall());
     assertEquals(3, lookupGroup.getButtons().size());
     assertNull(lookupGroup.getSelectedButton());
+  }
+
+  @Test
+  public void testGetForm() {
+    IForm formMock = mock(IForm.class);
+    m_group.setFormInternal(formMock);
+    assertEquals(formMock, m_group.getForm());
+    for (IRadioButton<Long> radioButton : m_group.getButtons()) {
+      assertEquals(formMock, radioButton.getForm());
+    }
   }
 
   private void assertAllButtonsEnabled(boolean enabled, IRadioButtonGroup<?> group) {

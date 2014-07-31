@@ -10,36 +10,22 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.listbox;
 
-import java.util.List;
-import java.util.Locale;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 
-import org.eclipse.scout.commons.LocaleThreadLocal;
+import java.util.List;
+
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- *
+ * Tests for {@link AbstractListBox}
  */
 public class AbstractListBoxTest extends AbstractListBox<Long> {
-
-  private static Locale ORIGINAL_LOCALE;
-
-  @BeforeClass
-  public static void setupBeforeClass() {
-    ORIGINAL_LOCALE = LocaleThreadLocal.get();
-    LocaleThreadLocal.set(new Locale("de", "CH"));
-  }
-
-  @AfterClass
-  public static void tearDownAfterClass() {
-    LocaleThreadLocal.set(ORIGINAL_LOCALE);
-  }
 
   @Override
   protected void execFilterLookupResult(ILookupCall<Long> call, List<ILookupRow<Long>> result) throws ProcessingException {
@@ -52,6 +38,14 @@ public class AbstractListBoxTest extends AbstractListBox<Long> {
   @Test
   public void testNoNullKeys() throws Exception {
     List<? extends ILookupRow<Long>> rows = execLoadTableData();
-    Assert.assertEquals(3, rows.size());
+    assertEquals(3, rows.size());
+  }
+
+  @Test
+  public void testGetForm() {
+    IForm formMock = mock(IForm.class);
+    setFormInternal(formMock);
+    assertEquals(formMock, getForm());
+    assertEquals(formMock, getListBoxFilterBox().getForm());
   }
 }
