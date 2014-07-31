@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.html.json.table.control;
 
 import org.eclipse.scout.rt.client.ui.basic.table.control.IAnalysisTableControl;
+import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.json.JSONObject;
 
@@ -21,11 +22,17 @@ public class JsonAnalysisTableControl extends JsonTableControl<IAnalysisTableCon
   }
 
   @Override
+  protected void attachModel() {
+    super.attachModel();
+    attachAdapter(getModel().getDataModel());
+  }
+
+  @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
     if (getModel().isSelected()) {
       putProperty(json, "rootEntityRef", "e140"); //FIXME CGU
-      putProperty(json, IAnalysisTableControl.PROP_DATA_MODEL, getOrCreateJsonAdapter(getModel().getDataModel()));
+      putProperty(json, IAnalysisTableControl.PROP_DATA_MODEL, getAdapterIdForModel(getModel().getDataModel()));
       m_contentLoaded = true;
     }
     return json;
@@ -38,14 +45,19 @@ public class JsonAnalysisTableControl extends JsonTableControl<IAnalysisTableCon
 
   @Override
   protected void handleUiLoadContent() {
-    getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), "rootEntityRef", "e140"); //FIXME CGU
-    getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), IAnalysisTableControl.PROP_DATA_MODEL, getOrCreateJsonAdapter(getModel().getDataModel()));
+    addPropertyChangeEvent("rootEntityRef", "e140"); // FIXME CGU
+    addPropertyDataModelChangeEvent();
+  }
+
+  private void addPropertyDataModelChangeEvent() {
+    IJsonAdapter<?> dataModelAdapter = attachAdapter(getModel().getDataModel());
+    addPropertyChangeEvent(IAnalysisTableControl.PROP_DATA_MODEL, dataModelAdapter.getId());
   }
 
   @Override
   protected void handleModelPropertyChange(String propertyName, Object newValue) {
     if (IAnalysisTableControl.PROP_DATA_MODEL.equals(propertyName) && m_contentLoaded) {
-      getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), IAnalysisTableControl.PROP_DATA_MODEL, getOrCreateJsonAdapter(getModel().getDataModel()));
+      addPropertyDataModelChangeEvent();
     }
     else {
       super.handleModelPropertyChange(propertyName, newValue);

@@ -41,11 +41,6 @@ public interface IJsonSession {
    */
   IJsonAdapter<?> getOrCreateJsonAdapter(Object model);
 
-  /**
-   * Creates a new IJsonAdapter instance for the given model.
-   */
-  IJsonAdapter<?> createJsonAdapter(Object model);
-
   void registerJsonAdapter(IJsonAdapter<?> adapter);
 
   void unregisterJsonAdapter(String id);

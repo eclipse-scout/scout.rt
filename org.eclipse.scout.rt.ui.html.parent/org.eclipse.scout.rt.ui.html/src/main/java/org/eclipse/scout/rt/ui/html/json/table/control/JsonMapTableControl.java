@@ -64,7 +64,7 @@ public class JsonMapTableControl extends JsonTableControl<IMapTableControl> {
 
   @Override
   protected void handleUiLoadContent() {
-    getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), "map", JsonObjectUtility.newJSONObject(MAP));
+    addPropertyChangeEvent("map", JsonObjectUtility.newJSONObject(MAP));
   }
 
 }

@@ -78,10 +78,14 @@ public class JsonMenu extends AbstractJsonPropertyObserver<IMenu> {
   }
 
   @Override
+  protected void attachModel() {
+    super.attachModel();
+    attachAdapters(getModel().getChildActions());
+  }
+
+  @Override
   public JSONObject toJson() {
-    JSONObject json = super.toJson();
-    putProperty(json, PROP_CHILD_MENUS, getOrCreateJsonAdapters(getModel().getChildActions()));
-    return json;
+    return putAdapterIdsProperty(super.toJson(), PROP_CHILD_MENUS, getModel().getChildActions());
   }
 
   @Override

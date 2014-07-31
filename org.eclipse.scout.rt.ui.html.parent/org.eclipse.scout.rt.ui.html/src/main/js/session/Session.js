@@ -16,6 +16,7 @@ scout.Session = function($entryPoint, jsonSessionId, userAgent) {
   this.desktop;
   this.userAgent = userAgent;
   this.url = 'json';
+  this._adapterDataCache = {};
   if (!userAgent) {
     this.userAgent = new scout.UserAgent(scout.UserAgent.DEVICE_TYPE_DESKTOP);
   }
@@ -61,16 +62,50 @@ scout.Session.prototype.registerModelAdapter = function(modelAdapter) {
   this.modelAdapterRegistry[modelAdapter.id] = modelAdapter;
 };
 
-scout.Session.prototype.getModelAdapter = function(model) {
-  if (!model) {
-    return;
-  }
-
-  return this.getModelAdapterForId(model.id);
+scout.Session.prototype.getModelAdapter = function(id) {
+  return this.modelAdapterRegistry[id];
 };
 
-scout.Session.prototype.getModelAdapterForId = function(id) {
-  return this.modelAdapterRegistry[id];
+scout.Session.prototype.getOrCreateModelAdapter = function(id, parent) {
+  if (!id) {
+    return;
+  }
+  if (typeof id != 'string') {
+    throw 'typeof id must be string';
+  }
+  if (!parent) {
+    throw 'parent needs to be set';
+  }
+  
+  var adapter = this.modelAdapterRegistry[id];
+  if (adapter) {
+    return adapter;
+  }
+
+  var adapterData = this._getAdapterData(id);
+  if (!adapterData) {
+    throw 'no adapterData found for id=' + id;
+  }
+  adapter = this.objectFactory.create(adapterData);
+
+  adapter.parent = parent;
+  if (scout.ModelAdapter.prototype.isPrototypeOf(parent)) {
+    parent.addChild(adapter);
+  }
+
+  return adapter;
+};
+
+
+scout.Session.prototype.getOrCreateModelAdapters = function(ids, parent) {
+  if (!ids) {
+    return [];
+  }
+  var adapters = [];
+  for (var i = 0; i < ids.length; i++) {
+    adapters[i] = this.getOrCreateModelAdapter(ids[i], parent);
+  }
+  return adapters;
 };
 
 /**
@@ -151,11 +186,16 @@ scout.Session.prototype._processSuccessResponse = function(message) {
   this._queuedRequest = null;
   this._requestsPendingCounter--;
 
+  this._copyAdapterData(message.adapterData);
   this.processingEvents = true;
   try {
     this._processEvents(message.events);
   } finally {
     this.processingEvents = false;
+    var cacheSize = scout.countProperties(this._adapterDataCache);
+    if (cacheSize > 0) {
+      $.log('size of _adapterDataCache after response has been processed: ' + cacheSize);
+    }
   }
 
   if (this._deferred) {
@@ -168,6 +208,17 @@ scout.Session.prototype._processSuccessResponse = function(message) {
       this._deferred = null;
       this._deferredEventTypes = null;
     }
+  }
+};
+
+scout.Session.prototype._copyAdapterData = function(adapterData) {
+  var count = 0;
+  for (var prop in adapterData) {
+    this._adapterDataCache[prop] = adapterData[prop];
+    count++;
+  }
+  if (count > 0) {
+    $.log('Stored ' + count +  ' properties in adapterDataCache');
   }
 };
 
@@ -254,17 +305,22 @@ scout.Session.prototype.areRequestsPending = function() {
 };
 
 scout.Session.prototype._processEvents = function(events) {
-  // TODO AWE: convert plain JS event object in Event class
   var session = this;
+  // TODO AWE: convert plain JS event object in Event class
   for (var i = 0; i < events.length; i++) {
     var event = events[i];
-
-    var adapter = this.getModelAdapter(event);
-    if (!adapter) {
-      throw new Error('No adapter found for id ' + event.id);
+	
+    // TODO AWE: (json) hack - solve on server side (filter)
+    if (session._adapterDataCache[event.id]) {
+      $.log("Skip event '" + event.type + "' for adapter with ID " + event.id + ". Adapter will be created later");
+      continue;
     }
 
-    this._ensureAdaptersCreated(event, adapter);
+    $.log("Processing event '" + event.type + "' for adapter with ID " + event.id);
+    var adapter = session.modelAdapterRegistry[event.id];
+    if (!adapter) {
+      throw 'No adapter registered for ID ' + event.id;
+    }
 
     if (event.type === 'property') { // Special handling for 'property' type
       adapter.onModelPropertyChange(event);
@@ -272,75 +328,6 @@ scout.Session.prototype._processEvents = function(events) {
       adapter.onModelAction(event);
     }
   }
-};
-
-scout.Session.prototype._ensureAdaptersCreated = function(object, parent) {
-  var i, adapter, adapters;
-  var time = new Date().getTime();
-
-  if (parent === this) {
-    //Session is not a ModelAdapter and therefore does not have addChild -> Currently it is not necessary to link with session
-    parent = null;
-  }
-
-  adapters = this._ensureAdaptersCreatedRec(object, parent);
-
-  for (i=0; i<adapters.length;i++) {
-    adapter = adapters[i];
-    if (!adapter.initialized) {
-      adapter.init(adapter.model, this);
-    }
-  }
-
-  $.log('Adapter creation time: ' + (new Date().getTime() - time) + 'ms');
-};
-
-scout.Session.prototype._ensureAdaptersCreatedRec = function(object, parent) {
-  var i, adapter, propertyName;
-  var adapters = [];
-  if (!object || typeof object !== 'object') {
-    return adapters;
-  }
-
-  //Object is an array -> check if the array elements are adapters
-  if (Array.isArray(object)) {
-    for (i = 0; i < object.length; i++) {
-      adapters = adapters.concat(this._ensureAdaptersCreatedRec(object[i], parent));
-    }
-    return adapters;
-  }
-
-  //Object is an adapter -> create it
-  if (object.objectType) {
-    if (this.getModelAdapter(object)) {
-      throw new Error('object is already registred, must not happen. Id: ' + object.id);
-    }
-    adapter = this.objectFactory.create(object);
-    adapter.id = object.id;
-    //FIXME registering here but unregister at destroy, little strange. Maybe register and write properties in constructor, but link to other adapters later
-    this.registerModelAdapter(adapter);
-
-    adapter.model = object;
-    //FIXME What if the same model adapter is used by two different $parents? The link is wrong for the second $parent (e.g. TableField/Table).
-    //Main question should be: Do we want to link the models or the gui objects? maybe we need two lists. Maybe the server has to set the server so that destroy works correctly
-    if (parent) {
-      adapter.parent = parent;
-      parent.addChild(adapter);
-    }
-
-    adapters.push(adapter);
-    parent = adapter;
-  }
-
-  //check properties of the object for more adapters
-  //Only check properties if containsNewAdapters is set to true -> improves performance a little.
-  if (object.containsNewAdapters) {
-    delete object.containsNewAdapters;
-    for (propertyName in object) {
-      adapters = adapters.concat(this._ensureAdaptersCreatedRec(object[propertyName], parent));
-    }
-  }
-  return adapters;
 };
 
 scout.Session.prototype.init = function() {
@@ -369,10 +356,25 @@ scout.Session.prototype.onModelAction = function(event) {
     this.locale = new scout.Locale(event);
     // FIXME inform components to reformat display text?
   } else if (event.type === 'initialized') {
-    this.locale = new scout.Locale(event.clientSession.locale);
-    this.desktop = this.getModelAdapter(event.clientSession.desktop);
+    // cannot use getOrCreateModelAdapter here since Session doesn't have a parent
+    var sessionData = this._getAdapterData(event.clientSession);
+    this.locale = new scout.Locale(sessionData.locale);
+    var desktopData = this._getAdapterData(sessionData.desktop);
+    this.desktop = this.objectFactory.create(desktopData);
     this.desktop.render(this.$entryPoint);
   }
+};
+
+/**
+ * Returns the adapter-data sent with the JSON response from the adapter-data cache. Note that this operation
+ * removes the requested element from the cache, thus you cannot request the same ID twice. Typically once
+ * you've requested an element from this cache an adapter for that ID is created and stored in the adapter
+ * registry which too exists on this session object.
+ */
+scout.Session.prototype._getAdapterData = function(id) {
+  var adapterData = this._adapterDataCache[id];
+  delete this._adapterDataCache[id];
+  return adapterData;
 };
 
 scout.Session.prototype.registerChildWindow = function(childWindow) {

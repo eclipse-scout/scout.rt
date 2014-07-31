@@ -32,6 +32,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTreeForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
+import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonException;
@@ -65,25 +66,26 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
   }
 
   @Override
-  public void startup() {
-    super.startup();
-
-  }
-
-  @Override
   protected void attachModel() {
     super.attachModel();
-
     if (m_desktopListener == null) {
       m_desktopListener = new P_DesktopListener();
       getModel().addDesktopListener(m_desktopListener);
     }
+
+    // attach child adapters
+    attachAdapters(getForms());
+    attachAdapters(getModel().getToolButtons());
+    if (!isFormBased()) {
+      attachAdapters(getModel().getViewButtons());
+      optAttachAdapter(getModel().getOutline());
+    }
+    optAttachAdapter(getBreadcrumbNavigation());
   }
 
   @Override
   protected void detachModel() {
     super.detachModel();
-
     if (m_desktopListener != null) {
       getModel().removeDesktopListener(m_desktopListener);
       m_desktopListener = null;
@@ -93,18 +95,18 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
   @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
-
-    List<IForm> modelForms = getForms();
-    putProperty(json, "forms", getOrCreateJsonAdapters(modelForms));
-    putProperty(json, "toolButtons", getOrCreateJsonAdapters(getModel().getToolButtons()));
-
-    boolean formBased = isFormBased();
-    if (!formBased) {
-      //FIXME view and tool buttons should be removed from desktop by device transformer
-      putProperty(json, "viewButtons", getOrCreateJsonAdapters(getModel().getViewButtons()));
-      putProperty(json, "outline", getOrCreateJsonAdapter(getModel().getOutline()));
+    putAdapterIdsProperty(json, "forms", getForms());
+    putAdapterIdsProperty(json, "toolButtons", getModel().getToolButtons());
+    if (!isFormBased()) {
+      // FIXME view and tool buttons should be removed from desktop by device transformer
+      putAdapterIdsProperty(json, "viewButtons", getModel().getViewButtons());
+      putAdapterIdProperty(json, "outline", getModel().getOutline());
     }
+    optPutAdapterIdProperty(json, "breadCrumbNavigation", getBreadcrumbNavigation());
+    return json;
+  }
 
+  private IBreadCrumbsNavigation getBreadcrumbNavigation() {
     final IHolder<IBreadCrumbsNavigation> breadCrumbsNavigation = new Holder<>();
     ClientSyncJob job = new ClientSyncJob("AbstractJsonSession#init", getJsonSession().getClientSession()) {
       @Override
@@ -115,9 +117,6 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
         }
       }
     };
-    if (breadCrumbsNavigation.getValue() != null) {
-      putProperty(json, "breadCrumbNavigation", getOrCreateJsonAdapter(breadCrumbsNavigation.getValue()));
-    }
     job.runNow(new NullProgressMonitor());
     try {
       job.throwOnError();
@@ -125,7 +124,7 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
     catch (ProcessingException e) {
       throw new JsonException(e);
     }
-    return json;
+    return breadCrumbsNavigation.getValue();
   }
 
   protected boolean isFormBased() {
@@ -186,43 +185,60 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
     if (isFormBased()) {
       return;
     }
-    getJsonSession().currentJsonResponse().addActionEvent("outlineChanged", getId(), putAdapterProperty(new JSONObject(), PROP_OUTLINE, outline));
+    addActionEvent("outlineChanged", attachToJsonId(PROP_OUTLINE, outline));
   }
 
   protected void handleModelFormAdded(IForm form) {
     if (isFormBlocked(form)) {
       return;
     }
-    getJsonSession().currentJsonResponse().addActionEvent("formAdded", getId(), putAdapterProperty(new JSONObject(), PROP_FORM, form));
+    addActionEvent("formAdded", attachToJsonId(PROP_FORM, form));
   }
 
   protected void handleModelFormRemoved(IForm form) {
-    if (getJsonSession().getJsonAdapter(form) == null) {
-//    JsonForm gets disposed on form close so we do not want the create a new JsonForm if the form is closed before getting removed from the desktop
+    IJsonAdapter<?> formAdapter = getAdapter(form);
+    if (formAdapter == null) {
+      // JsonForm gets disposed on form close so we do not want the create a new JsonForm
+      // if the form is closed before getting removed from the desktop
       return;
     }
-
-    getJsonSession().currentJsonResponse().addActionEvent("formRemoved", getId(), putAdapterProperty(new JSONObject(), PROP_FORM, form));
+    addActionEvent("formRemoved", toJsonId(PROP_FORM, formAdapter));
   }
 
   protected void handleModelFormEnsureVisible(IForm form) {
-    getJsonSession().currentJsonResponse().addActionEvent("formEnsureVisible", getId(), putAdapterProperty(new JSONObject(), PROP_FORM, form));
+    addActionEvent("formEnsureVisible", toJsonId(PROP_FORM, getAdapter(form)));
   }
 
   protected void handleModelMessageBoxAdded(final IMessageBox messageBox) {
-    //FIXME implement
-    //for the moment auto close messagebox to not block the model thread
+    // FIXME implement
+    // for the moment auto close messagebox to not block the model thread
     messageBox.getUIFacade().setResultFromUI(IMessageBox.YES_OPTION);
   }
 
   protected void handleModelDesktopClosed() {
     dispose();
-    //FIXME what to do? probably http session invalidation -> will terminate EVERY json session (if login is done for all, logout is done for all as well, gmail does the same).
-    //Important: Consider tomcat form auth problem, see scout rap logout mechanism for details
+    // FIXME what to do? probably http session invalidation -> will terminate EVERY json session (if login is done
+    // for all, logout is done for all as well, gmail does the same).
+    // Important: Consider tomcat form auth problem, see scout rap logout mechanism for details
   }
 
   @Override
   public void handleUiEvent(JsonEvent event, JsonResponse res) {
+  }
+
+  /**
+   * Creates an adapter instance, attaches the adapter and returns a JSON object with a single property where the value
+   * is the ID of the adapter.
+   */
+  private JSONObject attachToJsonId(String popertyName, Object model) {
+    return toJsonId(popertyName, attachAdapter(model));
+  }
+
+  /**
+   * Returns a JSON object with a single property where the value is the ID of the adapter.
+   */
+  private JSONObject toJsonId(String propertyName, IJsonAdapter<?> jsonAdapter) {
+    return putProperty(new JSONObject(), propertyName, jsonAdapter.getId());
   }
 
   protected class P_DesktopListener implements DesktopListener {
@@ -232,4 +248,5 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
       handleModelDesktopEvent(e);
     }
   }
+
 }

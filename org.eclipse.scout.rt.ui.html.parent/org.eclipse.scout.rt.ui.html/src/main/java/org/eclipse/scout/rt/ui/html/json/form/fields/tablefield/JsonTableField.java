@@ -15,7 +15,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
-import org.json.JSONObject;
 
 public class JsonTableField extends JsonFormField<ITableField<? extends ITable>> {
 
@@ -31,8 +30,10 @@ public class JsonTableField extends JsonFormField<ITableField<? extends ITable>>
   }
 
   @Override
-  public JSONObject toJson() {
-    return super.toJson();
+  protected void attachModel() {
+    super.attachModel();
+    // attach child adapters
+    attachAdapter(getModel().getTable());
   }
 
   @Override
@@ -45,4 +46,5 @@ public class JsonTableField extends JsonFormField<ITableField<? extends ITable>>
     disposeJsonAdapter(getModel().getTable());
     super.dispose();
   }
+
 }

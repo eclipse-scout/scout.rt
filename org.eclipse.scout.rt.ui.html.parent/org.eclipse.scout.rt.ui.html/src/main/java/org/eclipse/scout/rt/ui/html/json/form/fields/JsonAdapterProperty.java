@@ -29,7 +29,8 @@ public abstract class JsonAdapterProperty<T> extends JsonProperty<T> {
     if (value == null) {
       return null;
     }
-    return m_jsonSession.getOrCreateJsonAdapter(value);
+    // TODO AWE: (json) hier besser nur getReference aufrufen? geht das?
+    return m_jsonSession.getOrCreateJsonAdapter(value).getId();
   }
 
 }

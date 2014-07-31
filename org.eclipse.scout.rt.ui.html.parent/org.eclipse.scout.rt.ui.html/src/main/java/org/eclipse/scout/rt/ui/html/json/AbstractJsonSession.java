@@ -35,7 +35,6 @@ import org.eclipse.scout.rt.shared.ui.UiDeviceType;
 import org.eclipse.scout.rt.shared.ui.UiLayer;
 import org.eclipse.scout.rt.shared.ui.UiLayer2;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
-import org.eclipse.scout.rt.ui.html.json.JsonAdapterFactory.NullAdapter;
 import org.json.JSONObject;
 
 public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBindingListener {
@@ -74,16 +73,22 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     }
 
     IClientSession clientSession = createClientSession(userAgent, subject, request.getLocale());
-
-    // FIXME AWE/CGU: use sessionId or use createUniqueIdFor? duplicates possible?
-    // was <<jsonReq.getSessionPartId()>> before, now createUniqueIdFor is used again
     m_jsonClientSession = (JsonClientSession) getOrCreateJsonAdapter(clientSession);
     m_jsonEventProcessor = new JsonEventProcessor(m_jsonClientSession);
+    startUpClientSession(clientSession);
 
-    ClientSyncJob job = new ClientSyncJob("AbstractJsonSession#init", clientSession) {
+    JSONObject jsonEvent = new JSONObject();
+    JsonObjectUtility.putProperty(jsonEvent, "clientSession", m_jsonClientSession.getId());
+    m_currentJsonResponse.addActionEvent("initialized", m_jsonSessionId, jsonEvent);
+
+    LOG.info("JsonSession with ID " + m_jsonSessionId + " initialized");
+  }
+
+  private void startUpClientSession(IClientSession clientSession) {
+    ClientSyncJob job = new ClientSyncJob("AbstractJsonSession#startClientSession", clientSession) {
       @Override
       protected void runVoid(IProgressMonitor monitor) throws Throwable {
-        m_jsonClientSession.startup();
+        m_jsonClientSession.startUp();
       }
     };
     job.runNow(new NullProgressMonitor());
@@ -93,16 +98,9 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     catch (ProcessingException e) {
       throw new JsonException(e);
     }
-
     if (!clientSession.isActive()) {
       throw new JsonException("ClientSession is not active, there must have been a problem with loading or starting");
     }
-
-    JSONObject json = new JSONObject();
-    JsonObjectUtility.putProperty(json, "clientSession", m_jsonClientSession);
-    m_currentJsonResponse.addActionEvent("initialized", m_jsonSessionId, json);
-
-    LOG.info("JsonSession with ID " + m_jsonSessionId + " initialized");
   }
 
   protected UserAgent createUserAgent() {
@@ -202,24 +200,17 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     return "" + (++m_jsonAdapterSeq);
   }
 
-  @Override
-  public IJsonAdapter<?> getOrCreateJsonAdapter(Object model) {
-    IJsonAdapter<?> jsonAdapter = getJsonAdapter(model);
-    if (jsonAdapter != null) {
-      return jsonAdapter;
-    }
-    jsonAdapter = createJsonAdapter(model);
-    //FIXME CGU see FIXME in Adapter Factory
-    if (jsonAdapter instanceof NullAdapter) {
-      return null;
-    }
-    return jsonAdapter;
-  }
+  // TODO AWE: (json) the createJsonAdapter shouldn't be public anymore
+  // always use getOrCreate from outside, also the add to the adapter map is missing here (is it?)
 
-  @Override
+  /**
+   * Creates an adapter instance for the given model and calls the <code>attach()</code> method on the created instance.
+   */
   public IJsonAdapter<?> createJsonAdapter(Object model) {
-    String id = createUniqueIdFor(null); //FIXME cgu
-    return m_jsonAdapterFactory.createJsonAdapter(model, this, id);
+    String id = createUniqueIdFor(null); // FIXME CGU
+    IJsonAdapter<?> adapter = m_jsonAdapterFactory.createJsonAdapter(model, this, id);
+    adapter.attach();
+    return adapter;
   }
 
   @Override
@@ -321,5 +312,17 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
       LOG.info("Client session with ID " + m_clientSessionId + " terminated.");
     }
+  }
+
+  @Override
+  public IJsonAdapter<?> getOrCreateJsonAdapter(Object model) {
+    IJsonAdapter<?> jsonAdapter = getJsonAdapter(model);
+    if (jsonAdapter != null) {
+      return jsonAdapter;
+    }
+    jsonAdapter = createJsonAdapter(model);
+    // because it's a new adapter we must add it to the response
+    m_currentJsonResponse.addAdapter(jsonAdapter);
+    return jsonAdapter;
   }
 }

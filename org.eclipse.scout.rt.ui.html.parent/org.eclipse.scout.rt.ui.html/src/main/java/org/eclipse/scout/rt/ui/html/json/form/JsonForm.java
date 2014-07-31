@@ -52,11 +52,12 @@ public class JsonForm extends AbstractJsonPropertyObserver<IForm> {
   @Override
   protected void attachModel() {
     super.attachModel();
-
     if (m_modelFormListener == null) {
       m_modelFormListener = new P_ModelFormListener();
       getModel().addFormListener(m_modelFormListener);
     }
+    // attach child adapters
+    attachAdapter(getModel().getRootGroupBox());
   }
 
   @Override
@@ -68,7 +69,6 @@ public class JsonForm extends AbstractJsonPropertyObserver<IForm> {
   @Override
   protected void detachModel() {
     super.detachModel();
-
     if (m_modelFormListener != null) {
       getModel().removeFormListener(m_modelFormListener);
       m_modelFormListener = null;
@@ -88,7 +88,7 @@ public class JsonForm extends AbstractJsonPropertyObserver<IForm> {
     putProperty(json, PROP_MODAL, model.isModal());
     putProperty(json, PROP_DISPLAY_HINT, displayHintToJson(model.getDisplayHint()));
     putProperty(json, PROP_DISPLAY_VIEW_ID, model.getDisplayViewId());
-    putProperty(json, "rootGroupBox", getOrCreateJsonAdapter(model.getRootGroupBox()));
+    putProperty(json, "rootGroupBox", getAdapterIdForModel(model.getRootGroupBox()));
     // TODO AWE: return other props
     return json;
   }
@@ -123,9 +123,7 @@ public class JsonForm extends AbstractJsonPropertyObserver<IForm> {
 //      handleModelFormRemoved(form);
     }
     dispose();
-
-    JSONObject jsonEvent = new JSONObject();
-    getJsonSession().currentJsonResponse().addActionEvent("formClosed", getId(), jsonEvent);
+    addActionEvent("formClosed", new JSONObject());
   }
 
   @Override

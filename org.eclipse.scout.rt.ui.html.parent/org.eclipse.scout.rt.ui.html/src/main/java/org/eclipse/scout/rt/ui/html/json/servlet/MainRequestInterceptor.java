@@ -112,7 +112,7 @@ public class MainRequestInterceptor extends AbstractService implements IServletR
   protected JsonResponse createSessionTimeoutJsonResponse() {
     JsonResponse jsonResp = new JsonResponse();
     jsonResp.setErrorCode(JsonResponse.ERR_SESSION_TIMEOUT);
-    jsonResp.setErrorMessage("The session has expired, please reload the page."); //FIXME use TEXTS
+    jsonResp.setErrorMessage("The session has expired, please reload the page."); // FIXME use TEXTS
     return jsonResp;
   }
 

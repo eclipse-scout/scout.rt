@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.ui.html.json.testing;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -34,7 +33,6 @@ public class JsonTestUtility {
     HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
     Mockito.when(request.getLocale()).thenReturn(new Locale("de_CH"));
     Mockito.when(request.getHeader("User-Agent")).thenReturn("dummy");
-
     JSONObject jsonReqObj = new JSONObject();
     try {
       jsonReqObj.put(JsonRequest.PROP_JSON_SESSION_ID, "1.1");
@@ -43,36 +41,22 @@ public class JsonTestUtility {
       throw new JsonException(e);
     }
     JsonRequest jsonRequest = new JsonRequest(jsonReqObj);
-
     IJsonSession jsonSession = new TestEnvironmentJsonSession();
     jsonSession.init(request, jsonRequest);
-
     return jsonSession;
   }
 
   public static JsonEvent createJsonEvent(String type) throws JSONException {
-    return createJsonEvent(type, null);
-  }
-
-  public static JsonEvent createJsonEvent(String type, String id) throws JSONException {
     JSONObject jsonObject = new JSONObject();
     jsonObject.put(JsonEvent.TYPE, type);
-    jsonObject.put(JsonEvent.ID, id);
+    jsonObject.put(JsonEvent.ID, (String) null);
     return new JsonEvent(jsonObject);
   }
 
   public static List<JSONObject> extractEventsFromResponse(JsonResponse response, String eventType) throws JSONException {
-    return extractEventsFromResponse(response, eventType, true);
-  }
-
-  /**
-   * @return all events of the given type. Never null.
-   */
-  public static List<JSONObject> extractEventsFromResponse(JsonResponse response, String eventType, boolean flush) throws JSONException {
     List<JSONObject> list = new LinkedList<>();
     for (JSONObject responseEvent : response.getEventList()) {
       if (eventType.equals(responseEvent.getString(JsonEvent.TYPE))) {
-        responseEvent = JsonTestUtility.resolveJsonObject(responseEvent);
         list.add(responseEvent);
       }
     }
@@ -93,20 +77,19 @@ public class JsonTestUtility {
       catch (InterruptedException e) {
       }
     }
-
     Assert.fail("Potential memory leak, object " + ref.get() + "still exists after gc");
   }
 
-  public static JSONObject resolveJsonObject(JSONObject object) throws JSONException {
-    return JsonResponse.resolveJsonAdapter(object);
+  public static JSONObject getAdapterData(JSONObject json, String id) throws JSONException {
+    return json.getJSONObject("adapterData").getJSONObject(id);
   }
 
-  public static List<JSONObject> resolveJsonAdapters(List<JSONObject> objects) throws JSONException {
-    List<JSONObject> result = new ArrayList<>(objects.size());
-    for (JSONObject obj : objects) {
-      result.add(resolveJsonObject(obj));
-    }
-    return result;
+  public static JSONObject getEvent(JSONObject json, int index) throws JSONException {
+    return (JSONObject) json.getJSONArray("events").get(index);
+  }
+
+  public static JSONObject getPropertyChange(JSONObject json, int index) throws JSONException {
+    return getEvent(json, index).getJSONObject("properties");
   }
 
 }

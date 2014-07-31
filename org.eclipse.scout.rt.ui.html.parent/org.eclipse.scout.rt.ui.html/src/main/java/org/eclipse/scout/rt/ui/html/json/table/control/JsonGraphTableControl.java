@@ -57,7 +57,7 @@ public class JsonGraphTableControl extends JsonTableControl<IGraphTableControl> 
 
   @Override
   protected void handleUiLoadContent() {
-    getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), "graph", JsonObjectUtility.newJSONObject(GRAPH));
+    addPropertyChangeEvent("graph", JsonObjectUtility.newJSONObject(GRAPH));
   }
 
 }

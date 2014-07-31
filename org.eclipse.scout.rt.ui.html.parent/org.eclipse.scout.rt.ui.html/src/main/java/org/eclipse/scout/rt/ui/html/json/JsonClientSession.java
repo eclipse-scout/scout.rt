@@ -39,10 +39,12 @@ public class JsonClientSession extends AbstractJsonAdapter<IClientSession> {
 
   private ILocaleListener m_localeListener;
   private boolean m_localeManagedByModel;
+  private boolean m_started;
 
   public JsonClientSession(IClientSession model, IJsonSession jsonSession, String id) {
     super(model, jsonSession, id);
     m_localeManagedByModel = false;
+    m_started = false;
   }
 
   @Override
@@ -51,44 +53,40 @@ public class JsonClientSession extends AbstractJsonAdapter<IClientSession> {
     return null;
   }
 
-  @Override
-  public void startup() {
-    super.startup();
-
-    //Same as in attachModel. Necessary for locale workaround. Find better solution in scout model
+  void startUp() {
+    // same as in attachModel. Necessary for locale workaround. Find better solution in scout model
     if (m_localeListener == null) {
       m_localeListener = new P_LocaleListener();
       getModel().addLocaleListener(m_localeListener);
     }
-
     if (!getModel().isActive()) {
-      //FIXME copied from session service. Moved here to be able to attach locale listener first
+      // FIXME CGU: copied from session service. Moved here to be able to attach locale listener first
       getModel().startSession(Activator.getDefault().getBundle());
     }
-
     if (!getModel().getDesktop().isOpened()) {
       getModel().getDesktop().getUIFacade().fireDesktopOpenedFromUI();
     }
     if (!getModel().getDesktop().isGuiAvailable()) {
       getModel().getDesktop().getUIFacade().fireGuiAttached();
     }
+
+    // attach child adapters - we cannot do this in attachModel() as normal
+    // since the desktop is not yet created when attachModel runs.
+    // see AbstractJsonSession#init()
+    attachAdapter(getModel().getDesktop());
+    m_started = true;
+  }
+
+  public boolean isStarted() {
+    return m_started;
   }
 
   @Override
   public void dispose() {
     super.dispose();
-
     if (m_localeListener != null) {
       getModel().removeLocaleListener(m_localeListener);
       m_localeListener = null;
-    }
-  }
-
-  @Override
-  protected void attachModel() {
-    if (m_localeListener == null) {
-      m_localeListener = new P_LocaleListener();
-      getModel().addLocaleListener(m_localeListener);
     }
   }
 
@@ -103,7 +101,7 @@ public class JsonClientSession extends AbstractJsonAdapter<IClientSession> {
   @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
-    putProperty(json, "desktop", getOrCreateJsonAdapter(getModel().getDesktop()));
+    putAdapterIdProperty(json, "desktop", getModel().getDesktop());
     putProperty(json, "locale", localeToJson(getModel().getLocale()));
     return json;
   }
@@ -190,8 +188,9 @@ public class JsonClientSession extends AbstractJsonAdapter<IClientSession> {
       final Locale locale = event.getLocale();
       if (!CompareUtility.equals(getJsonSession().currentHttpRequest().getLocale(), locale)) {
         m_localeManagedByModel = true;
-        if (isAttached()) {//If Locale changes during session startup (execLoadSession) it is not necessary to notify the gui
-          getJsonSession().currentJsonResponse().addActionEvent("localeChanged", getId(), localeToJson(locale));
+        // If Locale changes during session startup (execLoadSession) it is not necessary to notify the GUI
+        if (isStarted()) {
+          addActionEvent("localeChanged", localeToJson(locale));
         }
       }
     }

@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json;
 
-import java.util.Collection;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -41,10 +39,6 @@ public final class JsonObjectUtility {
     catch (JSONException e) {
       throw toRuntimeException(e);
     }
-  }
-
-  public static JSONObject putAdapterProperty(JSONObject object, IJsonSession session, String propertyName, Object model) {
-    return putProperty(object, propertyName, session.getOrCreateJsonAdapter(model));
   }
 
   public static String getString(JSONObject json, String key) {
@@ -137,17 +131,4 @@ public final class JsonObjectUtility {
     }
   }
 
-  public static void disposeJsonAdapters(IJsonSession session, Collection<? extends Object> models) {
-    for (Object model : models) {
-      disposeJsonAdapter(session, model);
-    }
-  }
-
-  public static void disposeJsonAdapter(IJsonSession session, Object model) {
-    IJsonAdapter<?> jsonAdapter = session.getJsonAdapter(model);
-    //on session dispose, the adapters get disposed in random order, so the may already be disposed when calling this method
-    if (jsonAdapter != null) {
-      jsonAdapter.dispose();
-    }
-  }
 }

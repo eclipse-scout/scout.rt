@@ -12,11 +12,9 @@ package org.eclipse.scout.rt.ui.html.json;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.Map.Entry;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -25,7 +23,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class JsonResponse {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractJsonSession.class);
+
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonResponse.class);
 
   public static final int ERR_SESSION_TIMEOUT = 10;
 
@@ -34,8 +33,11 @@ public class JsonResponse {
   private final List<JSONObject> m_eventList;
   private final Map<String/*id*/, JSONObject> m_idToPropertyChangeEventMap;
 
+  private Map<String, IJsonAdapter<?>> m_adapterMap;
+
   public JsonResponse() {
     m_eventList = new ArrayList<>();
+    m_adapterMap = new HashMap<>();
     m_idToPropertyChangeEventMap = new HashMap<>();
   }
 
@@ -43,9 +45,7 @@ public class JsonResponse {
    * event must have an 'id'
    */
   public void addPropertyChangeEvent(String id, String propertyName, Object newValue) {
-    if (id == null) {
-      throw new JsonException("id is null");
-    }
+    requiresId(id);
     //If text is null it won't be transferred -> set to empty string
     //FIXME CGU check if it is necessary on client to convert '' to null. Maybe not because !value also checks for emtpy string
     if (newValue == null) {
@@ -53,7 +53,6 @@ public class JsonResponse {
     }
     //coalesce
     JSONObject event = m_idToPropertyChangeEventMap.get(id);
-
     if (event == null) {
       event = new JSONObject();
       JsonObjectUtility.putProperty(event, "id", id);
@@ -70,82 +69,84 @@ public class JsonResponse {
   }
 
   /**
-   * event must have an 'id'
+   * Adds an adapter to the response. All adapters stored on the response are transferred to the client (browser)
+   * as JSON object. Only new adapters must be transferred, adapters already transferred to the client can be
+   * solely referenced by their ID.
    */
-  public void addActionEvent(String eventType, String id, JSONObject eventData) {
+  public void addAdapter(IJsonAdapter<?> adapter) {
+    if (!m_adapterMap.containsKey(adapter.getId())) {
+      m_adapterMap.put(adapter.getId(), adapter);
+    }
+  }
+
+  private void requiresId(String id) {
     if (id == null) {
       throw new JsonException("id is null");
     }
+  }
+
+  /**
+   * event must have an 'id'
+   */
+  public void addActionEvent(String eventType, String id, JSONObject eventData) {
+    requiresId(id);
     JSONObject event = eventData != null ? eventData : new JSONObject();
     JsonObjectUtility.putProperty(event, "id", id);
     JsonObjectUtility.putProperty(event, "type", eventType);
     m_eventList.add(event);
   }
 
-  //FIXME CGU potential threading issue: toJson is called by servlet thread. Property-Change-Events may alter the eventList from client job thread
-  public JSONObject toJson() {
-    JSONObject response = new JSONObject();
-    JSONArray eventArray = new JSONArray();
-    for (JSONObject e : m_eventList) {
-      eventArray.put(resolveJsonAdapter(e));
-    }
-    JsonObjectUtility.putProperty(response, "events", eventArray);
-    JsonObjectUtility.putProperty(response, "errorCode", m_errorCode);
-    JsonObjectUtility.putProperty(response, "errorMessage", m_errorMessage);
-    return response;
-  }
+  // TODO AWE: (json) kommentar lesen, und mit todo ergänzen - haben wir alles abgedeckt?
+  // Idee von Beat: wenn ein neuer adapter in der adapterData response ist, alle property change events
+  // für diesen adapter löschen.
 
-  /**
-   * Loops through all the objects and their properties to check whether there are {@link IJsonAdapter}s. If there are,
+  /* Loops through all the objects and their properties to check whether there are {@link IJsonAdapter}s. If there are,
    * the adapters get replaced with the actual json representation of the adapter ({@link IJsonAdapter#toJson()}) resp.
    * the ID of the adapter in case the adapter is already attached (and therefore sent to client). If the found adapter
    * has not been attached yet, it gets attached. From now on the adapter listens to model change events. The attaching
    * is done at the end of the request to prevent unnecessary model change events sent to the client. Additionally it
    * prevents conflicts with the coalescing of the property change events (for details see JsonResponseTest).
    */
-  public static JSONObject resolveJsonAdapter(JSONObject object) {
-    long resolveTime = System.currentTimeMillis();
-    JSONObject resolvedObject = (JSONObject) resolveJsonAdapterInternal(object, new JSONObject());
-    LOG.debug("Time to resolve adapters: " + (System.currentTimeMillis() - resolveTime) + "ms");
 
-    return resolvedObject;
-  }
+  // FIXME CGU potential threading issue: toJson is called by servlet thread. Property-Change-Events may alter the eventList from client job thread
+  /**
+   * Returns a JSON string representation of this instance. This method is called at the end of a request.
+   * The return value of this method is returned to the client-side GUI. There are some noteworthy points:
+   * <ul>
+   * <li>All new adapters (= adapters not yet transferred to the client), are put as a list in the 'adapterData'
+   * property.</li>
+   * <li>All events are transferred in the 'events' property.</li>
+   * </ul>
+   * This method will call the <code>toJson()</code> method on all adapter objects. Note that you can NOT create new
+   * adapter instances when the toJson() method runs! All new adapter instances must be created before: either in
+   * the <code>attachModel()</code> method or in an event handler method like <code>handleXYZ()</code>. The technical
+   * reason for this is, first: new adapters are added to the current response (see AbstractJsonSession), but at the
+   * point in time toJson() is called, we already have a new instance of the current response. Second: when we loop
+   * through the adapterMap and call toJson() for each adapter, if the adapter would create another adapter in its
+   * toJson() method, the adapterMap would grow, which would cause a ConcurrentModificationException. Additionally
+   * we should conceptually separate object creation from JSON output creation.
+   */
+  public JSONObject toJson() {
+    JSONObject response = new JSONObject();
+    JSONObject adapterData = new JSONObject();
+    // If you experience a ConcurrentModificationException at this point, then most likely you've created and added a new adapter
+    // in your to toJson() method, which is conceptually wrong. You must create new adapters when the attachModel() method is
+    // called or when an action-event is processed (typically in a handleXYZ() method).
+    // To debug which adapter caused the error, add a syso for entry.getValue() in the following loop.
+    for (Entry<String, IJsonAdapter<?>> entry : m_adapterMap.entrySet()) {
+      JsonObjectUtility.putProperty(adapterData, entry.getKey(), entry.getValue().toJson());
+    }
 
-  private static Object resolveJsonAdapterInternal(Object object, JSONObject parent) {
-    if (object instanceof IJsonAdapter<?>) {
-      IJsonAdapter<?> adapter = ((IJsonAdapter) object);
-      JSONObject json = adapter.write();
-      if (!adapter.isAttached()) {
-        adapter.attach();
-        JsonObjectUtility.putProperty(parent, "containsNewAdapters", true);
-      }
-      Object obj = resolveJsonAdapterInternal(json, json);
-      return obj;
+    JSONArray eventArray = new JSONArray();
+    for (JSONObject event : m_eventList) {
+      eventArray.put(event);
     }
-    else if (object instanceof JSONObject) {
-      JSONObject jsonObject = (JSONObject) object;
-      Set<String> keys = new HashSet<String>();
-      for (Iterator it = jsonObject.keys(); it.hasNext();) {
-        keys.add((String) it.next()); // FIXME BSH Change to keySet() or sortedKeys() when we have decided which JSON library to use
-      }
-      for (String key : keys) { // order does not matter
-        Object value = jsonObject.opt(key);
-        JsonObjectUtility.putProperty(jsonObject, key, resolveJsonAdapterInternal(value, jsonObject));
-        if (jsonObject.optBoolean("containsNewAdapters")) {
-          JsonObjectUtility.putProperty(parent, "containsNewAdapters", true);
-        }
-      }
-      return object;
-    }
-    else if (object instanceof JSONArray) {
-      JSONArray arr = (JSONArray) object;
-      JSONArray arr2 = new JSONArray();
-      for (int i = 0; i < arr.length(); i++) {
-        arr2.put(resolveJsonAdapterInternal(arr.opt(i), parent));
-      }
-      return arr2;
-    }
-    return object;
+
+    JsonObjectUtility.putProperty(response, "events", eventArray);
+    JsonObjectUtility.putProperty(response, "adapterData", adapterData);
+    JsonObjectUtility.putProperty(response, "errorCode", m_errorCode);
+    JsonObjectUtility.putProperty(response, "errorMessage", m_errorMessage);
+    return response;
   }
 
   public List<JSONObject> getEventList() {

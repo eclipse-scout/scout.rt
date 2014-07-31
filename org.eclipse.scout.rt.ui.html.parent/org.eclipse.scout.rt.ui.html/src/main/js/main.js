@@ -157,3 +157,18 @@ scout.getTimestamp = function() {
     padZeroLeft(date.getSeconds(), 2) +
     padZeroLeft(date.getMilliseconds(), 3);
 };
+
+
+/**
+ * Counts and returns the properties of a given object.
+ */
+scout.countProperties = function(obj) {
+  var count = 0;
+  for (var prop in obj) {
+      if (obj.hasOwnProperty(prop)) {
+         count++;
+      }
+  }
+  return count;
+};
+

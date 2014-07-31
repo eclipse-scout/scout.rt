@@ -81,7 +81,7 @@ scout.DesktopTree.prototype._render = function($parent) {
 
 scout.DesktopTree.prototype.setNodeDetailFormChanged = function(nodeId, detailForm) {
   var node = this._nodeMap[nodeId];
-  node.detailForm = this.session.getModelAdapter(detailForm);
+  node.detailForm = this.session.getOrCreateModelAdapter(detailForm, this);
 
   if (this._selectedNodes.indexOf(node) >= 0) {
     this.showNodeDetailForm(node);
@@ -424,12 +424,15 @@ scout.DesktopTree.prototype._addNodes = function(nodes, $parent) {
       $node.prependTo(this._$desktopTreeScroll);
     }
 
-    if (node.table) {
-      node.table = this.session.getModelAdapter(node.table);
+    // TODO AWE: (json) diese beiden if's prüfen und ggf. ganz entfernen
+    if (node.table && typeof node.table == 'string') {
+    //if (node.table) {
+      node.table = this.session.getOrCreateModelAdapter(node.table, this);
     }
 
-    if (node.detailForm) {
-      node.detailForm = this.session.getModelAdapter(node.detailForm);
+    if (node.detailForm && typeof node.detailForm == 'string') {
+    //if (node.detailForm) {
+      node.detailForm = this.session.getOrCreateModelAdapter(node.detailForm, this);
     }
 
     // if model demands children, create them

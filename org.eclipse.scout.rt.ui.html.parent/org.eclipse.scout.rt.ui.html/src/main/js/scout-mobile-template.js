@@ -12,6 +12,7 @@
 //@include("util/EventSupport.js");
 //@include("util/KeystrokeManager.js");
 //@include("util/ModelAdapter.js");
+//@include("util/NullAdapter.js");
 //@include("util/ObjectFactory.js");
 //@include("util/BorderLayout.js");
 //@include("util/Device.js");

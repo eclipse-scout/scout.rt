@@ -51,8 +51,15 @@ public class JsonGroupBox extends JsonFormField<IGroupBox> {
   }
 
   @Override
+  protected void attachModel() {
+    super.attachModel();
+    // attach child adapters
+    attachAdapters(getModel().getFields());
+  }
+
+  @Override
   public JSONObject toJson() {
-    return putProperty(super.toJson(), "formFields", getOrCreateJsonAdapters(getModel().getFields()));
+    return putProperty(super.toJson(), "formFields", getAdapterIdsForModels(getModel().getFields()));
   }
 
   @Override

@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.eclipse.scout.commons.DateUtility;
 import org.eclipse.scout.commons.LocaleThreadLocal;
+import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ContextMenuEvent;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ITableContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
@@ -30,7 +31,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable5;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.TableListener;
-import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilterManager;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractDateColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IDateColumn;
@@ -150,6 +150,8 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
         return null;
       }
     });
+    /* Commented out by AWE: causes errors in JS because setter for property columnFilterManager
+     * does not exist. BSH should check how to solve this.
     putJsonProperty(new JsonProperty<ITable>(ITable.PROP_COLUMN_FILTER_MANAGER, model) {
       @Override
       protected ITableColumnFilterManager modelValue() {
@@ -162,13 +164,20 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
         return null;
       }
     });
-    //FIXME create Keystroke.js on client first
-//    putJsonProperty(new JsonAdapterProperty<ITable>(ITable.PROP_KEY_STROKES, model, getJsonSession()) {
-//      @Override
-//      protected List<IKeyStroke> modelValue() {
-//        return getModel().getKeyStrokes();
-//      }
-//    });
+    */
+    putJsonProperty(new JsonProperty<ITable>(ITable.PROP_KEY_STROKES, model) {
+      @Override
+      protected List<IKeyStroke> modelValue() {
+        return getModel().getKeyStrokes();
+      }
+
+      @Override
+      public Object prepareValueForToJson(Object value) {
+        @SuppressWarnings("unchecked")
+        List<IKeyStroke> keyStrokes = (List<IKeyStroke>) value;
+        return getAdapterIdsForModels(keyStrokes);
+      }
+    });
     putJsonProperty(new JsonProperty<ITable>(ITable.PROP_SCROLL_TO_SELECTION, model) {
       @Override
       protected Boolean modelValue() {
@@ -213,9 +222,12 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
       m_modelTableListener = new P_ModelTableListener();
       getModel().addUITableListener(m_modelTableListener);
     }
-
-    IJsonAdapter<?> jsonAdapter = getOrCreateJsonAdapter(getModel().getContextMenu());
-    jsonAdapter.attach();
+    attachAdapter(getModel().getContextMenu());
+    attachAdapters(getModel().getMenus());
+    if (getModel() instanceof ITable5) {
+      attachAdapters(((ITable5) getModel()).getControls());
+    }
+    attachAdapters(getModel().getKeyStrokes()); // TODO AWE: (json) siehe JsonProperty oben
   }
 
   @Override
@@ -247,12 +259,11 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
       jsonRows.put(jsonRow);
     }
     putProperty(json, "rows", jsonRows);
-    putProperty(json, PROP_MENUS, getOrCreateJsonAdapters(getModel().getMenus()));
+    putAdapterIdsProperty(json, PROP_MENUS, getModel().getMenus());
     if (getModel() instanceof ITable5) {
-      putProperty(json, "controls", getOrCreateJsonAdapters(((ITable5) getModel()).getControls()));
+      putAdapterIdsProperty(json, "controls", ((ITable5) getModel()).getControls());
     }
     putProperty(json, PROP_SELECTED_ROW_IDS, rowIdsToJson(getModel().getSelectedRows()));
-
     return json;
   }
 
@@ -486,7 +497,7 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
       jsonRows.put(jsonRow);
     }
     putProperty(jsonEvent, "rows", jsonRows);
-    getJsonSession().currentJsonResponse().addActionEvent("rowsInserted", getId(), jsonEvent);
+    addActionEvent("rowsInserted", jsonEvent);
   }
 
   protected void handleModelRowsDeleted(Collection<ITableRow> modelRows) {
@@ -496,21 +507,20 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
     for (ITableRow row : modelRows) {
       String rowId = m_tableRowIds.get(row);
       jsonRowIds.put(rowId);
-
       m_tableRowIds.remove(row);
       m_tableRows.remove(rowId);
     }
-    getJsonSession().currentJsonResponse().addActionEvent(EVENT_ROWS_DELETED, getId(), jsonEvent);
+    addActionEvent(EVENT_ROWS_DELETED, jsonEvent);
   }
 
   protected void handleModelAllRowsDeleted(Collection<ITableRow> modelRows) {
-    getJsonSession().currentJsonResponse().addActionEvent(EVENT_ALL_ROWS_DELETED, getId(), new JSONObject());
+    addActionEvent(EVENT_ALL_ROWS_DELETED, new JSONObject());
   }
 
   protected void handleModelRowsSelected(Collection<ITableRow> modelRows) {
     JSONObject jsonEvent = new JSONObject();
     putProperty(jsonEvent, PROP_ROW_IDS, rowIdsToJson(modelRows));
-    getJsonSession().currentJsonResponse().addActionEvent(EVENT_ROWS_SELECTED, getId(), jsonEvent);
+    addActionEvent(EVENT_ROWS_SELECTED, jsonEvent);
   }
 
   protected void handleModelRowOrderChanged(Collection<ITableRow> modelRows) {
@@ -521,12 +531,13 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
       String rowId = m_tableRowIds.get(row);
       jsonRowIds.put(rowId);
     }
-    getJsonSession().currentJsonResponse().addActionEvent("rowOrderChanged", getId(), jsonEvent);
+    addActionEvent("rowOrderChanged", jsonEvent);
   }
 
   @Override
   public void handleModelContextMenuChanged(ContextMenuEvent event) {
-    getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), PROP_MENUS, getOrCreateJsonAdapters(getModel().getMenus()));
+    Collection<IJsonAdapter<?>> menuAdapters = attachAdapters(getModel().getMenus());
+    addPropertyChangeEvent(PROP_MENUS, getAdapterIds(menuAdapters));
   }
 
   private class P_ModelTableListener implements TableListener {

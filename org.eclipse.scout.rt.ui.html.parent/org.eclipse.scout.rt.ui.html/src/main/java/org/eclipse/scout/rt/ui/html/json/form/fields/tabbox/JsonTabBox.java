@@ -36,7 +36,6 @@ public class JsonTabBox extends JsonFormField<ITabBox> {
       protected Integer modelValue() {
         return getModel().getMarkStrategy();
       }
-
     });
   }
 
@@ -46,8 +45,16 @@ public class JsonTabBox extends JsonFormField<ITabBox> {
   }
 
   @Override
+  protected void attachModel() {
+    super.attachModel();
+    // attach child adapters
+    attachAdapter(getModel().getSelectedTab()); // TODO AWE: (json) solve with JsonAdapterProperty
+    attachAdapters(getModel().getGroupBoxes());
+  }
+
+  @Override
   public JSONObject toJson() {
-    return putProperty(super.toJson(), "groupBoxes", getOrCreateJsonAdapters(getModel().getGroupBoxes()));
+    return putAdapterIdsProperty(super.toJson(), "groupBoxes", getModel().getGroupBoxes());
   }
 
 }

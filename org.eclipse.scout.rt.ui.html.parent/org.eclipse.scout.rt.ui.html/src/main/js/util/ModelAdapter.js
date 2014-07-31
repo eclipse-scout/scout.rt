@@ -3,16 +3,11 @@ scout.ModelAdapter = function() {
   this.parent;
   this.children = [];
   this._adapterProperties = [];
-  this.initialized = false;
   this.rendered = false;
   this.destroyed = false;
 };
 
 scout.ModelAdapter.prototype.init = function(model, session) {
-  if (this.initialized) {
-    throw new Error('Already initialized');
-  }
-
   this.session = session;
 
   // copy all properties from model to this adapter instance
@@ -20,7 +15,7 @@ scout.ModelAdapter.prototype.init = function(model, session) {
     this[propertyName] = value;
   }.bind(this));
 
-  this.initialized = true;
+  this.session.registerModelAdapter(this);
 };
 
 // TODO AWE: underscore bei setter-func names entfernen, oder eventuell auf _render umbenennen?
@@ -149,19 +144,13 @@ scout.ModelAdapter.prototype._eachProperty = function(model, func, ignore) {
     if (Array.isArray(value)) {
       adapters = [];
       for (j = 0; j < value.length; j++) {
-        adapter = this.session.getModelAdapter(value[j]);
-        if (!adapter.initialized) {  //Initialize the child adapters to make them available at initialization time of the adapter (adapter.init()). Example: AnalysisTableControl.js
-          adapter.init(adapter.model, this.session); //FIXME CGU adapter.model set by session, little ugly. Maybe move model and session back to constructor...
-        }
+        adapter = this.session.getOrCreateModelAdapter(value[j], this);
         this.onChildAdapterCreated(propertyName, adapter);
         adapters.push(adapter);
       }
       value = adapters;
     } else {
-      value = this.session.getModelAdapter(value);
-      if (!value.initialized) {
-        value.init(value.model, this.session);
-      }
+      value = this.session.getOrCreateModelAdapter(value, this);
       this.onChildAdapterCreated(propertyName, value);
     }
 

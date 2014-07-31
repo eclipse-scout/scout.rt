@@ -9,7 +9,6 @@ import java.util.Map;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ContextMenuEvent;
-import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeListener;
@@ -67,9 +66,29 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserver<IOutline> impl
       m_modelTreeListener = new P_ModelTreeListener();
       getModel().addUITreeListener(m_modelTreeListener);
     }
+    attachAdapter(getModel().getContextMenu());
+    attachAdapters(getModel().getMenus());
+    if (getModel().isRootNodeVisible()) {
+      attachPage(getModel().getRootPage());
+    }
+    else {
+      for (IPage childPage : getModel().getRootPage().getChildPages()) {
+        attachPage(childPage);
+      }
+    }
+  }
 
-    IJsonAdapter<?> jsonAdapter = getOrCreateJsonAdapter(getModel().getContextMenu());
-    jsonAdapter.attach();
+  private void attachPage(IPage page) {
+    if (page.getChildNodeCount() > 0) {
+      for (IPage childPage : page.getChildPages()) {
+        attachPage(childPage);
+      }
+    }
+    optAttachAdapter(page.getDetailForm());
+    if (page instanceof IPageWithTable) {
+      IPageWithTable<?> pageWithTable = (IPageWithTable<?>) page;
+      attachAdapter(pageWithTable.getTable());
+    }
   }
 
   @Override
@@ -107,9 +126,7 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserver<IOutline> impl
     }
     putProperty(json, PROP_NODES, jsonPages);
     putProperty(json, PROP_SELECTED_NODE_IDS, nodeIdsToJson(getModel().getSelectedNodes()));
-
-    putProperty(json, PROP_MENUS, getOrCreateJsonAdapters(getModel().getMenus()));
-
+    putAdapterIdsProperty(json, PROP_MENUS, getModel().getMenus());
     return json;
   }
 
@@ -147,33 +164,33 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserver<IOutline> impl
     JSONObject jsonEvent = new JSONObject();
     putProperty(jsonEvent, PROP_NODE_ID, m_treeNodeIds.get(modelNode));
     putProperty(jsonEvent, "expanded", modelNode.isExpanded());
-    getJsonSession().currentJsonResponse().addActionEvent("nodeExpanded", getId(), jsonEvent);
+    addActionEvent("nodeExpanded", jsonEvent);
   }
 
   protected void handleModelNodesInserted(TreeEvent event) {
     JSONObject jsonEvent = new JSONObject();
     JSONArray jsonPages = new JSONArray();
     for (ITreeNode node : event.getNodes()) {
-      JSONObject jsonPage = pageToJson((IPage) node);
-      jsonPages.put(jsonPage);
+      IPage page = (IPage) node;
+      attachPage(page);
+      jsonPages.put(pageToJson(page));
     }
     putProperty(jsonEvent, "nodes", jsonPages);
-    putProperty(jsonEvent, PROP_COMMON_PARENT_NODE_ID, m_treeNodeIds.get(event.getCommonParentNode()));
-    getJsonSession().currentJsonResponse().addActionEvent("nodesInserted", getId(), jsonEvent);
+    putProperty(jsonEvent, PROP_COMMON_PARENT_NODE_ID, getOrCreateNodeId(event.getCommonParentNode()));
+    addActionEvent("nodesInserted", jsonEvent);
   }
 
   protected void handleModelNodesDeleted(TreeEvent event) {
     Collection<ITreeNode> nodes = event.getNodes();
-
     JSONObject jsonEvent = new JSONObject();
     putProperty(jsonEvent, PROP_COMMON_PARENT_NODE_ID, m_treeNodeIds.get(event.getCommonParentNode()));
 
     if (event.getCommonParentNode().getChildNodes().size() == 0) {
-      getJsonSession().currentJsonResponse().addActionEvent(EVENT_ALL_NODES_DELETED, getId(), jsonEvent);
+      addActionEvent(EVENT_ALL_NODES_DELETED, jsonEvent);
     }
     else {
       putProperty(jsonEvent, PROP_NODE_IDS, nodeIdsToJson(event.getNodes()));
-      getJsonSession().currentJsonResponse().addActionEvent(EVENT_NODES_DELETED, getId(), jsonEvent);
+      addActionEvent(EVENT_NODES_DELETED, jsonEvent);
     }
 
     for (ITreeNode node : nodes) {
@@ -190,21 +207,29 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserver<IOutline> impl
         }
       }
     }
-
   }
 
   protected void handleModelNodesSelected(Collection<ITreeNode> modelNodes) {
     JSONObject jsonEvent = new JSONObject();
     putProperty(jsonEvent, PROP_NODE_IDS, nodeIdsToJson(modelNodes));
-    getJsonSession().currentJsonResponse().addActionEvent(EVENT_NODES_SELECTED, getId(), jsonEvent);
+    addActionEvent(EVENT_NODES_SELECTED, jsonEvent);
   }
 
   protected void handleModelDetailFormChanged(IForm detailForm) {
     JSONObject jsonEvent = new JSONObject();
     ITreeNode selectedNode = getModel().getSelectedNode();
-    putProperty(jsonEvent, PROP_NODE_ID, m_treeNodeIds.get(selectedNode));
-    putProperty(jsonEvent, "detailForm", getOrCreateJsonAdapter(detailForm));
-    getJsonSession().currentJsonResponse().addActionEvent("detailFormChanged", getId(), jsonEvent);
+    putProperty(jsonEvent, PROP_NODE_ID, getOrCreateNodeId(selectedNode));
+    // TODO AWE: (json) überprüfen, ob das hier stimmt. Jetzt ist der zeitliche ablauf wohl etwas anders
+    // als früher, würde man m_treeNodeIds.get(selectedNode) aufrufen, käme hier "null" zurück.
+    // Evtl. muss das in den anderen handleXYZ() methoden auch so gelöst werden?
+    if (detailForm == null) {
+      putProperty(jsonEvent, "detailForm", null);
+    }
+    else {
+      IJsonAdapter<?> detailFormAdapter = attachAdapter(detailForm);
+      putProperty(jsonEvent, "detailForm", detailFormAdapter.getId());
+    }
+    addActionEvent("detailFormChanged", jsonEvent);
   }
 
   protected JSONArray nodeIdsToJson(Collection<ITreeNode> modelNodes) {
@@ -223,10 +248,11 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserver<IOutline> impl
 
   @Override
   public void handleModelContextMenuChanged(ContextMenuEvent event) {
-    getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), PROP_MENUS, getOrCreateJsonAdapters(getModel().getMenus()));
+    List<IJsonAdapter<?>> menuAdapters = attachAdapters(getModel().getMenus());
+    addPropertyChangeEvent(PROP_MENUS, getAdapterIds(menuAdapters));
   }
 
-  protected String getOrCreatedNodeId(ITreeNode node) {
+  protected String getOrCreateNodeId(ITreeNode node) {
     String id = m_treeNodeIds.get(node);
     if (id == null) {
       id = getJsonSession().createUniqueIdFor(null);
@@ -237,7 +263,7 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserver<IOutline> impl
   }
 
   protected JSONObject pageToJson(IPage page) {
-    String id = getOrCreatedNodeId(page);
+    String id = getOrCreateNodeId(page);
     JSONObject json = new JSONObject();
     putProperty(json, "id", id);
     putProperty(json, "text", page.getCell().getText());
@@ -250,14 +276,13 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserver<IOutline> impl
       }
     }
     putProperty(json, "childNodes", jsonChildPages);
-    putProperty(json, "detailForm", getOrCreateJsonAdapter(page.getDetailForm()));
+    optPutAdapterIdProperty(json, "detailForm", page.getDetailForm());
 
     String pageType = "";
     if (page instanceof IPageWithTable) {
       pageType = "table";
       IPageWithTable<?> pageWithTable = (IPageWithTable<?>) page;
-      ITable table = pageWithTable.getTable();
-      putProperty(json, "table", getOrCreateJsonAdapter(table));
+      putAdapterIdProperty(json, "table", pageWithTable.getTable());
     }
     else {
       pageType = "node";
@@ -275,7 +300,6 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserver<IOutline> impl
 //        }
     }
     putProperty(json, "type", pageType);
-
     return json;
   }
 
@@ -324,7 +348,6 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserver<IOutline> impl
     final List<ITreeNode> nodes = extractTreeNodes(event.getJsonObject());
     TreeEvent treeEvent = new TreeEvent(getModel(), TreeEvent.TYPE_NODES_SELECTED, nodes);
     getTreeEventFilter().addIgnorableModelEvent(treeEvent);
-
     try {
       getModel().getUIFacade().setNodesSelectedFromUI(nodes);
     }

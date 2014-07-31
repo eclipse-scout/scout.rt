@@ -27,7 +27,9 @@ scout.ObjectFactory.prototype.create = function(model) {
     throw new Error('No factory registered for objectType ' + model.objectType);
   }
 
-  return factory.create();
+  var object = factory.create();
+  object.init(model, this.session);
+  return object;
 };
 
 /**
@@ -163,5 +165,10 @@ scout.defaultObjectFactories = [{
   objectType: 'SequenceBox',
   create: function() {
     return new scout.SequenceBox();
+  }
+}, { //FIXME CGU only needed temporarily, remove when switched to FormToolButton2
+  objectType: 'Null',
+  create: function() {
+    return new scout.NullAdapter();
   }
 }];

@@ -9,7 +9,7 @@ function mostRecentJsonRequest() {
 var m_adapterSeq = 0;
 
 function createUniqueAdapterId() {
-  return m_adapterSeq++;
+  return "" + m_adapterSeq++;
 }
 
 /**

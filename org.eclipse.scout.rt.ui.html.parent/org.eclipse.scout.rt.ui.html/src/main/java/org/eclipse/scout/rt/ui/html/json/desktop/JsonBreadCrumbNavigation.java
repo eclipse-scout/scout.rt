@@ -116,13 +116,13 @@ public class JsonBreadCrumbNavigation extends AbstractJsonAdapter<IBreadCrumbsNa
 
     @Override
     public void breadCrumbsChanged(BreadCrumbsEvent e) {
-      //FIXME CGU improve listener to notify single removals /addings and not always all crumbs
-      getJsonSession().currentJsonResponse().addActionEvent(EVENT_CHANGED, getId(), toJson());
+      // FIXME CGU improve listener to notify single removals/addings and not always all crumbs
+      addActionEvent(EVENT_CHANGED, toJson());
     }
 
   }
 
-  //FIXME verify with awereally necessary to hold a state? Not extendable
+  // FIXME verify with AWE - really necessary to hold a state? Not extendable
   private class JsonBreadCrumb implements IJsonMapper {
     private IBreadCrumb m_breadCrumb;
 

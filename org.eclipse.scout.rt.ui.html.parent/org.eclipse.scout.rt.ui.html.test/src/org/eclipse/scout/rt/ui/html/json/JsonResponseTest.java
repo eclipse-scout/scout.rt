@@ -32,7 +32,6 @@ public class JsonResponseTest {
   @Test
   public void testJsonAdapterPropertyChange() throws JSONException {
     JsonSessionMock jsonSession = new JsonSessionMock();
-
     JsonTable jsonTable = createJsonTable(jsonSession);
     ITable table = jsonTable.getModel();
 
@@ -40,22 +39,26 @@ public class JsonResponseTest {
     menu.setText("first menu");
     table.setMenus(CollectionUtility.arrayList(menu));
 
-    IJsonAdapter<?> jsonMenu = jsonSession.getJsonAdapter(menu);
-    List<JSONObject> eventList = jsonSession.currentJsonResponse().getEventList();
+    JsonResponse jsonResp = jsonSession.currentJsonResponse();
+    IJsonAdapter<?> menuAdapter = jsonSession.getJsonAdapter(menu);
+    List<JSONObject> eventList = jsonResp.getEventList();
 
-    //Property change for table
+    // Property change for table
     JSONObject event = eventList.get(0);
     assertEquals(event.get("id"), jsonTable.getId());
     assertEquals(event.get("type"), "property");
 
-    //Complete menu must be sent
-    event = JsonTestUtility.resolveJsonObject(event);
-    JSONObject props = event.getJSONObject("properties");
+    // Complete menu must be sent
+    JSONObject json = jsonResp.toJson();
+    JSONArray jsonMenus = JsonTestUtility.getPropertyChange(json, 0).getJSONArray("menus");
+    assertEquals(1, jsonMenus.length());
+    assertEquals(menuAdapter.getId(), jsonMenus.get(0));
 
-    assertEquals(1, props.getJSONArray("menus").length());
-    JSONObject menuObj = props.getJSONArray("menus").getJSONObject(0);
-    assertEquals(jsonMenu.getId(), menuObj.get("id"));
-    assertEquals(menu.getText(), menuObj.get("text"));
+    // adapter-data for menu must exist in JSON response
+    JSONObject adapterData = JsonTestUtility.getAdapterData(json, menuAdapter.getId());
+    assertEquals(menuAdapter.getId(), adapterData.getString("id"));
+    assertEquals("Menu", adapterData.getString("objectType"));
+    assertEquals(menu.getText(), adapterData.get("text"));
   }
 
   /**
@@ -74,44 +77,45 @@ public class JsonResponseTest {
     Menu menu = new Menu();
     menu.setText("first menu");
     table.setMenus(CollectionUtility.arrayList(menu));
-
     assertEquals(1, jsonSession.currentJsonResponse().getEventList().size());
 
     Menu menu2 = new Menu();
     menu2.setText("second text");
     table.setMenus(CollectionUtility.arrayList(menu, menu2));
 
-    IJsonAdapter<?> jsonMenu = jsonSession.getJsonAdapter(menu);
-    List<JSONObject> eventList = jsonSession.currentJsonResponse().getEventList();
-    eventList = JsonTestUtility.resolveJsonAdapters(eventList);
+    IJsonAdapter<?> menuAdapter = jsonSession.getJsonAdapter(menu);
+    JsonResponse jsonResp = jsonSession.currentJsonResponse();
+    List<JSONObject> eventList = jsonResp.getEventList();
 
-    //There is still only one property change event containing the complete menus
+    // There is still only one property change event containing the complete menus
     assertEquals(1, eventList.size());
     JSONObject event = eventList.get(0);
     assertEquals(event.get("id"), jsonTable.getId());
     assertEquals(event.get("type"), "property");
-    JSONObject props = event.getJSONObject("properties");
+    JSONObject json = jsonResp.toJson();
+    JSONArray jsonMenus = JsonTestUtility.getPropertyChange(json, 0).getJSONArray("menus");
 
-    assertEquals(2, props.getJSONArray("menus").length());
-    JSONObject menuObj = props.getJSONArray("menus").getJSONObject(0);
-    assertEquals(jsonMenu.getId(), menuObj.get("id"));
-    assertEquals(menu.getText(), menuObj.get("text"));
+    assertEquals(2, jsonMenus.length());
+    assertEquals(menuAdapter.getId(), jsonMenus.get(0));
 
-    jsonMenu = jsonSession.getJsonAdapter(menu2);
-    menuObj = props.getJSONArray("menus").getJSONObject(1);
-    assertEquals(jsonMenu.getId(), menuObj.get("id"));
-    assertEquals(menu2.getText(), menuObj.get("text"));
+    JSONObject adapterData = JsonTestUtility.getAdapterData(json, menuAdapter.getId());
+    assertEquals(menuAdapter.getId(), adapterData.getString("id"));
+    assertEquals(menu.getText(), adapterData.getString("text"));
+
+    // second menu
+    menuAdapter = jsonSession.getJsonAdapter(menu2);
+    assertEquals(menuAdapter.getId(), jsonMenus.get(1));
+    adapterData = JsonTestUtility.getAdapterData(json, menuAdapter.getId());
+    assertEquals(menuAdapter.getId(), adapterData.getString("id"));
+    assertEquals(menu2.getText(), adapterData.getString("text"));
   }
 
   private static JsonTable createJsonTable(IJsonSession jsonSession) {
     Table table = new Table();
     table.setEnabled(true);
-
     JsonTable jsonTable = new JsonTable(table, jsonSession, jsonSession.createUniqueIdFor(null));
     jsonTable.attach();
-
     jsonTable.toJson();
-
     return jsonTable;
   }
 

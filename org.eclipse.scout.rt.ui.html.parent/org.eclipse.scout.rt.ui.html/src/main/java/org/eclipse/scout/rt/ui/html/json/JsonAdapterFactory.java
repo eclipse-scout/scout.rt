@@ -166,7 +166,7 @@ public class JsonAdapterFactory {
 
     @Override
     public String getObjectType() {
-      return null;
+      return "Null";
     }
 
     @Override

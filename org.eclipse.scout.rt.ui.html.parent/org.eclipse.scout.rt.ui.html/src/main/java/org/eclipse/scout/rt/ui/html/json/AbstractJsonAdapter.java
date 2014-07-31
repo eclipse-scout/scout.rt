@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -34,10 +35,6 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
   }
 
   @Override
-  public void startup() {
-  }
-
-  @Override
   public final String getId() {
     return m_id;
   }
@@ -53,6 +50,9 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
 
   @Override
   public final void attach() {
+    if (m_attached) {
+      throw new IllegalStateException("Adapter already attached");
+    }
     attachModel();
     m_attached = true;
   }
@@ -93,42 +93,114 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     return JsonObjectUtility.putProperty(json, key, value);
   }
 
-  protected JSONObject putAdapterProperty(JSONObject object, String propertyName, Object model) {
-    return JsonObjectUtility.putAdapterProperty(object, getJsonSession(), propertyName, model);
-  }
-
-  protected final IJsonAdapter<?> getOrCreateJsonAdapter(Object model) {
-    if (model == null) {
-      return null;
-    }
-    return getJsonSession().getOrCreateJsonAdapter(model);
-  }
-
-  protected final JSONArray getOrCreateJsonAdapters(List<?> models) {
-    JSONArray array = new JSONArray();
+  protected void disposeJsonAdapters(Collection<? extends Object> models) {
     for (Object model : models) {
-      IJsonAdapter<?> object = getOrCreateJsonAdapter(model);
-      if (object != null) {
-        array.put(object);
-      }
+      disposeJsonAdapter(model);
+    }
+  }
+
+  protected void disposeJsonAdapter(Object model) {
+    IJsonAdapter<?> jsonAdapter = m_jsonSession.getJsonAdapter(model);
+    // on session dispose, the adapters get disposed in random order, so they may already be disposed when calling this method
+    if (jsonAdapter != null) {
+      jsonAdapter.dispose();
+    }
+  }
+
+  protected final void optAttachAdapter(Object model) {
+    if (model != null) {
+      attachAdapter(model);
+    }
+  }
+
+  protected final IJsonAdapter<?> attachAdapter(Object model) {
+    return m_jsonSession.getOrCreateJsonAdapter(model);
+  }
+
+  protected final List<IJsonAdapter<?>> attachAdapters(Collection<?> models) {
+    List<IJsonAdapter<?>> adapters = new ArrayList<>(models.size());
+    for (Object model : models) {
+      adapters.add(attachAdapter(model));
+    }
+    return adapters;
+  }
+
+  /**
+   * Returns an existing adapter for the given model. When no adapter is registered for the given model this method will
+   * return null. This method is a shortcut for <code>getJsonSession().getJsonAdapter(model)</code>.
+   */
+  protected final IJsonAdapter<?> getAdapter(Object model) {
+    return getJsonSession().getJsonAdapter(model);
+  }
+
+  protected final Collection<IJsonAdapter<?>> getAdapters(Collection<?> models) {
+    List<IJsonAdapter<?>> adapters = new ArrayList<>(models.size());
+    for (Object model : models) {
+      adapters.add(getAdapter(model));
+    }
+    return adapters;
+  }
+
+  /**
+   * Returns the ID of the JSON adapter for the given model.
+   * This method requires that the adapter has already been created before.
+   * The method will never create a new adapter instance.
+   */
+  protected final String getAdapterIdForModel(Object model) {
+    IJsonAdapter<?> adapter = getAdapter(model);
+    if (adapter == null) {
+      throw new IllegalArgumentException("No adapter registered for model=" + model);
+    }
+    // can assert already isAttached() here?
+    return adapter.getId();
+  }
+
+  /**
+   * Returns a list of IDs of the JSON adapters for the given models.
+   * This method requires that the adapter has already been created before.
+   * The method will never create a new adapter instance.
+   */
+  protected final JSONArray getAdapterIdsForModels(Collection<?> models) {
+    return getAdapterIds(getAdapters(models));
+  }
+
+  /**
+   * Returns a list of IDs of the JSON adapters for the given adapters.
+   */
+  protected final JSONArray getAdapterIds(Collection<IJsonAdapter<?>> adapters) {
+    JSONArray array = new JSONArray();
+    for (IJsonAdapter<?> adapter : adapters) {
+      array.put(adapter.getId());
     }
     return array;
   }
 
-  protected void disposeJsonAdapters(Collection<? extends Object> models) {
-    JsonObjectUtility.disposeJsonAdapters(getJsonSession(), models);
+  protected final JSONObject putAdapterIdProperty(JSONObject json, String key, Object model) {
+    return JsonObjectUtility.putProperty(json, key, getAdapterIdForModel(model));
   }
 
-  protected void disposeJsonAdapter(Object model) {
-    JsonObjectUtility.disposeJsonAdapter(getJsonSession(), model);
-  }
-
-  @Override
-  public JSONObject write() {
-    if (isAttached()) {
-      return putProperty(new JSONObject(), "id", getId());
+  protected final JSONObject optPutAdapterIdProperty(JSONObject json, String key, Object model) {
+    if (model == null) {
+      return json;
     }
-
-    return toJson();
+    else {
+      return JsonObjectUtility.putProperty(json, key, getAdapterIdForModel(model));
+    }
   }
+
+  protected final JSONObject putAdapterIdsProperty(JSONObject json, String key, Collection<?> models) {
+    return JsonObjectUtility.putProperty(json, key, getAdapterIdsForModels(models));
+  }
+
+  protected final void addActionEvent(String eventName, JSONObject json) {
+    getJsonSession().currentJsonResponse().addActionEvent(eventName, getId(), json);
+  }
+
+  protected void addPropertyChangeEvent(String propertyName, Object json) {
+    if (json instanceof IJsonAdapter<?>) {
+      throw new IllegalArgumentException("Cannot pass an adapter instance to a JSON response");
+    }
+    getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), propertyName, json);
+  }
+
 }

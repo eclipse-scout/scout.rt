@@ -53,7 +53,7 @@ public class JsonCheckBoxField extends JsonValueField<IBooleanField> {
      * a VetoExeception in its execValidateValue() method.
      */
     if (uiChecked != modelChecked) {
-      getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), IValueField.PROP_VALUE, modelChecked);
+      addPropertyChangeEvent(IValueField.PROP_VALUE, modelChecked);
     }
   }
 

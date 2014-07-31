@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.html.json.table.control;
 
 import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
+import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
@@ -67,10 +68,16 @@ public class JsonTableControl<T extends ITableControl> extends AbstractJsonPrope
   }
 
   @Override
+  protected void attachModel() {
+    super.attachModel();
+    optAttachAdapter(getModel().getForm());
+  }
+
+  @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
     if (getModel().isSelected()) {
-      putProperty(json, ITableControl.PROP_FORM, getOrCreateJsonAdapter(getModel().getForm()));
+      optPutAdapterIdProperty(json, ITableControl.PROP_FORM, getModel().getForm());
       m_contentLoaded = true;
     }
     return json;
@@ -79,8 +86,7 @@ public class JsonTableControl<T extends ITableControl> extends AbstractJsonPrope
   @Override
   public void handleUiEvent(JsonEvent event, JsonResponse res) {
     if ("selected".equals(event.getType())) {
-
-      //Lazy loading content on selection. FIXME CGU Should this be controlled by the model?
+      // Lazy loading content on selection. FIXME CGU Should this be controlled by the model?
       if (!getModel().isSelected() && !m_contentLoaded) {
         handleUiLoadContent();
         m_contentLoaded = true;
@@ -90,13 +96,24 @@ public class JsonTableControl<T extends ITableControl> extends AbstractJsonPrope
   }
 
   protected void handleUiLoadContent() {
-    getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), ITableControl.PROP_FORM, getOrCreateJsonAdapter(getModel().getForm()));
+    addPropertyFormChangeEvent();
+  }
+
+  private void addPropertyFormChangeEvent() {
+    // TODO AWE: (json) hilfs-method für solche != null logik anbieten?
+    if (getModel().getForm() == null) {
+      addPropertyChangeEvent(ITableControl.PROP_FORM, null);
+    }
+    else {
+      IJsonAdapter<?> formAdapter = attachAdapter(getModel().getForm());
+      addPropertyChangeEvent(ITableControl.PROP_FORM, formAdapter.getId());
+    }
   }
 
   @Override
   protected void handleModelPropertyChange(String propertyName, Object newValue) {
     if (ITableControl.PROP_FORM.equals(propertyName) && m_contentLoaded) {
-      getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), ITableControl.PROP_FORM, getOrCreateJsonAdapter(getModel().getForm()));
+      addPropertyFormChangeEvent();
     }
     else {
       super.handleModelPropertyChange(propertyName, newValue);

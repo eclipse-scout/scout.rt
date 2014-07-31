@@ -53,7 +53,7 @@ public class JsonDesktopTreeTest {
 
     JsonDesktopTree jsonDesktopTree = createJsonDesktopTreeWithMocks(outline);
 
-    JsonEvent event = createJsonSelectedEvent(jsonDesktopTree.getOrCreatedNodeId(node));
+    JsonEvent event = createJsonSelectedEvent(jsonDesktopTree.getOrCreateNodeId(node));
     jsonDesktopTree.handleUiEvent(event, new JsonResponse());
 
     assertTrue(node.isSelectedNode());
@@ -69,7 +69,7 @@ public class JsonDesktopTreeTest {
 
     JsonDesktopTree jsonDesktopTree = createJsonDesktopTreeWithMocks(outline);
 
-    JsonEvent event = createJsonSelectedEvent(jsonDesktopTree.getOrCreatedNodeId(node));
+    JsonEvent event = createJsonSelectedEvent(jsonDesktopTree.getOrCreateNodeId(node));
     jsonDesktopTree.handleUiEvent(event, new JsonResponse());
 
     List<JSONObject> responseEvents = JsonTestUtility.extractEventsFromResponse(jsonDesktopTree.getJsonSession().currentJsonResponse(), JsonDesktopTree.EVENT_NODES_SELECTED);
@@ -95,7 +95,7 @@ public class JsonDesktopTreeTest {
     IOutline outline = new Outline(pages);
 
     JsonDesktopTree jsonDesktopTree = createJsonDesktopTreeWithMocks(outline);
-    JsonEvent event = createJsonSelectedEvent(jsonDesktopTree.getOrCreatedNodeId(secondNode));
+    JsonEvent event = createJsonSelectedEvent(jsonDesktopTree.getOrCreateNodeId(secondNode));
 
     assertFalse(firstNode.isSelectedNode());
     assertFalse(secondNode.isSelectedNode());
@@ -136,7 +136,7 @@ public class JsonDesktopTreeTest {
     JsonDesktopTree jsonDesktopTree = createJsonDesktopTreeWithMocks(outline);
     IJsonSession session = jsonDesktopTree.getJsonSession();
 
-    String node1Id = jsonDesktopTree.getOrCreatedNodeId(pages.get(1));
+    String node1Id = jsonDesktopTree.getOrCreateNodeId(pages.get(1));
     outline.removeNode(pages.get(1));
 
     List<JSONObject> responseEvents = JsonTestUtility.extractEventsFromResponse(session.currentJsonResponse(), JsonDesktopTree.EVENT_NODES_DELETED);
