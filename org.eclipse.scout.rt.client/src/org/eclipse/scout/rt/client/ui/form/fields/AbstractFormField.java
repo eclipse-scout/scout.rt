@@ -153,8 +153,8 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     return getConfiguredSearchTerm();
   }
 
-  /*
-   * Configuration
+  /**
+   * @return The text to show as the label of the current {@link IFormField}.
    */
   @ConfigProperty(ConfigProperty.TEXT)
   @Order(10)
@@ -165,7 +165,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   /**
    * One of the LABEL_POSITION_* constants or a custom constants interpreted by
    * the ui.
-   * 
+   *
    * @since 17.11.2009
    */
   @ConfigProperty(ConfigProperty.LABEL_POSITION)
@@ -261,7 +261,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    * Configures the foreground color of the label. The color is represented by the HEX value (e.g. FFFFFF).
    * <p>
    * Subclasses can override this method. Default is {@code null}.
-   * 
+   *
    * @return Foreground color HEX value of the label.
    */
   @ConfigProperty(ConfigProperty.COLOR)
@@ -274,7 +274,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    * Configures the background color of the label. The color is represented by the HEX value (e.g. FFFFFF).
    * <p>
    * Subclasses can override this method. Default is {@code null}.
-   * 
+   *
    * @return Background color HEX value of the label.
    */
   @ConfigProperty(ConfigProperty.COLOR)
@@ -287,7 +287,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    * Configures the font of the label. See {@link FontSpec#parse(String)} for the appropriate format.
    * <p>
    * Subclasses can override this method. Default is {@code null}.
-   * 
+   *
    * @return Font of the label.
    */
   @ConfigProperty(ConfigProperty.FONT)
@@ -302,7 +302,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    * {@link #getConfiguredFillHorizontal()}.
    * <p>
    * Subclasses can override this method. Default alignment is left.
-   * 
+   *
    * @return -1 for left, 0 for center and 1 for right alignment
    * @see {@link #getGridData()}, {@link #getGridDataHints()}
    */
@@ -318,7 +318,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    * {@link #getConfiguredFillVertical()}.
    * <p>
    * Subclasses can override this method. Default alignment is top.
-   * 
+   *
    * @return -1 for top, 0 for center and 1 for bottom alignment
    * @see {@link #getGridData()}, {@link #getGridDataHints()}
    */
@@ -337,7 +337,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    * of a logical grid column.
    * <p>
    * Subclasses can override this method. Default is true.
-   * 
+   *
    * @return {@code true} if this field should horizontally fill the grid cell, {@code false} otherwise
    * @see {@link #getGridData()}, {@link #getGridDataHints()}
    */
@@ -355,7 +355,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    * height of a logical grid row.
    * <p>
    * Subclasses can override this method. Default is true.
-   * 
+   *
    * @return {@code true} if this field should vertically fill the grid cell, {@code false} otherwise
    * @see {@link #getGridData()}, {@link #getGridDataHints()}
    */
@@ -375,7 +375,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    * {@link #getConfiguredGridY()}.
    * <p>
    * Subclasses can override this method. Default is -1.
-   * 
+   *
    * @return the x position in the grid.
    * @see {@link #getGridData()}, {@link #getGridDataHints()}
    */
@@ -394,7 +394,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    * {@link #getConfiguredGridY()}.
    * <p>
    * Subclasses can override this method. Default is -1.
-   * 
+   *
    * @return the y position in the grid.
    * @see {@link #getGridData()}, {@link #getGridDataHints()}
    */
@@ -426,7 +426,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    * </table>
    * <p>
    * Subclasses can override this method. Default is 1.
-   * 
+   *
    * @return the number of columns to span
    * @see #getConfiguredGridWeightX(), {@link #getGridData()}, {@link #getGridDataHints()}
    */
@@ -458,7 +458,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    * </table>
    * <p>
    * Subclasses can override this method. Default is 1.
-   * 
+   *
    * @return the number of rows to span
    * @see #getConfiguredGridWeightY(), {@link #getGridData()}, {@link #getGridDataHints()}
    */
@@ -489,7 +489,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    * </ul>
    * <p>
    * Subclasses can override this method. Default is -1.
-   * 
+   *
    * @return a value between 0 and 1, or -1
    * @see {@link #getGridData()}, {@link #getGridDataHints()}
    */
@@ -522,7 +522,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    * </ul>
    * <p>
    * Subclasses can override this method. Default is -1.
-   * 
+   *
    * @return a value between 0 and 1, or -1
    * @see {@link #getGridData()}, {@link #getGridDataHints()}
    */
@@ -539,7 +539,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    * effect if no explicit width is set.
    * <p>
    * Subclasses can override this method. Default is false.
-   * 
+   *
    * @return {@code true} if this field should be as width as preferred by the ui, {@code false} otherwise
    * @see {@link #getGridData()}, {@link #getGridDataHints()}
    */
@@ -556,7 +556,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    * effect if no explicit height is set.
    * <p>
    * Subclasses can override this method. Default is false.
-   * 
+   *
    * @return {@code true} if this field should be as height as preferred by the ui, {@code false} otherwise
    * @see {@link #getGridData()}, {@link #getGridDataHints()}
    */
@@ -571,7 +571,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    * If the value is <=0 the property will be ignored by the ui layout manager.
    * <p>
    * Subclasses can override this method. Default is 0.
-   * 
+   *
    * @return the preferred width in pixel
    * @see {@link #getGridData()}, {@link #getGridDataHints()}
    */
@@ -586,7 +586,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    * If the value is <=0 the property will be ignored by the ui layout manager.
    * <p>
    * Subclasses can override this method. Default is 0.
-   * 
+   *
    * @return the preferred height in pixel
    * @see {@link #getGridData()}, {@link #getGridDataHints()}
    */
@@ -772,7 +772,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
 
   /**
    * Searching the nearest field implementing the specified class by processing the enclosing field list bottom-up.
-   * 
+   *
    * @since 3.8.1
    */
   private <T extends IFormField> T findNearestFieldByClass(final Class<T> c) {
@@ -841,7 +841,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   /**
    * Register a {@link DataChangeListener} on the desktop for these dataTypes<br>
    * Example:
-   * 
+   *
    * <pre>
    * registerDataChangeListener(CRMEnum.Company, CRMEnum.Project, CRMEnum.Task);
    * </pre>
@@ -866,7 +866,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    * Unregister the {@link DataChangeListener} from the desktop for these
    * dataTypes<br>
    * Example:
-   * 
+   *
    * <pre>
    * unregisterDataChangeListener(CRMEnum.Company, CRMEnum.Project, CRMEnum.Task);
    * </pre>
@@ -1061,7 +1061,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
 
   /**
    * Sanity check for class ids. Scans all fields in a form to find duplicate class ids.
-   * 
+   *
    * @return <code>true</code>, if another field with the same id is found. <code>false</code> otherwise.
    */
   private boolean existsDuplicateClassId() {
@@ -1401,7 +1401,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   /**
    * Default implementation just calls {@link #execIsSaveNeeded()}<br>
    * For thread-safety-reason this method is final
-   * 
+   *
    * @throws ProcessingException
    */
   @Override
@@ -1444,7 +1444,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
 
   /**
    * Default implementation just calls {@link #execIsEmpty()}
-   * 
+   *
    * @throws ProcessingException
    */
   protected final void checkEmpty() {
@@ -1566,7 +1566,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     if (isMandatory()) {
       //nop
     }
-    */
+     */
     return true;
   }
 
