@@ -1,18 +1,17 @@
 /*******************************************************************************
- * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * Copyright (c) 2014 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.jdbc.internal.exec;
 
-import java.sql.Connection;
-import java.sql.Driver;
-import java.sql.DriverManager;
+import static org.junit.Assert.assertFalse;
+
 import java.util.Date;
 
 import org.eclipse.scout.commons.holders.IntegerHolder;
@@ -23,47 +22,55 @@ import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldData;
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
+import org.junit.Test;
 
-public class TestStatementProcessor {
+/**
+ * Unit Test for {@link StatementProcessor}
+ */
+public class StatementProcessorTest {
 
-  public static void main(String[] args) throws Exception {
-    new TestStatementProcessor().testSelectLike();
-    // new TestStatementProcessor().testFormData();
-    // new TestStatementProcessor().testLookupCall();
-    // new TestStatementProcessor().testStoredProc();
-  }
-
+  @Test
   public void testLookupCall() throws Exception {
     LookupCall call = new LookupCall() {
-
       private static final long serialVersionUID = 1L;
     };
+
     //
-    new StatementProcessor(
+    StatementProcessor sp = new StatementProcessor(
         new AbstractSqlService() {
         },
         "SELECT P.PERSON_NR,P.NAME" +
-            "FROM PERSON P " +
-            "WHERE P.PERSON_NR=:key " +
-            "AND P.NAME like '%'||:text||'%'",
-        new Object[]{call}).simulate();
+            " FROM PERSON P " +
+            " WHERE P.PERSON_NR=:key " +
+            " AND P.NAME like '%'||:text||'%'",
+        new Object[]{call});
+    sp.simulate();
+
+    String sqlPlainTextDump = sp.createSqlDump(false, true);
+    assertFalse(sqlPlainTextDump.contains("UNPARSED"));
   }
 
+  @Test
   public void testSelectLike() throws Exception {
-    new StatementProcessor(
+    StatementProcessor sp = new StatementProcessor(
         new AbstractSqlService() {
         },
         "SELECT BP_NR FROM FLM_BP WHERE BP_NO LIKE :bpNo INTO :bpNr",
-        new Object[]{new NVPair("bpNo", "12"), new NVPair("bpNr", new LongHolder())}).simulate();
+        new Object[]{new NVPair("bpNo", "12"), new NVPair("bpNr", new LongHolder())});
+    sp.simulate();
+
+    String sqlPlainTextDump = sp.createSqlDump(false, true);
+    assertFalse(sqlPlainTextDump.contains("UNPARSED"));
   }
 
+  @Test
   public void testFormData() throws Exception {
     IntegerHolder countConcurrent = new IntegerHolder();
     PersonFormData formData = new PersonFormData();
     formData.getAddressTable().addRow();
     formData.getAddressTable().addRow();
     //
-    new StatementProcessor(
+    StatementProcessor sp = new StatementProcessor(
         new AbstractSqlService() {
         },
         "SELECT COUNT(*) " +
@@ -72,27 +79,11 @@ public class TestStatementProcessor {
             "AND :name like '%Me%' " +
             "AND :{addressTable.street} like '%Park%' " +
             "INTO :countConcurrent ",
-        new Object[]{formData, new NVPair("countConcurrent", countConcurrent)}).simulate();
-  }
+        new Object[]{formData, new NVPair("countConcurrent", countConcurrent)});
+    sp.simulate();
 
-  public void testStoredProc() throws Exception {
-    DriverManager.registerDriver((Driver) Class.forName("oracle.jdbc.OracleDriver").newInstance());
-    Connection conn = DriverManager.getConnection("jdbc:oracle:thin:@db_bsi4.bsiag.local:1521:BSICRM", "ORSUSER", "ORSUSER");
-    //
-    IntegerHolder used = new IntegerHolder();
-    //
-    new StatementProcessor(
-        new AbstractSqlService() {
-        },
-        "DECLARE " +
-            "   v_used  PLS_INTEGER := 2; " +
-            "BEGIN " +
-            "   :[OUT]used := v_used; " +
-            "END; ",
-        new Object[]{new NVPair("used", used)}
-    // ).simulate();
-    ).processStoredProcedure(conn, new PreparedStatementCache(10), null);
-    System.out.println("used=" + used.getValue());
+    String sqlPlainTextDump = sp.createSqlDump(false, true);
+    assertFalse(sqlPlainTextDump.contains("UNPARSED"));
   }
 
   public static class PersonFormData extends AbstractFormData {
