@@ -56,11 +56,13 @@ public class RwtTableStatus implements IRwtTableStatus {
     m_populateLabel = getUiEnvironment().getFormToolkit().createLabel(m_labelContainer, "", SWT.NONE);
     m_populateLabel.setData(RWT.CUSTOM_VARIANT, m_statusVariant);
     m_populateLabel.setVisible(false);
+    m_populateLabel.setAlignment(getLabelHorizontalAlignment());
 
     //Label 2
     m_selectionLabel = getUiEnvironment().getFormToolkit().createLabel(m_labelContainer, "", SWT.NONE);
     m_selectionLabel.setData(RWT.CUSTOM_VARIANT, m_statusVariant);
     m_selectionLabel.setVisible(false);
+    m_selectionLabel.setAlignment(getLabelHorizontalAlignment());
 
     //Layout
     LogicalGridData tableGridData = LogicalGridDataBuilder.createField(model.getGridData());
@@ -81,13 +83,13 @@ public class RwtTableStatus implements IRwtTableStatus {
     GridData popLabelLayoutData = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL);
     popLabelLayoutData.exclude = true;
     popLabelLayoutData.verticalAlignment = SWT.CENTER;
-    popLabelLayoutData.horizontalAlignment = getLabelHorizontalAlignment();
+    popLabelLayoutData.horizontalAlignment = SWT.FILL;
     m_populateLabel.setLayoutData(popLabelLayoutData);
 
     GridData selLabelLayoutData = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL);
     selLabelLayoutData.exclude = true;
     selLabelLayoutData.verticalAlignment = SWT.CENTER;
-    selLabelLayoutData.horizontalAlignment = getLabelHorizontalAlignment();
+    selLabelLayoutData.horizontalAlignment = SWT.FILL;
     m_selectionLabel.setLayoutData(selLabelLayoutData);
   }
 
@@ -100,6 +102,15 @@ public class RwtTableStatus implements IRwtTableStatus {
     return VARIANT_TABLE_STATUS;
   }
 
+  /**
+   * Defines the horizontal alignment of the label's content. The default is left.
+   * Possible values are
+   * <ul>
+   * <li> <code>SWT.LEFT</code> for left alignment
+   * <li> <code>SWT.CENTER</code> for centered alignment
+   * <li> <code>SWT.RIGHT</code> for right alignment
+   * </ul>
+   */
   protected int getLabelHorizontalAlignment() {
     return SWT.LEFT;
   }
