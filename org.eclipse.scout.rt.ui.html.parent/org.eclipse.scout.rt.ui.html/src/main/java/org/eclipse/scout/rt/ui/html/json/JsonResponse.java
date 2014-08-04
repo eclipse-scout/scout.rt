@@ -89,7 +89,7 @@ public class JsonResponse {
   }
 
   /**
-   * event must have an 'id'
+   * Event must have an 'id'.
    */
   public void addActionEvent(String eventType, String id, JSONObject eventData) {
     requiresId(id);
@@ -99,19 +99,8 @@ public class JsonResponse {
     m_eventList.add(event);
   }
 
-  // TODO AWE: (json) kommentar lesen, und mit todo ergänzen - haben wir alles abgedeckt?
-  // Idee von Beat: wenn ein neuer adapter in der adapterData response ist, alle property change events
-  // für diesen adapter löschen.
-
-  /* Loops through all the objects and their properties to check whether there are {@link IJsonAdapter}s. If there are,
-   * the adapters get replaced with the actual json representation of the adapter ({@link IJsonAdapter#toJson()}) resp.
-   * the ID of the adapter in case the adapter is already attached (and therefore sent to client). If the found adapter
-   * has not been attached yet, it gets attached. From now on the adapter listens to model change events. The attaching
-   * is done at the end of the request to prevent unnecessary model change events sent to the client. Additionally it
-   * prevents conflicts with the coalescing of the property change events (for details see JsonResponseTest).
-   */
-
   // FIXME CGU potential threading issue: toJson is called by servlet thread. Property-Change-Events may alter the eventList from client job thread
+
   /**
    * Returns a JSON string representation of this instance. This method is called at the end of a request.
    * The return value of this method is returned to the client-side GUI. There are some noteworthy points:
@@ -153,8 +142,6 @@ public class JsonResponse {
     JsonObjectUtility.putProperty(response, "errorMessage", m_errorMessage);
     return response;
   }
-
-  // TODO AWE: unit-test
 
   /**
    * When we send a new adapter in the JSON response we can ignore all property change events

@@ -27,12 +27,12 @@ public interface IJsonSession {
   String createUniqueIdFor(IJsonAdapter<?> adapter);
 
   /**
-   * Returns an IJsonAdapter instance for the given adapter ID.
+   * Returns an existing IJsonAdapter instance for the given adapter ID.
    */
   IJsonAdapter<?> getJsonAdapter(String id);
 
   /**
-   * Returns an IJsonAdapter instance for the given model object.
+   * Returns an existing IJsonAdapter instance for the given model object.
    */
   IJsonAdapter<?> getJsonAdapter(Object model);
 

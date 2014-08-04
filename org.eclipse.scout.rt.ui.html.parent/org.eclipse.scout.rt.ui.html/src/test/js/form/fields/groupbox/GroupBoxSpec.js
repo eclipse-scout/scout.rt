@@ -5,7 +5,8 @@ describe("GroupBox", function() {
     var session;
     var groupBox;
     var model = {
-          label: "fooBar",
+        id : '2',
+        label: "fooBar",
           gridData : {
             x : 0,
             y : 0

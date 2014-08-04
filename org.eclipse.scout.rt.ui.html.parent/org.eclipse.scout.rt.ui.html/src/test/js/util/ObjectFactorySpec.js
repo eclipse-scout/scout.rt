@@ -21,7 +21,7 @@ describe("ObjectFactory", function() {
         expect(object).toBeTruthy();
       }
 
-      modelAdapter = session.getModelAdapter(model);
+      modelAdapter = session.getModelAdapter(model.id);
       expect(modelAdapter).toBe(object);
     }
   }

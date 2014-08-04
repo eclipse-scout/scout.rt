@@ -4,7 +4,7 @@ describe("CheckBoxField", function() {
 
     var session;
     var checkBox;
-    var model = {};
+    var model = {id:'2'};
 
     beforeEach(function() {
       setFixtures(sandbox());
