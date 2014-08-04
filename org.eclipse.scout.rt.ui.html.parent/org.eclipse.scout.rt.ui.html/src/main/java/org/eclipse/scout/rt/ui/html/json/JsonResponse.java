@@ -41,6 +41,9 @@ public class JsonResponse {
     m_idToPropertyChangeEventMap = new HashMap<>();
   }
 
+  // TODO AWE/CGU: wäre es nicht schlauer, die m_eventList mit einem eigenen Java-Typ zu füllen und die coalesce Operation
+  // damit durchzuführen und erst ganz am Schluss im toJSON() den Typ in JSON zu konvertieren? Analog m_adapterMap.
+
   /**
    * event must have an 'id'
    */
@@ -139,7 +142,9 @@ public class JsonResponse {
 
     JSONArray eventArray = new JSONArray();
     for (JSONObject event : m_eventList) {
-      eventArray.put(event);
+      if (doAddEvent(event)) {
+        eventArray.put(event);
+      }
     }
 
     JsonObjectUtility.putProperty(response, "events", eventArray);
@@ -147,6 +152,23 @@ public class JsonResponse {
     JsonObjectUtility.putProperty(response, "errorCode", m_errorCode);
     JsonObjectUtility.putProperty(response, "errorMessage", m_errorMessage);
     return response;
+  }
+
+  // TODO AWE: unit-test
+
+  /**
+   * When we send a new adapter in the JSON response we can ignore all property change events
+   * for that adapter, since the adapter data already describes the latest state of the adapter.
+   */
+  private boolean doAddEvent(JSONObject event) {
+    String id = event.optString("id");
+    String type = event.optString("type");
+    if ("property".equals(type)) {
+      if (m_adapterMap.containsKey(id)) {
+        return false;
+      }
+    }
+    return true;
   }
 
   public List<JSONObject> getEventList() {

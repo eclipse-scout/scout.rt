@@ -26,12 +26,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 public class JsonResponseTest {
 
+  JsonSessionMock jsonSession = new JsonSessionMock();
+
   @Test
   public void testJsonAdapterPropertyChange() throws JSONException {
-    JsonSessionMock jsonSession = new JsonSessionMock();
     JsonTable jsonTable = createJsonTable(jsonSession);
     ITable table = jsonTable.getModel();
 
@@ -67,8 +69,6 @@ public class JsonResponseTest {
    */
   @Test
   public void testJsonAdapterPropertyChangeAgain() throws JSONException {
-    JsonSessionMock jsonSession = new JsonSessionMock();
-
     JsonTable jsonTable = createJsonTable(jsonSession);
     ITable table = jsonTable.getModel();
 
@@ -122,7 +122,6 @@ public class JsonResponseTest {
   @Test
   public void testJsonEventPropertyChangeEvent() throws JSONException {
     // Check empty response
-    JsonSessionMock jsonSession = new JsonSessionMock();
     JSONObject json = jsonSession.currentJsonResponse().toJson();
 
     assertNotNull(json);
@@ -156,13 +155,28 @@ public class JsonResponseTest {
    */
   @Test
   public void testJsonEventPropertyNullToEmptyString() throws JSONException {
-
-    JsonSessionMock jsonSession = new JsonSessionMock();
     jsonSession.currentJsonResponse().addPropertyChangeEvent("-1", "name", null);
     JSONObject json = jsonSession.currentJsonResponse().toJson();
-
     JSONArray events = json.getJSONArray("events");
     JSONObject props = events.getJSONObject(0).getJSONObject("properties");
     assertEquals(props.get("name"), "");
   }
+
+  @Test
+  public void testDoAddEvent_PropertyChange() throws Exception {
+    // when m_adapterMap does not contain the ID 'foo', property change should be added
+    JsonResponse resp = new JsonResponse();
+    resp.addPropertyChangeEvent("foo", "name", "andre");
+    JSONObject json = resp.toJson();
+    JSONObject propertyChange = JsonTestUtility.getPropertyChange(json, 0);
+    assertEquals("andre", propertyChange.getString("name"));
+
+    // when m_adapterMap contains the ID 'foo', property change must be removed
+    IJsonAdapter<?> mockAdapter = Mockito.mock(IJsonAdapter.class);
+    Mockito.when(mockAdapter.getId()).thenReturn("foo");
+    resp.addAdapter(mockAdapter);
+    json = resp.toJson();
+    assertEquals(0, json.getJSONArray("events").length());
+  }
+
 }

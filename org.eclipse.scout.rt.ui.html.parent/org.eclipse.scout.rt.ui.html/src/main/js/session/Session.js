@@ -76,7 +76,7 @@ scout.Session.prototype.getOrCreateModelAdapter = function(id, parent) {
   if (!parent) {
     throw 'parent needs to be set';
   }
-  
+
   var adapter = this.modelAdapterRegistry[id];
   if (adapter) {
     return adapter;
@@ -309,13 +309,6 @@ scout.Session.prototype._processEvents = function(events) {
   // TODO AWE: convert plain JS event object in Event class
   for (var i = 0; i < events.length; i++) {
     var event = events[i];
-	
-    // TODO AWE: (json) hack - solve on server side (filter)
-    if (session._adapterDataCache[event.id]) {
-      $.log("Skip event '" + event.type + "' for adapter with ID " + event.id + ". Adapter will be created later");
-      continue;
-    }
-
     $.log("Processing event '" + event.type + "' for adapter with ID " + event.id);
     var adapter = session.modelAdapterRegistry[event.id];
     if (!adapter) {
