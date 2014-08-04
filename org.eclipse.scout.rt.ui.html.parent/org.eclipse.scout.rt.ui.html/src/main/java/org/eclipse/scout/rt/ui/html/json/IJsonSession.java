@@ -37,7 +37,8 @@ public interface IJsonSession {
   IJsonAdapter<?> getJsonAdapter(Object model);
 
   /**
-   * Creates a new IJsonAdapter instance for the given model, or returns an existing instance.
+   * Creates a new IJsonAdapter instance for the given model or returns an existing instance.
+   * As a side-effect a newly created adapter is added to the current JSON response.
    */
   IJsonAdapter<?> getOrCreateJsonAdapter(Object model);
 

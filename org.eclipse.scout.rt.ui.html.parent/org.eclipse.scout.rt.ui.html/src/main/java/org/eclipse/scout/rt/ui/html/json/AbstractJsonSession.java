@@ -200,13 +200,10 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     return "" + (++m_jsonAdapterSeq);
   }
 
-  // TODO AWE: (json) the createJsonAdapter shouldn't be public anymore
-  // always use getOrCreate from outside, also the add to the adapter map is missing here (is it?)
-
   /**
    * Creates an adapter instance for the given model and calls the <code>attach()</code> method on the created instance.
    */
-  public IJsonAdapter<?> createJsonAdapter(Object model) {
+  protected IJsonAdapter<?> createJsonAdapter(Object model) {
     String id = createUniqueIdFor(null); // FIXME CGU
     IJsonAdapter<?> adapter = m_jsonAdapterFactory.createJsonAdapter(model, this, id);
     adapter.attach();
