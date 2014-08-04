@@ -23,6 +23,7 @@ scout.Reconnector.prototype._schedulePing = function() {
 };
 
 scout.Reconnector.prototype.ping = function() {
+  this.pingTime = new Date();
   this.session.onReconnecting();
 
   var request = {
@@ -55,6 +56,20 @@ scout.Reconnector.prototype._onSuccess = function() {
 };
 
 scout.Reconnector.prototype._onFailure = function() {
+  var minDuration = 1000;
+  var pingDuration = new Date().getTime() - this.pingTime.getTime();
+
+  if (pingDuration > minDuration) {
+    this._onFailureImpl();
+  } else {
+    //Wait at least a certain time before informing about connection failure (to prevent flickering of the reconnecting notification)
+    setTimeout(function() {
+      this._onFailureImpl();
+    }.bind(this), minDuration - pingDuration);
+  }
+};
+
+scout.Reconnector.prototype._onFailureImpl = function() {
   this.session.onReconnectingFailed();
   this._schedulePing();
 };

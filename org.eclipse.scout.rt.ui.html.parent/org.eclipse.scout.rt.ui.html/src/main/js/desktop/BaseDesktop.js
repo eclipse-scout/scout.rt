@@ -39,7 +39,7 @@ scout.BaseDesktop.prototype.goOffline = function() {
   scout.BaseDesktop.parent.prototype.goOffline.call(this);
 
   var message = 'Die Netzwerkverbindung ist unterbrochen.',
-    $reconnect;//FIXME CGU translate
+    $reconnect; //FIXME CGU translate
 
   if (this.$offline) {
     return;
@@ -84,10 +84,11 @@ scout.BaseDesktop.prototype.onReconnecting = function() {
   }
 
   this.$offline.find('.reconnect').show();
+  this._reconnectionTimestamp = new Date();
 };
 
 scout.BaseDesktop.prototype.onReconnectingSucceeded = function() {
-  var message = 'Die Verbindung wurde wieder hergestellt.';  //FIXME CGU translate
+  var message = 'Die Verbindung wurde wieder hergestellt.'; //FIXME CGU translate
   if (!this.$offline) {
     return;
   }

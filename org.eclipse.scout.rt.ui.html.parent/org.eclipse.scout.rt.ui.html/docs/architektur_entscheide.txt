@@ -48,6 +48,7 @@ Offline
     -> Die DetailForms (und SearchForms) dürfen nicht auf den Desktop gelegt werden (mittels addForm) aus dem Model, das GUI soll sich darum kümmern. siehe auch FIXME in MiniCrmOutline
   Benutzer sieht, dass zur Zeit keine Verbindung hergestellt ist. Die Seite versucht automatisch, die Verbindung wieder herzustellen.
   Die Events werden aufgeonmmen und sobald der Server wieder erreichbar ist abgeschickt.
+  Mögliche Optimierung: Unnötige Events müssten nicht geschickt werden. Beispiel: Es ist nicht nötig, jede Selektion der TableRows zu schicken, die letzte würde genügen.
 - Aktenkoffer:
   Der Benutzer kann Objekte auswählen, die Offline verfübar sein sollen.
   Werden dann alle Childpages auch geladen? Inkl. Aller Forms? ev. mittels Benutzer-Auswahl?
@@ -258,6 +259,36 @@ Styling / Farben
 
 
 Erweiterbarkeit, Dependencies und weitere js Resourcen in externen Bundles
+- Andere Bundles würden gerne etwas contributen (z.B. Office-Feld), Java, Javascript und CSS-Files inkl. Tests.
+- Contribution zur Build-Time eher unrealistisch, da es ein "Master" bräuchte, der die Abhängigkeiten kennt (z.B. Projekt-Bundle).
+  Zudem liegen die Bundles binär rum, die Sourcen sind also gar nicht im Workspace, man müsste Scout auschecken.
+- Laufzeitansatz:
+  Jedes Plugin würde Scripts contributen (Extension-Point)
+  Die Scripts werden zu einem scout.js zusammengestellt (unter Berücksichtigung der Plugin-Dependencies).
+  Die Scripts sind alle mit einer IIFE gewrapped.
+  Die einzelnen Scripts sind entweder bereits komplett oder beinhalten @includes
+  Alternative zu includes, siehe Beispiel unten. Nachteil: Man kann nicht feingranular einzelne Dateien nicht verwenden (z.B. für Mobile). Oder doch?
+  Sind die Scripts bereits minifiziert oder machen wir die Minifizierung auch zur Laufzeit?
+- Dynamisches Nachladen
+  Je nach Script möchte man es vielleicht eher erst bei Bedarf laden (z.B. Office).
+  Mögliche Lösung: Scout.js stellt eine ScriptRegistry zur Verfügung.
+  Office-Plugin kann sich das Script registrieren (mittels Javascript).
+  Beim Erzeugen der Objekte (ObjectFactory) könnte es prüfen, ob es das Object gibt if(scout.FormField). Falls nicht, in der Script-Registry nachschauen.
+  Das Script wird mittels $.getCachedScript (siehe jquery-scout) geladen.
+- CSS-Files analog
+- index.html referenzieren die erzeugten scout.js bzw. scout.css bzw. scout-mobile.js.
+- Auch andere Scripts werden registriert (Jquery)?
+- Ausführung der JS-Tests noch unklar. Varianten:
+  1. Weiter wie jetzt -> einzelne Files refernzieren.
+  2. Erzeugte Script-Files referenzieren (pro bundle). Vor der Testausführung müssten die Script-Files neu erzeugt werden (Build-Time)
+  3. Vor der Test-Ausführung Server hochfahren, welcher die Scripts bereitstellt. SpecRunnerMaven.html könnte dann die scout.js mittels localhost:xy referenzieren. Auch die jasmine-Libs müssten so nicht für jedes Plugin kopiert werden.
+- Alternativen:
+  http://blog.teamtreehouse.com/organize-your-code-with-requirejs
+  http://softwarebyjosh.com/2011/12/04/how-to-organize-large-javascript-projects.html
+  https://github.com/asual/lesscss-engine (nur CSS-Files)
+  Bundle-Grenzen-Problem können diese Tools nicht lösen. Wir müssen sowieso die Files selber zusammensammeln.
+  Eventuell könnten die Files von uns zur Laufzeit zusammengesucht und danach die Abhängigkeiten mit einem solchen Tool aufgelöst werden? Vorteile?
+
 Beispiel:
 <code>
   ScoutTextField.js
