@@ -42,7 +42,7 @@ public class JsonCheckBoxField extends JsonValueField<IBooleanField> {
     }
   }
 
-  private void handleUiClick(JsonEvent event, JsonResponse res) {
+  private void handleUiClick(JsonEvent event, JsonResponse resp) {
     // FIXME AWE: UI state der checkbox mitschicken (anstatt einfach zu toggeln).
     // TODO AWE: wenn das UI schon selektiert ist, und der server selected sagt, Event filtern da unnötig (EventFilter)
     boolean uiChecked = !getModel().isChecked();
