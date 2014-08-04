@@ -100,14 +100,12 @@ public class JsonTableControl<T extends ITableControl> extends AbstractJsonPrope
   }
 
   private void addPropertyFormChangeEvent() {
-    // TODO AWE: (json) hilfs-method für solche != null logik anbieten?
-    if (getModel().getForm() == null) {
-      addPropertyChangeEvent(ITableControl.PROP_FORM, null);
-    }
-    else {
+    String formId = null;
+    if (getModel().getForm() != null) {
       IJsonAdapter<?> formAdapter = attachAdapter(getModel().getForm());
-      addPropertyChangeEvent(ITableControl.PROP_FORM, formAdapter.getId());
+      formId = formAdapter.getId();
     }
+    addPropertyChangeEvent(ITableControl.PROP_FORM, formId);
   }
 
   @Override
