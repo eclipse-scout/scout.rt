@@ -16,98 +16,99 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Class annotation on a form or form field used in scout sdk as a marker to
+ * Class annotation on a form or form field used in Scout SDK as a marker to
  * manage the FormData.
  * <p>
- * The following properties are supported.
+ * The following properties are supported:
  * <table border="1">
  * <tr>
  * <th width="10%">Property</th>
- * <th width="10%">Property</th>
+ * <th width="10%">Type</th>
  * <th width="80%">Description</th>
  * </tr>
  * <tr>
  * <td rowspan="1" vAlign="top"><code>value</code></td>
- * <td>*.class</td>
- * <td>A form data class (e.g. <code>AbstractMyGroupboxData.class</code>).
- * <li>The form data class to generate for a <code>? extends AbstractForm</code> when {@link SdkCommand#CREATE}</li>
- * <li>The super class of the managed form data when {@link SdkCommand#USE}</li></td>
+ * <td vAlign="top">*.class</td>
+ * <td vAlign="top">A form data class (e.g. <code>AbstractMyGroupboxData.class</code>).
+ * <li>The form data class to generate for a <code>? extends AbstractForm</code> when {@link FormData.SdkCommand#CREATE}
+ * </li>
+ * <li>The super class of the managed form data when {@link FormData.SdkCommand#USE}</li></td>
  * </tr>
  * <tr>
  * <td rowspan="4" vAlign="top"><code>sdkCommand</code></td>
- * <td> {@link SdkCommand#CREATE}</td>
- * <td>Scout SDK will create an manage the form data.</td>
+ * <td vAlign="top">{@link FormData.SdkCommand#CREATE}</td>
+ * <td vAlign="top">Scout SDK will create and manage the form data.</td>
  * </tr>
  * <tr>
- * <td> {@link SdkCommand#USE}</td>
- * <td>All subclasses will use the formdata (<code>value</code>) as a supertype of its formdata.</td>
+ * <td vAlign="top">{@link FormData.SdkCommand#USE}</td>
+ * <td vAlign="top">All subclasses will use the formdata (<code>value</code>) as a supertype of its formdata.</td>
  * </tr>
  * <tr>
- * <td> {@link SdkCommand#IGNORE}</td>
+ * <td vAlign="top">{@link FormData.SdkCommand#IGNORE}</td>
  * <td>The annotated class will be ignored in the formdata.</td>
  * </tr>
  * <tr>
- * <td> {@link SdkCommand#DEFAULT}</td>
+ * <td vAlign="top">{@link FormData.SdkCommand#DEFAULT}</td>
  * <td>Not to use in the code.</td>
  * </tr>
  * <tr>
  * <td rowspan="3" vAlign="top"><code>defaultSubtypeSdkCommand</code></td>
- * <td> {@link DefaultSubtypeSdkCommand#CREATE}</td>
- * <td>All subtypes will be included in the formdata.</td>
+ * <td vAlign="top">{@link FormData.DefaultSubtypeSdkCommand#CREATE}</td>
+ * <td vAlign="top">All subtypes will be included in the formdata.</td>
  * </tr>
  * <tr>
- * <td> {@link DefaultSubtypeSdkCommand#IGNORE}</td>
- * <td>All subtypes will be ignored in the formdata.</td>
+ * <td vAlign="top">{@link FormData.DefaultSubtypeSdkCommand#IGNORE}</td>
+ * <td vAlign="top">All subtypes will be ignored in the formdata.</td>
  * </tr>
  * <tr>
- * <td> {@link DefaultSubtypeSdkCommand#DEFAULT}</td>
- * <td>Not to use in the code.</td>
+ * <td> {@link FormData.DefaultSubtypeSdkCommand#DEFAULT}</td>
+ * <td vAlign="top">Not to use in the code.</td>
  * </tr>
  * <tr>
- * <td>genericOrdinal</td>
- * <td>int >= 0</td>
- * <td>Since Scout 4.1.<br>
+ * <td vAlign="top"><code>genericOrdinal</code></td>
+ * <td vAlign="top">int &gt;= 0</td>
+ * <td vAlign="top"><i>Since Scout 4.1.</i><br>
  * If the class referenced in <code>value</code> has a type parameter and the annotation owner has type parameters as
  * well, the ordinal describes the zero-based index of the type parameter of the annotation owner that should be
  * transfered to the type parameter of the <code>value</code> class.</td>
  * </tr>
  * <tr>
- * <td>interfaces</td>
- * <td>Class[]</td>
- * <td>Since Scout 4.1.<br>
+ * <td vAlign="top"><code>interfaces</code></td>
+ * <td vAlign="top">Class[]</td>
+ * <td vAlign="top"><i>Since Scout 4.1.</i><br>
  * An array of interface classes that the formdata class referenced in <code>value</code> should implement. There is no
  * check done that the resulting formdata fulfills the interfaces provided in this array. They are just added to the
  * generated formdata class.</td>
  * </tr>
  * </table>
  * <h3>Examples</h3>
- * <h4>Ignore on form fields</h4> <blockquote>
+ * <h4>Ignore on form fields</h4>
  *
  * <pre>
- * &#64FormData(sdkCommand=SdkCommand.IGNORE)
+ * &#64FormData(sdkCommand=FormData.SdkCommand.IGNORE)
  * public class NameField extends AbstractStringField{...
  * </pre>
  *
- * </blockquote> The NameField will not be considered in the form data. The NameField is an inner type in a
- * form.</blockquote>
- * <h4>Ignore on abstract form fields</h4> <blockquote>
+ * The NameField will not be considered in the form data. The NameField is an inner type in a form.
+ * <h4>Ignore on abstract form fields</h4>
  *
  * <pre>
- * &#64FormData(defaultSubtypeSdkCommand=DefaultSubtypeSdkCommand.IGNORE)
+ * &#64FormData(defaultSubtypeSdkCommand=FormData.DefaultSubtypeSdkCommand.IGNORE)
  * public abstract class AbstractNameField extends AbstractStringField{...
  * </pre>
  *
- * </blockquote> Any subtype of AbstractFormField will be ignored in its form data. The AbstractNameField is a primary
- * type.
- * <h4>Template Groupbox</h4> <blockquote>
+ * Any subtype of AbstractFormField will be ignored in its form data. The AbstractNameField is a primary type.
+ * <h4>Template Groupbox</h4>
  *
  * <pre>
- * &#64FormData(value=AbstractTemplateGroupBoxData, defaultSubtypeSdkCommand=DefaultSubtypeSdkCommand.CREATE, sdkCommand=SdkCommand.CREATE)
+ * &#64FormData(value=AbstractTemplateGroupBoxData.class, defaultSubtypeSdkCommand=FormData.DefaultSubtypeSdkCommand.CREATE, sdkCommand=FormData.SdkCommand.CREATE)
  * public abstract class AbstractTemplateGroupBox extends AbstractGroupBox{...
  * </pre>
  *
- * </blockquote> The <code>DefaultSubtypeSdkCommand.CREATE</code> ensures the creation of a FormData class for every
- * subclass of this groupbox. The value <code>AbstractTemplateGroupBoxData</code> ensures every
+ * The <code>FormData.DefaultSubtypeSdkCommand.CREATE</code> ensures the creation of a FormData class for every subclass
+ * of this groupbox. The value <code>AbstractTemplateGroupBoxData.class</code> ensures that every generated FormData
+ * class of every subclass of this groupbox extends AbstractTemplateGroupBoxData (instead of the default
+ * AbstractGroupBox).
  * <h3>Existing Annotations</h3>
  *
  * <pre>
@@ -116,27 +117,27 @@ import java.lang.annotation.Target;
  * </pre>
  *
  * <pre>
- * &#64FormData(value = AbstractFormFieldData.class, sdkCommand = SdkCommand.USE)
+ * &#64FormData(value = AbstractFormFieldData.class, sdkCommand = FormData.SdkCommand.USE)
  * public abstract class <b>AbstractFormField</b> extends AbstractPropertyObserver implements IFormField {...
  * </pre>
  *
  * <pre>
- * &#64FormData(value = AbstractValueFieldData.class, defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.CREATE, sdkCommand = SdkCommand.USE, genericOrdinal = 0)
+ * &#64FormData(value = AbstractValueFieldData.class, defaultSubtypeSdkCommand = FormData.DefaultSubtypeSdkCommand.CREATE, sdkCommand = FormData.SdkCommand.USE, genericOrdinal = 0)
  * public abstract class <b>AbstractValueField<T></b> extends AbstractFormField implements IValueField<T> { ...
  * </pre>
  *
  * <pre>
- * &#64FormData(value = AbstractComposerData.class, sdkCommand = SdkCommand.USE, defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.CREATE)
+ * &#64FormData(value = AbstractComposerData.class, sdkCommand = FormData.SdkCommand.USE, defaultSubtypeSdkCommand = FormData.DefaultSubtypeSdkCommand.CREATE)
  * public abstract class <b>AbstractComposerField</b> extends AbstractFormField implements IComposerField { ...
  * </pre>
  *
  * <pre>
- * &#64FormData(value = AbstractUTCFieldData.class, sdkCommand = SdkCommand.USE)
+ * &#64FormData(value = AbstractUTCFieldData.class, sdkCommand = FormData.SdkCommand.USE)
  * public abstract class <b>AbstractUTCDateField</b> extends AbstractDateField implements IUTCDateField { ...
  * </pre>
  *
  * <pre>
- * &#64FormData(value = AbstractTableFieldData.class, sdkCommand = SdkCommand.USE, defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.CREATE)
+ * &#64FormData(value = AbstractTableFieldData.class, sdkCommand = FormData.SdkCommand.USE, defaultSubtypeSdkCommand = FormData.DefaultSubtypeSdkCommand.CREATE)
  * public abstract class <b>AbstractTableField<T extends ITable></b> extends AbstractFormField implements ITableField<T> { ...
  * </pre>
  */
