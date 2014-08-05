@@ -64,7 +64,7 @@ public class MainRequestInterceptor extends AbstractService implements IServletR
 
     JsonRequest jsonReq = new JsonRequest(toJSON(req));
     if (jsonReq.isPingRequest()) {
-      writeResponse(resp, createPingJsonResponse());
+      writeResponse(resp, createPingJsonResponse().toJson());
       return true;
     }
 
@@ -101,10 +101,10 @@ public class MainRequestInterceptor extends AbstractService implements IServletR
       }
     }
 
-    //GUI requests for the same session must be processed consecutively
+    // GUI requests for the same session must be processed consecutively
     synchronized (jsonSession) {
-      JsonResponse jsonResp = jsonSession.processRequest(req, jsonReq);
-      writeResponse(resp, jsonResp);
+      JSONObject json = jsonSession.processRequest(req, jsonReq);
+      writeResponse(resp, json);
     }
     return true;
   }
@@ -120,8 +120,8 @@ public class MainRequestInterceptor extends AbstractService implements IServletR
     return new JsonResponse();
   }
 
-  protected void writeResponse(HttpServletResponse resp, JsonResponse jsonResp) throws IOException {
-    String jsonText = jsonResp.toJson().toString();
+  protected void writeResponse(HttpServletResponse resp, JSONObject json) throws IOException {
+    String jsonText = json.toString();
     byte[] data = jsonText.getBytes("UTF-8");
     resp.setContentLength(data.length);
     resp.setContentType("application/json");
@@ -134,7 +134,7 @@ public class MainRequestInterceptor extends AbstractService implements IServletR
 
   protected void writeError(HttpServletResponse resp, JsonResponse jsonResp) throws IOException {
     resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-    writeResponse(resp, jsonResp);
+    writeResponse(resp, jsonResp.toJson());
   }
 
   protected JSONObject toJSON(HttpServletRequest req) {

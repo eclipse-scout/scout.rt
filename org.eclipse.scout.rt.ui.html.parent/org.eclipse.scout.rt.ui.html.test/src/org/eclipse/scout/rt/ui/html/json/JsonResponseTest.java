@@ -13,14 +13,7 @@ package org.eclipse.scout.rt.ui.html.json;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import java.util.List;
-
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.ui.html.json.fixtures.JsonSessionMock;
-import org.eclipse.scout.rt.ui.html.json.menu.fixtures.Menu;
-import org.eclipse.scout.rt.ui.html.json.table.JsonTable;
-import org.eclipse.scout.rt.ui.html.json.table.fixtures.Table;
 import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,93 +24,6 @@ import org.mockito.Mockito;
 public class JsonResponseTest {
 
   JsonSessionMock jsonSession = new JsonSessionMock();
-
-  @Test
-  public void testJsonAdapterPropertyChange() throws JSONException {
-    JsonTable jsonTable = createJsonTable(jsonSession);
-    ITable table = jsonTable.getModel();
-
-    Menu menu = new Menu();
-    menu.setText("first menu");
-    table.setMenus(CollectionUtility.arrayList(menu));
-
-    JsonResponse jsonResp = jsonSession.currentJsonResponse();
-    IJsonAdapter<?> menuAdapter = jsonSession.getJsonAdapter(menu);
-    List<JSONObject> eventList = jsonResp.getEventList();
-
-    // Property change for table
-    JSONObject event = eventList.get(0);
-    assertEquals(event.get("id"), jsonTable.getId());
-    assertEquals(event.get("type"), "property");
-
-    // Complete menu must be sent
-    JSONObject json = jsonResp.toJson();
-    JSONArray jsonMenus = JsonTestUtility.getPropertyChange(json, 0).getJSONArray("menus");
-    assertEquals(1, jsonMenus.length());
-    assertEquals(menuAdapter.getId(), jsonMenus.get(0));
-
-    // adapter-data for menu must exist in JSON response
-    JSONObject adapterData = JsonTestUtility.getAdapterData(json, menuAdapter.getId());
-    assertEquals(menuAdapter.getId(), adapterData.getString("id"));
-    assertEquals("Menu", adapterData.getString("objectType"));
-    assertEquals(menu.getText(), adapterData.get("text"));
-  }
-
-  /**
-   * Executes ITable setMenus two times. Due to the coalescing only one property change event is sent. This property
-   * change event must contain the complete menu objects, not only the id.
-   */
-  @Test
-  public void testJsonAdapterPropertyChangeAgain() throws JSONException {
-    JsonTable jsonTable = createJsonTable(jsonSession);
-    ITable table = jsonTable.getModel();
-
-    assertEquals(0, jsonSession.currentJsonResponse().getEventList().size());
-
-    Menu menu = new Menu();
-    menu.setText("first menu");
-    table.setMenus(CollectionUtility.arrayList(menu));
-    assertEquals(1, jsonSession.currentJsonResponse().getEventList().size());
-
-    Menu menu2 = new Menu();
-    menu2.setText("second text");
-    table.setMenus(CollectionUtility.arrayList(menu, menu2));
-
-    IJsonAdapter<?> menuAdapter = jsonSession.getJsonAdapter(menu);
-    JsonResponse jsonResp = jsonSession.currentJsonResponse();
-    List<JSONObject> eventList = jsonResp.getEventList();
-
-    // There is still only one property change event containing the complete menus
-    assertEquals(1, eventList.size());
-    JSONObject event = eventList.get(0);
-    assertEquals(event.get("id"), jsonTable.getId());
-    assertEquals(event.get("type"), "property");
-    JSONObject json = jsonResp.toJson();
-    JSONArray jsonMenus = JsonTestUtility.getPropertyChange(json, 0).getJSONArray("menus");
-
-    assertEquals(2, jsonMenus.length());
-    assertEquals(menuAdapter.getId(), jsonMenus.get(0));
-
-    JSONObject adapterData = JsonTestUtility.getAdapterData(json, menuAdapter.getId());
-    assertEquals(menuAdapter.getId(), adapterData.getString("id"));
-    assertEquals(menu.getText(), adapterData.getString("text"));
-
-    // second menu
-    menuAdapter = jsonSession.getJsonAdapter(menu2);
-    assertEquals(menuAdapter.getId(), jsonMenus.get(1));
-    adapterData = JsonTestUtility.getAdapterData(json, menuAdapter.getId());
-    assertEquals(menuAdapter.getId(), adapterData.getString("id"));
-    assertEquals(menu2.getText(), adapterData.getString("text"));
-  }
-
-  private static JsonTable createJsonTable(IJsonSession jsonSession) {
-    Table table = new Table();
-    table.setEnabled(true);
-    JsonTable jsonTable = new JsonTable(table, jsonSession, jsonSession.createUniqueIdFor(null));
-    jsonTable.attach();
-    jsonTable.toJson();
-    return jsonTable;
-  }
 
   @Test
   public void testJsonEventPropertyChangeEvent() throws JSONException {
@@ -178,5 +84,8 @@ public class JsonResponseTest {
     json = resp.toJson();
     assertEquals(0, json.getJSONArray("events").length());
   }
+
+  // TODO AWE: (json) test hinzufügen für offline-problem, bzw. wenn im selben request ein adapter erzeugt und gleich wieder
+  // disposed wird.
 
 }

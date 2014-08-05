@@ -425,7 +425,7 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
   protected JSONArray rowIdsToJson(Collection<ITableRow> modelRows) {
     JSONArray jsonRowIds = new JSONArray();
     for (ITableRow row : modelRows) {
-      jsonRowIds.put(m_tableRowIds.get(row));
+      jsonRowIds.put(getOrCreatedRowId(row));
     }
     return jsonRowIds;
   }

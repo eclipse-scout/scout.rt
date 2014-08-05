@@ -11,7 +11,9 @@
 package org.eclipse.scout.rt.ui.html.json;
 
 import java.security.AccessController;
+import java.util.HashSet;
 import java.util.Locale;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.security.auth.Subject;
@@ -45,8 +47,16 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   // TODO AWE: JsonAdapterFactory überschreibbar machen, via Scout-service
   // FIXME BSH Allgemein Thema Erweiterbarkeit: es fehlen protected Getter/Setter fuer private Felder, finale Objekte in Konstruktor koennen nicht customized werden
   private final JsonAdapterFactory m_jsonAdapterFactory;
-
   private final JsonAdapterRegistry m_jsonAdapterRegistry;
+
+  /**
+   * Contains IDs to adapters which must be removed <i>after</i> a request has been processed.
+   * This concept was introduced, because an adapter can be created, attached and disposed in
+   * a single request. When we'd remove the adapters immediately we sometimes have the situation
+   * where an event in the response, references an adapter that has already been disposed. With
+   * this solution this situation is avoided.
+   */
+  private final Set<String> m_unregisterAdapterSet;
 
   private String m_jsonSessionId;
   private long m_jsonAdapterSeq;
@@ -59,6 +69,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     m_currentJsonResponse = new JsonResponse();
     m_jsonAdapterFactory = new JsonAdapterFactory(); // FIXME BSH Make customizable
     m_jsonAdapterRegistry = new JsonAdapterRegistry();
+    m_unregisterAdapterSet = new HashSet<String>();
   }
 
   @Override
@@ -227,7 +238,16 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
   @Override
   public void unregisterJsonAdapter(String id) {
-    m_jsonAdapterRegistry.removeJsonAdapter(id);
+    m_unregisterAdapterSet.add(id);
+  }
+
+  @Override
+  public void flush() {
+    LOG.debug("Flush. Remove these adapter IDs from registry: " + m_unregisterAdapterSet);
+    for (String id : m_unregisterAdapterSet) {
+      m_jsonAdapterRegistry.removeJsonAdapter(id);
+    }
+    m_unregisterAdapterSet.clear();
   }
 
   @Override
@@ -241,7 +261,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   }
 
   @Override
-  public JsonResponse processRequest(HttpServletRequest httpRequest, JsonRequest jsonRequest) {
+  public JSONObject processRequest(HttpServletRequest httpRequest, JsonRequest jsonRequest) {
     try {
       m_currentHttpRequest = httpRequest;
       m_currentJsonRequest = jsonRequest;
@@ -249,11 +269,13 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
       m_jsonClientSession.processRequestLocale(httpRequest.getLocale());
       JsonResponse jsonResponse = currentJsonResponse();
       m_jsonEventProcessor.processEvents(m_currentJsonRequest, jsonResponse);
-      return jsonResponse;
+      return jsonResponse.toJson();
     }
-    finally { //FIXME CGU really finally? what if exception occurs and some events are already delegated to the model?
+    finally {
+      // FIXME CGU really finally? what if exception occurs and some events are already delegated to the model?
       // reset event map (aka jsonResponse) when response has been sent to client
       m_currentJsonResponse = new JsonResponse();
+      flush();
     }
   }
 
@@ -319,7 +341,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     }
     jsonAdapter = createJsonAdapter(model);
     // because it's a new adapter we must add it to the response
-    m_currentJsonResponse.addAdapter(jsonAdapter);
+    m_currentJsonResponse.addAdapter(jsonAdapter); // TODO AWE: (json) in registerJsonAdapter verschieben? analog unregisterJsonAdapter
     return jsonAdapter;
   }
 }

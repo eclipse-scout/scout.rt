@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.ui.html.json;
 import javax.servlet.http.HttpServletRequest;
 
 import org.eclipse.scout.rt.client.IClientSession;
+import org.json.JSONObject;
 
 public interface IJsonSession {
 
@@ -54,5 +55,11 @@ public interface IJsonSession {
 
   HttpServletRequest currentHttpRequest();
 
-  JsonResponse processRequest(HttpServletRequest httpReq, JsonRequest jsonReq) throws JsonException;
+  JSONObject processRequest(HttpServletRequest httpReq, JsonRequest jsonReq) throws JsonException;
+
+  /**
+   * Performs clean-up operations on the current session, after a request has been processed.
+   */
+  void flush();
+
 }

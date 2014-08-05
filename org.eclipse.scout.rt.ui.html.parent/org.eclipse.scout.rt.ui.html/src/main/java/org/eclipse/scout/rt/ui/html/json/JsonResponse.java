@@ -32,7 +32,6 @@ public class JsonResponse {
   private String m_errorMessage;
   private final List<JSONObject> m_eventList;
   private final Map<String/*id*/, JSONObject> m_idToPropertyChangeEventMap;
-
   private Map<String, IJsonAdapter<?>> m_adapterMap;
 
   public JsonResponse() {
@@ -41,8 +40,7 @@ public class JsonResponse {
     m_idToPropertyChangeEventMap = new HashMap<>();
   }
 
-  // TODO AWE/CGU: wäre es nicht schlauer, die m_eventList mit einem eigenen Java-Typ zu füllen und die coalesce Operation
-  // damit durchzuführen und erst ganz am Schluss im toJSON() den Typ in JSON zu konvertieren? Analog m_adapterMap.
+  // TODO AWE: (json) JsonEvent verwenden
 
   /**
    * event must have an 'id'
@@ -119,7 +117,7 @@ public class JsonResponse {
    * we should conceptually separate object creation from JSON output creation.
    */
   public JSONObject toJson() {
-    JSONObject response = new JSONObject();
+    JSONObject json = new JSONObject();
     JSONObject adapterData = new JSONObject();
     // If you experience a ConcurrentModificationException at this point, then most likely you've created and added a new adapter
     // in your to toJson() method, which is conceptually wrong. You must create new adapters when the attachModel() method is
@@ -136,11 +134,11 @@ public class JsonResponse {
       }
     }
 
-    JsonObjectUtility.putProperty(response, "events", eventArray);
-    JsonObjectUtility.putProperty(response, "adapterData", adapterData);
-    JsonObjectUtility.putProperty(response, "errorCode", m_errorCode);
-    JsonObjectUtility.putProperty(response, "errorMessage", m_errorMessage);
-    return response;
+    JsonObjectUtility.putProperty(json, "events", eventArray);
+    JsonObjectUtility.putProperty(json, "adapterData", adapterData);
+    JsonObjectUtility.putProperty(json, "errorCode", m_errorCode);
+    JsonObjectUtility.putProperty(json, "errorMessage", m_errorMessage);
+    return json;
   }
 
   /**

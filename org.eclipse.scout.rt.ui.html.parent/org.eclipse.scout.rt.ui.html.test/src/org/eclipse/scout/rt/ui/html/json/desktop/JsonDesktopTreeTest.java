@@ -119,6 +119,7 @@ public class JsonDesktopTreeTest {
     WeakReference<JsonDesktopTree> ref = new WeakReference<JsonDesktopTree>(object);
 
     object.dispose();
+    object.getJsonSession().flush();
     object = null;
     JsonTestUtility.assertGC(ref);
   }

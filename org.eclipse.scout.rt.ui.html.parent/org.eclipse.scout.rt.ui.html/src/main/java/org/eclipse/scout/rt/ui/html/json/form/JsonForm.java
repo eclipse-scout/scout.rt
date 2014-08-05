@@ -62,7 +62,7 @@ public class JsonForm extends AbstractJsonPropertyObserver<IForm> {
 
   @Override
   public void dispose() {
-    disposeJsonAdapters(getModel().getRootGroupBox().getFields());
+    disposeJsonAdapter(getModel().getRootGroupBox());
     super.dispose();
   }
 

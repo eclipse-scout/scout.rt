@@ -112,21 +112,16 @@ public class JsonTableTest {
     Table table = new Table();
     JsonTable object = createJsonTableWithMocks(table);
     WeakReference<JsonTable> ref = new WeakReference<JsonTable>(object);
-
     object.dispose();
+    object.getJsonSession().flush();
     object = null;
     JsonTestUtility.assertGC(ref);
   }
 
   public static JsonTable createJsonTableWithMocks(ITable table) {
     JsonSessionMock jsonSession = new JsonSessionMock();
-
     JsonTable jsonTable = new JsonTable(table, jsonSession, jsonSession.createUniqueIdFor(null));
     jsonTable.attach();
-
-    //init treeNode map
-    jsonTable.toJson();
-
     return jsonTable;
   }
 

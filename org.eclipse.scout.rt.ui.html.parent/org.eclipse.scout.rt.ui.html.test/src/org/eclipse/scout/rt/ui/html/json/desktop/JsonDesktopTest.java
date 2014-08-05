@@ -13,6 +13,7 @@ import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.DesktopWithOneOutline;
@@ -24,40 +25,50 @@ import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(ScoutClientTestRunner.class)
 public class JsonDesktopTest {
 
-  @Test
-  public void testDisposeWithoutForms() {
-    IDesktop desktop = new DesktopWithOneOutline();
-    JsonDesktop object = createJsonDesktopWithMocks(desktop);
-    WeakReference<JsonDesktop> ref = new WeakReference<JsonDesktop>(object);
+  IDesktop desktop;
+  JsonDesktop jsonDesktop;
+  IJsonSession session;
 
-    object.dispose();
-    object = null;
-    JsonTestUtility.assertGC(ref);
+  @Before
+  public void setUp() {
+    setUp(new DesktopWithOutlineForms());
+  }
+
+  private void setUp(IDesktop desktop) {
+    this.desktop = desktop;
+    session = new JsonSessionMock();
+    jsonDesktop = new JsonDesktop(desktop, session, session.createUniqueIdFor(null));
+    jsonDesktop.attach();
   }
 
   @Test
   public void testDisposeWithForms() {
-    IDesktop desktop = new DesktopWithOutlineForms();
-    JsonDesktop object = createJsonDesktopWithMocks(desktop);
-    WeakReference<JsonDesktop> ref = new WeakReference<JsonDesktop>(object);
+    assertGc();
+  }
 
-    object.dispose();
-    object = null;
+  @Test
+  public void testDisposeWithoutForms() {
+    setUp(new DesktopWithOneOutline());
+    assertGc();
+  }
+
+  private void assertGc() {
+    WeakReference<?> ref = new WeakReference<IJsonAdapter>(jsonDesktop);
+    jsonDesktop.dispose();
+    session.flush();
+    jsonDesktop = null;
     JsonTestUtility.assertGC(ref);
   }
 
   @Test
   public void testFormAddedAndRemoved() throws ProcessingException, JSONException {
-    IDesktop desktop = new DesktopWithOutlineForms();
-    JsonDesktop jsonDesktop = createJsonDesktopWithMocks(desktop);
-    IJsonSession session = jsonDesktop.getJsonSession();
-
     FormWithOneField form = new FormWithOneField();
     form.setAutoAddRemoveOnDesktop(false);
 
@@ -106,10 +117,6 @@ public class JsonDesktopTest {
 
   @Test
   public void testFormClosedBeforeRemoved() throws ProcessingException, JSONException {
-    IDesktop desktop = new DesktopWithOutlineForms();
-    JsonDesktop jsonDesktop = createJsonDesktopWithMocks(desktop);
-    IJsonSession session = jsonDesktop.getJsonSession();
-
     FormWithOneField form = new FormWithOneField();
     form.setAutoAddRemoveOnDesktop(false);
 
@@ -126,20 +133,17 @@ public class JsonDesktopTest {
 
     form.start();
     form.doClose();
-
     responseEvents = JsonTestUtility.extractEventsFromResponse(session.currentJsonResponse(), "formClosed");
     assertTrue(responseEvents.size() == 1);
 
     desktop.removeForm(form);
-
     responseEvents = JsonTestUtility.extractEventsFromResponse(session.currentJsonResponse(), "formRemoved");
-    assertTrue(responseEvents.size() == 0);
+    assertTrue(responseEvents.size() == 1);
   }
 
-  public static JsonDesktop createJsonDesktopWithMocks(IDesktop desktop) {
-    JsonSessionMock jsonSession = new JsonSessionMock();
-    JsonDesktop jsonDesktop = new JsonDesktop(desktop, jsonSession, jsonSession.createUniqueIdFor(null));
-    jsonDesktop.attach();
-    return jsonDesktop;
+  @Test
+  public void testHandleFormRemoved() throws Exception {
+
   }
+
 }

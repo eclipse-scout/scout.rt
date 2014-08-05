@@ -197,12 +197,9 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
 
   protected void handleModelFormRemoved(IForm form) {
     IJsonAdapter<?> formAdapter = getAdapter(form);
-    if (formAdapter == null) {
-      // JsonForm gets disposed on form close so we do not want the create a new JsonForm
-      // if the form is closed before getting removed from the desktop
-      return;
+    if (formAdapter != null) {
+      addActionEvent("formRemoved", toJsonId(PROP_FORM, formAdapter));
     }
-    addActionEvent("formRemoved", toJsonId(PROP_FORM, formAdapter));
   }
 
   protected void handleModelFormEnsureVisible(IForm form) {
