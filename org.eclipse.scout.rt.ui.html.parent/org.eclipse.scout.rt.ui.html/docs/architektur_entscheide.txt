@@ -215,17 +215,6 @@ Portlets
   Falls ja, muss entweder JS bei der Erstellung der Komponenten divId berücksichtigen.
   Oder pro (unterschiedlichem) scout div machen wir new Scout() anstatt ein Singleton (siehe scout-pattern.js)
 
-Erweiterbarkeit
-- Es muss möglich sein, Komponenten austauschen zu könnnen
-- Dafür braucht eine Komponenten-Factory (analog FormFieldFactory)
-- Pattern muss Registrierung von eigenen Komponenten ermöglichen -> scout.registerComponent();
-- Wie gehen wir mit custom CSS um? Css erweiterbar machen mittels z.B. @extends? Build-Umgebung für Css / JS sollte den Projekten zur Verfügung gestellt werden
-  Custom css nötig für eigene Komponenten + für eigenes Styling (Corporate Design)
-- Wenn Projekt eine eigene JS-Library verwenden möchte, kann es die im Script-Tag einfügen -> Durch Namespacing grenzt sich Scout ab -> keine Konflikte
-- Wie kann das Projekte eine bestehende Komponente erweitern / patchen?
-  Komponente registrieren -> ok
-  Komponente erweitern (extends) -> unklar. Nur via Build-Prozess? Oder genügt es, alle Scout-Komponenten öffentlich zu machen (scout.Table = Table)? Dann könnte man "JS-Vererbung" verwenden
-
 Mobile
 - Separates CSS und Javascript für mobile? Basierend auf scout.css?
   - Vorteile:
@@ -257,6 +246,16 @@ Styling / Farben
   -> Das CRM darf keine fixen Farben verwenden, weil wenn das Projekt ein eigenes CSS hat diese Farben nicht mehr passen.
   Besser wäre es vermutlich, eine Farb-Palette zu definieren. Das CRM könnte dann Konstanten aus dieser Palette verwenden.
 
+Erweiterbarkeit
+- Es muss möglich sein, Komponenten austauschen zu könnnen
+- Dafür braucht eine Komponenten-Factory (analog FormFieldFactory)
+- Pattern muss Registrierung von eigenen Komponenten ermöglichen -> scout.registerComponent();
+- Wie gehen wir mit custom CSS um? Css erweiterbar machen mittels z.B. @extends? Build-Umgebung für Css / JS sollte den Projekten zur Verfügung gestellt werden
+  Custom css nötig für eigene Komponenten + für eigenes Styling (Corporate Design)
+- Wenn Projekt eine eigene JS-Library verwenden möchte, kann es die im Script-Tag einfügen -> Durch Namespacing grenzt sich Scout ab -> keine Konflikte
+- Wie kann das Projekte eine bestehende Komponente erweitern / patchen?
+  Komponente registrieren -> ok
+  Komponente erweitern (extends) -> unklar. Nur via Build-Prozess? Oder genügt es, alle Scout-Komponenten öffentlich zu machen (scout.Table = Table)? Dann könnte man "JS-Vererbung" verwenden
 
 Erweiterbarkeit, Dependencies und weitere js Resourcen in externen Bundles
 - Andere Bundles würden gerne etwas contributen (z.B. Office-Feld), Java, Javascript und CSS-Files inkl. Tests.
@@ -269,6 +268,16 @@ Erweiterbarkeit, Dependencies und weitere js Resourcen in externen Bundles
   Die einzelnen Scripts sind entweder bereits komplett oder beinhalten @includes
   Alternative zu includes, siehe Beispiel unten. Nachteil: Man kann nicht feingranular einzelne Dateien nicht verwenden (z.B. für Mobile). Oder doch?
   Sind die Scripts bereits minifiziert oder machen wir die Minifizierung auch zur Laufzeit?
+- Alternative: 
+  Anstatt dass jedes Plugin ein script contributed, welches mit dem ScriptProcessor zusammengebaut wird, könnte jedes einzelne File contributed werden.
+  Es gäbe dann keine Includes mehr im Template.js (ev. ausser für jquery-scout). Nur noch //@include js-files oder ähnlich 
+  Es gäbe nur ein template.js (oder noch eins für mobile), eventuell auch via extension point hinzugefügt -> austauschbar.
+  Die ObjectFactory.js müsste dann auch dynamisch erstellt werden.
+  Pro extension point könnte dann ein Feld.js, Feld.css und JsonFeld.java angegeben werden.
+  Für Files ohne Model halt nur ein Feld.js.
+  Man könnte dadurch jede JS-Klasse austauschen.
+  Reihenfolge müsste berücksichtigt werden, wie aktuell im template.js
+  Minifizierung müsste auch zwingend zur Laufzeit erfolgen (falls nicht debug=true).   
 - Dynamisches Nachladen
   Je nach Script möchte man es vielleicht eher erst bei Bedarf laden (z.B. Office).
   Mögliche Lösung: Scout.js stellt eine ScriptRegistry zur Verfügung.

@@ -220,7 +220,7 @@ scout.Table.prototype._buildRowDiv = function(row, index) {
     rowClass += 'row-selected ';
   }
   // FIXME Check if possible to use $.makeDiv (but maybe it's too slow)
-  var unselectable = (scout.device.supportsCssProperty('user-select') ? '' : ' unselectable="on"'); // workaround for IE 9
+  var unselectable = (scout.device.supportsCssUserSelect() ? '' : ' unselectable="on"'); // workaround for IE 9
 
   var rowDiv = '<div id="' + row.id + '" class="' + rowClass + '" data-row=' + index + ' style="width: ' + rowWidth + 'px"' + unselectable + '>';
   for (var c = 0; c < row.cells.length; c++) {

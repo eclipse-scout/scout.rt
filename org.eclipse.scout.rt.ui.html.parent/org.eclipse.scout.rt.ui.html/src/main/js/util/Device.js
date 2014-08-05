@@ -8,7 +8,6 @@ scout.Device = function(userAgent) {
   this.features = {};
   this.device;
   this._userAgentParsed = false;
-  this._propertySupportedMap =  {};
 };
 
 scout.Device.vendorPrefixes = ['Webkit', 'Moz', 'O', 'ms', 'Khtml'];
@@ -21,27 +20,34 @@ scout.Device.prototype.supportsTouch = function() {
   // Implement when needed, see https://hacks.mozilla.org/2013/04/detecting-touch-its-the-why-not-the-how/
 };
 
-/**
- * @see https://developer.mozilla.org/en-US/docs/Web/Guide/CSS/Using_CSS_animations/Detecting_CSS_animation_support
- */
 scout.Device.prototype.supportsCssAnimation = function() {
-  if (this.features.cssAnimation === undefined) {
-    this.features.cssAnimation = check();
-  }
-  return this.features.cssAnimation;
+  return this.supportsCssProperty('animation');
+};
 
-  function check() {
+scout.Device.prototype.supportsCssUserSelect = function() {
+  return this.supportsCssProperty('userSelect');
+};
+
+scout.Device.prototype.supportsCssProperty = function(property) {
+  if (this.features[property] === undefined) {
+    this.features[property] = check(property);
+  }
+  return this.features[property];
+
+  function check(property) {
     var i;
-    var element = document.createElement('div');
-    if (element.style.animation !== undefined) {
+    if (document.body.style[property] !== undefined) {
       return true;
     }
 
+    property = property.charAt(0).toUpperCase() + property.slice(1);
     for (i = 0; i < scout.Device.vendorPrefixes.length; i++) {
-      if (element.style[scout.Device.vendorPrefixes[i] + 'Animation'] !== undefined) {
+      if (document.body.style[scout.Device.vendorPrefixes[i] + property] !== undefined) {
         return true;
       }
     }
+
+    return false;
   }
 };
 
@@ -66,16 +72,6 @@ scout.Device.prototype.parseUserAgent = function(userAgent) {
   }
 
   this._userAgentParsed = true;
-};
-
-scout.Device.prototype.supportsCssProperty = function(property) {
-  var supported = this._propertySupportedMap[property];
-  if (typeof supported !== 'undefined') {
-    return supported; // cached
-  }
-  supported = (property in document.body.style);
-  this._propertySupportedMap[property] = supported;
-  return supported;
 };
 
 scout.Device.SYSTEM_IOS = 'IOS';

@@ -40,7 +40,7 @@ scout.MobileDesktop.prototype._resolveViewContainer = function(form) {
 /**
  * @override
  */
-scout.MobileDesktop.prototype._addForm = function(form) {
+scout.MobileDesktop.prototype.addForm = function(form) {
   var layoutDirty = false;
   if (form.displayHint == 'view') {
     var position = form.displayViewId;
@@ -65,7 +65,7 @@ scout.MobileDesktop.prototype._addForm = function(form) {
   if (layoutDirty) {
     this.layout.layout();
   }
-  scout.MobileDesktop.parent.prototype._addForm.call(this, form);
+  scout.MobileDesktop.parent.prototype.addForm.call(this, form);
 };
 
 scout.MobileDesktop.prototype._createMainArea = function() {
@@ -79,8 +79,8 @@ scout.MobileDesktop.prototype._createMainArea = function() {
 /**
  * @override
  */
-scout.MobileDesktop.prototype._removeForm = function(form) {
-  scout.MobileDesktop.parent.prototype._removeForm.call(this, form);
+scout.MobileDesktop.prototype.removeForm = function(form) {
+  scout.MobileDesktop.parent.prototype.removeForm.call(this, form);
 
   if (form.displayHint == 'view') {
     var position = form.displayViewId;
