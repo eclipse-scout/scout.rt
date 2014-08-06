@@ -30,8 +30,8 @@ public class JsonResponse {
 
   private Integer m_errorCode;
   private String m_errorMessage;
-  private final List<JSONObject> m_eventList;
-  private final Map<String/*id*/, JSONObject> m_idToPropertyChangeEventMap;
+  private final List<JsonEvent> m_eventList;
+  private final Map<String/*id*/, JsonEvent> m_idToPropertyChangeEventMap;
   private Map<String, IJsonAdapter<?>> m_adapterMap;
 
   public JsonResponse() {
@@ -40,31 +40,32 @@ public class JsonResponse {
     m_idToPropertyChangeEventMap = new HashMap<>();
   }
 
-  // TODO AWE: (json) JsonEvent verwenden
-
   /**
-   * event must have an 'id'
+   * @param id
+   *          Adapter ID
+   * @param propertyName
+   *          property name
+   * @param newValue
    */
   public void addPropertyChangeEvent(String id, String propertyName, Object newValue) {
-    requiresId(id);
-    //If text is null it won't be transferred -> set to empty string
-    //FIXME CGU check if it is necessary on client to convert '' to null. Maybe not because !value also checks for emtpy string
-    if (newValue == null) {
-      newValue = "";
-    }
-    //coalesce
-    JSONObject event = m_idToPropertyChangeEventMap.get(id);
+    // coalesce
+    JsonEvent event = m_idToPropertyChangeEventMap.get(id);
     if (event == null) {
-      event = new JSONObject();
-      JsonObjectUtility.putProperty(event, "id", id);
-      JsonObjectUtility.putProperty(event, "type", "property");
+      event = new JsonEvent(id, JsonEventType.PROPERTY.getEventType(), null);
       m_eventList.add(event);
       m_idToPropertyChangeEventMap.put(id, event);
     }
-    JSONObject props = event.optJSONObject("properties");
+
+    JSONObject props = event.getData().optJSONObject("properties");
     if (props == null) {
       props = new JSONObject();
-      JsonObjectUtility.putProperty(event, "properties", props);
+      JsonObjectUtility.putProperty(event.getData(), "properties", props);
+    }
+
+    // If text is null it won't be transferred -> set to empty string
+    // FIXME CGU check if it is necessary on client to convert '' to null. Maybe not because !value also checks for empty string
+    if (newValue == null) {
+      newValue = "";
     }
     JsonObjectUtility.putProperty(props, propertyName, newValue);
   }
@@ -80,21 +81,16 @@ public class JsonResponse {
     }
   }
 
-  private void requiresId(String id) {
-    if (id == null) {
-      throw new JsonException("id is null");
-    }
-  }
-
   /**
-   * Event must have an 'id'.
+   * @param id
+   *          Adapter ID
+   * @param eventType
+   *          Event type
+   * @param eventData
+   *          event data (JSON object)
    */
-  public void addActionEvent(String eventType, String id, JSONObject eventData) {
-    requiresId(id);
-    JSONObject event = eventData != null ? eventData : new JSONObject();
-    JsonObjectUtility.putProperty(event, "id", id);
-    JsonObjectUtility.putProperty(event, "type", eventType);
-    m_eventList.add(event);
+  public void addActionEvent(String id, String eventType, JSONObject eventData) {
+    m_eventList.add(new JsonEvent(id, eventType, eventData));
   }
 
   // FIXME CGU potential threading issue: toJson is called by servlet thread. Property-Change-Events may alter the eventList from client job thread
@@ -128,9 +124,9 @@ public class JsonResponse {
     }
 
     JSONArray eventArray = new JSONArray();
-    for (JSONObject event : m_eventList) {
+    for (JsonEvent event : m_eventList) {
       if (doAddEvent(event)) {
-        eventArray.put(event);
+        eventArray.put(event.toJson());
       }
     }
 
@@ -145,18 +141,16 @@ public class JsonResponse {
    * When we send a new adapter in the JSON response we can ignore all property change events
    * for that adapter, since the adapter data already describes the latest state of the adapter.
    */
-  private boolean doAddEvent(JSONObject event) {
-    String id = event.optString("id");
-    String type = event.optString("type");
-    if ("property".equals(type)) {
-      if (m_adapterMap.containsKey(id)) {
+  private boolean doAddEvent(JsonEvent event) {
+    if (JsonEventType.PROPERTY.matches(event)) {
+      if (m_adapterMap.containsKey(event.getId())) {
         return false;
       }
     }
     return true;
   }
 
-  public List<JSONObject> getEventList() {
+  public List<JsonEvent> getEventList() {
     return CollectionUtility.arrayList(m_eventList);
   }
 

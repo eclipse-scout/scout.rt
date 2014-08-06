@@ -69,7 +69,8 @@ public class JsonTableTest {
     JsonEvent event = createJsonSelectedEvent(jsonTable.getOrCreatedRowId(row));
     jsonTable.handleUiEvent(event, new JsonResponse());
 
-    List<JSONObject> responseEvents = JsonTestUtility.extractEventsFromResponse(jsonTable.getJsonSession().currentJsonResponse(), JsonTable.EVENT_ROWS_SELECTED);
+    List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(
+        jsonTable.getJsonSession().currentJsonResponse(), JsonTable.EVENT_ROWS_SELECTED);
     assertTrue(responseEvents.size() == 0);
   }
 
@@ -100,10 +101,11 @@ public class JsonTableTest {
     assertFalse(row2.isSelected());
     assertTrue(row4.isSelected());
 
-    List<JSONObject> responseEvents = JsonTestUtility.extractEventsFromResponse(jsonTable.getJsonSession().currentJsonResponse(), JsonTable.EVENT_ROWS_SELECTED);
+    List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(
+        jsonTable.getJsonSession().currentJsonResponse(), JsonTable.EVENT_ROWS_SELECTED);
     assertTrue(responseEvents.size() == 1);
 
-    List<ITableRow> tableRows = jsonTable.extractTableRows(responseEvents.get(0));
+    List<ITableRow> tableRows = jsonTable.extractTableRows(responseEvents.get(0).getData());
     assertEquals(row4, tableRows.get(0));
   }
 
@@ -126,11 +128,12 @@ public class JsonTableTest {
   }
 
   public static JsonEvent createJsonSelectedEvent(String rowId) throws JSONException {
-    JsonEvent event = JsonTestUtility.createJsonEvent(JsonTable.EVENT_ROWS_SELECTED);
+    String tableId = "x"; // never used
+    JSONObject data = new JSONObject();
     JSONArray rowIds = new JSONArray();
     rowIds.put(rowId);
-    event.getJsonObject().put(JsonTable.PROP_ROW_IDS, rowIds);
-    return event;
+    data.put(JsonTable.PROP_ROW_IDS, rowIds);
+    return new JsonEvent(tableId, JsonTable.EVENT_ROWS_SELECTED, data);
   }
 
 }

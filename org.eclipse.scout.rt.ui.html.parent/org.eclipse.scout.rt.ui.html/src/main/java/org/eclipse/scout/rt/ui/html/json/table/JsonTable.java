@@ -284,12 +284,12 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
   }
 
   protected void handleUiRowClicked(JsonEvent event, JsonResponse res) {
-    final ITableRow tableRow = extractTableRow(event.getJsonObject());
+    final ITableRow tableRow = extractTableRow(event.getData());
     getModel().getUIFacade().fireRowClickFromUI(tableRow);
   }
 
   protected void handleUiRowsSelected(JsonEvent event, JsonResponse res) {
-    final List<ITableRow> tableRows = extractTableRows(event.getJsonObject());
+    final List<ITableRow> tableRows = extractTableRows(event.getData());
     TableEvent tableEvent = new TableEvent(getModel(), TableEvent.TYPE_ROWS_SELECTED, tableRows);
     getTableEventFilter().addIgnorableModelEvent(tableEvent);
     try {
@@ -307,7 +307,7 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
   }
 
   protected void handleUiRowAction(JsonEvent event, JsonResponse res) {
-    final ITableRow tableRow = extractTableRow(event.getJsonObject());
+    final ITableRow tableRow = extractTableRow(event.getData());
     getModel().getUIFacade().fireRowActionFromUI(tableRow);
   }
 

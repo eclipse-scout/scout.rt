@@ -90,8 +90,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
     JSONObject jsonEvent = new JSONObject();
     JsonObjectUtility.putProperty(jsonEvent, "clientSession", m_jsonClientSession.getId());
-    m_currentJsonResponse.addActionEvent("initialized", m_jsonSessionId, jsonEvent);
-
+    m_currentJsonResponse.addActionEvent(m_jsonSessionId, "initialized", jsonEvent);
     LOG.info("JsonSession with ID " + m_jsonSessionId + " initialized");
   }
 

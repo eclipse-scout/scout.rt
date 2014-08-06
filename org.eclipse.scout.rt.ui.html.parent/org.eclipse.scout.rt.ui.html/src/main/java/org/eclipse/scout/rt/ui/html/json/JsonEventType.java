@@ -18,8 +18,10 @@ package org.eclipse.scout.rt.ui.html.json;
 public enum JsonEventType {
 
   // TODO AWE: add more common UI events
-	
-  CLICK("click");
+
+  CLICK("click"),
+
+  PROPERTY("property");
 
   private String m_eventType;
 

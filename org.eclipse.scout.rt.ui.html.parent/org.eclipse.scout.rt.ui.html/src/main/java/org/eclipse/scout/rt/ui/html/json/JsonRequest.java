@@ -48,7 +48,8 @@ public class JsonRequest {
     }
     List<JsonEvent> actionList = new ArrayList<>(events.length());
     for (int i = 0; i < events.length(); i++) {
-      actionList.add(new JsonEvent(JsonObjectUtility.getJSONObject(events, i)));
+      JSONObject json = JsonObjectUtility.getJSONObject(events, i);
+      actionList.add(JsonEvent.fromJson(json));
     }
     return actionList;
   }

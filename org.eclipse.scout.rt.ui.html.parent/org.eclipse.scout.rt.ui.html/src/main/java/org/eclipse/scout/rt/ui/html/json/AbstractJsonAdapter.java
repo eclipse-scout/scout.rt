@@ -193,7 +193,7 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
   }
 
   protected final void addActionEvent(String eventName, JSONObject json) {
-    getJsonSession().currentJsonResponse().addActionEvent(eventName, getId(), json);
+    getJsonSession().currentJsonResponse().addActionEvent(getId(), eventName, json);
   }
 
   protected void addPropertyChangeEvent(String propertyName, Object json) {

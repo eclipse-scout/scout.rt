@@ -15,6 +15,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
+import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.DesktopWithOneOutline;
 import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.DesktopWithOutlineForms;
@@ -81,14 +82,14 @@ public class JsonDesktopTest {
     assertNotNull(formAdapter);
 
     JsonResponse jsonResp = session.currentJsonResponse();
-    List<JSONObject> responseEvents = JsonTestUtility.extractEventsFromResponse(jsonResp, "formAdded");
+    List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(jsonResp, "formAdded");
     assertTrue(responseEvents.size() == 1);
 
-    JSONObject event = responseEvents.get(0);
-    String formId = event.getString("form");
+    JsonEvent event = responseEvents.get(0);
+    String formId = event.getData().getString("form");
 
     // Add event must contain reference (by ID) to form.
-    assertEquals(jsonDesktop.getId(), event.get("id"));
+    assertEquals(jsonDesktop.getId(), event.getId());
     assertEquals(formAdapter.getId(), formId);
 
     // adapter-data for form must exist in 'adapterData' property of response
@@ -108,10 +109,10 @@ public class JsonDesktopTest {
     assertTrue(responseEvents.size() == 1);
 
     event = responseEvents.get(0);
-    formId = event.getString("form");
+    formId = event.getData().getString("form");
 
     // Remove event must only contain the id, no other properties
-    assertEquals(jsonDesktop.getId(), event.get("id"));
+    assertEquals(jsonDesktop.getId(), event.getId());
     assertEquals(formAdapter.getId(), formId);
   }
 
@@ -128,7 +129,7 @@ public class JsonDesktopTest {
     jsonForm = (JsonForm) session.getJsonAdapter(form);
     assertNotNull(jsonForm);
 
-    List<JSONObject> responseEvents = JsonTestUtility.extractEventsFromResponse(session.currentJsonResponse(), "formAdded");
+    List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(session.currentJsonResponse(), "formAdded");
     assertTrue(responseEvents.size() == 1);
 
     form.start();

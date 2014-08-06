@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.ui.html.json.testing;
 
 import java.lang.ref.WeakReference;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -46,18 +46,16 @@ public class JsonTestUtility {
     return jsonSession;
   }
 
+  // FIXME AWE: (event) check callers
   public static JsonEvent createJsonEvent(String type) throws JSONException {
-    JSONObject jsonObject = new JSONObject();
-    jsonObject.put(JsonEvent.TYPE, type);
-    jsonObject.put(JsonEvent.ID, (String) null);
-    return new JsonEvent(jsonObject);
+    return new JsonEvent(type, null, new JSONObject());
   }
 
-  public static List<JSONObject> extractEventsFromResponse(JsonResponse response, String eventType) throws JSONException {
-    List<JSONObject> list = new LinkedList<>();
-    for (JSONObject responseEvent : response.getEventList()) {
-      if (eventType.equals(responseEvent.getString(JsonEvent.TYPE))) {
-        list.add(responseEvent);
+  public static List<JsonEvent> extractEventsFromResponse(JsonResponse response, String eventType) throws JSONException {
+    List<JsonEvent> list = new ArrayList<>();
+    for (JsonEvent event : response.getEventList()) {
+      if (event.getType().equals(eventType)) {
+        list.add(event);
       }
     }
     return list;

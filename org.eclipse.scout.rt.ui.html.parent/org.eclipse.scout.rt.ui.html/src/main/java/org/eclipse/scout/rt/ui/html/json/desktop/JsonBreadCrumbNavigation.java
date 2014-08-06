@@ -99,7 +99,7 @@ public class JsonBreadCrumbNavigation extends AbstractJsonAdapter<IBreadCrumbsNa
   }
 
   public void handleUiActivate(JsonEvent event, JsonResponse res) {
-    final String formId = JsonObjectUtility.getString(event.getJsonObject(), JsonForm.PROP_FORM_ID);
+    final String formId = JsonObjectUtility.getString(event.getData(), JsonForm.PROP_FORM_ID);
     JsonForm jsonForm = getCurrentJsonForm();
     while (!jsonForm.getId().equals(formId) || getModel().getCurrentNavigationForm() == null) {
       try {

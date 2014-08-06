@@ -72,7 +72,8 @@ public class JsonDesktopTreeTest {
     JsonEvent event = createJsonSelectedEvent(jsonDesktopTree.getOrCreateNodeId(node));
     jsonDesktopTree.handleUiEvent(event, new JsonResponse());
 
-    List<JSONObject> responseEvents = JsonTestUtility.extractEventsFromResponse(jsonDesktopTree.getJsonSession().currentJsonResponse(), JsonDesktopTree.EVENT_NODES_SELECTED);
+    List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(
+        jsonDesktopTree.getJsonSession().currentJsonResponse(), JsonDesktopTree.EVENT_NODES_SELECTED);
     assertTrue(responseEvents.size() == 0);
   }
 
@@ -105,10 +106,11 @@ public class JsonDesktopTreeTest {
     assertTrue(firstNode.isSelectedNode());
     assertFalse(secondNode.isSelectedNode());
 
-    List<JSONObject> responseEvents = JsonTestUtility.extractEventsFromResponse(jsonDesktopTree.getJsonSession().currentJsonResponse(), JsonDesktopTree.EVENT_NODES_SELECTED);
+    List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(
+        jsonDesktopTree.getJsonSession().currentJsonResponse(), JsonDesktopTree.EVENT_NODES_SELECTED);
     assertTrue(responseEvents.size() == 1);
 
-    List<ITreeNode> treeNodes = jsonDesktopTree.extractTreeNodes(responseEvents.get(0));
+    List<ITreeNode> treeNodes = jsonDesktopTree.extractTreeNodes(responseEvents.get(0).getData());
     assertEquals(firstNode, treeNodes.get(0));
   }
 
@@ -140,11 +142,11 @@ public class JsonDesktopTreeTest {
     String node1Id = jsonDesktopTree.getOrCreateNodeId(pages.get(1));
     outline.removeNode(pages.get(1));
 
-    List<JSONObject> responseEvents = JsonTestUtility.extractEventsFromResponse(session.currentJsonResponse(), JsonDesktopTree.EVENT_NODES_DELETED);
+    List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(session.currentJsonResponse(), JsonDesktopTree.EVENT_NODES_DELETED);
     assertTrue(responseEvents.size() == 1);
 
-    JSONObject event = responseEvents.get(0);
-    JSONArray nodeIds = event.getJSONArray("nodeIds");
+    JsonEvent event = responseEvents.get(0);
+    JSONArray nodeIds = event.getData().getJSONArray("nodeIds");
 
     assertTrue(nodeIds.length() == 1);
     assertTrue(nodeIds.get(0).equals(node1Id));
@@ -165,26 +167,28 @@ public class JsonDesktopTreeTest {
 
     outline.removeChildNodes(outline.getRootNode(), outline.getRootNode().getChildNodes());
 
-    List<JSONObject> responseEvents = JsonTestUtility.extractEventsFromResponse(session.currentJsonResponse(), JsonDesktopTree.EVENT_ALL_NODES_DELETED);
-    JSONObject event = responseEvents.get(0);
-    assertNull(event.optJSONArray("nodeIds"));
+    List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(
+        session.currentJsonResponse(), JsonDesktopTree.EVENT_ALL_NODES_DELETED);
+    JsonEvent event = responseEvents.get(0);
+    assertNull(event.getData().optJSONArray("nodeIds"));
   }
 
   public static JsonDesktopTree createJsonDesktopTreeWithMocks(IOutline outline) {
     JsonSessionMock jsonSession = new JsonSessionMock();
     JsonDesktopTree jsonDesktopTree = new JsonDesktopTree(outline, jsonSession, jsonSession.createUniqueIdFor(null));
     jsonDesktopTree.attach();
-
     // init treeNode map
-    jsonDesktopTree.toJson();
+    jsonDesktopTree.toJson(); // TODO CGU/AWE: toJson dürfte keinen seiten-effekt mehr haben
+    // die treeNode map müsste somit neu im attachModel initialisiert werden und nicht im toJson
     return jsonDesktopTree;
   }
 
   public static JsonEvent createJsonSelectedEvent(String nodeId) throws JSONException {
-    JsonEvent event = JsonTestUtility.createJsonEvent(JsonDesktopTree.EVENT_NODES_SELECTED);
+    String desktopId = "x"; // never used
+    JSONObject data = new JSONObject();
     JSONArray nodeIds = new JSONArray();
     nodeIds.put(nodeId);
-    event.getJsonObject().put(JsonDesktopTree.PROP_NODE_IDS, nodeIds);
-    return event;
+    data.put(JsonDesktopTree.PROP_NODE_IDS, nodeIds);
+    return new JsonEvent(desktopId, JsonDesktopTree.EVENT_NODES_SELECTED, data);
   }
 }

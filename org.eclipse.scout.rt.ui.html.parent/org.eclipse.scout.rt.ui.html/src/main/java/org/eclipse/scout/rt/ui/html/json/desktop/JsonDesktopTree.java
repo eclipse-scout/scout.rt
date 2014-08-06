@@ -340,12 +340,12 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserver<IOutline> impl
   }
 
   protected void handleUiNodeClick(JsonEvent event, JsonResponse res) {
-    final ITreeNode node = getTreeNodeForNodeId(JsonObjectUtility.getString(event.getJsonObject(), PROP_NODE_ID));
+    final ITreeNode node = getTreeNodeForNodeId(JsonObjectUtility.getString(event.getData(), PROP_NODE_ID));
     getModel().getUIFacade().fireNodeClickFromUI(node);
   }
 
   protected void handleUiNodesSelected(JsonEvent event, JsonResponse res) {
-    final List<ITreeNode> nodes = extractTreeNodes(event.getJsonObject());
+    final List<ITreeNode> nodes = extractTreeNodes(event.getData());
     TreeEvent treeEvent = new TreeEvent(getModel(), TreeEvent.TYPE_NODES_SELECTED, nodes);
     getTreeEventFilter().addIgnorableModelEvent(treeEvent);
     try {
@@ -357,8 +357,8 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserver<IOutline> impl
   }
 
   protected void handleUiNodeExpanded(JsonEvent event, JsonResponse res) {
-    final ITreeNode node = getTreeNodeForNodeId(JsonObjectUtility.getString(event.getJsonObject(), PROP_NODE_ID));
-    final boolean expanded = JsonObjectUtility.getBoolean(event.getJsonObject(), "expanded");
+    final ITreeNode node = getTreeNodeForNodeId(JsonObjectUtility.getString(event.getData(), PROP_NODE_ID));
+    final boolean expanded = JsonObjectUtility.getBoolean(event.getData(), "expanded");
     if (node.isExpanded() == expanded) {
       return;
     }
