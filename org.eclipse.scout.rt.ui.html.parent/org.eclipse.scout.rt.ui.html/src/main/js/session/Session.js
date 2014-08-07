@@ -133,7 +133,7 @@ scout.Session.prototype.send = function(type, id, data) {
 scout.Session.prototype._sendNow = function(events, deferred) {
   var request = {
     jsonSessionId: this.jsonSessionId,
-    events: events,
+    events: events
   };
 
   if (this._startup) {

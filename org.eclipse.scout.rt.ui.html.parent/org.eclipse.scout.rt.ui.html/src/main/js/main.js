@@ -83,7 +83,7 @@ scout.openWindow = function(url, windowId, popupWidth, popupHeight) {
       'outerHeight=' + popupHeight,
       // Fallback for IE and Chrome (window is not really centered, but it's the best we can do)
       'width=' + popupWidth,
-      'height=' + popupHeight,
+      'height=' + popupHeight
     ].join(',');
   } else {
     windowId = '_' + windowId;

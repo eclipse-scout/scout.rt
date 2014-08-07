@@ -341,7 +341,7 @@ describe("Table", function() {
 
       var requestData = mostRecentJsonRequest();
       var event = new scout.Event(scout.Table.EVENT_ROWS_SELECTED, table.id, {
-        "rowIds": ['0', ]
+        "rowIds": ['0']
       });
       expect(requestData).toContainEvents(event);
     });

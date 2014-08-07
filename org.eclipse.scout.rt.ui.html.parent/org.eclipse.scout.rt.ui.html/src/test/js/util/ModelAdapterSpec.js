@@ -30,19 +30,17 @@ describe("ModelAdapter", function() {
 
     // Send a dummy event to this object which contains both a new object and a id-only ref to that new object
     event = new scout.Event('property', '2', {
-      'containsNewAdapters': true,
       'properties': {
-        'containsNewAdapters': true,
         'x1': 'val1',
         'x2': 'val2',
         'o1': {
           'id': '3',
           'objectType': 'GroupBox',
-          'visible': true,
+          'visible': true
         },
         'o2': {
-          'id': '3',
-        },
+          'id': '3'
+        }
       }
     });
     session._processEvents([event]);
@@ -56,19 +54,17 @@ describe("ModelAdapter", function() {
 
     // Now send a second event, but now send the id-only ref first (in o1).
     event = new scout.Event('property', '2', {
-      'containsNewAdapters': true,
       'properties': {
         'x2': 'val20',
         'x1': 'val10',
         'o1': {
-          'id': '4',
+          'id': '4'
         },
         'o2': {
           'id': '4',
           'objectType': 'GroupBox',
-          'visible': false,
-        },
-        'containsNewAdapters': true,
+          'visible': false
+        }
       }
     });
     session._processEvents([event]);
