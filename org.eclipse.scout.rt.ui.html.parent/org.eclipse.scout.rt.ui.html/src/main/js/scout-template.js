@@ -14,7 +14,6 @@
 //@include("util/ModelAdapter.js");
 //@include("util/NullAdapter.js");
 //@include("util/ObjectFactory.js");
-//@include("util/BorderLayout.js");
 //@include("util/Device.js");
 //@include("util/URL.js");
 //@include("session/Session.js");
@@ -25,6 +24,7 @@
 //@include("datamodel/DataModel.js");
 //@include("layout/GridLayout.js");
 //@include("layout/TableLayout.js");
+//@include("layout/BorderLayout.js");
 //@include("table/Table.js");
 //@include("table/TableConfigurator.js");
 //@include("table/TableHeader.js");
