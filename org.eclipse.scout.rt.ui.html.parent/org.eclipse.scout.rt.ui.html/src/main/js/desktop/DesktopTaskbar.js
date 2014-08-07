@@ -1,23 +1,28 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-scout.DesktopTaskbar = function(desktop, toolButtons) {
+scout.DesktopTaskbar = function(desktop) {
   this.desktop = desktop;
+  this.toolButtons = desktop.toolButtons;
   this.$div;
-  this.$formThumbs;
-  this.formThumbsMap = {};
-  this.toolButtons = toolButtons;
+  this.$tabs;
+  this.tabs = {};
+  this.selectedTab;
 };
 
 scout.DesktopTaskbar.prototype.render = function($desktop) {
+  this.$parent = $desktop;
   this.$div = $desktop.appendDiv(undefined, 'desktop-taskbar');
 
+  this.$tabs = this.$div.appendDiv(undefined, 'tabs');
+
+  this.$tools = this.$div.appendDiv(undefined, 'tools');
   for (var i = 0; i < this.toolButtons.length; i++) {
     this.toolButtons[i].desktopTaskBar = this;
-    this.toolButtons[i].render(this.$div);
+    this.toolButtons[i].render(this.$tools);
   }
 
-  this.$formThumbs = this.$div.appendDiv(undefined, 'form-thumbnails');
+  this.$div.appendDiv('ViewLogo').delay(1000).animateAVCSD('width', 40, null, null, 1000);
 };
 
 scout.DesktopTaskbar.prototype.getToolButtonForForm = function(form) {
@@ -35,10 +40,9 @@ scout.DesktopTaskbar.prototype.formActivated = function(form) {
     return;
   }
 
-  var $formThumb = this.formThumbsMap[form.id];
-
-  $formThumb.selectOne();
-  this.unselectToolButtons();
+  var tab = this.tabs[form.id];
+  var $tab = tab.$tab;
+  $tab.selectOne();
 };
 
 scout.DesktopTaskbar.prototype.formAdded = function(form) {
@@ -49,22 +53,29 @@ scout.DesktopTaskbar.prototype.formAdded = function(form) {
     return;
   }
 
-  var $formThumb = this.$formThumbs.appendDiv(undefined, 'form-thumbnail taskbar-item', form.title);
-  this.formThumbsMap[form.id] = $formThumb;
-  $formThumb.attr('data-icon', '\uf096');
-  $formThumb.on('click', onFormThumbClick);
-  $formThumb.selectOne();
-  this.unselectToolButtons();
+ this.addTab({id: form.id, title: form.title, content: form, type: 'form'});
+};
 
-  function onFormThumbClick() {
+scout.DesktopTaskbar.prototype.addTab = function(tab) {
+  var $tab = this.$tabs.appendDiv(undefined, 'tab taskbar-item', tab.title);
+  tab.$tab = $tab;
+  this.tabs[tab.id] = tab;
+  $tab.attr('data-icon', '\uf096');
+  $tab.on('click', onTabClicked.bind(this));
+  $tab.selectOne();
+
+  function onTabClicked() {
     var $button = $(this),
       selected = !$button.isSelected();
 
     $button.select(selected);
 
-    that.formOfClickedButton = form;
-    that.buttonSelected(form, selected);
-    that.formOfClickedButton = null;
+    if (tab.type == 'form') {
+      this.desktop.activateForm(tab.content);
+    }
+    else if(tab.type == 'page') {
+      this.desktop.activatePage(tab.content);
+    }
   }
 };
 
@@ -75,45 +86,41 @@ scout.DesktopTaskbar.prototype.formRemoved = function(form) {
     return;
   }
 
-  var $formThumb = this.formThumbsMap[form.id];
-  delete this.formThumbsMap[form.id];
-  $formThumb.remove();
+  var tab = this.tabs[form.id];
+  this.removeTab(tab);
+};
+
+scout.DesktopTaskbar.prototype.removeTab = function(tab) {
+  delete this.tabs[tab.id];
+  tab.$tab.remove();
 };
 
 scout.DesktopTaskbar.prototype.formDisabled = function(form) {
-  var toolButton, $formThumb;
+  var toolButton, $tab;
   toolButton = this.getToolButtonForForm(form);
   if (toolButton) {
-    $formThumb = toolButton.$container;
+    $tab = toolButton.$container;
   } else {
-    $formThumb = this.formThumbsMap[form.id];
+    $tab = this.tabs[form.id].$tab;
   }
 
-  $formThumb.addClass('disabled');
+  $tab.addClass('disabled');
 };
 
 scout.DesktopTaskbar.prototype.formEnabled = function(form) {
-  var toolButton, $formThumb;
+  var toolButton, $tab;
   toolButton = this.getToolButtonForForm(form);
   if (toolButton) {
-    $formThumb = toolButton.$container;
+    $tab = toolButton.$container;
   } else {
-    $formThumb = this.formThumbsMap[form.id];
+    $tab = this.tabs[form.id].$tab;
   }
 
-  $formThumb.removeClass('disabled');
+  $tab.removeClass('disabled');
 };
 
 scout.DesktopTaskbar.prototype.toolButtonSelected = function(toolButton, selected) {
-  this.buttonSelected(toolButton.form, selected);
-
-  if (selected) {
-    this.unselectToolButtons(toolButton);
-    this.$formThumbs.children().select(false);
-  }
-};
-
-scout.DesktopTaskbar.prototype.buttonSelected = function(form, selected) {
+  var form = toolButton.form;
   if (!form) {
     return;
   }
@@ -128,6 +135,10 @@ scout.DesktopTaskbar.prototype.buttonSelected = function(form, selected) {
     if (form === this.formOfClickedButton && !form.minimized) {
       this.desktop.minimizeForm(form);
     }
+  }
+
+  if (selected) {
+    this.unselectToolButtons(toolButton);
   }
 };
 

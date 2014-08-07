@@ -1,16 +1,16 @@
-scout.DesktopKeystrokeAdapter = function(viewButtonBar, taskbar, tree) {
+scout.DesktopKeystrokeAdapter = function(navigation, bench) {
   var that = this;
 
   this.$target = undefined; // set by KeystrokeManager
   this.controller = undefined; // set by KeystrokeManager
   this.handlers = [];
-  this._viewButtonBar = viewButtonBar;
-  this._tree = tree;
-  this._taskbar = taskbar;
+  this._tree = navigation;
+  this._viewButtonBar = navigation.menu;
+  this._taskbar = bench.taskbar;
 
   //FIXME read keycodes from model
-  if (taskbar) {
-    $('.taskbar-item', taskbar.$div).each(function(i, element) {
+  if (this._taskbar) {
+    $('.taskbar-item', this._taskbar.$div).each(function(i, element) {
       var keystroke = $(element).attr('data-shortcut');
       if (keystroke) {
         keystroke = keystroke.toUpperCase();
@@ -36,7 +36,7 @@ scout.DesktopKeystrokeAdapter = function(viewButtonBar, taskbar, tree) {
 
   //FIXME read keycodes from model
   //FIXME Keypad?
-  if (viewButtonBar) {
+  if (this._viewButtonBar) {
     that.handlers.push({
       accept: function(event) {
         if (event && event.which >= 49 && event.which <= 57 && // 1-9
@@ -48,7 +48,7 @@ scout.DesktopKeystrokeAdapter = function(viewButtonBar, taskbar, tree) {
       handle: function(event) {
         var keycode = event.which;
 
-        $('.view-item', viewButtonBar.$div).eq(keycode - 49).click();
+        $('.view-item', that._viewButtonBar.$div).eq(keycode - 49).click();
 
         return false;
       }
@@ -56,7 +56,7 @@ scout.DesktopKeystrokeAdapter = function(viewButtonBar, taskbar, tree) {
   }
 
   //FIXME left right needs ctrl, up down not? -> quite complicated to use. Problem when using ctrl as modifier for every tree related keystroke: ctrl-+ / ctrl-- is used to zoom the browser...
-  if (tree) {
+  if (this._tree) {
     that.handlers.push({
       removeKeyBox: true,
       accept: function(event) {

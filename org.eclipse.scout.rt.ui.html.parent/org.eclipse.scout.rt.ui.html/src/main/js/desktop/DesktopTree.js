@@ -111,7 +111,7 @@ scout.DesktopTree.prototype.showNodeDetailTable = function(node) {
   var detailTable = node.table;
 
   if (this._detailTable && this._detailTable !== detailTable) {
-    this._detailTable.remove();
+    this.session.desktop.removeTable(this._detailTable);
     this._detailTable.desktopMenuContributor = false;
     this._detailTable = null;
   }
@@ -120,7 +120,7 @@ scout.DesktopTree.prototype.showNodeDetailTable = function(node) {
     this._detailTable = detailTable;
     this._detailTable.desktopMenuContributor = true;
     if (!this._detailTable.rendered) {
-      this._detailTable.render($('#DesktopBench'));
+      this.session.desktop.addTable(this._detailTable);
     }
   }
 };

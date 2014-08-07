@@ -12,14 +12,14 @@ scout.MobileDesktopToolButtons.prototype.render = function($desktop) {
   var $desktopTools = $desktop.appendDiv('DesktopTools');
   this.$div = $desktopTools;
 
-  // create tool-items
+  // create tool-buttons
   for (var i = 0; i < this.toolButtons.length; i++) {
     var state = this.toolButtons[i].state || '',
       icon = this.toolButtons[i].icon || '',
       shortcut = this.toolButtons[i].shortcut || '';
 
     var $tool = $desktopTools
-      .appendDiv(this.toolButtons[i].id, 'tool-item ' + state)
+      .appendDiv(this.toolButtons[i].id, 'tool-button ' + state)
       .attr('data-icon', icon).attr('data-shortcut', shortcut);
 
 

@@ -8,7 +8,7 @@ width: 100%;
 overflow: hidden;
 }
 
-.tool-item{
+.tool-button{
 position: relative;
 float: right;
 width: 65px;
@@ -16,18 +16,18 @@ padding: 15px 15px;
 text-align: center;
 }
 
-.tool-item:before{
+.tool-button:before{
 font-family: fontAwesome;
 font-size: 30px;
 color:#0082A1;
 content: attr(data-icon) '\A';
 }
 
-.tool-item:active{
+.tool-button:active{
 color:#0082A1;
 }
 
-.tool-item.selected, .tool-item.selected:before{
+.tool-button.selected, .tool-button.selected:before{
 color:#FE9915 !important;
 }
 

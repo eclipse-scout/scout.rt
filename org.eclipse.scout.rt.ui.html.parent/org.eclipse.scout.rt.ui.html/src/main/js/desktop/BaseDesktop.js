@@ -125,7 +125,7 @@ scout.BaseDesktop.prototype.addForm = function(form) {
       this.modalDialogStack.push(form);
     }
 
-    form.render(this.$parent);
+    form.render(this._resolveViewContainer(form));
     this.focusedDialog = form;
 
     if (this.taskbar) {
@@ -181,8 +181,6 @@ scout.BaseDesktop.prototype.activateForm = function(form) {
       form.render(this.$parent);
     }
 
-    //re attach it at the end
-    form.appendTo(this.$parent);
     this.focusedDialog = form;
 
     if (this.taskbar) {

@@ -1,27 +1,29 @@
-scout.DesktopTreeContainer = function(desktop, $parent, outline) {
+scout.DesktopNavigation = function(desktop, $parent) {
   this.desktop = desktop;
   this.session = desktop.session;
-  this.desktopTree = outline;
+  this.outline = desktop.outline;
 
   this._$desktopTree = $parent.appendDiv('DesktopTree');
   this.$div = this._$desktopTree;
+
+  this.menu = new scout.DesktopMenu(desktop, this.$div);
 };
 
-scout.DesktopTreeContainer.prototype.renderTree = function() {
-  this.desktopTree.render(this._$desktopTree);
+scout.DesktopNavigation.prototype.renderOutline = function() {
+  this.outline.render(this._$desktopTree);
   this._addVerticalSplitter(this._$desktopTree);
 };
 
-scout.DesktopTreeContainer.prototype.onOutlineChanged = function(outline) {
-  this.desktopTree.remove();
-  this.desktopTree = outline;
-  this.desktopTree.render(this._$desktopTree);
+scout.DesktopNavigation.prototype.onOutlineChanged = function(outline) {
+  this.outline.remove();
+  this.outline = outline;
+  this.outline.render(this._$desktopTree);
   if (this._$splitter) {
     this._$splitter.appendTo(this._$desktopTree); //move after tree, otherwise tree overlays splitter after outline change
   }
 };
 
-scout.DesktopTreeContainer.prototype._addVerticalSplitter = function($div) {
+scout.DesktopNavigation.prototype._addVerticalSplitter = function($div) {
   this._$splitter = $div.appendDiv(undefined, 'splitter-vertical')
     .on('mousedown', '', resize);
 
@@ -42,9 +44,9 @@ scout.DesktopTreeContainer.prototype._addVerticalSplitter = function($div) {
         .css('left', w);
 
       if (w <= 180) {
-        that.desktopTree.doBreadCrumb(true);
+        that.outline.doBreadCrumb(true);
       } else {
-        that.desktopTree.doBreadCrumb(false);
+        that.outline.doBreadCrumb(false);
       }
 
     }

@@ -88,25 +88,14 @@ scout.Form.prototype._remove = function() {
 
 scout.Form.prototype.appendTo = function($parent) {
   this.$container.appendTo($parent);
-  if (this.$glasspane) {
-    this.$glasspane.appendTo($parent);
-  }
 };
 
 // TODO AWE: (C.GU) hier sollten wir doch besser die setEnabled() method verwenden / überscheiben.
 scout.Form.prototype.enable = function() {
-  this.$glasspane.remove();
-  this.$glasspane = null;
+  //FIXME CGU implement
 };
 
 scout.Form.prototype.disable = function() {
-  this.$glasspane = this._$parent.appendDiv(undefined, 'glasspane'); // FIXME CGU how to do this properly? disable every mouse and keyevent?
-  // FIXME CGU adjust values on resize
-  this.$glasspane
-    .width(this.$container.width())
-    .height(this.$container.height())
-    .css('top', this.$container.position().top)
-    .css('left', this.$container.position().left);
 };
 
 scout.Form.prototype.onModelCreate = function() {};

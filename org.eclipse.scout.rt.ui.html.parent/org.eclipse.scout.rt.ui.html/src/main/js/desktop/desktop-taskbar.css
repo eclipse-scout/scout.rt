@@ -1,22 +1,28 @@
 .desktop-taskbar{
-position: absolute;
-right: 0px;
-z-index: 10;
-height: calc(100% - 100px);
-width: 100px;
-border-left: 1px solid #CCC;
-overflow: hidden;
+width: 100%;
+position: relative;
+height: 50px;
+white-space: nowrap;
+border-bottom: 1px solid #CCC;
+}
+
+.tabs, .tools {
+  display:inline-block;
+}
+
+.tools {
+  float: right;
 }
 
 .taskbar-item{
 position: relative;
-float: right;
 height: 62px;
 width: 100px;
 padding: 15px 15px 15px 15px;
 text-align: center;
 cursor: pointer;
 color:#FFF;
+display: inline-block;
 }
 
 .taskbar-item:before{
@@ -40,7 +46,7 @@ content: "\f00d" '\A';
 }
 
 /* FIXME CGU this would be the real disabled state, not the modal dialog disable */
-.tool-item.disabled:hover, .tool-item.disabled:before{
+.tool-button.disabled:hover, .tool-button.disabled:before{
 cursor: default;
 }
 
@@ -55,18 +61,12 @@ width: 22px;
 }
 
 /* FIXME CGU this would be the real disabled state, not the modal dialog disable */
-.tool-item.disabled .key-box{
+.tool-button.disabled .key-box{
 background-color:#CCC;
 }
 
-
-.form-thumbnails {
-  display:inline-block;
-}
-
-.form-thumbnail {
+.tab {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-
 }

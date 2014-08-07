@@ -1,7 +1,7 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-scout.DesktopViewButtonBar = function(desktop, $parent, viewButtons) {
+scout.DesktopMenu = function(desktop, $parent) {
   this.$div;
   this.desktop = desktop;
   this.session = desktop.session;
@@ -11,14 +11,10 @@ scout.DesktopViewButtonBar = function(desktop, $parent, viewButtons) {
   this.$div = $desktopView;
 
   //  add view-item, all before #viewAdd
-  for (var i = 0; i < viewButtons.length; i++) {
-    var button = viewButtons[i];
+  for (var i = 0; i < desktop.viewButtons.length; i++) {
+    var button = desktop.viewButtons[i];
     button.render($desktopView);
   }
-
-  //  create logo and plus sign
-  $desktopView.appendDiv('ViewAdd').on('click', '', addOwnView);
-  $desktopView.appendDiv('ViewLogo').delay(1000).animateAVCSD('width', 40, null, null, 1000);
 
   var that = this;
   function addOwnView() {

@@ -45,10 +45,10 @@
 //@include("desktop/DesktopBench.js");
 //@include("desktop/DesktopKeystrokeAdapter.js");
 //@include("desktop/DesktopTaskbar.js");
-//@include("desktop/DesktopTreeContainer.js");
+//@include("desktop/DesktopNavigation.js");
 //@include("desktop/DesktopTree.js");
 //@include("desktop/DesktopViewButton.js");
-//@include("desktop/DesktopViewButtonBar.js");
+//@include("desktop/DesktopMenu.js");
 //@include("desktop/DesktopViewButtonOwn.js");
 //@include("desktop/ToolButton.js");
 //@include("menu/Menu.js");
