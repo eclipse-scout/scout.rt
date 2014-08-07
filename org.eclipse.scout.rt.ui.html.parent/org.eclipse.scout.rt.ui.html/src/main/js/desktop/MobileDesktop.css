@@ -10,7 +10,7 @@ width: 300px;
 .desktop-area-C {
 left: 300px;
 top: 58px;
-height: calc(100% - 58px);
+height: ~"calc(100% - 58px)";
 overflow:hidden;
 }
 

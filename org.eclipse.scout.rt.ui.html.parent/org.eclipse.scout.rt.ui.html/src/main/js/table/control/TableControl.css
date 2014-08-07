@@ -111,7 +111,7 @@ top: 42px;
 position: absolute;
 top: 60px;
 left: 0px;
-width: calc(100% - 20px);
+width: ~"calc(100% - 20px)";
 height: 340px;
 margin: 0px 20px 10px 10px;
 }

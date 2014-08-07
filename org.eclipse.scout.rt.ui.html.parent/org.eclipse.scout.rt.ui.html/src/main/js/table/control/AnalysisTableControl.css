@@ -145,7 +145,7 @@ left: 90%;
 .criteria-container {
 position: absolute;
 top: 20px;
-height: calc(100% - 40px);
+height: ~"calc(100% - 40px)";
 width: 45%;
 left: 55%;
 }

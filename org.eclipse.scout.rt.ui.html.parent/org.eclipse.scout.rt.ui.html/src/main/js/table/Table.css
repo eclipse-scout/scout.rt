@@ -84,7 +84,7 @@ color:#FE9915
 
 .table-data {
 position: relative;
-height: calc(100% - 80px);
+height: ~"calc(100% - 80px)";
 width: 100%;
 overflow: hidden;
 padding-left: 4px;
@@ -94,14 +94,14 @@ padding-left: 4px;
 right: 7px;
 margin-top: 10px;
 margin-bottom: 10px;
-height: calc(100% - 23px);
+height: ~"calc(100% - 23px)";
 }
 
 .table-data > .scrollable-y {
 position: absolute;
 top: 0px;
 height: 100%;
-width: calc(100% - 11px);
+width: ~"calc(100% - 11px)";
 }
 
 /* table rows */
