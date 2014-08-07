@@ -7,6 +7,7 @@ scout.DesktopTaskbar = function(desktop) {
   this.$div;
   this.$tabs;
   this.tabs = {};
+  this.tabStack = [];
   this.selectedTab;
 };
 
@@ -41,42 +42,62 @@ scout.DesktopTaskbar.prototype.formActivated = function(form) {
   }
 
   var tab = this.tabs[form.id];
+  this.selectTab(tab);
+};
+
+scout.DesktopTaskbar.prototype.selectTab = function(tab) {
+  var previousTab = this.selectedTab;
+  if (previousTab) {
+    this.unselectTab(previousTab);
+  }
+
   var $tab = tab.$tab;
-  $tab.selectOne();
+  $tab.select(true);
+  tab.selected = true;
+  this.selectedTab = tab;
+  this.desktop.bench.onTabSelected(tab, previousTab);
+};
+
+scout.DesktopTaskbar.prototype.unselectTab = function(tab) {
+  var $tab = tab.$tab;
+  $tab.select(false);
+  tab.selected = false;
+  this.selectedTab = null;
 };
 
 scout.DesktopTaskbar.prototype.formAdded = function(form) {
-  var that = this;
+  var tab;
   var toolButton = this.getToolButtonForForm(form);
   if (toolButton) {
     toolButton._setSelected(true);
     return;
   }
 
- this.addTab({id: form.id, title: form.title, content: form, type: 'form'});
+ tab = {id: form.id, title: form.title, content: form, type: 'form'};
+ this.addTab(tab);
+ this.selectTab(tab);
 };
 
 scout.DesktopTaskbar.prototype.addTab = function(tab) {
   var $tab = this.$tabs.appendDiv(undefined, 'tab taskbar-item', tab.title);
   tab.$tab = $tab;
   this.tabs[tab.id] = tab;
+  this.tabStack.push(tab);
+
   $tab.attr('data-icon', '\uf096');
   $tab.on('click', onTabClicked.bind(this));
-  $tab.selectOne();
 
   function onTabClicked() {
-    var $button = $(this),
-      selected = !$button.isSelected();
-
-    $button.select(selected);
-
-    if (tab.type == 'form') {
-      this.desktop.activateForm(tab.content);
+    if ($tab.isSelected()) {
+      return;
     }
-    else if(tab.type == 'page') {
-      this.desktop.activatePage(tab.content);
-    }
+
+    this.selectTab(tab);
   }
+};
+
+scout.DesktopTaskbar.prototype.updateTab = function(tab) {
+  tab.$tab.text = tab.title;
 };
 
 scout.DesktopTaskbar.prototype.formRemoved = function(form) {
@@ -92,7 +113,15 @@ scout.DesktopTaskbar.prototype.formRemoved = function(form) {
 
 scout.DesktopTaskbar.prototype.removeTab = function(tab) {
   delete this.tabs[tab.id];
+  scout.arrays.remove(this.tabStack, tab);
   tab.$tab.remove();
+
+  if (tab.selected) {
+    this.selectedTab = null;
+    if (this.tabStack.length > 0) {
+      this.selectTab(this.tabStack[this.tabStack.length-1]);
+    }
+  }
 };
 
 scout.DesktopTaskbar.prototype.formDisabled = function(form) {

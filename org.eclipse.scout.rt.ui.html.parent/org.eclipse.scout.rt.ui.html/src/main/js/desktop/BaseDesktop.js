@@ -5,7 +5,6 @@ scout.BaseDesktop = function() {
   scout.BaseDesktop.parent.call(this);
   this.taskbar;
   this.modalDialogStack = [];
-  this.focusedDialog;
   this._addAdapterProperties(['forms']);
   this.rendered;
 };
@@ -114,19 +113,21 @@ scout.BaseDesktop.prototype.onMenusUpdated = function(group, menus) {
 
 scout.BaseDesktop.prototype.addForm = function(form) {
   if (form.displayHint == 'view') {
+    //FIXME CGU make views work like dialogs
     form.render(this._resolveViewContainer(form));
   } else if (form.displayHint == 'dialog') {
     var previousModalForm;
     if (form.modal) {
       if (this.modalDialogStack.length > 0) {
         previousModalForm = this.modalDialogStack[this.modalDialogStack.length - 1];
-        previousModalForm.disable();
+        previousModalForm.disable();//FIXME CGU implement enable/disable handling (disable desktop, tab switch must be possible)
       }
       this.modalDialogStack.push(form);
     }
 
-    form.render(this._resolveViewContainer(form));
-    this.focusedDialog = form;
+    if (this.bench) {
+      this.bench.renderForm(form);
+    }
 
     if (this.taskbar) {
       if (previousModalForm) {
@@ -156,10 +157,6 @@ scout.BaseDesktop.prototype.removeForm = function(form) {
         this.activateForm(previousModalForm);
       }
     }
-    if (form === this.focusedDialog) {
-      this.focusedDialog = null;
-      this.activateTopDialog();
-    }
 
     if (this.taskbar) {
       if (previousModalForm) {
@@ -172,20 +169,12 @@ scout.BaseDesktop.prototype.removeForm = function(form) {
 
 scout.BaseDesktop.prototype.activateForm = function(form) {
   //FIXME CGU send form activated
-  if (!form || this.focusedDialog === form) {
+  if (!form) {
     return;
   }
 
-  if (form.displayHint === 'dialog') {
-    if (!form.rendered) {
-      form.render(this.$parent);
-    }
-
-    this.focusedDialog = form;
-
-    if (this.taskbar) {
-      this.taskbar.formActivated(form);
-    }
+  if (this.bench) {
+    this.bench.activateForm(form);
   }
 };
 
@@ -197,18 +186,6 @@ scout.BaseDesktop.prototype.minimizeForm = function(form) {
 
   form.minized = true;
   form.remove();
-  if (form === this.focusedDialog) {
-    this.focusedDialog = null;
-    this.activateTopDialog();
-  }
-
-};
-
-scout.BaseDesktop.prototype.activateTopDialog = function() {
-  var topDialog = this.$parent.find('.form:last');
-  if (topDialog) {
-    this.activateForm(topDialog.data('model'));
-  }
 };
 
 scout.BaseDesktop.prototype.maximizeForm = function(form) {
@@ -217,7 +194,9 @@ scout.BaseDesktop.prototype.maximizeForm = function(form) {
   }
 
   form.minized = false;
-  form.render(this.$parent);
+  if (this.bench) {
+    this.bench.renderForm(form);
+  }
 };
 
 scout.BaseDesktop.prototype.onModelAction = function(event) {

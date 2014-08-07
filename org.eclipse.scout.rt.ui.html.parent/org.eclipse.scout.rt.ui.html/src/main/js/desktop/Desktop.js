@@ -38,7 +38,8 @@ scout.Desktop.prototype._render = function($parent) {
   this.navigation = new scout.DesktopNavigation(this, $parent);
   this.layout.register(this.navigation.$div, 'W');
 
-  this.bench = new scout.DesktopBench(this, $parent);
+  this.bench = new scout.DesktopBench(this);
+  this.bench.render($parent);
   this.layout.register(this.bench.$container, 'C');
   this.taskbar = this.bench.taskbar;
   this.menubar = this.bench.menubar;
@@ -58,12 +59,12 @@ scout.Desktop.prototype._render = function($parent) {
   scout.Desktop.parent.prototype._render.call(this, $parent);
 };
 
-scout.Desktop.prototype.addTable = function(table) {
-  this.bench.addTable(table);
+scout.Desktop.prototype.addPageDetailTable = function(page, table) {
+  this.bench.addPageDetailTable(page, table);
 };
 
-scout.Desktop.prototype.removeTable = function(table) {
-  this.bench.removeTable(table);
+scout.Desktop.prototype.removePageDetailTable = function(page, table) {
+  this.bench.removePageDetailTable(page, table);
 };
 
 /**

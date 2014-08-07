@@ -29,7 +29,7 @@ public abstract class JsonAdapterProperty<T> extends JsonProperty<T> {
     if (value == null) {
       return null;
     }
-    return m_jsonSession.getJsonAdapter(value).getId();
+    return m_jsonSession.getOrCreateJsonAdapter(value).getId();
   }
 
 }
