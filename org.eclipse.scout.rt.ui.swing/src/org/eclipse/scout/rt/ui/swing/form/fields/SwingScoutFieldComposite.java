@@ -230,7 +230,12 @@ public abstract class SwingScoutFieldComposite<T extends IFormField> extends Swi
 
   protected void setLabelFromScout(String s) {
     if (m_swingStatusLabel != null) {
-      m_swingStatusLabel.setText(s);
+      if (getScoutObject().getLabelPosition() == IFormField.LABEL_POSITION_ON_FIELD) {
+        m_swingStatusLabel.setText(null);
+      }
+      else {
+        m_swingStatusLabel.setText(s);
+      }
       if (m_swingContainer != null && m_swingStatusLabel.isVisible()) {
         m_swingContainer.revalidate();
       }
