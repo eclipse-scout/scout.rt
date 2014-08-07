@@ -1,0 +1,23 @@
+/* color basics */ 
+
+@color-nav: #41525E;
+@color-nav-semi: #506678;
+@color-nav-light: #DADADA;
+@color-nav-select: #FFFFFF; 
+@color-nav-text: #FFFFFF;
+
+@color-bench: #FFFFFF;
+@color-bench-light: #F6F6F6;
+@color-bench-light-border: #5C5C5C;
+
+@color-bench-text: #333333;
+@color-bench-text-hover: #0082A1;
+
+@color-bench-select: #E9F7FA;
+@color-bench-select-border: #0082A1;
+
+@color-bench-semi: #CCCCCC;
+@color-bench-light: #DBDBDB;
+@color-bench-highlight: #FE9915;
+
+

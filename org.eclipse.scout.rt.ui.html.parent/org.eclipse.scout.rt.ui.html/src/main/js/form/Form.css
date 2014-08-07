@@ -4,7 +4,7 @@
 
 .dialog-form {
   background-color:white;
-  border:solid 1px @testLess;
+  border:solid 1px #ff0000;
   position:absolute;
   top: 100px;
   left: 100px;

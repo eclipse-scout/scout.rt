@@ -1,36 +1,6 @@
 /* (c) Copyright 2013-2014, BSI Business Systems Integration AG */
 /* order: position, size, look, others */
 
-/* font definition */
-
-@testLess: #ff0000;
-
-@font-face {
-font-family: fontAwesome;
-src: url('awesome.woff') format('woff');
-}
-
-@font-face {
-  font-family: fontScout;
-  font-style: normal;
-  font-weight: 600;
-  src: local('Open Sans Semibold'), local('OpenSans-Semibold'), url('open_sans_semi.woff') format('woff');
-}
-
-@font-face {
-  font-family: fontScout;
-  font-style: normal;
-  font-weight: 700;
-  src: local('Open Sans Bold'), local('OpenSans-Bold'), url('open_sans_bold.woff') format('woff');
-}
-
-@font-face {
-  font-family: 'Open Sans';
-  font-style: normal;
-  font-weight: 800;
-  src: local('Open Sans Extrabold'), local('OpenSans-Extrabold'), url('open_sans_extra.woff') format('woff');
-}
-
 /* global section, narrow to .scout for usage as portlet */
 
 body {
@@ -38,15 +8,13 @@ height: 100%;
 width: 100%;
 margin: 0px;
 overflow: hidden;
-font-family: fontScout, sans-serif;
-font-weight: 600;
-font-size: 13px;
 -webkit-touch-callout: none;
 -webkit-user-select: none;
 -moz-user-select: none;
 -ms-user-select: none;
 user-select: none;
 cursor: default;
+.font-text-normal;
 }
 
 *, *:before, *:after {
@@ -61,6 +29,7 @@ div {
 }
 
 /* cursor handling */
+
 body.col-resize *, body.col-resize {
 cursor: col-resize !important;
 }
@@ -69,35 +38,8 @@ body.row-resize *, body.row-resize {
 cursor: row-resize !important;
 }
 
-/* color basics */
-
-include color {
-@color-nav: #41525E;
-@color-nav-semi: #506678;
-@color-nav-light: #DADADA;
-@color-nav-select: #FFFFFF;
-@color-nav-text: #FFFFFF;
-
-@color-bench: #FFFFFF;
-@color-bench-light: #F6F6F6;
-@color-bench-light-border: #5C5C5C;
-
-@color-bench-text: #333333;
-@color-bench-text-hover: #0082A1;
-
-@color-bench-select: #E9F7FA;
-@color-bench-select-border: #0082A1;
-
-@color-bench-semi: #CCCCCC;
-@color-bench-light: #DBDBDB;
-@color-bench-highlight: #FE9915;
-}
-
-@shadow {
-  box-shadow: 2px 6px 14px -6px #CCCCCC;
-}
-
 /* window handling */
+
 .splitter-vertical{
 position: absolute;
 top: 0px;
