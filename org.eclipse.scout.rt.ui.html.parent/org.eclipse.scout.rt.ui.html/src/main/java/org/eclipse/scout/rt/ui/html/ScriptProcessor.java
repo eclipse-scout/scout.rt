@@ -3,6 +3,9 @@ package org.eclipse.scout.rt.ui.html;
 import java.io.File;
 import java.io.IOException;
 
+import com.asual.lesscss.LessEngine;
+import com.asual.lesscss.LessException;
+
 /**
  * Process JS and CSS scripts such as <code>/WebContent/res/scout-4.0.0.css</code> and
  * <code>/WebContent/res/scout-4.0.0.js</code>
@@ -96,8 +99,20 @@ public class ScriptProcessor {
   protected String processCss() throws IOException {
     String content = m_input;
     content = replaceIncludeDirectives(content);
-    content = replaceConstants(content);
+    content = processCssWithLess(content);
     return content;
+  }
+
+  private String processCssWithLess(String content) {
+    LessEngine engine = new LessEngine();
+    try {
+      return engine.compile(content);
+    }
+    catch (LessException e) {
+      System.err.println("Failed to parse CSS content with LESS");
+      e.printStackTrace(System.err);
+      return content;
+    }
   }
 
   protected String replaceIncludeDirectives(String content) throws IOException {

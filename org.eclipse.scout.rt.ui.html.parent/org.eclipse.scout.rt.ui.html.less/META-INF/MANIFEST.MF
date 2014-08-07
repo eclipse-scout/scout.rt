@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Less for Scout Html UI
+Bundle-SymbolicName: org.eclipse.scout.rt.ui.html.less;singleton:=true
+Bundle-Version: 4.1.0.qualifier
+Bundle-ClassPath: commons-cli-1.2.jar,
+ commons-logging-1.2.jar,
+ js.jar,
+ lesscss-engine-1.7.4-SNAPSHOT.jar
+Export-Package: com.asual.lesscss,
+ com.asual.lesscss.compiler,
+ com.asual.lesscss.loader
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-Vendor: BSI Business Systems Integration AG
+Bundle-ActivationPolicy: lazy

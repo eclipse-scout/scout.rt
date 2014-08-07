@@ -3,6 +3,8 @@
 
 /* font definition */
 
+@testLess: #ff0000;
+
 @font-face {
 font-family: fontAwesome;
 src: url('awesome.woff') format('woff');

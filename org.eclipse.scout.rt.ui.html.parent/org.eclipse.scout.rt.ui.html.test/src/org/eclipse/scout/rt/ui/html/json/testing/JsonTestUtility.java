@@ -46,11 +46,6 @@ public class JsonTestUtility {
     return jsonSession;
   }
 
-  // FIXME AWE: (event) check callers
-  public static JsonEvent createJsonEvent(String type) throws JSONException {
-    return new JsonEvent(type, null, new JSONObject());
-  }
-
   public static List<JsonEvent> extractEventsFromResponse(JsonResponse response, String eventType) throws JSONException {
     List<JsonEvent> list = new ArrayList<>();
     for (JsonEvent event : response.getEventList()) {
@@ -67,7 +62,6 @@ public class JsonTestUtility {
       if (ref.get() == null) {
         return;
       }
-
       System.gc();
       try {
         Thread.sleep(50);
