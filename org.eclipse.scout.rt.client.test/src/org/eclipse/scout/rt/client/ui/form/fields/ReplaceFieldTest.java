@@ -127,6 +127,13 @@ public class ReplaceFieldTest {
     assertSame(AbstractTemplateBox.SecondTemplateField.class, form.getTemplate2Box().getSecondTemplateField().getClass());
   }
 
+  @Test
+  public void testNestedReplace() throws Exception {
+    ExampleExForm form = new ExampleExForm();
+    assertNotNull(form.getTextField());
+    assertSame(ExampleExForm.DetailExBox.TextExField.class, form.getTextField().getClass());
+  }
+
   public static class BaseField extends AbstractStringField {
   }
 
@@ -306,6 +313,44 @@ public class ReplaceFieldTest {
 
       @Replace
       public class FirstTemplateExField extends FirstTemplateField {
+      }
+    }
+  }
+
+  public static class ExampleForm extends AbstractForm {
+
+    public ExampleForm() throws ProcessingException {
+      super();
+    }
+
+    public MainBox.DetailBox.TextField getTextField() {
+      return getFieldByClass(MainBox.DetailBox.TextField.class);
+    }
+
+    @Order(10)
+    public class MainBox extends AbstractGroupBox {
+      @Order(10)
+      public class DetailBox extends AbstractGroupBox {
+        @Order(10)
+        public class TextField extends AbstractStringField {
+        }
+      }
+    }
+  }
+
+  public static class ExampleExForm extends ExampleForm {
+    public ExampleExForm() throws ProcessingException {
+      super();
+    }
+
+    @Replace
+    public class DetailExBox extends MainBox.DetailBox {
+      public DetailExBox(ExampleForm.MainBox container) {
+        container.super();
+      }
+
+      @Replace
+      public class TextExField extends TextField {
       }
     }
   }
