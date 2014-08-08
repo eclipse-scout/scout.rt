@@ -100,10 +100,6 @@ scout.Desktop.prototype.changeOutline = function(outline) {
   this.navigation.onOutlineChanged(this.outline);
 };
 
-scout.Desktop.prototype._onSearchPerformed = function(event) {
-  this.navigation.onSearchPerformed(event);
-};
-
 /**
  * @override
  */
@@ -111,7 +107,7 @@ scout.Desktop.prototype.onModelAction = function(event) {
   if (event.type === 'outlineChanged') {
     this.changeOutline(this.session.getOrCreateModelAdapter(event.outline, this));
   } else if (event.type === 'searchPerformed') {
-    this._onSearchPerformed(event);
+    this.navigation.onSearchPerformed(event);
   } else {
     scout.Desktop.parent.prototype.onModelAction.call(this, event);
   }

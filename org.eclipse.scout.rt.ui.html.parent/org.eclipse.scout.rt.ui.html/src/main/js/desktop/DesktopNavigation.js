@@ -26,14 +26,18 @@ scout.DesktopNavigation = function(desktop, $parent) {
 
   //  create tab container
   var outlineTab = new scout.TabAndBody(
+    'outlines',
     this._createOutlinesTabHead(),
     this._createOutlinesTabBody());
   outlineTab.$head.on('click', function() { this._setActiveTab(outlineTab); }.bind(this));
+  outlineTab.$outlineParent = outlineTab.$body;
 
   var searchTab = new scout.TabAndBody(
+      'search',
       this._createSearchTabHead(),
       this._createSearchTabBody());
   searchTab.$head.on('click', function() { this._setActiveTab(searchTab); }.bind(this));
+  searchTab.$outlineParent = searchTab.$body.find('#DesktopTree');
 
   this.$tabHeader = this._$navigation.appendDiv('DesktopTreeTabHeader');
   this.$tabHeader.append(outlineTab.$head);
@@ -45,13 +49,11 @@ scout.DesktopNavigation = function(desktop, $parent) {
   this.activeTab = outlineTab;
 };
 
-scout.TabAndBody = function($head, $body) {
+scout.TabAndBody = function(tabId, $head, $body) {
+  this.tabId = tabId;
   this.$head = $head;
   this.$body = $body;
-};
-
-scout.TabAndBody.prototype.getOutlineParent = function() {
-  return this.$body;
+  this.$outlineParent;
 };
 
 scout.DesktopNavigation.prototype._getSearchOutline = function() {
@@ -95,20 +97,16 @@ scout.DesktopNavigation.prototype._setActiveTab = function(tab) {
   tab.$head.addClass('active-tab-head');
   this.$tabContainer.append(tab.$body);
   this.activeTab = tab;
+  this.session.send('desktopTabClicked', this.desktop.id, {'tabId' : tab.tabId });
 };
 
 scout.DesktopNavigation.prototype._createOutlinesTabBody = function() {
-  var $body = $('<div class="tab-body" id="DesktopTree"></div>');
-  return $body;
+  return $('<div class="tab-body" id="DesktopTree"></div>');
 };
 
 scout.DesktopNavigation.prototype._showOutlinesMenu = function() {
   var visible = this.$outlinesMenu.css('display') === 'none';
   this.$outlinesMenu.css('display', visible ? 'auto' : 'none');
-};
-
-scout.DesktopNavigation.prototype.onOutlineChanged = function(outline) {
-  this.$activeOutline.html(outline.title);
 };
 
 scout.DesktopNavigation.prototype._createSearchTabHead = function() {
@@ -126,9 +124,11 @@ scout.DesktopNavigation.prototype._createSearchTabHead = function() {
 
 scout.DesktopNavigation.prototype._createSearchTabBody = function() {
   var $body = $('<div class="tab-body"></div>');
+  var $outline = $('<div class="tab-body" id="DesktopTree"></div>');
   this.$searchStatus = $('<div class="search-status"></div>');
-  $body.append(this.$searchStatus);
-  // TODO AWE: (search) hier den tree für die suchergebnisse hinzufügen
+  $body.
+    append(this.$searchStatus).
+    append($outline);
   return $body;
 };
 
@@ -140,7 +140,7 @@ scout.DesktopNavigation.prototype._search = function() {
 };
 
 scout.DesktopNavigation.prototype.renderOutline = function() {
-  this.outline.render(this.activeTab.getOutlineParent());
+  this.outline.render(this.activeTab.$outlineParent);
   this.$activeOutline.html(this.outline.title);
   this._addVerticalSplitter(this._$navigation);
 };
@@ -152,8 +152,8 @@ scout.DesktopNavigation.prototype.onSearchPerformed = function(event) {
 scout.DesktopNavigation.prototype.onOutlineChanged = function(outline) {
   this.outline.remove();
   this.outline = outline;
+  this.outline.render(this.activeTab.$outlineParent);
   this.$activeOutline.html(outline.title);
-  this.outline.render(this.activeTab.getOutlineParent());
   if (this._$splitter) {
     this._$splitter.appendTo(this._$navigation); //move after tree, otherwise tree overlays splitter after outline change
   }

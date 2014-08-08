@@ -43,20 +43,24 @@ import org.eclipse.scout.service.SERVICES;
 import org.json.JSONObject;
 
 public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
+
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonDesktop.class);
 
   public static final String PROP_OUTLINE = "outline";
+
   public static final String PROP_FORM = "form";
 
-  private DesktopListener m_desktopListener;
-
-  private String TOOL_BUTTONS = "[" +
+  private static final String TOOL_BUTTONS = "[" +
       "          {\"id\": \"t2\", \"objectType\": \"ToolButton\", \"text\": \"Zugriff\", \"icon\": \"\uf144\", \"shortcut\": \"F4\"}," +
       "          {\"id\": \"t3\", \"objectType\": \"ToolButton\", \"text\": \"Favoriten\", \"icon\": \"\uf005\", \"shortcut\": \"F6\"}," +
       "          {\"id\": \"t4\", \"objectType\": \"ToolButton\", \"text\": \"Muster\", \"icon\": \"\uf01C\", \"shortcut\": \"F7\", \"state\": \"disabled\"}," +
       "          {\"id\": \"t5\", \"objectType\": \"ToolButton\", \"text\": \"Telefon\", \"icon\": \"\uf095\", \"shortcut\": \"F8\"}," +
       "          {\"id\": \"t6\", \"objectType\": \"ToolButton\", \"text\": \"Cockpit\", \"icon\": \"\uf0E4\", \"shortcut\": \"F9\"}," +
       "          {\"id\": \"t7\", \"objectType\": \"ToolButton\", \"text\": \"Prozesse\", \"icon\": \"\uf0D0\",\"shortcut\": \"F10\"}]}]";
+
+  private DesktopListener m_desktopListener;
+
+  private IOutline m_previousOutline;
 
   public JsonDesktop(IDesktop desktop, IJsonSession jsonSession, String id) {
     super(desktop, jsonSession, id);
@@ -250,6 +254,23 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
   public void handleUiEvent(JsonEvent event, JsonResponse res) {
     if ("search".equals(event.getType())) {
       handleSearch(event);
+    }
+    else if ("desktopTabClicked".equals(event.getType())) {
+      handleDesktopTabClicked(event);
+    }
+  }
+
+  private void handleDesktopTabClicked(JsonEvent event) {
+    String tabId = event.getData().optString("tabId");
+    if ("search".equals(tabId)) {
+      IOutline activeOutline = getModel().getOutline();
+      if (!(activeOutline instanceof ISearchOutline)) {
+        m_previousOutline = activeOutline;
+        getModel().setOutline(getSearchOutline());
+      }
+    }
+    else {
+      getModel().setOutline(m_previousOutline);
     }
   }
 
