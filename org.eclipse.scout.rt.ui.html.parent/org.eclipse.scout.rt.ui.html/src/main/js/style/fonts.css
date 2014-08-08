@@ -1,5 +1,7 @@
 @font-face {
 font-family: fontAwesome;
+font-style: normal;
+font-weight: 400;
 src: url('awesome.woff') format('woff');
 }
 
@@ -29,6 +31,11 @@ font-family: 'Open Sans';
 font-style: normal;
 font-weight: 800;
 src: local('Open Sans Extrabold'), local('OpenSans-Extrabold'), url('open_sans_extra.woff') format('woff');
+}
+
+.font-icon(@weight: 400) {
+font-family: fontAwesome;
+font-weight: @weight;
 }
 
 .font-text-small(@weight: 600) {

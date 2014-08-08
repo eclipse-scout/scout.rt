@@ -75,7 +75,7 @@ scout.defaultObjectFactories = [{
 }, {
   objectType: 'ToolButton',
   create: function() {
-    return new scout.ToolButton();
+    return new scout.DesktopToolButton();
   }
 }, {
   objectType: 'DataModel',

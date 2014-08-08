@@ -1,6 +1,4 @@
-scout.DesktopMenubar = function($parent, session) {
-  this.session = session;
-
+scout.DesktopMenubar = function($parent) {
   //create container
   this.$container = $parent.appendDiv('', 'desktop-menu').data('this', this);
   this.$tree = this.$container.appendDiv('', 'desktop-menu-tree');

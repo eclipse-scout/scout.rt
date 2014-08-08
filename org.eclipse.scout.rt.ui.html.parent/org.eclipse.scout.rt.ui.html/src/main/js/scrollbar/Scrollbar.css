@@ -1,21 +1,21 @@
 .scrollbar {
-position: absolute;
-width: 10px;
-height: 100%;
-z-index: 1;
-background-color: white;
-cursor: pointer;
+	position: absolute;
+	width: 8px;
+	height: 100%;
+	z-index: 1;
+	cursor: pointer;
 }
 
 .scrollbar-thumb {
-position: absolute;
-width: 10px;
-top: 0px;
-z-index: 2;
-background-color: #D4D4D4;
-cursor: pointer;
+	position: absolute;
+	width: 10px;
+	top: 0px;
+	z-index: 2;
+	background-color: rgba(255, 255, 255, 0.3);
+	cursor: pointer;
+	border-radius: 4px;
 }
 
 .scrollbar-thumb-move, .scrollbar-thumb:hover{
-background-color: #0082A1;
+	background-color: rgba(255, 255, 255, 0.6);
 }

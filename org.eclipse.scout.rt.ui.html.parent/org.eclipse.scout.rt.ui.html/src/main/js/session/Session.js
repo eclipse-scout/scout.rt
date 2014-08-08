@@ -188,6 +188,7 @@ scout.Session.prototype._processSuccessResponse = function(message) {
 
   this._copyAdapterData(message.adapterData);
   this.processingEvents = true;
+  this._processEvents(message.events);
   try {
     this._processEvents(message.events);
   } finally {

@@ -1,6 +1,8 @@
 /**
  * JQuery plugin with scout extensions
  */
+var l = console.log.bind(console);
+
 /*global console: false */
 (function($) {
 
@@ -22,6 +24,10 @@
     );
   };
 
+  $.makeDIV = function(cssClass, htmlContent) {
+    return $.makeDiv(undefined, cssClass, htmlContent);
+  };
+
   // used by some animate functions
   $.removeThis = function() {
     $(this).remove();
@@ -34,6 +40,24 @@
    */
   $.suppressEvent = function(event) {
     event.stopPropagation();
+  };
+
+  /**
+   * Implements the 'debounce' pattern. The given function fx is executed after a certain delay
+   * (in milliseconds), but if the same function is called a second time within the waiting time,
+   * the timer is reset. The default value for 'delay' is 250 ms.
+   */
+  $.debounce = function(fx, delay) {
+    var delayer = null;
+    delay = (typeof delay !== 'undefined') ? delay : 250;
+    return function() {
+      var that = this,
+        args = arguments;
+      clearTimeout(delayer);
+      delayer = setTimeout(function() {
+        fx.apply(that, args);
+      }, delay);
+    };
   };
 
   /**
@@ -69,6 +93,27 @@
   $.fn.beforeDiv = function(id, cssClass, htmlContent) {
     return $.makeDiv(id, cssClass, htmlContent).insertBefore(this);
   };
+
+  // prepend without id - and return new div for chaining
+  $.fn.prependDIV = function(cssClass, htmlContent) {
+    return $.makeDiv(undefined, cssClass, htmlContent).prependTo(this);
+  };
+
+  // append without id - and return new div for chaining
+  $.fn.appendDIV = function(cssClass, htmlContent) {
+    return $.makeDiv(undefined, cssClass, htmlContent).appendTo(this);
+  };
+
+  // insert after without id - and return new div for chaining
+  $.fn.afterDIV = function(cssClass, htmlContent) {
+    return $.makeDiv(undefined, cssClass, htmlContent).insertAfter(this);
+  };
+
+  // insert before without id - and return new div for chaining
+  $.fn.beforeDIV = function(cssClass, htmlContent) {
+    return $.makeDiv(undefined, cssClass, htmlContent).insertBefore(this);
+  };
+
 
   // append svg
   $.fn.appendSVG = function(type, id, cssClass, htmlContent) {

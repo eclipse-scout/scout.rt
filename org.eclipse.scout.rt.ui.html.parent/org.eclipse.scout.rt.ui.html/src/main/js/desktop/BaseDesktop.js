@@ -3,31 +3,12 @@
 
 scout.BaseDesktop = function() {
   scout.BaseDesktop.parent.call(this);
-  this.taskbar;
-  this.modalDialogStack = [];
-  this._addAdapterProperties(['forms']);
-  this.rendered;
 };
 scout.inherits(scout.BaseDesktop, scout.ModelAdapter);
 
-scout.BaseDesktop.prototype._render = function($parent) {
-  //this.$entryPoint.addClass('desktop'); //FIXME desktop elements use ids,
-  // maybe better change to class to support multiple session divs with multiple
-  // desktops
-
-  var i, form;
-  for (i = 0; i < this.forms.length; i++) {
-    form = this.forms[i];
-    if (!form.minimized) {
-      this.addForm(form);
-    }
-  }
-};
-
 scout.BaseDesktop.prototype.showMessage = function(message, type) {
-  if (!type) {
-    type = 'info';
-  }
+  type = type || 'info';
+
   if (!this.$message) {
     this.$message = this.$parent.prependDiv('', type + '-message');
   }
@@ -105,115 +86,4 @@ scout.BaseDesktop.prototype.onReconnectingFailed = function() {
   }
 
   this.$offline.find('.reconnect').hide();
-};
-
-scout.BaseDesktop.prototype.onMenusUpdated = function(group, menus) {
-  //may be implemented by subclasses
-};
-
-scout.BaseDesktop.prototype.addForm = function(form) {
-  if (form.displayHint == 'view') {
-    //FIXME CGU make views work like dialogs
-    form.render(this._resolveViewContainer(form));
-  } else if (form.displayHint == 'dialog') {
-    var previousModalForm;
-    if (form.modal) {
-      if (this.modalDialogStack.length > 0) {
-        previousModalForm = this.modalDialogStack[this.modalDialogStack.length - 1];
-        previousModalForm.disable();//FIXME CGU implement enable/disable handling (disable desktop, tab switch must be possible)
-      }
-      this.modalDialogStack.push(form);
-    }
-
-    if (this.bench) {
-      this.bench.renderForm(form);
-    }
-
-    if (this.taskbar) {
-      if (previousModalForm) {
-        this.taskbar.formDisabled(previousModalForm);
-      }
-      this.taskbar.formAdded(form);
-    }
-  } else {
-    $.log('Form displayHint not handled: ' + form.displayHint + '.');
-  }
-};
-
-scout.BaseDesktop.prototype.removeForm = function(form) {
-  if (!form) {
-    return;
-  }
-
-  form.remove();
-
-  if (form.displayHint === 'dialog') {
-    var previousModalForm;
-    if (form.modal) {
-      scout.arrays.remove(this.modalDialogStack, form);
-      previousModalForm = this.modalDialogStack[this.modalDialogStack.length - 1];
-      if (previousModalForm) {
-        previousModalForm.enable();
-        this.activateForm(previousModalForm);
-      }
-    }
-
-    if (this.taskbar) {
-      if (previousModalForm) {
-        this.taskbar.formEnabled(previousModalForm);
-      }
-      this.taskbar.formRemoved(form);
-    }
-  }
-};
-
-scout.BaseDesktop.prototype.activateForm = function(form) {
-  //FIXME CGU send form activated
-  if (!form) {
-    return;
-  }
-
-  if (this.bench) {
-    this.bench.activateForm(form);
-  }
-};
-
-scout.BaseDesktop.prototype.minimizeForm = function(form) {
-  //FIXME CGU minimize maximize sind properties auf form, können auch vom modell gesteuert werden -> Steuerung eher über form.setMaximized
-  if (form.displayHint !== 'dialog') {
-    return;
-  }
-
-  form.minized = true;
-  form.remove();
-};
-
-scout.BaseDesktop.prototype.maximizeForm = function(form) {
-  if (form.displayHint !== 'dialog') {
-    return;
-  }
-
-  form.minized = false;
-  if (this.bench) {
-    this.bench.renderForm(form);
-  }
-};
-
-scout.BaseDesktop.prototype.onModelAction = function(event) {
-  var form;
-
-  if (event.type === 'formAdded') {
-    form = this.session.getOrCreateModelAdapter(event.form, this);
-    this.forms.push(form);
-    this.addForm(form);
-  } else if (event.type === 'formRemoved') {
-    form = this.session.getOrCreateModelAdapter(event.form, this);
-    scout.arrays.remove(this.forms, form);
-    this.removeForm(form);
-  } else if (event.type === 'formEnsureVisible') {
-    form = this.session.getOrCreateModelAdapter(event.form, this);
-    this.activateForm(form);
-  } else {
-    $.log('Model event not handled. Widget: Desktop. Event: ' + event.type + '.');
-  }
 };

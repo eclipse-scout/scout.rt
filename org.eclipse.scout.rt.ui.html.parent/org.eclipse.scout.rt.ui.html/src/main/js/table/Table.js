@@ -60,6 +60,8 @@ scout.Table.prototype._render = function($parent) {
     scout.keystrokeManager.installAdapter(this.$container, this._keystrokeAdapter);
   }
 
+  this.menubar = new scout.DesktopMenubar(this.$container);
+
   this._$header = this.$container.appendDiv(this.id + '_header', 'table-header');
   if (!this.headerVisible) {
     //FIXME maybe better to not create at all?
@@ -346,7 +348,7 @@ scout.Table.prototype._renderMenus = function($selectedRows) {
   this._selectedRowMenus = menus;
 
   if (this.desktopMenuContributor && this.session.desktop) {
-    this.session.desktop.onMenusUpdated('table', this._selectedRowMenus);
+    //this.session.desktop.onMenusUpdated('table', this._selectedRowMenus);
   }
 };
 

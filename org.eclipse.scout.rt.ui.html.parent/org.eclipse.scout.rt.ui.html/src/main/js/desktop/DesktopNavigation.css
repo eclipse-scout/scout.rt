@@ -1,102 +1,137 @@
-#DesktopViews {
-width: 100%;
-height: 50px;
-white-space: nowrap;
-border-bottom: 1px solid #CCC;
-overflow: hidden;
+/* main element */
+.desktop-navigation {
+	position: relative;
+	height: 100%;
+    width: @size-desktop-navigation;
+    background-color: @color-nav;
+    color: @color-bench;
 }
 
-
-
-.view-item {
-/* TODO CGU: clean-up unused styles, maybe delete whole css file
-  position: relative;
-float: left;
-margin: 14px 0px 0px 40px;
-padding-bottom: 7px;
-font-size: 18px;
-line-height: 26px;
-color: #9C9C9C;
-cursor: pointer;
-white-space: nowrap;
-min-width: 50px;
-text-align: center;
-*/
+.navigation-header{
+    width: 100%;
+    height: @size-desktop-tools;
+    .font-text-large;
+    white-space: nowrap;
 }
 
-.view-item:hover{
-color: #595959;
-border-bottom: 2px solid #595959;
+.navigation-container{
+    top: @size-desktop-tools;
+    height: calc(~"100%" - @size-desktop-tools);
+    width: 100%;
 }
 
-.view-item[disabled]:hover{
-color: #9C9C9C;
-border-bottom: 0;
-cursor: default;
+.navigation-splitter-vertical{
+	position: absolute;
+	top: 0px;
+	right: -8px;
+	height: 100%;
+	width: 16px;
+	cursor: col-resize;
+	z-index: 1;
 }
 
-.view-item.selected {
-color: #FE9915 !important;
-border-bottom: 2px solid #FE9915;
+.navigation-tab-outline,
+.navigation-tab-search {
+	float: left;
+	
+	&.tab-active {
+		width: calc(~"100%" - @size-desktop-tools);
+	}
+	
+    &:not(.tab-active) {
+        background-color: @color-nav-light;
+    	color: @color-bench-text;
+    	width: 50px;
+    	
+    }    	
 }
 
-.view-item-icon:before {
-font-family: fontAwesome;
-/* content: attr(data-iconId); */
-content: "\f002";
+/* navigation header outline */
+
+.navigation-tab-outline-button,
+.navigation-tab-search-button,
+.navigation-tab-outline-title,
+.navigation-tab-search-field {
+	padding: 0px 5px 0px 10px;
+	overflow: hidden;
+  	text-overflow: ellipsis;
+  	white-space: nowrap;
+	cursor: pointer;
+	.font-text-large;
+	line-height: 50px;
+	height: 50px;
 }
 
-#ViewAdd {
-float: left;
-height: 50px;
-width: 45px;
-padding: 17px 0px 0px 20px;
-margin-left: 15px;
-cursor: pointer;
+.navigation-tab-outline-button {
+	float: left;
+	padding: 0px 15px 0px 15px;
+
+	&.tab-menu-open {
+		color: @color-bench-text-hover;
+		background-color: @color-bench;
+	}
+	
+	&:before{
+		.font-icon;
+		font-size: 24px;
+		content: "\F0C9";
+	}
 }
 
-#ViewAdd:before{
-font-family: fontAwesome;
-font-size: 14px;
-color: #0082A1;
-content: "\f067";
+.navigation-tab-search-button {
+	float: right;
+	padding: 0px 15px 0px 15px;
+	
+	&:before{
+		.font-icon;
+		font-size: 24px;
+		content: "\F002";
+	}
+	
 }
 
-#ViewAdd:hover:before{
-color:#FE9915;
+.navigation-tab-outline-title {
+	overflow: hidden;
+	display: none;
+
+	.tab-active > & {
+	    display: initial;
+    }
+	
+}
+.navigation-tab-search-field {
+	width: calc(~"100% - 4px" - @size-desktop-tools );
+	
+	outline:0;
+	border: 0;
+	display: none;
+	
+    background-color: @color-nav;
+    color: @color-bench;
+
+	.tab-active > & {
+	    display: initial;
+    }
+}
+	
+/* outline menu */
+
+.navigation-tab-outline-menu {
+	position: absolute;
+	display: none;
+	background-color: @color-bench;
+	z-index: 2;
+	.mixin-shadow;
 }
 
-.view-remove{
-position: absolute;
-top: -10px;
-right: -10px;
-height: 25px;
-width: 10px;
-padding-left: 5px;
-}
-
-.view-item:hover .view-remove:after{
-font-family: fontAwesome;
-font-size: 9px;
-color: #0082A1;
-content: "\f00d";
-}
-
-.view-remove:hover:after {
-color:#FE9915 !important;
-}
-
-#ViewLogo {
-float: right;
-margin-top: 9px;
-width: 225px; /*animate to 57px;*/
-height: 33px;
-background: url("logo.png");
-background-size: cover;
-}
-
-.view-item .key-box {
-left: -18px;
-top: -8px;
-width: 14px;
+.outline-menu-item {
+	padding: 0px 15px 0px 15px;
+	line-height: 50px;
+	border-bottom: 1px solid @color-bench-light-border;
+	cursor: pointer;
+	color: @color-bench-text;
+	
+	&:hover{
+		color: @color-bench-text-hover;
+	}
 }

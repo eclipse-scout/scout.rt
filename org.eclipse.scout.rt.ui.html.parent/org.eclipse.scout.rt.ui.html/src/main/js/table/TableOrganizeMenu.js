@@ -102,8 +102,8 @@ scout.TableOrganizeMenu = function(table, x, y) {
 
   $('<input id="FilterInput"></input>')
     .appendTo($commandFilter)
-    .on('keydown', '', scout.debounce(filterKey))
-    .on('input paste', '', scout.debounce(filterEnter))
+    .on('keydown', '', $.debounce(filterKey))
+    .on('input paste', '', $.debounce(filterEnter))
     .val(filterText);
 
   // name all label elements
