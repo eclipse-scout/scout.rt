@@ -12,12 +12,15 @@ package org.eclipse.scout.rt.client.ui.form.fields;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.InjectFieldTo;
@@ -30,6 +33,10 @@ import org.eclipse.scout.rt.client.ui.form.FormFieldInjectionThreadLocal;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
+import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.AbstractSequenceBox;
+import org.eclipse.scout.rt.client.ui.form.fields.snapbox.AbstractSnapBox;
+import org.eclipse.scout.rt.client.ui.form.fields.splitbox.AbstractSplitBox;
+import org.eclipse.scout.rt.client.ui.form.fields.tabbox.AbstractTabBox;
 import org.eclipse.scout.rt.client.ui.form.fields.wrappedform.IWrappedFormField;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.service.SERVICES;
@@ -150,9 +157,75 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
   @Override
   public void setFormInternal(IForm form) {
     super.setFormInternal(form);
+    if (this == form.getRootGroupBox() && form instanceof AbstractForm) {
+      // this is the root group box. Publish replacement map to form and keep local map for better performance (see getReplacingFieldClass)
+      ((AbstractForm) form).registerFormFieldReplacementsInternal(m_formFieldReplacements);
+    }
     for (IFormField field : m_fields) {
       field.setFormInternal(form);
     }
+  }
+
+  @Override
+  public void setParentFieldInternal(ICompositeField parentField) {
+    super.setParentFieldInternal(parentField);
+    if (!(parentField instanceof AbstractCompositeField)) {
+      return;
+    }
+
+    // check if this is a template field box
+    if (isTemplateField()) {
+      // do not publish replacement map for template field boxes
+      return;
+    }
+
+    // publish replacement map to parent AbstractCompositeField and keep local map for better performance (see getReplacingFieldClass)
+    ((AbstractCompositeField) parentField).registerFormFieldReplacements(m_formFieldReplacements);
+  }
+
+  /**
+   * Returns <code>true</code> if this field is a template group box, i.e. an abstract box class containing
+   * other {@link IFormField}s.
+   * <p/>
+   * This default implementation checks the path of super classes, starting by the most specific one and stopping by
+   * this class or one of its well known direct sub classes (i.e {@link AbstractGroupBox}, {@link AbstractSequenceBox},
+   * {@link AbstractSnapBox}, {@link AbstractSplitBox} and {@link AbstractTabBox}). If there exists an abstract class
+   * containing {@link IFormField}, this method returns <code>true</code>. Subclasses may override this default
+   * behavior.
+   * 
+   * @since 4.0.1
+   */
+  protected boolean isTemplateField() {
+    Class<?> c = getClass();
+    while (c.getSuperclass() != null) {
+      c = c.getSuperclass();
+
+      // non-abstract classes are not considered as template
+      if (!Modifier.isAbstract(c.getModifiers())) {
+        continue;
+      }
+
+      // quick check for well known Scout classes
+      if (CompareUtility.isOneOf(c,
+          AbstractCompositeField.class,
+          AbstractGroupBox.class,
+          AbstractSequenceBox.class,
+          AbstractSnapBox.class,
+          AbstractSplitBox.class,
+          AbstractTabBox.class)) {
+        return false;
+      }
+
+      // class is only a template if it contains fields
+      for (Class<?> innerClass : c.getDeclaredClasses()) {
+        int m = innerClass.getModifiers();
+        if (Modifier.isPublic(m) && !Modifier.isAbstract(m) && IFormField.class.isAssignableFrom(innerClass)) {
+          return true;
+        }
+      }
+    }
+
+    return false;
   }
 
   @Override
@@ -217,6 +290,23 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
   }
 
   /**
+   * Registers the given form field replacements on this composite field.
+   * 
+   * @param replacements
+   *          Map having old field classes as key and replacing field classes as values.
+   * @since 4.0.1
+   */
+  private void registerFormFieldReplacements(Map<Class<?>, Class<? extends IFormField>> replacements) {
+    if (replacements == null || replacements.isEmpty()) {
+      return;
+    }
+    if (m_formFieldReplacements == null) {
+      m_formFieldReplacements = new HashMap<Class<?>, Class<? extends IFormField>>();
+    }
+    m_formFieldReplacements.putAll(replacements);
+  }
+
+  /**
    * Checks whether the form field with the given class has been replaced by another form field. If so, the replacing
    * form field's class is returned. Otherwise the given class itself.
    * 
@@ -246,7 +336,22 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
         }
       }
     }
-    // 3. field is not replaced
+    // 3. check parent field replacements (used for templates only. It is less common and therefore checked after global replacements)
+    ICompositeField parentField = getParentField();
+    while (parentField != null) {
+      if (parentField instanceof AbstractCompositeField) {
+        Map<Class<?>, Class<? extends IFormField>> parentReplacements = ((AbstractCompositeField) parentField).m_formFieldReplacements;
+        if (parentReplacements != null) {
+          @SuppressWarnings("unchecked")
+          Class<? extends T> replacementFieldClass = (Class<? extends T>) parentReplacements.get(c);
+          if (replacementFieldClass != null) {
+            return replacementFieldClass;
+          }
+        }
+      }
+      parentField = parentField.getParentField();
+    }
+    // 4. field is not replaced
     return c;
   }
 
