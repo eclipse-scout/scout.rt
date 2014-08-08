@@ -1,4 +1,4 @@
-package org.eclipse.scout.rt.ui.html.json.desktop;
+package org.eclipse.scout.rt.ui.html.json.tree;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -9,13 +9,10 @@ import java.util.Map;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ContextMenuEvent;
+import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeListener;
-import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
-import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
-import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
-import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
@@ -25,16 +22,16 @@ import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.menu.IContextMenuOwner;
-import org.eclipse.scout.rt.ui.html.json.table.JsonTable;
-import org.eclipse.scout.rt.ui.html.json.tree.TreeEventFilter;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class JsonDesktopTree extends AbstractJsonPropertyObserver<IOutline> implements IContextMenuOwner {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonDesktopTree.class);
+public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> implements IContextMenuOwner {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonTree.class);
+  public static final String EVENT_NODE_CLICKED = "nodeClicked";
   public static final String EVENT_NODES_SELECTED = "nodesSelected";
   public static final String EVENT_NODE_EXPANDED = "nodeExpanded";
   public static final String EVENT_NODES_DELETED = "nodesDeleted";
+  public static final String EVENT_NODES_INSERTED = "nodesInserted";
   public static final String EVENT_ALL_NODES_DELETED = "allNodesDeleted";
   public static final String PROP_NODE_ID = "nodeId";
   public static final String PROP_NODE_IDS = "nodeIds";
@@ -49,12 +46,12 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserver<IOutline> impl
   private TreeEventFilter m_treeEventFilter;
 
   // TODO AWE/CGU: wieso heisst die klasse hier nicht JsonOutline? naming auch in JS korrigieren
-  public JsonDesktopTree(IOutline model, IJsonSession jsonSession, String id) {
+  public JsonTree(T model, IJsonSession jsonSession, String id) {
     super(model, jsonSession, id);
     m_treeNodes = new HashMap<>();
     m_treeNodeIds = new HashMap<>();
     m_treeEventFilter = new TreeEventFilter(getModel());
-    putJsonProperty(new JsonProperty<IOutline>(IOutline.PROP_TITLE, model) {
+    putJsonProperty(new JsonProperty<T>(ITree.PROP_TITLE, model) {
       @Override
       protected String modelValue() {
         return getModel().getTitle();
@@ -64,7 +61,7 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserver<IOutline> impl
 
   @Override
   public String getObjectType() {
-    return "DesktopTree";
+    return "Tree";
   }
 
   @Override
@@ -77,25 +74,20 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserver<IOutline> impl
     attachAdapter(getModel().getContextMenu());
     attachAdapters(getModel().getMenus());
     if (getModel().isRootNodeVisible()) {
-      attachPage(getModel().getRootPage());
+      attachTreeNode(getModel().getRootNode());
     }
     else {
-      for (IPage childPage : getModel().getRootPage().getChildPages()) {
-        attachPage(childPage);
+      for (ITreeNode childNode : getModel().getRootNode().getChildNodes()) {
+        attachTreeNode(childNode);
       }
     }
   }
 
-  private void attachPage(IPage page) {
-    if (page.getChildNodeCount() > 0) {
-      for (IPage childPage : page.getChildPages()) {
-        attachPage(childPage);
+  protected void attachTreeNode(ITreeNode node) {
+    if (node.getChildNodeCount() > 0) {
+      for (ITreeNode childNode : node.getChildNodes()) {
+        attachTreeNode(childNode);
       }
-    }
-    optAttachAdapter(page.getDetailForm());
-    if (page instanceof IPageWithTable) {
-      IPageWithTable<?> pageWithTable = (IPageWithTable<?>) page;
-      attachAdapter(pageWithTable.getTable());
     }
   }
 
@@ -122,17 +114,17 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserver<IOutline> impl
   @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
-    JSONArray jsonPages = new JSONArray();
+    JSONArray jsonNodes = new JSONArray();
     if (getModel().isRootNodeVisible()) {
-      IPage rootPage = getModel().getRootPage();
-      jsonPages.put(pageToJson(rootPage));
+      ITreeNode rootNode = getModel().getRootNode();
+      jsonNodes.put(treeNodeToJson(rootNode));
     }
     else {
-      for (IPage childPage : getModel().getRootPage().getChildPages()) {
-        jsonPages.put(pageToJson(childPage));
+      for (ITreeNode childNode : getModel().getRootNode().getChildNodes()) {
+        jsonNodes.put(treeNodeToJson(childNode));
       }
     }
-    putProperty(json, PROP_NODES, jsonPages);
+    putProperty(json, PROP_NODES, jsonNodes);
     putProperty(json, PROP_SELECTED_NODE_IDS, nodeIdsToJson(getModel().getSelectedNodes()));
     putAdapterIdsProperty(json, PROP_MENUS, getModel().getMenus());
     return json;
@@ -172,20 +164,19 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserver<IOutline> impl
     JSONObject jsonEvent = new JSONObject();
     putProperty(jsonEvent, PROP_NODE_ID, m_treeNodeIds.get(modelNode));
     putProperty(jsonEvent, "expanded", modelNode.isExpanded());
-    addActionEvent("nodeExpanded", jsonEvent);
+    addActionEvent(EVENT_NODE_EXPANDED, jsonEvent);
   }
 
   protected void handleModelNodesInserted(TreeEvent event) {
     JSONObject jsonEvent = new JSONObject();
-    JSONArray jsonPages = new JSONArray();
+    JSONArray jsonNodes = new JSONArray();
     for (ITreeNode node : event.getNodes()) {
-      IPage page = (IPage) node;
-      attachPage(page);
-      jsonPages.put(pageToJson(page));
+      attachTreeNode(node);
+      jsonNodes.put(treeNodeToJson(node));
     }
-    putProperty(jsonEvent, "nodes", jsonPages);
+    putProperty(jsonEvent, PROP_NODES, jsonNodes);
     putProperty(jsonEvent, PROP_COMMON_PARENT_NODE_ID, getOrCreateNodeId(event.getCommonParentNode()));
-    addActionEvent("nodesInserted", jsonEvent);
+    addActionEvent(EVENT_NODES_INSERTED, jsonEvent);
   }
 
   protected void handleModelNodesDeleted(TreeEvent event) {
@@ -205,15 +196,6 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserver<IOutline> impl
       String nodeId = m_treeNodeIds.get(node);
       m_treeNodeIds.remove(node);
       m_treeNodes.remove(nodeId);
-
-      //FIXME CGU really dispose? Or better keep for offline? Memory issue?
-      if (node instanceof IPageWithTable) {
-        IPageWithTable<?> pageWithTable = (IPageWithTable<?>) node;
-        JsonTable table = (JsonTable) getJsonSession().getJsonAdapter(pageWithTable.getTable());
-        if (table != null) {
-          table.dispose();
-        }
-      }
     }
   }
 
@@ -221,23 +203,6 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserver<IOutline> impl
     JSONObject jsonEvent = new JSONObject();
     putProperty(jsonEvent, PROP_NODE_IDS, nodeIdsToJson(modelNodes));
     addActionEvent(EVENT_NODES_SELECTED, jsonEvent);
-  }
-
-  protected void handleModelDetailFormChanged(IForm detailForm) {
-    JSONObject jsonEvent = new JSONObject();
-    ITreeNode selectedNode = getModel().getSelectedNode();
-    putProperty(jsonEvent, PROP_NODE_ID, getOrCreateNodeId(selectedNode));
-    // TODO AWE: (json) überprüfen, ob das hier stimmt. Jetzt ist der zeitliche ablauf wohl etwas anders
-    // als früher, würde man m_treeNodeIds.get(selectedNode) aufrufen, käme hier "null" zurück.
-    // Evtl. muss das in den anderen handleXYZ() methoden auch so gelöst werden?
-    if (detailForm == null) {
-      putProperty(jsonEvent, "detailForm", null);
-    }
-    else {
-      IJsonAdapter<?> detailFormAdapter = attachAdapter(detailForm);
-      putProperty(jsonEvent, "detailForm", detailFormAdapter.getId());
-    }
-    addActionEvent("detailFormChanged", jsonEvent);
   }
 
   protected JSONArray nodeIdsToJson(Collection<ITreeNode> modelNodes) {
@@ -270,44 +235,20 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserver<IOutline> impl
     return id;
   }
 
-  protected JSONObject pageToJson(IPage page) {
-    String id = getOrCreateNodeId(page);
+  protected JSONObject treeNodeToJson(ITreeNode node) {
+    String id = getOrCreateNodeId(node);
     JSONObject json = new JSONObject();
     putProperty(json, "id", id);
-    putProperty(json, "text", page.getCell().getText());
-    putProperty(json, "expanded", page.isExpanded());
-    putProperty(json, "leaf", page.isLeaf());
-    JSONArray jsonChildPages = new JSONArray();
-    if (page.getChildNodeCount() > 0) {
-      for (IPage childPage : page.getChildPages()) {
-        jsonChildPages.put(pageToJson(childPage));
+    putProperty(json, "text", node.getCell().getText());
+    putProperty(json, "expanded", node.isExpanded());
+    putProperty(json, "leaf", node.isLeaf());
+    JSONArray jsonChildNodes = new JSONArray();
+    if (node.getChildNodeCount() > 0) {
+      for (ITreeNode childNode : node.getChildNodes()) {
+        jsonChildNodes.put(treeNodeToJson(childNode));
       }
     }
-    putProperty(json, "childNodes", jsonChildPages);
-    optPutAdapterIdProperty(json, "detailForm", page.getDetailForm());
-
-    String pageType = "";
-    if (page instanceof IPageWithTable) {
-      pageType = "table";
-      IPageWithTable<?> pageWithTable = (IPageWithTable<?>) page;
-      putAdapterIdProperty(json, "table", pageWithTable.getTable());
-    }
-    else {
-      pageType = "node";
-      //FIXME send internal table and ignore on gui? or better modify model? -> maybe best to make it configurable on nodepage
-//        IPageWithNodes pageWithNodes = (IPageWithNodes) page;
-//        ITable table = pageWithNodes.getInternalTable();
-//        if (table != null) {
-//          JsonDesktopTable jsonTable = m_jsonTables.get(table);
-//          if (jsonTable == null) {
-//            jsonTable = new JsonDesktopTable(table, getJsonSession());
-//            jsonTable.init();
-//            m_jsonTables.put(table, jsonTable);
-//          }
-//          json.put("table", m_jsonTables.get(table).toJson());
-//        }
-    }
-    putProperty(json, "type", pageType);
+    putProperty(json, "childNodes", jsonChildNodes);
     return json;
   }
 
@@ -333,8 +274,8 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserver<IOutline> impl
 
   @Override
   public void handleUiEvent(JsonEvent event, JsonResponse res) {
-    if ("nodeClicked".equals(event.getType())) {
-      handleUiNodeClick(event, res);
+    if (EVENT_NODE_CLICKED.equals(event.getType())) {
+      handleUiNodeClicked(event, res);
     }
     else if (EVENT_NODES_SELECTED.equals(event.getType())) {
       handleUiNodesSelected(event, res);
@@ -347,7 +288,7 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserver<IOutline> impl
     }
   }
 
-  protected void handleUiNodeClick(JsonEvent event, JsonResponse res) {
+  protected void handleUiNodeClicked(JsonEvent event, JsonResponse res) {
     final ITreeNode node = getTreeNodeForNodeId(JsonObjectUtility.getString(event.getData(), PROP_NODE_ID));
     getModel().getUIFacade().fireNodeClickFromUI(node);
   }
@@ -389,16 +330,6 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserver<IOutline> impl
     @Override
     public void treeChangedBatch(List<? extends TreeEvent> events) {
       handleModelTreeEventBatch(events);
-    }
-  }
-
-  @Override
-  protected void handleModelPropertyChange(String propertyName, Object newValue) {
-    if (IOutline.PROP_DETAIL_FORM.equals(propertyName)) {
-      handleModelDetailFormChanged((IForm) newValue);
-    }
-    else {
-      super.handleModelPropertyChange(propertyName, newValue);
     }
   }
 

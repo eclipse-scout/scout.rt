@@ -1,4 +1,4 @@
-describe("DesktopTree", function() {
+describe("Tree", function() {
   var session;
 
   beforeEach(function() {
@@ -31,8 +31,8 @@ describe("DesktopTree", function() {
     };
   }
 
-  function createDesktopTree(model) {
-    var tree = new scout.DesktopTree();
+  function createTree(model) {
+    var tree = new scout.Tree();
     tree.init(model, session);
     session.registerModelAdapter(tree); //FIXME CGU remove after moving to constructor
     return tree;
@@ -43,10 +43,10 @@ describe("DesktopTree", function() {
 
       var model = createModel();
       model.nodes = [createModelNode(1)];
-      var desktopTree = createDesktopTree(model);
-      desktopTree.render(session.$entryPoint);
+      var tree = createTree(model);
+      tree.render(session.$entryPoint);
 
-      expect(desktopTree._$desktopTreeScroll.find('.tree-item').length).toBe(1);
+      expect(tree._$treeScroll.find('.tree-item').length).toBe(1);
     });
   });
 
@@ -55,23 +55,23 @@ describe("DesktopTree", function() {
     it("reacts on node clicks", function() {
       var model = createModel();
       model.nodes = [createModelNode(1)];
-      var desktopTree = createDesktopTree(model);
-      spyOn(desktopTree, '_onNodeClicked');
-      desktopTree.render(session.$entryPoint);
+      var tree = createTree(model);
+      spyOn(tree, '_onNodeClicked');
+      tree.render(session.$entryPoint);
 
-      var $node = desktopTree._$desktopTreeScroll.find('.tree-item:first');
+      var $node = tree._$treeScroll.find('.tree-item:first');
       $node.click();
 
-      expect(desktopTree._onNodeClicked).toHaveBeenCalled();
+      expect(tree._onNodeClicked).toHaveBeenCalled();
     });
 
     it("sends click, selection and expansion events in one call in this order", function() {
       var model = createModel();
       model.nodes = [createModelNode(1)];
-      var desktopTree = createDesktopTree(model);
-      desktopTree.render(session.$entryPoint);
+      var tree = createTree(model);
+      tree.render(session.$entryPoint);
 
-      var $node = desktopTree._$desktopTreeScroll.find('.tree-item:first');
+      var $node = tree._$treeScroll.find('.tree-item:first');
       $node.click();
 
       sendQueuedAjaxCalls();
@@ -86,8 +86,8 @@ describe("DesktopTree", function() {
     it("does not send events if called when processing response", function() {
       var model = createModel();
       model.nodes = [createModelNode(1)];
-      var desktopTree = createDesktopTree(model);
-      desktopTree.render(session.$entryPoint);
+      var tree = createTree(model);
+      tree.render(session.$entryPoint);
 
       var message = {
         events: [{

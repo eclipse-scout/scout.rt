@@ -107,11 +107,6 @@ RendererRegistry
 - Dies führt zu einer inkrementellen Erstellung des Modells auf dem Client.
 - Wann sollen die Objekte aufgeräumt werden? Bei From passiert es zur Zeit beim Close, jedoch nicht rekursiv -> Felder bleiben bestehen -> Leak
 
-Auftrennung DesktopTree/DesktopTable
-- Da es im Modell TableField und TreeField gibt, sollten wir die Tree bzw. Tabellen-Logik von der Desktop-Logik trennen. Ansonsten müssten wir die Anzeige-Logik duplizieren
-- Chart, Graph, Map etc gehen zur Zeit fix auf DesktopTable, vorläufig vermutlich ok wenn diese Dinge nur in der Outline angezeigt werden können.
-  Wünschenswert für die Zukunft wäre es, wenn diese Komponenten unabhängig von der Outline verwendet werden könnten, eigentlich sogar unabhängig von einer Tabelle.
-
 JsHint
 - Wir verwenden kein unused, weil sonst alle ungenützten Parameter auch angezeigt würden, was man leider nicht abstellen kann.
 
@@ -268,16 +263,16 @@ Erweiterbarkeit, Dependencies und weitere js Resourcen in externen Bundles
   Die einzelnen Scripts sind entweder bereits komplett oder beinhalten @includes
   Alternative zu includes, siehe Beispiel unten. Nachteil: Man kann nicht feingranular einzelne Dateien nicht verwenden (z.B. für Mobile). Oder doch?
   Sind die Scripts bereits minifiziert oder machen wir die Minifizierung auch zur Laufzeit?
-- Alternative: 
+- Alternative:
   Anstatt dass jedes Plugin ein script contributed, welches mit dem ScriptProcessor zusammengebaut wird, könnte jedes einzelne File contributed werden.
-  Es gäbe dann keine Includes mehr im Template.js (ev. ausser für jquery-scout). Nur noch //@include js-files oder ähnlich 
+  Es gäbe dann keine Includes mehr im Template.js (ev. ausser für jquery-scout). Nur noch //@include js-files oder ähnlich
   Es gäbe nur ein template.js (oder noch eins für mobile), eventuell auch via extension point hinzugefügt -> austauschbar.
   Die ObjectFactory.js müsste dann auch dynamisch erstellt werden.
   Pro extension point könnte dann ein Feld.js, Feld.css und JsonFeld.java angegeben werden.
   Für Files ohne Model halt nur ein Feld.js.
   Man könnte dadurch jede JS-Klasse austauschen.
   Reihenfolge müsste berücksichtigt werden, wie aktuell im template.js
-  Minifizierung müsste auch zwingend zur Laufzeit erfolgen (falls nicht debug=true).   
+  Minifizierung müsste auch zwingend zur Laufzeit erfolgen (falls nicht debug=true).
 - Dynamisches Nachladen
   Je nach Script möchte man es vielleicht eher erst bei Bedarf laden (z.B. Office).
   Mögliche Lösung: Scout.js stellt eine ScriptRegistry zur Verfügung.

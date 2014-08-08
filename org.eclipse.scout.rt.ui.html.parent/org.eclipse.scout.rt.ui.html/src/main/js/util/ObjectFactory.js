@@ -63,9 +63,9 @@ scout.defaultObjectFactories = [{
     return new scout.Desktop();
   }
 }, {
-  objectType: 'DesktopTree',
+  objectType: 'Outline',
   create: function() {
-    return new scout.DesktopTree();
+    return new scout.Outline();
   }
 }, {
   objectType: 'ViewButton',
@@ -113,6 +113,11 @@ scout.defaultObjectFactories = [{
     return new scout.TableControl();
   }
 }, {
+  objectType: 'Tree',
+  create: function() {
+    return new scout.Tree();
+  }
+}, {
   objectType: 'Form',
   create: function() {
     return new scout.Form();
@@ -147,9 +152,15 @@ scout.defaultObjectFactories = [{
   create: function() {
     return new scout.StringField();
   }
-}, {  objectType: 'TableField',
+}, {
+  objectType: 'TableField',
   create: function() {
     return new scout.TableField();
+  }
+},  {
+  objectType: 'TreeField',
+  create: function() {
+    return new scout.TreeField();
   }
 }, {
   objectType: 'GroupBox',

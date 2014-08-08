@@ -1,19 +1,17 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-scout.DesktopTree = function() {
-  scout.DesktopTree.parent.call(this);
+scout.Tree = function() {
+  scout.Tree.parent.call(this);
   this._selectedNodes = [];
-  this._detailTable;
-  this._detailForm;
   this._addAdapterProperties('menus');
   this.nodes = [];
   this._nodeMap = {};
 };
-scout.inherits(scout.DesktopTree, scout.ModelAdapter);
+scout.inherits(scout.Tree, scout.ModelAdapter);
 
-scout.DesktopTree.prototype.init = function(model, session) {
-  scout.DesktopTree.parent.prototype.init.call(this, model, session);
+scout.Tree.prototype.init = function(model, session) {
+  scout.Tree.parent.prototype.init.call(this, model, session);
 
   var initNodeMap = function(parentNode, node) {
     this._nodeMap[node.id] = node;
@@ -34,7 +32,7 @@ scout.DesktopTree.prototype.init = function(model, session) {
   this._visitNodes(this.nodes, initNodeMap);
 };
 
-scout.DesktopTree.prototype._visitNodes = function(nodes, func, parentNode) {
+scout.Tree.prototype._visitNodes = function(nodes, func, parentNode) {
   var i, node;
   if (!nodes) {
     return;
@@ -49,11 +47,11 @@ scout.DesktopTree.prototype._visitNodes = function(nodes, func, parentNode) {
   }
 };
 
-scout.DesktopTree.prototype._render = function($parent) {
+scout.Tree.prototype._render = function($parent) {
   this.$parent = $parent;
   this.$container = $parent.appendDiv(undefined, 'tree');
-  this._$desktopTreeScroll = this.$container.appendDiv('DesktopTreeScroll');
-  this.scrollbar = new scout.Scrollbar(this._$desktopTreeScroll, 'y');
+  this._$treeScroll = this.$container.appendDiv('TreeScroll');
+  this.scrollbar = new scout.Scrollbar(this._$treeScroll, 'y');
   this._addNodes(this.nodes);
 
   var selectedNode;
@@ -65,7 +63,7 @@ scout.DesktopTree.prototype._render = function($parent) {
   }
 
   // home node for bread crumb
-  this._$desktopTreeScroll.prependDiv('', 'tree-home', '')
+  this._$treeScroll.prependDiv('', 'tree-home', '')
     .attr('data-level', -1)
     .on('click', '', onHomeClick);
 
@@ -79,59 +77,13 @@ scout.DesktopTree.prototype._render = function($parent) {
   }
 };
 
-scout.DesktopTree.prototype.setNodeDetailFormChanged = function(nodeId, detailForm) {
-  var node = this._nodeMap[nodeId];
-  node.detailForm = this.session.getOrCreateModelAdapter(detailForm, this);
-
-  if (this._selectedNodes.indexOf(node) >= 0) {
-    this.showNodeDetailForm(node);
-  }
-};
-
-scout.DesktopTree.prototype.showNodeDetailForm = function(node) {
-  //unlink detail form if it was closed
-  if (node.detailForm && node.detailForm.destroyed) {
-    node.detailForm = null;
-  }
-
-  if (this._detailForm && this._detailForm !== node.detailForm) {
-    this.session.desktop.removeForm(this._detailForm);
-    this._detailForm = null;
-  }
-
-  if (node.detailForm) {
-    this._detailForm = node.detailForm;
-    if (!this._detailForm.rendered) {
-      this.session.desktop.addForm(this._detailForm);
-    }
-  }
-};
-
-scout.DesktopTree.prototype.showNodeDetailTable = function(node) {
-  var detailTable = node.table;
-
-  if (this._detailTable && this._detailTable !== detailTable) {
-    this.session.desktop.removePageDetailTable(node, this._detailTable);
-    this._detailTable.desktopMenuContributor = false;
-    this._detailTable = null;
-  }
-
-  if (detailTable) {
-    this._detailTable = detailTable;
-    this._detailTable.desktopMenuContributor = true;
-    if (!this._detailTable.rendered) {
-      this.session.desktop.addPageDetailTable(node, this._detailTable);
-    }
-  }
-};
-
-scout.DesktopTree.prototype.setNodeExpandedById = function(nodeId, expanded) {
+scout.Tree.prototype.setNodeExpandedById = function(nodeId, expanded) {
   var node = this._nodeMap[nodeId];
   var $node = this._findNodeById(nodeId);
   this._setNodeExpanded(node, $node, expanded);
 };
 
-scout.DesktopTree.prototype._setNodeExpanded = function(node, $node, expanded) {
+scout.Tree.prototype._setNodeExpanded = function(node, $node, expanded) {
   node.expanded = expanded;
 
   if (!this.rendered) {
@@ -222,7 +174,7 @@ scout.DesktopTree.prototype._setNodeExpanded = function(node, $node, expanded) {
   }
 };
 
-scout.DesktopTree.prototype.setNodeSelectedById = function(nodeId) {
+scout.Tree.prototype.setNodeSelectedById = function(nodeId) {
   var $node, node;
   if (nodeId) {
     $node = this._findNodeById(nodeId);
@@ -235,10 +187,10 @@ scout.DesktopTree.prototype.setNodeSelectedById = function(nodeId) {
   this._setNodeSelected(node, $node);
 };
 
-scout.DesktopTree.prototype._setNodeSelected = function(node, $node) {
+scout.Tree.prototype._setNodeSelected = function(node, $node) {
   if (!node) {
     this._selectedNodes = [];
-    this._$desktopTreeScroll.children().select(false);
+    this._$treeScroll.children().select(false);
     return;
   }
   if ($node.length === 0) {
@@ -251,9 +203,6 @@ scout.DesktopTree.prototype._setNodeSelected = function(node, $node) {
 
   $node.selectOne();
 
-  this.showNodeDetailTable(node);
-  this.showNodeDetailForm(node);
-
   if (!this.session.processingEvents) {
     this.session.send('nodesSelected', this.id, {
       'nodeIds': [node.id]
@@ -261,7 +210,7 @@ scout.DesktopTree.prototype._setNodeSelected = function(node, $node) {
   }
 };
 
-scout.DesktopTree.prototype._onNodesInserted = function(nodes, parentNodeId) {
+scout.Tree.prototype._onNodesInserted = function(nodes, parentNodeId) {
   var updateNodeMap, parentNode, $parentNode;
 
   updateNodeMap = function(parentNode, node) {
@@ -283,7 +232,7 @@ scout.DesktopTree.prototype._onNodesInserted = function(nodes, parentNodeId) {
   }
 };
 
-scout.DesktopTree.prototype._onNodesDeleted = function(nodeIds, parentNodeId) {
+scout.Tree.prototype._onNodesDeleted = function(nodeIds, parentNodeId) {
   var updateNodeMap, parentNode, i, nodeId, node, deletedNodes = [];
 
   //update model and nodemap
@@ -329,7 +278,7 @@ scout.DesktopTree.prototype._onNodesDeleted = function(nodeIds, parentNodeId) {
   }
 };
 
-scout.DesktopTree.prototype._onAllNodesDeleted = function(parentNodeId) {
+scout.Tree.prototype._onAllNodesDeleted = function(parentNodeId) {
   var updateNodeMap, parentNode, i, node, nodes;
 
   //Update model and nodemap
@@ -363,7 +312,7 @@ scout.DesktopTree.prototype._onAllNodesDeleted = function(parentNodeId) {
  *
  * @param $parentNode optional. If not provided, parentNodeId will be used to find $parentNode.
  */
-scout.DesktopTree.prototype._removeNodes = function(nodes, parentNodeId, $parentNode) {
+scout.Tree.prototype._removeNodes = function(nodes, parentNodeId, $parentNode) {
   var i, $node, node;
 
   //Find parentNode to increase search performance. If there is only one child there is no benefit by searching its parent first.
@@ -383,7 +332,7 @@ scout.DesktopTree.prototype._removeNodes = function(nodes, parentNodeId, $parent
   }
 };
 
-scout.DesktopTree.prototype._addNodes = function(nodes, $parent) {
+scout.Tree.prototype._addNodes = function(nodes, $parent) {
   if (!nodes) {
     return;
   }
@@ -421,7 +370,7 @@ scout.DesktopTree.prototype._addNodes = function(nodes, $parent) {
     if ($parent) {
       $node.insertAfter($parent);
     } else {
-      $node.prependTo(this._$desktopTreeScroll);
+      $node.prependTo(this._$treeScroll);
     }
 
     // TODO AWE: (json) diese beiden if's prüfen und ggf. ganz entfernen
@@ -442,7 +391,7 @@ scout.DesktopTree.prototype._addNodes = function(nodes, $parent) {
   }
 };
 
-scout.DesktopTree.prototype._onNodeClicked = function(event) {
+scout.Tree.prototype._onNodeClicked = function(event) {
   var $clicked = $(event.currentTarget),
     nodeId = $clicked.attr('id'),
     node = this._nodeMap[nodeId];
@@ -456,7 +405,7 @@ scout.DesktopTree.prototype._onNodeClicked = function(event) {
   this._updateBreadCrumb();
 };
 
-scout.DesktopTree.prototype._onNodeControlClicked = function(event) {
+scout.Tree.prototype._onNodeControlClicked = function(event) {
   var $clicked = $(event.currentTarget),
     $node = $clicked.parent(),
     expanded = !$node.hasClass('expanded'),
@@ -470,25 +419,25 @@ scout.DesktopTree.prototype._onNodeControlClicked = function(event) {
   return false;
 };
 
-scout.DesktopTree.prototype._onNodeContextClick = function(event) {
+scout.Tree.prototype._onNodeContextClick = function(event) {
   var $clicked = $(event.currentTarget);
 
   event.preventDefault();
   $clicked.click();
 
   var x = 20,
-    y = $clicked.offset().top - this._$desktopTreeScroll.offset().top + 32;
+    y = $clicked.offset().top - this._$treeScroll.offset().top + 32;
 
   scout.menus.showContextMenuWithWait(this.session, showContextMenu.bind(this));
 
   function showContextMenu() {
-    scout.menus.showContextMenu(scout.menus.filter(this.menus), this._$desktopTreeScroll, $clicked, undefined, x, y);
+    scout.menus.showContextMenu(scout.menus.filter(this.menus), this._$treeScroll, $clicked, undefined, x, y);
   }
 };
 
-scout.DesktopTree.prototype._updateBreadCrumb = function() {
-  var $selected = $('.selected', this._$desktopTreeScroll),
-    $allNodes = this._$desktopTreeScroll.children(),
+scout.Tree.prototype._updateBreadCrumb = function() {
+  var $selected = $('.selected', this._$treeScroll),
+    $allNodes = this._$treeScroll.children(),
     level = parseFloat($selected.attr('data-level'));
 
   // first remove and select selected
@@ -519,7 +468,7 @@ scout.DesktopTree.prototype._updateBreadCrumb = function() {
   }
 };
 
-scout.DesktopTree.prototype.doBreadCrumb = function(show) {
+scout.Tree.prototype.doBreadCrumb = function(show) {
   if (show && !this.$parent.hasClass('bread-crumb')) {
     this._updateBreadCrumb();
     this.$parent.addClass('bread-crumb');
@@ -534,32 +483,32 @@ scout.DesktopTree.prototype.doBreadCrumb = function(show) {
 /**
  * @param $parent if specified only the elements after parent are considered (faster lookup)
  */
-scout.DesktopTree.prototype._findNodeById = function(nodeId, $parent) {
+scout.Tree.prototype._findNodeById = function(nodeId, $parent) {
   if ($parent) {
     return $parent.next('#' + nodeId);
   } else {
-    return this._$desktopTreeScroll.find('#' + nodeId);
+    return this._$treeScroll.find('#' + nodeId);
   }
 };
 
-scout.DesktopTree.prototype._findSelectedNodes = function() {
-  return this._$desktopTreeScroll.find('.selected');
+scout.Tree.prototype._findSelectedNodes = function() {
+  return this._$treeScroll.find('.selected');
 };
 
-scout.DesktopTree.prototype._setMenus = function(menus) {
+scout.Tree.prototype._setMenus = function(menus) {
   if (this._selectedNodes.length > 0) {
     var $node = this._findNodeById(this._selectedNodes[0].id);
     this._renderMenus($node);
   }
 };
 
-scout.DesktopTree.prototype._renderMenus = function($node) {
+scout.Tree.prototype._renderMenus = function($node) {
   if (this.session.desktop) {
     this.session.desktop.onMenusUpdated('tree', scout.menus.filter(this.menus));
   }
 };
 
-scout.DesktopTree.prototype.onModelAction = function(event) {
+scout.Tree.prototype.onModelAction = function(event) {
   if (event.type == 'nodesInserted') {
     this._onNodesInserted(event.nodes, event.commonParentNodeId);
   } else if (event.type == 'nodesDeleted') {
@@ -570,13 +519,12 @@ scout.DesktopTree.prototype.onModelAction = function(event) {
     this.setNodeSelectedById(event.nodeIds[0]);
   } else if (event.type == 'nodeExpanded') {
     this.setNodeExpandedById(event.nodeId, event.expanded);
-  } else if (event.type == 'detailFormChanged') {
-    this.setNodeDetailFormChanged(event.nodeId, event.detailForm);
-  } else {
-    $.log('Model event not handled. Widget: DesktopTree. Event: ' + event.type + '.');
+  }
+   else {
+    $.log('Model event not handled. Widget: Tree. Event: ' + event.type + '.');
   }
 };
 
-scout.DesktopTree.prototype.onMenuPropertyChange = function(event) {
+scout.Tree.prototype.onMenuPropertyChange = function(event) {
   //FIXME CGU implement
 };

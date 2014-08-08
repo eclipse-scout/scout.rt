@@ -40,13 +40,14 @@
 //@include("table/control/GraphTableControl.js");
 //@include("table/control/MapTableControl.js");
 //@include("table/control/AnalysisTableControl.js");
+//@include("tree/Tree.js");
 //@include("desktop/BaseDesktop.js");
 //@include("desktop/MobileDesktop.js");
 //@include("desktop/MobileDesktopToolButtons.js");
 //@include("desktop/DesktopBench.js");
 //@include("desktop/DesktopKeystrokeAdapter.js");
 //@include("desktop/DesktopNavigation.js");
-//@include("desktop/DesktopTree.js");
+//@include("desktop/Outline.js");
 //@include("desktop/DesktopViewButton.js");
 //@include("desktop/DesktopViewButtonOwn.js");
 //@include("desktop/BreadCrumbNavigation.js");
@@ -61,6 +62,7 @@
 //@include("form/fields/groupbox/GroupBox.js");
 //@include("form/fields/sequencebox/SequenceBox.js");
 //@include("form/fields/tablefield/TableField.js");
+//@include("form/fields/treefield/TreeField.js");
 //@include("form/fields/tabbox/TabBox.js");
 //@include("scrollbar/Scrollbar.js");
 //@include("text/DecimalFormat.js");

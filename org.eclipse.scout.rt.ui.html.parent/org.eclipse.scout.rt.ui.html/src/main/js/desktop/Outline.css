@@ -1,4 +1,4 @@
-#DesktopTree {
+#Outline {
 min-height: 100px;
 }
 
@@ -15,7 +15,7 @@ margin-top: 10px;
 margin-bottom: 10px;
 }
 
-#DesktopTreeScroll{
+#OutlineScroll{
 position: absolute;
 top: 0px;
 width: ~"calc(100% - 14px)";
@@ -24,15 +24,15 @@ padding: 12px 0px 0px 10px;
 }
 
  /* bread crumb mode */
-#DesktopTree.bread-crumb .tree-item{
+#Outline.bread-crumb .tree-item{
 height: 0px;
 padding: 0px;
 border: 0px;
 } 
 
-#DesktopTree.bread-crumb .tree-item.bread-parent,
-#DesktopTree.bread-crumb .tree-item.bread-selected,
-#DesktopTree.bread-crumb .tree-item.bread-children{
+#Outline.bread-crumb .tree-item.bread-parent,
+#Outline.bread-crumb .tree-item.bread-selected,
+#Outline.bread-crumb .tree-item.bread-children{
 display: block;
 margin-left: 0px !important;
 padding: 10px 5px 10px 5px !important;
@@ -47,24 +47,24 @@ line-height: 18px;
 border-radius: 7px;
 }
 
-#DesktopTree.bread-crumb .tree-item.bread-parent{
+#Outline.bread-crumb .tree-item.bread-parent{
 border: 2px solid #0082a1;
 }
 
-#DesktopTree.bread-crumb .tree-item.bread-selected{
+#Outline.bread-crumb .tree-item.bread-selected{
 border: 2px solid #FE9915;
 }
 
-#DesktopTree.bread-crumb .tree-item.bread-children{
+#Outline.bread-crumb .tree-item.bread-children{
 border: 2px solid #999;
 margin-bottom: 5px;
 }
 
 
-#DesktopTree.bread-crumb .tree-item.bread-parent:before,
-#DesktopTree.bread-crumb .tree-item.bread-selected:before,
-#DesktopTree.bread-crumb .tree-item.bread-parent:after,
-#DesktopTree.bread-crumb .tree-item.bread-selected:after{
+#Outline.bread-crumb .tree-item.bread-parent:before,
+#Outline.bread-crumb .tree-item.bread-selected:before,
+#Outline.bread-crumb .tree-item.bread-parent:after,
+#Outline.bread-crumb .tree-item.bread-selected:after{
 top: 100%;
 left: 50%;
 border: solid transparent;
@@ -74,14 +74,14 @@ width: 0;
 position: absolute;
 }
 
-#DesktopTree.bread-crumb .tree-item.bread-parent:before {
+#Outline.bread-crumb .tree-item.bread-parent:before {
 border-color: rgba(0, 130, 161, 0);
 border-top-color: #0082a1;
 border-width: 11px;
 margin-left: -11px;
 }
 
-#DesktopTree.bread-crumb .tree-item.bread-selected:before {
+#Outline.bread-crumb .tree-item.bread-selected:before {
 border-color: rgba(254, 153, 21, 0);
 border-top-color: #FE9915;
 border-width: 11px;
@@ -89,8 +89,8 @@ margin-left: -11px;
 }
 
 
-#DesktopTree.bread-crumb .tree-item.bread-parent:after,
-#DesktopTree.bread-crumb .tree-item.bread-selected:after {
+#Outline.bread-crumb .tree-item.bread-parent:after,
+#Outline.bread-crumb .tree-item.bread-selected:after {
 border-color: rgba(255, 255, 255, 0);
 border-top-color: #fff;
 border-width: 8px;
@@ -98,35 +98,35 @@ margin-left: -8px;
 }
 
 
-#DesktopTree.bread-crumb .tree-item.bread-parent:hover {
+#Outline.bread-crumb .tree-item.bread-parent:hover {
 background-color: rgba(0, 130, 161, 0.1);
 }
 
-#DesktopTree.bread-crumb .tree-item.bread-selected:hover {
+#Outline.bread-crumb .tree-item.bread-selected:hover {
 background-color: rgba(254, 153, 21, 0.1);
 }
 
-#DesktopTree.bread-crumb .tree-item.bread-children:hover {
+#Outline.bread-crumb .tree-item.bread-children:hover {
 background-color: rgba(153, 153, 153, 0.1);
 }
 
-#DesktopTree.bread-crumb .tree-item.bread-parent:hover:after,
-#DesktopTree.bread-crumb .tree-item.bread-selected:hover:after,
-#DesktopTree.bread-crumb .tree-item.bread-children:hover:after {
+#Outline.bread-crumb .tree-item.bread-parent:hover:after,
+#Outline.bread-crumb .tree-item.bread-selected:hover:after,
+#Outline.bread-crumb .tree-item.bread-children:hover:after {
 border-top-color: rgba(255, 255, 255, 0.9);
 }
 
-#DesktopTree.bread-crumb .tree-item-control,
-#DesktopTree.bread-crumb .tree-item-menu{
+#Outline.bread-crumb .tree-item-control,
+#Outline.bread-crumb .tree-item-menu{
 display:none;
 }
 
-#DesktopTree .tree-home {
+#Outline .tree-home {
 height: 0px; 
 transition: height 0.2s;
 }
 
-#DesktopTree.bread-crumb .tree-home {
+#Outline.bread-crumb .tree-home {
 display:block;
 cursor: pointer;
 left: ~"calc(50% - 30px)";
@@ -138,11 +138,11 @@ background-color: rgba(0, 130, 161, 0.3);
 margin-bottom: 15px;
 }
 
-#DesktopTree.bread-crumb .tree-home:hover {
+#Outline.bread-crumb .tree-home:hover {
 background-color: rgba(254, 153, 21, 0.3);
 }
 
-#DesktopTree.bread-crumb .tree-home:after{
+#Outline.bread-crumb .tree-home:after{
 top: 5px;
 left: ~"calc(50% - 14px)";
 position: absolute;
