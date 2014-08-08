@@ -9,6 +9,8 @@ scout.DesktopViewButton = function() {
 scout.inherits(scout.DesktopViewButton, scout.ModelAdapter);
 
 scout.DesktopViewButton.prototype._render = function($parent) {
+
+  // TODO AWE/CGU/CRU: refactor class names to match adapter name
   this._$viewButton = $parent.appendDiv(this.id, 'view-item ', this.text);
 
   this._setIconId(this.iconId);

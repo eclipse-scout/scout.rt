@@ -29,6 +29,7 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTableForm;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTreeForm;
+import org.eclipse.scout.rt.client.ui.desktop.outline.ISearchOutline;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
@@ -36,6 +37,7 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonException;
+import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.service.SERVICES;
 import org.json.JSONObject;
@@ -219,8 +221,36 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
     // Important: Consider tomcat form auth problem, see scout rap logout mechanism for details
   }
 
+  protected void handleSearch(JsonEvent event) {
+    ISearchOutline searchOutline = getSearchOutline();
+    String query = event.getData().optString("query");
+    try {
+      searchOutline.search(query);
+      // TODO AWE: (search) C.GU fragen wie such-ergebnisse ans GUI übermittelt werden event-technisch
+      String status = searchOutline.getSearchStatus();
+      JSONObject json = new JSONObject();
+      JsonObjectUtility.putProperty(json, "status", status);
+      addActionEvent("searchPerformed", json);
+    }
+    catch (ProcessingException e) {
+      throw new JsonException(e);
+    }
+  }
+
+  private ISearchOutline getSearchOutline() {
+    for (IOutline outline : getModel().getAvailableOutlines()) {
+      if (outline instanceof ISearchOutline) {
+        return (ISearchOutline) outline;
+      }
+    }
+    return null;
+  }
+
   @Override
   public void handleUiEvent(JsonEvent event, JsonResponse res) {
+    if ("search".equals(event.getType())) {
+      handleSearch(event);
+    }
   }
 
   /**

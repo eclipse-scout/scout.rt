@@ -52,4 +52,36 @@ background-clip: content-box;
 cursor: col-resize;
 }
 
+/* TODO AWE/CRU: move to correct CSS file, remove these hacks */
+.outlines-tab-head {
+  background-color:#eee;
+  width:50%;
+  float:left;
+}
 
+.search-tab-head {
+  background-color:#bbb;
+  width:50%;
+  float:right;
+}
+
+.search-tab-head input {
+  width:75%;
+}
+
+.search-tab-head button {
+  width:25%;
+}
+
+.outlines-menu {
+  background-color:white;
+  border: solid black 1px;
+  position:absolute;
+  top:2px;
+  left:30px;
+  z-index:1000;
+}
+
+.active-outline {
+  float:right;
+}

@@ -82,9 +82,9 @@ scout.Desktop.prototype._resolveViewContainer = function(form) {
 };
 
 scout.Desktop.prototype.linkOutlineAndViewButton = function() {
-  //Link button with outline (same done in desktopViewButton.js). Redundancy necessary because event order is not reliable (of button selection and outlineChanged events)
-  //Only necessary due to separation of view buttons and outlines in scout model...
-  //FXME CGU find better way for scout model
+  // Link button with outline (same done in desktopViewButton.js). Redundancy necessary because event order is not reliable (of button selection and outlineChanged events)
+  // Only necessary due to separation of view buttons and outlines in scout model...
+  // FIXME CGU find better way for scout model
   for (var i = 0; i < this.viewButtons.length; i++) {
     if (this.viewButtons[i].selected) {
       this.viewButtons[i].outline = this.outline;
@@ -96,9 +96,12 @@ scout.Desktop.prototype.changeOutline = function(outline) {
   if (this.outline === outline) {
     return;
   }
-
   this.outline = outline;
   this.navigation.onOutlineChanged(this.outline);
+};
+
+scout.Desktop.prototype._onSearchPerformed = function(event) {
+  this.navigation.onSearchPerformed(event);
 };
 
 /**
@@ -107,6 +110,8 @@ scout.Desktop.prototype.changeOutline = function(outline) {
 scout.Desktop.prototype.onModelAction = function(event) {
   if (event.type === 'outlineChanged') {
     this.changeOutline(this.session.getOrCreateModelAdapter(event.outline, this));
+  } else if (event.type === 'searchPerformed') {
+    this._onSearchPerformed(event);
   } else {
     scout.Desktop.parent.prototype.onModelAction.call(this, event);
   }

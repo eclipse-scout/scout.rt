@@ -14,9 +14,14 @@ scout.DesktopNavigation.prototype.renderOutline = function() {
   this._addVerticalSplitter(this._$desktopTree);
 };
 
+scout.DesktopNavigation.prototype.onSearchPerformed = function(event) {
+  this.menu.onSearchPerformed(event);
+};
+
 scout.DesktopNavigation.prototype.onOutlineChanged = function(outline) {
   this.outline.remove();
   this.outline = outline;
+  this.menu.onOutlineChanged(outline);
   this.outline.render(this._$desktopTree);
   if (this._$splitter) {
     this._$splitter.appendTo(this._$desktopTree); //move after tree, otherwise tree overlays splitter after outline change

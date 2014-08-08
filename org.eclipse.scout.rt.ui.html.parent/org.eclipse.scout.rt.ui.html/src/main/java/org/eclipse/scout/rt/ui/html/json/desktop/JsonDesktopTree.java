@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonException;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
+import org.eclipse.scout.rt.ui.html.json.form.fields.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.menu.IContextMenuOwner;
 import org.eclipse.scout.rt.ui.html.json.table.JsonTable;
 import org.eclipse.scout.rt.ui.html.json.tree.TreeEventFilter;
@@ -47,11 +48,18 @@ public class JsonDesktopTree extends AbstractJsonPropertyObserver<IOutline> impl
   private Map<ITreeNode, String> m_treeNodeIds;
   private TreeEventFilter m_treeEventFilter;
 
+  // TODO AWE/CGU: wieso heisst die klasse hier nicht JsonOutline? naming auch in JS korrigieren
   public JsonDesktopTree(IOutline model, IJsonSession jsonSession, String id) {
     super(model, jsonSession, id);
     m_treeNodes = new HashMap<>();
     m_treeNodeIds = new HashMap<>();
     m_treeEventFilter = new TreeEventFilter(getModel());
+    putJsonProperty(new JsonProperty<IOutline>(IOutline.PROP_TITLE, model) {
+      @Override
+      protected String modelValue() {
+        return getModel().getTitle();
+      }
+    });
   }
 
   @Override
