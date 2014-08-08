@@ -85,3 +85,28 @@ cursor: col-resize;
 .active-outline {
   float:right;
 }
+
+.active-tab-head {
+  background-color:#ffcc00;
+}
+
+.active-tab-head input {
+  background-color:#ffcc00;
+}
+
+#DesktopTreeTabContainer {
+  margin:0;
+  height:100%;
+}
+#DesktopTreeTabHeader:after {
+    content: ".";
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden;
+}
+
+.tab-body {
+  margin:0;
+  height:100%;
+}
