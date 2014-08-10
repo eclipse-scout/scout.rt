@@ -157,7 +157,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
   @Override
   public void setFormInternal(IForm form) {
     super.setFormInternal(form);
-    if (this == form.getRootGroupBox() && form instanceof AbstractForm) {
+    if (form instanceof AbstractForm && this == form.getRootGroupBox()) {
       // this is the root group box. Publish replacement map to form and keep local map for better performance (see getReplacingFieldClass)
       ((AbstractForm) form).registerFormFieldReplacementsInternal(m_formFieldReplacements);
     }
