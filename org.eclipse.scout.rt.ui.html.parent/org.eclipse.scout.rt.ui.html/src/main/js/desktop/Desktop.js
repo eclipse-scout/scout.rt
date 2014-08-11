@@ -103,11 +103,6 @@ scout.Desktop.prototype.changeOutline = function(outline) {
   this.navigation.onOutlineChanged(this.outline);
 };
 
-<<<<<<< Upstream, based on branch 'develop' of ssh://cru@git.bsiag.com:29418/tools/eclipse.scout
-/**
- * @override
- */
-=======
 scout.Desktop.prototype._onSearchPerformed = function(event) {
   this.navigation.onSearchPerformed(event);
 };
@@ -239,7 +234,6 @@ scout.Desktop.prototype.maximizeForm = function(form) {
   }
 };
 
->>>>>>> 9a0c84e html ui : first step to new design
 scout.Desktop.prototype.onModelAction = function(event) {
   var form;
 

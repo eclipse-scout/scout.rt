@@ -4,7 +4,6 @@
 scout.Tree = function() {
   scout.Tree.parent.call(this);
   this._selectedNodes = [];
-  this._addAdapterProperties('menus');
   this.nodes = [];
   this._nodeMap = {};
 };
@@ -49,8 +48,8 @@ scout.Tree.prototype._visitNodes = function(nodes, func, parentNode) {
 
 scout.Tree.prototype._render = function($parent) {
   this.$parent = $parent;
-  this.$container = $parent.appendDiv(undefined, 'tree');
-  this._$treeScroll = this.$container.appendDiv('TreeScroll');
+  this.$container = $parent.appendDIV('tree');
+  this._$treeScroll = this.$container.appendDIV('tree-scroll');
   this.scrollbar = new scout.Scrollbar(this._$treeScroll, 'y');
   this._addNodes(this.nodes);
 
@@ -58,23 +57,9 @@ scout.Tree.prototype._render = function($parent) {
   if (this._selectedNodes.length > 0) {
     selectedNode = this._selectedNodes[0];
     this.setNodeSelectedById(selectedNode.id);
-
-    this._renderMenus(this._findNodeById(selectedNode.id));
   }
-
-  // home node for bread crumb
-  this._$treeScroll.prependDiv('', 'tree-home', '')
-    .attr('data-level', -1)
-    .on('click', '', onHomeClick);
 
   var that = this;
-
-  function onHomeClick(event) {
-    $(this).selectOne();
-    that._renderMenus();
-    that._updateBreadCrumb();
-    that.scrollbar.initThumb();
-  }
 };
 
 scout.Tree.prototype.setNodeExpandedById = function(nodeId, expanded) {
@@ -116,7 +101,7 @@ scout.Tree.prototype._setNodeExpanded = function(node, $node, expanded) {
 
   if (expanded) {
     this._addNodes(node.childNodes, $node);
-    this._updateBreadCrumb();
+    this._updateItemPath();
 
     if (bread) {
       $node.addClass('expanded');
@@ -353,9 +338,7 @@ scout.Tree.prototype._addNodes = function(nodes, $parent) {
       .on('click', '', this._onNodeClicked.bind(this))
       .data('node', node)
       .attr('data-level', level)
-      .css('margin-left', level * 20)
-      .css('width', 'calc(100% - ' + (level * 20 + 20) + 'px)')
-      .on('contextmenu', this._onNodeContextClick.bind(this));
+      .css('padding-left', level * 20 + 30);
 
     // decorate with (close) control
     var $control = $node.appendDiv('', 'tree-item-control')
@@ -402,7 +385,7 @@ scout.Tree.prototype._onNodeClicked = function(event) {
 
   this._setNodeSelected(node, $clicked);
   this._setNodeExpanded(node, $clicked, true);
-  this._updateBreadCrumb();
+  this._updateItemPath();
 };
 
 scout.Tree.prototype._onNodeControlClicked = function(event) {
@@ -419,58 +402,56 @@ scout.Tree.prototype._onNodeControlClicked = function(event) {
   return false;
 };
 
-scout.Tree.prototype._onNodeContextClick = function(event) {
-  var $clicked = $(event.currentTarget);
-
-  event.preventDefault();
-  $clicked.click();
-
-  var x = 20,
-    y = $clicked.offset().top - this._$treeScroll.offset().top + 32;
-
-  scout.menus.showContextMenuWithWait(this.session, showContextMenu.bind(this));
-
-  function showContextMenu() {
-    scout.menus.showContextMenu(scout.menus.filter(this.menus), this._$treeScroll, $clicked, undefined, x, y);
-  }
-};
-
-scout.Tree.prototype._updateBreadCrumb = function() {
+scout.Tree.prototype._updateItemPath = function() {
   var $selected = $('.selected', this._$treeScroll),
     $allNodes = this._$treeScroll.children(),
     level = parseFloat($selected.attr('data-level'));
 
   // first remove and select selected
-  $allNodes.removeClass('bread-parent bread-selected bread-children');
-  $selected.addClass('bread-selected');
+  $allNodes.removeClass('parent children group');
 
-  // find all parents
+ // find direct children
   var $start = $selected.next();
   while ($start.length > 0) {
-    var l = parseFloat($start.attr('data-level'));
+    var l =  parseFloat($start.attr('data-level'));
     if (l === level + 1) {
-      $start.addClass('bread-children');
+      $start.addClass('children');
     } else if (l === level) {
       break;
     }
     $start = $start.next();
   }
 
-  // find direct children
+  // find parents
+  var $ultimate;
   $start = $selected.prev();
   while ($start.length > 0) {
-    var k = $start.attr('data-level');
+    var k = parseFloat($start.attr('data-level'));
     if (k < level) {
-      $start.addClass('bread-parent');
+      $start.addClass('parent');
+      $ultimate = $start;
       level = k;
     }
     $start = $start.prev();
+  }
+
+  // find group with same ultimate parent
+  $ultimate = $ultimate || $selected;
+  $start = $ultimate;
+  while ($start.length > 0) {
+    $start.addClass('group');
+    $start = $start.next();
+
+    var m = parseFloat($start.attr('data-level'));
+    if (m === 0 && $start[0] !== $ultimate[0]) {
+      break;
+    }
   }
 };
 
 scout.Tree.prototype.doBreadCrumb = function(show) {
   if (show && !this.$parent.hasClass('bread-crumb')) {
-    this._updateBreadCrumb();
+    this._updateItemPath();
     this.$parent.addClass('bread-crumb');
   } else if (!show && this.$parent.hasClass('bread-crumb')) {
     this.$parent.removeClass('bread-crumb');
@@ -495,18 +476,6 @@ scout.Tree.prototype._findSelectedNodes = function() {
   return this._$treeScroll.find('.selected');
 };
 
-scout.Tree.prototype._setMenus = function(menus) {
-  if (this._selectedNodes.length > 0) {
-    var $node = this._findNodeById(this._selectedNodes[0].id);
-    this._renderMenus($node);
-  }
-};
-
-scout.Tree.prototype._renderMenus = function($node) {
-  if (this.session.desktop) {
-    this.session.desktop.onMenusUpdated('tree', scout.menus.filter(this.menus));
-  }
-};
 
 scout.Tree.prototype.onModelAction = function(event) {
   if (event.type == 'nodesInserted') {
@@ -519,12 +488,11 @@ scout.Tree.prototype.onModelAction = function(event) {
     this.setNodeSelectedById(event.nodeIds[0]);
   } else if (event.type == 'nodeExpanded') {
     this.setNodeExpandedById(event.nodeId, event.expanded);
-  }
-   else {
+  } else {
     $.log('Model event not handled. Widget: Tree. Event: ' + event.type + '.');
   }
 };
 
-scout.Tree.prototype.onMenuPropertyChange = function(event) {
-  //FIXME CGU implement
+scout.Tree.prototype._setMenus = function () {
+  // TODO cru: braucht es doch nicht mehr!
 };

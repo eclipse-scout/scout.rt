@@ -44,18 +44,10 @@
 //@include("desktop/Desktop.js");
 //@include("desktop/DesktopKeystrokeAdapter.js");
 //@include("desktop/DesktopNavigation.js");
-<<<<<<< Upstream, based on branch 'develop' of ssh://cru@git.bsiag.com:29418/tools/eclipse.scout
-=======
 //@include("desktop/DesktopToolButton.js");
-//@include("desktop/DesktopTree.js");
->>>>>>> 9a0c84e html ui : first step to new design
 //@include("desktop/DesktopViewButton.js");
 //@include("desktop/DesktopViewButtonOwn.js");
-<<<<<<< Upstream, based on branch 'develop' of ssh://cru@git.bsiag.com:29418/tools/eclipse.scout
 //@include("desktop/Outline.js");
-//@include("desktop/ToolButton.js");
-=======
->>>>>>> 9a0c84e html ui : first step to new design
 //@include("menu/Menu.js");
 //@include("menu/menus.js");
 //@include("menu/Menubar.js")

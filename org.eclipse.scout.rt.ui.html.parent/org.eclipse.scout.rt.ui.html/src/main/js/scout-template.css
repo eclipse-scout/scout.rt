@@ -1,11 +1,5 @@
 //@include("main.css")
 //@include("desktop/Desktop.css")
-<<<<<<< Upstream, based on branch 'develop' of ssh://cru@git.bsiag.com:29418/tools/eclipse.scout
-//@include("desktop/DesktopTaskbar.css")
-//@include("desktop/DesktopMenubar.css")
-=======
-//@include("desktop/DesktopTree.css")
->>>>>>> 9a0c84e html ui : first step to new design
 //@include("desktop/DesktopNavigation.css")
 //@include("desktop/Outline.css")
 //@include("form/Form.css")
@@ -24,6 +18,7 @@
 //@include("table/control/GraphTableControl.css")
 //@include("table/control/MapTableControl.css")
 //@include("table/control/AnalysisTableControl.css")
+//@include("tree/Tree.css")
 //@include("scrollbar/Scrollbar.css")
 //@include("util/keybox.css")
 //@include("style/colors.css")
