@@ -45,7 +45,6 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   private Map<ITreeNode, String> m_treeNodeIds;
   private TreeEventFilter m_treeEventFilter;
 
-  // TODO AWE/CGU: wieso heisst die klasse hier nicht JsonOutline? naming auch in JS korrigieren
   public JsonTree(T model, IJsonSession jsonSession, String id) {
     super(model, jsonSession, id);
     m_treeNodes = new HashMap<>();
@@ -73,22 +72,6 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     }
     attachAdapter(getModel().getContextMenu());
     attachAdapters(getModel().getMenus());
-    if (getModel().isRootNodeVisible()) {
-      attachTreeNode(getModel().getRootNode());
-    }
-    else {
-      for (ITreeNode childNode : getModel().getRootNode().getChildNodes()) {
-        attachTreeNode(childNode);
-      }
-    }
-  }
-
-  protected void attachTreeNode(ITreeNode node) {
-    if (node.getChildNodeCount() > 0) {
-      for (ITreeNode childNode : node.getChildNodes()) {
-        attachTreeNode(childNode);
-      }
-    }
   }
 
   @Override
@@ -162,7 +145,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
 
   protected void handleModelNodeExpanded(ITreeNode modelNode) {
     JSONObject jsonEvent = new JSONObject();
-    putProperty(jsonEvent, PROP_NODE_ID, m_treeNodeIds.get(modelNode));
+    putProperty(jsonEvent, PROP_NODE_ID, getOrCreateNodeId(modelNode));
     putProperty(jsonEvent, "expanded", modelNode.isExpanded());
     addActionEvent(EVENT_NODE_EXPANDED, jsonEvent);
   }
@@ -171,7 +154,6 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     JSONObject jsonEvent = new JSONObject();
     JSONArray jsonNodes = new JSONArray();
     for (ITreeNode node : event.getNodes()) {
-      attachTreeNode(node);
       jsonNodes.put(treeNodeToJson(node));
     }
     putProperty(jsonEvent, PROP_NODES, jsonNodes);
@@ -182,7 +164,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   protected void handleModelNodesDeleted(TreeEvent event) {
     Collection<ITreeNode> nodes = event.getNodes();
     JSONObject jsonEvent = new JSONObject();
-    putProperty(jsonEvent, PROP_COMMON_PARENT_NODE_ID, m_treeNodeIds.get(event.getCommonParentNode()));
+    putProperty(jsonEvent, PROP_COMMON_PARENT_NODE_ID, getOrCreateNodeId(event.getCommonParentNode()));
 
     if (event.getCommonParentNode().getChildNodes().size() == 0) {
       addActionEvent(EVENT_ALL_NODES_DELETED, jsonEvent);
@@ -208,7 +190,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   protected JSONArray nodeIdsToJson(Collection<ITreeNode> modelNodes) {
     JSONArray jsonNodeIds = new JSONArray();
     for (ITreeNode node : modelNodes) {
-      jsonNodeIds.put(m_treeNodeIds.get(node));
+      jsonNodeIds.put(getOrCreateNodeId(node));
     }
     return jsonNodeIds;
   }

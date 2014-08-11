@@ -178,9 +178,6 @@ public class JsonTreeTest {
     JsonSessionMock jsonSession = new JsonSessionMock();
     JsonTree<ITree> jsonTree = new JsonTree<ITree>(tree, jsonSession, jsonSession.createUniqueIdFor(null));
     jsonTree.attach();
-    // init treeNode map
-    jsonTree.toJson(); // TODO CGU/AWE: toJson dürfte keinen seiten-effekt mehr haben
-    // die treeNode map müsste somit neu im attachModel initialisiert werden und nicht im toJson
     return jsonTree;
   }
 

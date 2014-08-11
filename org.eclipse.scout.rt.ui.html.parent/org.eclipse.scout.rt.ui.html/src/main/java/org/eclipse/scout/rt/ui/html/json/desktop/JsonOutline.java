@@ -36,13 +36,24 @@ public class JsonOutline extends JsonTree<IOutline> {
   }
 
   @Override
-  protected void attachTreeNode(ITreeNode node) {
-    super.attachTreeNode(node);
+  protected void attachModel() {
+    super.attachModel();
 
-    if (!(node instanceof IPage)) {
-      throw new IllegalArgumentException("Expected page.");
+    if (getModel().isRootNodeVisible()) {
+      attachPage(getModel().getRootPage());
     }
-    IPage page = (IPage) node;
+    else {
+      for (IPage page : getModel().getRootPage().getChildPages()) {
+        attachPage(page);
+      }
+    }
+  }
+
+  //FIXME CGU Verify with awe was ist jetzt genau der Vorteil dass die adapters nun im attach angehàngt werden? Es geht ja eh nicht immer, zB JsonDesktophandleModelOutlineChanged attachToJsonId macht auch nur nach Bedarf
+  protected void attachPage(IPage page) {
+    for (IPage childPage : page.getChildPages()) {
+      attachPage(childPage);
+    }
 
     optAttachAdapter(page.getDetailForm());
     if (page instanceof IPageWithTable) {
@@ -86,6 +97,19 @@ public class JsonOutline extends JsonTree<IOutline> {
     putProperty(json, "type", pageType);
 
     return json;
+  }
+
+  @Override
+  protected void handleModelNodesInserted(TreeEvent event) {
+    for (ITreeNode node : event.getNodes()) {
+      if (!(node instanceof IPage)) {
+        throw new IllegalArgumentException("Expected page.");
+      }
+      IPage page = (IPage) node;
+      attachPage(page);
+    }
+
+    super.handleModelNodesInserted(event);
   }
 
   @Override

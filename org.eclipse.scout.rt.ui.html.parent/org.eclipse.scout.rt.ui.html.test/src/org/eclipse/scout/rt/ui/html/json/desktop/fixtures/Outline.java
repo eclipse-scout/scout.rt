@@ -23,7 +23,7 @@ public class Outline extends AbstractOutline {
   public Outline(List<IPage> pages) {
     super(false);
     m_pages = pages;
-    initConfig();
+    callInitializer();
   }
 
   @Override
