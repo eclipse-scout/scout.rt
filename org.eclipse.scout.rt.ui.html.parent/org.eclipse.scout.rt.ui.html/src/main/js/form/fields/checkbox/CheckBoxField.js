@@ -2,7 +2,7 @@ scout.CheckBoxField = function() {
   scout.CheckBoxField.parent.call(this);
   this._$checkBox;
 };
-scout.inherits(scout.CheckBoxField, scout.FormField);
+scout.inherits(scout.CheckBoxField, scout.ValueField);
 
 scout.CheckBoxField.prototype._render = function($parent) {
   this.$container = $parent;

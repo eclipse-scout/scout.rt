@@ -53,10 +53,12 @@
 //@include("menu/Menubar.js")
 //@include("form/Form.js");
 //@include("form/fields/FormField.js");
+//@include("form/fields/ValueField.js");
 //@include("form/fields/button/Button.js");
 //@include("form/fields/checkbox/CheckBoxField.js");
 //@include("form/fields/numberfield/NumberField.js");
 //@include("form/fields/stringfield/StringField.js");
+//@include("form/fields/smartfield/SmartField.js");
 //@include("form/fields/groupbox/GroupBox.js");
 //@include("form/fields/sequencebox/SequenceBox.js");
 //@include("form/fields/tablefield/TableField.js");

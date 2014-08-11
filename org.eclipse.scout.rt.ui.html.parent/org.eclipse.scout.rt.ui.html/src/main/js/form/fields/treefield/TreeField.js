@@ -5,13 +5,13 @@ scout.TreeField = function() {
   scout.TreeField.parent.call(this);
   this._addAdapterProperties(['tree']);
 };
-scout.inherits(scout.TreeField, scout.ModelAdapter);
+scout.inherits(scout.TreeField, scout.FormField);
 
 scout.TreeField.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('', 'tree-field');
-  if (this.label) {
-    this.$label = this.$container.appendDiv('', 'label');
-  }
+  this.$label = $('<label>')
+    .appendTo(this.$container);
+
   if (this.tree) {
     this.tree.render(this.$container);
   }

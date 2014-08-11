@@ -49,7 +49,11 @@ scout.FormField.prototype._setErrorStatus = function(errorStatus) {
 };
 
 scout.FormField.prototype._setVisible = function(visible) {
-  // NOP
+  if (!this.$container) {
+    return;
+  }
+
+  this.$container.setVisible();
 };
 
 scout.FormField.prototype._setLabel = function(label) {
@@ -68,10 +72,6 @@ scout.FormField.prototype._setLabelVisible = function(visible) {
   }
 
   this.$label.setVisible(visible);
-};
-
-scout.FormField.prototype._setDisplayText = function(label) {//FIXME CGU/AWE move to ValueField.js
-  // NOP
 };
 
 scout.FormField.prototype._setEnabled = function(enabled) {

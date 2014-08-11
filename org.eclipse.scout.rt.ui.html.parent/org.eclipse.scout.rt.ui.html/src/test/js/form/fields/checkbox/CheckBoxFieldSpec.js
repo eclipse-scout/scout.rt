@@ -13,8 +13,8 @@ describe("CheckBoxField", function() {
       checkBox.init(model, session);
     });
 
-    it("inherits from FormField", function() {
-      expect(scout.FormField.prototype.isPrototypeOf(checkBox)).toBe(true);
+    it("inherits from ValueField", function() {
+      expect(scout.ValueField.prototype.isPrototypeOf(checkBox)).toBe(true);
     });
 
   });

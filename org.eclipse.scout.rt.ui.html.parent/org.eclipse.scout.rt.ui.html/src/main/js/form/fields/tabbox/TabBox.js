@@ -6,7 +6,7 @@ scout.TabBox = function() {
 
   this._addAdapterProperties(['groupBoxes', 'selectedTab']);
 };
-scout.inherits(scout.TabBox, scout.ModelAdapter);
+scout.inherits(scout.TabBox, scout.FormField);
 
 scout.TabBox.prototype._render = function($parent) {
   this.$container = $parent.appendDiv(undefined, 'tab-box');

@@ -14,7 +14,6 @@
 //@include("util/ModelAdapter.js");
 //@include("util/NullAdapter.js");
 //@include("util/ObjectFactory.js");
-//@include("util/BorderLayout.js");
 //@include("util/Device.js");
 //@include("util/URL.js");
 //@include("session/Session.js");
@@ -23,6 +22,7 @@
 //@include("session/UserAgent.js");
 //@include("session/Reconnector.js");
 //@include("datamodel/DataModel.js");
+//@include("layout/BorderLayout.js");
 //@include("layout/GridLayout.js");
 //@include("layout/TableLayout.js");
 //@include("table/Table.js");
@@ -54,6 +54,7 @@
 //@include("menu/menus.js");
 //@include("form/Form.js");
 //@include("form/fields/FormField.js");
+//@include("form/fields/ValueField.js");
 //@include("form/fields/button/Button.js");
 //@include("form/fields/checkbox/CheckBoxField.js");
 //@include("form/fields/numberfield/NumberField.js");
