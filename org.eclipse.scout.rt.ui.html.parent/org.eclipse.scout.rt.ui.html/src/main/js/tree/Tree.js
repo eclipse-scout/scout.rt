@@ -57,6 +57,8 @@ scout.Tree.prototype._render = function($parent) {
   if (this._selectedNodes.length > 0) {
     selectedNode = this._selectedNodes[0];
     this.setNodeSelectedById(selectedNode.id);
+    this._updateItemPath();
+    this.scrollbar.initThumb();
   }
 
   var that = this;
@@ -102,6 +104,7 @@ scout.Tree.prototype._setNodeExpanded = function(node, $node, expanded) {
   if (expanded) {
     this._addNodes(node.childNodes, $node);
     this._updateItemPath();
+    this.scrollbar.initThumb();
 
     if (bread) {
       $node.addClass('expanded');
@@ -138,7 +141,7 @@ scout.Tree.prototype._setNodeExpanded = function(node, $node, expanded) {
         };
 
         $control.css('borderSpacing', 0)
-          .animateAVCSD('borderSpacing', 135, addExpanded, rotateControl, 200);
+          .animateAVCSD('borderSpacing', 90, addExpanded, rotateControl, 200);
       }
     }
   } else {
@@ -154,7 +157,7 @@ scout.Tree.prototype._setNodeExpanded = function(node, $node, expanded) {
     // animated control
     $control = $node.children('.tree-item-control');
 
-    $control.css('borderSpacing', 135)
+    $control.css('borderSpacing', 90)
       .animateAVCSD('borderSpacing', 0, null, rotateControl, 200);
   }
 };
@@ -341,12 +344,12 @@ scout.Tree.prototype._addNodes = function(nodes, $parent) {
       .css('padding-left', level * 20 + 30);
 
     // decorate with (close) control
-    var $control = $node.appendDiv('', 'tree-item-control')
+    var $control = $node.prependDiv('', 'tree-item-control')
       .on('click', '', this._onNodeControlClicked.bind(this));
 
     // rotate control if expanded
     if ($node.hasClass('expanded')) {
-      $control.css('transform', 'rotate(270deg)');
+      $control.css('transform', 'rotate(90deg)');
     }
 
     // append first node and successors
@@ -386,6 +389,7 @@ scout.Tree.prototype._onNodeClicked = function(event) {
   this._setNodeSelected(node, $clicked);
   this._setNodeExpanded(node, $clicked, true);
   this._updateItemPath();
+  this.scrollbar.initThumb();
 };
 
 scout.Tree.prototype._onNodeControlClicked = function(event) {
@@ -449,18 +453,6 @@ scout.Tree.prototype._updateItemPath = function() {
   }
 };
 
-scout.Tree.prototype.doBreadCrumb = function(show) {
-  if (show && !this.$parent.hasClass('bread-crumb')) {
-    this._updateItemPath();
-    this.$parent.addClass('bread-crumb');
-  } else if (!show && this.$parent.hasClass('bread-crumb')) {
-    this.$parent.removeClass('bread-crumb');
-  }
-
-  this.scrollbar.initThumb();
-
-};
-
 /**
  * @param $parent if specified only the elements after parent are considered (faster lookup)
  */
@@ -475,7 +467,6 @@ scout.Tree.prototype._findNodeById = function(nodeId, $parent) {
 scout.Tree.prototype._findSelectedNodes = function() {
   return this._$treeScroll.find('.selected');
 };
-
 
 scout.Tree.prototype.onModelAction = function(event) {
   if (event.type == 'nodesInserted') {

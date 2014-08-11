@@ -8,16 +8,27 @@
 }
 
 .navigation-header{
+	position: relative;
     width: 100%;
     height: @size-desktop-tools;
     .font-text-large;
     white-space: nowrap;
+    
+   .navigation-breadcrumb & {
+    	height: 2 * @size-desktop-tools;
+    } 
 }
 
 .navigation-container{
     top: @size-desktop-tools;
     height: calc(~"100%" - @size-desktop-tools);
     width: 100%;
+
+    .navigation-breadcrumb & {
+    	top: 2 * @size-desktop-tools;
+    	height: calc(~"100%" - 2 * @size-desktop-tools);
+    } 
+
 }
 
 .navigation-splitter-vertical{
@@ -32,6 +43,7 @@
 
 .navigation-tab-outline,
 .navigation-tab-search {
+	position: relative;
 	float: left;
 	
 	&.tab-active {
@@ -42,8 +54,11 @@
         background-color: @color-nav-light;
     	color: @color-bench-text;
     	width: 50px;
-    	
     }    	
+    
+    .navigation-breadcrumb & {
+    	width: 50%;
+    } 
 }
 
 /* navigation header outline */
@@ -53,8 +68,6 @@
 .navigation-tab-outline-title,
 .navigation-tab-search-field {
 	padding: 0px 5px 0px 10px;
-	overflow: hidden;
-  	text-overflow: ellipsis;
   	white-space: nowrap;
 	cursor: pointer;
 	.font-text-large;
@@ -65,6 +78,8 @@
 .navigation-tab-outline-button {
 	float: left;
 	padding: 0px 15px 0px 15px;
+	vertical-align: -50%;
+	text-align: center;
 
 	&.tab-menu-open {
 		color: @color-bench-text-hover;
@@ -76,31 +91,53 @@
 		font-size: 24px;
 		content: "\F0C9";
 	}
+	
+	.navigation-breadcrumb & {
+		width: 100%;
+	}
 }
 
 .navigation-tab-search-button {
-	float: right;
 	padding: 0px 15px 0px 15px;
+	width: @size-desktop-tools;
+	float: right;
+	text-align: center;
 	
 	&:before{
 		.font-icon;
 		font-size: 24px;
 		content: "\F002";
 	}
-	
+
+	.navigation-breadcrumb & {
+		width: 100%;
+	}	
 }
 
 .navigation-tab-outline-title {
 	overflow: hidden;
+  	text-overflow: ellipsis;
+  	padding: 0px 10px 0px 10px;
+	min-width: @size-desktop-breadcrumb - 2 * @size-desktop-tools;
 	display: none;
-
-	.tab-active > & {
-	    display: initial;
-    }
 	
+	.tab-active > & {
+	    display: block;
+    }
+    
+	.navigation-breadcrumb & {
+		width: 200%;
+		text-align: center;
+		padding: 0px 10px 0px 10px;
+		border-bottom: 1px solid @color-bench;
+	} 
+
 }
 .navigation-tab-search-field {
-	width: calc(~"100% - 4px" - @size-desktop-tools );
+	overflow: hidden;
+  	text-overflow: ellipsis;
+	float: left;
+	width: calc(~"100% - 2px" - @size-desktop-tools );
 	
 	outline:0;
 	border: 0;
@@ -110,17 +147,27 @@
     color: @color-bench;
 
 	.tab-active > & {
-	    display: initial;
+	    display: block;
     }
+	.navigation-breadcrumb & {
+		min-width: 200%;
+		text-align: center;
+		border-bottom: 1px solid @color-bench;
+		padding: 0px 10px 0px 10px;
+		position: absolute;
+		top:  @size-desktop-tools;
+		left: -100%;
+	}     
 }
 	
 /* outline menu */
 
 .navigation-tab-outline-menu {
 	position: absolute;
+	top: @size-desktop-tools;
 	display: none;
 	background-color: @color-bench;
-	z-index: 2;
+	z-index: 10;
 	.mixin-shadow;
 }
 

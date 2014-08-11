@@ -37,7 +37,6 @@
 .taskbar-tab-item,
 .taskbar-tool-item {
 	height: @size-desktop-tools;
-	max-width: 250px;
 	padding: 0px 20px 0px 20px;
 		
 	overflow: hidden;

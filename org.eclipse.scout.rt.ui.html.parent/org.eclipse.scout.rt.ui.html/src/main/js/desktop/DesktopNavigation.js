@@ -132,41 +132,44 @@ scout.DesktopNavigation.prototype.onSearchPerformed = function(event) {
 //vertical splitter
 
 scout.DesktopNavigation.prototype._addSplitter = function($navigation) {
-this._$splitter = $navigation.appendDIV('navigation-splitter-vertical')
- .on('mousedown', '', resize);
+  this._$splitter = $navigation.appendDIV('navigation-splitter-vertical')
+   .on('mousedown', '', resize);
 
-var that = this;
+  var WIDTH_BREADCRUMB = 190;
 
-function resize() {
- var w;
+  var that = this;
 
- $('body').addClass('col-resize')
-   .on('mousemove', '', resizeMove)
-   .one('mouseup', '', resizeEnd);
+  function resize() {
+   var w;
 
- function resizeMove(event) {
-   w = event.pageX;
+   $('body').addClass('col-resize')
+     .on('mousemove', '', resizeMove)
+     .one('mouseup', '', resizeEnd);
 
-   $navigation.width(w);
-   $navigation.nextAll().css('left', w);
+   function resizeMove(event) {
+     w = event.pageX;
 
-   if (w <= 180) {
-     that.outline.doBreadCrumb(true);
-   } else {
-     that.outline.doBreadCrumb(false);
+     $navigation.width(w);
+     $navigation.nextAll().css('left', w);
+
+     if (w <= WIDTH_BREADCRUMB) {
+       $navigation.addClass('navigation-breadcrumb');
+     } else {
+       $navigation.removeClass('navigation-breadcrumb');
+     }
+
+     that.outline.scrollbar.initThumb();
    }
- }
 
- function resizeEnd() {
-   $('body').off('mousemove')
-     .removeClass('col-resize');
+   function resizeEnd() {
+     $('body').off('mousemove')
+       .removeClass('col-resize');
 
-   if (w < 180) {
-     w = 180;
-     $navigation.animateAVCSD('width', w);
-     $navigation.nextAll().animateAVCSD('left', w);
+     if (w < WIDTH_BREADCRUMB) {
+       $navigation.animateAVCSD('width', WIDTH_BREADCRUMB);
+       $navigation.nextAll().animateAVCSD('left', WIDTH_BREADCRUMB);
+     }
    }
- }
- return false;
-}
+   return false;
+  }
 };

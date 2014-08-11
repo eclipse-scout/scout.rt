@@ -81,7 +81,7 @@ scout.Desktop.prototype._render = function($parent) {
 };
 
 scout.Desktop.prototype._resolveViewContainer = function(form) {
-  return this.$parent;
+  return this.$bench;
 };
 
 scout.Desktop.prototype.linkOutlineAndViewButton = function() {
@@ -121,7 +121,7 @@ scout.Desktop.prototype.onTabSelected = function(tab, previousTab) {
   }
   else {
     if (!tab.content.rendered) {
-      tab.content.render(this.$container);
+      tab.content.render(this.$bench);
     }
     tab.content.$container.show();
   }
@@ -136,10 +136,10 @@ scout.Desktop.prototype.activateForm = function(form) {
 
 scout.Desktop.prototype.renderForm = function(form) {
   if (this.taskbar.getToolButtonForForm(form)) {
-    form.render(this.$parent);
+    form.render(this.$bench);
   }
   else {
-    form.render(this.$container);
+    form.render(this.$bench);
   }
 };
 
@@ -150,6 +150,8 @@ scout.Desktop.prototype.addForm = function(form) {
   if (form.displayHint == 'view') {
     //FIXME CGU make views work like dialogs
     form.render(this._resolveViewContainer(form));
+    this._outlineTab.title = form.title;
+    this.updateTab(this._outlineTab);
   } else if (form.displayHint == 'dialog') {
     var previousModalForm;
     if (form.modal) {
@@ -160,9 +162,7 @@ scout.Desktop.prototype.addForm = function(form) {
       this.modalDialogStack.push(form);
     }
 
-    if (this.bench) {
-      this.bench.renderForm(form);
-    }
+    form.render(this.$bench);
 
     if (this.taskbar) {
       if (previousModalForm) {
@@ -173,6 +173,7 @@ scout.Desktop.prototype.addForm = function(form) {
   } else {
     $.log('Form displayHint not handled: ' + form.displayHint + '.');
   }
+
 };
 
 scout.Desktop.prototype.removeForm = function(form) {
@@ -346,7 +347,7 @@ scout.Desktop.prototype.addTab = function(tab) {
 };
 
 scout.Desktop.prototype.updateTab = function(tab) {
-  tab.$tab.text = tab.title;
+  tab.$tab.text(tab.title);
 };
 
 scout.Desktop.prototype.formRemoved = function(form) {
