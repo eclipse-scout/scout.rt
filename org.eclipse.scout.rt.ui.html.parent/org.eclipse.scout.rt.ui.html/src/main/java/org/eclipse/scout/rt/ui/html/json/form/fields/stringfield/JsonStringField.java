@@ -25,4 +25,9 @@ public class JsonStringField extends JsonValueField<IStringField> {
     return "StringField";
   }
 
+  @Override
+  protected void handleUiDisplayTextChangedImpl(String displayText, boolean whileTyping) {
+    getModel().getUIFacade().setTextFromUI(displayText, whileTyping);
+  }
+
 }

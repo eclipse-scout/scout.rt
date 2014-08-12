@@ -17,5 +17,6 @@ scout.NumberField.prototype._render = function($parent) {
 
   this.$field = $('<input type="text">')
     .addClass('field')
+    .blur(this._onFieldBlur.bind(this))
     .appendTo(this.$container);
 };

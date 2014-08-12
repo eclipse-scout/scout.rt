@@ -10,17 +10,23 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form.fields;
 
+import java.beans.PropertyChangeEvent;
+
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
+import org.eclipse.scout.rt.ui.html.json.JsonEvent;
+import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
+import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 
 /**
  * Base class used to create JSON output for Scout form-fields with a value. When a sub-class need to provide a custom
  * <code>valueToJson()</code> method for the value property, it should replace the default JsonProperty for PROP_VALUE ,
  * with it's own implementation by calling <code>putJsonProperty()</code>.
- * 
+ *
  * @param <T>
  */
 public class JsonValueField<T extends IValueField<?>> extends JsonFormField<T> {
+  public String EVENT_DISPLAY_TEXT_CHANGED = "displayTextChanged";
 
   public JsonValueField(T model, IJsonSession session, String id) {
     super(model, session, id);
@@ -46,4 +52,31 @@ public class JsonValueField<T extends IValueField<?>> extends JsonFormField<T> {
     return "ValueField";
   }
 
+  @Override
+  public void handleUiEvent(JsonEvent event, JsonResponse res) {
+    if (EVENT_DISPLAY_TEXT_CHANGED.equals(event.getType())) {
+      handleUiDisplayTextChanged(event);
+    }
+    else {
+      super.handleUiEvent(event, res);
+    }
+  }
+
+  protected void handleUiDisplayTextChanged(JsonEvent event) {
+    String displayText = JsonObjectUtility.getString(event.getData(), IValueField.PROP_DISPLAY_TEXT);
+    boolean whileTyping = event.getData().optBoolean("whileTyping");
+
+    PropertyChangeEvent propertyEvent = new PropertyChangeEvent(getModel(), IValueField.PROP_DISPLAY_TEXT, null, displayText);
+    getPropertyEventFilter().addIgnorableModelEvent(propertyEvent);
+    try {
+      handleUiDisplayTextChangedImpl(displayText, whileTyping);
+    }
+    finally {
+      getPropertyEventFilter().removeIgnorableModelEvent(propertyEvent);
+    }
+  }
+
+  protected void handleUiDisplayTextChangedImpl(String displayText, boolean whileTyping) {
+    //NOP may be implemented by subclasses
+  }
 }

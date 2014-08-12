@@ -43,5 +43,8 @@ public class JsonButton extends JsonFormField<IButton> {
     if (JsonEventType.CLICK.matches(event)) {
       getModel().getUIFacade().fireButtonClickedFromUI();
     }
+    else {
+      super.handleUiEvent(event, res);
+    }
   }
 }
