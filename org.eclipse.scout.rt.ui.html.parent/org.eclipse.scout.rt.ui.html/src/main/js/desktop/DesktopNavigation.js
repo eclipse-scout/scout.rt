@@ -16,11 +16,11 @@ scout.DesktopNavigation.prototype.render = function($parent) {
   this.$navigation = $parent.appendDIV('desktop-navigation');
 
   //  create outline tabs
-  var outlineTab = new scout.TabAndContent(this._createOutlinesTab());
+  var outlineTab = new scout.DesktopNavigation.TabAndContent(this._createOutlinesTab());
   outlineTab.$tab.on('click', function() { this._setActiveTab(outlineTab); }.bind(this));
 
   //  create search tabs
-  var searchTab = new scout.TabAndContent(this._createSearchTab());
+  var searchTab = new scout.DesktopNavigation.TabAndContent(this._createSearchTab());
   searchTab.$tab.on('click', function() { this._setActiveTab(searchTab); }.bind(this));
 
   this.$header = this.$navigation.appendDIV('navigation-header');
@@ -33,7 +33,7 @@ scout.DesktopNavigation.prototype.render = function($parent) {
   this._addSplitter(this.$navigation);
 };
 
-scout.TabAndContent = function($tab, $content) {
+scout.DesktopNavigation.TabAndContent = function($tab) {
   this.$tab = $tab;
   this.$storage = null;
 };

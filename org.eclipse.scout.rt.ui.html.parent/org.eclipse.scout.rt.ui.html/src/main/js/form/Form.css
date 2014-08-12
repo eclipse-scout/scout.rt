@@ -1,8 +1,10 @@
 .form {
-  height: 100%;
+	height: 100%;
+	width: 100%;
 }
 
 .dialog-form {
+<<<<<<< Upstream, based on branch 'develop' of ssh://cru@git.bsiag.com:29418/tools/eclipse.scout
   background-color:white;
   border:solid 1px #ff0000;
   position:absolute;
@@ -10,6 +12,9 @@
   left: 100px;
   width:800px;
   height: 500px;
+=======
+  background-color: @color-bench;
+>>>>>>> ee88fb8 html ui: tabbar
 }
 
 .glasspane {

@@ -42,19 +42,17 @@ scout.Form.prototype._render = function($parent) {
 
   if (this.displayHint == 'dialog') {
     // TODO AWE: append form title section (including ! ? and progress indicator)
-    var $dialogBar = $.makeDiv('', 'dialog-bar', '');
-    var $dialogTitle = $('<span>').addClass('dialog-title').text(this.title);
-    $dialogBar.append($dialogTitle);
+    this.menubar = new scout.Menubar(this.$container);
     if (closeable) {
       var $closeButton = $('<button>').text('X');
-      $dialogBar.append($closeButton);
+      this.menubar.$container.append($closeButton);
       $closeButton.on('click', function() {
         this.session.send('formClosing', this.id);
       }.bind(this));
     }
     if (detachable) {
       var $detachButton = $('<button>').text('D').attr('title', "Detach form");
-      $dialogBar.append($detachButton);
+      this.menubar.$container.append($detachButton);
       $detachButton.on('click', function() {
         // FIXME BSH Set correct url or write content
         //        w.document.write('<html><head><title>Test</title></head><body>Hello</body></html>');
@@ -70,7 +68,6 @@ scout.Form.prototype._render = function($parent) {
       }.bind(this));
     }
     this.$container.addClass('dialog-form');
-    this.$container.prepend($dialogBar);
   }
 
   if (this._locked) {

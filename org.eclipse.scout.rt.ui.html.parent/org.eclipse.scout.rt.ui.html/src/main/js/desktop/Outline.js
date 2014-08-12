@@ -5,67 +5,62 @@ scout.Outline = function() {
 };
 scout.inherits(scout.Outline, scout.Tree);
 
-scout.Outline.prototype.showPageDetailForm = function(node) {
-  //unlink detail form if it was closed
-  if (node.detailForm && node.detailForm.destroyed) {
-    node.detailForm = null;
-  }
+/* create form and table */
 
+scout.Outline.prototype._showForm = function(node) {
   if (this._detailForm && this._detailForm !== node.detailForm) {
-    this.session.desktop.removeForm(this._detailForm);
+    this._detailForm.remove();
     this._detailForm = null;
   }
 
   if (node.detailForm) {
     this._detailForm = node.detailForm;
     if (!this._detailForm.rendered) {
-      this.session.desktop.addForm(this._detailForm);
+      this.session.desktop.updateOutline(this._detailForm, this._detailForm.title);
     }
   }
 };
 
-scout.Outline.prototype.showPageDetailTable = function(node) {
-  var detailTable = node.table;
-
-  if (this._detailTable && this._detailTable !== detailTable) {
-    this.session.desktop.removePageDetailTable(node, this._detailTable);
-    this._detailTable.desktopMenuContributor = false;
+scout.Outline.prototype._showTable = function(node) {
+  if (this._detailTable && this._detailTable !== node.table) {
+    this._detailTable.remove();
     this._detailTable = null;
   }
 
-  if (detailTable) {
-    this._detailTable = detailTable;
-    this._detailTable.desktopMenuContributor = true;
+  if (node.table) {
+    this._detailTable = node.table;
     if (!this._detailTable.rendered) {
-      this.session.desktop.addPageDetailTable(node, this._detailTable);
+      this.session.desktop.updateOutline(this._detailTable, node.text);
     }
   }
 };
 
+/* user input handling */
+
 scout.Outline.prototype._setNodeSelected = function(node, $node) {
   scout.Outline.parent.prototype._setNodeSelected.call(this, node, $node);
-  if (!node) {
-    return;
-  }
 
-  this.showPageDetailTable(node);
-  this.showPageDetailForm(node);
+  if (node) {
+    this._showForm(node);
+    this._showTable(node);
+  }
 };
 
+/* event handling */
 
-scout.Outline.prototype.setPageDetailFormChanged = function(nodeId, detailForm) {
+scout.Outline.prototype.formChanged = function(nodeId, detailForm) {
   var node = this._nodeMap[nodeId];
   node.detailForm = this.session.getOrCreateModelAdapter(detailForm, this);
 
   if (this._selectedNodes.indexOf(node) >= 0) {
-    this.showPageDetailForm(node);
+    this._showForm(node);
   }
 };
 
 
 scout.Outline.prototype.onModelAction = function(event) {
   if (event.type == 'detailFormChanged') {
-    this.setPageDetailFormChanged(event.nodeId, event.detailForm);
+    this.formChanged(event.nodeId, event.detailForm);
   } else {
     scout.Outline.parent.prototype.onModelAction.call(this, event);
   }

@@ -6,15 +6,12 @@ scout.Desktop = function() {
 
   this.navigation;
   this.$bar;
+  this.$tabbar;
+  this.$toolbar
   this.$bench;
 
-  this.$tabs;
-  this.tabs = {};
-  this.tabStack = [];
+  this.allTabs = [];
   this.selectedTab;
-  this.selectedTool;
-
-  this.modalDialogStack = [];
 
   this._addAdapterProperties(['viewButtons', 'toolButtons', 'forms', 'outline', 'messageBoxes']);
 };
@@ -26,9 +23,7 @@ scout.Desktop.prototype.onChildAdapterCreated = function(propertyName, adapter) 
   }
 };
 
-/**
- * @override
- */
+
 scout.Desktop.prototype._render = function($parent) {
   this.$parent = $parent;
 
@@ -47,21 +42,16 @@ scout.Desktop.prototype._render = function($parent) {
       }
     }.bind(this));
 
-  this.$tabs = this.$bar.appendDIV('taskbar-tabs');
-  this.$tools = this.$bar.appendDIV('taskbar-tools');
+  this.$tabbar = this.$bar.appendDIV('taskbar-tabs');
+  this.$toolbar = this.$bar.appendDIV('taskbar-tools');
 
-  this._outlineTab = {
-    title: 'Tabelle',
-    id: this.id,
-  };
+  this._outlineTab = new scout.Desktop.TabAndContent();
 
   this.addTab(this._outlineTab);
-  this.selectTab(this._outlineTab);
 
-  // warum kommen 7 toolbuttons?
   for (var i = 0; i < this.toolButtons.length; i++) {
     this.toolButtons[i].desktopTaskbar = this;
-    this.toolButtons[i].render(this.$tools);
+    this.toolButtons[i].render(this.$toolbar);
   }
 
   this.$bench = this.$parent.appendDIV('desktop-bench');
@@ -85,19 +75,11 @@ scout.Desktop.prototype._render = function($parent) {
   }
 };
 
-scout.Desktop.prototype._resolveViewContainer = function(form) {
-  return this.$bench;
-};
-
-scout.Desktop.prototype.linkOutlineAndViewButton = function() {
-  // Link button with outline (same done in desktopViewButton.js). Redundancy necessary because event order is not reliable (of button selection and outlineChanged events)
-  // Only necessary due to separation of view buttons and outlines in scout model...
-  // FIXME CGU find better way for scout model
-  for (var i = 0; i < this.viewButtons.length; i++) {
-    if (this.viewButtons[i].selected) {
-      this.viewButtons[i].outline = this.outline;
-    }
-  }
+scout.Desktop.TabAndContent = function(title, content) {
+  this.title = title;
+  this.content = null;
+  this.$div = null;
+  this.$storage = null;
 };
 
 scout.Desktop.prototype.changeOutline = function(outline) {
@@ -112,42 +94,15 @@ scout.Desktop.prototype._onSearchPerformed = function(event) {
   this.navigation.onSearchPerformed(event);
 };
 
-scout.Desktop.prototype.onTabSelected = function(tab, previousTab) {
-  if (!tab.content) {
-    return;
-  }
-
-  if (previousTab) {
-    previousTab.content.$container.hide();
-  }
-
-  if (tab.type == 'form') {
-    this.desktop.activateForm(tab.content);
-  }
-  else {
-    if (!tab.content.rendered) {
-      tab.content.render(this.$bench);
-    }
-    tab.content.$container.show();
-  }
-};
-
 scout.Desktop.prototype.activateForm = function(form) {
   if (!form.rendered) {
-    this.renderForm(form);
+    form.render(this.$bench);
   }
   form.$container.show();
 };
 
-scout.Desktop.prototype.renderForm = function(form) {
-  if (this.taskbar.getToolButtonForForm(form)) {
-    form.render(this.$bench);
-  }
-  else {
-    form.render(this.$bench);
-  }
-};
 
+<<<<<<< Upstream, based on branch 'develop' of ssh://cru@git.bsiag.com:29418/tools/eclipse.scout
 
 
 
@@ -282,6 +237,9 @@ scout.Desktop.prototype.selectTab = function(tab) {
   this.onTabSelected(tab, previousTab);
 };
 
+=======
+// check, delete
+>>>>>>> ee88fb8 html ui: tabbar
 
 scout.Desktop.prototype.selectTool = function(tool) {
   var previousTool = this.selectedTool;
@@ -317,71 +275,6 @@ scout.Desktop.prototype.formActivated = function(form) {
   this.selectTab(tab);
 };
 
-
-scout.Desktop.prototype.unselectTab = function(tab) {
-  var $tab = tab.$tab;
-  $tab.select(false);
-  tab.selected = false;
-  this.selectedTab = null;
-};
-
-scout.Desktop.prototype.formAdded = function(form) {
-  var tab;
-  var toolButton = this.getToolButtonForForm(form);
-  if (toolButton) {
-    toolButton._setSelected(true);
-    return;
-  }
-
- tab = {id: form.id, title: form.title, content: form, type: 'form'};
- this.addTab(tab);
- this.selectTab(tab);
-};
-
-scout.Desktop.prototype.addTab = function(tab) {
-  var $tab = this.$tabs.appendDiv(undefined, 'taskbar-tab-item', tab.title);
-  tab.$tab = $tab;
-  this.tabs[tab.id] = tab;
-  this.tabStack.push(tab);
-
-  $tab.on('click', onTabClicked.bind(this));
-
-  function onTabClicked() {
-    if ($tab.isSelected()) {
-      return;
-    }
-
-    this.selectTab(tab);
-  }
-};
-
-scout.Desktop.prototype.updateTab = function(tab) {
-  tab.$tab.text(tab.title);
-};
-
-scout.Desktop.prototype.formRemoved = function(form) {
-  var toolButton = this.getToolButtonForForm(form);
-  if (toolButton) {
-      toolButton._setSelected(false);
-    return;
-  }
-
-  var tab = this.tabs[form.id];
-  this.removeTab(tab);
-};
-
-scout.Desktop.prototype.removeTab = function(tab) {
-  delete this.tabs[tab.id];
-  scout.arrays.remove(this.tabStack, tab);
-  tab.$tab.remove();
-
-  if (tab.selected) {
-    this.selectedTab = null;
-    if (this.tabStack.length > 0) {
-      this.selectTab(this.tabStack[this.tabStack.length-1]);
-    }
-  }
-};
 
 scout.Desktop.prototype.formDisabled = function(form) {
   var toolButton, $tab;
@@ -439,21 +332,107 @@ scout.Desktop.prototype.unselectToolButtons = function(toolButton) {
   }
 };
 
-scout.Desktop.prototype.addPageDetailTable = function(page, table) {
-  this._outlineTab.content = table;
-  this._outlineTab.title = page.text;
-  this.updateTab(this._outlineTab);
+/* tab handling */
 
-  if (this._outlineTab.selected || true) {
-    table.render(this.$bench);
+scout.Desktop.prototype.addTab = function(tab) {
+  tab.$div = this.$tabbar.appendDIV('taskbar-tab-item', tab.title);
+
+  tab.$div.on('click', function onTabClicked() {
+      if (!tab.$div.isSelected()) {
+        this.selectTab(tab);
+      }
+    }.bind(this));
+
+
+  this.allTabs.push(tab);
+  this.selectTab(tab);
+
+};
+
+scout.Desktop.prototype.updateTab = function(tab) {
+  tab.$div.text(tab.title);
+};
+
+scout.Desktop.prototype.removeTab = function(tab) {
+  scout.arrays.remove(this.allTabs, tab);
+
+  if (tab.$div.isSelected()) {
+    this.selectTab(this.allTabs[this.allTabs.length - 1]);
+  }
+
+  tab.$div.remove();
+};
+
+scout.Desktop.prototype.selectTab = function(tab) {
+  if (this.selectedTab) {
+    this.unselectTab(this.selectedTab);
+  }
+
+  tab.$div.select(true);
+  this.selectedTab = tab;
+  if (tab.$storage) {
+    this.$bench.append(tab.$storage);
   }
 };
 
-scout.Desktop.prototype.removePageDetailTable = function(page, table) {
-  this._outlineTab.title = '';
-  this._outlineTab.content = null;
+scout.Desktop.prototype.unselectTab = function(tab) {
+  tab.$storage = this.$bench.children();
+  this.$bench.children().detach();
+  tab.$div.select(false);
+};
+
+/* handling of forms */
+
+// activate form
+// enable / disable and modal handling auch beim tab löschen
+
+/* handling of outline (form and table) and forms */
+
+scout.Desktop.prototype.addForm = function(form) {
+  var tab = new scout.Desktop.TabAndContent(form.title, form);
+  this.addTab(tab);
+  form.render(this.$bench);
+};
+
+scout.Desktop.prototype.removeForm = function(form) {
+  // muss nicht der selektierte sein, muss man in allenTabs suchen.. zusammen mit modal, letzzte machen
+  this.removeTab(this.selectedTab);
+  form.remove();
+};
+
+scout.Desktop.prototype.updateOutline = function(content, title) {
+  this._outlineTab.title = title;
+  this._outlineTab.content = content;
+
   this.updateTab(this._outlineTab);
-  table.remove();
+  this.selectTab(this._outlineTab);
+  content.render(this.$bench);
+};
+
+
+/* event handling */
+
+scout.Desktop.prototype.onModelAction = function(event) {
+  var form;
+
+  if (event.type === 'formAdded') {
+    form = this.session.getOrCreateModelAdapter(event.form, this);
+    this.forms.push(form);
+    this.addForm(form);
+  } else if (event.type === 'formRemoved') {
+    form = this.session.getOrCreateModelAdapter(event.form, this);
+    scout.arrays.remove(this.forms, form);
+    this.removeForm(form);
+  } else if (event.type === 'formEnsureVisible') {
+    form = this.session.getOrCreateModelAdapter(event.form, this);
+    this.activateForm(form);
+  } else if (event.type === 'outlineChanged') {
+    this.changeOutline(this.session.getOrCreateModelAdapter(event.outline, this));
+  } else if (event.type === 'searchPerformed') {
+    this.navigation.onSearchPerformed(event);
+  } else {
+    scout.parent.prototype.onModelAction.call(this, event);
+  }
 };
 
 scout.Desktop.prototype.addMessageBox = function(messageBox) {

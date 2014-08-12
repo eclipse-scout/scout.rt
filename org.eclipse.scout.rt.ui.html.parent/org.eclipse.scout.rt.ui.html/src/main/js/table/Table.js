@@ -60,7 +60,7 @@ scout.Table.prototype._render = function($parent) {
     scout.keystrokeManager.installAdapter(this.$container, this._keystrokeAdapter);
   }
 
-  this.menubar = new scout.DesktopMenubar(this.$container);
+  this.menubar = new scout.Menubar(this.$container);
 
   this._$header = this.$container.appendDiv(this.id + '_header', 'table-header');
   if (!this.headerVisible) {

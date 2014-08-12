@@ -1,11 +1,11 @@
-scout.DesktopMenubar = function($parent) {
+scout.Menubar = function($parent) {
   //create container
-  this.$container = $parent.appendDiv('', 'desktop-menu').data('this', this);
+  this.$container = $parent.prependDiv('', 'desktop-menu').data('this', this);
   this.$tree = this.$container.appendDiv('', 'desktop-menu-tree');
   this.$table = this.$container.appendDiv('', 'desktop-menu-table');
 };
 
-scout.DesktopMenubar.prototype.updateItems = function(group, menus) {
+scout.Menubar.prototype.updateItems = function(group, menus) {
   var $div, i, existingMenus;
 
   if (group === 'tree') {

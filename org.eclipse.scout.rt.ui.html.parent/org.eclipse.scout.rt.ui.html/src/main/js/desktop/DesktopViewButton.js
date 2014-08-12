@@ -37,13 +37,6 @@ scout.DesktopViewButton.prototype._callSetters = function() {
 };
 
 scout.DesktopViewButton.prototype._setSelected = function(selected) {
-  if (selected) {
-    this._$viewButton.selectOne();
-  }
-  else {
-    //Called here because select = false comes after select = true and outlineChanged ...
-    this.desktop.linkOutlineAndViewButton();
-  }
 };
 
 scout.DesktopViewButton.prototype._setEnabled = function(enabled) {
