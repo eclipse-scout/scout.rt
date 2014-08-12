@@ -106,10 +106,6 @@ public class JsonClientSession extends AbstractJsonAdapter<IClientSession> {
     return json;
   }
 
-  @Override
-  public void handleUiEvent(JsonEvent event, JsonResponse res) {
-  }
-
   protected void processRequestLocale(final Locale locale) {
     if (m_localeManagedByModel) {
       return;

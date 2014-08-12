@@ -1,0 +1,17 @@
+.messagebox {
+  background-color:white;
+  border:solid 1px #000000;
+  position:absolute;
+  top: 100px;
+  left: 100px;
+  min-height: 50px;
+  min-width: 100px;
+}
+
+.messagebox-label {
+  margin: 5px;
+}
+
+.messagebox button {
+  margin: 5px;
+}

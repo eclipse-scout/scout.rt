@@ -49,6 +49,7 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
   public static final String PROP_OUTLINE = "outline";
 
   public static final String PROP_FORM = "form";
+  public static final String PROP_MESSAGE_BOX = "messageBox";
 
   private static final String TOOL_BUTTONS = "[" +
       "          {\"id\": \"t2\", \"objectType\": \"ToolButton\", \"text\": \"Zugriff\", \"icon\": \"\uf144\", \"shortcut\": \"F4\"}," +
@@ -81,6 +82,7 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
 
     // attach child adapters
     attachAdapters(getForms());
+    attachAdapters(getModel().getMessageBoxStack());
     attachAdapters(getModel().getToolButtons());
     if (!isFormBased()) {
       attachAdapters(getModel().getViewButtons());
@@ -102,6 +104,7 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
   public JSONObject toJson() {
     JSONObject json = super.toJson();
     putAdapterIdsProperty(json, "forms", getForms());
+    putAdapterIdsProperty(json, "messageBoxes", getModel().getMessageBoxStack());
     putAdapterIdsProperty(json, "toolButtons", getModel().getToolButtons());
     if (!isFormBased()) {
       // FIXME view and tool buttons should be removed from desktop by device transformer
@@ -213,9 +216,7 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
   }
 
   protected void handleModelMessageBoxAdded(final IMessageBox messageBox) {
-    // FIXME implement
-    // for the moment auto close messagebox to not block the model thread
-    messageBox.getUIFacade().setResultFromUI(IMessageBox.YES_OPTION);
+    addActionEvent("messageBoxAdded", attachToJsonId(PROP_MESSAGE_BOX, messageBox));
   }
 
   protected void handleModelDesktopClosed() {
@@ -257,6 +258,9 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
     }
     else if ("desktopTabClicked".equals(event.getType())) {
       handleDesktopTabClicked(event);
+    }
+    else {
+      super.handleUiEvent(event, res);
     }
   }
 

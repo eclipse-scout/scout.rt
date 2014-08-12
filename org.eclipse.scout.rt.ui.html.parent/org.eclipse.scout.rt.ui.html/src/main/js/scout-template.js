@@ -51,6 +51,7 @@
 //@include("menu/Menu.js");
 //@include("menu/menus.js");
 //@include("menu/Menubar.js")
+//@include("messagebox/MessageBox.js");
 //@include("form/Form.js");
 //@include("form/fields/FormField.js");
 //@include("form/fields/ValueField.js");

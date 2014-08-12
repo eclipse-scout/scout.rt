@@ -18,13 +18,10 @@ import org.json.JSONObject;
 public class JsonEvent implements IJsonMapper {
 
   public static final String TYPE = "type";
-
   public static final String ID = "id";
 
   private final JSONObject m_data;
-
   private final String m_id;
-
   private final String m_type;
 
   /**
@@ -81,4 +78,8 @@ public class JsonEvent implements IJsonMapper {
     return json;
   }
 
+  @Override
+  public String toString() {
+    return "Id: " + m_id + ". Type: " + m_type + ". Data: " + m_data;
+  }
 }

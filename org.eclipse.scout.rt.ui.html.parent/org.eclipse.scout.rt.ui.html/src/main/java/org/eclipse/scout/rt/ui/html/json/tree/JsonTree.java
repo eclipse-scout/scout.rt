@@ -266,7 +266,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
       handleUiNodeExpanded(event, res);
     }
     else {
-      throw new IllegalArgumentException("unsupported event type");
+      super.handleUiEvent(event, res);
     }
   }
 

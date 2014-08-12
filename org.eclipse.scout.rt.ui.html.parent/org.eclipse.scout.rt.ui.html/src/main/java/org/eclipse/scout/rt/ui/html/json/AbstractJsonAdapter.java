@@ -89,6 +89,11 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     return json;
   }
 
+  @Override
+  public void handleUiEvent(JsonEvent event, JsonResponse res) {
+    throw new IllegalStateException("Event not handled. " + event);
+  }
+
   protected final JSONObject putProperty(JSONObject json, String key, Object value) {
     return JsonObjectUtility.putProperty(json, key, value);
   }

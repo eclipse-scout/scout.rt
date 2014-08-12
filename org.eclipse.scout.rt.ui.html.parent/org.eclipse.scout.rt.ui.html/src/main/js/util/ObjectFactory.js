@@ -123,6 +123,11 @@ scout.defaultObjectFactories = [{
     return new scout.Form();
   }
 }, {
+  objectType: 'MessageBox',
+  create: function() {
+    return new scout.MessageBox();
+  }
+}, {
   objectType: 'Menu',
   create: function() {
     return new scout.Menu();

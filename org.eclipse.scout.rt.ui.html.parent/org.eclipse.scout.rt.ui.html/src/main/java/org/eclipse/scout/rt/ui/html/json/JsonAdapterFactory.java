@@ -40,6 +40,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
 import org.eclipse.scout.rt.client.ui.form.fields.treefield.ITreeField;
+import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.shared.data.model.IDataModel;
 import org.eclipse.scout.rt.ui.html.json.action.keystroke.JsonKeyStroke;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonBreadCrumbNavigation;
@@ -61,6 +62,7 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.tablefield.JsonTableField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.treefield.JsonTreeField;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonMenu;
+import org.eclipse.scout.rt.ui.html.json.messagebox.JsonMessageBox;
 import org.eclipse.scout.rt.ui.html.json.table.JsonTable;
 import org.eclipse.scout.rt.ui.html.json.table.control.JsonAnalysisTableControl;
 import org.eclipse.scout.rt.ui.html.json.table.control.JsonChartTableControl;
@@ -123,6 +125,9 @@ public class JsonAdapterFactory {
     }
     else if (model instanceof IForm) {
       return new JsonForm((IForm) model, session, id);
+    }
+    else if (model instanceof IMessageBox) {
+      return new JsonMessageBox((IMessageBox) model, session, id);
     }
     else if (model instanceof IViewButton) {
       return new JsonViewButton((IViewButton) model, session, id);

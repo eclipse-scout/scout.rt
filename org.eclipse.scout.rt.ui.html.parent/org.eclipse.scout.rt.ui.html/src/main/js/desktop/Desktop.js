@@ -16,7 +16,7 @@ scout.Desktop = function() {
 
   this.modalDialogStack = [];
 
-  this._addAdapterProperties(['viewButtons', 'toolButtons', 'forms', 'outline']);
+  this._addAdapterProperties(['viewButtons', 'toolButtons', 'forms', 'outline', 'messageBoxes']);
 };
 scout.inherits(scout.Desktop, scout.BaseDesktop);
 
@@ -71,12 +71,17 @@ scout.Desktop.prototype._render = function($parent) {
   // TODO cru: split and move
   // scout.keystrokeManager.installAdapter($parent, new scout.DesktopKeystrokeAdapter(this.navigation, this.taskbar));
 
-  var i, form;
+  var i, form, messageBox;
   for (i = 0; i < this.forms.length; i++) {
     form = this.forms[i];
     if (!form.minimized) {
       this.addForm(form);
     }
+  }
+
+  for (i = 0; i < this.messageBoxes.length; i++) {
+    messageBox = this.messageBoxes[i];
+    this.addMessageBox(messageBox);
   }
 };
 
@@ -236,7 +241,7 @@ scout.Desktop.prototype.maximizeForm = function(form) {
 };
 
 scout.Desktop.prototype.onModelAction = function(event) {
-  var form;
+  var form, messageBox;
 
   if (event.type === 'formAdded') {
     form = this.session.getOrCreateModelAdapter(event.form, this);
@@ -253,6 +258,10 @@ scout.Desktop.prototype.onModelAction = function(event) {
     this.changeOutline(this.session.getOrCreateModelAdapter(event.outline, this));
   } else if (event.type === 'searchPerformed') {
     this.navigation.onSearchPerformed(event);
+  } else if (event.type === 'messageBoxAdded') {
+    messageBox = this.session.getOrCreateModelAdapter(event.messageBox, this);
+    this.forms.push(form);
+    this.addMessageBox(messageBox);
   } else {
     scout.parent.prototype.onModelAction.call(this, event);
   }
@@ -445,4 +454,12 @@ scout.Desktop.prototype.removePageDetailTable = function(page, table) {
   this._outlineTab.content = null;
   this.updateTab(this._outlineTab);
   table.remove();
+};
+
+scout.Desktop.prototype.addMessageBox = function(messageBox) {
+  messageBox.render(this.$bench);
+};
+
+scout.Desktop.prototype.onMessageBoxClosed = function(messageBox) {
+  scout.arrays.remove(this.messageBoxes, messageBox);
 };

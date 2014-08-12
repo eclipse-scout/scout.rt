@@ -72,6 +72,14 @@ var l = console.log.bind(console);
     return jQuery.ajax(options);
   };
 
+  $.nl2br = function(text) {
+    if (!text) {
+      return text;
+    }
+
+    return text.replace(/\n/g,"<br>");
+  };
+
   //== $.prototype extensions
 
   // prepend - and return new div for chaining

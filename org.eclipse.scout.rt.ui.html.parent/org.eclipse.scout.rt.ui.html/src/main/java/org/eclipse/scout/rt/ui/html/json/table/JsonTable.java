@@ -164,7 +164,7 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
         return null;
       }
     });
-    */
+     */
     putJsonProperty(new JsonProperty<ITable>(ITable.PROP_KEY_STROKES, model) {
       @Override
       protected List<IKeyStroke> modelValue() {
@@ -280,6 +280,9 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
     }
     else if (EVENT_RELOAD.equals(event.getType())) {
       handleUiReload(event, res);
+    }
+    else {
+      super.handleUiEvent(event, res);
     }
   }
 
