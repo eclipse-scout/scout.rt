@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <?pde version="3.6"?>
-<target name="scout-luna-integration.target" sequenceNumber="10">
+<target name="scout-mars-integration.target" sequenceNumber="10">
   <locations>
     <location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
-      <repository id="eclipse_luna_I" location="http://download.eclipse.org/eclipse/updates/4.4-I-builds/"/>
+      <repository id="eclipse_mars_I" location="http://download.eclipse.org/eclipse/updates/4.5-I-builds/"/>
 
       <unit id="org.eclipse.platform.feature.group" version="0.0.0"/>
       <unit id="org.eclipse.platform.source.feature.group" version="0.0.0"/>
