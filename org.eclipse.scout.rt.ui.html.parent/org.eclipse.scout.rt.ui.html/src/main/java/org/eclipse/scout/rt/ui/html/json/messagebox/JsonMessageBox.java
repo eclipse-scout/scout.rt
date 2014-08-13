@@ -29,6 +29,11 @@ public class JsonMessageBox extends AbstractJsonPropertyObserver<IMessageBox> {
 
   public JsonMessageBox(IMessageBox model, IJsonSession jsonSession, String id) {
     super(model, jsonSession, id);
+  }
+
+  @Override
+  protected void initProperties(IMessageBox model) {
+    super.initProperties(model);
 
     putJsonProperty(new JsonProperty<IMessageBox>("title", model) {
       @Override

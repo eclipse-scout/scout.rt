@@ -50,6 +50,11 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     m_treeNodes = new HashMap<>();
     m_treeNodeIds = new HashMap<>();
     m_treeEventFilter = new TreeEventFilter(getModel());
+  }
+
+  @Override
+  protected void initProperties(T model) {
+    super.initProperties(model);
     putJsonProperty(new JsonProperty<T>(ITree.PROP_TITLE, model) {
       @Override
       protected String modelValue() {
@@ -64,14 +69,26 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   }
 
   @Override
+  protected void createChildAdapters() {
+    super.createChildAdapters();
+    attachAdapter(getModel().getContextMenu());
+    attachAdapters(getModel().getMenus());
+  }
+
+  @Override
+  protected void disposeChildAdapters() {
+    super.disposeChildAdapters();
+    disposeAdapter(getModel().getContextMenu());
+    disposeAdapters(getModel().getMenus());
+  }
+
+  @Override
   protected void attachModel() {
     super.attachModel();
     if (m_modelTreeListener == null) { //FIXME CGU illegal state when null
       m_modelTreeListener = new P_ModelTreeListener();
       getModel().addUITreeListener(m_modelTreeListener);
     }
-    attachAdapter(getModel().getContextMenu());
-    attachAdapters(getModel().getMenus());
   }
 
   @Override

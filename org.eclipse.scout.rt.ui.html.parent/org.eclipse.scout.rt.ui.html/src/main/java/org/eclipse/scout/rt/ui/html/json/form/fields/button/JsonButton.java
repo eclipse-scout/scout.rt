@@ -24,13 +24,19 @@ public class JsonButton extends JsonFormField<IButton> {
 
   public JsonButton(IButton model, IJsonSession jsonSession, String id) {
     super(model, jsonSession, id);
+  }
+
+  @Override
+  protected void initProperties(IButton model) {
+    super.initProperties(model);
+
+    // TODO AWE: System-type von button mit ans UI schicken?
     putJsonProperty(new JsonProperty<IButton>(PROP_SYSTEM_TYPE, model) {
       @Override
       protected Integer modelValue() {
         return getModel().getSystemType();
       }
     });
-    // TODO AWE: System-type von button mit ans UI schicken?
   }
 
   @Override

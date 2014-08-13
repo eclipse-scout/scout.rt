@@ -50,20 +50,24 @@ public class JsonForm extends AbstractJsonPropertyObserver<IForm> {
   }
 
   @Override
+  protected void createChildAdapters() {
+    super.createChildAdapters();
+    attachAdapter(getModel().getRootGroupBox());
+  }
+
+  @Override
+  protected void disposeChildAdapters() {
+    super.disposeChildAdapters();
+    disposeAdapter(getModel().getRootGroupBox());
+  }
+
+  @Override
   protected void attachModel() {
     super.attachModel();
     if (m_modelFormListener == null) {
       m_modelFormListener = new P_ModelFormListener();
       getModel().addFormListener(m_modelFormListener);
     }
-    // attach child adapters
-    attachAdapter(getModel().getRootGroupBox());
-  }
-
-  @Override
-  public void dispose() {
-    disposeJsonAdapter(getModel().getRootGroupBox());
-    super.dispose();
   }
 
   @Override

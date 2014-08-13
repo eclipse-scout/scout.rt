@@ -23,6 +23,11 @@ public class JsonFormField<T extends IFormField> extends AbstractJsonPropertyObs
 
   public JsonFormField(T model, IJsonSession session, String id) {
     super(model, session, id);
+  }
+
+  @Override
+  protected void initProperties(T model) {
+    super.initProperties(model);
     putJsonProperty(new JsonProperty<T>(IFormField.PROP_LABEL, model) {
       @Override
       protected String modelValue() {

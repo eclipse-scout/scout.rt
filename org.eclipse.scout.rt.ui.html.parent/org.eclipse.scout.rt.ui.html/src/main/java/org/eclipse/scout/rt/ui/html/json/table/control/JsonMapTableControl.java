@@ -27,6 +27,11 @@ public class JsonMapTableControl extends JsonTableControl<IMapTableControl> {
 
   public JsonMapTableControl(IMapTableControl model, IJsonSession jsonSession, String id) {
     super(model, jsonSession, id);
+  }
+
+  @Override
+  protected void initProperties(IMapTableControl model) {
+    super.initProperties(model);
     putJsonProperty(new JsonProperty<IMapTableControl>("columnIds", model) {
 
       @Override
@@ -44,7 +49,6 @@ public class JsonMapTableControl extends JsonTableControl<IMapTableControl> {
         return columnIds;
       }
     });
-
   }
 
   @Override

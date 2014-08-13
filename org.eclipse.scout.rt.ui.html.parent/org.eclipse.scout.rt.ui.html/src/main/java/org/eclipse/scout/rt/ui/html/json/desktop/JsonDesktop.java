@@ -73,14 +73,8 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
   }
 
   @Override
-  protected void attachModel() {
-    super.attachModel();
-    if (m_desktopListener == null) {
-      m_desktopListener = new P_DesktopListener();
-      getModel().addDesktopListener(m_desktopListener);
-    }
-
-    // attach child adapters
+  protected void createChildAdapters() {
+    super.createChildAdapters();
     attachAdapters(getForms());
     attachAdapters(getModel().getMessageBoxStack());
     attachAdapters(getModel().getToolButtons());
@@ -89,6 +83,27 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
       optAttachAdapter(getModel().getOutline());
     }
     optAttachAdapter(getBreadcrumbNavigation());
+  }
+
+  @Override
+  protected void disposeChildAdapters() {
+    disposeAdapters(getForms());
+    disposeAdapters(getModel().getMessageBoxStack());
+    disposeAdapters(getModel().getToolButtons());
+    if (!isFormBased()) {
+      disposeAdapters(getModel().getViewButtons());
+      optDisposeAdapter(getModel().getOutline());
+    }
+    optDisposeAdapter(getBreadcrumbNavigation());
+  }
+
+  @Override
+  protected void attachModel() {
+    super.attachModel();
+    if (m_desktopListener == null) {
+      m_desktopListener = new P_DesktopListener();
+      getModel().addDesktopListener(m_desktopListener);
+    }
   }
 
   @Override

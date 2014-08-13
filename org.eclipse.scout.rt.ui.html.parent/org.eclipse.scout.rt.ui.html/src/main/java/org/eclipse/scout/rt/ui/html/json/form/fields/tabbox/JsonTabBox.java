@@ -22,8 +22,13 @@ public class JsonTabBox extends JsonFormField<ITabBox> {
 
   public JsonTabBox(ITabBox model, IJsonSession session, String id) {
     super(model, session, id);
+  }
 
-    putJsonProperty(new JsonAdapterProperty<ITabBox>(ITabBox.PROP_SELECTED_TAB, model, session) {
+  @Override
+  protected void initProperties(ITabBox model) {
+    super.initProperties(model);
+
+    putJsonProperty(new JsonAdapterProperty<ITabBox>(ITabBox.PROP_SELECTED_TAB, model, getJsonSession()) {
       @Override
       protected IGroupBox modelValue() {
         return getModel().getSelectedTab();
@@ -45,21 +50,20 @@ public class JsonTabBox extends JsonFormField<ITabBox> {
   }
 
   @Override
-  protected void attachModel() {
-    super.attachModel();
-    // attach child adapters
+  protected void createChildAdapters() {
+    super.createChildAdapters();
     attachAdapters(getModel().getGroupBoxes());
+  }
+
+  @Override
+  protected void disposeChildAdapters() {
+    super.disposeChildAdapters();
+    disposeAdapters(getModel().getGroupBoxes());
   }
 
   @Override
   public JSONObject toJson() {
     return putAdapterIdsProperty(super.toJson(), "groupBoxes", getModel().getGroupBoxes());
-  }
-
-  @Override
-  public void dispose() {
-    super.dispose();
-    disposeJsonAdapters(getModel().getGroupBoxes());
   }
 
 }

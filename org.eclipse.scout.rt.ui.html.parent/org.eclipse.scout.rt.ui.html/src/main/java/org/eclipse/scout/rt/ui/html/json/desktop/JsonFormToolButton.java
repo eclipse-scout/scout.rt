@@ -28,14 +28,17 @@ public class JsonFormToolButton extends AbstractJsonPropertyObserver<IFormToolBu
 
   public JsonFormToolButton(IFormToolButton5 model, IJsonSession jsonSession, String id) {
     super(model, jsonSession, id);
+  }
 
+  @Override
+  protected void initProperties(IFormToolButton5 model) {
+    super.initProperties(model);
     putJsonProperty(new JsonProperty<IFormToolButton5>(IFormToolButton5.PROP_TEXT, model) {
       @Override
       protected String modelValue() {
         return getModel().getText();
       }
     });
-
     putJsonProperty(new JsonProperty<IFormToolButton5>(IFormToolButton5.PROP_ICON_ID, model) {
       @Override
       protected String modelValue() {
@@ -43,7 +46,7 @@ public class JsonFormToolButton extends AbstractJsonPropertyObserver<IFormToolBu
       }
     });
 
-    putJsonProperty(new JsonAdapterProperty<IFormToolButton5>(IFormToolButton5.PROP_FORM, model, jsonSession) {
+    putJsonProperty(new JsonAdapterProperty<IFormToolButton5>(IFormToolButton5.PROP_FORM, model, getJsonSession()) {
       @Override
       protected IForm modelValue() {
         return getModel().getForm();
@@ -70,7 +73,6 @@ public class JsonFormToolButton extends AbstractJsonPropertyObserver<IFormToolBu
         return getModel().getKeyStroke();
       }
     });
-
   }
 
   @Override

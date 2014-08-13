@@ -33,7 +33,11 @@ public class JsonMenu extends AbstractJsonPropertyObserver<IMenu> {
 
   public JsonMenu(IMenu model, IJsonSession jsonSession, String id) {
     super(model, jsonSession, id);
+  }
 
+  @Override
+  protected void initProperties(IMenu model) {
+    super.initProperties(model);
     putJsonProperty(new JsonProperty<IMenu>(IMenu.PROP_TEXT, model) {
       @Override
       protected String modelValue() {

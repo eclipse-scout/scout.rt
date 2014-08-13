@@ -27,7 +27,7 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
 
   private P_PropertyChangeListener m_propertyChangeListener;
   private PropertyEventFilter m_propertyEventFilter;
-
+  private boolean m_initializingProperties;
   /**
    * Key = propertyName.
    */
@@ -35,8 +35,21 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
 
   public AbstractJsonPropertyObserver(T model, IJsonSession jsonSession, String id) {
     super(model, jsonSession, id);
-    m_jsonProperties = new HashMap<>();
     m_propertyEventFilter = new PropertyEventFilter(getModel());
+  }
+
+  @Override
+  protected void init() {
+    m_jsonProperties = new HashMap<>();
+
+    m_initializingProperties = true;
+    initProperties(getModel());
+    m_initializingProperties = false;
+
+    super.init();
+  }
+
+  protected void initProperties(T model) {
   }
 
   /**
@@ -45,6 +58,9 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
    * are propagated to the browser-side client when a property change event occurs.
    */
   protected void putJsonProperty(JsonProperty jsonProperty) {
+    if (!m_initializingProperties) {
+      throw new IllegalStateException("Putting properties is only allowed in initProperties.");
+    }
     m_jsonProperties.put(jsonProperty.getPropertyName(), jsonProperty);
   }
 
@@ -53,15 +69,8 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
   }
 
   @Override
-  protected void attachModel() {
-    super.attachModel();
-    if (m_propertyChangeListener == null) {
-      m_propertyChangeListener = new P_PropertyChangeListener();
-      getModel().addPropertyChangeListener(m_propertyChangeListener);
-    }
-
-    //Attach child adapters
-    //FIXME maybe move child adapter creation to constructor. AttachModel should only attach the model (listeners)
+  protected void createChildAdapters() {
+    super.createChildAdapters();
     for (JsonProperty<?> prop : m_jsonProperties.values()) {
       if (prop instanceof JsonAdapterProperty) {
         ((JsonAdapterProperty) prop).attachAdapters();
@@ -70,9 +79,8 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
   }
 
   @Override
-  public void dispose() {
-    super.dispose();
-
+  protected void disposeChildAdapters() {
+    super.disposeChildAdapters();
     //FIXME CGU this is actually wrong. attach adapters does not necessarily create a new adapter (It may if there is non for the given model).
     //Dispose however always disposes. If the model is used elsewhere, it will fail because there is no adapter anymore
     //Possible solutions:
@@ -82,6 +90,15 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
       if (prop instanceof JsonAdapterProperty) {
         ((JsonAdapterProperty) prop).disposeAdapters();
       }
+    }
+  }
+
+  @Override
+  protected void attachModel() {
+    super.attachModel();
+    if (m_propertyChangeListener == null) {
+      m_propertyChangeListener = new P_PropertyChangeListener();
+      getModel().addPropertyChangeListener(m_propertyChangeListener);
     }
   }
 

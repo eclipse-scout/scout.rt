@@ -72,7 +72,10 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
     m_tableRows = new HashMap<>();
     m_tableRowIds = new HashMap<>();
     m_tableEventFilter = new TableEventFilter(model);
+  }
 
+  @Override
+  protected void initProperties(ITable model) {
     putJsonProperty(new JsonProperty<ITable>(ITable.PROP_TITLE, model) {
       @Override
       protected String modelValue() {

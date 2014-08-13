@@ -36,9 +36,8 @@ public class JsonOutline extends JsonTree<IOutline> {
   }
 
   @Override
-  protected void attachModel() {
-    super.attachModel();
-
+  protected void createChildAdapters() {
+    super.createChildAdapters();
     if (getModel().isRootNodeVisible()) {
       attachPage(getModel().getRootPage());
     }
@@ -49,7 +48,19 @@ public class JsonOutline extends JsonTree<IOutline> {
     }
   }
 
-  //FIXME CGU Verify with awe was ist jetzt genau der Vorteil dass die adapters nun im attach angehàngt werden? Es geht ja eh nicht immer, zB JsonDesktophandleModelOutlineChanged attachToJsonId macht auch nur nach Bedarf
+  @Override
+  protected void disposeChildAdapters() {
+    super.disposeChildAdapters();
+    if (getModel().isRootNodeVisible()) {
+      disposePage(getModel().getRootPage());
+    }
+    else {
+      for (IPage page : getModel().getRootPage().getChildPages()) {
+        disposePage(page);
+      }
+    }
+  }
+
   protected void attachPage(IPage page) {
     for (IPage childPage : page.getChildPages()) {
       attachPage(childPage);
@@ -59,6 +70,18 @@ public class JsonOutline extends JsonTree<IOutline> {
     if (page instanceof IPageWithTable) {
       IPageWithTable<?> pageWithTable = (IPageWithTable<?>) page;
       attachAdapter(pageWithTable.getTable());
+    }
+  }
+
+  protected void disposePage(IPage page) {
+    for (IPage childPage : page.getChildPages()) {
+      disposePage(childPage);
+    }
+
+    optDisposeAdapter(page.getDetailForm());
+    if (page instanceof IPageWithTable) {
+      IPageWithTable<?> pageWithTable = (IPageWithTable<?>) page;
+      disposeAdapter(pageWithTable.getTable());
     }
   }
 

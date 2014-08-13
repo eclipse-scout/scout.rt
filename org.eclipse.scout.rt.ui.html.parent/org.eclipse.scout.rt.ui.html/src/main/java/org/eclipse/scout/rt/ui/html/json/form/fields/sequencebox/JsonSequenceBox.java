@@ -32,21 +32,20 @@ public class JsonSequenceBox extends JsonFormField<ISequenceBox> {
   }
 
   @Override
-  protected void attachModel() {
-    super.attachModel();
-    // attach child adapters
+  protected void createChildAdapters() {
+    super.createChildAdapters();
     attachAdapters(getModel().getFields());
+  }
+
+  @Override
+  protected void disposeChildAdapters() {
+    super.disposeChildAdapters();
+    disposeAdapters(getModel().getFields());
   }
 
   @Override
   public JSONObject toJson() {
     return putProperty(super.toJson(), PROP_FIELDS, getAdapterIdsForModels(getModel().getFields()));
-  }
-
-  @Override
-  public void dispose() {
-    disposeJsonAdapters(getModel().getFields());
-    super.dispose();
   }
 
 }

@@ -19,25 +19,32 @@ import org.json.JSONObject;
 /**
  * This class creates JSON output for an <code>IGroupBox</code>.
  */
+// TODO AWE: JsonCompositeField für group / seq. / etc.
 public class JsonGroupBox extends JsonFormField<IGroupBox> {
 
   public static final String PROP_GRID_COLUMN_COUNT = "gridColumnCount";
 
-  public JsonGroupBox(IGroupBox aGroupBox, IJsonSession session, String id) {
-    super(aGroupBox, session, id);
-    putJsonProperty(new JsonProperty<IGroupBox>(IGroupBox.PROP_BORDER_DECORATION, aGroupBox) {
+  public JsonGroupBox(IGroupBox model, IJsonSession session, String id) {
+    super(model, session, id);
+  }
+
+  @Override
+  protected void initProperties(IGroupBox model) {
+    super.initProperties(model);
+
+    putJsonProperty(new JsonProperty<IGroupBox>(IGroupBox.PROP_BORDER_DECORATION, model) {
       @Override
       protected String modelValue() {
         return getModel().getBorderDecoration();
       }
     });
-    putJsonProperty(new JsonProperty<IGroupBox>(IGroupBox.PROP_BORDER_VISIBLE, aGroupBox) {
+    putJsonProperty(new JsonProperty<IGroupBox>(IGroupBox.PROP_BORDER_VISIBLE, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isBorderVisible();
       }
     });
-    putJsonProperty(new JsonProperty<IGroupBox>(PROP_GRID_COLUMN_COUNT, aGroupBox) {
+    putJsonProperty(new JsonProperty<IGroupBox>(PROP_GRID_COLUMN_COUNT, model) {
       @Override
       protected Integer modelValue() {
         return getModel().getGridColumnCount();
@@ -51,22 +58,20 @@ public class JsonGroupBox extends JsonFormField<IGroupBox> {
   }
 
   @Override
-  protected void attachModel() {
-    super.attachModel();
-    // attach child adapters
+  protected void createChildAdapters() {
+    super.createChildAdapters();
     attachAdapters(getModel().getFields());
+  }
+
+  @Override
+  protected void disposeChildAdapters() {
+    super.disposeChildAdapters();
+    disposeAdapters(getModel().getFields());
   }
 
   @Override
   public JSONObject toJson() {
     return putProperty(super.toJson(), "formFields", getAdapterIdsForModels(getModel().getFields()));
-  }
-
-  @Override
-  // TODO AWE: JsonCompositeField für group / seq. / etc.
-  public void dispose() {
-    disposeJsonAdapters(getModel().getFields());
-    super.dispose();
   }
 
 }

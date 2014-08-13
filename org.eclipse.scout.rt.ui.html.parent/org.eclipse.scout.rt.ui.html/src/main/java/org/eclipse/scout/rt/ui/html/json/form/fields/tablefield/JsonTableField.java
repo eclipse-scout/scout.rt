@@ -20,8 +20,12 @@ public class JsonTableField extends JsonFormField<ITableField<? extends ITable>>
 
   public JsonTableField(ITableField<? extends ITable> model, IJsonSession session, String id) {
     super(model, session, id);
+  }
 
-    putJsonProperty(new JsonAdapterProperty<ITableField<? extends ITable>>(ITableField.PROP_TABLE, model, session) {
+  @Override
+  protected void initProperties(ITableField<? extends ITable> model) {
+    super.initProperties(model);
+    putJsonProperty(new JsonAdapterProperty<ITableField<? extends ITable>>(ITableField.PROP_TABLE, model, getJsonSession()) {
       @Override
       protected ITable modelValue() {
         return getModel().getTable();

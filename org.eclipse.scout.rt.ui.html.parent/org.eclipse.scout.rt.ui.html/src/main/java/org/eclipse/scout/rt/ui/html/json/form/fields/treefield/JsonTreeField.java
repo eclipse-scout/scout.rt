@@ -20,8 +20,13 @@ public class JsonTreeField extends JsonFormField<ITreeField> {
 
   public JsonTreeField(ITreeField model, IJsonSession session, String id) {
     super(model, session, id);
+  }
 
-    putJsonProperty(new JsonAdapterProperty<ITreeField>(ITreeField.PROP_TREE, model, session) {
+  @Override
+  protected void initProperties(ITreeField model) {
+    super.initProperties(model);
+
+    putJsonProperty(new JsonAdapterProperty<ITreeField>(ITreeField.PROP_TREE, model, getJsonSession()) {
       @Override
       protected ITree modelValue() {
         return getModel().getTree();
@@ -30,10 +35,15 @@ public class JsonTreeField extends JsonFormField<ITreeField> {
   }
 
   @Override
-  protected void attachModel() {
-    super.attachModel();
-    // attach child adapters
+  protected void createChildAdapters() {
+    super.createChildAdapters();
     attachAdapter(getModel().getTree());
+  }
+
+  @Override
+  protected void disposeChildAdapters() {
+    super.disposeChildAdapters();
+    disposeAdapter(getModel().getTree());
   }
 
   @Override
@@ -41,9 +51,4 @@ public class JsonTreeField extends JsonFormField<ITreeField> {
     return "TreeField";
   }
 
-  @Override
-  public void dispose() {
-    disposeJsonAdapter(getModel().getTree());
-    super.dispose();
-  }
 }

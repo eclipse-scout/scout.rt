@@ -33,6 +33,7 @@ public class JsonResponse {
   private final List<JsonEvent> m_eventList;
   private final Map<String/*id*/, JsonEvent> m_idToPropertyChangeEventMap;
   private Map<String, IJsonAdapter<?>> m_adapterMap;
+  private boolean m_toJsonInProgress;
 
   public JsonResponse() {
     m_eventList = new ArrayList<>();
@@ -76,6 +77,10 @@ public class JsonResponse {
    * solely referenced by their ID.
    */
   public void addAdapter(IJsonAdapter<?> adapter) {
+    if (m_toJsonInProgress) {
+      throw new IllegalStateException("It is not allowed to modify the adapter list while toJson is executed. Adapter: " + adapter);
+    }
+
     if (!m_adapterMap.containsKey(adapter.getId())) {
       m_adapterMap.put(adapter.getId(), adapter);
     }
@@ -115,25 +120,31 @@ public class JsonResponse {
   public JSONObject toJson() {
     JSONObject json = new JSONObject();
     JSONObject adapterData = new JSONObject();
-    // If you experience a ConcurrentModificationException at this point, then most likely you've created and added a new adapter
-    // in your to toJson() method, which is conceptually wrong. You must create new adapters when the attachModel() method is
-    // called or when an action-event is processed (typically in a handleXYZ() method).
-    // To debug which adapter caused the error, add a syso for entry.getValue() in the following loop.
-    for (Entry<String, IJsonAdapter<?>> entry : m_adapterMap.entrySet()) {
-      JsonObjectUtility.putProperty(adapterData, entry.getKey(), entry.getValue().toJson());
-    }
-
-    JSONArray eventArray = new JSONArray();
-    for (JsonEvent event : m_eventList) {
-      if (doAddEvent(event)) {
-        eventArray.put(event.toJson());
+    m_toJsonInProgress = true;
+    try {
+      // If you experience a ConcurrentModificationException at this point, then most likely you've created and added a new adapter
+      // in your to toJson() method, which is conceptually wrong. You must create new adapters when the attachModel() method is
+      // called or when an action-event is processed (typically in a handleXYZ() method).
+      // To debug which adapter caused the error, add a syso for entry.getValue() in the following loop.
+      for (Entry<String, IJsonAdapter<?>> entry : m_adapterMap.entrySet()) {
+        JsonObjectUtility.putProperty(adapterData, entry.getKey(), entry.getValue().toJson());
       }
-    }
 
-    JsonObjectUtility.putProperty(json, "events", eventArray);
-    JsonObjectUtility.putProperty(json, "adapterData", adapterData);
-    JsonObjectUtility.putProperty(json, "errorCode", m_errorCode);
-    JsonObjectUtility.putProperty(json, "errorMessage", m_errorMessage);
+      JSONArray eventArray = new JSONArray();
+      for (JsonEvent event : m_eventList) {
+        if (doAddEvent(event)) {
+          eventArray.put(event.toJson());
+        }
+      }
+
+      JsonObjectUtility.putProperty(json, "events", eventArray);
+      JsonObjectUtility.putProperty(json, "adapterData", adapterData);
+      JsonObjectUtility.putProperty(json, "errorCode", m_errorCode);
+      JsonObjectUtility.putProperty(json, "errorMessage", m_errorMessage);
+    }
+    finally {
+      m_toJsonInProgress = false;
+    }
     return json;
   }
 

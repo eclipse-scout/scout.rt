@@ -30,7 +30,11 @@ public class JsonValueField<T extends IValueField<?>> extends JsonFormField<T> {
 
   public JsonValueField(T model, IJsonSession session, String id) {
     super(model, session, id);
+  }
 
+  @Override
+  protected void initProperties(T model) {
+    super.initProperties(model);
     putJsonProperty(new JsonProperty<T>(IValueField.PROP_DISPLAY_TEXT, model) {
       @Override
       protected String modelValue() {

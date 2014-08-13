@@ -32,6 +32,11 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     m_jsonSession = jsonSession;
     m_id = id;
     m_jsonSession.registerJsonAdapter(this);
+    init();
+  }
+
+  protected void init() {
+    createChildAdapters();
   }
 
   @Override
@@ -46,6 +51,12 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
   @Override
   public T getModel() {
     return m_model;
+  }
+
+  protected void createChildAdapters() {
+  }
+
+  protected void disposeChildAdapters() {
   }
 
   @Override
@@ -70,6 +81,7 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     if (m_attached) {
       detachModel();
     }
+    disposeChildAdapters();
     m_jsonSession.unregisterJsonAdapter(m_id);
   }
 
@@ -98,13 +110,19 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     return JsonObjectUtility.putProperty(json, key, value);
   }
 
-  protected void disposeJsonAdapters(Collection<? extends Object> models) {
+  protected final void disposeAdapters(Collection<? extends Object> models) {
     for (Object model : models) {
-      disposeJsonAdapter(model);
+      disposeAdapter(model);
     }
   }
 
-  protected void disposeJsonAdapter(Object model) {
+  protected final void optDisposeAdapter(Object model) {
+    if (model != null) {
+      disposeAdapter(model);
+    }
+  }
+
+  protected final void disposeAdapter(Object model) {
     IJsonAdapter<?> jsonAdapter = m_jsonSession.getJsonAdapter(model);
     // on session dispose, the adapters get disposed in random order, so they may already be disposed when calling this method
     if (jsonAdapter != null) {

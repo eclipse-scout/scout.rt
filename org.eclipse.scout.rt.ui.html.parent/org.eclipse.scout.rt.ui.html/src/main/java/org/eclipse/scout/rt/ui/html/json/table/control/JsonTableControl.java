@@ -24,6 +24,11 @@ public class JsonTableControl<T extends ITableControl> extends AbstractJsonPrope
 
   public JsonTableControl(T model, IJsonSession jsonSession, String id) {
     super(model, jsonSession, id);
+  }
+
+  @Override
+  protected void initProperties(T model) {
+    super.initProperties(model);
 
     putJsonProperty(new JsonProperty<ITableControl>(ITableControl.PROP_LABEL, model) {
       @Override
@@ -59,7 +64,6 @@ public class JsonTableControl<T extends ITableControl> extends AbstractJsonPrope
         return getModel().isEnabled();
       }
     });
-
   }
 
   @Override
@@ -68,9 +72,15 @@ public class JsonTableControl<T extends ITableControl> extends AbstractJsonPrope
   }
 
   @Override
-  protected void attachModel() {
-    super.attachModel();
+  protected void createChildAdapters() {
+    super.createChildAdapters();
     optAttachAdapter(getModel().getForm());
+  }
+
+  @Override
+  protected void disposeChildAdapters() {
+    super.disposeChildAdapters();
+    optDisposeAdapter(getModel().getForm());
   }
 
   @Override

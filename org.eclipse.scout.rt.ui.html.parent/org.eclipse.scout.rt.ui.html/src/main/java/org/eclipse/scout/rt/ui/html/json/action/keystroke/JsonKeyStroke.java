@@ -24,6 +24,11 @@ public class JsonKeyStroke extends AbstractJsonPropertyObserver<IKeyStroke> {
 
   public JsonKeyStroke(IKeyStroke model, IJsonSession jsonSession, String id) {
     super(model, jsonSession, id);
+  }
+
+  @Override
+  protected void initProperties(IKeyStroke model) {
+    super.initProperties(model);
 
     putJsonProperty(new JsonProperty<IKeyStroke>(IKeyStroke.PROP_ENABLED, model) {
       @Override
