@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json;
 
+import java.util.Collection;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -129,6 +131,14 @@ public final class JsonObjectUtility {
     catch (JSONException e) {
       throw toRuntimeException(e);
     }
+  }
+
+  public static JSONArray adapterIdsToJson(Collection<IJsonAdapter<?>> adapters) {
+    JSONArray array = new JSONArray();
+    for (IJsonAdapter<?> adapter : adapters) {
+      array.put(adapter.getId());
+    }
+    return array;
   }
 
 }

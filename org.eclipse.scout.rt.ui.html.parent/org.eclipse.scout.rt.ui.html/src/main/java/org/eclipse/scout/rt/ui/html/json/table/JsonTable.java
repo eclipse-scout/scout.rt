@@ -42,6 +42,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonException;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
+import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.menu.IContextMenuOwner;
 import org.json.JSONArray;
@@ -165,17 +166,10 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
       }
     });
      */
-    putJsonProperty(new JsonProperty<ITable>(ITable.PROP_KEY_STROKES, model) {
+    putJsonProperty(new JsonAdapterProperty<ITable>(ITable.PROP_KEY_STROKES, model, getJsonSession()) {
       @Override
       protected List<IKeyStroke> modelValue() {
         return getModel().getKeyStrokes();
-      }
-
-      @Override
-      public Object prepareValueForToJson(Object value) {
-        @SuppressWarnings("unchecked")
-        List<IKeyStroke> keyStrokes = (List<IKeyStroke>) value;
-        return getAdapterIdsForModels(keyStrokes);
       }
     });
     putJsonProperty(new JsonProperty<ITable>(ITable.PROP_SCROLL_TO_SELECTION, model) {

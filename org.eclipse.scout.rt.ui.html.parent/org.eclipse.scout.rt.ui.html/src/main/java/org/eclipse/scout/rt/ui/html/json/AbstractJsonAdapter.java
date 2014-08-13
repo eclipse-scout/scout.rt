@@ -173,11 +173,7 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
    * Returns a list of IDs of the JSON adapters for the given adapters.
    */
   protected final JSONArray getAdapterIds(Collection<IJsonAdapter<?>> adapters) {
-    JSONArray array = new JSONArray();
-    for (IJsonAdapter<?> adapter : adapters) {
-      array.put(adapter.getId());
-    }
-    return array;
+    return JsonObjectUtility.adapterIdsToJson(adapters);
   }
 
   protected final JSONObject putAdapterIdProperty(JSONObject json, String key, Object model) {

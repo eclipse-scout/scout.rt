@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.ui.html.json.form.fields;
 /**
  * This property class is used to map a model object property to a JSON property and is used to automatically create a
  * JSON object for a model and also to propagate property change events to the browser-side client.
- * 
+ *
  * @param <T>
  *          Type of model object
  */

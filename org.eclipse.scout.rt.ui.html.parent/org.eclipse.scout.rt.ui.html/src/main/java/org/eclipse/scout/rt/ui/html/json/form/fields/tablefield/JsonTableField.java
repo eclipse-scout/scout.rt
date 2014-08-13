@@ -30,21 +30,8 @@ public class JsonTableField extends JsonFormField<ITableField<? extends ITable>>
   }
 
   @Override
-  protected void attachModel() {
-    super.attachModel();
-    // attach child adapters
-    attachAdapter(getModel().getTable());
-  }
-
-  @Override
   public String getObjectType() {
     return "TableField";
-  }
-
-  @Override
-  public void dispose() {
-    disposeJsonAdapter(getModel().getTable());
-    super.dispose();
   }
 
 }

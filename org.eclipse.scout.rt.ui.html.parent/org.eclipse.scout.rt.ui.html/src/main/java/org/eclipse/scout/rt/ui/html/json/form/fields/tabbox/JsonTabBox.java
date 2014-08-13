@@ -48,13 +48,18 @@ public class JsonTabBox extends JsonFormField<ITabBox> {
   protected void attachModel() {
     super.attachModel();
     // attach child adapters
-    attachAdapter(getModel().getSelectedTab()); // TODO AWE: (json) solve with JsonAdapterProperty
     attachAdapters(getModel().getGroupBoxes());
   }
 
   @Override
   public JSONObject toJson() {
     return putAdapterIdsProperty(super.toJson(), "groupBoxes", getModel().getGroupBoxes());
+  }
+
+  @Override
+  public void dispose() {
+    super.dispose();
+    disposeJsonAdapters(getModel().getGroupBoxes());
   }
 
 }

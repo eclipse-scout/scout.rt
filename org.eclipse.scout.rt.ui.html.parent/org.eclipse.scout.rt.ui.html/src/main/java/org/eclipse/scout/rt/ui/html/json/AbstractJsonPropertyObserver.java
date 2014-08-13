@@ -18,6 +18,7 @@ import java.util.Map;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonProperty;
 import org.json.JSONObject;
 
@@ -57,6 +58,30 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
     if (m_propertyChangeListener == null) {
       m_propertyChangeListener = new P_PropertyChangeListener();
       getModel().addPropertyChangeListener(m_propertyChangeListener);
+    }
+
+    //Attach child adapters
+    //FIXME maybe move child adapter creation to constructor. AttachModel should only attach the model (listeners)
+    for (JsonProperty<?> prop : m_jsonProperties.values()) {
+      if (prop instanceof JsonAdapterProperty) {
+        ((JsonAdapterProperty) prop).attachAdapters();
+      }
+    }
+  }
+
+  @Override
+  public void dispose() {
+    super.dispose();
+
+    //FIXME CGU this is actually wrong. attach adapters does not necessarily create a new adapter (It may if there is non for the given model).
+    //Dispose however always disposes. If the model is used elsewhere, it will fail because there is no adapter anymore
+    //Possible solutions:
+    //- Dispose removes just the owning adapter (this) from a set of references. Only if the list is empty dispose the adapter. BUT: Aussuming the property is set to null before disposing the owning adapter, the child adapter never gets disposed.
+    //- Don't create an adapter for each model instance. Instead always create an adapter if the owning adapter needs one (getOrCreate -> create). But: May influence traffic and offline behaviour. Needs to be considered very well.
+    for (JsonProperty<?> prop : m_jsonProperties.values()) {
+      if (prop instanceof JsonAdapterProperty) {
+        ((JsonAdapterProperty) prop).disposeAdapters();
+      }
     }
   }
 
