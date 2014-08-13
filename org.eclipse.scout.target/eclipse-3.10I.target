@@ -3,7 +3,7 @@
 <target name="scout-3.10I.target" sequenceNumber="10">
   <locations>
     <location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
-      <repository id="eclipse_luna_I" location="http://download.eclipse.org/eclipse/updates/4.4-I-builds/"/>
+      <repository id="eclipse_luna_I" location="http://download.eclipse.org/eclipse/updates/4.4-M-builds/"/>
 
       <unit id="org.eclipse.platform.feature.group" version="0.0.0"/>
       <unit id="org.eclipse.platform.source.feature.group" version="0.0.0"/>
