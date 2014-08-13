@@ -1,3 +1,10 @@
+/* TODO CRU
+every stroke has a search
+close menu when clicking arround
+focus on search field
+replace initial search entry
+*/
+
 scout.DesktopNavigation = function(desktop) {
   this.desktop = desktop;
   this.session = desktop.session;
@@ -8,12 +15,13 @@ scout.DesktopNavigation = function(desktop) {
   this.$container;
 
   this.activeTab;
-  this.$activeOutline;
+  this.$outlineTitle;
 };
 
 scout.DesktopNavigation.prototype.render = function($parent) {
   // create main element
   this.$navigation = $parent.appendDIV('desktop-navigation');
+  this.$header = this.$navigation.appendDIV('navigation-header');
 
   //  create outline tabs
   var outlineTab = new scout.DesktopNavigation.TabAndContent(this._createOutlinesTab());
@@ -23,14 +31,10 @@ scout.DesktopNavigation.prototype.render = function($parent) {
   var searchTab = new scout.DesktopNavigation.TabAndContent(this._createSearchTab());
   searchTab.$tab.on('click', function() { this._setActiveTab(searchTab); }.bind(this));
 
-  this.$header = this.$navigation.appendDIV('navigation-header');
-  this.$header.append(outlineTab.$tab);
-  this.$header.append(searchTab.$tab);
-
   this.$container = this.$navigation.appendDIV('navigation-container');
   this._setActiveTab(outlineTab);
 
-  this._addSplitter(this.$navigation);
+  this._addSplitter();
 };
 
 scout.DesktopNavigation.TabAndContent = function($tab) {
@@ -41,55 +45,49 @@ scout.DesktopNavigation.TabAndContent = function($tab) {
 // outline tab creation
 
 scout.DesktopNavigation.prototype._createOutlinesTab = function() {
-  // create title of active outline
-  var $activeOutline = $.makeDIV('navigation-tab-outline-title');
-
-  // create menu
-  var $outlinesMenu = $.makeDIV('navigation-tab-outline-menu');
-  for (var i = 0; i < this.desktop.viewButtons.length; i++) {
-    var $item = $.makeDIV('outline-menu-item')
-      .on('click',  function() {
-        $button.removeClass('tab-menu-open');
-        $outlinesMenu.hide();
-      });
-
-    this.desktop.viewButtons[i].render($item);
-    $outlinesMenu.append($item);
-  }
+  // create tab
+  var $tab = this.$header.appendDIV('navigation-tab-outline');
 
   // create button
-  var $button = $.makeDIV('navigation-tab-outline-button')
+  $tab.appendDIV('navigation-tab-outline-button')
     .on('click', function() {
-      $button.toggleClass('tab-menu-open');
-      $outlinesMenu.toggle();
-    });
+      if ($tab.hasClass('tab-active')) {
+        this.$header.toggleClass('tab-menu-open');
+      }
+    }.bind(this));
 
-  // create tab
-  var $tab = $.makeDIV('navigation-tab-outline')
-    .append($button)
-    .append($activeOutline)
-    .append($outlinesMenu);
+  // create menu
+  var $outlinesMenu = $tab.appendDIV('navigation-tab-outline-menu');
+  for (var i = 0; i < this.desktop.viewButtons.length; i++) {
+    var $item = $outlinesMenu.appendDIV('outline-menu-item')
+      .on('click',  function() {
+        $header.removeClass('tab-menu-open');
+      }.bind(this));
+
+    this.desktop.viewButtons[i].render($item);
+  }
+
+  // create title of active outline
+  var $outlineTitle = $tab.appendDIV('navigation-tab-outline-title');
 
   // save and return
-  this.$activeOutline = $activeOutline;
+  this.$outlineTitle = $outlineTitle;
   return $tab;
 };
 
 scout.DesktopNavigation.prototype._createSearchTab = function() {
+  // create tab
+  var $tab = this.$header.appendDIV('navigation-tab-search');
+
   // create field
   var $queryField = $('<input class="navigation-tab-search-field">').val('Suchbegriff');
+  $tab.append($queryField);
 
   // create button
-  var $button = $.makeDIV('navigation-tab-search-button')
+  $tab.appendDIV('navigation-tab-search-button')
     .on('click',  function() {
         this.session.send('search', this.desktop.id, { 'query': $queryField.val() });
     }.bind(this));
-
-
-  // create tab
-  var $tab = $.makeDIV('navigation-tab-search')
-    .append(this.$queryField).append($queryField)
-    .append(this.$queryField).append($button);
 
   // return
   return $tab;
@@ -113,6 +111,7 @@ scout.DesktopNavigation.prototype._setActiveTab = function(newTab) {
   newTab.$tab.addClass('tab-active');
   this.activeTab = newTab;
 
+  // TODO cru: save in model?
   // this.session.send('desktopTabClicked', this.desktop.id, {'tabId' : tab.tabId });
 };
 
@@ -122,7 +121,7 @@ scout.DesktopNavigation.prototype.onOutlineChanged = function(outline) {
   this.outline.remove();
   this.outline = outline;
   this.outline.render(this.$container);
-  this.$activeOutline.html(this.outline.title);
+  this.$outlineTitle.html(this.outline.title);
 };
 
 scout.DesktopNavigation.prototype.onSearchPerformed = function(event) {
@@ -131,8 +130,8 @@ scout.DesktopNavigation.prototype.onSearchPerformed = function(event) {
 
 //vertical splitter
 
-scout.DesktopNavigation.prototype._addSplitter = function($navigation) {
-  this._$splitter = $navigation.appendDIV('navigation-splitter-vertical')
+scout.DesktopNavigation.prototype._addSplitter = function() {
+  this._$splitter = this.$navigation.appendDIV('navigation-splitter-vertical')
    .on('mousedown', '', resize);
 
   var WIDTH_BREADCRUMB = 190;
@@ -149,27 +148,30 @@ scout.DesktopNavigation.prototype._addSplitter = function($navigation) {
    function resizeMove(event) {
      w = event.pageX;
 
-     $navigation.width(w);
-     $navigation.nextAll().css('left', w);
+     that.$navigation.width(w);
+     that.desktop.$bar.css('left', w);
+     that.desktop.$bench.css('left', w);
 
      if (w <= WIDTH_BREADCRUMB) {
-       $navigation.addClass('navigation-breadcrumb');
+       that.$navigation.addClass('navigation-breadcrumb');
      } else {
-       $navigation.removeClass('navigation-breadcrumb');
+       that.$navigation.removeClass('navigation-breadcrumb');
      }
 
      that.outline.scrollbar.initThumb();
-   }
+   };
 
    function resizeEnd() {
      $('body').off('mousemove')
        .removeClass('col-resize');
 
      if (w < WIDTH_BREADCRUMB) {
-       $navigation.animateAVCSD('width', WIDTH_BREADCRUMB);
-       $navigation.nextAll().animateAVCSD('left', WIDTH_BREADCRUMB);
+       that.$navigation.animateAVCSD('width', WIDTH_BREADCRUMB);
+       that.desktop.$bar.animateAVCSD('left', WIDTH_BREADCRUMB);
+       that.desktop.$bench.animateAVCSD('left', WIDTH_BREADCRUMB);
      }
    }
+
    return false;
   }
 };

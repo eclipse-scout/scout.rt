@@ -1,4 +1,5 @@
 /* main element */
+
 .desktop-navigation {
 	position: relative;
 	height: 100%;
@@ -8,11 +9,9 @@
 }
 
 .navigation-header{
-	position: relative;
     width: 100%;
     height: @size-desktop-tools;
     .font-text-large;
-    white-space: nowrap;
     
    .navigation-breadcrumb & {
     	height: 2 * @size-desktop-tools;
@@ -20,15 +19,13 @@
 }
 
 .navigation-container{
-    top: @size-desktop-tools;
-    height: calc(~"100%" - @size-desktop-tools);
     width: 100%;
+    height: calc(~"100%" - @size-desktop-tools);
+	top: @size-desktop-tools;
 
     .navigation-breadcrumb & {
-    	top: 2 * @size-desktop-tools;
     	height: calc(~"100%" - 2 * @size-desktop-tools);
     } 
-
 }
 
 .navigation-splitter-vertical{
@@ -45,7 +42,8 @@
 .navigation-tab-search {
 	position: relative;
 	float: left;
-	
+	cursor: pointer;
+		
 	&.tab-active {
 		width: calc(~"100%" - @size-desktop-tools);
 	}
@@ -53,7 +51,7 @@
     &:not(.tab-active) {
         background-color: @color-nav-light;
     	color: @color-bench-text;
-    	width: 50px;
+    	width:  @size-desktop-tools;
     }    	
     
     .navigation-breadcrumb & {
@@ -61,114 +59,109 @@
     } 
 }
 
-/* navigation header outline */
+/* navigation header buttons*/
 
 .navigation-tab-outline-button,
-.navigation-tab-search-button,
-.navigation-tab-outline-title,
-.navigation-tab-search-field {
-	padding: 0px 5px 0px 10px;
-  	white-space: nowrap;
-	cursor: pointer;
+.navigation-tab-search-button {
+	padding: 0px 10px 0px 10px;
+	text-align: center;
+	height: @size-desktop-tools;
+	width: @size-desktop-tools;
 	.font-text-large;
-	line-height: 50px;
-	height: 50px;
+	line-height: @size-desktop-tools;
+
+	&:before{
+		.font-icon;
+		font-size: 24px;
+	}
+	
+	.navigation-breadcrumb & {
+		width: 100%;
+	}
 }
 
 .navigation-tab-outline-button {
 	float: left;
-	padding: 0px 15px 0px 15px;
-	vertical-align: -50%;
-	text-align: center;
 
-	&.tab-menu-open {
+	.tab-menu-open & {
 		color: @color-bench-text-hover;
 		background-color: @color-bench;
 	}
 	
 	&:before{
-		.font-icon;
-		font-size: 24px;
 		content: "\F0C9";
-	}
-	
-	.navigation-breadcrumb & {
-		width: 100%;
 	}
 }
 
 .navigation-tab-search-button {
-	padding: 0px 15px 0px 15px;
-	width: @size-desktop-tools;
 	float: right;
-	text-align: center;
 	
 	&:before{
-		.font-icon;
-		font-size: 24px;
 		content: "\F002";
 	}
-
-	.navigation-breadcrumb & {
-		width: 100%;
-	}	
 }
 
-.navigation-tab-outline-title {
+/* navigation header fields */
+
+.navigation-tab-outline-title,
+.navigation-tab-search-field {
+	padding: 0px 10px 0px 10px;
+	height: @size-desktop-tools;
+  	white-space: nowrap;
+	.font-text-large;
+	line-height: @size-desktop-tools;
 	overflow: hidden;
   	text-overflow: ellipsis;
-  	padding: 0px 10px 0px 10px;
-	min-width: @size-desktop-breadcrumb - 2 * @size-desktop-tools;
 	display: none;
 	
 	.tab-active > & {
 	    display: block;
     }
     
-	.navigation-breadcrumb & {
+    .navigation-breadcrumb & {
 		width: 200%;
 		text-align: center;
-		padding: 0px 10px 0px 10px;
 		border-bottom: 1px solid @color-bench;
 	} 
+ }
+
+.navigation-tab-outline-title {
+	min-width: @size-desktop-breadcrumb - 2 * @size-desktop-tools;
 
 }
 .navigation-tab-search-field {
-	overflow: hidden;
-  	text-overflow: ellipsis;
 	float: left;
 	width: calc(~"100% - 2px" - @size-desktop-tools );
 	
 	outline:0;
 	border: 0;
-	display: none;
 	
     background-color: @color-nav;
     color: @color-bench;
 
-	.tab-active > & {
-	    display: block;
-    }
 	.navigation-breadcrumb & {
-		min-width: 200%;
-		text-align: center;
-		border-bottom: 1px solid @color-bench;
-		padding: 0px 10px 0px 10px;
 		position: absolute;
 		top:  @size-desktop-tools;
 		left: -100%;
 	}     
 }
 	
-/* outline menu */
+/* navigation outline menu */
 
 .navigation-tab-outline-menu {
 	position: absolute;
 	top: @size-desktop-tools;
-	display: none;
 	background-color: @color-bench;
 	z-index: 10;
+	white-space: nowrap;
 	.mixin-shadow;
+	border: 1px solid @color-bench-light-border;
+	border-top: 1px solid transparent;	
+	display: none;
+
+	.tab-menu-open & {
+		display: block;
+	}
 }
 
 .outline-menu-item {

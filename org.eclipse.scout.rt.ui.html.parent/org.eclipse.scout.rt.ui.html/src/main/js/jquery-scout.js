@@ -1,7 +1,6 @@
 /**
  * JQuery plugin with scout extensions
  */
-var l = console.log.bind(console);
 
 /*global console: false */
 (function($) {

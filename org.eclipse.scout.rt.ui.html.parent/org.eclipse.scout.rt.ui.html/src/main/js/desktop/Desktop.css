@@ -15,6 +15,17 @@
     bottom: 0;
 }
 
+.desktop-tool-container{
+	position: absolute;
+	top: @size-desktop-tools;
+	width: @size-desktop-navigation;
+	z-index: 10;
+	.mixin-shadow;
+	border: 1px solid @color-bench-light-border;
+	border-top: 1px solid transparent;
+	display: none;
+}
+
 /* taskbar */
 
 .desktop-taskbar{
@@ -28,6 +39,7 @@
 
 .taskbar-tabs, .taskbar-tools {
 	display:inline-block;
+	word-wrap: none;
 }
 
 .taskbar-tools {
@@ -74,8 +86,11 @@
 }
 
 .taskbar-tool-item {
+	position: relative;
 	.font-text-plus;
 	background-color: @color-bench;
+	border-left: 1px solid transparent;
+	border-right: 1px solid transparent;		
 		
 	&:before{
 		.font-icon;
@@ -89,6 +104,7 @@
 		border-left: 1px solid @color-bench-light-border;
 		border-right: 1px solid @color-bench-light-border;		
 		border-bottom: 1px solid @color-bench;
+		cursor: pointer;
 	}	
 }
 
@@ -108,7 +124,8 @@
 	float: right;
 	margin-top: 8px;
  	margin-left: 20px;
-	width: 225px; /* animate to 40px ;*/
+ 	margin-right: 13px;
+	width: 40px; /* original size 225px ;*/
 	height: 33px;
 	background: url("logo.png");
 	background-size: cover;

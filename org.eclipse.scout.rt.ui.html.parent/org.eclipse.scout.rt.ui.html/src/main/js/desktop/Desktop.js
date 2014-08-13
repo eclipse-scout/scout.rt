@@ -1,5 +1,6 @@
-// SCOUT GUI
-// (c) Copyright 2013-2014, BSI Business Systems Integration AG
+/* TODO cru
+ *  enable / disable and modal handling? auch beim tab löschen
+*/
 
 scout.Desktop = function() {
   scout.Desktop.parent.call(this);
@@ -7,11 +8,13 @@ scout.Desktop = function() {
   this.navigation;
   this.$bar;
   this.$tabbar;
-  this.$toolbar
+  this.$toolbar;
   this.$bench;
+  this.$toolContainer;
 
-  this.allTabs = [];
-  this.selectedTab;
+  this._allTabs = [];
+  this._selectedTab;
+  this.selectedTool;
 
   this._addAdapterProperties(['viewButtons', 'toolButtons', 'forms', 'outline', 'messageBoxes']);
 };
@@ -21,10 +24,13 @@ scout.Desktop.prototype.onChildAdapterCreated = function(propertyName, adapter) 
   if (propertyName === 'viewButtons') {
     adapter.desktop = this;
   }
-};
-
+  if (propertyName === 'toolButtons') {
+    adapter.desktop = this;
+  }};
 
 scout.Desktop.prototype._render = function($parent) {
+  var i, form, messageBox;
+
   this.$parent = $parent;
 
   this.navigation = new scout.DesktopNavigation(this);
@@ -44,35 +50,33 @@ scout.Desktop.prototype._render = function($parent) {
 
   this.$tabbar = this.$bar.appendDIV('taskbar-tabs');
   this.$toolbar = this.$bar.appendDIV('taskbar-tools');
+  this.$bench = this.$parent.appendDIV('desktop-bench');
+  this.$toolContainer = this.$parent.appendDIV('desktop-tool-container');
 
   this._outlineTab = new scout.Desktop.TabAndContent();
 
-  this.addTab(this._outlineTab);
+  this._addTab(this._outlineTab);
 
-  for (var i = 0; i < this.toolButtons.length; i++) {
-    this.toolButtons[i].desktopTaskbar = this;
+  for (i = 0; i < this.toolButtons.length; i++) {
+    //this.toolButtons[i].desktop  = this;
     this.toolButtons[i].render(this.$toolbar);
   }
 
-  this.$bench = this.$parent.appendDIV('desktop-bench');
-
   this.navigation.onOutlineChanged(this.outline);
 
-  // TODO cru: split and move
-  // scout.keystrokeManager.installAdapter($parent, new scout.DesktopKeystrokeAdapter(this.navigation, this.taskbar));
-
-  var i, form, messageBox;
   for (i = 0; i < this.forms.length; i++) {
     form = this.forms[i];
-    if (!form.minimized) {
-      this.addForm(form);
-    }
+    if (form.title != "Telefon") this._addForm(form);
   }
 
   for (i = 0; i < this.messageBoxes.length; i++) {
     messageBox = this.messageBoxes[i];
     this.addMessageBox(messageBox);
   }
+
+
+  // TODO cru: split and move
+  // scout.keystrokeManager.installAdapter($parent, new scout.DesktopKeystrokeAdapter(this.navigation, this.taskbar));
 };
 
 scout.Desktop.TabAndContent = function(title, content) {
@@ -81,29 +85,6 @@ scout.Desktop.TabAndContent = function(title, content) {
   this.$div = null;
   this.$storage = null;
 };
-
-scout.Desktop.prototype.changeOutline = function(outline) {
-  if (this.outline === outline) {
-    return;
-  }
-  this.outline = outline;
-  this.navigation.onOutlineChanged(this.outline);
-};
-
-scout.Desktop.prototype._onSearchPerformed = function(event) {
-  this.navigation.onSearchPerformed(event);
-};
-
-scout.Desktop.prototype.activateForm = function(form) {
-  if (!form.rendered) {
-    form.render(this.$bench);
-  }
-  form.$container.show();
-};
-
-
-<<<<<<< Upstream, based on branch 'develop' of ssh://cru@git.bsiag.com:29418/tools/eclipse.scout
-
 
 
 scout.Desktop.prototype.addForm = function(form) {
@@ -237,145 +218,50 @@ scout.Desktop.prototype.selectTab = function(tab) {
   this.onTabSelected(tab, previousTab);
 };
 
-=======
-// check, delete
->>>>>>> ee88fb8 html ui: tabbar
-
-scout.Desktop.prototype.selectTool = function(tool) {
-  var previousTool = this.selectedTool;
-  if (previousTool) {
-    this.unselectTool(previousTool);
-  }
-
-  var $tool = tool.$tool;
-  $tool.select(true);
-  this.selectedTool = tool;
-  this.onToolSelected(tool, previousTool);
-};
-
-
-
-
-scout.Desktop.prototype.getToolButtonForForm = function(form) {
-  for (var i = 0; i < this.toolButtons.length; i++) {
-    if (this.toolButtons[i].form === form) {
-      return this.toolButtons[i];
-    }
-  }
-};
-
-scout.Desktop.prototype.formActivated = function(form) {
-  var toolButton = this.getToolButtonForForm(form);
-  if (toolButton) {
-    toolButton._setSelected(true);
-    return;
-  }
-
-  var tab = this.tabs[form.id];
-  this.selectTab(tab);
-};
-
-
-scout.Desktop.prototype.formDisabled = function(form) {
-  var toolButton, $tab;
-  toolButton = this.getToolButtonForForm(form);
-  if (toolButton) {
-    $tab = toolButton.$container;
-  } else {
-    $tab = this.tabs[form.id].$tab;
-  }
-
-  $tab.addClass('disabled');
-};
-
-scout.Desktop.prototype.formEnabled = function(form) {
-  var toolButton, $tab;
-  toolButton = this.getToolButtonForForm(form);
-  if (toolButton) {
-    $tab = toolButton.$container;
-  } else {
-    $tab = this.tabs[form.id].$tab;
-  }
-
-  $tab.removeClass('disabled');
-};
-
-scout.Desktop.prototype.toolButtonSelected = function(toolButton, selected) {
-  var form = toolButton.form;
-  if (!form) {
-    return;
-  }
-
-  if (selected) {
-    if (form.minimized) {
-      this.desktop.maximizeForm(form);
-    }
-    this.desktop.activateForm(form);
-  } else {
-    //minimize the form if the already selected button is clicked again
-    if (form === this.formOfClickedButton && !form.minimized) {
-      this.desktop.minimizeForm(form);
-    }
-  }
-
-  if (selected) {
-    this.unselectToolButtons(toolButton);
-  }
-};
-
-scout.Desktop.prototype.unselectToolButtons = function(toolButton) {
-  for (var i = 0; i < this.toolButtons.length; i++) {
-    var otherToolButton = this.toolButtons[i];
-    if (otherToolButton !== toolButton) {
-      otherToolButton._setSelected(false);
-    }
-  }
-};
-
 /* tab handling */
 
-scout.Desktop.prototype.addTab = function(tab) {
+scout.Desktop.prototype._addTab = function(tab) {
   tab.$div = this.$tabbar.appendDIV('taskbar-tab-item', tab.title);
 
   tab.$div.on('click', function onTabClicked() {
-      if (!tab.$div.isSelected()) {
-        this.selectTab(tab);
+      if (tab !== this._selectedTab) {
+        this._selectTab(tab);
       }
     }.bind(this));
 
 
-  this.allTabs.push(tab);
-  this.selectTab(tab);
+  this._allTabs.push(tab);
+  this._selectTab(tab);
 
 };
 
-scout.Desktop.prototype.updateTab = function(tab) {
+scout.Desktop.prototype._updateTab = function(tab) {
   tab.$div.text(tab.title);
 };
 
-scout.Desktop.prototype.removeTab = function(tab) {
-  scout.arrays.remove(this.allTabs, tab);
+scout.Desktop.prototype._removeTab = function(tab) {
+  scout.arrays.remove(this._allTabs, tab);
 
   if (tab.$div.isSelected()) {
-    this.selectTab(this.allTabs[this.allTabs.length - 1]);
+    this._selectTab(this._allTabs[this._allTabs.length - 1]);
   }
 
   tab.$div.remove();
 };
 
-scout.Desktop.prototype.selectTab = function(tab) {
-  if (this.selectedTab) {
-    this.unselectTab(this.selectedTab);
+scout.Desktop.prototype._selectTab = function(tab) {
+  if (this._selectedTab) {
+    this._unselectTab(this._selectedTab);
   }
 
   tab.$div.select(true);
-  this.selectedTab = tab;
+  this._selectedTab = tab;
   if (tab.$storage) {
     this.$bench.append(tab.$storage);
   }
 };
 
-scout.Desktop.prototype.unselectTab = function(tab) {
+scout.Desktop.prototype._unselectTab = function(tab) {
   tab.$storage = this.$bench.children();
   this.$bench.children().detach();
   tab.$div.select(false);
@@ -383,30 +269,45 @@ scout.Desktop.prototype.unselectTab = function(tab) {
 
 /* handling of forms */
 
-// activate form
-// enable / disable and modal handling auch beim tab löschen
-
-/* handling of outline (form and table) and forms */
-
-scout.Desktop.prototype.addForm = function(form) {
+scout.Desktop.prototype._addForm = function(form) {
   var tab = new scout.Desktop.TabAndContent(form.title, form);
-  this.addTab(tab);
+  this._addTab(tab);
   form.render(this.$bench);
+  form.tab = tab;
 };
 
-scout.Desktop.prototype.removeForm = function(form) {
-  // muss nicht der selektierte sein, muss man in allenTabs suchen.. zusammen mit modal, letzzte machen
-  this.removeTab(this.selectedTab);
+scout.Desktop.prototype._removeForm = function(form) {
+  this._removeTab(form.tab);
   form.remove();
 };
+
+scout.Desktop.prototype._showForm = function(form) {
+  this._selectTab(form.tab);
+};
+
+/* communication with outline */
 
 scout.Desktop.prototype.updateOutline = function(content, title) {
   this._outlineTab.title = title;
   this._outlineTab.content = content;
 
-  this.updateTab(this._outlineTab);
-  this.selectTab(this._outlineTab);
+  this._updateTab(this._outlineTab);
+  this._selectTab(this._outlineTab);
   content.render(this.$bench);
+};
+
+scout.Desktop.prototype.changeOutline = function(outline) {
+  if (this.outline === outline) {
+    return;
+  }
+  this.outline = outline;
+  this.navigation.onOutlineChanged(this.outline);
+};
+
+/* message boxes */
+
+scout.Desktop.prototype.addMessageBox = function(messageBox) {
+  messageBox.render(this.$bench);
 };
 
 
@@ -418,14 +319,14 @@ scout.Desktop.prototype.onModelAction = function(event) {
   if (event.type === 'formAdded') {
     form = this.session.getOrCreateModelAdapter(event.form, this);
     this.forms.push(form);
-    this.addForm(form);
+    this._addForm(form);
   } else if (event.type === 'formRemoved') {
     form = this.session.getOrCreateModelAdapter(event.form, this);
     scout.arrays.remove(this.forms, form);
-    this.removeForm(form);
+    this._removeForm(form);
   } else if (event.type === 'formEnsureVisible') {
     form = this.session.getOrCreateModelAdapter(event.form, this);
-    this.activateForm(form);
+    this._showForm(form);
   } else if (event.type === 'outlineChanged') {
     this.changeOutline(this.session.getOrCreateModelAdapter(event.outline, this));
   } else if (event.type === 'searchPerformed') {
@@ -435,10 +336,10 @@ scout.Desktop.prototype.onModelAction = function(event) {
   }
 };
 
-scout.Desktop.prototype.addMessageBox = function(messageBox) {
-  messageBox.render(this.$bench);
-};
-
 scout.Desktop.prototype.onMessageBoxClosed = function(messageBox) {
   scout.arrays.remove(this.messageBoxes, messageBox);
+};
+
+scout.Desktop.prototype._onSearchPerformed = function(event) {
+  this.navigation.onSearchPerformed(event);
 };
