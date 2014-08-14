@@ -1,6 +1,4 @@
-
 scout.TableLayout = function() {
-
 };
 
 /**
@@ -8,50 +6,46 @@ scout.TableLayout = function() {
  * @param fields fields in group-box without system buttons
  */
 scout.TableLayout.prototype.render = function($parent, groupBox, fields) {
-  var cssClass = 'cols-' + groupBox.gridColumnCount;
-  var id = 'GroupBox' + groupBox.id;
-  // FIXME Use $.makeDiv
-  var html = '<div id="' + id + '" class="group-box">' +
-             '  <div class="group-box-title">Groupbox 1</div>' +
-             '  <table class="form-grid ' + cssClass + '">' +
-             '  </table>' +
-             '</div>';
-  var $groupBox = $(html);
-  var $table = $groupBox.find('table');
   var tmp = this._analyzeFields(fields);
-  var maxY = tmp[0],
-      fieldMap = tmp[1];
+  var maxY = tmp[0], fieldMap = tmp[1], $tr, $td, field, y, i;
+  var $table = $('<table>').
+    addClass('form-grid').
+    addClass('cols-' + groupBox.gridColumnCount);
+  var $groupBox = $('<div>').
+    attr('id', 'GroupBox' + groupBox.id).
+    addClass('group-box').
+    append($('<div>').addClass('group-box-title')).
+    append($table);
 
-  var $tr, $td, field, y, i;
-  for (y=0; y<=maxY; y++) {
-    $tr = $('<tr></tr>');
+  $parent.append($groupBox);
+  for (y = 0; y <= maxY; y++) {
+    $tr = $('<tr>');
+    $table.append($tr);
     if (fieldMap.hasOwnProperty(y)) {
-      for (i=0; i<fieldMap[y].length; i++) {
+      for (i = 0; i < fieldMap[y].length; i++) {
         field = fieldMap[y][i];
-        $td = $('<td class="form-field"></td>');
+        $td = $('<td>').addClass('form-field');
+        $tr.append($td);
         if (field.gridData.w > 1) {
           $td.attr('colspan', field.gridData.w);
         }
         if (field.gridData.h > 1) {
           $td.attr('rowspan', field.gridData.h);
         }
-        $tr.append($td);
         field.render($td);
       }
     }
-    $table.append($tr);
   }
-  $parent.append($table);
 };
 
 scout.TableLayout.prototype._analyzeFields = function(fields) {
   var fieldMap = {}, // key = y| value = array of fields
-      maxY = 0,
-      fieldsByY;
-  for (var i=0; i<fields.length; i++) {
-    var field = fields[i];
-    var gridData = field.gridData;
-    var y = gridData.y + gridData.h - 1;
+    maxY = 0, fieldsByY, i, field, gridData, y;
+
+  for (i = 0; i < fields.length; i++) {
+    field = fields[i];
+    gridData = field.gridData;
+    y = gridData.y + gridData.h - 1;
     if (y > maxY) {
       maxY = y;
     }
@@ -63,6 +57,6 @@ scout.TableLayout.prototype._analyzeFields = function(fields) {
     }
     fieldsByY.push(field);
   }
-  // TODO AWE: sorty fields by X
+  // TODO AWE: (layout) sorty fields by X
   return [maxY, fieldMap];
 };

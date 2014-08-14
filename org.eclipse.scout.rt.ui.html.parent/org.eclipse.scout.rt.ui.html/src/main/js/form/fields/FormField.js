@@ -11,9 +11,6 @@ scout.FormField = function() {
 scout.inherits(scout.FormField, scout.ModelAdapter);
 
 scout.FormField.prototype._render = function($parent) {
-  // TODO AWE: definitiven HTML aufbau / styles mit C.RU besprechen (vergleiche mit bsicrm.rusche.ch)
-  // das normale status-label von Scout ist ein composite mit Icon. Siehe JStatusLabelEx.
-
   /*
   this._$label = this.$container.appendDiv(undefined, 'label', this.model.label);
   // TODO AWE: (ask C.GU) vermutlich wäre es besser, das statusLabel nur bei Bedarf zu erzeugen und
@@ -52,15 +49,13 @@ scout.FormField.prototype._setVisible = function(visible) {
   if (!this.$container) {
     return;
   }
-
-  this.$container.setVisible();
+  this.$container.setVisible(visible);
 };
 
 scout.FormField.prototype._setLabel = function(label) {
   if (!label) {
     label = '';
   }
-
   if (this.$label) {
     this.$label.html(label);
   }
@@ -70,7 +65,6 @@ scout.FormField.prototype._setLabelVisible = function(visible) {
   if (!this.$label) {
     return;
   }
-
   this.$label.setVisible(visible);
 };
 
@@ -78,16 +72,7 @@ scout.FormField.prototype._setEnabled = function(enabled) {
   if (!this.$field) {
     return;
   }
-
   this.$field.setEnabled(enabled);
-};
-
-scout.FormField.prototype._setVisible = function(visible) {
-  if (!this.$field) {
-    return;
-  }
-
-  this.$field.setVisible(visible);
 };
 
 scout.FormField.prototype._updateStatusLabel = function() {
