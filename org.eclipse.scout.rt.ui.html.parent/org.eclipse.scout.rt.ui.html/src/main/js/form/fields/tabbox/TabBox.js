@@ -3,7 +3,6 @@
 
 scout.TabBox = function() {
   scout.TabBox.parent.call(this);
-
   this._addAdapterProperties(['groupBoxes', 'selectedTab']);
 };
 scout.inherits(scout.TabBox, scout.FormField);

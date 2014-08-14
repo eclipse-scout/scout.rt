@@ -11,14 +11,14 @@ scout.inherits(scout.GroupBox, scout.FormField);
 scout.GroupBox.prototype._render = function($parent) {
   var root = this.parent.objectType == 'Form';
   var cssClass = root ? 'root-group-box' : 'group-box';
-  this.$container = $parent.appendDiv(undefined, cssClass);
-  this.$container.attr('id', 'GroupBox-' + this.id);
+  this.$container = $parent.appendDiv('', cssClass).
+     attr('id', 'GroupBox-' + this.id);
 
   if (this.label) {
-    var $title = $.makeDiv('', 'group-box-title', '');
-    this.$label = $('<span>' + this.label + '</span>');
-    $title.append(this.$label);
-    this.$container.append($title);
+    this.$label = $('<span>').html(this.label);
+    this.$container.
+      appendDiv('', 'group-box-title').
+      append(this.$label);
   }
 
   var i, controlFields = this.getControlFields();

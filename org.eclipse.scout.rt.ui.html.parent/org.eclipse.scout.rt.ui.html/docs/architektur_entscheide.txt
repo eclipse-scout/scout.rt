@@ -313,3 +313,9 @@ gothaer.js
   #include("Gothaer")
 }(window.scout = window.scout || {}, jQuery));
 </code>
+
+14.08.2014 AWE, Html Rendering
+Wenn Adapter gerendert werden, sollen die DOM elemente möglichst unmittelbar zum parent appended werden.
+Andernfalls kann der Effekt von CSS definitionen auf das jeweilige Element nicht korrekt aufgelöst werden.
+Wenn das geschieht, können Fehler entstehen wie z.B. das JQuery#show() fälschlicherweise ein display Attribut
+setzt das der CSS Definition widerspricht.

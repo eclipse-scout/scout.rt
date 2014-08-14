@@ -11,13 +11,8 @@ scout.TableLayout.prototype.render = function($parent, groupBox, fields) {
   var $table = $('<table>').
     addClass('form-grid').
     addClass('cols-' + groupBox.gridColumnCount);
-  var $groupBox = $('<div>').
-    attr('id', 'GroupBox' + groupBox.id).
-    addClass('group-box').
-    append($('<div>').addClass('group-box-title')).
-    append($table);
 
-  $parent.append($groupBox);
+  $parent.append($table);
   for (y = 0; y <= maxY; y++) {
     $tr = $('<tr>');
     $table.append($tr);
