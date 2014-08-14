@@ -16,6 +16,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import javax.swing.JComponent;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.AttributeSet;
@@ -24,8 +25,10 @@ import javax.swing.text.Document;
 import javax.swing.text.DocumentFilter;
 import javax.swing.text.JTextComponent;
 
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.form.fields.numberfield.AbstractNumberField;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.INumberField;
 import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
@@ -124,17 +127,50 @@ public class SwingScoutNumberField extends SwingScoutBasicFieldComposite<INumber
     @Override
     public void replace(FilterBypass fb, int offset, int length, String text, AttributeSet attrs) throws BadLocationException {
       Document doc = fb.getDocument();
-      if (StringUtility.isWithinNumberFormatLimits(getScoutObject().getFormat(), doc.getText(0, doc.getLength()), offset, length, text)) {
+      if (AbstractNumberField.isWithinNumberFormatLimits(getScoutObject().getFormat(), doc.getText(0, doc.getLength()), offset, length, text)) {
         super.replace(fb, offset, length, text, attrs);
+      }
+      else {
+        if (textWasPasted(text)) {
+          try {
+            text = AbstractNumberField.createNumberWithinFormatLimits(getScoutObject().getFormat(), doc.getText(0, doc.getLength()), offset, length, text);
+            offset = 0;
+            length = doc.getLength();
+            super.replace(fb, offset, length, text, attrs);
+          }
+          catch (ProcessingException e) {
+            showCouldNotPasteDialog();
+          }
+        }
       }
     }
 
     @Override
-    public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {
+    public void insertString(FilterBypass fb, int offset, String text, AttributeSet attr) throws BadLocationException {
       Document doc = fb.getDocument();
-      if (StringUtility.isWithinNumberFormatLimits(getScoutObject().getFormat(), doc.getText(0, doc.getLength()), offset, 0, string)) {
-        super.insertString(fb, offset, string, attr);
+      if (textWasPasted(text)) {
+        try {
+          text = AbstractNumberField.createNumberWithinFormatLimits(getScoutObject().getFormat(), doc.getText(0, doc.getLength()), offset, 0, text);
+          super.insertString(fb, offset, text, attr);
+        }
+        catch (ProcessingException e) {
+          showCouldNotPasteDialog();
+        }
+      }
+      else if (AbstractNumberField.isWithinNumberFormatLimits(getScoutObject().getFormat(), doc.getText(0, doc.getLength()), offset, 0, text)) {
+        super.insertString(fb, offset, text, attr);
       }
     }
+
+    private void showCouldNotPasteDialog() {
+      SwingUtility.showMessageDialogSynthCapable(SwingUtility.getOwnerForChildWindow(), SwingUtility.getNlsText("PasteTextNotApplicableForNumberField", String.valueOf(getScoutObject().getFormat().getMaximumIntegerDigits())), SwingUtility.getNlsText("Paste"), JOptionPane.WARNING_MESSAGE);
+    }
+  }
+
+  /**
+   * returns true if the text was pasted.
+   */
+  private boolean textWasPasted(String text) {
+    return StringUtility.length(text) > 1;
   }
 }
