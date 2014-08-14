@@ -15,6 +15,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -283,6 +284,77 @@ public class AbstractNumberFieldTest extends AbstractNumberField<BigDecimal> {
       m_notified = true;
       m_cachedProperty = evt.getNewValue();
     }
+  }
+
+  @Test
+  public void testIsWithinNumberFormatLimits() {
+    for (Locale locale : Locale.getAvailableLocales()) {
+      DecimalFormat format = (DecimalFormat) DecimalFormat.getNumberInstance(locale);
+      format.setMaximumIntegerDigits(3);
+      format.setMaximumFractionDigits(2);
+      char decimalSeparator = format.getDecimalFormatSymbols().getDecimalSeparator();
+
+      assertTrue(AbstractNumberField.isWithinNumberFormatLimits(format, "123", 2, 0, null));
+      assertTrue(AbstractNumberField.isWithinNumberFormatLimits(format, null, 2, 0, null));
+      assertTrue(AbstractNumberField.isWithinNumberFormatLimits(format, null, 2, 0, ""));
+      assertTrue(AbstractNumberField.isWithinNumberFormatLimits(format, null, 0, 0, "123"));
+
+      assertFalse(AbstractNumberField.isWithinNumberFormatLimits(format, "123", 2, 0, "45"));
+      assertTrue(AbstractNumberField.isWithinNumberFormatLimits(format, "1", 1, 0, "23"));
+
+      assertFalse(AbstractNumberField.isWithinNumberFormatLimits(format, "123", 2, 0, decimalSeparator + "456"));
+      assertTrue(AbstractNumberField.isWithinNumberFormatLimits(format, "1", 1, 0, decimalSeparator + "23"));
+
+      assertFalse(AbstractNumberField.isWithinNumberFormatLimits(format, "123", 1, 2, "567"));
+      assertTrue(AbstractNumberField.isWithinNumberFormatLimits(format, "123", 1, 2, "56"));
+
+      assertFalse(AbstractNumberField.isWithinNumberFormatLimits(format, "123", 1, 2, "567" + decimalSeparator + "7"));
+      assertTrue(AbstractNumberField.isWithinNumberFormatLimits(format, "123", 1, 2, "56" + decimalSeparator + "78"));
+    }
+  }
+
+  @Test
+  public void testCreateNumberWithinFormatLimits() throws ProcessingException {
+    for (Locale locale : Locale.getAvailableLocales()) {
+      DecimalFormat format = (DecimalFormat) DecimalFormat.getNumberInstance(locale);
+      char decimalSeparator = format.getDecimalFormatSymbols().getDecimalSeparator();
+
+      format.setMaximumIntegerDigits(2);
+      format.setMaximumFractionDigits(2);
+      assertEquals(format("", decimalSeparator), AbstractNumberField.createNumberWithinFormatLimits(format, null, 0, 0, null));
+      assertEquals(format("21.12", decimalSeparator), AbstractNumberField.createNumberWithinFormatLimits(format, format("21.12", decimalSeparator), 0, 0, null));
+      assertEquals(format("21.12", decimalSeparator), AbstractNumberField.createNumberWithinFormatLimits(format, format("21.12", decimalSeparator), 0, 0, ""));
+      assertEquals(format("21.12", decimalSeparator), AbstractNumberField.createNumberWithinFormatLimits(format, null, 0, 0, format("21.12", decimalSeparator)));
+      assertEquals(format("21.12", decimalSeparator), AbstractNumberField.createNumberWithinFormatLimits(format, format("21.00", decimalSeparator), 3, 2, "12"));
+      assertEquals(format("12.98", decimalSeparator), AbstractNumberField.createNumberWithinFormatLimits(format, format("12.12", decimalSeparator), 3, 2, "987"));
+      assertEquals(format("12", decimalSeparator), AbstractNumberField.createNumberWithinFormatLimits(format, format("80", decimalSeparator), 0, 2, "12"));
+
+      format.setMaximumIntegerDigits(2);
+      format.setMaximumFractionDigits(5);
+      assertEquals(format("12.12345", decimalSeparator), AbstractNumberField.createNumberWithinFormatLimits(format, format("12.12", decimalSeparator), 3, 2, "123456789"));
+
+      format.setMaximumFractionDigits(2);
+      format.setMaximumIntegerDigits(4);
+      try {
+        AbstractNumberField.createNumberWithinFormatLimits(format, format("12.12", decimalSeparator), 0, 2, "12345");
+        fail("Exception should be thrown");
+      }
+      catch (ProcessingException e) {
+        //okay, expected
+      }
+
+      try {
+        AbstractNumberField.createNumberWithinFormatLimits(format, null, 0, 0, "12345678.1234");
+        fail("Exception should be thrown");
+      }
+      catch (ProcessingException e) {
+        //okay, expected
+      }
+    }
+  }
+
+  private String format(String s, char decimalSeparator) {
+    return s.replace('.', decimalSeparator);
   }
 
 }

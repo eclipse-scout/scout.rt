@@ -545,10 +545,10 @@ public final class StringUtility {
     while (startPos < text.length() && (a = getStartTag(text, tagName, startPos)).begin >= 0 && (b = text.indexOf("</" + tagName + ">", a.end)) > 0) {
       text =
           text.substring(0, a.begin) +
-          start +
-          text.substring(a.end, b) +
-          end +
-          text.substring(b + tagName.length() + 3);
+              start +
+              text.substring(a.end, b) +
+              end +
+              text.substring(b + tagName.length() + 3);
       //next
       startPos = a.begin + start.length();
     }
@@ -1163,7 +1163,7 @@ public final class StringUtility {
             "(?<=[^A-Z])(?=[A-Z])",
             "(?<=[A-Za-z])(?=[^A-Za-z])"
             ),
-            " "
+        " "
         );
   }
 
@@ -1750,7 +1750,11 @@ public final class StringUtility {
    * @return <code>true</code> if the given {@link DecimalFormat} length constraints are still fulfilled after the
    *         string modification has been applied or if the resulting string is no valid number. <code>false</code>
    *         otherwise.
+   * @deprecated use {@link AbstractNumberField#isWithinNumberFormatLimits(DecimalFormat, String, int, int, String)}
+   *             instead.
+   *             Will be removed in the N-Release
    */
+  @Deprecated
   public static boolean isWithinNumberFormatLimits(DecimalFormat format, String curText, int offset, int replaceLen, String insertText) {
     // !! IMPORTANT NOTE: There is also a JavaScript implementation of this method: org/eclipse/scout/rt/ui/rap/form/fields/numberfield/RwtScoutNumberField.js
     // When changing this implementation also consider updating the js version!

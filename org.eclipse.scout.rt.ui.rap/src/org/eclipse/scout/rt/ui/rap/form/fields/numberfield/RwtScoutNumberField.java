@@ -18,12 +18,15 @@ import java.text.DecimalFormat;
 import org.eclipse.rap.rwt.RWT;
 import org.eclipse.rap.rwt.scripting.ClientListener;
 import org.eclipse.scout.commons.IOUtility;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.numberfield.AbstractNumberField;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.INumberField;
+import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.ui.rap.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.rap.RwtMenuUtility;
 import org.eclipse.scout.rt.ui.rap.action.menu.RwtContextMenuMarkerComposite;
@@ -37,14 +40,17 @@ import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.VerifyEvent;
+import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MessageBox;
 
 /**
  * <h3>RwtScoutNumberField</h3>
- * 
+ *
  * @since 3.7.0 June 2011
  */
 public class RwtScoutNumberField extends RwtScoutBasicFieldComposite<INumberField<?>> implements IRwtScoutNumberField {
@@ -140,7 +146,9 @@ public class RwtScoutNumberField extends RwtScoutBasicFieldComposite<INumberFiel
     if (js != null) {
       text.addListener(SWT.Verify, new ClientListener(js));
       org.eclipse.rap.rwt.internal.lifecycle.WidgetDataUtil.registerDataKeys(PROP_MAX_INTEGER_DIGITS, PROP_MAX_FRACTION_DIGITS, PROP_ZERO_DIGIT, PROP_DECIMAL_SEPARATOR);
+      text.addVerifyListener(new P_VerifyListener());
     }
+
   }
 
   protected void updateContextMenuVisibilityFromScout() {
@@ -221,6 +229,41 @@ public class RwtScoutNumberField extends RwtScoutBasicFieldComposite<INumberFiel
             updateContextMenuVisibilityFromScout();
           }
         });
+      }
+    }
+  }
+
+  /**
+   * This verifyListener only handles the case if text was pasted into the NumberField and an exception occurs.
+   * All other logic is implemented in the RwtScoutNumberField.js
+   * We need this additional listener in order to show a MessageBox with an NLS text, since we don't know how
+   * to show a messageBox from pure JavaScript. Once we have figured it out, this logic can be added to
+   * RwtScoutNumberField.js
+   */
+  private class P_VerifyListener implements VerifyListener {
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * returns true if the text was pasted.
+     */
+    private boolean textWasPasted(VerifyEvent e) {
+      return StringUtility.length(e.text) > 1;
+    }
+
+    @Override
+    public void verifyText(VerifyEvent e) {
+      String curText = ((StyledText) e.widget).getText();
+      if (textWasPasted(e)) {
+        try {
+          AbstractNumberField.createNumberWithinFormatLimits(getScoutObject().getFormat(), curText, e.start, e.end - e.start, e.text);
+        }
+        catch (ProcessingException exception) {
+          e.doit = false;
+          MessageBox box = new MessageBox(e.display.getActiveShell(), SWT.OK);
+          box.setText(TEXTS.get("Paste"));
+          box.setMessage(RwtUtility.getNlsText(e.display, "PasteTextNotApplicableForNumberField", String.valueOf(getScoutObject().getFormat().getMaximumIntegerDigits())));
+          box.open();
+        }
       }
     }
   }

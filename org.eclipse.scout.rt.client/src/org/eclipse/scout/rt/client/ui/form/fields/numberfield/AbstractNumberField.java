@@ -16,6 +16,7 @@ import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParsePosition;
+import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.LocaleThreadLocal;
@@ -59,7 +60,7 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractBasi
    * {@link DecimalFormat} like for example {@link #setGroupingUsed(boolean)}
    * <p>
    * Subclasses can override this method. Default is {@code null}.
-   * 
+   *
    * @deprecated Will be removed with scout 5.0. For setting the format override {@link #initConfig()} and call
    *             {@link #setFormat(DecimalFormat)}.
    */
@@ -108,7 +109,7 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractBasi
    * (before the decimal separator).<br>
    * Corresponds to {@link DecimalFormat#setMaximumIntegerDigits(int)}
    * <p>
-   * 
+   *
    * @return
    */
   @ConfigProperty(ConfigProperty.INTEGER)
@@ -393,7 +394,7 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractBasi
    * <p>
    * If the parsing cannot be done complying these rules and considering {@link #getRoundingMode()} an exception is
    * thrown.
-   * 
+   *
    * @param text
    * @return
    * @throws ProcessingException
@@ -451,7 +452,7 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractBasi
 
   /**
    * Rounds the parsed value according {@link #getRoundingMode()}.
-   * 
+   *
    * @throws ArithmeticException
    *           if roundingMode is {@link RoundingMode#UNNECESSARY} but rounding would be needed
    */
@@ -472,5 +473,126 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractBasi
       text = StringUtility.concatenateTokens(text, positiveSuffix);
     }
     return text;
+  }
+
+  /**
+   * Checks whether the given string modification still fulfills the given {@link DecimalFormat} max length constraints.
+   *
+   * @param format
+   *          The {@link DecimalFormat} holding the constraints: {@link DecimalFormat#getMaximumIntegerDigits()},
+   *          {@link DecimalFormat#getMaximumFractionDigits()}.
+   * @param curText
+   *          The current text (before the modification).
+   * @param offset
+   *          The offset of the modification relative to the curText parameter.
+   * @param replaceLen
+   *          How many characters that will be replaced starting at the given offset.
+   * @param insertText
+   *          The new text that should be inserted at the given replace range.
+   * @return <code>true</code> if the given {@link DecimalFormat} length constraints are still fulfilled after the
+   *         string modification has been applied or if the resulting string is no valid number. <code>false</code>
+   *         otherwise. Also returns <code>true</code> if the String can not be parsed as number (e.g. when it contains
+   *         alpha-numerical characters) or is <code>null</code>
+   */
+  public static boolean isWithinNumberFormatLimits(DecimalFormat format, String curText, int offset, int replaceLen, String insertText) {
+    // !! IMPORTANT NOTE: There is also a JavaScript implementation of this method: org/eclipse/scout/rt/ui/rap/form/fields/numberfield/RwtScoutNumberField.js
+    // When changing this implementation also consider updating the js version!
+    if (insertText == null || insertText.length() < 1) {
+      return true;
+    }
+
+    String futureText = null;
+    if (curText == null) {
+      futureText = insertText;
+    }
+    else {
+      StringBuilder docTxt = new StringBuilder(curText.length() + insertText.length());
+      docTxt.append(curText);
+      docTxt.replace(offset, offset + replaceLen, insertText);
+      futureText = docTxt.toString();
+    }
+
+    Pattern pat = Pattern.compile("[^1-9" + format.getDecimalFormatSymbols().getZeroDigit() + "]");
+    String decimalSeparator = String.valueOf(format.getDecimalFormatSymbols().getDecimalSeparator());
+    String[] parts = futureText.split(Pattern.quote(decimalSeparator));
+    if (parts.length >= 1) {
+      String intPartDigits = pat.matcher(parts[0]).replaceAll("");
+      boolean intPartValid = StringUtility.length(intPartDigits) <= format.getMaximumIntegerDigits();
+      if (!intPartValid) {
+        return false;
+      }
+    }
+    if (parts.length == 2) {
+      String fracPartDigits = pat.matcher(parts[1]).replaceAll("");
+      boolean fracPartValid = StringUtility.length(fracPartDigits) <= format.getMaximumFractionDigits();
+      if (!fracPartValid) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Creates a new string which fulfills the given {@link DecimalFormat} max length constraints. An exception is thrown
+   * if the number's digits before the decimal point be cut off. It the number's digits after the decimal point would be
+   * cut off, no exception is thrown.
+   *
+   * @param format
+   *          The {@link DecimalFormat} holding the constraints: {@link DecimalFormat#getMaximumIntegerDigits()},
+   *          {@link DecimalFormat#getMaximumFractionDigits()}.
+   * @param curText
+   *          The current text (before the modification).
+   * @param offset
+   *          The offset of the modification relative to the curText parameter.
+   * @param replaceLen
+   *          How many characters that will be replaced starting at the given offset.
+   * @param insertText
+   *          The new text that should be inserted at the given replace range.
+   * @return String that fulfills the given {@link DecimalFormat} length constraints
+   * @throws throws a {@link ProcessingException} if the number's digits before the decimal point would be cut off
+   */
+  public static String createNumberWithinFormatLimits(DecimalFormat format, String curText, int offset, int replaceLen, String insertText) throws ProcessingException {
+    // !! IMPORTANT NOTE: There is also a JavaScript implementation of this method: org/eclipse/scout/rt/ui/rap/form/fields/numberfield/RwtScoutNumberField.js
+    // When changing this implementation also consider updating the js version!
+    if (insertText == null || insertText.length() < 1) {
+      insertText = "";
+    }
+    StringBuilder result = new StringBuilder();
+
+    String futureText = null;
+    if (curText == null) {
+      futureText = insertText;
+    }
+    else {
+      StringBuilder docTxt = new StringBuilder(curText.length() + insertText.length());
+      docTxt.append(curText);
+      docTxt.replace(offset, offset + replaceLen, insertText);
+      futureText = docTxt.toString();
+    }
+
+    Pattern pat = Pattern.compile("[^1-9" + format.getDecimalFormatSymbols().getZeroDigit() + "]");
+    String decimalSeparator = String.valueOf(format.getDecimalFormatSymbols().getDecimalSeparator());
+    String[] parts = futureText.split(Pattern.quote(decimalSeparator));
+    if (parts.length >= 1) {
+      String intPartDigits = pat.matcher(parts[0]).replaceAll("");
+      boolean intPartValid = StringUtility.length(intPartDigits) <= format.getMaximumIntegerDigits();
+      if (intPartValid) {
+        result.append(intPartDigits);
+      }
+      else {
+        throw new ProcessingException("Do not truncate integer digits!");
+      }
+    }
+    if (parts.length == 2) {
+      String fracPartDigits = pat.matcher(parts[1]).replaceAll("");
+      boolean fracPartValid = StringUtility.length(fracPartDigits) <= format.getMaximumFractionDigits();
+      if (fracPartValid) {
+        result.append(decimalSeparator + fracPartDigits);
+      }
+      else {
+        result.append(decimalSeparator + fracPartDigits.substring(0, format.getMaximumFractionDigits()));
+      }
+    }
+    return result.toString();
   }
 }
