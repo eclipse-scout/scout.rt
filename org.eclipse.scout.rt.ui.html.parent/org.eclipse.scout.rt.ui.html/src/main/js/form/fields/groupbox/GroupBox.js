@@ -11,24 +11,18 @@ scout.inherits(scout.GroupBox, scout.FormField);
 scout.GroupBox.prototype._render = function($parent) {
   var root = this.parent.objectType == 'Form';
   var cssClass = root ? 'root-group-box' : 'group-box';
-  this.$container = $parent.appendDiv('', cssClass).
-     attr('id', 'GroupBox-' + this.id);
+  this.$container = $parent.
+    appendDiv('', cssClass).
+    attr('id', 'GroupBox-' + this.id);
 
   if (this.label) {
     this.$label = $('<span>').html(this.label);
     this.$container.
-      appendDiv('', 'group-box-title').
-      append(this.$label);
+    appendDiv('', 'group-box-title').
+    append(this.$label);
   }
 
-  var i, controlFields = this.getControlFields();
-  if (root) { // TODO AWE: das hier schöner lösen, sollte alles in der selben klasse geschehen
-    for (i = 0; i < controlFields.length; i++) {
-      controlFields[i].render(this.$container);
-    }
-  } else {
-    new scout.TableLayout().render(this.$container, this, controlFields);
-  }
+  new scout.TableLayout().render(this.$container, this, this.getControlFields());
 };
 
 /**
