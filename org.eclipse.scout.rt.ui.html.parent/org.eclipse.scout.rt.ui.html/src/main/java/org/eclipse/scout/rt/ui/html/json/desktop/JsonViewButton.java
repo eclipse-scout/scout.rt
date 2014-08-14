@@ -60,6 +60,8 @@ public class JsonViewButton extends AbstractJsonPropertyObserver<IViewButton> {
   }
 
   protected void handleUiClick(JsonEvent event, JsonResponse res) {
+    // TODO selection call
+    getModel().getUIFacade().setSelectedFromUI(true);
     getModel().getUIFacade().fireActionFromUI();
   }
 
