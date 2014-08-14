@@ -132,14 +132,26 @@ public class TimeLineComponentElementFactory extends AbstractComponentElementFac
   private Element createComponentElement(Element container, SvgRect containerDimension, CalendarComponentComposite c,
       int numColumns, int numFullDay, HashSet<CalendarComponentComposite> list, Date day) {
 
-    Element newEl = createNewComponentElement(container, c.comp, day);
+    Element rectangle = createNewComponentElement(container, c.comp, day);
     Element composite = container.getOwnerDocument().createElementNS(SVGUtility.SVG_NS, SVGConstants.SVG_G_TAG);
 
     SvgRect elementDimension = getCopyWithPadding(getTimeLineElementDimension(c, list, containerDimension, numColumns, numFullDay), PADDING);
-    setElementDimensions(newEl, elementDimension);
+    setElementDimensions(rectangle, elementDimension);
 
-    composite.appendChild(newEl);
-    Element txt = createTextElement(c.comp, newEl, elementDimension, day);
+    // create a clippingRectangle which has the same size as the rectangle containing the text.
+    // this enforces that the text never draws outside the containing rectangle
+    String clipPathId = "clipRect_" + rectangle.getAttribute(SVGConstants.SVG_ID_ATTRIBUTE);
+    Element clipPath = container.getOwnerDocument().createElementNS(SVGUtility.SVG_NS, SVGConstants.SVG_CLIP_PATH_TAG);
+    clipPath.setAttribute(SVGConstants.SVG_ID_ATTRIBUTE, clipPathId);
+    Element clipPathRect = container.getOwnerDocument().createElementNS(SVGUtility.SVG_NS, SVGConstants.SVG_RECT_TAG);
+    setElementDimensions(clipPathRect, elementDimension);
+    clipPath.appendChild(clipPathRect);
+    composite.setAttribute(SVGConstants.SVG_CLIP_PATH_ATTRIBUTE, "url(#" + clipPathId + ")");
+    composite.appendChild(clipPath);
+
+    composite.appendChild(rectangle);
+
+    Element txt = createTextElement(c.comp, rectangle, elementDimension, day);
     if (txt != null) {
       composite.appendChild(txt);
     }
