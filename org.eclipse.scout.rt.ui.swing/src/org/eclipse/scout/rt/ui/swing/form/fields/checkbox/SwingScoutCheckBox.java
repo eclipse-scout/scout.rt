@@ -179,18 +179,18 @@ public class SwingScoutCheckBox extends SwingScoutValueFieldComposite<IBooleanFi
       return;
     }
     //notify Scout
+
+    final boolean uiSelection = getSwingCheckBox().isSelected();
     Runnable t = new Runnable() {
       @Override
       public void run() {
-        final boolean oldSelection = getScoutObject().isChecked();
-        final boolean newSelection = getScoutObject().getUIFacade().setSelectedFromUI();
-        if (oldSelection == newSelection) {
-          // ensure that the UI has the same value as the Scout model
-          // oldSelection != newSelection case is handled by the value property change listener.
+        getScoutObject().getUIFacade().setSelectedFromUI(uiSelection);
+        // ensure the selection state of model and UI matches.
+        if (uiSelection != getScoutObject().isChecked()) {
           Runnable r = new Runnable() {
             @Override
             public void run() {
-              getSwingCheckBox().setSelected(newSelection);
+              getSwingCheckBox().setSelected(getScoutObject().isChecked());
             }
           };
           getSwingEnvironment().invokeSwingLater(r);

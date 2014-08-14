@@ -152,7 +152,7 @@ public class SwtScoutCheckbox extends SwtScoutValueFieldComposite<IBooleanField>
     getSwtField().setSelection(BooleanUtility.nvl(getScoutObject() == null ? null : getScoutObject().getValue()));
   }
 
-  protected void handleSwtAction() {
+  protected void handleSwtAction(final boolean selection) {
     if (!getSwtField().isEnabled()) {
       return;
     }
@@ -160,15 +160,13 @@ public class SwtScoutCheckbox extends SwtScoutValueFieldComposite<IBooleanField>
     Runnable t = new Runnable() {
       @Override
       public void run() {
-        final boolean oldSelection = getScoutObject().isChecked();
-        final boolean newSelection = getScoutObject().getUIFacade().setSelectedFromUI();
-        if (oldSelection == newSelection) {
-          // ensure that the UI has the same value as the Scout model
-          // oldSelection != newSelection case is handled by the value property change listener.
+        getScoutObject().getUIFacade().setSelectedFromUI(selection);
+        // ensure the selection state of model and UI matches.
+        if (selection != getScoutObject().isChecked()) {
           Runnable r = new Runnable() {
             @Override
             public void run() {
-              getSwtField().setSelection(newSelection);
+              getSwtField().setSelection(getScoutObject().isChecked());
             }
           };
           getEnvironment().invokeSwtLater(r);
@@ -184,7 +182,7 @@ public class SwtScoutCheckbox extends SwtScoutValueFieldComposite<IBooleanField>
     public void handleEvent(Event event) {
       switch (event.type) {
         case SWT.Selection:
-          handleSwtAction();
+          handleSwtAction(getSwtField().getSelection());
           break;
       }
     }

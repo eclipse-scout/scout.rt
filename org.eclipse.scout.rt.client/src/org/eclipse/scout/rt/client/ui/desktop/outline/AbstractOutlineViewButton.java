@@ -97,13 +97,44 @@ public abstract class AbstractOutlineViewButton extends AbstractViewButton {
         );
   }
 
-  /**
-   * allow only to set on true on view buttons
-   */
   @Override
-  protected void doActionInternal() throws ProcessingException {
-    if (!isSelected()) {
-      super.doActionInternal();
+  protected void execSelectionChanged(boolean selection) throws ProcessingException {
+    if (selection) {
+      if (m_desktop.getOutline() != null && m_desktop.getOutline() == m_outline) {
+        //determine new selection
+        ITreeNode newSelectedNode;
+        if (m_outline.isRootNodeVisible()) {
+          newSelectedNode = m_outline.getRootPage();
+        }
+        else {
+          newSelectedNode = m_outline.getSelectedNode();
+          while (newSelectedNode != null && newSelectedNode.getParentNode() != m_outline.getRootPage()) {
+            newSelectedNode = newSelectedNode.getParentNode();
+          }
+        }
+        m_outline.selectNode(newSelectedNode);
+        // collapse outline
+        if (m_outline.isRootNodeVisible()) {
+          m_outline.collapseAll(m_outline.getRootPage());
+          if (m_outline.getRootPage() instanceof AbstractPage && ((AbstractPage) m_outline.getRootPage()).isInitialExpanded()) {
+            m_outline.setNodeExpanded(m_outline.getRootPage(), true);
+          }
+        }
+        else {
+          for (IPage root : m_outline.getRootPage().getChildPages()) {
+            m_outline.collapseAll(root);
+          }
+          for (IPage root : m_outline.getRootPage().getChildPages()) {
+            if (root instanceof AbstractPage && ((AbstractPage) root).isInitialExpanded()) {
+              m_outline.setNodeExpanded(root, true);
+            }
+          }
+        }
+      }
+      else {
+        // activate outline
+        m_desktop.setOutline(m_outline);
+      }
     }
   }
 
@@ -146,47 +177,6 @@ public abstract class AbstractOutlineViewButton extends AbstractViewButton {
   @Override
   protected final boolean getConfiguredVisible() {
     return super.getConfiguredVisible();
-  }
-
-  @Override
-  protected void execAction() throws ProcessingException {
-    if (isSelected()) {
-      if (m_desktop.getOutline() != null && m_desktop.getOutline() == m_outline) {
-        //determine new selection
-        ITreeNode newSelectedNode;
-        if (m_outline.isRootNodeVisible()) {
-          newSelectedNode = m_outline.getRootPage();
-        }
-        else {
-          newSelectedNode = m_outline.getSelectedNode();
-          while (newSelectedNode != null && newSelectedNode.getParentNode() != m_outline.getRootPage()) {
-            newSelectedNode = newSelectedNode.getParentNode();
-          }
-        }
-        m_outline.selectNode(newSelectedNode);
-        // collapse outline
-        if (m_outline.isRootNodeVisible()) {
-          m_outline.collapseAll(m_outline.getRootPage());
-          if (m_outline.getRootPage() instanceof AbstractPage && ((AbstractPage) m_outline.getRootPage()).isInitialExpanded()) {
-            m_outline.setNodeExpanded(m_outline.getRootPage(), true);
-          }
-        }
-        else {
-          for (IPage root : m_outline.getRootPage().getChildPages()) {
-            m_outline.collapseAll(root);
-          }
-          for (IPage root : m_outline.getRootPage().getChildPages()) {
-            if (root instanceof AbstractPage && ((AbstractPage) root).isInitialExpanded()) {
-              m_outline.setNodeExpanded(root, true);
-            }
-          }
-        }
-      }
-      else {
-        // activate outline
-        m_desktop.setOutline(m_outline);
-      }
-    }
   }
 
 }

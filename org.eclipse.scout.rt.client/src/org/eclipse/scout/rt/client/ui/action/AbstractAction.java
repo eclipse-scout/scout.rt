@@ -172,7 +172,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   }
 
   /**
-   * called when action is performed
+   * called when action is performed independent of the selection state.
    */
   @ConfigOperation
   @Order(30)
@@ -180,11 +180,23 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   }
 
   /**
-   * called whenever the selection (of a toggle-action) is changed
+   * @deprecated will be removed with release 5.0 use {@link AbstractAction#execSelectionChanged(boolean)} instead.
    */
   @ConfigOperation
   @Order(31)
+  @Deprecated
   protected void execToggleAction(boolean selected) throws ProcessingException {
+  }
+
+  /**
+   * called whenever the selection (of toggle-action) is changed.
+   * 
+   * @param selection
+   *          the new selection state
+   * @throws ProcessingException
+   */
+  protected void execSelectionChanged(boolean selection) throws ProcessingException {
+
   }
 
   protected void initConfig() {
@@ -265,9 +277,6 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
    * @throws ProcessingException
    */
   protected void doActionInternal() throws ProcessingException {
-    if (isToggleAction()) {
-      setSelected(!isSelected());
-    }
     execAction();
   }
 
@@ -413,6 +422,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   public void setSelected(boolean b) {
     if (setSelectedInternal(b)) {
       try {
+        execSelectionChanged(b);
         execToggleAction(b);
       }
       catch (ProcessingException e) {
@@ -612,7 +622,6 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
       }
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public void setSelectedFromUI(boolean b) {
       setSelected(b);

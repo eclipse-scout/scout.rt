@@ -160,10 +160,10 @@ public abstract class AbstractSwtScoutAction extends Action {
 
   @Override
   public void run() {
-    handleSwtAction();
+    handleSwtAction(isChecked());
   }
 
-  protected void handleSwtAction() {
+  protected void handleSwtAction(final boolean selected) {
     try {
       if (getUpdateSwtFromScoutLock().acquire()) {
         if (getScoutObject().isToggleAction() && getScoutObject() instanceof IViewButton && getScoutObject().isSelected()) {
@@ -179,6 +179,7 @@ public abstract class AbstractSwtScoutAction extends Action {
                 @Override
                 public void run() {
                   try {
+                    getScoutObject().getUIFacade().setSelectedFromUI(selected);
                     getScoutObject().getUIFacade().fireActionFromUI();
                   }
                   finally {

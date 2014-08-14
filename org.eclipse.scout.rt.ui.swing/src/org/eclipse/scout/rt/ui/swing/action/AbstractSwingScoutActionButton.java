@@ -12,6 +12,8 @@ package org.eclipse.scout.rt.ui.swing.action;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 
 import javax.swing.AbstractButton;
 import javax.swing.Action;
@@ -50,6 +52,7 @@ public abstract class AbstractSwingScoutActionButton<T extends IAction> extends 
     setSwingField(swingButton);
     // attach swing listeners
     swingButton.addActionListener(new P_SwingActionListener());
+    swingButton.addItemListener(new P_SwingSelectionListener());
   }
 
   @Override
@@ -125,6 +128,23 @@ public abstract class AbstractSwingScoutActionButton<T extends IAction> extends 
     }
   }
 
+  protected void setSelectionFromSwing(final boolean b) {
+    if (getUpdateSwingFromScoutLock().isAcquired()) {
+      return;
+    }
+    //
+    // notify Scout
+    Runnable t = new Runnable() {
+      @Override
+      public void run() {
+        getScoutObject().getUIFacade().setSelectedFromUI(b);
+      }
+    };
+
+    getSwingEnvironment().invokeScoutLater(t, 0);
+    // end notify
+  }
+
   /**
    * in swing thread
    */
@@ -185,4 +205,10 @@ public abstract class AbstractSwingScoutActionButton<T extends IAction> extends 
     }
   }// end class
 
+  private class P_SwingSelectionListener implements ItemListener {
+    @Override
+    public void itemStateChanged(ItemEvent e) {
+      setSelectionFromSwing(getSwingField().isSelected());
+    }
+  }// end private class
 }

@@ -10,15 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.booleanfield;
 
-
 public interface IBooleanFieldUIFacade {
 
-  /**
-   * Sets the selection of the BooleanField by using the toggled current selection as
-   * an input value. The return value is the output value calculated by the model.
-   * 
-   * @return the new calculated selection of the model.
-   * @since 4.0.0-M7
-   */
-  boolean setSelectedFromUI();
+  void setSelectedFromUI(boolean b);
+
 }

@@ -111,11 +111,10 @@ public abstract class AbstractBooleanField extends AbstractValueField<Boolean> i
 
   private class P_UIFacade implements IBooleanFieldUIFacade {
     @Override
-    public boolean setSelectedFromUI() {
+    public void setSelectedFromUI(boolean b) {
       if (isEnabled() && isVisible()) {
-        setChecked(!isChecked());
+        setChecked(b);
       }
-      return isChecked();
     }
   }
 }

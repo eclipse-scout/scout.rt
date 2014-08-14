@@ -31,6 +31,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutlineViewButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
+import org.eclipse.scout.rt.testing.shared.DevTestMarker;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -39,6 +40,7 @@ import org.mockito.Mockito;
  * 
  * @since 3.8.2
  */
+@DevTestMarker
 public class ActionTest {
   private static final String TEST_CLASS_ID = "TEST_CLASS_ID";
 
@@ -57,22 +59,24 @@ public class ActionTest {
       }
 
       @Override
-      protected void execToggleAction(boolean selected) throws ProcessingException {
+      protected void execSelectionChanged(boolean selection) throws ProcessingException {
         execToggleHolder.setValue(execToggleHolder.getValue() + 1);
       }
     };
+    b.getUIFacade().setSelectedFromUI(true);
     b.getUIFacade().fireActionFromUI();
     assertEquals(1, execActionHolder.getValue().intValue());
     assertEquals(1, execToggleHolder.getValue().intValue());
     assertTrue(b.isSelected());
 
     b.getUIFacade().fireActionFromUI();
-    assertEquals(1, execActionHolder.getValue().intValue());
+    assertEquals(2, execActionHolder.getValue().intValue());
     assertEquals(1, execToggleHolder.getValue().intValue());
     assertTrue(b.isSelected());
 
-    b.setSelected(false);
-    assertEquals(1, execActionHolder.getValue().intValue());
+    b.getUIFacade().setSelectedFromUI(false);
+    b.getUIFacade().fireActionFromUI();
+    assertEquals(3, execActionHolder.getValue().intValue());
     assertEquals(2, execToggleHolder.getValue().intValue());
     assertFalse(b.isSelected());
 

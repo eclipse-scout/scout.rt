@@ -13,13 +13,17 @@ package org.eclipse.scout.rt.client.ui.action;
 public interface IActionUIFacade {
 
   /**
-   * use {@link #fireActionFromUI()} instead
+   * toggable actions must call this method in addition to the {@link #fireActionFromUI()} method on selection change
+   * event.
    * 
-   * @deprecated will be removed with V 5.0
+   * @param b
    */
-  @Deprecated
   void setSelectedFromUI(boolean b);
 
+  /**
+   * all actions must call this method when the UI action is invoked. In case of toggable action
+   * {@link #fireActionFromUI()} is also called if the selection state does not change.
+   */
   void fireActionFromUI();
 
 }
