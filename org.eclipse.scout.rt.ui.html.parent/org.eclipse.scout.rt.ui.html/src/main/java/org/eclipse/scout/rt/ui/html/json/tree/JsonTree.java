@@ -36,7 +36,6 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   public static final String PROP_NODE_ID = "nodeId";
   public static final String PROP_NODE_IDS = "nodeIds";
   public static final String PROP_COMMON_PARENT_NODE_ID = "commonParentNodeId";
-  public static final String PROP_MENUS = "menus";
   public static final String PROP_NODES = "nodes";
   public static final String PROP_SELECTED_NODE_IDS = "selectedNodeIds";
 
@@ -53,8 +52,8 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   }
 
   @Override
-  protected void initProperties(T model) {
-    super.initProperties(model);
+  protected void initJsonProperties(T model) {
+    super.initJsonProperties(model);
     putJsonProperty(new JsonProperty<T>(ITree.PROP_TITLE, model) {
       @Override
       protected String modelValue() {

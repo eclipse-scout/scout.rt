@@ -3,7 +3,7 @@ scout.Form = function() {
   this._$title;
   this._$parent;
   this.rootGroupBox;
-  this._addAdapterProperties('rootGroupBox');
+  this._addAdapterProperties(['rootGroupBox', 'menus']);
   this._locked;
 };
 scout.inherits(scout.Form, scout.ModelAdapter);

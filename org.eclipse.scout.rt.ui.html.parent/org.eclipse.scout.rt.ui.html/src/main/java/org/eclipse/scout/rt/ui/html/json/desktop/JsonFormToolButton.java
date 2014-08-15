@@ -31,8 +31,8 @@ public class JsonFormToolButton extends AbstractJsonPropertyObserver<IFormToolBu
   }
 
   @Override
-  protected void initProperties(IFormToolButton5 model) {
-    super.initProperties(model);
+  protected void initJsonProperties(IFormToolButton5 model) {
+    super.initJsonProperties(model);
     putJsonProperty(new JsonProperty<IFormToolButton5>(IFormToolButton5.PROP_TEXT, model) {
       @Override
       protected String modelValue() {

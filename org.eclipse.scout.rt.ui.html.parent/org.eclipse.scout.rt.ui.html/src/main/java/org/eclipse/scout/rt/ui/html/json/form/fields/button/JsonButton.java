@@ -27,8 +27,8 @@ public class JsonButton extends JsonFormField<IButton> {
   }
 
   @Override
-  protected void initProperties(IButton model) {
-    super.initProperties(model);
+  protected void initJsonProperties(IButton model) {
+    super.initJsonProperties(model);
 
     // TODO AWE: System-type von button mit ans UI schicken?
     putJsonProperty(new JsonProperty<IButton>(PROP_SYSTEM_TYPE, model) {

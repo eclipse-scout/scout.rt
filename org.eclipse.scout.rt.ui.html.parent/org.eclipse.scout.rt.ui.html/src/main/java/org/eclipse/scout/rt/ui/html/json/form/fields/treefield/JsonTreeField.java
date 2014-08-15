@@ -23,8 +23,8 @@ public class JsonTreeField extends JsonFormField<ITreeField> {
   }
 
   @Override
-  protected void initProperties(ITreeField model) {
-    super.initProperties(model);
+  protected void initJsonProperties(ITreeField model) {
+    super.initJsonProperties(model);
 
     putJsonProperty(new JsonAdapterProperty<ITreeField>(ITreeField.PROP_TREE, model, getJsonSession()) {
       @Override

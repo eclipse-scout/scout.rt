@@ -25,8 +25,8 @@ public class JsonTabBox extends JsonFormField<ITabBox> {
   }
 
   @Override
-  protected void initProperties(ITabBox model) {
-    super.initProperties(model);
+  protected void initJsonProperties(ITabBox model) {
+    super.initJsonProperties(model);
 
     putJsonProperty(new JsonAdapterProperty<ITabBox>(ITabBox.PROP_SELECTED_TAB, model, getJsonSession()) {
       @Override

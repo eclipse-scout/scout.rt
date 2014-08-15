@@ -8,12 +8,22 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.html.json.menu;
+package org.eclipse.scout.rt.client.ui.form;
 
-import org.eclipse.scout.rt.client.ui.action.menu.root.ContextMenuEvent;
+import java.util.List;
 
-public interface IContextMenuOwner {
-  public static final String PROP_MENUS = "menus";
+import org.eclipse.scout.commons.beans.IPropertyObserver;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.AbstractContextMenu;
 
-  void handleModelContextMenuChanged(ContextMenuEvent event);
+public class FormContextMenu extends AbstractContextMenu implements IFormContextMenu {
+
+  public FormContextMenu(IPropertyObserver owner, List<? extends IMenu> initialChildList) {
+    super(owner, initialChildList);
+  }
+
+  @Override
+  public IForm getOwner() {
+    return (IForm) super.getOwner();
+  }
 }

@@ -327,9 +327,9 @@ scout.Table.prototype._getRowMenus = function($selectedRows) {
   var menus;
   if ($selectedRows) {
     if ($selectedRows.length == 1) {
-      menus = scout.menus.filter(this.menus, ['SingleSelection']);
+      menus = scout.menus.filter(this.menus, ['Table.SingleSelection']);
     } else if ($selectedRows.length > 1) {
-      menus = scout.menus.filter(this.menus, ['MultiSelection']);
+      menus = scout.menus.filter(this.menus, ['Tree.MultiSelection']);
     } else {
       menus = [];
     }

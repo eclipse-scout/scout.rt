@@ -29,8 +29,8 @@ public class JsonGroupBox extends JsonFormField<IGroupBox> {
   }
 
   @Override
-  protected void initProperties(IGroupBox model) {
-    super.initProperties(model);
+  protected void initJsonProperties(IGroupBox model) {
+    super.initJsonProperties(model);
 
     putJsonProperty(new JsonProperty<IGroupBox>(IGroupBox.PROP_BORDER_DECORATION, model) {
       @Override

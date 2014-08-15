@@ -15,8 +15,8 @@ public class JsonViewButton extends AbstractJsonPropertyObserver<IViewButton> {
   }
 
   @Override
-  protected void initProperties(IViewButton model) {
-    super.initProperties(model);
+  protected void initJsonProperties(IViewButton model) {
+    super.initJsonProperties(model);
 
     putJsonProperty(new JsonProperty<IViewButton>(IViewButton.PROP_TEXT, model) {
       @Override

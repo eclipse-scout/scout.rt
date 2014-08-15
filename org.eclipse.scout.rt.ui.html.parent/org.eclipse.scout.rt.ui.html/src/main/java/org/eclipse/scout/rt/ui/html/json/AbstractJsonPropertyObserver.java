@@ -43,13 +43,13 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
     m_jsonProperties = new HashMap<>();
 
     m_initializingProperties = true;
-    initProperties(getModel());
+    initJsonProperties(getModel());
     m_initializingProperties = false;
 
     super.init();
   }
 
-  protected void initProperties(T model) {
+  protected void initJsonProperties(T model) {
   }
 
   /**
@@ -62,6 +62,10 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
       throw new IllegalStateException("Putting properties is only allowed in initProperties.");
     }
     m_jsonProperties.put(jsonProperty.getPropertyName(), jsonProperty);
+  }
+
+  protected JsonProperty getJsonProperty(String name) {
+    return m_jsonProperties.get(name);
   }
 
   public PropertyEventFilter getPropertyEventFilter() {

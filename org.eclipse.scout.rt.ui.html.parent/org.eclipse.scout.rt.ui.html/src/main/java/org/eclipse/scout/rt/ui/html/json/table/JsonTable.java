@@ -24,7 +24,6 @@ import org.eclipse.scout.commons.DateUtility;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ContextMenuEvent;
-import org.eclipse.scout.rt.client.ui.action.menu.root.ITableContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable5;
@@ -58,7 +57,6 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
   public static final String EVENT_RELOAD = "reload";
   public static final String PROP_ROW_IDS = "rowIds";
   public static final String PROP_ROW_ID = "rowId";
-  public static final String PROP_MENUS = "menus";
   public static final String PROP_CONTROLS = "controls";
   public static final String PROP_SELECTED_ROW_IDS = "selectedRowIds";
 
@@ -75,7 +73,7 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
   }
 
   @Override
-  protected void initProperties(ITable model) {
+  protected void initJsonProperties(ITable model) {
     putJsonProperty(new JsonProperty<ITable>(ITable.PROP_TITLE, model) {
       @Override
       protected String modelValue() {
@@ -193,23 +191,31 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
 //        return null;
 //      }
 //    });
-    putJsonProperty(new JsonProperty<ITable>(ITable.PROP_CONTEXT_MENU, model) {
-      @Override
-      protected ITableContextMenu modelValue() {
-        return getModel().getContextMenu();
-      }
-
-      @Override
-      public Object prepareValueForToJson(Object value) {
-        // XXX BSH Convert to JSON (or remove property entirely)
-        return null;
-      }
-    });
   }
 
   @Override
   public String getObjectType() {
     return "Table";
+  }
+
+  @Override
+  protected void createChildAdapters() {
+    super.createChildAdapters();
+    attachAdapter(getModel().getContextMenu());
+    attachAdapters(getModel().getMenus());
+    if (getModel() instanceof ITable5) {
+      attachAdapters(((ITable5) getModel()).getControls());
+    }
+  }
+
+  @Override
+  protected void disposeChildAdapters() {
+    super.disposeChildAdapters();
+    disposeAdapter(getModel().getContextMenu());
+    disposeAdapters(getModel().getMenus());
+    if (getModel() instanceof ITable5) {
+      disposeAdapters(((ITable5) getModel()).getControls());
+    }
   }
 
   @Override
@@ -219,12 +225,6 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
       m_modelTableListener = new P_ModelTableListener();
       getModel().addUITableListener(m_modelTableListener);
     }
-    attachAdapter(getModel().getContextMenu());
-    attachAdapters(getModel().getMenus());
-    if (getModel() instanceof ITable5) {
-      attachAdapters(((ITable5) getModel()).getControls());
-    }
-    attachAdapters(getModel().getKeyStrokes()); // TODO AWE: (json) siehe JsonProperty oben
   }
 
   @Override

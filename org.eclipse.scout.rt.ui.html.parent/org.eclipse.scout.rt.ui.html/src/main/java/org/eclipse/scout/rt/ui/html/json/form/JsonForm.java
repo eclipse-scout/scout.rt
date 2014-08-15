@@ -10,20 +10,26 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form;
 
+import java.util.Collection;
+
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.ui.action.menu.root.ContextMenuEvent;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.client.ui.form.IForm5;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
+import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
+import org.eclipse.scout.rt.ui.html.json.menu.IContextMenuOwner;
 import org.json.JSONObject;
 
-public class JsonForm extends AbstractJsonPropertyObserver<IForm> {
+public class JsonForm extends AbstractJsonPropertyObserver<IForm> implements IContextMenuOwner {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonForm.class);
 
   public JsonForm(IForm model, IJsonSession jsonSession, String id) {
@@ -53,12 +59,20 @@ public class JsonForm extends AbstractJsonPropertyObserver<IForm> {
   protected void createChildAdapters() {
     super.createChildAdapters();
     attachAdapter(getModel().getRootGroupBox());
+    if (getModel() instanceof IForm5) {
+      attachAdapter(((IForm5) getModel()).getContextMenu());
+      attachAdapters(((IForm5) getModel()).getMenus());
+    }
   }
 
   @Override
   protected void disposeChildAdapters() {
     super.disposeChildAdapters();
     disposeAdapter(getModel().getRootGroupBox());
+    if (getModel() instanceof IForm5) {
+      disposeAdapter(((IForm5) getModel()).getContextMenu());
+      disposeAdapters(((IForm5) getModel()).getMenus());
+    }
   }
 
   @Override
@@ -93,6 +107,9 @@ public class JsonForm extends AbstractJsonPropertyObserver<IForm> {
     putProperty(json, PROP_DISPLAY_HINT, displayHintToJson(model.getDisplayHint()));
     putProperty(json, PROP_DISPLAY_VIEW_ID, model.getDisplayViewId());
     putProperty(json, "rootGroupBox", getAdapterIdForModel(model.getRootGroupBox()));
+    if (getModel() instanceof IForm5) {
+      putAdapterIdsProperty(json, PROP_MENUS, ((IForm5) getModel()).getMenus());
+    }
     // TODO AWE: return other props
     return json;
   }
@@ -128,6 +145,14 @@ public class JsonForm extends AbstractJsonPropertyObserver<IForm> {
     }
     dispose();
     addActionEvent("formClosed", new JSONObject());
+  }
+
+  @Override
+  public void handleModelContextMenuChanged(ContextMenuEvent event) {
+    if (getModel() instanceof IForm5) {
+      Collection<IJsonAdapter<?>> menuAdapters = attachAdapters(((IForm5) getModel()).getMenus());
+      addPropertyChangeEvent(PROP_MENUS, getAdapterIds(menuAdapters));
+    }
   }
 
   @Override

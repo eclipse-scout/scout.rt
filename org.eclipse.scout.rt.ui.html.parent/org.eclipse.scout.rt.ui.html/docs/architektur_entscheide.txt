@@ -9,6 +9,10 @@ JsonAdapter / JavaScript Model [03.06.2014 cgu, awe]
 - Wird eine (Scout-)Model Instanz abgeräumt (z.B. eine Form Instanz) muss die serverseitige JsonAdapter Implementierung dafür sorgen,
   dass alle Kinder (z.B. FormFields) aus der modelAdapterRegistry entfernt werden. Der genau gleiche Clean-up muss auf Clientseite
   erfolgen und alle ModelAdapter Instanzen bzw. DOM Objekte aus der modelAdapterRegistry gelöscht werden (ModelAdapter.destroy())
+  OFFEN: JsonAdapters erstellen child adapters nach bedarf in createChildAdatpers bzw PropertyChangeEvents. ChildAdapters werden jedoch IMMER disposed.
+  Auswirkung: Wenn ein Adapter geteilt wird (z.B. selbe Model-Menu-Instanz wird auf Table und Tree verwendet), löscht die eine Komponente die Adapter. Die andere muss dann die Adapter neu erstellen.
+  -> Das modelData wird erneut an den Client geschickt.
+  OFFEN2: Wann soll der client seitige Adapter aus der Registry entfernt werden. Entweder wird pro Server adapter ein dispose geschickt (viel Traffic, jedoch klar). Oder Adapter müssen verknüpft sein (parent child, jedoch basierend auf server adapters). Oder...?
 - PROBLEME:
   - UseCase: Modell wird initial per Property Change geschickt (z.B. TableField.setTable(X)). Noch während der Server am drehen ist, wechselt die Table von X auf Y. Table X wird nun NIE geschickt, im Server ist sie aber in der Registry vorhanden.
     Passiert in der Widgets App wenn man auf Page & Search Forms, Page with nodes und dann Page with table klickt (Exception auf Client bei Menus)

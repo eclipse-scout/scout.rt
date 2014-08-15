@@ -27,8 +27,8 @@ public class JsonTableControl<T extends ITableControl> extends AbstractJsonPrope
   }
 
   @Override
-  protected void initProperties(T model) {
-    super.initProperties(model);
+  protected void initJsonProperties(T model) {
+    super.initJsonProperties(model);
 
     putJsonProperty(new JsonProperty<ITableControl>(ITableControl.PROP_LABEL, model) {
       @Override

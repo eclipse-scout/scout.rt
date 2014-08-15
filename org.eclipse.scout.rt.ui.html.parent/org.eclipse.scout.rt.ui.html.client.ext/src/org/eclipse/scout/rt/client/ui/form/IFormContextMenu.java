@@ -8,12 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.html.json.menu;
+package org.eclipse.scout.rt.client.ui.form;
 
-import org.eclipse.scout.rt.client.ui.action.menu.root.ContextMenuEvent;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 
-public interface IContextMenuOwner {
-  public static final String PROP_MENUS = "menus";
+public interface IFormContextMenu extends IContextMenu {
 
-  void handleModelContextMenuChanged(ContextMenuEvent event);
+  @Override
+  IForm getOwner();
 }

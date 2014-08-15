@@ -38,7 +38,7 @@ TableSpecHelper.prototype.createModelCell = function(text) {
 };
 
 TableSpecHelper.prototype.createMenuModel = function(id, text, icon) {
-  return this.menuHelper.createModel(id, text, icon, ['SingleSelection']);
+  return this.menuHelper.createModel(id, text, icon, ['Table.SingleSelection']);
 };
 
 TableSpecHelper.prototype.createModelColumns = function(count) {

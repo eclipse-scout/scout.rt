@@ -30,8 +30,8 @@ public class JsonMapTableControl extends JsonTableControl<IMapTableControl> {
   }
 
   @Override
-  protected void initProperties(IMapTableControl model) {
-    super.initProperties(model);
+  protected void initJsonProperties(IMapTableControl model) {
+    super.initJsonProperties(model);
     putJsonProperty(new JsonProperty<IMapTableControl>("columnIds", model) {
 
       @Override

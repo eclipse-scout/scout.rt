@@ -33,8 +33,8 @@ public class JsonValueField<T extends IValueField<?>> extends JsonFormField<T> {
   }
 
   @Override
-  protected void initProperties(T model) {
-    super.initProperties(model);
+  protected void initJsonProperties(T model) {
+    super.initJsonProperties(model);
     putJsonProperty(new JsonProperty<T>(IValueField.PROP_DISPLAY_TEXT, model) {
       @Override
       protected String modelValue() {

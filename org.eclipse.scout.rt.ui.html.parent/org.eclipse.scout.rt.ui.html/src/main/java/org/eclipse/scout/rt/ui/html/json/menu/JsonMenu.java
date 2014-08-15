@@ -36,8 +36,8 @@ public class JsonMenu extends AbstractJsonPropertyObserver<IMenu> {
   }
 
   @Override
-  protected void initProperties(IMenu model) {
-    super.initProperties(model);
+  protected void initJsonProperties(IMenu model) {
+    super.initJsonProperties(model);
     putJsonProperty(new JsonProperty<IMenu>(IMenu.PROP_TEXT, model) {
       @Override
       protected String modelValue() {
@@ -71,14 +71,32 @@ public class JsonMenu extends AbstractJsonPropertyObserver<IMenu> {
     });
     putJsonProperty(new JsonProperty<IMenu>(PROP_MENU_TYPES, model) {
       @Override
-      protected Set<String> modelValue() {
+      protected Set<IMenuType> modelValue() {
+        return getModel().getMenuTypes();
+      }
+
+      @Override
+      public Object prepareValueForToJson(Object value) {
         Set<String> menuTypes = new HashSet<>();
         for (IMenuType type : getModel().getMenuTypes()) {
-          menuTypes.add(type.toString());
+          String prefix = type.getClass().getSimpleName().replace("MenuType", "");
+          menuTypes.add(prefix + "." + type.toString());
         }
         return menuTypes;
       }
     });
+  }
+
+  @Override
+  protected void handleModelPropertyChange(String propertyName, Object newValue) {
+    if (IMenu.PROP_MENU_TYPES.equals(propertyName)) {
+      //FIXME CGU name of IMenu.PROP_MENU_TYPES is propMenuTypes which is bad -> fix it and remove the following lines
+      JsonProperty jsonProperty = getJsonProperty(PROP_MENU_TYPES);
+      addPropertyChangeEvent(propertyName, jsonProperty.prepareValueForToJson(newValue));
+    }
+    else {
+      super.handleModelPropertyChange(propertyName, newValue);
+    }
   }
 
   @Override
