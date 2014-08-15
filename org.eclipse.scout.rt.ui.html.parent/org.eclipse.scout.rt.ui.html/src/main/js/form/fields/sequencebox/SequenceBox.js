@@ -14,6 +14,10 @@ scout.SequenceBox.prototype._render = function($parent) {
   this.$label = $('<label>').
     appendTo(this.$container);
 
+  this.$status = $('<span>')
+  .addClass('status')
+  .appendTo(this.$container);
+
   this.$sequenceBox = $('<ul>').
     addClass('field').
     addClass('sequence-box').
