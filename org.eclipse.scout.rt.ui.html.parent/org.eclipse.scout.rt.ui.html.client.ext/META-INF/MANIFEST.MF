@@ -12,4 +12,6 @@ Export-Package: org.eclipse.scout.rt.client.ui.basic.table,
  org.eclipse.scout.rt.client.ui.desktop.outline,
  org.eclipse.scout.rt.client.ui.desktop.outline.pages,
  org.eclipse.scout.rt.client.ui.form,
- org.eclipse.scout.rt.shared.ui
+ org.eclipse.scout.rt.client.ui.form.menus,
+ org.eclipse.scout.rt.shared.ui,
+ org.eclipse.scout.rt.shared.ui.menu

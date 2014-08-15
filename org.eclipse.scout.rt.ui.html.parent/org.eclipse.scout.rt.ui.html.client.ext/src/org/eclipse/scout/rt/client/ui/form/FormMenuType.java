@@ -14,6 +14,6 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 
 public enum FormMenuType implements IMenuType {
   Regular,
-  System,
+  System, //Not sure if necessary. We have a system_type on IMenu5. Maybe we should better configure the buttons in the right order and use separators
   Tool
 }
