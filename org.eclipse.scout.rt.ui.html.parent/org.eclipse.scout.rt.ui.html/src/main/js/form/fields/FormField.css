@@ -3,6 +3,14 @@
   border-spacing:15px;
 }
 
+/* form-grid of root-group-box must be 0 
+ * because group-box header underline must
+ * have no margins left and right.
+ */
+div.root-group-box > table.form-grid {
+   border-spacing:0;
+}
+
 .form-field {
   box-sizing:border-box;
   /* DEBUG border:1px dotted red;*/

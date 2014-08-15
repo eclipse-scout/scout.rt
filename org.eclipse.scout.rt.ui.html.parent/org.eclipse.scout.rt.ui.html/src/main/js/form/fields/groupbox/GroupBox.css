@@ -14,12 +14,9 @@
 
 .group-box-title {
   width:100%;
-}
-
-.group-box-title+* {
-  border-top: solid 1px #ccc;
-  padding-top: 8px;
-  margin-top: -8px;
+  border-bottom: 1px solid #ccc;
+  padding-top: -8px;
+  margin-top: 8px;
 }
 
 .group-box-title span {
@@ -29,15 +26,6 @@
   padding-left:15px;
   padding-right:8px;
 }
-
-/*
-.group-box-title div {
-  position:absolute;
-  width:100%;
-  border-top:solid #ccc 1px;
-  margin-top: 8px;
-}
-*/
 
 td {
   vertical-align:top;
