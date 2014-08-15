@@ -45,7 +45,7 @@ public class RwtScoutToolButton extends RwtScoutComposite<IAction> implements IR
 
       @Override
       public void widgetSelected(SelectionEvent e) {
-        handleUiSelection();
+        handleUiSelection(getUiField().getSelection());
       }
     });
   }
@@ -66,11 +66,12 @@ public class RwtScoutToolButton extends RwtScoutComposite<IAction> implements IR
     return (Button) super.getUiField();
   }
 
-  protected void handleUiSelection() {
+  protected void handleUiSelection(final boolean selection) {
     //notify Scout
     Runnable t = new Runnable() {
       @Override
       public void run() {
+        getScoutObject().getUIFacade().setSelectedFromUI(selection);
         getScoutObject().getUIFacade().fireActionFromUI();
       }
     };
