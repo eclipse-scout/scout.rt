@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.html.json;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -126,9 +127,18 @@ public class JsonResponse {
       // in your to toJson() method, which is conceptually wrong. You must create new adapters when the attachModel() method is
       // called or when an action-event is processed (typically in a handleXYZ() method).
       // To debug which adapter caused the error, add a syso for entry.getValue() in the following loop.
+      List<String> adapterIds = null;
       for (Entry<String, IJsonAdapter<?>> entry : m_adapterMap.entrySet()) {
         JsonObjectUtility.putProperty(adapterData, entry.getKey(), entry.getValue().toJson());
+
+        if (LOG.isDebugEnabled()) {
+          if (adapterIds == null) {
+            adapterIds = new LinkedList<String>();
+          }
+          adapterIds.add(entry.getValue().getId());
+        }
       }
+      LOG.debug("Adapter data created for these adapters: " + adapterIds);
 
       JSONArray eventArray = new JSONArray();
       for (JsonEvent event : m_eventList) {

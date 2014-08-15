@@ -310,7 +310,7 @@ scout.Session.prototype._processEvents = function(events) {
   for (var i = 0; i < events.length; i++) {
     var event = events[i];
     $.log("Processing event '" + event.type + "' for adapter with ID " + event.id);
-    var adapter = session.modelAdapterRegistry[event.id];
+    var adapter = session.getOrCreateModelAdapter(event.id, this);
     if (!adapter) {
       throw 'No adapter registered for ID ' + event.id;
     }

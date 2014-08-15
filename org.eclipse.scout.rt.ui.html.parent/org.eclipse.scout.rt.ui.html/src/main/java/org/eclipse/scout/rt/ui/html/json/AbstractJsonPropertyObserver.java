@@ -128,7 +128,7 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
     if (m_jsonProperties.containsKey(propertyName)) {
       JsonProperty jsonProperty = m_jsonProperties.get(propertyName);
       addPropertyChangeEvent(propertyName, jsonProperty.prepareValueForToJson(newValue));
-      LOG.debug("Added property change event '" + propertyName + ": " + newValue + "' for " + getObjectType() + " with id " + getId());
+      LOG.debug("Added property change event '" + propertyName + ": " + newValue + "' for " + getObjectType() + " with id " + getId() + ". Model: " + getModel());
     }
   }
 
