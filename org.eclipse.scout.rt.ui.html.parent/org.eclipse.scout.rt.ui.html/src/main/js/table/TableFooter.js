@@ -3,7 +3,7 @@ scout.TableFooter = function(table, $parent, session) {
 
   this._table = table;
 
-  this._$tableControl = $parent.appendDiv('TableControl');
+  this._$tableControl = $parent.appendDIV('table-control');
 
   this.$controlContainer = this._$tableControl.appendDiv('ControlContainer');
   this._$controlResizeTop = this._$tableControl.appendDiv('ControlResizeTop');

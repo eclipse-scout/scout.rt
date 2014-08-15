@@ -7,6 +7,6 @@ scout.TableConfigurator.prototype.configure = function() {
 };
 
 scout.TableConfigurator.prototype.render = function() {
-  this.table.$dataScroll = this.table.$data.appendDiv(this.table.id + '_dataScroll', 'scrollable-y');
+  this.table.$dataScroll = this.table.$data.appendDIV('scrollable-y');
   this.table.scrollbar = new scout.Scrollbar(this.table.$dataScroll, 'y');
 };

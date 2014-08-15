@@ -1,59 +1,45 @@
 .menu-item {
-display: inline-block;
-vertical-align: bottom;
-padding-left: 10px;
+	display: inline-block;
+	padding-right: 40px;
+	overflow: hidden;
+	cursor: pointer;
+	line-height: @size-desktop-menu;
+	color: @color-bench-text;
+
+	&:hover {
+		color: @color-bench-text-hover;
+	}
+
+	&.disable {
+		color: @color-bench-semi;
+	}
 }
 
-.menu-item {
-color: #0082A1;
-overflow: hidden;
-cursor: pointer;
-line-height: 24px;
-padding: 4px 8px 0px 14px;
-}
+/* todo */
 
 .menu-item:before{
-position: relative;
-left: -5px;
-top: -1px;
-font-family: fontAwesome;
-font-size: 24px;
-line-height: 24px;
-color:#0082A1;
-content: '\A' attr(data-icon) '\A';
-text-decoration: none;
-display: inline-block;
-vertical-align: bottom;
-}
-
-.menu-item:hover {
-color: #FE9915;
-text-decoration: underline;
-}
-
-.menu-item:hover:before {
-color: #FE9915;
-}
-
-.menu-item[disabled],
-.menu-item[disabled]:before {
-color: #9C9C9C;
-}
-
-.menu-item[disabled]:hover{
-cursor: default;
-text-decoration: none;
+	position: relative;
+	left: -5px;
+	top: -1px;
+	font-family: fontAwesome;
+	font-size: 24px;
+	line-height: 24px;
+	color:#0082A1;
+	content: '\A' attr(data-icon) '\A';
+	text-decoration: none;
+	display: inline-block;
+	vertical-align: bottom;
 }
 
 .menu-container{
-position: absolute;
-border-bottom: 2px solid #0082A1;
-border-left: 2px solid #0082A1;
-border-right: 2px solid #0082A1;
-background-color: #FFF;
-white-space: nowrap;
-padding: 2px;
-min-width: 140px;
+	position: absolute;
+	border-bottom: 2px solid #0082A1;
+	border-left: 2px solid #0082A1;
+	border-right: 2px solid #0082A1;
+	background-color: #FFF;
+	white-space: nowrap;
+	padding: 2px;
+	min-width: 140px;
 }
 
 .menu-buttons {

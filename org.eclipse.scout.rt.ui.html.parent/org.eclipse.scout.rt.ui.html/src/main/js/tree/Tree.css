@@ -5,12 +5,6 @@
 	overflow: hidden;
 }
 
-.tree > .scrollbar{
-	right: 8px;
-	margin-top: 8px;
-	margin-bottom: 8px;
-}
-
 .tree-scroll{
 	position: absolute;
 	top: 0px;

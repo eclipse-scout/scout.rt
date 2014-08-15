@@ -49,7 +49,7 @@ scout.Tree.prototype._visitNodes = function(nodes, func, parentNode) {
 scout.Tree.prototype._render = function($parent) {
   this.$parent = $parent;
   this.$container = $parent.appendDIV('tree');
-  this._$treeScroll = this.$container.appendDIV('tree-scroll');
+  this._$treeScroll = this.$container.appendDIV('scrollable-y');
   this.scrollbar = new scout.Scrollbar(this._$treeScroll, 'y');
   this._addNodes(this.nodes);
 

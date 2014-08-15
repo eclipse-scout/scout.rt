@@ -80,7 +80,6 @@ scout.DesktopToolButton.prototype._closeContainer = function () {
 
   this.desktop.selectedTool = null;
   this.$div.select(false);
-
 };
 
 

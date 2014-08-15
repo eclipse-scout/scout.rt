@@ -1,4 +1,4 @@
-// SCOUT GUI
+  // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
 scout.Table = function() {
@@ -49,8 +49,8 @@ scout.Table.prototype._createTableConfigurator = function() {
 scout.Table.prototype._render = function($parent) {
   this._$parent = $parent;
 
-  this.$container = this._$parent.appendDiv(this.id, 'table');
-  if ($parent && $parent.parent() && $parent.parent().attr('id') === 'Desktop') {
+  this.$container = this._$parent.appendDIV('table');
+  if ($parent.hasClass('desktop-bench')) {
     // desktop table (no input focus required to trigger table keystrokes)
     scout.keystrokeManager.installAdapter($parent.parent(), this._keystrokeAdapter);
   } else {
@@ -62,17 +62,16 @@ scout.Table.prototype._render = function($parent) {
 
   this.menubar = new scout.Menubar(this.$container);
 
-  this._$header = this.$container.appendDiv(this.id + '_header', 'table-header');
+  this._$header = this.$container.appendDIV('table-header');
   if (!this.headerVisible) {
     //FIXME maybe better to not create at all?
     this._$header.hide();
   }
   this._header = new scout.TableHeader(this, this._$header, this.session);
 
-  this.$data = this.$container.appendDiv(this.id + '_data', 'table-data');
+  this.$data = this.$container.appendDIV('table-data');
 
-  this._$footer = this.$container.appendDiv(this.id + '_footer');
-  this.footer = new scout.TableFooter(this, this._$footer, this.session);
+  this.footer = new scout.TableFooter(this, this.$container, this.session);
 
   if (this.configurator && this.configurator.render) {
     this.configurator.render();
@@ -345,11 +344,7 @@ scout.Table.prototype._setMenus = function(menus) {
 
 scout.Table.prototype._renderMenus = function($selectedRows) {
   var menus = this._getRowMenus($selectedRows);
-  this._selectedRowMenus = menus;
-
-  if (this.desktopMenuContributor && this.session.desktop) {
-    //this.session.desktop.onMenusUpdated('table', this._selectedRowMenus);
-  }
+  this.menubar.updateItems(this.menus);
 };
 
 scout.Table.prototype.onRowsSelected = function($selectedRows) {

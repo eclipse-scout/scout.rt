@@ -27,7 +27,7 @@ scout.TableHeader = function(table, $tableHeader, session) {
     columns[i].filter = [];
   }
 
-  $tableHeader.appendDiv('HeaderOrganize')
+  table.menubar.$container.appendDiv('HeaderOrganize')
     .on('click', '', clickOrganize);
 
   function clickHeader(event) {
@@ -69,7 +69,7 @@ scout.TableHeader = function(table, $tableHeader, session) {
     function resizeMove(event) {
       var diff = event.pageX - startX;
 
-      if (headerWidth + diff > 80) {
+      if (headerWidth + diff > 80 || diff > 0) {
         var wHeader = headerWidth + diff + 'px';
         var wCell = headerWidth + 17 + diff + 'px'; // 17 is width of header-resize handle, see table.css (.header-resize)
         var wSummary = totalWidth + diff + 'px';

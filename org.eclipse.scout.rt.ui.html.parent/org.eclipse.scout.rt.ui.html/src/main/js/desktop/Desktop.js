@@ -339,7 +339,3 @@ scout.Desktop.prototype.onModelAction = function(event) {
 scout.Desktop.prototype.onMessageBoxClosed = function(messageBox) {
   scout.arrays.remove(this.messageBoxes, messageBox);
 };
-
-scout.Desktop.prototype._onSearchPerformed = function(event) {
-  this.navigation.onSearchPerformed(event);
-};

@@ -1,20 +1,12 @@
 scout.Menubar = function($parent) {
   //create container
-  this.$container = $parent.prependDiv('', 'desktop-menu').data('this', this);
-  this.$tree = this.$container.appendDiv('', 'desktop-menu-tree');
-  this.$table = this.$container.appendDiv('', 'desktop-menu-table');
+  this.$container = $parent.prependDiv('', 'menubar');
 };
 
-scout.Menubar.prototype.updateItems = function(group, menus) {
-  var $div, i, existingMenus;
+scout.Menubar.prototype.updateItems = function(menus) {
+  var i, existingMenus;
 
-  if (group === 'tree') {
-    $div = this.$tree;
-  } else {
-    $div = this.$table;
-  }
-
-  existingMenus = $div.data('menus');
+  existingMenus = this.$container.data('menus');
   if (scout.arrays.equals(existingMenus, menus)) {
     return;
   }
@@ -24,19 +16,19 @@ scout.Menubar.prototype.updateItems = function(group, menus) {
       existingMenus[i].remove();
     }
   }
-  $div.data('menus', []);
+  this.$container.data('menus', []);
 
   if (menus && menus.length > 0) {
     for (i = 0; i < menus.length; i++) {
       if (menus[i].separator) {
         continue;
       }
-      menus[i].render($div);
-      $div.data('menus').push(menus[i]);
+      menus[i].render(this.$container);
+      this.$container.data('menus').push(menus[i]);
     }
   }
 
   //TODO cru: border is visible even if there are no tree menus
   // size menu
-  $div.widthToContent(150);
+  this.$container.widthToContent(150);
 };
