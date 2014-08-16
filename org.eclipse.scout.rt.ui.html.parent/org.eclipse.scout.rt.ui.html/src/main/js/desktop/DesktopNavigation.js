@@ -61,7 +61,7 @@ scout.DesktopNavigation.prototype._createOutlinesTab = function() {
   for (var i = 0; i < this.desktop.viewButtons.length; i++) {
     var $item = $outlinesMenu.appendDIV('outline-menu-item')
       .on('click',  function() {
-        $header.removeClass('tab-menu-open');
+        this.$header.removeClass('tab-menu-open');
       }.bind(this));
 
     this.desktop.viewButtons[i].render($item);

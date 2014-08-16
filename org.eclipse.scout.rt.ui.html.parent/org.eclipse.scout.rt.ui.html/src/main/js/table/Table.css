@@ -2,9 +2,12 @@
 	height: 100%;
 	width: 100%;
 	
+	& .scrollbar {
+		right: 3px;
+	}
+	
 	& .scrollbar-thumb {
 		background-color: rgba(0, 0, 0, 0.15);
-		right: 14px;
 	}
 
 	& .scrollbar-thumb-move, 
@@ -63,9 +66,8 @@
 
 .table-data {
 	position: relative;
-	padding: 0px 20px 0px 20px;  
+	margin: 0px 20px 0px 20px;  
 	height: calc(~"100% - " @size-desktop-menu + @size-table-header + @size-table-footer);
-	width: 100%;
 	overflow: hidden;
 }
 
