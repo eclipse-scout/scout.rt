@@ -4,11 +4,8 @@ scout.TableFooter = function(table, $parent, session) {
   this._table = table;
 
   this._$tableControl = $parent.appendDIV('table-control');
-
-  this.$controlContainer = this._$tableControl.appendDiv('ControlContainer');
-  this._$controlResizeTop = this._$tableControl.appendDiv('ControlResizeTop');
-  this._$controlResizeBottom = this._$tableControl.appendDiv('ControlResizeBottom');
-
+  this.$controlContainer = this._$tableControl.appendDIV('control-container');
+  this._addResize(this.$controlContainer);
 
   this._$controlLabel = this._$tableControl.appendDiv(undefined, 'control-label');
   this._controlGroups = {};
@@ -107,9 +104,6 @@ scout.TableFooter.prototype._resetControlLabel = function() {
   this._$controlLabel.text('');
 };
 
-/**
- * @param control object with label and action().
- */
 scout.TableFooter.prototype._addGroup = function(title) {
   var $group = $.makeDiv(undefined, 'control-group').attr('data-title', title);
   this._$controlLabel.before($group);
@@ -117,48 +111,73 @@ scout.TableFooter.prototype._addGroup = function(title) {
   return $group;
 };
 
+/* open, close and resize of the container */
+
 scout.TableFooter.prototype.openTableControl = function() {
-  // allow resizing
-  this._$tableControl.addClass('resize-on');
+  var SIZE_CONTAINER = 340;
 
   //adjust table
-  this._table.$data.animateAVCSD('height',
-    parseFloat(this._table.$container.css('height')) - 444,
-    function() {
-      $(this).css('height', 'calc(100% - 430px');
-    },
-    this._table.updateScrollbar.bind(this._table),
-    500);
+  this._resizeData(SIZE_CONTAINER);
 
-  // visual: update label, size container and control
-  this.$controlContainer.height(340);
-  this._$tableControl.animateAVCSD('height', 400, null, null, 500);
-
-  // set events for resizing
-  this._$controlResizeTop.on('mousedown', '', resizeControl);
-  this._$controlResizeBottom.on('mousedown', '', resizeControl);
+  //adjust container
+  this.$controlContainer.show().animateAVCSD('height', SIZE_CONTAINER, null, null, 500);
 
   this.open = true;
+};
 
+scout.TableFooter.prototype.closeTableControl = function(control) {
+  //adjust table and container
+  this._resizeData(0);
+
+  // adjust container
+  this.$controlContainer.animateAVCSD('height', 0, null, null, 500);
+  this.$controlContainer.promise().done(function() {
+    this.$controlContainer.hide();
+    control.onClosed();
+  }.bind(this));
+
+  // adjust control
+  this._resetControlLabel();
+
+  this.open = false;
+};
+
+scout.TableFooter.prototype._resizeData = function(sizeContainer) {
   var that = this;
 
-  function resizeControl(event) {
+  // new size of container and table data
+  var sizeMenubar = parseFloat(that._table.menubar.$container.css('height')),
+    sizeHeader = parseFloat(that._table._$header.css('height')),
+    sizeFooter = parseFloat(that._$tableControl.css('height')),
+    newOffset = sizeMenubar + sizeHeader + sizeFooter + sizeContainer;
+
+  var oldH = this._table.$data.height(),
+    newH = this._table.$data.css('height', 'calc(100% - ' + newOffset + 'px)').height();
+
+  //adjust table
+  this._table.$data.css('height', oldH)
+    .animateAVCSD('height', newH,
+      function() {
+        that._table.$data.css('height', 'calc(100% - ' + newOffset + 'px)');
+      },
+      this._table.updateScrollbar.bind(this._table),
+      500);
+};
+
+scout.TableFooter.prototype._addResize = function($parent) {
+  this._$controlResize = $parent.appendDIV('control-resize')
+    .on('mousedown', '', resize);
+  var that = this;
+
+  function resize (event){
     $('body').addClass('row-resize')
       .on('mousemove', '', resizeMove)
       .one('mouseup', '', resizeEnd);
 
-    var offset = (this.id == 'ControlResizeTop') ? 102 : 152;
-
     function resizeMove(event) {
-      var h = that._table.$container.outerHeight() - event.pageY + offset;
-      if (that._table.$container.outerHeight() < h + 50) {
-        //Don't overlap table header
-        return false;
-      }
-
-      that._$tableControl.height(h);
-      that._table.$data.height('calc(100% - ' + (h + 30) + 'px)');
-      that.$controlContainer.height(h - 60);
+      var h = that._table.$container.height() - event.pageY;
+      that._resizeData(h);
+      that.$controlContainer.height(h);
       that._table.updateScrollbar();
     }
 
@@ -173,32 +192,4 @@ scout.TableFooter.prototype.openTableControl = function() {
 
     return false;
   }
-};
-
-scout.TableFooter.prototype.closeTableControl = function(control) {
-  // reset handling resize
-  this._$controlResizeTop.off('mousedown');
-  this._$controlResizeBottom.off('mousedown');
-
-  // classes: unselect and stop resizing
-  this._$tableControl.removeClass('resize-on');
-
-  var that = this;
-  //adjust table
-  this._table.$data.animateAVCSD('height',
-    parseFloat(that._table.$container.css('height')) - 93,
-    function() {
-      $(this).css('height', 'calc(100% - 85px');
-    },
-    that._table.updateScrollbar.bind(that._table),
-    500);
-
-  // visual: reset label and close control
-  this._resetControlLabel();
-  this._$tableControl.animateAVCSD('height', 50, null, null, 500);
-
-  this._$tableControl.promise().done(function() {
-    control.onClosed();
-  });
-  this.open = false;
 };
