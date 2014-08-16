@@ -20,6 +20,10 @@ scout.Menu.prototype._render = function($parent) {
     .appendDiv('', 'menu-item')
     .on('click', '', onClicked.bind(this));
 
+  if (scout.menus.checkType(this, ['Table.Header'])) {
+    this.$container.addClass('menu-right');
+  }
+
   function onClicked() {
     if (this.$container.isEnabled()) {
       return;
@@ -45,7 +49,7 @@ scout.Menu.prototype._setText = function(text) {
 
 
 scout.Menu.prototype._setIconId = function(iconId) {
-  if (iconId) {
+  if (iconId && !this.text) {
     this.$container.attr('data-icon', iconId);
   } else {
     this.$container.removeAttr('data-icon');

@@ -154,8 +154,7 @@
 	background-color: @color-bench;
 	z-index: 10;
 	white-space: nowrap;
-	.mixin-shadow;
-	border: 1px solid @color-bench-light-border;
+	.menu-context;
 	border-top: 1px solid transparent;	
 	display: none;
 

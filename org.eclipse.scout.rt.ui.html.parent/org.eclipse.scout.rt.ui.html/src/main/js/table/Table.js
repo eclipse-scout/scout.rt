@@ -280,16 +280,16 @@ scout.Table.prototype._drawData = function(startRow) {
     var $selectedRows, x, y;
     event.preventDefault();
 
-    $selectedRows = $('.row-selected', that.$dataScroll);
-    x = Math.max(25, Math.min($selectedRows.first().outerWidth() - 164, event.pageX - that.$dataScroll.offset().left - 13)) + 16;
-    y = $selectedRows.last().offset().top - that.$dataScroll.offset().top + 32;
+    $selectedRows = that.findSelectedRows();
+    x = event.pageX - that.$dataScroll.offset().left;
+    y = event.pageY - that.$dataScroll.offset().top;
 
     if ($selectedRows.length > 0) {
       scout.menus.showContextMenuWithWait(that.session, showContextMenu);
     }
 
     function showContextMenu() {
-      scout.menus.showContextMenu(that._getRowMenus($selectedRows), that.$dataScroll, $(that), x, undefined, y);
+      scout.menus.showContextMenu(that._getRowMenus($selectedRows, false), that.$dataScroll, $(that), x, undefined, y);
     }
   }
 
@@ -322,19 +322,22 @@ scout.Table.prototype._drawData = function(startRow) {
 
 };
 
-scout.Table.prototype._getRowMenus = function($selectedRows) {
-  var menus;
-  if ($selectedRows) {
-    if ($selectedRows.length == 1) {
-      menus = scout.menus.filter(this.menus, ['Table.SingleSelection']);
-    } else if ($selectedRows.length > 1) {
-      menus = scout.menus.filter(this.menus, ['Tree.MultiSelection']);
-    } else {
-      menus = [];
-    }
+scout.Table.prototype._getRowMenus = function($selectedRows, all) {
+  var menus, check;
+
+  if (all) {
+    check = ['Table.EmptySpace', 'Table.Header'];
+  } else {
+    check = [];
   }
 
-  return menus;
+  if ($selectedRows && $selectedRows.length == 1) {
+    check.push('Table.SingleSelection')
+  } else if ($selectedRows && $selectedRows.length > 1) {
+    check.push('Table.MultiSelection')
+  }
+
+  return scout.menus.filter(this.menus, check);
 };
 
 scout.Table.prototype._setMenus = function(menus) {
@@ -343,8 +346,8 @@ scout.Table.prototype._setMenus = function(menus) {
 };
 
 scout.Table.prototype._renderMenus = function($selectedRows) {
-  var menus = this._getRowMenus($selectedRows);
-  this.menubar.updateItems(this.menus);
+  var menus = this._getRowMenus($selectedRows, true);
+  this.menubar.updateItems(menus);
 };
 
 scout.Table.prototype.onRowsSelected = function($selectedRows) {

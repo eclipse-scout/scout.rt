@@ -43,6 +43,8 @@ scout.Form.prototype._render = function($parent) {
   if (this.displayHint == 'dialog') {
     // TODO AWE: append form title section (including ! ? and progress indicator)
     this.menubar = new scout.Menubar(this.$container);
+    this.menubar.updateItems(this.menus);
+
     if (closeable) {
       var $closeButton = $('<button>').text('X');
       this.menubar.$container.append($closeButton);

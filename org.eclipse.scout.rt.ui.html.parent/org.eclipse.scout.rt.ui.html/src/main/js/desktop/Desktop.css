@@ -20,9 +20,8 @@
 	top: @size-desktop-tools;
 	width: @size-desktop-navigation;
 	z-index: 10;
-	.mixin-shadow;
+	.menu-context;
 	background-color: @color-bench;
-	border: 1px solid @color-bench-light-border;
 	border-top: 1px solid transparent;
 	display: none;
 }

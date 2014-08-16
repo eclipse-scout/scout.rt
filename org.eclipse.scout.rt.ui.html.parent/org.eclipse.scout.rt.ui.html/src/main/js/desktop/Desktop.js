@@ -66,7 +66,7 @@ scout.Desktop.prototype._render = function($parent) {
 
   for (i = 0; i < this.forms.length; i++) {
     form = this.forms[i];
-    if (form.title != "Telefon") this._addForm(form);
+    this._addForm(form);
   }
 
   for (i = 0; i < this.messageBoxes.length; i++) {
@@ -270,6 +270,8 @@ scout.Desktop.prototype._unselectTab = function(tab) {
 /* handling of forms */
 
 scout.Desktop.prototype._addForm = function(form) {
+  if (form.title == "Telefon") return;
+
   var tab = new scout.Desktop.TabAndContent(form.title, form);
   this._addTab(tab);
   form.render(this.$bench);

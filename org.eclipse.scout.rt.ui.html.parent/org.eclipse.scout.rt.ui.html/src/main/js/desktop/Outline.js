@@ -31,6 +31,7 @@ scout.Outline.prototype._showTable = function(node) {
     this._detailTable = node.table;
     if (!this._detailTable.rendered) {
       this.session.desktop.updateOutline(this._detailTable, node.text);
+      this.scrollbar.initThumb();
     }
   }
 };

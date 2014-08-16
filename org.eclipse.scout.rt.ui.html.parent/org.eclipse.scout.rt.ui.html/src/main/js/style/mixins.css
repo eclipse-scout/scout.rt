@@ -1,3 +1,0 @@
-.mixin-shadow(@color: @color-bench-semi) {
-box-shadow: 2px 6px 14px -6px @color;
-}

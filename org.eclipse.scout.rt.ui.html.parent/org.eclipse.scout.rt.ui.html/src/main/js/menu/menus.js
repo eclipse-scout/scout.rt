@@ -87,31 +87,10 @@ scout.menus = {
         $menuContainer.css('top', top);
       }
 
-      // TODO cru: if menu closed, will be removed
-      $clicked.addClass('menu-open');
-
-      if (menus[i].iconId) {
-        $menuContainer.appendDiv('', 'menu-button menu-item', menu.text)
-          .data('menu', menus[i])
-          .attr('data-icon', menu.iconId)
-          .attr('data-label', menu.text)
-          .on('click', '', onItemClicked)
-          .hover(onHoverIn, onHoverOut);
-      } else {
-        $menuContainer.appendDiv('', 'menu-item', menu.text)
-          .data('menu', menu)
-          .on('click', '', onItemClicked);
-      }
+      $menuContainer.appendDiv('', 'menu-item', menu.text)
+        .data('menu', menu)
+        .on('click', '', onItemClicked);
     }
-
-    // wrap icon menus
-    $('.menu-button', $menuContainer).wrapAll($.makeDiv('', 'menu-buttons', ''));
-    var $menuButtons = $('.menu-buttons', $menuContainer);
-    $menuButtons.appendDiv('', 'menu-buttons-label');
-    $menuContainer.append($menuButtons);
-
-    // animated opening
-    $menuContainer.css('height', 0).heightToContent(150);
 
     // every user action will close menu; menu is removed in 'click' event, see onMenuItemClicked()
     var closingEvents = 'mousedown.contextMenu keydown.contextMenu mousewheel.contextMenu';
@@ -120,33 +99,10 @@ scout.menus = {
 
     function removeMenu() {
       // Animate
-      var h = $menuContainer.outerHeight();
-      $menuContainer.animateAVCSD('height', 0,
-        function() {
-          $(this).remove();
-          $clicked.removeClass('menu-open');
-        }, null, 150);
+      $menuContainer.remove();
 
       // Remove all cleanup handlers
       $(document).off('.contextMenu');
-    }
-
-    function onHoverIn() {
-      var $container = $(this).parent().parent();
-      $container.css('height', 'auto');
-      $('.menu-buttons-label', $container)
-        .text($(this).text())
-        .heightToContent(150);
-    }
-
-    function onHoverOut() {
-      var $container = $(this).parent().parent();
-
-      $('.menu-buttons-label', $container)
-        .stop()
-        .animateAVCSD('height', 0, null, function() {
-          $(this).text('');
-        }, 150);
     }
 
     function onItemClicked() {

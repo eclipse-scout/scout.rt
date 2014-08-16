@@ -1,6 +1,16 @@
+.menubar {
+	width: 100%;
+	position: relative;
+	height: 50px;
+	white-space: nowrap;
+	overflow: hidden;
+}
+
 .menu-item {
+	position: relative;
 	display: inline-block;
-	padding-right: 40px;
+	padding-right: 20px;
+	padding-left: 20px;
 	overflow: hidden;
 	cursor: pointer;
 	line-height: @size-desktop-menu;
@@ -13,47 +23,54 @@
 	&.disable {
 		color: @color-bench-semi;
 	}
+
+	&.menu-right {
+		float: right;
+	}
+
+	&[data-icon]:before{
+		font-family: fontAwesome;
+		font-size: 24px;
+		line-height: @size-desktop-menu;
+		content: attr(data-icon);
+	}
+	
+	&.menu-separator:after {
+		position: absolute;
+		right: 0px;
+		top: 10px;
+		content: ' ';
+		height: @size-desktop-menu - 20px;
+		border-right: 1px solid @color-bench-light-border;
+	}
 }
 
-/* todo */
+/* context menu */
 
-.menu-item:before{
-	position: relative;
-	left: -5px;
-	top: -1px;
-	font-family: fontAwesome;
-	font-size: 24px;
-	line-height: 24px;
-	color:#0082A1;
-	content: '\A' attr(data-icon) '\A';
-	text-decoration: none;
-	display: inline-block;
-	vertical-align: bottom;
+.menu-context {
+	box-shadow: 2px 6px 14px -6px @color-bench-semi;
+	border: 1px solid @color-bench-light-border;
 }
 
-.menu-container{
+
+.menu-container {
+	.menu-context;
 	position: absolute;
-	border-bottom: 2px solid #0082A1;
-	border-left: 2px solid #0082A1;
-	border-right: 2px solid #0082A1;
-	background-color: #FFF;
+	background-color: @color-bench;
+	z-index: 10;
 	white-space: nowrap;
-	padding: 2px;
-	min-width: 140px;
+	border-top: 1px solid transparent;	
 }
 
-.menu-buttons {
-padding: 5px;
-}
-
-.menu-buttons .menu-item{
-width: 36px;
-color: #FFF;
-}
-
-.menu-buttons-label{
-color: #FE9915;
-padding: 0px 8px 0px 4px;
-line-height: 20px;
-height: 0px;
+.menu-container .menu-item{
+	display: block;
+	padding: 0px 15px 0px 15px;
+	line-height: @size-table-header;
+	border-bottom: 1px solid @color-bench-light-border;
+	cursor: pointer;
+	color: @color-bench-text;
+	
+	&:hover{
+		color: @color-bench-text-hover;
+	}
 }

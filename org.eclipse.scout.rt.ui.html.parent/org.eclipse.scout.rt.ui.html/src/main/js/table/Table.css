@@ -1,10 +1,10 @@
 .table {
 	height: 100%;
 	width: 100%;
-	padding: 0px 20px 0px 20px;  
 	
 	& .scrollbar-thumb {
 		background-color: rgba(0, 0, 0, 0.15);
+		right: 14px;
 	}
 
 	& .scrollbar-thumb-move, 
@@ -23,14 +23,16 @@
 	border-bottom: 1px solid @color-bench-light-border;
 	white-space: nowrap;
 	overflow: hidden;
-	padding: 0px 0px 0px 12px; /* 12px = (4px left-pad .table-data) + (2px left-pad .table-row) + 6px left-pad table cells) */
+	margin: 0px 20px 0px 20px;
 }
+
 
 .header-item {
 	position: relative;
 	display: inline-block;
 	.font-text-normal(700);
 	font-weight: bold;
+	padding: 0px 0px 0px 9px;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	line-height: @size-table-header;
@@ -61,6 +63,7 @@
 
 .table-data {
 	position: relative;
+	padding: 0px 20px 0px 20px;  
 	height: calc(~"100% - " @size-desktop-menu + @size-table-header + @size-table-footer);
 	width: 100%;
 	overflow: hidden;
@@ -80,7 +83,7 @@
 .table-row .table-cell, 
 .table-row-sum .table-cell {
 	display: table-cell;
-	padding: 0px 3px 0px 9px;
+	padding: 0px 3px 0px 7px;
 	border-bottom: 1px solid @color-bench-light-border;
 	overflow: hidden;
 	text-overflow: ellipsis;
