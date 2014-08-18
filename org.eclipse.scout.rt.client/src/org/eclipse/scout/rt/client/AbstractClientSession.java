@@ -384,41 +384,51 @@ public abstract class AbstractClientSession implements IClientSession {
       LOG.info("logout on server", t);
     }
 
+    if (getMaxShutdownWaitTime() > 0) {
+      scheduleSessionInactivation();
+    }
+    else {
+      inactivateSession();
+    }
+  }
+
+  private void scheduleSessionInactivation() {
     new Job("Delay Session Inactivation") {
       @Override
       protected IStatus run(IProgressMonitor monitor) {
-        long maxShutdownWaitTime = getMaxShutdownWaitTime();
-        if (maxShutdownWaitTime > 0) {
-          // Wait for all client jobs to complete (max. for a short time)
-          final CountDownLatch joinLock = new CountDownLatch(1);
-          new Job("Join JobManager") {
-            @Override
-            protected IStatus run(IProgressMonitor monitor2) {
-              try {
-                ClientJob.getJobManager().join(ClientJob.class, null);
-              }
-              catch (Throwable t) {
-                LOG.warn("Interrupted while joining JobManager", t);
-              }
-              joinLock.countDown(); // notify outer job
-              return Status.OK_STATUS;
+        // Wait for all client jobs to complete (max. for a short time)
+        final CountDownLatch joinLock = new CountDownLatch(1);
+        new Job("Join JobManager") {
+          @Override
+          protected IStatus run(IProgressMonitor monitor2) {
+            try {
+              ClientJob.getJobManager().join(ClientJob.class, null);
             }
-          }.schedule();
-          try {
-            joinLock.await(maxShutdownWaitTime, TimeUnit.MILLISECONDS);
+            catch (Throwable t) {
+              LOG.warn("Interrupted while joining JobManager", t);
+            }
+            joinLock.countDown(); // notify outer job
+            return Status.OK_STATUS;
           }
-          catch (InterruptedException e) {
-            LOG.warn("Interrupted while waiting for finishing ClientJobs", e);
-          }
+        }.schedule();
+        try {
+          joinLock.await(getMaxShutdownWaitTime(), TimeUnit.MILLISECONDS);
+        }
+        catch (InterruptedException e) {
+          LOG.warn("Interrupted while waiting for finishing ClientJobs", e);
         }
         // Now really stop the session
-        setActive(false);
-        if (LOG.isInfoEnabled()) {
-          LOG.info("end session event loop");
-        }
+        inactivateSession();
         return Status.OK_STATUS;
       }
     }.schedule();
+  }
+
+  protected void inactivateSession() {
+    setActive(false);
+    if (LOG.isInfoEnabled()) {
+      LOG.info("end session event loop");
+    }
   }
 
   protected boolean isStopping() {
