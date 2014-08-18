@@ -70,11 +70,6 @@
                   <classifier>eclipse-3.9</classifier>
                 </artifact>
                 <artifact>
-                  <file>eclipse-3.9I.target</file>
-                  <type>target</type>
-                  <classifier>eclipse-3.9I</classifier>
-                </artifact>
-                <artifact>
                   <file>eclipse-3.10.target</file>
                   <type>target</type>
                   <classifier>eclipse-3.10</classifier>
@@ -120,7 +115,6 @@
                     <param>eclipse-3.7.target</param>
                     <param>eclipse-3.8.target</param>
                     <param>eclipse-3.9.target</param>
-                    <param>eclipse-3.9I.target</param>
                     <param>eclipse-3.10.target</param>
                     <param>eclipse-3.10I.target</param>
                     <param>eclipse-staging.target</param>
