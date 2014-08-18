@@ -38,8 +38,8 @@ public class ButtonWrappingAction extends AbstractMobileAction {
   }
 
   @Override
-  protected void execToggleAction(boolean selected) throws ProcessingException {
-    getWrappedButton().setSelected(selected);
+  protected void execSelectionChanged(boolean selection) throws ProcessingException {
+    getWrappedButton().setSelected(selection);
   }
 
   public IButton getWrappedButton() {

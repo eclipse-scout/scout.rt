@@ -92,12 +92,12 @@ public abstract class AbstractFormToolButton<FORM extends IForm> extends Abstrac
   }
 
   @Override
-  protected void execToggleAction(boolean selected) throws ProcessingException {
+  protected void execSelectionChanged(boolean selection) throws ProcessingException {
     IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
     if (desktop == null) {
       return;
     }
-    if (selected) {
+    if (selection) {
       if (isToggleAction()) {
         // unselect other form tool buttons
         for (IToolButton b : desktop.getToolButtons()) {
