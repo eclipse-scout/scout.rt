@@ -43,15 +43,11 @@ public abstract class AbstractFormToolButton5 extends AbstractToolButton impleme
   public final void setForm(IForm form, boolean force) {
     IForm oldForm = getForm();
     if (force || form != oldForm) {
-      if (form != null) {
-        decorateForm(form);
-      }
       //single observer
       IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
       if (desktop != null) {
         if (form == null) {
           // Close the "tab", when the form is null (but remember the previous state)
-//          desktop.removeForm(oldForm);
           m_previousSelectionState = isSelected();
           setSelected(false);
           setEnabled(false);
@@ -61,12 +57,6 @@ public abstract class AbstractFormToolButton5 extends AbstractToolButton impleme
           if (!isSelected()) { // restore selection
             setSelected(m_previousSelectionState);
           }
-//          if (isSelected()) {
-//            if (oldForm != null) {
-//              desktop.removeForm(oldForm);
-//            }
-//            desktop.addForm(form);
-//          }
         }
       }
     }
@@ -90,20 +80,12 @@ public abstract class AbstractFormToolButton5 extends AbstractToolButton impleme
   }
 
   @Override
-  protected void execToggleAction(boolean selected) throws ProcessingException {
+  protected void execSelectionChanged(boolean selection) throws ProcessingException {
     IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
     if (desktop == null) {
       return;
     }
-    if (selected) {
-      if (isToggleAction()) {
-        // unselect other form tool buttons
-//        for (IToolButton b : desktop.getToolButtons()) {
-//          if (b != this && b instanceof AbstractFormToolButton && b.isSelected()) {
-//            b.setSelected(false);
-//          }
-//        }
-      }
+    if (selection) {
       // show form
       IForm oldForm = getForm();
       execStartForm();
@@ -111,23 +93,9 @@ public abstract class AbstractFormToolButton5 extends AbstractToolButton impleme
       if (oldForm == newForm) {
         if (newForm != null) {
           m_previousSelectionState = true;
-//          desktop.addForm(newForm);
         }
       }
     }
-    else {
-//      // hide form
-//      IForm form = getForm();
-//      if (form != null) {
-//        m_previousSelectionState = false;
-//        desktop.removeForm(form);
-//      }
-    }
   }
 
-  protected void decorateForm(IForm f) {
-//    f.setAutoAddRemoveOnDesktop(false);
-//    f.setDisplayHint(IForm.DISPLAY_HINT_VIEW);
-//    f.setDisplayViewId(IForm.VIEW_ID_E);
-  }
 }
