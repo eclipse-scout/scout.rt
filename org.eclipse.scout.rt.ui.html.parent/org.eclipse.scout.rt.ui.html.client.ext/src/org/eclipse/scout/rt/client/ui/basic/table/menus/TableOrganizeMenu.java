@@ -14,9 +14,9 @@ import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 
 @ClassId("b4810839-8bfd-42ba-b295-5df38241bb3c")
-public class OrganizeColumnsMenu5 extends OrganizeColumnsMenu {
+public class TableOrganizeMenu extends OrganizeColumnsMenu {
 
-  public OrganizeColumnsMenu5(ITable table) {
+  public TableOrganizeMenu(ITable table) {
     super(table);
   }
 

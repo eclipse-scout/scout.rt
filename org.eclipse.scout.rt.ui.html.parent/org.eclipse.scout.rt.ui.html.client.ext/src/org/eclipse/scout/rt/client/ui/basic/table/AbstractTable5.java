@@ -16,7 +16,7 @@ import java.util.List;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
-import org.eclipse.scout.rt.client.ui.basic.table.menus.OrganizeColumnsMenu5;
+import org.eclipse.scout.rt.client.ui.basic.table.menus.TableOrganizeMenu;
 import org.eclipse.scout.rt.extension.client.ui.basic.table.AbstractExtensibleTable;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.ui.UiLayer2;
@@ -39,7 +39,7 @@ public class AbstractTable5 extends AbstractExtensibleTable implements ITable5 {
   protected void execCreateHeaderMenus(List<IMenu> menuList) {
     //FIXME how to distinguish between html ui and others? better create service?
     if (UserAgentUtility.getCurrentUiLayer().equals(UiLayer2.HTML)) {
-      menuList.add(new OrganizeColumnsMenu5(this));
+      menuList.add(new TableOrganizeMenu(this));
     }
     else {
       super.execCreateHeaderMenus(menuList);

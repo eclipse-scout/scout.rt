@@ -583,8 +583,10 @@ scout.Table.prototype.selectRowsByIds = function(rowIds) {
 
   this.selectedRowIds = rowIds;
 
-  if (this.selectionHandler) {
-    this.selectionHandler.drawSelection();
+  if (this.rendered) {
+    if (this.selectionHandler) {
+      this.selectionHandler.drawSelection();
+    }
   }
 
   if (!this.session.processingEvents) {

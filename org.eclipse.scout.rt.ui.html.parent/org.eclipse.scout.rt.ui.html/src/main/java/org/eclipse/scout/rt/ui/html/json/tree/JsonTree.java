@@ -219,6 +219,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
 
   @Override
   public void handleModelContextMenuChanged(ContextMenuEvent event) {
+    //FIXME dispose former menus? Keep list of menu adapters? Currently switching a page always creates new menus.
     List<IJsonAdapter<?>> menuAdapters = attachAdapters(getModel().getMenus());
     addPropertyChangeEvent(PROP_MENUS, getAdapterIds(menuAdapters));
   }

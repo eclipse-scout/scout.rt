@@ -10,17 +10,23 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
+import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
-import org.eclipse.scout.rt.client.ui.action.menu.TreeMenuType;
 import org.eclipse.scout.rt.client.ui.form.FormMenuType;
+import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IForm5;
 import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.AbstractExtensiblePageWithNodes;
+import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
+import org.eclipse.scout.rt.shared.ui.menu.IMenu5;
+import org.eclipse.scout.rt.shared.ui.menu.MenuWrapper;
+import org.eclipse.scout.service.SERVICES;
 
 public class AbstractPageWithNodes5 extends AbstractExtensiblePageWithNodes {
 
@@ -54,41 +60,79 @@ public class AbstractPageWithNodes5 extends AbstractExtensiblePageWithNodes {
   @Override
   public void pageActivatedNotify() {
     super.pageActivatedNotify();
-
-    if (getDetailForm() != null) {
-      if (getDetailForm() instanceof IForm5) {
-        //FIXME CGU requires adjustment in scout rt (removal of TablePageTreeMenuWrapper)
-//        syncPageMenus((IForm5) getDetailForm());
-      }
+    try {
+      ensureDetailFormCreated();
+      ensureDetailFormStarted();
+    }
+    catch (ProcessingException e) {
+      SERVICES.getService(IExceptionHandlerService.class).handleException(e);
     }
   }
 
-  protected void syncPageMenus(IForm5 form) {
-    //Add page menus to the form which are not already there
-    for (IMenu menu : getOutline().getContextMenu().getChildActions()) {
-      if (!form.getContextMenu().getChildActions().contains(menu)) {
-        Set<IMenuType> menuTypes = menu.getMenuTypes();
-        menuTypes.add(FormMenuType.Regular);
-        ((AbstractMenu) menu).setMenuTypes(menuTypes);
-        form.getContextMenu().addChildAction(menu);
+  @Override
+  protected void execDisposePage() throws ProcessingException {
+    if (getDetailForm() != null) {
+      getDetailForm().doClose();
+      setDetailForm(null);
+    }
+  }
+
+  protected IForm execCreateDetailForm() throws ProcessingException {
+    return null;
+  }
+
+  protected void execStartDetailForm(IForm form) throws ProcessingException {
+  }
+
+  protected void ensureDetailFormCreated() throws ProcessingException {
+    if (getDetailForm() != null) {
+      return;
+    }
+    IForm form = execCreateDetailForm();
+    if (form != null) {
+      if (form instanceof IForm5) {
+        IForm5 form5 = (IForm5) form;
+        List<IMenu> menus = form5.getContextMenu().getChildActions();
+        adaptDetailFormMenus(menus);
+        if (!CollectionUtility.equalsCollection(menus, ((IForm5) form).getContextMenu().getChildActions())) {
+          form5.getContextMenu().setChildActions(menus);
+        }
       }
     }
+    setDetailForm(form);
+  }
 
-    //Get existing page menus on form
-    List<IMenu> pageMenusOnForm = new LinkedList<IMenu>();
-    for (IMenu menu : getOutline().getContextMenu().getChildActions()) {
-      for (IMenuType menuType : menu.getMenuTypes()) {
-        if (menuType instanceof TreeMenuType) {
-          pageMenusOnForm.add(menu);
+  protected void ensureDetailFormStarted() throws ProcessingException {
+    if (getDetailForm() == null || getDetailForm().isFormOpen()) {
+      return;
+    }
+    execStartDetailForm(getDetailForm());
+  }
+
+  protected void adaptDetailFormMenus(List<IMenu> menus) {
+    List<IMenu> copy = new LinkedList<IMenu>(menus);
+    //Remove system menus (ok cancel)
+    for (IMenu menu : copy) {
+      if (menu instanceof IMenu5) {
+        if (((IMenu5) menu).getSystemType() != IMenu5.SYSTEM_TYPE_NONE) {
+          menus.remove(menu);
         }
       }
     }
 
-    //Remove page menus which are not present (anymore) on the page (only necessary if the page menus may be dynamically added/removed)
-    for (IMenu menu : pageMenusOnForm) {
-      if (!getOutline().getContextMenu().getChildActions().contains(menu)) {
-        form.getContextMenu().removeChildAction(menu);
+    //Add page menus to the form
+    for (IMenu menu : getOutline().getContextMenu().getChildActions()) {
+      Set<IMenuType> types = new HashSet<IMenuType>();
+      for (IMenuType type : menu.getMenuTypes()) {
+        if (type instanceof FormMenuType) {
+          types.add(type);
+        }
       }
+      if (types.isEmpty()) {
+        types.add(FormMenuType.Regular);
+      }
+      MenuWrapper menuWrapper = new MenuWrapper(menu, types);
+      menus.add(menuWrapper);
     }
   }
 }

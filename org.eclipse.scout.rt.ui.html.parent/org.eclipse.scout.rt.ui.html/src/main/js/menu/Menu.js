@@ -1,5 +1,6 @@
 scout.Menu = function() {
   scout.Menu.parent.call(this);
+  this._addAdapterProperties('childMenus');
 };
 
 scout.inherits(scout.Menu, scout.ModelAdapter);

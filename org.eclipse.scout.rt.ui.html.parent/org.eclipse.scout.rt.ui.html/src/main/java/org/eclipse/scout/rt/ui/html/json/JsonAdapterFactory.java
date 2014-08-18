@@ -22,6 +22,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.control.IChartTableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.control.IGraphTableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.control.IMapTableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
+import org.eclipse.scout.rt.client.ui.basic.table.menus.TableOrganizeMenu;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IFormToolButton;
@@ -64,6 +65,7 @@ import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonMenu;
 import org.eclipse.scout.rt.ui.html.json.messagebox.JsonMessageBox;
 import org.eclipse.scout.rt.ui.html.json.table.JsonTable;
+import org.eclipse.scout.rt.ui.html.json.table.JsonTableOrganizeMenu;
 import org.eclipse.scout.rt.ui.html.json.table.control.JsonAnalysisTableControl;
 import org.eclipse.scout.rt.ui.html.json.table.control.JsonChartTableControl;
 import org.eclipse.scout.rt.ui.html.json.table.control.JsonGraphTableControl;
@@ -114,8 +116,14 @@ public class JsonAdapterFactory {
       return new JsonFormField((IFormField) model, session, id);
     }
     // other model objects
+    else if (model instanceof IDesktop) {
+      return new JsonDesktop((IDesktop) model, session, id);
+    }
     else if (model instanceof IContextMenu) {
       return new JsonContextMenu((IContextMenu) model, session, id);
+    }
+    else if (model instanceof TableOrganizeMenu) { //Needs to be before IMenu
+      return new JsonTableOrganizeMenu((TableOrganizeMenu) model, session, id);
     }
     else if (model instanceof IMenu) {
       return new JsonMenu((IMenu) model, session, id);
@@ -147,19 +155,16 @@ public class JsonAdapterFactory {
     else if (model instanceof ITable) {
       return new JsonTable((ITable) model, session, id);
     }
-    else if (model instanceof IDesktop) {
-      return new JsonDesktop((IDesktop) model, session, id);
-    }
-    else if (model instanceof IChartTableControl) {
+    else if (model instanceof IChartTableControl) {//Needs to be before ITableControl
       return new JsonChartTableControl((IChartTableControl) model, session, id);
     }
-    else if (model instanceof IGraphTableControl) {
+    else if (model instanceof IGraphTableControl) {//Needs to be before ITableControl
       return new JsonGraphTableControl((IGraphTableControl) model, session, id);
     }
-    else if (model instanceof IMapTableControl) {
+    else if (model instanceof IMapTableControl) {//Needs to be before ITableControl
       return new JsonMapTableControl((IMapTableControl) model, session, id);
     }
-    else if (model instanceof IAnalysisTableControl) {
+    else if (model instanceof IAnalysisTableControl) {//Needs to be before ITableControl
       return new JsonAnalysisTableControl((IAnalysisTableControl) model, session, id);
     }
     else if (model instanceof ITableControl) {
