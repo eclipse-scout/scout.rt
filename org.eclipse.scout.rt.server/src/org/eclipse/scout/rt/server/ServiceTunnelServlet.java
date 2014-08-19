@@ -97,6 +97,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
   private final boolean m_isMultiClientSessionCookieStore;
 
   private final VirtualSessionCache m_ajaxSessionCache = new VirtualSessionCache();
+  private volatile boolean m_isAjaxSessionTimeoutInitialized = false;
 
   public ServiceTunnelServlet() {
     m_debug = StringUtility.parseBoolean(Activator.getDefault().getBundle().getBundleContext().getProperty(HTTP_DEBUG_PARAM));
@@ -240,8 +241,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
   }
 
   private IServerSession lookupScoutServerSessionOnVirtualSession(HttpServletRequest req, HttpServletResponse res, String ajaxSessionId, Subject subject, UserAgent userAgent) throws ProcessingException, ServletException {
-    //update session timeout
-    m_ajaxSessionCache.setSessionTimeoutMillis(Math.max(3600L, 1000L * req.getSession().getMaxInactiveInterval()));
+    initializeAjaxSessionTimeout(req);
     IServerSession serverSession = m_ajaxSessionCache.get(ajaxSessionId);
     if (serverSession == null) {
       synchronized (m_ajaxSessionCache) {
@@ -253,6 +253,18 @@ public class ServiceTunnelServlet extends HttpServletEx {
     }
     m_ajaxSessionCache.touch(ajaxSessionId);
     return serverSession;
+  }
+
+  /**
+   * Initialize Ajax Session timeout only once from the HTTP session
+   */
+  protected void initializeAjaxSessionTimeout(HttpServletRequest req) {
+    if (!m_isAjaxSessionTimeoutInitialized) {
+      final long defaultSessionTimeout = 3600L;
+      final long millisecondsInSeconds = 1000L;
+      m_ajaxSessionCache.setSessionTimeoutMillis(Math.max(defaultSessionTimeout, millisecondsInSeconds * req.getSession().getMaxInactiveInterval()));
+      m_isAjaxSessionTimeoutInitialized = true;
+    }
   }
 
   private IServerSession createAndCacheNewServerSession(String ajaxSessionId, Subject subject, UserAgent userAgent, HttpServletRequest req, HttpServletResponse res) throws ProcessingException {
