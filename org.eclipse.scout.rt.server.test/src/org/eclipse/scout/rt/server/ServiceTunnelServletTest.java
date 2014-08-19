@@ -286,7 +286,7 @@ public class ServiceTunnelServletTest {
   }
 
   private ServiceTunnelServlet getServiceTunnelServletWithTestSession() {
-    return new ServiceTunnelServlet() {
+    return new ServiceTunnelServlet(false, false) {
       private static final long serialVersionUID = 1L;
 
       @Override

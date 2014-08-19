@@ -98,9 +98,14 @@ public class ServiceTunnelServlet extends HttpServletEx {
 
   private final VirtualSessionCache m_ajaxSessionCache = new VirtualSessionCache();
 
+  public ServiceTunnelServlet(boolean multiClientSessionCookieStore, boolean debug) {
+    m_isMultiClientSessionCookieStore = multiClientSessionCookieStore;
+    m_debug = debug;
+  }
+
   public ServiceTunnelServlet() {
-    m_debug = StringUtility.parseBoolean(Activator.getDefault().getBundle().getBundleContext().getProperty(HTTP_DEBUG_PARAM));
-    m_isMultiClientSessionCookieStore = StringUtility.parseBoolean(Activator.getDefault().getBundle().getBundleContext().getProperty(MULTI_CLIENT_SESSION_COOKIESTORE));
+    this(StringUtility.parseBoolean(Activator.getDefault().getBundle().getBundleContext().getProperty(MULTI_CLIENT_SESSION_COOKIESTORE), true),
+        StringUtility.parseBoolean(Activator.getDefault().getBundle().getBundleContext().getProperty(HTTP_DEBUG_PARAM)));
   }
 
   @Override
@@ -161,7 +166,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
    * <p>
    * If there is no min-version defined it uses the Bundle-Version of the bundle which contains the running product.
    * </p>
-   * 
+   *
    * @param config
    * @return
    */

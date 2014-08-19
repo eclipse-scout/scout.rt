@@ -68,7 +68,7 @@ public class Activator extends AbstractUIPlugin {
   }
 
   private void installCookieStore(BundleContext context) {
-    boolean isMultiClientSessionCookieStoreEnabled = StringUtility.parseBoolean(context.getProperty(MULTI_CLIENT_SESSION_COOKIESTORE));
+    boolean isMultiClientSessionCookieStoreEnabled = StringUtility.parseBoolean(context.getProperty(MULTI_CLIENT_SESSION_COOKIESTORE), true);
     if (isMultiClientSessionCookieStoreEnabled) {
       CookieHandler.setDefault(new CookieManager(new MultiClientSessionCookieStore(), CookiePolicy.ACCEPT_ALL));
     }
