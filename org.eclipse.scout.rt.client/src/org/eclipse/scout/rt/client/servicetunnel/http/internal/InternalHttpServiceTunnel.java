@@ -19,8 +19,8 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.servicetunnel.AbstractServiceTunnel;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
-import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
-import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
+import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelRequest;
+import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelResponse;
 
 /**
  * @deprecated: the new class is
@@ -56,7 +56,7 @@ public class InternalHttpServiceTunnel extends AbstractServiceTunnel {
   }
 
   @Override
-  protected ServiceTunnelResponse tunnelOnline(ServiceTunnelRequest call) {
+  protected IServiceTunnelResponse tunnelOnline(IServiceTunnelRequest call) {
     return super.tunnelOffline(call);
   }
 }

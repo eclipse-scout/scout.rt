@@ -24,6 +24,7 @@ import org.eclipse.scout.commons.UriUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.servicetunnel.http.ClientHttpServiceTunnel;
+import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 import org.eclipse.scout.service.SERVICES;
@@ -54,7 +55,7 @@ public class MockServiceTunnel extends ClientHttpServiceTunnel {
    * @return the service response
    *         You may call callTargetService() to simply call a service for test purpose (without a transaction!)
    */
-  protected ServiceTunnelResponse mockServiceCall(ServiceTunnelRequest req) throws Exception {
+  protected ServiceTunnelResponse mockServiceCall(IServiceTunnelRequest req) throws Exception {
     try {
       Class<?> serviceInterface = Class.forName(req.getServiceInterfaceClassName());
       Method serviceOperation = ServiceUtility.getServiceOperation(serviceInterface, req.getOperation(), req.getParameterTypes());
@@ -78,11 +79,11 @@ public class MockServiceTunnel extends ClientHttpServiceTunnel {
   }
 
   @Override
-  protected URLConnection createURLConnection(final ServiceTunnelRequest call, byte[] callData) throws IOException {
+  protected URLConnection createURLConnection(final IServiceTunnelRequest call, byte[] callData) throws IOException {
     URLConnection urlConn = new MockHttpURLConnection(getServerURL()) {
       @Override
       protected int mockHttpServlet(InputStream servletIn, OutputStream servletOut) throws Exception {
-        ServiceTunnelRequest req = getContentHandler().readRequest(servletIn);
+        IServiceTunnelRequest req = getContentHandler().readRequest(servletIn);
         try {
           m_runningMap.put(call.getRequestSequence(), Thread.currentThread());
           //

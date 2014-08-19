@@ -44,7 +44,7 @@ import org.eclipse.scout.rt.shared.Activator;
 import org.osgi.framework.Bundle;
 
 /**
- * Creates SOAP envelopes for {@link ServiceTunnelRequest} and {@link ServiceTunnelResponse} objects.<br>
+ * Creates SOAP envelopes for {@link IServiceTunnelRequest} and {@link IServiceTunnelResponse} objects.<br>
  * Use config.ini property org.eclipse.scout.rt.shared.servicetunnel.debug=true
  * to activate debug info
  * <p>
@@ -168,7 +168,7 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
   }
 
   @Override
-  public void writeRequest(OutputStream out, ServiceTunnelRequest msg) throws Exception {
+  public void writeRequest(OutputStream out, IServiceTunnelRequest msg) throws Exception {
     // build soap message without sax (hi-speed)
     boolean compressed = isUseCompression();
     StringBuilder buf = new StringBuilder();
@@ -223,7 +223,7 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
   }
 
   @Override
-  public void writeResponse(OutputStream out, ServiceTunnelResponse msg) throws Exception {
+  public void writeResponse(OutputStream out, IServiceTunnelResponse msg) throws Exception {
     // build soap message without sax (hi-speed)
     boolean compressed = isUseCompression();
     StringBuilder buf = new StringBuilder();
@@ -306,13 +306,13 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
   }
 
   @Override
-  public ServiceTunnelRequest readRequest(InputStream in) throws Exception {
-    return (ServiceTunnelRequest) read(in);
+  public IServiceTunnelRequest readRequest(InputStream in) throws Exception {
+    return (IServiceTunnelRequest) read(in);
   }
 
   @Override
-  public ServiceTunnelResponse readResponse(InputStream in) throws Exception {
-    return (ServiceTunnelResponse) read(in);
+  public IServiceTunnelResponse readResponse(InputStream in) throws Exception {
+    return (IServiceTunnelResponse) read(in);
   }
 
   protected Object/* msg */read(InputStream in) throws Exception {
@@ -417,9 +417,9 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
    * </pre>
    *         <p>
    *         The default calls
-   *         {@link DefaultServiceTunnelContentHandler#createDefaultWsSecurityElement(ServiceTunnelRequest)}
+   *         {@link DefaultServiceTunnelContentHandler#createDefaultWsSecurityElement(IServiceTunnelRequest)}
    */
-  protected String createWsSecurityElement(ServiceTunnelRequest req) {
+  protected String createWsSecurityElement(IServiceTunnelRequest req) {
     return DefaultServiceTunnelContentHandler.createDefaultWsSecurityElement(req);
   }
 
@@ -447,7 +447,7 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
    *         the password is the triple-des encoding of "${timestamp}:${username}" using the config.ini parameter
    *         <code>scout.ajax.token.key</code>
    */
-  public static final String createDefaultWsSecurityElement(ServiceTunnelRequest req) {
+  public static final String createDefaultWsSecurityElement(IServiceTunnelRequest req) {
     if (tripleDesKey == null) {
       return null;
     }

@@ -14,7 +14,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlTransactionMember;
 import org.eclipse.scout.rt.server.transaction.internal.ActiveTransactionRegistry;
 import org.eclipse.scout.rt.shared.services.common.processing.IServerProcessingCancelService;
-import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
+import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelRequest;
 
 /**
  * Whenever a remote service call is handled by the ServiceTunnelServlet it is dispatched to a
@@ -36,7 +36,7 @@ public interface ITransaction {
 
   /**
    * @return transaction sequence
-   *         is either 0L for non-cancellable transactions or the {@link ServiceTunnelRequest#getRequestSequence()} for
+   *         is either 0L for non-cancellable transactions or the {@link IServiceTunnelRequest#getRequestSequence()} for
    *         backend calls
    *         from the ui. This number is used when cancelling a transaction by
    *         {@link IServerProcessingCancelService#cancel(long)}

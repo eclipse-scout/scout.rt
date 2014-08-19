@@ -30,7 +30,8 @@ import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.processing.IServerProcessingCancelService;
 import org.eclipse.scout.rt.shared.servicetunnel.DefaultServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
-import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
+import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelRequest;
+import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 
 /**
@@ -74,7 +75,7 @@ public abstract class AbstractInternalHttpServiceTunnel<T extends ISession> exte
    *           override this method to customize the creation of the {@link URLConnection} see
    *           {@link #addCustomHeaders(URLConnection, String)}
    */
-  protected URLConnection createURLConnection(ServiceTunnelRequest call, byte[] callData) throws IOException {
+  protected URLConnection createURLConnection(IServiceTunnelRequest call, byte[] callData) throws IOException {
     // fast check of dummy URL's
     if (getServerURL().getProtocol().startsWith("file")) {
       throw new IOException("File connection is not supporting HTTP: " + getServerURL());
@@ -133,13 +134,13 @@ public abstract class AbstractInternalHttpServiceTunnel<T extends ISession> exte
   }
 
   @Override
-  protected ServiceTunnelResponse tunnel(final ServiceTunnelRequest req) {
+  protected IServiceTunnelResponse tunnel(final IServiceTunnelRequest req) {
     final Object backgroundLock = new Object();
     IHttpBackgroundExecutor executor = createHttpBackgroundExecutor("ServerCallProcessing", req, backgroundLock);
     JobEx httpJob = executor.getJob();
     decorateBackgroundJob(req, httpJob);
     // wait until done
-    ServiceTunnelResponse res = null;
+    IServiceTunnelResponse res = null;
     boolean cancelled = false;
     boolean sentCancelRequest = false;
     synchronized (backgroundLock) {
@@ -186,7 +187,7 @@ public abstract class AbstractInternalHttpServiceTunnel<T extends ISession> exte
    * @param call
    * @param backgroundJob
    */
-  protected void decorateBackgroundJob(ServiceTunnelRequest call, Job backgroundJob) {
+  protected void decorateBackgroundJob(IServiceTunnelRequest call, Job backgroundJob) {
   }
 
   /**
@@ -196,17 +197,15 @@ public abstract class AbstractInternalHttpServiceTunnel<T extends ISession> exte
    */
   protected boolean sendCancelRequest(long requestSequence) {
     try {
-      ServiceTunnelRequest cancelCall = new ServiceTunnelRequest(getVersion(), IServerProcessingCancelService.class, IServerProcessingCancelService.class.getMethod("cancel", long.class), new Object[]{requestSequence});
-      cancelCall.setClientSubject(getSession().getSubject());
-      cancelCall.setVirtualSessionId(getSession().getVirtualSessionId());
-      cancelCall.setUserAgent(getSession().getUserAgent().createIdentifier());
+      IServiceTunnelRequest cancelCall = createServiceTunnelRequest(getVersion(), IServerProcessingCancelService.class, IServerProcessingCancelService.class.getMethod("cancel", long.class), new Object[]{requestSequence});
+
       IHttpBackgroundExecutor executor = createHttpBackgroundExecutor("ServerCallCancelProcessing", cancelCall, new Object());
       JobEx cancelHttpJob = executor.getJob();
       cancelHttpJob.setSystem(true);
       cancelHttpJob.schedule();
       try {
         cancelHttpJob.join(10000L);
-        ServiceTunnelResponse cancelResult = executor.getResponse();
+        IServiceTunnelResponse cancelResult = executor.getResponse();
         if (cancelResult == null) {
           return false;
         }
@@ -227,7 +226,7 @@ public abstract class AbstractInternalHttpServiceTunnel<T extends ISession> exte
     }
   }
 
-  private IHttpBackgroundExecutor createHttpBackgroundExecutor(String name, ServiceTunnelRequest request, Object lock) {
+  private IHttpBackgroundExecutor createHttpBackgroundExecutor(String name, IServiceTunnelRequest request, Object lock) {
     HttpBackgroundExecutable executable = new HttpBackgroundExecutable(request, lock, this);
     JobEx job = createHttpBackgroundJob(ScoutTexts.get(name), executable);
     return new HttpBackgroundExecutor(job, executable);
@@ -242,7 +241,7 @@ public abstract class AbstractInternalHttpServiceTunnel<T extends ISession> exte
    * 
    * @since 06.07.2009
    */
-  protected void preprocessHttpRepsonse(URLConnection urlConn, ServiceTunnelRequest call, int httpCode) {
+  protected void preprocessHttpRepsonse(URLConnection urlConn, IServiceTunnelRequest call, int httpCode) {
   }
 
 }

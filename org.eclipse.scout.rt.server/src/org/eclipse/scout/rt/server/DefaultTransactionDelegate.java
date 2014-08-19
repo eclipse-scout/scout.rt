@@ -33,6 +33,8 @@ import org.eclipse.scout.rt.shared.security.RemoteServiceAccessPermission;
 import org.eclipse.scout.rt.shared.services.common.clientnotification.IClientNotification;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
+import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelRequest;
+import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
@@ -86,8 +88,8 @@ public class DefaultTransactionDelegate {
     m_debug = debug;
   }
 
-  public ServiceTunnelResponse invoke(ServiceTunnelRequest serviceReq) throws Exception {
-    ServiceTunnelResponse response;
+  public IServiceTunnelResponse invoke(IServiceTunnelRequest serviceReq) throws Exception {
+    IServiceTunnelResponse response;
     m_requestStart = System.nanoTime();
     try {
       response = invokeImpl(serviceReq);
@@ -122,7 +124,9 @@ public class DefaultTransactionDelegate {
       }
     }
     m_requestEnd = System.nanoTime();
-    response.setProcessingDuration((m_requestEnd - m_requestStart) / 1000000L);
+    if (response instanceof ServiceTunnelResponse) {
+      ((ServiceTunnelResponse) response).setProcessingDuration((m_requestEnd - m_requestStart) / 1000000L);
+    }
     return response;
   }
 
@@ -148,7 +152,7 @@ public class DefaultTransactionDelegate {
   /**
    * This method is executed within a {@link IServerSession} context using a {@link ServerJob}
    */
-  protected ServiceTunnelResponse invokeImpl(ServiceTunnelRequest serviceReq) throws Throwable {
+  protected IServiceTunnelResponse invokeImpl(IServiceTunnelRequest serviceReq) throws Throwable {
     String soapOperation = ServiceTunnelRequest.toSoapOperation(serviceReq.getServiceInterfaceClassName(), serviceReq.getOperation());
     IServerSession serverSession = ThreadContext.getServerSession();
     String authenticatedUser = serverSession.getUserId();
@@ -163,7 +167,7 @@ public class DefaultTransactionDelegate {
       }
       Version requestVersion = Version.parseVersion(v);
       if (requestVersion.compareTo(m_requestMinVersion) < 0) {
-        ServiceTunnelResponse serviceRes = new ServiceTunnelResponse(null, null, new VersionMismatchException(requestVersion.toString(), m_requestMinVersion.toString()));
+        IServiceTunnelResponse serviceRes = new ServiceTunnelResponse(null, null, new VersionMismatchException(requestVersion.toString(), m_requestMinVersion.toString()));
         return serviceRes;
       }
     }
@@ -335,7 +339,7 @@ public class DefaultTransactionDelegate {
   }
 
   /**
-   * Validate inbound data.Called by {@link #invokeImpl(ServiceTunnelRequest)}.
+   * Validate inbound data.Called by {@link #invokeImpl(IServiceTunnelRequest)}.
    * <p>
    * For default handling use
    * 
@@ -359,7 +363,7 @@ public class DefaultTransactionDelegate {
   }
 
   /**
-   * Validate outbound data. Default does nothing. Called by {@link #invokeImpl(ServiceTunnelRequest)}.
+   * Validate outbound data. Default does nothing. Called by {@link #invokeImpl(IServiceTunnelRequest)}.
    * Override this method to do central output validation inside the transaction context.
    * <p>
    * This method is part of the protected api and can be overridden.

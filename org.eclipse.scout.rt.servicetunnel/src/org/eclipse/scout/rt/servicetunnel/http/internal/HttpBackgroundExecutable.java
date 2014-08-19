@@ -23,7 +23,8 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.servicetunnel.Activator;
 import org.eclipse.scout.rt.servicetunnel.http.AbstractHttpServiceTunnel;
 import org.eclipse.scout.rt.shared.servicetunnel.HttpException;
-import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
+import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelRequest;
+import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 
 /**
@@ -36,13 +37,13 @@ public class HttpBackgroundExecutable {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(HttpBackgroundExecutable.class);
 
   private final Object m_callerLock;
-  private final ServiceTunnelRequest m_req;
-  private ServiceTunnelResponse m_res;
+  private final IServiceTunnelRequest m_req;
+  private IServiceTunnelResponse m_res;
   private final AbstractInternalHttpServiceTunnel m_tunnel;
   private URLConnection m_urlConn;
   private boolean m_debug;
 
-  public HttpBackgroundExecutable(ServiceTunnelRequest req, Object callerLock, AbstractInternalHttpServiceTunnel tunnel) {
+  public HttpBackgroundExecutable(IServiceTunnelRequest req, Object callerLock, AbstractInternalHttpServiceTunnel tunnel) {
     m_req = req;
     m_callerLock = callerLock;
     m_tunnel = tunnel;
@@ -60,7 +61,7 @@ public class HttpBackgroundExecutable {
     return false;
   }
 
-  public ServiceTunnelResponse getResponse() {
+  public IServiceTunnelResponse getResponse() {
     return m_res;
   }
 
@@ -121,7 +122,7 @@ public class HttpBackgroundExecutable {
     }
   }
 
-  private void delayForDebug(ServiceTunnelRequest call, long millis) throws InterruptedException {
+  private void delayForDebug(IServiceTunnelRequest call, long millis) throws InterruptedException {
     if (millis <= 0) {
       return;
     }

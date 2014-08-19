@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.servicetunnel.http.internal;
 
 import org.eclipse.scout.commons.job.JobEx;
-import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
+import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelResponse;
 
 /**
  * This interface is required because http background job must be executed in client or server jobs.
@@ -22,6 +22,6 @@ public interface IHttpBackgroundExecutor {
 
   JobEx getJob();
 
-  ServiceTunnelResponse getResponse();
+  IServiceTunnelResponse getResponse();
 
 }

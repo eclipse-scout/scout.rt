@@ -17,7 +17,7 @@ import java.util.Set;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.shared.services.common.clientnotification.IClientNotification;
 
-public class ServiceTunnelResponse implements java.io.Serializable {
+public class ServiceTunnelResponse implements IServiceTunnelResponse {
   private static final long serialVersionUID = 0L;
 
   private transient int m_httpCode;
@@ -47,6 +47,7 @@ public class ServiceTunnelResponse implements java.io.Serializable {
     m_exception = t;
   }
 
+  @Override
   public String getSoapOperation() {
     return m_soapOperation;
   }
@@ -55,25 +56,27 @@ public class ServiceTunnelResponse implements java.io.Serializable {
     m_soapOperation = soapOperation;
   }
 
-  /**
-   * @return 0 if code is unknown or >0 if code is known
-   */
+  @Override
   public int getHttpCode() {
     return m_httpCode;
   }
 
+  @Override
   public Object getData() {
     return m_data;
   }
 
+  @Override
   public Object[] getOutVars() {
     return m_outVars;
   }
 
+  @Override
   public Throwable getException() {
     return m_exception;
   }
 
+  @Override
   public Set<IClientNotification> getClientNotifications() {
     return CollectionUtility.hashSet(m_clientNotifications);
   }
@@ -82,6 +85,11 @@ public class ServiceTunnelResponse implements java.io.Serializable {
     m_clientNotifications = CollectionUtility.hashSet(clientNotifications);
   }
 
+  /**
+   * @return
+   * @deprecated extend the {@link ServiceTunnelResponse} and add your own attrubutes will be removed with V5.0
+   */
+  @Deprecated
   public Object getMetaData() {
     return m_metaData;
   }
@@ -90,6 +98,7 @@ public class ServiceTunnelResponse implements java.io.Serializable {
     m_metaData = o;
   }
 
+  @Override
   public Long getProcessingDuration() {
     return m_processingDuration;
   }

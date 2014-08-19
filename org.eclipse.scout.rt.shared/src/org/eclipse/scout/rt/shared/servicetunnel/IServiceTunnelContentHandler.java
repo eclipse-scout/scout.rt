@@ -30,12 +30,12 @@ public interface IServiceTunnelContentHandler {
    */
   void initialize(Bundle[] classResolveBundles, ClassLoader rawClassLoader);
 
-  void writeRequest(OutputStream out, ServiceTunnelRequest msg) throws Exception;
+  void writeRequest(OutputStream out, IServiceTunnelRequest msg) throws Exception;
 
-  ServiceTunnelRequest readRequest(InputStream in) throws Exception;
+  IServiceTunnelRequest readRequest(InputStream in) throws Exception;
 
-  void writeResponse(OutputStream out, ServiceTunnelResponse msg) throws Exception;
+  void writeResponse(OutputStream out, IServiceTunnelResponse msg) throws Exception;
 
-  ServiceTunnelResponse readResponse(InputStream in) throws Exception;
+  IServiceTunnelResponse readResponse(InputStream in) throws Exception;
 
 }
