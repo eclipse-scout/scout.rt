@@ -147,7 +147,7 @@ describe("Tree", function() {
 
   describe("onModelAction", function() {
 
-    describe("delete node event", function() {
+    describe("nodesDeleted event", function() {
       var model;
       var tree;
       var node0;
@@ -275,7 +275,7 @@ describe("Tree", function() {
 
     });
 
-    describe("delete all node event", function() {
+    describe("allNodesDeleted event", function() {
       var model;
       var tree;
       var node0;

@@ -29,6 +29,9 @@ scout.arrays = {
     }
     return true;
   },
+  pushAll: function(arr, arr2) {
+    arr.push.apply(arr, arr2);
+  },
   equalsIgnoreOrder: function(arr, arr2) {
     if (arr === arr2) {
       return true;

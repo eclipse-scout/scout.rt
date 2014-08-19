@@ -78,7 +78,7 @@ describe("Table", function() {
 
       expect(jasmine.Ajax.requests.count()).toBe(1);
 
-      var event = new scout.Event(scout.Table.EVENT_ROWS_SELECTED, table.id, {
+      var event = new scout.Event('rowsSelected', table.id, {
         "rowIds": rowIds
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
@@ -172,7 +172,7 @@ describe("Table", function() {
 
       sendQueuedAjaxCalls();
 
-      expect(mostRecentJsonRequest()).toContainEventTypesExactly([scout.Table.EVENT_ROW_CLICKED, scout.Table.EVENT_ROWS_SELECTED]);
+      expect(mostRecentJsonRequest()).toContainEventTypesExactly(['rowClicked', 'rowsSelected']);
     });
 
     it("sends only click if row already is selected", function() {
@@ -184,13 +184,13 @@ describe("Table", function() {
       clickRowAndAssertSelection(table, $row);
       sendQueuedAjaxCalls();
 
-      expect(mostRecentJsonRequest()).toContainEventTypesExactly([scout.Table.EVENT_ROW_CLICKED, scout.Table.EVENT_ROWS_SELECTED]);
+      expect(mostRecentJsonRequest()).toContainEventTypesExactly(['rowClicked', 'rowsSelected']);
 
       jasmine.Ajax.requests.reset();
       clickRowAndAssertSelection(table, $row);
       sendQueuedAjaxCalls();
 
-      expect(mostRecentJsonRequest()).toContainEventTypesExactly([scout.Table.EVENT_ROW_CLICKED]);
+      expect(mostRecentJsonRequest()).toContainEventTypesExactly(['rowClicked']);
     });
 
   });
@@ -206,7 +206,7 @@ describe("Table", function() {
 
       sendQueuedAjaxCalls();
 
-      expect(mostRecentJsonRequest()).toContainEventTypesExactly([scout.Table.EVENT_ROW_CLICKED, scout.Table.EVENT_ROWS_SELECTED, scout.Table.EVENT_ROW_ACTION]);
+      expect(mostRecentJsonRequest()).toContainEventTypesExactly(['rowClicked', 'rowsSelected', 'rowAction']);
     });
   });
 
@@ -304,9 +304,9 @@ describe("Table", function() {
       sendQueuedAjaxCalls();
 
       var requestData = mostRecentJsonRequest();
-      expect(requestData).toContainEventTypesExactly(scout.Table.EVENT_ROWS_SELECTED);
+      expect(requestData).toContainEventTypesExactly('rowsSelected');
 
-      var event = new scout.Event(scout.Table.EVENT_ROWS_SELECTED, table.id, {
+      var event = new scout.Event('rowsSelected', table.id, {
         "rowIds": ['0', '1', '2']
       });
       expect(requestData).toContainEvents(event);
@@ -340,7 +340,7 @@ describe("Table", function() {
       sendQueuedAjaxCalls();
 
       var requestData = mostRecentJsonRequest();
-      var event = new scout.Event(scout.Table.EVENT_ROWS_SELECTED, table.id, {
+      var event = new scout.Event('rowsSelected', table.id, {
         "rowIds": ['0']
       });
       expect(requestData).toContainEvents(event);
@@ -350,7 +350,7 @@ describe("Table", function() {
 
   describe("onModelAction", function() {
 
-    it("processes insertion events from model", function() {
+    it("processes insertion events", function() {
       var model = helper.createModelFixture(2);
       var table = helper.createTable(model);
       table.render(session.$entryPoint);
@@ -358,7 +358,7 @@ describe("Table", function() {
       spyOn(table, 'insertRows');
 
       var rows = helper.createModelRows(2, 5);
-      var event = new scout.Event(scout.Table.EVENT_ROWS_INSERTED, table.id, {
+      var event = new scout.Event('rowsInserted', table.id, {
         "rows": rows
       });
       table.onModelAction(event);
@@ -366,7 +366,7 @@ describe("Table", function() {
       expect(table.insertRows).toHaveBeenCalledWith(rows);
     });
 
-    it("processes selection events from model", function() {
+    it("processes selection events", function() {
       var model = helper.createModelFixture(2, 5);
       var table = helper.createTable(model);
       table.render(session.$entryPoint);
@@ -374,7 +374,7 @@ describe("Table", function() {
       spyOn(table, 'selectRowsByIds');
 
       var rowIds = ['0', '4'];
-      var event = new scout.Event(scout.Table.EVENT_ROWS_SELECTED, table.id, {
+      var event = new scout.Event('rowsSelected', table.id, {
         "rowIds": rowIds
       });
       table.onModelAction(event);
@@ -382,27 +382,145 @@ describe("Table", function() {
       expect(table.selectRowsByIds).toHaveBeenCalledWith(rowIds);
     });
 
+    describe("rowsDeleted event", function() {
+      var model, table, row0, row1, row2;
+
+      function createRowsDeletedEvent(model, rowIds) {
+        return {
+          id: model.id,
+          rowIds: rowIds,
+          type: 'rowsDeleted'
+        };
+      }
+
+      beforeEach(function() {
+        model = helper.createModelFixture(2, 3);
+        table = helper.createTable(model);
+        row0 = model.rows[0];
+        row1 = model.rows[1];
+        row2 = model.rows[2];
+      });
+
+      it("deletes single rows from model", function() {
+        expect(table.rows.length).toBe(3);
+        expect(table.rows[0]).toBe(row0);
+
+        var message = {
+          events: [createRowsDeletedEvent(model, [row0.id])]
+        };
+        session._processSuccessResponse(message);
+        sendQueuedAjaxCalls();
+
+        expect(table.rows.length).toBe(2);
+        expect(table.rows[0]).toBe(row1);
+
+        message = {
+          events: [createRowsDeletedEvent(model, [row1.id, row2.id])]
+        };
+        session._processSuccessResponse(message);
+        sendQueuedAjaxCalls();
+
+        expect(table.rows.length).toBe(0);
+      });
+
+      it("deletes single rows from model html document", function() {
+        table.render(session.$entryPoint);
+
+        expect(table.findRows().length).toBe(3);
+
+        var message = {
+          events: [createRowsDeletedEvent(model, [row0.id])]
+        };
+        session._processSuccessResponse(message);
+        sendQueuedAjaxCalls();
+
+        expect(table.findRows().length).toBe(2);
+        expect(table.findRowById(row0.id).length).toBe(0);
+        expect(table.findRowById(row1.id).length).toBe(1);
+        expect(table.findRowById(row2.id).length).toBe(1);
+
+        message = {
+          events: [createRowsDeletedEvent(model, [row1.id, row2.id])]
+        };
+        session._processSuccessResponse(message);
+        sendQueuedAjaxCalls();
+
+        expect(table.findRows().length).toBe(0);
+      });
+
+    });
+
+    describe("allRowsDeleted event", function() {
+      var model, table, row0, row1, row2;
+
+      function createAllRowsDeletedEvent(model, rowIds) {
+        return {
+          id: model.id,
+          type: 'allRowsDeleted'
+        };
+      }
+
+      beforeEach(function() {
+        model = helper.createModelFixture(2, 3);
+        table = helper.createTable(model);
+        row0 = model.rows[0];
+        row1 = model.rows[1];
+        row2 = model.rows[2];
+      });
+
+      it("deletes all rows from model", function() {
+        expect(table.rows.length).toBe(3);
+
+        var message = {
+          events: [createAllRowsDeletedEvent(model)]
+        };
+        session._processSuccessResponse(message);
+        sendQueuedAjaxCalls();
+
+        expect(table.rows.length).toBe(0);
+      });
+
+      it("deletes all rows from html document", function() {
+        table.render(session.$entryPoint);
+
+        expect(table.findRows().length).toBe(3);
+
+        var message = {
+          events: [createAllRowsDeletedEvent(model)]
+        };
+        session._processSuccessResponse(message);
+        sendQueuedAjaxCalls();
+
+        expect(table.findRows().length).toBe(0);
+      });
+
+    });
+
   });
 
   describe("onModelPropertyChange", function() {
 
-    it("hide the table header from model", function() {
-      var model = helper.createModelFixture(2);
-      var table = helper.createTable(model);
-      table.render(session.$entryPoint);
+    describe("headerVisible", function() {
 
-      expect(table._header).toBeDefined();
-      expect(table._$header.is(':visible')).toBe(true);
+      it("hides the table header", function() {
+        var model = helper.createModelFixture(2);
+        var table = helper.createTable(model);
+        table.render(session.$entryPoint);
 
-      var event = new scout.Event('property', table.id, {
-        "properties": {
-          "headerVisible": false
-        }
+        expect(table._header).toBeDefined();
+        expect(table._$header.is(':visible')).toBe(true);
+
+        var event = new scout.Event('property', table.id, {
+          "properties": {
+            "headerVisible": false
+          }
+        });
+        table.onModelPropertyChange(event);
+
+        expect(table._header).toBeDefined();
+        expect(table._$header.is(':visible')).toBe(false);
       });
-      table.onModelPropertyChange(event);
 
-      expect(table._header).toBeDefined();
-      expect(table._$header.is(':visible')).toBe(false);
     });
 
   });

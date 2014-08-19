@@ -9,12 +9,20 @@ TableSpecHelper.prototype.createModel = function(id, columns, rows) {
     id = createUniqueAdapterId();
   }
 
-  return {
+  var model =  {
     "id": id,
-    "columns": columns,
-    "rows": rows,
     "headerVisible": true
   };
+
+  //Server will never send undefined -> don't create model with undefined properties.
+  if (rows) {
+    model.rows = rows;
+  }
+  if (columns) {
+    model.columns = columns;
+  }
+
+  return model;
 };
 
 TableSpecHelper.prototype.createModelRow = function(id, cells) {
@@ -78,16 +86,14 @@ TableSpecHelper.prototype.createModelFixture = function(colCount, rowCount) {
 };
 
 TableSpecHelper.prototype.createTable = function(model) {
-  var table = new scout.Table(model, this.session);
+  var table = new scout.Table();
   table.init(model, this.session);
-  this.session.registerModelAdapter(table); //FIXME CGU remove after moving to constructor
   return table;
 };
 
 TableSpecHelper.prototype.createMobileTable = function(model) {
-  var table = new scout.MobileTable(model, this.session);
+  var table = new scout.MobileTable();
   table.init(model, this.session);
-  this.session.registerModelAdapter(table); //FIXME CGU remove after moving to constructor
   return table;
 };
 
@@ -118,7 +124,7 @@ TableSpecHelper.prototype.assertSelection = function(table, rowIds) {
 };
 
 TableSpecHelper.prototype.assertSelectionEvent = function(id, rowIds) {
-  var event = new scout.Event(scout.Table.EVENT_ROWS_SELECTED, id, {
+  var event = new scout.Event('rowsSelected', id, {
     "rowIds": rowIds
   });
   expect(mostRecentJsonRequest()).toContainEvents(event);

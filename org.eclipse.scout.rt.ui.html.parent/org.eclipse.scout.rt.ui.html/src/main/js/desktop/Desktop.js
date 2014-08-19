@@ -201,6 +201,8 @@ scout.Desktop.prototype.onModelAction = function(event) {
     this.changeOutline(this.session.getOrCreateModelAdapter(event.outline, this));
   } else if (event.type === 'searchPerformed') {
     this.navigation.onSearchPerformed(event);
+  } else if (event.type === 'messageBoxAdded') {
+    this.addMessageBox(this.session.getOrCreateModelAdapter(event.messageBox, this));
   } else {
     scout.parent.prototype.onModelAction.call(this, event);
   }

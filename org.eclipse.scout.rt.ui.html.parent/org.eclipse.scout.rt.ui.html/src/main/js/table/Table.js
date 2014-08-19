@@ -13,19 +13,13 @@ scout.Table = function() {
   this._keystrokeAdapter;
   this.controls = [];
   this.menus = [];
+  this.rows = [];
   this._addAdapterProperties(['controls', 'menus']);
   this.events = new scout.EventSupport();
   this._filterMap = {};
   this.desktopMenuContributor;
 };
 scout.inherits(scout.Table, scout.ModelAdapter);
-
-scout.Table.EVENT_ROWS_SELECTED = 'rowsSelected';
-scout.Table.EVENT_ROWS_INSERTED = 'rowsInserted';
-scout.Table.EVENT_ROW_CLICKED = 'rowClicked';
-scout.Table.EVENT_ROW_ACTION = 'rowAction';
-scout.Table.EVENT_ALL_ROWS_DELETED = 'allRowsDeleted';
-scout.Table.EVENT_RELOAD = 'reload';
 
 scout.Table.GUI_EVENT_ROWS_DRAWN = 'rowsDrawn';
 scout.Table.GUI_EVENT_ROWS_SELECTED = 'rowsSelected';
@@ -241,15 +235,14 @@ scout.Table.prototype._buildRowDiv = function(row, index) {
 scout.Table.prototype._drawData = function(startRow) {
   // this function has to be fast
   var rowString = '',
-    table = this, // FIXME AWE: können wir auch gleich mit this ersetzen weiter unten
     that = this,
     numRowsLoaded = startRow,
     $rows,
     $mouseDownRow;
 
-  if (table.rows && table.rows.length > 0) {
-    for (var r = startRow; r < Math.min(table.rows.length, startRow + 100); r++) {
-      var row = table.rows[r];
+  if (this.rows.length > 0) {
+    for (var r = startRow; r < Math.min(this.rows.length, startRow + 100); r++) {
+      var row = this.rows[r];
       rowString += this._buildRowDiv(row, r);
     }
     numRowsLoaded = r;
@@ -268,8 +261,8 @@ scout.Table.prototype._drawData = function(startRow) {
   this.updateScrollbar();
 
   // repaint and append next block
-  if (table.rows && table.rows.length > 0) {
-    if (numRowsLoaded < table.rows.length) {
+  if (this.rows.length > 0) {
+    if (numRowsLoaded < this.rows.length) {
       setTimeout(function() {
         that._drawData(startRow + 100);
       }, 0);
@@ -310,7 +303,7 @@ scout.Table.prototype._drawData = function(startRow) {
 
     var $row = $(event.delegateTarget);
     //Send click only if mouseDown and mouseUp happened on the same row
-    that.session.send(scout.Table.EVENT_ROW_CLICKED, that.id, {
+    that.session.send('rowClicked', that.id, {
       'rowId': $row.attr('id')
     });
   }
@@ -332,9 +325,9 @@ scout.Table.prototype._getRowMenus = function($selectedRows, all) {
   }
 
   if ($selectedRows && $selectedRows.length == 1) {
-    check.push('Table.SingleSelection')
+    check.push('Table.SingleSelection');
   } else if ($selectedRows && $selectedRows.length > 1) {
-    check.push('Table.MultiSelection')
+    check.push('Table.MultiSelection');
   }
 
   return scout.menus.filter(this.menus, check);
@@ -366,7 +359,7 @@ scout.Table.prototype.onRowsSelected = function($selectedRows) {
     this.selectedRowIds = rowIds;
 
     if (!this.session.processingEvents) {
-      this.session.send(scout.Table.EVENT_ROWS_SELECTED, this.id, {
+      this.session.send('rowsSelected', this.id, {
         'rowIds': rowIds
       });
     }
@@ -374,13 +367,13 @@ scout.Table.prototype.onRowsSelected = function($selectedRows) {
 };
 
 scout.Table.prototype.sendRowAction = function($row) {
-  this.session.send(scout.Table.EVENT_ROW_ACTION, this.id, {
+  this.session.send('rowAction', this.id, {
     'rowId': $row.attr('id')
   });
 };
 
 scout.Table.prototype.sendReload = function() {
-  this.session.send(scout.Table.EVENT_RELOAD, this.id);
+  this.session.send('reload', this.id);
 };
 
 scout.Table.prototype.getValue = function(col, row) {
@@ -558,13 +551,30 @@ scout.Table.prototype.colorData = function(mode, colorColumn) {
 
 scout.Table.prototype.insertRows = function(rows) {
   //always insert new rows at the end
-  if (this.rows) {
-    this.rows.push.apply(this.rows, rows);
-  } else {
-    this.rows = rows;
-  }
+  scout.arrays.pushAll(this.rows, rows);
+
   if (this.rendered) {
     this.drawData();
+  }
+};
+
+scout.Table.prototype.deleteRowsByIds = function(rowIds) {
+  var rows, $row, i, row;
+
+  //update model
+  rows = this.getModelRowsByIds(rowIds);
+  for (i=0; i < rows.length; i++){
+    row = rows[i];
+    scout.arrays.remove(this.rows, row);
+  }
+
+  //update html doc
+  if (this.rendered) {
+    for (i=0; i < rowIds.length; i++){
+      $row = this.findRowById(rowIds[i]);
+      $row.remove();
+    }
+    this.updateScrollbar();
   }
 };
 
@@ -590,7 +600,7 @@ scout.Table.prototype.selectRowsByIds = function(rowIds) {
   }
 
   if (!this.session.processingEvents) {
-    this.session.send(scout.Table.EVENT_ROWS_SELECTED, this.id, {
+    this.session.send('rowsSelected', this.id, {
       'rowIds': rowIds
     });
   }
@@ -608,6 +618,22 @@ scout.Table.prototype.findRows = function() {
     return $();
   }
   return this.$dataScroll.find('.table-row');
+};
+
+scout.Table.prototype.findRowById = function(rowId) {
+  return this.$dataScroll.find('#' + rowId);
+};
+
+scout.Table.prototype.getModelRowsByIds = function(rowIds) {
+  var i, row, rows = [];
+
+  for (i=0; i < this.rows.length; i++){
+    row = this.rows[i];
+    if (rowIds.indexOf(row.id) > -1) {
+      rows.push(this.rows[i]);
+    }
+  }
+  return rows;
 };
 
 scout.Table.prototype.filter = function() {
@@ -804,11 +830,8 @@ scout.Table.prototype._triggerRowsDrawn = function($rows, numRows) {
 };
 
 scout.Table.prototype.triggerRowsSelected = function($rows) {
-  var rowCount = 0,
+  var rowCount = this.rows.length,
     allSelected = false;
-  if (this.rows) {
-    rowCount = this.rows.length;
-  }
 
   if ($rows) {
     allSelected = $rows.length == rowCount;
@@ -845,11 +868,13 @@ scout.Table.prototype._setHeaderVisible = function(headerVisible) {
 };
 
 scout.Table.prototype.onModelAction = function(event) {
-  if (event.type == scout.Table.EVENT_ROWS_INSERTED) {
+  if (event.type == 'rowsInserted') {
     this.insertRows(event.rows);
-  } else if (event.type == scout.Table.EVENT_ALL_ROWS_DELETED) {
+  } else if (event.type == 'rowsDeleted') {
+    this.deleteRowsByIds(event.rowIds);
+  } else if (event.type == 'allRowsDeleted') {
     this.deleteAllRows();
-  } else if (event.type == scout.Table.EVENT_ROWS_SELECTED) {
+  } else if (event.type == 'rowsSelected') {
     this.selectRowsByIds(event.rowIds);
   } else {
     $.log('Model event not handled. Widget: scout.Table. Event: ' + event.type + '.');
