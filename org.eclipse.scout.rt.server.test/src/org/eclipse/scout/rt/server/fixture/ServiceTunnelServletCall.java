@@ -17,6 +17,8 @@ import org.eclipse.scout.commons.Base64Utility;
 import org.eclipse.scout.rt.server.internal.Activator;
 import org.eclipse.scout.rt.shared.servicetunnel.DefaultServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
+import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelRequest;
+import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 import org.osgi.framework.Bundle;
@@ -25,8 +27,8 @@ import org.osgi.framework.Bundle;
  * Calls the /process servlet. Requires the config.ini variable <code>server.url</code>
  */
 public class ServiceTunnelServletCall extends Thread {
-  private ServiceTunnelRequest m_req;
-  private ServiceTunnelResponse m_res;
+  private IServiceTunnelRequest m_req;
+  private IServiceTunnelResponse m_res;
   private String m_serverUrl;
 
   public ServiceTunnelServletCall(ServiceTunnelRequest req, String serverUrl) {
@@ -34,7 +36,7 @@ public class ServiceTunnelServletCall extends Thread {
     m_serverUrl = serverUrl;
   }
 
-  public ServiceTunnelResponse getServiceTunnelResponse() {
+  public IServiceTunnelResponse getServiceTunnelResponse() {
     return m_res;
   }
 

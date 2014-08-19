@@ -34,6 +34,8 @@ import org.eclipse.scout.rt.servicetunnel.http.internal.HttpBackgroundExecutable
 import org.eclipse.scout.rt.shared.OfflineState;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.offline.IOfflineDispatcherService;
+import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelRequest;
+import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 import org.eclipse.scout.service.SERVICES;
@@ -96,15 +98,15 @@ public class InternalClientHttpServiceTunnel extends AbstractInternalHttpService
   }
 
   @Override
-  protected void decorateServiceRequest(ServiceTunnelRequest call) {
+  protected void decorateServiceRequest(IServiceTunnelRequest call) {
     IClientNotificationConsumerService cns = SERVICES.getService(IClientNotificationConsumerService.class);
-    if (cns != null) {
-      call.setConsumedNotifications(cns.getConsumedNotificationIds(getSession()));
+    if (call instanceof ServiceTunnelRequest && cns != null) {
+      ((ServiceTunnelRequest) call).setConsumedNotifications(cns.getConsumedNotificationIds(getSession()));
     }
   }
 
   @Override
-  protected void onInvokeService(long t0, ServiceTunnelResponse response) {
+  protected void onInvokeService(long t0, IServiceTunnelResponse response) {
     // performance analyzer
     IPerformanceAnalyzerService perf = SERVICES.getService(IPerformanceAnalyzerService.class);
     if (perf != null) {
@@ -148,7 +150,7 @@ public class InternalClientHttpServiceTunnel extends AbstractInternalHttpService
   }
 
   @Override
-  protected ServiceTunnelResponse tunnel(ServiceTunnelRequest call) {
+  protected IServiceTunnelResponse tunnel(IServiceTunnelRequest call) {
     boolean offline = OfflineState.isOfflineInCurrentThread();
     //
     if (offline) {
@@ -159,7 +161,7 @@ public class InternalClientHttpServiceTunnel extends AbstractInternalHttpService
     }
   }
 
-  protected ServiceTunnelResponse tunnelOnline(final ServiceTunnelRequest req) {
+  protected IServiceTunnelResponse tunnelOnline(final IServiceTunnelRequest req) {
     if (ClientJob.isCurrentJobCanceled()) {
       return new ServiceTunnelResponse(null, null, new InterruptedException(ScoutTexts.get("UserInterrupted")));
     }
@@ -169,7 +171,7 @@ public class InternalClientHttpServiceTunnel extends AbstractInternalHttpService
   /**
    * Default for offline handling
    */
-  protected ServiceTunnelResponse tunnelOffline(final ServiceTunnelRequest call) {
+  protected IServiceTunnelResponse tunnelOffline(final IServiceTunnelRequest call) {
     final IProgressMonitor monitor;
     Job job = Job.getJobManager().currentJob();
     if (job instanceof ClientJob) {
@@ -180,13 +182,13 @@ public class InternalClientHttpServiceTunnel extends AbstractInternalHttpService
     }
     IClientSession clientSession = ClientSyncJob.getCurrentSession();
     if (clientSession != null && clientSession.getOfflineSubject() != null) {
-      Object response = Subject.doAs(clientSession.getOfflineSubject(), new PrivilegedAction<ServiceTunnelResponse>() {
+      Object response = Subject.doAs(clientSession.getOfflineSubject(), new PrivilegedAction<IServiceTunnelResponse>() {
         @Override
-        public ServiceTunnelResponse run() {
+        public IServiceTunnelResponse run() {
           return SERVICES.getService(IOfflineDispatcherService.class).dispatch(call, monitor);
         }
       });
-      return (ServiceTunnelResponse) response;
+      return (IServiceTunnelResponse) response;
     }
     else {
       return SERVICES.getService(IOfflineDispatcherService.class).dispatch(call, monitor);
@@ -194,7 +196,7 @@ public class InternalClientHttpServiceTunnel extends AbstractInternalHttpService
   }
 
   @Override
-  protected void decorateBackgroundJob(ServiceTunnelRequest call, Job backgroundJob) {
+  protected void decorateBackgroundJob(IServiceTunnelRequest call, Job backgroundJob) {
     backgroundJob.setUser(false);
     backgroundJob.setSystem(true);
   }

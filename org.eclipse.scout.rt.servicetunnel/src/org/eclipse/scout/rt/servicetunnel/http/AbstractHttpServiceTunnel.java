@@ -20,8 +20,8 @@ import org.eclipse.scout.rt.servicetunnel.http.internal.AbstractInternalHttpServ
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.servicetunnel.DefaultServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
-import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
-import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
+import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelRequest;
+import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelResponse;
 
 /**
  * Abstract tunnel used to invoke a service through HTTP.
@@ -62,7 +62,7 @@ public abstract class AbstractHttpServiceTunnel<T extends ISession> extends Abst
    *           {@link #addCustomHeaders(URLConnection, String)}
    */
   @Override
-  protected URLConnection createURLConnection(ServiceTunnelRequest call, byte[] callData) throws IOException {
+  protected URLConnection createURLConnection(IServiceTunnelRequest call, byte[] callData) throws IOException {
     return super.createURLConnection(call, callData);
   }
 
@@ -112,7 +112,7 @@ public abstract class AbstractHttpServiceTunnel<T extends ISession> extends Abst
   }
 
   @Override
-  protected ServiceTunnelResponse tunnel(final ServiceTunnelRequest call) {
+  protected IServiceTunnelResponse tunnel(final IServiceTunnelRequest call) {
     return super.tunnel(call);
   }
 
@@ -124,7 +124,7 @@ public abstract class AbstractHttpServiceTunnel<T extends ISession> extends Abst
    * @since 06.07.2009
    */
   @Override
-  protected void preprocessHttpRepsonse(URLConnection urlConn, ServiceTunnelRequest call, int httpCode) {
+  protected void preprocessHttpRepsonse(URLConnection urlConn, IServiceTunnelRequest call, int httpCode) {
     super.preprocessHttpRepsonse(urlConn, call, httpCode);
   }
 

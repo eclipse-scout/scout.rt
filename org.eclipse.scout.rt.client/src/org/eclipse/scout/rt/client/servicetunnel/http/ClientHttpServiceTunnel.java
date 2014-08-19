@@ -21,8 +21,8 @@ import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.servicetunnel.http.internal.InternalClientHttpServiceTunnel;
 import org.eclipse.scout.rt.shared.servicetunnel.DefaultServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
-import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
-import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
+import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelRequest;
+import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelResponse;
 
 /**
  * Client-side tunnel used to invoke a service through HTTP. This class re-defines methods of it's super class
@@ -72,7 +72,7 @@ public class ClientHttpServiceTunnel extends InternalClientHttpServiceTunnel {
    *           {@link #addCustomHeaders(URLConnection, String)}
    */
   @Override
-  protected URLConnection createURLConnection(ServiceTunnelRequest call, byte[] callData) throws IOException {
+  protected URLConnection createURLConnection(IServiceTunnelRequest call, byte[] callData) throws IOException {
     return super.createURLConnection(call, callData);
   }
 
@@ -122,17 +122,17 @@ public class ClientHttpServiceTunnel extends InternalClientHttpServiceTunnel {
   }
 
   @Override
-  protected ServiceTunnelResponse tunnel(ServiceTunnelRequest call) {
+  protected IServiceTunnelResponse tunnel(IServiceTunnelRequest call) {
     return super.tunnel(call);
   }
 
   @Override
-  protected ServiceTunnelResponse tunnelOnline(final ServiceTunnelRequest call) {
+  protected IServiceTunnelResponse tunnelOnline(final IServiceTunnelRequest call) {
     return super.tunnelOnline(call);
   }
 
   @Override
-  protected ServiceTunnelResponse tunnelOffline(ServiceTunnelRequest call) {
+  protected IServiceTunnelResponse tunnelOffline(IServiceTunnelRequest call) {
     return super.tunnelOffline(call);
   }
 
@@ -142,7 +142,7 @@ public class ClientHttpServiceTunnel extends InternalClientHttpServiceTunnel {
    * The default makes all jobs cancellable except IPingService (used for client notification polling)
    */
   @Override
-  protected void decorateBackgroundJob(ServiceTunnelRequest call, Job backgroundJob) {
+  protected void decorateBackgroundJob(IServiceTunnelRequest call, Job backgroundJob) {
     super.decorateBackgroundJob(call, backgroundJob);
   }
 
@@ -154,7 +154,7 @@ public class ClientHttpServiceTunnel extends InternalClientHttpServiceTunnel {
    * @since 06.07.2009
    */
   @Override
-  protected void preprocessHttpRepsonse(URLConnection urlConn, ServiceTunnelRequest call, int httpCode) {
+  protected void preprocessHttpRepsonse(URLConnection urlConn, IServiceTunnelRequest call, int httpCode) {
     super.preprocessHttpRepsonse(urlConn, call, httpCode);
   }
 

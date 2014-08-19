@@ -51,7 +51,8 @@ import org.eclipse.scout.rt.server.internal.Activator;
 import org.eclipse.scout.rt.server.services.common.session.IServerSessionRegistryService;
 import org.eclipse.scout.rt.shared.servicetunnel.DefaultServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
-import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
+import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelRequest;
+import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.service.SERVICES;
@@ -61,7 +62,7 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.framework.Version;
 
 /**
- * Use this servlet to dispatch scout gui service requests using {@link ServiceTunnelRequest},
+ * Use this servlet to dispatch scout gui service requests using {@link IServiceTunnelRequest},
  * {@link ServiceTunnelResponse} and any {@link IServiceTunnelContentHandler} implementation.
  * <p>
  * Override the methods
@@ -217,7 +218,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
     return m_orderedBundleList;
   }
 
-  protected IServerSession lookupServerSession(HttpServletRequest req, HttpServletResponse res, Subject subject, ServiceTunnelRequest serviceRequest) throws ProcessingException, ServletException {
+  protected IServerSession lookupServerSession(HttpServletRequest req, HttpServletResponse res, Subject subject, IServiceTunnelRequest serviceRequest) throws ProcessingException, ServletException {
     UserAgent userAgent = UserAgent.createByIdentifier(serviceRequest.getUserAgent());
     String virtualSessionId = serviceRequest.getVirtualSessionId();
     if (virtualSessionId != null && !m_isMultiClientSessionCookieStore) {
@@ -325,12 +326,12 @@ public class ServiceTunnelServlet extends HttpServletEx {
         ThreadContext.putHttpServletRequest(req);
         ThreadContext.putHttpServletResponse(res);
         //read request
-        ServiceTunnelRequest serviceRequest = deserializeInput(req.getInputStream());
+        IServiceTunnelRequest serviceRequest = deserializeInput(req.getInputStream());
         LocaleThreadLocal.set(serviceRequest.getLocale());
         //virtual or http session?
         IServerSession serverSession = lookupServerSession(req, res, subject, serviceRequest);
         //invoke
-        AtomicReference<ServiceTunnelResponse> serviceResponseHolder = new AtomicReference<ServiceTunnelResponse>();
+        AtomicReference<IServiceTunnelResponse> serviceResponseHolder = new AtomicReference<IServiceTunnelResponse>();
         ServerJob job = createServiceTunnelServerJob(serverSession, serviceRequest, serviceResponseHolder, subject);
         job.setTransactionSequence(serviceRequest.getRequestSequence());
         job.runNow(new NullProgressMonitor());
@@ -364,11 +365,11 @@ public class ServiceTunnelServlet extends HttpServletEx {
     }
   }
 
-  protected ServiceTunnelRequest deserializeInput(InputStream in) throws Exception {
+  protected IServiceTunnelRequest deserializeInput(InputStream in) throws Exception {
     return getServiceTunnelContentHandler().readRequest(in);
   }
 
-  protected void serializeOutput(HttpServletResponse httpResponse, ServiceTunnelResponse res) throws Exception {
+  protected void serializeOutput(HttpServletResponse httpResponse, IServiceTunnelResponse res) throws Exception {
     // security: do not send back error stack trace
     if (res.getException() != null) {
       res.getException().setStackTrace(new StackTraceElement[0]);
@@ -413,7 +414,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
   /**
    * Create the {@link ServerJob} that runs the request as a single atomic transaction
    */
-  protected ServerJob createServiceTunnelServerJob(IServerSession serverSession, ServiceTunnelRequest serviceRequest, AtomicReference<ServiceTunnelResponse> serviceResponseHolder, Subject subject) {
+  protected ServerJob createServiceTunnelServerJob(IServerSession serverSession, IServiceTunnelRequest serviceRequest, AtomicReference<IServiceTunnelResponse> serviceResponseHolder, Subject subject) {
     return new RemoteServiceJob(serverSession, serviceRequest, serviceResponseHolder, subject);
   }
 
@@ -422,36 +423,36 @@ public class ServiceTunnelServlet extends HttpServletEx {
    * <p>
    * This method is part of the protected api and can be overridden.
    */
-  protected ServiceTunnelResponse runServerJobTransaction(ServiceTunnelRequest req) throws Exception {
+  protected IServiceTunnelResponse runServerJobTransaction(IServiceTunnelRequest req) throws Exception {
     return runServerJobTransactionWithDelegate(req, getOrderedBundleList(), m_requestMinVersion, m_debug);
   }
 
-  protected ServiceTunnelResponse runServerJobTransactionWithDelegate(ServiceTunnelRequest req, Bundle[] loaderBundles, Version requestMinVersion, boolean debug) throws Exception {
+  protected IServiceTunnelResponse runServerJobTransactionWithDelegate(IServiceTunnelRequest req, Bundle[] loaderBundles, Version requestMinVersion, boolean debug) throws Exception {
     return new DefaultTransactionDelegate(loaderBundles, requestMinVersion, debug).invoke(req);
   }
 
   private class RemoteServiceJob extends ServerJob {
 
-    private final ServiceTunnelRequest m_serviceRequest;
-    private final AtomicReference<ServiceTunnelResponse> m_serviceResponseHolder;
+    private final IServiceTunnelRequest m_serviceRequest;
+    private final AtomicReference<IServiceTunnelResponse> m_serviceResponseHolder;
 
-    public RemoteServiceJob(IServerSession serverSession, ServiceTunnelRequest serviceRequest, AtomicReference<ServiceTunnelResponse> serviceResponseHolder, Subject subject) {
+    public RemoteServiceJob(IServerSession serverSession, IServiceTunnelRequest serviceRequest, AtomicReference<IServiceTunnelResponse> serviceResponseHolder, Subject subject) {
       super("RemoteServiceCall", serverSession, subject);
       m_serviceRequest = serviceRequest;
       m_serviceResponseHolder = serviceResponseHolder;
     }
 
-    public ServiceTunnelRequest getServiceRequest() {
+    public IServiceTunnelRequest getServiceRequest() {
       return m_serviceRequest;
     }
 
-    public AtomicReference<ServiceTunnelResponse> getServiceResponseHolder() {
+    public AtomicReference<IServiceTunnelResponse> getServiceResponseHolder() {
       return m_serviceResponseHolder;
     }
 
     @Override
     protected IStatus runTransaction(IProgressMonitor monitor) throws Exception {
-      ServiceTunnelResponse serviceRes = runServerJobTransaction(getServiceRequest());
+      IServiceTunnelResponse serviceRes = runServerJobTransaction(getServiceRequest());
       getServiceResponseHolder().set(serviceRes);
       return Status.OK_STATUS;
     }

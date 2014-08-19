@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.servicetunnel;
 
-import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.Locale;
 import java.util.Set;
@@ -23,7 +22,7 @@ import org.eclipse.scout.commons.VerboseUtility;
 import org.eclipse.scout.rt.shared.services.common.processing.IServerProcessingCancelService;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 
-public class ServiceTunnelRequest implements Serializable {
+public class ServiceTunnelRequest implements IServiceTunnelRequest {
   private static final long serialVersionUID = 0L;
   private static final AtomicLong requestSequenceGenerator = new AtomicLong();
 
@@ -75,47 +74,60 @@ public class ServiceTunnelRequest implements Serializable {
    *         The sequence can be used to find and manipulate transactions of the same session. Such a scenario is used
    *         when cancelling "old" lookup requests using {@link IServerProcessingCancelService#cancel(long)}
    */
+  @Override
   public long getRequestSequence() {
     return m_requestSequence;
   }
 
+  @Override
   public String getServiceInterfaceClassName() {
     return m_serviceInterfaceClassName;
   }
 
+  @Override
   public String getVersion() {
     return m_version;
   }
 
+  @Override
   public String getOperation() {
     return m_operation;
   }
 
+  @Override
   public Class[] getParameterTypes() {
     return m_parameterTypes;
   }
 
+  @Override
   public Object[] getArgs() {
     return m_args;
   }
 
+  @Override
   public Locale getLocale() {
     return m_locale;
   }
 
+  /**
+   * @return
+   * @deprecated extends this class to add custom information (will be removed with V5.0
+   */
+  @Deprecated
   public Object getMetaData() {
     return m_metaData;
   }
 
+  /**
+   * @return
+   * @deprecated extends this class to add custom information (will be removed with V5.0
+   */
+  @Deprecated
   public void setMetaData(Object o) {
     m_metaData = o;
   }
 
-  /**
-   * The subject under which the request is done
-   * <p>
-   * Client only method. The member is transient and will be null on the server.
-   */
+  @Override
   public Subject getClientSubject() {
     return m_clientSubject;
   }
@@ -129,9 +141,7 @@ public class ServiceTunnelRequest implements Serializable {
     m_clientSubject = requestSubject;
   }
 
-  /**
-   * The web (ajax) session under which the request is done
-   */
+  @Override
   public String getVirtualSessionId() {
     return m_virtualSessionId;
   }
@@ -143,10 +153,7 @@ public class ServiceTunnelRequest implements Serializable {
     m_virtualSessionId = virtualSessionId;
   }
 
-  /**
-   * Represents the user interface on client side.<br/>
-   * To parse an identifier use {@link UserAgent#createByIdentifier(String)}
-   */
+  @Override
   public String getUserAgent() {
     return m_userAgent;
   }
@@ -163,6 +170,7 @@ public class ServiceTunnelRequest implements Serializable {
     m_consumedNotificationIds = notificationsIds;
   }
 
+  @Override
   public Set<String> getConsumedNotifications() {
     return m_consumedNotificationIds;
   }

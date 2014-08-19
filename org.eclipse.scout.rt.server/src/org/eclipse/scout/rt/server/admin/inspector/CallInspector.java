@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -13,14 +13,14 @@ package org.eclipse.scout.rt.server.admin.inspector;
 import org.eclipse.scout.rt.server.ThreadContext;
 import org.eclipse.scout.rt.server.admin.inspector.info.CallInfo;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
-import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
-import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
+import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelRequest;
+import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelResponse;
 
 public class CallInspector {
   private SessionInspector m_parent;
   private CallInfo m_info;
 
-  protected CallInspector(SessionInspector parent, ServiceTunnelRequest call) {
+  protected CallInspector(SessionInspector parent, IServiceTunnelRequest call) {
     m_parent = parent;
     m_info = new CallInfo();
     m_info.setStartTime(System.currentTimeMillis());
@@ -48,7 +48,7 @@ public class CallInspector {
     return false;
   }
 
-  public void close(ServiceTunnelResponse res) {
+  public void close(IServiceTunnelResponse res) {
     update();
     m_info.setEndTime(System.currentTimeMillis());
     if (res != null) {

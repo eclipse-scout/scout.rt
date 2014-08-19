@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.servicetunnel.http.internal;
 
 import org.eclipse.scout.commons.job.JobEx;
-import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
+import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelResponse;
 
 /**
  * This class is a composite of a Job and an HttpBackgroundExecutable instance.
@@ -35,7 +35,7 @@ class HttpBackgroundExecutor implements IHttpBackgroundExecutor {
   }
 
   @Override
-  public ServiceTunnelResponse getResponse() {
+  public IServiceTunnelResponse getResponse() {
     return m_executable.getResponse();
   }
 

@@ -20,6 +20,8 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.shared.ISession;
+import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelRequest;
+import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.servicetunnel.VersionMismatchException;
@@ -87,13 +89,10 @@ public abstract class AbstractServiceTunnel<T extends ISession> implements IServ
         LOG.debug("" + serviceInterfaceClass + "." + operation + "(" + Arrays.asList(callerArgs) + ")");
       }
       Object[] serializableArgs = ServiceUtility.filterHolderArguments(callerArgs);
-      ServiceTunnelRequest call = new ServiceTunnelRequest(getVersion(), serviceInterfaceClass, operation, serializableArgs);
-      call.setClientSubject(m_session.getSubject());
-      call.setVirtualSessionId(m_session.getVirtualSessionId());
-      call.setUserAgent(m_session.getUserAgent().createIdentifier());
+      IServiceTunnelRequest call = createServiceTunnelRequest(getVersion(), serviceInterfaceClass, operation, serializableArgs);
       decorateServiceRequest(call);
       //
-      ServiceTunnelResponse response = tunnel(call);
+      IServiceTunnelResponse response = tunnel(call);
       // check if response is interrupted (incomplete /null=interrupted)
       if (response == null) {
         response = new ServiceTunnelResponse(null, null, new InterruptedException());
@@ -137,10 +136,19 @@ public abstract class AbstractServiceTunnel<T extends ISession> implements IServ
     }
   }
 
+  protected IServiceTunnelRequest createServiceTunnelRequest(String version, Class serviceInterfaceClass, Method operation, Object[] args) {
+    // default implementation
+    ServiceTunnelRequest call = new ServiceTunnelRequest(version, serviceInterfaceClass, operation, args);
+    call.setClientSubject(getSession().getSubject());
+    call.setVirtualSessionId(getSession().getVirtualSessionId());
+    call.setUserAgent(getSession().getUserAgent().createIdentifier());
+    return call;
+  }
+
   /**
    * Override this method to do additional things before the service is called
    */
-  protected void decorateServiceRequest(ServiceTunnelRequest call) {
+  protected void decorateServiceRequest(IServiceTunnelRequest call) {
   }
 
   /**
@@ -150,8 +158,8 @@ public abstract class AbstractServiceTunnel<T extends ISession> implements IServ
    *          System time before the request has been started (may be used for performance analyzing).
    * @param response
    */
-  protected void onInvokeService(long t0, ServiceTunnelResponse response) {
+  protected void onInvokeService(long t0, IServiceTunnelResponse response) {
   }
 
-  protected abstract ServiceTunnelResponse tunnel(final ServiceTunnelRequest call);
+  protected abstract IServiceTunnelResponse tunnel(final IServiceTunnelRequest call);
 }

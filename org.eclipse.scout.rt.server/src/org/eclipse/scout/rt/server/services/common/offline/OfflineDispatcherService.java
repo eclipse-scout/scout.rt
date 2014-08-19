@@ -34,7 +34,7 @@ import org.eclipse.scout.rt.server.services.common.session.IServerSessionRegistr
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.shared.OfflineState;
 import org.eclipse.scout.rt.shared.services.common.offline.IOfflineDispatcherService;
-import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
+import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.service.AbstractService;
@@ -93,7 +93,7 @@ public class OfflineDispatcherService extends AbstractService implements IOfflin
 
   @Override
   @SuppressWarnings("unchecked")
-  public ServiceTunnelResponse dispatch(final ServiceTunnelRequest request, final IProgressMonitor monitor) {
+  public ServiceTunnelResponse dispatch(final IServiceTunnelRequest request, final IProgressMonitor monitor) {
     final Subject subject = Subject.getSubject(AccessController.getContext());
     if (m_serverSessionClass == null) {
       String className = Platform.getProduct().getDefiningBundle().getSymbolicName();
@@ -164,7 +164,7 @@ public class OfflineDispatcherService extends AbstractService implements IOfflin
     }
   }
 
-  private ServiceTunnelResponse dispatchInServerThread(final ServiceTunnelRequest request, final Subject subject) {
+  private ServiceTunnelResponse dispatchInServerThread(final IServiceTunnelRequest request, final Subject subject) {
     Map<Class, Object> backup = ThreadContext.backup();
     try {
       if (m_serverSession == null || subject == null || !subject.equals(m_subject)) {
@@ -196,7 +196,7 @@ public class OfflineDispatcherService extends AbstractService implements IOfflin
     }
   }
 
-  private ServiceTunnelResponse callService(ServiceTunnelRequest serviceReq) throws Exception {
+  private ServiceTunnelResponse callService(IServiceTunnelRequest serviceReq) throws Exception {
     try {
       IServerSession serverSession = ThreadContext.getServerSession();
       Class<?> serviceInterfaceClass = serverSession.getBundle().loadClass(serviceReq.getServiceInterfaceClassName());

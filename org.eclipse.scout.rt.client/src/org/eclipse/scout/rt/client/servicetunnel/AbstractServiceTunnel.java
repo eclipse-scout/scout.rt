@@ -11,8 +11,8 @@
 package org.eclipse.scout.rt.client.servicetunnel;
 
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
-import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
+import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelRequest;
+import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelResponse;
 
 /**
  * @deprecated: use {@link org.eclipse.scout.rt.client.servicetunnel.http.ClientHttpServiceTunnel} instead
@@ -34,10 +34,10 @@ public abstract class AbstractServiceTunnel extends org.eclipse.scout.rt.client.
   }
 
   @Override
-  protected abstract ServiceTunnelResponse tunnelOnline(ServiceTunnelRequest call);
+  protected abstract IServiceTunnelResponse tunnelOnline(IServiceTunnelRequest call);
 
   @Override
-  protected ServiceTunnelResponse tunnel(ServiceTunnelRequest call) {
+  protected IServiceTunnelResponse tunnel(IServiceTunnelRequest call) {
     return tunnelOnline(call);
   }
 }

@@ -18,7 +18,7 @@ import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.admin.inspector.info.SessionInfo;
-import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
+import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelRequest;
 
 public class SessionInspector {
   private ProcessInspector m_parent;
@@ -64,7 +64,7 @@ public class SessionInspector {
     }
   }
 
-  public CallInspector requestCallInspector(ServiceTunnelRequest call) {
+  public CallInspector requestCallInspector(IServiceTunnelRequest call) {
     synchronized (m_callListLock) {
       if (getProcessInspector().isEnabled()) {
         if (getProcessInspector().acceptCall(call.getServiceInterfaceClassName(), call.getOperation())) {
