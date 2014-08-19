@@ -46,11 +46,6 @@ public class AbstractJsonSessionTest {
 
     jsonSession.valueUnbound(mockEvent);
     dummyCleanupHandler.valueUnbound(mockEvent);
-    synchronized (jsonSession.getClientSession().getStateLock()) {
-      if (clientSession.isActive()) {
-        jsonSession.getClientSession().getStateLock().wait(5000);
-      }
-    }
     assertFalse(clientSession.isActive());
 
     jsonSession = null;
