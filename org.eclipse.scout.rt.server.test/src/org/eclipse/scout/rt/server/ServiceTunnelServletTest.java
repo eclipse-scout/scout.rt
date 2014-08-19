@@ -286,14 +286,7 @@ public class ServiceTunnelServletTest {
   }
 
   private ServiceTunnelServlet getServiceTunnelServletWithTestSession() {
-    return new ServiceTunnelServlet(false, false) {
-      private static final long serialVersionUID = 1L;
-
-      @Override
-      protected Class<? extends IServerSession> locateServerSessionClass(HttpServletRequest req, HttpServletResponse res) {
-        return TestServerSession.class;
-      }
-    };
+    return new TestServiceTunnelServlet(false, false);
   }
 
   private void scheduleAndJoinJobs(List<? extends JobEx> jobs) throws InterruptedException {
@@ -374,5 +367,39 @@ public class ServiceTunnelServletTest {
         return new Status(IStatus.ERROR, Activator.PLUGIN_ID, 0, "Error executing lookup http session", e);
       }
     }
+  }
+
+  private static class TestServiceTunnelServlet extends ServiceTunnelServlet {
+    private static final long serialVersionUID = 1L;
+
+    public TestServiceTunnelServlet(boolean multiClientSessionCookieStore, boolean debug) {
+      super(multiClientSessionCookieStore, debug);
+    }
+
+    /**
+     *
+     */
+    @Override
+    public void initializeAjaxSessionTimeout(HttpServletRequest req) {
+      super.initializeAjaxSessionTimeout(req);
+    }
+
+    @Override
+    protected Class<? extends IServerSession> locateServerSessionClass(HttpServletRequest req, HttpServletResponse res) {
+      return TestServerSession.class;
+    }
+  }
+
+  /**
+   * Tests that getSession is only called once when initializeAjaxSessionTimeout is called.
+   */
+  @Test
+  public void testInitializeAjaxSessionTimeout() {
+    final TestServiceTunnelServlet s = new TestServiceTunnelServlet(false, false);
+    final HttpServletRequest mock = mock(HttpServletRequest.class);
+    when(mock.getSession()).thenReturn(mock(HttpSession.class));
+    s.initializeAjaxSessionTimeout(mock);
+    s.initializeAjaxSessionTimeout(mock);
+    verify(mock, times(1)).getSession();
   }
 }
