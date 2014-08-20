@@ -58,7 +58,7 @@ import org.eclipse.swt.widgets.Widget;
 
 /**
  * <h3>SwtScoutTableCellEditor</h3> ...
- *
+ * 
  * @author imo
  * @since 1.0.8 30.06.2010
  */
@@ -498,6 +498,14 @@ public class SwtScoutTableCellEditor {
         }
       });
       m_tableComposite.getEnvironment().addKeyStroke(m_container, new SwtKeyStroke(SWT.CR) {
+        @Override
+        public void handleSwtAction(Event e) {
+          e.doit = false;
+          fireApplyEditorValue();
+          deactivate();
+        }
+      });
+      m_tableComposite.getEnvironment().addKeyStroke(m_container, new SwtKeyStroke(SWT.KEYPAD_CR) {
         @Override
         public void handleSwtAction(Event e) {
           e.doit = false;
