@@ -53,7 +53,6 @@ import org.eclipse.scout.rt.shared.servicetunnel.DefaultServiceTunnelContentHand
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelResponse;
-import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.service.SERVICES;
 import org.osgi.framework.Bundle;
@@ -63,7 +62,7 @@ import org.osgi.framework.Version;
 
 /**
  * Use this servlet to dispatch scout gui service requests using {@link IServiceTunnelRequest},
- * {@link ServiceTunnelResponse} and any {@link IServiceTunnelContentHandler} implementation.
+ * {@link IServiceTunnelResponse} and any {@link IServiceTunnelContentHandler} implementation.
  * <p>
  * Override the methods
  * {@link DefaultTransactionDelegate#validateInput(org.eclipse.scout.rt.shared.validate.IValidationStrategy, Object, java.lang.reflect.Method, Object[])
@@ -90,8 +89,8 @@ public class ServiceTunnelServlet extends HttpServletEx {
 
   private transient IServiceTunnelContentHandler m_contentHandler;
   private transient Bundle[] m_orderedBundleList;
-  private Object m_orderedBundleListLock = new Boolean(true);
-  private Object m_msgEncoderLock = new Boolean(true);
+  private final Object m_orderedBundleListLock = new Object();
+  private final Object m_msgEncoderLock = new Object();
   private Class<? extends IServerSession> m_serverSessionClass;
   private Version m_requestMinVersion;
   private final boolean m_debug;
@@ -195,7 +194,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
    */
   protected IServiceTunnelContentHandler createContentHandler(Class<? extends IServerSession> sessionClass) {
     DefaultServiceTunnelContentHandler e = new DefaultServiceTunnelContentHandler();
-    e.initialize(getOrderedBundleList(), sessionClass.getClassLoader());
+    e.initialize();
     return e;
   }
 
@@ -208,6 +207,11 @@ public class ServiceTunnelServlet extends HttpServletEx {
     return m_contentHandler;
   }
 
+  /**
+   * @deprecated use {@link SerializationUtility} instead. Will be removed in the N release.
+   * @return
+   */
+  @Deprecated
   protected Bundle[] getOrderedBundleList() {
     synchronized (m_orderedBundleListLock) {
       if (m_orderedBundleList == null) {
@@ -393,7 +397,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
         if (xpServlet != null) {
           for (IExtension xServlet : xpServlet.getExtensions()) {
             for (IConfigurationElement cServlet : xServlet.getConfigurationElements()) {
-              if (cServlet.getName().equals("servlet")) {
+              if ("servlet".equals(cServlet.getName())) {
                 if (this.getClass().getName().equals(cServlet.getAttribute("class"))) {
                   // half match, go on looping
                   bundle = Platform.getBundle(xServlet.getContributor().getName());
@@ -424,11 +428,19 @@ public class ServiceTunnelServlet extends HttpServletEx {
    * This method is part of the protected api and can be overridden.
    */
   protected IServiceTunnelResponse runServerJobTransaction(IServiceTunnelRequest req) throws Exception {
-    return runServerJobTransactionWithDelegate(req, getOrderedBundleList(), m_requestMinVersion, m_debug);
+    return runServerJobTransactionWithDelegate(req, m_requestMinVersion, m_debug);
   }
 
+  /**
+   * @deprecated use {@link #runServerJobTransactionWithDelegate(IServiceTunnelRequest, Version, boolean)} instead
+   */
+  @Deprecated
   protected IServiceTunnelResponse runServerJobTransactionWithDelegate(IServiceTunnelRequest req, Bundle[] loaderBundles, Version requestMinVersion, boolean debug) throws Exception {
-    return new DefaultTransactionDelegate(loaderBundles, requestMinVersion, debug).invoke(req);
+    return runServerJobTransactionWithDelegate(req, requestMinVersion, debug);
+  }
+
+  protected IServiceTunnelResponse runServerJobTransactionWithDelegate(IServiceTunnelRequest req, Version requestMinVersion, boolean debug) throws Exception {
+    return new DefaultTransactionDelegate(requestMinVersion, debug).invoke(req);
   }
 
   private class RemoteServiceJob extends ServerJob {

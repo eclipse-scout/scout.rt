@@ -14,14 +14,12 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 import org.eclipse.scout.commons.Base64Utility;
-import org.eclipse.scout.rt.server.internal.Activator;
 import org.eclipse.scout.rt.shared.servicetunnel.DefaultServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
-import org.osgi.framework.Bundle;
 
 /**
  * Calls the /process servlet. Requires the config.ini variable <code>server.url</code>
@@ -45,8 +43,7 @@ public class ServiceTunnelServletCall extends Thread {
     try {
       URL url = new URL(m_serverUrl + "/process");
       IServiceTunnelContentHandler contentHandler = new DefaultServiceTunnelContentHandler();
-      Bundle bundle = Activator.getDefault().getBundle();
-      contentHandler.initialize(new Bundle[]{bundle}, null);
+      contentHandler.initialize();
       //
       HttpURLConnection conn = (HttpURLConnection) url.openConnection();
       conn.setRequestProperty("Authorization", "Basic " + Base64Utility.encode("admin:manager".getBytes()));

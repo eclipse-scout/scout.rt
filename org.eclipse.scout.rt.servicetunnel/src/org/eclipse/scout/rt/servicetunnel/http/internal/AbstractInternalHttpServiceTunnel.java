@@ -22,8 +22,6 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.commons.osgi.BundleInspector;
-import org.eclipse.scout.commons.serialization.SerializationUtility;
 import org.eclipse.scout.rt.servicetunnel.AbstractServiceTunnel;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ScoutTexts;
@@ -36,7 +34,7 @@ import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 
 /**
  * Abstract non-public implementation of a tunnel used to invoke a service through HTTP.
- * 
+ *
  * @author awe (refactoring)
  */
 public abstract class AbstractInternalHttpServiceTunnel<T extends ISession> extends AbstractServiceTunnel<T> {
@@ -127,8 +125,7 @@ public abstract class AbstractInternalHttpServiceTunnel<T extends ISession> exte
   public Object invokeService(Class serviceInterfaceClass, Method operation, Object[] callerArgs) throws ProcessingException {
     if (m_contentHandler == null) {
       m_contentHandler = new DefaultServiceTunnelContentHandler();
-      String[] bundleOrderPrefixes = SerializationUtility.getBundleOrderPrefixes();
-      m_contentHandler.initialize(BundleInspector.getOrderedBundleList(bundleOrderPrefixes), getSession().getClass().getClassLoader());
+      m_contentHandler.initialize();
     }
     return super.invokeService(serviceInterfaceClass, operation, callerArgs);
   }
@@ -183,7 +180,7 @@ public abstract class AbstractInternalHttpServiceTunnel<T extends ISession> exte
   /**
    * Override this method to decide when background jobs to the backend should be presented to the user or not (for
    * cancelling). The default implementation does nothing.
-   * 
+   *
    * @param call
    * @param backgroundJob
    */
@@ -192,7 +189,7 @@ public abstract class AbstractInternalHttpServiceTunnel<T extends ISession> exte
 
   /**
    * Signals the server to cancel processing jobs for the current session.
-   * 
+   *
    * @return true if cancel was successful and transaction was in fact cancelled, false otherwise
    */
   protected boolean sendCancelRequest(long requestSequence) {
@@ -238,7 +235,7 @@ public abstract class AbstractInternalHttpServiceTunnel<T extends ISession> exte
    * This method is called just after the http response is received but before
    * the http response is processed by scout. This might be used to read and
    * interpret custom http headers.
-   * 
+   *
    * @since 06.07.2009
    */
   protected void preprocessHttpRepsonse(URLConnection urlConn, IServiceTunnelRequest call, int httpCode) {

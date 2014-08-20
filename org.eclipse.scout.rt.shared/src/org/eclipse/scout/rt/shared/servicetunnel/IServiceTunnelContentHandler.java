@@ -27,8 +27,12 @@ public interface IServiceTunnelContentHandler {
   /**
    * @param classresolveBundles
    *          is often created using {@link BundleInspector#getOrderedBundleList(String...)}
+   * @deprecated use {@link #initialize()} instead. Will be removed in the N release.
    */
+  @Deprecated
   void initialize(Bundle[] classResolveBundles, ClassLoader rawClassLoader);
+
+  void initialize();
 
   void writeRequest(OutputStream out, IServiceTunnelRequest msg) throws Exception;
 

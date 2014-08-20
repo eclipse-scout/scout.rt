@@ -109,8 +109,8 @@ public class ServiceTunnelResponse implements IServiceTunnelResponse {
 
   @Override
   public String toString() {
-    StringBuffer buf = new StringBuffer();
-    buf.append("Response[data=" + m_data + ", vars=" + Arrays.asList(m_outVars) + ", exception=" + m_exception + "]");
+    StringBuilder buf = new StringBuilder();
+    buf.append("Response[data=" + m_data + ", vars=" + ((m_outVars == null) ? "" : Arrays.asList(m_outVars)) + ", exception=" + m_exception + "]");
     return buf.toString();
   }
 

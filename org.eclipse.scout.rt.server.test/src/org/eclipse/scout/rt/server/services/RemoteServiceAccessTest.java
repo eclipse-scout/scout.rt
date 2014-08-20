@@ -26,7 +26,6 @@ import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.eclipse.scout.service.AbstractService;
 import org.eclipse.scout.service.IService;
 import org.junit.Test;
-import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
 
 public class RemoteServiceAccessTest {
@@ -86,7 +85,7 @@ public class RemoteServiceAccessTest {
     private final Permissions m_permissionCollection;
 
     public DefaultTransactionDelegateMock() {
-      super(new Bundle[0], Version.emptyVersion, false);
+      super(Version.emptyVersion, false);
       m_permissionCollection = new Permissions();
       m_permissionCollection.add(new RemoteServiceAccessPermission("*.shared.*", "*"));
       m_permissionCollection.add(new RemoteServiceAccessPermission("*.IMockProcessService", "*"));

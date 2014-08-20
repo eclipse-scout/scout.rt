@@ -24,7 +24,6 @@ import org.eclipse.scout.commons.serialization.SerializationUtility;
 import org.eclipse.scout.rt.server.admin.inspector.CallInspector;
 import org.eclipse.scout.rt.server.admin.inspector.ProcessInspector;
 import org.eclipse.scout.rt.server.admin.inspector.SessionInspector;
-import org.eclipse.scout.rt.server.internal.Activator;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;
 import org.eclipse.scout.rt.server.transaction.AbstractTransactionMember;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
@@ -61,7 +60,7 @@ import org.osgi.framework.Version;
  * {@link #defaultValidateOutput(IValidationStrategy, Object, Method, Object, Object[])}
  * <p>
  * Set the config.ini properties to activate default validation:
- * 
+ *
  * <pre>
  *   org.eclipse.scout.rt.server.validateInput=true
  *   org.eclipse.scout.rt.server.validateOutput=false
@@ -70,22 +69,27 @@ import org.osgi.framework.Version;
 @SuppressWarnings("deprecation")
 public class DefaultTransactionDelegate {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(DefaultTransactionDelegate.class);
-  private static final Boolean VALIDATE_INPUT = "true".equals(Activator.getDefault().getBundle().getBundleContext().getProperty("org.eclipse.scout.rt.server.validateInput"));
-  private static final Boolean VALIDATE_OUTPUT = "true".equals(Activator.getDefault().getBundle().getBundleContext().getProperty("org.eclipse.scout.rt.server.validateOutput"));
 
   public static final Pattern DEFAULT_QUERY_NAMES_PATTERN = Pattern.compile("(get|is|has|load|read|find|select)([A-Z].*)?");
   public static final Pattern DEFAULT_PROCESS_NAMES_PATTERN = Pattern.compile("(set|put|add|remove|store|write|create|insert|update|delete)([A-Z].*)?");
 
   private final Version m_requestMinVersion;
   private final boolean m_debug;
-  private final Bundle[] m_loaderBundles;
   private long m_requestStart;
   private long m_requestEnd;
 
+  /**
+   * @deprecated use {@link #DefaultTransactionDelegate(Version, boolean)} instead. Will be removed in the 6.0 Release.
+   */
+  @Deprecated
   public DefaultTransactionDelegate(Bundle[] loaderBundles, Version requestMinVersion, boolean debug) {
-    m_loaderBundles = loaderBundles;
+    this(requestMinVersion, debug);
+  }
+
+  public DefaultTransactionDelegate(Version requestMinVersion, boolean debug) {
     m_requestMinVersion = requestMinVersion;
     m_debug = debug;
+
   }
 
   public IServiceTunnelResponse invoke(IServiceTunnelRequest serviceReq) throws Exception {
@@ -342,7 +346,7 @@ public class DefaultTransactionDelegate {
    * Validate inbound data.Called by {@link #invokeImpl(IServiceTunnelRequest)}.
    * <p>
    * For default handling use
-   * 
+   *
    * <pre>
    * new {@link DefaultValidator#DefaultValidator(IValidationStrategy)}.validate()
    * </pre>
@@ -350,7 +354,7 @@ public class DefaultTransactionDelegate {
    * Override this method to do central input validation inside the transaction context.
    * <p>
    * This method is part of the protected api and can be overridden.
-   * 
+   *
    * @param validationStrategy
    *          may be null, add corresponding null handling.
    */
@@ -427,7 +431,7 @@ public class DefaultTransactionDelegate {
 
   /**
    * Pass 2 decides the strategy by java bean, collections framework and business process naming
-   * 
+   *
    * <pre>
    * <i>Java bean naming</i>
    * {@link IValidationStrategy.QUERY}: get*, is*

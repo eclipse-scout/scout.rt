@@ -51,7 +51,7 @@ import org.osgi.framework.Bundle;
  * This fast hi-speed encoder/decoder ignores xml structure and reads content of first &lt;data&gt; tag directly.
  * <p>
  * Example request:
- * 
+ *
  * <pre>
  * @code
  * <?xml version="1.0" encoding="UTF-8"?>
@@ -64,9 +64,9 @@ import org.osgi.framework.Bundle;
  * </soapenv:Envelope>
  * }
  * </pre>
- * 
+ *
  * Example response (success):
- * 
+ *
  * <pre>
  * @code
  * <?xml version="1.0" encoding="UTF-8"?>
@@ -79,9 +79,9 @@ import org.osgi.framework.Bundle;
  * </soapenv:Envelope>
  * }
  * </pre>
- * 
+ *
  * Example response (error):
- * 
+ *
  * <pre>
  * @code
  * <?xml version="1.0" encoding="UTF-8"?>
@@ -96,7 +96,7 @@ import org.osgi.framework.Bundle;
  * </soapenv:Envelope>
  * }
  * </pre>
- * 
+ *
  * In order to enable/disable content compression, use the system property or config.ini property:
  * <code>org.eclipse.scout.serviceTunnel.compress=true</code>
  * <p>
@@ -147,8 +147,19 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
     m_listeners = new EventListenerList();
   }
 
+  /**
+   * @deprecated
+   * @deprecated use {@link #initialize()} instead. Will be removed in the 6.0 release.
+   */
+  @SuppressWarnings("deprecation")
+  @Deprecated
   @Override
   public void initialize(Bundle[] classResolveBundles, ClassLoader rawClassLoader) {
+    initialize();
+  }
+
+  @Override
+  public void initialize() {
     try {
       m_originAddress = InetAddress.getLocalHost().getHostAddress();
     }
@@ -406,7 +417,7 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
    * @return the wsse:Security tag. The subject may be null and may contain no principals
    *         <p>
    *         Example WS-Security element for user/pass
-   * 
+   *
    *         <pre>
    * <wsse:Security soapenv:mustUnderstand="1">
    *   <wsse:UsernameToken>
