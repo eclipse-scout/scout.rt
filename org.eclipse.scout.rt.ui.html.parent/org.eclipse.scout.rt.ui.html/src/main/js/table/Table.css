@@ -7,13 +7,13 @@
 	}
 	
 	& .scrollbar-thumb {
-		background-color: rgba(0, 0, 0, 0.15);
+		background-color: rgba(153, 153, 153, 0.3);
 	}
-
+	
 	& .scrollbar-thumb-move, 
 	& .scrollbar-thumb:hover{
-		background-color: rgba(0, 0, 0, 0.4);
-	}	
+		background-color: rgba(153, 153, 153, 0.6);
+	}
 }
 
 /* main table header */
@@ -79,7 +79,7 @@
 	line-height: @size-table-row;
 	height: @size-table-row;
 	border: 2px solid transparent;
-	margin-bottom: -4px;
+	margin-bottom: -2px;
 }
 
 .table-row .table-cell, 
@@ -92,6 +92,7 @@
 	white-space: nowrap;
 	vertical-align: center;
 	line-height: @size-table-row - 5px;
+	color: @color-bench-text;
 }
 
 .table-row-sum .table-cell {
@@ -104,8 +105,9 @@
 .table-row.select-top .table-cell, 
 .table-row.select-middle .table-cell,
 .table-row.select-bottom .table-cell,
-.table-row.select-single{
+.table-row.select-single .table-cell{
 	background-color: @color-bench-select;
+	border-bottom: 1px solid @color-bench-select-border;
 }
 
 .table-row.select-top {
