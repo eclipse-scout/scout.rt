@@ -505,6 +505,14 @@ public class SwtScoutTableCellEditor {
           deactivate();
         }
       });
+      m_tableComposite.getEnvironment().addKeyStroke(m_container, new SwtKeyStroke(SWT.KEYPAD_CR) {
+        @Override
+        public void handleSwtAction(Event e) {
+          e.doit = false;
+          fireApplyEditorValue();
+          deactivate();
+        }
+      });
       return m_container;
     }
 
