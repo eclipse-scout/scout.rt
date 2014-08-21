@@ -30,14 +30,13 @@ scout.Menubar.prototype.updateItems = function(menus) {
     for (i = 0; i < empty.length; i++) {
       this._addMenuItem(empty[i]);
     }
-
     this._addMenuSeparator();
   }
 
   // add all other menues
   for (i = 0; i < menus.length; i++) {
     if (menus[i].separator) {
-      scout.Menubar.prototype._addMenuSeparator();
+      this._addMenuSeparator();
     } else if (!scout.menus.checkType(menus[i], ['Table.EmptySpace'])){
       this._addMenuItem(menus[i]);
     }

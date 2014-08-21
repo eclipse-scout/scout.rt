@@ -1,6 +1,7 @@
 .root-group-box {
   margin: 0;
   /* DEBUG background-color:#eee;*/
+  border-top: 1px solid @color-bench-light-border;
   box-sizing:border-box;
   position:relative;
 }

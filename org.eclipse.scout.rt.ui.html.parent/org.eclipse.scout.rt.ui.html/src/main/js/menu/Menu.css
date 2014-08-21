@@ -4,6 +4,7 @@
 	height: 50px;
 	white-space: nowrap;
 	overflow: hidden;
+	padding-right: 20px;
 }
 
 .menu-item {
@@ -15,6 +16,9 @@
 	cursor: pointer;
 	line-height: @size-desktop-menu;
 	color: @color-bench-text;
+	
+	border-left: 1px solid transparent;
+	border-right: 1px solid transparent;		
 
 	&:hover {
 		color: @color-bench-text-hover;
@@ -27,6 +31,11 @@
 	&.menu-right {
 		float: right;
 	}
+	
+	&.menu-open {
+		border-left: 1px solid @color-bench-light-border;
+		border-right: 1px solid @color-bench-light-border;		
+	}	
 
 	&[data-icon]:before{
 		font-family: fontAwesome;
@@ -59,7 +68,6 @@
 	background-color: @color-bench;
 	z-index: 10;
 	white-space: nowrap;
-	border-top: 1px solid transparent;	
 }
 
 .menu-container .menu-item{

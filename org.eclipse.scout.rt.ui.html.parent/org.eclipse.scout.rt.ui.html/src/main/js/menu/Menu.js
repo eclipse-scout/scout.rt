@@ -30,7 +30,12 @@ scout.Menu.prototype._render = function($parent) {
       return;
     }
 
-    this.sendMenuAction();
+    if (this.children.length > 0) {
+      // TODO cru: mmh, works only for menubar, not for context menu...
+      scout.menus.showContextMenu(this.children, this.parent.$container, this.$container, undefined, 50, 50);
+    } else {
+      this.sendMenuAction();
+    }
   }
 };
 

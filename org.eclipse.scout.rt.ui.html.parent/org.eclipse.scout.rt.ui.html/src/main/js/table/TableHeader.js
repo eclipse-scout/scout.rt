@@ -27,9 +27,6 @@ scout.TableHeader = function(table, $tableHeader, session) {
     columns[i].filter = [];
   }
 
-  table.menubar.$container.appendDiv('HeaderOrganize')
-    .on('click', '', clickOrganize);
-
   function clickHeader(event) {
     var $header = $(this);
 
@@ -71,7 +68,7 @@ scout.TableHeader = function(table, $tableHeader, session) {
 
       if (headerWidth + diff > 80 || diff > 0) {
         var wHeader = headerWidth + diff + 'px';
-        var wCell = headerWidth + 17 + diff + 'px'; // 17 is width of header-resize handle, see table.css (.header-resize)
+        var wCell = headerWidth + 22 + diff + 'px'; // 17 is width of header-resize handle, see table.css (.header-resize)
         var wSummary = totalWidth + diff + 'px';
         $header.css('min-width', wHeader).css('max-width', wHeader);
         $('.table-row > div:nth-of-type(' + colNum + ' ), .table-row-sum > div:nth-of-type(' + colNum + ' )').css('min-width', wCell).css('max-width', wCell);

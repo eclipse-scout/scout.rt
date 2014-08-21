@@ -3,25 +3,9 @@
 	width: 100%;
 }
 
-.dialog-form {
-}
-
 .glasspane {
   background-color: rgba(0, 0, 0, 0.1);
   position: fixed;
   z-index:1000;
 }
 
-.dialog-title {
-  font-weight:bold;
-}
-
-.dialog-bar > button {
-  float:right;
-}
-
-.dialog-bar:after {
-  content:'';
-  display:block;
-  clear:both;
-}

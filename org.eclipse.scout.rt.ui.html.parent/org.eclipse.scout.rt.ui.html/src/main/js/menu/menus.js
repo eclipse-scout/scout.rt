@@ -68,6 +68,7 @@ scout.menus = {
     }
 
     $menuContainer = $parent.appendDiv('', 'menu-container');
+    $clicked.addClass('menu-open');
 
     for (i = 0; i < menus.length; i++) {
       var menu = menus[i];
@@ -98,8 +99,9 @@ scout.menus = {
     $menuContainer.one(closingEvents, $.suppressEvent);
 
     function removeMenu() {
-      // Animate
+      // close container
       $menuContainer.remove();
+      $clicked.addClass('menu-open');
 
       // Remove all cleanup handlers
       $(document).off('.contextMenu');
