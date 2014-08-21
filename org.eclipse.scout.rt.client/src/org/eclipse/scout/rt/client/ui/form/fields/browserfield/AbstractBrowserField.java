@@ -57,7 +57,7 @@ public abstract class AbstractBrowserField extends AbstractValueField<RemoteFile
    * true.<br>
    * If there is more to do then simply return true/false, put the
    * code in a {@link ClientSyncJob} to prevent deadlocks and other problems
-   * 
+   *
    * @return true to accept this location, false to prevent the browser from going to that location (equal to browser
    *         esc/stop button)
    * @param location
@@ -77,7 +77,7 @@ public abstract class AbstractBrowserField extends AbstractValueField<RemoteFile
    * This callback is invoked after the link was followed, thus it is already at that location
    * <p>
    * The default does noting.
-   * 
+   *
    * @param location
    * @param path
    *          may be null for locations like about:blank or javascript:... {@link URL#getPath()}
@@ -141,7 +141,7 @@ public abstract class AbstractBrowserField extends AbstractValueField<RemoteFile
         catch (Throwable t) {
           //nop
         }
-        return execAcceptLocationChange(location, url != null ? url.getPath() : null, url != null && url.getHost().equals("local"));
+        return execAcceptLocationChange(location, url != null ? url.getPath() : null, url != null && "local".equals(url.getHost()));
       }
       catch (Throwable t) {
         LOG.error("location: " + location, t);
@@ -159,7 +159,7 @@ public abstract class AbstractBrowserField extends AbstractValueField<RemoteFile
         catch (Throwable t) {
           //nop
         }
-        execLocationChanged(location, url != null ? url.getPath() : null, url != null && url.getHost().equals("local"));
+        execLocationChanged(location, url != null ? url.getPath() : null, url != null && "local".equals(url.getHost()));
       }
       catch (Throwable t) {
         LOG.error("location: " + location, t);

@@ -12,6 +12,9 @@ import org.w3c.dom.svg.SVGStylable;
 public final class CalendarSvgUtility {
   public static final String COLOR_PREFIX = "#";
 
+  private CalendarSvgUtility() {
+  }
+
   private static String ensureColorPrefix(String color) {
     if (!color.startsWith(COLOR_PREFIX)) {
       color = COLOR_PREFIX + color;

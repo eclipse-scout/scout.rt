@@ -50,8 +50,8 @@ public class RemoveCustomColumnMenu extends AbstractMenu {
 
       @Override
       public void propertyChange(PropertyChangeEvent evt) {
-        if (ITable.PROP_CONTEXT_COLUMN.equals(evt.getPropertyName()) ||
-            ITable.PROP_TABLE_CUSTOMIZER.equals(evt.getPropertyName())) {
+        if (ITable.PROP_CONTEXT_COLUMN.equals(evt.getPropertyName())
+            || ITable.PROP_TABLE_CUSTOMIZER.equals(evt.getPropertyName())) {
           updateVisibility();
         }
       }

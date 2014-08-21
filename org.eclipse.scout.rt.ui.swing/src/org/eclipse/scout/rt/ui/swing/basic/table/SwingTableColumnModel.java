@@ -153,7 +153,7 @@ public class SwingTableColumnModel extends DefaultTableColumnModel implements Pr
   public void propertyChange(PropertyChangeEvent e) {
     super.propertyChange(e);
     if (m_mousePressedInTableHeader) {
-      if (e.getPropertyName().equals("preferredWidth") || e.getPropertyName().equals("width")) {
+      if ("preferredWidth".equals(e.getPropertyName()) || "width".equals(e.getPropertyName())) {
         TableColumn column = (TableColumn) e.getSource();
         if (m_swingScoutTable != null) {
           ArrayList<TableColumn> list = new ArrayList<TableColumn>(1);
@@ -174,7 +174,7 @@ public class SwingTableColumnModel extends DefaultTableColumnModel implements Pr
   /**
    * Ensure the first column to retain a non-editable column. Otherwise, the checkable and editable column would
    * be the very same column which is confusing.
-   * 
+   *
    * @param oldIndex
    * @param newIndex
    * @return

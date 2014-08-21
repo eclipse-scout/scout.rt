@@ -31,7 +31,7 @@ public final class CollectionUtility {
   /**
    * compares the two collection of same content in any order. Is overloaded ({@link #equalsCollection(List, List)} for
    * lists where the order of the list is considered.
-   * 
+   *
    * @param c1
    * @param c2
    * @return true if the two collections contains the same elements in any order.
@@ -74,7 +74,7 @@ public final class CollectionUtility {
   /**
    * compares the two lists of same content in the same order. Is an overloaded of (
    * {@link #equalsCollection(Collection, Collection)}.
-   * 
+   *
    * @param c1
    * @param c2
    * @return true if the two lists contains the same elements in the same order.
@@ -162,7 +162,7 @@ public final class CollectionUtility {
 
   /**
    * exception safe access of an element of a list by index.
-   * 
+   *
    * @param list
    * @param index
    * @return null if the index is out of the list bounds or the element is null by itself.
@@ -192,7 +192,7 @@ public final class CollectionUtility {
    * Returns a new empty {@link ArrayList}.<br>
    * This method differs to {@link Collections#emptyList()} in that way that the {@link ArrayList} returned by this
    * method can be modified hence is no shared instance.
-   * 
+   *
    * @return An empty but modifiable {@link ArrayList} with an initial capacity of <code>0</code>.
    */
   public static <T> ArrayList<T> emptyArrayList() {
@@ -222,7 +222,7 @@ public final class CollectionUtility {
   /**
    * Null safe creation of a {@link ArrayList} out of a given collection. The returned {@link ArrayList} is modifiable
    * and not null.
-   * 
+   *
    * @param c
    * @return an {@link ArrayList} containing the given collection's elements. Never null.
    */
@@ -236,7 +236,7 @@ public final class CollectionUtility {
   /**
    * Null safe creation of a {@link ArrayList} out of a given collection. The returned {@link ArrayList} is modifiable.
    * The result list is never null and does not contain any null elements.
-   * 
+   *
    * @param c
    * @return an {@link ArrayList} containing the given collection's elements. Never null
    */
@@ -256,7 +256,7 @@ public final class CollectionUtility {
   /**
    * Null safe creation of a {@link HashSet} out of a given collection. The returned {@link HashSet} is modifiable and
    * never null.
-   * 
+   *
    * @param c
    * @return an {@link HashSet} containing the given collection's elements. Never null.
    */
@@ -270,7 +270,7 @@ public final class CollectionUtility {
   /**
    * Null safe creation of a {@link HashSet} out of a given collection without <code>null</code> elements. The returned
    * {@link HashSet} is modifiable and never null.
-   * 
+   *
    * @param c
    * @return an {@link HashSet} containing the given collection's elements without <code>null</code> elements. Never
    *         null.
@@ -285,7 +285,7 @@ public final class CollectionUtility {
    * Null safe creation of a {@link LinkedHashSet} out of a given collection. The returned {@link LinkedHashSet} is
    * modifiable and
    * never null.
-   * 
+   *
    * @param c
    * @return an {@link LinkedHashSet} containing the given collection's elements. Never null.
    */
@@ -299,7 +299,7 @@ public final class CollectionUtility {
   /**
    * Null safe creation of a {@link LinkedHashSet} out of a given collection without <code>null</code> elements. The
    * returned {@link LinkedHashSet} is modifiable and never null.
-   * 
+   *
    * @param c
    * @return an {@link LinkedHashSet} containing the given collection's elements without <code>null</code> elements.
    *         Never
@@ -615,7 +615,7 @@ public final class CollectionUtility {
    * Returns a new empty {@link HashSet}.<br>
    * This method differs to {@link Collections#emptyList()} in that way that the {@link HashSet} returned by this
    * method can be modified hence is no shared instance.
-   * 
+   *
    * @return An empty but modifiable {@link HashSet} with an initial capacity of <code>0</code>.
    */
   public static <T> HashSet<T> emptyHashSet() {
@@ -669,7 +669,7 @@ public final class CollectionUtility {
         Object o;
         // remove escaped ','
         s = s.replaceAll("%2C", ",");
-        if (s.equalsIgnoreCase("null")) {
+        if ("null".equalsIgnoreCase(s)) {
           o = null;
         }
         else if (s.length() >= 2 && s.startsWith("'") && s.endsWith("'")) {
@@ -727,7 +727,7 @@ public final class CollectionUtility {
 
   /**
    * To get a string representation of a collection.
-   * 
+   *
    * @param list
    *          input list
    * @param delimiter

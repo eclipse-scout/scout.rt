@@ -396,9 +396,9 @@ public class SwingScoutTimeField extends SwingScoutBasicFieldComposite<IDateFiel
 
   @Override
   protected void setForegroundFromScout(String scoutColor) {
-    JComponent fld = getSwingField();
-    if (fld != null && scoutColor != null && fld instanceof JTextComponent) {
-      setDisabledTextColor(ColorUtility.createColor(scoutColor), (JTextComponent) fld);
+    JTextComponent fld = getSwingField();
+    if (fld != null && scoutColor != null) {
+      setDisabledTextColor(ColorUtility.createColor(scoutColor), fld);
     }
     super.setForegroundFromScout(scoutColor);
   }

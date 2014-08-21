@@ -83,7 +83,6 @@ public class DefaultOutlineTreeForm extends AbstractForm implements IOutlineTree
 
   private void installTree(ITree tree) {
     getOutlineTreeField().setTree(tree, true);
-    // IDesktop desktop=ClientJob.getCurrentSession().getDesktop();
     if (tree != null) {
       setTitle(tree.getTitle());
       setIconId(tree.getIconId());

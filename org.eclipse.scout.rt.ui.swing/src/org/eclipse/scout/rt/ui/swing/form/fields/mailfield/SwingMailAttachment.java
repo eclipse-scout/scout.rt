@@ -36,7 +36,7 @@ public class SwingMailAttachment {
       else {
         // try to create a usable filename
         String extension = ".txt";
-        if (m_part.getContentType().equals("message/rfc822")) {
+        if ("message/rfc822".equals(m_part.getContentType())) {
           extension = ".eml";
         }
         filename = IOUtility.getTempFileName(extension);

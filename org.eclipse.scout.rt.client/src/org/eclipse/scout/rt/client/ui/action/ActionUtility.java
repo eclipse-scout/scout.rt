@@ -26,6 +26,9 @@ import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
  */
 public final class ActionUtility {
 
+  private ActionUtility() {
+  }
+
   public static IActionFilter FALSE_FILTER = new IActionFilter() {
     @Override
     public boolean accept(IAction action) {
@@ -42,7 +45,7 @@ public final class ActionUtility {
 
   /**
    * Removes invisible actions. Also removes leading and trailing separators as well as multiple consecutive separators.
-   * 
+   *
    * @since 3.8.1
    */
   public static <T extends IAction> List<T> visibleNormalizedActions(List<T> actionNodes) {
@@ -179,7 +182,7 @@ public final class ActionUtility {
    * visibleOnly) and at least one of its leaf children (recursively) is visible (depending on visible only) and and has
    * one of the passed menu types.</li>
    * </ul>
-   * 
+   *
    * @param menuTypes
    * @param visibleOnly
    * @return

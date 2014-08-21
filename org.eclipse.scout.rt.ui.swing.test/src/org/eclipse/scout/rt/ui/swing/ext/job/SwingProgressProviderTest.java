@@ -28,7 +28,7 @@ public class SwingProgressProviderTest {
 
   private static final String[] EXPECTED = {"foo", "bar"};
 
-  private int count;
+  private int m_count;
 
   SwingProgressProvider prov = new SwingProgressProvider();
 
@@ -44,9 +44,9 @@ public class SwingProgressProviderTest {
           @Override
           public void propertyChange(PropertyChangeEvent evt) {
             MonitorProperties props = (MonitorProperties) evt.getNewValue();
-            Assert.assertEquals(EXPECTED[count],
+            Assert.assertEquals(EXPECTED[m_count],
                 props.getTaskName());
-            count++;
+            m_count++;
           }
         });
     SwingProgressMonitor monitor = new SwingProgressMonitor();
@@ -54,7 +54,7 @@ public class SwingProgressProviderTest {
     prov.setActiveMonitor(monitor);
     monitor.setTaskName("bar");
     prov.setActiveMonitor(monitor);
-    Assert.assertEquals(2, count);
+    Assert.assertEquals(2, m_count);
   }
 
   /**
@@ -67,20 +67,20 @@ public class SwingProgressProviderTest {
         new PropertyChangeListener() {
           @Override
           public void propertyChange(PropertyChangeEvent evt) {
-            if (count == 0) {
+            if (m_count == 0) {
               assertEquals("bar", ((MonitorProperties) evt.getNewValue()).getSubTaskName());
             }
-            else if (count == 1) {
+            else if (m_count == 1) {
               assertNull(evt.getNewValue());
             }
-            count++;
+            m_count++;
           }
         });
     SwingProgressMonitor monitor = new SwingProgressMonitor();
     monitor.subTask("bar");
     prov.setActiveMonitor(monitor);
     prov.setActiveMonitor(null);
-    Assert.assertEquals(2, count);
+    Assert.assertEquals(2, m_count);
   }
 
 }

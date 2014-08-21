@@ -21,6 +21,9 @@ import org.eclipse.scout.commons.CollectionUtility;
  */
 public final class TreeUtility {
 
+  private TreeUtility() {
+  }
+
   /**
    * If every given node has the same parent, that common parent node will be returned, else null.
    */
@@ -97,7 +100,7 @@ public final class TreeUtility {
 
   /**
    * Returns the ancestor of the given node which resides at the given level.
-   * 
+   *
    * @param level
    *          The level to look for the ancestor. The level has to be <= than node.getLevel(); Otherwise null will
    *          returned.

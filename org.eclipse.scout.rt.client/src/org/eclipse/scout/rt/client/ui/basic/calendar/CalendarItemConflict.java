@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -23,7 +23,6 @@ import org.eclipse.scout.rt.client.ui.basic.calendar.provider.ICalendarItemProvi
 public class CalendarItemConflict {
   private Map<Class<? extends ICalendarItemProvider>, Collection<CalendarComponent>> m_componentsByProvider;
   private List<CalendarComponent> m_components;
-  private CalendarComponent m_c2;
   private double m_match;
 
   public CalendarItemConflict(Map<Class<? extends ICalendarItemProvider>, Collection<CalendarComponent>> componentsByProvider, List<CalendarComponent> components, double match) {

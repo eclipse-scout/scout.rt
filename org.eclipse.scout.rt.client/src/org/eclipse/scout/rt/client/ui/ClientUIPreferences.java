@@ -194,7 +194,7 @@ public class ClientUIPreferences {
    * Since this property depends on the user agent it is saved separately for each combination of
    * {@link org.eclipse.scout.rt.shared.ui.IUiLayer IUiLayer} and {@link org.eclipse.scout.rt.shared.ui.IUiDeviceType
    * IUiDeviceType}.
-   * 
+   *
    * @since 3.8.0
    */
   public int[] getSplitterPosition(ISplitBox splitBox) {
@@ -217,7 +217,7 @@ public class ClientUIPreferences {
    * Since this property depends on the user agent it is saved separately for each combination of
    * {@link org.eclipse.scout.rt.shared.ui.IUiLayer IUiLayer} and {@link org.eclipse.scout.rt.shared.ui.IUiDeviceType
    * IUiDeviceType}.
-   * 
+   *
    * @since 3.8.0
    */
   public void setSplitterPosition(ISplitBox splitBox, int[] weights) {
@@ -570,10 +570,7 @@ public class ClientUIPreferences {
   public boolean getApplicationWindowMaximized() {
     String key = APPLICATION_WINDOW_MAXIMIZED;
     String value = m_env.get(key, null);
-    if (value != null) {
-      return value.equalsIgnoreCase("yes");
-    }
-    return false;
+    return "yes".equalsIgnoreCase(value);
   }
 
   public BoundsSpec getApplicationWindowBounds() {

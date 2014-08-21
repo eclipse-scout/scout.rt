@@ -25,36 +25,36 @@ import org.junit.Test;
  * Test for {@link SwtScoutLabelField}
  */
 public class SWTScoutLabelFieldUiTest {
-  TestSwtScoutLabelField testLabelField;
+  private TestSwtScoutLabelField m_testLabelField;
 
   @Before
   public void setup() {
-    testLabelField = new TestSwtScoutLabelField();
-    testLabelField.setScoutObjectAndSwtEnvironment();
-    testLabelField.initializeSwt(new Shell(Display.getDefault()));
+    m_testLabelField = new TestSwtScoutLabelField();
+    m_testLabelField.setScoutObjectAndSwtEnvironment();
+    m_testLabelField.initializeSwt(new Shell(Display.getDefault()));
   }
 
   @Test
   public void testSwtFieldInitiallyEnabled() {
-    assertTrue(testLabelField.getSwtField().isEnabled());
+    assertTrue(m_testLabelField.getSwtField().isEnabled());
   }
 
   @Test
   public void testSwtFieldDisabledWhenNotSelecteable() {
     setModelSelectable(false);
-    assertFalse(testLabelField.getSwtField().isEnabled());
+    assertFalse(m_testLabelField.getSwtField().isEnabled());
   }
 
   @Test
   public void testSwtFieldEnabledWhenSelecteable() {
     setModelSelectable(false);
     setModelSelectable(true);
-    assertTrue(testLabelField.getSwtField().isEnabled());
+    assertTrue(m_testLabelField.getSwtField().isEnabled());
   }
 
   private void setModelSelectable(boolean selectable) {
-    testLabelField.getScoutObject().setSelectable(selectable);
-    testLabelField.handleScoutPropertyChange(ILabelField.PROP_SELECTABLE, testLabelField.getScoutObject());
+    m_testLabelField.getScoutObject().setSelectable(selectable);
+    m_testLabelField.handleScoutPropertyChange(ILabelField.PROP_SELECTABLE, m_testLabelField.getScoutObject());
   }
 
   class TestSwtScoutLabelField extends SwtScoutLabelField {

@@ -65,9 +65,6 @@ public class StaticDate implements java.io.Serializable {
 
   @Override
   public String toString() {
-    /*
-     * return "StaticDate[millis="+l+"]";
-     */
     return "StaticDate[" + m_textAsLong + "]";
   }
 }

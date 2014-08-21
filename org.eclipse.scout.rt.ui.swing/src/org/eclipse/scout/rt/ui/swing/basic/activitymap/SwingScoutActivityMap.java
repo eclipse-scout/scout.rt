@@ -395,9 +395,9 @@ public class SwingScoutActivityMap extends SwingScoutComposite<IActivityMap<?, ?
     else if (name.equals(IActivityMap.PROP_SELECTED_ACTIVITY_CELL)) {
       setSelectedActivityCellFromScout((ActivityCell) newValue);
     }
-    else if (name.equals(IActivityMap.PROP_SELECTED_RESOURCE_IDS) ||
-        name.equals(IActivityMap.PROP_SELECTED_BEGIN_TIME) ||
-        name.equals(IActivityMap.PROP_SELECTED_END_TIME)) {
+    else if (name.equals(IActivityMap.PROP_SELECTED_RESOURCE_IDS)
+        || name.equals(IActivityMap.PROP_SELECTED_BEGIN_TIME)
+        || name.equals(IActivityMap.PROP_SELECTED_END_TIME)) {
       setSelectionFromScout();
     }
     else if (name.equals(IActivityMap.PROP_RESOURCE_IDS)) {

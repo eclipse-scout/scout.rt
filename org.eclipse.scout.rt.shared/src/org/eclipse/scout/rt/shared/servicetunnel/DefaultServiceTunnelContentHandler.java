@@ -148,8 +148,7 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
   }
 
   /**
-   * @deprecated
-   * @deprecated use {@link #initialize()} instead. Will be removed in the 6.0 release.
+   * @deprecated use {@link #initialize()} instead. Will be removed in the N release.
    */
   @SuppressWarnings("deprecation")
   @Deprecated

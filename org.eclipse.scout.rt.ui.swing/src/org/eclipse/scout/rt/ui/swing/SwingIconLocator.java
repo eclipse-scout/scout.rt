@@ -129,7 +129,7 @@ public class SwingIconLocator {
     if (name == null) {
       return;
     }
-    if (name.equalsIgnoreCase("window")) {
+    if ("window".equalsIgnoreCase(name)) {
       //optional image, maybe the new style window16, window256 etc were specified
       return;
     }

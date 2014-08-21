@@ -34,7 +34,7 @@ import org.eclipse.scout.commons.xmlparser.SimpleXmlElement;
  * Default implementation of a calendar service delivering holiday items <br>
  * Produces data using XML resource file XML records can be recurring (with year
  * 0000) and/or single entries (with specific year)
- * 
+ *
  * <pre>
  * @code <holidays>
  *   <!--1st april every year-->
@@ -162,34 +162,34 @@ public class HolidayCalendarItemParser {
     //
     int weekday = -1;
     if (weekdayPattern != null) {
-      if (weekdayPattern.equalsIgnoreCase("MONDAY")) {
+      if ("MONDAY".equalsIgnoreCase(weekdayPattern)) {
         weekday = Calendar.MONDAY;
       }
-      else if (weekdayPattern.equalsIgnoreCase("TUESDAY")) {
+      else if ("TUESDAY".equalsIgnoreCase(weekdayPattern)) {
         weekday = Calendar.TUESDAY;
       }
-      else if (weekdayPattern.equalsIgnoreCase("WEDNESDAY")) {
+      else if ("WEDNESDAY".equalsIgnoreCase(weekdayPattern)) {
         weekday = Calendar.WEDNESDAY;
       }
-      else if (weekdayPattern.equalsIgnoreCase("THURSDAY")) {
+      else if ("THURSDAY".equalsIgnoreCase(weekdayPattern)) {
         weekday = Calendar.THURSDAY;
       }
-      else if (weekdayPattern.equalsIgnoreCase("FRIDAY")) {
+      else if ("FRIDAY".equalsIgnoreCase(weekdayPattern)) {
         weekday = Calendar.FRIDAY;
       }
-      else if (weekdayPattern.equalsIgnoreCase("SATURDAY")) {
+      else if ("SATURDAY".equalsIgnoreCase(weekdayPattern)) {
         weekday = Calendar.SATURDAY;
       }
-      else if (weekdayPattern.equalsIgnoreCase("SUNDAY")) {
+      else if ("SUNDAY".equalsIgnoreCase(weekdayPattern)) {
         weekday = Calendar.SUNDAY;
       }
     }
     int instance = 0;
     if (instancePattern != null) {
-      if (instancePattern.equalsIgnoreCase("FIRST")) {
+      if ("FIRST".equalsIgnoreCase(instancePattern)) {
         instance = 1;
       }
-      else if (instancePattern.equalsIgnoreCase("LAST")) {
+      else if ("LAST".equalsIgnoreCase(instancePattern)) {
         instance = -1;
       }
       else {

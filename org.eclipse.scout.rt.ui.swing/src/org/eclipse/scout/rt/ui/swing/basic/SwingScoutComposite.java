@@ -194,7 +194,7 @@ public abstract class SwingScoutComposite<T extends IPropertyObserver> implement
     if (fld != null) {
       // opaque
       if (!existsClientProperty(fld, CLIENT_PROP_INITIAL_OPAQUE)) {
-        putClientProperty(fld, CLIENT_PROP_INITIAL_OPAQUE, new Boolean(fld.isOpaque()));
+        putClientProperty(fld, CLIENT_PROP_INITIAL_OPAQUE, Boolean.valueOf(fld.isOpaque()));
       }
       // background
       if (!existsClientProperty(fld, CLIENT_PROP_INITIAL_BACKGROUND)) {

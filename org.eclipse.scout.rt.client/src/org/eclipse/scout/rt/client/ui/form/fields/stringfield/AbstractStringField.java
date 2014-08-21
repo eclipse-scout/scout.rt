@@ -459,11 +459,11 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
    */
   @Override
   public boolean isSpellCheckEnabled() {
-    return (!this.isDecorationLink() &&
-        !this.isFormatUpper() &&
-        !this.isFormatLower() &&
-        this.isEnabled() &&
-        this.isEnabledGranted() && (!(this.getForm() instanceof ISearchForm)));
+    return (!this.isDecorationLink()
+        && !this.isFormatUpper()
+        && !this.isFormatLower()
+        && this.isEnabled()
+        && this.isEnabledGranted() && (!(this.getForm() instanceof ISearchForm)));
   }
 
   /**
@@ -484,7 +484,7 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
    */
   @Override
   public void setSpellCheckAsYouTypeEnabled(boolean monitorSpelling) {
-    m_monitorSpelling = new Boolean(monitorSpelling);
+    m_monitorSpelling = Boolean.valueOf(monitorSpelling);
   }
 
 }

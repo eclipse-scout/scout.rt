@@ -118,7 +118,7 @@ public final class SwingUtility {
 
   public static boolean isSunDropAction() {
     AWTEvent e = EventQueue.getCurrentEvent();
-    if (e != null && e.getID() == MouseEvent.MOUSE_RELEASED && e.getClass().getName().equals("sun.awt.dnd.SunDropTargetEvent")) {
+    if (e != null && e.getID() == MouseEvent.MOUSE_RELEASED && "sun.awt.dnd.SunDropTargetEvent".equals(e.getClass().getName())) {
       return true;
     }
     return false;
@@ -394,23 +394,23 @@ public final class SwingUtility {
     String key = "";
     boolean hasMeta = false;
     for (String s : a) {
-      if (s.equalsIgnoreCase("shift")) {
+      if ("shift".equalsIgnoreCase(s)) {
         shift = "shift ";
         hasMeta = true;
       }
-      else if (s.equalsIgnoreCase("control")) {
+      else if ("control".equalsIgnoreCase(s)) {
         ctrl = "control ";
         hasMeta = true;
       }
-      else if (s.equalsIgnoreCase("ctrl")) {
+      else if ("ctrl".equalsIgnoreCase(s)) {
         ctrl = "control ";
         hasMeta = true;
       }
-      else if (s.equalsIgnoreCase("alternate")) {
+      else if ("alternate".equalsIgnoreCase(s)) {
         alt = "alt ";
         hasMeta = true;
       }
-      else if (s.equalsIgnoreCase("alt")) {
+      else if ("alt".equalsIgnoreCase(s)) {
         alt = "alt ";
         hasMeta = true;
       }
@@ -892,7 +892,7 @@ public final class SwingUtility {
    * will be returned. In Windows environments these circumstances (task bar on a none primary screen) will be very rare
    * and therefore ignored until the bug will be fixed in a future Java version.
    * </p>
-   * 
+   *
    * @param screenDevice
    *          a screen thats {@link GraphicsConfiguration} will be used to determine the insets
    * @return the insets of this toolkit's screen, in pixels, if the given screen device is the primary screen, otherwise
@@ -1074,7 +1074,7 @@ public final class SwingUtility {
 
   /**
    * Adjusts the window such that it fits on the screen, if necessary.
-   * 
+   *
    * @param window
    */
   public static void adjustBoundsToScreen(Window window) {
@@ -1183,7 +1183,7 @@ public final class SwingUtility {
    * lies within the specified frame.
    * <p>
    * Intended be used in custom implementations of {@link JComponent#getToolTipLocation(MouseEvent)}.
-   * 
+   *
    * @param e
    *          the event that caused the display of the tool tip
    * @param c
@@ -1258,7 +1258,7 @@ public final class SwingUtility {
   /**
    * This method is used to get a top margin for {@link SwingScoutLabelField} and {@link SwingScoutHtmlField} in order
    * to have correct alignment for customized look and feel (e.g. Rayo)
-   * 
+   *
    * @since 3.10.0-M2
    */
   public static int getTopMarginForField() {

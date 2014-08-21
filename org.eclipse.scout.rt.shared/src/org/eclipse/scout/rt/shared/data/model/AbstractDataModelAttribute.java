@@ -423,11 +423,11 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
       case DataModelConstants.TYPE_CODE_LIST:
       case DataModelConstants.TYPE_CODE_TREE:
       case DataModelConstants.TYPE_NUMBER_LIST:
-      case DataModelConstants.TYPE_NUMBER_TREE: {
+      case DataModelConstants.TYPE_NUMBER_TREE:
         return true;
-      }
+      default:
+        return false;
     }
-    return false;
   }
 
   @Override
@@ -474,7 +474,7 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
   /**
    * Method is called in case the raw value is null.
    * This method may be overridden by subclass in order to provide a different formatted value for null values.
-   * 
+   *
    * @return null
    */
   protected String formatNullValue() {
@@ -488,7 +488,7 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
    * <li>{@link DataModelConstants#TYPE_DATE_TIME}</li>
    * <li>{@link DataModelConstants#TYPE_TIME}</li>
    * </ul>
-   * 
+   *
    * @param rawValue
    *          Raw value to format
    * @param hasDate
@@ -522,7 +522,7 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
    * <li>{@link DataModelConstants#TYPE_PLAIN_DOUBLE}</li>
    * <li>{@link DataModelConstants#TYPE_PERCENT}</li>
    * </ul>
-   * 
+   *
    * @param rawValue
    *          Raw value to format
    * @param groupingUsed
@@ -559,7 +559,7 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
    * <li>{@link DataModelConstants#TYPE_INTEGER}</li>
    * <li>{@link DataModelConstants#TYPE_PLAIN_INTEGER}</li>
    * </ul>
-   * 
+   *
    * @param rawValue
    *          Raw value to format
    * @param groupingUsed
@@ -582,7 +582,7 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
    * <li>{@link DataModelConstants#TYPE_LONG}</li>
    * <li>{@link DataModelConstants#TYPE_PLAIN_LONG}</li>
    * </ul>
-   * 
+   *
    * @param rawValue
    *          Raw value to format
    * @param groupingUsed
@@ -610,7 +610,7 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
    * </ul>
    * If whether code type class nor lookup call is set, the return value will be null.
    * The method does not throw an exception. In case of failure, the return value is the empty string.
-   * 
+   *
    * @param rawValue
    *          Raw value to format
    * @param codeTypeClass
@@ -669,7 +669,7 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
    * <li>{@link DataModelConstants#TYPE_STRING}</li>
    * <li>{@link DataModelConstants#TYPE_FULL_TEXT}</li>
    * </ul>
-   * 
+   *
    * @param rawValue
    *          Raw value to format
    * @return Formatted value: raw value is casted to String
@@ -680,7 +680,7 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
 
   /**
    * Formats the raw value for unknown attribute types
-   * 
+   *
    * @param rawValue
    *          Raw value to format
    * @return Formatted value: raw value is casted to String

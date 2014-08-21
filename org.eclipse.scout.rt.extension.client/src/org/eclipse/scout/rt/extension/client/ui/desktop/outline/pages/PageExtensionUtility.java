@@ -38,11 +38,11 @@ import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.internal.P
  * {@link AbstractExtensiblePageWithNodes} and {@link AbstractExtensiblePageWithTable} should be used in general for
  * providing extensible outlines. This utility class is intended to be used in cases in which it is not possible to
  * modify the given class hierarchy.
- * 
+ *
  * @since 3.9.0
  */
 public final class PageExtensionUtility {
-  private final static IScoutLogger LOG = ScoutLogManager.getLogger(PageExtensionUtility.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(PageExtensionUtility.class);
 
   private PageExtensionUtility() {
     // utility class
@@ -51,7 +51,7 @@ public final class PageExtensionUtility {
   /**
    * Adapts the given {@link IPageWithNodes} by adding new pages to the given page list and by removing or modifying
    * existing pages.
-   * 
+   *
    * @param nodePage
    * @param pageList
    * @throws ProcessingException
@@ -74,7 +74,7 @@ public final class PageExtensionUtility {
   /**
    * Adapts the given {@link IOutline} by adding new pages to the given page list and by removing or modifying
    * existing pages.
-   * 
+   *
    * @param outline
    * @param pageList
    * @throws ProcessingException
@@ -95,7 +95,7 @@ public final class PageExtensionUtility {
 
   /**
    * Adapts the given page by applying page modifications contributed by extensions.
-   * 
+   *
    * @param outline
    * @param parentPage
    * @param page

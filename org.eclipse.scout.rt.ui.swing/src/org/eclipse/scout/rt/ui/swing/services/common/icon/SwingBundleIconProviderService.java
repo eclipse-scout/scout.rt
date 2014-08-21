@@ -76,21 +76,21 @@ public class SwingBundleIconProviderService extends IconProviderService {
         else if (iconName.startsWith(elementName)) {
           String state = iconName.substring(elementName.length());
           // hover icon
-          if (state.equalsIgnoreCase("_mouse_over") || state.equalsIgnoreCase("_rollover")) {
+          if ("_mouse_over".equalsIgnoreCase(state) || "_rollover".equalsIgnoreCase(state)) {
             resourceName = element.getAttribute("icon_hover");
             if (resourceName == null) {
               resourceName = element.getAttribute("icon");
             }
           }
           // selected icon
-          else if (state.equalsIgnoreCase("_active") || state.equalsIgnoreCase("_pressed") || state.equalsIgnoreCase("_selected")) {
+          else if ("_active".equalsIgnoreCase(state) || "_pressed".equalsIgnoreCase(state) || "_selected".equalsIgnoreCase(state)) {
             resourceName = element.getAttribute("icon_selected");
             if (resourceName == null) {
               resourceName = element.getAttribute("icon");
             }
           }
           // disabled icon
-          else if (state.equalsIgnoreCase("_disabled")) {
+          else if ("_disabled".equalsIgnoreCase(state)) {
             resourceName = element.getAttribute("icon_disabled");
             if (resourceName == null) {
               resourceName = element.getAttribute("icon");

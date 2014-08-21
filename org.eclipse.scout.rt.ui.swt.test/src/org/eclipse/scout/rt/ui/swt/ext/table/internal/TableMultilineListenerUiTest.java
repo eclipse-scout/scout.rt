@@ -30,7 +30,7 @@ import org.junit.Test;
  */
 public class TableMultilineListenerUiTest {
 
-  private static final String test3Lines = "1\n2\n3";
+  private static final String TEST_3_LINES = "1\n2\n3";
 
   @BeforeClass
   public static void before() throws Exception {
@@ -69,8 +69,8 @@ public class TableMultilineListenerUiTest {
   @Test
   public void testTrimToRowHeightEqualRowHeight() {
     TestTableMultilineListener listener = new TestTableMultilineListener(30);
-    String trimmed = listener.trimToRowHeight(test3Lines, 10);
-    assertEquals(test3Lines, trimmed);
+    String trimmed = listener.trimToRowHeight(TEST_3_LINES, 10);
+    assertEquals(TEST_3_LINES, trimmed);
   }
 
   /**
@@ -79,8 +79,8 @@ public class TableMultilineListenerUiTest {
   @Test
   public void testTrimToRowHeightLargerRowHeight() {
     TestTableMultilineListener listener = new TestTableMultilineListener(40);
-    String trimmed = listener.trimToRowHeight(test3Lines, 10);
-    assertEquals(test3Lines, trimmed);
+    String trimmed = listener.trimToRowHeight(TEST_3_LINES, 10);
+    assertEquals(TEST_3_LINES, trimmed);
   }
 
   /**
@@ -89,7 +89,7 @@ public class TableMultilineListenerUiTest {
   @Test
   public void testTrimToRowHeightSmallerRowHeight() {
     TestTableMultilineListener listener = new TestTableMultilineListener(20);
-    String trimmed = listener.trimToRowHeight(test3Lines, 10);
+    String trimmed = listener.trimToRowHeight(TEST_3_LINES, 10);
     assertEquals("1\n2", trimmed);
   }
 
@@ -99,8 +99,8 @@ public class TableMultilineListenerUiTest {
   @Test
   public void testTrimToRowHeightNoRowHeight() {
     TestTableMultilineListener listener = new TestTableMultilineListener(0);
-    String trimmed = listener.trimToRowHeight(test3Lines, 10);
-    assertEquals(test3Lines, trimmed);
+    String trimmed = listener.trimToRowHeight(TEST_3_LINES, 10);
+    assertEquals(TEST_3_LINES, trimmed);
   }
 
   /**
@@ -139,8 +139,8 @@ public class TableMultilineListenerUiTest {
   @Test
   public void testTrimToRowHeightNoTextHeight() {
     TestTableMultilineListener listener = new TestTableMultilineListener(10);
-    String trimmed = listener.trimToRowHeight(test3Lines, 0);
-    assertEquals(test3Lines, trimmed);
+    String trimmed = listener.trimToRowHeight(TEST_3_LINES, 0);
+    assertEquals(TEST_3_LINES, trimmed);
   }
 
   /**
@@ -151,7 +151,7 @@ public class TableMultilineListenerUiTest {
     TestTableMultilineListener listener = new TestTableMultilineListener(10);
     Rectangle bounds = new Rectangle(0, 0, 10, 100);
     String wrapped = listener.softWrapText(null, "1 2 3", bounds);
-    assertEquals(test3Lines, wrapped);
+    assertEquals(TEST_3_LINES, wrapped);
   }
 
   /**

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -204,22 +204,20 @@ public class WizardStatusButton extends Canvas {
 
   @Override
   public Point computeSize(int wHint, int hHint, boolean changed) {
-    if (true) {
-      Point size = new Point(height, height);
-      GC gc = null;
-      try {
-        gc = new GC(this);
-        gc.setFont(getTextFont());
-        Point stringSize = gc.stringExtent(getText());
-        size.x = Math.max(wHint, stringSize.x + height + 10);
-      }
-      catch (Exception e) {
-        if (gc != null && !gc.isDisposed()) {
-          gc.dispose();
-        }
-      }
-      m_cachedSize = size;
+    Point size = new Point(height, height);
+    GC gc = null;
+    try {
+      gc = new GC(this);
+      gc.setFont(getTextFont());
+      Point stringSize = gc.stringExtent(getText());
+      size.x = Math.max(wHint, stringSize.x + height + 10);
     }
+    catch (Exception e) {
+      if (gc != null && !gc.isDisposed()) {
+        gc.dispose();
+      }
+    }
+    m_cachedSize = size;
     return m_cachedSize;
   }
 

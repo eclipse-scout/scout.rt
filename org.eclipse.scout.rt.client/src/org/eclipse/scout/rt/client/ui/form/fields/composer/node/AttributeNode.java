@@ -29,7 +29,6 @@ public class AttributeNode extends AbstractComposerNode {
   private IDataModelAttribute m_attribute;
   private Integer m_aggregationType;
   private IDataModelAttributeOp m_op;
-  private String m_verbose;
   private List<Object> m_values;
   private List<String> m_texts;
 

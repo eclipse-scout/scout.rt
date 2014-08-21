@@ -54,7 +54,7 @@ public class CalendarTest {
     Locale.setDefault(new Locale("th", "TH"));
 
     Date buddhistDate = new Date();
-    Integer buddhistYear = new Integer(new SimpleDateFormat("yyyy").format(buddhistDate));
+    Integer buddhistYear = Integer.valueOf(new SimpleDateFormat("yyyy").format(buddhistDate));
 
     byte[] outArray = write(buddhistDate);
 
@@ -62,7 +62,7 @@ public class CalendarTest {
     Locale.setDefault(new Locale("de", "CH"));
 
     Date transferredDate = (Date) read(outArray);
-    Integer transferredYear = new Integer(new SimpleDateFormat("yyyy").format(transferredDate));
+    Integer transferredYear = Integer.valueOf(new SimpleDateFormat("yyyy").format(transferredDate));
 
     assertEquals(buddhistDate, transferredDate);
     assertEquals(new Integer(buddhistYear - 543), transferredYear);

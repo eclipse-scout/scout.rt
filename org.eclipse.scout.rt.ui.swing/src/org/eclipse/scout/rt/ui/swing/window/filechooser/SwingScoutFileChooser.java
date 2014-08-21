@@ -286,7 +286,7 @@ public class SwingScoutFileChooser implements ISwingScoutFileChooser {
       else {
         ArrayList<String> list = new ArrayList<String>(extensions.size());
         for (String extension : extensions) {
-          if (extension != null && !extension.equals("*")) {
+          if (extension != null && !"*".equals(extension)) {
             list.add(extension.toLowerCase());
           }
         }

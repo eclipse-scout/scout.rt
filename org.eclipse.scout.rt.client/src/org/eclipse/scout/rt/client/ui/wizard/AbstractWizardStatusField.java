@@ -172,9 +172,9 @@ public abstract class AbstractWizardStatusField extends AbstractHtmlField {
 
     @Override
     public void propertyChange(final PropertyChangeEvent e) {
-      if (IWizard.PROP_TITLE.equals(e.getPropertyName()) ||
-          IWizard.PROP_TITLE_HTML.equals(e.getPropertyName()) ||
-          IWizard.PROP_TOOLTIP_TEXT.equals(e.getPropertyName())) {
+      if (IWizard.PROP_TITLE.equals(e.getPropertyName())
+          || IWizard.PROP_TITLE_HTML.equals(e.getPropertyName())
+          || IWizard.PROP_TOOLTIP_TEXT.equals(e.getPropertyName())) {
         markDirty();
       }
     }
@@ -183,11 +183,11 @@ public abstract class AbstractWizardStatusField extends AbstractHtmlField {
   private class P_WizardStepListener implements PropertyChangeListener, WeakEventListener {
     @Override
     public void propertyChange(final PropertyChangeEvent e) {
-      if (IWizardStep.PROP_DESCRIPTION_HTML.equals(e.getPropertyName()) ||
-          IWizardStep.PROP_TITLE.equals(e.getPropertyName()) ||
-          IWizardStep.PROP_TITLE_HTML.equals(e.getPropertyName()) ||
-          IWizardStep.PROP_TOOLTIP_TEXT.equals(e.getPropertyName()) ||
-          IWizardStep.PROP_ENABLED.equals(e.getPropertyName())) {
+      if (IWizardStep.PROP_DESCRIPTION_HTML.equals(e.getPropertyName())
+          || IWizardStep.PROP_TITLE.equals(e.getPropertyName())
+          || IWizardStep.PROP_TITLE_HTML.equals(e.getPropertyName())
+          || IWizardStep.PROP_TOOLTIP_TEXT.equals(e.getPropertyName())
+          || IWizardStep.PROP_ENABLED.equals(e.getPropertyName())) {
         markDirty();
       }
     }

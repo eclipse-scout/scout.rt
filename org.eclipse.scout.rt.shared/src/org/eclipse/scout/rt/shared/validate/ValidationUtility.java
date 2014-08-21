@@ -54,10 +54,8 @@ public final class ValidationUtility {
     if (value != null) {
       // equality is provided and a value is set
       // if provided value corresponds to 0, provided null to the check method (reject validation)
-      if (value instanceof Number) {
-        if (((Number) value).longValue() == 0L) {
-          return null;
-        }
+      if (value instanceof Number && ((Number) value).longValue() == 0L) {
+        return null;
       }
     }
     return value;
@@ -235,7 +233,7 @@ public final class ValidationUtility {
    * Checks if the string value (if not null) matches the regex.
    * If the regex is a string, the pattern created uses case insensitive {@link Pattern#CASE_INSENSITIVE} and
    * full-text-scan {@link Pattern#DOTALL}.
-   * 
+   *
    * @param value
    * @param regex
    */
@@ -285,7 +283,7 @@ public final class ValidationUtility {
    * Since java knows multiple inheritance with interfaces and even loops, there is no deterministic way of collecting
    * annotations for a method. The default implementation collects the validation annotations in the order as
    * illustrated in the following example with the method "hello" that is overridden in every possible level.
-   * 
+   *
    * <pre>
    * interface I1a {
    *   void hello(@MaxLength(1) String s);
@@ -321,7 +319,7 @@ public final class ValidationUtility {
    *   }
    * }
    * </pre>
-   * 
+   *
    * The order of annotation traversal for A2.hello is A2, I2a, I2b, I2c, A1, I1a, I1b, I1c. This leads to using the
    * validation MaxLength(8).
    * <p>
@@ -565,9 +563,6 @@ public final class ValidationUtility {
       }
       Class<?> c = obj.getClass();
       //filter leaf nodes
-      if (c == null) {
-        return;
-      }
       if (c.isPrimitive() || c == Byte.class || c == Short.class || c == Integer.class || c == Long.class || c == Float.class || c == Double.class || c == Character.class || c == Boolean.class || c == String.class) {
         return;
       }

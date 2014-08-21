@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -63,10 +63,10 @@ public final class FormFieldsExtensionPoint {
 
   private static int getScopePriority(String scope) {
     int prio = IFormFieldExtension.SCOPE_DEFAULT;
-    if (StringUtility.isNullOrEmpty(scope) || scope.equalsIgnoreCase("default")) {
+    if (StringUtility.isNullOrEmpty(scope) || "default".equalsIgnoreCase(scope)) {
       prio = IFormFieldExtension.SCOPE_DEFAULT;
     }
-    else if (scope.equalsIgnoreCase("global")) {
+    else if ("global".equalsIgnoreCase(scope)) {
       prio = IFormFieldExtension.SCOPE_GLOBAL;
     }
     return prio;

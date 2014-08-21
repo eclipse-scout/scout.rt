@@ -91,10 +91,10 @@ public abstract class AbstractBooleanField extends AbstractValueField<Boolean> i
       text = null;
     }
     if (text != null) {
-      if (text.equals("1")) {
+      if ("1".equals(text)) {
         retVal = true;
       }
-      else if (text.equalsIgnoreCase("true")) {
+      else if ("true".equalsIgnoreCase(text)) {
         retVal = true;
       }
       else {

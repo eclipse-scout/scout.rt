@@ -130,8 +130,8 @@ public abstract class AbstractScoutEditorPart extends EditorPart implements ISwt
   }
 
   /**
-  *
-  */
+   *
+   */
   protected void updateToolbarActionsFromScout() {
     List<IToolButton> toolbuttons = ActionUtility.visibleNormalizedActions(getForm().getToolButtons());
     if (!toolbuttons.isEmpty()) {
@@ -215,7 +215,7 @@ public abstract class AbstractScoutEditorPart extends EditorPart implements ISwt
     //
     s = f.getSubTitle();
     if (s != null) {
-      swtForm.setText(SwtUtility.escapeMnemonics(StringUtility.removeNewLines(s != null ? s : "")));
+      swtForm.setText(SwtUtility.escapeMnemonics(StringUtility.removeNewLines(s)));
     }
     else {
       swtForm.setText(null);

@@ -143,7 +143,7 @@ public class ServicesExtensionManager implements Listener {
           initParams.put(initParamElement.getAttribute("name"), initParamElement.getAttribute("value"));
         }
         // add impl
-        if (serviceElement.getName().equals("service")) {
+        if ("service".equals(serviceElement.getName())) {
           if (sessionType != null && factory == null) {
             throw new IllegalArgumentException("cannot specify a session without a factory");
           }
@@ -169,7 +169,7 @@ public class ServicesExtensionManager implements Listener {
             ((IServiceFactory) factory).serviceRegistered(reg);
           }
         }
-        else if (serviceElement.getName().equals("proxy")) {
+        else if ("proxy".equals(serviceElement.getName())) {
           if (factory == null) {
             throw new IllegalArgumentException("a proxy requires a factory");
           }
@@ -194,7 +194,7 @@ public class ServicesExtensionManager implements Listener {
             ((IServiceFactory) factory).serviceRegistered(reg);
           }
         }
-        else if (serviceElement.getName().equals("serviceInitializerFactory")) {
+        else if ("serviceInitializerFactory".equals(serviceElement.getName())) {
           loadServiceInitializerFactory(extension, serviceElement, contributorBundle);
         }
         else {

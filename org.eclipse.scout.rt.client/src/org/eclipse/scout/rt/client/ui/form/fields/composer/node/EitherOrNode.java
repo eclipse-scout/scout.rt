@@ -43,12 +43,7 @@ public class EitherOrNode extends AbstractComposerNode {
 
   public boolean isEndOfEitherOr() {
     ITreeNode next = getSiblingAfter();
-    if (next instanceof EitherOrNode && !((EitherOrNode) next).isBeginOfEitherOr()) {
-      return false;
-    }
-    else {
-      return true;
-    }
+    return !(next instanceof EitherOrNode && !((EitherOrNode) next).isBeginOfEitherOr());
   }
 
   public boolean isNegative() {

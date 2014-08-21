@@ -111,7 +111,7 @@ public class FontSpec implements java.io.Serializable {
         }
       }
       //if name is "null" set it to null
-      if (newName != null && newName.equalsIgnoreCase("null")) {
+      if ("null".equalsIgnoreCase(newName)) {
         newName = null;
       }
       return new FontSpec(newName, newStyle, newSize);

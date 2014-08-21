@@ -177,8 +177,8 @@ public class VerticalGridMatrix implements IGridMatrix {
   }
 
   private boolean isAllCellFree(int x, int y, int w, int h) {
-    if (x + w > m_cursor.startX + m_cursor.columnCount ||
-        y + h > m_cursor.startY + m_cursor.rowCount) {
+    if (x + w > m_cursor.startX + m_cursor.columnCount
+        || y + h > m_cursor.startY + m_cursor.rowCount) {
       return false;
     }
     for (int xi = x; xi < x + w; xi++) {

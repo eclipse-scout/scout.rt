@@ -47,7 +47,7 @@ public class ExtensibleSwingApplicationTest {
 
   /**
    * When one of the extensions returns anything other than null, start() is aborted.
-   * 
+   *
    * @throws Exception
    */
   @Test
@@ -77,25 +77,6 @@ public class ExtensibleSwingApplicationTest {
     assertEquals(IApplication.EXIT_OK, app.startInSubject(null));
   }
 
-  /*
-
-  Cannot test this because showLoadError() opens a Swing message box which blocks the application.
-
-  @Test
-  public void testStartInSubject_CheckClientSession_Abort() throws Exception {
-    ISwingApplicationExtension ext = EasyMock.createMock(ISwingApplicationExtension.class);
-    IClientSession cs = EasyMock.createMock(IClientSession.class);
-    expect(ext.execStartInSubject(null, null)).andReturn(null);
-    expect(ext.getClientSession()).andReturn(cs);
-    expect(cs.isActive()).andReturn(false);
-    expect(cs.getLoadError()).andReturn(new IOException());
-    replay(ext, cs);
-    app = new ExtensibleSwingApplication(Collections.singletonList(ext));
-    assertEquals(IApplication.EXIT_OK, app.startInSubject(null));
-    verify(ext, cs);
-  }
-  */
-
   @Test
   public void testStartGUI() throws Exception {
     ISwingApplicationExtension ext = EasyMock.createMock(ISwingApplicationExtension.class);
@@ -123,7 +104,7 @@ public class ExtensibleSwingApplicationTest {
    * to call the notifyAll() method on that lock object a bit later. After that call the session is
    * not active anymore (the 3rd call for isActive() does return false). So the application should
    * terminate with the exit code of the last session that was terminated.
-   * 
+   *
    * @throws Exception
    */
   @Test

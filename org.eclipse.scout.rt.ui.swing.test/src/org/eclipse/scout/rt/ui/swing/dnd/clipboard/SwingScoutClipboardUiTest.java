@@ -30,12 +30,12 @@ import org.junit.Test;
 
 /**
  * This JUnit test tests the clipboard functionality for Swing
- * 
+ *
  * @since 3.10.0-M2
  */
 public class SwingScoutClipboardUiTest {
 
-  private static final String clipboardText = "some Text";
+  private static final String CLIPBOARD_TEXT = "some Text";
 
   @Test
   public void testBestTextFlavor() throws Exception {
@@ -47,7 +47,7 @@ public class SwingScoutClipboardUiTest {
     DataFlavor bestTextFlavor = DataFlavor.selectBestTextFlavor(flavors);
     Object content = transferable.getTransferData(bestTextFlavor);
     if (content instanceof String) {
-      assertEquals(clipboardText, content);
+      assertEquals(CLIPBOARD_TEXT, content);
     }
   }
 
@@ -63,10 +63,10 @@ public class SwingScoutClipboardUiTest {
     for (DataFlavor flavor : flavors) {
       Object content = transferable.getTransferData(flavor);
       if (content instanceof String) {
-        assertEquals(clipboardText, content);
+        assertEquals(CLIPBOARD_TEXT, content);
       }
       else if (content instanceof InputStream) {
-        assertEquals(clipboardText, getStringOfInputStream((InputStream) content, flavor.getParameter("charset")));
+        assertEquals(CLIPBOARD_TEXT, getStringOfInputStream((InputStream) content, flavor.getParameter("charset")));
       }
     }
 
@@ -74,10 +74,10 @@ public class SwingScoutClipboardUiTest {
     for (DataFlavor flavor : flavors) {
       Object content = transferable.getTransferData(flavor);
       if (content instanceof String) {
-        assertEquals(clipboardText, content);
+        assertEquals(CLIPBOARD_TEXT, content);
       }
       else if (content instanceof InputStream) {
-        assertEquals(clipboardText, getStringOfInputStream((InputStream) content, flavor.getParameter("charset")));
+        assertEquals(CLIPBOARD_TEXT, getStringOfInputStream((InputStream) content, flavor.getParameter("charset")));
       }
     }
   }
@@ -89,18 +89,18 @@ public class SwingScoutClipboardUiTest {
     JTextField textfield = new JTextField();
     textfield.paste();
 
-    assertEquals(clipboardText, textfield.getText());
+    assertEquals(CLIPBOARD_TEXT, textfield.getText());
 
     textfield.paste();
     textfield.paste();
     textfield.paste();
 
-    assertEquals(clipboardText + clipboardText + clipboardText + clipboardText, textfield.getText());
+    assertEquals(CLIPBOARD_TEXT + CLIPBOARD_TEXT + CLIPBOARD_TEXT + CLIPBOARD_TEXT, textfield.getText());
   }
 
   private void setTextToClipboard() throws Exception {
     SwingScoutClipboardService service = new SwingScoutClipboardService();
-    TextTransferObject textTransferObject = new TextTransferObject(clipboardText);
+    TextTransferObject textTransferObject = new TextTransferObject(CLIPBOARD_TEXT);
     service.setContents(textTransferObject);
     Thread.sleep(500); //Wait half a second to make sure the content is in the clipboard
   }

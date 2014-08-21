@@ -57,15 +57,12 @@ public class DataModelUtilityTest {
     String s;
     //
     s = visit(dataModel, v, 2);
-    //System.out.println(s);
     assertEquals(readFile("fixture/level2-new.txt").trim(), s.trim());
     //
     s = visit(dataModel, v, 3);
-    //System.out.println(s);
     assertEquals(readFile("fixture/level3-new.txt").trim(), s.trim());
     //
     s = visit(dataModel, v, 4);
-    //System.out.println(s);
     assertEquals(readFile("fixture/level4-new.txt").trim(), s.trim());
   }
 

@@ -82,7 +82,7 @@ public abstract class AbstractTableFieldData extends AbstractFormFieldData imple
 
   @Override
   public void setRowState(int row, int state) {
-    setValueInternal(row, getColumnCount(), new Integer(state));
+    setValueInternal(row, getColumnCount(), Integer.valueOf(state));
   }
 
   /**

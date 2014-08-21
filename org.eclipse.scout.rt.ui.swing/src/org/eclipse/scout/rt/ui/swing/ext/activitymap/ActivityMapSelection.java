@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -215,14 +215,14 @@ public class ActivityMapSelection {
   public boolean equals(Object obj) {
     if (obj instanceof ActivityMapSelection) {
       ActivityMapSelection o = (ActivityMapSelection) obj;
-      return CompareUtility.equals(this.m_rows, o.m_rows) &&
-          CompareUtility.equals(this.m_range, o.m_range) &&
-          this.m_hasAnchor == o.m_hasAnchor &&
-          CompareUtility.equals(this.m_anchorRange, o.m_anchorRange) &&
-          this.m_anchorRow == o.m_anchorRow &&
-          this.m_hasLead == o.m_hasAnchor &&
-          CompareUtility.equals(this.m_leadRange, o.m_leadRange) &&
-          this.m_leadRow == o.m_leadRow;
+      return CompareUtility.equals(this.m_rows, o.m_rows)
+          && CompareUtility.equals(this.m_range, o.m_range)
+          && this.m_hasAnchor == o.m_hasAnchor
+          && CompareUtility.equals(this.m_anchorRange, o.m_anchorRange)
+          && this.m_anchorRow == o.m_anchorRow
+          && this.m_hasLead == o.m_hasAnchor
+          && CompareUtility.equals(this.m_leadRange, o.m_leadRange)
+          && this.m_leadRow == o.m_leadRow;
     }
     return false;
   }

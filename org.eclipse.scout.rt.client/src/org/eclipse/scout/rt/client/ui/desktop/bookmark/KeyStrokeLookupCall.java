@@ -44,7 +44,7 @@ public class KeyStrokeLookupCall extends LocalLookupCall<String> {
     final HashMap<String, Integer> keyStrokesUpper = new HashMap<String, Integer>();
     //build possible keyStrokes
     for (int i = 1; i <= 12; i++) {
-      keyStrokesUpper.put("SHIFT-F" + i, new Integer(i));
+      keyStrokesUpper.put("SHIFT-F" + i, Integer.valueOf(i));
     }
     //remove used keyStrokes
     IBookmarkService service = SERVICES.getService(IBookmarkService.class);

@@ -190,11 +190,11 @@ public class AbstractMemoryPolicy implements IMemoryPolicy {
     }
     FastBeanInfo pi = new FastBeanInfo(page.getClass(), page.getClass().getSuperclass());
     for (FastPropertyDescriptor prop : pi.getPropertyDescriptors()) {
-      if (prop.getReadMethod() != null &&
-          (Date.class.isAssignableFrom(prop.getPropertyType()) ||
-              Number.class.isAssignableFrom(prop.getPropertyType()) ||
-              String.class.isAssignableFrom(prop.getPropertyType()) ||
-              long.class.isAssignableFrom(prop.getPropertyType()))) {
+      if (prop.getReadMethod() != null
+          && (Date.class.isAssignableFrom(prop.getPropertyType())
+              || Number.class.isAssignableFrom(prop.getPropertyType())
+              || String.class.isAssignableFrom(prop.getPropertyType())
+              || long.class.isAssignableFrom(prop.getPropertyType()))) {
         // only accept Numbers, Strings or Dates
         try {
           b.append("/");

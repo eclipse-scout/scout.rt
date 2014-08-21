@@ -76,9 +76,9 @@ public abstract class AbstractColorField extends AbstractBasicField<String> impl
         int r = Integer.valueOf(matcher.group(1));
         int g = Integer.valueOf(matcher.group(2));
         int b = Integer.valueOf(matcher.group(3));
-        if (r < 0 || r > 255 ||
-            g < 0 || g > 255 ||
-            b < 0 || b > 255) {
+        if (r < 0 || r > 255
+            || g < 0 || g > 255
+            || b < 0 || b > 255) {
           throw new ProcessingException(ScoutTexts.get("InvalidValueMessageX", text));
         }
         String hexValue = ColorUtility.rgbToText(r, g, b).toUpperCase();

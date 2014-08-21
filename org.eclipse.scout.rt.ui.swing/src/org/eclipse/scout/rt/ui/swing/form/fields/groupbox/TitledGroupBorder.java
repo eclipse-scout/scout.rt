@@ -139,7 +139,7 @@ public class TitledGroupBorder implements Border {
       insets.bottom = i.bottom;
       insets.left = i.left;
     }
-    if (c == null || getText() == null || getText().equals("")) {
+    if (c == null || getText() == null || "".equals(getText())) {
       /* nop */
     }
     else {
