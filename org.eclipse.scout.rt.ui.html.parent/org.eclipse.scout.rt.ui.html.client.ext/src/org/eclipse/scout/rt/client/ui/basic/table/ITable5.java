@@ -2,6 +2,7 @@ package org.eclipse.scout.rt.client.ui.basic.table;
 
 import java.util.List;
 
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
 
 /*******************************************************************************
@@ -18,4 +19,6 @@ public interface ITable5 extends ITable {
   List<ITableControl> getControls();
 
   void fireTableReloadFromUI();
+
+  Class<? extends IMenu> getDefaultMenu();
 }

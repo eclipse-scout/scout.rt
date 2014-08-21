@@ -73,4 +73,9 @@ public class AbstractTable5 extends AbstractExtensibleTable implements ITable5 {
     }
   }
 
+  @Override
+  public Class<? extends IMenu> getDefaultMenu() {
+    return super.getDefaultMenuInternal();
+  }
+
 }
