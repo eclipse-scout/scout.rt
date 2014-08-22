@@ -12,51 +12,30 @@ font-weight: 400;
 src: local('Open Sans'), local('OpenSans'), url('open_sans_normal.woff') format('woff');
 }
 
-@font-face {
-font-family: fontScout;
-font-style: normal;
-font-weight: 600;
-src: local('Open Sans Semibold'), local('OpenSans-Semibold'), url('open_sans_semi.woff') format('woff');
-}
-
-@font-face {
-font-family: fontScout;
-font-style: normal;
-font-weight: 700;
-src: local('Open Sans Bold'), local('OpenSans-Bold'), url('open_sans_bold.woff') format('woff');
-}
-
-@font-face {
-font-family: 'Open Sans';
-font-style: normal;
-font-weight: 800;
-src: local('Open Sans Extrabold'), local('OpenSans-Extrabold'), url('open_sans_extra.woff') format('woff');
-}
-
 .font-icon(@weight: 400) {
 font-family: fontAwesome;
 font-weight: @weight;
 }
 
-.font-text-small(@weight: 600) {
+.font-text-small(@weight: 400) {
 font-family: fontScout, sans-serif;
 font-weight: @weight;
 font-size: 11px;
 }
 
-.font-text-normal(@weight: 600) {
+.font-text-normal(@weight: 400) {
 font-family: fontScout, sans-serif;
 font-weight: @weight;
 font-size: 13px;
 }
 
-.font-text-plus(@weight: 600) {
+.font-text-plus(@weight: 400) {
 font-family: fontScout, sans-serif;
 font-weight: @weight;
 font-size: 14px;
 }
 
-.font-text-large(@weight: 600) {
+.font-text-large(@weight: 400) {
 font-family: fontScout, sans-serif;
 font-weight: @weight;
 font-size: 16px;

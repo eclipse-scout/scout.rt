@@ -16,9 +16,6 @@ user-select: none;
 cursor: default;
 .font-text-normal;
 
-/* workaround */
-font-weight: 100;
--webkit-font-smoothing: antialiased;
 }
 
 *, *:before, *:after {

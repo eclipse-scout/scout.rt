@@ -67,6 +67,11 @@ scout.menus = {
       return;
     }
 
+    if ($clicked && $clicked.hasClass('menu-open')) {
+      $clicked.removeClass('menu-open');
+      return;
+    }
+
     $menuContainer = $parent.appendDiv('', 'menu-container');
     $clicked.addClass('menu-open');
 
@@ -96,15 +101,18 @@ scout.menus = {
     // every user action will close menu; menu is removed in 'click' event, see onMenuItemClicked()
     var closingEvents = 'mousedown.contextMenu keydown.contextMenu mousewheel.contextMenu';
     $(document).one(closingEvents, removeMenu);
-    $menuContainer.one(closingEvents, $.suppressEvent);
 
-    function removeMenu() {
+    function removeMenu(event) {
       // close container
       $menuContainer.remove();
-      $clicked.addClass('menu-open');
 
       // Remove all cleanup handlers
       $(document).off('.contextMenu');
+
+      // click on button do not reopen menu
+      if (!$(event.target).is($clicked)) {
+        $clicked.removeClass('menu-open');
+      }
     }
 
     function onItemClicked() {
