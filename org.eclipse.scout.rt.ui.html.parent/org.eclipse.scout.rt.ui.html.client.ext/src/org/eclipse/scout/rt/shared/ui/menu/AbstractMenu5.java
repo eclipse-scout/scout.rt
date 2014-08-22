@@ -23,6 +23,14 @@ public class AbstractMenu5 extends AbstractMenu implements IMenu5 {
   private final EventListenerList m_listenerList = new EventListenerList();
   private int m_systemType;
 
+  public AbstractMenu5() {
+    super(true);
+  }
+
+  public AbstractMenu5(boolean callInitializer) {
+    super(callInitializer);
+  }
+
   @Override
   protected void initConfig() {
     super.initConfig();
