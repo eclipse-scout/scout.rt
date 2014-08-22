@@ -80,7 +80,9 @@ public abstract class AbstractExtensiblePageWithTable<T extends ITable> extends 
   @Override
   protected IPage createChildPageInternal(ITableRow row) throws ProcessingException {
     IPage childPage = super.createChildPageInternal(row);
-    PageExtensionUtility.adaptPage(getOutline(), this, childPage);
+    if (childPage != null) {
+      PageExtensionUtility.adaptPage(getOutline(), this, childPage);
+    }
     return childPage;
   }
 }
