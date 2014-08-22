@@ -57,5 +57,6 @@ scout.Menubar.prototype._addMenuItem = function(menu) {
 };
 
 scout.Menubar.prototype._addMenuSeparator = function () {
-  this.lastMenu.$container.addClass('menu-separator');
+  var s = this.$container.appendDIV('menu-separator');
+  this.menus.push(s);
 };

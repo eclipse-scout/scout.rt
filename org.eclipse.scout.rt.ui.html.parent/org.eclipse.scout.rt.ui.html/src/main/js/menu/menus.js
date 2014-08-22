@@ -71,7 +71,7 @@ scout.menus = {
       }
     }
   },
-  showContextMenu: function(menus, $parent, $clicked, left, right, top) {
+  showContextMenu: function(menus, $parent, $clicked, left, right, top, menuWindow) {
     var i, $menuContainer = $('.menu-container', $parent);
 
     if ($menuContainer.length) {
@@ -89,6 +89,16 @@ scout.menus = {
 
     $menuContainer = $parent.appendDiv('', 'menu-container');
     $clicked.addClass('menu-open');
+
+    if (menuWindow) {
+      $menuContainer.addClass('menu-window');
+      $menuContainer.width($clicked.width() + 24);
+    }
+
+    if ($clicked && $clicked.hasClass('menu-right')) {
+      $menuContainer.addClass('menu-right');
+    }
+
 
     for (i = 0; i < menus.length; i++) {
       var menu = menus[i];
@@ -108,7 +118,7 @@ scout.menus = {
         $menuContainer.css('top', top);
       }
 
-      $menuContainer.appendDiv('', 'menu-item', menu.text)
+      $menuContainer.appendDIV('menu-item', menu.text)
         .data('menu', menu)
         .on('click', '', onItemClicked);
     }
@@ -116,6 +126,10 @@ scout.menus = {
     // every user action will close menu; menu is removed in 'click' event, see onMenuItemClicked()
     var closingEvents = 'mousedown.contextMenu keydown.contextMenu mousewheel.contextMenu';
     $(document).one(closingEvents, removeMenu);
+
+    if (!menuWindow) {
+      $menuContainer.one(closingEvents, $.suppressEvent);
+    }
 
     function removeMenu(event) {
       // close container

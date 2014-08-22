@@ -22,17 +22,25 @@ scout.Menu.prototype._render = function($parent) {
     .appendDiv('', 'menu-item')
     .on('click', '', onClicked.bind(this));
 
+  if (this.childMenus.length > 0 && this.text) {
+    this.$container.addClass('has-submenu');
+  }
+
   function onClicked(event) {
     if (this.$container.isEnabled()) {
       return;
     }
 
     if (this.children.length > 0) {
-      // TODO cru: mmh, works only for menubar, not for context menu...
-      var right = parseFloat(this.parent.$container[0].offsetWidth) - parseFloat(this.$container.position().left) -  parseFloat(this.$container[0].offsetWidth),
-        top = this.$container.height() - 3;
-
-      scout.menus.showContextMenu(this.children, this.parent.$container, this.$container, undefined, right, top);
+      //TODO cru: work in progress
+      if (this.$container.hasClass('menu-right')) {
+        var right = parseFloat(this.parent.$container[0].offsetWidth) - parseFloat(this.$container.position().left) -  parseFloat(this.$container[0].offsetWidth),
+          top = this.$container.height() - 7;
+        scout.menus.showContextMenu(this.children, this.parent.$container, this.$container, undefined, right, top, false);
+      } else {
+        var left = parseFloat(this.$container.position().left) + 8;
+      scout.menus.showContextMenu(this.children, this.parent.$container, this.$container, left, undefined, 8, true);
+      }
     } else {
       this.sendMenuAction();
     }
