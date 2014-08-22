@@ -55,6 +55,9 @@ scout.Table.prototype._render = function($parent) {
   }
 
   this.menubar = new scout.Menubar(this.$container);
+  this.menubar.menuTypesForLeft1 = ['Table.EmptySpace'];
+  this.menubar.menuTypesForLeft2 = ['Table.SingleSelection', 'Table.MultiSelection'];
+  this.menubar.menuTypesForRight = ['Table.Header'];
 
   this._$header = this.$container.appendDIV('table-header');
   if (!this.headerVisible) {

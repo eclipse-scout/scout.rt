@@ -1,5 +1,6 @@
 scout.Menu = function() {
   scout.Menu.parent.call(this);
+  this.childMenus = [];
   this._addAdapterProperties('childMenus');
 };
 
@@ -20,10 +21,6 @@ scout.Menu.prototype._render = function($parent) {
   this.$container = $parent
     .appendDiv('', 'menu-item')
     .on('click', '', onClicked.bind(this));
-
-  if (scout.menus.checkType(this, ['Table.Header'])) {
-    this.$container.addClass('menu-right');
-  }
 
   function onClicked(event) {
     if (this.$container.isEnabled()) {

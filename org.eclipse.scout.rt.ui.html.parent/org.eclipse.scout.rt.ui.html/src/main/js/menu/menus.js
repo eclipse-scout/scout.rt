@@ -8,23 +8,22 @@ scout.menus = {
     }
 
     var filteredMenus = [];
-    var hasValidMenus = false;
     var separatorCount = 0;
     for (var i = 0; i < menus.length; i++) {
       var menu = menus[i];
 
       var childMenus = menu.childMenus;
-      if (childMenus && childMenus.length > 0) {
+      if (childMenus.length > 0) {
         childMenus = scout.menus.filter(menu.childMenus, types);
         if (childMenus.length === 0) {
           continue;
         }
+      } //don't check the menu type for a group
+      else if (!scout.menus._checkType(menu, types)) {
+        continue;
       }
 
       if (!menu.visible) {
-        continue;
-      }
-      if (!scout.menus.checkType(menu, types)) {
         continue;
       }
 
@@ -43,6 +42,22 @@ scout.menus = {
     return filteredMenus;
   },
   checkType: function(menu, types) {
+    var childMenus;
+    if (types && !Array.isArray(types)) {
+      types = [types];
+    }
+
+    if (menu.childMenus.length > 0) {
+      childMenus = scout.menus.filter(menu.childMenus, types);
+      return (childMenus.length > 0);
+    }
+
+    return scout.menus._checkType(menu, types);
+  },
+  /**
+   * Checks the type of a menu. Don't use this for menu groups.
+   */
+  _checkType: function(menu, types) {
     if (!types) {
       return true;
     }

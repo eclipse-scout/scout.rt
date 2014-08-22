@@ -3,6 +3,9 @@ scout.Menubar = function($parent) {
   this.$container = $parent.prependDiv('', 'menubar');
   this.menus = [];
   this.lastMenu;
+  this.menuTypesForLeft1 = [];
+  this.menuTypesForLeft2 = [];
+  this.menuTypesForRight = [];
 };
 
 scout.Menubar.prototype.updateItems = function(menus) {
@@ -25,7 +28,7 @@ scout.Menubar.prototype.updateItems = function(menus) {
   if (!menus || menus.length === 0) return;
 
   // add empty space menu
-  empty = scout.menus.filter(menus, ['Table.EmptySpace']);
+  empty = scout.menus.filter(menus, this.menuTypesForLeft1);
   if (empty && empty.length > 0) {
     for (i = 0; i < empty.length; i++) {
       this._addMenuItem(empty[i]);
@@ -34,10 +37,11 @@ scout.Menubar.prototype.updateItems = function(menus) {
   }
 
   // add all other menues
+  menus = scout.menus.filter(menus, this.menuTypesForLeft2.concat(this.menuTypesForRight));
   for (i = 0; i < menus.length; i++) {
     if (menus[i].separator) {
       this._addMenuSeparator();
-    } else if (!scout.menus.checkType(menus[i], ['Table.EmptySpace'])){
+    } else {
       this._addMenuItem(menus[i]);
     }
   }
@@ -45,6 +49,9 @@ scout.Menubar.prototype.updateItems = function(menus) {
 
 scout.Menubar.prototype._addMenuItem = function(menu) {
   menu.render(this.$container);
+  if (scout.menus.checkType(menu, this.menuTypesForRight)) {
+    menu.$container.addClass('menu-right');
+  }
   this.menus.push(menu);
   this.lastMenu = menu;
 };

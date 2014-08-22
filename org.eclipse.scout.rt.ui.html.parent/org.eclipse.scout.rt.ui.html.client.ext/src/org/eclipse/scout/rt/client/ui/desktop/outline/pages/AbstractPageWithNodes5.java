@@ -19,6 +19,7 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
+import org.eclipse.scout.rt.client.ui.basic.table.internal.TablePageTreeMenuWrapper;
 import org.eclipse.scout.rt.client.ui.form.FormMenuType;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IForm5;
@@ -122,12 +123,17 @@ public class AbstractPageWithNodes5 extends AbstractExtensiblePageWithNodes {
 
     //Add page menus to the form
     for (IMenu menu : getOutline().getContextMenu().getChildActions()) {
+      //FIXME CGU improve this
+      if (menu instanceof TablePageTreeMenuWrapper && ((TablePageTreeMenuWrapper) menu).getWrappedMenu().getClass().getSimpleName().contains("DrillDownMenu")) {
+        continue;
+      }
       Set<IMenuType> types = new HashSet<IMenuType>();
       for (IMenuType type : menu.getMenuTypes()) {
         if (type instanceof FormMenuType) {
           types.add(type);
         }
       }
+
       if (types.isEmpty()) {
         types.add(FormMenuType.Regular);
       }
