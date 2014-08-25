@@ -31,7 +31,7 @@ scout.CheckBoxField.prototype._render = function($parent) {
 };
 
 scout.CheckBoxField.prototype._setEnabled = function(enabled) {
-    this._$checkBox.setEnabled(enabled);
+  this._$checkBox.setEnabled(enabled);
 };
 
 scout.CheckBoxField.prototype._setValue = function(value) {

@@ -12,23 +12,22 @@ scout.inherits(scout.Tree, scout.ModelAdapter);
 scout.Tree.prototype.init = function(model, session) {
   scout.Tree.parent.prototype.init.call(this, model, session);
 
-  var initNodeMap = function(parentNode, node) {
-    this._nodeMap[node.id] = node;
+  this._visitNodes(this.nodes, this._initTreeNode.bind(this));
+};
 
-    if (parentNode) {
-      node.parentNode = parentNode;
+scout.Tree.prototype._initTreeNode = function(parentNode, node) {
+  this._nodeMap[node.id] = node;
+
+  if (parentNode) {
+    node.parentNode = parentNode;
+  }
+
+  //init this._selectedNodes
+  if (this.selectedNodeIds && this.selectedNodeIds.indexOf(node.id) > -1) {
+    if (this._selectedNodes.indexOf(node) <= -1) {
+      this._selectedNodes.push(node);
     }
-
-    //init this._selectedNodes
-    if (this.selectedNodeIds && this.selectedNodeIds.indexOf(node.id) > -1) {
-      if (this._selectedNodes.indexOf(node) <= -1) {
-        this._selectedNodes.push(node);
-      }
-    }
-
-  }.bind(this);
-
-  this._visitNodes(this.nodes, initNodeMap);
+  }
 };
 
 scout.Tree.prototype._visitNodes = function(nodes, func, parentNode) {
@@ -199,17 +198,10 @@ scout.Tree.prototype._setNodeSelected = function(node, $node) {
 };
 
 scout.Tree.prototype._onNodesInserted = function(nodes, parentNodeId) {
-  var updateNodeMap, parentNode, $parentNode;
-
-  updateNodeMap = function(parentNode, node) {
-    if (parentNode) {
-      node.parentNode = parentNode;
-    }
-    this._nodeMap[node.id] = node;
-  }.bind(this);
+  var parentNode, $parentNode;
 
   parentNode = this._nodeMap[parentNodeId];
-  this._visitNodes(nodes, updateNodeMap, parentNode);
+  this._visitNodes(nodes, this._initTreeNode.bind(this), parentNode);
 
   //update parent with new child nodes
   parentNode.childNodes.push.apply(parentNode.childNodes, nodes);
@@ -357,17 +349,6 @@ scout.Tree.prototype._addNodes = function(nodes, $parent) {
       $node.insertAfter($parent);
     } else {
       $node.prependTo(this._$treeScroll);
-    }
-
-    // TODO AWE: (json) diese beiden if's prüfen und ggf. ganz entfernen
-    if (node.table && typeof node.table == 'string') {
-    //if (node.table) {
-      node.table = this.session.getOrCreateModelAdapter(node.table, this);
-    }
-
-    if (node.detailForm && typeof node.detailForm == 'string') {
-    //if (node.detailForm) {
-      node.detailForm = this.session.getOrCreateModelAdapter(node.detailForm, this);
     }
 
     // if model demands children, create them

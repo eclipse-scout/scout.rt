@@ -12,10 +12,12 @@ package org.eclipse.scout.rt.ui.html.json.desktop;
 
 import java.util.Collection;
 
+import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithNodes;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
@@ -71,6 +73,10 @@ public class JsonOutline extends JsonTree<IOutline> {
       IPageWithTable<?> pageWithTable = (IPageWithTable<?>) page;
       attachAdapter(pageWithTable.getTable());
     }
+    else if (page instanceof IPageWithNodes) {
+      IPageWithNodes pageWithNodes = (IPageWithNodes) page;
+      attachAdapter(pageWithNodes.getInternalTable());
+    }
   }
 
   protected void disposePage(IPage page) {
@@ -90,33 +96,26 @@ public class JsonOutline extends JsonTree<IOutline> {
     JSONObject json = super.treeNodeToJson(node);
 
     if (!(node instanceof IPage)) {
-      throw new IllegalArgumentException("Expected page.");
+      throw new IllegalArgumentException("Expected node to be a page. " + node);
     }
     IPage page = (IPage) node;
 
-    optPutAdapterIdProperty(json, "detailForm", page.getDetailForm());
+    optPutAdapterIdProperty(json, IOutline.PROP_DETAIL_FORM, page.getDetailForm());
 
     String pageType = "";
     if (page instanceof IPageWithTable) {
-      pageType = "table";
+      pageType = IOutline.PROP_DETAIL_TABLE;
       IPageWithTable<?> pageWithTable = (IPageWithTable<?>) page;
-      putAdapterIdProperty(json, "table", pageWithTable.getTable());
+      putAdapterIdProperty(json, IOutline.PROP_DETAIL_TABLE, pageWithTable.getTable());
     }
-    else {
+    else if (page instanceof IPageWithNodes) {
       pageType = "node";
       //FIXME send internal table and ignore on gui? or better modify model? -> maybe best to make it configurable on nodepage
-//        IPageWithNodes pageWithNodes = (IPageWithNodes) page;
-//        ITable table = pageWithNodes.getInternalTable();
-//        if (table != null) {
-//          JsonDesktopTable jsonTable = m_jsonTables.get(table);
-//          if (jsonTable == null) {
-//            jsonTable = new JsonDesktopTable(table, getJsonSession());
-//            jsonTable.init();
-//            m_jsonTables.put(table, jsonTable);
-//          }
-//          json.put("table", m_jsonTables.get(table).toJson());
-//        }
+      IPageWithNodes pageWithNodes = (IPageWithNodes) page;
+      ITable table = pageWithNodes.getInternalTable();
+      putAdapterIdProperty(json, IOutline.PROP_DETAIL_TABLE, table);
     }
+    //FIXME CGU virtual node?
     putProperty(json, "type", pageType);
 
     return json;
@@ -160,19 +159,37 @@ public class JsonOutline extends JsonTree<IOutline> {
     // als früher, würde man m_treeNodeIds.get(selectedNode) aufrufen, käme hier "null" zurück.
     // Evtl. muss das in den anderen handleXYZ() methoden auch so gelöst werden?
     if (detailForm == null) {
-      putProperty(jsonEvent, "detailForm", null);
+      putProperty(jsonEvent, IOutline.PROP_DETAIL_FORM, null);
     }
     else {
       IJsonAdapter<?> detailFormAdapter = attachAdapter(detailForm);
-      putProperty(jsonEvent, "detailForm", detailFormAdapter.getId());
+      putProperty(jsonEvent, IOutline.PROP_DETAIL_FORM, detailFormAdapter.getId());
     }
+    System.out.println(IOutline.PROP_DETAIL_FORM + detailForm);
     addActionEvent("detailFormChanged", jsonEvent);
+  }
+
+  protected void handleModelDetailTableChanged(ITable detailTable) {
+    JSONObject jsonEvent = new JSONObject();
+    ITreeNode selectedNode = getModel().getSelectedNode();
+    putProperty(jsonEvent, PROP_NODE_ID, getOrCreateNodeId(selectedNode));
+    if (detailTable == null) {
+      putProperty(jsonEvent, IOutline.PROP_DETAIL_TABLE, null);
+    }
+    else {
+      IJsonAdapter<?> detailFormAdapter = attachAdapter(detailTable);
+      putProperty(jsonEvent, IOutline.PROP_DETAIL_TABLE, detailFormAdapter.getId());
+    }
+    addActionEvent("detailTableChanged", jsonEvent);
   }
 
   @Override
   protected void handleModelPropertyChange(String propertyName, Object newValue) {
     if (IOutline.PROP_DETAIL_FORM.equals(propertyName)) {
       handleModelDetailFormChanged((IForm) newValue);
+    }
+    else if (IOutline.PROP_DETAIL_TABLE.equals(propertyName)) {
+      handleModelDetailTableChanged((ITable) newValue);
     }
     else {
       super.handleModelPropertyChange(propertyName, newValue);

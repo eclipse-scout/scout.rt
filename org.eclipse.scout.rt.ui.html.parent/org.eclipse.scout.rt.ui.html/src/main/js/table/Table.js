@@ -60,14 +60,8 @@ scout.Table.prototype._render = function($parent) {
   this.menubar.menuTypesForRight = ['Table.Header'];
 
   this._$header = this.$container.appendDIV('table-header');
-  if (!this.headerVisible) {
-    //FIXME maybe better to not create at all?
-    this._$header.hide();
-  }
   this._header = new scout.TableHeader(this, this._$header, this.session);
-
   this.$data = this.$container.appendDIV('table-data');
-
   this.footer = new scout.TableFooter(this, this.$container, this.session);
 
   if (this.configurator && this.configurator.render) {
@@ -76,6 +70,11 @@ scout.Table.prototype._render = function($parent) {
 
   // load data and create rows
   this.drawData();
+};
+
+scout.Table.prototype._callSetters = function() {
+  this._setHeaderVisible(this.headerVisible);
+  this._setEnabled(this.enabled);
 };
 
 scout.Table.prototype.dispose = function() {
@@ -863,11 +862,21 @@ scout.Table.prototype._triggerFilterResetted = function() {
 };
 
 scout.Table.prototype._setHeaderVisible = function(headerVisible) {
-  if (headerVisible) {
-    this._$header.show();
-  } else {
-    this._$header.hide();
-  }
+  //FIXME CGU this would be better than show/hide, but buildRow relies on header -> refactor
+//  if (this.headerVisible && !this._header) {
+//      this._$header = $('table-header').prependTo(this.$data);
+//      this._header = new scout.TableHeader(this, this._$header, this.session);
+//    }
+//  else if (!this.headerVisible && this._header) {
+//    this._$header.remove();
+//    this._header = null;
+//  }
+  this._$header.setVisible(headerVisible);
+};
+
+scout.Table.prototype._setEnabled = function(enabled) {
+  //FIXME CGU remove/add events. Maybe extend jquery to not fire on disabled events?
+  this.$dataScroll.setEnabled(enabled);
 };
 
 scout.Table.prototype.onModelAction = function(event) {
