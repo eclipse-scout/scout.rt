@@ -794,10 +794,9 @@ scout.Table.prototype.moveColumn = function($header, oldPos, newPos, dragged) {
   }
 
   // move menu
-  var left = $header.offset().left;
+  var left = $header.position().left;
 
-  $('#TableHeaderMenuTitle').animateAVCSD('left', left - 12);
-  $('#TableHeaderMenu').animateAVCSD('left', left - 12);
+  $('.table-header-menu').animateAVCSD('left', left + 20);
 
   // move cells
   $('.table-row, .table-row-sum').each(function() {

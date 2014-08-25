@@ -1,64 +1,54 @@
-#TableHeaderMenuTitle {
-position: fixed;
-z-index: 104;
-border-top: 2px solid #0082A1;
-border-left: 2px solid #0082A1;
-border-right: 2px solid #0082A1;
-padding: 6px 4px 0px 10px;
-font-weight: bold;
-line-height: 20px;
-cursor:pointer;
-overflow: hidden;
-color:#FE9915;
-background-color: #FFF;
-white-space: nowrap;
-text-overflow: ellipsis;
-}
-
-#TableHeaderMenu {
-position: fixed;
-z-index: 103;
-border: 2px solid #0082A1;
-background-color: #FFF;
-padding-bottom: 5px;
-overflow: hidden;}
-
-#HeaderTitle{
-padding: 10px 1px 10px 10px;
-}
-
-#HeaderCommand{
-padding: 10px 1px 0px 10px;
-}
-
-#HeaderFilter{
-padding: 0px 1px 5px 10px;
+.table-header-menu {
+	position: absolute;
+	z-index: 4;
+	border-top: 1px solid @color-bench;
+	.menu-context;
+	width: 225px;
+	background-color: @color-bench;
+	padding-bottom: 5px;
+	overflow: hidden;
 }
 
 .header-group{
-width: 250px;
-height: 60px;
+	padding: 10px 0px 35px 10px;
 }
 
+
 .header-text{
-clear: both;
-color: #0082A1;
+	.font-text-normal(700);
+	color: @color-bench-text;
+	line-height: 22px;
+	height: 22px;
+	overflow: hidden;
 }
 
 .header-command{
-float: left;
-width: 55px;
-margin-right: 7px;
-heigth: 26px;
-font-family: fontAwesome;
-font-size: 17px;
-line-height: 26px;
-color: #fff;
-background-color: #e2e2e2;
-cursor: pointer;
-text-align: center;
-}
+	float: left;
+	width: 43px;
+	margin-right: 10px;
+	heigth: 30px;
+	font-family: fontAwesome;
+	font-size: 17px;
+	line-height: 30px;
+	color: @color-bench-text;
+	border: 1px solid @color-bench-light-border;
+	cursor: pointer;
+	text-align: center;
+	
+	&:hover {
+		color: @color-bench-text-hover;
+	}
+	
+	&.selected{
+		background-color: @color-bench-highlight;
+		border: 1px solid @color-bench-highlight;
+	}
 
+	&.selected:before,
+	&.selected:after{
+		color: @color-bench;
+	}
+}
 
 .header-command:after {
 position: relative;
@@ -168,58 +158,31 @@ line-height: 22px;
 #HeaderCommandColumnAdd:before { content: "\F067";}
 #HeaderCommandColumnRemove:before { content: "\F00D";}
 
-#HeaderCommandSetUser1:before { content: "1";}
-#HeaderCommandSetUser2:before { content: "2";}
-#HeaderCommandSetUser3:before { content: "3";}
-
-#HeaderCommandResetUser1:before { content: "1";}
-#HeaderCommandResetUser2:before { content: "2";}
-#HeaderCommandResetUser3:before { content: "3";}
-#HeaderCommandResetDefault:before { content: "BSI";}
-
-#HeaderCommandExportExcel:before { content: "XLS";}
-#HeaderCommandExportWord:before { content: "DOC";}
-#HeaderCommandExportPowerpoint:before { content: "PPT";}
-#HeaderCommandExportPDF:before { content: "PDF";}
-
-#HeaderCommandShareEmail:before { content: "\F0E0";}
-#HeaderCommandShareGoogle:before { content: "\F0D5";}
-#HeaderCommandShareTwitter:before { content: "\F099  ";}
-#HeaderCommandShareFacebook:before { content: "\F09A";}
-
-#HeaderFilterContainer{
-position: relative;
-overflow:hidden;
-height: 226px;
-padding: 0px;
+.header-filter-container{
+	position: relative;
+	overflow:hidden;
+	height: 226px;
+	padding: 0px;
 }
 
-#HeaderFilterScroll {
-position: absolute;
-top: 0px;
-width: 100%;
-height: 100%;
-padding: 0px;
-}
-
-#HeaderFilterContainer > .scrollbar{
+.header-filter-container > .scrollbar{
 right: 8px;}
 
 
 .header-filter {
-position:relative;
-width: 241px;
-float: left;
-clear: both;
-heigth: 26px;
-line-height: 26px;
-background-color: #e2e2e2;
-cursor: pointer;
-margin-bottom: 5px;
-padding: 2px 20px 0px 6px;
-overflow: hidden;
-white-space: nowrap;
-text-overflow: ellipsis;
+	position:relative;
+	width: 241px;
+	float: left;
+	clear: both;
+	heigth: 26px;
+	line-height: 26px;
+	background-color: #e2e2e2;
+	cursor: pointer;
+	margin-bottom: 5px;
+	padding: 2px 20px 0px 6px;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
 }
 
 .header-filter:last-child {
@@ -232,17 +195,6 @@ right: 10px;
 content: attr(data-value);
 }
 
-.header-command.selected,
 .header-filter.selected {
 background-color: #fe9915 ! important;
-}
-
-.header-command:hover,
-.header-filter:hover{
-background-color: #ccc;
-}
-
-.header-command.selected:after,
-.header-command.selected:before {
-color: #fff !important;
 }

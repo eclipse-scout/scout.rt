@@ -11,8 +11,8 @@ scout.TableHeader = function(table, $tableHeader, session) {
   for (var i = 0; i < columns.length; i++) {
     var $header = $tableHeader.appendDiv('', 'header-item', columns[i].text)
       .data('index', i)
-      .css('min-width', columns[i].width - 17 + 'px') // 17 is width of header-resize handle, see table.css (.header-resize)
-      .css('max-width', columns[i].width - 17 + 'px')
+      .css('min-width', columns[i].width + 'px') // 17 is width of header-resize handle, see table.css (.header-resize)
+      .css('max-width', columns[i].width + 'px')
       .on('click', '', clickHeader)
       .on('mousedown', '', dragHeader);
 
@@ -35,24 +35,16 @@ scout.TableHeader = function(table, $tableHeader, session) {
     } else if (event.shiftKey || event.ctrlKey) {
       table.sortChange($header, $header.hasClass('sort-up') ? 'down' : 'up', event.shiftKey);
     } else {
-      var x = $header.offset().left,
-        y = $header.offset().top;
+      var x = $header.position().left + $tableHeader.position().left + parseFloat($tableHeader.css('margin-left')),
+        y = $header.position().top +  $tableHeader.position().top;
       new scout.TableHeaderMenu(table, $header, x, y, session);
     }
 
     return false;
   }
 
-  function clickOrganize(event) {
-    var $clicked = $(this),
-      x = $clicked.offset().left,
-      y = $clicked.offset().top;
-
-    new scout.TableOrganizeMenu(table, x, y);
-  }
-
   function resizeHeader(event) {
-    var startX = event.pageX - 1,
+    var startX = event.pageX - 18,
       $header = $(this).prev(),
       colNum = $header.index() / 2 + 1,
       headerWidth = $header.width(),
@@ -68,10 +60,9 @@ scout.TableHeader = function(table, $tableHeader, session) {
 
       if (headerWidth + diff > 80 || diff > 0) {
         var wHeader = headerWidth + diff + 'px';
-        var wCell = headerWidth + 22 + diff + 'px'; // 17 is width of header-resize handle, see table.css (.header-resize)
         var wSummary = totalWidth + diff + 'px';
         $header.css('min-width', wHeader).css('max-width', wHeader);
-        $('.table-row > div:nth-of-type(' + colNum + ' ), .table-row-sum > div:nth-of-type(' + colNum + ' )').css('min-width', wCell).css('max-width', wCell);
+        $('.table-row > div:nth-of-type(' + colNum + ' ), .table-row-sum > div:nth-of-type(' + colNum + ' )').css('min-width', wHeader).css('max-width', wHeader);
         $('.table-row, .table-row-sum').css('min-width', wSummary).css('max-width', wSummary);
       }
     }

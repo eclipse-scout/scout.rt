@@ -34,12 +34,13 @@
 	position: relative;
 	display: inline-block;
 	.font-text-normal(700);
-	font-weight: bold;
-	padding: 0px 0px 0px 9px;
+	padding: 0px 6px 0px 9px;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	line-height: @size-table-header;
 	cursor:pointer;
+	border-left: 1px solid transparent;
+	border-right: 1px solid transparent;
 	
 	&.sort-up, &.sort-down,	&.filter, &.group-all, 	&.group-sort {
 		color: @color-bench-text-active;
@@ -48,18 +49,28 @@
 	&:hover, &.header-move{
 		color: @color-bench-text-hover;
 	}
+	
+	&.menu-open {
+		border-left: 1px solid @color-bench-light-border;
+		border-right: 1px solid @color-bench-light-border;
+		background-color: @color-bench;
+		color: @color-bench-text-active;
+		z-index: 2;
+	}
 }
 
 .header-resize {
-	position: relative;
+	position: absolute;
 	display: inline-block;
 	top: 0px;
 	height: @size-table-header;
 	width: 17px;
 	padding: 8px;
+	margin-left: -8px;
 	background-color: @color-bench-light-border;
 	background-clip: content-box;
 	cursor: col-resize;
+	z-index: 4;
 }
 
 /* main table data */
@@ -85,7 +96,7 @@
 .table-row .table-cell, 
 .table-row-sum .table-cell {
 	display: table-cell;
-	padding: 0px 3px 0px 7px;
+	padding: 0px 4px 0px 8px;
 	border-bottom: 1px solid @color-bench-light-border;
 	overflow: hidden;
 	text-overflow: ellipsis;

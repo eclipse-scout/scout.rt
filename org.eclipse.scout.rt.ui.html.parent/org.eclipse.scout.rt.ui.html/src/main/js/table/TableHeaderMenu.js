@@ -2,7 +2,7 @@
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
 scout.TableHeaderMenu = function(table, $header, x, y, session) {
-  $('.header-menu').remove();
+  $('.table-header-menu').remove();
   $('body').off('mousedown.remove');
   $('body').off('keydown.remove');
 
@@ -10,29 +10,24 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
     id = $header.data('index'),
     column = table.columns[id];
 
-  // create titel
-  var $menuHeaderTitle = $('body').appendDiv('TableHeaderMenuTitle', 'header-menu')
-    .css('left', x - 12).css('top', y - 4)
-    .css('width', $header.width() + 18)
-    .css('height', $header.parent().height() + 1)
-    .text($header.text());
-
-  if (column.type == 'number') $menuHeaderTitle.css('text-align', 'right');
+  // label title
+  if ($header.hasClass('menu-open')) {
+    $header.removeClass('menu-open');
+    return;
+  }
+  $header.addClass('menu-open');
 
   // create container
-  var $menuHeader = $('body').appendDiv('TableHeaderMenu', 'header-menu')
-    .css('left', x - 12).css('top', y + $header.parent().height() - 5);
-
-  var $headerCommand = $menuHeader.appendDiv('HeaderCommand'),
-    $headerFilter = $menuHeader.appendDiv('HeaderFilter');
+  var $menuHeader = table.$container.appendDIV('table-header-menu')
+    .css('left', x).css('top', y + $header.parent().height() + 1);
 
   // every user action will close menu
   $('body').on('mousedown.remove', removeMenu);
   $('body').on('keydown.remove', removeMenu);
 
   // create buttons in command for order
-  var $commandMove = $headerCommand.appendDiv('', 'header-group');
-  $commandMove.appendDiv('', 'header-text')
+  var $commandMove = $menuHeader.appendDIV('header-group');
+  $commandMove.appendDIV('header-text')
     .data('label', 'Verschieben');
 
   $commandMove.appendDiv('HeaderCommandMoveTop', 'header-command')
@@ -49,7 +44,7 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
     .click(moveBottom);
 
   // create buttons in command for sorting
-  var $commandSort = $headerCommand.appendDiv('', 'header-group');
+  var $commandSort = $menuHeader.appendDiv('', 'header-group');
   $commandSort.appendDiv('', 'header-text')
     .data('label', 'Sortierung');
 
@@ -78,7 +73,7 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
 
   // create buttons in command for grouping
   if (column.type === 'text' || column.type === 'date') {
-    var $commandGroup = $headerCommand.appendDiv('', 'header-group');
+    var $commandGroup = $menuHeader.appendDiv('', 'header-group');
     $commandGroup.appendDiv('', 'header-text')
       .data('label', 'Summe');
 
@@ -95,7 +90,7 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
 
   // create buttons in command for coloring
   if (column.type === 'number') {
-    var $commandColor = $headerCommand.appendDiv('', 'header-group');
+    var $commandColor = $menuHeader.appendDiv('', 'header-group');
     $commandColor.appendDiv('', 'header-text')
       .data('label', 'Einfärben');
 
@@ -114,7 +109,7 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
   }
 
   // create buttons in command for new columns
-  var $commandColumn = $headerCommand.appendDiv('', 'header-group');
+  var $commandColumn = $menuHeader.appendDiv('', 'header-group');
   $commandColumn.appendDiv('', 'header-text')
     .data('label', 'Spalte');
 
@@ -126,6 +121,7 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
     .click(columnRemove);
 
   // filter
+  var $headerFilter = $menuHeader.appendDIV('header-group');
   $headerFilter.appendDiv('', 'header-text')
     .data('label', 'Filtern nach');
 
@@ -135,8 +131,8 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
     dataAxis = matrix.addData(-1, -1),
     cube = matrix.calculateCube();
 
-  var $headerFilterContainer = $headerFilter.appendDiv('HeaderFilterContainer'),
-    $headerFilterScroll = $headerFilterContainer.appendDiv('HeaderFilterScroll');
+  var $headerFilterContainer = $headerFilter.appendDIV('header-filter-container'),
+    $headerFilterScroll = $headerFilterContainer.appendDiv('.scrollable-y');
 
   for (var a = 0; a < xAxis.length; a++) {
     var key = xAxis[a],
@@ -170,7 +166,7 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
   });
 
   // set events to buttons
-  $headerCommand
+  $header
     .on('mouseenter click', '.header-command', enterCommand)
     .on('mouseleave', '.header-command', leaveCommand);
 
@@ -179,25 +175,16 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
   if ($header.hasClass('sort-down')) $menuHeader.addClass('sort-down');
   if ($header.hasClass('filter')) $menuHeader.addClass('filter');
 
-  // animated opening
-  var h = $menuHeader.css('height');
-  $menuHeader.css('height', 0)
-    .animateAVCSD('height', h);
-
-  // title should not be wider than menu
-  $menuHeaderTitle.width(Math.min($menuHeaderTitle.width(), $menuHeader.width() - 14) );
-
   function removeMenu(event) {
     if ($menuHeader.has($(event.target)).length === 0) {
-      $menuHeader.animateAVCSD('height', 0, function() {
-        $menuHeader.remove();
-        $menuHeaderTitle.remove();
-      });
+      $menuHeader.remove();
+      if (!$(event.target).is($header)) {
+        $header.removeClass('menu-open');
+      }
 
       $('body').off('mousedown.remove');
       $('body').off('keydown.remove');
     }
-
   }
 
   // event handling
