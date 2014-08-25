@@ -74,12 +74,6 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
 
   @Override
   protected void initJsonProperties(ITable model) {
-    putJsonProperty(new JsonProperty<ITable>(ITable.PROP_TITLE, model) {
-      @Override
-      protected String modelValue() {
-        return getModel().getTitle();
-      }
-    });
     putJsonProperty(new JsonProperty<ITable>(ITable.PROP_ENABLED, model) {
       @Override
       protected Boolean modelValue() {

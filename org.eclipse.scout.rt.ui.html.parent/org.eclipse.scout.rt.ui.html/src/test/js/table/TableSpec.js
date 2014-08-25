@@ -409,7 +409,6 @@ describe("Table", function() {
           events: [createRowsDeletedEvent(model, [row0.id])]
         };
         session._processSuccessResponse(message);
-        sendQueuedAjaxCalls();
 
         expect(table.rows.length).toBe(2);
         expect(table.rows[0]).toBe(row1);
@@ -418,7 +417,6 @@ describe("Table", function() {
           events: [createRowsDeletedEvent(model, [row1.id, row2.id])]
         };
         session._processSuccessResponse(message);
-        sendQueuedAjaxCalls();
 
         expect(table.rows.length).toBe(0);
       });
@@ -432,7 +430,6 @@ describe("Table", function() {
           events: [createRowsDeletedEvent(model, [row0.id])]
         };
         session._processSuccessResponse(message);
-        sendQueuedAjaxCalls();
 
         expect(table.findRows().length).toBe(2);
         expect(table.findRowById(row0.id).length).toBe(0);
@@ -443,7 +440,6 @@ describe("Table", function() {
           events: [createRowsDeletedEvent(model, [row1.id, row2.id])]
         };
         session._processSuccessResponse(message);
-        sendQueuedAjaxCalls();
 
         expect(table.findRows().length).toBe(0);
       });
@@ -475,7 +471,6 @@ describe("Table", function() {
           events: [createAllRowsDeletedEvent(model)]
         };
         session._processSuccessResponse(message);
-        sendQueuedAjaxCalls();
 
         expect(table.rows.length).toBe(0);
       });
@@ -489,7 +484,6 @@ describe("Table", function() {
           events: [createAllRowsDeletedEvent(model)]
         };
         session._processSuccessResponse(message);
-        sendQueuedAjaxCalls();
 
         expect(table.findRows().length).toBe(0);
       });

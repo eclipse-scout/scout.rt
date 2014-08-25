@@ -109,7 +109,7 @@ describe("Tree", function() {
       expect(tree._onNodeClicked).toHaveBeenCalled();
     });
 
-    it("sends click, selection and expansion events in one call in this order", function() {
+    it("sends click and selection events in one call in this order", function() {
       var model = createModelFixture(1);
       var tree = createTree(model);
       tree.render(session.$entryPoint);
@@ -121,27 +121,7 @@ describe("Tree", function() {
       expect(jasmine.Ajax.requests.count()).toBe(1);
 
       var requestData = mostRecentJsonRequest();
-      expect(requestData).toContainEventTypesExactly(['nodeClicked', 'nodesSelected', 'nodeExpanded']);
-    });
-  });
-
-  describe("_setNodeSelected", function() {
-    it("does not send events if called when processing response", function() {
-      var model = createModelFixture(1);
-      var tree = createTree(model);
-      tree.render(session.$entryPoint);
-
-      var message = {
-        events: [{
-          id: model.id,
-          nodeIds: [model.nodes[0].id],
-          type: 'nodesSelected'
-        }]
-      };
-      session._processSuccessResponse(message);
-
-      sendQueuedAjaxCalls();
-      expect(jasmine.Ajax.requests.count()).toBe(0);
+      expect(requestData).toContainEventTypesExactly(['nodeClicked', 'nodesSelected']);
     });
   });
 
@@ -184,7 +164,6 @@ describe("Tree", function() {
             events: [createNodesDeletedEvent(model, [node2Child0.id], node2.id)]
           };
           session._processSuccessResponse(message);
-          sendQueuedAjaxCalls();
 
           expect(tree.nodes[2].childNodes.length).toBe(2);
           expect(tree.nodes[2].childNodes[0]).toBe(node2Child1);
@@ -205,7 +184,6 @@ describe("Tree", function() {
             events: [createNodesDeletedEvent(model, [node2Child0.id], node2.id)]
           };
           session._processSuccessResponse(message);
-          sendQueuedAjaxCalls();
 
           expect(findAllNodes(tree).length).toBe(11);
           expect(tree._findNodeById(node2Child0.id).length).toBe(0);
@@ -224,7 +202,6 @@ describe("Tree", function() {
             events: [createNodesDeletedEvent(model, [node0.id])]
           };
           session._processSuccessResponse(message);
-          sendQueuedAjaxCalls();
 
           expect(tree.nodes.length).toBe(2);
           expect(tree.nodes[0]).toBe(node1);
@@ -238,7 +215,6 @@ describe("Tree", function() {
             events: [createNodesDeletedEvent(model, [node0.id])]
           };
           session._processSuccessResponse(message);
-          sendQueuedAjaxCalls();
 
           expect(findAllNodes(tree).length).toBe(8);
           expect(tree._findNodeById(node0.id).length).toBe(0);
@@ -254,7 +230,6 @@ describe("Tree", function() {
             events: [createNodesDeletedEvent(model, [node0.id, node1.id, node2.id])]
           };
           session._processSuccessResponse(message);
-          sendQueuedAjaxCalls();
 
           expect(tree.nodes.length).toBe(0);
           expect(Object.keys(tree._nodeMap).length).toBe(0);
@@ -267,7 +242,6 @@ describe("Tree", function() {
             events: [createNodesDeletedEvent(model, [node0.id, node1.id, node2.id])]
           };
           session._processSuccessResponse(message);
-          sendQueuedAjaxCalls();
 
           expect(findAllNodes(tree).length).toBe(0);
         });
@@ -313,7 +287,6 @@ describe("Tree", function() {
           events: [createAllNodesDeletedEvent(model)]
         };
         session._processSuccessResponse(message);
-        sendQueuedAjaxCalls();
 
         expect(tree.nodes.length).toBe(0);
         expect(Object.keys(tree._nodeMap).length).toBe(0);
@@ -328,7 +301,6 @@ describe("Tree", function() {
           events: [createAllNodesDeletedEvent(model)]
         };
         session._processSuccessResponse(message);
-        sendQueuedAjaxCalls();
 
         expect(findAllNodes(tree).length).toBe(0);
       });
@@ -341,7 +313,6 @@ describe("Tree", function() {
           events: [createAllNodesDeletedEvent(model, node1.id)]
         };
         session._processSuccessResponse(message);
-        sendQueuedAjaxCalls();
 
         expect(node1.childNodes.length).toBe(0);
         expect(Object.keys(tree._nodeMap).length).toBe(9);
@@ -356,7 +327,6 @@ describe("Tree", function() {
           events: [createAllNodesDeletedEvent(model, node1.id)]
         };
         session._processSuccessResponse(message);
-        sendQueuedAjaxCalls();
 
         expect(findAllNodes(tree).length).toBe(9);
 
@@ -367,6 +337,81 @@ describe("Tree", function() {
         expect(tree._findNodeById(node1Child2.id).length).toBe(0);
       });
 
+    });
+
+    describe("nodesSelected event", function() {
+      var model;
+      var tree;
+      var node0;
+      var child0;
+      var grandchild0;
+
+      function createNodesSelectedEvent(model, nodeIds) {
+        return {
+          id: model.id,
+          nodeIds: nodeIds,
+          type: 'nodesSelected'
+        };
+      }
+
+      beforeEach(function() {
+        model = createModelFixture(3, 3, false);
+        tree = createTree(model);
+        node0 = model.nodes[0];
+        child0 = node0.childNodes[0];
+        grandchild0 = child0.childNodes[0];
+      });
+
+      it("selects a node", function() {
+        tree.render(session.$entryPoint);
+        expect(tree._findSelectedNodes().length).toBe(0);
+        expect(tree._findNodeById(node0.id).isSelected()).toBe(false);
+
+        var message = {
+          events: [createNodesSelectedEvent(model, [node0.id])]
+        };
+        session._processSuccessResponse(message);
+
+        expect(tree._findSelectedNodes().length).toBe(1);
+        expect(tree._findNodeById(node0.id).isSelected()).toBe(true);
+      });
+
+      it("expands the parents if a hidden node should be selected whose parents are collapsed (revealing the selection)", function() {
+        tree.render(session.$entryPoint);
+
+        expect(node0.expanded).toBe(false);
+        expect(child0.expanded).toBe(false);
+        expect(tree._findNodeById(child0.id).length).toBe(0);
+
+        var message = {
+          events: [createNodesSelectedEvent(model, [grandchild0.id])]
+        };
+        session._processSuccessResponse(message);
+
+        expect(node0.expanded).toBe(true);
+        expect(child0.expanded).toBe(true);
+        expect(tree._findSelectedNodes().length).toBe(1);
+        expect(tree._findNodeById(grandchild0.id).isSelected()).toBe(true);
+
+        sendQueuedAjaxCalls();
+
+        var requestData = mostRecentJsonRequest();
+        var event0 = new scout.Event('nodeExpanded', tree.id, {"nodeId": node0.id, expanded: true});
+        var event1 = new scout.Event('nodeExpanded', tree.id, {"nodeId": child0.id, expanded: true});
+        expect(mostRecentJsonRequest()).toContainEvents([event0, event1]);
+      });
+
+      it("does not send events if called when processing response", function() {
+        tree.render(session.$entryPoint);
+
+        var message = {
+            events: [createNodesSelectedEvent(model, [node0.id])]
+          };
+        session._processSuccessResponse(message);
+
+        sendQueuedAjaxCalls();
+        expect(jasmine.Ajax.requests.count()).toBe(0);
+      });
     });
   });
 });

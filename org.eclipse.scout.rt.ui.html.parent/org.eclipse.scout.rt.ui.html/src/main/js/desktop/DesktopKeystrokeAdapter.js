@@ -74,24 +74,24 @@ scout.DesktopKeystrokeAdapter = function(navigation, bench) {
         // left: up in tree
         if (keycode == 37) {
           if ($currentNode.hasClass('expanded')) {
-            $currentNode.children('.tree-item-control').click();
+            $currentNode.children('.tree-item-control').click(); //FIXME Use tree.setNodeExpanded instead
           } else {
             $targetNode = $currentNode.prevAll('.tree-item[data-level=' + (+$currentNode.attr('data-level') - 1) + ']');
             if ($targetNode.attr('id')) {
               // FIXME BSH "scroll into view"
-              that._tree.desktopTree.setNodeSelectedById($targetNode.attr('id'));
+              that._tree.desktopTree.setNodesSelected([$targetNode.data('node')]);
             }
           }
         }
         // right: down in tree
         else if (keycode == 39) {
           if (!$currentNode.hasClass('expanded')) {
-            $currentNode.children('.tree-item-control').click();
+            $currentNode.children('.tree-item-control').click(); //FIXME Use tree.setNodeExpanded instead
           } else {
             $targetNode = $currentNode.next('.tree-item[data-level=' + (+$currentNode.attr('data-level') + 1) + ']');
             if ($targetNode.attr('id')) {
               // FIXME BSH "scroll into view"
-              that._tree.desktopTree.setNodeSelectedById($targetNode.attr('id'));
+              that._tree.desktopTree.setNodesSelected([$targetNode.data('node')]);
             }
           }
         }
@@ -125,7 +125,7 @@ scout.DesktopKeystrokeAdapter = function(navigation, bench) {
           $targetNode = $currentNode.prevAll('.tree-item[data-level=' + $currentNode.attr('data-level') + ']').first();
           if ($targetNode.attr('id')) {
             // FIXME BSH "scroll into view"
-            that._tree.desktopTree.setNodeSelectedById($targetNode.attr('id'));
+            that._tree.desktopTree.setNodesSelected([$targetNode.data('node')]);
           }
         }
         // ctrl-down: go down (same level)
@@ -133,7 +133,7 @@ scout.DesktopKeystrokeAdapter = function(navigation, bench) {
           $targetNode = $currentNode.nextAll('.tree-item[data-level=' + $currentNode.attr('data-level') + ']').first();
           if ($targetNode.attr('id')) {
             // FIXME BSH "scroll into view"
-            that._tree.desktopTree.setNodeSelectedById($targetNode.attr('id'));
+            that._tree.desktopTree.setNodesSelected([$targetNode.data('node')]);
           }
         }
 

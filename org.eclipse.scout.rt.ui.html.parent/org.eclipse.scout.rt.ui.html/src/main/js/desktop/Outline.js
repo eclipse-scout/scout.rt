@@ -53,9 +53,19 @@ scout.Outline.prototype._showTable = function(node) {
 
 /* user input handling */
 
-scout.Outline.prototype._setNodeSelected = function(node, $node) {
-  scout.Outline.parent.prototype._setNodeSelected.call(this, node, $node);
+scout.Outline.prototype._renderSelection = function($nodes) {
+  scout.Outline.parent.prototype._renderSelection.call(this, $nodes);
 
+  if (!$nodes) {
+    $nodes = [this._findNodeById(this.selectedNodeIds[0])];
+  }
+
+  if ($nodes.length === 0) {
+    return;
+  }
+
+  //Outline does not support multi selection
+  var node = $nodes[0].data('node');
   if (node) {
     this._showForm(node);
     this._showTable(node);
@@ -68,7 +78,7 @@ scout.Outline.prototype.onFormChanged = function(nodeId, detailForm) {
   var node = this._nodeMap[nodeId];
   node.detailForm = this.session.getOrCreateModelAdapter(detailForm, this);
 
-  if (this._selectedNodes.indexOf(node) >= 0) {
+  if (this.selectedNodeIds.indexOf(node.id) >= 0) {
     this._showForm(node);
   }
 };
@@ -77,7 +87,7 @@ scout.Outline.prototype.onTableChanged = function(nodeId, detailTable) {
   var node = this._nodeMap[nodeId];
   node.detailTable = this.session.getOrCreateModelAdapter(detailTable, this);
 
-  if (this._selectedNodes.indexOf(node) >= 0) {
+  if (this.selectedNodeIds.indexOf(node.id) >= 0) {
     this._showTable(node);
   }
 };
