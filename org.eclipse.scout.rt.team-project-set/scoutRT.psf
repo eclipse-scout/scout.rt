@@ -63,7 +63,6 @@
 <project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.ui.rap.test"/>
 <project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.ui.rap.theme.rayo"/>
 <project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.ui.rap.theme.rayo.mobile"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.ui.rap.workbench"/>
 <project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.ui.svg.calendar"/>
 <project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.ui.swing"/>
 <project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,develop,org.eclipse.scout.rt.ui.swing.browser.swt.fragment"/>
@@ -116,7 +115,6 @@
 <item elementID="=org.eclipse.scout.rt.client.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.rt.ui.rap" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.rt.ui.swt" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=org.eclipse.scout.rt.ui.rap.workbench" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.svg.ui.swing" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.rt.ui.swt.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.rt.ui.rap.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>

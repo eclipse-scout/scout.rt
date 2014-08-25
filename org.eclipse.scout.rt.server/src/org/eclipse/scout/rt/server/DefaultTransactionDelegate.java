@@ -43,7 +43,6 @@ import org.eclipse.scout.rt.shared.validate.IValidationStrategy;
 import org.eclipse.scout.rt.shared.validate.InputValidation;
 import org.eclipse.scout.rt.shared.validate.OutputValidation;
 import org.eclipse.scout.service.IService;
-import org.eclipse.scout.service.IService2;
 import org.eclipse.scout.service.SERVICES;
 import org.eclipse.scout.service.ServiceUtility;
 import org.osgi.framework.Bundle;
@@ -66,7 +65,6 @@ import org.osgi.framework.Version;
  *   org.eclipse.scout.rt.server.validateOutput=false
  * </pre>
  */
-@SuppressWarnings("deprecation")
 public class DefaultTransactionDelegate {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(DefaultTransactionDelegate.class);
 
@@ -279,7 +277,7 @@ public class DefaultTransactionDelegate {
       throw new SecurityException("access denied (code 1c).");
     }
     //exists
-    if (verifyMethod.getDeclaringClass() == IService.class || verifyMethod.getDeclaringClass() == IService2.class) {
+    if (verifyMethod.getDeclaringClass() == IService.class) {
       throw new SecurityException("access denied (code 1d).");
     }
     //continue
