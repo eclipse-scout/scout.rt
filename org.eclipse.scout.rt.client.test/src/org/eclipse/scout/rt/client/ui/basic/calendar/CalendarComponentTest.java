@@ -23,14 +23,13 @@ import org.junit.Test;
 
 /**
  * Test for {@link CalendarComponent}
- * 
+ *
  * @author Adrian Moser
- * 
  */
 public class CalendarComponentTest {
 
-  private static final Date date1 = DateUtility.parse("01072012", "ddmmyyyy");
-  private static final Date date2 = DateUtility.parse("02072012", "ddmmyyyy");
+  private static final Date m_date1 = DateUtility.parse("01072012", "ddmmyyyy");
+  private static final Date m_date2 = DateUtility.parse("02072012", "ddmmyyyy");
 
   @Test
   public void testOrder1() throws Exception {
@@ -67,7 +66,7 @@ public class CalendarComponentTest {
 
   @Test
   public void testDateOrder1() throws Exception {
-    CalendarComponent comp1 = createComponent(createItem(date1, "B"));
+    CalendarComponent comp1 = createComponent(createItem(m_date1, "B"));
     CalendarComponent comp2 = createComponent(createItem("A"));
     Set<CalendarComponent> set = createSet(comp1, comp2);
 
@@ -77,8 +76,8 @@ public class CalendarComponentTest {
 
   @Test
   public void testDateOrder2() throws Exception {
-    CalendarComponent comp1 = createComponent(createItem(date2, "B"));
-    CalendarComponent comp2 = createComponent(createItem(date1, "A"));
+    CalendarComponent comp1 = createComponent(createItem(m_date2, "B"));
+    CalendarComponent comp2 = createComponent(createItem(m_date1, "A"));
     Set<CalendarComponent> set = createSet(comp1, comp2);
 
     Assert.assertEquals("Order", comp2, toArray(set)[0]);
@@ -87,8 +86,8 @@ public class CalendarComponentTest {
 
   @Test
   public void testDateOrder3() throws Exception {
-    CalendarComponent comp1 = createComponent(createItem(date2, null));
-    CalendarComponent comp2 = createComponent(createItem(date2, null));
+    CalendarComponent comp1 = createComponent(createItem(m_date2, null));
+    CalendarComponent comp2 = createComponent(createItem(m_date2, null));
     Set<CalendarComponent> set = createSet(comp1, comp2);
 
     Assert.assertEquals("Count", 2, set.size());
@@ -108,7 +107,7 @@ public class CalendarComponentTest {
   }
 
   private ICalendarItem createItem(String subject) {
-    return createItem(date2, subject);
+    return createItem(m_date2, subject);
   }
 
   private Set<CalendarComponent> createSet(CalendarComponent... calendarComponents) {

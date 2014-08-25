@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -71,7 +70,7 @@ public class PageWithTable3Test {
     for (IColumn<?> c : table.getColumns()) {
       System.out.println("col " + c.getClass().getSimpleName() + ": " + c.isSortActive() + ", " + c.isSortExplicit() + ", " + c.getSortIndex() + " " + c.isSortAscending());
     }
-    */
+     */
     List<Integer> actualExplicitSortIndices = new ArrayList<Integer>();
     for (IColumn<?> c : table.getColumns()) {
       if (c.isSortActive() && c.isSortExplicit()) {

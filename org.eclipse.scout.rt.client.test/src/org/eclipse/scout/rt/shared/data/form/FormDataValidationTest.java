@@ -112,8 +112,7 @@ public class FormDataValidationTest {
     oo.close();
     ObjectInputStream oi = new ObjectInputStream(new ByteArrayInputStream(o.toByteArray()));
     try {
-      @SuppressWarnings("unused")
-      MyFormData d2 = (MyFormData) oi.readObject();
+      oi.readObject();
     }
     catch (SecurityException e) {
       //ok

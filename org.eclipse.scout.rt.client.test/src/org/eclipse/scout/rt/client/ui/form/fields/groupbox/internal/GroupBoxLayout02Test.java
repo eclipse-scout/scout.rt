@@ -15,12 +15,12 @@ import static org.junit.Assert.assertEquals;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCloseButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
-import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.GroupBoxLayoutTest02.MainBox.Field01;
-import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.GroupBoxLayoutTest02.MainBox.Field02;
-import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.GroupBoxLayoutTest02.MainBox.Field03;
-import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.GroupBoxLayoutTest02.MainBox.Field04;
-import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.GroupBoxLayoutTest02.MainBox.Field05;
-import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.GroupBoxLayoutTest02.MainBox.Field06;
+import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.GroupBoxLayout02Test.MainBox.Field01;
+import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.GroupBoxLayout02Test.MainBox.Field02;
+import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.GroupBoxLayout02Test.MainBox.Field03;
+import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.GroupBoxLayout02Test.MainBox.Field04;
+import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.GroupBoxLayout02Test.MainBox.Field05;
+import org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal.GroupBoxLayout02Test.MainBox.Field06;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.junit.Test;
 
@@ -52,7 +52,7 @@ import org.junit.Test;
  * @author Andreas Hoegger
  * @since 4.0.0 M6 25.02.2014
  */
-public class GroupBoxLayoutTest02 extends AbstractGroupBoxLayoutTest {
+public class GroupBoxLayout02Test extends AbstractGroupBoxLayoutTest {
 
   @Test
   public void testVerticalLayout() {

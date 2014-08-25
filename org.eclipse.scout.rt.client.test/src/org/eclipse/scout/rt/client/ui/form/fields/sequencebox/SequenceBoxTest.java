@@ -40,7 +40,7 @@ import org.junit.runner.RunWith;
 @RunWith(ScoutClientTestRunner.class)
 public class SequenceBoxTest {
 
-  private static int ONE_MINUTE = 60000;
+  private static final int ONE_MINUTE = 60000;
 
   /**
    * Test method for {@link

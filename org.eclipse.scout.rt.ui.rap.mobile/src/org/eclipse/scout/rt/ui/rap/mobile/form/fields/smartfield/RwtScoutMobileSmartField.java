@@ -97,6 +97,7 @@ public class RwtScoutMobileSmartField extends RwtScoutValueFieldComposite<IConte
     return (Text) super.getUiField();
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   protected void attachScout() {
     super.attachScout();

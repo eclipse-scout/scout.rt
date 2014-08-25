@@ -12,8 +12,6 @@ package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.List;
-
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.annotations.Order;
@@ -30,7 +28,6 @@ import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.osgi.framework.ServiceRegistration;
 
 /**
  * Test for {@link AbstractPageWithTable}: importPageData, status
@@ -45,7 +42,6 @@ public class PageWithTable2Test {
   private static final String S1 = "Lorem";
   private static final String S2 = "Ipsum";
   private static final String S3 = "Dolor";
-  private static List<ServiceRegistration> s_registerServices;
 
   @Test
   public void testImportFormData1() throws Exception {

@@ -61,7 +61,7 @@ public class SmartFieldParseValueTest {
     // close the proposal form
     smartField.getProposalForm().doOk();
     assertNull(smartField.getProposalForm());
-    assertEquals(new Long(1L), smartField.getValue());
+    assertEquals(Long.valueOf(1L), smartField.getValue());
   }
 
   @Test

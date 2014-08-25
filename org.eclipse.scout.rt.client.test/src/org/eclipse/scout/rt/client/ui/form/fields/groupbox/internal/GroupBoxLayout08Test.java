@@ -52,7 +52,7 @@ import org.junit.Test;
  * @author Andreas Hoegger
  * @since 4.0.0 M6 25.02.2014
  */
-public class GroupBoxLayoutTest08 extends AbstractGroupBoxLayoutTest {
+public class GroupBoxLayout08Test extends AbstractGroupBoxLayoutTest {
 
   @Test
   public void testVerticalLayout() throws Exception {
@@ -65,23 +65,23 @@ public class GroupBoxLayoutTest08 extends AbstractGroupBoxLayoutTest {
     assertEquals(4, grid.getGridRowCount());
 
     // group01
-    assertGridData(0, 0, 2, 1, groupBox.getFieldByClass(GroupBoxLayoutTest08.MainBox.GroupBox01.class).getGridData());
+    assertGridData(0, 0, 2, 1, groupBox.getFieldByClass(GroupBoxLayout08Test.MainBox.GroupBox01.class).getGridData());
 
     // group02
-    assertGridData(0, 1, 2, 1, groupBox.getFieldByClass(GroupBoxLayoutTest08.MainBox.GroupBox02.class).getGridData());
+    assertGridData(0, 1, 2, 1, groupBox.getFieldByClass(GroupBoxLayout08Test.MainBox.GroupBox02.class).getGridData());
 
     // group03
-    assertGridData(0, 2, 2, 1, groupBox.getFieldByClass(GroupBoxLayoutTest08.MainBox.GroupBox03.class).getGridData());
+    assertGridData(0, 2, 2, 1, groupBox.getFieldByClass(GroupBoxLayout08Test.MainBox.GroupBox03.class).getGridData());
 
     // group04
-    assertGridData(0, 3, 2, 1, groupBox.getFieldByClass(GroupBoxLayoutTest08.MainBox.GroupBox04.class).getGridData());
+    assertGridData(0, 3, 2, 1, groupBox.getFieldByClass(GroupBoxLayout08Test.MainBox.GroupBox04.class).getGridData());
 
     // group05
-    assertGridData(2, 0, 2, 1, groupBox.getFieldByClass(GroupBoxLayoutTest08.MainBox.GroupBox05.class).getGridData());
+    assertGridData(2, 0, 2, 1, groupBox.getFieldByClass(GroupBoxLayout08Test.MainBox.GroupBox05.class).getGridData());
     // group06
-    assertGridData(2, 1, 1, 1, groupBox.getFieldByClass(GroupBoxLayoutTest08.MainBox.GroupBox06.class).getGridData());
+    assertGridData(2, 1, 1, 1, groupBox.getFieldByClass(GroupBoxLayout08Test.MainBox.GroupBox06.class).getGridData());
     // group07
-    assertGridData(2, 2, 2, 1, groupBox.getFieldByClass(GroupBoxLayoutTest08.MainBox.GroupBox07.class).getGridData());
+    assertGridData(2, 2, 2, 1, groupBox.getFieldByClass(GroupBoxLayout08Test.MainBox.GroupBox07.class).getGridData());
 
   }
 
@@ -96,23 +96,23 @@ public class GroupBoxLayoutTest08 extends AbstractGroupBoxLayoutTest {
     assertEquals(4, grid.getGridRowCount());
 
     // group01
-    assertGridData(0, 0, 2, 1, groupBox.getFieldByClass(GroupBoxLayoutTest08.MainBox.GroupBox01.class).getGridData());
+    assertGridData(0, 0, 2, 1, groupBox.getFieldByClass(GroupBoxLayout08Test.MainBox.GroupBox01.class).getGridData());
 
     // group02
-    assertGridData(2, 0, 2, 1, groupBox.getFieldByClass(GroupBoxLayoutTest08.MainBox.GroupBox02.class).getGridData());
+    assertGridData(2, 0, 2, 1, groupBox.getFieldByClass(GroupBoxLayout08Test.MainBox.GroupBox02.class).getGridData());
 
     // group03
-    assertGridData(0, 1, 2, 1, groupBox.getFieldByClass(GroupBoxLayoutTest08.MainBox.GroupBox03.class).getGridData());
+    assertGridData(0, 1, 2, 1, groupBox.getFieldByClass(GroupBoxLayout08Test.MainBox.GroupBox03.class).getGridData());
 
     // group04
-    assertGridData(2, 1, 2, 1, groupBox.getFieldByClass(GroupBoxLayoutTest08.MainBox.GroupBox04.class).getGridData());
+    assertGridData(2, 1, 2, 1, groupBox.getFieldByClass(GroupBoxLayout08Test.MainBox.GroupBox04.class).getGridData());
 
     // group05
-    assertGridData(0, 2, 2, 1, groupBox.getFieldByClass(GroupBoxLayoutTest08.MainBox.GroupBox05.class).getGridData());
+    assertGridData(0, 2, 2, 1, groupBox.getFieldByClass(GroupBoxLayout08Test.MainBox.GroupBox05.class).getGridData());
     // group06
-    assertGridData(2, 2, 1, 1, groupBox.getFieldByClass(GroupBoxLayoutTest08.MainBox.GroupBox06.class).getGridData());
+    assertGridData(2, 2, 1, 1, groupBox.getFieldByClass(GroupBoxLayout08Test.MainBox.GroupBox06.class).getGridData());
     // group07
-    assertGridData(0, 3, 2, 1, groupBox.getFieldByClass(GroupBoxLayoutTest08.MainBox.GroupBox07.class).getGridData());
+    assertGridData(0, 3, 2, 1, groupBox.getFieldByClass(GroupBoxLayout08Test.MainBox.GroupBox07.class).getGridData());
 
   }
 

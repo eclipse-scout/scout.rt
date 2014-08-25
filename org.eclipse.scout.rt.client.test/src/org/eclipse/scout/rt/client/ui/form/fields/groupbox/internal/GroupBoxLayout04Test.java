@@ -23,95 +23,89 @@ import org.junit.Test;
  * <h4>Vertical</h4>
  * 
  * <pre>
- * ---------------------------
- *    Field01   |   Field02
- * ---------------------------
- *    Field03   |   Field03
- * ---------------------------
- *    Field03   |   Field03
- * ---------------------------
- *    Field04   |   Field05
- * ---------------------------
+ * -----------------------------------------
+ *    Field01   |   Field02   |   Field04
+ * -----------------------------------------
+ *    Field03   |   Field03   |   Field05
+ * -----------------------------------------
  * </pre>
  * 
  * <h4>Horizontal</h4>
  * 
  * <pre>
- * ---------------------------
- *    Field01   |   Field02
- * ---------------------------
- *    Field03   |   Field03
- * ---------------------------
- *    Field03   |   Field03
- * ---------------------------
- *    Field04   |   Field05
- * ---------------------------
+ * -----------------------------------------
+ *    Field01   |   Field02   |
+ * -----------------------------------------
+ *    Field03   |   Field03   |   Field04
+ * -----------------------------------------
+ *    Field05   |             |
+ * -----------------------------------------
  * </pre>
  * 
  * @author Andreas Hoegger
  * @since 4.0.0 M6 25.02.2014
  */
-public class GroupBoxLayoutTest06 extends AbstractGroupBoxLayoutTest {
+public class GroupBoxLayout04Test extends AbstractGroupBoxLayoutTest {
 
   @Test
   public void testVerticalLayout() throws Exception {
-    LayoutGroupBox groupBox = new LayoutGroupBox();
+    MainBox groupBox = new MainBox();
     IGroupBoxBodyGrid grid = new VerticalSmartGroupBoxBodyGrid();
     grid.validate(groupBox);
 
     // groupbox
-    assertEquals(2, grid.getGridColumnCount());
-    assertEquals(4, grid.getGridRowCount());
+    assertEquals(3, grid.getGridColumnCount());
+    assertEquals(2, grid.getGridRowCount());
 
     // field01
-    assertGridData(0, 0, 1, 1, -1, -1, groupBox.getFieldByClass(GroupBoxLayoutTest06.LayoutGroupBox.Field01.class).getGridData());
+    assertGridData(0, 0, 1, 1, groupBox.getFieldByClass(GroupBoxLayout04Test.MainBox.Field01.class).getGridData());
 
     // field02
-    assertGridData(1, 0, 1, 1, -1, -1, groupBox.getFieldByClass(GroupBoxLayoutTest06.LayoutGroupBox.Field02.class).getGridData());
+    assertGridData(1, 0, 1, 1, groupBox.getFieldByClass(GroupBoxLayout04Test.MainBox.Field02.class).getGridData());
 
     // field03
-    assertGridData(0, 1, 2, 2, -1, -1, groupBox.getFieldByClass(GroupBoxLayoutTest06.LayoutGroupBox.Field03.class).getGridData());
+    assertGridData(0, 1, 2, 1, groupBox.getFieldByClass(GroupBoxLayout04Test.MainBox.Field03.class).getGridData());
 
     // field04
-    assertGridData(0, 3, 1, 1, -1, -1, groupBox.getFieldByClass(GroupBoxLayoutTest06.LayoutGroupBox.Field04.class).getGridData());
+    assertGridData(2, 0, 1, 1, groupBox.getFieldByClass(GroupBoxLayout04Test.MainBox.Field04.class).getGridData());
 
     // field05
-    assertGridData(1, 3, 1, 1, -1, -1, groupBox.getFieldByClass(GroupBoxLayoutTest06.LayoutGroupBox.Field05.class).getGridData());
+    assertGridData(2, 1, 1, 1, groupBox.getFieldByClass(GroupBoxLayout04Test.MainBox.Field05.class).getGridData());
 
   }
 
   @Test
   public void testHorizontalLayout() throws Exception {
-    LayoutGroupBox groupBox = new LayoutGroupBox();
+    MainBox groupBox = new MainBox();
     IGroupBoxBodyGrid grid = new HorizontalGroupBoxBodyGrid();
     grid.validate(groupBox);
 
     // groupbox
-    assertEquals(2, grid.getGridColumnCount());
-    assertEquals(4, grid.getGridRowCount());
+    assertEquals(3, grid.getGridColumnCount());
+    assertEquals(3, grid.getGridRowCount());
 
     // field01
-    assertGridData(0, 0, 1, 1, -1, -1, groupBox.getFieldByClass(GroupBoxLayoutTest06.LayoutGroupBox.Field01.class).getGridData());
+    assertGridData(0, 0, 1, 1, groupBox.getFieldByClass(GroupBoxLayout04Test.MainBox.Field01.class).getGridData());
 
     // field02
-    assertGridData(1, 0, 1, 1, -1, -1, groupBox.getFieldByClass(GroupBoxLayoutTest06.LayoutGroupBox.Field02.class).getGridData());
+    assertGridData(1, 0, 1, 1, groupBox.getFieldByClass(GroupBoxLayout04Test.MainBox.Field02.class).getGridData());
 
     // field03
-    assertGridData(0, 1, 2, 2, -1, -1, groupBox.getFieldByClass(GroupBoxLayoutTest06.LayoutGroupBox.Field03.class).getGridData());
+    assertGridData(0, 1, 2, 1, groupBox.getFieldByClass(GroupBoxLayout04Test.MainBox.Field03.class).getGridData());
 
     // field04
-    assertGridData(0, 3, 1, 1, -1, -1, groupBox.getFieldByClass(GroupBoxLayoutTest06.LayoutGroupBox.Field04.class).getGridData());
+    assertGridData(2, 1, 1, 1, groupBox.getFieldByClass(GroupBoxLayout04Test.MainBox.Field04.class).getGridData());
 
     // field05
-    assertGridData(1, 3, 1, 1, -1, -1, groupBox.getFieldByClass(GroupBoxLayoutTest06.LayoutGroupBox.Field05.class).getGridData());
+    assertGridData(0, 2, 1, 1, groupBox.getFieldByClass(GroupBoxLayout04Test.MainBox.Field05.class).getGridData());
 
   }
 
-  public class LayoutGroupBox extends AbstractGroupBox {
+  public class MainBox extends AbstractGroupBox {
 
     @Override
     protected int getConfiguredGridColumnCount() {
-      return 2;
+      return 3;
     }
 
     @Order(10)
@@ -142,11 +136,6 @@ public class GroupBoxLayoutTest06 extends AbstractGroupBoxLayoutTest {
 
       @Override
       protected int getConfiguredGridW() {
-        return 2;
-      }
-
-      @Override
-      protected int getConfiguredGridH() {
         return 2;
       }
     }
