@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.desktop.fixtures;
 
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;

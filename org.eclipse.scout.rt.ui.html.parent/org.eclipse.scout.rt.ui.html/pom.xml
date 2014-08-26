@@ -213,17 +213,6 @@
   <pluginManagement>
     <plugins>
 
-      <!-- Disable jgit warning in workspace, when some files are not yet
-        committed -->
-      <plugin>
-        <groupId>org.eclipse.tycho</groupId>
-        <artifactId>tycho-packaging-plugin</artifactId>
-        <configuration>
-          <timestampProvider>jgit</timestampProvider>
-          <jgit.dirtyWorkingTree>warning</jgit.dirtyWorkingTree>
-        </configuration>
-      </plugin>
-
       <!-- Disable error message in m2e. This long xml section is only necessary
         in tycho to make it not display a red error marker... -->
       <!--This plugin's configuration is used to store Eclipse m2e settings
