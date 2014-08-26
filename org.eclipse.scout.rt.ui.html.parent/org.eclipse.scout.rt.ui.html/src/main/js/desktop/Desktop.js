@@ -163,6 +163,9 @@ scout.Desktop.prototype.updateOutline = function(content, title) {
 
   this._updateTab(this._outlineTab);
   this._selectTab(this._outlineTab);
+
+  var selectedNode = this.outline.getSelectedModelNodes()[0];
+  content.staticMenus = [new scout.OutlineNavigateUpMenu(this.outline, selectedNode)];
   content.render(this.$bench);
 };
 

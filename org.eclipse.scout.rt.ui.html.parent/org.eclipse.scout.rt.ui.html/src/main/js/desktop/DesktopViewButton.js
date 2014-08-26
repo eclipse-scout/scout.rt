@@ -17,7 +17,7 @@ scout.DesktopViewButton.prototype._render = function($parent) {
 
   var that = this;
   this._$viewButton.on('click', '', function() {
-    if (that._$viewButton.isEnabled()) {
+    if (!that._$viewButton.isEnabled()) {
       return;
     }
 
@@ -40,11 +40,7 @@ scout.DesktopViewButton.prototype._setSelected = function(selected) {
 };
 
 scout.DesktopViewButton.prototype._setEnabled = function(enabled) {
-  if (enabled) {
-    this._$viewButton.removeAttr('disabled');
-  } else {
-    this._$viewButton.attr('disabled', 'disabled');
-  }
+  this._$viewButton.setEnabled(enabled);
 };
 
 scout.DesktopViewButton.prototype._setIconId = function(iconId) {

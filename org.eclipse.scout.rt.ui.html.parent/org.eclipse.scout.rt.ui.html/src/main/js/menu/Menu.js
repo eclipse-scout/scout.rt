@@ -27,7 +27,7 @@ scout.Menu.prototype._render = function($parent) {
   }
 
   function onClicked(event) {
-    if (this.$container.isEnabled()) {
+    if (!this.$container.isEnabled()) {
       return;
     }
 
@@ -71,19 +71,11 @@ scout.Menu.prototype._setIconId = function(iconId) {
 };
 
 scout.Menu.prototype._setEnabled = function(enabled) {
-  if (enabled) {
-    this.$container.removeAttr('disabled');
-  } else {
-    this.$container.attr('disabled', 'disabled');
-  }
+  this.$container.setEnabled(enabled);
 };
 
 scout.Menu.prototype._setVisible = function(visible) {
-  if (visible) {
-    this.$container.show();
-  } else {
-    this.$container.hide();
-  }
+  this.$container.setVisible(visible);
 };
 
 scout.Menu.prototype.goOffline = function() {

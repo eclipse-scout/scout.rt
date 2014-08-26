@@ -6,10 +6,13 @@ scout.Menubar = function($parent) {
   this.menuTypesForLeft1 = [];
   this.menuTypesForLeft2 = [];
   this.menuTypesForRight = [];
+  this.staticMenus = [];
 };
 
 scout.Menubar.prototype.updateItems = function(menus) {
   var i, empty;
+
+  menus = this.staticMenus.concat(menus);
 
   // stop if menu the same as before
   if (scout.arrays.equals(this.menus, menus)) {

@@ -3,6 +3,8 @@ scout.Form = function() {
   this._$title;
   this._$parent;
   this.rootGroupBox;
+  this.menus = [];
+  this.staticMenus = [];
   this._addAdapterProperties(['rootGroupBox', 'menus']);
   this._locked;
 };
@@ -45,6 +47,7 @@ scout.Form.prototype._render = function($parent) {
   this.menubar.menuTypesForLeft1 = ['Form.System'];
   this.menubar.menuTypesForLeft2 = ['Form.Regular'];
   this.menubar.menuTypesForRight = ['Form.Tool'];
+  this.menubar.staticMenus = this.staticMenus;
   this.menubar.updateItems(this.menus);
 
   if (closeable) {

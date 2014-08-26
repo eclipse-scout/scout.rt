@@ -48,6 +48,7 @@
 //@include("desktop/DesktopViewButton.js");
 //@include("desktop/DesktopViewButtonOwn.js");
 //@include("desktop/Outline.js");
+//@include("desktop/OutlineNavigateUpMenu.js");
 //@include("menu/Menu.js");
 //@include("menu/menus.js");
 //@include("menu/Menubar.js")

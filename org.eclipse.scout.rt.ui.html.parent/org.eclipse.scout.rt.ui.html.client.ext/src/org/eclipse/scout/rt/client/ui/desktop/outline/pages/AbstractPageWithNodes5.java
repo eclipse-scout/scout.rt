@@ -20,8 +20,6 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.basic.table.internal.TablePageTreeMenuWrapper;
-import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
-import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineNavigateUpMenu;
 import org.eclipse.scout.rt.client.ui.form.FormMenuType;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IForm5;
@@ -32,7 +30,6 @@ import org.eclipse.scout.rt.shared.ui.menu.MenuWrapper;
 import org.eclipse.scout.service.SERVICES;
 
 public class AbstractPageWithNodes5 extends AbstractExtensiblePageWithNodes {
-  private OutlineNavigateUpMenu m_navigateUpMenu;
 
   public AbstractPageWithNodes5() {
     super();
@@ -128,9 +125,7 @@ public class AbstractPageWithNodes5 extends AbstractExtensiblePageWithNodes {
     for (IMenu menu : getOutline().getContextMenu().getChildActions()) {
       //FIXME CGU improve this
       if (menu instanceof TablePageTreeMenuWrapper && ((TablePageTreeMenuWrapper) menu).getWrappedMenu().getClass().getSimpleName().contains("OutlineNavigateDownMenu")) {
-        menu = new OutlineNavigateUpMenu(getOutline());
-        m_navigateUpMenu = (OutlineNavigateUpMenu) menu;
-        m_navigateUpMenu.initAction();
+        continue;
       }
       Set<IMenuType> types = new HashSet<IMenuType>();
       for (IMenuType type : menu.getMenuTypes()) {
@@ -144,14 +139,6 @@ public class AbstractPageWithNodes5 extends AbstractExtensiblePageWithNodes {
       }
       MenuWrapper menuWrapper = new MenuWrapper(menu, types);
       menus.add(menuWrapper);
-    }
-  }
-
-  @Override
-  public void setParentNodeInternal(ITreeNode parent) {
-    super.setParentNodeInternal(parent);
-    if (m_navigateUpMenu != null) {
-      m_navigateUpMenu.notifyParentNodeChanged();
     }
   }
 

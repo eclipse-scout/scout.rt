@@ -194,14 +194,16 @@
   $.fn.setEnabled = function(enabled) {
     if (enabled) {
       this.removeAttr('disabled');
+      this.removeClass('disabled');
     } else {
       this.attr('disabled', 'disabled');
+      this.addClass('disabled');
     }
     return this;
   };
 
   $.fn.isEnabled = function() {
-    return this.attr('disabled');
+    return this.attr('disabled') === undefined;
   };
 
   $.fn.setVisible = function(visible) {

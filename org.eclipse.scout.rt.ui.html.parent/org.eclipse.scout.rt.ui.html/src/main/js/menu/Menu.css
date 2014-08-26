@@ -1,121 +1,121 @@
 .menubar {
-	width: 100%;
-	position: relative;
-	height: 50px;
-	white-space: nowrap;
-	overflow: hidden;
-	padding-right: 20px;
+  width: 100%;
+  position: relative;
+  height: 50px;
+  white-space: nowrap;
+  overflow: hidden;
+  padding-right: 20px;
 }
 
 .menu-item {
-	position: relative;
-	display: inline-block;
-	padding-right: 20px;
-	padding-left: 20px;
-	overflow: hidden;
-	cursor: pointer;
-	line-height: @size-desktop-menu;
-	color: @color-bench-text;
-	
-	border-left: 1px solid transparent;
-	border-right: 1px solid transparent;
-	border-bottom: 1px solid transparent;		
+  position: relative;
+  display: inline-block;
+  padding-right: 20px;
+  padding-left: 20px;
+  overflow: hidden;
+  cursor: pointer;
+  line-height: @size-desktop-menu;
+  color: @color-bench-text;
 
-	&:hover {
-		color: @color-bench-text-hover;
-	}
+  border-left: 1px solid transparent;
+  border-right: 1px solid transparent;
+  border-bottom: 1px solid transparent;
 
-	&.disable {
-		color: @color-bench-semi;
-	}
+  &:hover {
+    color: @color-bench-text-hover;
+  }
 
-	&.menu-right {
-		float: right;
-	}
-	
-	&.menu-right.menu-open {
-		border-left: 1px solid @color-bench-light-border;
-		border-right: 1px solid @color-bench-light-border;
-		color: @color-bench-text-active;		
-	}	
+  &.disabled {
+    color: @color-bench-semi;
+  }
 
-	&.menu-open {
-		color: @color-bench-text-active;		
-	}	
+  &.menu-right {
+    float: right;
+  }
+
+  &.menu-right.menu-open {
+    border-left: 1px solid @color-bench-light-border;
+    border-right: 1px solid @color-bench-light-border;
+    color: @color-bench-text-active;
+  }
+
+  &.menu-open {
+    color: @color-bench-text-active;
+  }
 
 
-	&[data-icon]:before{
-		display: inline-block;
-		font-family: fontAwesome;
-		font-size: 24px;
-		line-height: @size-desktop-menu;
-		content: attr(data-icon);
-	}
+  &[data-icon]:before{
+    display: inline-block;
+    font-family: fontAwesome;
+    font-size: 24px;
+    line-height: @size-desktop-menu;
+    content: attr(data-icon);
+  }
 
-	&.has-submenu:after{
-		display: inline-block;
-		position: relative;
-		left: 0px;
-		top: 2px;
-		font-family: fontAwesome;
-		font-size: 18px;
-		padding-left: 10px;
-		content: "\F107";
-	}
+  &.has-submenu:after{
+    display: inline-block;
+    position: relative;
+    left: 0px;
+    top: 2px;
+    font-family: fontAwesome;
+    font-size: 18px;
+    padding-left: 10px;
+    content: "\F107";
+  }
 
 }
 
 .menu-separator {
-	display: inline-block;
-	position: relative;
-	left: -1px;
-	top: -10px;
-	width: 1px;
-	height: @size-desktop-menu - 20px;
-	border-right: 1px solid @color-bench-light-border;
-	cursor: pointer;	
+  display: inline-block;
+  position: relative;
+  left: -1px;
+  top: -10px;
+  width: 1px;
+  height: @size-desktop-menu - 20px;
+  border-right: 1px solid @color-bench-light-border;
+  cursor: pointer;
 }
 
 /* context menu */
 
 .menu-context {
-	box-shadow: 2px 6px 14px -6px @color-bench-semi;
-	border: 1px solid @color-bench-light-border;
+  box-shadow: 2px 6px 14px -6px @color-bench-semi;
+  border: 1px solid @color-bench-light-border;
 }
 
 
 .menu-container {
-	.menu-context;
-	position: absolute;
-	z-index: 10;
-	white-space: nowrap;
-	
-	&.menu-right:before {
-	  content: ' ';
-	  width: 65px;
-	  border-bottom: 1px solid @color-bench;
-	  position:absolute;
-	  top: -1px;
-	  right: -1px;    
-	}	
-	
-	&.menu-window {
-		padding-top: 28px;
-		cursor: pointer;
-	}
+  .menu-context;
+  position: absolute;
+  z-index: 10;
+  white-space: nowrap;
+
+  &.menu-right:before {
+    content: ' ';
+    width: 65px;
+    border-bottom: 1px solid @color-bench;
+    position:absolute;
+    top: -1px;
+    right: -1px;
+  }
+
+  &.menu-window {
+    padding-top: 28px;
+    cursor: pointer;
+  }
 }
 
 
 .menu-container .menu-item{
-	display: block;
-	background-color: @color-bench;
-	padding: 0px 12px 0px 12px;
-	line-height: @size-table-header - 3px;
-	border-bottom: 1px solid @color-bench-light-border;
-	cursor: pointer;
-	color: @color-bench-text;
-	
-	&:hover{
-		color: @color-bench-text-hover;
-	}
+  display: block;
+  background-color: @color-bench;
+  padding: 0px 12px 0px 12px;
+  line-height: @size-table-header - 3px;
+  border-bottom: 1px solid @color-bench-light-border;
+  cursor: pointer;
+  color: @color-bench-text;
+
+  &:hover{
+    color: @color-bench-text-hover;
+  }
 }

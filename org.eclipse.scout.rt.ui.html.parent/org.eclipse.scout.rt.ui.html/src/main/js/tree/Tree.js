@@ -147,7 +147,7 @@ scout.Tree.prototype._renderNodeExpanded = function(node, $node, expanded) {
 scout.Tree.prototype.setNodesSelected = function(nodes, $nodes) {
   var nodeIds = new Array(nodes.length), i;
   for (i=0; i < nodes.length; i++) {
-    nodeIds[i] = nodes[i];
+    nodeIds[i] = nodes[i].id;
   }
 
   if (!scout.arrays.equalsIgnoreOrder(nodeIds, this.selectedNodeIds)) {
@@ -402,7 +402,7 @@ scout.Tree.prototype._onNodeClicked = function(event) {
     'nodeId': nodeId
   });
 
-  this.setNodesSelected([node.id], [$clicked]);
+  this.setNodesSelected([node], [$clicked]);
 };
 
 scout.Tree.prototype._onNodeControlClicked = function(event) {
@@ -412,7 +412,7 @@ scout.Tree.prototype._onNodeControlClicked = function(event) {
     node = $node.data('node');
 
   //TODO cru/cgu: talk about click on not seleced nodes
-  this.setNodesSelected([node.id], [$node]);
+  this.setNodesSelected([node], [$node]);
   this.setNodeExpanded(node, $node, expanded);
 
   // prevent immediately reopening
@@ -489,6 +489,14 @@ scout.Tree.prototype._findNodeById = function(nodeId, $parent) {
 
 scout.Tree.prototype._findSelectedNodes = function() {
   return this._$treeScroll.find('.selected');
+};
+
+scout.Tree.prototype.getSelectedModelNodes = function() {
+  var nodes = [];
+  for (var i=0;i<this.selectedNodeIds.length;i++) {
+    nodes.push(this._nodeMap[this.selectedNodeIds[i]]);
+  }
+  return nodes;
 };
 
 scout.Tree.prototype.onModelAction = function(event) {

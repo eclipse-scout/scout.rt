@@ -123,6 +123,20 @@ describe("Tree", function() {
       var requestData = mostRecentJsonRequest();
       expect(requestData).toContainEventTypesExactly(['nodeClicked', 'nodesSelected']);
     });
+
+    it("updates model (selection)", function() {
+      var model = createModelFixture(1);
+      var tree = createTree(model);
+      tree.render(session.$entryPoint);
+
+      expect(tree.selectedNodeIds.length).toBe(0);
+
+      var $node = tree._$treeScroll.find('.tree-item:first');
+      $node.click();
+
+      expect(tree.selectedNodeIds.length).toBe(1);
+      expect(tree.selectedNodeIds[0]).toBe(model.nodes[0].id);
+    });
   });
 
   describe("onModelAction", function() {
@@ -372,8 +386,14 @@ describe("Tree", function() {
         };
         session._processSuccessResponse(message);
 
+        //Check model
+        expect(tree.selectedNodeIds.length).toBe(1);
+        expect(tree.selectedNodeIds[0]).toBe(node0.id);
+
+        //Check gui
         expect(tree._findSelectedNodes().length).toBe(1);
         expect(tree._findNodeById(node0.id).isSelected()).toBe(true);
+
       });
 
       it("expands the parents if a hidden node should be selected whose parents are collapsed (revealing the selection)", function() {
