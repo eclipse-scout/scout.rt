@@ -159,7 +159,7 @@ public class UnsavedFormChangesForm extends AbstractForm {
       }
 
       @Order(30.0)
-      @ClassId("923e159b-3e29-4604-9532-c1a274f89aa8")
+      @ClassId("215a6594-5fb2-435e-85ec-f612afb36a05")
       public class CheckAllButton extends AbstractButton {
         @Override
         protected String getConfiguredLabel() {
@@ -173,7 +173,7 @@ public class UnsavedFormChangesForm extends AbstractForm {
       }
 
       @Order(30.0)
-      @ClassId("923e159b-3e29-4604-9532-c1a274f89aa8")
+      @ClassId("b7f69fff-f7ff-4474-8a27-be9083ff731d")
       public class UnCheckAllButton extends AbstractButton {
         @Override
         protected String getConfiguredLabel() {
