@@ -84,15 +84,11 @@ scout.Table.prototype.dispose = function() {
 };
 
 scout.Table.prototype.clearSelection = function() {
-  if (this.selectionHandler) {
-    this.selectionHandler.clearSelection();
-  }
+  this.selectionHandler.clearSelection();
 };
 
 scout.Table.prototype.toggleSelection = function() {
-  if (this.selectionHandler) {
-    this.selectionHandler.toggleSelection();
-  }
+  this.selectionHandler.toggleSelection();
 };
 
 scout.Table.prototype.updateScrollbar = function() {
@@ -206,9 +202,7 @@ scout.Table.prototype.sortChange = function($header, dir, additional, remove) {
 scout.Table.prototype.drawData = function() {
   this.findRows().remove();
   this._drawData(0);
-  if (this.selectionHandler) {
-    this.selectionHandler.dataDrawn();
-  }
+  this.selectionHandler.dataDrawn();
 };
 
 scout.Table.prototype._buildRowDiv = function(row, index) {
@@ -598,9 +592,7 @@ scout.Table.prototype.selectRowsByIds = function(rowIds) {
   this.selectedRowIds = rowIds;
 
   if (this.rendered) {
-    if (this.selectionHandler) {
-      this.selectionHandler.drawSelection();
-    }
+    this.selectionHandler.drawSelection();
   }
 
   if (!this.session.processingEvents) {
@@ -878,6 +870,10 @@ scout.Table.prototype._setHeaderVisible = function(headerVisible) {
 scout.Table.prototype._setEnabled = function(enabled) {
   //FIXME CGU remove/add events. Maybe extend jquery to not fire on disabled events?
   this.$dataScroll.setEnabled(enabled);
+};
+
+scout.Table.prototype._setMultiSelect = function(multiSelect) {
+  // nop
 };
 
 scout.Table.prototype.onModelAction = function(event) {

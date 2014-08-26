@@ -312,11 +312,19 @@ describe("Table", function() {
       expect(requestData).toContainEvents(event);
     });
 
-    it("only selects first row if mouse move selection is disabled", function() {
+    it("only selects first row if mouse move selection or multi selection is disabled", function() {
       var model = helper.createModelFixture(2, 4);
       var table = helper.createTable(model);
       table.selectionHandler.mouseMoveSelectionEnabled = false;
+      verifyMouseMoveSelectionIsDisabled(table);
 
+      model = helper.createModelFixture(2, 4);
+      table = helper.createTable(model);
+      table.multiSelect = false;
+      verifyMouseMoveSelectionIsDisabled(table);
+    });
+
+    function verifyMouseMoveSelectionIsDisabled(table) {
       table.render(session.$entryPoint);
 
       var $rows = table.$dataScroll.children();
@@ -344,7 +352,7 @@ describe("Table", function() {
         "rowIds": ['0']
       });
       expect(requestData).toContainEvents(event);
-    });
+    }
 
   });
 

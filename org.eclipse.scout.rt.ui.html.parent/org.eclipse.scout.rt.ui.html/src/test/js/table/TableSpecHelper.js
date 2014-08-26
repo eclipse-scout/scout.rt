@@ -11,7 +11,8 @@ TableSpecHelper.prototype.createModel = function(id, columns, rows) {
 
   var model =  {
     "id": id,
-    "headerVisible": true
+    "headerVisible": true,
+    "multiSelect": true
   };
 
   //Server will never send undefined -> don't create model with undefined properties.

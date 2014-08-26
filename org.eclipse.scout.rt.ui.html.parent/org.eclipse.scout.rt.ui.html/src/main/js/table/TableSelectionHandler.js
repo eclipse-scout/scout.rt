@@ -31,9 +31,9 @@ scout.TableSelectionHandler.prototype._onRowsDrawn = function($rows) {
       selectionChanged = false;
 
     // click without ctrl always starts new selection, with ctrl toggle
-    if (event.shiftKey) {
+    if (that.table.multiSelect && event.shiftKey) {
       first = $selectedRows.first().index();
-    } else if (event.ctrlKey) {
+    } else if (that.table.multiSelect && event.ctrlKey) {
       add = !$row.hasClass('row-selected'); //FIXME why not just selected as in tree?
     }
     else {
@@ -51,7 +51,7 @@ scout.TableSelectionHandler.prototype._onRowsDrawn = function($rows) {
       selectData(event);
     }
 
-    if (that.mouseMoveSelectionEnabled) {
+    if (that.table.multiSelect && that.mouseMoveSelectionEnabled) {
       // ...or movement with held mouse button
       $('.table-row').one('mousemove.selectionHandler', function(event) {
         selectData(event);
