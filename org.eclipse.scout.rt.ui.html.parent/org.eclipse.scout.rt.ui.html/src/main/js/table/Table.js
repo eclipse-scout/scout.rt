@@ -769,9 +769,9 @@ scout.Table.prototype.hideRow = function($row) {
 // move column
 
 scout.Table.prototype.moveColumn = function($header, oldPos, newPos, dragged) {
-  var $headers = $('.header-item, .header-resize'),
-    $moveHeader = $headers.eq(oldPos),
-    $moveResize = $headers.eq(oldPos + 1);
+  var $headers = $('.header-item', this.$container),
+    $moveHeader = $headers.eq(oldPos / 2),
+    $moveResize = $moveHeader.next();
 
   // store old position of header
   $headers.each(function() {
@@ -783,8 +783,8 @@ scout.Table.prototype.moveColumn = function($header, oldPos, newPos, dragged) {
     this._$header.prepend($moveResize);
     this._$header.prepend($moveHeader);
   } else {
-    $headers.eq(newPos).after($moveHeader);
-    $headers.eq(newPos).after($moveResize);
+    $headers.eq(newPos / 2).after($moveHeader);
+    $headers.eq(newPos / 2).after($moveResize);
   }
 
   // move menu

@@ -57,6 +57,8 @@
 		color: @color-bench-text-active;
 		z-index: 2;
 	}
+	
+
 }
 
 .header-resize {
@@ -71,6 +73,14 @@
 	background-clip: content-box;
 	cursor: col-resize;
 	z-index: 4;
+	
+	.header-move & {
+		background-color: @color-bench-light;
+	}
+
+	.menu-open + &.header-resize{
+		background-color: @color-bench-light;
+	}	
 }
 
 /* main table data */

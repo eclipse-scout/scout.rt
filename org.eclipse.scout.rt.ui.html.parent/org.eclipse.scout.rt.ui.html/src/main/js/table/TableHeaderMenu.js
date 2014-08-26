@@ -11,15 +11,19 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
     column = table.columns[id];
 
   // label title
-  if ($header.hasClass('menu-open')) {
-    $header.removeClass('menu-open');
+  $.log($header.menuOpen);
+  if ($header.data('menu-open')) {
+    $header.data('menu-open', false);
     return;
   }
   $header.addClass('menu-open');
+  $header.data('menu-open', true);
 
   // create container
   var $menuHeader = table.$container.appendDIV('table-header-menu')
     .css('left', x).css('top', y + $header.parent().height() + 1);
+
+  $menuHeader.appendDIV('table-header-menu-whiter').width($header[0].offsetWidth - 2);
 
   // every user action will close menu
   $('body').on('mousedown.remove', removeMenu);
@@ -44,8 +48,8 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
     .click(moveBottom);
 
   // create buttons in command for sorting
-  var $commandSort = $menuHeader.appendDiv('', 'header-group');
-  $commandSort.appendDiv('', 'header-text')
+  var $commandSort = $menuHeader.appendDIV('header-group');
+  $commandSort.appendDIV('header-text')
     .data('label', 'Sortierung');
 
   var $sortUp = $commandSort.appendDiv('HeaderCommandSortUp', 'header-command')
@@ -73,8 +77,8 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
 
   // create buttons in command for grouping
   if (column.type === 'text' || column.type === 'date') {
-    var $commandGroup = $menuHeader.appendDiv('', 'header-group');
-    $commandGroup.appendDiv('', 'header-text')
+    var $commandGroup = $menuHeader.appendDIV('header-group');
+    $commandGroup.appendDIV('header-text')
       .data('label', 'Summe');
 
     var $groupAll = $commandGroup.appendDiv('HeaderCommandGroupAll', 'header-command')
@@ -90,8 +94,8 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
 
   // create buttons in command for coloring
   if (column.type === 'number') {
-    var $commandColor = $menuHeader.appendDiv('', 'header-group');
-    $commandColor.appendDiv('', 'header-text')
+    var $commandColor = $menuHeader.appendDIV('header-group');
+    $commandColor.appendDIV('header-text')
       .data('label', 'Einfärben');
 
     $commandColor.appendDiv('HeaderCommandColorRed', 'header-command')
@@ -109,8 +113,8 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
   }
 
   // create buttons in command for new columns
-  var $commandColumn = $menuHeader.appendDiv('', 'header-group');
-  $commandColumn.appendDiv('', 'header-text')
+  var $commandColumn = $menuHeader.appendDIV('header-group');
+  $commandColumn.appendDIV('header-text')
     .data('label', 'Spalte');
 
   $commandColumn.appendDiv('HeaderCommandColumnAdd', 'header-command')
@@ -121,8 +125,8 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
     .click(columnRemove);
 
   // filter
-  var $headerFilter = $menuHeader.appendDIV('header-group');
-  $headerFilter.appendDiv('', 'header-text')
+  var $headerFilter = $menuHeader.appendDIV('header-group-filter');
+  $headerFilter.appendDIV('header-text')
     .data('label', 'Filtern nach');
 
   var group = (column.type === 'date') ?  3 : -1,
@@ -132,7 +136,7 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
     cube = matrix.calculateCube();
 
   var $headerFilterContainer = $headerFilter.appendDIV('header-filter-container'),
-    $headerFilterScroll = $headerFilterContainer.appendDiv('.scrollable-y');
+    $headerFilterScroll = $headerFilterContainer.appendDIV('scrollable-y');
 
   for (var a = 0; a < xAxis.length; a++) {
     var key = xAxis[a],
@@ -153,7 +157,6 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
   if (containerHeight < scrollHeight) {
     var scrollbar = new scout.Scrollbar($headerFilterScroll , 'y');
     scrollbar.initThumb();
-    $('.header-filter', $headerFilterScroll).css('width', 'calc(100% - 22px)');
   } else {
     $headerFilterScroll.css('height', 'auto');
     scrollHeight = $headerFilterScroll.get(0).offsetHeight;
@@ -178,10 +181,10 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
   function removeMenu(event) {
     if ($menuHeader.has($(event.target)).length === 0) {
       $menuHeader.remove();
+      $header.removeClass('menu-open');
       if (!$(event.target).is($header)) {
-        $header.removeClass('menu-open');
+        $header.data('menu-open', false);
       }
-
       $('body').off('mousedown.remove');
       $('body').off('keydown.remove');
     }

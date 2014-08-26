@@ -44,23 +44,22 @@ scout.TableHeader = function(table, $tableHeader, session) {
   }
 
   function resizeHeader(event) {
-    var startX = event.pageX - 18,
+    var startX = event.pageX ,
       $header = $(this).prev(),
       colNum = $header.index() / 2 + 1,
-      headerWidth = $header.width(),
-      totalWidth = $('.table-row').first().width();
+      headerWidth = parseFloat($header.css('min-width')),
+      totalWidth = parseFloat($('.table-row').eq(0).css('width'));
 
     $('body').addClass('col-resize')
       .on('mousemove', '', resizeMove)
       .one('mouseup', '', resizeEnd);
-    return false;
 
     function resizeMove(event) {
-      var diff = event.pageX - startX;
+      var diff = event.pageX  - startX,
+        wHeader = headerWidth + diff,
+        wSummary = totalWidth + diff;
 
-      if (headerWidth + diff > 80 || diff > 0) {
-        var wHeader = headerWidth + diff + 'px';
-        var wSummary = totalWidth + diff + 'px';
+      if (wHeader > 80 || diff > 0) {
         $header.css('min-width', wHeader).css('max-width', wHeader);
         $('.table-row > div:nth-of-type(' + colNum + ' ), .table-row-sum > div:nth-of-type(' + colNum + ' )').css('min-width', wHeader).css('max-width', wHeader);
         $('.table-row, .table-row-sum').css('min-width', wSummary).css('max-width', wSummary);
@@ -78,12 +77,10 @@ scout.TableHeader = function(table, $tableHeader, session) {
       $header = $(this),
       oldPos = $header.index(),
       newPos =  oldPos,
-      move = $header.outerWidth() + $header.next().outerWidth(),
+      move = $header.outerWidth(),
       $headers = $header.siblings('.header-item');
 
-    // change css of draged header
-    $header.css('z-index', 50)
-      .addClass('header-move');
+    that.dragDone = false;
 
     // start drag & drop events
     $('body').on('mousemove', '', dragMove)
@@ -91,6 +88,11 @@ scout.TableHeader = function(table, $tableHeader, session) {
 
     function dragMove(event) {
       var diff = event.pageX - startX;
+
+      // change css of draged header
+      $header.css('z-index', 50)
+        .addClass('header-move');
+      $tableHeader.addClass('header-move');
 
       // move dragged header
       $header.css('left', diff);
@@ -103,13 +105,10 @@ scout.TableHeader = function(table, $tableHeader, session) {
 
         if (middle < m && i < oldPos / 2) {
           $(this).css('left', move);
-          $(this).next().css('left', move);
         } else if (middle > m && i >= oldPos / 2) {
           $(this).css('left', -move);
-          $(this).next().css('left', -move);
         } else {
           $(this).css('left', 0);
-          $(this).next().css('left', 0);
         }
       });
 
@@ -124,7 +123,9 @@ scout.TableHeader = function(table, $tableHeader, session) {
         }
       });
 
-      that.dragDone = true;
+      if (diff !== 0) {
+        that.dragDone = true;
+      }
     }
 
     function realWidth($div) {
@@ -145,18 +146,13 @@ scout.TableHeader = function(table, $tableHeader, session) {
 
 
     function dragEnd(event) {
-      // reset css of dragged header
-      $header.css('z-index', '')
-        .css('background', '')
-        .removeClass('header-move');
-
-      $headers.each(function() {
-          $(this).css('left', '');
-          $(this).next().css('left', '');
-        });
-
       // remove events
       $('body').off('mousemove');
+
+      // in case of no movement: return
+      if (!that.dragDone)  {
+        return true;
+      }
 
       // move column
       if (oldPos !== newPos) {
@@ -166,6 +162,15 @@ scout.TableHeader = function(table, $tableHeader, session) {
         $header.animateAVCSD('left', '', function () {that.dragDone = false;});
       }
 
+      // reset css of dragged header
+      $headers.each(function() {
+        $(this).css('left', '');
+      });
+
+      $header.css('z-index', '')
+        .css('background', '')
+        .removeClass('header-move');
+      $tableHeader.removeClass('header-move');
 
     }
   }

@@ -43,6 +43,7 @@
 	position: relative;
 	float: left;
 	cursor: pointer;
+	display: inline-block;
 		
 	&.tab-active {
 		width: calc(~"100%" - @size-desktop-tools);
