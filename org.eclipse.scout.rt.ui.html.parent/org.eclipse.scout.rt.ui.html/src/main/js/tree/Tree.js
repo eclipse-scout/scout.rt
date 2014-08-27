@@ -43,6 +43,7 @@ scout.Tree.prototype._render = function($parent) {
   this.$container = $parent.appendDIV('tree');
   this._$treeScroll = this.$container.appendDIV('scrollable-y');
   this.scrollbar = new scout.Scrollbar(this._$treeScroll, 'y');
+  this.scrollbar.initThumb();
   this._addNodes(this.nodes);
 
   if (this.selectedNodeIds.length > 0) {

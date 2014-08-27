@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.TablePage;
 import org.eclipse.scout.rt.ui.html.json.fixtures.JsonSessionMock;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,7 +35,7 @@ public class JsonOutlineTest {
    * Tests whether the adapters for the detail forms get created
    */
   @Test
-  public void testChildAdaptersCreated() throws ProcessingException, JSONException {
+  public void testChildAdaptersCreated() throws ProcessingException {
     TablePage tablePage = new TablePage(1, new TablePage.NodePageWithFormFactory());
     NodePageWithForm nodePage = new NodePageWithForm();
 
@@ -56,6 +57,28 @@ public class JsonOutlineTest {
 
     Assert.assertNotNull(jsonSession.getJsonAdapter(nodePage.getDetailForm()));
     Assert.assertNotNull(jsonSession.getJsonAdapter(rowPage.getDetailForm()));
+  }
+
+  /**
+   * Node.detailTable must not be sent if node.tableVisible is set to false to reduce response size.
+   */
+  @Test
+  public void testTableNotSentIfInvisible() throws ProcessingException, JSONException {
+    NodePageWithForm nodePage = new NodePageWithForm();
+    nodePage.setTableVisible(false);
+
+    List<IPage> pages = new ArrayList<IPage>();
+    pages.add(nodePage);
+    IOutline outline = new Outline(pages);
+    JsonOutline jsonOutline = createJsonOutlineWithMocks(outline);
+
+    JSONObject jsonNode = jsonOutline.toJson().getJSONArray("nodes").getJSONObject(0);
+    Assert.assertNull(jsonNode.opt(IOutline.PROP_DETAIL_TABLE));
+
+    //FIXME CGU/AWE this does not work because no adapter is created. How to solve it? Property Change event necessary? Store tableVisible on jsonOutline and forbid dynamic changes? Remove attachAdapters?
+//    nodePage.setTableVisible(true);
+//    jsonNode = jsonOutline.toJson().getJSONArray("nodes").getJSONObject(0);
+//    Assert.assertNotNull(jsonNode.opt(IOutline.PROP_DETAIL_TABLE));
   }
 
   public static JsonOutline createJsonOutlineWithMocks(IOutline outline) {

@@ -20,43 +20,13 @@ scout.Outline.prototype._initTreeNode = function(parentNode, node) {
   }
 };
 
-/* create form and table */
-
-scout.Outline.prototype._showForm = function(node) {
-  if (this._detailForm && this._detailForm !== node.detailForm) {
-    this._detailForm.remove();
-    this._detailForm = null;
-  }
-
-  if (node.detailForm) {
-    this._detailForm = node.detailForm;
-    if (!this._detailForm.rendered) {
-      this.session.desktop.updateOutline(this._detailForm, this._detailForm.title);
-    }
-  }
-};
-
-scout.Outline.prototype._showTable = function(node) {
-  if (this._detailTable && this._detailTable !== node.detailTable) {
-    this._detailTable.remove();
-    this._detailTable = null;
-  }
-
-  if (node.detailTable) {
-    this._detailTable = node.detailTable;
-    if (!this._detailTable.rendered) {
-      this.session.desktop.updateOutline(this._detailTable, node.text);
-      this.scrollbar.initThumb();
-    }
-  }
-};
-
 /* user input handling */
 
 scout.Outline.prototype._renderSelection = function($nodes) {
   scout.Outline.parent.prototype._renderSelection.call(this, $nodes);
 
   if (!$nodes) {
+    //Outline does not support multi selection -> [0]
     $nodes = [this._findNodeById(this.selectedNodeIds[0])];
   }
 
@@ -64,12 +34,30 @@ scout.Outline.prototype._renderSelection = function($nodes) {
     return;
   }
 
-  //Outline does not support multi selection
   var node = $nodes[0].data('node');
   if (node) {
-    this._showForm(node);
-    this._showTable(node);
+    this._updateOutlineTab(node);
   }
+};
+
+scout.Outline.prototype._updateOutlineTab = function(node) {
+  // Unlink detail form if it was closed.
+  // May happen in the following case:
+  // The form gets closed on execPageDeactivated.
+  // No detailFormChanged event will be fired because the deactivated page is not selected anymore
+  if (node.detailForm && node.detailForm.destroyed) {
+    node.detailForm = null;
+  }
+
+  var content = node.detailForm;
+  var text = node.text;
+  if (!content) {
+    content = node.detailTable;
+  }
+  else {
+    text = node.detailForm.title;
+  }
+  this.session.desktop.updateOutlineTab(content, text);
 };
 
 /* event handling */
@@ -79,7 +67,7 @@ scout.Outline.prototype.onFormChanged = function(nodeId, detailForm) {
   node.detailForm = this.session.getOrCreateModelAdapter(detailForm, this);
 
   if (this.selectedNodeIds.indexOf(node.id) >= 0) {
-    this._showForm(node);
+    this._updateOutlineTab(node);
   }
 };
 
@@ -88,7 +76,7 @@ scout.Outline.prototype.onTableChanged = function(nodeId, detailTable) {
   node.detailTable = this.session.getOrCreateModelAdapter(detailTable, this);
 
   if (this.selectedNodeIds.indexOf(node.id) >= 0) {
-    this._showTable(node);
+    this._updateOutlineTab(node);
   }
 };
 

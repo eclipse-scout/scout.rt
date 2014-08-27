@@ -55,8 +55,6 @@ scout.Desktop.prototype._render = function($parent) {
 
   this._outlineTab = new scout.Desktop.TabAndContent();
 
-  this._addTab(this._outlineTab);
-
   for (i = 0; i < this.toolButtons.length; i++) {
     //this.toolButtons[i].desktop  = this;
     this.toolButtons[i].render(this.$toolbar);
@@ -100,7 +98,10 @@ scout.Desktop.prototype._addTab = function(tab) {
 
   this._allTabs.push(tab);
   this._selectTab(tab);
+};
 
+scout.Desktop.prototype._isTabVisible = function(tab) {
+  return this._allTabs.indexOf(tab) >= 0;
 };
 
 scout.Desktop.prototype._updateTab = function(tab) {
@@ -110,7 +111,7 @@ scout.Desktop.prototype._updateTab = function(tab) {
 scout.Desktop.prototype._removeTab = function(tab) {
   scout.arrays.remove(this._allTabs, tab);
 
-  if (tab.$div.isSelected()) {
+  if (tab.$div.isSelected() && this._allTabs.length > 0) {
     this._selectTab(this._allTabs[this._allTabs.length - 1]);
   }
 
@@ -157,16 +158,34 @@ scout.Desktop.prototype._showForm = function(form) {
 
 /* communication with outline */
 
-scout.Desktop.prototype.updateOutline = function(content, title) {
-  this._outlineTab.title = title;
+scout.Desktop.prototype.updateOutlineTab = function(content, title) {
+  if (this._outlineTab.content && this._outlineTab.content !== content) {
+    this._outlineTab.content.remove();
+    //Also remove storage to make sure selectTab does not restore the content
+    this._outlineTab.$storage = null;
+  }
+
+  //Remove tab completely if no content is available (neither a table nor a form)
+  if (!content){
+    this._removeTab(this._outlineTab);
+    return;
+  }
+
+  if (!this._isTabVisible(this._outlineTab)) {
+    this._addTab(this._outlineTab);
+  }
+
   this._outlineTab.content = content;
+  this._outlineTab.title = title;
 
   this._updateTab(this._outlineTab);
   this._selectTab(this._outlineTab);
 
-  var selectedNode = this.outline.getSelectedModelNodes()[0];
-  content.staticMenus = [new scout.OutlineNavigateUpMenu(this.outline, selectedNode)];
-  content.render(this.$bench);
+  if (!content.rendered) {
+    var selectedNode = this.outline.getSelectedModelNodes()[0];
+    content.staticMenus = [new scout.OutlineNavigateUpMenu(this.outline, selectedNode)];
+    content.render(this.$bench);
+  }
 };
 
 scout.Desktop.prototype.changeOutline = function(outline) {

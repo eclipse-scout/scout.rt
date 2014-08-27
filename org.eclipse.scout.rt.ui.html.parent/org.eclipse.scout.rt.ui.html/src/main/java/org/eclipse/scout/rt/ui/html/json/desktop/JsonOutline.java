@@ -69,13 +69,16 @@ public class JsonOutline extends JsonTree<IOutline> {
     }
 
     optAttachAdapter(page.getDetailForm());
-    if (page instanceof IPageWithTable) {
-      IPageWithTable<?> pageWithTable = (IPageWithTable<?>) page;
-      attachAdapter(pageWithTable.getTable());
-    }
-    else if (page instanceof IPageWithNodes) {
-      IPageWithNodes pageWithNodes = (IPageWithNodes) page;
-      attachAdapter(pageWithNodes.getInternalTable());
+    //FIXME CGU What if there is a detailform AND a table? We should give the possibility on the gui to show both. Currently one of them overlaps the other
+    if (page.isTableVisible()) {
+      if (page instanceof IPageWithTable) {
+        IPageWithTable<?> pageWithTable = (IPageWithTable<?>) page;
+        attachAdapter(pageWithTable.getTable());
+      }
+      else if (page instanceof IPageWithNodes) {
+        IPageWithNodes pageWithNodes = (IPageWithNodes) page;
+        attachAdapter(pageWithNodes.getInternalTable());
+      }
     }
   }
 
@@ -88,6 +91,10 @@ public class JsonOutline extends JsonTree<IOutline> {
     if (page instanceof IPageWithTable) {
       IPageWithTable<?> pageWithTable = (IPageWithTable<?>) page;
       disposeAdapter(pageWithTable.getTable());
+    }
+    else if (page instanceof IPageWithNodes) {
+      IPageWithNodes pageWithNodes = (IPageWithNodes) page;
+      disposeAdapter(pageWithNodes.getInternalTable());
     }
   }
 
@@ -104,18 +111,20 @@ public class JsonOutline extends JsonTree<IOutline> {
 
     String pageType = "";
     if (page instanceof IPageWithTable) {
-      pageType = IOutline.PROP_DETAIL_TABLE;
-      IPageWithTable<?> pageWithTable = (IPageWithTable<?>) page;
-      putAdapterIdProperty(json, IOutline.PROP_DETAIL_TABLE, pageWithTable.getTable());
+      pageType = "table";
+      if (page.isTableVisible()) {
+        IPageWithTable<?> pageWithTable = (IPageWithTable<?>) page;
+        putAdapterIdProperty(json, IOutline.PROP_DETAIL_TABLE, pageWithTable.getTable());
+      }
     }
     else if (page instanceof IPageWithNodes) {
       pageType = "node";
-      //FIXME send internal table and ignore on gui? or better modify model? -> maybe best to make it configurable on nodepage
-      IPageWithNodes pageWithNodes = (IPageWithNodes) page;
-      ITable table = pageWithNodes.getInternalTable();
-      putAdapterIdProperty(json, IOutline.PROP_DETAIL_TABLE, table);
+      if (page.isTableVisible()) {
+        IPageWithNodes pageWithNodes = (IPageWithNodes) page;
+        ITable table = pageWithNodes.getInternalTable();
+        putAdapterIdProperty(json, IOutline.PROP_DETAIL_TABLE, table);
+      }
     }
-    //FIXME CGU virtual node?
     putProperty(json, "type", pageType);
 
     return json;
@@ -155,9 +164,6 @@ public class JsonOutline extends JsonTree<IOutline> {
     JSONObject jsonEvent = new JSONObject();
     ITreeNode selectedNode = getModel().getSelectedNode();
     putProperty(jsonEvent, PROP_NODE_ID, getOrCreateNodeId(selectedNode));
-    // TODO AWE: (json) überprüfen, ob das hier stimmt. Jetzt ist der zeitliche ablauf wohl etwas anders
-    // als früher, würde man m_treeNodeIds.get(selectedNode) aufrufen, käme hier "null" zurück.
-    // Evtl. muss das in den anderen handleXYZ() methoden auch so gelöst werden?
     if (detailForm == null) {
       putProperty(jsonEvent, IOutline.PROP_DETAIL_FORM, null);
     }
