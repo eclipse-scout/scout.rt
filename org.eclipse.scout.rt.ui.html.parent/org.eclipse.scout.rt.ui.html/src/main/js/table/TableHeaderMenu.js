@@ -11,7 +11,6 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
     column = table.columns[id];
 
   // label title
-  $.log($header.menuOpen);
   if ($header.data('menu-open')) {
     $header.data('menu-open', false);
     return;

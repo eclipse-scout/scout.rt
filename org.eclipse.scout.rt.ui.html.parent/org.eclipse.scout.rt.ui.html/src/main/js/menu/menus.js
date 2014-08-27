@@ -71,23 +71,21 @@ scout.menus = {
       }
     }
   },
-  showContextMenu: function(menus, $parent, $clicked, left, right, top, menuWindow) {
+  showContextMenu: function(menus, $parent, $clicked, left, right, top, menuWindow, menuToggle) {
     var i, $menuContainer = $('.menu-container', $parent);
-
-    if ($menuContainer.length) {
-      removeMenu();
-    }
 
     if (!menus || menus.length === 0) {
       return;
     }
 
-    if ($clicked && $clicked.hasClass('menu-open')) {
-      $clicked.removeClass('menu-open');
+    $.log($clicked, menuToggle, $clicked.data('menu-open'));
+    if (menuToggle && $clicked.data('menu-open')) {
+      removeContainer();
+      $clicked.data('menu-open', false);
       return;
     }
 
-    $menuContainer = $parent.appendDiv('', 'menu-container');
+    $menuContainer = $parent.appendDIV('menu-container');
     $clicked.addClass('menu-open');
 
     if (menuWindow) {
@@ -125,13 +123,10 @@ scout.menus = {
 
     // every user action will close menu; menu is removed in 'click' event, see onMenuItemClicked()
     var closingEvents = 'mousedown.contextMenu keydown.contextMenu mousewheel.contextMenu';
-    $(document).one(closingEvents, removeMenu);
+    $(document).one(closingEvents, removeContainer);
+    $('.menu-item', $menuContainer).one(closingEvents, $.suppressEvent);
 
-    if (!menuWindow) {
-      $menuContainer.one(closingEvents, $.suppressEvent);
-    }
-
-    function removeMenu(event) {
+    function removeContainer(event) {
       // close container
       $menuContainer.remove();
 
@@ -139,12 +134,15 @@ scout.menus = {
       $(document).off('.contextMenu');
 
       // click on button do not reopen menu
-      if (!$(event.target).is($clicked)) {
-        $clicked.removeClass('menu-open');
+      $clicked.removeClass('menu-open');
+
+      if (event && $(event.target).is($clicked) && menuToggle) {
+        $clicked.data('menu-open', true);
       }
     }
 
     function onItemClicked() {
+      $.log('item clicked');
       var menu = $(this).data('menu');
       menu.sendMenuAction();
     }

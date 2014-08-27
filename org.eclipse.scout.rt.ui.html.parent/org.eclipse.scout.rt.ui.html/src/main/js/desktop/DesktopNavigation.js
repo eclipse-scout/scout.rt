@@ -45,24 +45,20 @@ scout.DesktopNavigation.TabAndContent = function($tab) {
 // outline tab creation
 
 scout.DesktopNavigation.prototype._createOutlinesTab = function() {
+  var that = this,
+    doNotOpen = false;
+
   // create tab
   var $tab = this.$header.appendDIV('navigation-tab-outline');
 
   // create button
-  $tab.appendDIV('navigation-tab-outline-button')
-    .on('click', function() {
-      if ($tab.hasClass('tab-active')) {
-        this.$header.toggleClass('tab-menu-open');
-      }
-    }.bind(this));
+  var $menuButton = $tab.appendDIV('navigation-tab-outline-button')
+    .on('click', openMenu);
 
   // create menu
   var $outlinesMenu = $tab.appendDIV('navigation-tab-outline-menu');
   for (var i = 0; i < this.desktop.viewButtons.length; i++) {
-    var $item = $outlinesMenu.appendDIV('outline-menu-item')
-      .on('click',  function() {
-        this.$header.removeClass('tab-menu-open');
-      }.bind(this));
+    var $item = $outlinesMenu.appendDIV('outline-menu-item');
 
     this.desktop.viewButtons[i].render($item);
   }
@@ -73,6 +69,29 @@ scout.DesktopNavigation.prototype._createOutlinesTab = function() {
   // save and return
   this.$outlineTitle = $outlineTitle;
   return $tab;
+
+  function openMenu() {
+    if ($tab.hasClass('tab-active') && !doNotOpen) {
+      that.$header.addClass('tab-menu-open');
+      $(document).one('mousedown.remove keydown.remove', closeMenu);
+    } else {
+      doNotOpen = false;
+    }
+  }
+
+  function closeMenu(event) {
+    // in case of click on 'open menu button': close, but do not reopen
+    if ($(event.target).is($menuButton)) {
+      doNotOpen = true;
+    }
+
+    // in case of menu item was clicked: remove class after handling click event
+    if ($outlinesMenu.has($(event.target)).length === 0) {
+      that.$header.removeClass('tab-menu-open');
+    }
+
+    $(document).off('.remove');
+  }
 };
 
 scout.DesktopNavigation.prototype._createSearchTab = function() {
@@ -122,6 +141,7 @@ scout.DesktopNavigation.prototype.onOutlineChanged = function(outline) {
   this.outline = outline;
   this.outline.render(this.$container);
   this.$outlineTitle.html(this.outline.title);
+  this.$header.removeClass('tab-menu-open');
 };
 
 scout.DesktopNavigation.prototype.onSearchPerformed = function(event) {
@@ -159,7 +179,7 @@ scout.DesktopNavigation.prototype._addSplitter = function() {
      }
 
      that.outline.scrollbar.initThumb();
-   };
+   }
 
    function resizeEnd() {
      $('body').off('mousemove')

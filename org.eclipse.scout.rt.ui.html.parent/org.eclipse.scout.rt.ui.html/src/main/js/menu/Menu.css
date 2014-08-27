@@ -100,7 +100,7 @@
   }
 
   &.menu-window {
-    padding-top: 28px;
+    padding-top: @size-table-header - 5px;
     cursor: pointer;
   }
 }

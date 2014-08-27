@@ -2,6 +2,8 @@ scout.Menu = function() {
   scout.Menu.parent.call(this);
   this.childMenus = [];
   this._addAdapterProperties('childMenus');
+
+  var that = this;
 };
 
 scout.inherits(scout.Menu, scout.ModelAdapter);
@@ -14,12 +16,14 @@ scout.Menu.prototype.sendAboutToShow = function(event) {
 };
 
 scout.Menu.prototype.sendMenuAction = function(event) {
+  $('.menu-container').remove();
+  $('.menu-open').removeClass('menu-open');
   this.session.send(scout.Menu.EVENT_MENU_ACTION, this.id);
 };
 
 scout.Menu.prototype._render = function($parent) {
   this.$container = $parent
-    .appendDiv('', 'menu-item')
+    .appendDIV('menu-item')
     .on('click', '', onClicked.bind(this));
 
   if (this.childMenus.length > 0 && this.text) {
@@ -36,10 +40,10 @@ scout.Menu.prototype._render = function($parent) {
       if (this.$container.hasClass('menu-right')) {
         var right = parseFloat(this.parent.$container[0].offsetWidth) - parseFloat(this.$container.position().left) -  parseFloat(this.$container[0].offsetWidth),
           top = this.$container.height() - 7;
-        scout.menus.showContextMenu(this.children, this.parent.$container, this.$container, undefined, right, top, false);
+        scout.menus.showContextMenu(this.children, this.parent.$container, this.$container, undefined, right, top, false, true);
       } else {
         var left = parseFloat(this.$container.position().left) + 8;
-      scout.menus.showContextMenu(this.children, this.parent.$container, this.$container, left, undefined, 8, true);
+        scout.menus.showContextMenu(this.children, this.parent.$container, this.$container, left, undefined, 8, true, false);
       }
     } else {
       this.sendMenuAction();

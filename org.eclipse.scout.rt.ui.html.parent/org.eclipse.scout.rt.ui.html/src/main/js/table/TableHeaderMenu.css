@@ -211,4 +211,9 @@
 	&.selected + .header-filter {
 		border-top: 1px solid @color-bench;
 	}
+	
+	&.selected:last-child {
+		border-bottom: @color-bench-highlight;
+	}
+	
 }
