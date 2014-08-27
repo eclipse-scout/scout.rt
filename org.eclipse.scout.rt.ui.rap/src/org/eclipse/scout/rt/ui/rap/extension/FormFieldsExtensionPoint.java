@@ -25,7 +25,7 @@ import org.eclipse.scout.rt.ui.rap.extension.internal.FormFieldExtension;
 
 /**
  * <h3>FormFieldsExtensionPoint</h3> To access all form field extension beans.
- * 
+ *
  * @since 3.7.0 June 2011
  */
 public final class FormFieldsExtensionPoint {
@@ -68,16 +68,15 @@ public final class FormFieldsExtensionPoint {
 
   private static int getScopePriority(String scope) {
     int prio = IFormFieldExtension.SCOPE_DEFAULT;
-    if (StringUtility.isNullOrEmpty(scope) || scope.equalsIgnoreCase("default")) {
+    if (StringUtility.isNullOrEmpty(scope) || "default".equalsIgnoreCase(scope)) {
       prio = IFormFieldExtension.SCOPE_DEFAULT;
     }
-    else if (scope.equalsIgnoreCase("global")) {
+    else if ("global".equalsIgnoreCase(scope)) {
       prio = IFormFieldExtension.SCOPE_GLOBAL;
     }
-    else if (scope.equalsIgnoreCase("local")) {
+    else if ("local".equalsIgnoreCase(scope)) {
       prio = IFormFieldExtension.SCOPE_LOCAL;
     }
     return prio;
   }
-
 }

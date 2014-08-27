@@ -53,7 +53,7 @@ import org.eclipse.scout.rt.server.transaction.AbstractTransactionMember;
 
 /**
  * Queue/Topic xa resource (per request)
- * 
+ *
  * @since Build 192
  *        (Extracted out of JmsService class to an autonomous class)
  */
@@ -76,7 +76,7 @@ public class JmsTransactionMember extends AbstractTransactionMember {
   private boolean m_useSecurityCredential;
 
   public JmsTransactionMember(JmsJndiConfig config) {
-    super(new Long(config.getCrc()).toString());
+    super(Long.valueOf(config.getCrc()).toString());
     m_config = config;
     m_useSecurityCredential = StringUtility.hasText(config.getUserName());
   }
@@ -84,7 +84,7 @@ public class JmsTransactionMember extends AbstractTransactionMember {
   /**
    * Makes sure the message connection factory and destination (queue / topic)
    * cache is set and can be used.
-   * 
+   *
    * @throws ProcessingException
    */
   public void ensureCache() throws ProcessingException {

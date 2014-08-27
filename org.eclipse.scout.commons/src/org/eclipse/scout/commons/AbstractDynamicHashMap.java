@@ -37,7 +37,7 @@ public abstract class AbstractDynamicHashMap<K, V> implements Map<K, V>, Seriali
   protected final Map<K, DynamicEntry<V>> internalMap;
 
   public AbstractDynamicHashMap() {
-    internalMapLock = new Long(1L);
+    internalMapLock = Long.valueOf(1L);
     internalMap = new HashMap<K, DynamicEntry<V>>();
   }
 

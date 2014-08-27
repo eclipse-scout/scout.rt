@@ -106,10 +106,10 @@ public final class UiDecorationExtensionPoint {
 
   private static int getScopePriority(String scope) {
     int prio = SCOPE_DEFAULT;
-    if (StringUtility.isNullOrEmpty(scope) || scope.equalsIgnoreCase("default")) {
+    if (StringUtility.isNullOrEmpty(scope) || "default".equalsIgnoreCase(scope)) {
       prio = SCOPE_DEFAULT;
     }
-    else if (scope.equalsIgnoreCase("global")) {
+    else if ("global".equalsIgnoreCase(scope)) {
       prio = SCOPE_GLOBAL;
     }
     return prio;
@@ -117,10 +117,10 @@ public final class UiDecorationExtensionPoint {
 
   private static int parseStarMarkerPosition(String value) {
     int pos = ILookAndFeelDecorations.STAR_MARKER_NONE;
-    if (StringUtility.isNullOrEmpty(value) || value.equalsIgnoreCase("afterLabel")) {
+    if (StringUtility.isNullOrEmpty(value) || "afterLabel".equalsIgnoreCase(value)) {
       pos = ILookAndFeelDecorations.STAR_MARKER_AFTER_LABEL;
     }
-    else if (value.equalsIgnoreCase("beforeLabel")) {
+    else if ("beforeLabel".equalsIgnoreCase(value)) {
       pos = ILookAndFeelDecorations.STAR_MARKER_BEFORE_LABEL;
     }
     return pos;

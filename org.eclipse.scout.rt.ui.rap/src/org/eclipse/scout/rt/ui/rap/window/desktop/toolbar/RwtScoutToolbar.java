@@ -24,7 +24,7 @@ import org.eclipse.swt.widgets.Layout;
 
 /**
  * <h3>RwtScoutToolbar</h3> ...
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.7.0 June 2011
  */
@@ -36,7 +36,6 @@ public class RwtScoutToolbar extends RwtScoutComposite<IDesktop> implements IRwt
   private static final String VARIANT_TOOL_BUTTON_BUTTON_ACTIVE = "toolButton-active";
   private static final String VARIANT_TOOL_BUTTON = "toolButton";
   private RwtScoutToolButtonBar m_uiToolButtonBar;
-  private Composite m_busyIndicator;
   private RwtScoutViewButtonBar m_uiViewButtonBar;
 
   @Override

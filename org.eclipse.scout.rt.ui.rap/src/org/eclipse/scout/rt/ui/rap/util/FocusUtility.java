@@ -23,6 +23,9 @@ import org.eclipse.swt.widgets.Control;
  */
 public class FocusUtility {
 
+  private FocusUtility() {
+  }
+
   public static boolean isFocusable(Control control) {
     if (control == null) {
       return false;

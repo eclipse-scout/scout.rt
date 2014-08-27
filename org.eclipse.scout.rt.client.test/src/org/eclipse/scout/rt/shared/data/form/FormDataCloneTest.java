@@ -103,8 +103,8 @@ public class FormDataCloneTest {
     /**
      * access method for property PersonId.
      */
-    public void setPersonId(Long PersonId) {
-      getPersonIdProperty().setValue(PersonId);
+    public void setPersonId(Long personId) {
+      getPersonIdProperty().setValue(personId);
     }
 
     public Active getActive() {

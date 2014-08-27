@@ -287,7 +287,6 @@ public class DefaultValidator extends ValidationUtility.ValidateTreeVisitor impl
         LOG.error("failed creating check implementation for " + ctx.ruleName + "=" + ctx.ruleValue, t);
       }
     }
-    return;
   }
 
   /**

@@ -59,7 +59,7 @@ public final class NumberUtility {
    * Converts a Number into a BigDecimal using it's String representation. If the <code>number</code>'s String
    * representation cannot be converted to a BigDecimal this method returns <code>null</code> (E.g. for Double and
    * Floats special values: NaN, POSITIVE_INFINITY and NEGATIVE_INFINITY).
-   * 
+   *
    * @param number
    */
   public static BigDecimal numberToBigDecimal(Number number) {
@@ -144,7 +144,7 @@ public final class NumberUtility {
 
   /**
    * null lenient
-   * 
+   *
    * @param numbers
    * @return the sum of all numbers passt in the given list. Null elements are not considered.
    */
@@ -267,7 +267,7 @@ public final class NumberUtility {
 
   public static Number sign(Number n) {
     if (n == null) {
-      return new Integer(0);
+      return Integer.valueOf(0);
     }
     double d = n.doubleValue();
     if (d < 0) {
@@ -369,7 +369,7 @@ public final class NumberUtility {
 
   /**
    * Divides two double values, NPE save.
-   * 
+   *
    * @param numerator
    * @param denominator
    * @return null if the numerator is null or the denominator is null or 0.0.

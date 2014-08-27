@@ -193,7 +193,7 @@ public final class HTMLUtility {
       // 1b) ensure </HTML> tag
       Matcher matcherHtmlEndTag = createMatcherForTag(rawHtml, "html", true);
       if (!matcherHtmlEndTag.find()) {
-        rawHtml = rawHtml += "</html>";
+        rawHtml += "</html>";
       }
 
       // 2a) ensure <HEAD> tag

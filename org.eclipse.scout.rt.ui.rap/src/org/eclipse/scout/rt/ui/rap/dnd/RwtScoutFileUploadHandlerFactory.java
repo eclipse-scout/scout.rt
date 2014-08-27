@@ -21,11 +21,14 @@ import org.eclipse.scout.service.SERVICES;
  * If the bundle org.eclipse.scout.rt.ui.rap.incubator.filechooser is missing, a dummy implementation
  * of the file upload handler will be created which does nothing when a drag and drop operation occurs.
  * In case the bundle is installed, a file handler responsible for the drag and drop operation will be used.
- * 
+ *
  * @since 4.0.0-M7
  */
 public class RwtScoutFileUploadHandlerFactory {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutFileUploadHandlerFactory.class);
+
+  private RwtScoutFileUploadHandlerFactory() {
+  }
 
   public static IRwtScoutFileUploadHandler createFileUploadHandler(IRwtScoutDndUploadCallback uploadCallback) {
     IRwtScoutFileUploadHandler fileUploadHandler = null;

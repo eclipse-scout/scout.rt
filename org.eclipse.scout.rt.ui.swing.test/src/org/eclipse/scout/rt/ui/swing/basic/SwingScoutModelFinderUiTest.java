@@ -87,7 +87,7 @@ public class SwingScoutModelFinderUiTest {
     EasyMock.replay(clientSession);
 
     SwingUtilities.invokeAndWait(new Runnable() {
-      final ISwingEnvironment env = new AbstractSwingApplication() {
+      final ISwingEnvironment m_env = new AbstractSwingApplication() {
 
         @Override
         protected IClientSession getClientSession() {
@@ -100,7 +100,7 @@ public class SwingScoutModelFinderUiTest {
       public void run() {
         try {
           //create swing environment
-          env.showGUI(clientSession);
+          m_env.showGUI(clientSession);
 
           //form fields
           AllFieldsTestForm testScoutForm = new AllFieldsTestForm();
@@ -110,6 +110,7 @@ public class SwingScoutModelFinderUiTest {
 
         }
         catch (ProcessingException e) {
+          LOG.error(e.getMessage(), e);
           fail("" + e.getMessage());
         }
 
@@ -117,7 +118,7 @@ public class SwingScoutModelFinderUiTest {
 
       private void testFormField(IFormField formFieldModel) {
         JPanel testContainer = new JPanel();
-        ISwingScoutFormField formField = env.createFormField(testContainer, formFieldModel);
+        ISwingScoutFormField formField = m_env.createFormField(testContainer, formFieldModel);
         Object resolvedScoutModel = m_swingScoutModelFinder.getScoutModel(formField.getSwingField());
         assertEquals("Finding scout model failed ", formFieldModel, resolvedScoutModel);
       }
@@ -246,14 +247,6 @@ public class SwingScoutModelFinderUiTest {
       @Order(70.0)
       public class DateField extends AbstractDateField {
       }
-
-//      @Order(70.0)
-//      public class DateField2 extends AbstractDateField {
-//        @Override
-//        protected boolean getConfiguredHasTime() {
-//          return true;
-//        }
-//      }
 
       @Order(80.0)
       public class GroupBox extends AbstractGroupBox {

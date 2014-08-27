@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.ui.swt.form.fields.labelfield;
 
 import java.lang.reflect.Method;
 
-import org.eclipse.scout.commons.internal.runtime.CompatibilityUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -29,7 +28,7 @@ import org.eclipse.swt.widgets.Control;
 
 /**
  * <h3>SwtScoutLabelField</h3> ...
- * 
+ *
  * @since 1.0.0 28.04.2008
  */
 @SuppressWarnings("restriction")
@@ -54,22 +53,17 @@ public class SwtScoutLabelField extends SwtScoutValueFieldComposite<ILabelField>
     //Editing the text is never allowed at label fields
     text.setEditable(false);
 
-    if (CompatibilityUtility.isEclipseVersionLessThan35()) {
-      //FIXME we need a bugfix for bug 350237
+    try {
+      //Make sure the wrap indent is the same as the indent so that the text is vertically aligned
+      Method setWrapIndent = StyledText.class.getMethod("setWrapIndent", int.class);
+      setWrapIndent.invoke(text, text.getIndent());
+      //Make sure the text is horizontally aligned with the label
+      int borderWidth = 4;
+      Method setMargins = StyledText.class.getMethod("setMargins", int.class, int.class, int.class, int.class);
+      setMargins.invoke(text, 0, borderWidth, 0, borderWidth);
     }
-    else {
-      try {
-        //Make sure the wrap indent is the same as the indent so that the text is vertically aligned
-        Method setWrapIndent = StyledText.class.getMethod("setWrapIndent", int.class);
-        setWrapIndent.invoke(text, text.getIndent());
-        //Make sure the text is horizontally aligned with the label
-        int borderWidth = 4;
-        Method setMargins = StyledText.class.getMethod("setMargins", int.class, int.class, int.class, int.class);
-        setMargins.invoke(text, 0, borderWidth, 0, borderWidth);
-      }
-      catch (Exception e) {
-        LOG.warn("could not access methods 'setWrapIndent' or 'setMargins' on 'StyledText'.", e);
-      }
+    catch (Exception e) {
+      LOG.warn("could not access methods 'setWrapIndent' or 'setMargins' on 'StyledText'.", e);
     }
 
     LogicalGridData textData = LogicalGridDataBuilder.createField(((IFormField) getScoutObject()).getGridData());
@@ -121,7 +115,7 @@ public class SwtScoutLabelField extends SwtScoutValueFieldComposite<ILabelField>
 
   /**
    * Defines if the label should be selectable or not
-   * 
+   *
    * @since 3.10.0-M6
    */
   protected void setSelectableFromScout(boolean booleanValue) {

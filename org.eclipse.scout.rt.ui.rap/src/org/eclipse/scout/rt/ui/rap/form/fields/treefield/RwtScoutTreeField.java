@@ -74,9 +74,9 @@ public class RwtScoutTreeField extends RwtScoutFieldComposite<ITreeField> implem
 
       IForm form = getScoutObject() == null ? null : getScoutObject().getForm();
       m_treeContainer = null;
-      if (form == null ||
-          form instanceof IContentAssistFieldProposalForm ||
-          IForm.VIEW_ID_OUTLINE.equals(form.getDisplayViewId())) {
+      if (form == null
+          || form instanceof IContentAssistFieldProposalForm
+          || IForm.VIEW_ID_OUTLINE.equals(form.getDisplayViewId())) {
         m_treeComposite.createUiField(getUiContainer(), getScoutObject().getTree(), getUiEnvironment());
         m_treeComposite.getUiField().setLayoutData(LogicalGridDataBuilder.createField(getScoutObject().getGridData()));
       }

@@ -27,8 +27,4 @@ public class CompatibilityUtility {
 
     return false;
   }
-
-  public static boolean isEclipseVersionLessThan35() {
-    return isEclipseVersionLessThan(new Version("3.5"));
-  }
 }

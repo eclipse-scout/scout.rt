@@ -15,7 +15,6 @@ import java.io.StringWriter;
 import java.lang.reflect.Method;
 
 import org.eclipse.core.runtime.Status;
-import org.eclipse.scout.commons.internal.runtime.CompatibilityUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.swt.Activator;
@@ -64,23 +63,15 @@ public final class SwtLayoutUtility {
       //This is especially necessary if StyledText#isWordWrap() and LogicalGridData#useUiHeight is set to true
       if (control instanceof StyledText) {
         StyledText styledText = (StyledText) control;
-
-        //Necessary for backward compatibility to Eclipse 3.4 needed for Lotus Notes 8.5.2
-        if (CompatibilityUtility.isEclipseVersionLessThan35()) {
-          trimW = trimW + 4;
+        try {
+          Method getLeftMargin = StyledText.class.getMethod("getLeftMargin");
+          int leftMargin = (Integer) getLeftMargin.invoke(styledText);
+          Method getRightMargin = StyledText.class.getMethod("getRightMargin");
+          int rightMargin = (Integer) getRightMargin.invoke(styledText);
+          trimW = trimW + leftMargin + rightMargin;
         }
-        else {
-          try {
-            Method getLeftMargin = StyledText.class.getMethod("getLeftMargin");
-            int leftMargin = (Integer) getLeftMargin.invoke(styledText);
-            Method getRightMargin = StyledText.class.getMethod("getRightMargin");
-            int rightMargin = (Integer) getRightMargin.invoke(styledText);
-            trimW = trimW + leftMargin + rightMargin;
-
-          }
-          catch (Exception e) {
-            Activator.getDefault().getLog().log(new Status(Status.WARNING, Activator.PLUGIN_ID, "could not access methods 'getLeftMargin' and 'getRightMargin' on 'StyledText'.", e));
-          }
+        catch (Exception e) {
+          Activator.getDefault().getLog().log(new Status(Status.WARNING, Activator.PLUGIN_ID, "could not access methods 'getLeftMargin' and 'getRightMargin' on 'StyledText'.", e));
         }
       }
       int wHintFixed = wHint == SWT.DEFAULT ? wHint : Math.max(0, wHint - trimW);

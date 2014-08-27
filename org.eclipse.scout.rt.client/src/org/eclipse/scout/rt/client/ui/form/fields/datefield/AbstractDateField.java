@@ -326,11 +326,6 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
   // validate value for ranges, mandatory, ...
   @Override
   protected Date validateValueInternal(Date rawValue) throws ProcessingException {
-    //legacy support
-    Object legacyValue = rawValue;
-    if (legacyValue instanceof Number) {
-      rawValue = DateUtility.convertDoubleTimeToDate((Number) legacyValue);
-    }
     Date validValue = null;
     rawValue = super.validateValueInternal(rawValue);
     try {

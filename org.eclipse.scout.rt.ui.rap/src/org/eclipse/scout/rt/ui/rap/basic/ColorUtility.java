@@ -12,13 +12,17 @@ import org.eclipse.swt.widgets.Display;
  * Utility class for Colors in SWT
  */
 public class ColorUtility {
+
+  private ColorUtility() {
+  }
+
   /**
    * Converts a {@link Color} to a hexadecimal representation.
    * <p>
    * Example: Color.RED --> "#ff0000"
    * <p>
    * Note: the hexadecimal representation is lowercase
-   * 
+   *
    * @return hexadecimal representation of {@link Color} in lowercase. Returns <code>null</code> if parameter is
    *         <code>null</code>
    * @since 4.0-M7

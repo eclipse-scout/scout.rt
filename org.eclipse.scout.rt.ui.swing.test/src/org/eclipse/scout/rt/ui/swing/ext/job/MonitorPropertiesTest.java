@@ -22,22 +22,22 @@ import org.junit.Test;
  */
 public class MonitorPropertiesTest {
 
-  MonitorProperties props1 = new MonitorProperties(1, "foo", "bar");
+  MonitorProperties m_props1 = new MonitorProperties(1, "foo", "bar");
 
   @Test
   public void testEqualsHashcode() {
     MonitorProperties props2 = new MonitorProperties(1, "foo", "bar");
-    assertEquals(props1, props2);
-    assertEquals(props2, props1);
-    assertEquals(props1.hashCode(), props2.hashCode());
-    assertEquals(props2.hashCode(), props1.hashCode());
+    assertEquals(m_props1, props2);
+    assertEquals(props2, m_props1);
+    assertEquals(m_props1.hashCode(), props2.hashCode());
+    assertEquals(props2.hashCode(), m_props1.hashCode());
   }
 
   @Test
   public void testNotEqualsHashcode() {
-    assertFalse(props1.equals(new MonitorProperties(2, "foo", "bar")));
-    assertFalse(props1.equals(new MonitorProperties(1, "bar", "bar")));
-    assertFalse(props1.equals(new MonitorProperties(1, "foo", "foo")));
+    assertFalse(m_props1.equals(new MonitorProperties(2, "foo", "bar")));
+    assertFalse(m_props1.equals(new MonitorProperties(1, "bar", "bar")));
+    assertFalse(m_props1.equals(new MonitorProperties(1, "foo", "foo")));
   }
 
   @Test

@@ -43,7 +43,7 @@ public class SmartFieldParseValueTest {
     SmartField smartField = new SmartField();
     // single match
     smartField.getUIFacade().setTextFromUI("a");
-    assertEquals(new Long(1L), smartField.getValue());
+    assertEquals(Long.valueOf(1L), smartField.getValue());
     assertNull(smartField.getProposalForm());
 
   }

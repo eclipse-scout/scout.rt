@@ -31,7 +31,7 @@ import org.osgi.framework.ServiceRegistration;
 
 /**
  * Common base class used to create proxy instances for services using a service tunnel.
- * 
+ *
  * @author awe (refactoring)
  */
 public abstract class CommonProxyServiceFactory<T extends ISession> implements IServiceFactory {
@@ -90,13 +90,13 @@ public abstract class CommonProxyServiceFactory<T extends ISession> implements I
     return ServiceUtility.NULL_SERVICE;
   }
 
-  abstract protected Tier getTier();
+  protected abstract Tier getTier();
 
-  abstract protected Class<T> getDefaultSessionClass();
+  protected abstract Class<T> getDefaultSessionClass();
 
-  abstract protected boolean isCreateServiceTunnelPossible();
+  protected abstract boolean isCreateServiceTunnelPossible();
 
-  abstract protected IServiceTunnel createServiceTunnel();
+  protected abstract IServiceTunnel createServiceTunnel();
 
   @Override
   public void ungetService(Bundle bundle, ServiceRegistration registration, Object service) {
@@ -157,7 +157,7 @@ public abstract class CommonProxyServiceFactory<T extends ISession> implements I
    * This method creates a new instance from the given service class. The default implementation calls
    * <code>newInstance()</code> on the class instance. Override this method if you must create instances
    * in another way (e.g. by using a dependency injection mechanism).
-   * 
+   *
    * @param serviceClass
    * @return
    * @throws InstantiationException

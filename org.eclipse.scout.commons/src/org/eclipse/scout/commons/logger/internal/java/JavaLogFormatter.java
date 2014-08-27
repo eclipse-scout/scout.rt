@@ -18,13 +18,13 @@ import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 
 public class JavaLogFormatter extends Formatter {
-  private final static SimpleDateFormat TIMESTAMP_FORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss.SSS");
+  private static final SimpleDateFormat TIMESTAMP_FORMAT = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss.SSS");
 
   private Date m_tmpDate = new Date();
 
   /**
    * Format the given LogRecord.
-   * 
+   *
    * @param record
    *          the log record to be formatted.
    * @return a formatted log record

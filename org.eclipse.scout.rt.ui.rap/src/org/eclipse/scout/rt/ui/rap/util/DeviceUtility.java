@@ -20,6 +20,9 @@ import org.eclipse.scout.rt.shared.ui.UiDeviceType;
 public class DeviceUtility {
   public static final String SESSION_ATTR_DEVICE_TYPE = "device-type";
 
+  private DeviceUtility() {
+  }
+
   public static IUiDeviceType getCurrentDeviceType() {
     return (IUiDeviceType) RWT.getUISession().getAttribute(SESSION_ATTR_DEVICE_TYPE);
   }

@@ -48,7 +48,7 @@ public class FontRegistry {
     }
     FontData[] fds = templateFont.getFontData();
     FontData fd = (fds != null && fds.length > 0 ? fds[0] : null);
-    if (newName == null || newName.equalsIgnoreCase("null")) {
+    if (newName == null || "null".equalsIgnoreCase(newName)) {
       if (fd != null) {
         newName = fd.getName();
       }

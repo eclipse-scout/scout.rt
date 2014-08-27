@@ -504,11 +504,9 @@ public final class ValidationUtility {
    * Override {@link #visitObject(Object, Annotation[])} for custom handling.
    */
   public static abstract class ValidateTreeVisitor {
-    private HashMap<Field, Annotation[]> m_fieldToAnnotationsCache;
     private HashSet<Object> m_markedSet;
 
     public ValidateTreeVisitor() {
-      m_fieldToAnnotationsCache = new HashMap<Field, Annotation[]>();
     }
 
     public void start(Object obj, Collection<Annotation> annotations) throws Exception {

@@ -65,7 +65,7 @@ public class CalendarTest {
     Integer transferredYear = Integer.valueOf(new SimpleDateFormat("yyyy").format(transferredDate));
 
     assertEquals(buddhistDate, transferredDate);
-    assertEquals(new Integer(buddhistYear - 543), transferredYear);
+    assertEquals(Integer.valueOf(buddhistYear - 543), transferredYear);
   }
 
   /**
@@ -77,7 +77,7 @@ public class CalendarTest {
     Locale.setDefault(new Locale("th", "TH"));
 
     UTCDate buddhistDate = new UTCDate();
-    Integer buddhistYear = new Integer(new SimpleDateFormat("yyyy").format(buddhistDate));
+    Integer buddhistYear = Integer.valueOf(new SimpleDateFormat("yyyy").format(buddhistDate));
 
     byte[] outArray = write(buddhistDate);
 
@@ -85,10 +85,10 @@ public class CalendarTest {
     Locale.setDefault(new Locale("de", "CH"));
 
     UTCDate transferredDate = (UTCDate) read(outArray);
-    Integer transferredYear = new Integer(new SimpleDateFormat("yyyy").format(transferredDate));
+    Integer transferredYear = Integer.valueOf(new SimpleDateFormat("yyyy").format(transferredDate));
 
     assertEquals(buddhistDate, transferredDate);
-    assertEquals(new Integer(buddhistYear - 543), transferredYear);
+    assertEquals(Integer.valueOf(buddhistYear - 543), transferredYear);
   }
 
   /**
@@ -99,14 +99,14 @@ public class CalendarTest {
     TimeZone.setDefault(TimeZone.getTimeZone("GMT+1"));
 
     Date inDate = new Date();
-    Integer hours = new Integer(new SimpleDateFormat("hh").format(inDate));
+    Integer hours = Integer.valueOf(new SimpleDateFormat("hh").format(inDate));
 
     byte[] outArray = write(inDate);
 
     TimeZone.setDefault(TimeZone.getTimeZone("GMT+0"));
 
     Date transferredDate = (Date) read(outArray);
-    Integer transferredhours = new Integer(new SimpleDateFormat("hh").format(transferredDate));
+    Integer transferredhours = Integer.valueOf(new SimpleDateFormat("hh").format(transferredDate));
 
     assertNotSame(inDate, transferredhours);
     assertEquals(hours, transferredhours);
@@ -120,17 +120,17 @@ public class CalendarTest {
     TimeZone.setDefault(TimeZone.getTimeZone("GMT+1"));
 
     UTCDate inDate = new UTCDate();
-    Integer hours = new Integer(new SimpleDateFormat("HH").format(inDate));
+    Integer hours = Integer.valueOf(new SimpleDateFormat("HH").format(inDate));
 
     byte[] outArray = write(inDate);
 
     TimeZone.setDefault(TimeZone.getTimeZone("GMT+0"));
 
     UTCDate transferredDate = (UTCDate) read(outArray);
-    Integer transferredhours = new Integer(new SimpleDateFormat("HH").format(transferredDate));
+    Integer transferredhours = Integer.valueOf(new SimpleDateFormat("HH").format(transferredDate));
 
     assertEquals(inDate, transferredDate);
-    assertEquals(new Integer((hours - 1 + 24) % 24), transferredhours);
+    assertEquals(Integer.valueOf((hours - 1 + 24) % 24), transferredhours);
   }
 
   /**

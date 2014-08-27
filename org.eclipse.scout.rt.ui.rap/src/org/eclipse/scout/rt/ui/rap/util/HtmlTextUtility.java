@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 /**
  * Utility class that provides a number of useful static methods to support the
  * implementation of widget life cycle adapters with regard to supporting html markup in table headers, cells, etc.
- * 
+ *
  * @since 1.0
  */
 public final class HtmlTextUtility {
@@ -16,6 +16,9 @@ public final class HtmlTextUtility {
   private static final Pattern bodyBracketPattern = Pattern.compile("<body[^>]*>(.*)</body>", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
   private static final Pattern breakingTagsPattern = Pattern.compile("(<br>|<br/>|<p[^>]*>|<p[^>]*/>|</p>|</tr>|<ul[^>]*>|</ul>|<ol[^>]*>|</ol>|</li>)", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
   private static final Pattern allTagsPattern = Pattern.compile("(<[^>]+>)", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+
+  private HtmlTextUtility() {
+  }
 
   /**
    * Support for styled content (inline html) in table column header cell.

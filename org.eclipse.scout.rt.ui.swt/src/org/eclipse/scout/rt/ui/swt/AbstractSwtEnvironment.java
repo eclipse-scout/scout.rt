@@ -38,7 +38,6 @@ import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.holders.IHolder;
-import org.eclipse.scout.commons.internal.runtime.CompatibilityUtility;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -138,7 +137,7 @@ import org.osgi.framework.Bundle;
 
 /**
  * <h3>SwtEnvironment</h3> ...
- * 
+ *
  * @since 1.0.0 06.03.2008
  */
 @SuppressWarnings("restriction")
@@ -1198,13 +1197,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
               break;
             }
             case IProcessingStatus.CANCEL: {
-              //Necessary for backward compatibility to Eclipse 3.4 needed for Lotus Notes 8.5.2
-              if (CompatibilityUtility.isEclipseVersionLessThan35()) {
-                iconId = SWT.ICON_INFORMATION;
-              }
-              else {
-                iconId = 1 << 8;//SWT.ICON_CANCEL
-              }
+              iconId = 1 << 8;//SWT.ICON_CANCEL
               break;
             }
             default: {

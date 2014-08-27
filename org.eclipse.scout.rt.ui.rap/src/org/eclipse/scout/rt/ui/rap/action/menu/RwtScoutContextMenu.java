@@ -40,7 +40,7 @@ public class RwtScoutContextMenu implements IRwtScoutMenu {
 
   private IContextMenu m_scoutContextMenu;
   private Listener m_uiMenuListener;
-  private Boolean m_childrenCreated = Boolean.valueOf(false);
+  private Boolean m_childrenCreated = Boolean.FALSE;
 
   public RwtScoutContextMenu(Shell parentShell, IContextMenu scoutContextMenu, IRwtEnvironment environment) {
     this(parentShell, scoutContextMenu, environment, true);
@@ -82,7 +82,7 @@ public class RwtScoutContextMenu implements IRwtScoutMenu {
           }
         }
         finally {
-          m_childrenCreated = Boolean.valueOf(false);
+          m_childrenCreated = Boolean.FALSE;
         }
       }
     }
@@ -118,8 +118,8 @@ public class RwtScoutContextMenu implements IRwtScoutMenu {
   }
 
   /**
-  *
-  */
+   *
+   */
   protected void handleSwtMenuShow() {
     Runnable t = new Runnable() {
       @Override

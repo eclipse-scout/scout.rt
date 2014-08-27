@@ -379,7 +379,7 @@ public final class MailUtility {
 
   /**
    * Create {@link MimeMessage} from plain text fields.
-   * 
+   *
    * @rn aho, 19.01.2009
    */
   public static MimeMessage createMimeMessage(String[] toRecipients, String sender, String subject, String bodyTextPlain, DataSource[] attachements) throws ProcessingException {
@@ -388,7 +388,7 @@ public final class MailUtility {
 
   /**
    * Create {@link MimeMessage} from plain text fields.
-   * 
+   *
    * @rn aho, 19.01.2009
    */
   public static MimeMessage createMimeMessage(String[] toRecipients, String[] ccRecipients, String[] bccRecipients, String sender, String subject, String bodyTextPlain, DataSource[] attachements) throws ProcessingException {
@@ -578,11 +578,11 @@ public final class MailUtility {
    * Checks if file is a Microsoft Word specific directory file. They are only used to edit HTML in Word.
    */
   private boolean isWordSpecificFile(String filename) {
-    return filename.equalsIgnoreCase("filelist.xml") ||
-        filename.equalsIgnoreCase("colorschememapping.xml") ||
-        filename.equalsIgnoreCase("themedata.thmx") ||
-        filename.equalsIgnoreCase("header.html") ||
-        filename.equalsIgnoreCase("editdata.mso") ||
+    return "filelist.xml".equalsIgnoreCase(filename) ||
+        "colorschememapping.xml".equalsIgnoreCase(filename) ||
+        "themedata.thmx".equalsIgnoreCase(filename) ||
+        "header.html".equalsIgnoreCase(filename) ||
+        "editdata.mso".equalsIgnoreCase(filename) ||
         wordPatternItem.matcher(filename).matches() ||
         wordPatternProps.matcher(filename).matches();
   }

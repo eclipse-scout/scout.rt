@@ -14,7 +14,7 @@ package org.eclipse.scout.rt.testing.commons;
  * Utility class to check for the underlying Operating System name. Currently,
  * only the latest Windows versions are implemented.
  */
-public class OsUtility {
+public final class OsUtility {
 
   private static final String WIN_7 = "windows 7";
   private static final String WIN_VISTA = "windows vista";

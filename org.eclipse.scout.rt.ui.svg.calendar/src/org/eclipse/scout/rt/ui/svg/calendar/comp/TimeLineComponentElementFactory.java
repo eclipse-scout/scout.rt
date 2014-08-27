@@ -33,8 +33,8 @@ public class TimeLineComponentElementFactory extends AbstractComponentElementFac
   // this is important when calendar component ends at 12:00 and the next starts at 12:00
   // if the start event would be first in the event list, then an overlap of the events would be detected.
   // ensuring that the end event always comes first, allows us to display elements in one column if they happen serialized.
-  private static final Integer EVENT_START = new Integer(2);
-  private static final Integer EVENT_END = new Integer(1);
+  private static final Integer EVENT_START = Integer.valueOf(2);
+  private static final Integer EVENT_END = Integer.valueOf(1);
 
   public TimeLineComponentElementFactory(int startHour, int endHour) {
     super();
