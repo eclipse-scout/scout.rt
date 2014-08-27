@@ -159,14 +159,16 @@ public class JsonResponse {
   }
 
   /**
-   * When we send a new adapter in the JSON response we can ignore all property change events
+   * When we send a new adapter in the JSON response we have to ignore all events
    * for that adapter, since the adapter data already describes the latest state of the adapter.
+   * <p>
+   * For property change events this is just an optimization to reduce the response size.<br>
+   * For other event types it may be crucial that the events are not sent.<br>
+   * Example: NodesInserted event on tree must not be sent since the same nodes are already sent by Tree.toJson.
    */
   private boolean doAddEvent(JsonEvent event) {
-    if (JsonEventType.PROPERTY.matches(event)) {
-      if (m_adapterMap.containsKey(event.getId())) {
-        return false;
-      }
+    if (m_adapterMap.containsKey(event.getId())) {
+      return false;
     }
     return true;
   }

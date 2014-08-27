@@ -224,7 +224,7 @@ scout.Tree.prototype._onNodesInserted = function(nodes, parentNodeId) {
   this._visitNodes(nodes, this._initTreeNode.bind(this), parentNode);
 
   //update parent with new child nodes
-  parentNode.childNodes.push.apply(parentNode.childNodes, nodes);
+  scout.arrays.pushAll(parentNode.childNodes, nodes);
 
   $parentNode = this._findNodeById(parentNode.id);
   if (parentNode.expanded) {
