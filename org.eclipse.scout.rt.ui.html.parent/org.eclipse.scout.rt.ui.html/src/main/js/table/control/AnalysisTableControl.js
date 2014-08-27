@@ -164,7 +164,7 @@ scout.AnalysisTableControl.prototype._renderContent = function($parent) {
   }
 
   function oneIteration($container, list, top, left, height, width) {
-    if (list.length === 0) {
+    if (list === undefined || list.length === 0) {
       // finish iteration
       return;
 
