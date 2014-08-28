@@ -180,6 +180,48 @@ describe("Tree", function() {
     });
   });
 
+  describe("node control double click", function() {
+
+    beforeEach(function() {
+      //Expansion happens with an animation (async).
+      //Disabling it makes it possible to test the expansion state after the expansion
+      $.fx.off = true;
+    });
+
+    afterEach(function() {
+      $.fx.off = false;
+    });
+
+    it("does the same as control single click (does NOT expand and immediately collapse again)", function() {
+      var model = createModelFixture(1, 1, false);
+      var tree = createTree(model);
+      tree.render(session.$entryPoint);
+
+      var $nodeControl = tree._$treeScroll.find('.tree-item-control:first');
+      var $node = $nodeControl.parent();
+      expect($node).not.toHaveClass('expanded');
+
+      $nodeControl.triggerDoubleClick();
+      expect($node).toHaveClass('expanded');
+
+      $nodeControl.triggerDoubleClick();
+      expect($node).not.toHaveClass('expanded');
+    });
+
+    it("sends clicked, selection, action and expansion events", function() {
+      var model = createModelFixture(1, 1, false);
+      var tree = createTree(model);
+      tree.render(session.$entryPoint);
+
+      var $node = tree._$treeScroll.find('.tree-item:first');
+      $node.triggerDoubleClick();
+
+      sendQueuedAjaxCalls();
+
+      expect(mostRecentJsonRequest()).toContainEventTypesExactly(['nodeClicked', 'nodesSelected', 'nodeAction', 'nodeExpanded']);
+    });
+  });
+
   describe("collapseAll", function() {
 
     it("collapses all nodes and updates model", function() {

@@ -396,7 +396,8 @@ scout.Tree.prototype._addNodes = function(nodes, $parent) {
 
     // decorate with (close) control
     var $control = $node.prependDiv('', 'tree-item-control')
-      .on('click', '', this._onNodeControlClick.bind(this));
+      .on('click', '', this._onNodeControlClick.bind(this))
+      .on('dblclick', '', this._onNodeControlClick.bind(this)); //_onNodeControlClick immediately returns with false to prevent bubbling
 
     // rotate control if expanded
     if ($node.hasClass('expanded')) {
@@ -448,6 +449,11 @@ scout.Tree.prototype._onNodeDoubleClick = function(event) {
 };
 
 scout.Tree.prototype._onNodeControlClick = function(event) {
+  if (event.originalEvent.detail > 1) {
+    //don't execute on double click events
+    return false;
+  }
+
   var $clicked = $(event.currentTarget),
     $node = $clicked.parent(),
     expanded = !$node.hasClass('expanded'),

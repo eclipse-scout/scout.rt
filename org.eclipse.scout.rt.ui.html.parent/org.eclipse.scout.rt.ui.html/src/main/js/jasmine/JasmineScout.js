@@ -181,12 +181,17 @@ $.fn.triggerClick = function(clicks) {
   return $this;
 };
 
-$.fn.triggerDoubleClick = function(clicks) {
+$.fn.triggerDoubleClick = function() {
   var $this = $(this);
+  var clicks = 2;
+
   $this.triggerClick();
   $this.triggerClick(2);
   $this.trigger({
-    type: 'dblclick'
+    type: 'dblclick',
+    originalEvent: {
+      detail: clicks
+    }
   });
   return $this;
 };
