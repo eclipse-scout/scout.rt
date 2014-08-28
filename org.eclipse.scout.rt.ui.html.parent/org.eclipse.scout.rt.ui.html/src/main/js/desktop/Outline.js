@@ -41,21 +41,25 @@ scout.Outline.prototype._renderSelection = function($nodes) {
 };
 
 scout.Outline.prototype._updateOutlineTab = function(node) {
-  // Unlink detail form if it was closed.
-  // May happen in the following case:
-  // The form gets closed on execPageDeactivated.
-  // No detailFormChanged event will be fired because the deactivated page is not selected anymore
-  if (node.detailForm && node.detailForm.destroyed) {
-    node.detailForm = null;
-  }
+  var content, text;
 
-  var content = node.detailForm;
-  var text = node.text;
-  if (!content) {
-    content = node.detailTable;
-  }
-  else {
-    text = node.detailForm.title;
+  if (node) {
+    // Unlink detail form if it was closed.
+    // May happen in the following case:
+    // The form gets closed on execPageDeactivated.
+    // No detailFormChanged event will be fired because the deactivated page is not selected anymore
+    if (node.detailForm && node.detailForm.destroyed) {
+      node.detailForm = null;
+    }
+
+    content = node.detailForm;
+    text = node.text;
+    if (!content) {
+      content = node.detailTable;
+    }
+    else {
+      text = node.detailForm.title;
+    }
   }
   this.session.desktop.updateOutlineTab(content, text);
 };
@@ -63,20 +67,32 @@ scout.Outline.prototype._updateOutlineTab = function(node) {
 /* event handling */
 
 scout.Outline.prototype.onFormChanged = function(nodeId, detailForm) {
-  var node = this._nodeMap[nodeId];
-  node.detailForm = this.session.getOrCreateModelAdapter(detailForm, this);
-
-  if (this.selectedNodeIds.indexOf(node.id) >= 0) {
-    this._updateOutlineTab(node);
+  var node;
+  if (nodeId >= 0) {
+    node = this._nodeMap[nodeId];
+    node.detailForm = this.session.getOrCreateModelAdapter(detailForm, this);
+    //If the following condition is false, the selection state is not synchronized yet which means there is a selection event in the queue which will be processed right afterwards.
+    if (this.selectedNodeIds.indexOf(node.id) >= 0) {
+      this._updateOutlineTab(node);
+    }
+  }
+  else {
+    this._updateOutlineTab();
   }
 };
 
 scout.Outline.prototype.onTableChanged = function(nodeId, detailTable) {
-  var node = this._nodeMap[nodeId];
-  node.detailTable = this.session.getOrCreateModelAdapter(detailTable, this);
-
-  if (this.selectedNodeIds.indexOf(node.id) >= 0) {
-    this._updateOutlineTab(node);
+  var node;
+  if (nodeId >= 0) {
+    node = this._nodeMap[nodeId];
+    node.detailTable = this.session.getOrCreateModelAdapter(detailTable, this);
+    //If the following condition is false, the selection state is not synchronized yet which means there is a selection event in the queue which will be processed right afterwards.
+    if (this.selectedNodeIds.indexOf(node.id) >= 0) {
+      this._updateOutlineTab(node);
+    }
+  }
+  else {
+    this._updateOutlineTab();
   }
 };
 

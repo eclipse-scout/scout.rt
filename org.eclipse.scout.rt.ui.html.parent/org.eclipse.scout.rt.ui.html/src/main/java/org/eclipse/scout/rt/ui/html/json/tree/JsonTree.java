@@ -226,6 +226,10 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   }
 
   protected String getOrCreateNodeId(ITreeNode node) {
+    if (node == null) {
+      return null;
+    }
+
     String id = m_treeNodeIds.get(node);
     if (id == null) {
       id = getJsonSession().createUniqueIdFor(null);
@@ -314,12 +318,13 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   }
 
   protected void handleUiNodeExpanded(JsonEvent event, JsonResponse res) {
-    final ITreeNode node = getTreeNodeForNodeId(JsonObjectUtility.getString(event.getData(), PROP_NODE_ID));
-    final boolean expanded = JsonObjectUtility.getBoolean(event.getData(), "expanded");
-    if (node.isExpanded() == expanded) {
-      return;
+    ITreeNode node = getTreeNodeForNodeId(JsonObjectUtility.getString(event.getData(), PROP_NODE_ID));
+    boolean expanded = JsonObjectUtility.getBoolean(event.getData(), "expanded");
+    int eventType = TreeEvent.TYPE_NODE_EXPANDED;
+    if (!expanded) {
+      eventType = TreeEvent.TYPE_NODE_COLLAPSED;
     }
-    TreeEvent treeEvent = new TreeEvent(getModel(), TreeEvent.TYPE_NODE_EXPANDED, node);
+    TreeEvent treeEvent = new TreeEvent(getModel(), eventType, node);
     getTreeEventFilter().addIgnorableModelEvent(treeEvent);
     try {
       getModel().getUIFacade().setNodeExpandedFromUI(node, expanded);

@@ -171,7 +171,6 @@ public class JsonOutline extends JsonTree<IOutline> {
       IJsonAdapter<?> detailFormAdapter = attachAdapter(detailForm);
       putProperty(jsonEvent, IOutline.PROP_DETAIL_FORM, detailFormAdapter.getId());
     }
-    System.out.println(IOutline.PROP_DETAIL_FORM + detailForm);
     addActionEvent("detailFormChanged", jsonEvent);
   }
 

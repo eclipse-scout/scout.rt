@@ -408,6 +408,10 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
   }
 
   protected String getOrCreatedRowId(ITableRow row) {
+    if (row == null) {
+      return null;
+    }
+
     String id = m_tableRowIds.get(row);
     if (id == null) {
       id = getJsonSession().createUniqueIdFor(null);

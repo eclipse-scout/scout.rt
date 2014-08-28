@@ -31,10 +31,10 @@ scout.Tree.prototype._visitNodes = function(nodes, func, parentNode) {
 
   for (i = 0; i < nodes.length; i++) {
     node = nodes[i];
+    func(parentNode, node);
     if (node.childNodes && node.childNodes.length > 0) {
       this._visitNodes(node.childNodes, func, node);
     }
-    func(parentNode, node);
   }
 };
 
@@ -51,6 +51,21 @@ scout.Tree.prototype._render = function($parent) {
   }
 };
 
+scout.Tree.prototype.collapseAll = function() {
+  var that = this;
+
+  //Collapse root nodes
+  this._$treeScroll.find('[data-level="0"]').each(function() {
+    var $node = $(this);
+    that.setNodeExpanded($node.data('node'), $node , false);
+  });
+
+  //Collapse all expanded child nodes (only model)
+  this._visitNodes(this.nodes, function(parentNode, node) {
+    this.setNodeExpanded(node, null, false);
+  }.bind(this));
+};
+
 scout.Tree.prototype.setNodeExpanded = function(node, $node, expanded) {
   if (node.expanded !== expanded) {
     node.expanded = expanded;
@@ -61,7 +76,10 @@ scout.Tree.prototype.setNodeExpanded = function(node, $node, expanded) {
     });
   }
 
-  this._renderNodeExpanded(node, $node, expanded);
+  //Only render if $node is given to make it possible to expand/collapse currently invisible nodes (used by collapseAll).
+  if ($node && $node.length > 0) {
+    this._renderNodeExpanded(node, $node, expanded);
+  }
 };
 
 scout.Tree.prototype._renderNodeExpanded = function(node, $node, expanded) {
@@ -143,6 +161,10 @@ scout.Tree.prototype._renderNodeExpanded = function(node, $node, expanded) {
     $control.css('borderSpacing', 90)
       .animateAVCSD('borderSpacing', 0, null, rotateControl, 200);
   }
+};
+
+scout.Tree.prototype.clearSelection = function() {
+  this.setNodesSelected([], []);
 };
 
 scout.Tree.prototype.setNodesSelected = function(nodes, $nodes) {

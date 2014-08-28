@@ -33,6 +33,7 @@ import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -115,6 +116,33 @@ public class JsonTreeTest {
 //    assertEquals(firstNode, treeNodes.get(0));
 //  }
 
+  /**
+   * Response must not contain the expansion event if the expansion was triggered by the request
+   */
+  @Test
+  public void testIgnorableExpansionEvent() throws ProcessingException, JSONException {
+    ITree tree = new OutlineWithOneNode();
+    ITreeNode node = tree.getRootNode().getChildNode(0);
+
+    JsonTree jsonTree = createJsonTreeWithMocks(tree);
+
+    //Check expanded = true
+    JsonEvent event = createJsonExpansionEvent(jsonTree.getOrCreateNodeId(node), true);
+    jsonTree.handleUiEvent(event, new JsonResponse());
+
+    List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(
+        jsonTree.getJsonSession().currentJsonResponse(), JsonTree.EVENT_NODE_EXPANDED);
+    assertTrue(responseEvents.size() == 0);
+
+    //Check expanded = false
+    event = createJsonExpansionEvent(jsonTree.getOrCreateNodeId(node), false);
+    jsonTree.handleUiEvent(event, new JsonResponse());
+
+    responseEvents = JsonTestUtility.extractEventsFromResponse(
+        jsonTree.getJsonSession().currentJsonResponse(), JsonTree.EVENT_NODE_EXPANDED);
+    assertTrue(responseEvents.size() == 0);
+  }
+
   @Test
   public void testDispose() {
     ITree tree = new OutlineWithOneNode();
@@ -174,6 +202,17 @@ public class JsonTreeTest {
     assertNull(event.getData().optJSONArray("nodeIds"));
   }
 
+  /**
+   * GetOrCreateNodeId must not create a nodeId if null is passed (may happen if someone calls getSelectedNode which may
+   * return null).
+   */
+  @Test
+  public void testGetOrCreateNodeIdWithNull() throws ProcessingException, JSONException {
+    ITree tree = new OutlineWithOneNode();
+    JsonTree jsonTree = createJsonTreeWithMocks(tree);
+    Assert.assertNull(jsonTree.getOrCreateNodeId(null));
+  }
+
   public static JsonTree<ITree> createJsonTreeWithMocks(ITree tree) {
     JsonSessionMock jsonSession = new JsonSessionMock();
     JsonTree<ITree> jsonTree = new JsonTree<ITree>(tree, jsonSession, jsonSession.createUniqueIdFor(null));
@@ -188,5 +227,12 @@ public class JsonTreeTest {
     nodeIds.put(nodeId);
     data.put(JsonTree.PROP_NODE_IDS, nodeIds);
     return new JsonEvent(desktopId, JsonTree.EVENT_NODES_SELECTED, data);
+  }
+
+  public static JsonEvent createJsonExpansionEvent(String nodeId, boolean expanded) throws JSONException {
+    JSONObject data = new JSONObject();
+    data.put(JsonTree.PROP_NODE_ID, nodeId);
+    data.put("expanded", expanded);
+    return new JsonEvent("", JsonTree.EVENT_NODE_EXPANDED, data);
   }
 }

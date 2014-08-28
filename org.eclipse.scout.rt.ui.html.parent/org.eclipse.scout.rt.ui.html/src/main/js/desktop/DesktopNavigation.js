@@ -65,6 +65,10 @@ scout.DesktopNavigation.prototype._createOutlinesTab = function() {
 
   // create title of active outline
   var $outlineTitle = $tab.appendDIV('navigation-tab-outline-title');
+  $outlineTitle.click(function() {
+    that.outline.collapseAll();
+    that.outline.clearSelection();
+  });
 
   // save and return
   this.$outlineTitle = $outlineTitle;

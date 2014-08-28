@@ -180,6 +180,56 @@ describe("Tree", function() {
     });
   });
 
+  describe("collapseAll", function() {
+
+    it("collapses all nodes and updates model", function() {
+      var i;
+      var model = createModelFixture(3, 2, true);
+      var tree = createTree(model);
+      tree.render(session.$entryPoint);
+
+      var allNodes = [];
+      tree._visitNodes(tree.nodes, function(parentNode, node) {
+        allNodes.push(node);
+      });
+
+      for (i=0; i < allNodes.length; i++) {
+        expect(allNodes[i].expanded).toBe(true);
+      }
+
+      tree.collapseAll();
+
+      for (i=0; i < allNodes.length; i++) {
+        expect(allNodes[i].expanded).toBe(false);
+      }
+
+      //A nodeExpanded event must be sent for every node because all nodes were initially expanded
+      sendQueuedAjaxCalls();
+      expect(mostRecentJsonRequest().events.length).toBe(allNodes.length);
+    });
+  });
+
+  describe("clearSelection", function() {
+
+    it("clears the selection", function() {
+      var model = createModelFixture(1, 1);
+      var node0 = model.nodes[0];
+      model.selectedNodeIds = [node0.id];
+
+      var tree = createTree(model);
+      tree.render(session.$entryPoint);
+      expect(tree._findSelectedNodes().length).toBe(1);
+
+      tree.clearSelection();
+
+      //Check model
+      expect(tree.selectedNodeIds.length).toBe(0);
+
+      //Check gui
+      expect(tree._findSelectedNodes().length).toBe(0);
+    });
+  });
+
   describe("onModelAction", function() {
 
     describe("nodesDeleted event", function() {
@@ -434,7 +484,6 @@ describe("Tree", function() {
         //Check gui
         expect(tree._findSelectedNodes().length).toBe(1);
         expect(tree._findNodeById(node0.id).isSelected()).toBe(true);
-
       });
 
       it("expands the parents if a hidden node should be selected whose parents are collapsed (revealing the selection)", function() {
