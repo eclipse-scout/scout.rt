@@ -43,15 +43,17 @@ describe("Table", function() {
       var $cells0 = $rows.eq(0).find('.table-cell');
       var $cells1 = $rows.eq(1).find('.table-cell');
 
-      expect($headerItem0.css('text-align')).toBe('start');
-      expect($cells0.eq(0).css('text-align')).toBe('start');
-      expect($cells1.eq(0).css('text-align')).toBe('start');
+      //Default is different in every browser... (start chrome, webkit-auto phantomjs, left IE)
+      expect($headerItem0.css('text-align')).toMatch('start|webkit-auto|left');
+      expect($cells0.eq(0).css('text-align')).toMatch('start|webkit-auto|left');
+      expect($cells1.eq(0).css('text-align')).toMatch('start|webkit-auto|left');
+
       expect($headerItem1.css('text-align')).toBe('center');
       expect($cells0.eq(1).css('text-align')).toBe('center');
       expect($cells1.eq(1).css('text-align')).toBe('center');
-      expect($headerItem2.css('text-align')).toBe('end');
-      expect($cells0.eq(2).css('text-align')).toBe('end');
-      expect($cells1.eq(2).css('text-align')).toBe('end');
+      expect($headerItem2.css('text-align')).toBe('right');
+      expect($cells0.eq(2).css('text-align')).toBe('right');
+      expect($cells1.eq(2).css('text-align')).toBe('right');
     });
 
   });

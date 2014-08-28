@@ -222,7 +222,7 @@ scout.Table.prototype._buildRowDiv = function(row, index) {
     width = column.width;
     style = (width === 0) ? 'display: none; ' : 'min-width: ' + width + 'px; max-width: ' + width + 'px; ';
     alignment =  scout.Table.parseHorizontalAlignment(column.horizontalAlignment);
-    align = alignment !== 'start' ? 'text-align: '+ alignment + '; ' : '';
+    align = alignment !== 'left' ? 'text-align: '+ alignment + '; ' : '';
     value = this.getText(c, index);
 
     rowDiv += '<div class="table-cell" style="' + style + align + '"' + unselectable + '>' + value + '</div>';
@@ -905,10 +905,10 @@ scout.Table.prototype.onMenuPropertyChange = function(event) {
 
 scout.Table.parseHorizontalAlignment = function(alignment) {
   if (alignment > 0) {
-    return 'end';
+    return 'right';
   }
   if (alignment === 0) {
     return 'center';
   }
-  return 'start';
+  return 'left';
 };

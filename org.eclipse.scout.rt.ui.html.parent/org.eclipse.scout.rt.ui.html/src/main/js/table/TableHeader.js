@@ -17,7 +17,7 @@ scout.TableHeader = function(table, $tableHeader, session) {
       .on('mousedown', '', dragHeader);
 
     var alignment =  scout.Table.parseHorizontalAlignment(columns[i].horizontalAlignment);
-    if (alignment !== 'start')  {
+    if (alignment !== 'left')  {
       $headerItem.css('text-align', alignment);
     }
 
