@@ -366,14 +366,15 @@ scout.Tree.prototype._addNodes = function(nodes, $parent) {
     var level = $parent ? $parent.data('level') + 1 : 0;
 
     var $node = $.makeDiv(node.id, 'tree-item ' + state, node.text)
-      .on('click', '', this._onNodeClicked.bind(this))
+      .on('click', '', this._onNodeClick.bind(this))
+      .on('dblclick', '', this._onNodeDoubleClick.bind(this))
       .data('node', node)
       .attr('data-level', level)
       .css('padding-left', level * 20 + 30);
 
     // decorate with (close) control
     var $control = $node.prependDiv('', 'tree-item-control')
-      .on('click', '', this._onNodeControlClicked.bind(this));
+      .on('click', '', this._onNodeControlClick.bind(this));
 
     // rotate control if expanded
     if ($node.hasClass('expanded')) {
@@ -394,19 +395,37 @@ scout.Tree.prototype._addNodes = function(nodes, $parent) {
   }
 };
 
-scout.Tree.prototype._onNodeClicked = function(event) {
-  var $clicked = $(event.currentTarget),
-    nodeId = $clicked.attr('id'),
+scout.Tree.prototype._onNodeClick = function(event) {
+  if (event.originalEvent.detail > 1) {
+    //don't execute on double click events
+    return;
+  }
+
+  var $node = $(event.currentTarget),
+    nodeId = $node.attr('id'),
     node = this._nodeMap[nodeId];
 
   this.session.send('nodeClicked', this.id, {
     'nodeId': nodeId
   });
 
-  this.setNodesSelected([node], [$clicked]);
+  this.setNodesSelected([node], [$node]);
 };
 
-scout.Tree.prototype._onNodeControlClicked = function(event) {
+scout.Tree.prototype._onNodeDoubleClick = function(event) {
+  var $node = $(event.currentTarget),
+    nodeId = $node.attr('id'),
+    expanded = !$node.hasClass('expanded'),
+    node = this._nodeMap[nodeId];
+
+  this.session.send('nodeAction', this.id, {
+    'nodeId': nodeId
+  });
+
+  this.setNodeExpanded(node, $node, expanded);
+};
+
+scout.Tree.prototype._onNodeControlClick = function(event) {
   var $clicked = $(event.currentTarget),
     $node = $clicked.parent(),
     expanded = !$node.hasClass('expanded'),

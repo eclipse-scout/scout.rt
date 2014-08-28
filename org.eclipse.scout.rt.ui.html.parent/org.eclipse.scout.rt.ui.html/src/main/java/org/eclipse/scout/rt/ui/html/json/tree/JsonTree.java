@@ -28,6 +28,7 @@ import org.json.JSONObject;
 public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> implements IContextMenuOwner {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonTree.class);
   public static final String EVENT_NODE_CLICKED = "nodeClicked";
+  public static final String EVENT_NODE_ACTION = "nodeAction";
   public static final String EVENT_NODES_SELECTED = "nodesSelected";
   public static final String EVENT_NODE_EXPANDED = "nodeExpanded";
   public static final String EVENT_NODES_DELETED = "nodesDeleted";
@@ -276,6 +277,9 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     if (EVENT_NODE_CLICKED.equals(event.getType())) {
       handleUiNodeClicked(event, res);
     }
+    else if (EVENT_NODE_ACTION.equals(event.getType())) {
+      handleUiNodeAction(event, res);
+    }
     else if (EVENT_NODES_SELECTED.equals(event.getType())) {
       handleUiNodesSelected(event, res);
     }
@@ -290,6 +294,11 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   protected void handleUiNodeClicked(JsonEvent event, JsonResponse res) {
     final ITreeNode node = getTreeNodeForNodeId(JsonObjectUtility.getString(event.getData(), PROP_NODE_ID));
     getModel().getUIFacade().fireNodeClickFromUI(node);
+  }
+
+  protected void handleUiNodeAction(JsonEvent event, JsonResponse res) {
+    final ITreeNode node = getTreeNodeForNodeId(JsonObjectUtility.getString(event.getData(), PROP_NODE_ID));
+    getModel().getUIFacade().fireNodeActionFromUI(node);
   }
 
   protected void handleUiNodesSelected(JsonEvent event, JsonResponse res) {

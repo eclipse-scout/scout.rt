@@ -95,18 +95,18 @@ describe("Tree", function() {
     });
   });
 
-  describe("_onNodeClicked", function() {
+  describe("node click", function() {
 
-    it("reacts on node clicks", function() {
+    it("calls tree._onNodeClick", function() {
       var model = createModelFixture(1);
       var tree = createTree(model);
-      spyOn(tree, '_onNodeClicked');
+      spyOn(tree, '_onNodeClick');
       tree.render(session.$entryPoint);
 
       var $node = tree._$treeScroll.find('.tree-item:first');
       $node.click();
 
-      expect(tree._onNodeClicked).toHaveBeenCalled();
+      expect(tree._onNodeClick).toHaveBeenCalled();
     });
 
     it("sends click and selection events in one call in this order", function() {
@@ -115,7 +115,7 @@ describe("Tree", function() {
       tree.render(session.$entryPoint);
 
       var $node = tree._$treeScroll.find('.tree-item:first');
-      $node.click();
+      $node.triggerClick();
 
       sendQueuedAjaxCalls();
       expect(jasmine.Ajax.requests.count()).toBe(1);
@@ -132,10 +132,51 @@ describe("Tree", function() {
       expect(tree.selectedNodeIds.length).toBe(0);
 
       var $node = tree._$treeScroll.find('.tree-item:first');
-      $node.click();
+      $node.triggerClick();
 
       expect(tree.selectedNodeIds.length).toBe(1);
       expect(tree.selectedNodeIds[0]).toBe(model.nodes[0].id);
+    });
+  });
+
+  describe("node double click", function() {
+
+    beforeEach(function() {
+      //Expansion happens with an animation (async).
+      //Disabling it makes it possible to test the expansion state after the expansion
+      $.fx.off = true;
+    });
+
+    afterEach(function() {
+      $.fx.off = false;
+    });
+
+    it("expands/collapses the node", function() {
+      var model = createModelFixture(1, 1, false);
+      var tree = createTree(model);
+      tree.render(session.$entryPoint);
+
+      var $node = tree._$treeScroll.find('.tree-item:first');
+      expect($node).not.toHaveClass('expanded');
+
+      $node.triggerDoubleClick();
+      expect($node).toHaveClass('expanded');
+
+      $node.triggerDoubleClick();
+      expect($node).not.toHaveClass('expanded');
+    });
+
+    it("sends clicked, selection, action and expansion events", function() {
+      var model = createModelFixture(1, 1, false);
+      var tree = createTree(model);
+      tree.render(session.$entryPoint);
+
+      var $node = tree._$treeScroll.find('.tree-item:first');
+      $node.triggerDoubleClick();
+
+      sendQueuedAjaxCalls();
+
+      expect(mostRecentJsonRequest()).toContainEventTypesExactly(['nodeClicked', 'nodesSelected', 'nodeAction', 'nodeExpanded']);
     });
   });
 
