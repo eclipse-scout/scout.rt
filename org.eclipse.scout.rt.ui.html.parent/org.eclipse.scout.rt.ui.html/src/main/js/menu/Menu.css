@@ -16,6 +16,7 @@
   cursor: pointer;
   line-height: @size-desktop-menu;
   color: @color-bench-text;
+  height: @size-desktop-menu;
 
   border-left: 1px solid transparent;
   border-right: 1px solid transparent;
