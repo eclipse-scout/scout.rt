@@ -30,8 +30,7 @@
 //@include("table/TableHeader.js");
 //@include("table/TableFooter.js");
 //@include("table/TableHeaderMenu.js");
-//@include("table/TableOrganizeMenu.js");
-//@include("table/TableKeystrokeAdapter.js");
+  //@include("table/TableKeystrokeAdapter.js");
 //@include("table/TableSelectionHandler.js");
 //@include("table/control/TableControl.js");
 //@include("table/control/ChartTableControl.js");

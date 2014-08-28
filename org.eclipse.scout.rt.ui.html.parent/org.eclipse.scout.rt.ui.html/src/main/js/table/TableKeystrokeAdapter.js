@@ -16,10 +16,8 @@ scout.TableKeystrokeAdapter = function(table) {
       return false;
     },
     handle: function(event) {
-      that._table.$container.find('#HeaderOrganize').click();
-
       // set focus
-      var $input = $('#FilterInput');
+      var $input = $('.control-filter', that._table.$container);
       var length = $input.val().length;
 
       $input.focus();

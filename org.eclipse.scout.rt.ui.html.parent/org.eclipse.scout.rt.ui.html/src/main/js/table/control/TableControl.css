@@ -30,6 +30,25 @@
 }
 
 
+.control-filter{
+	width: 200px;
+	border: 1px solid @color-bench-midi;
+	min-height: 26px;
+	font-size: 14px;
+	margin-top: 11px;
+	padding-left: 6px;
+	&:hover{
+		border: 1px solid @color-bench-semi;
+	}
+	
+	&:focus{
+		border-color: @color-bench-select-border;
+	}
+}
+
+
+
+
 .control-group {
 display: inline;
 float: left;

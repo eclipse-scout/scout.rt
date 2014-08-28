@@ -22,6 +22,20 @@ scout.TableFooter = function(table, $parent, session) {
     control.render($group);
   }
 
+  // filter
+  var filter = table.getFilter(scout.MapTableControl.FILTER_KEY),
+    filterText;
+
+  if (filter) {
+    filterText = filter.text;
+  }
+
+  $('<input class="control-filter"></input>')
+    .appendTo(this._$tableControl)
+    .on('input paste', '', $.debounce(filterEnter))
+    .val(filterText);
+
+  // info section
   this._$infoSelect = this._$tableControl.appendDiv('InfoSelect').on('click', '', this._table.toggleSelection.bind(this._table));
   this._$infoFilter = this._$tableControl.appendDiv('InfoFilter').on('click', '', this._table.resetFilter.bind(this._table));
   this._$infoLoad = this._$tableControl.appendDiv('InfoLoad').on('click', '', this._table.sendReload.bind(this._table));
@@ -65,6 +79,35 @@ scout.TableFooter = function(table, $parent, session) {
     function() {
       $('#control_label').text('');
     });
+
+  // TODO cru: move, clean
+  function filterEnter(event) {
+    var $input = $(this);
+    $input.val($input.val().toLowerCase());
+
+    var filter = table.getFilter(scout.MapTableControl.FILTER_KEY);
+    if (!filter && $input.val()) {
+      filter = {
+        accept: function($row) {
+          var rowText = $row.text().toLowerCase();
+          return rowText.indexOf(this.text) > -1;
+        }
+      };
+      table.registerFilter(scout.MapTableControl.FILTER_KEY, filter);
+    } else if (!$input.val()) {
+      table.unregisterFilter(scout.MapTableControl.FILTER_KEY);
+    }
+
+    if (filter) {
+      filter.text = $input.val();
+      filter.label = filter.text;
+    }
+
+    table.filter();
+    event.stopPropagation();
+  }
+
+
 };
 
 scout.TableFooter.prototype._setInfoLoad = function(count) {
@@ -193,3 +236,5 @@ scout.TableFooter.prototype._addResize = function($parent) {
     return false;
   }
 };
+
+

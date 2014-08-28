@@ -46,8 +46,8 @@ scout.Table.prototype._render = function($parent) {
 
   this.$container = this._$parent.appendDIV('table');
   if ($parent.hasClass('desktop-bench')) {
-    // desktop table (no input focus required to trigger table keystrokes)
-    scout.keystrokeManager.installAdapter($parent.parent(), this._keystrokeAdapter);
+    // TODO cru: desktop table (no input focus required to trigger table keystrokes), is body ok?
+    scout.keystrokeManager.installAdapter($('body'), this._keystrokeAdapter);
   } else {
     // independent table, i.e. inside form (input focus required to trigger table keystrokes)
     this.$container.attr('tabIndex', 0);
@@ -706,6 +706,8 @@ scout.Table.prototype.resetFilter = function() {
   }
   this._filterMap = {};
   this._triggerFilterResetted();
+  $('.control-filter', this.$container, '').val('');
+  this.unregisterFilter(scout.MapTableControl.FILTER_KEY);
 };
 
 /**

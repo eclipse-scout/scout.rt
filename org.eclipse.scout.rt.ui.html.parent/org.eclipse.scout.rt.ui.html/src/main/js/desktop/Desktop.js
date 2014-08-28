@@ -72,7 +72,6 @@ scout.Desktop.prototype._render = function($parent) {
     this.addMessageBox(messageBox);
   }
 
-
   // TODO cru: split and move
   // scout.keystrokeManager.installAdapter($parent, new scout.DesktopKeystrokeAdapter(this.navigation, this.taskbar));
 };

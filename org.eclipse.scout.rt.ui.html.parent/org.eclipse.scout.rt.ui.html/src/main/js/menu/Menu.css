@@ -16,7 +16,6 @@
   cursor: pointer;
   line-height: @size-desktop-menu;
   color: @color-bench-text;
-  height: @size-desktop-menu;
 
   border-left: 1px solid transparent;
   border-right: 1px solid transparent;
@@ -59,6 +58,7 @@
     left: 0px;
     top: 2px;
     font-family: fontAwesome;
+	line-height: 18px;
     font-size: 18px;
     padding-left: 10px;
     content: "\F107";
