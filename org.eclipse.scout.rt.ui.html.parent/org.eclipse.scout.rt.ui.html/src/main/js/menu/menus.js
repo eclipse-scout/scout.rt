@@ -78,7 +78,6 @@ scout.menus = {
       return;
     }
 
-    $.log($clicked, menuToggle, $clicked.data('menu-open'));
     if (menuToggle && $clicked.data('menu-open')) {
       removeContainer();
       $clicked.data('menu-open', false);
@@ -142,8 +141,8 @@ scout.menus = {
     }
 
     function onItemClicked() {
-      $.log('item clicked');
       var menu = $(this).data('menu');
+      removeContainer();
       menu.sendMenuAction();
     }
 

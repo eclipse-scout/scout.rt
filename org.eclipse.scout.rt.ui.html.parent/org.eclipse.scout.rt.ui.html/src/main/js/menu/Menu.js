@@ -16,8 +16,6 @@ scout.Menu.prototype.sendAboutToShow = function(event) {
 };
 
 scout.Menu.prototype.sendMenuAction = function(event) {
-  $('.menu-container').remove();
-  $('.menu-open').removeClass('menu-open');
   this.session.send(scout.Menu.EVENT_MENU_ACTION, this.id);
 };
 
