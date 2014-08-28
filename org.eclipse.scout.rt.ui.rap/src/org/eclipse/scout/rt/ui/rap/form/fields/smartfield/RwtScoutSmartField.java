@@ -91,8 +91,6 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<IContentAssi
   private final Object m_popupLock = new Object();
   private TextFieldEditableSupport m_editableSupport;
 
-  private P_KeyListener m_tabKeyListener;
-  private P_KeyListener m_shiftTabKeyListener;
   private Set<IPopupSupportListener> m_popupEventListeners;
   private Object m_popupEventListenerLock;
 
@@ -349,11 +347,6 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<IContentAssi
       return;
     }
 
-    // make sure tab won't go to next field
-    if (!(getScoutObject() instanceof IProposalField)) {
-      disableTabbing();
-    }
-
     // show new
     m_proposalPopup = new RwtScoutDropDownPopup();
     m_proposalPopup.createPart(form, m_smartContainer, getUiField(), SWT.RESIZE, getUiEnvironment());
@@ -428,7 +421,7 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<IContentAssi
       }
       m_proposalPopup.showPart();
     }
-    catch (Throwable e1) {
+    catch (Exception e1) {
       LOG.error(e1.getLocalizedMessage(), e1);
     }
   }
@@ -474,38 +467,12 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<IContentAssi
 
   protected boolean hideProposalPopup() {
     synchronized (m_popupLock) {
-      enableTabbing();
       if (m_proposalPopup != null && m_proposalPopup.isVisible()) {
         m_proposalPopup.closePart();
         m_proposalPopup = null;
         return true;
       }
       return false;
-    }
-  }
-
-  private void enableTabbing() {
-    if (m_tabKeyListener != null) {
-      getUiEnvironment().removeKeyStroke(getUiField(), m_tabKeyListener);
-    }
-    if (m_shiftTabKeyListener != null) {
-      getUiEnvironment().removeKeyStroke(getUiField(), m_shiftTabKeyListener);
-    }
-  }
-
-  private void disableTabbing() {
-    if (m_tabKeyListener == null) {
-      m_tabKeyListener = new P_KeyListener(SWT.TAB);
-    }
-    if (m_shiftTabKeyListener == null) {
-      m_shiftTabKeyListener = new P_KeyListener(SWT.TAB, SWT.SHIFT);
-    }
-
-    if (!getUiEnvironment().hasKeyStroke(getUiField(), m_tabKeyListener)) {
-      getUiEnvironment().addKeyStroke(getUiField(), m_tabKeyListener, true);
-    }
-    if (!getUiEnvironment().hasKeyStroke(getUiField(), m_shiftTabKeyListener)) {
-      getUiEnvironment().addKeyStroke(getUiField(), m_shiftTabKeyListener, true);
     }
   }
 
@@ -709,11 +676,7 @@ public class RwtScoutSmartField extends RwtScoutValueFieldComposite<IContentAssi
     public void handleUiAction(Event e) {
       switch (e.keyCode) {
         case SWT.TAB:
-          if (m_proposalPopup == null) {
-            enableTabbing();
-          }
           break;
-
         default:
           if (m_proposalPopup == null) {
             if (getUiField().getEditable() && getUiField().isVisible()) {
