@@ -206,9 +206,10 @@ scout.Table.prototype.drawData = function() {
 };
 
 scout.Table.prototype._buildRowDiv = function(row, index) {
-  var column, width, style, align, value;
+  var column, width, style, align, value, alignment;
   var rowWidth = this._header.totalWidth + 4;
   var rowClass = 'table-row ';
+
   if (this.selectedRowIds && this.selectedRowIds.indexOf(row.id) > -1) {
     rowClass += 'row-selected ';
   }
@@ -220,7 +221,8 @@ scout.Table.prototype._buildRowDiv = function(row, index) {
     column = this.columns[c];
     width = column.width;
     style = (width === 0) ? 'display: none; ' : 'min-width: ' + width + 'px; max-width: ' + width + 'px; ';
-    align = (column.type == 'number') ? 'text-align: right; ' : '';
+    alignment =  scout.Table.parseHorizontalAlignment(column.horizontalAlignment);
+    align = alignment !== 'start' ? 'text-align: '+ alignment + '; ' : '';
     value = this.getText(c, index);
 
     rowDiv += '<div class="table-cell" style="' + style + align + '"' + unselectable + '>' + value + '</div>';
@@ -444,12 +446,13 @@ scout.Table.prototype._group = function() {
       for (c = 0; c < $cols.length; c++) {
         var $div;
 
+        //FIXME CGU alignment (use scout.Table.parseAlignment) as soon as SUM works again
         if (typeof sum[c] == 'number') {
           $div = $.makeDiv('', '', sum[c])
-            .css('text-align', 'right');
+            .css('text-align', 'end');
         } else if (!all && $cols.eq(c).data('index') == groupIndex) {
           $div = $.makeDiv('', '', this.getText(groupIndex, row))
-            .css('text-align', 'left');
+            .css('text-align', 'start');
         } else {
           $div = $.makeDiv('', '', '&nbsp');
         }
@@ -892,4 +895,18 @@ scout.Table.prototype.onModelAction = function(event) {
 
 scout.Table.prototype.onMenuPropertyChange = function(event) {
   //FIXME CGU implement
+};
+
+/*
+ * Helpers
+ */
+
+scout.Table.parseHorizontalAlignment = function(alignment) {
+  if (alignment > 0) {
+    return 'end';
+  }
+  if (alignment === 0) {
+    return 'center';
+  }
+  return 'start';
 };

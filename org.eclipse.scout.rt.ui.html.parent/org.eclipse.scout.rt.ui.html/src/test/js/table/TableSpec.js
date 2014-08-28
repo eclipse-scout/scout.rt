@@ -28,6 +28,32 @@ describe("Table", function() {
       expect(table._header).not.toBeUndefined();
     });
 
+    it("considers horizontal alignment", function() {
+      var model = helper.createModelFixture(3, 2);
+      model.columns[1].horizontalAlignment = 0;
+      model.columns[2].horizontalAlignment = 1;
+      var table = helper.createTable(model);
+      table.render(session.$entryPoint);
+
+      var $headerItems = table._$header.find('.header-item');
+      var $headerItem0 = $headerItems.eq(0);
+      var $headerItem1 = $headerItems.eq(1);
+      var $headerItem2 = $headerItems.eq(2);
+      var $rows = table.$container.find('.table-row');
+      var $cells0 = $rows.eq(0).find('.table-cell');
+      var $cells1 = $rows.eq(1).find('.table-cell');
+
+      expect($headerItem0.css('text-align')).toBe('start');
+      expect($cells0.eq(0).css('text-align')).toBe('start');
+      expect($cells1.eq(0).css('text-align')).toBe('start');
+      expect($headerItem1.css('text-align')).toBe('center');
+      expect($cells0.eq(1).css('text-align')).toBe('center');
+      expect($cells1.eq(1).css('text-align')).toBe('center');
+      expect($headerItem2.css('text-align')).toBe('end');
+      expect($cells0.eq(2).css('text-align')).toBe('end');
+      expect($cells1.eq(2).css('text-align')).toBe('end');
+    });
+
   });
 
   describe("insertRows", function() {

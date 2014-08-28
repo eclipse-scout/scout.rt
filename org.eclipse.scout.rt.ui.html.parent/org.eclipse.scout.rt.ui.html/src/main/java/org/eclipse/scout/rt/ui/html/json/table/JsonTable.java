@@ -349,7 +349,7 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
         }
       }
     }
-    else if (Number.class.isAssignableFrom(column.getDataType())) {
+    else if (column instanceof INumberColumn) {
       retVal = cell.getValue();
     }
     //not necessary to send duplicate values
@@ -367,7 +367,8 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
       json.put("type", computeColumnType(column));
       json.put(IColumn.PROP_WIDTH, column.getWidth());
       json.put("summary", column.isSummary());
-      json.put(IColumn.PROP_VISIBLE, column.isVisible()); //FIXME property change, really transmit invisible cols?
+      json.put(IColumn.PROP_VISIBLE, column.isVisible());
+      json.put(IColumn.PROP_HORIZONTAL_ALIGNMENT, column.getHorizontalAlignment());
 
       if (column instanceof INumberColumn<?>) {
         //Use localized pattern which contains the relevant chars for the current locale using DecimalFormatSymbols
@@ -397,10 +398,10 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
   }
 
   protected String computeColumnType(IColumn column) {
-    if (Number.class.isAssignableFrom(column.getDataType())) {
+    if (column instanceof INumberColumn) {
       return "number";
     }
-    if (Date.class.isAssignableFrom(column.getDataType())) {
+    if (column instanceof IDateColumn) {
       return "date";
     }
     return "text";
