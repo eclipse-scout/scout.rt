@@ -6,6 +6,7 @@ scout.Tree = function() {
   this.selectedNodeIds = [];
   this.nodes = [];
   this._nodeMap = {};
+  this._breadcrumb = false;
 };
 scout.inherits(scout.Tree, scout.ModelAdapter);
 
@@ -51,21 +52,27 @@ scout.Tree.prototype._render = function($parent) {
   }
 };
 
-scout.Tree.prototype.prepareBreadcrumb = function() {
-  var $selected = this._findSelectedNodes();
+scout.Tree.prototype.setBreadcrumb = function(bread) {
+  if (bread) {
+    this._breadcrumb = true;
 
-  if ($selected.length > 0) {
-    var nodeId = $selected.attr('id'),
-      expanded = $selected.hasClass('expanded'),
-      node = this._nodeMap[nodeId];
+    var $selected = this._findSelectedNodes();
 
-    if (!expanded) {
-      this.session.send('nodeAction', this.id, {
-        'nodeId': nodeId
-      });
+    if ($selected.length > 0) {
+      var nodeId = $selected.attr('id'),
+        expanded = $selected.hasClass('expanded'),
+        node = this._nodeMap[nodeId];
 
-      this.setNodeExpanded(node, $selected, true);
+      if (!expanded) {
+        this.session.send('nodeAction', this.id, {
+          'nodeId': nodeId
+        });
+
+        this.setNodeExpanded(node, $selected, true);
+      }
     }
+  } else {
+    this._breadcrumb = false;
   }
 };
 
@@ -114,8 +121,7 @@ scout.Tree.prototype._renderNodeExpanded = function(node, $node, expanded) {
     return true;
   }
 
-  var bread = this.$parent.hasClass('bread-crumb'),
-    level = $node.attr('data-level'),
+  var level = $node.attr('data-level'),
     $control,
     rotateControl = function(now, fx) {
       $control.css('transform', 'rotate(' + now + 'deg)');
@@ -126,7 +132,7 @@ scout.Tree.prototype._renderNodeExpanded = function(node, $node, expanded) {
     this._updateItemPath();
     this.scrollbar.initThumb();
 
-    if (bread) {
+    if (this._breadcrumb) {
       $node.addClass('expanded');
       return;
     }
@@ -217,6 +223,7 @@ scout.Tree.prototype._renderSelection = function($nodes) {
       $nodes[i].select(true);
     }
   } else { //Otherwise render the selection based on the this.selectedNodeIds
+    $nodes = [];
     for (i=0; i < this.selectedNodeIds.length; i++) {
       node = this._nodeMap[this.selectedNodeIds[i]];
       $node = this._findNodeById(node.id);
@@ -230,7 +237,15 @@ scout.Tree.prototype._renderSelection = function($nodes) {
         }
       }
 
+      $nodes.push($node);
       $node.select(true);
+    }
+  }
+
+  // in case of breadcrumb, expand
+  if (this._breadcrumb) {
+    for (i=0; i < $nodes.length; i++) {
+      this.setNodeExpanded($nodes[i].data('node'), $nodes[i], true);
     }
   }
 
@@ -451,15 +466,6 @@ scout.Tree.prototype._onNodeClick = function(event) {
   });
 
   this.setNodesSelected([node], [$node]);
-
-  // in case of breadcrumb, simulate double click
-  if ($node.parents('.navigation-breadcrumb').length > 0) {
-    this.session.send('nodeAction', this.id, {
-      'nodeId': nodeId
-    });
-
-    this.setNodeExpanded(node, $node, true);
-  }
 };
 
 scout.Tree.prototype._onNodeDoubleClick = function(event) {
@@ -468,7 +474,7 @@ scout.Tree.prototype._onNodeDoubleClick = function(event) {
     expanded = !$node.hasClass('expanded'),
     node = this._nodeMap[nodeId];
 
-  if ($node.parents('.navigation-breadcrumb').length > 0) {
+  if (this._breadcrumb) {
     return;
   }
 
