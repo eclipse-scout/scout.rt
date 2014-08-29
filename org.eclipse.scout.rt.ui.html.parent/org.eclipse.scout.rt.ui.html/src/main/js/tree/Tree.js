@@ -51,11 +51,26 @@ scout.Tree.prototype._render = function($parent) {
   }
 };
 
+scout.Tree.prototype.prepareBreadcrumb = function() {
+  var $selected = this._findSelectedNodes();
+
+  if ($selected.length > 0) {
+    var nodeId = $selected.attr('id'),
+      expanded = $selected.hasClass('expanded'),
+      node = this._nodeMap[nodeId];
+
+    if (!expanded) {
+      this.session.send('nodeAction', this.id, {
+        'nodeId': nodeId
+      });
+
+      this.setNodeExpanded(node, $selected, true);
+    }
+  }
+};
+
 scout.Tree.prototype.collapseAll = function() {
   var that = this;
-
-  //remove selection
-  this.clearSelection();
 
   //Collapse root nodes
   this._$treeScroll.find('[data-level="0"]').each(function() {

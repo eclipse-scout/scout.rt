@@ -1,10 +1,3 @@
-/* TODO CRU
-every stroke has a search
-close menu when clicking arround
-focus on search field
-replace initial search entry
-*/
-
 scout.DesktopNavigation = function(desktop) {
   this.desktop = desktop;
   this.session = desktop.session;
@@ -66,8 +59,8 @@ scout.DesktopNavigation.prototype._createOutlinesTab = function() {
   // create title of active outline
   var $outlineTitle = $tab.appendDIV('navigation-tab-outline-title');
   $outlineTitle.click(function() {
-    that.outline.collapseAll();
     that.outline.clearSelection();
+    that.outline.collapseAll();
   });
 
   // save and return
@@ -177,7 +170,10 @@ scout.DesktopNavigation.prototype._addSplitter = function() {
      that.desktop.$bench.css('left', w);
 
      if (w <= WIDTH_BREADCRUMB) {
-       that.$navigation.addClass('navigation-breadcrumb');
+       if (!that.$navigation.hasClass('navigation-breadcrumb')) {
+         that.$navigation.addClass('navigation-breadcrumb');
+         that.outline.prepareBreadcrumb();
+       }
      } else {
        that.$navigation.removeClass('navigation-breadcrumb');
      }
