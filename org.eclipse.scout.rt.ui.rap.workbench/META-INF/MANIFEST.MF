@@ -2,11 +2,11 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Scout UI RAP Workbench
 Bundle-SymbolicName: org.eclipse.scout.rt.ui.rap.workbench
-Bundle-Version: 4.0.1.qualifier
+Bundle-Version: 4.0.100.qualifier
 Bundle-Activator: org.eclipse.scout.rt.ui.rap.workbench.Activator
 Bundle-Vendor: Eclipse Scout Project
 Require-Bundle: org.eclipse.core.runtime;bundle-version="[3.4.0,4.0.0)",
- org.eclipse.scout.rt.ui.rap;bundle-version="[4.0.1,4.1.0)";visibility:=reexport,
+ org.eclipse.scout.rt.ui.rap;bundle-version="[4.0.100,4.1.0)";visibility:=reexport,
  org.eclipse.rap.ui;bundle-version="[2.0.0,3.0.0)"
 Export-Package: org.eclipse.scout.rt.ui.rap.workbench,
  org.eclipse.scout.rt.ui.rap.workbench.util.listener,
