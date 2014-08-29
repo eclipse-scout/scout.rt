@@ -10,35 +10,35 @@ scout.OutlineNavigateUpMenu = function(outline, selectedNode) {
 };
 
 scout.OutlineNavigateUpMenu.prototype.render = function($parent) {
-  var text = 'Zurück';
-  var $parentNode;
-  var parentNode;
+  var text,
+    $parentNode,
+    parentNode;
+
+  parentNode = this.selectedNode.parentNode;
+  //FIXME: translate text
+  if (parentNode) {
+    $parentNode = this.outline._findNodeById(parentNode.id);
+    text = 'Zurück';
+  } else {
+    text = 'Home';
+  }
 
   this.$container = $parent
     .appendDIV('menu-item')
     .on('click', '', onClicked.bind(this))
     .text(text);
 
-  if (!this.selectedNode) {
-    this.$container.setEnabled(false);
-  }
-  else {
-    parentNode = this.selectedNode.parentNode;
-    if (parentNode) {
-      $parentNode = this.outline._findNodeById(parentNode.id);
-    }
-  }
-
   function onClicked(event) {
     if (!this.$container.isEnabled()) {
       return;
     }
 
-    if (!parentNode) {
-      this.outline.clearSelection();
+    if (parentNode) {
+      this.outline.setNodesSelected([parentNode], [$parentNode]);
     }
     else {
-      this.outline.setNodesSelected([parentNode], [$parentNode]);
+      this.outline.clearSelection();
+      this.outline.collapseAll();
     }
   }
 };

@@ -181,9 +181,11 @@ scout.Desktop.prototype.updateOutlineTab = function(content, title) {
   this._selectTab(this._outlineTab);
 
   if (!content.rendered) {
-    var selectedNode = this.outline.getSelectedModelNodes()[0];
-    content.staticMenus = [new scout.OutlineNavigateUpMenu(this.outline, selectedNode)];
-    content.render(this.$bench);
+    var selectedNodes = this.outline.getSelectedModelNodes();
+    if (selectedNodes.length > 0) {
+      content.staticMenus = [new scout.OutlineNavigateUpMenu(this.outline, selectedNodes[0])];
+      content.render(this.$bench);
+    }
   }
 };
 
