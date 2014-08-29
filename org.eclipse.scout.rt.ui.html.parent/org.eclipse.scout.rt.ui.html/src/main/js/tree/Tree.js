@@ -54,6 +54,9 @@ scout.Tree.prototype._render = function($parent) {
 scout.Tree.prototype.collapseAll = function() {
   var that = this;
 
+  //remove selection
+  this.clearSelection();
+
   //Collapse root nodes
   this._$treeScroll.find('[data-level="0"]').each(function() {
     var $node = $(this);
@@ -433,6 +436,15 @@ scout.Tree.prototype._onNodeClick = function(event) {
   });
 
   this.setNodesSelected([node], [$node]);
+
+  // in case of breadcrumb, simulate double click
+  if ($node.parents('.navigation-breadcrumb').length > 0) {
+    this.session.send('nodeAction', this.id, {
+      'nodeId': nodeId
+    });
+
+    this.setNodeExpanded(node, $node, true);
+  }
 };
 
 scout.Tree.prototype._onNodeDoubleClick = function(event) {
@@ -440,6 +452,10 @@ scout.Tree.prototype._onNodeDoubleClick = function(event) {
     nodeId = $node.attr('id'),
     expanded = !$node.hasClass('expanded'),
     node = this._nodeMap[nodeId];
+
+  if ($node.parents('.navigation-breadcrumb').length > 0) {
+    return;
+  }
 
   this.session.send('nodeAction', this.id, {
     'nodeId': nodeId
@@ -474,6 +490,12 @@ scout.Tree.prototype._updateItemPath = function() {
 
   // first remove and select selected
   $allNodes.removeClass('parent children group');
+
+  // if no selection: mark all top elements as children
+  if ($selected.length === 0) {
+    $allNodes.addClass('children');
+    return;
+  }
 
   // find direct children
   var $start = $selected.next();

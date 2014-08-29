@@ -54,7 +54,8 @@
 	text-align: center  !important;
 	display: none;
 	max-height: 80px;
-	padding: 6px 0px 6px 0px !important;
+	line-height: 21px;
+	padding: 12px 2px 12px 2px !important;
 	border-bottom: 1px solid @color-bench;
 	
 	&.parent, &.children, &.selected {
@@ -106,18 +107,19 @@
 
 /* bread crumb arrows */
 
-.navigation-breadcrumb .tree-item.parent:before,
-.navigation-breadcrumb .tree-item.selected:before,
-.navigation-breadcrumb .tree-item.parent:after{
+.navigation-breadcrumb .can-expand.parent:before,
+.navigation-breadcrumb .can-expand.selected:before,
+.navigation-breadcrumb .can-expand.parent:after{
 	position: absolute;
 	left: 50%;
 	margin-left: -13px;
 	border: solid transparent;
-	content: " ";
+	content: "";
 	height: 0;
 	width: 0;
-	z-index: 3;
+	z-index: 3;	
 }
+
 
 .navigation-breadcrumb .tree-item.parent:before {
 	border-color: @color-bench transparent transparent transparent;
