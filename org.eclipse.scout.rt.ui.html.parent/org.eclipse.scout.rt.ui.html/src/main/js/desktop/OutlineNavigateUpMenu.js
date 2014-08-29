@@ -10,22 +10,23 @@ scout.OutlineNavigateUpMenu = function(outline, selectedNode) {
 };
 
 scout.OutlineNavigateUpMenu.prototype.render = function($parent) {
-  var text = 'Zurück'; //FIXME CGU translation
+  var text = 'Zurück';
   var $parentNode;
-  var parentNode = this.selectedNode.parentNode;
-
-  if (parentNode) {
-    $parentNode = this.outline._findNodeById(parentNode.id);
-    text = 'Zurück zu ' + $parentNode.text(); //FIXME CGU if the text of the parent gets changed this needs to change as well
-  }
+  var parentNode;
 
   this.$container = $parent
     .appendDIV('menu-item')
     .on('click', '', onClicked.bind(this))
     .text(text);
 
-  if (!parentNode) {
+  if (!this.selectedNode) {
     this.$container.setEnabled(false);
+  }
+  else {
+    parentNode = this.selectedNode.parentNode;
+    if (parentNode) {
+      $parentNode = this.outline._findNodeById(parentNode.id);
+    }
   }
 
   function onClicked(event) {
@@ -34,10 +35,11 @@ scout.OutlineNavigateUpMenu.prototype.render = function($parent) {
     }
 
     if (!parentNode) {
-      throw "Already on top";
+      this.outline.clearSelection();
     }
-
-    this.outline.setNodesSelected([parentNode], [$parentNode]);
+    else {
+      this.outline.setNodesSelected([parentNode], [$parentNode]);
+    }
   }
 };
 

@@ -1,9 +1,19 @@
 scout.Outline = function() {
   scout.Outline.parent.call(this);
-  this._detailTable;
-  this._detailForm;
+  this._addAdapterProperties('defaultDetailForm');
 };
 scout.inherits(scout.Outline, scout.Tree);
+
+/**
+ * @Override
+ */
+scout.Outline.prototype._render = function($parent) {
+  scout.Outline.parent.prototype._render.call(this, $parent);
+
+  if (this.selectedNodeIds.length === 0) {
+    this._updateOutlineTab();
+  }
+};
 
 /**
  * @Override
@@ -19,8 +29,6 @@ scout.Outline.prototype._initTreeNode = function(parentNode, node) {
     node.detailForm = this.session.getOrCreateModelAdapter(node.detailForm, this);
   }
 };
-
-/* user input handling */
 
 scout.Outline.prototype._renderSelection = function($nodes) {
   scout.Outline.parent.prototype._renderSelection.call(this, $nodes);
@@ -61,6 +69,10 @@ scout.Outline.prototype._updateOutlineTab = function(node) {
       text = node.detailForm.title;
     }
   }
+  else if (this.defaultDetailForm) {
+    content = this.defaultDetailForm;
+    text = this.defaultDetailForm.title;
+  }
   this.session.desktop.updateOutlineTab(content, text);
 };
 
@@ -77,6 +89,7 @@ scout.Outline.prototype.onFormChanged = function(nodeId, detailForm) {
     }
   }
   else {
+    this.defaultDetailForm = this.session.getOrCreateModelAdapter(detailForm, this);
     this._updateOutlineTab();
   }
 };

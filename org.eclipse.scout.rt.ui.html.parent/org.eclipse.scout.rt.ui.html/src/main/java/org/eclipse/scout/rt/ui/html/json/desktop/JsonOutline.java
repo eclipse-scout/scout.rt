@@ -16,6 +16,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline5;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithNodes;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
@@ -35,6 +36,34 @@ public class JsonOutline extends JsonTree<IOutline> {
   @Override
   public String getObjectType() {
     return "Outline";
+  }
+
+  @Override
+  protected void attachModel() {
+    super.attachModel();
+
+    if (getModel() instanceof IOutline5) {
+      optAttachAdapter(((IOutline5) getModel()).getDefaultDetailForm());
+    }
+  }
+
+  @Override
+  protected void detachModel() {
+    super.detachModel();
+
+    if (getModel() instanceof IOutline5) {
+      disposeAdapter(((IOutline5) getModel()).getDefaultDetailForm());
+    }
+  }
+
+  @Override
+  public JSONObject toJson() {
+    JSONObject json = super.toJson();
+
+    if (getModel() instanceof IOutline5) {
+      optPutAdapterIdProperty(json, "defaultDetailForm", ((IOutline5) getModel()).getDefaultDetailForm());
+    }
+    return json;
   }
 
   @Override
