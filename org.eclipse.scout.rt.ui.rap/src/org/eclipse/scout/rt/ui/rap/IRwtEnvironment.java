@@ -106,7 +106,7 @@ public interface IRwtEnvironment {
    * global key strokes will be executed when and only when no key stroke of the
    * control hierarchy starting at the event's source control consumed
    * (event.doit = false) the event.
-   * 
+   *
    * @param stroke
    * @return
    */
@@ -116,7 +116,7 @@ public interface IRwtEnvironment {
    * global key strokes will be executed when and only when no key stroke of the
    * control hierarchy starting at the event's source control consumed
    * (event.doit = false) the event.
-   * 
+   *
    * @param stroke
    * @return
    */
@@ -218,6 +218,11 @@ public interface IRwtEnvironment {
 
   HtmlAdapter getHtmlAdapter();
 
+  /**
+   * Returns the display which this environment and the associated UIThread belongs to.
+   *
+   * @return the {@link Display} for this environment; is never <code>null</code>.
+   */
   Display getDisplay();
 
   IClientSession getClientSession();
@@ -229,7 +234,7 @@ public interface IRwtEnvironment {
    * <p>
    * The job is only run when it reaches the model within the cancelTimeout. This means if the job is delayed longer
    * than cancelTimeout millis when the model job runs it, then the job is ignored.
-   * 
+   *
    * @return the created and scheduled job, a {@link ClientJob}
    */
   JobEx invokeScoutLater(Runnable job, long cancelTimeout);

@@ -10,43 +10,36 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap;
 
-import java.lang.reflect.Field;
 import java.security.AccessController;
 import java.util.TreeMap;
 
 import javax.security.auth.Subject;
 
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.rap.rwt.service.ServerPushSession;
 import org.eclipse.scout.commons.CompositeLong;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.servicetunnel.http.IClientServiceTunnel;
 import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.scout.rt.ui.rap.window.IRwtScoutPart;
 import org.eclipse.scout.rt.ui.rap.window.desktop.RwtScoutDesktop;
 import org.eclipse.scout.rt.ui.rap.window.desktop.nonmodalFormBar.RwtScoutFormButtonBar;
-import org.eclipse.scout.service.SERVICES;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.PlatformUI;
 import org.osgi.framework.Bundle;
 
 public abstract class AbstractStandaloneRwtEnvironment extends AbstractRwtEnvironment implements IRwtStandaloneEnvironment {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractStandaloneRwtEnvironment.class);
 
   private Display m_display;
-  private Shell m_rootShell;
   private RwtScoutDesktop m_uiDesktop;
   private RwtScoutFormButtonBar m_uiButtonArea;
   private ServerPushSession m_clientNotificationPushSession;
@@ -57,6 +50,7 @@ public abstract class AbstractStandaloneRwtEnvironment extends AbstractRwtEnviro
 
   @Override
   public int createUI() {
+    // Ensure the UI initialization request to be authenticated.
     if (getSubject() == null) {
       Subject subject = Subject.getSubject(AccessController.getContext());
       if (subject == null) {
@@ -64,91 +58,28 @@ public abstract class AbstractStandaloneRwtEnvironment extends AbstractRwtEnviro
       }
       setSubject(subject);
     }
-    m_display = Display.getDefault();
-    if (m_display == null) {
-      m_display = new Display();
-    }
+
+    return super.createUI();
+  }
+
+  @Override
+  protected void createContents(Composite parent) {
+    m_display = Display.getCurrent();
     m_display.setData(IRwtEnvironment.class.getName(), this);
 
-    //XXX Workaround for rwt npe
-    try {
-      final Object wb = PlatformUI.getWorkbench();
-      final Field f = wb.getClass().getDeclaredField("display");
-      f.setAccessible(true);
-      f.set(wb, m_display);
-      m_display.addListener(SWT.Dispose, new Listener() {
-        private static final long serialVersionUID = 1L;
+    createApplicationContent(parent);
+    createNonmodalFormButtonArea(parent);
 
-        @Override
-        public void handleEvent(Event event) {
-          try {
-            // WORKAROUND for memory leaks (display reference in workbench still exists after dispose)
-            // workbench should be closed instead, but NPEs are thrown
-            f.set(wb, null);
-          }
-          catch (Throwable t1) {
-            // nop
-          }
-        }
-      });
-    }
-    catch (Throwable t) {
-      //nop
-    }
-    //XXX end Workaround for rwt npe
-
-    Shell shell = new Shell(m_display, SWT.NO_TRIM);
-    m_rootShell = shell;
-    createApplicationContent(shell);
-    createNonmodalFormButtonArea(shell);
-    //layout
-    GridLayout shellLayout = new GridLayout(1, true);
-    shellLayout.horizontalSpacing = 0;
-    shellLayout.marginHeight = 0;
-    shellLayout.marginWidth = 0;
-    shellLayout.verticalSpacing = 0;
-    shell.setLayout(shellLayout);
-    GridData desktopLayoutData = new GridData(SWT.FILL, SWT.FILL, true, true);
-    m_uiDesktop.getUiContainer().setLayoutData(desktopLayoutData);
-
-    GridData nonmodalFormsLayoutData = new GridData(SWT.FILL, SWT.FILL, true, false);
-    nonmodalFormsLayoutData.exclude = true;
-    m_uiButtonArea.getUiContainer().setLayoutData(nonmodalFormsLayoutData);
-
-    shell.setMaximized(true);
-    shell.open();
-    shell.layout(true, true);
+    // layout
+    GridLayoutFactory.fillDefaults().applyTo(parent);
+    GridDataFactory.swtDefaults().align(SWT.FILL, SWT.FILL).grab(true, true).applyTo(m_uiDesktop.getUiContainer());
+    GridDataFactory.swtDefaults().align(SWT.FILL, SWT.FILL).grab(true, false).exclude(true).applyTo(m_uiButtonArea.getUiContainer());
 
     if (needsClientNotificationServerPushSession()) {
       // Necessary for client notifications.
       m_clientNotificationPushSession = new ServerPushSession();
       m_clientNotificationPushSession.start();
     }
-
-    while (!shell.isDisposed()) {
-      try {
-        if (!m_display.readAndDispatch()) {
-          m_display.sleep();
-        }
-      }
-      //Catch only exception instead of throwable to allow proper uithread shutdown (see UIThread.UIThreadTerminationError
-      catch (Exception e) {
-        handleEventLoopException(e);
-      }
-    }
-    return 0;
-  }
-
-  protected void handleEventLoopException(final Exception e) {
-    invokeScoutLater(new Runnable() {
-
-      @Override
-      public void run() {
-        ProcessingException p = new ProcessingException("", e);
-        SERVICES.getService(IExceptionHandlerService.class).handleException(p);
-      }
-
-    }, 0);
   }
 
   protected void createApplicationContent(final Composite parent) {
@@ -194,33 +125,11 @@ public abstract class AbstractStandaloneRwtEnvironment extends AbstractRwtEnviro
 
   @Override
   public Display getDisplay() {
-    Display current = null;
-    try {
-      current = Display.getCurrent();
-    }
-    catch (Exception e) {
-      // NOP
-    }
-    if (current != null && m_display != current) {
-      ScoutLogManager.getLogger(AbstractStandaloneRwtEnvironment.class).error(
-          "Different Display.\n" +
-              "m_display: {0}\n" +
-              "cur_displ: {1}",
-          new Object[]{m_display, current});
-    }
-    Display defdisp = null;
-    try {
-      defdisp = Display.getDefault();
-    }
-    catch (Exception e) {
-      // NOP
-    }
-    if (defdisp != null && m_display != defdisp) {
-      ScoutLogManager.getLogger(AbstractStandaloneRwtEnvironment.class).error(
-          "Different Display.\n" +
-              "m_display: {0}\n" +
-              "defdisp  : {1}",
-          new Object[]{m_display, defdisp});
+    // Sanity check for proper display if the calling thread is a user-interface thread.
+    Display currentDisplay = Display.getCurrent();
+    if (currentDisplay != null && m_display != currentDisplay) {
+      LOG.error("WRONG DISPLAY: the calling user-interface thread does not belong to this environment [display_environment={0}, display_callingThread={1}, callingThread={2}]",
+          new Object[]{m_display, currentDisplay, Thread.currentThread()});
     }
     return m_display;
   }
@@ -273,7 +182,9 @@ public abstract class AbstractStandaloneRwtEnvironment extends AbstractRwtEnviro
    */
   @Override
   public Shell getParentShellIgnoringPopups(int modalities) {
-    Shell shell = Display.getCurrent().getActiveShell();
+    Display display = getDisplay();
+
+    Shell shell = display.getActiveShell();
     if (shell != null) {
       while (RwtUtility.isPopupShell(shell) && shell.getParent() instanceof Shell) {
         shell = (Shell) shell.getParent();
@@ -282,7 +193,7 @@ public abstract class AbstractStandaloneRwtEnvironment extends AbstractRwtEnviro
     // traverse available shells
     if (shell == null) {
       TreeMap<CompositeLong, Shell> map = new TreeMap<CompositeLong, Shell>();
-      for (Shell s : Display.getCurrent().getShells()) {
+      for (Shell s : display.getShells()) {
         RwtUtility.visitShellTreeRec(s, modalities, 0, map);
       }
       if (map.size() > 0) {
@@ -298,7 +209,7 @@ public abstract class AbstractStandaloneRwtEnvironment extends AbstractRwtEnviro
     }
 
     if (shell == null) {
-      shell = m_rootShell;
+      shell = getShell(); // main shell for this entrypoint.
     }
 
     return shell;

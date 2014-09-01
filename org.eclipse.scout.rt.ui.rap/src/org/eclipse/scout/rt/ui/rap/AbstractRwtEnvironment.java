@@ -33,6 +33,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.rap.rwt.RWT;
+import org.eclipse.rap.rwt.application.AbstractEntryPoint;
 import org.eclipse.rap.rwt.lifecycle.PhaseEvent;
 import org.eclipse.rap.rwt.lifecycle.PhaseId;
 import org.eclipse.rap.rwt.lifecycle.PhaseListener;
@@ -121,7 +122,7 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
 
 @SuppressWarnings("deprecation")
-public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
+public abstract class AbstractRwtEnvironment extends AbstractEntryPoint implements IRwtEnvironment {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractRwtEnvironment.class);
 
   private Subject m_subject;
@@ -1473,7 +1474,7 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
 
       if (LOG.isInfoEnabled()) {
         String msg = "ClientSession is going down [thread={0}, httpSession={1}, clientSession={2}, environment={3}, userAgent={4}]";
-        LOG.info(msg, new Object[]{Thread.currentThread().getId(), event.getSession().getId(), m_clientSession, m_environment, m_clientSession.getUserAgent()});
+        LOG.info(msg, new Object[]{Thread.currentThread(), event.getSession().getId(), m_clientSession, m_environment, m_clientSession.getUserAgent()});
       }
 
       // Synchronize with Scout model job to stop the application.
