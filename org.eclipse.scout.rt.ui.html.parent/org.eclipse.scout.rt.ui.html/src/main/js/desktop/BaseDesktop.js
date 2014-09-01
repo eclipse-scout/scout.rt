@@ -34,8 +34,6 @@ scout.BaseDesktop.prototype.goOffline = function() {
   if (scout.device.supportsCssAnimation()) {
     $reconnect.addClass('reconnect-animated');
   }
-  this.layout.marginTop += this.$offline.outerHeight(true);
-  this.layout.layout();
 };
 
 scout.BaseDesktop.prototype.goOnline = function() {
@@ -51,9 +49,7 @@ scout.BaseDesktop.prototype.hideOfflineMessage = function() {
     return;
   }
 
-  this.layout.marginTop -= this.$offline.outerHeight(true);
   this.$offline.remove();
-  this.layout.layout();
   this.hideOfflineMessagePending = false;
   this.$offline = null;
 };
