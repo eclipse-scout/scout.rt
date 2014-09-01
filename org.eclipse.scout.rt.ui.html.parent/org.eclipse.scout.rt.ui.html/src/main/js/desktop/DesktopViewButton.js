@@ -4,57 +4,49 @@
 
 scout.DesktopViewButton = function() {
   scout.DesktopViewButton.parent.call(this);
-  this._$viewButton;
+  this._addAdapterProperties('outline');
 };
 scout.inherits(scout.DesktopViewButton, scout.ModelAdapter);
 
 scout.DesktopViewButton.prototype._render = function($parent) {
-
-  // TODO AWE/CGU/CRU: refactor class names to match adapter name
-  this._$viewButton = $parent.appendDiv(this.id, 'view-item ', this.text);
-
-  this._setIconId(this.iconId);
+  this.$container = $parent.appendDIV('outline-menu-item');
 
   var that = this;
-  this._$viewButton.on('click', '', function() {
-    if (!that._$viewButton.isEnabled()) {
+  this.$container.on('click', '', function() {
+    if (!this.$container.isEnabled()) {
       return;
     }
 
     //don't await server response to make it more responsive and offline capable
-    that._$viewButton.selectOne();
-    if (that.outline) {
-      that.desktop.changeOutline(that.outline);
+    if (this.outline) {
+      this.desktop.changeOutline(that.outline);
     }
+    this.session.send('click', that.id);
+  }.bind(this));
 
-    that.session.send('click', that.id);
-  });
+  this._callSetters();
 };
 
 scout.DesktopViewButton.prototype._callSetters = function() {
-  this._setSelected(this.selected);
   this._setEnabled(this.enabled);
-};
-
-scout.DesktopViewButton.prototype._setSelected = function(selected) {
+  this._setText(this.text);
+  this._setIconId(this.iconId);
 };
 
 scout.DesktopViewButton.prototype._setEnabled = function(enabled) {
-  this._$viewButton.setEnabled(enabled);
+  this.$container.setEnabled(enabled);
+};
+
+scout.DesktopViewButton.prototype._setText = function(title) {
+  this.$container.text(title);
 };
 
 scout.DesktopViewButton.prototype._setIconId = function(iconId) {
-//  this._$viewButton.attr('data-iconId', iconId); //FIXME CGU how to dynamically set icon?
-  if (iconId) {
-    this._$viewButton.addClass('view-item-icon');
-  }
-  else {
-    this._$viewButton.removeClass('view-item-icon');
-  }
+  //FIXME implement
 };
 
-scout.DesktopViewButton.prototype._setText = function(text) {
-  this._$viewButton.text = text;
+scout.DesktopViewButton.prototype._setOutline = function(outline) {
+  // nop
 };
 
 scout.DesktopViewButton.prototype.goOffline = function() {

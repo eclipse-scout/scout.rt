@@ -1,7 +1,6 @@
 scout.DesktopNavigation = function(desktop) {
   this.desktop = desktop;
   this.session = desktop.session;
-  this.outline = desktop.outline;
 
   this.$navigation;
   this.$header;
@@ -51,9 +50,7 @@ scout.DesktopNavigation.prototype._createOutlinesTab = function() {
   // create menu
   var $outlinesMenu = $tab.appendDIV('navigation-tab-outline-menu');
   for (var i = 0; i < this.desktop.viewButtons.length; i++) {
-    var $item = $outlinesMenu.appendDIV('outline-menu-item');
-
-    this.desktop.viewButtons[i].render($item);
+    this.desktop.viewButtons[i].render($outlinesMenu);
   }
 
   // create title of active outline
@@ -134,7 +131,15 @@ scout.DesktopNavigation.prototype._setActiveTab = function(newTab) {
 // event handling
 
 scout.DesktopNavigation.prototype.onOutlineChanged = function(outline) {
-  this.outline.remove();
+  if (this.outline === outline) {
+    this.$header.removeClass('tab-menu-open');
+    return;
+  }
+
+  if (this.outline) {
+    this.outline.remove();
+  }
+
   this.outline = outline;
   this.outline.render(this.$container);
   this.$outlineTitle.html(this.outline.title);

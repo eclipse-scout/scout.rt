@@ -188,9 +188,6 @@ scout.Desktop.prototype.updateOutlineTab = function(content, title) {
 };
 
 scout.Desktop.prototype.changeOutline = function(outline) {
-  if (this.outline === outline) {
-    return;
-  }
   this.outline = outline;
   this.navigation.onOutlineChanged(this.outline);
 };
