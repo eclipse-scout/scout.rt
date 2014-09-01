@@ -607,5 +607,9 @@ scout.Tree.prototype.onModelAction = function(event) {
 };
 
 scout.Tree.prototype._setMenus = function() {
-  // TODO cru: braucht es doch nicht mehr!
+  // NOP
+};
+
+scout.Tree.prototype._setTitle = function() {
+  // NOP
 };

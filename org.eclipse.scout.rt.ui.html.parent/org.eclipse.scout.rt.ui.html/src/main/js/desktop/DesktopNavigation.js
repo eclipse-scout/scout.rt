@@ -201,3 +201,14 @@ scout.DesktopNavigation.prototype._addSplitter = function() {
    return false;
   }
 };
+
+/**
+ * Called by DesktopViewButton.js
+ */
+scout.DesktopNavigation.prototype.onOutlinePropertyChange = function(event) {
+  for (var propertyName in event.properties) {
+    if (propertyName === "text") {
+      this.$outlineTitle.text(event.properties[propertyName]);
+    }
+  }
+};

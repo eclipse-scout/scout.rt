@@ -1,8 +1,8 @@
 /* main element */
 
 .desktop-navigation {
-	position: relative;
-	height: 100%;
+  position: relative;
+  height: 100%;
     width: @size-desktop-navigation;
     background-color: @color-nav;
     color: @color-bench;
@@ -12,166 +12,170 @@
     width: 100%;
     height: @size-desktop-tools;
     .font-text-large;
-    
+
    .navigation-breadcrumb & {
-    	height: 2 * @size-desktop-tools;
-    } 
+      height: 2 * @size-desktop-tools;
+    }
 }
 
 .navigation-container{
     width: 100%;
     height: calc(~"100%" - @size-desktop-tools);
-	top: @size-desktop-tools;
+  top: @size-desktop-tools;
 
     .navigation-breadcrumb & {
-    	height: calc(~"100%" - 2 * @size-desktop-tools);
-    } 
+      height: calc(~"100%" - 2 * @size-desktop-tools);
+    }
 }
 
 .navigation-splitter-vertical{
-	position: absolute;
-	top: 0px;
-	right: -8px;
-	height: 100%;
-	width: 16px;
-	cursor: col-resize;
-	z-index: 1;
+  position: absolute;
+  top: 0px;
+  right: -8px;
+  height: 100%;
+  width: 16px;
+  cursor: col-resize;
+  z-index: 1;
 }
 
 .navigation-tab-outline,
 .navigation-tab-search {
-	position: relative;
-	float: left;
-	cursor: pointer;
-	display: inline-block;
-		
-	&.tab-active {
-		width: calc(~"100%" - @size-desktop-tools);
-	}
-	
+  position: relative;
+  float: left;
+  cursor: pointer;
+  display: inline-block;
+
+  &.tab-active {
+    width: calc(~"100%" - @size-desktop-tools);
+  }
+
     &:not(.tab-active) {
         background-color: @color-nav-light;
-    	color: @color-bench-text;
-    	width:  @size-desktop-tools;
-    }    	
-    
+      color: @color-bench-text;
+      width:  @size-desktop-tools;
+    }
+
     .navigation-breadcrumb & {
-    	width: 50%;
-    } 
+      width: 50%;
+    }
 }
 
 /* navigation header buttons*/
 
 .navigation-tab-outline-button,
 .navigation-tab-search-button {
-	padding: 0px 10px 0px 10px;
-	text-align: center;
-	height: @size-desktop-tools;
-	width: @size-desktop-tools;
-	.font-text-large;
-	line-height: @size-desktop-tools;
+  padding: 0px 10px 0px 10px;
+  text-align: center;
+  height: @size-desktop-tools;
+  width: @size-desktop-tools;
+  .font-text-large;
+  line-height: @size-desktop-tools;
 
-	&:before{
-		.font-icon;
-		font-size: 24px;
-	}
-	
-	.navigation-breadcrumb & {
-		width: 100%;
-	}
+  &:before{
+    .font-icon;
+    font-size: 24px;
+  }
+
+  .navigation-breadcrumb & {
+    width: 100%;
+  }
 }
 
 .navigation-tab-outline-button {
-	float: left;
+  float: left;
 
-	.tab-menu-open & {
-		color: @color-bench-text-hover;
-		background-color: @color-bench;
-	}
-	
-	&:before{
-		content: "\F0C9";
-	}
+  .tab-menu-open & {
+    color: @color-bench-text-hover;
+    background-color: @color-bench;
+  }
+
+  &:before{
+    content: "\F0C9";
+  }
 }
 
 .navigation-tab-search-button {
-	float: right;
-	
-	&:before{
-		content: "\F002";
-	}
+  float: right;
+
+  &:before{
+    content: "\F002";
+  }
 }
 
 /* navigation header fields */
 
 .navigation-tab-outline-title,
 .navigation-tab-search-field {
-	padding: 0px 10px 0px 10px;
-	height: @size-desktop-tools;
-  	white-space: nowrap;
-	.font-text-large;
-	line-height: @size-desktop-tools;
-	overflow: hidden;
-  	text-overflow: ellipsis;
-	display: none;
-	
-	.tab-active > & {
-	    display: block;
+  padding: 0px 10px 0px 10px;
+  height: @size-desktop-tools;
+    white-space: nowrap;
+  .font-text-large;
+  line-height: @size-desktop-tools;
+  overflow: hidden;
+    text-overflow: ellipsis;
+  display: none;
+
+  .tab-active > & {
+      display: block;
     }
-    
+
     .navigation-breadcrumb & {
-		width: 200%;
-		text-align: center;
-		border-bottom: 1px solid @color-bench;
-	} 
+    width: 200%;
+    text-align: center;
+    border-bottom: 1px solid @color-bench;
+  }
  }
 
 .navigation-tab-outline-title {
-	min-width: @size-desktop-breadcrumb - 2 * @size-desktop-tools;
+  min-width: @size-desktop-breadcrumb - 2 * @size-desktop-tools;
 
 }
 .navigation-tab-search-field {
-	float: left;
-	width: calc(~"100% - 2px" - @size-desktop-tools );
-	
-	outline:0;
-	border: 0;
-	
+  float: left;
+  width: calc(~"100% - 2px" - @size-desktop-tools );
+
+  outline:0;
+  border: 0;
+
     background-color: @color-nav;
     color: @color-bench;
 
-	.navigation-breadcrumb & {
-		position: absolute;
-		top:  @size-desktop-tools;
-		left: -100%;
-	}     
+  .navigation-breadcrumb & {
+    position: absolute;
+    top:  @size-desktop-tools;
+    left: -100%;
+  }
 }
-	
+
 /* navigation outline menu */
 
 .navigation-tab-outline-menu {
-	position: absolute;
-	top: @size-desktop-tools;
-	background-color: @color-bench;
-	z-index: 10;
-	white-space: nowrap;
-	.menu-context;
-	border-top: 1px solid transparent;	
-	display: none;
+  position: absolute;
+  top: @size-desktop-tools;
+  background-color: @color-bench;
+  z-index: 10;
+  white-space: nowrap;
+  .menu-context;
+  border-top: 1px solid transparent;
+  display: none;
 
-	.tab-menu-open & {
-		display: block;
-	}
+  .tab-menu-open & {
+    display: block;
+  }
 }
 
 .outline-menu-item {
-	padding: 0px 15px 0px 15px;
-	line-height: 50px;
-	border-bottom: 1px solid @color-bench-light-border;
-	cursor: pointer;
-	color: @color-bench-text;
-	
-	&:hover{
-		color: @color-bench-text-hover;
-	}
+  padding: 0px 15px 0px 15px;
+  line-height: 50px;
+  border-bottom: 1px solid @color-bench-light-border;
+  cursor: pointer;
+  color: @color-bench-text;
+
+  &:hover{
+    color: @color-bench-text-hover;
+  }
+
+  &.disabled {
+    color: @color-bench-semi;
+  }
 }

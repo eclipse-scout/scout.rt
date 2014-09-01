@@ -65,3 +65,13 @@ scout.DesktopViewButton.prototype.goOnline = function() {
     this._setEnabled(true);
   }
 };
+
+scout.DesktopViewButton.prototype.onModelPropertyChange = function(event) {
+  scout.DesktopViewButton.parent.prototype.onModelPropertyChange.call(this, event);
+
+  //Update navigation as well if properties for current outline have changed
+  var navigation = this.session.desktop.navigation;
+  if (navigation.outline == this.outline) {
+    navigation.onOutlinePropertyChange(event);
+  }
+};
