@@ -22,6 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import javax.security.auth.Subject;
 import javax.servlet.http.HttpSession;
@@ -30,7 +31,6 @@ import javax.servlet.http.HttpSessionBindingListener;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.rap.rwt.RWT;
 import org.eclipse.rap.rwt.lifecycle.PhaseEvent;
@@ -44,7 +44,7 @@ import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ClientAsyncJob;
+import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ILocaleListener;
@@ -229,57 +229,49 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
    * {@link P_HttpSessionInvalidationListener}) continues to close the desktop. Synchronization is done on the
    * environment instance.
    */
-  protected synchronized void dispose() {
-    try {
-      closeFormParts();
-      if (m_historySupport != null) {
-        m_historySupport.uninstall();
-        m_historySupport = null;
+  protected void dispose() {
+    closeFormParts();
+    if (m_historySupport != null) {
+      m_historySupport.uninstall();
+      m_historySupport = null;
+    }
+    if (m_desktopKeyStrokes != null) {
+      for (IRwtKeyStroke uiKeyStroke : m_desktopKeyStrokes) {
+        removeGlobalKeyStroke(uiKeyStroke);
       }
-      if (m_desktopKeyStrokes != null) {
-        for (IRwtKeyStroke uiKeyStroke : m_desktopKeyStrokes) {
-          removeGlobalKeyStroke(uiKeyStroke);
-        }
-        m_desktopKeyStrokes.clear();
-      }
-      if (m_iconLocator != null) {
-        m_iconLocator.dispose();
-        m_iconLocator = null;
-      }
-      if (m_colorFactory != null) {
-        m_colorFactory.dispose();
-        m_colorFactory = null;
-      }
-      m_keyStrokeManager = null;
-      if (m_fontRegistry != null) {
-        m_fontRegistry.dispose();
-        m_fontRegistry = null;
-      }
-      if (m_formToolkit != null) {
-        m_formToolkit.dispose();
-        m_formToolkit = null;
-      }
-      detachScoutListeners();
-      if (m_synchronizer != null) {
-        m_synchronizer = null;
-      }
-      detachBusyHandler();
-      if (m_requestInterceptor != null) {
-        RWT.getLifeCycle().removePhaseListener(m_requestInterceptor);
-        m_requestInterceptor = null;
-      }
+      m_desktopKeyStrokes.clear();
+    }
+    if (m_iconLocator != null) {
+      m_iconLocator.dispose();
+      m_iconLocator = null;
+    }
+    if (m_colorFactory != null) {
+      m_colorFactory.dispose();
+      m_colorFactory = null;
+    }
+    m_keyStrokeManager = null;
+    if (m_fontRegistry != null) {
+      m_fontRegistry.dispose();
+      m_fontRegistry = null;
+    }
+    if (m_formToolkit != null) {
+      m_formToolkit.dispose();
+      m_formToolkit = null;
+    }
+    detachScoutListeners();
+    if (m_synchronizer != null) {
+      m_synchronizer = null;
+    }
+    detachBusyHandler();
+    if (m_requestInterceptor != null) {
+      RWT.getLifeCycle().removePhaseListener(m_requestInterceptor);
+      m_requestInterceptor = null;
+    }
 
-      m_status = RwtEnvironmentEvent.STOPPED;
-      fireEnvironmentChanged(new RwtEnvironmentEvent(this, RwtEnvironmentEvent.STOPPED));
-    }
-    finally {
-      notifyAll();
-    }
+    m_status = RwtEnvironmentEvent.STOPPED;
+    fireEnvironmentChanged(new RwtEnvironmentEvent(this, RwtEnvironmentEvent.STOPPED));
   }
 
-  /**
-   * @see {@link LogoutFilter}
-   */
   protected String getLogoutLocation() {
     String path = RWT.getRequest().getServletPath();
 
@@ -451,8 +443,10 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
       //If the subject has changed always create a new clientSession
       //Also create a new clientSession if the userAgent changed (f.e. switch from /web to /mobile)
       if (!getSubject().equals(clientSession.getSubject()) || !userAgent.equals(clientSession.getUserAgent())) {
-        //Force client session shutdown
+        // Force the current client session to be closed. This call blocks until the client session is terminated (see P_HttpSessionInvalidationListener).
+        // Removing the object from the httpSession will trigger the valueUnbound method, which actually closes the application.
         httpSession.setAttribute(P_HttpSessionInvalidationListener.class.getName(), null);
+
         //Make sure a new client session will be initialized
         clientSession = null;
       }
@@ -1471,36 +1465,45 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
 
     @Override
     public void valueUnbound(HttpSessionBindingEvent event) {
-      if (LOG.isInfoEnabled()) {
-        UserAgent userAgent = m_clientSession.getUserAgent();
-        String msg = "Thread: {0} Session goes down...; UserAgent: {2}";
-        LOG.info(msg, new Object[]{Long.valueOf(Thread.currentThread().getId()), userAgent});
-      }
-
+      // Only stop the session if not already done, e.g. by a manual logout of the user.
       final IDesktop desktop = m_clientSession.getDesktop();
       if (!m_clientSession.isActive() || desktop == null || !desktop.isOpened()) {
-        //client session was probably already stopped by the model itself
         return;
       }
 
-      // wait until the environment has been stopped or a maximum of 5s before continuing to close the desktop.
-      synchronized (m_environment) {
-        if (!m_environment.isStopped()) {
-          try {
-            m_environment.wait(5000);
-          }
-          catch (InterruptedException e) {
-            LOG.warn("Interrupted while waiting for environment to stop.");
-          }
-        }
+      if (LOG.isInfoEnabled()) {
+        String msg = "ClientSession is going down [thread={0}, httpSession={1}, clientSession={2}, environment={3}, userAgent={4}]";
+        LOG.info(msg, new Object[]{Thread.currentThread().getId(), event.getSession().getId(), m_clientSession, m_environment, m_clientSession.getUserAgent()});
       }
 
-      new ClientAsyncJob("HTTP session inactivator", m_clientSession) {
+      // Synchronize with Scout model job to stop the application.
+      ClientJob job = new ClientSyncJob("HTTP session invalidator", m_clientSession) {
+
         @Override
         protected void runVoid(IProgressMonitor monitor) throws Throwable {
+          // Fire a forced close request to prevent the user from interrupting the process in Desktop#execBeforeClosing.
+          // Mostly the shutdown process cannot be prevented anyway because #valueUnbound is called when the HttpSession gets expired
+          // except for being invoked when the user agent is switched. (see AbstractRwtEnvironment#initClientSession).
           desktop.getUIFacade().fireDesktopClosingFromUI(true);
         }
-      }.runNow(new NullProgressMonitor());
+      };
+      job.schedule();
+
+      // Wait for the ClientSession to be stopped for maximal 30 seconds.
+      // This is necessary if the session is stopped due to an userAgent switch; otherwise, cleanup might occur on the newly created client session.
+      Object sessionLock = m_clientSession.getStateLock();
+      long timeout = TimeUnit.SECONDS.toMillis(30);
+      long timeoutExpires = System.currentTimeMillis() + timeout;
+      synchronized (sessionLock) {
+        try {
+          while (m_clientSession.isActive() && System.currentTimeMillis() < timeoutExpires) { // Conditional guard against spurious wakeup.
+            sessionLock.wait(timeout);
+          }
+        }
+        catch (InterruptedException e) {
+          LOG.error("Interrupted while waiting for the ClientSession to be stopped.", e);
+        }
+      }
     }
   }
 }
