@@ -26,12 +26,17 @@ import javax.swing.text.View;
 import javax.swing.text.html.HTML;
 import javax.swing.text.html.HTMLDocument;
 
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
+
 /**
  * Abstract class to detect a hyperlink in a JComponent (e.g. JTable or JTree)
- * 
+ *
  * @since 4.0-RC1 (backported)
  */
 public abstract class AbstractHtmlLinkDetector<T extends JComponent> {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractHtmlLinkDetector.class);
+
   private URL m_hyperlink;
   private T m_container;
 
@@ -87,7 +92,7 @@ public abstract class AbstractHtmlLinkDetector<T extends JComponent> {
       }
     }
     catch (Throwable t) {
-      //nop
+      LOG.error(t.getMessage(), t);
     }
 
     return false;

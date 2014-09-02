@@ -51,9 +51,11 @@ public class TreeHtmlLinkDetector extends AbstractHtmlLinkDetector<JTree> {
   protected Component getComponent(Point p) {
     JTree tree = getContainer();
     TreePath path = getPath(p);
-    TreeCellRenderer renderer = getContainer().getCellRenderer();
-    Component c = renderer.getTreeCellRendererComponent(tree, path.getLastPathComponent(), tree.isPathSelected(path), tree.isExpanded(path), tree.getModel().isLeaf(path.getLastPathComponent()), tree.getRowForPath(path), true);
-    return c;
+    if (path != null) {
+      TreeCellRenderer renderer = getContainer().getCellRenderer();
+      return renderer.getTreeCellRendererComponent(tree, path.getLastPathComponent(), tree.isPathSelected(path), tree.isExpanded(path), tree.getModel().isLeaf(path.getLastPathComponent()), tree.getRowForPath(path), true);
+    }
+    return null;
   }
 
   private TreePath getPath(Point p) {
