@@ -226,9 +226,7 @@ public abstract class AbstractRwtEnvironment extends AbstractEntryPoint implemen
   }
 
   /**
-   * This method is synchronized because the UI thread disposing the old environment has to run first before the
-   * {@link P_HttpSessionInvalidationListener}) continues to close the desktop. Synchronization is done on the
-   * environment instance.
+   * This method is called when the {@link Display} of this environment is disposed.
    */
   protected void dispose() {
     closeFormParts();
@@ -1493,12 +1491,12 @@ public abstract class AbstractRwtEnvironment extends AbstractEntryPoint implemen
       // Wait for the ClientSession to be stopped for maximal 30 seconds.
       // This is necessary if the session is stopped due to an userAgent switch; otherwise, cleanup might occur on the newly created client session.
       Object sessionLock = m_clientSession.getStateLock();
-      long timeout = TimeUnit.SECONDS.toMillis(30);
-      long timeoutExpires = System.currentTimeMillis() + timeout;
+      long timeoutMillis = TimeUnit.SECONDS.toMillis(30);
+      long timeoutExpires = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(timeoutMillis);
       synchronized (sessionLock) {
         try {
-          while (m_clientSession.isActive() && System.currentTimeMillis() < timeoutExpires) { // Conditional guard against spurious wakeup.
-            sessionLock.wait(timeout);
+          while (m_clientSession.isActive() && System.nanoTime() < timeoutExpires) { // Conditional guard against spurious wakeup.
+            sessionLock.wait(timeoutMillis);
           }
         }
         catch (InterruptedException e) {
