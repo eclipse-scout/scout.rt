@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.ui.html.json.AbstractEventFilter;
 
-public class TreeEventFilter extends AbstractEventFilter<TreeEvent> {
+public class TreeEventFilter extends AbstractEventFilter<TreeEvent, TreeEventFilterCondition> {
 
   private ITree m_source;
 
@@ -40,10 +40,14 @@ public class TreeEventFilter extends AbstractEventFilter<TreeEvent> {
    */
   @Override
   public TreeEvent filterIgnorableModelEvent(TreeEvent event) {
-    for (TreeEvent eventToIgnore : getIgnorableModelEvents()) {
-      if (eventToIgnore.getType() == event.getType()) {
+    for (TreeEventFilterCondition condition : getIgnorableModelEvents()) {
+      if (condition.getType() == event.getType()) {
+        if (!condition.checkNodes()) {
+          return null;
+        }
+
         Collection<ITreeNode> nodes = new ArrayList<>(event.getNodes());
-        nodes.removeAll(eventToIgnore.getNodes());
+        nodes.removeAll(condition.getNodes());
         if (nodes.size() == 0) {
           //Event should be ignored if no nodes remain or if the event contained no nodes at all
           return null;

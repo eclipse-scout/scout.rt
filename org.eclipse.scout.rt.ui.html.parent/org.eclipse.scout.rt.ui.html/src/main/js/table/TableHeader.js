@@ -3,31 +3,42 @@
 
 scout.TableHeader = function(table, $tableHeader, session) {
   var that = this,
-    columns = table.columns;
+    columns = table.columns,
+    column, $headerItem, sortDirection, alignment;
 
   this.totalWidth = 0;
   this.dragDone = false;
 
   for (var i = 0; i < columns.length; i++) {
-    var $headerItem = $tableHeader.appendDiv('', 'header-item', columns[i].text)
+    column = columns[i];
+    $headerItem = $tableHeader.appendDIV('header-item', columns[i].text)
       .data('index', i)
-      .css('min-width', columns[i].width + 'px') // 17 is width of header-resize handle, see table.css (.header-resize)
-      .css('max-width', columns[i].width + 'px')
+      .css('min-width', column.width + 'px') // 17 is width of header-resize handle, see table.css (.header-resize)
+      .css('max-width', column.width + 'px')
       .on('click', '', onHeaderClick)
       .on('mousedown', '', dragHeader);
 
-    var alignment =  scout.Table.parseHorizontalAlignment(columns[i].horizontalAlignment);
+    if (column.sortActive) {
+      sortDirection = column.sortAscending ? 'asc' : 'desc';
+      $headerItem.addClass('sort-' + sortDirection);
+      //FIXME CGU consider index
+//      if (column.sortIndex >= 0) {
+//        $headerItem.attr('data-sort-order', column.sortIndex);
+//      }
+    }
+
+    alignment =  scout.Table.parseHorizontalAlignment(column.horizontalAlignment);
     if (alignment !== 'left')  {
       $headerItem.css('text-align', alignment);
     }
 
     this.totalWidth += columns[i].width;
 
-    $tableHeader.appendDiv('', 'header-resize', '')
+    $tableHeader.appendDIV('header-resize', '')
       .on('mousedown', '', resizeHeader);
 
-    columns[i].$div = $headerItem;
-    columns[i].filter = [];
+    column.$div = $headerItem;
+    column.filter = [];
   }
 
   function onHeaderClick(event) {
@@ -36,7 +47,7 @@ scout.TableHeader = function(table, $tableHeader, session) {
     if (that.dragDone) {
       that.dragDone = false;
     } else if (event.shiftKey || event.ctrlKey) {
-      table.sortChange($headerItem, $headerItem.hasClass('sort-up') ? 'down' : 'up', event.shiftKey);
+      table.sort($headerItem, $headerItem.hasClass('sort-asc') ? 'desc' : 'asc', event.shiftKey);
     } else {
       var x = $headerItem.position().left + $tableHeader.position().left + parseFloat($tableHeader.css('margin-left')),
         y = $headerItem.position().top +  $tableHeader.position().top;
@@ -176,5 +187,90 @@ scout.TableHeader = function(table, $tableHeader, session) {
       $tableHeader.removeClass('header-move');
 
     }
+  }
+};
+
+scout.TableHeader.prototype.onSortingChanged = function($header, dir, additional, remove) {
+  $header.removeClass('sort-asc sort-desc');
+
+  if (remove) {
+    var attr = $header.attr('data-sort-order');
+    $header.siblings().each(function() {
+      if ($(this).attr('data-sort-order') > attr) {
+        var sortOrder = parseInt($(this).attr('data-sort-order'), 0) - 1;
+        $(this).attr('data-sort-order', sortOrder);
+      }
+    });
+    $header.removeAttr('data-sort-order');
+  } else {
+    // change sort order of clicked header
+    $header.addClass('sort-' + dir);
+
+    // when shift pressed: add, otherwise reset
+    if (additional) {
+      var clickOrder = $header.data('sort-order'),
+        maxOrder = -1;
+
+      $('.header-item').each(function() {
+        var value = parseInt($(this).attr('data-sort-order'), 0);
+        maxOrder = (value > maxOrder) ? value : maxOrder;
+      });
+
+      if (clickOrder !== undefined && clickOrder !== null) {
+        $header.attr('data-sort-order', clickOrder);
+      } else {
+        $header.attr('data-sort-order', maxOrder + 1);
+      }
+
+    } else {
+      $header.attr('data-sort-order', 0)
+        .siblings()
+        .removeClass('sort-asc sort-desc')
+        .attr('data-sort-order', null);
+    }
+  }
+};
+
+scout.TableHeader.prototype.onGroupingChanged = function($headerItem, all) {
+  if (all) {
+    $headerItem.parent().addClass('group-all');
+  } else {
+    $headerItem.addClass('group-sort');
+  }
+};
+
+scout.TableHeader.prototype.onColumnMoved = function($header, oldPos, newPos, dragged) {
+  var $headers = $('.header-item', this.$container),
+  $moveHeader = $headers.eq(oldPos / 2),
+  $moveResize = $moveHeader.next();
+
+  // store old position of header
+  $headers.each(function() {
+  $(this).data('old-pos', $(this).offset().left);
+  });
+
+  // change order in dom of header
+  if (newPos < 0) {
+  this._$header.prepend($moveResize);
+  this._$header.prepend($moveHeader);
+  } else {
+  $headers.eq(newPos / 2).after($moveHeader);
+  $headers.eq(newPos / 2).after($moveResize);
+  }
+
+  // move menu
+  var left = $header.position().left;
+
+  $('.table-header-menu').animateAVCSD('left', left + 20);
+
+  // move to old position and then animate
+  if (dragged) {
+    $header.css('left', parseInt($header.css('left'), 0) + $header.data('old-pos') - $header.offset().left)
+      .animateAVCSD('left', 0);
+    } else {
+    $headers.each(function() {
+      $(this).css('left', $(this).data('old-pos') - $(this).offset().left)
+        .animateAVCSD('left', 0);
+    });
   }
 };

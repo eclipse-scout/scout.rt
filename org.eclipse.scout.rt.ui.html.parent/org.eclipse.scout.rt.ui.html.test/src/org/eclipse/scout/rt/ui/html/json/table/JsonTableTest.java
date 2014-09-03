@@ -41,8 +41,7 @@ public class JsonTableTest {
    */
   @Test
   public void testSelectionEvent() throws ProcessingException, JSONException {
-    Table table = new Table();
-    table.fill(5);
+    Table table = createTableFixture(5);
 
     assertNull(table.getSelectedRow());
 
@@ -56,12 +55,31 @@ public class JsonTableTest {
   }
 
   /**
+   * Tests whether the model rows get correctly unselected
+   */
+  @Test
+  public void testClearSelectionEvent() throws ProcessingException, JSONException {
+    Table table = createTableFixture(5);
+    ITableRow row1 = table.getRow(1);
+
+    table.selectRow(row1);
+
+    assertTrue(row1.isSelected());
+
+    JsonTable jsonTable = createJsonTableWithMocks(table);
+    JsonEvent event = createJsonSelectedEvent(null);
+
+    jsonTable.handleUiEvent(event, new JsonResponse());
+
+    assertTrue(table.getSelectedRows().size() == 0);
+  }
+
+  /**
    * Response must not contain the selection event if the selection was triggered by the request
    */
   @Test
   public void testIgnorableSelectionEvent() throws ProcessingException, JSONException {
-    Table table = new Table();
-    table.fill(5);
+    Table table = createTableFixture(5);
 
     ITableRow row = table.getRow(2);
     JsonTable jsonTable = createJsonTableWithMocks(table);
@@ -86,6 +104,7 @@ public class JsonTableTest {
       }
     };
     table.fill(5);
+    table.initTable();
 
     ITableRow row2 = table.getRow(2);
     ITableRow row4 = table.getRow(4);
@@ -94,6 +113,45 @@ public class JsonTableTest {
     JsonEvent event = createJsonSelectedEvent(jsonTable.getOrCreatedRowId(row2));
 
     assertFalse(row2.isSelected());
+    assertFalse(row4.isSelected());
+
+    jsonTable.handleUiEvent(event, new JsonResponse());
+
+    assertFalse(row2.isSelected());
+    assertTrue(row4.isSelected());
+
+    List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(
+        jsonTable.getJsonSession().currentJsonResponse(), JsonTable.EVENT_ROWS_SELECTED);
+    assertTrue(responseEvents.size() == 1);
+
+    List<ITableRow> tableRows = jsonTable.extractTableRows(responseEvents.get(0).getData());
+    assertEquals(row4, tableRows.get(0));
+  }
+
+  /**
+   * Same as {@link #testIgnorableSelectionEvent2()} but with an empty selection
+   */
+  @Test
+  public void testIgnorableSelectionEvent3() throws ProcessingException, JSONException {
+    Table table = new Table() {
+      @Override
+      protected void execRowsSelected(List<? extends ITableRow> rows) throws ProcessingException {
+        if (rows.size() == 0) {
+          selectRow(4);
+        }
+      }
+    };
+    table.fill(5);
+    table.initTable();
+
+    ITableRow row2 = table.getRow(2);
+    ITableRow row4 = table.getRow(4);
+    table.selectRow(row2);
+
+    JsonTable jsonTable = createJsonTableWithMocks(table);
+    JsonEvent event = createJsonSelectedEvent(null);
+
+    assertTrue(row2.isSelected());
     assertFalse(row4.isSelected());
 
     jsonTable.handleUiEvent(event, new JsonResponse());
@@ -120,6 +178,13 @@ public class JsonTableTest {
     JsonTestUtility.assertGC(ref);
   }
 
+  public static Table createTableFixture(int numRows) throws ProcessingException {
+    Table table = new Table();
+    table.fill(numRows);
+    table.initTable();
+    return table;
+  }
+
   public static JsonTable createJsonTableWithMocks(ITable table) {
     JsonSessionMock jsonSession = new JsonSessionMock();
     JsonTable jsonTable = new JsonTable(table, jsonSession, jsonSession.createUniqueIdFor(null));
@@ -131,9 +196,10 @@ public class JsonTableTest {
     String tableId = "x"; // never used
     JSONObject data = new JSONObject();
     JSONArray rowIds = new JSONArray();
-    rowIds.put(rowId);
+    if (rowId != null) {
+      rowIds.put(rowId);
+    }
     data.put(JsonTable.PROP_ROW_IDS, rowIds);
     return new JsonEvent(tableId, JsonTable.EVENT_ROWS_SELECTED, data);
   }
-
 }

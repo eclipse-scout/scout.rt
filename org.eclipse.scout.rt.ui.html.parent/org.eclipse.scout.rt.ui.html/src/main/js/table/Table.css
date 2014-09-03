@@ -1,178 +1,191 @@
 .table {
-	height: 100%;
-	width: 100%;
-	
-	& .scrollbar {
-		right: 3px;
-	}
-	
-	& .scrollbar-thumb {
-		background-color: rgba(153, 153, 153, 0.3);
-	}
-	
-	& .scrollbar-thumb-move, 
-	& .scrollbar-thumb:hover{
-		background-color: rgba(153, 153, 153, 0.6);
-	}
+  height: 100%;
+  width: 100%;
+
+  & .scrollbar {
+    right: 3px;
+  }
+
+  & .scrollbar-thumb {
+    background-color: rgba(153, 153, 153, 0.3);
+  }
+
+  & .scrollbar-thumb-move,
+  & .scrollbar-thumb:hover{
+    background-color: rgba(153, 153, 153, 0.6);
+  }
 }
 
 /* main table header */
 
 .table-header {
-	height: @size-table-header;
-	position: relative;
-	background-color: @color-bench-light;
-	border-top: 1px solid @color-bench-light-border;
-	border-bottom: 1px solid @color-bench-light-border;
-	white-space: nowrap;
-	overflow: hidden;
-	margin: 0px 20px 0px 20px;
+  height: @size-table-header;
+  position: relative;
+  background-color: @color-bench-light;
+  border-top: 1px solid @color-bench-light-border;
+  border-bottom: 1px solid @color-bench-light-border;
+  white-space: nowrap;
+  overflow: hidden;
+  margin: 0px 20px 0px 20px;
 }
 
+.sort-icon(@icon) {
+  .font-icon;
+  content: @icon;
+  margin-left: 4px;
+  line-height: normal;
+}
 
 .header-item {
-	position: relative;
-	display: inline-block;
-	.font-text-normal(700);
-	padding: 0px 6px 0px 9px;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	line-height: @size-table-header;
-	cursor:pointer;
-	border-left: 1px solid transparent;
-	border-right: 1px solid transparent;
-	
-	&.sort-up, &.sort-down,	&.filter, &.group-all, 	&.group-sort {
-		color: @color-bench-text-active;
-	}
-	
-	&:hover, &.header-move{
-		color: @color-bench-text-hover;
-	}
-	
-	&.menu-open {
-		border-left: 1px solid @color-bench-light-border;
-		border-right: 1px solid @color-bench-light-border;
-		background-color: @color-bench;
-		color: @color-bench-text-active;
-		z-index: 2;
-	}
-	
+  position: relative;
+  display: inline-block;
+  .font-text-normal(700);
+  padding: 0px 6px 0px 9px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: @size-table-header;
+  cursor:pointer;
+  border-left: 1px solid transparent;
+  border-right: 1px solid transparent;
+
+  &.sort-asc, &.sort-desc,  &.filter, &.group-all,   &.group-sort {
+    color: @color-bench-text-active;
+  }
+
+  &.sort-desc:after {
+    .sort-icon('\f0d7');
+  }
+
+  &.sort-asc:after {
+    .sort-icon('\f0d8');
+  }
+
+  &:hover, &.header-move{
+    color: @color-bench-text-hover;
+  }
+
+  &.menu-open {
+    border-left: 1px solid @color-bench-light-border;
+    border-right: 1px solid @color-bench-light-border;
+    background-color: @color-bench;
+    color: @color-bench-text-active;
+    z-index: 2;
+  }
 
 }
 
 .header-resize {
-	position: absolute;
-	display: inline-block;
-	top: 0px;
-	height: @size-table-header;
-	width: 17px;
-	padding: 8px;
-	margin-left: -8px;
-	background-color: @color-bench-light-border;
-	background-clip: content-box;
-	cursor: col-resize;
-	z-index: 4;
-	
-	.header-move & {
-		background-color: @color-bench-light;
-	}
+  position: absolute;
+  display: inline-block;
+  top: 0px;
+  height: @size-table-header;
+  width: 17px;
+  padding: 8px;
+  margin-left: -8px;
+  background-color: @color-bench-light-border;
+  background-clip: content-box;
+  cursor: col-resize;
+  z-index: 4;
 
-	.menu-open + &.header-resize{
-		background-color: @color-bench-light;
-	}	
+  .header-move & {
+    background-color: @color-bench-light;
+  }
+
+  .menu-open + &.header-resize{
+    background-color: @color-bench-light;
+  }
 }
 
 /* main table data */
 
 .table-data {
-	position: relative;
-	margin: 0px 20px 0px 20px;  
-	height: calc(~"100% - " @size-desktop-menu + @size-table-header + @size-table-footer);
-	overflow: hidden;
+  position: relative;
+  margin: 0px 20px 0px 20px;
+  height: calc(~"100% - " @size-desktop-menu + @size-table-header + @size-table-footer);
+  overflow: hidden;
 }
 
 /* table rows */
 
 .table-row, .table-row-sum {
-	position:relative;
-	overflow: hidden;
-	line-height: @size-table-row;
-	height: @size-table-row;
-	border: 2px solid transparent;
-	margin-bottom: -2px;
+  position:relative;
+  overflow: hidden;
+  line-height: @size-table-row;
+  height: @size-table-row;
+  border: 2px solid transparent;
+  margin-bottom: -2px;
 }
 
-.table-row .table-cell, 
+.table-row .table-cell,
 .table-row-sum .table-cell {
-	display: table-cell;
-	padding: 0px 4px 0px 8px;
-	border-bottom: 1px solid @color-bench-light-border;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-	vertical-align: center;
-	line-height: @size-table-row - 5px;
-	color: @color-bench-text;
+  display: table-cell;
+  padding: 0px 4px 0px 8px;
+  border-bottom: 1px solid @color-bench-light-border;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: center;
+  line-height: @size-table-row - 5px;
+  color: @color-bench-text;
 }
 
 .table-row-sum .table-cell {
-	font-weight: bold;
+  font-weight: bold;
 }
 
 
 /* Selected rows */
 
-.table-row.select-top .table-cell, 
+.table-row.select-top .table-cell,
 .table-row.select-middle .table-cell,
 .table-row.select-bottom .table-cell,
 .table-row.select-single .table-cell{
-	background-color: @color-bench-select;
-	border-bottom: 1px solid @color-bench-select-border;
+  background-color: @color-bench-select;
+  border-bottom: 1px solid @color-bench-select-border;
 }
 
 .table-row.select-top {
-	border-top-color: @color-bench-select-border;
-	border-left-color: @color-bench-select-border;
-	border-right-color: @color-bench-select-border;
+  border-top-color: @color-bench-select-border;
+  border-left-color: @color-bench-select-border;
+  border-right-color: @color-bench-select-border;
 }
 
 .table-row.select-middle {
-	border-left-color: @color-bench-select-border;
-	border-right-color: @color-bench-select-border;
-	border-top: 0px; /* workaround for multicolored borders in the corner (use cell borders, see below) */
+  border-left-color: @color-bench-select-border;
+  border-right-color: @color-bench-select-border;
+  border-top: 0px; /* workaround for multicolored borders in the corner (use cell borders, see below) */
 
-	& .table-cell {
-		border-top: 2px solid transparent;
-	}
+  & .table-cell {
+    border-top: 2px solid transparent;
+  }
 }
 
 .table-row.select-bottom {
-	border-bottom-color: @color-bench-select-border;
-	border-left-color: @color-bench-select-border;
-	border-right-color: @color-bench-select-border;
-	border-top: 0px; /* workaround for multicolored borders in the corner (use cell borders, see below) */
+  border-bottom-color: @color-bench-select-border;
+  border-left-color: @color-bench-select-border;
+  border-right-color: @color-bench-select-border;
+  border-top: 0px; /* workaround for multicolored borders in the corner (use cell borders, see below) */
 
-	& .table-cell {
-		border-top: 2px solid transparent;
-		border-bottom-color: transparent;
-	}
+  & .table-cell {
+    border-top: 2px solid transparent;
+    border-bottom-color: transparent;
+  }
 }
 
 .table-row.select-single {
-	border: 2px solid @color-bench-select-border;
+  border: 2px solid @color-bench-select-border;
 
-	& .table-cell {
-		border-bottom-color: transparent;
-	}
+  & .table-cell {
+    border-bottom-color: transparent;
+  }
 }
 
 
 /* key box */
 
 .table .key-box{
-	right: 24px;
-	width: 32px;
+  right: 24px;
+  width: 32px;
 }
 
 .table .key-box.top3 { top: 10px;}

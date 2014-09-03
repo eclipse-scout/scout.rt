@@ -107,7 +107,7 @@ scout.Table.prototype._sort = function() {
   for (var c = 0; c < this.columns.length; c++) {
     var column = this.columns[c],
       order = column.$div.attr('data-sort-order'),
-      dir = column.$div.hasClass('sort-up') ? 'up' : (order >= 0 ? 'down' : '');
+      dir = column.sortAscending ? 'asc' : (order >= 0 ? 'desc' : '');
     if (order >= 0) {
       sortColumns[order] = {
         index: c,
@@ -124,7 +124,7 @@ scout.Table.prototype._sort = function() {
       var index = sortColumns[s].index,
         valueA = that.getValue(index, $(a).data('row')),
         valueB = that.getValue(index, $(b).data('row')),
-        dir = sortColumns[s].dir == 'up' ? -1 : 1;
+        dir = sortColumns[s].dir == 'asc' ? -1 : 1;
 
       if (valueA < valueB) {
         return dir;
@@ -156,44 +156,24 @@ scout.Table.prototype._sort = function() {
   }
 };
 
-scout.Table.prototype.sortChange = function($header, dir, additional, remove) {
-  $header.removeClass('sort-up sort-down');
+scout.Table.prototype.sort = function($header, dir, additional, remove) {
+  var index = $header.data('index');
+  var column = this.columns[index];
+  column.sortAscending = dir === 'asc' ? true : false;
+  column.sortActive = true;
 
-  if (remove) {
-    var attr = $header.attr('data-sort-order');
-    $header.siblings().each(function() {
-      if ($(this).attr('data-sort-order') > attr) {
-        $(this).attr('data-sort-order', parseInt($(this).attr('data-sort-order'), 0) - 1);
-      }
-    });
-    $header.removeAttr('data-sort-order');
-  } else {
-    // change sort order of clicked header
-    $header.addClass('sort-' + dir);
-
-    // when shift pressed: add, otherwise reset
-    if (additional) {
-      var clickOrder = $header.data('sort-order'),
-        maxOrder = -1;
-
-      $('.header-item').each(function() {
-        var value = parseInt($(this).attr('data-sort-order'), 0);
-        maxOrder = (value > maxOrder) ? value : maxOrder;
-      });
-
-      if (clickOrder !== undefined && clickOrder !== null) {
-        $header.attr('data-sort-order', clickOrder);
-      } else {
-        $header.attr('data-sort-order', maxOrder + 1);
-      }
-
-    } else {
-      $header.attr('data-sort-order', 0)
-        .siblings()
-        .removeClass('sort-up sort-down')
-        .attr('data-sort-order', null);
-    }
+  var data = { columnId: column.id };
+  if (additional) {
+    data.multiSort = true;
   }
+  if (remove) {
+    data.sortingRemoved = true;
+    column.sortActive = false;
+  }
+
+  this.session.send('columnSortingChanged', this.id, data);
+
+  this._header.onSortingChanged($header, dir, additional, remove);
 
   // sort and visualize
   this._sort();
@@ -471,17 +451,15 @@ scout.Table.prototype._group = function() {
   }
 };
 
-scout.Table.prototype.groupChange = function($header, draw, all) {
+scout.Table.prototype.group = function($headerItem, draw, all) {
   $('.group-sort', this.$container).removeClass('group-sort');
   $('.group-all', this.$container).removeClass('group-all');
 
   if (draw) {
-    if (all) {
-      $header.parent().addClass('group-all');
-    } else {
-      this.sortChange($header, 'up', false);
-      $header.addClass('group-sort');
+    if (!all) {
+      this.sort($headerItem, 'asc', false);
     }
+    this._header.onGroupingChanged($headerItem, all);
   }
 
   this._group();
@@ -774,28 +752,7 @@ scout.Table.prototype.hideRow = function($row) {
 // move column
 
 scout.Table.prototype.moveColumn = function($header, oldPos, newPos, dragged) {
-  var $headers = $('.header-item', this.$container),
-    $moveHeader = $headers.eq(oldPos / 2),
-    $moveResize = $moveHeader.next();
-
-  // store old position of header
-  $headers.each(function() {
-    $(this).data('old-pos', $(this).offset().left);
-  });
-
-  // change order in dom of header
-  if (newPos < 0) {
-    this._$header.prepend($moveResize);
-    this._$header.prepend($moveHeader);
-  } else {
-    $headers.eq(newPos / 2).after($moveHeader);
-    $headers.eq(newPos / 2).after($moveResize);
-  }
-
-  // move menu
-  var left = $header.position().left;
-
-  $('.table-header-menu').animateAVCSD('left', left + 20);
+  this._header.onColumnMoved($header, oldPos, newPos, dragged);
 
   // move cells
   $('.table-row, .table-row-sum').each(function() {
@@ -806,18 +763,6 @@ scout.Table.prototype.moveColumn = function($header, oldPos, newPos, dragged) {
       $cells.eq(newPos / 2).after($cells.eq(oldPos / 2));
     }
   });
-
-  // move to old position and then animate
-  if (dragged) {
-    $header.css('left', parseInt($header.css('left'), 0) + $header.data('old-pos') - $header.offset().left)
-      .animateAVCSD('left', 0);
-  } else {
-    $headers.each(function() {
-      $(this).css('left', $(this).data('old-pos') - $(this).offset().left)
-        .animateAVCSD('left', 0);
-    });
-  }
-
 };
 
 scout.Table.prototype._triggerRowsDrawn = function($rows, numRows) {

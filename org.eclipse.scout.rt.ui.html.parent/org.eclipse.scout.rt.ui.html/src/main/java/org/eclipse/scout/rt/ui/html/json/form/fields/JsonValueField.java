@@ -10,13 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form.fields;
 
-import java.beans.PropertyChangeEvent;
-
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
+import org.eclipse.scout.rt.ui.html.json.PropertyChangeEventFilterCondition;
 
 /**
  * Base class used to create JSON output for Scout form-fields with a value. When a sub-class need to provide a custom
@@ -70,13 +69,13 @@ public class JsonValueField<T extends IValueField<?>> extends JsonFormField<T> {
     String displayText = JsonObjectUtility.getString(event.getData(), IValueField.PROP_DISPLAY_TEXT);
     boolean whileTyping = event.getData().optBoolean("whileTyping");
 
-    PropertyChangeEvent propertyEvent = new PropertyChangeEvent(getModel(), IValueField.PROP_DISPLAY_TEXT, null, displayText);
-    getPropertyEventFilter().addIgnorableModelEvent(propertyEvent);
+    PropertyChangeEventFilterCondition condition = new PropertyChangeEventFilterCondition(IValueField.PROP_DISPLAY_TEXT, displayText);
+    getPropertyEventFilter().addIgnorableModelEvent(condition);
     try {
       handleUiDisplayTextChangedImpl(displayText, whileTyping);
     }
     finally {
-      getPropertyEventFilter().removeIgnorableModelEvent(propertyEvent);
+      getPropertyEventFilter().removeIgnorableModelEvent(condition);
     }
   }
 

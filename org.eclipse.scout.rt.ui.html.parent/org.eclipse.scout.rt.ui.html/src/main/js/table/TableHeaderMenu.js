@@ -51,25 +51,25 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
   $commandSort.appendDIV('header-text')
     .data('label', 'Sortierung');
 
-  var $sortUp = $commandSort.appendDiv('HeaderCommandSortUp', 'header-command')
+  var $sortAsc = $commandSort.appendDiv('HeaderCommandSortAsc', 'header-command')
     .data('label', 'aufsteigend')
     .click(function() {
-      sort('up', false, $(this).hasClass('selected'));
+      sort('asc', false, $(this).hasClass('selected'));
     });
-  var $sortDown = $commandSort.appendDiv('HeaderCommandSortDown', 'header-command')
+  var $sortDesc = $commandSort.appendDiv('HeaderCommandSortDesc', 'header-command')
     .data('label', 'absteigend')
     .click(function() {
-      sort('down', false, $(this).hasClass('selected'));
+      sort('desc', false, $(this).hasClass('selected'));
     });
-  var $sortUpAdd = $commandSort.appendDiv('HeaderCommandSortUpAdd', 'header-command')
+  var $sortAscAdd = $commandSort.appendDiv('HeaderCommandSortAscAdd', 'header-command')
     .data('label', 'zusätzlich aufsteigend')
     .click(function() {
-      sort('up', true, $(this).hasClass('selected'));
+      sort('asc', true, $(this).hasClass('selected'));
     });
-  var $sortDownAdd = $commandSort.appendDiv('HeaderCommandSortDownAdd', 'header-command')
+  var $sortDescAdd = $commandSort.appendDiv('HeaderCommandSortDescAdd', 'header-command')
     .data('label', 'zusätzlich absteigend')
     .click(function() {
-      sort('down', true, $(this).hasClass('selected'));
+      sort('desc', true, $(this).hasClass('selected'));
     });
 
   sortSelect();
@@ -173,8 +173,8 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
     .on('mouseleave', '.header-command', leaveCommand);
 
   // copy flags to menu
-  if ($header.hasClass('sort-up')) $menuHeader.addClass('sort-up');
-  if ($header.hasClass('sort-down')) $menuHeader.addClass('sort-down');
+  if ($header.hasClass('sort-asc')) $menuHeader.addClass('sort-asc');
+  if ($header.hasClass('sort-desc')) $menuHeader.addClass('sort-desc');
   if ($header.hasClass('filter')) $menuHeader.addClass('filter');
 
   function removeMenu(event) {
@@ -226,8 +226,8 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
   }
 
   function sort(dir, additional, remove) {
-    table.groupChange($header, false, false);
-    table.sortChange($header, dir, additional, remove);
+    table.group($header, false, false);
+    table.sort($header, dir, additional, remove);
 
     sortSelect();
     groupSelect();
@@ -240,19 +240,19 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
     $('.header-command', $commandSort).removeClass('selected');
 
     if (sortCount == 1) {
-      if ($header.hasClass('sort-up')) {
-        $sortUp.addClass('selected');
+      if ($header.hasClass('sort-asc')) {
+        $sortAsc.addClass('selected');
         addIcon = null;
-      } else if ($header.hasClass('sort-down')) {
-        $sortDown.addClass('selected');
+      } else if ($header.hasClass('sort-desc')) {
+        $sortDesc.addClass('selected');
         addIcon = null;
       }
     } else if (sortCount > 1) {
-      if ($header.hasClass('sort-up')) {
-        $sortUpAdd.addClass('selected');
+      if ($header.hasClass('sort-asc')) {
+        $sortAscAdd.addClass('selected');
         addIcon = parseInt($header.attr('data-sort-order'), 0) + 1;
-      } else if ($header.hasClass('sort-down')) {
-        $sortDownAdd.addClass('selected');
+      } else if ($header.hasClass('sort-desc')) {
+        $sortDescAdd.addClass('selected');
         addIcon = parseInt($header.attr('data-sort-order'), 0) + 1;
       }
     } else {
@@ -260,23 +260,23 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
     }
 
     if (addIcon) {
-      $sortUpAdd.show().attr('data-icon', addIcon);
-      $sortDownAdd.show().attr('data-icon', addIcon);
+      $sortAscAdd.show().attr('data-icon', addIcon);
+      $sortDescAdd.show().attr('data-icon', addIcon);
     } else {
-      $sortUpAdd.hide();
-      $sortDownAdd.hide();
+      $sortAscAdd.hide();
+      $sortDescAdd.hide();
     }
   }
 
   function groupAll() {
-    table.groupChange($header, !$(this).hasClass('selected'), true);
+    table.group($header, !$(this).hasClass('selected'), true);
 
     sortSelect();
     groupSelect();
   }
 
   function groupSort() {
-    table.groupChange($header, !$(this).hasClass('selected'), false);
+    table.group($header, !$(this).hasClass('selected'), false);
 
     sortSelect();
     groupSelect();

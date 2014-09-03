@@ -54,9 +54,11 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
   public static final String EVENT_ROWS_SELECTED = "rowsSelected";
   public static final String EVENT_ROWS_DELETED = "rowsDeleted";
   public static final String EVENT_ALL_ROWS_DELETED = "allRowsDeleted";
+  public static final String EVENT_COLUMN_SORTING_CHANGED = "columnSortingChanged";
   public static final String EVENT_RELOAD = "reload";
   public static final String PROP_ROW_IDS = "rowIds";
   public static final String PROP_ROW_ID = "rowId";
+  public static final String PROP_COLUMN_ID = "columnId";
   public static final String PROP_CONTROLS = "controls";
   public static final String PROP_SELECTED_ROW_IDS = "selectedRowIds";
 
@@ -272,31 +274,54 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
     else if (EVENT_RELOAD.equals(event.getType())) {
       handleUiReload(event, res);
     }
+    else if (EVENT_COLUMN_SORTING_CHANGED.equals(event.getType())) {
+      handleUiColumnSortingChanged(event, res);
+    }
     else {
       super.handleUiEvent(event, res);
     }
   }
 
   protected void handleUiRowClicked(JsonEvent event, JsonResponse res) {
-    final ITableRow tableRow = extractTableRow(event.getData());
+    ITableRow tableRow = extractTableRow(event.getData());
     getModel().getUIFacade().fireRowClickFromUI(tableRow);
   }
 
   protected void handleUiRowsSelected(JsonEvent event, JsonResponse res) {
-    final List<ITableRow> tableRows = extractTableRows(event.getData());
-    TableEvent tableEvent = new TableEvent(getModel(), TableEvent.TYPE_ROWS_SELECTED, tableRows);
-    getTableEventFilter().addIgnorableModelEvent(tableEvent);
+    List<ITableRow> tableRows = extractTableRows(event.getData());
+    TableEventFilterCondition filterCondition = new TableEventFilterCondition(TableEvent.TYPE_ROWS_SELECTED, tableRows);
+    getTableEventFilter().addIgnorableModelEvent(filterCondition);
     try {
       getModel().getUIFacade().setSelectedRowsFromUI(tableRows);
     }
     finally {
-      getTableEventFilter().removeIgnorableModelEvent(tableEvent);
+      getTableEventFilter().removeIgnorableModelEvent(filterCondition);
     }
   }
 
   protected void handleUiReload(JsonEvent event, JsonResponse res) {
     if (getModel() instanceof ITable5) {
       ((ITable5) getModel()).fireTableReloadFromUI();
+    }
+  }
+
+  protected void handleUiColumnSortingChanged(JsonEvent event, JsonResponse res) {
+    IColumn column = extractColumn(event.getData());
+    boolean multiSort = event.getData().optBoolean("multiSort");
+    boolean sortingRemoved = event.getData().optBoolean("sortingRemoved");
+
+    TableEventFilterCondition filterCondition = new TableEventFilterCondition(TableEvent.TYPE_ROW_ORDER_CHANGED);
+    getTableEventFilter().addIgnorableModelEvent(filterCondition);
+    try {
+      if (sortingRemoved && getModel() instanceof ITable5) {
+        ((ITable5) getModel()).fireSortColumnRemovedFromUI(column);
+      }
+      else {
+        getModel().getUIFacade().fireHeaderSortFromUI(column, multiSort);
+      }
+    }
+    finally {
+      getTableEventFilter().removeIgnorableModelEvent(filterCondition);
     }
   }
 
@@ -369,6 +394,10 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
       json.put("summary", column.isSummary());
       json.put(IColumn.PROP_VISIBLE, column.isVisible());
       json.put(IColumn.PROP_HORIZONTAL_ALIGNMENT, column.getHorizontalAlignment());
+      if (column.isSortActive() && column.isSortExplicit()) {
+        json.put("sortActive", true);
+        json.put("sortAscending", column.isSortAscending());
+      }
 
       if (column instanceof INumberColumn<?>) {
         //Use localized pattern which contains the relevant chars for the current locale using DecimalFormatSymbols
@@ -435,6 +464,11 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
 
   public ITableRow extractTableRow(JSONObject json) {
     return getTableRowForRowId(JsonObjectUtility.getString(json, PROP_ROW_ID));
+  }
+
+  public IColumn extractColumn(JSONObject json) {
+    String columnId = JsonObjectUtility.getString(json, PROP_COLUMN_ID);
+    return getModel().getColumnSet().getColumnById(columnId);
   }
 
   protected List<ITableRow> jsonToTableRows(JSONArray rowIds) {

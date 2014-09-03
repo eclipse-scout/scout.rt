@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.ui.html.json.AbstractEventFilter;
 
-public class TableEventFilter extends AbstractEventFilter<TableEvent> {
+public class TableEventFilter extends AbstractEventFilter<TableEvent, TableEventFilterCondition> {
 
   private ITable m_source;
 
@@ -28,10 +28,14 @@ public class TableEventFilter extends AbstractEventFilter<TableEvent> {
 
   @Override
   public TableEvent filterIgnorableModelEvent(TableEvent event) {
-    for (TableEvent eventToIgnore : getIgnorableModelEvents()) {
-      if (eventToIgnore.getType() == event.getType()) {
+    for (TableEventFilterCondition condition : getIgnorableModelEvents()) {
+      if (condition.getType() == event.getType()) {
+        if (!condition.checkRows()) {
+          return null;
+        }
+
         List<ITableRow> rows = new ArrayList<>(event.getRows());
-        rows.removeAll(eventToIgnore.getRows());
+        rows.removeAll(condition.getRows());
         if (rows.size() == 0) {
           //Event should be ignored if no nodes remain or if the event contained no nodes at all
           return null;
