@@ -16,10 +16,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Locale;
 
 import org.junit.Test;
 
@@ -470,27 +468,5 @@ public class StringUtilityTest {
     assertEquals("subsitute", StringUtility.substituteWhenEmpty("", "subsitute"));
     assertEquals("subsitute", StringUtility.substituteWhenEmpty("\t\n  \t\n", "subsitute"));
     assertEquals("5", StringUtility.substituteWhenEmpty(Integer.valueOf(5), "subsitute"));
-  }
-
-  @Test
-  public void testIsWithinNumberFormatLimits() {
-    for (Locale locale : Locale.getAvailableLocales()) {
-      DecimalFormat format = (DecimalFormat) DecimalFormat.getNumberInstance(locale);
-      format.setMaximumIntegerDigits(3);
-      format.setMaximumFractionDigits(2);
-      char decimalSeparator = format.getDecimalFormatSymbols().getDecimalSeparator();
-
-      assertFalse(StringUtility.isWithinNumberFormatLimits(format, "123", 2, 0, "45"));
-      assertTrue(StringUtility.isWithinNumberFormatLimits(format, "1", 1, 0, "23"));
-
-      assertFalse(StringUtility.isWithinNumberFormatLimits(format, "123", 2, 0, decimalSeparator + "456"));
-      assertTrue(StringUtility.isWithinNumberFormatLimits(format, "1", 1, 0, decimalSeparator + "23"));
-
-      assertFalse(StringUtility.isWithinNumberFormatLimits(format, "123", 1, 2, "567"));
-      assertTrue(StringUtility.isWithinNumberFormatLimits(format, "123", 1, 2, "56"));
-
-      assertFalse(StringUtility.isWithinNumberFormatLimits(format, "123", 1, 2, "567" + decimalSeparator + "7"));
-      assertTrue(StringUtility.isWithinNumberFormatLimits(format, "123", 1, 2, "56" + decimalSeparator + "78"));
-    }
   }
 }
