@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
-import org.eclipse.rap.rwt.lifecycle.WidgetUtil;
+import org.eclipse.rap.rwt.widgets.WidgetUtil;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -442,7 +442,7 @@ public class RapMock extends AbstractGuiMock {
   @Override
   public void gotoField(FieldType type, int index) {
     Control c = waitForIndexedField(type, index);
-    setCurrentWidgetId(WidgetUtil.getAdapter(c).getId());
+    setCurrentWidgetId(WidgetUtil.getId(c));
     if (FieldType.Text.equals(type)) {
       setCurrentWidgetId(new StringBuffer("//*[@id=\"").append(getCurrentWidgetId_()).append("\"]/input").toString());
     }
@@ -462,7 +462,7 @@ public class RapMock extends AbstractGuiMock {
       throw new IllegalArgumentException("y should be in [0, 1] range.");
     }
     final Control c = waitForScoutField(name);
-    setCurrentWidgetId(WidgetUtil.getAdapter(c).getId());
+    setCurrentWidgetId(WidgetUtil.getId(c));
     if (c instanceof Text) {
       setCurrentWidgetId(new StringBuffer("//*[@id=\"").append(getCurrentWidgetId_()).append("\"]/input").toString());
     }
@@ -474,7 +474,7 @@ public class RapMock extends AbstractGuiMock {
     syncExec(new WaitCondition<Object>() {
       @Override
       public Object run() throws Throwable {
-        setCurrentWidgetId(WidgetUtil.getAdapter(table).getId());
+        setCurrentWidgetId(WidgetUtil.getId(table));
         StringBuffer xpathWidgetId = new StringBuffer("//*[@id=\"").append(getCurrentWidgetId_()).append("\"]/div[1]/div[").append(rowIndex + table.getColumnCount()).append("]/div");
         if (columnIndex > 0) {
           xpathWidgetId.append("[").append(columnIndex).append("]");
@@ -521,7 +521,7 @@ public class RapMock extends AbstractGuiMock {
     syncExec(new WaitCondition<Object>() {
       @Override
       public Object run() throws Throwable {
-        setCurrentWidgetId(WidgetUtil.getAdapter(tree).getId());
+        setCurrentWidgetId(WidgetUtil.getId(tree));
         TreeItem[] items = tree.getItems();
         for (int i = 0; i < items.length; i++) {
           if (nodeText.equals(items[i].getText())) {
@@ -656,7 +656,7 @@ public class RapMock extends AbstractGuiMock {
   @Override
   public void gotoPoint(int x, int y) {
     final Control c = waitForLocatedField(x, y);
-    setCurrentWidgetId(WidgetUtil.getAdapter(c).getId());
+    setCurrentWidgetId(WidgetUtil.getId(c));
   }
 
   @Override
@@ -672,7 +672,7 @@ public class RapMock extends AbstractGuiMock {
       @Override
       public Object run() throws Throwable {
         Control focusControl = Display.getCurrent().getFocusControl();
-        setCurrentWidgetId(WidgetUtil.getAdapter(focusControl).getId());
+        setCurrentWidgetId(WidgetUtil.getId(focusControl));
         return null;
       }
     });

@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.rap.rwt.SingletonUtil;
-import org.eclipse.rap.rwt.lifecycle.WidgetUtil;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -32,11 +31,12 @@ import org.eclipse.swt.widgets.Widget;
  * - If the same form is opened multiple times<br>
  * - If the scout object is not a form field and used inside a template field. For example a {@link IMenu} used in a
  * smartfield template.
- * 
+ *
  * @since 3.8.2
  */
 public class CustomWidgetIdGenerator {
   private Map<String, Integer> m_existingIds = new HashMap<String, Integer>();
+  private static final String CUSTOM_WIDGET_ID = "org.eclipse.rap.rwt.customWidgetId";
 
   public static CustomWidgetIdGenerator getInstance() {
     return SingletonUtil.getSessionInstance(CustomWidgetIdGenerator.class);
@@ -56,8 +56,8 @@ public class CustomWidgetIdGenerator {
     List<Widget> children = RwtUtility.findChildComponents(widget, Widget.class);
     String customWidgetId = newId(widget, scoutObject, prefix);
     for (Widget childWidget : children) {
-      if (childWidget.getData(WidgetUtil.CUSTOM_WIDGET_ID) == null) {
-        childWidget.setData(WidgetUtil.CUSTOM_WIDGET_ID, newChildId(customWidgetId, childIndex));
+      if (childWidget.getData(CUSTOM_WIDGET_ID) == null) {
+        childWidget.setData(CUSTOM_WIDGET_ID, newChildId(customWidgetId, childIndex));
         childIndex++;
       }
     }

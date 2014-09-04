@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.ui.rap.keystroke;
 
 import org.eclipse.rap.rwt.RWT;
-import org.eclipse.rap.rwt.lifecycle.PhaseListener;
 import org.eclipse.scout.rt.ui.rap.form.fields.stringfield.RwtScoutStringField;
 import org.eclipse.swt.SWT;
 
@@ -20,7 +19,6 @@ public abstract class RwtKeyStroke implements IRwtKeyStroke {
   private final int m_stateMask;
   private final int m_keyCode;
   private final boolean m_registerActiveKey;
-  private PhaseListener m_phaseListener;
 
   public RwtKeyStroke(int keyCode) {
     this(keyCode, SWT.NONE);
@@ -59,22 +57,4 @@ public abstract class RwtKeyStroke implements IRwtKeyStroke {
   public boolean isRegisterActiveKey() {
     return m_registerActiveKey;
   }
-
-  /**
-   * @return the phaseListener
-   */
-  @Override
-  public PhaseListener getPhaseListener() {
-    return m_phaseListener;
-  }
-
-  /**
-   * @param phaseListener
-   *          the phaseListener to set
-   */
-  @Override
-  public void setPhaseListener(PhaseListener phaseListener) {
-    m_phaseListener = phaseListener;
-  }
-
 }

@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.ui.rap.keystroke;
 
 import org.eclipse.rap.rwt.RWT;
-import org.eclipse.rap.rwt.lifecycle.PhaseListener;
 import org.eclipse.scout.rt.ui.rap.form.fields.stringfield.RwtScoutStringField;
 import org.eclipse.swt.widgets.Event;
 
@@ -19,7 +18,7 @@ public interface IRwtKeyStroke {
 
   /**
    * set e.doit false to avoid
-   * 
+   *
    * @param e
    */
   void handleUiAction(Event e);
@@ -35,8 +34,4 @@ public interface IRwtKeyStroke {
    *         see {@link RwtScoutStringField}
    */
   boolean isRegisterActiveKey();
-
-  void setPhaseListener(PhaseListener phaseListener);
-
-  PhaseListener getPhaseListener();
 }

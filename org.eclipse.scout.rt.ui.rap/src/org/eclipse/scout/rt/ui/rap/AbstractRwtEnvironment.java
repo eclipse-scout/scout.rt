@@ -34,9 +34,11 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.rap.rwt.RWT;
 import org.eclipse.rap.rwt.application.AbstractEntryPoint;
-import org.eclipse.rap.rwt.lifecycle.PhaseEvent;
-import org.eclipse.rap.rwt.lifecycle.PhaseId;
-import org.eclipse.rap.rwt.lifecycle.PhaseListener;
+import org.eclipse.rap.rwt.internal.application.ApplicationContextImpl;
+import org.eclipse.rap.rwt.internal.protocol.RequestMessage;
+import org.eclipse.rap.rwt.internal.protocol.ResponseMessage;
+import org.eclipse.rap.rwt.internal.remote.MessageFilter;
+import org.eclipse.rap.rwt.internal.remote.MessageFilterChain;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.LocaleThreadLocal;
@@ -263,7 +265,11 @@ public abstract class AbstractRwtEnvironment extends AbstractEntryPoint implemen
     }
     detachBusyHandler();
     if (m_requestInterceptor != null) {
-      RWT.getLifeCycle().removePhaseListener(m_requestInterceptor);
+      /** TODO: remove cast when {@link ApplicationContextImpl#addMessageFilter(MessageFilter)} is API */
+      ApplicationContextImpl impl = (ApplicationContextImpl) RWT.getApplicationContext();
+      if (impl != null) {
+        impl.removeMessageFilter(m_requestInterceptor);
+      }
       m_requestInterceptor = null;
     }
 
@@ -338,9 +344,14 @@ public abstract class AbstractRwtEnvironment extends AbstractEntryPoint implemen
       m_status = RwtEnvironmentEvent.STARTING;
 
       // enable HTTP request handling
-      // the first beforeRequest-event has to be fired manually, because currently no PhaseListener is attached
+      // the first beforeRequest-event has to be fired manually, because currently no MessageFilter is attached
       beforeHttpRequest();
-      RWT.getLifeCycle().addPhaseListener(m_requestInterceptor);
+
+      /** TODO: remove cast when {@link ApplicationContextImpl#addMessageFilter(MessageFilter)} is API */
+      ApplicationContextImpl impl = (ApplicationContextImpl) RWT.getApplicationContext();
+      if (impl != null) {
+        impl.addMessageFilter(m_requestInterceptor);
+      }
 
       fireEnvironmentChanged(new RwtEnvironmentEvent(this, m_status));
 
@@ -474,7 +485,7 @@ public abstract class AbstractRwtEnvironment extends AbstractEntryPoint implemen
   /**
    * Do NOT override this internal method, instead use {@link #beforeHttpRequest()}.
    */
-  protected void beforeHttpRequestInternal() {
+  protected final void beforeHttpRequestInternal() {
     if (getClientSession() != null) {
       LocaleThreadLocal.set(getClientSession().getLocale());
     }
@@ -491,7 +502,7 @@ public abstract class AbstractRwtEnvironment extends AbstractEntryPoint implemen
   /**
    * Do NOT override this internal method, instead use {@link #afterHttpRequest()}.
    */
-  protected void afterHttpRequestInternal() {
+  protected final void afterHttpRequestInternal() {
     afterHttpRequest();
   }
 
@@ -1409,31 +1420,16 @@ public abstract class AbstractRwtEnvironment extends AbstractEntryPoint implemen
     }
   }
 
-  private final class P_RequestInterceptor implements PhaseListener {
-    private static final long serialVersionUID = 1L;
+  private class P_RequestInterceptor implements MessageFilter {
 
     @Override
-    public PhaseId getPhaseId() {
-      return PhaseId.ANY;
-    }
-
-    @Override
-    public void beforePhase(PhaseEvent event) {
-      if (event.getPhaseId() != PhaseId.PREPARE_UI_ROOT) {
-        return;
-      }
-
+    public ResponseMessage handleMessage(RequestMessage request, MessageFilterChain chain) {
       beforeHttpRequestInternal();
-    }
-
-    @Override
-    public void afterPhase(PhaseEvent event) {
-      if (event.getPhaseId() != PhaseId.RENDER) {
-        return;
-      }
-
+      ResponseMessage ret = chain.handleMessage(request);
       afterHttpRequestInternal();
+      return ret;
     }
+
   }
 
   private class P_DisplayDisposeListener implements Listener {

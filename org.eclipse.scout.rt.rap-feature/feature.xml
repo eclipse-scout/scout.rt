@@ -25,7 +25,7 @@
    </url>
 
    <requires>
-      <import feature="org.eclipse.rap.feature" version="2.0.0" match="compatible"/>
+      <import feature="org.eclipse.rap.feature" version="2.3.0" match="greaterOrEqual"/>
       <import feature="org.eclipse.scout.rt.client" version="4.1.0" match="compatible"/>
    </requires>
 
