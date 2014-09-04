@@ -35,6 +35,10 @@ scout.Table.prototype.init = function(model, session) {
     this.configurator.configure(this);
   }
   this._keystrokeAdapter = new scout.TableKeystrokeAdapter(this);
+
+  for (var i=0; i < model.columns.length;i++) {
+    model.columns[i].index = i;
+  }
 };
 
 scout.Table.prototype._createTableConfigurator = function() {
@@ -106,25 +110,19 @@ scout.Table.prototype._sort = function() {
   // find all sort columns
   for (var c = 0; c < this.columns.length; c++) {
     var column = this.columns[c],
-      order = column.$div.attr('data-sort-order'),
-      dir = column.sortAscending ? 'asc' : (order >= 0 ? 'desc' : '');
+      order = column.$div.attr('data-sort-order');
     if (order >= 0) {
-      sortColumns[order] = {
-        index: c,
-        dir: dir
-      };
+      sortColumns[order] = column;
     }
   }
 
   // compare rows
-  var that = this;
-
-  function compare(a, b) {
+  function compare(row1, row2) {
     for (var s = 0; s < sortColumns.length; s++) {
-      var index = sortColumns[s].index,
-        valueA = that.getValue(index, $(a).data('row')),
-        valueB = that.getValue(index, $(b).data('row')),
-        dir = sortColumns[s].dir == 'asc' ? -1 : 1;
+      column = sortColumns[s];
+      var valueA = this.getValueByModel(column, row1);
+      var valueB = this.getValueByModel(column, row2);
+      var dir = column.sortActive && column.sortAscending ? -1 : 1;
 
       if (valueA < valueB) {
         return dir;
@@ -135,20 +133,32 @@ scout.Table.prototype._sort = function() {
 
     return 0;
   }
+  this.rows.sort(compare.bind(this));
+  this._renderRowOrder();
+};
 
+scout.Table.prototype._renderRowOrder = function() {
   var $rows = this.findRows();
+  var $sortedRows = $();
+  var animationRowLimit = 50;
 
-  // store old position
-  $rows.each(function() {
-    $(this).data('old-top', $(this).offset().top);
-  });
+  //store old position
+  if ($rows.length < animationRowLimit) {
+    $rows.each(function() {
+      $(this).data('old-top', $(this).offset().top);
+    });
+  }
+
+  for (var i=0;i<this.rows.length;i++) {
+    var $row = this.findRowById(this.rows[i].id);
+    $sortedRows.push($row[0]);
+  }
 
   // change order in dom
-  $rows = $rows.sort(compare);
-  this.$dataScroll.prepend($rows);
+  this.$dataScroll.prepend($sortedRows);
 
-  // for less than 100 rows: move to old position and then animate
-  if ($rows.length < 100) {
+  // for less than animationRowLimit rows: move to old position and then animate
+  if ($rows.length < animationRowLimit) {
     $rows.each(function() {
       $(this).css('top', $(this).data('old-top') - $(this).offset().top)
         .animateAVCSD('top', 0);
@@ -356,8 +366,23 @@ scout.Table.prototype.sendReload = function() {
   this.session.send('reload', this.id);
 };
 
-scout.Table.prototype.getValue = function(col, row) {
-  var cell = this.rows[row].cells[col];
+scout.Table.prototype.getValue = function(colIndex, rowIndex) {
+  var cell = this.rows[rowIndex].cells[colIndex];
+
+  if (cell === null) { //cell may be a number so don't use !cell
+    return null;
+  }
+  if (typeof cell !== 'object') {
+    return cell;
+  }
+  if (cell.value !== undefined) {
+    return cell.value;
+  }
+  return cell.text;
+};
+
+scout.Table.prototype.getValueByModel = function(col, row) {
+  var cell = row.cells[col.index];
 
   if (cell === null) { //cell may be a number so don't use !cell
     return null;
@@ -608,6 +633,9 @@ scout.Table.prototype.getModelRowsByIds = function(rowIds) {
     row = this.rows[i];
     if (rowIds.indexOf(row.id) > -1) {
       rows.push(this.rows[i]);
+      if (rows.length === rowIds.length) {
+        return rows;
+      }
     }
   }
   return rows;
@@ -826,6 +854,26 @@ scout.Table.prototype._setMultiSelect = function(multiSelect) {
   // nop
 };
 
+scout.Table.prototype._onRowOrderChanged = function(rowIds) {
+  var newPos, rows, row;
+  if (rowIds.length !== this.rows.length) {
+    throw "Order changed event may not be processed because lengths of the arrays differ.";
+  }
+
+  // update model
+  rows = new Array(this.rows.length);
+  for (var i=0; i < this.rows.length; i++) {
+    row = this.rows[i];
+    newPos = rowIds.indexOf(this.rows[i].id);
+    rows[newPos] = row;
+  }
+  this.rows = rows;
+
+  if (this.rendered) {
+    this._renderRowOrder();
+  }
+};
+
 scout.Table.prototype.onModelAction = function(event) {
   if (event.type == 'rowsInserted') {
     this.insertRows(event.rows);
@@ -835,6 +883,8 @@ scout.Table.prototype.onModelAction = function(event) {
     this.deleteAllRows();
   } else if (event.type == 'rowsSelected') {
     this.selectRowsByIds(event.rowIds);
+  } else if (event.type == 'rowOrderChanged') {
+    this._onRowOrderChanged(event.rowIds);
   } else {
     $.log('Model event not handled. Widget: scout.Table. Event: ' + event.type + '.');
   }

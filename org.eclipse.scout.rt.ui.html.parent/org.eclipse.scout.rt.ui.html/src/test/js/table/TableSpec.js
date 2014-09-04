@@ -526,6 +526,51 @@ describe("Table", function() {
 
     });
 
+    describe("rowOrderChanged event", function() {
+      var model, table, row0, row1, row2;
+
+      beforeEach(function() {
+        model = helper.createModelFixture(2, 3);
+        table = helper.createTable(model);
+        row0 = model.rows[0];
+        row1 = model.rows[1];
+        row2 = model.rows[2];
+      });
+
+      function createRowOrderChangedEvent(model, rowIds) {
+        return {
+          id: model.id,
+          rowIds: rowIds,
+          type: 'rowOrderChanged'
+        };
+      }
+
+      it("reorders the model rows", function() {
+        var message = {
+          events: [createRowOrderChangedEvent(model, [row2.id, row1.id, row0.id])]
+        };
+        session._processSuccessResponse(message);
+
+        expect(table.rows.length).toBe(3);
+        expect(table.rows[0]).toBe(row2);
+        expect(table.rows[1]).toBe(row1);
+        expect(table.rows[2]).toBe(row0);
+      });
+
+      it("reorders the html nodes", function() {
+        table.render(session.$entryPoint);
+
+        var message = {
+          events: [createRowOrderChangedEvent(model, [row2.id, row1.id, row0.id])]
+        };
+        session._processSuccessResponse(message);
+
+        var $rows = table.findRows();
+        expect($rows.eq(0).attr('id')).toBe('2');
+        expect($rows.eq(1).attr('id')).toBe('1');
+        expect($rows.eq(2).attr('id')).toBe('0');
+      });
+    });
   });
 
   describe("onModelPropertyChange", function() {
