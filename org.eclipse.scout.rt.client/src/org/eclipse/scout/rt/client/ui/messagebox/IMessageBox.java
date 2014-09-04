@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -77,19 +77,40 @@ public interface IMessageBox extends IPropertyObserver {
 
   long getAutoCloseMillis();
 
+  /**
+   * To close the message box automatically after the specified period of time. By default, the result
+   * {@link #CANCEL_OPTION} is returned after being closed. This can be changed by using {@link #startMessageBox(int)}
+   * to construct the message box.
+   *
+   * @param millis
+   *          timeout [ms]
+   */
   void setAutoCloseMillis(long millis);
 
   String getCopyPasteText();
 
   void setCopyPasteText(String s);
 
+  /**
+   * To query whether the message box is open or closed.
+   *
+   * @return <code>true</code> if the message box is open, <code>false</code> if closed.
+   */
   boolean isOpen();
 
   /**
-   * start a blocking message box and wait until it returns the result
-   * (YES,NO,CANCEL)
+   * Opens a message box. This call blocks until the message box is closed.
+   *
+   * @return The close result ({@link #YES_OPTION}, {@link #NO_OPTION}, {@link #CANCEL_OPTION}).
    */
   int startMessageBox();
 
+  /**
+   * Opens a message box. This call blocks until the message box is closed.
+   *
+   * @param defaultResult
+   *          default result to return if not closed by the user (e.g. by auto-close timer).
+   * @return The close result ({@link #YES_OPTION}, {@link #NO_OPTION}, {@link #CANCEL_OPTION}).
+   */
   int startMessageBox(int defaultResult);
 }
