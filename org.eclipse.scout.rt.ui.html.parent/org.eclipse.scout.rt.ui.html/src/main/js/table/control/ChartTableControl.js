@@ -29,7 +29,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
 
   this._filterResetListener = this.table.events.on(scout.Table.GUI_EVENT_FILTER_RESETTED, function(event) {
     //  $('.main-chart.selected, .map-item.selected').removeClassSVG('selected');
-    that.$container.find('.main-chart.selected').removeClassSVG('selected');
+    that.$parent.find('.main-chart.selected').removeClassSVG('selected');
   });
 
   // create container

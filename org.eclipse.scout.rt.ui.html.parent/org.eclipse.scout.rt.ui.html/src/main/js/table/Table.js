@@ -18,7 +18,6 @@ scout.Table = function() {
   this._addAdapterProperties(['controls', 'menus']);
   this.events = new scout.EventSupport();
   this._filterMap = {};
-  this.desktopMenuContributor;
 };
 scout.inherits(scout.Table, scout.ModelAdapter);
 
@@ -120,8 +119,8 @@ scout.Table.prototype._sort = function() {
   function compare(row1, row2) {
     for (var s = 0; s < sortColumns.length; s++) {
       column = sortColumns[s];
-      var valueA = this.getValueByModel(column, row1);
-      var valueB = this.getValueByModel(column, row2);
+      var valueA = this.getValue(column.index, row1);
+      var valueB = this.getValue(column.index, row2);
       var dir = column.sortActive && column.sortAscending ? -1 : 1;
 
       if (valueA < valueB) {
@@ -195,7 +194,7 @@ scout.Table.prototype.drawData = function() {
   this.selectionHandler.dataDrawn();
 };
 
-scout.Table.prototype._buildRowDiv = function(row, index) {
+scout.Table.prototype._buildRowDiv = function(row) {
   var column, width, style, align, value, alignment;
   var rowWidth = this._header.totalWidth + 4;
   var rowClass = 'table-row ';
@@ -206,14 +205,14 @@ scout.Table.prototype._buildRowDiv = function(row, index) {
   // FIXME Check if possible to use $.makeDiv (but maybe it's too slow)
   var unselectable = (scout.device.supportsCssUserSelect() ? '' : ' unselectable="on"'); // workaround for IE 9
 
-  var rowDiv = '<div id="' + row.id + '" class="' + rowClass + '" data-row=' + index + ' style="width: ' + rowWidth + 'px"' + unselectable + '>';
+  var rowDiv = '<div id="' + row.id + '" class="' + rowClass + '" style="width: ' + rowWidth + 'px"' + unselectable + '>';
   for (var c = 0; c < row.cells.length; c++) {
     column = this.columns[c];
     width = column.width;
     style = (width === 0) ? 'display: none; ' : 'min-width: ' + width + 'px; max-width: ' + width + 'px; ';
     alignment =  scout.Table.parseHorizontalAlignment(column.horizontalAlignment);
     align = alignment !== 'left' ? 'text-align: '+ alignment + '; ' : '';
-    value = this.getText(c, index);
+    value = this.getText(c, row);
 
     rowDiv += '<div class="table-cell" style="' + style + align + '"' + unselectable + '>' + value + '</div>';
   }
@@ -366,23 +365,8 @@ scout.Table.prototype.sendReload = function() {
   this.session.send('reload', this.id);
 };
 
-scout.Table.prototype.getValue = function(colIndex, rowIndex) {
-  var cell = this.rows[rowIndex].cells[colIndex];
-
-  if (cell === null) { //cell may be a number so don't use !cell
-    return null;
-  }
-  if (typeof cell !== 'object') {
-    return cell;
-  }
-  if (cell.value !== undefined) {
-    return cell.value;
-  }
-  return cell.text;
-};
-
-scout.Table.prototype.getValueByModel = function(col, row) {
-  var cell = row.cells[col.index];
+scout.Table.prototype.getValue = function(colIndex, row) {
+  var cell = row.cells[colIndex];
 
   if (cell === null) { //cell may be a number so don't use !cell
     return null;
@@ -397,7 +381,7 @@ scout.Table.prototype.getValueByModel = function(col, row) {
 };
 
 scout.Table.prototype.getText = function(col, row) {
-  var cell = this.rows[row].cells[col];
+  var cell = row.cells[col];
 
   if (cell === null) { //cell may be a number so don't use !cell
     return '';
@@ -433,7 +417,9 @@ scout.Table.prototype._group = function() {
     sum = [];
 
   for (var r = 0; r < $rows.length; r++) {
-    var row = $rows.eq(r).data('row');
+    var rowId = $rows.eq(r).attr('id');
+    //FIXME CGU is it possible to link row to $row? because table.getModelRowById does a lookup
+    var row = this.getModelRowById(rowId);
 
     // calculate sum per column
     for (var c = 0; c < $cols.length; c++) {
@@ -446,7 +432,9 @@ scout.Table.prototype._group = function() {
     }
 
     // test if sum should be shown, if yes: reset sum-array
-    var nextRow = $rows.eq(r + 1).data('row');
+    var nextRowId = $rows.eq(r + 1).attr('id');
+    var nextRow = this.getModelRowById(rowId);
+
     if ((r == $rows.length - 1) || (!all && this.getText(groupIndex, row) != this.getText(groupIndex, nextRow)) && sum.length > 0) {
       for (c = 0; c < $cols.length; c++) {
         var $div;
@@ -545,7 +533,8 @@ scout.Table.prototype.colorData = function(mode, colorColumn) {
   });
 
   for (var s = 0; s < $rows.length; s++) {
-    var row = $rows.eq(s).data('row'),
+    var rowId = $rows.eq(s).attr('id'),
+      row = this.getModelRowById(rowId),
       value = this.getValue(colorColumn, row);
 
     colorFunc($rows.eq(s).children().eq(c), value);
@@ -624,6 +613,16 @@ scout.Table.prototype.findRows = function() {
 
 scout.Table.prototype.findRowById = function(rowId) {
   return this.$dataScroll.find('#' + rowId);
+};
+
+scout.Table.prototype.getModelRowById = function(rowId) {
+  var row, i;
+  for (i=0; i < this.rows.length; i++){
+    row = this.rows[i];
+    if (row.id === rowId) {
+      return row;
+    }
+  }
 };
 
 scout.Table.prototype.getModelRowsByIds = function(rowIds) {

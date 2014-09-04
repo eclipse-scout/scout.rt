@@ -335,7 +335,8 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
     // filter function
     if (column.filter.length) {
       column.filterFunc = function($row) {
-        var textX = table.getValue(xAxis.column, $row.data('row')),
+        var row = table.getModelRowById($row.attr('id')),
+          textX = table.getValue(xAxis.column, row),
           nX = xAxis.norm(textX);
         return (column.filter.indexOf(nX) > -1);
       };
