@@ -21,6 +21,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import javax.security.auth.Subject;
 import javax.servlet.http.HttpSession;
@@ -29,7 +30,6 @@ import javax.servlet.http.HttpSessionBindingListener;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.rap.rwt.RWT;
 import org.eclipse.rap.rwt.lifecycle.PhaseEvent;
@@ -43,7 +43,7 @@ import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ClientAsyncJob;
+import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ILocaleListener;
@@ -225,11 +225,9 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
   }
 
   /**
-   * This method is synchronized because the UI thread disposing the old environment has to run first before the
-   * {@link P_HttpSessionInvalidationListener}) continues to close the desktop. Synchronization is done on the
-   * environment instance.
+   * This method is called when the {@link Display} of this environment is disposed.
    */
-  protected synchronized void dispose() {
+  protected void dispose() {
     try {
       closeFormParts();
       if (m_historySupport != null) {
@@ -277,7 +275,6 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
         m_status = RwtEnvironmentEvent.STARTED;
         fireEnvironmentChanged(new RwtEnvironmentEvent(this, RwtEnvironmentEvent.STARTED));
       }
-      notifyAll();
     }
   }
 
@@ -1460,36 +1457,45 @@ public abstract class AbstractRwtEnvironment implements IRwtEnvironment {
 
     @Override
     public void valueUnbound(HttpSessionBindingEvent event) {
-      if (LOG.isInfoEnabled()) {
-        UserAgent userAgent = m_clientSession.getUserAgent();
-        String msg = "Thread: {0} Session goes down...; UserAgent: {2}";
-        LOG.info(msg, new Object[]{Long.valueOf(Thread.currentThread().getId()), userAgent});
-      }
-
+      // Only stop the session if not already done, e.g. by a manual logout of the user.
       final IDesktop desktop = m_clientSession.getDesktop();
       if (!m_clientSession.isActive() || desktop == null || !desktop.isOpened()) {
-        //client session was probably already stopped by the model itself
         return;
       }
 
-      // wait until the environment has been stopped or a maximum of 5s before continuing to close the desktop.
-      synchronized (m_environment) {
-        if (!m_environment.isStopped()) {
-          try {
-            m_environment.wait(5000);
-          }
-          catch (InterruptedException e) {
-            LOG.warn("Interrupted while waiting for environment to stop.");
-          }
-        }
+      if (LOG.isInfoEnabled()) {
+        String msg = "ClientSession is going down [thread={0}, httpSession={1}, clientSession={2}, environment={3}, userAgent={4}]";
+        LOG.info(msg, new Object[]{Thread.currentThread().getId(), event.getSession().getId(), m_clientSession, m_environment, m_clientSession.getUserAgent()});
       }
 
-      new ClientAsyncJob("HTTP session inactivator", m_clientSession) {
+      // Synchronize with Scout model job to stop the application.
+      ClientJob job = new ClientSyncJob("HTTP session invalidator", m_clientSession) {
+
         @Override
         protected void runVoid(IProgressMonitor monitor) throws Throwable {
+          // Fire a forced close request to prevent the user from interrupting the process in Desktop#execBeforeClosing.
+          // Mostly the shutdown process cannot be prevented anyway because #valueUnbound is called when the HttpSession gets expired
+          // except for being invoked when the user agent is switched. (see AbstractRwtEnvironment#initClientSession).
           desktop.getUIFacade().fireDesktopClosingFromUI(true);
         }
-      }.runNow(new NullProgressMonitor());
+      };
+      job.schedule();
+
+      // Wait for the ClientSession to be stopped for maximal 30 seconds.
+      // This is necessary if the session is stopped due to an userAgent switch; otherwise, cleanup might occur on the newly created client session.
+      Object sessionLock = m_clientSession.getStateLock();
+      long timeoutMillis = TimeUnit.SECONDS.toMillis(30);
+      long timeoutExpires = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(timeoutMillis);
+      synchronized (sessionLock) {
+        try {
+          while (m_clientSession.isActive() && System.nanoTime() < timeoutExpires) { // Conditional guard against spurious wakeup.
+            sessionLock.wait(timeoutMillis);
+          }
+        }
+        catch (InterruptedException e) {
+          LOG.error("Interrupted while waiting for the ClientSession to be stopped.", e);
+        }
+      }
     }
   }
 }
