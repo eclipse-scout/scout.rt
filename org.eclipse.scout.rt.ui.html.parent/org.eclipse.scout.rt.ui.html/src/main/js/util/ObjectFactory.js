@@ -115,7 +115,7 @@ scout.defaultObjectFactories = [{
 }, {
   objectType: 'TableOrganizeMenu',
   create: function() {
-    return new scout.Menu(); //FIXME Change to scout.TableOrganizeMenu after TableOrganizeMenu is refactored
+    return new scout.TableOrganizeMenu();
   }
 }, {
   objectType: 'Tree',

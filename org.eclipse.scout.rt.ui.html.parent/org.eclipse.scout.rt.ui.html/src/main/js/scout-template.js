@@ -25,12 +25,16 @@
 //@include("layout/GridLayout.js");
 //@include("layout/TableLayout.js");
 //@include("layout/BorderLayout.js");
+//@include("menu/Menu.js");
+//@include("menu/menus.js");
+//@include("menu/Menubar.js")
 //@include("table/Table.js");
 //@include("table/TableConfigurator.js");
 //@include("table/TableHeader.js");
 //@include("table/TableFooter.js");
 //@include("table/TableHeaderMenu.js");
-  //@include("table/TableKeystrokeAdapter.js");
+//@include("table/TableOrganizeMenu.js");
+//@include("table/TableKeystrokeAdapter.js");
 //@include("table/TableSelectionHandler.js");
 //@include("table/control/TableControl.js");
 //@include("table/control/ChartTableControl.js");
@@ -48,9 +52,6 @@
 //@include("desktop/DesktopViewButtonOwn.js");
 //@include("desktop/Outline.js");
 //@include("desktop/OutlineNavigateUpMenu.js");
-//@include("menu/Menu.js");
-//@include("menu/menus.js");
-//@include("menu/Menubar.js")
 //@include("messagebox/MessageBox.js");
 //@include("form/Form.js");
 //@include("form/fields/FormField.js");

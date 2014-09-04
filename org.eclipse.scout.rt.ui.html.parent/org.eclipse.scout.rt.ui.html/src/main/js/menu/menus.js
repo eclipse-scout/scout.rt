@@ -71,6 +71,55 @@ scout.menus = {
       }
     }
   },
+  //FIXME more or less the same code as in showContextMenu. Maybe better create separate class (ContextMenu.js or PopupMenu.js)
+  createContextMenuContainer: function($parent, $clicked, left, right, top, menuWindow, menuToggle) {
+    var i, $menuContainer;
+
+    $menuContainer = $parent.appendDIV('menu-container');
+    $clicked.addClass('menu-open');
+
+    if (menuWindow) {
+      $menuContainer.addClass('menu-window');
+      $menuContainer.width($clicked.width() + 24);
+    }
+
+    if ($clicked && $clicked.hasClass('menu-right')) {
+      $menuContainer.addClass('menu-right');
+    }
+
+    if (left !== undefined) {
+      $menuContainer.css('left', left);
+    }
+    if (right !== undefined) {
+      $menuContainer.css('right', right);
+    }
+    if (top !== undefined) {
+      $menuContainer.css('top', top);
+    }
+
+    // every user action will close menu; menu is removed in 'click' event, see onMenuItemClicked()
+    var closingEvents = 'mousedown.contextMenu keydown.contextMenu mousewheel.contextMenu';
+    $(document).one(closingEvents, function() {
+      scout.menus.removeContextMenuContainer($menuContainer, $clicked, menuToggle);
+    });
+    $('.menu-item', $menuContainer).one(closingEvents, $.suppressEvent);
+
+    return $menuContainer;
+  },
+  removeContextMenuContainer: function($menuContainer, $clicked, menuToggle) {
+    // close container
+    $menuContainer.remove();
+
+    // Remove all cleanup handlers
+    $(document).off('.contextMenu');
+
+    // click on button do not reopen menu
+    $clicked.removeClass('menu-open');
+
+    if (event && $(event.target).is($clicked) && menuToggle) {
+      $clicked.data('menu-open', true);
+    }
+  },
   showContextMenu: function(menus, $parent, $clicked, left, right, top, menuWindow, menuToggle) {
     var i, $menuContainer = $('.menu-container', $parent);
 
@@ -145,7 +194,6 @@ scout.menus = {
       removeContainer();
       menu.sendMenuAction();
     }
-
   },
   /**
    * menus may change at any time -> wait for server response before showing any menus

@@ -33,19 +33,23 @@ scout.Menu.prototype._render = function($parent) {
       return;
     }
 
-    if (this.children.length > 0) {
-      //TODO cru: work in progress
-      if (this.$container.hasClass('menu-right')) {
-        var right = parseFloat(this.parent.$container[0].offsetWidth) - parseFloat(this.$container.position().left) -  parseFloat(this.$container[0].offsetWidth),
-          top = this.$container.height() - 7;
-        scout.menus.showContextMenu(this.children, this.parent.$container, this.$container, undefined, right, top, false, true);
-      } else {
-        var left = parseFloat(this.$container.position().left) + 8;
-        scout.menus.showContextMenu(this.children, this.parent.$container, this.$container, left, undefined, 8, true, false);
-      }
+    this._onMenuClicked(event);
+  }
+};
+
+scout.Menu.prototype._onMenuClicked = function(event) {
+  if (this.children.length > 0) {
+    //TODO cru: work in progress
+    if (this.$container.hasClass('menu-right')) {
+      var right = parseFloat(this.parent.$container[0].offsetWidth) - parseFloat(this.$container.position().left) -  parseFloat(this.$container[0].offsetWidth),
+        top = this.$container.height() - 7;
+      scout.menus.showContextMenu(this.children, this.parent.$container, this.$container, undefined, right, top, false, true);
     } else {
-      this.sendMenuAction();
+      var left = parseFloat(this.$container.position().left) + 8;
+      scout.menus.showContextMenu(this.children, this.parent.$container, this.$container, left, undefined, 8, true, false);
     }
+  } else {
+    this.sendMenuAction();
   }
 };
 

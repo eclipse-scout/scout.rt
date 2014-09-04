@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.eclipse.scout.commons.DateUtility;
 import org.eclipse.scout.commons.LocaleThreadLocal;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ContextMenuEvent;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
@@ -30,10 +31,12 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable5;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.TableListener;
+import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilterManager;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractDateColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IDateColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
@@ -55,6 +58,7 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
   public static final String EVENT_ROWS_DELETED = "rowsDeleted";
   public static final String EVENT_ALL_ROWS_DELETED = "allRowsDeleted";
   public static final String EVENT_RELOAD = "reload";
+  public static final String EVENT_RESET_COLUMNS = "resetColumns";
   public static final String PROP_ROW_IDS = "rowIds";
   public static final String PROP_ROW_ID = "rowId";
   public static final String PROP_CONTROLS = "controls";
@@ -272,6 +276,9 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
     else if (EVENT_RELOAD.equals(event.getType())) {
       handleUiReload(event, res);
     }
+    else if (EVENT_RESET_COLUMNS.equals(event.getType())) {
+      handleUiResetColumns(event, res);
+    }
     else {
       super.handleUiEvent(event, res);
     }
@@ -297,6 +304,29 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
   protected void handleUiReload(JsonEvent event, JsonResponse res) {
     if (getModel() instanceof ITable5) {
       ((ITable5) getModel()).fireTableReloadFromUI();
+    }
+  }
+
+  protected void handleUiResetColumns(JsonEvent event, JsonResponse res) {
+    //FIXME CGU Code from ResetColumnsMenu, move to ITableUiFacade
+    try {
+      getModel().setTableChanging(true);
+      getModel().resetDisplayableColumns();
+      try {
+        ITableColumnFilterManager m = getModel().getColumnFilterManager();
+        if (m != null) {
+          m.reset();
+        }
+        ITableCustomizer cst = getModel().getTableCustomizer();
+        if (cst != null) {
+          cst.removeAllColumns();
+        }
+      }
+      catch (ProcessingException e) {
+      }
+    }
+    finally {
+      getModel().setTableChanging(false);
     }
   }
 
