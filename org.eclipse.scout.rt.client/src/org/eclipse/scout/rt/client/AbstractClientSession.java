@@ -13,14 +13,19 @@ package org.eclipse.scout.rt.client;
 import java.beans.PropertyChangeListener;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 
 import javax.security.auth.Subject;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.LocaleThreadLocal;
@@ -83,6 +88,7 @@ public abstract class AbstractClientSession implements IClientSession {
   private Locale m_locale;
   private UserAgent m_userAgent;
   private Vector<ILocaleListener> m_localeListener = new Vector<ILocaleListener>();
+  private long m_maxShutdownWaitTime = 4567;
 
   public AbstractClientSession(boolean autoInitConfig) {
     m_clientSessionData = new HashMap<String, Object>();
@@ -377,9 +383,76 @@ public abstract class AbstractClientSession implements IClientSession {
     catch (Throwable t) {
       LOG.info("logout on server", t);
     }
+
+    if (getMaxShutdownWaitTime() > 0) {
+      scheduleSessionInactivation();
+    }
+    else {
+      inactivateSession();
+    }
+
+  }
+
+  /**
+   * Delay the client session inactivation for a maximal period of time until all client jobs of this session have
+   * finished. This method does not block the caller.
+   */
+  private void scheduleSessionInactivation() {
+    new Job("Wait for client jobs to finish before inactivating the session") {
+      @Override
+      protected IStatus run(IProgressMonitor monitor) {
+        final long timeout = getMaxShutdownWaitTime();
+
+        // Wait for the client jobs to finish for a maximal period of time.
+        for (ClientJob clientJob : findClientJobs()) {
+          try {
+            clientJob.join(timeout);
+          }
+          catch (InterruptedException e) {
+            LOG.info(String.format("Interrupted while waiting for the client job to finish. [job=%s]", clientJob), e);
+          }
+        }
+
+        // Inactivate the client session.
+        inactivateSession();
+
+        return Status.OK_STATUS;
+      }
+    }.schedule();
+  }
+
+  /**
+   * Finds all client jobs that belong to this client session. If called on behalf of a client job, that job is not
+   * returned.
+   *
+   * @return {@link Set} of client jobs.
+   */
+  protected final Set<ClientJob> findClientJobs() {
+    final Job currentJob = ClientJob.getJobManager().currentJob();
+    final Set<ClientJob> clientJobs = new HashSet<ClientJob>();
+
+    for (Job job : Job.getJobManager().find(ClientJob.class)) {
+      ClientJob candidateJob = (ClientJob) job;
+      if (candidateJob.getClientSession() == AbstractClientSession.this && candidateJob != currentJob) {
+        clientJobs.add(candidateJob);
+      }
+    }
+    return clientJobs;
+  }
+
+  protected void inactivateSession() {
+    Set<ClientJob> runningClientJobs = findClientJobs();
+    if (!runningClientJobs.isEmpty()) {
+      LOG.warn(""
+          + "Some running client jobs found while client session is going to shutdown. "
+          + "If waiting for a condition or running a scheduled executor, the associated worker threads may never been released. "
+          + "Please ensure to terminate all client jobs when the session is going down. [session={0}, user={1}, jobs={2}]"
+          , new Object[]{AbstractClientSession.this, getUserId(), runningClientJobs});
+    }
+
     setActive(false);
     if (LOG.isInfoEnabled()) {
-      LOG.info("end session event loop");
+      LOG.info("Client session was shutdown successfully [session={0}, user={1}]", AbstractClientSession.this, getUserId());
     }
   }
 
@@ -534,5 +607,22 @@ public abstract class AbstractClientSession implements IClientSession {
       ILocaleListener listener = (ILocaleListener) it.next();
       listener.localeChanged(event);
     }
+  }
+
+  /**
+   * Sets the maximum time (in milliseconds) to wait for each client job to finish when stopping the session before
+   * it is set to inactive. When a value &lt;= 0 is set, the session is set to inactive immediately, without
+   * waiting for client jobs to finish.
+   */
+  public void setMaxShutdownWaitTime(long maxShutdownWaitTime) {
+    m_maxShutdownWaitTime = maxShutdownWaitTime;
+  }
+
+  /**
+   * @return the maximum time (in milliseconds) to wait for each client job to finish when stopping the session before
+   *         it is set to inactive. The default value is 4567, which should be reasonable for most use cases.
+   */
+  public long getMaxShutdownWaitTime() {
+    return m_maxShutdownWaitTime;
   }
 }

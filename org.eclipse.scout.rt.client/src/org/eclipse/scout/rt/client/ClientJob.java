@@ -181,7 +181,7 @@ public class ClientJob extends JobEx implements IClientSessionProvider {
 
   /**
    * Executes this job. The session's locale is accessible through {@link LocaleThreadLocal}.
-   * 
+   *
    * @see #run(IProgressMonitor)
    */
   protected IStatus runStatus(IProgressMonitor monitor) {
@@ -227,7 +227,7 @@ public class ClientJob extends JobEx implements IClientSessionProvider {
     // continue work
   }
 
-  void releaseWaitFor() throws InterruptedException {
+  void releaseWaitFor() {
     final ClientRule rule = (getRule() instanceof ClientRule ? (ClientRule) getRule() : null);
     if (rule != null) {
       ClientSyncJob proxyJob = new ClientSyncJob("release waitFor lock on \"" + this + "\"", m_session) {
