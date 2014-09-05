@@ -13,13 +13,14 @@ scout.GroupBox.prototype._render = function($parent) {
   var cssClass = root ? 'root-group-box' : 'group-box';
   this.$container = $parent.
     appendDiv('', cssClass).
+    addClass('form-field').
     attr('id', 'GroupBox-' + this.id);
 
   if (this.label) {
     this.$label = $('<span>').html(this.label);
     this.$container.
-    appendDiv('', 'group-box-title').
-    append(this.$label);
+      appendDiv('', 'group-box-title').
+      append(this.$label);
   }
 
   new scout.TableLayout().render(this.$container, this, this.getControlFields());

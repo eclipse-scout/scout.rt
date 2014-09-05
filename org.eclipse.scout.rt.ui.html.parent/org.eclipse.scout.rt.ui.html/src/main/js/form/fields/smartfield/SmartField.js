@@ -4,8 +4,10 @@ scout.SmartField = function() {
 scout.inherits(scout.SmartField, scout.ValueField);
 
 scout.SmartField.prototype._render = function($parent) {
-  this.$container = $parent;
-  this.$container.attr('id', 'SmartField-' + this.id);
+  this.$container = $('<div>').
+    appendTo($parent).
+    addClass('form-field').
+    attr('id', 'SmartField-' + this.id);
 
   this.$label = $('<label>')
     .appendTo(this.$container);

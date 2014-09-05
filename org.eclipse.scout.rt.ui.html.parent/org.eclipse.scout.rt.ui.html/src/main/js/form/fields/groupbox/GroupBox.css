@@ -4,6 +4,7 @@
   border-top: 1px solid @color-bench-light-border;
   box-sizing:border-box;
   position:relative;
+  width:100%;
 }
 
 .group-box {
@@ -11,6 +12,7 @@
   /* DEBUG background-color:#ccc;*/
   box-sizing:border-box;
   position:relative;
+  width:100%;
 }
 
 .group-box-title {

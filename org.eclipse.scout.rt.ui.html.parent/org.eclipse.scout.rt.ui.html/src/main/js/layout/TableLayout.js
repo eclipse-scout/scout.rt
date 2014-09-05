@@ -27,7 +27,7 @@ scout.TableLayout.prototype.render = function($parent, groupBox, fields) {
       widthSum = 0;
       for (i = 0; i < fieldMap[y].length; i++) {
         field = fieldMap[y][i];
-        $td = $('<td>').addClass('form-field').appendTo($tr);
+        $td = $('<td>').appendTo($tr);
         widthSum++;
         if (field.gridData.w > 1) {
           $td.attr('colspan', field.gridData.w);
