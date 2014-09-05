@@ -28,6 +28,8 @@
 //@include("menu/Menu.js");
 //@include("menu/menus.js");
 //@include("menu/Menubar.js")
+//@include("layout/layouts.js");
+//@include("layout/LogicalGridLayoutInfo.js");
 //@include("table/Table.js");
 //@include("table/TableConfigurator.js");
 //@include("table/TableHeader.js");

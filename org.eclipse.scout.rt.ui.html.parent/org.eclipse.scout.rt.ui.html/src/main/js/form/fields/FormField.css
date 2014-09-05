@@ -1,35 +1,24 @@
-.form-grid {
-  width:100%;
-  border-spacing:15px;
-}
-
-/* form-grid of root-group-box must be 0 
- * because group-box header underline must
- * have no margins left and right.
- */
-div.root-group-box > table.form-grid {
-   border-spacing:0;
-}
-
 .form-field {
+  display:table;
   box-sizing:border-box;
-  /* DEBUG border:1px dotted red;*/
   white-space:nowrap;
+  border-spacing:0;
+  position:absolute;
 }
 
 .form-field > label {
-  width : 33%;
-  display:inline-block;
+  display:table-cell;
+  text-overflow:ellipsis;
+  overflow:hidden;
+  max-width:130px;
 }
 
 .form-field > span.status {
-  width : 1%;
-  display:inline-block;
+  display:table-cell;
 }
 
 .form-field > .field {
-  width : 66%;
-  display:inline-block;
+  display:table-cell;
 }
 
 /* Form-Fields */

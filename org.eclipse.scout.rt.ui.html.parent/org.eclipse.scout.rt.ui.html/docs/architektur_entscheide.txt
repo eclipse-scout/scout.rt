@@ -323,3 +323,11 @@ Wenn Adapter gerendert werden, sollen die DOM elemente möglichst unmittelbar zu
 Andernfalls kann der Effekt von CSS definitionen auf das jeweilige Element nicht korrekt aufgelöst werden.
 Wenn das geschieht, können Fehler entstehen wie z.B. das JQuery#show() fälschlicherweise ein display Attribut
 setzt das der CSS Definition widerspricht.
+
+03.09.2014 AWE, Layout
+Layouting mit HTML/CSS für Forms funktioniert nicht gut genug. Fälle in denen das Layout programmatisch geändert
+wird (visibility ändert, text-länge ändert, komponente wird added/removed) können nicht gut genug CSS-only behandelt
+werden. Zudem ist das Layout hochgradig konfigurierbar durch den Scout-Entwickler. Schwierig umsetzebar sind v.a.
+die properties weightX/Y und useUiHeight/Width für die es in HTML nur wenig Support gibt, bzw. die schlecht ohne
+Programmlogik in CSS umgesetzt werden können. Fazit: wir müssen das LogicalGridLayout in JavaScript implementieren
+und benötigen zudem ein Layout-Konzept ähnlich wie der Swing LayoutManager2 (invalidate, layout, etc.).

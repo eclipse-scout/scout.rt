@@ -13,16 +13,32 @@ scout.GroupBox.prototype._render = function($parent) {
   var cssClass = root ? 'root-group-box' : 'group-box';
   this.$container = $parent.
     appendDiv('', cssClass).
+    addClass('form-field').
     attr('id', 'GroupBox-' + this.id);
+
+  scout.Layout.setLayout(this.$container, new scout.GroupBoxLayout());
+  if (!root) {
+    scout.Layout.setLogicalGridData(this.$container, this.gridData);
+  }
 
   if (this.label) {
     this.$label = $('<span>').html(this.label);
     this.$container.
-    appendDiv('', 'group-box-title').
-    append(this.$label);
+      appendDiv('', 'group-box-title').
+      append(this.$label);
   }
 
-  new scout.TableLayout().render(this.$container, this, this.getControlFields());
+  var $body = this.$container.
+    appendDiv('', 'group-box-body');
+
+  scout.Layout.setLayout($body, new scout.LogicalGridLayout());
+
+  var i, field, fields = this.getControlFields();
+  for (i=0; i<fields.length; i++) {
+    fields[i].render($body);
+  }
+
+  // new scout.TableLayout().render(this.$container, this, this.getControlFields());
 };
 
 /**

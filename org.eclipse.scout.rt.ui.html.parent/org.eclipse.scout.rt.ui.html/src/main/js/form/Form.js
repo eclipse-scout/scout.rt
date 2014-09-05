@@ -15,6 +15,9 @@ scout.Form.prototype._render = function($parent) {
   this.$container = $parent.appendDiv(undefined, 'form');
   this.$container.data('model', this);
 
+  var layout = new scout.FillLayout(); // TODO AWE: (layout) wir brauchen wahrscheinlich ein scout.FormLayout
+  scout.Layout.setLayout(this.$container, layout);
+
   this.rootGroupBox.render(this.$container);
 
   var closeable = false;
@@ -74,6 +77,8 @@ scout.Form.prototype._render = function($parent) {
       }.bind(this));
     }.bind(this));
   }
+
+  layout.layout(this.$container);
 
   if (this._locked) {
     this.disable();

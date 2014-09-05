@@ -1,6 +1,7 @@
-// FIXME AWE: (layout) work in progress
 // JavaScript port of LogicalGridLayoutInfo.java
+// plus some ports of JRE Swing/AWT classes
 
+// TODO AWE: (layout) check if we can remove other *layout*.js files in this folder
 scout.SwingLayoutUtility = function() {
 };
 
@@ -12,6 +13,10 @@ scout.SwingLayoutUtility.EPS = 1e-6;
 scout.Dimension = function(width, height) {
   this.width = width;
   this.height = height;
+};
+
+scout.Dimension.prototype.toString = function() {
+  return 'Dimension[width=' + this.width + ' height=' + this.height + ']';
 };
 
 scout.Insets = function(top, right, bottom, left) {
@@ -32,6 +37,46 @@ scout.Rectangle.prototype.toString = function() {
  return 'Rectangle[x=' + this.x + ' y=' + this.y + ' width=' + this.width + ' height=' + this.height + ']';
 };
 
+// INFO: copy & paste von der JRE
+scout.Rectangle.prototype.union = function(r) {
+        var tx2 = this.width;
+        var ty2 = this.height;
+        if ((tx2 | ty2) < 0) {
+            // This rectangle has negative dimensions...
+            // If r has non-negative dimensions then it is the answer.
+            // If r is non-existant (has a negative dimension), then both
+            // are non-existant and we can return any non-existant rectangle
+            // as an answer.  Thus, returning r meets that criterion.
+            // Either way, r is our answer.
+            return new scout.Rectangle(r.x, r.y, r.width, r.height);
+        }
+        var rx2 = r.width;
+        var ry2 = r.height;
+        if ((rx2 | ry2) < 0) {
+            return new scout.Rectangle(this.x, this.y, this.width, this.height);
+        }
+        var tx1 = this.x;
+        var ty1 = this.y;
+        tx2 += tx1;
+        ty2 += ty1;
+        var rx1 = r.x;
+        var ry1 = r.y;
+        rx2 += rx1;
+        ry2 += ry1;
+        if (tx1 > rx1) tx1 = rx1;
+        if (ty1 > ry1) ty1 = ry1;
+        if (tx2 < rx2) tx2 = rx2;
+        if (ty2 < ry2) ty2 = ry2;
+        tx2 -= tx1;
+        ty2 -= ty1;
+        // tx2,ty2 will never underflow since both original rectangles
+        // were already proven to be non-empty
+        // they might overflow, though...
+        if (tx2 > Number.MAX_VALUE) tx2 = Number.MAX_VALUE;
+        if (ty2 > Number.MAX_VALUE) ty2 = Number.MAX_VALUE;
+        return new scout.Rectangle(tx1, ty1, tx2, ty2);
+};
+
 scout.SwingEnvironment = function() {
   this.formRowHeight = 23;
   this.formRowGap = 6;
@@ -40,21 +85,21 @@ scout.SwingEnvironment = function() {
 };
 
 scout.LogicalGridData = function(template) {
-  this.gridx;
-  this.gridy;
+  this.gridx = 0;
+  this.gridy = 0;
   this.gridw = 1;
   this.gridh = 1;
-  this.weightx;
-  this.weighty;
-  this.useUiWidth;
-  this.useUiHeight;
-  this.widthHint;
-  this.heightHint;
+  this.weightx = 0.0;
+  this.weighty = 0.0;
+  this.useUiWidth = false;
+  this.useUiHeight = false;
+  this.widthHint = 0;
+  this.heightHint = 0;
   this.horizontalAlignment = -1;
   this.verticalAlignment = -1;
   this.fillHorizontal = true;
   this.fillVertical = true;
-  this.topInset;
+  this.topInset = 0;
   if (template) {
     this.gridx = template.gridx;
     this.gridy = template.gridy;
@@ -287,7 +332,7 @@ scout.LogicalGridLayoutInfo.prototype._initializeColumns = function(env, compSiz
           distWidth = compSize[i].width - spanWidth - (hSpan - 1) * hgap;
         }
         else {
-          distWidth = logicalWidthInPixel(env, cons) - spanWidth - (hSpan - 1) * hgap;
+          distWidth = this.logicalWidthInPixel(env, cons) - spanWidth - (hSpan - 1) * hgap;
         }
         if (distWidth > 0) {
           var equalWidth = (distWidth + spanWidth) / hSpan;
@@ -568,7 +613,73 @@ scout.LogicalGridLayoutInfo.prototype.logicalHeightInPixel = function(env, cons)
   return env.formRowHeight * gridH + env.formRowGap * Math.max(0, gridH - 1);
 };
 
-scout.LogicalGridLayoutInfo.prototype.uiSizeInPixel = function(comp) {
-  return new scout.Dimension(100, 20 /*comp.getPreferredSize()*/); // FIXME AWE: das haben wir leider nicht
+scout.LogicalGridLayoutInfo.prototype.uiSizeInPixel = function($comp) {
+  var prefSize, layout;
+  layout = $comp.data('layout');
+  if (layout) {
+  prefSize = layout.preferredLayoutSize($comp);
+  $.log('(LogicalGridLayout#uiSizeInPixel) ' + $comp.attr('id') + ' impl. preferredSize = ' + prefSize);
+  } else {
+    // TODO: hier koennten wir eigentlich einen fehler werfen, weil das nicht passieren sollte
+    prefSize = scout.Dimension($comp.width(), $comp.height());
+  $.log('(LogicalGridLayout#uiSizeInPixel) ' + $comp.attr('id') + ' size of HTML element = ' + prefSize);
+  }
+  return prefSize;
+};
+
+// -----------------
+
+scout.LogicalGridDataBuilder = function() {
+};
+
+// ip = input, op = output
+scout.LogicalGridDataBuilder.prototype.build = function(ip) {
+  var op = new scout.LogicalGridData();
+  op.gridx = ip.x;
+  op.gridy = ip.y;
+  op.gridw = ip.w;
+  op.gridh = ip.h;
+  op.weightx = ip.weightX;
+  op.weighty = ip.weightY;
+  if (op.weightx < 0) {
+    // inherit
+    op.weightx = Math.max(1.0, op.gridw);
+  }
+  if (op.weighty < 0) {
+    // inherit
+    // TODO AWE: (layout) impl. _inheritWeightY
+    // op.weighty = this._inheritWeightY(m_scoutField);
+  }
+  op.useUiWidth = ip.useUiWidth;
+
+  // When having the label on top the container of the field must not have a fix size but use the calculated ui height instead.
+  /*
+  TODO AWE: (layout) impl. label position special handling
+  if (m_scoutField.getLabelPosition() == IFormField.LABEL_POSITION_TOP) {
+    op.useUiHeight = true;
+  }
+  else {
+  */
+    op.useUiHeight = ip.useUiHeight;
+  //}
+
+  op.horizontalAlignment = ip.horizontalAlignment;
+  op.verticalAlignment = ip.verticalAlignment;
+  op.fillHorizontal = ip.fillHorizontal;
+  op.fillVertical = ip.fillVertical;
+  op.widthHint = ip.widthInPixel;
+  op.heightHint = ip.heightInPixel;
+  if (op.weighty === 0 || (op.weighty < 0 && op.gridh <= 1)) {
+    op.fillVertical = false;
+  }
+  return op;
+};
+
+scout.LogicalGridDataBuilder.prototype._inheritWeightY = function(f) {
+// see: SwingScoutFormFieldGridData
+};
+
+scout.LogicalGridDataBuilder.prototype._inheritWeightYRec = function(f) {
+//see: SwingScoutFormFieldGridData
 };
 

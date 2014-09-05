@@ -5,8 +5,11 @@ scout.NumberField = function() {
 scout.inherits(scout.NumberField, scout.ValueField);
 
 scout.NumberField.prototype._render = function($parent) {
-  this.$container = $parent;
-  this.$container.attr('id', 'NumberField-' + this.id);
+  this.$container = $('<div>').
+    appendTo($parent).
+    addClass('form-field').
+    attr('id', 'NumberField-' + this.id);
+
 
   this.$label = $('<label>')
     .appendTo(this.$container);

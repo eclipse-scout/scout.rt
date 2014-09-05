@@ -1,16 +1,13 @@
 .root-group-box {
   margin: 0;
-  /* DEBUG background-color:#eee;*/
   border-top: 1px solid @color-bench-light-border;
   box-sizing:border-box;
-  position:relative;
 }
 
 .group-box {
   margin-bottom:10px;
-  /* DEBUG background-color:#ccc;*/
   box-sizing:border-box;
-  position:relative;
+  width:100%; /* TODO AWE: prüfen warum es das hier noch braucht */
 }
 
 .group-box-title {
@@ -28,23 +25,3 @@
   padding-right:8px;
 }
 
-td {
-  vertical-align:top;
-}
-
-/* also used for sequence-box */
-.cols-1 td, .cols-1 li {
-  width:100%;
-}
-
-.cols-2 td, .cols-2 li {
-  width:50%;
-}
-
-.cols-3 td, .cols-3 li {
-  width:33.3%;
-}
-
-.cols-4 td, .cols-4 li {
-  width:25%;
-}
