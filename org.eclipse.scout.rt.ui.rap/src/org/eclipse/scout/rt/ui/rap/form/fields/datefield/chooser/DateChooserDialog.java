@@ -114,10 +114,33 @@ public class DateChooserDialog extends Dialog {
     }
     // vertical correction
     if (prefBounds.y + prefBounds.height > appBounds.height) {
-      prefBounds.y = appBounds.height - prefBounds.height;
+      if (dialogFitsAboveField(absPrefPos, prefBounds, field)) {
+        prefBounds.y = getYCoordinateForDialogAboveField(absPrefPos, prefBounds, field);
+      }
+      else {
+        prefBounds.y = appBounds.height - prefBounds.height;
+      }
     }
 
     return new Point(prefBounds.x, prefBounds.y);
+  }
+
+  /**
+   * Checks if the dialog does fit above the given field.
+   * 
+   * @since 5.0-M2 (backported)
+   */
+  private boolean dialogFitsAboveField(Point absPrefPos, Rectangle dialogPrefBounds, Control field) {
+    return getYCoordinateForDialogAboveField(absPrefPos, dialogPrefBounds, field) >= 0;
+  }
+
+  /**
+   * Returns the Y-Position for the DateChooserDialog if it should be displayed above the given field.
+   * 
+   * @since 5.0-M2 (backported)
+   */
+  private int getYCoordinateForDialogAboveField(Point absPrefPos, Rectangle dialogPrefBounds, Control field) {
+    return absPrefPos.y - field.getBounds().height - dialogPrefBounds.height;
   }
 
   @Override
