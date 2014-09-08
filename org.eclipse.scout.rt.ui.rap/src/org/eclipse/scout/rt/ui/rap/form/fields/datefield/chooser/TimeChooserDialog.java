@@ -94,7 +94,7 @@ public class TimeChooserDialog extends Dialog {
    * Returns the choosen time from the time table. The time value is represented in a Date object and
    * should be used.
    * The date value part is uninitialized. Therefore, it should NOT be used.
-   * 
+   *
    * @return Choosen time value.
    */
   public Date getReturnTime() {
@@ -122,10 +122,33 @@ public class TimeChooserDialog extends Dialog {
     }
     // vertical correciton
     if (prefBounds.y + prefBounds.height > appBounds.height) {
-      prefBounds.y = appBounds.height - prefBounds.height;
+      if (dialogFitsAboveField(absPrefPos, prefBounds, field)) {
+        prefBounds.y = getYCoordinateForDialogAboveField(absPrefPos, prefBounds, field);
+      }
+      else {
+        prefBounds.y = appBounds.height - prefBounds.height;
+      }
     }
 
     return new Point(prefBounds.x, prefBounds.y);
+  }
+
+  /**
+   * Checks if the dialog does fit above the given field.
+   *
+   * @since 5.0-M2
+   */
+  private boolean dialogFitsAboveField(Point absPrefPos, Rectangle dialogPrefBounds, Control field) {
+    return getYCoordinateForDialogAboveField(absPrefPos, dialogPrefBounds, field) >= 0;
+  }
+
+  /**
+   * Returns the Y-Position for the TimeChooserDialog if it should be displayed above the given field.
+   *
+   * @since 5.0-M2
+   */
+  private int getYCoordinateForDialogAboveField(Point absPrefPos, Rectangle dialogPrefBounds, Control field) {
+    return absPrefPos.y - field.getBounds().height - dialogPrefBounds.height;
   }
 
   @Override
