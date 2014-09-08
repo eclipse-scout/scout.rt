@@ -52,6 +52,15 @@ public final class JsonObjectUtility {
     }
   }
 
+  public static int getInt(JSONObject json, String key) {
+    try {
+      return json.getInt(key);
+    }
+    catch (JSONException e) {
+      throw toRuntimeException(e);
+    }
+  }
+
   public static boolean getBoolean(JSONObject json, String key) {
     try {
       return json.getBoolean(key);

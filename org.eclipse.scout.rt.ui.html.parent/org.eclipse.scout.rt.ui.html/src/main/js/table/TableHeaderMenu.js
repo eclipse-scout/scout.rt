@@ -6,7 +6,7 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
   $('body').off('mousedown.remove');
   $('body').off('keydown.remove');
 
-  var pos = $header.index(),
+  var pos = table._header.getColumnViewIndex($header),
     id = $header.data('index'),
     column = table.columns[id];
 
@@ -206,23 +206,23 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
   }
 
   function moveTop() {
-    table.moveColumn($header, pos, -1);
-    pos = $header.index();
+    table.moveColumn($header, pos, 0);
+    pos = table._header.getColumnViewIndex($header);
   }
 
   function moveUp() {
-    table.moveColumn($header, pos, Math.max(pos - 4, -1));
-    pos = $header.index();
+    table.moveColumn($header, pos, Math.max(pos - 1, 0));
+    pos = table._header.getColumnViewIndex($header);
   }
 
   function moveDown() {
-    table.moveColumn($header, pos, Math.min(pos + 2, $('.header-item, .header-resize').length - 2));
-    pos = $header.index();
+    table.moveColumn($header, pos, Math.min(pos + 1, table._header.findHeaderItems().length - 1));
+    pos = table._header.getColumnViewIndex($header);
   }
 
   function moveBottom() {
-    table.moveColumn($header, pos, $('.header-item, .header-resize').length - 2);
-    pos = $header.index();
+    table.moveColumn($header, pos, table._header.findHeaderItems().length - 1);
+    pos = table._header.getColumnViewIndex($header);
   }
 
   function sort(dir, additional, remove) {

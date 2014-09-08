@@ -55,6 +55,7 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
   public static final String EVENT_ROWS_DELETED = "rowsDeleted";
   public static final String EVENT_ALL_ROWS_DELETED = "allRowsDeleted";
   public static final String EVENT_COLUMN_SORTING_CHANGED = "columnSortingChanged";
+  public static final String EVENT_COLUMN_MOVED = "columnMoved";
   public static final String EVENT_RELOAD = "reload";
   public static final String PROP_ROW_IDS = "rowIds";
   public static final String PROP_ROW_ID = "rowId";
@@ -240,10 +241,8 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
   public JSONObject toJson() {
     JSONObject json = super.toJson();
     JSONArray jsonColumns = new JSONArray();
-    for (IColumn<?> column : getModel().getColumns()) {
-      if (column.isDisplayable()) {
-        jsonColumns.put(columnToJson(column));
-      }
+    for (IColumn<?> column : getModel().getColumnSet().getVisibleColumns()) {
+      jsonColumns.put(columnToJson(column));
     }
     putProperty(json, "columns", jsonColumns);
     JSONArray jsonRows = new JSONArray();
@@ -276,6 +275,9 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
     }
     else if (EVENT_COLUMN_SORTING_CHANGED.equals(event.getType())) {
       handleUiColumnSortingChanged(event, res);
+    }
+    else if (EVENT_COLUMN_MOVED.equals(event.getType())) {
+      handleUiColumnMoved(event, res);
     }
     else {
       super.handleUiEvent(event, res);
@@ -323,6 +325,12 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
     finally {
       getTableEventFilter().removeIgnorableModelEvent(filterCondition);
     }
+  }
+
+  protected void handleUiColumnMoved(JsonEvent event, JsonResponse res) {
+    IColumn column = extractColumn(event.getData());
+    int viewIndex = JsonObjectUtility.getInt(event.getData(), "index");
+    getModel().getUIFacade().fireColumnMovedFromUI(column, viewIndex);
   }
 
   protected void handleUiRowAction(JsonEvent event, JsonResponse res) {
@@ -392,7 +400,6 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
       json.put("type", computeColumnType(column));
       json.put(IColumn.PROP_WIDTH, column.getWidth());
       json.put("summary", column.isSummary());
-      json.put(IColumn.PROP_VISIBLE, column.isVisible());
       json.put(IColumn.PROP_HORIZONTAL_ALIGNMENT, column.getHorizontalAlignment());
       if (column.isSortActive() && column.isSortExplicit()) {
         json.put("sortActive", true);

@@ -384,6 +384,41 @@ describe("Table", function() {
 
   });
 
+  describe("moveColumn", function() {
+
+    it("moves column from oldPos to newPos", function() {
+      var model = helper.createModelFixture(3, 2);
+      var table = helper.createTable(model);
+      table.render(session.$entryPoint);
+
+      var $rows = table.$dataScroll.children();
+      var $row0 = $rows.eq(0);
+      var $row1 = $rows.eq(1);
+
+      var $colHeaders = table._$header.find('.header-item');
+      var $header0 = $colHeaders.eq(0);
+      var $header1 = $colHeaders.eq(1);
+      var $header2 = $colHeaders.eq(2);
+
+      expect(table._header.getColumnViewIndex($header0)).toBe(0);
+      expect(table._header.getColumnViewIndex($header1)).toBe(1);
+      expect(table._header.getColumnViewIndex($header2)).toBe(2);
+
+      table.moveColumn($header0, 0, 2);
+
+      expect(table._header.getColumnViewIndex($header1)).toBe(0);
+      expect(table._header.getColumnViewIndex($header2)).toBe(1);
+      expect(table._header.getColumnViewIndex($header0)).toBe(2);
+
+      table.moveColumn($header2, 1, 0);
+
+      expect(table._header.getColumnViewIndex($header2)).toBe(0);
+      expect(table._header.getColumnViewIndex($header1)).toBe(1);
+      expect(table._header.getColumnViewIndex($header0)).toBe(2);
+    });
+
+  });
+
   describe("onModelAction", function() {
 
     it("processes insertion events", function() {

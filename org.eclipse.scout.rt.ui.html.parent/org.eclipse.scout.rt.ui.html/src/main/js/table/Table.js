@@ -1,4 +1,4 @@
-  // SCOUT GUI
+// SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
 scout.Table = function() {
@@ -35,7 +35,7 @@ scout.Table.prototype.init = function(model, session) {
   }
   this._keystrokeAdapter = new scout.TableKeystrokeAdapter(this);
 
-  for (var i=0; i < model.columns.length;i++) {
+  for (var i = 0; i < model.columns.length; i++) {
     model.columns[i].index = i;
   }
 };
@@ -148,7 +148,7 @@ scout.Table.prototype._renderRowOrder = function() {
     });
   }
 
-  for (var i=0;i<this.rows.length;i++) {
+  for (var i = 0; i < this.rows.length; i++) {
     var $row = this.findRowById(this.rows[i].id);
     $sortedRows.push($row[0]);
   }
@@ -171,7 +171,9 @@ scout.Table.prototype.sort = function($header, dir, additional, remove) {
   column.sortAscending = dir === 'asc' ? true : false;
   column.sortActive = true;
 
-  var data = { columnId: column.id };
+  var data = {
+    columnId: column.id
+  };
   if (additional) {
     data.multiSort = true;
   }
@@ -210,8 +212,8 @@ scout.Table.prototype._buildRowDiv = function(row) {
     column = this.columns[c];
     width = column.width;
     style = (width === 0) ? 'display: none; ' : 'min-width: ' + width + 'px; max-width: ' + width + 'px; ';
-    alignment =  scout.Table.parseHorizontalAlignment(column.horizontalAlignment);
-    align = alignment !== 'left' ? 'text-align: '+ alignment + '; ' : '';
+    alignment = scout.Table.parseHorizontalAlignment(column.horizontalAlignment);
+    align = alignment !== 'left' ? 'text-align: ' + alignment + '; ' : '';
     value = this.getText(c, row);
 
     rowDiv += '<div class="table-cell" style="' + style + align + '"' + unselectable + '>' + value + '</div>';
@@ -556,14 +558,14 @@ scout.Table.prototype.deleteRowsByIds = function(rowIds) {
 
   //update model
   rows = this.getModelRowsByIds(rowIds);
-  for (i=0; i < rows.length; i++){
+  for (i = 0; i < rows.length; i++) {
     row = rows[i];
     scout.arrays.remove(this.rows, row);
   }
 
   //update html doc
   if (this.rendered) {
-    for (i=0; i < rowIds.length; i++){
+    for (i = 0; i < rowIds.length; i++) {
       $row = this.findRowById(rowIds[i]);
       $row.remove();
     }
@@ -617,7 +619,7 @@ scout.Table.prototype.findRowById = function(rowId) {
 
 scout.Table.prototype.getModelRowById = function(rowId) {
   var row, i;
-  for (i=0; i < this.rows.length; i++){
+  for (i = 0; i < this.rows.length; i++) {
     row = this.rows[i];
     if (row.id === rowId) {
       return row;
@@ -628,7 +630,7 @@ scout.Table.prototype.getModelRowById = function(rowId) {
 scout.Table.prototype.getModelRowsByIds = function(rowIds) {
   var i, row, rows = [];
 
-  for (i=0; i < this.rows.length; i++){
+  for (i = 0; i < this.rows.length; i++) {
     row = this.rows[i];
     if (rowIds.indexOf(row.id) > -1) {
       rows.push(this.rows[i]);
@@ -779,15 +781,23 @@ scout.Table.prototype.hideRow = function($row) {
 // move column
 
 scout.Table.prototype.moveColumn = function($header, oldPos, newPos, dragged) {
+  var index = $header.data('index');
+  var column = this.columns[index];
+  var data = {
+    columnId: column.id,
+    index: newPos
+  };
+  this.session.send('columnMoved', this.id, data);
+
   this._header.onColumnMoved($header, oldPos, newPos, dragged);
 
   // move cells
-  $('.table-row, .table-row-sum').each(function() {
+  $('.table-row, .table-row-sum', this.$dataScroll).each(function() {
     var $cells = $(this).children();
-    if (newPos < 0) {
-      $(this).prepend($cells.eq(oldPos / 2));
+    if (newPos < oldPos) {
+      $cells.eq(newPos).before($cells.eq(oldPos));
     } else {
-      $cells.eq(newPos / 2).after($cells.eq(oldPos / 2));
+      $cells.eq(newPos).after($cells.eq(oldPos));
     }
   });
 };
@@ -833,14 +843,14 @@ scout.Table.prototype._triggerFilterResetted = function() {
 
 scout.Table.prototype._setHeaderVisible = function(headerVisible) {
   //FIXME CGU this would be better than show/hide, but buildRow relies on header -> refactor
-//  if (this.headerVisible && !this._header) {
-//      this._$header = $('table-header').prependTo(this.$data);
-//      this._header = new scout.TableHeader(this, this._$header, this.session);
-//    }
-//  else if (!this.headerVisible && this._header) {
-//    this._$header.remove();
-//    this._header = null;
-//  }
+  //  if (this.headerVisible && !this._header) {
+  //      this._$header = $('table-header').prependTo(this.$data);
+  //      this._header = new scout.TableHeader(this, this._$header, this.session);
+  //    }
+  //  else if (!this.headerVisible && this._header) {
+  //    this._$header.remove();
+  //    this._header = null;
+  //  }
   this._$header.setVisible(headerVisible);
 };
 
@@ -861,7 +871,7 @@ scout.Table.prototype._onRowOrderChanged = function(rowIds) {
 
   // update model
   rows = new Array(this.rows.length);
-  for (var i=0; i < this.rows.length; i++) {
+  for (var i = 0; i < this.rows.length; i++) {
     row = this.rows[i];
     newPos = rowIds.indexOf(this.rows[i].id);
     rows[newPos] = row;

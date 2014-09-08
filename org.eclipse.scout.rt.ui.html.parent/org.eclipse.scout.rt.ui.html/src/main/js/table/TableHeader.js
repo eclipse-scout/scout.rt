@@ -8,6 +8,7 @@ scout.TableHeader = function(table, $tableHeader, session) {
 
   this.totalWidth = 0;
   this.dragDone = false;
+  this._$tableHeader = $tableHeader;
 
   for (var i = 0; i < columns.length; i++) {
     column = columns[i];
@@ -21,7 +22,7 @@ scout.TableHeader = function(table, $tableHeader, session) {
     if (column.sortActive) {
       sortDirection = column.sortAscending ? 'asc' : 'desc';
       $headerItem.addClass('sort-' + sortDirection);
-      //FIXME CGU consider index
+//      FIXME CGU consider index
 //      if (column.sortIndex >= 0) {
 //        $headerItem.attr('data-sort-order', column.sortIndex);
 //      }
@@ -60,7 +61,7 @@ scout.TableHeader = function(table, $tableHeader, session) {
   function resizeHeader(event) {
     var startX = event.pageX ,
       $headerItem = $(this).prev(),
-      colNum = $headerItem.index() / 2 + 1,
+      colNum = that.getColumnViewIndex($headerItem) + 1,
       headerWidth = parseFloat($headerItem.css('min-width')),
       totalWidth = parseFloat($('.table-row').eq(0).css('width'));
 
@@ -87,12 +88,13 @@ scout.TableHeader = function(table, $tableHeader, session) {
   }
 
   function dragHeader(event) {
-    var startX = event.pageX,
+    var diff = 0,
+      startX = event.pageX,
       $headerItem = $(this),
-      oldPos = $headerItem.index(),
+      oldPos = that.getColumnViewIndex($headerItem),
       newPos =  oldPos,
       move = $headerItem.outerWidth(),
-      $headers = $headerItem.siblings('.header-item');
+      $otherHeaders = $headerItem.siblings('.header-item');
 
     that.dragDone = false;
 
@@ -101,9 +103,9 @@ scout.TableHeader = function(table, $tableHeader, session) {
       .one('mouseup', '', dragEnd);
 
     function dragMove(event) {
-      var diff = event.pageX - startX;
+      diff = event.pageX - startX;
 
-      // change css of draged header
+      // change css of dragged header
       $headerItem.css('z-index', 50)
         .addClass('header-move');
       $tableHeader.addClass('header-move');
@@ -114,26 +116,15 @@ scout.TableHeader = function(table, $tableHeader, session) {
       // find other affected headers
       var middle = realMiddle($headerItem);
 
-      $headers.each(function(i) {
-        var m = realMiddle($($headers[i]));
+      $otherHeaders.each(function(i) {
+        var m = realMiddle($($otherHeaders[i]));
 
-        if (middle < m && i < oldPos / 2) {
+        if (middle < m && i < oldPos) {
           $(this).css('left', move);
-        } else if (middle > m && i >= oldPos / 2) {
+        } else if (middle > m && i >= oldPos) {
           $(this).css('left', -move);
         } else {
           $(this).css('left', 0);
-        }
-      });
-
-      // find new position of dragged header
-      var h = (diff < 0) ? $headers : $($headers.get().reverse()),
-          d = (diff < 0) ? 2 : 0;
-
-      h.each(function(i) {
-        if ($(this).css('left') != '0px') {
-          newPos = $(this).index() - d;
-          return false;
         }
       });
 
@@ -163,6 +154,16 @@ scout.TableHeader = function(table, $tableHeader, session) {
       // remove events
       $('body').off('mousemove');
 
+      // find new position of dragged header
+      var h = (diff < 0) ? $otherHeaders : $($otherHeaders.get().reverse());
+
+      h.each(function(i) {
+        if ($(this).css('left') != '0px') {
+          newPos = that.getColumnViewIndex($(this));
+          return false;
+        }
+      });
+
       // in case of no movement: return
       if (!that.dragDone)  {
         return true;
@@ -177,7 +178,7 @@ scout.TableHeader = function(table, $tableHeader, session) {
       }
 
       // reset css of dragged header
-      $headers.each(function() {
+      $otherHeaders.each(function() {
         $(this).css('left', '');
       });
 
@@ -185,7 +186,6 @@ scout.TableHeader = function(table, $tableHeader, session) {
         .css('background', '')
         .removeClass('header-move');
       $tableHeader.removeClass('header-move');
-
     }
   }
 };
@@ -240,9 +240,9 @@ scout.TableHeader.prototype.onGroupingChanged = function($headerItem, all) {
 };
 
 scout.TableHeader.prototype.onColumnMoved = function($header, oldPos, newPos, dragged) {
-  var $headers = $('.header-item', this.$container),
-  $moveHeader = $headers.eq(oldPos / 2),
-  $moveResize = $moveHeader.next();
+  var $headers = this.findHeaderItems(),
+    $moveHeader = $headers.eq(oldPos),
+    $moveResize = $moveHeader.next();
 
   // store old position of header
   $headers.each(function() {
@@ -250,12 +250,12 @@ scout.TableHeader.prototype.onColumnMoved = function($header, oldPos, newPos, dr
   });
 
   // change order in dom of header
-  if (newPos < 0) {
-  this._$header.prepend($moveResize);
-  this._$header.prepend($moveHeader);
+  if (newPos < oldPos) {
+    $headers.eq(newPos).before($moveHeader);
+    $headers.eq(newPos).before($moveResize);
   } else {
-  $headers.eq(newPos / 2).after($moveHeader);
-  $headers.eq(newPos / 2).after($moveResize);
+    $headers.eq(newPos).after($moveHeader);
+    $headers.eq(newPos).after($moveResize);
   }
 
   // move menu
@@ -273,4 +273,12 @@ scout.TableHeader.prototype.onColumnMoved = function($header, oldPos, newPos, dr
         .animateAVCSD('left', 0);
     });
   }
+};
+
+scout.TableHeader.prototype.getColumnViewIndex = function($headerItem) {
+  return $headerItem.index() / 2;
+};
+
+scout.TableHeader.prototype.findHeaderItems = function() {
+  return this._$tableHeader.find('.header-item');
 };
