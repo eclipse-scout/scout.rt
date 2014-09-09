@@ -300,9 +300,19 @@ public interface IDesktop extends IPropertyObserver {
   List<IAction> getActions();
 
   /**
+   * Convenience to find a toolbutton in the desktop, uses {@link ActionFinder}
+   */
+  <T extends IToolButton> T getToolButton(Class<? extends T> searchType);
+
+  /**
    * @return all {@link IToolButton} actions
    */
   List<IToolButton> getToolButtons();
+
+  /**
+   * Convenience to find a menu in the desktop, uses {@link ActionFinder}
+   */
+  <T extends IViewButton> T getViewButton(Class<? extends T> searchType);
 
   /**
    * @return all {@link IViewButton} actions
@@ -499,4 +509,5 @@ public interface IDesktop extends IPropertyObserver {
    * @since 4.0.0
    */
   void traverseFocusPrevious();
+
 }

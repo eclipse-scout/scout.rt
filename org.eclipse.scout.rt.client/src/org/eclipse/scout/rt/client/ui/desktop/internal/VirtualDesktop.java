@@ -440,7 +440,17 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
+  public <T extends IViewButton> T getViewButton(Class<? extends T> searchType) {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
   public List<IViewButton> getViewButtons() {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
+  public <T extends IToolButton> T getToolButton(Class<? extends T> searchType) {
     throw createUnsupportedOperationException();
   }
 
