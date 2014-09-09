@@ -24,11 +24,10 @@ import org.eclipse.scout.rt.shared.data.model.DataModelConstants;
 /**
  * Definition of a property-to-sql and valueField-to-sql mapping for {@link AbstractPropertyData} and
  * {@link AbstractValueFieldData}
- * 
+ *
  * @deprecated use the more general {@link BasicPartDefinition} instead. Will be removed in the M-Release
  */
 @Deprecated
-@SuppressWarnings("deprecation")
 public class ValuePartDefinition extends BasicPartDefinition {
 
   /**
@@ -113,7 +112,7 @@ public class ValuePartDefinition extends BasicPartDefinition {
 
   /**
    * Computes whether this {@link ValuePartDefinition} takes part in building the filter criterion.
-   * 
+   *
    * @param formData
    *          the form data to be checked.
    * @param fieldsBreathFirstMap

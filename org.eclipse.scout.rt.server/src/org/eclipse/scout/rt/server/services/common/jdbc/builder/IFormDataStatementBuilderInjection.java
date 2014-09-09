@@ -17,13 +17,10 @@ import org.eclipse.scout.rt.shared.data.form.fields.composer.ComposerEntityNodeD
 
 /**
  * see {@link FormDataStatementBuilder#addFormDataStatementBuilderInjection(IPartDefinitionInjection)}
- * 
+ *
  * @author imo
  * @since 3.8
- * @deprecated Will be removed in the M-Release
  */
-@Deprecated
-@SuppressWarnings("deprecation")
 public interface IFormDataStatementBuilderInjection {
 
   /**

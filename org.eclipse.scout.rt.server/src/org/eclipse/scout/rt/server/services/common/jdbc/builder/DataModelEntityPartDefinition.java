@@ -21,7 +21,6 @@ import org.eclipse.scout.rt.shared.data.model.IDataModelEntity;
 /**
  * Definition of a entity-to-sql mapping for {@link IDataModelEntity}
  */
-@SuppressWarnings("deprecation")
 public class DataModelEntityPartDefinition implements DataModelConstants {
   private final Class<? extends IDataModelEntity> m_entityType;
   private final String m_whereClause;
@@ -37,7 +36,7 @@ public class DataModelEntityPartDefinition implements DataModelConstants {
   /**
    * @param whereClause
    *          is the clause used to find data by constraining the where clause. This is normally something like
-   * 
+   *
    *          <pre>
    *        EXISTS (
    *          SELECT 1
@@ -59,7 +58,7 @@ public class DataModelEntityPartDefinition implements DataModelConstants {
    *          containing a <column/> tag and a @parent.TableAlias@.PRIMARY_KEY_ID
    *          <p>
    *          Example for a Person-Contact-Entity-join select-clause:
-   * 
+   *
    *          <pre>
    * SELECT &lt;selectParts/&gt;
    * FROM MY_CONTACT @Contact@ &lt;fromParts/&gt;
@@ -104,7 +103,7 @@ public class DataModelEntityPartDefinition implements DataModelConstants {
         }
       }
     }
-    */
+     */
   }
 
   public String getSelectClause() {
@@ -123,7 +122,7 @@ public class DataModelEntityPartDefinition implements DataModelConstants {
    * Override this method to intercept and change the sql fragment that is created by this entity.<br>
    * Sometimes it is convenient to have dynamic joins depending on what attributes are contained within the
    * {@link ComposerEntityNodeData#getContainingAttributeNodes()}.
-   * 
+   *
    * @param builder
    *          containging all binds and sql parts
    * @param entityNodeData

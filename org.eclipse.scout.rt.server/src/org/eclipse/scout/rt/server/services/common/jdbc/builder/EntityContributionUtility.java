@@ -18,6 +18,7 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.StringUtility.ITagProcessor;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.holders.NVPair;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.services.common.jdbc.builder.FormDataStatementBuilder.EntityStrategy;
@@ -25,7 +26,6 @@ import org.eclipse.scout.rt.server.services.common.jdbc.builder.FormDataStatemen
 /**
  * Utility for building statements with {@link EntityContribution}
  */
-@SuppressWarnings("deprecation")
 public final class EntityContributionUtility {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(EntityContributionUtility.class);
 
@@ -40,7 +40,7 @@ public final class EntityContributionUtility {
   /**
    * Creates a where constraints based on the {@link EntityContribution}. This means that from parts etc. are wrapped
    * inside an EXISTS (SELECT 1 FROM ... WHERE ... ) clause.
-   * 
+   *
    * @returns a where constraint or null if the {@link EntityContribution} is empty.
    *          <p>
    *          The constraint does not start with "AND" and can be added with {@link #addWhere(String, NVPair...)} by
@@ -61,7 +61,7 @@ public final class EntityContributionUtility {
   /**
    * Creates constraints based on the {@link EntityContribution}. This means that from parts etc. are wrapped
    * inside an EXISTS (SELECT 1 FROM ... WHERE ... GROUP BY ... HAVING ...) clause.
-   * 
+   *
    * @return Returns an {@link EntityContribution} with constraints or null if the given {@link EntityContribution} is
    *         empty.
    */
@@ -108,7 +108,7 @@ public final class EntityContributionUtility {
    * and as 'where' on {@link EntityStrategy#BuildConstraints}
    * <p>
    * Before the call is processed, all {@link IFormDataStatementBuilderInjection}s are invoked.
-   * 
+   *
    * @param entityStrategy
    * @param entityPartWithTags
    *          may contain the collecting tags selectParts, fromParts, whereParts, groupBy, groupByParts, havingParts<br/>
@@ -355,7 +355,7 @@ public final class EntityContributionUtility {
 
   /**
    * Check if a group by part is valid, i.e. ist not a SELECT clause.
-   * 
+   *
    * @throws ProcessingException
    *           with {@link IStatus#getCode()} = X
    * @since 3.8

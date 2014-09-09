@@ -29,7 +29,6 @@ import org.junit.Test;
 /**
  * Tests the {@link FormDataStatementBuilder} with externally defined template data.
  */
-@SuppressWarnings("deprecation")
 public class FormDataStatementBuilderTest {
 
   private static final String STATEMENT_TEMPLATE = "SELECT <selectParts>P.PERSON_NR</selectParts> FROM <fromParts>ORS_PERSON P</fromParts> WHERE <whereParts>1=1</whereParts>";
