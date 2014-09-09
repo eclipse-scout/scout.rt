@@ -297,7 +297,7 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
   }
 
   protected void setSelectionFromSwt(final List<ITreeNode> nodes) {
-    if (m_ignoreSelectionEventsFromSwtToScout) {
+    if (m_ignoreSelectionEventsFromSwtToScout && CollectionUtility.isEmpty(nodes)) {
       return;
     }
     if (getUpdateSwtFromScoutLock().isAcquired()) {
