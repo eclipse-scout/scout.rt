@@ -34,7 +34,6 @@ import org.eclipse.scout.rt.shared.data.model.DataModelConstants;
  * data, to finally call {@link #createInstance(FormDataStatementBuilder, List, List, List, Map)} to retrieve the
  * statement contribution. In its simplest form, the result is just a whereClause.
  */
-@SuppressWarnings("deprecation")
 public class BasicPartDefinition implements DataModelConstants {
   private final ClassIdentifier[] m_valueTypeClassIdentifiers;
   private final String m_sqlAttribute;
@@ -165,7 +164,7 @@ public class BasicPartDefinition implements DataModelConstants {
 
   /**
    * Computes whether this {@link BasicPartDefinition} takes part in building the filter criterion.
-   * 
+   *
    * @param formData
    *          the form data to be checked.
    * @return <code>true</code> if the properties in the form data are sufficient in order to append this part to the
@@ -206,7 +205,7 @@ public class BasicPartDefinition implements DataModelConstants {
    * Sometimes it is convenient to set the operation to {@link DataModelConstants#OPERATOR_NONE} which uses the
    * attribute
    * itself as the complete statement part.
-   * 
+   *
    * @param builder
    * @param formData
    *          the form data to be checked.

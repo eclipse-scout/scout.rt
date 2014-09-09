@@ -26,7 +26,6 @@ import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
 /**
  * Definition of a attribute-to-sql mapping for {@link IDataModelAttribute}
  */
-@SuppressWarnings("deprecation")
 public class DataModelAttributePartDefinition implements DataModelConstants {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(DataModelAttributePartDefinition.class);
 
@@ -47,14 +46,14 @@ public class DataModelAttributePartDefinition implements DataModelConstants {
    *          is normally something like @Person@.LAST_NAME
    *          <p>
    *          Maximum extent is using tags like
-   * 
+   *
    *          <pre>
    *          &lt;attribute&gt;@Person@.LAST_NAME&lt;/attribute&gt;
    *          &lt;fromPart&gt;MY_PERSON @Person@&lt;/fromPart&gt;
    *          &lt;wherePart&gt;@Person@.PERSON_ID=...&lt;/wherePart&gt;
    *          &lt;havingPart&gt;...&lt;/havingPart&gt;
    * </pre>
-   * 
+   *
    *          That way the wherePart is added to the entities whereParts section and never to the havingParts section,
    *          which would be wrong.
    * @param selectClause
@@ -126,7 +125,7 @@ public class DataModelAttributePartDefinition implements DataModelConstants {
    * Sometimes it is convenient to set the operation to {@link DataModelConstants#OPERATOR_NONE} which uses the
    * attribute
    * itself as the complete statement part.
-   * 
+   *
    * @param builder
    *          containging all binds and sql parts
    * @param attributeNodeData

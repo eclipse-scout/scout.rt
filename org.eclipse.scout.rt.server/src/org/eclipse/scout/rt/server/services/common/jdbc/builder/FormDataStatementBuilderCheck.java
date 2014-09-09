@@ -24,11 +24,6 @@ import org.eclipse.scout.rt.shared.data.model.EntityPath;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
 import org.eclipse.scout.rt.shared.data.model.IDataModelEntity;
 
-/**
- * @deprecated Will be removed in the M-Release.
- */
-@Deprecated
-@SuppressWarnings("deprecation")
 public class FormDataStatementBuilderCheck {
   protected final FormDataStatementBuilder builder;
   private TreeSet<String> m_imports;

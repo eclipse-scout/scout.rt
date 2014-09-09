@@ -22,7 +22,6 @@ import org.junit.Test;
 /**
  * test {@link EntityContributionUtility}
  */
-@SuppressWarnings("deprecation")
 public class EntityContributionUtilityTest {
 
   @Test
@@ -98,7 +97,7 @@ public class EntityContributionUtilityTest {
         baseSqlWithTags + " <groupBy>GROUP BY <groupByParts>T.GROUP</groupByParts> HAVING <havingParts>SUM(T.TEST) > 0</havingParts></groupBy> " +
             "UNION " +
             baseSqlWithTags + " <groupBy>GROUP BY <groupByParts/> HAVING 1=1 <havingParts/></groupBy>",
-        new EntityContribution(), true).getSelectParts().get(0);
+            new EntityContribution(), true).getSelectParts().get(0);
     assertEquals("SELECT SUM(T.B) FROM SCOUT_TABLE T WHERE T.W = 14 GROUP BY T.GROUP HAVING SUM(T.TEST) > 0 UNION SELECT SUM(T.B) FROM SCOUT_TABLE T WHERE T.W = 14 ", s);
   }
 
