@@ -157,7 +157,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    * window.
    * <p>
    * Subclasses can override this method. Default is {@code null}.
-   *
+   * 
    * @return the title of this desktop
    */
   @ConfigProperty(ConfigProperty.TEXT)
@@ -172,7 +172,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    * A system tray may not be available at all.
    * <p>
    * Subclasses can override this method. Default is {@code false}.
-   *
+   * 
    * @return {@code true} if this application should be visible in the system tray, {@code false} otherwise
    * @see #execAddTrayMenus(List)
    */
@@ -190,7 +190,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    * Note that {@linkplain IDesktopExtension desktop extensions} might contribute additional outlines to this desktop.
    * <p>
    * Subclasses can override this method. Default is {@code null}.
-   *
+   * 
    * @return an array of outline type tokens
    * @see IOutline
    */
@@ -210,7 +210,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    * Called while this desktop is initialized.
    * <p>
    * Subclasses can override this method. The default does nothing.
-   *
+   * 
    * @throws ProcessingException
    */
   @ConfigOperation
@@ -222,7 +222,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    * Called after this desktop was opened and displayed on the GUI.
    * <p>
    * Subclasses can override this method. The default does nothing.
-   *
+   * 
    * @throws ProcessingException
    */
   @ConfigOperation
@@ -236,7 +236,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    * Subclasses can override this method to execute some custom code before the desktop gets into its closing state. The
    * default behavior is to do nothing. By throwing an explicit {@link VetoException} the closing process will be
    * stopped.
-   *
+   * 
    * @throws ProcessingException
    */
   @ConfigOperation
@@ -248,7 +248,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    * Called before this desktop is being closed.
    * <p>
    * Subclasses can override this method. The default does nothing.
-   *
+   * 
    * @throws ProcessingException
    */
   @ConfigOperation
@@ -260,7 +260,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    * Called after a UI has been attached to this desktop. This desktop must not necessarily be open.
    * <p>
    * Subclasses can override this method. The default does nothing.
-   *
+   * 
    * @throws ProcessingException
    */
   @ConfigOperation
@@ -272,7 +272,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    * Called after a UI has been detached from this desktop. This desktop must not necessarily be open.
    * <p>
    * Subclasses can override this method. The default does nothing.
-   *
+   * 
    * @throws ProcessingException
    */
   @ConfigOperation
@@ -284,7 +284,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    * Called whenever a new outline has been activated on this desktop.
    * <p>
    * Subclasses can override this method. The default does nothing.
-   *
+   * 
    * @param oldOutline
    *          old outline that was active before
    * @param newOutline
@@ -302,7 +302,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    * Subclasses can override this method.<br/>
    * This default implementation {@linkplain #removeForm(IForm) removes} the old form from this desktop and
    * {@linkplain #addForm(IForm) adds} the new form to this desktop.
-   *
+   * 
    * @param oldForm
    *          is the search form of the old (not selected anymore) page or {@code null}
    * @param newForm
@@ -332,7 +332,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    * Subclasses can override this method.<br/>
    * This default implementation {@linkplain #removeForm(IForm) removes} the old form from this desktop and
    * {@linkplain #addForm(IForm) adds} the new form to this desktop.
-   *
+   * 
    * @param oldForm
    *          is the detail form of the old (not selected anymore) page or {@code null}
    * @param newForm
@@ -356,7 +356,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    * Subclasses can override this method.<br/>
    * This default implementation keeps track of the current outline table form and updates it accordingly (including
    * visibility). See also {@link #getOutlineTableForm()}.
-   *
+   * 
    * @param oldTable
    *          is the table of the old (not selected anymore) table page or {@code null}
    * @param newTable
@@ -377,7 +377,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    * <p>
    * Subclasses can override this method.<br/>
    * This default implementation minimizes the page search form when data has been found.
-   *
+   * 
    * @param tablePage
    *          the table page that has been (re)loaded
    * @throws ProcessingException
@@ -399,7 +399,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    * called on each and then checked if the menu is visible.
    * <p>
    * Subclasses can override this method. The default does nothing.
-   *
+   * 
    * @param menus
    *          a live list to add menus to the tray
    * @throws ProcessingException
@@ -503,7 +503,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    * The extension that are held by this desktop must call {@link IDesktopExtension#setCoreDesktop(this)} before using
    * the extension. That way the extension can use and access this desktop's methods.
    * </p>
-   *
+   * 
    * @param desktopExtensions
    *          a live list can be modified.
    */
@@ -662,7 +662,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    * returns all forms except the searchform and the current detail form with
    * the same fully qualified classname and an equal primary key different from
    * null.
-   *
+   * 
    * @param form
    * @return
    */
@@ -1026,8 +1026,20 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
+  public <T extends IToolButton> T getToolButton(Class<? extends T> searchType) {
+    // ActionFinder performs instance-of checks. Hence the toolbutton replacement mapping is not required
+    return new ActionFinder().findAction(getMenus(), searchType);
+  }
+
+  @Override
   public List<IToolButton> getToolButtons() {
     return CollectionUtility.arrayList(m_toolButtons);
+  }
+
+  @Override
+  public <T extends IViewButton> T getViewButton(Class<? extends T> searchType) {
+    // ActionFinder performs instance-of checks. Hence the viewbutton replacement mapping is not required
+    return new ActionFinder().findAction(getMenus(), searchType);
   }
 
   @Override
