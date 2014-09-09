@@ -131,7 +131,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   }
 
   protected void handleModelTreeEvent(TreeEvent event) {
-    event = getTreeEventFilter().filterIgnorableModelEvent(event);
+    event = getTreeEventFilter().filter(event);
     if (event == null) {
       return;
     }
@@ -308,12 +308,12 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   protected void handleUiNodesSelected(JsonEvent event, JsonResponse res) {
     final List<ITreeNode> nodes = extractTreeNodes(event.getData());
     TreeEventFilterCondition condition = new TreeEventFilterCondition(TreeEvent.TYPE_NODES_SELECTED, nodes);
-    getTreeEventFilter().addIgnorableModelEvent(condition);
+    getTreeEventFilter().addCondition(condition);
     try {
       getModel().getUIFacade().setNodesSelectedFromUI(nodes);
     }
     finally {
-      getTreeEventFilter().removeIgnorableModelEvent(condition);
+      getTreeEventFilter().removeCondition(condition);
     }
   }
 
@@ -325,12 +325,12 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
       eventType = TreeEvent.TYPE_NODE_COLLAPSED;
     }
     TreeEventFilterCondition condition = new TreeEventFilterCondition(eventType, node);
-    getTreeEventFilter().addIgnorableModelEvent(condition);
+    getTreeEventFilter().addCondition(condition);
     try {
       getModel().getUIFacade().setNodeExpandedFromUI(node, expanded);
     }
     finally {
-      getTreeEventFilter().removeIgnorableModelEvent(condition);
+      getTreeEventFilter().removeCondition(condition);
     }
   }
 

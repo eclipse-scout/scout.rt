@@ -70,12 +70,12 @@ public class JsonValueField<T extends IValueField<?>> extends JsonFormField<T> {
     boolean whileTyping = event.getData().optBoolean("whileTyping");
 
     PropertyChangeEventFilterCondition condition = new PropertyChangeEventFilterCondition(IValueField.PROP_DISPLAY_TEXT, displayText);
-    getPropertyEventFilter().addIgnorableModelEvent(condition);
+    getPropertyEventFilter().addCondition(condition);
     try {
       handleUiDisplayTextChangedImpl(displayText, whileTyping);
     }
     finally {
-      getPropertyEventFilter().removeIgnorableModelEvent(condition);
+      getPropertyEventFilter().removeCondition(condition);
     }
   }
 

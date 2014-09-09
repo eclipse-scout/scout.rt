@@ -39,7 +39,7 @@ describe("Table", function() {
       var $headerItem0 = $headerItems.eq(0);
       var $headerItem1 = $headerItems.eq(1);
       var $headerItem2 = $headerItems.eq(2);
-      var $rows = table.$container.find('.table-row');
+      var $rows = table.findRows();
       var $cells0 = $rows.eq(0).find('.table-cell');
       var $cells1 = $rows.eq(1).find('.table-cell');
 
@@ -604,6 +604,101 @@ describe("Table", function() {
         expect($rows.eq(0).attr('id')).toBe('2');
         expect($rows.eq(1).attr('id')).toBe('1');
         expect($rows.eq(2).attr('id')).toBe('0');
+      });
+    });
+
+    describe("columnStructureChanged event", function() {
+      var model, table, column0, column1, column2;
+
+      beforeEach(function() {
+        model = helper.createModelFixture(3, 2);
+        table = helper.createTable(model);
+        column0 = model.columns[0];
+        column1 = model.columns[1];
+        column2 = model.columns[2];
+      });
+
+      function createColumnStructureChangedEvent(model, columns) {
+        return {
+          id: model.id,
+          columns: columns,
+          type: 'columnStructureChanged'
+        };
+      }
+
+      it("resets the model columns", function() {
+        var message = {
+          events: [createColumnStructureChangedEvent(model, [column2, column1])]
+        };
+        session._processSuccessResponse(message);
+
+        expect(table.columns.length).toBe(2);
+        expect(table.columns[0]).toBe(column2);
+        expect(table.columns[1]).toBe(column1);
+      });
+
+      it("redraws the header to reflect header cell changes (text)", function() {
+        table.render(session.$entryPoint);
+
+        var $colHeaders = table._header.findHeaderItems();
+        expect($colHeaders.eq(0).text()).toBe(column0.text);
+        expect($colHeaders.eq(1).text()).toBe(column1.text);
+        expect($colHeaders.eq(2).text()).toBe(column2.text);
+
+        column0.text = 'newColText0';
+        column1.text = 'newColText1';
+
+        var message = {
+          events: [createColumnStructureChangedEvent(model, [column0, column1, column2])]
+        };
+        session._processSuccessResponse(message);
+
+        //Check column header text
+        $colHeaders = table._header.findHeaderItems();
+        expect($colHeaders.eq(0).text()).toBe(column0.text);
+        expect($colHeaders.eq(1).text()).toBe(column1.text);
+        expect($colHeaders.eq(2).text()).toBe(column2.text);
+      });
+
+      it("redraws the columns to reflect column order changes", function() {
+        table.render(session.$entryPoint);
+
+        var $colHeaders = table._header.findHeaderItems();
+        expect($colHeaders.length).toBe(3);
+        expect($colHeaders.eq(0).data('column')).toBe(column0);
+        expect($colHeaders.eq(1).data('column')).toBe(column1);
+        expect($colHeaders.eq(2).data('column')).toBe(column2);
+
+        var $rows = table.findRows();
+        var $cells0 = $rows.eq(0).find('.table-cell');
+        var $cells1 = $rows.eq(1).find('.table-cell');
+
+        expect($cells0.eq(0).text()).toBe('0');
+        expect($cells0.eq(1).text()).toBe('1');
+        expect($cells0.eq(2).text()).toBe('2');
+        expect($cells1.eq(0).text()).toBe('0');
+        expect($cells1.eq(1).text()).toBe('1');
+        expect($cells1.eq(2).text()).toBe('2');
+
+        var message = {
+          events: [createColumnStructureChangedEvent(model, [column2, column1])]
+        };
+        session._processSuccessResponse(message);
+
+        //Check column header order
+        $colHeaders = table._header.findHeaderItems();
+        expect($colHeaders.length).toBe(2);
+        expect($colHeaders.eq(0).data('column')).toBe(column2);
+        expect($colHeaders.eq(1).data('column')).toBe(column1);
+
+        //Check cells order
+        $rows = table.findRows();
+        $cells0 = $rows.eq(0).find('.table-cell');
+        $cells1 = $rows.eq(1).find('.table-cell');
+        expect($cells0.eq(0).text()).toBe('2');
+        expect($cells0.eq(1).text()).toBe('1');
+        expect($cells1.eq(0).text()).toBe('2');
+        expect($cells1.eq(1).text()).toBe('1');
       });
     });
   });

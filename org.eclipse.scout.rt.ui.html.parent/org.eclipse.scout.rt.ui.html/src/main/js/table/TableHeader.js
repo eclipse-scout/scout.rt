@@ -13,7 +13,7 @@ scout.TableHeader = function(table, $tableHeader, session) {
   for (var i = 0; i < columns.length; i++) {
     column = columns[i];
     $headerItem = $tableHeader.appendDIV('header-item', columns[i].text)
-      .data('index', i)
+      .data('column', column)
       .css('min-width', column.width + 'px') // 17 is width of header-resize handle, see table.css (.header-resize)
       .css('max-width', column.width + 'px')
       .on('click', '', onHeaderClick)

@@ -35,8 +35,8 @@ scout.Table.prototype.init = function(model, session) {
   }
   this._keystrokeAdapter = new scout.TableKeystrokeAdapter(this);
 
-  for (var i = 0; i < model.columns.length; i++) {
-    model.columns[i].index = i;
+  for (var i = 0; i < this.columns.length; i++) {
+    this.columns[i].index = i;
   }
 };
 
@@ -119,8 +119,8 @@ scout.Table.prototype._sort = function() {
   function compare(row1, row2) {
     for (var s = 0; s < sortColumns.length; s++) {
       column = sortColumns[s];
-      var valueA = this.getValue(column.index, row1);
-      var valueB = this.getValue(column.index, row2);
+      var valueA = this.getCellValue(column, row1);
+      var valueB = this.getCellValue(column, row2);
       var dir = column.sortActive && column.sortAscending ? -1 : 1;
 
       if (valueA < valueB) {
@@ -166,8 +166,7 @@ scout.Table.prototype._renderRowOrder = function() {
 };
 
 scout.Table.prototype.sort = function($header, dir, additional, remove) {
-  var index = $header.data('index');
-  var column = this.columns[index];
+  var column = $header.data('column');
   column.sortAscending = dir === 'asc' ? true : false;
   column.sortActive = true;
 
@@ -208,13 +207,13 @@ scout.Table.prototype._buildRowDiv = function(row) {
   var unselectable = (scout.device.supportsCssUserSelect() ? '' : ' unselectable="on"'); // workaround for IE 9
 
   var rowDiv = '<div id="' + row.id + '" class="' + rowClass + '" style="width: ' + rowWidth + 'px"' + unselectable + '>';
-  for (var c = 0; c < row.cells.length; c++) {
+  for (var c = 0; c < this.columns.length; c++) {
     column = this.columns[c];
     width = column.width;
     style = (width === 0) ? 'display: none; ' : 'min-width: ' + width + 'px; max-width: ' + width + 'px; ';
     alignment = scout.Table.parseHorizontalAlignment(column.horizontalAlignment);
     align = alignment !== 'left' ? 'text-align: ' + alignment + '; ' : '';
-    value = this.getText(c, row);
+    value = this.getCellText(column, row);
 
     rowDiv += '<div class="table-cell" style="' + style + align + '"' + unselectable + '>' + value + '</div>';
   }
@@ -367,8 +366,8 @@ scout.Table.prototype.sendReload = function() {
   this.session.send('reload', this.id);
 };
 
-scout.Table.prototype.getValue = function(colIndex, row) {
-  var cell = row.cells[colIndex];
+scout.Table.prototype.getCellValue = function(col, row) {
+  var cell = row.cells[col.index];
 
   if (cell === null) { //cell may be a number so don't use !cell
     return null;
@@ -382,8 +381,8 @@ scout.Table.prototype.getValue = function(colIndex, row) {
   return cell.text;
 };
 
-scout.Table.prototype.getText = function(col, row) {
-  var cell = row.cells[col];
+scout.Table.prototype.getCellText = function(col, row) {
+  var cell = row.cells[col.index];
 
   if (cell === null) { //cell may be a number so don't use !cell
     return '';
@@ -397,7 +396,7 @@ scout.Table.prototype.getText = function(col, row) {
 scout.Table.prototype._group = function() {
   var that = this,
     all,
-    groupIndex,
+    groupColumn,
     $group = $('.group-sort', this.$container);
 
   // remove all sum rows
@@ -407,7 +406,7 @@ scout.Table.prototype._group = function() {
   if ($('.group-all', this.$container).length) {
     all = true;
   } else if ($group.length) {
-    groupIndex = $group.data('index');
+    groupColumn = $group.data('column');
   } else {
     return;
   }
@@ -425,10 +424,10 @@ scout.Table.prototype._group = function() {
 
     // calculate sum per column
     for (var c = 0; c < $cols.length; c++) {
-      var index = $cols.eq(c).data('index'),
-        value = this.getValue(index, row);
+      var column = $cols.eq(c).data('column'),
+        value = this.getCellValue(column, row);
 
-      if (this.columns[index].type == 'number') {
+      if (column.type == 'number') {
         sum[c] = (sum[c] || 0) + value;
       }
     }
@@ -437,7 +436,7 @@ scout.Table.prototype._group = function() {
     var nextRowId = $rows.eq(r + 1).attr('id');
     var nextRow = this.getModelRowById(rowId);
 
-    if ((r == $rows.length - 1) || (!all && this.getText(groupIndex, row) != this.getText(groupIndex, nextRow)) && sum.length > 0) {
+    if ((r == $rows.length - 1) || (!all && this.getCellText(groupColumn, row) != this.getCellText(groupColumn, nextRow)) && sum.length > 0) {
       for (c = 0; c < $cols.length; c++) {
         var $div;
 
@@ -445,8 +444,8 @@ scout.Table.prototype._group = function() {
         if (typeof sum[c] == 'number') {
           $div = $.makeDiv('', '', sum[c])
             .css('text-align', 'end');
-        } else if (!all && $cols.eq(c).data('index') == groupIndex) {
-          $div = $.makeDiv('', '', this.getText(groupIndex, row))
+        } else if (!all && $cols.eq(c).data('column') == groupColumn) {
+          $div = $.makeDiv('', '', this.getCellText(groupColumn, row))
             .css('text-align', 'start');
         } else {
           $div = $.makeDiv('', '', '&nbsp');
@@ -481,12 +480,11 @@ scout.Table.prototype.group = function($headerItem, draw, all) {
 };
 
 scout.Table.prototype.colorData = function(mode, colorColumn) {
-  var minValue,
-    maxValue,
-    colorFunc;
+  var minValue, maxValue, colorFunc, row, rowId, value, v, c, $rows;
 
   for (var r = 0; r < this.rows.length; r++) {
-    var v = this.getValue(colorColumn, r);
+    row = this.rows[r];
+    v = this.getCellValue(colorColumn, row);
 
     if (v < minValue || minValue === undefined) minValue = v;
     if (v > maxValue || maxValue === undefined) maxValue = v;
@@ -527,17 +525,16 @@ scout.Table.prototype.colorData = function(mode, colorColumn) {
       cell.css('background-color', '#fff');
     };
 
-  var $rows = $('.table-row:visible', this.$dataScroll),
-    c;
+  $rows = $('.table-row:visible', this.$dataScroll);
 
   $('.header-item', this.$container).each(function(i) {
-    if ($(this).data('index') == colorColumn) c = i;
+    if ($(this).data('column') == colorColumn) c = i;
   });
 
   for (var s = 0; s < $rows.length; s++) {
-    var rowId = $rows.eq(s).attr('id'),
-      row = this.getModelRowById(rowId),
-      value = this.getValue(colorColumn, row);
+    rowId = $rows.eq(s).attr('id');
+    row = this.getModelRowById(rowId);
+    value = this.getCellValue(colorColumn, row);
 
     colorFunc($rows.eq(s).children().eq(c), value);
 
@@ -781,8 +778,11 @@ scout.Table.prototype.hideRow = function($row) {
 // move column
 
 scout.Table.prototype.moveColumn = function($header, oldPos, newPos, dragged) {
-  var index = $header.data('index');
-  var column = this.columns[index];
+  var column = $header.data('column');
+
+  scout.arrays.remove(this.columns, column);
+  scout.arrays.insert(this.columns, column, newPos);
+
   var data = {
     columnId: column.id,
     index: newPos
@@ -883,6 +883,28 @@ scout.Table.prototype._onRowOrderChanged = function(rowIds) {
   }
 };
 
+scout.Table.prototype._onColumnStructureChanged = function(columns) {
+  for (var i = 0; i < columns.length; i++) {
+    for (var j = 0; j < this.columns.length; j++) {
+      if (columns[i].id ===  this.columns[j].id) {
+        columns[i].index = this.columns[j].index;
+        break;
+      }
+    }
+  }
+  this.columns = columns;
+
+  if (this.rendered) {
+    this._$header.empty();
+    this._header = new scout.TableHeader(this, this._$header, this.session);
+    this.drawData();
+  }
+};
+
+scout.Table.prototype._onColumnOrderChanged = function(columnIds) {
+
+};
+
 scout.Table.prototype.onModelAction = function(event) {
   if (event.type == 'rowsInserted') {
     this.insertRows(event.rows);
@@ -894,6 +916,10 @@ scout.Table.prototype.onModelAction = function(event) {
     this.selectRowsByIds(event.rowIds);
   } else if (event.type == 'rowOrderChanged') {
     this._onRowOrderChanged(event.rowIds);
+  } else if (event.type == 'columnStructureChanged') {
+    this._onColumnStructureChanged(event.columns);
+  } else if (event.type == 'columnOrderChanged') {
+    this._onColumnOrderChanged(event.columnIds);
   } else {
     $.log('Model event not handled. Widget: scout.Table. Event: ' + event.type + '.');
   }

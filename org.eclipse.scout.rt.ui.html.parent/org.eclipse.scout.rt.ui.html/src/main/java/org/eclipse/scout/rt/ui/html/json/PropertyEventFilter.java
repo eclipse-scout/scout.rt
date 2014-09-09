@@ -26,8 +26,8 @@ public class PropertyEventFilter extends AbstractEventFilter<PropertyChangeEvent
    * Ignores the event if new value is the same.
    */
   @Override
-  public PropertyChangeEvent filterIgnorableModelEvent(PropertyChangeEvent event) {
-    for (PropertyChangeEventFilterCondition condition : getIgnorableModelEvents()) {
+  public PropertyChangeEvent filter(PropertyChangeEvent event) {
+    for (PropertyChangeEventFilterCondition condition : getConditions()) {
       if (condition.getPropertyName().equals(event.getPropertyName())) {
         //Ignore if null == null
         if (condition.getValue() == null) {

@@ -39,8 +39,8 @@ public class TreeEventFilter extends AbstractEventFilter<TreeEvent, TreeEventFil
    * This is the case if the event should be filtered for every node in the original event
    */
   @Override
-  public TreeEvent filterIgnorableModelEvent(TreeEvent event) {
-    for (TreeEventFilterCondition condition : getIgnorableModelEvents()) {
+  public TreeEvent filter(TreeEvent event) {
+    for (TreeEventFilterCondition condition : getConditions()) {
       if (condition.getType() == event.getType()) {
         if (!condition.checkNodes()) {
           return null;

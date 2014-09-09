@@ -7,8 +7,7 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
   $('body').off('keydown.remove');
 
   var pos = table._header.getColumnViewIndex($header),
-    id = $header.data('index'),
-    column = table.columns[id];
+    column = $header.data('column');
 
   // label title
   if ($header.data('menu-open')) {
@@ -130,7 +129,7 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
 
   var group = (column.type === 'date') ?  3 : -1,
     matrix = new scout.ChartTableControlMatrix(table, session),
-    xAxis = matrix.addAxis(id, group),
+    xAxis = matrix.addAxis(column, group),
     dataAxis = matrix.addData(-1, -1),
     cube = matrix.calculateCube();
 
@@ -291,19 +290,19 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
   }
 
   function colorRed() {
-    table.colorData('red', id);
+    table.colorData('red', column);
   }
 
   function colorGreen() {
-    table.colorData('green', id);
+    table.colorData('green', column);
   }
 
   function colorBar() {
-    table.colorData('bar', id);
+    table.colorData('bar', column);
   }
 
   function colorRemove() {
-    table.colorData('remove', id);
+    table.colorData('remove', column);
   }
 
 
@@ -336,7 +335,7 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
     if (column.filter.length) {
       column.filterFunc = function($row) {
         var row = table.getModelRowById($row.attr('id')),
-          textX = table.getValue(xAxis.column, row),
+          textX = table.getCellValue(xAxis.column, row),
           nX = xAxis.norm(textX);
         return (column.filter.indexOf(nX) > -1);
       };

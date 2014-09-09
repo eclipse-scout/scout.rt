@@ -90,12 +90,12 @@ public class JsonFormToolButton extends AbstractJsonPropertyObserver<IFormToolBu
     boolean selected = JsonObjectUtility.getBoolean(event.getData(), IAction.PROP_SELECTED);
 
     PropertyChangeEventFilterCondition condition = new PropertyChangeEventFilterCondition(IAction.PROP_SELECTED, selected);
-    getPropertyEventFilter().addIgnorableModelEvent(condition);
+    getPropertyEventFilter().addCondition(condition);
     try {
       getModel().getUIFacade().setSelectedFromUI(selected);
     }
     finally {
-      getPropertyEventFilter().removeIgnorableModelEvent(condition);
+      getPropertyEventFilter().removeCondition(condition);
     }
   }
 

@@ -21,10 +21,12 @@ import java.util.List;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.fixtures.JsonSessionMock;
 import org.eclipse.scout.rt.ui.html.json.table.fixtures.Table;
+import org.eclipse.scout.rt.ui.html.json.table.fixtures.TableWith3Cols;
 import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
 import org.json.JSONArray;
@@ -168,6 +170,53 @@ public class JsonTableTest {
   }
 
   @Test
+  public void testColumnOrderChangedEvent() throws ProcessingException, JSONException {
+    TableWith3Cols table = new TableWith3Cols();
+    table.fill(2);
+    table.initTable();
+    table.resetDisplayableColumns();
+
+    IColumn<?> column0 = table.getColumns().get(0);
+    IColumn<?> column1 = table.getColumns().get(1);
+    JsonTable jsonTable = createJsonTableWithMocks(table);
+
+    assertEquals(table.getColumnSet().getVisibleColumn(0), column0);
+    assertEquals(table.getColumnSet().getVisibleColumn(1), column1);
+
+    JsonEvent event = createJsonColumnMovedEvent(column0.getColumnId(), 2);
+    jsonTable.handleUiEvent(event, new JsonResponse());
+
+    assertEquals(table.getColumnSet().getVisibleColumn(2), column0);
+
+    event = createJsonColumnMovedEvent(column1.getColumnId(), 0);
+    jsonTable.handleUiEvent(event, new JsonResponse());
+
+    assertEquals(table.getColumnSet().getVisibleColumn(0), column1);
+  }
+
+  /**
+   * Response must not contain the column order changed event if the event was triggered by the request and the order
+   * hasn't changed
+   */
+  @Test
+  public void testIgnorableColumnOrderChangedEvent() throws ProcessingException, JSONException {
+    TableWith3Cols table = new TableWith3Cols();
+    table.fill(2);
+    table.initTable();
+    table.resetDisplayableColumns();
+
+    IColumn<?> column = table.getColumns().get(0);
+    JsonTable jsonTable = createJsonTableWithMocks(table);
+
+    JsonEvent event = createJsonColumnMovedEvent(column.getColumnId(), 2);
+    jsonTable.handleUiEvent(event, new JsonResponse());
+
+    List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(
+        jsonTable.getJsonSession().currentJsonResponse(), "columnOrderChanged");
+    assertTrue(responseEvents.size() == 0);
+  }
+
+  @Test
   public void testDispose() {
     Table table = new Table();
     JsonTable object = createJsonTableWithMocks(table);
@@ -201,5 +250,13 @@ public class JsonTableTest {
     }
     data.put(JsonTable.PROP_ROW_IDS, rowIds);
     return new JsonEvent(tableId, JsonTable.EVENT_ROWS_SELECTED, data);
+  }
+
+  public static JsonEvent createJsonColumnMovedEvent(String columnId, int index) throws JSONException {
+    String tableId = "x"; // never used
+    JSONObject data = new JSONObject();
+    data.put(JsonTable.PROP_COLUMN_ID, columnId);
+    data.put("index", index);
+    return new JsonEvent(tableId, JsonTable.EVENT_COLUMN_MOVED, data);
   }
 }
