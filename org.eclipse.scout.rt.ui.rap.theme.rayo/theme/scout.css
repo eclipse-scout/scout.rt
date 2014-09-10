@@ -747,6 +747,7 @@ Composite.listboxDisabled {
 }
 Composite.formbarContainer {
   background-color: #ddebf4;
+  padding: 5px;
 }
 Composite.labelfield {
   /* a little padding to make sure the label is on the same line as the field's label */

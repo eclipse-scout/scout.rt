@@ -170,7 +170,11 @@ public class RwtScoutDialog extends AbstractRwtScoutPart {
       }
 
       @Override
-      public void shellActivated(ShellEvent e) {
+      public void shellActivated(final ShellEvent e) {
+        final Shell shell = (Shell) e.widget;
+        if (!shell.isDisposed() && shell.getMinimized()) {
+          shell.setMinimized(false);
+        }
         getUiEnvironment().invokeScoutLater(new Runnable() {
           @Override
           public void run() {
