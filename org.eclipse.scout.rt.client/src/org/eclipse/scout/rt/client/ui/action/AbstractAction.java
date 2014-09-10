@@ -152,7 +152,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   }
 
   /**
-   * called by constructor<br>
+   * called by {@link #initAction()}<br>
    * this way a menu can for example add/remove custom child menus
    */
   @ConfigOperation
@@ -163,7 +163,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   /**
    * called by prepareAction before action is added to list or used<br>
    * this way a menu can be made dynamically visible / enabled
-   * 
+   *
    * @deprecated use {@link AbstractMenu#execOwnerValueChanged}
    */
   @Deprecated
@@ -190,7 +190,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
 
   /**
    * called whenever the selection (of toggle-action) is changed.
-   * 
+   *
    * @param selection
    *          the new selection state
    * @throws ProcessingException
@@ -273,7 +273,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   /**
    * Please double check if implementing this method!
    * Consider using {@link #execAction()} instead. If no other option ensure super call when overriding this method.
-   * 
+   *
    * @throws ProcessingException
    */
   protected void doActionInternal() throws ProcessingException {
