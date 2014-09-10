@@ -60,6 +60,7 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
   public static final String PROP_ROW_IDS = "rowIds";
   public static final String PROP_ROW_ID = "rowId";
   public static final String PROP_COLUMN_ID = "columnId";
+  public static final String PROP_COLUMN_IDS = "columnIds";
   public static final String PROP_COLUMNS = "columns";
   public static final String PROP_CONTROLS = "controls";
   public static final String PROP_SELECTED_ROW_IDS = "selectedRowIds";
@@ -498,6 +499,14 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
     return getModel().getColumnSet().getColumnById(columnId);
   }
 
+  protected JSONArray columnIdsToJson(Collection<IColumn<?>> columns) {
+    JSONArray jsonColumnIds = new JSONArray();
+    for (IColumn column : columns) {
+      jsonColumnIds.put(column.getColumnId());
+    }
+    return jsonColumnIds;
+  }
+
   protected List<ITableRow> jsonToTableRows(JSONArray rowIds) {
     List<ITableRow> rows = new ArrayList<>(rowIds.length());
     for (int i = 0; i < rowIds.length(); i++) {
@@ -551,7 +560,7 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
         break;
       }
       case TableEvent.TYPE_COLUMN_ORDER_CHANGED: {
-        handleModelColumnOrderChanged(event.getColumns());
+        handleModelColumnOrderChanged();
         break;
       }
     }
@@ -608,14 +617,9 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
     addActionEvent("columnStructureChanged", jsonEvent);
   }
 
-  protected void handleModelColumnOrderChanged(Collection<IColumn<?>> columns) {
+  protected void handleModelColumnOrderChanged() {
     JSONObject jsonEvent = new JSONObject();
-//    putProperty(jsonEvent, PROP_ROW_IDS, rowIdsToJson(modelRows));
-//    JSONArray jsonRowIds = new JSONArray();
-//    for (ITableRow row : modelRows) {
-//      String rowId = m_tableRowIds.get(row);
-//      jsonRowIds.put(rowId);
-//    }
+    putProperty(jsonEvent, PROP_COLUMN_IDS, columnIdsToJson(getColumns()));
     addActionEvent("columnOrderChanged", jsonEvent);
   }
 

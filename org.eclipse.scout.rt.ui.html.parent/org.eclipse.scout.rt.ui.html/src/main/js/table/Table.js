@@ -133,10 +133,10 @@ scout.Table.prototype._sort = function() {
     return 0;
   }
   this.rows.sort(compare.bind(this));
-  this._renderRowOrder();
+  this._renderRowOrderChanges();
 };
 
-scout.Table.prototype._renderRowOrder = function() {
+scout.Table.prototype._renderRowOrderChanges = function() {
   var $rows = this.findRows();
   var $sortedRows = $();
   var animationRowLimit = 50;
@@ -624,6 +624,16 @@ scout.Table.prototype.getModelRowById = function(rowId) {
   }
 };
 
+scout.Table.prototype.getModelColumnById = function(columnId) {
+  var column, i;
+  for (i = 0; i < this.columns.length; i++) {
+    column = this.columns[i];
+    if (column.id === columnId) {
+      return column;
+    }
+  }
+};
+
 scout.Table.prototype.getModelRowsByIds = function(rowIds) {
   var i, row, rows = [];
 
@@ -802,6 +812,31 @@ scout.Table.prototype.moveColumn = function($header, oldPos, newPos, dragged) {
   });
 };
 
+scout.Table.prototype._renderColumnOrderChanges = function(oldColumnOrder) {
+  var column, i, j, $orderedCells, $cell, $cells, that = this;
+
+  this._header.renderColumnOrderChanges(oldColumnOrder);
+
+  // move cells
+  $('.table-row, .table-row-sum', this.$dataScroll).each(function() {
+    $orderedCells = $();
+    $cells = $(this).children();
+    for (i = 0; i < that.columns.length; i++) {
+      column = that.columns[i];
+
+      //Find $cell for given column
+      for (j = 0; j < oldColumnOrder.length; j++) {
+        if (oldColumnOrder[j] === column) {
+          $cell = $cells[j];
+          break;
+        }
+      }
+      $orderedCells.push($cell);
+    }
+    $(this).prepend($orderedCells);
+  });
+};
+
 scout.Table.prototype._triggerRowsDrawn = function($rows, numRows) {
   var type = scout.Table.GUI_EVENT_ROWS_DRAWN;
   var event = {
@@ -866,7 +901,7 @@ scout.Table.prototype._setMultiSelect = function(multiSelect) {
 scout.Table.prototype._onRowOrderChanged = function(rowIds) {
   var newPos, rows, row;
   if (rowIds.length !== this.rows.length) {
-    throw "Order changed event may not be processed because lengths of the arrays differ.";
+    throw "Row order changed event may not be processed because lengths of the arrays differ.";
   }
 
   // update model
@@ -879,14 +914,14 @@ scout.Table.prototype._onRowOrderChanged = function(rowIds) {
   this.rows = rows;
 
   if (this.rendered) {
-    this._renderRowOrder();
+    this._renderRowOrderChanges();
   }
 };
 
 scout.Table.prototype._onColumnStructureChanged = function(columns) {
   for (var i = 0; i < columns.length; i++) {
     for (var j = 0; j < this.columns.length; j++) {
-      if (columns[i].id ===  this.columns[j].id) {
+      if (columns[i].id === this.columns[j].id) {
         columns[i].index = this.columns[j].index;
         break;
       }
@@ -902,7 +937,31 @@ scout.Table.prototype._onColumnStructureChanged = function(columns) {
 };
 
 scout.Table.prototype._onColumnOrderChanged = function(columnIds) {
+  var i, column, columnId, currentPosition, oldColumnOrder;
+  if (columnIds.length !== this.columns.length) {
+    throw "Column order changed event may not be processed because lengths of the arrays differ.";
+  }
 
+  oldColumnOrder = this.columns.slice();
+
+  for (i = 0; i < columnIds.length; i++) {
+    columnId = columnIds[i];
+    column = this.getModelColumnById(columnId);
+    currentPosition = this.columns.indexOf(column);
+    if (currentPosition < 0) {
+      throw 'Column with id ' + columnId + 'not found.';
+    }
+
+    if (currentPosition !== i) {
+      //Update model
+      scout.arrays.remove(this.columns, column);
+      scout.arrays.insert(this.columns, column, i);
+    }
+  }
+
+  if (this.rendered) {
+    this._renderColumnOrderChanges(oldColumnOrder);
+  }
 };
 
 scout.Table.prototype.onModelAction = function(event) {

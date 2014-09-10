@@ -9,6 +9,7 @@ scout.TableHeader = function(table, $tableHeader, session) {
   this.totalWidth = 0;
   this.dragDone = false;
   this._$tableHeader = $tableHeader;
+  this.table = table;
 
   for (var i = 0; i < columns.length; i++) {
     column = columns[i];
@@ -49,10 +50,13 @@ scout.TableHeader = function(table, $tableHeader, session) {
       that.dragDone = false;
     } else if (event.shiftKey || event.ctrlKey) {
       table.sort($headerItem, $headerItem.hasClass('sort-asc') ? 'desc' : 'asc', event.shiftKey);
+    } else if (that._tableHeaderMenu && that._tableHeaderMenu.isOpenFor($(event.target))){
+      that._tableHeaderMenu.remove();
+      that._tableHeaderMenu = null;
     } else {
       var x = $headerItem.position().left + $tableHeader.position().left + parseFloat($tableHeader.css('margin-left')),
         y = $headerItem.position().top +  $tableHeader.position().top;
-      new scout.TableHeaderMenu(table, $headerItem, x, y, session);
+      that._tableHeaderMenu = new scout.TableHeaderMenu(table, $headerItem, x, y, session);
     }
 
     return false;
@@ -246,7 +250,7 @@ scout.TableHeader.prototype.onColumnMoved = function($header, oldPos, newPos, dr
 
   // store old position of header
   $headers.each(function() {
-  $(this).data('old-pos', $(this).offset().left);
+    $(this).data('old-pos', $(this).offset().left);
   });
 
   // change order in dom of header
@@ -273,6 +277,39 @@ scout.TableHeader.prototype.onColumnMoved = function($header, oldPos, newPos, dr
         .animateAVCSD('left', 0);
     });
   }
+};
+
+scout.TableHeader.prototype.renderColumnOrderChanges = function(oldColumnOrder) {
+  var column, newPos, oldPos, i, $header, $headerResize;
+  var $headers = this.findHeaderItems();
+
+  // store old position of headers
+  $headers.each(function() {
+    $(this).data('old-pos', $(this).offset().left);
+  });
+
+  // change order in dom of header
+  for (i=0; i < this.table.columns.length; i++) {
+    column = this.table.columns[i];
+    $header = column.$div;
+    $headerResize = $header.next('.header-resize');
+
+    this._$tableHeader.append($header);
+    this._$tableHeader.append($headerResize);
+  }
+
+  // move menu
+  //Menu may only be open at this time if the user opened the menu right before the columnOrderChanged event arrives from the server
+  if (this._tableHeaderMenu && this._tableHeaderMenu.isOpen()) {
+    var left = this._tableHeaderMenu.$header.position().left;
+    this._tableHeaderMenu.$headerMenu.animateAVCSD('left', left + 20);
+  }
+
+  // move to old position and then animate
+  $headers.each(function() {
+    $(this).css('left', $(this).data('old-pos') - $(this).offset().left)
+      .animateAVCSD('left', 0);
+  });
 };
 
 scout.TableHeader.prototype.getColumnViewIndex = function($headerItem) {

@@ -701,6 +701,103 @@ describe("Table", function() {
         expect($cells1.eq(1).text()).toBe('1');
       });
     });
+
+    describe("columnOrderChanged event", function() {
+      var model, table, column0, column1, column2;
+
+      beforeEach(function() {
+        model = helper.createModelFixture(3, 2);
+        table = helper.createTable(model);
+        column0 = model.columns[0];
+        column1 = model.columns[1];
+        column2 = model.columns[2];
+      });
+
+      function createColumnOrderChangedEvent(model, columnIds) {
+        return {
+          id: model.id,
+          columnIds: columnIds,
+          type: 'columnOrderChanged'
+        };
+      }
+
+      it("reorders the model columns", function() {
+        var message = {
+          events: [createColumnOrderChangedEvent(model, [column2.id, column0.id, column1.id])]
+        };
+        session._processSuccessResponse(message);
+
+        expect(table.columns.length).toBe(3);
+        expect(table.columns[0]).toBe(column2);
+        expect(table.columns[1]).toBe(column0);
+        expect(table.columns[2]).toBe(column1);
+      });
+
+      it("reorders the html nodes", function() {
+        table.render(session.$entryPoint);
+
+        var $colHeaders = table._header.findHeaderItems();
+        expect($colHeaders.length).toBe(3);
+        expect($colHeaders.eq(0).data('column')).toBe(column0);
+        expect($colHeaders.eq(1).data('column')).toBe(column1);
+        expect($colHeaders.eq(2).data('column')).toBe(column2);
+
+        var $rows = table.findRows();
+        var $cells0 = $rows.eq(0).find('.table-cell');
+        var $cells1 = $rows.eq(1).find('.table-cell');
+
+        expect($cells0.eq(0).text()).toBe('0');
+        expect($cells0.eq(1).text()).toBe('1');
+        expect($cells0.eq(2).text()).toBe('2');
+        expect($cells1.eq(0).text()).toBe('0');
+        expect($cells1.eq(1).text()).toBe('1');
+        expect($cells1.eq(2).text()).toBe('2');
+
+        var message = {
+            events: [createColumnOrderChangedEvent(model, [column2.id, column0.id, column1.id])]
+        };
+        session._processSuccessResponse(message);
+
+        //Check column header order
+        $colHeaders = table._header.findHeaderItems();
+        expect($colHeaders.length).toBe(3);
+        expect($colHeaders.eq(0).data('column')).toBe(column2);
+        expect($colHeaders.eq(1).data('column')).toBe(column0);
+        expect($colHeaders.eq(2).data('column')).toBe(column1);
+
+        //Check cells order
+        $rows = table.findRows();
+        $cells0 = $rows.eq(0).find('.table-cell');
+        $cells1 = $rows.eq(1).find('.table-cell');
+        expect($cells0.eq(0).text()).toBe('2');
+        expect($cells0.eq(1).text()).toBe('0');
+        expect($cells0.eq(2).text()).toBe('1');
+        expect($cells1.eq(0).text()).toBe('2');
+        expect($cells1.eq(1).text()).toBe('0');
+        expect($cells1.eq(2).text()).toBe('1');
+      });
+
+      //TODO CGU fails because css is not applied -> include css files in SpecRunner
+//      it("moves the table header menu if it is open", function() {
+//        table.render(session.$entryPoint);
+//
+//        var $colHeaders = table._header.findHeaderItems();
+//
+//        var $clickedHeader = $colHeaders.eq(0);
+//        $clickedHeader.triggerClick();
+//
+//        var tableHeaderMenu = table._header._tableHeaderMenu;
+//        var menuLeftPosition = tableHeaderMenu.$headerMenu.position().left;
+//        expect(tableHeaderMenu.isOpen()).toBe(true);
+//
+//        var message = {
+//            events: [createColumnOrderChangedEvent(model, [column2.id, column0.id, column1.id])]
+//        };
+//        session._processSuccessResponse(message);
+//
+//        expect(tableHeaderMenu.$headerMenu.position().left > menuLeftPosition).toBe(true);
+//      });
+    });
   });
 
   describe("onModelPropertyChange", function() {

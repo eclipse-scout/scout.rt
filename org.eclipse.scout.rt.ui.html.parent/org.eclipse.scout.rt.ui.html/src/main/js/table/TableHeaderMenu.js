@@ -2,20 +2,11 @@
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
 scout.TableHeaderMenu = function(table, $header, x, y, session) {
-  $('.table-header-menu').remove();
-  $('body').off('mousedown.remove');
-  $('body').off('keydown.remove');
-
   var pos = table._header.getColumnViewIndex($header),
     column = $header.data('column');
 
   // label title
-  if ($header.data('menu-open')) {
-    $header.data('menu-open', false);
-    return;
-  }
   $header.addClass('menu-open');
-  $header.data('menu-open', true);
 
   // create container
   var $menuHeader = table.$container.appendDIV('table-header-menu')
@@ -23,8 +14,11 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
 
   $menuHeader.appendDIV('table-header-menu-whiter').width($header[0].offsetWidth - 2);
 
+  this.$headerMenu = $menuHeader;
+  this.$header = $header;
+
   // every user action will close menu
-  $('body').on('mousedown.remove', removeMenu);
+  $('body').on('mousedown.remove', onMouseDown);
   $('body').on('keydown.remove', removeMenu);
 
   // create buttons in command for order
@@ -176,15 +170,19 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
   if ($header.hasClass('sort-desc')) $menuHeader.addClass('sort-desc');
   if ($header.hasClass('filter')) $menuHeader.addClass('filter');
 
+  var that = this;
+
+  function onMouseDown(event) {
+    if ($header.is($(event.target))) {
+      return;
+    }
+
+    removeMenu(event);
+  }
+
   function removeMenu(event) {
     if ($menuHeader.has($(event.target)).length === 0) {
-      $menuHeader.remove();
-      $header.removeClass('menu-open');
-      if (!$(event.target).is($header)) {
-        $header.data('menu-open', false);
-      }
-      $('body').off('mousedown.remove');
-      $('body').off('keydown.remove');
+      that.remove();
     }
   }
 
@@ -285,8 +283,8 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
     $groupAll.removeClass('selected');
     $groupSort.removeClass('selected');
 
-    if  ($header.parent().hasClass('group-all')) $groupAll.addClass('selected');
-    if  ($header.hasClass('group-sort')) $groupSort.addClass('selected');
+    if ($header.parent().hasClass('group-all')) $groupAll.addClass('selected');
+    if ($header.hasClass('group-sort')) $groupSort.addClass('selected');
   }
 
   function colorRed() {
@@ -346,4 +344,19 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
     // callback to table
     table.filter();
   }
+};
+
+scout.TableHeaderMenu.prototype.remove = function() {
+  this.$headerMenu.remove();
+  this.$header.removeClass('menu-open');
+  $('body').off('mousedown.remove');
+  $('body').off('keydown.remove');
+};
+
+scout.TableHeaderMenu.prototype.isOpenFor = function($header) {
+  return this.$header.is($header) && this.$header.hasClass('menu-open');
+};
+
+scout.TableHeaderMenu.prototype.isOpen = function() {
+  return this.$header.hasClass('menu-open');
 };
