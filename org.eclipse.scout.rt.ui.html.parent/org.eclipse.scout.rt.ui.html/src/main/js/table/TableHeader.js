@@ -134,6 +134,11 @@ scout.TableHeader = function(table, $tableHeader, session) {
 
       if (diff !== 0) {
         that.dragDone = true;
+
+        if (that._tableHeaderMenu && that._tableHeaderMenu.isOpen()) {
+          that._tableHeaderMenu.remove();
+          that._tableHeaderMenu = null;
+        }
       }
     }
 
@@ -263,9 +268,10 @@ scout.TableHeader.prototype.onColumnMoved = function($header, oldPos, newPos, dr
   }
 
   // move menu
-  var left = $header.position().left;
-
-  $('.table-header-menu').animateAVCSD('left', left + 20);
+  if (this._tableHeaderMenu && this._tableHeaderMenu.isOpen()) {
+    var left = $header.position().left;
+    this._tableHeaderMenu.$headerMenu.animateAVCSD('left', left + 20);
+  }
 
   // move to old position and then animate
   if (dragged) {
