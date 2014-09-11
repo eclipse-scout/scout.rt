@@ -29,7 +29,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.net.internal.TTLCache;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
-import org.osgi.framework.Version;
 
 /**
  * Implementation of a java.net {@link ProxySelector}. To activate this
@@ -43,7 +42,7 @@ import org.osgi.framework.Version;
  * <p>
  * The config.ini property "org.eclipse.scout.net.cache" can be used to set the cache TTL in millis, default is 300'000
  * millis (5 minutes). Values &lt;=0 deactivate caching.
- * 
+ *
  * @deprecated this class is only used until
  *             https://bugs.eclipse.org/bugs/show_bug.cgi?id=299756 and
  *             https://bugs.eclipse.org/bugs/show_bug.cgi?id=257443 are solved.
@@ -164,19 +163,12 @@ public final class EclipseProxySelector extends ProxySelector {
     if (ref != null) {
       try {
         IProxyService service = (IProxyService) context.getService(ref);
-
-        //Necessary for backward compatibility to Eclipse 3.4 needed for Lotus Notes 8.5.2
-        if (isOsgiFramework34()) {
-          return new IProxyData[0];
+        try {
+          Method method = IProxyService.class.getMethod("select", URI.class);
+          return (IProxyData[]) method.invoke(service, uri);
         }
-        else {
-          try {
-            Method method = IProxyService.class.getMethod("select", URI.class);
-            return (IProxyData[]) method.invoke(service, uri);
-          }
-          catch (Exception e) {
-            NetActivator.getDefault().getLog().log(new Status(Status.WARNING, NetActivator.PLUGIN_ID, "could not access method 'select' on 'IProxyService'.", e));
-          }
+        catch (Exception e) {
+          NetActivator.getDefault().getLog().log(new Status(Status.WARNING, NetActivator.PLUGIN_ID, "could not access method 'select' on 'IProxyService'.", e));
         }
       }
       finally {
@@ -184,18 +176,6 @@ public final class EclipseProxySelector extends ProxySelector {
       }
     }
     return new IProxyData[0];
-  }
-
-  /**
-   * @return true, if the version of osgi.framework.version is 3.4.x, false otherwise
-   */
-  private boolean isOsgiFramework34() {
-    String osgiFrameworkVersion = NetActivator.getDefault().getBundle().getBundleContext().getProperty("osgi.framework.version");
-    if (osgiFrameworkVersion != null) {
-      Version frameworkVersion = new Version(osgiFrameworkVersion);
-      return frameworkVersion.getMajor() == 3 && frameworkVersion.getMinor() <= 4;
-    }
-    return false;
   }
 
 }

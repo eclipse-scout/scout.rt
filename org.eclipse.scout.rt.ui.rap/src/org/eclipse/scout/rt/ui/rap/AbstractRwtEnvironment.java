@@ -121,7 +121,6 @@ import org.eclipse.swt.widgets.TrayItem;
 import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.osgi.framework.Bundle;
-import org.osgi.framework.Version;
 
 @SuppressWarnings("deprecation")
 public abstract class AbstractRwtEnvironment extends AbstractEntryPoint implements IRwtEnvironment {
@@ -1049,15 +1048,7 @@ public abstract class AbstractRwtEnvironment extends AbstractEntryPoint implemen
             break;
           }
           case IProcessingStatus.CANCEL: {
-            //Necessary for backward compatibility to Eclipse 3.4 needed for Lotus Notes 8.5.2
-            Version frameworkVersion = new Version(Activator.getDefault().getBundle().getBundleContext().getProperty("osgi.framework.version"));
-            if (frameworkVersion.getMajor() == 3
-                && frameworkVersion.getMinor() <= 4) {
-              iconId = SWT.ICON_INFORMATION;
-            }
-            else {
-              iconId = 1 << 8;//SWT.ICON_CANCEL
-            }
+            iconId = 1 << SWT.ICON_CANCEL;
             break;
           }
           default: {
