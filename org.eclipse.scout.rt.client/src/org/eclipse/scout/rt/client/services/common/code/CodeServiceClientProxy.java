@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.services.common.code;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -202,6 +203,7 @@ public class CodeServiceClientProxy extends AbstractService implements ICodeServ
 
   @Override
   public List<ICodeType<?, ?>> getCodeTypes(List<Class<? extends ICodeType<?, ?>>> types) {
+    List<Class<? extends ICodeType<?, ?>>> missingTypes = new ArrayList<Class<? extends ICodeType<?, ?>>>();
     List<ICodeType<?, ?>> instances = new ArrayList<ICodeType<?, ?>>(types.size());
     ServiceState state = getServiceState();
     synchronized (state.m_cacheLock) {
@@ -209,6 +211,22 @@ public class CodeServiceClientProxy extends AbstractService implements ICodeServ
         ICodeType<?, ?> codeType = state.m_cache.get(codeTypeClazz);
         if (codeType != null) {
           instances.add(codeType);
+        }
+        else {
+          missingTypes.add(codeTypeClazz);
+        }
+      }
+      if (missingTypes.size() > 0) {
+        List<ICodeType<?, ?>> newInstances = getRemoteService().getCodeTypes(missingTypes);
+        Iterator<ICodeType<?, ?>> iNewInstances = newInstances.iterator();
+        for (Class<? extends ICodeType<?, ?>> type : missingTypes) {
+          if (iNewInstances.hasNext()) {
+            ICodeType<?, ?> instance = iNewInstances.next();
+            if (instance != null) {
+              state.m_cache.put(type, instance);
+              instances.add(instance);
+            }
+          }
         }
       }
     }
@@ -375,7 +393,7 @@ public class CodeServiceClientProxy extends AbstractService implements ICodeServ
     }
   }
 
-  private ICodeService getRemoteService() {
+  protected ICodeService getRemoteService() {
     return ServiceTunnelUtility.createProxy(ICodeService.class, ClientSyncJob.getCurrentSession().getServiceTunnel());
   }
 
