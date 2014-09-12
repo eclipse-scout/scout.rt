@@ -29,7 +29,9 @@
 //@include("menu/menus.js");
 //@include("menu/Menubar.js")
 //@include("layout/layouts.js");
+//@include("layout/LogicalGridData.js");
 //@include("layout/LogicalGridLayoutInfo.js");
+//@include("layout/LogicalGridLayout.js");
 //@include("table/Table.js");
 //@include("table/TableConfigurator.js");
 //@include("table/TableHeader.js");

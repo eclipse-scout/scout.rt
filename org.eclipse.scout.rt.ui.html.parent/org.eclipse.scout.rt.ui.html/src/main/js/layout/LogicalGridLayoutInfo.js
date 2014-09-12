@@ -11,19 +11,28 @@ scout.SwingLayoutUtility.MAX = 2;
 scout.SwingLayoutUtility.EPS = 1e-6;
 
 scout.Dimension = function(width, height) {
-  this.width = width;
-  this.height = height;
+  this.width = width || 0;
+  this.height = height || 0;
 };
 
 scout.Dimension.prototype.toString = function() {
   return 'Dimension[width=' + this.width + ' height=' + this.height + ']';
 };
 
+scout.Dimension.prototype.equals = function(o) {
+  return this.width === o.width &&
+    this.height === o.height;
+};
+
 scout.Insets = function(top, right, bottom, left) {
-  this.top = left;
-  this.right = left;
-  this.bottom = left;
-  this.left = left;
+  this.top = top || 0;
+  this.right = right || 0;
+  this.bottom = bottom || 0;
+  this.left = left || 0;
+};
+
+scout.Insets.prototype.toString = function() {
+  return 'Insets[top=' + this.top + ' right=' + this.right + ' bottom=' + this.bottom + ' left=' + this.left + ']';
 };
 
 scout.Rectangle = function(x, y, width, height) {
@@ -82,41 +91,6 @@ scout.SwingEnvironment = function() {
   this.formRowGap = 6;
   this.formColumnWidth = 360;
   this.formColumnGap = 12;
-};
-
-scout.LogicalGridData = function(template) {
-  this.gridx = 0;
-  this.gridy = 0;
-  this.gridw = 1;
-  this.gridh = 1;
-  this.weightx = 0.0;
-  this.weighty = 0.0;
-  this.useUiWidth = false;
-  this.useUiHeight = false;
-  this.widthHint = 0;
-  this.heightHint = 0;
-  this.horizontalAlignment = -1;
-  this.verticalAlignment = -1;
-  this.fillHorizontal = true;
-  this.fillVertical = true;
-  this.topInset = 0;
-  if (template) {
-    this.gridx = template.gridx;
-    this.gridy = template.gridy;
-    this.gridw = template.gridw;
-    this.gridh = template.gridh;
-    this.weightx = template.weightx;
-    this.weighty = template.weighty;
-    this.useUiWidth = template.useUiWidth;
-    this.useUiHeight = template.useUiHeight;
-    this.widthHint = template.widthHint;
-    this.heightHint = template.heightHint;
-    this.horizontalAlignment = template.horizontalAlignment;
-    this.verticalAlignment = template.verticalAlignment;
-    this.fillHorizontal = template.fillHorizontal;
-    this.fillVertical = template.fillVertical;
-    this.topInset = template.topInset;
-  }
 };
 
 scout.TreeSet = function() {
@@ -617,15 +591,16 @@ scout.LogicalGridLayoutInfo.prototype.uiSizeInPixel = function($comp) {
   var prefSize, layout;
   layout = $comp.data('layout');
   if (layout) {
-  prefSize = layout.preferredLayoutSize($comp);
-  $.log('(LogicalGridLayout#uiSizeInPixel) ' + $comp.attr('id') + ' impl. preferredSize = ' + prefSize);
+    prefSize = layout.preferredLayoutSize($comp);
+    $.log('(LogicalGridLayoutInfo#uiSizeInPixel) ' + scout.Layout.debugComponent($comp) + ' impl. preferredSize=' + prefSize);
   } else {
     // TODO: hier koennten wir eigentlich einen fehler werfen, weil das nicht passieren sollte
     prefSize = scout.Dimension($comp.width(), $comp.height());
-  $.log('(LogicalGridLayout#uiSizeInPixel) ' + $comp.attr('id') + ' size of HTML element = ' + prefSize);
+    $.log('(LogicalGridLayoutInfo#uiSizeInPixel) ' + scout.Layout.debugComponent($comp) + ' size of HTML element=' + prefSize);
   }
   return prefSize;
 };
+
 
 // -----------------
 

@@ -12,8 +12,11 @@ scout.inherits(scout.Form, scout.ModelAdapter);
 
 scout.Form.prototype._render = function($parent) {
   this._$parent = $parent;
-  this.$container = $parent.appendDiv(undefined, 'form');
-  this.$container.data('model', this);
+  this.$container = $('<div>').
+    appendTo($parent).
+    attr('id', 'Form-' + this.id).
+    addClass('form').
+    data('model', this);
 
   var layout = new scout.FillLayout(); // TODO AWE: (layout) wir brauchen wahrscheinlich ein scout.FormLayout
   scout.Layout.setLayout(this.$container, layout);

@@ -21,8 +21,20 @@ scout.Layout.layout = function($comp)  {
 
 scout.Layout.measureString = function(text) {
   var $div = $('#StringMeasurement');
+  if ($div.length === 0) {
+    throw 'DIV StringMeasurement does\'nt exist';
+  }
   $div.html(text);
   return new scout.Dimension($div.width(), $div.height());
+};
+
+// FIXME AWE: getInsets impl. ist so falsch margin und border separat bestimmen
+// schauen ob wir das überhaupt brauchen (width VS outherWidth im vergleich z Swing)
+// ggf. andere Stellen refactoren an denen das hier auch gebraucht wird
+scout.Layout.getInsets = function($comp) {
+  var hMargin = $comp.outerWidth(true) - $comp.width();
+  var vMargin = $comp.outerHeight(true) - $comp.height();
+  return new scout.Insets(vMargin / 2, hMargin / 2, vMargin / 2, hMargin / 2);
 };
 
 scout.Layout.getDimension = function($comp) {
@@ -33,6 +45,24 @@ scout.Layout.getDimension = function($comp) {
 scout.Layout.setLogicalGridData = function($comp, gridData) {
   var logicalGridData = new scout.LogicalGridDataBuilder().build(gridData);
   $comp.data('logicalGridData', logicalGridData);
+};
+
+scout.Layout.getLogicalGridData = function($comp) {
+  return $comp.data('logicalGridData');
+};
+
+scout.Layout.debugComponent = function($comp) {
+  var attrs = '';
+  if ($comp.attr('id')) {
+    attrs += 'id=' + $comp.attr('id');
+  }
+  if ($comp.attr('class')) {
+    attrs += ' class=' + $comp.attr('class');
+  }
+  if (attrs.length === 0) {
+    attrs = $comp.html().substring(0, 30) + '...';
+  }
+  return 'Comp[' + attrs + ']';
 };
 
 // ---- Abstract Layout ----
@@ -85,117 +115,23 @@ scout.GroupBoxLayout.prototype.layout = function($parent) {
   var parentSize = scout.Layout.getDimension($parent);
   var titleHeight = 28; // TODO: dynamisch ermitteln / visibility / existenz pruefen
   var bodyHeight = parentSize.height - titleHeight;
-  var $body = $parent.find('.group-box-body').first();
-  this.setSize($body, new scout.Dimension(parentSize.width, bodyHeight));
+  this.setSize(this._getBody($parent), new scout.Dimension(parentSize.width, bodyHeight));
 };
 
 scout.GroupBoxLayout.prototype.preferredLayoutSize = function($parent) {
-  return new scout.Dimension(550, 300); // TODO impl.
+  var $body = this._getBody($parent);
+  var layout = scout.Layout.getLayout($body);
+  var bodySize = layout.preferredLayoutSize($body);
+  var size = new scout.Dimension(bodySize.width, bodySize.height);
+  size.height += 28;
+  // TODO AWE: (layout) add insets
+  return size;
 };
 
-// ---- Logical Grid Layout ----
-scout.LogicalGridLayout = function() {
-  scout.LogicalGridLayout.parent.call(this);
-  this.info;
-};
-scout.inherits(scout.LogicalGridLayout, scout.AbstractLayout);
-
-scout.LogicalGridLayout.prototype.layout = function($parent) {
-  var $formFields = $parent.children('.form-field');
-  var i, $components = [],
-    $comp, gridDatas = [],
-    data;
-  for (i = 0; i < $formFields.length; i++) {
-    $comp = $($formFields[i]);
-    data = $comp.data('logicalGridData');
-    if (!data) {
-      throw 'component [id=' + $comp.attr('id') + ' class=' + $comp.attr('class') + '] does not have a logical-grid-data. Failed to layout';
-    }
-    $components.push($comp);
-    gridDatas.push(data);
-  }
-
-  // Calculate layout - TODO: move to validateLayout()?
-  var env = new scout.SwingEnvironment(); // TODO: rename HtmlEnvironment, make more static?
-  this.info = new scout.LogicalGridLayoutInfo(env, $components, gridDatas, 5, 5);
-  var parentSize = scout.Layout.getDimension($parent);
-  console.log('(LogicalGridLayout#layout) size of parent ' + $parent + '= ' + parentSize);
-  var parentInsets = new scout.Insets(0, 0, 0, 0);
-  var cellBounds = this.info.layoutCellBounds(parentSize, parentInsets);
-
-  // Set bounds of components
-  var r1, r2, r, d, maxHeight = 0, tmpMaxHeight = 0, layout;
-  for (i = 0; i < $components.length; i++) {
-    $comp = $components[i];
-    data = gridDatas[i];
-    if (!$comp.is(':visible')) {
-      continue; // skip invisible components
-    }
-    r1 = cellBounds[data.gridy][data.gridx];
-    r2 = cellBounds[data.gridy + data.gridh - 1][data.gridx + data.gridw - 1];
-    r = r1.union(r2);
-    if (data.topInset > 0) {
-      r.y += data.topInset;
-      r.height -= data.topInset;
-    }
-    if (data.fillHorizontal && data.fillVertical) {
-      // ok
-    } else {
-      d = $comp.data('layout').preferredLayoutSize($comp);
-      if (!data.fillHorizontal) {
-        if (d.width < r.width) {
-          var delta = r.width - d.width;
-          r.width = d.width;
-          if (data.horizontalAlignment == 0) {
-            // Do ceil the result as other layout managers of Java also handle floating calculation results that way.
-            // This is important if being used in conjunction with another layout manager.
-            // E.g. the editable checkbox in inline table cell is a JCheckBox and rendered by LogicalGridLayout,
-            // whereas the default boolean representation in a table cell is simply an image on a label positioned by
-            // default layout manager. If switching in between of edit and non-edit mode, the widget would bounce otherwise.
-            r.x += Math.ceil(delta / 2.0);
-          } else if (data.horizontalAlignment > 0) {
-            r.x += delta;
-          }
-        }
-      }
-      if (!data.fillVertical) {
-        if (d.height < r.height) {
-          var delta = r.height - d.height;
-          if (data.heightHint == 0) {
-            r.height = d.height;
-          } else {
-            r.height = data.heightHint;
-          }
-          if (data.verticalAlignment == 0) {
-            // Do ceil the result as other layout managers of Java also handle floating calculation results that way.
-            // This is important if being used in conjunction with another layout manager.
-            // E.g. the editable checkbox in inline table cell is a JCheckBox and rendered by LogicalGridLayout,
-            // whereas the default boolean representation in a table cell is simply an image on a label positioned by
-            // default layout manager. If switching in between of edit and non-edit mode, the widget would bounce otherwise.
-            r.y += Math.ceil(delta / 2.0);
-          } else if (data.verticalAlignment > 0) {
-            r.y += delta;
-          }
-        }
-      }
-    }
-    this.setBounds($comp, r);
-
-    tmpMaxHeight = r.y + r.height - 1;
-    if (tmpMaxHeight > maxHeight) {
-      maxHeight = tmpMaxHeight;
-    }
-  }
-
-  // After all components have been laid out in the container (with absolute positioning) we must
-  // resize the parent-container to the correct heigth, since absolute positioned elements are
-  // outside of the HTML flow.
-  // $parent.css('height', maxHeight + 'px'); // FIXME AWE: check this - war vorher $body - evtl. entfernen
+scout.GroupBoxLayout.prototype._getBody = function($parent) {
+  return $parent.find('.group-box-body').first();
 };
 
-scout.LogicalGridLayout.prototype.preferredLayoutSize = function($parent) {
-  return new scout.Dimension(400, 300); // TODO impl.
-};
 
 // ---- Form-Field Layout ----
 // Layout for a form-field with label, status-label and a field
@@ -261,20 +197,21 @@ scout.TextFieldLayout.prototype.preferredLayoutSize = function($parent) {
    return scout.Layout.measureString($parent.val());
 };
 
-// ---- Button Layout ----
-// layout which does nothing
-scout.ButtonLayout = function() {
-  scout.ButtonLayout.parent.call(this);
-}
-scout.inherits(scout.ButtonLayout, scout.AbstractLayout);
+// ---- Button Field Layout ----
+// layout for fields with a button
+scout.ButtonFieldLayout = function() {
+  scout.ButtonFieldLayout.parent.call(this);
+};
+scout.inherits(scout.ButtonFieldLayout, scout.AbstractLayout);
 
-scout.ButtonLayout.prototype.layout = function($parent) {
+scout.ButtonFieldLayout.prototype.layout = function($parent) {
   // button has no children - nothing to do here
 };
 
-scout.ButtonLayout.prototype.preferredLayoutSize = function($parent) {
-  var hMargin = $parent.outerWidth(true) - $parent.width();
-  var vMargin = $parent.outerHeight(true) - $parent.height();
-  var textSize = scout.Layout.measureString($parent.html());
+scout.ButtonFieldLayout.prototype.preferredLayoutSize = function($parent) {
+  var $button = $parent.find('button');
+  var hMargin = $button.outerWidth(true) - $button.width();
+  var vMargin = $button.outerHeight(true) - $button.height();
+  var textSize = scout.Layout.measureString($button.html());
   return new scout.Dimension(textSize.width + hMargin, textSize.height + vMargin);
 };

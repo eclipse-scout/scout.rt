@@ -30,15 +30,13 @@ scout.GroupBox.prototype._render = function($parent) {
 
   var $body = this.$container.
     appendDiv('', 'group-box-body');
-
-  scout.Layout.setLayout($body, new scout.LogicalGridLayout());
+  var env = new scout.SwingEnvironment();
+  scout.Layout.setLayout($body, new scout.LogicalGridLayout(env, env.formColumnGap, env.formRowGap));
 
   var i, field, fields = this.getControlFields();
   for (i=0; i<fields.length; i++) {
     fields[i].render($body);
   }
-
-  // new scout.TableLayout().render(this.$container, this, this.getControlFields());
 };
 
 /**
