@@ -52,13 +52,13 @@ public class SwingScoutGroupBox extends SwingScoutFieldComposite<IGroupBox> impl
   private JPanel m_swingBodyPart;
   private JPanel m_swingButtonBarPart;
   // cache
-  protected String containerLabel;
-  protected String containerImage;
-  protected int containerImageHAlign = SwingConstants.LEFT;
-  protected int containerImageVAlign = SwingConstants.TOP;
-  protected boolean containerBorderInstalled;
-  protected boolean containerBorderVisible;
-  protected String containerBorderDecoration;
+  protected String m_containerLabel;
+  protected String m_containerImage;
+  protected int m_containerImageHAlign = SwingConstants.LEFT;
+  protected int m_containerImageVAlign = SwingConstants.TOP;
+  protected boolean m_containerBorderInstalled;
+  protected boolean m_containerBorderVisible;
+  protected String m_containerBorderDecoration;
 
   @Override
   protected void initializeSwing() {
@@ -113,7 +113,7 @@ public class SwingScoutGroupBox extends SwingScoutFieldComposite<IGroupBox> impl
   }
 
   protected boolean isSection() {
-    return containerBorderVisible && IGroupBox.BORDER_DECORATION_SECTION.equals(containerBorderDecoration);
+    return m_containerBorderVisible && IGroupBox.BORDER_DECORATION_SECTION.equals(m_containerBorderDecoration);
   }
 
   protected JPanel createButtonBarPart() {
@@ -187,47 +187,47 @@ public class SwingScoutGroupBox extends SwingScoutFieldComposite<IGroupBox> impl
   }
 
   /**
-   * set the values {@link #containerBorderVisible} and {@link #containerBorderDecoration}
+   * set the values {@link #m_containerBorderVisible} and {@link #m_containerBorderDecoration}
    */
   protected void interceptBorderStyle(IGroupBox box) {
-    containerBorderVisible = box.isBorderVisible();
-    containerBorderDecoration = IGroupBox.BORDER_DECORATION_EMPTY;
-    if (containerBorderVisible) {
+    m_containerBorderVisible = box.isBorderVisible();
+    m_containerBorderDecoration = IGroupBox.BORDER_DECORATION_EMPTY;
+    if (m_containerBorderVisible) {
       if (IGroupBox.BORDER_DECORATION_SECTION.equals(box.getBorderDecoration())) {
-        containerBorderDecoration = IGroupBox.BORDER_DECORATION_SECTION;
+        m_containerBorderDecoration = IGroupBox.BORDER_DECORATION_SECTION;
       }
       else if (IGroupBox.BORDER_DECORATION_LINE.equals(box.getBorderDecoration())) {
-        containerBorderDecoration = IGroupBox.BORDER_DECORATION_LINE;
+        m_containerBorderDecoration = IGroupBox.BORDER_DECORATION_LINE;
       }
       else if (IGroupBox.BORDER_DECORATION_AUTO.equals(box.getBorderDecoration())) {
         //auto default cases
         if (box.isMainBox()) {
           if (SwingUtility.isSynth()) {
-            containerBorderVisible = false;
+            m_containerBorderVisible = false;
           }
-          containerBorderDecoration = IGroupBox.BORDER_DECORATION_EMPTY;
+          m_containerBorderDecoration = IGroupBox.BORDER_DECORATION_EMPTY;
         }
         else if (box.isExpandable()) {
           // best guess
-          containerBorderDecoration = IGroupBox.BORDER_DECORATION_SECTION;
+          m_containerBorderDecoration = IGroupBox.BORDER_DECORATION_SECTION;
         }
         else if (box.getParentField() instanceof ITabBox) {
-          containerBorderDecoration = IGroupBox.BORDER_DECORATION_EMPTY;
+          m_containerBorderDecoration = IGroupBox.BORDER_DECORATION_EMPTY;
         }
         else {
-          containerBorderDecoration = IGroupBox.BORDER_DECORATION_LINE;
+          m_containerBorderDecoration = IGroupBox.BORDER_DECORATION_LINE;
         }
       }
     }
   }
 
   protected void setBackgroundImageFromScout(String imageName) {
-    if (imageName == containerImage || (imageName != null && imageName.equals(containerImage))) {
+    if (imageName == m_containerImage || (imageName != null && imageName.equals(m_containerImage))) {
       // nop
     }
     else {
-      containerImage = imageName;
-      if (containerBorderInstalled) {
+      m_containerImage = imageName;
+      if (m_containerBorderInstalled) {
         installSwingContainerBorder();
       }
     }
@@ -235,9 +235,9 @@ public class SwingScoutGroupBox extends SwingScoutFieldComposite<IGroupBox> impl
 
   protected void setBackgroundImageHorizontalAlignFromScout(int halign) {
     int swingAlign = SwingUtility.createHorizontalAlignment(halign);
-    if (swingAlign != containerImageHAlign) {
-      containerImageHAlign = swingAlign;
-      if (containerBorderInstalled) {
+    if (swingAlign != m_containerImageHAlign) {
+      m_containerImageHAlign = swingAlign;
+      if (m_containerBorderInstalled) {
         installSwingContainerBorder();
       }
     }
@@ -245,9 +245,9 @@ public class SwingScoutGroupBox extends SwingScoutFieldComposite<IGroupBox> impl
 
   protected void setBackgroundImageVerticalAlignFromScout(int valign) {
     int swingAlign = SwingUtility.createVerticalAlignment(valign);
-    if (swingAlign != containerImageVAlign) {
-      containerImageVAlign = swingAlign;
-      if (containerBorderInstalled) {
+    if (swingAlign != m_containerImageVAlign) {
+      m_containerImageVAlign = swingAlign;
+      if (m_containerBorderInstalled) {
         installSwingContainerBorder();
       }
     }
@@ -258,17 +258,17 @@ public class SwingScoutGroupBox extends SwingScoutFieldComposite<IGroupBox> impl
     if (s == null) {
       s = "";
     }
-    if (!s.equals(containerLabel)) {
-      containerLabel = s;
-      if (containerBorderInstalled) {
+    if (!s.equals(m_containerLabel)) {
+      m_containerLabel = s;
+      if (m_containerBorderInstalled) {
         installSwingContainerBorder();
       }
     }
   }
 
   protected void installSwingContainerBorder() {
-    containerBorderInstalled = true;
-    if (containerBorderVisible) {
+    m_containerBorderInstalled = true;
+    if (m_containerBorderVisible) {
       Border border = UIManager.getBorder("GroupBox.border");
       if (border == null) {
         border = new EmptyBorder(0, 0, 0, 0);
@@ -279,21 +279,21 @@ public class SwingScoutGroupBox extends SwingScoutFieldComposite<IGroupBox> impl
         insets.right += 6;
         border = new EmptyBorder(insets);
       }
-      if (IGroupBox.BORDER_DECORATION_SECTION.equals(containerBorderDecoration)) {
+      if (IGroupBox.BORDER_DECORATION_SECTION.equals(m_containerBorderDecoration)) {
         // section
         JSection section = (JSection) getSwingContainer();
-        section.setText(containerLabel);
+        section.setText(m_containerLabel);
         section.addPropertyChangeListener("expanded", new P_ExpansionListener());
         section.getContentPane().setBorder(border);
       }
-      else if (IGroupBox.BORDER_DECORATION_LINE.equals(containerBorderDecoration)) {
+      else if (IGroupBox.BORDER_DECORATION_LINE.equals(m_containerBorderDecoration)) {
         Insets insets = new Insets(26, border.getBorderInsets(null).left, border.getBorderInsets(null).bottom, border.getBorderInsets(null).right);
         insets.bottom += 6;
         insets.right += 6;
-        border = new TitledGroupBorder(containerLabel != null ? containerLabel : "", insets);
+        border = new TitledGroupBorder(m_containerLabel != null ? m_containerLabel : "", insets);
         Border bgBorder;
-        if (containerImage != null) {
-          Icon icon = getSwingEnvironment().getIcon(containerImage);
+        if (m_containerImage != null) {
+          Icon icon = getSwingEnvironment().getIcon(m_containerImage);
           if (icon != null) {
             // set minimum container size
             getSwingContainer().setMinimumSize(new Dimension(icon.getIconWidth(), icon.getIconHeight()));
@@ -302,7 +302,7 @@ public class SwingScoutGroupBox extends SwingScoutFieldComposite<IGroupBox> impl
             // reset minimum container size
             getSwingContainer().setMinimumSize(null);
           }
-          bgBorder = new BackgroundBorder(icon, containerImageHAlign, containerImageVAlign);
+          bgBorder = new BackgroundBorder(icon, m_containerImageHAlign, m_containerImageVAlign);
         }
         else {
           bgBorder = new EmptyBorder(0, 0, 0, 0);

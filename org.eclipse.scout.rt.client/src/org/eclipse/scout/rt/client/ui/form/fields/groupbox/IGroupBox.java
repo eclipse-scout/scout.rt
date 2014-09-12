@@ -55,7 +55,7 @@ public interface IGroupBox extends ICompositeField {
    * <ul>
    * <li>expandable=true uses section border</li>
    * <li>MainBox (IGroupBox#isMainBox()) has no border</li>
-   * <li>groupbog inside tab box (IGroupBox#isMainBox()) has no border</li>
+   * <li>groupbox inside tab box (IGroupBox#isMainBox()) has no border</li>
    * <li>all others use line border</li>
    * </ul>
    */
