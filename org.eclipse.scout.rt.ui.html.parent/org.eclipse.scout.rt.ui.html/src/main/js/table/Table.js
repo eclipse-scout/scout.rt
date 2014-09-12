@@ -465,15 +465,15 @@ scout.Table.prototype._group = function() {
   }
 };
 
-scout.Table.prototype.group = function($headerItem, draw, all) {
+scout.Table.prototype.group = function($header, draw, all) {
   $('.group-sort', this.$container).removeClass('group-sort');
   $('.group-all', this.$container).removeClass('group-all');
 
   if (draw) {
     if (!all) {
-      this.sort($headerItem, 'asc', false);
+      this.sort($header, 'asc', false);
     }
-    this._header.onGroupingChanged($headerItem, all);
+    this._header.onGroupingChanged($header, all);
   }
 
   this._group();
@@ -603,11 +603,23 @@ scout.Table.prototype.findSelectedRows = function() {
   return this.$dataScroll.find('.row-selected');
 };
 
-scout.Table.prototype.findRows = function() {
+scout.Table.prototype.findRows = function(includeSumRows) {
   if (!this.$dataScroll) {
     return $();
   }
-  return this.$dataScroll.find('.table-row');
+  var selector = '.table-row';
+  if (includeSumRows) {
+    selector += ', .table-row-sum';
+  }
+  return this.$dataScroll.find(selector);
+};
+
+scout.Table.prototype.findRowsForColIndex = function(colIndex, includeSumRows) {
+  var selector = '.table-row > div:nth-of-type(' + colIndex + ' )';
+  if (includeSumRows) {
+    selector += ', .table-row-sum > div:nth-of-type(' + colIndex + ' )';
+  }
+  return this.$dataScroll.find(selector);
 };
 
 scout.Table.prototype.findRowById = function(rowId) {
@@ -785,7 +797,34 @@ scout.Table.prototype.hideRow = function($row) {
   //  }
 };
 
-// move column
+/**
+ * @param resizingInProgress set this to true when calling this function several times in a row. If resizing is finished you have to call resizingColumnFinished.
+ */
+scout.Table.prototype.resizeColumn = function($header, width, summaryWidth, resizingInProgress) {
+  var colNum = this._header.getColumnViewIndex($header) + 1;
+
+  this.findRowsForColIndex(colNum, true)
+    .css('min-width', width)
+    .css('max-width', width);
+  this.findRows(true)
+    .css('min-width', summaryWidth)
+    .css('max-width', summaryWidth);
+
+  this._header.onColumnResized($header, width);
+
+  if (!resizingInProgress) {
+    this.resizingColumnFinished($header, width);
+  }
+};
+
+scout.Table.prototype.resizingColumnFinished = function($header, width) {
+  var column = $header.data('column');
+  var data = {
+      columnId: column.id,
+      width: width
+  };
+  this.session.send('columnResized', this.id, data);
+};
 
 scout.Table.prototype.moveColumn = function($header, oldPos, newPos, dragged) {
   var column = $header.data('column');
@@ -815,7 +854,7 @@ scout.Table.prototype.moveColumn = function($header, oldPos, newPos, dragged) {
 scout.Table.prototype._renderColumnOrderChanges = function(oldColumnOrder) {
   var column, i, j, $orderedCells, $cell, $cells, that = this;
 
-  this._header.renderColumnOrderChanges(oldColumnOrder);
+  this._header.onOrderChanged(oldColumnOrder);
 
   // move cells
   $('.table-row, .table-row-sum', this.$dataScroll).each(function() {
@@ -919,6 +958,7 @@ scout.Table.prototype._onRowOrderChanged = function(rowIds) {
 };
 
 scout.Table.prototype._onColumnStructureChanged = function(columns) {
+  //Index is not sent -> update received columns with the current indices
   for (var i = 0; i < columns.length; i++) {
     for (var j = 0; j < this.columns.length; j++) {
       if (columns[i].id === this.columns[j].id) {
@@ -964,6 +1004,27 @@ scout.Table.prototype._onColumnOrderChanged = function(columnIds) {
   }
 };
 
+/**
+ * @param columns array of columns which were updated.
+ */
+scout.Table.prototype._onColumnHeadersUpdated = function(columns) {
+  var updatedColumns = [], column;
+
+  //Update model columns
+  for (var i = 0; i < columns.length; i++) {
+    column = this.getModelColumnById(columns[i].id);
+    column.text = columns[i].text;
+    column.sortActive = columns[i].sortActive;
+    column.sortAscending = columns[i].sortAscending;
+
+    updatedColumns.push(column);
+  }
+
+  if (this.rendered) {
+    this._header.updateHeaders(updatedColumns);
+  }
+};
+
 scout.Table.prototype.onModelAction = function(event) {
   if (event.type == 'rowsInserted') {
     this.insertRows(event.rows);
@@ -979,6 +1040,8 @@ scout.Table.prototype.onModelAction = function(event) {
     this._onColumnStructureChanged(event.columns);
   } else if (event.type == 'columnOrderChanged') {
     this._onColumnOrderChanged(event.columnIds);
+  } else if (event.type == 'columnHeadersUpdated') {
+    this._onColumnHeadersUpdated(event.columns);
   } else {
     $.log('Model event not handled. Widget: scout.Table. Event: ' + event.type + '.');
   }

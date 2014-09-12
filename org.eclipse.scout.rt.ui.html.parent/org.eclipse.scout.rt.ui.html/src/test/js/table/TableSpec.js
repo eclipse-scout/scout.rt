@@ -162,6 +162,69 @@ describe("Table", function() {
     });
   });
 
+  describe("resizeColumn", function() {
+
+    it("sends resize event", function() {
+      var model = helper.createModelFixture(2, 5);
+      var table = helper.createTable(model);
+      table.render(session.$entryPoint);
+
+      var $colHeaders = table._$header.find('.header-item');
+      var $header0 = $colHeaders.eq(0);
+
+      table.resizeColumn($header0, 100, 150);
+
+      sendQueuedAjaxCalls();
+
+      var event = new scout.Event('columnResized', table.id, {
+        "columnId": table.columns[0].id,
+        "width": 100
+      });
+      expect(mostRecentJsonRequest()).toContainEvents(event);
+    });
+
+    it("does not send resize event when resizing is in progress", function() {
+      var model = helper.createModelFixture(2, 5);
+      var table = helper.createTable(model);
+      table.render(session.$entryPoint);
+
+      var $colHeaders = table._$header.find('.header-item');
+      var $header0 = $colHeaders.eq(0);
+
+      table.resizeColumn($header0, 50, 100, true);
+      table.resizeColumn($header0, 100, 150, true);
+
+      sendQueuedAjaxCalls();
+
+      expect(jasmine.Ajax.requests.count()).toBe(0);
+    });
+
+    it("sends resize event when resizing is finished", function() {
+      var model = helper.createModelFixture(2, 5);
+      var table = helper.createTable(model);
+      table.render(session.$entryPoint);
+
+      var $colHeaders = table._$header.find('.header-item');
+      var $header0 = $colHeaders.eq(0);
+
+      table.resizeColumn($header0, 50, 100, true);
+      table.resizeColumn($header0, 100, 150, true);
+      table.resizeColumn($header0, 150, 200);
+
+      sendQueuedAjaxCalls();
+
+      expect(jasmine.Ajax.requests.count()).toBe(1);
+      expect(mostRecentJsonRequest().events.length).toBe(1);
+
+      var event = new scout.Event('columnResized', table.id, {
+        "columnId": table.columns[0].id,
+        "width": 150
+      });
+      expect(mostRecentJsonRequest()).toContainEvents(event);
+    });
+
+  });
+
   describe("row click", function() {
 
     function clickRowAndAssertSelection(table, $row) {
@@ -797,6 +860,76 @@ describe("Table", function() {
 //
 //        expect(tableHeaderMenu.$headerMenu.position().left > menuLeftPosition).toBe(true);
 //      });
+
+    });
+
+    describe("columnHeadersUpdated event", function() {
+      var model, table, column0, column1, column2;
+
+      beforeEach(function() {
+        model = helper.createModelFixture(3, 2);
+        table = helper.createTable(model);
+        column0 = model.columns[0];
+        column1 = model.columns[1];
+        column2 = model.columns[2];
+      });
+
+      function createColumnHeadersUpdatedEvent(model, columns) {
+        return {
+          id: model.id,
+          columns: columns,
+          type: 'columnHeadersUpdated'
+        };
+      }
+
+      it("updates the text and sorting state of model columns", function() {
+        var text0 = table.columns[0].text;
+
+        column1 = helper.createModelColumn(column1.id, 'newText1');
+        column1.sortActive = true;
+        column1.sortAscending = true;
+        column2 = helper.createModelColumn(column2.id, 'newText2');
+
+        var message = {
+          events: [createColumnHeadersUpdatedEvent(model, [column1, column2])]
+        };
+        session._processSuccessResponse(message);
+
+        expect(table.columns.length).toBe(3);
+        expect(table.columns[0].text).toBe(text0);
+        expect(table.columns[1].text).toBe(column1.text);
+        expect(table.columns[1].sortAscending).toBe(column1.sortAscending);
+        expect(table.columns[1].sortActive).toBe(column1.sortActive);
+        expect(table.columns[2].text).toBe(column2.text);
+        expect(table.columns[2].sortAscending).toBe(column2.sortAscending);
+        expect(table.columns[2].sortActive).toBe(column2.sortActive);
+      });
+
+      it("updates the text and sorting state of html table header nodes", function() {
+        table.render(session.$entryPoint);
+
+        var $colHeaders = table._header.findHeaderItems();
+        expect($colHeaders.eq(0).text()).toBe(column0.text);
+        expect($colHeaders.eq(1).text()).toBe(column1.text);
+        expect($colHeaders.eq(1)).not.toHaveClass('sort-asc');
+        expect($colHeaders.eq(2).text()).toBe(column2.text);
+
+        column1 = helper.createModelColumn(column1.id, 'newText1');
+        column1.sortActive = true;
+        column1.sortAscending = true;
+        column2 = helper.createModelColumn(column2.id, 'newText2');
+
+        var message = {
+          events: [createColumnHeadersUpdatedEvent(model, [column1, column2])]
+        };
+        session._processSuccessResponse(message);
+
+        $colHeaders = table._header.findHeaderItems();
+        expect($colHeaders.eq(0).text()).toBe(column0.text);
+        expect($colHeaders.eq(1).text()).toBe(column1.text);
+        expect($colHeaders.eq(1)).toHaveClass('sort-asc');
+        expect($colHeaders.eq(2).text()).toBe(column2.text);
+      });
     });
   });
 

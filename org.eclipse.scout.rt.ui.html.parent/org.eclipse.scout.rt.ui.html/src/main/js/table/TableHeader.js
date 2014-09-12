@@ -4,34 +4,29 @@
 scout.TableHeader = function(table, $tableHeader, session) {
   var that = this,
     columns = table.columns,
-    column, $headerItem, sortDirection, alignment;
+    column, $header, alignment;
 
   this.totalWidth = 0;
   this.dragDone = false;
   this._$tableHeader = $tableHeader;
   this.table = table;
+  this.columns = table.columns;
 
   for (var i = 0; i < columns.length; i++) {
     column = columns[i];
-    $headerItem = $tableHeader.appendDIV('header-item', columns[i].text)
+    $header = $tableHeader.appendDIV('header-item')
       .data('column', column)
       .css('min-width', column.width + 'px') // 17 is width of header-resize handle, see table.css (.header-resize)
       .css('max-width', column.width + 'px')
       .on('click', '', onHeaderClick)
       .on('mousedown', '', dragHeader);
 
-    if (column.sortActive) {
-      sortDirection = column.sortAscending ? 'asc' : 'desc';
-      $headerItem.addClass('sort-' + sortDirection);
-//      FIXME CGU consider index
-//      if (column.sortIndex >= 0) {
-//        $headerItem.attr('data-sort-order', column.sortIndex);
-//      }
-    }
+    this._applyColumnText($header, column);
+    this._applyColumnSorting($header, column);
 
     alignment =  scout.Table.parseHorizontalAlignment(column.horizontalAlignment);
     if (alignment !== 'left')  {
-      $headerItem.css('text-align', alignment);
+      $header.css('text-align', alignment);
     }
 
     this.totalWidth += columns[i].width;
@@ -39,24 +34,24 @@ scout.TableHeader = function(table, $tableHeader, session) {
     $tableHeader.appendDIV('header-resize', '')
       .on('mousedown', '', resizeHeader);
 
-    column.$div = $headerItem;
+    column.$div = $header;
     column.filter = [];
   }
 
   function onHeaderClick(event) {
-    var $headerItem = $(this);
+    var $header = $(this);
 
     if (that.dragDone) {
       that.dragDone = false;
     } else if (event.shiftKey || event.ctrlKey) {
-      table.sort($headerItem, $headerItem.hasClass('sort-asc') ? 'desc' : 'asc', event.shiftKey);
+      table.sort($header, $header.hasClass('sort-asc') ? 'desc' : 'asc', event.shiftKey);
     } else if (that._tableHeaderMenu && that._tableHeaderMenu.isOpenFor($(event.target))){
       that._tableHeaderMenu.remove();
       that._tableHeaderMenu = null;
     } else {
-      var x = $headerItem.position().left + $tableHeader.position().left + parseFloat($tableHeader.css('margin-left')),
-        y = $headerItem.position().top +  $tableHeader.position().top;
-      that._tableHeaderMenu = new scout.TableHeaderMenu(table, $headerItem, x, y, session);
+      var x = $header.position().left + $tableHeader.position().left + parseFloat($tableHeader.css('margin-left')),
+        y = $header.position().top +  $tableHeader.position().top;
+      that._tableHeaderMenu = new scout.TableHeaderMenu(table, $header, x, y, session);
     }
 
     return false;
@@ -64,10 +59,9 @@ scout.TableHeader = function(table, $tableHeader, session) {
 
   function resizeHeader(event) {
     var startX = event.pageX ,
-      $headerItem = $(this).prev(),
-      colNum = that.getColumnViewIndex($headerItem) + 1,
-      headerWidth = parseFloat($headerItem.css('min-width')),
-      totalWidth = parseFloat($('.table-row').eq(0).css('width'));
+      $header = $(this).prev(),
+      headerWidth = parseFloat($header.css('min-width')),
+      totalWidth = parseFloat(that.table.findRows().eq(0).css('width'));
 
     $('body').addClass('col-resize')
       .on('mousemove', '', resizeMove)
@@ -79,26 +73,27 @@ scout.TableHeader = function(table, $tableHeader, session) {
         wSummary = totalWidth + diff;
 
       if (wHeader > 80 || diff > 0) {
-        $headerItem.css('min-width', wHeader).css('max-width', wHeader);
-        $('.table-row > div:nth-of-type(' + colNum + ' ), .table-row-sum > div:nth-of-type(' + colNum + ' )').css('min-width', wHeader).css('max-width', wHeader);
-        $('.table-row, .table-row-sum').css('min-width', wSummary).css('max-width', wSummary);
+        that.table.resizeColumn($header, wHeader, wSummary, true);
       }
     }
 
     function resizeEnd(event) {
       $('body').off('mousemove')
         .removeClass('col-resize');
+
+      var width = parseFloat($header.css('min-width'));
+      that.table.resizingColumnFinished($header, width);
     }
   }
 
   function dragHeader(event) {
     var diff = 0,
       startX = event.pageX,
-      $headerItem = $(this),
-      oldPos = that.getColumnViewIndex($headerItem),
+      $header = $(this),
+      oldPos = that.getColumnViewIndex($header),
       newPos =  oldPos,
-      move = $headerItem.outerWidth(),
-      $otherHeaders = $headerItem.siblings('.header-item');
+      move = $header.outerWidth(),
+      $otherHeaders = $header.siblings('.header-item');
 
     that.dragDone = false;
 
@@ -110,15 +105,15 @@ scout.TableHeader = function(table, $tableHeader, session) {
       diff = event.pageX - startX;
 
       // change css of dragged header
-      $headerItem.css('z-index', 50)
+      $header.css('z-index', 50)
         .addClass('header-move');
       $tableHeader.addClass('header-move');
 
       // move dragged header
-      $headerItem.css('left', diff);
+      $header.css('left', diff);
 
       // find other affected headers
-      var middle = realMiddle($headerItem);
+      var middle = realMiddle($header);
 
       $otherHeaders.each(function(i) {
         var m = realMiddle($($otherHeaders[i]));
@@ -180,10 +175,10 @@ scout.TableHeader = function(table, $tableHeader, session) {
 
       // move column
       if (oldPos !== newPos) {
-        table.moveColumn($headerItem, oldPos, newPos, true);
+        table.moveColumn($header, oldPos, newPos, true);
         that.dragDone = false;
       } else {
-        $headerItem.animateAVCSD('left', '', function () {that.dragDone = false;});
+        $header.animateAVCSD('left', '', function () {that.dragDone = false;});
       }
 
       // reset css of dragged header
@@ -191,12 +186,18 @@ scout.TableHeader = function(table, $tableHeader, session) {
         $(this).css('left', '');
       });
 
-      $headerItem.css('z-index', '')
+      $header.css('z-index', '')
         .css('background', '')
         .removeClass('header-move');
       $tableHeader.removeClass('header-move');
     }
   }
+};
+
+scout.TableHeader.prototype.onColumnResized = function($header, width) {
+  $header
+    .css('min-width', width)
+    .css('max-width', width);
 };
 
 scout.TableHeader.prototype.onSortingChanged = function($header, dir, additional, remove) {
@@ -240,11 +241,11 @@ scout.TableHeader.prototype.onSortingChanged = function($header, dir, additional
   }
 };
 
-scout.TableHeader.prototype.onGroupingChanged = function($headerItem, all) {
+scout.TableHeader.prototype.onGroupingChanged = function($header, all) {
   if (all) {
-    $headerItem.parent().addClass('group-all');
+    $header.parent().addClass('group-all');
   } else {
-    $headerItem.addClass('group-sort');
+    $header.addClass('group-sort');
   }
 };
 
@@ -285,7 +286,7 @@ scout.TableHeader.prototype.onColumnMoved = function($header, oldPos, newPos, dr
   }
 };
 
-scout.TableHeader.prototype.renderColumnOrderChanges = function(oldColumnOrder) {
+scout.TableHeader.prototype.onOrderChanged = function(oldColumnOrder) {
   var column, newPos, oldPos, i, $header, $headerResize;
   var $headers = this.findHeaderItems();
 
@@ -318,10 +319,48 @@ scout.TableHeader.prototype.renderColumnOrderChanges = function(oldColumnOrder) 
   });
 };
 
-scout.TableHeader.prototype.getColumnViewIndex = function($headerItem) {
-  return $headerItem.index() / 2;
+scout.TableHeader.prototype.getColumnViewIndex = function($header) {
+  return $header.index() / 2;
 };
 
 scout.TableHeader.prototype.findHeaderItems = function() {
   return this._$tableHeader.find('.header-item');
+};
+
+/**
+ * Updates the column headers visualization of the text and sorting state
+ */
+scout.TableHeader.prototype.updateHeaders = function(columns) {
+  for (var i=0;i<columns.length;i++) {
+    var column = columns[i];
+    var $header = columns[i].$div;
+    this._applyColumnText($header, column);
+    this._applyColumnSorting($header, column);
+  }
+};
+
+scout.TableHeader.prototype._applyColumnText = function($header, column) {
+  var text = column.text;
+  if (!text) {
+    text = '';
+  }
+  $header.text(text);
+};
+
+scout.TableHeader.prototype._applyColumnSorting = function($header, column) {
+  var sortDirection;
+  if (column.sortActive) {
+    sortDirection = column.sortAscending ? 'asc' : 'desc';
+    if (!$header.hasClass('sort-' + sortDirection)) {
+      $header.addClass('sort-' + sortDirection);
+    }
+  //  FIXME CGU consider index
+  //  if (column.sortIndex >= 0) {
+  //    $header.attr('data-sort-order', column.sortIndex);
+  //  }
+  }
+  else {
+    $header.removeClass('sort-asc');
+    $header.removeClass('sort-desc');
+  }
 };
