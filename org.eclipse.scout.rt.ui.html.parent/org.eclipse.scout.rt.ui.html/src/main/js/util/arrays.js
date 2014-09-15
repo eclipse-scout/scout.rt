@@ -75,6 +75,13 @@ scout.arrays = {
       arr2Length = arr2.length;
     }
     return arrLength > arr2Length;
+  },
+  eachSibling: function(arr, element, func) {
+    for (var i=0; i< arr.length; i++) {
+      var elementAtI = arr[i];
+      if (elementAtI !== element) {
+        func(elementAtI, i);
+      }
+    }
   }
-
 };

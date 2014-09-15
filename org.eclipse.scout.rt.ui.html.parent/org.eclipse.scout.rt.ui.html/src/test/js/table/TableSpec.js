@@ -203,6 +203,137 @@ describe("Table", function() {
 
   });
 
+  describe("sort", function() {
+    var model, table, column0, column1, column2;
+    var $colHeaders, $header0, $header1, $header2;
+
+    beforeEach(function() {
+      model = helper.createModelFixture(3, 3);
+      table = helper.createTable(model);
+      column0 = model.columns[0];
+      column1 = model.columns[1];
+      column2 = model.columns[2];
+    });
+
+    function render(table) {
+      table.render(session.$entryPoint);
+      $colHeaders = table._$header.find('.header-item');
+      $header0 = $colHeaders.eq(0);
+      $header1 = $colHeaders.eq(1);
+      $header2 = $colHeaders.eq(2);
+    }
+
+    it("updates column model", function() {
+      render(table);
+      table.sort($header0, 'desc');
+
+      expect(table.columns[0].sortActive).toBe(true);
+      expect(table.columns[0].sortAscending).toBe(false);
+      expect(table.columns[0].sortIndex).toBe(0);
+    });
+
+    describe('model update', function() {
+      it("sets sortAscending according to direction param", function() {
+        render(table);
+
+        table.sort($header0, 'desc');
+        expect(table.columns[0].sortAscending).toBe(false);
+
+        table.sort($header0, 'asc');
+        expect(table.columns[0].sortAscending).toBe(true);
+      });
+
+      it("resets properties on other columns", function() {
+        render(table);
+
+        table.sort($header0, 'desc');
+        expect(table.columns[0].sortActive).toBe(true);
+        expect(table.columns[0].sortAscending).toBe(false);
+        expect(table.columns[0].sortIndex).toBe(0);
+        expect(table.columns[1].sortActive).toBeFalsy();
+        expect(table.columns[1].sortAscending).toBeFalsy();
+        expect(table.columns[1].sortIndex).toBeUndefined();
+
+        table.sort($header1, 'desc');
+        expect(table.columns[0].sortActive).toBeFalsy();
+        expect(table.columns[0].sortAscending).toBeFalsy();
+        expect(table.columns[0].sortIndex).toBeUndefined();
+        expect(table.columns[1].sortActive).toBe(true);
+        expect(table.columns[1].sortAscending).toBe(false);
+        expect(table.columns[1].sortIndex).toBe(0);
+      });
+
+      it("sets sortIndex", function() {
+        render(table);
+
+        table.sort($header0, 'desc');
+        expect(table.columns[0].sortIndex).toBe(0);
+        expect(table.columns[1].sortIndex).toBeUndefined();
+
+        table.sort($header1, 'desc', true);
+        expect(table.columns[0].sortIndex).toBe(0);
+        expect(table.columns[1].sortIndex).toBe(1);
+
+        table.sort($header1, 'desc');
+        expect(table.columns[0].sortIndex).toBeUndefined();
+        expect(table.columns[1].sortIndex).toBe(0);
+      });
+
+      it("removes column from sort columns", function() {
+        render(table);
+
+        table.sort($header0, 'desc');
+        expect(table.columns[0].sortIndex).toBe(0);
+        expect(table.columns[1].sortIndex).toBeUndefined();
+
+        table.sort($header1, 'desc', true);
+        expect(table.columns[0].sortIndex).toBe(0);
+        expect(table.columns[1].sortIndex).toBe(1);
+
+        table.sort($header2, 'desc', true);
+        expect(table.columns[0].sortIndex).toBe(0);
+        expect(table.columns[1].sortIndex).toBe(1);
+        expect(table.columns[2].sortIndex).toBe(2);
+
+        //Remove second column -> sortIndex of 3rd column gets adjusted
+        table.sort($header1, 'desc', false, true);
+        expect(table.columns[0].sortIndex).toBe(0);
+        expect(table.columns[1].sortIndex).toBeUndefined();
+        expect(table.columns[2].sortIndex).toBe(1);
+      });
+    });
+
+    it("sends columnSortingChanged event", function() {
+      render(table);
+      table.sort($header0, 'desc');
+
+      sendQueuedAjaxCalls();
+
+      var event = new scout.Event('columnSortingChanged', table.id, {
+        "columnId": table.columns[0].id
+      });
+      expect(mostRecentJsonRequest()).toContainEvents(event);
+    });
+
+    it("sorts the data", function() {
+      render(table);
+      spyOn(table, '_sort');
+
+      table.sort($header0, 'desc');
+
+      expect(table._sort).toHaveBeenCalled();
+    });
+
+//    describe("sorting", function() {
+//
+//      it("todo", function() {
+        //FIXME CGU verify sorting is equal on client and server (including consideration of locale rules)
+//      });
+
+//    });
+
+  });
+
   describe("row click", function() {
 
     function clickRowAndAssertSelection(table, $row) {

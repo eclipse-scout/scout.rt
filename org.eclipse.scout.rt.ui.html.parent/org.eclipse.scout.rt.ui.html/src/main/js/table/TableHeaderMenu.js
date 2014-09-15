@@ -232,7 +232,8 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
 
   function sortSelect() {
     var addIcon = '\uF067',
-      sortCount = $('.header-item[data-sort-order]').length;
+      sortCount = getSortColumnCount(),
+      column = $header.data('column');
 
     $('.header-command', $commandSort).removeClass('selected');
 
@@ -247,10 +248,10 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
     } else if (sortCount > 1) {
       if ($header.hasClass('sort-asc')) {
         $sortAscAdd.addClass('selected');
-        addIcon = parseInt($header.attr('data-sort-order'), 0) + 1;
+        addIcon = column.sortIndex + 1;
       } else if ($header.hasClass('sort-desc')) {
         $sortDescAdd.addClass('selected');
-        addIcon = parseInt($header.attr('data-sort-order'), 0) + 1;
+        addIcon = column.sortIndex + 1;
       }
     } else {
       addIcon = null;
@@ -263,6 +264,18 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
       $sortAscAdd.hide();
       $sortDescAdd.hide();
     }
+  }
+
+  function getSortColumnCount() {
+    var sortCount = 0;
+
+    for (var i=0; i<table.columns.length; i++) {
+      if (table.columns[i].sortActive) {
+        sortCount++;
+      }
+    }
+
+    return sortCount;
   }
 
   function groupAll() {

@@ -109,9 +109,9 @@ scout.Table.prototype._sort = function() {
   // find all sort columns
   for (var c = 0; c < this.columns.length; c++) {
     var column = this.columns[c],
-      order = column.$div.attr('data-sort-order');
-    if (order >= 0) {
-      sortColumns[order] = column;
+      sortIndex = column.sortIndex;
+    if (sortIndex >= 0) {
+      sortColumns[sortIndex] = column;
     }
   }
 
@@ -184,25 +184,63 @@ scout.Table.prototype._renderRowOrderChanges = function() {
   }
 };
 
+/**
+ * @param additional true to add the column to list of sorted columns. False to use this column exclusively as sort column (reset other columns)
+ */
 scout.Table.prototype.sort = function($header, dir, additional, remove) {
+  var maxIndex = -1, sortIndex, siblingsResetted;
   var column = $header.data('column');
-  column.sortAscending = dir === 'asc' ? true : false;
-  column.sortActive = true;
-
   var data = {
     columnId: column.id
   };
-  if (additional) {
-    data.multiSort = true;
-  }
+
+  // Update model
   if (remove) {
     data.sortingRemoved = true;
     column.sortActive = false;
-  }
 
+    //Adjust sibling columns with higher index
+    scout.arrays.eachSibling(this.columns, column, function(siblingColumn) {
+      if (siblingColumn.sortIndex > column.sortIndex) {
+        siblingColumn.sortIndex = siblingColumn.sortIndex - 1;
+      }
+    });
+    column.sortIndex = undefined;
+  } else {
+    if (additional) {
+      data.multiSort = true;
+
+      // If not already sorted set the appropriate sort index
+      if (!column.sortActive) {
+        for (var i=0; i < this.columns.length; i++) {
+          sortIndex = this.columns[i].sortIndex;
+          if (sortIndex >= 0) {
+            maxIndex = Math.max(sortIndex, maxIndex);
+          }
+        }
+        column.sortIndex = maxIndex + 1;
+      }
+    } else {
+      scout.arrays.eachSibling(this.columns, column, function(siblingColumn) {
+        if (siblingColumn.sortActive) {
+          siblingColumn.sortIndex = undefined;
+          siblingColumn.sortActive = false;
+          siblingsResetted = true;
+        }
+      });
+      column.sortIndex = 0;
+    }
+    if (column.sortActive && siblingsResetted) {
+      //FIXME CGU this is necessary because the server logic does it (handleSortEvent). In my opinion we have to send sorting details (active, index, asc) instead of just column sorted.
+      column.sortAscending = true;
+    } else {
+      column.sortAscending = dir === 'asc' ? true : false;
+    }
+    column.sortActive = true;
+  }
   this.session.send('columnSortingChanged', this.id, data);
 
-  this._header.onSortingChanged($header, dir, additional, remove);
+  this._header.onSortingChanged();
 
   // sort and visualize
   this._sort();

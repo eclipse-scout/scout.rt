@@ -200,44 +200,10 @@ scout.TableHeader.prototype.onColumnResized = function($header, width) {
     .css('max-width', width);
 };
 
-scout.TableHeader.prototype.onSortingChanged = function($header, dir, additional, remove) {
-  $header.removeClass('sort-asc sort-desc');
-
-  if (remove) {
-    var attr = $header.attr('data-sort-order');
-    $header.siblings().each(function() {
-      if ($(this).attr('data-sort-order') > attr) {
-        var sortOrder = parseInt($(this).attr('data-sort-order'), 0) - 1;
-        $(this).attr('data-sort-order', sortOrder);
-      }
-    });
-    $header.removeAttr('data-sort-order');
-  } else {
-    // change sort order of clicked header
-    $header.addClass('sort-' + dir);
-
-    // when shift pressed: add, otherwise reset
-    if (additional) {
-      var clickOrder = $header.data('sort-order'),
-        maxOrder = -1;
-
-      $('.header-item').each(function() {
-        var value = parseInt($(this).attr('data-sort-order'), 0);
-        maxOrder = (value > maxOrder) ? value : maxOrder;
-      });
-
-      if (clickOrder !== undefined && clickOrder !== null) {
-        $header.attr('data-sort-order', clickOrder);
-      } else {
-        $header.attr('data-sort-order', maxOrder + 1);
-      }
-
-    } else {
-      $header.attr('data-sort-order', 0)
-        .siblings()
-        .removeClass('sort-asc sort-desc')
-        .attr('data-sort-order', null);
-    }
+scout.TableHeader.prototype.onSortingChanged = function() {
+  for (var i=0; i<this.table.columns.length; i++) {
+    var column = this.table.columns[i];
+    this._applyColumnSorting(column.$div, column);
   }
 };
 
@@ -348,19 +314,12 @@ scout.TableHeader.prototype._applyColumnText = function($header, column) {
 };
 
 scout.TableHeader.prototype._applyColumnSorting = function($header, column) {
+  $header.removeClass('sort-asc');
+  $header.removeClass('sort-desc');
+
   var sortDirection;
   if (column.sortActive) {
     sortDirection = column.sortAscending ? 'asc' : 'desc';
-    if (!$header.hasClass('sort-' + sortDirection)) {
-      $header.addClass('sort-' + sortDirection);
-    }
-  //  FIXME CGU consider index
-  //  if (column.sortIndex >= 0) {
-  //    $header.attr('data-sort-order', column.sortIndex);
-  //  }
-  }
-  else {
-    $header.removeClass('sort-asc');
-    $header.removeClass('sort-desc');
+    $header.addClass('sort-' + sortDirection);
   }
 };

@@ -437,6 +437,7 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
       if (column.isSortActive() && column.isSortExplicit()) {
         json.put("sortActive", true);
         json.put("sortAscending", column.isSortAscending());
+        json.put("sortIndex", column.getSortIndex());
       }
 
       if (column instanceof INumberColumn<?>) {
