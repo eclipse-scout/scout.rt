@@ -58,28 +58,6 @@ describe("Table", function() {
 
   });
 
-  describe("insertRows", function() {
-
-    it("inserts rows at the end of the table", function() {
-      var model = helper.createModelFixture(2);
-      var table = helper.createTable(model);
-      table.render(session.$entryPoint);
-
-      expect(table.$dataScroll.children().length).toBe(0);
-
-      var rows = helper.createModelRows(2, 5);
-      table.insertRows(rows);
-
-      expect(table.$dataScroll.children().length).toBe(5);
-
-      rows = helper.createModelRows(2, 8);
-      table.insertRows(rows);
-
-      expect(table.$dataScroll.children().length).toBe(5 + 8);
-    });
-
-  });
-
   describe("selectRowsByIds", function() {
 
     it("selects rows and unselects others", function() {
@@ -484,28 +462,20 @@ describe("Table", function() {
 
   describe("onModelAction", function() {
 
-    it("processes insertion events", function() {
-      var model = helper.createModelFixture(2);
-      var table = helper.createTable(model);
-      table.render(session.$entryPoint);
-
-      spyOn(table, 'insertRows');
-
-      var rows = helper.createModelRows(2, 5);
-      var event = new scout.Event('rowsInserted', table.id, {
-        "rows": rows
-      });
-      table.onModelAction(event);
-
-      expect(table.insertRows).toHaveBeenCalledWith(rows);
-    });
+    function createRowsInsertedEvent(model, rows) {
+      return {
+        id: model.id,
+        rows: rows,
+        type: 'rowsInserted'
+      };
+    }
 
     it("processes selection events", function() {
       var model = helper.createModelFixture(2, 5);
       var table = helper.createTable(model);
       table.render(session.$entryPoint);
 
-      spyOn(table, 'selectRowsByIds');
+      spyOn(table, '_onRowsSelected');
 
       var rowIds = ['0', '4'];
       var event = new scout.Event('rowsSelected', table.id, {
@@ -513,7 +483,7 @@ describe("Table", function() {
       });
       table.onModelAction(event);
 
-      expect(table.selectRowsByIds).toHaveBeenCalledWith(rowIds);
+      expect(table._onRowsSelected).toHaveBeenCalledWith(rowIds);
     });
 
     describe("rowsDeleted event", function() {
@@ -624,6 +594,35 @@ describe("Table", function() {
 
     });
 
+    describe("rowsInserted event", function() {
+      var model, table;
+
+      beforeEach(function() {
+        model = helper.createModelFixture(2);
+        table = helper.createTable(model);
+      });
+
+      it("inserts rows at the end of the table", function() {
+        expect(table.rows.length).toBe(0);
+
+        var rows = helper.createModelRows(2, 5);
+        var message = {
+          events: [createRowsInsertedEvent(model, rows)]
+        };
+        session._processSuccessResponse(message);
+
+        expect(table.rows.length).toBe(5);
+
+        rows = helper.createModelRows(2, 3);
+        message = {
+          events: [createRowsInsertedEvent(model, rows)]
+        };
+        session._processSuccessResponse(message);
+
+        expect(table.rows.length).toBe(5 + 3);
+      });
+    });
+
     describe("rowOrderChanged event", function() {
       var model, table, row0, row1, row2;
 
@@ -667,6 +666,42 @@ describe("Table", function() {
         expect($rows.eq(0).attr('id')).toBe('2');
         expect($rows.eq(1).attr('id')).toBe('1');
         expect($rows.eq(2).attr('id')).toBe('0');
+      });
+
+      it("does not animate ordering for newly inserted rows", function() {
+        table.render(session.$entryPoint);
+        expect(table.rows.length).toBe(3);
+
+        var newRows = [
+          helper.createModelRow('3', helper.createModelCells(2)),
+          helper.createModelRow('4', helper.createModelCells(2))
+        ];
+
+        //Insert new rows and switch rows 0 and 1
+        var message = {
+          events: [
+            createRowsInsertedEvent(model, newRows),
+            createRowOrderChangedEvent(model, [row1.id, row0.id, newRows[0].id, newRows[1].id, row2.id])
+          ]
+        };
+        session._processSuccessResponse(message);
+
+        //Checkif rows were inserted
+        expect(table.rows.length).toBe(5);
+
+        //Check if animation is not done for the inserted rows
+        //The animation should be done for the other rows (row0 and 1 are switched -> visualize)
+        var $rows = table.findRows();
+        $rows.each(function() {
+          var $row = $(this);
+          var oldTop = $row.data('old-top');
+          var rowId = $row.attr('id');
+          if (rowId  === newRows[0].id || rowId === newRows[1].id) {
+            expect(oldTop).toBeUndefined();
+          } else {
+            expect(oldTop).toBeDefined();
+          }
+        });
       });
     });
 

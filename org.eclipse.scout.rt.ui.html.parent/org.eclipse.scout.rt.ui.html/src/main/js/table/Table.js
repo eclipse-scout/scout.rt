@@ -137,6 +137,7 @@ scout.Table.prototype._sort = function() {
 };
 
 scout.Table.prototype._renderRowOrderChanges = function() {
+  var $row, oldTop, i, rowWasInserted, animate, that = this;
   var $rows = this.findRows();
   var $sortedRows = $();
   var animationRowLimit = 50;
@@ -144,12 +145,26 @@ scout.Table.prototype._renderRowOrderChanges = function() {
   //store old position
   if ($rows.length < animationRowLimit) {
     $rows.each(function() {
-      $(this).data('old-top', $(this).offset().top);
+      $row = $(this);
+
+      //Prevent the order animation for newly inserted rows (to not confuse the user)
+      rowWasInserted = false;
+      for (var i in that._insertedRows) {
+        if (that._insertedRows[i].id === $row.attr('id')) {
+          rowWasInserted = true;
+          break;
+        }
+      }
+
+      if (!rowWasInserted) {
+        animate = true;
+        $row.data('old-top', $row.offset().top);
+      }
     });
   }
 
-  for (var i = 0; i < this.rows.length; i++) {
-    var $row = this.findRowById(this.rows[i].id);
+  for (i = 0; i < this.rows.length; i++) {
+    $row = this.findRowById(this.rows[i].id);
     $sortedRows.push($row[0]);
   }
 
@@ -157,10 +172,14 @@ scout.Table.prototype._renderRowOrderChanges = function() {
   this.$dataScroll.prepend($sortedRows);
 
   // for less than animationRowLimit rows: move to old position and then animate
-  if ($rows.length < animationRowLimit) {
+  if (animate) {
     $rows.each(function() {
-      $(this).css('top', $(this).data('old-top') - $(this).offset().top)
-        .animateAVCSD('top', 0);
+      $row = $(this);
+      oldTop = $row.data('old-top');
+      if (oldTop !== undefined) {
+        $row.css('top', oldTop - $row.offset().top)
+          .animateAVCSD('top', 0);
+      }
     });
   }
 };
@@ -541,16 +560,34 @@ scout.Table.prototype.colorData = function(mode, colorColumn) {
   }
 };
 
-scout.Table.prototype.insertRows = function(rows) {
-  //always insert new rows at the end
+scout.Table.prototype._onRowsSelected = function(rowIds) {
+  this.selectedRowIds = rowIds;
+
+  if (this.rendered) {
+    this.selectionHandler.drawSelection();
+  }
+};
+
+scout.Table.prototype._onRowsInserted = function(rows) {
+  //always insert new rows at the end, if the order is wrong a rowOrderChange event will follow
   scout.arrays.pushAll(this.rows, rows);
 
   if (this.rendered) {
+    //Remember inserted rows for future events like rowOrderChanged
+    if (!this._insertedRows) {
+      this._insertedRows = rows;
+      setTimeout(function() {
+        this._insertedRows = null;
+      }.bind(this), 0);
+    } else {
+      scout.arrays.pushAll(this._insertedRows, rows);
+    }
+
     this.drawData();
   }
 };
 
-scout.Table.prototype.deleteRowsByIds = function(rowIds) {
+scout.Table.prototype._onRowsDeleted = function(rowIds) {
   var rows, $row, i, row;
 
   //update model
@@ -570,7 +607,7 @@ scout.Table.prototype.deleteRowsByIds = function(rowIds) {
   }
 };
 
-scout.Table.prototype.deleteAllRows = function() {
+scout.Table.prototype._onAllRowsDeleted = function() {
   this.rows = [];
 
   if (this.rendered) {
@@ -579,21 +616,15 @@ scout.Table.prototype.deleteAllRows = function() {
 };
 
 scout.Table.prototype.selectRowsByIds = function(rowIds) {
-  if (!Array.isArray(rowIds)) {
-    rowIds = [rowIds];
-  }
+  if (!scout.arrays.equalsIgnoreOrder(rowIds, this.selectedRowIds)) {
+    this.selectedRowIds = rowIds;
 
-  this.selectedRowIds = rowIds;
-
-  if (this.rendered) {
-    this.selectionHandler.drawSelection();
-  }
-
-  if (!this.session.processingEvents) {
     this.session.send('rowsSelected', this.id, {
       'rowIds': rowIds
     });
   }
+
+  this.selectionHandler.drawSelection();
 };
 
 scout.Table.prototype.findSelectedRows = function() {
@@ -1027,13 +1058,13 @@ scout.Table.prototype._onColumnHeadersUpdated = function(columns) {
 
 scout.Table.prototype.onModelAction = function(event) {
   if (event.type == 'rowsInserted') {
-    this.insertRows(event.rows);
+    this._onRowsInserted(event.rows);
   } else if (event.type == 'rowsDeleted') {
-    this.deleteRowsByIds(event.rowIds);
+    this._onRowsDeleted(event.rowIds);
   } else if (event.type == 'allRowsDeleted') {
-    this.deleteAllRows();
+    this._onAllRowsDeleted();
   } else if (event.type == 'rowsSelected') {
-    this.selectRowsByIds(event.rowIds);
+    this._onRowsSelected(event.rowIds);
   } else if (event.type == 'rowOrderChanged') {
     this._onRowOrderChanged(event.rowIds);
   } else if (event.type == 'columnStructureChanged') {

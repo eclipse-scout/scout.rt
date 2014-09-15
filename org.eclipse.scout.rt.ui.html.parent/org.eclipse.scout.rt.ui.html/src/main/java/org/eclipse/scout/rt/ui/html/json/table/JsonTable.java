@@ -317,6 +317,7 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
 
     TableEventFilterCondition filterCondition = new TableEventFilterCondition(TableEvent.TYPE_ROW_ORDER_CHANGED);
     getTableEventFilter().addCondition(filterCondition);
+    //FIXME CGU add filter for HEADER_UPDATE event with json data of column (execDecorateHeaderCell is called which may change other header properties (text etc)
     try {
       if (sortingRemoved && getModel() instanceof ITable5) {
         ((ITable5) getModel()).fireSortColumnRemovedFromUI(column);
@@ -536,7 +537,7 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
 
   protected void handleModelTableEventBatch(List<? extends TableEvent> events) {
     for (TableEvent event : events) {
-      handleModelTableEvent(event); //FIXME sufficient?
+      handleModelTableEvent(event);
     }
   }
 
