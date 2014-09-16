@@ -29,7 +29,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
 
   this._filterResetListener = this.table.events.on(scout.Table.GUI_EVENT_FILTER_RESETTED, function(event) {
     //  $('.main-chart.selected, .map-item.selected').removeClassSVG('selected');
-    that.$container.find('.main-chart.selected').removeClassSVG('selected');
+    that.$parent.find('.main-chart.selected').removeClassSVG('selected');
   });
 
   // create container
@@ -68,7 +68,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
     if (column1.type == 'key') continue;
 
     var $div = $.makeDiv('', 'select-axis', column1.text)
-      .data('column', c1);
+      .data('column', column1);
 
     if (column1.type == 'date') {
       $div.appendDiv('', 'select-axis-group', dateDesc[0]);
@@ -112,7 +112,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
 
     if ((column2.type == 'number')) {
       $dataSelect.appendDiv('', 'select-data data-sum', column2.text)
-        .data('column', c2);
+        .data('column', column2);
     }
   }
 
@@ -674,14 +674,13 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
 
     //  filter function
     var filterFunc = function($row) {
-      //FIXME does not work anymore if column gets moved
-      var textX = $row.children().eq(xAxis.column).text(),
+      var textX = $row.children().eq(xAxis.column.index).text(),
         nX = xAxis.norm(textX);
 
       if (oneDim) {
         return (filters.indexOf(nX) > -1);
       } else {
-        var textY = $row.children().eq(yAxis.column).text(),
+        var textY = $row.children().eq(yAxis.column.index).text(),
           nY = yAxis.norm(textY);
         return (filters.indexOf(JSON.stringify([nX, nY])) > -1);
       }

@@ -3,6 +3,7 @@ package org.eclipse.scout.rt.client.ui.basic.table;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
 
 /*******************************************************************************
@@ -18,7 +19,10 @@ import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
 public interface ITable5 extends ITable {
   List<ITableControl> getControls();
 
+//FIXME move to ui facade.
   void fireTableReloadFromUI();
+
+  void fireSortColumnRemovedFromUI(IColumn<?> column);
 
   Class<? extends IMenu> getDefaultMenu();
 }

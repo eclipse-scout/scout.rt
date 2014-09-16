@@ -57,10 +57,16 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
   public static final String EVENT_ROWS_SELECTED = "rowsSelected";
   public static final String EVENT_ROWS_DELETED = "rowsDeleted";
   public static final String EVENT_ALL_ROWS_DELETED = "allRowsDeleted";
+  public static final String EVENT_COLUMN_SORTING_CHANGED = "columnSortingChanged";
+  public static final String EVENT_COLUMN_MOVED = "columnMoved";
+  public static final String EVENT_COLUMN_RESIZED = "columnResized";
   public static final String EVENT_RELOAD = "reload";
   public static final String EVENT_RESET_COLUMNS = "resetColumns";
   public static final String PROP_ROW_IDS = "rowIds";
   public static final String PROP_ROW_ID = "rowId";
+  public static final String PROP_COLUMN_ID = "columnId";
+  public static final String PROP_COLUMN_IDS = "columnIds";
+  public static final String PROP_COLUMNS = "columns";
   public static final String PROP_CONTROLS = "controls";
   public static final String PROP_SELECTED_ROW_IDS = "selectedRowIds";
 
@@ -73,7 +79,7 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
     super(model, jsonSession, id);
     m_tableRows = new HashMap<>();
     m_tableRowIds = new HashMap<>();
-    m_tableEventFilter = new TableEventFilter(model);
+    m_tableEventFilter = new TableEventFilter(this);
   }
 
   @Override
@@ -241,13 +247,7 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
   @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
-    JSONArray jsonColumns = new JSONArray();
-    for (IColumn<?> column : getModel().getColumns()) {
-      if (column.isDisplayable()) {
-        jsonColumns.put(columnToJson(column));
-      }
-    }
-    putProperty(json, "columns", jsonColumns);
+    putProperty(json, PROP_COLUMNS, columnsToJson(getColumns()));
     JSONArray jsonRows = new JSONArray();
     for (ITableRow row : getModel().getRows()) {
       JSONObject jsonRow = tableRowToJson(row);
@@ -279,25 +279,35 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
     else if (EVENT_RESET_COLUMNS.equals(event.getType())) {
       handleUiResetColumns(event, res);
     }
+    else if (EVENT_COLUMN_SORTING_CHANGED.equals(event.getType())) {
+      handleUiColumnSortingChanged(event, res);
+    }
+    else if (EVENT_COLUMN_MOVED.equals(event.getType())) {
+      handleUiColumnMoved(event, res);
+    }
+    else if (EVENT_COLUMN_RESIZED.equals(event.getType())) {
+      handleUiColumnResized(event, res);
+    }    
     else {
       super.handleUiEvent(event, res);
     }
   }
 
   protected void handleUiRowClicked(JsonEvent event, JsonResponse res) {
-    final ITableRow tableRow = extractTableRow(event.getData());
+    ITableRow tableRow = extractTableRow(event.getData());
     getModel().getUIFacade().fireRowClickFromUI(tableRow);
   }
 
   protected void handleUiRowsSelected(JsonEvent event, JsonResponse res) {
-    final List<ITableRow> tableRows = extractTableRows(event.getData());
-    TableEvent tableEvent = new TableEvent(getModel(), TableEvent.TYPE_ROWS_SELECTED, tableRows);
-    getTableEventFilter().addIgnorableModelEvent(tableEvent);
+    List<ITableRow> tableRows = extractTableRows(event.getData());
+    TableEventFilterCondition filterCondition = new TableEventFilterCondition(TableEvent.TYPE_ROWS_SELECTED);
+    filterCondition.setRows(tableRows);
+    getTableEventFilter().addCondition(filterCondition);
     try {
       getModel().getUIFacade().setSelectedRowsFromUI(tableRows);
     }
     finally {
-      getTableEventFilter().removeIgnorableModelEvent(tableEvent);
+      getTableEventFilter().removeCondition(filterCondition);
     }
   }
 
@@ -329,6 +339,53 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
       getModel().setTableChanging(false);
     }
   }
+  
+  protected void handleUiColumnSortingChanged(JsonEvent event, JsonResponse res) {
+    IColumn column = extractColumn(event.getData());
+    boolean multiSort = event.getData().optBoolean("multiSort");
+    boolean sortingRemoved = event.getData().optBoolean("sortingRemoved");
+
+    TableEventFilterCondition filterCondition = new TableEventFilterCondition(TableEvent.TYPE_ROW_ORDER_CHANGED);
+    getTableEventFilter().addCondition(filterCondition);
+    //FIXME CGU add filter for HEADER_UPDATE event with json data of column (execDecorateHeaderCell is called which may change other header properties (text etc)
+    try {
+      if (sortingRemoved && getModel() instanceof ITable5) {
+        ((ITable5) getModel()).fireSortColumnRemovedFromUI(column);
+      }
+      else {
+        getModel().getUIFacade().fireHeaderSortFromUI(column, multiSort);
+      }
+    }
+    finally {
+      getTableEventFilter().removeCondition(filterCondition);
+    }
+  }
+
+  protected void handleUiColumnMoved(JsonEvent event, JsonResponse res) {
+    IColumn column = extractColumn(event.getData());
+    int viewIndex = JsonObjectUtility.getInt(event.getData(), "index");
+
+    //Create column list with expected order
+    TableEventFilterCondition filterCondition = new TableEventFilterCondition(TableEvent.TYPE_COLUMN_ORDER_CHANGED);
+    List<IColumn<?>> columns = getColumns();
+    columns.remove(column);
+    columns.add(viewIndex, column);
+    filterCondition.setColumns(columns);
+    getTableEventFilter().addCondition(filterCondition);
+    try {
+      getModel().getUIFacade().fireColumnMovedFromUI(column, viewIndex);
+    }
+    finally {
+      getTableEventFilter().removeCondition(filterCondition);
+    }
+  }
+
+  protected void handleUiColumnResized(JsonEvent event, JsonResponse res) {
+    IColumn column = extractColumn(event.getData());
+    int width = JsonObjectUtility.getInt(event.getData(), "width");
+
+    getModel().getUIFacade().setColumnWidthFromUI(column, width);
+  }
 
   protected void handleUiRowAction(JsonEvent event, JsonResponse res) {
     final ITableRow tableRow = extractTableRow(event.getData());
@@ -337,11 +394,8 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
 
   protected JSONObject tableRowToJson(ITableRow row) {
     JSONArray jsonCells = new JSONArray();
-    for (int colIndex = 0; colIndex < row.getCellCount(); colIndex++) {
-      IColumn column = row.getTable().getColumnSet().getColumn(colIndex);
-      if (column.isDisplayable()) {
-        jsonCells.put(cellToJson(row.getCell(colIndex), column));
-      }
+    for (IColumn<?> column : getColumns()) {
+      jsonCells.put(cellToJson(row.getCell(column), column));
     }
     JSONObject jsonRow = new JSONObject();
     putProperty(jsonRow, "id", getOrCreatedRowId(row));
@@ -389,6 +443,18 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
     return null;
   }
 
+  protected JSONArray columnsToJson(Collection<IColumn<?>> columns) {
+    JSONArray jsonColumns = new JSONArray();
+    for (IColumn<?> column : columns) {
+      jsonColumns.put(columnToJson(column));
+    }
+    return jsonColumns;
+  }
+
+  public List<IColumn<?>> getColumns() {
+    return getModel().getColumnSet().getVisibleColumns();
+  }
+
   protected JSONObject columnToJson(IColumn column) {
     try {
       JSONObject json = new JSONObject();
@@ -397,8 +463,12 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
       json.put("type", computeColumnType(column));
       json.put(IColumn.PROP_WIDTH, column.getWidth());
       json.put("summary", column.isSummary());
-      json.put(IColumn.PROP_VISIBLE, column.isVisible());
       json.put(IColumn.PROP_HORIZONTAL_ALIGNMENT, column.getHorizontalAlignment());
+      if (column.isSortActive() && column.isSortExplicit()) {
+        json.put("sortActive", true);
+        json.put("sortAscending", column.isSortAscending());
+        json.put("sortIndex", column.getSortIndex());
+      }
 
       if (column instanceof INumberColumn<?>) {
         //Use localized pattern which contains the relevant chars for the current locale using DecimalFormatSymbols
@@ -467,6 +537,19 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
     return getTableRowForRowId(JsonObjectUtility.getString(json, PROP_ROW_ID));
   }
 
+  public IColumn extractColumn(JSONObject json) {
+    String columnId = JsonObjectUtility.getString(json, PROP_COLUMN_ID);
+    return getModel().getColumnSet().getColumnById(columnId);
+  }
+
+  protected JSONArray columnIdsToJson(Collection<IColumn<?>> columns) {
+    JSONArray jsonColumnIds = new JSONArray();
+    for (IColumn column : columns) {
+      jsonColumnIds.put(column.getColumnId());
+    }
+    return jsonColumnIds;
+  }
+
   protected List<ITableRow> jsonToTableRows(JSONArray rowIds) {
     List<ITableRow> rows = new ArrayList<>(rowIds.length());
     for (int i = 0; i < rowIds.length(); i++) {
@@ -485,12 +568,12 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
 
   protected void handleModelTableEventBatch(List<? extends TableEvent> events) {
     for (TableEvent event : events) {
-      handleModelTableEvent(event); //FIXME sufficient?
+      handleModelTableEvent(event);
     }
   }
 
   protected void handleModelTableEvent(TableEvent event) {
-    event = getTableEventFilter().filterIgnorableModelEvent(event);
+    event = getTableEventFilter().filter(event);
     if (event == null) {
       return;
     }
@@ -513,6 +596,18 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
       }
       case TableEvent.TYPE_ROW_ORDER_CHANGED: {
         handleModelRowOrderChanged(event.getRows());
+        break;
+      }
+      case TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED: {
+        handleModelColumnStructureChanged();
+        break;
+      }
+      case TableEvent.TYPE_COLUMN_ORDER_CHANGED: {
+        handleModelColumnOrderChanged();
+        break;
+      }
+      case TableEvent.TYPE_COLUMN_HEADERS_UPDATED: {
+        handleModelColumnHeadersUpdated(event.getColumns());
         break;
       }
     }
@@ -561,6 +656,24 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
       jsonRowIds.put(rowId);
     }
     addActionEvent("rowOrderChanged", jsonEvent);
+  }
+
+  protected void handleModelColumnStructureChanged() {
+    JSONObject jsonEvent = new JSONObject();
+    putProperty(jsonEvent, PROP_COLUMNS, columnsToJson(getColumns()));
+    addActionEvent("columnStructureChanged", jsonEvent);
+  }
+
+  protected void handleModelColumnOrderChanged() {
+    JSONObject jsonEvent = new JSONObject();
+    putProperty(jsonEvent, PROP_COLUMN_IDS, columnIdsToJson(getColumns()));
+    addActionEvent("columnOrderChanged", jsonEvent);
+  }
+
+  protected void handleModelColumnHeadersUpdated(Collection<IColumn<?>> columns) {
+    JSONObject jsonEvent = new JSONObject();
+    putProperty(jsonEvent, PROP_COLUMNS, columnsToJson(columns));
+    addActionEvent("columnHeadersUpdated", jsonEvent);
   }
 
   @Override

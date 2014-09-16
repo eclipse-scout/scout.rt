@@ -16,24 +16,24 @@ import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
 
-public abstract class AbstractEventFilter<EVENT extends EventObject> {
-  private List<EVENT> m_ignorableModelEvents;
+public abstract class AbstractEventFilter<EVENT extends EventObject, CONDITION> {
+  private List<CONDITION> m_conditions;
 
   public AbstractEventFilter() {
-    m_ignorableModelEvents = new LinkedList<>();
+    m_conditions = new LinkedList<>();
   }
 
-  public abstract EVENT filterIgnorableModelEvent(EVENT event);
+  public abstract EVENT filter(EVENT event);
 
-  public List<EVENT> getIgnorableModelEvents() {
-    return CollectionUtility.arrayList(m_ignorableModelEvents);
+  public List<CONDITION> getConditions() {
+    return CollectionUtility.arrayList(m_conditions);
   }
 
-  public void addIgnorableModelEvent(EVENT event) {
-    m_ignorableModelEvents.add(event);
+  public void addCondition(CONDITION event) {
+    m_conditions.add(event);
   }
 
-  public void removeIgnorableModelEvent(EVENT event) {
-    m_ignorableModelEvents.remove(event);
+  public void removeCondition(CONDITION event) {
+    m_conditions.remove(event);
   }
 }

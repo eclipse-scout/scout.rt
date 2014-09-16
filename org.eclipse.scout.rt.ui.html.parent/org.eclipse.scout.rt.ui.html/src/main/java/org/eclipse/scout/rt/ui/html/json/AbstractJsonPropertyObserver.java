@@ -135,7 +135,7 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
   private class P_PropertyChangeListener implements PropertyChangeListener {
     @Override
     public void propertyChange(PropertyChangeEvent event) {
-      event = getPropertyEventFilter().filterIgnorableModelEvent(event);
+      event = getPropertyEventFilter().filter(event);
       if (event == null) {
         return;
       }

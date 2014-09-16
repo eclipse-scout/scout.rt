@@ -13,32 +13,44 @@ package org.eclipse.scout.rt.ui.html.json.table;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.rt.client.ui.basic.table.ITable;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.ui.html.json.AbstractEventFilter;
 
-public class TableEventFilter extends AbstractEventFilter<TableEvent> {
+public class TableEventFilter extends AbstractEventFilter<TableEvent, TableEventFilterCondition> {
 
-  private ITable m_source;
+  private JsonTable m_jsonTable;
 
-  public TableEventFilter(ITable source) {
-    m_source = source;
+  public TableEventFilter(JsonTable jsonTable) {
+    m_jsonTable = jsonTable;
   }
 
   @Override
-  public TableEvent filterIgnorableModelEvent(TableEvent event) {
-    for (TableEvent eventToIgnore : getIgnorableModelEvents()) {
-      if (eventToIgnore.getType() == event.getType()) {
-        List<ITableRow> rows = new ArrayList<>(event.getRows());
-        rows.removeAll(eventToIgnore.getRows());
-        if (rows.size() == 0) {
-          //Event should be ignored if no nodes remain or if the event contained no nodes at all
-          return null;
+  public TableEvent filter(TableEvent event) {
+    for (TableEventFilterCondition condition : getConditions()) {
+      if (condition.getType() == event.getType()) {
+        if (condition.checkRows()) {
+          List<ITableRow> rows = new ArrayList<>(event.getRows());
+          rows.removeAll(condition.getRows());
+          if (rows.size() == 0) {
+            //Event should be ignored if no nodes remain or if the event contained no nodes at all
+            return null;
+          }
+
+          TableEvent newEvent = new TableEvent(m_jsonTable.getModel(), event.getType(), rows);
+          return newEvent;
+        }
+        else if (condition.checkColumns()) {
+          //Columns are not delivered by the event itself (at least not with COLUMN_ORDER_CHANGED) -> grab from table
+          if (CollectionUtility.equalsCollection(m_jsonTable.getColumns(), condition.getColumns())) {
+            return null;
+          }
+          //Don't ignore if columns are different
+          return event;
         }
 
-        TableEvent newEvent = new TableEvent(m_source, event.getType(), rows);
-        return newEvent;
+        return null;
       }
     }
     return event;

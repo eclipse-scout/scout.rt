@@ -29,6 +29,12 @@
   margin: 0px 20px 0px 20px;
 }
 
+.sort-icon(@icon) {
+  .font-icon;
+  content: @icon;
+  margin-left: 4px;
+  line-height: normal;
+}
 
 .header-item {
   position: relative;
@@ -42,8 +48,16 @@
   border-left: 1px solid transparent;
   border-right: 1px solid transparent;
 
-  &.sort-up, &.sort-down,  &.filter, &.group-all,   &.group-sort {
+  &.sort-asc, &.sort-desc,  &.filter, &.group-all,   &.group-sort {
     color: @color-bench-text-active;
+  }
+
+  &.sort-desc:after {
+    .sort-icon('\f0d7');
+  }
+
+  &.sort-asc:after {
+    .sort-icon('\f0d8');
   }
 
   &:hover, &.header-move{
@@ -57,7 +71,6 @@
     color: @color-bench-text-active;
     z-index: 2;
   }
-
 
 }
 

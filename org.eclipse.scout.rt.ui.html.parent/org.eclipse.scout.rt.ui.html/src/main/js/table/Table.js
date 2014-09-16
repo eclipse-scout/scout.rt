@@ -1,4 +1,4 @@
-  // SCOUT GUI
+// SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
 scout.Table = function() {
@@ -18,7 +18,6 @@ scout.Table = function() {
   this._addAdapterProperties(['controls', 'menus']);
   this.events = new scout.EventSupport();
   this._filterMap = {};
-  this.desktopMenuContributor;
 };
 scout.inherits(scout.Table, scout.ModelAdapter);
 
@@ -35,6 +34,10 @@ scout.Table.prototype.init = function(model, session) {
     this.configurator.configure(this);
   }
   this._keystrokeAdapter = new scout.TableKeystrokeAdapter(this);
+
+  for (var i = 0; i < this.columns.length; i++) {
+    this.columns[i].index = i;
+  }
 };
 
 scout.Table.prototype._createTableConfigurator = function() {
@@ -106,25 +109,19 @@ scout.Table.prototype._sort = function() {
   // find all sort columns
   for (var c = 0; c < this.columns.length; c++) {
     var column = this.columns[c],
-      order = column.$div.attr('data-sort-order'),
-      dir = column.$div.hasClass('sort-up') ? 'up' : (order >= 0 ? 'down' : '');
-    if (order >= 0) {
-      sortColumns[order] = {
-        index: c,
-        dir: dir
-      };
+      sortIndex = column.sortIndex;
+    if (sortIndex >= 0) {
+      sortColumns[sortIndex] = column;
     }
   }
 
   // compare rows
-  var that = this;
-
-  function compare(a, b) {
+  function compare(row1, row2) {
     for (var s = 0; s < sortColumns.length; s++) {
-      var index = sortColumns[s].index,
-        valueA = that.getValue(index, $(a).data('row')),
-        valueB = that.getValue(index, $(b).data('row')),
-        dir = sortColumns[s].dir == 'up' ? -1 : 1;
+      column = sortColumns[s];
+      var valueA = this.getCellValue(column, row1);
+      var valueB = this.getCellValue(column, row2);
+      var dir = column.sortActive && column.sortAscending ? -1 : 1;
 
       if (valueA < valueB) {
         return dir;
@@ -135,65 +132,115 @@ scout.Table.prototype._sort = function() {
 
     return 0;
   }
+  this.rows.sort(compare.bind(this));
+  this._renderRowOrderChanges();
+};
 
+scout.Table.prototype._renderRowOrderChanges = function() {
+  var $row, oldTop, i, rowWasInserted, animate, that = this;
   var $rows = this.findRows();
+  var $sortedRows = $();
+  var animationRowLimit = 50;
 
-  // store old position
-  $rows.each(function() {
-    $(this).data('old-top', $(this).offset().top);
-  });
+  //store old position
+  if ($rows.length < animationRowLimit) {
+    $rows.each(function() {
+      $row = $(this);
+
+      //Prevent the order animation for newly inserted rows (to not confuse the user)
+      rowWasInserted = false;
+      for (var i in that._insertedRows) {
+        if (that._insertedRows[i].id === $row.attr('id')) {
+          rowWasInserted = true;
+          break;
+        }
+      }
+
+      if (!rowWasInserted) {
+        animate = true;
+        $row.data('old-top', $row.offset().top);
+      }
+    });
+  }
+
+  for (i = 0; i < this.rows.length; i++) {
+    $row = this.findRowById(this.rows[i].id);
+    $sortedRows.push($row[0]);
+  }
 
   // change order in dom
-  $rows = $rows.sort(compare);
-  this.$dataScroll.prepend($rows);
+  this.$dataScroll.prepend($sortedRows);
 
-  // for less than 100 rows: move to old position and then animate
-  if ($rows.length < 100) {
+  // for less than animationRowLimit rows: move to old position and then animate
+  if (animate) {
     $rows.each(function() {
-      $(this).css('top', $(this).data('old-top') - $(this).offset().top)
-        .animateAVCSD('top', 0);
+      $row = $(this);
+      oldTop = $row.data('old-top');
+      if (oldTop !== undefined) {
+        $row.css('top', oldTop - $row.offset().top)
+          .animateAVCSD('top', 0);
+      }
     });
   }
 };
 
-scout.Table.prototype.sortChange = function($header, dir, additional, remove) {
-  $header.removeClass('sort-up sort-down');
+/**
+ * @param additional true to add the column to list of sorted columns. False to use this column exclusively as sort column (reset other columns)
+ */
+scout.Table.prototype.sort = function($header, dir, additional, remove) {
+  var maxIndex = -1, sortIndex, siblingsResetted;
+  var column = $header.data('column');
+  var data = {
+    columnId: column.id
+  };
 
+  // Update model
   if (remove) {
-    var attr = $header.attr('data-sort-order');
-    $header.siblings().each(function() {
-      if ($(this).attr('data-sort-order') > attr) {
-        $(this).attr('data-sort-order', parseInt($(this).attr('data-sort-order'), 0) - 1);
+    data.sortingRemoved = true;
+    column.sortActive = false;
+
+    //Adjust sibling columns with higher index
+    scout.arrays.eachSibling(this.columns, column, function(siblingColumn) {
+      if (siblingColumn.sortIndex > column.sortIndex) {
+        siblingColumn.sortIndex = siblingColumn.sortIndex - 1;
       }
     });
-    $header.removeAttr('data-sort-order');
+    column.sortIndex = undefined;
   } else {
-    // change sort order of clicked header
-    $header.addClass('sort-' + dir);
-
-    // when shift pressed: add, otherwise reset
     if (additional) {
-      var clickOrder = $header.data('sort-order'),
-        maxOrder = -1;
+      data.multiSort = true;
 
-      $('.header-item').each(function() {
-        var value = parseInt($(this).attr('data-sort-order'), 0);
-        maxOrder = (value > maxOrder) ? value : maxOrder;
-      });
-
-      if (clickOrder !== undefined && clickOrder !== null) {
-        $header.attr('data-sort-order', clickOrder);
-      } else {
-        $header.attr('data-sort-order', maxOrder + 1);
+      // If not already sorted set the appropriate sort index
+      if (!column.sortActive) {
+        for (var i=0; i < this.columns.length; i++) {
+          sortIndex = this.columns[i].sortIndex;
+          if (sortIndex >= 0) {
+            maxIndex = Math.max(sortIndex, maxIndex);
+          }
+        }
+        column.sortIndex = maxIndex + 1;
       }
-
     } else {
-      $header.attr('data-sort-order', 0)
-        .siblings()
-        .removeClass('sort-up sort-down')
-        .attr('data-sort-order', null);
+      scout.arrays.eachSibling(this.columns, column, function(siblingColumn) {
+        if (siblingColumn.sortActive) {
+          siblingColumn.sortIndex = undefined;
+          siblingColumn.sortActive = false;
+          siblingsResetted = true;
+        }
+      });
+      column.sortIndex = 0;
     }
+    if (column.sortActive && siblingsResetted) {
+      //FIXME CGU this is necessary because the server logic does it (handleSortEvent). In my opinion we have to send sorting details (active, index, asc) instead of just column sorted.
+      column.sortAscending = true;
+    } else {
+      column.sortAscending = dir === 'asc' ? true : false;
+    }
+    column.sortActive = true;
   }
+  this.session.send('columnSortingChanged', this.id, data);
+
+  this._header.onSortingChanged();
 
   // sort and visualize
   this._sort();
@@ -205,7 +252,7 @@ scout.Table.prototype.drawData = function() {
   this.selectionHandler.dataDrawn();
 };
 
-scout.Table.prototype._buildRowDiv = function(row, index) {
+scout.Table.prototype._buildRowDiv = function(row) {
   var column, width, style, align, value, alignment;
   var rowWidth = this._header.totalWidth + 4;
   var rowClass = 'table-row ';
@@ -216,14 +263,14 @@ scout.Table.prototype._buildRowDiv = function(row, index) {
   // FIXME Check if possible to use $.makeDiv (but maybe it's too slow)
   var unselectable = (scout.device.supportsCssUserSelect() ? '' : ' unselectable="on"'); // workaround for IE 9
 
-  var rowDiv = '<div id="' + row.id + '" class="' + rowClass + '" data-row=' + index + ' style="width: ' + rowWidth + 'px"' + unselectable + '>';
-  for (var c = 0; c < row.cells.length; c++) {
+  var rowDiv = '<div id="' + row.id + '" class="' + rowClass + '" style="width: ' + rowWidth + 'px"' + unselectable + '>';
+  for (var c = 0; c < this.columns.length; c++) {
     column = this.columns[c];
     width = column.width;
     style = (width === 0) ? 'display: none; ' : 'min-width: ' + width + 'px; max-width: ' + width + 'px; ';
-    alignment =  scout.Table.parseHorizontalAlignment(column.horizontalAlignment);
-    align = alignment !== 'left' ? 'text-align: '+ alignment + '; ' : '';
-    value = this.getText(c, index);
+    alignment = scout.Table.parseHorizontalAlignment(column.horizontalAlignment);
+    align = alignment !== 'left' ? 'text-align: ' + alignment + '; ' : '';
+    value = this.getCellText(column, row);
 
     rowDiv += '<div class="table-cell" style="' + style + align + '"' + unselectable + '>' + value + '</div>';
   }
@@ -376,8 +423,8 @@ scout.Table.prototype.sendReload = function() {
   this.session.send('reload', this.id);
 };
 
-scout.Table.prototype.getValue = function(col, row) {
-  var cell = this.rows[row].cells[col];
+scout.Table.prototype.getCellValue = function(col, row) {
+  var cell = row.cells[col.index];
 
   if (cell === null) { //cell may be a number so don't use !cell
     return null;
@@ -391,8 +438,8 @@ scout.Table.prototype.getValue = function(col, row) {
   return cell.text;
 };
 
-scout.Table.prototype.getText = function(col, row) {
-  var cell = this.rows[row].cells[col];
+scout.Table.prototype.getCellText = function(col, row) {
+  var cell = row.cells[col.index];
 
   if (cell === null) { //cell may be a number so don't use !cell
     return '';
@@ -406,7 +453,7 @@ scout.Table.prototype.getText = function(col, row) {
 scout.Table.prototype._group = function() {
   var that = this,
     all,
-    groupIndex,
+    groupColumn,
     $group = $('.group-sort', this.$container);
 
   // remove all sum rows
@@ -416,7 +463,7 @@ scout.Table.prototype._group = function() {
   if ($('.group-all', this.$container).length) {
     all = true;
   } else if ($group.length) {
-    groupIndex = $group.data('index');
+    groupColumn = $group.data('column');
   } else {
     return;
   }
@@ -428,21 +475,25 @@ scout.Table.prototype._group = function() {
     sum = [];
 
   for (var r = 0; r < $rows.length; r++) {
-    var row = $rows.eq(r).data('row');
+    var rowId = $rows.eq(r).attr('id');
+    //FIXME CGU is it possible to link row to $row? because table.getModelRowById does a lookup
+    var row = this.getModelRowById(rowId);
 
     // calculate sum per column
     for (var c = 0; c < $cols.length; c++) {
-      var index = $cols.eq(c).data('index'),
-        value = this.getValue(index, row);
+      var column = $cols.eq(c).data('column'),
+        value = this.getCellValue(column, row);
 
-      if (this.columns[index].type == 'number') {
+      if (column.type == 'number') {
         sum[c] = (sum[c] || 0) + value;
       }
     }
 
     // test if sum should be shown, if yes: reset sum-array
-    var nextRow = $rows.eq(r + 1).data('row');
-    if ((r == $rows.length - 1) || (!all && this.getText(groupIndex, row) != this.getText(groupIndex, nextRow)) && sum.length > 0) {
+    var nextRowId = $rows.eq(r + 1).attr('id');
+    var nextRow = this.getModelRowById(rowId);
+
+    if ((r == $rows.length - 1) || (!all && this.getCellText(groupColumn, row) != this.getCellText(groupColumn, nextRow)) && sum.length > 0) {
       for (c = 0; c < $cols.length; c++) {
         var $div;
 
@@ -450,8 +501,8 @@ scout.Table.prototype._group = function() {
         if (typeof sum[c] == 'number') {
           $div = $.makeDiv('', '', sum[c])
             .css('text-align', 'end');
-        } else if (!all && $cols.eq(c).data('index') == groupIndex) {
-          $div = $.makeDiv('', '', this.getText(groupIndex, row))
+        } else if (!all && $cols.eq(c).data('column') == groupColumn) {
+          $div = $.makeDiv('', '', this.getCellText(groupColumn, row))
             .css('text-align', 'start');
         } else {
           $div = $.makeDiv('', '', '&nbsp');
@@ -471,29 +522,26 @@ scout.Table.prototype._group = function() {
   }
 };
 
-scout.Table.prototype.groupChange = function($header, draw, all) {
+scout.Table.prototype.group = function($header, draw, all) {
   $('.group-sort', this.$container).removeClass('group-sort');
   $('.group-all', this.$container).removeClass('group-all');
 
   if (draw) {
-    if (all) {
-      $header.parent().addClass('group-all');
-    } else {
-      this.sortChange($header, 'up', false);
-      $header.addClass('group-sort');
+    if (!all) {
+      this.sort($header, 'asc', false);
     }
+    this._header.onGroupingChanged($header, all);
   }
 
   this._group();
 };
 
 scout.Table.prototype.colorData = function(mode, colorColumn) {
-  var minValue,
-    maxValue,
-    colorFunc;
+  var minValue, maxValue, colorFunc, row, rowId, value, v, c, $rows;
 
   for (var r = 0; r < this.rows.length; r++) {
-    var v = this.getValue(colorColumn, r);
+    row = this.rows[r];
+    v = this.getCellValue(colorColumn, row);
 
     if (v < minValue || minValue === undefined) minValue = v;
     if (v > maxValue || maxValue === undefined) maxValue = v;
@@ -534,44 +582,62 @@ scout.Table.prototype.colorData = function(mode, colorColumn) {
       cell.css('background-color', '#fff');
     };
 
-  var $rows = $('.table-row:visible', this.$dataScroll),
-    c;
+  $rows = $('.table-row:visible', this.$dataScroll);
 
   $('.header-item', this.$container).each(function(i) {
-    if ($(this).data('index') == colorColumn) c = i;
+    if ($(this).data('column') == colorColumn) c = i;
   });
 
   for (var s = 0; s < $rows.length; s++) {
-    var row = $rows.eq(s).data('row'),
-      value = this.getValue(colorColumn, row);
+    rowId = $rows.eq(s).attr('id');
+    row = this.getModelRowById(rowId);
+    value = this.getCellValue(colorColumn, row);
 
     colorFunc($rows.eq(s).children().eq(c), value);
 
   }
 };
 
-scout.Table.prototype.insertRows = function(rows) {
-  //always insert new rows at the end
+scout.Table.prototype._onRowsSelected = function(rowIds) {
+  this.selectedRowIds = rowIds;
+
+  if (this.rendered) {
+    this.selectionHandler.drawSelection();
+  }
+};
+
+scout.Table.prototype._onRowsInserted = function(rows) {
+  //always insert new rows at the end, if the order is wrong a rowOrderChange event will follow
   scout.arrays.pushAll(this.rows, rows);
 
   if (this.rendered) {
+    //Remember inserted rows for future events like rowOrderChanged
+    if (!this._insertedRows) {
+      this._insertedRows = rows;
+      setTimeout(function() {
+        this._insertedRows = null;
+      }.bind(this), 0);
+    } else {
+      scout.arrays.pushAll(this._insertedRows, rows);
+    }
+
     this.drawData();
   }
 };
 
-scout.Table.prototype.deleteRowsByIds = function(rowIds) {
+scout.Table.prototype._onRowsDeleted = function(rowIds) {
   var rows, $row, i, row;
 
   //update model
   rows = this.getModelRowsByIds(rowIds);
-  for (i=0; i < rows.length; i++){
+  for (i = 0; i < rows.length; i++) {
     row = rows[i];
     scout.arrays.remove(this.rows, row);
   }
 
   //update html doc
   if (this.rendered) {
-    for (i=0; i < rowIds.length; i++){
+    for (i = 0; i < rowIds.length; i++) {
       $row = this.findRowById(rowIds[i]);
       $row.remove();
     }
@@ -579,7 +645,7 @@ scout.Table.prototype.deleteRowsByIds = function(rowIds) {
   }
 };
 
-scout.Table.prototype.deleteAllRows = function() {
+scout.Table.prototype._onAllRowsDeleted = function() {
   this.rows = [];
 
   if (this.rendered) {
@@ -588,21 +654,15 @@ scout.Table.prototype.deleteAllRows = function() {
 };
 
 scout.Table.prototype.selectRowsByIds = function(rowIds) {
-  if (!Array.isArray(rowIds)) {
-    rowIds = [rowIds];
-  }
+  if (!scout.arrays.equalsIgnoreOrder(rowIds, this.selectedRowIds)) {
+    this.selectedRowIds = rowIds;
 
-  this.selectedRowIds = rowIds;
-
-  if (this.rendered) {
-    this.selectionHandler.drawSelection();
-  }
-
-  if (!this.session.processingEvents) {
     this.session.send('rowsSelected', this.id, {
       'rowIds': rowIds
     });
   }
+
+  this.selectionHandler.drawSelection();
 };
 
 scout.Table.prototype.findSelectedRows = function() {
@@ -612,24 +672,59 @@ scout.Table.prototype.findSelectedRows = function() {
   return this.$dataScroll.find('.row-selected');
 };
 
-scout.Table.prototype.findRows = function() {
+scout.Table.prototype.findRows = function(includeSumRows) {
   if (!this.$dataScroll) {
     return $();
   }
-  return this.$dataScroll.find('.table-row');
+  var selector = '.table-row';
+  if (includeSumRows) {
+    selector += ', .table-row-sum';
+  }
+  return this.$dataScroll.find(selector);
+};
+
+scout.Table.prototype.findRowsForColIndex = function(colIndex, includeSumRows) {
+  var selector = '.table-row > div:nth-of-type(' + colIndex + ' )';
+  if (includeSumRows) {
+    selector += ', .table-row-sum > div:nth-of-type(' + colIndex + ' )';
+  }
+  return this.$dataScroll.find(selector);
 };
 
 scout.Table.prototype.findRowById = function(rowId) {
   return this.$dataScroll.find('#' + rowId);
 };
 
+scout.Table.prototype.getModelRowById = function(rowId) {
+  var row, i;
+  for (i = 0; i < this.rows.length; i++) {
+    row = this.rows[i];
+    if (row.id === rowId) {
+      return row;
+    }
+  }
+};
+
+scout.Table.prototype.getModelColumnById = function(columnId) {
+  var column, i;
+  for (i = 0; i < this.columns.length; i++) {
+    column = this.columns[i];
+    if (column.id === columnId) {
+      return column;
+    }
+  }
+};
+
 scout.Table.prototype.getModelRowsByIds = function(rowIds) {
   var i, row, rows = [];
 
-  for (i=0; i < this.rows.length; i++){
+  for (i = 0; i < this.rows.length; i++) {
     row = this.rows[i];
     if (rowIds.indexOf(row.id) > -1) {
       rows.push(this.rows[i]);
+      if (rows.length === rowIds.length) {
+        return rows;
+      }
     }
   }
   return rows;
@@ -771,53 +866,83 @@ scout.Table.prototype.hideRow = function($row) {
   //  }
 };
 
-// move column
+/**
+ * @param resizingInProgress set this to true when calling this function several times in a row. If resizing is finished you have to call resizingColumnFinished.
+ */
+scout.Table.prototype.resizeColumn = function($header, width, summaryWidth, resizingInProgress) {
+  var colNum = this._header.getColumnViewIndex($header) + 1;
+
+  this.findRowsForColIndex(colNum, true)
+    .css('min-width', width)
+    .css('max-width', width);
+  this.findRows(true)
+    .css('min-width', summaryWidth)
+    .css('max-width', summaryWidth);
+
+  this._header.onColumnResized($header, width);
+
+  if (!resizingInProgress) {
+    this.resizingColumnFinished($header, width);
+  }
+};
+
+scout.Table.prototype.resizingColumnFinished = function($header, width) {
+  var column = $header.data('column');
+  var data = {
+      columnId: column.id,
+      width: width
+  };
+  this.session.send('columnResized', this.id, data);
+};
 
 scout.Table.prototype.moveColumn = function($header, oldPos, newPos, dragged) {
-  var $headers = $('.header-item', this.$container),
-    $moveHeader = $headers.eq(oldPos / 2),
-    $moveResize = $moveHeader.next();
+  var column = $header.data('column');
 
-  // store old position of header
-  $headers.each(function() {
-    $(this).data('old-pos', $(this).offset().left);
-  });
+  scout.arrays.remove(this.columns, column);
+  scout.arrays.insert(this.columns, column, newPos);
 
-  // change order in dom of header
-  if (newPos < 0) {
-    this._$header.prepend($moveResize);
-    this._$header.prepend($moveHeader);
-  } else {
-    $headers.eq(newPos / 2).after($moveHeader);
-    $headers.eq(newPos / 2).after($moveResize);
-  }
+  var data = {
+    columnId: column.id,
+    index: newPos
+  };
+  this.session.send('columnMoved', this.id, data);
 
-  // move menu
-  var left = $header.position().left;
-
-  $('.table-header-menu').animateAVCSD('left', left + 20);
+  this._header.onColumnMoved($header, oldPos, newPos, dragged);
 
   // move cells
-  $('.table-row, .table-row-sum').each(function() {
+  $('.table-row, .table-row-sum', this.$dataScroll).each(function() {
     var $cells = $(this).children();
-    if (newPos < 0) {
-      $(this).prepend($cells.eq(oldPos / 2));
+    if (newPos < oldPos) {
+      $cells.eq(newPos).before($cells.eq(oldPos));
     } else {
-      $cells.eq(newPos / 2).after($cells.eq(oldPos / 2));
+      $cells.eq(newPos).after($cells.eq(oldPos));
     }
   });
+};
 
-  // move to old position and then animate
-  if (dragged) {
-    $header.css('left', parseInt($header.css('left'), 0) + $header.data('old-pos') - $header.offset().left)
-      .animateAVCSD('left', 0);
-  } else {
-    $headers.each(function() {
-      $(this).css('left', $(this).data('old-pos') - $(this).offset().left)
-        .animateAVCSD('left', 0);
-    });
-  }
+scout.Table.prototype._renderColumnOrderChanges = function(oldColumnOrder) {
+  var column, i, j, $orderedCells, $cell, $cells, that = this;
 
+  this._header.onOrderChanged(oldColumnOrder);
+
+  // move cells
+  $('.table-row, .table-row-sum', this.$dataScroll).each(function() {
+    $orderedCells = $();
+    $cells = $(this).children();
+    for (i = 0; i < that.columns.length; i++) {
+      column = that.columns[i];
+
+      //Find $cell for given column
+      for (j = 0; j < oldColumnOrder.length; j++) {
+        if (oldColumnOrder[j] === column) {
+          $cell = $cells[j];
+          break;
+        }
+      }
+      $orderedCells.push($cell);
+    }
+    $(this).prepend($orderedCells);
+  });
 };
 
 scout.Table.prototype._triggerRowsDrawn = function($rows, numRows) {
@@ -861,14 +986,14 @@ scout.Table.prototype._triggerFilterResetted = function() {
 
 scout.Table.prototype._setHeaderVisible = function(headerVisible) {
   //FIXME CGU this would be better than show/hide, but buildRow relies on header -> refactor
-//  if (this.headerVisible && !this._header) {
-//      this._$header = $('table-header').prependTo(this.$data);
-//      this._header = new scout.TableHeader(this, this._$header, this.session);
-//    }
-//  else if (!this.headerVisible && this._header) {
-//    this._$header.remove();
-//    this._header = null;
-//  }
+  //  if (this.headerVisible && !this._header) {
+  //      this._$header = $('table-header').prependTo(this.$data);
+  //      this._header = new scout.TableHeader(this, this._$header, this.session);
+  //    }
+  //  else if (!this.headerVisible && this._header) {
+  //    this._$header.remove();
+  //    this._header = null;
+  //  }
   this._$header.setVisible(headerVisible);
 };
 
@@ -881,15 +1006,111 @@ scout.Table.prototype._setMultiSelect = function(multiSelect) {
   // nop
 };
 
+scout.Table.prototype._onRowOrderChanged = function(rowIds) {
+  var newPos, rows, row;
+  if (rowIds.length !== this.rows.length) {
+    throw "Row order changed event may not be processed because lengths of the arrays differ.";
+  }
+
+  // update model
+  rows = new Array(this.rows.length);
+  for (var i = 0; i < this.rows.length; i++) {
+    row = this.rows[i];
+    newPos = rowIds.indexOf(this.rows[i].id);
+    rows[newPos] = row;
+  }
+  this.rows = rows;
+
+  if (this.rendered) {
+    this._renderRowOrderChanges();
+  }
+};
+
+scout.Table.prototype._onColumnStructureChanged = function(columns) {
+  //Index is not sent -> update received columns with the current indices
+  for (var i = 0; i < columns.length; i++) {
+    for (var j = 0; j < this.columns.length; j++) {
+      if (columns[i].id === this.columns[j].id) {
+        columns[i].index = this.columns[j].index;
+        break;
+      }
+    }
+  }
+  this.columns = columns;
+
+  if (this.rendered) {
+    this._$header.empty();
+    this._header = new scout.TableHeader(this, this._$header, this.session);
+    this.drawData();
+  }
+};
+
+scout.Table.prototype._onColumnOrderChanged = function(columnIds) {
+  var i, column, columnId, currentPosition, oldColumnOrder;
+  if (columnIds.length !== this.columns.length) {
+    throw "Column order changed event may not be processed because lengths of the arrays differ.";
+  }
+
+  oldColumnOrder = this.columns.slice();
+
+  for (i = 0; i < columnIds.length; i++) {
+    columnId = columnIds[i];
+    column = this.getModelColumnById(columnId);
+    currentPosition = this.columns.indexOf(column);
+    if (currentPosition < 0) {
+      throw 'Column with id ' + columnId + 'not found.';
+    }
+
+    if (currentPosition !== i) {
+      //Update model
+      scout.arrays.remove(this.columns, column);
+      scout.arrays.insert(this.columns, column, i);
+    }
+  }
+
+  if (this.rendered) {
+    this._renderColumnOrderChanges(oldColumnOrder);
+  }
+};
+
+/**
+ * @param columns array of columns which were updated.
+ */
+scout.Table.prototype._onColumnHeadersUpdated = function(columns) {
+  var updatedColumns = [], column;
+
+  //Update model columns
+  for (var i = 0; i < columns.length; i++) {
+    column = this.getModelColumnById(columns[i].id);
+    column.text = columns[i].text;
+    column.sortActive = columns[i].sortActive;
+    column.sortAscending = columns[i].sortAscending;
+
+    updatedColumns.push(column);
+  }
+
+  if (this.rendered) {
+    this._header.updateHeaders(updatedColumns);
+  }
+};
+
 scout.Table.prototype.onModelAction = function(event) {
   if (event.type == 'rowsInserted') {
-    this.insertRows(event.rows);
+    this._onRowsInserted(event.rows);
   } else if (event.type == 'rowsDeleted') {
-    this.deleteRowsByIds(event.rowIds);
+    this._onRowsDeleted(event.rowIds);
   } else if (event.type == 'allRowsDeleted') {
-    this.deleteAllRows();
+    this._onAllRowsDeleted();
   } else if (event.type == 'rowsSelected') {
-    this.selectRowsByIds(event.rowIds);
+    this._onRowsSelected(event.rowIds);
+  } else if (event.type == 'rowOrderChanged') {
+    this._onRowOrderChanged(event.rowIds);
+  } else if (event.type == 'columnStructureChanged') {
+    this._onColumnStructureChanged(event.columns);
+  } else if (event.type == 'columnOrderChanged') {
+    this._onColumnOrderChanged(event.columnIds);
+  } else if (event.type == 'columnHeadersUpdated') {
+    this._onColumnHeadersUpdated(event.columns);
   } else {
     $.log('Model event not handled. Widget: scout.Table. Event: ' + event.type + '.');
   }

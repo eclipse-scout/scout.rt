@@ -82,7 +82,7 @@ scout.ChartTableControlMatrix.prototype.addAxis = function(axis, axisGroup) {
   };
 
   // norm and format depends of datatype and group functionality
-  if (this._columns[axis].type == 'date') {
+  if (axis.type == 'date') {
     if (axisGroup === 0) {
       keyAxis.norm = function(f) {
         if (f) {
@@ -120,7 +120,7 @@ scout.ChartTableControlMatrix.prototype.addAxis = function(axis, axisGroup) {
         return String(n);
       };
     }
-  } else if (this._columns[axis].type == 'number') {
+  } else if (axis.type == 'number') {
     keyAxis.norm = function(f) {
       return parseFloat(f);
     };
@@ -157,7 +157,7 @@ scout.ChartTableControlMatrix.prototype.calculateCube = function() {
     // collect keys of x, y axis from row
     var keys = [];
     for (k = 0; k < this._allAxis.length; k++) {
-      key = this._table.getValue(this._allAxis[k].column, r);
+      key = this._table.getCellValue(this._allAxis[k].column, this._rows[r]);
       var normKey = this._allAxis[k].norm(key);
 
       if (normKey !== undefined) {
@@ -170,7 +170,7 @@ scout.ChartTableControlMatrix.prototype.calculateCube = function() {
     // collect values of data axis from row
     var values = [];
     for (v = 0; v < this._allData.length; v++) {
-      data = this._table.getValue(this._allData[v].column, r);
+      data = this._table.getCellValue(this._allData[v].column, this._rows[r]);
       normData = this._allData[v].norm(data);
       var normData = this._allData[v].norm(data);
       if (normData !== undefined) {
@@ -246,10 +246,11 @@ scout.ChartTableControlMatrix.prototype.columnCount = function() {
   var colCount = [];
 
   for (var c = 0; c < this._columns.length; c++) {
-    colCount.push([c, []]);
+    var column = this._columns[c];
+    colCount.push([column, []]);
 
     for (var r = 0; r < this._rows.length; r++) {
-      var v = this._table.getValue(c, r);
+      var v = this._table.getCellValue(column, this._rows[r]);
       if (colCount[c][1].indexOf(v) == -1) colCount[c][1].push(v);
     }
 

@@ -37,7 +37,7 @@ scout.MobileTable.prototype._drawData = function(startRow) {
 /**
  * @override
  */
-scout.MobileTable.prototype._buildRowDiv = function(row, index) {
+scout.MobileTable.prototype._buildRowDiv = function(row) {
   var rowClass,
     cellContent = '',
     columns = this.columns,
@@ -47,7 +47,7 @@ scout.MobileTable.prototype._buildRowDiv = function(row, index) {
 
   for (var c = 0; c < row.cells.length; c++) {
     column = this.columns[c];
-    value = this.getText(c, index);
+    value = this.getCellText(column, row);
 
     if (c === 0) {
       cellContent += '<p>';

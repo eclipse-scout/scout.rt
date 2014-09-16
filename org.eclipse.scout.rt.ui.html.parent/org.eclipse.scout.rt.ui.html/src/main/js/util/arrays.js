@@ -21,6 +21,9 @@ scout.arrays = {
       arr.splice(index, 1);
     }
   },
+  insert: function(arr, element, index) {
+    arr.splice(index, 0, element);
+  },
   containsAll: function(arr, arr2) {
     for (var i = 0; i < arr2.length; i++) {
       if (arr.indexOf(arr2[i]) < 0) {
@@ -72,6 +75,13 @@ scout.arrays = {
       arr2Length = arr2.length;
     }
     return arrLength > arr2Length;
+  },
+  eachSibling: function(arr, element, func) {
+    for (var i=0; i< arr.length; i++) {
+      var elementAtI = arr[i];
+      if (elementAtI !== element) {
+        func(elementAtI, i);
+      }
+    }
   }
-
 };

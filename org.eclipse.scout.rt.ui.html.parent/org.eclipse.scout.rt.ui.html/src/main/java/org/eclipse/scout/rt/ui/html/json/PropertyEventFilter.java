@@ -14,7 +14,7 @@ import java.beans.PropertyChangeEvent;
 
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 
-public class PropertyEventFilter extends AbstractEventFilter<PropertyChangeEvent> {
+public class PropertyEventFilter extends AbstractEventFilter<PropertyChangeEvent, PropertyChangeEventFilterCondition> {
 
   private IPropertyObserver m_source;
 
@@ -26,17 +26,17 @@ public class PropertyEventFilter extends AbstractEventFilter<PropertyChangeEvent
    * Ignores the event if new value is the same.
    */
   @Override
-  public PropertyChangeEvent filterIgnorableModelEvent(PropertyChangeEvent event) {
-    for (PropertyChangeEvent eventToIgnore : getIgnorableModelEvents()) {
-      if (eventToIgnore.getPropertyName().equals(event.getPropertyName())) {
+  public PropertyChangeEvent filter(PropertyChangeEvent event) {
+    for (PropertyChangeEventFilterCondition condition : getConditions()) {
+      if (condition.getPropertyName().equals(event.getPropertyName())) {
         //Ignore if null == null
-        if (eventToIgnore.getNewValue() == null) {
+        if (condition.getValue() == null) {
           if (event.getNewValue() == null) {
             return null;
           }
         }
         //Ignore if value is the same
-        else if (eventToIgnore.getNewValue().equals(event.getNewValue())) {
+        else if (condition.getValue().equals(event.getNewValue())) {
           return null;
         }
       }

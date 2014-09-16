@@ -21,10 +21,12 @@ import java.util.List;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.fixtures.JsonSessionMock;
 import org.eclipse.scout.rt.ui.html.json.table.fixtures.Table;
+import org.eclipse.scout.rt.ui.html.json.table.fixtures.TableWith3Cols;
 import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
 import org.json.JSONArray;
@@ -41,8 +43,7 @@ public class JsonTableTest {
    */
   @Test
   public void testSelectionEvent() throws ProcessingException, JSONException {
-    Table table = new Table();
-    table.fill(5);
+    Table table = createTableFixture(5);
 
     assertNull(table.getSelectedRow());
 
@@ -56,12 +57,31 @@ public class JsonTableTest {
   }
 
   /**
+   * Tests whether the model rows get correctly unselected
+   */
+  @Test
+  public void testClearSelectionEvent() throws ProcessingException, JSONException {
+    Table table = createTableFixture(5);
+    ITableRow row1 = table.getRow(1);
+
+    table.selectRow(row1);
+
+    assertTrue(row1.isSelected());
+
+    JsonTable jsonTable = createJsonTableWithMocks(table);
+    JsonEvent event = createJsonSelectedEvent(null);
+
+    jsonTable.handleUiEvent(event, new JsonResponse());
+
+    assertTrue(table.getSelectedRows().size() == 0);
+  }
+
+  /**
    * Response must not contain the selection event if the selection was triggered by the request
    */
   @Test
   public void testIgnorableSelectionEvent() throws ProcessingException, JSONException {
-    Table table = new Table();
-    table.fill(5);
+    Table table = createTableFixture(5);
 
     ITableRow row = table.getRow(2);
     JsonTable jsonTable = createJsonTableWithMocks(table);
@@ -86,6 +106,7 @@ public class JsonTableTest {
       }
     };
     table.fill(5);
+    table.initTable();
 
     ITableRow row2 = table.getRow(2);
     ITableRow row4 = table.getRow(4);
@@ -109,6 +130,92 @@ public class JsonTableTest {
     assertEquals(row4, tableRows.get(0));
   }
 
+  /**
+   * Same as {@link #testIgnorableSelectionEvent2()} but with an empty selection
+   */
+  @Test
+  public void testIgnorableSelectionEvent3() throws ProcessingException, JSONException {
+    Table table = new Table() {
+      @Override
+      protected void execRowsSelected(List<? extends ITableRow> rows) throws ProcessingException {
+        if (rows.size() == 0) {
+          selectRow(4);
+        }
+      }
+    };
+    table.fill(5);
+    table.initTable();
+
+    ITableRow row2 = table.getRow(2);
+    ITableRow row4 = table.getRow(4);
+    table.selectRow(row2);
+
+    JsonTable jsonTable = createJsonTableWithMocks(table);
+    JsonEvent event = createJsonSelectedEvent(null);
+
+    assertTrue(row2.isSelected());
+    assertFalse(row4.isSelected());
+
+    jsonTable.handleUiEvent(event, new JsonResponse());
+
+    assertFalse(row2.isSelected());
+    assertTrue(row4.isSelected());
+
+    List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(
+        jsonTable.getJsonSession().currentJsonResponse(), JsonTable.EVENT_ROWS_SELECTED);
+    assertTrue(responseEvents.size() == 1);
+
+    List<ITableRow> tableRows = jsonTable.extractTableRows(responseEvents.get(0).getData());
+    assertEquals(row4, tableRows.get(0));
+  }
+
+  @Test
+  public void testColumnOrderChangedEvent() throws ProcessingException, JSONException {
+    TableWith3Cols table = new TableWith3Cols();
+    table.fill(2);
+    table.initTable();
+    table.resetDisplayableColumns();
+
+    IColumn<?> column0 = table.getColumns().get(0);
+    IColumn<?> column1 = table.getColumns().get(1);
+    JsonTable jsonTable = createJsonTableWithMocks(table);
+
+    assertEquals(table.getColumnSet().getVisibleColumn(0), column0);
+    assertEquals(table.getColumnSet().getVisibleColumn(1), column1);
+
+    JsonEvent event = createJsonColumnMovedEvent(column0.getColumnId(), 2);
+    jsonTable.handleUiEvent(event, new JsonResponse());
+
+    assertEquals(table.getColumnSet().getVisibleColumn(2), column0);
+
+    event = createJsonColumnMovedEvent(column1.getColumnId(), 0);
+    jsonTable.handleUiEvent(event, new JsonResponse());
+
+    assertEquals(table.getColumnSet().getVisibleColumn(0), column1);
+  }
+
+  /**
+   * Response must not contain the column order changed event if the event was triggered by the request and the order
+   * hasn't changed
+   */
+  @Test
+  public void testIgnorableColumnOrderChangedEvent() throws ProcessingException, JSONException {
+    TableWith3Cols table = new TableWith3Cols();
+    table.fill(2);
+    table.initTable();
+    table.resetDisplayableColumns();
+
+    IColumn<?> column = table.getColumns().get(0);
+    JsonTable jsonTable = createJsonTableWithMocks(table);
+
+    JsonEvent event = createJsonColumnMovedEvent(column.getColumnId(), 2);
+    jsonTable.handleUiEvent(event, new JsonResponse());
+
+    List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(
+        jsonTable.getJsonSession().currentJsonResponse(), "columnOrderChanged");
+    assertTrue(responseEvents.size() == 0);
+  }
+
   @Test
   public void testDispose() {
     Table table = new Table();
@@ -118,6 +225,13 @@ public class JsonTableTest {
     object.getJsonSession().flush();
     object = null;
     JsonTestUtility.assertGC(ref);
+  }
+
+  public static Table createTableFixture(int numRows) throws ProcessingException {
+    Table table = new Table();
+    table.fill(numRows);
+    table.initTable();
+    return table;
   }
 
   public static JsonTable createJsonTableWithMocks(ITable table) {
@@ -131,9 +245,18 @@ public class JsonTableTest {
     String tableId = "x"; // never used
     JSONObject data = new JSONObject();
     JSONArray rowIds = new JSONArray();
-    rowIds.put(rowId);
+    if (rowId != null) {
+      rowIds.put(rowId);
+    }
     data.put(JsonTable.PROP_ROW_IDS, rowIds);
     return new JsonEvent(tableId, JsonTable.EVENT_ROWS_SELECTED, data);
   }
 
+  public static JsonEvent createJsonColumnMovedEvent(String columnId, int index) throws JSONException {
+    String tableId = "x"; // never used
+    JSONObject data = new JSONObject();
+    data.put(JsonTable.PROP_COLUMN_ID, columnId);
+    data.put("index", index);
+    return new JsonEvent(tableId, JsonTable.EVENT_COLUMN_MOVED, data);
+  }
 }

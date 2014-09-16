@@ -15,6 +15,7 @@ import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.menus.TableOrganizeMenu;
 import org.eclipse.scout.rt.extension.client.ui.basic.table.AbstractExtensibleTable;
@@ -62,7 +63,7 @@ public class AbstractTable5 extends AbstractExtensibleTable implements ITable5 {
   }
 
   @Override
-  public void fireTableReloadFromUI() { //FIXME move to ui facade.
+  public void fireTableReloadFromUI() {
     try {
       if (m_reloadHandler != null) {
         m_reloadHandler.reload();
@@ -71,6 +72,12 @@ public class AbstractTable5 extends AbstractExtensibleTable implements ITable5 {
     catch (ProcessingException se) {
       SERVICES.getService(IExceptionHandlerService.class).handleException(se);
     }
+  }
+
+  @Override
+  public void fireSortColumnRemovedFromUI(IColumn<?> column) {
+    getColumnSet().removeSortColumn(column);
+    sort();
   }
 
   @Override

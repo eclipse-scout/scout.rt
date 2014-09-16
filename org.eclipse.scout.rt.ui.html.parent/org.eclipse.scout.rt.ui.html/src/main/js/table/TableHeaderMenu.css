@@ -1,71 +1,71 @@
 .table-header-menu {
-	position: absolute;
-	z-index: 4;
-	border-top: 1px solid @color-bench;
-	.menu-context;
-	width: 225px;
-	background-color: @color-bench;
-	padding-bottom: 5px;
+  position: absolute;
+  z-index: 4;
+  border-top: 1px solid @color-bench;
+  .menu-context;
+  width: 225px;
+  background-color: @color-bench;
+  padding-bottom: 5px;
 }
 
 .table-header-menu-whiter {
-	height: 1px;
-	position: absolute;
-	top: -1px;
-	left: 0px;
-	background-color: @color-bench;
+  height: 1px;
+  position: absolute;
+  top: -1px;
+  left: 0px;
+  background-color: @color-bench;
 }
 
 .header-group{
-	padding: 10px 0px 35px 10px;
+  padding: 10px 0px 35px 10px;
 }
 
 .header-group-filter{
-	padding: 10px 0px 7px 10px;
+  padding: 10px 0px 7px 10px;
 }
 
 .header-text{
-	.font-text-normal(700);
-	color: @color-bench-text;
-	line-height: 22px;
-	height: 22px;
-	overflow: hidden;
+  .font-text-normal(700);
+  color: @color-bench-text;
+  line-height: 22px;
+  height: 22px;
+  overflow: hidden;
 }
 
 .header-command{
-	float: left;
-	width: 43px;
-	margin-right: 10px;
-	heigth: 29px;
-	font-family: fontAwesome;
-	font-size: 17px;
-	line-height: 29px;
-	color: @color-bench-text;
-	border: 1px solid @color-bench-light-border;
-	cursor: pointer;
-	text-align: center;
-	
-	&:hover {
-		color: @color-bench-text-hover;
-	}
-	
-	&.selected{
-		background-color: @color-bench-highlight;
-		border: 1px solid @color-bench-highlight;
-	}
+  float: left;
+  width: 43px;
+  margin-right: 10px;
+  heigth: 29px;
+  font-family: fontAwesome;
+  font-size: 17px;
+  line-height: 29px;
+  color: @color-bench-text;
+  border: 1px solid @color-bench-light-border;
+  cursor: pointer;
+  text-align: center;
 
-	&.selected:before,
-	&.selected:after{
-		color: @color-bench;
-	}
+  &:hover {
+    color: @color-bench-text-hover;
+  }
+
+  &.selected{
+    background-color: @color-bench-highlight;
+    border: 1px solid @color-bench-highlight;
+  }
+
+  &.selected:before,
+  &.selected:after{
+    color: @color-bench;
+  }
 }
 
 .header-command:after {
-	position: relative;
-	left: 3px;
-	top: -6px;
-	font-size: 10px;
-	line-height: 10px;
+  position: relative;
+  left: 3px;
+  top: -6px;
+  font-size: 10px;
+  line-height: 10px;
 }
 
 
@@ -73,8 +73,8 @@
 #HeaderCommandMoveUp:before,
 #HeaderCommandMoveDown:before,
 #HeaderCommandMoveBottom:before {
-	font-size: 20px;
-	line-height: 20px;
+  font-size: 20px;
+  line-height: 20px;
 }
 
 #HeaderCommandMoveTop:before { content: "\F100";}
@@ -82,138 +82,138 @@
 #HeaderCommandMoveDown:before { content: "\F105";}
 #HeaderCommandMoveBottom:before { content: "\F101";}
 
-#HeaderCommandSortUp:before,
-#HeaderCommandSortUpAdd:before {
-	content: "\F175";
+#HeaderCommandSortAsc:before,
+#HeaderCommandSortAscAdd:before {
+  content: "\F175";
 }
 
-#HeaderCommandSortDown:before,
-#HeaderCommandSortDownAdd:before {
-	content: "\F176";
+#HeaderCommandSortDesc:before,
+#HeaderCommandSortDescAdd:before {
+  content: "\F176";
 }
 
-#HeaderCommandSortUpAdd:after,
-#HeaderCommandSortDownAdd:after {
-	content: attr(data-icon);
+#HeaderCommandSortAscAdd:after,
+#HeaderCommandSortDescAdd:after {
+  content: attr(data-icon);
 }
 
-#HeaderCommandSortUp:before,
-#HeaderCommandSortUpAdd:before {
-	content: "\F175";
+#HeaderCommandSortAsc:before,
+#HeaderCommandSortAscAdd:before {
+  content: "\F175";
 }
 
-#HeaderCommandSortUp.selected:hover:before,
-#HeaderCommandSortUpAdd.selected:hover:before,
-#HeaderCommandSortDown.selected:hover:before,
-#HeaderCommandSortDownAdd.selected:hover:before,
+#HeaderCommandSortAsc.selected:hover:before,
+#HeaderCommandSortAscAdd.selected:hover:before,
+#HeaderCommandSortDesc.selected:hover:before,
+#HeaderCommandSortDescAdd.selected:hover:before,
 #HeaderCommandGroupAll.selected:hover:before,
 #HeaderCommandGroupSort.selected:hover:before{
-	font-family: fontAwesome;
-	top: 0px;
-	font-size: 17px;
-	line-height: 20px;
-	content: "\f00d";
+  font-family: fontAwesome;
+  top: 0px;
+  font-size: 17px;
+  line-height: 20px;
+  content: "\f00d";
 }
 
-#HeaderCommandSortUp.selected:hover:after,
-#HeaderCommandSortUpAdd.selected:hover:after,
-#HeaderCommandSortDown.selected:hover:after,
-#HeaderCommandSortDownAdd.selected:hover:after,
+#HeaderCommandSortAsc.selected:hover:after,
+#HeaderCommandSortAscAdd.selected:hover:after,
+#HeaderCommandSortDesc.selected:hover:after,
+#HeaderCommandSortDescAdd.selected:hover:after,
 #HeaderCommandGroupAll.selected:hover:after,
 #HeaderCommandGroupSort.selected:hover:after{
-	content: "";
+  content: "";
 }
 
 #HeaderCommandGroupAll:before,
 #HeaderCommandGroupSort:before {
-	position: relative;
-	top: 2px;
-	font-family: sans-serif;
-	font-size: 20px;
-	line-height: 20px;
-	content: "\03a3";
+  position: relative;
+  top: 2px;
+  font-family: sans-serif;
+  font-size: 20px;
+  line-height: 20px;
+  content: "\03a3";
 }
 
 #HeaderCommandGroupSort:after {content: "\F00B";}
 
 #HeaderCommandColorRed:after {content: "\00a0";}
 #HeaderCommandColorRed{
-	background-image: linear-gradient(to right, #ffafaf, #abd693);
+  background-image: linear-gradient(to right, #ffafaf, #abd693);
 }
 #HeaderCommandColorGreen:after {content: "\00a0";}
 #HeaderCommandColorGreen{
-	background-image: linear-gradient(to right, #abd693, #ffafaf);
+  background-image: linear-gradient(to right, #abd693, #ffafaf);
 }
 
 #HeaderCommandColorBar:after {content: "\00a0";}
 #HeaderCommandColorBar{
-	background-image: linear-gradient(to right, #80c1d0 0%, #80c1d0 65%, white 65%, white 100% );
-	border: 1px solid #80c1d0;
-	width: 43px;
-	line-height: 29px;
+  background-image: linear-gradient(to right, #80c1d0 0%, #80c1d0 65%, white 65%, white 100% );
+  border: 1px solid #80c1d0;
+  width: 43px;
+  line-height: 29px;
 }
 
 #HeaderCommandColorRemove:after {content: "\00a0";}
 #HeaderCommandColorRemove{
-	background: #fff;
-	border: 1px solid #80c1d0;
-	width: 43px;
-	line-height: 29px;
+  background: #fff;
+  border: 1px solid #80c1d0;
+  width: 43px;
+  line-height: 29px;
 }
 
 #HeaderCommandColumnAdd:before { content: "\F067";}
 #HeaderCommandColumnRemove:before { content: "\F00D";}
 
 .header-filter-container{
-	position: relative;
-	overflow:hidden;
-	height: 226px;
-	padding: 0px;
+  position: relative;
+  overflow:hidden;
+  height: 226px;
+  padding: 0px;
 }
 
 .header-filter-container > .scrollbar{
-	right: 14px;
-	margin-top: 5px;
-	margin-bottom: 5px;
+  right: 14px;
+  margin-top: 5px;
+  margin-bottom: 5px;
 }
 
 
 .header-filter {
-	position:relative;
-	width: 200px;
-	float: left;
-	clear: both;
-	heigth: 30px;
-	line-height: 30px;
-	cursor: pointer;
-	padding: 0px 20px 0px 8px;
-	overflow: hidden;
-	white-space: nowrap;
-	text-overflow: ellipsis;
-	border-top: 1px solid @color-bench-light-border;
+  position:relative;
+  width: 200px;
+  float: left;
+  clear: both;
+  heigth: 30px;
+  line-height: 30px;
+  cursor: pointer;
+  padding: 0px 20px 0px 8px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  border-top: 1px solid @color-bench-light-border;
 
-	&:last-child {
-		border-bottom: 1px solid @color-bench-light-border;
-	}
+  &:last-child {
+    border-bottom: 1px solid @color-bench-light-border;
+  }
 
-	&:after {
-		position: absolute;
-		right: 14px;
-		content: attr(data-value);
-	}
-	
-	&.selected {
-		background-color: @color-bench-highlight;
-		border-top: 1px solid @color-bench-highlight;
-		color: @color-bench; 
-	}
-	
-	&.selected + .header-filter {
-		border-top: 1px solid @color-bench;
-	}
-	
-	&.selected:last-child {
-		border-bottom: @color-bench-highlight;
-	}
-	
+  &:after {
+    position: absolute;
+    right: 14px;
+    content: attr(data-value);
+  }
+
+  &.selected {
+    background-color: @color-bench-highlight;
+    border-top: 1px solid @color-bench-highlight;
+    color: @color-bench;
+  }
+
+  &.selected + .header-filter {
+    border-top: 1px solid @color-bench;
+  }
+
+  &.selected:last-child {
+    border-bottom: @color-bench-highlight;
+  }
+
 }

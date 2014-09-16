@@ -3,44 +3,55 @@
 
 scout.TableHeader = function(table, $tableHeader, session) {
   var that = this,
-    columns = table.columns;
+    columns = table.columns,
+    column, $header, alignment;
 
   this.totalWidth = 0;
   this.dragDone = false;
+  this._$tableHeader = $tableHeader;
+  this.table = table;
+  this.columns = table.columns;
 
   for (var i = 0; i < columns.length; i++) {
-    var $headerItem = $tableHeader.appendDiv('', 'header-item', columns[i].text)
-      .data('index', i)
-      .css('min-width', columns[i].width + 'px') // 17 is width of header-resize handle, see table.css (.header-resize)
-      .css('max-width', columns[i].width + 'px')
+    column = columns[i];
+    $header = $tableHeader.appendDIV('header-item')
+      .data('column', column)
+      .css('min-width', column.width + 'px') // 17 is width of header-resize handle, see table.css (.header-resize)
+      .css('max-width', column.width + 'px')
       .on('click', '', onHeaderClick)
       .on('mousedown', '', dragHeader);
 
-    var alignment =  scout.Table.parseHorizontalAlignment(columns[i].horizontalAlignment);
+    this._applyColumnText($header, column);
+    this._applyColumnSorting($header, column);
+
+    alignment =  scout.Table.parseHorizontalAlignment(column.horizontalAlignment);
     if (alignment !== 'left')  {
-      $headerItem.css('text-align', alignment);
+      $header.css('text-align', alignment);
     }
 
     this.totalWidth += columns[i].width;
 
-    $tableHeader.appendDiv('', 'header-resize', '')
+    $tableHeader.appendDIV('header-resize', '')
       .on('mousedown', '', resizeHeader);
 
-    columns[i].$div = $headerItem;
-    columns[i].filter = [];
+    column.$div = $header;
+    column.filter = [];
   }
 
   function onHeaderClick(event) {
-    var $headerItem = $(this);
+    var $header = $(this);
 
     if (that.dragDone) {
       that.dragDone = false;
     } else if (event.shiftKey || event.ctrlKey) {
-      table.sortChange($headerItem, $headerItem.hasClass('sort-up') ? 'down' : 'up', event.shiftKey);
+      table.sort($header, $header.hasClass('sort-asc') ? 'desc' : 'asc', event.shiftKey);
+    } else if (that._tableHeaderMenu && that._tableHeaderMenu.isOpenFor($(event.target))){
+      that._tableHeaderMenu.remove();
+      that._tableHeaderMenu = null;
     } else {
-      var x = $headerItem.position().left + $tableHeader.position().left + parseFloat($tableHeader.css('margin-left')),
-        y = $headerItem.position().top +  $tableHeader.position().top;
-      new scout.TableHeaderMenu(table, $headerItem, x, y, session);
+      var x = $header.position().left + $tableHeader.position().left + parseFloat($tableHeader.css('margin-left')),
+        y = $header.position().top +  $tableHeader.position().top;
+      that._tableHeaderMenu = new scout.TableHeaderMenu(table, $header, x, y, session);
     }
 
     return false;
@@ -48,10 +59,9 @@ scout.TableHeader = function(table, $tableHeader, session) {
 
   function resizeHeader(event) {
     var startX = event.pageX ,
-      $headerItem = $(this).prev(),
-      colNum = $headerItem.index() / 2 + 1,
-      headerWidth = parseFloat($headerItem.css('min-width')),
-      totalWidth = parseFloat($('.table-row').eq(0).css('width'));
+      $header = $(this).prev(),
+      headerWidth = parseFloat($header.css('min-width')),
+      totalWidth = parseFloat(that.table.findRows().eq(0).css('width'));
 
     $('body').addClass('col-resize')
       .on('mousemove', '', resizeMove)
@@ -63,25 +73,27 @@ scout.TableHeader = function(table, $tableHeader, session) {
         wSummary = totalWidth + diff;
 
       if (wHeader > 80 || diff > 0) {
-        $headerItem.css('min-width', wHeader).css('max-width', wHeader);
-        $('.table-row > div:nth-of-type(' + colNum + ' ), .table-row-sum > div:nth-of-type(' + colNum + ' )').css('min-width', wHeader).css('max-width', wHeader);
-        $('.table-row, .table-row-sum').css('min-width', wSummary).css('max-width', wSummary);
+        that.table.resizeColumn($header, wHeader, wSummary, true);
       }
     }
 
     function resizeEnd(event) {
       $('body').off('mousemove')
         .removeClass('col-resize');
+
+      var width = parseFloat($header.css('min-width'));
+      that.table.resizingColumnFinished($header, width);
     }
   }
 
   function dragHeader(event) {
-    var startX = event.pageX,
-      $headerItem = $(this),
-      oldPos = $headerItem.index(),
+    var diff = 0,
+      startX = event.pageX,
+      $header = $(this),
+      oldPos = that.getColumnViewIndex($header),
       newPos =  oldPos,
-      move = $headerItem.outerWidth(),
-      $headers = $headerItem.siblings('.header-item');
+      move = $header.outerWidth(),
+      $otherHeaders = $header.siblings('.header-item');
 
     that.dragDone = false;
 
@@ -90,44 +102,38 @@ scout.TableHeader = function(table, $tableHeader, session) {
       .one('mouseup', '', dragEnd);
 
     function dragMove(event) {
-      var diff = event.pageX - startX;
+      diff = event.pageX - startX;
 
-      // change css of draged header
-      $headerItem.css('z-index', 50)
+      // change css of dragged header
+      $header.css('z-index', 50)
         .addClass('header-move');
       $tableHeader.addClass('header-move');
 
       // move dragged header
-      $headerItem.css('left', diff);
+      $header.css('left', diff);
 
       // find other affected headers
-      var middle = realMiddle($headerItem);
+      var middle = realMiddle($header);
 
-      $headers.each(function(i) {
-        var m = realMiddle($($headers[i]));
+      $otherHeaders.each(function(i) {
+        var m = realMiddle($($otherHeaders[i]));
 
-        if (middle < m && i < oldPos / 2) {
+        if (middle < m && i < oldPos) {
           $(this).css('left', move);
-        } else if (middle > m && i >= oldPos / 2) {
+        } else if (middle > m && i >= oldPos) {
           $(this).css('left', -move);
         } else {
           $(this).css('left', 0);
         }
       });
 
-      // find new position of dragged header
-      var h = (diff < 0) ? $headers : $($headers.get().reverse()),
-          d = (diff < 0) ? 2 : 0;
-
-      h.each(function(i) {
-        if ($(this).css('left') != '0px') {
-          newPos = $(this).index() - d;
-          return false;
-        }
-      });
-
       if (diff !== 0) {
         that.dragDone = true;
+
+        if (that._tableHeaderMenu && that._tableHeaderMenu.isOpen()) {
+          that._tableHeaderMenu.remove();
+          that._tableHeaderMenu = null;
+        }
       }
     }
 
@@ -152,6 +158,16 @@ scout.TableHeader = function(table, $tableHeader, session) {
       // remove events
       $('body').off('mousemove');
 
+      // find new position of dragged header
+      var h = (diff < 0) ? $otherHeaders : $($otherHeaders.get().reverse());
+
+      h.each(function(i) {
+        if ($(this).css('left') != '0px') {
+          newPos = that.getColumnViewIndex($(this));
+          return false;
+        }
+      });
+
       // in case of no movement: return
       if (!that.dragDone)  {
         return true;
@@ -159,22 +175,151 @@ scout.TableHeader = function(table, $tableHeader, session) {
 
       // move column
       if (oldPos !== newPos) {
-        table.moveColumn($headerItem, oldPos, newPos, true);
+        table.moveColumn($header, oldPos, newPos, true);
         that.dragDone = false;
       } else {
-        $headerItem.animateAVCSD('left', '', function () {that.dragDone = false;});
+        $header.animateAVCSD('left', '', function () {that.dragDone = false;});
       }
 
       // reset css of dragged header
-      $headers.each(function() {
+      $otherHeaders.each(function() {
         $(this).css('left', '');
       });
 
-      $headerItem.css('z-index', '')
+      $header.css('z-index', '')
         .css('background', '')
         .removeClass('header-move');
       $tableHeader.removeClass('header-move');
-
     }
+  }
+};
+
+scout.TableHeader.prototype.onColumnResized = function($header, width) {
+  $header
+    .css('min-width', width)
+    .css('max-width', width);
+};
+
+scout.TableHeader.prototype.onSortingChanged = function() {
+  for (var i=0; i<this.table.columns.length; i++) {
+    var column = this.table.columns[i];
+    this._applyColumnSorting(column.$div, column);
+  }
+};
+
+scout.TableHeader.prototype.onGroupingChanged = function($header, all) {
+  if (all) {
+    $header.parent().addClass('group-all');
+  } else {
+    $header.addClass('group-sort');
+  }
+};
+
+scout.TableHeader.prototype.onColumnMoved = function($header, oldPos, newPos, dragged) {
+  var $headers = this.findHeaderItems(),
+    $moveHeader = $headers.eq(oldPos),
+    $moveResize = $moveHeader.next();
+
+  // store old position of header
+  $headers.each(function() {
+    $(this).data('old-pos', $(this).offset().left);
+  });
+
+  // change order in dom of header
+  if (newPos < oldPos) {
+    $headers.eq(newPos).before($moveHeader);
+    $headers.eq(newPos).before($moveResize);
+  } else {
+    $headers.eq(newPos).after($moveHeader);
+    $headers.eq(newPos).after($moveResize);
+  }
+
+  // move menu
+  if (this._tableHeaderMenu && this._tableHeaderMenu.isOpen()) {
+    var left = $header.position().left;
+    this._tableHeaderMenu.$headerMenu.animateAVCSD('left', left + 20);
+  }
+
+  // move to old position and then animate
+  if (dragged) {
+    $header.css('left', parseInt($header.css('left'), 0) + $header.data('old-pos') - $header.offset().left)
+      .animateAVCSD('left', 0);
+    } else {
+    $headers.each(function() {
+      $(this).css('left', $(this).data('old-pos') - $(this).offset().left)
+        .animateAVCSD('left', 0);
+    });
+  }
+};
+
+scout.TableHeader.prototype.onOrderChanged = function(oldColumnOrder) {
+  var column, newPos, oldPos, i, $header, $headerResize;
+  var $headers = this.findHeaderItems();
+
+  // store old position of headers
+  $headers.each(function() {
+    $(this).data('old-pos', $(this).offset().left);
+  });
+
+  // change order in dom of header
+  for (i=0; i < this.table.columns.length; i++) {
+    column = this.table.columns[i];
+    $header = column.$div;
+    $headerResize = $header.next('.header-resize');
+
+    this._$tableHeader.append($header);
+    this._$tableHeader.append($headerResize);
+  }
+
+  // move menu
+  //Menu may only be open at this time if the user opened the menu right before the columnOrderChanged event arrives from the server
+  if (this._tableHeaderMenu && this._tableHeaderMenu.isOpen()) {
+    var left = this._tableHeaderMenu.$header.position().left;
+    this._tableHeaderMenu.$headerMenu.animateAVCSD('left', left + 20);
+  }
+
+  // move to old position and then animate
+  $headers.each(function() {
+    $(this).css('left', $(this).data('old-pos') - $(this).offset().left)
+      .animateAVCSD('left', 0);
+  });
+};
+
+scout.TableHeader.prototype.getColumnViewIndex = function($header) {
+  return $header.index() / 2;
+};
+
+scout.TableHeader.prototype.findHeaderItems = function() {
+  return this._$tableHeader.find('.header-item');
+};
+
+/**
+ * Updates the column headers visualization of the text and sorting state
+ */
+scout.TableHeader.prototype.updateHeaders = function(columns) {
+  for (var i=0;i<columns.length;i++) {
+    var column = columns[i];
+    var $header = columns[i].$div;
+    this._applyColumnText($header, column);
+    this._applyColumnSorting($header, column);
+  }
+};
+
+scout.TableHeader.prototype._applyColumnText = function($header, column) {
+  var text = column.text;
+  if (!text) {
+    text = '';
+  }
+  $header.text(text);
+};
+
+scout.TableHeader.prototype._applyColumnSorting = function($header, column) {
+  $header.removeClass('sort-asc');
+  $header.removeClass('sort-desc');
+
+  var sortDirection;
+  if (column.sortActive) {
+    sortDirection = column.sortAscending ? 'asc' : 'desc';
+    $header.addClass('sort-' + sortDirection);
   }
 };

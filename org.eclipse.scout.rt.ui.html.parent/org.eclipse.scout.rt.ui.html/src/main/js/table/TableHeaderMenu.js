@@ -2,21 +2,11 @@
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
 scout.TableHeaderMenu = function(table, $header, x, y, session) {
-  $('.table-header-menu').remove();
-  $('body').off('mousedown.remove');
-  $('body').off('keydown.remove');
-
-  var pos = $header.index(),
-    id = $header.data('index'),
-    column = table.columns[id];
+  var pos = table._header.getColumnViewIndex($header),
+    column = $header.data('column');
 
   // label title
-  if ($header.data('menu-open')) {
-    $header.data('menu-open', false);
-    return;
-  }
   $header.addClass('menu-open');
-  $header.data('menu-open', true);
 
   // create container
   var $menuHeader = table.$container.appendDIV('table-header-menu')
@@ -24,8 +14,11 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
 
   $menuHeader.appendDIV('table-header-menu-whiter').width($header[0].offsetWidth - 2);
 
+  this.$headerMenu = $menuHeader;
+  this.$header = $header;
+
   // every user action will close menu
-  $('body').on('mousedown.remove', removeMenu);
+  $('body').on('mousedown.remove', onMouseDown);
   $('body').on('keydown.remove', removeMenu);
 
   // create buttons in command for order
@@ -51,25 +44,25 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
   $commandSort.appendDIV('header-text')
     .data('label', 'Sortierung');
 
-  var $sortUp = $commandSort.appendDiv('HeaderCommandSortUp', 'header-command')
+  var $sortAsc = $commandSort.appendDiv('HeaderCommandSortAsc', 'header-command')
     .data('label', 'aufsteigend')
     .click(function() {
-      sort('up', false, $(this).hasClass('selected'));
+      sort('asc', false, $(this).hasClass('selected'));
     });
-  var $sortDown = $commandSort.appendDiv('HeaderCommandSortDown', 'header-command')
+  var $sortDesc = $commandSort.appendDiv('HeaderCommandSortDesc', 'header-command')
     .data('label', 'absteigend')
     .click(function() {
-      sort('down', false, $(this).hasClass('selected'));
+      sort('desc', false, $(this).hasClass('selected'));
     });
-  var $sortUpAdd = $commandSort.appendDiv('HeaderCommandSortUpAdd', 'header-command')
+  var $sortAscAdd = $commandSort.appendDiv('HeaderCommandSortAscAdd', 'header-command')
     .data('label', 'zusätzlich aufsteigend')
     .click(function() {
-      sort('up', true, $(this).hasClass('selected'));
+      sort('asc', true, $(this).hasClass('selected'));
     });
-  var $sortDownAdd = $commandSort.appendDiv('HeaderCommandSortDownAdd', 'header-command')
+  var $sortDescAdd = $commandSort.appendDiv('HeaderCommandSortDescAdd', 'header-command')
     .data('label', 'zusätzlich absteigend')
     .click(function() {
-      sort('down', true, $(this).hasClass('selected'));
+      sort('desc', true, $(this).hasClass('selected'));
     });
 
   sortSelect();
@@ -130,7 +123,7 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
 
   var group = (column.type === 'date') ?  3 : -1,
     matrix = new scout.ChartTableControlMatrix(table, session),
-    xAxis = matrix.addAxis(id, group),
+    xAxis = matrix.addAxis(column, group),
     dataAxis = matrix.addData(-1, -1),
     cube = matrix.calculateCube();
 
@@ -173,19 +166,23 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
     .on('mouseleave', '.header-command', leaveCommand);
 
   // copy flags to menu
-  if ($header.hasClass('sort-up')) $menuHeader.addClass('sort-up');
-  if ($header.hasClass('sort-down')) $menuHeader.addClass('sort-down');
+  if ($header.hasClass('sort-asc')) $menuHeader.addClass('sort-asc');
+  if ($header.hasClass('sort-desc')) $menuHeader.addClass('sort-desc');
   if ($header.hasClass('filter')) $menuHeader.addClass('filter');
+
+  var that = this;
+
+  function onMouseDown(event) {
+    if ($header.is($(event.target))) {
+      return;
+    }
+
+    removeMenu(event);
+  }
 
   function removeMenu(event) {
     if ($menuHeader.has($(event.target)).length === 0) {
-      $menuHeader.remove();
-      $header.removeClass('menu-open');
-      if (!$(event.target).is($header)) {
-        $header.data('menu-open', false);
-      }
-      $('body').off('mousedown.remove');
-      $('body').off('keydown.remove');
+      that.remove();
     }
   }
 
@@ -206,28 +203,28 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
   }
 
   function moveTop() {
-    table.moveColumn($header, pos, -1);
-    pos = $header.index();
+    table.moveColumn($header, pos, 0);
+    pos = table._header.getColumnViewIndex($header);
   }
 
   function moveUp() {
-    table.moveColumn($header, pos, Math.max(pos - 4, -1));
-    pos = $header.index();
+    table.moveColumn($header, pos, Math.max(pos - 1, 0));
+    pos = table._header.getColumnViewIndex($header);
   }
 
   function moveDown() {
-    table.moveColumn($header, pos, Math.min(pos + 2, $('.header-item, .header-resize').length - 2));
-    pos = $header.index();
+    table.moveColumn($header, pos, Math.min(pos + 1, table._header.findHeaderItems().length - 1));
+    pos = table._header.getColumnViewIndex($header);
   }
 
   function moveBottom() {
-    table.moveColumn($header, pos, $('.header-item, .header-resize').length - 2);
-    pos = $header.index();
+    table.moveColumn($header, pos, table._header.findHeaderItems().length - 1);
+    pos = table._header.getColumnViewIndex($header);
   }
 
   function sort(dir, additional, remove) {
-    table.groupChange($header, false, false);
-    table.sortChange($header, dir, additional, remove);
+    table.group($header, false, false);
+    table.sort($header, dir, additional, remove);
 
     sortSelect();
     groupSelect();
@@ -235,48 +232,61 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
 
   function sortSelect() {
     var addIcon = '\uF067',
-      sortCount = $('.header-item[data-sort-order]').length;
+      sortCount = getSortColumnCount(),
+      column = $header.data('column');
 
     $('.header-command', $commandSort).removeClass('selected');
 
     if (sortCount == 1) {
-      if ($header.hasClass('sort-up')) {
-        $sortUp.addClass('selected');
+      if ($header.hasClass('sort-asc')) {
+        $sortAsc.addClass('selected');
         addIcon = null;
-      } else if ($header.hasClass('sort-down')) {
-        $sortDown.addClass('selected');
+      } else if ($header.hasClass('sort-desc')) {
+        $sortDesc.addClass('selected');
         addIcon = null;
       }
     } else if (sortCount > 1) {
-      if ($header.hasClass('sort-up')) {
-        $sortUpAdd.addClass('selected');
-        addIcon = parseInt($header.attr('data-sort-order'), 0) + 1;
-      } else if ($header.hasClass('sort-down')) {
-        $sortDownAdd.addClass('selected');
-        addIcon = parseInt($header.attr('data-sort-order'), 0) + 1;
+      if ($header.hasClass('sort-asc')) {
+        $sortAscAdd.addClass('selected');
+        addIcon = column.sortIndex + 1;
+      } else if ($header.hasClass('sort-desc')) {
+        $sortDescAdd.addClass('selected');
+        addIcon = column.sortIndex + 1;
       }
     } else {
       addIcon = null;
     }
 
     if (addIcon) {
-      $sortUpAdd.show().attr('data-icon', addIcon);
-      $sortDownAdd.show().attr('data-icon', addIcon);
+      $sortAscAdd.show().attr('data-icon', addIcon);
+      $sortDescAdd.show().attr('data-icon', addIcon);
     } else {
-      $sortUpAdd.hide();
-      $sortDownAdd.hide();
+      $sortAscAdd.hide();
+      $sortDescAdd.hide();
     }
   }
 
+  function getSortColumnCount() {
+    var sortCount = 0;
+
+    for (var i=0; i<table.columns.length; i++) {
+      if (table.columns[i].sortActive) {
+        sortCount++;
+      }
+    }
+
+    return sortCount;
+  }
+
   function groupAll() {
-    table.groupChange($header, !$(this).hasClass('selected'), true);
+    table.group($header, !$(this).hasClass('selected'), true);
 
     sortSelect();
     groupSelect();
   }
 
   function groupSort() {
-    table.groupChange($header, !$(this).hasClass('selected'), false);
+    table.group($header, !$(this).hasClass('selected'), false);
 
     sortSelect();
     groupSelect();
@@ -286,24 +296,24 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
     $groupAll.removeClass('selected');
     $groupSort.removeClass('selected');
 
-    if  ($header.parent().hasClass('group-all')) $groupAll.addClass('selected');
-    if  ($header.hasClass('group-sort')) $groupSort.addClass('selected');
+    if ($header.parent().hasClass('group-all')) $groupAll.addClass('selected');
+    if ($header.hasClass('group-sort')) $groupSort.addClass('selected');
   }
 
   function colorRed() {
-    table.colorData('red', id);
+    table.colorData('red', column);
   }
 
   function colorGreen() {
-    table.colorData('green', id);
+    table.colorData('green', column);
   }
 
   function colorBar() {
-    table.colorData('bar', id);
+    table.colorData('bar', column);
   }
 
   function colorRemove() {
-    table.colorData('remove', id);
+    table.colorData('remove', column);
   }
 
 
@@ -335,7 +345,8 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
     // filter function
     if (column.filter.length) {
       column.filterFunc = function($row) {
-        var textX = table.getValue(xAxis.column, $row.data('row')),
+        var row = table.getModelRowById($row.attr('id')),
+          textX = table.getCellValue(xAxis.column, row),
           nX = xAxis.norm(textX);
         return (column.filter.indexOf(nX) > -1);
       };
@@ -346,4 +357,19 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
     // callback to table
     table.filter();
   }
+};
+
+scout.TableHeaderMenu.prototype.remove = function() {
+  this.$headerMenu.remove();
+  this.$header.removeClass('menu-open');
+  $('body').off('mousedown.remove');
+  $('body').off('keydown.remove');
+};
+
+scout.TableHeaderMenu.prototype.isOpenFor = function($header) {
+  return this.$header.is($header) && this.$header.hasClass('menu-open');
+};
+
+scout.TableHeaderMenu.prototype.isOpen = function() {
+  return this.$header.hasClass('menu-open');
 };

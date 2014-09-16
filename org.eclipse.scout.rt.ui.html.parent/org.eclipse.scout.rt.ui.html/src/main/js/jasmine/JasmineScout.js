@@ -123,15 +123,20 @@ $.fn.triggerRightClick = function() {
 };
 
 $.fn.triggerMouseDown = function(clicks) {
-  return $(this).triggerEventWithDetail('mousedown', clicks);
+  return $(this).triggerWithDetail('mousedown', clicks);
 };
 
 $.fn.triggerMouseUp = function(clicks) {
-  return $(this).triggerEventWithDetail('mouseup', clicks);
+  return $(this).triggerWithDetail('mouseup', clicks);
 };
 
-$.fn.triggerEventWithDetail = function(event, clicks) {
-  var $this = $(this);
+$.fn.triggerMouseMove = function(position) {
+  return $(this).triggerWithPosition('mousemove', position);
+};
+
+$.fn.triggerWithDetail = function(event, clicks) {
+  var $this = $(this),
+    pos = $this.position();
 
   if (!clicks) {
     clicks = 1;
@@ -141,7 +146,24 @@ $.fn.triggerEventWithDetail = function(event, clicks) {
     type: event,
     originalEvent: {
       detail: clicks
-    }
+    },
+    pageX: pos.left,
+    pageY: pos.right
+  });
+  return $this;
+};
+
+$.fn.triggerWithPosition = function(event, position) {
+  var $this = $(this);
+
+  if (!position) {
+    position = $this.position();
+  }
+
+  $this.trigger({
+    type: event,
+    pageX: position.left,
+    pageY: position.right
   });
   return $this;
 };
@@ -162,8 +184,7 @@ $.fn.triggerContextMenu = function() {
 };
 
 $.fn.triggerClick = function(clicks) {
-  var $this = $(this),
-    pos = $this.position();
+  var $this = $(this);
 
   if (!clicks) {
     clicks = 1;
