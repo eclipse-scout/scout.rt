@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.testenvironment.ui.desktop;
 
-import java.util.ArrayList;
-
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ClientSyncJob;
@@ -30,32 +28,21 @@ import org.eclipse.scout.rt.shared.TEXTS;
  * @author jbr
  */
 public class TestEnvironmentDesktop extends AbstractDesktop implements IDesktop {
-  public static ArrayList<String> protocol = new ArrayList<String>();
-
   public TestEnvironmentDesktop() {
   }
 
-  public ArrayList<String> getProtocol() {
-    return protocol;
-  }
-
-  /**
-   * do NOT change the title of the app
-   */
   @Override
   protected String getConfiguredTitle() {
-    return "Test Application";
+    return "Test Environment Application";
   }
 
   @Override
   protected void execOpened() throws ProcessingException {
-    // outline form
+    // outline form:
     DefaultOutlineTreeForm treeForm = new DefaultOutlineTreeForm();
-    // TODO: was treeForm.setIconId(Icons.EclipseScout);
     treeForm.startView();
-    // outline table
+    // outline table:
     DefaultOutlineTableForm tableForm = new DefaultOutlineTableForm();
-    // TODO: was tableForm.setIconId(Icons.EclipseScout);
     tableForm.startView();
   }
 
@@ -87,11 +74,6 @@ public class TestEnvironmentDesktop extends AbstractDesktop implements IDesktop 
   public class F1Key extends AbstractKeyStroke {
 
     @Override
-    protected void execAction() throws ProcessingException {
-      protocol.add("Action on " + getKeyStroke());
-    }
-
-    @Override
     protected String getConfiguredKeyStroke() {
       return "f1";
     }
@@ -99,11 +81,6 @@ public class TestEnvironmentDesktop extends AbstractDesktop implements IDesktop 
 
   @Order(50.0)
   public class F2Key extends AbstractKeyStroke {
-
-    @Override
-    protected void execAction() throws ProcessingException {
-      protocol.add("Action on " + getKeyStroke());
-    }
 
     @Override
     protected String getConfiguredKeyStroke() {
@@ -115,11 +92,6 @@ public class TestEnvironmentDesktop extends AbstractDesktop implements IDesktop 
   public class F3Key extends AbstractKeyStroke {
 
     @Override
-    protected void execAction() throws ProcessingException {
-      protocol.add("Action on " + getKeyStroke());
-    }
-
-    @Override
     protected String getConfiguredKeyStroke() {
       return "f3";
     }
@@ -127,11 +99,6 @@ public class TestEnvironmentDesktop extends AbstractDesktop implements IDesktop 
 
   @Order(70.0)
   public class F4Key extends AbstractKeyStroke {
-
-    @Override
-    protected void execAction() throws ProcessingException {
-      protocol.add("Action on " + getKeyStroke());
-    }
 
     @Override
     protected String getConfiguredKeyStroke() {
@@ -143,11 +110,6 @@ public class TestEnvironmentDesktop extends AbstractDesktop implements IDesktop 
   public class F5Key extends AbstractKeyStroke {
 
     @Override
-    protected void execAction() throws ProcessingException {
-      protocol.add("Action on " + getKeyStroke());
-    }
-
-    @Override
     protected String getConfiguredKeyStroke() {
       return "f5";
     }
@@ -155,11 +117,6 @@ public class TestEnvironmentDesktop extends AbstractDesktop implements IDesktop 
 
   @Order(90.0)
   public class F6Key extends AbstractKeyStroke {
-
-    @Override
-    protected void execAction() throws ProcessingException {
-      protocol.add("Action on " + getKeyStroke());
-    }
 
     @Override
     protected String getConfiguredKeyStroke() {
@@ -171,11 +128,6 @@ public class TestEnvironmentDesktop extends AbstractDesktop implements IDesktop 
   public class F7Key extends AbstractKeyStroke {
 
     @Override
-    protected void execAction() throws ProcessingException {
-      protocol.add("Action on " + getKeyStroke());
-    }
-
-    @Override
     protected String getConfiguredKeyStroke() {
       return "f7";
     }
@@ -183,11 +135,6 @@ public class TestEnvironmentDesktop extends AbstractDesktop implements IDesktop 
 
   @Order(110.0)
   public class F8Key extends AbstractKeyStroke {
-
-    @Override
-    protected void execAction() throws ProcessingException {
-      protocol.add("Action on " + getKeyStroke());
-    }
 
     @Override
     protected String getConfiguredKeyStroke() {
@@ -199,11 +146,6 @@ public class TestEnvironmentDesktop extends AbstractDesktop implements IDesktop 
   public class F9Key extends AbstractKeyStroke {
 
     @Override
-    protected void execAction() throws ProcessingException {
-      protocol.add("Action on " + getKeyStroke());
-    }
-
-    @Override
     protected String getConfiguredKeyStroke() {
       return "f9";
     }
@@ -211,11 +153,6 @@ public class TestEnvironmentDesktop extends AbstractDesktop implements IDesktop 
 
   @Order(130.0)
   public class F10Key extends AbstractKeyStroke {
-
-    @Override
-    protected void execAction() throws ProcessingException {
-      protocol.add("Action on " + getKeyStroke());
-    }
 
     @Override
     protected String getConfiguredKeyStroke() {
@@ -227,11 +164,6 @@ public class TestEnvironmentDesktop extends AbstractDesktop implements IDesktop 
   public class F11Key extends AbstractKeyStroke {
 
     @Override
-    protected void execAction() throws ProcessingException {
-      protocol.add("Action on " + getKeyStroke());
-    }
-
-    @Override
     protected String getConfiguredKeyStroke() {
       return "f11";
     }
@@ -239,11 +171,6 @@ public class TestEnvironmentDesktop extends AbstractDesktop implements IDesktop 
 
   @Order(150.0)
   public class F12Key extends AbstractKeyStroke {
-
-    @Override
-    protected void execAction() throws ProcessingException {
-      protocol.add("Action on " + getKeyStroke());
-    }
 
     @Override
     protected String getConfiguredKeyStroke() {
