@@ -1,29 +1,30 @@
-// ---- Logical Grid Layout ----
-scout.LogicalGridLayout = function(env, hgap, vgap) {
+/**
+ * JavaScript port of org.eclipse.scout.rt.ui.swing.LogicalGridLayout.
+ */
+scout.LogicalGridLayout = function(hgap, vgap) {
   scout.LogicalGridLayout.parent.call(this);
-  this.m_info; // FIXME AWE: set these values
-  this.m_env = env || new scout.SwingEnvironment();
+  this.m_info;
   this.m_hgap = hgap || 0;
   this.m_vgap = vgap || 0;
 };
 scout.inherits(scout.LogicalGridLayout, scout.AbstractLayout);
 
-// TODO AWE: (layout) irgendwann müssen wir das layout invalidieren (resize, visibility-change, etc.)
+// TODO AWE: (layout) implement resize event
 
 scout.LogicalGridLayout.prototype.validateLayout = function($parent) {
   var visibleComps = [], visibleCons = [], i, cons,
     children = $parent.children('.form-field');
   for (i = 0; i < children.length; i++) {
     var $comp = $(children[i]);
-    if ($comp.isVisible()) { // FIXME AWE check why sequence box is not visible at this point!
+    if ($comp.isVisible()) {
       visibleComps.push($comp);
       cons = scout.Layout.getLogicalGridData($comp);
       cons.validate();
       visibleCons.push(cons);
     }
   }
-  this.m_info = new scout.LogicalGridLayoutInfo(this.m_env, visibleComps, visibleCons, this.m_hgap, this.m_vgap);
-  $.log('LogicalGridLayout#validateLayout layout validated $parent=' + scout.Layout.debugComponent($parent));
+  this.m_info = new scout.LogicalGridLayoutInfo(visibleComps, visibleCons, this.m_hgap, this.m_vgap);
+  $.log('(LogicalGridLayout#validateLayout) $parent=' + scout.Layout.debugComponent($parent));
 };
 
 scout.LogicalGridLayout.prototype.layout = function($parent) {
@@ -42,10 +43,10 @@ scout.LogicalGridLayout.prototype.layout = function($parent) {
     gridDatas.push(data);
   }
 
-  // Calculate layout - TODO: move to validateLayout()?
+  // Calculate layout - TODO AWE: (layout) move to validateLayout()?
   var parentSize = scout.Layout.getDimension($parent),
     parentInsets = scout.Layout.getInsets($parent);
-  console.log('(LogicalGridLayout#layout) size of parent ' + scout.Layout.debugComponent($parent) + '= ' + parentSize + ' insets=' + parentInsets);
+  $.log('(LogicalGridLayout#layout) size of parent ' + scout.Layout.debugComponent($parent) + '= ' + parentSize + ' insets=' + parentInsets);
   var cellBounds = this.m_info.layoutCellBounds(parentSize, parentInsets);
 
   // Set bounds of components

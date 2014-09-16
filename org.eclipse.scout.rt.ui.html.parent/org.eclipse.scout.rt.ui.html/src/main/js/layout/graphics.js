@@ -1,5 +1,5 @@
 /**
- * This file contains JavaScript ports from java.awt classes.
+* This file contains JavaScript ports from java.awt classes.
  */
 
 /**
@@ -138,18 +138,12 @@ scout.TreeSet.prototype.last = function() {
   return this.array[this.array.length - 1];
 };
 
-
-// TODO AWE: (layout) check what to do with SwingLayoutUtility / SwingEnvironment
-scout.SwingLayoutUtility = function() {};
-
-scout.SwingLayoutUtility.MIN = 0;
-scout.SwingLayoutUtility.PREF = 1;
-scout.SwingLayoutUtility.MAX = 2;
-scout.SwingLayoutUtility.EPS = 1e-6;
-
-scout.SwingEnvironment = function() {
-  this.formRowHeight = 23;
-  this.formRowGap = 6;
-  this.formColumnWidth = 360;
-  this.formColumnGap = 12;
+/**
+ * HtmlEnvironment is used in place of org.eclipse.scout.rt.ui.swing.DefaultSwingEnvironment.
+ */
+scout.HtmlEnvironment = {
+  'formRowHeight': 23,
+  'formRowGap': 6,
+  'formColumnWidth': 360,
+  'formColumnGap': 12
 };

@@ -1,6 +1,16 @@
+/**
+ * This file contains various constant, classes and functions used for layouting.
+ */
+scout.LayoutConstants = {
+    'MIN':0,
+    'PREF':1,
+    'MAX':2,
+    'EPS':1e-6
+};
+
 // ---- Layout ----
 // Static utility functions for layouting
-scout.Layout = function() {
+scout.Layout = {
 };
 
 scout.Layout.setLayout = function($comp, layout) {
@@ -83,8 +93,9 @@ scout.Layout.debugComponent = function($comp) {
   return 'Comp[' + attrs + ']';
 };
 
-// ---- Abstract Layout ----
-// Abstract layout class with functions used by all layouts.
+/**
+ * Abstract layout class with functions used by all layout algorithms.
+ */
 scout.AbstractLayout = function() {
   this.valid = false;
   this.validityBasedOnParentSize = new scout.Dimension();
@@ -131,8 +142,9 @@ scout.AbstractLayout.prototype.setBounds = function($comp, bounds) {
   scout.Layout.layout($comp);
 };
 
-// ---- Form Layout ----
-// layouts a scout form.
+/**
+ * Form layout.
+ */
 scout.FormLayout = function() {
   scout.FormLayout.parent.call(this);
 };
@@ -147,7 +159,9 @@ scout.FormLayout.prototype.preferredLayoutSize = function($parent) {
   return scout.Layout.getDimension($parent);
 };
 
-// ---- Group-Box Layout ----
+/**
+ * Group-Box layout.
+ */
 scout.GroupBoxLayout = function() {
   scout.GroupBoxLayout.parent.call(this);
 };
@@ -174,9 +188,9 @@ scout.GroupBoxLayout.prototype._getBody = function($parent) {
   return $parent.find('.group-box-body').first();
 };
 
-
-// ---- Form-Field Layout ----
-// Layout for a form-field with label, status-label and a field
+/**
+ * Form-Field Layout, for a form-field with label, status-label and a field-
+ */
 scout.FormFieldLayout = function() {
   scout.FormFieldLayout.parent.call(this);
 };
@@ -225,12 +239,11 @@ scout.FormFieldLayout.prototype.preferredLayoutSize = function($parent) {
   return new scout.Dimension(width, height);
 };
 
-// TODO: ueberlegen ob wir hier wirklich "Layout" meinen oder ob wir einfach nur eine prefSize func brauchen
 
-// ---- Text-Field Layout ----
-// used to calculate the preferred size of a HTML text-field. Note that this is not the same as the "auto" size of the HTML element.
-// Browsers typically render a text-field larger than the minimum size to display the whole text.
-
+/**
+ * Text-Field Layout, used to calculate the preferred size of a HTML text-field. Note that this is not the same as the
+ * "auto" size of the HTML element. Browsers typically render a text-field larger than the minimum size to display the whole text.
+ */
 scout.TextFieldLayout = function() {
   scout.TextFieldLayout.parent.call(this);
 };
@@ -240,8 +253,9 @@ scout.TextFieldLayout.prototype.preferredLayoutSize = function($parent) {
    return scout.Layout.measureString($parent.val());
 };
 
-// ---- Button Field Layout ----
-// layout for fields with a button
+/**
+ * Button Field Layout, for fields with a button.
+ */
 scout.ButtonFieldLayout = function() {
   scout.ButtonFieldLayout.parent.call(this);
 };

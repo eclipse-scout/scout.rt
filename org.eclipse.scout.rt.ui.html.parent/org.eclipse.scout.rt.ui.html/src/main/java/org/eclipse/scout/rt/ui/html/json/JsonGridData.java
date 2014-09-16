@@ -22,7 +22,7 @@ public class JsonGridData implements IJsonMapper {
   }
 
   // TODO AWE: (layout) wahrscheinlich müssen nicht alle properties gesendet werden, vielleicht nur die,
-  // die != default wert sind? Möglicherweise sind auch gar nicht alle relevant fürs Html UI.
+  // die != default wert sind?
   @Override
   public JSONObject toJson() {
     JSONObject json = new JSONObject();

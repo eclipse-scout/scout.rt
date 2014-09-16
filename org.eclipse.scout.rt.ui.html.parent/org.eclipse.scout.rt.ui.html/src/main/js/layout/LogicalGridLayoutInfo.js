@@ -1,142 +1,143 @@
 /**
  * JavaScript port of org.eclipse.scout.rt.ui.swing.LogicalGridLayoutInfo.
  */
-scout.LogicalGridLayoutInfo = function(env, components, cons, hgap, vgap) {
-  /*LogicalGridData[] */ this.gridDatas = [];
-  /*Component[]*/ this.components = components;
-  /*int*/ this.cols;
-  /*int*/ this.rows;
-  /*int[][]*/ this.width = [];
-  /*int[][]*/ this.height = [];
-  /*double[]*/ this.weightX;
-  /*double[]*/ this.weightY;
-  /*private int*/ this.m_hgap = hgap;
-  /*private int*/ this.m_vgap = vgap;
-  /*private Rectangle[][]*/ this.m_cellBounds = [];
+scout.LogicalGridLayoutInfo = function(components, cons, hgap, vgap) {
+  this.gridDatas = [];
+  this.components = components;
+  this.cols;
+  this.rows;
+  this.width = [];
+  this.height = [];
+  this.weightX;
+  this.weightY;
+  this.m_hgap = hgap;
+  this.m_vgap = vgap;
+  this.m_cellBounds = [];
 
-    // create a modifiable copy of the grid datas
-    var i, gd, x, y;
-    for (i = 0; i < cons.length; i++) {
-      this.gridDatas[i] = new scout.LogicalGridData(cons[i]);
+  // create a modifiable copy of the grid datas
+  var i, gd, x, y;
+  for (i = 0; i < cons.length; i++) {
+    this.gridDatas[i] = new scout.LogicalGridData(cons[i]);
+  }
+  if (components.length === 0) {
+    this.cols = 0;
+    this.rows = 0;
+    this.width = [];
+    this.height = [];
+    this.weightX = [];
+    this.weightY = [];
+    return;
+  }
+  // eliminate unused rows and columns
+  var usedCols = new scout.TreeSet();
+  var usedRows = new scout.TreeSet();
+  // ticket 86645 use member gridDatas instead of param cons
+  for (i = 0; i < this.gridDatas.length; i++) {
+    gd = this.gridDatas[i];
+    if (gd.gridx < 0) {
+      gd.gridx = 0;
     }
-    if (components.length === 0) {
-      this.cols = 0;
-      this.rows = 0;
-      this.width = [];
-      this.height = [];
-      this.weightX = [];
-      this.weightY = [];
-      return;
+    if (gd.gridy < 0) {
+      gd.gridy = 0;
     }
-    // eliminate unused rows and columns
-    var /*TreeSet<Integer>*/ usedCols = new scout.TreeSet();
-    var /*TreeSet<Integer>*/ usedRows = new scout.TreeSet();
-    // ticket 86645 use member gridDatas instead of param cons
-    for (i=0; i<this.gridDatas.length; i++) {
-      gd = this.gridDatas[i];
-      if (gd.gridx < 0) {
-        gd.gridx = 0;
-      }
-      if (gd.gridy < 0) {
-        gd.gridy = 0;
-      }
-      if (gd.gridw < 1) {
-        gd.gridw = 1;
-      }
-      if (gd.gridh < 1) {
-        gd.gridh = 1;
-      }
-      for (x = gd.gridx; x < gd.gridx + gd.gridw; x++) {
-        usedCols.add(x);
-      }
-      for (y = gd.gridy; y < gd.gridy + gd.gridh; y++) {
-        usedRows.add(y);
-      }
+    if (gd.gridw < 1) {
+      gd.gridw = 1;
     }
-    var maxCol = usedCols.last();
-    for (x = maxCol; x >= 0; x--) {
-      if (!usedCols.contains(x)) {
-        // eliminate column
-        // ticket 86645 use member gridDatas instead of param cons
-        for (i=0; i<this.gridDatas.length; i++) {
-          gd = this.gridDatas[i];
-          if (gd.gridx > x) {
-            gd.gridx--;
-          }
+    if (gd.gridh < 1) {
+      gd.gridh = 1;
+    }
+    for (x = gd.gridx; x < gd.gridx + gd.gridw; x++) {
+      usedCols.add(x);
+    }
+    for (y = gd.gridy; y < gd.gridy + gd.gridh; y++) {
+      usedRows.add(y);
+    }
+  }
+  var maxCol = usedCols.last();
+  for (x = maxCol; x >= 0; x--) {
+    if (!usedCols.contains(x)) {
+      // eliminate column
+      // ticket 86645 use member gridDatas instead of param cons
+      for (i = 0; i < this.gridDatas.length; i++) {
+        gd = this.gridDatas[i];
+        if (gd.gridx > x) {
+          gd.gridx--;
         }
       }
     }
-    var maxRow = usedRows.last();
-    for (y = maxRow; y >= 0; y--) {
-      if (!usedRows.contains(y)) {
-        // eliminate row
-        // ticket 86645 use member gridDatas instead of param cons
-        for (i=0; i<this.gridDatas.length; i++) {
-          gd = this.gridDatas[i];
+  }
+  var maxRow = usedRows.last();
+  for (y = maxRow; y >= 0; y--) {
+    if (!usedRows.contains(y)) {
+      // eliminate row
+      // ticket 86645 use member gridDatas instead of param cons
+      for (i = 0; i < this.gridDatas.length; i++) {
+        gd = this.gridDatas[i];
         if (gd.gridy > y) {
-            // ticket 86645
-            gd.gridy--;
-          }
+          // ticket 86645
+          gd.gridy--;
         }
       }
     }
-    //
-    this.cols = usedCols.size();
-    this.rows = usedRows.size();
-    this.width = []; // new int[cols][3];
-    this.height = []; // new int[rows][3];
-    this.weightX = []; // new double[cols];
-    this.weightY = []; // new double[rows];
-    console.log('usedCols='+this.cols+' usedRows='+ this.rows);
-    this._initializeInfo(env, hgap, vgap);
+  }
+  //
+  this.cols = usedCols.size();
+  this.rows = usedRows.size();
+  this.width = [];
+  this.height = [];
+  this.weightX = [];
+  this.weightY = [];
+  $.log('(LogicalGridLayoutInfo#CTOR) usedCols=' + this.cols + ' usedRows=' + this.rows);
+  this._initializeInfo(hgap, vgap);
 };
 
-scout.LogicalGridLayoutInfo.prototype._initializeInfo = function(env, hgap, vgap) {
-    var compCount = this.components.length;
-    var /*Dimension[]*/ compSize = [];
-    // cache component sizes and cleanup constraints
+scout.LogicalGridLayoutInfo.prototype._initializeInfo = function(hgap, vgap) {
+  var compCount = this.components.length;
+  var compSize = [];
+  // cache component sizes and cleanup constraints
   var comp, cons, d;
-    for (var i = 0; i < compCount; i++) {
-      /*Component*/ comp = this.components[i];
-      /*LogicalGridData*/ cons = this.gridDatas[i];
-      /*Dimension*/ d = this.uiSizeInPixel(comp);
-      if (cons.widthHint > 0) {
-        d.width = cons.widthHint;
-      }
-      if (cons.heightHint > 0) {
-        d.height = cons.heightHint;
-      }
-      compSize[i] = d;
-      if (cons.gridx < 0) {
-        cons.gridx = 0;
-      }
-      if (cons.gridy < 0) {
-        cons.gridy = 0;
-      }
-      if (cons.gridw < 1) {
-        cons.gridw = 1;
-      }
-      if (cons.gridh < 1) {
-        cons.gridh = 1;
-      }
-      if (cons.gridx >= this.cols) {
-        cons.gridx = this.cols - 1;
-      }
-      if (cons.gridy >= this.rows) {
-        cons.gridy = this.rows - 1;
-      }
-      if (cons.gridx + cons.gridw - 1 >= this.cols) {
-        cons.gridw = this.cols - cons.gridx;
-      }
-      if (cons.gridy + cons.gridh >= this.rows) {
-        cons.gridh = this.rows - cons.gridy;
-      }
+  for (var i = 0; i < compCount; i++) {
+    comp = this.components[i];
+    cons = this.gridDatas[i];
+    d = this.uiSizeInPixel(comp);
+    if (cons.widthHint > 0) {
+      d.width = cons.widthHint;
     }
-  console.log('cons='+cons);
-  this._initializeColumns(env, compSize, hgap);
-  this._initializeRows(env, compSize, vgap);
+    if (cons.heightHint > 0) {
+      d.height = cons.heightHint;
+    }
+    compSize[i] = d;
+    if (cons.gridx < 0) {
+      cons.gridx = 0;
+    }
+    if (cons.gridy < 0) {
+      cons.gridy = 0;
+    }
+    if (cons.gridw < 1) {
+      cons.gridw = 1;
+    }
+    if (cons.gridh < 1) {
+      cons.gridh = 1;
+    }
+    if (cons.gridx >= this.cols) {
+      cons.gridx = this.cols - 1;
+    }
+    if (cons.gridy >= this.rows) {
+      cons.gridy = this.rows - 1;
+    }
+    if (cons.gridx + cons.gridw - 1 >= this.cols) {
+      cons.gridw = this.cols - cons.gridx;
+    }
+    if (cons.gridy + cons.gridh >= this.rows) {
+      cons.gridh = this.rows - cons.gridy;
+    }
+  }
+  console.log('cons=' + cons);
+  this._initializeColumns(compSize, hgap);
+  this._initializeRows(compSize, vgap);
 };
 
+// TODO AWE: move to arrays.js
 arrayInit = function(length, initValue) {
   var array = [], i;
   for (i=0; i<length; i++) {
@@ -145,7 +146,7 @@ arrayInit = function(length, initValue) {
   return array;
 };
 
-scout.LogicalGridLayoutInfo.prototype._initializeColumns = function(env, compSize, hgap) {
+scout.LogicalGridLayoutInfo.prototype._initializeColumns = function(compSize, hgap) {
   var compCount = compSize.length;
   var prefWidths = arrayInit(this.cols, 0);
   var fixedWidths = arrayInit(this.cols, false);
@@ -160,7 +161,7 @@ scout.LogicalGridLayoutInfo.prototype._initializeColumns = function(env, compSiz
           prefw = compSize[i].width;
         }
         else {
-          prefw = this.logicalWidthInPixel(env, cons);
+          prefw = this.logicalWidthInPixel(cons);
         }
         for (j = cons.gridx; j < cons.gridx + cons.gridw && j < this.cols; j++) {
           prefWidths[j] = Math.max(prefWidths[j], prefw);
@@ -189,7 +190,7 @@ scout.LogicalGridLayoutInfo.prototype._initializeColumns = function(env, compSiz
           distWidth = compSize[i].width - spanWidth - (hSpan - 1) * hgap;
         }
         else {
-          distWidth = this.logicalWidthInPixel(env, cons) - spanWidth - (hSpan - 1) * hgap;
+          distWidth = this.logicalWidthInPixel(cons) - spanWidth - (hSpan - 1) * hgap;
         }
         if (distWidth > 0) {
           var equalWidth = (distWidth + spanWidth) / hSpan;
@@ -213,17 +214,18 @@ scout.LogicalGridLayoutInfo.prototype._initializeColumns = function(env, compSiz
       }
     }
 
+    var lc = scout.LayoutConstants;
     for (i = 0; i < this.cols; i++) {
       this.width[i] = [];
       if (fixedWidths[i]) {
-        this.width[i][scout.SwingLayoutUtility.MIN] = prefWidths[i];
-        this.width[i][scout.SwingLayoutUtility.PREF] = prefWidths[i];
-        this.width[i][scout.SwingLayoutUtility.MAX] = prefWidths[i];
+        this.width[i][lc.MIN] = prefWidths[i];
+        this.width[i][lc.PREF] = prefWidths[i];
+        this.width[i][lc.MAX] = prefWidths[i];
       }
       else {
-        this.width[i][scout.SwingLayoutUtility.MIN] = 0;// must be exactly 0!
-        this.width[i][scout.SwingLayoutUtility.PREF] = prefWidths[i];
-        this.width[i][scout.SwingLayoutUtility.MAX] = 10240;
+        this.width[i][lc.MIN] = 0;// must be exactly 0!
+        this.width[i][lc.PREF] = prefWidths[i];
+        this.width[i][lc.MAX] = 10240;
       }
     }
 
@@ -258,7 +260,7 @@ scout.LogicalGridLayoutInfo.prototype._initializeColumns = function(env, compSiz
     }
 };
 
-scout.LogicalGridLayoutInfo.prototype._initializeRows = function(env, compSize, vgap) {
+scout.LogicalGridLayoutInfo.prototype._initializeRows = function(compSize, vgap) {
   var compCount = compSize.length;
   var prefHeights = arrayInit(this.rows, 0);
   var fixedHeights = arrayInit(this.rows, false);
@@ -273,7 +275,7 @@ scout.LogicalGridLayoutInfo.prototype._initializeRows = function(env, compSize, 
           prefh = compSize[i].height;
         }
         else {
-          prefh = this.logicalHeightInPixel(env, cons);
+          prefh = this.logicalHeightInPixel(cons);
         }
         for (j = cons.gridy; j < cons.gridy + cons.gridh && j < this.rows; j++) {
           prefHeights[j] = Math.max(prefHeights[j], prefh);
@@ -300,7 +302,7 @@ scout.LogicalGridLayoutInfo.prototype._initializeRows = function(env, compSize, 
           distHeight = compSize[i].height - spanHeight - (vSpan - 1) * vgap;
         }
         else {
-          distHeight = this.logicalHeightInPixel(env, cons) - spanHeight - (vSpan - 1) * vgap;
+          distHeight = this.logicalHeightInPixel(cons) - spanHeight - (vSpan - 1) * vgap;
         }
         if (distHeight > 0) {
           var equalHeight = (distHeight + spanHeight) / vSpan;
@@ -319,17 +321,18 @@ scout.LogicalGridLayoutInfo.prototype._initializeRows = function(env, compSize, 
       }
     }
 
+    var lc = scout.LayoutConstants;
     for (i = 0; i < this.rows; i++) {
       this.height[i] = [];
       if (fixedHeights[i]) {
-        this.height[i][scout.SwingLayoutUtility.MIN] = prefHeights[i];
-        this.height[i][scout.SwingLayoutUtility.PREF] = prefHeights[i];
-        this.height[i][scout.SwingLayoutUtility.MAX] = prefHeights[i];
+        this.height[i][lc.MIN] = prefHeights[i];
+        this.height[i][lc.PREF] = prefHeights[i];
+        this.height[i][lc.MAX] = prefHeights[i];
       }
       else {
-        this.height[i][scout.SwingLayoutUtility.MIN] = 0;// must be exactly 0!
-        this.height[i][scout.SwingLayoutUtility.PREF] = prefHeights[i];
-        this.height[i][scout.SwingLayoutUtility.MAX] = 10240;
+        this.height[i][lc.MIN] = 0;// must be exactly 0!
+        this.height[i][lc.PREF] = prefHeights[i];
+        this.height[i][lc.MAX] = 10240;
       }
     }
 
@@ -364,109 +367,108 @@ scout.LogicalGridLayoutInfo.prototype._initializeRows = function(env, compSize, 
 };
 
 scout.LogicalGridLayoutInfo.prototype.layoutCellBounds = function(size, insets) {
-    /*int[]*/ var w = this.layoutSizes(size.width - insets.left - insets.right - Math.max(0, (this.cols - 1) * this.m_hgap), this.width, this.weightX);
-    /*int[]*/ var h = this.layoutSizes(size.height - insets.top - insets.bottom - Math.max(0, (this.rows - 1) * this.m_vgap), this.height, this.weightY);
-    this.m_cellBounds = arrayInit(this.rows, null);
-    var y = insets.top, r, x, c;
-    for (r = 0; r < this.rows; r++) {
-      x = insets.left;
-      this.m_cellBounds[r] = arrayInit(this.cols, null);
-      for (c = 0; c < this.cols; c++) {
-        this.m_cellBounds[r][c] = new scout.Rectangle(x, y, w[c], h[r]);
-        x += w[c];
-        x += this.m_hgap;
-      }
-      y += h[r];
-      y += this.m_vgap;
+  var w = this.layoutSizes(size.width - insets.left - insets.right - Math.max(0, (this.cols - 1) * this.m_hgap), this.width, this.weightX);
+  var h = this.layoutSizes(size.height - insets.top - insets.bottom - Math.max(0, (this.rows - 1) * this.m_vgap), this.height, this.weightY);
+  this.m_cellBounds = arrayInit(this.rows, null);
+  var y = insets.top, r, x, c;
+  for (r = 0; r < this.rows; r++) {
+    x = insets.left;
+    this.m_cellBounds[r] = arrayInit(this.cols, null);
+    for (c = 0; c < this.cols; c++) {
+      this.m_cellBounds[r][c] = new scout.Rectangle(x, y, w[c], h[r]);
+      x += w[c];
+      x += this.m_hgap;
     }
-    return this.m_cellBounds;
+    y += h[r];
+    y += this.m_vgap;
+  }
+  return this.m_cellBounds;
 };
 
 scout.LogicalGridLayoutInfo.prototype.layoutSizes = function(targetSize, sizes, weights) {
-    /*int[]*/ var outSizes = arrayInit(sizes.length, 0);
-    if (targetSize <= 0) {
-      return [];
-    }
-    var sumSize = 0;
-    var tmpWeight = arrayInit(weights.length, 0.0);
-    var sumWeight = 0, i;
-    for (i = 0; i < sizes.length; i++) {
-      outSizes[i] = sizes[i][scout.SwingLayoutUtility.PREF];
-      sumSize += outSizes[i];
-      tmpWeight[i] = weights[i];
-      /**
-       * auto correction: if weight is 0 and min / max sizes are NOT equal then
-       * set weight to 1; if weight<eps set it to 0
-       */
-      if (tmpWeight[i] < scout.SwingLayoutUtility.EPS) {
-        if (sizes[i][scout.SwingLayoutUtility.MAX] > sizes[i][scout.SwingLayoutUtility.MIN]) {
-          tmpWeight[i] = 1;
-        }
-        else {
-          tmpWeight[i] = 0;
-        }
-      }
-      sumWeight += tmpWeight[i];
-    }
-    // normalize weights
-    if (sumWeight > 0) {
-      for (i = 0; i < tmpWeight.length; i++) {
-        tmpWeight[i] = tmpWeight[i] / sumWeight;
+  var outSizes = arrayInit(sizes.length, 0);
+  if (targetSize <= 0) {
+    return [];
+  }
+  var sumSize = 0;
+  var tmpWeight = arrayInit(weights.length, 0.0);
+  var sumWeight = 0, i;
+  for (i = 0; i < sizes.length; i++) {
+    outSizes[i] = sizes[i][scout.LayoutConstants.PREF];
+    sumSize += outSizes[i];
+    tmpWeight[i] = weights[i];
+    /**
+     * auto correction: if weight is 0 and min / max sizes are NOT equal then
+     * set weight to 1; if weight<eps set it to 0
+     */
+    if (tmpWeight[i] < scout.LayoutConstants.EPS) {
+      if (sizes[i][scout.LayoutConstants.MAX] > sizes[i][scout.LayoutConstants.MIN]) {
+        tmpWeight[i] = 1;
+      } else {
+        tmpWeight[i] = 0;
       }
     }
-    var deltaInt = targetSize - sumSize;
-    // expand or shrink
-    if (Math.abs(deltaInt) > 0) {
-      // setup accumulators
-      /*float[]*/ var accWeight = arrayInit(tmpWeight.length, 0.0);
-      var hasTargets;
-      if (deltaInt > 0) {
-        // expand
-        hasTargets = true;
-        while (deltaInt > 0 && hasTargets) {
-          hasTargets = false;
-          for (i = 0; i < outSizes.length && deltaInt > 0; i++) {
-            if (tmpWeight[i] > 0 && outSizes[i] < sizes[i][scout.SwingLayoutUtility.MAX]) {
-              hasTargets = true;
-              accWeight[i] += tmpWeight[i];
-              if (accWeight[i] > 0) {
-                accWeight[i] -= 1;
-                outSizes[i] += 1;
-                deltaInt -= 1;
-              }
+    sumWeight += tmpWeight[i];
+  }
+  // normalize weights
+  if (sumWeight > 0) {
+    for (i = 0; i < tmpWeight.length; i++) {
+      tmpWeight[i] = tmpWeight[i] / sumWeight;
+    }
+  }
+  var deltaInt = targetSize - sumSize;
+  // expand or shrink
+  if (Math.abs(deltaInt) > 0) {
+    // setup accumulators
+    /*float[]*/
+    var accWeight = arrayInit(tmpWeight.length, 0.0);
+    var hasTargets;
+    if (deltaInt > 0) {
+      // expand
+      hasTargets = true;
+      while (deltaInt > 0 && hasTargets) {
+        hasTargets = false;
+        for (i = 0; i < outSizes.length && deltaInt > 0; i++) {
+          if (tmpWeight[i] > 0 && outSizes[i] < sizes[i][scout.LayoutConstants.MAX]) {
+            hasTargets = true;
+            accWeight[i] += tmpWeight[i];
+            if (accWeight[i] > 0) {
+              accWeight[i] -= 1;
+              outSizes[i] += 1;
+              deltaInt -= 1;
             }
           }
         }
       }
-      else {// delta<0
-        // shrink
-        hasTargets = true;
-        while (deltaInt < 0 && hasTargets) {
-          hasTargets = false;
-          for (i = 0; i < outSizes.length && deltaInt < 0; i++) {
-            if (tmpWeight[i] > 0 && outSizes[i] > sizes[i][scout.SwingLayoutUtility.MIN]) {
-              hasTargets = true;
-              accWeight[i] += tmpWeight[i];
-              if (accWeight[i] > 0) {
-                accWeight[i] -= 1;
-                outSizes[i] -= 1;
-                deltaInt += 1;
-              }
+    } else { // delta<0
+      // shrink
+      hasTargets = true;
+      while (deltaInt < 0 && hasTargets) {
+        hasTargets = false;
+        for (i = 0; i < outSizes.length && deltaInt < 0; i++) {
+          if (tmpWeight[i] > 0 && outSizes[i] > sizes[i][scout.LayoutConstants.MIN]) {
+            hasTargets = true;
+            accWeight[i] += tmpWeight[i];
+            if (accWeight[i] > 0) {
+              accWeight[i] -= 1;
+              outSizes[i] -= 1;
+              deltaInt += 1;
             }
           }
         }
       }
     }
-    return outSizes;
+  }
+  return outSizes;
 };
 
-scout.LogicalGridLayoutInfo.prototype.logicalWidthInPixel = function(env, cons) {
-  var gridW = cons.gridw;
+scout.LogicalGridLayoutInfo.prototype.logicalWidthInPixel = function(cons) {
+  var gridW = cons.gridw, env = scout.HtmlEnvironment;
   return env.formColumnWidth * gridW + env.formColumnGap * Math.max(0, gridW - 1);
 };
 
-scout.LogicalGridLayoutInfo.prototype.logicalHeightInPixel = function(env, cons) {
-  var gridH = cons.gridh;
+scout.LogicalGridLayoutInfo.prototype.logicalHeightInPixel = function(cons) {
+  var gridH = cons.gridh, env = scout.HtmlEnvironment;
   return env.formRowHeight * gridH + env.formRowGap * Math.max(0, gridH - 1);
 };
 
@@ -477,7 +479,7 @@ scout.LogicalGridLayoutInfo.prototype.uiSizeInPixel = function($comp) {
     prefSize = layout.preferredLayoutSize($comp);
     $.log('(LogicalGridLayoutInfo#uiSizeInPixel) ' + scout.Layout.debugComponent($comp) + ' impl. preferredSize=' + prefSize);
   } else {
-    // TODO: hier koennten wir eigentlich einen fehler werfen, weil das nicht passieren sollte
+    // TODO AWE: (layout) hier koennten wir eigentlich einen fehler werfen, weil das nicht passieren sollte
     prefSize = scout.Dimension($comp.width(), $comp.height());
     $.log('(LogicalGridLayoutInfo#uiSizeInPixel) ' + scout.Layout.debugComponent($comp) + ' size of HTML element=' + prefSize);
   }

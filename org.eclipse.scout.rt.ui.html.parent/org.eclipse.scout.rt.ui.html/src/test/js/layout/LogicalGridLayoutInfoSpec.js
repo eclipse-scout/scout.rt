@@ -54,8 +54,7 @@ describe("LogicalGridLayoutInfo", function() {
     gd2.weightx = 1.0;
 
     var cons = [gd1, gd2];
-    var env = new scout.SwingEnvironment();
-    var lgli = new scout.LogicalGridLayoutInfo(env, components, cons, 5, 5);
+    var lgli = new scout.LogicalGridLayoutInfo(components, cons, 5, 5);
     var parentSize = new scout.Dimension(500, 23);
     var parentInsets = new scout.Insets(0, 0, 0, 0);
 

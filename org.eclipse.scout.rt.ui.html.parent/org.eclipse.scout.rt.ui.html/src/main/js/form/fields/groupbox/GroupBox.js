@@ -31,8 +31,8 @@ scout.GroupBox.prototype._render = function($parent) {
 
   this.$body = this.$container.
     appendDiv('', 'group-box-body');
-  var env = new scout.SwingEnvironment();
-  scout.Layout.setLayout(this.$body, new scout.LogicalGridLayout(env, env.formColumnGap, env.formRowGap));
+  var env = scout.HtmlEnvironment;
+  scout.Layout.setLayout(this.$body, new scout.LogicalGridLayout(env.formColumnGap, env.formRowGap));
 
   var i, field, fields = this.getControlFields();
   for (i=0; i<fields.length; i++) {
