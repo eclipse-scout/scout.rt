@@ -15,7 +15,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.awt.Point;
-import java.util.logging.Handler;
 import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
@@ -23,12 +22,13 @@ import java.util.logging.Logger;
 import javax.swing.JTree;
 import javax.swing.tree.TreeCellRenderer;
 
+import org.eclipse.scout.rt.testing.shared.HandlerAdapter;
 import org.eclipse.scout.rt.ui.swing.basic.AbstractHtmlLinkDetector;
 import org.junit.Test;
 
 /**
  * Test for {@link TreeHtmlLinkDetector}
- * 
+ *
  * @since 4.1.0
  */
 public class TreeHtmlLinkDetectorTest {
@@ -49,21 +49,13 @@ public class TreeHtmlLinkDetectorTest {
     logger.addHandler(new P_LogHandler());
   }
 
-  private class P_LogHandler extends Handler {
+  private class P_LogHandler extends HandlerAdapter {
 
     @Override
     public void publish(LogRecord record) {
       if (record.getThrown() != null) {
         fail("An exception ocurred! " + record.getThrown());
       }
-    }
-
-    @Override
-    public void flush() {
-    }
-
-    @Override
-    public void close() throws SecurityException {
     }
   }
 }
