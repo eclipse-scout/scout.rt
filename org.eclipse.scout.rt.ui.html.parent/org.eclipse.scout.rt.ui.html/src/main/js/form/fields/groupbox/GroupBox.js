@@ -17,9 +17,10 @@ scout.GroupBox.prototype._render = function($parent) {
     addClass('form-field').
     attr('id', 'GroupBox-' + this.id);
 
-  scout.Layout.setLayout(this.$container, new scout.GroupBoxLayout());
+  var htmlContainer = new scout.HtmlComponent(this.$container);
+  htmlContainer.setLayout(new scout.GroupBoxLayout());
   if (!root) {
-    scout.Layout.setLogicalGridData(this.$container, this);
+    htmlContainer.layoutData = new scout.LogicalGridData(this);
   }
 
   if (this.label) {
@@ -29,10 +30,10 @@ scout.GroupBox.prototype._render = function($parent) {
       append(this.$label);
   }
 
-  this.$body = this.$container.
-    appendDiv('', 'group-box-body');
+  this.$body = this.$container.appendDiv('', 'group-box-body');
   var env = scout.HtmlEnvironment;
-  scout.Layout.setLayout(this.$body, new scout.LogicalGridLayout(env.formColumnGap, env.formRowGap));
+  var htmlBody = new scout.HtmlComponent(this.$body);
+  htmlBody.setLayout(new scout.LogicalGridLayout(env.formColumnGap, env.formRowGap));
 
   var i, field, fields = this.getControlFields();
   for (i=0; i<fields.length; i++) {

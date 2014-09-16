@@ -15,7 +15,8 @@ scout.SequenceBox.prototype._render = function($parent) {
     addClass('field').
     addClass('sequence-box').
     appendTo(this.$container);
-  scout.Layout.setLayout(this.$_sequenceBox, new scout.LogicalGridLayout(scout.HtmlEnvironment.formColumnGap, 0));
+  var htmlSequenceBox = new scout.HtmlComponent(this.$_sequenceBox);
+  htmlSequenceBox.setLayout(new scout.LogicalGridLayout(scout.HtmlEnvironment.formColumnGap, 0));
 
   var field, i;
   for (i = 0; i < this.fields.length; i++) {

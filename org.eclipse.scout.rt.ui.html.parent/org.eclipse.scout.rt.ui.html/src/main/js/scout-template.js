@@ -30,6 +30,7 @@
 //@include("menu/Menubar.js")
 //@include("layout/graphics.js");
 //@include("layout/layouts.js");
+//@include("layout/HtmlComponent.js");
 //@include("layout/LogicalGridData.js");
 //@include("layout/LogicalGridDataBuilder.js");
 //@include("layout/LogicalGridLayoutInfo.js");

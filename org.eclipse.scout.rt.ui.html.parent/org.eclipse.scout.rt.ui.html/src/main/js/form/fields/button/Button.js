@@ -22,7 +22,6 @@ scout.Button.prototype._render = function($parent) {
     on('click', function() {
       this.session.send('click', this.id);
     }.bind(this));
-  scout.Layout.setLogicalGridData(this.$container, this);
 };
 
 scout.Button.prototype._setLabel = function(label) {

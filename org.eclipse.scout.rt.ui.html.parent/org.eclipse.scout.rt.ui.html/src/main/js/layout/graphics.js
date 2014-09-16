@@ -147,3 +147,14 @@ scout.HtmlEnvironment = {
   'formColumnWidth': 360,
   'formColumnGap': 12
 };
+
+scout.graphics = {
+  'measureString': function(text) {
+    var $div = $('#StringMeasurement');
+    if ($div.length === 0) {
+      throw 'DIV StringMeasurement does\'nt exist';
+    }
+    $div.html(text);
+    return new scout.Dimension($div.width(), $div.height());
+  }
+};

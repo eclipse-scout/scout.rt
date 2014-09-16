@@ -473,15 +473,5 @@ scout.LogicalGridLayoutInfo.prototype.logicalHeightInPixel = function(cons) {
 };
 
 scout.LogicalGridLayoutInfo.prototype.uiSizeInPixel = function($comp) {
-  var prefSize, layout;
-  layout = $comp.data('layout');
-  if (layout) {
-    prefSize = layout.preferredLayoutSize($comp);
-    $.log('(LogicalGridLayoutInfo#uiSizeInPixel) ' + scout.Layout.debugComponent($comp) + ' impl. preferredSize=' + prefSize);
-  } else {
-    // TODO AWE: (layout) hier koennten wir eigentlich einen fehler werfen, weil das nicht passieren sollte
-    prefSize = scout.Dimension($comp.width(), $comp.height());
-    $.log('(LogicalGridLayoutInfo#uiSizeInPixel) ' + scout.Layout.debugComponent($comp) + ' size of HTML element=' + prefSize);
-  }
-  return prefSize;
+  return scout.HtmlComponent.get($comp).getPreferredSize();
 };

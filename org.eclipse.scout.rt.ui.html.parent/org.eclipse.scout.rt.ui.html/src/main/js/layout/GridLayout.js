@@ -1,3 +1,5 @@
+// TODO AWE: (layout) remove file GridLayout.js?
+
 /**
  * Layout manager for Scout Html UI forms. Don't forget to dispose the GridLayout when you dispose
  * the layouted container. Otherwise the grid layout still handles resize-events when the widget is

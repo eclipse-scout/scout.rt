@@ -18,8 +18,8 @@ scout.Form.prototype._render = function($parent) {
     addClass('form').
     data('model', this);
 
-  var layout = new scout.FormLayout();
-  scout.Layout.setLayout(this.$container, layout);
+  var htmlContainer = new scout.HtmlComponent(this.$container);
+  htmlContainer.setLayout(new scout.FormLayout());
 
   this.rootGroupBox.render(this.$container);
 
@@ -81,7 +81,7 @@ scout.Form.prototype._render = function($parent) {
     }.bind(this));
   }
 
-  layout.layout(this.$container);
+  htmlContainer.layout($parent); // FIXME parent/container?
 
   if (this._locked) {
     this.disable();

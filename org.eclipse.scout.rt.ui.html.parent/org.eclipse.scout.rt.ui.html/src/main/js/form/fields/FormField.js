@@ -16,9 +16,10 @@ scout.FormField.prototype._render = function($parent) {
   this.addContainer($parent, 'FormField', new scout.FormFieldLayout());
   this.addLabel();
   this.addStatus();
-  this.$field = $.makeDiv('', '.field').
+  this.$field = $.makeDiv('', 'field').
     html('[not implemented yet]').
     appendTo(this.$container);
+
 };
 
 scout.FormField.prototype._callSetters = function() {
@@ -140,17 +141,19 @@ scout.FormField.prototype.addStatus = function() {
  * @param $parent to which container is appended
  * @param typeName typeName of scout component used in ID attribute
  * @param layout when layout is undefined, scout.FormFieldLayout() is set
+ *
+ * @return The HtmlComponent created for this.$container
  */
 scout.FormField.prototype.addContainer = function($parent, typeName, layout) {
   this.$container = $('<div>').
     appendTo($parent).
     addClass('form-field').
     attr('id', typeName + '-' + this.id);
-  scout.Layout.setLogicalGridData(this.$container, this);
-  if (!layout) {
-    layout = new scout.FormFieldLayout();
-  }
-  scout.Layout.setLayout(this.$container, layout);
+
+  var htmlComp = new scout.HtmlComponent(this.$container);
+  htmlComp.layoutData = new scout.LogicalGridData(this);
+  htmlComp.setLayout(layout || new scout.FormFieldLayout());
+  return htmlComp;
 };
 
 
