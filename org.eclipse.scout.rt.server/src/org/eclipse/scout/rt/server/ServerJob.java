@@ -249,6 +249,9 @@ public abstract class ServerJob extends JobEx implements IServerSessionProvider 
     finally {
       ActiveTransactionRegistry.unregister(transaction);
       if (transaction.hasFailures()) {
+        for (Throwable transactionFailure : transaction.getFailures()) {
+          LOG.error("Transaction had failure.", transactionFailure);
+        }
         // xa rollback
         try {
           transaction.rollback();
