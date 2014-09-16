@@ -38,3 +38,11 @@ cursor: col-resize !important;
 body.row-resize *, body.row-resize {
 cursor: row-resize !important;
 }
+
+/* hidden DIV used to measure string length in UI */
+#StringMeasurement {
+  position: absolute;
+  visibility: hidden;
+  height: auto;
+  width: auto;
+}

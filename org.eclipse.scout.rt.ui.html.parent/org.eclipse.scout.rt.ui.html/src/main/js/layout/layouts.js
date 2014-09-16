@@ -41,9 +41,13 @@ scout.Layout.getDimension = function($comp) {
   return new scout.Dimension($comp.width(), $comp.height());
 };
 
+scout.Layout.getLocation = function($comp) {
+  return new scout.Point($comp.css('left'), $comp.css('top'));
+};
+
 // Takes a GridData object and creates a LogicalGridData object which is set on the given component.
-scout.Layout.setLogicalGridData = function($comp, gridData) {
-  var logicalGridData = new scout.LogicalGridDataBuilder().build(gridData);
+scout.Layout.setLogicalGridData = function($comp, model) {
+  var logicalGridData = new scout.LogicalGridData(model);
   $comp.data('logicalGridData', logicalGridData);
 };
 
@@ -68,10 +72,29 @@ scout.Layout.debugComponent = function($comp) {
 // ---- Abstract Layout ----
 // Abstract layout class with functions used by all layouts.
 scout.AbstractLayout = function() {
+  this.valid = false;
+  this.validityBasedOnParentSize = new scout.Dimension();
+};
+
+scout.AbstractLayout.prototype._verifyLayout = function($parent) {
+  var parentSize = scout.Layout.getDimension($parent);
+  if (!this.valid || !this.validityBasedOnParentSize.equals(parentSize)) {
+    this.validityBasedOnParentSize = parentSize;
+    this.validateLayout($parent);
+    this.valid = true;
+  }
+};
+
+scout.AbstractLayout.prototype.invalidate = function() {
+  this.valid = false;
 };
 
 // Sets the size of given component and layout component.
 scout.AbstractLayout.prototype.setSize = function($comp, size) {
+  var oldSize =scout.Layout.getDimension($comp);
+  if (!oldSize.equals(size)) {
+    this.invalidate();
+  }
   $comp.
     css('width', size.width).
     css('height', size.height);
@@ -79,6 +102,13 @@ scout.AbstractLayout.prototype.setSize = function($comp, size) {
 };
 
 scout.AbstractLayout.prototype.setBounds = function($comp, bounds) {
+  var oldSize = scout.Layout.getDimension($comp);
+  var newSize = new scout.Dimension(bounds.width, bounds.height);
+  var oldLocation = scout.Layout.getLocation($comp);
+  var newLocation = new scout.Point(bounds.x, bounds.y);
+  if (!oldSize.equals(newSize) || !oldLocation.equals(newLocation)) {
+    this.invalidate();
+  }
   $comp.
     css('left', bounds.x).
     css('width', bounds.width).
@@ -215,3 +245,4 @@ scout.ButtonFieldLayout.prototype.preferredLayoutSize = function($parent) {
   var textSize = scout.Layout.measureString($button.html());
   return new scout.Dimension(textSize.width + hMargin, textSize.height + vMargin);
 };
+

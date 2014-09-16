@@ -5,8 +5,6 @@ scout.LogicalGridLayout = function(env, hgap, vgap) {
   this.m_env = env || new scout.SwingEnvironment();
   this.m_hgap = hgap || 0;
   this.m_vgap = vgap || 0;
-  this.valid = false;
-  this.validityBasedOnParentSize = new scout.Dimension();
 };
 scout.inherits(scout.LogicalGridLayout, scout.AbstractLayout);
 
@@ -26,15 +24,6 @@ scout.LogicalGridLayout.prototype.validateLayout = function($parent) {
   }
   this.m_info = new scout.LogicalGridLayoutInfo(this.m_env, visibleComps, visibleCons, this.m_hgap, this.m_vgap);
   $.log('LogicalGridLayout#validateLayout layout validated $parent=' + scout.Layout.debugComponent($parent));
-};
-
-scout.LogicalGridLayout.prototype._verifyLayout = function($parent) {
-  var parentSize = scout.Layout.getDimension($parent);
-  if (!this.valid || !this.validityBasedOnParentSize.equals(parentSize)) {
-    this.validityBasedOnParentSize = parentSize;
-    this.validateLayout($parent);
-    this.valid = true;
-  }
 };
 
 scout.LogicalGridLayout.prototype.layout = function($parent) {
@@ -67,6 +56,7 @@ scout.LogicalGridLayout.prototype.layout = function($parent) {
     r1 = cellBounds[data.gridy][data.gridx];
     r2 = cellBounds[data.gridy + data.gridh - 1][data.gridx + data.gridw - 1];
     r = r1.union(r2);
+    $.log('layoutContainer comp=' + scout.Layout.debugComponent($comp) + ' r=' + r);
     if (data.topInset > 0) {
       r.y += data.topInset;
       r.height -= data.topInset;

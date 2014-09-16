@@ -8,6 +8,8 @@ scout.GroupBox = function() {
 };
 scout.inherits(scout.GroupBox, scout.FormField);
 
+// TODO AWE: ICompositeField einführen und getFields() implementieren.
+
 scout.GroupBox.prototype._render = function($parent) {
   var root = this.parent.objectType == 'Form';
   var cssClass = root ? 'root-group-box' : 'group-box';
@@ -18,7 +20,7 @@ scout.GroupBox.prototype._render = function($parent) {
 
   scout.Layout.setLayout(this.$container, new scout.GroupBoxLayout());
   if (!root) {
-    scout.Layout.setLogicalGridData(this.$container, this.gridData);
+    scout.Layout.setLogicalGridData(this.$container, this);
   }
 
   if (this.label) {

@@ -1,6 +1,19 @@
 /* This test also exists as Java code, to make sure Java and JS code produces the same results */
 describe("LogicalGridLayoutInfo", function() {
 
+  describe("Rectangle.union", function() {
+
+    var r1 = new scout.Rectangle(0, 0, 675, 558);
+    var r2 = new scout.Rectangle(687, 0, 674, 558);
+
+    it("calculates bounds", function() {
+      var r = r1.union(r2);
+      var expected = new scout.Rectangle(0, 0, 1361, 558);
+      expect(expected.equals(r)).toBe(true);
+    });
+
+  });
+
   describe("layoutCellBounds", function() {
 
     var env = new scout.SwingEnvironment();
@@ -49,5 +62,7 @@ describe("LogicalGridLayoutInfo", function() {
     });
 
   });
+
+
 
 });

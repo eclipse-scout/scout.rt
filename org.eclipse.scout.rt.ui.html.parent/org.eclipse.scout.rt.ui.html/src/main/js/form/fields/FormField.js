@@ -144,7 +144,7 @@ scout.FormField.prototype.addContainer = function($parent, typeName, layout) {
     appendTo($parent).
     addClass('form-field').
     attr('id', typeName + '-' + this.id);
-  scout.Layout.setLogicalGridData(this.$container, this.gridData);
+  scout.Layout.setLogicalGridData(this.$container, this);
   if (!layout) {
     layout = new scout.FormFieldLayout();
   }
