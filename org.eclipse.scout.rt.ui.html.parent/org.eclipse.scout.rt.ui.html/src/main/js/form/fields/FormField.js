@@ -11,12 +11,14 @@ scout.FormField = function() {
 scout.inherits(scout.FormField, scout.ModelAdapter);
 
 scout.FormField.prototype._render = function($parent) {
-  /*
-  this._$label = this.$container.appendDiv(undefined, 'label', this.model.label);
-  // TODO AWE: (ask C.GU) vermutlich wäre es besser, das statusLabel nur bei Bedarf zu erzeugen und
-  // dann wieder wegzuwerfen
-  this._$statusLabel = this.$container.appendDiv(undefined, 'status-label', ' ');
-  */
+  // TODO AWE: (form) remove this code when FormField is "abstract". There should be no reason to instantiate a
+  // FormField directly. Currently this is required as a placeholder for un-implemented form-fields.
+  this.addContainer($parent, 'FormField', new scout.FormFieldLayout());
+  this.addLabel();
+  this.addStatus();
+  this.$field = $.makeDiv('', '.field').
+    html('[not implemented yet]').
+    appendTo(this.$container);
 };
 
 scout.FormField.prototype._callSetters = function() {
@@ -111,3 +113,46 @@ scout.FormField.prototype.goOnline = function() {
     this._setEnabled(true);
   }
 };
+
+/**
+ * Appends a LABEL element to this.$container and sets the this.$label property.
+ */
+scout.FormField.prototype.addLabel = function() {
+  this.$label = $('<label>').
+    appendTo(this.$container).
+    attr('title', this.label);
+};
+
+/**
+ * Appends a SPAN element for form-field status to this.$container and sets the this.$status property.
+ */
+scout.FormField.prototype.addStatus = function() {
+  this.$status = $('<span>').
+    addClass('status').
+    appendTo(this.$container);
+};
+
+
+/**
+ * Appends a DIV element as form-field container to $parent and sets the this.$container property.
+ * Applies (logical) grid-data and FormFieldLayout to this.$container.
+ *
+ * @param $parent to which container is appended
+ * @param typeName typeName of scout component used in ID attribute
+ * @param layout when layout is undefined, scout.FormFieldLayout() is set
+ */
+scout.FormField.prototype.addContainer = function($parent, typeName, layout) {
+  this.$container = $('<div>').
+    appendTo($parent).
+    addClass('form-field').
+    attr('id', typeName + '-' + this.id);
+  scout.Layout.setLogicalGridData(this.$container, this);
+  if (!layout) {
+    layout = new scout.FormFieldLayout();
+  }
+  scout.Layout.setLayout(this.$container, layout);
+};
+
+
+
+

@@ -8,11 +8,14 @@ scout.TableField = function() {
 scout.inherits(scout.TableField, scout.FormField);
 
 scout.TableField.prototype._render = function($parent) {
-  this.$container = $parent.appendDiv('', 'table-field');
-  this.$label = $('<label>')
-    .appendTo(this.$container);
+  this.addContainer($parent, 'TableField');
+  this.addLabel();
+  this.addStatus();
 
+  this.$field = $.makeDiv('', '.field').
+    appendTo(this.$container);
   if (this.table) {
-    this.table.render(this.$container);
+    this.table.render(this.$field);
   }
+
 };

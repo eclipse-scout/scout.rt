@@ -1,10 +1,42 @@
 /* This test also exists as Java code, to make sure Java and JS code produces the same results */
 describe("LogicalGridLayoutInfo", function() {
 
-  describe("layoutCellBounds", function() {
+  describe("Rectangle.union", function() {
 
-    var env = new scout.SwingEnvironment();
-    var components = [{name:'DateField'}, {name:'StringField'}];
+    var r1 = new scout.Rectangle(0, 0, 675, 558);
+    var r2 = new scout.Rectangle(687, 0, 674, 558);
+
+    it("produces same results as java.awt.Rectangle", function() {
+      var r = r1.union(r2);
+      var expected = new scout.Rectangle(0, 0, 1361, 558);
+      expect(expected.equals(r)).toBe(true);
+    });
+
+  });
+
+  describe("layoutCellBounds", function() {
+    var mockComponent = function(componentName) {
+      return {
+          name:componentName,
+          data:function(dataKey) {
+            if (dataKey === 'layout') {
+              return {
+                preferredLayoutSize:function($comp) {
+                  return new scout.Dimension(1, 1);
+                }
+              };
+            }
+          },
+          attr:function(attrKey) {
+            return attrKey === 'id' ? componentName : undefined;
+          }
+      };
+    };
+
+    var components = [
+      mockComponent('DateField'),
+      mockComponent('StringField')
+    ];
 
     var gd1 = new scout.LogicalGridData();
     gd1.gridx = 0;
@@ -22,6 +54,7 @@ describe("LogicalGridLayoutInfo", function() {
     gd2.weightx = 1.0;
 
     var cons = [gd1, gd2];
+    var env = new scout.SwingEnvironment();
     var lgli = new scout.LogicalGridLayoutInfo(env, components, cons, 5, 5);
     var parentSize = new scout.Dimension(500, 23);
     var parentInsets = new scout.Insets(0, 0, 0, 0);
@@ -49,5 +82,7 @@ describe("LogicalGridLayoutInfo", function() {
     });
 
   });
+
+
 
 });

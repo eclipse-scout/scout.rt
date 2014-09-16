@@ -1,7 +1,6 @@
 scout.Button = function() {
   scout.Button.parent.call(this);
 };
-
 scout.inherits(scout.Button, scout.FormField);
 
 scout.Button.SYSTEM_TYPE = {
@@ -11,14 +10,19 @@ scout.Button.SYSTEM_TYPE = {
   OK: 3
 };
 
+/**
+ * The button form-field has no label and no status. Additionally it also has no container.
+ * Container and field are the same thing.
+ */
 scout.Button.prototype._render = function($parent) {
-  this.$container = $parent;
-  this.$container.attr('id', 'Button-' + this.id);
-  this.$field = $('<button>')
-    .appendTo(this.$container)
-    .on('click', function() {
+  this.addContainer($parent, 'Button', new scout.ButtonFieldLayout());
+  this.$field = $('<button>').
+    addClass('field').
+    appendTo(this.$container).
+    on('click', function() {
       this.session.send('click', this.id);
     }.bind(this));
+  scout.Layout.setLogicalGridData(this.$container, this);
 };
 
 scout.Button.prototype._setLabel = function(label) {

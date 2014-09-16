@@ -1,106 +1,6 @@
-// FIXME AWE: (layout) work in progress
-// JavaScript port of LogicalGridLayoutInfo.java
-
-// TODO AWE: (layout) check if we can remove other *layout*.js files in this folder
-
-scout.SwingLayoutUtility = function() {
-};
-
-scout.SwingLayoutUtility.MIN = 0;
-scout.SwingLayoutUtility.PREF = 1;
-scout.SwingLayoutUtility.MAX = 2;
-scout.SwingLayoutUtility.EPS = 1e-6;
-
-scout.Dimension = function(width, height) {
-  this.width = width;
-  this.height = height;
-};
-
-scout.Insets = function(top, right, bottom, left) {
-  this.top = left;
-  this.right = left;
-  this.bottom = left;
-  this.left = left;
-};
-
-scout.Rectangle = function(x, y, width, height) {
-  this.x = x;
-  this.y = y;
-  this.width = width;
-  this.height = height;
-};
-
-scout.Rectangle.prototype.toString = function() {
- return 'Rectangle[x=' + this.x + ' y=' + this.y + ' width=' + this.width + ' height=' + this.height + ']';
-};
-
-scout.SwingEnvironment = function() {
-  this.formRowHeight = 23;
-  this.formRowGap = 6;
-  this.formColumnWidth = 360;
-  this.formColumnGap = 12;
-};
-
-scout.LogicalGridData = function(template) {
-  this.gridx;
-  this.gridy;
-  this.gridw = 1;
-  this.gridh = 1;
-  this.weightx;
-  this.weighty;
-  this.useUiWidth;
-  this.useUiHeight;
-  this.widthHint;
-  this.heightHint;
-  this.horizontalAlignment = -1;
-  this.verticalAlignment = -1;
-  this.fillHorizontal = true;
-  this.fillVertical = true;
-  this.topInset;
-  if (template) {
-    this.gridx = template.gridx;
-    this.gridy = template.gridy;
-    this.gridw = template.gridw;
-    this.gridh = template.gridh;
-    this.weightx = template.weightx;
-    this.weighty = template.weighty;
-    this.useUiWidth = template.useUiWidth;
-    this.useUiHeight = template.useUiHeight;
-    this.widthHint = template.widthHint;
-    this.heightHint = template.heightHint;
-    this.horizontalAlignment = template.horizontalAlignment;
-    this.verticalAlignment = template.verticalAlignment;
-    this.fillHorizontal = template.fillHorizontal;
-    this.fillVertical = template.fillVertical;
-    this.topInset = template.topInset;
-  }
-};
-
-scout.TreeSet = function() {
-  this.array = [];
-  this.properties = {};
-};
-
-scout.TreeSet.prototype.add = function(value) {
-  if (!this.contains(value)) {
-    this.array.push(value);
-    this.array.sort();
-    this.properties[value] = true;
-  }
-};
-
-scout.TreeSet.prototype.size = function() {
-  return this.array.length;
-};
-
-scout.TreeSet.prototype.contains = function(value) {
-  return (value in this.properties);
-};
-
-scout.TreeSet.prototype.last = function() {
-  return this.array[this.array.length - 1];
-};
-
+/**
+ * JavaScript port of org.eclipse.scout.rt.ui.swing.LogicalGridLayoutInfo.
+ */
 scout.LogicalGridLayoutInfo = function(env, components, cons, hgap, vgap) {
   /*LogicalGridData[] */ this.gridDatas = [];
   /*Component[]*/ this.components = components;
@@ -289,7 +189,7 @@ scout.LogicalGridLayoutInfo.prototype._initializeColumns = function(env, compSiz
           distWidth = compSize[i].width - spanWidth - (hSpan - 1) * hgap;
         }
         else {
-          distWidth = logicalWidthInPixel(env, cons) - spanWidth - (hSpan - 1) * hgap;
+          distWidth = this.logicalWidthInPixel(env, cons) - spanWidth - (hSpan - 1) * hgap;
         }
         if (distWidth > 0) {
           var equalWidth = (distWidth + spanWidth) / hSpan;
@@ -570,64 +470,16 @@ scout.LogicalGridLayoutInfo.prototype.logicalHeightInPixel = function(env, cons)
   return env.formRowHeight * gridH + env.formRowGap * Math.max(0, gridH - 1);
 };
 
-scout.LogicalGridLayoutInfo.prototype.uiSizeInPixel = function(comp) {
-  $.log('pref width='+comp.width() + ' height='+comp.height());
-  return new scout.Dimension(comp.width(), comp.height());
-};
-
-// -----------------
-
-scout.LogicalGridDataBuilder = function() {
-};
-
-// ip = input, op = output
-scout.LogicalGridDataBuilder.prototype.build = function(ip) {
-  var op = new scout.LogicalGridData();
-  op.gridx = ip.x;
-  op.gridy = ip.y;
-  op.gridw = ip.w;
-  op.gridh = ip.h;
-  op.weightx = ip.weightX;
-  op.weighty = ip.weightY;
-  if (op.weightx < 0) {
-    // inherit
-    op.weightx = Math.max(1.0, op.gridw);
+scout.LogicalGridLayoutInfo.prototype.uiSizeInPixel = function($comp) {
+  var prefSize, layout;
+  layout = $comp.data('layout');
+  if (layout) {
+    prefSize = layout.preferredLayoutSize($comp);
+    $.log('(LogicalGridLayoutInfo#uiSizeInPixel) ' + scout.Layout.debugComponent($comp) + ' impl. preferredSize=' + prefSize);
+  } else {
+    // TODO: hier koennten wir eigentlich einen fehler werfen, weil das nicht passieren sollte
+    prefSize = scout.Dimension($comp.width(), $comp.height());
+    $.log('(LogicalGridLayoutInfo#uiSizeInPixel) ' + scout.Layout.debugComponent($comp) + ' size of HTML element=' + prefSize);
   }
-  if (op.weighty < 0) {
-    // inherit
-    // TODO AWE: (layout) impl. _inheritWeightY
-    // op.weighty = this._inheritWeightY(m_scoutField);
-  }
-  op.useUiWidth = ip.useUiWidth;
-
-  // When having the label on top the container of the field must not have a fix size but use the calculated ui height instead.
-  /*
-  TODO AWE: (layout) impl. label position special handling
-  if (m_scoutField.getLabelPosition() == IFormField.LABEL_POSITION_TOP) {
-    op.useUiHeight = true;
-  }
-  else {
-  */
-    op.useUiHeight = ip.useUiHeight;
-  //}
-
-  op.horizontalAlignment = ip.horizontalAlignment;
-  op.verticalAlignment = ip.verticalAlignment;
-  op.fillHorizontal = ip.fillHorizontal;
-  op.fillVertical = ip.fillVertical;
-  op.widthHint = ip.widthInPixel;
-  op.heightHint = ip.heightInPixel;
-  if (op.weighty === 0 || (op.weighty < 0 && op.gridh <= 1)) {
-    op.fillVertical = false;
-  }
-  return op;
+  return prefSize;
 };
-
-scout.LogicalGridDataBuilder.prototype._inheritWeightY = function(f) {
-// see: SwingScoutFormFieldGridData
-};
-
-scout.LogicalGridDataBuilder.prototype._inheritWeightYRec = function(f) {
-//see: SwingScoutFormFieldGridData
-};
-

@@ -28,7 +28,12 @@
 //@include("menu/Menu.js");
 //@include("menu/menus.js");
 //@include("menu/Menubar.js")
+//@include("layout/graphics.js");
+//@include("layout/layouts.js");
+//@include("layout/LogicalGridData.js");
+//@include("layout/LogicalGridDataBuilder.js");
 //@include("layout/LogicalGridLayoutInfo.js");
+//@include("layout/LogicalGridLayout.js");
 //@include("table/Table.js");
 //@include("table/TableConfigurator.js");
 //@include("table/TableHeader.js");
@@ -57,6 +62,7 @@
 //@include("form/Form.js");
 //@include("form/fields/FormField.js");
 //@include("form/fields/ValueField.js");
+//@include("form/fields/CompositeField.js");
 //@include("form/fields/button/Button.js");
 //@include("form/fields/checkbox/CheckBoxField.js");
 //@include("form/fields/numberfield/NumberField.js");

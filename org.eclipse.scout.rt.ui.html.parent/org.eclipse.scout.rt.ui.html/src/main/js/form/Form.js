@@ -12,13 +12,19 @@ scout.inherits(scout.Form, scout.ModelAdapter);
 
 scout.Form.prototype._render = function($parent) {
   this._$parent = $parent;
-  this.$container = $parent.appendDiv(undefined, 'form');
-  this.$container.data('model', this);
+  this.$container = $('<div>').
+    appendTo($parent).
+    attr('id', 'Form-' + this.id).
+    addClass('form').
+    data('model', this);
+
+  var layout = new scout.FormLayout();
+  scout.Layout.setLayout(this.$container, layout);
 
   this.rootGroupBox.render(this.$container);
 
   var closeable = false;
-  var detachable = true; // FIXME How to determine 'detachable' property?
+  var detachable = true; // FIXME BSH: How to determine 'detachable' property?
   if (window.scout.sessions.length > 1 || this.session.parentJsonSession) {
     // Cannot detach if...
     // 1. there is more than one session inside the window (portlets), because
@@ -27,10 +33,11 @@ scout.Form.prototype._render = function($parent) {
     detachable = false;
   }
 
+  // TODO AWE: (button-bar) move to GroupBox / add layout / see SSGroupBoxButtonBar
   var systemButtons = this.rootGroupBox.getSystemButtons();
   if (systemButtons) {
-    // TODO AWE: CSS for button-bar / position / visible
-    var $buttonBar = $.makeDiv('', 'button-bar', '');
+    var $buttonBar = $.makeDiv('', 'button-bar').
+      appendTo(this.$container);
     var i, button;
     for (i = 0; i < systemButtons.length; i++) {
       button = systemButtons[i];
@@ -39,7 +46,6 @@ scout.Form.prototype._render = function($parent) {
         closeable = true;
       }
     }
-    this.$container.append($buttonBar);
   }
 
   // TODO AWE: append form title section (including ! ? and progress indicator)
@@ -74,6 +80,8 @@ scout.Form.prototype._render = function($parent) {
       }.bind(this));
     }.bind(this));
   }
+
+  layout.layout(this.$container);
 
   if (this._locked) {
     this.disable();

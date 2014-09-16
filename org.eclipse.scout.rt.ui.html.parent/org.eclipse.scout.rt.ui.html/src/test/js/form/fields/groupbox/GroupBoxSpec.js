@@ -1,21 +1,20 @@
 describe("GroupBox", function() {
 
   describe("_render", function() {
-
-    var session;
-    var groupBox;
-    var model = {
-        id : '2',
+    var session,
+      groupBox,
+      model = {
+        id: '2',
         label: "fooBar",
-          gridData : {
-            x : 0,
-            y : 0
-          },
-          gridColumnCount : 2,
-          parent : {
-            objectType : 'GroupBox'
-          }
-    };
+        gridData: {
+          x: 0,
+          y: 0
+        },
+        gridColumnCount: 2,
+        parent: {
+          objectType: 'GroupBox'
+        }
+      };
 
     beforeEach(function() {
       setFixtures(sandbox());
