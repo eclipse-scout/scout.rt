@@ -5,10 +5,9 @@ scout.GroupBox = function() {
   scout.GroupBox.parent.call(this);
   this.formFields = [];
   this._addAdapterProperties('formFields');
+  this.$body;
 };
-scout.inherits(scout.GroupBox, scout.FormField);
-
-// TODO AWE: ICompositeField einführen und getFields() implementieren.
+scout.inherits(scout.GroupBox, scout.CompositeField);
 
 scout.GroupBox.prototype._render = function($parent) {
   var root = this.parent.objectType == 'Form';
@@ -30,14 +29,14 @@ scout.GroupBox.prototype._render = function($parent) {
       append(this.$label);
   }
 
-  var $body = this.$container.
+  this.$body = this.$container.
     appendDiv('', 'group-box-body');
   var env = new scout.SwingEnvironment();
-  scout.Layout.setLayout($body, new scout.LogicalGridLayout(env, env.formColumnGap, env.formRowGap));
+  scout.Layout.setLayout(this.$body, new scout.LogicalGridLayout(env, env.formColumnGap, env.formRowGap));
 
   var i, field, fields = this.getControlFields();
   for (i=0; i<fields.length; i++) {
-    fields[i].render($body);
+    fields[i].render(this.$body);
   }
 };
 
@@ -60,6 +59,13 @@ scout.GroupBox.prototype.getSystemButtons = function() {
  */
 scout.GroupBox.prototype.getControlFields = function() {
   return this._getFields(false);
+};
+
+/**
+ * @override CompositeField.js
+ */
+scout.GroupBox.prototype.getFields = function() {
+  return this.getControlFields();
 };
 
 /**

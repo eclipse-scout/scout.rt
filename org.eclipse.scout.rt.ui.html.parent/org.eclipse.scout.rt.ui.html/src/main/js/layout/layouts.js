@@ -11,12 +11,26 @@ scout.Layout.getLayout = function($comp) {
   return $comp.data('layout');
 };
 
+/**
+ * Layouts the given component.
+ * @exception when component has no layout
+ */
 scout.Layout.layout = function($comp)  {
   var layout = this.getLayout($comp);
   if (!layout) {
     throw 'Tried to layout component [id=' + $comp.attr('id') + ' class=' + $comp.attr('class') + '] but component has no layout';
   }
   layout.layout($comp);
+};
+
+/**
+ * Layouts the given component if the component has a layout. Otherwise, do nothing.
+ */
+scout.Layout.optLayout = function($comp) {
+  var layout = this.getLayout($comp);
+  if (layout) {
+    layout.layout($comp);
+  }
 };
 
 scout.Layout.measureString = function(text) {
@@ -117,21 +131,19 @@ scout.AbstractLayout.prototype.setBounds = function($comp, bounds) {
   scout.Layout.layout($comp);
 };
 
-// ---- Fill Layout ----
-// layout a container with a single child element, so the child element will have the same size as the parent.
-scout.FillLayout = function() {
-  scout.FillLayout.parent.call(this);
+// ---- Form Layout ----
+// layouts a scout form.
+scout.FormLayout = function() {
+  scout.FormLayout.parent.call(this);
 };
-scout.inherits(scout.FillLayout, scout.AbstractLayout);
+scout.inherits(scout.FormLayout, scout.AbstractLayout);
 
-// TODO AWE: (layout) daraus ein FormLayout machen?
-scout.FillLayout.prototype.layout = function($parent) {
-//  var $comp = $parent.children(':first');
+scout.FormLayout.prototype.layout = function($parent) {
   var $comp = $parent.children('.root-group-box');
   this.setSize($comp, scout.Layout.getDimension($parent));
 };
 
-scout.FillLayout.prototype.preferredLayoutSize = function($parent) {
+scout.FormLayout.prototype.preferredLayoutSize = function($parent) {
   return scout.Layout.getDimension($parent);
 };
 
@@ -183,8 +195,9 @@ scout.FormFieldLayout.prototype.layout = function($parent) {
     $status.css('width', '10px');
     widthDiff += 10;
   }
-  $parent.children('.field').
-    css('width', (parentSize.width - widthDiff) + 'px');
+  var $field = $parent.children('.field');
+  $field.css('width', (parentSize.width - widthDiff) + 'px');
+  scout.Layout.optLayout($field);
 };
 
 scout.FormFieldLayout.prototype.preferredLayoutSize = function($parent) {

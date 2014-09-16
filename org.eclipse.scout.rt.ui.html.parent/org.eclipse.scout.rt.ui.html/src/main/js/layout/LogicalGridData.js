@@ -21,6 +21,7 @@ scout.LogicalGridData = function(vararg) { // FIXME AWE: discuss with C.GU --> o
   this.topInset = 0;
 
   if (vararg instanceof scout.LogicalGridData) {
+    // copy properties from LGD template
     // TODO AWE: impl. generic copyProperties?
     this.gridx = vararg.gridx;
     this.gridy = vararg.gridy;
@@ -36,8 +37,12 @@ scout.LogicalGridData = function(vararg) { // FIXME AWE: discuss with C.GU --> o
     this.verticalAlignment = vararg.verticalAlignment;
     this.fillHorizontal = vararg.fillHorizontal;
     this.fillVertical = vararg.fillVertical;
+    this.topInset = vararg.topInset;
+  } else if (vararg instanceof scout.FormField) {
+    // work with model / validate
+    this.model = vararg;
   } else {
-    this.topInset = vararg.topInset;    this.model = vararg;
+    // NOP - default CTOR
   }
 };
 
@@ -101,8 +106,8 @@ scout.LogicalGridData.prototype._inheritWeightY = function() {
 scout.LogicalGridData.prototype._inheritWeightYRec = function(f) {
   var found = false,
       sumWy = 0;
-  if (f.getControlFields !== undefined) { // FIXME AWE: check if that works with SequenceBox too, what about an 'interface'?
-    var i, inheritWeightY, child, children = f.getControlFields();
+  if (f instanceof scout.CompositeField) {
+    var i, inheritWeightY, child, children = f.getFields();
     for (i=0; i<children.length; i++) {
       child = children[i];
       if (child.visible) {

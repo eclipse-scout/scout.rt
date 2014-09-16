@@ -62,6 +62,7 @@
 //@include("form/Form.js");
 //@include("form/fields/FormField.js");
 //@include("form/fields/ValueField.js");
+//@include("form/fields/CompositeField.js");
 //@include("form/fields/button/Button.js");
 //@include("form/fields/checkbox/CheckBoxField.js");
 //@include("form/fields/numberfield/NumberField.js");

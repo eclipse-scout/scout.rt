@@ -1,9 +1,3 @@
-ul.sequence-box {
-  margin:0;
-  padding:0;
-}
-
-ul.sequence-box li {
-  list-style: none;
-  display: inline-block;
+.sequence-box {
+  position:relative;
 }

@@ -15,7 +15,7 @@ scout.LogicalGridLayout.prototype.validateLayout = function($parent) {
     children = $parent.children('.form-field');
   for (i = 0; i < children.length; i++) {
     var $comp = $(children[i]);
-    if ($comp.is(':visible')) {
+    if ($comp.isVisible()) { // FIXME AWE check why sequence box is not visible at this point!
       visibleComps.push($comp);
       cons = scout.Layout.getLogicalGridData($comp);
       cons.validate();

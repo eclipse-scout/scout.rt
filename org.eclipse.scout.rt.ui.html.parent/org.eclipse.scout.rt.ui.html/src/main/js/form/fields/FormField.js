@@ -11,12 +11,14 @@ scout.FormField = function() {
 scout.inherits(scout.FormField, scout.ModelAdapter);
 
 scout.FormField.prototype._render = function($parent) {
-  /*
-  this._$label = this.$container.appendDiv(undefined, 'label', this.model.label);
-  // TODO AWE: (ask C.GU) vermutlich wäre es besser, das statusLabel nur bei Bedarf zu erzeugen und
-  // dann wieder wegzuwerfen
-  this._$statusLabel = this.$container.appendDiv(undefined, 'status-label', ' ');
-  */
+  // TODO AWE: (form) remove this code when FormField is "abstract". There should be no reason to instantiate a
+  // FormField directly. Currently this is required as a placeholder for un-implemented form-fields.
+  this.addContainer($parent, 'FormField', new scout.FormFieldLayout());
+  this.addLabel();
+  this.addStatus();
+  this.$field = $.makeDiv('', '.field').
+    html('[not implemented yet]').
+    appendTo(this.$container);
 };
 
 scout.FormField.prototype._callSetters = function() {

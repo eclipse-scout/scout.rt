@@ -38,5 +38,5 @@ scout.CheckBoxField.prototype._setValue = function(value) {
 };
 
 scout.CheckBoxField.prototype._setLabelVisible = function(visible) {
-  //FIXME label visible logic in scout for checkboxes is strange. LabelVisible removes not the label but instead the empty space before the checkbox
+  // FIXME label visible logic in scout for checkboxes is strange. LabelVisible removes not the label but instead the empty space before the checkbox
 };

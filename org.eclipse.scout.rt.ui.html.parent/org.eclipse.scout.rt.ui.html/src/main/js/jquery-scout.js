@@ -215,6 +215,24 @@
     return this;
   };
 
+  // TODO AWE: search/replace for other uses of is(':visible')
+
+  /**
+   * Returns false when the component display is 'none' or visibility is 'hidden', otherwise true.
+   * Note: this gives other results than $.is(':visible'), since that method will also return false
+   * when a component has absolute positioning and no width and height is defined (well, you cannot
+   * see a component with a style like this, but technically it is not set to 'not visible').
+   */
+  $.fn.isVisible = function() {
+    if ('none' === this.css('display')) {
+      return false;
+    }
+    if ('hidden' === this.css('visibility')) {
+      return false;
+    }
+    return true;
+  };
+
   // most used animate
   $.fn.animateAVCSD = function(attr, value, complete, step, duration) {
     var properties = {};
