@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.html.json.form.fields.stringfield;
 
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
+import org.eclipse.scout.rt.ui.html.json.form.fields.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 
 public class JsonStringField extends JsonValueField<IStringField> {
@@ -23,6 +24,17 @@ public class JsonStringField extends JsonValueField<IStringField> {
   @Override
   public String getObjectType() {
     return "StringField";
+  }
+
+  @Override
+  protected void initJsonProperties(IStringField model) {
+    super.initJsonProperties(model);
+    putJsonProperty(new JsonProperty<IStringField>(IStringField.PROP_MULTILINE_TEXT, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isMultilineText();
+      }
+    });
   }
 
   @Override

@@ -106,7 +106,9 @@ scout.FormFieldLayout.prototype.layout = function($container) {
     widthDiff += 10;
   }
   var $field = $container.children('.field');
+  // TODO AWE: (layout) können wir hier nicht einfach setSize verwenden?
   $field.css('width', (containerSize.width - widthDiff) + 'px');
+  $field.css('height', containerSize.height + 'px');
   // TODO AWE: (layout) dafür sorgen, dass wir hier immer ein get() machen können
   var htmlField = scout.HtmlComponent.optGet($field);
   if (htmlField) {

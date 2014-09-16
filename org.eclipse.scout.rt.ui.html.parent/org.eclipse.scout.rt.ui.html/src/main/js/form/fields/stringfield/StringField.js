@@ -8,8 +8,13 @@ scout.StringField.prototype._render = function($parent) {
   this.addLabel();
   this.addStatus();
 
-  this.$field = $('<input>').
-    attr('type', 'text').
+  if (this.multilineText) {
+    this.$field = $('<textarea>');
+  } else {
+    this.$field = $('<input>').attr('type', 'text');
+  }
+
+  this.$field.
     addClass('field').
     blur(this._onFieldBlur.bind(this)).
     appendTo(this.$container);
