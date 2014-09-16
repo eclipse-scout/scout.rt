@@ -142,7 +142,7 @@ describe("Table", function() {
 
   describe("resizeColumn", function() {
 
-    it("sends resize event", function() {
+    it("updates column model and sends resize event ", function() {
       var model = helper.createModelFixture(2, 5);
       var table = helper.createTable(model);
       table.render(session.$entryPoint);
@@ -150,10 +150,13 @@ describe("Table", function() {
       var $colHeaders = table._$header.find('.header-item');
       var $header0 = $colHeaders.eq(0);
 
+      expect(table.columns[0].width).not.toBe(100);
+
       table.resizeColumn($header0, 100, 150);
 
-      sendQueuedAjaxCalls();
+      expect(table.columns[0].width).toBe(100);
 
+      sendQueuedAjaxCalls();
       var event = new scout.Event('columnResized', table.id, {
         "columnId": table.columns[0].id,
         "width": 100

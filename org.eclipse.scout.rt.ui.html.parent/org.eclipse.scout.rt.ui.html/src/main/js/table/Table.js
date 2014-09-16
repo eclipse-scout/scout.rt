@@ -452,12 +452,11 @@ scout.Table.prototype.getCellText = function(col, row) {
 
 scout.Table.prototype._group = function() {
   var that = this,
-    all,
-    groupColumn,
+    all, groupColumn, column, alignment,
     $group = $('.group-sort', this.$container);
 
   // remove all sum rows
-  $('.table-row-sum', this.$dataScroll).animateAVCSD('height', 0, $.removeThis, that.updateScrollbar.bind(that));
+  this.findSumRows().animateAVCSD('height', 0, $.removeThis, that.updateScrollbar.bind(that));
 
   // find group type
   if ($('.group-all', this.$container).length) {
@@ -470,7 +469,6 @@ scout.Table.prototype._group = function() {
 
   // prepare data
   var $rows = $('.table-row:visible', this.$dataScroll),
-    $cols = $('.header-item', this.$container),
     $sumRow = $.makeDiv('', 'table-row-sum'),
     sum = [];
 
@@ -480,9 +478,9 @@ scout.Table.prototype._group = function() {
     var row = this.getModelRowById(rowId);
 
     // calculate sum per column
-    for (var c = 0; c < $cols.length; c++) {
-      var column = $cols.eq(c).data('column'),
-        value = this.getCellValue(column, row);
+    for (var c = 0; c < this.columns.length; c++) {
+      column = this.columns[c];
+      var value = this.getCellValue(column, row);
 
       if (column.type == 'number') {
         sum[c] = (sum[c] || 0) + value;
@@ -491,30 +489,31 @@ scout.Table.prototype._group = function() {
 
     // test if sum should be shown, if yes: reset sum-array
     var nextRowId = $rows.eq(r + 1).attr('id');
-    var nextRow = this.getModelRowById(rowId);
+    var nextRow = this.getModelRowById(nextRowId);
 
     if ((r == $rows.length - 1) || (!all && this.getCellText(groupColumn, row) != this.getCellText(groupColumn, nextRow)) && sum.length > 0) {
-      for (c = 0; c < $cols.length; c++) {
-        var $div;
+      for (c = 0; c < this.columns.length; c++) {
+        var $cell;
 
-        //FIXME CGU alignment (use scout.Table.parseAlignment) as soon as SUM works again
+        column = this.columns[c];
+        alignment = scout.Table.parseHorizontalAlignment(column.horizontalAlignment);
         if (typeof sum[c] == 'number') {
-          $div = $.makeDiv('', '', sum[c])
-            .css('text-align', 'end');
-        } else if (!all && $cols.eq(c).data('column') == groupColumn) {
-          $div = $.makeDiv('', '', this.getCellText(groupColumn, row))
-            .css('text-align', 'start');
+          $cell = $.makeDiv('', 'table-cell', sum[c])
+            .css('text-align', alignment);
+        } else if (!all && column == groupColumn) {
+          $cell = $.makeDiv('', 'table-cell', this.getCellText(groupColumn, row))
+            .css('text-align', alignment);
         } else {
-          $div = $.makeDiv('', '', '&nbsp');
+          $cell = $.makeDiv('', 'table-cell', '&nbsp');
         }
 
-        $div.appendTo($sumRow).width($rows.eq(r).children().eq(c).outerWidth());
+        $cell.appendTo($sumRow).width($rows.eq(r).children().eq(c).outerWidth());
       }
 
       $sumRow.insertAfter($rows.eq(r))
         .width(this._header.totalWidth + 4)
-        .css('height', 0)
-        .animateAVCSD('height', 34, null, that.updateScrollbar.bind(that));
+        .hide()
+        .slideDown();
 
       $sumRow = $.makeDiv('', 'table-row-sum');
       sum = [];
@@ -673,9 +672,6 @@ scout.Table.prototype.findSelectedRows = function() {
 };
 
 scout.Table.prototype.findRows = function(includeSumRows) {
-  if (!this.$dataScroll) {
-    return $();
-  }
   var selector = '.table-row';
   if (includeSumRows) {
     selector += ', .table-row-sum';
@@ -683,7 +679,11 @@ scout.Table.prototype.findRows = function(includeSumRows) {
   return this.$dataScroll.find(selector);
 };
 
-scout.Table.prototype.findRowsForColIndex = function(colIndex, includeSumRows) {
+scout.Table.prototype.findSumRows = function() {
+  return this.$dataScroll.find('.table-row-sum');
+};
+
+scout.Table.prototype.findCellsForColIndex = function(colIndex, includeSumRows) {
   var selector = '.table-row > div:nth-of-type(' + colIndex + ' )';
   if (includeSumRows) {
     selector += ', .table-row-sum > div:nth-of-type(' + colIndex + ' )';
@@ -737,7 +737,7 @@ scout.Table.prototype.filter = function() {
     $allRows = this.findRows();
 
   that.clearSelection();
-  $('.table-row-sum', this.$dataScroll).hide();
+  this.findSumRows().hide();
 
   $allRows.each(function() {
     var $row = $(this),
@@ -871,8 +871,11 @@ scout.Table.prototype.hideRow = function($row) {
  */
 scout.Table.prototype.resizeColumn = function($header, width, summaryWidth, resizingInProgress) {
   var colNum = this._header.getColumnViewIndex($header) + 1;
+  var column = $header.data('column');
 
-  this.findRowsForColIndex(colNum, true)
+  column.width = width;
+
+  this.findCellsForColIndex(colNum, true)
     .css('min-width', width)
     .css('max-width', width);
   this.findRows(true)
@@ -910,7 +913,7 @@ scout.Table.prototype.moveColumn = function($header, oldPos, newPos, dragged) {
   this._header.onColumnMoved($header, oldPos, newPos, dragged);
 
   // move cells
-  $('.table-row, .table-row-sum', this.$dataScroll).each(function() {
+  this.findRows(true).each(function() {
     var $cells = $(this).children();
     if (newPos < oldPos) {
       $cells.eq(newPos).before($cells.eq(oldPos));
@@ -921,14 +924,15 @@ scout.Table.prototype.moveColumn = function($header, oldPos, newPos, dragged) {
 };
 
 scout.Table.prototype._renderColumnOrderChanges = function(oldColumnOrder) {
-  var column, i, j, $orderedCells, $cell, $cells, that = this;
+  var column, i, j, $orderedCells, $cell, $cells, that = this, $row;
 
   this._header.onOrderChanged(oldColumnOrder);
 
   // move cells
-  $('.table-row, .table-row-sum', this.$dataScroll).each(function() {
+  this.findRows(true).each(function() {
+    $row = $(this);
     $orderedCells = $();
-    $cells = $(this).children();
+    $cells = $row.children();
     for (i = 0; i < that.columns.length; i++) {
       column = that.columns[i];
 
@@ -941,7 +945,7 @@ scout.Table.prototype._renderColumnOrderChanges = function(oldColumnOrder) {
       }
       $orderedCells.push($cell);
     }
-    $(this).prepend($orderedCells);
+    $row.prepend($orderedCells);
   });
 };
 
