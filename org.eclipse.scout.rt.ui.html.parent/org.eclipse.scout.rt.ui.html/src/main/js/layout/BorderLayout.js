@@ -1,3 +1,4 @@
+// TODO AWE/CGU: BorderLayout should extend AbstractLayout
 scout.BorderLayout = function(marginTop, marginRight, cssClassPrefix) {
   this.marginTop = marginTop;
   this.cssClassPrefix = cssClassPrefix;

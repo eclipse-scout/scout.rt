@@ -23,8 +23,6 @@
 //@include("session/Reconnector.js");
 //@include("datamodel/DataModel.js");
 //@include("layout/BorderLayout.js");
-//@include("layout/GridLayout.js");
-//@include("layout/TableLayout.js");
 //@include("table/Table.js");
 //@include("table/MobileTable.js");
 //@include("table/MobileTableConfigurator.js");
