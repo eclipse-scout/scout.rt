@@ -28,6 +28,10 @@ scout.Device.prototype.supportsCssUserSelect = function() {
   return this.supportsCssProperty('userSelect');
 };
 
+scout.Device.prototype.supportsInternationalization = function() {
+  return window.Intl && typeof window.Intl === 'object';
+};
+
 scout.Device.prototype.supportsCssProperty = function(property) {
   if (this.features[property] === undefined) {
     this.features[property] = check(property);

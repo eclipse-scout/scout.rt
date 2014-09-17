@@ -1,56 +1,17 @@
+/* global LocaleSpecHelper */
 describe("DecimalFormat", function() {
   var locale;
-  var symbolsByLocale;
-  var patternByLocale;
+  var helper;
 
   beforeEach(function() {
     setFixtures(sandbox());
-    initSymbols();
-    initDefaultPatterns();
-    locale = createLocale('de_CH');
+    helper = new LocaleSpecHelper();
+    locale = helper.createLocale('de_CH');
   });
 
   afterEach(function() {
     locale = null;
   });
-
-  function createLocale(locale) {
-    var model = {};
-    model.decimalFormatSymbols = symbolsByLocale[locale];
-    model.decimalFormatPatternDefault = patternByLocale[locale];
-    return new scout.Locale(model);
-  }
-
-  function initSymbols() {
-    symbolsByLocale = {};
-    symbolsByLocale.de_CH = createSymbolsForDeCH();
-    symbolsByLocale.de_DE = createSymbolsForDeDE();
-  }
-
-  function initDefaultPatterns() {
-    patternByLocale = {};
-    patternByLocale.de_CH = "#'##0.###";
-    patternByLocale.de_DE = "#.##0,###";
-  }
-
-  function createSymbolsForDeCH() {
-    return {
-      "digit": "#",
-      "zeroDigit": "0",
-      "decimalSeparator": ".",
-      "groupingSeparator": "'",
-      "minusSign": "-",
-      "patternSeparator": ";"
-    };
-  }
-
-  function createSymbolsForDeDE() {
-    var symbols = createSymbolsForDeCH();
-    symbols.decimalSeparator = ",";
-    symbols.groupingSeparator = ".";
-    return symbols;
-  }
-
 
   describe("format", function() {
 
@@ -62,7 +23,7 @@ describe("DecimalFormat", function() {
       expect(decimalFormat.format(0.000)).toBe('0.00');
       expect(decimalFormat.format(1000.1234)).toBe('1000.12');
 
-      locale = createLocale('de_DE');
+      locale = helper.createLocale('de_DE');
       pattern = '###0,00';
       decimalFormat = new scout.DecimalFormat(locale, pattern);
 
@@ -82,7 +43,7 @@ describe("DecimalFormat", function() {
       expect(decimalFormat.format(50121000.1234)).toBe('50\'121\'000.12');
       expect(decimalFormat.format(100005121000.1234)).toBe('100\'005\'121\'000.12');
 
-      locale = createLocale('de_DE');
+      locale = helper.createLocale('de_DE');
       pattern = '#.##0,00';
       decimalFormat = new scout.DecimalFormat(locale, pattern);
 

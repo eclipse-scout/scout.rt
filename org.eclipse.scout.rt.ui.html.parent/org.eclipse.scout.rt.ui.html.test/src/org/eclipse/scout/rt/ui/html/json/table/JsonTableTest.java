@@ -16,11 +16,16 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.lang.ref.WeakReference;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
@@ -32,6 +37,7 @@ import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -214,6 +220,48 @@ public class JsonTableTest {
     List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(
         jsonTable.getJsonSession().currentJsonResponse(), "columnOrderChanged");
     assertTrue(responseEvents.size() == 0);
+  }
+
+  /**
+   * {@link AbstractStringColumn} considers the locale when sorting. This test is used to compare the results of the
+   * java sorting algorithm with the javascript sorting algorithm.
+   *
+   * @see TableSpec.js
+   */
+  @Test
+  public void testTextualSortingWithCollator() throws ProcessingException, JSONException {
+    String[] data = {"Österreich", "Italien", "Zypern"};
+
+    Arrays.sort(data, new TextSortComparator(true, new Locale("de")));
+    Assert.assertArrayEquals(new String[]{"Italien", "Österreich", "Zypern"}, data);
+
+    Arrays.sort(data, new TextSortComparator(false, new Locale("de")));
+    Assert.assertArrayEquals(new String[]{"Zypern", "Österreich", "Italien"}, data);
+
+    Arrays.sort(data, new TextSortComparator(true, new Locale("sv")));
+    Assert.assertArrayEquals(new String[]{"Italien", "Zypern", "Österreich"}, data);
+
+    Arrays.sort(data, new TextSortComparator(false, new Locale("sv")));
+    Assert.assertArrayEquals(new String[]{"Österreich", "Zypern", "Italien"}, data);
+  }
+
+  private class TextSortComparator implements Comparator<String> {
+    private boolean m_asc;
+    private Locale m_locale;
+
+    public TextSortComparator(boolean asc, Locale locale) {
+      m_asc = asc;
+      m_locale = locale;
+    }
+
+    @Override
+    public int compare(String a, String b) {
+      int result = StringUtility.compareIgnoreCase(m_locale, a, b);
+      if (!m_asc) {
+        result = -result;
+      }
+      return result;
+    }
   }
 
   @Test

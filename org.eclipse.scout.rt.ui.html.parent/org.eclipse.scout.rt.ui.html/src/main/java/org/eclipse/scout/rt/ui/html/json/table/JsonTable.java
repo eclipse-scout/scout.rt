@@ -57,7 +57,8 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
   public static final String EVENT_ROWS_SELECTED = "rowsSelected";
   public static final String EVENT_ROWS_DELETED = "rowsDeleted";
   public static final String EVENT_ALL_ROWS_DELETED = "allRowsDeleted";
-  public static final String EVENT_COLUMN_SORTING_CHANGED = "columnSortingChanged";
+  public static final String EVENT_ROWS_SORTED = "rowsSorted";
+  public static final String EVENT_SORT_ROWS = "sortRows";
   public static final String EVENT_COLUMN_MOVED = "columnMoved";
   public static final String EVENT_COLUMN_RESIZED = "columnResized";
   public static final String EVENT_RELOAD = "reload";
@@ -279,15 +280,18 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
     else if (EVENT_RESET_COLUMNS.equals(event.getType())) {
       handleUiResetColumns(event, res);
     }
-    else if (EVENT_COLUMN_SORTING_CHANGED.equals(event.getType())) {
-      handleUiColumnSortingChanged(event, res);
+    else if (EVENT_SORT_ROWS.equals(event.getType())) {
+      handleUiSortRows(event, res);
+    }
+    else if (EVENT_ROWS_SORTED.equals(event.getType())) {
+      handleUiRowsSorted(event, res);
     }
     else if (EVENT_COLUMN_MOVED.equals(event.getType())) {
       handleUiColumnMoved(event, res);
     }
     else if (EVENT_COLUMN_RESIZED.equals(event.getType())) {
       handleUiColumnResized(event, res);
-    }    
+    }
     else {
       super.handleUiEvent(event, res);
     }
@@ -339,25 +343,41 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
       getModel().setTableChanging(false);
     }
   }
-  
-  protected void handleUiColumnSortingChanged(JsonEvent event, JsonResponse res) {
+
+  /**
+   * Makes sure that no rowOrderChanged event is returned to the client after sorting because the sorting already
+   * happened on client as well.
+   */
+  protected void handleUiRowsSorted(JsonEvent event, JsonResponse res) {
     IColumn column = extractColumn(event.getData());
     boolean multiSort = event.getData().optBoolean("multiSort");
     boolean sortingRemoved = event.getData().optBoolean("sortingRemoved");
 
     TableEventFilterCondition filterCondition = new TableEventFilterCondition(TableEvent.TYPE_ROW_ORDER_CHANGED);
     getTableEventFilter().addCondition(filterCondition);
-    //FIXME CGU add filter for HEADER_UPDATE event with json data of column (execDecorateHeaderCell is called which may change other header properties (text etc)
     try {
-      if (sortingRemoved && getModel() instanceof ITable5) {
-        ((ITable5) getModel()).fireSortColumnRemovedFromUI(column);
-      }
-      else {
-        getModel().getUIFacade().fireHeaderSortFromUI(column, multiSort);
-      }
+      fireSortRowsFromUi(column, multiSort, sortingRemoved);
     }
     finally {
       getTableEventFilter().removeCondition(filterCondition);
+    }
+  }
+
+  protected void handleUiSortRows(JsonEvent event, JsonResponse res) {
+    IColumn column = extractColumn(event.getData());
+    boolean multiSort = event.getData().optBoolean("multiSort");
+    boolean sortingRemoved = event.getData().optBoolean("sortingRemoved");
+
+    fireSortRowsFromUi(column, multiSort, sortingRemoved);
+  }
+
+  protected void fireSortRowsFromUi(IColumn<?> column, boolean multiSort, boolean sortingRemoved) {
+    //FIXME CGU add filter for HEADER_UPDATE event with json data of column (execDecorateHeaderCell is called which may change other header properties (text etc)
+    if (sortingRemoved && getModel() instanceof ITable5) {
+      ((ITable5) getModel()).fireSortColumnRemovedFromUI(column);
+    }
+    else {
+      getModel().getUIFacade().fireHeaderSortFromUI(column, multiSort);
     }
   }
 

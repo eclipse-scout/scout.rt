@@ -153,6 +153,7 @@ public class JsonClientSession extends AbstractJsonAdapter<IClientSession> {
     JSONObject json = new JSONObject();
     DecimalFormat defaultDecimalFormat = getDefaultDecimalFormat(locale);
     SimpleDateFormat defaultDateFormat = getDefaultSimpleDateFormat(locale);
+    putProperty(json, "languageTag", locale.toLanguageTag());
     putProperty(json, "decimalFormatPatternDefault", defaultDecimalFormat.toLocalizedPattern());
     putProperty(json, "dateFormatPatternDefault", defaultDateFormat.toPattern());
     putProperty(json, "decimalFormatSymbols", decimalFormatSymbolsToJson(defaultDecimalFormat.getDecimalFormatSymbols()));

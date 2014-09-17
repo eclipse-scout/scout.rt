@@ -1,46 +1,17 @@
+/* global LocaleSpecHelper */
 describe("DateFormat", function() {
   var locale;
-  var symbolsByLocale;
-  var patternByLocale;
+  var helper;
 
   beforeEach(function() {
     setFixtures(sandbox());
-    initSymbols();
-    initDefaultPatterns();
-    locale = createLocale('de');
+    helper = new LocaleSpecHelper();
+    locale = helper.createLocale('de');
   });
 
   afterEach(function() {
     locale = null;
   });
-
-  function createLocale(locale) {
-    var model = {};
-    model.dateFormatSymbols = symbolsByLocale[locale];
-    model.dateFormatPatternDefault = patternByLocale[locale];
-    return new scout.Locale(model);
-  }
-
-  function initSymbols() {
-    symbolsByLocale = {};
-    symbolsByLocale.de = createSymbolsForDe();
-  }
-
-  function initDefaultPatterns() {
-    patternByLocale = {};
-    patternByLocale.de = "dd.MM.yyyy";
-  }
-
-  function createSymbolsForDe() {
-    return {
-      "weekdays": ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'],
-      "weekdaysShort": ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'],
-      "months": ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember', ''],
-      "monthsShort": ['Jan', 'Feb', 'Mrz', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez', ''],
-      "am": "AM",
-      "pm": "PM"
-    };
-  }
 
   function dateInMillis(dateStr) {
     return new Date(dateStr).getTime();

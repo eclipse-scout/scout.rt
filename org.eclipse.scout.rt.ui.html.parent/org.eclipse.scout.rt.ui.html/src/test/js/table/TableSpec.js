@@ -1,4 +1,4 @@
-/* global TableSpecHelper */
+/* global TableSpecHelper, LocaleSpecHelper */
 describe("Table", function() {
   var session;
   var helper;
@@ -7,6 +7,7 @@ describe("Table", function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = new scout.Session($('#sandbox'), '1.1');
+    session.locale = new LocaleSpecHelper().createLocale('de');
     helper = new TableSpecHelper(session);
     jasmine.Ajax.install();
     jasmine.clock().install();
@@ -210,13 +211,13 @@ describe("Table", function() {
     var model, table, column0, column1, column2;
     var $colHeaders, $header0, $header1, $header2;
 
-    beforeEach(function() {
+    function prepareTable() {
       model = helper.createModelFixture(3, 3);
       table = helper.createTable(model);
       column0 = model.columns[0];
       column1 = model.columns[1];
       column2 = model.columns[2];
-    });
+    }
 
     function render(table) {
       table.render(session.$entryPoint);
@@ -227,6 +228,7 @@ describe("Table", function() {
     }
 
     it("updates column model", function() {
+      prepareTable();
       render(table);
       table.sort($header0, 'desc');
 
@@ -237,6 +239,7 @@ describe("Table", function() {
 
     describe('model update', function() {
       it("sets sortAscending according to direction param", function() {
+        prepareTable();
         render(table);
 
         table.sort($header0, 'desc');
@@ -247,6 +250,7 @@ describe("Table", function() {
       });
 
       it("resets properties on other columns", function() {
+        prepareTable();
         render(table);
 
         table.sort($header0, 'desc');
@@ -267,6 +271,7 @@ describe("Table", function() {
       });
 
       it("sets sortIndex", function() {
+        prepareTable();
         render(table);
 
         table.sort($header0, 'desc');
@@ -283,6 +288,7 @@ describe("Table", function() {
       });
 
       it("removes column from sort columns", function() {
+        prepareTable();
         render(table);
 
         table.sort($header0, 'desc');
@@ -306,19 +312,38 @@ describe("Table", function() {
       });
     });
 
-    it("sends columnSortingChanged event", function() {
+    it("sends rowsSorted event when client side sorting is possible", function() {
+      prepareTable();
       render(table);
-      table.sort($header0, 'desc');
+      spyOn(scout.device, "supportsInternationalization").and.returnValue(true);
+      //Make sure sorting is not executed because it does not work with phantomJS
+      spyOn(table, "_sort").and.returnValue(true);
 
+      table.sort($header0, 'desc');
       sendQueuedAjaxCalls();
 
-      var event = new scout.Event('columnSortingChanged', table.id, {
+      var event = new scout.Event('rowsSorted', table.id, {
+        "columnId": table.columns[0].id
+      });
+      expect(mostRecentJsonRequest()).toContainEvents(event);
+    });
+
+    it("sends sortRows event when client side sorting is not possible", function() {
+      prepareTable();
+      render(table);
+      spyOn(scout.device, "supportsInternationalization").and.returnValue(false);
+
+      table.sort($header0, 'desc');
+      sendQueuedAjaxCalls();
+
+      var event = new scout.Event('sortRows', table.id, {
         "columnId": table.columns[0].id
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
 
     it("sorts the data", function() {
+      prepareTable();
       render(table);
       spyOn(table, '_sort');
 
@@ -327,13 +352,64 @@ describe("Table", function() {
       expect(table._sort).toHaveBeenCalled();
     });
 
-//    describe("sorting", function() {
-//
-//      it("todo", function() {
-        //FIXME CGU verify sorting is equal on client and server (including consideration of locale rules)
-//      });
+    describe("sorting", function() {
 
-//    });
+      it("sorts text columns considering locale (if browser supports it)", function() {
+        if (!scout.device.supportsInternationalization()) {
+          return;
+        }
+
+        var model = helper.createModelFixtureByTexts(1, ['Österreich', 'Italien', 'Zypern']);
+        var table = helper.createTable(model);
+        table.render(session.$entryPoint);
+        $colHeaders = table._$header.find('.header-item');
+        $header0 = $colHeaders.eq(0);
+
+        table.sort($header0, 'desc');
+        helper.assertTextsInCells(table.rows, 0, ['Zypern', 'Österreich', 'Italien']);
+
+        table.sort($header0, 'asc');
+        helper.assertTextsInCells(table.rows, 0, ['Italien', 'Österreich', 'Zypern']);
+
+        session.locale = new LocaleSpecHelper().createLocale('sv');
+
+        table.sort($header0, 'desc');
+        helper.assertTextsInCells(table.rows, 0, ['Österreich', 'Zypern', 'Italien']);
+
+        table.sort($header0, 'asc');
+        helper.assertTextsInCells(table.rows, 0, ['Italien', 'Zypern', 'Österreich']);
+      });
+
+      it("sorts number columns", function() {
+        var model = helper.createModelFixtureByValues(1, [11, 1, 8], 'number');
+        var table = helper.createTable(model);
+        table.render(session.$entryPoint);
+        $colHeaders = table._$header.find('.header-item');
+        $header0 = $colHeaders.eq(0);
+
+        table.sort($header0, 'desc');
+        helper.assertValuesInCells(table.rows, 0, [11, 8, 1]);
+
+        table.sort($header0, 'asc');
+        helper.assertValuesInCells(table.rows, 0, [1, 8, 11]);
+      });
+
+      it("sorts date columns", function() {
+        var model = helper.createModelFixtureByValues(1, [new Date('2012-08-10'), new Date('2014-03-01'), new Date('1999-01-10')], 'date');
+        var table = helper.createTable(model);
+        table.render(session.$entryPoint);
+        $colHeaders = table._$header.find('.header-item');
+        $header0 = $colHeaders.eq(0);
+
+        table.sort($header0, 'desc');
+        helper.assertDatesInCells(table.rows, 0, [new Date('2014-03-01'), new Date('2012-08-10'), new Date('1999-01-10')]);
+
+        table.sort($header0, 'asc');
+        helper.assertDatesInCells(table.rows, 0, [new Date('1999-01-10'), new Date('2012-08-10'), new Date('2014-03-01')]);
+      });
+
+
+    });
 
   });
 

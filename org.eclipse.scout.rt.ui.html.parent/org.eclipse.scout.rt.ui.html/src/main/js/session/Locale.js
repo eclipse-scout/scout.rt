@@ -1,4 +1,5 @@
 scout.Locale = function Locale(model) {
+  this.languageTag = model.languageTag;
   this.decimalFormatPatternDefault = model.decimalFormatPatternDefault;
   this.decimalFormatSymbols = model.decimalFormatSymbols;
 

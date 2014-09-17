@@ -101,18 +101,21 @@ scout.Table.prototype.updateScrollbar = function() {
 };
 
 scout.Table.prototype._sort = function() {
-  var sortColumns = [];
-
-  // remove selection
-  this.clearSelection();
+  var sortColumns = [], column, sortIndex;
 
   // find all sort columns
   for (var c = 0; c < this.columns.length; c++) {
-    var column = this.columns[c],
-      sortIndex = column.sortIndex;
+    column = this.columns[c];
+    sortIndex = column.sortIndex;
     if (sortIndex >= 0) {
       sortColumns[sortIndex] = column;
     }
+  }
+
+  // Initialize comparators
+  var clientSideSortingPossible = this._prepareColumnsForSorting(sortColumns);
+  if (!clientSideSortingPossible) {
+    return false;
   }
 
   // compare rows
@@ -121,19 +124,59 @@ scout.Table.prototype._sort = function() {
       column = sortColumns[s];
       var valueA = this.getCellValue(column, row1);
       var valueB = this.getCellValue(column, row2);
-      var dir = column.sortActive && column.sortAscending ? -1 : 1;
+      var direction = column.sortActive && column.sortAscending ? -1 : 1;
 
-      if (valueA < valueB) {
-        return dir;
-      } else if (valueA > valueB) {
-        return -1 * dir;
+      var result = column.compare(valueA, valueB);
+      if (result < 0) {
+        return direction;
+      } else if (result > 0) {
+        return -1 * direction;
       }
     }
 
     return 0;
   }
   this.rows.sort(compare.bind(this));
-  this._renderRowOrderChanges();
+
+  //Sort was possible -> return true
+  return true;
+};
+
+scout.Table.prototype._prepareColumnsForSorting = function(sortColumns) {
+  var collator, column;
+
+  var textComparator = function(valueA, valueB) {
+    return collator.compare(valueA, valueB);
+  };
+
+  var defaultComparator = function(valueA, valueB) {
+    if (valueA < valueB) {
+      return -1;
+    } else if (valueA > valueB) {
+      return 1;
+    }
+    return 0;
+  };
+
+  // initialize comparators
+  for (var c = 0; c < sortColumns.length; c++) {
+    column = sortColumns[c];
+    if (column.type === 'text') {
+      if (!scout.device.supportsInternationalization()) {
+        //Locale comparison not possible -> do it on server
+        return false;
+      }
+
+      if (!collator) {
+        collator = new window.Intl.Collator(this.session.locale.languageTag);
+      }
+      column.compare = textComparator;
+    } else {
+      column.compare = defaultComparator;
+    }
+  }
+
+  return true;
 };
 
 scout.Table.prototype._renderRowOrderChanges = function() {
@@ -238,12 +281,20 @@ scout.Table.prototype.sort = function($header, dir, additional, remove) {
     }
     column.sortActive = true;
   }
-  this.session.send('columnSortingChanged', this.id, data);
 
   this._header.onSortingChanged();
 
-  // sort and visualize
-  this._sort();
+  // sort model
+  var sorted = this._sort();
+  if (sorted) {
+    this.session.send('rowsSorted', this.id, data);
+
+    this.clearSelection();
+    this._renderRowOrderChanges();
+  } else {
+    //Delegate sorting to server when it is not possible on client side
+    this.session.send('sortRows', this.id, data);
+  }
 };
 
 scout.Table.prototype.drawData = function() {
