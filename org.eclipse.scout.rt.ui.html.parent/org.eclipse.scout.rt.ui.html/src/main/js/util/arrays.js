@@ -21,6 +21,11 @@ scout.arrays = {
       arr.splice(index, 1);
     }
   },
+  removeAll: function(arr, arr2) {
+    for (var i=0; i < arr2.length; i++) {
+      scout.arrays.remove(arr, arr2[i]);
+    }
+  },
   insert: function(arr, element, index) {
     arr.splice(index, 0, element);
   },
