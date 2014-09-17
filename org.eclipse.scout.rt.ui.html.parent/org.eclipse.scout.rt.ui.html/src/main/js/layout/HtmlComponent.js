@@ -42,7 +42,10 @@ scout.HtmlComponent.prototype.setLayout = function(layoutManager) {
   this.layoutManager = layoutManager;
 };
 
-// TODO AWE: (layout) konzeptionell ist das noch nicht richtig, preferredLayoutSize braucht keinen parent, nur einen container
+
+/**
+ * Returns the preferred size of the component, insets included.
+ */
 scout.HtmlComponent.prototype.getPreferredSize = function() {
   var prefSize;
   if (this.layoutManager) {
@@ -56,15 +59,9 @@ scout.HtmlComponent.prototype.getPreferredSize = function() {
   return prefSize;
 };
 
-//FIXME AWE: getInsets impl. ist so falsch margin und border separat bestimmen
-//schauen ob wir das überhaupt brauchen (width VS outherWidth im vergleich z Swing)
-//ggf. andere Stellen refactoren an denen das hier auch gebraucht wird
-//scout.HtmlComponent.prototype.getInsets = function() {
-//  var hMargin = this.$comp.outerWidth(true) - this.$comp.width();
-//  var vMargin = this.$comp.outerHeight(true) - this.$comp.height();
-//  return new scout.Insets(vMargin / 2, hMargin / 2, vMargin / 2, hMargin / 2);
-//};
-
+/**
+ * Returns the inset-dimensions of the component (padding, margin, border).
+ */
 scout.HtmlComponent.prototype.getInsets = function() {
   var directions = ['top', 'right', 'bottom', 'left'],
     insets = [0, 0, 0, 0],
@@ -81,14 +78,20 @@ scout.HtmlComponent.prototype.getInsets = function() {
   return new scout.Insets(insets[0], insets[1], insets[2], insets[3]);
 };
 
-// TODO AWE: (layout) merge with Layout. static class, check consequences first
-
+/**
+ * Returns the current size of the component, insets included.
+ * TODO AWE: (layout) prüfen ob hier tatsächlich die insets included sind. Müssten wir dann nicht outerWidth/-Height verwenden?
+ */
 scout.HtmlComponent.prototype.getSize = function() {
   return new scout.Dimension(
       this.$comp.width(),
       this.$comp.height());
 };
 
+/**
+ * Sets the size of the component, insets included. Which means: the method subtracts the components insets
+ * from the given size before setting the width/height of the component.
+ */
 scout.HtmlComponent.prototype.setSize = function(size) {
   var oldSize = this.getSize();
   if (!oldSize.equals(size)) {

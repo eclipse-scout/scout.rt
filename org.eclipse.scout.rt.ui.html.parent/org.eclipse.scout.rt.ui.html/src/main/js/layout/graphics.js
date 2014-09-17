@@ -106,6 +106,13 @@ scout.Insets = function(top, right, bottom, left) {
   this.left = left || 0;
 };
 
+scout.Insets.prototype.equals = function(o) {
+  return this.top === o.top &&
+    this.right === o.right &&
+    this.bottom === o.bottom &&
+    this.left === o.left;
+};
+
 scout.Insets.prototype.toString = function() {
   return 'Insets[top=' + this.top + ' right=' + this.right + ' bottom=' + this.bottom + ' left=' + this.left + ']';
 };

@@ -39,17 +39,22 @@ scout.FormLayout = function() {
 scout.inherits(scout.FormLayout, scout.AbstractLayout);
 
 scout.FormLayout.prototype.layout = function($container) {
-  var $rootGroupBox = $container.children('.root-group-box');
-  var htmlRootGroupBox = scout.HtmlComponent.get($rootGroupBox);
-  var htmlContainer = scout.HtmlComponent.get($container);
-  // TODO AWE: (layout) add insets to root group box?
-  htmlRootGroupBox.setSize(htmlContainer.getSize());
+  var htmlRootGb = this._getHtmlRootGroupBox($container),
+    contSize = scout.HtmlComponent.get($container).getSize(),
+    rootGbInsets = htmlRootGb.getInsets(),
+    rootGbSize = new scout.Dimension(
+      contSize.width - rootGbInsets.left - rootGbInsets.right,
+      contSize.height - rootGbInsets.top - rootGbInsets.bottom);
+  htmlRootGb.setSize(rootGbSize);
 };
 
 scout.FormLayout.prototype.preferredLayoutSize = function($container) {
-  var $rootGroupBox = $container.children('.root-group-box');
-  var htmlRootGroupBox = scout.HtmlComponent.get($rootGroupBox);
-  return htmlRootGroupBox.getPreferredSize();
+  return this._getHtmlRootGroupBox($container).getPreferredSize();
+};
+
+scout.FormLayout.prototype._getHtmlRootGroupBox = function($container) {
+  var $rootGb = $container.children('.root-group-box');
+  return scout.HtmlComponent.get($rootGb);
 };
 
 /**
@@ -61,21 +66,24 @@ scout.GroupBoxLayout = function() {
 scout.inherits(scout.GroupBoxLayout, scout.AbstractLayout);
 
 scout.GroupBoxLayout.prototype.layout = function($container) {
-  var htmlContainer = scout.HtmlComponent.get($container);
-  var containerSize = htmlContainer.getSize();
-  var titleHeight = 28; // TODO: dynamisch ermitteln / visibility / existenz pruefen
-  var bodyHeight = containerSize.height - titleHeight;
-  var htmlBody = this._getHtmlBody($container);
-  htmlBody.setSize(new scout.Dimension(containerSize.width, bodyHeight));
+  var containerSize = scout.HtmlComponent.get($container).getSize();
+  this._getHtmlBody($container).setSize(new scout.Dimension(
+      containerSize.width,
+      containerSize.height - this._getTitleHeight($container)));
 };
 
 scout.GroupBoxLayout.prototype.preferredLayoutSize = function($container) {
-  var htmlBody = this._getHtmlBody($container);
-  var bodySize = htmlBody.getPreferredSize();
-  var size = new scout.Dimension(bodySize.width, bodySize.height);
-  size.height += 28;
   // TODO AWE: (layout) add insets to GroupBoxLayout
-  return size;
+  var bodySize = this._getHtmlBody($container).getPreferredSize();
+  return new scout.Dimension(
+      bodySize.width,
+      bodySize.height + this._getTitleHeight($container));
+};
+
+scout.GroupBoxLayout.prototype._getTitleHeight = function($container) {
+  // TODO AWE: (layout) visibility berücksichtigen
+  var $title = $container.children('.group-box-title');
+  return $title.outerHeight(true);
 };
 
 scout.GroupBoxLayout.prototype._getHtmlBody = function($container) {
