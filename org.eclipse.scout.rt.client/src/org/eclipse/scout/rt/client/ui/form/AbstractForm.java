@@ -282,7 +282,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
    * one of {@link IForm#TOOLBAR_FORM_HEADER} or {@link IForm#TOOLBAR_VIEW_PART}. The {@link IForm#TOOLBAR_VIEW_PART} is
    * only considered if the form is displayed as a view (display hint {@link IForm#DISPLAY_HINT_VIEW} and SWT
    * representation. In all other cases the fallback {@link IForm#TOOLBAR_FORM_HEADER} is taken.
-   * 
+   *
    * @return {@link IForm#TOOLBAR_FORM_HEADER} | {@link IForm#TOOLBAR_VIEW_PART}
    */
   @ConfigProperty(ConfigProperty.TOOLBAR_LOCATION)
@@ -295,7 +295,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
    * This method is called to get an exclusive key of the form. The key is used
    * to open the same form with the same handler only once. Obviously this
    * behavior can only be used for view forms.
-   * 
+   *
    * @see AbstractDesktop#getSimilarViewForms(IForm)
    * @return null for exclusive form behavior an exclusive key to ensure similar
    *         handling.
@@ -311,7 +311,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
    * By default any of the #start* methods of the form call this method
    * <p>
    * This method is called in the process of the initialization. The UI is not ready yet.
-   * 
+   *
    * @throws ProcessingException
    */
   @ConfigOperation
@@ -321,7 +321,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   /**
    * This method is called when UI is ready.
-   * 
+   *
    * @throws ProcessingException
    */
   @ConfigOperation
@@ -343,7 +343,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
    * before the form is validated and stored.<br>
    * After this method, the form is checking fields itself and displaying a
    * dialog with missing and invalid fields.
-   * 
+   *
    * @return true when this check is done and further checks can continue, false
    *         to silently cancel the current process
    * @throws ProcessingException
@@ -361,7 +361,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
    * enablings.<br>
    * This method is called before {@link IFormHandler#execValidate()} and before
    * the form is stored.
-   * 
+   *
    * @return true when validate is successful, false to silently cancel the
    *         current process
    * @throws ProcessingException
@@ -677,7 +677,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   /**
    * Register a {@link DataChangeListener} on the desktop for these dataTypes<br>
    * Example:
-   * 
+   *
    * <pre>
    * registerDataChangeListener(CRMEnum.Company, CRMEnum.Project, CRMEnum.Task);
    * </pre>
@@ -702,7 +702,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
    * Unregister the {@link DataChangeListener} from the desktop for these
    * dataTypes<br>
    * Example:
-   * 
+   *
    * <pre>
    * unregisterDataChangeListener(CRMEnum.Company, CRMEnum.Project, CRMEnum.Task);
    * </pre>
@@ -868,7 +868,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
           f.exportFormFieldData(data);
         }
         else {
-          LOG.warn("cannot find field data for '" + fieldQId + " in form " + getClass().getName() + "'");
+          LOG.warn("cannot find field data for '" + fieldQId + "' in form " + getClass().getName() + "'");
         }
       }
     }
@@ -1151,7 +1151,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
    * <p>
    * Implement {@link #execCreateFormData()} to automatically attach a filled form data to the search filter (since
    * 3.8).
-   * 
+   *
    * @param searchFilter
    *          is never null
    */
@@ -1184,7 +1184,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
    * Convenience to add form data to search filter and load/store form data.
    * override this method to create an empty search form data that can be used for example by
    * {@link #execResetSearchFilter(SearchFilter)}
-   * 
+   *
    * @since 3.8
    */
   @ConfigOperation
@@ -1473,7 +1473,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   /**
    * attach a statement (mode) that is executed every interval
-   * 
+   *
    * @since Build 195 09.02.2005, imo
    */
   @Override
@@ -1488,7 +1488,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   /**
    * remove a statement (mode) that is executed every interval
-   * 
+   *
    * @since Build 195 09.02.2005, imo
    */
   @Override
@@ -1604,7 +1604,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
    * It will make this decision based on {@link #isSaveNeeded}.
    * Saving usually involves calling the <code>execStore</code> method
    * of the current form handler.
-   * 
+   *
    * @see AbstractFormHandler#execStore()
    */
   @Override
@@ -2191,7 +2191,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   /**
    * Registers the given form field replacements on this form. Do not use this internal method.
-   * 
+   *
    * @param replacements
    *          Map having old field classes as key and replacing field classes as values.
    * @since 3.8.2
