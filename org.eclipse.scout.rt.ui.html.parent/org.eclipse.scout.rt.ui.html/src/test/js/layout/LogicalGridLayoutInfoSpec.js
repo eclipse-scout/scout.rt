@@ -15,27 +15,32 @@ describe("LogicalGridLayoutInfo", function() {
   });
 
   describe("layoutCellBounds", function() {
-    var mockComponent = function(componentName) {
+    // Create some mock-objects for JQuery selector- and HtmlComponent instances.
+    var mockJquery = function(compName) {
+      var jquery = this;
       return {
-          name:componentName,
-          data:function(dataKey) {
-            if (dataKey === 'layout') {
-              return {
-                preferredLayoutSize:function($comp) {
-                  return new scout.Dimension(1, 1);
-                }
-              };
-            }
-          },
-          attr:function(attrKey) {
-            return attrKey === 'id' ? componentName : undefined;
+        data:function(dataKey) {
+          if ('htmlComponent' == dataKey) {
+            return mockHtmlComp(jquery);
           }
+        },
+        attr:function(attrKey) {
+          return attrKey === 'id' ? compName : undefined;
+        }
+      };
+    };
+
+    var mockHtmlComp = function(jquery) {
+      return {
+        getPreferredSize:function() {
+          return new scout.Dimension(1, 1);
+        }
       };
     };
 
     var components = [
-      mockComponent('DateField'),
-      mockComponent('StringField')
+      mockJquery('DateField'),
+      mockJquery('StringField')
     ];
 
     var gd1 = new scout.LogicalGridData();
@@ -81,7 +86,5 @@ describe("LogicalGridLayoutInfo", function() {
     });
 
   });
-
-
 
 });

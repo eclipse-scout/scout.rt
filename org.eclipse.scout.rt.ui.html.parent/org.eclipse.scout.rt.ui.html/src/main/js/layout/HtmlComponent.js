@@ -59,10 +59,26 @@ scout.HtmlComponent.prototype.getPreferredSize = function() {
 //FIXME AWE: getInsets impl. ist so falsch margin und border separat bestimmen
 //schauen ob wir das überhaupt brauchen (width VS outherWidth im vergleich z Swing)
 //ggf. andere Stellen refactoren an denen das hier auch gebraucht wird
+//scout.HtmlComponent.prototype.getInsets = function() {
+//  var hMargin = this.$comp.outerWidth(true) - this.$comp.width();
+//  var vMargin = this.$comp.outerHeight(true) - this.$comp.height();
+//  return new scout.Insets(vMargin / 2, hMargin / 2, vMargin / 2, hMargin / 2);
+//};
+
 scout.HtmlComponent.prototype.getInsets = function() {
-  var hMargin = this.$comp.outerWidth(true) - this.$comp.width();
-  var vMargin = this.$comp.outerHeight(true) - this.$comp.height();
-  return new scout.Insets(vMargin / 2, hMargin / 2, vMargin / 2, hMargin / 2);
+  var directions = ['top', 'right', 'bottom', 'left'],
+    insets = [0, 0, 0, 0],
+    i,
+  cssToInt = function($comp, cssProp) {
+      return parseInt($comp.css(cssProp), 10);
+    };
+  for (i=0; i<directions.length; i++) {
+  // parseInt will ignore 'px' in string returned from css() method
+  insets[i] += cssToInt(this.$comp, 'margin-' + directions[i]);
+  insets[i] += cssToInt(this.$comp, 'padding-' + directions[i]);
+  insets[i] += cssToInt(this.$comp, 'border-' + directions[i] + '-width');
+  }
+  return new scout.Insets(insets[0], insets[1], insets[2], insets[3]);
 };
 
 // TODO AWE: (layout) merge with Layout. static class, check consequences first
