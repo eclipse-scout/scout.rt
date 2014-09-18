@@ -29,7 +29,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Scrollable;
 
-@SuppressWarnings("restriction")
 public final class SwtLayoutUtility {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwtLayoutUtility.class);
 

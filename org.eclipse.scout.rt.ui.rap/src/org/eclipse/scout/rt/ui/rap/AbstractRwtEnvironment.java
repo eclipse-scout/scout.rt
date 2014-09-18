@@ -122,7 +122,7 @@ import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.osgi.framework.Bundle;
 
-@SuppressWarnings("deprecation")
+@SuppressWarnings({"restriction", "deprecation"})
 public abstract class AbstractRwtEnvironment extends AbstractEntryPoint implements IRwtEnvironment {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractRwtEnvironment.class);
 
@@ -229,7 +229,6 @@ public abstract class AbstractRwtEnvironment extends AbstractEntryPoint implemen
   /**
    * This method is called when the {@link Display} of this environment is disposed.
    */
-  @SuppressWarnings("restriction")
   protected void dispose() {
     closeFormParts();
     if (m_historySupport != null) {
@@ -330,7 +329,6 @@ public abstract class AbstractRwtEnvironment extends AbstractEntryPoint implemen
    *          if not null, the callback is executed at the end of the initialization but before the {@link IDesktop} is
    *          notified.
    */
-  @SuppressWarnings("restriction")
   protected synchronized void init(Runnable additionalInitCallback) throws CoreException {
     if (m_status == RwtEnvironmentEvent.STARTING
         || m_status == RwtEnvironmentEvent.STARTED
@@ -1419,7 +1417,6 @@ public abstract class AbstractRwtEnvironment extends AbstractEntryPoint implemen
     }
   }
 
-  @SuppressWarnings("restriction")
   private class P_RequestInterceptor implements MessageFilter {
 
     @Override

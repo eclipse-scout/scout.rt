@@ -51,7 +51,6 @@ import org.eclipse.ui.forms.widgets.Form;
  *
  * @since 1.0.9 18.07.2008
  */
-@SuppressWarnings("restriction")
 public class SwtScoutDialog extends Dialog implements ISwtScoutPart {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwtScoutDialog.class);
 

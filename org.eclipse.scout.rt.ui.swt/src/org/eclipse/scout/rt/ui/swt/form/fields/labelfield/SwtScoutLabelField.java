@@ -31,7 +31,6 @@ import org.eclipse.swt.widgets.Control;
  *
  * @since 1.0.0 28.04.2008
  */
-@SuppressWarnings("restriction")
 public class SwtScoutLabelField extends SwtScoutValueFieldComposite<ILabelField> implements ISwtScoutLabelField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwtScoutLabelField.class);
 

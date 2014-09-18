@@ -82,7 +82,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * but upon activation. this is a performance-optimization and especially recommended for tablepages
    * where the parent is directly another table page (and no folder- or plain page) in this case the parent page can
    * have a huge amount of child pages with a lot of tables to be constructed but never used.
-   * 
+   *
    * @param callInitializer
    */
   public AbstractPageWithTable(boolean callInitializer) {
@@ -150,7 +150,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * method in subclasses instead.
    * <p>
    * Subclasses can override this method. Default is {@code null}.
-   * 
+   *
    * @return a search form type token
    * @see ISearchForm
    */
@@ -170,7 +170,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * this table page.
    * <p>
    * Subclasses can override this method. Default is {@code false}.
-   * 
+   *
    * @return {@code true} if the table data should be loaded on explicit user interaction, {@code false} otherwise
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -190,7 +190,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * invisible.
    * <p>
    * Subclasses can override this method. Default is {@code true}.
-   * 
+   *
    * @return {@code true} if empty space menus should generally be visible, {@code false} otherwise
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -208,7 +208,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * the GUI. However, if this property is set to {@code true}, single menus can still individually be set to invisible.
    * <p>
    * Subclasses can override this method. Default is {@code true}.
-   * 
+   *
    * @return {@code true} if table row menus should generally be visible, {@code false} otherwise
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -222,7 +222,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * <p/>
    * Typically subclasses override this method if this table page is using a bean-based table page data (i.e. an
    * {@link PageData} annotation is present on this class):
-   * 
+   *
    * <pre>
    * AbstractTablePageData pageData = service.loadPageData(...);
    * getTable().importFromTableBeanData(pageData);
@@ -230,7 +230,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * <p/>
    * This default implementation invokes {@link #execLoadTableData(SearchFilter)} to fetch the tabular data and loads it
    * into the table using {@link ITable#replaceRowsByMatrix(Object)}.
-   * 
+   *
    * @param filter
    *          a search filter, guaranteed not to be {@code null}
    * @throws ProcessingException
@@ -253,7 +253,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * {@code execPopulateTable()} instead.
    * <p>
    * Subclasses can override this method. The default returns {@code null}.
-   * 
+   *
    * @param filter
    *          a search filter, guaranteed not to be {@code null}
    * @return an {@code Object[][]} representing tabular data to be displayed in this page's table
@@ -276,7 +276,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * or {@link #execLoadTableData(SearchFilter)} instead.<br/>
    * This default implementation does the following: It queries methods {@link #isSearchActive()} and
    * {@link #isSearchRequired()} and then calls {@link #execLoadData(SearchFilter)} if appropriate.
-   * 
+   *
    * @throws ProcessingException
    */
   @ConfigOperation
@@ -317,7 +317,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * outline tree structure.
    * <p>
    * Subclasses can override this method. The default returns {@code null}.
-   * 
+   *
    * @param row
    *          a table row for which a new child page should be created
    * @return a new child page for {@code row}
@@ -343,7 +343,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * {@link #execCreateChildPage(ITableRow)} instead.<br/>
    * This default implementation checks whether {@code execCreateChildPage} is overridden and returns a new virtual
    * page, or {@code null} otherwise.
-   * 
+   *
    * @param row
    *          a table row for which a new virtual child page should be created
    * @return a new virtual child page for {@code row}
@@ -369,7 +369,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * <li>else creates a new child page by calling {@link #execCreateChildPage(ITableRow)}, links the table row to the
    * new tree node and returns the new node.
    * </ul>
-   * 
+   *
    * @param node
    *          the virtual tree node to be resolved
    * @return a new real tree node, replacing the virtual tree node
@@ -402,7 +402,6 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   protected void initConfig() {
     super.initConfig();
     m_searchActive = true;
@@ -460,7 +459,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   /**
    * creates the search form, but doesn't start it
    * called by {@link #ensureSearchFormCreated()}
-   * 
+   *
    * @return {@link ISearchForm}
    * @throws ProcessingException
    * @since 3.8.2
@@ -566,7 +565,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * Legacy: If the search form is defined as inner class, this method is called when this page is initialized.
    * <p>
    * Subclasses can override this method. The default does nothing.
-   * 
+   *
    * @throws ProcessingException
    * @see #ensureSearchFormCreated()
    * @see #ensureSearchFormStarted()
@@ -672,7 +671,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * Indicates if the result displayed in the table is the whole result or if there is more data in the server (that
    * wasn't sent to the client).
    * Is set if {@link #importPageData(AbstractTablePageData)} was used.
-   * 
+   *
    * @since 3.10.0-M3
    */
   protected boolean isLimitedResult() {
@@ -695,7 +694,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
 
   /**
    * Import the content of the tablePageData in the table of the page.
-   * 
+   *
    * @param tablePageData
    * @since 3.10.0-M3
    */
