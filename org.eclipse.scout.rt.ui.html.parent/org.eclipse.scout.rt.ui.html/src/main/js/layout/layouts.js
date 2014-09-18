@@ -108,7 +108,7 @@ scout.FormFieldLayout.prototype.layout = function($container) {
   var $label = $container.children('label');
   if ($label.isVisible()) {
     $label.css('width', '130px');
-    widthDiff += 130;
+    widthDiff += 130; // TODO AWE: (layout) dafür gibt es sicher einen value auf dem swing-env.
   }
   var $status = $container.children('.status');
   if ($status.isVisible()) {

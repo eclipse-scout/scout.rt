@@ -6,7 +6,7 @@ scout.inherits(scout.CheckBoxField, scout.ValueField);
 
 scout.CheckBoxField.prototype._render = function($parent) {
   this.addContainer($parent, 'CheckBoxField');
-  this.addLabel();
+  //this.addLabel();
   this.addStatus();
 
   // a wrapper span element is required in order to align the checkbox within
@@ -19,6 +19,12 @@ scout.CheckBoxField.prototype._render = function($parent) {
   this._$checkBox = $('<input>').
     appendTo($field).
     attr('type', 'checkbox');
+
+  // Note we don't call the addLabel method here, instead we add the label right of
+  // the check-box.
+  this.$label = $('<label>').
+    appendTo($field).
+    attr('title', this.label);
 
   this._$checkBox.on('click', function() {
     this.session.send('click', this.id);

@@ -331,3 +331,11 @@ werden. Zudem ist das Layout hochgradig konfigurierbar durch den Scout-Entwickle
 die properties weightX/Y und useUiHeight/Width für die es in HTML nur wenig Support gibt, bzw. die schlecht ohne
 Programmlogik in CSS umgesetzt werden können. Fazit: wir müssen das LogicalGridLayout in JavaScript implementieren
 und benötigen zudem ein Layout-Konzept ähnlich wie der Swing LayoutManager2 (invalidate, layout, etc.).
+
+18.09.2014 AWE, Layout Facts
+- Vorbild der Umsetzung: LayoutManager(2) von Swing, mit gewissen Vereinfachungen (nur Forms können layouted werden).
+- Definition "Insets" für Html UI: Padding, Margin, Border
+- Definition "width" und "height" (Dimension) für Html UI: Grösse einer Komponente exkl. Insets.
+  width/height in HTML/CSS sind _ohne_ Insets
+- getSize() liefert Dimensionen inkl. Insets zurück
+- getPreferredSize() liefert Dimension inkl. Insets zurück.
