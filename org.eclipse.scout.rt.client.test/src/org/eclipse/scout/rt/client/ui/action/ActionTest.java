@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.action;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -36,7 +37,7 @@ import org.mockito.Mockito;
 
 /**
  * JUnit tests for {@link AbstractAction}
- * 
+ *
  * @since 3.8.2
  */
 public class ActionTest {
@@ -108,6 +109,18 @@ public class ActionTest {
     }
 
     assertNotEquals(CollectionUtility.firstElement(menus1).classId(), CollectionUtility.firstElement(menus2).classId());
+  }
+
+  @Test
+  public void testKeystroke() {
+    BaseAction action = new BaseAction();
+    assertNull(action.getKeyStroke());
+    action.setKeyStroke("");
+    assertEquals(null, action.getKeyStroke());
+    action.setKeyStroke(null);
+    assertNull(action.getKeyStroke());
+    action.setKeyStroke("f11");
+    assertEquals("f11", action.getKeyStroke());
   }
 
   @ClassId(TEST_CLASS_ID)

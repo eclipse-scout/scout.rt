@@ -95,7 +95,7 @@ public final class RwtUtility {
 
   /**
    * Convenience method to get the environment from the client session
-   * 
+   *
    * @param session
    *          the clientsession from the current thread
    */
@@ -106,7 +106,7 @@ public final class RwtUtility {
 
   /**
    * Convenience method to get the environment from the display
-   * 
+   *
    * @param display
    *          the display from the current thread
    */
@@ -117,7 +117,7 @@ public final class RwtUtility {
 
   /**
    * Convenience method to get the locale from the current client session
-   * 
+   *
    * @param display
    *          the display from the current thread
    */
@@ -568,7 +568,7 @@ public final class RwtUtility {
    * of zero or more SWT key modifier masks (i.e. SWT.CTRL or SWT.ALT) and a
    * character code).<br>
    * For example if the keyStroke is defined as 'control-alt-f1' the method will return SWT.F1
-   * 
+   *
    * @param stroke
    * @return
    */
@@ -584,7 +584,7 @@ public final class RwtUtility {
 
   /**
    * Converts a scoutKey to an Rwt key. For example 'f11' will be converted to SWT.F11
-   * 
+   *
    * @param scoutKey
    *          must be lowercase, e.g. f11 instead of F11
    * @return Rwt key
@@ -1179,6 +1179,10 @@ public final class RwtUtility {
     // RWT_SCOUT_KEY_MAP.put((int) KeyEvent.VK_ALT_GRAPH, "alt_graph");
   }
 
+  public static Map<String, Integer> getScoutRwtKeyMap() {
+    return SCOUT_RWT_KEY_MAP;
+  }
+
   /**
    * Since there is no way to easily delegate and simulate up/down pageup/pagedown events on trees, tables and other
    * widgets,
@@ -1249,7 +1253,7 @@ public final class RwtUtility {
               tree.setTopItem(next);
             }
           }
-          */
+           */
           break;
         case SWT.PAGE_UP:
           //XXX rap
@@ -1279,7 +1283,7 @@ public final class RwtUtility {
               tree.setTopItem(next);
             }
           }
-          */
+           */
           break;
       }
       if (next != null) {
@@ -1508,7 +1512,7 @@ public final class RwtUtility {
 
   /**
    * Escapes every mnemonic character '&' in the string by simply doubling the character.
-   * 
+   *
    * @param text
    *          the string to be escaped, also <code>null</code> or empty string values are allowed
    * @return the escaped string
@@ -1531,7 +1535,7 @@ public final class RwtUtility {
 
   /**
    * Run the inputVerifier on the currently focused control. See {@link #runUiInputVerifier(Control)} for more details.
-   * 
+   *
    * @since 3.10.0-M5
    */
   public static void runUiInputVerifier() {
@@ -1560,7 +1564,7 @@ public final class RwtUtility {
    * <ul>
    * <li>control-alternate-f1 --> Ctrl+Alt+F1
    * </ul>
-   * 
+   *
    * @since 3.10.0-M4
    */
   public static String getKeyStrokePrettyPrinted(IAction scoutAction) {
@@ -1573,7 +1577,7 @@ public final class RwtUtility {
   /**
    * Pretty printed version of the key stroke.
    * See {@link RwtUtility#getKeyStrokePrettyPrinted(IAction)}
-   * 
+   *
    * @since 3.10.0-M4
    */
   public static String getKeyStrokePrettyPrinted(String s) {

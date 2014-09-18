@@ -17,7 +17,7 @@ import org.junit.Test;
 
 /**
  * JUnit tests for {@link RwtUtility}
- * 
+ *
  * @since 3.10.0-M4
  */
 public class RwtUtilityTest {
@@ -79,7 +79,7 @@ public class RwtUtilityTest {
     Assert.assertEquals("KeyStroke pretty printed should be Ctrl+Alt+1", "Ctrl+Alt+1", RwtUtility.getKeyStrokePrettyPrinted(ks));
 
     ks = new KeyStroke("");
-    Assert.assertEquals("KeyStroke should be empty", "", ks.getKeyStroke());
+    Assert.assertEquals("KeyStroke should be null", null, ks.getKeyStroke());
     Assert.assertEquals("KeyStroke pretty printed should be empty", "", RwtUtility.getKeyStrokePrettyPrinted(ks));
   }
 }

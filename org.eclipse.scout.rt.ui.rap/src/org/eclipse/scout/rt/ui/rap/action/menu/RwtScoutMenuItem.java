@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.ui.rap.action.menu;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.client.ui.action.IActionFilter;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
@@ -74,8 +75,7 @@ public class RwtScoutMenuItem {
     // init
     updateEnabledFromScout();
     updateIconFromScout();
-    updateKeyStrokeFromScout();
-    updateTextWithMnemonicFromScout();
+    updateTextFromScout();
     updateTooltipTextFromScout();
     updateSelectedFromScout();
   }
@@ -116,7 +116,7 @@ public class RwtScoutMenuItem {
       updateEnabledFromScout();
     }
     else if (name.equals(IMenu.PROP_TEXT_WITH_MNEMONIC)) {
-      updateTextWithMnemonicFromScout();
+      updateTextFromScout();
     }
     else if (name.equals(IMenu.PROP_TOOLTIP_TEXT)) {
       updateTooltipTextFromScout();
@@ -125,7 +125,7 @@ public class RwtScoutMenuItem {
       updateIconFromScout();
     }
     else if (name.equals(IMenu.PROP_KEYSTROKE)) {
-      updateKeyStrokeFromScout();
+      updateTextFromScout();
     }
     else if (name.equals(IMenu.PROP_VISIBLE)) {
       updateVisibilityFromScout();
@@ -134,12 +134,6 @@ public class RwtScoutMenuItem {
       updateSelectedFromScout();
     }
 
-  }
-
-  protected void updateKeyStrokeFromScout() {
-    if (getSwtMenuItem() != null && !getSwtMenuItem().isDisposed()) {
-      // void see settext mnemonic
-    }
   }
 
   protected void updateIconFromScout() {
@@ -154,11 +148,15 @@ public class RwtScoutMenuItem {
     }
   }
 
-  protected void updateTextWithMnemonicFromScout() {
+  protected void updateTextFromScout() {
     if (getSwtMenuItem() != null && !getSwtMenuItem().isDisposed()) {
       String text = getScoutMenu().getTextWithMnemonic();
       if (text == null) {
         text = "";
+      }
+
+      if (StringUtility.hasText(getScoutMenu().getKeyStroke())) {
+        text += "\t" + RwtMenuUtility.formatKeystroke(getScoutMenu().getKeyStroke());
       }
       getSwtMenuItem().setText(text);
     }
@@ -204,8 +202,8 @@ public class RwtScoutMenuItem {
   }
 
   /**
-  *
-  */
+   *
+   */
   protected void handleSwtMenuItemDispose() {
     if (getSwtMenuItem() != null && !getSwtMenuItem().isDisposed()) {
       getSwtMenuItem().removeListener(SWT.Dispose, m_swtMenuDisposeListener);

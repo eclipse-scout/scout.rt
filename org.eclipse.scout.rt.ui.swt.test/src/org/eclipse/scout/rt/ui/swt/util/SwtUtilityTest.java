@@ -34,7 +34,7 @@ public class SwtUtilityTest {
     assertEquals("KeyStroke pretty printed should be Ctrl+Alt+1", "Ctrl+Alt+1", SwtUtility.getKeyStrokePrettyPrinted(ks));
 
     ks = new KeyStroke("");
-    assertEquals("KeyStroke should be empty", "", ks.getKeyStroke());
+    assertEquals("KeyStroke should be null", null, ks.getKeyStroke());
     assertEquals("KeyStroke pretty printed should be empty", "", SwtUtility.getKeyStrokePrettyPrinted(ks));
   }
 

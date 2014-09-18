@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.ui.swt.action.menu;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.client.ui.action.IActionFilter;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
@@ -83,8 +84,7 @@ public class SwtScoutMenuItem implements ISwtScoutMenuItem {
     // init
     updateEnabledFromScout();
     updateIconFromScout();
-    updateKeyStrokeFromScout();
-    updateTextWithMnemonicFromScout();
+    updateTextFromScout();
     updateTooltipTextFromScout();
     updateSelectedFromScout();
   }
@@ -129,7 +129,7 @@ public class SwtScoutMenuItem implements ISwtScoutMenuItem {
       updateEnabledFromScout();
     }
     else if (name.equals(IMenu.PROP_TEXT_WITH_MNEMONIC)) {
-      updateTextWithMnemonicFromScout();
+      updateTextFromScout();
     }
     else if (name.equals(IMenu.PROP_TOOLTIP_TEXT)) {
       updateTooltipTextFromScout();
@@ -138,7 +138,7 @@ public class SwtScoutMenuItem implements ISwtScoutMenuItem {
       updateIconFromScout();
     }
     else if (name.equals(IMenu.PROP_KEYSTROKE)) {
-      updateKeyStrokeFromScout();
+      updateTextFromScout();
     }
     else if (name.equals(IMenu.PROP_VISIBLE)) {
       updateVisibilityFromScout();
@@ -147,12 +147,6 @@ public class SwtScoutMenuItem implements ISwtScoutMenuItem {
       updateSelectedFromScout();
     }
 
-  }
-
-  protected void updateKeyStrokeFromScout() {
-    if (getSwtMenuItem() != null && !getSwtMenuItem().isDisposed()) {
-      // void see settext mnemonic
-    }
   }
 
   protected void updateIconFromScout() {
@@ -167,11 +161,14 @@ public class SwtScoutMenuItem implements ISwtScoutMenuItem {
     }
   }
 
-  protected void updateTextWithMnemonicFromScout() {
+  protected void updateTextFromScout() {
     if (getSwtMenuItem() != null && !getSwtMenuItem().isDisposed()) {
       String text = getScoutMenu().getTextWithMnemonic();
       if (text == null) {
         text = "";
+      }
+      if (StringUtility.hasText(getScoutMenu().getKeyStroke())) {
+        text += "\t" + SwtMenuUtility.formatKeystroke(getScoutMenu().getKeyStroke());
       }
       getSwtMenuItem().setText(text);
     }
@@ -220,8 +217,8 @@ public class SwtScoutMenuItem implements ISwtScoutMenuItem {
   }
 
   /**
-  *
-  */
+   *
+   */
   protected void handleSwtMenuItemDispose() {
     if (getSwtMenuItem() != null && !getSwtMenuItem().isDisposed()) {
       getSwtMenuItem().removeListener(SWT.Dispose, m_swtMenuDisposeListener);

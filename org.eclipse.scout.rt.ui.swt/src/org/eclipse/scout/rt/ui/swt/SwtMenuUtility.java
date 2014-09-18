@@ -12,11 +12,15 @@ package org.eclipse.scout.rt.ui.swt;
 
 import java.util.List;
 
+import org.eclipse.jface.bindings.keys.KeyStroke;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.IActionFilter;
+import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStrokeNormalizer;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -77,5 +81,33 @@ public final class SwtMenuUtility {
       environment.createMenuItem(menu, childMenu, filter);
     }
 
+  }
+
+  /**
+   * Returns a formatted version of the Scout keystroke passed as argument.
+   * Returns an empty string if it could not be formatted.
+   */
+  public static String formatKeystroke(String keyStroke) {
+    KeyStrokeNormalizer scoutKeystroke = new KeyStrokeNormalizer(keyStroke);
+    scoutKeystroke.normalize();
+
+    int naturalKey = KeyStroke.NO_KEY;
+    if (StringUtility.hasText(scoutKeystroke.getKey())) {
+      if (scoutKeystroke.getKey().length() == 1) {
+        naturalKey = scoutKeystroke.getKey().charAt(0);
+      }
+      else if (SwtUtility.getScoutSwtKeyMap().containsKey(scoutKeystroke.getKey().toLowerCase())) {
+        naturalKey = SwtUtility.getScoutSwtKeyMap().get(scoutKeystroke.getKey().toLowerCase());
+      }
+      else {
+        LOG.error("Was not able to create shortcut label for " + keyStroke);
+      }
+    }
+
+    if (naturalKey != KeyStroke.NO_KEY) {
+      KeyStroke ks = KeyStroke.getInstance(((scoutKeystroke.hasShift()) ? SWT.SHIFT : SWT.None) | ((scoutKeystroke.hasCtrl()) ? SWT.CONTROL : SWT.None) | ((scoutKeystroke.hasAlt()) ? SWT.ALT : SWT.None), naturalKey);
+      return ks.format();
+    }
+    return "";
   }
 }

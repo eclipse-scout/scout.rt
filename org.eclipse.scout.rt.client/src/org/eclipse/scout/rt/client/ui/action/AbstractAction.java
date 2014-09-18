@@ -25,6 +25,7 @@ import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStrokeNormalizer;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
@@ -99,6 +100,20 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
     return null;
   }
 
+  /**
+   * Defines the keystroke for this action. A keystroke is built from optional modifiers (alt, control, shift)
+   * and a key (p, f11, delete).
+   * The keystroke has to follow a certain pattern: The modifiers (alt, shift, control) are separated from the key by a
+   * '-'. Examples:
+   * <ul>
+   * <li>control-alt-1
+   * <li>control-shift-alt-1
+   * <li>f11
+   * <li>alt-f11
+   * </ul>
+   *
+   * @return
+   */
   @ConfigProperty(ConfigProperty.STRING)
   @Order(55)
   protected String getConfiguredKeyStroke() {
@@ -321,47 +336,14 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
 
   @Override
   public void setKeyStroke(String k) {
-    // normalize key stroke format
-    if (k != null) {
-      k = k.toLowerCase();
-      boolean shift = false;
-      boolean ctrl = false;
-      boolean alt = false;
-      String key = null;
-      if (k.endsWith(" ")) {
-        key = " ";
-      }
-      for (String s : k.trim().split("[ -]")) {
-        if ("shift".equals(s)) {
-          shift = true;
-        }
-        else if ("control".equals(s)) {
-          ctrl = true;
-        }
-        else if ("ctrl".equals(s)) {
-          ctrl = true;
-        }
-        else if ("strg".equals(s)) {
-          ctrl = true;
-        }
-        else if ("alt".equals(s)) {
-          alt = true;
-        }
-        else if ("alternate".equals(s)) {
-          alt = true;
-        }
-        else {
-          key = s;
-        }
-      }
-      if (key != null) {
-        k = (shift ? "shift-" : "") + (ctrl ? "control-" : "") + (alt ? "alternate-" : "") + key;
-      }
-      else {
-        k = null;
-      }
+    KeyStrokeNormalizer scoutKeystroke = new KeyStrokeNormalizer(k);
+    scoutKeystroke.normalize();
+    if (scoutKeystroke.isValid()) {
+      propertySupport.setPropertyString(PROP_KEYSTROKE, scoutKeystroke.getNormalizedKeystroke());
     }
-    propertySupport.setPropertyString(PROP_KEYSTROKE, k);
+    else {
+      LOG.warn("Could not create keystroke '" + k + "' because it is invalid!");
+    }
   }
 
   @Override

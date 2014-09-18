@@ -423,7 +423,7 @@ public final class SwtUtility {
    * Converts {@link IKeyStroke} to a swt keycode (This is a bitwise OR
    * of zero or more SWT key modifier masks (i.e. SWT.CTRL or SWT.ALT) and a
    * character code).
-   * 
+   *
    * @param stroke
    * @return
    */
@@ -657,6 +657,10 @@ public final class SwtUtility {
     // SCOUT_SWT_KEY_MAP.put("stop",(int) KeyEvent.VK_STOP);
     // SCOUT_SWT_KEY_MAP.put("compose",(int) KeyEvent.VK_COMPOSE);
     // SCOUT_SWT_KEY_MAP.put("alt_graph",(int) KeyEvent.VK_ALT_GRAPH);
+  }
+
+  public static Map<String, Integer> getScoutSwtKeyMap() {
+    return SCOUT_SWT_KEY_MAP;
   }
 
   /**
@@ -1040,7 +1044,7 @@ public final class SwtUtility {
 
   /**
    * Escapes every mnemonic character '&' in the string by simply doubling the character.
-   * 
+   *
    * @param text
    *          the string to be escaped, also <code>null</code> or empty string values are allowed
    * @return the escaped string
@@ -1060,7 +1064,7 @@ public final class SwtUtility {
    * <ul>
    * <li>control-alternate-f1 --> Ctrl+Alt+F1
    * </ul>
-   * 
+   *
    * @since 3.10.0-M4
    */
   public static String getKeyStrokePrettyPrinted(IAction scoutAction) {
@@ -1073,7 +1077,7 @@ public final class SwtUtility {
   /**
    * Pretty printed version of the key stroke.
    * See {@link RwtUtility#getKeyStrokePrettyPrinted(IAction)}
-   * 
+   *
    * @since 3.10.0-M4
    */
   public static String getKeyStrokePrettyPrinted(String s) {
@@ -1088,7 +1092,7 @@ public final class SwtUtility {
 
   /**
    * Run the inputVerifier on the currently focused control. See {@link #runSwtInputVerifier(Control)} for more details.
-   * 
+   *
    * @since 3.10.0-M5
    */
   public static boolean runSwtInputVerifier() {
@@ -1097,7 +1101,7 @@ public final class SwtUtility {
 
   /**
    * Force the control's inputVerifier to run
-   * 
+   *
    * @since 3.10.0-M5
    */
   public static boolean runSwtInputVerifier(Control control) {
