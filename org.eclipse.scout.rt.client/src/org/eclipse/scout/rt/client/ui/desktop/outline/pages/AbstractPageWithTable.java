@@ -401,6 +401,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     return ConfigurationUtility.filterClass(dca, ITable.class);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   protected void initConfig() {
     super.initConfig();
