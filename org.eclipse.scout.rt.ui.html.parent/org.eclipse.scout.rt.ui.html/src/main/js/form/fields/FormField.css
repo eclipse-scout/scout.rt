@@ -1,5 +1,4 @@
 .form-field {
-  display:table;
   box-sizing:border-box;
   white-space:nowrap;
   border-spacing:0;
@@ -7,18 +6,18 @@
 }
 
 .form-field > label {
-  display:table-cell;
+  display:inline-block;
   text-overflow:ellipsis;
   overflow:hidden;
   max-width:130px;
 }
 
 .form-field > span.status {
-  display:table-cell;
+  display:inline-block;
 }
 
 .form-field > .field {
-  display:table-cell;
+  display:inline-block;
 }
 
 /* Form-Fields */

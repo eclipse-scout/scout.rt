@@ -43,8 +43,8 @@ scout.LogicalGridLayout.prototype.layout = function($parent) {
   }
 
   // Calculate layout - TODO AWE: (layout) move to validateLayout()?
-  var htmlParent = scout.HtmlComponent.get($parent);
-  var parentSize = htmlParent.getSize(),
+  var htmlParent = scout.HtmlComponent.get($parent),
+    parentSize = htmlParent.getSize(),
     parentInsets = htmlParent.getInsets();
   $.log('(LogicalGridLayout#layout) parent ' + htmlParent.debug() + ' size=' + parentSize + ' insets=' + parentInsets);
   var cellBounds = this.m_info.layoutCellBounds(parentSize, parentInsets);

@@ -25,6 +25,15 @@ scout.HtmlComponent.optGet = function($comp) {
   return $comp.data('htmlComponent');
 };
 
+/**
+ * Returns the parent or $comp. Creates a new instance of HtmlComponent if the parent DOM element has no linked instance.
+ */
+scout.HtmlComponent.prototype.getParent = function() {
+  var $parent = this.$comp.parent(),
+    htmlParent = scout.HtmlComponent.optGet($parent);
+  return htmlParent || new scout.HtmlComponent($parent);
+};
+
 scout.HtmlComponent.prototype.layout = function() {
   if (this.layoutManager) {
     this.layoutManager.layout(this.$comp);
@@ -98,8 +107,8 @@ scout.HtmlComponent.prototype.setSize = function(size) {
     this.layoutManager.invalidate();
   }
   this.$comp.
-    css('width', size.width).
-    css('height', size.height);
+    css('width', size.width + 'px').
+    css('height', size.height + 'px');
   this.layout();
 };
 
@@ -118,9 +127,9 @@ scout.HtmlComponent.prototype.setBounds = function(bounds) {
   }
   this.$comp.
     css('left', bounds.x).
-    css('width', bounds.width).
+    css('width', bounds.width + 'px').
     css('top', bounds.y).
-    css('height', bounds.height);
+    css('height', bounds.height + 'px');
   this.layout();
 };
 

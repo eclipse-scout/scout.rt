@@ -45,6 +45,7 @@ scout.FormLayout.prototype.layout = function($container) {
     rootGbSize = new scout.Dimension(
       contSize.width - rootGbInsets.left - rootGbInsets.right,
       contSize.height - rootGbInsets.top - rootGbInsets.bottom);
+  $.log('(FormLayout#layout) contSize=' + contSize);
   htmlRootGb.setSize(rootGbSize);
 };
 
@@ -66,10 +67,11 @@ scout.GroupBoxLayout = function() {
 scout.inherits(scout.GroupBoxLayout, scout.AbstractLayout);
 
 scout.GroupBoxLayout.prototype.layout = function($container) {
-  var containerSize = scout.HtmlComponent.get($container).getSize();
+  var contSize = scout.HtmlComponent.get($container).getSize();
+  $.log('(GroupBoxLayout#layout) contSize=' + contSize);
   this._getHtmlBody($container).setSize(new scout.Dimension(
-      containerSize.width,
-      containerSize.height - this._getTitleHeight($container)));
+      contSize.width,
+      contSize.height - this._getTitleHeight($container)));
 };
 
 scout.GroupBoxLayout.prototype.preferredLayoutSize = function($container) {

@@ -81,11 +81,21 @@ scout.Form.prototype._render = function($parent) {
     }.bind(this));
   }
 
-  htmlContainer.layout($parent); // FIXME parent/container?
+  htmlContainer.layout();
+  $(window).on('resize', this._onResize.bind(this));
 
   if (this._locked) {
     this.disable();
   }
+};
+
+scout.Form.prototype._onResize = function() {
+  // TODO AWE/CGU: dieses event müssten wir auch bekommen, wenn man den Divider zwischen
+  // Tree und Working Area schiebt.
+  $.log('(Form#_onResize) window was resized -> layout Form container');
+  var htmlCont = scout.HtmlComponent.get(this.$container),
+    htmlParent = htmlCont.getParent();
+  htmlCont.setSize(htmlParent.getSize());
 };
 
 scout.Form.prototype._remove = function() {
@@ -102,7 +112,16 @@ scout.Form.prototype.appendTo = function($parent) {
 
 // TODO AWE: (C.GU) hier sollten wir doch besser die setEnabled() method verwenden / überscheiben.
 scout.Form.prototype.enable = function() {
-  //FIXME CGU implement
+  // FIXME CGU implement
+};
+
+
+/**
+ * @override
+ */
+scout.Form.prototype.dispose = function() {
+  scout.Form.parent.prototype.dispose.call(this);
+  $(window).off('resize', this._onResize);
 };
 
 scout.Form.prototype.disable = function() {
