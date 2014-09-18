@@ -1,5 +1,17 @@
 describe("scout.arrays", function() {
 
+  describe("init", function() {
+
+    it("checks whether array has correct length and initial values", function() {
+      var i, arr = scout.arrays.init(5, 'foo');
+      expect(arr.length).toBe(5);
+      for (i=0; i<arr.length; i++) {
+        expect(arr[i]).toBe('foo');
+      }
+    });
+
+  });
+
   describe("equals", function() {
 
     it("checks whether two arrays contain the same elements in the same order", function() {

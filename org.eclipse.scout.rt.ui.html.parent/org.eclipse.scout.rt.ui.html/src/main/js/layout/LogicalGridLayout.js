@@ -9,8 +9,6 @@ scout.LogicalGridLayout = function(hgap, vgap) {
 };
 scout.inherits(scout.LogicalGridLayout, scout.AbstractLayout);
 
-// TODO AWE: (layout) implement resize event
-
 scout.LogicalGridLayout.prototype.validateLayout = function($parent) {
   var visibleComps = [], visibleCons = [], i, cons,
     children = $parent.children('.form-field');
@@ -30,19 +28,6 @@ scout.LogicalGridLayout.prototype.validateLayout = function($parent) {
 
 scout.LogicalGridLayout.prototype.layout = function($parent) {
   this._verifyLayout($parent);
-  var formFields = $parent.children('.form-field');
-  var i, $components = [], $comp, htmlComp, gridDatas = [], data;
-  for (i = 0; i < formFields.length; i++) {
-    $comp = $(formFields[i]);
-    htmlComp = scout.HtmlComponent.get($comp);
-    if (!htmlComp.layoutData) {
-      throw 'Component ' + htmlComp.debug() + ' does not have layout data. Failed to layout';
-    }
-    $components.push($comp);
-    gridDatas.push(htmlComp.layoutData);
-  }
-
-  // Calculate layout - TODO AWE: (layout) move to validateLayout()?
   var htmlParent = scout.HtmlComponent.get($parent),
     parentSize = htmlParent.getSize(),
     parentInsets = htmlParent.getInsets();
@@ -50,11 +35,11 @@ scout.LogicalGridLayout.prototype.layout = function($parent) {
   var cellBounds = this.m_info.layoutCellBounds(parentSize, parentInsets);
 
   // Set bounds of components
-  var r1, r2, r, d;
-  for (i = 0; i < $components.length; i++) {
-    $comp = $components[i];
+  var r1, r2, r, d, $comp, i, htmlComp, data;
+  for (i = 0; i < this.m_info.$components.length; i++) {
+    $comp = this.m_info.$components[i];
     htmlComp = scout.HtmlComponent.get($comp);
-    data = gridDatas[i];
+    data = this.m_info.gridDatas[i];
     r1 = cellBounds[data.gridy][data.gridx];
     r2 = cellBounds[data.gridy + data.gridh - 1][data.gridx + data.gridw - 1];
     r = r1.union(r2);
@@ -70,7 +55,7 @@ scout.LogicalGridLayout.prototype.layout = function($parent) {
         if (d.width < r.width) {
           var delta = r.width - d.width;
           r.width = d.width;
-          if (data.horizontalAlignment == 0) {
+          if (data.horizontalAlignment === 0) {
             // Do ceil the result as other layout managers of Java also handle floating calculation results that way.
             // This is important if being used in conjunction with another layout manager.
             // E.g. the editable checkbox in inline table cell is a JCheckBox and rendered by LogicalGridLayout,
@@ -85,12 +70,12 @@ scout.LogicalGridLayout.prototype.layout = function($parent) {
       if (!data.fillVertical) {
         if (d.height < r.height) {
           var delta = r.height - d.height;
-          if (data.heightHint == 0) {
+          if (data.heightHint === 0) {
             r.height = d.height;
           } else {
             r.height = data.heightHint;
           }
-          if (data.verticalAlignment == 0) {
+          if (data.verticalAlignment === 0) {
             // Do ceil the result as other layout managers of Java also handle floating calculation results that way.
             // This is important if being used in conjunction with another layout manager.
             // E.g. the editable checkbox in inline table cell is a JCheckBox and rendered by LogicalGridLayout,

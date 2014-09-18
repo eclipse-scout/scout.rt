@@ -15,6 +15,16 @@ scout.arrays = {
 
     return array;
   },
+  /**
+   * Creates an array with the given length and initializes each value with the given initValue.
+   */
+  init: function(length, initValue) {
+    var array = [], i;
+    for (i=0; i<length; i++) {
+      array[i] = initValue;
+    }
+    return array;
+  },
   remove: function(arr, element) {
     var index = arr.indexOf(element);
     if (index >= 0) {

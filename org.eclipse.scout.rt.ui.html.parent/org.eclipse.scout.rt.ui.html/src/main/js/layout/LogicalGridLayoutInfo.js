@@ -1,9 +1,9 @@
 /**
  * JavaScript port of org.eclipse.scout.rt.ui.swing.LogicalGridLayoutInfo.
  */
-scout.LogicalGridLayoutInfo = function(components, cons, hgap, vgap) {
+scout.LogicalGridLayoutInfo = function($components, cons, hgap, vgap) {
   this.gridDatas = [];
-  this.components = components;
+  this.$components = $components;
   this.cols;
   this.rows;
   this.width = [];
@@ -19,7 +19,7 @@ scout.LogicalGridLayoutInfo = function(components, cons, hgap, vgap) {
   for (i = 0; i < cons.length; i++) {
     this.gridDatas[i] = new scout.LogicalGridData(cons[i]);
   }
-  if (components.length === 0) {
+  if ($components.length === 0) {
     this.cols = 0;
     this.rows = 0;
     this.width = [];
@@ -87,19 +87,19 @@ scout.LogicalGridLayoutInfo = function(components, cons, hgap, vgap) {
   this.height = [];
   this.weightX = [];
   this.weightY = [];
-  $.log('(LogicalGridLayoutInfo#CTOR) usedCols=' + this.cols + ' usedRows=' + this.rows);
+  $.log('(LogicalGridLayoutInfo#CTOR) $components.length=' + $components.length + ' usedCols=' + this.cols + ' usedRows=' + this.rows);
   this._initializeInfo(hgap, vgap);
 };
 
 scout.LogicalGridLayoutInfo.prototype._initializeInfo = function(hgap, vgap) {
-  var compCount = this.components.length;
+  var compCount = this.$components.length;
   var compSize = [];
   // cache component sizes and cleanup constraints
-  var comp, cons, d;
+  var $comp, cons, d;
   for (var i = 0; i < compCount; i++) {
-    comp = this.components[i];
+    $comp = this.$components[i];
     cons = this.gridDatas[i];
-    d = this.uiSizeInPixel(comp);
+    d = this.uiSizeInPixel($comp);
     if (cons.widthHint > 0) {
       d.width = cons.widthHint;
     }
@@ -132,24 +132,14 @@ scout.LogicalGridLayoutInfo.prototype._initializeInfo = function(hgap, vgap) {
       cons.gridh = this.rows - cons.gridy;
     }
   }
-  console.log('cons=' + cons);
   this._initializeColumns(compSize, hgap);
   this._initializeRows(compSize, vgap);
 };
 
-// TODO AWE: move to arrays.js
-arrayInit = function(length, initValue) {
-  var array = [], i;
-  for (i=0; i<length; i++) {
-    array[i] = initValue;
-  }
-  return array;
-};
-
 scout.LogicalGridLayoutInfo.prototype._initializeColumns = function(compSize, hgap) {
   var compCount = compSize.length;
-  var prefWidths = arrayInit(this.cols, 0);
-  var fixedWidths = arrayInit(this.cols, false);
+  var prefWidths = scout.arrays.init(this.cols, 0);
+  var fixedWidths = scout.arrays.init(this.cols, false);
   var i, j, k, prefw;
   for (i = 0; i < compCount; i++) {
       var cons = this.gridDatas[i];
@@ -165,7 +155,7 @@ scout.LogicalGridLayoutInfo.prototype._initializeColumns = function(compSize, hg
         }
         for (j = cons.gridx; j < cons.gridx + cons.gridw && j < this.cols; j++) {
           prefWidths[j] = Math.max(prefWidths[j], prefw);
-          if (cons.weightx == 0) {
+          if (cons.weightx === 0) {
             fixedWidths[j] = true;
           }
         }
@@ -203,7 +193,7 @@ scout.LogicalGridLayoutInfo.prototype._initializeColumns = function(compSize, hg
             else {
               prefWidths[last = j] = Math.max(equalWidth, prefWidths[j]);
             }
-            if (cons.weightx == 0) {
+            if (cons.weightx === 0) {
               fixedWidths[j] = true;
             }
           }
@@ -262,8 +252,8 @@ scout.LogicalGridLayoutInfo.prototype._initializeColumns = function(compSize, hg
 
 scout.LogicalGridLayoutInfo.prototype._initializeRows = function(compSize, vgap) {
   var compCount = compSize.length;
-  var prefHeights = arrayInit(this.rows, 0);
-  var fixedHeights = arrayInit(this.rows, false);
+  var prefHeights = scout.arrays.init(this.rows, 0);
+  var fixedHeights = scout.arrays.init(this.rows, false);
   var i, j, k, prefh;
   for (i = 0; i < compCount; i++) {
       var cons = this.gridDatas[i];
@@ -279,7 +269,7 @@ scout.LogicalGridLayoutInfo.prototype._initializeRows = function(compSize, vgap)
         }
         for (j = cons.gridy; j < cons.gridy + cons.gridh && j < this.rows; j++) {
           prefHeights[j] = Math.max(prefHeights[j], prefh);
-          if (cons.weighty == 0) {
+          if (cons.weighty === 0) {
             fixedHeights[j] = true;
           }
         }
@@ -310,7 +300,7 @@ scout.LogicalGridLayoutInfo.prototype._initializeRows = function(compSize, vgap)
           var last = -1;
           for (j = cons.gridy; j < cons.gridy + cons.gridh && j < this.rows; j++) {
             prefHeights[last = j] = Math.max(equalHeight, prefHeights[j]);
-            if (cons.weighty == 0) {
+            if (cons.weighty === 0) {
               fixedHeights[j] = true;
             }
           }
@@ -369,11 +359,11 @@ scout.LogicalGridLayoutInfo.prototype._initializeRows = function(compSize, vgap)
 scout.LogicalGridLayoutInfo.prototype.layoutCellBounds = function(size, insets) {
   var w = this.layoutSizes(size.width - insets.left - insets.right - Math.max(0, (this.cols - 1) * this.m_hgap), this.width, this.weightX);
   var h = this.layoutSizes(size.height - insets.top - insets.bottom - Math.max(0, (this.rows - 1) * this.m_vgap), this.height, this.weightY);
-  this.m_cellBounds = arrayInit(this.rows, null);
+  this.m_cellBounds = scout.arrays.init(this.rows, null);
   var y = insets.top, r, x, c;
   for (r = 0; r < this.rows; r++) {
     x = insets.left;
-    this.m_cellBounds[r] = arrayInit(this.cols, null);
+    this.m_cellBounds[r] = scout.arrays.init(this.cols, null);
     for (c = 0; c < this.cols; c++) {
       this.m_cellBounds[r][c] = new scout.Rectangle(x, y, w[c], h[r]);
       x += w[c];
@@ -386,12 +376,12 @@ scout.LogicalGridLayoutInfo.prototype.layoutCellBounds = function(size, insets) 
 };
 
 scout.LogicalGridLayoutInfo.prototype.layoutSizes = function(targetSize, sizes, weights) {
-  var outSizes = arrayInit(sizes.length, 0);
+  var outSizes = scout.arrays.init(sizes.length, 0);
   if (targetSize <= 0) {
     return [];
   }
   var sumSize = 0;
-  var tmpWeight = arrayInit(weights.length, 0.0);
+  var tmpWeight = scout.arrays.init(weights.length, 0.0);
   var sumWeight = 0, i;
   for (i = 0; i < sizes.length; i++) {
     outSizes[i] = sizes[i][scout.LayoutConstants.PREF];
@@ -421,7 +411,7 @@ scout.LogicalGridLayoutInfo.prototype.layoutSizes = function(targetSize, sizes, 
   if (Math.abs(deltaInt) > 0) {
     // setup accumulators
     /*float[]*/
-    var accWeight = arrayInit(tmpWeight.length, 0.0);
+    var accWeight = scout.arrays.init(tmpWeight.length, 0.0);
     var hasTargets;
     if (deltaInt > 0) {
       // expand
