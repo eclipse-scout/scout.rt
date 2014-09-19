@@ -3,8 +3,12 @@
 }
 
 .tab-area > button {
-  color:#0082a1;
+  color:#ccc;
   border:solid 1px #ccc;
   border-bottom:none;
   background-color:white;
+}
+
+.tab-area > button.selected {
+  color:#0082a1;
 }

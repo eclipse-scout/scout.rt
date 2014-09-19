@@ -25,8 +25,11 @@ scout.TabBox.prototype._render = function($parent) {
     groupBox = this.groupBoxes[i];
     $tab = $('<button>').
       text(groupBox.label).
-      appendTo(this._$tabArea);
+      appendTo(this._$tabArea).
+      data('tabIndex', i).
+      on('click', this._onTabClicked.bind(this));
   }
+  this._setTabItemSelected(0);
 
   // render 1st tab (currently hard-coded)
   this._$tabContent = this.$container.appendDiv('', 'tab-content');
@@ -42,5 +45,21 @@ scout.TabBox.prototype._render = function($parent) {
   this.groupBoxes[0]._setLabelVisible(false);
 
   // TODO AWE: (tab-box) improv. implementation - currently very hacky
-  // in Swing hat das JTabbedPane 2'500 lines of code!
+  // in Swing hat das JTabbedPane 2'500 lines of code! use JQuery UI plugin?
+};
+
+scout.TabBox.prototype._onTabClicked = function(tab) {
+  var tabIndex = $(tab.target).data('tabIndex');
+  this._setTabItemSelected(tabIndex);
+  // TODO AWE: (tab-box) send to server? or make everything client-side
+};
+
+scout.TabBox.prototype._setTabItemSelected = function(index) {
+  var i, $tabs = this._$tabArea.children('button');
+  for (i=0; i<$tabs.length; i++) {
+    $($tabs[i]).removeClass('selected');
+  }
+  if (index >= 0 && index < $tabs.length) {
+    $($tabs[index]).addClass('selected');
+  }
 };
