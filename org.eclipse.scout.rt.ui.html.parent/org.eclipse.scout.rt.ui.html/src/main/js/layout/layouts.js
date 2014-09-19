@@ -44,18 +44,31 @@ scout.FormLayout.prototype.layout = function($container) {
     rootGbInsets = htmlRootGb.getInsets(),
     rootGbSize = new scout.Dimension(
       contSize.width - rootGbInsets.left - rootGbInsets.right,
-      contSize.height - rootGbInsets.top - rootGbInsets.bottom);
-  $.log('(FormLayout#layout) contSize=' + contSize);
+      contSize.height - rootGbInsets.top - rootGbInsets.bottom - this._getMenuBarHeight($container));
+  $.log.trace('(FormLayout#layout) contSize=' + contSize);
+  // TODO AWE: (layout) must regard menu bar
   htmlRootGb.setSize(rootGbSize);
 };
 
 scout.FormLayout.prototype.preferredLayoutSize = function($container) {
-  return this._getHtmlRootGroupBox($container).getPreferredSize();
+  var prefSize = this._getHtmlRootGroupBox($container).getPreferredSize();
+  prefSize.height += this.getMenuBarHeight($container);
+  return prefSize;
 };
 
 scout.FormLayout.prototype._getHtmlRootGroupBox = function($container) {
   var $rootGb = $container.children('.root-group-box');
   return scout.HtmlComponent.get($rootGb);
+};
+
+scout.FormLayout.prototype._getMenuBarHeight = function($container) {
+  // TODO AWE: (layout) remove copy/paste
+  var $comp = $container.children('.menubar');
+  if ($comp.length === 1 && $comp.isVisible()) {
+    return $comp.outerHeight(true);
+  } else {
+    return 0;
+  }
 };
 
 /**
@@ -68,10 +81,12 @@ scout.inherits(scout.GroupBoxLayout, scout.AbstractLayout);
 
 scout.GroupBoxLayout.prototype.layout = function($container) {
   var contSize = scout.HtmlComponent.get($container).getSize();
-  $.log('(GroupBoxLayout#layout) contSize=' + contSize);
+  $.log.trace('(GroupBoxLayout#layout) contSize=' + contSize);
   this._getHtmlBody($container).setSize(new scout.Dimension(
       contSize.width,
-      contSize.height - this._getTitleHeight($container)));
+      contSize.height -
+        this._getTitleHeight($container) -
+        this._getButtonBarHeight($container)));
 };
 
 scout.GroupBoxLayout.prototype.preferredLayoutSize = function($container) {
@@ -79,17 +94,30 @@ scout.GroupBoxLayout.prototype.preferredLayoutSize = function($container) {
   var bodySize = this._getHtmlBody($container).getPreferredSize();
   return new scout.Dimension(
       bodySize.width,
-      bodySize.height + this._getTitleHeight($container));
+      bodySize.height +
+        this._getTitleHeight($container) +
+        this._getButtonBarHeight($container));
 };
 
 scout.GroupBoxLayout.prototype._getTitleHeight = function($container) {
-  // TODO AWE: (layout) visibility berücksichtigen
-  var $title = $container.children('.group-box-title');
-  return $title.outerHeight(true);
+  return this._getHeight($container, '.group-box-title');
+};
+
+scout.GroupBoxLayout.prototype._getButtonBarHeight = function($container) {
+  return this._getHeight($container, '.button-bar');
+};
+
+scout.GroupBoxLayout.prototype._getHeight = function($container, selector) {
+  var $comp = $container.children(selector);
+  if ($comp.length === 1 && $comp.isVisible()) {
+    return $comp.outerHeight(true);
+  } else {
+    return 0;
+  }
 };
 
 scout.GroupBoxLayout.prototype._getHtmlBody = function($container) {
-  var $body = $container.find('.group-box-body').first();
+  var $body = $container.children('.group-box-body');
   return scout.HtmlComponent.get($body);
 };
 
@@ -178,6 +206,7 @@ scout.ButtonFieldLayout.prototype.layout = function($parent) {
   // button has no children - nothing to do here
 };
 
+// TODO AWE: (layout) use HtmlComponent#getInsets here
 scout.ButtonFieldLayout.prototype.preferredLayoutSize = function($parent) {
   var $button = $parent.find('button');
   var hMargin = $button.outerWidth(true) - $button.width();

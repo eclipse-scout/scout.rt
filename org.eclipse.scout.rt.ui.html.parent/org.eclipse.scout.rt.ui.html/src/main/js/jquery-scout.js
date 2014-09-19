@@ -6,7 +6,7 @@
 (function($) {
 
   //== $ extensions
-  $.log = console.log.bind(console);
+  $.log = log4javascript.getDefaultLogger();
 
   $.makeDiv = function(id, cssClass, htmlContent) {
     if (id === 0) {

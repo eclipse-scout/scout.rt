@@ -1167,7 +1167,7 @@ scout.Table.prototype.onModelAction = function(event) {
   } else if (event.type == 'columnHeadersUpdated') {
     this._onColumnHeadersUpdated(event.columns);
   } else {
-    $.log('Model event not handled. Widget: scout.Table. Event: ' + event.type + '.');
+    $.log.warn('Model event not handled. Widget: scout.Table. Event: ' + event.type + '.');
   }
 };
 

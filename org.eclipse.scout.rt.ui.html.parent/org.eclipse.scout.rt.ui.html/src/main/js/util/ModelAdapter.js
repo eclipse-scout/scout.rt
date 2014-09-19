@@ -198,7 +198,7 @@ scout.ModelAdapter.prototype._syncProperties = function(oldValues, newValues, ig
 scout.ModelAdapter.prototype._renderProperties = function(oldValues, newValues, ignore) {
   this._eachProperty(newValues, function(propertyName, value) {
     var setterFuncName = '_set' + scout.ModelAdapter.preparePropertyNameForFunctionCal(propertyName);
-    $.log('call ' + setterFuncName + '(' + value + ')');
+    $.log.debug('call ' + setterFuncName + '(' + value + ')');
 
     if (this._adapterProperties.indexOf(propertyName) > -1 && this[propertyName]) {
       this.onChildAdapterChange(propertyName, oldValues[propertyName], value);

@@ -33,18 +33,13 @@ scout.Form.prototype._render = function($parent) {
     detachable = false;
   }
 
-  // TODO AWE: (button-bar) move to GroupBox / add layout / see SSGroupBoxButtonBar
-  var systemButtons = this.rootGroupBox.getSystemButtons();
-  if (systemButtons) {
-    var $buttonBar = $.makeDiv('', 'button-bar').
-      appendTo(this.$container);
-    var i, button;
-    for (i = 0; i < systemButtons.length; i++) {
-      button = systemButtons[i];
-      button.render($buttonBar);
-      if (button.visible && (button.systemType == scout.Button.SYSTEM_TYPE.CANCEL || button.systemType == scout.Button.SYSTEM_TYPE.CLOSE)) {
-        closeable = true;
-      }
+  var i, btn, systemButtons = this.rootGroupBox.systemButtons;
+  for (i = 0; i < systemButtons.length; i++) {
+    btn = systemButtons[i];
+    if (btn.visible &&
+       (btn.systemType == scout.Button.SYSTEM_TYPE.CANCEL ||
+        btn.systemType == scout.Button.SYSTEM_TYPE.CLOSE)) {
+      closeable = true;
     }
   }
 
@@ -92,7 +87,7 @@ scout.Form.prototype._render = function($parent) {
 scout.Form.prototype._onResize = function() {
   // TODO AWE/CGU: dieses event müssten wir auch bekommen, wenn man den Divider zwischen
   // Tree und Working Area schiebt.
-  $.log('(Form#_onResize) window was resized -> layout Form container');
+  $.log.trace('(Form#_onResize) window was resized -> layout Form container');
   var htmlCont = scout.HtmlComponent.get(this.$container),
     htmlParent = htmlCont.getParent();
   htmlCont.setSize(htmlParent.getSize());
@@ -133,6 +128,6 @@ scout.Form.prototype.onModelAction = function(event) {
   if (event.type === 'formClosed') {
     this.destroy();
   } else {
-    $.log('Model event not handled. Widget: Form. Event: ' + event.type + '.');
+    $.log.warn('Model event not handled. Widget: Form. Event: ' + event.type + '.');
   }
 };

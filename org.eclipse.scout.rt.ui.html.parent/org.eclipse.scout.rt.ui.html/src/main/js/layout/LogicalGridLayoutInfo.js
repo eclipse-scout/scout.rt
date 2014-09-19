@@ -87,7 +87,7 @@ scout.LogicalGridLayoutInfo = function($components, cons, hgap, vgap) {
   this.height = [];
   this.weightX = [];
   this.weightY = [];
-  $.log('(LogicalGridLayoutInfo#CTOR) $components.length=' + $components.length + ' usedCols=' + this.cols + ' usedRows=' + this.rows);
+  $.log.trace('(LogicalGridLayoutInfo#CTOR) $components.length=' + $components.length + ' usedCols=' + this.cols + ' usedRows=' + this.rows);
   this._initializeInfo(hgap, vgap);
 };
 

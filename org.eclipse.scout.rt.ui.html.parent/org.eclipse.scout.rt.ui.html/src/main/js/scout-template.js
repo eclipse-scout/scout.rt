@@ -67,6 +67,7 @@
 //@include("form/fields/stringfield/StringField.js");
 //@include("form/fields/smartfield/SmartField.js");
 //@include("form/fields/groupbox/GroupBox.js");
+//@include("form/fields/groupbox/GroupBoxButtonBar.js");
 //@include("form/fields/sequencebox/SequenceBox.js");
 //@include("form/fields/tablefield/TableField.js");
 //@include("form/fields/treefield/TreeField.js");

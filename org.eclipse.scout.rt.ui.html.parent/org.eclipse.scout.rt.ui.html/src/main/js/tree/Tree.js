@@ -602,7 +602,7 @@ scout.Tree.prototype.onModelAction = function(event) {
   } else if (event.type == 'nodeExpanded') {
     this._onNodeExpanded(event.nodeId, event.expanded);
   } else {
-    $.log('Model event not handled. Widget: Tree. Event: ' + event.type + '.');
+    $.log.warn('Model event not handled. Widget: Tree. Event: ' + event.type + '.');
   }
 };
 

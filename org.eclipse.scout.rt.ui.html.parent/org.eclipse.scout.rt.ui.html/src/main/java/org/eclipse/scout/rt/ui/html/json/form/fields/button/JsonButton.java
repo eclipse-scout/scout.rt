@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.JsonProperty;
 public class JsonButton extends JsonFormField<IButton> {
 
   public final static String PROP_SYSTEM_TYPE = "systemType";
+  public final static String PROP_PROCESS_BUTTON = "processButton";
 
   public JsonButton(IButton model, IJsonSession jsonSession, String id) {
     super(model, jsonSession, id);
@@ -29,12 +30,16 @@ public class JsonButton extends JsonFormField<IButton> {
   @Override
   protected void initJsonProperties(IButton model) {
     super.initJsonProperties(model);
-
-    // TODO AWE: System-type von button mit ans UI schicken?
     putJsonProperty(new JsonProperty<IButton>(PROP_SYSTEM_TYPE, model) {
       @Override
       protected Integer modelValue() {
         return getModel().getSystemType();
+      }
+    });
+    putJsonProperty(new JsonProperty<IButton>(PROP_PROCESS_BUTTON, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isProcessButton();
       }
     });
   }

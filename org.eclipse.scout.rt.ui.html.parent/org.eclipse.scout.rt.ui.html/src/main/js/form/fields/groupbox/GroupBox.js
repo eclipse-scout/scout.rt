@@ -6,6 +6,12 @@ scout.GroupBox = function() {
   this.formFields = [];
   this._addAdapterProperties('formFields');
   this.$body;
+  this.$buttonBar;
+
+  this.controls = [];
+  this.systemButtons = [];
+  this.customButtons = [];
+  this.processButtons = [];
 };
 scout.inherits(scout.GroupBox, scout.CompositeField);
 
@@ -35,56 +41,46 @@ scout.GroupBox.prototype._render = function($parent) {
   var htmlBody = new scout.HtmlComponent(this.$body);
   htmlBody.setLayout(new scout.LogicalGridLayout(env.formColumnGap, env.formRowGap));
 
-  var i, field, fields = this.getControlFields();
-  for (i=0; i<fields.length; i++) {
-    fields[i].render(this.$body);
+  this._createFieldArraysByType();
+  for (var i=0; i<this.controls.length; i++) {
+    this.controls[i].render(this.$body);
+  }
+
+  if (this.processButtons.length > 0) {
+    var buttonBar = new scout.GroupBoxButtonBar(this.processButtons);
+    buttonBar.render(this.$container);
   }
 };
 
-/**
- * Returns all fields (including system buttons).
- */
-scout.GroupBox.prototype.getFormFields = function() {
-  return this.formFields;
-};
-
-/**
- * Returns all fields that are a system button.
- */
-scout.GroupBox.prototype.getSystemButtons = function() {
-  return this._getFields(true);
-};
-
-/**
- * Returns all fields that are _not_ a system button.
- */
-scout.GroupBox.prototype.getControlFields = function() {
-  return this._getFields(false);
+scout.GroupBox.prototype._createFieldArraysByType = function() {
+  var i, field;
+  for (i = 0; i < this.formFields.length; i++) {
+    field = this.formFields[i];
+    if (field instanceof scout.Button) {
+      if (field.processButton) {
+        this.processButtons.push(field);
+        if (field.systemType != scout.Button.SYSTEM_TYPE.NONE) {
+          this.systemButtons.push(field);
+        }
+        else {
+          this.customButtons.push(field);
+        }
+      }
+      else {
+        this.controls.push(field);
+      }
+    }
+    else {
+      this.controls.push(field);
+    }
+  }
 };
 
 /**
  * @override CompositeField.js
  */
 scout.GroupBox.prototype.getFields = function() {
-  return this.getControlFields();
-};
-
-/**
- * Returns all fields that are (not) a system button, depending on the given boolean value.
- */
-scout.GroupBox.prototype._getFields = function(systemButton) {
-  var i, fields = [];
-  for (i = 0; i < this.formFields.length; i++) {
-    if (systemButton == this._isSystemButton(this.formFields[i])) {
-      fields.push(this.formFields[i]);
-    }
-  }
-  return fields;
-};
-
-scout.GroupBox.prototype._isSystemButton = function(formField) {
-  return formField instanceof scout.Button &&
-    formField.systemType != scout.Button.SYSTEM_TYPE.NONE;
+  return this.controls;
 };
 
 scout.GroupBox.prototype._setBorderVisible = function(borderVisible) {

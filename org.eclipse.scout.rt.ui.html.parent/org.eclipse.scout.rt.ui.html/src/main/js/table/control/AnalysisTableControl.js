@@ -308,7 +308,7 @@ scout.AnalysisTableControl.prototype._renderContent = function($parent) {
 
       for (var o = 0; o < $oldBoxes.length; o++) {
         $oldB = $oldBoxes.eq(o);
-        $.log($oldB, $newB);
+        $.log.debug($oldB, $newB);
         if (($oldB.text() === $newB.text()) ||
           ($oldB.hasClass('criteria-attribute-container') && $newB.hasClass('criteria-attribute-container'))) {
           break;

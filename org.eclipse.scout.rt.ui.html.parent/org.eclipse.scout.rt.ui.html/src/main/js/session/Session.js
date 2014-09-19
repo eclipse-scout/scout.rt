@@ -194,7 +194,7 @@ scout.Session.prototype._processSuccessResponse = function(message) {
     this.processingEvents = false;
     var cacheSize = scout.countProperties(this._adapterDataCache);
     if (cacheSize > 0) {
-      $.log('size of _adapterDataCache after response has been processed: ' + cacheSize);
+      $.log.debug('size of _adapterDataCache after response has been processed: ' + cacheSize);
     }
   }
 
@@ -218,19 +218,18 @@ scout.Session.prototype._copyAdapterData = function(adapterData) {
     count++;
   }
   if (count > 0) {
-    $.log('Stored ' + count +  ' properties in adapterDataCache');
+    $.log.debug('Stored ' + count +  ' properties in adapterDataCache');
   }
 };
 
 /**
- *
  * @param textStatus timeout, abort, error or parseerror
  */
 scout.Session.prototype._processErrorResponse = function(request, jqXHR, textStatus, errorThrown) {
   this._requestsPendingCounter--;
 
   // FIXME AWE Remove when not needed anymore
-  $.log('ERROR: status=' + jqXHR.status + ', textStatus=' + textStatus + ', errorThrown=' + errorThrown);
+  $.log.error('errorResponse: status=' + jqXHR.status + ', textStatus=' + textStatus + ', errorThrown=' + errorThrown);
 
   //Status code = 0 -> no connection
   //Status code >= 12000 come from windows, see http://msdn.microsoft.com/en-us/library/aa383770%28VS.85%29.aspx. Not sure if it is necessary for IE >= 9.
@@ -309,7 +308,7 @@ scout.Session.prototype._processEvents = function(events) {
   // TODO AWE: convert plain JS event object in Event class
   for (var i = 0; i < events.length; i++) {
     var event = events[i];
-    $.log("Processing event '" + event.type + "' for adapter with ID " + event.id);
+    $.log.debug("Processing event '" + event.type + "' for adapter with ID " + event.id);
     var adapter = session.getOrCreateModelAdapter(event.id, this);
     if (!adapter) {
       throw 'No adapter registered for ID ' + event.id;

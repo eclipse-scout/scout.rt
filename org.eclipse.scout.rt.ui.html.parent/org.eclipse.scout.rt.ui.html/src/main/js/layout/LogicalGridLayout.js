@@ -23,7 +23,7 @@ scout.LogicalGridLayout.prototype.validateLayout = function($parent) {
     }
   }
   this.m_info = new scout.LogicalGridLayoutInfo(visibleComps, visibleCons, this.m_hgap, this.m_vgap);
-  $.log('(LogicalGridLayout#validateLayout) $parent=' + scout.HtmlComponent.get($parent).debug());
+  $.log.trace('(LogicalGridLayout#validateLayout) $parent=' + scout.HtmlComponent.get($parent).debug());
 };
 
 scout.LogicalGridLayout.prototype.layout = function($parent) {
@@ -31,7 +31,7 @@ scout.LogicalGridLayout.prototype.layout = function($parent) {
   var htmlParent = scout.HtmlComponent.get($parent),
     parentSize = htmlParent.getSize(),
     parentInsets = htmlParent.getInsets();
-  $.log('(LogicalGridLayout#layout) parent ' + htmlParent.debug() + ' size=' + parentSize + ' insets=' + parentInsets);
+  $.log.trace('(LogicalGridLayout#layout) parent ' + htmlParent.debug() + ' size=' + parentSize + ' insets=' + parentInsets);
   var cellBounds = this.m_info.layoutCellBounds(parentSize, parentInsets);
 
   // Set bounds of components
@@ -88,7 +88,7 @@ scout.LogicalGridLayout.prototype.layout = function($parent) {
         }
       }
     }
-    $.log('(LogicalGridLayout#layout) comp=' + htmlComp.debug() + ' bounds=' + r);
+    $.log.trace('(LogicalGridLayout#layout) comp=' + htmlComp.debug() + ' bounds=' + r);
     htmlComp.setBounds(r);
   }
 };

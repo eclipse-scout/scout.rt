@@ -72,6 +72,6 @@ scout.BreadCrumbNavigation.prototype.onModelAction = function(event) {
     this.$scrollContainer.empty();
     this._renderBreadCrumbs();
   } else {
-    $.log('Model event not handled. Widget: Form. Event: ' + event.type + '.');
+    $.log.warn('Model event not handled. Widget: Form. Event: ' + event.type + '.');
   }
 };

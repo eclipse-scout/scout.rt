@@ -27,3 +27,31 @@
 .group-box-body {
   position:relative;
 }
+
+.button-bar {
+  position:relative;
+  height:28px;
+}
+
+.button-bar > .process {
+  position:absolute;
+  top:0px;
+  left:0px;
+}
+
+.button-bar > .process > .form-field {
+  position:static;
+  display:inline-block;
+}
+
+.button-bar > .system {
+  position:absolute;
+  top:0px;
+  right:0px;
+}
+
+.button-bar > .system > .form-field {
+  position:static;
+  display:inline-block;
+}
+

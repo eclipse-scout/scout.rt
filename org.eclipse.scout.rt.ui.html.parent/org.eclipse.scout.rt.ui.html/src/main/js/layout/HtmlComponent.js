@@ -38,7 +38,7 @@ scout.HtmlComponent.prototype.layout = function() {
   if (this.layoutManager) {
     this.layoutManager.layout(this.$comp);
   } else {
-    $.log('WARN (HtmlComponent#layout) Called layout() but component ' + this.debug() + ' has no layout manager');
+    $.log.warn('(HtmlComponent#layout) Called layout() but component ' + this.debug() + ' has no layout manager');
     // throw 'Tried to layout component ' + this.debug() +' but component has no layout manager';
     // TODO AWE: (layout) entscheiden, ob wir dieses throw "scharf machen" wollen oder nicht
   }
@@ -59,11 +59,11 @@ scout.HtmlComponent.prototype.getPreferredSize = function() {
   var prefSize;
   if (this.layoutManager) {
     prefSize = this.layoutManager.preferredLayoutSize(this.$comp);
-    $.log('(HtmlComponent#getPreferredSize) ' + this.debug() + ' impl. preferredSize=' + prefSize);
+    $.log.trace('(HtmlComponent#getPreferredSize) ' + this.debug() + ' impl. preferredSize=' + prefSize);
   } else {
     // TODO AWE: (layout) hier koennten wir eigentlich einen fehler werfen, weil das nicht passieren sollte
     prefSize = scout.Dimension(this.$comp.width(), this.$comp.height());
-    $.log('(HtmlComponent#getPreferredSize) ' + this.debug() + ' size of HTML element=' + prefSize);
+    $.log.trace('(HtmlComponent#getPreferredSize) ' + this.debug() + ' size of HTML element=' + prefSize);
   }
   return prefSize;
 };
