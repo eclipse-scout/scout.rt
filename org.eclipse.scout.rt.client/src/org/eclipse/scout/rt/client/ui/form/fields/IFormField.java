@@ -72,6 +72,7 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId {
   String PROP_VISIBLE = "visible";
   String PROP_ENABLED = "enabled";
   String PROP_MANDATORY = "mandatory";
+  String PROP_VIEW_ORDER = "viewOrder";
   String PROP_ERROR_STATUS = "errorStatus";
   String PROP_TOOLTIP_TEXT = "tooltipText";
   String PROP_FOREGROUND_COLOR = "foregroundColor";
@@ -456,6 +457,19 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId {
   boolean isMandatory();
 
   void setMandatory(boolean b);
+
+  /**
+   * @return Returns the field's view order. It determines where this field is arranged in the view.
+   */
+  double getViewOrder();
+
+  /**
+   * Sets the field's view order used for ordering all fields in a group box. It is initialized with the fields's model
+   * order (given by @Order annotation).
+   * 
+   * @param order
+   */
+  void setViewOrder(double order);
 
   /**
    * @return null iff value is valid, non-null if the currently set value has
