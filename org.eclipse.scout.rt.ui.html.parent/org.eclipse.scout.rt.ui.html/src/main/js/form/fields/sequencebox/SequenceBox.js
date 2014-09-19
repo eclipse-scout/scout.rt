@@ -20,7 +20,16 @@ scout.SequenceBox.prototype._render = function($parent) {
 
   var field, i;
   for (i = 0; i < this.fields.length; i++) {
-    field = this.fields[i].render(this.$_sequenceBox);
+    field = this.fields[i];
+    field.render(this.$_sequenceBox);
+    this._modifyLabel(field);
+  }
+};
+
+// TODO AWE: (sequence-box) es braucht auch die sonderbehandlung vom status, siehe SwingScoutSequenceBox
+scout.SequenceBox.prototype._modifyLabel = function(field) {
+  if (field instanceof scout.CheckBoxField) {
+    field.$label.setVisible(false);
   }
 };
 
