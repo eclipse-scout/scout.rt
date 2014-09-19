@@ -7,6 +7,6 @@ scout.inherits(scout.CompositeField, scout.FormField);
  * Returns an array of child-fields.
  */
 scout.CompositeField.prototype.getFields = function() {
-  throw 'Not implemented';
+  throw new Error('Not implemented');
 };
 

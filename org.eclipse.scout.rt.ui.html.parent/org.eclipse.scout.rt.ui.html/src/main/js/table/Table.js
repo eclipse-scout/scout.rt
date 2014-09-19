@@ -1064,7 +1064,7 @@ scout.Table.prototype._setMultiSelect = function(multiSelect) {
 scout.Table.prototype._onRowOrderChanged = function(rowIds) {
   var newPos, rows, row;
   if (rowIds.length !== this.rows.length) {
-    throw "Row order changed event may not be processed because lengths of the arrays differ.";
+    throw new Error('Row order changed event may not be processed because lengths of the arrays differ.');
   }
 
   // update model
@@ -1103,7 +1103,7 @@ scout.Table.prototype._onColumnStructureChanged = function(columns) {
 scout.Table.prototype._onColumnOrderChanged = function(columnIds) {
   var i, column, columnId, currentPosition, oldColumnOrder;
   if (columnIds.length !== this.columns.length) {
-    throw "Column order changed event may not be processed because lengths of the arrays differ.";
+    throw new Error('Column order changed event may not be processed because lengths of the arrays differ.');
   }
 
   oldColumnOrder = this.columns.slice();
@@ -1113,7 +1113,7 @@ scout.Table.prototype._onColumnOrderChanged = function(columnIds) {
     column = this.getModelColumnById(columnId);
     currentPosition = this.columns.indexOf(column);
     if (currentPosition < 0) {
-      throw 'Column with id ' + columnId + 'not found.';
+      throw new Error('Column with id ' + columnId + 'not found.');
     }
 
     if (currentPosition !== i) {

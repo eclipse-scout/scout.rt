@@ -10,7 +10,6 @@ describe("GroupBox", function() {
           x: 0,
           y: 0
         },
-        gridColumnCount: 2,
         parent: {
           objectType: 'GroupBox'
         }

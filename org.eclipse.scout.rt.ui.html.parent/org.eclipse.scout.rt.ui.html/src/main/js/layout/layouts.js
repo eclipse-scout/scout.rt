@@ -190,8 +190,8 @@ scout.TextFieldLayout = function() {
 };
 scout.inherits(scout.TextFieldLayout, scout.AbstractLayout);
 
-scout.TextFieldLayout.prototype.preferredLayoutSize = function($parent) {
-   return scout.graphics.measureString($parent.val());
+scout.TextFieldLayout.prototype.preferredLayoutSize = function($container) {
+   return scout.graphics.measureString($container.val());
 };
 
 /**
@@ -202,16 +202,76 @@ scout.ButtonFieldLayout = function() {
 };
 scout.inherits(scout.ButtonFieldLayout, scout.AbstractLayout);
 
-scout.ButtonFieldLayout.prototype.layout = function($parent) {
+scout.ButtonFieldLayout.prototype.layout = function($container) {
   // button has no children - nothing to do here
 };
 
-// TODO AWE: (layout) use HtmlComponent#getInsets here
-scout.ButtonFieldLayout.prototype.preferredLayoutSize = function($parent) {
-  var $button = $parent.find('button');
+// TODO AWE: (layout) use HtmlComponent#getInsets here , children instead of find?
+scout.ButtonFieldLayout.prototype.preferredLayoutSize = function($container) {
+  var $button = $container.find('button');
   var hMargin = $button.outerWidth(true) - $button.width();
   var vMargin = $button.outerHeight(true) - $button.height();
   var textSize = scout.graphics.measureString($button.html());
   return new scout.Dimension(textSize.width + hMargin, textSize.height + vMargin);
+};
+
+/**
+ * Tab-box Layout.
+ */
+scout.TabBoxLayout = function() {
+  scout.TabBoxLayout.parent.call(this);
+};
+scout.inherits(scout.TabBoxLayout, scout.AbstractLayout);
+
+scout.TabBoxLayout.prototype.layout = function($container) {
+  // TODO AWE: (tab-box) impl. layout
+  var htmlCont = scout.HtmlComponent.get($container),
+    contSize = htmlCont.getSize();
+  scout.HtmlComponent.get($container.children('.tab-area')).setSize(new scout.Dimension(contSize.width, 30));
+  scout.HtmlComponent.get($container.children('.tab-content')).setSize(new scout.Dimension(contSize.width, 520));
+};
+
+scout.TabBoxLayout.prototype.preferredLayoutSize = function($container) {
+  return new scout.Dimension($container.width(), 550);
+  //TODO AWE: (tab-box) impl. prefSize
+  // size of tab-area
+  // ... calculate tab-runs = Die container breite nehmen, mit buttons
+  //     füllen, wenn die summe der buttons > breite ist, eine neue zeile
+  //     beginnen.
+  // size of content (find largest group-box)
+  // ... hier haben wir das problem, das die content-panes nicht visible
+  //     bzw. gar nicht im DOM sind. Trotzdem müssen wir irgendwie die
+  //     grösse der groupbox berechnen können
+};
+
+/**
+ * Null Layout.
+ */
+scout.NullLayout = function() {
+  scout.NullLayout.parent.call(this);
+};
+scout.inherits(scout.NullLayout, scout.AbstractLayout);
+
+scout.NullLayout.prototype.layout = function($container) {
+  // NOP
+};
+
+/**
+ * Single Layout. Expects the container to have exactly one child. Resizes the child so it has the same size as the container.
+ */
+scout.SingleLayout = function() {
+  scout.SingleLayout.parent.call(this);
+};
+scout.inherits(scout.SingleLayout, scout.AbstractLayout);
+
+scout.SingleLayout.prototype.preferredLayoutSize = function($container) {
+  var $singleChild = $container.children().first();
+  return scout.HtmlComponent.get($container).getPreferredSize();
+};
+
+scout.SingleLayout.prototype.layout = function($container) {
+  var $singleChild = $container.children().first(),
+    contSize = scout.HtmlComponent.get($container).getSize();
+  scout.HtmlComponent.get($singleChild).setSize(contSize);
 };
 

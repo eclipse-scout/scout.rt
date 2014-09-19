@@ -71,10 +71,10 @@ scout.Session.prototype.getOrCreateModelAdapter = function(id, parent) {
     return;
   }
   if (typeof id != 'string') {
-    throw 'typeof id must be string';
+    throw new Error('typeof id must be string');
   }
   if (!parent) {
-    throw 'parent needs to be set';
+    throw new Error('parent needs to be set');
   }
 
   var adapter = this.modelAdapterRegistry[id];
@@ -84,7 +84,7 @@ scout.Session.prototype.getOrCreateModelAdapter = function(id, parent) {
 
   var adapterData = this._getAdapterData(id);
   if (!adapterData) {
-    throw 'no adapterData found for id=' + id;
+    throw new Error('no adapterData found for id=' + id);
   }
   adapter = this.objectFactory.create(adapterData);
 
@@ -226,10 +226,8 @@ scout.Session.prototype._copyAdapterData = function(adapterData) {
  * @param textStatus timeout, abort, error or parseerror
  */
 scout.Session.prototype._processErrorResponse = function(request, jqXHR, textStatus, errorThrown) {
-  this._requestsPendingCounter--;
-
-  // FIXME AWE Remove when not needed anymore
   $.log.error('errorResponse: status=' + jqXHR.status + ', textStatus=' + textStatus + ', errorThrown=' + errorThrown);
+  this._requestsPendingCounter--;
 
   //Status code = 0 -> no connection
   //Status code >= 12000 come from windows, see http://msdn.microsoft.com/en-us/library/aa383770%28VS.85%29.aspx. Not sure if it is necessary for IE >= 9.
@@ -311,7 +309,7 @@ scout.Session.prototype._processEvents = function(events) {
     $.log.debug("Processing event '" + event.type + "' for adapter with ID " + event.id);
     var adapter = session.getOrCreateModelAdapter(event.id, this);
     if (!adapter) {
-      throw 'No adapter registered for ID ' + event.id;
+      throw new Error('No adapter registered for ID ' + event.id);
     }
 
     if (event.type === 'property') { // Special handling for 'property' type

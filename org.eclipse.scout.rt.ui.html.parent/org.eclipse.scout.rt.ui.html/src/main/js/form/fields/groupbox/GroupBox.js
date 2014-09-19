@@ -5,8 +5,8 @@ scout.GroupBox = function() {
   scout.GroupBox.parent.call(this);
   this.formFields = [];
   this._addAdapterProperties('formFields');
-  this.$body;
-  this.$buttonBar;
+  this._$body;
+  this._$groupBoxTitle;
 
   this.controls = [];
   this.systemButtons = [];
@@ -16,34 +16,30 @@ scout.GroupBox = function() {
 scout.inherits(scout.GroupBox, scout.CompositeField);
 
 scout.GroupBox.prototype._render = function($parent) {
-  var root = this.parent.objectType == 'Form';
-  var cssClass = root ? 'root-group-box' : 'group-box';
   this.$container = $parent.
-    appendDiv('', cssClass).
+    appendDiv('', this.mainBox ? 'root-group-box' : 'group-box').
     addClass('form-field').
     attr('id', 'GroupBox-' + this.id);
 
-  var htmlContainer = new scout.HtmlComponent(this.$container);
-  htmlContainer.setLayout(new scout.GroupBoxLayout());
-  if (!root) {
-    htmlContainer.layoutData = new scout.LogicalGridData(this);
+  var htmlCont = new scout.HtmlComponent(this.$container);
+  htmlCont.setLayout(new scout.GroupBoxLayout());
+  if (!this.mainBox) {
+    htmlCont.layoutData = new scout.LogicalGridData(this);
   }
 
-  if (this.label) {
-    this.$label = $('<span>').html(this.label);
-    this.$container.
-      appendDiv('', 'group-box-title').
-      append(this.$label);
-  }
+  this.$label = $('<span>').html(this.label);
+  this._$groupBoxTitle = this.$container.
+    appendDiv('', 'group-box-title').
+    append(this.$label);
 
-  this.$body = this.$container.appendDiv('', 'group-box-body');
+  this._$body = this.$container.appendDiv('', 'group-box-body');
   var env = scout.HtmlEnvironment;
-  var htmlBody = new scout.HtmlComponent(this.$body);
+  var htmlBody = new scout.HtmlComponent(this._$body);
   htmlBody.setLayout(new scout.LogicalGridLayout(env.formColumnGap, env.formRowGap));
 
   this._createFieldArraysByType();
   for (var i=0; i<this.controls.length; i++) {
-    this.controls[i].render(this.$body);
+    this.controls[i].render(this._$body);
   }
 
   if (this.processButtons.length > 0) {
@@ -83,6 +79,18 @@ scout.GroupBox.prototype.getFields = function() {
   return this.controls;
 };
 
-scout.GroupBox.prototype._setBorderVisible = function(borderVisible) {
+/**
+ * @override FormField.js
+ */
+scout.GroupBox.prototype._setBorderVisible = function(visible) {
   // NOP
 };
+
+/**
+ * @override FormField.js
+ */
+scout.GroupBox.prototype._setLabelVisible = function(visible) {
+  // TODO AWE: (concept) discuss with C.GU -> auf dem GUI server korrigieren oder im Browser UI?
+  this._$groupBoxTitle.setVisible(visible && this.label && !this.mainBox);
+};
+

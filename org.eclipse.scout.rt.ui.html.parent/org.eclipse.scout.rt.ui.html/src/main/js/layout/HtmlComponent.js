@@ -16,7 +16,7 @@ scout.HtmlComponent = function($comp) {
 scout.HtmlComponent.get = function($comp) {
   var htmlComp = this.optGet($comp);
   if (!htmlComp) {
-    throw 'data "htmlComponent" is undefined';
+    throw new Error('data "htmlComponent" is undefined');
   }
   return htmlComp;
 };

@@ -11,6 +11,7 @@
     <script src="res/scout-5.0.0.min.js"></script>
     <script>
       $(document).ready(function() {
+        log4javascript.getDefaultLogger().setLevel(log4javascript.Level.TRACE);
         scout.init();
       });
     </script>

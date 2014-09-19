@@ -233,7 +233,7 @@ scout.Tree.prototype._renderSelection = function($nodes) {
         this._expandAllParentNodes(node);
         $node = this._findNodeById(node.id);
         if ($node.length === 0) {
-          throw 'Stil no node found. ' + node;
+          throw new Error('Still no node found. node=' + node);
         }
       }
 
@@ -265,7 +265,7 @@ scout.Tree.prototype._expandAllParentNodes = function(node) {
     if (!parentNodes[i].expanded) {
       $parentNode = this._findNodeById(parentNodes[i].id);
       if ($parentNode.length === 0) {
-        throw "Illegal state, $parentNode should be displayed. Rendered: " + this.rendered + ", parentNode: " + parentNodes[i];
+        throw new Error('Illegal state, $parentNode should be displayed. Rendered: ' + this.rendered + ', parentNode: ' + parentNodes[i]);
       }
       this.setNodeExpanded(parentNodes[i], $parentNode, true);
     }

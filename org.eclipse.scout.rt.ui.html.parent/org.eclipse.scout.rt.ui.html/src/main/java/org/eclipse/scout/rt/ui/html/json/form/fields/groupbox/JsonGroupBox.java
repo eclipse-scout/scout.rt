@@ -22,10 +22,15 @@ import org.json.JSONObject;
 // TODO AWE: JsonCompositeField für group / seq. / etc.
 public class JsonGroupBox extends JsonFormField<IGroupBox> {
 
-  public static final String PROP_GRID_COLUMN_COUNT = "gridColumnCount";
+  public static final String PROP_MAIN_BOX = "mainBox";
 
   public JsonGroupBox(IGroupBox model, IJsonSession session, String id) {
     super(model, session, id);
+  }
+
+  @Override
+  public String getObjectType() {
+    return "GroupBox";
   }
 
   @Override
@@ -44,17 +49,12 @@ public class JsonGroupBox extends JsonFormField<IGroupBox> {
         return getModel().isBorderVisible();
       }
     });
-    putJsonProperty(new JsonProperty<IGroupBox>(PROP_GRID_COLUMN_COUNT, model) {
+    putJsonProperty(new JsonProperty<IGroupBox>(PROP_MAIN_BOX, model) {
       @Override
-      protected Integer modelValue() {
-        return getModel().getGridColumnCount();
+      protected Boolean modelValue() {
+        return getModel().isMainBox();
       }
     });
-  }
-
-  @Override
-  public String getObjectType() {
-    return "GroupBox";
   }
 
   @Override
