@@ -8,17 +8,17 @@ import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.util.LinkedList;
-import java.util.List;
+import java.lang.reflect.Field;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.IOUtility;
-import org.eclipse.scout.commons.RunnableWithException;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.browserfield.IBrowserField;
@@ -35,36 +35,25 @@ import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.LocationAdapter;
 import org.eclipse.swt.browser.LocationEvent;
+import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
+/**
+ * Browser-Field to display the native browser in a {@link Canvas} by using the SWT-AWT-Bridge.
+ */
 public class SwingScoutBrowserField extends SwingScoutValueFieldComposite<IBrowserField> implements ISwingScoutBrowserField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingScoutBrowserField.class);
-
-  private static Display swtDisplay;
-
-  static {
-    StaticDisplayDispatcher disp = new StaticDisplayDispatcher();
-    disp.start();
-    swtDisplay = disp.getDisplay();
-  }
 
   private Shell m_swtShell;
   private Browser m_swtBrowser;
   private File m_tempDir;
-  private String m_currentLocation;
-  //
-  private final List<RunnableWithException<?>> m_swtCommandQueue;
-  private final Object m_swtCommandQueueLock;
+
   private P_CanvasEx m_canvas;
   private P_HierarchyListener m_hierarchyListener;
-  private P_MouseEventListener m_mouseEventListener = null;
-
-  public SwingScoutBrowserField() {
-    m_swtCommandQueueLock = new Object();
-    m_swtCommandQueue = new LinkedList<RunnableWithException<?>>();
-  }
+  private P_MouseEventListener m_mouseEventListener;
+  private SwtThread m_swtThread;
 
   @Override
   protected void initializeSwing() {
@@ -103,18 +92,20 @@ public class SwingScoutBrowserField extends SwingScoutValueFieldComposite<IBrows
   @Override
   protected void attachScout() {
     super.attachScout();
-    if (m_hierarchyListener == null) {
-      m_hierarchyListener = new P_HierarchyListener();
-      m_canvas.addHierarchyListener(m_hierarchyListener);
-    }
+
+    // Create the SWT-Thread to interact with the browser widget.
+    m_swtThread = new SwtThread();
+    m_swtThread.start();
+
+    // Defer the creation of the AWT-SWT-bridge until connected to the native screen resource. Otherwise, the OLE component cannot be initialized correctly.
+    m_hierarchyListener = new P_HierarchyListener();
+    m_canvas.addHierarchyListener(m_hierarchyListener);
   }
 
   @Override
   protected void detachScout() {
-    if (m_hierarchyListener != null) {
-      m_canvas.removeHierarchyListener(m_hierarchyListener);
-      m_hierarchyListener = null;
-    }
+    m_canvas.removeHierarchyListener(m_hierarchyListener);
+
     if (m_tempDir != null) {
       IOUtility.deleteDirectory(m_tempDir);
       m_tempDir = null;
@@ -122,53 +113,76 @@ public class SwingScoutBrowserField extends SwingScoutValueFieldComposite<IBrows
     super.detachScout();
   }
 
+  /**
+   * @return <code>true</code> if the browser widget is created.
+   */
   private boolean isSwtAttached() {
     return m_swtBrowser != null;
   }
 
+  /**
+   * Creates the SWT-AWT bridge to display the native browser in a {@link Canvas}. This call blocks until the widget is
+   * created. This call has no effect if already attached to SWT.
+   */
   private void attachSwtSafe() {
     if (isSwtAttached()) {
       return;
     }
+
     PopupFactoryEx.activate();
-    try {
-      // must be executed synchronously
-      swtDisplay.syncExec(new Runnable() {
-        @Override
-        public void run() {
-          try {
-            m_swtShell = SWT_AWT.new_Shell(Display.getDefault(), m_canvas);
-            m_swtBrowser = new Browser(m_swtShell, SWT.NONE);
-            m_swtShell.setLayout(new FillLayout());
-            runSwtCommandsInsideSwtThread();
-            //add link listener
-            m_swtBrowser.addLocationListener(new LocationAdapter() {
-              @Override
-              public void changing(LocationEvent event) {
-                event.doit = fireBeforeLocationChangedFromSwt(event.location);
-              }
 
-              @Override
-              public void changed(LocationEvent event) {
-                fireAfterLocationChangedFromSwt(event.location);
-              }
-            });
+    final Display display = m_swtThread.getDisplay();
+    display.syncExec(new Runnable() {
+      @Override
+      public void run() {
+        try {
+          m_swtShell = SWT_AWT.new_Shell(display, m_canvas);
+          m_swtShell.setLayout(new FillLayout());
 
-            installMouseListener();
+          m_swtBrowser = new Browser(m_swtShell, SWT.NONE);
+
+          // Install Link and mouse listener.
+          m_swtBrowser.addLocationListener(new LocationAdapter() {
+            @Override
+            public void changing(LocationEvent event) {
+              event.doit = fireBeforeLocationChangedFromSwt(event.location);
+            }
+
+            @Override
+            public void changed(LocationEvent event) {
+              fireAfterLocationChangedFromSwt(event.location);
+            }
+          });
+          installMouseListener();
+
+          // Initialize the browser with the Scout model properties.
+          IBrowserField scoutField = getScoutObject();
+
+          // Determine the URL to be displayed. If an URL-location is set, the URL wins over the field's value.
+          String url = null;
+          if (scoutField.getLocation() != null) {
+            url = scoutField.getLocation();
           }
-          catch (Exception e) {
-            LOG.error("Unexpected error occured while attaching Microsoft Word. All resources safely disposed.", e);
-            detachSwtSafe();
+          else if (scoutField.getValue() != null) {
+            url = toRemoteFileUrl(scoutField.getValue());
           }
-          finally {
-            getSwingContainer().revalidate();
+
+          if (url != null && !url.isEmpty()) {
+            getSwtBrowser().setUrl(url);
+          }
+          else {
+            getSwtBrowser().setText("");
           }
         }
-      });
-    }
-    catch (Exception e) {
-      LOG.error("Error occured while attaching SWT.", e);
-    }
+        catch (RuntimeException e) {
+          LOG.error("Failed to connect to SWT. All resources safely disposed.", e);
+          detachSwtSafe();
+        }
+        finally {
+          getSwingContainer().revalidate();
+        }
+      }
+    });
   }
 
   private void detachSwtSafe() {
@@ -177,23 +191,14 @@ public class SwingScoutBrowserField extends SwingScoutValueFieldComposite<IBrows
     }
     PopupFactoryEx.deactivate();
     try {
-      // must be executed synchronously
-      swtDisplay.syncExec(new Runnable() {
-        @Override
-        public void run() {
-          runSwtCommandsInsideSwtThread();
-          synchronized (m_swtCommandQueueLock) {
-            m_swtCommandQueue.clear();
-          }
-          DisposeUtil.disposeSafe(m_swtBrowser);
-          m_swtBrowser = null;
-          DisposeUtil.closeAndDisposeSafe(m_swtShell);
-          m_swtShell = null;
-        }
-      });
+      // Terminate the SWT UI-Thread and dispose allocated SWT resources.
+      // Do not dispose the Shell and Browser in advance because of IE11 Patch KB2977629. Otherwise, the JVM might crash because of pending browser-events (Bugzilla 444427).
+      m_swtThread.dispose();
+      m_swtBrowser = null;
+      m_swtShell = null;
     }
-    catch (Throwable t) {
-      LOG.error("Error occured while detaching SWT.", t);
+    catch (RuntimeException e) {
+      LOG.error("Failed to disconnect from SWT.", e);
     }
     finally {
       removeMouseListener();
@@ -205,45 +210,10 @@ public class SwingScoutBrowserField extends SwingScoutValueFieldComposite<IBrows
    * The listener is only removed if it was installed before.
    */
   private void removeMouseListener() {
-    // now remove the event listener
     if (m_mouseEventListener != null) {
       Toolkit.getDefaultToolkit().removeAWTEventListener(m_mouseEventListener);
       m_mouseEventListener.setSwtShell(null);
       m_mouseEventListener = null;
-    }
-  }
-
-  private void swtAsyncExec(final RunnableWithException<?> command) {
-    synchronized (m_swtCommandQueueLock) {
-      m_swtCommandQueue.add(command);
-    }
-    swtDisplay.asyncExec(new Runnable() {
-      @Override
-      public void run() {
-        runSwtCommandsInsideSwtThread();
-      }
-    });
-  }
-
-  /**
-   * commands are only be executed if COM and scout are attached
-   */
-  private void runSwtCommandsInsideSwtThread() {
-    if (isSwtAttached() && getScoutObject() != null) {
-      while (true) {
-        synchronized (m_swtCommandQueueLock) {
-          if (m_swtCommandQueue.isEmpty()) {
-            break;
-          }
-          RunnableWithException r = m_swtCommandQueue.remove(0);
-          try {
-            r.run();
-          }
-          catch (Throwable e) {
-            LOG.error("running command in COM", e);
-          }
-        }
-      }
     }
   }
 
@@ -255,63 +225,82 @@ public class SwingScoutBrowserField extends SwingScoutValueFieldComposite<IBrows
     }
   }
 
-  @Override
-  protected void setValueFromScout(Object o) {
-    setLocationFromScout();
+  protected void setLocationFromScout() {
+    setLocationInternal(getScoutObject().getLocation());
   }
 
-  protected void setLocationFromScout() {
-    String location = getScoutObject().getLocation();
-    RemoteFile r = getScoutObject().getValue();
-    if (location == null && r != null && r.exists()) {
-      try {
-        if (m_tempDir == null) {
-          try {
-            m_tempDir = IOUtility.createTempDirectory("html");
-          }
-          catch (ProcessingException e) {
-            LOG.error("create temporary folder", e);
-          }
+  @Override
+  protected void setValueFromScout(Object value) {
+    setLocationInternal(toRemoteFileUrl(getScoutObject().getValue()));
+  }
+
+  /**
+   * Provides an URL for the given {@link RemoteFile} to be displayed in the browser. If the file represents an archive,
+   * the archive content is looked for an HTML file of the same name (e.g. archive=test.zip, html=test.html).
+   * 
+   * @param remoteFile
+   *          {@link RemoteFile}.
+   * @return the URL or <code>null</code> if not applicable.
+   */
+  protected String toRemoteFileUrl(RemoteFile remoteFile) {
+    if (remoteFile == null || !remoteFile.exists()) {
+      return null;
+    }
+
+    try {
+      if (m_tempDir == null) {
+        try {
+          m_tempDir = IOUtility.createTempDirectory("html");
         }
-        if (r.getName().matches(".*\\.(zip|jar)")) {
-          r.writeZipContentToDirectory(m_tempDir);
-          String simpleName = r.getName().replaceAll("\\.(zip|jar)", ".htm");
-          for (File f : m_tempDir.listFiles()) {
-            if (f.getName().startsWith(simpleName)) {
-              location = f.toURI().toURL().toExternalForm();
-              break;
-            }
-          }
-        }
-        else {
-          File f = new File(m_tempDir, r.getName());
-          r.writeData(f);
-          location = f.toURI().toURL().toExternalForm();
+        catch (ProcessingException e) {
+          LOG.error("Failed to create temporary folder for the content to be displayed in the browser.", e);
+          return null;
         }
       }
-      catch (Throwable t) {
-        LOG.error("preparing html content for " + r, t);
+
+      if (remoteFile.getName().matches(".*\\.(zip|jar)")) {
+        remoteFile.writeZipContentToDirectory(m_tempDir);
+        String simpleName = remoteFile.getName().replaceAll("\\.(zip|jar)", ".htm");
+        for (File f : m_tempDir.listFiles()) {
+          if (f.getName().startsWith(simpleName)) {
+            return f.toURI().toURL().toExternalForm();
+          }
+        }
+        return null;
+      }
+      else {
+        File f = new File(m_tempDir, remoteFile.getName());
+        remoteFile.writeData(f);
+        return f.toURI().toURL().toExternalForm();
       }
     }
-    m_currentLocation = location;
-    //post the document to swt
-    swtAsyncExec(new RunnableWithException<Object>() {
+    catch (Exception e) {
+      LOG.error(String.format("Failed to prepare HTML content to be displayed in the browser [remoteFile=%s]", remoteFile), e);
+      return null;
+    }
+  }
+
+  protected void setLocationInternal(final String location) {
+    if (!isSwtAttached()) {
+      return;
+    }
+
+    m_swtThread.getDisplay().asyncExec(new Runnable() {
       @Override
-      public Object run() throws Throwable {
-        if (m_currentLocation != null) {
-          getSwtBrowser().setUrl(m_currentLocation);
+      public void run() {
+        if (location != null && !location.isEmpty()) {
+          getSwtBrowser().setUrl(location);
         }
         else {
           getSwtBrowser().setText("");
         }
-        return null;
       }
     });
   }
 
   protected boolean fireBeforeLocationChangedFromSwt(final String location) {
-    final AtomicReference<Boolean> accept = new AtomicReference<Boolean>();
-    ClientSyncJob job = new ClientSyncJob("fireBeforeLocationChangedFromSwt", getSwingEnvironment().getScoutSession()) {
+    final AtomicReference<Boolean> accept = new AtomicReference<Boolean>(false);
+    ClientJob job = new ClientSyncJob("fireBeforeLocationChangedFromSwt", getSwingEnvironment().getScoutSession()) {
       @Override
       protected void runVoid(IProgressMonitor monitor) {
         accept.set(getScoutObject().getUIFacade().fireBeforeLocationChangedFromUI(location));
@@ -319,12 +308,13 @@ public class SwingScoutBrowserField extends SwingScoutValueFieldComposite<IBrows
     };
     job.schedule();
     try {
-      job.join(10000L);
+      job.join(TimeUnit.SECONDS.toMillis(10));
+      return accept.get().booleanValue();
     }
     catch (InterruptedException e) {
-      // nop
+      LOG.warn("Failed to wait for the Scout model to accept a location change.", e);
+      return false;
     }
-    return accept.get() != null ? accept.get().booleanValue() : false;
   }
 
   protected void fireAfterLocationChangedFromSwt(final String location) {
@@ -337,6 +327,10 @@ public class SwingScoutBrowserField extends SwingScoutValueFieldComposite<IBrows
     job.schedule();
   }
 
+  /**
+   * @return the SWT browser widget or <code>null</code> if not attached to SWT yet.
+   * @see #isSwtAttached()
+   */
   protected Browser getSwtBrowser() {
     return m_swtBrowser;
   }
@@ -349,9 +343,6 @@ public class SwingScoutBrowserField extends SwingScoutValueFieldComposite<IBrows
         if (e.getChanged().isDisplayable()) {
           attachSwtSafe();
         }
-        else {
-          detachSwtSafe();
-        }
       }
     }
   }
@@ -363,41 +354,101 @@ public class SwingScoutBrowserField extends SwingScoutValueFieldComposite<IBrows
     @Override
     public void removeNotify() {
       // SWT control must be disposed prior to destroying SWING components.
-      // Otherwise, disposal for OLE component does not work properly (e.g. WINWORD process is not terminated)
+      // Otherwise, disposal for OLE component does not work properly (e.g. browser process is not terminated)
       detachSwtSafe();
       super.removeNotify();
     }
   }
 
-  private static class StaticDisplayDispatcher extends Thread {
+  /**
+   * SWT UI-Thread to interact with the browser widget.
+   */
+  private static class SwtThread extends Thread {
     private Display m_display;
+    private final Object m_displayLock = new Object();
 
-    public StaticDisplayDispatcher() {
-      super("SWT HTML Display Dispatcher");
-      setDaemon(true);
+    private static final long DISPLAY_WAIT_TIMEOUT = 15;
+
+    public SwtThread() {
+      super("SWT Browser Thread");
     }
 
     @Override
     public void run() {
-      m_display = Display.getDefault();
-      if (m_display.getThread() == Thread.currentThread()) {
+      // Create a dedicated Display for this UI-Thread (Bugzilla 389786). That is why Display#getDefault cannot be used.
+      synchronized (Device.class) { // synchronization to ensure exclusive Display access (see Display#getDefault).
+        m_display = new Display();
+
+        // Prevent this Display from being registered as Default-Display (see Display#create(DeviceData). Otherwise, that Display would be used by other widgets as well.
+        if (m_display == Display.getDefault()) {
+          try {
+            Field f_default = Display.class.getDeclaredField("Default");
+            f_default.setAccessible(true);
+            f_default.set(null, null);
+          }
+          catch (Exception e) {
+            LOG.error(String.format("Failed to unregister the Display to not be the global Display [display=%s]", m_display), e);
+          }
+        }
+      }
+
+      // Notify waiting callers to access the Display.
+      synchronized (m_displayLock) {
+        m_displayLock.notifyAll();
+      }
+
+      try {
+        // The SWT-Thread is running as long the display is not disposed.
         while (!m_display.isDisposed()) {
           if (!m_display.readAndDispatch()) {
             m_display.sleep();
           }
         }
+        m_display = null;
+      }
+      catch (RuntimeException e) {
+        LOG.error("Failed to dispatch work to the SWT UI-Thread.", e);
       }
     }
 
+    /**
+     * Terminates the SWT UI-Thread and disposes allocated SWT resources.
+     */
+    public void dispose() {
+      m_display.syncExec(new Runnable() {
+
+        @Override
+        public void run() {
+          m_display.dispose(); // By disposing the Display, the UI-Thread stops the event dispatching and terminates himself.
+        }
+      });
+    }
+
+    /**
+     * @return The {@link Display} of the SWT UI-Thread. If not available yet, the caller is blocked for maximal 15
+     *         seconds until the SWT-Thread created its {@link Display}; is never <code>null</code>.
+     * @throws IllegalStateException
+     *           if the {@link Display} could not be acquired within 15 seconds.
+     */
     Display getDisplay() {
-      while (m_display == null) {
+      final long threshold = System.nanoTime() + TimeUnit.SECONDS.toNanos(DISPLAY_WAIT_TIMEOUT);
+      while (m_display == null && System.nanoTime() < threshold) {
         try {
-          Thread.sleep(100L);
+          synchronized (m_displayLock) {
+            if (m_display == null) {
+              m_displayLock.wait(TimeUnit.SECONDS.toMillis(DISPLAY_WAIT_TIMEOUT));
+            }
+          }
         }
         catch (InterruptedException e) {
-          //nop
+          throw new RuntimeException("Interrupted while waiting for the Display to be created.", e);
         }
       }
+
+      if (m_display == null) {
+        throw new IllegalStateException("SWT Display could not be acquired.");
+      }
+
       return m_display;
     }
   }
@@ -423,7 +474,7 @@ public class SwingScoutBrowserField extends SwingScoutValueFieldComposite<IBrows
     public void eventDispatched(AWTEvent e) {
       if (e.getID() == MouseEvent.MOUSE_CLICKED) {
         if (m_swtShell != null) {
-          swtDisplay.syncExec(new Runnable() {
+          m_swtThread.getDisplay().syncExec(new Runnable() {
             @Override
             public void run() {
               if (m_swtShell.getEnabled()) {
@@ -436,5 +487,4 @@ public class SwingScoutBrowserField extends SwingScoutValueFieldComposite<IBrows
       }
     }
   }
-
 }
