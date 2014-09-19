@@ -93,50 +93,86 @@ public class KeyStrokeNormalizer {
     if (StringUtility.hasText(keyStroke)) {
       keyStroke = keyStroke.toLowerCase();
       List<String> components = getComponents(keyStroke);
-      if (components.size() > 1 && keyStroke.endsWith("-") && !CollectionUtility.lastElement(components).equals("-")) {
-        setInvalid();
-        return;
-      }
 
-      Iterator<String> iter = components.iterator();
-      while (iter.hasNext()) {
-        String currentComponent = iter.next();
-        if ("shift".equalsIgnoreCase(currentComponent)) {
-          m_shift = true;
-        }
-        else if ("control".equalsIgnoreCase(currentComponent)) {
-          m_ctrl = true;
-        }
-        else if ("ctrl".equalsIgnoreCase(currentComponent)) {
-          m_ctrl = true;
-        }
-        else if ("strg".equalsIgnoreCase(currentComponent)) {
-          m_ctrl = true;
-        }
-        else if ("alt".equalsIgnoreCase(currentComponent)) {
-          m_alt = true;
-        }
-        else if ("alternate".equalsIgnoreCase(currentComponent)) {
-          m_alt = true;
-        }
-        else {
-          if (!iter.hasNext()) {
-            m_key = currentComponent;
-          }
-          else {
-            setInvalid();
-            return;
-          }
-        }
-      }
-      if (m_key != null) {
-        m_normalizedKeyStroke = (m_shift ? "shift-" : "") + (m_ctrl ? "control-" : "") + (m_alt ? "alternate-" : "") + m_key;
-      }
-      else {
+      performSanityChecks(keyStroke, components);
+      parseModifiers(components);
+      parseKey(components);
+
+      if (!m_isValid) {
         setInvalid();
-        return;
       }
     }
+  }
+
+  /**
+   * Parses the key of the list of components. The key is the last element of the components but can't be a modifier.
+   */
+  private void parseKey(List<String> components) {
+    String key = CollectionUtility.lastElement(components);
+    if (isModifier(key)) {
+      m_isValid = false;
+    }
+    else {
+      m_key = key;
+      m_normalizedKeyStroke = (m_shift ? "shift-" : "") + (m_ctrl ? "control-" : "") + (m_alt ? "alternate-" : "") + m_key;
+    }
+  }
+
+  /**
+   * Parses the modifiers of the list of components. Note, the last element of the components can't be a modifier
+   */
+  private void parseModifiers(List<String> components) {
+    Iterator<String> iter = components.iterator();
+    while (iter.hasNext()) {
+      String currentComponent = iter.next();
+      if (isLastElement(iter)) {
+        continue; //last element can't be a modifier
+      }
+      if (hasAltModifier(currentComponent)) {
+        m_alt = true;
+      }
+      else if (hasCtrlModifier(currentComponent)) {
+        m_ctrl = true;
+      }
+      else if (hasShiftModifier(currentComponent)) {
+        m_shift = true;
+      }
+      else {
+        m_isValid = false;
+      }
+    }
+  }
+
+  private boolean isLastElement(Iterator<String> iter) {
+    return !iter.hasNext();
+  }
+
+  /**
+   * Performs a set of sanity checks to make sure the keystroke is valid.
+   */
+  private void performSanityChecks(String keystroke, List<String> components) {
+    if (components.size() > 1 && keystroke.endsWith("-") && !"-".equals(CollectionUtility.lastElement(components))) {
+      m_isValid = false;
+    }
+  }
+
+  /**
+   * Returns <code>true</code> if given String is a modifier (alt, shift, ctrl), <code>fals</code> otherwise
+   */
+  private boolean isModifier(String component) {
+    return hasAltModifier(component) || hasShiftModifier(component) || hasCtrlModifier(component);
+  }
+
+  private boolean hasAltModifier(String component) {
+    return "alt".equalsIgnoreCase(component) || "alternate".equalsIgnoreCase(component);
+  }
+
+  private boolean hasCtrlModifier(String component) {
+    return "control".equalsIgnoreCase(component) || "ctrl".equalsIgnoreCase(component) || "strg".equalsIgnoreCase(component);
+  }
+
+  private boolean hasShiftModifier(String component) {
+    return "shift".equalsIgnoreCase(component);
   }
 
   private List<String> getComponents(String keyStroke) {
@@ -146,6 +182,7 @@ public class KeyStrokeNormalizer {
 
   private void setInvalid() {
     m_normalizedKeyStroke = null;
+    m_key = null;
     m_alt = false;
     m_shift = false;
     m_ctrl = false;
