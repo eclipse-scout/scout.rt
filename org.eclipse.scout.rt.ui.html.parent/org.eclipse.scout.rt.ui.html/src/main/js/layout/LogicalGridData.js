@@ -3,7 +3,7 @@
  * Merged with the base class LogicalGridData (for the default values). We don't need the base
  * class standalone, since we only used LGL for the group-box body in Html UI.
  */
-scout.LogicalGridData = function(vararg) { // FIXME AWE: discuss with C.GU --> overloaded ctor
+scout.LogicalGridData = function(vararg) {
   this.gridx = 0;
   this.gridy = 0;
   this.gridw = 1;

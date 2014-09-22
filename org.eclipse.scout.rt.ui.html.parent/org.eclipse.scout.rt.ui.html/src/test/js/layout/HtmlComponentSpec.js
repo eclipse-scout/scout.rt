@@ -1,5 +1,75 @@
 describe("HtmlComponent", function() {
 
+  var jqueryMock = {
+    data:function(htmlComp) {
+    }
+  };
+
+  var addWidthHeightMock = function(jqueryMock) {
+    jqueryMock.width = function() {
+      return 6;
+    };
+    jqueryMock.height = function() {
+      return 7;
+    };
+  };
+
+  describe("Ctor", function() {
+
+    it("sets data 'htmlComponent' when Ctor is called", function() {
+      spyOn(jqueryMock, 'data');
+      var htmlComp = new scout.HtmlComponent(jqueryMock);
+      expect(jqueryMock.data).toHaveBeenCalledWith('htmlComponent', htmlComp);
+    });
+
+  });
+
+  describe("getSize", function() {
+
+    addWidthHeightMock(jqueryMock);
+
+    it("returns width() and height() of JQuery comp", function() {
+      var htmlComp = new scout.HtmlComponent(jqueryMock);
+      var size = htmlComp.getSize();
+      expect(size.width).toBe(6);
+      expect(size.height).toBe(7);
+    });
+  });
+
+  describe("setSize", function() {
+
+    // return size(6, 7)
+    addWidthHeightMock(jqueryMock);
+
+    jqueryMock.css = function(key, value) {
+      return jqueryMock;
+    };
+
+    var htmlComp = new scout.HtmlComponent(jqueryMock);
+
+    htmlComp.layoutManager = {
+      invalidate:function() {},
+      layout:function() {}
+    };
+
+    it("accepts scout.Dimension as single argument", function() {
+      spyOn(jqueryMock, 'css').and.callThrough();
+      htmlComp.setSize(new scout.Dimension(6, 7));
+      var size = htmlComp.getSize();
+      expect(size.width).toBe(6);
+      expect(size.height).toBe(7);
+      expect(jqueryMock.css).toHaveBeenCalledWith('width', '6px');
+      expect(jqueryMock.css).toHaveBeenCalledWith('height', '7px');
+    });
+
+    it("calls invalidate on layout-manager when size has changed", function() {
+      spyOn(htmlComp.layoutManager, 'invalidate');
+      htmlComp.setSize(new scout.Dimension(1, 2));
+      expect(htmlComp.layoutManager.invalidate).toHaveBeenCalled();
+    });
+
+  });
+
   describe("getInsets", function() {
 
     it("reads padding, margin and border correctly", function() {

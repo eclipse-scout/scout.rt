@@ -126,6 +126,7 @@ scout.GroupBoxLayout.prototype._getHtmlBody = function($container) {
  */
 scout.FormFieldLayout = function() {
   scout.FormFieldLayout.parent.call(this);
+  this.labelWidth = scout.HtmlEnvironment.fieldLabelWidth;
 };
 scout.inherits(scout.FormFieldLayout, scout.AbstractLayout);
 
@@ -135,18 +136,16 @@ scout.FormFieldLayout.prototype.layout = function($container) {
   var widthDiff = 0;
   var $label = $container.children('label');
   if ($label.isVisible()) {
-    $label.css('width', '130px');
-    widthDiff += 130; // TODO AWE: (layout) dafür gibt es sicher einen value auf dem swing-env.
+    $label.width(this.labelWidth);
+    widthDiff += this.labelWidth;
   }
   var $status = $container.children('.status');
   if ($status.isVisible()) {
-    $status.css('width', '10px');
+    $status.width(10);
     widthDiff += 10;
   }
   var $field = $container.children('.field');
-  // TODO AWE: (layout) können wir hier nicht einfach setSize verwenden?
-  $field.css('width', (containerSize.width - widthDiff) + 'px');
-  $field.css('height', containerSize.height + 'px');
+  $field.width(containerSize.width - widthDiff).height(containerSize.height);
   // TODO AWE: (layout) dafür sorgen, dass wir hier immer ein get() machen können
   var htmlField = scout.HtmlComponent.optGet($field);
   if (htmlField) {
@@ -161,7 +160,7 @@ scout.FormFieldLayout.prototype.preferredLayoutSize = function($container) {
     $status = $container.children('.status'),
     $field = $container.children('.field');
   if ($label.isVisible()) {
-    width += 130;
+    width += this.labelWidth;
   }
   if ($status.isVisible()) {
     width += 10;

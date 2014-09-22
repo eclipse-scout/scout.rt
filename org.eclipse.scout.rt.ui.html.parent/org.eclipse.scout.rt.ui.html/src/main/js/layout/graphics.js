@@ -21,10 +21,17 @@ scout.Point.prototype.equals = function(o) {
 
 /**
  * JavaScript port from java.awt.Dimension.
+ * @param vararg width (number) or otherDimension (scout.Dimension)
+ * @param height number or undefined (when vararg is scout.Dimension)
  */
-scout.Dimension = function(width, height) {
-  this.width = width || 0;
-  this.height = height || 0;
+scout.Dimension = function(vararg, height) {
+  if (vararg instanceof scout.Dimension) {
+    this.width = vararg.width;
+    this.height = vararg.height;
+  } else {
+    this.width = vararg || 0;
+    this.height = height || 0;
+  }
 };
 
 scout.Dimension.prototype.toString = function() {
@@ -152,7 +159,8 @@ scout.HtmlEnvironment = {
   'formRowHeight': 23,
   'formRowGap': 6,
   'formColumnWidth': 360,
-  'formColumnGap': 12
+  'formColumnGap': 12,
+  'fieldLabelWidth': 130
 };
 
 scout.graphics = {

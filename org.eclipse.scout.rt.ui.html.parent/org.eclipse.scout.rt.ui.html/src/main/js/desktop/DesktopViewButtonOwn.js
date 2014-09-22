@@ -40,7 +40,7 @@ scout.DesktopViewButtonOwn.prototype.onModelPropertyChange = function(event) {
       this._$viewButton.selectOne();
     }
   }
-  // FIXME BSH Do we need a "super" call? Check with CGU/AWE
+  // FIXME BSH Do we need a "super" call? Check with C.GU/A.WE
   //scout.DesktopViewButtonOwn.parent.prototype.onModelPropertyChange.call(this, event);
 };
 

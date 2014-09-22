@@ -8,57 +8,61 @@ https://google-styleguide.googlecode.com/svn/trunk/javascriptguide.xml
 
 ### Variablen
 
-- Variablen wenn moeglich immer am Anfang der Funktion deklarieren.
-- 1 "var ..." Anweisung pro Zeile und nur 1 Variable pro "var".
-- Ausnahme: Bei nicht initialisierte Variablen koennen auch mehrere
-  gleichzeitig deklariert werden (aber nicht mischen mit Zuweisungen).
-- Variablen am Anfang zu Deklarieren ist good practice, denn die JS-Engine macht
-  das bei der Ausfuehrung sowieo (variable hoisting).
-- 1 Variable pro Zeile macht Refactorings einfacher und ist uebersichtlicher.
+- Variablen wenn moeglich immer am Anfang der Funktion deklarieren. Variablen am
+  Anfang zu Deklarieren ist good practice, denn die JS-Engine macht das bei der
+  Ausfuehrung sowieso (variable hoisting).
+- Pro 'var' Anweisung dürfen mehrere Variablen deklariert und auch initialisiert
+  werden. Komplexe Initialisierung soll aber auf einer separaten Zeile notiert
+  werden.
+- Grundsätzlich ist eine kompakte Darstellung erwünscht, die Lesbarkeit soll
+  aber nicht darunter leiden.
 
 
 Beispiele:
 
 NOK:                           OK:
 -------------------------------------------------------------------------
-var x, y = 3;                  var x;
-                               var y = 3;
-var foo = 2,                   var bar;
-    bar, barbar = 3;           var foo = 2;
-                               var barbar = 3;
+var x = (y > 0 ? 1 : 2), y = $('h1').children('.myClass').first().text();
+
+                               var x, y = 3;
+
+                               var x = 4,
+                                 y = 3,
+                                 value = $('h1').text();
+
 
 Links:
-http://benalman.com/news/2012/05/multiple-var-statements-javascript/
+- http://benalman.com/news/2012/05/multiple-var-statements-javascript/
 
 
 ### Pruefen, ob eine Variable oder ein Property existiert
 
-Fuer Properties:
+Varianten fuer Properties:
+  1. if (obj.x === undefined)
+  2. if (typeof obj.x === 'undefined')
+  3. if (obj.hasOwnProperty('x'))
 
-Es gibt mehrere Varianten:
-1. if (obj.x === undefined)
-2. if (typeof obj.x === 'undefined')
-3. if (obj.hasOwnProperty('x'))
-
-Fuer Variablen gibt es auch mehrere Varianten:
+Varianten fuer Variablen:
   1. if (y === undefined)
   2. if (typeof y === 'undefined')
 
 Bewertung:
 - #1 funktioniert bei Properties, aber nicht bei Variablen. Wenn die Variable nicht
-  definiert ist, gibt es eine Exception.
-  Weiteres (theoretisches) Problem: Jemand koennte die Variable 'undefined' umdefinieren.
-- #2 funktioniert immer. Bei Properties werden auch diejenigen der Protypen
+  definiert ist, gibt es eine Exception. Weiteres (theoretisches) Problem: Jemand
+  koennte die Variable 'undefined' umdefinieren. (wir stellen jedoch im scout-template.js
+  sicher, dass dies nicht geschehen kann).
+- #2 funktioniert immer. Bei Properties werden auch diejenigen der Protoypen
   beruecksichtigt.
 - #3 kann sinnvoll sein, denn es schaut _nicht_ beim Prototyp nach. Allerdings scheint
   es extrem langsam zu sein, darum besser nicht verwenden.
 
-=> Empfohlen wird darum #2.
+--> Wir verwenden grundsätzlich Variante #1. Exceptions die durch nicht deklarierte
+    Variablen verursacht werden sind Programmierfehler.
 
 Links:
-http://stackoverflow.com/questions/4725603
-http://stackoverflow.com/questions/17150396
-http://jsperf.com/hasownproperty-vs-in/2
+- http://stackoverflow.com/questions/4725603
+- http://stackoverflow.com/questions/17150396
+- http://jsperf.com/hasownproperty-vs-in/2
 
 
 ### Gleichheit pruefen
@@ -77,6 +81,7 @@ Man kann in JS grundsaetzlich beliebige Objekte werfen. Es sollte aber immer ein
 Objekt geworfen werden, nie nur ein String. Das Problem mit Strings ist, dass nicht
 alle "Faenger" damit umgehen konnen. Jasmine z.B. zeigt dann nur "undefined: undefined"
 als Meldung an, was ueberhaupt nicht hilfreich ist. IE hat angeblich auch Probleme damit.
+FireFox zeigt keine Line-Number-Info an ohne Error Object.
 
 NOK:                           OK:
 -------------------------------------------------------------------------
@@ -122,3 +127,38 @@ Kommentare immer so:
 So nicht:
   //My comment
   /* My comment */
+
+
+### Overloading
+
+JavaScript kennt kein Ueberladen von Methoden. Allerdings sind Funktionen auch nicht streng
+typisiert, somit kann eine dynamische Anzahl Argumente uebergeben werden, mit unterschiedlichen
+Typen. Ein Pattern um Overloading zu implementieren ist wie folgt. Agenommen die Methode 'setSize'
+soll mit 2 Numbers und mit einem Dimension Objekt aufgerufen werden koennen:
+
+  obj.setSize(6, 7);
+
+  obj.setSize(new Dimension(6, 7));
+
+Die Implementierung von setSize ist wie folgt:
+
+  setSize = function(vararg, height) {
+    if (vararg instanceof Dimension) {
+      this.width = vararg.width;
+      this.height = vararg.height;
+    } else {
+      this.width = vararg;
+      this.height = height;
+    }
+  };
+
+Bei Konstruktoren moechte man oft auch einen Default-Konstruktor, das Beispiel oben liesse sich
+dann wie folgt erweitern:
+
+      this.width = vararg || 0;
+      this.height = height || 0;
+
+
+
+
+

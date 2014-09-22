@@ -51,7 +51,6 @@ scout.HtmlComponent.prototype.setLayout = function(layoutManager) {
   this.layoutManager = layoutManager;
 };
 
-
 /**
  * Returns the preferred size of the component, insets included.
  */
@@ -78,11 +77,11 @@ scout.HtmlComponent.prototype.getInsets = function() {
   cssToInt = function($comp, cssProp) {
       return parseInt($comp.css(cssProp), 10);
     };
-  for (i=0; i<directions.length; i++) {
-  // parseInt will ignore 'px' in string returned from css() method
-  insets[i] += cssToInt(this.$comp, 'margin-' + directions[i]);
-  insets[i] += cssToInt(this.$comp, 'padding-' + directions[i]);
-  insets[i] += cssToInt(this.$comp, 'border-' + directions[i] + '-width');
+  for (i = 0; i < directions.length; i++) {
+    // parseInt will ignore 'px' in string returned from css() method
+    insets[i] += cssToInt(this.$comp, 'margin-' + directions[i]);
+    insets[i] += cssToInt(this.$comp, 'padding-' + directions[i]);
+    insets[i] += cssToInt(this.$comp, 'border-' + directions[i] + '-width');
   }
   return new scout.Insets(insets[0], insets[1], insets[2], insets[3]);
 };
@@ -107,8 +106,8 @@ scout.HtmlComponent.prototype.setSize = function(size) {
     this.layoutManager.invalidate();
   }
   this.$comp.
-    css('width', size.width + 'px').
-    css('height', size.height + 'px');
+    width(size.width).
+    height(size.height);
   this.layout();
 };
 
@@ -116,8 +115,8 @@ scout.HtmlComponent.prototype.getBounds = function() {
   return new scout.Rectangle(
       this.$comp.css('left'),
       this.$comp.css('top'),
-      this.$comp.css('width'),
-      this.$comp.css('height'));
+      this.$comp.width(),
+      this.$comp.height());
 };
 
 scout.HtmlComponent.prototype.setBounds = function(bounds) {
@@ -127,9 +126,9 @@ scout.HtmlComponent.prototype.setBounds = function(bounds) {
   }
   this.$comp.
     css('left', bounds.x).
-    css('width', bounds.width + 'px').
+    width(bounds.width).
     css('top', bounds.y).
-    css('height', bounds.height + 'px');
+    height(bounds.height);
   this.layout();
 };
 
