@@ -361,27 +361,19 @@ public abstract class AbstractClientSession implements IClientSession {
       execStoreSession();
     }
     catch (Throwable t) {
-      LOG.error("store session", t);
+      LOG.error("Failed to store the client session.", t);
     }
     if (m_desktop != null) {
       try {
         m_desktop.closeInternal();
       }
       catch (Throwable t) {
-        LOG.error("close desktop", t);
+        LOG.error("Failed to close the desktop.", t);
       }
       m_desktop = null;
     }
     if (!m_localeListener.isEmpty()) {
       m_localeListener.clear();
-    }
-    try {
-      if (getServiceTunnel() != null) {
-        SERVICES.getService(ILogoutService.class).logout();
-      }
-    }
-    catch (Throwable t) {
-      LOG.info("logout on server", t);
     }
 
     if (getMaxShutdownWaitTime() > 0) {
@@ -396,10 +388,10 @@ public abstract class AbstractClientSession implements IClientSession {
    * Delay the client session inactivation for a maximal period of time until all client jobs of this session have
    * finished. This method does not block the caller.
    */
-  private void scheduleSessionInactivation() {
-    new Job("Wait for client jobs to finish before inactivating the session") {
+  protected void scheduleSessionInactivation() {
+    new ClientAsyncJob("Wait for client jobs to finish before inactivating the session", this) {
       @Override
-      protected IStatus run(IProgressMonitor monitor) {
+      protected IStatus runStatus(IProgressMonitor monitor) {
         final long timeout = getMaxShutdownWaitTime();
 
         // Wait for the client jobs to finish for a maximal period of time.
@@ -426,10 +418,9 @@ public abstract class AbstractClientSession implements IClientSession {
    *
    * @return {@link Set} of client jobs.
    */
-  protected final Set<ClientJob> findClientJobs() {
-    final Job currentJob = ClientJob.getJobManager().currentJob();
-    final Set<ClientJob> clientJobs = new HashSet<ClientJob>();
-
+  protected Set<ClientJob> findClientJobs() {
+    Job currentJob = ClientJob.getJobManager().currentJob();
+    Set<ClientJob> clientJobs = new HashSet<ClientJob>();
     for (Job job : Job.getJobManager().find(ClientJob.class)) {
       ClientJob candidateJob = (ClientJob) job;
       if (candidateJob.getClientSession() == AbstractClientSession.this && candidateJob != currentJob) {
@@ -449,6 +440,14 @@ public abstract class AbstractClientSession implements IClientSession {
           , new Object[]{AbstractClientSession.this, getUserId(), runningClientJobs});
     }
 
+    if (getServiceTunnel() != null) {
+      try {
+        SERVICES.getService(ILogoutService.class).logout();
+      }
+      catch (Throwable e) {
+        LOG.info("Failed to logout from server.", e);
+      }
+    }
     setActive(false);
     if (LOG.isInfoEnabled()) {
       LOG.info("Client session was shutdown successfully [session={0}, user={1}]", AbstractClientSession.this, getUserId());
@@ -609,7 +608,7 @@ public abstract class AbstractClientSession implements IClientSession {
   }
 
   /**
-   * Sets the maximum time (in milliseconds) to wait for all client jobs to finish when stopping the session before
+   * Sets the maximum time (in milliseconds) to wait for each client job to finish when stopping the session before
    * it is set to inactive. When a value &lt;= 0 is set, the session is set to inactive immediately, without
    * waiting for client jobs to finish.
    */
@@ -618,7 +617,7 @@ public abstract class AbstractClientSession implements IClientSession {
   }
 
   /**
-   * @return the maximum time (in milliseconds) to wait for all client jobs to finish when stopping the session before
+   * @return the maximum time (in milliseconds) to wait for each client job to finish when stopping the session before
    *         it is set to inactive. The default value is 4567, which should be reasonable for most use cases.
    */
   public long getMaxShutdownWaitTime() {
