@@ -26,7 +26,6 @@
   border-bottom: 1px solid @color-bench-light-border;
   white-space: nowrap;
   overflow: hidden;
-  margin: 0px 20px 0px 20px;
 }
 
 .sort-icon(@icon) {
@@ -100,7 +99,6 @@
 
 .table-data {
   position: relative;
-  margin: 0px 20px 0px 20px;
   height: calc(~"100% - " @size-desktop-menu + @size-table-header + @size-table-footer);
   overflow: hidden;
 }
@@ -178,20 +176,6 @@
   & .table-cell {
     border-bottom-color: transparent;
   }
-}
-
-//FIXME CGU move to TableOrganizeMenu.css
-.table-menu-organize {
-  background-color: white;
-}
-
-.table-menu-organize > button {
-  cursor: pointer;
-  background-color: none;
-  background: none;
-  border: 1px solid @color-bench-light-border;
-  margin: 5px;
-  height: 32px;
 }
 
 /* key box */

@@ -12,10 +12,10 @@ scout.TableField.prototype._render = function($parent) {
   this.addLabel();
   this.addStatus();
 
-  this.$field = $.makeDiv('', '.field').
+  this.$field = $.makeDIV('field').
     appendTo(this.$container);
+
   if (this.table) {
     this.table.render(this.$field);
   }
-
 };

@@ -1,7 +1,7 @@
 .root-group-box {
-  margin: 20px 25px 25px 20px;
+  margin: 20px @margin-bench-right 25px @margin-bench-left;
   border-top: 1px solid @color-bench-light-border;
-  box-sizing:border-box;
+  box-sizing: border-box;
 }
 
 .group-box {

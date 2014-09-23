@@ -1,166 +1,178 @@
 /* main elements */
 .desktop {
-	position: fixed;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
 }
 
 .desktop-bench {
-    position: fixed;
-    top: @size-desktop-tools;
-    left: @size-desktop-navigation;
-    right: 0;
-    bottom: 0;
+  position: fixed;
+  top: @size-desktop-tools;
+  left: @size-desktop-navigation;
+  right: 0;
+  bottom: 0;
 }
 
 .desktop-tool-container{
-	position: absolute;
-	top: @size-desktop-tools;
-	width: @size-desktop-navigation;
-	z-index: 10;
-	.menu-context;
-	background-color: @color-bench;
-	border-top: 1px solid transparent;
-	display: none;
+  position: absolute;
+  top: @size-desktop-tools;
+  width: @size-desktop-navigation;
+  z-index: 10;
+  .menu-context;
+  background-color: @color-bench;
+  border-top: 1px solid transparent;
+  display: none;
 }
 
 /* taskbar */
 
 .desktop-taskbar{
-    position: fixed;
-    top: 0px;
-    left: @size-desktop-navigation;
-    right: 0px;
-    height: @size-desktop-tools;
-	border-bottom: 1px solid @color-bench-light-border;
+  position: fixed;
+  top: 0px;
+  left: @size-desktop-navigation;
+  right: 0px;
+  height: @size-desktop-tools;
+  border-bottom: 1px solid @color-bench-light-border;
 }
 
 .taskbar-tabs, .taskbar-tools {
-	display:inline-block;
-	word-wrap: none;
+  display:inline-block;
+  word-wrap: none;
 }
 
 .taskbar-tools {
- 	float: right;
+   float: right;
 }
 
 .taskbar-tab-item,
 .taskbar-tool-item {
-	height: @size-desktop-tools;
-	padding: 0px 20px 0px 20px;
-		
-	overflow: hidden;
-  	text-overflow: ellipsis;
-  	white-space: nowrap;
-  	display: inline-block;
-	
-	cursor: pointer;
-	.font-text-large;
-	line-height: 50px;
-	background-color: @color-bench-light;
-	color: @color-bench-text;
-	border-bottom: 1px solid @color-bench-light-border;
+  height: @size-desktop-tools;
+  padding: 0px 20px 0px 20px;
 
-	&:hover{
-		color: @color-bench-text-hover;
-	}
-		
-	&.disabled{
-		color: @color-bench-semi;
-		cursor: default;
-	}
-	
-	&.selected{
-		cursor: default;
-		background-color: @color-bench;
-		color: @color-bench-text-active;
-		border-bottom: 1px solid @color-bench;
-	}
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-block;
+
+  cursor: pointer;
+  .font-text-large;
+  line-height: 50px;
+  background-color: @color-bench-light;
+  color: @color-bench-text;
+  border-bottom: 1px solid @color-bench-light-border;
+
+  &:hover{
+    color: @color-bench-text-hover;
+  }
+
+  &.disabled{
+    color: @color-bench-semi;
+    cursor: default;
+  }
+
+  &.selected{
+    cursor: default;
+    background-color: @color-bench;
+    color: @color-bench-text-active;
+    border-bottom: 1px solid @color-bench;
+  }
 
 }
 
 .taskbar-tab-item {
-	border-right: 1px solid @color-bench-light-border;
+  border-right: 1px solid @color-bench-light-border;
 }
 
 .taskbar-tool-item {
-	position: relative;
-	.font-text-plus;
-	background-color: @color-bench;
-	border-left: 1px solid transparent;
-	border-right: 1px solid transparent;		
-		
-	&:before{
-		.font-icon;
-		font-size: 22px;
-		vertical-align: -3px;
-		padding-right: 11px;
-		content: attr(data-icon);
-	}
-	
-	&.selected{
-		border-left: 1px solid @color-bench-light-border;
-		border-right: 1px solid @color-bench-light-border;		
-		border-bottom: 1px solid @color-bench;
-		cursor: pointer;
-	}	
+  position: relative;
+  .font-text-plus;
+  background-color: @color-bench;
+  border-left: 1px solid transparent;
+  border-right: 1px solid transparent;
+
+  &:before{
+    .font-icon;
+    font-size: 22px;
+    vertical-align: -3px;
+    padding-right: 11px;
+    content: attr(data-icon);
+  }
+
+  &.selected{
+    border-left: 1px solid @color-bench-light-border;
+    border-right: 1px solid @color-bench-light-border;
+    border-bottom: 1px solid @color-bench;
+    cursor: pointer;
+  }
 }
 
 .taskbar-tab-item .key-box,
 .taskbar-tool-item .key-box {
-	left: 4px;
-	top: 8px;
-	width: 22px;
+  left: 4px;
+  top: 8px;
+  width: 22px;
 
-	&.disabled{
-		background-color: @color-bench-semi;
-	}
+  &.disabled{
+    background-color: @color-bench-semi;
+  }
 }
 
 
 .taskbar-logo {
-	float: right;
-	margin-top: 8px;
- 	margin-left: 20px;
- 	margin-right: 13px;
-	width: 40px; /* original size 225px ;*/
-	height: 33px;
-	background: url("logo.png");
-	background-size: cover;
+  float: right;
+  margin-top: 8px;
+  margin-left: 20px;
+  margin-right: 13px;
+  width: 40px; /* original size 225px ;*/
+  height: 33px;
+  background: url("logo.png");
+  background-size: cover;
+}
+
+/* table */
+
+.desktop-bench > .table > .table-header,
+.desktop-bench > .table > .table-data {
+  margin-left: @margin-bench-left;
+  margin-right: @margin-bench-right;
 }
 
 /* base desktop */
 
 .timeout-message {
-border: 1px solid red;
-background-color: rgb(255, 200, 200);
-padding: 5px;
-color: rgb(150,0,0);
-max-width: 300px;
-margin: 20px auto;
+  border: 1px solid red;
+  background-color: rgb(255, 200, 200);
+  padding: 5px;
+  color: rgb(150,0,0);
+  max-width: 300px;
+  margin: 20px auto;
 }
 
 .offline-message {
-border: 1px solid #0082a1;
-background-color: #eee;
-margin: 5px 10px;
-padding: 6px 5px;
+  border: 1px solid #0082a1;
+  background-color: #eee;
+  padding: 6px 5px;
+  margin: 20px auto;
+  z-index: 1;
+  position: fixed;
+  right: 10px;
+  top: 55px;
 }
 
 .offline-message.reconnect-successful {
-border: 1px solid #00A507;
-background-color: #E1FDE3;
+  border: 1px solid #00A507;
+  background-color: #E1FDE3;
 }
 
 .reconnect {
-display: inline-block;
-float: right;
+  display: inline-block;
+  float: right;
 }
 
-/* FIXME CGU create mixin when using less/sass */
-@-webkit-keyframes reconnect-rotation {
+// Mixin
+.keyframes-rotation () {
   0% {
     transform: rotate(0deg);
     -webkit-transform: rotate(0deg);
@@ -172,20 +184,14 @@ float: right;
     -webkit-transform: rotate(359deg);
     -ms-transform: rotate(359deg);
   }
+}
+
+@-webkit-keyframes reconnect-rotation {
+  .keyframes-rotation;
 }
 
 @keyframes reconnect-rotation {
-  0% {
-    transform: rotate(0deg);
-    -webkit-transform: rotate(0deg);
-    -ms-transform: rotate(0deg);
-  }
-
-  100% {
-    transform: rotate(359deg);
-    -webkit-transform: rotate(359deg);
-    -ms-transform: rotate(359deg);
-  }
+  .keyframes-rotation;
 }
 
 .reconnect-animated:before {
@@ -194,6 +200,7 @@ float: right;
   content: " ";
   display: inline-block;
   vertical-align: middle;
+  margin-left: 6px;
   margin-right: 6px;
   border-radius: 50%;
   border: 1px solid rgba(0, 0, 0, 0);

@@ -1,0 +1,12 @@
+.table-menu-organize {
+  background-color: white;
+}
+
+.table-menu-organize > button {
+  cursor: pointer;
+  background-color: none;
+  background: none;
+  border: 1px solid @color-bench-light-border;
+  margin: 5px;
+  height: 32px;
+}

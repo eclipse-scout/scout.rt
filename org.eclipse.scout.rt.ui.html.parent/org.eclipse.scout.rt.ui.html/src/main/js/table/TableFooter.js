@@ -3,11 +3,11 @@ scout.TableFooter = function(table, $parent, session) {
 
   this._table = table;
 
-  this._$tableControl = $parent.appendDIV('table-control');
-  this.$controlContainer = this._$tableControl.appendDIV('control-container');
+  this._$tableFooter = $parent.appendDIV('table-footer');
+  this.$controlContainer = this._$tableFooter.appendDIV('control-container');
   this._addResize(this.$controlContainer);
 
-  this._$controlLabel = this._$tableControl.appendDiv(undefined, 'control-label');
+  this._$controlLabel = this._$tableFooter.appendDIV('control-label');
   this._controlGroups = {};
 
   for (i = 0; i < this._table.controls.length; i++) {
@@ -31,14 +31,14 @@ scout.TableFooter = function(table, $parent, session) {
   }
 
   $('<input class="control-filter"></input>')
-    .appendTo(this._$tableControl)
+    .appendTo(this._$tableFooter)
     .on('input paste', '', $.debounce(filterEnter))
     .val(filterText);
 
   // info section
-  this._$infoSelect = this._$tableControl.appendDiv('InfoSelect').on('click', '', this._table.toggleSelection.bind(this._table));
-  this._$infoFilter = this._$tableControl.appendDiv('InfoFilter').on('click', '', this._table.resetFilter.bind(this._table));
-  this._$infoLoad = this._$tableControl.appendDiv('InfoLoad').on('click', '', this._table.sendReload.bind(this._table));
+  this._$infoSelection = this._$tableFooter.appendDIV('table-info-selection').on('click', '', this._table.toggleSelection.bind(this._table));
+  this._$infoFilter = this._$tableFooter.appendDIV('table-info-filter').on('click', '', this._table.resetFilter.bind(this._table));
+  this._$infoReload = this._$tableFooter.appendDIV('table-info-reload').on('click', '', this._table.sendReload.bind(this._table));
 
   this._table.events.on(scout.Table.GUI_EVENT_ROWS_DRAWN, function(event) {
     that._setInfoLoad(event.numRows);
@@ -111,11 +111,9 @@ scout.TableFooter = function(table, $parent, session) {
 };
 
 scout.TableFooter.prototype._setInfoLoad = function(count) {
-  this._$infoLoad.html(this._findInfo(count) + ' geladen</br>Daten neu laden');
-  this._$infoLoad.show().widthToContent();
+  this._$infoReload.html(this._findInfo(count) + ' geladen</br>Daten neu laden');
+  this._$infoReload.show().widthToContent();
 };
-
-scout.TableFooter.prototype._setInfoMore = function( /*count*/ ) {};
 
 scout.TableFooter.prototype._setInfoFilter = function(count, origin) {
   this._$infoFilter.html(this._findInfo(count) + ' gefiltert' + (origin ? ' durch ' + origin : '') + '</br>Filter entfernen');
@@ -124,8 +122,8 @@ scout.TableFooter.prototype._setInfoFilter = function(count, origin) {
 
 scout.TableFooter.prototype._setInfoSelect = function(count, all) {
   var allText = all ? 'Keine' : 'Alle';
-  this._$infoSelect.html(this._findInfo(count) + ' selektiert</br>' + (allText) + ' selektieren'); //FIXME get translations from server
-  this._$infoSelect.show().widthToContent();
+  this._$infoSelection.html(this._findInfo(count) + ' selektiert</br>' + (allText) + ' selektieren'); //FIXME get translations from server
+  this._$infoSelection.show().widthToContent();
 };
 
 scout.TableFooter.prototype._findInfo = function(n) {

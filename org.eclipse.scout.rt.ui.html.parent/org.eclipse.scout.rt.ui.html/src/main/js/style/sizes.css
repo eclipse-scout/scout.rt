@@ -7,4 +7,5 @@
 @size-table-row: 45px;
 @size-table-footer: 50px;
 
-
+@margin-bench-left: 20px;
+@margin-bench-right: @margin-bench-left;
