@@ -77,14 +77,13 @@ scout.Form.prototype._render = function($parent) {
   }
 
   htmlContainer.layout();
-  $(window).on('resize', this._onResize.bind(this));
 
   if (this._locked) {
     this.disable();
   }
 };
 
-scout.Form.prototype._onResize = function() {
+scout.Form.prototype.onResize = function() {
   // TODO AWE/CGU: dieses event müssten wir auch bekommen, wenn man den Divider zwischen
   // Tree und Working Area schiebt.
   $.log.trace('(Form#_onResize) window was resized -> layout Form container');
@@ -109,7 +108,6 @@ scout.Form.prototype.appendTo = function($parent) {
 scout.Form.prototype.enable = function() {
   // FIXME CGU implement
 };
-
 
 /**
  * @override

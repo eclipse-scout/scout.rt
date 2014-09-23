@@ -196,6 +196,8 @@ scout.DesktopNavigation.prototype._addSplitter = function() {
        that.desktop.$bar.animateAVCSD('left', WIDTH_BREADCRUMB);
        that.desktop.$bench.animateAVCSD('left', WIDTH_BREADCRUMB);
      }
+
+     that.desktop.onResize();
    }
 
    return false;

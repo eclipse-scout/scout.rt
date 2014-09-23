@@ -144,8 +144,13 @@ scout.FormFieldLayout.prototype.layout = function($container) {
     $status.width(10);
     widthDiff += 10;
   }
-  var $field = $container.children('.field');
-  $field.width(containerSize.width - widthDiff).height(containerSize.height);
+  var $field = $container.
+    children('.field').
+    innerWidth(containerSize.width - widthDiff).
+    innerHeight(containerSize.height);
+  // TODO AWE: (layout) hier scheinen die insets nicht korrekt zu sein: generell layout/size
+  // konzept mit C.GU besprechen Swing VS Html UI.
+    
   // TODO AWE: (layout) dafür sorgen, dass wir hier immer ein get() machen können
   var htmlField = scout.HtmlComponent.optGet($field);
   if (htmlField) {

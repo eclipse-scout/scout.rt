@@ -50,6 +50,9 @@ scout.Table.prototype._render = function($parent) {
   this.$container = this._$parent.appendDIV('table');
   if ($parent.hasClass('desktop-bench')) {
     // TODO cru: desktop table (no input focus required to trigger table keystrokes), is body ok?
+    // input A.WE eine komponente sollte nie etwas von seinen parents wissen,
+    //   das reduziert die wiederverwendbarkeit der komponente --> refactor: bench oder form
+    //   _setzen_ einen keystroke adapter auf der Table.
     scout.keystrokeManager.installAdapter($('body'), this._keystrokeAdapter);
   } else {
     // independent table, i.e. inside form (input focus required to trigger table keystrokes)

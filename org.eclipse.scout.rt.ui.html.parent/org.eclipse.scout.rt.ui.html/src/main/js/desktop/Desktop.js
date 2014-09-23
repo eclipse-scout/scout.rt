@@ -72,8 +72,26 @@ scout.Desktop.prototype._render = function($parent) {
     this.addMessageBox(messageBox);
   }
 
+  $(window).on('resize', this.onResize.bind(this));
+
   // TODO cru: split and move
   // scout.keystrokeManager.installAdapter($parent, new scout.DesktopKeystrokeAdapter(this.navigation, this.taskbar));
+};
+
+scout.Desktop.prototype.onResize = function() {
+  if (this.forms.length > 0) {
+    var i, form;
+    for (i = 0; i < this.forms.length; i++) {
+      form = this.forms[i];
+      if (form.rendered) {
+        form.onResize();
+      }
+    }
+  }
+
+  if (this._outlineTab.content) {
+    this._outlineTab.content.onResize();
+  }
 };
 
 scout.Desktop.TabAndContent = function(title, content) {
