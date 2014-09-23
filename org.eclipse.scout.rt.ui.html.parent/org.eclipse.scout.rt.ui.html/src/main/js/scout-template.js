@@ -9,6 +9,7 @@
 //@include("main.js");
 
 //@include("util/arrays.js");
+//@include("util/logging.js");
 //@include("util/EventSupport.js");
 //@include("util/KeystrokeManager.js");
 //@include("util/ModelAdapter.js");

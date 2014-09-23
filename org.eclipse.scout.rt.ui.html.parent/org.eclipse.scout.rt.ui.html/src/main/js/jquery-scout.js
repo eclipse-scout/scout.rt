@@ -6,8 +6,6 @@
 (function($) {
 
   //== $ extensions
-  $.log = log4javascript.getDefaultLogger();
-
   $.makeDiv = function(id, cssClass, htmlContent) {
     if (id === 0) {
       //Allow 0 as id (!id would result in false)

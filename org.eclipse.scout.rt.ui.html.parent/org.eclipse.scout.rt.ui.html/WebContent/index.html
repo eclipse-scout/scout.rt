@@ -7,12 +7,16 @@
     <link rel="shortcut icon" type="image/x-icon" href="res/favicon.ico">
     <link rel="stylesheet" type="text/css" href="res/scout-5.0.0.min.css">
     <script src="res/jquery-2.1.0.min.js"></script>
-    <script src="res/log4javascript.js"></script>
     <script src="res/scout-5.0.0.min.js"></script>
     <script>
       $(document).ready(function() {
-        log4javascript.getDefaultLogger().setLevel(log4javascript.Level.TRACE);
-        scout.init();
+        var $deferredInits = [];
+        $deferredInits.push(scout.logging.init());
+
+        //Unfortunately it is not possible to set the array, we need to pass the parameters comma separated
+        $.when($deferredInits[0]).done(function() {
+          scout.init();
+        });
       });
     </script>
   </head>

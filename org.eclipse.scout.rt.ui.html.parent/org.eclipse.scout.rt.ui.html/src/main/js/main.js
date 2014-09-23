@@ -23,7 +23,6 @@ scout.inherits = function(childCtor, parentCtor) {
   childCtor.parent = parentCtor;
 };
 
-
 /**
  * Opens a popup window or new browser tab for the given URL and returns the window reference.
  * <p>
