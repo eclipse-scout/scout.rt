@@ -39,6 +39,9 @@ public class ClientNotificationPollingJob extends ClientAsyncJob {
 
   @Override
   protected IStatus runStatus(IProgressMonitor monitor) {
+    if (monitor.isCanceled()) {
+      return Status.CANCEL_STATUS;
+    }
     IPingService pingService = SERVICES.getService(IPingService.class);
     try {
       // side-effect of every service call (whether ping or any other) is to get
@@ -53,17 +56,14 @@ public class ClientNotificationPollingJob extends ClientAsyncJob {
     if (monitor.isCanceled()) {
       return Status.CANCEL_STATUS;
     }
-    else {
-      // re-schedule
-      long netLatency = 0L;
-      IPerformanceAnalyzerService perf = SERVICES.getService(IPerformanceAnalyzerService.class);
-      if (perf != null) {
-        netLatency = perf.getNetworkLatency();
-      }
-      long sleepInterval = m_analyzeNetworkLatency ? Math.max(m_pollInterval, 10 * netLatency) : m_pollInterval;
-      schedule(sleepInterval);
-      return Status.OK_STATUS;
+    // re-schedule
+    long netLatency = 0L;
+    IPerformanceAnalyzerService perf = SERVICES.getService(IPerformanceAnalyzerService.class);
+    if (perf != null) {
+      netLatency = perf.getNetworkLatency();
     }
+    long sleepInterval = m_analyzeNetworkLatency ? Math.max(m_pollInterval, 10 * netLatency) : m_pollInterval;
+    schedule(sleepInterval);
+    return Status.OK_STATUS;
   }
-
 }
