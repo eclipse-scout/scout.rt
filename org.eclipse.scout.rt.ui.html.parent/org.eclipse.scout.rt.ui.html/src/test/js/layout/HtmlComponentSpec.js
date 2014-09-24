@@ -6,11 +6,19 @@ describe("HtmlComponent", function() {
   };
 
   var addWidthHeightMock = function(jqueryMock) {
-    jqueryMock.width = function() {
-      return 6;
+    jqueryMock.width = function(val) {
+      if (val !== undefined) {
+        return jqueryMock;
+      } else {
+        return 6;
+      }
     };
-    jqueryMock.height = function() {
-      return 7;
+    jqueryMock.height = function(val) {
+      if (val !== undefined) {
+        return jqueryMock;
+      } else {
+        return 7;
+      }
     };
   };
 
@@ -53,13 +61,14 @@ describe("HtmlComponent", function() {
     };
 
     it("accepts scout.Dimension as single argument", function() {
-      spyOn(jqueryMock, 'css').and.callThrough();
+      spyOn(jqueryMock, 'width').and.callThrough();
+      spyOn(jqueryMock, 'height').and.callThrough();
       htmlComp.setSize(new scout.Dimension(6, 7));
       var size = htmlComp.getSize();
       expect(size.width).toBe(6);
       expect(size.height).toBe(7);
-      expect(jqueryMock.css).toHaveBeenCalledWith('width', '6px');
-      expect(jqueryMock.css).toHaveBeenCalledWith('height', '7px');
+      expect(jqueryMock.width).toHaveBeenCalledWith(6);
+      expect(jqueryMock.height).toHaveBeenCalledWith(7);
     });
 
     it("calls invalidate on layout-manager when size has changed", function() {
