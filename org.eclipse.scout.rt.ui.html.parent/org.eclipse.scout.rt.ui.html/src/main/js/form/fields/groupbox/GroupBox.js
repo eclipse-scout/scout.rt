@@ -49,6 +49,11 @@ scout.GroupBox.prototype._render = function($parent) {
 };
 
 scout.GroupBox.prototype._createFieldArraysByType = function() {
+  this.controls = [];
+  this.systemButtons = [];
+  this.customButtons = [];
+  this.processButtons = [];
+
   var i, field;
   for (i = 0; i < this.formFields.length; i++) {
     field = this.formFields[i];
