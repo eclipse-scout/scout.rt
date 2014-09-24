@@ -140,11 +140,11 @@ scout.MapTableControl.prototype.dispose = function() {
   this.table.events.removeListener(this._filterResetListener);
 };
 
-scout.MapTableControl.prototype._unsetMap = function() {
+scout.MapTableControl.prototype._removeMap = function() {
   this.removeContent();
 };
 
-scout.MapTableControl.prototype._setMap = function(map) {
+scout.MapTableControl.prototype._renderMap = function(map) {
   this.renderContent();
 };
 

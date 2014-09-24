@@ -15,14 +15,14 @@ scout.MessageBox.prototype._render = function($parent) {
   this.$cancelButton = this._createButton('cancel');
 };
 
-scout.MessageBox.prototype._callSetters = function() {
-  this._setTitle(this.title);
-  this._setIconId(this.iconId);
-  this._setIntroText(this.introText);
-  this._setActionText(this.actionText);
-  this._setYesButtonText(this.yesButtonText);
-  this._setNoButtonText(this.noButtonText);
-  this._setCancelButtonText(this.cancelButtonText);
+scout.MessageBox.prototype._renderProperties = function() {
+  this._renderTitle(this.title);
+  this._renderIconId(this.iconId);
+  this._renderIntroText(this.introText);
+  this._renderActionText(this.actionText);
+  this._renderYesButtonText(this.yesButtonText);
+  this._renderNoButtonText(this.noButtonText);
+  this._renderCancelButtonText(this.cancelButtonText);
 };
 
 scout.MessageBox.prototype._createButton = function(option) {
@@ -38,36 +38,36 @@ scout.MessageBox.prototype._onButtonClicked = function() {
   this.session.send('action', this.id, {option: option});
 };
 
-scout.MessageBox.prototype._setTitle = function(title) {
+scout.MessageBox.prototype._renderTitle = function(title) {
   this.$title.html($.nl2br(title));
   this.$title.setVisible(title);
 };
 
-scout.MessageBox.prototype._setIconId = function(iconId) {
+scout.MessageBox.prototype._renderIconId = function(iconId) {
   //FIXME implement
 };
 
-scout.MessageBox.prototype._setIntroText = function(text) {
+scout.MessageBox.prototype._renderIntroText = function(text) {
   this.$introText.html($.nl2br(text));
   this.$introText.setVisible(text);
 };
 
-scout.MessageBox.prototype._setActionText = function(text) {
+scout.MessageBox.prototype._renderActionText = function(text) {
   this.$actionText.html($.nl2br(text));
   this.$actionText.setVisible(text);
 };
 
-scout.MessageBox.prototype._setYesButtonText = function(text) {
+scout.MessageBox.prototype._renderYesButtonText = function(text) {
   this.$yesButton.text(text);
   this.$yesButton.setVisible(text);
 };
 
-scout.MessageBox.prototype._setNoButtonText = function(text) {
+scout.MessageBox.prototype._renderNoButtonText = function(text) {
   this.$noButton.text(text);
   this.$noButton.setVisible(text);
 };
 
-scout.MessageBox.prototype._setCancelButtonText = function(text) {
+scout.MessageBox.prototype._renderCancelButtonText = function(text) {
   this.$cancelButton.text(text);
   this.$cancelButton.setVisible(text);
 };

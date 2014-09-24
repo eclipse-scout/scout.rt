@@ -24,7 +24,7 @@ scout.Button.prototype._render = function($parent) {
     }.bind(this));
 };
 
-scout.Button.prototype._setLabel = function(label) {
+scout.Button.prototype._renderLabel = function(label) {
   if (!label) {
     label = '';
   } else {

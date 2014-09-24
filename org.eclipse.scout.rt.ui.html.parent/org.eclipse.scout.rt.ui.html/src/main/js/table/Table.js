@@ -80,9 +80,9 @@ scout.Table.prototype._render = function($parent) {
   this.drawData();
 };
 
-scout.Table.prototype._callSetters = function() {
-  this._setHeaderVisible(this.headerVisible);
-  this._setEnabled(this.enabled);
+scout.Table.prototype._renderProperties = function() {
+  this._renderHeaderVisible(this.headerVisible);
+  this._renderEnabled(this.enabled);
 };
 
 scout.Table.prototype.dispose = function() {
@@ -434,12 +434,12 @@ scout.Table.prototype._getRowMenus = function($selectedRows, all) {
   return scout.menus.filter(this.menus, check);
 };
 
-scout.Table.prototype._setMenus = function(menus) {
+scout.Table.prototype._renderMenus = function(menus) {
   var $selectedRows = this.findSelectedRows();
-  this._renderMenus($selectedRows);
+  this._renderRowMenus($selectedRows);
 };
 
-scout.Table.prototype._renderMenus = function($selectedRows) {
+scout.Table.prototype._renderRowMenus = function($selectedRows) {
   var menus = this._getRowMenus($selectedRows, true);
   this.menubar.updateItems(menus);
 };
@@ -448,7 +448,7 @@ scout.Table.prototype.onRowsSelected = function($selectedRows) {
   var rowIds = [];
 
   this.triggerRowsSelected($selectedRows);
-  this._renderMenus($selectedRows);
+  this._renderRowMenus($selectedRows);
 
   if ($selectedRows) {
     $selectedRows.each(function() {
@@ -1046,7 +1046,7 @@ scout.Table.prototype._triggerFilterResetted = function() {
   this.events.trigger(type);
 };
 
-scout.Table.prototype._setHeaderVisible = function(headerVisible) {
+scout.Table.prototype._renderHeaderVisible = function(headerVisible) {
   //FIXME CGU this would be better than show/hide, but buildRow relies on header -> refactor
   //  if (this.headerVisible && !this._header) {
   //      this._$header = $('table-header').prependTo(this.$data);
@@ -1059,12 +1059,12 @@ scout.Table.prototype._setHeaderVisible = function(headerVisible) {
   this._$header.setVisible(headerVisible);
 };
 
-scout.Table.prototype._setEnabled = function(enabled) {
+scout.Table.prototype._renderEnabled = function(enabled) {
   //FIXME CGU remove/add events. Maybe extend jquery to not fire on disabled events?
   this.$dataScroll.setEnabled(enabled);
 };
 
-scout.Table.prototype._setMultiSelect = function(multiSelect) {
+scout.Table.prototype._renderMultiSelect = function(multiSelect) {
   // nop
 };
 

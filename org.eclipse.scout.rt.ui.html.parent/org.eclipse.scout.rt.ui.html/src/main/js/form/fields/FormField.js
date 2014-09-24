@@ -22,40 +22,40 @@ scout.FormField.prototype._render = function($parent) {
 
 };
 
-scout.FormField.prototype._callSetters = function() {
-  this._setEnabled(this.enabled);
-  this._setValue(this.value);
-  this._setMandatory(this.mandatory);
-  this._setVisible(this.visible);
-  this._setErrorStatus(this.errorStatus);
-  this._setLabel(this.label);
-  this._setLabelVisible(this.labelVisible);
+scout.FormField.prototype._renderProperties = function() {
+  this._renderEnabled(this.enabled);
+  this._renderValue(this.value);
+  this._renderMandatory(this.mandatory);
+  this._renderVisible(this.visible);
+  this._renderErrorStatus(this.errorStatus);
+  this._renderLabel(this.label);
+  this._renderLabelVisible(this.labelVisible);
 };
 
-scout.FormField.prototype._setEnabled = function(enabled) {
+scout.FormField.prototype._renderEnabled = function(enabled) {
   // NOP
 };
 
-scout.FormField.prototype._setValue = function(value) {
+scout.FormField.prototype._renderValue = function(value) {
   // NOP
 };
 
-scout.FormField.prototype._setMandatory = function(mandatory) {
+scout.FormField.prototype._renderMandatory = function(mandatory) {
   this._updateStatusLabel();
 };
 
-scout.FormField.prototype._setErrorStatus = function(errorStatus) {
+scout.FormField.prototype._renderErrorStatus = function(errorStatus) {
   this._updateStatusLabel();
 };
 
-scout.FormField.prototype._setVisible = function(visible) {
+scout.FormField.prototype._renderVisible = function(visible) {
   if (!this.$container) {
     return;
   }
   this.$container.setVisible(visible);
 };
 
-scout.FormField.prototype._setLabel = function(label) {
+scout.FormField.prototype._renderLabel = function(label) {
   if (!label) {
     label = '';
   }
@@ -64,14 +64,14 @@ scout.FormField.prototype._setLabel = function(label) {
   }
 };
 
-scout.FormField.prototype._setLabelVisible = function(visible) {
+scout.FormField.prototype._renderLabelVisible = function(visible) {
   if (!this.$label) {
     return;
   }
   this.$label.setVisible(visible);
 };
 
-scout.FormField.prototype._setEnabled = function(enabled) {
+scout.FormField.prototype._renderEnabled = function(enabled) {
   if (!this.$field) {
     return;
   }
@@ -104,14 +104,14 @@ scout.FormField.prototype._updateStatusLabel = function() {
 
 scout.FormField.prototype.goOffline = function() {
   scout.FormField.parent.prototype.goOffline.call(this);
-  this._setEnabled(false);
+  this._renderEnabled(false);
 };
 
 scout.FormField.prototype.goOnline = function() {
   scout.FormField.parent.prototype.goOnline.call(this);
 
   if (this.enabled) {
-    this._setEnabled(true);
+    this._renderEnabled(true);
   }
 };
 

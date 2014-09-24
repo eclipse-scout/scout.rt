@@ -6,7 +6,6 @@ scout.TableControl = function() {
   this._addAdapterProperties('form');
   this.contentRendered = false;
 };
-
 scout.inherits(scout.TableControl, scout.ModelAdapter);
 
 scout.TableControl.prototype._render = function($parent) {
@@ -17,9 +16,13 @@ scout.TableControl.prototype._render = function($parent) {
 
   this.$control = $parent.appendDiv('', classes)
     .data('control', this);
+};
 
-  this._setEnabled(this.enabled);
-  this._setSelected(this.selected);
+scout.TableControl.prototype._renderProperties = function() {
+  scout.TableControl.parent.prototype._renderProperties.call(this);
+
+  this._renderEnabled(this.enabled);
+  this._renderSelected(this.selected);
 };
 
 scout.TableControl.prototype.remove = function() {
@@ -66,11 +69,11 @@ scout.TableControl.prototype.onClosed = function() {
   this.removeContent();
 };
 
-scout.TableControl.prototype._unsetForm = function() {
+scout.TableControl.prototype._removeForm = function() {
   this.removeContent();
 };
 
-scout.TableControl.prototype._setForm = function(form) {
+scout.TableControl.prototype._renderForm = function(form) {
   this.renderContent();
 };
 
@@ -81,12 +84,12 @@ scout.TableControl.prototype.isContentAvailable = function() {
   return this.form;
 };
 
-scout.TableControl.prototype._setSelectedAndSend = function(selected) {
-  this._setSelected(selected);
+scout.TableControl.prototype.setSelected = function(selected) {
+  this._renderSelected(selected);
   this.session.send('selected', this.id);
 };
 
-scout.TableControl.prototype._setSelected = function(selected) {
+scout.TableControl.prototype._renderSelected = function(selected) {
   if (selected == this.$control.isSelected()) {
     return;
   }
@@ -99,7 +102,7 @@ scout.TableControl.prototype._setSelected = function(selected) {
     }
 
     if (previouslySelectedControl) {
-      previouslySelectedControl._setSelectedAndSend(false);
+      previouslySelectedControl.setSelected(false);
     }
 
     this.renderContent();
@@ -118,7 +121,7 @@ scout.TableControl.prototype._setSelected = function(selected) {
   }
 };
 
-scout.TableControl.prototype._setEnabled = function(enabled) {
+scout.TableControl.prototype._renderEnabled = function(enabled) {
   var that = this;
 
   if (enabled) {
@@ -141,7 +144,7 @@ scout.TableControl.prototype._setEnabled = function(enabled) {
   }
 
   function onControlClicked(event) {
-    that._setSelectedAndSend(!that.$control.isSelected());
+    that.setSelected(!that.$control.isSelected());
   }
 };
 
@@ -149,7 +152,7 @@ scout.TableControl.prototype.goOffline = function() {
   scout.TableControl.parent.prototype.goOffline.call(this);
 
   if (!this.isContentAvailable()) {
-    this._setEnabled(false);
+    this._renderEnabled(false);
   }
 };
 
@@ -157,6 +160,6 @@ scout.TableControl.prototype.goOnline = function() {
   scout.TableControl.parent.prototype.goOnline.call(this);
 
   if (!this.isContentAvailable() && this.enabled) {
-    this._setEnabled(true);
+    this._renderEnabled(true);
   }
 };

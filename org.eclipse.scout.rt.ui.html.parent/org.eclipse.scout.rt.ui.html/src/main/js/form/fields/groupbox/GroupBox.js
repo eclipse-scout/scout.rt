@@ -82,14 +82,14 @@ scout.GroupBox.prototype.getFields = function() {
 /**
  * @override FormField.js
  */
-scout.GroupBox.prototype._setBorderVisible = function(visible) {
+scout.GroupBox.prototype._renderBorderVisible = function(visible) {
   // NOP
 };
 
 /**
  * @override FormField.js
  */
-scout.GroupBox.prototype._setLabelVisible = function(visible) {
+scout.GroupBox.prototype._renderLabelVisible = function(visible) {
   // TODO AWE: (concept) discuss with C.GU -> auf dem GUI server korrigieren oder im Browser UI?
   this._$groupBoxTitle.setVisible(visible && this.label && !this.mainBox);
 };

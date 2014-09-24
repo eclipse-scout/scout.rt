@@ -85,6 +85,8 @@ scout.DesktopToolButton.prototype._closeContainer = function () {
 
 /* event handling */
 
-scout.DesktopToolButton.prototype._setForm = function () {
-  if (this.form) {this._openContainer();}
+scout.DesktopToolButton.prototype._renderForm = function () {
+  if (this.form) {
+    this._openContainer();
+  }
 };

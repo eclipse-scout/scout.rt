@@ -241,7 +241,7 @@ scout.GraphTableControl.prototype._removeContent = function() {
   this.$container.remove();
 };
 
-scout.GraphTableControl.prototype._setGraph = function(graph) {
+scout.GraphTableControl.prototype._renderGraph = function(graph) {
   this.renderContent();
 };
 

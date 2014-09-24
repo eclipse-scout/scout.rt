@@ -18,8 +18,6 @@ scout.ModelAdapter.prototype.init = function(model, session) {
   this.session.registerModelAdapter(this);
 };
 
-// TODO AWE: underscore bei setter-func names entfernen, oder eventuell auf _render umbenennen?
-
 scout.ModelAdapter.prototype.render = function($parent) {
   if (this.rendered) {
     throw new Error('Already rendered');
@@ -28,7 +26,7 @@ scout.ModelAdapter.prototype.render = function($parent) {
     throw new Error('Object is destroyed');
   }
   this._render($parent);
-  this._callSetters();
+  this._renderProperties();
   this.rendered = true;
   if (this.session.offline) {
     this.goOffline();
@@ -51,7 +49,7 @@ scout.ModelAdapter.prototype._addAdapterProperties = function(properties) {
 /**
  * This method creates the UI through DOM manipulation. At this point we should not apply model
  * properties on the UI, since sub-classes may need to contribute to the DOM first. You must not
- * apply model values to the UI here, since this is done in the _callSetters method later.
+ * apply model values to the UI here, since this is done in the _renderProperties method later.
  * The default impl. does nothing.
  */
 scout.ModelAdapter.prototype._render = function() {
@@ -62,7 +60,7 @@ scout.ModelAdapter.prototype._render = function() {
  * This method calls the UI setter methods after the _render method has been executed.
  * Here values of the model are applied to the DOM / UI. The default impl. does nothing.
  */
-scout.ModelAdapter.prototype._callSetters = function() {
+scout.ModelAdapter.prototype._renderProperties = function() {
   // NOP
 };
 
@@ -174,15 +172,15 @@ scout.ModelAdapter.prototype.onModelPropertyChange = function(event) {
   var oldValues = {};
 
   // step 1 synchronizing - apply properties on adapter or calls syncPropertyName if it exists
-  this._syncProperties(oldValues, event.properties);
+  this._syncPropertiesOnPropertyChange(oldValues, event.properties);
 
-  // step 2 rendering - call setter methods to update UI, but only if it is displayed (rendered)
+  // step 2 rendering - call render methods to update UI, but only if it is displayed (rendered)
   if (this.rendered) {
-    this._renderProperties(oldValues, event.properties);
+    this._renderPropertiesOnPropertyChange(oldValues, event.properties);
   }
 }; // TODO AWE: (form) jasmine-test this!
 
-scout.ModelAdapter.prototype._syncProperties = function(oldValues, newValues, ignore) {
+scout.ModelAdapter.prototype._syncPropertiesOnPropertyChange = function(oldValues, newValues, ignore) {
   this._eachProperty(newValues, function(propertyName, value) {
     var onFuncName = '_sync' + scout.ModelAdapter.preparePropertyNameForFunctionCal(propertyName);
     oldValues[propertyName] = value;
@@ -195,20 +193,20 @@ scout.ModelAdapter.prototype._syncProperties = function(oldValues, newValues, ig
   }.bind(this), ignore);
 };
 
-scout.ModelAdapter.prototype._renderProperties = function(oldValues, newValues, ignore) {
+scout.ModelAdapter.prototype._renderPropertiesOnPropertyChange = function(oldValues, newValues, ignore) {
   this._eachProperty(newValues, function(propertyName, value) {
-    var setterFuncName = '_set' + scout.ModelAdapter.preparePropertyNameForFunctionCal(propertyName);
-    $.log.debug('call ' + setterFuncName + '(' + value + ')');
+    var renderFuncName = '_render' + scout.ModelAdapter.preparePropertyNameForFunctionCal(propertyName);
+    $.log.debug('call ' + renderFuncName + '(' + value + ')');
 
     if (this._adapterProperties.indexOf(propertyName) > -1 && this[propertyName]) {
       this.onChildAdapterChange(propertyName, oldValues[propertyName], value);
     }
     else {
-      //Call the setter for regular properties, for adapters see onChildAdapterChange
-      if (!this[setterFuncName]) {
-        throw new Error('Setter function ' + setterFuncName + ' does not exist in model adapter');
+      //Call the render function for regular properties, for adapters see onChildAdapterChange
+      if (!this[renderFuncName]) {
+        throw new Error('Render function ' + renderFuncName + ' does not exist in model adapter');
       }
-      this[setterFuncName](value);
+      this[renderFuncName](value);
     }
 
   }.bind(this), ignore);
@@ -220,15 +218,15 @@ scout.ModelAdapter.preparePropertyNameForFunctionCal = function(propertyName) {
 
 /**
  * Removes the existing adapter specified by oldValue. Renders the new adapters if this.$container is set.<br>
- * To prevent this behavior just implement the method _setPropertyName or _unsetPropertyName (e.g _unsetTable).
+ * To prevent this behavior just implement the method _renderPropertyName or _removePropertyName (e.g _removeTable).
  */
 scout.ModelAdapter.prototype.onChildAdapterChange = function(propertyName, oldValue, newValue) {
   var funcName = scout.ModelAdapter.preparePropertyNameForFunctionCal(propertyName);
-  var setFuncName = '_set' + funcName;
-  var unsetFuncName = '_unset' + funcName;
+  var renderFuncName = '_render' + funcName;
+  var removeFuncName = '_remove' + funcName;
   var i;
 
-  if (!this[unsetFuncName]) {
+  if (!this[removeFuncName]) {
     if (Array.isArray(oldValue)) {
       for (i = 0; i < oldValue.length; i++) {
         oldValue[i].remove();
@@ -237,10 +235,10 @@ scout.ModelAdapter.prototype.onChildAdapterChange = function(propertyName, oldVa
       oldValue.remove();
     }
   } else {
-    this[unsetFuncName]();
+    this[removeFuncName]();
   }
 
-  if (!this[setFuncName] && this.$container) {
+  if (!this[renderFuncName] && this.$container) {
     if (Array.isArray(oldValue)) {
       for (i = 0; i < oldValue.length; i++) {
         newValue[i].render(this.$container);
@@ -249,7 +247,7 @@ scout.ModelAdapter.prototype.onChildAdapterChange = function(propertyName, oldVa
       newValue.render(this.$container);
     }
   } else {
-    this[setFuncName](newValue);
+    this[renderFuncName](newValue);
   }
 };
 

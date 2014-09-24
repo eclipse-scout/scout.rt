@@ -849,7 +849,7 @@ scout.AnalysisTableControl.prototype._syncRootEntityRef = function(rootEntityRef
   this._initRootEntity();
 };
 
-scout.AnalysisTableControl.prototype._renderProperties = function(oldValues, newValues, ignore) {
+scout.AnalysisTableControl.prototype._renderPropertiesOnPropertyChange = function(oldValues, newValues, ignore) {
   var render = false;
   if (newValues.dataModel !== undefined && newValues.dataModel !== oldValues.dataModel) {
     render = true;

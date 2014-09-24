@@ -3,17 +3,17 @@ scout.ValueField = function() {
 };
 scout.inherits(scout.ValueField, scout.FormField);
 
-scout.ValueField.prototype._callSetters = function() {
-  scout.ValueField.parent.prototype._callSetters.call(this);
+scout.ValueField.prototype._renderProperties = function() {
+  scout.ValueField.parent.prototype._renderProperties.call(this);
 
-  this._setDisplayText(this.displayText);
+  this._renderDisplayText(this.displayText);
 };
 
-scout.ValueField.prototype._setValue = function(value) {
+scout.ValueField.prototype._renderValue = function(value) {
   // NOP //FIXME CGU may probably be removed
 };
 
-scout.ValueField.prototype._setDisplayText = function(displayText) {
+scout.ValueField.prototype._renderDisplayText = function(displayText) {
   if (!this.$field) {
     return;
   }
@@ -29,7 +29,7 @@ scout.ValueField.prototype._readDisplayText = function(displayText) {
   return this.$field.val();
 };
 
-scout.ValueField.prototype._setValidateOnAnyKey = function(validateOnAnyKey) {
+scout.ValueField.prototype._renderValidateOnAnyKey = function(validateOnAnyKey) {
   if (!this.$field) {
     return;
   }

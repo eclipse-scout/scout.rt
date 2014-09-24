@@ -33,11 +33,11 @@ scout.CheckBoxField.prototype._render = function($parent) {
   }.bind(this));
 };
 
-scout.CheckBoxField.prototype._setEnabled = function(enabled) {
+scout.CheckBoxField.prototype._renderEnabled = function(enabled) {
   this._$checkBox.setEnabled(enabled);
 };
 
-scout.CheckBoxField.prototype._setValue = function(value) {
+scout.CheckBoxField.prototype._renderValue = function(value) {
   if (value) {
     this._$checkBox.attr('checked', 'checked');
   } else {
@@ -52,7 +52,7 @@ scout.CheckBoxField.prototype._setValue = function(value) {
 /**
  * @override
  */
-scout.CheckBoxField.prototype._setLabel = function(label) {
+scout.CheckBoxField.prototype._renderLabel = function(label) {
   if (!label) {
     label = '';
   }

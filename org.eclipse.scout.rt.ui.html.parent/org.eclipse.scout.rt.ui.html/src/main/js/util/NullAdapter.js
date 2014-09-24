@@ -4,6 +4,6 @@ scout.NullAdapter = function() {
 
 scout.inherits(scout.NullAdapter, scout.ModelAdapter);
 
-scout.NullAdapter.prototype._setSelected = function(selected) {
+scout.NullAdapter.prototype._renderSelected = function(selected) {
   // nop
 };

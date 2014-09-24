@@ -606,10 +606,10 @@ scout.Tree.prototype.onModelAction = function(event) {
   }
 };
 
-scout.Tree.prototype._setMenus = function() {
+scout.Tree.prototype._renderMenus = function() {
   // NOP
 };
 
-scout.Tree.prototype._setTitle = function() {
+scout.Tree.prototype._renderTitle = function() {
   // NOP
 };

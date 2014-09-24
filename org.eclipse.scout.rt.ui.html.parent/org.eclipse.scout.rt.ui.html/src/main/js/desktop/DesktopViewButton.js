@@ -23,29 +23,27 @@ scout.DesktopViewButton.prototype._render = function($parent) {
     }
     this.session.send('click', that.id);
   }.bind(this));
-
-  this._callSetters();
 };
 
-scout.DesktopViewButton.prototype._callSetters = function() {
-  this._setEnabled(this.enabled);
-  this._setText(this.text);
-  this._setIconId(this.iconId);
+scout.DesktopViewButton.prototype._renderProperties = function() {
+  this._renderEnabled(this.enabled);
+  this._renderText(this.text);
+  this._renderIconId(this.iconId);
 };
 
-scout.DesktopViewButton.prototype._setEnabled = function(enabled) {
+scout.DesktopViewButton.prototype._renderEnabled = function(enabled) {
   this.$container.setEnabled(enabled);
 };
 
-scout.DesktopViewButton.prototype._setText = function(title) {
+scout.DesktopViewButton.prototype._renderText = function(title) {
   this.$container.text(title);
 };
 
-scout.DesktopViewButton.prototype._setIconId = function(iconId) {
+scout.DesktopViewButton.prototype._renderIconId = function(iconId) {
   //FIXME implement
 };
 
-scout.DesktopViewButton.prototype._setOutline = function(outline) {
+scout.DesktopViewButton.prototype._renderOutline = function(outline) {
   // nop
 };
 
@@ -54,7 +52,7 @@ scout.DesktopViewButton.prototype.goOffline = function() {
 
   //Disable if outline has not been loaded yet
   if (!this.outline) {
-    this._setEnabled(false);
+    this._renderEnabled(false);
   }
 };
 
@@ -62,7 +60,7 @@ scout.DesktopViewButton.prototype.goOnline = function() {
   scout.DesktopViewButton.parent.prototype.goOnline.call(this);
 
   if (this.enabled) {
-    this._setEnabled(true);
+    this._renderEnabled(true);
   }
 };
 

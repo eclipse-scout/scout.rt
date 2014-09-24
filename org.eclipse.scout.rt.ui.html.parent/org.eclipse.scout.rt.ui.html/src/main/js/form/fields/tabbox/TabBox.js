@@ -42,24 +42,23 @@ scout.TabBox.prototype._render = function($parent) {
    * I decided to simply this and always set the title of the first group-box
    * to invisible.
    */
-  this.groupBoxes[this.selectedTab]._setLabelVisible(false);
+  this.groupBoxes[this.selectedTab]._renderLabelVisible(false);
 
   // TODO AWE: (tab-box) improv. implementation - currently very hacky
   // in Swing hat das JTabbedPane 2'500 lines of code! use JQuery UI plugin?
 //  this._uiSetSelectedTab(this.selectedTab);
 };
 
-// TODO AWE: rename _renderProperties
-scout.TabBox.prototype._callSetters = function() {
-  scout.TabBox.parent.prototype._callSetters.call(this);
-  this._setSelectedTab(this.selectedTab);
+scout.TabBox.prototype._renderProperties = function() {
+  scout.TabBox.parent.prototype._renderProperties.call(this);
+  this._renderSelectedTab(this.selectedTab);
 };
 
 scout.TabBox.prototype._onTabClicked = function(tab) {
   var tabIndex = $(tab.target).data('tabIndex');
   this.selectedTab = tabIndex;
   this.session.send('select', this.id, {'tabIndex':tabIndex});
-  this._setSelectedTab(tabIndex);
+  this._renderSelectedTab(tabIndex);
   // TODO AWE: (tab-box) send to server? or make everything client-side
 };
 
@@ -67,7 +66,7 @@ scout.TabBox.prototype._onTabClicked = function(tab) {
 //  this.groupBoxes[tabIndex].render(this._$tabContent);
 
 // TODO AWE: rename _setXxx --> _renderXxx
-scout.TabBox.prototype._setSelectedTab = function(selectedTab) {
+scout.TabBox.prototype._renderSelectedTab = function(selectedTab) {
   var i, $tabs = this._$tabArea.children('button');
   for (i=0; i<$tabs.length; i++) {
     $($tabs[i]).removeClass('selected');
