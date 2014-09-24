@@ -467,6 +467,10 @@ scout.Table.prototype.onRowsSelected = function($selectedRows) {
   }
 };
 
+scout.Table.prototype.onResize = function() {
+  // TODO CGU: impl. onResize for Table.js
+};
+
 scout.Table.prototype.sendRowAction = function($row) {
   this.session.send('rowAction', this.id, {
     'rowId': $row.attr('id')

@@ -10,10 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form.fields.tabbox;
 
+import java.util.List;
+
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
-import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
+import org.eclipse.scout.rt.ui.html.json.JsonEvent;
+import org.eclipse.scout.rt.ui.html.json.JsonEventType;
+import org.eclipse.scout.rt.ui.html.json.JsonResponse;
+import org.eclipse.scout.rt.ui.html.json.PropertyChangeEventFilterCondition;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonProperty;
 import org.json.JSONObject;
@@ -28,14 +33,35 @@ public class JsonTabBox extends JsonFormField<ITabBox> {
   protected void initJsonProperties(ITabBox model) {
     super.initJsonProperties(model);
 
-    putJsonProperty(new JsonAdapterProperty<ITabBox>(ITabBox.PROP_SELECTED_TAB, model, getJsonSession()) {
+    // instead of returning a whole adapter here, we simply return the index of the group-box (=tab)
+    putJsonProperty(new JsonProperty<ITabBox>(ITabBox.PROP_SELECTED_TAB, model) {
+
+      // TODO AWE: (tab-box) feuert als folge von getModel().getUIFacade().setSelectedTabFromUI(groupBox);
+      // einen PC event, den wir gerne filtern würden - wie machen wir das am elegantesten?
+
       @Override
-      protected IGroupBox modelValue() {
+      public Integer prepareValueForToJson(Object value) {
+        IGroupBox selectedTab = (IGroupBox) value;
+        return getIndexForGroupBox(selectedTab);
+      }
+
+      private int getIndexForGroupBox(IGroupBox groupBox) {
+        List<IGroupBox> groupBoxes = getModel().getGroupBoxes();
+        for (int i = 0; i < groupBoxes.size(); i++) {
+          if (groupBox == groupBoxes.get(i)) {
+            return i;
+          }
+        }
+        throw new IllegalStateException("selected tab not found in group-boxes list");
+      }
+
+      @Override
+      protected Object modelValue() {
         return getModel().getSelectedTab();
       }
     });
 
-    //FIXME CGU really needed?
+    // FIXME CGU really needed?
     putJsonProperty(new JsonProperty<ITabBox>(ITabBox.PROP_MARK_STRATEGY, model) {
       @Override
       protected Integer modelValue() {
@@ -66,4 +92,30 @@ public class JsonTabBox extends JsonFormField<ITabBox> {
     return putAdapterIdsProperty(super.toJson(), "groupBoxes", getModel().getGroupBoxes());
   }
 
+  @Override
+  public void handleUiEvent(JsonEvent event, JsonResponse res) {
+    if (JsonEventType.SELECT.matches(event)) {
+      handleUiTabSelected(event);
+    }
+    else {
+      super.handleUiEvent(event, res);
+    }
+  }
+
+  private void handleUiTabSelected(JsonEvent event) {
+    int tabIndex = event.getData().optInt("tabIndex");
+    List<IGroupBox> groupBoxes = getModel().getGroupBoxes();
+    if (tabIndex >= 0 && tabIndex < groupBoxes.size()) {
+      IGroupBox groupBox = groupBoxes.get(tabIndex);
+      // TODO AWE: (filter) anschauen --> evtl. filter am ende vom request abräumen
+      PropertyChangeEventFilterCondition condition = new PropertyChangeEventFilterCondition(ITabBox.PROP_SELECTED_TAB, groupBox);
+      getPropertyEventFilter().addCondition(condition);
+      try {
+        getModel().getUIFacade().setSelectedTabFromUI(groupBox);
+      }
+      finally {
+        getPropertyEventFilter().removeCondition(condition);
+      }
+    }
+  }
 }

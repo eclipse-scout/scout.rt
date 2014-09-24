@@ -21,7 +21,9 @@ public enum JsonEventType {
 
   CLICK("click"),
 
-  PROPERTY("property");
+  PROPERTY("property"),
+
+  SELECT("select");
 
   private String m_eventType;
 

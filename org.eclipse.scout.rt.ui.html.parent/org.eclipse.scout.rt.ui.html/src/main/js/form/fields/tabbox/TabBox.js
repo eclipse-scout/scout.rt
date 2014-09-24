@@ -7,7 +7,8 @@
  */
 scout.TabBox = function() {
   scout.TabBox.parent.call(this);
-  this._addAdapterProperties(['groupBoxes', 'selectedTab']);
+  this._addAdapterProperties(['groupBoxes']);
+  this.selectedTab;
   this._$tabArea;
   this._$tabContent;
 };
@@ -29,37 +30,50 @@ scout.TabBox.prototype._render = function($parent) {
       data('tabIndex', i).
       on('click', this._onTabClicked.bind(this));
   }
-  this._setTabItemSelected(0);
 
   // render 1st tab (currently hard-coded)
   this._$tabContent = this.$container.appendDiv('', 'tab-content');
   htmlComp = new scout.HtmlComponent(this._$tabContent);
   htmlComp.setLayout(new scout.SingleLayout());
-  this.groupBoxes[0].render(this._$tabContent);
+  this.groupBoxes[this.selectedTab].render(this._$tabContent);
 
   /* in Swing there's some complicated logic dealing with borders and labels
    * that determines whether the first group-box in a tab-box has a title or not.
    * I decided to simply this and always set the title of the first group-box
    * to invisible.
    */
-  this.groupBoxes[0]._setLabelVisible(false);
+  this.groupBoxes[this.selectedTab]._setLabelVisible(false);
 
   // TODO AWE: (tab-box) improv. implementation - currently very hacky
   // in Swing hat das JTabbedPane 2'500 lines of code! use JQuery UI plugin?
+//  this._uiSetSelectedTab(this.selectedTab);
+};
+
+// TODO AWE: rename _renderProperties
+scout.TabBox.prototype._callSetters = function() {
+  scout.TabBox.parent.prototype._callSetters.call(this);
+  this._setSelectedTab(this.selectedTab);
 };
 
 scout.TabBox.prototype._onTabClicked = function(tab) {
   var tabIndex = $(tab.target).data('tabIndex');
-  this._setTabItemSelected(tabIndex);
+  this.selectedTab = tabIndex;
+  this.session.send('select', this.id, {'tabIndex':tabIndex});
+  this._setSelectedTab(tabIndex);
   // TODO AWE: (tab-box) send to server? or make everything client-side
 };
 
-scout.TabBox.prototype._setTabItemSelected = function(index) {
+//  this._$tabContent.children().first().detach();
+//  this.groupBoxes[tabIndex].render(this._$tabContent);
+
+// TODO AWE: rename _setXxx --> _renderXxx
+scout.TabBox.prototype._setSelectedTab = function(selectedTab) {
   var i, $tabs = this._$tabArea.children('button');
   for (i=0; i<$tabs.length; i++) {
     $($tabs[i]).removeClass('selected');
   }
-  if (index >= 0 && index < $tabs.length) {
-    $($tabs[index]).addClass('selected');
+  if (selectedTab >= 0 && selectedTab < $tabs.length) {
+    $($tabs[selectedTab]).addClass('selected');
   }
+  $.log.debug('selectedTab='+selectedTab);
 };
