@@ -160,7 +160,7 @@ scout.FormFieldLayout.prototype.layout = function($container) {
 
 scout.FormFieldLayout.prototype.preferredLayoutSize = function($container) {
   var width = 0,
-    height = 23,
+    height = scout.HtmlEnvironment.formRowHeight,
     $label = $container.children('label'),
     $status = $container.children('.status'),
     $field = $container.children('.field');
@@ -179,7 +179,7 @@ scout.FormFieldLayout.prototype.preferredLayoutSize = function($container) {
       prefSize = new scout.Dimension($field.width(), $field.height());
     }
     width += prefSize.width;
-    height += prefSize.height;
+    height = Math.max(height, prefSize.height);
   }
   return new scout.Dimension(width, height);
 };
