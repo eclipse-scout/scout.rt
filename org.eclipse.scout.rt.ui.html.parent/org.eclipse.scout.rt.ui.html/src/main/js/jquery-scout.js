@@ -213,6 +213,15 @@
     return this;
   };
 
+  $.fn.icon = function(iconId) {
+    if (iconId) {
+      this.attr('data-icon', iconId);
+    } else {
+      this.removeAttr('data-icon');
+    }
+    return this;
+  };
+
   // TODO AWE: search/replace for other uses of is(':visible') - in der Table wird das noch verwendet
   // C.GU fragen ob es Ok ist, wenn wir das mit isVisible() ersetzen.
 

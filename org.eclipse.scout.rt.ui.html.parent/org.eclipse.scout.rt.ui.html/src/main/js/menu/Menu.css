@@ -1,3 +1,11 @@
+.menu-icon(@icon) {
+  display: inline-block;
+  font-family: fontAwesome;
+  font-size: 24px;
+  line-height: @size-desktop-menu;
+  content: @icon;
+}
+
 .menubar {
   width: 100%;
   position: relative;
@@ -43,13 +51,8 @@
     color: @color-bench-text-active;
   }
 
-
   &[data-icon]:before{
-    display: inline-block;
-    font-family: fontAwesome;
-    font-size: 24px;
-    line-height: @size-desktop-menu;
-    content: attr(data-icon);
+    .menu-icon(attr(data-icon));
   }
 
   &.has-submenu:after{
@@ -58,7 +61,7 @@
     left: 0px;
     top: 2px;
     font-family: fontAwesome;
-	line-height: 18px;
+    line-height: 18px;
     font-size: 18px;
     padding-left: 10px;
     content: "\F107";

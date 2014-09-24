@@ -59,6 +59,7 @@
 //@include("desktop/OutlineNavigateUpMenu.js");
 //@include("messagebox/MessageBox.js");
 //@include("form/Form.js");
+//@include("form/DetachFormMenu.js");
 //@include("form/fields/FormField.js");
 //@include("form/fields/ValueField.js");
 //@include("form/fields/CompositeField.js");

@@ -69,11 +69,7 @@ scout.Menu.prototype._renderText = function(text) {
 
 
 scout.Menu.prototype._renderIconId = function(iconId) {
-  if (iconId && !this.text) {
-    this.$container.attr('data-icon', iconId);
-  } else {
-    this.$container.removeAttr('data-icon');
-  }
+  this.$container.icon(iconId);
 };
 
 scout.Menu.prototype._renderEnabled = function(enabled) {

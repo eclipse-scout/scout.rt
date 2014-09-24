@@ -2,3 +2,7 @@
   height: 100%;
   width: 100%;
 }
+
+.detach-menu:before {
+  .menu-icon('\f0c4');
+}
