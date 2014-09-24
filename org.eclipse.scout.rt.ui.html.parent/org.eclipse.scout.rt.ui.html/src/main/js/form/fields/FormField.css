@@ -6,18 +6,18 @@
 }
 
 .form-field > label {
-  display:inline-block;
+  position:absolute;
   text-overflow:ellipsis;
   overflow:hidden;
   max-width:130px;
 }
 
 .form-field > span.status {
-  display:inline-block;
+  position:absolute;
 }
 
 .form-field > .field {
-  display:inline-block;
+  position:absolute;
 }
 
 /* Form-Fields */

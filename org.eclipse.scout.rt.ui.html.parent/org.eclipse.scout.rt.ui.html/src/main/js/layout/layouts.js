@@ -127,34 +127,32 @@ scout.GroupBoxLayout.prototype._getHtmlBody = function($container) {
 scout.FormFieldLayout = function() {
   scout.FormFieldLayout.parent.call(this);
   this.labelWidth = scout.HtmlEnvironment.fieldLabelWidth;
+  this.statusWidth = 10;
 };
 scout.inherits(scout.FormFieldLayout, scout.AbstractLayout);
 
 scout.FormFieldLayout.prototype.layout = function($container) {
-  var htmlComp = scout.HtmlComponent.get($container);
-  var containerSize = htmlComp.getSize();
-  var widthDiff = 0;
-  var $label = $container.children('label');
+  var htmlComp = scout.HtmlComponent.get($container),
+    contSize = htmlComp.getSize(),
+    widthSum = 0,
+    $label = $container.children('label'),
+    $status = $container.children('.status'),
+    $field = $container.children('.field');
   if ($label.isVisible()) {
-    $label.width(this.labelWidth);
-    widthDiff += this.labelWidth;
+    scout.HtmlComponent.setBounds($label, 0, 0, this.labelWidth, contSize.height);
+    widthSum += this.labelWidth;
   }
-  var $status = $container.children('.status');
   if ($status.isVisible()) {
-    $status.width(10);
-    widthDiff += 10;
+    scout.HtmlComponent.setBounds($status, widthSum, 0, this.statusWidth, contSize.height);
+    widthSum += this.statusWidth;
   }
-  var $field = $container.
-    children('.field').
-    innerWidth(containerSize.width - widthDiff).
-    innerHeight(containerSize.height);
-  // TODO AWE: (layout) hier scheinen die insets nicht korrekt zu sein: generell layout/size
-  // konzept mit C.GU besprechen Swing VS Html UI.
-
+  var fieldBounds = new scout.Rectangle(widthSum, 0, contSize.width - widthSum, contSize.height),
+    htmlField = scout.HtmlComponent.optGet($field);
   // TODO AWE: (layout) dafür sorgen, dass wir hier immer ein get() machen können
-  var htmlField = scout.HtmlComponent.optGet($field);
   if (htmlField) {
-    htmlField.layout();
+    htmlField.setBounds(fieldBounds);
+  } else {
+    scout.HtmlComponent.setBounds($field, fieldBounds);
   }
 };
 
@@ -168,7 +166,7 @@ scout.FormFieldLayout.prototype.preferredLayoutSize = function($container) {
     width += this.labelWidth;
   }
   if ($status.isVisible()) {
-    width += 10;
+    width += this.statusWidth;
   }
   if ($field.isVisible()) {
     // TODO AWE: (layout) dafür sorgen, dass wir hier immer ein get() machen können

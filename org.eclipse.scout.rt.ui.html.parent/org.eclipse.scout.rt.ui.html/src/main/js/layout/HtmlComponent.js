@@ -25,6 +25,29 @@ scout.HtmlComponent.optGet = function($comp) {
   return $comp.data('htmlComponent');
 };
 
+/* These functions are designed to be used with box-sizing:box-model. The only reliable
+ * way to set the size of a component when working with box model is to use css('width/height'...)
+ * in favor of width/height() functions.
+ */
+
+scout.HtmlComponent.setSize = function($comp, vararg, height) {
+  var size = vararg instanceof scout.Dimension ?
+      vararg : new scout.Dimension(vararg, height);
+  $comp.
+    css('width', size.width + 'px').
+    css('height', size.height+ 'px');
+};
+
+scout.HtmlComponent.setBounds = function($comp, vararg, y, width, height) {
+  var bounds = vararg instanceof scout.Rectangle ?
+      vararg : new scout.Rectangle(vararg, y, width, height);
+  $comp.
+    css('left', bounds.x + 'px').
+    css('top', bounds.y + 'px').
+    css('width', bounds.width + 'px').
+    css('height', bounds.height + 'px');
+};
+
 /**
  * Returns the parent or $comp. Creates a new instance of HtmlComponent if the parent DOM element has no linked instance.
  */
@@ -105,9 +128,7 @@ scout.HtmlComponent.prototype.setSize = function(size) {
   if (!oldSize.equals(size)) {
     this.layoutManager.invalidate();
   }
-  this.$comp.
-    width(size.width).
-    height(size.height);
+  scout.HtmlComponent.setSize(this.$comp, size);
   this.layout();
 };
 
@@ -124,11 +145,7 @@ scout.HtmlComponent.prototype.setBounds = function(bounds) {
   if (!oldBounds.equals(bounds)) {
     this.layoutManager.invalidate();
   }
-  this.$comp.
-    css('left', bounds.x).
-    width(bounds.width).
-    css('top', bounds.y).
-    height(bounds.height);
+  scout.HtmlComponent.setBounds(this.$comp, bounds);
   this.layout();
 };
 
@@ -145,4 +162,3 @@ scout.HtmlComponent.prototype.debug = function() {
   }
   return 'HtmlComponent[' + attrs.trim() + ']';
 };
-

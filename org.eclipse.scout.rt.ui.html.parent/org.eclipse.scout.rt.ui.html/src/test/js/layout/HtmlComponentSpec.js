@@ -61,14 +61,13 @@ describe("HtmlComponent", function() {
     };
 
     it("accepts scout.Dimension as single argument", function() {
-      spyOn(jqueryMock, 'width').and.callThrough();
-      spyOn(jqueryMock, 'height').and.callThrough();
+      spyOn(jqueryMock, 'css').and.callThrough();
       htmlComp.setSize(new scout.Dimension(6, 7));
       var size = htmlComp.getSize();
       expect(size.width).toBe(6);
       expect(size.height).toBe(7);
-      expect(jqueryMock.width).toHaveBeenCalledWith(6);
-      expect(jqueryMock.height).toHaveBeenCalledWith(7);
+      expect(jqueryMock.css).toHaveBeenCalledWith('width', '6px');
+      expect(jqueryMock.css).toHaveBeenCalledWith('height', '7px');
     });
 
     it("calls invalidate on layout-manager when size has changed", function() {
