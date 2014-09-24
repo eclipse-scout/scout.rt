@@ -11,6 +11,9 @@ scout.TabBox = function() {
   this.selectedTab;
   this._$tabArea;
   this._$tabContent;
+
+  // Contains detached tab-content, stored in order to be appended later
+  this._$tabContentCache = [];
 };
 scout.inherits(scout.TabBox, scout.FormField);
 
@@ -35,18 +38,6 @@ scout.TabBox.prototype._render = function($parent) {
   this._$tabContent = this.$container.appendDiv('', 'tab-content');
   htmlComp = new scout.HtmlComponent(this._$tabContent);
   htmlComp.setLayout(new scout.SingleLayout());
-  this.groupBoxes[this.selectedTab].render(this._$tabContent);
-
-  /* in Swing there's some complicated logic dealing with borders and labels
-   * that determines whether the first group-box in a tab-box has a title or not.
-   * I decided to simply this and always set the title of the first group-box
-   * to invisible.
-   */
-  this.groupBoxes[this.selectedTab]._renderLabelVisible(false);
-
-  // TODO AWE: (tab-box) improv. implementation - currently very hacky
-  // in Swing hat das JTabbedPane 2'500 lines of code! use JQuery UI plugin?
-//  this._uiSetSelectedTab(this.selectedTab);
 };
 
 scout.TabBox.prototype._renderProperties = function() {
@@ -59,14 +50,11 @@ scout.TabBox.prototype._onTabClicked = function(tab) {
   this.selectedTab = tabIndex;
   this.session.send('select', this.id, {'tabIndex':tabIndex});
   this._renderSelectedTab(tabIndex);
-  // TODO AWE: (tab-box) send to server? or make everything client-side
 };
 
-//  this._$tabContent.children().first().detach();
-//  this.groupBoxes[tabIndex].render(this._$tabContent);
 
-// TODO AWE: rename _setXxx --> _renderXxx
 scout.TabBox.prototype._renderSelectedTab = function(selectedTab) {
+  $.log.debug('(TabBox#_setSelectedTab) selectedTab='+selectedTab);
   var i, $tabs = this._$tabArea.children('button');
   for (i=0; i<$tabs.length; i++) {
     $($tabs[i]).removeClass('selected');
@@ -74,5 +62,31 @@ scout.TabBox.prototype._renderSelectedTab = function(selectedTab) {
   if (selectedTab >= 0 && selectedTab < $tabs.length) {
     $($tabs[selectedTab]).addClass('selected');
   }
-  $.log.debug('selectedTab='+selectedTab);
+
+  // replace tab-content
+  var $oldTab = this._$tabContent.children().first().detach();
+  if ($oldTab.data('tabIndex') !== undefined) {
+    var oldTabIndex = $oldTab.data('tabIndex');
+    this._$tabContentCache[oldTabIndex] = $oldTab;
+  }
+
+  var $cachedTabContent = this._$tabContentCache[this.selectedTab];
+  if ($cachedTabContent) {
+    $cachedTabContent.appendTo(this._$tabContent);
+  } else {
+    this.groupBoxes[this.selectedTab].render(this._$tabContent);
+    this._$tabContent.children().first().data('tabIndex', this.selectedTab);
+
+    /* in Swing there's some complicated logic dealing with borders and labels
+     * that determines whether the first group-box in a tab-box has a title or not.
+     * I decided to simply this and always set the title of the first group-box
+     * to invisible.
+     */
+    this.groupBoxes[this.selectedTab]._renderLabelVisible(false);
+
+    // TODO AWE: (layout) beim initialen rendern ist das nicht nötig
+    // schauen ob wir hier etwas unterdrücken müssen oder ob das
+    // durch valid/invalidate bereits abgedeckt ist
+    scout.HtmlComponent.get(this._$tabContent).layout();
+  }
 };
