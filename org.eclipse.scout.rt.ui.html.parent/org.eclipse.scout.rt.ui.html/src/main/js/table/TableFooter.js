@@ -189,7 +189,7 @@ scout.TableFooter.prototype._resizeData = function(sizeContainer) {
   // new size of container and table data
   var sizeMenubar = parseFloat(that._table.menubar.$container.css('height')),
     sizeHeader = parseFloat(that._table._$header.css('height')),
-    sizeFooter = parseFloat(that._$tableControl.css('height')),
+    sizeFooter = parseFloat(that._$tableFooter.css('height')),
     newOffset = sizeMenubar + sizeHeader + sizeFooter + sizeContainer;
 
   var oldH = this._table.$data.height(),
@@ -224,7 +224,7 @@ scout.TableFooter.prototype._addResize = function($parent) {
 
     function resizeEnd() {
       if (that.$controlContainer.height() < 75) {
-        $('.selected', that._$tableControl).click();
+        $('.selected', that._$tableFooter).click();
       }
 
       $('body').off('mousemove')
