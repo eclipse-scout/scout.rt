@@ -17,6 +17,8 @@ import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
  ******************************************************************************/
 
 public interface ITable5 extends ITable {
+  String PROP_TABLE_STATUS_VISIBLE = "tableStatusVisible";
+
   List<ITableControl> getControls();
 
 //FIXME move to ui facade.
@@ -25,4 +27,8 @@ public interface ITable5 extends ITable {
   void fireSortColumnRemovedFromUI(IColumn<?> column);
 
   Class<? extends IMenu> getDefaultMenu();
+
+  boolean isTableStatusVisible();
+
+  void setTableStatusVisible(boolean b);
 }

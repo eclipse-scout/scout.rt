@@ -1,7 +1,18 @@
-scout.TableFooter = function(table, $parent, session) {
-  var that = this, i, control, $group;
-
+scout.TableFooter = function(table, $parent) {
   this._table = table;
+  this._render($parent);
+};
+
+scout.TableFooter.FILTER_KEY = 'TEXTFIELD';
+
+scout.TableFooter.prototype._render = function($parent) {
+  var that = this, i, control, $group;
+  var filter = this._table.getFilter(scout.TableFooter.FILTER_KEY),
+    filterText;
+
+  if (filter) {
+    filterText = filter.text;
+  }
 
   this._$tableFooter = $parent.appendDIV('table-footer');
   this.$controlContainer = this._$tableFooter.appendDIV('control-container');
@@ -22,26 +33,33 @@ scout.TableFooter = function(table, $parent, session) {
     control.render($group);
   }
 
-  // filter
-  var filter = table.getFilter(scout.MapTableControl.FILTER_KEY),
-    filterText;
-
-  if (filter) {
-    filterText = filter.text;
-  }
-
-  $('<input class="control-filter"></input>')
+  $('<input>')
+    .addClass('control-filter')
     .appendTo(this._$tableFooter)
-    .on('input paste', '', $.debounce(filterEnter))
+    .on('input paste', '', $.debounce(this._onFilterInput.bind(this)))
     .val(filterText);
 
   // info section
-  this._$infoSelection = this._$tableFooter.appendDIV('table-info-selection').on('click', '', this._table.toggleSelection.bind(this._table));
-  this._$infoFilter = this._$tableFooter.appendDIV('table-info-filter').on('click', '', this._table.resetFilter.bind(this._table));
-  this._$infoReload = this._$tableFooter.appendDIV('table-info-reload').on('click', '', this._table.sendReload.bind(this._table));
+  this._$infoSelection = this._$tableFooter
+    .appendDIV('table-info-selection')
+    .on('click', '', this._table.toggleSelection.bind(this._table));
+  this._$infoFilter = this._$tableFooter
+    .appendDIV('table-info-filter')
+    .on('click', '', this._table.resetFilter.bind(this._table));
+  this._$infoLoad = this._$tableFooter
+    .appendDIV('table-info-load')
+    .on('click', '', this._table.sendReload.bind(this._table));
+
+  this._updateInfoLoad();
+  this._updateInfoLoadVisibility();
+  this._updateInfoSelection();
+  this._updateInfoSelectionVisibility();
+  this._updateInfoFilter();
+  this._updateInfoFilterVisibility();
 
   this._table.events.on(scout.Table.GUI_EVENT_ROWS_DRAWN, function(event) {
-    that._setInfoLoad(event.numRows);
+    that._updateInfoLoad();
+    that._updateInfoLoadVisibility();
   });
 
   this._table.events.on(scout.Table.GUI_EVENT_ROWS_SELECTED, function(event) {
@@ -49,84 +67,124 @@ scout.TableFooter = function(table, $parent, session) {
     if (event.$rows) {
       numRows = event.$rows.length;
     }
-    that._setInfoSelect(numRows, event.allSelected);
+    that._updateInfoSelection(numRows, event.allSelected);
+    that._updateInfoSelectionVisibility();
   });
 
   this._table.events.on(scout.Table.GUI_EVENT_ROWS_FILTERED, function(event) {
-    if (event.filterName.length) {
-      that._setInfoFilter(event.numRows, event.filterName.join(', '));
-    } else {
-      that._$infoFilter.animateAVCSD('width', 0, function() {
-        $(this).hide();
-      });
-    }
+    that._updateInfoFilter();
+    that._updateInfoFilterVisibility();
   });
 
   this._table.events.on(scout.Table.GUI_EVENT_FILTER_RESETTED, function(event) {
-    //hide info section
-    that._$infoFilter.animateAVCSD('width', 0, function() {
-      $(this).hide();
-    });
+    that._setInfoVisible(that._$infoFilter, false);
   });
+};
 
-  // control buttons have mouse over effects
-  $('body').on('mouseenter', '#control_graph, #control_chart, #control_map',
-    function() {
-      $('#control_label').text($(this).data('label'));
-    });
+scout.TableFooter.prototype._onFilterInput = function(event) {
+  var $input = $(event.currentTarget);
+  $input.val($input.val().toLowerCase());
 
-  $('body').on('mouseleave', '#control_graph, #control_chart, #control_map',
-    function() {
-      $('#control_label').text('');
-    });
-
-  // TODO cru: move, clean
-  function filterEnter(event) {
-    var $input = $(this);
-    $input.val($input.val().toLowerCase());
-
-    var filter = table.getFilter(scout.MapTableControl.FILTER_KEY);
-    if (!filter && $input.val()) {
-      filter = {
-        accept: function($row) {
-          var rowText = $row.text().toLowerCase();
-          return rowText.indexOf(this.text) > -1;
-        }
-      };
-      table.registerFilter(scout.MapTableControl.FILTER_KEY, filter);
-    } else if (!$input.val()) {
-      table.unregisterFilter(scout.MapTableControl.FILTER_KEY);
-    }
-
-    if (filter) {
-      filter.text = $input.val();
-      filter.label = filter.text;
-    }
-
-    table.filter();
-    event.stopPropagation();
+  var filter = this._table.getFilter(scout.TableFooter.FILTER_KEY);
+  if (!filter && $input.val()) {
+    filter = {
+      accept: function($row) {
+        var rowText = $row.text().toLowerCase();
+        return rowText.indexOf(this.text) > -1;
+      }
+    };
+    this._table.registerFilter(scout.TableFooter.FILTER_KEY, filter);
+  } else if (!$input.val()) {
+    this._table.unregisterFilter(scout.TableFooter.FILTER_KEY);
   }
 
+  if (filter) {
+    filter.text = $input.val();
+    filter.label = filter.text;
+  }
 
+  this._table.filter();
+  event.stopPropagation();
 };
 
-scout.TableFooter.prototype._setInfoLoad = function(count) {
-  this._$infoReload.html(this._findInfo(count) + ' geladen</br>Daten neu laden');
-  this._$infoReload.show().widthToContent();
+scout.TableFooter.prototype.remove = function() {
+  this._$tableFooter.remove();
 };
 
-scout.TableFooter.prototype._setInfoFilter = function(count, origin) {
-  this._$infoFilter.html(this._findInfo(count) + ' gefiltert' + (origin ? ' durch ' + origin : '') + '</br>Filter entfernen');
-  this._$infoFilter.show().widthToContent();
+scout.TableFooter.prototype.setTableStatusVisible= function(visible) {
+  this._updateInfoLoadVisibility();
+  this._updateInfoSelectionVisibility();
+  this._updateInfoFilterVisibility();
 };
 
-scout.TableFooter.prototype._setInfoSelect = function(count, all) {
-  var allText = all ? 'Keine' : 'Alle';
-  this._$infoSelection.html(this._findInfo(count) + ' selektiert</br>' + (allText) + ' selektieren'); //FIXME get translations from server
-  this._$infoSelection.show().widthToContent();
+scout.TableFooter.prototype._updateInfoLoad = function() {
+  var numRows = this._table.rows.length;
+  var info = this._computeCountInfo(numRows) + ' geladen<br>Daten neu laden';
+  if (this._$infoLoad.html() === info) {
+    return;
+  }
+
+  this._$infoLoad.html(info);
 };
 
-scout.TableFooter.prototype._findInfo = function(n) {
+scout.TableFooter.prototype._updateInfoFilter = function() {
+  var filteredBy = this._table.filteredBy();
+  if (filteredBy.length > 0) {
+    filteredBy = filteredBy.join(', ');
+  }
+  var numFilteredRows = this._table.filteredRowCount;
+  var info = this._computeCountInfo(numFilteredRows) + ' gefiltert' + (filteredBy ? ' durch ' + filteredBy : '') + '<br>Filter entfernen';
+  if (this._$infoFilter.html() === info) {
+    return;
+  }
+
+  this._$infoFilter.html(info);
+};
+
+scout.TableFooter.prototype._updateInfoSelection = function(numSelectedRows, all) {
+  var numRows = this._table.rows.length;
+  var allText, info;
+
+  if (numSelectedRows === undefined) {
+    numSelectedRows = this._table.selectedRowIds.length;
+  }
+  if (all === undefined) {
+    all = numRows === numSelectedRows;
+  }
+
+  allText = all ? 'Keine' : 'Alle';
+  info = this._computeCountInfo(numSelectedRows) + ' selektiert<br>' + (allText) + ' selektieren'; //FIXME get translations from server;
+  if (this._$infoSelection.html() === info) {
+    return;
+  }
+
+  this._$infoSelection.html(info);
+};
+
+scout.TableFooter.prototype._updateInfoSelectionVisibility = function() {
+  this._setInfoVisible(this._$infoSelection, this._table.tableStatusVisible);
+};
+
+scout.TableFooter.prototype._updateInfoLoadVisibility = function() {
+  this._setInfoVisible(this._$infoLoad, this._table.tableStatusVisible);
+};
+
+scout.TableFooter.prototype._updateInfoFilterVisibility = function() {
+  var visible =  this._table.tableStatusVisible && this._table.filteredBy().length > 0;
+  this._setInfoVisible(this._$infoFilter, visible);
+};
+
+scout.TableFooter.prototype._setInfoVisible = function($info, visible) {
+  if (visible) {
+    $info.show().widthToContent();
+  } else {
+    $info.animateAVCSD('width', 0, function() {
+      $(this).hide();
+    });
+  }
+};
+
+scout.TableFooter.prototype._computeCountInfo = function(n) {
   if (n === 0) {
     return 'Keine Zeile';
   } else if (n == 1) {

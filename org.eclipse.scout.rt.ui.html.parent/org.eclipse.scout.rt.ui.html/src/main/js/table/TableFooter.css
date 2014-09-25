@@ -16,7 +16,6 @@
   z-index: 10;
 }
 
-
 .control-container {
   position: absolute;
   overflow: hidden;
@@ -102,7 +101,7 @@
 .control-query:before {content:"\F002";}
 .control-category:before {content:"\F02B";}
 
-.table-info-reload,
+.table-info-load,
 .table-info-filter,
 .table-info-selection{
   position:relative;

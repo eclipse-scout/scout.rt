@@ -23,6 +23,12 @@ import org.eclipse.scout.service.SERVICES;
 public class AbstractPageWithTable5<T extends ITable5> extends AbstractPageWithTable<T> implements IPage5 {
 
   @Override
+  protected void initConfig() {
+    super.initConfig();
+    getTable().setTableStatusVisible(true);
+  }
+
+  @Override
   public void setTreeInternal(ITree tree, boolean includeSubtree) {
     super.setTreeInternal(tree, includeSubtree);
 

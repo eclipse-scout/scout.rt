@@ -131,12 +131,17 @@
   background-size: cover;
 }
 
-/* table */
+/* table / form*/
 
 .desktop-bench > .table > .table-header,
 .desktop-bench > .table > .table-data {
   margin-left: @margin-bench-left;
   margin-right: @margin-bench-right;
+}
+
+.desktop-bench > .table > .menubar,
+.desktop-bench > .form > .menubar {
+  padding-right: @margin-bench-right;
 }
 
 /* base desktop */

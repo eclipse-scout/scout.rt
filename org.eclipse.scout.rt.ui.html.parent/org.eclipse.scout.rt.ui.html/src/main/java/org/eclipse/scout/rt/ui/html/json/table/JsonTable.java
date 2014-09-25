@@ -184,6 +184,14 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
         return getModel().isScrollToSelection();
       }
     });
+    if (getModel() instanceof ITable5) {
+      putJsonProperty(new JsonProperty<ITable>(ITable5.PROP_TABLE_STATUS_VISIBLE, model) {
+        @Override
+        protected Boolean modelValue() {
+          return ((ITable5) getModel()).isTableStatusVisible();
+        }
+      });
+    }
 //    putJsonProperty(new JsonProperty<ITable, ITypeWithClassId>(ITable.PROP_CONTAINER, model) { //FIXME BSH CGU: only send properties when needed, do we need this one?
 //      @Override
 //      protected ITypeWithClassId getValueImpl() {
