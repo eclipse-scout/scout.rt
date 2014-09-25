@@ -17,12 +17,24 @@ scout.AbstractLayout = function() {
 };
 
 scout.AbstractLayout.prototype._verifyLayout = function($parent) {
-  var htmlParent = scout.HtmlComponent.get($parent);
-  var parentSize = htmlParent.getSize();
+  var htmlParent = scout.HtmlComponent.get($parent),
+    parentSize = htmlParent.getSize();
   if (!this.valid || !this.validityBasedOnParentSize.equals(parentSize)) {
     this.validityBasedOnParentSize = parentSize;
     this.validateLayout($parent);
     this.valid = true;
+  }
+};
+
+/**
+ * Returns the size of a visible component or (0,0) when component is invisible.
+ */
+scout.AbstractLayout.prototype._getVisibleSize = function($comp) {
+  if ($comp.length === 1 && $comp.isVisible()) {
+    // TODO AWE: (layout) static methode auf HtmlComponent -->
+    return new scout.Dimension($comp.outerWidth(true), $comp.outerHeight(true));
+  } else {
+    return new scout.Dimension(0, 0);
   }
 };
 
@@ -46,7 +58,6 @@ scout.FormLayout.prototype.layout = function($container) {
       contSize.width - rootGbInsets.left - rootGbInsets.right,
       contSize.height - rootGbInsets.top - rootGbInsets.bottom - this._getMenuBarHeight($container));
   $.log.trace('(FormLayout#layout) contSize=' + contSize);
-  // TODO AWE: (layout) must regard menu bar
   htmlRootGb.setSize(rootGbSize);
 };
 
@@ -62,13 +73,7 @@ scout.FormLayout.prototype._getHtmlRootGroupBox = function($container) {
 };
 
 scout.FormLayout.prototype._getMenuBarHeight = function($container) {
-  // TODO AWE: (layout) remove copy/paste
-  var $comp = $container.children('.menubar');
-  if ($comp.length === 1 && $comp.isVisible()) {
-    return $comp.outerHeight(true);
-  } else {
-    return 0;
-  }
+  return this._getVisibleSize($container.children('.menubar')).height;
 };
 
 /**
@@ -90,7 +95,6 @@ scout.GroupBoxLayout.prototype.layout = function($container) {
 };
 
 scout.GroupBoxLayout.prototype.preferredLayoutSize = function($container) {
-  // TODO AWE: (layout) add insets to GroupBoxLayout
   var bodySize = this._getHtmlBody($container).getPreferredSize();
   return new scout.Dimension(
       bodySize.width,
@@ -100,25 +104,15 @@ scout.GroupBoxLayout.prototype.preferredLayoutSize = function($container) {
 };
 
 scout.GroupBoxLayout.prototype._getTitleHeight = function($container) {
-  return this._getHeight($container, '.group-box-title');
+  return this._getVisibleSize($container.children('.group-box-title')).height;
 };
 
 scout.GroupBoxLayout.prototype._getButtonBarHeight = function($container) {
-  return this._getHeight($container, '.button-bar');
-};
-
-scout.GroupBoxLayout.prototype._getHeight = function($container, selector) {
-  var $comp = $container.children(selector);
-  if ($comp.length === 1 && $comp.isVisible()) {
-    return $comp.outerHeight(true);
-  } else {
-    return 0;
-  }
+  return this._getVisibleSize($container.children('.button-bar')).height;
 };
 
 scout.GroupBoxLayout.prototype._getHtmlBody = function($container) {
-  var $body = $container.children('.group-box-body');
-  return scout.HtmlComponent.get($body);
+  return scout.HtmlComponent.get($container.children('.group-box-body'));
 };
 
 /**
@@ -208,12 +202,12 @@ scout.ButtonFieldLayout.prototype.layout = function($container) {
   // button has no children - nothing to do here
 };
 
-// TODO AWE: (layout) use HtmlComponent#getInsets here , children instead of find?
+// TODO AWE: (layout) use HtmlComponent#getInsets here
 scout.ButtonFieldLayout.prototype.preferredLayoutSize = function($container) {
-  var $button = $container.find('button');
-  var hMargin = $button.outerWidth(true) - $button.width();
-  var vMargin = $button.outerHeight(true) - $button.height();
-  var textSize = scout.graphics.measureString($button.html());
+  var $button = $container.children('button'),
+    hMargin = $button.outerWidth(true) - $button.width(),
+    vMargin = $button.outerHeight(true) - $button.height(),
+    textSize = scout.graphics.measureString($button.html());
   return new scout.Dimension(textSize.width + hMargin, textSize.height + vMargin);
 };
 
@@ -226,15 +220,25 @@ scout.TabBoxLayout = function() {
 scout.inherits(scout.TabBoxLayout, scout.AbstractLayout);
 
 scout.TabBoxLayout.prototype.layout = function($container) {
-  // TODO AWE: (tab-box) impl. layout
   var htmlCont = scout.HtmlComponent.get($container),
-    contSize = htmlCont.getSize();
-  scout.HtmlComponent.get($container.children('.tab-area')).setSize(new scout.Dimension(contSize.width, 30));
-  scout.HtmlComponent.get($container.children('.tab-content')).setSize(new scout.Dimension(contSize.width, 520));
+    contSize = htmlCont.getSize(),
+    $tabArea =  $container.children('.tab-area'),
+    tabAreaHeight = 0;
+  if ($tabArea.isVisible()) {
+    // TODO AWE: (tab-box) tabArea neu layouten, inkl. tab-runs - muss noch definiert werden, wie wir das darstellen
+    // TODO AWE: (layout) function machen um "nur width" zu setzen.
+    $tabArea.css('width', contSize.width + 'px');
+    tabAreaHeight = $tabArea.outerHeight(true);
+  }
+  scout.HtmlComponent.get($container.children('.tab-content')).setSize(
+      new scout.Dimension(contSize.width, contSize.height - tabAreaHeight));
 };
 
 scout.TabBoxLayout.prototype.preferredLayoutSize = function($container) {
-  return new scout.Dimension($container.width(), 550);
+  var $tabArea = $container.children('.tab-area'),
+    $tabContent = $container.children('.tab-content'),
+    tabAreaSize = this._getVisibleSize($tabArea),
+    tabContentSize = scout.HtmlComponent.get($tabContent).getPreferredSize();
   //TODO AWE: (tab-box) impl. prefSize
   // size of tab-area
   // ... calculate tab-runs = Die container breite nehmen, mit buttons
@@ -244,6 +248,9 @@ scout.TabBoxLayout.prototype.preferredLayoutSize = function($container) {
   // ... hier haben wir das problem, das die content-panes nicht visible
   //     bzw. gar nicht im DOM sind. Trotzdem müssen wir irgendwie die
   //     grösse der groupbox berechnen können
+  return new scout.Dimension(
+    Math.max(tabAreaSize.width, tabContentSize.width),
+    tabAreaSize.height + tabContentSize.height);
 };
 
 /**
@@ -267,13 +274,14 @@ scout.SingleLayout = function() {
 scout.inherits(scout.SingleLayout, scout.AbstractLayout);
 
 scout.SingleLayout.prototype.preferredLayoutSize = function($container) {
-  var $singleChild = $container.children().first();
-  return scout.HtmlComponent.get($container).getPreferredSize();
+  return this._getHtmlSingleChild($container).getPreferredSize();
 };
 
 scout.SingleLayout.prototype.layout = function($container) {
-  var $singleChild = $container.children().first(),
-    contSize = scout.HtmlComponent.get($container).getSize();
-  scout.HtmlComponent.get($singleChild).setSize(contSize);
+  this._getHtmlSingleChild($container).setSize(
+      scout.HtmlComponent.get($container).getSize());
 };
 
+scout.SingleLayout.prototype._getHtmlSingleChild = function($container) {
+  return scout.HtmlComponent.get($container.children().first());
+};

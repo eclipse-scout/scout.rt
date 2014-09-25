@@ -15,7 +15,7 @@ scout.TabBox = function() {
   // Contains detached tab-content, stored in order to be appended later
   this._$tabContentCache = [];
 };
-scout.inherits(scout.TabBox, scout.FormField);
+scout.inherits(scout.TabBox, scout.CompositeField);
 
 scout.TabBox.prototype._render = function($parent) {
   this.addContainer($parent, 'TabBox', new scout.TabBoxLayout());
@@ -90,3 +90,11 @@ scout.TabBox.prototype._renderSelectedTab = function(selectedTab) {
     scout.HtmlComponent.get(this._$tabContent).layout();
   }
 };
+
+/**
+ * @override CompositeField
+ */
+scout.CompositeField.prototype.getFields = function() {
+  return this.groupBoxes;
+};
+
