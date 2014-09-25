@@ -155,7 +155,3 @@ scout.FormField.prototype.addContainer = function($parent, typeName, layout) {
   htmlComp.setLayout(layout || new scout.FormFieldLayout());
   return htmlComp;
 };
-
-
-
-

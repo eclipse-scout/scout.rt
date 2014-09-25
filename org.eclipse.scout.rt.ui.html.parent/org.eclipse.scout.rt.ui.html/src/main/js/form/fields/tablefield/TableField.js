@@ -9,13 +9,19 @@ scout.inherits(scout.TableField, scout.FormField);
 
 scout.TableField.prototype._render = function($parent) {
   this.addContainer($parent, 'TableField');
+  this.$container.addClass('table-field');
   this.addLabel();
   this.addStatus();
 
-  this.$field = $.makeDIV('field').
-    appendTo(this.$container);
-
   if (this.table) {
-    this.table.render(this.$field);
+    this._renderTable();
   }
+};
+
+/**
+ * Will also be called by model adapter on property change event
+ */
+scout.TableField.prototype._renderTable = function() {
+  this.table.render(this.$container);
+  this.table.$container.addClass('field');
 };

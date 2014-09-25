@@ -136,20 +136,25 @@ scout.ModelAdapter.prototype._eachProperty = function(model, func, ignore) {
   for (i = 0; i < this._adapterProperties.length; i++) {
     propertyName = this._adapterProperties[i];
     value = model[propertyName];
-    if (!value) {
+    if (value === undefined) {
       continue;
     }
-    if (Array.isArray(value)) {
-      adapters = [];
-      for (j = 0; j < value.length; j++) {
-        adapter = this.session.getOrCreateModelAdapter(value[j], this);
-        this.onChildAdapterCreated(propertyName, adapter);
-        adapters.push(adapter);
+    // Distinguishing between undefined and '' is important
+    // The value is '' if the server wants to explicitly remove the adapter
+    // -> func() needs to be called for 'empty' adapters
+    if (value !== '') {
+      if (Array.isArray(value)) {
+        adapters = [];
+        for (j = 0; j < value.length; j++) {
+          adapter = this.session.getOrCreateModelAdapter(value[j], this);
+          this.onChildAdapterCreated(propertyName, adapter);
+          adapters.push(adapter);
+        }
+        value = adapters;
+      } else {
+        value = this.session.getOrCreateModelAdapter(value, this);
+        this.onChildAdapterCreated(propertyName, value);
       }
-      value = adapters;
-    } else {
-      value = this.session.getOrCreateModelAdapter(value, this);
-      this.onChildAdapterCreated(propertyName, value);
     }
 
     func(propertyName, value);
@@ -183,7 +188,7 @@ scout.ModelAdapter.prototype.onModelPropertyChange = function(event) {
 scout.ModelAdapter.prototype._syncPropertiesOnPropertyChange = function(oldValues, newValues, ignore) {
   this._eachProperty(newValues, function(propertyName, value) {
     var onFuncName = '_sync' + scout.ModelAdapter.preparePropertyNameForFunctionCal(propertyName);
-    oldValues[propertyName] = value;
+    oldValues[propertyName] = this[propertyName];
 
     if (this[onFuncName]) {
       this[onFuncName](value);
@@ -198,7 +203,7 @@ scout.ModelAdapter.prototype._renderPropertiesOnPropertyChange = function(oldVal
     var renderFuncName = '_render' + scout.ModelAdapter.preparePropertyNameForFunctionCal(propertyName);
     $.log.debug('call ' + renderFuncName + '(' + value + ')');
 
-    if (this._adapterProperties.indexOf(propertyName) > -1 && this[propertyName]) {
+    if (this._adapterProperties.indexOf(propertyName) > -1) {
       this.onChildAdapterChange(propertyName, oldValues[propertyName], value);
     }
     else {
@@ -226,28 +231,34 @@ scout.ModelAdapter.prototype.onChildAdapterChange = function(propertyName, oldVa
   var removeFuncName = '_remove' + funcName;
   var i;
 
-  if (!this[removeFuncName]) {
-    if (Array.isArray(oldValue)) {
-      for (i = 0; i < oldValue.length; i++) {
-        oldValue[i].remove();
+  // Remove old adapter, if there is one
+  if (oldValue) {
+    if (!this[removeFuncName]) {
+      if (Array.isArray(oldValue)) {
+        for (i = 0; i < oldValue.length; i++) {
+          oldValue[i].remove();
+        }
+      } else {
+        oldValue.remove();
       }
     } else {
-      oldValue.remove();
+      this[removeFuncName]();
     }
-  } else {
-    this[removeFuncName]();
   }
 
-  if (!this[renderFuncName] && this.$container) {
-    if (Array.isArray(oldValue)) {
-      for (i = 0; i < oldValue.length; i++) {
-        newValue[i].render(this.$container);
+  // Render new adapter, if there is one
+  if (newValue) {
+    if (!this[renderFuncName] && this.$container) {
+      if (Array.isArray(oldValue)) {
+        for (i = 0; i < oldValue.length; i++) {
+          newValue[i].render(this.$container);
+        }
+      } else {
+        newValue.render(this.$container);
       }
     } else {
-      newValue.render(this.$container);
+      this[renderFuncName](newValue);
     }
-  } else {
-    this[renderFuncName](newValue);
   }
 };
 

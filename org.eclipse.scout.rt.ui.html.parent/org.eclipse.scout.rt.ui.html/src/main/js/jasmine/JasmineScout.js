@@ -32,6 +32,14 @@ function sendQueuedAjaxCalls(response) {
   }
 }
 
+function createPropertyChangeEvent(model, properties) {
+  return {
+    id: model.id,
+    properties: properties,
+    type: 'property'
+  };
+}
+
 var jasmineScoutMatchers = {
   /**
    * Checks if given request contains expected events, order does not matter.
