@@ -1,3 +1,5 @@
+@table-cell-inset: 5px;
+
 .table {
   height: 100%;
   width: 100%;
@@ -125,7 +127,7 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   vertical-align: center;
-  line-height: @size-table-row - 5px;
+  line-height: @size-table-row - @table-cell-inset;
   color: @color-bench-text;
 }
 

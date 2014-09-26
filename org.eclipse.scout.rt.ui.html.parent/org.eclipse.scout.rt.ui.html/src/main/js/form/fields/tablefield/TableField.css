@@ -1,3 +1,27 @@
 .table-field > .table {
   border: 1px solid @color-bench-light-border;
 }
+
+.table-field > .table > .menubar,
+.table-field > .table > .table-header {
+  height: @logical-grid-height;
+}
+
+.table-field > .table > .menubar > .menu-item,
+.table-field > .table > .table-header > .header-item {
+  line-height: @logical-grid-height;
+}
+
+.table-field > .table > .menubar > .menu-item[data-icon]:before {
+  font-size: 18px;
+  line-height: @logical-grid-height;
+}
+
+.table-field > .table > .table-data .table-row {
+  height: @logical-grid-height;
+  line-height: @logical-grid-height;
+}
+
+.table-field > .table > .table-data .table-row > .table-cell {
+  line-height: @logical-grid-height - @table-cell-inset;
+}

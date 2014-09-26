@@ -1,3 +1,5 @@
+@logical-grid-height: 36px;
+
 .form-field {
   box-sizing:border-box;
   white-space:nowrap;
