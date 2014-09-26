@@ -1,9 +1,9 @@
-/* color basics */ 
+/* color basics */
 
 @color-nav: #41525E;
 @color-nav-semi: #506678;
 @color-nav-light: #DADADA;
-@color-nav-select: #FFFFFF; 
+@color-nav-select: #FFFFFF;
 @color-nav-text: #FFFFFF;
 
 @color-bench: #FFFFFF;
@@ -21,4 +21,5 @@
 
 @color-bench-highlight: #FE9915;
 
-
+/* TODO AWE: ueber naming diskutieren */
+@color-bsi-orange: #FE9915;

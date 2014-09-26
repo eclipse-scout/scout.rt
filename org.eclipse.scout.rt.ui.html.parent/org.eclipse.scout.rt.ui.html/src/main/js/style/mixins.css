@@ -4,4 +4,7 @@
   &:disabled {
     background-color:white;
   }
+  &:focus {
+    border-bottom:solid 1px @color-bsi-orange;
+  }
 }
