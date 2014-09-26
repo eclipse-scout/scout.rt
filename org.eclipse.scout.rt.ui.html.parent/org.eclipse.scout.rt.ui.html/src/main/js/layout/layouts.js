@@ -134,10 +134,13 @@ scout.FormFieldLayout.prototype.layout = function($container) {
     $field = $container.children('.field');
   if ($label.isVisible()) {
     scout.HtmlComponent.setBounds($label, 0, 0, this.labelWidth, contSize.height);
+    // with this property we achieve "vertical-align:middle" which doesn't work for non-table-cell elements
+    $label.css('line-height', contSize.height + 'px');
     widthSum += this.labelWidth;
   }
   if ($status.isVisible()) {
     scout.HtmlComponent.setBounds($status, widthSum, 0, this.statusWidth, contSize.height);
+    $status.css('line-height', contSize.height + 'px');
     widthSum += this.statusWidth;
   }
   var fieldBounds = new scout.Rectangle(widthSum, 0, contSize.width - widthSum, contSize.height),

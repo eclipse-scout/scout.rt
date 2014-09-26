@@ -1,3 +1,7 @@
 textarea {
  .font-text-normal();
 }
+
+.string-field input {
+  .text-field();
+}
