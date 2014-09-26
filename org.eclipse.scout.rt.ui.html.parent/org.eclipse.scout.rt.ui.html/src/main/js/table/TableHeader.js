@@ -237,7 +237,8 @@ scout.TableHeader.prototype.onColumnMoved = function($header, oldPos, newPos, dr
   // move menu
   if (this._tableHeaderMenu && this._tableHeaderMenu.isOpen()) {
     var left = $header.position().left;
-    this._tableHeaderMenu.$headerMenu.animateAVCSD('left', left + 20);
+    var marginLeft = this._$tableHeader.marginLeft();
+    this._tableHeaderMenu.$headerMenu.animateAVCSD('left', left + marginLeft);
   }
 
   // move to old position and then animate

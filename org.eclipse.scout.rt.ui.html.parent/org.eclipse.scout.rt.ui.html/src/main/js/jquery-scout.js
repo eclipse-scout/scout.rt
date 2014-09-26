@@ -323,4 +323,9 @@
     return newH;
   };
 
+  $.fn.marginLeft = function() {
+    var marginLeft = this.css('margin-left').replace('px', '');
+    return parseInt(marginLeft, 10);
+  };
+
 }(jQuery));
