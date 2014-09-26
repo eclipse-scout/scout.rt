@@ -1,14 +1,19 @@
-.tab-area {
-  border-bottom:solid 1px #ccc;
-}
-
 .tab-area > button {
-  color:#ccc;
-  border:solid 1px #ccc;
+  color:#506678;
+  border:solid 1px #a7b2bb;
   border-bottom:none;
-  background-color:white;
+  background-color:#e9ecee;
+  height:32px;
+  padding-left:10px;
+  padding-right:10px;
 }
 
 .tab-area > button.selected {
-  color:#0082a1;
+  color:#2f82ab;
+  background-color:white;
+  border-color:#41525e;
+}
+
+.tab-content {
+  border:solid 1px #41525e;
 }
