@@ -68,6 +68,11 @@
 
 }
 
+.menu-item-iconandtext[data-icon]:before {
+  /* margin between icon and text */
+  margin-right: 5px;
+}
+
 .menu-separator {
   display: inline-block;
   position: relative;

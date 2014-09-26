@@ -65,11 +65,22 @@ scout.Menu.prototype._renderText = function(text) {
     text = '';
   }
   this.$container.text(text);
+  this._updateIconAndTextStyle();
 };
 
+scout.Menu.prototype._updateIconAndTextStyle = function() {
+  if (this.text && this.text.length > 0 && this.iconId) {
+    if (!this.$container.hasClass('menu-item-iconandtext')) {
+      this.$container.addClass('menu-item-iconandtext');
+    }
+  } else {
+    this.$container.removeClass('menu-item-iconandtext');
+  }
+};
 
 scout.Menu.prototype._renderIconId = function(iconId) {
   this.$container.icon(iconId);
+  this._updateIconAndTextStyle();
 };
 
 scout.Menu.prototype._renderEnabled = function(enabled) {
