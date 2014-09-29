@@ -70,7 +70,8 @@
 
 .menu-item-iconandtext[data-icon]:before {
   /* margin between icon and text */
-  margin-right: 5px;
+  margin-right: 6px;
+  vertical-align: -3px;
 }
 
 .menu-separator {

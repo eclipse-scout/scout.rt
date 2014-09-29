@@ -1,4 +1,5 @@
-@logical-grid-height: 36px;
+/** currently also defined in scout.HtmlEnvironment (graphics.js) */
+@logical-grid-height: 32px;
 
 .form-field {
   box-sizing:border-box;

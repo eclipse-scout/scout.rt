@@ -6,5 +6,6 @@
   }
   &:focus {
     border-bottom:solid 1px @color-bsi-orange;
+    outline: none;
   }
 }
