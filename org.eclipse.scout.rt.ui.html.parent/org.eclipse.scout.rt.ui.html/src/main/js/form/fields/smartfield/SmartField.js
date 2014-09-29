@@ -14,4 +14,6 @@ scout.SmartField.prototype._render = function($parent) {
     addClass('field').
     blur(this._onFieldBlur.bind(this)).
     appendTo(this.$container);
+
+  this.addIcon();
 };

@@ -24,20 +24,11 @@ scout.FormField.prototype._render = function($parent) {
 
 scout.FormField.prototype._renderProperties = function() {
   this._renderEnabled(this.enabled);
-  this._renderValue(this.value);
   this._renderMandatory(this.mandatory);
   this._renderVisible(this.visible);
   this._renderErrorStatus(this.errorStatus);
   this._renderLabel(this.label);
   this._renderLabelVisible(this.labelVisible);
-};
-
-scout.FormField.prototype._renderEnabled = function(enabled) {
-  // NOP
-};
-
-scout.FormField.prototype._renderValue = function(value) {
-  // NOP
 };
 
 scout.FormField.prototype._renderMandatory = function(mandatory) {
@@ -130,6 +121,12 @@ scout.FormField.prototype.addLabel = function() {
 scout.FormField.prototype.addStatus = function() {
   this.$status = $('<span>').
     addClass('status').
+    appendTo(this.$container);
+};
+
+scout.FormField.prototype.addIcon = function() {
+  this.$icon = $('<span>').
+    addClass('icon').
     appendTo(this.$container);
 };
 

@@ -1,11 +1,40 @@
+@field-with-icon-padding: 20px;
+
 .text-field {
   border:none;
   border-bottom:solid 1px #ccc;
+
   &:disabled {
     background-color:white;
+    border-bottom: none;
   }
   &:focus {
     border-bottom:solid 1px @color-bsi-orange;
     outline: none;
+  }
+}
+
+/** expects a sibling html element with class 'icon' **/
+.text-field-with-icon {
+  .text-field;
+  padding-left: @field-with-icon-padding;
+
+  & + .icon {
+    position: absolute;
+  }
+
+  & + .icon:before {
+    .font-icon;
+    font-size: 12px;
+    content: "\f002";
+    line-height: @logical-grid-height;
+  }
+
+  &.disabled {
+    padding-left: 0px;
+  }
+
+  &.disabled + .icon{
+    display: none;
   }
 }

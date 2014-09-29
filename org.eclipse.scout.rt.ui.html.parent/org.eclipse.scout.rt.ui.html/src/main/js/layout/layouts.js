@@ -131,7 +131,8 @@ scout.FormFieldLayout.prototype.layout = function($container) {
     widthSum = 0,
     $label = $container.children('label'),
     $status = $container.children('.status'),
-    $field = $container.children('.field');
+    $field = $container.children('.field'),
+    $icon = $container.children('.icon');
   if ($label.isVisible()) {
     scout.HtmlComponent.setBounds($label, 0, 0, this.labelWidth, contSize.height);
     // with this property we achieve "vertical-align:middle" which doesn't work for non-table-cell elements
@@ -150,6 +151,9 @@ scout.FormFieldLayout.prototype.layout = function($container) {
     htmlField.setBounds(fieldBounds);
   } else {
     scout.HtmlComponent.setBounds($field, fieldBounds);
+  }
+  if ($icon) {
+    $icon.css('left', $field.position().left + 'px');
   }
 };
 
