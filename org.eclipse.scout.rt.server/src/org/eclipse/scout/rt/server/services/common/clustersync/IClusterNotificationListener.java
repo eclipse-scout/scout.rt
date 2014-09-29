@@ -10,16 +10,20 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.clustersync;
 
+import java.util.EventListener;
+
+import org.eclipse.scout.commons.exception.ProcessingException;
+
 /**
  * Listener for reacting to cluster notifications
  */
-public interface IClusterNotificationListener {
+public interface IClusterNotificationListener extends EventListener {
 
   /**
    * Handle the cluster notification
-   *
-   * @param notification
+   * 
+   * @param notificationMessage
    */
-  void onNotification(IClusterNotificationMessage notification);
+  void onNotification(IClusterNotificationMessage message) throws ProcessingException;
 
 }

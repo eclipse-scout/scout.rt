@@ -10,8 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.clustersync;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.security.auth.Subject;
@@ -20,57 +26,91 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.scout.commons.EventListenerList;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.ServerJob;
+import org.eclipse.scout.rt.server.ThreadContext;
 import org.eclipse.scout.rt.server.internal.Activator;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationMessage;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationMessageProperties;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ServerSessionClassFinder;
 import org.eclipse.scout.rt.server.services.common.session.IServerSessionRegistryService;
+import org.eclipse.scout.rt.server.transaction.AbstractTransactionMember;
+import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.service.AbstractService;
+import org.eclipse.scout.service.IService;
 import org.eclipse.scout.service.SERVICES;
 import org.osgi.framework.ServiceRegistration;
 
-/**
- *
- */
-public class ClusterSynchronizationService extends AbstractService implements IClusterSynchronizationService, IPubSubMessageListener {
+public class ClusterSynchronizationService extends AbstractService implements IClusterSynchronizationService, IPublishSubscribeMessageListener {
+  private static final String TRANSACTION_MEMBER_ID = ClusterSynchronizationService.class.getName();
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ClusterSynchronizationService.class);
 
-  private final List<IClusterNotificationListener> m_listeners = new ArrayList<IClusterNotificationListener>();
-  private static final String QUEUE_NAME = "scoutNotificationQueue";
+  private static final String CLUSTER_NODE_ID_PARAM = "org.eclipse.scout.rt.server.clusterNodeId";
+  private final EventListenerList m_listenerList = new EventListenerList();
+  private final ClusterNodeStatusInfo m_statusInfo = new ClusterNodeStatusInfo();
 
-  private IPubSubMessageService m_pubSubMessageService;
+  // variables must not be synchronized as they are only set at initialization
   private String m_nodeId;
-  private boolean m_enabled;
   private IServerSession m_session;
-  private Subject m_subject;
+
+  private volatile boolean m_enabled;
+  private volatile IPublishSubscribeMessageService m_messageService;
 
   @Override
   public void initializeService(ServiceRegistration registration) {
     super.initializeService(registration);
-    m_pubSubMessageService = SERVICES.getService(IPubSubMessageService.class);
-    m_nodeId = UUID.randomUUID().toString();
-    m_subject = createBackendSubject();
+    m_nodeId = createNodeId();
     m_session = createBackendSession();
-    enable();
   }
 
-  private Subject createBackendSubject() {
-    Subject subject = new Subject();
-    subject.getPrincipals().add(new SimplePrincipal("server"));
-    return subject;
+  protected String createNodeId() {
+    // system property defined node id
+    String nodeId = Activator.getDefault().getBundle().getBundleContext().getProperty(CLUSTER_NODE_ID_PARAM);
+
+    // weblogic name as node id
+    if (!StringUtility.hasText(nodeId)) {
+      nodeId = System.getProperty("weblogic.Name");
+    }
+
+    // jboss node name as node id
+    if (!StringUtility.hasText(nodeId)) {
+      nodeId = System.getProperty("jboss.node.name");
+    }
+
+    // use host name
+    if (!StringUtility.hasText(nodeId)) {
+      String hostname;
+      try {
+        hostname = InetAddress.getLocalHost().getHostName();
+      }
+      catch (UnknownHostException e) {
+        hostname = null;
+      }
+      // might result in a hostname 'localhost'
+      if (StringUtility.isNullOrEmpty(hostname) || "localhost".equals(hostname)) {
+        // use random number
+        nodeId = UUID.randomUUID().toString();
+      }
+
+      // in development on same machine there might run multiple instances on different ports (usecase when testing cluster sync)
+      // therefore we use in this case the port jetty port too
+      String port = System.getProperty("org.eclipse.equinox.http.jetty.http.port");
+      nodeId = StringUtility.join(":", hostname, port);
+    }
+    return nodeId;
   }
 
   protected IServerSession createBackendSession() {
     Class<? extends IServerSession> sessionClazz = ServerSessionClassFinder.find();
     IServerSession serverSession = null;
     try {
-      serverSession = SERVICES.getService(IServerSessionRegistryService.class).newServerSession(sessionClazz, m_subject);
+      serverSession = SERVICES.getService(IServerSessionRegistryService.class).newServerSession(sessionClazz, createBackendSubject());
       serverSession.setIdInternal(UUID.randomUUID().toString());
     }
     catch (ProcessingException e) {
@@ -79,113 +119,33 @@ public class ClusterSynchronizationService extends AbstractService implements IC
     return serverSession;
   }
 
-  @Override
-  public void disposeServices() {
-    super.disposeServices();
-    disable();
+  protected Subject createBackendSubject() {
+    Subject subject = new Subject();
+    subject.getPrincipals().add(new SimplePrincipal("server"));
+    return subject;
   }
 
-  @Override
-  public boolean enable() {
-    if (m_pubSubMessageService != null) {
-      m_enabled = m_pubSubMessageService.subscribe(QUEUE_NAME);
-      if (m_enabled) {
-        m_pubSubMessageService.setListener(this);
-      }
-    }
-    else {
-      m_enabled = false;
-      LOG.error("Clustersync could not be enabled. No service of type IPubSubMessageService found.");
-    }
-    return m_enabled;
-  }
-
-  /**
-   * @return the synchronization status of the current node
-   */
-  public IClusterNodeStatusInfo getNodeStatus() {
-    return Activator.getDefault().getClusterSynchronizationInfo();
-  }
-
-  @Override
-  public boolean disable() {
-    boolean unregisterSuccessful = m_pubSubMessageService.unsubsribe(QUEUE_NAME);
-    if (unregisterSuccessful) {
-      m_enabled = false;
-    }
-    return unregisterSuccessful;
-  }
-
-  @Override
-  public boolean isEnabled() {
-    return m_enabled;
-  }
-
-  @Override
-  public void publishNotification(IClusterNotification notification) {
-    if (m_enabled) {
-      ClusterNotificationMessage message = new ClusterNotificationMessage(notification, getNotificationProperties());
-      boolean successful = m_pubSubMessageService.publishNotification(message);
-      if (successful) {
-        Activator.getDefault().getClusterSynchronizationInfo().incrementSentMessageCount();
-      }
-    }
-  }
-
-  protected IClusterNotificationMessageProperties getNotificationProperties() {
-    return new ClusterNotificationMessageProperties(getNodeId(), ServerJob.getCurrentSession().getUserId());
-  }
-
-  /**
-   * @return {@link IServerSession} used to handle incoming notification messages
-   */
-  public IServerSession getBackendSession() {
-    return m_session;
-  }
-
-  /**
-   * @return {@link Subject} used to handle incoming notification messages
-   */
-  public Subject getBackendSubject() {
-    return m_subject;
-  }
-
-  protected void notifyListeners(IClusterNotificationMessage message) {
-    for (IClusterNotificationListener listener : getListeners()) {
-      listener.onNotification(message);
-    }
-  }
-
-  private class P_NotificationProcessingJob extends ServerJob {
-
-    private final IClusterNotificationMessage m_distributedNotification;
-    private final List<IClusterNotificationListener> m_listeners;
-
-    public P_NotificationProcessingJob(String name, IClusterNotificationMessage notification, List<IClusterNotificationListener> listener) {
-      super(name, getBackendSession(), getBackendSubject());
-      m_distributedNotification = notification;
-      m_listeners = listener;
-    }
-
-    @Override
-    protected IStatus runTransaction(IProgressMonitor monitor) throws Exception {
-      notifyListeners(m_distributedNotification);
-      return Status.OK_STATUS;
-    }
+  protected EventListenerList getListenerList() {
+    return m_listenerList;
   }
 
   @Override
   public void addListener(IClusterNotificationListener listener) {
-    m_listeners.add(listener);
+    m_listenerList.add(IClusterNotificationListener.class, listener);
   }
 
   @Override
   public void removeListener(IClusterNotificationListener listener) {
-    m_listeners.remove(listener);
+    m_listenerList.remove(IClusterNotificationListener.class, listener);
   }
 
-  protected List<IClusterNotificationListener> getListeners() {
-    return m_listeners;
+  protected IClusterNotificationListener[] getListeners() {
+    return getListenerList().getListeners(IClusterNotificationListener.class);
+  }
+
+  @Override
+  public ClusterNodeStatusInfo getClusterNodeStatusInfo() {
+    return m_statusInfo;
   }
 
   @Override
@@ -193,14 +153,202 @@ public class ClusterSynchronizationService extends AbstractService implements IC
     return m_nodeId;
   }
 
+  // used to handle incoming notification messages
+  protected IServerSession getBackendSession() {
+    return m_session;
+  }
+
+  protected IPublishSubscribeMessageService getMessageService() {
+    return m_messageService;
+  }
+
+  protected void setMessageService(IPublishSubscribeMessageService messageService) {
+    m_messageService = messageService;
+  }
+
+  protected void setEnabled(boolean enabled) {
+    m_enabled = enabled;
+  }
+
   @Override
-  public void onMessage(IClusterNotificationMessage message) {
+  public boolean isEnabled() {
+    return m_enabled;
+  }
+
+  /**
+   * Contributing all {@link IClusterNotificationListenerService} to the listenerList. If a listener was already added,
+   * removes old listener if there is now a service with a higher ranking.
+   */
+  protected void contributeListeners() throws ProcessingException {
+    Set<IClusterNotificationListener> currentListeners = new HashSet<IClusterNotificationListener>(Arrays.asList(getListeners()));
+
+    for (IClusterNotificationListenerService contributingService : SERVICES.getServices(IClusterNotificationListenerService.class)) {
+      IService definingService = SERVICES.getService(contributingService.getDefiningServiceInterface());
+      if (contributingService == definingService) {
+        if (!currentListeners.contains(contributingService)) {
+          addListener(contributingService);
+        }
+      }
+      else {
+        if (currentListeners.contains(contributingService)) {
+          removeListener(contributingService);
+        }
+      }
+    }
+  }
+
+  @Override
+  public boolean enable() {
+    if (isEnabled()) {
+      return true;
+    }
+    if (getNodeId() == null) {
+      LOG.error("Clustersync could not be enabled. No cluster nodeId could be determined.");
+      return false;
+    }
+    if (getBackendSession() == null) {
+      LOG.error("Clustersync could not be enabled. Backend session could not be initialized.");
+      return false;
+    }
+    IPublishSubscribeMessageService messageService = SERVICES.getService(IPublishSubscribeMessageService.class);
+    if (messageService == null) {
+      LOG.error("Clustersync could not be enabled. No MessageService found.");
+      return false;
+    }
+    try {
+      messageService.setListener(this);
+      messageService.subscribe();
+      setMessageService(messageService);
+      contributeListeners();
+    }
+    catch (Exception e) {
+      LOG.error(e.getMessage(), e);
+      return false;
+    }
+    setEnabled(true);
+    return true;
+  }
+
+  @Override
+  public boolean disable() {
+    if (!isEnabled()) {
+      return true;
+    }
+    setEnabled(false);
+    IPublishSubscribeMessageService messageService = getMessageService();
+    if (messageService != null) {
+      try {
+        messageService.unsubsribe();
+      }
+      catch (Exception e) {
+        LOG.error(e.getMessage(), e);
+        return false;
+      }
+    }
+    return true;
+  }
+
+  @Override
+  public void publishNotification(IClusterNotification notification) throws ProcessingException {
+    if (isEnabled()) {
+      ClusterNotificationMessage message = new ClusterNotificationMessage(notification, getNotificationProperties());
+      getTransaction().addMessage(message);
+    }
+  }
+
+  protected IClusterNotificationMessageProperties getNotificationProperties() {
+    return new ClusterNotificationMessageProperties(getNodeId(), ServerJob.getCurrentSession().getUserId());
+  }
+
+  protected void notifyListeners(IClusterNotificationMessage message) {
+    for (IClusterNotificationListener listener : getListeners()) {
+      try {
+        listener.onNotification(message);
+      }
+      catch (Exception e) {
+        LOG.error("Failed notification of message " + message + " to listener " + listener.getClass().getName(), e);
+      }
+    }
+  }
+
+  @Override
+  public void onMessage(final IClusterNotificationMessage message) {
     //Do not progress notifications sent by node itself
     String originNode = message.getProperties().getOriginNode();
-    if (!m_nodeId.equals(originNode)) {
-      Activator.getDefault().getClusterSynchronizationInfo().updateReceiveStatus(message);
-      P_NotificationProcessingJob j = new P_NotificationProcessingJob("NotificationProcessingJob", message, m_listeners);
-      j.runNow(new NullProgressMonitor());
+    if (!getNodeId().equals(originNode)) {
+      getClusterNodeStatusInfo().updateReceiveStatus(message);
+      new ServerJob("NotificationProcessingJob", getBackendSession(), getBackendSession().getSubject()) {
+
+        @Override
+        protected IStatus runTransaction(IProgressMonitor monitor) throws Exception {
+          notifyListeners(message);
+          return Status.OK_STATUS;
+        }
+      }.runNow(new NullProgressMonitor());
+    }
+  }
+
+  @Override
+  public void disposeServices() {
+    super.disposeServices();
+    disable();
+  }
+
+  protected ClusterSynchronizationTransaction getTransaction() throws ProcessingException {
+    ITransaction t = ThreadContext.getTransaction();
+    if (t == null) {
+      throw new IllegalStateException("not inside a scout transaction (ServerJob.schedule)");
+    }
+    ClusterSynchronizationTransaction m = (ClusterSynchronizationTransaction) t.getMember(TRANSACTION_MEMBER_ID);
+    if (m == null) {
+      m = new ClusterSynchronizationTransaction(TRANSACTION_MEMBER_ID, getMessageService());
+      t.registerMember(m);
+    }
+    return m;
+  }
+
+  /**
+   * Transaction member that notifies other cluster nodes after the causing Scout transaction has been committed. This
+   * ensures that other cluster nodes are not informed too early.
+   */
+  protected static class ClusterSynchronizationTransaction extends AbstractTransactionMember {
+    private final List<IClusterNotificationMessage> m_messageQueue;
+    private final IPublishSubscribeMessageService m_messageService;
+    private final ClusterNodeStatusInfo m_statusInfo = new ClusterNodeStatusInfo();
+
+    public ClusterSynchronizationTransaction(String transactionId, IPublishSubscribeMessageService messageService) throws ProcessingException {
+      super(transactionId);
+      m_messageQueue = new LinkedList<IClusterNotificationMessage>();
+      m_messageService = messageService;
+    }
+
+    public synchronized void addMessage(IClusterNotificationMessage m) {
+      m_messageQueue.add(m);
+    }
+
+    @Override
+    public boolean commitPhase1() {
+      return true;
+    }
+
+    @Override
+    public synchronized void commitPhase2() {
+      m_messageService.publishNotifications(new ArrayList<IClusterNotificationMessage>(m_messageQueue));
+      m_statusInfo.addSentMessageCount(m_messageQueue.size());
+    }
+
+    @Override
+    public synchronized boolean needsCommit() {
+      return !m_messageQueue.isEmpty();
+    }
+
+    @Override
+    public void release() {
+    }
+
+    @Override
+    public synchronized void rollback() {
+      m_messageQueue.clear();
     }
   }
 }

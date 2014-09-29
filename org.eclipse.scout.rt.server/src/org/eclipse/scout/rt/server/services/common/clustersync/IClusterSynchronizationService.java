@@ -29,6 +29,11 @@ public interface IClusterSynchronizationService extends IService {
   String getNodeId();
 
   /**
+   * @return ClusterNodeStatusInfo
+   */
+  ClusterNodeStatusInfo getClusterNodeStatusInfo();
+
+  /**
    * Starts listening to notifications
    * 
    * @return <code>true</code>, if successful

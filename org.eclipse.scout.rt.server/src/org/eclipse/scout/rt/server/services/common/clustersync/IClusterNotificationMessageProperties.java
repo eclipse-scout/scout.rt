@@ -12,13 +12,9 @@ package org.eclipse.scout.rt.server.services.common.clustersync;
 
 import java.io.Serializable;
 
-/**
- *
- */
 public interface IClusterNotificationMessageProperties extends Serializable {
 
   String getOriginNode();
 
   String getOriginUser();
-
 }

@@ -12,9 +12,6 @@ package org.eclipse.scout.rt.server.services.common.clustersync.internal;
 
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterNotificationMessageProperties;
 
-/**
- *
- */
 public class ClusterNotificationMessageProperties implements IClusterNotificationMessageProperties {
   private static final long serialVersionUID = 245680805887844037L;
   private final String m_originNode;
@@ -35,4 +32,8 @@ public class ClusterNotificationMessageProperties implements IClusterNotificatio
     return m_originUser;
   }
 
+  @Override
+  public String toString() {
+    return "ClusterNotificationMessageProperties [m_originNode=" + m_originNode + ", m_originUser=" + m_originUser + "]";
+  }
 }

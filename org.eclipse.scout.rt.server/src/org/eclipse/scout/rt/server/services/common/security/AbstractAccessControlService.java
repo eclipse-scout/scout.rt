@@ -28,16 +28,16 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterNotification;
-import org.eclipse.scout.rt.server.services.common.clustersync.IClusterNotificationListener;
+import org.eclipse.scout.rt.server.services.common.clustersync.IClusterNotificationListenerService;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterNotificationMessage;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterSynchronizationService;
-import org.eclipse.scout.rt.server.services.common.security.internal.AccessControlCacheChangedClusterNotification;
 import org.eclipse.scout.rt.server.services.common.security.internal.AccessControlStore;
 import org.eclipse.scout.rt.shared.security.BasicHierarchyPermission;
 import org.eclipse.scout.rt.shared.security.RemoteServiceAccessPermission;
 import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.eclipse.scout.service.AbstractService;
+import org.eclipse.scout.service.IService;
 import org.eclipse.scout.service.SERVICES;
 import org.osgi.framework.ServiceRegistration;
 
@@ -45,7 +45,7 @@ import org.osgi.framework.ServiceRegistration;
  * Implementations should override {@link #execLoadPermissions()}
  */
 @Priority(-1)
-public class AbstractAccessControlService extends AbstractService implements IClusterSyncAccessControlService, IClusterNotificationListener {
+public class AbstractAccessControlService extends AbstractService implements IAccessControlService, IClusterNotificationListenerService {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractAccessControlService.class);
 
   private AccessControlStore m_accessControlStore;
@@ -119,17 +119,6 @@ public class AbstractAccessControlService extends AbstractService implements ICl
   public void initializeService(ServiceRegistration registration) {
     m_accessControlStore = new AccessControlStore();
     super.initializeService(registration);
-    addClusterNotificationListener();
-  }
-
-  /**
-   *
-   */
-  protected void addClusterNotificationListener() {
-    IClusterSynchronizationService s = SERVICES.getService(IClusterSynchronizationService.class);
-    if (s != null) {
-      s.addListener(this);
-    }
   }
 
   @Override
@@ -273,14 +262,17 @@ public class AbstractAccessControlService extends AbstractService implements ICl
     m_accessControlStore.clearCacheOfUserIds(userIds);
   }
 
-  @Override
-  public void clearCacheNoFire() {
+  protected void clearCacheNoFire() {
     m_accessControlStore.clearCache();
   }
 
-  @Override
-  public void clearCacheOfUserIdsNoFire(Collection<String> userIds) {
+  protected void clearCacheOfUserIdsNoFire(Collection<String> userIds) {
     m_accessControlStore.clearCacheOfUserIdsNoFire(userIds);
+  }
+
+  @Override
+  public Class<? extends IService> getDefiningServiceInterface() {
+    return IAccessControlService.class;
   }
 
   @Override
@@ -288,7 +280,7 @@ public class AbstractAccessControlService extends AbstractService implements ICl
     IClusterNotification clusterNotification = notification.getNotification();
     if ((clusterNotification instanceof AccessControlCacheChangedClusterNotification)) {
       AccessControlCacheChangedClusterNotification n = (AccessControlCacheChangedClusterNotification) clusterNotification;
-      if (n.getUserIds() == null) {
+      if (n.getUserIds().isEmpty()) {
         clearCacheNoFire();
       }
       else {
@@ -296,5 +288,4 @@ public class AbstractAccessControlService extends AbstractService implements ICl
       }
     }
   }
-
 }

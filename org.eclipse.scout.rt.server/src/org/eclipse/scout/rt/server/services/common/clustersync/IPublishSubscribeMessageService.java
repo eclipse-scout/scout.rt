@@ -10,20 +10,26 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.clustersync;
 
+import java.util.List;
+
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.service.IService;
 
 /**
- *
+ * Note: Implementing services must not be registered with a session based service factory.
  */
-public interface IPubSubMessageService extends IService {
+public interface IPublishSubscribeMessageService extends IService {
 
-  boolean subscribe(String queueName);
+  void setListener(IPublishSubscribeMessageListener listener);
 
-  boolean unsubsribe(String queueName);
+  IPublishSubscribeMessageListener getListener();
 
-  void setListener(IPubSubMessageListener listener);
+  void subscribe() throws ProcessingException;
 
-  IPubSubMessageListener getListener();
+  void unsubsribe() throws ProcessingException;
 
-  boolean publishNotification(IClusterNotificationMessage notification);
+  /**
+   * This method is not called within a scout server transaction
+   */
+  void publishNotifications(List<IClusterNotificationMessage> notificationMessages);
 }

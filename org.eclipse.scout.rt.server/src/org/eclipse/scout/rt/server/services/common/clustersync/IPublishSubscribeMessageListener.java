@@ -10,36 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.clustersync;
 
-import java.util.Date;
+import org.eclipse.scout.rt.server.ServerJob;
 
-/**
- *
- */
-public interface IClusterNodeStatusInfo {
+public interface IPublishSubscribeMessageListener {
 
   /**
-   * @return number of sent messages
+   * This method is <strong>not</strong> called within a scout transaction. Therefore a message listener should insure
+   * that a new {@link ServerJob} is created and the message is handled in this job.
+   * 
+   * @param message
    */
-  long getSentMessageCount();
-
-  /**
-   * @return number of received messages
-   */
-  long getReceivedMessageCount();
-
-  /**
-   * @return date of the last received message
-   */
-  Date getLastReceivedDate();
-
-  /**
-   * @return user id of the last received message
-   */
-  String getLastReceivedOriginUser();
-
-  /**
-   * @return node id of the last received message
-   */
-  String getLastReceivedOriginNode();
-
+  void onMessage(IClusterNotificationMessage message);
 }

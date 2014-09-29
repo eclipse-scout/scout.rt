@@ -8,26 +8,33 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.server.services.common.security.internal;
+package org.eclipse.scout.rt.server.services.common.security;
 
 import java.util.Collection;
+import java.util.Set;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterNotification;
 
 public class AccessControlCacheChangedClusterNotification implements IClusterNotification {
   private static final long serialVersionUID = 128460814967537176L;
 
-  private final Collection<String> m_userIds;
-
-  public Collection<String> getUserIds() {
-    return m_userIds;
-  }
-
-  public AccessControlCacheChangedClusterNotification(Collection<String> userIds) {
-    m_userIds = userIds;
-  }
+  private final Set<String> m_userIds;
 
   public AccessControlCacheChangedClusterNotification() {
     this(null);
+  }
+
+  public AccessControlCacheChangedClusterNotification(Collection<String> userIds) {
+    m_userIds = CollectionUtility.hashSetWithoutNullElements(userIds);
+  }
+
+  public Set<String> getUserIds() {
+    return m_userIds;
+  }
+
+  @Override
+  public String toString() {
+    return "AccessControlCacheChangedClusterNotification [m_userIds=" + m_userIds + "]";
   }
 }

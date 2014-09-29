@@ -16,8 +16,9 @@ import org.eclipse.scout.rt.shared.services.common.security.IAccessControlServic
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 
 /**
- *
+ * @deprecated will be removed in N Release
  */
+@Deprecated
 public interface IClusterSyncAccessControlService extends IAccessControlService {
 
   /**

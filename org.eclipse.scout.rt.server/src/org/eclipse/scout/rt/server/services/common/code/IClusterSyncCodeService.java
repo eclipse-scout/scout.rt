@@ -17,9 +17,11 @@ import org.eclipse.scout.rt.shared.services.common.code.ICodeService;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 
 /**
- *
+ * @deprecated will be removed in N Release
  */
+@Deprecated
 public interface IClusterSyncCodeService extends ICodeService {
+
   /**
    * reload code types without firing any client notifications
    * 

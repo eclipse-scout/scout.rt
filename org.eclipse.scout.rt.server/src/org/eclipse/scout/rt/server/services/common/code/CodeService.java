@@ -28,22 +28,23 @@ import org.eclipse.scout.commons.osgi.BundleClassDescriptor;
 import org.eclipse.scout.commons.runtime.BundleBrowser;
 import org.eclipse.scout.rt.server.internal.Activator;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterNotification;
-import org.eclipse.scout.rt.server.services.common.clustersync.IClusterNotificationListener;
+import org.eclipse.scout.rt.server.services.common.clustersync.IClusterNotificationListenerService;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterNotificationMessage;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterSynchronizationService;
 import org.eclipse.scout.rt.shared.services.common.code.ICode;
+import org.eclipse.scout.rt.shared.services.common.code.ICodeService;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.eclipse.scout.service.AbstractService;
+import org.eclipse.scout.service.IService;
 import org.eclipse.scout.service.SERVICES;
 import org.osgi.framework.Bundle;
-import org.osgi.framework.ServiceRegistration;
 
 /**
  * delegates to {@link CodeTypeStore}
  */
 @Priority(-1)
-public class CodeService extends AbstractService implements IClusterSyncCodeService, IClusterNotificationListener {
+public class CodeService extends AbstractService implements ICodeService, IClusterNotificationListenerService {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(CodeService.class);
 
   private final CodeTypeStore m_codeTypeStore;
@@ -54,18 +55,6 @@ public class CodeService extends AbstractService implements IClusterSyncCodeServ
     m_codeTypeStore = new CodeTypeStore();
     m_codeTypeClassDescriptorMapLock = new Object();
     m_codeTypeClassDescriptorMap = new HashMap<String, Set<BundleClassDescriptor>>();
-  }
-
-  @Override
-  public void initializeService(ServiceRegistration registration) {
-    addClusterNotificationListener();
-  }
-
-  protected void addClusterNotificationListener() {
-    IClusterSynchronizationService s = SERVICES.getService(IClusterSynchronizationService.class);
-    if (s != null) {
-      s.addListener(this);
-    }
   }
 
   @Override
@@ -149,15 +138,14 @@ public class CodeService extends AbstractService implements IClusterSyncCodeServ
     return getCodeTypeCache().reloadCodeTypes(types);
   }
 
-  private void publishCluster(List<Class<? extends ICodeType<?, ?>>> codetypeList) throws ProcessingException {
+  protected void publishCluster(List<Class<? extends ICodeType<?, ?>>> codetypeList) throws ProcessingException {
     IClusterSynchronizationService s = SERVICES.getService(IClusterSynchronizationService.class);
     if (s != null) {
       s.publishNotification(new UnloadCodeTypeCacheClusterNotification(codetypeList));
     }
   }
 
-  @Override
-  public List<ICodeType<?, ?>> reloadCodeTypesNoFire(List<Class<? extends ICodeType<?, ?>>> types) throws ProcessingException {
+  protected List<ICodeType<?, ?>> reloadCodeTypesNoFire(List<Class<? extends ICodeType<?, ?>>> types) throws ProcessingException {
     if (types == null) {
       return null;
     }
@@ -310,17 +298,16 @@ public class CodeService extends AbstractService implements IClusterSyncCodeServ
   }
 
   @Override
-  public void onNotification(IClusterNotificationMessage notification) {
-    IClusterNotification clusterNotification = notification.getNotification();
-    if ((clusterNotification instanceof UnloadCodeTypeCacheClusterNotification)) {
-      try {
-        UnloadCodeTypeCacheClusterNotification n = (UnloadCodeTypeCacheClusterNotification) clusterNotification;
-        reloadCodeTypesNoFire(n.getTypes());
-      }
-      catch (ProcessingException e) {
-        LOG.error("Unable to reload CodeTypes", e);
-      }
-    }
+  public Class<? extends IService> getDefiningServiceInterface() {
+    return ICodeService.class;
   }
 
+  @Override
+  public void onNotification(IClusterNotificationMessage notification) throws ProcessingException {
+    IClusterNotification clusterNotification = notification.getNotification();
+    if (clusterNotification instanceof UnloadCodeTypeCacheClusterNotification) {
+      UnloadCodeTypeCacheClusterNotification n = (UnloadCodeTypeCacheClusterNotification) clusterNotification;
+      reloadCodeTypesNoFire(n.getTypes());
+    }
+  }
 }

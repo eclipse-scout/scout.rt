@@ -15,14 +15,10 @@ import java.util.List;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterNotification;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 
-/**
- *
- */
 public class UnloadCodeTypeCacheClusterNotification implements IClusterNotification {
-
   private static final long serialVersionUID = 3498451762775759388L;
 
-  private List<Class<? extends ICodeType<?, ?>>> m_types;
+  private final List<Class<? extends ICodeType<?, ?>>> m_types;
 
   public UnloadCodeTypeCacheClusterNotification(List<Class<? extends ICodeType<?, ?>>> types) {
     m_types = types;
@@ -32,8 +28,8 @@ public class UnloadCodeTypeCacheClusterNotification implements IClusterNotificat
     return m_types;
   }
 
-  public void setTypes(List<Class<? extends ICodeType<?, ?>>> types) {
-    m_types = types;
+  @Override
+  public String toString() {
+    return "UnloadCodeTypeCacheClusterNotification [m_types=" + m_types + "]";
   }
-
 }

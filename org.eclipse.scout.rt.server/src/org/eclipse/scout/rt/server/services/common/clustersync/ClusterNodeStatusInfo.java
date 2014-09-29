@@ -15,70 +15,75 @@ import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Cluster sync status info for the current server node
+ * <p>
+ * This class is thread safe
  */
-public class ClusterNodeStatusInfo implements IClusterNodeStatusInfo {
+public class ClusterNodeStatusInfo {
 
   private AtomicLong m_sentMessageCount;
   private AtomicLong m_receivedMessageCount;
 
   private volatile Date m_lastChangedDate;
   private volatile String m_lastChangedUserId;
-  private volatile String m_lastReceivedOriginNode;
+  private volatile String m_lastChangedOriginNodeId;
 
   public ClusterNodeStatusInfo() {
     m_sentMessageCount = new AtomicLong();
     m_receivedMessageCount = new AtomicLong();
   }
 
-  @Override
   public long getSentMessageCount() {
     return m_sentMessageCount.get();
-  }
-
-  @Override
-  public long getReceivedMessageCount() {
-    return m_receivedMessageCount.get();
   }
 
   public long incrementSentMessageCount() {
     return m_sentMessageCount.incrementAndGet();
   }
 
+  public long addSentMessageCount(long delta) {
+    return m_sentMessageCount.addAndGet(delta);
+  }
+
+  public long getReceivedMessageCount() {
+    return m_receivedMessageCount.get();
+  }
+
   public long incrementReceivedMessageCount() {
     return m_receivedMessageCount.incrementAndGet();
   }
 
-  @Override
-  public Date getLastReceivedDate() {
+  public long addReceivedMessageCount(long delta) {
+    return m_receivedMessageCount.addAndGet(delta);
+  }
+
+  public Date getLastChangedDate() {
     return m_lastChangedDate;
-  }
-
-  @Override
-  public String getLastReceivedOriginUser() {
-    return m_lastChangedUserId;
-  }
-
-  @Override
-  public String getLastReceivedOriginNode() {
-    return m_lastReceivedOriginNode;
-  }
-
-  public void updateReceiveStatus(IClusterNotificationMessage message) {
-    incrementReceivedMessageCount();
-    setLastChangedDate(new Date());
-    setLastReceivedOriginUser(message.getProperties().getOriginUser());
-    setLastReceivedOriginNode(message.getProperties().getOriginNode());
   }
 
   public void setLastChangedDate(Date lastChangedDate) {
     m_lastChangedDate = lastChangedDate;
   }
 
-  public void setLastReceivedOriginUser(String lastChangedUserId) {
+  public String getLastChangedUserId() {
+    return m_lastChangedUserId;
+  }
+
+  public void setLastChangedUserId(String lastChangedUserId) {
     m_lastChangedUserId = lastChangedUserId;
   }
 
-  public void setLastReceivedOriginNode(String lastReceivedOriginNode) {
-    m_lastReceivedOriginNode = lastReceivedOriginNode;
+  public String getLastChangedOriginNodeId() {
+    return m_lastChangedOriginNodeId;
+  }
+
+  public void setLastChangedOriginNodeId(String lastChangedOriginNodeId) {
+    m_lastChangedOriginNodeId = lastChangedOriginNodeId;
+  }
+
+  public void updateReceiveStatus(IClusterNotificationMessage message) {
+    incrementReceivedMessageCount();
+    setLastChangedDate(new Date());
+    setLastChangedUserId(message.getProperties().getOriginUser());
+    setLastChangedOriginNodeId(message.getProperties().getOriginNode());
   }
 }

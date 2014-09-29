@@ -20,16 +20,19 @@ import org.eclipse.scout.rt.server.ThreadContext;
 import org.eclipse.scout.rt.server.services.common.clientnotification.internal.ClientNotificationQueue;
 import org.eclipse.scout.rt.server.services.common.clientnotification.internal.ClientNotificationQueueElement;
 import org.eclipse.scout.rt.server.services.common.clientnotification.internal.ConsumableClientNotificationQueueElement;
+import org.eclipse.scout.rt.server.services.common.clustersync.IClusterNotification;
+import org.eclipse.scout.rt.server.services.common.clustersync.IClusterNotificationListenerService;
+import org.eclipse.scout.rt.server.services.common.clustersync.IClusterNotificationMessage;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterSynchronizationService;
 import org.eclipse.scout.rt.server.transaction.AbstractTransactionMember;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.shared.services.common.clientnotification.IClientNotification;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.eclipse.scout.service.AbstractService;
+import org.eclipse.scout.service.IService;
 import org.eclipse.scout.service.SERVICES;
-import org.osgi.framework.ServiceRegistration;
 
-public class ClientNotificationService extends AbstractService implements IClientNotificationService {
+public class ClientNotificationService extends AbstractService implements IClientNotificationService, IClusterNotificationListenerService {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ClientNotificationService.class);
   private static final String TRANSACTION_MEMBER_ID = ClientNotificationService.class.getName();
 
@@ -37,12 +40,6 @@ public class ClientNotificationService extends AbstractService implements IClien
 
   public ClientNotificationService() {
     m_clientNotificationQueue = new ClientNotificationQueue();
-  }
-
-  @Override
-  public void initializeService(ServiceRegistration registration) {
-    super.initializeService(registration);
-    addClusterNotificationListener();
   }
 
   @Override
@@ -103,13 +100,6 @@ public class ClientNotificationService extends AbstractService implements IClien
     return m;
   }
 
-  protected void addClusterNotificationListener() {
-    IClusterSynchronizationService s = SERVICES.getService(IClusterSynchronizationService.class);
-    if (s != null) {
-      s.addListener(new ClientNotificationClusterNotificationListener());
-    }
-  }
-
   /**
    * Has no effect, if no cluster service is registered
    */
@@ -136,6 +126,24 @@ public class ClientNotificationService extends AbstractService implements IClien
         n.setProvidingServerNode(s.getNodeId());
       }
     }
+  }
+
+  @Override
+  public Class<? extends IService> getDefiningServiceInterface() {
+    return IClientNotificationService.class;
+  }
+
+  @Override
+  public void onNotification(IClusterNotificationMessage notification) throws ProcessingException {
+    if (accept(notification.getNotification())) {
+      ClientNotificationClusterNotification n = (ClientNotificationClusterNotification) notification.getNotification();
+      SERVICES.getService(IClientNotificationService.class).putNonClusterDistributedNotification(n.getQueueElement().getNotification(), n.getQueueElement().getFilter());
+    }
+  }
+
+  protected boolean accept(IClusterNotification notification) {
+    return (notification instanceof ClientNotificationClusterNotification) &&
+        ((ClientNotificationClusterNotification) notification).getQueueElement().isActive();
   }
 
   /**
@@ -191,7 +199,5 @@ public class ClientNotificationService extends AbstractService implements IClien
     @Override
     public void release() {
     }
-
   }
-
 }

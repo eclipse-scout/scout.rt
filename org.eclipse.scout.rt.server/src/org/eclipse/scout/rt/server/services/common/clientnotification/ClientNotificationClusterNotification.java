@@ -28,4 +28,8 @@ public class ClientNotificationClusterNotification implements IClusterNotificati
     return m_queueElement;
   }
 
+  @Override
+  public String toString() {
+    return "ClientNotificationClusterNotification [m_queueElement=" + m_queueElement + "]";
+  }
 }

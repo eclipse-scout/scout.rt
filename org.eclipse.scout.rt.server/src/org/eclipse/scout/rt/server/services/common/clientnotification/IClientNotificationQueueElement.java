@@ -14,9 +14,6 @@ import java.io.Serializable;
 
 import org.eclipse.scout.rt.shared.services.common.clientnotification.IClientNotification;
 
-/**
- *
- */
 public interface IClientNotificationQueueElement extends Serializable {
 
   IClientNotification getNotification();
@@ -24,5 +21,4 @@ public interface IClientNotificationQueueElement extends Serializable {
   IClientNotificationFilter getFilter();
 
   boolean isActive();
-
 }
