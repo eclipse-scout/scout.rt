@@ -1,7 +1,10 @@
-textarea {
- .font-text-normal();
-}
+.string-field {
+  & input {
+    .text-field();
+  }
 
-.string-field input {
-  .text-field();
+  & textarea {
+    .font-text-normal();
+    width:100%;
+  }
 }

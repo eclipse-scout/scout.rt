@@ -12,12 +12,15 @@
     border-bottom:solid 1px @color-bsi-orange;
     outline: none;
   }
+  &.has-error {
+    border-bottom: solid 1px @color-error;
+  }
 }
 
 /** expects a sibling html element with class 'icon' **/
 .text-field-with-icon {
   .text-field;
-  padding-left: @field-with-icon-padding;
+  padding-left: 20px;
 
   & + .icon {
     position: absolute;

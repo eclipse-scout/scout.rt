@@ -116,11 +116,12 @@ scout.GroupBoxLayout.prototype._getHtmlBody = function($container) {
 };
 
 /**
- * Form-Field Layout, for a form-field with label, status-label and a field-
+ * Form-Field Layout, for a form-field with label, status, mandatory-indicator and a field
  */
 scout.FormFieldLayout = function() {
   scout.FormFieldLayout.parent.call(this);
   this.labelWidth = scout.HtmlEnvironment.fieldLabelWidth;
+  this.mandatoryWidth = 10;
   this.statusWidth = 10;
 };
 scout.inherits(scout.FormFieldLayout, scout.AbstractLayout);
@@ -131,18 +132,23 @@ scout.FormFieldLayout.prototype.layout = function($container) {
     widthSum = 0,
     $label = $container.children('label'),
     $status = $container.children('.status'),
+    $mandatory = $container.children('.mandatory-indicator'),
     $field = $container.children('.field'),
     $icon = $container.children('.icon');
+
   if ($label.isVisible()) {
     scout.HtmlComponent.setBounds($label, 0, 0, this.labelWidth, contSize.height);
     // with this property we achieve "vertical-align:middle" which doesn't work for non-table-cell elements
     $label.css('line-height', contSize.height + 'px');
     widthSum += this.labelWidth;
   }
-  if ($status.isVisible()) {
-    scout.HtmlComponent.setBounds($status, widthSum, 0, this.statusWidth, contSize.height);
+  if ($status.length > 0) {
     $status.css('line-height', contSize.height + 'px');
     widthSum += this.statusWidth;
+  }
+  if ($mandatory.length > 0) {
+    scout.HtmlComponent.setBounds($mandatory, widthSum, 0, this.mandatoryWidth, contSize.height);
+    widthSum += this.mandatoryWidth;
   }
   var fieldBounds = new scout.Rectangle(widthSum, 0, contSize.width - widthSum, contSize.height),
     htmlField = scout.HtmlComponent.optGet($field);
@@ -152,7 +158,7 @@ scout.FormFieldLayout.prototype.layout = function($container) {
   } else {
     scout.HtmlComponent.setBounds($field, fieldBounds);
   }
-  if ($icon) {
+  if ($icon.length > 0) {
     $icon.css('left', $field.position().left + 'px');
   }
 };
@@ -162,12 +168,16 @@ scout.FormFieldLayout.prototype.preferredLayoutSize = function($container) {
     height = scout.HtmlEnvironment.formRowHeight,
     $label = $container.children('label'),
     $status = $container.children('.status'),
+    $mandatory = $container.children('.mandatory-indicator'),
     $field = $container.children('.field');
   if ($label.isVisible()) {
     width += this.labelWidth;
   }
-  if ($status.isVisible()) {
+  if ($status.length > 0) {
     width += this.statusWidth;
+  }  
+  if ($mandatory.length > 0) {
+    width += this.mandatoryWidth;
   }
   if ($field.isVisible()) {
     // TODO AWE: (layout) dafür sorgen, dass wir hier immer ein get() machen können

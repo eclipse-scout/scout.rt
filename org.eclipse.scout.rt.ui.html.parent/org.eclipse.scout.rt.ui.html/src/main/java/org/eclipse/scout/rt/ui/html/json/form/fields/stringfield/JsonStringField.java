@@ -35,6 +35,12 @@ public class JsonStringField extends JsonValueField<IStringField> {
         return getModel().isMultilineText();
       }
     });
+    putJsonProperty(new JsonProperty<IStringField>(IStringField.PROP_VALIDATE_ON_ANY_KEY, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isValidateOnAnyKey();
+      }
+    });
   }
 
   @Override

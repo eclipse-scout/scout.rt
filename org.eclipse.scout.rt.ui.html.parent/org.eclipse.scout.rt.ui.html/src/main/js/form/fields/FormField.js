@@ -19,7 +19,6 @@ scout.FormField.prototype._render = function($parent) {
   this.$field = $.makeDiv('', 'field').
     html('[not implemented yet]').
     appendTo(this.$container);
-
 };
 
 scout.FormField.prototype._renderProperties = function() {
@@ -32,11 +31,30 @@ scout.FormField.prototype._renderProperties = function() {
 };
 
 scout.FormField.prototype._renderMandatory = function(mandatory) {
-  this._updateStatusLabel();
+  this.$container.setClass(mandatory, 'mandatory');
 };
 
 scout.FormField.prototype._renderErrorStatus = function(errorStatus) {
-  this._updateStatusLabel();
+  var title;
+  this.$container.setClass(errorStatus, 'has-error');
+
+  if (this.$field) {
+    this.$field.setClass(errorStatus, 'has-error');
+  }
+
+  if (this.$status) {
+    if (errorStatus) {
+      title = errorStatus.message;
+    }
+
+    if (title) {
+      this.$status.attr('title', title);
+      this.$status.addClass('error-status');
+    } else {
+      this.$status.removeAttr('title');
+      this.$status.removeClass('error-status');
+    }
+  }
 };
 
 scout.FormField.prototype._renderVisible = function(visible) {
@@ -63,33 +81,9 @@ scout.FormField.prototype._renderLabelVisible = function(visible) {
 };
 
 scout.FormField.prototype._renderEnabled = function(enabled) {
-  if (!this.$field) {
-    return;
-  }
-  this.$field.setEnabled(enabled);
-};
-
-scout.FormField.prototype._updateStatusLabel = function() {
-  if (!this.$status) {
-    return;
-  }
-
-  // errorStatus has higher priority than mandatory
-  var title, icon = ' ';
-  if (this.errorStatus) {
-    title = this.errorStatus.message;
-    icon = '!';
-  } else if (this.mandatory === true) {
-    icon = '*';
-  }
-
-  this.$status.html(icon);
-  if (title) {
-    this.$status.attr('title', title);
-    this.$status.addClass('error-status');
-  } else {
-    this.$status.removeAttr('title');
-    this.$status.removeClass('error-status');
+  this.$container.setEnabled(enabled);
+  if (this.$field) {
+    this.$field.setEnabled(enabled);
   }
 };
 
@@ -121,6 +115,12 @@ scout.FormField.prototype.addLabel = function() {
 scout.FormField.prototype.addStatus = function() {
   this.$status = $('<span>').
     addClass('status').
+    appendTo(this.$container);
+};
+
+scout.FormField.prototype.addMandatoryIndicator = function() {
+  this.$mandatory = $('<span>').
+    addClass('mandatory-indicator').
     appendTo(this.$container);
 };
 

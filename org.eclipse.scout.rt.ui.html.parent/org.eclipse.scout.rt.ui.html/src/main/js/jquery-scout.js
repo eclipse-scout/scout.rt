@@ -175,14 +175,18 @@
     this.addClass('selected');
     return this;
   };
-
-  $.fn.select = function(selected) {
-    if (selected) {
-      this.addClass('selected');
+  
+  $.fn.setClass = function(condition, cssClass) {
+    if (condition) {
+      this.addClass(cssClass);
     } else {
-      this.removeClass('selected');
+      this.removeClass(cssClass);
     }
     return this;
+  };
+
+  $.fn.select = function(selected) {
+    return this.setClass(selected, 'selected');
   };
 
   $.fn.isSelected = function() {
@@ -326,6 +330,10 @@
   $.fn.marginLeft = function() {
     var marginLeft = this.css('margin-left').replace('px', '');
     return parseInt(marginLeft, 10);
+  };
+
+  $.fn.disableSpellcheck = function() {
+    return this.attr('spellcheck', false);
   };
 
 }(jQuery));

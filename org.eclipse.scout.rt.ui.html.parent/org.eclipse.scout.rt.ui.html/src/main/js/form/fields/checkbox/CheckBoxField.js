@@ -8,7 +8,7 @@ scout.inherits(scout.CheckBoxField, scout.ValueField);
 scout.CheckBoxField.prototype._render = function($parent) {
   this.addContainer($parent, 'CheckBoxField');
   this.addLabel();
-  this.addStatus();
+  this.addMandatoryIndicator();
 
   // a wrapper span element is required in order to align the checkbox within
   // the form-field. If we'd apply the width to the checkbox element itself, the
@@ -31,6 +31,8 @@ scout.CheckBoxField.prototype._render = function($parent) {
   this._$checkBox.on('click', function() {
     this.session.send('click', this.id);
   }.bind(this));
+
+  this.addStatus();
 };
 
 scout.CheckBoxField.prototype._renderEnabled = function(enabled) {

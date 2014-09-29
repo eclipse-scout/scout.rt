@@ -7,13 +7,15 @@ scout.SmartField.prototype._render = function($parent) {
   this.addContainer($parent, 'SmartField');
   this.$container.addClass('smart-field');
   this.addLabel();
-  this.addStatus();
+  this.addMandatoryIndicator();
 
   this.$field = $('<input>').
     attr('type', 'text').
     addClass('field').
+    disableSpellcheck().
     blur(this._onFieldBlur.bind(this)).
     appendTo(this.$container);
 
   this.addIcon();
+  this.addStatus();
 };

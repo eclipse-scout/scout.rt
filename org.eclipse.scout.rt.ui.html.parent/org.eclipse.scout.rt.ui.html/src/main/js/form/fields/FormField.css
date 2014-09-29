@@ -6,29 +6,41 @@
   white-space:nowrap;
   border-spacing:0;
   position:absolute;
-}
 
-.form-field > label {
-  position:absolute;
-  text-overflow:ellipsis;
-  overflow:hidden;
-  max-width:130px;
-}
+  & > label {
+    position:absolute;
+    text-overflow:ellipsis;
+    overflow:hidden;
+    max-width:130px;
+  }
 
-.form-field > span.status {
-  position:absolute;
-}
+  & > .mandatory-indicator,
+    > .field {
+    position:absolute;
+  }
 
-.form-field > .field {
-  position:absolute;
-}
+  & > .status {
+    position:absolute;
+    right: 0px;
+  }
 
-/* Form-Fields */
-.form-field > textarea {
-  width:100%;
-}
+  &.mandatory > .mandatory-indicator:before {
+    content: '*';
+    font-size: 10px;
+  }
 
-/* Image-field hack, resize per JS */
-.form-field > img {
-  height:1px;
+  &.has-error {
+    & > .status:before  {
+      .font-icon;
+      font-size: 18px;
+      content: '\f05c';
+      color: @color-error;
+    }
+  }
+
+  /* keep space so that fields don't move when changing from disabled to enabled */
+  &.disabled > .mandatory-indicator {
+    visibility: hidden;
+  }
+
 }
