@@ -215,26 +215,23 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
   @ConfigOperation
   @Order(20)
   protected void execOverwriteCode(ICodeRow<CODE_ID> oldCode, ICodeRow<CODE_ID> newCode) throws ProcessingException {
-    if (newCode instanceof CodeRow) {
-      CodeRow editableRow = (CodeRow) newCode;
-      if (editableRow.getBackgroundColor() == null) {
-        editableRow.setBackgroundColor(oldCode.getBackgroundColor());
-      }
-      if (editableRow.getFont() == null) {
-        editableRow.setFont(oldCode.getFont());
-      }
-      if (editableRow.getForegroundColor() == null) {
-        editableRow.setForegroundColor(oldCode.getForegroundColor());
-      }
-      if (editableRow.getIconId() == null) {
-        editableRow.setIconId(oldCode.getIconId());
-      }
-      if (editableRow.getExtKey() == null) {
-        editableRow.setExtKey(oldCode.getExtKey());
-      }
-      if (editableRow.getValue() == null) {
-        editableRow.setValue(oldCode.getValue());
-      }
+    if (newCode.getBackgroundColor() == null) {
+      newCode.setBackgroundColor(oldCode.getBackgroundColor());
+    }
+    if (newCode.getFont() == null) {
+      newCode.setFont(oldCode.getFont());
+    }
+    if (newCode.getForegroundColor() == null) {
+      newCode.setForegroundColor(oldCode.getForegroundColor());
+    }
+    if (newCode.getIconId() == null) {
+      newCode.setIconId(oldCode.getIconId());
+    }
+    if (newCode.getExtKey() == null) {
+      newCode.setExtKey(oldCode.getExtKey());
+    }
+    if (newCode.getValue() == null) {
+      newCode.setValue(oldCode.getValue());
     }
   }
 

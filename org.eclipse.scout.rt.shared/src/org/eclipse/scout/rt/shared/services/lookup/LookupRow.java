@@ -101,7 +101,7 @@ public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookup
 
   /**
    * Creates a new lookup row with the given cells as data.
-   *
+   * 
    * @param cells
    *          array containing the following values:<br>
    *          Object key (use keyClass to specify the type of the key) <br>
@@ -260,6 +260,7 @@ public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookup
     return c != null ? new String(c) : null;
   }
 
+  @Override
   public void setTooltipText(String tooltip) {
     setValueInternal(TOOLTIP_BIT, tooltip != null ? tooltip.toCharArray() : null);
   }
@@ -269,6 +270,7 @@ public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookup
     return (String) getValueInternal(FOREGROUD_COLOR_BIT);
   }
 
+  @Override
   public void setForegroundColor(String foregroundColor) {
     setValueInternal(FOREGROUD_COLOR_BIT, StringUtility.intern(foregroundColor));
   }
@@ -278,6 +280,7 @@ public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookup
     return (String) getValueInternal(BACKGROUD_COLOR_BIT);
   }
 
+  @Override
   public void setBackgroundColor(String backgroundColor) {
     setValueInternal(BACKGROUD_COLOR_BIT, StringUtility.intern(backgroundColor));
   }
@@ -288,6 +291,7 @@ public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookup
     return s != null ? FontSpec.parse(s) : null;
   }
 
+  @Override
   public void setFont(FontSpec font) {
     setValueInternal(FONT_BIT, font != null ? StringUtility.intern(font.toPattern()) : null);
   }
@@ -330,7 +334,7 @@ public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookup
 
   /**
    * Convenience helper for transforming Object[][] data into CodeRow[] <br>
-   *
+   * 
    * @deprecated Will be removed in Scout 5.0. Use {@link LookupRow(Object[] cells, Class<?> keyClass)} instead.
    */
   @Deprecated

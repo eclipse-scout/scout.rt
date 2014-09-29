@@ -16,7 +16,7 @@ import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 
 /**
- *
+ * @since Scout 4.0.0
  */
 public interface ILookupRow<KEY_TYPE> extends Serializable {
 
@@ -29,68 +29,94 @@ public interface ILookupRow<KEY_TYPE> extends Serializable {
    */
   KEY_TYPE getKey();
 
-  void setText(String text);
-
   /**
-   * @return
+   * @return text
    */
   String getText();
 
-  void setIconId(String iconId);
+  /**
+   * @param text
+   */
+  void setText(String text);
 
   /**
-   * @return
+   * @return iconId
    */
   String getIconId();
 
   /**
-   * @return
+   * @param iconId
+   */
+  void setIconId(String iconId);
+
+  /**
+   * @return tooltipText
    */
   String getTooltipText();
 
   /**
-   * @return
+   * @param tooltipText
+   */
+  void setTooltipText(String tooltipText);
+
+  /**
+   * @return foregroundColor
    */
   String getForegroundColor();
 
   /**
-   * @return
+   * @return foregroundColor
+   */
+  void setForegroundColor(String foregroundColor);
+
+  /**
+   * @return backgroundColor
    */
   String getBackgroundColor();
 
   /**
-   * @return
+   * @param backgroundColor
+   */
+  void setBackgroundColor(String backgroundColor);
+
+  /**
+   * @return font
    */
   FontSpec getFont();
 
   /**
-   * @param b
+   * @param font
    */
-  void setActive(boolean b);
+  void setFont(FontSpec font);
 
   /**
-   * @return
+   * @return active
    */
   boolean isActive();
 
   /**
-   * @param b
+   * @param active
    */
-  void setEnabled(boolean b);
+  void setActive(boolean active);
 
   /**
-   * @return
+   * @return enabled
    */
   boolean isEnabled();
+
+  /**
+   * @param enabled
+   */
+  void setEnabled(boolean enabled);
+
+  /**
+   * @return parentKey
+   */
+  KEY_TYPE getParentKey();
 
   /**
    * @param parentKey
    */
   void setParentKey(KEY_TYPE parentKey);
-
-  /**
-   * @return
-   */
-  KEY_TYPE getParentKey();
 
 }
