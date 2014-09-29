@@ -32,7 +32,7 @@ scout.MessageBox.prototype._createButton = function(option) {
     .data('option', option);
 };
 
-scout.MessageBox.prototype._onButtonClicked = function() {
+scout.MessageBox.prototype._onButtonClicked = function(event) {
   var $button = $(event.target);
   var option = $button.data('option');
   this.session.send('action', this.id, {option: option});
