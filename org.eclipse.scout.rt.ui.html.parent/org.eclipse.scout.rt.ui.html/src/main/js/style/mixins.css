@@ -7,6 +7,9 @@
   &:disabled {
     background-color:white;
     border-bottom: none;
+    /* compensate missing border due to border-box model */
+    /*//FIXME CGU hacky, why 2px, border is 1px? does not work well with zoom...*/
+    padding-bottom: 2px;
   }
   &:focus {
     border-bottom:solid 1px @color-bsi-orange;
@@ -18,18 +21,18 @@
 }
 
 /** expects a sibling html element with class 'icon' **/
-.text-field-with-icon {
+.text-field-with-icon (@icon) {
   .text-field;
   padding-left: 20px;
 
-  & + .icon {
+  & ~ .icon {
     position: absolute;
   }
 
-  & + .icon:before {
+  & ~ .icon:before {
     .font-icon;
     font-size: 12px;
-    content: "\f002";
+    content: @icon;
     line-height: @logical-grid-height;
   }
 
@@ -37,7 +40,7 @@
     padding-left: 0px;
   }
 
-  &.disabled + .icon{
+  &.disabled ~ .icon{
     display: none;
   }
 }

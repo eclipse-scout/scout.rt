@@ -1,0 +1,142 @@
+.date-field input {
+  .text-field-with-icon('\f073');
+}
+
+/* date box */
+
+#date_box{
+height: 224px;
+width: 224px;
+position: absolute;
+left: 130px;
+top: 29px;
+background-color: #FFF;
+border: 1px solid #0082A1  ;
+padding: 6px;
+z-index: 100;
+}
+
+.date-field > .predict {
+color: @color-bench-semi;
+}
+
+.field.has_error ~ #date_box{
+border-color:#A61300
+}
+
+div.date_weekday,
+div.date_day{
+width: 30px;
+margin: 0px;
+height: 26px;
+line-height: 26px;
+float: left;
+left: 100px;
+text-align: center;
+cursor: default;
+}
+
+div.date_day:hover {
+color: #0082A1;
+}
+
+div.date_weekday{
+font-weight: bold;
+color: #000;
+}
+
+div.date_day{
+cursor: pointer;
+}
+
+div.date_weekend{
+color:#777777;
+}
+
+div.date_out{
+color:#d2d2d2;
+}
+
+div.date_out_weekend{
+color: #aaa;
+}
+
+div.date_now{
+font-weight: bold !important;}
+
+div.date_select{
+width: 30px;
+line-height: 26px;
+height: 26px;
+font-weight:normal;
+background-color:#ededed;
+}
+
+div.date_header{
+height: 26px;
+width: 211px;
+float: left;
+margin: 0px 0px 5px 0px;
+}
+
+div.date_month{
+line-height: 26px;
+height: 26px;
+width: 110px;
+text-align: center;
+cursor: default;
+position: absolute;
+left: 55px;
+top: 5px;
+color: #0082A1;
+font-size:13px;
+}
+
+div.date_left_y,
+div.date_left_m,
+div.date_right_y,
+div.date_right_m{
+text-align: center;
+padding: 3px 0px 2px 0px;
+width: 20px;
+height: 14px;
+cursor: pointer;
+font-family: FontAwesome;
+color:#0082A1;
+margin: 0px 2px 0px 0px;
+font-size: 18px;
+font-weight: bold;
+}
+
+div.date_left_y:hover,
+div.date_left_m:hover,
+div.date_right_y:hover,
+div.date_right_m:hover{
+color:#FE9915;
+}
+
+div.date_left_y,
+div.date_left_m{
+float: left;
+}
+
+div.date_left_y:before {
+content:"\f100";
+}
+
+div.date_left_m:before {
+content:"\f104";
+}
+
+div.date_right_y,
+div.date_right_m{
+float: right;
+}
+
+div.date_right_y:before {
+content:"\f101";
+}
+
+div.date_right_m:before {
+content:"\f105";
+}

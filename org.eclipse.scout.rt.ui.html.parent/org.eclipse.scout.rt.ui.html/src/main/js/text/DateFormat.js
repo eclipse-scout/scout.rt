@@ -21,7 +21,10 @@ scout.DateFormat = function(locale, pattern) {
     pattern = locale.dateFormatPatternDefault;
   }
 
-  this._symbols = locale.dateFormatSymbols;
+  this.symbols = locale.dateFormatSymbols;
+  this.symbols.firstDayOfWeek = 1; // monday //FIXME deliver from server
+  this.symbols.weekdaysOrdered = scout.DateFormat.orderWeekdays(this.symbols.weekdays, this.symbols.firstDayOfWeek);
+  this.symbols.weekdaysShortOrdered = scout.DateFormat.orderWeekdays(this.symbols.weekdaysShort, this.symbols.firstDayOfWeek);
   this.formatFunc = [];
   this.pattern = pattern;
 
@@ -43,12 +46,12 @@ scout.DateFormat = function(locale, pattern) {
   patternLibrary['month'] = [{
     term: 'MMMM',
     func: function(date) {
-      return that._symbols.months[date.getMonth()];
+      return that.symbols.months[date.getMonth()];
     }
   }, {
     term: 'MMM',
     func: function(date) {
-      return that._symbols.monthsShort[date.getMonth()];
+      return that.symbols.monthsShort[date.getMonth()];
     }
   }, {
     term: 'MM',
@@ -101,12 +104,12 @@ scout.DateFormat = function(locale, pattern) {
   patternLibrary['weekday'] = [{
     term: 'EEEE',
     func: function(date) {
-      return that._symbols.weekdays[date.getDay()];
+      return that.symbols.weekdays[date.getDay()];
     }
   }, {
     term: 'E',
     func: function(date) {
-      return that._symbols.weekdaysShort[date.getDay()];
+      return that.symbols.weekdaysShort[date.getDay()];
     }
   }];
 
@@ -137,7 +140,7 @@ scout.DateFormat = function(locale, pattern) {
   patternLibrary['am/pm marker'] = [{
     term: 'a',
     func: function(date) {
-      return (date.getHours() < 12) ? that._symbols.am : that._symbols.pm;
+      return (date.getHours() < 12) ? that.symbols.am : that.symbols.pm;
     }
   }];
 
@@ -217,4 +220,12 @@ scout.DateFormat.prototype.format = function format(time) {
   }
 
   return ret;
+};
+
+scout.DateFormat.orderWeekdays = function(weekdays, firstDayOfWeek) {
+  var weekdaysOrdered = [];
+  for (var i=0; i < 7; i++) {
+    weekdaysOrdered[i] = weekdays[(i + firstDayOfWeek) % 7];
+  }
+  return weekdaysOrdered;
 };

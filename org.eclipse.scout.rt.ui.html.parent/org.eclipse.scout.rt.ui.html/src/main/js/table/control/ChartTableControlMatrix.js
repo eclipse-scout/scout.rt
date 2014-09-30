@@ -95,11 +95,12 @@ scout.ChartTableControlMatrix.prototype.addAxis = function(axis, axisGroup) {
     } else if (axisGroup === 1) {
       keyAxis.norm = function(f) {
         if (f) {
-          return (new Date(f).getDay() + 6) % 7; //start with monday
+          var b = (new Date(f).getDay() + 7 - locale.dateFormatSymbols.firstDayOfWeek) % 7;
+          return b;
         }
       };
       keyAxis.format = function(n) {
-        return locale.dateFormatSymbols.weekdays[(n + 1) % 7];
+        return locale.dateFormatSymbols.weekdaysOrdered[n];
       };
     } else if (axisGroup === 2) {
       keyAxis.norm = function(f) {

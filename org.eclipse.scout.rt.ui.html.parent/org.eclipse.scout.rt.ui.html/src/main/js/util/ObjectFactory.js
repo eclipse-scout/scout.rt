@@ -168,6 +168,11 @@ scout.defaultObjectFactories = [{
     return new scout.SmartField();
   }
 }, {
+  objectType: 'DateField',
+  create: function() {
+    return new scout.DateField();
+  }
+}, {
   objectType: 'TableField',
   create: function() {
     return new scout.TableField();
