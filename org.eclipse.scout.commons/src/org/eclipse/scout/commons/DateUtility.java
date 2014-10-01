@@ -13,8 +13,10 @@ package org.eclipse.scout.commons;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 public final class DateUtility {
@@ -23,6 +25,13 @@ public final class DateUtility {
   }
 
   public static final long DAY_MILLIS = 24L * 3600L * 1000L;
+
+  //2 letter code countries for different weekends worldwide
+  private static final List<String> SUN_WEEKEND_DAYS_COUNTRIES = Arrays.asList(new String[]{"GQ", "IN", "TH", "UG"});
+  private static final List<String> FRY_WEEKEND_DAYS_COUNTRIES = Arrays.asList(new String[]{"DJ", "IR"});
+  private static final List<String> FRY_SUN_WEEKEND_DAYS_COUNTRIES = Arrays.asList(new String[]{"BN"});
+  private static final List<String> THU_FRY_WEEKEND_DAYS_COUNTRIES = Arrays.asList(new String[]{"AF"});
+  private static final List<String> FRY_SAT_WEEKEND_DAYS_COUNTRIES = Arrays.asList(new String[]{"AE", "DZ", "BH", "BD", "EG", "IQ", "IL", "JO", "KW", "LY", "MV", "MR", "OM", "PS", "QA", "SA", "SD", "SY", "YE"});
 
   /**
    * format date with {@value DateFormat#DEFAULT} pattern
@@ -109,7 +118,7 @@ public final class DateUtility {
 
   /**
    * Adds a number of days to a date.
-   * 
+   *
    * @param count
    *          days is truncated to second and can be negative
    * @param d
@@ -157,7 +166,7 @@ public final class DateUtility {
 
   /**
    * determines the day of the week
-   * 
+   *
    * @param d
    * @return int with the the day of the week (sunday=1)
    */
@@ -256,7 +265,7 @@ public final class DateUtility {
 
   /**
    * truncate the calendar to week
-   * 
+   *
    * @param adjustIncrement
    *          +1 or -1
    */
@@ -337,7 +346,7 @@ public final class DateUtility {
 
   /**
    * only compares the date, so doesn't care about time
-   * 
+   *
    * @return true if d is in the date range [minDate,maxDate]
    */
   public static boolean isInDateRange(Date minDate, Date d, Date maxDate) {
@@ -405,17 +414,49 @@ public final class DateUtility {
   }
 
   public static boolean isWeekend(Date d) {
+    return isWeekend(d, LocaleThreadLocal.get());
+  }
+
+  public static boolean isWeekend(Date d, Locale locale) {
     Calendar c = Calendar.getInstance();
     c.setTime(d);
     int dayOfWeek = c.get(Calendar.DAY_OF_WEEK);
-    return dayOfWeek == Calendar.SATURDAY || dayOfWeek == Calendar.SUNDAY;
+
+    int[] weekendDays = getWeekendDays(locale);
+    for (int weekendDay : weekendDays) {
+      if (dayOfWeek == weekendDay) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private static int[] getWeekendDays(Locale locale) {
+    if (THU_FRY_WEEKEND_DAYS_COUNTRIES.contains(locale.getCountry())) {
+      return new int[]{Calendar.THURSDAY, Calendar.FRIDAY};
+    }
+    else if (FRY_SUN_WEEKEND_DAYS_COUNTRIES.contains(locale.getCountry())) {
+      return new int[]{Calendar.FRIDAY, Calendar.SUNDAY};
+    }
+    else if (FRY_WEEKEND_DAYS_COUNTRIES.contains(locale.getCountry())) {
+      return new int[]{Calendar.FRIDAY};
+    }
+    else if (SUN_WEEKEND_DAYS_COUNTRIES.contains(locale.getCountry())) {
+      return new int[]{Calendar.SUNDAY};
+    }
+    else if (FRY_SAT_WEEKEND_DAYS_COUNTRIES.contains(locale.getCountry())) {
+      return new int[]{Calendar.FRIDAY, Calendar.SATURDAY};
+    }
+    else {
+      return new int[]{Calendar.SATURDAY, Calendar.SUNDAY};
+    }
   }
 
   /**
    * Correctly calculate covered days of a day range. 13.3.2008 00:00 -
    * 14.3.2008 00:00 only covers 1 day (13.3.) 13.3.2008 12:00 - 14.3.2008 12:00
    * covers 2 days (13.3., 14.3.)
-   * 
+   *
    * @return array of days that with time set to 00:00:00.000
    */
   public static Date[] getCoveredDays(Date from, Date to) {

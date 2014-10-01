@@ -35,6 +35,7 @@ public class DatefieldTableModel implements IStructuredContentProvider, ITableLa
   private Date m_navigationDate = null;
   private Date m_highLightDate = null;
   private final SimpleDateFormat m_monthYearFormat;
+  private final Locale m_locale;
 
   // ui
   private Color m_weekendForeground;
@@ -45,6 +46,7 @@ public class DatefieldTableModel implements IStructuredContentProvider, ITableLa
   private Font m_highlightFont;
 
   public DatefieldTableModel(Locale locale) {
+    m_locale = locale;
     m_monthYearFormat = new SimpleDateFormat("MMMMM yyyy", locale);
 //    m_weekendForeground = getUiEnvironment().getColor(new RGB(254, 154, 35));FIXME SLE set color via css
 //    m_outMonthForeground = getUiEnvironment().getColor(new RGB(180, 180, 180));
@@ -92,13 +94,12 @@ public class DatefieldTableModel implements IStructuredContentProvider, ITableLa
     }
     m_navigationDate = date;
     m_rows.clear();
-    Calendar c = Calendar.getInstance();
+    Calendar c = Calendar.getInstance(m_locale);
     c.setTime(date);
-    // Calculate Startdate; go back to 1st of month, then go back to monday
-    // (1=sunday)
-    int monday = Calendar.MONDAY;
+    // Calculate Startdate; go back to 1st of month, then go back to first week day
+    int firstDayOfWeek = c.getFirstDayOfWeek();
     c.add(Calendar.DAY_OF_MONTH, -(c.get(Calendar.DAY_OF_MONTH) - 1));
-    c.add(Calendar.DAY_OF_WEEK, -((c.get(Calendar.DAY_OF_WEEK) - monday + 7) % 7));
+    c.add(Calendar.DAY_OF_WEEK, -((c.get(Calendar.DAY_OF_WEEK) - firstDayOfWeek + 7) % 7));
     for (int iRows = 0; iRows < 6; iRows++) {
       DateRow row = new DateRow(c.getTime());
       m_rows.add(row);
@@ -144,13 +145,13 @@ public class DatefieldTableModel implements IStructuredContentProvider, ITableLa
     if (DateUtility.isSameDay(date, m_highLightDate)) {
       return m_highlightForeground;
     }
-    if (DateUtility.isWeekend(date) && DateUtility.isSameMonth(date, m_navigationDate)) {
+    if (DateUtility.isWeekend(date, m_locale) && DateUtility.isSameMonth(date, m_navigationDate)) {
       return m_weekendForeground;
     }
-    if (!DateUtility.isSameMonth(date, m_navigationDate) && !DateUtility.isWeekend(date)) {
+    if (!DateUtility.isSameMonth(date, m_navigationDate) && !DateUtility.isWeekend(date, m_locale)) {
       return m_outMonthForeground;
     }
-    if (!DateUtility.isSameMonth(date, m_navigationDate) && DateUtility.isWeekend(date)) {
+    if (!DateUtility.isSameMonth(date, m_navigationDate) && DateUtility.isWeekend(date, m_locale)) {
       return m_outMonthForegroundWeekend;
     }
     return null;

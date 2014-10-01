@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -24,6 +24,7 @@ import org.eclipse.jface.viewers.ITableFontProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.scout.commons.DateUtility;
+import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.swt.graphics.Color;
@@ -102,9 +103,9 @@ public class DatefieldTableModel implements IStructuredContentProvider, ITableLa
     c.setTime(date);
     // Calculate Startdate; go back to 1st of month, then go back to monday
     // (1=sunday)
-    int monday = Calendar.MONDAY;
+    int firstDayOfWeek = c.getFirstDayOfWeek();
     c.add(Calendar.DAY_OF_MONTH, -(c.get(Calendar.DAY_OF_MONTH) - 1));
-    c.add(Calendar.DAY_OF_WEEK, -((c.get(Calendar.DAY_OF_WEEK) - monday + 7) % 7));
+    c.add(Calendar.DAY_OF_WEEK, -((c.get(Calendar.DAY_OF_WEEK) - firstDayOfWeek + 7) % 7));
     for (int iRows = 0; iRows < 6; iRows++) {
       DateRow row = new DateRow(c.getTime());
       m_rows.add(row);
@@ -140,13 +141,12 @@ public class DatefieldTableModel implements IStructuredContentProvider, ITableLa
 
   @Override
   public Color getBackground(Object element, int columnIndex) {
-
     Date date = ((DateRow) element).getDate(columnIndex - 1);
     // check hightlight
     if (DateUtility.isSameDay(date, m_highLightDate)) {
       return m_highlightBackground;
     }
-    if (DateUtility.isWeekend(date)) {
+    if (DateUtility.isWeekend(date, LocaleThreadLocal.get())) {
       return m_weekendBackground;
     }
     return m_highlightForeground;

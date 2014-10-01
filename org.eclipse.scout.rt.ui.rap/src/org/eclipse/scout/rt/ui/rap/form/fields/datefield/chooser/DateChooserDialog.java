@@ -231,22 +231,23 @@ public class DateChooserDialog extends Dialog {
     dummyColumn.setMoveable(false);
 
     String[] wd = new DateFormatSymbols(RwtUtility.getClientSessionLocale(parent.getDisplay())).getShortWeekdays();
-    // create the m_columns from monday to saturday
-    for (int i = 2; i < 8; i++) {
+
+    Calendar c = Calendar.getInstance(RwtUtility.getClientSessionLocale(parent.getDisplay()));
+    int dayOfWeek = c.getFirstDayOfWeek();
+
+    do {
       TableColumn col = new TableColumn(table, SWT.CENTER);
       col.setData(RWT.CUSTOM_VARIANT, getDialogVariant());
       col.setWidth(getDateCellWidth());
       col.setResizable(false);
       col.setMoveable(false);
-      col.setText(wd[i]);
+      col.setText(wd[dayOfWeek]);
+
+      dayOfWeek = (dayOfWeek + 8) % 7;
+      dayOfWeek = dayOfWeek == 0 ? 7 : dayOfWeek;
     }
-    // sunday
-    TableColumn col = new TableColumn(table, SWT.CENTER);
-    col.setData(RWT.CUSTOM_VARIANT, getDialogVariant());
-    col.setWidth(getDateCellWidth());
-    col.setResizable(false);
-    col.setMoveable(false);
-    col.setText(wd[Calendar.SUNDAY]);
+    while (dayOfWeek != c.getFirstDayOfWeek());
+
     // viewer
     m_viewer = viewer;
 

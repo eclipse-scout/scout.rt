@@ -13,11 +13,11 @@ package org.eclipse.scout.rt.ui.swt.form.fields.datefield.chooser;
 import java.text.DateFormatSymbols;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Locale;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.scout.commons.DateUtility;
+import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.ext.table.util.TableCellRolloverSupport;
 import org.eclipse.swt.SWT;
@@ -160,21 +160,23 @@ public class DateChooserDialog extends Dialog {
     dummyColumn.setResizable(false);
     dummyColumn.setMoveable(false);
 
-    String[] wd = new DateFormatSymbols(Locale.getDefault()).getShortWeekdays();
-    // create the m_columns from monday to saturday
-    for (int i = 2; i < 8; i++) {
+    String[] wd = new DateFormatSymbols(LocaleThreadLocal.get()).getShortWeekdays();
+
+    Calendar c = Calendar.getInstance(LocaleThreadLocal.get());
+    int dayOfWeek = c.getFirstDayOfWeek();
+
+    do {
       TableColumn col = new TableColumn(table, SWT.CENTER);
       col.setWidth(COLUMN_WIDTH);
       col.setResizable(false);
       col.setMoveable(false);
-      col.setText(wd[i]);
+      col.setText(wd[dayOfWeek]);
+
+      dayOfWeek = (dayOfWeek + 8) % 7;
+      dayOfWeek = dayOfWeek == 0 ? 7 : dayOfWeek;
     }
-    // sunday
-    TableColumn col = new TableColumn(table, SWT.CENTER);
-    col.setWidth(COLUMN_WIDTH);
-    col.setResizable(false);
-    col.setMoveable(false);
-    col.setText(wd[Calendar.SUNDAY]);
+    while (dayOfWeek != c.getFirstDayOfWeek());
+
     // viewer
     m_viewer = viewer;
 

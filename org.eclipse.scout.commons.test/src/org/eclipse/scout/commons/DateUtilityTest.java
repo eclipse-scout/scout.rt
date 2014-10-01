@@ -19,6 +19,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import org.junit.After;
@@ -671,5 +672,51 @@ public class DateUtilityTest {
     assertEquals(1, DateUtility.getDaysBetween(d2, d1));
 
     assertEquals(0, DateUtility.getDaysBetween(d1, d1));
+  }
+
+  @Test
+  public void testIsWeekend() {
+    Calendar todayCalendar = Calendar.getInstance();
+
+    Calendar mondayCalendar = Calendar.getInstance();
+    mondayCalendar.set(2014, Calendar.OCTOBER, 6, 0, 0);
+
+    Calendar sundayCalendar = Calendar.getInstance();
+    sundayCalendar.set(2014, Calendar.OCTOBER, 5, 0, 0);
+
+    Calendar saturdayCalendar = Calendar.getInstance();
+    saturdayCalendar.set(2014, Calendar.OCTOBER, 4, 0, 0);
+
+    Calendar fridayCalendar = Calendar.getInstance();
+    fridayCalendar.set(2014, Calendar.OCTOBER, 3, 0, 0);
+
+    Calendar thursdayCalendar = Calendar.getInstance();
+    thursdayCalendar.set(2014, Calendar.OCTOBER, 2, 0, 0);
+
+    assertTrue(DateUtility.isWeekend(thursdayCalendar.getTime(), new Locale("ar", "AF")));
+    assertFalse(DateUtility.isWeekend(thursdayCalendar.getTime(), new Locale("ar", "GQ")));
+
+    assertFalse(DateUtility.isWeekend(fridayCalendar.getTime(), Locale.US));
+    assertTrue(DateUtility.isWeekend(fridayCalendar.getTime(), new Locale("ar", "AE")));
+
+    assertTrue(DateUtility.isWeekend(sundayCalendar.getTime(), Locale.UK));
+    assertFalse(DateUtility.isWeekend(sundayCalendar.getTime(), new Locale("ar", "AE")));
+
+    assertFalse(DateUtility.isWeekend(saturdayCalendar.getTime(), new Locale("ar", "BN")));
+    assertTrue(DateUtility.isWeekend(saturdayCalendar.getTime(), new Locale("ar", "AE")));
+    assertFalse(DateUtility.isWeekend(saturdayCalendar.getTime(), new Locale("ar", "AF")));
+    assertFalse(DateUtility.isWeekend(saturdayCalendar.getTime(), new Locale("ar", "IN")));
+
+    assertTrue(DateUtility.isWeekend(sundayCalendar.getTime(), Locale.UK));
+    assertFalse(DateUtility.isWeekend(sundayCalendar.getTime(), new Locale("ar", "AE")));
+
+    assertFalse(DateUtility.isWeekend(mondayCalendar.getTime(), new Locale("ar", "AE")));
+    assertFalse(DateUtility.isWeekend(mondayCalendar.getTime(), new Locale("ar", "AF")));
+    assertFalse(DateUtility.isWeekend(mondayCalendar.getTime(), new Locale("ar", "IN")));
+    assertFalse(DateUtility.isWeekend(mondayCalendar.getTime(), new Locale("ar", "BN")));
+    assertFalse(DateUtility.isWeekend(mondayCalendar.getTime(), Locale.US));
+    assertFalse(DateUtility.isWeekend(mondayCalendar.getTime(), Locale.UK));
+
+    assertEquals(DateUtility.isWeekend(todayCalendar.getTime()), DateUtility.isWeekend(todayCalendar.getTime(), Locale.getDefault()));
   }
 }
