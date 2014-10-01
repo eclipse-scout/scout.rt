@@ -1,6 +1,6 @@
 /* TODO cru
  *  enable / disable and modal handling? auch beim tab löschen
-*/
+ */
 
 scout.Desktop = function() {
   scout.Desktop.parent.call(this);
@@ -26,7 +26,8 @@ scout.Desktop.prototype.onChildAdapterCreated = function(propertyName, adapter) 
   }
   if (propertyName === 'toolButtons') {
     adapter.desktop = this;
-  }};
+  }
+};
 
 scout.Desktop.prototype._render = function($parent) {
   var i, form, messageBox;
@@ -103,15 +104,19 @@ scout.Desktop.TabAndContent = function(title, content) {
 
 /* tab handling */
 
-scout.Desktop.prototype._addTab = function(tab) {
-  tab.$div = this.$tabbar.appendDIV('taskbar-tab-item', tab.title);
+scout.Desktop.prototype._addTab = function(tab, prepend) {
+  tab.$div = $.makeDIV('taskbar-tab-item', tab.title);
+  if (prepend) {
+    tab.$div.prependTo(this.$tabbar);
+  } else {
+    tab.$div.appendTo(this.$tabbar);
+  }
 
   tab.$div.on('click', function onTabClicked() {
-      if (tab !== this._selectedTab) {
-        this._selectTab(tab);
-      }
-    }.bind(this));
-
+    if (tab !== this._selectedTab) {
+      this._selectTab(tab);
+    }
+  }.bind(this));
 
   this._allTabs.push(tab);
   this._selectTab(tab);
@@ -183,13 +188,13 @@ scout.Desktop.prototype.updateOutlineTab = function(content, title) {
   }
 
   //Remove tab completely if no content is available (neither a table nor a form)
-  if (!content){
+  if (!content) {
     this._removeTab(this._outlineTab);
     return;
   }
 
   if (!this._isTabVisible(this._outlineTab)) {
-    this._addTab(this._outlineTab);
+    this._addTab(this._outlineTab, true);
   }
 
   this._outlineTab.content = content;
@@ -217,7 +222,6 @@ scout.Desktop.prototype.changeOutline = function(outline) {
 scout.Desktop.prototype.addMessageBox = function(messageBox) {
   messageBox.render(this.$bench);
 };
-
 
 /* event handling */
 
