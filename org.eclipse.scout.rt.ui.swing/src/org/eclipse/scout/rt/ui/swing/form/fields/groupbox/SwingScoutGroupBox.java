@@ -18,6 +18,7 @@ import java.beans.PropertyChangeListener;
 
 import javax.swing.Icon;
 import javax.swing.JPanel;
+import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
@@ -35,8 +36,8 @@ import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.ext.BorderLayoutEx;
 import org.eclipse.scout.rt.ui.swing.ext.JPanelEx;
-import org.eclipse.scout.rt.ui.swing.ext.JScrollPaneEx;
 import org.eclipse.scout.rt.ui.swing.ext.JSection;
+import org.eclipse.scout.rt.ui.swing.ext.ViewportTrackableJScrollPaneEx;
 import org.eclipse.scout.rt.ui.swing.ext.internal.LogicalGridLayoutSpyAction;
 import org.eclipse.scout.rt.ui.swing.form.fields.ISwingScoutFormField;
 import org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutFieldComposite;
@@ -67,16 +68,27 @@ public class SwingScoutGroupBox extends SwingScoutFieldComposite<IGroupBox> impl
     m_swingBodyPart.setOpaque(false);
     m_swingBodyPart.putClientProperty(LogicalGridLayoutSpyAction.GROUP_BOX_MARKER, Boolean.TRUE);
     m_swingButtonBarPart = createButtonBarPart();
-    // main panel: NORTH=sectionHeader, CENTER=bodyPanel, SOUTH=buttonPanel
+    // Layout: CENTER=bodyPanel, SOUTH=buttonPanel
     JPanelEx swingBox = new JPanelEx();
     swingBox.setOpaque(false);
     swingBox.setLayout(new BorderLayoutEx(0, 0));
-    //
+
     if (getScoutObject().isScrollable()) {
-      JScrollPane scrollPane = new JScrollPaneEx(m_swingBodyPart);
-      scrollPane.getVerticalScrollBar().setUnitIncrement(16);
-      scrollPane.getHorizontalScrollBar().setUnitIncrement(16);
+      JScrollPane scrollPane = new ViewportTrackableJScrollPaneEx(m_swingBodyPart);
       scrollPane.setBorder(null);
+
+      // set the horizontal scroll increment to 16 pixel.
+      int hScrollIncrement = 16;
+      JScrollBar hsb = scrollPane.getHorizontalScrollBar();
+      hsb.setUnitIncrement(hScrollIncrement);
+      hsb.setBlockIncrement(hScrollIncrement);
+
+      // set the vertical scroll increment to the height of a logical layout row.
+      int vScrollIncrement = getSwingEnvironment().getFormRowHeight() + getSwingEnvironment().getFormRowGap();
+      JScrollBar vsb = scrollPane.getVerticalScrollBar();
+      vsb.setUnitIncrement(vScrollIncrement);
+      vsb.setBlockIncrement(vScrollIncrement);
+
       swingBox.add(scrollPane, BorderLayoutEx.CENTER);
     }
     else {
@@ -97,9 +109,9 @@ public class SwingScoutGroupBox extends SwingScoutFieldComposite<IGroupBox> impl
       setSwingLabel(null);
       setSwingContainer(swingBox);
     }
-    // FIELDS: add layout here and then add fields with constraints (no process buttons)
-    LogicalGridLayout bodyLayout = new LogicalGridLayout(getSwingEnvironment(), getSwingEnvironment().getFormColumnGap(), getSwingEnvironment().getFormRowGap());
+    LogicalGridLayout bodyLayout = new LogicalGridLayout(getSwingEnvironment(), getSwingEnvironment().getFormColumnGap(), getSwingEnvironment().getFormRowGap(), false);
     m_swingBodyPart.setLayout(bodyLayout);
+
     // items without process buttons
     for (IFormField field : getScoutObject().getControlFields()) {
       // create item
@@ -109,7 +121,6 @@ public class SwingScoutGroupBox extends SwingScoutFieldComposite<IGroupBox> impl
       swingScoutComposite.getSwingContainer().putClientProperty(LogicalGridData.CLIENT_PROPERTY_NAME, cons);
       m_swingBodyPart.add(swingScoutComposite.getSwingContainer());
     }
-
   }
 
   protected boolean isSection() {

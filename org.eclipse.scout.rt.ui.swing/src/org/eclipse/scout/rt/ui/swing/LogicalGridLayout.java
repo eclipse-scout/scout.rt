@@ -13,12 +13,12 @@ package org.eclipse.scout.rt.ui.swing;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.Insets;
 import java.awt.Rectangle;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 
 import javax.swing.JComponent;
+import javax.swing.SwingUtilities;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -39,11 +39,30 @@ public class LogicalGridLayout extends AbstractLayoutManager2 {
   private int m_hgap;
   private int m_vgap;
   private LogicalGridLayoutInfo m_info;
+  private boolean m_useLogicalPrefSize;
 
   public LogicalGridLayout(ISwingEnvironment env, int hgap, int vgap) {
+    this(env, hgap, vgap, true);
+  }
+
+  /**
+   * @param env
+   *          Swing-UI configuration.
+   * @param hgap
+   *          horizontal gap between the cells of the grid (gap between adjacent rows).
+   * @param vgap
+   *          vertical gap between the cells of the grid (gap between adjacent columns).
+   * @param useLogicalPrefSize
+   *          <code>true</code> to only use logical sizes when calculating the preferred size of the grid (default),
+   *          <code>false</code> to respect the parent's dimension when calculating the preferred width of the grid.
+   *          This is vital if a parent container calculates its height based on the children's width (e.g.
+   *          tab-row-extent in a tabbed pane) [Bugzilla 410306].
+   */
+  public LogicalGridLayout(ISwingEnvironment env, int hgap, int vgap, boolean useLogicalPrefSize) {
     m_env = env;
     m_hgap = hgap;
     m_vgap = vgap;
+    m_useLogicalPrefSize = useLogicalPrefSize;
   }
 
   public void setDebug(boolean b) {
@@ -95,7 +114,8 @@ public class LogicalGridLayout extends AbstractLayoutManager2 {
         visibleCons.add(cons);
       }
     }
-    m_info = new LogicalGridLayoutInfo(m_env, visibleComps.toArray(new Component[visibleComps.size()]), visibleCons.toArray(new LogicalGridData[visibleCons.size()]), m_hgap, m_vgap);
+    m_info = new LogicalGridLayoutInfo(m_env, visibleComps.toArray(new Component[visibleComps.size()]), visibleCons.toArray(new LogicalGridData[visibleCons.size()]), m_hgap, m_vgap, m_useLogicalPrefSize);
+    m_info.layoutCellBounds(parent.getSize(), parent.getInsets(), SwingUtilities.getRoot(parent).isShowing());
   }
 
   public LogicalGridLayoutInfo getInfo() {
@@ -108,7 +128,7 @@ public class LogicalGridLayout extends AbstractLayoutManager2 {
 
   public void dumpLayoutInfo(Container parent, PrintWriter out) {
     out.println("**************** LogicalGridLayout[" + parent.getName() + "]");
-    Component[] c = m_info.components;
+    Component[] c = m_info.m_components;
     String[] names = new String[c.length];
     String[] constraints = new String[c.length];
     for (int i = 0; i < c.length; i++) {
@@ -136,7 +156,8 @@ public class LogicalGridLayout extends AbstractLayoutManager2 {
     out.println("  row-height=" + dump(m_info.height));
     out.println("  col-weightX=" + dump(m_info.weightX));
     out.println("  row-weightY=" + dump(m_info.weightY));
-    Rectangle[][] cellBounds = m_info.layoutCellBounds(parent.getSize(), parent.getInsets());
+
+    Rectangle[][] cellBounds = m_info.getCellBounds();
     if (cellBounds != null) {
       for (int row = 0; row < cellBounds.length; row++) {
         for (int col = 0; col < cellBounds[row].length; col++) {
@@ -159,45 +180,19 @@ public class LogicalGridLayout extends AbstractLayoutManager2 {
   }
 
   @Override
-  protected Dimension getLayoutSize(Container parent, int sizeflag) {
-    Dimension dim = new Dimension();
-    // w
-    int useCount = 0;
-    for (int i = 0; i < m_info.cols; i++) {
-      int w = m_info.width[i][sizeflag];
-      if (useCount > 0) {
-        dim.width += m_hgap;
-      }
-      dim.width += w;
-      useCount++;
-    }
-    // h
-    useCount = 0;
-    for (int i = 0; i < m_info.rows; i++) {
-      int h = m_info.height[i][sizeflag];
-      if (useCount > 0) {
-        dim.height += m_vgap;
-      }
-      dim.height += h;
-      useCount++;
-    }
-    if (dim.width > 0 && dim.height > 0) {
-      Insets insets = parent.getInsets();
-      dim.width += insets.left + insets.right;
-      dim.height += insets.top + insets.bottom;
-    }
-    return dim;
+  protected Dimension getLayoutSize(Container parent, int sizeFlag) {
+    return m_info.getGridDimension(sizeFlag);
   }
 
   @Override
   public void layoutContainer(Container parent) {
     verifyLayout(parent);
+
     synchronized (parent.getTreeLock()) {
       if (m_debug || LOG.isDebugEnabled()) {
         dumpLayoutInfo(parent);
       }
-      Dimension size = parent.getSize();
-      Rectangle[][] cellBounds = m_info.layoutCellBounds(size, parent.getInsets());
+      Rectangle[][] cellBounds = m_info.getCellBounds();
       /*
        * necessary as workaround for awt bug: when component does not change
        * size, its reported minimumSize, preferredSize and maximumSize are
@@ -207,9 +202,10 @@ public class LogicalGridLayout extends AbstractLayoutManager2 {
         SwingUtility.setZeroBounds(parent.getComponents());
       }
       // bounds
-      int n = m_info.components.length;
+      int n = m_info.m_components.length;
       for (int i = 0; i < n; i++) {
-        Component comp = m_info.components[i];
+        Component comp = m_info.m_components[i];
+
         LogicalGridData data = m_info.gridDatas[i];
         Rectangle r1 = cellBounds[data.gridy][data.gridx];
         Rectangle r2 = cellBounds[data.gridy + data.gridh - 1][data.gridx + data.gridw - 1];
@@ -218,10 +214,7 @@ public class LogicalGridLayout extends AbstractLayoutManager2 {
           r.y += data.topInset;
           r.height -= data.topInset;
         }
-        if (data.fillHorizontal && data.fillVertical) {
-          // ok
-        }
-        else {
+        if (!data.fillHorizontal || !data.fillVertical) {
           Dimension d = comp.getPreferredSize();
           if (!data.fillHorizontal) {
             if (d.width < r.width) {
@@ -263,9 +256,9 @@ public class LogicalGridLayout extends AbstractLayoutManager2 {
             }
           }
         }
+
         comp.setBounds(r);
       }
     }
   }
-
 }
