@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.rap.window.messagebox;
 
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxEvent;
@@ -26,6 +27,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.internal.widgets.MarkupValidator;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -36,9 +38,10 @@ import org.eclipse.swt.widgets.Shell;
 
 /**
  * <h3>MessageBoxDialog</h3> ...
- * 
+ *
  * @since 3.7.0 June 2011
  */
+@SuppressWarnings("restriction")
 public class RwtScoutMessageBoxDialog extends Dialog {
   private static final long serialVersionUID = 1L;
 
@@ -190,6 +193,9 @@ public class RwtScoutMessageBoxDialog extends Dialog {
     Composite container = getUiEnvironment().getFormToolkit().createComposite(parent);
     m_imageLabel = getUiEnvironment().getFormToolkit().createLabel(container, "");
     m_introLabel = getUiEnvironment().getFormToolkit().createLabel(container, "", SWT.WRAP | SWT.LEFT);
+    m_introLabel.setData(RWT.MARKUP_ENABLED, Boolean.TRUE);
+    //Unsafe configuration. Size for h1, h2, h3.. tags isn't well calculated at the first time
+    m_introLabel.setData(MarkupValidator.MARKUP_VALIDATION_DISABLED, Boolean.TRUE);
 
     // layout
     GridLayout headerLayout = new GridLayout(2, false);
@@ -200,7 +206,7 @@ public class RwtScoutMessageBoxDialog extends Dialog {
     GridData gridData = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
     gridData.exclude = true;
     m_imageLabel.setLayoutData(gridData);
-    gridData = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING | GridData.GRAB_HORIZONTAL | GridData.FILL_BOTH);
+    gridData = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL | GridData.FILL_BOTH);
     gridData.horizontalIndent = 7;
     gridData.verticalIndent = 0;
     gridData.exclude = true;
