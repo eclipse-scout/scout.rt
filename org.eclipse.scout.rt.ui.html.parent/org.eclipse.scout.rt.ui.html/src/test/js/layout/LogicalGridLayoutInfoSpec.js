@@ -75,13 +75,13 @@ describe("LogicalGridLayoutInfo", function() {
       expect(cell.x).toBe(0);
       expect(cell.y).toBe(0);
       expect(cell.width).toBe(70);
-      expect(cell.height).toBe(23);
+      expect(cell.height).toBe(32);
 
       cell = cells[1];
       expect(cell.x).toBe(75);
       expect(cell.y).toBe(0);
       expect(cell.width).toBe(425);
-      expect(cell.height).toBe(23);
+      expect(cell.height).toBe(32);
 
     });
 
