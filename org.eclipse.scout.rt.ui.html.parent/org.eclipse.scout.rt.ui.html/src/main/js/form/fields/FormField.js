@@ -13,7 +13,7 @@ scout.inherits(scout.FormField, scout.ModelAdapter);
 scout.FormField.prototype._render = function($parent) {
   // TODO AWE: (form) remove this code when FormField is "abstract". There should be no reason to instantiate a
   // FormField directly. Currently this is required as a placeholder for un-implemented form-fields.
-  this.addContainer($parent, 'FormField', new scout.FormFieldLayout());
+  this.addContainer($parent, 'form-field', new scout.FormFieldLayout());
   this.addLabel();
   this.addStatus();
   this.$field = $.makeDiv('', 'field').
@@ -136,7 +136,7 @@ scout.FormField.prototype.addIcon = function() {
  * Applies (logical) grid-data and FormFieldLayout to this.$container.
  *
  * @param $parent to which container is appended
- * @param typeName typeName of scout component used in ID attribute
+ * @param typeName typeName of scout component used as class name and ID attribute. ID is only used for debug purpose so don't rely on it.
  * @param layout when layout is undefined, scout.FormFieldLayout() is set
  *
  * @return The HtmlComponent created for this.$container
@@ -144,11 +144,29 @@ scout.FormField.prototype.addIcon = function() {
 scout.FormField.prototype.addContainer = function($parent, typeName, layout) {
   this.$container = $('<div>').
     appendTo($parent).
-    addClass('form-field').
-    attr('id', typeName + '-' + this.id);
+    addClass('form-field');
+
+  if (typeName) {
+    this.$container.
+      addClass(typeName).
+      attr('id', this._generateId(typeName));
+  }
 
   var htmlComp = new scout.HtmlComponent(this.$container);
   htmlComp.layoutData = new scout.LogicalGridData(this);
   htmlComp.setLayout(layout || new scout.FormFieldLayout());
   return htmlComp;
+};
+
+/**
+ * Creates an id based on a class name. E.g.: smart-field -> SmartField-13
+ */
+scout.FormField.prototype._generateId = function(cssClass) {
+  var i,
+    idParts = cssClass.split('-');
+
+  for (i=0; i < idParts.length; i++) {
+    idParts[i] = idParts[i].charAt(0).toUpperCase() + idParts[i].substring(1);
+  }
+  return idParts.join('') + '-' + this.id;
 };

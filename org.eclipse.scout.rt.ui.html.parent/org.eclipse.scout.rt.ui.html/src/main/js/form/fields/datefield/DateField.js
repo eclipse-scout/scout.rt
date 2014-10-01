@@ -4,8 +4,7 @@ scout.DateField = function() {
 scout.inherits(scout.DateField, scout.ValueField);
 
 scout.DateField.prototype._render = function($parent) {
-  this.addContainer($parent, 'DateField');
-  this.$container.addClass('date-field'); // TODO AWE: refactor addContainer to accept options-object
+  this.addContainer($parent, 'date-field');
   this.addLabel();
   this.addMandatoryIndicator();
 

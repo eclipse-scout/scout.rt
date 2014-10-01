@@ -7,13 +7,12 @@ scout.SequenceBox = function() {
 scout.inherits(scout.SequenceBox, scout.CompositeField);
 
 scout.SequenceBox.prototype._render = function($parent) {
-  this.addContainer($parent, 'SequenceBox');
+  this.addContainer($parent, 'sequence-box');
   this.addLabel();
   this.addMandatoryIndicator();
 
   this.$_sequenceBox = $('<div>').
     addClass('field').
-    addClass('sequence-box').
     appendTo(this.$container);
   var htmlSequenceBox = new scout.HtmlComponent(this.$_sequenceBox);
   htmlSequenceBox.setLayout(new scout.LogicalGridLayout(scout.HtmlEnvironment.formColumnGap, 0));

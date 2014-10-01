@@ -4,8 +4,7 @@ scout.SmartField = function() {
 scout.inherits(scout.SmartField, scout.ValueField);
 
 scout.SmartField.prototype._render = function($parent) {
-  this.addContainer($parent, 'SmartField');
-  this.$container.addClass('smart-field');
+  this.addContainer($parent, 'smart-field');
   this.addLabel();
   this.addMandatoryIndicator();
 

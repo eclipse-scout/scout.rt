@@ -10,8 +10,7 @@ scout.StringField.prototype._renderProperties = function() {
 };
 
 scout.StringField.prototype._render = function($parent) {
-  this.addContainer($parent, 'StringField');
-  this.$container.addClass('string-field'); // TODO AWE: refactor addContainer to accept options-object
+  this.addContainer($parent, 'string-field');
   this.addLabel();
   this.addMandatoryIndicator();
 

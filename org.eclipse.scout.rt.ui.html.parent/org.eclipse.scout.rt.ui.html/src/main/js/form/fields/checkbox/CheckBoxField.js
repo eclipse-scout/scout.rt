@@ -6,7 +6,7 @@ scout.CheckBoxField = function() {
 scout.inherits(scout.CheckBoxField, scout.ValueField);
 
 scout.CheckBoxField.prototype._render = function($parent) {
-  this.addContainer($parent, 'CheckBoxField');
+  this.addContainer($parent, 'check-box-field');
   this.addLabel();
   this.addMandatoryIndicator();
 
