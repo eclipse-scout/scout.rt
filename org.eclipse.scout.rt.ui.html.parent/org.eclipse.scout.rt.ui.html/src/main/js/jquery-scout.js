@@ -361,10 +361,10 @@
   };
 
   /**
-   * bottom of a html element without margin and border. Expects border-box model.
+   * Bottom of a html element without margin and border relative to offset parent. Expects border-box model.
    */
   $.fn.innerBottom = function() {
-    return this.outerHeight(true) - this.cssMarginBottom() - this.cssBorderBottomWidth();
+    return this.position().top + this.outerHeight(true) - this.cssMarginBottom() - this.cssBorderBottomWidth();
   };
 
   $.fn.disableSpellcheck = function() {
