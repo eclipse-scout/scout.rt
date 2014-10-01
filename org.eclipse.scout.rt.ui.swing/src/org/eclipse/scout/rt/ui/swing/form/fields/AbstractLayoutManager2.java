@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -94,6 +94,14 @@ public abstract class AbstractLayoutManager2 implements LayoutManager2 {
     m_valid = false;
   }
 
+  /**
+   * Ensures the layout of the given container to be up-to-date according to the parent's dimension. If the parent's
+   * dimension has changed or the layout was invalidated, the layout is calculated anew.
+   *
+   * @param parent
+   * @see #invalidateLayout()
+   * @see #invalidateLayout(Container)
+   */
   protected final void verifyLayout(Container parent) {
     if ((!m_valid) || !m_validityBasedOnParentSize.equals(parent.getSize())) {
       m_validityBasedOnParentSize = parent.getSize();
@@ -105,7 +113,9 @@ public abstract class AbstractLayoutManager2 implements LayoutManager2 {
   }
 
   /**
-   * do not get tree lock here, the lock has already been acquired
+   * Discards any cached layout information and computes the container's layout anew according to the parent's
+   * dimension.</br>
+   * Hint: do not acquire tree lock here because already done.
    */
   protected abstract void validateLayout(Container parent);
 
