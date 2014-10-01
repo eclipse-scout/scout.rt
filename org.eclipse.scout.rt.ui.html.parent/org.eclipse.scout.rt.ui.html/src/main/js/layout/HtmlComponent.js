@@ -42,10 +42,10 @@ scout.HtmlComponent.setBounds = function($comp, vararg, y, width, height) {
   var bounds = vararg instanceof scout.Rectangle ?
       vararg : new scout.Rectangle(vararg, y, width, height);
   $comp.
-    css('left', bounds.x + 'px').
-    css('top', bounds.y + 'px').
-    css('width', bounds.width + 'px').
-    css('height', bounds.height + 'px');
+    cssLeft(bounds.x).
+    cssTop(bounds.y).
+    cssWidth(bounds.width).
+    cssHeight(bounds.height);
 };
 
 /**

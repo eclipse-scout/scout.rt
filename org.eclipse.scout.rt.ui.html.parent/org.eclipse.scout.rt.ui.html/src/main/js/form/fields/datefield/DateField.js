@@ -125,6 +125,9 @@ scout.DateField.prototype._showPicker = function(show) {
 
   $("#date_box").remove();
   var box = $('<div id="date_box"></div>');
+  var fieldPosition = field.position();
+  box.cssLeft(fieldPosition.left);
+  box.cssTop(field.innerBottom());
   field.after(box);
 
   var header_text = months[show.getMonth()] + ' ' + show.getFullYear()

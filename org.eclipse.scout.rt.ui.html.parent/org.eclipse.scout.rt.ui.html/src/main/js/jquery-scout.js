@@ -135,6 +135,11 @@
     return $svgElement.appendTo(this);
   };
 
+  $.pxToNumber = function(pixel) {
+    var value = pixel.replace('px', '');
+    return parseInt(value, 10);
+  };
+
   // attr and class handling for svg
   $.fn.attrSVG = function(attributeName, value) {
     return this.each(function() {
@@ -175,7 +180,7 @@
     this.addClass('selected');
     return this;
   };
-  
+
   $.fn.setClass = function(condition, cssClass) {
     if (condition) {
       this.addClass(cssClass);
@@ -327,9 +332,39 @@
     return newH;
   };
 
-  $.fn.marginLeft = function() {
-    var marginLeft = this.css('margin-left').replace('px', '');
-    return parseInt(marginLeft, 10);
+  $.fn.cssLeft = function(position) {
+    return this.css('left', position + 'px');
+  };
+
+  $.fn.cssTop = function(position) {
+    return this.css('top', position + 'px');
+  };
+
+  $.fn.cssWidth = function(width) {
+    return this.css('width', width + 'px');
+  };
+
+  $.fn.cssHeight = function(height) {
+    return this.css('height', height + 'px');
+  };
+
+  $.fn.cssMarginLeft = function() {
+    return $.pxToNumber(this.css('margin-left'));
+  };
+
+  $.fn.cssMarginBottom = function() {
+    return $.pxToNumber(this.css('margin-bottom'));
+  };
+
+  $.fn.cssBorderBottomWidth = function() {
+    return $.pxToNumber(this.css('border-bottom-width'));
+  };
+
+  /**
+   * bottom of a html element without margin and border. Expects border-box model.
+   */
+  $.fn.innerBottom = function() {
+    return this.outerHeight(true) - this.cssMarginBottom() - this.cssBorderBottomWidth();
   };
 
   $.fn.disableSpellcheck = function() {
