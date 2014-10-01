@@ -11,10 +11,12 @@
 //@include("util/arrays.js");
 //@include("util/logging.js");
 //@include("util/EventSupport.js");
+//@include("util/keys.js");
 //@include("util/KeystrokeManager.js");
 //@include("util/ModelAdapter.js");
 //@include("util/NullAdapter.js");
 //@include("util/ObjectFactory.js");
+//@include("util/dates.js");
 //@include("util/Device.js");
 //@include("util/URL.js");
 //@include("session/Session.js");
@@ -69,6 +71,7 @@
 //@include("form/fields/stringfield/StringField.js");
 //@include("form/fields/smartfield/SmartField.js");
 //@include("form/fields/datefield/DateField.js");
+//@include("form/fields/datefield/DatePicker.js");
 //@include("form/fields/groupbox/GroupBox.js");
 //@include("form/fields/groupbox/GroupBoxButtonBar.js");
 //@include("form/fields/sequencebox/SequenceBox.js");
