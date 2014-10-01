@@ -35,8 +35,8 @@ import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.ext.BorderLayoutEx;
 import org.eclipse.scout.rt.ui.swing.ext.JPanelEx;
-import org.eclipse.scout.rt.ui.swing.ext.JScrollPaneEx;
 import org.eclipse.scout.rt.ui.swing.ext.JSection;
+import org.eclipse.scout.rt.ui.swing.ext.ViewportTrackableJScrollPaneEx;
 import org.eclipse.scout.rt.ui.swing.form.fields.ISwingScoutFormField;
 import org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutFieldComposite;
 import org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutFormFieldGridData;
@@ -71,7 +71,7 @@ public class SwingScoutGroupBox extends SwingScoutFieldComposite<IGroupBox> impl
     swingBox.setLayout(new BorderLayoutEx(0, 0));
     //
     if (getScoutObject().isScrollable()) {
-      JScrollPane scrollPane = new JScrollPaneEx(m_swingBodyPart);
+      JScrollPane scrollPane = new ViewportTrackableJScrollPaneEx(m_swingBodyPart);
       scrollPane.getVerticalScrollBar().setUnitIncrement(16);
       scrollPane.getHorizontalScrollBar().setUnitIncrement(16);
       scrollPane.setBorder(null);
@@ -96,7 +96,7 @@ public class SwingScoutGroupBox extends SwingScoutFieldComposite<IGroupBox> impl
       setSwingContainer(swingBox);
     }
     // FIELDS: add layout here and then add fields with constraints (no process buttons)
-    LogicalGridLayout bodyLayout = new LogicalGridLayout(getSwingEnvironment(), getSwingEnvironment().getFormColumnGap(), getSwingEnvironment().getFormRowGap());
+    LogicalGridLayout bodyLayout = new LogicalGridLayout(getSwingEnvironment(), getSwingEnvironment().getFormColumnGap(), getSwingEnvironment().getFormRowGap(), false);
     m_swingBodyPart.setLayout(bodyLayout);
     // items without process buttons
     IFormField[] scoutFields = getScoutObject().getControlFields();

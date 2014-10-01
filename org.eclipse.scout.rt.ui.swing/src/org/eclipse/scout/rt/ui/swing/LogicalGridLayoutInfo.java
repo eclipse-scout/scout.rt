@@ -16,9 +16,14 @@ import java.awt.Insets;
 import java.awt.Rectangle;
 import java.util.TreeSet;
 
-class LogicalGridLayoutInfo {
+public class LogicalGridLayoutInfo {
+
+  private static final Dimension ZERO_DIMENSION = new Dimension(0, 0);
+
+  private ISwingEnvironment m_env;
+
   LogicalGridData[/* component count */] gridDatas;
-  Component[/* component count */] components;
+  Component[/* component count */] m_components;
   int cols;/* number of cells horizontally */
   int rows;/* number of cells vertically */
   int[/* column */][/* min,pref,max */] width;
@@ -27,11 +32,36 @@ class LogicalGridLayoutInfo {
   double[/* row */] weightY;
   private int m_hgap;
   private int m_vgap;
+  private Rectangle[][] m_cellBounds;
 
-  LogicalGridLayoutInfo(ISwingEnvironment env, Component[] components, LogicalGridData[] cons, int hgap, int vgap) {
-    this.components = components;
+  private boolean m_useLogicalPrefSize;
+  private Dimension m_sizePref;
+  private Dimension m_sizeMin;
+  private Dimension m_sizeMax;
+
+  /**
+   * @param env
+   *          Swing-UI configuration.
+   * @param components
+   *          the components to be laid out in the container.
+   * @param cons
+   *          logical GridData constraints in the order of the container's components.
+   * @param hgap
+   *          horizontal gap between the cells of the grid (gap in between of adjacent rows).
+   * @param vgap
+   *          vertical gap between the cells of the grid (gap in between of adjacent columns).
+   * @param useLogicalPrefSize
+   *          <code>true</code> to only use logical sizes when calculating the preferred size of the grid (default),
+   *          <code>false</code> to respect the parent's dimension when calculating the preferred width of the grid.
+   *          This is vital if a parent container calculates its height based on the children's width (e.g.
+   *          tab-row-extent in a tabbed pane) [Bugzilla 410306].
+   */
+  LogicalGridLayoutInfo(ISwingEnvironment env, Component[] components, LogicalGridData[] cons, int hgap, int vgap, boolean useLogicalPrefSize) {
+    m_env = env;
+    m_components = components;
     m_hgap = hgap;
     m_vgap = vgap;
+    m_useLogicalPrefSize = useLogicalPrefSize;
     // create a modifiable copy of the grid datas
     this.gridDatas = new LogicalGridData[cons.length];
     for (int i = 0; i < cons.length; i++) {
@@ -102,15 +132,15 @@ class LogicalGridLayoutInfo {
     this.height = new int[rows][3];
     this.weightX = new double[cols];
     this.weightY = new double[rows];
-    initializeInfo(env, hgap, vgap);
+    initializeInfo();
   }
 
-  private void initializeInfo(ISwingEnvironment env, int hgap, int vgap) {
-    int compCount = components.length;
+  private void initializeInfo() {
+    int compCount = m_components.length;
     Dimension[] compSize = new Dimension[compCount];
     // cache component sizes and cleanup constraints
     for (int i = 0; i < compCount; i++) {
-      Component comp = components[i];
+      Component comp = m_components[i];
       LogicalGridData cons = gridDatas[i];
       Dimension d = uiSizeInPixel(comp);
       if (cons.widthHint > 0) {
@@ -145,11 +175,17 @@ class LogicalGridLayoutInfo {
         cons.gridh = rows - cons.gridy;
       }
     }
-    initializeColumns(env, compSize, hgap);
-    initializeRows(env, compSize, vgap);
+    initializeColumns(compSize);
+    initializeRows(compSize);
   }
 
-  private void initializeColumns(ISwingEnvironment env, Dimension[] compSize, int hgap) {
+  /**
+   * Calculates the logical widths and weights of the grid columns.
+   * 
+   * @param compSize
+   *          the logical dimensions of the components in the grid.
+   */
+  private void initializeColumns(Dimension[] compSize) {
     int compCount = compSize.length;
     int[] prefWidths = new int[cols];
     boolean[] fixedWidths = new boolean[cols];
@@ -164,7 +200,7 @@ class LogicalGridLayoutInfo {
           prefw = compSize[i].width;
         }
         else {
-          prefw = logicalWidthInPixel(env, cons);
+          prefw = logicalWidthInPixel(m_env, cons);
         }
         for (int j = cons.gridx; j < cons.gridx + cons.gridw && j < cols; j++) {
           prefWidths[j] = Math.max(prefWidths[j], prefw);
@@ -188,13 +224,13 @@ class LogicalGridLayoutInfo {
           }
         }
         if (cons.widthHint > 0) {
-          distWidth = cons.widthHint - spanWidth - (hSpan - 1) * hgap;
+          distWidth = cons.widthHint - spanWidth - (hSpan - 1) * m_hgap;
         }
         else if (cons.useUiWidth) {
-          distWidth = compSize[i].width - spanWidth - (hSpan - 1) * hgap;
+          distWidth = compSize[i].width - spanWidth - (hSpan - 1) * m_hgap;
         }
         else {
-          distWidth = logicalWidthInPixel(env, cons) - spanWidth - (hSpan - 1) * hgap;
+          distWidth = logicalWidthInPixel(m_env, cons) - spanWidth - (hSpan - 1) * m_hgap;
         }
         if (distWidth > 0) {
           int equalWidth = (distWidth + spanWidth) / hSpan;
@@ -219,7 +255,7 @@ class LogicalGridLayoutInfo {
     }
     for (int i = 0; i < cols; i++) {
       if (fixedWidths[i]) {
-        width[i][SwingLayoutUtility.MIN] = prefWidths[i];
+        width[i][SwingLayoutUtility.MIN] = prefWidths[i]; // do not set to 0 especially because of field-labels which get truncated too early in small forms (e.g. search forms) or even worse, forms get messy if having fields that span multiple columns together with other fields that don't.
         width[i][SwingLayoutUtility.PREF] = prefWidths[i];
         width[i][SwingLayoutUtility.MAX] = prefWidths[i];
       }
@@ -260,7 +296,13 @@ class LogicalGridLayoutInfo {
     }
   }
 
-  private void initializeRows(ISwingEnvironment env, Dimension[] compSize, int vgap) {
+  /**
+   * Calculates the logical heights and weights of the grid rows.
+   * 
+   * @param compSize
+   *          the logical dimensions of the components in the grid.
+   */
+  private void initializeRows(Dimension[] compSize) {
     int compCount = compSize.length;
     int[] prefHeights = new int[rows];
     boolean[] fixedHeights = new boolean[rows];
@@ -275,7 +317,7 @@ class LogicalGridLayoutInfo {
           prefh = compSize[i].height;
         }
         else {
-          prefh = logicalHeightInPixel(env, cons);
+          prefh = logicalHeightInPixel(m_env, cons);
         }
         for (int j = cons.gridy; j < cons.gridy + cons.gridh && j < rows; j++) {
           prefHeights[j] = Math.max(prefHeights[j], prefh);
@@ -297,13 +339,13 @@ class LogicalGridLayoutInfo {
           spanHeight += prefHeights[j];
         }
         if (cons.heightHint > 0) {
-          distHeight = cons.heightHint - spanHeight - (vspan - 1) * vgap;
+          distHeight = cons.heightHint - spanHeight - (vspan - 1) * m_vgap;
         }
         else if (cons.useUiHeight) {
-          distHeight = compSize[i].height - spanHeight - (vspan - 1) * vgap;
+          distHeight = compSize[i].height - spanHeight - (vspan - 1) * m_vgap;
         }
         else {
-          distHeight = logicalHeightInPixel(env, cons) - spanHeight - (vspan - 1) * vgap;
+          distHeight = logicalHeightInPixel(m_env, cons) - spanHeight - (vspan - 1) * m_vgap;
         }
         if (distHeight > 0) {
           int equalHeight = (distHeight + spanHeight) / vspan;
@@ -328,7 +370,7 @@ class LogicalGridLayoutInfo {
         height[i][SwingLayoutUtility.MAX] = prefHeights[i];
       }
       else {
-        height[i][SwingLayoutUtility.MIN] = 0;// must be exactly 0!
+        height[i][SwingLayoutUtility.MIN] = 0; // must be exactly 0!
         height[i][SwingLayoutUtility.PREF] = prefHeights[i];
         height[i][SwingLayoutUtility.MAX] = 10240;
       }
@@ -364,25 +406,151 @@ class LogicalGridLayoutInfo {
   }
 
   /**
-   * calculate grid cells (gaps are not included in the grid cell bounds)
+   * Computes the grid with its cells aligned to the parent's dimension. Thereby, gaps are not included in the grid cell
+   * bounds. Also, the minimal, maximal and preferred extent of the grid is calculated.
+   * 
+   * @param parentSize
+   *          the actual size of the parent container.
+   * @param insets
+   *          the insets of the parent container.
+   * @param rootShowing
+   *          Indicates whether the root container is showing on screen. This is used do determine the initial extent
+   *          of the grid.
+   * @return the bounds of the cells.
    */
-  Rectangle[][] layoutCellBounds(Dimension size, Insets insets) {
-    int[] w = layoutSizes(size.width - insets.left - insets.right - Math.max(0, (cols - 1) * m_hgap), width, weightX);
-    int[] h = layoutSizes(size.height - insets.top - insets.bottom - Math.max(0, (rows - 1) * m_vgap), height, weightY);
-    Rectangle[][] cellBounds = new Rectangle[rows][cols];
+  Rectangle[][] layoutCellBounds(Dimension parentSize, Insets insets, boolean rootShowing) {
+    boolean initialization = !rootShowing && ZERO_DIMENSION.equals(parentSize);
+
+    /*
+     * 1. Determine the column widths and row heights based on the parent's dimension.
+     */
+    int[] w;
+    int[] h;
+    if (initialization) {
+      // The container does not specify a concrete dimension yet (e.g. during initialization).
+      w = new int[width.length];
+      h = new int[height.length];
+    }
+    else {
+      // Calculate the column widths and row heights based on the parent's dimension.
+      w = layoutSizes(parentSize.width - insets.left - insets.right - Math.max(0, (cols - 1) * m_hgap), width, weightX);
+      h = layoutSizes(parentSize.height - insets.top - insets.bottom - Math.max(0, (rows - 1) * m_vgap), height, weightY);
+    }
+
+    /*
+     * 2. Construct the the grid.
+     */
+    m_cellBounds = new Rectangle[rows][cols];
     int y = insets.top;
-    for (int r = 0; r < cellBounds.length; r++) {
+    for (int r = 0; r < m_cellBounds.length; r++) {
       int x = insets.left;
-      for (int c = 0; c < cellBounds[r].length; c++) {
-        cellBounds[r][c] = new Rectangle(x, y, w[c], h[r]);
+      for (int c = 0; c < m_cellBounds[r].length; c++) {
+        m_cellBounds[r][c] = new Rectangle(x, y, w[c], h[r]);
         x += w[c];
         x += m_hgap;
       }
       y += h[r];
       y += m_vgap;
     }
-    return cellBounds;
+
+    /*
+     * 3. Compute the minimal, maximal and preferred extent of the grid.
+     */
+    m_useLogicalPrefSize = true;
+    if (initialization || m_useLogicalPrefSize) {
+      // Use logical sizes if the root container is not showing on screen to determine the container's initial size.
+      int[] logicalColWidths = extractSizes(width, LogicalGridLayout.PREF_SIZE);
+      int[] logicalRowHeights = extractSizes(height, LogicalGridLayout.PREF_SIZE);
+      m_sizePref = calculateGridDimension(logicalColWidths, logicalRowHeights, insets, m_hgap, m_vgap);
+    }
+    else {
+      // Width: Use calculated widths that respect the container's dimension. This is vital for containers which rely on the children's width to determine their height, e.g. the tabbed pane do determine the tab-row-extent.
+      // Height: Use logical heights because this is of interest for the parent container, e.g. for a scrolling container to correctly determine the viewport-size.
+      int[] logicalRowheights = extractSizes(height, LogicalGridLayout.PREF_SIZE);
+      m_sizePref = calculateGridDimension(w, logicalRowheights, insets, m_hgap, m_vgap);
+    }
+    m_sizeMin = calculateGridDimension(extractSizes(width, LogicalGridLayout.PREF_SIZE), extractSizes(height, LogicalGridLayout.PREF_SIZE), insets, m_hgap, m_vgap); // use the logical size as minimal size to not shrink to empty space.
+    m_sizeMax = calculateGridDimension(extractSizes(width, LogicalGridLayout.MAX_SIZE), extractSizes(height, LogicalGridLayout.MAX_SIZE), insets, m_hgap, m_vgap);
+
+    return m_cellBounds;
   }
+
+  /**
+   * To get the sizes of the given type (MIN, MAX, PREF).
+   */
+  private static int[] extractSizes(int[][] sizes, int sizeFlag) {
+    int[] result = new int[sizes.length];
+    for (int i = 0; i < sizes.length; i++) {
+      result[i] = sizes[i][sizeFlag];
+    }
+    return result;
+  }
+
+  /**
+   * Calculates the grid-dimension spanned by all the cells.
+   */
+  private static Dimension calculateGridDimension(int[] colWidths, int[] rowHeights, Insets insets, int hgap, int vgap) {
+    int width = 0;
+    int height = 0;
+
+    // Calculate the total width.
+    if (colWidths.length > 0) {
+      for (int colWidth : colWidths) {
+        width += colWidth;
+      }
+
+      width += (colWidths.length - 1) * hgap; // Horizontal gaps in between of the cells.
+      width += insets.left + insets.right; // Insets to the left and right.
+    }
+
+    // Calculate the total height.
+    if (rowHeights.length > 0) {
+      for (int rowHeight : rowHeights) {
+        height += rowHeight;
+      }
+
+      height += (rowHeights.length - 1) * vgap; // Vertical gaps in between of the cells.
+      height += insets.top + insets.bottom; // Insets to the top and bottom.
+    }
+
+    return new Dimension(width, height);
+  }
+
+  /**
+   * @return the cell bounds of the components.
+   * @see #layoutCellBounds(Dimension, Insets)
+   */
+  public Rectangle[][] getCellBounds() {
+    return m_cellBounds;
+  }
+
+  /**
+   * @return the grid-dimension taken by all the containing cells.
+   */
+  public Dimension getGridDimension(int sizeFlag) {
+    switch (sizeFlag) {
+      case LogicalGridLayout.PREF_SIZE:
+        return m_sizePref;
+      case LogicalGridLayout.MIN_SIZE:
+        return m_sizeMin;
+      case LogicalGridLayout.MAX_SIZE:
+        return m_sizeMax;
+      default:
+        throw new IllegalArgumentException(String.format("Unsupported size flag: %s", sizeFlag));
+    }
+  }
+
+  /**
+   * Calculates the components's sizes in respect to the given size of the container.
+   * 
+   * @param targetSize
+   *          the size specified by the container.
+   * @param sizes
+   *          sizes as specified in the logical grid layout.
+   * @param weights
+   *          weights as specified in the logical grid layout.
+   * @return
+   */
 
   private int[] layoutSizes(int targetSize, int[][] sizes, double[] weights) {
     int[] outSizes = new int[sizes.length];
@@ -422,7 +590,7 @@ class LogicalGridLayoutInfo {
       // setup accumulators
       float[] accWeight = new float[tmpWeight.length];
       if (deltaInt > 0) {
-        // expand
+        // Expand the components because not taking all the available space.
         boolean hasTargets = true;
         while (deltaInt > 0 && hasTargets) {
           hasTargets = false;
@@ -439,8 +607,8 @@ class LogicalGridLayoutInfo {
           }
         }
       }
-      else {// delta<0
-        // shrink
+      else {
+        // Shrink the content because not fitting into the parent container.
         boolean hasTargets = true;
         while (deltaInt < 0 && hasTargets) {
           hasTargets = false;
