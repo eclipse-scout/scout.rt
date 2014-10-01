@@ -112,4 +112,28 @@ describe("HtmlComponent", function() {
 
   });
 
+  describe("getBounds", function() {
+
+    var jqueryMock = {
+      css:function(key) {
+        if (key == 'top') {
+          return '5px';
+        } else if (key == 'left') {
+          return '4px';
+        } else {
+          throw new Error('unexpected CSS key');
+        }
+      }
+    };
+
+    addWidthHeightMock(jqueryMock);
+
+    it("returns bounds without 'px'", function() {
+      var actual = scout.HtmlComponent.getBounds(jqueryMock);
+      var expected = new scout.Rectangle(4, 5, 6, 7);
+      expect(actual).toEqual(expected);
+    });
+
+  });
+
 });

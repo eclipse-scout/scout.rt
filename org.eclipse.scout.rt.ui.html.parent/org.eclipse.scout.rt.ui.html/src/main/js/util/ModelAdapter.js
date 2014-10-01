@@ -185,6 +185,13 @@ scout.ModelAdapter.prototype.onModelPropertyChange = function(event) {
   }
 }; // TODO AWE: (form) jasmine-test this!
 
+/**
+ * The default impl. only logs a warning that the event is not supported.
+ */
+scout.ModelAdapter.prototype.onModelAction = function(event) {
+  $.log.warn('Model action "' + event.type + '" is not supported by model-adapter ' + this.objectType);
+};
+
 scout.ModelAdapter.prototype._syncPropertiesOnPropertyChange = function(oldValues, newValues, ignore) {
   this._eachProperty(newValues, function(propertyName, value) {
     var onFuncName = '_sync' + scout.ModelAdapter.preparePropertyNameForFunctionCal(propertyName);

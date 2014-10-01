@@ -1,3 +1,21 @@
 .smart-field input {
   .text-field-with-icon('\f002');
 }
+
+.smart-field-popup {
+  border:solid 2px @color-bsi-orange;
+  position:absolute;
+  z-index:101;
+  margin-top:5px;
+  background-color:white;
+  box-shadow: 5px 5px 2px #ccc;
+}
+
+
+.smart-field-popup > div {
+  border-bottom:solid 1px gray;
+}
+
+.smart-field-popup > div:hover {
+  background-color:#ccc;
+}

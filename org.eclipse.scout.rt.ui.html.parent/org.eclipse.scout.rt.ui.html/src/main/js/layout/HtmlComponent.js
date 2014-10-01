@@ -38,6 +38,14 @@ scout.HtmlComponent.setSize = function($comp, vararg, height) {
     css('height', size.height+ 'px');
 };
 
+scout.HtmlComponent.getBounds = function($comp) {
+  return new scout.Rectangle(
+      parseInt($comp.css('left'), 10),
+      parseInt($comp.css('top'), 10),
+      $comp.width(),
+      $comp.height());
+};
+
 scout.HtmlComponent.setBounds = function($comp, vararg, y, width, height) {
   var bounds = vararg instanceof scout.Rectangle ?
       vararg : new scout.Rectangle(vararg, y, width, height);
@@ -133,11 +141,7 @@ scout.HtmlComponent.prototype.setSize = function(size) {
 };
 
 scout.HtmlComponent.prototype.getBounds = function() {
-  return new scout.Rectangle(
-      this.$comp.css('left'),
-      this.$comp.css('top'),
-      this.$comp.width(),
-      this.$comp.height());
+  return scout.HtmlComponent.getBounds(this.$comp);
 };
 
 scout.HtmlComponent.prototype.setBounds = function(bounds) {
