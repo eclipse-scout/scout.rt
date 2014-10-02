@@ -34,7 +34,6 @@ public class FormScreenshotPrinter {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(PrintScreenshotsFormListener.class);
   private final File m_destinationFolder;
   private final String m_contentType;
-  private IForm m_form;
 
   public FormScreenshotPrinter(File destinationFolder) {
     this(destinationFolder, "image/jpg");
@@ -127,18 +126,10 @@ public class FormScreenshotPrinter {
     }
   }
 
-  private Map<String, Object> createPrintParams(File out) {
+  protected Map<String, Object> createPrintParams(File out) {
     HashMap<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("file", out);
     parameters.put("contentType", getContentType());
     return parameters;
   }
-
-  /**
-   * @param form
-   */
-  public void setForm(IForm form) {
-    m_form = form;
-  }
-
 }

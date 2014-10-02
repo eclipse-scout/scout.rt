@@ -41,7 +41,10 @@ public class PrintScreenshotsFormListener implements FormListener {
 
   private final FormScreenshotPrinter m_formPrinter;
 
-  private List<File> m_printedFiles = new ArrayList<File>();
+  private final List<File> m_printedFiles = new ArrayList<File>();
+
+  // reference to outer top level form, needed in case of embedded forms within a form
+  private IForm m_topLevelForm;
 
   public PrintScreenshotsFormListener(FormScreenshotPrinter formPrinter) {
     m_formPrinter = formPrinter;
@@ -50,17 +53,16 @@ public class PrintScreenshotsFormListener implements FormListener {
   @Override
   public void formChanged(FormEvent e) throws ProcessingException {
     if (e.getType() == FormEvent.TYPE_ACTIVATED) {
-      m_formPrinter.setForm(e.getForm());
-      enqueuePrintObjects(e.getForm());
+      m_topLevelForm = e.getForm();
+      enqueuePrintObjects(m_topLevelForm);
       scheduleNextPrintJob();
     }
     else if (e.getType() == FormEvent.TYPE_PRINTED) {
       // TODO ASA check if file exists and size > 0 (because FormEvent.TYPE_PRINTED is also thrown when an exception occurs)
       m_printedFiles.add(e.getPrintedFile());
       if (m_printQueue.isEmpty()) {
-        IForm form = e.getForm();
-        LOG.info("Closing form : {}", form);
-        form.doClose();
+        LOG.info("Closing form : {}", m_topLevelForm);
+        m_topLevelForm.doClose();
       }
       else {
         scheduleNextPrintJob();
@@ -71,7 +73,7 @@ public class PrintScreenshotsFormListener implements FormListener {
   /**
    * Schedules a job for a scout form or field
    */
-  private void scheduleNextPrintJob() {
+  protected void scheduleNextPrintJob() {
     new ClientSyncJob("Printing", ClientSyncJob.getCurrentSession()) {
 
       @Override
@@ -92,7 +94,7 @@ public class PrintScreenshotsFormListener implements FormListener {
    * @param form
    *          form containing tab boxes
    */
-  private void enqueuePrintObjects(IForm form) {
+  protected void enqueuePrintObjects(IForm form) {
     List<ITypeWithClassId> printObjects = m_formPrinter.getPrintObjects(form);
     for (ITypeWithClassId o : printObjects) {
       m_printQueue.add(o);
@@ -100,11 +102,7 @@ public class PrintScreenshotsFormListener implements FormListener {
     }
   }
 
-  /**
-   * @return
-   */
   public List<File> getPrintedFiles() {
     return m_printedFiles;
   }
-
 }
