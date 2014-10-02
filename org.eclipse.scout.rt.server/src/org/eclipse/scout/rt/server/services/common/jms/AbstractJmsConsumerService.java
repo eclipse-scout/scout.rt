@@ -20,6 +20,11 @@ import org.eclipse.scout.rt.server.services.common.jms.internal.JmsTransactionMe
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.service.AbstractService;
 
+/**
+ * @deprecated use org.eclipse.scout.rt.server.jms.transactional.AbstractTransactionalJmsService<T>. Will be removed in
+ *             the N release.
+ */
+@Deprecated
 public abstract class AbstractJmsConsumerService extends AbstractService implements IJmsConsumerService {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractJmsConsumerService.class);

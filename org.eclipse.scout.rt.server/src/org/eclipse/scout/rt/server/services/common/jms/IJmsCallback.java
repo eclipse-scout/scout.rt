@@ -20,7 +20,10 @@ import org.eclipse.scout.service.IService;
  * Generic interface that needs to be implemented by any service that should be
  * called via JMS. Inherits from IService to make sure the service can be
  * retrieved from Service Registry.
+ * 
+ * @deprecated use org.eclipse.scout.rt.server.jms.AbstractSimpleJmsService. Will be removed in the N release.
  */
+@Deprecated
 @SuppressWarnings("restriction")
 public interface IJmsCallback extends IService {
 

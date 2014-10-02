@@ -32,7 +32,10 @@ import org.eclipse.scout.rt.server.services.common.jms.internal.JmsTransactionMe
 /**
  * J2eeJmsObserver implementation with anchor in servlet context J2eeJmsObserver
  * expects to find its IServerSession in the servlet context
+ * 
+ * @deprecated use org.eclipse.scout.rt.server.jms.AbstractSimpleJmsService. Will be removed in the N release.
  */
+@Deprecated
 @SuppressWarnings("restriction")
 public class JmsObserver {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JmsObserver.class);

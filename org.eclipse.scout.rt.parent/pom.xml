@@ -38,6 +38,8 @@
     <module>../org.eclipse.scout.rt.client-feature</module>
 
     <module>../org.eclipse.scout.rt.server</module>
+    <module>../org.eclipse.scout.rt.server.jms</module>
+
     <module>../org.eclipse.scout.rt.jdbc.derby10</module>
 
     <module>../org.eclipse.scout.rt.ui.swing</module>

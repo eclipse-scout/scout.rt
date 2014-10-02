@@ -20,6 +20,10 @@ import javax.naming.NamingException;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 
+/**
+ * @deprecated use org.eclipse.scout.rt.server.jms.AbstractJmsService. Will be removed in the N release.
+ */
+@Deprecated
 public class JmsJndiConfig {
 
   // JNDI config
@@ -82,7 +86,7 @@ public class JmsJndiConfig {
 
   /**
    * Creates the initial JNDI context to work with.
-   *
+   * 
    * @return context {@link InitialContext}
    * @throws ProcessingException
    */
