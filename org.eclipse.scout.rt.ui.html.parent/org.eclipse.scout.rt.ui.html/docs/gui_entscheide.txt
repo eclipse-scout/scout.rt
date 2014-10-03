@@ -10,3 +10,12 @@ Tastatur-Navigation
   - Idee: Navigation im Baum mit Ctrl, Tabelle ohne Modifier
   - Problem: Ctrl-+ und Ctrl-- bereits belegt vom Browser (Zoom)
   - Lösung?: Ctrl-Alt- verwenden stattdessen? Oder effektiv wechseln zwischen Baum und Tabelle / 360°-Sicht / Such-Form erlauben mittels Tab oder Tastenkombination.
+
+Sequence-Box
+  Wir möchten die UI-Impl. vereinfachen:
+  - Fehlerstatus für alle Felder "sammeln", d.h. eine Sequence-Box hat nur einen Fehlerstatus
+  - Infotext (Tooltip) für alle Felder sammeln,  .h. eine Sequence-Box hat nur einen Infotext
+  - Jedes Feld in der SB hat einen Mandatory-Stern, der Platz für den Stern wird immer reserviert
+    auch wenn das Feld nicht obligatrisch ist (einfacher zu layouten, keine Schlangenlinien).
+  - Die komplizierte Label-Logik entfällt. Wenn ein Feld in der SB dargestellt wird, wird
+    das Label automatisch im Feld als Placeholder-Text dargestellt.
