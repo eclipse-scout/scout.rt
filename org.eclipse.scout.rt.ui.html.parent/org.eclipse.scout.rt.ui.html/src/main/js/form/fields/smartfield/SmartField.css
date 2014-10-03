@@ -9,6 +9,8 @@
   margin-top:5px;
   background-color:white;
   box-shadow: 5px 5px 2px #ccc;
+  overflow:hidden;
+  overflow-y: scroll;
 }
 
 
@@ -16,6 +18,10 @@
   border-bottom:solid 1px gray;
 }
 
+.smart-field-popup > div.selected {
+  background-color:@color-bench-select;
+}
+
 .smart-field-popup > div:hover {
-  background-color:#ccc;
+  background-color:@color-bench-select;
 }
