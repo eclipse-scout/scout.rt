@@ -21,7 +21,7 @@ import javax.jms.Session;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.server.jms.JmsMessageSerializer;
+import org.eclipse.scout.rt.server.jms.IJmsMessageSerializer;
 import org.eclipse.scout.rt.server.transaction.AbstractTransactionMember;
 import org.eclipse.scout.rt.server.transaction.ITransactionMember;
 
@@ -38,12 +38,12 @@ public class JmsTransactionMember<T> extends AbstractTransactionMember {
   private final Connection m_connection;
   private final Session m_session;
   private final Destination m_destination;
-  private final JmsMessageSerializer<T> m_messageSerializer;
+  private final IJmsMessageSerializer<T> m_messageSerializer;
   //lazy initialized
   private MessageConsumer m_messageConsumer;
   private MessageProducer m_messageProducer;
 
-  public JmsTransactionMember(String transactionMemberId, Connection connection, Session session, Destination destination, JmsMessageSerializer<T> messageSerializer) {
+  public JmsTransactionMember(String transactionMemberId, Connection connection, Session session, Destination destination, IJmsMessageSerializer<T> messageSerializer) {
     super(transactionMemberId);
     if (connection == null || session == null || destination == null || messageSerializer == null) {
       throw new IllegalArgumentException("None of the arguments can be null");
@@ -66,7 +66,7 @@ public class JmsTransactionMember<T> extends AbstractTransactionMember {
     return m_destination;
   }
 
-  protected JmsMessageSerializer<T> getMessageSerializer() {
+  protected IJmsMessageSerializer<T> getMessageSerializer() {
     return m_messageSerializer;
   }
 

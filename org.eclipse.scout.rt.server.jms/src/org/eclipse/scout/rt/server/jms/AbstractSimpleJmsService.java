@@ -74,7 +74,7 @@ public abstract class AbstractSimpleJmsService<T> extends AbstractJmsService<T> 
     try {
       session = createSession(connection);
       producer = session.createProducer(lookupDestination());
-      JmsMessageSerializer<T> serializer = createMessageSerializer();
+      IJmsMessageSerializer<T> serializer = createMessageSerializer();
       for (T message : messages) {
         producer.send(serializer.createMessage(message, session));
       }
@@ -141,7 +141,7 @@ public abstract class AbstractSimpleJmsService<T> extends AbstractJmsService<T> 
    * This is by intend not a ServerJob; we do not want to running a in scout transaction.
    */
   protected class MessageConsumerJob extends JobEx {
-    private final JmsMessageSerializer<T> m_messageSerializer;
+    private final IJmsMessageSerializer<T> m_messageSerializer;
     private final Connection m_connection;
     private final Session m_session;
     private final MessageConsumer m_consumer;

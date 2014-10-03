@@ -110,7 +110,7 @@ public abstract class AbstractJmsService<T> extends AbstractJndiService {
     return TypeCastUtility.getGenericsParameterClass(this.getClass(), AbstractJmsService.class);
   }
 
-  protected JmsMessageSerializer<T> createMessageSerializer() {
+  protected IJmsMessageSerializer<T> createMessageSerializer() {
     return new JmsMessageSerializer<T>(getMessageType());
   }
 

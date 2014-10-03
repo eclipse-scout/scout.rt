@@ -19,7 +19,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.serialization.IObjectSerializer;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
 
-public class JmsMessageSerializer<T> {
+public class JmsMessageSerializer<T> implements IJmsMessageSerializer<T> {
   private static IScoutLogger LOG = ScoutLogManager.getLogger(JmsMessageSerializer.class);
   // Property name to save the message content on a JMS message - only used for logging/debug reasons.
   private static final String JMS_PROPERTY_TRACE_MESSAGE_CONTENT = "traceMessageContent";
@@ -45,6 +45,7 @@ public class JmsMessageSerializer<T> {
     return m_objectSerializer;
   }
 
+  @Override
   public Message createMessage(T message, Session session) throws Exception {
     if (LOG.isTraceEnabled()) {
       LOG.trace("creating JMS message: msgContent={0}", message);
@@ -57,6 +58,7 @@ public class JmsMessageSerializer<T> {
     return jmsMessage;
   }
 
+  @Override
   public T extractMessage(Message jmsMessage) throws Exception {
     if (LOG.isTraceEnabled()) {
       LOG.trace("extracting JMS message: jmsMessageId={0}, messageContent={1}", jmsMessage.getJMSMessageID(), jmsMessage.getStringProperty(JMS_PROPERTY_TRACE_MESSAGE_CONTENT));
@@ -77,8 +79,7 @@ public class JmsMessageSerializer<T> {
     else {
       byte[] buffer = new byte[(int) bodyLength];
       bm.readBytes(buffer);
-      byte[] data = new byte[(int) bm.getBodyLength()];
-      return getObjectSerializer().deserialize(data, getMessageType());
+      return getObjectSerializer().deserialize(buffer, getMessageType());
     }
     return null;
   }
