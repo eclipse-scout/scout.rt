@@ -90,7 +90,7 @@ scout.ChartTableControlMatrix.prototype.addAxis = function(axis, axisGroup) {
         }
       };
       keyAxis.format = function(n) {
-        return locale.dateFormat.format(n);
+        return locale.dateFormat.format(new Date(n));
       };
     } else if (axisGroup === 1) {
       keyAxis.norm = function(f) {

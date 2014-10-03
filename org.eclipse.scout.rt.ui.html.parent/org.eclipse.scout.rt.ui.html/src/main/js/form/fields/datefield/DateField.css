@@ -4,7 +4,15 @@
 
 /* date box */
 
-#date_box{
+.date-field > .predict {
+color: @color-bench-semi;
+}
+
+.field.has-error ~ .date-box{
+border-color:#A61300
+}
+
+.date-box{
 height: 224px;
 width: 224px;
 position: absolute;
@@ -14,16 +22,8 @@ padding: 6px;
 z-index: 100;
 }
 
-.date-field > .predict {
-color: @color-bench-semi;
-}
-
-.field.has_error ~ #date_box{
-border-color:#A61300
-}
-
-div.date_weekday,
-div.date_day{
+.date-box-weekday,
+.date-box-day{
 width: 30px;
 margin: 0px;
 height: 26px;
@@ -34,35 +34,35 @@ text-align: center;
 cursor: default;
 }
 
-div.date_day:hover {
+.date-box-day:hover {
 color: #0082A1;
 }
 
-div.date_weekday{
+.date-box-weekday{
 font-weight: bold;
 color: #000;
 }
 
-div.date_day{
+.date-box-day{
 cursor: pointer;
 }
 
-div.date_weekend{
+.date-box-weekend{
 color:#777777;
 }
 
-div.date_out{
+.date-box-out{
 color:#d2d2d2;
 }
 
-div.date_out_weekend{
+.date-box-out-weekend{
 color: #aaa;
 }
 
-div.date_now{
+.date-box-now{
 font-weight: bold !important;}
 
-div.date_select{
+.date-box-select{
 width: 30px;
 line-height: 26px;
 height: 26px;
@@ -70,14 +70,14 @@ font-weight:normal;
 background-color:#ededed;
 }
 
-div.date_header{
+.date-box-header{
 height: 26px;
 width: 211px;
 float: left;
 margin: 0px 0px 5px 0px;
 }
 
-div.date_month{
+.date-box-month{
 line-height: 26px;
 height: 26px;
 width: 110px;
@@ -90,10 +90,10 @@ color: #0082A1;
 font-size:13px;
 }
 
-div.date_left_y,
-div.date_left_m,
-div.date_right_y,
-div.date_right_m{
+.date-box-left-y,
+.date-box-left-m,
+.date-box-right-y,
+.date-box-right-m{
 text-align: center;
 padding: 3px 0px 2px 0px;
 width: 20px;
@@ -106,35 +106,35 @@ font-size: 18px;
 font-weight: bold;
 }
 
-div.date_left_y:hover,
-div.date_left_m:hover,
-div.date_right_y:hover,
-div.date_right_m:hover{
+.date-box-left-y:hover,
+.date-box-left-m:hover,
+.date-box-right-y:hover,
+.date-box-right-m:hover{
 color:#FE9915;
 }
 
-div.date_left_y,
-div.date_left_m{
+.date-box-left-y,
+.date-box-left-m{
 float: left;
 }
 
-div.date_left_y:before {
+.date-box-left-y:before {
 content:"\f100";
 }
 
-div.date_left_m:before {
+.date-box-left-m:before {
 content:"\f104";
 }
 
-div.date_right_y,
-div.date_right_m{
+.date-box-right-y,
+.date-box-right-m{
 float: right;
 }
 
-div.date_right_y:before {
+.date-box-right-y:before {
 content:"\f101";
 }
 
-div.date_right_m:before {
+.date-box-right-m:before {
 content:"\f105";
 }

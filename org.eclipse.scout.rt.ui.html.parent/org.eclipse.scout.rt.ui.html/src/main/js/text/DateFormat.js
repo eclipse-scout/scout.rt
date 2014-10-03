@@ -1,6 +1,6 @@
 /**
  *
- * Converts milliseconds to string using java format pattern.<br/>
+ * Provides formatting of dates using java format pattern.<br/>
  * It does not consider timezones.
  * <p>
  * locale.dateFormatSymbols contains:
@@ -211,15 +211,43 @@ scout.DateFormat = function(locale, pattern) {
   }
 };
 
-scout.DateFormat.prototype.format = function format(time) {
-  var ret = this.pattern,
-    date = new Date(time);
+scout.DateFormat.prototype.format = function(date) {
+  var ret = this.pattern;
 
   for (var f = this.formatFunc.length - 1; f >= 0; f--) {
     ret = this.formatFunc[f](ret, date);
   }
 
   return ret;
+};
+
+scout.DateFormat.prototype.analyze = function(text, asNumber) {
+  var result = {};
+  var sep = this.pattern.replace('dd', '').replace('MM', '').replace('yyyy', '')[0];
+  var pattern = this.pattern.split(sep);
+  text = text.split(sep);
+
+  result.day = text[pattern.indexOf('dd')];
+  result.month = text[pattern.indexOf('MM')];
+  result.year = text[pattern.indexOf('yyyy')];
+
+  if (asNumber) {
+    result.day = parseInt(result.day, 10);
+    result.month = parseInt(result.month, 10);
+    result.year = parseInt(result.year, 10);
+  }
+
+  return result;
+};
+
+
+scout.DateFormat.prototype.parseLazy = function (text) {
+  var dateInfo = this.analyze(text, true);
+  var year = dateInfo.year;
+  if (year < 100) {
+    year += 2000;
+  }
+  return new Date(year, dateInfo.month - 1, dateInfo.day);
 };
 
 scout.DateFormat.orderWeekdays = function(weekdays, firstDayOfWeek) {

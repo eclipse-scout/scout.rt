@@ -1,5 +1,5 @@
 /**
- * Converts numbers to strings using java format pattern.
+ * Provides formatting of numbers using java format pattern.
  * <p>
  * Compared to the java DecimalFormat the following pattern characters are not considered:
  * <ul>
