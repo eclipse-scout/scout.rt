@@ -51,6 +51,7 @@ public class ClusterSynchronizationService extends AbstractService implements IC
   private static final String TRANSACTION_MEMBER_ID = ClusterSynchronizationService.class.getName();
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ClusterSynchronizationService.class);
 
+  public static final String CLUSTER_SYNC_BACKEND_SESSION_ID = "org.eclipse.scout.rt.server.clustersync.BackendSessionId";
   private static final String CLUSTER_NODE_ID_PARAM = "org.eclipse.scout.rt.server.clusterNodeId";
   private final EventListenerList m_listenerList = new EventListenerList();
   private final ClusterNodeStatusInfo m_statusInfo = new ClusterNodeStatusInfo();
@@ -111,7 +112,7 @@ public class ClusterSynchronizationService extends AbstractService implements IC
     IServerSession serverSession = null;
     try {
       serverSession = SERVICES.getService(IServerSessionRegistryService.class).newServerSession(sessionClazz, createBackendSubject());
-      serverSession.setIdInternal(UUID.randomUUID().toString());
+      serverSession.setIdInternal(CLUSTER_SYNC_BACKEND_SESSION_ID);
     }
     catch (ProcessingException e) {
       LOG.error("Error creating backend session for cluster synchronization.", e);
