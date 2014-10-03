@@ -22,10 +22,52 @@ scout.SmartField.prototype._render = function($parent) {
     //     2. _onXyzEvent überschreiben
     focus(this._onFocus.bind(this)).
     blur(this._onBlur.bind(this)).
-    keyup(this._onKeyup.bind(this));
+    keyup(this._onKeyup.bind(this)).
+    keydown(this._onKeydown.bind(this));
 
   this.addIcon();
   this.addStatus();
+};
+
+// navigate in options
+scout.SmartField.prototype._onKeydown = function(e) {
+  if (e.which == 33 || e.which == 34 || e.which == 38 || e.which == 40) {
+
+    // ensure popup is opened for following operations
+    if (!this._$popup) {
+      setTimeout(function() {
+        this._openPopup();
+      }.bind(this));
+      return;
+    }
+
+    var $options = this._$popup.children(':visible');
+    var pos = this._selectedOption;
+    if (e.which == 33) { pos-=10; }
+    if (e.which == 34) { pos+=10; }
+    if (e.which == 38) { pos--; }
+    if (e.which == 40) { pos++; }
+    if (pos < 0) {
+      pos = 0;
+    } else {
+      if (pos >= $options.length) {
+        pos = $options.length - 1;
+      }
+    }
+    if (pos != this.selectedOption) {
+      if (this._selectedOption >= 0 && this._selectedOption < $options.length) {
+        $($options[this._selectedOption]).removeClass('selected');
+      }
+      var $selectedOption = $($options[pos]);
+      $selectedOption.addClass('selected');
+      var h = this._$popup.height();
+      var hPerOption = 19; // TODO AWE: (smartfield) höhe aller optionen dynamisch ermitteln
+      var top = pos * hPerOption;
+      this._$popup.scrollTop(top);
+      $.log.info('_selectedOption=' + this._selectedOption + ' pos='+pos + ' top=' + top + ' text=' +  $selectedOption.html());
+      this._selectedOption = pos;
+    }
+  }
 };
 
 scout.SmartField.prototype._onKeyup = function(e) {
@@ -47,36 +89,16 @@ scout.SmartField.prototype._onKeyup = function(e) {
     return;
   }
 
+  // TODO AWE: (smartfield) das geht sicher noch schöner --> check preventDefault
+  if (e.which == 33 || e.which == 34 || e.which == 38 || e.which == 40) {
+    return;
+  }
+
   // ensure popup is opened for following operations
   if (!this._$popup) {
     setTimeout(function() {
       this._openPopup();
     }.bind(this));
-    return;
-  }
-
-  // navigate in options
-  // TODO AWE: (smartfield) support page-up/down 33/34
-  if (e.which == 38 || e.which == 40) {
-    var $options = this._$popup.children(':visible');
-    var pos = this._selectedOption;
-    if (e.which == 38) { pos--; }
-    if (e.which == 40) { pos++; }
-    if (pos < 0) {
-      pos = 0;
-    } else {
-      if (pos >= $options.length) {
-        pos = $options.length - 1;
-      }
-    }
-    if (pos != this.selectedOption) {
-      if (this._selectedOption >= 0 && this._selectedOption < $options.length) {
-        $($options[this._selectedOption]).removeClass('selected');
-      }
-      $($options[pos]).addClass('selected');
-      $.log.info('_selectedOption=' + this._selectedOption + ' pos='+pos);
-      this._selectedOption = pos;
-    }
     return;
   }
 
@@ -118,6 +140,7 @@ scout.SmartField.prototype._onFocus = function() {
   }
 };
 
+// TODO AWE: (smartfield) wenn das popup offen ist und man wegtabbt bekommt das nächste field noch nicht den fokus
 scout.SmartField.prototype._onBlur = function() {
   $.log.debug("_onBlur");
   this._closePopup();
