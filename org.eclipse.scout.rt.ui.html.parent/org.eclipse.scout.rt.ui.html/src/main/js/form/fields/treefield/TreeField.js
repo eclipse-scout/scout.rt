@@ -8,11 +8,19 @@ scout.TreeField = function() {
 scout.inherits(scout.TreeField, scout.FormField);
 
 scout.TreeField.prototype._render = function($parent) {
-  this.$container = $parent.appendDiv('', 'tree-field');
-  this.$label = $('<label>')
-    .appendTo(this.$container);
+  this.addContainer($parent, 'tree-field');
+  this.addLabel();
+  this.addStatus();
 
   if (this.tree) {
-    this.tree.render(this.$container);
+    this._renderTree();
   }
+};
+
+/**
+ * Will also be called by model adapter on property change event
+ */
+scout.TreeField.prototype._renderTree = function() {
+  this.tree.render(this.$container);
+  this.tree.$container.addClass('field');
 };

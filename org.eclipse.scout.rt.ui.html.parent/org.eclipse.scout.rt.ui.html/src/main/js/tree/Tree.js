@@ -7,6 +7,8 @@ scout.Tree = function() {
   this.nodes = [];
   this._nodeMap = {};
   this._breadcrumb = false;
+  this._treeItemPaddingLeft = 30;
+  this._treeItemPaddingLevel = 20;
 };
 scout.inherits(scout.Tree, scout.ModelAdapter);
 
@@ -213,16 +215,10 @@ scout.Tree.prototype.setNodesSelected = function(nodes, $nodes) {
  * @param $nodes if undefined the nodes will be resolved using this.selectedNodeIds
  */
 scout.Tree.prototype._renderSelection = function($nodes) {
-  var i, parentNode, $parentNode, node, $node;
+  var i, parentNode, $parentNode, node, $node, that = this;
 
-  this._$treeScroll.children().select(false);
-
-  //If $nodes are given, just render the selection
-  if ($nodes) {
-    for (i=0; i < $nodes.length; i++) {
-      $nodes[i].select(true);
-    }
-  } else { //Otherwise render the selection based on the this.selectedNodeIds
+  //If $nodes are given collect the nodes based on this.selectedNodeIds
+  if (!$nodes) {
     $nodes = [];
     for (i=0; i < this.selectedNodeIds.length; i++) {
       node = this._nodeMap[this.selectedNodeIds[i]];
@@ -238,18 +234,27 @@ scout.Tree.prototype._renderSelection = function($nodes) {
       }
 
       $nodes.push($node);
-      $node.select(true);
     }
   }
 
-  // in case of breadcrumb, expand
-  if (this._breadcrumb) {
-    for (i=0; i < $nodes.length; i++) {
+  this._$treeScroll.children().select(false);
+
+  // render selection
+  for (i=0; i < $nodes.length; i++) {
+    $node = $nodes [i];
+    $node.select(true);
+
+    // in case of breadcrumb, expand
+    if (this._breadcrumb) {
       this.setNodeExpanded($nodes[i].data('node'), $nodes[i], true);
     }
   }
 
   this._updateItemPath();
+};
+
+scout.Tree.prototype._computeTreeItemPaddingLeft = function(level, selected) {
+  return level * this._treeItemPaddingLevel + this._treeItemPaddingLeft;
 };
 
 scout.Tree.prototype._expandAllParentNodes = function(node) {
@@ -425,7 +430,7 @@ scout.Tree.prototype._addNodes = function(nodes, $parent) {
       .on('dblclick', '', this._onNodeDoubleClick.bind(this))
       .data('node', node)
       .attr('data-level', level)
-      .css('padding-left', level * 20 + 30);
+      .css('padding-left', this._computeTreeItemPaddingLeft(level));
 
     // decorate with (close) control
     var $control = $node.prependDiv('', 'tree-item-control')

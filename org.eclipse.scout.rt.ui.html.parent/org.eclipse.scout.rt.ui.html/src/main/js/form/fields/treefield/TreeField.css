@@ -1,3 +1,13 @@
-.tree-field {
-  height: 100%;
+.tree-field .tree-item {	
+	/* Compensate missing border with transparent border due to border-box model. */
+	border: 1px solid transparent;
+	
+	&.group {	
+	  background-color: transparent;
+	}
+	
+	&.selected {
+  	  background-color: @color-bench-select;
+      border: 1px solid @color-bench-select-border;
+	}
 }
