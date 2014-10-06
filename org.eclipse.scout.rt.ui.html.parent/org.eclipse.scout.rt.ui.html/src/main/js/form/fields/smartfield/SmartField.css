@@ -9,19 +9,26 @@
   margin-top:5px;
   background-color:white;
   box-shadow: 5px 5px 2px #ccc;
+}
+
+
+.smart-field-popup > .options {
   overflow:hidden;
   overflow-y: scroll;
 }
 
+.smart-field-popup > .status {
+  background-color:#ccc;
+}
 
-.smart-field-popup > div {
+.smart-field-popup > .options > div {
   border-bottom:solid 1px gray;
 }
 
-.smart-field-popup > div.selected {
+.smart-field-popup > .options > div.selected {
   background-color:@color-bench-select;
 }
 
-.smart-field-popup > div:hover {
+.smart-field-popup > .options > div:hover {
   background-color:@color-bench-select;
 }

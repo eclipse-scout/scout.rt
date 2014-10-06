@@ -30,6 +30,7 @@ scout.SmartField.prototype._render = function($parent) {
 };
 
 // navigate in options
+// TODO AWE: (smartfield) scrolling intelligenter machen (erst scrollen, wenn man an die boundaries stösst).
 scout.SmartField.prototype._onKeydown = function(e) {
   if (e.which == 33 || e.which == 34 || e.which == 38 || e.which == 40) {
 
@@ -41,7 +42,7 @@ scout.SmartField.prototype._onKeydown = function(e) {
       return;
     }
 
-    var $options = this._$popup.children(':visible');
+    var $options = this._$popup.children('.options').children(':visible');
     var pos = this._selectedOption;
     if (e.which == 33) { pos-=10; }
     if (e.which == 34) { pos+=10; }
@@ -63,7 +64,7 @@ scout.SmartField.prototype._onKeydown = function(e) {
       var h = this._$popup.height();
       var hPerOption = 19; // TODO AWE: (smartfield) höhe aller optionen dynamisch ermitteln
       var top = pos * hPerOption;
-      this._$popup.scrollTop(top);
+      this._$popup.children('.options').scrollTop(top);
       $.log.info('_selectedOption=' + this._selectedOption + ' pos='+pos + ' top=' + top + ' text=' +  $selectedOption.html());
       this._selectedOption = pos;
     }
@@ -81,10 +82,10 @@ scout.SmartField.prototype._onKeyup = function(e) {
   // enter
   if (e.which == 13) {
     if (this._selectedOption > -1) {
-      var value = $(this._$popup.children(':visible').get(this._selectedOption)).html();
+      var value = $(this._$popup.children('.options').children(':visible').get(this._selectedOption)).html();
       this.$field.val(value);
+      this.$field.get(0).select();
       this._closePopup();
-      this.$field.select();
     }
     return;
   }
@@ -106,21 +107,30 @@ scout.SmartField.prototype._onKeyup = function(e) {
   this._filterOptions(this.$field.val());
 };
 
+
 scout.SmartField.prototype._openPopup = function() {
-  var fieldBounds = scout.HtmlComponent.getBounds(this.$field);
-  var popupBounds = new scout.Rectangle(fieldBounds.x, fieldBounds.y + fieldBounds.height, fieldBounds.width, 100);
+  var numOptions = this.options.length,
+    fieldBounds = scout.HtmlComponent.getBounds(this.$field),
+    popupHeight = Math.min(10, numOptions) * 19 + 19 + 3, // TODO AWE: (smartfield) layout dynamisch
+    popupBounds = new scout.Rectangle(fieldBounds.x, fieldBounds.y + fieldBounds.height, fieldBounds.width, popupHeight);
   this._$popup = $('<div>').
     addClass('smart-field-popup').
+    append($('<div>').addClass('options')).
+    append($('<div>').addClass('status').text(this._getStatusText(numOptions))).
     appendTo(this.$container);
   scout.HtmlComponent.setBounds(this._$popup, popupBounds);
 
+  // layout options and status div
+  scout.HtmlComponent.setSize(this._$popup.children('.options'), fieldBounds.width - 4, popupHeight - 19 - 3);
+
   // add options
-  var i, option;
-  for (i=0; i<this.options.length; i++) {
+  var i, option,
+    $optionsDiv = this._$popup.children('.options');
+  for (i=0; i<numOptions; i++) {
     option = this.options[i];
     $('<div>').
       on('mousedown', this._onOptionMousedown.bind(this)).
-      appendTo(this._$popup).
+      appendTo($optionsDiv).
       html(option);
   }
 };
@@ -154,17 +164,33 @@ scout.SmartField.prototype._closePopup = function() {
   }
 };
 
+scout.SmartField.prototype._getStatusText = function(numOptions) {
+  if (numOptions === 0) {
+    return 'Keine Übereinstimmung';
+  } else if (numOptions === 1) {
+    return '1 Option';
+  } else {
+    return numOptions + ' Optionen';
+  }
+};
+
 scout.SmartField.prototype._filterOptions = function(text) {
   this._selectedOption = -1;
-  var regexp = new RegExp(text, 'i');
-  this._$popup.children().each(function() {
-    if (!text || '*' === text) {
+  var statusText, match, numVisibleOptions = 0,
+    showAll = !text || '*' === text,
+    regexp = new RegExp(text, 'i');
+  this._$popup.children('.options').children().each(function() {
+    if (showAll) {
       $(this).setVisible(true);
     } else {
       // TODO AWE: (smartfield) implement clever client-side match algorithm
+      match = $(this).html().match(regexp);
+      if (match) { numVisibleOptions++; }
       $.log.debug('regexp='+regexp + ' html='+$(this).html());
-      $(this).setVisible($(this).html().match(regexp));
+      $(this).setVisible(match);
     }
   });
+  if (showAll) { numVisibleOptions = this.options.length; }
+  this._$popup.children('.status').text(this._getStatusText(numVisibleOptions));
 };
 
