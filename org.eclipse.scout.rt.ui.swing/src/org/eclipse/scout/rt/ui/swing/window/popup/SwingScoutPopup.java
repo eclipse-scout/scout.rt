@@ -57,14 +57,14 @@ import org.eclipse.scout.rt.ui.swing.window.SwingScoutViewListener;
 public class SwingScoutPopup implements ISwingScoutView {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingScoutPopup.class);
 
-  private ISwingEnvironment m_env;
-  private EventListenerList m_listenerList;
-  private Component m_ownerComponent;
+  private final ISwingEnvironment m_env;
+  private final EventListenerList m_listenerList;
+  private final Component m_ownerComponent;
   private ComponentListener m_ownerComponentListener;
-  private Rectangle m_ownerBounds;
-  private JWindowEx m_swingWindow;
+  private final Rectangle m_ownerBounds;
+  private final JWindowEx m_swingWindow;
   private boolean m_resizable;
-  private P_ResizeListener m_resizeListener;
+  private final P_ResizeListener m_resizeListener;
   // cache
   private boolean m_maximized;
   private boolean m_positionBelowReferenceField;// ticket 76521

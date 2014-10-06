@@ -86,9 +86,17 @@ public class DesktopEvent extends EventObject {
    */
   public static final int TYPE_TRAVERSE_FOCUS_PREVIOUS = 1030;
 
+  /**
+   * Event type that indicates that the currently active (focused) {@link IForm} should be calculated.
+   * 
+   * @see IDesktop#traverseFocusPrevious()
+   */
+  public static final int TYPE_FIND_ACTIVE_FORM = 1040;
+
   private final int m_type;
   private IOutline m_outline;
   private IForm m_form;
+  private IForm m_activeForm;
   private IFormField m_focusedField;
   private IMessageBox m_messageBox;
   private IFileChooser m_fileChooser;
@@ -245,9 +253,17 @@ public class DesktopEvent extends EventObject {
     return CollectionUtility.copyMap(m_printParameters);
   }
 
+  public IForm getActiveForm() {
+    return m_activeForm;
+  }
+
+  public void setActiveForm(IForm activeForm) {
+    m_activeForm = activeForm;
+  }
+
   @Override
   public String toString() {
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     buf.append(getClass().getSimpleName() + "[");
     // decode type
     try {

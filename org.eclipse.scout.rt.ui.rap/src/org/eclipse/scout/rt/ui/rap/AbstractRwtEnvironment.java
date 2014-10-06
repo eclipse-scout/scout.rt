@@ -942,6 +942,19 @@ public abstract class AbstractRwtEnvironment extends AbstractEntryPoint implemen
     m_popupOwnerBounds = ownerBounds;
   }
 
+  public IForm findActiveForm() {
+    Control comp = getDisplay().getFocusControl();
+    while (comp != null) {
+      Object o = comp.getData(IRwtScoutFormField.CLIENT_PROPERTY_SCOUT_OBJECT);
+      if (o instanceof IForm) {
+        return (IForm) o;
+      }
+      // next
+      comp = comp.getParent();
+    }
+    return null;
+  }
+
   @Override
   public void showFormPart(IForm form) {
     if (form == null) {
@@ -1210,10 +1223,7 @@ public abstract class AbstractRwtEnvironment extends AbstractEntryPoint implemen
             @Override
             public void run() {
               try {
-                IFormField f = findFocusOwnerField();
-                if (f != null) {
-                  e.setFocusedField(f);
-                }
+                e.setFocusedField(findFocusOwnerField());
               }
               finally {
                 synchronized (lock) {
@@ -1225,10 +1235,36 @@ public abstract class AbstractRwtEnvironment extends AbstractEntryPoint implemen
           synchronized (lock) {
             invokeUiLater(t);
             try {
-              lock.wait(2000L);
+              lock.wait(TimeUnit.SECONDS.toMillis(2));
             }
             catch (InterruptedException e1) {
-              //nop
+              LOG.warn("Interrupted while waiting for the focus owner to be found.", e1);
+            }
+          }
+          break;
+        }
+        case DesktopEvent.TYPE_FIND_ACTIVE_FORM: {
+          final Object lock = new Object();
+          Runnable t = new Runnable() {
+            @Override
+            public void run() {
+              try {
+                e.setActiveForm(findActiveForm());
+              }
+              finally {
+                synchronized (lock) {
+                  lock.notifyAll();
+                }
+              }
+            }
+          };
+          synchronized (lock) {
+            invokeUiLater(t);
+            try {
+              lock.wait(TimeUnit.SECONDS.toMillis(2));
+            }
+            catch (InterruptedException e1) {
+              LOG.warn("Interrupted while waiting for the active form to be found.", e1);
             }
           }
           break;

@@ -51,10 +51,10 @@ import org.eclipse.scout.rt.ui.swing.window.SwingScoutViewListener;
 public class SwingScoutDialog implements ISwingScoutView {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingScoutDialog.class);
 
-  private ISwingEnvironment m_env;
-  private EventListenerList m_listenerList;
-  private Window m_swingParent;
-  private JDialogEx m_swingDialog;
+  private final ISwingEnvironment m_env;
+  private final EventListenerList m_listenerList;
+  private final Window m_swingParent;
+  private final JDialogEx m_swingDialog;
   // cache
   private boolean m_opened;
   private boolean m_maximized;

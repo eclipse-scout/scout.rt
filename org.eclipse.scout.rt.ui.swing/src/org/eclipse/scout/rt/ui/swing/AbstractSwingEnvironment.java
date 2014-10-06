@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.swing;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dialog;
 import java.awt.Font;
 import java.awt.Frame;
@@ -27,8 +28,10 @@ import java.beans.PropertyChangeSupport;
 import java.beans.PropertyVetoException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.WeakHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -306,7 +309,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
 
   /**
    * Is called before desktop is displayed
-   * 
+   *
    * @param clientSession
    * @return true to start desktop or false to exit application
    * @throws Exception
@@ -397,10 +400,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
                 @Override
                 public void run() {
                   try {
-                    IFormField f = findFocusOwnerField();
-                    if (f != null) {
-                      e.setFocusedField(f);
-                    }
+                    e.setFocusedField(findFocusOwnerField());
                   }
                   finally {
                     synchronized (lock) {
@@ -412,10 +412,36 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
               synchronized (lock) {
                 invokeSwingLater(t);
                 try {
-                  lock.wait(2000L);
+                  lock.wait(TimeUnit.SECONDS.toMillis(2));
                 }
                 catch (InterruptedException e1) {
-                  //nop
+                  LOG.warn("Interrupted while waiting for the focus owner to be found.", e1);
+                }
+              }
+              break;
+            }
+            case DesktopEvent.TYPE_FIND_ACTIVE_FORM: {
+              final Object lock = new Object();
+              Runnable t = new Runnable() {
+                @Override
+                public void run() {
+                  try {
+                    e.setActiveForm(findActiveForm());
+                  }
+                  finally {
+                    synchronized (lock) {
+                      lock.notifyAll();
+                    }
+                  }
+                }
+              };
+              synchronized (lock) {
+                invokeSwingLater(t);
+                try {
+                  lock.wait(TimeUnit.SECONDS.toMillis(2));
+                }
+                catch (InterruptedException e1) {
+                  LOG.warn("Interrupted while waiting for the active form to be found.", e1);
                 }
               }
               break;
@@ -596,7 +622,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
 
   /**
    * decorateAppZone is called after a frame or dialog is created
-   * 
+   *
    * <pre>
    * app.zone=prod | production (paints no special border around all dialogs and frames, this is the default)
    * app.zone=int | integration (paints a yellow border around all dialogs and frames)
@@ -808,6 +834,25 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
       LOG.warn("unexpected viewId \"" + viewId + "\"");
       return new MultiSplitLayoutConstraints(1, 1, 50, new float[]{6, 6, 6, 7, 9, 6, 6, 6, 6});
     }
+  }
+
+  public IForm findActiveForm() {
+    KeyboardFocusManager keyboardFocusManager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
+
+    // Get the container, which is the root of the current focus traversal cycle.
+    Container container = keyboardFocusManager.getCurrentFocusCycleRoot();
+    while (container != null) {
+      for (Entry<IForm, ISwingScoutForm> entry : m_standaloneFormComposites.entrySet()) {
+        JComponent candidate = entry.getValue().getSwingFormPane();
+        if (SwingUtilities.isDescendingFrom(candidate, container)) {
+          return entry.getKey();
+        }
+      }
+
+      // try to find the active form with the ancestor focus cycle root.
+      container = container.getFocusCycleRootAncestor();
+    }
+    return null;
   }
 
   @Override

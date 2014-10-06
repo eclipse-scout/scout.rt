@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -126,6 +127,7 @@ import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchListener;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PerspectiveAdapter;
@@ -865,12 +867,35 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
     }
     // dialogs
     for (IForm dialog : desktop.getDialogStack()) {
-      // showDialogFromScout(dialogs[i]);
       showStandaloneForm(dialog);
     }
     for (IMessageBox messageBoxe : desktop.getMessageBoxStack()) {
       showMessageBoxFromScout(messageBoxe);
     }
+  }
+
+  public IForm findActiveForm() {
+    Shell activeShell = getDisplay().getActiveShell();
+    if (activeShell == null) {
+      return null;
+    }
+
+    Object data = activeShell.getData();
+    if (data instanceof ISwtScoutPart) {
+      return ((ISwtScoutPart) data).getForm();
+    }
+    else if (data instanceof IWorkbenchWindow) {
+      IWorkbenchPage activePage = ((IWorkbenchWindow) data).getActivePage();
+      if (activePage == null) {
+        return null;
+      }
+
+      IWorkbenchPart activePart = activePage.getActivePart();
+      if (activePart instanceof ISwtScoutPart) {
+        return ((ISwtScoutPart) activePart).getForm();
+      }
+    }
+    return null;
   }
 
   public IFormField findFocusOwnerField() {
@@ -1372,10 +1397,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
             @Override
             public void run() {
               try {
-                IFormField f = findFocusOwnerField();
-                if (f != null) {
-                  e.setFocusedField(f);
-                }
+                e.setFocusedField(findFocusOwnerField());
               }
               finally {
                 synchronized (lock) {
@@ -1387,10 +1409,36 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
           synchronized (lock) {
             invokeSwtLater(t);
             try {
-              lock.wait(2000L);
+              lock.wait(TimeUnit.SECONDS.toMillis(2));
             }
             catch (InterruptedException e1) {
-              //nop
+              LOG.warn("Interrupted while waiting for the focus owner to be found.", e1);
+            }
+          }
+          break;
+        }
+        case DesktopEvent.TYPE_FIND_ACTIVE_FORM: {
+          final Object lock = new Object();
+          Runnable t = new Runnable() {
+            @Override
+            public void run() {
+              try {
+                e.setActiveForm(findActiveForm());
+              }
+              finally {
+                synchronized (lock) {
+                  lock.notifyAll();
+                }
+              }
+            }
+          };
+          synchronized (lock) {
+            invokeSwtLater(t);
+            try {
+              lock.wait(TimeUnit.SECONDS.toMillis(2));
+            }
+            catch (InterruptedException e1) {
+              LOG.warn("Interrupted while waiting for the active form to be found.", e1);
             }
           }
           break;

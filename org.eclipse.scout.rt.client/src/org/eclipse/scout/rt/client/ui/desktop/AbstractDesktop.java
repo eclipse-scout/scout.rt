@@ -613,6 +613,11 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
+  public IForm getActiveForm() {
+    return fireFindActiveForm();
+  }
+
+  @Override
   @SuppressWarnings("unchecked")
   public <T extends IForm> List<T> findForms(Class<T> formType) {
     List<T> resultList = new ArrayList<T>();
@@ -1463,6 +1468,12 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     DesktopEvent e = new DesktopEvent(this, DesktopEvent.TYPE_FIND_FOCUS_OWNER);
     fireDesktopEvent(e);
     return e.getFocusedField();
+  }
+
+  private IForm fireFindActiveForm() {
+    DesktopEvent e = new DesktopEvent(this, DesktopEvent.TYPE_FIND_ACTIVE_FORM);
+    fireDesktopEvent(e);
+    return e.getActiveForm();
   }
 
   // main handler

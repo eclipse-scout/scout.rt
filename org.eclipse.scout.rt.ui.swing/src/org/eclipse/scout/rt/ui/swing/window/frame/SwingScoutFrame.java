@@ -45,9 +45,9 @@ import org.eclipse.scout.rt.ui.swing.window.SwingScoutViewListener;
 public class SwingScoutFrame implements ISwingScoutView {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingScoutFrame.class);
 
-  private ISwingEnvironment m_env;
-  private EventListenerList m_listenerList;
-  private JFrameEx m_swingFrame;
+  private final ISwingEnvironment m_env;
+  private final EventListenerList m_listenerList;
+  private final JFrameEx m_swingFrame;
   // cache
   private boolean m_maximized;
   private boolean m_opened;

@@ -510,4 +510,11 @@ public interface IDesktop extends IPropertyObserver {
    */
   void traverseFocusPrevious();
 
+  /**
+   * Gets the currently active (focused) {@link IForm}.
+   * 
+   * @return The currently active {@link IForm} or <code>null</code> if no {@link IForm} is active.
+   * @since 4.2.0
+   */
+  IForm getActiveForm();
 }
