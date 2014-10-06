@@ -15,6 +15,7 @@ import java.beans.PropertyChangeListener;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.client.ui.action.IActionFilter;
+import org.eclipse.scout.rt.client.ui.action.IActionUIFacade;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.ui.rap.IRwtEnvironment;
 import org.eclipse.scout.rt.ui.rap.RwtMenuUtility;
@@ -24,9 +25,6 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
-/**
- *
- */
 public class RwtScoutMenuItem {
   private final IMenu m_scoutMenu;
 
@@ -182,14 +180,24 @@ public class RwtScoutMenuItem {
   }
 
   protected void handleSwtMenuSelection() {
+
     if (!m_handleSelectionPending) {
       m_handleSelectionPending = true;
-      //notify Scout
+
+      final boolean selection = getSwtMenuItem().getSelection();
+
       Runnable t = new Runnable() {
         @Override
         public void run() {
           try {
-            getScoutMenu().getUIFacade().fireActionFromUI();
+            IActionUIFacade uiFacade = getScoutMenu().getUIFacade();
+
+            // Notify the model about the selection change.
+            if (getScoutMenu().isToggleAction()) {
+              uiFacade.setSelectedFromUI(selection);
+            }
+            // Notify the model about the click event; do this for toggle actions as well (see IActionUIFacade for more information).
+            uiFacade.fireActionFromUI();
           }
           finally {
             m_handleSelectionPending = false;
@@ -197,7 +205,6 @@ public class RwtScoutMenuItem {
         }
       };
       getEnvironment().invokeScoutLater(t, 0);
-      //end notify
     }
   }
 

@@ -174,17 +174,30 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   }
 
   /**
-   * Called whenever the state of a toggle button or radio button changes.
-   * <p>
+   * Called whenever the state of a toggle button or radio button changes.</br>
    * Subclasses can override this method. The default does nothing.
    * 
    * @param selected
    *          new state of the button
    * @throws ProcessingException
+   * @deprecated will be removed in release 5.0; use {@link AbstractButton#execSelectionChanged(boolean)} instead.
    */
   @ConfigOperation
   @Order(200)
+  @Deprecated
   protected void execToggleAction(boolean selected) throws ProcessingException {
+  }
+
+  /**
+   * Called whenever the selection (of toggle-button) is changed.
+   * 
+   * @param selection
+   *          the new selection state
+   * @throws ProcessingException
+   */
+  @ConfigOperation
+  @Order(210)
+  protected void execSelectionChanged(boolean selection) throws ProcessingException {
   }
 
   protected List<Class<? extends IMenu>> getDeclaredMenus() {
@@ -336,6 +349,7 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
     // single observer for config
     if (changed) {
       try {
+        execSelectionChanged(b);
         execToggleAction(b);
       }
       catch (ProcessingException e) {

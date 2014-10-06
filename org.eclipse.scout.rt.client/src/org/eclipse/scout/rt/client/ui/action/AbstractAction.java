@@ -111,7 +111,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
    * <li>f11
    * <li>alt-f11
    * </ul>
-   *
+   * 
    * @return
    */
   @ConfigProperty(ConfigProperty.STRING)
@@ -178,7 +178,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   /**
    * called by prepareAction before action is added to list or used<br>
    * this way a menu can be made dynamically visible / enabled
-   *
+   * 
    * @deprecated use {@link AbstractMenu#execOwnerValueChanged}
    */
   @Deprecated
@@ -195,7 +195,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   }
 
   /**
-   * @deprecated will be removed with release 5.0 use {@link AbstractAction#execSelectionChanged(boolean)} instead.
+   * @deprecated will be removed in release 5.0; use {@link AbstractAction#execSelectionChanged(boolean)} instead.
    */
   @ConfigOperation
   @Order(31)
@@ -204,14 +204,15 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   }
 
   /**
-   * called whenever the selection (of toggle-action) is changed.
-   *
+   * Called whenever the selection (of toggle-action) is changed.
+   * 
    * @param selection
    *          the new selection state
    * @throws ProcessingException
    */
+  @ConfigOperation
+  @Order(32)
   protected void execSelectionChanged(boolean selection) throws ProcessingException {
-
   }
 
   protected void initConfig() {
@@ -288,7 +289,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   /**
    * Please double check if implementing this method!
    * Consider using {@link #execAction()} instead. If no other option ensure super call when overriding this method.
-   *
+   * 
    * @throws ProcessingException
    */
   protected void doActionInternal() throws ProcessingException {

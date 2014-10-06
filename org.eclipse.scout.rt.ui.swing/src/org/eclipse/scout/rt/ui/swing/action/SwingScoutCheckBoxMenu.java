@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swing.action;
 
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
@@ -29,6 +31,7 @@ public class SwingScoutCheckBoxMenu<T extends IMenu> extends SwingScoutComposite
     m_actionComposite = new SwingScoutAction<T>();
     m_actionComposite.createField(getScoutObject(), getSwingEnvironment());
     JCheckBoxMenuItem swingItem = new JCheckBoxMenuItem(m_actionComposite.getSwingAction());
+    swingItem.addItemListener(new P_SwingSelectionListener());
     swingItem.setOpaque(false);
     setSwingField(swingItem);
     /**
@@ -77,6 +80,21 @@ public class SwingScoutCheckBoxMenu<T extends IMenu> extends SwingScoutComposite
     getSwingField().setSelected(b);
   }
 
+  protected void setSelectionFromSwing(final boolean selected) {
+    if (getUpdateSwingFromScoutLock().isAcquired()) {
+      return;
+    }
+    if (getScoutObject().isSelected() != selected) {
+      Runnable t = new Runnable() {
+        @Override
+        public void run() {
+          getScoutObject().getUIFacade().setSelectedFromUI(selected);
+        }
+      };
+      getSwingEnvironment().invokeScoutLater(t, 0);
+    }
+  }
+
   /**
    * in swing thread
    */
@@ -88,4 +106,11 @@ public class SwingScoutCheckBoxMenu<T extends IMenu> extends SwingScoutComposite
     }
   }
 
+  private class P_SwingSelectionListener implements ItemListener {
+
+    @Override
+    public void itemStateChanged(ItemEvent e) {
+      setSelectionFromSwing(getSwingField().isSelected());
+    }
+  }
 }

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -14,7 +14,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import javax.swing.Action;
-import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JMenuItem;
 
@@ -29,14 +28,7 @@ public class SwingScoutMenuItem<T extends IActionNode<?>> extends SwingScoutComp
     super.initializeSwing();
     m_actionComposite = new SwingScoutAction<T>();
     m_actionComposite.createField(getScoutObject(), getSwingEnvironment());
-    JMenuItem swingItem = null;
-    if (getScoutObject().isToggleAction()) {
-      swingItem = new JCheckBoxMenuItem(m_actionComposite.getSwingAction());
-    }
-    else {
-      swingItem = new JMenuItem(m_actionComposite.getSwingAction());
-    }
-    setSwingField(swingItem);
+    JMenuItem swingItem = new JMenuItem(m_actionComposite.getSwingAction());
     /**
      * WORKAROUND swing doesn't know "visible" property on action objects, but it
      * knows "enabled" property and others... therefore add a transfer listener to
@@ -54,6 +46,7 @@ public class SwingScoutMenuItem<T extends IActionNode<?>> extends SwingScoutComp
         }
       }
     });
+    setSwingField(swingItem);
   }
 
   @Override
