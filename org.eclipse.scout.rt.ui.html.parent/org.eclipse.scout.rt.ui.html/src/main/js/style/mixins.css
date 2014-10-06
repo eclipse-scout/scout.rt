@@ -1,22 +1,23 @@
 @field-with-icon-padding: 20px;
+@field-border-width: 1px;
 
 .text-field {
-  border:none;
-  border-bottom:solid 1px #ccc;
+  padding: 0;
+  
+  /* Add transparent border to compensate missing border due to border-box model */
+  border: @field-border-width solid transparent;
+  border-bottom-color: @color-bench-semi;
 
   &:disabled {
     background-color:white;
-    border-bottom: none;
-    /* compensate missing border due to border-box model */
-    /*//FIXME CGU hacky, why 2px, border is 1px? does not work well with zoom...*/
-    padding-bottom: 2px;
+    border-bottom-color: transparent;
   }
   &:focus {
-    border-bottom:solid 1px @color-bsi-orange;
+    border-bottom-color: @color-bsi-orange;
     outline: none;
   }
   &.has-error {
-    border-bottom: solid 1px @color-error;
+    border-bottom-color: @color-error;
   }
 }
 

@@ -39,6 +39,10 @@ body.row-resize *, body.row-resize {
 cursor: row-resize !important;
 }
 
+input, textarea, button {
+  .font-text-normal;
+}
+
 /* hidden DIV used to measure string length in UI */
 #StringMeasurement {
   position: absolute;

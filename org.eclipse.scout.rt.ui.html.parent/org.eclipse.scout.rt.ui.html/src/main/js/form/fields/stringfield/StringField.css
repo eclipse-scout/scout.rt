@@ -4,7 +4,6 @@
   }
 
   & textarea {
-    .font-text-normal();
     width:100%;
   }
 }
