@@ -85,7 +85,6 @@
 <item elementID="=org.eclipse.scout.jaxws216.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.rt.jdbc.derby10" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.rt.server.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=org.eclipse.scout.rt.testing.shared.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/org.eclipse.scout.rt.team-project-set" type="4"/>
 <item elementID="=org.apache.derby.jdbc_1091.fragment" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.net" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
@@ -163,6 +162,7 @@
 <item elementID="=org.eclipse.scout.rt.testing.ui.swing" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.rt.testing.ui.rap" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.rt.testing.server" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=org.eclipse.scout.rt.testing.shared.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 </workingSets>
 <workingSets editPageId="org.eclipse.jdt.ui.JavaWorkingSetPage" id="1375705167852_7" label="scout.rt.spec" name="scout.rt.spec">
 <item elementID="=org.eclipse.scout.rt.spec.client" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
