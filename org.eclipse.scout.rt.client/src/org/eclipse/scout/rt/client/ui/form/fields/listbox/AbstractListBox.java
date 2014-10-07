@@ -159,6 +159,16 @@ public abstract class AbstractListBox<T> extends AbstractValueField<Set<T>> impl
   }
 
   /**
+   * On any value change or call to {@link #checkEmpty()} this method is called
+   * to calculate if the field represents an empty state (semantics)
+   * <p>
+   */
+  @Override
+  protected boolean execIsEmpty() throws ProcessingException {
+    return getValue().isEmpty();
+  }
+
+  /**
    * called before any lookup is performed
    */
   @ConfigOperation
@@ -594,19 +604,23 @@ public abstract class AbstractListBox<T> extends AbstractValueField<Set<T>> impl
   @Override
   public boolean isContentValid() {
     boolean valid = super.isContentValid();
-    if (valid && isMandatory()) {
-      if (getValue() == null || getValue().isEmpty()) {
-        return false;
-      }
+    if (valid && isMandatory() && getValue().isEmpty()) {
+      return false;
     }
     return valid;
   }
 
+  /**
+   * Value, empty {@link Set} in case of an empty value, never <code>null</code>.
+   */
   @Override
   public Set<T> getValue() {
     return CollectionUtility.hashSet(super.getValue());
   }
 
+  /**
+   * Initial value, empty {@link Set} in case of an empty value, never <code>null</code>.
+   */
   @Override
   public Set<T> getInitValue() {
     return CollectionUtility.hashSet(super.getInitValue());
@@ -628,13 +642,7 @@ public abstract class AbstractListBox<T> extends AbstractValueField<Set<T>> impl
 
   @Override
   public int getCheckedKeyCount() {
-    Set<T> value = super.getValue();
-    if (value != null) {
-      return value.size();
-    }
-    else {
-      return 0;
-    }
+    return getValue().size();
   }
 
   @Override

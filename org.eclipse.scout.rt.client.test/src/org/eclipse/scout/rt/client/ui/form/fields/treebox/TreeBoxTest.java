@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.form.fields.treebox;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -27,8 +28,9 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
+import org.eclipse.scout.rt.testing.commons.ScoutAssert;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
-import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -37,6 +39,13 @@ import org.junit.runner.RunWith;
  */
 @RunWith(ScoutClientTestRunner.class)
 public class TreeBoxTest {
+  private HashSet<Long> testValue;
+
+  @Before
+  public void setUp() {
+    testValue = new HashSet<Long>();
+    testValue.add(1L);
+  }
 
   /**
    * Select a parent node in a tree box and check whether only this node is selected..
@@ -45,8 +54,7 @@ public class TreeBoxTest {
    */
   @Test
   public void testDefaultBehavior() throws Exception {
-    SimpleTreeBox treeBox = new SimpleTreeBox();
-    treeBox.initField();
+    SimpleTreeBox treeBox = createSimpleTreeBox();
     ITree tree = treeBox.getTree();
 
     ITreeNode node = tree.findNode(1L); // A
@@ -149,7 +157,77 @@ public class TreeBoxTest {
     AutoSelectTreeBox treeBox = new AutoSelectTreeBox();
     treeBox.initField();
     treeBox.checkAllKeys();
-    Assert.assertEquals(14, treeBox.getCheckedKeyCount()); // assert the null key is not available
+    assertEquals(14, treeBox.getCheckedKeyCount()); // assert the null key is not available
+  }
+
+  /**
+   * Test {@link #execIsEmpty} empty field
+   */
+  @Test
+  public void testEmpty() throws ProcessingException {
+    SimpleTreeBox treeBox = createSimpleTreeBox();
+    assertTrue(treeBox.isEmpty());
+    assertTrue(treeBox.getValue().isEmpty());
+    assertEquals(0, treeBox.getCheckedKeyCount());
+    assertEquals(null, treeBox.getCheckedKey());
+  }
+
+  /**
+   * Test {@link #execIsEmpty} non empty
+   */
+  @Test
+  public void testNonEmpty() throws ProcessingException {
+    SimpleTreeBox treeBox = createSimpleTreeBox();
+    treeBox.setValue(testValue);
+    assertFalse(treeBox.isEmpty());
+    ScoutAssert.assertSetEquals(testValue, treeBox.getValue());
+    assertEquals(1, treeBox.getCheckedKeyCount());
+    assertEquals(Long.valueOf(1L), treeBox.getCheckedKey());
+  }
+
+  /**
+   * Tests that the content is valid for a filled mandatory field. {@link #isContentValid()}
+   *
+   * @throws ProcessingException
+   */
+  @Test
+  public void testContentValid() throws ProcessingException {
+    SimpleTreeBox treeBox = createSimpleTreeBox();
+    treeBox.setValue(testValue);
+    treeBox.setMandatory(true);
+    assertTrue(treeBox.isMandatory());
+    assertTrue(treeBox.isContentValid());
+  }
+
+  /**
+   * Tests that the content is valid for an empty mandatory field. {@link #isContentValid()}
+   *
+   * @throws ProcessingException
+   */
+  @Test
+  public void testContentInvalid() throws ProcessingException {
+    SimpleTreeBox treeBox = createSimpleTreeBox();
+    treeBox.setMandatory(true);
+    assertTrue(treeBox.isMandatory());
+    assertFalse(treeBox.isContentValid());
+  }
+
+  /**
+   * Tests that the content is valid for an empty mandatory field. {@link #isContentValid()}
+   *
+   * @throws ProcessingException
+   */
+  @Test
+  public void testContentInvalidError() throws ProcessingException {
+    SimpleTreeBox treeBox = createSimpleTreeBox();
+    treeBox.setErrorStatus("Error");
+    assertFalse(treeBox.isContentValid());
+  }
+
+  private SimpleTreeBox createSimpleTreeBox() throws ProcessingException {
+    SimpleTreeBox treeBox = new SimpleTreeBox();
+    treeBox.initField();
+    return treeBox;
   }
 
   public class SimpleTreeBox extends AbstractTreeBox<Long> {

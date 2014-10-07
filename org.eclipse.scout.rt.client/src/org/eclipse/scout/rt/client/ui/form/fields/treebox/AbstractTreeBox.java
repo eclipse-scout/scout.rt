@@ -91,7 +91,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
    * When loadIncremental=true then this method is called on every node.
    * <p>
    * The default implementation is:
-   * 
+   *
    * <pre>
    * List&lt;ITreeNode&gt; children;
    * if (isLoadIncremental()) {
@@ -191,13 +191,13 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
    * Checks / unchecks all visible child nodes if the parent node gets checked / unchecked.
    * <p>
    * Makes only sense if
-   * 
+   *
    * <pre>
    * {@link #getConfiguredCheckable()}
    * </pre>
-   * 
+   *
    * is set to true.
-   * 
+   *
    * @since 3.10-M1 (backported to 3.8 / 3.9)
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -215,6 +215,16 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     List<Class<IFormField>> filtered = ConfigurationUtility.filterClasses(dca, IFormField.class);
     return ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IFormField.class);
+  }
+
+  /**
+   * On any value change or call to {@link #checkEmpty()} this method is called
+   * to calculate if the field represents an empty state (semantics)
+   * <p>
+   */
+  @Override
+  protected boolean execIsEmpty() throws ProcessingException {
+    return getValue().isEmpty();
   }
 
   /**
@@ -626,19 +636,23 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
   @Override
   public boolean isContentValid() {
     boolean valid = super.isContentValid();
-    if (valid && isMandatory()) {
-      if (getValue() == null || getValue().isEmpty()) {
-        return false;
-      }
+    if (valid && isMandatory() && getValue().isEmpty()) {
+      return false;
     }
     return valid;
   }
 
+  /**
+   * Value, empty {@link Set} in case of an empty value, never <code>null</code>.
+   */
   @Override
   public Set<T> getValue() {
     return CollectionUtility.hashSet(super.getValue());
   }
 
+  /**
+   * Initial value, empty {@link Set} in case of an empty value, never <code>null</code>.
+   */
   @Override
   public Set<T> getInitValue() {
     return CollectionUtility.hashSet(super.getInitValue());
@@ -660,24 +674,12 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
 
   @Override
   public int getCheckedKeyCount() {
-    Set<T> keys = super.getValue();
-    if (keys != null) {
-      return keys.size();
-    }
-    else {
-      return 0;
-    }
+    return getValue().size();
   }
 
   @Override
   public T getCheckedKey() {
-    Set<T> a = getCheckedKeys();
-    if (a != null && a.size() > 0) {
-      return CollectionUtility.firstElement(a);
-    }
-    else {
-      return null;
-    }
+    return CollectionUtility.firstElement(getCheckedKeys());
   }
 
   @Override
@@ -984,9 +986,9 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
     updateCheckedNodesFilter();
   }
 
-  /*
-   * Implementation of ICompositeField
-   */
+/*
+ * Implementation of ICompositeField
+ */
 
   @SuppressWarnings("unchecked")
   @Override

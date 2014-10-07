@@ -11,8 +11,11 @@
 package org.eclipse.scout.rt.client.ui.form.fields.listbox;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
+import java.util.HashSet;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -20,12 +23,24 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
+import org.eclipse.scout.rt.testing.commons.ScoutAssert;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
  * Tests for {@link AbstractListBox}
  */
-public class AbstractListBoxTest extends AbstractListBox<Long> {
+public class ListBoxTest extends AbstractListBox<Long> {
+  private HashSet<Long> m_testValue;
+
+  /**
+   * Initialize test values
+   */
+  @Before
+  public void setup() {
+    m_testValue = new HashSet<Long>();
+    m_testValue.add(1L);
+  }
 
   @Override
   protected void execFilterLookupResult(ILookupCall<Long> call, List<ILookupRow<Long>> result) throws ProcessingException {
@@ -48,4 +63,48 @@ public class AbstractListBoxTest extends AbstractListBox<Long> {
     assertEquals(formMock, getForm());
     assertEquals(formMock, getListBoxFilterBox().getForm());
   }
+
+  /**
+   * Test {@link #execIsEmpty} empty field
+   */
+  @Test
+  public void testEmpty() throws ProcessingException {
+    assertTrue(execIsEmpty());
+    assertTrue(getValue().isEmpty());
+    assertEquals(0, getCheckedKeyCount());
+  }
+
+  /**
+   * Test {@link #execIsEmpty} non empty
+   */
+  @Test
+  public void testNonEmpty() throws ProcessingException {
+    setValue(m_testValue);
+    assertFalse(execIsEmpty());
+    ScoutAssert.assertSetEquals(m_testValue, getValue());
+    assertEquals(1, getCheckedKeyCount());
+    assertEquals(Long.valueOf(1L), getCheckedKey());
+  }
+
+  /**
+   * Tests that the content is valid for a filled mandatory field. {@link #isContentValid()}
+   */
+  @Test
+  public void testContentValid() {
+    setValue(m_testValue);
+    setMandatory(true);
+    assertTrue(isMandatory());
+    assertTrue(isContentValid());
+  }
+
+  /**
+   * Tests that the content is valid for an empty mandatory field. {@link #isContentValid()}
+   */
+  @Test
+  public void testContentInvalid() {
+    setMandatory(true);
+    assertTrue(isMandatory());
+    assertFalse(isContentValid());
+  }
+
 }
