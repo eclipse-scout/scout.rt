@@ -3,6 +3,7 @@ scout.SmartField = function() {
   this._$popup;
   this.options;
   this._selectedOption = -1;
+  this._oldVal;
 };
 scout.inherits(scout.SmartField, scout.ValueField);
 
@@ -56,19 +57,23 @@ scout.SmartField.prototype._onKeydown = function(e) {
       }
     }
     if (pos != this.selectedOption) {
-      if (this._selectedOption >= 0 && this._selectedOption < $options.length) {
-        $($options[this._selectedOption]).removeClass('selected');
-      }
-      var $selectedOption = $($options[pos]);
-      $selectedOption.addClass('selected');
-      var h = this._$popup.height();
-      var hPerOption = 19; // TODO AWE: (smartfield) höhe aller optionen dynamisch ermitteln
-      var top = pos * hPerOption;
-      this._$popup.children('.options').scrollTop(top);
-      $.log.info('_selectedOption=' + this._selectedOption + ' pos='+pos + ' top=' + top + ' text=' +  $selectedOption.html());
-      this._selectedOption = pos;
+      this._selectOption($options, pos);
     }
   }
+};
+
+scout.SmartField.prototype._selectOption = function($options, pos) {
+  if (this._selectedOption >= 0 && this._selectedOption < $options.length) {
+    $($options[this._selectedOption]).removeClass('selected');
+  }
+  var $selectedOption = $($options[pos]);
+  $selectedOption.addClass('selected');
+  var h = this._$popup.height();
+  var hPerOption = 19;
+  var top = pos * hPerOption;
+  this._$popup.children('.options').scrollTop(top);
+  $.log.info('_selectedOption=' + this._selectedOption + ' pos='+pos + ' top=' + top + ' text=' +  $selectedOption.html());
+  this._selectedOption = pos;
 };
 
 scout.SmartField.prototype._onKeyup = function(e) {
@@ -124,14 +129,24 @@ scout.SmartField.prototype._openPopup = function() {
   scout.HtmlComponent.setSize(this._$popup.children('.options'), fieldBounds.width - 4, popupHeight - 19 - 3);
 
   // add options
+  // try to find selected value in options
   var i, option,
-    $optionsDiv = this._$popup.children('.options');
+    $optionsDiv = this._$popup.children('.options'),
+    val = this.$field.val(),
+    selectedPos = -1;
   for (i=0; i<numOptions; i++) {
     option = this.options[i];
     $('<div>').
       on('mousedown', this._onOptionMousedown.bind(this)).
       appendTo($optionsDiv).
       html(option);
+    if (option === val) {
+      selectedPos = i;
+    }
+  }
+
+  if (selectedPos > -1) {
+    this._selectOption(this._$popup.children('.options').children(), selectedPos);
   }
 };
 
@@ -144,7 +159,8 @@ scout.SmartField.prototype._onOptionMousedown = function(e) {
 
 
 scout.SmartField.prototype._onFocus = function() {
-  $.log.debug("_onFocus");
+  this._oldVal = this.$field.val();
+  $.log.debug('_onFocus. set oldVal=' + this._oldVal);
   if (!this._$popup) {
     this._openPopup();
   }
@@ -175,6 +191,11 @@ scout.SmartField.prototype._getStatusText = function(numOptions) {
 };
 
 scout.SmartField.prototype._filterOptions = function(text) {
+  var val = this.$field.val();
+  if (this._oldVal === val) {
+    $.log.debug('value of field has not changed - do not filter (oldVal=' + this._oldVal + ')');
+    return;
+  }
   this._selectedOption = -1;
   var statusText, match, numVisibleOptions = 0,
     showAll = !text || '*' === text,
@@ -183,7 +204,6 @@ scout.SmartField.prototype._filterOptions = function(text) {
     if (showAll) {
       $(this).setVisible(true);
     } else {
-      // TODO AWE: (smartfield) implement clever client-side match algorithm
       match = $(this).html().match(regexp);
       if (match) { numVisibleOptions++; }
       $.log.debug('regexp='+regexp + ' html='+$(this).html());
@@ -192,5 +212,7 @@ scout.SmartField.prototype._filterOptions = function(text) {
   });
   if (showAll) { numVisibleOptions = this.options.length; }
   this._$popup.children('.status').text(this._getStatusText(numVisibleOptions));
+  this._oldVal = val;
+  $.log.debug('updated oldVal=' + this._oldVal);
 };
 

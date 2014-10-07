@@ -88,7 +88,7 @@ scout.SmartFieldRemote.prototype._onKeyup = function(e) {
   // enter
   if (e.which == 13) {
     if (this._selectedOption > -1) {
-      var value = $(this._$popup.children('.options').children(':visible').get(this._selectedOption)).html();
+      var value = $(this._$popup.children('.options').children().get(this._selectedOption)).html();
       this.$field.val(value);
       this.$field.get(0).select();
       this._closePopup();
