@@ -5,136 +5,143 @@
 /* date box */
 
 .date-field > .predict {
-color: @color-bench-semi;
+  color: @color-bench-semi;
 }
 
 .field.has-error ~ .date-box{
-border-color:#A61300
+  border-color: @color-error;
 }
 
 .date-box{
-height: 224px;
-width: 224px;
-position: absolute;
-background-color: #FFF;
-border: 1px solid #0082A1  ;
-padding: 6px;
-z-index: 100;
+  height: 224px;
+  width: 224px;
+  position: absolute;
+  background-color: #FFF;
+  border: 1px solid @color-bench-text-active;
+  padding: 6px;
+  z-index: 100;
+
+  /* necessary for animation */
+  overflow: hidden;
+}
+
+/* necessary for animation */
+.date-box .viewport {
+  position: absolute;
+  height: 100%;
+}
+
+/* necessary for animation */
+.date-box-month {
+  display: inline-block;
 }
 
 .date-box-weekday,
 .date-box-day{
-width: 30px;
-margin: 0px;
-height: 26px;
-line-height: 26px;
-float: left;
-left: 100px;
-text-align: center;
-cursor: default;
+  width: 30px;
+  margin: 0px;
+  height: 26px;
+  line-height: 26px;
+  float: left;
+  left: 100px;
+  text-align: center;
+  cursor: default;
 }
 
 .date-box-day:hover {
-color: #0082A1;
+  color: @color-bench-text-active;
 }
 
 .date-box-weekday{
-font-weight: bold;
-color: #000;
+  font-weight: bold;
+  color: #000;
 }
 
 .date-box-day{
-cursor: pointer;
+  cursor: pointer;
 }
 
 .date-box-weekend{
-color:#777777;
+  color:#777777;
 }
 
 .date-box-out{
-color:#d2d2d2;
+  color:#d2d2d2;
 }
 
 .date-box-out-weekend{
-color: #aaa;
+  color: #aaa;
 }
 
 .date-box-now{
-font-weight: bold !important;}
+  font-weight: bold !important;
+}
 
 .date-box-select{
-width: 30px;
-line-height: 26px;
-height: 26px;
-font-weight:normal;
-background-color:#ededed;
+  width: 30px;
+  line-height: 26px;
+  height: 26px;
+  font-weight:normal;
+  background-color: #ededed;
 }
 
 .date-box-header{
-height: 26px;
-width: 211px;
-float: left;
-margin: 0px 0px 5px 0px;
+  line-height: 26px;
+  height: 26px;
+  width: 211px;
+  float: left;
+  color: @color-bench-text-active;
+  margin: 0px 0px 5px 0px;
 }
 
-.date-box-month{
-line-height: 26px;
-height: 26px;
-width: 110px;
-text-align: center;
-cursor: default;
-position: absolute;
-left: 55px;
-top: 5px;
-color: #0082A1;
-font-size:13px;
+.date-box-header-month{
+  text-align: center;
+  cursor: default;
+  font-size:13px;
 }
 
 .date-box-left-y,
 .date-box-left-m,
 .date-box-right-y,
 .date-box-right-m{
-text-align: center;
-padding: 3px 0px 2px 0px;
-width: 20px;
-height: 14px;
-cursor: pointer;
-font-family: FontAwesome;
-color:#0082A1;
-margin: 0px 2px 0px 0px;
-font-size: 18px;
-font-weight: bold;
+  text-align: center;
+  width: 20px;
+  height: 14px;
+  cursor: pointer;
+  .font-icon(bold);
+  margin: 0px 2px 0px 0px;
+  font-size: 18px;
 }
 
 .date-box-left-y:hover,
 .date-box-left-m:hover,
 .date-box-right-y:hover,
 .date-box-right-m:hover{
-color:#FE9915;
+  color: @color-bench-highlight;
 }
 
 .date-box-left-y,
 .date-box-left-m{
-float: left;
+  float: left;
 }
 
 .date-box-left-y:before {
-content:"\f100";
+  content:"\f100";
 }
 
 .date-box-left-m:before {
-content:"\f104";
+  content:"\f104";
 }
 
 .date-box-right-y,
 .date-box-right-m{
-float: right;
+  float: right;
 }
 
 .date-box-right-y:before {
-content:"\f101";
+  content:"\f101";
 }
 
 .date-box-right-m:before {
-content:"\f105";
+  content:"\f105";
 }
