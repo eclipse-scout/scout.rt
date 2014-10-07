@@ -42,8 +42,8 @@ scout.HtmlComponent.getBounds = function($comp) {
   return new scout.Rectangle(
       parseInt($comp.css('left'), 10),
       parseInt($comp.css('top'), 10),
-      $comp.width(),
-      $comp.height());
+      $comp.outerWidth(true),
+      $comp.outerHeight(true));
 };
 
 scout.HtmlComponent.setBounds = function($comp, vararg, y, width, height) {

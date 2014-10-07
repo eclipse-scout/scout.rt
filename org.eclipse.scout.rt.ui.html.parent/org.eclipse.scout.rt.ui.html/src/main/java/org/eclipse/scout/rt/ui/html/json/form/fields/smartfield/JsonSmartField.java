@@ -10,18 +10,22 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form.fields.smartfield;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.scout.commons.holders.Holder;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.CachingEnabled;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
+import org.eclipse.scout.rt.ui.html.json.JsonEvent;
+import org.eclipse.scout.rt.ui.html.json.JsonException;
+import org.eclipse.scout.rt.ui.html.json.JsonResponse;
+import org.eclipse.scout.rt.ui.html.json.form.fields.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -30,38 +34,104 @@ public class JsonSmartField extends JsonValueField<ISmartField> {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonSmartField.class);
 
+  private static final String PROP_CACHING_ENABLED = "cachingEnabled";
+
+  private static final String PROP_OPTIONS = "options";
+
   private static final int MAX_OPTIONS = 100;
+
+  private List<? extends ILookupRow<?>> options = new ArrayList<>();
 
   public JsonSmartField(ISmartField model, IJsonSession session, String id) {
     super(model, session, id);
+
+  }
+
+  @Override
+  protected void initJsonProperties(ISmartField model) {
+    super.initJsonProperties(model);
+    putJsonProperty(new JsonProperty<ISmartField<?>>(PROP_CACHING_ENABLED, model) {
+      @Override
+      protected Boolean modelValue() {
+        return isCachingEnabled();
+      }
+    });
+    putJsonProperty(new JsonProperty<ISmartField<?>>(PROP_OPTIONS, model) {
+      @Override
+      protected List<? extends ILookupRow<?>> modelValue() {
+        return options;
+      }
+
+      @Override
+      public Object prepareValueForToJson(Object value) {
+        return optionsToJson((List<? extends ILookupRow<?>>) value);
+      }
+    });
   }
 
   @Override
   public String getObjectType() {
-    return "SmartField";
+    return isCachingEnabled() ? "SmartField" : "SmartFieldRemote";
   }
 
   @Override
-  public JSONObject toJson() {
-    return addOptions(super.toJson());
+  protected void attachModel() {
+    super.attachModel();
+    options = isCachingEnabled() ?
+        loadOptions(IContentAssistField.BROWSE_ALL_TEXT) :
+        Collections.<ILookupRow<?>> emptyList();
+  }
+
+  private JSONArray optionsToJson(List<? extends ILookupRow<?>> options) {
+    JSONArray optionsArray = new JSONArray();
+    for (ILookupRow<?> lr : options) {
+      optionsArray.put(lr.getText());
+    }
+    return optionsArray;
+  }
+
+  // TODO AWE: (smartfield) event 'code-type neu laden' behandeln. browser-seitige felder mit cachingEnabled neu laden
+  // evtl. nur wenn der Code-Type passt
+
+  /**
+   * Returns whether or not it is allowed to cache all options on the browser-side.
+   * When allowed, the client does not send any requests to the server while the
+   * smart-field is used until a value is selected.
+   */
+  private boolean isCachingEnabled() {
+    return getModel().getClass().isAnnotationPresent(CachingEnabled.class);
   }
 
   private JSONObject addOptions(JSONObject json) {
     // TODO AWE: (smartfield) überlegen ob wir die optionen wirklich hier laden wollen oder besser erst,
     // wenn das popup im UI zum ersten mal geöffnet wird.
-    final Holder<List<? extends ILookupRow<?>>> holder = new Holder<>();
-    new ClientSyncJob("loadOptions", getJsonSession().getClientSession()) {
-      @Override
-      protected void runVoid(IProgressMonitor monitor) throws Throwable {
-        @SuppressWarnings("unchecked")
-        List<? extends ILookupRow<?>> list = getModel().callBrowseLookup(IContentAssistField.BROWSE_ALL_TEXT, MAX_OPTIONS);
-        holder.setValue(list);
-      }
-    }.runNow(new NullProgressMonitor());
-    JSONArray optionsArray = new JSONArray();
-    for (ILookupRow<?> lr : holder.getValue()) {
-      optionsArray.put(lr.getText());
-    }
-    return putProperty(json, "options", optionsArray);
+    return putProperty(json, "options", loadOptions(IContentAssistField.BROWSE_ALL_TEXT));
   }
+
+  private List<? extends ILookupRow<?>> loadOptions(final String query) {
+    try {
+      return getModel().callBrowseLookup(query, MAX_OPTIONS);
+    }
+    catch (ProcessingException e) {
+      throw new JsonException(e);
+    }
+  }
+
+  @Override
+  public void handleUiEvent(JsonEvent event, JsonResponse res) {
+    if ("loadOptions".equals(event.getType())) {
+      handleLoadOptions(event);
+    }
+    else {
+      super.handleUiEvent(event, res);
+    }
+  }
+
+  private void handleLoadOptions(JsonEvent event) {
+    String query = event.getData().optString("query");
+    LOG.debug("load options for query=" + query);
+    JSONArray options = optionsToJson(loadOptions(query));
+    addActionEvent("optionsLoaded", putProperty(new JSONObject(), "options", options));
+  }
+
 }

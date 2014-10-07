@@ -70,6 +70,7 @@
 //@include("form/fields/numberfield/NumberField.js");
 //@include("form/fields/stringfield/StringField.js");
 //@include("form/fields/smartfield/SmartField.js");
+//@include("form/fields/smartfield/SmartFieldRemote.js");
 //@include("form/fields/datefield/DateField.js");
 //@include("form/fields/datefield/DatePicker.js");
 //@include("form/fields/groupbox/GroupBox.js");
