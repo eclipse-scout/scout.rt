@@ -32,11 +32,11 @@ import org.eclipse.scout.rt.server.services.common.jms.internal.JmsTransactionMe
 /**
  * J2eeJmsObserver implementation with anchor in servlet context J2eeJmsObserver
  * expects to find its IServerSession in the servlet context
- * 
+ *
  * @deprecated use org.eclipse.scout.rt.server.jms.AbstractSimpleJmsService. Will be removed in the N release.
  */
 @Deprecated
-@SuppressWarnings("restriction")
+@SuppressWarnings({"restriction", "deprecation"})
 public class JmsObserver {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JmsObserver.class);
 
@@ -55,7 +55,7 @@ public class JmsObserver {
   /**
    * Cleanup all weak references. Should be called when a Session terminates to
    * remove all potentially weak referenced callback classes.
-   * 
+   *
    * @throws ProcessingException
    */
   public void cleanup() throws ProcessingException {
@@ -92,7 +92,7 @@ public class JmsObserver {
    * Callback method that gets called by all listeners on the queue. Iterates
    * the observer map for given config and calls all registered callback classes
    * for this config.
-   * 
+   *
    * @param config
    *          {@link JmsJndiConfig}
    * @param msg
@@ -127,7 +127,7 @@ public class JmsObserver {
    * use of username password to connect to JMS-server. Warning: IJmsCallback
    * classes given are weak referenced! Make sure the reference to it is managed
    * outside this class. It will be garbage collected otherwise!
-   * 
+   *
    * @param callback
    *          {@link IJmsCallback}
    * @param config
@@ -162,7 +162,7 @@ public class JmsObserver {
    * the callback is listening on as parameter. Makes sure that listener is
    * removed if no callback class is listening on the given config anymore.
    * Method is thread safe.
-   * 
+   *
    * @param callback
    *          {@link IJmsCallback}
    * @param config
@@ -248,7 +248,7 @@ public class JmsObserver {
     /**
      * Start to listen on the queue defined in {@link JmsTransactionMember} instance of
      * this class.
-     * 
+     *
      * @throws ProcessingException
      */
     public void startListeningOnQueue() throws ProcessingException {
@@ -265,7 +265,7 @@ public class JmsObserver {
 
     /**
      * Stop to listen on the queue defined in {@link ScoutJMSXAResource} instance of this class.
-     * 
+     *
      * @throws ProcessingException
      */
     public void stopListeningOnQueue() throws ProcessingException {

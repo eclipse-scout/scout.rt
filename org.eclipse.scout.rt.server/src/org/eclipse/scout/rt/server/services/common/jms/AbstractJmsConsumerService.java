@@ -24,6 +24,7 @@ import org.eclipse.scout.service.AbstractService;
  * @deprecated use org.eclipse.scout.rt.server.jms.transactional.AbstractTransactionalJmsService<T>. Will be removed in
  *             the N release.
  */
+@SuppressWarnings("deprecation")
 @Deprecated
 public abstract class AbstractJmsConsumerService extends AbstractService implements IJmsConsumerService {
 
@@ -130,7 +131,7 @@ public abstract class AbstractJmsConsumerService extends AbstractService impleme
 
   /**
    * Sends given object to the JMS queue / topic
-   * 
+   *
    * @param object
    *          {@link Object}
    */
@@ -154,7 +155,7 @@ public abstract class AbstractJmsConsumerService extends AbstractService impleme
   /**
    * Retrieve next object from queue / topic.<br>
    * Wait max given milliseconds for next message if not there yet.
-   * 
+   *
    * @param timeoutMillis
    *          long
    */

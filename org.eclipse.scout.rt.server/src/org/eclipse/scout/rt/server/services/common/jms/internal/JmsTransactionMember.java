@@ -53,14 +53,14 @@ import org.eclipse.scout.rt.server.transaction.AbstractTransactionMember;
 
 /**
  * Queue/Topic xa resource (per request)
- * 
+ *
  * @since Build 192
  *        (Extracted out of JmsService class to an autonomous class)
  * @deprecated use org.eclipse.scout.rt.server.jms.transactional.JmsTransactionMember. Will be removed in
  *             the N release.
  */
 @Deprecated
-@SuppressWarnings("restriction")
+@SuppressWarnings({"restriction", "deprecation"})
 public class JmsTransactionMember extends AbstractTransactionMember {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JmsTransactionMember.class);
 
@@ -87,7 +87,7 @@ public class JmsTransactionMember extends AbstractTransactionMember {
   /**
    * Makes sure the message connection factory and destination (queue / topic)
    * cache is set and can be used.
-   * 
+   *
    * @throws ProcessingException
    */
   public void ensureCache() throws ProcessingException {

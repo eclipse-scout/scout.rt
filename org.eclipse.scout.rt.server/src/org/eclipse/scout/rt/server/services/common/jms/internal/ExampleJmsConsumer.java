@@ -16,6 +16,7 @@ import org.eclipse.scout.rt.server.services.common.jms.AbstractJmsConsumerServic
 /**
  * @deprecated Will be removed in the N release.
  */
+@SuppressWarnings("deprecation")
 @Deprecated
 @Priority(-1)
 public class ExampleJmsConsumer extends AbstractJmsConsumerService {
