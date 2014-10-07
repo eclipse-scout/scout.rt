@@ -23,4 +23,10 @@ public class JsonDateField extends JsonValueField<IDateField> {
   public String getObjectType() {
     return "DateField";
   }
+
+  @Override
+  protected void handleUiDisplayTextChangedImpl(String displayText, boolean whileTyping) {
+    getModel().getUIFacade().setTextFromUI(displayText, whileTyping);
+  }
+
 }

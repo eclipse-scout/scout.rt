@@ -1,15 +1,9 @@
 scout.DatePicker = function(dateFormat, $field) {
   this._dateFormat = dateFormat;
   this._$field = $field;
+  this.selectedDate = null;
+  this.viewDate = null;
   this.$box = null;
-};
-
-scout.DatePicker.prototype.selectDateByText = function(dateStr) {
-  var date = null;
-  if (dateStr) {
-    date = this._dateFormat.parseLazy(dateStr);
-  }
-  this.selectDate(date);
 };
 
 scout.DatePicker.prototype.selectDate = function(date) {
@@ -50,7 +44,7 @@ scout.DatePicker.prototype._onDayMouseDown = function(event) {
   //FIXME CGU click would be better but comes after field.blur -> ignore blur when clicking inside box and close box here
   var $target = $(event.currentTarget);
   var date = $target.data('date');
-  this.set(date);
+  this._onDateSelected(date);
 };
 
 scout.DatePicker.prototype._onMouseWheel = function(event) {
@@ -73,7 +67,6 @@ scout.DatePicker.prototype.shiftViewDate = function(years, months, days) {
   this.show(date);
 };
 
-//FIXME CGU makes more sense in DateField.js
 scout.DatePicker.prototype.shiftSelectedDate = function(years, months, days) {
   var date = this.selectedDate;
   if (!date) {
@@ -82,11 +75,11 @@ scout.DatePicker.prototype.shiftSelectedDate = function(years, months, days) {
   date = scout.dates.shift(date, years, months, days);
 
   var text = this._dateFormat.format(date);
-  this.set(text);
+  this._onDateSelected(text);
   this.selectDate(date);
 };
 
-scout.DatePicker.prototype.set = function (text){
+scout.DatePicker.prototype._onDateSelected = function (text){
   this._$field.val(text);
 };
 

@@ -31,15 +31,15 @@ scout.FormField.prototype._renderProperties = function() {
 };
 
 scout.FormField.prototype._renderMandatory = function(mandatory) {
-  this.$container.setClass(mandatory, 'mandatory');
+  this.$container.updateClass(mandatory, 'mandatory');
 };
 
 scout.FormField.prototype._renderErrorStatus = function(errorStatus) {
   var title;
-  this.$container.setClass(errorStatus, 'has-error');
+  this.$container.updateClass(errorStatus, 'has-error');
 
   if (this.$field) {
-    this.$field.setClass(errorStatus, 'has-error');
+    this.$field.updateClass(errorStatus, 'has-error');
   }
 
   if (this.$status) {

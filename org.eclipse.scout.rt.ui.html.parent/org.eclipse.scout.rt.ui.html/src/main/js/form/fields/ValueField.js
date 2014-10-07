@@ -21,7 +21,7 @@ scout.ValueField.prototype._renderDisplayText = function(displayText) {
   this.$field.val(displayText);
 };
 
-scout.ValueField.prototype._readDisplayText = function(displayText) {
+scout.ValueField.prototype._readDisplayText = function() {
   if (!this.$field) {
     return;
   }

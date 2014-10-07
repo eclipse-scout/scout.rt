@@ -130,6 +130,18 @@ $.fn.triggerRightClick = function() {
   return $(this);
 };
 
+$.fn.triggerKeyDown = function(key, modifier) {
+  var event = jQuery.Event("keydown");
+  event.which = key;
+  if (modifier === 'ctrl') {
+    event.ctrlKey = true;
+  }
+  if (modifier === 'shift') {
+    event.shiftKey = true;
+  }
+  (this).trigger(event);
+};
+
 $.fn.triggerMouseDown = function(clicks) {
   return $(this).triggerWithDetail('mousedown', clicks);
 };
@@ -191,6 +203,11 @@ $.fn.triggerContextMenu = function() {
   return $this;
 };
 
+/**
+ * Triggers mouse down, mouse up and click events. <br>
+ * Also sets the detail property of the originalEvent which contains the numbers of clicks.
+ * @param clicks the number of clicks. If not set 1 is used.
+ */
 $.fn.triggerClick = function(clicks) {
   var $this = $(this);
 

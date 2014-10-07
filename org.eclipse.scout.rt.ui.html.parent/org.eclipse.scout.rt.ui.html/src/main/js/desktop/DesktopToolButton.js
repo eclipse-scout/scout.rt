@@ -14,11 +14,11 @@ scout.DesktopToolButton.prototype._render = function($parent) {
     .appendDIV('taskbar-tool-item', this.text)
     .attr('data-icon', iconId).attr('data-shortcut', keystroke);
 
+  //FIXME CGU refactor to renderProperties (enabled and selected may be changed by server)
   if (this.enabled) {
     this.$div.on('click', '', this._click.bind(this));
-  } else  {
-    this.$div.setClass('disabled');
   }
+  this.$div.setEnabled(this.enabled);
 
   if (this.selected && this.form) {
     this.$div.select(true);

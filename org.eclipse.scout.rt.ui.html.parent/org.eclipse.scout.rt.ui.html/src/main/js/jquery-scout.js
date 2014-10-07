@@ -181,7 +181,7 @@
     return this;
   };
 
-  $.fn.setClass = function(condition, cssClass) {
+  $.fn.updateClass = function(condition, cssClass) {
     if (condition) {
       this.addClass(cssClass);
     } else {
@@ -191,7 +191,7 @@
   };
 
   $.fn.select = function(selected) {
-    return this.setClass(selected, 'selected');
+    return this.updateClass(selected, 'selected');
   };
 
   $.fn.isSelected = function() {

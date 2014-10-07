@@ -29,6 +29,8 @@ describe("TableField", function() {
     }
     var model =  {
       "id": id,
+      "enabled": true,
+      "visible": true
     };
     return model;
   }

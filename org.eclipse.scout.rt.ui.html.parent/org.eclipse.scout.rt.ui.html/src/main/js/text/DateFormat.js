@@ -241,12 +241,21 @@ scout.DateFormat.prototype.analyze = function(text, asNumber) {
 };
 
 
-scout.DateFormat.prototype.parseLazy = function (text) {
+scout.DateFormat.prototype.parse = function (text) {
+  if (!text) {
+    return;
+  }
+
   var dateInfo = this.analyze(text, true);
+  if (isNaN(dateInfo.year) || isNaN(dateInfo.year) || isNaN(dateInfo.day)) {
+    return null;
+  }
+
   var year = dateInfo.year;
   if (year < 100) {
     year += 2000;
   }
+
   return new Date(year, dateInfo.month - 1, dateInfo.day);
 };
 

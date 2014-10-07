@@ -24,15 +24,20 @@ scout.DateField.prototype._render = function($parent) {
 };
 
 scout.DateField.prototype._onFocus = function() {
-  var displayText = this.$field.val();
-  this._picker.selectDateByText(displayText);
+  this._updateSelection(this.$field.val());
   if (!this._$predict || this._$predict.length === 0){
     this._$predict = this._createPredictionField();
   }
 };
 
 scout.DateField.prototype._onFieldBlur = function() {
-  scout.DateField.parent.prototype._onFieldBlur.call(this);
+  this._acceptPrediction();
+
+  //Only update model if date is valid (according to ui)
+  if (!this.errorStatusUi) {
+    var displayText = this.$field.val();
+    this._updateDisplayText(displayText, false);
+  }
 
   this.$field.css('background-color', this._$predict.css('background-color'));
   this._$predict.remove();
@@ -44,11 +49,19 @@ scout.DateField.prototype._onKeyDown = function(event) {
   var years = 0, months = 0, days = 0, diff = 0;
   var cursorPos = this.$field[0].selectionStart;
   var displayText = this.$field.val();
+  var prediction = this._$predict.val();
 
-  if (event.which === scout.keys.ESC) {
+  if (event.which === scout.keys.ENTER) {
+    //FIXME CGU move to ValueField? close picker afterwards?
+    this._updateDisplayText(this._readDisplayText(), false);
+//    this._picker.close();
+  } else if (event.which === scout.keys.ESC) {
     this._picker.close();
   } else if (event.which === scout.keys.RIGHT && cursorPos === displayText.length) {
-    this._acceptPrediction();
+    //Move cursor one right and apply next char of the prediction
+    if (prediction) {
+      this.$field.val(prediction.substring(0, displayText.length + 1));
+    }
   } else if (event.which == scout.keys.PAGE_UP || event.which == scout.keys.PAGE_DOWN) {
     months = (event.which === scout.keys.PAGE_UP ? -1 : 1);
     this._picker.shiftViewDate(0, months, 0);
@@ -77,39 +90,66 @@ scout.DateField.prototype._onKeyDown = function(event) {
 
       displayText = this.$field.val();
       var predictedDateText = '';
-      if (this._validate(displayText)){
+      if (this.validateDisplayText(displayText)){
         predictedDateText = this._predict(displayText);
       }
       this._$predict.val(predictedDateText);
-      this._picker.selectDateByText(predictedDateText);
+      this._updateSelection(predictedDateText);
     }.bind(this), 1);
   }
+};
+
+scout.DateField.prototype._updateSelection = function(displayText) {
+  var date = this._dateFormat.parse(displayText);
+  this._picker.selectDate(date);
 };
 
 /**
  * Analyzes the text and checks whether all relevant parts are filled.<p>
  * If year is provided, month and day need to be provided as well.<br>
  * If no year but a month is provided day needs to be provided as well.
+ * @return errorStatus
  */
-scout.DateField.prototype._validate = function (text) {
+scout.DateField.prototype._validateDisplayText = function (text) {
+  if (!text) {
+    return;
+  }
+
+  //FIXME CGU what if text is 12. Juli 2014 -> wrong? actually depends on pattern... check with cru prototype
+  //FIXME CGU optimize validation -> 1a.12.2003 currently is valid because parseInt strips 'a' maybe better use regexp
   var dateInfo = this._dateFormat.analyze(text, true);
   var day = dateInfo.day, month = dateInfo.month, year = dateInfo.year;
+  var valid = false;
 
   if (year) {
-    return day >= 0 && day < 32 && month >= 0 && month < 13 && year > 0 && year < 9999;
+    valid = day >= 0 && day < 32 && month >= 0 && month < 13 && year > 0 && year < 9999;
   } else if (month) {
-    return day >= 0 && day < 32 && month >= 0 && month < 13;
+    valid =  day >= 0 && day < 32 && month >= 0 && month < 13;
   } else if (day) {
-    return day >= 0 && day < 32;
-  } else {
-    return false;
+    valid = day >= 0 && day < 32;
   }
+  if (!valid) { //FIXME CGU translation
+    return {message: 'Das Datum ist in einem ungültigen Format'};
+  }
+};
+
+/*
+ * @return true if valid, false if not
+ */
+scout.DateField.prototype.validateDisplayText = function (text) {
+  this.errorStatusUi = this._validateDisplayText(text);
+  this._renderErrorStatus(this.errorStatusUi);
+  return !this.errorStatusUi;
 };
 
 scout.DateField.prototype._acceptPrediction = function() {
   var prediction = this._$predict.val();
+  if (!prediction) {
+    return;
+  }
+
   this.$field.val(prediction);
-  this._picker.selectDateByText(prediction);
+  this._updateSelection(prediction);
 };
 
 scout.DateField.prototype._predict = function(text) {
@@ -157,6 +197,7 @@ scout.DateField.prototype._createPredictionField = function () {
   var fieldBg = this.$field.css('background-color');
   this.$field.css('background-color', 'transparent');
   $predict.css('background-color', fieldBg);
+  $predict.val('');
 
   this.$field.before($predict);
   return $predict;
