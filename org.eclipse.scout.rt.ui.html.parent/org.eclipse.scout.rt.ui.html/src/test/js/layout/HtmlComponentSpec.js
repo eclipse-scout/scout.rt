@@ -123,15 +123,25 @@ describe("HtmlComponent", function() {
         } else {
           throw new Error('unexpected CSS key');
         }
+      },
+      outerWidth:function(withMargins) {
+        return 6;
+      },
+      outerHeight:function(withMargins) {
+        return 7;
       }
     };
 
     addWidthHeightMock(jqueryMock);
 
     it("returns bounds without 'px'", function() {
+      spyOn(jqueryMock, 'outerWidth').and.callThrough();
+      spyOn(jqueryMock, 'outerHeight').and.callThrough();
       var actual = scout.HtmlComponent.getBounds(jqueryMock);
       var expected = new scout.Rectangle(4, 5, 6, 7);
       expect(actual).toEqual(expected);
+      expect(jqueryMock.outerWidth).toHaveBeenCalledWith(true);
+      expect(jqueryMock.outerHeight).toHaveBeenCalledWith(true);
     });
 
   });
