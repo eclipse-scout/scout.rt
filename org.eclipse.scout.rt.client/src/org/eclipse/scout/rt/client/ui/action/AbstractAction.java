@@ -197,8 +197,6 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   /**
    * @deprecated will be removed in release 5.0; use {@link AbstractAction#execSelectionChanged(boolean)} instead.
    */
-  @ConfigOperation
-  @Order(31)
   @Deprecated
   protected void execToggleAction(boolean selected) throws ProcessingException {
   }

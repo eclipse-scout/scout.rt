@@ -182,8 +182,6 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
    * @throws ProcessingException
    * @deprecated will be removed in release 5.0; use {@link AbstractButton#execSelectionChanged(boolean)} instead.
    */
-  @ConfigOperation
-  @Order(200)
   @Deprecated
   protected void execToggleAction(boolean selected) throws ProcessingException {
   }
