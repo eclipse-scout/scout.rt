@@ -1,32 +1,32 @@
 .scrollbar {
-	position: absolute;
-	width: 10px;
-	height: 100%;
-	z-index: 1;
-	cursor: pointer;
-	right: 6px;
-	margin-top: 8px;
-	margin-bottom: 8px;
+  position: absolute;
+  width: 10px;
+  height: 100%;
+  z-index: 1;
+  cursor: pointer;
+  right: 6px;
+  margin-top: 8px;
+  margin-bottom: 8px;
 }
 
 .scrollbar-thumb {
-	position: absolute;
-	width: 8px;
-	top: 0px;
-	z-index: 2;
-	background-color: rgba(255, 255, 255, 0.3);
-	cursor: pointer;
-	border-radius: 4px;
+  position: absolute;
+  width: 8px;
+  top: 0px;
+  z-index: 2;
+  background-color: rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  border-radius: 4px;
 }
 
-.scrollbar-thumb-move, 
-.scrollbar-thumb:hover{
-	background-color: rgba(255, 255, 255, 0.6);
+.scrollbar-thumb-move,
+.scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.6);
 }
 
 .scrollable-y {
-	position: absolute;
-	top: 0px;
-	height: 100%;
-	width: 100%;	
+  position: absolute;
+  top: 0px;
+  height: 100%;
+  width: 100%;
 }

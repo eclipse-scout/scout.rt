@@ -1,7 +1,14 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-scout.Scrollbar = function($parent, axis) {
+// TODO AWE: (scrollbar) discuss with C.GU, C.RU:
+// - bugfix: Scrollbar impl. cannot deal with scrollTo()
+// - bugfix: Scrollbar should not change insets (padding, margin) of scrollable container
+// - rename scrollable-y to 'viewport' (as in JScrollPane)
+// - rename initThumb to update
+// - pass options object to Ctor instead of multiple arguments
+
+scout.Scrollbar = function($parent, axis, invertColors) {
   this._$parent = $parent;
   this._beginDefault = 0;
   this._thumbRange;
@@ -13,6 +20,9 @@ scout.Scrollbar = function($parent, axis) {
   this.axis = axis;
   this._$scrollbar = $parent.beforeDiv('', 'scrollbar');
   this._$thumb = this._$scrollbar.appendDiv('', 'scrollbar-thumb');
+  if (invertColors === true) {
+    this._$thumb.css('background-color', 'rgba(0, 0, 0, 0.3)');
+  }
   this._dim = (axis === 'x' ? 'Width' : 'Height');
   this._dir = (axis === 'x' ? 'left' : 'top');
 

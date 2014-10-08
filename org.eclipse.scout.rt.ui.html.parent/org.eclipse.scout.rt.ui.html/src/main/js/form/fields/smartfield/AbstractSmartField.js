@@ -35,7 +35,7 @@ scout.AbstractSmartField.prototype._render = function($parent) {
  */
 scout.AbstractSmartField.prototype._get$Options = function(visible) {
   var filter = visible === true ? ':visible' : undefined;
-  return this._get$OptionsDiv().children(filter);
+  return this._get$OptionsDiv().children('.scrollable-y').children(filter);
 };
 
 scout.AbstractSmartField.prototype._get$OptionsDiv = function() {
@@ -147,13 +147,17 @@ scout.AbstractSmartField.prototype._showPopup = function(numOptions, vararg) {
     popupBounds = new scout.Rectangle(fieldBounds.x, fieldBounds.y + fieldBounds.height, fieldBounds.width, popupHeight);
   this._$popup = $('<div>').
     addClass('smart-field-popup').
-    append($('<div>').addClass('options')).
+    append($('<div>').addClass('options').
+      append($('<div>').addClass('scrollable-y'))).
     append($('<div>').addClass('status')).
     appendTo(this.$container);
   scout.HtmlComponent.setBounds(this._$popup, popupBounds);
   // layout options and status-div
   var $optionsDiv = this._get$OptionsDiv();
-//  $optionsDiv.perfectScrollbar(); // FIXME try
+
+  this.scrollbar = new scout.Scrollbar($optionsDiv.children('.scrollable-y'), 'y', true);
+  this.scrollbar.initThumb();
+
   scout.HtmlComponent.setSize($optionsDiv, fieldBounds.width - 4, popupHeight - 19 - 3);
   this._setStatusText(vararg);
 };
@@ -163,13 +167,13 @@ scout.AbstractSmartField.prototype._showPopup = function(numOptions, vararg) {
  */
 scout.AbstractSmartField.prototype._renderOptions = function(options) {
   var i, option, selectedPos = -1,
-    $optionsDiv = this._get$OptionsDiv(),
+    $viewportDiv = this._get$OptionsDiv().children('.scrollable-y'),
     val = this.$field.val();
   for (i=0; i<options.length; i++) {
     option = options[i];
     $('<div>').
       on('mousedown', this._onOptionMousedown.bind(this)).
-      appendTo($optionsDiv).
+      appendTo($viewportDiv).
       html(option);
     if (option === val) {
       selectedPos = i;
@@ -178,6 +182,10 @@ scout.AbstractSmartField.prototype._renderOptions = function(options) {
   if (selectedPos > -1) {
     this._selectOption(this._get$Options(true), selectedPos);
   }
+};
+
+scout.AbstractSmartField.prototype._emptyOptions = function(options) {
+  this._get$OptionsDiv().children('.scrollable-y').empty();
 };
 
 scout.AbstractSmartField.prototype._onOptionMousedown = function(e) {
