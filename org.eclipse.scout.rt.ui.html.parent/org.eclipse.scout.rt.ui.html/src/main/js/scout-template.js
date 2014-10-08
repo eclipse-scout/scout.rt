@@ -18,6 +18,7 @@
 //@include("util/ObjectFactory.js");
 //@include("util/dates.js");
 //@include("util/Device.js");
+//@include("util/texts.js");
 //@include("util/URL.js");
 //@include("session/Session.js");
 //@include("session/Event.js");

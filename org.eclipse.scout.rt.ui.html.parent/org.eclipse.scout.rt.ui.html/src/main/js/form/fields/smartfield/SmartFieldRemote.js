@@ -32,7 +32,7 @@ scout.SmartFieldRemote.prototype._onOptionsLoaded = function(options) {
 };
 
 scout.SmartFieldRemote.prototype._openPopup = function() {
-  this._showPopup(1, 'Lade Optionen...');
+  this._showPopup(1, scout.texts.get('loadOptions'));
   this._loadOptions('*');
 };
 

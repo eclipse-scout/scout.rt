@@ -42,11 +42,17 @@ scout.AbstractSmartField.prototype._get$OptionsDiv = function() {
   return this._$popup.children('.options');
 };
 
+scout.AbstractSmartField.prototype._isNavigationKey = function(e) {
+  return e.which === scout.keys.PAGE_UP ||
+    e.which === scout.keys.PAGE_DOWN ||
+    e.which === scout.keys.UP ||
+    e.which === scout.keys.DOWN;
+};
+
 // navigate in options
 // TODO AWE: (smartfield) scrolling intelligenter machen (erst scrollen, wenn man an die boundaries stösst).
 scout.AbstractSmartField.prototype._onKeydown = function(e) {
-  if (e.which == 33 || e.which == 34 || e.which == 38 || e.which == 40) {
-
+  if (this._isNavigationKey(e)) {
     // ensure popup is opened for following operations
     if (!this._$popup) {
       setTimeout(function() {
@@ -55,19 +61,15 @@ scout.AbstractSmartField.prototype._onKeydown = function(e) {
       return;
     }
 
-    var $options = this._get$Options(true),
-      pos = this._selectedOption;
-    if (e.which == 33) { pos-=10; }
-    if (e.which == 34) { pos+=10; }
-    if (e.which == 38) { pos--; }
-    if (e.which == 40) { pos++; }
-    if (pos < 0) {
-      pos = 0;
-    } else {
-      if (pos >= $options.length) {
-        pos = $options.length - 1;
-      }
+    var pos = this._selectedOption,
+        $options = this._get$Options(true);
+    switch (e.which) {
+      case scout.keys.PAGE_UP: pos -= 10; break;
+      case scout.keys.PAGE_DOWN: pos += 10; break;
+      case scout.keys.UP: pos--; break;
+      case scout.keys.DOWN: pos++; break;
     }
+    pos = Math.min(Math.max(0, pos), $options.length - 1);
     if (pos != this.selectedOption) {
       this._selectOption($options, pos);
     }
@@ -90,13 +92,13 @@ scout.AbstractSmartField.prototype._selectOption = function($options, pos) {
 
 scout.AbstractSmartField.prototype._onKeyup = function(e) {
   // escape
-  if (e.which == 27) { // TODO AWE (smartfield) key-constanten von C.GU verwenden
+  if (e.which === scout.keys.ESC) {
     this.$field.blur();
     return;
   }
 
   // enter
-  if (e.which == 13) {
+  if (e.which === scout.keys.ENTER) {
     if (this._selectedOption > -1) {
       var value = $(this._get$Options(true).get(this._selectedOption)).html();
       this.$field.val(value);
@@ -107,7 +109,7 @@ scout.AbstractSmartField.prototype._onKeyup = function(e) {
   }
 
   // TODO AWE: (smartfield) das geht sicher noch schöner --> check preventDefault/stopPropagation
-  if (e.which == 33 || e.which == 34 || e.which == 38 || e.which == 40) {
+  if (this._isNavigationKey(e)) {
     return;
   }
 
@@ -193,7 +195,6 @@ scout.AbstractSmartField.prototype._onFocus = function() {
   }
 };
 
-// TODO AWE: (smartfield) wenn das popup offen ist und man wegtabbt bekommt das nächste field noch nicht den fokus
 scout.AbstractSmartField.prototype._onBlur = function() {
   $.log.debug("_onBlur");
   this._closePopup();
@@ -215,11 +216,11 @@ scout.AbstractSmartField.prototype._setStatusText = function(vararg) {
   var text;
   if ($.isNumeric(vararg)) {
     if (vararg === 0) {
-      text = 'Keine Übereinstimmung';
+      text = scout.texts.get('noOptions');
     } else if (vararg === 1) {
-      text = '1 Option';
+      text = scout.texts.get('oneOption');
     } else {
-      text = vararg + ' Optionen';
+      text = scout.texts.get('options', vararg);
     }
   } else {
     text = vararg;
