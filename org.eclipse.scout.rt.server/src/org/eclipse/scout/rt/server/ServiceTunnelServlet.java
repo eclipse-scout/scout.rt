@@ -270,9 +270,9 @@ public class ServiceTunnelServlet extends HttpServletEx {
    */
   protected void initializeAjaxSessionTimeout(HttpServletRequest req) {
     if (!m_isAjaxSessionTimeoutInitialized) {
-      final long defaultSessionTimeout = 3600L;
+      final long defaultSessionTimeout = 1800L;
       final long millisecondsInSeconds = 1000L;
-      m_ajaxSessionCache.setSessionTimeoutMillis(Math.max(defaultSessionTimeout, millisecondsInSeconds * req.getSession().getMaxInactiveInterval()));
+      m_ajaxSessionCache.setSessionTimeoutMillis(Math.max(millisecondsInSeconds * defaultSessionTimeout, millisecondsInSeconds * req.getSession().getMaxInactiveInterval()));
       m_isAjaxSessionTimeoutInitialized = true;
     }
   }
