@@ -30,8 +30,16 @@ scout.AbstractSmartField.prototype._render = function($parent) {
   this.addStatus();
 };
 
-scout.AbstractSmartField.prototype._get$Options = function() {
-  return this._$popup.children('.options').children();
+/**
+ * @param visible [optional] when true, returns only visible options from the DOM, otherwise return all options regardless of their visible state.
+ */
+scout.AbstractSmartField.prototype._get$Options = function(visible) {
+  var filter = visible === true ? ':visible' : undefined;
+  return this._get$OptionsDiv().children(filter);
+};
+
+scout.AbstractSmartField.prototype._get$OptionsDiv = function() {
+  return this._$popup.children('.options');
 };
 
 // navigate in options
@@ -47,7 +55,7 @@ scout.AbstractSmartField.prototype._onKeydown = function(e) {
       return;
     }
 
-    var $options = this._get$Options(),
+    var $options = this._get$Options(true),
       pos = this._selectedOption;
     if (e.which == 33) { pos-=10; }
     if (e.which == 34) { pos+=10; }
@@ -75,7 +83,7 @@ scout.AbstractSmartField.prototype._selectOption = function($options, pos) {
   var h = this._$popup.height();
   var hPerOption = 19;
   var top = pos * hPerOption;
-  this._$popup.children('.options').scrollTop(top);
+  this._get$OptionsDiv().scrollTop(top);
   $.log.info('_selectedOption=' + this._selectedOption + ' pos='+pos + ' top=' + top + ' text=' +  $selectedOption.html());
   this._selectedOption = pos;
 };
@@ -90,7 +98,7 @@ scout.AbstractSmartField.prototype._onKeyup = function(e) {
   // enter
   if (e.which == 13) {
     if (this._selectedOption > -1) {
-      var value = $(this._get$Options().get(this._selectedOption)).html();
+      var value = $(this._get$Options(true).get(this._selectedOption)).html();
       this.$field.val(value);
       this.$field.get(0).select();
       this._closePopup();
@@ -98,7 +106,7 @@ scout.AbstractSmartField.prototype._onKeyup = function(e) {
     return;
   }
 
-  // TODO AWE: (smartfield) das geht sicher noch schöner --> check preventDefault
+  // TODO AWE: (smartfield) das geht sicher noch schöner --> check preventDefault/stopPropagation
   if (e.which == 33 || e.which == 34 || e.which == 38 || e.which == 40) {
     return;
   }
@@ -129,30 +137,32 @@ scout.AbstractSmartField.prototype._filterOptions = function() {
 
 /**
  * @param numOptions the height of the popup is 'numOptions * height per option in px'
- * @param statusText text displayed in status bar
+ * @param vararg same as in #_setStatusText(vararg)
  */
-scout.AbstractSmartField.prototype._showPopup = function(numOptions, statusText) {
+scout.AbstractSmartField.prototype._showPopup = function(numOptions, vararg) {
   var fieldBounds = scout.HtmlComponent.getBounds(this.$field),
     popupHeight = numOptions * 19 + 19 + 3, // TODO AWE: (smartfield) popup-layout dynamischer
     popupBounds = new scout.Rectangle(fieldBounds.x, fieldBounds.y + fieldBounds.height, fieldBounds.width, popupHeight);
   this._$popup = $('<div>').
     addClass('smart-field-popup').
     append($('<div>').addClass('options')).
-    append($('<div>').addClass('status').text(statusText)).
+    append($('<div>').addClass('status')).
     appendTo(this.$container);
   scout.HtmlComponent.setBounds(this._$popup, popupBounds);
-  // layout options and status div
-  scout.HtmlComponent.setSize(this._$popup.children('.options'), fieldBounds.width - 4, popupHeight - 19 - 3);
+  // layout options and status-div
+  var $optionsDiv = this._get$OptionsDiv();
+//  $optionsDiv.perfectScrollbar(); // FIXME try
+  scout.HtmlComponent.setSize($optionsDiv, fieldBounds.width - 4, popupHeight - 19 - 3);
+  this._setStatusText(vararg);
 };
 
 /**
  * Adds the given options to the DOM, tries to select the selected option by comparing to the value of the text-field.
  */
 scout.AbstractSmartField.prototype._renderOptions = function(options) {
-  var i, option,
-    $optionsDiv = this._$popup.children('.options'),
-    val = this.$field.val(),
-    selectedPos = -1;
+  var i, option, selectedPos = -1,
+    $optionsDiv = this._get$OptionsDiv(),
+    val = this.$field.val();
   for (i=0; i<options.length; i++) {
     option = options[i];
     $('<div>').
@@ -164,7 +174,7 @@ scout.AbstractSmartField.prototype._renderOptions = function(options) {
     }
   }
   if (selectedPos > -1) {
-    this._selectOption(this._$popup.children('.options').children(), selectedPos);
+    this._selectOption(this._get$Options(true), selectedPos);
   }
 };
 
@@ -197,13 +207,23 @@ scout.AbstractSmartField.prototype._closePopup = function() {
   }
 };
 
-scout.AbstractSmartField.prototype._getStatusText = function(numOptions) {
-  if (numOptions === 0) {
-    return 'Keine Übereinstimmung';
-  } else if (numOptions === 1) {
-    return '1 Option';
+/**
+ * @param vararg if vararg is numeric, a text is generated according to the given number of options and set in the status-bar<br/>
+ *   if vararg is text, the given text is set in the status-bar
+ */
+scout.AbstractSmartField.prototype._setStatusText = function(vararg) {
+  var text;
+  if ($.isNumeric(vararg)) {
+    if (vararg === 0) {
+      text = 'Keine Übereinstimmung';
+    } else if (vararg === 1) {
+      text = '1 Option';
+    } else {
+      text = vararg + ' Optionen';
+    }
   } else {
-    return numOptions + ' Optionen';
+    text = vararg;
   }
+  this._$popup.children('.status').text(text);
 };
 
