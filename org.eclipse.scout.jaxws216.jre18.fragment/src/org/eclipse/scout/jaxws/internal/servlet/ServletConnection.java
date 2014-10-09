@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -16,9 +16,11 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -191,6 +193,7 @@ public class ServletConnection extends WSHTTPConnection {
     m_response.setContentLength(value);
   }
 
+  @Override
   @Property(MessageContext.SERVLET_CONTEXT)
   public ServletContext getContext() {
     return m_context;
@@ -208,5 +211,57 @@ public class ServletConnection extends WSHTTPConnection {
 
   protected WebServiceContextDelegate createContextDelegate(HttpAdapter adapter, HttpServletRequest request) {
     return new ServletContextDelegate(adapter, request);
+  }
+
+  @Override
+  @SuppressWarnings("deprecation")
+  @Deprecated
+  public Set<String> getRequestHeaderNames() {
+    Set<String> headerNameSet = new HashSet<String>();
+    for (Enumeration<String> headerNames = m_request.getHeaderNames(); headerNames.hasMoreElements();) {
+      headerNameSet.add(headerNames.nextElement());
+    }
+    return headerNameSet;
+  }
+
+  @Override
+  public List<String> getRequestHeaderValues(String arg0) {
+    List<String> headerList = new ArrayList<String>();
+    for (Enumeration<String> headers = m_request.getHeaders(arg0); headers.hasMoreElements();) {
+      headerList.add(headers.nextElement());
+    }
+    return headerList;
+  }
+
+  @Override
+  public String getRequestScheme() {
+    return m_request.getScheme();
+  }
+
+  @Override
+  public String getRequestURI() {
+    return m_request.getRequestURI();
+  }
+
+  @Override
+  public String getServerName() {
+    return m_request.getServerName();
+  }
+
+  @Override
+  public int getServerPort() {
+    return m_request.getServerPort();
+  }
+
+  @Override
+  public void setResponseHeader(String name, List<String> values) {
+    // According to JavaDoc, ignore 'Content-Type' and 'Content-Length'
+    if (name.equalsIgnoreCase("Content-Type") || name.equalsIgnoreCase("Content-Length")) {
+      return;
+    }
+
+    for (String value : values) {
+      m_response.addHeader(name, value);
+    }
   }
 }
