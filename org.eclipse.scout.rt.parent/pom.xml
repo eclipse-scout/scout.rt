@@ -26,6 +26,8 @@
     <module>../org.eclipse.scout.service</module>
     <module>../org.eclipse.scout.rt.server.commons</module>
     <module>../org.eclipse.scout.jaxws216</module>
+    <module>../org.eclipse.scout.jaxws216.jre16.fragment</module>
+    <module>../org.eclipse.scout.jaxws216.jre18.fragment</module>
     <module>../org.eclipse.scout.net</module>
 
     <module>../org.eclipse.scout.rt.servicetunnel</module>

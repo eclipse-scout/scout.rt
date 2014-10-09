@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.ws.WebServiceException;
 
+import org.eclipse.scout.commons.BeanUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -45,7 +46,16 @@ public class ServletAdapter extends HttpAdapter implements BoundEndpoint {
   }
 
   public void handle(ServletContext context, HttpServletRequest request, HttpServletResponse response) throws IOException {
-    WSHTTPConnection connection = new ServletConnection(this, context, request, response);
+    // connection handler is created using reflection because java 1.6 and java 1.8 use different APIs.
+    WSHTTPConnection connection;
+    try {
+      // use this bundle's class loader to load a class form one of it's jre-dependent fragments
+      Class<?> clazz = ServletAdapter.class.getClassLoader().loadClass("org.eclipse.scout.jaxws.internal.servlet.ServletConnection");
+      connection = (WSHTTPConnection) BeanUtility.createInstance(clazz, this, context, request, response);
+    }
+    catch (Exception e) {
+      throw new RuntimeException("unable to create ServletConnection", e);
+    }
     super.handle(connection);
   }
 
