@@ -105,7 +105,7 @@ import org.eclipse.swt.widgets.TableItem;
  * - multi line support in headers is not supported by swt.
  * <p>
  * - multi line support in row texts is not supported so far. Might probably be done by customized table rows.
- * 
+ *
  * @since 1.0.0 28.03.2008
  */
 public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScoutTable {
@@ -1156,14 +1156,6 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
           break;
         }
       }
-    }
-
-    private boolean isEditableIconNeeded(Event event, TableItem item) {
-      IColumn<?> col = ((IColumn<?>) item.getParent().getColumn(event.index).getData(ISwtScoutTable.KEY_SCOUT_COLUMN));
-      if (col != null && col.isEditable() && !col.getDataType().isAssignableFrom(Boolean.class)) {
-        return true;
-      }
-      return false;
     }
   }
 

@@ -24,6 +24,7 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.TableItem;
 
 public class RwtScoutColumnModel extends ColumnLabelProvider {
   private static final long serialVersionUID = 1L;
@@ -61,15 +62,21 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
 
   @Override
   public void update(ViewerCell cell) {
-    ITableRow element = (ITableRow) cell.getElement();
+    ITableRow row = (ITableRow) cell.getElement();
     int columnIndex = cell.getColumnIndex();
 
-    cell.setText(getColumnText(element, columnIndex));
-    cell.setImage(getColumnImage(element, columnIndex));
+    cell.setText(getColumnText(row, columnIndex));
+    cell.setImage(getColumnImage(row, columnIndex));
+    cell.setBackground(getBackground(row, columnIndex));
+    cell.setForeground(getForeground(row, columnIndex));
+    cell.setFont(getFont(row, columnIndex));
 
-    cell.setBackground(getBackground(element, columnIndex));
-    cell.setForeground(getForeground(element, columnIndex));
-    cell.setFont(getFont(element, columnIndex));
+    // Encode the information of which cell is editable into the custom variant of the 'TableItem' to display a visual marker for editable cells.
+    // This is a workaround because there is no actual RAP support to set an individual variant on table-cells (the CSS-element 'Table-Cell' applies to all cells of the table).
+    // The marker itself is added in the JavaScript patch 'EditableCellMarkerPatch.js' which patches 'GridRow.js'.
+    if (cell.getColumnIndex() == 1) {
+      cell.getItem().setData(RWT.CUSTOM_VARIANT, createTableRowVariant(row)); // A 'TableItem' represents not a single cell but the whole row instead. Therefore, the encoding is only done for the first cell being updated.
+    }
   }
 
   public String getColumnText(ITableRow element, int columnIndex) {
@@ -258,6 +265,45 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
     else {
       return null;
     }
+  }
+
+  /**
+   * Creates a custom variant to be set as {@link TableItem}'s data to identify editable cells of that row. This
+   * identifier is used in <code>GridRow.js</code> to install a visual marker for editable cells.<br/>
+   * Format: the cells are delimited with a '_' and editable cells are marked with the literal 'EDITABLE'.
+   *
+   * @param row
+   *          the current row.
+   * @return the variant for that row.
+   */
+  protected String createTableRowVariant(ITableRow row) {
+    StringBuilder builder = new StringBuilder();
+    for (int column = 0; column < row.getCellCount(); column++) {
+      if (column > 0) {
+        builder.append("_");
+      }
+
+      if (isEditableIconNeeded(row, m_columnManager.getColumnByModelIndex(column))) {
+        builder.append("EDITABLE");
+      }
+    }
+
+    String variant = builder.toString();
+    if (variant.contains("EDITABLE")) {
+      return "EDITABLE_CELL_VARIANT_" + variant;
+    }
+    else {
+      return null;
+    }
+  }
+
+  /**
+   * Determines whether the visual marker for a cell is to be displayed.
+   *
+   * @return <code>true</code> if the cell is editable and not of the type {@link Boolean}.
+   */
+  protected boolean isEditableIconNeeded(ITableRow row, IColumn<?> column) {
+    return getScoutTable().isCellEditable(row, column) && !column.getDataType().isAssignableFrom(Boolean.class);
   }
 
   private void rebuildCache() {

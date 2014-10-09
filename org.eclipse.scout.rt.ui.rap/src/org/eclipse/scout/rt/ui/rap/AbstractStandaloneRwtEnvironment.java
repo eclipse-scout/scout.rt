@@ -10,7 +10,11 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.security.AccessController;
+import java.util.List;
 import java.util.TreeMap;
 
 import javax.security.auth.Subject;
@@ -18,6 +22,7 @@ import javax.security.auth.Subject;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.rap.rwt.RWT;
 import org.eclipse.rap.rwt.service.ServerPushSession;
 import org.eclipse.scout.commons.CompositeLong;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -213,5 +218,32 @@ public abstract class AbstractStandaloneRwtEnvironment extends AbstractRwtEnviro
     }
 
     return shell;
+  }
+
+  @Override
+  protected void contributePatches(List<URL> patches) {
+    super.contributePatches(patches);
+
+    // Install patch to mark editable cells with a visual marker.
+    registerEditableCellMarkerIcon();
+    patches.add(Activator.class.getResource("/resources/patches/EditableCellMarkerPatch.js"));
+  }
+
+  protected void registerEditableCellMarkerIcon() {
+    String icon = "editable_tablecell_marker.png";
+    if (!RWT.getResourceManager().isRegistered(icon)) {
+      InputStream is = Activator.class.getResourceAsStream(String.format("/resources/icons/internal/%s", icon));
+      try {
+        RWT.getResourceManager().register(icon, is);
+      }
+      finally {
+        try {
+          is.close();
+        }
+        catch (IOException e) {
+          LOG.warn("Failed to close InputStream for editable cell marker.", e);
+        }
+      }
+    }
   }
 }

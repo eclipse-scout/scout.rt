@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.ui.rap;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.Serializable;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -79,6 +80,7 @@ import org.eclipse.scout.rt.ui.rap.form.fields.IRwtScoutFormField;
 import org.eclipse.scout.rt.ui.rap.html.HtmlAdapter;
 import org.eclipse.scout.rt.ui.rap.keystroke.IRwtKeyStroke;
 import org.eclipse.scout.rt.ui.rap.keystroke.KeyStrokeManager;
+import org.eclipse.scout.rt.ui.rap.patches.PatchInstaller;
 import org.eclipse.scout.rt.ui.rap.servletfilter.LogoutFilter;
 import org.eclipse.scout.rt.ui.rap.servletfilter.LogoutHandler;
 import org.eclipse.scout.rt.ui.rap.util.ColorFactory;
@@ -416,6 +418,9 @@ public abstract class AbstractRwtEnvironment extends AbstractEntryPoint implemen
         additionalInitCallback.run();
       }
       applyScoutState();
+
+      // Discovers and installs RAP JavaScript patches.
+      installPatches();
 
       // notify ui available
       // notify desktop that it is loaded
@@ -1533,5 +1538,29 @@ public abstract class AbstractRwtEnvironment extends AbstractEntryPoint implemen
         }
       }
     }
+  }
+
+  /**
+   * Discovers and installs JavaScript patches.
+   */
+  protected void installPatches() {
+    List<URL> patches = new ArrayList<URL>();
+
+    // Discover patches.
+    contributePatches(patches);
+
+    // Install the patches.
+    for (URL patch : patches) {
+      PatchInstaller.install(patch);
+    }
+  }
+
+  /**
+   * Overwrite this method to contribute JavaScript patches.
+   *
+   * @param patches
+   *          live-list of the JavaScript-Files to be installed.
+   */
+  protected void contributePatches(List<URL> patches) {
   }
 }

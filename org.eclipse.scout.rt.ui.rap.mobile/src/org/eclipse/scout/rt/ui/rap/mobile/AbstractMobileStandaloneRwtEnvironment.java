@@ -10,7 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.mobile;
 
-import org.eclipse.core.runtime.CoreException;
+import java.net.URL;
+import java.util.List;
+
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.mobile.ui.form.AbstractMobileForm;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.IMainPageForm;
@@ -27,7 +29,6 @@ import org.eclipse.scout.rt.ui.rap.mobile.form.RwtScoutMobileForm;
 import org.eclipse.scout.rt.ui.rap.mobile.form.RwtScoutMobileFormFooter;
 import org.eclipse.scout.rt.ui.rap.mobile.form.RwtScoutMobileFormHeader;
 import org.eclipse.scout.rt.ui.rap.mobile.form.RwtScoutMobileOutlineFormHeader;
-import org.eclipse.scout.rt.ui.rap.mobile.patches.TouchScrollingPatch;
 import org.eclipse.scout.rt.ui.rap.mobile.window.MobileBrowserWindowHandler;
 import org.eclipse.scout.rt.ui.rap.mobile.window.desktop.RwtScoutMobileDesktop;
 import org.eclipse.scout.rt.ui.rap.mobile.window.dialog.RwtScoutMobileDialog;
@@ -49,16 +50,6 @@ public abstract class AbstractMobileStandaloneRwtEnvironment extends AbstractSta
 
   public AbstractMobileStandaloneRwtEnvironment(Bundle applicationBundle, Class<? extends IClientSession> clientSessionClazz) {
     super(applicationBundle, clientSessionClazz);
-  }
-
-  @Override
-  protected synchronized void init(Runnable additionalInitCallback) throws CoreException {
-    super.init(additionalInitCallback);
-    initPatches();
-  }
-
-  protected void initPatches() {
-    TouchScrollingPatch.enable();
   }
 
   @Override
@@ -137,5 +128,11 @@ public abstract class AbstractMobileStandaloneRwtEnvironment extends AbstractSta
   @Override
   protected RwtBusyHandler createBusyHandler() {
     return new RwtMobileBusyHandler(getClientSession(), this);
+  }
+
+  @Override
+  protected void contributePatches(List<URL> patches) {
+    super.contributePatches(patches);
+    patches.add(Activator.class.getResource("/resources/patches/TouchScrollingPatch.js"));
   }
 }
