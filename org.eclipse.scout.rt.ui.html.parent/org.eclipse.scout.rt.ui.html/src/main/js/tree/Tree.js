@@ -14,13 +14,11 @@ scout.inherits(scout.Tree, scout.ModelAdapter);
 
 scout.Tree.prototype.init = function(model, session) {
   scout.Tree.parent.prototype.init.call(this, model, session);
-
   this._visitNodes(this.nodes, this._initTreeNode.bind(this));
 };
 
 scout.Tree.prototype._initTreeNode = function(parentNode, node) {
   this._nodeMap[node.id] = node;
-
   if (parentNode) {
     node.parentNode = parentNode;
   }
@@ -44,11 +42,8 @@ scout.Tree.prototype._visitNodes = function(nodes, func, parentNode) {
 scout.Tree.prototype._render = function($parent) {
   this.$parent = $parent;
   this.$container = $parent.appendDIV('tree');
-  this._$treeScroll = this.$container.appendDIV('scrollable-y');
-  this.scrollbar = new scout.Scrollbar(this._$treeScroll, 'y');
-  this.scrollbar.initThumb();
+  this._$viewport = scout.Scrollbar2.install(this.$container);
   this._addNodes(this.nodes);
-
   if (this.selectedNodeIds.length > 0) {
     this._renderSelection();
   }
@@ -82,7 +77,7 @@ scout.Tree.prototype.collapseAll = function() {
   var that = this;
 
   //Collapse root nodes
-  this._$treeScroll.find('[data-level="0"]').each(function() {
+  this._$viewport.find('[data-level="0"]').each(function() {
     var $node = $(this);
     that.setNodeExpanded($node.data('node'), $node , false);
   });
@@ -113,12 +108,12 @@ scout.Tree.prototype._renderNodeExpanded = function(node, $node, expanded) {
   var $wrapper;
   var that = this;
 
-  //check for expanding to prevent adding the same nodes twice on fast multiple clicks
+  // check for expanding to prevent adding the same nodes twice on fast multiple clicks
   if (expanded === $node.hasClass('expanded') ||  $node.data('expanding')) {
     return;
   }
 
-  //Only expand / collapse if there are child nodes
+  // Only expand / collapse if there are child nodes
   if (!node.childNodes || node.childNodes.length === 0) {
     return true;
   }
@@ -132,7 +127,7 @@ scout.Tree.prototype._renderNodeExpanded = function(node, $node, expanded) {
   if (expanded) {
     this._addNodes(node.childNodes, $node);
     this._updateItemPath();
-    this.scrollbar.initThumb();
+    scout.Scrollbar2.update(this._$viewport); // TODO AWE: (scrollbar) trigger resize event instead
 
     if (this._breadcrumb) {
       $node.addClass('expanded');
@@ -152,11 +147,11 @@ scout.Tree.prototype._renderNodeExpanded = function(node, $node, expanded) {
         var h = $newNodes.height() * $newNodes.length;
         var removeContainer = function() {
           $(this).replaceWith($(this).contents());
-          that.scrollbar.initThumb();
+          scout.Scrollbar2.update(that._$viewport);
         };
 
-        $wrapper.css('height', 0)
-          .animateAVCSD('height', h, removeContainer, this.scrollbar.initThumb.bind(this.scrollbar), 200);
+        $wrapper.css('height', 0).
+          animateAVCSD('height', h, removeContainer, scout.Scrollbar2.update.bind(this, this._$viewport), 200);
 
         // animated control, at the end: parent is expanded
         $node.data('expanding', true);
@@ -167,8 +162,8 @@ scout.Tree.prototype._renderNodeExpanded = function(node, $node, expanded) {
           $node.removeData('expanding');
         };
 
-        $control.css('borderSpacing', 0)
-          .animateAVCSD('borderSpacing', 90, addExpanded, rotateControl, 200);
+        $control.css('borderSpacing', 0).
+          animateAVCSD('borderSpacing', 90, addExpanded, rotateControl, 200);
       }
     }
   } else {
@@ -179,13 +174,13 @@ scout.Tree.prototype._renderNodeExpanded = function(node, $node, expanded) {
       return $(this).attr('data-level') <= level;
     }).wrapAll('<div class="animationWrapper">)').parent();
 
-    $wrapper.animateAVCSD('height', 0, $.removeThis, this.scrollbar.initThumb.bind(this.scrollbar), 200);
+    $wrapper.animateAVCSD('height', 0, $.removeThis, scout.Scrollbar2.update.bind(this, this._$viewport), 200);
 
     // animated control
     $control = $node.children('.tree-item-control');
 
-    $control.css('borderSpacing', 90)
-      .animateAVCSD('borderSpacing', 0, null, rotateControl, 200);
+    $control.css('borderSpacing', 90).
+      animateAVCSD('borderSpacing', 0, null, rotateControl, 200);
   }
 };
 
@@ -237,7 +232,7 @@ scout.Tree.prototype._renderSelection = function($nodes) {
     }
   }
 
-  this._$treeScroll.children().select(false);
+  this._$viewport.children().select(false);
 
   // render selection
   for (i=0; i < $nodes.length; i++) {
@@ -446,7 +441,7 @@ scout.Tree.prototype._addNodes = function(nodes, $parent) {
     if ($parent) {
       $node.insertAfter($parent);
     } else {
-      $node.prependTo(this._$treeScroll);
+      $node.prependTo(this._$viewport);
     }
 
     // if model demands children, create them
@@ -511,7 +506,7 @@ scout.Tree.prototype._onNodeControlClick = function(event) {
 
 scout.Tree.prototype._updateItemPath = function() {
   var $selected = this._findSelectedNodes(),
-    $allNodes = this._$treeScroll.children(),
+    $allNodes = this._$viewport.children(),
     level = parseFloat($selected.attr('data-level'));
 
   // first remove and select selected
@@ -579,12 +574,12 @@ scout.Tree.prototype._findNodeById = function(nodeId, $parent) {
   if ($parent) {
     return $parent.next('#' + nodeId);
   } else {
-    return this._$treeScroll.find('#' + nodeId);
+    return this._$viewport.find('#' + nodeId);
   }
 };
 
 scout.Tree.prototype._findSelectedNodes = function() {
-  return this._$treeScroll.find('.selected');
+  return this._$viewport.find('.selected');
 };
 
 scout.Tree.prototype.getSelectedModelNodes = function() {

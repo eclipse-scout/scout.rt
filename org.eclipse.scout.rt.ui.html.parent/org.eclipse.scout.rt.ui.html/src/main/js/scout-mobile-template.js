@@ -25,7 +25,6 @@
 //@include("layout/BorderLayout.js");
 //@include("table/Table.js");
 //@include("table/MobileTable.js");
-//@include("table/MobileTableConfigurator.js");
 //@include("table/TableHeader.js");
 //@include("table/TableFooter.js");
 //@include("table/TableHeaderMenu.js");

@@ -1,6 +1,7 @@
 scout.AbstractSmartField = function() {
   scout.AbstractSmartField.parent.call(this);
   this._$popup;
+  this._$viewport;
   this.options;
   this._selectedOption = -1;
   this._oldVal;
@@ -35,11 +36,15 @@ scout.AbstractSmartField.prototype._render = function($parent) {
  */
 scout.AbstractSmartField.prototype._get$Options = function(visible) {
   var filter = visible === true ? ':visible' : undefined;
-  return this._get$OptionsDiv().children('.scrollable-y').children(filter);
+  return this._$viewport.children(filter);
 };
 
 scout.AbstractSmartField.prototype._get$OptionsDiv = function() {
   return this._$popup.children('.options');
+};
+
+scout.AbstractSmartField.prototype._updateScrollbar = function() {
+  scout.Scrollbar2.update(this._$viewport);
 };
 
 scout.AbstractSmartField.prototype._isNavigationKey = function(e) {
@@ -83,9 +88,9 @@ scout.AbstractSmartField.prototype._selectOption = function($options, pos) {
   var $selectedOption = $($options[pos]);
   $selectedOption.addClass('selected');
   var h = this._$popup.height();
-  var hPerOption = 19;
+  var hPerOption = 24;
   var top = pos * hPerOption;
-  this._get$OptionsDiv().scrollTop(top);
+  this._$viewport.scrollTop(top);
   $.log.info('_selectedOption=' + this._selectedOption + ' pos='+pos + ' top=' + top + ' text=' +  $selectedOption.html());
   this._selectedOption = pos;
 };
@@ -143,22 +148,18 @@ scout.AbstractSmartField.prototype._filterOptions = function() {
  */
 scout.AbstractSmartField.prototype._showPopup = function(numOptions, vararg) {
   var fieldBounds = scout.HtmlComponent.getBounds(this.$field),
-    popupHeight = numOptions * 19 + 19 + 3, // TODO AWE: (smartfield) popup-layout dynamischer
+    popupHeight = numOptions * 24 + 24 + 3, // TODO AWE: (smartfield) popup-layout dynamischer
     popupBounds = new scout.Rectangle(fieldBounds.x, fieldBounds.y + fieldBounds.height, fieldBounds.width, popupHeight);
   this._$popup = $('<div>').
     addClass('smart-field-popup').
-    append($('<div>').addClass('options').
-      append($('<div>').addClass('scrollable-y'))).
+    append($('<div>').addClass('options')).
     append($('<div>').addClass('status')).
     appendTo(this.$container);
   scout.HtmlComponent.setBounds(this._$popup, popupBounds);
   // layout options and status-div
   var $optionsDiv = this._get$OptionsDiv();
-
-  this.scrollbar = new scout.Scrollbar($optionsDiv.children('.scrollable-y'), 'y', true);
-  this.scrollbar.initThumb();
-
-  scout.HtmlComponent.setSize($optionsDiv, fieldBounds.width - 4, popupHeight - 19 - 3);
+  this._$viewport = scout.Scrollbar2.install($optionsDiv, {invertColors:true});
+  scout.HtmlComponent.setSize($optionsDiv, fieldBounds.width - 4, popupHeight - 24 - 3);
   this._setStatusText(vararg);
 };
 
@@ -167,13 +168,12 @@ scout.AbstractSmartField.prototype._showPopup = function(numOptions, vararg) {
  */
 scout.AbstractSmartField.prototype._renderOptions = function(options) {
   var i, option, selectedPos = -1,
-    $viewportDiv = this._get$OptionsDiv().children('.scrollable-y'),
     val = this.$field.val();
   for (i=0; i<options.length; i++) {
     option = options[i];
     $('<div>').
       on('mousedown', this._onOptionMousedown.bind(this)).
-      appendTo($viewportDiv).
+      appendTo(this._$viewport).
       html(option);
     if (option === val) {
       selectedPos = i;
@@ -185,7 +185,7 @@ scout.AbstractSmartField.prototype._renderOptions = function(options) {
 };
 
 scout.AbstractSmartField.prototype._emptyOptions = function(options) {
-  this._get$OptionsDiv().children('.scrollable-y').empty();
+  this._$viewport.empty();
 };
 
 scout.AbstractSmartField.prototype._onOptionMousedown = function(e) {

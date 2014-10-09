@@ -3,7 +3,7 @@
 }
 
 .smart-field-popup {
-  border:solid 2px @color-bsi-orange;
+  border:solid 1px @color-bsi-green;
   position:absolute;
   z-index:101;
   margin-top:5px;
@@ -18,20 +18,22 @@
 }
 
 .smart-field-popup > .status {
-  background-color:#ccc;
+  background-color:#eee;
   position:absolute;
   bottom:0px;
   width:100%;
+  padding:2px 0 3px 0;
 }
 
-.smart-field-popup > .options > .scrollable-y > div {
-  border-bottom:solid 1px gray;
+.smart-field-popup > .options > div {
+  border-bottom:solid 1px #ccc;
+  padding:2px 0 3px 0;
 }
 
-.smart-field-popup > .options > .scrollable-y > div.selected {
+.smart-field-popup > .options div.selected {
   background-color:@color-bench-select;
 }
 
-.smart-field-popup > .options > .scrollable-y > div:hover {
+.smart-field-popup > .options div:hover {
   background-color:@color-bench-select;
 }

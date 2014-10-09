@@ -37,7 +37,6 @@
 //@include("layout/LogicalGridLayoutInfo.js");
 //@include("layout/LogicalGridLayout.js");
 //@include("table/Table.js");
-//@include("table/TableConfigurator.js");
 //@include("table/TableHeader.js");
 //@include("table/TableFooter.js");
 //@include("table/TableHeaderMenu.js");
@@ -82,6 +81,7 @@
 //@include("form/fields/treefield/TreeField.js");
 //@include("form/fields/tabbox/TabBox.js");
 //@include("scrollbar/Scrollbar.js");
+//@include("scrollbar/Scrollbar2.js");
 //@include("text/DecimalFormat.js");
 //@include("text/DateFormat.js");
 

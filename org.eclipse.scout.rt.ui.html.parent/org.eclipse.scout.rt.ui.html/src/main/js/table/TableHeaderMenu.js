@@ -128,7 +128,7 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
     cube = matrix.calculateCube();
 
   var $headerFilterContainer = $headerFilter.appendDIV('header-filter-container'),
-    $headerFilterScroll = $headerFilterContainer.appendDIV('scrollable-y');
+    $headerFilterScroll = scout.Scrollbar2.install($headerFilterContainer);
 
   for (var a = 0; a < xAxis.length; a++) {
     var key = xAxis[a],
@@ -146,10 +146,7 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
   var containerHeight = $headerFilterContainer.get(0).offsetHeight,
     scrollHeight = $headerFilterScroll.get(0).scrollHeight;
 
-  if (containerHeight < scrollHeight) {
-    var scrollbar = new scout.Scrollbar($headerFilterScroll , 'y');
-    scrollbar.initThumb();
-  } else {
+  if (containerHeight >= scrollHeight) {
     $headerFilterScroll.css('height', 'auto');
     scrollHeight = $headerFilterScroll.get(0).offsetHeight;
     $headerFilterContainer.css('height', scrollHeight);

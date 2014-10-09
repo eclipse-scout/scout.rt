@@ -433,7 +433,7 @@ describe("Table", function() {
       var $selectedRows = table.findSelectedRows();
       expect($selectedRows.length).toBe(0);
 
-      var $rows = table.$dataScroll.children();
+      var $rows = table._$viewport.children();
       clickRowAndAssertSelection(table, $rows.eq(1));
       clickRowAndAssertSelection(table, $rows.eq(2));
 
@@ -446,7 +446,7 @@ describe("Table", function() {
       var table = helper.createTable(model);
       table.render(session.$entryPoint);
 
-      var $row = table.$dataScroll.children().first();
+      var $row = table._$viewport.children().first();
       $row.triggerClick();
 
       sendQueuedAjaxCalls();
@@ -459,7 +459,7 @@ describe("Table", function() {
       var table = helper.createTable(model);
       table.render(session.$entryPoint);
 
-      var $row = table.$dataScroll.children().first();
+      var $row = table._$viewport.children().first();
       clickRowAndAssertSelection(table, $row);
       sendQueuedAjaxCalls();
 
@@ -480,7 +480,7 @@ describe("Table", function() {
       var table = helper.createTable(model);
       table.render(session.$entryPoint);
 
-      var $row = table.$dataScroll.children().first();
+      var $row = table._$viewport.children().first();
       $row.triggerDoubleClick();
 
       sendQueuedAjaxCalls();
@@ -501,7 +501,7 @@ describe("Table", function() {
       //register adapter
       helper.menuHelper.createMenu(menuModel);
       table.menus = session.getOrCreateModelAdapters([menuId], table);
-      var $row0 = table.$dataScroll.children().eq(0);
+      var $row0 = table._$viewport.children().eq(0);
       $row0.triggerContextMenu();
 
       sendQueuedAjaxCalls();
@@ -520,7 +520,7 @@ describe("Table", function() {
       //register adapter
       helper.menuHelper.createMenu(menuModel);
       table.menus = session.getOrCreateModelAdapters([menuId], table);
-      var $row0 = table.$dataScroll.children().eq(0);
+      var $row0 = table._$viewport.children().eq(0);
       $row0.triggerContextMenu();
 
       sendQueuedAjaxCalls();
@@ -542,7 +542,7 @@ describe("Table", function() {
       var table = helper.createTable(model);
       table.render(session.$entryPoint);
 
-      var $rows = table.$dataScroll.children();
+      var $rows = table._$viewport.children();
       var $row0 = $rows.eq(0);
       var $row1 = $rows.eq(1);
       var $row2 = $rows.eq(2);
@@ -568,7 +568,7 @@ describe("Table", function() {
       var table = helper.createTable(model);
       table.render(session.$entryPoint);
 
-      var $rows = table.$dataScroll.children();
+      var $rows = table._$viewport.children();
       var $row0 = $rows.eq(0);
       var $row1 = $rows.eq(1);
       var $row2 = $rows.eq(2);
@@ -606,7 +606,7 @@ describe("Table", function() {
     function verifyMouseMoveSelectionIsDisabled(table) {
       table.render(session.$entryPoint);
 
-      var $rows = table.$dataScroll.children();
+      var $rows = table._$viewport.children();
       var $row0 = $rows.eq(0);
       var $row1 = $rows.eq(1);
       var $row2 = $rows.eq(2);
@@ -642,7 +642,7 @@ describe("Table", function() {
       var table = helper.createTable(model);
       table.render(session.$entryPoint);
 
-      var $rows = table.$dataScroll.children();
+      var $rows = table._$viewport.children();
       var $row0 = $rows.eq(0);
       var $row1 = $rows.eq(1);
 

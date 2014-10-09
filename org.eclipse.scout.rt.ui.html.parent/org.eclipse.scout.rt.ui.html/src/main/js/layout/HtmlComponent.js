@@ -56,6 +56,21 @@ scout.HtmlComponent.setBounds = function($comp, vararg, y, width, height) {
     cssHeight(bounds.height);
 };
 
+scout.HtmlComponent.debug = function($comp) {
+  var attrs = '';
+  if ($comp.attr('id')) {
+    attrs += 'id=' + $comp.attr('id');
+  }
+  if ($comp.attr('class')) {
+    attrs += ' class=' + $comp.attr('class');
+  }
+  if (attrs.length === 0) {
+    attrs = $comp.html().substring(0, 30) + '...';
+  }
+  return 'HtmlComponent[' + attrs.trim() + ']';
+};
+
+
 /**
  * Returns the parent or $comp. Creates a new instance of HtmlComponent if the parent DOM element has no linked instance.
  */
@@ -154,15 +169,5 @@ scout.HtmlComponent.prototype.setBounds = function(bounds) {
 };
 
 scout.HtmlComponent.prototype.debug = function() {
-  var attrs = '';
-  if (this.$comp.attr('id')) {
-    attrs += 'id=' + this.$comp.attr('id');
-  }
-  if (this.$comp.attr('class')) {
-    attrs += ' class=' + this.$comp.attr('class');
-  }
-  if (attrs.length === 0) {
-    attrs = this.$comp.html().substring(0, 30) + '...';
-  }
-  return 'HtmlComponent[' + attrs.trim() + ']';
+  scout.HtmlComponent.debug(this.$comp);
 };

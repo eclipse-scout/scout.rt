@@ -3,7 +3,7 @@
 
 scout.MobileTable = function() {
   scout.MobileTable.parent.call(this);
-
+  this.selectionHandler.mouseMoveSelectionEnabled = false;
   this._headerColumns = [];
 };
 scout.inherits(scout.MobileTable, scout.Table);
@@ -12,17 +12,9 @@ scout.inherits(scout.MobileTable, scout.Table);
  * @override
  */
 scout.MobileTable.prototype.init = function(model, session) {
-  //FIXME should be done by server, or should we add gui only property to control it? model may set it to true at any time later
+  // FIXME CGU: should be done by server, or should we add gui only property to control it? model may set it to true at any time later
   model.headerVisible = false;
-
   scout.MobileTable.parent.prototype.init.call(this, model, session);
-};
-
-/**
- * @override
- */
-scout.MobileTable.prototype._createTableConfigurator = function() {
-  return new scout.MobileTableConfigurator(this);
 };
 
 /**
@@ -30,7 +22,6 @@ scout.MobileTable.prototype._createTableConfigurator = function() {
  */
 scout.MobileTable.prototype._drawData = function(startRow) {
   this._headerColumns = this._computeHeaderColumns();
-
   scout.MobileTable.parent.prototype._drawData.call(this, startRow);
 };
 
@@ -107,7 +98,7 @@ scout.MobileTable.prototype._computeHeaderColumns = function() {
   for (i = 0; i < columns.length; i++) {
     column = columns[i];
 
-    if (column.visible) { //FIXME also check for other criterias (checkboxcolum, see AbstractRowSummaryColumn);
+    if (column.visible) { // FIXME CGU also check for other criterias (checkboxcolum, see AbstractRowSummaryColumn);
       headerColumns.push(column);
       return headerColumns;
     }

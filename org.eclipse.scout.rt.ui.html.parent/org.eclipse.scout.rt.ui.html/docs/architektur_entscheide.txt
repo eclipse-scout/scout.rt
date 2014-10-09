@@ -339,3 +339,13 @@ und benötigen zudem ein Layout-Konzept ähnlich wie der Swing LayoutManager2 (i
   width/height in HTML/CSS sind _ohne_ Insets
 - getSize() liefert Dimensionen inkl. Insets zurück
 - getPreferredSize() liefert Dimension inkl. Insets zurück.
+
+09.10.2014 AWE, CGU: Scrollbar
+1. Native Scrollbar wenn möglich verwenden
+2. Wenn native Scrollbar hässlich, native Scrollbar stylen, wenn möglich
+3. Im Notfall JS-basierte Scrollbar verwenden
+
+Grund: die nativen SBs funktionieren immer besser, als die JS basierten. Sie funktionieren auch auf verschiedenen
+  Gerätetypen mit unterschiedlichen Browsern / Maustreiber / etc. am problemlosesten. --> spart Aufwand
+
+

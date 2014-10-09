@@ -4,11 +4,17 @@
 // TODO AWE: (scrollbar) discuss with C.GU, C.RU:
 // - bugfix: Scrollbar impl. cannot deal with scrollTo()
 // - bugfix: Scrollbar should not change insets (padding, margin) of scrollable container
-// - rename scrollable-y to 'viewport' (as in JScrollPane)
 // - rename initThumb to update
 // - pass options object to Ctor instead of multiple arguments
 
-scout.Scrollbar = function($parent, axis, invertColors) {
+scout.Scrollbar = function($parent, options) {
+
+  this.defaultOptions = {
+    axis:'y',
+    invertColors:false
+  };
+
+  this.options = $.extend({}, this.defaultSettings, options);
   this._$parent = $parent;
   this._beginDefault = 0;
   this._thumbRange;
@@ -17,20 +23,24 @@ scout.Scrollbar = function($parent, axis, invertColors) {
   this._initThumbPending = false;
 
   // create scrollbar
-  this.axis = axis;
   this._$scrollbar = $parent.beforeDiv('', 'scrollbar');
   this._$thumb = this._$scrollbar.appendDiv('', 'scrollbar-thumb');
-  if (invertColors === true) {
+  if (this.options.invertColors === true) {
     this._$thumb.css('background-color', 'rgba(0, 0, 0, 0.3)');
   }
-  this._dim = (axis === 'x' ? 'Width' : 'Height');
-  this._dir = (axis === 'x' ? 'left' : 'top');
+  this._dim = this.options.axis === 'x' ? 'Width' : 'Height';
+  this._dir = this.options.axis === 'x' ? 'left' : 'top';
 
   var begin = 0,
     that = this;
 
   //event handling
-  $parent.parent().on('DOMMouseScroll mousewheel', '', scrollWheel);
+  $parent.parent().
+    on('DOMMouseScroll mousewheel', '', scrollWheel).
+    on('scroll', function() {
+      $.log.debug('onScroll. _scroll=' + that._scroll + ' ._offset=' + that._offset + ' scrollTop=' + $parent.parent().scrollTop());
+      this._setThumb($parent.parent().scrollTop() / (that._scroll / that._offset));
+    }.bind(this));
   this._$scrollbar.on('mousedown', scrollEnd);
   this._$thumb.on('mousedown', '', scrollStart);
   $(window).on('load resize', this.initThumb.bind(this));
@@ -47,16 +57,17 @@ scout.Scrollbar = function($parent, axis, invertColors) {
   }
 
   function scrollStart(event) {
-    begin = (axis === 'x' ? event.pageX : event.pageY) - that._$thumb.offset()[that._dir];
+    begin = (this.options.axis === 'x' ? event.pageX : event.pageY) - that._$thumb.offset()[that._dir];
     that._$thumb.addClass('scrollbar-thumb-move');
-    $(document).on('mousemove', scrollEnd)
-      .one('mouseup', scrollExit);
+    $(document).
+      on('mousemove', scrollEnd).
+      one('mouseup', scrollExit);
     return false;
   }
 
   function scrollEnd(event) {
     begin = begin === 0 ? that._beginDefault : begin;
-    var end = (axis === 'x' ? event.pageX : event.pageY) - that._$thumb.offset()[that._dir];
+    var end = (this.options.axis === 'x' ? event.pageX : event.pageY) - that._$thumb.offset()[that._dir];
     that._setThumb(end - begin);
   }
 
@@ -111,6 +122,8 @@ scout.Scrollbar.prototype._initThumbImpl = function() {
   this._beginDefault = thumbSize / 2;
 
   // set location of thumb
+  $.log.debug('_initThumbImpl:  topContainer=' + topContainer + ' _offset=' + this._offset + ' _scroll=' + this._scroll + ' _thumbRange=' + this._thumbRange +
+      ' jquery.scrollTop=' + this._$parent.parent().scrollTop());
   this._$thumb.css(this._dir, topContainer / (this._offset - this._scroll) * this._thumbRange);
 
   // show scrollbar
