@@ -141,29 +141,14 @@ public final class MenuUtility {
   }
 
   public static Set<TableMenuType> getMenuTypesForTableSelection(List<? extends ITableRow> selection) {
-    boolean allEnabled = true;
-    if (!CollectionUtility.isEmpty(selection)) {
-      allEnabled = true;
-      for (ITableRow n : selection) {
-        if (!n.isEnabled()) {
-          allEnabled = false;
-          break;
-        }
-      }
+    if (CollectionUtility.isEmpty(selection)) {
+      return CollectionUtility.hashSet(TableMenuType.EmptySpace);
     }
-    if (allEnabled) {
-      if (CollectionUtility.isEmpty(selection)) {
-        return CollectionUtility.hashSet(TableMenuType.EmptySpace);
-      }
-      else if (CollectionUtility.size(selection) == 1) {
-        return CollectionUtility.hashSet(TableMenuType.SingleSelection);
-      }
-      else {
-        return CollectionUtility.hashSet(TableMenuType.MultiSelection);
-      }
+    else if (CollectionUtility.size(selection) == 1) {
+      return CollectionUtility.hashSet(TableMenuType.SingleSelection);
     }
     else {
-      return CollectionUtility.emptyHashSet();
+      return CollectionUtility.hashSet(TableMenuType.MultiSelection);
     }
   }
 
@@ -177,29 +162,14 @@ public final class MenuUtility {
   }
 
   public static Set<TreeMenuType> getMenuTypesForTreeSelection(Set<? extends ITreeNode> selection) {
-    boolean allEnabled = true;
-    if (!CollectionUtility.isEmpty(selection)) {
-      allEnabled = true;
-      for (ITreeNode n : selection) {
-        if (!n.isEnabled()) {
-          allEnabled = false;
-          break;
-        }
-      }
+    if (CollectionUtility.isEmpty(selection)) {
+      return CollectionUtility.hashSet(TreeMenuType.EmptySpace);
     }
-    if (allEnabled) {
-      if (CollectionUtility.isEmpty(selection)) {
-        return CollectionUtility.hashSet(TreeMenuType.EmptySpace);
-      }
-      else if (CollectionUtility.size(selection) == 1) {
-        return CollectionUtility.hashSet(TreeMenuType.SingleSelection);
-      }
-      else {
-        return CollectionUtility.hashSet(TreeMenuType.MultiSelection);
-      }
+    else if (CollectionUtility.size(selection) == 1) {
+      return CollectionUtility.hashSet(TreeMenuType.SingleSelection);
     }
     else {
-      return CollectionUtility.emptyHashSet();
+      return CollectionUtility.hashSet(TreeMenuType.MultiSelection);
     }
   }
 }

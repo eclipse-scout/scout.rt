@@ -1227,57 +1227,6 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
     }
   } // end class P_ColumnSortListener
 
-//  private class P_ContextMenuListener extends MenuAdapter {
-//    @Override
-//    public void menuShown(MenuEvent e) {
-//      // clear all previous
-//      // Windows BUG: fires menu hide before the selection on the menu item is
-//      // propagated.
-//      if (m_contextMenu != null) {
-//        for (MenuItem item : m_contextMenu.getItems()) {
-//          disposeMenuItem(item);
-//        }
-//      }
-////      final AtomicReference<IContextMenu> scoutMenusRef = new AtomicReference<IContextMenu>();
-//      Runnable t = new Runnable() {
-//        @Override
-//        public void run() {
-//          IContextMenu contextMenu = getScoutObject().getContextMenu();
-//          // manually call about to show
-//          contextMenu.callAboutToShow(contextMenu.getActiveFilter());
-////          contextMenu.aboutToShow();
-////          contextMenu.prepareAction();
-////          scoutMenusRef.set(contextMenu);
-//        }
-//      };
-//      JobEx job = getEnvironment().invokeScoutLater(t, 1200);
-//      try {
-//        job.join(1200);
-//      }
-//      catch (InterruptedException ex) {
-//        //nop
-//      }
-//
-//      IContextMenu contextMenu = getScoutObject().getContextMenu();
-//      if (contextMenu != null) {
-//        IActionFilter filter = ActionUtility.createCombinedFilter(contextMenu.getActiveFilter(), ActionUtility.createVisibleFilter());
-//        SwtMenuUtility.fillMenu(m_contextMenu, contextMenu.getChildActions(), filter, getEnvironment());
-//      }
-//    }
-//
-//    private void disposeMenuItem(MenuItem item) {
-//      Menu menu = item.getMenu();
-//      if (menu != null) {
-//        for (MenuItem childItem : menu.getItems()) {
-//          disposeMenuItem(childItem);
-//        }
-//        menu.dispose();
-//      }
-//      item.dispose();
-//    }
-//
-//  } // end class P_ContextMenuListener
-
   private class P_SwtHeaderMenuDetectListener implements MenuDetectListener {
 
     @Override
