@@ -47,60 +47,60 @@ scout.DatePicker.prototype.show = function(viewDate, selectedDate, animated) {
   if (animated && this.$currentBox && viewDateDiff) {
     this._appendAnimated(viewDateDiff, $box);
   } else {
+    //Just replace the current month box (new day in the same month has been chosen)
     if (this.$currentBox) {
       this.$currentBox.remove();
     }
     $box.appendTo(this.$viewport);
+
+    //Measure box size for the animation
+    if (!this._boxWidth) {
+      this._boxWidth = $box.width();
+    }
+    if (!this._boxHeight) {
+      this._boxHeight = $box.height();
+    }
   }
   this.$currentBox = $box;
 };
 
 scout.DatePicker.prototype._appendAnimated = function(viewDateDiff, $box) {
   var $currentBox = this.$currentBox;
-  var boxWidth = $currentBox.width();
-  var boxHeight = $currentBox.height();
   var newLeft = 0, that = this;
   var monthBoxCount = this.$viewport.find('.date-box-month').length + 1;
-  var viewportWidth = monthBoxCount * boxWidth;
+  var viewportWidth = monthBoxCount * this._boxWidth;
 
   //Fix the size of the boxes
   $currentBox
-    .width(boxWidth)
-    .height(boxHeight);
+    .width(this._boxWidth)
+    .height(this._boxHeight);
   $box
-    .width(boxWidth)
-    .height(boxHeight);
-
-  //Define new viewport width so that all boxes fit in
-  this.$viewport.width(viewportWidth);
+    .width(this._boxWidth)
+    .height(this._boxHeight);
 
   if (viewDateDiff > 0) {
     //New view date is larger -> shift left
     $box.appendTo(this.$viewport);
-    newLeft = this._viewportLeft - (this.$viewport.width() - boxWidth);
+    newLeft = this._viewportLeft - (viewportWidth - this._boxWidth);
   } else {
     //New view date is smaller -> shift right
-    this.$viewport.cssLeft(this._viewportLeft - boxWidth);
+    this.$viewport.cssLeft(this._viewportLeft - this._boxWidth);
     $box.prependTo(this.$viewport);
     newLeft = this._viewportLeft;
   }
 
+  //Animate
+  //At first: stop existing animation when shifting multiple dates in a row (e.g. with mouse wheel)
   this.$viewport.
     stop(true).
     animate({ left: newLeft }, 200, function() {
       //Remove every month box beside the new one
-      that.$viewport
-        .find('.date-box-month').each(function() {
-          var $b = $(this);
-          if ($b[0] !== $box[0]) {
-            $b.remove();
-          }
-        });
+      //Its important to use that.$currentBox because $box may already be removed
+      //if a new day in the current month has been chosen while the animation is in progress (e.g. by holding down key)
+      that.$currentBox.siblings('.date-box-month').remove();
 
       //Reset viewport settings
-      that.$viewport
-        .cssLeft(that._viewportLeft)
-        .width('100%');
+      that.$viewport.cssLeft(that._viewportLeft);
     });
 };
 
@@ -164,7 +164,7 @@ scout.DatePicker.prototype._createDateBox = function () {
   var months = this._dateFormat.symbols.months;
   var start = new Date(this.viewDate);
 
-  var $box = $.makeDIV('date-box-month');
+  var $box = $.makeDIV('date-box-month').data('viewDate', this.viewDate);
 
   // Create header
   var headerText = months[this.viewDate.getMonth()] + ' ' + this.viewDate.getFullYear();
