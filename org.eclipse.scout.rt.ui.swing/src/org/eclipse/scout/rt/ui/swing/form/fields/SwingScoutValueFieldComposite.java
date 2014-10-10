@@ -16,14 +16,11 @@ import javax.swing.JComponent;
 import javax.swing.text.JTextComponent;
 
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.ValueFieldEvent;
-import org.eclipse.scout.rt.client.ui.form.fields.ValueFieldListener;
 
 public abstract class SwingScoutValueFieldComposite<T extends IValueField<?>> extends SwingScoutFieldComposite<T> {
 
-  private ValueFieldListener m_valueFieldListener;
   private boolean m_menuOpened;
 
   @Override
@@ -33,15 +30,6 @@ public abstract class SwingScoutValueFieldComposite<T extends IValueField<?>> ex
     setValueFromScout(f.getValue());
     setDisplayTextFromScout(f.getDisplayText());
     updateContextMenuFromScout();
-    m_valueFieldListener = new P_ValueFieldListener();
-    f.addValueFieldListener(m_valueFieldListener);
-  }
-
-  @Override
-  protected void detachScout() {
-    getScoutObject().removeValueFieldListener(m_valueFieldListener);
-    m_valueFieldListener = null;
-    super.detachScout();
   }
 
   protected void valueFieldChangedFromScout(ValueFieldEvent<?> event) {
@@ -149,35 +137,6 @@ public abstract class SwingScoutValueFieldComposite<T extends IValueField<?>> ex
     }
   }
 
-  @Override
-  protected void setSwingField(JComponent swingField) {
-    super.setSwingField(swingField);
-//    installMenuSupport();
-  }
-
-//  protected void installMenuSupport() {
-//    if (getScoutObject().getContextMenu().hasChildActions()) {
-//      SwingScoutMenuSupport menuSupport = SwingScoutMenuSupport.install(getSwingField(), getScoutObject(), getScoutObject().getContextMenu(), getSwingEnvironment());
-//
-//      if (menuSupport != null) {
-//        menuSupport.addListener(new PopupMenuListener() {
-//          @Override
-//          public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-//            setMenuOpened(true);
-//          }
-//
-//          @Override
-//          public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
-//          }
-//
-//          @Override
-//          public void popupMenuCanceled(PopupMenuEvent e) {
-//          }
-//        });
-//      }
-//    }
-//  }
-
   protected Color getDisabledColor(Color origColor) {
     /**
      * some users wish that also the disabled fg color is the same as the fg
@@ -215,10 +174,4 @@ public abstract class SwingScoutValueFieldComposite<T extends IValueField<?>> ex
     m_menuOpened = menuOpened;
   }
 
-  private final class P_ValueFieldListener implements ValueFieldListener {
-    @Override
-    public void valueFieldChanged(ValueFieldEvent event) throws ProcessingException {
-      valueFieldChangedFromScout(event);
-    }
-  }
 }

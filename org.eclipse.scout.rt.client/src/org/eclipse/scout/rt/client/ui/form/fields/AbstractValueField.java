@@ -59,7 +59,6 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
   private int m_valueParsing;
   private int m_valueValidating;
   private T m_initValue;
-  private EventListenerList m_listenerList;
   private EventListenerList m_listeningSlaves;// my slaves
 
   public AbstractValueField() {
@@ -95,7 +94,6 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
   protected void initConfig() {
     super.initConfig();
     m_listeningSlaves = new EventListenerList();
-    m_listenerList = new EventListenerList();
     setAutoDisplayText(getConfiguredAutoDisplayText());
     setAutoAddDefaultMenus(getConfiguredAutoAddDefaultMenus());
 
@@ -454,16 +452,6 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
   @Override
   public boolean isValueValidating() {
     return m_valueValidating > 0;
-  }
-
-  @Override
-  public void addValueFieldListener(ValueFieldListener listener) {
-    m_listenerList.add(ValueFieldListener.class, listener);
-  }
-
-  @Override
-  public void removeValueFieldListener(ValueFieldListener listener) {
-    m_listenerList.remove(ValueFieldListener.class, listener);
   }
 
   private void setValueValidating(boolean b) {
