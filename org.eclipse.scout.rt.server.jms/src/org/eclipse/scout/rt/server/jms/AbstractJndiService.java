@@ -46,7 +46,7 @@ import org.osgi.framework.ServiceRegistration;
  * platform:/plugin/org.eclipse.scout.rt.server.jms/jndi.properties
  * </code>
  */
-public class AbstractJndiService extends AbstractService {
+public abstract class AbstractJndiService extends AbstractService {
   private String m_jndiInitialContextFactory;
   private String m_jndiProviderUrl;
   private String m_jndiUrlPkgPrefixes;
@@ -158,18 +158,7 @@ public class AbstractJndiService extends AbstractService {
     if (StringUtility.hasText(getJndiProperties())) {
       InputStream jndiProperties = null;
       try {
-        String propertiesLocation = getJndiProperties();
-        try {
-          // assume URL
-          URL url = new URL(propertiesLocation);
-          URLConnection connection = url.openConnection();
-          connection.setUseCaches(false);
-          jndiProperties = connection.getInputStream();
-        }
-        catch (MalformedURLException e) {
-          // assume file location
-          jndiProperties = new FileInputStream(getJndiProperties());
-        }
+        jndiProperties = getJndiPorpertiesInputStream(getJndiProperties());
         env.load(jndiProperties);
       }
       catch (Exception e) {
@@ -229,5 +218,21 @@ public class AbstractJndiService extends AbstractService {
     catch (NamingException e) {
       throw new ProcessingException("Error while looking up JNDI resource '" + name + "'", e);
     }
+  }
+
+  protected InputStream getJndiPorpertiesInputStream(String propertiesLocation) throws IOException {
+    InputStream jndiProperties;
+    try {
+      // assume URL
+      URL url = new URL(propertiesLocation);
+      URLConnection connection = url.openConnection();
+      connection.setUseCaches(false);
+      jndiProperties = connection.getInputStream();
+    }
+    catch (MalformedURLException e) {
+      // assume file location
+      jndiProperties = new FileInputStream(propertiesLocation);
+    }
+    return jndiProperties;
   }
 }

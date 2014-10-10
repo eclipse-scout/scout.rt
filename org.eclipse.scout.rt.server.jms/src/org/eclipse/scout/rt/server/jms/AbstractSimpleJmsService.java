@@ -117,7 +117,7 @@ public abstract class AbstractSimpleJmsService<T> extends AbstractJmsService<T> 
 
   protected synchronized void startMessageConsumerJob() throws ProcessingException {
     stopMessageConsumerJob();
-    m_messageConsumerJob = new MessageConsumerJob(getConnection());
+    m_messageConsumerJob = createMessageConsumerJob();
     m_messageConsumerJob.schedule();
   }
 
@@ -135,6 +135,10 @@ public abstract class AbstractSimpleJmsService<T> extends AbstractJmsService<T> 
       }
       job.throwOnError();
     }
+  }
+
+  protected MessageConsumerJob createMessageConsumerJob() throws ProcessingException {
+    return new MessageConsumerJob(getConnection());
   }
 
   /**
@@ -162,33 +166,23 @@ public abstract class AbstractSimpleJmsService<T> extends AbstractJmsService<T> 
       }
     }
 
-    public long getReceiveTimeout() {
+    protected long getReceiveTimeout() {
       return 1000;
     }
 
     @Override
     protected IStatus run(IProgressMonitor monitor) {
       LOG.info("JMS message consumer job started.");
+      IStatus result = Status.OK_STATUS;
       try {
         m_connection.start();
         while (!monitor.isCanceled()) {
-          Message jmsMessage = m_consumer.receive(getReceiveTimeout());
-          try {
-            if (jmsMessage != null) {
-              T message = m_messageSerializer.extractMessage(jmsMessage);
-              if (message != null) {
-                execOnMessage(message, m_session, monitor);
-              }
-            }
-          }
-          catch (Exception e) {
-            LOG.error("Unexpected exception", e);
-          }
+          onMessage(m_consumer.receive(getReceiveTimeout()), monitor);
         }
       }
       catch (Exception e) {
         LOG.error("Unexpected exception while receiving messages from consumer.", e);
-        return new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage());
+        result = new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage());
       }
       finally {
         LOG.trace("Stopping JMS message consumer job...");
@@ -199,11 +193,25 @@ public abstract class AbstractSimpleJmsService<T> extends AbstractJmsService<T> 
         }
         catch (Exception e) {
           LOG.error("Unexpected exception", e);
-          return new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage());
+          result = new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage());
         }
       }
       LOG.info("JMS message consumer job stopped.");
-      return Status.OK_STATUS;
+      return result;
+    }
+
+    protected void onMessage(Message jmsMessage, IProgressMonitor monitor) {
+      if (jmsMessage != null) {
+        try {
+          T message = m_messageSerializer.extractMessage(jmsMessage);
+          if (message != null) {
+            execOnMessage(message, m_session, monitor);
+          }
+        }
+        catch (Exception e) {
+          LOG.error("Unexpected exception", e);
+        }
+      }
     }
   }
 }
