@@ -9,10 +9,14 @@ $.log = log4javascript.getDefaultLogger();
 
 // Patches necessary for phantomJs
 // bind does not exist, see https://github.com/ariya/phantomjs/issues/10522
-// replace with jQuery's bind alternative
+// This piece of code is a simplified version of jQuery#proxy
 if (!Function.prototype.bind) {
-  Function.prototype.bind = function(thisArg) {
-    return jQuery.proxy(this, thisArg);
+  Function.prototype.bind = function(context) {
+    var fn = this,
+      args = Array.prototype.slice.call(arguments, 1);
+    return function() {
+      return fn.apply(context || this, args.concat( Array.prototype.slice.call(arguments) ));
+    };
   };
 }
 
