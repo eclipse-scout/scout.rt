@@ -75,7 +75,7 @@ scout.AbstractSmartField.prototype._onKeydown = function(e) {
       case scout.keys.DOWN: pos++; break;
     }
     pos = Math.min(Math.max(0, pos), $options.length - 1);
-    if (pos != this.selectedOption) {
+    if (pos !== this._selectedOption) {
       this._selectOption($options, pos);
     }
   }
@@ -85,15 +85,25 @@ scout.AbstractSmartField.prototype._selectOption = function($options, pos) {
   if (this._selectedOption >= 0 && this._selectedOption < $options.length) {
     $($options[this._selectedOption]).removeClass('selected');
   }
-  var $selectedOption = $($options[pos]);
-  $selectedOption.addClass('selected');
-  var h = this._$popup.height();
-  var hPerOption = 24;
-  var top = pos * hPerOption;
-  // FIXME AWE: continue... check if item is visible in view-port
 
-  this._$viewport.scrollTop(top);
-  $.log.info('_selectedOption=' + this._selectedOption + ' pos='+pos + ' top=' + top + ' text=' +  $selectedOption.html());
+  var $selectedOption = $($options[pos]),
+    scrollDir = 'n/a',
+    scrollTop = this._$viewport.scrollTop(),
+    viewportH = this._$viewport.height(),
+    optionH = scout.HtmlComponent.getSize($selectedOption).height,
+    optionY = $selectedOption.position().top;
+
+  $selectedOption.addClass('selected');
+
+  if (optionY < 0) {
+    scrollDir = 'Up';
+    this._$viewport.scrollTop(scrollTop + optionY);
+  } else if (optionY + optionH > viewportH) {
+    scrollDir = 'Down';
+    this._$viewport.scrollTop(scrollTop + optionY + optionH - viewportH);
+  }
+
+  $.log.debug('_selectedOption=' + this._selectedOption + ' pos=' + pos + ' scrollDir=' + scrollDir + ' text=' +  $selectedOption.text());
   this._selectedOption = pos;
 };
 

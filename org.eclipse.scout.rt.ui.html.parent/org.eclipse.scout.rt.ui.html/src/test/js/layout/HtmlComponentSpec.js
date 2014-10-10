@@ -9,16 +9,18 @@ describe("HtmlComponent", function() {
     jqueryMock.width = function(val) {
       if (val !== undefined) {
         return jqueryMock;
-      } else {
-        return 6;
       }
     };
     jqueryMock.height = function(val) {
       if (val !== undefined) {
         return jqueryMock;
-      } else {
-        return 7;
       }
+    };
+    jqueryMock.outerWidth = function(withMargins) {
+      return 6;
+    };
+    jqueryMock.outerHeight = function(withMargins) {
+      return 7;
     };
   };
 
@@ -36,7 +38,7 @@ describe("HtmlComponent", function() {
 
     addWidthHeightMock(jqueryMock);
 
-    it("returns width() and height() of JQuery comp", function() {
+    it("returns outerWidth() and outerHeight() of JQuery comp", function() {
       var htmlComp = new scout.HtmlComponent(jqueryMock);
       var size = htmlComp.getSize();
       expect(size.width).toBe(6);
@@ -124,12 +126,6 @@ describe("HtmlComponent", function() {
           throw new Error('unexpected CSS key');
         }
       },
-      outerWidth:function(withMargins) {
-        return 6;
-      },
-      outerHeight:function(withMargins) {
-        return 7;
-      }
     };
 
     addWidthHeightMock(jqueryMock);

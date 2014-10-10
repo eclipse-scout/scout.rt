@@ -30,6 +30,16 @@ scout.HtmlComponent.optGet = function($comp) {
  * in favor of width/height() functions.
  */
 
+/**
+ * Returns the current size of the component, insets included.
+ * TODO AWE: (layout) prüfen ob hier tatsächlich die insets included sind. Müssten wir dann nicht outerWidth/-Height verwenden?
+ */
+scout.HtmlComponent.getSize = function($comp) {
+  return new scout.Dimension(
+      $comp.outerWidth(true),
+      $comp.outerHeight(true));
+};
+
 scout.HtmlComponent.setSize = function($comp, vararg, height) {
   var size = vararg instanceof scout.Dimension ?
       vararg : new scout.Dimension(vararg, height);
@@ -137,9 +147,7 @@ scout.HtmlComponent.prototype.getInsets = function() {
  * TODO AWE: (layout) prüfen ob hier tatsächlich die insets included sind. Müssten wir dann nicht outerWidth/-Height verwenden?
  */
 scout.HtmlComponent.prototype.getSize = function() {
-  return new scout.Dimension(
-      this.$comp.width(),
-      this.$comp.height());
+  return scout.HtmlComponent.getSize(this.$comp);
 };
 
 /**
