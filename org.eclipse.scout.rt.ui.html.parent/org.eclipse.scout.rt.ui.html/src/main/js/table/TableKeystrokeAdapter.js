@@ -42,7 +42,7 @@ scout.TableKeystrokeAdapter = function(table) {
       var $rowsSelected = that._table.findSelectedRows();
 
       // up: move up
-      if (keycode == 38) {
+      if (keycode == 38) { // TODO AWE: keys.js verwenden
         if ($rowsSelected.length > 0) {
           $newRowSelection = $rowsSelected.first().prev('.table-row');
         } else {

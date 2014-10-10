@@ -90,6 +90,8 @@ scout.AbstractSmartField.prototype._selectOption = function($options, pos) {
   var h = this._$popup.height();
   var hPerOption = 24;
   var top = pos * hPerOption;
+  // FIXME AWE: continue... check if item is visible in view-port
+
   this._$viewport.scrollTop(top);
   $.log.info('_selectedOption=' + this._selectedOption + ' pos='+pos + ' top=' + top + ' text=' +  $selectedOption.html());
   this._selectedOption = pos;
