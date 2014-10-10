@@ -10,6 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
+import java.util.Arrays;
+import java.util.List;
+
+import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
@@ -18,12 +22,15 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractMixedSmartField;
 import org.eclipse.scout.rt.shared.services.common.code.CODES;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
+import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
+import org.eclipse.scout.service.SERVICES;
 
 public abstract class AbstractMixedSmartColumn<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE> extends AbstractContentAssistColumn<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE> implements IMixedSmartColumn<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE> {
 
@@ -41,7 +48,7 @@ public abstract class AbstractMixedSmartColumn<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE>
    * lookup call, the values are sorted by display text.
    * <p>
    * Subclasses can override this method. Default is {@code false}.
-   * 
+   *
    * @return {@code true} if values are sorted by display text, {@code false} otherwise.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -64,7 +71,7 @@ public abstract class AbstractMixedSmartColumn<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE>
 
   /**
    * the default implementation simply casts one to the other type
-   * 
+   *
    * @param key
    * @return
    */
@@ -146,6 +153,21 @@ public abstract class AbstractMixedSmartColumn<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE>
       protected VALUE_TYPE execConvertKeyToValue(LOOKUP_CALL_KEY_TYPE key) {
         return AbstractMixedSmartColumn.this.execConvertKeyToValue(key);
       }
+
+      @Override
+      protected void injectMenusInternal(List<IMenu> menuList) {
+        List<? extends Class> menuCandidates = Arrays.asList(ConfigurationUtility.getDeclaredPublicClasses(AbstractMixedSmartColumn.this.getClass()));
+        List<Class<? extends IMenu>> menuClazzes = ConfigurationUtility.sortFilteredClassesByOrderAnnotation(menuCandidates, IMenu.class);
+
+        for (Class<? extends IMenu> menuClazz : menuClazzes) {
+          try {
+            menuList.add(ConfigurationUtility.newInnerInstance(AbstractMixedSmartColumn.this, menuClazz));
+          }
+          catch (Exception e) {
+            SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException(this.getClass().getSimpleName(), e));
+          }
+        }
+      }
     };
 
     f.setCodeTypeClass(getCodeTypeClass());
@@ -156,6 +178,7 @@ public abstract class AbstractMixedSmartColumn<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE>
     f.setActiveFilterEnabled(getConfiguredActiveFilterEnabled());
     f.setBrowseAutoExpandAll(getConfiguredBrowseAutoExpandAll());
     f.setBrowseLoadIncremental(getConfiguredBrowseLoadIncremental());
+
     return f;
   }
 
