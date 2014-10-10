@@ -119,16 +119,6 @@ public interface IValueField<T> extends IFormField, IHolder<T> {
   void fireValueChanged();
 
   /**
-   * @param listener
-   */
-  void addValueFieldListener(ValueFieldListener listener);
-
-  /**
-   * @param listener
-   */
-  void removeValueFieldListener(ValueFieldListener listener);
-
-  /**
    * @return the child list of {@link #getContextMenu()}
    */
   List<IMenu> getMenus();
