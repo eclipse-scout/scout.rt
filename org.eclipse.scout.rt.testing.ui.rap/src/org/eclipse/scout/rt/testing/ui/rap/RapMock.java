@@ -536,6 +536,17 @@ public class RapMock extends AbstractGuiMock {
   }
 
   @Override
+  public org.eclipse.scout.testing.client.menu.MenuItem getContextMenuItem(String label) {
+    final MenuItem uiMenuItem = waitForMenuItem(label);
+    return syncExec(new WaitCondition<org.eclipse.scout.testing.client.menu.MenuItem>() {
+      @Override
+      public org.eclipse.scout.testing.client.menu.MenuItem run() throws Throwable {
+        return new org.eclipse.scout.testing.client.menu.MenuItem(uiMenuItem.getText(), uiMenuItem.isEnabled(), true);
+      }
+    });
+  }
+
+  @Override
   public void contextMenu(final String... names) {
     //move to menu
     for (int i = 0; i < names.length; i++) {

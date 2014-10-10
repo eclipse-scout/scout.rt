@@ -112,7 +112,34 @@ public class TreeContextMenu extends AbstractPropertyObserverContextMenu<ITree> 
       // update menu types
       setCurrentMenuTypes(MenuUtility.getMenuTypesForTreeSelection(ownerSelection));
       calculateLocalVisibility();
+      calculateEnableState(ownerSelection);
     }
+  }
+
+  /**
+   * @param ownerSelection
+   */
+  protected void calculateEnableState(Set<ITreeNode> ownerSelection) {
+    boolean enabled = true;
+    for (ITreeNode node : ownerSelection) {
+      if (!node.isEnabled()) {
+        enabled = false;
+        break;
+      }
+    }
+    final boolean inheritedEnability = enabled;
+    acceptVisitor(new IActionVisitor() {
+      @Override
+      public int visit(IAction action) {
+        if (action instanceof IMenu) {
+          IMenu menu = (IMenu) action;
+          if (!menu.hasChildActions() && menu.isInheritAccessibility()) {
+            menu.setEnabled(inheritedEnability);
+          }
+        }
+        return CONTINUE;
+      }
+    });
   }
 
   @Override

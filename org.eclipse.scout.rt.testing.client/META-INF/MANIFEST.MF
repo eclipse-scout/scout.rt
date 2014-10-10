@@ -11,6 +11,7 @@ Require-Bundle: org.eclipse.scout.rt.testing.shared;bundle-version="[4.1.0,4.2.0
 Export-Package: org.eclipse.scout.rt.testing.client.runner.parameterized,
  org.eclipse.scout.testing.client,
  org.eclipse.scout.testing.client.form,
+ org.eclipse.scout.testing.client.menu,
  org.eclipse.scout.testing.client.robot,
  org.eclipse.scout.testing.client.runner,
  org.eclipse.scout.testing.client.servicetunnel.http

@@ -110,7 +110,34 @@ public class TableContextMenu extends AbstractPropertyObserverContextMenu<ITable
       // set current menu types
       setCurrentMenuTypes(MenuUtility.getMenuTypesForTableSelection(ownerValue));
       calculateLocalVisibility();
+      calculateEnableState(ownerValue);
     }
+  }
+
+  /**
+   * @param ownerValue
+   */
+  protected void calculateEnableState(List<ITableRow> ownerValue) {
+    boolean enabled = true;
+    for (ITableRow row : ownerValue) {
+      if (!row.isEnabled()) {
+        enabled = false;
+        break;
+      }
+    }
+    final boolean inheritedEnability = enabled;
+    acceptVisitor(new IActionVisitor() {
+      @Override
+      public int visit(IAction action) {
+        if (action instanceof IMenu) {
+          IMenu menu = (IMenu) action;
+          if (!menu.hasChildActions() && menu.isInheritAccessibility()) {
+            menu.setEnabled(inheritedEnability);
+          }
+        }
+        return CONTINUE;
+      }
+    });
   }
 
   @Override

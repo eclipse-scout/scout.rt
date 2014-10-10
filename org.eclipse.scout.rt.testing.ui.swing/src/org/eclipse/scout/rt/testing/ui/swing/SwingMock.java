@@ -401,6 +401,15 @@ public class SwingMock extends AbstractGuiMock {
   }
 
   @Override
+  public org.eclipse.scout.testing.client.menu.MenuItem getContextMenuItem(String label) {
+    Component uiMenuItem = waitForContextMenu(label);
+    if (uiMenuItem != null) {
+      return new org.eclipse.scout.testing.client.menu.MenuItem(uiMenuItem.getName(), uiMenuItem.isEnabled(), uiMenuItem.isVisible());
+    }
+    return null;
+  }
+
+  @Override
   public void contextMenu(final String... names) {
     //move to menu
     for (int i = 0; i < names.length; i++) {

@@ -15,6 +15,7 @@ import java.util.Set;
 
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.testing.shared.WaitCondition;
+import org.eclipse.scout.testing.client.menu.MenuItem;
 
 /**
  * This interface is used to support gui testing with an abstraction layer.
@@ -400,4 +401,9 @@ public interface IGuiMock {
    * @return Gets the {@link IClientSession} associated with the current {@link IGuiMock}.
    */
   IClientSession getClientSession();
+
+  /**
+   * @return
+   */
+  MenuItem getContextMenuItem(String name);
 }
