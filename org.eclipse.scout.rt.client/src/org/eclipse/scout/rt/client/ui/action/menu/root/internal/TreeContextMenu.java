@@ -11,9 +11,11 @@
 package org.eclipse.scout.rt.client.ui.action.menu.root.internal;
 
 import java.beans.PropertyChangeEvent;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -36,6 +38,8 @@ import org.eclipse.scout.service.SERVICES;
  */
 public class TreeContextMenu extends AbstractPropertyObserverContextMenu<ITree> implements ITreeContextMenu {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(TreeContextMenu.class);
+
+  private Set<? extends ITreeNode> m_currentSelection;
 
   /**
    * @param owner
@@ -94,6 +98,7 @@ public class TreeContextMenu extends AbstractPropertyObserverContextMenu<ITree> 
   protected void handleOwnerValueChanged() {
     if (getOwner() != null) {
       final Set<ITreeNode> ownerSelection = getOwner().getSelectedNodes();
+      m_currentSelection = CollectionUtility.hashSet(ownerSelection);
       acceptVisitor(new IActionVisitor() {
         @Override
         public int visit(IAction action) {
@@ -119,7 +124,7 @@ public class TreeContextMenu extends AbstractPropertyObserverContextMenu<ITree> 
   /**
    * @param ownerSelection
    */
-  protected void calculateEnableState(Set<ITreeNode> ownerSelection) {
+  protected void calculateEnableState(Collection<? extends ITreeNode> ownerSelection) {
     boolean enabled = true;
     for (ITreeNode node : ownerSelection) {
       if (!node.isEnabled()) {
@@ -142,6 +147,15 @@ public class TreeContextMenu extends AbstractPropertyObserverContextMenu<ITree> 
     });
   }
 
+  /**
+   * @param nodes
+   */
+  protected void handleNodesUpdated(Collection<ITreeNode> nodes) {
+    if (CollectionUtility.containsAny(nodes, m_currentSelection)) {
+      calculateEnableState(m_currentSelection);
+    }
+  }
+
   @Override
   protected void handleOwnerPropertyChanged(PropertyChangeEvent evt) {
     if (ITable.PROP_ENABLED.equals(evt.getPropertyName())) {
@@ -155,6 +169,9 @@ public class TreeContextMenu extends AbstractPropertyObserverContextMenu<ITree> 
     public void treeChanged(TreeEvent e) {
       if (e.getType() == TreeEvent.TYPE_NODES_SELECTED) {
         handleOwnerValueChanged();
+      }
+      else if (e.getType() == TreeEvent.TYPE_NODES_UPDATED) {
+        handleNodesUpdated(e.getNodes());
       }
     }
   }

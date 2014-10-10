@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.action.menu.root.internal;
 import java.beans.PropertyChangeEvent;
 import java.util.List;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -34,6 +35,8 @@ import org.eclipse.scout.service.SERVICES;
  */
 public class TableContextMenu extends AbstractPropertyObserverContextMenu<ITable> implements ITableContextMenu {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(TableContextMenu.class);
+
+  private List<? extends ITableRow> m_currentSelection;
 
   /**
    * @param owner
@@ -90,8 +93,10 @@ public class TableContextMenu extends AbstractPropertyObserverContextMenu<ITable
   }
 
   protected void handleOwnerValueChanged() {
+    m_currentSelection = null;
     if (getOwner() != null) {
       final List<ITableRow> ownerValue = getOwner().getSelectedRows();
+      m_currentSelection = CollectionUtility.arrayList(ownerValue);
       acceptVisitor(new IActionVisitor() {
         @Override
         public int visit(IAction action) {
@@ -117,7 +122,7 @@ public class TableContextMenu extends AbstractPropertyObserverContextMenu<ITable
   /**
    * @param ownerValue
    */
-  protected void calculateEnableState(List<ITableRow> ownerValue) {
+  protected void calculateEnableState(List<? extends ITableRow> ownerValue) {
     boolean enabled = true;
     for (ITableRow row : ownerValue) {
       if (!row.isEnabled()) {
@@ -140,6 +145,15 @@ public class TableContextMenu extends AbstractPropertyObserverContextMenu<ITable
     });
   }
 
+  /**
+   * @param rows
+   */
+  protected void handleRowsUpdated(List<ITableRow> rows) {
+    if (CollectionUtility.containsAny(rows, m_currentSelection)) {
+      calculateEnableState(m_currentSelection);
+    }
+  }
+
   @Override
   protected void handleOwnerPropertyChanged(PropertyChangeEvent evt) {
     if (ITable.PROP_ENABLED.equals(evt.getPropertyName())) {
@@ -153,6 +167,10 @@ public class TableContextMenu extends AbstractPropertyObserverContextMenu<ITable
       if (e.getType() == TableEvent.TYPE_ROWS_SELECTED) {
         handleOwnerValueChanged();
       }
+      else if (e.getType() == TableEvent.TYPE_ROWS_UPDATED) {
+        handleRowsUpdated(e.getRows());
+      }
     }
+
   }
 }
