@@ -20,8 +20,15 @@ scout.DatePicker.prototype.show = function(viewDate, selectedDate, animated) {
       cssLeft(this._$field.position().left).
       cssTop(this._$field.innerBottom());
     this._$field.after(this.$popup);
-    this.$viewport = this.$popup.appendDIV('viewport');
+
+    this._$header = this._createHeader().appendTo(this.$popup);
+    this._$header.find('.date-box-left-y, .date-box-left-m, .date-box-right-m, .date-box-right-y').mousedown(this._onNavigationMouseDown.bind(this));
+
+    this.$viewport = this.$popup.appendDIV('date-box-viewport');
+    this._viewportTop = this.$viewport.position().top;
     this._viewportLeft = this.$viewport.position().left;
+    //Fix the position of the viewport in order to to proper viewport shifting (see _appendAnimated)
+    this.$viewport.css({'position': 'absolute', left: this._viewportLeft, top: this._viewportTop});
   }
 
   this.selectedDate = selectedDate;
@@ -39,9 +46,10 @@ scout.DatePicker.prototype.show = function(viewDate, selectedDate, animated) {
   }
   this.viewDate = viewDate;
 
+  this._updateHeader(viewDate);
+
   var $box = this._createDateBox();
   $box.find('.date-box-day').mousedown(this._onDayMouseDown.bind(this));
-  $box.find('.date-box-left-y, .date-box-left-m, .date-box-right-m, .date-box-right-y').mousedown(this._onNavigationMouseDown.bind(this));
   $box[0].addEventListener("mousewheel", this._onMouseWheel.bind(this), false);
 
   if (animated && this.$currentBox && viewDateDiff) {
@@ -161,22 +169,9 @@ scout.DatePicker.prototype._createDateBox = function () {
   var cl, i, now = new Date();
   var day, dayInMonth, $day;
   var weekdays = this._dateFormat.symbols.weekdaysShortOrdered;
-  var months = this._dateFormat.symbols.months;
   var start = new Date(this.viewDate);
 
   var $box = $.makeDIV('date-box-month').data('viewDate', this.viewDate);
-
-  // Create header
-  var headerText = months[this.viewDate.getMonth()] + ' ' + this.viewDate.getFullYear();
-  var headerHtml =
-    '<div class="date-box-header">' +
-    '  <div class="date-box-left-y" data-shift="-12"></div>' +
-    '  <div class="date-box-left-m" data-shift="-1"></div>' +
-    '  <div class="date-box-right-y" data-shift="12"></div>' +
-    '  <div class="date-box-right-m" data-shift="1"></div>' +
-    '  <div class="date-box-header-month">' + headerText + '</div>' +
-    '</div>';
-  $box.append(headerHtml);
 
   // Create weekday header
   for (i in weekdays){
@@ -219,4 +214,26 @@ scout.DatePicker.prototype._createDateBox = function () {
   }
 
   return $box;
+};
+
+scout.DatePicker.prototype._createHeader = function () {
+  var headerHtml =
+    '<div class="date-box-header">' +
+    '  <div class="date-box-left-y" data-shift="-12"></div>' +
+    '  <div class="date-box-left-m" data-shift="-1"></div>' +
+    '  <div class="date-box-right-y" data-shift="12"></div>' +
+    '  <div class="date-box-right-m" data-shift="1"></div>' +
+    '  <div class="date-box-header-month"></div>' +
+    '</div>';
+
+  return $(headerHtml);
+};
+
+scout.DatePicker.prototype._updateHeader = function (viewDate) {
+  this._$header.find('.date-box-header-month').text(this._createHeaderText(viewDate));
+};
+
+scout.DatePicker.prototype._createHeaderText = function (viewDate) {
+  var months = this._dateFormat.symbols.months;
+  return months[viewDate.getMonth()] + ' ' + viewDate.getFullYear();
 };

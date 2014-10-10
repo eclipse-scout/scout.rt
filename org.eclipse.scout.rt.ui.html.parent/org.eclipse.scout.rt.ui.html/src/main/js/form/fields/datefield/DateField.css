@@ -26,8 +26,8 @@
 }
 
 /* necessary for animation */
-.date-box .viewport {
-  position: absolute;
+.date-box-viewport {
+  position: relative;
   height: 100%;
 }
 
@@ -88,8 +88,6 @@
 .date-box-header{
   line-height: 26px;
   height: 26px;
-  width: 211px;
-  float: left;
   color: @color-bench-text-active;
   margin: 0px 0px 5px 0px;
 }
