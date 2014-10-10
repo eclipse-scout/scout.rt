@@ -85,26 +85,10 @@ scout.AbstractSmartField.prototype._selectOption = function($options, pos) {
   if (this._selectedOption >= 0 && this._selectedOption < $options.length) {
     $($options[this._selectedOption]).removeClass('selected');
   }
-
-  var $selectedOption = $($options[pos]),
-    scrollDir = 'n/a',
-    scrollTop = this._$viewport.scrollTop(),
-    viewportH = this._$viewport.height(),
-    optionH = scout.HtmlComponent.getSize($selectedOption).height,
-    optionY = $selectedOption.position().top;
-
+  var $selectedOption = $($options[pos]);
   $selectedOption.addClass('selected');
-
-  if (optionY < 0) {
-    scrollDir = 'Up';
-    this._$viewport.scrollTop(scrollTop + optionY);
-  } else if (optionY + optionH > viewportH) {
-    scrollDir = 'Down';
-    this._$viewport.scrollTop(scrollTop + optionY + optionH - viewportH);
-  }
-
-  $.log.debug('_selectedOption=' + this._selectedOption + ' pos=' + pos + ' scrollDir=' + scrollDir + ' text=' +  $selectedOption.text());
   this._selectedOption = pos;
+  scout.Scrollbar2.scrollTo(this._$viewport, $selectedOption);
 };
 
 scout.AbstractSmartField.prototype._onKeyup = function(e) {

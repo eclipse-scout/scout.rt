@@ -705,6 +705,10 @@ scout.Table.prototype._onAllRowsDeleted = function() {
   }
 };
 
+scout.Table.prototype.scrollTo = function($selection) {
+  scout.Scrollbar2.scrollTo(this._$viewport, $selection);
+};
+
 scout.Table.prototype.selectRowsByIds = function(rowIds) {
   if (!scout.arrays.equalsIgnoreOrder(rowIds, this.selectedRowIds)) {
     this.selectedRowIds = rowIds;

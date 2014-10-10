@@ -29,7 +29,8 @@ scout.TableKeystrokeAdapter = function(table) {
 
   this.handlers.push({
     accept: function(event) {
-      if (event && $.inArray(event.which, [38, 40, 36, 35, 33, 34]) >= 0 && // up, down, home, end, pgup, pgdown
+      if (event && $.inArray(event.which,
+          [scout.keys.UP, scout.keys.DOWN, scout.keys.HOME, scout.keys.END, scout.keys.PAGE_UP,scout.keys.PAGE_DOWN]) >= 0 &&
         !event.ctrlKey && !event.altKey && !event.metaKey) {
         return true;
       }
@@ -42,7 +43,7 @@ scout.TableKeystrokeAdapter = function(table) {
       var $rowsSelected = that._table.findSelectedRows();
 
       // up: move up
-      if (keycode == 38) { // TODO AWE: keys.js verwenden
+      if (keycode === scout.keys.UP) {
         if ($rowsSelected.length > 0) {
           $newRowSelection = $rowsSelected.first().prev('.table-row');
         } else {
@@ -51,7 +52,7 @@ scout.TableKeystrokeAdapter = function(table) {
       }
 
       // down: move down
-      if (keycode == 40) {
+      if (keycode === scout.keys.DOWN) {
         if ($rowsSelected.length > 0) {
           $newRowSelection = $rowsSelected.last().next('.table-row');
         } else {
@@ -60,17 +61,17 @@ scout.TableKeystrokeAdapter = function(table) {
       }
 
       // home: top of table
-      if (keycode == 36) {
+      if (keycode === scout.keys.HOME) {
         $newRowSelection = $rowsAll.first();
       }
 
       // end: bottom of table
-      if (keycode == 35) {
+      if (keycode === scout.keys.END) {
         $newRowSelection = $rowsAll.last();
       }
 
       // pgup: jump up
-      if (keycode == 33) {
+      if (keycode === scout.keys.PAGE_UP) {
         if ($rowsSelected.length > 0) {
           $prev = $rowsSelected.first().prevAll();
           if ($prev.length > 10) {
@@ -84,7 +85,7 @@ scout.TableKeystrokeAdapter = function(table) {
       }
 
       // pgdn: jump down
-      if (keycode == 34) {
+      if (keycode === scout.keys.PAGE_DOWN) {
         if ($rowsSelected.length > 0) {
           $prev = $rowsSelected.last().nextAll();
           if ($prev.length > 10) {
@@ -100,7 +101,7 @@ scout.TableKeystrokeAdapter = function(table) {
       // apply selection
       if ($newRowSelection.length > 0) {
         rowIds = [];
-        // FIXME Handling of shift key not perfect, yet... (must remember first selected row)
+        // FIXME CGU: Handling of shift key not perfect, yet... (must remember first selected row)
         if (event.shiftKey) {
           $newRowSelection = $rowsSelected.add($newRowSelection);
         }
@@ -110,9 +111,14 @@ scout.TableKeystrokeAdapter = function(table) {
         that._table.selectRowsByIds(rowIds);
       }
 
-      //FIXME If selection is not visible we need to scroll
-      //that._table.scrollToSelection();
+      // scroll selection into viewport (if not visible)
+      if ($newRowSelection.length > 0) {
+        that._table.scrollTo($newRowSelection);
+      }
 
+      // preventDefault() is required here, because Chrome would native scroll a scrollable DIV,
+      // which would interfere with our custom scroll behavior.
+      event.preventDefault();
       return false;
     }
   });

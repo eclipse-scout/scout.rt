@@ -39,3 +39,27 @@ scout.Scrollbar2.update = function($viewport) {
     scrollbar.initThumb();
   }
 };
+
+/**
+ * Scrolls the viewport to the given object (must be a child of viewport)
+ * @param $viewport
+ * @param $selection
+ */
+scout.Scrollbar2.scrollTo = function($viewport, $selection) {
+  var scrollDir = 'n/a',
+    scrollTop = $viewport.scrollTop(),
+    viewportH = $viewport.height(),
+    optionH = scout.HtmlComponent.getSize($selection).height,
+    optionY = $selection.position().top;
+  $.log.debug('scrollTo() scrollTop=' + scrollTop + ' viewportH=' + viewportH + ' optionH=' + optionH + ' optionY=' + optionY);
+
+  if (optionY < 0) {
+    scrollDir = 'Up';
+    $viewport.scrollTop(scrollTop + optionY);
+  } else if (optionY + optionH > viewportH) {
+    scrollDir = 'Down';
+    $viewport.scrollTop(scrollTop + optionY + optionH - viewportH);
+  }
+
+  $.log.debug('_scrollToSelection scrollDir=' + scrollDir);
+};
