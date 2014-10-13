@@ -45,7 +45,7 @@ public final class ActionUtility {
 
   /**
    * Removes invisible actions. Also removes leading and trailing separators as well as multiple consecutive separators.
-   *
+   * 
    * @since 3.8.1
    */
   public static <T extends IAction> List<T> visibleNormalizedActions(List<T> actionNodes) {
@@ -182,7 +182,7 @@ public final class ActionUtility {
    * visibleOnly) and at least one of its leaf children (recursively) is visible (depending on visible only) and and has
    * one of the passed menu types.</li>
    * </ul>
-   *
+   * 
    * @param menuTypes
    * @param visibleOnly
    * @return
@@ -225,13 +225,13 @@ public final class ActionUtility {
     public boolean accept(IAction action) {
       if (action instanceof IMenu) {
         IMenu menu = (IMenu) action;
-        if (menu.hasChildActions()) {
-          // check for filter matching child menus
-          return !normalizedActions(menu.getChildActions(), this).isEmpty();
+        if (isVisibleOnly() && !menu.isVisible()) {
+          return false;
         }
         else {
-          if (isVisibleOnly() && !menu.isVisible()) {
-            return false;
+          if (menu.hasChildActions()) {
+            // check for filter matching child menus
+            return !normalizedActions(menu.getChildActions(), this).isEmpty();
           }
           if (getMenuTypes() != null) {
             for (IMenuType t : getMenuTypes()) {
@@ -244,6 +244,7 @@ public final class ActionUtility {
           else {
             return true;
           }
+
         }
       }
       return false;
