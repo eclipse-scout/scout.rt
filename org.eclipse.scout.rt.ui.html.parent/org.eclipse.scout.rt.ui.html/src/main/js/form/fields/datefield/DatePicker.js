@@ -1,6 +1,6 @@
-scout.DatePicker = function(dateFormat, $field) {
+scout.DatePicker = function(dateFormat, dateField) {
   this._dateFormat = dateFormat;
-  this._$field = $field;
+  this._dateField = dateField;
   this.selectedDate = null;
   this.viewDate = null;
   this.$popup = null;
@@ -17,9 +17,9 @@ scout.DatePicker.prototype.show = function(viewDate, selectedDate, animated) {
   var viewDateDiff = 0;
   if (!this.$popup) {
     this.$popup = $.makeDIV('date-box').
-      cssLeft(this._$field.position().left).
-      cssTop(this._$field.innerBottom());
-    this._$field.after(this.$popup);
+      cssLeft(this._dateField.$field.position().left).
+      cssTop(this._dateField.$field.innerBottom());
+    this._dateField.$field.after(this.$popup);
 
     this._$header = this._createHeader().appendTo(this.$popup);
     this._$header.find('.date-box-left-y, .date-box-left-m, .date-box-right-m, .date-box-right-y').mousedown(this._onNavigationMouseDown.bind(this));
@@ -125,7 +125,7 @@ scout.DatePicker.prototype._onDayMouseDown = function(event) {
   //FIXME CGU click would be better but comes after field.blur -> ignore blur when clicking inside box and close box here
   var $target = $(event.currentTarget);
   var date = $target.data('date');
-  this._onDateSelected(date);
+  this._dateField.onDateSelected(date);
 };
 
 scout.DatePicker.prototype._onMouseWheel = function(event) {
@@ -138,8 +138,10 @@ scout.DatePicker.prototype._onMouseWheel = function(event) {
 };
 
 scout.DatePicker.prototype.close = function() {
-  this.$popup.remove();
-  this.$popup = null;
+  if (this.$popup) {
+    this.$popup.remove();
+    this.$popup = null;
+  }
 };
 
 scout.DatePicker.prototype.shiftViewDate = function(years, months, days) {
@@ -156,13 +158,8 @@ scout.DatePicker.prototype.shiftSelectedDate = function(years, months, days) {
   }
   date = scout.dates.shift(date, years, months, days);
 
-  var text = this._dateFormat.format(date);
-  this._onDateSelected(text);
+  this._dateField.onDateSelected(date);
   this.selectDate(date, true);
-};
-
-scout.DatePicker.prototype._onDateSelected = function (text){
-  this._$field.val(text);
 };
 
 scout.DatePicker.prototype._createDateBox = function () {
@@ -210,7 +207,7 @@ scout.DatePicker.prototype._createDateBox = function () {
     day = (dayInMonth <= 9 ? '0' + dayInMonth : dayInMonth);
     $day = $box.
       appendDIV('date-box-day ' + cl, day).
-      data('date', this._dateFormat.format(start));
+      data('date', new Date(start));
   }
 
   return $box;

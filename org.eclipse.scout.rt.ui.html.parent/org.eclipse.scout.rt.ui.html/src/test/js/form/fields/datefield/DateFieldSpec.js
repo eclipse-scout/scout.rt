@@ -23,12 +23,15 @@ describe("DateField", function() {
     return field;
   }
 
-  function createFieldAndFocus(model) {
+  function createFieldAndFocusAndOpenPicker(model) {
     var dateField = createField(model);
     dateField.render(session.$entryPoint);
 
     dateField.$field.focus();
     expect(dateField.$field).toBeFocused();
+
+    dateField.$field.click();
+    expect(findPicker().length).toBe(1);
 
     return dateField;
   }
@@ -54,7 +57,7 @@ describe("DateField", function() {
     dateField.validateDisplayText(dateField.$field.val());
   }
 
-  describe("Focusing the field", function() {
+  describe("Clicking the field", function() {
 
     it("opens the datepicker", function() {
       var model = createModel();
@@ -62,9 +65,8 @@ describe("DateField", function() {
       dateField.render(session.$entryPoint);
       expect(findPicker().length).toBe(0);
 
-      dateField.$field.focus();
+      dateField.$field.click();
 
-      expect(dateField.$field).toBeFocused();
       expect(findPicker().length).toBe(1);
     });
   });
@@ -73,7 +75,7 @@ describe("DateField", function() {
 
     it("closes the datepicker", function() {
       var model = createModel();
-      var dateField = createFieldAndFocus(model);
+      var dateField = createFieldAndFocusAndOpenPicker(model);
       expect(findPicker().length).toBe(1);
 
       dateField.$field.blur();
@@ -83,7 +85,7 @@ describe("DateField", function() {
 
     it("accepts the prediction", function() {
       var model = createModel();
-      var dateField = createFieldAndFocus(model);
+      var dateField = createFieldAndFocusAndOpenPicker(model);
 
       writeText(dateField, '02');
       dateField._$predict.val('02.11.2015');
@@ -95,7 +97,7 @@ describe("DateField", function() {
     it("updates the model with the selected value", function() {
       var model = createModel();
       model.displayText = '01.10.2014';
-      var dateField = createFieldAndFocus(model);
+      var dateField = createFieldAndFocusAndOpenPicker(model);
       expect(dateField.displayText).toBe('01.10.2014');
 
       writeText(dateField, '02.11.2015');
@@ -108,7 +110,7 @@ describe("DateField", function() {
   describe("Validation", function() {
     it("invalidates field if value is invalid (not a date)", function() {
       var model = createModel();
-      var dateField = createFieldAndFocus(model);
+      var dateField = createFieldAndFocusAndOpenPicker(model);
 
       writeText(dateField, '33');
       expect(dateField.$field).toHaveClass('has-error');
@@ -116,7 +118,7 @@ describe("DateField", function() {
 
     it("prevents model update if value is invalid", function() {
       var model = createModel();
-      var dateField = createFieldAndFocus(model);
+      var dateField = createFieldAndFocusAndOpenPicker(model);
 
       writeText(dateField, '33');
       expect(dateField.displayText).toBeFalsy();
@@ -131,7 +133,7 @@ describe("DateField", function() {
 
       it("closes the datepicker", function() {
         var model = createModel();
-        var dateField = createFieldAndFocus(model);
+        var dateField = createFieldAndFocusAndOpenPicker(model);
         expect(findPicker().length).toBe(1);
 
         dateField.$field.triggerKeyDown(scout.keys.ESC);
@@ -143,16 +145,17 @@ describe("DateField", function() {
 
     describe("ENTER", function() {
 
-      it("updates the model with the selected value", function() {
+      it("updates the model with the selected value and closes picker", function() {
         var model = createModel();
         model.displayText = '01.10.2014';
-        var dateField = createFieldAndFocus(model);
+        var dateField = createFieldAndFocusAndOpenPicker(model);
         expect(dateField.displayText).toBe('01.10.2014');
 
         writeText(dateField, '02.11.2015');
         expect(dateField.displayText).toBe('01.10.2014');
         dateField.$field.triggerKeyDown(scout.keys.ENTER);
         expect(dateField.displayText).toBe('02.11.2015');
+        expect(findPicker().length).toBe(0);
       });
 
     });
@@ -162,7 +165,7 @@ describe("DateField", function() {
       it("increases day by one", function() {
         var model = createModel();
         model.displayText = '01.10.2014';
-        var dateField = createFieldAndFocus(model);
+        var dateField = createFieldAndFocusAndOpenPicker(model);
         expect(dateField.displayText).toBe('01.10.2014');
 
         dateField.$field.triggerKeyDown(scout.keys.DOWN);
@@ -174,7 +177,7 @@ describe("DateField", function() {
       it("increases month by one if shift is used as modifier", function() {
         var model = createModel();
         model.displayText = '01.10.2014';
-        var dateField = createFieldAndFocus(model);
+        var dateField = createFieldAndFocusAndOpenPicker(model);
         expect(dateField.displayText).toBe('01.10.2014');
 
         dateField.$field.triggerKeyDown(scout.keys.DOWN, 'shift');
@@ -186,7 +189,7 @@ describe("DateField", function() {
       it("increases year by one if ctrl is used as modifier", function() {
         var model = createModel();
         model.displayText = '01.10.2014';
-        var dateField = createFieldAndFocus(model);
+        var dateField = createFieldAndFocusAndOpenPicker(model);
         expect(dateField.displayText).toBe('01.10.2014');
 
         dateField.$field.triggerKeyDown(scout.keys.DOWN, 'ctrl');
@@ -200,7 +203,7 @@ describe("DateField", function() {
       it("decreases day by one", function() {
         var model = createModel();
         model.displayText = '01.10.2014';
-        var dateField = createFieldAndFocus(model);
+        var dateField = createFieldAndFocusAndOpenPicker(model);
         expect(dateField.displayText).toBe('01.10.2014');
 
         dateField.$field.triggerKeyDown(scout.keys.UP);
@@ -212,7 +215,7 @@ describe("DateField", function() {
       it("decreases month by one if shift is used as modifier", function() {
         var model = createModel();
         model.displayText = '01.10.2014';
-        var dateField = createFieldAndFocus(model);
+        var dateField = createFieldAndFocusAndOpenPicker(model);
         expect(dateField.displayText).toBe('01.10.2014');
 
         dateField.$field.triggerKeyDown(scout.keys.UP, 'shift');
@@ -224,7 +227,7 @@ describe("DateField", function() {
       it("decreases year by one if ctrl is used as modifier", function() {
         var model = createModel();
         model.displayText = '01.10.2014';
-        var dateField = createFieldAndFocus(model);
+        var dateField = createFieldAndFocusAndOpenPicker(model);
         expect(dateField.displayText).toBe('01.10.2014');
 
         dateField.$field.triggerKeyDown(scout.keys.UP, 'ctrl');

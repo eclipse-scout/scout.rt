@@ -3,7 +3,8 @@ scout.texts = {
       'loadOptions':'Lade Optionen...',
       'noOptions':'Keine Übereinstimmung',
       'oneOption':'1 Option',
-      'options':'{0} Optionen'
+      'options':'{0} Optionen',
+      'invalidDateFormat':'Das Datum ist in einem ungültigen Format'
   }
 };
 

@@ -14,17 +14,17 @@ scout.DateField.prototype._render = function($parent) {
     blur(this._onFieldBlur.bind(this)).
     keydown(this._onKeyDown.bind(this)).
     focus(this._onFocus.bind(this)).
+    click(this._onClick.bind(this)).
     appendTo(this.$container);
 
   this._dateFormat = this.session.locale.dateFormat; //FIXME CGU datefield has own dateformat
-  this._picker = new scout.DatePicker(this._dateFormat, this.$field);
+  this._picker = new scout.DatePicker(this._dateFormat, this);
 
   this.addIcon();
   this.addStatus();
 };
 
 scout.DateField.prototype._onFocus = function() {
-  this._updateSelection(this.$field.val());
   if (!this._$predict || this._$predict.length === 0){
     this._$predict = this._createPredictionField();
   }
@@ -35,14 +35,38 @@ scout.DateField.prototype._onFieldBlur = function() {
 
   //Only update model if date is valid (according to ui)
   if (!this.errorStatusUi) {
-    var displayText = this.$field.val();
-    this._updateDisplayText(displayText, false);
+    this._updateDisplayText(this.$field.val(), false);
   }
 
   this.$field.css('background-color', this._$predict.css('background-color'));
   this._$predict.remove();
   this._$predict = null;
   this._picker.close();
+};
+
+scout.DateField.prototype._onClick = function() {
+  // open picker and select date
+  this._updateSelection(this.$field.val());
+};
+
+/**
+ * Called by datepicker when a date has been selected
+ */
+scout.DateField.prototype.onDateSelected = function (date){
+  var text = this._dateFormat.format(date);
+  this._renderDisplayText(text);
+};
+
+/**
+ * @Override
+ */
+scout.DateField.prototype._renderDisplayText = function(text) {
+  this.$field.val(text);
+
+  //Make sure there is no invisible and wrong prediction
+  if (this._$predict) {
+    this._$predict.val('');
+  }
 };
 
 scout.DateField.prototype._onKeyDown = function(event) {
@@ -52,21 +76,32 @@ scout.DateField.prototype._onKeyDown = function(event) {
   var prediction = this._$predict.val();
 
   if (event.which === scout.keys.ENTER) {
-    //FIXME CGU move to ValueField? close picker afterwards?
-    this._updateDisplayText(this._readDisplayText(), false);
-//    this._picker.close();
-  } else if (event.which === scout.keys.ESC) {
+    //Update model and close picker
+    this._updateDisplayText(this.$field.val(), false);
     this._picker.close();
-  } else if (event.which === scout.keys.RIGHT && cursorPos === displayText.length) {
+    return;
+  }
+
+  if (event.which === scout.keys.ESC) {
+    this._picker.close();
+    return;
+  }
+
+  if (event.which === scout.keys.RIGHT && cursorPos === displayText.length) {
     //Move cursor one right and apply next char of the prediction
     if (prediction) {
       this.$field.val(prediction.substring(0, displayText.length + 1));
     }
-  } else if (event.which == scout.keys.PAGE_UP || event.which == scout.keys.PAGE_DOWN) {
+    return;
+  }
+
+  if (event.which == scout.keys.PAGE_UP || event.which == scout.keys.PAGE_DOWN) {
     months = (event.which === scout.keys.PAGE_UP ? -1 : 1);
-    this._picker.shiftViewDate(0, months, 0);
-    event.preventDefault();
-  } else if (event.which == scout.keys.UP || event.which == scout.keys.DOWN) {
+    this._picker.shiftSelectedDate(0, months, 0);
+    return;
+  }
+
+  if (event.which == scout.keys.UP || event.which == scout.keys.DOWN) {
     diff = (event.which === scout.keys.UP ? -1 : 1);
 
     if (event.ctrlKey) {
@@ -78,25 +113,25 @@ scout.DateField.prototype._onKeyDown = function(event) {
     }
 
     this._picker.shiftSelectedDate(years, months, days);
-    this._$predict.val(this.$field.val());
-    event.preventDefault();
-  } else {
-    //Use set timeout because field value is not set when keydown is fried. Keydown is used because keyup feels laggy.
-    setTimeout(function(e) {
-      if (!this._$predict) {
-        //Return if $predict was already removed (e.g. by focus lost)
-        return;
-      }
-
-      displayText = this.$field.val();
-      var predictedDateText = '';
-      if (this.validateDisplayText(displayText)){
-        predictedDateText = this._predict(displayText);
-      }
-      this._$predict.val(predictedDateText);
-      this._updateSelection(predictedDateText);
-    }.bind(this), 1);
+    return;
   }
+
+  //Use set timeout because field value is not set when keydown is fried. Keydown is used because keyup feels laggy.
+  setTimeout(function(e) {
+    if (!this._$predict) {
+      //Return if $predict was already removed (e.g. by focus lost)
+      return;
+    }
+
+    displayText = this.$field.val();
+    var predictedDateText = '';
+    var valid = this.validateDisplayText(displayText);
+    if (displayText && valid){
+      predictedDateText = this._predict(displayText);
+    }
+    this._$predict.val(predictedDateText);
+    this._updateSelection(predictedDateText);
+  }.bind(this), 1);
 };
 
 scout.DateField.prototype._updateSelection = function(displayText) {
@@ -116,7 +151,7 @@ scout.DateField.prototype._validateDisplayText = function (text) {
   }
 
   //FIXME CGU what if text is 12. Juli 2014 -> wrong? actually depends on pattern... check with cru prototype
-  //FIXME CGU optimize validation -> 1a.12.2003 currently is valid because parseInt strips 'a' maybe better use regexp
+  //FIXME CGU optimize validation -> 1a.12.2003 currently is valid because parseInt strips 'a' maybe better use regexp. Also 10....02.2014 is currently valid
   var dateInfo = this._dateFormat.analyze(text, true);
   var day = dateInfo.day, month = dateInfo.month, year = dateInfo.year;
   var valid = false;
@@ -128,8 +163,8 @@ scout.DateField.prototype._validateDisplayText = function (text) {
   } else if (day) {
     valid = day >= 0 && day < 32;
   }
-  if (!valid) { //FIXME CGU translation
-    return {message: 'Das Datum ist in einem ungültigen Format'};
+  if (!valid) {
+    return {message: scout.texts.get('invalidDateFormat')};
   }
 };
 
