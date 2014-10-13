@@ -55,7 +55,6 @@ scout.AbstractSmartField.prototype._isNavigationKey = function(e) {
 };
 
 // navigate in options
-// TODO AWE: (smartfield) scrolling intelligenter machen (erst scrollen, wenn man an die boundaries stösst).
 scout.AbstractSmartField.prototype._onKeydown = function(e) {
   if (this._isNavigationKey(e)) {
     // ensure popup is opened for following operations

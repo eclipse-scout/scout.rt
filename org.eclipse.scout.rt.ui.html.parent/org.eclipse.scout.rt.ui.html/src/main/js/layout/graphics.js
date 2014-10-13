@@ -43,6 +43,12 @@ scout.Dimension.prototype.equals = function(o) {
     this.height === o.height;
 };
 
+scout.Dimension.prototype.subtractInsets = function(insets) {
+  return new scout.Dimension(
+      this.width - insets.left - insets.right,
+      this.height - insets.top - insets.bottom);
+};
+
 /**
  * JavaScript port from java.awt.Rectangle.
  */

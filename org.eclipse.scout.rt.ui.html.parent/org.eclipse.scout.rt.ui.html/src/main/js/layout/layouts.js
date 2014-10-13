@@ -85,11 +85,12 @@ scout.GroupBoxLayout = function() {
 scout.inherits(scout.GroupBoxLayout, scout.AbstractLayout);
 
 scout.GroupBoxLayout.prototype.layout = function($container) {
-  var contSize = scout.HtmlComponent.get($container).getSize();
-  $.log.trace('(GroupBoxLayout#layout) contSize=' + contSize);
+  var htmlComp = scout.HtmlComponent.get($container),
+    bodySize = htmlComp.getSize().subtractInsets(htmlComp.getInsets());
+  $.log.trace('(GroupBoxLayout#layout) bodySize=' + bodySize);
   this._getHtmlBody($container).setSize(new scout.Dimension(
-      contSize.width,
-      contSize.height -
+      bodySize.width,
+      bodySize.height -
         this._getTitleHeight($container) -
         this._getButtonBarHeight($container)));
 };
@@ -128,7 +129,7 @@ scout.inherits(scout.FormFieldLayout, scout.AbstractLayout);
 
 scout.FormFieldLayout.prototype.layout = function($container) {
   var htmlComp = scout.HtmlComponent.get($container),
-    contSize = htmlComp.getSize(),
+    contSize = htmlComp.getSize().subtractInsets(htmlComp.getInsets()),
     widthSum = 0,
     $label = $container.children('label'),
     $status = $container.children('.status'),
@@ -175,7 +176,7 @@ scout.FormFieldLayout.prototype.preferredLayoutSize = function($container) {
   }
   if ($status.length > 0) {
     width += this.statusWidth;
-  }  
+  }
   if ($mandatory.length > 0) {
     width += this.mandatoryWidth;
   }
@@ -238,7 +239,7 @@ scout.inherits(scout.TabBoxLayout, scout.AbstractLayout);
 
 scout.TabBoxLayout.prototype.layout = function($container) {
   var htmlCont = scout.HtmlComponent.get($container),
-    contSize = htmlCont.getSize(),
+    contSize = htmlCont.getSize().subtractInsets(htmlCont.getInsets()),
     $tabArea =  $container.children('.tab-area'),
     tabAreaHeight = 0;
   if ($tabArea.isVisible()) {
@@ -295,8 +296,9 @@ scout.SingleLayout.prototype.preferredLayoutSize = function($container) {
 };
 
 scout.SingleLayout.prototype.layout = function($container) {
+  var htmlComp = scout.HtmlComponent.get($container);
   this._getHtmlSingleChild($container).setSize(
-      scout.HtmlComponent.get($container).getSize());
+      htmlComp.getSize().subtractInsets(htmlComp.getInsets()));
 };
 
 scout.SingleLayout.prototype._getHtmlSingleChild = function($container) {
