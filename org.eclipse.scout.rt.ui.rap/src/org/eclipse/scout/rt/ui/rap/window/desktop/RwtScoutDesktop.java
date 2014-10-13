@@ -10,6 +10,8 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.window.desktop;
 
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.rap.rwt.RWT;
 import org.eclipse.rap.rwt.client.service.JavaScriptExecutor;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -18,22 +20,20 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.ui.rap.IRwtStandaloneEnvironment;
 import org.eclipse.scout.rt.ui.rap.basic.RwtScoutComposite;
-import org.eclipse.scout.rt.ui.rap.util.RwtLayoutUtility;
 import org.eclipse.scout.rt.ui.rap.window.IRwtScoutPart;
 import org.eclipse.scout.rt.ui.rap.window.desktop.toolbar.RwtScoutToolbar;
 import org.eclipse.scout.rt.ui.rap.window.desktop.viewarea.ILayoutListener;
 import org.eclipse.scout.rt.ui.rap.window.desktop.viewarea.ViewArea;
 import org.eclipse.scout.rt.ui.rap.window.desktop.viewarea.ViewArea.SashKey;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Sash;
 
 /**
  * <h3>RwtScoutDesktop</h3> ...
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.7.0 June 2011
  */
@@ -62,39 +62,42 @@ public class RwtScoutDesktop extends RwtScoutComposite<IDesktop> implements IRwt
 
   @Override
   protected void initializeUi(Composite parent) {
-    try {
-      Composite desktopComposite = parent;
-      Control toolbar = createToolBar(desktopComposite);
-      Control viewsArea = createViewsArea(desktopComposite);
-      viewsArea.setData(RWT.CUSTOM_VARIANT, getViewsAreaVariant());
+    Composite desktopContainer = new Composite(parent, SWT.NONE);
 
-      initLayout(desktopComposite, toolbar, viewsArea);
+    Control toolbar = createToolBar(desktopContainer);
+    Control viewsArea = createViewsArea(desktopContainer);
+    viewsArea.setData(RWT.CUSTOM_VARIANT, getViewsAreaVariant());
 
-      setUiContainer(desktopComposite);
-    }
-    catch (Throwable t) {
-      LOG.error("Exception occured while creating ui desktop.", t);
-    }
+    initLayout(desktopContainer, toolbar, viewsArea);
+
+    setUiContainer(desktopContainer);
   }
 
   protected String getViewsAreaVariant() {
     return VARIANT_VIEWS_AREA;
   }
 
+  /**
+   * Is called to initialize the given desktop container with a layout and to layout the toolbar and view area
+   * accordingly.
+   *
+   * @param container
+   *          the container containing the toolbar and the view area.
+   * @param toolbar
+   *          the toolbar containing the application menus, the view tabs and toolbuttons.
+   * @param viewsArea
+   *          the area containing the view content.
+   */
   protected void initLayout(Composite container, Control toolbar, Control viewsArea) {
-    GridLayout layout = RwtLayoutUtility.createGridLayoutNoSpacing(1, true);
-    container.setLayout(layout);
+    GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(container);
 
     if (toolbar != null) {
-      GridData toolbarData = new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL);
-      toolbar.setLayoutData(toolbarData);
+      GridDataFactory.fillDefaults().span(SWT.FILL, SWT.BEGINNING).grab(true, false).applyTo(toolbar);
     }
 
     if (viewsArea != null) {
-      GridData viewsAreaData = new GridData(GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL | GridData.FILL_BOTH);
-      viewsArea.setLayoutData(viewsAreaData);
+      GridDataFactory.fillDefaults().span(SWT.FILL, SWT.FILL).grab(true, true).applyTo(viewsArea);
     }
-
   }
 
   protected Control createToolBar(Composite parent) {

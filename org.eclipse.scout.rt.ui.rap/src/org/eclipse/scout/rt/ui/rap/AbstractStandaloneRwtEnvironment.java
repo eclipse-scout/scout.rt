@@ -72,11 +72,11 @@ public abstract class AbstractStandaloneRwtEnvironment extends AbstractRwtEnviro
     m_display = Display.getCurrent();
     m_display.setData(IRwtEnvironment.class.getName(), this);
 
-    createApplicationContent(parent);
-    createNonmodalFormButtonArea(parent);
+    m_uiDesktop = createApplicationContent(parent);
+    m_uiButtonArea = createNonmodalFormButtonArea(parent);
 
     // layout
-    GridLayoutFactory.fillDefaults().applyTo(parent);
+    GridLayoutFactory.fillDefaults().spacing(0, 0).applyTo(parent);
     GridDataFactory.swtDefaults().align(SWT.FILL, SWT.FILL).grab(true, true).applyTo(m_uiDesktop.getUiContainer());
     GridDataFactory.swtDefaults().align(SWT.FILL, SWT.FILL).grab(true, false).exclude(true).applyTo(m_uiButtonArea.getUiContainer());
 
@@ -87,23 +87,45 @@ public abstract class AbstractStandaloneRwtEnvironment extends AbstractRwtEnviro
     }
   }
 
-  protected void createApplicationContent(final Composite parent) {
-    m_uiDesktop = createUiDesktop();
+  /**
+   * Creates the controls that constitute the desktop for this application.
+   *
+   * @param parent
+   *          the parent composite to contain the application content.
+   * @return the {@link RwtScoutDesktop} that contains the desktop with a UI container which is to be laid out
+   *         within the given parent composite.
+   */
+  protected RwtScoutDesktop createApplicationContent(final Composite parent) {
+    final RwtScoutDesktop uiDesktop = createUiDesktop();
     ensureInitialized(new Runnable() {
       @Override
       public void run() {
-        m_uiDesktop.createUiField(parent, getScoutDesktop(), AbstractStandaloneRwtEnvironment.this);
+        uiDesktop.createUiField(parent, getScoutDesktop(), AbstractStandaloneRwtEnvironment.this);
       }
     });
     if (!isInitialized()) {
       throw new SecurityException("Cannot initialize application");
     }
     getKeyStrokeManager().setGlobalKeyStrokesActivated(true);
+
+    return uiDesktop;
   }
 
-  protected void createNonmodalFormButtonArea(Composite parent) {
-    m_uiButtonArea = new RwtScoutFormButtonBar();
-    m_uiButtonArea.createUiField(parent, m_uiDesktop.getScoutObject(), this);
+  /**
+   * Creates the composite to keep track of non-modal forms. Whenever a non-modal form is shown, a corresponding
+   * button is shown in this button bar to restore the form if being in minimized state. This button bar is visible once
+   * a minimizable form is started.
+   *
+   * @param parent
+   *          the parent composite to contain the button bar.
+   * @return the {@link RwtScoutFormButtonBar} that contains the form button with a UI container which is to be laid out
+   *         within the given parent composite.
+   */
+  protected RwtScoutFormButtonBar createNonmodalFormButtonArea(Composite parent) {
+    RwtScoutFormButtonBar buttonBar = new RwtScoutFormButtonBar();
+    buttonBar.createUiField(parent, m_uiDesktop.getScoutObject(), this);
+
+    return buttonBar;
   }
 
   protected RwtScoutDesktop createUiDesktop() {
