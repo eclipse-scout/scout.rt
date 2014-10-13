@@ -222,13 +222,13 @@ public final class ActionUtility {
     public boolean accept(IAction action) {
       if (action instanceof IMenu) {
         IMenu menu = (IMenu) action;
-        if (menu.hasChildActions()) {
-          // check for filter matching child menus
-          return !normalizedActions(menu.getChildActions(), this).isEmpty();
+        if (isVisibleOnly() && !menu.isVisible()) {
+          return false;
         }
         else {
-          if (isVisibleOnly() && !menu.isVisible()) {
-            return false;
+          if (menu.hasChildActions()) {
+            // check for filter matching child menus
+            return !normalizedActions(menu.getChildActions(), this).isEmpty();
           }
           if (getMenuTypes() != null) {
             for (IMenuType t : getMenuTypes()) {
@@ -241,6 +241,7 @@ public final class ActionUtility {
           else {
             return true;
           }
+
         }
       }
       return false;

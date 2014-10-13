@@ -402,7 +402,7 @@ public class SwingMock extends AbstractGuiMock {
 
   @Override
   public org.eclipse.scout.testing.client.menu.MenuItem getContextMenuItem(String label) {
-    Component uiMenuItem = waitForContextMenu(label);
+    Component uiMenuItem = getContextMenu(label);
     if (uiMenuItem != null) {
       return new org.eclipse.scout.testing.client.menu.MenuItem(uiMenuItem.getName(), uiMenuItem.isEnabled(), uiMenuItem.isVisible());
     }
@@ -912,68 +912,72 @@ public class SwingMock extends AbstractGuiMock {
     return waitUntil(new WaitCondition<Component>() {
       @Override
       public Component run() {
-        return syncExec(new WaitCondition<Component>() {
-          @Override
-          public Component run() throws Throwable {
-            String label = cleanButtonLabel(text);
-            //find lightweight popup
-            Window activeWindow = KeyboardFocusManager.getCurrentKeyboardFocusManager().getActiveWindow();
-            Component popupContainer = null;
-            if (popupContainer == null) {
-              if (activeWindow instanceof RootPaneContainer) {
-                Component[] a = ((RootPaneContainer) activeWindow).getLayeredPane().getComponentsInLayer(JLayeredPane.POPUP_LAYER);
-                if (a.length > 0) {
-                  popupContainer = a[0];
-                }
-              }
-            }
-            //find heavyweight popup
-            if (popupContainer == null) {
-              popupContainer = findHeavyweightPopup(activeWindow);
-            }
-            if (popupContainer != null) {
-              for (AbstractButton b : SwingUtility.findChildComponents(popupContainer, AbstractButton.class)) {
-                if (label.equals(b.getText())) {
-                  return b;
-                }
-              }
-            }
-            return null;
-          }
-
-          /**
-           * Use {@link Window#getOwnedWindows()} recursively to find the active javax.swing.Popup$HeavyWeightWindow.
-           * 
-           * @param window
-           * @return
-           */
-          private Component findHeavyweightPopup(Window window) {
-            for (Window ownedWindow : window.getOwnedWindows()) {
-              if (ownedWindow.getClass().getName().equals("javax.swing.Popup$HeavyWeightWindow")) {
-                if (ownedWindow instanceof JWindow) {
-                  JWindow w = (JWindow) ownedWindow;
-                  if (!w.isVisible()) {
-                    continue;
-                  }
-                  Component child = findHeavyweightPopup(w);
-                  if (child != null) {
-                    return child;
-                  }
-                  return ((RootPaneContainer) ownedWindow).getContentPane();
-                }
-                else if (ownedWindow instanceof RootPaneContainer) {
-                  return ((RootPaneContainer) ownedWindow).getContentPane();
-                }
-                else {
-                  return ownedWindow;
-                }
-              }
-            }
-            return null;
-          }
-
-        });
+        return getContextMenu(text);
       }
+    });
+  }
+
+  protected Component getContextMenu(final String name) {
+    return syncExec(new WaitCondition<Component>() {
+      @Override
+      public Component run() throws Throwable {
+        String label = cleanButtonLabel(name);
+        //find lightweight popup
+        Window activeWindow = KeyboardFocusManager.getCurrentKeyboardFocusManager().getActiveWindow();
+        Component popupContainer = null;
+        if (popupContainer == null) {
+          if (activeWindow instanceof RootPaneContainer) {
+            Component[] a = ((RootPaneContainer) activeWindow).getLayeredPane().getComponentsInLayer(JLayeredPane.POPUP_LAYER);
+            if (a.length > 0) {
+              popupContainer = a[0];
+            }
+          }
+        }
+        //find heavyweight popup
+        if (popupContainer == null) {
+          popupContainer = findHeavyweightPopup(activeWindow);
+        }
+        if (popupContainer != null) {
+          for (AbstractButton b : SwingUtility.findChildComponents(popupContainer, AbstractButton.class)) {
+            if (label.equals(b.getText())) {
+              return b;
+            }
+          }
+        }
+        return null;
+      }
+
+      /**
+       * Use {@link Window#getOwnedWindows()} recursively to find the active javax.swing.Popup$HeavyWeightWindow.
+       * 
+       * @param window
+       * @return
+       */
+      private Component findHeavyweightPopup(Window window) {
+        for (Window ownedWindow : window.getOwnedWindows()) {
+          if (ownedWindow.getClass().getName().equals("javax.swing.Popup$HeavyWeightWindow")) {
+            if (ownedWindow instanceof JWindow) {
+              JWindow w = (JWindow) ownedWindow;
+              if (!w.isVisible()) {
+                continue;
+              }
+              Component child = findHeavyweightPopup(w);
+              if (child != null) {
+                return child;
+              }
+              return ((RootPaneContainer) ownedWindow).getContentPane();
+            }
+            else if (ownedWindow instanceof RootPaneContainer) {
+              return ((RootPaneContainer) ownedWindow).getContentPane();
+            }
+            else {
+              return ownedWindow;
+            }
+          }
+        }
+        return null;
+      }
+
     });
   }
 

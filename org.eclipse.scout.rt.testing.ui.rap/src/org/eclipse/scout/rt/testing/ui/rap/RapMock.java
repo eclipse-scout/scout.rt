@@ -537,11 +537,17 @@ public class RapMock extends AbstractGuiMock {
 
   @Override
   public org.eclipse.scout.testing.client.menu.MenuItem getContextMenuItem(String label) {
-    final MenuItem uiMenuItem = waitForMenuItem(label);
+    final MenuItem uiMenuItem = getMenuItem(label);
     return syncExec(new WaitCondition<org.eclipse.scout.testing.client.menu.MenuItem>() {
       @Override
       public org.eclipse.scout.testing.client.menu.MenuItem run() throws Throwable {
-        return new org.eclipse.scout.testing.client.menu.MenuItem(uiMenuItem.getText(), uiMenuItem.isEnabled(), true);
+        if (uiMenuItem != null) {
+          return new org.eclipse.scout.testing.client.menu.MenuItem(uiMenuItem.getText(), uiMenuItem.isEnabled(), true);
+        }
+        else {
+          return null;
+
+        }
       }
     });
   }
@@ -1132,52 +1138,56 @@ public class RapMock extends AbstractGuiMock {
     return waitUntil(new WaitCondition<MenuItem>() {
       @Override
       public MenuItem run() {
-        return syncExec(new WaitCondition<MenuItem>() {
-          @Override
-          public MenuItem run() throws Throwable {
-            String label = cleanButtonLabel(name);
-            //focus control
-            Control focusControl = getDisplay().getFocusControl();
-            if (focusControl != null) {
-              Menu m = focusControl.getMenu();
-              if (m != null) {
-                for (MenuItem item : m.getItems()) {
-                  if (label.equals(cleanButtonLabel(item.getText()))) {
-                    return item;
-                  }
-                }
-              }
-            }
-            //other controls
-            for (Composite parent : enumerateParentContainers()) {
-              for (Control c : RwtUtility.findChildComponents(parent, Control.class)) {
-                Menu m = c.getMenu();
-                if (m != null) {
-                  for (MenuItem item : m.getItems()) {
-                    if (label.equals(cleanButtonLabel(item.getText()))) {
-                      return item;
-                    }
-                  }
-                }
-              }
-            }
-            //main menu
-            for (Shell shell : getDisplay().getShells()) {
-              Menu m = shell.getMenuBar();
-              if (m != null) {
-                for (MenuItem item : m.getItems()) {
-                  if (label.equals(cleanButtonLabel(item.getText()))) {
-                    return item;
-                  }
-                }
-              }
-            }
-            return null;
-          }
-        });
+        return getMenuItem(name);
       }
     });
 
+  }
+
+  protected MenuItem getMenuItem(final String name) {
+    return syncExec(new WaitCondition<MenuItem>() {
+      @Override
+      public MenuItem run() throws Throwable {
+        String label = cleanButtonLabel(name);
+        //focus control
+        Control focusControl = getDisplay().getFocusControl();
+        if (focusControl != null) {
+          Menu m = focusControl.getMenu();
+          if (m != null) {
+            for (MenuItem item : m.getItems()) {
+              if (label.equals(cleanButtonLabel(item.getText()))) {
+                return item;
+              }
+            }
+          }
+        }
+        //other controls
+        for (Composite parent : enumerateParentContainers()) {
+          for (Control c : RwtUtility.findChildComponents(parent, Control.class)) {
+            Menu m = c.getMenu();
+            if (m != null) {
+              for (MenuItem item : m.getItems()) {
+                if (label.equals(cleanButtonLabel(item.getText()))) {
+                  return item;
+                }
+              }
+            }
+          }
+        }
+        //main menu
+        for (Shell shell : getDisplay().getShells()) {
+          Menu m = shell.getMenuBar();
+          if (m != null) {
+            for (MenuItem item : m.getItems()) {
+              if (label.equals(cleanButtonLabel(item.getText()))) {
+                return item;
+              }
+            }
+          }
+        }
+        return null;
+      }
+    });
   }
 
   protected <T> T syncExec(final WaitCondition<T> r) {
