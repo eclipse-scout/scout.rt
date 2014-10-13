@@ -94,9 +94,11 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
     m_headerCell = new HeaderCell();
     initConfig();
     propertySupport.addPropertyChangeListener(new PropertyChangeListener() {
-
       @Override
       public void propertyChange(PropertyChangeEvent evt) {
+        if (!CompareUtility.isOneOf(evt.getPropertyName(), IColumn.PROP_EDITABLE, IColumn.PROP_VISIBLE /* includes PROP_DISPLAYABLE */)) {
+          return;
+        }
         // force decoration of rows on property change.
         // This is important to recalculate editability of editable cells.
         ITable table = getTable();
@@ -140,7 +142,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    * (see {@link #getConfiguredDisplayable()}).
    * <p>
    * Subclasses can override this method. Default is {@code true}.
-   * 
+   *
    * @return {@code true} if this column is visible, {@code false} otherwise.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -153,7 +155,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    * Configures the header text of this column.
    * <p>
    * Subclasses can override this method. Default is {@code null}.
-   * 
+   *
    * @return Header text of this column.
    */
   @ConfigProperty(ConfigProperty.TEXT)
@@ -166,7 +168,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    * Configures the header tooltip of this column.
    * <p>
    * Subclasses can override this method. Default is {@code null}.
-   * 
+   *
    * @return Tooltip of this column.
    */
   @ConfigProperty(ConfigProperty.TEXT)
@@ -179,7 +181,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    * Configures the color of this column header text. The color is represented by the HEX value (e.g. FFFFFF).
    * <p>
    * Subclasses can override this method. Default is {@code null}.
-   * 
+   *
    * @return Foreground color HEX value of this column header text.
    */
   @ConfigProperty(ConfigProperty.COLOR)
@@ -192,7 +194,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    * Configures the background color of this column header. The color is represented by the HEX value (e.g. FFFFFF).
    * <p>
    * Subclasses can override this method. Default is {@code null}.
-   * 
+   *
    * @return Background color HEX value of this column header.
    */
   @ConfigProperty(ConfigProperty.COLOR)
@@ -205,7 +207,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    * Configures the font of this column header text. See {@link FontSpec#parse(String)} for the appropriate format.
    * <p>
    * Subclasses can override this method. Default is {@code null}.
-   * 
+   *
    * @return Font of this column header text.
    */
   @ConfigProperty(ConfigProperty.STRING)
@@ -221,7 +223,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    * width.
    * <p>
    * Subclasses can override this method. Default is {@code 60}.
-   * 
+   *
    * @return Width of this column.
    */
   @ConfigProperty(ConfigProperty.INTEGER)
@@ -247,7 +249,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    * displayable column may be visible for a user, depending on {@link #getConfiguredVisible()}.
    * <p>
    * Subclasses can override this method. Default is {@code true}.
-   * 
+   *
    * @return {@code true} if this column is displayable, {@code false} otherwise.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -262,7 +264,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    * {@link AbstractTable#findRowByKey(List)}.
    * <p>
    * Subclasses can override this method. Default is {@code false}.
-   * 
+   *
    * @return {@code true} if this column value belongs to the primary key of the surrounding table, {@code false}
    *         otherwise.
    */
@@ -277,7 +279,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    * non-editable column is read-only.
    * <p>
    * Subclasses can override this method. Default is {@code false}.
-   * 
+   *
    * @return {@code true} if this column is editable, {@code false} otherwise.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -292,7 +294,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    * for more information.
    * <p>
    * Subclasses can override this method. Default is {@code false}.
-   * 
+   *
    * @return {@code true} if this column is a summary column, {@code false} otherwise.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -306,7 +308,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    * {@link #getConfiguredHeaderForegroundColor()}). The color is represented by the HEX value (e.g. FFFFFF).
    * <p>
    * Subclasses can override this method. Default is {@code null}.
-   * 
+   *
    * @return Foreground color HEX value of this column text.
    */
   @ConfigProperty(ConfigProperty.COLOR)
@@ -320,7 +322,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    * {@link #getConfiguredHeaderBackgroundColor()}. The color is represented by the HEX value (e.g. FFFFFF).
    * <p>
    * Subclasses can override this method. Default is {@code null}.
-   * 
+   *
    * @return Background color HEX value of this column.
    */
   @ConfigProperty(ConfigProperty.COLOR)
@@ -334,7 +336,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    * {@link FontSpec#parse(String)} for the appropriate format.
    * <p>
    * Subclasses can override this method. Default is {@code null}.
-   * 
+   *
    * @return Font of this column text.
    */
   @ConfigProperty(ConfigProperty.STRING)
@@ -349,7 +351,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    * might have set a sort index. Sorting starts with the column having the the lowest sort index ({@code >= 0}).
    * <p>
    * Subclasses can override this method. Default is {@code -1}.
-   * 
+   *
    * @return Sort index of this column.
    */
   @ConfigProperty(ConfigProperty.INTEGER)
@@ -364,7 +366,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    * column class.
    * <p>
    * Subclasses can override this method. Default is {@code -1}.
-   * 
+   *
    * @return View order of this column.
    */
   @ConfigProperty(ConfigProperty.DOUBLE)
@@ -378,7 +380,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    * must be set (see {@link #getConfiguredSortIndex()}).
    * <p>
    * Subclasses can override this method. Default is {@code true}.
-   * 
+   *
    * @return {@code true} if this column is sorted ascending, {@code false} otherwise.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -392,7 +394,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    * set to {@code true}, the sort index (see {@link #getConfiguredSortIndex()}) must be set.
    * <p>
    * Subclasses can override this method. Default is {@code false}.
-   * 
+   *
    * @return {@code true} if this column is always included for sort at begin, {@code false} otherwise.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -406,7 +408,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    * to {@code true}, the sort index (see {@link #getConfiguredSortIndex()}) must be set.
    * <p>
    * Subclasses can override this method. Default is {@code false}.
-   * 
+   *
    * @return {@code true} if this column is always included for sort at end, {@code false} otherwise.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -419,7 +421,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    * Configures the horizontal alignment of text inside this column (including header text).
    * <p>
    * Subclasses can override this method. Default is {@code -1} (left alignment).
-   * 
+   *
    * @return {@code -1} for left, {@code 0} for center and {@code 1} for right alignment.
    */
   @ConfigProperty(ConfigProperty.INTEGER)
@@ -437,7 +439,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    * This feature is not supported in SWT and RWT since SWT does not offer such an API method.
    * <p>
    * Subclasses can override this method. Default is {@code false}.
-   * 
+   *
    * @return {@code true} if this column width is auto optimized, {@code false} otherwise.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -451,7 +453,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    * documentation. This method is typically processed by a documentation generation tool or similar.
    * <p>
    * Subclasses can override this method. Default is {@code null}.
-   * 
+   *
    * @deprecated: Use a {@link ClassId} annotation as key for Doc-Text. Will be removed in the 5.0 Release.
    * @return a documentation text, suitable to be included in external documents
    */
@@ -466,7 +468,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    * {@link #getConfiguredEditable()} ).
    * <p>
    * Subclasses can override this method. Default is {@code false}.
-   * 
+   *
    * @return {@code true} if this column value is mandatory, {@code false} otherwise.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -483,7 +485,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    * {@link AbstractTableField#reloadTableData()} or via {@link AbstractForm#importFormData(AbstractFormData)}.
    * <p>
    * Subclasses can override this method. The default does nothing.
-   * 
+   *
    * @throws ProcessingException
    */
   @ConfigOperation
@@ -495,7 +497,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    * Called when the surrounding table is disposed. This method may execute additional cleanup.
    * <p>
    * Subclasses can override this method. The default does nothing.
-   * 
+   *
    * @throws ProcessingException
    */
   @ConfigOperation
@@ -509,7 +511,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    * see also {@link #execValidateValue(ITableRow, Object)}
    * <p>
    * Subclasses can override this method. The default calls {@link #parseValueInternal(ITableRow, Object)}.
-   * 
+   *
    * @param row
    *          Table row for which to parse the raw value.
    * @param rawValue
@@ -530,7 +532,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    * see also {@link #execParseValue(ITableRow, Object)}
    * <p>
    * Subclasses can override this method. The default calls {@link #validateValueInternal(ITableRow, Object)}.
-   * 
+   *
    * @param row
    *          Table row for which to validate the raw value.
    * @param rawValue
@@ -548,7 +550,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    * Called when decorating the table cell. This method may add additional decorations to the table cell.
    * <p>
    * Subclasses can override this method. The default does nothing.
-   * 
+   *
    * @param cell
    *          Cell to decorate.
    * @param row
@@ -564,7 +566,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    * Called when decorating the table header cell. This method may add additional decorations to the table header cell.
    * <p>
    * Subclasses can override this method. The default does nothing.
-   * 
+   *
    * @param cell
    *          Header cell to decorate.
    * @throws ProcessingException
@@ -579,7 +581,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    * for dynamic checks of editablility, otherwise use {@link #getConfiguredEditable()}.
    * <p>
    * Subclasses can override this method. Default is {@code true}.
-   * 
+   *
    * @param row
    *          for which to determine editability dynamically.
    * @return {@code true} if the cell (row, column) is editable, {@code false} otherwise.
@@ -600,7 +602,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    * {@link #execCompleteEdit(ITableRow, IFormField)} is called on this column.
    * <p>
    * Subclasses can override this method. The default returns an appropriate field based on the column data type.
-   * 
+   *
    * @param row
    *          on which editing occurs
    * @return a field for editing or null to install an empty cell editor.
@@ -632,7 +634,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    * <p>
    * Subclasses can override this method. The default calls {@link #applyValueInternal(ITableRow, Object)} and delegates
    * to {@link #execParseValue(ITableRow, Object)} and {@link #execValidateValue(ITableRow, Object)}.
-   * 
+   *
    * @param row
    *          on which editing occurred.
    * @param editingField
@@ -661,7 +663,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    * <p>
    * Thereby, if sorting is enabled on table, it is temporarily suspended to prevent rows from scampering.
    * </p>
-   * 
+   *
    * @param row
    * @param newValue
    * @throws ProcessingException
@@ -735,7 +737,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
   /**
    * Calculates the column's view order, e.g. if the @Order annotation is set to 30.0, the method will
    * return 30.0. If no {@link Order} annotation is set, the method checks its super classes for an @Order annotation.
-   * 
+   *
    * @since 3.10.0-M4
    */
   protected double calculateViewOrder() {
@@ -1559,7 +1561,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    * Can be used to persist data directly after a value has been modified in a cell editor.
    * CAUTION: This method is called even when an invalid value has been entered in the cell editor.
    * In this case the last valid value is retrieved while {@link #getValue(ITableRow)} is called.
-   * 
+   *
    * @param row
    *          The row changed in the table.
    * @throws ProcessingException
@@ -1594,7 +1596,7 @@ public abstract class AbstractColumn<T> extends AbstractPropertyObserver impleme
    * This method should be called if single column validation should be used for performance reason and/or
    * if a value is set in the Scout model (and not by the UI component). In this case, the parameter editor
    * is null and the passed value will be used.
-   * 
+   *
    * @param row
    *          The row changed in the table
    * @param editor
