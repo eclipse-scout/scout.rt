@@ -62,6 +62,11 @@ scout.FormField.prototype._renderVisible = function(visible) {
     return;
   }
   this.$container.setVisible(visible);
+
+  if (this.rendered) {
+    var htmlComp = scout.HtmlComponent.get(this.$container).getParent();
+    htmlComp.revalidate();
+  }
 };
 
 scout.FormField.prototype._renderLabel = function(label) {
@@ -78,6 +83,11 @@ scout.FormField.prototype._renderLabelVisible = function(visible) {
     return;
   }
   this.$label.setVisible(visible);
+
+  if (this.rendered) {
+    var htmlComp = scout.HtmlComponent.get(this.$container);
+    htmlComp.revalidate();
+  }
 };
 
 scout.FormField.prototype._renderEnabled = function(enabled) {
@@ -85,6 +95,10 @@ scout.FormField.prototype._renderEnabled = function(enabled) {
   if (this.$field) {
     this.$field.setEnabled(enabled);
   }
+};
+
+scout.FormField.prototype._renderGridData = function(gridData) {
+  // NOP
 };
 
 scout.FormField.prototype.goOffline = function() {
@@ -152,7 +166,7 @@ scout.FormField.prototype.addContainer = function($parent, typeName, layout) {
       attr('id', this._generateId(typeName));
   }
 
-  var htmlComp = new scout.HtmlComponent(this.$container);
+  var htmlComp = new scout.HtmlComponent(this.$container, this.session);
   htmlComp.layoutData = new scout.LogicalGridData(this);
   htmlComp.setLayout(layout || new scout.FormFieldLayout());
   return htmlComp;

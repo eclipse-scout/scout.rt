@@ -21,7 +21,7 @@ scout.TabBox.prototype._render = function($parent) {
   this.addContainer($parent, 'tab-box', new scout.TabBoxLayout());
 
   this._$tabArea = this.$container.appendDiv('', 'tab-area');
-  var htmlComp = new scout.HtmlComponent(this._$tabArea);
+  var htmlComp = new scout.HtmlComponent(this._$tabArea, this.session);
   htmlComp.setLayout(new scout.NullLayout());
   var i, groupBox, $tab;
   for (i = 0; i < this.groupBoxes.length; i++) {
@@ -35,7 +35,7 @@ scout.TabBox.prototype._render = function($parent) {
 
   // render 1st tab (currently hard-coded)
   this._$tabContent = this.$container.appendDiv('', 'tab-content');
-  htmlComp = new scout.HtmlComponent(this._$tabContent);
+  htmlComp = new scout.HtmlComponent(this._$tabContent, this.session);
   htmlComp.setLayout(new scout.SingleLayout());
 };
 
@@ -86,7 +86,10 @@ scout.TabBox.prototype._renderSelectedTab = function(selectedTab) {
     // TODO AWE: (layout) beim initialen rendern ist das nicht nötig
     // schauen ob wir hier etwas unterdrücken müssen oder ob das
     // durch valid/invalidate bereits abgedeckt ist
-    scout.HtmlComponent.get(this._$tabContent).layout();
+
+    var htmlComp = scout.HtmlComponent.get(this._$tabContent);
+    htmlComp.invalidate();
+    htmlComp.layout();
   }
 };
 

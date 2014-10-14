@@ -37,6 +37,11 @@ scout.Table.prototype._render = function($parent) {
   this._$parent = $parent;
   this.$container = this._$parent.appendDIV('table');
 
+  var layout = new scout.TableLayout(this);
+  this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
+  this.htmlComp.setLayout(layout);
+  this.htmlComp.pixelBasedSizing = false;
+
   if ($parent.hasClass('desktop-bench')) {
     // TODO cru: desktop table (no input focus required to trigger table keystrokes), is body ok?
     // input A.WE eine komponente sollte nie etwas von seinen parents wissen,
@@ -73,6 +78,20 @@ scout.Table.prototype._renderProperties = function() {
   this._renderHeaderVisible(this.headerVisible);
   this._renderEnabled(this.enabled);
 };
+
+//scout.Table.prototype._renderDataHeight = function() {
+//  var height = 0;
+//  if (this.menubar.$container.isVisible()){
+//    height += this.menubar.$container.outerHeight(true);
+//  }
+//  if (this.footer) {
+//    height += this.footer.$container.outerHeight(true);
+//  }
+//  if (this._$header.isVisible()) {
+//    height += this._$header.outerHeight(true);
+//  }
+//  this.$data.css('height', 'calc(100% - '+ height + 'px)');
+//};
 
 scout.Table.prototype._isFooterVisible = function() {
   return this.tableStatusVisible || this.controls.length > 0;
@@ -463,7 +482,9 @@ scout.Table.prototype.onRowsSelected = function($selectedRows) {
 };
 
 scout.Table.prototype.onResize = function() {
-  // TODO CGU: impl. onResize for Table.js
+  if (this.footer) {
+    this.footer.onResize();
+  }
 };
 
 scout.Table.prototype.sendRowAction = function($row) {
@@ -1062,6 +1083,9 @@ scout.Table.prototype._renderHeaderVisible = function(headerVisible) {
   //    this._header = null;
   //  }
   this._$header.setVisible(headerVisible);
+  if (this.rendered) {
+    this.htmlComp.revalidate();
+  }
 };
 
 scout.Table.prototype._renderTableStatusVisible = function(tableStatusVisible) {
@@ -1077,6 +1101,9 @@ scout.Table.prototype._renderTableStatusVisible = function(tableStatusVisible) {
   else if (!footerVisible && this.footer){
     this.footer.remove();
     this.footer = null;
+  }
+  if (this.rendered) {
+    this.htmlComp.revalidate();
   }
 };
 

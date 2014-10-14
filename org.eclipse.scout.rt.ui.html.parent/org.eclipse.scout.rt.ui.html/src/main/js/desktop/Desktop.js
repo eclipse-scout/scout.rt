@@ -52,6 +52,7 @@ scout.Desktop.prototype._render = function($parent) {
   this.$tabbar = this.$bar.appendDIV('taskbar-tabs');
   this.$toolbar = this.$bar.appendDIV('taskbar-tools');
   this.$bench = this.$parent.appendDIV('desktop-bench');
+  new scout.HtmlComponent(this.$bench, this.session);
   this.$toolContainer = this.$parent.appendDIV('desktop-tool-container');
 
   this._outlineTab = new scout.Desktop.TabAndContent();
@@ -147,8 +148,13 @@ scout.Desktop.prototype._selectTab = function(tab) {
 
   tab.$div.select(true);
   this._selectedTab = tab;
-  if (tab.$storage) {
+  if (tab.$storage && tab.$storage.length > 0) {
     this.$bench.append(tab.$storage);
+
+    //If the parent has been resized while the content was not visible, the content has the wrong size -> update
+    var htmlComp = scout.HtmlComponent.get(tab.$storage);
+    var htmlParent = htmlComp.getParent();
+    htmlComp.setSize(htmlParent.getSize());
   }
 };
 
@@ -166,6 +172,10 @@ scout.Desktop.prototype._addForm = function(form) {
   var tab = new scout.Desktop.TabAndContent(form.title, form);
   this._addTab(tab);
   form.render(this.$bench);
+  
+  //FIXME CGU maybe include in render?
+  form.htmlComp.layout();
+  form.htmlComp.validateRoot = true;
   form.tab = tab;
 };
 
@@ -208,6 +218,10 @@ scout.Desktop.prototype.updateOutlineTab = function(content, title) {
     if (selectedNodes.length > 0) {
       content.staticMenus = [new scout.OutlineNavigateUpMenu(this.outline, selectedNodes[0])];
       content.render(this.$bench);
+      
+      //FIXME CGU maybe include in render?
+      content.htmlComp.layout();
+      content.htmlComp.validateRoot = true;
     }
   }
 };

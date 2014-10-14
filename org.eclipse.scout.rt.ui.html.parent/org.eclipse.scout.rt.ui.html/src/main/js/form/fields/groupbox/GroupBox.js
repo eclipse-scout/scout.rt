@@ -21,7 +21,7 @@ scout.GroupBox.prototype._render = function($parent) {
     addClass('form-field').
     attr('id', 'GroupBox-' + this.id);
 
-  var htmlCont = new scout.HtmlComponent(this.$container);
+  var htmlCont = new scout.HtmlComponent(this.$container, this.session);
   htmlCont.setLayout(new scout.GroupBoxLayout());
   if (!this.mainBox) {
     htmlCont.layoutData = new scout.LogicalGridData(this);
@@ -34,7 +34,7 @@ scout.GroupBox.prototype._render = function($parent) {
 
   this._$body = this.$container.appendDiv('', 'group-box-body');
   var env = scout.HtmlEnvironment;
-  var htmlBody = new scout.HtmlComponent(this._$body);
+  var htmlBody = new scout.HtmlComponent(this._$body, this.session);
   htmlBody.setLayout(new scout.LogicalGridLayout(env.formColumnGap, env.formRowGap));
 
   this._createFieldArraysByType();

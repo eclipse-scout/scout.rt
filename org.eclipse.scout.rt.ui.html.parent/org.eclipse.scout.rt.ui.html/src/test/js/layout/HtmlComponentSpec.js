@@ -1,9 +1,22 @@
 describe("HtmlComponent", function() {
+  setFixtures(sandbox());
+  var session = new scout.Session($('#sandbox'), '1.1');
+
+  beforeEach(function() {
+    setFixtures(sandbox());
+    session = new scout.Session($('#sandbox'), '1.1');
+  });
 
   var jqueryMock = {
     data:function(htmlComp) {
     }
   };
+
+  var LayoutMock = function(){
+    LayoutMock.parent.call(this);
+  };
+  scout.inherits(LayoutMock, scout.AbstractLayout);
+  LayoutMock.prototype.layout = function() {};
 
   var addWidthHeightMock = function(jqueryMock) {
     jqueryMock.width = function(val) {
@@ -28,7 +41,7 @@ describe("HtmlComponent", function() {
 
     it("sets data 'htmlComponent' when Ctor is called", function() {
       spyOn(jqueryMock, 'data');
-      var htmlComp = new scout.HtmlComponent(jqueryMock);
+      var htmlComp = new scout.HtmlComponent(jqueryMock, session);
       expect(jqueryMock.data).toHaveBeenCalledWith('htmlComponent', htmlComp);
     });
 
@@ -39,7 +52,7 @@ describe("HtmlComponent", function() {
     addWidthHeightMock(jqueryMock);
 
     it("returns outerWidth() and outerHeight() of JQuery comp", function() {
-      var htmlComp = new scout.HtmlComponent(jqueryMock);
+      var htmlComp = new scout.HtmlComponent(jqueryMock, session);
       var size = htmlComp.getSize();
       expect(size.width).toBe(6);
       expect(size.height).toBe(7);
@@ -55,12 +68,9 @@ describe("HtmlComponent", function() {
       return jqueryMock;
     };
 
-    var htmlComp = new scout.HtmlComponent(jqueryMock);
+    var htmlComp = new scout.HtmlComponent(jqueryMock, session);
 
-    htmlComp.layoutManager = {
-      invalidate:function() {},
-      layout:function() {}
-    };
+    htmlComp.layoutManager = new LayoutMock();
 
     it("accepts scout.Dimension as single argument", function() {
       spyOn(jqueryMock, 'css').and.callThrough();
@@ -106,7 +116,7 @@ describe("HtmlComponent", function() {
         }
       };
 
-      var htmlComp = new scout.HtmlComponent(jqueryMock);
+      var htmlComp = new scout.HtmlComponent(jqueryMock, session);
       var expected = new scout.Insets(15, 18, 21, 24);
       var actual = htmlComp.getInsets();
       expect(actual).toEqual(expected);

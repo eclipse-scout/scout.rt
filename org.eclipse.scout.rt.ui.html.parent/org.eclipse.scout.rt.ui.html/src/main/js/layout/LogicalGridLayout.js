@@ -9,6 +9,20 @@ scout.LogicalGridLayout = function(hgap, vgap) {
 };
 scout.inherits(scout.LogicalGridLayout, scout.AbstractLayout);
 
+scout.AbstractLayout.prototype._verifyLayout = function($parent) {
+  var htmlParent = scout.HtmlComponent.get($parent),
+    parentSize = htmlParent.getSize();
+  if (!this.valid || !this.validityBasedOnParentSize.equals(parentSize)) {
+    this.validityBasedOnParentSize = parentSize;
+    this.validateLayout($parent);
+    this.valid = true;
+  }
+};
+
+scout.AbstractLayout.prototype.invalidate = function() {
+  this.valid = false;
+};
+
 scout.LogicalGridLayout.prototype.validateLayout = function($parent) {
   var visibleComps = [], visibleCons = [], i, cons,
     children = $parent.children('.form-field');
@@ -35,7 +49,7 @@ scout.LogicalGridLayout.prototype.layout = function($parent) {
   var cellBounds = this.m_info.layoutCellBounds(parentSize, parentInsets);
 
   // Set bounds of components
-  var r1, r2, r, d, $comp, i, htmlComp, data;
+  var r1, r2, r, d, $comp, i, htmlComp, data, delta;
   for (i = 0; i < this.m_info.$components.length; i++) {
     $comp = this.m_info.$components[i];
     htmlComp = scout.HtmlComponent.get($comp);
@@ -53,7 +67,7 @@ scout.LogicalGridLayout.prototype.layout = function($parent) {
       d = htmlComp.getPreferredSize();
       if (!data.fillHorizontal) {
         if (d.width < r.width) {
-          var delta = r.width - d.width;
+          delta = r.width - d.width;
           r.width = d.width;
           if (data.horizontalAlignment === 0) {
             // Do ceil the result as other layout managers of Java also handle floating calculation results that way.
@@ -69,7 +83,7 @@ scout.LogicalGridLayout.prototype.layout = function($parent) {
       }
       if (!data.fillVertical) {
         if (d.height < r.height) {
-          var delta = r.height - d.height;
+          delta = r.height - d.height;
           if (data.heightHint === 0) {
             r.height = d.height;
           } else {

@@ -15,6 +15,10 @@ scout.Point.prototype.toString = function() {
 };
 
 scout.Point.prototype.equals = function(o) {
+  if (!o) {
+    return false;
+  }
+
   return this.x === o.x &&
     this.y === o.y;
 };
@@ -39,6 +43,10 @@ scout.Dimension.prototype.toString = function() {
 };
 
 scout.Dimension.prototype.equals = function(o) {
+  if (!o) {
+    return false;
+  }
+
   return this.width === o.width &&
     this.height === o.height;
 };

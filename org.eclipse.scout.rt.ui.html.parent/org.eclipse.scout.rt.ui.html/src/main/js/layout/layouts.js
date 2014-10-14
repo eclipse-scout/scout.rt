@@ -12,34 +12,16 @@ scout.LayoutConstants = {
  * Abstract layout class with functions used by all layout algorithms.
  */
 scout.AbstractLayout = function() {
-  this.valid = false;
+  // Set this flag to false if the controls in your container don't depend on size changes of the container
+  // (e.g. width and height is set by the css).
+  // -> Layout() won't be called if the size of the container changes
+  this.invalidateOnResize = true;
+
   this.validityBasedOnParentSize = new scout.Dimension();
 };
 
-scout.AbstractLayout.prototype._verifyLayout = function($parent) {
-  var htmlParent = scout.HtmlComponent.get($parent),
-    parentSize = htmlParent.getSize();
-  if (!this.valid || !this.validityBasedOnParentSize.equals(parentSize)) {
-    this.validityBasedOnParentSize = parentSize;
-    this.validateLayout($parent);
-    this.valid = true;
-  }
-};
-
-/**
- * Returns the size of a visible component or (0,0) when component is invisible.
- */
-scout.AbstractLayout.prototype._getVisibleSize = function($comp) {
-  if ($comp.length === 1 && $comp.isVisible()) {
-    // TODO AWE: (layout) static methode auf HtmlComponent -->
-    return new scout.Dimension($comp.outerWidth(true), $comp.outerHeight(true));
-  } else {
-    return new scout.Dimension(0, 0);
-  }
-};
-
 scout.AbstractLayout.prototype.invalidate = function() {
-  this.valid = false;
+  // may be implemented by subclasses
 };
 
 /**
@@ -73,7 +55,7 @@ scout.FormLayout.prototype._getHtmlRootGroupBox = function($container) {
 };
 
 scout.FormLayout.prototype._getMenuBarHeight = function($container) {
-  return this._getVisibleSize($container.children('.menubar')).height;
+  return scout.HtmlComponent.getVisibleSize($container.children('.menubar')).height;
 };
 
 /**
@@ -86,13 +68,17 @@ scout.inherits(scout.GroupBoxLayout, scout.AbstractLayout);
 
 scout.GroupBoxLayout.prototype.layout = function($container) {
   var htmlComp = scout.HtmlComponent.get($container),
-    bodySize = htmlComp.getSize().subtractInsets(htmlComp.getInsets());
+    bodySize = htmlComp.getSize().subtractInsets(htmlComp.getInsets()),
+    newSize;
+
   $.log.trace('(GroupBoxLayout#layout) bodySize=' + bodySize);
-  this._getHtmlBody($container).setSize(new scout.Dimension(
+
+  newSize = new scout.Dimension(
       bodySize.width,
       bodySize.height -
         this._getTitleHeight($container) -
-        this._getButtonBarHeight($container)));
+        this._getButtonBarHeight($container));
+  this._getHtmlBody($container).setSize(newSize);
 };
 
 scout.GroupBoxLayout.prototype.preferredLayoutSize = function($container) {
@@ -105,11 +91,11 @@ scout.GroupBoxLayout.prototype.preferredLayoutSize = function($container) {
 };
 
 scout.GroupBoxLayout.prototype._getTitleHeight = function($container) {
-  return this._getVisibleSize($container.children('.group-box-title')).height;
+  return scout.HtmlComponent.getVisibleSize($container.children('.group-box-title')).height;
 };
 
 scout.GroupBoxLayout.prototype._getButtonBarHeight = function($container) {
-  return this._getVisibleSize($container.children('.button-bar')).height;
+  return scout.HtmlComponent.getVisibleSize($container.children('.button-bar')).height;
 };
 
 scout.GroupBoxLayout.prototype._getHtmlBody = function($container) {
@@ -255,7 +241,7 @@ scout.TabBoxLayout.prototype.layout = function($container) {
 scout.TabBoxLayout.prototype.preferredLayoutSize = function($container) {
   var $tabArea = $container.children('.tab-area'),
     $tabContent = $container.children('.tab-content'),
-    tabAreaSize = this._getVisibleSize($tabArea),
+    tabAreaSize = scout.HtmlComponent.getVisibleSize($tabArea),
     tabContentSize = scout.HtmlComponent.get($tabContent).getPreferredSize();
   //TODO AWE: (tab-box) impl. prefSize
   // size of tab-area
@@ -280,7 +266,12 @@ scout.NullLayout = function() {
 scout.inherits(scout.NullLayout, scout.AbstractLayout);
 
 scout.NullLayout.prototype.layout = function($container) {
-  // NOP
+  $container.children().each(function() {
+    var htmlComp = scout.HtmlComponent.get($(this));
+    if (htmlComp) {
+      htmlComp.layout();
+    }
+  });
 };
 
 /**
@@ -303,4 +294,40 @@ scout.SingleLayout.prototype.layout = function($container) {
 
 scout.SingleLayout.prototype._getHtmlSingleChild = function($container) {
   return scout.HtmlComponent.get($container.children().first());
+};
+
+
+/**
+ * Table Layout.
+ */
+scout.TableLayout = function(table) {
+  scout.TableLayout.parent.call(this);
+  this.table = table;
+  this.invalidateOnResize = false;
+};
+scout.inherits(scout.TableLayout, scout.AbstractLayout);
+
+scout.TableLayout.prototype.layout = function($container) {
+  var menubar = this.table.menubar,
+    footer = this.table.footer,
+    $header = this.table._$header,
+    $data = this.table.$data,
+    height = 0;
+
+  if (menubar.$container.isVisible()){
+    height += scout.HtmlComponent.getSize(menubar.$container).height;
+  }
+  if (footer) {
+    height += scout.HtmlComponent.getSize(footer.$container).height;
+  }
+  if ($header.isVisible()) {
+    height += scout.HtmlComponent.getSize($header).height;
+  }
+  $data.css('height', 'calc(100% - '+ height + 'px)');
+
+  this.valid2 = true;
+};
+
+scout.TableLayout.prototype.preferredLayoutSize = function($comp) {
+  return scout.HtmlComponent.getSize($comp);
 };

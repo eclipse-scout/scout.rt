@@ -138,3 +138,6 @@ scout.LogicalGridData.prototype._inheritWeightYRec = function(f) {
   }
 };
 
+scout.LogicalGridData.prototype.isValidateRoot = function() {
+  return !this.useUiHeight && !this.useUiWidth;
+};

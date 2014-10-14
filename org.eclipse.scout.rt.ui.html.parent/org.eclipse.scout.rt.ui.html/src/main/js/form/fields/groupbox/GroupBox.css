@@ -39,19 +39,18 @@
   left:0px;
 }
 
-.button-bar > .process > .form-field {
+.button-bar .form-field {
   position:static;
   display:inline-block;
+}
+
+.button-bar .field {
+  position:static;
 }
 
 .button-bar > .system {
   position:absolute;
   top:0px;
   right:0px;
-}
-
-.button-bar > .system > .form-field {
-  position:static;
-  display:inline-block;
 }
 

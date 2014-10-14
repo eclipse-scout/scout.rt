@@ -1,10 +1,20 @@
 /**
  * Wrapper for a JQuery selector. Used as replacement for javax.swing.JComponent.
  */
-scout.HtmlComponent = function($comp) {
+scout.HtmlComponent = function($comp, session) {
   this.$comp = $comp;
-  this.layoutManager;
+  this.layoutManager = new scout.NullLayout();
   this.layoutData;
+  this.valid = false;
+
+  // Set this to false if your component automatically adjusts its size (e.g. by using css styling)
+  // -> setSize won't be called
+  this.pixelBasedSizing = true;
+
+  if (!session) {
+    throw new Error('session must be defined for ' + this);
+  }
+  this.session = session;
   // link DOM element with this instance
   $comp.data('htmlComponent', this);
 };
@@ -48,6 +58,17 @@ scout.HtmlComponent.setSize = function($comp, vararg, height) {
     css('height', size.height+ 'px');
 };
 
+/**
+ * Returns the size of a visible component or (0,0) when component is invisible.
+ */
+scout.HtmlComponent.getVisibleSize = function($comp) {
+  if ($comp.length === 1 && $comp.isVisible()) {
+    return scout.HtmlComponent.getSize($comp);
+  } else {
+    return new scout.Dimension(0, 0);
+  }
+};
+
 scout.HtmlComponent.getBounds = function($comp) {
   return new scout.Rectangle(
       parseInt($comp.css('left'), 10),
@@ -87,17 +108,56 @@ scout.HtmlComponent.debug = function($comp) {
 scout.HtmlComponent.prototype.getParent = function() {
   var $parent = this.$comp.parent(),
     htmlParent = scout.HtmlComponent.optGet($parent);
-  return htmlParent || new scout.HtmlComponent($parent);
+
+  if ($parent.length === 0) {
+    return null;
+  }
+  return htmlParent;
 };
 
 scout.HtmlComponent.prototype.layout = function() {
-  if (this.layoutManager) {
-    this.layoutManager.layout(this.$comp);
-  } else {
+  if (!this.layoutManager) {
     $.log.warn('(HtmlComponent#layout) Called layout() but component ' + this.debug() + ' has no layout manager');
     // throw 'Tried to layout component ' + this.debug() +' but component has no layout manager';
     // TODO AWE: (layout) entscheiden, ob wir dieses throw "scharf machen" wollen oder nicht
+    return;
   }
+
+  if (!this.valid) {
+    this.layoutManager.layout(this.$comp);
+    //Save size for later use (necessary if pixelBasedSizing is set to false)
+    this.size = this.getSize();
+    this.valid = true;
+  }
+};
+
+scout.HtmlComponent.prototype.invalidate = function() {
+  this.valid = false;
+  if (this.layoutManager) {
+    this.layoutManager.invalidate();
+  }
+};
+
+scout.HtmlComponent.prototype.revalidate = function() {
+  this.session.layoutValidator.revalidate(this);
+};
+
+/**
+ * Marks the end of the parent invalidation. <p>
+ * A component is a validate root if its size does not depend on the visibility or bounds of its children.<p>
+ * Example: It is not necessary to relayout the whole form if just the label of a form field gets invisible.
+ * Only the form field container needs to be relayouted. In this case the form field container is the validate root.
+ */
+scout.HtmlComponent.prototype.isValidateRoot = function() {
+  if (this.validateRoot) {
+    return true;
+  }
+
+  if (!this.layoutData || !this.layoutData.isValidateRoot) {
+    return false;
+  }
+
+  return this.layoutData.isValidateRoot();
 };
 
 /**
@@ -155,11 +215,13 @@ scout.HtmlComponent.prototype.getSize = function() {
  * from the given size before setting the width/height of the component.
  */
 scout.HtmlComponent.prototype.setSize = function(size) {
-  var oldSize = this.getSize();
-  if (!oldSize.equals(size)) {
-    this.layoutManager.invalidate();
+  var oldSize = this.size;
+  if (!size.equals(oldSize) && this.layoutManager.invalidateOnResize) {
+    this.invalidate();
   }
-  scout.HtmlComponent.setSize(this.$comp, size);
+  if (this.pixelBasedSizing) {
+    scout.HtmlComponent.setSize(this.$comp, size);
+  }
   this.layout();
 };
 
@@ -169,8 +231,8 @@ scout.HtmlComponent.prototype.getBounds = function() {
 
 scout.HtmlComponent.prototype.setBounds = function(bounds) {
   var oldBounds = this.getBounds();
-  if (!oldBounds.equals(bounds)) {
-    this.layoutManager.invalidate();
+  if (!oldBounds.equals(bounds) && this.layoutManager.invalidateOnResize) {
+    this.invalidate();
   }
   scout.HtmlComponent.setBounds(this.$comp, bounds);
   this.layout();

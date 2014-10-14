@@ -49,6 +49,7 @@ scout.Session = function($entryPoint, jsonSessionId, userAgent) {
   // FIXME maybe better separate session object from event processing, create
   // ClientSession.js?
   this.modelAdapterRegistry[jsonSessionId] = this;
+  this.layoutValidator = new scout.LayoutValidator();
 };
 
 scout.Session.prototype.unregisterModelAdapter = function(modelAdapter) {
@@ -190,6 +191,7 @@ scout.Session.prototype._processSuccessResponse = function(message) {
   this.processingEvents = true;
   try {
     this._processEvents(message.events);
+    this.layoutValidator.validate();
   } finally {
     this.processingEvents = false;
     var cacheSize = scout.countProperties(this._adapterDataCache);

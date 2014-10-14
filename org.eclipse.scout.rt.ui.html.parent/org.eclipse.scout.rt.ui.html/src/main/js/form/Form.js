@@ -18,8 +18,9 @@ scout.Form.prototype._render = function($parent) {
     addClass('form').
     data('model', this);
 
-  var htmlContainer = new scout.HtmlComponent(this.$container);
-  htmlContainer.setLayout(new scout.FormLayout());
+  this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
+  this.htmlComp.setLayout(new scout.FormLayout());
+  this.htmlComp.pixelBasedSizing = false;
 
   this.rootGroupBox.render(this.$container);
 
@@ -63,8 +64,6 @@ scout.Form.prototype._render = function($parent) {
     }.bind(this));
   }
 
-  htmlContainer.layout();
-
   if (this._locked) {
     this.disable();
   }
@@ -73,19 +72,15 @@ scout.Form.prototype._render = function($parent) {
 scout.Form.prototype.onResize = function() {
   // TODO AWE/CGU: dieses event müssten wir auch bekommen, wenn man den Divider zwischen
   // Tree und Working Area schiebt.
-  $.log.trace('(Form#_onResize) window was resized -> layout Form container');
-  var htmlCont = scout.HtmlComponent.get(this.$container),
-    htmlParent = htmlCont.getParent();
-  htmlCont.setSize(htmlParent.getSize());
+  $.log.trace('(Form#onResize) window was resized -> layout Form container');
+
+  var htmlCont = scout.HtmlComponent.get(this.$container);
+  var parentSize = scout.HtmlComponent.getSize(this.$container.parent());
+  htmlCont.setSize(parentSize);
 };
 
 scout.Form.prototype.appendTo = function($parent) {
   this.$container.appendTo($parent);
-};
-
-// TODO AWE: (C.GU) hier sollten wir doch besser die setEnabled() method verwenden / überscheiben.
-scout.Form.prototype.enable = function() {
-  // FIXME CGU implement
 };
 
 /**
@@ -93,10 +88,6 @@ scout.Form.prototype.enable = function() {
  */
 scout.Form.prototype.dispose = function() {
   scout.Form.parent.prototype.dispose.call(this);
-  $(window).off('resize', this._onResize);
-};
-
-scout.Form.prototype.disable = function() {
 };
 
 scout.Form.prototype.onModelCreate = function() {};

@@ -1,7 +1,7 @@
 scout.SequenceBox = function() {
   scout.SequenceBox.parent.call(this);
   this._addAdapterProperties('fields');
-  this.$_sequenceBox;
+  this._$sequenceBox;
 };
 
 scout.inherits(scout.SequenceBox, scout.CompositeField);
@@ -11,16 +11,16 @@ scout.SequenceBox.prototype._render = function($parent) {
   this.addLabel();
   this.addMandatoryIndicator();
 
-  this.$_sequenceBox = $('<div>').
+  this._$sequenceBox = $('<div>').
     addClass('field').
     appendTo(this.$container);
-  var htmlSequenceBox = new scout.HtmlComponent(this.$_sequenceBox);
+  var htmlSequenceBox = new scout.HtmlComponent(this._$sequenceBox, this.session);
   htmlSequenceBox.setLayout(new scout.LogicalGridLayout(scout.HtmlEnvironment.formColumnGap, 0));
 
   var field, i;
   for (i = 0; i < this.fields.length; i++) {
     field = this.fields[i];
-    field.render(this.$_sequenceBox);
+    field.render(this._$sequenceBox);
     this._modifyLabel(field);
   }
 };

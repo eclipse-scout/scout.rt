@@ -33,6 +33,13 @@ scout.TableControl.prototype.remove = function() {
 
 scout.TableControl.prototype._renderContent = function($parent) {
   this.form.render($parent);
+  this.form.$container.height(scout.TableFooter.CONTAINER_SIZE);
+  this.form.$container.width($parent.width());
+  //FIXME CGU make this more easy to use
+  this.form.htmlComp.pixelBasedSizing = true;
+  this.form.htmlComp.validateRoot = true;
+  this.form.htmlComp.invalidate();
+  this.form.htmlComp.layout();
 };
 
 scout.TableControl.prototype._removeContent = function() {
@@ -55,12 +62,12 @@ scout.TableControl.prototype.renderContent = function() {
     return;
   }
 
-  this._renderContent(this.tableFooter.$controlContainer);
-
   //FIXME CGU opening should be controllable. Check current implementation of table page: is search form always opened automatically on activation?
   if (!this.tableFooter.open) {
     this.tableFooter.openTableControl();
   }
+
+  this._renderContent(this.tableFooter.$controlContainer);
 
   this.contentRendered = true;
 };
@@ -161,5 +168,12 @@ scout.TableControl.prototype.goOnline = function() {
 
   if (!this.isContentAvailable() && this.enabled) {
     this._renderEnabled(true);
+  }
+};
+
+
+scout.TableControl.prototype.onResize = function() {
+  if (this.form && this.form.rendered) {
+    this.form.onResize();
   }
 };

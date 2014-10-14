@@ -184,7 +184,7 @@ scout.DesktopNavigation.prototype._addSplitter = function() {
        that.outline.setBreadcrumb(false);
      }
 
-     that.outline.scrollbar.initThumb();
+     scout.Scrollbar2.update(that.outline._$viewport);
    }
 
    function resizeEnd() {

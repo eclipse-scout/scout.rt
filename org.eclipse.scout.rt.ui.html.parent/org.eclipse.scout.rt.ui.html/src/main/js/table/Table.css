@@ -103,7 +103,6 @@
 
 .table-data {
   position: relative;
-  height: calc(~"100% - " @size-desktop-menu + @size-table-header + @size-table-footer);
   overflow: hidden;
 }
 
