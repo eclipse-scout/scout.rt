@@ -139,7 +139,7 @@ import org.osgi.framework.Bundle;
 
 /**
  * <h3>SwtEnvironment</h3> ...
- *
+ * 
  * @since 1.0.0 06.03.2008
  */
 public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver implements ISwtEnvironment {
@@ -1253,15 +1253,19 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
   protected void updateWindowTitle() {
     if (getScoutDesktop() != null) {
       final String title = getScoutDesktop().getTitle();
-      for (IWorkbenchWindow w : PlatformUI.getWorkbench().getWorkbenchWindows()) {
-        final Shell s = w.getShell();
-        if (!s.isDisposed()) {
-          s.getDisplay().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-              s.setText(title);
-            }
-          });
+      // title is null when the getConfiguredTitle on AbstractDesktop returns null.
+      // If the title is null the product title will be left in the titlebar.
+      if (title == null) {
+        for (IWorkbenchWindow w : PlatformUI.getWorkbench().getWorkbenchWindows()) {
+          final Shell s = w.getShell();
+          if (!s.isDisposed()) {
+            s.getDisplay().asyncExec(new Runnable() {
+              @Override
+              public void run() {
+                s.setText(title);
+              }
+            });
+          }
         }
       }
     }
