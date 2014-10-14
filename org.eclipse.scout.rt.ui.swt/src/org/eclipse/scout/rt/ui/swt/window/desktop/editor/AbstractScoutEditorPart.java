@@ -52,7 +52,6 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.part.EditorPart;
-import org.eclipse.ui.presentations.IPresentablePart;
 
 public abstract class AbstractScoutEditorPart extends EditorPart implements ISwtScoutPart, ISaveablePart2 {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractScoutEditorPart.class);
@@ -236,10 +235,6 @@ public abstract class AbstractScoutEditorPart extends EditorPart implements ISwt
 
   protected void setMinimizedFromScout(boolean minimized) {
 
-  }
-
-  private void setSaveNeededFromScout() {
-    firePropertyChange(IPresentablePart.PROP_DIRTY);
   }
 
   protected void setCloseEnabledFromScout(boolean closebale) {
@@ -459,9 +454,6 @@ public abstract class AbstractScoutEditorPart extends EditorPart implements ISwt
     }
     else if (name.equals(IForm.PROP_MAXIMIZED)) {
       setMaximizedFromScout(((Boolean) newValue).booleanValue());
-    }
-    else if (name.equals(IForm.PROP_SAVE_NEEDED)) {
-      setSaveNeededFromScout();
     }
   }
 
