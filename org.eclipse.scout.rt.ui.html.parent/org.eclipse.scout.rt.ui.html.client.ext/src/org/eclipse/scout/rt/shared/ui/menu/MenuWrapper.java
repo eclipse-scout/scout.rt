@@ -26,6 +26,7 @@ public class MenuWrapper implements IMenu {
   private IPropertyObserver m_menuOwner;
   private List<IMenu> m_childMenus;
   private boolean m_localEnabled = true;
+  private boolean m_localEnabledInheritAccessibility = true;
   private Set<IMenuType> m_menuTypes;
 
   /**
@@ -261,7 +262,7 @@ public class MenuWrapper implements IMenu {
 
   @Override
   public boolean isEnabled() {
-    return m_localEnabled && m_wrappedMenu.isEnabled();
+    return m_localEnabled && m_localEnabledInheritAccessibility && m_wrappedMenu.isEnabled();
   }
 
   @Override
@@ -312,6 +313,16 @@ public class MenuWrapper implements IMenu {
   @Override
   public void setEnabledProcessingAction(boolean b) {
     throw new UnsupportedOperationException("read only wrapper");
+  }
+
+  @Override
+  public boolean isEnabledInheritAccessibility() {
+    return m_wrappedMenu.isEnabledInheritAccessibility();
+  }
+
+  @Override
+  public void setEnabledInheritAccessibility(boolean enabled) {
+    m_localEnabledInheritAccessibility = enabled;
   }
 
   @Override
