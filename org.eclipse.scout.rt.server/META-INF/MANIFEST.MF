@@ -46,6 +46,7 @@ Export-Package: org.eclipse.scout.rt.server,
  org.eclipse.scout.rt.server.services.common.useractivity,
  org.eclipse.scout.rt.server.services.common.workflow,
  org.eclipse.scout.rt.server.services.lookup,
+ org.eclipse.scout.rt.server.servlet,
  org.eclipse.scout.rt.server.transaction
 Eclipse-BuddyPolicy: registered
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

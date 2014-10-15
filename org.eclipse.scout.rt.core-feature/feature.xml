@@ -107,15 +107,15 @@
          install-size="0"
          version="0.0.0"
          unpack="false"/>
-	
-	<plugin
+
+   <plugin
          id="org.eclipse.scout.jaxws216.jre16.fragment"
          download-size="0"
          install-size="0"
          version="0.0.0"
          fragment="true"/>
-	
-	<plugin
+
+   <plugin
          id="org.eclipse.scout.jaxws216.jre18.fragment"
          download-size="0"
          install-size="0"
@@ -148,6 +148,20 @@
          download-size="0"
          install-size="0"
          version="2.7.1.v201005080400"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.scout.rt.server.servlet25"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.scout.rt.server.servlet31"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
          unpack="false"/>
 
 </feature>

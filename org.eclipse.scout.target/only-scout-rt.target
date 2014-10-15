@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <?pde version="3.6"?>
-<target name="only-scout-rt.target" sequenceNumber="10">
+<target name="only-scout-rt.target" sequenceNumber="12">
   <locations>
     <!-- Scout Nightly update site containing only RT features -->
     <location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">

@@ -44,6 +44,8 @@ import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.server.commons.servletfilter.FilterConfigInjection;
 import org.eclipse.scout.rt.server.commons.servletfilter.security.SecureHttpServletRequestWrapper;
 import org.eclipse.scout.rt.server.internal.Activator;
+import org.eclipse.scout.rt.server.servlet.IServletHelperService;
+import org.eclipse.scout.service.SERVICES;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -131,19 +133,29 @@ public class SoapWsseJaasFilter implements Filter {
     }
     final InputStream cacheIn = new ByteArrayInputStream(cacheOut.toByteArray());
     cacheOut = null;
+
+    final IServletHelperService svc = SERVICES.getService(IServletHelperService.class);
+    if (svc == null) {
+      LOG.error("Service IServletHelperService not available.\n"
+          + "Depending on the servlet version add \norg.eclipse.scout.rt.server.servlet31 or \n"
+          + "org.eclipse.scout.rt.server.servlet25\nto your product");
+      ((HttpServletResponse) response).sendError(HttpServletResponse.SC_FORBIDDEN);
+      return;
+    }
     //
-    final HttpServletRequestWrapper replayRequest = new HttpServletRequestWrapper((HttpServletRequest) request) {
+    continueChainWithPrincipal(subject, createReplayRequest(request, cacheIn, svc), (HttpServletResponse) response, chain);
+  }
+
+  /**
+   * @return request with new {@link ServletInputStream} that can be read again with original data
+   */
+  private HttpServletRequestWrapper createReplayRequest(ServletRequest request, final InputStream cacheIn, final IServletHelperService svc) {
+    return new HttpServletRequestWrapper((HttpServletRequest) request) {
       @Override
       public ServletInputStream getInputStream() throws IOException {
-        return new ServletInputStream() {
-          @Override
-          public int read() throws IOException {
-            return cacheIn.read();
-          }
-        };
+        return svc.createInputStream(cacheIn);
       }
     };
-    continueChainWithPrincipal(subject, replayRequest, (HttpServletResponse) response, chain);
   }
 
   private void continueChainWithPrincipal(Subject subject, final HttpServletRequest req, final HttpServletResponse res, final FilterChain chain) throws IOException, ServletException {
