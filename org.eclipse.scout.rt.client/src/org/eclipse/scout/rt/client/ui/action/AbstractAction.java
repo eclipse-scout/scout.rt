@@ -39,7 +39,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   private final EventListenerList m_listenerList = new EventListenerList();
   private final IActionUIFacade m_uiFacade;
   private boolean m_inheritAccessibility;
-  // enabled is defined as: enabledGranted && enabledProperty && enabledProcessing
+  // enabled is defined as: enabledGranted && enabledProperty && enabledProcessing && enabledInheritAccessibility
   private boolean m_enabledGranted;
   private boolean m_enabledProperty;
   private boolean m_enabledProcessingAction;
