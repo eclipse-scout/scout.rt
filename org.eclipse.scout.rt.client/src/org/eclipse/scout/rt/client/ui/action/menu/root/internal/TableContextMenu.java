@@ -137,7 +137,7 @@ public class TableContextMenu extends AbstractPropertyObserverContextMenu<ITable
         if (action instanceof IMenu) {
           IMenu menu = (IMenu) action;
           if (!menu.hasChildActions() && menu.isInheritAccessibility()) {
-            menu.setEnabled(inheritedEnability);
+            menu.setEnabledInheritAccessibility(inheritedEnability);
           }
         }
         return CONTINUE;

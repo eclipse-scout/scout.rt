@@ -139,7 +139,7 @@ public class TreeContextMenu extends AbstractPropertyObserverContextMenu<ITree> 
         if (action instanceof IMenu) {
           IMenu menu = (IMenu) action;
           if (!menu.hasChildActions() && menu.isInheritAccessibility()) {
-            menu.setEnabled(inheritedEnability);
+            menu.setEnabledInheritAccessibility(inheritedEnability);
           }
         }
         return CONTINUE;

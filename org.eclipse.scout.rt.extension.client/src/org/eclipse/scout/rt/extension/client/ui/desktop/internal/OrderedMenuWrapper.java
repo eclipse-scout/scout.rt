@@ -275,6 +275,16 @@ public class OrderedMenuWrapper implements IMenu, IOrdered, IWrappedObject<IMenu
   }
 
   @Override
+  public boolean isEnabledInheritAccessibility() {
+    return m_menu.isEnabledInheritAccessibility();
+  }
+
+  @Override
+  public void setEnabledInheritAccessibility(boolean enabled) {
+    m_menu.setEnabledInheritAccessibility(enabled);
+  }
+
+  @Override
   public void setVisiblePermission(Permission p) {
     m_menu.setVisiblePermission(p);
   }

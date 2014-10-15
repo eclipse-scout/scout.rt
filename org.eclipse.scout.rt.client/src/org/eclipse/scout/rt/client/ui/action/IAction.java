@@ -129,6 +129,10 @@ public interface IAction extends IPropertyObserver, ITypeWithClassId {
    */
   void setInheritAccessibility(boolean b);
 
+  boolean isEnabledInheritAccessibility();
+
+  void setEnabledInheritAccessibility(boolean enabled);
+
   /**
    * Access control<br>
    * when false, enabled property cannot be set to true
