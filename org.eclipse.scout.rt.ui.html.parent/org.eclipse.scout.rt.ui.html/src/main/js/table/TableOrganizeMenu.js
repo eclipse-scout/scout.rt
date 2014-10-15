@@ -11,9 +11,9 @@ scout.TableOrganizeMenu.prototype._onMenuClicked = function(event) {
     this.$container.data('menu-open', false);
   }
   else {
-    //FIXME CGU Same code as in Menu.js, improve
-    var right = parseFloat(this.parent.$container[0].offsetWidth) - parseFloat(this.$container.position().left) -  parseFloat(this.$container[0].offsetWidth),
-      top = this.$container.height() - 7;
+    // FIXME CGU: Same code as in Menu.js, improve
+    var right = parseFloat(this.parent.$container[0].offsetWidth) - parseFloat(this.$container.position().left) -  parseFloat(this.$container[0].offsetWidth) - 20,
+      top = this.$container.height();
     this.$menuContainer = scout.menus.createContextMenuContainer(this.parent.$container, this.$container, undefined, right, top, false, true);
     this._renderContent(this.$menuContainer);
   }

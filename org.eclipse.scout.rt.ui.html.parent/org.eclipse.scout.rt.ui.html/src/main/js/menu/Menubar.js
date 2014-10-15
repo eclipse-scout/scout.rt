@@ -36,16 +36,18 @@ scout.Menubar.prototype.updateItems = function(menus) {
     for (i = 0; i < leftMenus.length; i++) {
       this._addMenuItem(leftMenus[i]);
     }
-    this._addMenuSeparator();
+    if (i > 1) {
+      this._addMenuSeparator();
+    }
   }
 
   // add all other menus
   menus = scout.menus.filter(menus, this.menuTypesForLeft2.concat(this.menuTypesForRight));
-  //It is not possible to display the same menu twice. If menuTypes for left and right are specified, prefer left
+  // It is not possible to display the same menu twice. If menuTypes for left and right are specified, prefer left
   scout.arrays.removeAll(menus, leftMenus);
   for (i = 0; i < menus.length; i++) {
     if (menus[i].separator) {
-      this._addMenuSeparator();
+//      this._addMenuSeparator();
     } else {
       this._addMenuItem(menus[i]);
     }
@@ -64,4 +66,7 @@ scout.Menubar.prototype._addMenuItem = function(menu) {
 scout.Menubar.prototype._addMenuSeparator = function () {
   var s = this.$container.appendDIV('menu-separator');
   this.menus.push(s);
+  if (this.lastMenu) {
+    this.lastMenu.$container.addClass('last');
+  }
 };

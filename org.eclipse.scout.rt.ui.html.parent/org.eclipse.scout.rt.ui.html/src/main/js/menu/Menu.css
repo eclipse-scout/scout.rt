@@ -1,32 +1,45 @@
 .menu-icon(@icon) {
   display: inline-block;
   font-family: fontAwesome;
-  font-size: 24px;
-  line-height: @size-desktop-menu;
+  font-size: 22px;
+  line-height: @size-desktop-menu - 1px;
   content: @icon;
+  color:#666666;
 }
 
 .menubar {
   width: 100%;
   position: relative;
-  height: 50px;
-  white-space: nowrap;
+  height: @size-desktop-menu;
   overflow: hidden;
+  margin:11px 0 14px 20px;
+}
+
+.menubar div, button {
+  display:inline-block;
+  vertical-align:middle;
+  font-family:arial;
+  font-size:13px;
+  box-sizing:border-box;
 }
 
 .menu-item {
   position: relative;
   display: inline-block;
-  padding-right: 20px;
-  padding-left: 20px;
   overflow: hidden;
   cursor: pointer;
-  line-height: @size-desktop-menu;
+  /* -1px used to cancel out effects of border-top */
+  line-height: @size-desktop-menu - 1px;
   color: @color-bench-text;
+  padding:0 10px;
 
   border-left: 1px solid transparent;
   border-right: 1px solid transparent;
-  border-bottom: 1px solid transparent;
+  border-top: 1px solid transparent;
+
+  &:not(.last) {
+    margin-right:10px;
+  }
 
   &:hover {
     color: @color-bench-text-hover;
@@ -43,6 +56,7 @@
   &.menu-right.menu-open {
     border-left: 1px solid @color-bench-light-border;
     border-right: 1px solid @color-bench-light-border;
+    border-top:  1px solid @color-bench-light-border;
     color: @color-bench-text-active;
   }
 
@@ -50,11 +64,11 @@
     color: @color-bench-text-active;
   }
 
-  &[data-icon]:before{
+  &[data-icon]:before {
     .menu-icon(attr(data-icon));
   }
 
-  &.has-submenu:after{
+  &.has-submenu:after {
     display: inline-block;
     position: relative;
     left: 0px;
@@ -75,14 +89,11 @@
 }
 
 .menu-separator {
-  display: inline-block;
-  position: relative;
-  left: -1px;
-  top: -10px;
-  width: 1px;
-  height: @size-desktop-menu - 20px;
-  border-right: 1px solid @color-bench-light-border;
-  cursor: pointer;
+  background-color:#d6d6d6;
+  box-sizing:content-box;
+  width:1px;
+  height:30px;
+  margin:0 19px 0 19px;
 }
 
 /* context menu */
@@ -92,7 +103,6 @@
   border: 1px solid @color-bench-light-border;
 }
 
-
 .menu-container {
   .menu-context;
   position: absolute;
@@ -101,7 +111,7 @@
 
   &.menu-right:before {
     content: ' ';
-    width: 65px;
+    width: 42px;
     border-bottom: 1px solid @color-bench;
     position:absolute;
     top: -1px;
@@ -114,8 +124,7 @@
   }
 }
 
-
-.menu-container .menu-item{
+.menu-container .menu-item {
   display: block;
   background-color: @color-bench;
   padding: 0px 12px 0px 12px;
@@ -123,8 +132,31 @@
   border-bottom: 1px solid @color-bench-light-border;
   cursor: pointer;
   color: @color-bench-text;
+  width:100%;
 
   &:hover{
     color: @color-bench-text-hover;
   }
 }
+
+.menu-button {
+  background-color:@color-bench-light;
+  color:@color-bench-text;
+  border:1px solid @color-bench-light-border;
+  min-width:110px;
+  height:30px;
+  -moz-border-radius:3px;
+  border-radius:3px;
+}
+
+.menu-button:not(.last) {
+  margin-right:14px;
+}
+
+.menu-button+.default-button {
+  background-color:@color-bsi-green-semi;
+  color:white;
+  border:none;
+  font-weight:bold;
+}
+

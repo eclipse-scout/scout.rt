@@ -12,21 +12,26 @@ scout.OutlineNavigateUpMenu = function(outline, selectedNode) {
 scout.OutlineNavigateUpMenu.prototype.render = function($parent) {
   var text,
     $parentNode,
-    parentNode;
-
-  parentNode = this.selectedNode.parentNode;
-  //FIXME: translate text
+    parentNode = this.selectedNode.parentNode;
   if (parentNode) {
     $parentNode = this.outline._findNodeById(parentNode.id);
-    text = 'Zurück';
+    text = scout.texts.get('back');
   } else {
-    text = 'Home';
+    text = scout.texts.get('home');
   }
 
-  this.$container = $parent
-    .appendDIV('menu-item')
-    .on('click', '', onClicked.bind(this))
-    .text(text);
+  // FIXME AWE: (menu) discuss with C.GU - das ist copy/paste code von Menu.js ... zusammenführen
+  // Wäre es nicht sinnvoll, wenn es diese Menüs schon im Modell gäbe?
+  this.$container = $('<button>').
+    appendTo($parent).
+    addClass('menu-button').addClass('system').
+    on('click', '', onClicked.bind(this)).
+    text(text);
+
+//  this.$container = $parent
+//    .appendDIV('menu-item')
+//    .on('click', '', onClicked.bind(this))
+//    .text(text);
 
   function onClicked(event) {
     if (!this.$container.isEnabled()) {

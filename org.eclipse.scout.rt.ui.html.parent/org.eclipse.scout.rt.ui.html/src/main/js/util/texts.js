@@ -1,5 +1,7 @@
 scout.texts = {
   'textMap': {
+      'back':'Zurück',
+      'home':'Home',
       'loadOptions':'Lade Optionen...',
       'noOptions':'Keine Übereinstimmung',
       'oneOption':'1 Option',

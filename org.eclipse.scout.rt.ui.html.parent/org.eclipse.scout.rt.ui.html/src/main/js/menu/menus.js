@@ -71,7 +71,7 @@ scout.menus = {
       }
     }
   },
-  //FIXME more or less the same code as in showContextMenu. Maybe better create separate class (ContextMenu.js or PopupMenu.js)
+  // FIXME more or less the same code as in showContextMenu. Maybe better create separate class (ContextMenu.js or PopupMenu.js)
   createContextMenuContainer: function($parent, $clicked, left, right, top, menuWindow, menuToggle) {
     var i, $menuContainer;
 
@@ -144,7 +144,6 @@ scout.menus = {
     if ($clicked && $clicked.hasClass('menu-right')) {
       $menuContainer.addClass('menu-right');
     }
-
 
     for (i = 0; i < menus.length; i++) {
       var menu = menus[i];
