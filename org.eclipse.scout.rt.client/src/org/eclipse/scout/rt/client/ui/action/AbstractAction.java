@@ -42,6 +42,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   private boolean m_enabledGranted;
   private boolean m_enabledProperty;
   private boolean m_enabledProcessingAction;
+  private boolean m_enabledInheritAccessibility;
   private boolean m_visibleProperty;
   private boolean m_visibleGranted;
   private boolean m_toggleAction;
@@ -56,6 +57,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
     m_uiFacade = createUIFacade();
     m_enabledGranted = true;
     m_enabledProcessingAction = true;
+    m_enabledInheritAccessibility = true;
     m_visibleGranted = true;
     if (callInitializer) {
       callInitializer();
@@ -474,6 +476,17 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
     m_inheritAccessibility = b;
   }
 
+  @Override
+  public void setEnabledInheritAccessibility(boolean b) {
+    m_enabledInheritAccessibility = b;
+    setEnabledInternal();
+  }
+
+  @Override
+  public boolean isEnabledInheritAccessibility() {
+    return m_enabledInheritAccessibility;
+  }
+
   /**
    * Access control<br>
    * when false, overrides isEnabled with false
@@ -517,7 +530,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   }
 
   private void setEnabledInternal() {
-    propertySupport.setPropertyBool(PROP_ENABLED, m_enabledGranted && m_enabledProperty && m_enabledProcessingAction);
+    propertySupport.setPropertyBool(PROP_ENABLED, m_enabledGranted && m_enabledProperty && m_enabledProcessingAction && m_enabledInheritAccessibility);
   }
 
   @Override
