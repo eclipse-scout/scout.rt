@@ -44,6 +44,8 @@ public class AbstractTable5 extends AbstractExtensibleTable implements ITable5 {
     m_reloadHandler = reloadHandler;
   }
 
+  //FIXME CGU remove PropertyChangeListener in AbstractColumn constructor -> generates a lot of unnecessary events
+
   @Override
   protected void execCreateHeaderMenus(List<IMenu> menuList) {
     //FIXME how to distinguish between html ui and others? better create service?
