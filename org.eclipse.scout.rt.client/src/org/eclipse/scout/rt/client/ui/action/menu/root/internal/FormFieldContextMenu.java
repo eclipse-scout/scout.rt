@@ -59,7 +59,7 @@ public class FormFieldContextMenu<T extends IFormField> extends AbstractProperty
           if (action instanceof IMenu) {
             IMenu menu = (IMenu) action;
             if (!menu.hasChildActions() && menu.isInheritAccessibility()) {
-              menu.setEnabled(enabled);
+              menu.setEnabledInheritAccessibility(enabled);
             }
           }
           return CONTINUE;
