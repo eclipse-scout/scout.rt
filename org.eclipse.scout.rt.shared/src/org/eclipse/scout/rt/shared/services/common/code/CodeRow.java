@@ -203,14 +203,22 @@ public class CodeRow<ID_TYPE> implements ICodeRow<ID_TYPE> {
 
   /**
    * @return
-   * @deprecated use {@link #getTooltipText()}
+   * @deprecated use {@link #getTooltipText()} instead. Will be removed with V5.0
    */
   @Deprecated
   public String getTooltip() {
     return m_tooltip;
   }
 
+  /**
+   * @deprecated use {@link #setTooltipText(String)} instead. Will be removed with V5.0
+   */
+  @Deprecated
   public void setTooltip(String tooltip) {
+    setTooltipText(tooltip);
+  }
+
+  public void setTooltipText(String tooltip) {
     m_tooltip = tooltip;
   }
 
@@ -219,6 +227,7 @@ public class CodeRow<ID_TYPE> implements ICodeRow<ID_TYPE> {
     return m_foregroundColor;
   }
 
+  @Override
   public void setForegroundColor(String foregroundColor) {
     m_foregroundColor = foregroundColor;
   }
@@ -228,6 +237,7 @@ public class CodeRow<ID_TYPE> implements ICodeRow<ID_TYPE> {
     return m_backgroundColor;
   }
 
+  @Override
   public void setBackgroundColor(String backgroundColor) {
     m_backgroundColor = backgroundColor;
   }
@@ -237,6 +247,7 @@ public class CodeRow<ID_TYPE> implements ICodeRow<ID_TYPE> {
     return m_font;
   }
 
+  @Override
   public void setFont(FontSpec font) {
     m_font = font;
   }
@@ -296,6 +307,7 @@ public class CodeRow<ID_TYPE> implements ICodeRow<ID_TYPE> {
     return m_partitionId;
   }
 
+  @Override
   public void setPartitionId(long partitionId) {
     m_partitionId = partitionId;
   }
