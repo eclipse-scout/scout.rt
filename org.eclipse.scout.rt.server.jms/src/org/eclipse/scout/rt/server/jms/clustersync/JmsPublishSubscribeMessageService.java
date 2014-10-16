@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.server.services.common.clustersync.IPublishSubscribe
  * <p>
  * This services must not be registered with a session based service factory.
  */
+@SuppressWarnings("restriction")
 public class JmsPublishSubscribeMessageService extends AbstractSimpleJmsService<IClusterNotificationMessage> implements IPublishSubscribeMessageService {
   private static IScoutLogger LOG = ScoutLogManager.getLogger(JmsPublishSubscribeMessageService.class);
 

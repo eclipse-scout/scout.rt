@@ -46,10 +46,11 @@ import org.eclipse.scout.service.SERVICES;
  * {@link MessageConsumer#setMessageListener(javax.jms.MessageListener)} as this is a J2EE container private method.
  * Instead one should use the synchronous methods like {@link MessageConsumer#receive(long)}
  * </ul>
- * 
+ *
  * @param <T>
  *          the type of message that should be sent and received
  */
+@SuppressWarnings("restriction")
 public abstract class AbstractJmsService<T> extends AbstractJndiService {
   private static IScoutLogger LOG = ScoutLogManager.getLogger(AbstractJmsService.class);
 

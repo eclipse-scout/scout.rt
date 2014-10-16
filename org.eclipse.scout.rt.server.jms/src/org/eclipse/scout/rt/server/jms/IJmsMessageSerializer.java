@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.server.jms;
 import javax.jms.Message;
 import javax.jms.Session;
 
+@SuppressWarnings("restriction")
 public interface IJmsMessageSerializer<T> {
 
   Message createMessage(T message, Session session) throws Exception;

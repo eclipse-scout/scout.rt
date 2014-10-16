@@ -28,10 +28,11 @@ import org.eclipse.scout.rt.server.transaction.ITransactionMember;
 /**
  * Scout {@link ITransactionMember} to use the JMS API transaction features. If one needs transactional behavior on JMS
  * messaging one should also consider JTA transactions.
- * 
+ *
  * @param <T>
  *          the type of message that should be sent and received
  */
+@SuppressWarnings("restriction")
 public class JmsTransactionMember<T> extends AbstractTransactionMember {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JmsTransactionMember.class);
 

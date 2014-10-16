@@ -19,6 +19,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.serialization.IObjectSerializer;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
 
+@SuppressWarnings("restriction")
 public class JmsMessageSerializer<T> implements IJmsMessageSerializer<T> {
   private static IScoutLogger LOG = ScoutLogManager.getLogger(JmsMessageSerializer.class);
   // Property name to save the message content on a JMS message - only used for logging/debug reasons.

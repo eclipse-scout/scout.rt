@@ -70,7 +70,7 @@ public class TestHttpSession implements HttpSession {
     return null;
   }
 
-  @SuppressWarnings({"rawtypes"})
+  @SuppressWarnings({"rawtypes", "unchecked"})
   @Override
   public Enumeration getAttributeNames() {
     return Collections.enumeration(m_sessionAttributes.keySet());
