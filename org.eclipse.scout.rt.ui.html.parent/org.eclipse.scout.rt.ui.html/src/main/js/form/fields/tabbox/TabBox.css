@@ -1,19 +1,24 @@
-.tab-area > button {
-  color:#506678;
-  border:solid 1px #a7b2bb;
-  border-bottom:none;
-  background-color:#e9ecee;
-  height:32px;
-  padding-left:10px;
-  padding-right:10px;
-}
+.tab-area {
 
-.tab-area > button.selected {
-  color:#2f82ab;
-  background-color:white;
-  border-color:#41525e;
+  background-image:url('bg_tab_area.png');
+  background-repeat:repeat-x;
+  background-position:center bottom;
+
+  & > button {
+    color:@color-bench-text;
+    border:none;
+    background-color:transparent;
+    height:32px;
+    padding-left:10px;
+    padding-right:10px;
+
+    &.selected {
+      color:@color-bench-text-active;
+	  border-bottom:solid 3px @color-bench-text-active;
+    }
+  }
 }
 
 .tab-content {
-  border:solid 1px #41525e;
+  padding-top:10px;
 }
