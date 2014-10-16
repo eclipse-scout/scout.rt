@@ -1,5 +1,5 @@
 /** currently also defined in scout.HtmlEnvironment (graphics.js) */
-@logical-grid-height: 32px;
+@logical-grid-height: 30px;
 
 .form-field {
   box-sizing:border-box;
@@ -22,20 +22,33 @@
   & > .status {
     position:absolute;
     right: 0px;
-  }
+    margin-left: 10px;
+    visibility: hidden;
 
-  &.mandatory > .mandatory-indicator:before {
-    content: '*';
-    font-size: 10px;
-  }
-
-  &.has-error {
-    & > .status:before  {
-      .font-icon;
+    &:before  {
+      .font-icon();
       font-size: 18px;
       content: '\f05c';
       color: @color-error;
     }
+  }
+
+  &.has-error > .status {
+    visibility: visible;
+  }
+
+  & > .mandatory-indicator {
+    visibility: hidden;
+    margin-right: 2px;
+
+    &:before {
+      content: '*';
+      font-size: 10px;
+    }
+  }
+
+  &.mandatory > .mandatory-indicator {
+    visibility: visible;
   }
 
   /* keep space so that fields don't move when changing from disabled to enabled */

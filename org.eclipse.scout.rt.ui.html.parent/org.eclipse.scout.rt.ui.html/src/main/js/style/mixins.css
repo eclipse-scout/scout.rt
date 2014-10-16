@@ -1,33 +1,37 @@
 @field-with-icon-padding: 20px;
-@field-border-width: 1px;
+@text-field-padding: 10px;
+@text-field-background-color: white;
 
 .text-field {
-  padding: 0;
-  
-  /* Add transparent border to compensate missing border due to border-box model */
-  border: @field-border-width solid transparent;
-  border-bottom-color: @color-bench-semi;
+  background-color: @text-field-background-color;
+  padding: @text-field-padding;
+  border: 1px solid @color-bench-light-border;
+  border-radius: 5px;
+  color: @color-bench-text;
 
   &:disabled {
-    background-color:white;
-    border-bottom-color: transparent;
+    border-color: transparent;
+    border-bottom-color: @color-bench-verylight-border;
+    border-radius: 0px;
   }
   &:focus {
-    border-bottom-color: @color-bsi-orange;
+    border-color: @color-bsi-orange;
     outline: none;
   }
   &.has-error {
-    border-bottom-color: @color-error;
+    border-color: @color-error;
+    background-color: @color-error-light;
   }
 }
 
 /** expects a sibling html element with class 'icon' **/
 .text-field-with-icon (@icon) {
   .text-field;
-  padding-left: 20px;
+  padding-right: @text-field-padding + 15px;
 
   & ~ .icon {
     position: absolute;
+    margin-right: @text-field-padding;
   }
 
   & ~ .icon:before {
@@ -35,10 +39,15 @@
     font-size: 12px;
     content: @icon;
     line-height: @logical-grid-height;
+    color: @color-bench-light-border;
+  }
+
+  &.has-error ~ .icon:before {
+    color: @color-error;
   }
 
   &.disabled {
-    padding-left: 0px;
+    padding-right: 0px;
   }
 
   &.disabled ~ .icon{

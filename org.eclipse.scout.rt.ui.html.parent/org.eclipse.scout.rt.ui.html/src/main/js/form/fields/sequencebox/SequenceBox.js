@@ -9,7 +9,6 @@ scout.inherits(scout.SequenceBox, scout.CompositeField);
 scout.SequenceBox.prototype._render = function($parent) {
   this.addContainer($parent, 'sequence-box');
   this.addLabel();
-  this.addMandatoryIndicator();
 
   this._$sequenceBox = $('<div>').
     addClass('field').

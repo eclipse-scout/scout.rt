@@ -108,15 +108,15 @@ scout.GroupBoxLayout.prototype._getHtmlBody = function($container) {
 scout.FormFieldLayout = function() {
   scout.FormFieldLayout.parent.call(this);
   this.labelWidth = scout.HtmlEnvironment.fieldLabelWidth;
-  this.mandatoryWidth = 10;
-  this.statusWidth = 10;
 };
 scout.inherits(scout.FormFieldLayout, scout.AbstractLayout);
 
 scout.FormFieldLayout.prototype.layout = function($container) {
+  var fieldBounds, htmlField;
   var htmlComp = scout.HtmlComponent.get($container),
     contSize = htmlComp.getSize().subtractInsets(htmlComp.getInsets()),
-    widthSum = 0,
+    leftWidth = 0,
+    rightWidth = 0,
     $label = $container.children('label'),
     $status = $container.children('.status'),
     $mandatory = $container.children('.mandatory-indicator'),
@@ -127,26 +127,29 @@ scout.FormFieldLayout.prototype.layout = function($container) {
     scout.HtmlComponent.setBounds($label, 0, 0, this.labelWidth, contSize.height);
     // with this property we achieve "vertical-align:middle" which doesn't work for non-table-cell elements
     $label.css('line-height', contSize.height + 'px');
-    widthSum += this.labelWidth;
+    leftWidth += this.labelWidth;
+  }
+  if ($mandatory.length > 0) {
+    $mandatory.cssLeft(leftWidth);
+    leftWidth += $mandatory.outerWidth(true);
   }
   if ($status.length > 0) {
     $status.css('line-height', contSize.height + 'px');
-    widthSum += this.statusWidth;
+    rightWidth += $status.outerWidth(true);
   }
-  if ($mandatory.length > 0) {
-    scout.HtmlComponent.setBounds($mandatory, widthSum, 0, this.mandatoryWidth, contSize.height);
-    widthSum += this.mandatoryWidth;
-  }
-  var fieldBounds = new scout.Rectangle(widthSum, 0, contSize.width - widthSum, contSize.height),
-    htmlField = scout.HtmlComponent.optGet($field);
+
+  fieldBounds = new scout.Rectangle(leftWidth, 0, contSize.width - leftWidth - rightWidth, contSize.height);
+  htmlField = scout.HtmlComponent.optGet($field);
   // TODO AWE: (layout) dafür sorgen, dass wir hier immer ein get() machen können
   if (htmlField) {
     htmlField.setBounds(fieldBounds);
   } else {
     scout.HtmlComponent.setBounds($field, fieldBounds);
   }
+
+  //Icon is placed inside the field (as overlay)
   if ($icon.length > 0) {
-    $icon.css('left', $field.position().left + 'px');
+    $icon.css('right', $field.cssBorderRightWidth() + rightWidth + 'px');
   }
 };
 
@@ -160,11 +163,11 @@ scout.FormFieldLayout.prototype.preferredLayoutSize = function($container) {
   if ($label.isVisible()) {
     width += this.labelWidth;
   }
-  if ($status.length > 0) {
-    width += this.statusWidth;
-  }
   if ($mandatory.length > 0) {
-    width += this.mandatoryWidth;
+    width += $mandatory.outerWidth(true);
+  }
+  if ($status.length > 0) {
+    width += $status.outerWidth(true);
   }
   if ($field.isVisible()) {
     // TODO AWE: (layout) dafür sorgen, dass wir hier immer ein get() machen können

@@ -1,6 +1,5 @@
 .root-group-box {
   margin: 20px @margin-bench-right 25px @margin-bench-left;
-  border-top: 1px solid @color-bench-light-border;
   box-sizing: border-box;
 }
 
@@ -12,16 +11,17 @@
 
 .group-box-title {
   width:100%;
-  border-bottom: 1px solid #ccc;
+  border-bottom: 3px solid @color-bench-light-border;
   padding-top: -8px;
+  padding-bottom: 6px;
   margin-top: 8px;
   margin-bottom:4px;
-}
 
-.group-box-title span {
-  font-weight:bold;
-  background-color:white;
-  color:#5D5D5D;
+  & span {
+   font-weight:bold;
+   background-color:white;
+   color:#5D5D5D;
+ }
 }
 
 .group-box-body {

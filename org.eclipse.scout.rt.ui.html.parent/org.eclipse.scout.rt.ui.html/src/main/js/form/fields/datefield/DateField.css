@@ -2,12 +2,17 @@
   .text-field-with-icon('\f073');
 }
 
-/* date box */
-
-.date-field > .predict {
+/** Prediction input field is in the back of the actual input field -> make actual input field transparent */
+.predict {
   color: @color-bench-semi;
+  background-color: @text-field-background-color;
+
+  & + input {
+    background-color: transparent;
+  }
 }
 
+/* date box */
 .field.has-error ~ .date-box{
   border-color: @color-error;
 }

@@ -38,7 +38,6 @@ scout.DateField.prototype._onFieldBlur = function() {
     this._updateDisplayText(this.$field.val(), false);
   }
 
-  this.$field.css('background-color', this._$predict.css('background-color'));
   this._$predict.remove();
   this._$predict = null;
   this._picker.close();
@@ -66,6 +65,17 @@ scout.DateField.prototype._renderDisplayText = function(text) {
   //Make sure there is no invisible and wrong prediction
   if (this._$predict) {
     this._$predict.val('');
+  }
+};
+
+/**
+ * @Override
+ */
+scout.DateField.prototype._renderErrorStatus = function(errorStatus) {
+  scout.DateField.parent.prototype._renderErrorStatus.call(this, errorStatus);
+
+  if (this._$predict) {
+    this._$predict.updateClass(errorStatus, 'has-error');
   }
 };
 
@@ -225,13 +235,8 @@ scout.DateField.prototype._predict = function(text) {
 scout.DateField.prototype._createPredictionField = function () {
   var $predict = this.$field.
     clone().
-    addClass('predict').
-    attr('disabled', 'disabled');
+    addClass('predict');
 
-  //Prediction field is in the back of the original field -> make original field transparent
-  var fieldBg = this.$field.css('background-color');
-  this.$field.css('background-color', 'transparent');
-  $predict.css('background-color', fieldBg);
   $predict.val('');
 
   this.$field.before($predict);

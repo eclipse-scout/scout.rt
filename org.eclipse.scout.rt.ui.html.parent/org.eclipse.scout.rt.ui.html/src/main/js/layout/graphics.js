@@ -170,11 +170,11 @@ scout.TreeSet.prototype.last = function() {
  * HtmlEnvironment is used in place of org.eclipse.scout.rt.ui.swing.DefaultSwingEnvironment.
  */
 scout.HtmlEnvironment = {
-  'formRowHeight': 32,
+  'formRowHeight': 30,
   'formRowGap': 6,
   'formColumnWidth': 360,
   'formColumnGap': 32,
-  'fieldLabelWidth': 130
+  'fieldLabelWidth': 140
 };
 
 scout.graphics = {

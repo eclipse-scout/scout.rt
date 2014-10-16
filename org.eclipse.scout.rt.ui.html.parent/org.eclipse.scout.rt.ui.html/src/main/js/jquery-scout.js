@@ -356,8 +356,16 @@
     return $.pxToNumber(this.css('margin-bottom'));
   };
 
+  $.fn.cssMarginRight = function() {
+    return $.pxToNumber(this.css('margin-right'));
+  };
+
   $.fn.cssBorderBottomWidth = function() {
     return $.pxToNumber(this.css('border-bottom-width'));
+  };
+
+  $.fn.cssBorderRightWidth = function() {
+    return $.pxToNumber(this.css('border-right-width'));
   };
 
   /**
@@ -365,6 +373,13 @@
    */
   $.fn.innerBottom = function() {
     return this.position().top + this.outerHeight(true) - this.cssMarginBottom() - this.cssBorderBottomWidth();
+  };
+
+  /**
+   * Right of a html element without margin and border relative to offset parent. Expects border-box model.
+   */
+  $.fn.innerRight = function() {
+    return this.position().left + this.outerWidth(true) - this.cssMarginRight() - this.cssBorderRightWidth();
   };
 
   $.fn.disableSpellcheck = function() {

@@ -15,6 +15,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 
 public interface IMenu5 extends IMenu {
 
+  //FIXME maybe better move to IAction. And button references an action in these cases
   /*
    * System Types
    */

@@ -11,6 +11,7 @@
 @color-bench-midi: #DBDBDB;
 @color-bench-light: #F6F6F6;
 @color-bench-light-border: #DDDDDD;
+@color-bench-verylight-border: #EBEBEB;
 
 @color-bench-text: #333333;
 @color-bench-text-hover: #0082A1;
@@ -21,9 +22,10 @@
 
 @color-bench-highlight: #FE9915;
 
-@color-error: #A61300;
 
 /* TODO AWE: (css/colors) ueber naming diskutieren */
+@color-error: #FF6060;
+@color-error-light: #FFE0E0;
 @color-bsi-orange: #FE9915;
 @color-bsi-green: #0082A1;
 @color-bsi-green-semi: #389db6;
