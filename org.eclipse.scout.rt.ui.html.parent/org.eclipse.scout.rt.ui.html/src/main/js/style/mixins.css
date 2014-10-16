@@ -4,7 +4,7 @@
 
 .text-field {
   background-color: @text-field-background-color;
-  padding: @text-field-padding;
+  padding: 0 @text-field-padding;
   border: 1px solid @color-bench-light-border;
   border-radius: 5px;
   color: @color-bench-text;
@@ -16,6 +16,7 @@
   }
   &:focus {
     border-color: @color-bsi-orange;
+    box-shadow: 0 0 5px @color-bsi-orange;
     outline: none;
   }
   &.has-error {

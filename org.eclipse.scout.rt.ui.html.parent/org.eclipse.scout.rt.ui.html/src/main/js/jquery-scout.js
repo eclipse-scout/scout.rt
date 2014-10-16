@@ -364,6 +364,10 @@
     return $.pxToNumber(this.css('border-bottom-width'));
   };
 
+  $.fn.cssBorderLeftWidth = function() {
+    return $.pxToNumber(this.css('border-left-width'));
+  };
+
   $.fn.cssBorderRightWidth = function() {
     return $.pxToNumber(this.css('border-right-width'));
   };

@@ -1,3 +1,5 @@
+@tablefield-selection-border-width: 1px;
+
 .table-field > .table {
   border: 1px solid @color-bench-light-border;
 }
@@ -8,27 +10,66 @@
   height: @logical-grid-height;
 }
 
-.table-field > .table > .menubar > .menu-item,
-.table-field > .table > .table-header > .header-item {
+.table-field > .table > .menubar {
+  margin: 0 0 7px 0;
+}
+
+.table-field .menubar > .menu-item,
+.table-field .table-header > .header-item {
   line-height: @logical-grid-height;
 }
 
 /*TODO CGU/CRU wieso nicht mit background-color wie bei header-resize? UND braucht es all diese height definitionen wirklich? */
-.table-field > .table > .menubar > .menu-separator {
+.table-field .menubar > .menu-separator {
   top: -8px;
   height: @logical-grid-height - 14px;
 }
 
-.table-field > .table > .menubar > .menu-item[data-icon]:before {
+.table-field .menubar > .menu-item[data-icon]:before {
   font-size: 18px;
   line-height: @logical-grid-height;
 }
 
-.table-field > .table > .table-data .table-row {
-  height: @logical-grid-height;
-  line-height: @logical-grid-height;
+.table-field .table-row {
+  border: @tablefield-selection-border-width solid transparent;
+  margin-bottom: -@tablefield-selection-border-width;
 }
 
 .table-field > .table > .table-data .table-row > .table-cell {
   line-height: @logical-grid-height - @table-cell-inset;
+}
+
+
+/* Selected rows */
+
+.table-field .table-row.select-top .table-cell,
+.table-field .table-row.select-middle .table-cell,
+.table-field .table-row.select-bottom .table-cell,
+.table-field .table-row.select-single .table-cell{
+  border-bottom: @tablefield-selection-border-width solid @color-bench-select-border;
+}
+
+.table-field .table-row.select-middle {
+  border-top: 0px; /* workaround for multicolored borders in the corner (use cell borders, see below) */
+
+  & .table-cell {
+    border-top: @tablefield-selection-border-width solid transparent;
+  }
+}
+
+.table-field .table-row.select-bottom {
+  border-top: 0px; /* workaround for multicolored borders in the corner (use cell borders, see below) */
+
+  & .table-cell {
+    border-top: @tablefield-selection-border-width solid transparent;
+    border-bottom-color: transparent;
+  }
+}
+
+.table-field .table-row.select-single {
+  border: @tablefield-selection-border-width solid @color-bench-select-border;
+
+  & .table-cell {
+    border-bottom-color: transparent;
+  }
 }

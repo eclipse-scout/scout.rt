@@ -322,7 +322,7 @@ scout.Table.prototype.drawData = function() {
 
 scout.Table.prototype._buildRowDiv = function(row) {
   var column, width, style, align, value, alignment;
-  var rowWidth = this._header.totalWidth + 4;
+  var rowWidth = this._header.totalWidth + this._getTableRowBorderWidth();
   var rowClass = 'table-row ';
 
   if (this.selectedRowIds && this.selectedRowIds.indexOf(row.id) > -1) {
@@ -345,6 +345,17 @@ scout.Table.prototype._buildRowDiv = function(row) {
   rowDiv += '</div>';
 
   return rowDiv;
+};
+
+scout.Table.prototype._getTableRowBorderWidth = function() {
+  if (this._tablRowBorderWidth !== undefined) {
+    return this._tablRowBorderWidth;
+  }
+
+  var $tableRowDummy = this._$viewport.appendDIV('table-row');
+  this._tablRowBorderWidth = $tableRowDummy.cssBorderLeftWidth() + $tableRowDummy.cssBorderRightWidth();
+  $tableRowDummy.remove();
+  return this._tablRowBorderWidth;
 };
 
 scout.Table.prototype._drawData = function(startRow) {

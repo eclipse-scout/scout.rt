@@ -1,4 +1,5 @@
 @table-cell-inset: 5px;
+@table-selection-border-width: 2px;
 
 .table {
   height: 100%;
@@ -111,10 +112,8 @@
 .table-row, .table-row-sum {
   position:relative;
   overflow: hidden;
-  line-height: @size-table-row;
-  height: @size-table-row;
-  border: 2px solid transparent;
-  margin-bottom: -2px;
+  border: @table-selection-border-width solid transparent;
+  margin-bottom: -@table-selection-border-width;
 }
 
 .table-row .table-cell,
@@ -157,7 +156,7 @@
   border-top: 0px; /* workaround for multicolored borders in the corner (use cell borders, see below) */
 
   & .table-cell {
-    border-top: 2px solid transparent;
+    border-top: @table-selection-border-width solid transparent;
   }
 }
 
@@ -168,13 +167,13 @@
   border-top: 0px; /* workaround for multicolored borders in the corner (use cell borders, see below) */
 
   & .table-cell {
-    border-top: 2px solid transparent;
+    border-top: @table-selection-border-width solid transparent;
     border-bottom-color: transparent;
   }
 }
 
 .table-row.select-single {
-  border: 2px solid @color-bench-select-border;
+  border: @table-selection-border-width solid @color-bench-select-border;
 
   & .table-cell {
     border-bottom-color: transparent;

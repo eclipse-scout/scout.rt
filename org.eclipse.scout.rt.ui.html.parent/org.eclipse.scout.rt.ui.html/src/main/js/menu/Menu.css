@@ -12,7 +12,7 @@
   position: relative;
   height: @size-desktop-menu;
   overflow: hidden;
-  margin:11px 0 14px 20px;
+  margin: 11px 0 14px 20px;
 }
 
 .menubar div, button {

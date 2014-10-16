@@ -173,7 +173,7 @@ scout.HtmlEnvironment = {
   'formRowHeight': 30,
   'formRowGap': 6,
   'formColumnWidth': 360,
-  'formColumnGap': 32,
+  'formColumnGap': 50,
   'fieldLabelWidth': 140
 };
 
