@@ -16,6 +16,7 @@ import java.util.Set;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.shared.ui.menu.IMenu5;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
@@ -30,6 +31,7 @@ public class JsonMenu extends AbstractJsonPropertyObserver<IMenu> {
   public static final String PROP_SEPARATOR = "separator";
   public static final String PROP_MENU_TYPES = "menuTypes";
   public static final String PROP_CHILD_MENUS = "childMenus";
+  public static final String PROP_SYSTEM_TYPE = "systemType";
 
   public JsonMenu(IMenu model, IJsonSession jsonSession, String id) {
     super(model, jsonSession, id);
@@ -83,6 +85,15 @@ public class JsonMenu extends AbstractJsonPropertyObserver<IMenu> {
           menuTypes.add(prefix + "." + type.toString());
         }
         return menuTypes;
+      }
+    });
+    putJsonProperty(new JsonProperty<IMenu>(PROP_SYSTEM_TYPE, model) {
+      @Override
+      protected Integer modelValue() {
+        if (getModel() instanceof IMenu5) {
+          return ((IMenu5) getModel()).getSystemType();
+        }
+        return -1;
       }
     });
   }

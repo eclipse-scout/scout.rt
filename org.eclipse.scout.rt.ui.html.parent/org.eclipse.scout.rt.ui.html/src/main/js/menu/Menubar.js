@@ -10,7 +10,7 @@ scout.Menubar = function($parent) {
 };
 
 scout.Menubar.prototype.updateItems = function(menus) {
-  var i, leftMenus;
+  var i, left1Menus, left2Menus, hasLeft1Menus, rightMenus;
 
   menus = this.staticMenus.concat(menus);
 
@@ -31,23 +31,30 @@ scout.Menubar.prototype.updateItems = function(menus) {
   if (!menus || menus.length === 0) return;
 
   // add menus for the first left area
-  leftMenus = scout.menus.filter(menus, this.menuTypesForLeft1);
-  if (leftMenus && leftMenus.length > 0) {
-    for (i = 0; i < leftMenus.length; i++) {
-      this._addMenuItem(leftMenus[i]);
-    }
-    if (i > 1) {
-      this._addMenuSeparator();
+  left1Menus = scout.menus.filter(menus, this.menuTypesForLeft1);
+  hasLeft1Menus = left1Menus && left1Menus.length > 0;
+  if (hasLeft1Menus) {
+    for (i = 0; i < left1Menus.length; i++) {
+      this._addMenuItem(left1Menus[i]);
     }
   }
 
   // add all other menus
-  menus = scout.menus.filter(menus, this.menuTypesForLeft2.concat(this.menuTypesForRight));
+  left2Menus = scout.menus.filter(menus, this.menuTypesForLeft2);
+  rightMenus = scout.menus.filter(menus, this.menuTypesForRight);
+
   // It is not possible to display the same menu twice. If menuTypes for left and right are specified, prefer left
-  scout.arrays.removeAll(menus, leftMenus);
+  menus = left2Menus.concat(rightMenus);
+  scout.arrays.removeAll(menus, left1Menus);
+
+  // add a fixed separator between left1 and left2, if required
+  if (hasLeft1Menus && left2Menus.length > 0 && this.lastMenu && !this.lastMenu.hasButtonStyle()) {
+    this._addMenuSeparator();
+  }
+
   for (i = 0; i < menus.length; i++) {
     if (menus[i].separator) {
-//      this._addMenuSeparator();
+      this._addMenuSeparator();
     } else {
       this._addMenuItem(menus[i]);
     }

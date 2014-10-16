@@ -3,6 +3,7 @@ scout.Button = function() {
 };
 scout.inherits(scout.Button, scout.FormField);
 
+// TODO AWE/CGU: (scout) refactor when system-types are moved to IAction (also used for Menus)
 scout.Button.SYSTEM_TYPE = {
   NONE: 0,
   CANCEL: 1,

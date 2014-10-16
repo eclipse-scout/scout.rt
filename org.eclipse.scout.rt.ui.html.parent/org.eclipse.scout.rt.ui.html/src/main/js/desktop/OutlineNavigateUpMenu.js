@@ -20,24 +20,17 @@ scout.OutlineNavigateUpMenu.prototype.render = function($parent) {
     text = scout.texts.get('home');
   }
 
-  // FIXME AWE: (menu) discuss with C.GU - das ist copy/paste code von Menu.js ... zusammenführen
-  // Wäre es nicht sinnvoll, wenn es diese Menüs schon im Modell gäbe?
+  // TODO CGU/AWE: (menu) das ist copy/paste code von Menu.js -> zusammenführen
   this.$container = $('<button>').
     appendTo($parent).
     addClass('menu-button').addClass('system').
     on('click', '', onClicked.bind(this)).
     text(text);
 
-//  this.$container = $parent
-//    .appendDIV('menu-item')
-//    .on('click', '', onClicked.bind(this))
-//    .text(text);
-
   function onClicked(event) {
     if (!this.$container.isEnabled()) {
       return;
     }
-
     if (parentNode) {
       this.outline.setNodesSelected([parentNode], [$parentNode]);
     }
@@ -50,4 +43,8 @@ scout.OutlineNavigateUpMenu.prototype.render = function($parent) {
 
 scout.OutlineNavigateUpMenu.prototype.remove = function($parent) {
   this.$container.remove();
+};
+
+scout.OutlineNavigateUpMenu.prototype.hasButtonStyle = function() {
+  return true;
 };

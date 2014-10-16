@@ -17,21 +17,17 @@ scout.Menu.prototype.sendMenuAction = function(event) {
 };
 
 scout.Menu.prototype._render = function($parent) {
-
-  // FIXME AWE: (menus) solve with menuType
   var text = this.text;
-  if (text === 'OK') {
-    this.$container = $('<button>').
-      appendTo($parent).
-      addClass('menu-button').addClass('default-button').addClass('last').
-      on('click', '', onClicked.bind(this));
-  } else if (text === 'Abbrechen' || text === 'Cancel') {
-     // FIXME AWE: (menus) Zurück und Home sind irgendwie speziell
-     // der text ist hier noch nicht gesetzt
+  if (this.hasButtonStyle()) {
     this.$container = $('<button>').
       appendTo($parent).
       addClass('menu-button').
       on('click', '', onClicked.bind(this));
+    if (scout.Button.SYSTEM_TYPE.OK === this.systemType) {
+      this.$container.
+        addClass('default-button').
+        addClass('last');
+    }
   } else {
     this.$container = $parent.
        appendDIV('menu-item').
@@ -46,9 +42,12 @@ scout.Menu.prototype._render = function($parent) {
     if (!this.$container.isEnabled()) {
       return;
     }
-
     this._onMenuClicked(event);
   }
+};
+
+scout.Menu.prototype.hasButtonStyle = function() {
+  return scout.menus.checkType(this, ["Form.System"]);
 };
 
 scout.Menu.prototype._onMenuClicked = function(event) {
