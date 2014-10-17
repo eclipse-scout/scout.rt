@@ -30,10 +30,14 @@ scout.TabBox.prototype._render = function($parent) {
       text(groupBox.label).
       appendTo(this._$tabArea).
       data('tabIndex', i).
-      on('click', this._onTabClicked.bind(this));
+      on('click', this._onTabClicked.bind(this)).
+      on('keydown', this._onKeydown.bind(this));
+    // only the selected tab is focusable
+    if (i != this.selectedTab) {
+      $tab.attr('tabindex', -1);
+    }
   }
 
-  // render 1st tab (currently hard-coded)
   this._$tabContent = this.$container.appendDiv('', 'tab-content');
   htmlComp = new scout.HtmlComponent(this._$tabContent, this.session);
   htmlComp.setLayout(new scout.SingleLayout());
@@ -44,22 +48,61 @@ scout.TabBox.prototype._renderProperties = function() {
   this._renderSelectedTab(this.selectedTab);
 };
 
-scout.TabBox.prototype._onTabClicked = function(tab) {
-  var tabIndex = $(tab.target).data('tabIndex');
+scout.TabBox.prototype._onTabClicked = function(e) {
+  var tabIndex = $(e.target).data('tabIndex');
+  this._selectTab(tabIndex);
+};
+
+scout.TabBox.prototype._selectTab = function(tabIndex) {
   this.selectedTab = tabIndex;
   this.session.send('select', this.id, {'tabIndex':tabIndex});
   this._renderSelectedTab(tabIndex);
 };
 
+// keyboard navigation in tab-box button area
+scout.TabBox.prototype._onKeydown = function(e) {
+  var tabIndex, navigationKey =
+    e.which === scout.keys.LEFT ||
+    e.which === scout.keys.RIGHT;
+  if (!navigationKey) {
+    return true;
+  }
+  tabIndex = $(e.target).data('tabIndex');
+  if (e.which === scout.keys.LEFT) { tabIndex--; }
+  if (e.which === scout.keys.RIGHT) { tabIndex++; }
+  if (tabIndex >= 0 && tabIndex < this.groupBoxes.length) {
+    setTimeout(function() {
+      if (tabIndex >= 0 && tabIndex < this.groupBoxes.length) {
+        this._selectTab(tabIndex);
+        var $tabButton = this._$tabArea.children('button').get(tabIndex);
+        $tabButton.focus();
+      }
+    }.bind(this));
+  }
+  e.preventDefault();
+};
 
 scout.TabBox.prototype._renderSelectedTab = function(selectedTab) {
   $.log.debug('(TabBox#_setSelectedTab) selectedTab='+selectedTab);
-  var i, $tabs = this._$tabArea.children('button');
+  var i, $tabButton, $oldTabButton, $selectedTabButton, $tabs = this._$tabArea.children('button');
   for (i=0; i<$tabs.length; i++) {
-    $($tabs[i]).removeClass('selected');
+    $tabButton = $($tabs[i]);
+    if ($tabButton.hasClass('selected')) {
+      $oldTabButton = $tabButton;
+      $oldTabButton.removeClass('selected');
+    }
   }
   if (selectedTab >= 0 && selectedTab < $tabs.length) {
-    $($tabs[selectedTab]).addClass('selected');
+    $selectedTabButton = $($tabs[selectedTab]);
+    $selectedTabButton.addClass('selected');
+  }
+
+  // deal with HTML attr 'tabindex' used for focus handling
+  // don't confuse jquery data 'tabIndex' and HTML attr 'tabindex' here.
+  // the former is used for internal widget logic, the later for focus handling
+  if ($oldTabButton && $selectedTabButton) {
+    $oldTabButton.attr('tabindex', -1);
+    $selectedTabButton.removeAttr('tabindex');
   }
 
   // replace tab-content
@@ -84,9 +127,8 @@ scout.TabBox.prototype._renderSelectedTab = function(selectedTab) {
     this.groupBoxes[this.selectedTab]._renderLabelVisible(false);
 
     // TODO AWE: (layout) beim initialen rendern ist das nicht nötig
-    // schauen ob wir hier etwas unterdrücken müssen oder ob das
+    // schauen, ob wir hier etwas unterdrücken müssen oder ob das
     // durch valid/invalidate bereits abgedeckt ist
-
     var htmlComp = scout.HtmlComponent.get(this._$tabContent);
     htmlComp.invalidate();
     htmlComp.layout();

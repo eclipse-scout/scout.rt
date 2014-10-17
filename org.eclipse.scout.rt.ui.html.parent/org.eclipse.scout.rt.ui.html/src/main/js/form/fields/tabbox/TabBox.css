@@ -9,12 +9,16 @@
     border:none;
     background-color:transparent;
     height:32px;
-    padding-left:10px;
-    padding-right:10px;
+    padding:0 10px;
+    border-bottom:solid 3px transparent;
 
     &.selected {
       color:@color-bench-text-active;
-	  border-bottom:solid 3px @color-bench-text-active;
+      border-bottom:solid 3px @color-bench-text-active;
+    }
+
+    &:hover {
+      color:@color-bench-text-hover;
     }
   }
 }
