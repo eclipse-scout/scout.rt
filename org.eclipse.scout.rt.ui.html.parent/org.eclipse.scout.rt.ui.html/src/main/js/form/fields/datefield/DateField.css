@@ -1,5 +1,5 @@
 .date-field input {
-  .text-field-with-icon('\f073');
+  .text-field-with-icon(@icon-calendar);
 }
 
 /** Prediction input field is in the back of the actual input field -> make actual input field transparent */
@@ -129,11 +129,11 @@
 }
 
 .date-box-left-y:before {
-  content:"\f100";
+  content: @icon-angle-double-left;
 }
 
 .date-box-left-m:before {
-  content:"\f104";
+  content: @icon-angle-left;
 }
 
 .date-box-right-y,
@@ -142,9 +142,9 @@
 }
 
 .date-box-right-y:before {
-  content:"\f101";
+  content: @icon-angle-double-right;
 }
 
 .date-box-right-m:before {
-  content:"\f105";
+  content: @icon-angle-right;
 }

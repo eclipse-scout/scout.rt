@@ -86,9 +86,9 @@
 
 
 .control:before{
-  font-family: fontAwesome;
+  .font-icon;
   font-size: 24px;
-  color:#0082A1;
+  color: #0082A1;
 }
 
 .control-label{
@@ -98,8 +98,13 @@
   color: #0082A1;
 }
 
-.control-query:before {content:"\F002";}
-.control-category:before {content:"\F02B";}
+.control-query:before {
+  content:@icon-search;
+}
+.control-category:before {
+  .font-icon;
+  content: @icon-category;
+}
 
 .table-info-load,
 .table-info-filter,

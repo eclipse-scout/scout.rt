@@ -1,6 +1,6 @@
 .menu-icon(@icon) {
   display: inline-block;
-  font-family: fontAwesome;
+  .font-icon;
   font-size: 22px;
   line-height: @size-desktop-menu - 1px;
   content: @icon;
@@ -73,11 +73,11 @@
     position: relative;
     left: 0px;
     top: 2px;
-    font-family: fontAwesome;
+    .font-icon;
     line-height: 18px;
     font-size: 18px;
     padding-left: 10px;
-    content: "\F107";
+    content: @icon-angle-down;
   }
 
 }

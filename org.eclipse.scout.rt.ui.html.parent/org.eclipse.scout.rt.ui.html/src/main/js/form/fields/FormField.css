@@ -27,8 +27,8 @@
 
     &:before  {
       .font-icon();
-      font-size: 18px;
-      content: '\f05c';
+      content: @icon-error;
+      font-size: 16px;
       color: @color-error;
     }
   }

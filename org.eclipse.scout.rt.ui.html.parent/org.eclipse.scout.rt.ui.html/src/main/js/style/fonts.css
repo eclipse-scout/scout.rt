@@ -1,8 +1,8 @@
 @font-face {
-font-family: fontAwesome;
+font-family: scoutIcons;
 font-style: normal;
 font-weight: 400;
-src: url('awesome.woff') format('woff');
+src: url('scoutIcons.woff') format('woff');
 }
 
 @font-face {
@@ -13,8 +13,11 @@ src: local('Open Sans'), local('OpenSans'), url('open_sans_normal.woff') format(
 }
 
 .font-icon(@weight: 400) {
-font-family: fontAwesome;
+font-family: scoutIcons;
 font-weight: @weight;
+speak: none;
+-webkit-font-smoothing: antialiased;
+-moz-osx-font-smoothing: grayscale;
 }
 
 .font-text-small(@weight: 400) {

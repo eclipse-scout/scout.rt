@@ -1,5 +1,5 @@
 .smart-field input {
-  .text-field-with-icon('\f002');
+  .text-field-with-icon(@icon-search);
 }
 
 .smart-field-popup {

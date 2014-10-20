@@ -17,7 +17,7 @@ text-align: center;
 }
 
 .tool-button:before{
-font-family: fontAwesome;
+.font-icon;
 font-size: 30px;
 color:#0082A1;
 content: attr(data-icon) '\A';

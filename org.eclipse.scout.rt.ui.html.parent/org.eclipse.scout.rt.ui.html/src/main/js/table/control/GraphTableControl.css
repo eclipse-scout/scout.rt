@@ -1,4 +1,6 @@
-.control-graph:before {content:"\F0E8";}
+.control-graph:before {
+  content:@icon-graph;
+}
 
 #GraphContainer {
 width: 100%;

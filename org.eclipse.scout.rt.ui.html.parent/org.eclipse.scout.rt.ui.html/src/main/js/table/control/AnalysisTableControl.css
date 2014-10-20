@@ -1,13 +1,15 @@
-.control-analysis:before {content:"\F140";}
+.control-analysis:before {
+  content: @icon-target;
+}
 
 .analysis-container{
-position: relative;	
+position: relative;
 height: 100%;
 width: 100%;
 }
 
 .command-container {
-position: absolute;	
+position: absolute;
 height: 100%;
 width: 10%;
 left: 45%;
@@ -19,7 +21,7 @@ float: left;
 clear: both;
 min-height: 16px;
 color: #bfbfbf;
-white-space: pre-wrap; 
+white-space: pre-wrap;
 }
 
 .command-container .command {
@@ -38,12 +40,12 @@ white-space: nowrap;
 text-overflow: ellipsis;
 }
 
-.command-container .command:hover{
+.command-container .command:hover {
 background-color: #ccc;
 }
 
 .venn-container {
-position: absolute;	
+position: absolute;
 height: 100%;
 width: 45%;
 left: 0%;
@@ -121,16 +123,16 @@ text-decoration: none;
 }
 
 .criteria-navigation-item:after{
-font-family: fontAwesome;
-content:  "\f105";
+.font-icon;
+content:  @icon-angle-right;
 position: relative;
 left: 10px;
 display: inline-block;
 }
 
-.criteria-navigation-item:last-child:after{
-font-family: fontAwesome;
-content:  "";
+.criteria-navigation-item:last-child:after {
+.font-icon;
+content: "";
 left: 0px;
 }
 
@@ -162,7 +164,7 @@ word-wrap: break-word;
 }
 
 .criteria-attribute-container {
-border: 0;	
+border: 0;
 }
 
 .criteria-attribute{
@@ -173,8 +175,8 @@ color: #f2f2f2;
 .criteria-attribute:hover {
 background-color: #ccc;
 color: #ccc;
-} 
+}
 
-.criteria-entity:hover{
+.criteria-entity:hover {
 background-color: #ccc;
 }

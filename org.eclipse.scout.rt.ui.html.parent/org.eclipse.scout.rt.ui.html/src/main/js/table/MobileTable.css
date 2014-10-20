@@ -41,8 +41,8 @@ height: ~"calc(100% - 95px)"; /*85px is table footer/control*/
 }
 
 .table-row > p:after {
-  font-family: fontAwesome;
-  content: "\F054";
+  .font-icon;
+  content: @icon-chevron-right;
   color: #D4D4D4;
   position: absolute;
   display: block;

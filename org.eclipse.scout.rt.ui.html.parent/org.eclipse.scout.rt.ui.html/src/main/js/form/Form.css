@@ -4,5 +4,5 @@
 }
 
 .detach-menu:before {
-  .menu-icon('\f0c4');
+  .menu-icon(@icon-detach);
 }

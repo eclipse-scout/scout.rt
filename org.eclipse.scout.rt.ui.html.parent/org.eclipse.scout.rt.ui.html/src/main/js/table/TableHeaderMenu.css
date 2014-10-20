@@ -37,7 +37,7 @@
   width: 43px;
   margin-right: 10px;
   heigth: 29px;
-  font-family: fontAwesome;
+  .font-icon;
   font-size: 17px;
   line-height: 29px;
   color: @color-bench-text;
@@ -77,19 +77,27 @@
   line-height: 20px;
 }
 
-#HeaderCommandMoveTop:before { content: "\F100";}
-#HeaderCommandMoveUp:before { content: "\F104";}
-#HeaderCommandMoveDown:before { content: "\F105";}
-#HeaderCommandMoveBottom:before { content: "\F101";}
+#HeaderCommandMoveTop:before {
+  content: @icon-angle-double-left;
+}
+#HeaderCommandMoveUp:before {
+  content: @icon-angle-left;
+}
+#HeaderCommandMoveDown:before {
+ content: @icon-angle-right;
+}
+#HeaderCommandMoveBottom:before {
+  content: @icon-angle-double-right;
+}
 
 #HeaderCommandSortAsc:before,
 #HeaderCommandSortAscAdd:before {
-  content: "\F175";
+  content: @icon-long-arrow-up;
 }
 
 #HeaderCommandSortDesc:before,
 #HeaderCommandSortDescAdd:before {
-  content: "\F176";
+  content: @icon-long-arrow-down;
 }
 
 #HeaderCommandSortAscAdd:after,
@@ -99,7 +107,7 @@
 
 #HeaderCommandSortAsc:before,
 #HeaderCommandSortAscAdd:before {
-  content: "\F175";
+  content: @icon-long-arrow-up;
 }
 
 #HeaderCommandSortAsc.selected:hover:before,
@@ -108,11 +116,11 @@
 #HeaderCommandSortDescAdd.selected:hover:before,
 #HeaderCommandGroupAll.selected:hover:before,
 #HeaderCommandGroupSort.selected:hover:before{
-  font-family: fontAwesome;
   top: 0px;
   font-size: 17px;
   line-height: 20px;
-  content: "\f00d";
+  .font-icon;
+  content: @icon-remove;
 }
 
 #HeaderCommandSortAsc.selected:hover:after,
@@ -131,21 +139,32 @@
   font-family: sans-serif;
   font-size: 20px;
   line-height: 20px;
-  content: "\03a3";
+  content: @icon-sum;
 }
 
-#HeaderCommandGroupSort:after {content: "\F00B";}
+#HeaderCommandGroupSort:after {
+  content: @icon-th-list;
+}
 
-#HeaderCommandColorRed:after {content: "\00a0";}
+#HeaderCommandColorRed:after {
+  content: @icon-nbsp;
+}
+
 #HeaderCommandColorRed{
   background-image: linear-gradient(to right, #ffafaf, #abd693);
 }
-#HeaderCommandColorGreen:after {content: "\00a0";}
+
+#HeaderCommandColorGreen:after {
+  content: @icon-nbsp;
+}
 #HeaderCommandColorGreen{
   background-image: linear-gradient(to right, #abd693, #ffafaf);
 }
 
-#HeaderCommandColorBar:after {content: "\00a0";}
+#HeaderCommandColorBar:after {
+  content: @icon-nbsp;
+}
+
 #HeaderCommandColorBar{
   background-image: linear-gradient(to right, #80c1d0 0%, #80c1d0 65%, white 65%, white 100% );
   border: 1px solid #80c1d0;
@@ -153,7 +172,10 @@
   line-height: 29px;
 }
 
-#HeaderCommandColorRemove:after {content: "\00a0";}
+#HeaderCommandColorRemove:after {
+  content: @icon-nbsp;
+}
+
 #HeaderCommandColorRemove{
   background: #fff;
   border: 1px solid #80c1d0;
@@ -161,8 +183,13 @@
   line-height: 29px;
 }
 
-#HeaderCommandColumnAdd:before { content: "\F067";}
-#HeaderCommandColumnRemove:before { content: "\F00D";}
+#HeaderCommandColumnAdd:before {
+  content: @icon-add;
+}
+
+#HeaderCommandColumnRemove:before {
+  content: @icon-remove;
+}
 
 .header-filter-container{
   position: relative;

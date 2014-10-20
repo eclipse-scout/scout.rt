@@ -57,11 +57,11 @@
   }
 
   &.sort-desc:after {
-    .sort-icon('\f0d7');
+    .sort-icon(@icon-caret-down);
   }
 
   &.sort-asc:after {
-    .sort-icon('\f0d8');
+    .sort-icon(@icon-caret-up);
   }
 
   &:hover, &.header-move{

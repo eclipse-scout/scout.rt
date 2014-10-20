@@ -22,7 +22,7 @@ public class TableOrganizeMenu extends OrganizeColumnsMenu {
 
   @Override
   protected String getConfiguredIconId() {
-    return "\uf013";
+    return "\uE031";
   }
 
   @Override

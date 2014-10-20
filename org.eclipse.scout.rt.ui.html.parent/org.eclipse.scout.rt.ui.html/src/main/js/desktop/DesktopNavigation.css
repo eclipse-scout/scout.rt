@@ -3,29 +3,29 @@
 .desktop-navigation {
   position: relative;
   height: 100%;
-    width: @size-desktop-navigation;
-    background-color: @color-nav;
-    color: @color-bench;
+  width: @size-desktop-navigation;
+  background-color: @color-nav;
+  color: @color-bench;
 }
 
 .navigation-header{
-    width: 100%;
-    height: @size-desktop-tools;
-    .font-text-large;
+  width: 100%;
+  height: @size-desktop-tools;
+  .font-text-large;
 
-   .navigation-breadcrumb & {
-      height: 2 * @size-desktop-tools;
-    }
+  .navigation-breadcrumb & {
+    height: 2 * @size-desktop-tools;
+  }
 }
 
 .navigation-container{
-    width: 100%;
-    height: calc(~"100%" - @size-desktop-tools);
+  width: 100%;
+  height: calc(~"100%" - @size-desktop-tools);
   top: @size-desktop-tools;
 
-    .navigation-breadcrumb & {
-      height: calc(~"100%" - 2 * @size-desktop-tools);
-    }
+  .navigation-breadcrumb & {
+    height: calc(~"100%" - 2 * @size-desktop-tools);
+  }
 }
 
 .navigation-splitter-vertical{
@@ -49,15 +49,15 @@
     width: calc(~"100%" - @size-desktop-tools);
   }
 
-    &:not(.tab-active) {
-        background-color: @color-nav-light;
-      color: @color-bench-text;
-      width:  @size-desktop-tools;
-    }
+  &:not(.tab-active) {
+    background-color: @color-nav-light;
+    color: @color-bench-text;
+    width:  @size-desktop-tools;
+  }
 
-    .navigation-breadcrumb & {
-      width: 50%;
-    }
+  .navigation-breadcrumb & {
+    width: 50%;
+  }
 }
 
 /* navigation header buttons*/
@@ -90,7 +90,7 @@
   }
 
   &:before{
-    content: "\F0C9";
+    content: @icon-menu;
   }
 }
 
@@ -98,7 +98,7 @@
   float: right;
 
   &:before{
-    content: "\F002";
+    content: @icon-search;
   }
 }
 
@@ -108,28 +108,28 @@
 .navigation-tab-search-field {
   padding: 0px 10px 0px 10px;
   height: @size-desktop-tools;
-    white-space: nowrap;
+  white-space: nowrap;
   .font-text-large;
   line-height: @size-desktop-tools;
   overflow: hidden;
-    text-overflow: ellipsis;
+  text-overflow: ellipsis;
   display: none;
 
   .tab-active > & {
-      display: block;
-    }
+    display: block;
+  }
 
-    .navigation-breadcrumb & {
+  .navigation-breadcrumb & {
     width: 200%;
     text-align: center;
     border-bottom: 1px solid @color-bench;
   }
- }
+}
 
 .navigation-tab-outline-title {
   min-width: @size-desktop-breadcrumb - 2 * @size-desktop-tools;
-
 }
+
 .navigation-tab-search-field {
   float: left;
   width: calc(~"100% - 2px" - @size-desktop-tools );
@@ -137,8 +137,8 @@
   outline:0;
   border: 0;
 
-    background-color: @color-nav;
-    color: @color-bench;
+  background-color: @color-nav;
+  color: @color-bench;
 
   .navigation-breadcrumb & {
     position: absolute;

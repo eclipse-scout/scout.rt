@@ -89,7 +89,7 @@
   }
 
   .tree-item.can-expand > &:before {
-    content: "\F105";
+    content: @icon-angle-right;
   }
 
   .tree-item:selected > &:before{

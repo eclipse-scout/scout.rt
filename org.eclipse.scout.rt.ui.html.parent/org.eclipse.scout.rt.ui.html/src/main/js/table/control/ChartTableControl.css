@@ -1,49 +1,51 @@
-.control-chart:before {content:"\F080";}
+.control-chart:before {
+  content:@icon-chart;
+}
 
 /* chart - type select */
 #ChartSelect{
-float: left;
+  float: left;
 }
 
 svg.select-chart{
-height: 65px;
-width: 80px;
-display: block;
+  height: 65px;
+  width: 80px;
+  display: block;
 }
 
 rect.select-events{
-cursor: pointer;
+  cursor: pointer;
 }
 
-rect.select-fill, circle.select-fill{
-fill: #e2e2e2;
+rect.select-fill, circle.select-fill {
+  fill: #e2e2e2;
 }
 
-path.select-fill-line, line.select-fill-line{
-stroke: #e2e2e2;
-fill: #fff;
-stroke-width: 3px;
-stroke-linejoin: round;
-stroke-linecap: round;
+path.select-fill-line, line.select-fill-line {
+  stroke: #e2e2e2;
+  fill: #fff;
+  stroke-width: 3px;
+  stroke-linejoin: round;
+  stroke-linecap: round;
 }
 
-path.select-fill-pie{
-stroke: #fff;
-fill: #e2e2e2;
-stroke-width: 1px;
-stroke-linejoin: round;
-stroke-linecap: round;
+path.select-fill-pie {
+  stroke: #fff;
+  fill: #e2e2e2;
+  stroke-width: 1px;
+  stroke-linejoin: round;
+  stroke-linecap: round;
 }
 
 svg.select-chart:hover rect.select-fill,
 svg.select-chart:hover circle.select-fill,
-svg.select-chart:hover path.select-fill-pie{
-fill: #ccc;
+svg.select-chart:hover path.select-fill-pie {
+  fill: #ccc;
 }
 
 svg.select-chart:hover path.select-fill-line,
-svg.select-chart:hover line.select-fill-line{
-stroke: #ccc;
+svg.select-chart:hover line.select-fill-line {
+  stroke: #ccc;
 }
 
 svg.select-chart.selected rect.select-fill,
@@ -53,73 +55,92 @@ fill: #fe9915;
 }
 
 svg.select-chart.selected path.select-fill-line,
-svg.select-chart.selected line.select-fill-line{
-stroke: #fe9915;
+svg.select-chart.selected line.select-fill-line {
+  stroke: #fe9915;
 }
 
 /* chart - axis and data select */
 
-#XAxisSelect, #YAxisSelect, #DataSelect{
-float: left;
-width: 175px;
-display: inline-block;
-overflow: hidden;
+#XAxisSelect, #YAxisSelect, #DataSelect {
+  float: left;
+  width: 175px;
+  display: inline-block;
+  overflow: hidden;
 }
 
 #YAxisSelect {
-width: 0px;
+  width: 0px;
 }
 
-.select-axis, .select-data{
-position: relative;
-margin:5px 10px 0px 15px;
-padding-left: 25px;
-padding-top: 4px;
-height: 26px;
-line-height: 21px;
-width: 150px;
-background-color: #e2e2e2;
-cursor: pointer;
-overflow: hidden;
-text-overflow: ellipsis;
+.select-axis, .select-data {
+  position: relative;
+  margin:5px 10px 0px 15px;
+  padding-left: 25px;
+  padding-top: 4px;
+  height: 26px;
+  line-height: 21px;
+  width: 150px;
+  background-color: #e2e2e2;
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.select-axis-group{
-position: relative;
-font-size: 10px;
-line-height: 12px;
+.select-axis-group {
+  position: relative;
+  font-size: 10px;
+  line-height: 12px;
 }
 
-.select-axis:hover, .select-data:hover{
-background-color: #ccc;
+.select-axis:hover, .select-data:hover {
+  background-color: #ccc;
 }
 
-.select-axis.selected, .select-data.selected{
-background-color: #fe9915;
-color: #fff;
+.select-axis.selected, .select-data.selected {
+  background-color: #fe9915;
+  color: #fff;
 }
 
-.select-axis:before, .select-data:before{
-color: #fff !important;
-position: absolute;
-font-size: 16px;
-line-height: 16px;
-left: 9px;
-top: 6px;
+.select-axis:before, .select-data:before {
+  color: #fff !important;
+  position: absolute;
+  font-size: 16px;
+  line-height: 16px;
+  left: 9px;
+  top: 6px;
 }
 
 .select-axis:before {
-font-family: fontAwesome;
+  .font-icon;
 }
 
-.axis-ver.selected:before{content: "\F175"; }
-.axis-hor.selected:before{content: "\F178"; left: 5px; }
-.axis-around.selected:before{content: "\F01E"; left: 6px; }
-.axis-up.selected:before{content: "\F176"; }
-
-.data-count.selected:before{content: "\2317"; top: 5px;}
-.data-sum.selected:before{content: "\03a3"; top: 7px;}
-.data-median.selected:before{content: "\2300"; left: 6px; top: 7px;}
+.axis-ver.selected:before {
+  content: @icon-long-arrow-down;
+}
+.axis-hor.selected:before {
+  content: @icon-long-arrow-right;
+  left: 5px;
+}
+.axis-around.selected:before {
+  content: @icon-rotate-right;
+  left: 6px;
+}
+.axis-up.selected:before {
+  content: @icon-long-arrow-up;
+}
+.data-count.selected:before {
+  content: @icon-count;
+  top: 5px;
+}
+.data-sum.selected:before {
+  content: @icon-sum;
+  top: 7px;
+}
+.data-median.selected:before {
+  content: @icon-median;
+  left: 6px;
+  top: 7px;
+}
 
 /* chart - main */
 #ChartMain {
@@ -127,56 +148,58 @@ width: 1000px;
 height: 320px;
 }
 
-rect.main-chart, circle.main-chart{
-fill: #0082a1;
-stroke: #fff;
-stroke-width: 0px;
-cursor: pointer;}
+rect.main-chart, circle.main-chart {
+  fill: #0082a1;
+  stroke: #fff;
+  stroke-width: 0px;
+  cursor: pointer;
+}
 
 circle.main-chart {
-opacity: 0.7;
+  opacity: 0.7;
 }
 
 path.main-chart{
-fill: #0082a1;
-stroke: #fff;
-stroke-width: 2px;
-cursor: pointer;}
+  fill: #0082a1;
+  stroke: #fff;
+  stroke-width: 2px;
+  cursor: pointer;
+}
 
 
-line.main-chart{
-stroke: #0082a1;
-stroke-width: 4px;
-stroke-linejoin: round;
-stroke-linecap: round;
+line.main-chart {
+  stroke: #0082a1;
+  stroke-width: 4px;
+  stroke-linejoin: round;
+  stroke-linecap: round;
 }
 
 .main-chart:hover, .main-chart.selected {
-fill: #fe9915
+  fill: #fe9915
 }
 
 
-line.main-axis{
-stroke: #ddd;
-stroke-width: 1px;
+line.main-axis {
+  stroke: #ddd;
+  stroke-width: 1px;
 }
 
-text.main-axis{
-fill: #fff;
-text-anchor: middle;
-dominant-baseline: middle;
+text.main-axis {
+  fill: #fff;
+  text-anchor: middle;
+  dominant-baseline: middle;
 }
 
-text.main-axis-y{
-fill: #aaa;
-text-anchor: end;
-dominant-baseline: central;
-font-size: 10px;
-}
+text.main-axis-y {
+  fill: #aaa;
+  text-anchor: end;
+  dominant-baseline: central;
+  font-size: 10px;
+  }
 
-text.main-axis-x, textPath.main-axis-x{
-fill: #aaa;
-text-anchor: middle;
-dominant-baseline: middle;
-font-size: 10px;
+text.main-axis-x, textPath.main-axis-x {
+  fill: #aaa;
+  text-anchor: middle;
+  dominant-baseline: middle;
+  font-size: 10px;
 }

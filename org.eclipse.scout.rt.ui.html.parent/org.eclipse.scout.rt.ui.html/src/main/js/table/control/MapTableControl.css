@@ -1,4 +1,6 @@
-.control-map:before {content:"\F0AC";}
+.control-map:before {
+  content: @icon-world;
+}
 
 #MapContainer {
 width: 100%;

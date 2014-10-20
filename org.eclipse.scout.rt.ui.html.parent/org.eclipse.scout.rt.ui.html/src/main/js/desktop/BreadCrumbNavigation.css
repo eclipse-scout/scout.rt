@@ -21,18 +21,8 @@
 }
 
 .breadcrumb:before {
-  font-family: fontAwesome;
+  .font-icon;
   font-size: 14px;
-  content: "\f053";
+  content: @icon-chevron-left;
   padding-right: 5px;
-}
-
-.breadcrumb-home {
-}
-
-.breadcrumb-home:before {
-  font-family: fontAwesome;
-  font-size: 22px;
-  content: "\f015";
-  padding: 0px;
 }

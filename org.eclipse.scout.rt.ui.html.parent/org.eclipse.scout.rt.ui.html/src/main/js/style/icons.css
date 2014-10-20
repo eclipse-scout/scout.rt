@@ -1,0 +1,41 @@
+/* custom icons */
+@icon-error: '\E001';
+@icon-info: '\E002';
+@icon-calendar: '\E003';
+@icon-clock: '\E004';
+@icon-wand: '\E010';
+@icon-phone: '\E011';
+@icon-target: '\E020';
+@icon-world: '\E021';
+@icon-chart: '\E022';
+@icon-graph: '\E023';
+@icon-category: '\E024';
+@icon-detach: '\E030';
+@icon-gear: '\E031';
+@icon-star: '\E032';
+
+/* sans-serif font icons*/
+@icon-nbsp: '\00a0';
+@icon-sum: '\03a3';
+@icon-median: '\2300';
+@icon-count: '\2317';
+
+/* awesome icons */
+@icon-menu: '\F0C9';
+@icon-search: '\F002';
+@icon-long-arrow-down: '\F175';
+@icon-long-arrow-up: '\F176';
+@icon-long-arrow-right: '\F178';
+@icon-rotate-right: '\F01E';
+@icon-caret-down: '\F0D7';
+@icon-caret-up: '\F0D8';
+@icon-th-list: '\F00B';
+@icon-add: '\F067';
+@icon-remove: '\F00D';
+@icon-angle-down: '\F107';
+@icon-angle-double-left: '\F100';
+@icon-angle-left: '\F104';
+@icon-angle-right: '\F105';
+@icon-angle-double-right: '\F101';
+@icon-chevron-left: '\f053';
+@icon-chevron-right: '\f054';
