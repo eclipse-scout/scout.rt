@@ -36,6 +36,7 @@ import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
+import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStroke;
@@ -395,6 +396,17 @@ public final class SwtUtility {
     return (style & SWT.POP_UP) != 0;
   }
 
+  public static MouseButton swtToScoutMouseButton(int swtButton) {
+    switch (swtButton) {
+      case 1:
+        return MouseButton.Left;
+      case 3:
+        return MouseButton.Right;
+      default:
+        return MouseButton.Unknown;
+    }
+  }
+
   public static ISwtKeyStroke[] getKeyStrokes(IKeyStroke stroke, ISwtEnvironment environment) {
     ArrayList<ISwtKeyStroke> swtKeyStrokes = new ArrayList<ISwtKeyStroke>();
     List<Integer> keyCodes = getSwtKeyCodes(stroke);
@@ -423,7 +435,7 @@ public final class SwtUtility {
    * Converts {@link IKeyStroke} to a swt keycode (This is a bitwise OR
    * of zero or more SWT key modifier masks (i.e. SWT.CTRL or SWT.ALT) and a
    * character code).
-   *
+   * 
    * @param stroke
    * @return
    */
@@ -1044,7 +1056,7 @@ public final class SwtUtility {
 
   /**
    * Escapes every mnemonic character '&' in the string by simply doubling the character.
-   *
+   * 
    * @param text
    *          the string to be escaped, also <code>null</code> or empty string values are allowed
    * @return the escaped string
@@ -1064,7 +1076,7 @@ public final class SwtUtility {
    * <ul>
    * <li>control-alternate-f1 --> Ctrl+Alt+F1
    * </ul>
-   *
+   * 
    * @since 3.10.0-M4
    */
   public static String getKeyStrokePrettyPrinted(IAction scoutAction) {
@@ -1077,7 +1089,7 @@ public final class SwtUtility {
   /**
    * Pretty printed version of the key stroke.
    * See {@link RwtUtility#getKeyStrokePrettyPrinted(IAction)}
-   *
+   * 
    * @since 3.10.0-M4
    */
   public static String getKeyStrokePrettyPrinted(String s) {
@@ -1092,7 +1104,7 @@ public final class SwtUtility {
 
   /**
    * Run the inputVerifier on the currently focused control. See {@link #runSwtInputVerifier(Control)} for more details.
-   *
+   * 
    * @since 3.10.0-M5
    */
   public static boolean runSwtInputVerifier() {
@@ -1101,7 +1113,7 @@ public final class SwtUtility {
 
   /**
    * Force the control's inputVerifier to run
-   *
+   * 
    * @since 3.10.0-M5
    */
   public static boolean runSwtInputVerifier(Control control) {

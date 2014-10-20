@@ -14,6 +14,7 @@ import java.net.URL;
 import java.util.List;
 
 import org.eclipse.scout.commons.dnd.TransferObject;
+import org.eclipse.scout.rt.client.ui.MouseButton;
 
 public interface ITreeUIFacade {
 
@@ -28,7 +29,7 @@ public interface ITreeUIFacade {
   /**
    * Single mouse click on a node or (for checkable trees) the space key
    */
-  void fireNodeClickFromUI(ITreeNode node);
+  void fireNodeClickFromUI(ITreeNode node, MouseButton mouseButton);
 
   /**
    * Double mouse click on a node or enter
@@ -60,4 +61,5 @@ public interface ITreeUIFacade {
   void fireNodeDropTargetChangedFromUI(ITreeNode node);
 
   void fireHyperlinkActionFromUI(ITreeNode node, URL url);
+
 }
