@@ -37,7 +37,7 @@ import org.junit.Test;
 
 /**
  * JUnit tests for {@link ConfigurationUtility}
- * 
+ *
  * @since 3.8.0
  */
 public class ConfigurationUtilityTest {
@@ -64,6 +64,7 @@ public class ConfigurationUtilityTest {
   }
 
   @Test
+  @SuppressWarnings("deprecation")
   public void getEnclosingContainerType() {
     // null
     assertNull(ConfigurationUtility.getEnclosingContainerType(null));
@@ -82,6 +83,7 @@ public class ConfigurationUtilityTest {
   }
 
   @Test
+  @SuppressWarnings("deprecation")
   public void getEnclosingContainerTypeAbstractInnerClasses() {
     assertSame(ConfigurationUtilityTest.class, ConfigurationUtility.getEnclosingContainerType(new InnerA()));
     assertSame(ConfigurationUtilityTest.class, ConfigurationUtility.getEnclosingContainerType(new InnerA().b));

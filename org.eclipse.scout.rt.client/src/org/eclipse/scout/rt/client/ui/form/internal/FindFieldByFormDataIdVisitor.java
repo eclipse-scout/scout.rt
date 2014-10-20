@@ -10,10 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.internal;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.TreeMap;
 
 import org.eclipse.scout.commons.CompositeObject;
-import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
@@ -24,7 +25,7 @@ import org.eclipse.scout.rt.shared.data.form.FormDataUtility;
 
 /**
  * Visitor for finding a form field by its form data field Id.
- * 
+ *
  * @see IFormField#getFieldId()
  * @see FormDataUtility#getFieldDataId(String)
  */
@@ -124,20 +125,15 @@ public class FindFieldByFormDataIdVisitor implements IFormFieldVisitor {
   private int getEnclosingFieldPathRank(IFormField f) {
     int rank = 0;
     int i = m_fieldIdParts.length - 2; // the last segment is the field id, i.e. not part of the enclosing field path
-    Class<?> currentEnclosingContainerType = ConfigurationUtility.getEnclosingContainerType(f);
-    ICompositeField p = f.getParentField();
-    while (p != null) {
-      Class<?> enclosingContainerType = ConfigurationUtility.getEnclosingContainerType(p);
-      if (enclosingContainerType != currentEnclosingContainerType) {
-        if (i >= 0 && m_fieldIdParts[i].equals(FormDataUtility.getFieldDataId(p.getFieldId()))) {
-          i--;
-        }
-        else {
-          rank++;
-        }
-        currentEnclosingContainerType = enclosingContainerType;
+    List<ICompositeField> enclosingFieldList = f.getEnclosingFieldList();
+    Collections.reverse(enclosingFieldList);
+    for (ICompositeField p : enclosingFieldList) {
+      if (i >= 0 && m_fieldIdParts[i].equals(FormDataUtility.getFieldDataId(p.getFieldId()))) {
+        i--;
       }
-      p = p.getParentField();
+      else {
+        rank++;
+      }
     }
     return rank;
   }

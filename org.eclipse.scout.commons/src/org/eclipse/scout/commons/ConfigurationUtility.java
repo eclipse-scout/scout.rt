@@ -46,7 +46,7 @@ public final class ConfigurationUtility {
    * By default, the method throws an {@link IllegalArgumentException} if one of the remaining classes is not annotated
    * by {@link Order}. The behavior can be switched off by setting the system property
    * <code>bsi.debug.innerclass.order</code> to an arbitrary value.
-   * 
+   *
    * @param classes
    * @param filter
    * @return
@@ -82,7 +82,7 @@ public final class ConfigurationUtility {
    * <li>If the object implements {@link IOrdered}, {@link IOrdered#getOrder()} is used</li>
    * <li>Finally, the index in the original collection is used</li>
    * </ol>
-   * 
+   *
    * @since 3.8.1
    */
   public static <T> List<T> sortByOrder(Collection<T> list) {
@@ -116,7 +116,7 @@ public final class ConfigurationUtility {
   /**
    * Filters the given class array and returns the first occurrence of an
    * instantiable class of filter
-   * 
+   *
    * @param classes
    * @param filter
    * @return first occurrence of filter, might be annotated with {@link InjectFieldTo} or {@link Replace}
@@ -134,7 +134,7 @@ public final class ConfigurationUtility {
   /**
    * same as {@link #filterClass(Class[], Class)} but ignoring classes with {@link InjectFieldTo} and {@link Replace}
    * annotations
-   * 
+   *
    * @since 3.8.1
    */
   @SuppressWarnings("unchecked")
@@ -152,7 +152,7 @@ public final class ConfigurationUtility {
   /**
    * Filters the given class array and returns all occurrences of instantiable
    * classes of filter
-   * 
+   *
    * @param classes
    * @param filter
    * @return all occurrences of filter
@@ -172,7 +172,7 @@ public final class ConfigurationUtility {
   /**
    * same as {@link #filterClasses(Class[], Class)} but ignoring classes with {@link InjectFieldTo} and {@link Replace}
    * annotations
-   * 
+   *
    * @since 3.8.1
    */
   @SuppressWarnings("unchecked")
@@ -191,7 +191,7 @@ public final class ConfigurationUtility {
   /**
    * same as {@link #filterClasses(Class[], Class)} but only accepting classes with {@link InjectFieldTo} and
    * {@link Replace} annotations
-   * 
+   *
    * @since 3.8.1
    */
   @SuppressWarnings("unchecked")
@@ -271,7 +271,9 @@ public final class ConfigurationUtility {
   /**
    * @return Returns the given objects enclosing container type, i.e the first class on the enclosing classes path that
    *         is abstract or the outermost enclosing class. The latter is the primary type.
+   * @deprecated method will be removed in N-Release
    */
+  @Deprecated
   public static Class<?> getEnclosingContainerType(Object o) {
     if (o == null) {
       return null;
@@ -287,7 +289,7 @@ public final class ConfigurationUtility {
    * Returns a new array without those classes, that are replaced by another class. The returned array is a new
    * instance, except there are no replacing classes. Replacing classes are annotated with {@link Replace}. Replacing
    * classes are reordered according to their nearest {@link Order} annotation that is found up the type hierarchy.
-   * 
+   *
    * @param classes
    * @return
    * @since 3.8.2
@@ -336,7 +338,7 @@ public final class ConfigurationUtility {
    * method never returns <code>null</code>.
    * <p/>
    * <b>Example:</b> Given the following two classes
-   * 
+   *
    * <pre>
    * public class A {
    * }
@@ -345,10 +347,10 @@ public final class ConfigurationUtility {
    * public class B extends A {
    * }
    * </pre>
-   * 
+   *
    * The invocation of <code>getReplacementMapping(new Class[] {B.class, String.class})</code> returns a map containing
    * <code>&lt;A.class, B.class&gt;</code>.
-   * 
+   *
    * @param classes
    * @return
    * @since 3.8.2
@@ -378,7 +380,7 @@ public final class ConfigurationUtility {
    * the most specific classes are returned.
    * <p/>
    * <b>Example:</b> Given the following two classes
-   * 
+   *
    * <pre>
    * public class A {
    * }
@@ -387,11 +389,11 @@ public final class ConfigurationUtility {
    * public class B extends A {
    * }
    * </pre>
-   * 
+   *
    * The invocation of <code>getReplacingLeafClasses(new Class[] {A.class, B.class, String.class})</code> returns a set
    * that contains <code>B.class</code> only. <code>String.class</code> is not annotated with {@link Replace} and
    * <code>A.class</code> is not a leaf replacement, but further replaced by <code>B.class</code>.
-   * 
+   *
    * @param classes
    * @return Returns the set of replacing leaf classes or an empty set.
    * @since 3.8.2
@@ -425,7 +427,7 @@ public final class ConfigurationUtility {
    * Moves the given element before the reference element. Both are expected to be part of the given list. If the
    * reference element is not in the list, the list remains untouched. If the element to move is not part of the list,
    * it is added before the reference element.
-   * 
+   *
    * @param list
    * @param element
    * @param referenceElement
@@ -447,7 +449,7 @@ public final class ConfigurationUtility {
    * <p>
    * If the class is replaced, the id of the replaced field is used ({@link ClassId}).
    * </p>
-   * 
+   *
    * @param clazz
    * @return annotated id or class name fallback
    * @since 3.10.0
@@ -461,7 +463,7 @@ public final class ConfigurationUtility {
    * <p>
    * If the class is replaced, the id of the replaced field is used ({@link ClassId}).
    * </p>
-   * 
+   *
    * @param clazz
    * @param simpleName
    *          use the simple class name instead of the fully qualified class name.
@@ -484,7 +486,7 @@ public final class ConfigurationUtility {
   /**
    * If the class is replacing another class, the one that is being replaced is returned. Otherwise the class itself is
    * returned.
-   * 
+   *
    * @return class to be replaced
    */
   private static Class<?> getOriginalClass(Class<?> c) {

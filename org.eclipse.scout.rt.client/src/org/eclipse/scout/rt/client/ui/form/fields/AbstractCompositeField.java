@@ -197,7 +197,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
    *
    * @since 4.0.1
    */
-  protected boolean isTemplateField() {
+  public boolean isTemplateField() {
     Class<?> c = getClass();
     while (c.getSuperclass() != null) {
       c = c.getSuperclass();
