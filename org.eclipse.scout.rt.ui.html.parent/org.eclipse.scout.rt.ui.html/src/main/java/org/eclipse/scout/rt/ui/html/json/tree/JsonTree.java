@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ContextMenuEvent;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
@@ -297,7 +298,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
 
   protected void handleUiNodeClicked(JsonEvent event, JsonResponse res) {
     final ITreeNode node = getTreeNodeForNodeId(JsonObjectUtility.getString(event.getData(), PROP_NODE_ID));
-    getModel().getUIFacade().fireNodeClickFromUI(node);
+    getModel().getUIFacade().fireNodeClickFromUI(node, MouseButton.Left);
   }
 
   protected void handleUiNodeAction(JsonEvent event, JsonResponse res) {

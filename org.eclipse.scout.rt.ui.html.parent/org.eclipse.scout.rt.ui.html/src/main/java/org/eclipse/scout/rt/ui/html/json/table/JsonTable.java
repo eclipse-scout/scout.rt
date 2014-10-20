@@ -23,6 +23,7 @@ import java.util.Map;
 import org.eclipse.scout.commons.DateUtility;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ContextMenuEvent;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
@@ -307,7 +308,7 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
 
   protected void handleUiRowClicked(JsonEvent event, JsonResponse res) {
     ITableRow tableRow = extractTableRow(event.getData());
-    getModel().getUIFacade().fireRowClickFromUI(tableRow);
+    getModel().getUIFacade().fireRowClickFromUI(tableRow, MouseButton.Left);
   }
 
   protected void handleUiRowsSelected(JsonEvent event, JsonResponse res) {
