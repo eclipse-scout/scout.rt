@@ -50,7 +50,7 @@ public class StoreAndLoadXml3FormTest {
     checkFieldXml(f.getG3Box(), "G3Box");
     checkFieldXml(f.getG4Box(), "G4Box");
 
-    checkFieldXml(f.getText3Field(), "Text3Field");
+    checkFieldXml(f.getText3Field(), "Text3Field", new EnclosingField("G2Box", G2Box.class.getName()));
 
     checkFieldXml(f.getG1Box().getText1Field(), "Text1Field", new EnclosingField("G1Box", G1Box.class.getName()));
     checkFieldXml(f.getG2Box().getText1Field(), "Text1Field", new EnclosingField("G2Box", G2Box.class.getName()));

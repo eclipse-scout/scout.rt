@@ -11,14 +11,15 @@
 package org.eclipse.scout.rt.client.ui.form.internal;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.CompositeObject;
-import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
@@ -107,20 +108,15 @@ public class FindFieldByXmlIdsVisitor implements IFormFieldVisitor {
   private int getEnclosingFieldPathRank(IFormField f) {
     int rank = 0;
     int i = m_xmlFieldIds.length - 2; // the last segment is the field id, i.e. not part of the enclosing field path
-    Class<?> currentEnclosingContainerType = ConfigurationUtility.getEnclosingContainerType(f);
-    ICompositeField p = f.getParentField();
-    while (p != null) {
-      Class<?> enclosingContainerType = ConfigurationUtility.getEnclosingContainerType(p);
-      if (enclosingContainerType != currentEnclosingContainerType) {
-        if (i >= 0 && p.getFieldId().equals(m_xmlFieldIds[i])) {
-          i--;
-        }
-        else {
-          rank--;
-        }
-        currentEnclosingContainerType = enclosingContainerType;
+    List<ICompositeField> enclosingFieldList = f.getEnclosingFieldList();
+    Collections.reverse(enclosingFieldList);
+    for (ICompositeField p : enclosingFieldList) {
+      if (i >= 0 && p.getFieldId().equals(m_xmlFieldIds[i])) {
+        i--;
       }
-      p = p.getParentField();
+      else {
+        rank--;
+      }
     }
     return rank;
   }
