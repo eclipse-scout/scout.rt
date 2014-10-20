@@ -13,7 +13,7 @@
   <parent>
     <groupId>org.eclipse.scout.rt.ui.html.parent</groupId>
     <artifactId>org.eclipse.scout.rt.ui.html.parent</artifactId>
-    <version>4.1.0-SNAPSHOT</version>
+    <version>4.2.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>org.eclipse.scout.rt.ui.html.client.ext</artifactId>

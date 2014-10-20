@@ -2,10 +2,10 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Scout Html UI Ext
 Bundle-SymbolicName: org.eclipse.scout.rt.ui.html.client.ext
-Bundle-Version: 4.1.0.qualifier
+Bundle-Version: 4.2.0.qualifier
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
-Require-Bundle: org.eclipse.scout.rt.client;bundle-version="4.1.0",
- org.eclipse.scout.rt.extension.client;bundle-version="4.1.0"
+Require-Bundle: org.eclipse.scout.rt.client;bundle-version="4.2.0",
+ org.eclipse.scout.rt.extension.client;bundle-version="4.2.0"
 Export-Package: org.eclipse.scout.rt.client.ui.basic.table,
  org.eclipse.scout.rt.client.ui.basic.table.control,
  org.eclipse.scout.rt.client.ui.basic.table.menus,
