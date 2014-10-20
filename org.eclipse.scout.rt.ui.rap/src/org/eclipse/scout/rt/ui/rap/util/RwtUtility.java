@@ -39,6 +39,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
+import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStroke;
@@ -534,6 +535,17 @@ public final class RwtUtility {
       }
     }
     return null;
+  }
+
+  public static MouseButton rwtToScoutMouseButton(int rwtButton) {
+    switch (rwtButton) {
+      case 1:
+        return MouseButton.Left;
+      case 3:
+        return MouseButton.Right;
+      default:
+        return MouseButton.Unknown;
+    }
   }
 
   public static IRwtKeyStroke[] getKeyStrokes(IKeyStroke stroke, IRwtEnvironment uiEnvironment) {

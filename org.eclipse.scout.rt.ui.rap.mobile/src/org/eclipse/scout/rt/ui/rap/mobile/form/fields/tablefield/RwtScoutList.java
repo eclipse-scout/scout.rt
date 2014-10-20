@@ -486,7 +486,7 @@ public class RwtScoutList extends RwtScoutComposite<ITable> implements IRwtScout
     return filteredRows;
   }
 
-  protected void handleUiRowClick(final ITableRow row) {
+  protected void handleUiRowClick(final ITableRow row, final int rwtMouseButton) {
     if (getScoutObject() == null || row == null) {
       return;
     }
@@ -499,7 +499,7 @@ public class RwtScoutList extends RwtScoutComposite<ITable> implements IRwtScout
     Runnable t = new Runnable() {
       @Override
       public void run() {
-        getScoutObject().getUIFacade().fireRowClickFromUI(row);
+        getScoutObject().getUIFacade().fireRowClickFromUI(row, RwtUtility.rwtToScoutMouseButton(rwtMouseButton));
       }
     };
     getUiEnvironment().invokeScoutLater(t, 0);
@@ -558,7 +558,7 @@ public class RwtScoutList extends RwtScoutComposite<ITable> implements IRwtScout
           case ' ':
             List<ITableRow> selectedRows = RwtUtility.getItemsOfSelection(ITableRow.class, (StructuredSelection) getUiTableViewer().getSelection());
             if (CollectionUtility.hasElements(selectedRows)) {
-              handleUiRowClick(CollectionUtility.firstElement(selectedRows));
+              handleUiRowClick(CollectionUtility.firstElement(selectedRows), e.button);
             }
             e.doit = false;
             break;
@@ -650,7 +650,7 @@ public class RwtScoutList extends RwtScoutComposite<ITable> implements IRwtScout
             setSelectionFromUi(new StructuredSelection());
           }
           else {
-            handleUiRowClick((ITableRow) element);
+            handleUiRowClick((ITableRow) element, event.button);
           }
           break;
         }

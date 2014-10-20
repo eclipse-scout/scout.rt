@@ -35,6 +35,7 @@ import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
+import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.action.ActionFinder;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.IAction;
@@ -326,11 +327,21 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   protected void execNodesSelected(TreeEvent e) throws ProcessingException {
   }
 
-  @ConfigOperation
-  @Order(70)
+  /**
+   * @deprecated use {@link #execNodeClick(ITreeNode, MouseButton)} instead. This method will be removed with V5.0
+   */
+  @Deprecated
   protected void execNodeClick(ITreeNode node) throws ProcessingException {
     TreeEvent e = new TreeEvent(this, TreeEvent.TYPE_NODE_CLICK, node);
     fireTreeEventInternal(e);
+  }
+
+  @ConfigOperation
+  @Order(70)
+  protected void execNodeClick(ITreeNode node, MouseButton mouseButton) throws ProcessingException {
+    TreeEvent e = new TreeEvent(this, TreeEvent.TYPE_NODE_CLICK, node);
+    fireTreeEventInternal(e);
+    execNodeClick(node);
   }
 
   @ConfigOperation
@@ -2075,11 +2086,11 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
   }
 
-  private void fireNodeClick(ITreeNode node) {
+  private void fireNodeClick(ITreeNode node, MouseButton mouseButton) {
     if (node != null) {
       try {
         interceptNodeClickSingleObserver(node);
-        execNodeClick(node);
+        execNodeClick(node, mouseButton);
       }
       catch (ProcessingException ex) {
         SERVICES.getService(IExceptionHandlerService.class).handleException(ex);
@@ -2593,13 +2604,13 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
 
     @Override
-    public void fireNodeClickFromUI(ITreeNode node) {
+    public void fireNodeClickFromUI(ITreeNode node, MouseButton mouseButton) {
       try {
         pushUIProcessor();
         node = resolveNode(node);
         node = resolveVirtualNode(node);
         if (node != null) {
-          fireNodeClick(node);
+          fireNodeClick(node, mouseButton);
         }
       }
       catch (ProcessingException e) {

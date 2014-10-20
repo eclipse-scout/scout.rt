@@ -762,14 +762,14 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
     }
   }
 
-  protected void handleSwtRowClick(final ITableRow row) {
+  protected void handleSwtRowClick(final ITableRow row, final int swtMouseButton) {
     if (getScoutObject() != null) {
       if (row != null) {
         // notify Scout
         Runnable t = new Runnable() {
           @Override
           public void run() {
-            getScoutObject().getUIFacade().fireRowClickFromUI(row);
+            getScoutObject().getUIFacade().fireRowClickFromUI(row, SwtUtility.swtToScoutMouseButton(swtMouseButton));
           }
         };
         getEnvironment().invokeScoutLater(t, 0);
@@ -1119,7 +1119,7 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
           if (event.count == 1) {
             StructuredSelection selection = (StructuredSelection) swtTableViewer.getSelection();
             if (selection.size() == 1) {
-              handleSwtRowClick((ITableRow) selection.getFirstElement());
+              handleSwtRowClick((ITableRow) selection.getFirstElement(), event.button);
             }
           }
           break;
@@ -1146,7 +1146,7 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
                 case SWT.CR:
                   List<ITableRow> selectedRows = SwtUtility.getItemsOfSelection(ITableRow.class, (StructuredSelection) swtTableViewer.getSelection());
                   if (CollectionUtility.hasElements(selectedRows)) {
-                    handleSwtRowClick(CollectionUtility.firstElement(selectedRows));
+                    handleSwtRowClick(CollectionUtility.firstElement(selectedRows), event.button);
                   }
                   event.doit = false;
                   break;

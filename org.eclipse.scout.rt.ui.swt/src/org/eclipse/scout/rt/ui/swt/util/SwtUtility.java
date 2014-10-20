@@ -36,6 +36,7 @@ import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
+import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStroke;
@@ -393,6 +394,17 @@ public final class SwtUtility {
       style = style | extendedStyle;
     }
     return (style & SWT.POP_UP) != 0;
+  }
+
+  public static MouseButton swtToScoutMouseButton(int swtButton) {
+    switch (swtButton) {
+      case 1:
+        return MouseButton.Left;
+      case 3:
+        return MouseButton.Right;
+      default:
+        return MouseButton.Unknown;
+    }
   }
 
   public static ISwtKeyStroke[] getKeyStrokes(IKeyStroke stroke, ISwtEnvironment environment) {

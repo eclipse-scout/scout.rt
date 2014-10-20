@@ -73,6 +73,7 @@ import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
+import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.basic.BoundsSpec;
@@ -202,6 +203,17 @@ public final class SwingUtility {
     dlg.getRootPane().setName("Synth.Dialog");
     dlg.pack();
     dlg.setVisible(true);
+  }
+
+  public static MouseButton swingToScoutMouseButton(int swingButton) {
+    switch (swingButton) {
+      case MouseEvent.BUTTON1:
+        return MouseButton.Left;
+      case MouseEvent.BUTTON3:
+        return MouseButton.Right;
+      default:
+        return MouseButton.Unknown;
+    }
   }
 
   /**
