@@ -228,7 +228,8 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
 
         @Override
         public void actionPerformed(ActionEvent e) {
-          handleSwingNodeClick(getSwingTree().getSelectionPath());
+          // 99 for undefined mouse button
+          handleSwingNodeClick(getSwingTree().getSelectionPath(), 99);
         }
       });
     }
@@ -862,7 +863,7 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
     }
   }
 
-  protected void handleSwingNodeClick(TreePath path) {
+  protected void handleSwingNodeClick(TreePath path, final int swingMouseButton) {
     if (getUpdateSwingFromScoutLock().isAcquired()) {
       return;
     }
@@ -876,7 +877,7 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
         Runnable t = new Runnable() {
           @Override
           public void run() {
-            getScoutObject().getUIFacade().fireNodeClickFromUI(scoutNode);
+            getScoutObject().getUIFacade().fireNodeClickFromUI(scoutNode, SwingUtility.swingToScoutMouseButton(swingMouseButton));
           }
         };
 
@@ -1221,7 +1222,7 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
           if (path != null) {
             // no click on +/- icon
             if (e.getPoint().x >= getSwingTree().getPathBounds(path).x) {
-              handleSwingNodeClick(path);
+              handleSwingNodeClick(path, e.getButton());
             }
           }
         }

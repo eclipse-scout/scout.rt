@@ -484,14 +484,14 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
     getSwtTreeViewer().update(node, null);
   }
 
-  protected void handleSwtNodeClick(final ITreeNode node) {
+  protected void handleSwtNodeClick(final ITreeNode node, final int swtMouseButton) {
     if (getScoutObject() != null) {
       if (node != null) {
         // notify Scout
         Runnable t = new Runnable() {
           @Override
           public void run() {
-            getScoutObject().getUIFacade().fireNodeClickFromUI(node);
+            getScoutObject().getUIFacade().fireNodeClickFromUI(node, SwtUtility.swtToScoutMouseButton(swtMouseButton));
           }
         };
         getEnvironment().invokeScoutLater(t, 0);
@@ -663,11 +663,11 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
                 // find checkbox area
                 Rectangle imgBounds = cell.getImageBounds();
                 if (imgBounds != null && e.x >= (imgBounds.x) && e.x <= (imgBounds.x + imgBounds.width)) {
-                  handleSwtNodeClick(nodeToClick);
+                  handleSwtNodeClick(nodeToClick, e.button);
                 }
               }
               else {
-                handleSwtNodeClick(nodeToClick);
+                handleSwtNodeClick(nodeToClick, e.button);
               }
             }
           }
@@ -682,7 +682,8 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
                   @SuppressWarnings("unchecked")
                   ITreeNode[] nodes = (ITreeNode[]) sel.toList().toArray(new ITreeNode[sel.size()]);
                   if (nodes != null && nodes.length > 0) {
-                    handleSwtNodeClick(nodes[0]);
+                    // 99 for undefined mouse button
+                    handleSwtNodeClick(nodes[0], 99);
                   }
                   e.doit = false;
                   break;
@@ -742,7 +743,8 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
           else {
             handleSwtNodeAction(nodes[0]);
             if (getScoutObject().isCheckable()) {
-              handleSwtNodeClick(nodes[0]);
+              // 1 for left button always with double click
+              handleSwtNodeClick(nodes[0], 1);
             }
           }
         }

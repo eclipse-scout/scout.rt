@@ -26,6 +26,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.columns.AbstractRowSummaryColumn;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.columns.IRowSummaryColumn;
+import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -189,10 +190,10 @@ public class MobileTable extends AbstractMobileTable implements IMobileTable {
   }
 
   @Override
-  protected void execRowClick(ITableRow row) throws ProcessingException {
+  protected void execRowClick(ITableRow row, MouseButton mouseButton) throws ProcessingException {
     //Delegate to original table
     ITableRow originalRow = getRowMapColumn().getValue(row);
-    getOriginalTable().getUIFacade().fireRowClickFromUI(originalRow);
+    getOriginalTable().getUIFacade().fireRowClickFromUI(originalRow, mouseButton);
   }
 
   @Override

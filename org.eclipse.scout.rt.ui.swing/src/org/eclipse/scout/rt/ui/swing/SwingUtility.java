@@ -73,6 +73,7 @@ import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
+import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.basic.BoundsSpec;
@@ -202,6 +203,17 @@ public final class SwingUtility {
     dlg.getRootPane().setName("Synth.Dialog");
     dlg.pack();
     dlg.setVisible(true);
+  }
+
+  public static MouseButton swingToScoutMouseButton(int swingButton) {
+    switch (swingButton) {
+      case MouseEvent.BUTTON1:
+        return MouseButton.Left;
+      case MouseEvent.BUTTON3:
+        return MouseButton.Right;
+      default:
+        return MouseButton.Unknown;
+    }
   }
 
   /**
@@ -892,7 +904,7 @@ public final class SwingUtility {
    * will be returned. In Windows environments these circumstances (task bar on a none primary screen) will be very rare
    * and therefore ignored until the bug will be fixed in a future Java version.
    * </p>
-   *
+   * 
    * @param screenDevice
    *          a screen thats {@link GraphicsConfiguration} will be used to determine the insets
    * @return the insets of this toolkit's screen, in pixels, if the given screen device is the primary screen, otherwise
@@ -1074,7 +1086,7 @@ public final class SwingUtility {
 
   /**
    * Adjusts the window such that it fits on the screen, if necessary.
-   *
+   * 
    * @param window
    */
   public static void adjustBoundsToScreen(Window window) {
@@ -1183,7 +1195,7 @@ public final class SwingUtility {
    * lies within the specified frame.
    * <p>
    * Intended be used in custom implementations of {@link JComponent#getToolTipLocation(MouseEvent)}.
-   *
+   * 
    * @param e
    *          the event that caused the display of the tool tip
    * @param c
@@ -1258,7 +1270,7 @@ public final class SwingUtility {
   /**
    * This method is used to get a top margin for {@link SwingScoutLabelField} and {@link SwingScoutHtmlField} in order
    * to have correct alignment for customized look and feel (e.g. Rayo)
-   *
+   * 
    * @since 3.10.0-M2
    */
   public static int getTopMarginForField() {

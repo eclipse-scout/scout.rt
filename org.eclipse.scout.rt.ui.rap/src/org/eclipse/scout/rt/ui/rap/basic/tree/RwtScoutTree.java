@@ -555,14 +555,14 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
     }
   }
 
-  protected void handleUiNodeClick(final ITreeNode node) {
+  protected void handleUiNodeClick(final ITreeNode node, final int rwtMouseButton) {
     if (getScoutObject() != null) {
       if (node != null) {
         // notify Scout
         Runnable t = new Runnable() {
           @Override
           public void run() {
-            getScoutObject().getUIFacade().fireNodeClickFromUI(node);
+            getScoutObject().getUIFacade().fireNodeClickFromUI(node, RwtUtility.rwtToScoutMouseButton(rwtMouseButton));
           }
         };
         getUiEnvironment().invokeScoutLater(t, 0);
@@ -757,7 +757,8 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
       else {
         handleUiNodeAction(nodes[0]);
         if (getScoutObject().isCheckable()) {
-          handleUiNodeClick(nodes[0]);
+          // on double click it is always the left mouse button
+          handleUiNodeClick(nodes[0], 1);
         }
       }
     }
@@ -772,7 +773,7 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
       @SuppressWarnings("unchecked")
       ITreeNode[] nodes = (ITreeNode[]) sel.toList().toArray(new ITreeNode[sel.size()]);
       if (nodes != null && nodes.length > 0) {
-        handleUiNodeClick(nodes[0]);
+        handleUiNodeClick(nodes[0], event.button);
       }
       event.doit = false;
     }
@@ -788,7 +789,7 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
           ViewerCell cell = getUiTreeViewer().getCell(new Point(event.x, event.y));
           if (cell != null && cell.getElement() instanceof ITreeNode) {
             ITreeNode nodeToClick = (ITreeNode) cell.getElement();
-            handleUiNodeClick(nodeToClick);
+            handleUiNodeClick(nodeToClick, event.button);
           }
           break;
         }

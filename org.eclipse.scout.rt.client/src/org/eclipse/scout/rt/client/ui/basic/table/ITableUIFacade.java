@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.scout.commons.dnd.TransferObject;
+import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 
@@ -29,7 +30,7 @@ public interface ITableUIFacade {
   /**
    * A mouse single click on a row or (for checkable tables) the space key triggers this action
    */
-  void fireRowClickFromUI(ITableRow row);
+  void fireRowClickFromUI(ITableRow row, MouseButton mouseButton);
 
   /**
    * A mouse double click on a row triggers this action

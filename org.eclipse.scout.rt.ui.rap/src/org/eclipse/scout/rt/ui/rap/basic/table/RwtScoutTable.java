@@ -799,14 +799,14 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
     }
   }
 
-  protected void handleUiRowClick(final ITableRow row) {
+  protected void handleUiRowClick(final ITableRow row, final int rwtMouseButton) {
     if (getScoutObject() != null) {
       if (row != null) {
         // notify Scout
         Runnable t = new Runnable() {
           @Override
           public void run() {
-            getScoutObject().getUIFacade().fireRowClickFromUI(row);
+            getScoutObject().getUIFacade().fireRowClickFromUI(row, RwtUtility.rwtToScoutMouseButton(rwtMouseButton));
           }
         };
         getUiEnvironment().invokeScoutLater(t, 0);
@@ -1023,7 +1023,7 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
           case ' ':
             List<ITableRow> selectedRows = RwtUtility.getItemsOfSelection(ITableRow.class, (StructuredSelection) getUiTableViewer().getSelection());
             if (CollectionUtility.hasElements(selectedRows)) {
-              handleUiRowClick(CollectionUtility.firstElement(selectedRows));
+              handleUiRowClick(CollectionUtility.firstElement(selectedRows), e.button);
             }
             e.doit = false;
             break;
@@ -1142,7 +1142,7 @@ public class RwtScoutTable extends RwtScoutComposite<ITable> implements IRwtScou
         case SWT.MouseUp: {
           StructuredSelection selection = (StructuredSelection) uiTableViewer.getSelection();
           if (selection != null && selection.size() == 1) {
-            handleUiRowClick((ITableRow) selection.getFirstElement());
+            handleUiRowClick((ITableRow) selection.getFirstElement(), event.button);
           }
           break;
         }

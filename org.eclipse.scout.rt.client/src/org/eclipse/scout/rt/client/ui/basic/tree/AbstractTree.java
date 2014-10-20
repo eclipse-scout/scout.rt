@@ -35,6 +35,7 @@ import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
+import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.action.ActionFinder;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.IAction;
@@ -198,7 +199,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
    * Advices the ui to automatically scroll to the selection
    * <p>
    * If not used permanent, this feature can also used dynamically at individual occasions using
-   *
+   * 
    * <pre>
    * {@link #scrollToSelection()}
    * </pre>
@@ -217,7 +218,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
    * component is attached to Scout.
    * <p>
    * Subclasses can override this method. Default is {@code false}.
-   *
+   * 
    * @return {@code true} if this tree should save and restore its scrollbars coordinates, {@code false} otherwise
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -251,7 +252,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   /**
    * The hyperlink's tree node is the selected node {@link #getSelectedNode()}
-   *
+   * 
    * @param url
    * @param path
    *          {@link URL#getPath()}
@@ -267,7 +268,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   /**
    * this method should not be implemented if you support {@link AbstractTree#execDrag(ITreeNode[])} (drag of mulitple
    * nodes), as it takes precedence
-   *
+   * 
    * @return a transferable object representing the given row
    */
   @ConfigOperation
@@ -279,7 +280,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   /**
    * Drag of multiple nodes. If this method is implemented, also single drags will be handled by Scout,
    * the method {@link AbstractTree#execDrag(ITreeNode)} must not be implemented then.
-   *
+   * 
    * @return a transferable object representing the given rows
    */
   @ConfigOperation
@@ -299,7 +300,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   /**
    * This method gets called when the drop node is changed, e.g. the dragged object
    * is moved over a new drop target.
-   *
+   * 
    * @since 4.0-M7
    */
   @ConfigOperation
@@ -326,11 +327,21 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   protected void execNodesSelected(TreeEvent e) throws ProcessingException {
   }
 
-  @ConfigOperation
-  @Order(70)
+  /**
+   * @deprecated use {@link #execNodeClick(ITreeNode, MouseButton)} instead. This method will be removed with V5.0
+   */
+  @Deprecated
   protected void execNodeClick(ITreeNode node) throws ProcessingException {
     TreeEvent e = new TreeEvent(this, TreeEvent.TYPE_NODE_CLICK, node);
     fireTreeEventInternal(e);
+  }
+
+  @ConfigOperation
+  @Order(70)
+  protected void execNodeClick(ITreeNode node, MouseButton mouseButton) throws ProcessingException {
+    TreeEvent e = new TreeEvent(this, TreeEvent.TYPE_NODE_CLICK, node);
+    fireTreeEventInternal(e);
+    execNodeClick(node);
   }
 
   @ConfigOperation
@@ -496,7 +507,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   /**
    * Override this internal method only in order to make use of dynamic menus<br/>
    * Used to manage menu list and add/remove menus
-   *
+   * 
    * @param menuList
    *          live and mutable list of configured menus
    */
@@ -1917,7 +1928,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   /**
    * keeps order of input
-   *
+   * 
    * @param nodes
    * @return
    */
@@ -2063,11 +2074,11 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
   }
 
-  private void fireNodeClick(ITreeNode node) {
+  private void fireNodeClick(ITreeNode node, MouseButton mouseButton) {
     if (node != null) {
       try {
         interceptNodeClickSingleObserver(node);
-        execNodeClick(node);
+        execNodeClick(node, mouseButton);
       }
       catch (ProcessingException ex) {
         SERVICES.getService(IExceptionHandlerService.class).handleException(ex);
@@ -2133,7 +2144,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   /**
    * This method gets called when the drop node is changed, e.g. the dragged object
    * is moved over a new drop target.
-   *
+   * 
    * @since 4.0-M7
    */
   public void fireNodeDropTargetChanged(ITreeNode node) {
@@ -2143,7 +2154,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   /**
    * This method gets called after the drag action has been finished.
-   *
+   * 
    * @since 4.0-M7
    */
   public void fireDragFinished() {
@@ -2581,13 +2592,13 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
 
     @Override
-    public void fireNodeClickFromUI(ITreeNode node) {
+    public void fireNodeClickFromUI(ITreeNode node, MouseButton mouseButton) {
       try {
         pushUIProcessor();
         node = resolveNode(node);
         node = resolveVirtualNode(node);
         if (node != null) {
-          fireNodeClick(node);
+          fireNodeClick(node, mouseButton);
         }
       }
       catch (ProcessingException e) {

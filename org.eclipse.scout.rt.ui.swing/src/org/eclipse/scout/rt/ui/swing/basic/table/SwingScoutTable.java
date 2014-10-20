@@ -338,7 +338,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
 
         @Override
         public void actionPerformed(ActionEvent e) {
-          handleSwingRowClick(getSwingTable().getSelectedRow());
+          handleSwingRowClick(getSwingTable().getSelectedRow(), 99);
         }
       });
     }
@@ -849,7 +849,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
     }
   }
 
-  protected void handleSwingRowClick(int rowIndex) {
+  protected void handleSwingRowClick(int rowIndex, final int swingButton) {
     if (getUpdateSwingFromScoutLock().isAcquired()) {
       return;
     }
@@ -861,7 +861,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
         Runnable t = new Runnable() {
           @Override
           public void run() {
-            getScoutObject().getUIFacade().fireRowClickFromUI(scoutRow);
+            getScoutObject().getUIFacade().fireRowClickFromUI(scoutRow, SwingUtility.swingToScoutMouseButton(swingButton));
           }
         };
 
@@ -1573,7 +1573,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
       if (e.getClickCount() == 1 && e.getButton() == MouseEvent.BUTTON1) {
         int pressedRow = getSwingTable().rowAtPoint(e.getPoint());
         if (pressedRow >= 0) {
-          handleSwingRowClick(pressedRow);
+          handleSwingRowClick(pressedRow, e.getButton());
         }
       }
       else if (e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON1) {
@@ -1661,7 +1661,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
 
   /**
    * Implementation of DropSource's DragGestureListener support for drag/drop
-   *
+   * 
    * @since Build 202
    */
   private class P_SwingRowTransferHandler extends TransferHandlerEx {

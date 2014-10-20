@@ -53,6 +53,7 @@ import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
+import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
@@ -606,19 +607,30 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   /**
+   * @deprecated use {@link #execRowClick(ITableRow, MouseButton)} instead. Will be removed with V5.0.
+   */
+  @Deprecated
+  protected void execRowClick(ITableRow row) throws ProcessingException {
+
+  }
+
+  /**
    * Called when the user clicks on a row in this table.
    * <p>
    * Subclasses can override this method. The default fires a {@link TableEvent#TYPE_ROW_CLICK} event.
    * 
    * @param Row
    *          that was clicked (never null).
+   * @param mouseButton
+   *          the mouse button ({@link MouseButton}) which triggered this method
    * @throws ProcessingException
    */
   @ConfigOperation
   @Order(80)
-  protected void execRowClick(ITableRow row) throws ProcessingException {
+  protected void execRowClick(ITableRow row, MouseButton mouseButton) throws ProcessingException {
     TableEvent e = new TableEvent(this, TableEvent.TYPE_ROW_CLICK, CollectionUtility.arrayList(row));
     fireTableEventInternal(e);
+    execRowClick(row);
   }
 
   /**
@@ -3746,11 +3758,11 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     fireTableEventInternal(new TableEvent(this, TableEvent.TYPE_ROWS_SELECTED, rows));
   }
 
-  private void fireRowClick(ITableRow row) {
+  private void fireRowClick(ITableRow row, MouseButton mouseButton) {
     if (row != null) {
       try {
         interceptRowClickSingleObserver(row);
-        execRowClick(row);
+        execRowClick(row, mouseButton);
       }
       catch (ProcessingException ex) {
         SERVICES.getService(IExceptionHandlerService.class).handleException(ex);
@@ -4056,13 +4068,13 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
 
     @Override
-    public void fireRowClickFromUI(ITableRow row) {
+    public void fireRowClickFromUI(ITableRow row, MouseButton mouseButton) {
       try {
         pushUIProcessor();
         //
         row = resolveRow(row);
         if (row != null) {
-          fireRowClick(resolveRow(row));
+          fireRowClick(resolveRow(row), mouseButton);
         }
       }
       finally {
