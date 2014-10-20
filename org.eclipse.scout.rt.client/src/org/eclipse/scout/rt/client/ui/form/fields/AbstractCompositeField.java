@@ -97,6 +97,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
       if (injectedFields != null) {
         FormFieldInjectionThreadLocal.push(injectedFields);
       }
+      FormFieldInjectionThreadLocal.pushContainerField(this);
       //
       filterFieldsInternal(configuredFields);
       for (Class<? extends IFormField> clazz : configuredFields) {
@@ -115,6 +116,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
         m_formFieldReplacements = injectedFields.getReplacementMapping();
         FormFieldInjectionThreadLocal.pop(injectedFields);
       }
+      FormFieldInjectionThreadLocal.popContainerField(this);
     }
     for (IFormField f : fieldList) {
       f.setParentFieldInternal(this);
@@ -131,7 +133,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
    * Filter list of configured fields before they are instantiated.
    * <p/>
    * The default implementation removes fields replaced by another field annotated with {@link Replace}.
-   * 
+   *
    * @param fieldList
    *          live and mutable list of configured field classes (i.e. yet not instantiated)
    * @since 3.8.2
@@ -145,7 +147,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
    * Used to manage field list and add/remove fields (see {@link AbstractGroupBox} with wizard buttons)
    * <p>
    * The default implementation checks for {@link InjectFieldTo} annotations in the enclosing (runtime) classes.
-   * 
+   *
    * @param fieldList
    *          live and mutable list of configured fields, not yet initialized
    *          and added to composite field
@@ -192,7 +194,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
    * {@link AbstractSnapBox}, {@link AbstractSplitBox} and {@link AbstractTabBox}). If there exists an abstract class
    * containing {@link IFormField}, this method returns <code>true</code>. Subclasses may override this default
    * behavior.
-   * 
+   *
    * @since 4.0.1
    */
   protected boolean isTemplateField() {
@@ -291,7 +293,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
 
   /**
    * Registers the given form field replacements on this composite field.
-   * 
+   *
    * @param replacements
    *          Map having old field classes as key and replacing field classes as values.
    * @since 4.0.1
@@ -309,7 +311,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
   /**
    * Checks whether the form field with the given class has been replaced by another form field. If so, the replacing
    * form field's class is returned. Otherwise the given class itself.
-   * 
+   *
    * @param c
    * @return Returns the possibly available replacing field class for the given class.
    * @see Replace
