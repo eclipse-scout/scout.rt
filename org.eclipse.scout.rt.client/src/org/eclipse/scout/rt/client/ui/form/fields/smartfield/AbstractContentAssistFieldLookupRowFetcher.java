@@ -78,7 +78,8 @@ public abstract class AbstractContentAssistFieldLookupRowFetcher<KEY_TYPE> imple
   }
 
   protected void setResult(IContentAssistFieldDataFetchResult<KEY_TYPE> result) {
-    propertySupport.setProperty(PROP_SEARCH_RESULT, result);
+    // Always propagate the event of an executed search to the listeners even if the search result did not change. Thus, the proposal popup is opened for every search.
+    propertySupport.setPropertyAlwaysFire(PROP_SEARCH_RESULT, result);
   }
 
   @Override
