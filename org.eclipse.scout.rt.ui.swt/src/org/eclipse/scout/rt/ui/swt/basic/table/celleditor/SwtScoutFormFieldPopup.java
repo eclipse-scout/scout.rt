@@ -10,12 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt.basic.table.celleditor;
 
-import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.Set;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
@@ -24,23 +26,21 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.ui.swt.basic.SwtScoutComposite;
-import org.eclipse.scout.rt.ui.swt.form.ISwtScoutForm;
-import org.eclipse.scout.rt.ui.swt.window.SwtScoutPartEvent;
-import org.eclipse.scout.rt.ui.swt.window.SwtScoutPartListener;
+import org.eclipse.scout.rt.ui.swt.form.fields.ISwtScoutFormField;
+import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
 import org.eclipse.scout.rt.ui.swt.window.popup.SwtScoutDropDownPopup;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ControlAdapter;
-import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Event;
 
 /**
- * Wraps a {@link IFormField} to be displayed as popup cell editor
+ * Wraps a {@link IFormField} to be displayed as popup cell editor.
  */
 public class SwtScoutFormFieldPopup extends SwtScoutComposite<IFormField> {
 
@@ -54,118 +54,223 @@ public class SwtScoutFormFieldPopup extends SwtScoutComposite<IFormField> {
   private int m_minHeight;
   private int m_prefHeight;
   private int m_style;
-  private SwtScoutPartListener m_popupEventListener;
 
-  private List<IFormFieldPopupEventListener> m_eventListeners = new ArrayList<IFormFieldPopupEventListener>();
-  private Object m_eventListenerLock = new Object();
+  private Control m_swtFormField;
+
+  private final Set<IFormFieldPopupListener> m_listeners = Collections.synchronizedSet(new HashSet<IFormFieldPopupListener>());
 
   public SwtScoutFormFieldPopup(Composite owner) {
     m_owner = owner;
-    m_style = SWT.NO_TRIM;
-    m_popupEventListener = new P_PopupEventListener();
+    m_style = SWT.NO_TRIM; // no trim area on the popup Shell.
   }
 
   @Override
   protected void initializeSwt(Composite parent) {
     super.initializeSwt(parent);
 
-    // create form to hold the form field
-    final AtomicReference<IForm> formRef = new AtomicReference<IForm>();
-    Runnable runnable = new Runnable() {
-      @Override
-      public void run() {
-        try {
-          P_Form form = new P_Form();
-          form.setAutoAddRemoveOnDesktop(false);
-          form.startForm();
-          formRef.set(form);
-        }
-        catch (Throwable t) {
-          LOG.error("failed to start popup form", t);
-        }
-        synchronized (formRef) {
-          formRef.notifyAll();
-        }
-      }
-    };
-    synchronized (formRef) {
-      getEnvironment().invokeScoutLater(runnable, 2345);
-      try {
-        formRef.wait(2345);
-      }
-      catch (InterruptedException t) {
-        //nop
-      }
-    }
-
-    IForm form = formRef.get();
-    if (form == null) {
-      LOG.error("No popup form available");
-      return;
-    }
-
-    // create popup in reference to cell editor (owner)
-    m_swtScoutPopup = new P_SwtScoutDropDownPopup(m_owner, m_style);
+    // Create the Popup-Shell but do not make it visible yet; This is done the time the owner component is painted.
+    m_swtScoutPopup = new SwtScoutDropDownPopup(getEnvironment(), m_owner, true, m_style);
     m_swtScoutPopup.setPopupOnField(true);
     m_swtScoutPopup.setHeightHint(m_prefHeight);
     m_swtScoutPopup.setWidthHint(m_prefWidth);
     m_swtScoutPopup.getShell().setMinimumSize(m_minWidth, m_minHeight);
-    m_swtScoutPopup.getShell().addTraverseListener(new TraverseListener() {
 
+    // Listener to be notified about traversal events and keystrokes occurred on the popup.
+    final TraverseListener traverseListener = new TraverseListener() {
       @Override
-      public void keyTraversed(TraverseEvent event) {
-        switch (event.detail) {
+      public void keyTraversed(TraverseEvent e) {
+        switch (e.detail) {
+          case SWT.TRAVERSE_TAB_NEXT: {
+            e.doit = false;
+            notifyListeners(IFormFieldPopupListener.TYPE_OK | IFormFieldPopupListener.TYPE_FOCUS_NEXT);
+            break;
+          }
+          case SWT.TRAVERSE_TAB_PREVIOUS: {
+            e.doit = false;
+            notifyListeners(IFormFieldPopupListener.TYPE_OK | IFormFieldPopupListener.TYPE_FOCUS_BACK);
+            break;
+          }
           case SWT.TRAVERSE_ESCAPE: {
-            event.doit = false;
-            closePopup(FormFieldPopupEvent.TYPE_CANCEL);
+            e.doit = false;
+            notifyListeners(IFormFieldPopupListener.TYPE_CANCEL);
             break;
           }
           case SWT.TRAVERSE_RETURN: {
-            event.doit = false;
-            closePopup(FormFieldPopupEvent.TYPE_OK);
+            e.doit = false;
+            notifyListeners(IFormFieldPopupListener.TYPE_OK);
             break;
           }
         }
       }
-    });
+    };
 
-    // install popup listener
-    m_swtScoutPopup.addSwtScoutPartListener(m_popupEventListener);
-
-    // open popup
-    try {
-      m_swtScoutPopup.showForm(form);
-      // install traversal keystrokes on inner form
-      installTraverseKeyStrokes(m_swtScoutPopup.getSwtContentPane());
-    }
-    catch (Throwable t) {
-      LOG.error("failed to show popup form", t);
-    }
-
-    // add control listener to adjust popup location
-    m_owner.addControlListener(new ControlAdapter() {
+    // Listener to handle Shell deactivation events.
+    m_swtScoutPopup.addShellListener(new ShellAdapter() {
 
       @Override
-      public void controlResized(ControlEvent e) {
-        // invoke at next reasonable time to guarantee proper location
-        getSwtContainer().getDisplay().asyncExec(new Runnable() {
-
-          @Override
-          public void run() {
-            if (m_swtScoutPopup != null) {
-              m_swtScoutPopup.autoAdjustBounds();
-            }
-          }
-        });
+      public void shellDeactivated(ShellEvent e) {
+        notifyListeners(IFormFieldPopupListener.TYPE_OK);
       }
+    });
+
+    // Defer opening the Shell to be positioned at the location of the owner component.
+    m_owner.addPaintListener(new PaintListener() {
+
+      @Override
+      public void paintControl(PaintEvent e) {
+        if (m_owner.isDisposed()) {
+          return; // do not open the Shell if the owner is already disposed.
+        }
+        m_owner.removePaintListener(this);
+
+        // Create the Form to contain the form-field.
+        final IForm form = createForm();
+        if (form != null) {
+          m_swtScoutPopup.showForm(form);
+          m_swtFormField = findSwtFormField(m_swtScoutPopup.getUiForm().getSwtField(), getScoutObject());
+          if (m_swtFormField == null) {
+            LOG.warn("UI-FormField could not be found in UI-Form");
+          }
+
+          // Install listener to be notified about traversal events.
+          installTraverseListener(m_swtScoutPopup.getShell(), traverseListener);
+        }
+        else {
+          LOG.error("Failed to create the Form for the form-field.");
+        }
+      }
+
     });
     setSwtContainer(m_owner);
   }
 
-  private class P_Form extends AbstractForm {
+  public void setMinWidth(int minWidth) {
+    m_minWidth = minWidth;
+  }
 
-    public P_Form() throws ProcessingException {
-      super();
+  public void setPrefWidth(int prefWidth) {
+    m_prefWidth = prefWidth;
+  }
+
+  public void setMinHeight(int minHeight) {
+    m_minHeight = minHeight;
+  }
+
+  public void setPrefHeight(int prefHeight) {
+    m_prefHeight = prefHeight;
+  }
+
+  /**
+   * Closes the popup.
+   */
+  public void closePopup() {
+    m_swtScoutPopup.closePart();
+  }
+
+  /**
+   * Touches the field to write its UI value back to the model.
+   */
+  public void touch() {
+    if (m_swtFormField != null && !m_swtFormField.isDisposed()) {
+      SwtUtility.runSwtInputVerifier(m_swtFormField);
+    }
+  }
+
+  public void addListener(IFormFieldPopupListener listener) {
+    m_listeners.add(listener);
+  }
+
+  public void removeListener(IFormFieldPopupListener listener) {
+    m_listeners.remove(listener);
+  }
+
+  private void notifyListeners(int eventType) {
+    for (IFormFieldPopupListener listener : m_listeners) {
+      listener.handleEvent(eventType);
+    }
+  }
+
+  /**
+   * Installs the given traverse listener on the given control and its child controls.
+   */
+  private void installTraverseListener(Control control, TraverseListener listener) {
+    control.addTraverseListener(listener);
+    if (control instanceof Composite) {
+      Composite composite = (Composite) control;
+      for (Control child : composite.getChildren()) {
+        installTraverseListener(child, listener);
+      }
+    }
+  }
+
+  /**
+   * @return creates the {@link IForm} that contains the {@link IFormField}.
+   */
+  private IForm createForm() {
+    final Holder<IForm> result = new Holder<IForm>();
+    Runnable runnable = new Runnable() {
+      @Override
+      public void run() {
+        try {
+          P_Form form = new P_Form(getScoutObject());
+          form.setAutoAddRemoveOnDesktop(false);
+          form.startForm();
+          result.setValue(form);
+        }
+        catch (Exception e) {
+          LOG.error("Failed to create and start popup form.", e);
+        }
+      }
+    };
+
+    try {
+      getEnvironment().invokeScoutLater(runnable, 2345).join(2345);
+    }
+    catch (InterruptedException e) {
+      LOG.warn("Interrupted while waiting for the popup form to be started.", e);
+    }
+
+    return result.getValue();
+  }
+
+  /**
+   * Finds the <code>FormField</code> {@link Control} that represents the {@link IFormField} in the hierarchy of the
+   * given {@link Control}.
+   *
+   * @param control
+   *          container.
+   * @param formField
+   *          {@link IFormField}.
+   * @return {@link Control} or <code>null</code> if not found.
+   */
+  private static Control findSwtFormField(Control control, IFormField formField) {
+    Object o = control.getData(ISwtScoutFormField.CLIENT_PROPERTY_SCOUT_OBJECT);
+    if (o == formField) {
+      return control;
+    }
+
+    if (control instanceof Composite) {
+      for (Control child : ((Composite) control).getChildren()) {
+        Control candiate = findSwtFormField(child, formField);
+        if (candiate != null) {
+          return candiate;
+        }
+      }
+    }
+    return null;
+  }
+
+  /**
+   * {@link IForm} to contain the {@link IFormField}.
+   */
+  private static class P_Form extends AbstractForm {
+
+    private final IFormField m_formField;
+
+    public P_Form(IFormField formField) throws ProcessingException {
+      super(false);
+      m_formField = formField;
+      callInitializer();
     }
 
     @Override
@@ -201,7 +306,7 @@ public class SwtScoutFormFieldPopup extends SwtScoutComposite<IFormField> {
 
       @Override
       protected void injectFieldsInternal(List<IFormField> fieldList) {
-        fieldList.add(getScoutObject());
+        fieldList.add(m_formField);
       }
 
       @Override
@@ -226,182 +331,6 @@ public class SwtScoutFormFieldPopup extends SwtScoutComposite<IFormField> {
     }
 
     private class FormHandler extends AbstractFormHandler {
-    }
-  }
-
-  /**
-   * Touch the field to write its UI value back to the model
-   */
-  public void touch() {
-    if (m_swtScoutPopup != null) {
-      touch(m_swtScoutPopup.getSwtContentPane());
-    }
-  }
-
-  private void touch(Control control) {
-    if (control == null || control.isDisposed()) {
-      return;
-    }
-    Event event = new Event();
-    event.widget = control;
-    control.notifyListeners(SWT.Traverse, event);
-
-    if (control instanceof Composite) {
-      Composite composite = (Composite) control;
-      for (Control child : composite.getChildren()) {
-        touch(child);
-      }
-    }
-  }
-
-  private void installTraverseKeyStrokes(Control control) {
-    control.addTraverseListener(new TraverseListener() {
-      @Override
-      public void keyTraversed(TraverseEvent e) {
-        switch (e.detail) {
-          case SWT.TRAVERSE_TAB_NEXT: {
-            e.doit = false;
-            closePopup(FormFieldPopupEvent.TYPE_OK | FormFieldPopupEvent.TYPE_FOCUS_NEXT);
-            break;
-          }
-          case SWT.TRAVERSE_TAB_PREVIOUS: {
-            e.doit = false;
-            closePopup(FormFieldPopupEvent.TYPE_OK | FormFieldPopupEvent.TYPE_FOCUS_BACK);
-            break;
-          }
-        }
-      }
-    });
-    if (control instanceof Composite) {
-      Composite composite = (Composite) control;
-      for (Control child : composite.getChildren()) {
-        installTraverseKeyStrokes(child);
-      }
-    }
-  }
-
-  public void addEventListener(IFormFieldPopupEventListener eventListener) {
-    synchronized (m_eventListenerLock) {
-      m_eventListeners.add(eventListener);
-    }
-  }
-
-  public void removeEventListener(IFormFieldPopupEventListener eventListener) {
-    synchronized (m_eventListenerLock) {
-      m_eventListeners.remove(eventListener);
-    }
-  }
-
-  protected void notifyEventListeners(FormFieldPopupEvent event) {
-    IFormFieldPopupEventListener[] eventListeners;
-    synchronized (m_eventListenerLock) {
-      eventListeners = m_eventListeners.toArray(new IFormFieldPopupEventListener[m_eventListeners.size()]);
-    }
-    for (IFormFieldPopupEventListener eventListener : eventListeners) {
-      eventListener.handleEvent(event);
-    }
-  }
-
-  public void closePopup(int type) {
-    touch();
-    m_swtScoutPopup.removeSwtScoutPartListener(m_popupEventListener);
-    m_swtScoutPopup.closePart();
-    m_swtScoutPopup = null;
-
-    // notify listeners
-    notifyEventListeners(new FormFieldPopupEvent(getScoutObject(), type));
-  }
-
-  public SwtScoutDropDownPopup getPopup() {
-    return m_swtScoutPopup;
-  }
-
-  public boolean isClosed() {
-    return m_swtScoutPopup == null || m_swtScoutPopup.getSwtContentPane() == null || m_swtScoutPopup.getSwtContentPane().isDisposed();
-  }
-
-  public ISwtScoutForm getInnerSwtScoutForm() {
-    return m_swtScoutPopup.getUiForm();
-  }
-
-  public int getMinWidth() {
-    return m_minWidth;
-  }
-
-  public void setMinWidth(int minWidth) {
-    m_minWidth = minWidth;
-  }
-
-  public int getPrefWidth() {
-    return m_prefWidth;
-  }
-
-  public void setPrefWidth(int prefWidth) {
-    m_prefWidth = prefWidth;
-  }
-
-  public int getMinHeight() {
-    return m_minHeight;
-  }
-
-  public void setMinHeight(int minHeight) {
-    m_minHeight = minHeight;
-  }
-
-  public int getPrefHeight() {
-    return m_prefHeight;
-  }
-
-  public void setPrefHeight(int prefHeight) {
-    m_prefHeight = prefHeight;
-  }
-
-  public int getStyle() {
-    return m_style;
-  }
-
-  public void setStyle(int style) {
-    m_style = style;
-  }
-
-  private class P_PopupEventListener implements SwtScoutPartListener {
-
-    @Override
-    public void partChanged(SwtScoutPartEvent e) {
-      if (e.getType() == SwtScoutPartEvent.TYPE_CLOSED) {
-        closePopup(FormFieldPopupEvent.TYPE_OK);
-      }
-    }
-  }
-
-  private class P_SwtScoutDropDownPopup extends SwtScoutDropDownPopup {
-
-    private ShellAdapter m_shellListener;
-
-    public P_SwtScoutDropDownPopup(Control ownerComponent, int style) {
-      super(getEnvironment(), ownerComponent, null, style);
-    }
-
-    @Override
-    protected void installFocusListener() {
-      if (m_shellListener == null) {
-        m_shellListener = new ShellAdapter() {
-          @Override
-          public void shellDeactivated(ShellEvent e) {
-            closePart();
-            fireSwtScoutPartEvent(new SwtScoutPartEvent(P_SwtScoutDropDownPopup.this, SwtScoutPartEvent.TYPE_CLOSED));
-          }
-        };
-        getShell().addShellListener(m_shellListener);
-      }
-    }
-
-    @Override
-    protected void uninstallFocusLostListener() {
-      if (m_shellListener != null) {
-        getShell().removeShellListener(m_shellListener);
-      }
-      m_shellListener = null;
     }
   }
 }

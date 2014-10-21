@@ -83,8 +83,6 @@ import org.eclipse.scout.rt.ui.swt.util.ScoutFormToolkit;
 import org.eclipse.scout.rt.ui.swt.util.SwtIconLocator;
 import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
 import org.eclipse.scout.rt.ui.swt.window.ISwtScoutPart;
-import org.eclipse.scout.rt.ui.swt.window.SwtScoutPartEvent;
-import org.eclipse.scout.rt.ui.swt.window.SwtScoutPartListener;
 import org.eclipse.scout.rt.ui.swt.window.desktop.editor.AbstractScoutEditorPart;
 import org.eclipse.scout.rt.ui.swt.window.desktop.editor.ScoutFormEditorInput;
 import org.eclipse.scout.rt.ui.swt.window.desktop.tray.ISwtScoutTray;
@@ -139,7 +137,7 @@ import org.osgi.framework.Bundle;
 
 /**
  * <h3>SwtEnvironment</h3> ...
- * 
+ *
  * @since 1.0.0 06.03.2008
  */
 public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver implements ISwtEnvironment {
@@ -1110,30 +1108,8 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
     if (owner == null) {
       return null;
     }
-    Rectangle ownerBounds = getPopupOwnerBounds();
-    if (ownerBounds == null) {
-      ownerBounds = owner.getBounds();
-      Point pDisp = owner.toDisplay(0, 0);
-      ownerBounds.x = pDisp.x;
-      ownerBounds.y = pDisp.y;
-    }
-    final SwtScoutPopup popup = new SwtScoutPopup(this, owner, ownerBounds, SWT.RESIZE);
+    final SwtScoutPopup popup = new SwtScoutPopup(this, owner, true, SWT.RESIZE);
     popup.setMaxHeightHint(280);
-    popup.addSwtScoutPartListener(new SwtScoutPartListener() {
-      @Override
-      public void partChanged(SwtScoutPartEvent e) {
-        switch (e.getType()) {
-          case SwtScoutPartEvent.TYPE_CLOSED: {
-            popup.closePart();
-            break;
-          }
-          case SwtScoutPartEvent.TYPE_CLOSING: {
-            popup.closePart();
-            break;
-          }
-        }
-      }
-    });
     //close popup when PARENT shell is activated or closed
     owner.getShell().addShellListener(new ShellAdapter() {
       @Override
