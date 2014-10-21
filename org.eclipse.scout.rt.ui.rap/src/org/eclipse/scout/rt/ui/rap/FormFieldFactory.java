@@ -27,6 +27,13 @@ import org.eclipse.scout.rt.ui.rap.form.fields.IRwtScoutFormField;
 import org.eclipse.swt.widgets.Composite;
 import org.osgi.framework.Bundle;
 
+/**
+ * Generic {@link IFormFieldFactory} for creating {@link IFormField}s by using the extension point
+ * org.eclipse.scout.rt.ui.rap.formfields. <br>
+ * With this extension point it is possible to define how a UI object is created for a specific model class: <br>
+ * Either map a specific UI class to the model class and use the default factory to create it or specify a specific
+ * factory.
+ */
 public class FormFieldFactory implements IFormFieldFactory {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(FormFieldFactory.class);
 
