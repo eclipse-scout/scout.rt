@@ -18,6 +18,7 @@ import java.util.TreeMap;
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.CompositeObject;
+import org.eclipse.scout.commons.NumberUtility;
 import org.eclipse.scout.rt.server.admin.html.AbstractHtmlAction;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
 import org.eclipse.scout.rt.server.admin.html.widget.table.HtmlComponent;
@@ -32,7 +33,7 @@ import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 public class SessionsView extends DefaultView {
   private static final long serialVersionUID = 4697127041507442841L;
   private SessionInspector m_selectedSession;
-  private SortInfo m_table1SortInfo;
+  private final SortInfo m_table1SortInfo;
 
   public SessionsView(AdminSession as) {
     super(as);
@@ -69,29 +70,14 @@ public class SessionsView extends DefaultView {
     renderSessionTable(p);
   }
 
-  private void renderSessionTable(HtmlComponent p) {
-    SessionInspector[] sessionInspectors = ProcessInspector.getDefault().getSessionInspectors();
-    TreeMap<CompositeObject, SessionInspector> userAndTimeToSessions = new TreeMap<CompositeObject, SessionInspector>();
-    for (int i = 0; i < sessionInspectors.length; i++) {
-      String user = sessionInspectors[i].getInfo().getUserId();
-      long lastAccess = sessionInspectors[i].getInfo().getLastAccessedTime();
-      userAndTimeToSessions.put(new CompositeObject(lastAccess, user, i), sessionInspectors[i]);
-    }
-    SessionInspector[] sorted = userAndTimeToSessions.values().toArray(new SessionInspector[userAndTimeToSessions.size()]);
-    // render
+  protected void renderSessionTable(HtmlComponent p) {
     HtmlTable table1 = new HtmlTable(p, "table1", m_table1SortInfo);
     table1.startTable(1, 0, 3);
-    table1.startTableRow();
-    table1.tableHeaderCell("#");
-    table1.tableHeaderCell("User");
-    table1.tableHeaderCell("SessionID");
-    table1.tableHeaderCell("Details");
-    table1.tableHeaderCell("Created");
-    table1.tableHeaderCell("Last&nbsp;accessed");
-    table1.tableHeaderCell("JAAS");
-    table1.tableHeaderCell("UserAgent");
-    table1.endTableRow();
+
+    renderSessionTableHeader(table1);
+
     SessionInspector validSelection = null;
+    SessionInspector[] sorted = getSortedSessions();
     for (int i = sorted.length - 1; i >= 0; i--) {
       if (sorted[i] == m_selectedSession) {
         validSelection = m_selectedSession;
@@ -105,62 +91,50 @@ public class SessionsView extends DefaultView {
     p.append(table1);
   }
 
-  private void renderSessionRow(HtmlComponent p, int index, final SessionInspector session) {
-    boolean selected = m_selectedSession != null && (m_selectedSession == session);
-    SimpleDateFormat fmt = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-    //
-    p.startTableRow();
-    p.tableCell("" + index);
-    p.tableCell(session.getInfo().getUserId());
-    p.startTableCell();
-    if (selected) {
-      p.focusAnchor();
+  protected SessionInspector[] getSortedSessions() {
+    SessionInspector[] sessionInspectors = ProcessInspector.getDefault().getSessionInspectors();
+    TreeMap<CompositeObject, SessionInspector> userAndTimeToSessions = new TreeMap<CompositeObject, SessionInspector>();
+    for (int i = 0; i < sessionInspectors.length; i++) {
+      String user = sessionInspectors[i].getInfo().getUserId();
+      long lastAccess = NumberUtility.nvl(sessionInspectors[i].getInfo().getLastAccessedTime(), 0L);
+      userAndTimeToSessions.put(new CompositeObject(lastAccess, user, i), sessionInspectors[i]);
     }
-    p.startLinkAction(new AbstractHtmlAction("selectSession" + session.getInfo().getSessionId()) {
+    return userAndTimeToSessions.values().toArray(new SessionInspector[userAndTimeToSessions.size()]);
+  }
 
-      private static final long serialVersionUID = 898464700226491147L;
+  protected void renderSessionTableHeader(HtmlTable table) {
+    table.startTableRow();
+    table.tableHeaderCell("#");
+    table.tableHeaderCell("User");
+    table.tableHeaderCell("SessionID");
+    table.tableHeaderCell("Details");
+    table.tableHeaderCell("Created");
+    table.tableHeaderCell("Last&nbsp;accessed");
+    table.tableHeaderCell("JAAS");
+    table.tableHeaderCell("UserAgent");
+    table.endTableRow();
+  }
 
-      @Override
-      public void run() {
-        m_selectedSession = session;
-      }
-    });
-    p.print(session.getInfo().getSessionId());
-    p.endLinkAction();
-    p.endTableCell();
+  protected void renderSessionRow(HtmlComponent p, int index, SessionInspector session) {
+    p.startTableRow();
+    renderIndexCell(p, index);
+    renderUserIdCell(p, session);
+    renderSessionIdCell(p, session);
+    renderSessionDetailsCell(p, session);
+    renderCreatedCell(p, session);
+    renderLastAccessedCell(p, session);
+    renderJaasCell(p, session);
+    renderUserAgentCell(p, session);
+    p.endTableRow();
+  }
+
+  protected void renderUserAgentCell(HtmlComponent p, SessionInspector session) {
     p.startTableCell();
-    p.startLinkAction(new AbstractHtmlAction("showServicesOf" + session.getInfo().getSessionId()) {
-
-      private static final long serialVersionUID = 9010809462756614037L;
-
-      @Override
-      public void run() {
-        m_selectedSession = session;
-        getAdminSession().getTopView().showServices();
-      }
-    });
-    p.print("Services");
-    p.endLinkAction();
-    p.raw("&nbsp;");
-    p.startLinkAction(new AbstractHtmlAction("showCallsOf" + session.getInfo().getSessionId()) {
-
-      private static final long serialVersionUID = -7595683661385397351L;
-
-      @Override
-      public void run() {
-        m_selectedSession = session;
-        getAdminSession().getTopView().showCalls();
-      }
-    });
-    p.print("Calls");
-    p.endLinkAction();
+    p.printNoBreak(session.getInfo().getUserAgent().toString());
     p.endTableCell();
-    p.startTableCell();
-    p.printNoBreak(fmt.format(new Date(session.getInfo().getCreationTime())));
-    p.endTableCell();
-    p.startTableCell();
-    p.printNoBreak(fmt.format(new Date(session.getInfo().getLastAccessedTime())));
-    p.endTableCell();
+  }
+
+  protected void renderJaasCell(HtmlComponent p, SessionInspector session) {
     p.startTableCell();
     // show jaas context
     try {
@@ -188,10 +162,90 @@ public class SessionsView extends DefaultView {
       p.print("Exception: " + e);
     }
     p.endTableCell();
-    p.startTableCell();
-    p.printNoBreak(session.getInfo().getUserAgent().toString());
-    p.endTableCell();
-    p.endTableRow();
   }
 
+  protected void renderLastAccessedCell(HtmlComponent p, SessionInspector session) {
+    p.startTableCell();
+    p.printNoBreak(formatTime(session.getInfo().getLastAccessedTime()));
+    p.endTableCell();
+  }
+
+  protected void renderCreatedCell(HtmlComponent p, SessionInspector session) {
+    p.startTableCell();
+    p.printNoBreak(formatTime(session.getInfo().getCreationTime()));
+    p.endTableCell();
+  }
+
+  protected void renderSessionDetailsCell(HtmlComponent p, final SessionInspector session) {
+    p.startTableCell();
+    p.startLinkAction(new AbstractHtmlAction("showServicesOf" + session.getInfo().getSessionId()) {
+      private static final long serialVersionUID = 9010809462756614037L;
+
+      @Override
+      public void run() {
+        m_selectedSession = session;
+        getAdminSession().getTopView().showServices();
+      }
+    });
+    p.print("Services");
+    p.endLinkAction();
+    p.raw("&nbsp;");
+    p.startLinkAction(new AbstractHtmlAction("showCallsOf" + session.getInfo().getSessionId()) {
+      private static final long serialVersionUID = -7595683661385397351L;
+
+      @Override
+      public void run() {
+        m_selectedSession = session;
+        getAdminSession().getTopView().showCalls();
+      }
+    });
+    p.print("Calls");
+    p.endLinkAction();
+    p.endTableCell();
+  }
+
+  protected void renderSessionIdCell(HtmlComponent p, final SessionInspector session) {
+    p.startTableCell();
+    if (isSelectedSession(session)) {
+      p.focusAnchor();
+    }
+    p.startLinkAction(new AbstractHtmlAction("selectSession" + session.getInfo().getSessionId()) {
+      private static final long serialVersionUID = 898464700226491147L;
+
+      @Override
+      public void run() {
+        m_selectedSession = session;
+      }
+    });
+    p.print(session.getInfo().getSessionId());
+    p.endLinkAction();
+    p.endTableCell();
+  }
+
+  protected void renderUserIdCell(HtmlComponent p, SessionInspector session) {
+    p.tableCell(session.getInfo().getUserId());
+  }
+
+  protected void renderIndexCell(HtmlComponent p, int index) {
+    p.tableCell("" + index);
+  }
+
+  protected boolean isSelectedSession(SessionInspector session) {
+    return m_selectedSession != null && m_selectedSession == session;
+  }
+
+  /**
+   * Formats a timestamp according to the format "dd.MM.yyyy HH:mm:ss"
+   *
+   * @param timestamp
+   *          possibly {@code null}
+   * @return a formatted timestamp
+   */
+  protected String formatTime(Long timestamp) {
+    if (timestamp != null) {
+      SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+      return format.format(new Date(timestamp));
+    }
+    return "";
+  }
 }

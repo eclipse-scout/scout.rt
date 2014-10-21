@@ -16,8 +16,8 @@ import org.eclipse.scout.rt.shared.ui.UserAgent;
 
 public class SessionInfo {
   private String m_sessionId;
-  private long m_creationTime;
-  private long m_lastAccessedTime;
+  private Long m_creationTime;
+  private Long m_lastAccessedTime;
   private String m_userId;
   private Subject m_subject;
   private UserAgent m_userAgent;
@@ -30,7 +30,7 @@ public class SessionInfo {
   }
 
   public void setUserId(String user) {
-    this.m_userId = user;
+    m_userId = user;
   }
 
   public Subject getSubject() {
@@ -41,20 +41,20 @@ public class SessionInfo {
     m_subject = s;
   }
 
-  public long getCreationTime() {
+  public Long getCreationTime() {
     return m_creationTime;
   }
 
-  public void setCreationTime(long t) {
-    this.m_creationTime = t;
+  public void setCreationTime(Long t) {
+    m_creationTime = t;
   }
 
-  public long getLastAccessedTime() {
+  public Long getLastAccessedTime() {
     return m_lastAccessedTime;
   }
 
-  public void setLastAccessedTime(long t) {
-    this.m_lastAccessedTime = t;
+  public void setLastAccessedTime(Long t) {
+    m_lastAccessedTime = t;
   }
 
   public String getSessionId() {
@@ -62,7 +62,7 @@ public class SessionInfo {
   }
 
   public void setSessionId(String s) {
-    this.m_sessionId = s;
+    m_sessionId = s;
   }
 
   public UserAgent getUserAgent() {
@@ -72,5 +72,4 @@ public class SessionInfo {
   public void setUserAgent(UserAgent userAgent) {
     m_userAgent = userAgent;
   }
-
 }
