@@ -115,10 +115,9 @@ public class CodeLookupCall<CODE_ID> extends LocalLookupCall<CODE_ID> implements
   }
 
   /**
-   * Default implementation to create lookup rows from codes.
-   * <p>
-   * Called by {@link #execCreateLookupRowsFromCodes(List)}.
+   * Deprecated: Use {@link #createCodeLookupRowList(List)}. Will be removed in N release.
    */
+  @Deprecated
   public static <T> List<ILookupRow<T>> createLookupRowArray(List<? extends ICode<T>> codes) {
     List<ILookupRow<T>> rows = new ArrayList<ILookupRow<T>>(codes.size());
     for (ICode<T> code : codes) {
@@ -128,10 +127,22 @@ public class CodeLookupCall<CODE_ID> extends LocalLookupCall<CODE_ID> implements
   }
 
   /**
-   * Default implementation to create a lookup row from a code.
+   * Default implementation to create lookup rows from codes.
    * <p>
-   * Called by {@link #createLookupRowArray(List)}.
+   * Called by {@link #execCreateLookupRowsFromCodes(List)}.
    */
+  protected <T> List<ILookupRow<T>> createCodeLookupRowList(List<? extends ICode<T>> codes) {
+    List<ILookupRow<T>> rows = new ArrayList<ILookupRow<T>>(codes.size());
+    for (ICode<T> code : codes) {
+      rows.add(createCodeLookupRow(code));
+    }
+    return rows;
+  }
+
+  /**
+   * Deprecated: Use {@link #createCodeLookupRow(ICode)}. Will be removed in N release.
+   */
+  @Deprecated
   public static <T> ILookupRow<T> createLookupRow(ICode<T> c) {
     T parentId = null;
     if (c.getParentCode() != null) {
@@ -140,7 +151,36 @@ public class CodeLookupCall<CODE_ID> extends LocalLookupCall<CODE_ID> implements
     return new LookupRow<T>(c.getId(), c.getText(), c.getIconId(), c.getTooltipText(), c.getBackgroundColor(), c.getForegroundColor(), c.getFont(), c.isEnabled(), parentId, c.isActive());
   }
 
+  /**
+   * Default implementation to create a lookup row from a code.
+   * <p>
+   * Called by {@link #createCodeLookupRowList(List)}.
+   */
+  protected <T> ILookupRow<T> createCodeLookupRow(ICode<T> c) {
+    T parentId = null;
+    if (c.getParentCode() != null) {
+      parentId = c.getParentCode().getId();
+    }
+    return new LookupRow<T>(c.getId(), c.getText(), c.getIconId(), c.getTooltipText(), c.getBackgroundColor(), c.getForegroundColor(), c.getFont(), c.isEnabled(), parentId, c.isActive());
+  }
+
+  /**
+   * Deprecated: Use {@link #createSearchPattern(String)} instead. Will be removed in N release.
+   */
+  @Deprecated
   public static Pattern getSearchPattern(String s) {
+    if (s == null) {
+      s = "";
+    }
+    s = s.toLowerCase();
+    if (!s.endsWith("*")) {
+      s = s + "*";
+    }
+    return Pattern.compile(StringUtility.toRegExPattern(s), Pattern.DOTALL);
+  }
+
+  @Override
+  protected Pattern createSearchPattern(String s) {
     if (s == null) {
       s = "";
     }
@@ -169,7 +209,7 @@ public class CodeLookupCall<CODE_ID> extends LocalLookupCall<CODE_ID> implements
    */
   @Override
   public List<ILookupRow<CODE_ID>> getDataByText() throws ProcessingException {
-    final Pattern pat = getSearchPattern(getText());
+    final Pattern pat = createSearchPattern(getText());
     AbstractLookupRowCollector v = new AbstractLookupRowCollector() {
       @Override
       public boolean visit(ICode<CODE_ID> code, int treeLevel) {
@@ -201,7 +241,7 @@ public class CodeLookupCall<CODE_ID> extends LocalLookupCall<CODE_ID> implements
    */
   @Override
   public List<ILookupRow<CODE_ID>> getDataByAll() throws ProcessingException {
-    final Pattern pat = getSearchPattern(getAll());
+    final Pattern pat = createSearchPattern(getAll());
     AbstractLookupRowCollector v = new AbstractLookupRowCollector() {
       @Override
       public boolean visit(ICode<CODE_ID> code, int treeLevel) {
@@ -270,7 +310,7 @@ public class CodeLookupCall<CODE_ID> extends LocalLookupCall<CODE_ID> implements
   /**
    * https://bugs.eclipse.org/bugs/show_bug.cgi?id=388242
    * <p>
-   * 
+   *
    * @return the result of this lookup call into a single code or null.
    * @since 3.8.1
    */
@@ -286,7 +326,7 @@ public class CodeLookupCall<CODE_ID> extends LocalLookupCall<CODE_ID> implements
   /**
    * https://bugs.eclipse.org/bugs/show_bug.cgi?id=388242
    * <p>
-   * 
+   *
    * @return the result of this lookup call into multiple codes matching the filter.
    * @since 3.8.1
    */
