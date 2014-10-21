@@ -6,14 +6,14 @@ scout.KeystrokeManager = function() {
   // alt and f1-help
   // FIXME BSH Alt-Key is a bad choice on IE, see http://superuser.com/questions/470064/is-it-possible-to-disable-the-alt-key-as-it-is-used-for-default-windows-things
   $(document).keydown(function(event) {
-    if (event.which == 18) {
+    if (event.which === scout.keys.ALT) {
       removeKeyBox();
       drawKeyBox();
     }
   });
 
   $(document).keyup(function(event) {
-    if (event.which == 18) {
+    if (event.which === scout.keys.ALT) {
       removeKeyBox();
       // FIXME BSH This cannot work... See http://stackoverflow.com/questions/6220300/jquery-keyup-how-do-i-prevent-the-default-behavior-of-the-arrow-up-down-an
       return false;

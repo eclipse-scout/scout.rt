@@ -250,6 +250,13 @@
     return true;
   };
 
+  /**
+   * @return true if the element is attached (= is in the dom tree), false if not
+   */
+  $.fn.isAttached = function() {
+    return $.contains(document.documentElement, this[0]);
+  };
+
   // most used animate
   $.fn.animateAVCSD = function(attr, value, complete, step, duration) {
     var properties = {};

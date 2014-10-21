@@ -9,6 +9,12 @@ scout.TableKeystrokeAdapter = function(table) {
   //table filter
   this.handlers.push({
     accept: function(event) {
+      //Don't accept if table is detached
+      //FIXME CGU/AWE better remove adapter on detach and reinstall on attach to increase performance?
+      if (!that._table.$container.isAttached()) {
+        return false;
+      }
+
       if (event && event.which >= 65 && event.which <= 90 && // a-z
         !event.ctrlKey && !event.altKey && !event.metaKey) {
         return true;
@@ -29,6 +35,12 @@ scout.TableKeystrokeAdapter = function(table) {
 
   this.handlers.push({
     accept: function(event) {
+      //Don't accept if table is detached
+      //FIXME CGU/AWE better remove adapter on detach and reinstall on attach to increase performance?
+      if (!that._table.$container.isAttached()) {
+        return false;
+      }
+
       if (event && $.inArray(event.which,
           [scout.keys.UP, scout.keys.DOWN, scout.keys.HOME, scout.keys.END, scout.keys.PAGE_UP,scout.keys.PAGE_DOWN]) >= 0 &&
         !event.ctrlKey && !event.altKey && !event.metaKey) {
