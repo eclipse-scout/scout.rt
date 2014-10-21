@@ -257,6 +257,12 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     return false;
   }
 
+  /**
+   * Modal defines if a form is the only form a user can interact with within the same process as long as this form is
+   * open.
+   *
+   * @return <code>true</code> if form is modal, <code>false</code> otherwise.
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(120)
   protected boolean getConfiguredModal() {
