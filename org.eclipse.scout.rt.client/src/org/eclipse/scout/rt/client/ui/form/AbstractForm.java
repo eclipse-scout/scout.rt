@@ -179,6 +179,9 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   /*
    * Configuration
    */
+  /**
+   * @return the localized title property of the form. Use {@link TEXTS}.
+   */
   @ConfigProperty(ConfigProperty.TEXT)
   @Order(10)
   protected String getConfiguredTitle() {
