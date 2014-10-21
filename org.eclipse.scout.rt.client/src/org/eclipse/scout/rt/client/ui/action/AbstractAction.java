@@ -113,7 +113,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
    * <li>f11
    * <li>alt-f11
    * </ul>
-   * 
+   *
    * @return
    */
   @ConfigProperty(ConfigProperty.STRING)
@@ -122,12 +122,22 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
     return null;
   }
 
+  /**
+   * Configures whether the action can be selected or not
+   *
+   * @return <code>true</code> if the action can be selected and <code>false</code> otherwise
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(10)
   protected boolean getConfiguredEnabled() {
     return true;
   }
 
+  /**
+   * Configures whether the action is visible or not
+   *
+   * @return <code>true</code> if the action is visible and <code>false</code> otherwise
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(20)
   protected boolean getConfiguredVisible() {
@@ -180,7 +190,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   /**
    * called by prepareAction before action is added to list or used<br>
    * this way a menu can be made dynamically visible / enabled
-   * 
+   *
    * @deprecated use {@link AbstractMenu#execOwnerValueChanged}
    */
   @Deprecated
@@ -205,7 +215,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
 
   /**
    * Called whenever the selection (of toggle-action) is changed.
-   * 
+   *
    * @param selection
    *          the new selection state
    * @throws ProcessingException
@@ -289,7 +299,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   /**
    * Please double check if implementing this method!
    * Consider using {@link #execAction()} instead. If no other option ensure super call when overriding this method.
-   * 
+   *
    * @throws ProcessingException
    */
   protected void doActionInternal() throws ProcessingException {
