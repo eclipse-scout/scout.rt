@@ -14,11 +14,17 @@
 
     &.selected {
       color:@color-bench-text-active;
-      border-bottom:solid 3px @color-bench-text-active;
+      border-bottom-color: @color-bench-text-active;
     }
 
     &:hover {
       color:@color-bench-text-hover;
+    }
+
+    &:focus {
+      outline: none;
+      color: @color-focus;
+      border-bottom-color: @color-focus
     }
   }
 }

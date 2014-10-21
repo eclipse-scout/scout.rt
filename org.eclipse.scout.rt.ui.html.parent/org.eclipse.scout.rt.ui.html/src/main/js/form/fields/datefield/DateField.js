@@ -85,6 +85,10 @@ scout.DateField.prototype._onKeyDown = function(event) {
   var displayText = this.$field.val();
   var prediction = this._$predict.val();
 
+  if (event.which === scout.keys.TAB) {
+    return;
+  }
+
   if (event.which === scout.keys.ENTER) {
     //Update model and close picker
     this._updateDisplayText(this.$field.val(), false);
@@ -235,7 +239,8 @@ scout.DateField.prototype._predict = function(text) {
 scout.DateField.prototype._createPredictionField = function () {
   var $predict = this.$field.
     clone().
-    addClass('predict');
+    addClass('predict').
+    attr('tabIndex', '-1');
 
   $predict.val('');
 

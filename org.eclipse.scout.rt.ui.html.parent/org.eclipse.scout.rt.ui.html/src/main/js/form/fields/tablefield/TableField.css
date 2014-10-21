@@ -4,6 +4,12 @@
   border: 1px solid @color-bench-light-border;
 }
 
+.table-field > .table:focus {
+  outline: none;
+  border-color: @color-focus;
+  .glow(@color-focus-glow);
+}
+
 .table-field > .table > .menubar,
 .table-field > .table > .table-header,
 .table-field > .table > .table-header > .header-resize  {

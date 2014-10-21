@@ -43,6 +43,11 @@ input, textarea, button {
   .font-text-normal;
 }
 
+/* remove the dotted border in firefox */
+button::-moz-focus-inner {
+  border: 0;
+}
+
 /* hidden DIV used to measure string length in UI */
 #StringMeasurement {
   position: absolute;

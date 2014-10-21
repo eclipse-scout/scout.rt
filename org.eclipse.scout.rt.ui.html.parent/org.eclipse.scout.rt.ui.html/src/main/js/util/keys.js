@@ -1,4 +1,5 @@
 scout.keys = {
+  TAB: 9,
   ENTER: 13,
   ALT: 18,
   ESC: 27,

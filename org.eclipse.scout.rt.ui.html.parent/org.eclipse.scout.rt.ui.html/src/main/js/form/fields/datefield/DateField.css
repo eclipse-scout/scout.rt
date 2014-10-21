@@ -3,7 +3,7 @@
 }
 
 /** Prediction input field is in the back of the actual input field -> make actual input field transparent */
-.predict {
+.date-field .predict {
   color: @color-bench-semi;
   background-color: @text-field-background-color;
 
@@ -18,13 +18,15 @@
 }
 
 .date-box{
+  margin-top: 5px;
   height: 224px;
   width: 224px;
   position: absolute;
   background-color: #FFF;
-  border: 1px solid @color-bench-text-active;
   padding: 6px;
   z-index: 100;
+  border: 1px solid @color-bench-light-border;
+  .drop-shadow();
 
   /* necessary for animation */
   overflow: hidden;

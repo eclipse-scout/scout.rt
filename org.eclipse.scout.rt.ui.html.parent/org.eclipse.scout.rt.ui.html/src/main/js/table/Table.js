@@ -51,7 +51,6 @@ scout.Table.prototype._render = function($parent) {
   } else {
     // independent table, i.e. inside form (input focus required to trigger table keystrokes)
     this.$container.attr('tabIndex', 0);
-    this.$container.css('outline', 'none');
     scout.keystrokeManager.installAdapter(this.$container, this._keystrokeAdapter);
   }
 

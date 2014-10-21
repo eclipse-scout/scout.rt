@@ -1,12 +1,21 @@
 @field-with-icon-padding: 20px;
 @text-field-padding: 10px;
 @text-field-background-color: white;
+@text-field-border-radius: 5px;
+
+.glow(@color) {
+  box-shadow: 0 0 5px @color;
+}
+
+.drop-shadow(@x: 2px, @y: 6px, @blur: 14px, @spread: -6px, @alpha: 0.2) {
+  box-shadow: @x @y @blur @spread rgba(0, 0, 0, @alpha);
+}
 
 .text-field {
   background-color: @text-field-background-color;
   padding: 0 @text-field-padding;
   border: 1px solid @color-bench-light-border;
-  border-radius: 5px;
+  border-radius: @text-field-border-radius;
   color: @color-bench-text;
 
   &:disabled {
@@ -15,8 +24,8 @@
     border-radius: 0px;
   }
   &:focus {
-    border-color: @color-bsi-orange;
-    box-shadow: 0 0 5px @color-bsi-orange;
+    border-color: @color-focus;
+    .glow(@color-focus-glow);
     outline: none;
   }
   &.has-error {
@@ -24,7 +33,7 @@
     background-color: @color-error-light;
   }
   &.has-error:focus {
-    box-shadow: 0 0 5px @color-error;
+    .glow(@color-error);
   }
 }
 
@@ -46,6 +55,10 @@
     color: @color-bench-light-border;
   }
 
+  &:focus ~ .icon:before {
+    color: @color-focus;
+  }
+
   &.has-error ~ .icon:before {
     color: @color-error;
   }
@@ -56,5 +69,23 @@
 
   &.disabled ~ .icon{
     display: none;
+  }
+}
+
+.text-area() {
+   /* these two properties are required for FF, otherwise the editable textarea is 2px too large,
+   * and the DOM inspector does not include these 2 pixels.
+   */
+  margin: 0 auto;
+  padding: 5px @text-field-padding;
+  background-color: @text-field-background-color;
+  border: 1px solid @color-bench-light-border;
+  border-radius: @text-field-border-radius;
+  color: @color-bench-text;
+
+  &:focus {
+    outline: none;
+    border-color: @color-focus;
+   .glow(@color-focus-glow);
   }
 }

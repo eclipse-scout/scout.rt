@@ -29,3 +29,5 @@
 @color-bsi-orange: #FE9915;
 @color-bsi-green: #0082A1;
 @color-bsi-green-semi: #389db6;
+@color-focus: @color-bsi-orange;
+@color-focus-glow: rgba(254, 153, 21, 0.5);
