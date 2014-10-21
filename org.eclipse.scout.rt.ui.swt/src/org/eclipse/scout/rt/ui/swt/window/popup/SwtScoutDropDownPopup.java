@@ -10,41 +10,49 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt.window.popup;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.swt.DefaultValidateRoot;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.IValidateRoot;
-import org.eclipse.scout.rt.ui.swt.window.ISwtScoutPart;
-import org.eclipse.scout.rt.ui.swt.window.SwtScoutPartEvent;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.FocusAdapter;
-import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.FocusListener;
-import org.eclipse.swt.events.MouseAdapter;
-import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ScrollBar;
+import org.eclipse.swt.widgets.Shell;
 
 /**
- * Popup window bound to a component (ownerComponent). The popup closes when
- * there is either a click outside this window or the component loses focus
- * (focusComponent), or the component becomes invisible.
+ * <p>
+ * Popup window bound to a {@link Control}.
+ * </p>
+ * Additionaly, a {@link SWT#Dispose}-event is fired when the {@link Control ownerComponent} or one of its ancestors is
+ * being scrolled, resized or moved.
  */
 public class SwtScoutDropDownPopup extends SwtScoutPopup {
+
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwtScoutDropDownPopup.class);
 
-  private Composite m_focusComponent;
-  private FocusListener m_focusComponentListener;
-  private boolean m_nonFocusable;
-  private P_ScrollBarListener m_scrollbarListener;
+  private final Listener m_viewPortChangedListener = new P_ViewPortChangedListener();
+  private Set<ScrollBar> scrollBars;
 
-  public SwtScoutDropDownPopup(ISwtEnvironment env, Control ownerComponent, Composite focusComponent, int style) {
-    super(env, ownerComponent, ownerComponent.getBounds(), style);
-    m_focusComponent = focusComponent;
+  /**
+   * @param env
+   *          {@link ISwtEnvironment}.
+   * @param ownerComponent
+   *          the {@link Control} the popup is bound to.
+   * @param takeFocusOnOpen
+   *          A boolean indicating whether focus should be taken by this popup when it opens.
+   * @param style
+   *          the style of control to construct
+   */
+  public SwtScoutDropDownPopup(ISwtEnvironment env, Control ownerComponent, boolean takeFocusOnOpen, int style) {
+    super(env, ownerComponent, takeFocusOnOpen, style);
 
     getShell().setData(IValidateRoot.VALIDATE_ROOT_DATA, new DefaultValidateRoot(getShell()) {
       @Override
@@ -54,162 +62,108 @@ public class SwtScoutDropDownPopup extends SwtScoutPopup {
     });
   }
 
-  public void makeNonFocusable() {
-    m_nonFocusable = true;
+  @Override
+  protected void onPopupOpened() {
+    // Install listener to close the popup if being scrolled.
+    scrollBars = findScrollbarsInHierarchy(getOwnerComponent());
+    installScrollListeners(scrollBars, m_viewPortChangedListener);
+
+    // Install listener to close the popup if being moved or resized.
+    getOwnerComponent().getShell().addListener(SWT.Move, m_viewPortChangedListener);
+    getOwnerComponent().getShell().addListener(SWT.Resize, m_viewPortChangedListener);
+
+    super.onPopupOpened();
   }
 
   @Override
-  protected void handleSwtWindowOpened() {
-    // add listener to adjust location
-    if (getOwnerComponent() != null && !getOwnerComponent().isDisposed()) {
-      if (m_scrollbarListener == null) {
-        m_scrollbarListener = new P_ScrollBarListener();
-      }
-      reqAddScrollbarListener(m_scrollbarListener, getOwnerComponent());
-      getOwnerComponent().getShell().addListener(SWT.Move, m_scrollbarListener);
+  protected void onPopupClosed() {
+    // Uninstall listener to close the popup if being scrolled.
+    uninstallScrollListeners(scrollBars, m_viewPortChangedListener);
+    scrollBars = null;
+
+    // Uninstall listener to close the popup if being moved or resized.
+    Shell shell = getOwnerShell();
+    if (shell != null) {
+      getOwnerComponent().getShell().removeListener(SWT.Move, m_viewPortChangedListener);
+      getOwnerComponent().getShell().removeListener(SWT.Resize, m_viewPortChangedListener);
     }
 
-    installFocusListener();
-    //
-    fireSwtScoutPartEvent(new SwtScoutPartEvent(SwtScoutDropDownPopup.this, SwtScoutPartEvent.TYPE_OPENED));
-    fireSwtScoutPartEvent(new SwtScoutPartEvent(SwtScoutDropDownPopup.this, SwtScoutPartEvent.TYPE_ACTIVATED));
-    if (m_nonFocusable) {
-      if (getShell().getDisplay().getActiveShell() == getShell()) {
-        m_focusComponent.setFocus();
-      }
-      if (!m_focusComponent.isFocusControl()) {
-        closePart();
-        fireSwtScoutPartEvent(new SwtScoutPartEvent(SwtScoutDropDownPopup.this, SwtScoutPartEvent.TYPE_CLOSED));
-      }
-    }
-  }
-
-  protected void installFocusListener() {
-    if (m_focusComponentListener != null) {
-      return;
-    }
-    if (m_focusComponent == null || m_focusComponent.isDisposed()) {
-      return;
-    }
-
-    m_focusComponentListener = new FocusAdapter() {
-      @Override
-      public void focusLost(FocusEvent e) {
-        // defer decision until it is known who is new focus owner
-        getShell().getDisplay().asyncExec(new Runnable() {
-          @Override
-          public void run() {
-            if (getShell().isDisposed()) {
-              return;
-            }
-            if (getShell() == getShell().getDisplay().getActiveShell()) {
-              Control c = getShell().getDisplay().getFocusControl();
-              if (c != null && c != getShell() && c.getShell() == getShell()) {
-                c.addMouseListener(new MouseAdapter() {
-                  @Override
-                  public void mouseUp(MouseEvent event) {
-                    if (!((Control) event.getSource()).isDisposed()) {
-                      ((Control) event.getSource()).removeMouseListener(this);
-                    }
-                    if (!m_focusComponent.isDisposed()) {
-                      m_focusComponent.setFocus();
-                    }
-                  }
-                });
-              }
-              else {
-                m_focusComponent.setFocus();
-              }
-            }
-            else {
-              closePart();
-              fireSwtScoutPartEvent(new SwtScoutPartEvent(SwtScoutDropDownPopup.this, SwtScoutPartEvent.TYPE_CLOSED));
-            }
-          }
-        });
-      }
-    };
-    m_focusComponent.addFocusListener(m_focusComponentListener);
-  }
-
-  protected void uninstallFocusLostListener() {
-    if (m_focusComponent == null || m_focusComponentListener == null) {
-      return;
-    }
-    if (!m_focusComponent.isDisposed()) {
-      m_focusComponent.removeFocusListener(m_focusComponentListener);
-    }
-    m_focusComponentListener = null;
-  }
-
-  @Override
-  protected void handleSwtWindowClosed() {
-    if (getOwnerComponent() != null && !getOwnerComponent().isDisposed() && m_scrollbarListener != null) {
-      reqRemoveScrollbarListener(m_scrollbarListener, getOwnerComponent());
-      if (getOwnerComponent().getShell() != null && !getOwnerComponent().getShell().isDisposed()) {
-        getOwnerComponent().getShell().removeListener(SWT.Move, m_scrollbarListener);
-      }
-    }
-    m_scrollbarListener = null;
-    //
-    uninstallFocusLostListener();
-    super.handleSwtWindowClosed();
+    super.onPopupClosed();
   }
 
   /**
-   * <h3>P_ScrollBarListener</h3> ensures the location and size of the popup in
-   * case of resizing, moving.
-   * 
-   * @since 1.0.9 13.08.2008
+   * Adds the given listener to the given scrollbars.
    */
-  private class P_ScrollBarListener implements Listener {
-    @Override
-    public void handleEvent(Event event) {
-      closePart();
+  private static void installScrollListeners(Set<ScrollBar> scrollBars, Listener listener) {
+    for (ScrollBar scrollBar : scrollBars) {
+      scrollBar.addListener(SWT.Selection, listener);
     }
-  } // end private class
-
-  private void reqRemoveScrollbarListener(Listener l, Control control) {
-    if (!(control instanceof Composite)) {
-      return;
-    }
-    Composite composite = (Composite) control;
-    if (composite.getData(ISwtScoutPart.MARKER_SCOLLED_FORM) != null) {
-      composite.removeListener(SWT.Resize, l);
-      composite.removeListener(SWT.Move, l);
-
-      ScrollBar hBar = composite.getHorizontalBar();
-      if (hBar != null) {
-
-        hBar.removeListener(SWT.Selection, l);
-      }
-      ScrollBar vBar = composite.getVerticalBar();
-      if (vBar != null) {
-        vBar.removeListener(SWT.Selection, l);
-      }
-    }
-    reqRemoveScrollbarListener(l, composite.getParent());
   }
 
-  private void reqAddScrollbarListener(Listener l, Control control) {
-    if (!(control instanceof Composite)) {
+  /**
+   * Removes the given listener from them given scrollbars.
+   */
+  private static void uninstallScrollListeners(Set<ScrollBar> scrollBars, Listener listener) {
+    if (scrollBars == null) {
       return;
     }
-    Composite composite = (Composite) control;
-    if (control.getData(ISwtScoutPart.MARKER_SCOLLED_FORM) != null) {
-      control.addListener(SWT.Resize, l);
-      control.addListener(SWT.Move, l);
-      ScrollBar hBar = composite.getHorizontalBar();
-      if (hBar != null) {
-
-        hBar.addListener(SWT.Selection, l);
+    for (ScrollBar scrollBar : scrollBars) {
+      if (!scrollBar.isDisposed()) {
+        scrollBar.removeListener(SWT.Selection, listener);
       }
-      ScrollBar vBar = composite.getVerticalBar();
-      if (vBar != null) {
-        vBar.addListener(SWT.Selection, l);
-      }
-
     }
-    reqAddScrollbarListener(l, control.getParent());
+  }
+
+  /**
+   * Finds the scrollbars in the ancestor hierarchy of the given control.
+   */
+  private static Set<ScrollBar> findScrollbarsInHierarchy(Control control) {
+    final Set<ScrollBar> scrollBars = new HashSet<ScrollBar>();
+    if (!(control instanceof Composite)) {
+      return Collections.emptySet();
+    }
+
+    final Composite composite = (Composite) control;
+
+    final ScrollBar hBar = composite.getHorizontalBar();
+    if (hBar != null) {
+      scrollBars.add(hBar);
+    }
+    final ScrollBar vBar = composite.getVerticalBar();
+    if (vBar != null) {
+      scrollBars.add(vBar);
+    }
+
+    scrollBars.addAll(findScrollbarsInHierarchy(control.getParent()));
+
+    return scrollBars;
+  }
+
+  /**
+   * @return Shell of the owner component or <code>null</code> if already disposed.
+   */
+  private Shell getOwnerShell() {
+    final Control ownerComponent = getOwnerComponent();
+    if (ownerComponent.isDisposed()) {
+      return null;
+    }
+    final Shell shell = ownerComponent.getShell();
+    if (shell.isDisposed()) {
+      return null;
+    }
+    return shell;
+  }
+
+  private class P_ViewPortChangedListener implements Listener {
+
+    @Override
+    public void handleEvent(Event event) {
+      if (getShell().isDisposed()) {
+        return;
+      }
+      // viewport changes are propagated as Shell deactivation events.
+      event.type = SWT.Deactivate;
+      getShell().notifyListeners(SWT.Deactivate, event);
+    }
   }
 }

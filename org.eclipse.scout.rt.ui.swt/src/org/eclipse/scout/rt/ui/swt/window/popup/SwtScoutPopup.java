@@ -10,10 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt.window.popup;
 
-import java.util.EventListener;
-
-import org.eclipse.scout.commons.EventListenerList;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -22,11 +18,8 @@ import org.eclipse.scout.rt.ui.swt.extension.UiDecorationExtensionPoint;
 import org.eclipse.scout.rt.ui.swt.form.ISwtScoutForm;
 import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
 import org.eclipse.scout.rt.ui.swt.window.ISwtScoutPart;
-import org.eclipse.scout.rt.ui.swt.window.SwtScoutPartEvent;
-import org.eclipse.scout.rt.ui.swt.window.SwtScoutPartListener;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -37,23 +30,20 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.forms.widgets.Form;
 
 /**
- * Popup window bound to a component (ownerComponent). The popup closes when
- * there is either a click outside this window or the component loses focus
- * (focusComponent), or the component becomes invisible.
+ * Popup window bound to a {@link Control}.
  */
 public class SwtScoutPopup implements ISwtScoutPart {
+
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwtScoutPopup.class);
+
   public static final String PROP_POPUP_OWNER = "propPopupOwner";
 
   private ISwtEnvironment m_env;
   private Control m_ownerComponent;
-  private Rectangle m_ownerBounds;
-  private Shell m_swtWindow;
-  private Composite m_swtWindowContentPane;
-  private EventListenerList m_listenerList;
+  private Shell m_shell;
+  private Composite m_shellContentPane;
   private IForm m_scoutForm;
   private boolean m_positionBelowReferenceField;
-  private boolean m_opened;
   private boolean m_popupOnField;
 
   private int m_widthHint;
@@ -63,35 +53,54 @@ public class SwtScoutPopup implements ISwtScoutPart {
 
   private ISwtScoutForm m_uiForm;
 
-  public SwtScoutPopup(ISwtEnvironment env, Control ownerComponent, Rectangle ownerBounds, int style) {
+  /**
+   * Flag indicating whether focus should be taken when the dialog is opened.
+   */
+  private boolean m_takeFocusOnOpen = false;
+
+  /**
+   * @param env
+   *          {@link ISwtEnvironment}.
+   * @param ownerComponent
+   *          the {@link Control} the popup is bound to.
+   * @param takeFocusOnOpen
+   *          A boolean indicating whether focus should be taken by this popup when it opens.
+   * @param style
+   *          the style of control to construct
+   */
+  public SwtScoutPopup(ISwtEnvironment env, Control ownerComponent, boolean takeFocusOnOpen, int style) {
     m_env = env;
+    m_takeFocusOnOpen = takeFocusOnOpen;
+
+    // ensure the popup to be in front if not taking the focus when it opens. (SWT.ON_TOP is required for Mac OS X).
+    if (!m_takeFocusOnOpen) {
+      style |= SWT.ON_TOP | SWT.NO_FOCUS;
+    }
+
     m_positionBelowReferenceField = true;
     m_ownerComponent = ownerComponent;
-    m_ownerBounds = ownerBounds;
-    m_listenerList = new EventListenerList();
 
     m_widthHint = SWT.DEFAULT;
     m_heightHint = SWT.DEFAULT;
     m_maxHeightHint = SWT.DEFAULT;
     m_maxWidthHint = SWT.DEFAULT;
 
-    m_swtWindow = new Shell(ownerComponent.getShell(), style);
-    m_swtWindow.setData("extendedStyle", SWT.POP_UP);
-    m_swtWindow.setLayout(new FillLayout());
-    m_swtWindow.addDisposeListener(new P_SwtWindowDisposeListener());
+    m_shell = new Shell(ownerComponent.getShell(), style);
+    m_shell.setData("extendedStyle", SWT.POP_UP);
+    m_shell.setLayout(new FillLayout());
 
     // content pane
-    m_swtWindowContentPane = env.getFormToolkit().createComposite(m_swtWindow, SWT.NONE);
-    m_swtWindowContentPane.setLayout(new FillLayout());
+    m_shellContentPane = env.getFormToolkit().createComposite(m_shell, SWT.NONE);
+    m_shellContentPane.setLayout(new FillLayout());
   }
 
   @Override
   public void setBusy(boolean b) {
-    //nop
+    // NOOP
   }
 
   public Shell getShell() {
-    return m_swtWindow;
+    return m_shell;
   }
 
   public void setBounds(Rectangle bounds) {
@@ -99,20 +108,8 @@ public class SwtScoutPopup implements ISwtScoutPart {
     getShell().layout(true, true);
   }
 
-  public boolean isPopupOnField() {
-    return m_popupOnField;
-  }
-
   public void setPopupOnField(boolean popupOnField) {
     m_popupOnField = popupOnField;
-  }
-
-  public boolean isPopupBelow() {
-    return m_positionBelowReferenceField;
-  }
-
-  public int getWidthHint() {
-    return m_widthHint;
   }
 
   public void setWidthHint(int widthHint) {
@@ -124,10 +121,6 @@ public class SwtScoutPopup implements ISwtScoutPart {
     }
   }
 
-  public int getHeightHint() {
-    return m_heightHint;
-  }
-
   public void setHeightHint(int heightHint) {
     if (heightHint > 0) {
       m_heightHint = heightHint;
@@ -135,10 +128,6 @@ public class SwtScoutPopup implements ISwtScoutPart {
     else {
       m_heightHint = SWT.DEFAULT;
     }
-  }
-
-  public int getMaxHeightHint() {
-    return m_maxHeightHint;
   }
 
   public void setMaxHeightHint(int maxHeightHint) {
@@ -150,10 +139,6 @@ public class SwtScoutPopup implements ISwtScoutPart {
     }
   }
 
-  public int getMaxWidthHint() {
-    return m_maxWidthHint;
-  }
-
   public void setMaxWidthHint(int maxWidthHint) {
     if (maxWidthHint > 0) {
       m_maxWidthHint = maxWidthHint;
@@ -163,39 +148,36 @@ public class SwtScoutPopup implements ISwtScoutPart {
     }
   }
 
-  public void showForm(IForm scoutForm) throws ProcessingException {
-    m_opened = true;
-    if (m_scoutForm == null) {
-      m_scoutForm = scoutForm;
-      m_uiForm = m_env.createForm(getSwtContentPane(), scoutForm);
-      autoAdjustBounds();
-      if (m_opened) {
-        handleSwtWindowOpening();
-        //open and activate, do NOT just call setVisible(true)
-        m_swtWindow.open();
-        autoAdjustBounds();
-        if (m_opened) {
-          handleSwtWindowOpened();
-        }
-      }
-    }
-    else {
-      throw new ProcessingException("The popup is already open. The form '" + scoutForm.getTitle() + " (" + scoutForm.getClass().getName() + ")' can not be opened!");
+  /**
+   * Opens the popup with the given {@link IForm}.
+   */
+  public void showForm(IForm scoutForm) {
+    if (m_scoutForm != null) {
+      throw new IllegalStateException("The popup is already opened.");
     }
 
+    m_scoutForm = scoutForm;
+    m_uiForm = m_env.createForm(m_shellContentPane, scoutForm);
+    autoAdjustBounds();
+
+    // open the window
+    if (m_takeFocusOnOpen) {
+      m_shell.open(); // open the popup, mark it visible, make it the focus owner and ask the window manager to make it the shell active.
+
+    }
+    else {
+      m_shell.setVisible(true); // open the popup without making it the active shell and the focus owner.
+    }
+
+    autoAdjustBounds();
+    onPopupOpened();
   }
 
   @Override
   public void closePart() {
-    m_opened = false;
-    try {
-      if (!m_swtWindow.isDisposed()) {
-        m_swtWindow.setVisible(false);
-        m_swtWindow.dispose();
-      }
-    }
-    catch (Throwable t) {
-      LOG.error("Failed closing popup for " + m_scoutForm, t);
+    if (!m_shell.isDisposed()) {
+      m_shell.dispose(); // directly dispose the Shell to not make it the focus owner while closing.
+      onPopupClosed();
     }
   }
 
@@ -219,7 +201,7 @@ public class SwtScoutPopup implements ISwtScoutPart {
       return;
     }
     if (m_ownerComponent.isDisposed()) {
-      LOG.warn("Unexpected: Owner component of popup is disposed");
+      LOG.warn("Failed to adjust popup bounds because owner component is disposed");
       return;
     }
     //invalidate all layouts
@@ -261,83 +243,61 @@ public class SwtScoutPopup implements ISwtScoutPart {
     }
   }
 
-  public Composite getSwtContentPane() {
-    return m_swtWindowContentPane;
+  public Composite getShellContentPane() {
+    return m_shellContentPane;
   }
 
-  public void addSwtScoutPartListener(SwtScoutPartListener listener) {
-    m_listenerList.add(SwtScoutPartListener.class, listener);
+  public void addShellListener(ShellListener listener) {
+    m_shell.addShellListener(listener);
   }
 
-  public void removeSwtScoutPartListener(SwtScoutPartListener listener) {
-    m_listenerList.remove(SwtScoutPartListener.class, listener);
-  }
-
-  protected void fireSwtScoutPartEvent(SwtScoutPartEvent e) {
-    if (m_swtWindow != null) {
-      EventListener[] listeners = m_listenerList.getListeners(SwtScoutPartListener.class);
-      if (listeners != null && listeners.length > 0) {
-        for (EventListener listener : listeners) {
-          try {
-            ((SwtScoutPartListener) listener).partChanged(e);
-          }
-          catch (Throwable t) {
-            LOG.error("Unexpected:", t);
-          }
-        }
-      }
-    }
+  public void removeShellListener(ShellListener listener) {
+    m_shell.removeShellListener(listener);
   }
 
   @Override
   public boolean isVisible() {
-    return m_swtWindow != null && m_swtWindow.getVisible();
+    return !m_shell.isDisposed() && m_shell.getVisible();
   }
 
   @Override
   public void activate() {
-    m_swtWindow.getShell().setActive();
+    if (!m_shell.isDisposed()) {
+      m_shell.setActive();
+    }
   }
 
   @Override
   public boolean isActive() {
-    return m_swtWindow != null && m_swtWindow.getDisplay().getActiveShell() == m_swtWindow;
+    return m_shell.isDisposed() && m_shell.getDisplay().getActiveShell() == m_shell;
   }
 
   @Override
   public void setStatusLineMessage(Image image, String message) {
-    // void
+    // NOOP
   }
 
-  protected void handleSwtWindowOpening() {
-    fireSwtScoutPartEvent(new SwtScoutPartEvent(SwtScoutPopup.this, SwtScoutPartEvent.TYPE_OPENING));
+  /**
+   * Called after the popup was opened.
+   */
+  protected void onPopupOpened() {
   }
 
-  protected void handleSwtWindowOpened() {
-    fireSwtScoutPartEvent(new SwtScoutPartEvent(SwtScoutPopup.this, SwtScoutPartEvent.TYPE_OPENED));
-    fireSwtScoutPartEvent(new SwtScoutPartEvent(SwtScoutPopup.this, SwtScoutPartEvent.TYPE_ACTIVATED));
+  /**
+   * Called after the popup was closed.
+   */
+  protected void onPopupClosed() {
+    if (m_scoutForm != null) {
+      m_env.invokeScoutLater(new Runnable() {
+        @Override
+        public void run() {
+          m_scoutForm.getUIFacade().fireFormKilledFromUI();
+        }
+      }, 0);
+    }
   }
 
   protected Control getOwnerComponent() {
     return m_ownerComponent;
   }
-
-  protected void handleSwtWindowClosed() {
-    fireSwtScoutPartEvent(new SwtScoutPartEvent(SwtScoutPopup.this, SwtScoutPartEvent.TYPE_CLOSED));
-    Runnable job = new Runnable() {
-      @Override
-      public void run() {
-        m_scoutForm.getUIFacade().fireFormKilledFromUI();
-      }
-    };
-    m_env.invokeScoutLater(job, 0);
-  }
-
-  private class P_SwtWindowDisposeListener implements DisposeListener {
-    @Override
-    public void widgetDisposed(DisposeEvent e) {
-      handleSwtWindowClosed();
-    }
-  }// end private class
-
 }

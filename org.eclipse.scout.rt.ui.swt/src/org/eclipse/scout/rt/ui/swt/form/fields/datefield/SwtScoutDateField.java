@@ -14,8 +14,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.text.DateFormat;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.holders.Holder;
@@ -30,7 +28,6 @@ import org.eclipse.scout.rt.ui.swt.action.menu.SwtContextMenuMarkerComposite;
 import org.eclipse.scout.rt.ui.swt.action.menu.SwtScoutContextMenu;
 import org.eclipse.scout.rt.ui.swt.action.menu.text.StyledTextAccess;
 import org.eclipse.scout.rt.ui.swt.ext.StatusLabelEx;
-import org.eclipse.scout.rt.ui.swt.form.fields.IPopupSupport;
 import org.eclipse.scout.rt.ui.swt.form.fields.LogicalGridDataBuilder;
 import org.eclipse.scout.rt.ui.swt.form.fields.SwtScoutBasicFieldComposite;
 import org.eclipse.scout.rt.ui.swt.form.fields.datefield.chooser.DateChooserDialog;
@@ -50,7 +47,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 
-public class SwtScoutDateField extends SwtScoutBasicFieldComposite<IDateField> implements ISwtScoutDateField, IPopupSupport {
+public class SwtScoutDateField extends SwtScoutBasicFieldComposite<IDateField> implements ISwtScoutDateField {
   public static final int TYPE_TIME_CHOOSER = 1;
   public static final int TYPE_DATE_CHOOSER = 2;
 
@@ -59,16 +56,11 @@ public class SwtScoutDateField extends SwtScoutBasicFieldComposite<IDateField> i
   private boolean m_hasTime;
   private TextFieldEditableSupport m_editableSupport;
 
-  private Set<IPopupSupportListener> m_popupEventListeners;
-  private Object m_popupEventListenerLock;
   private SwtContextMenuMarkerComposite m_menuMarkerComposite;
   private SwtScoutContextMenu m_contextMenu;
 
   @Override
   protected void initializeSwt(Composite parent) {
-    m_popupEventListeners = new HashSet<IPopupSupportListener>();
-    m_popupEventListenerLock = new Object();
-
     Composite container = getEnvironment().getFormToolkit().createComposite(parent);
     StatusLabelEx label = getEnvironment().getFormToolkit().createStatusLabel(container, getEnvironment(), getScoutObject());
 
@@ -271,37 +263,12 @@ public class SwtScoutDateField extends SwtScoutBasicFieldComposite<IDateField> i
     getSwtField().setSelection(0, 0);
   }
 
-  private void notifyPopupEventListeners(int eventType) {
-    IPopupSupportListener[] listeners;
-    synchronized (m_popupEventListenerLock) {
-      listeners = m_popupEventListeners.toArray(new IPopupSupportListener[m_popupEventListeners.size()]);
-    }
-    for (IPopupSupportListener listener : listeners) {
-      listener.handleEvent(eventType);
-    }
-  }
-
-  @Override
-  public void addPopupEventListener(IPopupSupportListener listener) {
-    synchronized (m_popupEventListenerLock) {
-      m_popupEventListeners.add(listener);
-    }
-  }
-
-  @Override
-  public void removePopupEventListener(IPopupSupportListener listener) {
-    synchronized (m_popupEventListenerLock) {
-      m_popupEventListeners.remove(listener);
-    }
-  }
-
   private void handleSwtDateChooserAction() {
     if (getDateChooserButton().isVisible() && getDateChooserButton().isEnabled()) {
       Date oldDate = getScoutObject().getValue();
       if (oldDate == null) {
         oldDate = new Date();
       }
-      notifyPopupEventListeners(IPopupSupportListener.TYPE_OPENING);
       try {
         DateChooserDialog dialog = new DateChooserDialog(getSwtField().getShell(), oldDate, getEnvironment());
         final Date newDate = dialog.openDateChooser(getSwtField());
@@ -319,7 +286,6 @@ public class SwtScoutDateField extends SwtScoutBasicFieldComposite<IDateField> i
         }
       }
       finally {
-        notifyPopupEventListeners(IPopupSupportListener.TYPE_CLOSED);
         if (!getSwtField().isDisposed()) {
           getSwtField().setFocus();
         }
@@ -333,7 +299,6 @@ public class SwtScoutDateField extends SwtScoutBasicFieldComposite<IDateField> i
       if (d == null) {
         d = new Date();
       }
-      notifyPopupEventListeners(IPopupSupportListener.TYPE_OPENING);
       try {
         TimeChooserDialog dialog = new TimeChooserDialog(getSwtField().getShell(), d, getEnvironment());
         Date newDate = dialog.openDateChooser(getSwtField());
@@ -343,7 +308,6 @@ public class SwtScoutDateField extends SwtScoutBasicFieldComposite<IDateField> i
         }
       }
       finally {
-        notifyPopupEventListeners(IPopupSupportListener.TYPE_CLOSED);
         if (!getSwtField().isDisposed()) {
           getSwtField().setFocus();
         }
