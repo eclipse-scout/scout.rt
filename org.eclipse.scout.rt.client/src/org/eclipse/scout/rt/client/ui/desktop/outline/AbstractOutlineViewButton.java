@@ -97,9 +97,13 @@ public abstract class AbstractOutlineViewButton extends AbstractViewButton {
         );
   }
 
+  /**
+   * here is execAction used instead of execSelectionChanged to ensure every click event is handled. In case an outline
+   * is already selected the selection of the node will be reseted and the tree collapsed to the initial state.
+   */
   @Override
-  protected void execSelectionChanged(boolean selection) throws ProcessingException {
-    if (selection) {
+  protected void execAction() throws ProcessingException {
+    if (isSelected()) {
       if (m_desktop.getOutline() != null && m_desktop.getOutline() == m_outline) {
         //determine new selection
         ITreeNode newSelectedNode;

@@ -149,8 +149,8 @@ public abstract class AbstractOutlineButton extends AbstractButton {
    *          the state of the toggle button
    */
   @Override
-  protected final void execToggleAction(boolean selected) {
-    if (selected) {
+  protected final void execSelectionChanged(boolean selection) throws ProcessingException {
+    if (selection) {
       IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
       if (desktop != null) {
         // activate outline
