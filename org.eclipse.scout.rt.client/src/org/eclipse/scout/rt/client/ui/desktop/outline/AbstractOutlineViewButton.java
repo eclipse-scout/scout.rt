@@ -105,6 +105,9 @@ public abstract class AbstractOutlineViewButton extends AbstractViewButton {
     if (!isSelected()) {
       super.doActionInternal();
     }
+    else {
+      execAction();
+    }
   }
 
   @Override
