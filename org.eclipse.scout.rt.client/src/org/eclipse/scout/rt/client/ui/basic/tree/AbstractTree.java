@@ -34,6 +34,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.action.ActionFinder;
@@ -160,12 +161,30 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     return false;
   }
 
+  /**
+   * Configures the drag support of this tree.
+   * <p>
+   * Subclasses can override this method. Default is {@code 0} (no drag support).
+   *
+   * @return {@code 0} for no support or one or more of {@link IDNDSupport#TYPE_FILE_TRANSFER},
+   *         {@link IDNDSupport#TYPE_IMAGE_TRANSFER}, {@link IDNDSupport#TYPE_JAVA_ELEMENT_TRANSFER} or
+   *         {@link IDNDSupport#TYPE_TEXT_TRANSFER} (e.g. {@code TYPE_TEXT_TRANSFER | TYPE_FILE_TRANSFER}).
+   */
   @ConfigProperty(ConfigProperty.DRAG_AND_DROP_TYPE)
   @Order(51)
   protected int getConfiguredDragType() {
     return 0;
   }
 
+  /**
+   * Configures the drop support of this tree.
+   * <p>
+   * Subclasses can override this method. Default is {@code 0} (no drop support).
+   *
+   * @return {@code 0} for no support or one or more of {@link IDNDSupport#TYPE_FILE_TRANSFER},
+   *         {@link IDNDSupport#TYPE_IMAGE_TRANSFER}, {@link IDNDSupport#TYPE_JAVA_ELEMENT_TRANSFER} or
+   *         {@link IDNDSupport#TYPE_TEXT_TRANSFER} (e.g. {@code TYPE_TEXT_TRANSFER | TYPE_FILE_TRANSFER}).
+   */
   @ConfigProperty(ConfigProperty.DRAG_AND_DROP_TYPE)
   @Order(52)
   protected int getConfiguredDropType() {
@@ -199,7 +218,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
    * Advices the ui to automatically scroll to the selection
    * <p>
    * If not used permanent, this feature can also used dynamically at individual occasions using
-   * 
+   *
    * <pre>
    * {@link #scrollToSelection()}
    * </pre>
@@ -218,7 +237,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
    * component is attached to Scout.
    * <p>
    * Subclasses can override this method. Default is {@code false}.
-   * 
+   *
    * @return {@code true} if this tree should save and restore its scrollbars coordinates, {@code false} otherwise
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -252,7 +271,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   /**
    * The hyperlink's tree node is the selected node {@link #getSelectedNode()}
-   * 
+   *
    * @param url
    * @param path
    *          {@link URL#getPath()}
@@ -268,7 +287,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   /**
    * this method should not be implemented if you support {@link AbstractTree#execDrag(ITreeNode[])} (drag of mulitple
    * nodes), as it takes precedence
-   * 
+   *
    * @return a transferable object representing the given row
    */
   @ConfigOperation
@@ -280,7 +299,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   /**
    * Drag of multiple nodes. If this method is implemented, also single drags will be handled by Scout,
    * the method {@link AbstractTree#execDrag(ITreeNode)} must not be implemented then.
-   * 
+   *
    * @return a transferable object representing the given rows
    */
   @ConfigOperation
@@ -300,7 +319,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   /**
    * This method gets called when the drop node is changed, e.g. the dragged object
    * is moved over a new drop target.
-   * 
+   *
    * @since 4.0-M7
    */
   @ConfigOperation
@@ -507,7 +526,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   /**
    * Override this internal method only in order to make use of dynamic menus<br/>
    * Used to manage menu list and add/remove menus
-   * 
+   *
    * @param menuList
    *          live and mutable list of configured menus
    */
@@ -1928,7 +1947,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   /**
    * keeps order of input
-   * 
+   *
    * @param nodes
    * @return
    */
@@ -2144,7 +2163,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   /**
    * This method gets called when the drop node is changed, e.g. the dragged object
    * is moved over a new drop target.
-   * 
+   *
    * @since 4.0-M7
    */
   public void fireNodeDropTargetChanged(ITreeNode node) {
@@ -2154,7 +2173,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   /**
    * This method gets called after the drag action has been finished.
-   * 
+   *
    * @since 4.0-M7
    */
   public void fireDragFinished() {

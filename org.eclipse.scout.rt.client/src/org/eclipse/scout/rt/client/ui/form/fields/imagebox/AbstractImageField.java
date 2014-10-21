@@ -24,6 +24,7 @@ import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -121,12 +122,30 @@ public abstract class AbstractImageField extends AbstractFormField implements II
     return false;
   }
 
+  /**
+   * Configures the drop support of this image field.
+   * <p>
+   * Subclasses can override this method. Default is {@code 0} (no drop support).
+   *
+   * @return {@code 0} for no support or one or more of {@link IDNDSupport#TYPE_FILE_TRANSFER},
+   *         {@link IDNDSupport#TYPE_IMAGE_TRANSFER}, {@link IDNDSupport#TYPE_JAVA_ELEMENT_TRANSFER} or
+   *         {@link IDNDSupport#TYPE_TEXT_TRANSFER} (e.g. {@code TYPE_TEXT_TRANSFER | TYPE_FILE_TRANSFER}).
+   */
   @ConfigProperty(ConfigProperty.DRAG_AND_DROP_TYPE)
   @Order(400)
   protected int getConfiguredDropType() {
     return 0;
   }
 
+  /**
+   * Configures the drag support of this image field.
+   * <p>
+   * Subclasses can override this method. Default is {@code 0} (no drag support).
+   *
+   * @return {@code 0} for no support or one or more of {@link IDNDSupport#TYPE_FILE_TRANSFER},
+   *         {@link IDNDSupport#TYPE_IMAGE_TRANSFER}, {@link IDNDSupport#TYPE_JAVA_ELEMENT_TRANSFER} or
+   *         {@link IDNDSupport#TYPE_TEXT_TRANSFER} (e.g. {@code TYPE_TEXT_TRANSFER | TYPE_FILE_TRANSFER}).
+   */
   @ConfigProperty(ConfigProperty.DRAG_AND_DROP_TYPE)
   @Order(410)
   protected int getConfiguredDragType() {
@@ -200,7 +219,7 @@ public abstract class AbstractImageField extends AbstractFormField implements II
   /**
    * Override this internal method only in order to make use of dynamic menus<br>
    * Used to manage menu list and add/remove menus
-   * 
+   *
    * @param menuList
    *          live and mutable list of configured menus
    */
