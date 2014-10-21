@@ -47,6 +47,14 @@ public final class StringUtility {
   private StringUtility() {
   }
 
+  /**
+   * Checks whether a given string is {@code null} or empty. A string is considered empty if it
+   * equals the empty string "" (internally this method checks whether the string length is 0).
+   *
+   * @param s
+   *          the string to be checked
+   * @return {@code true} if {@code s} is {@code null} or equals the empty string, {@code false} otherwise
+   */
   public static boolean isNullOrEmpty(CharSequence s) {
     return s == null || s.length() == 0;
   }

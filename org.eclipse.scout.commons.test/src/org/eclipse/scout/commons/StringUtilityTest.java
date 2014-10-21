@@ -469,4 +469,13 @@ public class StringUtilityTest {
     assertEquals("subsitute", StringUtility.substituteWhenEmpty("\t\n  \t\n", "subsitute"));
     assertEquals("5", StringUtility.substituteWhenEmpty(Integer.valueOf(5), "subsitute"));
   }
+
+  @Test
+  public void testIsNullOrEmpty() {
+    assertTrue(StringUtility.isNullOrEmpty(null));
+    assertTrue(StringUtility.isNullOrEmpty(""));
+    assertTrue(StringUtility.isNullOrEmpty(new StringBuilder()));
+    assertFalse(StringUtility.isNullOrEmpty(" "));
+    assertFalse(StringUtility.isNullOrEmpty("\n"));
+  }
 }
