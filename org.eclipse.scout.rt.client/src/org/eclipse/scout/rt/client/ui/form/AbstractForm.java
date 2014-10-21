@@ -233,12 +233,18 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     return null;
   }
 
+  /**
+   * @return if the form can be minimized.
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(108)
   protected boolean getConfiguredMinimizeEnabled() {
     return false;
   }
 
+  /**
+   * @return if the form can be maximized.
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(109)
   protected boolean getConfiguredMaximizeEnabled() {
