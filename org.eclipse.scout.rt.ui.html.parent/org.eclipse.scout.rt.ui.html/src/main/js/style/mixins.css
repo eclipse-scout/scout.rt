@@ -23,6 +23,9 @@
     border-color: @color-error;
     background-color: @color-error-light;
   }
+  &.has-error:focus {
+    box-shadow: 0 0 5px @color-error;
+  }
 }
 
 /** expects a sibling html element with class 'icon' **/
