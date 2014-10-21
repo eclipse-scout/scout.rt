@@ -79,6 +79,8 @@ public class CollectionUtilityTest {
     assertNull(CollectionUtility.firstElement((Object) null));
     // empty
     assertNull(CollectionUtility.firstElement(new Object()));
+    // Cover switch to firstElement(Collection)
+    assertEquals(TriState.FALSE, CollectionUtility.firstElement((Object) EnumSet.of(TriState.FALSE)));
   }
 
   /**
