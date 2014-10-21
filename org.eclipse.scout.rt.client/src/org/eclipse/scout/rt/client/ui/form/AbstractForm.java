@@ -281,6 +281,9 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     return true;
   }
 
+  /**
+   * @return configured icon ID for this form
+   */
   @ConfigProperty(ConfigProperty.ICON_ID)
   @Order(160)
   protected String getConfiguredIconId() {
