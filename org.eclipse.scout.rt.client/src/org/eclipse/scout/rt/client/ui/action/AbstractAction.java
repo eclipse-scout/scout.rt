@@ -25,6 +25,7 @@ import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
 import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStrokeNormalizer;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
@@ -83,6 +84,14 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
 
   /*
    * Configuration
+   */
+  /**
+   * Configures the icon for this action.
+   * <p>
+   * Subclasses can override this method. Default is {@code null}.
+   *
+   * @return the ID (name) of the icon
+   * @see IIconProviderService
    */
   @ConfigProperty(ConfigProperty.ICON_ID)
   @Order(30)
