@@ -1,5 +1,5 @@
 .tab-area {
-
+  margin-top: @group-margin-top;
   background-image:url('bg_tab_area.png');
   background-repeat:repeat-x;
   background-position:center bottom;
@@ -30,5 +30,5 @@
 }
 
 .tab-content {
-  padding-top:10px;
+  padding-top: @group-padding-top;
 }
