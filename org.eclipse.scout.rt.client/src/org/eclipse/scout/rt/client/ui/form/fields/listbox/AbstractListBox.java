@@ -91,6 +91,11 @@ public abstract class AbstractListBox<T> extends AbstractValueField<Set<T>> impl
   /*
    * Configuration
    */
+  /**
+   * Configure a lookup call to fill listbox with values.
+   * 
+   * @return Lookup call of listbox
+   */
   @ConfigProperty(ConfigProperty.LOOKUP_CALL)
   @Order(240)
   @ValidationRule(ValidationRule.LOOKUP_CALL)
