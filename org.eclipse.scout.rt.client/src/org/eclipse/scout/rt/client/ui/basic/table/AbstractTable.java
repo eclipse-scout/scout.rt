@@ -2658,7 +2658,14 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     movingRow = resolveRow(movingRow);
     targetRow = resolveRow(targetRow);
     if (movingRow != null && targetRow != null) {
-      moveRowImpl(movingRow.getRowIndex(), targetRow.getRowIndex());
+      int sourceIndex = movingRow.getRowIndex();
+      int targetIndex = targetRow.getRowIndex();
+      if (sourceIndex < targetIndex) {
+        moveRowImpl(sourceIndex, targetIndex - 1);
+      }
+      else {
+        moveRowImpl(sourceIndex, targetIndex);
+      }
     }
   }
 
@@ -2670,10 +2677,22 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     movingRow = resolveRow(movingRow);
     targetRow = resolveRow(targetRow);
     if (movingRow != null && targetRow != null) {
-      moveRowImpl(movingRow.getRowIndex(), targetRow.getRowIndex() + 1);
+      int sourceIndex = movingRow.getRowIndex();
+      int targetIndex = targetRow.getRowIndex();
+      if (sourceIndex > targetIndex) {
+        moveRowImpl(sourceIndex, targetIndex + 1);
+      }
+      else {
+        moveRowImpl(sourceIndex, targetIndex);
+      }
     }
   }
 
+  /**
+   * @see {@link List#add(int, Object)}
+   * @param sourceIndex
+   * @param targetIndex
+   */
   private void moveRowImpl(int sourceIndex, int targetIndex) {
     if (sourceIndex < 0) {
       sourceIndex = 0;
