@@ -21,6 +21,8 @@ import org.junit.Test;
 
 public class NumberUtilityTest {
 
+  private static final double EPSILON = 0.01;
+
   /**
    * Test method for {@link org.eclipse.scout.commons.NumberUtility#numberToBigDecimal(java.lang.Number)}.
    */
@@ -54,5 +56,29 @@ public class NumberUtilityTest {
             Float.NEGATIVE_INFINITY,
             Double.POSITIVE_INFINITY,
             Integer.valueOf(45)));
+  }
+
+  /**
+   * Test of method {@link NumberUtility#median(double...)}
+   */
+  @Test
+  public void testMedian() {
+    // test behavior on null argument
+    double d = NumberUtility.median(null);
+    assertEquals(0, d, EPSILON);
+    // test behavior on zero length argument
+    double[] darray = {};
+    d = NumberUtility.median(darray);
+    assertEquals(0, d, EPSILON);
+    // test behavior on odd length array
+    d = NumberUtility.median(10.0);
+    assertEquals(10.0, d, EPSILON);
+    d = NumberUtility.median(10.0, 15.0, 20.0);
+    assertEquals(15.0, d, EPSILON);
+    // test behavior on even length array
+    d = NumberUtility.median(10.0, 20.0);
+    assertEquals(20.0, d, EPSILON);
+    d = NumberUtility.median(10.0, 20.0, 30.0, 40.0);
+    assertEquals(30.0, d, EPSILON);
   }
 }
