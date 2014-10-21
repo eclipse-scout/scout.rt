@@ -32,7 +32,7 @@ import org.eclipse.scout.rt.ui.rap.form.fields.IRwtScoutFormField;
  * overwrite the global defined implementation. Local extensions should only be declared in application specific plugins
  * (e.g. com.bsiag.crm.ui.swt).</li>
  * </ul>
- * 
+ *
  * @since 3.7.0 June 2011
  */
 public interface IFormFieldExtension {
@@ -57,7 +57,7 @@ public interface IFormFieldExtension {
    * extensions overwrite the global defined implementation. Local extensions should only be declared in application
    * specific plugins (e.g. com.bsiag.crm.ui.swt).</li>
    * </ul>
-   * 
+   *
    * @return one of {@link IFormFieldExtension#SCOPE_DEFAULT}, {@link IFormFieldExtension#SCOPE_GLOBAL},
    *         {@link IFormFieldExtension#SCOPE_LOCAL}
    */
@@ -65,7 +65,7 @@ public interface IFormFieldExtension {
 
   /**
    * users of this interface should type check
-   * 
+   *
    * @return either a marker interface class name or a class name instanceof
    *         IFormField
    */
@@ -73,14 +73,14 @@ public interface IFormFieldExtension {
 
   /**
    * users of this interface should type check
-   * 
+   *
    * @return a class name instanceof ISwtScoutFormField
    */
   String getUiClassName();
 
   /**
    * users of this interface should type check
-   * 
+   *
    * @return a class name instanceof IFormFieldFactory
    */
   String getFactoryClassName();
@@ -88,10 +88,16 @@ public interface IFormFieldExtension {
   boolean isActive();
 
   /**
-   * The id of the contibutor bundle.
-   * 
+   * The id of the contributor bundle.
+   *
    * @return
    */
+  String getContributorBundleId();
+
+  /**
+   * @deprecated use {@link #getContributorBundleId()} instead. Will be removed in the 5.0 Release.
+   */
+  @Deprecated
   String getContibuterBundleId();
 
 }

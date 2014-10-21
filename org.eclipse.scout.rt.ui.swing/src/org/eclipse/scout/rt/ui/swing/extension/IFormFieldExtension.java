@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -28,7 +28,7 @@ import org.eclipse.scout.rt.ui.swing.form.fields.ISwingScoutFormField;
  *      {@link IFormFieldExtension#SCOPE_GLOBAL} to indicate this extension to have a global scope (whole eclipse).
  * Global defined extensions overwrite the default implementation.</li>
  * </ul>
- * 
+ *
  * @since 1.0.8 17.04.2009
  */
 public interface IFormFieldExtension {
@@ -45,14 +45,14 @@ public interface IFormFieldExtension {
    *      {@link IFormFieldExtension#SCOPE_GLOBAL} to indicate this extension to have a global scope (whole eclipse).
    * Global defined extensions overwrite the default implementation.</li>
    * </ul>
-   * 
+   *
    * @return one of {@link IFormFieldExtension#SCOPE_DEFAULT}, {@link IFormFieldExtension#SCOPE_GLOBAL}
    */
   int getScope();
 
   /**
    * users of this interface should type check
-   * 
+   *
    * @return either a marker interface class name or a class name instanceof
    *         IFormField
    */
@@ -60,14 +60,14 @@ public interface IFormFieldExtension {
 
   /**
    * users of this interface should type check
-   * 
+   *
    * @return a class name instanceof ISwtScoutFormField
    */
   String getUiClassName();
 
   /**
    * users of this interface should type check
-   * 
+   *
    * @return a class name instanceof IFormFieldFactory
    */
   String getFactoryClassName();
@@ -75,10 +75,16 @@ public interface IFormFieldExtension {
   boolean isActive();
 
   /**
-   * The id of the contibutor bundle.
-   * 
+   * The id of the contributor bundle.
+   *
    * @return
    */
+  String getContributorBundleId();
+
+  /**
+   * @deprecated use {@link #getContributorBundleId()} instead. Will be removed in the 5.0 Release.
+   */
+  @Deprecated
   String getContibuterBundleId();
 
 }

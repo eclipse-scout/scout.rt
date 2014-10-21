@@ -45,7 +45,7 @@ public class FormFieldFactory implements IFormFieldFactory {
     TreeMap<CompositeObject, P_FormFieldExtension> sortedMap = new TreeMap<CompositeObject, P_FormFieldExtension>();
     for (IFormFieldExtension extension : FormFieldsExtensionPoint.getFormFieldExtensions()) {
       if (extension.isActive()) {
-        Bundle loaderBundle = Platform.getBundle(extension.getContibuterBundleId());
+        Bundle loaderBundle = Platform.getBundle(extension.getContributorBundleId());
         if (loaderBundle != null) {
           Class<?> modelClazz;
           Class<? extends ISwingScoutFormField> uiClazz = null;
@@ -55,14 +55,14 @@ public class FormFieldFactory implements IFormFieldFactory {
             if (!StringUtility.isNullOrEmpty(extension.getUiClassName())) {
               uiClazz = (Class<? extends ISwingScoutFormField>) loaderBundle.loadClass(extension.getUiClassName());
               if (!ISwingScoutFormField.class.isAssignableFrom(uiClazz)) {
-                LOG.warn("extension '" + extension.getName() + "' contributed by '" + extension.getContibuterBundleId() + "' has an ui class not instanceof " + ISwingScoutFormField.class.getName() + ".");
+                LOG.warn("extension '" + extension.getName() + "' contributed by '" + extension.getContributorBundleId() + "' has an ui class not instanceof " + ISwingScoutFormField.class.getName() + ".");
                 uiClazz = null;
               }
             }
             else if (!StringUtility.isNullOrEmpty(extension.getFactoryClassName())) {
               factoryClazz = (Class<? extends IFormFieldFactory>) loaderBundle.loadClass(extension.getFactoryClassName());
               if (!IFormFieldFactory.class.isAssignableFrom(factoryClazz)) {
-                LOG.warn("extension '" + extension.getName() + "' contributed by '" + extension.getContibuterBundleId() + "' has a facotry class not instanceof " + IFormFieldFactory.class.getName() + ".");
+                LOG.warn("extension '" + extension.getName() + "' contributed by '" + extension.getContributorBundleId() + "' has a facotry class not instanceof " + IFormFieldFactory.class.getName() + ".");
                 factoryClazz = null;
               }
             }
@@ -79,7 +79,7 @@ public class FormFieldFactory implements IFormFieldFactory {
               }
             }
             else {
-              LOG.debug("extension '" + extension.getName() + "' contributed by '" + extension.getContibuterBundleId() + "' has neither an UiClass nor a factory defined! Skipping extension.");
+              LOG.debug("extension '" + extension.getName() + "' contributed by '" + extension.getContributorBundleId() + "' has neither an UiClass nor a factory defined! Skipping extension.");
               break;
             }
             int distance = -distanceToIFormField(modelClazz, 0);
@@ -88,7 +88,7 @@ public class FormFieldFactory implements IFormFieldFactory {
               P_FormFieldExtension existingExt = sortedMap.get(key);
               // check scope
               if (existingExt.getFormFieldExtension().getScope() == extension.getScope()) {
-                LOG.warn("The bundles '" + extension.getContibuterBundleId() + "' and '" + existingExt.getFormFieldExtension().getContibuterBundleId() + "' are both providing " + "an form field extension to '" + extension.getModelClassName() + "' with the same scope.");
+                LOG.warn("The bundles '" + extension.getContributorBundleId() + "' and '" + existingExt.getFormFieldExtension().getContributorBundleId() + "' are both providing " + "an form field extension to '" + extension.getModelClassName() + "' with the same scope.");
               }
               else if (existingExt.getFormFieldExtension().getScope() < extension.getScope()) {
                 // replace
@@ -100,7 +100,7 @@ public class FormFieldFactory implements IFormFieldFactory {
             }
           }
           catch (ClassNotFoundException e) {
-            LOG.debug("local extension '" + extension.getName() + "' contributed by '" + extension.getContibuterBundleId() + "' is not visible from bundle: '" + loaderBundle.getSymbolicName() + "'.");
+            LOG.debug("local extension '" + extension.getName() + "' contributed by '" + extension.getContributorBundleId() + "' is not visible from bundle: '" + loaderBundle.getSymbolicName() + "'.");
           }
         }
 

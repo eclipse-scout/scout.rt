@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -19,26 +19,36 @@ public class FormFieldExtension implements IFormFieldExtension {
   private int m_scope = SCOPE_DEFAULT;
   private String /* fully qualified name of a Class<? extends IFormField> */m_modelClassName;
   private String /*
-                  * fully qualified name of a Class<? extends
-                  * ISwtScoutFormField>
-                  */m_uiClassName;
+                 * fully qualified name of a Class<? extends
+                 * ISwtScoutFormField>
+                 */m_uiClassName;
   private String /*
-                  * fully qualified name of a Class<? extends
-                  * IFormFieldFactory>
-                  */m_factoryClassName;
-  private String m_contibuterBundleId;
+                 * fully qualified name of a Class<? extends
+                 * IFormFieldFactory>
+                 */m_factoryClassName;
+  private String m_contributorBundleId;
 
   public FormFieldExtension(String name) {
     m_name = name;
   }
 
+  /**
+   * @deprecated use {@link #getContributorBundleId()} instead. Will be removed in the 5.0 Release.
+   */
+  @SuppressWarnings("deprecation")
+  @Deprecated
   @Override
   public String getContibuterBundleId() {
-    return m_contibuterBundleId;
+    return m_contributorBundleId;
   }
 
-  public void setContibuterBundleId(String contibuterBundleId) {
-    m_contibuterBundleId = contibuterBundleId;
+  @Override
+  public String getContributorBundleId() {
+    return m_contributorBundleId;
+  }
+
+  public void setContibuterBundleId(String contributorBundleId) {
+    m_contributorBundleId = contributorBundleId;
   }
 
   @Override
