@@ -167,6 +167,28 @@ public class CollectionUtilityTest {
   }
 
   /**
+   * Test for {@link CollectionUtility#lastElement(List<T> c)}
+   */
+  @Test
+  public void testLastElementList() {
+    assertNull(CollectionUtility.lastElement((List<Object>) null));
+    assertNull(CollectionUtility.lastElement(new ArrayList<Object>()));
+    assertEquals("a", CollectionUtility.lastElement(createList("a")));
+    assertEquals("b", CollectionUtility.lastElement(createList("a", "b")));
+  }
+
+  /**
+   * Test for {@link CollectionUtility#lastElement(List<T> c)}
+   */
+  @Test
+  public void testLastElementMap() {
+    assertNull(CollectionUtility.lastElement((SortedMap<Object, Object>) null));
+    assertNull(CollectionUtility.lastElement(new TreeMap<Object, Object>()));
+    assertEquals("a", CollectionUtility.lastElement(createSortedMap("a")));
+    assertEquals("b", CollectionUtility.lastElement(createSortedMap("a", "b")));
+  }
+
+  /**
    * Test for {@link CollectionUtility#size(Collection<T> list)}
    */
   @Test
@@ -179,16 +201,25 @@ public class CollectionUtilityTest {
 
   private List<Object> createList(Object... elements) {
     List<Object> list = new ArrayList<Object>();
-    for (Object s : elements) {
-      list.add(s);
+    for (Object o : elements) {
+      list.add(o);
     }
     return list;
   }
 
+  private SortedMap<Integer, Object> createSortedMap(Object... elements) {
+    SortedMap<Integer, Object> map = new TreeMap<Integer, Object>();
+    int counter = 0;
+    for (Object o : elements) {
+      map.put(counter++, o);
+    }
+    return map;
+  }
+
   private Queue<Object> createQueue(Object... elements) {
     Queue<Object> list = new ConcurrentLinkedQueue<Object>();
-    for (Object s : elements) {
-      list.add(s);
+    for (Object o : elements) {
+      list.add(o);
     }
     return list;
   }
