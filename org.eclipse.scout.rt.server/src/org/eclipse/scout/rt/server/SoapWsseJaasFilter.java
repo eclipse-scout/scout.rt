@@ -136,10 +136,10 @@ public class SoapWsseJaasFilter implements Filter {
 
     final IServletHelperService svc = SERVICES.getService(IServletHelperService.class);
     if (svc == null) {
-      LOG.error("Service IServletHelperService not available.\n"
-          + "Depending on the servlet version add \norg.eclipse.scout.rt.server.servlet31 or \n"
-          + "org.eclipse.scout.rt.server.servlet25\nto your product");
-      ((HttpServletResponse) response).sendError(HttpServletResponse.SC_FORBIDDEN);
+      LOG.error("Service IServletHelperService not available."
+          + "Depending on the servlet version add org.eclipse.scout.rt.server.servlet31 or "
+          + "org.eclipse.scout.rt.server.servlet25 to your product");
+      ((HttpServletResponse) response).sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
       return;
     }
     //
