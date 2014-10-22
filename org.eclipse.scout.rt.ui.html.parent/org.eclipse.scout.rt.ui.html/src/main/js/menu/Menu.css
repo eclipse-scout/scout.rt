@@ -145,8 +145,7 @@
   border:1px solid @color-bench-light-border;
   min-width:110px;
   height:30px;
-  -moz-border-radius:3px;
-  border-radius:3px;
+  border-radius: @form-field-border-radius;
 
   &+.default-button {
     background-color: @color-bsi-green-semi;
@@ -166,5 +165,3 @@
 .menu-button:not(.last) {
   margin-right:14px;
 }
-
-

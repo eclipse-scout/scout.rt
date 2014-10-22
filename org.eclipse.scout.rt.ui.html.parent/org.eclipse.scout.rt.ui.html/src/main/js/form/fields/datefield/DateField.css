@@ -26,6 +26,7 @@
   padding: 6px;
   z-index: 100;
   border: 1px solid @color-bench-light-border;
+  border-radius: @form-field-border-radius;
   .drop-shadow();
 
   /* necessary for animation */

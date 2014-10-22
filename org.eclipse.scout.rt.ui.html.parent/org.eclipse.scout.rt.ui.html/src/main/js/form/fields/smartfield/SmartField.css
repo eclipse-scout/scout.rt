@@ -4,6 +4,7 @@
 
 .smart-field-popup {
   border:solid 1px @color-bsi-green;
+  border-radius: @form-field-border-radius;
   position:absolute;
   z-index:101;
   margin-top:5px;
