@@ -67,12 +67,12 @@ public class ActionTest {
     assertTrue(b.isSelected());
 
     b.getUIFacade().fireActionFromUI();
-    assertEquals(1, execActionHolder.getValue().intValue());
+    assertEquals(2, execActionHolder.getValue().intValue());
     assertEquals(1, execToggleHolder.getValue().intValue());
     assertTrue(b.isSelected());
 
     b.setSelected(false);
-    assertEquals(1, execActionHolder.getValue().intValue());
+    assertEquals(2, execActionHolder.getValue().intValue());
     assertEquals(2, execToggleHolder.getValue().intValue());
     assertFalse(b.isSelected());
 
