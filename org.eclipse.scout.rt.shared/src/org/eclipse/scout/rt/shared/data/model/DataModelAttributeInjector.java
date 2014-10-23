@@ -13,15 +13,17 @@ package org.eclipse.scout.rt.shared.data.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.scout.rt.shared.ScoutTexts;
+
 public class DataModelAttributeInjector implements DataModelConstants {
 
   public void injectOperators(IDataModelAttribute attribute) {
     List<IDataModelAttributeOp> opList = new ArrayList<IDataModelAttributeOp>();
     switch (attribute.getType()) {
       case IDataModelAttribute.TYPE_SMART: {
-        opList.add(DataModelAttributeOp.create(OPERATOR_EQ));
+        opList.add(DataModelAttributeOp.create(OPERATOR_EQ, ScoutTexts.get("LogicIn"), ScoutTexts.get("LogicIn")));
         if (attribute.isNotOperatorEnabled()) {
-          opList.add(DataModelAttributeOp.create(OPERATOR_NEQ));
+          opList.add(DataModelAttributeOp.create(OPERATOR_NEQ, ScoutTexts.get("LogicNotIn"), ScoutTexts.get("LogicNotIn")));
         }
         if (attribute.isNullOperatorEnabled()) {
           opList.add(DataModelAttributeOp.create(OPERATOR_NUMBER_NULL));
