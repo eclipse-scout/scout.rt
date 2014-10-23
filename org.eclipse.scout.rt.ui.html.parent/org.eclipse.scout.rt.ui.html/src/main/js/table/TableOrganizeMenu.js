@@ -5,34 +5,21 @@ scout.TableOrganizeMenu = function() {
 scout.inherits(scout.TableOrganizeMenu, scout.Menu);
 
 scout.TableOrganizeMenu.prototype._onMenuClicked = function(event) {
-
-  if (this.$container.data('menu-open')) {
-    scout.menus.removeContextMenuContainer(this.$menuContainer, this.$container, true);
-    this.$container.data('menu-open', false);
-  }
-  else {
-    // FIXME CGU: Same code as in Menu.js, improve
-    var right = parseFloat(this.parent.$container[0].offsetWidth) - parseFloat(this.$container.position().left) -  parseFloat(this.$container[0].offsetWidth) - 20,
-      top = this.$container.height();
-    this.$menuContainer = scout.menus.createContextMenuContainer(this.parent.$container, this.$container, undefined, right, top, false, true);
-    this._renderContent(this.$menuContainer);
-  }
+  var popup = new scout.PopupMenuItem($(event.target));
+  popup.render(this.parent.$container);
+  popup.addClassToBody('table-menu-organize');
+  popup.appendToBody(this._createBody(popup));
+  popup.alignTo();
 };
 
-scout.TableOrganizeMenu.prototype._renderContent = function($parent) {
-  var $content = $parent.appendDIV('table-menu-organize');
-  var $clicked = this.$container;
-
-  $('<button>')
-    .text('Spalten zurücksetzen')
-    .click(onClick.bind(this))
-    .one('mousedown.contextMenu', $.suppressEvent) //TODO event list to suppress is defined in createOrRemoveContextMenuContainer
-    .appendTo($content);
-
-  function onClick() {
-    var table = this.parent;
-    scout.menus.removeContextMenuContainer(this.$menuContainer, this.$container);
-    this.session.send('resetColumns', table.id);
-  }
+scout.TableOrganizeMenu.prototype._createBody = function(popup) {
+  return $('<button>').
+    text(scout.texts.get('resetColumns')).
+    click(function() {
+      var table = this.parent;
+      popup.remove();
+      this.session.send('resetColumns', table.id);
+    }.bind(this)).
+    one(scout.menus.CLOSING_EVENTS, $.suppressEvent);
 };
 

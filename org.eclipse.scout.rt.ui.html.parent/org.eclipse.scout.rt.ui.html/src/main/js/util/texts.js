@@ -6,7 +6,8 @@ scout.texts = {
       'noOptions':'Keine Übereinstimmung',
       'oneOption':'1 Option',
       'options':'{0} Optionen',
-      'invalidDateFormat':'Das Datum ist in einem ungültigen Format'
+      'invalidDateFormat':'Das Datum ist in einem ungültigen Format',
+      'resetColumns':'Spalten zurücksetzen'
   }
 };
 

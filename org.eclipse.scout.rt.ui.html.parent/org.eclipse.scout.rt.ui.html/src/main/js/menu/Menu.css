@@ -1,167 +1,178 @@
+/* Mixins */
 .menu-icon(@icon) {
-  display: inline-block;
   .font-icon;
+  display: inline-block;
   font-size: 22px;
   line-height: @size-desktop-menu - 1px;
   content: @icon;
-  color:#666666;
+  color:#666;
 }
-
-.menubar {
-  width: 100%;
-  position: relative;
-  height: @size-desktop-menu;
-  overflow: hidden;
-  margin: 11px 0 14px 20px;
-}
-
-.menubar div, button {
-  display:inline-block;
-  vertical-align:middle;
-  font-family:arial;
-  font-size:13px;
-  box-sizing:border-box;
-}
-
-.menu-item {
-  position: relative;
-  display: inline-block;
-  overflow: hidden;
-  cursor: pointer;
-  /* -1px used to cancel out effects of border-top */
-  line-height: @size-desktop-menu - 1px;
-  color: @color-bench-text;
-  padding:0 10px;
-
-  border-left: 1px solid transparent;
-  border-right: 1px solid transparent;
-  border-top: 1px solid transparent;
-
-  &:not(.last) {
-    margin-right:10px;
-  }
-
-  &:hover {
-    color: @color-bench-text-hover;
-  }
-
-  &.disabled {
-    color: @color-bench-semi;
-  }
-
-  &.menu-right {
-    float: right;
-  }
-
-  &.menu-right.menu-open {
-    border-left: 1px solid @color-bench-light-border;
-    border-right: 1px solid @color-bench-light-border;
-    border-top:  1px solid @color-bench-light-border;
-    color: @color-bench-text-active;
-  }
-
-  &.menu-open {
-    color: @color-bench-text-active;
-  }
-
-  &[data-icon]:before {
-    .menu-icon(attr(data-icon));
-  }
-
-  &.has-submenu:after {
-    display: inline-block;
-    position: relative;
-    left: 0px;
-    top: 2px;
-    .font-icon;
-    line-height: 18px;
-    font-size: 18px;
-    padding-left: 10px;
-    content: @icon-angle-down;
-  }
-
-}
-
-.menu-item-iconandtext[data-icon]:before {
-  /* margin between icon and text */
-  margin-right: 6px;
-  vertical-align: -3px;
-}
-
-.menu-separator {
-  background-color:#d6d6d6;
-  box-sizing:content-box;
-  width:1px;
-  height:30px;
-  margin:0 19px 0 19px;
-}
-
-/* context menu */
 
 .menu-context {
   .drop-shadow;
   border: 1px solid @color-bench-light-border;
 }
 
-.menu-container {
-  .menu-context;
-  position: absolute;
-  z-index: 10;
-  white-space: nowrap;
-
-  &.menu-right:before {
-    content: ' ';
-    width: 42px;
-    border-bottom: 1px solid @color-bench;
-    position:absolute;
-    top: -1px;
-    right: -1px;
-  }
-
-  &.menu-window {
-    padding-top: @size-table-header - 5px;
-    cursor: pointer;
-  }
+.sub-menu-icon {
+  display:inline-block;
+  position:relative;
+  left:0px;
+  top:3px;
+  .font-icon;
+  line-height:18px;
+  font-size:18px;
+  padding-left:10px;
+  content:@icon-angle-down;
 }
 
-.menu-container .menu-item {
-  display: block;
-  background-color: @color-bench;
-  padding: 0px 12px 0px 12px;
-  line-height: @size-table-header - 3px;
-  border-bottom: 1px solid @color-bench-light-border;
-  cursor: pointer;
-  color: @color-bench-text;
-  width:100%;
+/* Styles */
 
-  &:hover{
-    color: @color-bench-text-hover;
-  }
+.menubar {
+  position:relative;
+  box-sizing:border-box;
+  height:56px;
+  margin:0 20px;
+  padding:6px 0 10px 0;
+  border-bottom:solid 1px @color-bench-light-border;
+}
+
+.menu-separator {
+  box-sizing:content-box;
+  width:1px;
+  height:30px;
+  margin:6px 19px 3px 19px;
+  background-color:#d6d6d6;
+}
+
+.menubar div, button {
+  box-sizing:border-box;
+  display:inline-block;
+  vertical-align:middle;
 }
 
 .menu-button {
-  background-color:@color-bench-light;
-  color:@color-bench-text;
-  border:1px solid @color-bench-light-border;
-  min-width:110px;
   height:30px;
-  border-radius: @form-field-border-radius;
+  min-width:110px;
+  margin:6px 0 3px 0;
+  color:#333;
+  background-color:@color-bench-light;
+  border:1px solid @color-bench-light-border;
+  border-radius:3px;
 
-  &+.default-button {
-    background-color: @color-bsi-green-semi;
-    border-color: @color-bsi-green-semi;
+  &:not(.last) {
+    margin-right:14px;
+  }
+
+  &+ .default-button {
+    background-color:#389db6;
     color:white;
+    border:none;
     font-weight:bold;
   }
+}
 
-  &:focus {
-    color: white;
-    border-color:@color-focus;
-    background-color: @color-focus;
-    outline: none;
+.menu-item {
+  /* vertical-align:middle only works with line-height */
+  height:39px;
+  line-height:39px;
+  white-space:nowrap;
+  cursor:pointer;
+  padding-top:1px;
+
+  &:hover {
+    color:#389db6;
+  }
+
+  &.disabled {
+    color:@color-bench-semi;
+  }
+
+  &:not(.last) {
+    margin-right:14px;
+  }
+
+  &.menu-open {
+    color:@color-bench-text-active;
+  }
+
+  &.has-submenu:after {
+   .sub-menu-icon;
   }
 }
 
-.menu-button:not(.last) {
-  margin-right:14px;
+.menu-right {
+  float:right;
+  height:23px;
+
+  &:not(.last) {
+    margin-right:33px;
+  }
 }
+
+[data-icon]:before {
+  .menu-icon(attr(data-icon));
+  vertical-align:-3px;
+}
+
+.menu-textandicon[data-icon]:before {
+  padding-right: 11px;
+}
+
+.popup {
+  position:absolute;
+  margin:auto;
+  z-index:10;
+
+  & > .popup-head {
+    position:absolute;
+    box-sizing:border-box;
+    line-height:39px;
+    padding:0px 13px;
+    white-space: nowrap;
+    background-color:white;
+    border:solid 1px #ccc;
+    border-bottom:none;
+    box-shadow: 5px 5px 3px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.popup-body {
+  position:absolute;
+  top:39px;
+  border:solid 1px #ccc;
+  background-color:white;
+  box-shadow: 5px 5px 3px rgba(0, 0, 0, 0.1);
+
+  & > .menu-item {
+    border-bottom:solid 1px #ccc;
+    display:block;
+    width:100%;
+    padding-left:15px;
+  }
+
+  & > .menu-item:last-child {
+    border-bottom:none;
+  }
+}
+
+.popup-head {
+
+  color:@color-bench-text-active;
+
+  &.has-submenu:after {
+    .sub-menu-icon;
+    transform: rotate(180deg);
+    padding-right:10px;
+    padding-left:0;
+    top:5px;
+  }
+}
+
+.popup-deco {
+  position:absolute;
+  top:39px;
+  height:1px;
+  left:1px;
+  background-color:white;
+}
+

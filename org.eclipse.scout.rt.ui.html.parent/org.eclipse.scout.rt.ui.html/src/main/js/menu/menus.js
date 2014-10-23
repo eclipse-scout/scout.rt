@@ -1,216 +1,113 @@
-scout.menus = {
-  filter: function(menus, types) {
-    if (!menus) {
-      return;
-    }
-    if (types && !Array.isArray(types)) {
-      types = [types];
-    }
+scout.menus = function() {
+};
 
-    var filteredMenus = [];
-    var separatorCount = 0;
-    for (var i = 0; i < menus.length; i++) {
-      var menu = menus[i];
+scout.menus.CLOSING_EVENTS = 'mousedown.contextMenu keydown.contextMenu mousewheel.contextMenu';
 
-      var childMenus = menu.childMenus;
-      if (childMenus.length > 0) {
-        childMenus = scout.menus.filter(menu.childMenus, types);
-        if (childMenus.length === 0) {
-          continue;
-        }
-      } //don't check the menu type for a group
-      else if (!scout.menus._checkType(menu, types)) {
-        continue;
-      }
+scout.menus.filter = function(menus, types) {
+  if (!menus) {
+    return;
+  }
+  if (types && !Array.isArray(types)) {
+    types = [types];
+  }
 
-      if (!menu.visible) {
-        continue;
-      }
+  var filteredMenus = [];
+  var separatorCount = 0;
+  for (var i = 0; i < menus.length; i++) {
+    var menu = menus[i];
 
-      if (menu.separator) {
-        separatorCount++;
-      }
-
-      filteredMenus.push(menu);
-    }
-
-    //Ignore menus with only separators
-    if (separatorCount == filteredMenus.length) {
-      return [];
-    }
-
-    return filteredMenus;
-  },
-  checkType: function(menu, types) {
-    var childMenus;
-    if (types && !Array.isArray(types)) {
-      types = [types];
-    }
-
-    if (menu.childMenus.length > 0) {
+    var childMenus = menu.childMenus;
+    if (childMenus.length > 0) {
       childMenus = scout.menus.filter(menu.childMenus, types);
-      return (childMenus.length > 0);
-    }
-
-    return scout.menus._checkType(menu, types);
-  },
-  /**
-   * Checks the type of a menu. Don't use this for menu groups.
-   */
-  _checkType: function(menu, types) {
-    if (!types) {
-      return true;
-    }
-    if (!menu.menuTypes) {
-      return false;
-    }
-
-    for (var j = 0; j < types.length; j++) {
-      if (menu.menuTypes.indexOf(types[j]) > -1) {
-        return true;
-      }
-    }
-  },
-  // FIXME more or less the same code as in showContextMenu. Maybe better create separate class (ContextMenu.js or PopupMenu.js)
-  createContextMenuContainer: function($parent, $clicked, left, right, top, menuWindow, menuToggle) {
-    var i, $menuContainer;
-
-    $menuContainer = $parent.appendDIV('menu-container');
-    $clicked.addClass('menu-open');
-
-    if (menuWindow) {
-      $menuContainer.addClass('menu-window');
-      $menuContainer.width($clicked.width() + 24);
-    }
-
-    if ($clicked && $clicked.hasClass('menu-right')) {
-      $menuContainer.addClass('menu-right');
-    }
-
-    if (left !== undefined) {
-      $menuContainer.css('left', left);
-    }
-    if (right !== undefined) {
-      $menuContainer.css('right', right);
-    }
-    if (top !== undefined) {
-      $menuContainer.css('top', top);
-    }
-
-    // every user action will close menu; menu is removed in 'click' event, see onMenuItemClicked()
-    var closingEvents = 'mousedown.contextMenu keydown.contextMenu mousewheel.contextMenu';
-    $(document).one(closingEvents, function() {
-      scout.menus.removeContextMenuContainer($menuContainer, $clicked, menuToggle);
-    });
-    $('.menu-item', $menuContainer).one(closingEvents, $.suppressEvent);
-
-    return $menuContainer;
-  },
-  removeContextMenuContainer: function($menuContainer, $clicked, menuToggle) {
-    // close container
-    $menuContainer.remove();
-
-    // Remove all cleanup handlers
-    $(document).off('.contextMenu');
-
-    // click on button do not reopen menu
-    $clicked.removeClass('menu-open');
-
-    if (event && $(event.target).is($clicked) && menuToggle) {
-      $clicked.data('menu-open', true);
-    }
-  },
-  showContextMenu: function(menus, $parent, $clicked, left, right, top, menuWindow, menuToggle) {
-    var i, $menuContainer = $('.menu-container', $parent);
-
-    if (!menus || menus.length === 0) {
-      return;
-    }
-
-    if (menuToggle && $clicked.data('menu-open')) {
-      removeContainer();
-      $clicked.data('menu-open', false);
-      return;
-    }
-
-    $menuContainer = $parent.appendDIV('menu-container');
-    $clicked.addClass('menu-open');
-
-    if (menuWindow) {
-      $menuContainer.addClass('menu-window');
-      $menuContainer.width($clicked.width() + 24);
-    }
-
-    if ($clicked && $clicked.hasClass('menu-right')) {
-      $menuContainer.addClass('menu-right');
-    }
-
-    for (i = 0; i < menus.length; i++) {
-      var menu = menus[i];
-      if (menu.separator) {
+      if (childMenus.length === 0) {
         continue;
       }
-
-      menu.sendAboutToShow();
-
-      if (left !== undefined) {
-        $menuContainer.css('left', left);
-      }
-      if (right !== undefined) {
-        $menuContainer.css('right', right);
-      }
-      if (top !== undefined) {
-        $menuContainer.css('top', top);
-      }
-
-      $menuContainer.appendDIV('menu-item', menu.text)
-        .data('menu', menu)
-        .on('click', '', onItemClicked);
+    } //don't check the menu type for a group
+    else if (!scout.menus._checkType(menu, types)) {
+      continue;
     }
 
-    // every user action will close menu; menu is removed in 'click' event, see onMenuItemClicked()
-    var closingEvents = 'mousedown.contextMenu keydown.contextMenu mousewheel.contextMenu';
-    $(document).one(closingEvents, removeContainer);
-    $('.menu-item', $menuContainer).one(closingEvents, $.suppressEvent);
-
-    function removeContainer(event) {
-      // close container
-      $menuContainer.remove();
-
-      // Remove all cleanup handlers
-      $(document).off('.contextMenu');
-
-      // click on button do not reopen menu
-      $clicked.removeClass('menu-open');
-
-      if (event && $(event.target).is($clicked) && menuToggle) {
-        $clicked.data('menu-open', true);
-      }
+    if (!menu.visible) {
+      continue;
     }
 
-    function onItemClicked() {
-      var menu = $(this).data('menu');
-      removeContainer();
-      menu.sendMenuAction();
-    }
-  },
-  /**
-   * menus may change at any time -> wait for server response before showing any menus
-   */
-  showContextMenuWithWait: function(session, func) {
-    if (session.offline) {
-      //Do not show context menus in offline mode, they won't work
-      return;
+    if (menu.separator) {
+      separatorCount++;
     }
 
-    if (session.areRequestsPending() || session.areEventsQueued()) {
-      session.listen().done(onEventsProcessed);
-    } else {
-      func();
-    }
+    filteredMenus.push(menu);
+  }
 
-    function onEventsProcessed() {
-      func();
+  //Ignore menus with only separators
+  if (separatorCount == filteredMenus.length) {
+    return [];
+  }
+
+  return filteredMenus;
+};
+
+scout.menus.checkType = function(menu, types) {
+  var childMenus;
+  if (types && !Array.isArray(types)) {
+    types = [types];
+  }
+
+  if (menu.childMenus.length > 0) {
+    childMenus = scout.menus.filter(menu.childMenus, types);
+    return (childMenus.length > 0);
+  }
+
+  return scout.menus._checkType(menu, types);
+};
+
+/**
+ * Checks the type of a menu. Don't use this for menu groups.
+ */
+scout.menus._checkType = function(menu, types) {
+  if (!types) {
+    return true;
+  }
+  if (!menu.menuTypes) {
+    return false;
+  }
+  for (var j = 0; j < types.length; j++) {
+    if (menu.menuTypes.indexOf(types[j]) > -1) {
+      return true;
     }
   }
 };
+
+/**
+ * Appends menu items to the given popup and attaches event-handlers on the appended menu items.
+ *
+ * @param $parent Parent to which the popup is appended
+ * @param menus Menus added to the popup
+ * @returns
+ */
+scout.menus.appendMenuItems = function(popup, menus) {
+  if (!menus || menus.length === 0) {
+    return;
+  }
+  var i,
+    onMenuItemClicked = function() {
+      var menu = $(this).data('menu');
+      popup.remove();
+      menu.sendMenuAction();
+    };
+
+  for (i = 0; i < menus.length; i++) {
+    var menu = menus[i];
+    if (menu.separator) {
+      continue;
+    }
+    menu.sendAboutToShow();
+    popup.appendToBody(
+      $('<div>').
+        addClass('menu-item').
+        text(menu.text).
+        data('menu', menu).
+        on('click', '', onMenuItemClicked).
+        one(scout.menus.CLOSING_EVENTS, $.suppressEvent));
+  }
+};
+

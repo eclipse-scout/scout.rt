@@ -30,6 +30,7 @@
 //@include("menu/Menu.js");
 //@include("menu/menus.js");
 //@include("menu/Menubar.js")
+//@include("menu/Popup.js")
 //@include("layout/graphics.js");
 //@include("layout/layouts.js");
 //@include("layout/LayoutValidator.js");

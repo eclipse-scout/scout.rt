@@ -348,4 +348,16 @@ und benötigen zudem ein Layout-Konzept ähnlich wie der Swing LayoutManager2 (i
 Grund: die nativen SBs funktionieren immer besser, als die JS basierten. Sie funktionieren auch auf verschiedenen
   Gerätetypen mit unterschiedlichen Browsern / Maustreiber / etc. am problemlosesten. --> spart Aufwand
 
+23.10.2014 AWE, CGU, IMO - Word Integration
+1. für UGM präpariertes docx in /resources auf Webserver legen
+2. Menü "Word-Dokument öffnen" einfügen, auf Server ein (Desktop-)Event OPEN_URL an Browser schicken, URL
+   in Response zurückschicken. Browser öffnet dann die URL normal (mime-type)
+3. Client-Service anbieten mit Methoden die von Word-Plugin aufgerufen werden. Als Meta-Daten wird im docx
+   die Session-ID mitgeschickt, damit die Word-Integration in die richtige Session kommt. Es wird ein
+   eigener Service für die Word-Integration erstellt
+4. Noch offen ist, wie wir komplizierte Use-Cases (z.B. Variable Erstellen in der Template-Ansicht) lösen
+   wollen. Dialog in C# nachprogrammieren ist zu aufwändig, enge Integration von Word und Browser ist schwierig.
+   Evtl. brauchen wir dafür wirklich diese Detached-Dialoge
+
+
 

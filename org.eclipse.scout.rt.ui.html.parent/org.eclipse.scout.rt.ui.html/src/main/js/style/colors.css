@@ -1,4 +1,36 @@
 /* color basics */
+@palette-black:#000;
+@palette-dark-gray-1:#333;
+@palette-dark-gray-2:#666;
+@palette-gray:#999;
+@palette-light-gray-1:#ccc;
+@palette-light-gray-2:#ddd;
+@palette-light-gray-3:#ebebeb;
+@palette-light-gray-4:#f6f6f6;
+@palette-white:#fff;
+
+/**
+ * Idee (AWE):
+ * Die Palette wird pro Projekt definiert.
+ * Der Bezeichner der Paletten-Farbe ist entsprechend dem Farbwert, d.h.
+ *
+ *   @palette-red:#f00;
+ *
+ * Die logischen Farben referenzieren die Palette, z.B.:
+ *
+ *   @text-hover-color:@palette-red;
+ *
+ * Farbabstufungen über light|dark und falls nötig Zahlenwerte,
+ * kleinere Zahl bedeutet dunkler, grösserer Zahl bedeutet heller
+ *
+ * Wenn ein Kundenprojekt die Farben ändern will:
+ *
+ * 1. definiert es eine neue Farb-Palette (inkl. neue Bezeichner)
+ *    solange es Sinn macht, kann ein Bezeichner wiederverwendet werden
+ *    z.B. könnte @palette-red von #f00 auf #c00 geändert werden.
+ * 2. ändert ggf. die Zuordnung der logischen Farben auf die Paletten-Farben
+ *
+ */
 
 @color-nav: #41525E;
 @color-nav-semi: #506678;

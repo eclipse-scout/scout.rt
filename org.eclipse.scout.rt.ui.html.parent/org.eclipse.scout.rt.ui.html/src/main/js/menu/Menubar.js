@@ -59,6 +59,8 @@ scout.Menubar.prototype.updateItems = function(menus) {
       this._addMenuItem(menus[i]);
     }
   }
+  // TODO AWE: (menu) 'last' is not added to correct right aligned menu
+  // this._addLastClass();
 };
 
 scout.Menubar.prototype._addMenuItem = function(menu) {
@@ -73,6 +75,15 @@ scout.Menubar.prototype._addMenuItem = function(menu) {
 scout.Menubar.prototype._addMenuSeparator = function () {
   var s = this.$container.appendDIV('menu-separator');
   this.menus.push(s);
+  this._addLastClass();
+};
+
+/**
+ * Add 'last' class to each previous menu-item when:
+ * - after a menu-separator has been added
+ * - after all menu items have been added
+ */
+scout.Menubar.prototype._addLastClass = function () {
   if (this.lastMenu) {
     this.lastMenu.$container.addClass('last');
   }

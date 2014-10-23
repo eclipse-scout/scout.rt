@@ -53,14 +53,10 @@ scout.Menu.prototype.hasButtonStyle = function() {
 scout.Menu.prototype._onMenuClicked = function(event) {
   if (this.children.length > 0) {
     // TODO CRU: work in progress
-    if (this.$container.hasClass('menu-right')) {
-      var right = parseFloat(this.parent.$container[0].offsetWidth) - parseFloat(this.$container.position().left) -  parseFloat(this.$container[0].offsetWidth) - 20,
-        top = this.$container.height();
-      scout.menus.showContextMenu(this.children, this.parent.$container, this.$container, undefined, right, top, false, true);
-    } else {
-      var left = parseFloat(this.$container.position().left) + 18;
-      scout.menus.showContextMenu(this.children, this.parent.$container, this.$container, left, undefined, 0, true, false);
-    }
+    var popup = new scout.PopupMenuItem($(event.target));
+    popup.render(this.parent.$container);
+    scout.menus.appendMenuItems(popup, this.children);
+    popup.alignTo();
   } else {
     this.sendMenuAction();
   }

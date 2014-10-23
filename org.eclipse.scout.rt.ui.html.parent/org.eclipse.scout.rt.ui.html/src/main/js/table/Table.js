@@ -395,19 +395,36 @@ scout.Table.prototype._drawData = function(startRow) {
   }
 
   function onContextMenu(event) {
-    var $selectedRows, x, y;
     event.preventDefault();
 
-    $selectedRows = that.findSelectedRows();
-    x = event.pageX - that._$viewport.offset().left;
-    y = event.pageY - that._$viewport.offset().top;
+    var $selectedRows = that.findSelectedRows(),
+      x = event.pageX - that._$viewport.offset().left,
+      y = event.pageY - that._$viewport.offset().top;
 
     if ($selectedRows.length > 0) {
-      scout.menus.showContextMenuWithWait(that.session, showContextMenu);
+      waitForServer(that.session, showMenuPopup);
     }
 
-    function showContextMenu() {
-      scout.menus.showContextMenu(that._getRowMenus($selectedRows, false), that._$viewport, $(that), x, undefined, y);
+    // TODO AWE/CGU: (menu) try to get rid of aboutToShow, than delete this method
+    // or move to a better suited location if we cannot remove it
+    function waitForServer(session, func) {
+      if (session.offline) {
+        // don't show context menus in offline mode, they won't work
+        return;
+      }
+      if (session.areRequestsPending() || session.areEventsQueued()) {
+        session.listen().done(func);
+      } else {
+        func();
+      }
+    }
+
+    function showMenuPopup() {
+      var popup = new scout.Popup();
+      popup.render(that._$viewport);
+      scout.menus.appendMenuItems(popup, that._getRowMenus($selectedRows, false));
+      popup.setLocation(new scout.Point(x, y - 40)); // TODO AWE: (menu) check offset, remove hacky magic number
+      // seems to be the height of the selected row.
     }
   }
 
