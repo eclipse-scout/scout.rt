@@ -23,133 +23,137 @@ public final class DataModelAttributeOp implements DataModelConstants {
   private DataModelAttributeOp() {
   }
 
+  public static IDataModelAttributeOp create(int operator, String shortText, String text) {
+    switch (operator) {
+      case OPERATOR_BETWEEN:
+        return new Between(OPERATOR_BETWEEN, (shortText == null) ? (ScoutTexts.get("LogicBetweenShort")) : (shortText), (text == null) ? (ScoutTexts.get("LogicBetween")) : text);
+      case OPERATOR_DATE_BETWEEN:
+        return new Between(OPERATOR_DATE_BETWEEN, (shortText == null) ? (ScoutTexts.get("LogicBetweenShort")) : (shortText), (text == null) ? (ScoutTexts.get("LogicBetween")) : text);
+      case OPERATOR_DATE_TIME_BETWEEN:
+        return new Between(OPERATOR_DATE_TIME_BETWEEN, (shortText == null) ? (ScoutTexts.get("LogicBetweenShort")) : (shortText), (text == null) ? (ScoutTexts.get("LogicBetween")) : text);
+      case OPERATOR_NEQ:
+        return new NEQ(OPERATOR_NEQ, (shortText == null) ? (ScoutTexts.get("LogicNEQ")) : (shortText), (text == null) ? (ScoutTexts.get("LogicNEQ")) : text);
+      case OPERATOR_DATE_NEQ:
+        return new NEQ(OPERATOR_DATE_NEQ, (shortText == null) ? (ScoutTexts.get("LogicNEQ")) : (shortText), (text == null) ? (ScoutTexts.get("LogicNEQ")) : text);
+      case OPERATOR_DATE_TIME_NEQ:
+        return new NEQ(OPERATOR_DATE_TIME_NEQ, (shortText == null) ? (ScoutTexts.get("LogicNEQ")) : (shortText), (text == null) ? (ScoutTexts.get("LogicNEQ")) : text);
+      case OPERATOR_LT:
+        return new LT(OPERATOR_LT, (shortText == null) ? (ScoutTexts.get("LogicLT")) : (shortText), (text == null) ? (ScoutTexts.get("LogicLT")) : text);
+      case OPERATOR_DATE_LT:
+        return new LT(OPERATOR_DATE_LT, (shortText == null) ? (ScoutTexts.get("LogicLT")) : (shortText), (text == null) ? (ScoutTexts.get("LogicLT")) : text);
+      case OPERATOR_DATE_TIME_LT:
+        return new LT(OPERATOR_DATE_TIME_LT, (shortText == null) ? (ScoutTexts.get("LogicLT")) : (shortText), (text == null) ? (ScoutTexts.get("LogicLT")) : text);
+      case OPERATOR_LE:
+        return new LE(OPERATOR_LE, (shortText == null) ? (ScoutTexts.get("LogicLE")) : (shortText), (text == null) ? (ScoutTexts.get("LogicLE")) : text);
+      case OPERATOR_DATE_LE:
+        return new LE(OPERATOR_DATE_LE, (shortText == null) ? (ScoutTexts.get("LogicLE")) : (shortText), (text == null) ? (ScoutTexts.get("LogicLE")) : text);
+      case OPERATOR_DATE_TIME_LE:
+        return new LE(OPERATOR_DATE_TIME_LE, (shortText == null) ? (ScoutTexts.get("LogicLE")) : (shortText), (text == null) ? (ScoutTexts.get("LogicLE")) : text);
+      case OPERATOR_EQ:
+        return new EQ(OPERATOR_EQ, (shortText == null) ? (ScoutTexts.get("LogicEQ")) : (shortText), (text == null) ? (ScoutTexts.get("LogicEQ")) : text);
+      case OPERATOR_DATE_EQ:
+        return new EQ(OPERATOR_DATE_EQ, (shortText == null) ? (ScoutTexts.get("LogicEQ")) : (shortText), (text == null) ? (ScoutTexts.get("LogicEQ")) : text);
+      case OPERATOR_DATE_TIME_EQ:
+        return new EQ(OPERATOR_DATE_TIME_EQ, (shortText == null) ? (ScoutTexts.get("LogicEQ")) : (shortText), (text == null) ? (ScoutTexts.get("LogicEQ")) : text);
+      case OPERATOR_GT:
+        return new GT(OPERATOR_GT, (shortText == null) ? (ScoutTexts.get("LogicGT")) : (shortText), (text == null) ? (ScoutTexts.get("LogicGT")) : text);
+      case OPERATOR_DATE_GT:
+        return new GT(OPERATOR_DATE_GT, (shortText == null) ? (ScoutTexts.get("LogicGT")) : (shortText), (text == null) ? (ScoutTexts.get("LogicGT")) : text);
+      case OPERATOR_DATE_TIME_GT:
+        return new GT(OPERATOR_DATE_TIME_GT, (shortText == null) ? (ScoutTexts.get("LogicGT")) : (shortText), (text == null) ? (ScoutTexts.get("LogicGT")) : text);
+      case OPERATOR_GE:
+        return new GE(OPERATOR_GE, (shortText == null) ? (ScoutTexts.get("LogicGE")) : (shortText), (text == null) ? (ScoutTexts.get("LogicGE")) : text);
+      case OPERATOR_DATE_GE:
+        return new GE(OPERATOR_DATE_GE, (shortText == null) ? (ScoutTexts.get("LogicGE")) : (shortText), (text == null) ? (ScoutTexts.get("LogicGE")) : text);
+      case OPERATOR_DATE_TIME_GE:
+        return new GE(OPERATOR_DATE_TIME_GE, (shortText == null) ? (ScoutTexts.get("LogicGE")) : (shortText), (text == null) ? (ScoutTexts.get("LogicGE")) : text);
+      case OPERATOR_DATE_IS_IN_DAYS:
+        return new DateIsInDays(OPERATOR_DATE_IS_IN_DAYS, (shortText == null) ? (ScoutTexts.get("LogicDateIsInDays")) : (shortText), (text == null) ? (ScoutTexts.get("LogicDateIsInDays")) : text);
+      case OPERATOR_DATE_IS_IN_GE_DAYS:
+        return new DateIsInGEDays(OPERATOR_DATE_IS_IN_GE_DAYS, (shortText == null) ? (ScoutTexts.get("LogicDateIsInGEDays")) : (shortText), (text == null) ? (ScoutTexts.get("LogicDateIsInGEDays")) : text);
+      case OPERATOR_DATE_IS_IN_GE_MONTHS:
+        return new DateIsInGEMonths(OPERATOR_DATE_IS_IN_GE_MONTHS, (shortText == null) ? (ScoutTexts.get("LogicDateIsInGEMonths")) : (shortText), (text == null) ? (ScoutTexts.get("LogicDateIsInGEMonths")) : text);
+      case OPERATOR_DATE_IS_IN_LE_DAYS:
+        return new DateIsInLEDays(OPERATOR_DATE_IS_IN_LE_DAYS, (shortText == null) ? (ScoutTexts.get("LogicDateIsInLEDays")) : (shortText), (text == null) ? (ScoutTexts.get("LogicDateIsInLEDays")) : text);
+      case OPERATOR_DATE_IS_IN_LE_MONTHS:
+        return new DateIsInLEMonths(OPERATOR_DATE_IS_IN_LE_MONTHS, (shortText == null) ? (ScoutTexts.get("LogicDateIsInLEMonths")) : (shortText), (text == null) ? (ScoutTexts.get("LogicDateIsInLEMonths")) : text);
+      case OPERATOR_DATE_IS_IN_LAST_DAYS:
+        return new DateIsInLastDays(OPERATOR_DATE_IS_IN_LAST_DAYS, (shortText == null) ? (ScoutTexts.get("LogicDateIsInLastDays")) : (shortText), (text == null) ? (ScoutTexts.get("LogicDateIsInLastDays")) : text);
+      case OPERATOR_DATE_IS_IN_LAST_MONTHS:
+        return new DateIsInLastMonths(OPERATOR_DATE_IS_IN_LAST_MONTHS, (shortText == null) ? (ScoutTexts.get("LogicDateIsInLastMonths")) : (shortText), (text == null) ? (ScoutTexts.get("LogicDateIsInLastMonths")) : text);
+      case OPERATOR_DATE_IS_IN_MONTHS:
+        return new DateIsInMonths(OPERATOR_DATE_IS_IN_MONTHS, (shortText == null) ? (ScoutTexts.get("LogicDateIsInMonths")) : (shortText), (text == null) ? (ScoutTexts.get("LogicDateIsInMonths")) : text);
+      case OPERATOR_DATE_IS_IN_NEXT_DAYS:
+        return new DateIsInNextDays(OPERATOR_DATE_IS_IN_NEXT_DAYS, (shortText == null) ? (ScoutTexts.get("LogicDateIsInNextDays")) : (shortText), (text == null) ? (ScoutTexts.get("LogicDateIsInNextDays")) : text);
+      case OPERATOR_DATE_IS_IN_NEXT_MONTHS:
+        return new DateIsInNextMonths(OPERATOR_DATE_IS_IN_NEXT_MONTHS, (shortText == null) ? (ScoutTexts.get("LogicDateIsInNextMonths")) : (shortText), (text == null) ? (ScoutTexts.get("LogicDateIsInNextMonths")) : text);
+      case OPERATOR_DATE_IS_NOT_TODAY:
+        return new DateIsNotToday(OPERATOR_DATE_IS_NOT_TODAY, (shortText == null) ? (ScoutTexts.get("LogicDateIsNotToday")) : (shortText), (text == null) ? (ScoutTexts.get("LogicDateIsNotToday")) : text);
+      case OPERATOR_DATE_IS_TODAY:
+        return new DateIsToday(OPERATOR_DATE_IS_TODAY, (shortText == null) ? (ScoutTexts.get("LogicDateIsToday")) : (shortText), (text == null) ? (ScoutTexts.get("LogicDateIsToday")) : text);
+      case OPERATOR_DATE_TIME_IS_IN_GE_HOURS:
+        return new DateTimeIsInGEHours(OPERATOR_DATE_TIME_IS_IN_GE_HOURS, (shortText == null) ? (ScoutTexts.get("LogicDateTimeIsInGEHours")) : (shortText), (text == null) ? (ScoutTexts.get("LogicDateTimeIsInGEHours")) : text);
+      case OPERATOR_DATE_TIME_IS_IN_GE_MINUTES:
+        return new DateTimeIsInGEMinutes(OPERATOR_DATE_TIME_IS_IN_GE_MINUTES, (shortText == null) ? (ScoutTexts.get("LogicDateTimeIsInGEMinutes")) : (shortText), (text == null) ? (ScoutTexts.get("LogicDateTimeIsInGEMinutes")) : text);
+      case OPERATOR_DATE_TIME_IS_IN_LE_HOURS:
+        return new DateTimeIsInLEHours(OPERATOR_DATE_TIME_IS_IN_LE_HOURS, (shortText == null) ? (ScoutTexts.get("LogicDateTimeIsInLEHours")) : (shortText), (text == null) ? (ScoutTexts.get("LogicDateTimeIsInLEHours")) : text);
+      case OPERATOR_DATE_TIME_IS_IN_LE_MINUTES:
+        return new DateTimeIsInLEMinutes(OPERATOR_DATE_TIME_IS_IN_LE_MINUTES, (shortText == null) ? (ScoutTexts.get("LogicDateTimeIsInLEMinutes")) : (shortText), (text == null) ? (ScoutTexts.get("LogicDateTimeIsInLEMinutes")) : text);
+      case OPERATOR_DATE_TIME_IS_NOT_NOW:
+        return new DateTimeIsNotNow(OPERATOR_DATE_TIME_IS_NOT_NOW, (shortText == null) ? (ScoutTexts.get("LogicDateTimeIsNotNow")) : (shortText), (text == null) ? (ScoutTexts.get("LogicDateTimeIsNotNow")) : text);
+      case OPERATOR_DATE_TIME_IS_NOW:
+        return new DateTimeIsNow(OPERATOR_DATE_TIME_IS_NOW, (shortText == null) ? (ScoutTexts.get("LogicDateTimeIsNow")) : (shortText), (text == null) ? (ScoutTexts.get("LogicDateTimeIsNow")) : text);
+      case OPERATOR_ENDS_WITH:
+        return new EndsWith(OPERATOR_ENDS_WITH, (shortText == null) ? (ScoutTexts.get("LogicEndsWith")) : (shortText), (text == null) ? (ScoutTexts.get("LogicEndsWith")) : text);
+      case OPERATOR_NOT_ENDS_WITH:
+        return new NotEndsWith(OPERATOR_NOT_ENDS_WITH, (shortText == null) ? (ScoutTexts.get("LogicNotEndsWith")) : (shortText), (text == null) ? (ScoutTexts.get("LogicNotEndsWith")) : text);
+      case OPERATOR_IN:
+        return new In(OPERATOR_IN, (shortText == null) ? (ScoutTexts.get("LogicIn")) : (shortText), (text == null) ? (ScoutTexts.get("LogicIn")) : text);
+      case OPERATOR_CONTAINS:
+        return new Contains(OPERATOR_CONTAINS, (shortText == null) ? (ScoutTexts.get("LogicLike")) : (shortText), (text == null) ? (ScoutTexts.get("LogicLike")) : text);
+      case OPERATOR_LIKE:
+        return new Like(OPERATOR_LIKE, (shortText == null) ? (ScoutTexts.get("LogicEQ")) : (shortText), (text == null) ? (ScoutTexts.get("LogicEQ")) : text);
+      case OPERATOR_NOT_IN:
+        return new NotIn(OPERATOR_NOT_IN, (shortText == null) ? (ScoutTexts.get("LogicNotIn")) : (shortText), (text == null) ? (ScoutTexts.get("LogicNotIn")) : text);
+      case OPERATOR_NOT_CONTAINS:
+        return new NotContains(OPERATOR_NOT_CONTAINS, (shortText == null) ? (ScoutTexts.get("LogicNotLike")) : (shortText), (text == null) ? (ScoutTexts.get("LogicNotLike")) : text);
+      case OPERATOR_NOT_NULL:
+        return new NotNull(OPERATOR_NOT_NULL, (shortText == null) ? (ScoutTexts.get("LogicNotNull")) : (shortText), (text == null) ? (ScoutTexts.get("LogicNotNull")) : text);
+      case OPERATOR_NUMBER_NOT_NULL:
+        return new NumberNotNull(OPERATOR_NUMBER_NOT_NULL, (shortText == null) ? (ScoutTexts.get("LogicNotNull")) : (shortText), (text == null) ? (ScoutTexts.get("LogicNotNull")) : text);
+      case OPERATOR_NULL:
+        return new Null(OPERATOR_NULL, (shortText == null) ? (ScoutTexts.get("LogicNull")) : (shortText), (text == null) ? (ScoutTexts.get("LogicNull")) : text);
+      case OPERATOR_NUMBER_NULL:
+        return new NumberNull(OPERATOR_NUMBER_NULL, (shortText == null) ? (ScoutTexts.get("LogicNull")) : (shortText), (text == null) ? (ScoutTexts.get("LogicNull")) : text);
+      case OPERATOR_STARTS_WITH:
+        return new StartsWith(OPERATOR_STARTS_WITH, (shortText == null) ? (ScoutTexts.get("LogicStartsWith")) : (shortText), (text == null) ? (ScoutTexts.get("LogicStartsWith")) : text);
+      case OPERATOR_NOT_STARTS_WITH:
+        return new NotStartsWith(OPERATOR_NOT_STARTS_WITH, (shortText == null) ? (ScoutTexts.get("LogicNotStartsWith")) : (shortText), (text == null) ? (ScoutTexts.get("LogicNotStartsWith")) : text);
+      case OPERATOR_TIME_IS_IN_GE_HOURS:
+        return new TimeIsInGEHours(OPERATOR_TIME_IS_IN_GE_HOURS, (shortText == null) ? (ScoutTexts.get("LogicTimeIsInGEHours")) : (shortText), (text == null) ? (ScoutTexts.get("LogicTimeIsInGEHours")) : text);
+      case OPERATOR_TIME_IS_IN_GE_MINUTES:
+        return new TimeIsInGEMinutes(OPERATOR_TIME_IS_IN_GE_MINUTES, (shortText == null) ? (ScoutTexts.get("LogicTimeIsInGEMinutes")) : (shortText), (text == null) ? (ScoutTexts.get("LogicTimeIsInGEMinutes")) : text);
+      case OPERATOR_TIME_IS_IN_HOURS:
+        return new TimeIsInHours(OPERATOR_TIME_IS_IN_HOURS, (shortText == null) ? (ScoutTexts.get("LogicTimeIsInHours")) : (shortText), (text == null) ? (ScoutTexts.get("LogicTimeIsInHours")) : text);
+      case OPERATOR_TIME_IS_IN_LE_HOURS:
+        return new TimeIsInLEHours(OPERATOR_TIME_IS_IN_LE_HOURS, (shortText == null) ? (ScoutTexts.get("LogicTimeIsInLEHours")) : (shortText), (text == null) ? (ScoutTexts.get("LogicTimeIsInLEHours")) : text);
+      case OPERATOR_TIME_IS_IN_LE_MINUTES:
+        return new TimeIsInLEMinutes(OPERATOR_TIME_IS_IN_LE_MINUTES, (shortText == null) ? (ScoutTexts.get("LogicTimeIsInLEMinutes")) : (shortText), (text == null) ? (ScoutTexts.get("LogicTimeIsInLEMinutes")) : text);
+      case OPERATOR_TIME_IS_IN_MINUTES:
+        return new TimeIsInMinutes(OPERATOR_TIME_IS_IN_MINUTES, (shortText == null) ? (ScoutTexts.get("LogicTimeIsInMinutes")) : (shortText), (text == null) ? (ScoutTexts.get("LogicTimeIsInMinutes")) : text);
+      case OPERATOR_TIME_IS_NOW:
+        return new TimeIsNow(OPERATOR_TIME_IS_NOW, (shortText == null) ? (ScoutTexts.get("LogicTimeIsNow")) : (shortText), (text == null) ? (ScoutTexts.get("LogicTimeIsNow")) : text);
+      case OPERATOR_TIME_IS_NOT_NOW:
+        return new TimeIsNotNow(OPERATOR_TIME_IS_NOT_NOW, (shortText == null) ? (ScoutTexts.get("LogicTimeIsNotNow")) : (shortText), (text == null) ? (ScoutTexts.get("LogicTimeIsNotNow")) : text);
+    }
+    return null;
+  }
+
   /**
    * @return a new {@link IDataModelAttributeOp} for a {@link DataModelConstants#OPERATOR_*}
    */
   public static IDataModelAttributeOp create(int operator) {
-    switch (operator) {
-      case OPERATOR_BETWEEN:
-        return new Between(OPERATOR_BETWEEN);
-      case OPERATOR_DATE_BETWEEN:
-        return new Between(OPERATOR_DATE_BETWEEN);
-      case OPERATOR_DATE_TIME_BETWEEN:
-        return new Between(OPERATOR_DATE_TIME_BETWEEN);
-      case OPERATOR_NEQ:
-        return new NEQ(OPERATOR_NEQ);
-      case OPERATOR_DATE_NEQ:
-        return new NEQ(OPERATOR_DATE_NEQ);
-      case OPERATOR_DATE_TIME_NEQ:
-        return new NEQ(OPERATOR_DATE_TIME_NEQ);
-      case OPERATOR_LT:
-        return new LT(OPERATOR_LT);
-      case OPERATOR_DATE_LT:
-        return new LT(OPERATOR_DATE_LT);
-      case OPERATOR_DATE_TIME_LT:
-        return new LT(OPERATOR_DATE_TIME_LT);
-      case OPERATOR_LE:
-        return new LE(OPERATOR_LE);
-      case OPERATOR_DATE_LE:
-        return new LE(OPERATOR_DATE_LE);
-      case OPERATOR_DATE_TIME_LE:
-        return new LE(OPERATOR_DATE_TIME_LE);
-      case OPERATOR_EQ:
-        return new EQ(OPERATOR_EQ);
-      case OPERATOR_DATE_EQ:
-        return new EQ(OPERATOR_DATE_EQ);
-      case OPERATOR_DATE_TIME_EQ:
-        return new EQ(OPERATOR_DATE_TIME_EQ);
-      case OPERATOR_GT:
-        return new GT(OPERATOR_GT);
-      case OPERATOR_DATE_GT:
-        return new GT(OPERATOR_DATE_GT);
-      case OPERATOR_DATE_TIME_GT:
-        return new GT(OPERATOR_DATE_TIME_GT);
-      case OPERATOR_GE:
-        return new GE(OPERATOR_GE);
-      case OPERATOR_DATE_GE:
-        return new GE(OPERATOR_DATE_GE);
-      case OPERATOR_DATE_TIME_GE:
-        return new GE(OPERATOR_DATE_TIME_GE);
-      case OPERATOR_DATE_IS_IN_DAYS:
-        return new DateIsInDays(OPERATOR_DATE_IS_IN_DAYS);
-      case OPERATOR_DATE_IS_IN_GE_DAYS:
-        return new DateIsInGEDays(OPERATOR_DATE_IS_IN_GE_DAYS);
-      case OPERATOR_DATE_IS_IN_GE_MONTHS:
-        return new DateIsInGEMonths(OPERATOR_DATE_IS_IN_GE_MONTHS);
-      case OPERATOR_DATE_IS_IN_LE_DAYS:
-        return new DateIsInLEDays(OPERATOR_DATE_IS_IN_LE_DAYS);
-      case OPERATOR_DATE_IS_IN_LE_MONTHS:
-        return new DateIsInLEMonths(OPERATOR_DATE_IS_IN_LE_MONTHS);
-      case OPERATOR_DATE_IS_IN_LAST_DAYS:
-        return new DateIsInLastDays(OPERATOR_DATE_IS_IN_LAST_DAYS);
-      case OPERATOR_DATE_IS_IN_LAST_MONTHS:
-        return new DateIsInLastMonths(OPERATOR_DATE_IS_IN_LAST_MONTHS);
-      case OPERATOR_DATE_IS_IN_MONTHS:
-        return new DateIsInMonths(OPERATOR_DATE_IS_IN_MONTHS);
-      case OPERATOR_DATE_IS_IN_NEXT_DAYS:
-        return new DateIsInNextDays(OPERATOR_DATE_IS_IN_NEXT_DAYS);
-      case OPERATOR_DATE_IS_IN_NEXT_MONTHS:
-        return new DateIsInNextMonths(OPERATOR_DATE_IS_IN_NEXT_MONTHS);
-      case OPERATOR_DATE_IS_NOT_TODAY:
-        return new DateIsNotToday(OPERATOR_DATE_IS_NOT_TODAY);
-      case OPERATOR_DATE_IS_TODAY:
-        return new DateIsToday(OPERATOR_DATE_IS_TODAY);
-      case OPERATOR_DATE_TIME_IS_IN_GE_HOURS:
-        return new DateTimeIsInGEHours(OPERATOR_DATE_TIME_IS_IN_GE_HOURS);
-      case OPERATOR_DATE_TIME_IS_IN_GE_MINUTES:
-        return new DateTimeIsInGEMinutes(OPERATOR_DATE_TIME_IS_IN_GE_MINUTES);
-      case OPERATOR_DATE_TIME_IS_IN_LE_HOURS:
-        return new DateTimeIsInLEHours(OPERATOR_DATE_TIME_IS_IN_LE_HOURS);
-      case OPERATOR_DATE_TIME_IS_IN_LE_MINUTES:
-        return new DateTimeIsInLEMinutes(OPERATOR_DATE_TIME_IS_IN_LE_MINUTES);
-      case OPERATOR_DATE_TIME_IS_NOT_NOW:
-        return new DateTimeIsNotNow(OPERATOR_DATE_TIME_IS_NOT_NOW);
-      case OPERATOR_DATE_TIME_IS_NOW:
-        return new DateTimeIsNow(OPERATOR_DATE_TIME_IS_NOW);
-      case OPERATOR_ENDS_WITH:
-        return new EndsWith(OPERATOR_ENDS_WITH);
-      case OPERATOR_NOT_ENDS_WITH:
-        return new NotEndsWith(OPERATOR_NOT_ENDS_WITH);
-      case OPERATOR_IN:
-        return new In(OPERATOR_IN);
-      case OPERATOR_CONTAINS:
-        return new Contains(OPERATOR_CONTAINS);
-      case OPERATOR_LIKE:
-        return new Like(OPERATOR_LIKE);
-      case OPERATOR_NOT_IN:
-        return new NotIn(OPERATOR_NOT_IN);
-      case OPERATOR_NOT_CONTAINS:
-        return new NotContains(OPERATOR_NOT_CONTAINS);
-      case OPERATOR_NOT_NULL:
-        return new NotNull(OPERATOR_NOT_NULL);
-      case OPERATOR_NUMBER_NOT_NULL:
-        return new NumberNotNull(OPERATOR_NUMBER_NOT_NULL);
-      case OPERATOR_NULL:
-        return new Null(OPERATOR_NULL);
-      case OPERATOR_NUMBER_NULL:
-        return new NumberNull(OPERATOR_NUMBER_NULL);
-      case OPERATOR_STARTS_WITH:
-        return new StartsWith(OPERATOR_STARTS_WITH);
-      case OPERATOR_NOT_STARTS_WITH:
-        return new NotStartsWith(OPERATOR_NOT_STARTS_WITH);
-      case OPERATOR_TIME_IS_IN_GE_HOURS:
-        return new TimeIsInGEHours(OPERATOR_TIME_IS_IN_GE_HOURS);
-      case OPERATOR_TIME_IS_IN_GE_MINUTES:
-        return new TimeIsInGEMinutes(OPERATOR_TIME_IS_IN_GE_MINUTES);
-      case OPERATOR_TIME_IS_IN_HOURS:
-        return new TimeIsInHours(OPERATOR_TIME_IS_IN_HOURS);
-      case OPERATOR_TIME_IS_IN_LE_HOURS:
-        return new TimeIsInLEHours(OPERATOR_TIME_IS_IN_LE_HOURS);
-      case OPERATOR_TIME_IS_IN_LE_MINUTES:
-        return new TimeIsInLEMinutes(OPERATOR_TIME_IS_IN_LE_MINUTES);
-      case OPERATOR_TIME_IS_IN_MINUTES:
-        return new TimeIsInMinutes(OPERATOR_TIME_IS_IN_MINUTES);
-      case OPERATOR_TIME_IS_NOW:
-        return new TimeIsNow(OPERATOR_TIME_IS_NOW);
-      case OPERATOR_TIME_IS_NOT_NOW:
-        return new TimeIsNotNow(OPERATOR_TIME_IS_NOT_NOW);
-    }
-    return null;
+    return create(operator, null, null);
   }
 
   private abstract static class AbstractDataModelOp implements IDataModelAttributeOp, DataModelConstants, Serializable {
@@ -166,10 +170,10 @@ public final class DataModelAttributeOp implements DataModelConstants {
       return m_operator;
     }
 
-    @Override
-    public String getShortText() {
-      return getText();
-    }
+//    @Override
+//    public abstract String getShortText() {
+//      return getText();
+//    }
 
     @Override
     public boolean equals(Object obj) {
@@ -266,12 +270,16 @@ public final class DataModelAttributeOp implements DataModelConstants {
 
   private static class NEQ extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
+    private String m_shortText;
+    private String m_text;
 
     /**
      * @param aggregationType
      */
-    NEQ(int operator) {
+    NEQ(int operator, String shortText, String text) {
       super(operator);
+      m_shortText = shortText;
+      m_text = text;
     }
 
     @Override
@@ -281,7 +289,12 @@ public final class DataModelAttributeOp implements DataModelConstants {
 
     @Override
     public String getText() {
-      return ScoutTexts.get("LogicNEQ");
+      return m_text;
+    }
+
+    @Override
+    public String getShortText() {
+      return m_shortText;
     }
 
     @Override
@@ -292,12 +305,16 @@ public final class DataModelAttributeOp implements DataModelConstants {
 
   private static class LT extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
+    private String m_shortText;
+    private String m_text;
 
     /**
      * @param aggregationType
      */
-    LT(int operator) {
+    LT(int operator, String shortText, String text) {
       super(operator);
+      m_shortText = shortText;
+      m_text = text;
     }
 
     @Override
@@ -307,7 +324,12 @@ public final class DataModelAttributeOp implements DataModelConstants {
 
     @Override
     public String getText() {
-      return ScoutTexts.get("LogicLT");
+      return m_text;
+    }
+
+    @Override
+    public String getShortText() {
+      return m_shortText;
     }
 
     @Override
@@ -319,11 +341,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
   private static class LE extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
+    private String m_shortText;
+    private String m_text;
+
     /**
      * @param aggregationType
      */
-    LE(int operator) {
+    LE(int operator, String shortText, String text) {
       super(operator);
+      m_shortText = shortText;
+      m_text = text;
+
     }
 
     @Override
@@ -333,7 +361,12 @@ public final class DataModelAttributeOp implements DataModelConstants {
 
     @Override
     public String getText() {
-      return ScoutTexts.get("LogicLE");
+      return m_text;
+    }
+
+    @Override
+    public String getShortText() {
+      return m_shortText;
     }
 
     @Override
@@ -345,11 +378,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
   private static class EQ extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
+    private String m_shortText;
+    private String m_text;
+
     /**
      * @param aggregationType
      */
-    EQ(int operator) {
+    EQ(int operator, String shortText, String text) {
       super(operator);
+      m_shortText = shortText;
+      m_text = text;
+
     }
 
     @Override
@@ -359,7 +398,12 @@ public final class DataModelAttributeOp implements DataModelConstants {
 
     @Override
     public String getText() {
-      return ScoutTexts.get("LogicEQ");
+      return m_text;
+    }
+
+    @Override
+    public String getShortText() {
+      return m_shortText;
     }
 
     @Override
@@ -371,11 +415,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
   private static class GT extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
+    private String m_shortText;
+    private String m_text;
+
     /**
      * @param aggregationType
      */
-    GT(int operator) {
+    GT(int operator, String shortText, String text) {
       super(operator);
+      m_shortText = shortText;
+      m_text = text;
+
     }
 
     @Override
@@ -385,7 +435,12 @@ public final class DataModelAttributeOp implements DataModelConstants {
 
     @Override
     public String getText() {
-      return ScoutTexts.get("LogicGT");
+      return m_text;
+    }
+
+    @Override
+    public String getShortText() {
+      return m_shortText;
     }
 
     @Override
@@ -397,11 +452,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
   private static class GE extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
+    private String m_shortText;
+    private String m_text;
+
     /**
      * @param aggregationType
      */
-    GE(int operator) {
+    GE(int operator, String shortText, String text) {
       super(operator);
+      m_shortText = shortText;
+      m_text = text;
+
     }
 
     @Override
@@ -411,7 +472,12 @@ public final class DataModelAttributeOp implements DataModelConstants {
 
     @Override
     public String getText() {
-      return ScoutTexts.get("LogicGE");
+      return m_text;
+    }
+
+    @Override
+    public String getShortText() {
+      return m_shortText;
     }
 
     @Override
@@ -423,11 +489,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
   private static class DateIsInDays extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
+    private String m_shortText;
+    private String m_text;
+
     /**
      * @param aggregationType
      */
-    DateIsInDays(int operator) {
+    DateIsInDays(int operator, String shortText, String text) {
       super(operator);
+      m_shortText = shortText;
+      m_text = text;
+
     }
 
     @Override
@@ -437,7 +509,12 @@ public final class DataModelAttributeOp implements DataModelConstants {
 
     @Override
     public String getText() {
-      return ScoutTexts.get("LogicDateIsInDays");
+      return m_text;
+    }
+
+    @Override
+    public String getShortText() {
+      return m_shortText;
     }
 
     @Override
@@ -449,11 +526,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
   private static class DateIsInGEDays extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
+    private String m_shortText;
+    private String m_text;
+
     /**
      * @param aggregationType
      */
-    DateIsInGEDays(int operator) {
+    DateIsInGEDays(int operator, String shortText, String text) {
       super(operator);
+      m_shortText = shortText;
+      m_text = text;
+
     }
 
     @Override
@@ -463,7 +546,12 @@ public final class DataModelAttributeOp implements DataModelConstants {
 
     @Override
     public String getText() {
-      return ScoutTexts.get("LogicDateIsInGEDays");
+      return m_text;
+    }
+
+    @Override
+    public String getShortText() {
+      return m_shortText;
     }
 
     @Override
@@ -475,11 +563,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
   private static class DateIsInGEMonths extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
+    private String m_shortText;
+    private String m_text;
+
     /**
      * @param aggregationType
      */
-    DateIsInGEMonths(int operator) {
+    DateIsInGEMonths(int operator, String shortText, String text) {
       super(operator);
+      m_shortText = shortText;
+      m_text = text;
+
     }
 
     @Override
@@ -489,7 +583,12 @@ public final class DataModelAttributeOp implements DataModelConstants {
 
     @Override
     public String getText() {
-      return ScoutTexts.get("LogicDateIsInGEMonths");
+      return m_text;
+    }
+
+    @Override
+    public String getShortText() {
+      return m_shortText;
     }
 
     @Override
@@ -501,11 +600,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
   private static class DateIsInLEDays extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
+    private String m_shortText;
+    private String m_text;
+
     /**
      * @param aggregationType
      */
-    DateIsInLEDays(int operator) {
+    DateIsInLEDays(int operator, String shortText, String text) {
       super(operator);
+      m_shortText = shortText;
+      m_text = text;
+
     }
 
     @Override
@@ -515,7 +620,12 @@ public final class DataModelAttributeOp implements DataModelConstants {
 
     @Override
     public String getText() {
-      return ScoutTexts.get("LogicDateIsInLEDays");
+      return m_text;
+    }
+
+    @Override
+    public String getShortText() {
+      return m_shortText;
     }
 
     @Override
@@ -527,11 +637,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
   private static class DateIsInLEMonths extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
+    private String m_shortText;
+    private String m_text;
+
     /**
      * @param aggregationType
      */
-    DateIsInLEMonths(int operator) {
+    DateIsInLEMonths(int operator, String shortText, String text) {
       super(operator);
+      m_shortText = shortText;
+      m_text = text;
+
     }
 
     @Override
@@ -541,7 +657,12 @@ public final class DataModelAttributeOp implements DataModelConstants {
 
     @Override
     public String getText() {
-      return ScoutTexts.get("LogicDateIsInLEMonths");
+      return m_text;
+    }
+
+    @Override
+    public String getShortText() {
+      return m_shortText;
     }
 
     @Override
@@ -553,11 +674,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
   private static class DateIsInLastDays extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
+    private String m_shortText;
+    private String m_text;
+
     /**
      * @param aggregationType
      */
-    DateIsInLastDays(int operator) {
+    DateIsInLastDays(int operator, String shortText, String text) {
       super(operator);
+      m_shortText = shortText;
+      m_text = text;
+
     }
 
     @Override
@@ -567,7 +694,12 @@ public final class DataModelAttributeOp implements DataModelConstants {
 
     @Override
     public String getText() {
-      return ScoutTexts.get("LogicDateIsInLastDays");
+      return m_text;
+    }
+
+    @Override
+    public String getShortText() {
+      return m_shortText;
     }
 
     @Override
@@ -579,11 +711,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
   private static class DateIsInLastMonths extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
+    private String m_shortText;
+    private String m_text;
+
     /**
      * @param aggregationType
      */
-    DateIsInLastMonths(int operator) {
+    DateIsInLastMonths(int operator, String shortText, String text) {
       super(operator);
+      m_shortText = shortText;
+      m_text = text;
+
     }
 
     @Override
@@ -593,7 +731,12 @@ public final class DataModelAttributeOp implements DataModelConstants {
 
     @Override
     public String getText() {
-      return ScoutTexts.get("LogicDateIsInLastMonths");
+      return m_text;
+    }
+
+    @Override
+    public String getShortText() {
+      return m_shortText;
     }
 
     @Override
@@ -605,11 +748,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
   private static class DateIsInMonths extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
+    private String m_shortText;
+    private String m_text;
+
     /**
      * @param aggregationType
      */
-    DateIsInMonths(int operator) {
+    DateIsInMonths(int operator, String shortText, String text) {
       super(operator);
+      m_shortText = shortText;
+      m_text = text;
+
     }
 
     @Override
@@ -619,7 +768,12 @@ public final class DataModelAttributeOp implements DataModelConstants {
 
     @Override
     public String getText() {
-      return ScoutTexts.get("LogicDateIsInMonths");
+      return m_text;
+    }
+
+    @Override
+    public String getShortText() {
+      return m_shortText;
     }
 
     @Override
@@ -631,11 +785,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
   private static class DateIsInNextDays extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
+    private String m_shortText;
+    private String m_text;
+
     /**
      * @param aggregationType
      */
-    DateIsInNextDays(int operator) {
+    DateIsInNextDays(int operator, String shortText, String text) {
       super(operator);
+      m_shortText = shortText;
+      m_text = text;
+
     }
 
     @Override
@@ -645,7 +805,12 @@ public final class DataModelAttributeOp implements DataModelConstants {
 
     @Override
     public String getText() {
-      return ScoutTexts.get("LogicDateIsInNextDays");
+      return m_text;
+    }
+
+    @Override
+    public String getShortText() {
+      return m_shortText;
     }
 
     @Override
@@ -657,11 +822,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
   private static class DateIsInNextMonths extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
+    private String m_shortText;
+    private String m_text;
+
     /**
      * @param aggregationType
      */
-    DateIsInNextMonths(int operator) {
+    DateIsInNextMonths(int operator, String shortText, String text) {
       super(operator);
+      m_shortText = shortText;
+      m_text = text;
+
     }
 
     @Override
@@ -671,7 +842,12 @@ public final class DataModelAttributeOp implements DataModelConstants {
 
     @Override
     public String getText() {
-      return ScoutTexts.get("LogicDateIsInNextMonths");
+      return m_text;
+    }
+
+    @Override
+    public String getShortText() {
+      return m_shortText;
     }
 
     @Override
@@ -683,21 +859,32 @@ public final class DataModelAttributeOp implements DataModelConstants {
   private static class DateIsNotToday extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
+    private String m_shortText;
+    private String m_text;
+
     /**
      * @param aggregationType
      */
-    DateIsNotToday(int operator) {
+    DateIsNotToday(int operator, String shortText, String text) {
       super(operator);
+      m_shortText = shortText;
+      m_text = text;
+
     }
 
     @Override
     public String createVerboseText(Integer aggregationType, String attributeText, List<String> valueTexts) {
-      return buildText(aggregationType, attributeText, ScoutTexts.get("LogicDateIsNotToday"));
+      return buildText(aggregationType, attributeText, getText());
     }
 
     @Override
     public String getText() {
-      return ScoutTexts.get("LogicDateIsNotToday");
+      return m_text;
+    }
+
+    @Override
+    public String getShortText() {
+      return m_shortText;
     }
 
     @Override
@@ -709,21 +896,32 @@ public final class DataModelAttributeOp implements DataModelConstants {
   private static class DateIsToday extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
+    private String m_shortText;
+    private String m_text;
+
     /**
      * @param aggregationType
      */
-    DateIsToday(int operator) {
+    DateIsToday(int operator, String shortText, String text) {
       super(operator);
+      m_shortText = shortText;
+      m_text = text;
+
     }
 
     @Override
     public String createVerboseText(Integer aggregationType, String attributeText, List<String> valueTexts) {
-      return buildText(aggregationType, attributeText, ScoutTexts.get("LogicDateIsToday"));
+      return buildText(aggregationType, attributeText, getText());
     }
 
     @Override
     public String getText() {
-      return ScoutTexts.get("LogicDateIsToday");
+      return m_text;
+    }
+
+    @Override
+    public String getShortText() {
+      return m_shortText;
     }
 
     @Override
@@ -735,11 +933,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
   private static class DateTimeIsInGEHours extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
+    private String m_shortText;
+    private String m_text;
+
     /**
      * @param aggregationType
      */
-    DateTimeIsInGEHours(int operator) {
+    DateTimeIsInGEHours(int operator, String shortText, String text) {
       super(operator);
+      m_shortText = shortText;
+      m_text = text;
+
     }
 
     @Override
@@ -749,7 +953,12 @@ public final class DataModelAttributeOp implements DataModelConstants {
 
     @Override
     public String getText() {
-      return ScoutTexts.get("LogicDateTimeIsInGEHours");
+      return m_text;
+    }
+
+    @Override
+    public String getShortText() {
+      return m_shortText;
     }
 
     @Override
@@ -761,11 +970,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
   private static class DateTimeIsInGEMinutes extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
+    private String m_shortText;
+    private String m_text;
+
     /**
      * @param aggregationType
      */
-    DateTimeIsInGEMinutes(int operator) {
+    DateTimeIsInGEMinutes(int operator, String shortText, String text) {
       super(operator);
+      m_shortText = shortText;
+      m_text = text;
+
     }
 
     @Override
@@ -775,7 +990,12 @@ public final class DataModelAttributeOp implements DataModelConstants {
 
     @Override
     public String getText() {
-      return ScoutTexts.get("LogicDateTimeIsInGEMinutes");
+      return m_text;
+    }
+
+    @Override
+    public String getShortText() {
+      return m_shortText;
     }
 
     @Override
@@ -787,11 +1007,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
   private static class DateTimeIsInLEHours extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
+    private String m_shortText;
+    private String m_text;
+
     /**
      * @param aggregationType
      */
-    DateTimeIsInLEHours(int operator) {
+    DateTimeIsInLEHours(int operator, String shortText, String text) {
       super(operator);
+      m_shortText = shortText;
+      m_text = text;
+
     }
 
     @Override
@@ -801,7 +1027,12 @@ public final class DataModelAttributeOp implements DataModelConstants {
 
     @Override
     public String getText() {
-      return ScoutTexts.get("LogicDateTimeIsInLEHours");
+      return m_text;
+    }
+
+    @Override
+    public String getShortText() {
+      return m_shortText;
     }
 
     @Override
@@ -813,11 +1044,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
   private static class DateTimeIsInLEMinutes extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
+    private String m_shortText;
+    private String m_text;
+
     /**
      * @param aggregationType
      */
-    DateTimeIsInLEMinutes(int operator) {
+    DateTimeIsInLEMinutes(int operator, String shortText, String text) {
       super(operator);
+      m_shortText = shortText;
+      m_text = text;
+
     }
 
     @Override
@@ -827,7 +1064,12 @@ public final class DataModelAttributeOp implements DataModelConstants {
 
     @Override
     public String getText() {
-      return ScoutTexts.get("LogicDateTimeIsInLEMinutes");
+      return m_text;
+    }
+
+    @Override
+    public String getShortText() {
+      return m_shortText;
     }
 
     @Override
@@ -839,21 +1081,32 @@ public final class DataModelAttributeOp implements DataModelConstants {
   private static class DateTimeIsNotNow extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
+    private String m_shortText;
+    private String m_text;
+
     /**
      * @param aggregationType
      */
-    DateTimeIsNotNow(int operator) {
+    DateTimeIsNotNow(int operator, String shortText, String text) {
       super(operator);
+      m_shortText = shortText;
+      m_text = text;
+
     }
 
     @Override
     public String createVerboseText(Integer aggregationType, String attributeText, List<String> valueTexts) {
-      return buildText(aggregationType, attributeText, ScoutTexts.get("LogicDateTimeIsNotNow"));
+      return buildText(aggregationType, attributeText, getText());
     }
 
     @Override
     public String getText() {
-      return ScoutTexts.get("LogicDateTimeIsNotNow");
+      return m_text;
+    }
+
+    @Override
+    public String getShortText() {
+      return m_shortText;
     }
 
     @Override
@@ -865,21 +1118,32 @@ public final class DataModelAttributeOp implements DataModelConstants {
   private static class DateTimeIsNow extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
+    private String m_shortText;
+    private String m_text;
+
     /**
      * @param aggregationType
      */
-    DateTimeIsNow(int operator) {
+    DateTimeIsNow(int operator, String shortText, String text) {
       super(operator);
+      m_shortText = shortText;
+      m_text = text;
+
     }
 
     @Override
     public String createVerboseText(Integer aggregationType, String attributeText, List<String> valueTexts) {
-      return buildText(aggregationType, attributeText, ScoutTexts.get("LogicDateTimeIsNow"));
+      return buildText(aggregationType, attributeText, getText());
     }
 
     @Override
     public String getText() {
-      return ScoutTexts.get("LogicDateTimeIsNow");
+      return m_text;
+    }
+
+    @Override
+    public String getShortText() {
+      return m_shortText;
     }
 
     @Override
@@ -891,11 +1155,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
   private static class EndsWith extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
+    private String m_shortText;
+    private String m_text;
+
     /**
      * @param aggregationType
      */
-    EndsWith(int operator) {
+    EndsWith(int operator, String shortText, String text) {
       super(operator);
+      m_shortText = shortText;
+      m_text = text;
+
     }
 
     @Override
@@ -905,7 +1175,12 @@ public final class DataModelAttributeOp implements DataModelConstants {
 
     @Override
     public String getText() {
-      return ScoutTexts.get("LogicEndsWith");
+      return m_text;
+    }
+
+    @Override
+    public String getShortText() {
+      return m_shortText;
     }
 
     @Override
@@ -917,11 +1192,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
   private static class NotEndsWith extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
+    private String m_shortText;
+    private String m_text;
+
     /**
      * @param aggregationType
      */
-    NotEndsWith(int operator) {
+    NotEndsWith(int operator, String shortText, String text) {
       super(operator);
+      m_shortText = shortText;
+      m_text = text;
+
     }
 
     @Override
@@ -931,7 +1212,12 @@ public final class DataModelAttributeOp implements DataModelConstants {
 
     @Override
     public String getText() {
-      return ScoutTexts.get("LogicNotEndsWith");
+      return m_text;
+    }
+
+    @Override
+    public String getShortText() {
+      return m_shortText;
     }
 
     @Override
@@ -943,11 +1229,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
   private static class In extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
+    private String m_shortText;
+    private String m_text;
+
     /**
      * @param aggregationType
      */
-    In(int operator) {
+    In(int operator, String shortText, String text) {
       super(operator);
+      m_shortText = shortText;
+      m_text = text;
+
     }
 
     @Override
@@ -957,7 +1249,12 @@ public final class DataModelAttributeOp implements DataModelConstants {
 
     @Override
     public String getText() {
-      return ScoutTexts.get("LogicIn");
+      return m_text;
+    }
+
+    @Override
+    public String getShortText() {
+      return m_shortText;
     }
 
     @Override
@@ -969,11 +1266,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
   private static class Contains extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
+    private String m_shortText;
+    private String m_text;
+
     /**
      * @param aggregationType
      */
-    Contains(int operator) {
+    Contains(int operator, String shortText, String text) {
       super(operator);
+      m_shortText = shortText;
+      m_text = text;
+
     }
 
     @Override
@@ -983,7 +1286,12 @@ public final class DataModelAttributeOp implements DataModelConstants {
 
     @Override
     public String getText() {
-      return ScoutTexts.get("LogicLike");
+      return m_text;
+    }
+
+    @Override
+    public String getShortText() {
+      return m_shortText;
     }
 
     @Override
@@ -995,11 +1303,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
   private static class NotIn extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
+    private String m_shortText;
+    private String m_text;
+
     /**
      * @param aggregationType
      */
-    NotIn(int operator) {
+    NotIn(int operator, String shortText, String text) {
       super(operator);
+      m_shortText = shortText;
+      m_text = text;
+
     }
 
     @Override
@@ -1009,7 +1323,12 @@ public final class DataModelAttributeOp implements DataModelConstants {
 
     @Override
     public String getText() {
-      return ScoutTexts.get("LogicNotIn");
+      return m_text;
+    }
+
+    @Override
+    public String getShortText() {
+      return m_shortText;
     }
 
     @Override
@@ -1021,11 +1340,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
   private static class NotContains extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
+    private String m_shortText;
+    private String m_text;
+
     /**
      * @param aggregationType
      */
-    NotContains(int operator) {
+    NotContains(int operator, String shortText, String text) {
       super(operator);
+      m_shortText = shortText;
+      m_text = text;
+
     }
 
     @Override
@@ -1035,7 +1360,12 @@ public final class DataModelAttributeOp implements DataModelConstants {
 
     @Override
     public String getText() {
-      return ScoutTexts.get("LogicNotLike");
+      return m_text;
+    }
+
+    @Override
+    public String getShortText() {
+      return m_shortText;
     }
 
     @Override
@@ -1047,21 +1377,32 @@ public final class DataModelAttributeOp implements DataModelConstants {
   private static class NotNull extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
+    private String m_shortText;
+    private String m_text;
+
     /**
      * @param aggregationType
      */
-    NotNull(int operator) {
+    NotNull(int operator, String shortText, String text) {
       super(operator);
+      m_shortText = shortText;
+      m_text = text;
+
     }
 
     @Override
     public String createVerboseText(Integer aggregationType, String attributeText, List<String> valueTexts) {
-      return buildText(aggregationType, attributeText, ScoutTexts.get("LogicNotNull"));
+      return buildText(aggregationType, attributeText, getText());
     }
 
     @Override
     public String getText() {
-      return ScoutTexts.get("LogicNotNull");
+      return m_text;
+    }
+
+    @Override
+    public String getShortText() {
+      return m_shortText;
     }
 
     @Override
@@ -1076,21 +1417,32 @@ public final class DataModelAttributeOp implements DataModelConstants {
   private static class NumberNotNull extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
+    private String m_shortText;
+    private String m_text;
+
     /**
      * @param aggregationType
      */
-    NumberNotNull(int operator) {
+    NumberNotNull(int operator, String shortText, String text) {
       super(operator);
+      m_shortText = shortText;
+      m_text = text;
+
     }
 
     @Override
     public String createVerboseText(Integer aggregationType, String attributeText, List<String> valueTexts) {
-      return buildText(aggregationType, attributeText, ScoutTexts.get("LogicNotNull"));
+      return buildText(aggregationType, attributeText, getText());
     }
 
     @Override
     public String getText() {
-      return ScoutTexts.get("LogicNotNull");
+      return m_text;
+    }
+
+    @Override
+    public String getShortText() {
+      return m_shortText;
     }
 
     @Override
@@ -1102,21 +1454,32 @@ public final class DataModelAttributeOp implements DataModelConstants {
   private static class Null extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
+    private String m_shortText;
+    private String m_text;
+
     /**
      * @param aggregationType
      */
-    Null(int operator) {
+    Null(int operator, String shortText, String text) {
       super(operator);
+      m_shortText = shortText;
+      m_text = text;
+
     }
 
     @Override
     public String createVerboseText(Integer aggregationType, String attributeText, List<String> valueTexts) {
-      return buildText(aggregationType, attributeText, ScoutTexts.get("LogicNull"));
+      return buildText(aggregationType, attributeText, getText());
     }
 
     @Override
     public String getText() {
-      return ScoutTexts.get("LogicNull");
+      return m_text;
+    }
+
+    @Override
+    public String getShortText() {
+      return m_shortText;
     }
 
     @Override
@@ -1131,21 +1494,32 @@ public final class DataModelAttributeOp implements DataModelConstants {
   private static class NumberNull extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
+    private String m_shortText;
+    private String m_text;
+
     /**
      * @param aggregationType
      */
-    NumberNull(int operator) {
+    NumberNull(int operator, String shortText, String text) {
       super(operator);
+      m_shortText = shortText;
+      m_text = text;
+
     }
 
     @Override
     public String createVerboseText(Integer aggregationType, String attributeText, List<String> valueTexts) {
-      return buildText(aggregationType, attributeText, ScoutTexts.get("LogicNull"));
+      return buildText(aggregationType, attributeText, getText());
     }
 
     @Override
     public String getText() {
-      return ScoutTexts.get("LogicNull");
+      return m_text;
+    }
+
+    @Override
+    public String getShortText() {
+      return m_shortText;
     }
 
     @Override
@@ -1157,11 +1531,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
   private static class StartsWith extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
+    private String m_shortText;
+    private String m_text;
+
     /**
      * @param aggregationType
      */
-    StartsWith(int operator) {
+    StartsWith(int operator, String shortText, String text) {
       super(operator);
+      m_shortText = shortText;
+      m_text = text;
+
     }
 
     @Override
@@ -1171,7 +1551,12 @@ public final class DataModelAttributeOp implements DataModelConstants {
 
     @Override
     public String getText() {
-      return ScoutTexts.get("LogicStartsWith");
+      return m_text;
+    }
+
+    @Override
+    public String getShortText() {
+      return m_shortText;
     }
 
     @Override
@@ -1183,11 +1568,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
   private static class NotStartsWith extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
+    private String m_shortText;
+    private String m_text;
+
     /**
      * @param aggregationType
      */
-    NotStartsWith(int operator) {
+    NotStartsWith(int operator, String shortText, String text) {
       super(operator);
+      m_shortText = shortText;
+      m_text = text;
+
     }
 
     @Override
@@ -1197,7 +1588,12 @@ public final class DataModelAttributeOp implements DataModelConstants {
 
     @Override
     public String getText() {
-      return ScoutTexts.get("LogicNotStartsWith");
+      return m_text;
+    }
+
+    @Override
+    public String getShortText() {
+      return m_shortText;
     }
 
     @Override
@@ -1209,11 +1605,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
   private static class TimeIsInGEHours extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
+    private String m_shortText;
+    private String m_text;
+
     /**
      * @param aggregationType
      */
-    TimeIsInGEHours(int operator) {
+    TimeIsInGEHours(int operator, String shortText, String text) {
       super(operator);
+      m_shortText = shortText;
+      m_text = text;
+
     }
 
     @Override
@@ -1223,7 +1625,12 @@ public final class DataModelAttributeOp implements DataModelConstants {
 
     @Override
     public String getText() {
-      return ScoutTexts.get("LogicTimeIsInGEHours");
+      return m_text;
+    }
+
+    @Override
+    public String getShortText() {
+      return m_shortText;
     }
 
     @Override
@@ -1235,11 +1642,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
   private static class TimeIsInGEMinutes extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
+    private String m_shortText;
+    private String m_text;
+
     /**
      * @param aggregationType
      */
-    TimeIsInGEMinutes(int operator) {
+    TimeIsInGEMinutes(int operator, String shortText, String text) {
       super(operator);
+      m_shortText = shortText;
+      m_text = text;
+
     }
 
     @Override
@@ -1249,7 +1662,12 @@ public final class DataModelAttributeOp implements DataModelConstants {
 
     @Override
     public String getText() {
-      return ScoutTexts.get("LogicTimeIsInGEMinutes");
+      return m_text;
+    }
+
+    @Override
+    public String getShortText() {
+      return m_shortText;
     }
 
     @Override
@@ -1261,11 +1679,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
   private static class TimeIsInHours extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
+    private String m_shortText;
+    private String m_text;
+
     /**
      * @param aggregationType
      */
-    TimeIsInHours(int operator) {
+    TimeIsInHours(int operator, String shortText, String text) {
       super(operator);
+      m_shortText = shortText;
+      m_text = text;
+
     }
 
     @Override
@@ -1275,7 +1699,12 @@ public final class DataModelAttributeOp implements DataModelConstants {
 
     @Override
     public String getText() {
-      return ScoutTexts.get("LogicTimeIsInHours");
+      return m_text;
+    }
+
+    @Override
+    public String getShortText() {
+      return m_shortText;
     }
 
     @Override
@@ -1287,11 +1716,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
   private static class TimeIsInLEHours extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
+    private String m_shortText;
+    private String m_text;
+
     /**
      * @param aggregationType
      */
-    TimeIsInLEHours(int operator) {
+    TimeIsInLEHours(int operator, String shortText, String text) {
       super(operator);
+      m_shortText = shortText;
+      m_text = text;
+
     }
 
     @Override
@@ -1301,7 +1736,12 @@ public final class DataModelAttributeOp implements DataModelConstants {
 
     @Override
     public String getText() {
-      return ScoutTexts.get("LogicTimeIsInLEHours");
+      return m_text;
+    }
+
+    @Override
+    public String getShortText() {
+      return m_shortText;
     }
 
     @Override
@@ -1313,11 +1753,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
   private static class TimeIsInLEMinutes extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
+    private String m_shortText;
+    private String m_text;
+
     /**
      * @param aggregationType
      */
-    TimeIsInLEMinutes(int operator) {
+    TimeIsInLEMinutes(int operator, String shortText, String text) {
       super(operator);
+      m_shortText = shortText;
+      m_text = text;
+
     }
 
     @Override
@@ -1327,7 +1773,12 @@ public final class DataModelAttributeOp implements DataModelConstants {
 
     @Override
     public String getText() {
-      return ScoutTexts.get("LogicTimeIsInLEMinutes");
+      return m_text;
+    }
+
+    @Override
+    public String getShortText() {
+      return m_shortText;
     }
 
     @Override
@@ -1339,11 +1790,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
   private static class TimeIsInMinutes extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
+    private String m_shortText;
+    private String m_text;
+
     /**
      * @param aggregationType
      */
-    TimeIsInMinutes(int operator) {
+    TimeIsInMinutes(int operator, String shortText, String text) {
       super(operator);
+      m_shortText = shortText;
+      m_text = text;
+
     }
 
     @Override
@@ -1353,7 +1810,12 @@ public final class DataModelAttributeOp implements DataModelConstants {
 
     @Override
     public String getText() {
-      return ScoutTexts.get("LogicTimeIsInMinutes");
+      return m_text;
+    }
+
+    @Override
+    public String getShortText() {
+      return m_shortText;
     }
 
     @Override
@@ -1365,21 +1827,32 @@ public final class DataModelAttributeOp implements DataModelConstants {
   private static class TimeIsNow extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
+    private String m_shortText;
+    private String m_text;
+
     /**
      * @param aggregationType
      */
-    TimeIsNow(int operator) {
+    TimeIsNow(int operator, String shortText, String text) {
       super(operator);
+      m_shortText = shortText;
+      m_text = text;
+
     }
 
     @Override
     public String createVerboseText(Integer aggregationType, String attributeText, List<String> valueTexts) {
-      return buildText(aggregationType, attributeText, ScoutTexts.get("LogicTimeIsNow"));
+      return buildText(aggregationType, attributeText, getText());
     }
 
     @Override
     public String getText() {
-      return ScoutTexts.get("LogicTimeIsNow");
+      return m_text;
+    }
+
+    @Override
+    public String getShortText() {
+      return m_shortText;
     }
 
     @Override
@@ -1391,21 +1864,32 @@ public final class DataModelAttributeOp implements DataModelConstants {
   private static class TimeIsNotNow extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
+    private String m_shortText;
+    private String m_text;
+
     /**
      * @param aggregationType
      */
-    TimeIsNotNow(int operator) {
+    TimeIsNotNow(int operator, String shortText, String text) {
       super(operator);
+      m_shortText = shortText;
+      m_text = text;
+
     }
 
     @Override
     public String createVerboseText(Integer aggregationType, String attributeText, List<String> valueTexts) {
-      return buildText(aggregationType, attributeText, ScoutTexts.get("LogicTimeIsNotNow"));
+      return buildText(aggregationType, attributeText, getText());
     }
 
     @Override
     public String getText() {
-      return ScoutTexts.get("LogicTimeIsNotNow");
+      return m_text;
+    }
+
+    @Override
+    public String getShortText() {
+      return m_shortText;
     }
 
     @Override
@@ -1416,17 +1900,16 @@ public final class DataModelAttributeOp implements DataModelConstants {
 
   private static class Between extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
+    private String m_shortText;
+    private String m_text;
 
     /**
      * @param aggregationType
      */
-    Between(int operator) {
+    Between(int operator, String shortText, String text) {
       super(operator);
-    }
-
-    @Override
-    public String getShortText() {
-      return ScoutTexts.get("LogicBetweenShort");
+      m_shortText = shortText;
+      m_text = text;
     }
 
     @Override
@@ -1444,7 +1927,12 @@ public final class DataModelAttributeOp implements DataModelConstants {
 
     @Override
     public String getText() {
-      return ScoutTexts.get("LogicBetween");
+      return m_text;
+    }
+
+    @Override
+    public String getShortText() {
+      return m_shortText;
     }
 
     @Override
@@ -1456,11 +1944,17 @@ public final class DataModelAttributeOp implements DataModelConstants {
   private static class Like extends AbstractDataModelOp {
     private static final long serialVersionUID = 1L;
 
+    private String m_shortText;
+    private String m_text;
+
     /**
      * @param aggregationType
      */
-    Like(int operator) {
+    Like(int operator, String shortText, String text) {
       super(operator);
+      m_shortText = shortText;
+      m_text = text;
+
     }
 
     @Override
@@ -1470,7 +1964,12 @@ public final class DataModelAttributeOp implements DataModelConstants {
 
     @Override
     public String getText() {
-      return ScoutTexts.get("LogicEQ");
+      return m_text;
+    }
+
+    @Override
+    public String getShortText() {
+      return m_shortText;
     }
 
     @Override
