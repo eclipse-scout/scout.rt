@@ -25,6 +25,7 @@ scout.FormField.prototype._renderProperties = function() {
   this._renderEnabled(this.enabled);
   this._renderMandatory(this.mandatory);
   this._renderVisible(this.visible);
+  this._renderTooltipText(this.tooltipText);
   this._renderErrorStatus(this.errorStatus);
   this._renderLabel(this.label);
   this._renderLabelVisible(this.labelVisible);
@@ -35,25 +36,18 @@ scout.FormField.prototype._renderMandatory = function(mandatory) {
 };
 
 scout.FormField.prototype._renderErrorStatus = function(errorStatus) {
-  var title;
   this.$container.updateClass(errorStatus, 'has-error');
 
   if (this.$field) {
     this.$field.updateClass(errorStatus, 'has-error');
   }
+};
 
-  if (this.$status) {
-    if (errorStatus) {
-      title = errorStatus.message;
-    }
+scout.FormField.prototype._renderTooltipText = function(tooltipText) {
+  this.$container.updateClass(tooltipText, 'has-tooltip');
 
-    if (title) {
-      this.$status.attr('title', title);
-      this.$status.addClass('error-status');
-    } else {
-      this.$status.removeAttr('title');
-      this.$status.removeClass('error-status');
-    }
+  if (this.$field) {
+    this.$field.updateClass(tooltipText, 'has-tooltip');
   }
 };
 
@@ -101,6 +95,24 @@ scout.FormField.prototype._renderGridData = function(gridData) {
   // NOP
 };
 
+scout.FormField.prototype._onStatusClick = function() {
+  var text, tooltip;
+
+  if (this.errorStatusUi) {
+    text = this.errorStatusUi.message;
+  } else if (this.errorStatus) {
+    text = this.errorStatus.message;
+  } else {
+    text = this.tooltipText;
+  }
+
+  tooltip = new scout.Tooltip({
+    text: text,
+    $origin: this.$status
+  });
+  tooltip.render();
+};
+
 scout.FormField.prototype.goOffline = function() {
   scout.FormField.parent.prototype.goOffline.call(this);
   this._renderEnabled(false);
@@ -129,6 +141,7 @@ scout.FormField.prototype.addLabel = function() {
 scout.FormField.prototype.addStatus = function() {
   this.$status = $('<span>').
     addClass('status').
+    click(this._onStatusClick.bind(this)).
     appendTo(this.$container);
 };
 

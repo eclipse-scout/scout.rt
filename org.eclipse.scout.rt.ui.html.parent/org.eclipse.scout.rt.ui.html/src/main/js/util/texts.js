@@ -7,7 +7,8 @@ scout.texts = {
       'oneOption':'1 Option',
       'options':'{0} Optionen',
       'invalidDateFormat':'Das Datum ist in einem ungültigen Format',
-      'resetColumns':'Spalten zurücksetzen'
+      'resetColumns':'Spalten zurücksetzen',
+      'filterBy':'Filtern nach ...'
   }
 };
 

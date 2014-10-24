@@ -53,10 +53,11 @@
 @color-bench-select-border: #0082A1;
 
 @color-bench-highlight: #FE9915;
-
+@color-text-grey: #666666;
 
 /* TODO AWE: (css/colors) ueber naming diskutieren */
 @color-error: #FF6060;
+@color-info: #565656;
 @color-error-light: #FFE0E0;
 @color-bsi-orange: #FE9915;
 @color-bsi-green: #0082A1;

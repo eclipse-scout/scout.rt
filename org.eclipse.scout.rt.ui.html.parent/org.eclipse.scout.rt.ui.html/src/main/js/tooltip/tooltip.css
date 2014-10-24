@@ -1,0 +1,41 @@
+@tooltip-arrow-size: 14px;
+@tooltip-background-color: @color-bench-light;
+@tooltip-border-size: 1px;
+@tooltip-border: @tooltip-border-size solid @color-bench-semi;
+
+.tooltip {
+  position: absolute;
+  background-color: @tooltip-background-color;
+  border: @tooltip-border;
+  color: @color-text-grey;
+  .drop-shadow();
+  max-width: 300px;
+  z-index: 1000; /*FIXME CGU oder eher in scout div zu unterst?*/
+  white-space: normal;
+}
+
+.tooltip-content {
+  background-color: @tooltip-background-color;
+  padding: 8px 12px;
+  position: relative;
+}
+
+.tooltip-arrow {
+  position: absolute;
+  width: @tooltip-arrow-size;
+  height: @tooltip-arrow-size;
+  background-color: @tooltip-background-color;
+  border: @tooltip-border;
+  transform: rotate(45deg);
+  .drop-shadow();
+}
+
+.tooltip-arrow.arrow-bottom {
+  bottom: -(@tooltip-arrow-size / 2);
+  margin-left: -(@tooltip-arrow-size / 2) - @tooltip-border-size;
+}
+
+.tooltip-arrow.arrow-top {
+  top: -(@tooltip-arrow-size / 2);
+  margin-left: -(@tooltip-arrow-size / 2) - @tooltip-border-size;
+}

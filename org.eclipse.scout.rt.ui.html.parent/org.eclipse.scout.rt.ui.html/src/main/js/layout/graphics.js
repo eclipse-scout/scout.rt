@@ -178,12 +178,16 @@ scout.HtmlEnvironment = {
 };
 
 scout.graphics = {
-  'measureString': function(text) {
+  measureString: function(text) {
     var $div = $('#StringMeasurement');
     if ($div.length === 0) {
       throw new Error('DIV StringMeasurement does\'nt exist');
     }
     $div.html(text);
     return new scout.Dimension($div.width(), $div.height());
+  },
+  offsetBounds: function($elem, includeMargins) {
+    var pos = $elem.offset();
+    return new scout.Rectangle(pos.left, pos.top, $elem.outerWidth(false), $elem.outerHeight(false));
   }
 };

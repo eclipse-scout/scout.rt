@@ -52,6 +52,7 @@
 //@include("table/control/MapTableControl.js");
 //@include("table/control/AnalysisTableControl.js");
 //@include("tree/Tree.js");
+//@include("tooltip/Tooltip.js");
 //@include("desktop/BaseDesktop.js");
 //@include("desktop/Desktop.js");
 //@include("desktop/DesktopKeystrokeAdapter.js");

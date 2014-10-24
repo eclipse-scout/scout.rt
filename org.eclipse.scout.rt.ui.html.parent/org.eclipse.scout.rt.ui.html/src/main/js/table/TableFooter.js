@@ -19,7 +19,6 @@ scout.TableFooter.prototype._render = function($parent) {
   this.$controlContainer = this.$container.appendDIV('control-container');
   this._addResize(this.$controlContainer);
 
-  this._$controlLabel = this.$container.appendDIV('control-label');
   this._controlGroups = {};
 
   for (i = 0; i < this._table.controls.length; i++) {
@@ -38,6 +37,7 @@ scout.TableFooter.prototype._render = function($parent) {
     .addClass('control-filter')
     .appendTo(this.$container)
     .on('input paste', '', $.debounce(this._onFilterInput.bind(this)))
+    .attr('placeholder', scout.texts.get('filterBy'))
     .val(filterText);
 
   // info section
@@ -195,18 +195,8 @@ scout.TableFooter.prototype._computeCountInfo = function(n) {
   }
 };
 
-scout.TableFooter.prototype._updateControlLabel = function($control) {
-  var close = $control.hasClass('selected') ? ' schliessen' : '';
-  this._$controlLabel.text($control.data('label') + close);
-};
-
-scout.TableFooter.prototype._resetControlLabel = function() {
-  this._$controlLabel.text('');
-};
-
 scout.TableFooter.prototype._addGroup = function(title) {
-  var $group = $.makeDiv(undefined, 'control-group').attr('data-title', title);
-  this._$controlLabel.before($group);
+  var $group = $.makeDIV('control-group').attr('data-title', title).appendTo(this.$container);
   this._controlGroups[title] = $group;
   return $group;
 };
@@ -233,9 +223,6 @@ scout.TableFooter.prototype.closeTableControl = function(control) {
     this.$controlContainer.hide();
     control.onClosed();
   }.bind(this));
-
-  // adjust control
-  this._resetControlLabel();
 
   this.open = false;
 };

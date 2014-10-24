@@ -1,6 +1,7 @@
 scout.keys = {
   TAB: 9,
   ENTER: 13,
+  SHIFT: 16,
   ALT: 18,
   ESC: 27,
   PAGE_UP: 33,

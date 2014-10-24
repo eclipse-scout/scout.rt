@@ -85,7 +85,8 @@ scout.DateField.prototype._onKeyDown = function(event) {
   var displayText = this.$field.val();
   var prediction = this._$predict.val();
 
-  if (event.which === scout.keys.TAB) {
+  if (event.which === scout.keys.TAB ||
+      event.which === scout.keys.SHIFT) {
     return;
   }
 

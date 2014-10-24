@@ -58,6 +58,12 @@ public class JsonFormField<T extends IFormField> extends AbstractJsonPropertyObs
         return getModel().isMandatory();
       }
     });
+    putJsonProperty(new JsonProperty<T>(IFormField.PROP_TOOLTIP_TEXT, model) {
+      @Override
+      protected String modelValue() {
+        return getModel().getTooltipText();
+      }
+    });
     putJsonProperty(new JsonProperty<T>(IFormField.PROP_ERROR_STATUS, model) {
       @Override
       protected IProcessingStatus modelValue() {

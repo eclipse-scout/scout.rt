@@ -347,6 +347,10 @@
     return this.css('top', position + 'px');
   };
 
+  $.fn.cssRight = function(position) {
+    return this.css('right', position + 'px');
+  };
+
   $.fn.cssWidth = function(width) {
     return this.css('width', width + 'px');
   };
@@ -355,7 +359,10 @@
     return this.css('height', height + 'px');
   };
 
-  $.fn.cssMarginLeft = function() {
+  $.fn.cssMarginLeft = function(value) {
+    if (value !== undefined) {
+      return this.css('margin-left', value + 'px');
+    }
     return $.pxToNumber(this.css('margin-left'));
   };
 

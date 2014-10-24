@@ -1,3 +1,8 @@
+@padding-control: 12px;
+@size-table-header: 40px;
+@size-table-row: 45px;
+@size-table-footer: 52px;
+
 .table-footer {
   position: absolute;
   bottom: 0px;
@@ -33,6 +38,7 @@
   min-height: 26px;
   font-size: 14px;
   margin-top: 11px;
+  margin-left: @padding-control;
   padding-left: 6px;
   &:hover{
     border: 1px solid @color-bench-semi;
@@ -47,25 +53,14 @@
   display: inline;
   float: left;
   position: relative;
-  padding-left: 10px;
-  margin-right: 7px;
+  padding: 0 @padding-control;
   border-right: 1px solid #CCC;
   margin-top: 6px;
   height: 38px;
 }
 
-.control-group:before {
-  content: attr(data-title);
-  position: absolute;
-  color: #ccc;
-  font-size: 8px;
-  width: 100%;
-  top: -2px;
-  left: 12px;
-}
-
 .control{
-  padding: 9px 18px 10px 2px;
+  padding: 9px @padding-control 10px @padding-control;
   float: left;
   cursor: pointer;
   position: relative;
@@ -84,17 +79,9 @@
   color: #FE9915 !important;
 }
 
-
 .control:before{
   .font-icon;
   font-size: 24px;
-  color: #0082A1;
-}
-
-.control-label{
-  float: left;
-  padding-top: 18px;
-  padding-left: 4px;
   color: #0082A1;
 }
 

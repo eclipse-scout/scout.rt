@@ -25,17 +25,32 @@
     right: 0px;
     margin-left: 10px;
     visibility: hidden;
+    cursor: pointer;
 
     &:before  {
       .font-icon();
-      content: @icon-error;
+      /* set (invisible) info icon to reserve space */
+      content: @icon-info;
       font-size: 16px;
-      color: @color-error;
+    }
+  }
+
+  &.has-tooltip > .status {
+    visibility: visible;
+
+    &:before  {
+      content: @icon-info;
+      color: @color-info;
     }
   }
 
   &.has-error > .status {
     visibility: visible;
+
+    &:before  {
+      content: @icon-error;
+      color: @color-error;
+    }
   }
 
   & > .mandatory-indicator {

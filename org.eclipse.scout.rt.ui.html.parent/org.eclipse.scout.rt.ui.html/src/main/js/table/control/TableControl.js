@@ -129,13 +129,13 @@ scout.TableControl.prototype._renderSelected = function(selected) {
 };
 
 scout.TableControl.prototype._renderEnabled = function(enabled) {
-  var that = this;
+  var tooltip;
 
   if (enabled) {
-    this.$control.data('label', this.label)
+    this.$control
       .removeClass('disabled')
-      .hover(onControlHoverIn, onControlHoverOut)
-      .click(onControlClicked);
+      .hover(onControlHoverIn.bind(this), onControlHoverOut.bind(this))
+      .click(onControlClicked.bind(this));
   } else {
     this.$control.addClass('disabled')
       .off('mouseenter mouseleave')
@@ -143,15 +143,28 @@ scout.TableControl.prototype._renderEnabled = function(enabled) {
   }
 
   function onControlHoverIn(event) {
-    that.tableFooter._updateControlLabel($(event.target));
+    if (this.selected) {
+      return;
+    }
+
+    tooltip = new scout.Tooltip({
+      text: this.label,
+      $origin: this.$control,
+      arrowPosition: 50,
+      arrowPositionUnit: '%'
+    });
+    tooltip.render();
   }
 
   function onControlHoverOut(event) {
-    that.tableFooter._resetControlLabel($(event.target));
+    if (tooltip) {
+      tooltip.remove();
+      tooltip = null;
+    }
   }
 
   function onControlClicked(event) {
-    that.setSelected(!that.$control.isSelected());
+    this.setSelected(!this.$control.isSelected());
   }
 };
 
