@@ -99,6 +99,7 @@ public class TabBoxTableField extends AbstractTableField<Table> {
 
       IGroupBox tab = getTabColumn().getValue(getSelectedRow());
       TabForm form = new TabForm(tab);
+      form.getRootGroupBox().setFormInternal(getForm()); // set the original form to be the owner-form to have proper model context (Bugzilla 149246).
       form.setDisplayHint(getForm().getDisplayHint());
       form.setDisplayViewId(getForm().getDisplayViewId());
       form.setModal(IForm.DISPLAY_HINT_DIALOG == form.getDisplayHint());
