@@ -78,7 +78,7 @@ public class RwtScoutNumberField extends RwtScoutBasicFieldComposite<INumberFiel
 
     m_menuMarkerComposite = new RwtContextMenuMarkerComposite(container, getUiEnvironment());
     getUiEnvironment().getFormToolkit().adapt(m_menuMarkerComposite);
-    m_menuMarkerComposite.setData(RWT.CUSTOM_VARIANT, RwtUtility.VARIANT_COMPOSITE_INPUT_FIELD_BORDER);
+    m_menuMarkerComposite.setData(RWT.CUSTOM_VARIANT, VARIANT_NUMBERFIELD);
     m_menuMarkerComposite.addSelectionListener(new SelectionAdapter() {
       private static final long serialVersionUID = 1L;
 
@@ -211,10 +211,10 @@ public class RwtScoutNumberField extends RwtScoutBasicFieldComposite<INumberFiel
   protected void setEnabledFromScout(boolean b) {
     super.setEnabledFromScout(b);
     if (b) {
-      m_menuMarkerComposite.setData(RWT.CUSTOM_VARIANT, RwtUtility.VARIANT_COMPOSITE_INPUT_FIELD_BORDER);
+      m_menuMarkerComposite.setData(RWT.CUSTOM_VARIANT, VARIANT_NUMBERFIELD);
     }
     else {
-      m_menuMarkerComposite.setData(RWT.CUSTOM_VARIANT, RwtUtility.VARIANT_COMPOSITE_INPUT_FIELD_BORDER_READONLY);
+      m_menuMarkerComposite.setData(RWT.CUSTOM_VARIANT, VARIANT_NUMBERFIELD_DISABLED);
     }
   }
 

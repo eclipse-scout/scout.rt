@@ -108,7 +108,7 @@ public class RwtScoutTimeField extends RwtScoutBasicFieldComposite<IDateField> i
     StatusLabelEx label = getUiEnvironment().getFormToolkit().createStatusLabel(container, getScoutObject());
 
     m_timeContainer = getUiEnvironment().getFormToolkit().createComposite(container, SWT.BORDER);
-    m_timeContainer.setData(RWT.CUSTOM_VARIANT, RwtUtility.VARIANT_COMPOSITE_INPUT_FIELD_BORDER);
+    m_timeContainer.setData(RWT.CUSTOM_VARIANT, VARIANT_TIMEFIELD);
 
     m_menuMarkerComposite = new RwtContextMenuMarkerComposite(m_timeContainer, getUiEnvironment(), SWT.NONE);
     getUiEnvironment().getFormToolkit().adapt(m_menuMarkerComposite);
@@ -158,7 +158,6 @@ public class RwtScoutTimeField extends RwtScoutBasicFieldComposite<IDateField> i
         }
       }
     });
-
     //
     setUiContainer(container);
     setUiLabel(label);
@@ -287,10 +286,10 @@ public class RwtScoutTimeField extends RwtScoutBasicFieldComposite<IDateField> i
     m_dropDownButton.setEnabled(b);
     getUiField().setEnabled(b);
     if (b) {
-      m_timeContainer.setData(RWT.CUSTOM_VARIANT, RwtUtility.VARIANT_COMPOSITE_INPUT_FIELD_BORDER);
+      m_timeContainer.setData(RWT.CUSTOM_VARIANT, VARIANT_TIMEFIELD);
     }
     else {
-      m_timeContainer.setData(RWT.CUSTOM_VARIANT, RwtUtility.VARIANT_COMPOSITE_INPUT_FIELD_BORDER_READONLY);
+      m_timeContainer.setData(RWT.CUSTOM_VARIANT, VARIANT_TIMEFIELD_DISABLED);
     }
   }
 
@@ -489,8 +488,8 @@ public class RwtScoutTimeField extends RwtScoutBasicFieldComposite<IDateField> i
 
     @Override
     public void widgetSelected(SelectionEvent e) {
-      getUiField().forceFocus();
-      handleUiTimeChooserAction();
+          getUiField().forceFocus();
+          handleUiTimeChooserAction();
     }
   } // end class P_RwtBrowseButtonListener
 

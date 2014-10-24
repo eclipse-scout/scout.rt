@@ -108,7 +108,7 @@ public class RwtScoutDateField extends RwtScoutBasicFieldComposite<IDateField> i
     StatusLabelEx label = getUiEnvironment().getFormToolkit().createStatusLabel(container, getScoutObject());
 
     m_dateContainer = getUiEnvironment().getFormToolkit().createComposite(container, SWT.BORDER);
-    m_dateContainer.setData(RWT.CUSTOM_VARIANT, RwtUtility.VARIANT_COMPOSITE_INPUT_FIELD_BORDER);
+    m_dateContainer.setData(RWT.CUSTOM_VARIANT, VARIANT_DATEFIELD);
 
     m_menuMarkerComposite = new RwtContextMenuMarkerComposite(m_dateContainer, getUiEnvironment(), SWT.NONE);
     getUiEnvironment().getFormToolkit().adapt(m_menuMarkerComposite);
@@ -290,10 +290,10 @@ public class RwtScoutDateField extends RwtScoutBasicFieldComposite<IDateField> i
     super.setEnabledFromScout(b);
     m_dropDownButton.setEnabled(b);
     if (b) {
-      m_dateContainer.setData(RWT.CUSTOM_VARIANT, RwtUtility.VARIANT_COMPOSITE_INPUT_FIELD_BORDER);
+      m_dateContainer.setData(RWT.CUSTOM_VARIANT, VARIANT_DATEFIELD);
     }
     else {
-      m_dateContainer.setData(RWT.CUSTOM_VARIANT, RwtUtility.VARIANT_COMPOSITE_INPUT_FIELD_BORDER_READONLY);
+      m_dateContainer.setData(RWT.CUSTOM_VARIANT, VARIANT_DATEFIELD_DISABLED);
     }
   }
 
@@ -494,8 +494,8 @@ public class RwtScoutDateField extends RwtScoutBasicFieldComposite<IDateField> i
 
     @Override
     public void widgetSelected(SelectionEvent e) {
-      getUiField().forceFocus();
-      handleUiDateChooserAction();
+          getUiField().forceFocus();
+          handleUiDateChooserAction();
     }
   } // end class P_RwtBrowseButtonListener
 

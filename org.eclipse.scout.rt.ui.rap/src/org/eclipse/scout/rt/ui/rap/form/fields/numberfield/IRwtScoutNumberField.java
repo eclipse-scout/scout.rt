@@ -16,10 +16,13 @@ import org.eclipse.swt.widgets.Text;
 
 /**
  * <h3>IRwtScoutNumberField</h3>
- * 
+ *
  * @since 3.7.0 June 2011
  */
 public interface IRwtScoutNumberField extends IRwtScoutFormField<INumberField<?>> {
+
+  String VARIANT_NUMBERFIELD = "numberfield";
+  String VARIANT_NUMBERFIELD_DISABLED = "numberfield-disabled";
 
   @Override
   Text getUiField();

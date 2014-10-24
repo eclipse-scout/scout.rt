@@ -757,16 +757,6 @@ Composite.htmlfield {
   /* a little padding to make sure the content is on the same line as the field's label */
   padding: 4px 0px 0px 0px;
 }
-Composite[BORDER].inputField {
-  padding: 0px 0px 0px 0px;
-  border: 1px solid #95b7c1;
-  border-radius: 4px;
-}
-Composite[BORDER].inputField-readOnly {
-  padding: 0px 0px 0px 0px;
-  border: 1px solid #c9dadf;
-  border-radius: 4px;
-}
 Button.formButton {
   background-image: none;
   color: #000000;
@@ -866,14 +856,14 @@ Link-Hyperlink {
 Link-Hyperlink:disabled {
   color: #2a5a76;
 }
-Composite[BORDER].colorfield {
+Composite.colorfield {
   /* 2px on the right side to move the button a little bit away from the border */
   padding: 0px 2px 0px 0px;
   border: 1px solid #95b7c1;
   border-radius: 4px;
   background-image: none;
 }
-Composite[BORDER].colorfield-disabled {
+Composite.colorfield-disabled {
   /* 2px on the right side to move the button a little bit away from the border */
   padding: 0px 2px 0px 0px;
   border: 1px solid #c9dadf;
@@ -941,6 +931,16 @@ Button-FocusIndicator.colorpicker_browse_disabled_menu {
   border: none;
 }
 /*Datefield*/
+Composite.datefield {
+  padding: 0px 0px 0px 0px;
+  border: 1px solid #95b7c1;
+  border-radius: 4px;
+}
+Composite.datefield-disabled {
+  padding: 0px 0px 0px 0px;
+  border: 1px solid #c9dadf;
+  border-radius: 4px;
+}
 Text.datefield {
   border-radius: 4px;
   background-image: none;
@@ -1252,6 +1252,17 @@ Label[BORDER].menuDropDown {
   border: none;
   cursor: pointer;
 }
+/*Numberfield*/
+Composite.numberfield {
+  padding: 0px 0px 0px 0px;
+  border: 1px solid #95b7c1;
+  border-radius: 4px;
+}
+Composite.numberfield-disabled {
+  padding: 0px 0px 0px 0px;
+  border: 1px solid #c9dadf;
+  border-radius: 4px;
+}
 /* ScrollBar */
 ScrollBar {
   background-color: transparent;
@@ -1420,14 +1431,14 @@ Shell-CloseButton:inactive {
 Shell-CloseButton:inactive:hover {
   background-image: url(theme/img/window/shell-close-hover.png );
 }
-Composite[BORDER].smartfield {
+Composite.smartfield {
   /* 2px on the right side to move the button a little bit away from the border */
   padding: 0px 2px 0px 0px;
   border: 1px solid #95b7c1;
   border-radius: 4px;
   background-image: none;
 }
-Composite[BORDER].smartfield-disabled {
+Composite.smartfield-disabled {
   /* 2px on the right side to move the button a little bit away from the border */
   padding: 0px 2px 0px 0px;
   border: 1px solid #c9dadf;
@@ -1510,6 +1521,17 @@ Tree.proposal-form {
 TreeItem.proposal-form:selected {
   color: #fe9a23;
   background-color: #fafdff;
+}
+/*Stringfield*/
+Composite.stringfield {
+  padding: 0px 0px 0px 0px;
+  border: 1px solid #95b7c1;
+  border-radius: 4px;
+}
+Composite.stringfield-disabled {
+  padding: 0px 0px 0px 0px;
+  border: 1px solid #c9dadf;
+  border-radius: 4px;
 }
 /**
  *  RwtScoutTabBox / RwtScoutTabItem     start
@@ -1779,6 +1801,16 @@ Text-Message {
   color: #a7a6aa;
 }
 /*Timefield*/
+Composite.timefield {
+  padding: 0px 0px 0px 0px;
+  border: 1px solid #95b7c1;
+  border-radius: 4px;
+}
+Composite.timefield-disabled {
+  padding: 0px 0px 0px 0px;
+  border: 1px solid #c9dadf;
+  border-radius: 4px;
+}
 Text.timefield {
   border-radius: 4px;
   background-image: none;
