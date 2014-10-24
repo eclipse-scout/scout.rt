@@ -412,8 +412,8 @@ public final class MailUtility {
    *
    * @rn aho, 19.01.2009
    */
-  public static MimeMessage createMimeMessage(String[] toRecipients, String sender, String subject, String bodyTextPlain, DataSource[] attachements) throws ProcessingException {
-    return instance.createMimeMessageInternal(toRecipients, null, null, sender, subject, bodyTextPlain, attachements);
+  public static MimeMessage createMimeMessage(String[] toRecipients, String sender, String subject, String bodyTextPlain, DataSource[] attachments) throws ProcessingException {
+    return instance.createMimeMessageInternal(toRecipients, null, null, sender, subject, bodyTextPlain, attachments);
   }
 
   /**
@@ -421,13 +421,13 @@ public final class MailUtility {
    *
    * @rn aho, 19.01.2009
    */
-  public static MimeMessage createMimeMessage(String[] toRecipients, String[] ccRecipients, String[] bccRecipients, String sender, String subject, String bodyTextPlain, DataSource[] attachements) throws ProcessingException {
-    return instance.createMimeMessageInternal(toRecipients, ccRecipients, bccRecipients, sender, subject, bodyTextPlain, attachements);
+  public static MimeMessage createMimeMessage(String[] toRecipients, String[] ccRecipients, String[] bccRecipients, String sender, String subject, String bodyTextPlain, DataSource[] attachments) throws ProcessingException {
+    return instance.createMimeMessageInternal(toRecipients, ccRecipients, bccRecipients, sender, subject, bodyTextPlain, attachments);
   }
 
-  private MimeMessage createMimeMessageInternal(String[] toRecipients, String[] ccRecipients, String[] bccRecipients, String sender, String subject, String bodyTextPlain, DataSource[] attachements) throws ProcessingException {
+  private MimeMessage createMimeMessageInternal(String[] toRecipients, String[] ccRecipients, String[] bccRecipients, String sender, String subject, String bodyTextPlain, DataSource[] attachments) throws ProcessingException {
     try {
-      MimeMessage msg = MailUtility.createMimeMessage(bodyTextPlain, null, attachements);
+      MimeMessage msg = MailUtility.createMimeMessage(bodyTextPlain, null, attachments);
       if (sender != null) {
         InternetAddress addrSender = new InternetAddress(sender);
         msg.setFrom(addrSender);
@@ -450,8 +450,8 @@ public final class MailUtility {
     }
   }
 
-  public static MimeMessage createMimeMessage(String messagePlain, String messageHtml, DataSource[] attachements) throws ProcessingException {
-    return instance.createMimeMessageInternal(messagePlain, messageHtml, attachements);
+  public static MimeMessage createMimeMessage(String messagePlain, String messageHtml, DataSource[] attachments) throws ProcessingException {
+    return instance.createMimeMessageInternal(messagePlain, messageHtml, attachments);
   }
 
   public static MimeMessage createMimeMessageFromWordArchiveDirectory(File archiveDir, String simpleName, File[] attachments, boolean markAsUnsent) throws ProcessingException {
@@ -641,7 +641,7 @@ public final class MailUtility {
     plainBodyPart.setHeader("Content-Transfer-Encoding", "quoted-printable");
   }
 
-  private MimeMessage createMimeMessageInternal(String bodyTextPlain, String bodyTextHtml, DataSource[] attachements) throws ProcessingException {
+  private MimeMessage createMimeMessageInternal(String bodyTextPlain, String bodyTextHtml, DataSource[] attachments) throws ProcessingException {
     try {
       CharsetSafeMimeMessage m = new CharsetSafeMimeMessage();
       MimeMultipart multiPart = new MimeMultipart();
@@ -650,9 +650,9 @@ public final class MailUtility {
         return null;
       }
       multiPart.addBodyPart(bodyPart);
-      // attachements
-      if (attachements != null) {
-        for (DataSource source : attachements) {
+      // attachments
+      if (attachments != null) {
+        for (DataSource source : attachments) {
           MimeBodyPart part = new MimeBodyPart();
           DataHandler handler = new DataHandler(source);
           part.setDataHandler(handler);
