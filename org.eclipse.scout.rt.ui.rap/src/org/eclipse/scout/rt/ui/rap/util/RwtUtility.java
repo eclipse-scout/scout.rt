@@ -82,9 +82,6 @@ public final class RwtUtility {
   public static final String VARIANT_LISTBOX_DISABLED = "listboxDisabled";
   public static final String VARIANT_EMPTY = "empty";
 
-  public static final String VARIANT_COMPOSITE_INPUT_FIELD_BORDER = "inputField";
-  public static final String VARIANT_COMPOSITE_INPUT_FIELD_BORDER_READONLY = "inputField-readOnly";
-
   private static final Map<String, Integer> SCOUT_RWT_KEY_MAP;
   private static final Map<Integer, String> RWT_SCOUT_KEY_MAP;
 

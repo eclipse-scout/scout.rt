@@ -80,7 +80,7 @@ public class RwtScoutStringField extends RwtScoutBasicFieldComposite<IStringFiel
 
     m_menuMarkerComposite = new RwtContextMenuMarkerComposite(container, getUiEnvironment());
     getUiEnvironment().getFormToolkit().adapt(m_menuMarkerComposite);
-    m_menuMarkerComposite.setData(RWT.CUSTOM_VARIANT, RwtUtility.VARIANT_COMPOSITE_INPUT_FIELD_BORDER);
+    m_menuMarkerComposite.setData(RWT.CUSTOM_VARIANT, VARIANT_STRINGFIELD);
     m_menuMarkerComposite.addSelectionListener(new SelectionAdapter() {
       private static final long serialVersionUID = 1L;
 
@@ -183,10 +183,10 @@ public class RwtScoutStringField extends RwtScoutBasicFieldComposite<IStringFiel
   protected void setEnabledFromScout(boolean b) {
     super.setEnabledFromScout(b);
     if (b) {
-      m_menuMarkerComposite.setData(RWT.CUSTOM_VARIANT, RwtUtility.VARIANT_COMPOSITE_INPUT_FIELD_BORDER);
+      m_menuMarkerComposite.setData(RWT.CUSTOM_VARIANT, VARIANT_STRINGFIELD);
     }
     else {
-      m_menuMarkerComposite.setData(RWT.CUSTOM_VARIANT, RwtUtility.VARIANT_COMPOSITE_INPUT_FIELD_BORDER_READONLY);
+      m_menuMarkerComposite.setData(RWT.CUSTOM_VARIANT, VARIANT_STRINGFIELD_DISABLED);
     }
   }
 

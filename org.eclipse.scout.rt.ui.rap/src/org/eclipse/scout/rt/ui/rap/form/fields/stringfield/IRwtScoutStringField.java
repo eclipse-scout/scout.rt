@@ -16,6 +16,9 @@ import org.eclipse.scout.rt.ui.rap.form.fields.IRwtScoutFormField;
 
 public interface IRwtScoutStringField extends IRwtScoutFormField<IStringField> {
 
+  String VARIANT_STRINGFIELD = "stringfield";
+  String VARIANT_STRINGFIELD_DISABLED = "stringfield-disabled";
+
   @Override
   StyledTextEx getUiField();
 }

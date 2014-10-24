@@ -720,23 +720,14 @@ Composite.listboxDisabled {
   padding:2px;
 }
 
-Composite.formbarContainer { background-color:#ddebf4; }
+Composite.formbarContainer {
+  background-color:#ddebf4;
+  padding:5px;
+}
 
 Composite.labelfield { padding:6px 0px 0px 0px; }
 
 Composite.htmlfield { padding:6px 0px 0px 0px; }
-
-Composite[BORDER].inputField {
-  padding:0px 0px 0px 0px;
-  border:1px solid #95b7c1;
-  border-radius:4px;
-}
-
-Composite[BORDER].inputField-readOnly {
-  padding:0px 0px 0px 0px;
-  border:1px solid #c9dadf;
-  border-radius:4px;
-}
 
 Button.formButton {
   background-image:none;
@@ -905,14 +896,14 @@ Link-Hyperlink { color:red; }
 
 Link-Hyperlink:disabled { color:#2a5a76; }
 
-Composite[BORDER].colorfield {
+Composite.colorfield {
   padding:0px 2px 0px 0px;
   border:1px solid #95b7c1;
   border-radius:4px;
   background-image:none;
 }
 
-Composite[BORDER].colorfield-disabled {
+Composite.colorfield-disabled {
   padding:0px 2px 0px 0px;
   border:1px solid #c9dadf;
   border-radius:4px;
@@ -980,6 +971,18 @@ Button.colorpicker_browse_disabled_menu:hover { background-image:url(theme/img/b
 Button-FocusIndicator.colorpicker_browse_disabled_menu {
   background-color:transparent;
   border:none;
+}
+
+Composite.datefield {
+  padding:0px 0px 0px 0px;
+  border:1px solid #95b7c1;
+  border-radius:4px;
+}
+
+Composite.datefield-disabled {
+  padding:0px 0px 0px 0px;
+  border:1px solid #c9dadf;
+  border-radius:4px;
 }
 
 Text.datefield {
@@ -1321,6 +1324,18 @@ Label[BORDER].menuDropDown {
   cursor:pointer;
 }
 
+Composite.numberfield {
+  padding:0px 0px 0px 0px;
+  border:1px solid #95b7c1;
+  border-radius:4px;
+}
+
+Composite.numberfield-disabled {
+  padding:0px 0px 0px 0px;
+  border:1px solid #c9dadf;
+  border-radius:4px;
+}
+
 ScrollBar {
   background-color:transparent;
   background-image:gradient(linear,left top,right top,from(#d4e1e7),to(#c6d6df));
@@ -1475,15 +1490,15 @@ Shell-CloseButton:inactive { background-image:url(theme/img/window/shell-close.p
 
 Shell-CloseButton:inactive:hover { background-image:url(theme/img/window/shell-close-hover.png); }
 
-Composite[BORDER].smartfield {
-  padding:0px 2px 0px 0px;
+Composite.smartfield {
+  padding:0px;
   border:1px solid #95b7c1;
   border-radius:4px;
   background-image:none;
 }
 
-Composite[BORDER].smartfield-disabled {
-  padding:0px 2px 0px 0px;
+Composite.smartfield-disabled {
+  padding:0px;
   border:1px solid #c9dadf;
   border-radius:4px;
 }
@@ -1569,6 +1584,18 @@ Tree.proposal-form { background-color:#ffffff; }
 TreeItem.proposal-form:selected {
   color:#fe9a23;
   background-color:#fafdff;
+}
+
+Composite.stringfield {
+  padding:0px 0px 0px 0px;
+  border:1px solid #95b7c1;
+  border-radius:4px;
+}
+
+Composite.stringfield-disabled {
+  padding:0px 0px 0px 0px;
+  border:1px solid #c9dadf;
+  border-radius:4px;
 }
 
 Composite.tabboxContainer { background-color:#cde3ee; }
@@ -1962,6 +1989,18 @@ Text[MULTI][BORDER]:disabled {
 Text[MULTI][BORDER]:read-only { border:1px solid #c9dadf; }
 
 Text-Message { color:#a7a6aa; }
+
+Composite.timefield {
+  padding:0px 0px 0px 0px;
+  border:1px solid #95b7c1;
+  border-radius:4px;
+}
+
+Composite.timefield-disabled {
+  padding:0px 0px 0px 0px;
+  border:1px solid #c9dadf;
+  border-radius:4px;
+}
 
 Text.timefield {
   border-radius:4px;
@@ -2391,10 +2430,6 @@ CLabel.mobileFormHeader {
 Composite.mobileFormFooter { background-image:gradient(linear,left top,left bottom,from(#ddebf4),to(#d4e1e7)); }
 
 Composite.smartFieldActionBar { background-image:gradient(linear,left top,left bottom,from(#ddebf4),to(#d4e1e7)); }
-
-Composite.smartfield { padding:0px; }
-
-Composite.smartfield-disabled { padding:0px; }
 
 Composite.smartfield:hover { background-color:#fef9f1; }
 
