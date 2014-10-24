@@ -103,8 +103,7 @@ public final class MailUtility {
 
   private Part[] getBodyPartsImpl(Part message) throws ProcessingException {
     List<Part> bodyCollector = new ArrayList<Part>();
-    List<Part> attachementCollector = new ArrayList<Part>();
-    collectMailPartsReqImpl(message, bodyCollector, attachementCollector);
+    collectMailPartsReqImpl(message, bodyCollector, null, null);
     return bodyCollector.toArray(new Part[bodyCollector.size()]);
   }
 
@@ -113,45 +112,76 @@ public final class MailUtility {
   }
 
   private Part[] getAttachmentPartsImpl(Part message) throws ProcessingException {
-    List<Part> bodyCollector = new ArrayList<Part>();
-    List<Part> attachementCollector = new ArrayList<Part>();
-    collectMailPartsReqImpl(message, bodyCollector, attachementCollector);
-    return attachementCollector.toArray(new Part[attachementCollector.size()]);
+    List<Part> attachmentCollector = new ArrayList<Part>();
+    collectMailPartsReqImpl(message, null, attachmentCollector, null);
+    return attachmentCollector.toArray(new Part[attachmentCollector.size()]);
   }
 
-  public static void collectMailParts(Part message, List<Part> bodyCollector, List<Part> attachementCollector) throws ProcessingException {
-    instance.collectMailPartsReqImpl(message, bodyCollector, attachementCollector);
+  public static void collectMailParts(Part message, List<Part> bodyCollector, List<Part> attachmentCollector) throws ProcessingException {
+    collectMailParts(message, bodyCollector, attachmentCollector, null);
   }
 
-  private void collectMailPartsReqImpl(Part part, List<Part> bodyCollector, List<Part> attachementCollector) throws ProcessingException {
+  public static void collectMailParts(Part message, List<Part> bodyCollector, List<Part> attachmentCollector, List<Part> inlineAttachmentCollector) throws ProcessingException {
+    instance.collectMailPartsReqImpl(message, bodyCollector, attachmentCollector, inlineAttachmentCollector);
+  }
+
+  /**
+   * Collects the body, attachment and inline attachment parts from the provided part.
+   * <p>
+   * A single collector can be null in order to collect only the relevant parts.
+   *
+   * @param part
+   *          Part
+   * @param bodyCollector
+   *          Body collector (optional)
+   * @param attachmentCollector
+   *          Attachment collector (optional)
+   * @param inlineAttachmentCollector
+   *          Inline attachment collector (optional)
+   * @throws ProcessingException
+   */
+  private void collectMailPartsReqImpl(Part part, List<Part> bodyCollector, List<Part> attachmentCollector, List<Part> inlineAttachmentCollector) throws ProcessingException {
     if (part == null) {
       return;
     }
     try {
       String disp = part.getDisposition();
       if (disp != null && disp.equalsIgnoreCase(Part.ATTACHMENT)) {
-        attachementCollector.add(part);
+        if (attachmentCollector != null) {
+          attachmentCollector.add(part);
+        }
       }
       else if (part.getContent() instanceof Multipart) {
         Multipart multiPart = (Multipart) part.getContent();
         for (int i = 0; i < multiPart.getCount(); i++) {
-          collectMailPartsReqImpl(multiPart.getBodyPart(i), bodyCollector, attachementCollector);
+          collectMailPartsReqImpl(multiPart.getBodyPart(i), bodyCollector, attachmentCollector, inlineAttachmentCollector);
         }
       }
       else {
         if (part.isMimeType(CONTENT_TYPE_TEXT_PLAIN)) {
-          bodyCollector.add(part);
+          if (bodyCollector != null) {
+            bodyCollector.add(part);
+          }
         }
         else if (part.isMimeType(CONTENT_TYPE_TEXT_HTML)) {
-          bodyCollector.add(part);
+          if (bodyCollector != null) {
+            bodyCollector.add(part);
+          }
         }
         else if (part.isMimeType(CONTENT_TYPE_MESSAGE_RFC822) && part.getContent() instanceof MimeMessage) {
           // its a MIME message in rfc822 format as attachment therefore we have to set the filename for the attachment correctly.
-          MimeMessage msg = (MimeMessage) part.getContent();
-          String filteredSubjectText = StringUtility.filterText(msg.getSubject(), "a-zA-Z0-9_-", "");
-          String fileName = (StringUtility.hasText(filteredSubjectText) ? filteredSubjectText : "originalMessage") + ".eml";
-          RFCWrapperPart wrapperPart = new RFCWrapperPart(part, fileName);
-          attachementCollector.add(wrapperPart);
+          if (attachmentCollector != null) {
+            MimeMessage msg = (MimeMessage) part.getContent();
+            String filteredSubjectText = StringUtility.filterText(msg.getSubject(), "a-zA-Z0-9_-", "");
+            String fileName = (StringUtility.hasText(filteredSubjectText) ? filteredSubjectText : "originalMessage") + ".eml";
+            RFCWrapperPart wrapperPart = new RFCWrapperPart(part, fileName);
+            attachmentCollector.add(wrapperPart);
+          }
+        }
+        else if (disp != null && disp.equals(Part.INLINE)) {
+          if (inlineAttachmentCollector != null) {
+            inlineAttachmentCollector.add(part);
+          }
         }
       }
     }
