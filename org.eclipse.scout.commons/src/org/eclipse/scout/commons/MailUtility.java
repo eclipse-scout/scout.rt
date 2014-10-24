@@ -54,7 +54,7 @@ public final class MailUtility {
 
   public static final IScoutLogger LOG = ScoutLogManager.getLogger(MailUtility.class);
 
-  private static final String CONTENT_TYPE_ID = "Content-Type";
+  public static final String CONTENT_TYPE_ID = "Content-Type";
   public static final String CONTENT_TYPE_TEXT_HTML = "text/html; charset=\"UTF-8\"";
   public static final String CONTENT_TYPE_TEXT_PLAIN = "text/plain; charset=\"UTF-8\"";
   public static final String CONTENT_TYPE_MESSAGE_RFC822 = "message/rfc822";
@@ -685,6 +685,81 @@ public final class MailUtility {
     }
     catch (Throwable t) {
       throw new ProcessingException("Unexpected: ", t);
+    }
+  }
+
+  /**
+   * Adds the provided attachments to the existing mime message.
+   *
+   * @param msg
+   *          Mime message to attach files to
+   * @param attachments
+   *          List of attachments (files).
+   * @throws ProcessingException
+   * @since 4.1
+   */
+  public static void addAttachmentsToMimeMessage(MimeMessage msg, List<File> attachments) throws ProcessingException {
+    if (CollectionUtility.isEmpty(attachments)) {
+      return;
+    }
+
+    try {
+      Object messageContent = msg.getContent();
+
+      Multipart multiPart = null;
+      if (messageContent instanceof Multipart && StringUtility.contains(((Multipart) messageContent).getContentType(), "multipart/mixed")) {
+        // already contains attachments
+        // use the existing multipart
+        multiPart = (Multipart) messageContent;
+      }
+      else if (messageContent instanceof Multipart) {
+        MimeBodyPart multiPartBody = new MimeBodyPart();
+        multiPartBody.setContent((Multipart) messageContent);
+
+        multiPart = new MimeMultipart(); //mixed
+        msg.setContent(multiPart);
+
+        multiPart.addBodyPart(multiPartBody);
+      }
+      else if (messageContent instanceof String) {
+        MimeBodyPart multiPartBody = new MimeBodyPart();
+        String message = (String) messageContent;
+
+        String contentTypeHeader = StringUtility.join(" ", msg.getHeader("Content-Type"));
+        if (StringUtility.contains(contentTypeHeader, "html")) {
+          // html
+          multiPartBody.setContent(message, MailUtility.CONTENT_TYPE_TEXT_HTML);
+          multiPartBody.setHeader("Content-Type", MailUtility.CONTENT_TYPE_TEXT_HTML);
+          multiPartBody.setHeader("Content-Transfer-Encoding", "quoted-printable");
+        }
+        else {
+          // plain text
+          multiPartBody.setText(message);
+        }
+
+        multiPart = new MimeMultipart(); //mixed
+        msg.setContent(multiPart);
+
+        multiPart.addBodyPart(multiPartBody);
+      }
+      else {
+        throw new ProcessingException("Unsupported mime message format. Unable to add attachments.");
+      }
+
+      for (File attachment : attachments) {
+        MimeBodyPart bodyPart = new MimeBodyPart();
+        DataSource source = new FileDataSource(attachment);
+        bodyPart.setDataHandler(new DataHandler(source));
+        bodyPart.setFileName(attachment.getName());
+        multiPart.addBodyPart(bodyPart);
+      }
+      msg.saveChanges();
+    }
+    catch (MessagingException e) {
+      throw new ProcessingException("Failed to add attachment to existing mime message", e);
+    }
+    catch (IOException e) {
+      throw new ProcessingException("Failed to add attachment to existing mime message", e);
     }
   }
 
