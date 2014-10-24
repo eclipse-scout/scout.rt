@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigationServi
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.client.ui.desktop.IUrlTarget;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTableForm;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTreeForm;
@@ -182,27 +183,32 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
       case DesktopEvent.TYPE_OUTLINE_CHANGED:
         handleModelOutlineChanged(event.getOutline());
         break;
-      case DesktopEvent.TYPE_FORM_ADDED: {
+      case DesktopEvent.TYPE_FORM_ADDED:
         handleModelFormAdded(event.getForm());
         break;
-      }
-      case DesktopEvent.TYPE_FORM_REMOVED: {
+      case DesktopEvent.TYPE_FORM_REMOVED:
         handleModelFormRemoved(event.getForm());
         break;
-      }
-      case DesktopEvent.TYPE_FORM_ENSURE_VISIBLE: {
+      case DesktopEvent.TYPE_FORM_ENSURE_VISIBLE:
         handleModelFormEnsureVisible(event.getForm());
         break;
-      }
-      case DesktopEvent.TYPE_MESSAGE_BOX_ADDED: {
+      case DesktopEvent.TYPE_OPEN_URL_IN_BROWSER:
+        handleModelOpenUrlInBrowser(event.getPath(), event.getUrlTarget());
+        break;
+      case DesktopEvent.TYPE_MESSAGE_BOX_ADDED:
         handleModelMessageBoxAdded(event.getMessageBox());
         break;
-      }
-      case DesktopEvent.TYPE_DESKTOP_CLOSED: {
+      case DesktopEvent.TYPE_DESKTOP_CLOSED:
         handleModelDesktopClosed();
         break;
-      }
     }
+  }
+
+  private void handleModelOpenUrlInBrowser(String path, IUrlTarget urlTarget) {
+    JSONObject json = new JSONObject();
+    putProperty(json, "path", path);
+    putProperty(json, "urlTarget", urlTarget.toString());
+    addActionEvent("openUrlInBrowser", json);
   }
 
   protected void handleModelOutlineChanged(IOutline outline) {

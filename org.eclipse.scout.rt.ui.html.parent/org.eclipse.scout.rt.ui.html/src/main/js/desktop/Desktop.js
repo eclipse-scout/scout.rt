@@ -172,7 +172,7 @@ scout.Desktop.prototype._addForm = function(form) {
   var tab = new scout.Desktop.TabAndContent(form.title, form);
   this._addTab(tab);
   form.render(this.$bench);
-  
+
   //FIXME CGU maybe include in render?
   form.htmlComp.layout();
   form.htmlComp.validateRoot = true;
@@ -186,6 +186,13 @@ scout.Desktop.prototype._removeForm = function(form) {
 
 scout.Desktop.prototype._showForm = function(form) {
   this._selectTab(form.tab);
+};
+
+scout.Desktop.prototype._openUrlInBrowser = function(event) {
+  $.log.debug('(Desktop#_openUrlInBrowser) path=' + event.path + ' targetUrl=' + event.targetUrl);
+  if (event.path) {
+    window.open(event.path);
+  }
 };
 
 /* communication with outline */
@@ -218,7 +225,7 @@ scout.Desktop.prototype.updateOutlineTab = function(content, title) {
     if (selectedNodes.length > 0) {
       content.staticMenus = [new scout.OutlineNavigateUpMenu(this.outline, selectedNodes[0])];
       content.render(this.$bench);
-      
+
       //FIXME CGU maybe include in render?
       content.htmlComp.layout();
       content.htmlComp.validateRoot = true;
@@ -259,6 +266,8 @@ scout.Desktop.prototype.onModelAction = function(event) {
     this.navigation.onSearchPerformed(event);
   } else if (event.type === 'messageBoxAdded') {
     this.addMessageBox(this.session.getOrCreateModelAdapter(event.messageBox, this));
+  } else if (event.type === 'openUrlInBrowser') {
+    this._openUrlInBrowser(event);
   } else {
     scout.parent.prototype.onModelAction.call(this, event);
   }
