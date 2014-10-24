@@ -31,10 +31,9 @@
 .menubar {
   position:relative;
   box-sizing:border-box;
-  height:56px;
+  height:55px;
   margin:0 20px;
   padding:6px 0 10px 0;
-  border-bottom:solid 1px @color-bench-light-border;
 
   & div, button {
     box-sizing:border-box;
@@ -81,8 +80,16 @@
   cursor:pointer;
   padding-top:1px;
 
+  &[data-icon]:before {
+    .menu-icon(attr(data-icon));
+  }
+
+  &[data-icon]:hover:before {
+    color:@color-bench-text-hover;
+  }
+
   &:hover {
-    color:#389db6;
+    color:@color-bench-text-hover;
   }
 
   &.disabled {
@@ -100,6 +107,7 @@
   &.has-submenu:after {
    .sub-menu-icon;
   }
+
 }
 
 .menu-right {
@@ -109,10 +117,6 @@
   &:not(.last) {
     margin-right:33px;
   }
-}
-
-[data-icon]:before {
-  .menu-icon(attr(data-icon));
 }
 
 .menu-textandicon[data-icon]:before {
@@ -166,6 +170,11 @@
     padding-right:10px;
     padding-left:0;
     top:5px;
+  }
+
+  &[data-icon]:before {
+    .menu-icon(attr(data-icon));
+    color:@color-bench-text-hover;
   }
 }
 

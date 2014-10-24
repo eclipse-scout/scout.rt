@@ -3,6 +3,12 @@
   width: 100%;
 }
 
-.detach-menu:before {
-  .menu-icon(@icon-detach);
+.detach-menu {
+  &:before {
+    .menu-icon(@icon-detach);
+  }
+  &:hover:before {
+     color:@color-bench-text-hover;
+  }
 }
+

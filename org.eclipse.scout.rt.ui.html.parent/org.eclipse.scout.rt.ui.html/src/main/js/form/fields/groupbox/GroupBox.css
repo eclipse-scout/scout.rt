@@ -2,8 +2,10 @@
 @group-margin-top: 20px;
 
 .root-group-box {
-  margin: 20px @margin-bench-right 25px @margin-bench-left;
   box-sizing: border-box;
+  margin: 0 @margin-bench-right 25px @margin-bench-left;
+  padding-top:19px;
+  border-top:solid 1px @color-bench-light-border;
 }
 
 .group-box {
