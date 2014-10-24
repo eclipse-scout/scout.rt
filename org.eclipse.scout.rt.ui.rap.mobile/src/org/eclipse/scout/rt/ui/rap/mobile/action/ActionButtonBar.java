@@ -22,6 +22,11 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.rap.rwt.RWT;
+import org.eclipse.scout.commons.holders.Holder;
+import org.eclipse.scout.commons.job.JobEx;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.mobile.Icons;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
@@ -46,6 +51,9 @@ import org.eclipse.swt.widgets.Shell;
  * @since 3.9.0
  */
 public class ActionButtonBar extends Composite {
+
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ActionButtonBar.class);
+
   public static final int ORIENTATION_LEFT_TO_RIGHT = SWT.LEFT_TO_RIGHT;
   public static final int ORIENTATION_RIGHT_TO_LEFT = 1 << 26;
 
@@ -379,17 +387,35 @@ public class ActionButtonBar extends Composite {
     }
   }
 
-  private PileMenu createPileMenu(List<IMenu> childActions) {
-    PileMenu pileMenu = new PileMenu();
-    pileMenu.setChildActions(childActions);
-    if (getMenuOpeningDirection() == SWT.UP) {
-      pileMenu.setIconId(Icons.MoreActionsUp);
+  private PileMenu createPileMenu(final List<IMenu> childActions) {
+    final Holder<PileMenu> result = new Holder<PileMenu>();
+
+    // Synchronize with model thread to create model element.
+    JobEx job = new ClientSyncJob("PileMenu", getUiEnvironment().getClientSession()) {
+
+      @Override
+      protected void runVoid(IProgressMonitor monitor) throws Throwable {
+        PileMenu pileMenu = new PileMenu();
+        pileMenu.setChildActions(childActions);
+        if (getMenuOpeningDirection() == SWT.UP) {
+          pileMenu.setIconId(Icons.MoreActionsUp);
+        }
+        else {
+          pileMenu.setIconId(Icons.MoreActionsDown);
+        }
+
+        result.setValue(pileMenu);
+      }
+    };
+    job.schedule();
+    try {
+      job.join(2345);
     }
-    else {
-      pileMenu.setIconId(Icons.MoreActionsDown);
+    catch (InterruptedException e) {
+      LOG.warn("Interrupted while waiting for the PileMenu model to be created.", e);
     }
 
-    return pileMenu;
+    return result.getValue();
   }
 
   protected boolean createPileButton() {
