@@ -17,6 +17,7 @@ import org.eclipse.scout.rt.ui.rap.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.rap.ext.StatusLabelEx;
 import org.eclipse.scout.rt.ui.rap.form.fields.LogicalGridDataBuilder;
 import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutValueFieldComposite;
+import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -76,7 +77,7 @@ public class RwtScoutLabelField extends RwtScoutValueFieldComposite<ILabelField>
 
   /**
    * Defines if the label should be selectable or not
-   * 
+   *
    * @since 3.10.0-M6
    */
   protected void setSelectableFromScout(boolean booleanValue) {
@@ -97,6 +98,11 @@ public class RwtScoutLabelField extends RwtScoutValueFieldComposite<ILabelField>
     }
     getUiField().setText(s);
     getUiContainer().layout(true, true);
+  }
+
+  @Override
+  protected void setLabelHorizontalAlignmentFromScout() {
+    getUiField().setAlignment(RwtUtility.getHorizontalAlignment(getScoutObject().getGridData().horizontalAlignment));
   }
 
   /**

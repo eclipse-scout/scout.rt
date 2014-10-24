@@ -22,6 +22,7 @@ import org.eclipse.scout.rt.ui.swt.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swt.ext.StatusLabelEx;
 import org.eclipse.scout.rt.ui.swt.form.fields.LogicalGridDataBuilder;
 import org.eclipse.scout.rt.ui.swt.form.fields.SwtScoutValueFieldComposite;
+import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.widgets.Composite;
@@ -115,8 +116,8 @@ public class SwtScoutLabelField extends SwtScoutValueFieldComposite<ILabelField>
   }
 
   protected void setTextWrapFromScout(boolean booleanValue) {
-    // TODO sle wrap does not work as expected
-    // getSwtField().setWordWrap(booleanValue);
+    getSwtField().setWordWrap(booleanValue);
+    getSwtContainer().layout(true);
   }
 
   /**
@@ -131,6 +132,12 @@ public class SwtScoutLabelField extends SwtScoutValueFieldComposite<ILabelField>
   @Override
   protected void setFieldEnabled(Control swtField, boolean enabled) {
     // void here
+  }
+
+  @Override
+  protected void setLabelHorizontalAlignmentFromScout() {
+    int alignment = SwtUtility.getHorizontalAlignment(getScoutObject().getGridData().horizontalAlignment);
+    getSwtField().setAlignment(alignment);
   }
 
   /**
