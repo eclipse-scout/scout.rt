@@ -14,8 +14,62 @@ Tastatur-Navigation
 Sequence-Box
   Wir möchten die UI-Impl. vereinfachen:
   - Fehlerstatus für alle Felder "sammeln", d.h. eine Sequence-Box hat nur einen Fehlerstatus
-  - Infotext (Tooltip) für alle Felder sammeln,  .h. eine Sequence-Box hat nur einen Infotext
+  - Infotext (Tooltip) für alle Felder sammeln, d.h. eine Sequence-Box hat nur einen Infotext
   - Jedes Feld in der SB hat einen Mandatory-Stern, der Platz für den Stern wird immer reserviert
     auch wenn das Feld nicht obligatrisch ist (einfacher zu layouten, keine Schlangenlinien).
   - Die komplizierte Label-Logik entfällt. Wenn ein Feld in der SB dargestellt wird, wird
     das Label automatisch im Feld als Placeholder-Text dargestellt.
+
+
+Arbeits-Hypothese für Margins bei Groupboxes, TabBoxes und Table innerhalb von Forms
+AWE, CGU 24.10.2014
+
+Groupbox:
+
+  Hat NIE left/right margin
+  Kann top/bottom margin haben (siehe Groupbox-Body)
+
+Groupbox-Title:
+
+  Hat NIE einen margin
+  Visible: Ja wenn text !empty, sonst Nein
+  TODO: man könnte auf  dem Model set/isTitleVisible() impl.
+    analog FormField-Label
+
+Groupbox-body:
+
+  Hat einen top/bottom margin, wenn borderVisible = Ja
+    Andernfalls kein margin
+    Default = Ja
+  margin-bottom > margin-top (z.B. 20px / 10px)
+  TODO: man könnte borderVisible in marginVisible umbenennen
+    heute steuert borderVisible auch die Sichtbarkeit vom
+    Title, das wäre neu nicht mehr so.
+
+Einfache-"Magie":
+
+  Wenn GroupBox NUR ein TableField enthält, dann borderVisible
+  automatisch = Nein
+  Muss wahrscheinlich auf dem Modell gelöst werden.
+
+Spezialfälle:
+
+  RootGroupBox hat NIE einen margin
+
+  hat IMMER einen border-top (horiz. linie)
+
+Table:
+
+  Fokusrahmen um TableField fällt weg (weil wir die Table meistens
+  ohne Border darstellen). Dafür müssen wir den Fokus-Rahmen innerhalb
+  der Table-Cells visualisieren. Vorlage ist hier Windows. Wichtig:
+  Fokus ist nicht gleich Selektion!
+
+TableField:
+
+  Hat NIE einen Border (vorläufig)
+  Hat keinen Tablestatus (vorläufig)
+
+TabBox:
+
+  Hat kein margin-top

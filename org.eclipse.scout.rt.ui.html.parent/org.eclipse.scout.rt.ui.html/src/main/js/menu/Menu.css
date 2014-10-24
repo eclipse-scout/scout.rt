@@ -6,6 +6,7 @@
   line-height: @size-desktop-menu - 1px;
   content: @icon;
   color:#666;
+  vertical-align:-3px;
 }
 
 .menu-context {
@@ -112,7 +113,6 @@
 
 [data-icon]:before {
   .menu-icon(attr(data-icon));
-  vertical-align:-3px;
 }
 
 .menu-textandicon[data-icon]:before {

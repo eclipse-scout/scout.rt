@@ -1,5 +1,4 @@
 scout.Menubar = function($parent) {
-  //create container
   this.$container = $parent.prependDiv('', 'menubar');
   this.menus = [];
   this.lastMenu;
@@ -60,14 +59,16 @@ scout.Menubar.prototype.updateItems = function(menus) {
     }
   }
 
-  // TODO AWE: (menu) 'last' is not added to correct right aligned menu
-  // this._addLastClass();
-
   // Fix for Firefox issue with float:right. In Firefox elements with float:right must
   // come first in the HTML order of elements. Otherwise a strange layout bug occurs.
   this.$container.children('.menu-right').
     detach().
     prependTo(this.$container);
+
+  // The _first_ menu-right must have the 'last' class (reverse order because of float:right)
+  this.$container.children('.menu-right').
+    first().
+    addClass('last');
 };
 
 scout.Menubar.prototype._addMenuItem = function(menu) {
@@ -82,15 +83,7 @@ scout.Menubar.prototype._addMenuItem = function(menu) {
 scout.Menubar.prototype._addMenuSeparator = function () {
   var s = this.$container.appendDIV('menu-separator');
   this.menus.push(s);
-  this._addLastClass();
-};
-
-/**
- * Add 'last' class to each previous menu-item when:
- * - after a menu-separator has been added
- * - after all menu items have been added
- */
-scout.Menubar.prototype._addLastClass = function () {
+  // Add 'last' class to each previous menu-item when a separator has been added
   if (this.lastMenu) {
     this.lastMenu.$container.addClass('last');
   }
