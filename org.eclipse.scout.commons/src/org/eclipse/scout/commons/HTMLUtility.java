@@ -18,9 +18,12 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -379,6 +382,7 @@ public final class HTMLUtility {
       }
     }
     // clean font tags if any styles are present
+    final Map<MutableAttributeSet, List<Object>> attributesToRemove = new HashMap<MutableAttributeSet, List<Object>>();
     doc.writeLockEx();
     visitDocument(doc, new IDocumentVisitor() {
       @Override
@@ -390,11 +394,25 @@ public final class HTMLUtility {
       public void visitAttribute(Element elem, AttributeSet atts, Object nm, Object value) {
         if (nm == HTML.Attribute.FACE || nm == HTML.Attribute.SIZE || nm == CSS.Attribute.FONT_FAMILY || nm == CSS.Attribute.FONT_SIZE) {
           if (atts instanceof MutableAttributeSet) {
-            ((MutableAttributeSet) atts).removeAttribute(nm);
+            MutableAttributeSet mutableAttributeSet = (MutableAttributeSet) atts;
+            List<Object> attributes = attributesToRemove.get(mutableAttributeSet);
+            if (attributes == null) {
+              attributes = new ArrayList<Object>();
+              attributesToRemove.put(mutableAttributeSet, attributes);
+            }
+            attributes.add(nm);
           }
         }
       }
     });
+
+    for (Entry<MutableAttributeSet, List<Object>> entry : attributesToRemove.entrySet()) {
+      MutableAttributeSet mutableAttributeSet = entry.getKey();
+      for (Object nm : entry.getValue()) {
+        mutableAttributeSet.removeAttribute(nm);
+      }
+    }
+
     doc.writeUnlockEx();
     return htmlDoc;
   }
