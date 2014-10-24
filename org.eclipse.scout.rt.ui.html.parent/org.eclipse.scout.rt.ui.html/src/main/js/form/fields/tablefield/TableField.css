@@ -11,30 +11,35 @@
   .glow(@color-focus-glow);
 }
 
-.table-field > .table > .menubar,
+
 .table-field > .table > .table-header,
 .table-field > .table > .table-header > .header-resize  {
   height: @logical-grid-height;
 }
 
-.table-field > .table > .menubar {
-  margin: 0 0 7px 0;
-}
-
-.table-field .menubar > .menu-item,
 .table-field .table-header > .header-item {
   line-height: @logical-grid-height;
 }
 
-/*TODO CGU/CRU wieso nicht mit background-color wie bei header-resize? UND braucht es all diese height definitionen wirklich? */
-.table-field .menubar > .menu-separator {
-  top: -8px;
-  height: @logical-grid-height - 14px;
-}
+/* TODO CGU/CRU wieso nicht mit background-color wie bei header-resize? UND braucht es all diese height definitionen wirklich? */
+.table-field .menubar {
 
-.table-field .menubar > .menu-item[data-icon]:before {
-  font-size: 18px;
-  line-height: @logical-grid-height;
+  height:39px;
+  padding:0 0 0 0;
+  border-bottom:none;
+
+  & > .menu-item {
+    padding-top:0;
+
+    &[data-icon]:before {
+      font-size: 18px;
+      line-height: @logical-grid-height;
+    }
+  }
+
+  & > .menu-separator {
+    height: @logical-grid-height - 10px;
+  }
 }
 
 .table-field .table-row {

@@ -34,6 +34,13 @@
   margin:0 20px;
   padding:6px 0 10px 0;
   border-bottom:solid 1px @color-bench-light-border;
+
+  & div, button {
+    box-sizing:border-box;
+    display:inline-block;
+    vertical-align:middle;
+  }
+
 }
 
 .menu-separator {
@@ -42,12 +49,6 @@
   height:30px;
   margin:6px 19px 3px 19px;
   background-color:#d6d6d6;
-}
-
-.menubar div, button {
-  box-sizing:border-box;
-  display:inline-block;
-  vertical-align:middle;
 }
 
 .menu-button {

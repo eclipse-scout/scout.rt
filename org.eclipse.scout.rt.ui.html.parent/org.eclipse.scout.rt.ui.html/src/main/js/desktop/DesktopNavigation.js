@@ -48,6 +48,8 @@ scout.DesktopNavigation.prototype._createOutlinesTab = function() {
     .on('click', openMenu);
 
   // create menu
+  // TODO AWE: use Popup class here, maybe a new "head" style is required here
+  // than we could use the same popup for the phone-form
   var $outlinesMenu = $tab.appendDIV('navigation-tab-outline-menu');
   for (var i = 0; i < this.desktop.viewButtons.length; i++) {
     this.desktop.viewButtons[i].render($outlinesMenu);
