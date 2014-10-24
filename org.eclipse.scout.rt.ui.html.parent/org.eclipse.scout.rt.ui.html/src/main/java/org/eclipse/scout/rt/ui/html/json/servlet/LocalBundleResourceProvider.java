@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -64,9 +66,13 @@ public class LocalBundleResourceProvider extends AbstractService implements ISer
 
     //Prefer mime type mapping from container
     String contentType = servlet.getServletContext().getMimeType(pathInfo);
+    int lastDot = pathInfo.lastIndexOf('.');
+    String fileExtension = lastDot >= 0 ? pathInfo.substring(lastDot + 1) : pathInfo;
     if (contentType == null) {
-      int lastDot = pathInfo.lastIndexOf('.');
-      contentType = FileUtility.getContentTypeForExtension(lastDot >= 0 ? pathInfo.substring(lastDot + 1) : pathInfo);
+      contentType = getMsOfficeMimeTypes(fileExtension);
+    }
+    if (contentType == null) {
+      contentType = FileUtility.getContentTypeForExtension(fileExtension);
     }
     if (contentType == null) {
       LOG.warn("Could not determine content type of file " + pathInfo);
@@ -77,6 +83,31 @@ public class LocalBundleResourceProvider extends AbstractService implements ISer
 
     resp.getOutputStream().write(content);
     return true;
+  }
+
+  /**
+   * TODO AWE: gerrit commit for FileUtilty.
+   * see: http://stackoverflow.com/questions/4212861/what-is-a-correct-mime-type-for-docx-pptx-etc
+   */
+  private static final Map<String, String> EXT_TO_MIME_TYPE_MAP = new HashMap<>();
+
+  static {
+    EXT_TO_MIME_TYPE_MAP.put("xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    EXT_TO_MIME_TYPE_MAP.put("xltx", "application/vnd.openxmlformats-officedocument.spreadsheetml.template");
+    EXT_TO_MIME_TYPE_MAP.put("potx", "application/vnd.openxmlformats-officedocument.presentationml.template");
+    EXT_TO_MIME_TYPE_MAP.put("ppsx", "application/vnd.openxmlformats-officedocument.presentationml.slideshow");
+    EXT_TO_MIME_TYPE_MAP.put("pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation");
+    EXT_TO_MIME_TYPE_MAP.put("xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    EXT_TO_MIME_TYPE_MAP.put("sldx", "application/vnd.openxmlformats-officedocument.presentationml.slide");
+    EXT_TO_MIME_TYPE_MAP.put("docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+    EXT_TO_MIME_TYPE_MAP.put("xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    EXT_TO_MIME_TYPE_MAP.put("dotx", "application/vnd.openxmlformats-officedocument.wordprocessingml.template");
+    EXT_TO_MIME_TYPE_MAP.put("xlam", "application/vnd.ms-excel.addin.macroEnabled.12");
+    EXT_TO_MIME_TYPE_MAP.put("xlsb", "application/vnd.ms-excel.sheet.binary.macroEnabled.12");
+  }
+
+  private String getMsOfficeMimeTypes(String fileExtension) {
+    return EXT_TO_MIME_TYPE_MAP.get(fileExtension.toLowerCase());
   }
 
   protected Bundle getBundle() {
