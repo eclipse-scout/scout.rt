@@ -13,7 +13,7 @@ scout.inherits(scout.FormField, scout.ModelAdapter);
 scout.FormField.prototype._render = function($parent) {
   // TODO AWE: (form) remove this code when FormField is "abstract". There should be no reason to instantiate a
   // FormField directly. Currently this is required as a placeholder for un-implemented form-fields.
-  this.addContainer($parent, 'form-field', new scout.FormFieldLayout());
+  this.addContainer($parent, 'form-field');
   this.addLabel();
   this.addStatus();
   this.$field = $.makeDiv('', 'field').
@@ -36,10 +36,17 @@ scout.FormField.prototype._renderMandatory = function(mandatory) {
 };
 
 scout.FormField.prototype._renderErrorStatus = function(errorStatus) {
+  errorStatus = this.errorStatusUi || this.errorStatus;
   this.$container.updateClass(errorStatus, 'has-error');
 
   if (this.$field) {
     this.$field.updateClass(errorStatus, 'has-error');
+  }
+
+  if (errorStatus) {
+    this._showStatusMessage({autoRemove: false});
+  } else {
+    this._hideStatusMessage();
   }
 };
 
@@ -96,7 +103,14 @@ scout.FormField.prototype._renderGridData = function(gridData) {
 };
 
 scout.FormField.prototype._onStatusClick = function() {
-  var text, tooltip;
+  this._showStatusMessage();
+};
+
+scout.FormField.prototype._showStatusMessage = function(options) {
+  var opts, text;
+  if (this.tooltip && this.tooltip.rendered) {
+    return;
+  }
 
   if (this.errorStatusUi) {
     text = this.errorStatusUi.message;
@@ -106,11 +120,34 @@ scout.FormField.prototype._onStatusClick = function() {
     text = this.tooltipText;
   }
 
-  tooltip = new scout.Tooltip({
+  opts = {
     text: text,
-    $origin: this.$status
-  });
-  tooltip.render();
+    $origin: this.$status,
+    $context: this._findForm().$container
+  };
+  $.extend(opts, options);
+  this.tooltip = new scout.Tooltip(opts);
+  this.tooltip.render();
+};
+
+scout.FormField.prototype._findForm = function() {
+  var parent = this.parent;
+  while (parent.objectType !== 'Form') {
+    parent = parent.parent;
+  }
+  return parent;
+};
+
+scout.FormField.prototype._showStatusMessageOnError = function() {
+  if (this.$container.hasClass('has-error')) {
+    this._showStatusMessage({autoRemove: false});
+  }
+};
+
+scout.FormField.prototype._hideStatusMessage = function() {
+  if (this.tooltip) {
+    this.tooltip.remove();
+  }
 };
 
 scout.FormField.prototype.goOffline = function() {
@@ -181,7 +218,7 @@ scout.FormField.prototype.addContainer = function($parent, typeName, layout) {
 
   var htmlComp = new scout.HtmlComponent(this.$container, this.session);
   htmlComp.layoutData = new scout.LogicalGridData(this);
-  htmlComp.setLayout(layout || new scout.FormFieldLayout());
+  htmlComp.setLayout(layout || new scout.FormFieldLayout(this));
   return htmlComp;
 };
 

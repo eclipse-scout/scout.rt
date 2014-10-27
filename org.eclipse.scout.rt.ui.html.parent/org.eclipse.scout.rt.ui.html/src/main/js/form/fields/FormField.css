@@ -15,9 +15,28 @@
     max-width:130px;
   }
 
-  & > .mandatory-indicator,
-    > .field {
+  & > .field {
     position:absolute;
+  }
+
+  & > .mandatory-indicator {
+    position:absolute;
+    visibility: hidden;
+    margin-right: 2px;
+
+    &:before {
+      content: '*';
+      font-size: 10px;
+    }
+  }
+
+  &.mandatory > .mandatory-indicator {
+    visibility: visible;
+  }
+
+  /* keep space so that fields don't move when changing from disabled to enabled */
+  &.disabled > .mandatory-indicator {
+    visibility: hidden;
   }
 
   & > .status {
@@ -52,24 +71,4 @@
       color: @color-error;
     }
   }
-
-  & > .mandatory-indicator {
-    visibility: hidden;
-    margin-right: 2px;
-
-    &:before {
-      content: '*';
-      font-size: 10px;
-    }
-  }
-
-  &.mandatory > .mandatory-indicator {
-    visibility: visible;
-  }
-
-  /* keep space so that fields don't move when changing from disabled to enabled */
-  &.disabled > .mandatory-indicator {
-    visibility: hidden;
-  }
-
 }

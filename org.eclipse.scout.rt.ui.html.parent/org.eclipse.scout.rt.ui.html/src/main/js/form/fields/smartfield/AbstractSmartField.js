@@ -17,15 +17,11 @@ scout.AbstractSmartField.prototype._render = function($parent) {
     attr('type', 'text').
     addClass('field').
     disableSpellcheck().
+    focus(this._onFieldFocus.bind(this)).
     blur(this._onFieldBlur.bind(this)).
-    appendTo(this.$container).
-    // TODO AWE: (smartfield) event-handling mit C.GU besprechen, siehe auch ValueField.js
-    // --> 1. auf ValueField eine attachXyzEvent() Methode machen
-    //     2. _onXyzEvent überschreiben
-    focus(this._onFocus.bind(this)).
-    blur(this._onBlur.bind(this)).
     keyup(this._onKeyup.bind(this)).
-    keydown(this._onKeydown.bind(this));
+    keydown(this._onKeydown.bind(this)).
+    appendTo(this.$container);
 
   this.addIcon();
   this.addStatus();
@@ -190,7 +186,7 @@ scout.AbstractSmartField.prototype._onOptionMousedown = function(e) {
   this._closePopup();
 };
 
-scout.AbstractSmartField.prototype._onFocus = function() {
+scout.AbstractSmartField.prototype._onFieldFocus = function() {
   this._oldVal = this.$field.val();
   $.log.debug('_onFocus. set oldVal=' + this._oldVal);
   if (!this._$popup) {
@@ -198,7 +194,9 @@ scout.AbstractSmartField.prototype._onFocus = function() {
   }
 };
 
-scout.AbstractSmartField.prototype._onBlur = function() {
+scout.AbstractSmartField.prototype._onFieldBlur = function() {
+  scout.AbstractSmartField.parent.prototype._onFieldBlur.call(this);
+
   $.log.debug("_onBlur");
   this._closePopup();
 };

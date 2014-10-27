@@ -160,7 +160,9 @@ scout.Desktop.prototype._selectTab = function(tab) {
 
 scout.Desktop.prototype._unselectTab = function(tab) {
   tab.$storage = this.$bench.children();
-  this.$bench.children().detach();
+  var $children = this.$bench.children();
+  scout.Tooltip.removeTooltips($children);
+  $children.detach();
   tab.$div.select(false);
 };
 

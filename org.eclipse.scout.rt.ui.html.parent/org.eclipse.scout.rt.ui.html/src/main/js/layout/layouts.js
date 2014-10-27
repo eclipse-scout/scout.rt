@@ -105,8 +105,9 @@ scout.GroupBoxLayout.prototype._getHtmlBody = function($container) {
 /**
  * Form-Field Layout, for a form-field with label, status, mandatory-indicator and a field
  */
-scout.FormFieldLayout = function() {
+scout.FormFieldLayout = function(formField) {
   scout.FormFieldLayout.parent.call(this);
+  this.formField = formField;
   this.labelWidth = scout.HtmlEnvironment.fieldLabelWidth;
 };
 scout.inherits(scout.FormFieldLayout, scout.AbstractLayout);
@@ -117,11 +118,12 @@ scout.FormFieldLayout.prototype.layout = function($container) {
     contSize = htmlComp.getSize().subtractInsets(htmlComp.getInsets()),
     leftWidth = 0,
     rightWidth = 0,
-    $label = $container.children('label'),
-    $status = $container.children('.status'),
-    $mandatory = $container.children('.mandatory-indicator'),
-    $field = $container.children('.field'),
-    $icon = $container.children('.icon');
+    $label = this.formField.$label,
+    $status = this.formField.$status,
+    $mandatory = this.formField.$mandatory,
+    $field = this.formField.$field,
+    $icon = this.formField.$icon,
+    tooltip = this.formField.tooltip;
 
   if ($label.isVisible()) {
     scout.HtmlComponent.setBounds($label, 0, 0, this.labelWidth, contSize.height);
@@ -129,27 +131,34 @@ scout.FormFieldLayout.prototype.layout = function($container) {
     $label.css('line-height', contSize.height + 'px');
     leftWidth += this.labelWidth;
   }
-  if ($mandatory.length > 0) {
+  if ($mandatory) {
     $mandatory.cssLeft(leftWidth);
     leftWidth += $mandatory.outerWidth(true);
   }
-  if ($status.length > 0) {
+  if ($status) {
     $status.css('line-height', contSize.height + 'px');
     rightWidth += $status.outerWidth(true);
   }
 
-  fieldBounds = new scout.Rectangle(leftWidth, 0, contSize.width - leftWidth - rightWidth, contSize.height);
-  htmlField = scout.HtmlComponent.optGet($field);
-  // TODO AWE: (layout) dafür sorgen, dass wir hier immer ein get() machen können
-  if (htmlField) {
-    htmlField.setBounds(fieldBounds);
-  } else {
-    scout.HtmlComponent.setBounds($field, fieldBounds);
-  }
+  if ($field) {
+    fieldBounds = new scout.Rectangle(leftWidth, 0, contSize.width - leftWidth - rightWidth, contSize.height);
+    htmlField = scout.HtmlComponent.optGet($field);
+    // TODO AWE: (layout) dafür sorgen, dass wir hier immer ein get() machen können
+    if (htmlField) {
+      htmlField.setBounds(fieldBounds);
+    } else {
+      scout.HtmlComponent.setBounds($field, fieldBounds);
+    }
 
-  //Icon is placed inside the field (as overlay)
-  if ($icon.length > 0) {
-    $icon.css('right', $field.cssBorderRightWidth() + rightWidth + 'px');
+    //Icon is placed inside the field (as overlay)
+    if ($icon) {
+      $icon.css('right', $field.cssBorderRightWidth() + rightWidth + 'px');
+    }
+
+    //Make sure tooltip is at correct position after layouting, if there is one
+    if (tooltip && tooltip.rendered) {
+      tooltip.position();
+    }
   }
 };
 

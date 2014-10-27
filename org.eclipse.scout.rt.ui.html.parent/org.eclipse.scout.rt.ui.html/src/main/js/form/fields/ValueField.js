@@ -51,12 +51,7 @@ scout.ValueField.prototype._onFieldKeyUp = function() {
 };
 
 scout.ValueField.prototype._onFieldBlur = function() {
-  if (!this.$field) {
-    return;
-  }
-
-  var displayText = this._readDisplayText();
-  this._updateDisplayText(displayText, false);
+  this._updateDisplayText(this._readDisplayText(), false);
 };
 
 scout.ValueField.prototype._updateDisplayText = function(displayText, whileTyping) {

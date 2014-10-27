@@ -11,9 +11,9 @@ scout.DateField.prototype._render = function($parent) {
   this.$field = $('<input>').
     attr('type', 'text').
     addClass('field').
+    focus(this._onFieldFocus.bind(this)).
     blur(this._onFieldBlur.bind(this)).
     keydown(this._onKeyDown.bind(this)).
-    focus(this._onFocus.bind(this)).
     click(this._onClick.bind(this)).
     appendTo(this.$container);
 
@@ -24,7 +24,7 @@ scout.DateField.prototype._render = function($parent) {
   this.addStatus();
 };
 
-scout.DateField.prototype._onFocus = function() {
+scout.DateField.prototype._onFieldFocus = function() {
   if (!this._$predict || this._$predict.length === 0){
     this._$predict = this._createPredictionField();
   }
