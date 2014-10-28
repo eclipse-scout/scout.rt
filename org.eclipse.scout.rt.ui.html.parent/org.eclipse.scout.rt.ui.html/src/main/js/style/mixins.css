@@ -44,14 +44,15 @@
   & ~ .icon {
     position: absolute;
     margin-right: @text-field-padding;
+    cursor: text;
   }
 
   & ~ .icon:before {
     .font-icon;
-    font-size: 12px;
+    font-size: 14px;
     content: @icon;
     line-height: @logical-grid-height;
-    color: @color-bench-light-border;
+    color: @palette-light-gray-0;
   }
 
   &:focus ~ .icon:before {

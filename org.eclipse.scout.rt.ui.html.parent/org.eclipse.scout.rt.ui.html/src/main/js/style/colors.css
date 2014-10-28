@@ -2,7 +2,9 @@
 @palette-black:#000;
 @palette-dark-gray-1:#333;
 @palette-dark-gray-2:#666;
+@palette-dark-gray-3:#777;
 @palette-gray:#999;
+@palette-light-gray-0:#aaa;
 @palette-light-gray-1:#ccc;
 @palette-light-gray-2:#ddd;
 @palette-light-gray-3:#ebebeb;
@@ -57,7 +59,7 @@
 
 /* TODO AWE: (css/colors) ueber naming diskutieren */
 @color-error: #FF6060;
-@color-info: #565656;
+@color-info: @palette-dark-gray-3;
 @color-error-light: #FFE0E0;
 @color-bsi-orange: #FE9915;
 @color-bsi-green: #0082A1;
