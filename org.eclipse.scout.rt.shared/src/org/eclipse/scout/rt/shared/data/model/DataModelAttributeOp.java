@@ -1431,11 +1431,11 @@ public final class DataModelAttributeOp implements DataModelConstants {
 
     @Override
     public String createVerboseText(Integer aggregationType, String attributeText, List<String> valueTexts) {
-      if (StringUtility.isNullOrEmpty(valueTexts.get(0))) {
-        return buildText(aggregationType, attributeText, ScoutTexts.get("LogicLE"), valueTexts.get(0));
+      if (StringUtility.isNullOrEmpty(valueTexts.get(0)) && StringUtility.hasText(valueTexts.get(1))) {
+        return buildText(aggregationType, attributeText, ScoutTexts.get("LogicLE"), valueTexts.get(1));
       }
-      else if (StringUtility.isNullOrEmpty(valueTexts.get(1))) {
-        return buildText(aggregationType, attributeText, ScoutTexts.get("LogicGE"), valueTexts.get(1));
+      else if (StringUtility.isNullOrEmpty(valueTexts.get(1)) && StringUtility.hasText(valueTexts.get(0))) {
+        return buildText(aggregationType, attributeText, ScoutTexts.get("LogicGE"), valueTexts.get(0));
       }
       else {
         return buildText(aggregationType, attributeText, getText(), valueTexts);
