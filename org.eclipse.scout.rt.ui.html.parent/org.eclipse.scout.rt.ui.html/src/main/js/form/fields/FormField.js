@@ -107,7 +107,7 @@ scout.FormField.prototype._onStatusClick = function() {
 };
 
 scout.FormField.prototype._showStatusMessage = function(options) {
-  var opts, text;
+  var opts, text, form, $formContainer;
   if (this.tooltip && this.tooltip.rendered) {
     return;
   }
@@ -120,10 +120,15 @@ scout.FormField.prototype._showStatusMessage = function(options) {
     text = this.tooltipText;
   }
 
+  form = this._findForm();
+  if (form) {
+    $formContainer = form.$container;
+  }
+
   opts = {
     text: text,
     $origin: this.$status,
-    $context: this._findForm().$container
+    $context: $formContainer
   };
   $.extend(opts, options);
   this.tooltip = new scout.Tooltip(opts);
@@ -132,7 +137,7 @@ scout.FormField.prototype._showStatusMessage = function(options) {
 
 scout.FormField.prototype._findForm = function() {
   var parent = this.parent;
-  while (parent.objectType !== 'Form') {
+  while (parent && parent.objectType !== 'Form') {
     parent = parent.parent;
   }
   return parent;
@@ -191,6 +196,9 @@ scout.FormField.prototype.addMandatoryIndicator = function() {
 scout.FormField.prototype.addIcon = function() {
   this.$icon = $('<span>').
     addClass('icon').
+    click(function() {
+      this.$field.focus();
+    }.bind(this)).
     appendTo(this.$container);
 };
 

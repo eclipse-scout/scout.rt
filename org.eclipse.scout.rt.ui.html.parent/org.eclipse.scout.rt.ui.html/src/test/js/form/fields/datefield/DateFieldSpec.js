@@ -15,6 +15,7 @@ describe("DateField", function() {
     session = null;
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
+    $('.tooltip').remove();
   });
 
   function createField(model) {
