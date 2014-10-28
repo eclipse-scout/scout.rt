@@ -467,12 +467,8 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
     }
     ArrayList<Principal> list = new ArrayList<Principal>(subject.getPrincipals());
     String user = (list.size() > 0 ? list.get(0).getName() : null);
-    String pass = (list.size() > 1 ? list.get(1).getName() : null);
     if (user == null) {
       user = "";
-    }
-    if (pass == null) {
-      pass = "";
     }
     String msg = "" + System.currentTimeMillis() + ":" + user;
     try {
