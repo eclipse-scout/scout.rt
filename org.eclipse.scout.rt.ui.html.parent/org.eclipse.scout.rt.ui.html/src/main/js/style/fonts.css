@@ -1,47 +1,57 @@
-@font-face {
-font-family: scoutIcons;
-font-style: normal;
-font-weight: 400;
-src: url('scoutIcons.woff') format('woff');
-}
+/* Font face definition for custom icon font:
+
+See GIT history for font-face definitions. Some how it wasn't possible
+to produce a consistent look on all browsers with the font-face definition.
+Simply using font-family works better and is more reliable. However, we still
+could use 'Open Sans' in the font-family (when it's installed on the client
+system) and fall back to Arial otherwise, without downloading a WOFF file.
+
+Try these to switch between fonts:
+
+@defaultFont: 'Open Sans', OpenSans, Arial, sans-serif;
+@defaultFont: Arial, sans-serif;
+ */
+@defaultFont: Arial, sans-serif;
+@normal:normal;
+@bold:bold;
 
 @font-face {
-font-family: fontScout;
-font-style: normal;
-font-weight: 400;
-src: local('Open Sans'), local('OpenSans'), url('open_sans_normal.woff') format('woff');
+  font-family: scoutIcons;
+  font-weight: normal;
+  src: url('scoutIcons.woff') format('woff');
 }
 
-.font-icon(@weight: 400) {
-font-family: scoutIcons;
-font-weight: @weight;
-speak: none;
--webkit-font-smoothing: antialiased;
--moz-osx-font-smoothing: grayscale;
+/* Font Mixins */
+
+.font-text-small {
+  font-family: @defaultFont;
+  font-weight: normal;
+  font-size: 11px;
 }
 
-.font-text-small(@weight: 400) {
-font-family: fontScout, sans-serif;
-font-weight: @weight;
-font-size: 11px;
+.font-text-normal(@fontWeight:@normal) {
+  font-family: @defaultFont;
+  font-weight: @fontWeight;
+  font-size: 13px;
 }
 
-.font-text-normal(@weight: 400) {
-font-family: fontScout, sans-serif;
-font-weight: @weight;
-font-size: 13px;
+.font-text-plus(@fontWeight:@normal) {
+  font-family: @defaultFont;
+  font-weight: @fontWeight;
+  font-size: 14px;
 }
 
-.font-text-plus(@weight: 400) {
-font-family: fontScout, sans-serif;
-font-weight: @weight;
-font-size: 14px;
+.font-text-large {
+  font-family: @defaultFont;
+  font-weight: normal;
+  font-size: 16px;
 }
 
-.font-text-large(@weight: 400) {
-font-family: fontScout, sans-serif;
-font-weight: @weight;
-font-size: 16px;
+.font-icon {
+  font-family: scoutIcons;
+  speak: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 

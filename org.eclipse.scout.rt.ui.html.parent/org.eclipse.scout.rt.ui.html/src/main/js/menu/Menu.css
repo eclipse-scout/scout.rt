@@ -65,10 +65,10 @@
   }
 
   &+ .default-button {
+    .font-text-normal(@bold);
     background-color:#389db6;
     color:white;
     border:none;
-    font-weight:bold;
   }
 
   &:focus {

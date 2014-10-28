@@ -25,7 +25,8 @@
 }
 
 .header-text{
-  .font-text-normal(700);
+  .font-text-normal(@bold);
+  font-weight:bold;
   color: @color-bench-text;
   line-height: 22px;
   height: 22px;

@@ -43,7 +43,7 @@
 .header-item {
   position: relative;
   display: inline-block;
-  .font-text-normal(700);
+  .font-text-normal(@bold);
   padding: 0px 6px 0px 9px;
   overflow: hidden;
   text-overflow: ellipsis;

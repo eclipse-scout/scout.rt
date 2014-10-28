@@ -32,7 +32,7 @@
     }
 
   &.parent {
-    .font-text-plus(800);
+    .font-text-plus(@bold);
   }
 
   &.children {
