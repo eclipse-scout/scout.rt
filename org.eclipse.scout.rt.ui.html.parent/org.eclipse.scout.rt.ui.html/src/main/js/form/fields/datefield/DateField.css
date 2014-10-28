@@ -114,7 +114,7 @@
   width: 20px;
   height: 14px;
   cursor: pointer;
-  .font-icon(bold);
+  .font-icon;
   margin: 0px 2px 0px 0px;
   font-size: 18px;
 }

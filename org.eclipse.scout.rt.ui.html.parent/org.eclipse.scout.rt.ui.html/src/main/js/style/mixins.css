@@ -49,7 +49,7 @@
 
   & ~ .icon:before {
     .font-icon;
-    font-size: 14px;
+    font-size: 13px;
     content: @icon;
     line-height: @logical-grid-height;
     color: @palette-light-gray-0;
