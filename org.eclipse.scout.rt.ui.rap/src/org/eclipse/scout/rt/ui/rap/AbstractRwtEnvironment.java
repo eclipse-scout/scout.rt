@@ -41,6 +41,7 @@ import org.eclipse.rap.rwt.internal.protocol.ResponseMessage;
 import org.eclipse.rap.rwt.internal.remote.MessageFilter;
 import org.eclipse.rap.rwt.internal.remote.MessageFilterChain;
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.StringUtility;
@@ -349,7 +350,7 @@ public abstract class AbstractRwtEnvironment extends AbstractEntryPoint implemen
 
       // enable HTTP request handling
       // the first beforeRequest-event has to be fired manually, because currently no MessageFilter is attached
-      beforeHttpRequest();
+      beforeHttpRequestInternal();
 
       /**
        * TODO: remove cast and restriction annotation when
@@ -381,9 +382,7 @@ public abstract class AbstractRwtEnvironment extends AbstractEntryPoint implemen
       m_desktop = m_clientSession.getDesktop();
 
       // init RWT locale with the locale of the client session
-      if (clientSession.getLocale() != null && !clientSession.getLocale().equals(RWT.getLocale())) {
-        RWT.setLocale(clientSession.getLocale());
-      }
+      setLocaleInUi(clientSession.getLocale());
 
       if (m_synchronizer == null) {
         m_synchronizer = new RwtScoutSynchronizer(this);
@@ -496,10 +495,10 @@ public abstract class AbstractRwtEnvironment extends AbstractEntryPoint implemen
    * Do NOT override this internal method, instead use {@link #beforeHttpRequest()}.
    */
   protected final void beforeHttpRequestInternal() {
-    if (getClientSession() != null) {
-      LocaleThreadLocal.set(getClientSession().getLocale());
+    IClientSession clientSession = getClientSession();
+    if (clientSession != null) {
+      setLocaleInUi(clientSession.getLocale());
     }
-
     beforeHttpRequest();
   }
 
@@ -1431,6 +1430,17 @@ public abstract class AbstractRwtEnvironment extends AbstractEntryPoint implemen
     m_activateDesktopCalled = activateDesktopCalled;
   }
 
+  protected void setLocaleInUi(Locale locale) {
+    Locale rwtLocale = RWT.getLocale();
+    Locale uiThreadLocale = LocaleThreadLocal.get();
+    if (!CompareUtility.equals(rwtLocale, locale)) {
+      RWT.setLocale(locale);
+    }
+    if (!CompareUtility.equals(uiThreadLocale, locale)) {
+      LocaleThreadLocal.set(locale);
+    }
+  }
+
   private class P_LocaleListener implements ILocaleListener {
     @Override
     public void localeChanged(LocaleChangeEvent event) {
@@ -1438,23 +1448,9 @@ public abstract class AbstractRwtEnvironment extends AbstractEntryPoint implemen
       invokeUiLater(new Runnable() {
         @Override
         public void run() {
-          if (!hasSameLocale(RWT.getLocale(), locale)) {
-            setLocale(locale);
-          }
+          setLocaleInUi(locale);
         }
       });
-    }
-
-    private void setLocale(Locale locale) {
-      RWT.setLocale(locale);
-    }
-
-    private boolean hasSameLocale(Locale locale1, Locale locale2) {
-      boolean result = false;
-      if (locale1 != null && locale2 != null) {
-        result = locale1.equals(locale2);
-      }
-      return result;
     }
   }
 

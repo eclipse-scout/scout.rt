@@ -83,7 +83,7 @@ public abstract class AbstractClientSession implements IClientSession {
   private String m_virtualSessionId;
   private IMemoryPolicy m_memoryPolicy;
   private IIconLocator m_iconLocator;
-  private final HashMap<String, Object> m_clientSessionData;
+  private final Map<String, Object> m_clientSessionData;
   private ScoutTexts m_scoutTexts;
   private Locale m_locale;
   private UserAgent m_userAgent;
@@ -135,6 +135,9 @@ public abstract class AbstractClientSession implements IClientSession {
     if (locale != null) {
       Locale oldLocale = m_locale;
       m_locale = locale;
+      if (!locale.equals(LocaleThreadLocal.get())) {
+        LocaleThreadLocal.set(locale);
+      }
       if (!locale.equals(oldLocale)) {
         notifyLocaleListeners(locale);
       }
