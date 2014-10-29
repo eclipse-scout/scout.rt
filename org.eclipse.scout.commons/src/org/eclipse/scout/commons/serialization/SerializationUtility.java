@@ -20,6 +20,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.internal.Activator;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.osgi.BundleListClassLoader;
 
 /**
  * Utility for serializing and deserializing java objects. The utility works in a standard java environment as well as
@@ -39,13 +40,16 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
  * following fully qualified class name:
  * <p/>
  * <code>org.eclipse.scout.commons.serialization.CustomObjectSerializerFactory</code>
- * 
+ *
  * @since 3.8.2
  */
 public final class SerializationUtility {
+  private static final IScoutLogger LOG;
 
   public static final String BUNDLE_ORDER_PREFIX_PROPERTY_NAME = "org.eclipse.scout.commons.serialization.bundleOrderPrefixes";
-  private static final IScoutLogger LOG;
+  public static final String ENABLE_RESOURCE_URL_CACHING_PROPERTY_NAME = "org.eclipse.scout.commons.serialization.enableResourceUrlCaching";
+  public static final String ENABLE_USAGE_OF_BUNDLE_ORDER_PREFIX_LIST_AS_RESOURCE_FILTER_PROPERTY_NAME = "org.eclipse.scout.commons.serialization.enableUsageOfBundleOrderPrefixListAsResourceFilter";
+
   private static final IObjectSerializerFactory FACTORY;
 
   static {
@@ -133,8 +137,55 @@ public final class SerializationUtility {
   }
 
   /**
+   * The {@link BundleListClassLoader} can cache the resources URLs it finds in the getResource(s) methods. This has the
+   * potential problem, that when bundles get unloaded, the cached resource URLs can't be found anymore. Instead of
+   * building a big check around this, it was safer to only let it enable if this should never be the case.
+   * </br>
+   * This method returns the value as it is configured in the config.ini file or as system property:
+   * <p/>
+   * <code>org.eclipse.scout.commons.serialization.enableResourceUrlCaching</code>
+   * <p/>
+   */
+  public static boolean isResourceUrlCachingInBundleListClassLoaderEnabled() {
+    String cacheEnabled = null;
+    if (Activator.getDefault() != null) {
+      cacheEnabled = Activator.getDefault().getBundle().getBundleContext().getProperty(ENABLE_RESOURCE_URL_CACHING_PROPERTY_NAME);
+    }
+    if (!StringUtility.hasText(cacheEnabled)) {
+      cacheEnabled = System.getProperty(ENABLE_RESOURCE_URL_CACHING_PROPERTY_NAME, null);
+    }
+    return StringUtility.parseBoolean(cacheEnabled, false);
+  }
+
+  /**
+   * The methods getResource(s) from {@link BundleListClassLoader} return resources from every bundle from the product
+   * plus from the general classpath. There are cases (library bundles with multiple jars) which this behavior has to be
+   * changed. With this property resources will be filtered the following way:
+   * <ul>
+   * <li>if a resource is found in a bundle which matches the prefix list just this or these resources URLs will be
+   * returned.</li>
+   * <li>if no resource is found in a bundle which matches the prefix list the list will be returned unfiltered.</li>
+   * </ul>
+   * </br>
+   * This method returns the value as it is configured in the config.ini file or as system property:
+   * <p/>
+   * <code>org.eclipse.scout.commons.serialization.enableUsageOfBundleOrderPrefixListAsResourceFilter</code>
+   * <p/>
+   */
+  public static boolean isUseBundleOrderPrefixListAsResourceFilterEnabled() {
+    String cacheEnabled = null;
+    if (Activator.getDefault() != null) {
+      cacheEnabled = Activator.getDefault().getBundle().getBundleContext().getProperty(ENABLE_USAGE_OF_BUNDLE_ORDER_PREFIX_LIST_AS_RESOURCE_FILTER_PROPERTY_NAME);
+    }
+    if (!StringUtility.hasText(cacheEnabled)) {
+      cacheEnabled = System.getProperty(ENABLE_USAGE_OF_BUNDLE_ORDER_PREFIX_LIST_AS_RESOURCE_FILTER_PROPERTY_NAME, null);
+    }
+    return StringUtility.parseBoolean(cacheEnabled, false);
+  }
+
+  /**
    * Uses a {@link IObjectSerializerFactory} for creating a new {@link IObjectSerializer}.
-   * 
+   *
    * @return Returns a new {@link IObjectSerializer}.
    */
   public static IObjectSerializer createObjectSerializer() {
@@ -144,7 +195,7 @@ public final class SerializationUtility {
   /**
    * Uses a {@link IObjectSerializerFactory} for creating a new {@link IObjectSerializer} which uses the given
    * {@link IObjectReplacer} for substituting objects during the serializing and deserializing process.
-   * 
+   *
    * @return Returns a new {@link IObjectSerializer}.
    */
   public static IObjectSerializer createObjectSerializer(IObjectReplacer objectReplacer) {

@@ -31,7 +31,7 @@ public class BundleObjectInputStream extends ObjectInputStream {
   private final IObjectReplacer m_objectReplacer;
 
   public BundleObjectInputStream(InputStream in, Bundle[] bundleList) throws IOException {
-    this(in, new BundleListClassLoader(bundleList), null);
+    this(in, new BundleListClassLoader(null, bundleList), null);
   }
 
   public BundleObjectInputStream(InputStream in, ClassLoader classLoader) throws IOException {

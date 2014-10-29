@@ -10,9 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.serialization;
 
+import org.eclipse.scout.commons.internal.Activator;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.osgi.BundleInspector;
 import org.eclipse.scout.commons.osgi.BundleListClassLoader;
 import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 
 /**
  * Factory for creating {@link BundleObjectSerializer} instances. All of them are sharing the very same
@@ -22,12 +27,16 @@ import org.osgi.framework.Bundle;
  */
 public class BundleObjectSerializerFactory implements IObjectSerializerFactory {
 
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(BundleObjectSerializerFactory.class);
+  private static final String CONTEXT_FINDER_CLASS_NAME = "org.eclipse.core.runtime.internal.adaptor.ContextFinder";
+
   private BundleListClassLoader m_bundleBasedClassLoader;
 
   public BundleObjectSerializerFactory() {
     String[] bundleOrderPrefixes = SerializationUtility.getBundleOrderPrefixes();
     Bundle[] orderedBundleLists = BundleInspector.getOrderedBundleList(bundleOrderPrefixes);
-    m_bundleBasedClassLoader = new BundleListClassLoader(orderedBundleLists);
+    ClassLoader parent = getOsgiParentClassLoader();
+    m_bundleBasedClassLoader = new BundleListClassLoader(parent, orderedBundleLists);
   }
 
   @Override
@@ -38,5 +47,39 @@ public class BundleObjectSerializerFactory implements IObjectSerializerFactory {
   @Override
   public ClassLoader getClassLoader() {
     return m_bundleBasedClassLoader;
+  }
+
+  protected ClassLoader getOsgiParentClassLoader() {
+    ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+    if (contextClassLoader != null && CONTEXT_FINDER_CLASS_NAME.equals(contextClassLoader.getClass().getName())) {
+      return contextClassLoader.getParent();
+    }
+
+    // find OSGi parent classloader by service
+    ClassLoader osgiContextClassLoader = null;
+    try {
+      BundleContext context = Activator.getDefault().getBundle().getBundleContext();
+      for (ServiceReference ref : context.getServiceReferences(ClassLoader.class.getName(), null)) {
+        if ("contextClassLoader".equals(ref.getProperty("equinox.classloader.type"))) {
+          try {
+            osgiContextClassLoader = (ClassLoader) context.getService(ref);
+            break;
+          }
+          finally {
+            context.ungetService(ref);
+          }
+        }
+      }
+    }
+    catch (Throwable t) {
+      LOG.error("cannot determine OSGi context class loader", t);
+    }
+    if (osgiContextClassLoader == null) {
+      return null;
+    }
+    if (CONTEXT_FINDER_CLASS_NAME.equals(osgiContextClassLoader.getClass().getName())) {
+      return osgiContextClassLoader.getParent();
+    }
+    return osgiContextClassLoader;
   }
 }
