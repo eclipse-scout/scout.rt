@@ -15,13 +15,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-// TODO AWE: (smartfield, scout) mit Scout-team besprechen: annotation VS property, naming
+// TODO AWE: (smartfield, scout) mit Scout-team besprechen: annotation VS property
 
-/**
- * Hint for Html UI, whether or not browser-side caching is allowed.
- */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface CachingEnabled {
+public @interface Multiline {
 
 }

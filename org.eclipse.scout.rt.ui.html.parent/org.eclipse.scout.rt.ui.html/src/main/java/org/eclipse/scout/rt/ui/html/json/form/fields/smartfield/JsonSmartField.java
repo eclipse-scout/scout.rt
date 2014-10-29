@@ -20,6 +20,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.CachingEnabled;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.Multiline;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
@@ -38,6 +39,8 @@ public class JsonSmartField extends JsonValueField<ISmartField> {
 
   private static final String PROP_OPTIONS = "options";
 
+  private static final String PROP_MULTI_LINE = "multiline";
+
   private static final int MAX_OPTIONS = 100;
 
   private List<? extends ILookupRow<?>> options = new ArrayList<>();
@@ -50,6 +53,14 @@ public class JsonSmartField extends JsonValueField<ISmartField> {
   @Override
   protected void initJsonProperties(ISmartField model) {
     super.initJsonProperties(model);
+    // TODO AWE: (smartfield) prüfen ob wir die properties brauchen oder
+    // ob wir's über den objectType lösen wollen
+    putJsonProperty(new JsonProperty<ISmartField<?>>(PROP_MULTI_LINE, model) {
+      @Override
+      protected Boolean modelValue() {
+        return isMultiline();
+      }
+    });
     putJsonProperty(new JsonProperty<ISmartField<?>>(PROP_CACHING_ENABLED, model) {
       @Override
       protected Boolean modelValue() {
@@ -71,7 +82,15 @@ public class JsonSmartField extends JsonValueField<ISmartField> {
 
   @Override
   public String getObjectType() {
-    return isCachingEnabled() ? "SmartField" : "SmartFieldRemote";
+    if (isMultiline()) {
+      return "SmartFieldMultiline";
+    }
+    else if (isCachingEnabled()) {
+      return "SmartField";
+    }
+    else {
+      return "SmartFieldRemote";
+    }
   }
 
   @Override
@@ -100,6 +119,10 @@ public class JsonSmartField extends JsonValueField<ISmartField> {
    */
   private boolean isCachingEnabled() {
     return getModel().getClass().isAnnotationPresent(CachingEnabled.class);
+  }
+
+  private boolean isMultiline() {
+    return getModel().getClass().isAnnotationPresent(Multiline.class);
   }
 
   private JSONObject addOptions(JSONObject json) {

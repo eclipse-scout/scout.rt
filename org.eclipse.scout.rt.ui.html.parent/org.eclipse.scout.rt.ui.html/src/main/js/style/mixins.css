@@ -51,6 +51,9 @@
     .font-icon;
     font-size: 13px;
     content: @icon;
+  /* TODO AWE: (smartfield) wieso braucht das icon eine line-height?
+   * wird doch sowieso absolut positioniert.
+   */
     line-height: @logical-grid-height;
     color: @palette-light-gray-0;
   }

@@ -193,15 +193,22 @@ scout.FormField.prototype.addMandatoryIndicator = function() {
     appendTo(this.$container);
 };
 
-scout.FormField.prototype.addIcon = function() {
+/**
+ * Adds a SPAN element with class 'icon' the the given optional $parent.
+ * When $parent is not set, the element is added to this.$container.
+ * @param $parent (optional)
+ */
+scout.FormField.prototype.addIcon = function($parent) {
+  if (!$parent) {
+    $parent = this.$container;
+  }
   this.$icon = $('<span>').
     addClass('icon').
     click(function() {
       this.$field.focus();
     }.bind(this)).
-    appendTo(this.$container);
+    appendTo($parent);
 };
-
 
 /**
  * Appends a DIV element as form-field container to $parent and sets the this.$container property.

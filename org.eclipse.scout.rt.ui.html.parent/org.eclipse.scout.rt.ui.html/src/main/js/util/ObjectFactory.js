@@ -168,6 +168,11 @@ scout.defaultObjectFactories = [{
     return new scout.SmartField();
   }
 }, {
+  objectType: 'SmartFieldMultiline',
+  create: function() {
+    return new scout.SmartFieldMultiline();
+  }
+}, {
   objectType: 'SmartFieldRemote',
   create: function() {
     return new scout.SmartFieldRemote();

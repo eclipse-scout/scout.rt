@@ -69,10 +69,15 @@ scout.HtmlComponent.getVisibleSize = function($comp) {
   }
 };
 
+// TODO AWE: (unit-test) getBounds + auto
 scout.HtmlComponent.getBounds = function($comp) {
+  var parseCssPosition = function(prop) {
+    var value = $comp.css(prop);
+    return 'auto' === value ? 0 :  parseInt(value, 10);
+  };
   return new scout.Rectangle(
-      parseInt($comp.css('left'), 10),
-      parseInt($comp.css('top'), 10),
+      parseCssPosition('left'),
+      parseCssPosition('top'),
       $comp.outerWidth(true),
       $comp.outerHeight(true));
 };

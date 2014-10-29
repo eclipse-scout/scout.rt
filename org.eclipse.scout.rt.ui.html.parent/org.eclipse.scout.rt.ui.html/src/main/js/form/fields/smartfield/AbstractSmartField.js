@@ -17,7 +17,6 @@ scout.AbstractSmartField.prototype._render = function($parent) {
     attr('type', 'text').
     addClass('field').
     disableSpellcheck().
-    focus(this._onFieldFocus.bind(this)).
     blur(this._onFieldBlur.bind(this)).
     keyup(this._onKeyup.bind(this)).
     keydown(this._onKeydown.bind(this)).
@@ -89,23 +88,24 @@ scout.AbstractSmartField.prototype._selectOption = function($options, pos) {
 scout.AbstractSmartField.prototype._onKeyup = function(e) {
   // escape
   if (e.which === scout.keys.ESC) {
-    this.$field.blur();
+    this._get$Input().blur();
     return;
   }
 
   // enter
   if (e.which === scout.keys.ENTER) {
     if (this._selectedOption > -1) {
-      var value = $(this._get$Options(true).get(this._selectedOption)).html();
-      this.$field.val(value);
-      this.$field.get(0).select();
+      var value = $(this._get$Options(true).get(this._selectedOption)).data('option');
+      this._applyOption(value);
       this._closePopup();
     }
     return;
   }
 
   // TODO AWE: (smartfield) das geht sicher noch schöner --> check preventDefault/stopPropagation
-  if (this._isNavigationKey(e)) {
+  if (e.which === scout.keys.TAB ||
+      e.which === scout.keys.SHIFT ||
+      this._isNavigationKey(e)) {
     return;
   }
 
@@ -121,8 +121,19 @@ scout.AbstractSmartField.prototype._onKeyup = function(e) {
   this._filterOptions();
 };
 
+/**
+ * Applies the given option on the text-field. Subclasses may override this method
+ * to implement a different apply-behavior (for multiline fields for instance).
+ * @param option
+ */
+scout.AbstractSmartField.prototype._applyOption = function(option) {
+  this._get$Input().
+    val(option).
+    get(0).select();
+};
+
 scout.AbstractSmartField.prototype._filterOptions = function() {
-  var val = this.$field.val();
+  var val = this._get$Input().val();
   if (this._oldVal === val) {
     $.log.debug('value of field has not changed - do not filter (oldVal=' + this._oldVal + ')');
     return;
@@ -138,8 +149,8 @@ scout.AbstractSmartField.prototype._filterOptions = function() {
  * @param vararg same as in #_setStatusText(vararg)
  */
 scout.AbstractSmartField.prototype._showPopup = function(numOptions, vararg) {
-  var fieldBounds = scout.HtmlComponent.getBounds(this.$field),
-    popupHeight = numOptions * 24 + 24 + 3, // TODO AWE: (smartfield) popup-layout dynamischer
+  var fieldBounds = this._getInputBounds(),
+    popupHeight = numOptions * 24 + 24 + 3, // TODO AWE: (smartfield) popup-layout dynamischer,
     popupBounds = new scout.Rectangle(fieldBounds.x, fieldBounds.y + fieldBounds.height, fieldBounds.width, popupHeight);
   this._$popup = $('<div>').
     addClass('smart-field-popup').
@@ -155,17 +166,37 @@ scout.AbstractSmartField.prototype._showPopup = function(numOptions, vararg) {
 };
 
 /**
+ * Returns the text-input element. Subclasses may override this method when their
+ * text-field is not == this.$field.
+ * @returns
+ */
+scout.AbstractSmartField.prototype._get$Input = function() {
+  return this.$field;
+};
+
+/**
+ * Returns the bounds of the text-input element. Subclasses may override this method when their
+ * text-field is not == this.$field.
+ * @returns
+ */
+scout.AbstractSmartField.prototype._getInputBounds = function() {
+  return scout.HtmlComponent.getBounds(this.$field);
+};
+
+/**
  * Adds the given options to the DOM, tries to select the selected option by comparing to the value of the text-field.
  */
 scout.AbstractSmartField.prototype._renderOptions = function(options) {
-  var i, option, selectedPos = -1,
-    val = this.$field.val();
+  var i, option, htmlOption, selectedPos = -1,
+    val = this._get$Input().val();
   for (i=0; i<options.length; i++) {
     option = options[i];
+    htmlOption = option.replace(/\n/gi, "<br/>");
     $('<div>').
       on('mousedown', this._onOptionMousedown.bind(this)).
       appendTo(this._$viewport).
-      html(option);
+      data('option', option). // stores the original text as received from the server
+      html(htmlOption);
     if (option === val) {
       selectedPos = i;
     }
@@ -180,23 +211,16 @@ scout.AbstractSmartField.prototype._emptyOptions = function(options) {
 };
 
 scout.AbstractSmartField.prototype._onOptionMousedown = function(e) {
-  var selectedText = $(e.target).html();
-  $.log.info('option selected ' + selectedText);
-  this.$field.val(selectedText);
+  var selectedOption = $(e.target).data('option');
+  $.log.info('option selected ' + selectedOption);
+  this._applyOption(selectedOption); // FIXME AWE: (smartfield) ist das nicht genau der gleiche code?
+  // andere vewendung von applyOption suchen, vielleicht kann noch mehr zusammengeleght werden
+  //this._get$Input().val(selectedText);
   this._closePopup();
-};
-
-scout.AbstractSmartField.prototype._onFieldFocus = function() {
-  this._oldVal = this.$field.val();
-  $.log.debug('_onFocus. set oldVal=' + this._oldVal);
-  if (!this._$popup) {
-    this._openPopup();
-  }
 };
 
 scout.AbstractSmartField.prototype._onFieldBlur = function() {
   scout.AbstractSmartField.parent.prototype._onFieldBlur.call(this);
-
   $.log.debug("_onBlur");
   this._closePopup();
 };

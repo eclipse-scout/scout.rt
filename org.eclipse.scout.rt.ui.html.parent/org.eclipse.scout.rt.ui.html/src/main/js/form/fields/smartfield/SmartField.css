@@ -3,13 +3,13 @@
 }
 
 .smart-field-popup {
-  border:solid 1px @color-bsi-green;
-  border-radius: @form-field-border-radius;
   position:absolute;
+  border:solid 1px @color-bench-semi;;
+  border-radius: @form-field-border-radius;
   z-index:101;
   margin-top:5px;
   background-color:white;
-  .drop-shadow;
+  .drop-shadow();
 }
 
 .smart-field-popup > .options {
@@ -38,3 +38,35 @@
 .smart-field-popup > .options div:hover {
   background-color:@color-bench-select;
 }
+
+/* Multiline SmartField */
+.smart-field .text-field {
+/*  border:solid 1px #ccc; */
+  border-bottom-color:#eee;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+  width:100%;
+  padding-left:10px;
+  height:28px;
+}
+
+.smart-field .multiline-field {
+  border:solid 1px @color-bench-light-border;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 3px;
+  border-top:none;
+  padding:3px 10px;
+}
+
+/* TODO AWE: (smartfield) mit C.GU besprechen: evtl. etwas an der FormLayout impl. ändern?
+ * Kann man das Icon nicht einfach nur per CSS platziern?
+ */
+.smart-field .text-field ~ .icon {
+  margin-right:-15px;
+  top:0;
+}
+

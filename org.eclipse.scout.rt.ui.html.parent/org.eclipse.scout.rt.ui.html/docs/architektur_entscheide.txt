@@ -359,5 +359,19 @@ Grund: die nativen SBs funktionieren immer besser, als die JS basierten. Sie fun
    wollen. Dialog in C# nachprogrammieren ist zu aufwändig, enge Integration von Word und Browser ist schwierig.
    Evtl. brauchen wir dafür wirklich diese Detached-Dialoge
 
+29.20.2014 AWE, CGU, IMO - Detached Forms, Word Integration
+- Template-Dialoge nachprogrammieren zu aufwändig, wir wollen auch keine Code-Duplikation (Java, C#)
+- Einfachste Lösung ist folgende:
+  * Word erzeugt eine neue Scout-ClientSession mit einem eigenen Desktop (ohne Outlines)
+  * z.Z. ist der Desktop noch nicht besonders flexibel. Vermutlich müssen wir ein paar Änderungen machen
+    damit, der Desktop den Tree-Bereich nicht anzeigt, wenn es keine Outlines gibt.
+  * Muss das Word-Plugin die "Haupt-ClientSession" benachrichtigen, kann das via Jobs und der entsprechenden
+    Session ID gelöst werden.
+- Killerargument gegen gemeinsame ClientSession von Hauptfenster (Browser) und Word (embedded Browser):
+  * wenn der embedded Browser abstürzt und ein modaler Dialog offen ist (z.B. MessageBox) ist die
+    ClientSession blockiert. Das Hauptfenster hat keine Möglichkeit zu erkennen, dass der embedded
+    Browser abgestürzt ist (bis zum Session-Timeout). Möglicher Workaround für solche Situationen:
+    F5 im Hauptfenster --> GUI wird ab Model neu gebaut und zeigt auch detached Forms an. Nachteil:
+    die detached Forms werden dann natürlich auch angezeigt, wenn der embedded Browser noch läuft.
 
 

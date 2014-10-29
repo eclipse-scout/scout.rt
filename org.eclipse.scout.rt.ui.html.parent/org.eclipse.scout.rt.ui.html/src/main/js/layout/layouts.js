@@ -121,6 +121,10 @@ scout.FormFieldLayout.prototype.layout = function($container) {
     $label = this.formField.$label,
     $status = this.formField.$status,
     $mandatory = this.formField.$mandatory,
+    // TODO AWE: (layout) mit C.GU diskutieren: problem mit composite-feldern. Wir wollen:
+    // - JS: field == input/text
+    // - CSS/layout: field == irgend ein DIV der gelayouted werden muss (.field)
+    // Vorschlag: für Layout und UI bewusst mit CSS Klassen arbeiten und nicht mit adapter-properties
     $field = this.formField.$field,
     $icon = this.formField.$icon,
     tooltip = this.formField.tooltip;
