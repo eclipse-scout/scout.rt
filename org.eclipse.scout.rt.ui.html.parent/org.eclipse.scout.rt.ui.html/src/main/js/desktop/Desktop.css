@@ -176,31 +176,8 @@
   float: right;
 }
 
-.keyframes-rotation () {
-  0% {
-    transform: rotate(0deg);
-    -webkit-transform: rotate(0deg);
-    -ms-transform: rotate(0deg);
-  }
-
-  100% {
-    transform: rotate(359deg);
-    -webkit-transform: rotate(359deg);
-    -ms-transform: rotate(359deg);
-  }
-}
-
-@-webkit-keyframes reconnect-rotation {
-  .keyframes-rotation;
-}
-
-@keyframes reconnect-rotation {
-  .keyframes-rotation;
-}
-
 .reconnect-animated:before {
-  -webkit-animation: reconnect-rotation 0.9s linear infinite;
-  animation: reconnect-rotation 0.9s linear infinite;
+  .animation(rotation 0.9s linear infinite);
   content: " ";
   display: inline-block;
   vertical-align: middle;

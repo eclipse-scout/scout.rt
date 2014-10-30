@@ -16,6 +16,11 @@
   }
 }
 
+.messagebox.shown {
+  .animation-name (zoom-bounce);
+  .animation-duration (0.5s);
+}
+
 .messagebox-content {
   border-left: 1px solid @color-messagebox-border;
   border-right: 1px solid @color-messagebox-border;
@@ -32,18 +37,18 @@
 }
 
 .messagebox-buttons {
-   overflow: hidden;
-   border: 1px solid @color-messagebox-border;
-   border-bottom-left-radius: @form-field-border-radius;
-   border-bottom-right-radius: @form-field-border-radius;
+  overflow: hidden;
+  border: 1px solid @color-messagebox-border;
+  border-bottom-left-radius: @form-field-border-radius;
+  border-bottom-right-radius: @form-field-border-radius;
 
   & button {
-    padding: 14px;
+    padding: 12px;
     background-color: @palette-light-gray-4;
     border: 0;
   }
 
-  & > button ~ button {
+  & > button:first-child ~ button {
     border-left: 1px solid @color-messagebox-border;
   }
 }

@@ -4,7 +4,7 @@ scout.MessageBox = function() {
 scout.inherits(scout.MessageBox, scout.ModelAdapter);
 
 scout.MessageBox.prototype._render = function($parent) {
-  this.$container = $parent.appendDIV('messagebox');
+  this.$container = $.makeDIV('messagebox').hide().appendTo($parent);
 
   this.$content = this.$container.appendDIV('messagebox-content');
   this.$title = this.$content.appendDIV('messagebox-label');
@@ -15,6 +15,13 @@ scout.MessageBox.prototype._render = function($parent) {
   this.$yesButton = this._createButton('yes');
   this.$noButton = this._createButton('no');
   this.$cancelButton = this._createButton('cancel');
+
+  setTimeout(function() {
+    //Class shown is used for css animation
+    this.$container
+      .addClass('shown')
+      .show();
+  }.bind(this));
 };
 
 scout.MessageBox.prototype._renderProperties = function() {

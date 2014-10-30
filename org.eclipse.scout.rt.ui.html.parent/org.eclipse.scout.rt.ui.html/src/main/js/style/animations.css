@@ -1,0 +1,67 @@
+.animation(@args) {
+  -webkit-animation: @args;
+  -moz-animation: @args;
+  -ms-animation: @args;
+  -o-animation: @args;
+  animation: @args;
+}
+.animation-duration(@duration) {
+  -webkit-animation-duration: @duration;
+  -moz-animation-duration: @duration;
+  -ms-animation-duration: @duration;
+  -o-animation-duration: @duration;
+  animation-duration: @duration;
+}
+.animation-name(@name) {
+  -webkit-animation-name: @name;
+  -moz-animation-name: @name;
+  -ms-animation-name: @name;
+  -o-animation-name: @name;
+  animation-name: @name;
+}
+
+.keyframes-zoom-bounce() {
+  0% {
+    transform: scale(0.75, 0.75);
+    -webkit-transform: scale(0.75, 0.75);
+    -ms-transform: scale(0.75, 0.75);
+  }
+
+  25% {
+    transform: scale(1.1, 1.1);
+    -webkit-transform: scale(1.1, 1.1);
+    -ms-transform: scale(1.1, 1.1);
+  }
+
+  100% {
+    transform: scale(1, 1);
+    -webkit-transform: scale(1, 1);
+    -ms-transform: scale(1, 1);
+  }
+}
+@-webkit-keyframes zoom-bounce {
+  .keyframes-zoom-bounce;
+}
+@keyframes zoom-bounce {
+  .keyframes-zoom-bounce;
+}
+
+.keyframes-rotation () {
+  0% {
+    transform: rotate(0deg);
+    -webkit-transform: rotate(0deg);
+    -ms-transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(359deg);
+    -webkit-transform: rotate(359deg);
+    -ms-transform: rotate(359deg);
+  }
+}
+@-webkit-keyframes rotation {
+  .keyframes-rotation;
+}
+@keyframes rotation {
+  .keyframes-rotation;
+}
