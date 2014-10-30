@@ -1,8 +1,9 @@
 @tablefield-selection-border-width: 1px;
 
 .table-field > .table {
-  border: 1px solid @color-bench-light-border;
+  border: 1px solid @border-color;
   border-radius: @border-radius;
+  background-color:@control-background-color;
 }
 
 .table-field > .table:focus {
