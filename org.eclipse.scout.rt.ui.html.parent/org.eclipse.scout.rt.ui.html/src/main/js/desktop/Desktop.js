@@ -97,17 +97,35 @@ scout.Desktop.prototype.onResize = function() {
   }
 };
 
-scout.Desktop.TabAndContent = function(title, content) {
+scout.Desktop.TabAndContent = function(content, title, subtitle) {
+  this.content = content;
   this.title = title;
-  this.content = null;
-  this.$div = null;
-  this.$storage = null;
+  this.subtitle = subtitle;
+  this.$div;
+  this.$storage;
 };
 
-/* tab handling */
+scout.Desktop.TabAndContent.prototype._update = function(content, title, subtitle) {
+  this.content = content;
+  this.title = title;
+  this.subtitle = subtitle;
+};
+
+/* Tab-handling */
+
+// TODO AWE/CGU: (dialoge) Über modale Dialoge sprechen, v.a. über folgenden Fall:
+// - Outline-Tab > Autrag Xyz > Auftrag bearbeiten
+// - Tab geht auf, nun wieder auf Outline-Tab wechseln und nochmals Auftrag bearbeiten
+// - ein weiterer Tab geht auf, kann man beliebig wiederholen
+// Lösungen besprechen. Eine Möglichkeit wäre, bei Klick auf Auftrag bearbeiten in den
+// bereits geöffneten Tab/Dialog zu wecheseln. Oder das Menü-Item disablen.
 
 scout.Desktop.prototype._addTab = function(tab, prepend) {
-  tab.$div = $.makeDIV('taskbar-tab-item', tab.title);
+  tab.$div = $.makeDIV('taskbar-tab-item').
+     append($.makeDIV('title', tab.title).attr('title', tab.title)).
+     append($.makeDIV('subtitle', 'Bearbeiten')); // TODO AWE: (desktop) sub-titel für forms
+     // müsste abhängig von Handler gesetzt werden.
+
   if (prepend) {
     tab.$div.prependTo(this.$tabbar);
   } else {
@@ -129,7 +147,17 @@ scout.Desktop.prototype._isTabVisible = function(tab) {
 };
 
 scout.Desktop.prototype._updateTab = function(tab) {
-  tab.$div.text(tab.title);
+  var setTitle = function(selector, title) {
+    var $e = tab.$div.children(selector);
+    if (title) {
+      $e.text(title).attr('title', title).setVisible(true);
+    } else {
+      $e.setVisible(false);
+    }
+  };
+  setTitle('.title', tab.title);
+  setTitle('.subtitle', tab.subtitle);
+  tab.$div.toggleClass('single', !tab.subtitle);
 };
 
 scout.Desktop.prototype._removeTab = function(tab) {
@@ -172,11 +200,11 @@ scout.Desktop.prototype._unselectTab = function(tab) {
 scout.Desktop.prototype._addForm = function(form) {
   if (form.title == "Telefon") return;
 
-  var tab = new scout.Desktop.TabAndContent(form.title, form);
+  var tab = new scout.Desktop.TabAndContent(form, form.title, '%Modus%');
   this._addTab(tab);
   form.render(this.$bench);
 
-  //FIXME CGU maybe include in render?
+  // FIXME CGU maybe include in render?
   form.htmlComp.layout();
   form.htmlComp.validateRoot = true;
   form.tab = tab;
@@ -200,14 +228,14 @@ scout.Desktop.prototype._openUrlInBrowser = function(event) {
 
 /* communication with outline */
 
-scout.Desktop.prototype.updateOutlineTab = function(content, title) {
+scout.Desktop.prototype.updateOutlineTab = function(content, title, subtitle) {
   if (this._outlineTab.content && this._outlineTab.content !== content) {
     this._outlineTab.content.remove();
-    //Also remove storage to make sure selectTab does not restore the content
+    // Also remove storage to make sure selectTab does not restore the content
     this._outlineTab.$storage = null;
   }
 
-  //Remove tab completely if no content is available (neither a table nor a form)
+  // Remove tab completely if no content is available (neither a table nor a form)
   if (!content) {
     this._removeTab(this._outlineTab);
     return;
@@ -217,9 +245,7 @@ scout.Desktop.prototype.updateOutlineTab = function(content, title) {
     this._addTab(this._outlineTab, true);
   }
 
-  this._outlineTab.content = content;
-  this._outlineTab.title = title;
-
+  this._outlineTab._update(content, title, subtitle);
   this._updateTab(this._outlineTab);
   this._selectTab(this._outlineTab);
 
@@ -229,7 +255,7 @@ scout.Desktop.prototype.updateOutlineTab = function(content, title) {
       content.staticMenus = [new scout.OutlineNavigateUpMenu(this.outline, selectedNodes[0])];
       content.render(this.$bench);
 
-      //FIXME CGU maybe include in render?
+      // FIXME CGU maybe include in render?
       content.htmlComp.layout();
       content.htmlComp.validateRoot = true;
     }

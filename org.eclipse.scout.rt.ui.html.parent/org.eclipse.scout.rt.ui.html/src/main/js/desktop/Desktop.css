@@ -15,7 +15,7 @@
   bottom: 0;
 }
 
-.desktop-tool-container{
+.desktop-tool-container {
   position: absolute;
   top: @size-desktop-tools;
   width: @size-desktop-navigation;
@@ -40,6 +40,7 @@
 .taskbar-tabs, .taskbar-tools {
   display:inline-block;
   word-wrap: none;
+  vertical-align:top;
 }
 
 .taskbar-tools {
@@ -48,17 +49,13 @@
 
 .taskbar-tab-item,
 .taskbar-tool-item {
-  height: @size-desktop-tools;
-  padding: 0px 20px 0px 20px;
-
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  vertical-align:top;
   display: inline-block;
+  height: @size-desktop-tools;
+  padding: 6px 20px 0px 20px;
+  width:220px;
 
   cursor: pointer;
-  .font-text-large;
-  line-height: 50px;
   background-color: @color-bench-light;
   color: @color-bench-text;
   border-bottom: 1px solid @color-bench-light-border;
@@ -67,16 +64,34 @@
     color: @color-bench-text-hover;
   }
 
-  &.disabled{
+  &.disabled {
     color: @color-bench-semi;
     cursor: default;
   }
 
-  &.selected{
+  &.selected {
     cursor: default;
     background-color: @color-bench;
     color: @color-bench-text-active;
     border-bottom: 1px solid @color-bench;
+  }
+
+  &.single {
+    padding-top:14px;
+  }
+
+  &> div {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &> .title {
+    .font-text-large;
+  }
+
+  &> .subtitle {
+    .font-text-normal;
   }
 
 }

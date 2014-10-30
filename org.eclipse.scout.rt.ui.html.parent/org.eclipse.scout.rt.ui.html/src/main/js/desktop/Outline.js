@@ -49,8 +49,7 @@ scout.Outline.prototype._renderSelection = function($nodes) {
 };
 
 scout.Outline.prototype._updateOutlineTab = function(node) {
-  var content, text;
-
+  var content, parentText, nodeText, title, subtitle;
   if (node) {
     // Unlink detail form if it was closed.
     // May happen in the following case:
@@ -60,20 +59,35 @@ scout.Outline.prototype._updateOutlineTab = function(node) {
       node.detailForm = null;
     }
 
-    content = node.detailForm;
-    text = node.text;
-    if (!content) {
+    if (node.detailForm) {
+      content = node.detailForm;
+    } else {
       content = node.detailTable;
     }
-    else {
-      text = node.detailForm.title;
+
+    if (node.parentNode && node.parentNode.text) {
+      parentText = node.parentNode.text;
+    }
+    if (node.detailForm && node.detailForm.title) {
+      nodeText = node.detailForm.title;
+    } else {
+      nodeText = node.text;
+    }
+
+    if (parentText && nodeText) {
+      title = parentText;
+      subtitle = nodeText;
+    } else if (parentText) {
+      title = parentText;
+    } else if (nodeText) {
+      title = nodeText;
     }
   }
   else if (this.defaultDetailForm) {
     content = this.defaultDetailForm;
-    text = this.defaultDetailForm.title;
+    title = this.defaultDetailForm.title;
   }
-  this.session.desktop.updateOutlineTab(content, text);
+  this.session.desktop.updateOutlineTab(content, title, subtitle);
 };
 
 /* event handling */
