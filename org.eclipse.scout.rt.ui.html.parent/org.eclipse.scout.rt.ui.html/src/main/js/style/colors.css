@@ -1,5 +1,8 @@
-/* color basics */
+/* ------------------------ */
+/* Color Palette Definition */
+/* ------------------------ */
 @palette-black:#000;
+
 @palette-dark-gray-1:#333;
 @palette-dark-gray-2:#666;
 @palette-dark-gray-3:#777;
@@ -7,62 +10,49 @@
 @palette-light-gray-0:#aaa;
 @palette-light-gray-1:#ccc;
 @palette-light-gray-2:#ddd;
-@palette-light-gray-3:#ebebeb;
+@palette-light-gray-3:#d3d3d3;
 @palette-light-gray-4:#f6f6f6;
+@palette-light-gray-5:#fefefe;
+
 @palette-white:#fff;
 
-/**
- * Idee (AWE):
- * Die Palette wird pro Projekt definiert.
- * Der Bezeichner der Paletten-Farbe ist entsprechend dem Farbwert, d.h.
- *
- *   @palette-red:#f00;
- *
- * Die logischen Farben referenzieren die Palette, z.B.:
- *
- *   @text-hover-color:@palette-red;
- *
- * Farbabstufungen über light|dark und falls nötig Zahlenwerte,
- * kleinere Zahl bedeutet dunkler, grösserer Zahl bedeutet heller
- *
- * Wenn ein Kundenprojekt die Farben ändern will:
- *
- * 1. definiert es eine neue Farb-Palette (inkl. neue Bezeichner)
- *    solange es Sinn macht, kann ein Bezeichner wiederverwendet werden
- *    z.B. könnte @palette-red von #f00 auf #c00 geändert werden.
- * 2. ändert ggf. die Zuordnung der logischen Farben auf die Paletten-Farben
- *
- */
+@palette-red: #FF6060;
+@palette-light-red: #FFE0E0;
 
+@palette-bsi-orange: #FE9915;
+@palette-bsi-green: #0082A1;
+
+/* ------------------------ */
+/* Global Color Definitions */
+/* ------------------------ */
 @color-nav: #41525E;
 @color-nav-semi: #506678;
 @color-nav-light: #DADADA;
-@color-nav-select: #FFFFFF;
-@color-nav-text: #FFFFFF;
+@color-nav-select: @palette-white;
+@color-nav-text: @palette-white;
 
-@color-bench: #FFFFFF;
-@color-bench-semi: #CCCCCC;
-@color-bench-midi: #DBDBDB;
-@color-bench-light: #F6F6F6;
-@color-bench-light-border: #DDDDDD;
-@color-bench-verylight-border: #EBEBEB;
-
-@color-bench-text: #333333;
-@color-bench-text-hover: #0082A1;
-@color-bench-text-active: #0082A1;
-
+@color-bench: @palette-white;
+@color-bench-semi: @palette-light-gray-1;
+@color-bench-light: @palette-light-gray-4;
+@color-bench-light-border: @palette-light-gray-2;
+@color-bench-text: @palette-dark-gray-1;
+@color-bench-text-hover: @palette-bsi-green;
+@color-bench-text-active: @palette-bsi-green;
 @color-bench-select: #ECF3F7;
-@color-bench-select-border: #0082A1;
+@color-bench-select-border: @palette-bsi-green;
+@color-bench-highlight: @palette-bsi-orange;
 
-@color-bench-highlight: #FE9915;
-@color-text-grey: #666666;
-
-/* TODO AWE: (css/colors) ueber naming diskutieren */
-@color-error: #FF6060;
+@color-error: @palette-red;
+@color-error-light: @palette-light-red;
 @color-info: @palette-dark-gray-3;
-@color-error-light: #FFE0E0;
-@color-bsi-orange: #FE9915;
-@color-bsi-green: #0082A1;
-@color-bsi-green-semi: #389db6;
-@color-focus: @color-bsi-orange;
+@color-focus: @palette-bsi-orange;
 @color-focus-glow: rgba(254, 153, 21, 0.5);
+
+@body-background-color: @palette-light-gray-5;
+@border-color: @palette-light-gray-3;
+@chart-color-1: @palette-bsi-green;
+@control-background-color: @palette-white;
+@highlight-color: @palette-bsi-orange;
+@icon-color-active: @palette-bsi-green;
+@text-color-grey: @palette-dark-gray-2;
+

@@ -15,7 +15,7 @@ stroke: #fff;
 }
 
 .map-item.has-data {
-fill: #0082a1;
+fill: @chart-color-1;
 }
 
 .map-item:hover {
@@ -23,9 +23,9 @@ fill: #7f7f7f;
 }
 
 .map-item.selected {
-fill: #fe9915
+fill: @highlight-color;
 }
 
 .map-item.has-data:hover {
-fill: #fe9915 !important;
+fill: @highlight-color !important;
 }

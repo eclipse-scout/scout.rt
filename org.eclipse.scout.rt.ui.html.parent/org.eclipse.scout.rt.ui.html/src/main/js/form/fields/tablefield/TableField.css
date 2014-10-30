@@ -2,7 +2,7 @@
 
 .table-field > .table {
   border: 1px solid @color-bench-light-border;
-  border-radius: @form-field-border-radius;
+  border-radius: @border-radius;
 }
 
 .table-field > .table:focus {

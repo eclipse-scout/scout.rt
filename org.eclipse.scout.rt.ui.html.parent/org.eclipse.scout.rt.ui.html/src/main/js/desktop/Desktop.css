@@ -13,6 +13,7 @@
   left: @size-desktop-navigation;
   right: 0;
   bottom: 0;
+  background-color: @body-background-color;
 }
 
 .desktop-tool-container {
@@ -171,7 +172,7 @@
 }
 
 .offline-message {
-  border: 1px solid #0082a1;
+  border: 1px solid @palette-bsi-green;
   background-color: #eee;
   padding: 6px 5px;
   margin: 20px auto;
@@ -200,8 +201,8 @@
   margin-right: 6px;
   border-radius: 50%;
   border: 1px solid rgba(0, 0, 0, 0);
-  border-top-color: #0082a1;
-  border-left-color: #0082a1;
+  border-top-color: @palette-bsi-green;
+  border-left-color: @palette-bsi-green;
   width: 14px;
   height: 14px;
 }

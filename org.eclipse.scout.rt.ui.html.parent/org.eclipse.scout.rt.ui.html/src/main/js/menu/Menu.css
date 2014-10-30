@@ -58,7 +58,7 @@
   color:#333;
   background-color:@color-bench-light;
   border:1px solid @color-bench-light-border;
-  border-radius: @form-field-border-radius;
+  border-radius: @border-radius;
 
   &:not(.last) {
     margin-right:14px;

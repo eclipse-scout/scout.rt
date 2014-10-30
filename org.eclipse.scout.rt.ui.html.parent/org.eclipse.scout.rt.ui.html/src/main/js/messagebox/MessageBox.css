@@ -8,8 +8,8 @@
   max-width: 300px;
   .drop-shadow;
   border-top: 5px solid @color-bench-text-active;
-  border-top-left-radius: @form-field-border-radius;
-  border-top-right-radius: @form-field-border-radius;
+  border-top-left-radius: @border-radius;
+  border-top-right-radius: @border-radius;
 
   &.severity-error {
     border-top-color: @color-error;
@@ -37,10 +37,10 @@
 }
 
 .messagebox-buttons {
-  overflow: hidden;
-  border: 1px solid @color-messagebox-border;
-  border-bottom-left-radius: @form-field-border-radius;
-  border-bottom-right-radius: @form-field-border-radius;
+   overflow: hidden;
+   border: 1px solid @color-messagebox-border;
+   border-bottom-left-radius: @border-radius;
+   border-bottom-right-radius: @border-radius;
 
   & button {
     padding: 12px;

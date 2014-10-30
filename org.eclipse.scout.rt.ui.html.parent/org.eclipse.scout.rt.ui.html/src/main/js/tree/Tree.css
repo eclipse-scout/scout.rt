@@ -27,7 +27,7 @@
   padding-right: 8px;
 
   &.selected {
-    background-color: @color-bench;
+    background-color: @body-background-color;
     color: @color-bench-text;
     }
 

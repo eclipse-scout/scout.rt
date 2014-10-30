@@ -51,12 +51,12 @@ svg.select-chart:hover line.select-fill-line {
 svg.select-chart.selected rect.select-fill,
 svg.select-chart.selected circle.select-fill,
 svg.select-chart.selected path.select-fill-pie{
-fill: #fe9915;
+fill: @highlight-color;
 }
 
 svg.select-chart.selected path.select-fill-line,
 svg.select-chart.selected line.select-fill-line {
-  stroke: #fe9915;
+  stroke: @highlight-color;
 }
 
 /* chart - axis and data select */
@@ -97,7 +97,7 @@ svg.select-chart.selected line.select-fill-line {
 }
 
 .select-axis.selected, .select-data.selected {
-  background-color: #fe9915;
+  background-color: @highlight-color;
   color: #fff;
 }
 
@@ -149,7 +149,7 @@ height: 320px;
 }
 
 rect.main-chart, circle.main-chart {
-  fill: #0082a1;
+  fill: @chart-color-1;
   stroke: #fff;
   stroke-width: 0px;
   cursor: pointer;
@@ -160,7 +160,7 @@ circle.main-chart {
 }
 
 path.main-chart{
-  fill: #0082a1;
+  fill: @chart-color-1;
   stroke: #fff;
   stroke-width: 2px;
   cursor: pointer;
@@ -168,14 +168,14 @@ path.main-chart{
 
 
 line.main-chart {
-  stroke: #0082a1;
+  stroke: @chart-color-1;
   stroke-width: 4px;
   stroke-linejoin: round;
   stroke-linecap: round;
 }
 
 .main-chart:hover, .main-chart.selected {
-  fill: #fe9915
+  fill: @highlight-color;
 }
 
 

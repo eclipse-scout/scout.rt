@@ -7,7 +7,7 @@
   color: #FFF;
   line-height: 11px;
   text-align:center;
-  background-color:#FE9915;
+  background-color:@highlight-color;
 }
 
 .key-box.large {

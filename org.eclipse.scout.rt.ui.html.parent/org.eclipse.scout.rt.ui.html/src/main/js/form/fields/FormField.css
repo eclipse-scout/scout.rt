@@ -1,7 +1,4 @@
 /** currently also defined in scout.HtmlEnvironment (graphics.js) */
-@logical-grid-height: 30px;
-@form-field-border-radius: 3px;
-
 .form-field {
   box-sizing:border-box;
   white-space:nowrap;

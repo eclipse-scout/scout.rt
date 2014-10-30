@@ -7,7 +7,7 @@
   position: absolute;
   background-color: @tooltip-background-color;
   border: @tooltip-border;
-  color: @color-text-grey;
+  color: @text-color-grey;
   .drop-shadow();
   max-width: 300px;
   z-index: 1000; /*FIXME CGU oder eher in scout div zu unterst?*/

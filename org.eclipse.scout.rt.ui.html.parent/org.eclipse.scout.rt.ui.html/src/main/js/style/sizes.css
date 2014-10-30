@@ -5,3 +5,6 @@
 
 @margin-bench-left: 20px;
 @margin-bench-right: @margin-bench-left;
+
+@border-radius: 3px;
+@logical-grid-height: 30px;

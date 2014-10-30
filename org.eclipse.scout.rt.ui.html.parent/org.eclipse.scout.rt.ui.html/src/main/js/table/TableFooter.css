@@ -12,7 +12,7 @@
   border-top: 1px solid @color-bench-light-border;
 }
 
-.control-resize{
+.control-resize {
   position: absolute;
   width: 100%;
   left: 0px;
@@ -32,9 +32,9 @@
   display: none;
 }
 
-.control-filter{
+.control-filter {
   width: 200px;
-  border: 1px solid @color-bench-midi;
+  border: 1px solid @border-color;
   min-height: 26px;
   font-size: 14px;
   margin-top: 11px;
@@ -67,7 +67,7 @@
 }
 
 .control:hover:before, .control:hover:after {
-  color: #FE9915;
+  color: @highlight-color;
 }
 
 .control.disabled:hover, .control.disabled:before, .control.disabled:after{
@@ -76,13 +76,13 @@
 }
 
 .control.selected:before, .control.selected:after {
-  color: #FE9915 !important;
+  color: @highlight-color !important;
 }
 
 .control:before{
   .font-icon;
   font-size: 24px;
-  color: #0082A1;
+  color: @icon-color-active;
 }
 
 .control-query:before {

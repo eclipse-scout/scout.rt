@@ -13,9 +13,9 @@ stroke-width: 2px;
 cursor: pointer;
 }
 
-.graph-node.center {fill: #fe9915;}
+.graph-node.center {fill: @highlight-color;}
 .graph-node.internal {fill: #bfbfbf;}
-.graph-node.person {fill: #0082a1;}
+.graph-node.person {fill:@chart-color-1;}
 .graph-node.department {fill: #80c1d0;}
 .graph-node.company {fill: #ffcc8a;}
 
