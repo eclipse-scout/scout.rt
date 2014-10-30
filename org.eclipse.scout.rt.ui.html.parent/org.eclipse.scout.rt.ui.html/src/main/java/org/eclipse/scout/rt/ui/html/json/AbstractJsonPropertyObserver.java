@@ -59,7 +59,7 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
    */
   protected void putJsonProperty(JsonProperty jsonProperty) {
     if (!m_initializingProperties) {
-      throw new IllegalStateException("Putting properties is only allowed in initProperties.");
+      throw new IllegalStateException("Putting properties is only allowed in initJsonProperties.");
     }
     m_jsonProperties.put(jsonProperty.getPropertyName(), jsonProperty);
   }

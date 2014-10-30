@@ -11,6 +11,7 @@ scout.Desktop = function() {
   this.$toolbar;
   this.$bench;
   this.$toolContainer;
+  this.$glasspane;
 
   this._allTabs = [];
   this._selectedTab;
@@ -243,7 +244,18 @@ scout.Desktop.prototype.changeOutline = function(outline) {
 /* message boxes */
 
 scout.Desktop.prototype.addMessageBox = function(messageBox) {
-  messageBox.render(this.$bench);
+  if (!this.$glasspane) {
+    this.$glasspane = this.$parent.appendDIV('glasspane');
+  }
+  messageBox.render(this.$glasspane);
+};
+
+scout.Desktop.prototype.onMessageBoxClosed = function(messageBox) {
+  scout.arrays.remove(this.messageBoxes, messageBox);
+  if (this.messageBoxes.length === 0) {
+    this.$glasspane.remove();
+    this.$glasspane = null;
+  }
 };
 
 /* event handling */
@@ -273,8 +285,4 @@ scout.Desktop.prototype.onModelAction = function(event) {
   } else {
     scout.parent.prototype.onModelAction.call(this, event);
   }
-};
-
-scout.Desktop.prototype.onMessageBoxClosed = function(messageBox) {
-  scout.arrays.remove(this.messageBoxes, messageBox);
 };

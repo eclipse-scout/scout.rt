@@ -176,7 +176,6 @@
   float: right;
 }
 
-// Mixin
 .keyframes-rotation () {
   0% {
     transform: rotate(0deg);
@@ -213,4 +212,13 @@
   border-left-color: #0082a1;
   width: 14px;
   height: 14px;
+}
+
+.glasspane {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background-color: rgba(0,0,0,0.1);
 }

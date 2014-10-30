@@ -47,12 +47,12 @@ public class JsonMessageBox extends AbstractJsonPropertyObserver<IMessageBox> {
         return getModel().getIconId();
       }
     });
-//    putJsonProperty(new JsonProperty<IMessageBox>("severity", model) {
-//      @Override
-//      protected String modelValue() {
-//        return getModel().getIconId();//FIXME implement
-//      }
-//    });
+    putJsonProperty(new JsonProperty<IMessageBox>("severity", model) {
+      @Override
+      protected Integer modelValue() {
+        return getModel().getSeverity();
+      }
+    });
     putJsonProperty(new JsonProperty<IMessageBox>("introText", model) {
       @Override
       protected String modelValue() {

@@ -1,17 +1,49 @@
+@color-messagebox-border: @palette-light-gray-2;
+@messagebox-label-padding: 20px;
+
 .messagebox {
+  position: absolute;
+  top: 25%;
+  left: 50%;
+  max-width: 300px;
+  .drop-shadow;
+  border-top: 5px solid @color-bench-text-active;
+  border-top-left-radius: @form-field-border-radius;
+  border-top-right-radius: @form-field-border-radius;
+
+  &.severity-error {
+    border-top-color: @color-error;
+  }
+}
+
+.messagebox-content {
+  border-left: 1px solid @color-messagebox-border;
+  border-right: 1px solid @color-messagebox-border;
   background-color:white;
-  border:solid 1px #000000;
-  position:absolute;
-  top: 100px;
-  left: 100px;
-  min-height: 50px;
-  min-width: 100px;
+  padding: (26px - @messagebox-label-padding) / 2 26px 26px 26px;
 }
 
 .messagebox-label {
-  margin: 5px;
+  padding-top: @messagebox-label-padding;
 }
 
-.messagebox button {
-  margin: 5px;
+.messagebox-intro-text {
+  font-weight: bold;
+}
+
+.messagebox-buttons {
+   overflow: hidden;
+   border: 1px solid @color-messagebox-border;
+   border-bottom-left-radius: @form-field-border-radius;
+   border-bottom-right-radius: @form-field-border-radius;
+
+  & button {
+    padding: 14px;
+    background-color: @palette-light-gray-4;
+    border: 0;
+  }
+
+  & > button ~ button {
+    border-left: 1px solid @color-messagebox-border;
+  }
 }
