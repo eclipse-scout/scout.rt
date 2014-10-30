@@ -15,6 +15,7 @@ import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
 
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 
 public class BasicDocumentFilter extends DocumentFilter {
@@ -23,6 +24,7 @@ public class BasicDocumentFilter extends DocumentFilter {
   private int m_maxLen;
 
   public BasicDocumentFilter() {
+    this(-1);
   }
 
   public BasicDocumentFilter(int maxLength) {
@@ -39,37 +41,39 @@ public class BasicDocumentFilter extends DocumentFilter {
 
   @Override
   public void insertString(FilterBypass fb, int offset, String s, AttributeSet a) throws BadLocationException {
-    if (s == null) {
-      s = "";
-    }
-    checkStringTooLong(fb, s, fb.getDocument().getLength() + s.length());
-    fb.insertString(offset, s, a);
+    s = StringUtility.emptyIfNull(s);
+    String truncatedText = checkStringTooLong(fb, s, fb.getDocument().getLength() + s.length());
+    fb.insertString(offset, truncatedText, a);
   }
 
   @Override
   public void replace(FilterBypass fb, int offset, int length, String s, AttributeSet a) throws BadLocationException {
-    if (s == null) {
-      s = "";
-    }
-    checkStringTooLong(fb, s, fb.getDocument().getLength() + s.length() - length);
+    s = StringUtility.emptyIfNull(s);
+    s = checkStringTooLong(fb, s, fb.getDocument().getLength() + s.length() - length);
     fb.replace(offset, length, s, a);
   }
 
-  protected void checkStringTooLong(FilterBypass fb, String s, int newLen) throws BadLocationException {
-    if (m_maxLen > 0) {
-      if (newLen > m_maxLen) {
-        //value is too large
-        s = handleStringTooLong(s, Math.max(0, s.length() - (newLen - m_maxLen)));
-      }
+  /**
+   * Checks, if the text is too long and truncates it to the maximum length.
+   *
+   * @param fb
+   * @param text
+   *          not <code>null</code> text to check
+   * @param newLength
+   * @return text truncated to maximum length
+   * @throws BadLocationException
+   */
+  protected String checkStringTooLong(FilterBypass fb, String text, int newLength) throws BadLocationException {
+    if (m_maxLen > 0 && newLength > m_maxLen) {
+      showTruncateTextMessage();
+      return text.substring(0, Math.max(0, text.length() - (newLength - m_maxLen)));
     }
+    return text;
   }
 
-  protected String handleStringTooLong(String s, int availableLength) throws BadLocationException {
-    //ticket 89148
+  private void showTruncateTextMessage() {
     if (SwingUtility.isPasteAction() || SwingUtility.isSunDropAction()) {
       SwingUtility.showMessageDialogSynthCapable(SwingUtility.getOwnerForChildWindow(), SwingUtility.getNlsText("PasteTextTooLongForFieldX", "" + getMaxLength()), SwingUtility.getNlsText("Paste"), JOptionPane.WARNING_MESSAGE);
     }
-    s = s.substring(0, availableLength);
-    return s;
   }
 }
