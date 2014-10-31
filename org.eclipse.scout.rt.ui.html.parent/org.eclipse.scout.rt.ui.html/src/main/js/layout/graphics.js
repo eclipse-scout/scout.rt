@@ -1,6 +1,84 @@
 /**
-* This file contains JavaScript ports from java.awt classes.
+* This file contains helpers for graphical operations and JavaScript ports from java.awt classes
  */
+scout.graphics = {
+  measureString: function(text) {
+    var $div = $('#StringMeasurement');
+    if ($div.length === 0) {
+      throw new Error('DIV StringMeasurement does\'nt exist');
+    }
+    $div.html(text);
+    return new scout.Dimension($div.width(), $div.height());
+  },
+  /* These functions are designed to be used with box-sizing:box-model. The only reliable
+   * way to set the size of a component when working with box model is to use css('width/height'...)
+   * in favor of width/height() functions.
+   */
+  /**
+   * Returns the current size of the component, insets included.
+   * TODO AWE: (layout) prüfen ob hier tatsächlich die insets included sind. Müssten wir dann nicht outerWidth/-Height verwenden?
+   */
+  getSize: function($comp) {
+    return new scout.Dimension(
+        $comp.outerWidth(true),
+        $comp.outerHeight(true));
+  },
+  setSize: function($comp, vararg, height) {
+    var size = vararg instanceof scout.Dimension ?
+        vararg : new scout.Dimension(vararg, height);
+    $comp.
+      css('width', size.width + 'px').
+      css('height', size.height+ 'px');
+  },
+  /**
+   * Returns the size of a visible component or (0,0) when component is invisible.
+   */
+  getVisibleSize: function($comp) {
+    if ($comp.length === 1 && $comp.isVisible()) {
+      return scout.graphics.getSize($comp);
+    } else {
+      return new scout.Dimension(0, 0);
+    }
+  },
+  // TODO AWE: (unit-test) getBounds + auto
+  getBounds: function($comp) {
+    var parseCssPosition = function(prop) {
+      var value = $comp.css(prop);
+      return 'auto' === value ? 0 :  parseInt(value, 10);
+    };
+    return new scout.Rectangle(
+        parseCssPosition('left'),
+        parseCssPosition('top'),
+        $comp.outerWidth(true),
+        $comp.outerHeight(true));
+  },
+  setBounds: function($comp, vararg, y, width, height) {
+    var bounds = vararg instanceof scout.Rectangle ?
+        vararg : new scout.Rectangle(vararg, y, width, height);
+    $comp.
+      cssLeft(bounds.x).
+      cssTop(bounds.y).
+      cssWidth(bounds.width).
+      cssHeight(bounds.height);
+  },
+  offsetBounds: function($elem, includeMargins) {
+    var pos = $elem.offset();
+    return new scout.Rectangle(pos.left, pos.top, $elem.outerWidth(false), $elem.outerHeight(false));
+  },
+  debugOutput: function($comp) {
+    var attrs = '';
+    if ($comp.attr('id')) {
+      attrs += 'id=' + $comp.attr('id');
+    }
+    if ($comp.attr('class')) {
+      attrs += ' class=' + $comp.attr('class');
+    }
+    if (attrs.length === 0) {
+      attrs = $comp.html().substring(0, 30) + '...';
+    }
+    return 'HtmlComponent[' + attrs.trim() + ']';
+  }
+};
 
 /**
  * JavaScript port from java.awt.Point.
@@ -175,19 +253,4 @@ scout.HtmlEnvironment = {
   'formColumnWidth': 360,
   'formColumnGap': 50,
   'fieldLabelWidth': 140
-};
-
-scout.graphics = {
-  measureString: function(text) {
-    var $div = $('#StringMeasurement');
-    if ($div.length === 0) {
-      throw new Error('DIV StringMeasurement does\'nt exist');
-    }
-    $div.html(text);
-    return new scout.Dimension($div.width(), $div.height());
-  },
-  offsetBounds: function($elem, includeMargins) {
-    var pos = $elem.offset();
-    return new scout.Rectangle(pos.left, pos.top, $elem.outerWidth(false), $elem.outerHeight(false));
-  }
 };

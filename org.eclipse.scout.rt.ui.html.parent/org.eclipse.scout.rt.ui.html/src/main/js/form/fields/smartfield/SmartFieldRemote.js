@@ -21,11 +21,11 @@ scout.SmartFieldRemote.prototype._onOptionsLoaded = function(options) {
   this._emptyOptions();
 
   // adjust size of popup to loaded options (cannot know in advance)
-  var oldBounds = scout.HtmlComponent.getBounds(this._$popup),
+  var oldBounds = scout.graphics.getBounds(this._$popup),
     popupHeight = Math.min(10, options.length) * 24 + 24 + 3,
     newBounds = new scout.Rectangle(oldBounds.x, oldBounds.y, oldBounds.width, popupHeight);
-  scout.HtmlComponent.setBounds(this._$popup, newBounds);
-  scout.HtmlComponent.setSize(this._get$OptionsDiv(), newBounds.width - 4, popupHeight - 24 - 3);
+  scout.graphics.setBounds(this._$popup, newBounds);
+  scout.graphics.setSize(this._get$OptionsDiv(), newBounds.width - 4, popupHeight - 24 - 3);
   this._updateScrollbar();
   this._renderOptions(options);
   this._setStatusText(options.length);

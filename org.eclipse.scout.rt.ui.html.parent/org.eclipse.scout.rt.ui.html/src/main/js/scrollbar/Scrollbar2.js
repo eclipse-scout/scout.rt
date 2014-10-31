@@ -15,7 +15,7 @@ scout.Scrollbar2 = {};
 scout.Scrollbar2.install = function($container, options) {
   var prettyScrollbars = true;
   if (prettyScrollbars) {
-    $.log.debug('use native scrollbars for container ' + scout.HtmlComponent.debug($container));
+    $.log.debug('use native scrollbars for container ' + scout.graphics.debugOutput($container));
     $container.
       css('overflow', 'hidden').
       css('overflow-y', 'auto').
@@ -24,7 +24,7 @@ scout.Scrollbar2.install = function($container, options) {
       // -webkit-overflow-scrolling: touch;
     return $container;
   } else {
-    $.log.debug('install JS-scrollbars for container ' + scout.HtmlComponent.debug($container) +  ' and add viewport DIV');
+    $.log.debug('install JS-scrollbars for container ' + scout.graphics.debugOutput($container) +  ' and add viewport DIV');
     var $viewport = $container.appendDIV('viewport'),
       scrollbar = new scout.Scrollbar($viewport, options);
     scrollbar.initThumb();
@@ -49,7 +49,7 @@ scout.Scrollbar2.scrollTo = function($viewport, $selection) {
   var scrollDir = 'n/a',
     scrollTop = $viewport.scrollTop(),
     viewportH = $viewport.height(),
-    optionH = scout.HtmlComponent.getSize($selection).height,
+    optionH = scout.graphics.getSize($selection).height,
     optionY = $selection.position().top;
   $.log.debug('scrollTo() scrollTop=' + scrollTop + ' viewportH=' + viewportH + ' optionH=' + optionH + ' optionY=' + optionY);
 

@@ -143,7 +143,7 @@ describe("HtmlComponent", function() {
     it("returns bounds without 'px'", function() {
       spyOn(jqueryMock, 'outerWidth').and.callThrough();
       spyOn(jqueryMock, 'outerHeight').and.callThrough();
-      var actual = scout.HtmlComponent.getBounds(jqueryMock);
+      var actual = scout.graphics.getBounds(jqueryMock);
       var expected = new scout.Rectangle(4, 5, 6, 7);
       expect(actual).toEqual(expected);
       expect(jqueryMock.outerWidth).toHaveBeenCalledWith(true);

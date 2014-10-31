@@ -55,7 +55,7 @@ scout.FormLayout.prototype._getHtmlRootGroupBox = function($container) {
 };
 
 scout.FormLayout.prototype._getMenuBarHeight = function($container) {
-  return scout.HtmlComponent.getVisibleSize($container.children('.menubar')).height;
+  return scout.graphics.getVisibleSize($container.children('.menubar')).height;
 };
 
 /**
@@ -91,11 +91,11 @@ scout.GroupBoxLayout.prototype.preferredLayoutSize = function($container) {
 };
 
 scout.GroupBoxLayout.prototype._getTitleHeight = function($container) {
-  return scout.HtmlComponent.getVisibleSize($container.children('.group-box-title')).height;
+  return scout.graphics.getVisibleSize($container.children('.group-box-title')).height;
 };
 
 scout.GroupBoxLayout.prototype._getButtonBarHeight = function($container) {
-  return scout.HtmlComponent.getVisibleSize($container.children('.button-bar')).height;
+  return scout.graphics.getVisibleSize($container.children('.button-bar')).height;
 };
 
 scout.GroupBoxLayout.prototype._getHtmlBody = function($container) {
@@ -130,7 +130,7 @@ scout.FormFieldLayout.prototype.layout = function($container) {
     tooltip = this.formField.tooltip;
 
   if ($label.isVisible()) {
-    scout.HtmlComponent.setBounds($label, 0, 0, this.labelWidth, contSize.height);
+    scout.graphics.setBounds($label, 0, 0, this.labelWidth, contSize.height);
     // with this property we achieve "vertical-align:middle" which doesn't work for non-table-cell elements
     $label.css('line-height', contSize.height + 'px');
     leftWidth += this.labelWidth;
@@ -151,7 +151,7 @@ scout.FormFieldLayout.prototype.layout = function($container) {
     if (htmlField) {
       htmlField.setBounds(fieldBounds);
     } else {
-      scout.HtmlComponent.setBounds($field, fieldBounds);
+      scout.graphics.setBounds($field, fieldBounds);
     }
 
     //Icon is placed inside the field (as overlay)
@@ -257,7 +257,7 @@ scout.TabBoxLayout.prototype.layout = function($container) {
 scout.TabBoxLayout.prototype.preferredLayoutSize = function($container) {
   var $tabArea = $container.children('.tab-area'),
     $tabContent = $container.children('.tab-content'),
-    tabAreaSize = scout.HtmlComponent.getVisibleSize($tabArea),
+    tabAreaSize = scout.graphics.getVisibleSize($tabArea),
     tabContentSize = scout.HtmlComponent.get($tabContent).getPreferredSize();
   //TODO AWE: (tab-box) impl. prefSize
   // size of tab-area
@@ -331,13 +331,13 @@ scout.TableLayout.prototype.layout = function($container) {
     height = 0;
 
   if (menubar.$container.isVisible()){
-    height += scout.HtmlComponent.getSize(menubar.$container).height;
+    height += scout.graphics.getSize(menubar.$container).height;
   }
   if (footer) {
-    height += scout.HtmlComponent.getSize(footer.$container).height;
+    height += scout.graphics.getSize(footer.$container).height;
   }
   if ($header.isVisible()) {
-    height += scout.HtmlComponent.getSize($header).height;
+    height += scout.graphics.getSize($header).height;
   }
   $data.css('height', 'calc(100% - '+ height + 'px)');
 
@@ -345,5 +345,5 @@ scout.TableLayout.prototype.layout = function($container) {
 };
 
 scout.TableLayout.prototype.preferredLayoutSize = function($comp) {
-  return scout.HtmlComponent.getSize($comp);
+  return scout.graphics.getSize($comp);
 };

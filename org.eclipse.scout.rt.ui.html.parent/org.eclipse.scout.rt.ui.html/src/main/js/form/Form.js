@@ -75,7 +75,7 @@ scout.Form.prototype.onResize = function() {
   $.log.trace('(Form#onResize) window was resized -> layout Form container');
 
   var htmlCont = scout.HtmlComponent.get(this.$container);
-  var parentSize = scout.HtmlComponent.getSize(this.$container.parent());
+  var parentSize = scout.graphics.getSize(this.$container.parent());
   htmlCont.setSize(parentSize);
 };
 

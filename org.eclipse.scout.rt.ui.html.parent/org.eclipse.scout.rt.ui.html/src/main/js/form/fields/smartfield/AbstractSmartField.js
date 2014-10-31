@@ -167,11 +167,11 @@ scout.AbstractSmartField.prototype._showPopup = function(numOptions, vararg) {
     append($('<div>').addClass('options')).
     append($('<div>').addClass('status')).
     appendTo(this.$container);
-  scout.HtmlComponent.setBounds(this._$popup, popupBounds);
+  scout.graphics.setBounds(this._$popup, popupBounds);
   // layout options and status-div
   var $optionsDiv = this._get$OptionsDiv();
   this._$viewport = scout.Scrollbar2.install($optionsDiv, {invertColors:true});
-  scout.HtmlComponent.setSize($optionsDiv, fieldBounds.width - 4, popupHeight - 24 - 3);
+  scout.graphics.setSize($optionsDiv, fieldBounds.width - 4, popupHeight - 24 - 3);
   this._setStatusText(vararg);
 };
 
@@ -190,7 +190,7 @@ scout.AbstractSmartField.prototype._get$Input = function() {
  * @returns
  */
 scout.AbstractSmartField.prototype._getInputBounds = function() {
-  return scout.HtmlComponent.getBounds(this.$field);
+  return scout.graphics.getBounds(this.$field);
 };
 
 /**

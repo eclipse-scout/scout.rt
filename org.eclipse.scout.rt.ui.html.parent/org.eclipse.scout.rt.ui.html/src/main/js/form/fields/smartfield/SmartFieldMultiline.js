@@ -64,8 +64,8 @@ scout.SmartFieldMultiline.prototype._get$Input = function() {
 
 //@Override AbstractSmartField.js
 scout.SmartFieldMultiline.prototype._getInputBounds = function() {
-  var fieldBounds = scout.HtmlComponent.getBounds(this.$field),
-    textFieldBounds = scout.HtmlComponent.getBounds(this._$textField);
+  var fieldBounds = scout.graphics.getBounds(this.$field),
+    textFieldBounds = scout.graphics.getBounds(this._$textField);
   fieldBounds.height = textFieldBounds.height;
   return fieldBounds;
 };
