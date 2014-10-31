@@ -1,12 +1,9 @@
-@padding-control: 12px;
-@size-table-header: 40px;
-@size-table-row: 45px;
-@size-table-footer: 52px;
+@table-control-padding: 12px;
 
 .table-footer {
   position: absolute;
   bottom: 0px;
-  height: @size-table-footer;
+  height: @table-footer-height;
   width: 100%;
   white-space: nowrap;
   border-top: 1px solid @color-bench-light-border;
@@ -25,7 +22,7 @@
   position: absolute;
   overflow: hidden;
   background-color: @color-bench;
-  bottom: @size-table-footer;
+  bottom: @table-footer-height;
   border-top: 1px solid @color-bench-light-border;
   width: 100%;
   height: 0px;
@@ -38,7 +35,7 @@
   min-height: 26px;
   font-size: 14px;
   margin-top: 11px;
-  margin-left: @padding-control;
+  margin-left: @table-control-padding;
   padding-left: 6px;
 
   &:hover{
@@ -54,14 +51,14 @@
   display: inline;
   float: left;
   position: relative;
-  padding: 0 @padding-control;
+  padding: 0 @table-control-padding;
   border-right: 1px solid #CCC;
   margin-top: 6px;
   height: 38px;
 }
 
 .control{
-  padding: 9px @padding-control 10px @padding-control;
+  padding: 9px @table-control-padding 10px @table-control-padding;
   float: left;
   cursor: pointer;
   position: relative;

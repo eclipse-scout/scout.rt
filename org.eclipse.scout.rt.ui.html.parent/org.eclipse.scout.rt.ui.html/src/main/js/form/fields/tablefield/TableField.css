@@ -12,7 +12,6 @@
   .glow(@focus-color-glow);
 }
 
-
 .table-field > .table > .table-header,
 .table-field > .table > .table-header > .header-resize  {
   height: @logical-grid-height;
@@ -24,7 +23,6 @@
 
 /* TODO CGU/CRU wieso nicht mit background-color wie bei header-resize? UND braucht es all diese height definitionen wirklich? */
 .table-field .menubar {
-
   height:39px;
   padding:0 0 0 0;
   border-bottom:none;
@@ -49,7 +47,8 @@
 }
 
 .table-field > .table > .table-data .table-row > .table-cell {
-  line-height: @logical-grid-height - @table-cell-inset;
+  padding-top: @table-row-padding - 6;
+  padding-bottom: @table-row-padding - 6;
 }
 
 
