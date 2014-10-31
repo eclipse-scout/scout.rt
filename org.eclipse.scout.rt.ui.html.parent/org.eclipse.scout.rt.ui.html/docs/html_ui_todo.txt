@@ -15,6 +15,12 @@ Telefon-Icon korrigieren (Grösse, Farbe)
 
 [CGU]
 
+TableField: row-height === logicalGridHeight (text-field)?
+
+Table: Row-Text nicht genau zentriert
+
+MessageBox: Nur Fokus-Farbe, kein Default-Button. Default-Button ist initial fokussiert.
+
 [CRU]
 
 ===================================
@@ -25,6 +31,8 @@ Animation: im Tree bei Wechsel zwischen Search und Views
 Globale Suche: wie Design-Vorschlag, Baum mit Fake-Suchresultaten anzeigen
 
 Tree: Pfeil/-Text, vertikale Ausrichtung korrigieren
+
+Table: Row-Text nicht genau zentriert
 
 Scrollbars: für UGM JS-Scrollbars einschalten
 
@@ -77,6 +85,7 @@ TableField: Tab-Reihenfolge ändern, Menüs sollen tabbable sein. Fokusrahmen um
 
 Table-Menü bündig mit Table-Header
 
+MessageBox: Nur Fokus-Farbe, kein Default-Button. Default-Button ist initial fokussiert.
 
 ===================================
  DONE
