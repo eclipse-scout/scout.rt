@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -23,36 +23,36 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
  * Class to help getting timing information without the need of adding attaching a profiler.
  * </p>
  * <h2>Example 1</h2>
- * 
+ *
  * <pre>
- * TuningUtility.start();
+ * TuningUtility.startTimer();
  * // my code
  * // more of my code
- * TuningUtility.stop(&quot;myCode&quot;);
+ * TuningUtility.stopTimer(&quot;myCode&quot;);
  * </pre>
- * 
+ *
  * results in the output
- * 
+ *
  * <pre>
  * #TuningUtility myCode took 30ms
  * </pre>
- * 
+ *
  * <h2>Example 2</h2>
- * 
+ *
  * <pre>
  * for (int i = 0; i &lt; 100; i++) {
- *   TuningUtility.start();
+ *   TuningUtility.startTimer();
  *   // my repeated code A
- *   TuningUtility.stop(&quot;repeatCodeA&quot;, false, true);
- *   TuningUtility.start();
+ *   TuningUtility.stopTimer(&quot;repeatCodeA&quot;, false, true);
+ *   TuningUtility.startTimer();
  *   // my repeated code B
- *   TuningUtility.stop(&quot;repeatCodeB&quot;, false, true);
+ *   TuningUtility.stopTimer(&quot;repeatCodeB&quot;, false, true);
  * }
  * TuningUtility.finishAll();
  * </pre>
- * 
+ *
  * results in the output
- * 
+ *
  * <pre>
  * #TUNING: repeatCodeA[100] sum=1449.755488 min=1.941867ms avg=14.497554ms median=14.665551ms max=30.327598ms [without 1 smallest and 1 largest: sum=1417.486023 min=1.943543ms avg=14.613257ms median=14.665551ms max=30.265579ms]
  * #TUNING: repeatCodeB[100] sum=6893.764704 min=4.891404ms avg=68.937647ms median=68.354218ms max=143.545897ms [without 1 smallest and 1 largest: sum=6745.327403 min=7.807417ms avg=69.539457ms median=68.354218ms max=142.573987ms]
@@ -91,7 +91,7 @@ public final class TuningUtility {
    * <p>
    * If no timer was started the output is suppressed.
    * </p>
-   * 
+   *
    * @param name
    *          of the timer, used in the output
    * @return time spent in nanoseconds, -1 if no timer was started
@@ -102,7 +102,7 @@ public final class TuningUtility {
 
   /**
    * Stops a timer
-   * 
+   *
    * @param name
    *          of the timer, used to store the result for multiple measurements and for output
    * @param print
@@ -138,7 +138,7 @@ public final class TuningUtility {
 
   /**
    * print out a list of all timers that were stored (added to a batch)
-   * 
+   *
    * @param clearTimers
    *          <code>true</code> if any timers have not been stopped yet, they will be removed
    *          first. A warning message is still printed.<code>false</code> only a note will be printed, but unfinished
