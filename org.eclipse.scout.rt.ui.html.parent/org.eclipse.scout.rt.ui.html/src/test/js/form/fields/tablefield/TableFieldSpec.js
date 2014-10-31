@@ -35,7 +35,7 @@ describe("TableField", function() {
     return model;
   }
 
-  describe("table property", function() {
+  describe("property table", function() {
     var tableField, table;
     beforeEach(function() {
       var tableModel = helper.createModelFixture(2, 2);

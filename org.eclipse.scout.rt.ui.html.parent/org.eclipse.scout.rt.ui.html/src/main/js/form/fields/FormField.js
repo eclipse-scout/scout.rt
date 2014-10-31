@@ -10,6 +10,12 @@ scout.FormField = function() {
 };
 scout.inherits(scout.FormField, scout.ModelAdapter);
 
+scout.FormField.LABEL_POSITION_DEFAULT = 0;
+scout.FormField.LABEL_POSITION_LEFT = 1;
+scout.FormField.LABEL_POSITION_ON_FIELD = 2;
+scout.FormField.LABEL_POSITION_RIGHT = 3;
+scout.FormField.LABEL_POSITION_TOP = 4;
+
 scout.FormField.prototype._render = function($parent) {
   // TODO AWE: (form) remove this code when FormField is "abstract". There should be no reason to instantiate a
   // FormField directly. Currently this is required as a placeholder for un-implemented form-fields.
@@ -74,8 +80,27 @@ scout.FormField.prototype._renderLabel = function(label) {
   if (!label) {
     label = '';
   }
-  if (this.$label) {
+  if (this.labelPosition === scout.FormField.LABEL_POSITION_ON_FIELD) {
+    this._renderPlaceholder();
+    if (this.$label) {
+      this.$label.html('');
+    }
+  }
+  else if (this.$label) {
+    this._removePlaceholder();
     this.$label.html(label);
+  }
+};
+
+scout.FormField.prototype._renderPlaceholder = function() {
+  if (this.$field) {
+    this.$field.attr('placeholder', this.label);
+  }
+};
+
+scout.FormField.prototype._removePlaceholder = function() {
+  if (this.$field) {
+    this.$field.removeAttr('placeholder');
   }
 };
 
@@ -89,6 +114,11 @@ scout.FormField.prototype._renderLabelVisible = function(visible) {
     var htmlComp = scout.HtmlComponent.get(this.$container);
     htmlComp.revalidate();
   }
+};
+
+// Don't include in renderProperties, it is not necessary to execute it initially because the positioning is done by _renderLabel
+scout.FormField.prototype._renderLabelPosition = function(position) {
+  this._renderLabel(this.label);
 };
 
 scout.FormField.prototype._renderEnabled = function(enabled) {

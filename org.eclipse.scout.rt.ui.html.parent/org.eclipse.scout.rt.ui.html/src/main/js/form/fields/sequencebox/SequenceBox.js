@@ -13,7 +13,7 @@ scout.SequenceBox.prototype._render = function($parent) {
     addClass('field').
     appendTo(this.$container);
   var htmlSequenceBox = new scout.HtmlComponent(this.$field, this.session);
-  htmlSequenceBox.setLayout(new scout.LogicalGridLayout(scout.HtmlEnvironment.formColumnGap, 0));
+  htmlSequenceBox.setLayout(new scout.LogicalGridLayout(0, 0));
 
   var field, i;
   for (i = 0; i < this.fields.length; i++) {

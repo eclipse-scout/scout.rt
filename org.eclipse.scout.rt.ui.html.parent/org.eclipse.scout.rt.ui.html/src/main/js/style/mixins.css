@@ -68,7 +68,7 @@
   }
 
   &.disabled {
-    padding-right: 0px;
+    padding-right: @text-field-padding;
   }
 
   &.disabled ~ .icon {

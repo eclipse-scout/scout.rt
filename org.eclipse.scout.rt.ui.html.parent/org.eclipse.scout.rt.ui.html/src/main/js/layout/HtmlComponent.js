@@ -244,5 +244,5 @@ scout.HtmlComponent.prototype.setBounds = function(bounds) {
 };
 
 scout.HtmlComponent.prototype.debug = function() {
-  scout.HtmlComponent.debug(this.$comp);
+  return scout.HtmlComponent.debug(this.$comp);
 };

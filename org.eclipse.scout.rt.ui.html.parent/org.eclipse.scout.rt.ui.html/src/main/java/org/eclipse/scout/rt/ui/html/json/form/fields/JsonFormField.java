@@ -40,6 +40,12 @@ public class JsonFormField<T extends IFormField> extends AbstractJsonPropertyObs
         return getModel().isLabelVisible();
       }
     });
+    putJsonProperty(new JsonProperty<T>("labelPosition", model) {
+      @Override
+      protected Integer modelValue() {
+        return getModel().getLabelPosition();
+      }
+    });
     putJsonProperty(new JsonProperty<T>(IFormField.PROP_ENABLED, model) {
       @Override
       protected Boolean modelValue() {
