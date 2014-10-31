@@ -40,12 +40,13 @@
   margin-top: 11px;
   margin-left: @padding-control;
   padding-left: 6px;
+
   &:hover{
-    border: 1px solid @color-bench-semi;
+    border-color: @hover-color;
   }
 
   &:focus{
-    border-color: @color-bench-select-border;
+    border-color: @focus-color;
   }
 }
 
@@ -79,10 +80,10 @@
   color: @highlight-color !important;
 }
 
-.control:before{
+.control:before {
   .font-icon;
   font-size: 24px;
-  color: @icon-color-active;
+  color: @active-color;
 }
 
 .control-query:before {

@@ -18,6 +18,7 @@ scout.AbstractSmartField.prototype._render = function($parent) {
     addClass('field').
     disableSpellcheck().
     blur(this._onFieldBlur.bind(this)).
+    click(this._onClick.bind(this)).
     keyup(this._onKeyup.bind(this)).
     keydown(this._onKeydown.bind(this)).
     appendTo(this.$container);
@@ -47,6 +48,15 @@ scout.AbstractSmartField.prototype._isNavigationKey = function(e) {
     e.which === scout.keys.PAGE_DOWN ||
     e.which === scout.keys.UP ||
     e.which === scout.keys.DOWN;
+};
+
+scout.AbstractSmartField.prototype._onClick = function(e) {
+  // FIXME AWE: (smartfield) continue... options not loaded on click!
+  if (!this._$popup) {
+    setTimeout(function() {
+      this._openPopup();
+    }.bind(this));
+  }
 };
 
 // navigate in options

@@ -5,7 +5,7 @@
   font-size: 22px;
   line-height: @size-desktop-menu - 1px;
   content: @icon;
-  color:#666;
+  color:@icon-color;
   vertical-align:-3px;
 }
 
@@ -48,16 +48,16 @@
   width:1px;
   height:30px;
   margin:6px 19px 3px 19px;
-  background-color:#d6d6d6;
+  background-color:@border-color;
 }
 
 .menu-button {
   height:30px;
   min-width:110px;
   margin:6px 0 3px 0;
-  color:#333;
-  background-color:@color-bench-light;
-  border:1px solid @color-bench-light-border;
+  color:@text-color;
+  background-color:@button-background-color;
+  border:1px solid @border-color;
   border-radius: @border-radius;
 
   &:not(.last) {
@@ -66,17 +66,27 @@
 
   &+ .default-button {
     .font-text-normal(@bold);
-    background-color:#389db6;
-    color:white;
+    background-color:@default-button-background-color;
+    color:@palette-white;
     border:none;
   }
 
+  &:hover {
+    color: @hover-color;
+  }
+
+  &+ .default-button:hover {
+    color:white;
+    background-color:@palette-bsi-green;
+  }
+
   &:focus {
-    color: white;
-    border-color:@color-focus;
-    background-color: @color-focus;
+    color: @palette-white;
+    border-color: @focus-color;
+    background-color: @focus-color;
     outline: none;
   }
+
 }
 
 .menu-item {
@@ -92,15 +102,15 @@
   }
 
   &[data-icon]:hover:before {
-    color:@color-bench-text-hover;
+    color:@hover-color;
   }
 
   &:hover {
-    color:@color-bench-text-hover;
+    color:@hover-color;
   }
 
   &.disabled {
-    color:@color-bench-semi;
+    color:@disabled-color;
   }
 
   &:not(.last) {
@@ -108,7 +118,7 @@
   }
 
   &.menu-open {
-    color:@color-bench-text-active;
+    color:@active-color;
   }
 
   &.has-submenu:after {
@@ -142,7 +152,7 @@
     padding:0px 13px;
     white-space: nowrap;
     background-color:white;
-    border:solid 1px #ccc;
+    border:solid 1px @popup-border-color;
     border-bottom:none;
     .drop-shadow();
   }
@@ -151,12 +161,12 @@
 .popup-body {
   position:absolute;
   top:39px;
-  border:solid 1px #ccc;
+  border:solid 1px @popup-border-color;
   background-color:white;
   .drop-shadow();
 
   & > .menu-item {
-    border-bottom:solid 1px #ccc;
+    border-bottom:solid 1px @popup-border-color;
     display:block;
     width:100%;
     padding-left:15px;
@@ -169,7 +179,7 @@
 
 .popup-head {
 
-  color:@color-bench-text-active;
+  color:@active-color;
 
   &.has-submenu:after {
     .sub-menu-icon;
@@ -181,7 +191,7 @@
 
   &[data-icon]:before {
     .menu-icon(attr(data-icon));
-    color:@color-bench-text-hover;
+    color:@hover-color;
   }
 }
 
@@ -190,6 +200,6 @@
   top:39px;
   height:1px;
   left:1px;
-  background-color:white;
+  background-color:@palette-white;
 }
 

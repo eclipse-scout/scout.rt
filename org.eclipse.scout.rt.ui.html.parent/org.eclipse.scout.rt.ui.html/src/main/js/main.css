@@ -15,7 +15,7 @@ overflow: hidden;
 user-select: none;
 cursor: default;
 .font-text-normal;
-color: @color-bench-text;
+color: @text-color;
 }
 
 *, *:before, *:after {

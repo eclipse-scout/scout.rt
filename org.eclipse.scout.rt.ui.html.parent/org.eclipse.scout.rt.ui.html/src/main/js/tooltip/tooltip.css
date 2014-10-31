@@ -1,13 +1,14 @@
+@tooltip-color: @palette-dark-gray-2;
 @tooltip-arrow-size: 14px;
 @tooltip-background-color: @color-bench-light;
 @tooltip-border-size: 1px;
-@tooltip-border: @tooltip-border-size solid @color-bench-semi;
+@tooltip-border: @tooltip-border-size solid @popup-border-color;
 
 .tooltip {
   position: absolute;
   background-color: @tooltip-background-color;
   border: @tooltip-border;
-  color: @text-color-grey;
+  color: @tooltip-color;
   .drop-shadow();
   max-width: 300px;
   z-index: 1000; /*FIXME CGU oder eher in scout div zu unterst?*/

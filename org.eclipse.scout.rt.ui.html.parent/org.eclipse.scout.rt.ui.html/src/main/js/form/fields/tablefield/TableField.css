@@ -8,8 +8,8 @@
 
 .table-field > .table:focus {
   outline: none;
-  border-color: @color-focus;
-  .glow(@color-focus-glow);
+  border-color: @focus-color;
+  .glow(@focus-color-glow);
 }
 
 

@@ -21,38 +21,41 @@
 
 @palette-bsi-orange: #FE9915;
 @palette-bsi-green: #0082A1;
+@palette-bsi-light-green: #389DB6;
 
 /* ------------------------ */
 /* Global Color Definitions */
 /* ------------------------ */
 @color-nav: #41525E;
 @color-nav-semi: #506678;
-@color-nav-light: #DADADA;
 @color-nav-select: @palette-white;
 @color-nav-text: @palette-white;
 
 @color-bench: @palette-white;
-@color-bench-semi: @palette-light-gray-1;
 @color-bench-light: @palette-light-gray-4;
 @color-bench-light-border: @palette-light-gray-2;
-@color-bench-text: @palette-dark-gray-1;
-@color-bench-text-hover: @palette-bsi-green;
-@color-bench-text-active: @palette-bsi-green;
 @color-bench-select: #ECF3F7;
 @color-bench-select-border: @palette-bsi-green;
-@color-bench-highlight: @palette-bsi-orange;
 
 @color-error: @palette-red;
 @color-error-light: @palette-light-red;
 @color-info: @palette-dark-gray-3;
-@color-focus: @palette-bsi-orange;
-@color-focus-glow: rgba(254, 153, 21, 0.5);
 
 @body-background-color: @palette-light-gray-5;
 @border-color: @palette-light-gray-3;
 @chart-color-1: @palette-bsi-green;
 @control-background-color: @palette-white;
 @highlight-color: @palette-bsi-orange;
-@icon-color-active: @palette-bsi-green;
-@text-color-grey: @palette-dark-gray-2;
 
+@text-color: @palette-dark-gray-1;
+@icon-color: @palette-dark-gray-2;
+@disabled-color: @palette-light-gray-1;
+@hover-color: @palette-bsi-green;
+@focus-color: @palette-bsi-orange;
+@focus-color-glow: rgba(254, 153, 21, 0.5);
+@active-color: @palette-bsi-green;
+@highlight-color: @palette-bsi-orange;
+
+@popup-border-color: @palette-light-gray-1;
+@button-background-color: @palette-light-gray-4;
+@default-button-background-color: @palette-bsi-light-green;

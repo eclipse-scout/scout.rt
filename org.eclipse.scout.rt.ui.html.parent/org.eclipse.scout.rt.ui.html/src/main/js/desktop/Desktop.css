@@ -58,22 +58,22 @@
 
   cursor: pointer;
   background-color: @color-bench-light;
-  color: @color-bench-text;
+  color: @text-color;
   border-bottom: 1px solid @color-bench-light-border;
 
   &:hover{
-    color: @color-bench-text-hover;
+    color: @hover-color;
   }
 
   &.disabled {
-    color: @color-bench-semi;
+    color: @disabled-color;
     cursor: default;
   }
 
   &.selected {
     cursor: default;
     background-color: @color-bench;
-    color: @color-bench-text-active;
+    color: @active-color;
     border-bottom: 1px solid @color-bench;
   }
 
@@ -131,7 +131,7 @@
   width: 22px;
 
   &.disabled{
-    background-color: @color-bench-semi;
+    background-color: @disabled-color;
   }
 }
 

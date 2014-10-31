@@ -1,6 +1,5 @@
 @field-with-icon-padding: 20px;
 @text-field-padding: 10px;
-@text-field-background-color: white;
 
 .glow(@color) {
   box-shadow: 0 0 5px @color;
@@ -11,18 +10,18 @@
 }
 
 .text-field {
-  background-color: @text-field-background-color;
+  background-color: @control-background-color;
   padding: 0 @text-field-padding;
   border: 1px solid @border-color;
   border-radius: @border-radius;
-  color: @color-bench-text;
+  color: @text-color;
 
   &:disabled {
   }
 
   &:focus {
-    border-color: @color-focus;
-    .glow(@color-focus-glow);
+    border-color: @focus-color;
+    .glow(@focus-color-glow);
     outline: none;
   }
 
@@ -59,7 +58,7 @@
   }
 
   &:focus ~ .icon:before {
-    color: @color-focus;
+    color: @focus-color;
   }
 
   &.has-error ~ .icon:before {
@@ -81,14 +80,14 @@
    */
   margin: 0 auto;
   padding: 5px @text-field-padding;
-  background-color: @text-field-background-color;
-  border: 1px solid @color-bench-light-border;
+  background-color: @control-background-color;
+  border: 1px solid @border-color;
   border-radius: @border-radius;
-  color: @color-bench-text;
+  color: @text-color;
 
   &:focus {
     outline: none;
-    border-color: @color-focus;
-   .glow(@color-focus-glow);
+    border-color: @focus-color;
+   .glow(@focus-color-glow);
   }
 }

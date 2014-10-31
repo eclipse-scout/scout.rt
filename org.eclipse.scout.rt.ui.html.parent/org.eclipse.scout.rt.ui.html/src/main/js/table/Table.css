@@ -53,7 +53,7 @@
   border-right: 1px solid transparent;
 
   &.sort-asc, &.sort-desc,  &.filter, &.group-all,   &.group-sort {
-    color: @color-bench-text-active;
+    color: @active-color;
   }
 
   &.sort-desc:after {
@@ -65,14 +65,14 @@
   }
 
   &:hover, &.header-move{
-    color: @color-bench-text-hover;
+    color: @hover-color;
   }
 
   &.menu-open {
     border-left: 1px solid @color-bench-light-border;
     border-right: 1px solid @color-bench-light-border;
     background-color: @color-bench;
-    color: @color-bench-text-active;
+    color: @active-color;
     z-index: 2;
   }
 
@@ -126,7 +126,7 @@
   white-space: nowrap;
   vertical-align: center;
   line-height: @size-table-row - @table-cell-inset;
-  color: @color-bench-text;
+  color: @text-color;
 }
 
 .table-row-sum .table-cell {

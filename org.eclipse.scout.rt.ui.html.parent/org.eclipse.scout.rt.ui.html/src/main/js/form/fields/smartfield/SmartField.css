@@ -4,7 +4,7 @@
 
 .smart-field-popup {
   position:absolute;
-  border:solid 1px @color-bench-semi;;
+  border:solid 1px @popup-border-color;
   border-radius: @border-radius;
   z-index:101;
   margin-top:5px;

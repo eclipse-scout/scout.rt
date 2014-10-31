@@ -50,8 +50,8 @@
   }
 
   &:not(.tab-active) {
-    background-color: @color-nav-light;
-    color: @color-bench-text;
+    background-color: @palette-light-gray-2;
+    color: @text-color;
     width:  @size-desktop-tools;
   }
 
@@ -85,7 +85,7 @@
   float: left;
 
   .tab-menu-open & {
-    color: @color-bench-text-hover;
+    color: @hover-color;
     background-color: @color-bench;
   }
 
@@ -169,13 +169,13 @@
   line-height: 50px;
   border-bottom: 1px solid @color-bench-light-border;
   cursor: pointer;
-  color: @color-bench-text;
+  color: @text-color;
 
   &:hover{
-    color: @color-bench-text-hover;
+    color: @hover-color;
   }
 
   &.disabled {
-    color: @color-bench-semi;
+    color: @disabled-color;
   }
 }

@@ -27,7 +27,7 @@
 .header-text{
   .font-text-normal(@bold);
   font-weight:bold;
-  color: @color-bench-text;
+  color: @text-color;
   line-height: 22px;
   height: 22px;
   overflow: hidden;
@@ -41,18 +41,18 @@
   .font-icon;
   font-size: 17px;
   line-height: 29px;
-  color: @color-bench-text;
+  color: @text-color;
   border: 1px solid @color-bench-light-border;
   cursor: pointer;
   text-align: center;
 
   &:hover {
-    color: @color-bench-text-hover;
+    color: @hover-color;
   }
 
   &.selected{
-    background-color: @color-bench-highlight;
-    border: 1px solid @color-bench-highlight;
+    background-color: @highlight-color;
+    border: 1px solid @highlight-color;
   }
 
   &.selected:before,
@@ -231,8 +231,8 @@
   }
 
   &.selected {
-    background-color: @color-bench-highlight;
-    border-top: 1px solid @color-bench-highlight;
+    background-color: @highlight-color;
+    border-top: 1px solid @highlight-color;
     color: @color-bench;
   }
 
@@ -241,7 +241,7 @@
   }
 
   &.selected:last-child {
-    border-bottom: @color-bench-highlight;
+    border-bottom: @highlight-color;
   }
 
 }

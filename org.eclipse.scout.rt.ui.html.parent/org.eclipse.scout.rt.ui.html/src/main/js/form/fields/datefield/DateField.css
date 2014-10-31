@@ -4,8 +4,8 @@
 
 /** Prediction input field is in the back of the actual input field -> make actual input field transparent */
 .date-field .predict {
-  color: @color-bench-semi;
-  background-color: @text-field-background-color;
+  color: @disabled-color;
+  background-color: @control-background-color;
 
   & + input {
     background-color: transparent;
@@ -17,15 +17,15 @@
   border-color: @color-error;
 }
 
-.date-box{
+.date-box {
   margin-top: 5px;
   height: 224px;
   width: 224px;
   position: absolute;
-  background-color: #FFF;
+  background-color: @control-background-color;
   padding: 6px;
   z-index: 100;
-  border: 1px solid @color-bench-semi;
+  border: 1px solid @popup-border-color;
   border-radius: @border-radius;
   .drop-shadow();
 
@@ -57,7 +57,7 @@
 }
 
 .date-box-day:hover {
-  color: @color-bench-text-active;
+  color: @active-color;
 }
 
 .date-box-weekday{
@@ -96,7 +96,7 @@
 .date-box-header{
   line-height: 26px;
   height: 26px;
-  color: @color-bench-text-active;
+  color: @active-color;
   margin: 0px 0px 5px 0px;
 }
 
@@ -123,7 +123,7 @@
 .date-box-left-m:hover,
 .date-box-right-y:hover,
 .date-box-right-m:hover{
-  color: @color-bench-highlight;
+  color: @highlight-color;
 }
 
 .date-box-left-y,

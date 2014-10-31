@@ -8,7 +8,7 @@
     .menu-icon(@icon-detach);
   }
   &:hover:before {
-     color:@color-bench-text-hover;
+     color:@hover-color;
   }
 }
 
