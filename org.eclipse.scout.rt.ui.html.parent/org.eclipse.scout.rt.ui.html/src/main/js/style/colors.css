@@ -48,7 +48,7 @@
 @highlight-color: @palette-bsi-orange;
 
 @text-color: @palette-dark-gray-1;
-@icon-color: @palette-dark-gray-2;
+@icon-color: @palette-light-gray-0;
 @disabled-color: @palette-light-gray-1;
 @hover-color: @palette-bsi-green;
 @focus-color: @palette-bsi-orange;

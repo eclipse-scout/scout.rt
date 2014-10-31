@@ -1,0 +1,90 @@
+===================================
+ IN PROGRESS
+-----------------------------------
+[AWE]
+Tabs: "Bölle" nicht schön, Farbe dunkel-grau ausprobieren, evtl. active state bei mousedown setzen
+  und nicht bei mouseup wie jetzt (2 farben gleichzeitig sichtbar)
+
+Tabs: Titel fett, Pointer Cursor
+
+Desktop-Tabs: 2-zeilig gut, 2te Zeile evtl. grau machen? V-Align top, nicht middle wenn nur 1 Zeile
+
+Toolbar: Profil-Icon rechts oben, mit Benutzername und Menü mit Optionen..., Abmelden, etc.
+
+Telefon-Icon korrigieren (Grösse, Farbe)
+
+[CGU]
+
+[CRU]
+
+===================================
+ BACKLOG
+-----------------------------------
+Animation: im Tree bei Wechsel zwischen Search und Views
+
+Globale Suche: wie Design-Vorschlag, Baum mit Fake-Suchresultaten anzeigen
+
+Tree: Pfeil/-Text, vertikale Ausrichtung korrigieren
+
+Scrollbars: für UGM JS-Scrollbars einschalten
+
+Sichtenmenü: ausprobieren, ob bei Klick auf den Titel das Sichtenmenü aufgehen soll
+
+2 Buttons für Navigation unter dem Tree sind OK (Home + Breadcrumb/Tree-Switch)
+
+Navigation im Tree überdenken. Was ist wenn es viele Elemente hat? Braucht es "Alle anzeigen"? Hypothese: unter 10 immer alle anzeigen.
+
+Labor: Baum mit Einfach- oder Doppelklick öffnen? Hypothese: mit Einfach-Klick
+  im TreeField mit Checkboxen braucht es den Doppelklick vielleicht doch noch
+
+Labor: Table-Header mit oder ohne Icons?
+
+Table-Header: ganz feiner Pfeil wie in Excel ausprobieren, keine Farben für Header-Text
+
+Photoshop: Such-Forms / Table-Controls - vertikale "Tabs" ausprobieren. Nur Text und eine vertikale Linie daneben
+  Buttons müssen pro Form sein und nicht pro Tab
+
+Ausprobieren: Dickerer top-border, 2 oder 3 px oben an Table-Controls
+
+Navigation in Forms: in Forms ein zusätzliches Item als Button hervorheben (z.B. Anzeigen) und evtl. ein "multi-button"
+  damit man im Tree weiter nach unten navigieren kann ohne in den Tree klicken zu müssen
+
+Telefon-Form: anzeigen, verpasste Anrufe, Steuerung (an-/abmelden), gerne mit Telefonbuch
+
+Stern durch Teilen-Icon ersetzen
+
+Assistenten Menü hinzufügen
+
+Fokus-Farbe: überall grün
+
+Tooltip Icon: V-Align prüfen (1px off?)
+
+Textfeld padding-left etwas zu gross?
+
+Mandatory-Stern: Wingdings(2) Icon ausprobieren
+
+Rechenfunktionen bei Numberfield
+
+Tooltip auch bei Hover anzeigen
+
+TableField: row-height === logicalGridHeight (text-field)?
+
+Menüs: sollen neu auf mousedown reagieren und nicht bei mouseup
+
+Textfield: Selektionsfarbe ändern
+
+TableField: Tab-Reihenfolge ändern, Menüs sollen tabbable sein. Fokusrahmen um Tabelle weg. Selektion grau, wenn nicht fokussiert.
+
+Table-Menü bündig mit Table-Header
+
+
+===================================
+ DONE
+-----------------------------------
+
+AWE Menü-Buttons: Hover state fehlt
+
+AWE Form-Fields: alle rund, auch disabled (d.h. wir brauchen doch einen read-only modus)
+
+AWE Linie in RootGroupBox 3 px statt 1 px
+

@@ -26,11 +26,6 @@
   cursor: pointer;
   padding-right: 8px;
 
-  &.selected {
-    background-color: @body-background-color;
-    color: @text-color;
-    }
-
   &.parent {
     .font-text-plus(@bold);
   }
@@ -43,9 +38,10 @@
   }
 
   &.selected {
-    background-color: @color-bench;
+    background-color: @body-background-color;
     color: @text-color;
   }
+
 }
 
 .navigation-breadcrumb .tree-item{

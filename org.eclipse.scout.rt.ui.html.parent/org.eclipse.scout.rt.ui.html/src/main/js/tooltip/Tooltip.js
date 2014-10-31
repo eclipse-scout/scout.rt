@@ -89,7 +89,7 @@ scout.Tooltip.prototype.remove = function() {
   this.$container.remove();
 };
 
-scout.Tooltip.prototype._onTooltipClicked = function() {
+scout.Tooltip.prototype._onTooltipClicked = function(event) {
   //Only remove the tooltip if the click is outside of the container
   if (!this.$container.children().is($(event.target))) {
     this.remove();
