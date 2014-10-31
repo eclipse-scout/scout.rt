@@ -946,6 +946,11 @@ public final class StringUtility {
     return s;
   }
 
+  /**
+   * Compares two Strings, ignoring case considerations.
+   * Uses the method <code>java.lang.String.equalsIgnoreCase()</code>.
+   * Null strings are converted to zero length strings before comparison.
+   */
   public static boolean equalsIgnoreCase(String a, String b) {
     if (a == null) {
       a = "";
@@ -956,7 +961,21 @@ public final class StringUtility {
     return a.equalsIgnoreCase(b);
   }
 
+  /**
+   * @deprecated Use {@link #notEqualsIgnoreCase(String, String)} instead. Will be removed in the
+   *             N-Release.
+   */
+  @Deprecated
   public static boolean notEequalsIgnoreCase(String a, String b) {
+    return notEqualsIgnoreCase(a, b);
+  }
+
+  /**
+   * Compares two Strings, ignoring case considerations.
+   * Uses the method <code>java.lang.String.equalsIgnoreCase()</code>.
+   * Null strings are converted to zero length strings before comparison.
+   */
+  public static boolean notEqualsIgnoreCase(String a, String b) {
     if (a == null) {
       a = "";
     }

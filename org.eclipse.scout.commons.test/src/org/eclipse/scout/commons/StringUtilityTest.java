@@ -478,4 +478,25 @@ public class StringUtilityTest {
     assertFalse(StringUtility.isNullOrEmpty(" "));
     assertFalse(StringUtility.isNullOrEmpty("\n"));
   }
+
+  @Test
+  public void testEqualsIgnoreCase() {
+    assertTrue(StringUtility.equalsIgnoreCase(null, null));
+    assertTrue(StringUtility.equalsIgnoreCase("", null));
+    assertTrue(StringUtility.equalsIgnoreCase(null, ""));
+    assertTrue(StringUtility.equalsIgnoreCase("", ""));
+    assertTrue(StringUtility.equalsIgnoreCase("teststring", "TestString"));
+    assertFalse(StringUtility.equalsIgnoreCase("teststring", "teststring2"));
+  }
+
+  @Test
+  public void testNotEqualsIgnoreCase() {
+    assertFalse(StringUtility.notEqualsIgnoreCase(null, null));
+    assertFalse(StringUtility.notEqualsIgnoreCase("", null));
+    assertFalse(StringUtility.notEqualsIgnoreCase(null, ""));
+    assertFalse(StringUtility.notEqualsIgnoreCase("", ""));
+    assertFalse(StringUtility.notEqualsIgnoreCase("teststring", "TestString"));
+    assertTrue(StringUtility.notEqualsIgnoreCase("teststring", "teststring2"));
+  }
+
 }

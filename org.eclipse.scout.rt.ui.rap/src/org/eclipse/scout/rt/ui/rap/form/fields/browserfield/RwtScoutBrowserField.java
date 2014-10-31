@@ -98,7 +98,7 @@ public class RwtScoutBrowserField extends RwtScoutValueFieldComposite<IBrowserFi
     boolean externalUrl = false;
     try {
       String host = new URL(location).getHost();
-      externalUrl = StringUtility.hasText(host) && StringUtility.notEequalsIgnoreCase("local", host);
+      externalUrl = StringUtility.hasText(host) && StringUtility.notEqualsIgnoreCase("local", host);
     }
     catch (Throwable t) {
       // nop: externalUrl == false
