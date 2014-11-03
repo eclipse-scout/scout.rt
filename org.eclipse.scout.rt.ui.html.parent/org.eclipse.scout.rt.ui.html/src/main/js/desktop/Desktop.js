@@ -309,6 +309,6 @@ scout.Desktop.prototype.onModelAction = function(event) {
   } else if (event.type === 'openUrlInBrowser') {
     this._openUrlInBrowser(event);
   } else {
-    scout.parent.prototype.onModelAction.call(this, event);
+    scout.Desktop.parent.prototype.onModelAction.call(this, event);
   }
 };

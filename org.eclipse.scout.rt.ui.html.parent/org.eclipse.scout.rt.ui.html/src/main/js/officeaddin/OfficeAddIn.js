@@ -3,12 +3,18 @@ scout.OfficeAddIn = function() {
 };
 scout.inherits(scout.OfficeAddIn, scout.ModelAdapter);
 
+//override
+scout.OfficeAddIn.prototype.init = function(model, session) {
+  scout.OfficeAddIn.parent.prototype.init.call(this, model,session);
+  //call render directly since this model is not part of any other container such as desktop or form
+  this.render(this.session.$entryPoint);
+};
+
 scout.OfficeAddIn.prototype._render = function($parent) {
   this.$parent = $parent;
   this.$mscom = $parent.appendDIV('officeaddin');
   this.$mscom.attr('id','div_mscom');
 };
-
 
 /* event handling */
 
@@ -22,7 +28,7 @@ scout.OfficeAddIn.prototype.onModelAction = function(event) {
       this.session.send('invokeResult', this.id,{'ref':event.ref, 'status':'success'});
     }
   } else {
-    scout.parent.prototype.onModelAction.call(this, event);
+    scout.OfficeAddIn.parent.prototype.onModelAction.call(this, event);
   }
 };
 
