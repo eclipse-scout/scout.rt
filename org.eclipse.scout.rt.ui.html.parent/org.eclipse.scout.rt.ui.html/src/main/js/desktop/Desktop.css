@@ -110,6 +110,7 @@
 
   &:before {
     .font-icon;
+    color: @icon-color;
     font-size: 22px;
     vertical-align: -3px;
     padding-right: 11px;

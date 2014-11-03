@@ -1,24 +1,26 @@
 .tab-area {
   margin-top: @group-margin-top;
-  background-image:url('bg_tab_area.png');
-  background-repeat:repeat-x;
-  background-position:center bottom;
+  background-image: url('bg_tab_area.png');
+  background-repeat: repeat-x;
+  background-position: center bottom;
 
   & > button {
-    color:@text-color;
-    border:none;
-    background-color:transparent;
-    height:32px;
-    padding:0 10px;
-    border-bottom:solid 3px transparent;
+    .font-text-normal(@bold);
+    color: @title-color;
+    border: none;
+    background-color: transparent;
+    height: 32px;
+    padding: 0 10px;
+    border-bottom: solid 3px transparent;
+    cursor: pointer;
 
     &.selected {
-      color:@active-color;
+      color: @active-color;
       border-bottom-color: @active-color;
     }
 
     &:hover {
-      color:@hover-color;
+      color: @hover-color;
     }
 
     &:focus {

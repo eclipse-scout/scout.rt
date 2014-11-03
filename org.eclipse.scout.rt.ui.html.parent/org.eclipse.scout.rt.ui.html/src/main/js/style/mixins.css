@@ -18,7 +18,7 @@
 
   &:disabled {
     background-color: @palette-light-gray-4;
-    color: @palette-dark-gray-3;
+    color: @palette-dark-gray-4;
   }
 
   &:focus {
@@ -56,7 +56,7 @@
    * wird doch sowieso absolut positioniert.
    */
     line-height: @logical-grid-height;
-    color: @icon-color;
+    color: @text-field-icon-color;
   }
 
   &:focus ~ .icon:before {

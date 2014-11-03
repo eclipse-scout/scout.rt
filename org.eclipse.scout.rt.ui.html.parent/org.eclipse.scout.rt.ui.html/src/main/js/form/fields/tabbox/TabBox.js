@@ -30,7 +30,7 @@ scout.TabBox.prototype._render = function($parent) {
       text(groupBox.label).
       appendTo(this._$tabArea).
       data('tabIndex', i).
-      on('click', this._onTabClicked.bind(this)).
+      on('mousedown', this.onMousedown.bind(this)).
       on('keydown', this._onKeydown.bind(this));
     // only the selected tab is focusable
     if (i != this.selectedTab) {
@@ -48,7 +48,7 @@ scout.TabBox.prototype._renderProperties = function() {
   this._renderSelectedTab(this.selectedTab);
 };
 
-scout.TabBox.prototype._onTabClicked = function(e) {
+scout.TabBox.prototype.onMousedown = function(e) {
   var tabIndex = $(e.target).data('tabIndex');
   this._selectTab(tabIndex);
 };

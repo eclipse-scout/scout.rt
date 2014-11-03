@@ -3,16 +3,17 @@
 /* ------------------------ */
 @palette-black:#000;
 
-@palette-dark-gray-1:#333;
-@palette-dark-gray-2:#666;
-@palette-dark-gray-3:#777;
-@palette-gray:#999;
-@palette-light-gray-0:#aaa;
-@palette-light-gray-1:#ccc;
-@palette-light-gray-2:#ddd;
-@palette-light-gray-3:#d3d3d3;
-@palette-light-gray-4:#f6f6f6;
-@palette-light-gray-5:#fefefe;
+@palette-dark-gray-1: #333;
+@palette-dark-gray-2: #5D5D5D;
+@palette-dark-gray-3: #666;
+@palette-dark-gray-4: #777;
+@palette-gray: #9a9a9a;
+@palette-light-gray-0: #aaa;
+@palette-light-gray-1: #ccc;
+@palette-light-gray-2: #ddd;
+@palette-light-gray-3: #d3d3d3;
+@palette-light-gray-4: #f6f6f6;
+@palette-light-gray-5: #fefefe;
 
 @palette-white:#fff;
 
@@ -39,7 +40,6 @@
 
 @color-error: @palette-red;
 @color-error-light: @palette-light-red;
-@color-info: @palette-dark-gray-3;
 
 @body-background-color: @palette-light-gray-5;
 @border-color: @palette-light-gray-3;
@@ -48,7 +48,8 @@
 @highlight-color: @palette-bsi-orange;
 
 @text-color: @palette-dark-gray-1;
-@icon-color: @palette-light-gray-0;
+@icon-color: @palette-dark-gray-3;
+@text-field-icon-color: @palette-gray;
 @disabled-color: @palette-light-gray-1;
 @hover-color: @palette-bsi-green;
 @focus-color: @palette-bsi-orange;
@@ -59,3 +60,5 @@
 @popup-border-color: @palette-light-gray-1;
 @button-background-color: @palette-light-gray-4;
 @default-button-background-color: @palette-bsi-light-green;
+
+@title-color: @palette-dark-gray-1;

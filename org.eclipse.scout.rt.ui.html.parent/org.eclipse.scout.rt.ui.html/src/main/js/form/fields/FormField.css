@@ -56,7 +56,7 @@
 
     &:before  {
       content: @icon-info;
-      color: @color-info;
+      color: @icon-color;
     }
   }
 

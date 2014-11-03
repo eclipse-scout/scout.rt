@@ -5,17 +5,17 @@
   box-sizing: border-box;
   margin: 0 @margin-bench-right 25px @margin-bench-left;
   padding-top:19px;
-  border-top:solid 1px @color-bench-light-border;
+  border-top: 3px solid @color-bench-light-border;
 }
 
 .group-box {
-  margin-bottom:10px;
-  box-sizing:border-box;
-  width:100%; /* TODO AWE: prüfen warum es das hier noch braucht */
+  margin-bottom: 10px;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .group-box-title {
-  width:100%;
+  width: 100%;
   border-bottom: 3px solid @color-bench-light-border;
   padding-top: -8px;
   padding-bottom: 6px;
@@ -23,39 +23,38 @@
   margin-bottom: @group-padding-top;
 
   & span {
-   font-weight:bold;
-   background-color:white;
-   color:#5D5D5D;
+   .font-text-normal(@bold);
+   color: @title-color;
  }
 }
 
 .group-box-body {
-  position:relative;
+  position: relative;
 }
 
 .button-bar {
-  position:relative;
-  height:28px;
+  position: relative;
+  height: 28px;
 }
 
 .button-bar > .process {
-  position:absolute;
-  top:0px;
-  left:0px;
+  position: absolute;
+  top: 0px;
+  left: 0px;
 }
 
 .button-bar .form-field {
-  position:static;
-  display:inline-block;
+  position: static;
+  display: inline-block;
 }
 
 .button-bar .field {
-  position:static;
+  position: static;
 }
 
 .button-bar > .system {
-  position:absolute;
-  top:0px;
-  right:0px;
+  position: absolute;
+  top: 0px;
+  right: 0px;
 }
 
