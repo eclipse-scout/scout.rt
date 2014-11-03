@@ -71,7 +71,7 @@ public class MainRequestInterceptor extends AbstractService implements IServletR
     String jsonSessionAttributeName = "scout.htmlui.session.json." + jsonReq.getJsonSessionId();
     HttpSession httpSession = req.getSession();
 
-    //FIXME really synchronize on this? blocks every call, maybe introduce a lock object saved on httpSession?
+    //FIXME cgu really synchronize on this? blocks every call, maybe introduce a lock object saved on httpSession or even better use java.util.concurrent.locks.ReadWriteLock
     IJsonSession jsonSession = null;
     synchronized (httpSession) {
       jsonSession = (IJsonSession) httpSession.getAttribute(jsonSessionAttributeName);

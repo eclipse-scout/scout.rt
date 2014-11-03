@@ -88,5 +88,6 @@
 //@include("scrollbar/Scrollbar2.js");
 //@include("text/DecimalFormat.js");
 //@include("text/DateFormat.js");
+//@include("officeaddin/OfficeAddIn.js");
 
 }(window.scout = window.scout || {}, jQuery));

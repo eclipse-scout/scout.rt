@@ -125,7 +125,7 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
     if (!isFormBased()) {
       // FIXME view and tool buttons should be removed from desktop by device transformer
       putAdapterIdsProperty(json, "viewButtons", getModel().getViewButtons());
-      putAdapterIdProperty(json, "outline", getModel().getOutline());
+      optPutAdapterIdProperty(json, "outline", getModel().getOutline());
     }
     optPutAdapterIdProperty(json, "breadCrumbNavigation", getBreadcrumbNavigation());
     return json;

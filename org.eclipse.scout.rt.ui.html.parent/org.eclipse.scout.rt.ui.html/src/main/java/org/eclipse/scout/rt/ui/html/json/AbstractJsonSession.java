@@ -83,7 +83,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
       throw new SecurityException("/json request is not authenticated with a Subject");
     }
 
-    IClientSession clientSession = createClientSession(userAgent, subject, request.getLocale());
+    IClientSession clientSession = createUninitializedClientSession(userAgent, subject, request.getLocale());
     m_jsonClientSession = (JsonClientSession) getOrCreateJsonAdapter(clientSession);
     m_jsonEventProcessor = new JsonEventProcessor(m_jsonClientSession);
     startUpClientSession(clientSession);
@@ -138,7 +138,11 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
   protected abstract Class<? extends IClientSession> clientSessionClass();
 
-  protected IClientSession createClientSession(UserAgent userAgent, Subject subject, Locale locale) {
+  /**
+   * @return a new {@link IClientSession} that is not yet initialized, so
+   *         {@link IClientSession#startSession(org.osgi.framework.Bundle)} was not yet called
+   */
+  protected IClientSession createUninitializedClientSession(UserAgent userAgent, Subject subject, Locale locale) {
     synchronized (this) {
       HttpSession httpSession = m_currentHttpRequest.getSession();
       // Lookup the requested client session
@@ -155,37 +159,28 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
       }
       // No client session for the requested ID was found, so create one and store it in the map
       LOG.info("Creating new client session [clientSessionId=" + clientSessionId + "]");
+      String virtualSessionId = UUID.randomUUID().toString();
       LocaleThreadLocal.set(locale);
       try {
-        clientSession = createClientSessionInternal(clientSessionClass(), userAgent, subject, locale, UUID.randomUUID().toString());
-        //FIXME CGU session must be started later, see JsonClientSession
-        //return SERVICES.getService(IClientSessionRegistryService.class).newClientSession(clientSessionClass(), subject, UUID.randomUUID().toString(), userAgent);
-        httpSession.setAttribute(clientSessionAttributeName, clientSession);
-        httpSession.setAttribute(clientSessionAttributeName + ".cleanup", new P_ClientSessionCleanupHandler(clientSessionId, clientSession));
-        return clientSession;
+        try {
+          clientSession = clientSessionClass().newInstance();
+        }
+        catch (InstantiationException | IllegalAccessException e) {
+          throw new JsonException("Could not create client session.", e);
+        }
+        clientSession.setSubject(subject);
+        clientSession.setVirtualSessionId(virtualSessionId);
+        clientSession.setUserAgent(userAgent);
       }
       finally {
         LocaleThreadLocal.set(null);
       }
+      //FIXME CGU session must be started later, see JsonClientSession
+      //return SERVICES.getService(IClientSessionRegistryService.class).newClientSession(clientSessionClass(), subject, UUID.randomUUID().toString(), userAgent);
+      httpSession.setAttribute(clientSessionAttributeName, clientSession);
+      httpSession.setAttribute(clientSessionAttributeName + ".cleanup", new P_ClientSessionCleanupHandler(clientSessionId, clientSession));
+      return clientSession;
     }
-  }
-
-  private IClientSession createClientSessionInternal(Class<? extends IClientSession> clazz, UserAgent userAgent, Subject subject, Locale locale, String virtualSessionId) {
-    IClientSession clientSession;
-    try {
-      clientSession = clazz.newInstance();
-    }
-    catch (InstantiationException | IllegalAccessException e) {
-      throw new JsonException("Could not create client session.", e);
-    }
-
-    clientSession.setSubject(subject);
-    if (virtualSessionId != null) {
-      clientSession.setVirtualSessionId(virtualSessionId);
-    }
-    clientSession.setUserAgent(userAgent);
-
-    return clientSession;
   }
 
   @Override

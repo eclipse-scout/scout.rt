@@ -28,7 +28,7 @@ public class TestEnvironmentJsonSession extends AbstractJsonSession {
   }
 
   @Override
-  protected IClientSession createClientSession(UserAgent userAgent, Subject subject, Locale locale) {
+  protected IClientSession createUninitializedClientSession(UserAgent userAgent, Subject subject, Locale locale) {
     return TestEnvironmentClientSession.get();
   }
 
