@@ -115,15 +115,19 @@
 .table-row, .table-row-sum {
   position:relative;
   overflow: hidden;
-  border: @table-selection-border-width solid transparent;
-  margin-bottom: -@table-selection-border-width;
+  border-left: 1px solid transparent;
+  border-right: 1px solid transparent;
+  border-bottom: 1px solid @color-bench-light-border;
+}
+
+.table-row:first-child {
+  border-top: 1px solid transparent;
 }
 
 .table-row .table-cell,
 .table-row-sum .table-cell {
   display: table-cell;
   padding: @table-row-padding 4px @table-row-padding 8px;
-  border-bottom: 1px solid @color-bench-light-border;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -134,51 +138,24 @@
   font-weight: bold;
 }
 
-
 /* Selected rows */
+/* Hint: The definition of the 2px selection border is written in desktop.css because it is not possible to prevent the creation of the additional selection div in tablefield.css*/
 
-.table-row.select-top .table-cell,
-.table-row.select-middle .table-cell,
-.table-row.select-bottom .table-cell,
-.table-row.select-single .table-cell{
+.table-row.selected {
   background-color: @color-bench-select;
-  border-bottom: 1px solid @color-bench-select-border;
+  border-color: @color-bench-select-border;
 }
 
+.table-row.select-single,
 .table-row.select-top {
-  border-top-color: @color-bench-select-border;
-  border-left-color: @color-bench-select-border;
-  border-right-color: @color-bench-select-border;
+  border-top: 1px solid @color-bench-select-border;
+  /* Move the row 1px up to cover the bottom border of the previous row. */
+  margin-top: -1px;
 }
 
-.table-row.select-middle {
-  border-left-color: @color-bench-select-border;
-  border-right-color: @color-bench-select-border;
-  border-top: 0px; /* workaround for multicolored borders in the corner (use cell borders, see below) */
-
-  & .table-cell {
-    border-top: @table-selection-border-width solid transparent;
-  }
-}
-
-.table-row.select-bottom {
-  border-bottom-color: @color-bench-select-border;
-  border-left-color: @color-bench-select-border;
-  border-right-color: @color-bench-select-border;
-  border-top: 0px; /* workaround for multicolored borders in the corner (use cell borders, see below) */
-
-  & .table-cell {
-    border-top: @table-selection-border-width solid transparent;
-    border-bottom-color: transparent;
-  }
-}
-
-.table-row.select-single {
-  border: @table-selection-border-width solid @color-bench-select-border;
-
-  & .table-cell {
-    border-bottom-color: transparent;
-  }
+.table-row:first-child.selected {
+  /* The first row has a 1px transparent border-top because it is not possible to move the row 1px up due to the overlapping header. */
+  margin-top: 0px;
 }
 
 /* key box */

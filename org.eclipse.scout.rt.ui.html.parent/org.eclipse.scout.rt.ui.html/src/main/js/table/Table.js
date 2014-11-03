@@ -325,7 +325,7 @@ scout.Table.prototype._buildRowDiv = function(row) {
   var rowClass = 'table-row ';
 
   if (this.selectedRowIds && this.selectedRowIds.indexOf(row.id) > -1) {
-    rowClass += 'row-selected ';
+    rowClass += 'selected ';
   }
   // FIXME Check if possible to use $.makeDiv (but maybe it's too slow)
   var unselectable = (scout.device.supportsCssUserSelect() ? '' : ' unselectable="on"'); // workaround for IE 9
@@ -773,7 +773,7 @@ scout.Table.prototype.findSelectedRows = function() {
   if (!this._$viewport) {
     return $();
   }
-  return this._$viewport.find('.row-selected');
+  return this._$viewport.find('.selected');
 };
 
 scout.Table.prototype.findRows = function(includeSumRows) {

@@ -71,7 +71,7 @@ scout.MobileTable.prototype._buildRowDiv = function(row) {
     rowClass += 'table-row-single ';
   }
   if (this.selectedRowIds && this.selectedRowIds.indexOf(row.id) > -1) {
-    rowClass += 'row-selected ';
+    rowClass += 'selected ';
   }
 
   return '<div id="' + row.id + '" class="' + rowClass + '">' + cellContent + '</div>';

@@ -26,7 +26,7 @@ height: ~"calc(100% - 95px)"; /*85px is table footer/control*/
   background-color: #eee;
 }
 
-.table-row.row-selected {
+.table-row.selected {
   background-color: #eee;
 }
 

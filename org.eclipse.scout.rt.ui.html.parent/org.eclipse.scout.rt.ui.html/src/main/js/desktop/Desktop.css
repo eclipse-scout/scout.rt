@@ -157,7 +157,7 @@
   background-size: cover;
 }
 
-/* table / form*/
+/* table / form */
 
 .desktop-bench > .table > .table-header,
 .desktop-bench > .table > .table-data {
@@ -168,6 +168,37 @@
 .desktop-bench > .table > .menubar,
 .desktop-bench > .form > .menubar {
   padding-right: @margin-bench-right;
+}
+
+/* Desktop table has a 2px border. For this we create a div which spans the full row and has border-top/bottom set to 1px.
+Middle rows dont have 2px border so no need to do it for those. */
+.desktop-bench > .table .table-row,
+.desktop-bench > .table .table-row-sum {
+  border-left-width: 2px;
+  border-right-width: 2px;
+}
+
+.desktop-bench > .table .table-row.select-single:before,
+.desktop-bench > .table .table-row.select-top:before,
+.desktop-bench > .table .table-row.select-bottom:before {
+   position: absolute;
+   display: block;
+   content: '';
+   height: 100%;
+   width: 100%;
+}
+
+.desktop-bench > .table .table-row.select-top:before {
+   border-top: 1px solid @color-bench-select-border;
+}
+
+.desktop-bench > .table .table-row.select-bottom:before {
+   border-bottom: 1px solid @color-bench-select-border;
+}
+
+.desktop-bench > .table .table-row.select-single:before {
+   border-top: 1px solid @color-bench-select-border;
+   border-bottom: 1px solid @color-bench-select-border;
 }
 
 /* base desktop */

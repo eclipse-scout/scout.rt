@@ -549,18 +549,18 @@ describe("Table", function() {
       var $row3 = $rows.eq(3);
       var $row4 = $rows.eq(4);
 
-      expect($rows).not.toHaveClass('row-selected');
+      expect($rows).not.toHaveClass('selected');
 
       $row0.triggerMouseDown();
       $row1.trigger('mousemove');
       $row2.trigger('mousemove');
       $row2.triggerMouseUp();
 
-      expect($row0).toHaveClass('row-selected');
-      expect($row1).toHaveClass('row-selected');
-      expect($row2).toHaveClass('row-selected');
-      expect($row3).not.toHaveClass('row-selected');
-      expect($row4).not.toHaveClass('row-selected');
+      expect($row0).toHaveClass('selected');
+      expect($row1).toHaveClass('selected');
+      expect($row2).toHaveClass('selected');
+      expect($row3).not.toHaveClass('selected');
+      expect($row4).not.toHaveClass('selected');
     });
 
     it("only sends selection event, no click", function() {
@@ -573,7 +573,7 @@ describe("Table", function() {
       var $row1 = $rows.eq(1);
       var $row2 = $rows.eq(2);
 
-      expect($rows).not.toHaveClass('row-selected');
+      expect($rows).not.toHaveClass('selected');
 
       $row0.triggerMouseDown();
       $row1.trigger('mousemove');
@@ -612,17 +612,17 @@ describe("Table", function() {
       var $row2 = $rows.eq(2);
       var $row3 = $rows.eq(3);
 
-      expect($rows).not.toHaveClass('row-selected');
+      expect($rows).not.toHaveClass('selected');
 
       $row0.triggerMouseDown();
       $row1.trigger('mousemove');
       $row2.trigger('mousemove');
       $row2.triggerMouseUp();
 
-      expect($row0).toHaveClass('row-selected');
-      expect($row1).not.toHaveClass('row-selected');
-      expect($row2).not.toHaveClass('row-selected');
-      expect($row3).not.toHaveClass('row-selected');
+      expect($row0).toHaveClass('selected');
+      expect($row1).not.toHaveClass('selected');
+      expect($row2).not.toHaveClass('selected');
+      expect($row3).not.toHaveClass('selected');
 
       sendQueuedAjaxCalls();
 

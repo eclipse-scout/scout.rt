@@ -15,9 +15,7 @@ Telefon-Icon korrigieren (Grösse, Farbe)
 
 [CGU]
 
-TableField: row-height === logicalGridHeight (text-field)?
-
-Table: Row-Text nicht genau zentriert
+Tree: Pfeil/-Text, vertikale Ausrichtung korrigieren
 
 MessageBox: Nur Fokus-Farbe, kein Default-Button. Default-Button ist initial fokussiert.
 
@@ -29,10 +27,6 @@ MessageBox: Nur Fokus-Farbe, kein Default-Button. Default-Button ist initial fok
 Animation: im Tree bei Wechsel zwischen Search und Views
 
 Globale Suche: wie Design-Vorschlag, Baum mit Fake-Suchresultaten anzeigen
-
-Tree: Pfeil/-Text, vertikale Ausrichtung korrigieren
-
-Table: Row-Text nicht genau zentriert
 
 Scrollbars: für UGM JS-Scrollbars einschalten
 
@@ -75,8 +69,6 @@ Rechenfunktionen bei Numberfield
 
 Tooltip auch bei Hover anzeigen
 
-TableField: row-height === logicalGridHeight (text-field)?
-
 Menüs: sollen neu auf mousedown reagieren und nicht bei mouseup
 
 Textfield: Selektionsfarbe ändern
@@ -84,8 +76,6 @@ Textfield: Selektionsfarbe ändern
 TableField: Tab-Reihenfolge ändern, Menüs sollen tabbable sein. Fokusrahmen um Tabelle weg. Selektion grau, wenn nicht fokussiert.
 
 Table-Menü bündig mit Table-Header
-
-MessageBox: Nur Fokus-Farbe, kein Default-Button. Default-Button ist initial fokussiert.
 
 ===================================
  DONE
@@ -97,3 +87,6 @@ AWE Form-Fields: alle rund, auch disabled (d.h. wir brauchen doch einen read-onl
 
 AWE Linie in RootGroupBox 3 px statt 1 px
 
+CGU TableField: row-height === logicalGridHeight (text-field)?
+
+CGU Table: Row-Text nicht genau zentriert

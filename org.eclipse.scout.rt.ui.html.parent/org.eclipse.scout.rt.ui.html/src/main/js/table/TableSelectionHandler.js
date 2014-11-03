@@ -34,14 +34,14 @@ scout.TableSelectionHandler.prototype._onRowsDrawn = function($rows) {
     if (that.table.multiSelect && event.shiftKey) {
       first = $selectedRows.first().index();
     } else if (that.table.multiSelect && event.ctrlKey) {
-      add = !$row.hasClass('row-selected'); //FIXME why not just selected as in tree?
+      add = !$row.isSelected();
     }
     else {
       //Click on the already selected row must not clear the selection it to avoid another selection event sent to the server
       //Right click on already selected rows must not clear the selection
-      if (!$row.hasClass('row-selected') ||
+      if (!$row.isSelected() ||
           ($selectedRows.length > 1 && event.which != 3)) {
-        $selectedRows.removeClass('row-selected');
+        $selectedRows.select(false);
         that._clearSelectionBorder($selectedRows);
       }
     }
@@ -74,9 +74,9 @@ scout.TableSelectionHandler.prototype._onRowsDrawn = function($rows) {
 
       // set/remove selection
       if (add) {
-        $actionRow.addClass('row-selected');
+        $actionRow.select(true);
       } else {
-        $actionRow.removeClass('row-selected');
+        $actionRow.select(false);
         that._clearSelectionBorder($selectedRows);
       }
 
@@ -105,7 +105,7 @@ scout.TableSelectionHandler.prototype.drawSelection = function() {
   for (var i = 0; i < rowIds.length; i++) {
     var rowId = rowIds[i];
     var $row = $('#' + rowId, this.table.$data);
-    $row.addClass('row-selected');
+    $row.select(true);
     selectedRows.push($row);
   }
 
@@ -118,7 +118,7 @@ scout.TableSelectionHandler.prototype.drawSelection = function() {
 
 scout.TableSelectionHandler.prototype.clearSelection = function(dontFire) {
   var $selectedRows = this.table.findSelectedRows();
-  $selectedRows.removeClass('row-selected');
+  $selectedRows.select(false);
   this._clearSelectionBorder($selectedRows);
 
   if (!dontFire) {
@@ -139,8 +139,8 @@ scout.TableSelectionHandler.prototype.dataDrawn = function() {
  */
 scout.TableSelectionHandler.prototype._drawSelectionBorder = function($selectedRows) {
   $selectedRows.each(function() {
-    var hasPrev = $(this).prevAll('div:not(.invisible):first').hasClass('row-selected');
-    var hasNext = $(this).nextAll('div:not(.invisible):first').hasClass('row-selected');
+    var hasPrev = $(this).prevAll('div:not(.invisible):first').isSelected();
+    var hasNext = $(this).nextAll('div:not(.invisible):first').isSelected();
 
     if (hasPrev && hasNext) $(this).addClass('select-middle');
     if (!hasPrev && hasNext) $(this).addClass('select-top');
@@ -157,7 +157,7 @@ scout.TableSelectionHandler.prototype.selectAll = function() {
   this.clearSelection(true);
 
   var $rows = $('.table-row', this.table.$data);
-  $rows.addClass('row-selected');
+  $rows.select(true);
 
   this._drawSelectionBorder($rows);
   this.table.onRowsSelected($rows);

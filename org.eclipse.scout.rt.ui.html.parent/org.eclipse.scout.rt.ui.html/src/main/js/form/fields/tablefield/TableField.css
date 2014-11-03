@@ -21,7 +21,6 @@
   line-height: @logical-grid-height;
 }
 
-/* TODO CGU/CRU wieso nicht mit background-color wie bei header-resize? UND braucht es all diese height definitionen wirklich? */
 .table-field .menubar {
   height:39px;
   padding:0 0 0 0;
@@ -41,47 +40,7 @@
   }
 }
 
-.table-field .table-row {
-  border: @tablefield-selection-border-width solid transparent;
-  margin-bottom: -@tablefield-selection-border-width;
-}
-
 .table-field > .table > .table-data .table-row > .table-cell {
   padding-top: @table-row-padding - 6;
   padding-bottom: @table-row-padding - 6;
-}
-
-
-/* Selected rows */
-
-.table-field .table-row.select-top .table-cell,
-.table-field .table-row.select-middle .table-cell,
-.table-field .table-row.select-bottom .table-cell,
-.table-field .table-row.select-single .table-cell{
-  border-bottom: @tablefield-selection-border-width solid @color-bench-select-border;
-}
-
-.table-field .table-row.select-middle {
-  border-top: 0px; /* workaround for multicolored borders in the corner (use cell borders, see below) */
-
-  & .table-cell {
-    border-top: @tablefield-selection-border-width solid transparent;
-  }
-}
-
-.table-field .table-row.select-bottom {
-  border-top: 0px; /* workaround for multicolored borders in the corner (use cell borders, see below) */
-
-  & .table-cell {
-    border-top: @tablefield-selection-border-width solid transparent;
-    border-bottom-color: transparent;
-  }
-}
-
-.table-field .table-row.select-single {
-  border: @tablefield-selection-border-width solid @color-bench-select-border;
-
-  & .table-cell {
-    border-bottom-color: transparent;
-  }
 }
