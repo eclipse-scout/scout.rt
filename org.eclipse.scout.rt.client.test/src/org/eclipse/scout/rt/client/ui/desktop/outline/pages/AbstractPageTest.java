@@ -17,16 +17,16 @@ import org.junit.Test;
 
 /**
  * JUnit tests for {@link AbstractPage}
- * 
+ *
  * @since 3.10.0
  */
 public class AbstractPageTest {
-  private static final String TEST_CLASS_ID = "TEST_CLASS_ID";
+  private static final String TEST_PAGE_CLASS_ID = "TEST_CLASS_ID";
 
   @Test
   public void testClassIdAnnotatedPage() {
     AbstractPageWithClassId testPage = new AbstractPageWithClassId();
-    assertEquals("classid should correspond to annotated id", TEST_CLASS_ID, testPage.classId());
+    assertEquals("classid should correspond to annotated id", TEST_PAGE_CLASS_ID, testPage.classId());
   }
 
   @Test
@@ -36,7 +36,7 @@ public class AbstractPageTest {
     assertEquals("classid should correspond to annotated id", className, testPageNoAnnotation.classId());
   }
 
-  @ClassId(TEST_CLASS_ID)
+  @ClassId(TEST_PAGE_CLASS_ID)
   class AbstractPageWithClassId extends AbstractPage {
   }
 

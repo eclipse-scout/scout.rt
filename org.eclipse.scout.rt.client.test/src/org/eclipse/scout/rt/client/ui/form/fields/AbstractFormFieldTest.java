@@ -37,12 +37,14 @@ import org.junit.Test;
 
 /**
  * JUnit tests for {@link AbstractFormField}
- * 
+ *
  * @since 3.10.0
  */
 public class AbstractFormFieldTest {
   private static final String DUPLICATE_CLASS_ID = "DUPLICATE";
-  private static final String TEST_CLASS_ID = "TEST_CLASS_ID";
+  private static final String TEST_CLASS_ID = "TEST_CLASS_ID1";
+  private static final String TEST_FORM_ID = "TEST_FORM_CLASS_ID";
+  private static final String TEST_GROUP_BOX_ID = "TEST_GROUP_BOX_CLASS_ID";
 
   /**
    * Tests that {@link AbstractFormField#classId()} returns the annotation value for {@link ClassId}.
@@ -56,7 +58,7 @@ public class AbstractFormFieldTest {
 
   /**
    * Tests that {@link AbstractFormField#classId()} returns the annotation value for {@link ClassId}.
-   * 
+   *
    * @throws ProcessingException
    */
   @Test
@@ -64,7 +66,7 @@ public class AbstractFormFieldTest {
     TestForm2 testForm = new TestForm2();
     SimpleGroupBox2 testField = testForm.getFieldByClass(TestForm2.MainBox.SimpleGroupBox2.class);
     String classId = testField.classId();
-    assertEquals("classId should match annotated id", TEST_CLASS_ID, classId);
+    assertEquals("classId should match annotated id", TEST_GROUP_BOX_ID, classId);
   }
 
   @Test
@@ -78,7 +80,7 @@ public class AbstractFormFieldTest {
   public void testClassIdWithFormClassId() throws ProcessingException {
     TestFormWithClassId testForm = new TestFormWithClassId();
     TestFieldWithoutClassId field = testForm.getFieldByClass(TestFormWithClassId.MainBox.TestFieldWithoutClassId.class);
-    assertEquals("class id not as expected", field.getClass().getSimpleName() + ITypeWithClassId.ID_CONCAT_SYMBOL + TEST_CLASS_ID, field.classId());
+    assertEquals("class id not as expected", field.getClass().getSimpleName() + ITypeWithClassId.ID_CONCAT_SYMBOL + TEST_FORM_ID, field.classId());
   }
 
   @Test
@@ -86,13 +88,13 @@ public class AbstractFormFieldTest {
     TestFormWithClassId testForm = new TestFormWithClassId();
     TestFieldDuplicateClassId1 field1 = testForm.getFieldByClass(TestFieldDuplicateClassId1.class);
     TestFieldDuplicateClassId2 field2 = testForm.getFieldByClass(TestFieldDuplicateClassId2.class);
-    assertEquals("class id not as expected", DUPLICATE_CLASS_ID + ITypeWithClassId.ID_CONCAT_SYMBOL + "1", field1.classId());
-    assertEquals("class id not as expected", DUPLICATE_CLASS_ID + ITypeWithClassId.ID_CONCAT_SYMBOL + "2", field2.classId());
+    assertEquals("class id not as expected", DUPLICATE_CLASS_ID + DUPLICATE_CLASS_ID + ITypeWithClassId.ID_CONCAT_SYMBOL + "1", field1.classId());
+    assertEquals("class id not as expected", DUPLICATE_CLASS_ID + DUPLICATE_CLASS_ID + ITypeWithClassId.ID_CONCAT_SYMBOL + "2", field2.classId());
   }
 
   /**
    * Tests the generated {@link AbstractFormField#classId()} for injected sibling fields.
-   * 
+   *
    * @throws ProcessingException
    */
   @Test
@@ -102,7 +104,7 @@ public class AbstractFormFieldTest {
 
   /**
    * Tests the generated {@link AbstractFormField#classId()} for injected sibling fields.
-   * 
+   *
    * @throws ProcessingException
    */
   @Test
@@ -131,7 +133,7 @@ public class AbstractFormFieldTest {
   class TestClassWithClassId extends AbstractFormField {
   }
 
-  @ClassId(TEST_CLASS_ID)
+  @ClassId(TEST_FORM_ID)
   class TestFormWithClassId extends AbstractForm {
 
     public TestFormWithClassId() throws ProcessingException {
@@ -144,12 +146,13 @@ public class AbstractFormFieldTest {
       }
 
       @Order(20.0)
-      @ClassId(DUPLICATE_CLASS_ID)
+      @ClassId(DUPLICATE_CLASS_ID + DUPLICATE_CLASS_ID)
+      // must be a calculation, otherwise the SCOUT SDK reports a compile error
       public class TestFieldDuplicateClassId1 extends AbstractFormField {
       }
 
       @Order(30.0)
-      @ClassId(DUPLICATE_CLASS_ID)
+      @ClassId(DUPLICATE_CLASS_ID + DUPLICATE_CLASS_ID)
       public class TestFieldDuplicateClassId2 extends AbstractFormField {
       }
     }
@@ -219,7 +222,7 @@ public class AbstractFormFieldTest {
     public class MainBox extends AbstractGroupBox {
 
       @Order(10.0)
-      @ClassId(TEST_CLASS_ID)
+      @ClassId(TEST_GROUP_BOX_ID)
       public class SimpleGroupBox2 extends AbstractTestGroupBox {
       }
     }
