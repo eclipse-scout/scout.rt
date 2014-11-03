@@ -5,6 +5,9 @@ scout.Popup = function() {
 };
 
 scout.Popup.prototype.render = function($parent) {
+  if (!$parent) {
+    $parent = $('body');
+  }
   this.$body = $.makeDIV('popup-body');
   this.$container = $.makeDIV('popup').
     append(this.$body).

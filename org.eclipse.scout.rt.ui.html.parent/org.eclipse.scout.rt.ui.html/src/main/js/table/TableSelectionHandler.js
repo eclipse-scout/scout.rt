@@ -28,11 +28,12 @@ scout.TableSelectionHandler.prototype._onRowsDrawn = function($rows) {
       add = true,
       first,
       $selectedRows = that.table.findSelectedRows(),
+      $allRows = that.table.findRows(),
       selectionChanged = false;
 
     // click without ctrl always starts new selection, with ctrl toggle
     if (that.table.multiSelect && event.shiftKey) {
-      first = $selectedRows.first().index();
+      first = $allRows.index($selectedRows.first());
     } else if (that.table.multiSelect && event.ctrlKey) {
       add = !$row.isSelected();
     }
@@ -53,24 +54,24 @@ scout.TableSelectionHandler.prototype._onRowsDrawn = function($rows) {
 
     if (that.table.multiSelect && that.mouseMoveSelectionEnabled) {
       // ...or movement with held mouse button
-      $('.table-row').one('mousemove.selectionHandler', function(event) {
+      $allRows.one('mousemove.selectionHandler', function(event) {
         selectData(event);
       });
     }
-    $('.table-row').one('mouseup.selectionHandler', function(event) {
+    $allRows.one('mouseup.selectionHandler', function(event) {
       onMouseUp(event);
     });
 
     // action for all affected rows
     function selectData(event) {
       // affected rows between $row and Target
-      var firstIndex = (typeof first !== 'undefined' ? first : $row.index());
-      var lastIndex = $(event.delegateTarget).index();
+      var firstIndex = (typeof first !== 'undefined' ? first : $allRows.index($row));
+      var lastIndex = $allRows.index($(event.delegateTarget));
 
       var startIndex = Math.min(firstIndex, lastIndex);
       var endIndex = Math.max(firstIndex, lastIndex) + 1;
 
-      var $actionRow = $('.table-row', that.table.$data).slice(startIndex, endIndex);
+      var $actionRow = $allRows.slice(startIndex, endIndex);
 
       // set/remove selection
       if (add) {
@@ -90,7 +91,7 @@ scout.TableSelectionHandler.prototype._onRowsDrawn = function($rows) {
     }
 
     function onMouseUp(event) {
-      $('.table-row').off('.selectionHandler');
+      $allRows.off('.selectionHandler');
 
       that.table.onRowsSelected($selectedRows);
     }
@@ -156,7 +157,7 @@ scout.TableSelectionHandler.prototype._clearSelectionBorder = function($selected
 scout.TableSelectionHandler.prototype.selectAll = function() {
   this.clearSelection(true);
 
-  var $rows = $('.table-row', this.table.$data);
+  var $rows = this.table.findRows();
   $rows.select(true);
 
   this._drawSelectionBorder($rows);

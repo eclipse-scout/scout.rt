@@ -398,8 +398,8 @@ scout.Table.prototype._drawData = function(startRow) {
     event.preventDefault();
 
     var $selectedRows = that.findSelectedRows(),
-      x = event.pageX - that._$viewport.offset().left,
-      y = event.pageY - that._$viewport.offset().top;
+      x = event.pageX,
+      y = event.pageY;
 
     if ($selectedRows.length > 0) {
       waitForServer(that.session, showMenuPopup);
@@ -421,7 +421,7 @@ scout.Table.prototype._drawData = function(startRow) {
 
     function showMenuPopup() {
       var popup = new scout.Popup();
-      popup.render(that._$viewport);
+      popup.render();
       scout.menus.appendMenuItems(popup, that._getRowMenus($selectedRows, false));
       popup.setLocation(new scout.Point(x, y - 40)); // TODO AWE: (menu) check offset, remove hacky magic number
       // seems to be the height of the selected row.
@@ -608,7 +608,9 @@ scout.Table.prototype._group = function() {
           $cell = $.makeDiv('', 'table-cell', '&nbsp');
         }
 
-        $cell.appendTo($sumRow).width($rows.eq(r).children().eq(c).outerWidth());
+        $cell.appendTo($sumRow)
+          .css('min-width', column.width)
+          .css('max-width', column.width);
       }
 
       $sumRow.insertAfter($rows.eq(r))

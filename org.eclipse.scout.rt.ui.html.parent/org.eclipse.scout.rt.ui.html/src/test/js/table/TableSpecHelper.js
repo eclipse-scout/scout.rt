@@ -209,5 +209,5 @@ TableSpecHelper.prototype.assertSelectionEvent = function(id, rowIds) {
 };
 
 TableSpecHelper.prototype.getDisplayingContextMenu = function(table) {
-  return table.$data.find('.popup-body');
+  return $('body').find('.popup-body');
 };

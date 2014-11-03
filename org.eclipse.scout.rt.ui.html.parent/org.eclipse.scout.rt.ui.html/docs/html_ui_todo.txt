@@ -88,5 +88,7 @@ AWE Form-Fields: alle rund, auch disabled (d.h. wir brauchen doch einen read-onl
 AWE Linie in RootGroupBox 3 px statt 1 px
 
 CGU TableField: row-height === logicalGridHeight (text-field)?
-
 CGU Table: Row-Text nicht genau zentriert
+CGU Table: Context-Menu Position falsch wenn gescrolled
+CGU Table: Breite von Gruppierungs-Zelle falsch
+CGU Table: Falsche Row selektiert im Gruppierungs-Modus
