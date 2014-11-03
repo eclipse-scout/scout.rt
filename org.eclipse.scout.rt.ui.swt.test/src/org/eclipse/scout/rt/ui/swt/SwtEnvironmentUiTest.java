@@ -54,13 +54,14 @@ import org.junit.Test;
 public class SwtEnvironmentUiTest {
 
   private TestForm m_testForm;
-  private static final String TEST_CLASS_ID = "testClassId";
+  private static final String TEST_MENU_CLASS_ID = "testClassId";
+  private static final String TEST_STRINGFIELD_CLASS_ID = "testStringClassId";
   private static final String TEST_MAIN_BOX_CLASS_ID = "mainBoxId";
 
   @Before
   public void setUp() throws ProcessingException {
     m_testForm = new TestForm();
-    m_testForm.setClassId(TEST_CLASS_ID);
+    m_testForm.setClassId(TEST_MENU_CLASS_ID);
   }
 
   @After
@@ -76,7 +77,7 @@ public class SwtEnvironmentUiTest {
     System.setProperty(AbstractSwtEnvironment.PROP_WIDGET_IDS_ENABLED, "true");
     AbstractSwtEnvironment env = createEnvironment();
     ISwtScoutForm f = env.createForm(new Shell(), m_testForm);
-    assertEquals(TEST_CLASS_ID, getWidgetId(f));
+    assertEquals(TEST_MENU_CLASS_ID, getWidgetId(f));
   }
 
   /**
@@ -87,7 +88,7 @@ public class SwtEnvironmentUiTest {
     System.setProperty(AbstractSwtEnvironment.PROP_WIDGET_IDS_ENABLED, "true");
     AbstractSwtEnvironment env = createEnvironment();
     ISwtScoutFormField f = env.createFormField(new Shell(), m_testForm.getStringField());
-    assertEquals(TEST_CLASS_ID, getWidgetId(f));
+    assertEquals(TEST_STRINGFIELD_CLASS_ID, getWidgetId(f));
   }
 
   /**
@@ -116,7 +117,7 @@ public class SwtEnvironmentUiTest {
       }
     });
     Object expectedId = getWidgetId(menuItem.getSwtMenuItem());
-    assertTrue(((String) expectedId).contains(TEST_CLASS_ID));
+    assertTrue(((String) expectedId).contains(TEST_MENU_CLASS_ID));
   }
 
   /**
@@ -210,7 +211,7 @@ public class SwtEnvironmentUiTest {
     public class MainBox extends AbstractGroupBox {
 
       @Order(10.0)
-      @ClassId(TEST_CLASS_ID)
+      @ClassId(TEST_STRINGFIELD_CLASS_ID)
       public class StringField extends AbstractStringField {
       }
 
@@ -218,7 +219,7 @@ public class SwtEnvironmentUiTest {
       public class SmartField extends AbstractSmartField<Long> {
 
         @Order(20.0)
-        @ClassId(TEST_CLASS_ID)
+        @ClassId(TEST_MENU_CLASS_ID)
         public class TestMenu extends AbstractMenu {
         }
       }
