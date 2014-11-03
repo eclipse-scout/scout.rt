@@ -54,14 +54,13 @@
   display: inline-block;
   height: @size-desktop-tools;
   padding: 6px 20px 0px 20px;
-  width:220px;
 
   cursor: pointer;
   background-color: @color-bench-light;
   color: @text-color;
   border-bottom: 1px solid @color-bench-light-border;
 
-  &:hover{
+  &:hover {
     color: @hover-color;
   }
 
@@ -99,6 +98,7 @@
 
 .taskbar-tab-item {
   border-right: 1px solid @color-bench-light-border;
+  width:220px;
 }
 
 .taskbar-tool-item {
@@ -107,14 +107,19 @@
   background-color: @color-bench;
   border-left: 1px solid transparent;
   border-right: 1px solid transparent;
+  padding-top:16px;
 
   &:before {
     .font-icon;
     color: @icon-color;
-    font-size: 22px;
+    font-size: 17px;
     vertical-align: -3px;
     padding-right: 11px;
     content: attr(data-icon);
+  }
+
+  &:hover:before {
+    color: @hover-color;
   }
 
   &.selected {
@@ -122,6 +127,10 @@
     border-right: 1px solid @color-bench-light-border;
     border-bottom: 1px solid @color-bench;
     cursor: pointer;
+
+    &:before {
+      color: @active-color;
+    }
   }
 }
 
