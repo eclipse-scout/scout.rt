@@ -40,7 +40,7 @@ import org.mockito.Mockito;
  * @since 3.8.2
  */
 public class ActionTest {
-  private static final String TEST_CLASS_ID = "TEST_CLASS_ID";
+  private static final String TEST_ACTION_CLASS_ID = "TEST_CLASS_ID";
 
   @Test
   public void testOutlineButton() throws ProcessingException {
@@ -90,7 +90,7 @@ public class ActionTest {
 
   @Test
   public void testActionClassIds() throws ProcessingException {
-    assertEquals(TEST_CLASS_ID, new AnnotatedAction().classId());
+    assertEquals(TEST_ACTION_CLASS_ID, new AnnotatedAction().classId());
   }
 
   /**
@@ -108,7 +108,7 @@ public class ActionTest {
     assertNotEquals(CollectionUtility.firstElement(menus1).classId(), CollectionUtility.firstElement(menus2).classId());
   }
 
-  @ClassId(TEST_CLASS_ID)
+  @ClassId(TEST_ACTION_CLASS_ID)
   static class AnnotatedAction extends AbstractAction {
   }
 
