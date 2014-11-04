@@ -82,6 +82,7 @@
     .font-icon;
     font-size: 20px;
     content: "\00a0";
+    vertical-align: -2px;
   }
 
   .tree-item.can-expand > &:before {

@@ -15,8 +15,6 @@ Telefon-Icon korrigieren (Grösse, Farbe)
 
 [CGU]
 
-Tree: Pfeil/-Text, vertikale Ausrichtung korrigieren
-
 MessageBox: Nur Fokus-Farbe, kein Default-Button. Default-Button ist initial fokussiert.
 
 [CRU]
@@ -91,3 +89,4 @@ CGU Table: Context-Menu Position falsch wenn gescrolled
 CGU Table: Breite von Gruppierungs-Zelle falsch
 CGU Table: Falsche Row selektiert im Gruppierungs-Modus
 CGU Stern durch Teilen-Icon ersetzen
+CGU Tree: Pfeil/-Text, vertikale Ausrichtung korrigieren
