@@ -37,18 +37,46 @@
 }
 
 .messagebox-buttons {
-   overflow: hidden;
-   border: 1px solid @color-messagebox-border;
-   border-bottom-left-radius: @border-radius;
-   border-bottom-right-radius: @border-radius;
-
   & button {
+    position: relative;
     padding: 12px;
     background-color: @palette-light-gray-4;
-    border: 0;
+    border: 1px solid @color-messagebox-border;
+  }
+
+  & > button:first-child {
+    border-bottom-left-radius: @border-radius;
+  }
+
+  & > button:last-child {
+    border-bottom-right-radius: @border-radius;
   }
 
   & > button:first-child ~ button {
-    border-left: 1px solid @color-messagebox-border;
+    border-left-width: 0px;
+  }
+
+  & > button:focus{
+    outline: none;
+  }
+
+  & > button:focus:before{
+    .focus-border;
+    z-index: 1;
+
+    position: absolute;
+    content: '';
+    left: -1px;
+    top: -1px;
+    height: calc(~"100% + 2px");
+    width: calc(~"100% + 2px");
+  }
+
+  & > button:first-child:focus:before {
+    border-bottom-left-radius: @border-radius;
+  }
+
+  & > button:last-child:focus:before {
+    border-bottom-right-radius: @border-radius;
   }
 }

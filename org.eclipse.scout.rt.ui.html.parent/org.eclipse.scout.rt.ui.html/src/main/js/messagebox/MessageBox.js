@@ -12,9 +12,17 @@ scout.MessageBox.prototype._render = function($parent) {
   this.$actionText = this.$content.appendDIV('messagebox-label messagebox-action-text');
 
   this.$buttons = this.$container.appendDIV('messagebox-buttons');
-  this.$yesButton = this._createButton('yes');
-  this.$noButton = this._createButton('no');
-  this.$cancelButton = this._createButton('cancel');
+
+  if (this.yesButtonText) {
+    this.$yesButton = this._createButton('yes', this.yesButtonText);
+  }
+  if (this.noButtonText) {
+    this.$noButton = this._createButton('no', this.noButtonText);
+  }
+  if (this.cancelButtonText) {
+    this.$cancelButton = this._createButton('cancel', this.cancelButtonText);
+  }
+  this._updateButtonWidths();
 
   setTimeout(function() {
     //Class shown is used for css animation
@@ -30,9 +38,6 @@ scout.MessageBox.prototype._renderProperties = function() {
   this._renderSeverity(this.severity);
   this._renderIntroText(this.introText);
   this._renderActionText(this.actionText);
-  this._renderYesButtonText(this.yesButtonText);
-  this._renderNoButtonText(this.noButtonText);
-  this._renderCancelButtonText(this.cancelButtonText);
 
   this.position();
 };
@@ -41,11 +46,12 @@ scout.MessageBox.prototype.position = function() {
   this.$container.cssMarginLeft(-this.$container.outerWidth() / 2);
 };
 
-scout.MessageBox.prototype._createButton = function(option) {
+scout.MessageBox.prototype._createButton = function(option, text) {
   return $('<button>')
-    .appendTo(this.$buttons)
+    .text(text)
     .on('click', this._onButtonClicked.bind(this))
-    .data('option', option);
+    .data('option', option)
+    .appendTo(this.$buttons);
 };
 
 scout.MessageBox.prototype._onButtonClicked = function(event) {
@@ -78,24 +84,6 @@ scout.MessageBox.prototype._renderIntroText = function(text) {
 scout.MessageBox.prototype._renderActionText = function(text) {
   this.$actionText.html($.nl2br(text));
   this.$actionText.setVisible(text);
-};
-
-scout.MessageBox.prototype._renderYesButtonText = function(text) {
-  this._renderButton(this.$yesButton, text);
-};
-
-scout.MessageBox.prototype._renderNoButtonText = function(text) {
-  this._renderButton(this.$noButton, text);
-};
-
-scout.MessageBox.prototype._renderCancelButtonText = function(text) {
-  this._renderButton(this.$cancelButton, text);
-};
-
-scout.MessageBox.prototype._renderButton = function($button, text) {
-  $button.text(text);
-  $button.setVisible(text);
-  this._updateButtonWidths();
 };
 
 scout.MessageBox.prototype._updateButtonWidths = function() {
