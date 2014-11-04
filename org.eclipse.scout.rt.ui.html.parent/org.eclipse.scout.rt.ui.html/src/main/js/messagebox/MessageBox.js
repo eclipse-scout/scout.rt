@@ -15,21 +15,45 @@ scout.MessageBox.prototype._render = function($parent) {
 
   if (this.yesButtonText) {
     this.$yesButton = this._createButton('yes', this.yesButtonText);
+    if (!this.$defaultButton) {
+      this.$defaultButton = this.$yesButton;
+    }
   }
   if (this.noButtonText) {
     this.$noButton = this._createButton('no', this.noButtonText);
+    if (!this.$defaultButton) {
+      this.$defaultButton = this.$noButton;
+    }
   }
   if (this.cancelButtonText) {
     this.$cancelButton = this._createButton('cancel', this.cancelButtonText);
+    if (!this.$defaultButton) {
+      this.$defaultButton = this.$cancelButton;
+    }
   }
   this._updateButtonWidths();
 
+  this.previouslyFocusedElemenet = document.activeElement;
   setTimeout(function() {
     //Class shown is used for css animation
     this.$container
       .addClass('shown')
       .show();
+
+    if (this.$defaultButton) {
+      this.$defaultButton.focus();
+    }
   }.bind(this));
+
+  //FIXME CGU this solution does not allow for backwards tabbing (shift+tab) on the first button. Better do it like jquery ui (listen for keydown events)?
+  // Also make more generic to make it reusable by other elements (regular dialog, form)
+  this.focusListener = function(event) {
+    if (!this.$container[0].contains(event.target)) {
+      event.stopPropagation();
+      this.$container.find('button').eq(0).focus();
+    }
+  }.bind(this);
+  document.addEventListener("focus", this.focusListener, true);
 };
 
 scout.MessageBox.prototype._renderProperties = function() {
@@ -40,6 +64,14 @@ scout.MessageBox.prototype._renderProperties = function() {
   this._renderActionText(this.actionText);
 
   this.position();
+};
+
+scout.MessageBox.prototype._remove = function() {
+  scout.MessageBox.parent.prototype._remove.call(this);
+  document.removeEventListener("focus", this.focusListener, true);
+
+  //FIXME CGU does not work, because button gets disabled when clicked (why??).
+  this.previouslyFocusedElemenet.focus();
 };
 
 scout.MessageBox.prototype.position = function() {
