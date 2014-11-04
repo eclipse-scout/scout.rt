@@ -17,7 +17,7 @@ scout.Desktop = function() {
   this._selectedTab;
   this.selectedTool;
 
-  this._addAdapterProperties(['viewButtons', 'toolButtons', 'forms', 'outline', 'messageBoxes']);
+  this._addAdapterProperties(['viewButtons', 'actions', 'forms', 'outline', 'messageBoxes']);
 };
 scout.inherits(scout.Desktop, scout.BaseDesktop);
 
@@ -25,7 +25,7 @@ scout.Desktop.prototype.onChildAdapterCreated = function(propertyName, adapter) 
   if (propertyName === 'viewButtons') {
     adapter.desktop = this;
   }
-  if (propertyName === 'toolButtons') {
+  if (propertyName === 'actions') {
     adapter.desktop = this;
   }
 };
@@ -58,9 +58,8 @@ scout.Desktop.prototype._render = function($parent) {
 
   this._outlineTab = new scout.Desktop.TabAndContent();
 
-  for (i = 0; i < this.toolButtons.length; i++) {
-    //this.toolButtons[i].desktop  = this;
-    this.toolButtons[i].render(this.$toolbar);
+  for (i = 0; i < this.actions.length; i++) {
+    this.actions[i].render(this.$toolbar);
   }
 
   this.navigation.onOutlineChanged(this.outline);
@@ -77,7 +76,7 @@ scout.Desktop.prototype._render = function($parent) {
 
   $(window).on('resize', this.onResize.bind(this));
 
-  // TODO cru: split and move
+  // TODO CRU: split and move
   // scout.keystrokeManager.installAdapter($parent, new scout.DesktopKeystrokeAdapter(this.navigation, this.taskbar));
 };
 
@@ -204,7 +203,7 @@ scout.Desktop.prototype._addForm = function(form) {
   this._addTab(tab);
   form.render(this.$bench);
 
-  // FIXME CGU maybe include in render?
+  // FIXME CGU: maybe include in render?
   form.htmlComp.layout();
   form.htmlComp.validateRoot = true;
   form.tab = tab;
@@ -255,7 +254,7 @@ scout.Desktop.prototype.updateOutlineTab = function(content, title, subtitle) {
       content.staticMenus = [new scout.OutlineNavigateUpMenu(this.outline, selectedNodes[0])];
       content.render(this.$bench);
 
-      // FIXME CGU maybe include in render?
+      // FIXME CGU: maybe include in render?
       content.htmlComp.layout();
       content.htmlComp.validateRoot = true;
     }

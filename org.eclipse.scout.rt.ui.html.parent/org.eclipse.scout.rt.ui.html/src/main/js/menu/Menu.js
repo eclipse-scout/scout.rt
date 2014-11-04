@@ -52,9 +52,8 @@ scout.Menu.prototype.hasButtonStyle = function() {
 
 scout.Menu.prototype._onMenuClicked = function(event) {
   if (this.children.length > 0) {
-    // TODO CRU: work in progress
     var popup = new scout.PopupMenuItem($(event.target));
-    popup.render(this.parent.$container);
+    popup.render();
     scout.menus.appendMenuItems(popup, this.children);
     popup.alignTo();
   } else {
@@ -78,13 +77,8 @@ scout.Menu.prototype._renderText = function(text) {
 };
 
 scout.Menu.prototype._updateIconAndTextStyle = function() {
-  if (this.text && this.text.length > 0 && this.iconId) {
-    if (!this.$container.hasClass('menu-item-iconandtext')) {
-      this.$container.addClass('menu-item-iconandtext');
-    }
-  } else {
-    this.$container.removeClass('menu-item-iconandtext');
-  }
+  var textAndIcon = (this.text && this.text.length > 0 && this.iconId);
+  this.$container.toggleClass('menu-textandicon', !!textAndIcon);
 };
 
 scout.Menu.prototype._renderIconId = function(iconId) {

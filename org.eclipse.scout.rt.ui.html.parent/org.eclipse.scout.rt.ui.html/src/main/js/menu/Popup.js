@@ -4,14 +4,16 @@ scout.Popup = function() {
   this.$body;
 };
 
-scout.Popup.prototype.render = function($parent) {
-  if (!$parent) {
-    $parent = $('body');
-  }
+/**
+ * The popup is always appended to the HTML document body.
+ * That way we never have z-index issues with the rendered popups.
+ */
+scout.Popup.prototype.render = function() {
+  var $docBody = $('body');
   this.$body = $.makeDIV('popup-body');
   this.$container = $.makeDIV('popup').
     append(this.$body).
-    appendTo($parent);
+    appendTo($docBody);
   this._attachCloseHandler();
   return this.$container;
 };
@@ -80,7 +82,7 @@ scout.PopupMenuItem.prototype.render = function($parent) {
 };
 
 scout.PopupMenuItem.prototype.alignTo = function() {
-  var pos = this.$menuItem.position(),
+  var pos = this.$menuItem.offset(),
     headWidth = this.$head.outerWidth(true),
     bodyWidth = this.$body.outerWidth(true);
 
@@ -91,16 +93,19 @@ scout.PopupMenuItem.prototype.alignTo = function() {
   }
 
   // horiz. alignment
-  // TODO AWE: (menu) - dynamic find correct x pos, without magic number 6, see below
-  // must read insets
-  var left = pos.left;
-  $.log.debug(' headWidth=' + headWidth + ' bodyWidth=' + bodyWidth + ' left=' + left + ' top=' + pos.top);
+  var itemInsets = scout.graphics.getInsets(this.$menuItem),
+    headInsets = scout.graphics.getInsets(this.$head),
+    left = pos.left,
+    top = pos.top + itemInsets.top - 1;
+
+  $.log.debug('headWidth=' + headWidth + ' bodyWidth=' + bodyWidth + ' pos=[left' + pos.left + ' top=' + pos.top +
+      '] itemInsets=' + itemInsets + ' headInsets=' + headInsets + ' left=' + left + ' top=' + top);
   if (this.$menuItem.hasClass('menu-right')) {
     // when we use float:right, browser uses fractions of pixels, that's why we must
     // use the subPixelCorr variable. It corrects some visual pixel-shifting issues.
     var widthDiff = bodyWidth - headWidth,
       subPixelCorr = left - Math.floor(left);
-    left -= widthDiff - 6;
+    left -= widthDiff + headInsets.left;
     this.$head.css('left', widthDiff);
     this.$body.css('left', subPixelCorr);
     this.$deco.
@@ -108,13 +113,13 @@ scout.PopupMenuItem.prototype.alignTo = function() {
       width(headWidth - 2 + subPixelCorr);
     $.log.debug('right alignment: widthDiff=' + widthDiff + ' subPixelCorr=' + subPixelCorr);
   } else {
-    left += 6;
+    left -= headInsets.left;
     this.$head.css('left', 0);
     this.$deco.
       css('left', 1).
       width(headWidth - 2);
   }
 
-  this.setLocation(new scout.Point(left, pos.top));
+  this.setLocation(new scout.Point(left, top));
 };
 

@@ -120,19 +120,7 @@ scout.HtmlComponent.prototype.getPreferredSize = function() {
  * Returns the inset-dimensions of the component (padding, margin, border).
  */
 scout.HtmlComponent.prototype.getInsets = function() {
-  var directions = ['top', 'right', 'bottom', 'left'],
-    insets = [0, 0, 0, 0],
-    i,
-  cssToInt = function($comp, cssProp) {
-      return parseInt($comp.css(cssProp), 10);
-    };
-  for (i = 0; i < directions.length; i++) {
-    // parseInt will ignore 'px' in string returned from css() method
-    insets[i] += cssToInt(this.$comp, 'margin-' + directions[i]);
-    insets[i] += cssToInt(this.$comp, 'padding-' + directions[i]);
-    insets[i] += cssToInt(this.$comp, 'border-' + directions[i] + '-width');
-  }
-  return new scout.Insets(insets[0], insets[1], insets[2], insets[3]);
+  return scout.graphics.getInsets(this.$comp);
 };
 
 /**

@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.html.json.desktop;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -23,6 +24,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigation;
 import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigationService;
+import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -48,7 +50,6 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonDesktop.class);
 
   public static final String PROP_OUTLINE = "outline";
-
   public static final String PROP_FORM = "form";
   public static final String PROP_MESSAGE_BOX = "messageBox";
 
@@ -78,7 +79,7 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
     super.createChildAdapters();
     attachAdapters(getForms());
     attachAdapters(getModel().getMessageBoxStack());
-    attachAdapters(getModel().getToolButtons());
+    attachAdapters(filterModelActions());
     if (!isFormBased()) {
       attachAdapters(getModel().getViewButtons());
       optAttachAdapter(getModel().getOutline());
@@ -86,11 +87,40 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
     optAttachAdapter(getBreadcrumbNavigation());
   }
 
+  /**
+   * TODO CGU/AWE: (scout) mit Judith besprechen: Aufräumaktion im Bereich IToolButton/IViewButton
+   * Anstelle der vielen Marker interfaces möchten wir nur noch IActions haben. Alle IActions werden dann
+   * rechts oben angezeigt (es können Menüs und Buttons sein). Die Outlines werden einfach anhand der
+   * konfigurierten Outlines erzeugt, ohne dass dafür noch ein Button konfiguriert werden muss. Dann
+   * können alle Interfaces und abstrakten Klasse die es heute gibt gelöscht werden. <br/>
+   * An dieser Stelle filtern wir einfach alle Actions weg, die wir im MiniCRM nicht sehen wollen.
+   * Wenn wir den Fork haben, können wir die Konfiguration anpassen. Nach dem Refactoring diese Methode
+   * entfernen und nur noch model.getActions() verwenden.
+   */
+  private List<IAction> filterModelActions() {
+    List<IAction> result = new ArrayList<>();
+    for (IAction a : getModel().getActions()) {
+      if (hasClassName(a, "UserProfileMenu") ||
+          hasClassName(a, "PhoneFormToolButton")) {
+        result.add(a);
+      }
+    }
+    // Noch ein Hack: in AbstractDesktop#getActions() ist hart-kodiert, dass menus vor toolButtons
+    // geadded werden, unabhängig von der konfigurierten Reihenfolge (Order). Dieses Problem müsste
+    // auch gelöst sein, wenn alles nur noch IActions sind.
+    Collections.reverse(result);
+    return result;
+  }
+
+  private boolean hasClassName(IAction a, String className) {
+    return a.getClass().getName().contains(className);
+  }
+
   @Override
   protected void disposeChildAdapters() {
     disposeAdapters(getForms());
     disposeAdapters(getModel().getMessageBoxStack());
-    disposeAdapters(getModel().getToolButtons());
+    disposeAdapters(filterModelActions());
     if (!isFormBased()) {
       disposeAdapters(getModel().getViewButtons());
       optDisposeAdapter(getModel().getOutline());
@@ -121,9 +151,9 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
     JSONObject json = super.toJson();
     putAdapterIdsProperty(json, "forms", getForms());
     putAdapterIdsProperty(json, "messageBoxes", getModel().getMessageBoxStack());
-    putAdapterIdsProperty(json, "toolButtons", getModel().getToolButtons());
+    putAdapterIdsProperty(json, "actions", filterModelActions());
     if (!isFormBased()) {
-      // FIXME view and tool buttons should be removed from desktop by device transformer
+      // FIXME CGU: view and tool buttons should be removed from desktop by device transformer
       putAdapterIdsProperty(json, "viewButtons", getModel().getViewButtons());
       optPutAdapterIdProperty(json, "outline", getModel().getOutline());
     }
@@ -153,7 +183,7 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
   }
 
   protected boolean isFormBased() {
-    //FIXME add property to desktop.  PROP_FORM_BASED Devicetransformer should set it to true in case of mobile
+    // FIXME CGU: add property to desktop.  PROP_FORM_BASED Devicetransformer should set it to true in case of mobile
     return getJsonSession().getClientSession().getUserAgent().getUiDeviceType().isTouchDevice();
   }
 
@@ -174,7 +204,7 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
   }
 
   protected boolean isFormBlocked(IForm form) {
-    //FIXME ignore desktop forms for the moment, should not be done here, application should handle it or abstractDesktop
+    // FIXME CGU: ignore desktop forms for the moment, should not be done here, application should handle it or abstractDesktop
     return (!isFormBased() && (form instanceof IOutlineTableForm || form instanceof IOutlineTreeForm));
   }
 
@@ -242,7 +272,7 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
 
   protected void handleModelDesktopClosed() {
     dispose();
-    // FIXME what to do? probably http session invalidation -> will terminate EVERY json session (if login is done
+    // FIXME CGU: what to do? probably http session invalidation -> will terminate EVERY json session (if login is done
     // for all, logout is done for all as well, gmail does the same).
     // Important: Consider tomcat form auth problem, see scout rap logout mechanism for details
   }

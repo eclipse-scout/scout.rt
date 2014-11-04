@@ -6,7 +6,7 @@ scout.inherits(scout.TableOrganizeMenu, scout.Menu);
 
 scout.TableOrganizeMenu.prototype._onMenuClicked = function(event) {
   var popup = new scout.PopupMenuItem($(event.target));
-  popup.render(this.parent.$container);
+  popup.render();
   popup.addClassToBody('table-menu-organize');
   popup.appendToBody(this._createBody(popup));
   popup.alignTo();

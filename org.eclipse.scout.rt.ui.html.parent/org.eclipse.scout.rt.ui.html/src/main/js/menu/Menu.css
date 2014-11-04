@@ -96,6 +96,7 @@
   white-space:nowrap;
   cursor:pointer;
   padding-top:1px;
+  display: inline-block;
 
   &[data-icon]:before {
     .menu-icon(attr(data-icon));
@@ -125,6 +126,10 @@
    .sub-menu-icon;
   }
 
+}
+
+.taskbar-tools .menu-item {
+  padding-top: 6px;
 }
 
 .menu-right {

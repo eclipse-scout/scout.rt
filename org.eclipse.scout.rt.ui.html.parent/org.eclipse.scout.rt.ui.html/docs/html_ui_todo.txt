@@ -2,16 +2,12 @@
  IN PROGRESS
 -----------------------------------
 [AWE]
+Toolbar: Profil-Icon rechts oben, mit Benutzername und Menü mit Optionen..., Abmelden, etc.
+
 Tabs: "Bölle" nicht schön, Farbe dunkel-grau ausprobieren, evtl. active state bei mousedown setzen
   und nicht bei mouseup wie jetzt (2 farben gleichzeitig sichtbar)
 
-Tabs: Titel fett, Pointer Cursor
-
 Desktop-Tabs: 2-zeilig gut, 2te Zeile evtl. grau machen? V-Align top, nicht middle wenn nur 1 Zeile
-
-Toolbar: Profil-Icon rechts oben, mit Benutzername und Menü mit Optionen..., Abmelden, etc.
-
-Telefon-Icon korrigieren (Grösse, Farbe)
 
 [CGU]
 
@@ -78,10 +74,11 @@ Table-Menü bündig mit Table-Header
 -----------------------------------
 
 AWE Menü-Buttons: Hover state fehlt
-
 AWE Form-Fields: alle rund, auch disabled (d.h. wir brauchen doch einen read-only modus)
-
 AWE Linie in RootGroupBox 3 px statt 1 px
+AWE Tabs: Titel fett, Pointer Cursor
+AWE Telefon-Icon korrigieren (Grösse, Farbe)
+
 
 CGU TableField: row-height === logicalGridHeight (text-field)?
 CGU Table: Row-Text nicht genau zentriert
@@ -90,3 +87,5 @@ CGU Table: Breite von Gruppierungs-Zelle falsch
 CGU Table: Falsche Row selektiert im Gruppierungs-Modus
 CGU Stern durch Teilen-Icon ersetzen
 CGU Tree: Pfeil/-Text, vertikale Ausrichtung korrigieren
+
+
