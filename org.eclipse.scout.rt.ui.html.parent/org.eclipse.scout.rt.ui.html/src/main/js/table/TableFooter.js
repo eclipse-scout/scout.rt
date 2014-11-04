@@ -16,8 +16,9 @@ scout.TableFooter.prototype._render = function($parent) {
   }
 
   this.$container = $parent.appendDIV('table-footer');
-  this.$controlContainer = this.$container.appendDIV('control-container');
-  this._addResize(this.$controlContainer);
+  this._$controlContainer  = this.$container.appendDIV('control-container');
+  this._addResize(this._$controlContainer );
+  this.$controlContent = this._$controlContainer .appendDIV('control-content');
 
   this._controlGroups = {};
 
@@ -41,15 +42,18 @@ scout.TableFooter.prototype._render = function($parent) {
     .val(filterText);
 
   // info section
-  this._$infoSelection = this.$container
-    .appendDIV('table-info-selection')
-    .on('click', '', this._table.toggleSelection.bind(this._table));
-  this._$infoFilter = this.$container
-    .appendDIV('table-info-filter')
-    .on('click', '', this._table.resetFilter.bind(this._table));
-  this._$infoLoad = this.$container
+  this._$controlInfo = this.$container
+    .appendDIV('control-info');
+
+  this._$infoLoad = this._$controlInfo
     .appendDIV('table-info-load')
     .on('click', '', this._table.sendReload.bind(this._table));
+  this._$infoFilter = this._$controlInfo
+    .appendDIV('table-info-filter')
+    .on('click', '', this._table.resetFilter.bind(this._table));
+  this._$infoSelection = this._$controlInfo
+    .appendDIV('table-info-selection')
+    .on('click', '', this._table.toggleSelection.bind(this._table));
 
   this._updateInfoLoad();
   this._updateInfoLoadVisibility();
@@ -120,7 +124,7 @@ scout.TableFooter.prototype.setTableStatusVisible= function(visible) {
 
 scout.TableFooter.prototype._updateInfoLoad = function() {
   var numRows = this._table.rows.length;
-  var info = this._computeCountInfo(numRows) + ' geladen<br>Daten neu laden';
+  var info = this._computeCountInfo(numRows) + ' geladen<br><span class="info-button">Daten neu laden</span>';
   if (this._$infoLoad.html() === info) {
     return;
   }
@@ -134,7 +138,7 @@ scout.TableFooter.prototype._updateInfoFilter = function() {
     filteredBy = filteredBy.join(', ');
   }
   var numFilteredRows = this._table.filteredRowCount;
-  var info = this._computeCountInfo(numFilteredRows) + ' gefiltert' + (filteredBy ? ' durch ' + filteredBy : '') + '<br>Filter entfernen';
+  var info = this._computeCountInfo(numFilteredRows) + ' gefiltert' + (filteredBy ? ' durch ' + filteredBy : '') + '<br><span class="info-button">Filter entfernen</span>';
   if (this._$infoFilter.html() === info) {
     return;
   }
@@ -154,7 +158,7 @@ scout.TableFooter.prototype._updateInfoSelection = function(numSelectedRows, all
   }
 
   allText = all ? 'Keine' : 'Alle';
-  info = this._computeCountInfo(numSelectedRows) + ' selektiert<br>' + (allText) + ' selektieren'; //FIXME get translations from server;
+  info = this._computeCountInfo(numSelectedRows) + ' selektiert<br><span class="info-button">' + (allText) + ' selektieren</span>'; //FIXME get translations from server;
   if (this._$infoSelection.html() === info) {
     return;
   }
@@ -177,7 +181,7 @@ scout.TableFooter.prototype._updateInfoFilterVisibility = function() {
 
 scout.TableFooter.prototype._setInfoVisible = function($info, visible) {
   if (visible) {
-    $info.show().widthToContent();
+    $info.css('display', 'inline-block').widthToContent();
   } else {
     $info.animateAVCSD('width', 0, function() {
       $(this).hide();
@@ -208,7 +212,7 @@ scout.TableFooter.prototype.openTableControl = function() {
   this._resizeData(scout.TableFooter.CONTAINER_SIZE);
 
   //adjust container
-  this.$controlContainer.show().animateAVCSD('height', scout.TableFooter.CONTAINER_SIZE, null, null, 500);
+  this._$controlContainer .show().animateAVCSD('height', scout.TableFooter.CONTAINER_SIZE, null, null, 500);
 
   this.open = true;
 };
@@ -218,9 +222,9 @@ scout.TableFooter.prototype.closeTableControl = function(control) {
   this._resizeData(0);
 
   // adjust container
-  this.$controlContainer.animateAVCSD('height', 0, null, null, 500);
-  this.$controlContainer.promise().done(function() {
-    this.$controlContainer.hide();
+  this._$controlContainer .animateAVCSD('height', 0, null, null, 500);
+  this._$controlContainer .promise().done(function() {
+    this._$controlContainer .hide();
     control.onClosed();
   }.bind(this));
 
@@ -262,12 +266,12 @@ scout.TableFooter.prototype._addResize = function($parent) {
     function resizeMove(event) {
       var h = that._table.$container.height() - event.pageY;
       that._resizeData(h);
-      that.$controlContainer.height(h);
+      that._$controlContainer .height(h);
       that._table.updateScrollbar();
     }
 
     function resizeEnd() {
-      if (that.$controlContainer.height() < 75) {
+      if (that._$controlContainer .height() < 75) {
         $('.selected', that.$container).click();
       }
 

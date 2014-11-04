@@ -1,4 +1,4 @@
-@table-control-padding: 12px;
+@table-control-padding: 14px;
 
 .table-footer {
   position: absolute;
@@ -7,6 +7,7 @@
   width: 100%;
   white-space: nowrap;
   border-top: 1px solid @color-bench-light-border;
+ 
 }
 
 .control-resize {
@@ -29,61 +30,62 @@
   display: none;
 }
 
-.control-filter {
-  width: 200px;
-  border: 1px solid @border-color;
-  min-height: 26px;
-  font-size: 14px;
-  margin-top: 11px;
-  margin-left: @table-control-padding;
-  padding-left: 6px;
-
-  &:hover{
-    border-color: @hover-color;
-  }
-
-  &:focus{
-    border-color: @focus-color;
-  }
-}
-
 .control-group {
-  display: inline;
   float: left;
-  position: relative;
-  padding: 0 @table-control-padding;
-  border-right: 1px solid #CCC;
-  margin-top: 6px;
-  height: 38px;
+  
+  .table-footer > & ~ & {
+    margin-left: -1px;
+  }
 }
 
 .control{
-  padding: 9px @table-control-padding 10px @table-control-padding;
-  float: left;
+  position: relative;	
+  display: inline-block;
+  padding: 0px @table-control-padding 0px @table-control-padding;
   cursor: pointer;
-  position: relative;
-}
+  margin-top: -1px;
+  height: @table-footer-height;
+  line-height: @table-footer-height;
+  border: 1px solid transparent;
 
-.control:hover:before, .control:hover:after {
-  color: @highlight-color;
-}
+  &:before {
+    .font-icon;
+    font-size: 24px;
+    color: @palette-light-gray-0;
+  }
+  
+  &:last-child:after{
+	content: ' ';
+  	position: absolute;
+  	top: @table-control-padding / 2  + 2px;
+  	right: -1px;
+  	height: @table-footer-height - @table-control-padding - 4px;
+  	border-right: 1px solid @color-bench-light-border;
+  }
+    
+  &:hover:before {
+    color: @active-color;
+  }
 
-.control.disabled:hover, .control.disabled:before, .control.disabled:after{
-  cursor: default;
-  color:#CCC;
-}
+  &.disabled:hover, &.disabled:before{
+    cursor: default;
+    color: @palette-light-gray-4;
+  }
 
-.control.selected:before, .control.selected:after {
-  color: @highlight-color !important;
-}
-
-.control:before {
-  .font-icon;
-  font-size: 24px;
-  color: @active-color;
+  &.selected:before {
+    color: @active-color !important;    
+  }
+  
+  &.selected{
+    border-left: 1px solid @color-bench-light-border;
+    border-right: 1px solid @color-bench-light-border;
+    border-top: 1px solid @palette-white;
+    background-color: @palette-white;
+  }
 }
 
 .control-query:before {
+  .font-icon;
   content:@icon-search;
 }
 .control-category:before {
@@ -91,24 +93,49 @@
   content: @icon-category;
 }
 
+.control-filter {
+  float: left;
+  width: 200px;
+  min-height: 26px;
+  font-size: 14px;
+  margin-top: (@table-footer-height - 26px) / 2;
+  margin-left: @table-control-padding;
+  .text-field;
+}
+
+.control-info {
+  float: right;
+}
+
 .table-info-load,
 .table-info-filter,
 .table-info-selection{
-  position:relative;
-  float: right;
-  margin-top: 6px;
-  margin-left: 7px;
-  padding: 0px 0px 0px 7px;
+  float: left;
+  padding: @table-control-padding / 2 @table-control-padding 0px @table-control-padding;
+  position: relative;
   display: none;
   width: 0px;
-  height: 38px;
-  border-left: 1px solid #CCC;
-  color: #bfbfbf;
-  white-space: nowrap;
+  height: @table-footer-height;
+  color: @palette-light-gray-0;
   cursor: pointer;
-  line-height: 21px;
+  line-height: 19px;
+    
+  &:before{
+	content: ' ';
+  	position: absolute;
+  	top: @table-control-padding / 2  + 2px;
+  	left: 0px;
+  	height: @table-footer-height - @table-control-padding - 4px;
+  	border-right: 1px solid @color-bench-light-border;
+  }
+  
+  & span.info-button{
+   text-decoration: underline;
+  }
 
-    &:hover{
-      color: #444;
-    }
+  &:hover span.info-button{
+   color: @active-color;
+  }
+  
 }
+

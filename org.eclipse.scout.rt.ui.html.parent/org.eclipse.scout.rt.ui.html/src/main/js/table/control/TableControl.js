@@ -67,7 +67,7 @@ scout.TableControl.prototype.renderContent = function() {
     this.tableFooter.openTableControl();
   }
 
-  this._renderContent(this.tableFooter.$controlContainer);
+  this._renderContent(this.tableFooter.$controlContent);
 
   this.contentRendered = true;
 };
