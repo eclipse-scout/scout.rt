@@ -53,8 +53,6 @@ Navigation in Forms: in Forms ein zusätzliches Item als Button hervorheben (z.B
 
 Telefon-Form: anzeigen, verpasste Anrufe, Steuerung (an-/abmelden), gerne mit Telefonbuch
 
-Stern durch Teilen-Icon ersetzen
-
 Assistenten Menü hinzufügen
 
 Fokus-Farbe: überall grün
@@ -92,3 +90,4 @@ CGU Table: Row-Text nicht genau zentriert
 CGU Table: Context-Menu Position falsch wenn gescrolled
 CGU Table: Breite von Gruppierungs-Zelle falsch
 CGU Table: Falsche Row selektiert im Gruppierungs-Modus
+CGU Stern durch Teilen-Icon ersetzen
