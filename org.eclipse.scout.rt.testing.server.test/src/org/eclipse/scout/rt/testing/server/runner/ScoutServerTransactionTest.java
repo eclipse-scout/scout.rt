@@ -26,7 +26,6 @@ import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.LogExceptionHandlerService;
 import org.eclipse.scout.rt.testing.server.runner.fixture.TestTransactionMember;
 import org.eclipse.scout.rt.testing.shared.Activator;
-import org.eclipse.scout.rt.testing.shared.DevTestMarker;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -38,7 +37,6 @@ import org.osgi.framework.ServiceRegistration;
  * JUnit test for {@link ScoutServerTestRunner}
  */
 @RunWith(ScoutServerTestRunner.class)
-@DevTestMarker
 public class ScoutServerTransactionTest {
 
   @BeforeClass
