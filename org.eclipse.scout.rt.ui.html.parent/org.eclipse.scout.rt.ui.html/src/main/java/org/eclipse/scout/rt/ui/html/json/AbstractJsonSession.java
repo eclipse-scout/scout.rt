@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.ui.html.json;
 
 import java.security.AccessController;
 import java.util.HashSet;
-import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 
@@ -83,7 +82,40 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
       throw new SecurityException("/json request is not authenticated with a Subject");
     }
 
-    IClientSession clientSession = createUninitializedClientSession(userAgent, subject, request.getLocale());
+    IClientSession clientSession;
+    synchronized (this) {
+      HttpSession httpSession = m_currentHttpRequest.getSession();
+      // Lookup the requested client session
+      String clientSessionId = m_currentJsonRequest.getClientSessionId();
+      if (clientSessionId == null) {
+        throw new IllegalStateException("Missing clientSessionId in JSON request");
+      }
+      String clientSessionAttributeName = "scout.htmlui.session.client." + clientSessionId;
+      clientSession = (IClientSession) httpSession.getAttribute(clientSessionAttributeName);
+      if (clientSession != null) {
+        // Found existing client session
+        LOG.info("Using cached client session [clientSessionId=" + clientSessionId + "]");
+      }
+      else {
+        // No client session for the requested ID was found, so create one and store it in the map
+        LOG.info("Creating new client session [clientSessionId=" + clientSessionId + "]");
+        //FIXME CGU session must be started later, see JsonClientSession
+        //return SERVICES.getService(IClientSessionRegistryService.class).newClientSession(clientSessionClass(), subject, UUID.randomUUID().toString(), userAgent);
+        try {
+          LocaleThreadLocal.set(request.getLocale());
+          //
+          clientSession = createUninitializedClientSession();
+          clientSession.setUserAgent(userAgent);
+          clientSession.setSubject(subject);
+          clientSession.setVirtualSessionId(UUID.randomUUID().toString());
+        }
+        finally {
+          LocaleThreadLocal.set(null);
+        }
+        httpSession.setAttribute(clientSessionAttributeName, clientSession);
+        httpSession.setAttribute(clientSessionAttributeName + ".cleanup", new P_ClientSessionCleanupHandler(clientSessionId, clientSession));
+      }
+    }
     m_jsonClientSession = (JsonClientSession) getOrCreateJsonAdapter(clientSession);
     m_jsonEventProcessor = new JsonEventProcessor(m_jsonClientSession);
     startUpClientSession(clientSession);
@@ -94,24 +126,11 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     LOG.info("JsonSession with ID " + m_jsonSessionId + " initialized");
   }
 
-  private void startUpClientSession(IClientSession clientSession) {
-    ClientSyncJob job = new ClientSyncJob("AbstractJsonSession#startClientSession", clientSession) {
-      @Override
-      protected void runVoid(IProgressMonitor monitor) throws Throwable {
-        m_jsonClientSession.startUp();
-      }
-    };
-    job.runNow(new NullProgressMonitor());
-    try {
-      job.throwOnError();
-    }
-    catch (ProcessingException e) {
-      throw new JsonException(e);
-    }
-    if (!clientSession.isActive()) {
-      throw new JsonException("ClientSession is not active, there must have been a problem with loading or starting");
-    }
-  }
+  /**
+   * @return a new {@link IClientSession} that is not yet initialized, so
+   *         {@link IClientSession#startSession(org.osgi.framework.Bundle)} was not yet called
+   */
+  protected abstract IClientSession createUninitializedClientSession();
 
   protected UserAgent createUserAgent() {
     IUiLayer uiLayer = UiLayer2.HTML;
@@ -136,50 +155,22 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     return Subject.getSubject(AccessController.getContext());
   }
 
-  protected abstract Class<? extends IClientSession> clientSessionClass();
-
-  /**
-   * @return a new {@link IClientSession} that is not yet initialized, so
-   *         {@link IClientSession#startSession(org.osgi.framework.Bundle)} was not yet called
-   */
-  protected IClientSession createUninitializedClientSession(UserAgent userAgent, Subject subject, Locale locale) {
-    synchronized (this) {
-      HttpSession httpSession = m_currentHttpRequest.getSession();
-      // Lookup the requested client session
-      String clientSessionId = m_currentJsonRequest.getClientSessionId();
-      if (clientSessionId == null) {
-        throw new IllegalStateException("Missing clientSessionId in JSON request");
+  protected void startUpClientSession(IClientSession clientSession) {
+    ClientSyncJob job = new ClientSyncJob("AbstractJsonSession#startClientSession", clientSession) {
+      @Override
+      protected void runVoid(IProgressMonitor monitor) throws Throwable {
+        m_jsonClientSession.startUp();
       }
-      String clientSessionAttributeName = "scout.htmlui.session.client." + clientSessionId;
-      IClientSession clientSession = (IClientSession) httpSession.getAttribute(clientSessionAttributeName);
-      if (clientSession != null) {
-        // Found existing client session
-        LOG.info("Using cached client session [clientSessionId=" + clientSessionId + "]");
-        return clientSession;
-      }
-      // No client session for the requested ID was found, so create one and store it in the map
-      LOG.info("Creating new client session [clientSessionId=" + clientSessionId + "]");
-      String virtualSessionId = UUID.randomUUID().toString();
-      LocaleThreadLocal.set(locale);
-      try {
-        try {
-          clientSession = clientSessionClass().newInstance();
-        }
-        catch (InstantiationException | IllegalAccessException e) {
-          throw new JsonException("Could not create client session.", e);
-        }
-        clientSession.setSubject(subject);
-        clientSession.setVirtualSessionId(virtualSessionId);
-        clientSession.setUserAgent(userAgent);
-      }
-      finally {
-        LocaleThreadLocal.set(null);
-      }
-      //FIXME CGU session must be started later, see JsonClientSession
-      //return SERVICES.getService(IClientSessionRegistryService.class).newClientSession(clientSessionClass(), subject, UUID.randomUUID().toString(), userAgent);
-      httpSession.setAttribute(clientSessionAttributeName, clientSession);
-      httpSession.setAttribute(clientSessionAttributeName + ".cleanup", new P_ClientSessionCleanupHandler(clientSessionId, clientSession));
-      return clientSession;
+    };
+    job.runNow(new NullProgressMonitor());
+    try {
+      job.throwOnError();
+    }
+    catch (ProcessingException e) {
+      throw new JsonException(e);
+    }
+    if (!clientSession.isActive()) {
+      throw new JsonException("ClientSession is not active, there must have been a problem with loading or starting");
     }
   }
 
@@ -221,8 +212,21 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   }
 
   @Override
-  public IJsonAdapter<?> getJsonAdapter(Object model) {
+  public <M, A extends IJsonAdapter<? super M>> A getJsonAdapter(M model) {
     return m_jsonAdapterRegistry.getJsonAdapter(model);
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public <M, A extends IJsonAdapter<? super M>> A getOrCreateJsonAdapter(M model) {
+    A jsonAdapter = getJsonAdapter(model);
+    if (jsonAdapter != null) {
+      return jsonAdapter;
+    }
+    jsonAdapter = (A) createJsonAdapter(model);
+    // because it's a new adapter we must add it to the response
+    m_currentJsonResponse.addAdapter(jsonAdapter); // TODO AWE: (json) in registerJsonAdapter verschieben? analog unregisterJsonAdapter
+    return jsonAdapter;
   }
 
   @Override
@@ -325,17 +329,5 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
       LOG.info("Client session with ID " + m_clientSessionId + " terminated.");
     }
-  }
-
-  @Override
-  public IJsonAdapter<?> getOrCreateJsonAdapter(Object model) {
-    IJsonAdapter<?> jsonAdapter = getJsonAdapter(model);
-    if (jsonAdapter != null) {
-      return jsonAdapter;
-    }
-    jsonAdapter = createJsonAdapter(model);
-    // because it's a new adapter we must add it to the response
-    m_currentJsonResponse.addAdapter(jsonAdapter); // TODO AWE: (json) in registerJsonAdapter verschieben? analog unregisterJsonAdapter
-    return jsonAdapter;
   }
 }

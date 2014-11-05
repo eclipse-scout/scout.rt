@@ -23,9 +23,15 @@ scout.OfficeAddIn.prototype.onModelAction = function(event) {
 
   if (event.type === 'invoke') {
     alert('EVENT '+event.op+' '+event.ref);//op, ref, args
-    if(event.ref){
+    var data={};
+    data.ref=event.ref;
+    data.status='success';
+    if(event.op==20){
+      data.docx=this.$mscom.html();
+    }
+    if(data.ref || data.docx){
       //return ref, status=success|error+message|timeout
-      this.session.send('invokeResult', this.id,{'ref':event.ref, 'status':'success'});
+      this.session.send('invokeResult', this.id,data);
     }
   } else {
     scout.OfficeAddIn.parent.prototype.onModelAction.call(this, event);

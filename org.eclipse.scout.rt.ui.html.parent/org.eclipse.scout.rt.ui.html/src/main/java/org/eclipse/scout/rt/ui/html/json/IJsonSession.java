@@ -35,13 +35,13 @@ public interface IJsonSession {
   /**
    * Returns an existing IJsonAdapter instance for the given model object.
    */
-  IJsonAdapter<?> getJsonAdapter(Object model);
+  <M, A extends IJsonAdapter<? super M>> A getJsonAdapter(M model);
 
   /**
    * Creates a new IJsonAdapter instance for the given model or returns an existing instance.
    * As a side-effect a newly created adapter is added to the current JSON response.
    */
-  IJsonAdapter<?> getOrCreateJsonAdapter(Object model);
+  <M, A extends IJsonAdapter<? super M>> A getOrCreateJsonAdapter(M model);
 
   void registerJsonAdapter(IJsonAdapter<?> adapter);
 

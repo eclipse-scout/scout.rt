@@ -72,13 +72,14 @@ class JsonAdapterRegistry {
     return m_idAdapterMap.get(id).m_jsonAdapter;
   }
 
-  IJsonAdapter<?> getJsonAdapter(Object model) {
+  @SuppressWarnings("unchecked")
+  <M, A extends IJsonAdapter<? super M>> A getJsonAdapter(M model) {
     P_RegistryValue value = m_modelAdapterMap.get(model);
     if (value == null) {
       return null;
     }
     else {
-      return value.m_jsonAdapter;
+      return (A) value.m_jsonAdapter;
     }
   }
 

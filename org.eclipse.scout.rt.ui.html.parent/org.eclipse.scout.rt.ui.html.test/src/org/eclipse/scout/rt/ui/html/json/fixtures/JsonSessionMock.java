@@ -26,7 +26,7 @@ public class JsonSessionMock extends AbstractJsonSession {
   }
 
   @Override
-  protected Class<? extends IClientSession> clientSessionClass() {
+  protected IClientSession createUninitializedClientSession() {
     return null;
   }
 

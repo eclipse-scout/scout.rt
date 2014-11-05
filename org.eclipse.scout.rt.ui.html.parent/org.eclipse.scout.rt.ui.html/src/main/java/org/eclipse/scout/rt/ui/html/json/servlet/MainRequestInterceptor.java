@@ -92,7 +92,7 @@ public class MainRequestInterceptor extends AbstractService implements IServletR
           return true;
         }
         LOG.info("Creating new JSON session with ID " + jsonReq.getJsonSessionId() + "...");
-        jsonSession = servlet.createJsonSession();
+        jsonSession = servlet.createUninitializedJsonSession();
         jsonSession.init(req, jsonReq);
         httpSession.setAttribute(jsonSessionAttributeName, jsonSession);
       }

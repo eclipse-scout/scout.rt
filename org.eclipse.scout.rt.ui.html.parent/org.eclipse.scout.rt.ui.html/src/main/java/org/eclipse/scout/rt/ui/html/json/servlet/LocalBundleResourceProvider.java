@@ -155,13 +155,15 @@ public class LocalBundleResourceProvider extends AbstractService implements ISer
   /**
    * Checks whether the file needs to be returned or not, depending on the request headers and file modification state.
    * Also writes cache headers (last modified and etag) if the file needs to be returned.
-   * 
+   *
    * @return {@link HttpServletResponse#SC_NOT_MODIFIED} if the file hasn't changed in the meantime or
    *         {@link HttpServletResponse#SC_ACCEPTED} if the content of the file needs to be returned.
    */
   protected int processCacheHeaders(final HttpServletRequest req, final HttpServletResponse resp, long lastModified, int contentLength) {
+    resp.setHeader("cache-control", "private, max-age=0, no-cache, no-store, must-revalidate");
+
     String etag = null;
-    if (lastModified != -1 && contentLength != -1) {
+    if (lastModified != -1L && contentLength != -1L) {
       etag = "W/\"" + contentLength + "-" + lastModified + "\""; //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$
     }
 

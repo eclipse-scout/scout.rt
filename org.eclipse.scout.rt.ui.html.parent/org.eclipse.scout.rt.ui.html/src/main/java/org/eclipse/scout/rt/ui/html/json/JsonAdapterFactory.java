@@ -82,7 +82,7 @@ import org.eclipse.scout.rt.ui.html.json.tree.JsonTree;
 public class JsonAdapterFactory {
 
   @SuppressWarnings("unchecked")
-  public IJsonAdapter createJsonAdapter(Object model, IJsonSession session, String id) {
+  public IJsonAdapter<?> createJsonAdapter(Object model, IJsonSession session, String id) {
     // form fields
     if (model instanceof IGroupBox) {
       return new JsonGroupBox((IGroupBox) model, session, id);
