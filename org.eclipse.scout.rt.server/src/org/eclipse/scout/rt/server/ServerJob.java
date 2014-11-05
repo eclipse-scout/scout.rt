@@ -38,6 +38,8 @@ import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.server.transaction.internal.ActiveTransactionRegistry;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.TextsThreadLocal;
+import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
+import org.eclipse.scout.service.SERVICES;
 
 /**
  * Perform a transaction on a {@link IServerSession}<br>
@@ -249,8 +251,14 @@ public abstract class ServerJob extends JobEx implements IServerSessionProvider 
     finally {
       ActiveTransactionRegistry.unregister(transaction);
       if (transaction.hasFailures()) {
+        IExceptionHandlerService exceptionHandlerService = SERVICES.getService(IExceptionHandlerService.class);
         for (Throwable transactionFailure : transaction.getFailures()) {
-          LOG.error("Transaction had failure.", transactionFailure);
+          if (transactionFailure instanceof ProcessingException) {
+            exceptionHandlerService.handleException((ProcessingException) transactionFailure);
+          }
+          else {
+            LOG.error("Transaction had failure.", transactionFailure);
+          }
         }
         // xa rollback
         try {

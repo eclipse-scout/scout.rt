@@ -13,6 +13,8 @@ package org.eclipse.scout.rt.testing.server.runner;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.List;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -21,11 +23,15 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.server.ServerJob;
 import org.eclipse.scout.rt.server.ThreadContext;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
+import org.eclipse.scout.rt.shared.services.common.exceptionhandler.LogExceptionHandlerService;
 import org.eclipse.scout.rt.testing.server.runner.fixture.TestTransactionMember;
+import org.eclipse.scout.rt.testing.shared.Activator;
+import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.osgi.framework.ServiceRegistration;
 
 /**
  * JUnit test for {@link ScoutServerTestRunner}
@@ -159,17 +165,28 @@ public class ScoutServerTransactionTest {
   public void testTransactionWithException() {
     final TestTransactionMember transactionMember1 = new TestTransactionMember("01");
     final TestTransactionMember transactionMember2 = new TestTransactionMember("02");
-    ServerJob job = new ServerJob("", ServerJob.getCurrentSession()) {
+    List<ServiceRegistration> serviceReg = null;
+    //Use real live IExceptionHandlerService implementation here!
+    try {
+      serviceReg = TestingUtility.registerServices(Activator.getDefault().getBundle(), 1100, new LogExceptionHandlerService());
 
-      @Override
-      protected IStatus runTransaction(IProgressMonitor monitor) throws Exception {
-        ITransaction transaction = ThreadContext.getTransaction();
-        transaction.registerMember(transactionMember1);
-        transaction.registerMember(transactionMember2);
-        throw new ProcessingException("Blubber");
+      ServerJob job = new ServerJob("", ServerJob.getCurrentSession()) {
+
+        @Override
+        protected IStatus runTransaction(IProgressMonitor monitor) throws Exception {
+          ITransaction transaction = ThreadContext.getTransaction();
+          transaction.registerMember(transactionMember1);
+          transaction.registerMember(transactionMember2);
+          throw new ProcessingException("Blubber");
+        }
+      };
+      job.runNow(new NullProgressMonitor());
+    }
+    finally {
+      if (serviceReg != null) {
+        TestingUtility.unregisterServices(serviceReg);
       }
-    };
-    job.runNow(new NullProgressMonitor());
+    }
     assertEquals("CommitPhase1MethodCallCount", 0, transactionMember1.getCommitPhase1MethodCallCount());
     assertEquals("CommitPhase2MethodCallCount", 0, transactionMember1.getCommitPhase2MethodCallCount());
     assertEquals("ReleaseMethodCallCount", 1, transactionMember1.getReleaseMethodCallCount());
