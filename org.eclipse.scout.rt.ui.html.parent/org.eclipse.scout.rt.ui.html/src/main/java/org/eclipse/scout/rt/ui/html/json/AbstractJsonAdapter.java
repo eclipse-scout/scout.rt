@@ -53,6 +53,11 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     return m_model;
   }
 
+  @Override
+  public boolean isCreateImmediately() {
+    return false;
+  }
+
   protected void createChildAdapters() {
   }
 
@@ -98,6 +103,9 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     JSONObject json = new JSONObject();
     putProperty(json, "objectType", getObjectType());
     putProperty(json, "id", getId());
+    if (isCreateImmediately()) {
+      putProperty(json, "createImmediately", true);
+    }
     return json;
   }
 

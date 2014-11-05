@@ -7,6 +7,11 @@ scout.ModelAdapter = function() {
   this.destroyed = false;
 };
 
+/**
+ * This method is called when the adapter receives the first event, not when the adapter was created
+ * @param model
+ * @param session
+ */
 scout.ModelAdapter.prototype.init = function(model, session) {
   this.session = session;
 

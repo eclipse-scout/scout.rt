@@ -76,6 +76,9 @@ public class JsonResponse {
    * Adds an adapter to the response. All adapters stored on the response are transferred to the client (browser)
    * as JSON object. Only new adapters must be transferred, adapters already transferred to the client can be
    * solely referenced by their ID.
+   * <p>
+   * Note that in javascript the adapters are not created unless the first event is received or
+   * {@link IJsonAdapter#isCreateImmediately()} is set
    */
   public void addAdapter(IJsonAdapter<?> adapter) {
     if (m_toJsonInProgress) {
@@ -88,6 +91,8 @@ public class JsonResponse {
   }
 
   /**
+   * Note: ignores events on adapters that are also part of this response, see also {@link #doAddEvent(JsonEvent)}
+   *
    * @param id
    *          Adapter ID
    * @param eventType

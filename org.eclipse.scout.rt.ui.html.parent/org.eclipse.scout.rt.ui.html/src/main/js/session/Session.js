@@ -219,6 +219,13 @@ scout.Session.prototype._copyAdapterData = function(adapterData) {
     this._adapterDataCache[prop] = adapterData[prop];
     count++;
   }
+  //eval createImmediately flag
+  for (var prop in adapterData) {
+    var data = adapterData[prop];
+    if(data.createImmediately){
+      this.getOrCreateModelAdapter(data.id, this);
+    }
+  }
   if (count > 0) {
     $.log.debug('Stored ' + count +  ' properties in adapterDataCache');
   }
