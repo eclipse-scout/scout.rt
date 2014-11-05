@@ -26,11 +26,14 @@ public interface IJsonAdapter<T extends Object> extends IJsonMapper {
   T getModel();
 
   /**
-   * Force immediate creation of the adapter on the javascript side
+   * Root adapters (such as the desktop and other custom adapters) are created in the session 'initialize' event on the
+   * javascript side
+   * <p>
+   * All other adapters are created at first time use TODO cgu please review this (from imo)
    * <p>
    * see {@link JsonResponse#addAdapter(IJsonAdapter)}
    */
-  boolean isCreateImmediately();
+  boolean isRoot();
 
   void attach();
 

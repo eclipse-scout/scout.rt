@@ -75,6 +75,11 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
   }
 
   @Override
+  public boolean isRoot() {
+    return true;
+  }
+
+  @Override
   protected void createChildAdapters() {
     super.createChildAdapters();
     attachAdapters(getForms());

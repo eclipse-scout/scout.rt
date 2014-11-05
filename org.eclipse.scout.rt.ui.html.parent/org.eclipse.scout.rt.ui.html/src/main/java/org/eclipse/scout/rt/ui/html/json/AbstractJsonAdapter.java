@@ -54,7 +54,7 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
   }
 
   @Override
-  public boolean isCreateImmediately() {
+  public boolean isRoot() {
     return false;
   }
 
@@ -103,8 +103,8 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     JSONObject json = new JSONObject();
     putProperty(json, "objectType", getObjectType());
     putProperty(json, "id", getId());
-    if (isCreateImmediately()) {
-      putProperty(json, "createImmediately", true);
+    if (isRoot()) {
+      putProperty(json, "root", true);
     }
     return json;
   }

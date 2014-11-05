@@ -109,6 +109,20 @@ scout.Session.prototype.getOrCreateModelAdapters = function(ids, parent) {
   return adapters;
 };
 
+scout.Session.prototype._createRootModelAdapters = function() {
+  var $parent=this.$entryPoint;
+  var id, data;
+  for (id in this._adapterDataCache) {
+    data=this._adapterDataCache[id];
+    if(data.root){
+      this.objectFactory.
+        create(this._getAdapterData(data.id)).
+        render($parent);
+    }
+  }
+};
+
+
 /**
  *
  * Sends the request asynchronously and processes the response later.<br>
@@ -215,16 +229,10 @@ scout.Session.prototype._processSuccessResponse = function(message) {
 
 scout.Session.prototype._copyAdapterData = function(adapterData) {
   var count = 0;
-  for (var prop in adapterData) {
+  var prop;
+  for (prop in adapterData) {
     this._adapterDataCache[prop] = adapterData[prop];
     count++;
-  }
-  //eval createImmediately flag
-  for (var prop in adapterData) {
-    var data = adapterData[prop];
-    if(data.createImmediately){
-      this.getOrCreateModelAdapter(data.id, this);
-    }
   }
   if (count > 0) {
     $.log.debug('Stored ' + count +  ' properties in adapterDataCache');
@@ -358,9 +366,8 @@ scout.Session.prototype.onModelAction = function(event) {
     // cannot use getOrCreateModelAdapter here since Session doesn't have a parent
     var sessionData = this._getAdapterData(event.clientSession);
     this.locale = new scout.Locale(sessionData.locale);
-    var desktopData = this._getAdapterData(sessionData.desktop);
-    this.desktop = this.objectFactory.create(desktopData);
-    this.desktop.render(this.$entryPoint);
+    this._createRootModelAdapters();
+    this.desktop = this.getModelAdapter(sessionData.desktop);
   }
 };
 
