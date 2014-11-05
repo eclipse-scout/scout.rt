@@ -15,6 +15,12 @@
   .glow(@focus-color-glow);
 }
 
+.transform(@args) {
+  -webkit-transform: @args;
+  -ms-transform: @args;
+  transform: @args;
+}
+
 .text-field {
   background-color: @control-background-color;
   padding: 0 @text-field-padding;

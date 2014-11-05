@@ -20,7 +20,6 @@
   animation-name: @name;
 }
 
-
 .keyframes-fade-slidein-top() {
   0% {
     margin-top: -40px;
@@ -46,21 +45,15 @@
 
 .keyframes-zoom-bounce() {
   0% {
-    transform: scale(0.75, 0.75);
-    -webkit-transform: scale(0.75, 0.75);
-    -ms-transform: scale(0.75, 0.75);
+    .transform(scale(0.75, 0.75));
   }
 
   25% {
-    transform: scale(1.1, 1.1);
-    -webkit-transform: scale(1.1, 1.1);
-    -ms-transform: scale(1.1, 1.1);
+    .transform(scale(1.1, 1.1));
   }
 
   100% {
-    transform: scale(1, 1);
-    -webkit-transform: scale(1, 1);
-    -ms-transform: scale(1, 1);
+    .transform(scale(1, 1));
   }
 }
 @-webkit-keyframes zoom-bounce {
@@ -72,15 +65,11 @@
 
 .keyframes-rotation () {
   0% {
-    transform: rotate(0deg);
-    -webkit-transform: rotate(0deg);
-    -ms-transform: rotate(0deg);
+    .transform(rotate(0deg));
   }
 
   100% {
-    transform: rotate(359deg);
-    -webkit-transform: rotate(359deg);
-    -ms-transform: rotate(359deg);
+    .transform(rotate(359deg));
   }
 }
 @-webkit-keyframes rotation {
