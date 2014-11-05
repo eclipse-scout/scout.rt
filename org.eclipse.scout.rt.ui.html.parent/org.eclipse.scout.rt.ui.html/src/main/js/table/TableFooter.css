@@ -50,7 +50,7 @@
 
   &:before {
     .font-icon;
-    font-size: 24px;
+    font-size: 22px;
     color: @palette-light-gray-0;
   }
   
