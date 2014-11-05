@@ -15,9 +15,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.exception.ProcessingStatus;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.shared.ScoutTexts;
 
 public class BasicTransaction implements ITransaction {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(BasicTransaction.class);
@@ -64,7 +67,9 @@ public class BasicTransaction implements ITransaction {
       m_memberMap.put(memberId, member);
       //throw AFTER registering the resource in order to correctly release it later-on, bug 383736.
       if (m_cancelled) {
-        throw new ProcessingException("Interrupted", new InterruptedException());
+        ProcessingException cancelException = new ProcessingException("Interrupted", new InterruptedException());
+        ((ProcessingStatus) cancelException.getStatus()).setSeverity(IStatus.CANCEL);
+        throw cancelException;
       }
     }
   }
@@ -222,7 +227,9 @@ public class BasicTransaction implements ITransaction {
         return true;
       }
       m_cancelled = true;
-      addFailure(new InterruptedException());
+      ProcessingException cancelException = new ProcessingException(ScoutTexts.get("SearchWasCanceled"), new InterruptedException());
+      ((ProcessingStatus) cancelException.getStatus()).setSeverity(IStatus.CANCEL);
+      addFailure(cancelException);
     }
     for (ITransactionMember mem : getMembers()) {
       try {
