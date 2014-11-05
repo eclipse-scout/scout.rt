@@ -2,39 +2,41 @@
   content:@icon-graph;
 }
 
-#GraphContainer {
-width: 100%;
-height: 100%;
+.graph-container {
+  width: 100%;
+  height: 100%;
+  overflow:visible;
 }
 
 .graph-node {
-stroke: #fff;
-stroke-width: 2px;
-cursor: pointer;
+  stroke: #fff;
+  stroke-width: 2px;
+  cursor: pointer;
+  
+  &.center {fill: @highlight-color;}
+  &.internal {fill: #bfbfbf;}
+  &.person {fill:@chart-color-1;}
+  &.department {fill: #80c1d0;}
+  &.company {fill: #ffcc8a;}
 }
-
-.graph-node.center {fill: @highlight-color;}
-.graph-node.internal {fill: #bfbfbf;}
-.graph-node.person {fill:@chart-color-1;}
-.graph-node.department {fill: #80c1d0;}
-.graph-node.company {fill: #ffcc8a;}
 
 .graph-node-text{
-fill: #fff;
-text-anchor: middle;
-dominant-baseline: central;
-}
-
-.graph-node-text:hover{
-cursor: pointer;
+  fill: #fff;
+  text-anchor: middle;
+  dominant-baseline: central;
+  
+  &:hover{
+    cursor: pointer;
+  }
 }
 
 .graph-link {
-stroke: #bfbfbf;
-stroke-width: 2;
+  stroke: #bfbfbf;
+  stroke-width: 2;
 }
 
 .graph-link-text{
-fill: #9C9C9C;
-text-anchor: middle;
-dy: 20px;}
+  fill: #9C9C9C;
+  text-anchor: middle;
+  dy: 20px;
+}

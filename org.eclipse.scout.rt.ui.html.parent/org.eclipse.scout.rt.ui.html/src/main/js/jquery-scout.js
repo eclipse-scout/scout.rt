@@ -5,6 +5,9 @@
 /*global console: false */
 (function($) {
 
+  // chris' shortcut
+  $.l = console.log.bind(console);
+
   //== $ extensions
   $.makeDiv = function(id, cssClass, htmlContent) {
     if (id === 0) {

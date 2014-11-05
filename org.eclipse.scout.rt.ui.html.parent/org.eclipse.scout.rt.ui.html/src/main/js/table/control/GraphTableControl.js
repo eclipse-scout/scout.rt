@@ -7,20 +7,18 @@ scout.GraphTableControl = function() {
 scout.inherits(scout.GraphTableControl, scout.TableControl);
 
 scout.GraphTableControl.prototype._renderContent = function($parent) {
-  this.$container = $parent.appendSVG('svg', 'GraphContainer');
+  this.$container = $parent.appendSVG('svg', '', 'graph-container');
 
   // some basics
-  var wBox = 120,
-    hBox = 60,
-    kelvin = 1000,
-    wContainer = this.$container.width(),
-    hContainer = this.$container.height(),
-    graph = this.graph;
-
+  this.wBox = 120;
+  this.hBox = 60;
+  this.kelvin = 1000;
+  this.wContainer = this.$container.width();
+  this.hContainer = this.$container.height();
 
   // create all links with label
-  for (var l = 0; l < graph.links.length; l++) {
-    var link = graph.links[l];
+  for (var l = 0; l < this.graph.links.length; l++) {
+    var link = this.graph.links[l];
 
     link.$div = this.$container.appendSVG('line', null, 'graph-link');
     link.$divText = this.$container.appendSVG('text', null, 'graph-link-text', link.label)
@@ -28,213 +26,215 @@ scout.GraphTableControl.prototype._renderContent = function($parent) {
   }
 
   // create nodes with text and place them randomly
-  for (var n = 0; n < graph.nodes.length; n++) {
-    var node = graph.nodes[n];
+  for (var n = 0; n < this.graph.nodes.length; n++) {
+    var node = this.graph.nodes[n];
 
     node.$div = this.$container.appendSVG('rect', null, 'graph-node ' + node.type)
-      .attr('width', wBox).attr('height', hBox)
+      .attr('width', this.wBox).attr('height', this.hBox)
       .attr('x', 0).attr('y', 0)
-      .on('mousedown', moveNode);
+      .on('mousedown', this.moveNode.bind(this));
 
     node.$divText = this.$container.appendSVG('text', null, 'graph-node-text', node.name)
-      .on('mousedown', moveNode);
+      .on('mousedown', this.moveNode.bind(this));
 
-    setNode(node, Math.random() * (wContainer - wBox), Math.random() * (hContainer - hBox));
+    this.setNode(node, Math.random() * (this.wContainer - this.wBox), Math.random() * (this.hContainer - this.hBox));
   }
 
   // start optimization
-  disolveLinks();
-  doPhysics();
+  this.disolveLinks();
+  this.doPhysics();
+};
 
-  // moving nodes and links by dx and dy
-  function setNode(node, dx, dy) {
-    var x = getPos(node, 'x'),
-      y = getPos(node, 'y');
+// moving nodes and links by dx and dy
+scout.TableControl.prototype.setNode = function (node, dx, dy) {
+  var x = this.getPos(node, 'x'),
+    y = this.getPos(node, 'y');
 
-    node.$div
-      .attr('x', x + dx)
-      .attr('y', y + dy);
+  node.$div
+    .attr('x', x + dx)
+    .attr('y', y + dy);
 
-    node.$divText
-      .attr('x', x + dx + wBox / 2)
-      .attr('y', y + dy + hBox / 2);
+  node.$divText
+    .attr('x', x + dx + this.wBox / 2)
+    .attr('y', y + dy + this.hBox / 2);
 
-    for (var l = 0; l < graph.links.length; l++) {
-      var link = graph.links[l];
+  for (var l = 0; l < this.graph.links.length; l++) {
+    var link = this.graph.links[l];
 
-      if (link.source == node.id) {
-        link.$div
-          .attr('x1', x + dx + wBox / 2)
-          .attr('y1', y + dy + hBox / 2);
-        setLabel(link);
-      } else if (link.target == node.id) {
-        link.$div
-          .attr('x2', x + dx + wBox / 2)
-          .attr('y2', y + dy + hBox / 2);
-        setLabel(link);
+    if (link.source == node.id) {
+      link.$div
+        .attr('x1', x + dx + this.wBox / 2)
+        .attr('y1', y + dy + this.hBox / 2);
+      this.setLabel(link);
+    } else if (link.target == node.id) {
+      link.$div
+        .attr('x2', x + dx + this.wBox / 2)
+        .attr('y2', y + dy + this.hBox / 2);
+      this.setLabel(link);
+    }
+  }
+};
+
+// set label of a link
+scout.TableControl.prototype.setLabel = function (link) {
+  var x1 = this.getPos(link, 'x1'),
+    y1 = this.getPos(link, 'y1'),
+    x2 = this.getPos(link, 'x2'),
+    y2 = this.getPos(link, 'y2');
+
+  link.$divText
+    .attr('x', (x1 + x2) / 2)
+    .attr('y', (y1 + y2) / 2)
+    .attr('transform', 'rotate( ' + (Math.atan((y2 - y1) / (x2 - x1)) / Math.PI * 180) +
+      ', ' + ((x1 + x2) / 2) + ', ' + ((y1 + y2) / 2) + ')');
+};
+
+// disolve crossing links
+scout.TableControl.prototype.disolveLinks = function () {
+  for (var l1 = 0; l1 < this.graph.links.length; l1++) {
+    var link1 = this.graph.links[l1],
+      E = {}, F = {};
+
+    E.x = this.getPos(link1, 'x1'),
+    E.y = this.getPos(link1, 'y1'),
+    F.x = this.getPos(link1, 'x2'),
+    F.y = this.getPos(link1, 'y2');
+
+    for (var l2 = 0; l2 < this.graph.links.length; l2++) {
+      if (l1 == l2) continue;
+
+      var link2 = this.graph.links[l2],
+        P = {}, Q = {};
+
+      P.x = this.getPos(link2, 'x1'),
+      P.y = this.getPos(link2, 'y1'),
+      Q.x = this.getPos(link2, 'x2'),
+      Q.y = this.getPos(link2, 'y2');
+
+      // ckeck if crossing exists, if yes: change position
+      if ((_test(E, P, Q) != _test(F, P, Q)) && (_test(E, F, P) != _test(E, F, Q))) {
+        var n1 = this.graph.nodes[link1.target],
+          n2 = this.graph.nodes[link2.target],
+          dx = this.getPos(n1, 'x') - this.getPos(n2, 'x'),
+          dy = this.getPos(n1, 'y') - this.getPos(n2, 'y');
+
+        this.setNode(n1, -dx, -dy);
+        this.setNode(n2, dx, dy);
       }
     }
   }
 
-  // set label of a link
-  function setLabel(link) {
-    var x1 = getPos(link, 'x1'),
-      y1 = getPos(link, 'y1'),
-      x2 = getPos(link, 'x2'),
-      y2 = getPos(link, 'y2');
-
-    link.$divText
-      .attr('x', (x1 + x2) / 2)
-      .attr('y', (y1 + y2) / 2)
-      .attr('transform', 'rotate( ' + (Math.atan((y2 - y1) / (x2 - x1)) / Math.PI * 180) +
-        ', ' + ((x1 + x2) / 2) + ', ' + ((y1 + y2) / 2) + ')');
+  function _test(p1, p2, p3) {
+    return (p3.y - p1.y) * (p2.x - p1.x) > (p2.y - p1.y) * (p3.x - p1.x);
   }
-
-  // disolve crossing links
-  function disolveLinks() {
-    for (var l1 = 0; l1 < graph.links.length; l1++) {
-      var link1 = graph.links[l1],
-        E = {}, F = {};
-
-      E.x = getPos(link1, 'x1'),
-      E.y = getPos(link1, 'y1'),
-      F.x = getPos(link1, 'x2'),
-      F.y = getPos(link1, 'y2');
-
-      for (var l2 = 0; l2 < graph.links.length; l2++) {
-        if (l1 == l2) continue;
-
-        var link2 = graph.links[l2],
-          P = {}, Q = {};
-
-        P.x = getPos(link2, 'x1'),
-        P.y = getPos(link2, 'y1'),
-        Q.x = getPos(link2, 'x2'),
-        Q.y = getPos(link2, 'y2');
-
-        // ckeck if crossing exists, if yes: change position
-        if ((_test(E, P, Q) != _test(F, P, Q)) && (_test(E, F, P) != _test(E, F, Q))) {
-          var n1 = graph.nodes[link1.target],
-            n2 = graph.nodes[link2.target],
-            dx = getPos(n1, 'x') - getPos(n2, 'x'),
-            dy = getPos(n1, 'y') - getPos(n2, 'y');
-
-          setNode(n1, -dx, -dy);
-          setNode(n2, dx, dy);
-        }
-      }
-    }
-
-    function _test(p1, p2, p3) {
-      return (p3.y - p1.y) * (p2.x - p1.x) > (p2.y - p1.y) * (p3.x - p1.x);
-    }
-  }
+};
 
   // force the nodes to their place
-  function doPhysics() {
-    var totalDiff = 0;
+scout.TableControl.prototype.doPhysics = function () {
+  var totalDiff = 0;
 
-    for (var n = 0; n < graph.nodes.length; n++) {
-      var node = graph.nodes[n],
-        x = getPos(node, 'x'),
-        y = getPos(node, 'y'),
-        dx,dy;
-      dx = 0, dy = 0;
+  for (var n = 0; n < this.graph.nodes.length; n++) {
+    var node = this.graph.nodes[n],
+      x = this.getPos(node, 'x'),
+      y = this.getPos(node, 'y'),
+      dx,dy;
+    dx = 0, dy = 0;
 
-      // move center to the middle
-      if (node.type == 'center') {
-        dx += ((wContainer - wBox) / 2 - x) / 40;
-        dy += ((hContainer - hBox) / 2 - y) / 40;
-      }
-
-      // move from outside
-      dx -= (Math.min(x, 5) - 5) / 2;
-      dy -= (Math.min(y, 5) - 5) / 2;
-      dx += (Math.min(wContainer - wBox - x, 10) - 10) / 4;
-      dy += (Math.min(hContainer - hBox - y, 10) - 10) / 4;
-
-      // gravity
-      dx += ((wContainer - wBox) / 2 - x) / 500;
-      dy += ((hContainer - hBox) / 2 - y) / 500;
-
-      // repulsion force
-      for (var o = 0; o < graph.nodes.length; o++) {
-        var otherNode = graph.nodes[o];
-        if (o != n) {
-          var oX = getPos(otherNode, 'x'),
-            oY = getPos(otherNode, 'y'),
-            repForce = 100 / (Math.pow(x - oX, 2) + Math.pow(y - oY, 2));
-
-          dx += (x - oX) * repForce;
-          dy += (y - oY) * repForce;
-        }
-      }
-
-      // spring force
-      for (var l = 0; l < graph.links.length; l++) {
-        var link = graph.links[l],
-          oppositeNode = null;
-
-        if (link.source === node.id) {
-          oppositeNode = graph.nodes[link.target];
-        } else if (link.target === node.id) {
-          oppositeNode = graph.nodes[link.source];
-        }
-
-        if (oppositeNode) {
-          var otherX = getPos(oppositeNode, 'x');
-          var otherY = getPos(oppositeNode, 'y');
-
-          var dist = Math.sqrt(Math.pow(x - otherX, 2) + Math.pow(y - otherY, 2)),
-            springForce = Math.log(dist / 260) / 10;
-
-          dx -= (x - otherX) * springForce;
-          dy -= (y - otherY) * springForce;
-        }
-      }
-
-      // adjust position
-      setNode(node, dx, dy);
-      totalDiff += Math.abs(dx) + Math.abs(dy);
+    // move center to the middle
+    if (node.type == 'center') {
+      dx += ((this.wContainer - this.wBox) / 2 - x) / 40;
+      dy += ((this.hContainer - this.hBox) / 2 - y) / 40;
     }
 
-    // cool down, heat up
-    if (kelvin-- > 0) setTimeout(doPhysics, 0);
+    // move from outside
+    dx -= (Math.min(x, 5) - 5) / 2;
+    dy -= (Math.min(y, 5) - 5) / 2;
+    dx += (Math.min(this.wContainer - this.wBox - x, 10) - 10) / 4;
+    dy += (Math.min(this.hContainer - this.hBox - y, 10) - 10) / 4;
+
+    // gravity
+    dx += ((this.wContainer - this.wBox) / 2 - x) / 500;
+    dy += ((this.hContainer - this.hBox) / 2 - y) / 500;
+
+    // repulsion force
+    for (var o = 0; o < this.graph.nodes.length; o++) {
+      var otherNode = this.graph.nodes[o];
+      if (o != n) {
+        var oX = this.getPos(otherNode, 'x'),
+          oY = this.getPos(otherNode, 'y'),
+          repForce = 100 / (Math.pow(x - oX, 2) + Math.pow(y - oY, 2));
+
+        dx += (x - oX) * repForce;
+        dy += (y - oY) * repForce;
+      }
+    }
+
+    // spring force
+    for (var l = 0; l < this.graph.links.length; l++) {
+      var link = this.graph.links[l],
+        oppositeNode = null;
+
+      if (link.source === node.id) {
+        oppositeNode = this.graph.nodes[link.target];
+      } else if (link.target === node.id) {
+        oppositeNode = this.graph.nodes[link.source];
+      }
+
+      if (oppositeNode) {
+        var otherX = this.getPos(oppositeNode, 'x');
+        var otherY = this.getPos(oppositeNode, 'y');
+
+        var dist = Math.sqrt(Math.pow(x - otherX, 2) + Math.pow(y - otherY, 2)),
+          springForce = Math.log(dist / 260) / 10;
+
+        dx -= (x - otherX) * springForce;
+        dy -= (y - otherY) * springForce;
+      }
+    }
+
+    // adjust position
+    this.setNode(node, dx, dy);
+    totalDiff += Math.abs(dx) + Math.abs(dy);
   }
 
-  // move node by mouse
-  function moveNode(event) {
-    var startX = event.pageX,
-      startY = event.pageY,
-      clickedNode;
+  // cool down, heat up
+  if (this.kelvin-- > 0) setTimeout(this.doPhysics.bind(this), 0);
+};
 
-    for (var n = 0; n < graph.nodes.length; n++) {
-      var node = graph.nodes[n];
-      if ($(this).is(node.$div) || $(this).is(node.$divText)) clickedNode = graph.nodes[n];
-    }
+// move node by mouse
+scout.GraphTableControl.prototype.moveNode = function (event) {
+  var startX = event.pageX,
+    startY = event.pageY,
+    clickedNode,
+    that = this;
 
-    $('body').on('mousemove', '', nodeMove)
-      .one('mouseup', '', nodeEnd);
-    return false;
-
-    function nodeMove(event) {
-      setNode(clickedNode, event.pageX - startX, event.pageY - startY);
-      startX = event.pageX;
-      startY = event.pageY;
-      kelvin = 0;
-    }
-
-    function nodeEnd() {
-      $('body').off('mousemove');
-      kelvin = 200;
-      doPhysics();
+  for (var n = 0; n < this.graph.nodes.length; n++) {
+    var node = this.graph.nodes[n];
+    if ($(event.target).is(node.$div) || $(event.target).is(node.$divText)) {
+      clickedNode = this.graph.nodes[n];
     }
   }
 
-  function getPos(e, d) {
-    return parseFloat(e.$div.attr(d));
+  $('body').on('mousemove', '', nodeMove)
+    .one('mouseup', '', nodeEnd);
+  return false;
+
+  function nodeMove(event) {
+    that.setNode.call(that, clickedNode, event.pageX - startX, event.pageY - startY);
+    startX = event.pageX;
+    startY = event.pageY;
+    that.kelvin = 0;
   }
 
+  function nodeEnd() {
+    $('body').off('mousemove');
+    that.kelvin = 200;
+    that.doPhysics.call(that);
+  }
+};
+
+scout.GraphTableControl.prototype.getPos = function(e, d) {
+  return parseFloat(e.$div.attr(d));
 };
 
 scout.GraphTableControl.prototype._removeContent = function() {
@@ -247,4 +247,11 @@ scout.GraphTableControl.prototype._renderGraph = function(graph) {
 
 scout.GraphTableControl.prototype.isContentAvailable = function() {
   return this.graph;
+};
+
+scout.GraphTableControl.prototype.onResize = function() {
+  this.wContainer = this.$container.width();
+  this.hContainer = this.$container.height();
+  this.kelvin = 600;
+  this.doPhysics();
 };

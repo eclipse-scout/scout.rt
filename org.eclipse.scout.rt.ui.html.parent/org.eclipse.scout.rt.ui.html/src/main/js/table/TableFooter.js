@@ -211,6 +211,9 @@ scout.TableFooter.prototype.openTableControl = function() {
   //adjust table
   this._resizeData(scout.TableFooter.CONTAINER_SIZE);
 
+  //adjust content
+  this.$controlContent.outerHeight(scout.TableFooter.CONTAINER_SIZE);
+
   //adjust container
   this._$controlContainer .show().animateAVCSD('height', scout.TableFooter.CONTAINER_SIZE, null, null, 500);
 
@@ -267,7 +270,10 @@ scout.TableFooter.prototype._addResize = function($parent) {
       var h = that._table.$container.height() - event.pageY;
       that._resizeData(h);
       that._$controlContainer .height(h);
+      that.$controlContent .outerHeight(h);
+
       that._table.updateScrollbar();
+      that.onResize();
     }
 
     function resizeEnd() {
