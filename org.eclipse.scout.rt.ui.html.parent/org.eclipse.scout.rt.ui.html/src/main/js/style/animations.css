@@ -20,6 +20,30 @@
   animation-name: @name;
 }
 
+
+.keyframes-fade-slidein-top() {
+  0% {
+    margin-top: -40px;
+    opacity: 0;
+  }
+
+  40% {
+    margin-top: 7px;
+    opacity: 0.9;
+  }
+
+  100% {
+    margin-top: 0px;
+    opacity: 1;
+  }
+}
+@-webkit-keyframes fade-slidein-top {
+  .keyframes-fade-slidein-top;
+}
+@keyframes fade-slidein-top {
+  .keyframes-fade-slidein-top;
+}
+
 .keyframes-zoom-bounce() {
   0% {
     transform: scale(0.75, 0.75);

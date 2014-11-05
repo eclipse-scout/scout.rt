@@ -11,8 +11,6 @@ Desktop-Tabs: 2-zeilig gut, 2te Zeile evtl. grau machen? V-Align top, nicht midd
 
 [CGU]
 
-MessageBox: Nur Fokus-Farbe, kein Default-Button. Default-Button ist initial fokussiert.
-
 [CRU]
 
 ===================================
@@ -87,5 +85,4 @@ CGU Table: Breite von Gruppierungs-Zelle falsch
 CGU Table: Falsche Row selektiert im Gruppierungs-Modus
 CGU Stern durch Teilen-Icon ersetzen
 CGU Tree: Pfeil/-Text, vertikale Ausrichtung korrigieren
-
-
+CGU MessageBox: Nur Fokus-Farbe, kein Default-Button. Default-Button ist initial fokussiert.

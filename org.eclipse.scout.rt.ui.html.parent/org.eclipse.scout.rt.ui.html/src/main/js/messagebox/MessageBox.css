@@ -17,7 +17,7 @@
 }
 
 .messagebox.shown {
-  .animation-name (zoom-bounce);
+  .animation-name (fade-slidein-top);
   .animation-duration (0.5s);
 }
 
