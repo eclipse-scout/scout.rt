@@ -61,6 +61,7 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.sequencebox.JsonSequenceBox
 import org.eclipse.scout.rt.ui.html.json.form.fields.smartfield.JsonSmartField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.stringfield.JsonStringField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.tabbox.JsonTabBox;
+import org.eclipse.scout.rt.ui.html.json.form.fields.tabbox.JsonTabItem;
 import org.eclipse.scout.rt.ui.html.json.form.fields.tablefield.JsonTableField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.treefield.JsonTreeField;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
@@ -85,7 +86,15 @@ public class JsonAdapterFactory {
   public IJsonAdapter<?> createJsonAdapter(Object model, IJsonSession session, String id) {
     // form fields
     if (model instanceof IGroupBox) {
-      return new JsonGroupBox((IGroupBox) model, session, id);
+      // we must distinct between normal group-boxes and group-boxes in tab-boxes
+      // the use the same model, but we need different adapters
+      IGroupBox groupBox = (IGroupBox) model;
+      if (groupBox.getParentField() instanceof ITabBox) {
+        return new JsonTabItem(groupBox, session, id);
+      }
+      else {
+        return new JsonGroupBox(groupBox, session, id);
+      }
     }
     else if (model instanceof ISequenceBox) {
       return new JsonSequenceBox((ISequenceBox) model, session, id);

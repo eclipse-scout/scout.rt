@@ -7,7 +7,7 @@
  */
 scout.TabBox = function() {
   scout.TabBox.parent.call(this);
-  this._addAdapterProperties(['groupBoxes']);
+  this._addAdapterProperties(['tabItems']);
   this.selectedTab;
   this._$tabArea;
   this._$tabContent;
@@ -23,13 +23,10 @@ scout.TabBox.prototype._render = function($parent) {
   this._$tabArea = this.$container.appendDiv('', 'tab-area');
   var htmlComp = new scout.HtmlComponent(this._$tabArea, this.session);
   htmlComp.setLayout(new scout.NullLayout());
-  var i, groupBox, $tab;
-  for (i = 0; i < this.groupBoxes.length; i++) {
-    groupBox = this.groupBoxes[i];
-    $tab = $('<button>').
-      text(groupBox.label).
-      appendTo(this._$tabArea).
-      data('tabIndex', i).
+  var i, tabItem, $tab;
+  for (i = 0; i < this.tabItems.length; i++) {
+    tabItem = this.tabItems[i];
+    $tab = tabItem.renderTab(this._$tabArea, i).
       on('mousedown', this.onMousedown.bind(this)).
       on('keydown', this._onKeydown.bind(this));
     // only the selected tab is focusable
@@ -70,9 +67,9 @@ scout.TabBox.prototype._onKeydown = function(e) {
   tabIndex = $(e.target).data('tabIndex');
   if (e.which === scout.keys.LEFT) { tabIndex--; }
   if (e.which === scout.keys.RIGHT) { tabIndex++; }
-  if (tabIndex >= 0 && tabIndex < this.groupBoxes.length) {
+  if (tabIndex >= 0 && tabIndex < this.tabItems.length) {
     setTimeout(function() {
-      if (tabIndex >= 0 && tabIndex < this.groupBoxes.length) {
+      if (tabIndex >= 0 && tabIndex < this.tabItems.length) {
         this._selectTab(tabIndex);
         var $tabButton = this._$tabArea.children('button').get(tabIndex);
         $tabButton.focus();
@@ -116,7 +113,7 @@ scout.TabBox.prototype._renderSelectedTab = function(selectedTab) {
   if ($cachedTabContent) {
     $cachedTabContent.appendTo(this._$tabContent);
   } else {
-    this.groupBoxes[this.selectedTab].render(this._$tabContent);
+    this.tabItems[this.selectedTab].render(this._$tabContent);
     this._$tabContent.children().first().data('tabIndex', this.selectedTab);
 
     /* in Swing there's some complicated logic dealing with borders and labels
@@ -124,7 +121,7 @@ scout.TabBox.prototype._renderSelectedTab = function(selectedTab) {
      * I decided to simply this and always set the title of the first group-box
      * to invisible.
      */
-    this.groupBoxes[this.selectedTab]._renderLabelVisible(false);
+    this.tabItems[this.selectedTab]._renderLabelVisible(false);
 
     // TODO AWE: (layout) beim initialen rendern ist das nicht nötig
     // schauen, ob wir hier etwas unterdrücken müssen oder ob das
@@ -139,6 +136,6 @@ scout.TabBox.prototype._renderSelectedTab = function(selectedTab) {
  * @override CompositeField
  */
 scout.CompositeField.prototype.getFields = function() {
-  return this.groupBoxes;
+  return this.tabItems;
 };
 

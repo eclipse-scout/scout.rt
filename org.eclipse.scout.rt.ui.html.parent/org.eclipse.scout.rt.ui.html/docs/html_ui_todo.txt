@@ -2,16 +2,20 @@
  IN PROGRESS
 -----------------------------------
 [AWE]
-Toolbar: Profil-Icon rechts oben, mit Benutzername und Menü mit Optionen..., Abmelden, etc.
-
 Tabs: "Bölle" nicht schön, Farbe dunkel-grau ausprobieren, evtl. active state bei mousedown setzen
   und nicht bei mouseup wie jetzt (2 farben gleichzeitig sichtbar)
 
 Desktop-Tabs: 2-zeilig gut, 2te Zeile evtl. grau machen? V-Align top, nicht middle wenn nur 1 Zeile
 
+Navigation in Forms: in Forms ein zusätzliches Item als Button hervorheben (z.B. Anzeigen) und evtl. ein "multi-button"
+  damit man im Tree weiter nach unten navigieren kann ohne in den Tree klicken zu müssen
+  --> am UI Meeting besprechen (Vorschläge gemalt)
+
 [CGU]
 
 [CRU]
+Scrollbars: für UGM JS-Scrollbars einschalten
+ + Event-Handling in Smartfield-Popup fixen
 
 ===================================
  BACKLOG
@@ -19,8 +23,6 @@ Desktop-Tabs: 2-zeilig gut, 2te Zeile evtl. grau machen? V-Align top, nicht midd
 Animation: im Tree bei Wechsel zwischen Search und Views
 
 Globale Suche: wie Design-Vorschlag, Baum mit Fake-Suchresultaten anzeigen
-
-Scrollbars: für UGM JS-Scrollbars einschalten
 
 Sichtenmenü: ausprobieren, ob bei Klick auf den Titel das Sichtenmenü aufgehen soll
 
@@ -39,9 +41,6 @@ Photoshop: Such-Forms / Table-Controls - vertikale "Tabs" ausprobieren. Nur Text
   Buttons müssen pro Form sein und nicht pro Tab
 
 Ausprobieren: Dickerer top-border, 2 oder 3 px oben an Table-Controls
-
-Navigation in Forms: in Forms ein zusätzliches Item als Button hervorheben (z.B. Anzeigen) und evtl. ein "multi-button"
-  damit man im Tree weiter nach unten navigieren kann ohne in den Tree klicken zu müssen
 
 Telefon-Form: anzeigen, verpasste Anrufe, Steuerung (an-/abmelden), gerne mit Telefonbuch
 
@@ -76,7 +75,7 @@ AWE Form-Fields: alle rund, auch disabled (d.h. wir brauchen doch einen read-onl
 AWE Linie in RootGroupBox 3 px statt 1 px
 AWE Tabs: Titel fett, Pointer Cursor
 AWE Telefon-Icon korrigieren (Grösse, Farbe)
-
+AWE Toolbar: Profil-Icon rechts oben, mit Benutzername und Menü mit Optionen..., Abmelden, etc.
 
 CGU TableField: row-height === logicalGridHeight (text-field)?
 CGU Table: Row-Text nicht genau zentriert

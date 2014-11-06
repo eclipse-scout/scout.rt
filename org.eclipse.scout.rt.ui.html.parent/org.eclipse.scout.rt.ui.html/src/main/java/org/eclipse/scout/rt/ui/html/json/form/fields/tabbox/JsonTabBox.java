@@ -89,7 +89,7 @@ public class JsonTabBox extends JsonFormField<ITabBox> {
 
   @Override
   public JSONObject toJson() {
-    return putAdapterIdsProperty(super.toJson(), "groupBoxes", getModel().getGroupBoxes());
+    return putAdapterIdsProperty(super.toJson(), "tabItems", getModel().getGroupBoxes());
   }
 
   @Override

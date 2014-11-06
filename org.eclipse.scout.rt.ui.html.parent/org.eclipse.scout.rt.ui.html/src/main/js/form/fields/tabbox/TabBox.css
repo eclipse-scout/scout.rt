@@ -19,6 +19,10 @@
       border-bottom-color: @active-color;
     }
 
+    &.marked:not(.selected) {
+      border-bottom-color: @palette-gray;
+    }
+
     &:hover {
       color: @hover-color;
     }

@@ -223,11 +223,11 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     getJsonSession().currentJsonResponse().addActionEvent(getId(), eventName, json);
   }
 
-  protected void addPropertyChangeEvent(String propertyName, Object json) {
-    if (json instanceof IJsonAdapter<?>) {
+  protected void addPropertyChangeEvent(String propertyName, Object newValue) {
+    if (newValue instanceof IJsonAdapter<?>) {
       throw new IllegalArgumentException("Cannot pass an adapter instance to a JSON response");
     }
-    getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), propertyName, json);
+    getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), propertyName, newValue);
   }
 
 }

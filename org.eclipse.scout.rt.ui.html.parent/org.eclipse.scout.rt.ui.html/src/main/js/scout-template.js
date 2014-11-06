@@ -84,6 +84,7 @@
 //@include("form/fields/tablefield/TableField.js");
 //@include("form/fields/treefield/TreeField.js");
 //@include("form/fields/tabbox/TabBox.js");
+//@include("form/fields/tabbox/TabItem.js");
 //@include("scrollbar/Scrollbar.js");
 //@include("scrollbar/Scrollbar2.js");
 //@include("text/DecimalFormat.js");

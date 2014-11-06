@@ -202,11 +202,15 @@ scout.defaultObjectFactories = [{
     return new scout.TabBox();
   }
 }, {
-  objectType: 'SequenceBox',
+  objectType: 'TabItem',
+  create: function() {
+    return new scout.TabItem();
+  }
+}, {  objectType: 'SequenceBox',
   create: function() {
     return new scout.SequenceBox();
   }
-}, { //FIXME CGU only needed temporarily, remove when switched to FormToolButton2
+}, { //FIXME CGU: only needed temporarily, remove when switched to FormToolButton2
   objectType: 'Null',
   create: function() {
     return new scout.NullAdapter();
