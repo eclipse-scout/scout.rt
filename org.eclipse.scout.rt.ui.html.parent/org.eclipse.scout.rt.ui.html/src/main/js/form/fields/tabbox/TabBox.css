@@ -1,3 +1,6 @@
+@tabbox-padding-x: 20px;
+@tabbox-focus-arrow-width: 15px;
+
 .tab-area {
   margin-top: @group-margin-top;
   background-image: url('bg_tab_area.png');
@@ -11,7 +14,7 @@
     border: none;
     background-color: transparent;
     height: 32px;
-    padding: 0  20px;
+    padding: 0  @tabbox-padding-x;
     border-bottom: solid 3px transparent;
     border-top: solid 1px transparent;
     cursor: pointer;
@@ -28,17 +31,18 @@
     &:hover {
       color: @hover-color;
     }
-    
+
     &:focus {
       outline: none;
     }
 
     &:focus:before {
-      content: '>';
-      position: absolute;
+      .font-icon;
+      content: @icon-caret-right;
       color: @active-color;
-      left: 5px;
-      //border-left: solid 2px @active-color;
+      position: absolute;
+      left: @tabbox-padding-x - @tabbox-focus-arrow-width;
+      width: @tabbox-focus-arrow-width;
     }
 
   }

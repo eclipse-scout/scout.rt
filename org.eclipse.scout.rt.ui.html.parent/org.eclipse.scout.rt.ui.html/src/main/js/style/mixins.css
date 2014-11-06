@@ -21,6 +21,15 @@
   transform: @args;
 }
 
+.overlay(@left: 0px, @top: 0px, @diffW: 0px, @diffH: 0px) {
+  position: absolute;
+  content: '';
+  left: @left;
+  top: @top;
+  width: calc(~"100% + " @diffW);
+  height: calc(~"100% + " @diffH);
+}
+
 .text-field {
   background-color: @control-background-color;
   padding: 0 @text-field-padding;

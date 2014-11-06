@@ -5,8 +5,8 @@
   font-size: 22px;
   line-height: @size-desktop-menu - 1px;
   content: @icon;
-  color:@icon-color;
-  vertical-align:-3px;
+  color: @icon-color;
+  vertical-align: -3px;
 }
 
 .menu-context {
@@ -15,49 +15,50 @@
 }
 
 .sub-menu-icon {
-  display:inline-block;
-  position:relative;
-  left:0px;
-  top:3px;
+  display: inline-block;
+  position: relative;
+  left: 0px;
+  top: 3px;
   .font-icon;
-  line-height:18px;
-  font-size:18px;
-  padding-left:10px;
-  content:@icon-angle-down;
+  line-height: 18px;
+  font-size: 18px;
+  padding-left: 10px;
+  content: @icon-angle-down;
 }
 
 /* Styles */
 
 .menubar {
-  position:relative;
-  box-sizing:border-box;
-  height:55px;
-  margin:0 20px;
-  padding:6px 0 10px 0;
+  position: relative;
+  box-sizing: border-box;
+  height: 55px;
+  margin: 0 20px;
+  padding: 6px 0 10px 0;
 
   & div, button {
-    box-sizing:border-box;
-    display:inline-block;
-    vertical-align:middle;
+    box-sizing: border-box;
+    display: inline-block;
+    vertical-align: middle;
   }
 
 }
 
 .menu-separator {
-  box-sizing:content-box;
-  width:1px;
-  height:30px;
-  margin:6px 19px 3px 19px;
-  background-color:@border-color;
+  box-sizing: content-box;
+  width: 1px;
+  height: 30px;
+  margin: 6px 19px 3px 19px;
+  background-color: @border-color;
 }
 
 .menu-button {
-  height:30px;
-  min-width:110px;
-  margin:6px 0 3px 0;
-  color:@text-color;
-  background-color:@button-background-color;
-  border:1px solid @border-color;
+  position: relative;
+  height: 30px;
+  min-width: 110px;
+  margin: 6px 0 3px 0;
+  color: @text-color;
+  background-color: @button-background-color;
+  border: 1px solid @border-color;
   border-radius: @border-radius;
 
   &:not(.last) {
@@ -66,9 +67,9 @@
 
   &+ .default-button {
     .font-text-normal(@bold);
-    background-color:@palette-bsi-green;
-    color:@palette-white;
-    border:none;
+    background-color: @palette-bsi-green;
+    color: @palette-white;
+    border: none;
   }
 
   &:hover {
@@ -76,26 +77,28 @@
   }
 
   &+ .default-button:hover {
-    color:@palette-white;
-    background-color:@default-button-background-color;
+    color: @palette-white;
+    background-color: @default-button-background-color;
   }
 
   &:focus {
-    color: @palette-white;
-    border-color: @focus-color;
-    background-color: @focus-color;
     outline: none;
   }
 
+  &:focus:before {
+    .overlay(-3px, -3px, 6px, 6px);
+    .focus-border;
+    border-radius: @border-radius;
+  }
 }
 
 .menu-item {
   /* vertical-align:middle only works with line-height */
-  height:39px;
-  line-height:39px;
-  white-space:nowrap;
-  cursor:pointer;
-  padding-top:1px;
+  height: 39px;
+  line-height: 39px;
+  white-space: nowrap;
+  cursor: pointer;
+  padding-top: 1px;
   display: inline-block;
 
   &[data-icon]:before {
@@ -103,23 +106,23 @@
   }
 
   &[data-icon]:hover:before {
-    color:@hover-color;
+    color: @hover-color;
   }
 
   &:hover {
-    color:@hover-color;
+    color: @hover-color;
   }
 
   &.disabled {
-    color:@disabled-color;
+    color: @disabled-color;
   }
 
   &:not(.last) {
-    margin-right:14px;
+    margin-right: 14px;
   }
 
   &.menu-open {
-    color:@active-color;
+    color: @active-color;
   }
 
   &.has-submenu:after {
@@ -133,11 +136,11 @@
 }
 
 .menu-right {
-  float:right;
-  height:23px;
+  float: right;
+  height: 23px;
 
   &:not(.last) {
-    margin-right:33px;
+    margin-right: 33px;
   }
 }
 
@@ -146,65 +149,64 @@
 }
 
 .popup {
-  position:absolute;
-  margin:auto;
-  z-index:10;
+  position: absolute;
+  margin: auto;
+  z-index: 10;
 
   & > .popup-head {
-    position:absolute;
-    box-sizing:border-box;
-    line-height:39px;
-    padding:0px 13px;
+    position: absolute;
+    box-sizing: border-box;
+    line-height: 39px;
+    padding: 0px 13px;
     white-space: nowrap;
-    background-color:white;
-    border:solid 1px @popup-border-color;
-    border-bottom:none;
+    background-color: white;
+    border: solid 1px @popup-border-color;
+    border-bottom: none;
     .drop-shadow();
   }
 }
 
 .popup-body {
-  position:absolute;
-  top:39px;
-  border:solid 1px @popup-border-color;
-  background-color:@palette-white;
+  position: absolute;
+  top: 39px;
+  border: solid 1px @popup-border-color;
+  background-color: @palette-white;
   .drop-shadow();
 
   & > .menu-item {
-    border-bottom:solid 1px @popup-border-color;
-    display:block;
-    width:100%;
-    padding-left:15px;
+    border-bottom: solid 1px @popup-border-color;
+    display: block;
+    width: 100%;
+    padding-left: 15px;
   }
 
   & > .menu-item:last-child {
-    border-bottom:none;
+    border-bottom: none;
   }
 }
 
 .popup-head {
-
-  color:@active-color;
+  color: @active-color;
 
   &.has-submenu:after {
     .sub-menu-icon;
     transform: rotate(180deg);
-    padding-right:10px;
-    padding-left:0;
-    top:5px;
+    padding-right: 10px;
+    padding-left: 0;
+    top: 5px;
   }
 
   &[data-icon]:before {
     .menu-icon(attr(data-icon));
-    color:@hover-color;
+    color: @hover-color;
   }
 }
 
 .popup-deco {
-  position:absolute;
-  top:39px;
-  height:1px;
-  left:1px;
-  background-color:@palette-white;
+  position: absolute;
+  top: 39px;
+  height: 1px;
+  left: 1px;
+  background-color: @palette-white;
 }
 

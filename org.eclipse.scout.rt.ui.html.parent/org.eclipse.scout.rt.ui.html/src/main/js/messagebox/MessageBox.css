@@ -64,12 +64,7 @@
     .focus-border;
     z-index: 1;
 
-    position: absolute;
-    content: '';
-    left: 2px;
-    top: 2px;
-    height: calc(~"100% - 4px");
-    width: calc(~"100% - 4px");
+    .overlay(2px, 2px, -4px, -4px);
   }
 
   & > button:first-child:focus:before {
