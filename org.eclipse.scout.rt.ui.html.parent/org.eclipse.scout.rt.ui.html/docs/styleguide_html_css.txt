@@ -1,0 +1,62 @@
++---------------------------------+
+| CSS Style Guide      |
++---------------------------------+
+
+Als Basis dient der Google HTML/CSS StyleGuide:
+https://google-styleguide.googlecode.com/svn/trunk/htmlcssguide.xml
+
+### CSS
+- Leerschlag nach dem Doppelpunkt.
+- Leerschlag vor {
+- Einrückung mit 2 Leerschlägen wie im JS (keine Tabs)
+- Trennung von Wörter mit Bindestrich
+- Abkürzungen verwenden für padding und margin also margin:
+  So:
+  margin: 0 5px
+
+  So nicht:
+  margin: 0 5px 0 5px;
+
+- Abkürzungen verwenden für Farben:
+  So:
+  color: #ccc;
+
+  So nicht:
+  color: #cccccc
+
+- Unit weglassen bei 0
+- Universelle Klassen verwenden sofern sinnvoll
+  z.B. selected anstatt row-selected.
+  Dann kann man die CSS-Klassen kombinieren (z.B. .table-row.selected) und wir haben nicht für dasselbe immer neue Klassen-Namen.
+
+- Sortierung der Properties ist nicht nötig
+- Wenn ein Style ergänzt / überschrieben wird, soll man nur die Differenz definieren. Z.B.
+
+  .ab {
+    border: 1px solid black;
+  }
+  .ab.selected {
+    So:
+    border-color: red;
+
+    So nicht:
+    border: 1px solid red;
+  }
+
+### LESS
+- Mixins einsetzen für häufig genutze Konstrukte
+  z.B. .drop-shadow
+- Mixins einsetzen für Vendor-abhängige Stlyes
+  Also sobald ein Vendor-Prefix verwendet werden muss, dies in ein mixin auslagern.
+  Z.B.:
+  .animation-name(@name) {
+    -webkit-animation-name: @name;
+    -moz-animation-name: @name;
+    -ms-animation-name: @name;
+    -o-animation-name: @name;
+    animation-name: @name;
+  }
+  Vorher bitte prüfen, ob der Prefix wirklich noch nötig ist, am besten über caniuse.com
+
+- Variablen einsetzen wenn Werte abhängig voneinander sind -> hiflt bei Refactoring.
+- & einsetzen für bessere Gruppierung
