@@ -7,9 +7,9 @@ scout.OfficeAddIn.prototype._render = function($parent) {
   var that = this;
   this.$parent = $parent;
 
-  this.$mscomSend = $parent.appendDiv('_js2mscom', 'officeaddin','');
+  this.$mscomSend = $('#_js2mscom');
 
-  this.$mscomRecv = $parent.appendDiv('_mscom2js', 'officeaddin','');
+  this.$mscomRecv = $('#_mscom2js');
   this.$mscomRecv.click(function(){that._mscomRecv();});
   this._notImplementedMessage=JSON.stringify({'op':'0', 'status':'error', 'message':'Office is not attached'});
 };
@@ -27,17 +27,17 @@ scout.OfficeAddIn.prototype._mscomSend = function(serialJson) {
 scout.OfficeAddIn.prototype._mscomRecv = function() {
   var data=JSON.parse(this.$mscomRecv.html());
   this.$mscomRecv.html(' ');
-  this.session.send('mscomEvent', this.id, data);
+  this.session.send('inbound', this.id, data);
 };
 
 /* event handling */
 
 scout.OfficeAddIn.prototype.onModelAction = function(event) {
-  if (event.type === 'invoke') {
+  if (event.type === 'outbound') {
     var data=this._mscomSend(JSON.stringify(event));
     data.ref=event.ref;
     //return ref, status=success|error+message|timeout
-    this.session.send('invokeResult', this.id, data);
+    this.session.send('inbound', this.id, data);
   }
   else {
     scout.OfficeAddIn.parent.prototype.onModelAction.call(this, event);
