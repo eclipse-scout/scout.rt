@@ -45,8 +45,8 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
   // add addition rectangle for hover and event handling
   $('svg.select-chart')
     .appendSVG('rect', '', 'select-events')
-    .attr('width', 75)
-    .attr('height', 60)
+    .attr('width', 60)
+    .attr('height', 45)
     .attr('fill', 'none')
     .attr('pointer-events', 'all')
     .click(function() {
@@ -204,12 +204,10 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
   }
 
   function chartSelect($chart) {
-    var chart = $chart.attr('id');
-
     $chart.siblings().removeClassSVG('selected');
     $chart.addClassSVG('selected');
 
-    if (chart == 'ChartScatter') {
+    if ($chart.hasClassSVG('chart-scatter')) {
       $yAxisSelect.animateAVCSD('width', 175);
     } else {
       $yAxisSelect.animateAVCSD('width', 0);
@@ -220,7 +218,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
     var $axis = $(this),
       group = $axis.data('group');
 
-    $axis.siblings().animateAVCSD('height', 26);
+    $axis.siblings().animateAVCSD('height', 30);
 
     if (group >= 0) {
       $axis.animateAVCSD('height', 42);

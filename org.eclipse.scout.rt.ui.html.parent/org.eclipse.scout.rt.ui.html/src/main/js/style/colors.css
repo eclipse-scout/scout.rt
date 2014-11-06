@@ -44,8 +44,8 @@
 
 @body-background-color: @palette-light-gray-6;
 @border-color: @palette-light-gray-3;
-@chart-color-1: @palette-light-gray-0;
-@chart-color-2: @palette-light-gray-4;
+@chart-color-1: @palette-gray;
+@chart-color-2: @palette-light-gray-3;
 @control-background-color: @palette-white;
 @highlight-color: @palette-bsi-orange;
 

@@ -13,7 +13,7 @@ scout.Scrollbar2 = {};
  */
 // TODO AWE: (scrollbar) merge with Scrollbar.js or rename to ScrollbarWrapper(?)
 scout.Scrollbar2.install = function($container, options) {
-  var prettyScrollbars = true;
+  var prettyScrollbars = false;
   if (prettyScrollbars) {
     $.log.debug('use native scrollbars for container ' + scout.graphics.debugOutput($container));
     $container.

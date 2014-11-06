@@ -5,11 +5,12 @@
 /* chart - type select */
 .chart-select{
   float: left;
+  padding: 10px 40px 10px 20px;
 }
 
 svg.select-chart{
-  height: 65px;
-  width: 80px;
+  height: 60px;
+  width: 65px;
   display: block;
 }
 
@@ -18,88 +19,120 @@ rect.select-events{
 }
 
 rect.select-fill, circle.select-fill {
-  fill: #e2e2e2;
+  fill: @chart-color-2;
 }
 
 path.select-fill-line, line.select-fill-line {
-  stroke: #e2e2e2;
-  fill: #fff;
+  stroke: @chart-color-2;
+  fill: @palette-white;
   stroke-width: 3px;
   stroke-linejoin: round;
   stroke-linecap: round;
 }
 
 path.select-fill-pie {
-  stroke: #fff;
-  fill: #e2e2e2;
+  stroke: @palette-white;
+  fill: @chart-color-2;
   stroke-width: 1px;
   stroke-linejoin: round;
   stroke-linecap: round;
 }
 
-svg.select-chart:hover rect.select-fill,
-svg.select-chart:hover circle.select-fill,
-svg.select-chart:hover path.select-fill-pie {
-  fill: #ccc;
+svg.select-chart:hover {
+  & rect.select-fill, & circle.select-fill, & path.select-fill-pie {
+    fill: @active-color;
+  }
+
+  & path.select-fill-line, & line.select-fill-line {
+    stroke: @active-color;
+  }  
 }
 
-svg.select-chart:hover path.select-fill-line,
-svg.select-chart:hover line.select-fill-line {
-  stroke: #ccc;
-}
+svg.select-chart.selected {
+  & rect.select-fill, & circle.select-fill, & path.select-fill-pie {
+    fill: @highlight-color;
+  }
 
-svg.select-chart.selected rect.select-fill,
-svg.select-chart.selected circle.select-fill,
-svg.select-chart.selected path.select-fill-pie{
-fill: @highlight-color;
-}
-
-svg.select-chart.selected path.select-fill-line,
-svg.select-chart.selected line.select-fill-line {
-  stroke: @highlight-color;
+  & path.select-fill-line, & line.select-fill-line {
+    stroke: @highlight-color;
+  }  
 }
 
 /* chart - axis and data select */
 
 .xaxis-select, .yaxis-select, .data-select {
   float: left;
+  margin-top: 10px;
   width: 175px;
   display: inline-block;
   overflow: hidden;
+}
+
+.xaxis-select{
+  margin-right: 15px;
 }
 
 .yaxis-select {
   width: 0px;
 }
 
+.data-select{
+  margin-left: 15px;
+  margin-right: 15px;
+}
+
+
 .select-axis, .select-data {
   position: relative;
-  margin:5px 10px 0px 15px;
   padding-left: 25px;
-  padding-top: 4px;
-  height: 26px;
-  line-height: 21px;
-  width: 150px;
-  background-color: #e2e2e2;
+  height: 30px;
+  line-height: 30px;
+  width: 100%;
   cursor: pointer;
   overflow: hidden;
+  border-top: 1px solid @color-bench-light-border;
+  border-left: 1px solid @color-bench-light-border;
+  border-right: 1px solid @color-bench-light-border;
+  
   text-overflow: ellipsis;
+
+  &:hover {
+    color: @active-color;
+  }
+  
+  &:last-child{
+    border-bottom: 1px solid @color-bench-light-border;
+  }
+    
+  &.selected {
+    background-color: @highlight-color;
+    color: @palette-white;
+    border-top: 1px solid transparent;
+    border-left: 1px solid @highlight-color;
+    border-right: 1px solid @highlight-color;
+    border-bottom: 1px solid transparent;
+  }  
+
+  &.selected + & {
+    border-top: 1px solid transparent;
+  }  
+
 }
 
 .select-axis-group {
   position: relative;
+  top: -7px;
   font-size: 10px;
   line-height: 12px;
+  display: none;
+  
+  .selected > & {
+    display: block;
+  }
 }
 
-.select-axis:hover, .select-data:hover {
-  background-color: #ccc;
-}
 
-.select-axis.selected, .select-data.selected {
-  background-color: @highlight-color;
-  color: #fff;
-}
+
 
 .select-axis:before, .select-data:before {
   color: #fff !important;
@@ -146,6 +179,10 @@ svg.select-chart.selected line.select-fill-line {
 .chart-main {
 width: 1000px;
 height: 320px;
+outline: none;
+  & :focus {
+      outline: none;
+    }
 }
 
 rect.main-chart, circle.main-chart {
@@ -153,6 +190,7 @@ rect.main-chart, circle.main-chart {
   stroke: #fff;
   stroke-width: 0px;
   cursor: pointer;
+    
 }
 
 circle.main-chart {
