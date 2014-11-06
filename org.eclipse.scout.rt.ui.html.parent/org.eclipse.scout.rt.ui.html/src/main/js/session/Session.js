@@ -109,6 +109,8 @@ scout.Session.prototype.getOrCreateModelAdapters = function(ids, parent) {
   return adapters;
 };
 
+// FIXME IMO: commented by A.WE
+/*
 scout.Session.prototype._createRootModelAdapters = function() {
   var $parent=this.$entryPoint;
   var id, data;
@@ -121,6 +123,7 @@ scout.Session.prototype._createRootModelAdapters = function() {
     }
   }
 };
+*/
 
 
 /**
@@ -366,10 +369,16 @@ scout.Session.prototype.onModelAction = function(event) {
     // cannot use getOrCreateModelAdapter here since Session doesn't have a parent
     var sessionData = this._getAdapterData(event.clientSession);
     this.locale = new scout.Locale(sessionData.locale);
-    this._createRootModelAdapters();
-    this.desktop = this.getModelAdapter(sessionData.desktop);
+    var desktopData = this._getAdapterData(sessionData.desktop);
+    this.desktop = this.objectFactory.create(desktopData);
+    this.desktop.render(this.$entryPoint);
+// FIXME IMO: commented by A.WE
+//    this._createRootModelAdapters();
+//    this.desktop = this.getModelAdapter(sessionData.desktop);
   }
 };
+
+
 
 /**
  * Returns the adapter-data sent with the JSON response from the adapter-data cache. Note that this operation
