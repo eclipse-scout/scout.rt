@@ -66,9 +66,13 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
   public AbstractJsonSession() {
     m_currentJsonResponse = new JsonResponse();
-    m_jsonAdapterFactory = new JsonAdapterFactory(); // FIXME BSH Make customizable
+    m_jsonAdapterFactory = createJsonAdapterFactory();
     m_jsonAdapterRegistry = new JsonAdapterRegistry();
     m_unregisterAdapterSet = new HashSet<String>();
+  }
+
+  protected JsonAdapterFactory createJsonAdapterFactory() {
+    return new JsonAdapterFactory();
   }
 
   @Override
