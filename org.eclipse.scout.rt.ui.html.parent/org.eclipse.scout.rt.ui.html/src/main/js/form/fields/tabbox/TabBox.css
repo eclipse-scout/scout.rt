@@ -5,13 +5,15 @@
   background-position: center bottom;
 
   & > button {
+    position: relative;
     .font-text-normal(@bold);
     color: @title-color;
     border: none;
     background-color: transparent;
     height: 32px;
-    padding: 0 10px;
+    padding: 0  20px;
     border-bottom: solid 3px transparent;
+    border-top: solid 1px transparent;
     cursor: pointer;
 
     &.selected {
@@ -26,12 +28,19 @@
     &:hover {
       color: @hover-color;
     }
-
+    
     &:focus {
       outline: none;
-      color: @focus-color;
-      border-bottom-color: @focus-color
     }
+
+    &:focus:before {
+      content: '>';
+      position: absolute;
+      color: @active-color;
+      left: 5px;
+      //border-left: solid 2px @active-color;
+    }
+
   }
 }
 

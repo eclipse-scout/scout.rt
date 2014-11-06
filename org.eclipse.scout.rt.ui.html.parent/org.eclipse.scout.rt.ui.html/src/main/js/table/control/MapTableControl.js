@@ -9,7 +9,7 @@ scout.MapTableControl.FILTER_KEY = 'MAP';
 
 scout.MapTableControl.prototype._renderContent = function($parent) {
   this.$container = $parent
-    .appendSVG('svg', 'MapContainer')
+    .appendSVG('svg', '', 'map-container')
     .attrSVG('viewBox', '5000 -100000 200000 83000')
     .attrSVG('preserveAspectRatio', 'xMidYMid');
 

@@ -250,8 +250,10 @@ scout.GraphTableControl.prototype.isContentAvailable = function() {
 };
 
 scout.GraphTableControl.prototype.onResize = function() {
-  this.wContainer = this.$container.width();
-  this.hContainer = this.$container.height();
-  this.kelvin = 600;
-  this.doPhysics();
+  if (this.contentRendered) {
+    this.wContainer = this.$container.width();
+    this.hContainer = this.$container.height();
+    this.kelvin = 600;
+    this.doPhysics();
+  }
 };

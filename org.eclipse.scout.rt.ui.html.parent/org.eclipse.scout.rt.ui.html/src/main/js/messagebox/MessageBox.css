@@ -40,7 +40,7 @@
   & button {
     position: relative;
     padding: 12px;
-    background-color: @palette-light-gray-4;
+    background-color: @palette-light-gray-5;
     border: 1px solid @color-messagebox-border;
   }
 
@@ -66,10 +66,10 @@
 
     position: absolute;
     content: '';
-    left: -1px;
-    top: -1px;
-    height: calc(~"100% + 2px");
-    width: calc(~"100% + 2px");
+    left: 2px;
+    top: 2px;
+    height: calc(~"100% - 4px");
+    width: calc(~"100% - 4px");
   }
 
   & > button:first-child:focus:before {

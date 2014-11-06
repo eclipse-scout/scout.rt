@@ -57,7 +57,7 @@
   &:before {
     .font-icon;
     font-size: 22px;
-    color: @palette-light-gray-0;
+    color: @footer-color;
   }
   
   &:last-child:after{
@@ -75,7 +75,7 @@
 
   &.disabled:hover, &.disabled:before{
     cursor: default;
-    color: @palette-light-gray-4;
+    color: @footer-disabled-color;
   }
 
   &.selected:before {
@@ -122,7 +122,7 @@
   display: none;
   width: 0px;
   height: @table-footer-height;
-  color: @palette-light-gray-0;
+  color: @footer-color;
   cursor: pointer;
   line-height: 19px;
     

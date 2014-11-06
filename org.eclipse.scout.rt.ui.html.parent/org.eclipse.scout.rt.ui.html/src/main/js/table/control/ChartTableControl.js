@@ -33,7 +33,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
   });
 
   // create container
-  var $chartSelect = $parent.appendDiv('ChartSelect');
+  var $chartSelect = $parent.appendDIV('chart-select');
 
   // create chart types for selection
   addSelectBar($chartSelect);
@@ -58,8 +58,8 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
   $('svg.select-chart').first().addClassSVG('selected');
 
   // create container for x/y-axis
-  var $xAxisSelect = $parent.appendDiv('XAxisSelect'),
-    $yAxisSelect = $parent.appendDiv('YAxisSelect');
+  var $xAxisSelect = $parent.appendDIV('xaxis-select'),
+    $yAxisSelect = $parent.appendDIV('yaxis-select');
 
   // all x/y-axis for selection
   for (var c1 = 0; c1 < columns.length; c1++) {
@@ -102,8 +102,8 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
   });
 
   // create container for data
-  var $dataSelect = $parent.appendDiv('DataSelect');
-  $dataSelect.appendDiv('', 'select-data data-count', countDesc)
+  var $dataSelect = $parent.appendDIV('data-select');
+  $dataSelect.appendDIV('select-data data-count', countDesc)
     .data('column', -1);
 
   // all data for selection
@@ -111,7 +111,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
     var column2 = columns[c2];
 
     if ((column2.type == 'number')) {
-      $dataSelect.appendDiv('', 'select-data data-sum', column2.text)
+      $dataSelect.appendDIV('select-data data-sum', column2.text)
         .data('column', column2);
     }
   }
@@ -125,13 +125,13 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
   $('.select-data').first().addClass('selected');
 
   // draw first chart
-  var $chartMain = $parent.appendSVG('svg', 'ChartMain')
+  var $chartMain = $parent.appendSVG('svg', '', 'chart-main')
     .attrSVG('viewBox', '0 0 1000 320')
     .attr('preserveAspectRatio', 'xMinYMin');
   drawChart();
 
   function addSelectBar($container) {
-    var $svg = $container.appendSVG('svg', 'ChartBar', 'select-chart');
+    var $svg = $container.appendSVG('svg', '', 'chart-bar select-chart');
     var show = [2, 4, 3, 3.5, 5];
 
     for (var s = 0; s < show.length; s++) {
@@ -144,7 +144,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
   }
 
   function addSelectStacked($container) {
-    var $svg = $container.appendSVG('svg', 'ChartStacked', 'select-chart'),
+    var $svg = $container.appendSVG('svg', '', 'chart-stacked select-chart'),
       show = [2, 4, 3.5, 5];
 
     for (var s = 0; s < show.length; s++) {
@@ -157,7 +157,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
   }
 
   function addSelectLine($container) {
-    var $svg = $container.appendSVG('svg', 'ChartLine', 'select-chart'),
+    var $svg = $container.appendSVG('svg', '', 'chart-line select-chart'),
       show = [0, 1.7, 1, 2, 1.5, 3],
       pathPoints = [];
 
@@ -170,7 +170,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
   }
 
   function addSelectPie($container) {
-    var $svg = $container.appendSVG('svg', 'ChartPie', 'select-chart'),
+    var $svg = $container.appendSVG('svg', '', 'chart-pie select-chart'),
       show = [
         [0, 0.1],
         [0.1, 0.25],
@@ -184,7 +184,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
   }
 
   function addSelectScatter($container) {
-    var $svg = $container.appendSVG('svg', 'ChartScatter', 'select-chart');
+    var $svg = $container.appendSVG('svg', '', 'chart-scatter select-chart');
 
     $svg.appendSVG('line', '', 'select-fill-line')
       .attr('x1', 3).attr('y1', 53)
@@ -251,7 +251,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
   }
 
   function drawChart() {
-    var chart = $('.selected', $chartSelect).attr('id');
+    var $chart = $('.selected', $chartSelect);
 
     // remove axis and chart
     $chartMain.children('.main-axis, .main-axis-x, .main-axis-y')
@@ -273,7 +273,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
     xAxis = matrix.addAxis(axis, axisGroup);
 
     // in case of scatter
-    if (chart == 'ChartScatter') {
+    if ($chart.hasClassSVG('chart-scatter')) {
       var axis2 = $('.selected', $yAxisSelect).data('column'),
         axis2Group = $('.selected', $yAxisSelect).data('group');
 
@@ -284,19 +284,19 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
     var cube = matrix.calculateCube();
 
     // based on chart type: set class and draw chart
-    if (chart == 'ChartBar') {
+    if ($chart.hasClassSVG('chart-bar')) {
       $('.select-axis', $xAxisSelect).removeClass('axis-ver axis-around').addClass('axis-hor');
       drawBar(xAxis, dataAxis, cube);
-    } else if (chart == 'ChartStacked') {
+    } else if ($chart.hasClassSVG('chart-stacked')) {
       $('.select-axis', $xAxisSelect).removeClass('axis-hor axis-around').addClass('axis-ver');
       drawStacked(xAxis, dataAxis, cube);
-    } else if (chart == 'ChartLine') {
+    } else if ($chart.hasClassSVG('chart-line')) {
       $('.select-axis', $xAxisSelect).removeClass('axis-ver axis-around').addClass('axis-hor');
       drawLine(xAxis, dataAxis, cube);
-    } else if (chart == 'ChartPie') {
+    } else if ($chart.hasClassSVG('chart-pie')) {
       $('.select-axis', $xAxisSelect).removeClass('axis-ver axis-hor').addClass('axis-around');
       drawPie(xAxis, dataAxis, cube);
-    } else if (chart == 'ChartScatter') {
+    } else if ($chart.hasClassSVG('chart-scatter')) {
       $('.select-axis', $xAxisSelect).removeClass('axis-ver axis-around').addClass('axis-hor');
       $('.select-axis', $yAxisSelect).addClass('axis-up');
       drawScatter(xAxis, yAxis, dataAxis, cube);

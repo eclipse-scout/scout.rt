@@ -12,8 +12,9 @@
 @palette-light-gray-1: #ccc;
 @palette-light-gray-2: #ddd;
 @palette-light-gray-3: #d3d3d3;
-@palette-light-gray-4: #f6f6f6;
-@palette-light-gray-5: #fefefe;
+@palette-light-gray-4: #e3e3e3;
+@palette-light-gray-5: #f6f6f6;
+@palette-light-gray-6: #fefefe;
 
 @palette-white:#fff;
 
@@ -33,7 +34,7 @@
 @color-nav-text: @palette-white;
 
 @color-bench: @palette-white;
-@color-bench-light: @palette-light-gray-4;
+@color-bench-light: @palette-light-gray-5;
 @color-bench-light-border: @palette-light-gray-2;
 @color-bench-select: #ECF3F7;
 @color-bench-select-border: @palette-bsi-green;
@@ -41,9 +42,10 @@
 @color-error: @palette-red;
 @color-error-light: @palette-light-red;
 
-@body-background-color: @palette-light-gray-5;
+@body-background-color: @palette-light-gray-6;
 @border-color: @palette-light-gray-3;
-@chart-color-1: @palette-bsi-green;
+@chart-color-1: @palette-light-gray-0;
+@chart-color-2: @palette-light-gray-4;
 @control-background-color: @palette-white;
 @highlight-color: @palette-bsi-orange;
 
@@ -58,7 +60,10 @@
 @highlight-color: @palette-bsi-orange;
 
 @popup-border-color: @palette-light-gray-1;
-@button-background-color: @palette-light-gray-4;
+@button-background-color: @palette-light-gray-5;
 @default-button-background-color: @palette-bsi-light-green;
 
 @title-color: @palette-dark-gray-1;
+
+@footer-color: @palette-gray;
+@footer-disabled-color: @palette-light-gray-4;
