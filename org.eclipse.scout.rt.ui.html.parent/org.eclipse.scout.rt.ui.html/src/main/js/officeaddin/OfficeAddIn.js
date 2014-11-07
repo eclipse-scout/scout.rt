@@ -40,10 +40,15 @@ scout.OfficeAddIn.prototype._mscomRecv = function() {
 
 scout.OfficeAddIn.prototype.onModelAction = function(event) {
   if (event.type === 'outbound') {
-    var data=this._mscomSend(JSON.stringify(event));
-    data.ref=event.ref;
-    //return ref, status=success|error+message|timeout
-    this.session.send('inbound', this.id, data);
+    if(event.status==='request'){
+      var data=this._mscomSend(JSON.stringify(event));
+      data.ref=event.ref;
+      //return ref, status=success|error+message|timeout
+      this.session.send('inbound', this.id, data);
+    }
+    else{
+      this.$mscomSend.html(JSON.stringify(event));
+    }
   }
   else {
     scout.OfficeAddIn.parent.prototype.onModelAction.call(this, event);
