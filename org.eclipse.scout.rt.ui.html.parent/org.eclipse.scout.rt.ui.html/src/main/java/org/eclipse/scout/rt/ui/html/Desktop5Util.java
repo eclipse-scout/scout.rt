@@ -11,13 +11,18 @@
 package org.eclipse.scout.rt.ui.html;
 
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 
 // TODO AWE/CGU: (scout) siehe Desktop von Widget-App. Reflection Hack entfernen wenn
 // in Scout erweitert
 public final class Desktop5Util {
+
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(Desktop5Util.class);
 
   @SuppressWarnings("unchecked")
   public static List<Object> getAddOns(IDesktop desktop) {
@@ -26,7 +31,8 @@ public final class Desktop5Util {
       return (List<Object>) method.invoke(desktop);
     }
     catch (ReflectiveOperationException e) {
-      throw new RuntimeException(e);
+      LOG.warn("method getAddOns does not exist in " + desktop);
+      return Collections.emptyList();
     }
   }
 
