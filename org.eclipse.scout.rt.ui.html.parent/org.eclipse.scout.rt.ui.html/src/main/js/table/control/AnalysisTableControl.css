@@ -2,154 +2,194 @@
   content: @icon-target;
 }
 
-.analysis-container{
-position: relative;
-height: 100%;
-width: 100%;
-}
+/* command buttons */
 
 .command-container {
-position: absolute;
-height: 100%;
-width: 10%;
-left: 45%;
+  float: left;
+  padding: 15px 20px 10px 20px;
+  
+
+  & .command {
+    position: relative;
+    width: 90px;
+    height: 90px;
+    cursor: pointer;
+    text-align: center;
+    white-space: normal;
+    padding: 38px 5px 0px 5px;
+    overflow: visible;
+  }
+    
+  & .command:before {
+    position: absolute;
+    top: 0;
+    left: 0;
+    .font-icon;
+    color: @chart-color-empty;
+    font-size: 34px;
+    width: 90px;
+    text-align: center;
+  }
+
+  & .command.new:before {
+    content: @icon-add;
+  }
+
+  & .command.delete:before { content: @icon-remove;  }
+  & .command.search:before { content: @icon-search;  }
+  
+  & .command:hover { color: @active-color; }
+  & .command:hover:before { color: @active-color; }
+  
+  & .simulator {
+    padding: 10px 5px 0px 5px;
+    color: @chart-color-empty;
+  }
 }
 
-.command-container .separator {
-width: 80%;
-float: left;
-clear: both;
-min-height: 16px;
-color: #bfbfbf;
-white-space: pre-wrap;
-}
-
-.command-container .command {
-position:relative;
-width: 80%;
-float: left;
-clear: both;
-heigth: 26px;
-line-height: 26px;
-background-color: #e2e2e2;
-cursor: pointer;
-margin-bottom: 5px;
-padding: 2px 6px 0px 6px;
-overflow: hidden;
-white-space: nowrap;
-text-overflow: ellipsis;
-}
-
-.command-container .command:hover {
-background-color: #ccc;
-}
+/* venn */
 
 .venn-container {
-position: absolute;
-height: 100%;
-width: 45%;
-left: 0%;
-top: 0%;
+  float: left;
+  height: 335px;
+  width: 490px;
 }
 
 rect.venn-all {
-fill: #fff;
-stroke: #ddd;
-stroke-width: 2;
+  fill: @palette-white;
+  stroke: @chart-color-axis-line;
+  stroke-width: 2;
 }
 
-text.venn-all-text {
-fill: #aaa;
-font-size: 10px;
-text-anchor: end;
+text.venn-all-text{
+  fill: @chart-color-axis-text;
+  font-size: 10px;
+  text-anchor: end;
 }
 
+text.venn-button{
+  fill: @chart-color-axis-text;
+  font-size: 10px;
+  cursor: pointer;
+  text-anchor: end;
+  text-decoration: underline;
+
+  &:hover{
+    fill: @active-color;
+  }
+}
 
 circle.venn-circle {
-fill: none;
-stroke: @chart-color-1;
-stroke-width: 2;
-cursor: pointer;
-stroke-opacity: 1;
+  fill: none;
+  stroke: @chart-color-empty;
+  stroke-width: 2;
+  cursor: pointer;
+  stroke-opacity: 1;
+  
+  &.selected, &:hover{
+    stroke: @highlight-color;
+  }
 }
 
 .venn-set {
-fill: rgba(254, 153, 21, 0.1);
-opacity: 0;
+  fill: rgba(254, 153, 21, 0.1);
+  opacity: 0;
+  
+  &.selected {
+    opacity: 1;
+  }
 }
-
-.venn-set.selected {
-opacity: 1;
-}
-
 
 text.venn-circle-text {
-fill: #aaa;
-font-size: 10px;
-text-anchor: middle;
-alignment-baseline: middle;
+  fill: @chart-color-axis-text;
+  font-size: 10px;
+  text-anchor: middle;
+  alignment-baseline: middle;
 }
 
-circle.venn-circle.selected, circle.venn-circle:hover{
-stroke: @highlight-color;
+/* criteria overview */
+
+/* criteria box */
+
+.criteria-back {
+  position: absolute;
+  cursor: pointer;
+  top: 20px;
+  height: 20px;
+  width: 30px;
+  left: 780px;
+  
+  &:before {
+    position: relative;
+    top: -4px;
+    .font-icon;
+    color: @chart-color-axis-text;
+    font-size: 24px;
+    content: @icon-long-arrow-left;
+  }
+
+  &:hover:before {
+    color: @active-color;
+  }
 }
+
 
 .criteria-navigation {
-position: absolute;
-top: 0px;
-height: 20px;
-width: 30%;
-left: 55%;
+  position: absolute;
+  top: 20px;
+  height: 20px;
+  width: calc(50% - 30px);
+  left: 810px;
 }
 
 .criteria-navigation-item {
-float: left;
-padding-right: 20px;
-color: @chart-color-1;
-cursor: pointer;
-}
-
-.criteria-navigation-item:hover {
-text-decoration: underline;
-}
-
-.criteria-navigation-item:last-child {
-color: @highlight-color;
-cursor: default;
-}
-
-.criteria-navigation-item:last-child:hover {
-text-decoration: none;
-}
-
-.criteria-navigation-item:after{
-.font-icon;
-content:  @icon-angle-right;
-position: relative;
-left: 10px;
-display: inline-block;
-}
-
-.criteria-navigation-item:last-child:after {
-.font-icon;
-content: "";
-left: 0px;
+  float: left;
+  padding-right: 20px;
+  text-decoration: underline;
+  color: @chart-color-axis-text;
+  cursor: pointer;
+  
+  &:hover {
+    color: @active-color;
+  }
+  
+  &:last-child {
+    color: @highlight-color;
+    cursor: default;
+  }
+  
+  &:after{
+    .font-icon;
+    content:  @icon-angle-right;
+    position: relative;
+    left: 10px;
+    display: inline-block;
+  }
+  
+ &:last-child:after {
+    content: "";
+    left: 0px;
+  }
+  
 }
 
 .criteria-search {
-position: absolute;
-top: 0px;
-height: 20px;
-width: 10%;
-left: 90%;
+  position: absolute;
+  top: 20px;
+  height: 20px;
+  width: 100px;
+  right: 20px;
+  min-height: 20px;
+  font-size: 13px;
+  .text-field;
 }
 
 .criteria-container {
-position: absolute;
-top: 20px;
-height: ~"calc(100% - 40px)";
-width: 45%;
-left: 55%;
+  position: absolute;
+  top: 45px;
+  height: 275px;
+  width: ~"calc(100% - 800px)";
+  left: 780px;
 }
 
 .criteria-attribute, .criteria-entity {

@@ -24,7 +24,7 @@
   overflow: hidden;
   background-color: @color-bench;
   bottom: @table-footer-height;
-  border-top: 1px solid @color-bench-light-border;
+  border-top: 3px solid @color-bench-light-border;
   width: 100%;
   height: 0px;
   display: none;
@@ -103,7 +103,7 @@
   float: left;
   width: 200px;
   min-height: 26px;
-  font-size: 14px;
+  font-size: 13px;
   margin-top: (@table-footer-height - 26px) / 2;
   margin-left: @table-control-padding;
   .text-field;

@@ -14,8 +14,8 @@
   cursor: pointer;
   
   &.center {fill: @highlight-color;}
-  &.internal {fill: #bfbfbf;}
-  &.person {fill:@chart-color-1;}
+  &.internal {fill: @palette-light-gray-1;}
+  &.person {fill: @palette-gray;}
   &.department {fill: #80c1d0;}
   &.company {fill: #ffcc8a;}
 }

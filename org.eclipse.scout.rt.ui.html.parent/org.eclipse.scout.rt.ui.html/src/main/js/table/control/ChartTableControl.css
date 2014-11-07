@@ -5,7 +5,7 @@
 /* chart - type select */
 .chart-select{
   float: left;
-  padding: 10px 40px 10px 20px;
+  padding: 10px 40px 10px 30px;
 }
 
 svg.select-chart{
@@ -19,11 +19,11 @@ rect.select-events{
 }
 
 rect.select-fill, circle.select-fill {
-  fill: @chart-color-2;
+  fill: @chart-color-empty;
 }
 
 path.select-fill-line, line.select-fill-line {
-  stroke: @chart-color-2;
+  stroke: @chart-color-empty;
   fill: @palette-white;
   stroke-width: 3px;
   stroke-linejoin: round;
@@ -32,7 +32,7 @@ path.select-fill-line, line.select-fill-line {
 
 path.select-fill-pie {
   stroke: @palette-white;
-  fill: @chart-color-2;
+  fill: @chart-color-empty;
   stroke-width: 1px;
   stroke-linejoin: round;
   stroke-linecap: round;
@@ -84,7 +84,8 @@ svg.select-chart.selected {
 
 .select-axis, .select-data {
   position: relative;
-  padding-left: 25px;
+  padding-left: 8px;
+  padding-right: 20px;
   height: 30px;
   line-height: 30px;
   width: 100%;
@@ -117,126 +118,133 @@ svg.select-chart.selected {
     border-top: 1px solid transparent;
   }  
 
-}
-
-.select-axis-group {
-  position: relative;
-  top: -7px;
-  font-size: 10px;
-  line-height: 12px;
-  display: none;
+  & .select-axis-group {
+    position: relative;
+    top: -7px;
+    font-size: 10px;
+    line-height: 12px;
+    display: none;
+  }
   
-  .selected > & {
+  &.selected > .select-axis-group {
     display: block;
   }
-}
 
-
-
-
-.select-axis:before, .select-data:before {
-  color: #fff !important;
-  position: absolute;
-  font-size: 16px;
-  line-height: 16px;
-  left: 9px;
-  top: 6px;
-}
-
-.select-axis:before {
-  .font-icon;
-}
-
-.axis-ver.selected:before {
+  &:before {
+    color: @palette-white !important;
+    position: absolute;
+    font-size: 16px;
+    line-height: 16px;
+    right: 9px;
+    top: 6px;
+    .font-icon;
+  }
+    
+  
+  &.axis-ver.selected:before {
   content: @icon-long-arrow-down;
-}
-.axis-hor.selected:before {
-  content: @icon-long-arrow-right;
-  left: 5px;
-}
-.axis-around.selected:before {
-  content: @icon-rotate-right;
-  left: 6px;
-}
-.axis-up.selected:before {
-  content: @icon-long-arrow-up;
-}
-.data-count.selected:before {
-  content: @icon-count;
-  top: 5px;
-}
-.data-sum.selected:before {
-  content: @icon-sum;
-  top: 7px;
-}
-.data-median.selected:before {
-  content: @icon-median;
-  left: 6px;
-  top: 7px;
+  }
+  
+  &.axis-hor.selected:before {
+    content: @icon-long-arrow-right;
+    right: 5px;
+  }
+  
+  &.axis-around.selected:before {
+    content: @icon-rotate-right;
+    right: 6px;
+  }
+  
+  &.axis-up.selected:before {
+    content: @icon-long-arrow-up;
+  }
+  
+  &.data-count.selected:before {
+    content: @icon-count;
+    top: 3px;
+    right: 7px;
+  }
+  
+  &.data-sum.selected:before {
+    content: @icon-sum;
+    top: 4px;
+    right: 8px;
+  }
+  
+  &.data-median.selected:before {
+    content: @icon-median;
+    top: 4px;
+    right: 8px;
+  }
 }
 
 /* chart - main */
 .chart-main {
-width: 1000px;
-height: 320px;
-outline: none;
+  width: 1000px;
+  height: 320px;
+
   & :focus {
       outline: none;
     }
 }
 
-rect.main-chart, circle.main-chart {
-  fill: @chart-color-1;
-  stroke: #fff;
-  stroke-width: 0px;
-  cursor: pointer;
+.main-chart {
+
+  rect&, circle& {
+    fill: @chart-color-bar;
+    stroke: @palette-white;
+    stroke-width: 0px;
+    cursor: pointer;
+  }
     
-}
-
-circle.main-chart {
-  opacity: 0.7;
-}
-
-path.main-chart{
-  fill: @chart-color-1;
-  stroke: #fff;
-  stroke-width: 2px;
-  cursor: pointer;
-}
-
-
-line.main-chart {
-  stroke: @chart-color-1;
-  stroke-width: 4px;
-  stroke-linejoin: round;
-  stroke-linecap: round;
-}
-
-.main-chart:hover, .main-chart.selected {
-  fill: @highlight-color;
+  circle& {
+    opacity: 0.7;
+  }
+  
+  path& {
+    fill: @chart-color-bar;
+    stroke: @palette-white;
+    stroke-width: 2px;
+    cursor: pointer;
+  }
+  
+  line& {
+    stroke: @chart-color-bar;
+    stroke-width: 4px;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+  }
+  
+  &:hover {
+    fill: @active-color;
+  }
+  
+  &.selected {
+    fill: @highlight-color;
+  }   
 }
 
 
 line.main-axis {
-  stroke: #ddd;
+  stroke: @chart-color-axis-line;
   stroke-width: 1px;
 }
 
 text.main-axis {
-  fill: #fff;
+  fill: @palette-white;
   text-anchor: middle;
   dominant-baseline: middle;
 }
 
 text.main-axis-y {
-  fill: #aaa;
+  fill: @chart-color-axis-text;
   text-anchor: end;
   dominant-baseline: central;
   font-size: 10px;
   }
 
 text.main-axis-x, textPath.main-axis-x {
-  fill: #aaa;
+  fill: @chart-color-axis-text;
   text-anchor: middle;
   dominant-baseline: middle;
   font-size: 10px;

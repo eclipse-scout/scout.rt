@@ -15,34 +15,34 @@ scout.AnalysisTableControl.prototype.init = function(model, session) {
 scout.AnalysisTableControl.prototype._renderContent = function($parent) {
   this.$parent = $parent;
 
+  // commands
+  var $commandContainer = $parent.appendDiv('', 'command-container');
+
+  $commandContainer.appendDiv('', 'command new', 'Neues Kriterium').click(addCriteria);
+  $commandContainer.appendDiv('', 'command delete', 'Kriterium verwerfen').click(removeCriteria);
+  $commandContainer.appendDiv('', 'command search', 'Daten suchen');
+  $commandContainer.appendDiv('', 'command simulator', 'Simulator').click(simulateServer);
+
+
   // svg container for venn
   var $vennContainer = $parent
     .appendSVG('svg', '', 'venn-container')
-    .attrSVG('viewBox', '0 0 500 340')
+    .attrSVG('viewBox', '0 0 500 330')
     .attrSVG('preserveAspectRatio', 'xMinYMin')
     .on('click', clickCriteria)
     .on('contextmenu', clickSet);
 
   var $vennDefs = $vennContainer.appendSVG('defs', '', 'venn-defs');
+
   appendRect($vennContainer, 'venn-all');
 
-  // commands
-  var $commandContainer = $parent.appendDiv('', 'command-container');
-
-  $commandContainer.appendDiv('', 'command search', 'Daten anzeigen');
-  $commandContainer.appendDiv('', 'separator', '');
-  $commandContainer.appendDiv('', 'command new', 'Neues Kriterium').click(addCriteria);
-  $commandContainer.appendDiv('', 'command delete', 'Kriterium verwerfen').click(removeCriteria);
-  $commandContainer.appendDiv('', 'separator', '');
-  $commandContainer.appendDiv('', 'command union', 'Ansicht wechseln').click(switchShow);
-  $commandContainer.appendDiv('', 'command union', 'Vereinigungsmenge').click(setUnion);
-  $commandContainer.appendDiv('', 'command distinct', 'Schnittmenge').click(setIntersect);
-  $commandContainer.appendDiv('', 'separator', 'Eine beliebige Menge kann mit Hilfer der rechten Maustaste gesetzt werden');
-  $commandContainer.appendDiv('', 'command union', 'Simulator').click(simulateServer);
-
   // criteria container
+  var $criteriaBack = $parent.appendDiv('', 'criteria-back')
+    .on('click', '', backMap);
   var $criteriaNavigation = $parent.appendDiv('', 'criteria-navigation');
-  var $criteriaSearch = $parent.append('<input class="criteria-search"></input>').keyup(searchMap);
+  var $criteriaSearch = $parent.append('<input class="criteria-search"></input>')
+    .on('input paste', '', searchMap)
+    .attr('placeholder', scout.texts.get('filterBy'));
   var $criteriaContainer = $parent.appendDiv('', 'criteria-container');
   var containerWidth = parseFloat($criteriaContainer.css('width')),
     containerHeight = parseFloat($criteriaContainer.css('height'));
@@ -66,6 +66,16 @@ scout.AnalysisTableControl.prototype._renderContent = function($parent) {
   if (this.rootEntity) {
     addCriteria();
   }
+
+  // draw buttons
+  $vennContainer.appendSVG('text', '', 'venn-button', 'Schnittmenge')
+    .attr('x', 490).attr('y', 290)
+    .click(setIntersect);
+
+  $vennContainer.appendSVG('text', '', 'venn-button', 'Vereinigungsmenge')
+    .attr('x', 490).attr('y', 307)
+    .click(setUnion);
+
 
   function addCriteria() {
     // reset count
@@ -295,6 +305,10 @@ scout.AnalysisTableControl.prototype._renderContent = function($parent) {
       .click(closeMap);
   }
 
+  function backMap(event) {
+    $('.criteria-navigation-item:nth-last-child(2)', that.$container).click();
+  }
+
   function searchMap(event) {
     var $criteriaContainerTest = that.$container.appendDiv('', 'criteria-container');
     drawCriteria($criteriaContainerTest, that.rootEntity, $(event.target).val());
@@ -400,13 +414,17 @@ scout.AnalysisTableControl.prototype._renderContent = function($parent) {
 
   function drawVenn() {
     // remove all text
-    $('text', $vennContainer)
+    $('.venn-switch, .venn-circle-text', $vennContainer)
       .animateSVG('opacity', 0, 100, $.removeThis);
 
     // show count all data
     if (count.total) {
-      $vennContainer.appendSVG('text', '', 'venn-all-text', count.total + ' Datensätze')
+      $vennContainer.appendSVG('text', '', 'venn-all-text venn-switch', count.total + ' Datensätze')
         .attr('x', 490).attr('y', 28);
+
+      $vennContainer.appendSVG('text', '', 'venn-button venn-switch', 'Ansicht wechseln')
+        .attr('x', 490).attr('y', 273)
+        .click(switchShow);
     }
 
     // remove intersect elements
@@ -583,6 +601,11 @@ scout.AnalysisTableControl.prototype._renderContent = function($parent) {
       drawSetIntersect('12', r2, x2, y2, r1, x1, y1, r0, x0, y0);
       drawSetTriple('012', r2, x2, y2, r1, x1, y1, r0, x0, y0);
     }
+
+    // move buttons on top
+    $vennContainer.append($('.venn-button', $vennContainer));
+
+
   }
 
   function calcR(size, limit) {
@@ -646,7 +669,7 @@ scout.AnalysisTableControl.prototype._renderContent = function($parent) {
     var $rect = $def.appendSVG('rect', '', '')
       .attr('x', 5).attr('y', 15)
       .attr('width', 490).attr('height', 300)
-      .attr('rx', 10).attr('ry', 10);
+      .attr('rx', 5).attr('ry', 8);
 
     if (claz) $rect.attr('class', claz);
     if (fill) $rect.attr('fill', fill);
