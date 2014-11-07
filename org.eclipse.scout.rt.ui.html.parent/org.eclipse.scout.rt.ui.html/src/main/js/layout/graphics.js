@@ -27,8 +27,8 @@ scout.graphics = {
     var size = vararg instanceof scout.Dimension ?
         vararg : new scout.Dimension(vararg, height);
     $comp.
-      css('width', size.width + 'px').
-      css('height', size.height+ 'px');
+      cssWidth(size.width).
+      cssHeight(size.height);
   },
   /**
    * Returns the size of a visible component or (0,0) when component is invisible.
@@ -151,6 +151,12 @@ scout.Dimension.prototype.subtractInsets = function(insets) {
   return new scout.Dimension(
       this.width - insets.left - insets.right,
       this.height - insets.top - insets.bottom);
+};
+
+scout.Dimension.prototype.addInsets = function(insets) {
+  return new scout.Dimension(
+      this.width + insets.left + insets.right,
+      this.height + insets.top + insets.bottom);
 };
 
 /**

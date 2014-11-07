@@ -64,22 +64,19 @@ describe("HtmlComponent", function() {
     // return size(6, 7)
     addWidthHeightMock(jqueryMock);
 
-    jqueryMock.css = function(key, value) {
-      return jqueryMock;
-    };
-
-    var htmlComp = new scout.HtmlComponent(jqueryMock, session);
+    var $comp = $('<div>');
+    var htmlComp = new scout.HtmlComponent($comp, session);
 
     htmlComp.layoutManager = new LayoutMock();
 
     it("accepts scout.Dimension as single argument", function() {
-      spyOn(jqueryMock, 'css').and.callThrough();
+      spyOn($comp, 'css').and.callThrough();
       htmlComp.setSize(new scout.Dimension(6, 7));
       var size = htmlComp.getSize();
       expect(size.width).toBe(6);
       expect(size.height).toBe(7);
-      expect(jqueryMock.css).toHaveBeenCalledWith('width', '6px');
-      expect(jqueryMock.css).toHaveBeenCalledWith('height', '7px');
+      expect($comp.css).toHaveBeenCalledWith('width', '6px');
+      expect($comp.css).toHaveBeenCalledWith('height', '7px');
     });
 
     it("calls invalidate on layout-manager when size has changed", function() {

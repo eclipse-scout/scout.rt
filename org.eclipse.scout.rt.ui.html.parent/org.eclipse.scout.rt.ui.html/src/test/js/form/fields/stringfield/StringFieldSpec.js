@@ -1,9 +1,12 @@
+/* global FormFieldSpecHelper */
 describe("StringField", function() {
   var session;
+  var helper;
 
   beforeEach(function() {
     setFixtures(sandbox());
     session = new scout.Session($('#sandbox'), '1.1');
+    helper = new FormFieldSpecHelper(session);
   });
 
   function createField(model) {
@@ -13,15 +16,7 @@ describe("StringField", function() {
   }
 
   function createModel(id) {
-    if (id === undefined) {
-      id = createUniqueAdapterId();
-    }
-    var model =  {
-      "id": id,
-      "enabled": true,
-      "visible": true
-    };
-    return model;
+    return helper.createModel();
   }
 
   describe("property label position", function() {

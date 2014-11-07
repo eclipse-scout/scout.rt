@@ -33,4 +33,10 @@ public class AbstractSequenceBox5 extends AbstractSequenceBox {
     return "";
   }
 
+  @Override
+  protected boolean getConfiguredGridUseUiHeight() {
+    //FIXME CGU verify, makes no sence to be true
+    return false;
+  }
+
 }

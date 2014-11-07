@@ -39,13 +39,19 @@ scout.FormLayout.prototype.layout = function($container) {
     rootGbSize = new scout.Dimension(
       contSize.width - rootGbInsets.left - rootGbInsets.right,
       contSize.height - rootGbInsets.top - rootGbInsets.bottom - this._getMenuBarHeight($container));
+
   $.log.trace('(FormLayout#layout) contSize=' + contSize);
   htmlRootGb.setSize(rootGbSize);
 };
 
 scout.FormLayout.prototype.preferredLayoutSize = function($container) {
-  var prefSize = this._getHtmlRootGroupBox($container).getPreferredSize();
-  prefSize.height += this.getMenuBarHeight($container);
+  var htmlRootGb = this._getHtmlRootGroupBox($container),
+    prefSize = htmlRootGb.getPreferredSize(),
+    rootGbInsets = htmlRootGb.getInsets();
+
+  prefSize.width += rootGbInsets.left + rootGbInsets.right;
+  prefSize.height += rootGbInsets.top + rootGbInsets.bottom + this._getMenuBarHeight($container);
+
   return prefSize;
 };
 
@@ -68,21 +74,23 @@ scout.inherits(scout.GroupBoxLayout, scout.AbstractLayout);
 
 scout.GroupBoxLayout.prototype.layout = function($container) {
   var htmlComp = scout.HtmlComponent.get($container),
-    bodySize = htmlComp.getSize().subtractInsets(htmlComp.getInsets()),
-    newSize;
+    contSize = htmlComp.getSize().subtractInsets(htmlComp.getInsets()),
+    bodySize;
 
-  $.log.trace('(GroupBoxLayout#layout) bodySize=' + bodySize);
+  $.log.trace('(GroupBoxLayout#layout) contSize=' + contSize);
 
-  newSize = new scout.Dimension(
-      bodySize.width,
-      bodySize.height -
+  bodySize = new scout.Dimension(
+      contSize.width,
+      contSize.height -
         this._getTitleHeight($container) -
         this._getButtonBarHeight($container));
-  this._getHtmlBody($container).setSize(newSize);
+  this._getHtmlBody($container).setSize(bodySize);
 };
 
 scout.GroupBoxLayout.prototype.preferredLayoutSize = function($container) {
-  var bodySize = this._getHtmlBody($container).getPreferredSize();
+  var htmlComp = scout.HtmlComponent.get($container),
+    bodySize = this._getHtmlBody($container).getPreferredSize().addInsets(htmlComp.getInsets());
+
   return new scout.Dimension(
       bodySize.width,
       bodySize.height +

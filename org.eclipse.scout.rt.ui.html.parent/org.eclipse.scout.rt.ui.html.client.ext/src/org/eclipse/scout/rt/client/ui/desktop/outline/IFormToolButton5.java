@@ -24,14 +24,4 @@ public interface IFormToolButton5 extends IToolButton {
    * The form is shown whenever the tool button is activated.
    */
   void setForm(IForm f);
-
-  /**
-   * Set a new <b>started</b> form to the tool.
-   * <p>
-   * The form is shown whenever the tool button is activated.
-   * 
-   * @param force
-   *          set 'f' as the new form, event when it is equal to the old form
-   */
-  void setForm(IForm f, boolean force);
 }

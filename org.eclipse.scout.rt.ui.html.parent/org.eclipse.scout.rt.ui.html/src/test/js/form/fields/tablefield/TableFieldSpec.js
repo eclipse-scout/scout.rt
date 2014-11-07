@@ -1,12 +1,14 @@
-/* global TableSpecHelper */
+/* global TableSpecHelper, FormFieldSpecHelper */
 describe("TableField", function() {
   var session;
   var helper;
+  var tableHelper;
 
   beforeEach(function() {
     setFixtures(sandbox());
     session = new scout.Session($('#sandbox'), '1.1');
-    helper = new TableSpecHelper(session);
+    tableHelper = new TableSpecHelper(session);
+    helper = new FormFieldSpecHelper(session);
     jasmine.Ajax.install();
     jasmine.clock().install();
   });
@@ -24,22 +26,14 @@ describe("TableField", function() {
   }
 
   function createModel(id) {
-    if (id === undefined) {
-      id = createUniqueAdapterId();
-    }
-    var model =  {
-      "id": id,
-      "enabled": true,
-      "visible": true
-    };
-    return model;
+    return helper.createModel(id);
   }
 
   describe("property table", function() {
     var tableField, table;
     beforeEach(function() {
-      var tableModel = helper.createModelFixture(2, 2);
-      table = helper.createTable(tableModel);
+      var tableModel = tableHelper.createModelFixture(2, 2);
+      table = tableHelper.createTable(tableModel);
       tableField = createTableField(createModel());
     });
 

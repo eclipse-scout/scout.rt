@@ -159,6 +159,14 @@ scout.HtmlComponent.prototype.setBounds = function(bounds) {
   this.layout();
 };
 
+/**
+ * Sets the component to its preferred size.
+ */
+scout.HtmlComponent.prototype.pack = function() {
+  var preferredSize = this.getPreferredSize();
+  this.setSize(preferredSize);
+};
+
 scout.HtmlComponent.prototype.debug = function() {
   return scout.graphics.debugOutput(this.$comp);
 };

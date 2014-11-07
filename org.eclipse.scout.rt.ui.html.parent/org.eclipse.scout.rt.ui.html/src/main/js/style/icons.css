@@ -5,6 +5,7 @@
 @icon-clock: '\E004';
 @icon-wand: '\E010';
 @icon-phone: '\E011';
+@icon-person: '\E034'; /* FIXME CGU change to E12*/
 @icon-target: '\E020';
 @icon-world: '\E021';
 @icon-chart: '\E022';
@@ -14,7 +15,6 @@
 @icon-gear: '\E031';
 @icon-star: '\E032';
 @icon-share: '\E033';
-@icon-person: '\E034';
 
 /* sans-serif font icons*/
 @icon-nbsp: '\00a0';

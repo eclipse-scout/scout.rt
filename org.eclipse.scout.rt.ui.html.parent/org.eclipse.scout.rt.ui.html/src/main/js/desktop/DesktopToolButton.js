@@ -53,10 +53,13 @@ scout.DesktopToolButton.prototype._sendSelected = function (selected) {
 };
 
 scout.DesktopToolButton.prototype._openContainer = function () {
+  var preferredSize;
   if (this.$storage) {
     this.desktop.$toolContainer.append(this.$storage);
   } else if (this.form) {
     this.form.render(this.desktop.$toolContainer);
+    this.form.htmlComp.pixelBasedSizing = true;
+    this.form.htmlComp.pack();
   }
 
   var right = parseFloat(this.desktop.$parent[0].offsetWidth) - parseFloat(this.$div.offset().left) - parseFloat(this.$div[0].offsetWidth);

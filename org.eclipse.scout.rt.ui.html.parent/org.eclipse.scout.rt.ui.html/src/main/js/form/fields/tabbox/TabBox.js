@@ -123,12 +123,10 @@ scout.TabBox.prototype._renderSelectedTab = function(selectedTab) {
      */
     this.tabItems[this.selectedTab]._renderLabelVisible(false);
 
-    // TODO AWE: (layout) beim initialen rendern ist das nicht nötig
-    // schauen, ob wir hier etwas unterdrücken müssen oder ob das
-    // durch valid/invalidate bereits abgedeckt ist
-    var htmlComp = scout.HtmlComponent.get(this._$tabContent);
-    htmlComp.invalidate();
-    htmlComp.layout();
+    if (this.rendered) {
+      var htmlComp = scout.HtmlComponent.get(this._$tabContent);
+      htmlComp.revalidate();
+    }
   }
 };
 

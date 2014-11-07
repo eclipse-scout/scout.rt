@@ -19,12 +19,10 @@
 .desktop-tool-container {
   position: absolute;
   top: @size-desktop-tools;
-  width: @size-desktop-navigation;
   z-index: 10;
   .menu-context;
   background-color: @color-bench;
   border-top: 1px solid transparent;
-  display: none;
 }
 
 /* taskbar */
