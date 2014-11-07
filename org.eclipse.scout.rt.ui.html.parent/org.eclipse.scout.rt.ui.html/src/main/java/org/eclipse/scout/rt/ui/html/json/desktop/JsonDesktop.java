@@ -95,7 +95,8 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
     List<IAction> result = new ArrayList<>();
     for (IAction a : getModel().getActions()) {
       if (hasClassName(a, "UserProfileMenu") ||
-          hasClassName(a, "PhoneFormToolButton")) {
+          hasClassName(a, "PhoneFormToolButton") ||
+          hasClassName(a, "ProcessAssistantFormToolButton")) {
         result.add(a);
       }
     }

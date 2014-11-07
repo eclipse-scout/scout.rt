@@ -1,15 +1,39 @@
 Was wir im Labor herausfinden möchten:
+--------------------------------------
 
 - Ist der Aufbau vom UI verständlich:
-  begreifen die Anwender die Konzepte?
-  können sie sich im UI orientieren?
+  * Begreifen die Anwender die Konzepte?
+  * Können sie sich im UI orientieren?
 - Können die Anwender effizient arbeiten?
 - Wie schnell können Anwender konkrete Aufgaben lösen?
+- Wie fällt der Vergleich zum alten Rayo UI aus?
 - Wie kommen die Anwender ans Ziel?
-  Benutzen sie die Maus, Tastatur?
-  Welche Buttons klicken sie häufig, welche nicht?
+  * Benutzen sie die Maus, Tastatur?
+  * Welche Buttons klicken sie häufig, welche nicht?
 - Wie ist der Gesamteindruck? Fühlt der Anwender sich gut bei der Arbeit?
 
+
+
 Schwierigkeit:
+--------------------------------------
+
 - Neutrale Fragenstellung
 - Ausblenden von persönlichen Meinungen (mir gefällt Farbe X nicht).
+- Aus dem Ergebnissen sollen konkrete Arbeitsanweisungen / Entscheidungen
+  abgeleitet werden können.
+- Ergebnisse sollen mit vernünftigem Aufwand auszuwerten sein.
+
+
+Zu Untersuchen:
+--------------------------------------
+
+- Baum mit Einfach- oder Doppelklick öffnen? Hypothese: mit Einfach-Klick
+  im TreeField mit Checkboxen braucht es den Doppelklick vielleicht doch noch
+
+- Table-Header mit oder ohne Icons für Sortierung / Filter?
+
+- Button-Darstellung Ok? "Wichtige" Funktionen als Buttons, andere als Links?
+
+- Rechts-Klick?
+
+- Form-Felder zu gross (hoch): Input von ABU

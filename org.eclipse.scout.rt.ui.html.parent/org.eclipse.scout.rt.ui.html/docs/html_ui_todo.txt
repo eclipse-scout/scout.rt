@@ -27,11 +27,6 @@ Sichtenmenü: ausprobieren, ob bei Klick auf den Titel das Sichtenmenü aufgehen
 
 Navigation im Tree überdenken. Was ist wenn es viele Elemente hat? Braucht es "Alle anzeigen"? Hypothese: unter 10 immer alle anzeigen.
 
-Labor: Baum mit Einfach- oder Doppelklick öffnen? Hypothese: mit Einfach-Klick
-  im TreeField mit Checkboxen braucht es den Doppelklick vielleicht doch noch
-
-Labor: Table-Header mit oder ohne Icons?
-
 Table-Header: ganz feiner Pfeil wie in Excel ausprobieren, keine Farben für Header-Text
 
 Photoshop: Such-Forms / Table-Controls - vertikale "Tabs" ausprobieren. Nur Text und eine vertikale Linie daneben
