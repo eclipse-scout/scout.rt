@@ -1,0 +1,15 @@
+Was wir im Labor herausfinden möchten:
+
+- Ist der Aufbau vom UI verständlich:
+  begreifen die Anwender die Konzepte?
+  können sie sich im UI orientieren?
+- Können die Anwender effizient arbeiten?
+- Wie schnell können Anwender konkrete Aufgaben lösen?
+- Wie kommen die Anwender ans Ziel?
+  Benutzen sie die Maus, Tastatur?
+  Welche Buttons klicken sie häufig, welche nicht?
+- Wie ist der Gesamteindruck? Fühlt der Anwender sich gut bei der Arbeit?
+
+Schwierigkeit:
+- Neutrale Fragenstellung
+- Ausblenden von persönlichen Meinungen (mir gefällt Farbe X nicht).

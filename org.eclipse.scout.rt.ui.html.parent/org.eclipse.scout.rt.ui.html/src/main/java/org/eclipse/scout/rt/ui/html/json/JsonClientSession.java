@@ -35,6 +35,7 @@ import org.eclipse.scout.rt.ui.html.Activator;
 import org.json.JSONObject;
 
 public class JsonClientSession extends AbstractJsonAdapter<IClientSession> {
+
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonClientSession.class);
 
   private ILocaleListener m_localeListener;
@@ -49,7 +50,7 @@ public class JsonClientSession extends AbstractJsonAdapter<IClientSession> {
 
   @Override
   public String getObjectType() {
-    //Currently there is no representation on client side
+    // Currently there is no representation on client side
     return null;
   }
 
@@ -63,6 +64,13 @@ public class JsonClientSession extends AbstractJsonAdapter<IClientSession> {
       // FIXME CGU: copied from session service. Moved here to be able to attach locale listener first
       getModel().startSession(Activator.getDefault().getBundle());
     }
+    
+    // attach child adapters - we cannot do this in attachModel() as normal
+    // since the desktop is not yet created when attachModel runs.
+    // see AbstractJsonSession#init()
+    attachAdapter(getModel().getDesktop());
+    
+    
     if (!getModel().getDesktop().isOpened()) {
       getModel().getDesktop().getUIFacade().fireDesktopOpenedFromUI();
     }
@@ -70,10 +78,7 @@ public class JsonClientSession extends AbstractJsonAdapter<IClientSession> {
       getModel().getDesktop().getUIFacade().fireGuiAttached();
     }
 
-    // attach child adapters - we cannot do this in attachModel() as normal
-    // since the desktop is not yet created when attachModel runs.
-    // see AbstractJsonSession#init()
-    attachAdapter(getModel().getDesktop());
+
     m_started = true;
   }
 

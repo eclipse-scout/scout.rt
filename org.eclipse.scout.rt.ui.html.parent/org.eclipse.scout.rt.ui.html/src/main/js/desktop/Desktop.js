@@ -17,7 +17,7 @@ scout.Desktop = function() {
   this._selectedTab;
   this.selectedTool;
 
-  this._addAdapterProperties(['viewButtons', 'actions', 'forms', 'outline', 'messageBoxes']);
+  this._addAdapterProperties(['viewButtons', 'actions', 'forms', 'outline', 'messageBoxes', 'addOns']);
 };
 scout.inherits(scout.Desktop, scout.BaseDesktop);
 
@@ -57,6 +57,10 @@ scout.Desktop.prototype._render = function($parent) {
   this.$toolContainer = this.$parent.appendDIV('desktop-tool-container');
 
   this._outlineTab = new scout.Desktop.TabAndContent();
+
+  for (i = 0; i < this.addOns.length; i++) {
+    this.addOns[i].render($parent);
+  }
 
   for (i = 0; i < this.actions.length; i++) {
     this.actions[i].render(this.$toolbar);

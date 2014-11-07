@@ -35,6 +35,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTreeForm;
 import org.eclipse.scout.rt.client.ui.desktop.outline.ISearchOutline;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
+import org.eclipse.scout.rt.ui.html.Desktop5Util;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
@@ -53,14 +54,6 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
   public static final String PROP_FORM = "form";
   public static final String PROP_MESSAGE_BOX = "messageBox";
 
-  private static final String TOOL_BUTTONS = "[" +
-      "          {\"id\": \"t2\", \"objectType\": \"ToolButton\", \"text\": \"Zugriff\", \"icon\": \"\uf144\", \"shortcut\": \"F4\"}," +
-      "          {\"id\": \"t3\", \"objectType\": \"ToolButton\", \"text\": \"Favoriten\", \"icon\": \"\uf005\", \"shortcut\": \"F6\"}," +
-      "          {\"id\": \"t4\", \"objectType\": \"ToolButton\", \"text\": \"Muster\", \"icon\": \"\uf01C\", \"shortcut\": \"F7\", \"state\": \"disabled\"}," +
-      "          {\"id\": \"t5\", \"objectType\": \"ToolButton\", \"text\": \"Telefon\", \"icon\": \"\uf095\", \"shortcut\": \"F8\"}," +
-      "          {\"id\": \"t6\", \"objectType\": \"ToolButton\", \"text\": \"Cockpit\", \"icon\": \"\uf0E4\", \"shortcut\": \"F9\"}," +
-      "          {\"id\": \"t7\", \"objectType\": \"ToolButton\", \"text\": \"Prozesse\", \"icon\": \"\uf0D0\",\"shortcut\": \"F10\"}]}]";
-
   private DesktopListener m_desktopListener;
 
   private IOutline m_previousOutline;
@@ -75,16 +68,12 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
   }
 
   @Override
-  public boolean isRoot() {
-    return true;
-  }
-
-  @Override
   protected void createChildAdapters() {
     super.createChildAdapters();
     attachAdapters(getForms());
     attachAdapters(getModel().getMessageBoxStack());
     attachAdapters(filterModelActions());
+    attachAdapters(Desktop5Util.getAddOns(getModel()));
     if (!isFormBased()) {
       attachAdapters(getModel().getViewButtons());
       optAttachAdapter(getModel().getOutline());
@@ -126,6 +115,7 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
     disposeAdapters(getForms());
     disposeAdapters(getModel().getMessageBoxStack());
     disposeAdapters(filterModelActions());
+    disposeAdapters(Desktop5Util.getAddOns(getModel()));
     if (!isFormBased()) {
       disposeAdapters(getModel().getViewButtons());
       optDisposeAdapter(getModel().getOutline());
@@ -157,6 +147,7 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
     putAdapterIdsProperty(json, "forms", getForms());
     putAdapterIdsProperty(json, "messageBoxes", getModel().getMessageBoxStack());
     putAdapterIdsProperty(json, "actions", filterModelActions());
+    putAdapterIdsProperty(json, "addOns", Desktop5Util.getAddOns(getModel()));
     if (!isFormBased()) {
       // FIXME CGU: view and tool buttons should be removed from desktop by device transformer
       putAdapterIdsProperty(json, "viewButtons", getModel().getViewButtons());

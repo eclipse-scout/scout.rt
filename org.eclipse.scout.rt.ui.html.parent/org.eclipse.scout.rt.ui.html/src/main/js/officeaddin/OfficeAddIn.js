@@ -3,18 +3,10 @@ scout.OfficeAddIn = function() {
 };
 scout.inherits(scout.OfficeAddIn, scout.ModelAdapter);
 
-//override
-scout.OfficeAddIn.prototype.init = function(model, session) {
-  scout.OfficeAddIn.parent.prototype.init.call(this, model,session);
-  this.render(this.session.$entryPoint);
-};
-
 scout.OfficeAddIn.prototype._render = function($parent) {
   var that = this;
   this.$parent = $parent;
-
   this.$mscomSend = $('#_js2mscom');
-
   this.$mscomRecv = $('#_mscom2js');
   this.$mscomRecv.click(function(){that._mscomRecv();});
   this._notImplementedMessage=JSON.stringify({'op':'0', 'status':'error', 'message':'Office is not attached'});

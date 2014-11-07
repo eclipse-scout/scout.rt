@@ -53,11 +53,6 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     return m_model;
   }
 
-  @Override
-  public boolean isRoot() {
-    return false;
-  }
-
   protected void createChildAdapters() {
   }
 
@@ -103,9 +98,6 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     JSONObject json = new JSONObject();
     putProperty(json, "objectType", getObjectType());
     putProperty(json, "id", getId());
-    if (isRoot()) {
-      putProperty(json, "root", true);
-    }
     return json;
   }
 
