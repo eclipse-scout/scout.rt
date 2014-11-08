@@ -27,6 +27,7 @@ import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonException;
 import org.eclipse.scout.rt.ui.html.json.JsonRequest;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
+import org.eclipse.scout.rt.ui.html.json.JsonStartupRequest;
 import org.eclipse.scout.service.AbstractService;
 import org.eclipse.scout.service.SERVICES;
 import org.json.JSONException;
@@ -93,7 +94,7 @@ public class MainRequestInterceptor extends AbstractService implements IServletR
         }
         LOG.info("Creating new JSON session with ID " + jsonReq.getJsonSessionId() + "...");
         jsonSession = servlet.createUninitializedJsonSession();
-        jsonSession.init(req, jsonReq);
+        jsonSession.init(req, new JsonStartupRequest(jsonReq));
         httpSession.setAttribute(jsonSessionAttributeName, jsonSession);
       }
       else if (jsonReq.isStartupRequest()) {

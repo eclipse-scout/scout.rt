@@ -23,8 +23,6 @@ public class JsonRequest {
   public static final String PROP_UNLOAD = "unload";
   public static final String PROP_PING = "ping";
   public static final String PROP_JSON_SESSION_ID = "jsonSessionId";
-  public static final String PROP_CLIENT_SESSION_ID = "clientSessionId";
-  public static final String PROP_USER_AGENT = "userAgent";
   public static final String PROP_EVENTS = "events";
 
   private final JSONObject m_request;
@@ -33,12 +31,12 @@ public class JsonRequest {
     m_request = request;
   }
 
-  public String getJsonSessionId() {
-    return JsonObjectUtility.getString(m_request, PROP_JSON_SESSION_ID);
+  protected JSONObject getRequestObject() {
+    return m_request;
   }
 
-  public String getClientSessionId() {
-    return m_request.optString(PROP_CLIENT_SESSION_ID);
+  public String getJsonSessionId() {
+    return JsonObjectUtility.getString(m_request, PROP_JSON_SESSION_ID);
   }
 
   public List<JsonEvent> getEvents() {
@@ -54,10 +52,6 @@ public class JsonRequest {
     return actionList;
   }
 
-  public JSONObject getRequestObject() {
-    return m_request;
-  }
-
   public boolean isStartupRequest() {
     return m_request.optBoolean(PROP_STARTUP);
   }
@@ -68,13 +62,6 @@ public class JsonRequest {
 
   public boolean isPingRequest() {
     return m_request.optBoolean(PROP_PING);
-  }
-
-  /**
-   * Only set on startup requests
-   */
-  public JSONObject getUserAgent() {
-    return m_request.optJSONObject(PROP_USER_AGENT);
   }
 
   @Override

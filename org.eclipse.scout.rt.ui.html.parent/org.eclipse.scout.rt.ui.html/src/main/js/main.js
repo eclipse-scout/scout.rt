@@ -1,15 +1,64 @@
-scout.init = function(userAgent, objectFactories) {
+/**
+ * See javadoc for JsonStartupRequest.java for details of the defaults and origins of the property values.
+ * All parameters are optional, the following json bean shows all valid properties.
+ * {
+ * 'clientSessionId': '',
+ * 'userAgent': '',
+ * 'objectFactories': '',
+ * 'customParams': ''
+ * }
+ *
+ * minimal example:
+ * {}
+ *
+ * example defining mobile devices:
+ * {
+ * 'userAgent': new scout.UserAgent(scout.UserAgent.DEVICE_TYPE_MOBILE),
+ * 'objectFactories': scout.mobileObjectFactories
+ * }
+ *
+ * example forcing clientSessionId, setting all values directly and using custom properties:
+ * {
+ * 'clientSessionId': scout.numberToBase62(scout.getTimestamp()),
+ * 'userAgent': new scout.UserAgent(scout.UserAgent.DEVICE_TYPE_DESKTOP),
+ * 'objectFactories': scout.defaultObjectFactories,
+ * 'customParams': {'addinType': 'word', 'addInToken': '234jh523jk5hb235'}
+ * }
+ */
+scout.init = function(initBean) {
+  //validate params and set defaults
+  if(!initBean){
+    initBean={};
+  }
+  if (!initBean.userAgent) {
+    initBean.userAgent = new scout.UserAgent(scout.UserAgent.DEVICE_TYPE_DESKTOP);
+  }
+  if (!initBean.objectFactories) {
+    initBean.objectFactories = scout.defaultObjectFactories;
+  }
+  if (!initBean.clientSessionId) {
+    initBean.clientSessionId = sessionStorage.getItem('scout:clientSessionId');
+    if (!initBean.clientSessionId) {
+      initBean.clientSessionId = scout.numberToBase62(scout.getTimestamp());
+      sessionStorage.setItem('scout:clientSessionId', initBean.clientSessionId);
+    }
+  }
+  var customParamMap=new scout.URL().getParameterMap();
+  for (var prop in customParamMap) {
+    if (!initBean.customParams) {
+      initBean.customParams={};
+    }
+    initBean.customParams[prop]=customParamMap[prop];
+  }
+
   var tabId = '' + new Date().getTime();
   window.scout.sessions = []; // FIXME BSH Needed for detaching windows, but can we do this better???
   $('.scout').each(function() {
     var portletPartId = $(this).data('partid') || '0';
     var jsonSessionId = [portletPartId, tabId].join(':');
-    var session = new scout.Session($(this), jsonSessionId, userAgent);
+    var session = new scout.Session($(this), jsonSessionId, initBean);
     session.init();
-    if (!objectFactories) {
-      objectFactories = scout.defaultObjectFactories;
-    }
-    session.objectFactory.register(objectFactories);
+    session.objectFactory.register(initBean.objectFactories);
     window.scout.sessions.push(session);
   });
 };

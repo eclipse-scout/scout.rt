@@ -22,6 +22,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonException;
 import org.eclipse.scout.rt.ui.html.json.JsonRequest;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
+import org.eclipse.scout.rt.ui.html.json.JsonStartupRequest;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Assert;
@@ -42,7 +43,7 @@ public class JsonTestUtility {
     }
     JsonRequest jsonRequest = new JsonRequest(jsonReqObj);
     IJsonSession jsonSession = new TestEnvironmentJsonSession();
-    jsonSession.init(request, jsonRequest);
+    jsonSession.init(request, new JsonStartupRequest(jsonRequest));
     return jsonSession;
   }
 

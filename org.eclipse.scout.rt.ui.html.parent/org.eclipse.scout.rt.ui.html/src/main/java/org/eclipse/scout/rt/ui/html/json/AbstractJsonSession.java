@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.html.json;
 
 import java.security.AccessController;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -36,6 +37,8 @@ import org.eclipse.scout.rt.shared.ui.UiDeviceType;
 import org.eclipse.scout.rt.shared.ui.UiLayer;
 import org.eclipse.scout.rt.shared.ui.UiLayer2;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
+import org.eclipse.scout.rt.ui.html.Scout5ExtensionUtil;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBindingListener {
@@ -76,13 +79,11 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   }
 
   @Override
-  public void init(HttpServletRequest request, JsonRequest jsonReq) {
+  public void init(HttpServletRequest request, JsonStartupRequest jsonStartupRequest) {
     m_currentHttpRequest = request;
-    m_currentJsonRequest = jsonReq;
-    m_jsonSessionId = jsonReq.getJsonSessionId();
-    UserAgent userAgent = createUserAgent();
-    Subject subject = initSubject();
-    if (subject == null) {
+    m_currentJsonRequest = jsonStartupRequest;
+    m_jsonSessionId = jsonStartupRequest.getJsonSessionId();
+    if (currentSubject() == null) {
       throw new SecurityException("/json request is not authenticated with a Subject");
     }
 
@@ -90,7 +91,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     synchronized (this) {
       HttpSession httpSession = m_currentHttpRequest.getSession();
       // Lookup the requested client session
-      String clientSessionId = m_currentJsonRequest.getClientSessionId();
+      String clientSessionId = jsonStartupRequest.getClientSessionId();
       if (clientSessionId == null) {
         throw new IllegalStateException("Missing clientSessionId in JSON request");
       }
@@ -108,10 +109,8 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
         try {
           LocaleThreadLocal.set(request.getLocale());
           //
-          clientSession = createUninitializedClientSession();
-          clientSession.setUserAgent(userAgent);
-          clientSession.setSubject(subject);
-          clientSession.setVirtualSessionId(UUID.randomUUID().toString());
+          clientSession = createClientSession();
+          initClientSession(clientSession, jsonStartupRequest);
         }
         finally {
           LocaleThreadLocal.set(null);
@@ -134,29 +133,27 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
    * @return a new {@link IClientSession} that is not yet initialized, so
    *         {@link IClientSession#startSession(org.osgi.framework.Bundle)} was not yet called
    */
-  protected abstract IClientSession createUninitializedClientSession();
+  protected abstract IClientSession createClientSession();
 
-  protected UserAgent createUserAgent() {
-    IUiLayer uiLayer = UiLayer2.HTML;
-    IUiDeviceType uiDeviceType = UiDeviceType.DESKTOP;
-    String browserId = m_currentHttpRequest.getHeader("User-Agent");
-    JSONObject userAgent = m_currentJsonRequest.getUserAgent();
-    if (userAgent != null) {
-      // FIXME CGU it would be great if UserAgent could be changed dynamically, to switch from mobile to tablet mode on the fly, should be done as event in JsonClientSession
-      String uiDeviceTypeStr = userAgent.optString("deviceType", null);
-      if (uiDeviceTypeStr != null) {
-        uiDeviceType = UiDeviceType.createByIdentifier(uiDeviceTypeStr);
-      }
-      String uiLayerStr = userAgent.optString("uiLayer", null);
-      if (uiLayerStr != null) {
-        uiLayer = UiLayer.createByIdentifier(uiLayerStr);
+  /**
+   * initialize the properties of the {@link IClientSession} but does not yet start it
+   * {@link IClientSession#startSession(org.osgi.framework.Bundle)} was not yet called
+   */
+  protected void initClientSession(IClientSession clientSession, JsonStartupRequest jsonStartupRequest) {
+    UserAgent userAgent = createUserAgent(jsonStartupRequest);
+    clientSession.setUserAgent(userAgent);
+    clientSession.setSubject(currentSubject());
+    clientSession.setVirtualSessionId(UUID.randomUUID().toString());
+    //custom props
+    HashMap<String, String> customProps = new HashMap<String, String>();
+    JSONObject obj = jsonStartupRequest.getCustomParams();
+    if (obj != null) {
+      JSONArray names = jsonStartupRequest.getCustomParams().names();
+      for (int i = 0; i < names.length(); i++) {
+        customProps.put(names.optString(i), obj.optString(names.optString(i)));
       }
     }
-    return UserAgent.create(uiLayer, uiDeviceType, browserId);
-  }
-
-  protected Subject initSubject() {
-    return Subject.getSubject(AccessController.getContext());
+    Scout5ExtensionUtil.ISession_initCustomParams(clientSession, customProps);
   }
 
   protected void startUpClientSession(IClientSession clientSession) {
@@ -176,6 +173,29 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     if (!clientSession.isActive()) {
       throw new JsonException("ClientSession is not active, there must have been a problem with loading or starting");
     }
+  }
+
+  protected UserAgent createUserAgent(JsonStartupRequest jsonStartupRequest) {
+    IUiLayer uiLayer = UiLayer2.HTML;
+    IUiDeviceType uiDeviceType = UiDeviceType.DESKTOP;
+    String browserId = m_currentHttpRequest.getHeader("User-Agent");
+    JSONObject userAgent = jsonStartupRequest.getUserAgent();
+    if (userAgent != null) {
+      // FIXME CGU it would be great if UserAgent could be changed dynamically, to switch from mobile to tablet mode on the fly, should be done as event in JsonClientSession
+      String uiDeviceTypeStr = userAgent.optString("deviceType", null);
+      if (uiDeviceTypeStr != null) {
+        uiDeviceType = UiDeviceType.createByIdentifier(uiDeviceTypeStr);
+      }
+      String uiLayerStr = userAgent.optString("uiLayer", null);
+      if (uiLayerStr != null) {
+        uiLayer = UiLayer.createByIdentifier(uiLayerStr);
+      }
+    }
+    return UserAgent.create(uiLayer, uiDeviceType, browserId);
+  }
+
+  protected Subject currentSubject() {
+    return Subject.getSubject(AccessController.getContext());
   }
 
   @Override

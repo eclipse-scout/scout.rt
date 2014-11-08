@@ -1,34 +1,27 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-scout.Session = function($entryPoint, jsonSessionId, userAgent) {
+/**
+ * @param initBean see main.js:scout.init
+ */
+scout.Session = function($entryPoint, jsonSessionId, initBean) {
+  this.$entryPoint = $entryPoint;
+  this.jsonSessionId = jsonSessionId;
+  this._initBean = initBean;
+  this.userAgent= initBean.userAgent;
   this.modelAdapterRegistry = {};
   this.locale;
-  this.$entryPoint = $entryPoint;
   this._asyncEvents = [];
   this._asyncRequestQueued;
-  this.jsonSessionId = jsonSessionId;
   this.parentJsonSession; // FIXME BSH Improve this
   this._childWindows = []; // for detached windows
   this._deferred;
   this._startup;
   this._unload;
   this.desktop;
-  this.userAgent = userAgent;
   this.url = 'json';
   this._adapterDataCache = {};
-  if (!userAgent) {
-    this.userAgent = new scout.UserAgent(scout.UserAgent.DEVICE_TYPE_DESKTOP);
-  }
   this.objectFactory = new scout.ObjectFactory(this);
-
-  // Determine clientSessionId
-  var clientSessionId = sessionStorage.getItem('scout:clientSessionId');
-  if (!clientSessionId) {
-    clientSessionId = scout.numberToBase62(scout.getTimestamp());
-    sessionStorage.setItem('scout:clientSessionId', clientSessionId);
-  }
-  this._clientSessionId = clientSessionId;
 
   // FIXME BSH Improve this
   // If this is a popup window, re-register with parent (in case the user reloaded the popup window)
@@ -155,12 +148,15 @@ scout.Session.prototype._sendNow = function(events, deferred) {
   };
 
   if (this._startup) {
-    request.clientSessionId = this._clientSessionId;
+    request.clientSessionId = this._initBean.clientSessionId;
     request.startup = true;
     this._startup = false;
 
-    if (this.userAgent.deviceType !== scout.UserAgent.DEVICE_TYPE_DESKTOP) {
-      request.userAgent = this.userAgent;
+    if (this._initBean.userAgent.deviceType !== scout.UserAgent.DEVICE_TYPE_DESKTOP) {
+      request.userAgent = this._initBean.userAgent;
+    }
+    if (this._initBean.customParams) {
+      request.customParams = this._initBean.customParams;
     }
   }
   if (this._unload) {

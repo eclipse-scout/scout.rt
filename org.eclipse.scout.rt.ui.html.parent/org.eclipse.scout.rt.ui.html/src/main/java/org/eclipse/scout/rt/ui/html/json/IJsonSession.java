@@ -17,7 +17,7 @@ import org.json.JSONObject;
 
 public interface IJsonSession {
 
-  void init(HttpServletRequest request, JsonRequest jsonReq) throws JsonException;
+  void init(HttpServletRequest request, JsonStartupRequest jsonStartupRequest) throws JsonException;
 
   void dispose();
 

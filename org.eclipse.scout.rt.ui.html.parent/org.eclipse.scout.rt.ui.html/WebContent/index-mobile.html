@@ -30,7 +30,7 @@
       }
 
       function init() {
-        scout.init(new scout.UserAgent(scout.UserAgent.DEVICE_TYPE_MOBILE), scout.mobileObjectFactories);
+        scout.init({'userAgent': new scout.UserAgent(scout.UserAgent.DEVICE_TYPE_MOBILE), 'objectFactories': scout.mobileObjectFactories});
       }
     });
     </script>

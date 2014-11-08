@@ -68,6 +68,10 @@ scout.URL._parse = function(queryPart) {
   return map;
 };
 
+scout.URL.prototype.getParameterMap = function() {
+  return this._queryMap;
+};
+
 scout.URL.prototype.getParameter = function(param) {
   if (typeof param !== 'string') {
     throw new Error('Illegal argument type: ' + param);

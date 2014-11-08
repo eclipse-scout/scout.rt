@@ -15,18 +15,18 @@ import javax.servlet.http.HttpServletRequest;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonSession;
-import org.eclipse.scout.rt.ui.html.json.JsonRequest;
+import org.eclipse.scout.rt.ui.html.json.JsonStartupRequest;
 
 public class JsonSessionMock extends AbstractJsonSession {
 
   @Override
-  public void init(HttpServletRequest request, JsonRequest jsonReq) {
+  public void init(HttpServletRequest request, JsonStartupRequest jsonStartupRequest) {
     // nop
     // For a fully initialized jsonSession use TestEnvironmentJsonSession
   }
 
   @Override
-  protected IClientSession createUninitializedClientSession() {
+  protected IClientSession createClientSession() {
     return null;
   }
 

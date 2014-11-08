@@ -20,12 +20,12 @@ import org.eclipse.scout.rt.ui.html.json.AbstractJsonSession;
 public class TestEnvironmentJsonSession extends AbstractJsonSession {
 
   @Override
-  protected IClientSession createUninitializedClientSession() {
+  protected IClientSession createClientSession() {
     return TestEnvironmentClientSession.get();
   }
 
   @Override
-  protected Subject initSubject() {
+  protected Subject currentSubject() {
     Subject subject = new Subject();
     subject.getPrincipals().add(new SimplePrincipal("tester"));
     return subject;

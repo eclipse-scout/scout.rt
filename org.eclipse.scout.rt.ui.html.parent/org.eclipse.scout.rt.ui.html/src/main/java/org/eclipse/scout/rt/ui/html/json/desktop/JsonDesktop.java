@@ -35,7 +35,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTreeForm;
 import org.eclipse.scout.rt.client.ui.desktop.outline.ISearchOutline;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
-import org.eclipse.scout.rt.ui.html.Desktop5Util;
+import org.eclipse.scout.rt.ui.html.Scout5ExtensionUtil;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
@@ -73,7 +73,7 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
     attachAdapters(getForms());
     attachAdapters(getModel().getMessageBoxStack());
     attachAdapters(filterModelActions());
-    attachAdapters(Desktop5Util.getAddOns(getModel()));
+    attachAdapters(Scout5ExtensionUtil.IDesktop_getAddOns(getModel()));
     if (!isFormBased()) {
       attachAdapters(getModel().getViewButtons());
       optAttachAdapter(getModel().getOutline());
@@ -116,7 +116,7 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
     disposeAdapters(getForms());
     disposeAdapters(getModel().getMessageBoxStack());
     disposeAdapters(filterModelActions());
-    disposeAdapters(Desktop5Util.getAddOns(getModel()));
+    disposeAdapters(Scout5ExtensionUtil.IDesktop_getAddOns(getModel()));
     if (!isFormBased()) {
       disposeAdapters(getModel().getViewButtons());
       optDisposeAdapter(getModel().getOutline());
@@ -148,7 +148,7 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
     putAdapterIdsProperty(json, "forms", getForms());
     putAdapterIdsProperty(json, "messageBoxes", getModel().getMessageBoxStack());
     putAdapterIdsProperty(json, "actions", filterModelActions());
-    putAdapterIdsProperty(json, "addOns", Desktop5Util.getAddOns(getModel()));
+    putAdapterIdsProperty(json, "addOns", Scout5ExtensionUtil.IDesktop_getAddOns(getModel()));
     if (!isFormBased()) {
       // FIXME CGU: view and tool buttons should be removed from desktop by device transformer
       putAdapterIdsProperty(json, "viewButtons", getModel().getViewButtons());
