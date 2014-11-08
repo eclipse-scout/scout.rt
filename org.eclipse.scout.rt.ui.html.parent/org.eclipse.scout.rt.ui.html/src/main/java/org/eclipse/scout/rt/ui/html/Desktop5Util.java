@@ -34,6 +34,7 @@ public final class Desktop5Util {
       LOG.warn("method getAddOns does not exist in " + desktop);
       return Collections.emptyList();
     }
+
   }
 
   public static <T> T getAddOn(IDesktop desktop, Class<T> addOnInterface) {
