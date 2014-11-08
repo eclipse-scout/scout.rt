@@ -10,7 +10,6 @@ describe("ModelAdapter", function() {
 
     session = new scout.Session($('#sandbox'), '1.1');
     session.init();
-    session.objectFactory.register(scout.defaultObjectFactories);
   });
 
   afterEach(function() {

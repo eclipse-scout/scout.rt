@@ -2,9 +2,58 @@
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
 /**
- * @param initBean see main.js:scout.init
+ * See javadoc for JsonStartupRequest.java for details of the defaults and origins of the property values.
+ * All parameters are optional, the following json bean shows all valid properties.
+ * {
+ * 'clientSessionId': '',
+ * 'userAgent': '',
+ * 'objectFactories': '',
+ * 'customParams': ''
+ * }
+ *
+ * minimal example:
+ * {}
+ *
+ * example defining mobile devices:
+ * {
+ * 'userAgent': new scout.UserAgent(scout.UserAgent.DEVICE_TYPE_MOBILE),
+ * 'objectFactories': scout.mobileObjectFactories
+ * }
+ *
+ * example forcing clientSessionId, setting all values directly and using custom properties:
+ * {
+ * 'clientSessionId': '1234567',
+ * 'userAgent': new scout.UserAgent(scout.UserAgent.DEVICE_TYPE_DESKTOP),
+ * 'objectFactories': scout.defaultObjectFactories,
+ * 'customParams': {'addinType': 'word', 'addInToken': '234jh523jk5hb235'}
+ * }
  */
 scout.Session = function($entryPoint, jsonSessionId, initBean) {
+  //validate params and use defaults
+  if(!initBean){
+    initBean={};
+  }
+  if (!initBean.userAgent) {
+    initBean.userAgent = new scout.UserAgent(scout.UserAgent.DEVICE_TYPE_DESKTOP);
+  }
+  if (!initBean.objectFactories) {
+    initBean.objectFactories = scout.defaultObjectFactories;
+  }
+  if (!initBean.clientSessionId) {
+    initBean.clientSessionId = sessionStorage.getItem('scout:clientSessionId');
+    if (!initBean.clientSessionId) {
+      initBean.clientSessionId = scout.numberToBase62(scout.getTimestamp());
+      sessionStorage.setItem('scout:clientSessionId', initBean.clientSessionId);
+    }
+  }
+  var customParamMap=new scout.URL().getParameterMap();
+  for (var prop in customParamMap) {
+    if (!initBean.customParams) {
+      initBean.customParams={};
+    }
+    initBean.customParams[prop]=customParamMap[prop];
+  }
+  //set members
   this.$entryPoint = $entryPoint;
   this.jsonSessionId = jsonSessionId;
   this._initBean = initBean;
@@ -355,6 +404,7 @@ scout.Session.prototype.init = function() {
       childWindow.close();
     });
   }.bind(this));
+  this.objectFactory.register(this._initBean.objectFactories);
 };
 
 scout.Session.prototype.onModelAction = function(event) {
