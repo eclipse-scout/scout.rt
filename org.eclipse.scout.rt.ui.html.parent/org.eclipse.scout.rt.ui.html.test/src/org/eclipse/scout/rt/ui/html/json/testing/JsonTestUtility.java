@@ -37,6 +37,7 @@ public class JsonTestUtility {
     JSONObject jsonReqObj = new JSONObject();
     try {
       jsonReqObj.put(JsonRequest.PROP_JSON_SESSION_ID, "1.1");
+      jsonReqObj.put(JsonStartupRequest.PROP_CLIENT_SESSION_ID, "testClientSession123");
     }
     catch (JSONException e) {
       throw new JsonException(e);

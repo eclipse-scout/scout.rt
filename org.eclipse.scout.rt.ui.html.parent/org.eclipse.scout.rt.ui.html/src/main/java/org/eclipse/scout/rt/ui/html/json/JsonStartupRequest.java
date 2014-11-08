@@ -40,10 +40,12 @@ public class JsonStartupRequest extends JsonRequest {
   }
 
   public String getClientSessionId() {
+    //required
     return JsonObjectUtility.getString(getRequestObject(), PROP_CLIENT_SESSION_ID);
   }
 
   public JSONObject getUserAgent() {
+    //optional
     return getRequestObject().optJSONObject(PROP_USER_AGENT);
   }
 
@@ -51,6 +53,7 @@ public class JsonStartupRequest extends JsonRequest {
    * These properties are passed to the {@link IClientSession#initCustomParams(Map<String, String>)}
    */
   public JSONObject getCustomParams() {
+    //optional
     return getRequestObject().optJSONObject(PROP_CUSTOM_PARAMS);
   }
 
