@@ -19,7 +19,7 @@
  *
  * example forcing clientSessionId, setting all values directly and using custom properties:
  * {
- * 'clientSessionId': scout.numberToBase62(scout.getTimestamp()),
+ * 'clientSessionId': '1234567',
  * 'userAgent': new scout.UserAgent(scout.UserAgent.DEVICE_TYPE_DESKTOP),
  * 'objectFactories': scout.defaultObjectFactories,
  * 'customParams': {'addinType': 'word', 'addInToken': '234jh523jk5hb235'}
