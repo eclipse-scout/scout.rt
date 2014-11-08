@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
@@ -31,13 +32,18 @@ import org.mockito.Mockito;
 public class JsonTestUtility {
 
   public static IJsonSession createAndInitializeJsonSession() {
+    String jsonSessionId = "1.1";
+    String clientSessionId = "testClientSession123";
     HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
+    HttpSession httpSession = Mockito.mock(HttpSession.class);
     Mockito.when(request.getLocale()).thenReturn(new Locale("de_CH"));
     Mockito.when(request.getHeader("User-Agent")).thenReturn("dummy");
+    Mockito.when(request.getSession()).thenReturn(httpSession);
+    Mockito.when(httpSession.getAttribute("scout.htmlui.session.client." + clientSessionId)).thenReturn(null);
     JSONObject jsonReqObj = new JSONObject();
     try {
-      jsonReqObj.put(JsonRequest.PROP_JSON_SESSION_ID, "1.1");
-      jsonReqObj.put(JsonStartupRequest.PROP_CLIENT_SESSION_ID, "testClientSession123");
+      jsonReqObj.put(JsonRequest.PROP_JSON_SESSION_ID, jsonSessionId);
+      jsonReqObj.put(JsonStartupRequest.PROP_CLIENT_SESSION_ID, clientSessionId);
     }
     catch (JSONException e) {
       throw new JsonException(e);
