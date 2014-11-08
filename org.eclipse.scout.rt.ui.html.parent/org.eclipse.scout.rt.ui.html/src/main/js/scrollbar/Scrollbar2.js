@@ -46,20 +46,23 @@ scout.Scrollbar2.update = function($viewport) {
  * @param $selection
  */
 scout.Scrollbar2.scrollTo = function($viewport, $selection) {
-  var scrollDir = 'n/a',
-    scrollTop = $viewport.scrollTop(),
+  var scrollbar = $viewport.data('scrollbar'),
     viewportH = $viewport.height(),
     optionH = scout.graphics.getSize($selection).height,
-    optionY = $selection.position().top;
-  $.log.debug('scrollTo() scrollTop=' + scrollTop + ' viewportH=' + viewportH + ' optionH=' + optionH + ' optionY=' + optionY);
+    optionY,
+    scrollTopFunc;
 
-  if (optionY < 0) {
-    scrollDir = 'Up';
-    $viewport.scrollTop(scrollTop + optionY);
-  } else if (optionY + optionH > viewportH) {
-    scrollDir = 'Down';
-    $viewport.scrollTop(scrollTop + optionY + optionH - viewportH);
+  if (scrollbar) {
+    scrollTopFunc = scrollbar.scrollTop.bind(scrollbar);
+    optionY = $selection.offset().top - $selection.parent().parent().offset().top;
+  } else {
+    scrollTopFunc = $viewport.scrollTop.bind($viewport);
+    optionY = $selection.position().top;
   }
 
-  $.log.debug('_scrollToSelection scrollDir=' + scrollDir);
+  if (optionY < 0) {
+    scrollTopFunc(scrollTopFunc() + optionY);
+  } else if (optionY + optionH > viewportH) {
+    scrollTopFunc(scrollTopFunc() + optionY + optionH - viewportH);
+  }
 };

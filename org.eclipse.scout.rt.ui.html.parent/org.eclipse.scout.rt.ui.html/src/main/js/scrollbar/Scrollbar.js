@@ -35,12 +35,7 @@ scout.Scrollbar = function($parent, options) {
     that = this;
 
   //event handling
-  $parent.parent().
-    on('DOMMouseScroll mousewheel', '', scrollWheel).
-    on('scroll', function() {
-      $.log.debug('onScroll. _scroll=' + that._scroll + ' ._offset=' + that._offset + ' scrollTop=' + $parent.parent().scrollTop());
-      this._setThumb($parent.parent().scrollTop() / (that._scroll / that._offset));
-    }.bind(this));
+  $parent.parent().on('DOMMouseScroll mousewheel', '', scrollWheel);
   this._$scrollbar.on('mousedown', scrollEnd);
   this._$thumb.on('mousedown', '', scrollStart);
   $(window).on('load resize', this.initThumb.bind(this));
@@ -57,7 +52,7 @@ scout.Scrollbar = function($parent, options) {
   }
 
   function scrollStart(event) {
-    begin = (this.options.axis === 'x' ? event.pageX : event.pageY) - that._$thumb.offset()[that._dir];
+    begin = (that.options.axis === 'x' ? event.pageX : event.pageY) - that._$thumb.offset()[that._dir];
     that._$thumb.addClass('scrollbar-thumb-move');
     $(document).
       on('mousemove', scrollEnd).
@@ -67,7 +62,7 @@ scout.Scrollbar = function($parent, options) {
 
   function scrollEnd(event) {
     begin = begin === 0 ? that._beginDefault : begin;
-    var end = (this.options.axis === 'x' ? event.pageX : event.pageY) - that._$thumb.offset()[that._dir];
+    var end = (that.options.axis === 'x' ? event.pageX : event.pageY) - that._$thumb.offset()[that._dir];
     that._setThumb(end - begin);
   }
 
@@ -122,8 +117,6 @@ scout.Scrollbar.prototype._initThumbImpl = function() {
   this._beginDefault = thumbSize / 2;
 
   // set location of thumb
-  $.log.debug('_initThumbImpl:  topContainer=' + topContainer + ' _offset=' + this._offset + ' _scroll=' + this._scroll + ' _thumbRange=' + this._thumbRange +
-      ' jquery.scrollTop=' + this._$parent.parent().scrollTop());
   this._$thumb.css(this._dir, topContainer / (this._offset - this._scroll) * this._thumbRange);
 
   // show scrollbar
@@ -133,6 +126,16 @@ scout.Scrollbar.prototype._initThumbImpl = function() {
     this._$scrollbar.css('visibility', 'visible');
   }
 };
+
+scout.Scrollbar.prototype.scrollTop = function(top) {
+  if (top === undefined) {
+    return -parseFloat(this._$parent.css(this._dir));
+  }
+
+  this._$parent.css(this._dir, -top);
+  this._$thumb.css(this._dir, -top / (this._offset - this._scroll) * this._thumbRange);
+};
+
 
 scout.Scrollbar.prototype._setThumb = function(posDiff) {
   var posOld = this._$thumb.offset()[this._dir] - this._$scrollbar.offset()[this._dir],
