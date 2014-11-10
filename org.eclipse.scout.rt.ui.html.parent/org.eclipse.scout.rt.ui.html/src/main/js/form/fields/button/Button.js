@@ -8,7 +8,10 @@ scout.Button.SYSTEM_TYPE = {
   NONE: 0,
   CANCEL: 1,
   CLOSE: 2,
-  OK: 3
+  OK: 3,
+  RESET: 4,
+  SAVE: 5,
+  SAVE_WITHOUT_MARKER_CHANGE: 6
 };
 
 /**

@@ -43,18 +43,29 @@ scout.graphics = {
   /**
    * Returns the inset-dimensions of the component (padding, margin, border).
    */
-  getInsets: function($comp) {
+  getInsets: function($comp, options) {
+    options = options || {};
     var i,
       directions = ['top', 'right', 'bottom', 'left'],
       insets = [0, 0, 0, 0],
+      includeMargin = options.includeMargin !== undefined ? options.includeMargin : true,
+      includePadding = options.includePadding !== undefined ? options.includePadding : true,
+      includeBorder = options.includeBorder !== undefined ? options.includeBorder : true,
       cssToInt = function(cssProp) {
         return parseInt($comp.css(cssProp), 10);
       };
+
     for (i = 0; i < directions.length; i++) {
       // parseInt will ignore 'px' in string returned from css() method
-      insets[i] += cssToInt('margin-' + directions[i]);
-      insets[i] += cssToInt('padding-' + directions[i]);
-      insets[i] += cssToInt('border-' + directions[i] + '-width');
+      if (includeMargin) {
+        insets[i] += cssToInt('margin-' + directions[i]);
+      }
+      if (includePadding) {
+        insets[i] += cssToInt('padding-' + directions[i]);
+      }
+      if (includeBorder) {
+        insets[i] += cssToInt('border-' + directions[i] + '-width');
+      }
     }
     return new scout.Insets(insets[0], insets[1], insets[2], insets[3]);
   },

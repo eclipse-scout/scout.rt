@@ -1,6 +1,7 @@
 scout.Tooltip = function(options) {
+  options = options || {};
   this.text = options.text || '';
-  this.arrowPosition = options.arrowPosition || 50;
+  this.arrowPosition = options.arrowPosition !== undefined ? options.arrowPosition : 50;
   this.arrowPositionUnit = options.arrowPositionUnit || 'px';
   this.windowPaddingX = options.windowPaddingX !== undefined ? options.windowPaddingX : 10;
   this.windowPaddingY = options.windowPaddingY !== undefined ? options.windowPaddingY : 5;

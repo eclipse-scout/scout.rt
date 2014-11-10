@@ -31,16 +31,11 @@
 scout.Session = function($entryPoint, jsonSessionId, initOptions) {
   var prop;
   var customParamMap = new scout.URL().parameterMap;
+
   //validate params and use defaults
-  if (!initOptions) {
-    initOptions = {};
-  }
-  if (!initOptions.userAgent) {
-    initOptions.userAgent = new scout.UserAgent(scout.UserAgent.DEVICE_TYPE_DESKTOP);
-  }
-  if (!initOptions.objectFactories) {
-    initOptions.objectFactories = scout.defaultObjectFactories;
-  }
+  initOptions = initOptions || {};
+  initOptions.userAgent = initOptions.userAgent || new scout.UserAgent(scout.UserAgent.DEVICE_TYPE_DESKTOP);
+  initOptions.objectFactories = initOptions.objectFactories || scout.defaultObjectFactories;
   if (!initOptions.clientSessionId) {
     initOptions.clientSessionId = sessionStorage.getItem('scout:clientSessionId');
     if (!initOptions.clientSessionId) {
@@ -49,11 +44,10 @@ scout.Session = function($entryPoint, jsonSessionId, initOptions) {
     }
   }
   for (prop in customParamMap) {
-    if (!initOptions.customParams) {
-      initOptions.customParams = {};
-    }
+    initOptions.customParams = initOptions.customParams || {};
     initOptions.customParams[prop] = customParamMap[prop];
   }
+
   //set members
   this.$entryPoint = $entryPoint;
   this.jsonSessionId = jsonSessionId;

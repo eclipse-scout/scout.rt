@@ -166,13 +166,18 @@ Für Konstruktoren mit vielen Parametern bietet es sich an, ein einzelnes Objekt
 Dies macht die Erzeugung eines Objektes einiges übersichtlicher:
 
 scout.MyObject = function(options) {
+  options = options || {};
   var param1 = options.param1 || 'default';
+  var param2 = options.param2 !== undefined ? options.param2 : true
 }
 
 var obj = new scout.MyObject({
   param1: 'abc',
-  param2: 'cde'
+  param2: false
 }
+
+Achtung: Falls '', 0 oder false als Werte erlaubt sind, kann || nicht verwendet werden -> ? Notation verwenden
+Alternativ kann auch $.extend eingesetzt werden.
 
 ### Properties
 Wir erzeugen keine getter und setter für einfache Properties (ohne Logik). Man soll direkt auf die Variable zugreifen. Hauptgrund -> Code wird nicht unnötig aufgeblasen.

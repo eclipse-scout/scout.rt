@@ -34,7 +34,7 @@ scout.TableControl.prototype.remove = function() {
 scout.TableControl.prototype._renderContent = function($parent) {
   this.form.menubarPosition = 'bottom';
   this.form.render($parent);
-  this.form.$container.height(scout.TableFooter.CONTAINER_SIZE);
+  this.form.$container.height($parent.height());
   this.form.$container.width($parent.width());
   //FIXME CGU make this more easy to use
   this.form.htmlComp.pixelBasedSizing = true;

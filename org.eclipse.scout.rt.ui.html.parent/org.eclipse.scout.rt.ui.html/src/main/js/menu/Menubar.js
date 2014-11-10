@@ -1,5 +1,6 @@
 scout.Menubar = function($parent, options) {
-  var position = options && options.position || 'top';
+  options = options || {};
+  var position = options.position || 'top';
 
   this.menus = [];
   this.lastMenu;

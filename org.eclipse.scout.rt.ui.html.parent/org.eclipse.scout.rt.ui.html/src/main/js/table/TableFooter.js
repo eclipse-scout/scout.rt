@@ -208,14 +208,17 @@ scout.TableFooter.prototype._addGroup = function(title) {
 /* open, close and resize of the container */
 
 scout.TableFooter.prototype.openTableControl = function() {
+  var insets = scout.graphics.getInsets(this._$controlContainer, {includeMargin: false});
+  var contentHeight = scout.TableFooter.CONTAINER_SIZE - insets.top - insets.bottom;
+
   //adjust table
   this._resizeData(scout.TableFooter.CONTAINER_SIZE);
 
   //adjust content
-  this.$controlContent.outerHeight(scout.TableFooter.CONTAINER_SIZE);
+  this.$controlContent.outerHeight(contentHeight);
 
   //adjust container
-  this._$controlContainer .show().animateAVCSD('height', scout.TableFooter.CONTAINER_SIZE, null, null, 500);
+  this._$controlContainer.show().animateAVCSD('height', scout.TableFooter.CONTAINER_SIZE, null, null, 500);
 
   this.open = true;
 };

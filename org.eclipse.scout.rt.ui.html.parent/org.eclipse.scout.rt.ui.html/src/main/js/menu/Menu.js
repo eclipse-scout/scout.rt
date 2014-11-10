@@ -18,12 +18,16 @@ scout.Menu.prototype.sendMenuAction = function(event) {
 
 scout.Menu.prototype._render = function($parent) {
   var text = this.text;
+
+  this.defaultButton = scout.Button.SYSTEM_TYPE.OK === this.systemType ||
+    scout.Button.SYSTEM_TYPE.SAVE_WITHOUT_MARKER_CHANGE === this.systemType;
+
   if (this.hasButtonStyle()) {
     this.$container = $('<button>').
       appendTo($parent).
       addClass('menu-button').
       on('click', '', onClicked.bind(this));
-    if (scout.Button.SYSTEM_TYPE.OK === this.systemType) {
+    if (this.defaultButton) {
       this.$container.
         addClass('default-button').
         addClass('last');
