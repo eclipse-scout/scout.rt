@@ -36,6 +36,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.checkbox.ICheckBox;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.INumberField;
+import org.eclipse.scout.rt.client.ui.form.fields.richtextfield.IRichTextField;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
@@ -57,6 +58,7 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.button.JsonButton;
 import org.eclipse.scout.rt.ui.html.json.form.fields.checkbox.JsonCheckBoxField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.groupbox.JsonGroupBox;
 import org.eclipse.scout.rt.ui.html.json.form.fields.numberfield.JsonNumberField;
+import org.eclipse.scout.rt.ui.html.json.form.fields.richtextfield.JsonRichTextField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.sequencebox.JsonSequenceBox;
 import org.eclipse.scout.rt.ui.html.json.form.fields.smartfield.JsonSmartField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.stringfield.JsonStringField;
@@ -113,6 +115,9 @@ public class JsonAdapterFactory {
     }
     else if (model instanceof IButton) {
       return new JsonButton((IButton) model, session, id);
+    }
+    else if (model instanceof IRichTextField) {
+      return new JsonRichTextField((IRichTextField) model, session, id);
     }
     else if (model instanceof IStringField) {
       return new JsonStringField((IStringField) model, session, id);

@@ -71,6 +71,7 @@
 //@include("form/fields/button/Button.js");
 //@include("form/fields/checkbox/CheckBoxField.js");
 //@include("form/fields/numberfield/NumberField.js");
+//@include("form/fields/richtextfield/RichTextField.js");
 //@include("form/fields/stringfield/StringField.js");
 //@include("form/fields/smartfield/AbstractSmartField.js");
 //@include("form/fields/smartfield/SmartField.js");

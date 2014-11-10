@@ -157,6 +157,11 @@ scout.defaultObjectFactories = [{
     return new scout.NumberField();
   }
 }, {
+  objectType: 'RichTextField',
+  create: function() {
+    return new scout.RichTextField();
+  }
+}, {
   objectType: 'StringField',
   create: function() {
     return new scout.StringField();
