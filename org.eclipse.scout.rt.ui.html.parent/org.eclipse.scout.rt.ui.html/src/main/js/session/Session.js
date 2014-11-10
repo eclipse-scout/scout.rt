@@ -29,6 +29,8 @@
  * }
  */
 scout.Session = function($entryPoint, jsonSessionId, initOptions) {
+  var prop;
+  var customParamMap = new scout.URL().parameterMap;
   //validate params and use defaults
   if (!initOptions) {
     initOptions = {};
@@ -46,8 +48,7 @@ scout.Session = function($entryPoint, jsonSessionId, initOptions) {
       sessionStorage.setItem('scout:clientSessionId', initOptions.clientSessionId);
     }
   }
-  var customParamMap = new scout.URL().parameterMap;
-  for ( var prop in customParamMap) {
+  for (prop in customParamMap) {
     if (!initOptions.customParams) {
       initOptions.customParams = {};
     }
