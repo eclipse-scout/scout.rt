@@ -10,7 +10,7 @@ https://google-styleguide.googlecode.com/svn/trunk/javascriptguide.xml
 
 - Variablen wenn moeglich immer am Anfang der Funktion deklarieren. Variablen am
   Anfang zu Deklarieren ist good practice, denn die JS-Engine macht das bei der
-  Ausfuehrung sowieso (variable hoisting).
+  Ausfuehrung sowieso(variable hoisting).
 - Pro 'var' Anweisung dürfen mehrere Variablen deklariert und auch initialisiert
   werden. Komplexe Initialisierung soll aber auf einer separaten Zeile notiert
   werden.
@@ -33,6 +33,10 @@ var x = (y > 0 ? 1 : 2), y = $('h1').children('.myClass').first().text();
 
 Links:
 - http://benalman.com/news/2012/05/multiple-var-statements-javascript/
+
+
+### Visibility
+Wir verwenden _ als Prefix für private Members einer Klasse. Solche Members dürfen von aussen nicht zugegriffen werden (Ausnahme: in Tests/Specs)
 
 
 ### Pruefen, ob eine Variable oder ein Property existiert
@@ -158,7 +162,17 @@ dann wie folgt erweitern:
       this.width = vararg || 0;
       this.height = height || 0;
 
+Für Konstruktoren mit vielen Parametern bietet es sich an, ein einzelnes Objekt als Parameter zu verwenden. Wir nennen dieses Objekt "options".
+Dies macht die Erzeugung eines Objektes einiges übersichtlicher:
 
+scout.MyObject = function(options) {
+  var param1 = options.param1 || 'default';
+}
 
+var obj = new scout.MyObject({
+  param1: 'abc',
+  param2: 'cde'
+}
 
-
+### Properties
+Wir erzeugen keine getter und setter für einfache Properties (ohne Logik). Man soll direkt auf die Variable zugreifen. Hauptgrund -> Code wird nicht unnötig aufgeblasen.
