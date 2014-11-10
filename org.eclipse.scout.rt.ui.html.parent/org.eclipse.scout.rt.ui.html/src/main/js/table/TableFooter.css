@@ -1,4 +1,5 @@
 @table-control-padding: 14px;
+@table-control-content-padding: 10px;
 
 .table-footer {
   position: absolute;
@@ -7,7 +8,6 @@
   width: 100%;
   white-space: nowrap;
   border-top: 1px solid @color-bench-light-border;
- 
 }
 
 .control-resize {
@@ -33,21 +33,20 @@
 .control-content {
   height: 100%;
   width: 100%;
-  padding: 10px;
 }
 
 .control-group {
   float: left;
-  
+
   .table-footer > & ~ & {
     margin-left: -1px;
   }
 }
 
 .control{
-  position: relative;	
+  position: relative;
   display: inline-block;
-  padding: 0px @table-control-padding 0px @table-control-padding;
+  padding: 0 @table-control-padding;
   cursor: pointer;
   margin-top: -1px;
   height: @table-footer-height;
@@ -59,16 +58,16 @@
     font-size: 22px;
     color: @footer-color;
   }
-  
+
   &:last-child:after{
-	content: ' ';
-  	position: absolute;
-  	top: @table-control-padding / 2  + 2px;
-  	right: -1px;
-  	height: @table-footer-height - @table-control-padding - 4px;
-  	border-right: 1px solid @color-bench-light-border;
+  content: ' ';
+    position: absolute;
+    top: @table-control-padding / 2  + 2px;
+    right: -1px;
+    height: @table-footer-height - @table-control-padding - 4px;
+    border-right: 1px solid @color-bench-light-border;
   }
-    
+
   &:hover:before {
     color: @active-color;
   }
@@ -79,9 +78,9 @@
   }
 
   &.selected:before {
-    color: @active-color !important;    
+    color: @active-color !important;
   }
-  
+
   &.selected{
     border-left: 1px solid @color-bench-light-border;
     border-right: 1px solid @color-bench-light-border;
@@ -125,16 +124,16 @@
   color: @footer-color;
   cursor: pointer;
   line-height: 19px;
-    
+
   &:before{
-	content: ' ';
-  	position: absolute;
-  	top: @table-control-padding / 2  + 2px;
-  	left: 0px;
-  	height: @table-footer-height - @table-control-padding - 4px;
-  	border-right: 1px solid @color-bench-light-border;
+  content: ' ';
+    position: absolute;
+    top: @table-control-padding / 2  + 2px;
+    left: 0px;
+    height: @table-footer-height - @table-control-padding - 4px;
+    border-right: 1px solid @color-bench-light-border;
   }
-  
+
   & span.info-button{
    text-decoration: underline;
   }
@@ -142,6 +141,6 @@
   &:hover span.info-button{
    color: @active-color;
   }
-  
+
 }
 

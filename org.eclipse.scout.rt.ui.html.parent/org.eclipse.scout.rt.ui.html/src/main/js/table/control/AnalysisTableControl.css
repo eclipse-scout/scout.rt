@@ -2,12 +2,16 @@
   content: @icon-target;
 }
 
+.control-analysis-content {
+  padding: @table-control-content-padding;
+}
+
 /* command buttons */
 
 .command-container {
   float: left;
   padding: 15px 20px 10px 20px;
-  
+
 
   & .command {
     position: relative;
@@ -19,7 +23,7 @@
     padding: 38px 5px 0px 5px;
     overflow: visible;
   }
-    
+
   & .command:before {
     position: absolute;
     top: 0;
@@ -37,10 +41,10 @@
 
   & .command.delete:before { content: @icon-remove;  }
   & .command.search:before { content: @icon-search;  }
-  
+
   & .command:hover { color: @active-color; }
   & .command:hover:before { color: @active-color; }
-  
+
   & .simulator {
     padding: 10px 5px 0px 5px;
     color: @chart-color-empty;
@@ -85,7 +89,7 @@ circle.venn-circle {
   stroke-width: 2;
   cursor: pointer;
   stroke-opacity: 1;
-  
+
   &.selected, &:hover{
     stroke: @highlight-color;
   }
@@ -94,7 +98,7 @@ circle.venn-circle {
 .venn-set {
   fill: rgba(254, 153, 21, 0.1);
   opacity: 0;
-  
+
   &.selected {
     opacity: 1;
   }
@@ -118,7 +122,7 @@ text.venn-circle-text {
   height: 20px;
   width: 30px;
   left: 780px;
-  
+
   &:before {
     position: relative;
     top: -4px;
@@ -148,16 +152,16 @@ text.venn-circle-text {
   text-decoration: underline;
   color: @chart-color-axis-text;
   cursor: pointer;
-  
+
   &:hover {
     color: @active-color;
   }
-  
+
   &:last-child {
     color: @highlight-color;
     cursor: default;
   }
-  
+
   &:after{
     .font-icon;
     content:  @icon-angle-right;
@@ -165,12 +169,12 @@ text.venn-circle-text {
     left: 10px;
     display: inline-block;
   }
-  
+
  &:last-child:after {
     content: "";
     left: 0px;
   }
-  
+
 }
 
 .criteria-search {

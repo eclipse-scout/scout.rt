@@ -1,15 +1,24 @@
-scout.Menubar = function($parent) {
-  this.$container = $parent.prependDiv('', 'menubar');
+scout.Menubar = function($parent, options) {
+  var position = options && options.position || 'top';
+
   this.menus = [];
   this.lastMenu;
   this.menuTypesForLeft1 = [];
   this.menuTypesForLeft2 = [];
   this.menuTypesForRight = [];
   this.staticMenus = [];
+
+  this.$container = $.makeDIV('menubar').hide();
+  if (position === 'top') {
+    $parent.prepend(this.$container);
+  } else {
+    this.$container.addClass('bottom');
+    $parent.append(this.$container);
+  }
 };
 
 scout.Menubar.prototype.updateItems = function(menus) {
-  var i, left1Menus, left2Menus, hasLeft1Menus, rightMenus;
+  var i, left1Menus, left2Menus, hasLeft1Menus, rightMenus, hasMenus;
 
   menus = this.staticMenus.concat(menus);
 
@@ -35,6 +44,7 @@ scout.Menubar.prototype.updateItems = function(menus) {
   if (hasLeft1Menus) {
     for (i = 0; i < left1Menus.length; i++) {
       this._addMenuItem(left1Menus[i]);
+      hasMenus = true;
     }
   }
 
@@ -56,6 +66,7 @@ scout.Menubar.prototype.updateItems = function(menus) {
       this._addMenuSeparator();
     } else {
       this._addMenuItem(menus[i]);
+      hasMenus = true;
     }
   }
 
@@ -69,6 +80,12 @@ scout.Menubar.prototype.updateItems = function(menus) {
   this.$container.children('.menu-right').
     first().
     addClass('last');
+
+  if (!hasMenus) {
+    this.$container.hide();
+  } else {
+    this.$container.show();
+  }
 };
 
 scout.Menubar.prototype._addMenuItem = function(menu) {

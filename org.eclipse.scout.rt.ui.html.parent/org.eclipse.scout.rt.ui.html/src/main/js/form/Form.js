@@ -11,12 +11,14 @@ scout.Form = function() {
 scout.inherits(scout.Form, scout.ModelAdapter);
 
 scout.Form.prototype._render = function($parent) {
+  var detachable, closeable, i, btn, systemButtons;
+
   this._$parent = $parent;
-  this.$container = $('<div>').
-    appendTo($parent).
-    attr('id', 'Form-' + this.id).
-    addClass('form').
-    data('model', this);
+  this.$container = $('<div>')
+    .appendTo($parent)
+    .attr('id', 'Form-' + this.id)
+    .addClass('form')
+    .data('model', this);
 
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(new scout.FormLayout());
@@ -24,8 +26,12 @@ scout.Form.prototype._render = function($parent) {
 
   this.rootGroupBox.render(this.$container);
 
-  var closeable = false;
-  var detachable = !this.modal;
+  closeable = false;
+  if (this.detachable !== undefined) {
+    detachable = this.detachable;
+  } else {
+    detachable = this.displayHint === 'dialog' && !this.modal;
+  }
   if (window.scout.sessions.length > 1 || this.session.parentJsonSession) {
     // Cannot detach if...
     // 1. there is more than one session inside the window (portlets), because
@@ -34,21 +40,24 @@ scout.Form.prototype._render = function($parent) {
     detachable = false;
   }
 
-  var i, btn, systemButtons = this.rootGroupBox.systemButtons;
+  systemButtons = this.rootGroupBox.systemButtons;
   for (i = 0; i < systemButtons.length; i++) {
     btn = systemButtons[i];
     if (btn.visible &&
-       (btn.systemType == scout.Button.SYSTEM_TYPE.CANCEL ||
+      (btn.systemType == scout.Button.SYSTEM_TYPE.CANCEL ||
         btn.systemType == scout.Button.SYSTEM_TYPE.CLOSE)) {
       closeable = true;
     }
   }
 
-  if (detachable) {
-    this.staticMenus.push(new scout.DetachFormMenu(this, this.session));
+  if (detachable && !this.detachFormMenu) {
+    this.detachFormMenu = new scout.DetachFormMenu(this, this.session);
+    this.staticMenus.push(this.detachFormMenu);
   }
 
-  this.menubar = new scout.Menubar(this.$container);
+  this.menubar = new scout.Menubar(this.$container, {
+    position: this.menubarPosition
+  });
   this.menubar.menuTypesForLeft1 = ['Form.System'];
   this.menubar.menuTypesForLeft2 = ['Form.Regular'];
   this.menubar.menuTypesForRight = ['Form.Tool'];
@@ -74,7 +83,8 @@ scout.Form.prototype.onResize = function() {
   $.log.trace('(Form#onResize) window was resized -> layout Form container');
 
   var htmlCont = scout.HtmlComponent.get(this.$container);
-  var parentSize = scout.graphics.getSize(this.$container.parent());
+  var $parent = this.$container.parent();
+  var parentSize = new scout.Dimension($parent.width(), $parent.height());
   htmlCont.setSize(parentSize);
 };
 

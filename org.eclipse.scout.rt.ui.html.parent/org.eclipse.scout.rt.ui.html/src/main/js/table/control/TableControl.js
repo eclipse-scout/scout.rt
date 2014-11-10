@@ -32,6 +32,7 @@ scout.TableControl.prototype.remove = function() {
 };
 
 scout.TableControl.prototype._renderContent = function($parent) {
+  this.form.menubarPosition = 'bottom';
   this.form.render($parent);
   this.form.$container.height(scout.TableFooter.CONTAINER_SIZE);
   this.form.$container.width($parent.width());
@@ -49,6 +50,9 @@ scout.TableControl.prototype._removeContent = function() {
 scout.TableControl.prototype.removeContent = function() {
   if (this.contentRendered) {
     this._removeContent();
+    if (this.cssClass) {
+      this.tableFooter.$controlContent.removeClass(this.cssClass + '-content');
+    }
     this.contentRendered = false;
   }
 };
@@ -67,6 +71,9 @@ scout.TableControl.prototype.renderContent = function() {
     this.tableFooter.openTableControl();
   }
 
+  if (this.cssClass) {
+    this.tableFooter.$controlContent.addClass(this.cssClass + '-content');
+  }
   this._renderContent(this.tableFooter.$controlContent);
 
   this.contentRendered = true;
@@ -151,7 +158,8 @@ scout.TableControl.prototype._renderEnabled = function(enabled) {
       text: this.label,
       $origin: this.$control,
       arrowPosition: 50,
-      arrowPositionUnit: '%'
+      arrowPositionUnit: '%',
+      cssClass: 'table-control'
     });
     tooltip.render();
   }

@@ -1,3 +1,5 @@
+@menu-margin-x: @bench-margin-x;
+
 /* Mixins */
 .menu-icon(@icon) {
   .font-icon;
@@ -32,7 +34,7 @@
   position: relative;
   box-sizing: border-box;
   height: 55px;
-  margin: 0 20px;
+  margin: 0 @menu-margin-x;
   padding: 6px 0 10px 0;
 
   & div, button {

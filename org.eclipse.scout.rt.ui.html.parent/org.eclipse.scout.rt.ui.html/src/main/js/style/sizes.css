@@ -3,8 +3,7 @@
 @size-desktop-tools: 50px;
 @size-desktop-menu: 30px;
 
-@margin-bench-left: 20px;
-@margin-bench-right: @margin-bench-left;
+@bench-margin-x: 20px;
 
 @border-radius: 3px;
 @logical-grid-height: 30px;

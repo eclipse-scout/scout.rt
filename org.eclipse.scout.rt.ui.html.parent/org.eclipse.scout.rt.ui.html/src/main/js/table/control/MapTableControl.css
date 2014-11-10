@@ -2,6 +2,10 @@
   content: @icon-world;
 }
 
+.control-map-content {
+  padding: @table-control-content-padding;
+}
+
 .map-container {
   width: 100%;
   height: 100%;

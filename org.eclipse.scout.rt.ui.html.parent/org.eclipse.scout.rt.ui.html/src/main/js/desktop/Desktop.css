@@ -159,13 +159,8 @@
 
 .desktop-bench > .table > .table-header,
 .desktop-bench > .table > .table-data {
-  margin-left: @margin-bench-left;
-  margin-right: @margin-bench-right;
-}
-
-.desktop-bench > .table > .menubar,
-.desktop-bench > .form > .menubar {
-  padding-right: @margin-bench-right;
+  margin-left: @bench-margin-x;
+  margin-right: @bench-margin-x;
 }
 
 /* Desktop table has a 2px border. For this we create a div which spans the full row and has border-top/bottom set to 1px.

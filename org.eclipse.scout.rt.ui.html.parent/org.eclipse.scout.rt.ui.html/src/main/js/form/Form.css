@@ -1,6 +1,20 @@
 .form {
   height: 100%;
   width: 100%;
+  position: relative;
+}
+
+.form > .menubar {
+  border-bottom: 3px solid @color-bench-light-border;
+
+  &.bottom {
+    position: absolute;
+    bottom: 0;
+    width: calc(~"100% - " @menu-margin-x*2);
+
+    border-top: 3px solid @color-bench-light-border;
+    border-bottom: 0;
+  }
 }
 
 .detach-menu {
@@ -11,4 +25,3 @@
      color:@hover-color;
   }
 }
-

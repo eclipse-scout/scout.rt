@@ -80,8 +80,11 @@ scout.graphics = {
       cssHeight(bounds.height);
   },
   offsetBounds: function($elem, includeMargins) {
+    if (includeMargins === undefined) {
+      includeMargins = false;
+    }
     var pos = $elem.offset();
-    return new scout.Rectangle(pos.left, pos.top, $elem.outerWidth(false), $elem.outerHeight(false));
+    return new scout.Rectangle(pos.left, pos.top, $elem.outerWidth(includeMargins), $elem.outerHeight(includeMargins));
   },
   debugOutput: function($comp) {
     var attrs = '';

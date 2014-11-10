@@ -2,6 +2,10 @@
   content:@icon-graph;
 }
 
+.control-graph-content {
+  padding: @table-control-content-padding;
+}
+
 .graph-container {
   width: 100%;
   height: 100%;
@@ -12,7 +16,7 @@
   stroke: #fff;
   stroke-width: 2px;
   cursor: pointer;
-  
+
   &.center {fill: @highlight-color;}
   &.internal {fill: @palette-light-gray-1;}
   &.person {fill: @palette-gray;}
@@ -24,7 +28,7 @@
   fill: #fff;
   text-anchor: middle;
   dominant-baseline: central;
-  
+
   &:hover{
     cursor: pointer;
   }
