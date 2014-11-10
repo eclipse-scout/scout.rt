@@ -60,7 +60,7 @@
   }
 
   &:last-child:after{
-  content: ' ';
+    content: ' ';
     position: absolute;
     top: @table-control-padding / 2  + 2px;
     right: -1px;
@@ -87,6 +87,10 @@
     border-top: 1px solid @palette-white;
     background-color: @palette-white;
   }
+}
+
+.tooltip.table-control {
+  margin-top: 10px;
 }
 
 .control-query:before {
@@ -126,7 +130,7 @@
   line-height: 19px;
 
   &:before{
-  content: ' ';
+    content: ' ';
     position: absolute;
     top: @table-control-padding / 2  + 2px;
     left: 0px;
@@ -143,4 +147,3 @@
   }
 
 }
-

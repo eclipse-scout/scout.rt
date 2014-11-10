@@ -8,6 +8,7 @@ scout.Tooltip = function(options) {
   this.$origin = options.$origin;
   this.autoRemove = options.autoRemove !== undefined ? options.autoRemove : true;
   this.$context = options.$context;
+  this.cssClass = options.cssClass;
 };
 
 scout.Tooltip.prototype.render = function($parent) {
@@ -20,6 +21,10 @@ scout.Tooltip.prototype.render = function($parent) {
     .data('tooltip', this)
     .data('tooltipContext', this.$context)
     .appendTo($parent);
+
+  if (this.cssClass) {
+    this.$container.addClass(this.cssClass);
+  }
 
   this.$arrow = $.makeDIV('tooltip-arrow').appendTo(this.$container);
   this.$container.appendDIV('tooltip-content', this.text);
@@ -38,8 +43,13 @@ scout.Tooltip.prototype.position = function() {
   var top, left, arrowHeight, overlapX, overlapY, x, y, origin,
     tooltipWidth, tooltipHeight, arrowDivWidth;
 
-  origin = this.origin || this.$origin && scout.graphics.offsetBounds(this.$origin);
-  x = origin.x + origin.width / 2;
+  if (this.origin) {
+    origin = this.origin;
+    x = origin.x;
+  } else {
+    origin = this.$origin && scout.graphics.offsetBounds(this.$origin);
+    x = origin.x + origin.width / 2;
+  }
   y = origin.y;
 
   arrowDivWidth = this.$arrow.outerWidth();
@@ -111,7 +121,7 @@ scout.Tooltip.removeTooltips = function($contexts, $parent) {
       $context = $tooltips.eq(i).data('tooltipContext');
 
       if ($context[0] === $contexts.eq(j)[0]) {
-        $tooltips[i].data('tooltip').remove();
+        $tooltips.eq(i).data('tooltip').remove();
       }
     }
   }
