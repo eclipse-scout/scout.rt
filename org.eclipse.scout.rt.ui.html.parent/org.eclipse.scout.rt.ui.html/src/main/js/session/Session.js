@@ -28,36 +28,36 @@
  * 'customParams': {'addinType': 'word', 'addInToken': '234jh523jk5hb235'}
  * }
  */
-scout.Session = function($entryPoint, jsonSessionId, initBean) {
+scout.Session = function($entryPoint, jsonSessionId, initOptions) {
   //validate params and use defaults
-  if(!initBean){
-    initBean={};
+  if (!initOptions) {
+    initOptions = {};
   }
-  if (!initBean.userAgent) {
-    initBean.userAgent = new scout.UserAgent(scout.UserAgent.DEVICE_TYPE_DESKTOP);
+  if (!initOptions.userAgent) {
+    initOptions.userAgent = new scout.UserAgent(scout.UserAgent.DEVICE_TYPE_DESKTOP);
   }
-  if (!initBean.objectFactories) {
-    initBean.objectFactories = scout.defaultObjectFactories;
+  if (!initOptions.objectFactories) {
+    initOptions.objectFactories = scout.defaultObjectFactories;
   }
-  if (!initBean.clientSessionId) {
-    initBean.clientSessionId = sessionStorage.getItem('scout:clientSessionId');
-    if (!initBean.clientSessionId) {
-      initBean.clientSessionId = scout.numberToBase62(scout.getTimestamp());
-      sessionStorage.setItem('scout:clientSessionId', initBean.clientSessionId);
+  if (!initOptions.clientSessionId) {
+    initOptions.clientSessionId = sessionStorage.getItem('scout:clientSessionId');
+    if (!initOptions.clientSessionId) {
+      initOptions.clientSessionId = scout.numberToBase62(scout.getTimestamp());
+      sessionStorage.setItem('scout:clientSessionId', initOptions.clientSessionId);
     }
   }
-  var customParamMap=new scout.URL().getParameterMap();
-  for (var prop in customParamMap) {
-    if (!initBean.customParams) {
-      initBean.customParams={};
+  var customParamMap = new scout.URL().parameterMap;
+  for ( var prop in customParamMap) {
+    if (!initOptions.customParams) {
+      initOptions.customParams = {};
     }
-    initBean.customParams[prop]=customParamMap[prop];
+    initOptions.customParams[prop] = customParamMap[prop];
   }
   //set members
   this.$entryPoint = $entryPoint;
   this.jsonSessionId = jsonSessionId;
-  this._initBean = initBean;
-  this.userAgent= initBean.userAgent;
+  this._initOptions = initOptions;
+  this.userAgent = initOptions.userAgent;
   this.modelAdapterRegistry = {};
   this.locale;
   this._asyncEvents = [];
@@ -139,7 +139,6 @@ scout.Session.prototype.getOrCreateModelAdapter = function(id, parent) {
   return adapter;
 };
 
-
 scout.Session.prototype.getOrCreateModelAdapters = function(ids, parent) {
   if (!ids) {
     return [];
@@ -153,20 +152,19 @@ scout.Session.prototype.getOrCreateModelAdapters = function(ids, parent) {
 
 // FIXME IMO: commented by A.WE
 /*
-scout.Session.prototype._createRootModelAdapters = function() {
-  var $parent=this.$entryPoint;
-  var id, data;
-  for (id in this._adapterDataCache) {
-    data=this._adapterDataCache[id];
-    if(data.root){
-      this.objectFactory.
-        create(this._getAdapterData(data.id)).
-        render($parent);
-    }
-  }
-};
-*/
-
+ scout.Session.prototype._createRootModelAdapters = function() {
+ var $parent=this.$entryPoint;
+ var id, data;
+ for (id in this._adapterDataCache) {
+ data=this._adapterDataCache[id];
+ if(data.root){
+ this.objectFactory.
+ create(this._getAdapterData(data.id)).
+ render($parent);
+ }
+ }
+ };
+ */
 
 /**
  *
@@ -192,20 +190,20 @@ scout.Session.prototype.send = function(type, id, data) {
 
 scout.Session.prototype._sendNow = function(events, deferred) {
   var request = {
-    jsonSessionId: this.jsonSessionId,
-    events: events
+    jsonSessionId : this.jsonSessionId,
+    events : events
   };
 
   if (this._startup) {
-    request.clientSessionId = this._initBean.clientSessionId;
+    request.clientSessionId = this._initOptions.clientSessionId;
     request.startup = true;
     this._startup = false;
 
-    if (this._initBean.userAgent.deviceType !== scout.UserAgent.DEVICE_TYPE_DESKTOP) {
-      request.userAgent = this._initBean.userAgent;
+    if (this._initOptions.userAgent.deviceType !== scout.UserAgent.DEVICE_TYPE_DESKTOP) {
+      request.userAgent = this._initOptions.userAgent;
     }
-    if (this._initBean.customParams) {
-      request.customParams = this._initBean.customParams;
+    if (this._initOptions.customParams) {
+      request.customParams = this._initOptions.customParams;
     }
   }
   if (this._unload) {
@@ -227,22 +225,20 @@ scout.Session.prototype._sendRequest = function(request) {
   var that = this;
   this._requestsPendingCounter++;
   $.ajax({
-    async: true,
-    type: 'POST',
-    dataType: 'json',
-    contentType: 'application/json',
-    cache: false,
-    url: this.url,
-    data: JSON.stringify(request),
-    context: request
-  })
-    .done(function(data) {
-      that._processSuccessResponse(data);
-    })
-    .fail(function(jqXHR, textStatus, errorThrown) {
-      var request = this;
-      that._processErrorResponse(request, jqXHR, textStatus, errorThrown);
-    });
+    async : true,
+    type : 'POST',
+    dataType : 'json',
+    contentType : 'application/json',
+    cache : false,
+    url : this.url,
+    data : JSON.stringify(request),
+    context : request
+  }).done(function(data) {
+    that._processSuccessResponse(data);
+  }).fail(function(jqXHR, textStatus, errorThrown) {
+    var request = this;
+    that._processErrorResponse(request, jqXHR, textStatus, errorThrown);
+  });
 };
 
 scout.Session.prototype._processSuccessResponse = function(message) {
@@ -254,7 +250,8 @@ scout.Session.prototype._processSuccessResponse = function(message) {
   try {
     this._processEvents(message.events);
     this.layoutValidator.validate();
-  } finally {
+  }
+  finally {
     this.processingEvents = false;
     var cacheSize = scout.countProperties(this._adapterDataCache);
     if (cacheSize > 0) {
@@ -283,7 +280,7 @@ scout.Session.prototype._copyAdapterData = function(adapterData) {
     count++;
   }
   if (count > 0) {
-    $.log.debug('Stored ' + count +  ' properties in adapterDataCache');
+    $.log.debug('Stored ' + count + ' properties in adapterDataCache');
   }
 };
 
@@ -309,7 +306,8 @@ scout.Session.prototype._processErrorResponse = function(request, jqXHR, textSta
     this.$entryPoint.html('');
     if (this.desktop) {
       this.desktop.showMessage(jsonResponse.errorMessage, 'timeout');
-    } else {
+    }
+    else {
       this.$entryPoint.text(jsonResponse.errorMessage);
     }
     return;
@@ -379,7 +377,8 @@ scout.Session.prototype._processEvents = function(events) {
 
     if (event.type === 'property') { // Special handling for 'property' type
       adapter.onModelPropertyChange(event);
-    } else {
+    }
+    else {
       adapter.onModelAction(event);
     }
   }
@@ -404,27 +403,26 @@ scout.Session.prototype.init = function() {
       childWindow.close();
     });
   }.bind(this));
-  this.objectFactory.register(this._initBean.objectFactories);
+  this.objectFactory.register(this._initOptions.objectFactories);
 };
 
 scout.Session.prototype.onModelAction = function(event) {
   if (event.type === 'localeChanged') {
     this.locale = new scout.Locale(event);
     // FIXME inform components to reformat display text?
-  } else if (event.type === 'initialized') {
+  }
+  else if (event.type === 'initialized') {
     // cannot use getOrCreateModelAdapter here since Session doesn't have a parent
     var sessionData = this._getAdapterData(event.clientSession);
     this.locale = new scout.Locale(sessionData.locale);
     var desktopData = this._getAdapterData(sessionData.desktop);
     this.desktop = this.objectFactory.create(desktopData);
     this.desktop.render(this.$entryPoint);
-// FIXME IMO: commented by A.WE
-//    this._createRootModelAdapters();
-//    this.desktop = this.getModelAdapter(sessionData.desktop);
+    // FIXME IMO: commented by A.WE
+    //    this._createRootModelAdapters();
+    //    this.desktop = this.getModelAdapter(sessionData.desktop);
   }
 };
-
-
 
 /**
  * Returns the adapter-data sent with the JSON response from the adapter-data cache. Note that this operation

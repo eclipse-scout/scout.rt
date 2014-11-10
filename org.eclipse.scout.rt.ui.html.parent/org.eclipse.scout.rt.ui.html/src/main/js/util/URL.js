@@ -12,7 +12,7 @@ scout.URL = function(url) {
   this._queryPartRaw = a[2];
   this._hashPartRaw = a[3];
   // un-encoded (!)
-  this._queryMap = scout.URL._parse(this._queryPartRaw);
+  this.parameterMap = scout.URL._parse(this._queryPartRaw);
 };
 
 // Helper function to sort arrays alphabetically, nulls in front
@@ -68,15 +68,11 @@ scout.URL._parse = function(queryPart) {
   return map;
 };
 
-scout.URL.prototype.getParameterMap = function() {
-  return this._queryMap;
-};
-
 scout.URL.prototype.getParameter = function(param) {
   if (typeof param !== 'string') {
     throw new Error('Illegal argument type: ' + param);
   }
-  var value = this._queryMap[param];
+  var value = this.parameterMap[param];
   if (Array.isArray(value)) {
     return value.sort(scout.URL._sorter);
   }
@@ -87,7 +83,7 @@ scout.URL.prototype.removeParameter = function(param) {
   if (typeof param !== 'string') {
     throw new Error('Illegal argument type: ' + param);
   }
-  delete this._queryMap[param];
+  delete this.parameterMap[param];
   return this;
 };
 
@@ -98,7 +94,7 @@ scout.URL.prototype.setParameter = function(param, value) {
   if (param === null || param === '') { // ignore empty keys
     return;
   }
-  this._queryMap[param] = value;
+  this.parameterMap[param] = value;
   return this;
 };
 
@@ -109,16 +105,16 @@ scout.URL.prototype.addParameter = function(param, value) {
   if (param === null || param === '') { // ignore empty keys
     return;
   }
-  scout.URL._addToMap(this._queryMap, param, value);
+  scout.URL._addToMap(this.parameterMap, param, value);
   return this;
 };
 
 scout.URL.prototype.toString = function() {
   var result = this._baseUrlRaw;
 
-  if (Object.keys(this._queryMap).length) {
-    // Built a sorted string of all formatted _queryMap entries
-    var reconstructedQueryPart = Object.keys(this._queryMap).sort(scout.URL._sorter).map(function(key) {
+  if (Object.keys(this.parameterMap).length) {
+    // Built a sorted string of all formatted parameterMap entries
+    var reconstructedQueryPart = Object.keys(this.parameterMap).sort(scout.URL._sorter).map(function(key) {
       var value = this.getParameter(key);
       // For multiple values, generate a parameter string for each value
       if (Array.isArray(value)) {

@@ -8,22 +8,28 @@ scout.OfficeAddIn.prototype._render = function($parent) {
   this.$parent = $parent;
   this.$mscomSend = $('#_js2mscom');
   this.$mscomRecv = $('#_mscom2js');
-  this.$mscomRecv.click(function(){that._mscomRecv();});
-  this._notImplementedMessage=JSON.stringify({'op':'0', 'status':'error', 'message':'Office is not attached'});
+  this.$mscomRecv.click(function() {
+    that._mscomRecv();
+  });
+  this._notImplementedMessage = JSON.stringify({
+    'op' : '0',
+    'status' : 'error',
+    'message' : 'Office is not attached'
+  });
 };
 
 scout.OfficeAddIn.prototype._mscomSend = function(serialJson) {
   this.$mscomSend.html(serialJson);
   this.$mscomRecv.html(this._notImplementedMessage);
   this.$mscomSend.trigger('click');
-  var response=JSON.parse(this.$mscomRecv.html());
+  var response = JSON.parse(this.$mscomRecv.html());
   this.$mscomSend.html(' ');
   this.$mscomRecv.html(' ');
   return response;
 };
 
 scout.OfficeAddIn.prototype._mscomRecv = function() {
-  var data=JSON.parse(this.$mscomRecv.html());
+  var data = JSON.parse(this.$mscomRecv.html());
   this.$mscomRecv.html(' ');
   this.session.send('inbound', this.id, data);
 };
@@ -32,13 +38,13 @@ scout.OfficeAddIn.prototype._mscomRecv = function() {
 
 scout.OfficeAddIn.prototype.onModelAction = function(event) {
   if (event.type === 'outbound') {
-    if(event.status==='request'){
-      var data=this._mscomSend(JSON.stringify(event));
-      data.ref=event.ref;
-      //return ref, status=success|error+message|timeout
+    if (event.status === 'request') {
+      var data = this._mscomSend(JSON.stringify(event));
+      data.ref = event.ref;
+      // return ref, status=success|error+message|timeout
       this.session.send('inbound', this.id, data);
     }
-    else{
+    else {
       this.$mscomSend.html(JSON.stringify(event));
     }
   }
@@ -49,9 +55,9 @@ scout.OfficeAddIn.prototype.onModelAction = function(event) {
 
 /* registration in object factory */
 
-scout.defaultObjectFactories = scout.defaultObjectFactories.concat( [ {
+scout.defaultObjectFactories = scout.defaultObjectFactories.concat([ {
   objectType : 'OfficeAddIn',
   create : function() {
     return new scout.OfficeAddIn();
   }
-}]);
+} ]);
