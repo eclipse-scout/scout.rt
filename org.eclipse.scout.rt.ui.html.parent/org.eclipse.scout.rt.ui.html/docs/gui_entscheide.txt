@@ -73,3 +73,22 @@ TableField:
 TabBox:
 
   Hat kein margin-top
+
+
+Überlegungen zu Tastatursteuerung / Fokus-Handling
+AWE, CGU 10.11.2014
+
+- Key-Shortcuts sind kein Ersatz für Fokus-Handling, sondern ein ergänzendes Konzept on-top
+- Es gibt nicht _eine_ richtige Art die Applikation zu bedienen, jeder Benutzer hat eine andere
+  Art mit der Bedienung, das soll durch Html UI nicht verhindert werden (Beispiel von Claudio
+  Usability / Screen-Reader)
+- Alle wichtigen Elemente der Applikation sollen durch Fokus/Tab-Order erreichbar sein und
+  entsprechend visualisiert werden (Baum, Tabelle, Forms, Menübars).
+- Tastatur-Shortcuts dürfen kein Standardverhalten überschreiben (Cursor, Home, End, Ctrl + Cursor,
+  etc.) weder vom Browser noch generell von Eingabe-Feldern, Buttons, Links, etc.
+- Wir müssen grundlegend definieren wie wir Tastatursteuerung umsetzen und Fokus visualisieren
+  wollen --> Aufwand in CRM-Aktivität verifizieren.
+- Wichtig ist auch der initiale Fokus: Wenn wir auf einen (Desktop-)Tab klicken muss das erste
+  Feld im Form fokussiert werden bzw. dort wo der Fokus zuletzt war. Das gleiche gilt auch für
+  Dialoge die auf- und wieder zugehen. Nach dem Schliessen muss der Fokus wieder da sein, wo
+  er vorher war.

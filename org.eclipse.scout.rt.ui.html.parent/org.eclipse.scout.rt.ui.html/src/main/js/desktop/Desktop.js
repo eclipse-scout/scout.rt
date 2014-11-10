@@ -15,6 +15,13 @@ scout.Desktop = function() {
 
   this._allTabs = [];
   this._selectedTab;
+
+  /**
+   * TODO AWE/CGU: (forms) wird nun auch als 'activeForm' verwendet (siehe TableKeystrokeAdapter.js)
+   * Wahrscheinlich müssen wir das refactoren und eine activeForm property verwenden
+   * Diese Property muss mit dem Server synchronisiert werden, damit auch das server-seitige desktop.getActiveForm() stimmt.
+   * Auch im zusammenhang mit focus-handling nochmals überdenken.
+   */
   this.selectedTool;
 
   this._addAdapterProperties(['viewButtons', 'actions', 'forms', 'outline', 'messageBoxes', 'addOns']);
@@ -201,8 +208,6 @@ scout.Desktop.prototype._unselectTab = function(tab) {
 /* handling of forms */
 
 scout.Desktop.prototype._addForm = function(form) {
-  if (form.title == "Telefon") return;
-
   var tab = new scout.Desktop.TabAndContent(form, form.title, '%Modus%');
   this._addTab(tab);
   form.render(this.$bench);
@@ -291,7 +296,6 @@ scout.Desktop.prototype.onMessageBoxClosed = function(messageBox) {
 
 scout.Desktop.prototype.onModelAction = function(event) {
   var form;
-
   if (event.type === 'formAdded') {
     form = this.session.getOrCreateModelAdapter(event.form, this);
     this.forms.push(form);

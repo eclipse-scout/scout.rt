@@ -48,7 +48,6 @@ scout.Form.prototype._render = function($parent) {
     this.staticMenus.push(new scout.DetachFormMenu(this, this.session));
   }
 
-  // TODO AWE: append form title section (including ! ? and progress indicator)
   this.menubar = new scout.Menubar(this.$container);
   this.menubar.menuTypesForLeft1 = ['Form.System'];
   this.menubar.menuTypesForLeft2 = ['Form.Regular'];

@@ -150,7 +150,7 @@ scout.FormField.prototype._showStatusMessage = function(options) {
     text = this.tooltipText;
   }
 
-  form = this._findForm();
+  form = this.getForm();
   if (form) {
     $formContainer = form.$container;
   }
@@ -165,7 +165,7 @@ scout.FormField.prototype._showStatusMessage = function(options) {
   this.tooltip.render();
 };
 
-scout.FormField.prototype._findForm = function() {
+scout.FormField.prototype.getForm = function() {
   var parent = this.parent;
   while (parent && parent.objectType !== 'Form') {
     parent = parent.parent;

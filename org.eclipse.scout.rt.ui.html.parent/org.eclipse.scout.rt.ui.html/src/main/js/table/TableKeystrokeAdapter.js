@@ -6,15 +6,20 @@ scout.TableKeystrokeAdapter = function(table) {
   this.handlers = [];
   this._table = table;
 
+  function ignoreEvent() {
+    // Don't accept if table is detached or when tool-form is opened
+    // FIXME CGU/AWE: better remove adapter on detach and reinstall on attach to increase performance?
+    // also refactor selectedTool-if below when activeForm is implemented on desktop
+    return !that._table.$container.isAttached() ||
+            table.session.desktop.selectedTool;
+  }
+
   //table filter
   this.handlers.push({
     accept: function(event) {
-      //Don't accept if table is detached
-      //FIXME CGU/AWE better remove adapter on detach and reinstall on attach to increase performance?
-      if (!that._table.$container.isAttached()) {
+      if (ignoreEvent()) {
         return false;
       }
-
       if (event && event.which >= 65 && event.which <= 90 && // a-z
         !event.ctrlKey && !event.altKey && !event.metaKey) {
         return true;
@@ -35,12 +40,9 @@ scout.TableKeystrokeAdapter = function(table) {
 
   this.handlers.push({
     accept: function(event) {
-      //Don't accept if table is detached
-      //FIXME CGU/AWE better remove adapter on detach and reinstall on attach to increase performance?
-      if (!that._table.$container.isAttached()) {
+      if (ignoreEvent()) {
         return false;
       }
-
       if (event && $.inArray(event.which,
           [scout.keys.UP, scout.keys.DOWN, scout.keys.HOME, scout.keys.END, scout.keys.PAGE_UP,scout.keys.PAGE_DOWN]) >= 0 &&
         !event.ctrlKey && !event.altKey && !event.metaKey) {

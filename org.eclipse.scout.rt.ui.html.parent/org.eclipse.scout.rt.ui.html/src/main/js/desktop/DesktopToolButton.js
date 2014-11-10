@@ -14,7 +14,7 @@ scout.DesktopToolButton.prototype._render = function($parent) {
     .appendDIV('taskbar-tool-item', this.text)
     .attr('data-icon', iconId).attr('data-shortcut', keystroke);
 
-  //FIXME CGU refactor to renderProperties (enabled and selected may be changed by server)
+  // FIXME CGU: refactor to renderProperties (enabled and selected may be changed by server)
   if (this.enabled) {
     this.$div.on('click', '', this._click.bind(this));
   }
@@ -53,7 +53,6 @@ scout.DesktopToolButton.prototype._sendSelected = function (selected) {
 };
 
 scout.DesktopToolButton.prototype._openContainer = function () {
-  var preferredSize;
   if (this.$storage) {
     this.desktop.$toolContainer.append(this.$storage);
   } else if (this.form) {
@@ -66,6 +65,10 @@ scout.DesktopToolButton.prototype._openContainer = function () {
   this.desktop.$toolContainer
     .css('right', right)
     .show();
+
+  // find the 1st focusable element in the $container
+  // wollen wir nicht einfach JQuery UI :focusable dafür verwenden?
+  this.desktop.$toolContainer.find('input').first().get(0).focus();
 
   this.desktop.selectedTool = this;
   this.$div.select(true);
