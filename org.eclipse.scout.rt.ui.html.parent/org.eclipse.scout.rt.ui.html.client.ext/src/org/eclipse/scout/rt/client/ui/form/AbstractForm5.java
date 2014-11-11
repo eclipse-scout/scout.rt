@@ -16,9 +16,13 @@ import java.util.List;
 
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.action.IAction;
+import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.ButtonEvent;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
@@ -103,6 +107,27 @@ public class AbstractForm5 extends AbstractForm implements IForm5 {
   @Override
   public List<IMenu> getMenus() {
     return getContextMenu().getChildActions();
+  }
+
+  public <T extends IMenu> T getMenu(final Class<T> menuType) throws ProcessingException {
+    IContextMenu contextMenu = getContextMenu();
+    if (contextMenu != null) {
+      final Holder<T> resultHolder = new Holder<T>();
+      contextMenu.acceptVisitor(new IActionVisitor() {
+
+        @SuppressWarnings("unchecked")
+        @Override
+        public int visit(IAction action) {
+          if (menuType.isAssignableFrom(action.getClass())) {
+            resultHolder.setValue((T) action);
+            return CANCEL;
+          }
+          return CONTINUE;
+        }
+      });
+      return resultHolder.getValue();
+    }
+    return null;
   }
 
   protected void setContextMenu(IFormContextMenu contextMenu) {

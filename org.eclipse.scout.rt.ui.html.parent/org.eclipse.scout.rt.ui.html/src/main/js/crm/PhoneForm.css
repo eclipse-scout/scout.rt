@@ -1,0 +1,45 @@
+.phone-book-entry-person {
+  & > div {
+    display: table-cell;
+  }
+
+  & > div:last-child {
+    width: 150px;
+    text-align: right;
+  }
+
+  & .person-name {
+    font-size: 16px;
+    padding: 8px 0;
+  }
+
+  & .person-address {
+    font-size: 13px;
+    color: @palette-light-gray-0;
+    margin-left: 10px;
+  }
+
+}
+
+.phone-book-entry-number {
+  display: table;
+  border-collapse: collapse;
+  width: 100%;
+
+  & > div {
+    display: table-cell;
+  }
+
+  & > div:last-child {
+    text-align: right;
+  }
+
+  & .address-channel {
+    padding-bottom: 2px;
+  }
+
+  & .address-usages {
+    font-size: 11px;
+    line-height: 15px;
+  }
+}
