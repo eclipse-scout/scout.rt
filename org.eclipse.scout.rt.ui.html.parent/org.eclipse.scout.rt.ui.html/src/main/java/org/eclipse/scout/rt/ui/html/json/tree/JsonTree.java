@@ -230,13 +230,17 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     if (node == null) {
       return null;
     }
+    if (!getModel().isRootNodeVisible() && node == getModel().getRootNode()) {
+      return null;
+    }
 
     String id = m_treeNodeIds.get(node);
-    if (id == null) {
-      id = getJsonSession().createUniqueIdFor(null);
-      m_treeNodes.put(id, node);
-      m_treeNodeIds.put(node, id);
+    if (id != null) {
+      return id;
     }
+    id = getJsonSession().createUniqueIdFor(null);
+    m_treeNodes.put(id, node);
+    m_treeNodeIds.put(node, id);
     return id;
   }
 

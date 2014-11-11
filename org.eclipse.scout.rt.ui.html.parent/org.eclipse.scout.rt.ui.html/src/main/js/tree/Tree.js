@@ -256,15 +256,24 @@ scout.Tree.prototype._expandAllParentNodes = function(node) {
 scout.Tree.prototype._onNodesInserted = function(nodes, parentNodeId) {
   var parentNode, $parentNode;
 
-  parentNode = this._nodeMap[parentNodeId];
+  if (parentNodeId >= 0) {
+    parentNode = this._nodeMap[parentNodeId];
+    if (!parentNode) {
+      throw new Error('Parent node could not be found. Id: ' + parentNodeId);
+    }
+  }
   this._visitNodes(nodes, this._initTreeNode.bind(this), parentNode);
 
   //update parent with new child nodes
-  scout.arrays.pushAll(parentNode.childNodes, nodes);
-
-  $parentNode = this._findNodeById(parentNode.id);
-  if (parentNode.expanded) {
-    this._renderNodeExpanded(parentNode, $parentNode, true);
+  if (parentNode) {
+    scout.arrays.pushAll(parentNode.childNodes, nodes);
+    $parentNode = this._findNodeById(parentNode.id);
+    if (parentNode.expanded) {
+      this._renderNodeExpanded(parentNode, $parentNode, true);
+    }
+  } else {
+    scout.arrays.pushAll(this.nodes, nodes);
+    this._addNodes(nodes);
   }
 };
 
