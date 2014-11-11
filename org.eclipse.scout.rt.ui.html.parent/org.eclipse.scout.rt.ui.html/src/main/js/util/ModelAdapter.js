@@ -254,7 +254,7 @@ scout.ModelAdapter.prototype.onChildAdapterChange = function(propertyName, oldVa
         oldValue.remove();
       }
     } else {
-      this[removeFuncName]();
+      this[removeFuncName](oldValue);
     }
   }
 

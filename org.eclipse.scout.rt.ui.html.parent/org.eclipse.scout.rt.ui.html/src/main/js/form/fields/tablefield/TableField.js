@@ -22,5 +22,10 @@ scout.TableField.prototype._render = function($parent) {
  */
 scout.TableField.prototype._renderTable = function() {
   this.table.render(this.$container);
-  this.table.$container.addClass('field');
+  this.$field = this.table.$container.addClass('field');
+};
+
+scout.TableField.prototype._removeTable = function(oldTable) {
+  oldTable.remove();
+  this.$field = null;
 };

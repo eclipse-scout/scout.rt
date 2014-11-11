@@ -47,6 +47,9 @@ describe("TableField", function() {
       session._processSuccessResponse(message);
 
       expect(table.rendered).toBe(true);
+
+      //Field is necessary for the FormFieldLayout
+      expect(tableField.$field).toBeTruthy();
     });
 
     it("hides (removes) the table if value is changed to ''", function() {
@@ -60,6 +63,7 @@ describe("TableField", function() {
       session._processSuccessResponse(message);
 
       expect(table.rendered).toBe(false);
+      expect(tableField.$field).toBeFalsy();
     });
 
     it("table gets class 'field' to make it work with the form field layout", function() {
