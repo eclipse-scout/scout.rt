@@ -55,10 +55,16 @@ public final class MailUtility {
   public static final IScoutLogger LOG = ScoutLogManager.getLogger(MailUtility.class);
 
   public static final String CONTENT_TYPE_ID = "Content-Type";
+
+  public static final String CONTENT_TRANSFER_ENCODING_ID = "Content-Transfer-Encoding";
+  public static final String QUOTED_PRINTABLE = "quoted-printable";
+
   public static final String CONTENT_TYPE_TEXT_HTML = "text/html; charset=\"UTF-8\"";
   public static final String CONTENT_TYPE_TEXT_PLAIN = "text/plain; charset=\"UTF-8\"";
   public static final String CONTENT_TYPE_MESSAGE_RFC822 = "message/rfc822";
   public static final String CONTENT_TYPE_MULTIPART = "alternative";
+
+  private static final String UTF_8 = "UTF-8";
 
   public static final Pattern wordPatternItem = Pattern.compile("item\\d{3,4}\\.xml");
   public static final Pattern wordPatternProps = Pattern.compile("props\\d{3,4}\\.xml");
@@ -402,7 +408,7 @@ public final class MailUtility {
     String txt = null;
     File plainTextFile = new File(dir, simpleName + "." + fileType);
     if (plainTextFile.exists() && plainTextFile.canRead()) {
-      txt = IOUtility.getContentInEncoding(plainTextFile.getPath(), "UTF-8");
+      txt = IOUtility.getContentInEncoding(plainTextFile.getPath(), UTF_8);
     }
     return txt;
   }
@@ -435,7 +441,7 @@ public final class MailUtility {
       }
       msg.setSentDate(new java.util.Date());
       //
-      msg.setSubject(subject, "UTF-8");
+      msg.setSubject(subject, UTF_8);
       //
       msg.setRecipients(Message.RecipientType.TO, parseAddresses(toRecipients));
       msg.setRecipients(Message.RecipientType.CC, parseAddresses(ccRecipients));
@@ -487,7 +493,7 @@ public final class MailUtility {
       String plainTextMessage = null;
       boolean hasPlainText = false;
       if (plainTextFile.exists()) {
-        plainTextMessage = IOUtility.getContentInEncoding(plainTextFile.getPath(), "UTF-8");
+        plainTextMessage = IOUtility.getContentInEncoding(plainTextFile.getPath(), UTF_8);
         hasPlainText = StringUtility.hasText(plainTextMessage);
       }
 
@@ -516,7 +522,7 @@ public final class MailUtility {
       String htmlMessage = null;
       boolean hasHtml = false;
       if (htmlFile.exists()) {
-        htmlMessage = IOUtility.getContentInEncoding(htmlFile.getPath(), "UTF-8");
+        htmlMessage = IOUtility.getContentInEncoding(htmlFile.getPath(), UTF_8);
         // replace directory entry
         // replace all paths to the 'files directory' with the root directory
         htmlMessage = htmlMessage.replaceAll("\"" + folderName + "/", "\"cid:");
@@ -608,13 +614,13 @@ public final class MailUtility {
    * Checks if file is a Microsoft Word specific directory file. They are only used to edit HTML in Word.
    */
   private boolean isWordSpecificFile(String filename) {
-    return "filelist.xml".equalsIgnoreCase(filename) ||
-        "colorschememapping.xml".equalsIgnoreCase(filename) ||
-        "themedata.thmx".equalsIgnoreCase(filename) ||
-        "header.html".equalsIgnoreCase(filename) ||
-        "editdata.mso".equalsIgnoreCase(filename) ||
-        wordPatternItem.matcher(filename).matches() ||
-        wordPatternProps.matcher(filename).matches();
+    return "filelist.xml".equalsIgnoreCase(filename)
+        || "colorschememapping.xml".equalsIgnoreCase(filename)
+        || "themedata.thmx".equalsIgnoreCase(filename)
+        || "header.html".equalsIgnoreCase(filename)
+        || "editdata.mso".equalsIgnoreCase(filename)
+        || wordPatternItem.matcher(filename).matches()
+        || wordPatternProps.matcher(filename).matches();
   }
 
   private static void writeHtmlBody(MimePart htmlBodyPart, String htmlMessage, List<DataSource> htmlDataSourceList) throws MessagingException {
@@ -623,7 +629,7 @@ public final class MailUtility {
     MimeBodyPart part = new MimeBodyPart();
     part.setContent(htmlMessage, CONTENT_TYPE_TEXT_HTML);
     part.setHeader(CONTENT_TYPE_ID, CONTENT_TYPE_TEXT_HTML);
-    part.setHeader("Content-Transfer-Encoding", "quoted-printable");
+    part.setHeader(CONTENT_TRANSFER_ENCODING_ID, QUOTED_PRINTABLE);
     multiPartHtml.addBodyPart(part);
     for (DataSource source : htmlDataSourceList) {
       part = new MimeBodyPart();
@@ -636,9 +642,9 @@ public final class MailUtility {
   }
 
   private static void writePlainBody(MimePart plainBodyPart, String plainTextMessage) throws MessagingException {
-    plainBodyPart.setText(plainTextMessage, "UTF-8");
+    plainBodyPart.setText(plainTextMessage, UTF_8);
     plainBodyPart.setHeader(CONTENT_TYPE_ID, CONTENT_TYPE_TEXT_PLAIN);
-    plainBodyPart.setHeader("Content-Transfer-Encoding", "quoted-printable");
+    plainBodyPart.setHeader(CONTENT_TRANSFER_ENCODING_ID, QUOTED_PRINTABLE);
   }
 
   private MimeMessage createMimeMessageInternal(String bodyTextPlain, String bodyTextHtml, DataSource[] attachments) throws ProcessingException {
@@ -672,10 +678,10 @@ public final class MailUtility {
     if (!StringUtility.isNullOrEmpty(bodyTextPlain) && !StringUtility.isNullOrEmpty(bodyTextHtml)) {
       // multipart
       MimeBodyPart plainPart = new MimeBodyPart();
-      plainPart.setText(bodyTextPlain, "UTF-8");
+      plainPart.setText(bodyTextPlain, UTF_8);
       plainPart.addHeader(CONTENT_TYPE_ID, CONTENT_TYPE_TEXT_PLAIN);
       MimeBodyPart htmlPart = new MimeBodyPart();
-      htmlPart.setText(bodyTextHtml, "UTF-8");
+      htmlPart.setText(bodyTextHtml, UTF_8);
       htmlPart.addHeader(CONTENT_TYPE_ID, CONTENT_TYPE_TEXT_HTML);
 
       Multipart multiPart = new MimeMultipart("alternative");
@@ -687,13 +693,13 @@ public final class MailUtility {
     }
     else if (!StringUtility.isNullOrEmpty(bodyTextPlain)) {
       MimeBodyPart part = new MimeBodyPart();
-      part.setText(bodyTextPlain, "UTF-8");
+      part.setText(bodyTextPlain, UTF_8);
       part.addHeader(CONTENT_TYPE_ID, CONTENT_TYPE_TEXT_PLAIN);
       return part;
     }
     else if (!StringUtility.isNullOrEmpty(bodyTextHtml)) {
       MimeBodyPart part = new MimeBodyPart();
-      part.setText(bodyTextHtml, "UTF-8");
+      part.setText(bodyTextHtml, UTF_8);
       part.addHeader(CONTENT_TYPE_ID, CONTENT_TYPE_TEXT_HTML);
       return part;
     }
@@ -755,12 +761,12 @@ public final class MailUtility {
         MimeBodyPart multiPartBody = new MimeBodyPart();
         String message = (String) messageContent;
 
-        String contentTypeHeader = StringUtility.join(" ", msg.getHeader("Content-Type"));
+        String contentTypeHeader = StringUtility.join(" ", msg.getHeader(CONTENT_TYPE_ID));
         if (StringUtility.contains(contentTypeHeader, "html")) {
           // html
           multiPartBody.setContent(message, MailUtility.CONTENT_TYPE_TEXT_HTML);
-          multiPartBody.setHeader("Content-Type", MailUtility.CONTENT_TYPE_TEXT_HTML);
-          multiPartBody.setHeader("Content-Transfer-Encoding", "quoted-printable");
+          multiPartBody.setHeader(CONTENT_TYPE_ID, MailUtility.CONTENT_TYPE_TEXT_HTML);
+          multiPartBody.setHeader(CONTENT_TRANSFER_ENCODING_ID, QUOTED_PRINTABLE);
         }
         else {
           // plain text
@@ -834,16 +840,17 @@ public final class MailUtility {
   private String getCharacterEncodingOfMimePart(MimePart part) throws MessagingException {
     Pattern pattern = Pattern.compile("charset=\".*\"", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
     Matcher matcher = pattern.matcher(part.getContentType());
-    String characterEncoding = "UTF-8"; // default, a good guess in Europe
+    String characterEncoding = UTF_8; // default, a good guess in Europe
     if (matcher.find()) {
       if (matcher.group(0).split("\"").length >= 2) {
         characterEncoding = matcher.group(0).split("\"")[1];
       }
     }
     else {
-      if (part.getContentType().contains("charset=")) {
-        if (part.getContentType().split("charset=").length == 2) {
-          characterEncoding = part.getContentType().split("charset=")[1];
+      final String chartsetEquals = "charset=";
+      if (part.getContentType().contains(chartsetEquals)) {
+        if (part.getContentType().split(chartsetEquals).length == 2) {
+          characterEncoding = part.getContentType().split(chartsetEquals)[1];
         }
       }
     }
@@ -865,9 +872,10 @@ public final class MailUtility {
   private static void fixMailcapCommandMap() {
     try {
       //set the com.sun.mail.handlers.text_plain to level 0 (programmatic) to prevent others from overriding in level 0
+      final String className = "com.sun.mail.handlers.text_plain";
       Class textPlainClass;
       try {
-        textPlainClass = Class.forName("com.sun.mail.handlers.text_plain");
+        textPlainClass = Class.forName(className);
       }
       catch (Throwable t) {
         //class not found, cancel
@@ -888,8 +896,8 @@ public final class MailUtility {
       Map<Object, Object> typeMap = (Map<Object, Object>) db0.get("text/plain");
       List<String> handlerList = (List<String>) typeMap.get("content-handler");
       //put text_plain in front
-      handlerList.remove("com.sun.mail.handlers.text_plain");
-      handlerList.add(0, "com.sun.mail.handlers.text_plain");
+      handlerList.remove(className);
+      handlerList.add(0, className);
     }
     catch (Throwable t) {
       ScoutLogManager.getLogger(MailUtility.class).warn("Failed fixing MailcapComandMap string handling: " + t);
