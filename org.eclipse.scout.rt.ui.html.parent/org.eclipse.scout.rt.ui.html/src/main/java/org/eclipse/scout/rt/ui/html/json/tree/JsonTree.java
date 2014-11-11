@@ -11,6 +11,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ContextMenuEvent;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
+import org.eclipse.scout.rt.client.ui.basic.tree.ITree5;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeListener;
@@ -62,11 +63,30 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
         return getModel().getTitle();
       }
     });
+    putJsonProperty(new JsonProperty<T>(ITree5.PROP_FILTER_ENABLED, model) {
+      @Override
+      protected Boolean modelValue() {
+        if (getModel() instanceof ITree5) {
+          return ((ITree5) getModel()).isFilterEnabled();
+        }
+        else {
+          return false;
+        }
+      }
+    });
   }
 
   @Override
   public String getObjectType() {
-    return "Tree";
+    if (getModel() instanceof ITree5) {
+      // TODO AWE/CGU: (json-layer) diskutieren wie wir das am besten lösen
+      // custom model/widget? eigentlich würde ich gerne das Tree model verwenden
+      // und nur ein anderes JS rendering machen.
+      return "Tree.Compact";
+    }
+    else {
+      return "Tree";
+    }
   }
 
   @Override

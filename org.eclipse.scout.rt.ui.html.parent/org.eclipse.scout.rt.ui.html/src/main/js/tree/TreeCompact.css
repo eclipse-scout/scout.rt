@@ -1,0 +1,45 @@
+.compact-tree {
+
+  & .text-field {
+    width: 100%;
+    height: @logical-grid-height;
+  }
+
+  & .viewport {
+    top:40px;
+    width: 400px;
+    height: 165px;
+  }
+
+  & .nodes {
+    columns: 105px 2;
+    -moz-columns: 105px 2;
+    -webkit-columns: 105px 2;
+
+    column-gap: 24px;
+    -moz-column-gap: 24px;
+  }
+
+  & .section {
+
+  -webkit-column-break-inside: avoid;
+  -moz-column-break-inside: avoid;
+  -o-column-break-inside: avoid;
+  -ms-column-break-inside: avoid;
+  column-break-inside: avoid;
+
+  /* Hack for FF, because column-break-inside does not yet work for all elements, only for tables
+   * see: https://bugzilla.mozilla.org/show_bug.cgi?id=549114
+   */
+  display: table;
+  width:125px;
+
+    margin-bottom: 10px;
+
+    & .title {
+      font-weight: bold;
+    }
+  }
+
+
+}

@@ -4,7 +4,7 @@ scout.FormField = function() {
   this.$field;
 
   /**
-   * The status label is used for error-status and mandatory info.
+   * The status label is used for error-status and tooltip-icon.
    */
   this.$status;
 };
@@ -22,7 +22,7 @@ scout.FormField.prototype._render = function($parent) {
   this.addContainer($parent, 'form-field');
   this.addLabel();
   this.addStatus();
-  this.$field = $.makeDiv('', 'field').
+  this.$field = $.makeDIV('field').
     html('[not implemented yet]').
     appendTo(this.$container);
 };
@@ -35,6 +35,7 @@ scout.FormField.prototype._renderProperties = function() {
   this._renderErrorStatus(this.errorStatus);
   this._renderLabel(this.label);
   this._renderLabelVisible(this.labelVisible);
+  this._renderStatusVisible(this.statusVisible);
 };
 
 scout.FormField.prototype._renderMandatory = function(mandatory) {
@@ -105,14 +106,20 @@ scout.FormField.prototype._removePlaceholder = function() {
 };
 
 scout.FormField.prototype._renderLabelVisible = function(visible) {
-  if (!this.$label) {
+  this._renderChildVisible(this.$label, visible);
+};
+
+scout.FormField.prototype._renderStatusVisible = function(visible) {
+  this._renderChildVisible(this.$status, visible);
+};
+
+scout.FormField.prototype._renderChildVisible = function($child, visible) {
+  if (!$child) {
     return;
   }
-  this.$label.setVisible(visible);
-
+  $child.setVisible(visible);
   if (this.rendered) {
-    var htmlComp = scout.HtmlComponent.get(this.$container);
-    htmlComp.revalidate();
+    scout.HtmlComponent.get(this.$container).revalidate();
   }
 };
 

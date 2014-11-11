@@ -11,7 +11,6 @@ scout.TreeField.prototype._render = function($parent) {
   this.addContainer($parent, 'tree-field');
   this.addLabel();
   this.addStatus();
-
   if (this.tree) {
     this._renderTree();
   }
@@ -23,4 +22,5 @@ scout.TreeField.prototype._render = function($parent) {
 scout.TreeField.prototype._renderTree = function() {
   this.tree.render(this.$container);
   this.tree.$container.addClass('field');
+  this.$field = this.tree.$container;
 };

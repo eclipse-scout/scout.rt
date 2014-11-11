@@ -122,6 +122,11 @@ scout.defaultObjectFactories = [{
     return new scout.Tree();
   }
 }, {
+  objectType: 'Tree.Compact',
+  create: function() {
+    return new scout.TreeCompact();
+  }
+}, {
   objectType: 'Form',
   create: function() {
     return new scout.Form();
