@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -43,7 +44,7 @@ public class JsonSmartField extends JsonValueField<ISmartField> {
 
   private static final int MAX_OPTIONS = 100;
 
-  private List<? extends ILookupRow<?>> options = new ArrayList<>();
+  private List<? extends ILookupRow<?>> m_options = new ArrayList<>();
 
   public JsonSmartField(ISmartField model, IJsonSession session, String id) {
     super(model, session, id);
@@ -70,7 +71,7 @@ public class JsonSmartField extends JsonValueField<ISmartField> {
     putJsonProperty(new JsonProperty<ISmartField<?>>(PROP_OPTIONS, model) {
       @Override
       protected List<? extends ILookupRow<?>> modelValue() {
-        return options;
+        return m_options;
       }
 
       @Override
@@ -96,9 +97,9 @@ public class JsonSmartField extends JsonValueField<ISmartField> {
   @Override
   protected void attachModel() {
     super.attachModel();
-    options = isCachingEnabled() ?
+    m_options = isCachingEnabled() ?
         loadOptions(IContentAssistField.BROWSE_ALL_TEXT) :
-        Collections.<ILookupRow<?>> emptyList();
+          Collections.<ILookupRow<?>> emptyList();
   }
 
   private JSONArray optionsToJson(List<? extends ILookupRow<?>> options) {
@@ -133,7 +134,8 @@ public class JsonSmartField extends JsonValueField<ISmartField> {
 
   private List<? extends ILookupRow<?>> loadOptions(final String query) {
     try {
-      return getModel().callBrowseLookup(query, MAX_OPTIONS);
+      m_options = getModel().callBrowseLookup(query, MAX_OPTIONS);
+      return m_options;
     }
     catch (ProcessingException e) {
       throw new JsonException(e);
@@ -157,4 +159,18 @@ public class JsonSmartField extends JsonValueField<ISmartField> {
     addActionEvent("optionsLoaded", putProperty(new JSONObject(), "options", options));
   }
 
+  @Override
+  protected void handleUiDisplayTextChangedImpl(String displayText, boolean whileTyping) {
+    if (StringUtility.isNullOrEmpty(displayText)) {
+      getModel().setValue(null);
+    }
+    else {
+      for (ILookupRow<?> lr : m_options) {
+        if (displayText.equals(lr.getText())) {
+          getModel().setValue(lr.getKey());
+          break;
+        }
+      }
+    }
+  }
 }
