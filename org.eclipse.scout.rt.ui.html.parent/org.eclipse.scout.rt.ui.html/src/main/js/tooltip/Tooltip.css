@@ -2,7 +2,7 @@
 @tooltip-arrow-size: 14px;
 @tooltip-background-color: @color-bench-light;
 @tooltip-border-size: 1px;
-@tooltip-border: @tooltip-border-size solid @popup-border-color;
+@tooltip-border: @tooltip-border-size solid @menu-border-color;
 
 .tooltip {
   position: absolute;

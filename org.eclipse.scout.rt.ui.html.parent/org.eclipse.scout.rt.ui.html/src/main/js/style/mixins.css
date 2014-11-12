@@ -54,6 +54,11 @@
   &.has-error:focus {
     .glow(@color-error);
   }
+
+  &::-moz-selection {
+    background-color: @palette-bsi-light-green;
+    color: @palette-white;
+  }
 }
 
 /** expects a sibling html element with class 'icon' **/

@@ -25,8 +25,6 @@ Scrollbars: für UGM JS-Scrollbars einschalten
 
 P1 Globale Suche: wie Design-Vorschlag, Baum mit Fake-Suchresultaten anzeigen
 
-P1 Textfield: Selektionsfarbe ändern
-
 P1 Rechenfunktionen bei Numberfield
 
 P2 Navigation im Tree überdenken. Was ist wenn es viele Elemente hat? Braucht es "Alle anzeigen"? Hypothese: unter 10 immer alle anzeigen.
@@ -70,7 +68,7 @@ AWE Tabs: "Bölle" nicht schön, Farbe dunkel-grau ausprobieren, evtl. active st
     und nicht bei mouseup wie jetzt (2 farben gleichzeitig sichtbar)
 AWE Assistenten-Form designen/programmieren
 AWE SmartField noch ein bisschen schöner (auch mit JS-scrollbar)
-
+AWE P1 Textfield: Selektionsfarbe ändern
 
 CGU TableField: row-height === logicalGridHeight (text-field)?
 CGU Table: Row-Text nicht genau zentriert
