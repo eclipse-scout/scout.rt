@@ -1,5 +1,4 @@
 .compact-tree {
-
   & .process {
     cursor: pointer;
     line-height: 18px;
@@ -23,9 +22,26 @@
    * when height is fixed and DIV is scrollable vertically.
    */
   & .nodes-wrapper {
+    position: relative;
     margin-top: 10px;
     width: 400px;
     height: 205px;
+    overflow: hidden;
+  }
+
+  & .scrollbar {
+    right: -2px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+  }
+
+  & .scrollbar-thumb {
+    background-color: rgba(205, 205, 205, 0.3);
+  }
+
+  & .scrollbar-thumb-move,
+  & .scrollbar-thumb:hover{
+    background-color: rgba(153, 153, 153, 0.6);
   }
 
   & .nodes {
