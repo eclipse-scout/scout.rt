@@ -6,9 +6,9 @@ scout.GroupBoxButtonBar = function(processButtons) {
 };
 
 scout.GroupBoxButtonBar.prototype.render = function($parent) {
-  this.$container = $parent.appendDiv('', 'button-bar');
-  this.$processDiv = this.$container.appendDiv('', 'process');
-  this.$systemDiv = this.$container.appendDiv('', 'system');
+  this.$container = $parent.appendDIV('button-bar');
+  this.$processDiv = this.$container.appendDIV('process');
+  this.$systemDiv = this.$container.appendDIV('system');
 
   var i, btn;
   for (i=0; i<this.processButtons.length; i++) {

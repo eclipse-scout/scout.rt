@@ -7,6 +7,7 @@ scout.TreeCompact = function() {
   this._$nodesDiv;
   this._$viewport;
   this._domMap = {};
+  this._selectedNode = -1;
 };
 scout.inherits(scout.TreeCompact, scout.ModelAdapter);
 
@@ -14,10 +15,11 @@ scout.TreeCompact.prototype._render = function($parent) {
   this.$container = $parent.appendDIV('compact-tree');
   this._$filter = $('<input>').
     attr('type', 'text').
-    attr('placeholder', 'Filter...').
+    attr('placeholder', scout.texts.get('filterBy')).
     addClass('text-field').
     appendTo(this.$container).
-    keyup(this._onKeyup.bind(this));
+    on('input', this._onInput.bind(this)).
+    keydown(this._onKeydown.bind(this));
   var $viewport = $.makeDIV('viewport').appendTo(this.$container);
   this._$nodesDiv = $.makeDIV('nodes').appendTo($viewport);
   this._$viewport = scout.Scrollbar2.install($viewport);
@@ -28,12 +30,16 @@ scout.TreeCompact.prototype._renderNodes = function(filter) {
   var i, j, node, $node, childNode, $childNode;
   for (i=0; i<this.nodes.length; i++) {
     node = this.nodes[i];
-    $node = $.makeDIV('section').attr('id', 'node-' + node.id).appendTo(this._$nodesDiv);
+    $node = $.makeDIV('section').appendTo(this._$nodesDiv);
     $.makeDIV('title').appendTo($node).text(node.text);
     this._domMap[node.id] = $node;
     for (j=0; j<node.childNodes.length; j++) {
       childNode = node.childNodes[j];
-      $childNode = $.makeDIV('process').text(childNode.text).attr('id', 'node-' + childNode.id).appendTo($node);
+      $childNode = $.makeDIV('process').
+        data('node', childNode).
+        click(this._onNodeClick.bind(this)).
+        text(childNode.text).
+        appendTo($node);
       this._domMap[childNode.id] = $childNode;
     }
   }
@@ -56,7 +62,7 @@ scout.TreeCompact.prototype._updateNodes = function() {
   }
 };
 
-scout.TreeCompact.prototype._onKeyup = function() {
+scout.TreeCompact.prototype._onInput = function(event) {
   var filter = this._$filter.val();
   if (filter) {
     $.log.debug('filter nodes='+filter);
@@ -65,7 +71,46 @@ scout.TreeCompact.prototype._onKeyup = function() {
     $.log.debug('expand all nodes');
     this._expandAllNodes();
   }
+  this._selectedNode = -1;
+  this._$nodesDiv.find('.selected').removeClass('selected');
   this._updateNodes();
+};
+
+scout.TreeCompact.prototype._onKeydown = function(event) {
+  switch (event.which) {
+    case scout.keys.UP:
+      this._moveSelection(-1);
+      return false;
+    case scout.keys.DOWN:
+      this._moveSelection(1);
+      return false;
+    case scout.keys.ENTER:
+      if (this._selectedNode !== -1) {
+        var node = this._$nodesDiv.find('.selected').data('node');
+        this._selectNode(node);
+      }
+      return false;
+    default:
+      return true;
+  }
+};
+
+scout.TreeCompact.prototype._moveSelection = function(diff) {
+  var oldSelectedNode = this._selectedNode,
+    tmpSelectedNode = this._selectedNode + diff,
+    $nodes = this._$nodesDiv.find('.process:visible'),
+    numNodes = $nodes.length;
+  if (tmpSelectedNode >= numNodes) {
+    tmpSelectedNode = 0;
+  } else if (tmpSelectedNode < 0) {
+    tmpSelectedNode = numNodes - 1;
+  }
+  if (oldSelectedNode != tmpSelectedNode) {
+    $.log.debug('_moveSelection to node with index='+ tmpSelectedNode);
+    this._selectedNode = tmpSelectedNode;
+    $($nodes[oldSelectedNode]).removeClass('selected');
+    $($nodes[tmpSelectedNode]).addClass('selected');
+  }
 };
 
 scout.TreeCompact.prototype._expandAllNodes = function() {
@@ -86,11 +131,17 @@ scout.TreeCompact.prototype._matches = function(node, regexp) {
   return node.text.match(regexp) !== null;
 };
 
+/**
+ * Sets the visible and expanded state of the nodes depending on the given filter.
+ * The rules applied here are:
+ * 1. when filter matches a top-level root -> expand all child-nodes
+ * 2. when filter matches a child-node -> expand parent-node
+ * 3. when parent-node doesn't match and has no child-nodes that match -> make parent-node invisible
+ * @param filter
+ */
 scout.TreeCompact.prototype._filterNodes = function(filter) {
   var i, j, node, childNode, expanded,
     regexp = new RegExp(filter, 'i');
-  // pass 1: wenn lvl1.text matches -> expanded
-  // pass 2: wenn lvl2.text matches
   for (i=0; i<this.nodes.length; i++) {
     node = this.nodes[i];
     expanded = this._matches(node, regexp);
@@ -115,3 +166,15 @@ scout.TreeCompact.prototype._filterNodes = function(filter) {
     node.visible = node.expanded;
   }
 };
+
+scout.TreeCompact.prototype._onNodeClick = function(event) {
+  var node = $(event.target).data('node');
+  this._selectNode(node);
+};
+
+scout.TreeCompact.prototype._selectNode = function(node) {
+  $.log.debug('_selectNode id=' + node.id + ' text=' + node.text);
+  this.session.send('nodeAction', this.id, {'nodeId': node.id});
+};
+
+

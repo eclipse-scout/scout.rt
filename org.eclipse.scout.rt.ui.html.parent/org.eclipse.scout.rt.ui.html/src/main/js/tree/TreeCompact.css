@@ -1,5 +1,19 @@
 .compact-tree {
 
+  & .process {
+    cursor: pointer;
+    line-height: 18px;
+
+    &:hover {
+      color:@hover-color;
+    }
+
+    &.selected {
+      text-decoration:underline;
+      color:@active-color;
+    }
+  }
+
   & .text-field {
     width: 100%;
     height: @logical-grid-height;
@@ -40,6 +54,5 @@
       font-weight: bold;
     }
   }
-
 
 }

@@ -8,7 +8,12 @@ Navigation in Forms: in Forms ein zusätzliches Item als Button hervorheben (z.B
   damit man im Tree weiter nach unten navigieren kann ohne in den Tree klicken zu müssen
   --> am UI Meeting besprechen (Vorschläge gemalt)
 
+Assistenten-Form designen/programmieren
+
+
 [CGU]
+Telefon-Form: anzeigen, verpasste Anrufe, Steuerung (an-/abmelden), gerne mit Telefonbuch
+
 
 [CRU]
 Scrollbars: für UGM JS-Scrollbars einschalten
@@ -17,15 +22,15 @@ Scrollbars: für UGM JS-Scrollbars einschalten
 ===================================
  BACKLOG
 -----------------------------------
-Animation: im Tree bei Wechsel zwischen Search und Views
-
 Globale Suche: wie Design-Vorschlag, Baum mit Fake-Suchresultaten anzeigen
+
+Navigation im Tree überdenken. Was ist wenn es viele Elemente hat? Braucht es "Alle anzeigen"? Hypothese: unter 10 immer alle anzeigen.
+
+Animation: im Tree bei Wechsel zwischen Search und Views
 
 Sichtenmenü: ausprobieren, ob bei Klick auf den Titel das Sichtenmenü aufgehen soll
 
 2 Buttons für Navigation unter dem Tree sind OK (Home + Breadcrumb/Tree-Switch)
-
-Navigation im Tree überdenken. Was ist wenn es viele Elemente hat? Braucht es "Alle anzeigen"? Hypothese: unter 10 immer alle anzeigen.
 
 Table-Header: ganz feiner Pfeil wie in Excel ausprobieren, keine Farben für Header-Text
 
@@ -33,12 +38,6 @@ Photoshop: Such-Forms / Table-Controls - vertikale "Tabs" ausprobieren. Nur Text
   Buttons müssen pro Form sein und nicht pro Tab
 
 Ausprobieren: Dickerer top-border, 2 oder 3 px oben an Table-Controls
-
-Telefon-Form: anzeigen, verpasste Anrufe, Steuerung (an-/abmelden), gerne mit Telefonbuch
-
-Assistenten Menü hinzufügen
-
-Fokus-Farbe: überall grün
 
 Tooltip Icon: V-Align prüfen (1px off?)
 
@@ -80,3 +79,4 @@ CGU Table: Falsche Row selektiert im Gruppierungs-Modus
 CGU Stern durch Teilen-Icon ersetzen
 CGU Tree: Pfeil/-Text, vertikale Ausrichtung korrigieren
 CGU MessageBox: Nur Fokus-Farbe, kein Default-Button. Default-Button ist initial fokussiert.
+CGU Fokus-Farbe: überall grün
