@@ -16,6 +16,12 @@
     position:absolute;
   }
 
+  & > .field.not-implemented {
+    border: 1px solid @border-color;
+    border-radius: @border-radius;
+    padding: 6px @text-field-padding;
+  }
+
   & > .mandatory-indicator {
     position:absolute;
     visibility: hidden;

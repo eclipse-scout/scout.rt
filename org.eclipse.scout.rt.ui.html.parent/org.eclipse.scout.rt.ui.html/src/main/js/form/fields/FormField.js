@@ -21,10 +21,12 @@ scout.FormField.prototype._render = function($parent) {
   // FormField directly. Currently this is required as a placeholder for un-implemented form-fields.
   this.addContainer($parent, 'form-field');
   this.addLabel();
+  this.addMandatoryIndicator();
   this.addStatus();
-  this.$field = $.makeDIV('field').
-    html('[not implemented yet]').
-    appendTo(this.$container);
+  this.$field = $.makeDIV('field')
+    .text('not implemented yet')
+    .addClass('not-implemented')
+    .appendTo(this.$container);
 };
 
 scout.FormField.prototype._renderProperties = function() {

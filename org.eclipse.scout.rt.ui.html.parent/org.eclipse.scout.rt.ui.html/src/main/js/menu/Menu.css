@@ -37,6 +37,9 @@
   margin: 0 @menu-margin-x;
   padding: 6px 0 10px 0;
 
+  /* FIXME CGU currently only necessary for too long search forms -< remove when form gets scrollable */
+  background-color: @body-background-color;
+
   & div, button {
     box-sizing: border-box;
     display: inline-block;
