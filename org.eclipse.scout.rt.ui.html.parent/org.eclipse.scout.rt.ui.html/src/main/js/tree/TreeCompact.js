@@ -20,9 +20,11 @@ scout.TreeCompact.prototype._render = function($parent) {
     appendTo(this.$container).
     on('input', this._onInput.bind(this)).
     keydown(this._onKeydown.bind(this));
-  var $viewport = $.makeDIV('viewport').appendTo(this.$container);
-  this._$nodesDiv = $.makeDIV('nodes').appendTo($viewport);
-  this._$viewport = scout.Scrollbar2.install($viewport);
+
+  var $nodesWrapperDiv = $.makeDIV('nodes-wrapper').appendTo(this.$container);
+  this._$viewport = scout.Scrollbar2.install($nodesWrapperDiv);
+  this._$nodesDiv = $.makeDIV('nodes').appendTo(this._$viewport);
+
   this._renderNodes();
 };
 

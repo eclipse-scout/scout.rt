@@ -4,16 +4,20 @@
 [AWE]
 Desktop-Tabs: 2-zeilig gut, 2te Zeile evtl. grau machen? V-Align top, nicht middle wenn nur 1 Zeile
 
-Navigation in Forms: in Forms ein zusätzliches Item als Button hervorheben (z.B. Anzeigen) und evtl. ein "multi-button"
-  damit man im Tree weiter nach unten navigieren kann ohne in den Tree klicken zu müssen
-  --> am UI Meeting besprechen (Vorschläge gemalt)
-
 Assistenten-Form designen/programmieren
+
+SmartField noch ein bisschen schöner (auch mit JS-scrollbar)
+
+P2 Navigation in Forms: in Forms ein zusätzliches Item als Button hervorheben (z.B. Anzeigen) und
+  evtl. ein "multi-button" damit man im Tree weiter nach unten navigieren kann ohne in den Tree
+  klicken zu müssen
+  --> am UI Meeting besprechen (Vorschläge gemalt)
 
 
 [CGU]
 Telefon-Form: anzeigen, verpasste Anrufe, Steuerung (an-/abmelden), gerne mit Telefonbuch
 
+Such-Forms schöner
 
 [CRU]
 Scrollbars: für UGM JS-Scrollbars einschalten
@@ -22,36 +26,35 @@ Scrollbars: für UGM JS-Scrollbars einschalten
 ===================================
  BACKLOG
 -----------------------------------
-Globale Suche: wie Design-Vorschlag, Baum mit Fake-Suchresultaten anzeigen
 
-Navigation im Tree überdenken. Was ist wenn es viele Elemente hat? Braucht es "Alle anzeigen"? Hypothese: unter 10 immer alle anzeigen.
+P1 Globale Suche: wie Design-Vorschlag, Baum mit Fake-Suchresultaten anzeigen
 
-Animation: im Tree bei Wechsel zwischen Search und Views
+P1 Textfield: Selektionsfarbe ändern
 
-Sichtenmenü: ausprobieren, ob bei Klick auf den Titel das Sichtenmenü aufgehen soll
+P1 Rechenfunktionen bei Numberfield
 
-2 Buttons für Navigation unter dem Tree sind OK (Home + Breadcrumb/Tree-Switch)
+P2 Navigation im Tree überdenken. Was ist wenn es viele Elemente hat? Braucht es "Alle anzeigen"? Hypothese: unter 10 immer alle anzeigen.
 
-Table-Header: ganz feiner Pfeil wie in Excel ausprobieren, keine Farben für Header-Text
+P2 Table-Header: ganz feiner Pfeil wie in Excel ausprobieren, keine Farben für Header-Text
 
-Photoshop: Such-Forms / Table-Controls - vertikale "Tabs" ausprobieren. Nur Text und eine vertikale Linie daneben
+P3 Animation: im Tree bei Wechsel zwischen Search und Views
+
+P3 Sichtenmenü: ausprobieren, ob bei Klick auf den Titel das Sichtenmenü aufgehen soll
+
+P3 2 Buttons für Navigation unter dem Tree sind OK (Home + Breadcrumb/Tree-Switch)
+
+P3 Photoshop: Such-Forms / Table-Controls - vertikale "Tabs" ausprobieren. Nur Text und eine vertikale Linie daneben
   Buttons müssen pro Form sein und nicht pro Tab
 
-Ausprobieren: Dickerer top-border, 2 oder 3 px oben an Table-Controls
+P3 Tooltip Icon: V-Align prüfen (1px off?)
 
-Tooltip Icon: V-Align prüfen (1px off?)
+P3 Textfeld padding-left etwas zu gross?
 
-Textfeld padding-left etwas zu gross?
+P3 Mandatory-Stern: Wingdings(2) Icon ausprobieren
 
-Mandatory-Stern: Wingdings(2) Icon ausprobieren
+P3 Tooltip auch bei Hover anzeigen
 
-Rechenfunktionen bei Numberfield
-
-Tooltip auch bei Hover anzeigen
-
-Menüs: sollen neu auf mousedown reagieren und nicht bei mouseup
-
-Textfield: Selektionsfarbe ändern
+P3 Menüs: sollen neu auf mousedown reagieren und nicht bei mouseup
 
 TableField: Tab-Reihenfolge ändern, Menüs sollen tabbable sein. Fokusrahmen um Tabelle weg. Selektion grau, wenn nicht fokussiert.
 
@@ -80,3 +83,5 @@ CGU Stern durch Teilen-Icon ersetzen
 CGU Tree: Pfeil/-Text, vertikale Ausrichtung korrigieren
 CGU MessageBox: Nur Fokus-Farbe, kein Default-Button. Default-Button ist initial fokussiert.
 CGU Fokus-Farbe: überall grün
+
+CRU Ausprobieren: Dickerer top-border, 2 oder 3 px oben an Table-Controls

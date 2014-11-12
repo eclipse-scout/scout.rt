@@ -19,8 +19,11 @@
     height: @logical-grid-height;
   }
 
-  & .viewport {
-    top:40px;
+  /* This wrapper DIV is required because CSS3 column flow does not work
+   * when height is fixed and DIV is scrollable vertically.
+   */
+  & .nodes-wrapper {
+    margin-top: 10px;
     width: 400px;
     height: 165px;
   }
@@ -35,19 +38,17 @@
   }
 
   & .section {
+    -webkit-column-break-inside: avoid;
+    -moz-column-break-inside: avoid;
+    -o-column-break-inside: avoid;
+    -ms-column-break-inside: avoid;
+    column-break-inside: avoid;
 
-  -webkit-column-break-inside: avoid;
-  -moz-column-break-inside: avoid;
-  -o-column-break-inside: avoid;
-  -ms-column-break-inside: avoid;
-  column-break-inside: avoid;
-
-  /* Hack for FF, because column-break-inside does not yet work for all elements, only for tables
+    /* Hack for FF, because column-break-inside does not yet work for all elements, only for tables
    * see: https://bugzilla.mozilla.org/show_bug.cgi?id=549114
    */
-  display: table;
-  width:125px;
-
+    display: table;
+    width:125px;
     margin-bottom: 10px;
 
     & .title {
