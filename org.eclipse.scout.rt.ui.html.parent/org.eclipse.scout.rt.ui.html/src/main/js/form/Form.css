@@ -12,7 +12,7 @@
     bottom: 0;
     width: calc(~"100% - " @menu-margin-x*2);
 
-    border-top: 3px solid @color-bench-light-border;
+    border-top: 1px solid @color-bench-light-border;
     border-bottom: 0;
   }
 }
