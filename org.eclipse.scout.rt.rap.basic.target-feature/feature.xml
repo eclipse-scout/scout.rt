@@ -28,7 +28,7 @@
          id="javax.servlet"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="3.1.0.v201410161800"
          unpack="false"/>
     
    <plugin
