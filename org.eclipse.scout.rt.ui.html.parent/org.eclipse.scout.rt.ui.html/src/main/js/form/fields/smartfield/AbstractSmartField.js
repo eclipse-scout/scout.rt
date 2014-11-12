@@ -152,6 +152,7 @@ scout.AbstractSmartField.prototype._filterOptions = function() {
   this._filterOptionsImpl(val);
   this._oldVal = val;
   $.log.debug('updated oldVal=' + this._oldVal);
+  this._updateScrollbar();
 };
 
 /**
@@ -160,7 +161,7 @@ scout.AbstractSmartField.prototype._filterOptions = function() {
  */
 scout.AbstractSmartField.prototype._showPopup = function(numOptions, vararg) {
   var fieldBounds = this._getInputBounds(),
-    popupHeight = numOptions * 24 + 24 + 3, // TODO AWE: (smartfield) popup-layout dynamischer,
+    popupHeight = numOptions * 29 + 29 + 3, // TODO AWE: (smartfield) popup-layout dynamischer,
     popupBounds = new scout.Rectangle(fieldBounds.x, fieldBounds.y + fieldBounds.height, fieldBounds.width, popupHeight);
   this._$popup = $('<div>').
     addClass('smart-field-popup').
@@ -202,7 +203,7 @@ scout.AbstractSmartField.prototype._renderOptions = function(options) {
   for (i=0; i<options.length; i++) {
     option = options[i];
     htmlOption = option.replace(/\n/gi, "<br/>");
-    $('<div>').
+    $('<p>').
       on('mousedown', this._onOptionMousedown.bind(this)).
       appendTo(this._$viewport).
       data('option', option). // stores the original text as received from the server
@@ -214,10 +215,12 @@ scout.AbstractSmartField.prototype._renderOptions = function(options) {
   if (selectedPos > -1) {
     this._selectOption(this._get$Options(true), selectedPos);
   }
+  this._updateScrollbar();
 };
 
 scout.AbstractSmartField.prototype._emptyOptions = function(options) {
   this._$viewport.empty();
+  this._updateScrollbar();
 };
 
 scout.AbstractSmartField.prototype._onOptionMousedown = function(e) {

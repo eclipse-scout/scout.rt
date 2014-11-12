@@ -4,10 +4,6 @@
 [AWE]
 Desktop-Tabs: 2-zeilig gut, 2te Zeile evtl. grau machen? V-Align top, nicht middle wenn nur 1 Zeile
 
-Assistenten-Form designen/programmieren
-
-SmartField noch ein bisschen schöner (auch mit JS-scrollbar)
-
 P2 Navigation in Forms: in Forms ein zusätzliches Item als Button hervorheben (z.B. Anzeigen) und
   evtl. ein "multi-button" damit man im Tree weiter nach unten navigieren kann ohne in den Tree
   klicken zu müssen
@@ -72,6 +68,8 @@ AWE Telefon-Icon korrigieren (Grösse, Farbe)
 AWE Toolbar: Profil-Icon rechts oben, mit Benutzername und Menü mit Optionen..., Abmelden, etc.
 AWE Tabs: "Bölle" nicht schön, Farbe dunkel-grau ausprobieren, evtl. active state bei mousedown setzen
     und nicht bei mouseup wie jetzt (2 farben gleichzeitig sichtbar)
+AWE Assistenten-Form designen/programmieren
+AWE SmartField noch ein bisschen schöner (auch mit JS-scrollbar)
 
 
 CGU TableField: row-height === logicalGridHeight (text-field)?

@@ -142,13 +142,13 @@
 /* Hint: The definition of the 2px selection border is written in desktop.css because it is not possible to prevent the creation of the additional selection div in tablefield.css*/
 
 .table-row.selected {
-  background-color: @color-bench-select;
-  border-color: @color-bench-select-border;
+  background-color: @selection-background-color;
+  border-color: @selection-border-color;
 }
 
 .table-row.select-single,
 .table-row.select-top {
-  border-top: 1px solid @color-bench-select-border;
+  border-top: 1px solid @selection-border-color;
   /* Move the row 1px up to cover the bottom border of the previous row. */
   margin-top: -1px;
 }

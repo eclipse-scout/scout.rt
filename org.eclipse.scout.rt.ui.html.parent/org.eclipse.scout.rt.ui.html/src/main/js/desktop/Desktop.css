@@ -182,16 +182,16 @@ Middle rows dont have 2px border so no need to do it for those. */
 }
 
 .desktop-bench > .table .table-row.select-top:before {
-   border-top: 1px solid @color-bench-select-border;
+   border-top: 1px solid @selection-border-color;
 }
 
 .desktop-bench > .table .table-row.select-bottom:before {
-   border-bottom: 1px solid @color-bench-select-border;
+   border-bottom: 1px solid @selection-border-color;
 }
 
 .desktop-bench > .table .table-row.select-single:before {
-   border-top: 1px solid @color-bench-select-border;
-   border-bottom: 1px solid @color-bench-select-border;
+   border-top: 1px solid @selection-border-color;
+   border-bottom: 1px solid @selection-border-color;
 }
 
 /* base desktop */

@@ -340,6 +340,7 @@ und benötigen zudem ein Layout-Konzept ähnlich wie der Swing LayoutManager2 (i
 - getSize() liefert Dimensionen inkl. Insets zurück
 - getPreferredSize() liefert Dimension inkl. Insets zurück.
 
+
 09.10.2014 AWE, CGU: Scrollbar
 1. Native Scrollbar wenn möglich verwenden
 2. Wenn native Scrollbar hässlich, native Scrollbar stylen, wenn möglich
@@ -347,6 +348,11 @@ und benötigen zudem ein Layout-Konzept ähnlich wie der Swing LayoutManager2 (i
 
 Grund: die nativen SBs funktionieren immer besser, als die JS basierten. Sie funktionieren auch auf verschiedenen
   Gerätetypen mit unterschiedlichen Browsern / Maustreiber / etc. am problemlosesten. --> spart Aufwand
+Hauptproblem: Browser feuern kein resize-Event wenn ein DIV seine Grösse ändert. Als Ersatz muss immer explizit
+  ein "update" auf der JS-Scrollbar gemacht werden --> hässlicher Code
+Kompromiss: JS-Scrollbar nur im Baum verwenden, weil dort der optische "Gewinn" am grössten ist. Überall sonst
+  native Scrollbars verwenden.
+
 
 23.10.2014 AWE, CGU, IMO - Word Integration
 1. für UGM präpariertes docx in /resources auf Webserver legen
@@ -358,6 +364,7 @@ Grund: die nativen SBs funktionieren immer besser, als die JS basierten. Sie fun
 4. Noch offen ist, wie wir komplizierte Use-Cases (z.B. Variable Erstellen in der Template-Ansicht) lösen
    wollen. Dialog in C# nachprogrammieren ist zu aufwändig, enge Integration von Word und Browser ist schwierig.
    Evtl. brauchen wir dafür wirklich diese Detached-Dialoge
+
 
 29.20.2014 AWE, CGU, IMO - Detached Forms, Word Integration
 - Template-Dialoge nachprogrammieren zu aufwändig, wir wollen auch keine Code-Duplikation (Java, C#)
@@ -375,3 +382,14 @@ Grund: die nativen SBs funktionieren immer besser, als die JS basierten. Sie fun
     die detached Forms werden dann natürlich auch angezeigt, wenn der embedded Browser noch läuft.
 
 
+12.11.2014 AWE, CGU - Überlegungen zu MenuBar
+Das Konzept für die MenuBar muss überarbeitet werden. Wichtige Punkte sind dabei:
+- Existierende Konfiguration:
+  * System-Buttons in Form (Cancel, Ok, etc.) -> werden im Form rechts angezeigt
+  * Process-Buttons -> werden im Form links angezeigt
+  * Andere-Buttons -> werden im Layout-grid platziert
+- Braucht die GroupBox eine MenuBar oder reicht eine MenuBar pro Form? Beispiel: Marketing "Zielgruppen"
+- Wie gehen wir mit dem Default-Button um? Wie wird er konfiguriert? (Konzept gibt es heute in Scout nicht)
+- Wie werden die Menu-Contributions von Form, Page, Selection sinnvoll zusammengesetzt? Welche Möglichkeiten soll
+  es geben, diese per Konfiguration zu steuern? Brauchen wir frei konfigurierbare logische Gruppen wie in Eclipse
+  RCP? oder reicht ein horiz. Alignment wie heute?

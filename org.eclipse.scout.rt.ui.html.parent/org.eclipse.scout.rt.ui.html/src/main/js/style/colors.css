@@ -22,7 +22,9 @@
 @palette-light-red: #FFE0E0;
 
 @palette-bsi-orange: #FE9915;
+
 @palette-bsi-green: #0082A1;
+@palette-bsi-light-green-0: #ECF3F7;
 @palette-bsi-light-green: #389DB6;
 
 /* ------------------------ */
@@ -36,8 +38,6 @@
 @color-bench: @palette-white;
 @color-bench-light: @palette-light-gray-5;
 @color-bench-light-border: @palette-light-gray-2;
-@color-bench-select: #ECF3F7;
-@color-bench-select-border: @palette-bsi-green;
 
 @color-error: @palette-red;
 @color-error-light: @palette-light-red;
@@ -63,8 +63,10 @@
 @focus-color-glow: rgba(0, 130, 161, 0.5);
 @active-color: @palette-bsi-green;
 @highlight-color: @palette-bsi-orange;
+@selection-background-color: @palette-bsi-light-green-0;
+@selection-border-color: @palette-bsi-green;
 
-@popup-border-color: @palette-light-gray-1;
+@popup-border-color: @palette-bsi-green;
 @button-background-color: @palette-light-gray-5;
 @default-button-background-color: @palette-bsi-light-green;
 
@@ -72,3 +74,4 @@
 
 @footer-color: @palette-gray;
 @footer-disabled-color: @palette-light-gray-4;
+
