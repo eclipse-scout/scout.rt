@@ -70,7 +70,7 @@ scout.DesktopToolButton.prototype._openContainer = function () {
 
   // find the 1st focusable element in the $container
   // wollen wir nicht einfach JQuery UI :focusable dafür verwenden?
-  this.desktop.$toolContainer.find('input').first().get(0).focus();
+  this.desktop.$toolContainer.find('input').first().focus();
 
   this.desktop.selectedTool = this;
   this.$div.select(true);
