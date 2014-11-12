@@ -131,6 +131,7 @@ public class ScoutServerTestRunner extends BlockJUnit4ClassRunner {
       throw e;
     }
     catch (Exception e) {
+      LOG.error("Error creating session", e);
       List<Throwable> errors = new ArrayList<Throwable>();
       errors.add(e);
       throw new InitializationError(errors);
@@ -204,11 +205,11 @@ public class ScoutServerTestRunner extends BlockJUnit4ClassRunner {
   @Override
   protected Statement methodBlock(FrameworkMethod method) {
     LoginInfo loginInfo = m_loginInfo;
-    ServerTest methodLevelClientTest = method.getAnnotation(ServerTest.class);
-    if (methodLevelClientTest != null) {
+    ServerTest methodLevelAnnotation = method.getAnnotation(ServerTest.class);
+    if (methodLevelAnnotation != null) {
       try {
-        ServerTest classLevelClientTest = getTestClass().getJavaClass().getAnnotation(ServerTest.class);
-        loginInfo = getOrCreateServerSession(classLevelClientTest, methodLevelClientTest);
+        ServerTest classLevelAnnotation = getTestClass().getJavaClass().getAnnotation(ServerTest.class);
+        loginInfo = getOrCreateServerSession(classLevelAnnotation, methodLevelAnnotation);
       }
       catch (final Throwable e) {
         return new Statement() {
@@ -231,6 +232,18 @@ public class ScoutServerTestRunner extends BlockJUnit4ClassRunner {
     return super.possiblyExpectingExceptions(method, test, new ProcessingRuntimeExceptionUnwrappingStatement(next));
   }
 
+  /**
+   * Creates a {@link LoginInfo} with a {@link Subject} and {@link IServerSession} for tests given class and method
+   * annotations or default, if none available.
+   *
+   * @param classLevelServerTest
+   *          {@link ServerTest} class annotation
+   * @param methodLevelServerTest
+   *          {@link ServerTest} method annotation
+   * @return {@link LoginInfo}
+   * @throws InitializationError
+   *           , if no session class can be found.
+   */
   protected LoginInfo getOrCreateServerSession(ServerTest classLevelServerTest, ServerTest methodLevelServerTest) throws Exception {
     // process default values
     Class<? extends IServerSession> serverSessionClass = defaultServerSessionClass();
