@@ -18,6 +18,7 @@ import java.util.Comparator;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.service.internal.Activator;
+import org.eclipse.scout.service.internal.ServicesExtensionManager;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.InvalidSyntaxException;
@@ -30,6 +31,10 @@ import org.osgi.framework.ServiceReference;
  * https://bugs.eclipse.org/bugs/show_bug.cgi?id=299351 (solved with eclipse 3.6)
  * <p>
  * see also {@link INullService}
+ * <p>
+ * Since 4.0 there is a service cache for much better performance. Set the config.ini property
+ * <code>org.eclipse.scout.service.cache.enabled=true</code> to use it. Call {@link #clearCache()} to clear it at
+ * runtime.
  */
 public final class SERVICES {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SERVICES.class);
@@ -59,7 +64,8 @@ public final class SERVICES {
       return null;
     }
     // start the tracker, blocks until all service factories have been registered
-    a.getServicesExtensionManager().start();
+    ServicesExtensionManager extMgr = a.getServicesExtensionManager();
+    extMgr.start();
     BundleContext context = a.getBundle().getBundleContext();
     if (context == null) {
       return null;
@@ -71,7 +77,7 @@ public final class SERVICES {
       serviceReference = context.getServiceReference(serviceInterfaceClass.getName());
 
       if (serviceReference != null) {
-        T service = resolveService(serviceInterfaceClass, context, serviceReference);
+        T service = extMgr.fastResolveService(serviceInterfaceClass, context, serviceReference);
         if (service != null) {
           return service;
         }
@@ -88,32 +94,10 @@ public final class SERVICES {
 
     if (refs != null) {
       for (ServiceReference ref : refs) {
-        T service = resolveService(serviceInterfaceClass, context, ref);
+        T service = extMgr.fastResolveService(serviceInterfaceClass, context, ref);
         if (service != null) {
           return service;
         }
-      }
-    }
-    return null;
-  }
-
-  /**
-   * safely get and immediately unget the service in an atomic section using the service reference as lock
-   */
-  @SuppressWarnings("unchecked")
-  private static <T extends Object> T resolveService(Class<T> serviceInterfaceClass, BundleContext context, ServiceReference ref) {
-    if (ref == null) {
-      return null;
-    }
-    synchronized (ref) {
-      try {
-        Object s = safeGetService(context, ref);
-        if (s != null && serviceInterfaceClass.isAssignableFrom(s.getClass())) {
-          return (T) s;
-        }
-      }
-      finally {
-        context.ungetService(ref);
       }
     }
     return null;
@@ -141,7 +125,8 @@ public final class SERVICES {
     }
     // start the tracker, blocks until all service factories have been
     // registered
-    a.getServicesExtensionManager().start();
+    ServicesExtensionManager extMgr = a.getServicesExtensionManager();
+    extMgr.start();
     BundleContext context = a.getBundle().getBundleContext();
     if (context == null) {
       return (T[]) Array.newInstance(serviceInterfaceClass, 0);
@@ -162,7 +147,7 @@ public final class SERVICES {
       });
       ArrayList<T> list = new ArrayList<T>(refs.length);
       for (ServiceReference ref : refs) {
-        T s = resolveService(serviceInterfaceClass, context, ref);
+        T s = extMgr.fastResolveService(serviceInterfaceClass, context, ref);
         if (s != null) {
           list.add((T) s);
         }
@@ -172,11 +157,19 @@ public final class SERVICES {
     return (T[]) Array.newInstance(serviceInterfaceClass, 0);
   }
 
-  private static Object safeGetService(BundleContext context, ServiceReference ref) {
-    Object o = context.getService(ref);
-    if (o instanceof INullService) {
-      o = null;
+  /**
+   * Clear the services cache that speeds up service lookup.
+   * <p>
+   * This does not affect the registered services it is only clears the lookup cache.
+   * 
+   * @since 4.0
+   */
+  public static void clearCache() {
+    Activator a = Activator.getDefault();
+    if (a == null) {
+      return;
     }
-    return o;
+    ServicesExtensionManager extMgr = a.getServicesExtensionManager();
+    extMgr.clearDirectAccessorCache();
   }
 }

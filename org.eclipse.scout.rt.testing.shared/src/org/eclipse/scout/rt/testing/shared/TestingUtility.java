@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.service.IService;
+import org.eclipse.scout.service.SERVICES;
 import org.eclipse.scout.service.ServiceUtility;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Constants;
@@ -74,6 +75,7 @@ public final class TestingUtility {
         ((IService) service).initializeService(reg);
       }
     }
+    SERVICES.clearCache();
     return result;
   }
 
@@ -102,6 +104,7 @@ public final class TestingUtility {
     for (ServiceRegistration reg : registrationList) {
       reg.unregister();
     }
+    SERVICES.clearCache();
   }
 
   /**
