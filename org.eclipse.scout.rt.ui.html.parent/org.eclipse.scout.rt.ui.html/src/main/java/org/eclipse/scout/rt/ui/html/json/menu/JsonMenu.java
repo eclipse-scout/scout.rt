@@ -87,15 +87,22 @@ public class JsonMenu extends AbstractJsonPropertyObserver<IMenu> {
         return menuTypes;
       }
     });
-    putJsonProperty(new JsonProperty<IMenu>(PROP_SYSTEM_TYPE, model) {
-      @Override
-      protected Integer modelValue() {
-        if (getModel() instanceof IMenu5) {
+    if (getModel() instanceof IMenu5) {
+      putJsonProperty(new JsonProperty<IMenu>(PROP_SYSTEM_TYPE, model) {
+        @Override
+        protected Integer modelValue() {
           return ((IMenu5) getModel()).getSystemType();
         }
-        return -1;
-      }
-    });
+      });
+    }
+    if (getModel() instanceof IMenu5) {
+      putJsonProperty(new JsonProperty<IMenu>("defaultMenu", model) {
+        @Override
+        protected Boolean modelValue() {
+          return ((IMenu5) getModel()).isDefault();
+        }
+      });
+    }
   }
 
   @Override

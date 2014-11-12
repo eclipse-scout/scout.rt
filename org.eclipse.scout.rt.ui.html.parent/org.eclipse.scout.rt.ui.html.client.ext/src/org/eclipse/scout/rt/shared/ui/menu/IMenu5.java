@@ -31,6 +31,10 @@ public interface IMenu5 extends IMenu {
 
   void setSystemType(int systemType);
 
+  boolean isDefault();
+
+  void setDefault(boolean isDefault);
+
   void addActionListener(ActionListener listener);
 
   void removeActionListener(ActionListener listener);

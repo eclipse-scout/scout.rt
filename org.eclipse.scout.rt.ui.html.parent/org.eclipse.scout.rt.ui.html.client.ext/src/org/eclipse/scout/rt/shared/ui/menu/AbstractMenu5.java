@@ -22,6 +22,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 public class AbstractMenu5 extends AbstractMenu implements IMenu5 {
   private final EventListenerList m_listenerList = new EventListenerList();
   private int m_systemType;
+  private boolean m_default;
 
   public AbstractMenu5() {
     super(true);
@@ -35,6 +36,7 @@ public class AbstractMenu5 extends AbstractMenu implements IMenu5 {
   protected void initConfig() {
     super.initConfig();
     setSystemType(getConfiguredSystemType());
+    setDefault(getConfiguredIsDefault());
   }
 
   @Override
@@ -98,6 +100,21 @@ public class AbstractMenu5 extends AbstractMenu implements IMenu5 {
         ((ActionListener) listeners[i]).actionChanged(e);
       }
     }
+  }
+
+  //FIXME CGU maybe it would be better to move the property to the groupbox because only one default button is possible (as it is done for the default menu in abstractTable)
+  @Override
+  public boolean isDefault() {
+    return m_default;
+  }
+
+  @Override
+  public void setDefault(boolean isDefault) {
+    m_default = isDefault;
+  }
+
+  protected boolean getConfiguredIsDefault() {
+    return false;
   }
 
 }

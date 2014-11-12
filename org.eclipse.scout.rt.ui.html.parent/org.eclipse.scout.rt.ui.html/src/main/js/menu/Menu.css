@@ -67,18 +67,18 @@
     margin-right:14px;
   }
 
-  &+ .default-button {
+  &.default-button {
     .font-text-normal(@bold);
     background-color: @palette-bsi-green;
     color: @palette-white;
-    border: none;
+    border-width: 0;
   }
 
   &:hover {
     color: @hover-color;
   }
 
-  &+ .default-button:hover {
+  &.default-button:not(:disabled):hover {
     color: @palette-white;
     background-color: @default-button-background-color;
   }
@@ -92,6 +92,16 @@
     .focus-border;
     border-radius: @border-radius;
   }
+
+  &:disabled {
+    background-color: @palette-white;
+    color: @disabled-color;
+  }
+
+  &.default-button {
+    border-width: 1px;
+  }
+
 }
 
 .menu-item {

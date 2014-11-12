@@ -42,4 +42,9 @@ public class AbstractSearchMenu extends AbstractMenu5 {
   protected String getConfiguredTooltipText() {
     return ScoutTexts.get("SearchButtonTooltip");
   }
+
+  @Override
+  protected boolean getConfiguredIsDefault() {
+    return true;
+  }
 }
