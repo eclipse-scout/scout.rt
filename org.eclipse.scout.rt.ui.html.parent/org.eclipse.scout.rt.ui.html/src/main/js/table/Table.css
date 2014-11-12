@@ -13,15 +13,6 @@
   & .scrollbar {
     right: 3px;
   }
-
-  & .scrollbar-thumb {
-    background-color: rgba(153, 153, 153, 0.3);
-  }
-
-  & .scrollbar-thumb-move,
-  & .scrollbar-thumb:hover{
-    background-color: rgba(153, 153, 153, 0.6);
-  }
 }
 
 /* main table header */

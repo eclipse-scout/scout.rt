@@ -35,15 +35,6 @@
     margin-bottom: 0px;
   }
 
-  & .scrollbar-thumb {
-    background-color: rgba(205, 205, 205, 0.3);
-  }
-
-  & .scrollbar-thumb-move,
-  & .scrollbar-thumb:hover{
-    background-color: rgba(153, 153, 153, 0.6);
-  }
-
   & .nodes {
     columns: 105px 2;
     -moz-columns: 105px 2;
