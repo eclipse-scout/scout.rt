@@ -223,7 +223,7 @@ scout.Session.prototype._sendRequest = function(request) {
     async : true,
     type : 'POST',
     dataType : 'json',
-    contentType : 'application/json',
+    contentType : 'application/json; charset=UTF-8',
     cache : false,
     url : this.url,
     data : JSON.stringify(request),
