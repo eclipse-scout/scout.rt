@@ -104,6 +104,14 @@ public abstract class AbstractBooleanField extends AbstractValueField<Boolean> i
     return retVal;
   }
 
+  /**
+   * A boolean field is considered empty if unchecked.
+   */
+  @Override
+  protected boolean execIsEmpty() throws ProcessingException {
+    return !isChecked();
+  }
+
   @Override
   public IBooleanFieldUIFacade getUIFacade() {
     return m_uiFacade;
