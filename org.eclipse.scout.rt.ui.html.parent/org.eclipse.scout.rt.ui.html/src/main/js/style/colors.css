@@ -66,6 +66,7 @@
 @selection-background-color: @palette-bsi-light-green-0;
 @selection-border-color: @palette-bsi-green;
 
+@menu-border-color: @palette-light-gray-1;
 @popup-border-color: @palette-bsi-green;
 @button-background-color: @palette-light-gray-5;
 @default-button-background-color: @palette-bsi-light-green;

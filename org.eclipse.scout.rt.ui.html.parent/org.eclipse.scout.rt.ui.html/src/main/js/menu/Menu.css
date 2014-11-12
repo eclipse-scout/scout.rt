@@ -175,7 +175,7 @@
     padding: 0px 13px;
     white-space: nowrap;
     background-color: white;
-    border: solid 1px @popup-border-color;
+    border: solid 1px @menu-border-color;
     border-bottom: none;
     .drop-shadow();
   }
@@ -184,12 +184,12 @@
 .popup-body {
   position: absolute;
   top: 39px;
-  border: solid 1px @popup-border-color;
+  border: solid 1px @menu-border-color;
   background-color: @palette-white;
   .drop-shadow();
 
   & > .menu-item {
-    border-bottom: solid 1px @popup-border-color;
+    border-bottom: solid 1px @menu-border-color;
     display: block;
     width: 100%;
     padding-left: 15px;

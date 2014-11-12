@@ -17,7 +17,7 @@ scout.Scrollbar2.install = function($container, options) {
   if (prettyScrollbars) {
     $.log.debug('use native scrollbars for container ' + scout.graphics.debugOutput($container));
     $container.
-      css('overflow', 'hidden').
+      css('overflow-x', 'hidden').
       css('overflow-y', 'auto').
       css('-webkit-overflow-scrolling', 'touch');
       // TODO AWE: (scrollbar) add other styles based on config-object and used browser, for instance:

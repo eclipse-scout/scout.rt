@@ -10,8 +10,9 @@
 scout.Scrollbar = function($parent, options) {
 
   this.defaultOptions = {
-    axis:'y',
-    invertColors:false
+    axis: 'y',
+    invertColors: false,
+    borderless: false
   };
 
   this.options = $.extend({}, this.defaultSettings, options);
@@ -26,8 +27,12 @@ scout.Scrollbar = function($parent, options) {
   this._$scrollbar = $parent.beforeDiv('', 'scrollbar');
   this._$thumb = this._$scrollbar.appendDiv('', 'scrollbar-thumb');
   if (this.options.invertColors === true) {
-    this._$thumb.css('background-color', 'rgba(0, 0, 0, 0.3)');
+    this._$thumb.addClass('inverted');
   }
+  if (this.options.borderless === true) {
+    this._$scrollbar.addClass('borderless');
+  }
+
   this._dim = this.options.axis === 'x' ? 'Width' : 'Height';
   this._dir = this.options.axis === 'x' ? 'left' : 'top';
 

@@ -349,7 +349,8 @@ und benötigen zudem ein Layout-Konzept ähnlich wie der Swing LayoutManager2 (i
 Grund: die nativen SBs funktionieren immer besser, als die JS basierten. Sie funktionieren auch auf verschiedenen
   Gerätetypen mit unterschiedlichen Browsern / Maustreiber / etc. am problemlosesten. --> spart Aufwand
 Hauptproblem: Browser feuern kein resize-Event wenn ein DIV seine Grösse ändert. Als Ersatz muss immer explizit
-  ein "update" auf der JS-Scrollbar gemacht werden --> hässlicher Code
+  ein "update" auf der JS-Scrollbar gemacht werden --> hässlicher Code. Ebenfalls funktioniert die JS-Scrollbar
+  nicht richtig, wenn der Parent position:static hat, sondern nur wenn der parent relative oder absolute ist.
 Kompromiss: JS-Scrollbar nur im Baum verwenden, weil dort der optische "Gewinn" am grössten ist. Überall sonst
   native Scrollbars verwenden.
 

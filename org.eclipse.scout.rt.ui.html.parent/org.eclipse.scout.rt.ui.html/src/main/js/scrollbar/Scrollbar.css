@@ -7,6 +7,12 @@
   right: 6px;
   margin-top: 8px;
   margin-bottom: 8px;
+
+  &.borderless {
+    right: -2px;
+    margin-top: 0;
+    margin-bottom: 0;
+  }
 }
 
 .scrollbar-thumb {
@@ -18,12 +24,19 @@
   border-radius: 4px;
   background-color: rgba(153, 153, 153, 0.3);
 
-  &.scrollbar-thumb-move,
-  &:hover{
-    background-color: rgba(153, 153, 153, 0.6);
+  &.inverted {
+    background-color: rgba(0, 0, 0, 0.1);
   }
 }
 
+.scrollbar-thumb-move,
+.scrollbar-thumb:hover {
+    background-color: rgba(153, 153, 153, 0.6);
+
+  &.inverted {
+    background-color: rgba(0, 0, 0, 0.2);
+  }
+}
 
 .viewport {
   position: absolute;

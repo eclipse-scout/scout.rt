@@ -22,9 +22,8 @@ scout.TreeCompact.prototype._render = function($parent) {
     keydown(this._onKeydown.bind(this));
 
   var $nodesWrapperDiv = $.makeDIV('nodes-wrapper').appendTo(this.$container);
-  this._$viewport = scout.Scrollbar2.install($nodesWrapperDiv);
+  this._$viewport = scout.Scrollbar2.install($nodesWrapperDiv, {invertColors:true, borderless:true});
   this._$nodesDiv = $.makeDIV('nodes').appendTo(this._$viewport);
-
   this._renderNodes();
 };
 
@@ -62,6 +61,7 @@ scout.TreeCompact.prototype._updateNodes = function() {
       }
     }
   }
+  scout.Scrollbar2.update(this._$viewport);
 };
 
 scout.TreeCompact.prototype._onInput = function(event) {
