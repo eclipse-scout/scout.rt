@@ -73,7 +73,9 @@ scout.FormField.prototype._renderVisible = function(visible) {
 
   if (this.rendered) {
     var htmlComp = scout.HtmlComponent.get(this.$container).getParent();
-    htmlComp.revalidate();
+    if (htmlComp) { //may be null if $container is detached
+      htmlComp.revalidate();
+    }
   }
 };
 

@@ -16,6 +16,7 @@ import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonEventType;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
+import org.eclipse.scout.rt.ui.html.json.form.fields.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 
 /**
@@ -30,6 +31,17 @@ public class JsonCheckBoxField extends JsonValueField<IBooleanField> {
   @Override
   public String getObjectType() {
     return "CheckBoxField";
+  }
+
+  @Override
+  protected void initJsonProperties(IBooleanField model) {
+    super.initJsonProperties(model);
+    putJsonProperty(new JsonProperty<IBooleanField>(IBooleanField.PROP_VALUE, model) {
+      @Override
+      protected Object modelValue() {
+        return getModel().getValue();
+      }
+    });
   }
 
   @Override

@@ -9,10 +9,6 @@ scout.ValueField.prototype._renderProperties = function() {
   this._renderDisplayText(this.displayText);
 };
 
-scout.ValueField.prototype._renderValue = function(value) {
-  // NOP //FIXME CGU may probably be removed
-};
-
 scout.ValueField.prototype._renderDisplayText = function(displayText) {
   if (!this.$field) {
     return;

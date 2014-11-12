@@ -13,7 +13,7 @@ scout.CheckBoxField.prototype._render = function($parent) {
   // a wrapper span element is required in order to align the checkbox within
   // the form-field. If we'd apply the width to the checkbox element itself, the
   // checkbox is always in the center.
-  var $field = $('<span>').
+  this.$field = $('<span>').
     appendTo(this.$container).
     addClass('field');
 
@@ -21,12 +21,12 @@ scout.CheckBoxField.prototype._render = function($parent) {
   this._$checkBox = $('<input>').
     attr('id', forRefId).
     attr('type', 'checkbox').
-    appendTo($field);
+    appendTo(this.$field);
 
   this._$checkBoxLabel = $('<label>').
     attr('for', forRefId).
     attr('title', this.label).
-    appendTo($field);
+    appendTo(this.$field);
 
   this._$checkBox.on('click', function() {
     this.session.send('click', this.id);
@@ -35,8 +35,9 @@ scout.CheckBoxField.prototype._render = function($parent) {
   this.addStatus();
 };
 
-scout.CheckBoxField.prototype._renderEnabled = function(enabled) {
-  this._$checkBox.setEnabled(enabled);
+scout.CheckBoxField.prototype._renderProperties = function() {
+  scout.CheckBoxField.parent.prototype._renderProperties.call(this);
+  this._renderValue(this.value);
 };
 
 scout.CheckBoxField.prototype._renderValue = function(value) {
@@ -45,6 +46,13 @@ scout.CheckBoxField.prototype._renderValue = function(value) {
   } else {
     this._$checkBox.removeAttr('checked');
   }
+};
+
+/**
+ * @override
+ */
+scout.CheckBoxField.prototype._renderEnabled = function(enabled) {
+  this._$checkBox.setEnabled(enabled);
 };
 
 // FIXME AWE/CGU label visible logic in scout for checkboxes is strange.

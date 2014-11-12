@@ -16,15 +16,9 @@ scout.GroupBox = function() {
 scout.inherits(scout.GroupBox, scout.CompositeField);
 
 scout.GroupBox.prototype._render = function($parent) {
-  this.$container = $parent.
-    appendDiv('', this.mainBox ? 'root-group-box' : 'group-box').
-    addClass('form-field').
-    attr('id', 'GroupBox-' + this.id);
-
-  var htmlCont = new scout.HtmlComponent(this.$container, this.session);
-  htmlCont.setLayout(new scout.GroupBoxLayout());
-  if (!this.mainBox) {
-    htmlCont.layoutData = new scout.LogicalGridData(this);
+  var htmlComp = this.addContainer($parent, this.mainBox ? 'root-group-box' : 'group-box', new scout.GroupBoxLayout());
+  if (this.mainBox) {
+    htmlComp.layoutData = null;
   }
 
   this.$label = $('<span>').html(this.label);
