@@ -2,7 +2,8 @@
 @table-selection-border-width: 2px;
 @table-header-height: 40px;
 @table-footer-height: 52px;
-@table-row-padding: 12px;
+@table-row-padding-y: 12px;
+@table-row-padding-left: 8px;
 
 .table {
   height: 100%;
@@ -38,7 +39,7 @@
   position: relative;
   display: inline-block;
   .font-text-normal(@bold);
-  padding: 0px 6px 0px 9px;
+  padding: 0px 6px 0px @table-row-padding-left;
   overflow: hidden;
   text-overflow: ellipsis;
   line-height: @table-header-height;
@@ -118,7 +119,7 @@
 .table-row .table-cell,
 .table-row-sum .table-cell {
   display: table-cell;
-  padding: @table-row-padding 4px @table-row-padding 8px;
+  padding: @table-row-padding-y 4px @table-row-padding-y @table-row-padding-left;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

@@ -3,13 +3,18 @@
 .table-field > .table {
   border: 1px solid @border-color;
   border-radius: @border-radius;
-  background-color:@control-background-color;
+  background-color: @control-background-color;
+}
+
+.table-field.single > .table {
+  border: 0;
+  border-bottom: 0;
+  border-radius: 0;
+  background-color: transparent;
 }
 
 .table-field > .table:focus {
   outline: none;
-  border-color: @focus-color;
-  .glow(@focus-color-glow);
 }
 
 .table-field > .table > .table-header,
@@ -23,8 +28,10 @@
 
 .table-field .menubar {
   height:39px;
-  padding:0 0 0 0;
   border-bottom:none;
+  margin-left: @table-row-padding-left;
+  margin-right: @table-row-padding-left;
+  padding: 0;
 
   & > .menu-item {
     padding-top:0;
@@ -41,6 +48,6 @@
 }
 
 .table-field > .table > .table-data .table-row > .table-cell {
-  padding-top: @table-row-padding - 6;
-  padding-bottom: @table-row-padding - 6;
+  padding-top: @table-row-padding-y - 6;
+  padding-bottom: @table-row-padding-y - 6;
 }

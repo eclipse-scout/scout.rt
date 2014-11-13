@@ -22,7 +22,7 @@ scout.RichTextField.prototype._render = function($parent) {
           return false;
         }
       }));
-  
+
   // command bar
   this.$commandBar = this.$container.appendDIV('rich-text-bar');
 
@@ -60,10 +60,10 @@ scout.RichTextField.prototype._render = function($parent) {
 
   $('.rich-text-command', this.$commandBar).click((this._onCommandClick.bind(this)));
 
-  // anders lösen, denn: feld soll über die ganze breite gehen
-  //this.addLabel();
+  this.addLabel();
+  //FIXME CGU anders lösen, denn: feld soll über die ganze breite gehen
   //this.addMandatoryIndicator();
-  //this.addStatus();
+  this.addStatus();
 };
 
 scout.RichTextField.prototype._onCommandClick = function(event) {

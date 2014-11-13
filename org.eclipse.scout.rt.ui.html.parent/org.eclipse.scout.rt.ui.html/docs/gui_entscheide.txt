@@ -31,7 +31,8 @@ Groupbox:
 
 Groupbox-Title:
 
-  Hat NIE einen margin
+  Hat NIE einen margin-bottom
+  Margin-Top ist derselbe wie bei GroupBox-body
   Visible: Ja wenn text !empty, sonst Nein
   TODO: man könnte auf  dem Model set/isTitleVisible() impl.
     analog FormField-Label
@@ -46,11 +47,10 @@ Groupbox-body:
     heute steuert borderVisible auch die Sichtbarkeit vom
     Title, das wäre neu nicht mehr so.
 
-Einfache-"Magie":
+Einfache-"Magie" mit Border-Decoration=AUTO:
 
   Wenn GroupBox NUR ein TableField enthält, dann borderVisible
   automatisch = Nein
-  Muss wahrscheinlich auf dem Modell gelöst werden.
 
 Spezialfälle:
 
@@ -72,7 +72,8 @@ TableField:
 
 TabBox:
 
-  Hat kein margin-top
+  Hat kein margin-bottom
+  Tabarea hat denselben margin-top wie groupbox
 
 
 Überlegungen zu Tastatursteuerung / Fokus-Handling

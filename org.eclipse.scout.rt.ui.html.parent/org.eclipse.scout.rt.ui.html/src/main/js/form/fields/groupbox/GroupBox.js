@@ -15,6 +15,12 @@ scout.GroupBox = function() {
 };
 scout.inherits(scout.GroupBox, scout.CompositeField);
 
+scout.GroupBox.prototype._renderProperties = function() {
+  scout.GroupBox.parent.prototype._renderProperties.call(this);
+
+  this._renderBorderVisible(this.borderVisible);
+};
+
 scout.GroupBox.prototype._render = function($parent) {
   var htmlComp = this.addContainer($parent, this.mainBox ? 'root-group-box' : 'group-box', new scout.GroupBoxLayout());
   if (this.mainBox) {
@@ -78,11 +84,36 @@ scout.GroupBox.prototype.getFields = function() {
   return this.controls;
 };
 
+scout.GroupBox.prototype._renderBorderVisible = function(borderVisible) {
+  if (borderVisible && this.borderDecoration === 'auto') {
+    borderVisible = this._computeBorderVisible();
+  }
+
+  if (!borderVisible) {
+    this._$body.addClass('margin-invisible');
+  }
+};
+
+//Don't include in renderProperties, it is not necessary to execute it initially because renderBorderVisible is executed already
+scout.GroupBox.prototype._renderBorderDecoration = function() {
+  this._renderBorderVisible(this.borderVisible);
+};
+
 /**
- * @override FormField.js
+ *
+ * @returns false if it is the mainbox. Or if the groupbox contains exactly one tablefield which has an invisible label
  */
-scout.GroupBox.prototype._renderBorderVisible = function(visible) {
-  // NOP
+scout.GroupBox.prototype._computeBorderVisible = function() {
+  var fields = this.getFields();
+  if (this.mainBox) {
+    return false;
+  } else if (fields.length === 1 &&
+      fields[0].objectType === 'TableField' &&
+      !fields[0].labelVisible) {
+    fields[0].$container.addClass('single');
+    return false;
+  }
+  return true;
 };
 
 /**

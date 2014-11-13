@@ -1,26 +1,22 @@
-@group-padding-top: 14px;
-@group-margin-top: 20px;
+@group-margin-top: 14px;
+@group-margin-bottom: 16px;
 
 .root-group-box {
   box-sizing: border-box;
-  margin: 0 @bench-margin-x 25px @bench-margin-x;
-  padding-top: 19px;
+  margin: 0 @bench-margin-x;
   overflow: hidden;
 }
 
 .group-box {
-  margin-bottom: 10px;
   box-sizing: border-box;
   width: 100%;
 }
 
 .group-box-title {
   width: 100%;
-  border-bottom: 3px solid @color-bench-light-border;
-  padding-top: -8px;
-  padding-bottom: 6px;
   margin-top: @group-margin-top;
-  margin-bottom: @group-padding-top;
+  border-bottom: 3px solid @color-bench-light-border;
+  padding-bottom: 6px;
 
   & span {
    .font-text-normal(@bold);
@@ -30,6 +26,12 @@
 
 .group-box-body {
   position: relative;
+
+  margin: @group-margin-top 0 @group-margin-bottom 0;
+
+  &.margin-invisible {
+    margin: 0;
+  }
 }
 
 .button-bar {
