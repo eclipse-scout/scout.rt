@@ -29,19 +29,38 @@ scout.RichTextField.prototype._render = function($parent) {
   this.$commandBar = this.$container.appendDIV('rich-text-bar');
 
   this.$commandFormat = this.$commandBar.appendDIV('rich-text-bar-group');
-  this.$commandFormat.appendDIV('rich-text-command rich-text-bar-bold', 'a').data('command', 'bold');
-  this.$commandFormat.appendDIV('rich-text-command rich-text-bar-underline', 'a').data('command', 'underline');
-  this.$commandFormat.appendDIV('rich-text-command rich-text-bar-strike', 'a').data('command', 'strikeThrough');
+
+  this.$commandFormat.appendDIV('rich-text-command rich-text-bar-bold', 'a')
+    .data('command', 'bold').data('attribute', '');
+  this.$commandFormat.appendDIV('rich-text-command rich-text-bar-underline', 'a')
+    .data('command', 'underline').data('attribute', '');
+  this.$commandFormat.appendDIV('rich-text-command rich-text-bar-strike', 'a')
+    .data('command', 'strikeThrough').data('attribute', '');
 
   this.$commandMark = this.$commandBar.appendDIV('rich-text-bar-group');
-  this.$commandMark.appendDIV('rich-text-command rich-text-bar-white', '&nbsp');
-  this.$commandMark.appendDIV('rich-text-command rich-text-bar-yellow', '&nbsp');
-  this.$commandMark.appendDIV('rich-text-command rich-text-bar-green', '&nbsp');
+  this.$commandMark.appendDIV('rich-text-command rich-text-bar-white', '&nbsp')
+    .data('command', 'BackColor').data('attribute', 'white');
+  this.$commandMark.appendDIV('rich-text-command rich-text-bar-yellow', '&nbsp')
+    .data('command', 'BackColor').data('attribute', 'yellow');
+  this.$commandMark.appendDIV('rich-text-command rich-text-bar-green', '&nbsp')
+    .data('command', 'BackColor').data('attribute', 'green');
 
   this.$commandList = this.$commandBar.appendDIV('rich-text-bar-group');
-  this.$commandList.appendDIV('rich-text-command rich-text-bar-plain', 'ohne');
-  this.$commandList.appendDIV('rich-text-command rich-text-bar-bullet', 'bullet');
-  this.$commandList.appendDIV('rich-text-command rich-text-bar-number', 'num');
+  this.$commandList.appendDIV('rich-text-command rich-text-bar-plain', 'ohne')
+    .data('command', 'outdent').data('attribute', '');
+  this.$commandList.appendDIV('rich-text-command rich-text-bar-bullet', 'bullet')
+    .data('command', 'insertunorderedlist').data('attribute', '');
+  this.$commandList.appendDIV('rich-text-command rich-text-bar-number', 'num')
+    .data('command', 'insertorderedlist').data('attribute', 'green');
+
+  this.$commandList = this.$commandBar.appendDIV('rich-text-bar-group');
+  this.$commandList.appendDIV('rich-text-command rich-text-bar-line', 'line')
+    .data('command', 'inserthorizontalrule').data('attribute', '');
+
+  this.$commandList.appendDIV('rich-text-command rich-text-bar-line', 'numline')
+    .data('command', 'inserthorizontalrule').data('attribute', '');
+
+  $('.rich-text-command', this.$commandBar).click((this._onCommandClick.bind(this)));
 
   // anders lösen, denn: feld soll über die ganze breite gehen
   //this.addLabel();
@@ -49,3 +68,12 @@ scout.RichTextField.prototype._render = function($parent) {
   //this.addStatus();
 };
 
+scout.RichTextField.prototype._onCommandClick = function(event) {
+  var command = $(event.target).data('command'),
+    attribute = $(event.target).data('attribute');
+
+  document.execCommand (command, false, attribute);
+
+  // in some cases set cursor at the end of selection
+  // todo
+};
