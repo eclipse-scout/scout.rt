@@ -20,9 +20,8 @@ scout.SmartFieldMultiline.prototype._render = function($parent) {
       keydown(this._onKeydown.bind(this)).
       appendTo($fieldContainer);
   this.addField($field, $fieldContainer);
-  // FIXME AWE: (smartfield) remove hardcoded text
   this.addIcon($fieldContainer);
-  this._$multilineField = $.makeDIV('multiline-field', 'Täfernstrasse 16a<br/>CH 5405 Baden-Dättwil').
+  this._$multilineField = $.makeDIV('multiline-field', '<br/><br/>').
     appendTo($fieldContainer);
   this.addStatus();
 };
@@ -52,6 +51,13 @@ scout.SmartFieldMultiline.prototype._openPopup = function() {
   this._renderOptions(this.options);
 };
 
+//@override ValueField.js
+scout.SmartFieldMultiline.prototype._renderDisplayText = function(displayText) {
+  var tmp = this._splitValue(displayText);
+  this.$field.val(tmp.firstLine);
+  this._$multilineField.html(tmp.multiLines);
+};
+
 // @override AbstractSmartField.js
 scout.SmartFieldMultiline.prototype._getInputBounds = function() {
   var fieldBounds = scout.graphics.getBounds(this.$fieldContainer),
@@ -60,11 +66,17 @@ scout.SmartFieldMultiline.prototype._getInputBounds = function() {
   return fieldBounds;
 };
 
+scout.SmartFieldMultiline.prototype._splitValue = function(value) {
+  var tmp = value.split("\n");
+  return {
+    firstLine: tmp.shift(),
+    multiLines: tmp.join('<br/>')
+  };
+};
+
 // @override AbstractSmartField.js
 scout.SmartFieldMultiline.prototype._applyOption = function(option) {
-  var tmp = option.split("\n"),
-    firstLine = tmp.shift(),
-    multiLines = tmp.join('<br/>');
-  scout.SmartFieldMultiline.parent.prototype._applyOption.call(this, firstLine);
-  this._$multilineField.html(multiLines);
+  var tmp = this._splitValue(option);
+  scout.SmartFieldMultiline.parent.prototype._applyOption.call(this, tmp.firstLine);
+  this._$multilineField.html(tmp.multiLines);
 };
