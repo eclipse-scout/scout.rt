@@ -6,11 +6,10 @@ scout.GroupBoxButtonBar = function(processButtons) {
 };
 
 scout.GroupBoxButtonBar.prototype.render = function($parent) {
+  var i, btn;
   this.$container = $parent.appendDIV('button-bar');
   this.$processDiv = this.$container.appendDIV('process');
   this.$systemDiv = this.$container.appendDIV('system');
-
-  var i, btn;
   for (i=0; i<this.processButtons.length; i++) {
     btn = this.processButtons[i];
     if (btn.gridData.horizontalAlignment <= 0) {

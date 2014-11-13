@@ -4,24 +4,24 @@
 /* global section, narrow to .scout for usage as portlet */
 
 body {
-height: 100%;
-width: 100%;
-margin: 0px;
-overflow: hidden;
--webkit-touch-callout: none;
--webkit-user-select: none;
--moz-user-select: none;
--ms-user-select: none;
-user-select: none;
-cursor: default;
-.font-text-normal;
-color: @text-color;
+  .font-text-normal;
+  height: 100%;
+  width: 100%;
+  margin: 0px;
+  overflow: hidden;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  cursor: default;
+  color: @text-color;
 }
 
 *, *:before, *:after {
--moz-box-sizing: border-box;
--webkit-box-sizing: border-box;
-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 /* Workaround for firefox bug https://bugzilla.mozilla.org/show_bug.cgi?id=648624 */
@@ -29,14 +29,61 @@ div {
 -moz-user-select: none;
 }
 
+input[type=text] {
+  background-color: @control-background-color;
+  padding: 0 @text-field-padding;
+  border: 1px solid @border-color;
+  border-radius: @border-radius;
+  color: @text-color;
+
+  &:disabled {
+    background-color: @palette-light-gray-5;
+    color: @palette-dark-gray-4;
+  }
+
+  &:focus {
+    .focus-border;
+  }
+
+  &.has-error {
+    border-color: @color-error;
+    background-color: @color-error-light;
+  }
+
+  &.has-error:focus {
+    .glow(@color-error);
+  }
+
+  &::-moz-selection {
+    background-color: @palette-bsi-light-green;
+    color: @palette-white;
+  }
+}
+
+textarea {
+   /* these two properties are required for FF, otherwise the editable textarea is 2px too large,
+    * and the DOM inspector does not include these 2 pixels.
+    */
+  margin: 0 auto;
+  padding: 5px @text-field-padding;
+  background-color: @control-background-color;
+  border: 1px solid @border-color;
+  border-radius: @border-radius;
+  color: @text-color;
+
+  &:focus {
+    .focus-border;
+  }
+}
+
 /* cursor handling */
 
 body.col-resize *, body.col-resize {
-cursor: col-resize !important;
+  cursor: col-resize !important;
 }
 
 body.row-resize *, body.row-resize {
-cursor: row-resize !important;
+  cursor: row-resize !important;
 }
 
 input, textarea, button {

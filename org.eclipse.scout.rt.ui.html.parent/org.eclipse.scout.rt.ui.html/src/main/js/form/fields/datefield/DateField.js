@@ -7,19 +7,14 @@ scout.DateField.prototype._render = function($parent) {
   this.addContainer($parent, 'date-field');
   this.addLabel();
   this.addMandatoryIndicator();
-
-  this.$field = $('<input>').
-    attr('type', 'text').
-    addClass('field').
-    focus(this._onFieldFocus.bind(this)).
-    blur(this._onFieldBlur.bind(this)).
-    keydown(this._onKeyDown.bind(this)).
-    click(this._onClick.bind(this)).
-    appendTo(this.$container);
-
-  this._dateFormat = this.session.locale.dateFormat; //FIXME CGU datefield has own dateformat
+  this.addField(
+    scout.fields.new$TextField().
+      focus(this._onFieldFocus.bind(this)).
+      blur(this._onFieldBlur.bind(this)).
+      keydown(this._onKeyDown.bind(this)).
+      click(this._onClick.bind(this)));
+  this._dateFormat = this.session.locale.dateFormat; // FIXME CGU datefield has own dateformat
   this._picker = new scout.DatePicker(this._dateFormat, this);
-
   this.addIcon();
   this.addStatus();
 };

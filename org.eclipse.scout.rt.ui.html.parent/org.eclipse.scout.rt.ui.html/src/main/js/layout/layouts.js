@@ -134,6 +134,7 @@ scout.FormFieldLayout.prototype.layout = function($container) {
     // - CSS/layout: field == irgend ein DIV der gelayouted werden muss (.field)
     // Vorschlag: für Layout und UI bewusst mit CSS Klassen arbeiten und nicht mit adapter-properties
     $field = this.formField.$field,
+    $fieldContainer = this.formField.$fieldContainer,
     $icon = this.formField.$icon,
     tooltip = this.formField.tooltip;
 
@@ -154,22 +155,22 @@ scout.FormFieldLayout.prototype.layout = function($container) {
     rightWidth += $status.outerWidth(true);
   }
 
-  if ($field) {
+  if ($fieldContainer) {
     fieldBounds = new scout.Rectangle(leftWidth, 0, contSize.width - leftWidth - rightWidth, contSize.height);
-    htmlField = scout.HtmlComponent.optGet($field);
+    htmlField = scout.HtmlComponent.optGet($fieldContainer);
     // TODO AWE: (layout) dafür sorgen, dass wir hier immer ein get() machen können
     if (htmlField) {
       htmlField.setBounds(fieldBounds);
     } else {
-      scout.graphics.setBounds($field, fieldBounds);
+      scout.graphics.setBounds($fieldContainer, fieldBounds);
     }
 
-    //Icon is placed inside the field (as overlay)
+    // Icon is placed inside the field (as overlay)
     if ($icon) {
       $icon.css('right', $field.cssBorderRightWidth() + rightWidth + 'px');
     }
 
-    //Make sure tooltip is at correct position after layouting, if there is one
+    // Make sure tooltip is at correct position after layouting, if there is one
     if (tooltip && tooltip.rendered) {
       tooltip.position();
     }
@@ -182,6 +183,8 @@ scout.FormFieldLayout.prototype.preferredLayoutSize = function($container) {
     $label = $container.children('label'),
     $status = $container.children('.status'),
     $mandatory = $container.children('.mandatory-indicator'),
+    // TODO AWE/CGU: (form-field) inkosistent! oben greifen wir auf formField zu,
+    // hier verwenden wir JQuery selectors
     $field = $container.children('.field');
   if ($label.isVisible()) {
     width += this.labelWidth;

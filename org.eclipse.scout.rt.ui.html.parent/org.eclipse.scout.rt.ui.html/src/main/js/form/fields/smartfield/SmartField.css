@@ -5,7 +5,7 @@
   }
 
   /* Multiline SmartField */
-  & .text-field {
+  & .multiline {
     border-bottom-color:  @palette-light-gray-5;
     border-top-left-radius: @border-radius;
     border-top-right-radius: @border-radius;
@@ -27,10 +27,7 @@
     padding: 3px 10px;
   }
 
-  /* TODO AWE: (smartfield) mit C.GU besprechen: evtl. etwas an der FormLayout impl. ändern?
-   * Kann man das Icon nicht einfach nur per CSS platziern?
-   */
-   & .text-field ~ .icon {
+   & input.multiline ~ .icon {
     margin-right: -15px;
     top: 0;
   }

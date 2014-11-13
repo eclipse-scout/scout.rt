@@ -10,21 +10,19 @@ scout.RichTextField.prototype._renderProperties = function() {
 scout.RichTextField.prototype._render = function($parent) {
   this.addContainer($parent, 'rich-text-field');
 
-  // create editabel div
-  this.$field = $.makeDIV('field', 'Beispieltext');
-  this.$field
-    .blur(this._onFieldBlur.bind(this))
-    .attr('contentEditable', 'true')
-    .appendTo(this.$container);
-
-  // return should not create div
-  this.$field.keydown(function(e) {
-    if (e.keyCode === 13) {
-      document.execCommand('insertHTML', false, '<br><br>');
-      return false;
-    }
-  });
-
+  // create editable div
+  this.addField(
+    $.makeDIV('field', 'Beispieltext').
+      attr('contentEditable', 'true').
+      blur(this._onFieldBlur.bind(this)).
+      // return should not create div
+      keydown(function(e) {
+        if (e.keyCode === 13) {
+          document.execCommand('insertHTML', false, '<br><br>');
+          return false;
+        }
+      }));
+  
   // command bar
   this.$commandBar = this.$container.appendDIV('rich-text-bar');
 
@@ -71,9 +69,7 @@ scout.RichTextField.prototype._render = function($parent) {
 scout.RichTextField.prototype._onCommandClick = function(event) {
   var command = $(event.target).data('command'),
     attribute = $(event.target).data('attribute');
-
   document.execCommand (command, false, attribute);
-
   // in some cases set cursor at the end of selection
   // todo
 };

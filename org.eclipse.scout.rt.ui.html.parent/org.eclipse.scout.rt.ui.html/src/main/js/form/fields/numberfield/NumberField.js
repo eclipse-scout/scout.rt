@@ -8,14 +8,10 @@ scout.NumberField.prototype._render = function($parent) {
   this.addContainer($parent, 'number-field');
   this.addLabel();
   this.addMandatoryIndicator();
-
-  this.$field = $('<input>').
-    attr('type', 'text').
-    addClass('field').
-    blur(this._parse.bind(this)).
-    blur(this._onFieldBlur.bind(this)).
-    appendTo(this.$container);
-
+  this.addField(
+    scout.fields.new$TextField().
+      blur(this._parse.bind(this)).
+      blur(this._onFieldBlur.bind(this)));
   this.addStatus();
 };
 

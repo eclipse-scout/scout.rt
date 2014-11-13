@@ -20,11 +20,11 @@ scout.TreeField.prototype._render = function($parent) {
  * Will also be called by model adapter on property change event
  */
 scout.TreeField.prototype._renderTree = function() {
-  this.tree.render(this.$container);;
-  this.$field = this.tree.$container.addClass('field');
+  this.tree.render(this.$container);
+  this.addField(this.tree.$container);
 };
 
 scout.TreeField.prototype._removeTree = function(oldTree) {
   oldTree.remove();
-  this.$field = null;
+  this.removeField();
 };

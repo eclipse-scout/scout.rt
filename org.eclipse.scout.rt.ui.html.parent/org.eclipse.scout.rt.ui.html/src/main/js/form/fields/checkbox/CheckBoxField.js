@@ -13,9 +13,7 @@ scout.CheckBoxField.prototype._render = function($parent) {
   // a wrapper span element is required in order to align the checkbox within
   // the form-field. If we'd apply the width to the checkbox element itself, the
   // checkbox is always in the center.
-  this.$field = $('<span>').
-    appendTo(this.$container).
-    addClass('field');
+  this.addField($('<span>'));
 
   var forRefId = 'RefId-' + this.id;
   this._$checkBox = $('<input>').

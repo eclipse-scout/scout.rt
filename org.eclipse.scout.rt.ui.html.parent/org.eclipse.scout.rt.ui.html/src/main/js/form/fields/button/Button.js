@@ -20,12 +20,10 @@ scout.Button.SYSTEM_TYPE = {
  */
 scout.Button.prototype._render = function($parent) {
   this.addContainer($parent, 'button', new scout.ButtonFieldLayout());
-  this.$field = $('<button>').
-    addClass('field').
-    appendTo(this.$container).
+  this.addField($('<button>').
     on('click', function() {
       this.session.send('click', this.id);
-    }.bind(this));
+    }.bind(this)));
 };
 
 scout.Button.prototype._renderLabel = function(label) {

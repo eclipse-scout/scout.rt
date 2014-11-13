@@ -1,7 +1,18 @@
 scout.FormField = function() {
   scout.FormField.parent.call(this);
   this.$label;
+
+  /**
+   * Note the difference between $field and $fieldContainer:
+   * - $field points to the input-field (typically a browser-text field)
+   * - $fieldContainer could point to the same input-field or when the field is a composite,
+   *   to the parent DIV of that composite. For instance: the multi-line-smartfield is a
+   *   composite with a input-field and a DIV showing the additional lines. In that case $field
+   *   points to the input-field and $fieldContainer to the parent DIV of the input-field.
+   *   This property should be used primarily for layout-functionality.
+   */
   this.$field;
+  this.$fieldContainer;
 
   /**
    * The status label is used for error-status and tooltip-icon.
@@ -21,12 +32,11 @@ scout.FormField.prototype._render = function($parent) {
   // FormField directly. Currently this is required as a placeholder for un-implemented form-fields.
   this.addContainer($parent, 'form-field');
   this.addLabel();
+  this.addField($('<div>').
+    text('not implemented yet').
+    addClass('not-implemented'));
   this.addMandatoryIndicator();
   this.addStatus();
-  this.$field = $.makeDIV('field')
-    .text('not implemented yet')
-    .addClass('not-implemented')
-    .appendTo(this.$container);
 };
 
 scout.FormField.prototype._renderProperties = function() {
@@ -219,6 +229,35 @@ scout.FormField.prototype.addLabel = function() {
 };
 
 /**
+ * Appends the given field to the this.$container and sets the properties this.$field and
+ * this.$fieldContainer referencing the field. When $fieldContainer should point to another
+ * element you must do this explicitly after calling this method.
+ *
+ * @param $field
+ * @param $fieldContainer (optional)
+ */
+scout.FormField.prototype.addField = function($field, $fieldContainer) {
+  if ($fieldContainer) {
+    this.$field = $field;
+    this.$fieldContainer = $fieldContainer;
+    $fieldContainer.appendTo(this.$container);
+  } else {
+    this.$field = $field;
+    this.$fieldContainer = $field;
+    $field.appendTo(this.$container);
+  }
+  this.$fieldContainer.addClass('field');
+};
+
+/**
+ * Sets the properties this.$field, this.$fieldContainer to null.
+ */
+scout.FormField.prototype.removeField = function() {
+  this.$field = null;
+  this.$fieldContainer = null;
+};
+
+/**
  * Appends a SPAN element for form-field status to this.$container and sets the this.$status property.
  */
 scout.FormField.prototype.addStatus = function() {
@@ -262,9 +301,9 @@ scout.FormField.prototype.addIcon = function($parent) {
  * @return The HtmlComponent created for this.$container
  */
 scout.FormField.prototype.addContainer = function($parent, typeName, layout) {
-  this.$container = $('<div>').
-    appendTo($parent).
-    addClass('form-field');
+  this.$container =
+    $.makeDIV('form-field').
+      appendTo($parent);
 
   if (typeName) {
     this.$container.

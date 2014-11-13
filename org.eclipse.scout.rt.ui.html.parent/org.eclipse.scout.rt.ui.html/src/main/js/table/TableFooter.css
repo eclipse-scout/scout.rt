@@ -109,7 +109,6 @@
   font-size: 13px;
   margin-top: (@table-footer-height - 26px) / 2;
   margin-left: @table-control-padding;
-  .text-field;
 }
 
 .control-info {

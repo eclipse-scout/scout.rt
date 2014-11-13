@@ -3,7 +3,6 @@
 scout.SmartFieldMultiline = function() {
   scout.SmartFieldMultiline.parent.call(this);
   this.options;
-  this._$textField;
   this._$multilineField;
 };
 scout.inherits(scout.SmartFieldMultiline, scout.AbstractSmartField);
@@ -12,23 +11,19 @@ scout.SmartFieldMultiline.prototype._render = function($parent) {
   this.addContainer($parent, 'smart-field');
   this.addLabel();
   this.addMandatoryIndicator();
-
-  this.$field = $.makeDIV('field')
-    .appendTo(this.$container);
-
-  this._$textField = $('<input>').
-    attr('type', 'text').
-    addClass('text-field').
-    disableSpellcheck().
-    blur(this._onFieldBlur.bind(this)).
-    keyup(this._onKeyup.bind(this)).
-    keydown(this._onKeydown.bind(this)).
-    appendTo(this.$field);
-
+  var $fieldContainer = $('<div>'),
+    $field = scout.fields.new$TextField().
+      addClass('multiline').
+      blur(this._onFieldBlur.bind(this)).
+      click(this._onClick.bind(this)).
+      keyup(this._onKeyup.bind(this)).
+      keydown(this._onKeydown.bind(this)).
+      appendTo($fieldContainer);
+  this.addField($field, $fieldContainer);
+  // FIXME AWE: (smartfield) remove hardcoded text
+  this.addIcon($fieldContainer);
   this._$multilineField = $.makeDIV('multiline-field', 'Täfernstrasse 16a<br/>CH 5405 Baden-Dättwil').
-    appendTo(this.$field);
-
-  this.addIcon(this.$field);
+    appendTo($fieldContainer);
   this.addStatus();
 };
 
@@ -57,20 +52,15 @@ scout.SmartFieldMultiline.prototype._openPopup = function() {
   this._renderOptions(this.options);
 };
 
-// @Override AbstractSmartField.js
-scout.SmartFieldMultiline.prototype._get$Input = function() {
-  return this._$textField;
-};
-
-//@Override AbstractSmartField.js
+// @override AbstractSmartField.js
 scout.SmartFieldMultiline.prototype._getInputBounds = function() {
-  var fieldBounds = scout.graphics.getBounds(this.$field),
-    textFieldBounds = scout.graphics.getBounds(this._$textField);
+  var fieldBounds = scout.graphics.getBounds(this.$fieldContainer),
+    textFieldBounds = scout.graphics.getBounds(this.$field);
   fieldBounds.height = textFieldBounds.height;
   return fieldBounds;
 };
 
-//@Override AbstractSmartField.js
+// @override AbstractSmartField.js
 scout.SmartFieldMultiline.prototype._applyOption = function(option) {
   var tmp = option.split("\n"),
     firstLine = tmp.shift(),

@@ -34,12 +34,12 @@ scout.TableFooter.prototype._render = function($parent) {
     control.render($group);
   }
 
-  $('<input>')
-    .addClass('control-filter')
-    .appendTo(this.$container)
-    .on('input paste', '', $.debounce(this._onFilterInput.bind(this)))
-    .attr('placeholder', scout.texts.get('filterBy'))
-    .val(filterText);
+  scout.fields.new$TextField().
+    addClass('control-filter').
+    appendTo(this.$container).
+    on('input paste', '', $.debounce(this._onFilterInput.bind(this))).
+    attr('placeholder', scout.texts.get('filterBy')).
+    val(filterText);
 
   // info section
   this._$controlInfo = this.$container

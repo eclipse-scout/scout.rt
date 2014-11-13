@@ -2,13 +2,10 @@
  IN PROGRESS
 -----------------------------------
 [AWE]
-Desktop-Tabs: 2-zeilig gut, 2te Zeile evtl. grau machen? V-Align top, nicht middle wenn nur 1 Zeile
-
 P2 Navigation in Forms: in Forms ein zusätzliches Item als Button hervorheben (z.B. Anzeigen) und
   evtl. ein "multi-button" damit man im Tree weiter nach unten navigieren kann ohne in den Tree
   klicken zu müssen
   --> am UI Meeting besprechen (Vorschläge gemalt)
-
 
 [CGU]
 Telefon-Form: anzeigen, verpasste Anrufe, Steuerung (an-/abmelden), gerne mit Telefonbuch
@@ -69,6 +66,8 @@ AWE Tabs: "Bölle" nicht schön, Farbe dunkel-grau ausprobieren, evtl. active st
 AWE Assistenten-Form designen/programmieren
 AWE SmartField noch ein bisschen schöner (auch mit JS-scrollbar)
 AWE P1 Textfield: Selektionsfarbe ändern
+AWE Desktop-Tabs: 2-zeilig gut, 2te Zeile evtl. grau machen? V-Align top, nicht middle wenn nur 1 Zeile
+    2te Zeile, andere Farbe: nicht umgesetzt -> sieht unruhig aus.
 
 CGU TableField: row-height === logicalGridHeight (text-field)?
 CGU Table: Row-Text nicht genau zentriert

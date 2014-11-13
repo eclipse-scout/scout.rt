@@ -1,9 +1,0 @@
-.string-field {
-  & input {
-    .text-field();
-  }
-
-  & textarea {
-    .text-area();
-  }
-}

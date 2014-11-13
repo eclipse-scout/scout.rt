@@ -167,7 +167,6 @@ scout.Desktop.prototype._updateTab = function(tab) {
   };
   setTitle('.title', tab.title);
   setTitle('.subtitle', tab.subtitle);
-  tab.$div.toggleClass('single', !tab.subtitle);
 };
 
 scout.Desktop.prototype._removeTab = function(tab) {

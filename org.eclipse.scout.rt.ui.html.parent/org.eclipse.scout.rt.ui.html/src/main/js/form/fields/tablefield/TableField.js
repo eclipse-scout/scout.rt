@@ -11,7 +11,6 @@ scout.TableField.prototype._render = function($parent) {
   this.addContainer($parent, 'table-field');
   this.addLabel();
   this.addStatus();
-
   if (this.table) {
     this._renderTable();
   }
@@ -22,10 +21,10 @@ scout.TableField.prototype._render = function($parent) {
  */
 scout.TableField.prototype._renderTable = function() {
   this.table.render(this.$container);
-  this.$field = this.table.$container.addClass('field');
+  this.addField(this.table.$container);
 };
 
 scout.TableField.prototype._removeTable = function(oldTable) {
   oldTable.remove();
-  this.$field = null;
+  this.removeField();
 };

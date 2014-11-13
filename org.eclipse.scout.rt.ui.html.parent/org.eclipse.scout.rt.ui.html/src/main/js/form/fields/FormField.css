@@ -1,19 +1,19 @@
 /** currently also defined in scout.HtmlEnvironment (graphics.js) */
 .form-field {
-  box-sizing:border-box;
-  white-space:nowrap;
-  border-spacing:0;
-  position:absolute;
+  box-sizing: border-box;
+  white-space: nowrap;
+  border-spacing: 0;
+  position: absolute;
 
   & > label {
-    position:absolute;
-    text-overflow:ellipsis;
-    overflow:hidden;
-    max-width:130px;
+    position: absolute;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    max-width: 130px;
   }
 
   & > .field {
-    position:absolute;
+    position: absolute;
   }
 
   & > .field.not-implemented {
@@ -23,7 +23,7 @@
   }
 
   & > .mandatory-indicator {
-    position:absolute;
+    position: absolute;
     visibility: hidden;
     margin-right: 2px;
 
@@ -43,8 +43,8 @@
   }
 
   & > .status {
-    position:absolute;
-    right: 0px;
+    position: absolute;
+    right: 0;
     margin-left: 10px;
     visibility: hidden;
     cursor: pointer;

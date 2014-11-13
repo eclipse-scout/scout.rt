@@ -6,16 +6,12 @@ scout.SequenceBox = function() {
 scout.inherits(scout.SequenceBox, scout.CompositeField);
 
 scout.SequenceBox.prototype._render = function($parent) {
+  var field, i;
   this.addContainer($parent, 'sequence-box');
   this.addLabel();
-
-  this.$field = $('<div>').
-    addClass('field').
-    appendTo(this.$container);
-  var htmlSequenceBox = new scout.HtmlComponent(this.$field, this.session);
-  htmlSequenceBox.setLayout(new scout.LogicalGridLayout(0, 0));
-
-  var field, i;
+  this.addField($('<div>'));
+  var htmlComp = new scout.HtmlComponent(this.$field, this.session);
+  htmlComp.setLayout(new scout.LogicalGridLayout(0, 0));
   for (i = 0; i < this.fields.length; i++) {
     field = this.fields[i];
     field.render(this.$field);
