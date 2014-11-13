@@ -38,6 +38,7 @@ public class AbstractTable5 extends AbstractExtensibleTable implements ITable5 {
   protected void initConfig() {
     super.initConfig();
     setTableStatusVisible(getConfiguredTableStatusVisible());
+    setMenubarPosition(getConfiguredMenubarPosition());
   }
 
   public void setReloadHandler(IReloadHandler reloadHandler) {
@@ -117,5 +118,19 @@ public class AbstractTable5 extends AbstractExtensibleTable implements ITable5 {
   @Override
   public void setTableStatusVisible(boolean b) {
     propertySupport.setPropertyBool(PROP_TABLE_STATUS_VISIBLE, b);
+  }
+
+  @Override
+  public String getMenubarPosition() {
+    return propertySupport.getPropertyString(PROP_MENU_BAR_POSITION);
+  }
+
+  @Override
+  public void setMenubarPosition(String position) {
+    propertySupport.setPropertyString(PROP_MENU_BAR_POSITION, position);
+  }
+
+  protected String getConfiguredMenubarPosition() {
+    return null;
   }
 }

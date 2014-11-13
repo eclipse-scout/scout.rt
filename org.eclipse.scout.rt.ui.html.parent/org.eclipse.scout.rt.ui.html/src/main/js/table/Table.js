@@ -59,7 +59,9 @@ scout.Table.prototype._render = function($parent) {
   this.$data = this.$container.appendDIV('table-data');
   this._$viewport = scout.Scrollbar2.install(this.$data);
 
-  this.menubar = new scout.Menubar(this.$container);
+  this.menubar = new scout.Menubar(this.$container, {
+    position: this.menubarPosition
+  });
   this.menubar.menuTypesForLeft1 = ['Table.EmptySpace'];
   this.menubar.menuTypesForLeft2 = ['Table.SingleSelection', 'Table.MultiSelection'];
   this.menubar.menuTypesForRight = ['Table.Header'];
