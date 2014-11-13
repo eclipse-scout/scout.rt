@@ -1,5 +1,76 @@
 .rich-text-field {
-  & textarea {
+  position: relative;
+
+  & .field {
     .text-area();
+    height: 100%;
+    width: ~"calc(100% - 150px)";
+  }
+
+  & .rich-text-bar {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    height: 100%;
+    width: 150px;
+  }
+
+  & .rich-text-bar-group{
+    display: block;
+    margin-bottom: 10px;
+  }
+
+  & .rich-text-command {
+    display: inline-block;
+    height: 30px;
+    width: 50px;
+    text-align: center;
+    line-height: 30px;
+    cursor: pointer;
+
+    &:hover{
+      color: @active-color;
+    }
+  }
+
+  & .rich-text-bar-bold {
+    font-size: 20px;
+    font-weight: 900;
+  }
+
+  & .rich-text-bar-underline {
+    font-size: 20px;
+    text-decoration: underline;
+  }
+
+  & .rich-text-bar-strike {
+    font-size: 20px;
+    text-decoration: line-through;
+  }
+
+  & .rich-text-bar-white {
+    background-clip:content-box;
+    padding: 4px;
+    background-color: #eee;
+  }
+
+  & .rich-text-bar-yellow {
+    background-clip:content-box;
+    padding: 4px;
+    background-color: yellow;
+  }
+
+  & .rich-text-bar-green {
+    background-clip:content-box;
+    padding: 4px;
+    background-color: green;
+  }
+
+  & .rich-text-bar-plain {
+  }
+  & .rich-text-bar-bullet {
+  }
+  & .rich-text-bar-number {
   }
 }
+
