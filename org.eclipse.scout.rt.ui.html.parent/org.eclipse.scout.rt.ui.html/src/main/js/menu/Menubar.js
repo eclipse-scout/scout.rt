@@ -82,6 +82,10 @@ scout.Menubar.prototype.updateItems = function(menus) {
     first().
     addClass('last');
 
+  if (this.lastMenu && !this.lastMenu.$container.hasClass('menu-right')) {
+    this.lastMenu.$container.addClass('last');
+  }
+
   if (!hasMenus) {
     this.$container.hide();
   } else {
@@ -101,8 +105,4 @@ scout.Menubar.prototype._addMenuItem = function(menu) {
 scout.Menubar.prototype._addMenuSeparator = function () {
   var s = this.$container.appendDIV('menu-separator');
   this.menus.push(s);
-  // Add 'last' class to each previous menu-item when a separator has been added
-  if (this.lastMenu) {
-    this.lastMenu.$container.addClass('last');
-  }
 };

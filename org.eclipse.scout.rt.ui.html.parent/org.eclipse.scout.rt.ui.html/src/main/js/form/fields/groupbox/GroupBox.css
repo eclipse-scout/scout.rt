@@ -4,7 +4,8 @@
 .root-group-box {
   box-sizing: border-box;
   margin: 0 @bench-margin-x 25px @bench-margin-x;
-  padding-top:19px;
+  padding-top: 19px;
+  overflow: hidden;
 }
 
 .group-box {

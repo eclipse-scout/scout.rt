@@ -48,7 +48,7 @@ scout.Scrollbar2.update = function($viewport) {
 scout.Scrollbar2.scrollTo = function($viewport, $selection) {
   var scrollbar = $viewport.data('scrollbar'),
     viewportH = $viewport.height(),
-    optionH = scout.graphics.getSize($selection).height,
+    optionH = scout.graphics.getSize($selection, true).height,
     optionY,
     scrollTopFunc;
 

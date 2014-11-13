@@ -117,18 +117,22 @@ scout.HtmlComponent.prototype.getPreferredSize = function() {
 };
 
 /**
- * Returns the inset-dimensions of the component (padding, margin, border).
+ * Returns the inset-dimensions of the component (padding and border, no margin).
  */
-scout.HtmlComponent.prototype.getInsets = function() {
-  return scout.graphics.getInsets(this.$comp);
+scout.HtmlComponent.prototype.getInsets = function(options) {
+  return scout.graphics.getInsets(this.$comp, options);
+};
+
+scout.HtmlComponent.prototype.getMargins = function() {
+  return scout.graphics.getMargins(this.$comp);
 };
 
 /**
  * Returns the current size of the component, insets included.
  * TODO AWE: (layout) prüfen ob hier tatsächlich die insets included sind. Müssten wir dann nicht outerWidth/-Height verwenden?
  */
-scout.HtmlComponent.prototype.getSize = function() {
-  return scout.graphics.getSize(this.$comp);
+scout.HtmlComponent.prototype.getSize = function(includeMargins) {
+  return scout.graphics.getSize(this.$comp, includeMargins);
 };
 
 /**

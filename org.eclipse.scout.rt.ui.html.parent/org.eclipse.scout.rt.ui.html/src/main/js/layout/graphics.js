@@ -18,10 +18,13 @@ scout.graphics = {
    * Returns the current size of the component, insets included.
    * TODO AWE: (layout) prüfen ob hier tatsächlich die insets included sind. Müssten wir dann nicht outerWidth/-Height verwenden?
    */
-  getSize: function($comp) {
+  getSize: function($comp, includeMargins) {
+    if (includeMargins === undefined) {
+      includeMargins = false;
+    }
     return new scout.Dimension(
-        $comp.outerWidth(true),
-        $comp.outerHeight(true));
+        $comp.outerWidth(includeMargins),
+        $comp.outerHeight(includeMargins));
   },
   setSize: function($comp, vararg, height) {
     var size = vararg instanceof scout.Dimension ?
@@ -33,9 +36,9 @@ scout.graphics = {
   /**
    * Returns the size of a visible component or (0,0) when component is invisible.
    */
-  getVisibleSize: function($comp) {
+  getVisibleSize: function($comp, includeMargin) {
     if ($comp.length === 1 && $comp.isVisible()) {
-      return scout.graphics.getSize($comp);
+      return scout.graphics.getSize($comp, includeMargin);
     } else {
       return new scout.Dimension(0, 0);
     }
@@ -48,7 +51,7 @@ scout.graphics = {
     var i,
       directions = ['top', 'right', 'bottom', 'left'],
       insets = [0, 0, 0, 0],
-      includeMargin = options.includeMargin !== undefined ? options.includeMargin : true,
+      includeMargin = options.includeMargin !== undefined ? options.includeMargin : false,
       includePadding = options.includePadding !== undefined ? options.includePadding : true,
       includeBorder = options.includeBorder !== undefined ? options.includeBorder : true,
       cssToInt = function(cssProp) {
@@ -68,6 +71,13 @@ scout.graphics = {
       }
     }
     return new scout.Insets(insets[0], insets[1], insets[2], insets[3]);
+  },
+  getMargins: function($comp) {
+    return scout.graphics.getInsets($comp, {
+      includeMargin: true,
+      includePadding: false,
+      includeBorder: false
+    });
   },
   // TODO AWE: (unit-test) getBounds + auto
   getBounds: function($comp) {
@@ -161,13 +171,13 @@ scout.Dimension.prototype.equals = function(o) {
     this.height === o.height;
 };
 
-scout.Dimension.prototype.subtractInsets = function(insets) {
+scout.Dimension.prototype.subtract = function(insets) {
   return new scout.Dimension(
       this.width - insets.left - insets.right,
       this.height - insets.top - insets.bottom);
 };
 
-scout.Dimension.prototype.addInsets = function(insets) {
+scout.Dimension.prototype.add = function(insets) {
   return new scout.Dimension(
       this.width + insets.left + insets.right,
       this.height + insets.top + insets.bottom);

@@ -208,7 +208,7 @@ scout.TableFooter.prototype._addGroup = function(title) {
 /* open, close and resize of the container */
 
 scout.TableFooter.prototype.openTableControl = function() {
-  var insets = scout.graphics.getInsets(this._$controlContainer, {includeMargin: false});
+  var insets = scout.graphics.getInsets(this._$controlContainer);
   var contentHeight = scout.TableFooter.CONTAINER_SIZE - insets.top - insets.bottom;
 
   //adjust table

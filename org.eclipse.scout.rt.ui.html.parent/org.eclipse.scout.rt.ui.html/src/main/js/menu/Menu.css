@@ -1,4 +1,5 @@
 @menu-margin-x: @bench-margin-x;
+@menu-item-margin-right: 14px;
 
 /* Mixins */
 .menu-icon(@icon) {
@@ -37,9 +38,6 @@
   margin: 0 @menu-margin-x;
   padding: 6px 0 10px 0;
 
-  /* FIXME CGU currently only necessary for too long search forms -< remove when form gets scrollable */
-  background-color: @body-background-color;
-
   & div, button {
     box-sizing: border-box;
     display: inline-block;
@@ -52,7 +50,7 @@
   box-sizing: content-box;
   width: 1px;
   height: 30px;
-  margin: 6px 19px 3px 19px;
+  margin: 6px 19px 3px 19px - @menu-item-margin-right;
   background-color: @border-color;
 }
 
@@ -101,7 +99,7 @@
     color: @disabled-color;
   }
 
-  &.default-button {
+  &.default-button:disabled {
     border-width: 1px;
   }
 
@@ -133,7 +131,7 @@
   }
 
   &:not(.last) {
-    margin-right: 14px;
+    margin-right: @menu-item-margin-right;
   }
 
   &.menu-open {

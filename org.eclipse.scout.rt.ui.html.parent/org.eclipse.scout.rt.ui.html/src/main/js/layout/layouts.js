@@ -33,24 +33,28 @@ scout.FormLayout = function() {
 scout.inherits(scout.FormLayout, scout.AbstractLayout);
 
 scout.FormLayout.prototype.layout = function($container) {
-  var htmlRootGb = this._getHtmlRootGroupBox($container),
-    contSize = scout.HtmlComponent.get($container).getSize(),
-    rootGbInsets = htmlRootGb.getInsets(),
-    rootGbSize = new scout.Dimension(
-      contSize.width - rootGbInsets.left - rootGbInsets.right,
-      contSize.height - rootGbInsets.top - rootGbInsets.bottom - this._getMenuBarHeight($container));
+  var htmlContainer = scout.HtmlComponent.get($container),
+    htmlRootGb = this._getHtmlRootGroupBox($container),
+    rootGbSize;
 
-  $.log.trace('(FormLayout#layout) contSize=' + contSize);
+  rootGbSize = htmlContainer.getSize()
+    .subtract(htmlContainer.getInsets())
+    .subtract(htmlRootGb.getMargins());
+  rootGbSize.height -= this._getMenuBarHeight($container);
+
+  $.log.trace('(FormLayout#layout) rootGbSize=' + rootGbSize);
   htmlRootGb.setSize(rootGbSize);
 };
 
 scout.FormLayout.prototype.preferredLayoutSize = function($container) {
-  var htmlRootGb = this._getHtmlRootGroupBox($container),
-    prefSize = htmlRootGb.getPreferredSize(),
-    rootGbInsets = htmlRootGb.getInsets();
+  var htmlContainer = scout.HtmlComponent.get($container),
+    htmlRootGb = this._getHtmlRootGroupBox($container),
+    prefSize;
 
-  prefSize.width += rootGbInsets.left + rootGbInsets.right;
-  prefSize.height += rootGbInsets.top + rootGbInsets.bottom + this._getMenuBarHeight($container);
+  prefSize = htmlRootGb.getPreferredSize()
+    .add(htmlContainer.getInsets())
+    .add(htmlRootGb.getMargins());
+  prefSize.height += this._getMenuBarHeight($container);
 
   return prefSize;
 };
@@ -61,7 +65,7 @@ scout.FormLayout.prototype._getHtmlRootGroupBox = function($container) {
 };
 
 scout.FormLayout.prototype._getMenuBarHeight = function($container) {
-  return scout.graphics.getVisibleSize($container.children('.menubar')).height;
+  return scout.graphics.getVisibleSize($container.children('.menubar'), true).height;
 };
 
 /**
@@ -73,41 +77,44 @@ scout.GroupBoxLayout = function() {
 scout.inherits(scout.GroupBoxLayout, scout.AbstractLayout);
 
 scout.GroupBoxLayout.prototype.layout = function($container) {
-  var htmlComp = scout.HtmlComponent.get($container),
-    contSize = htmlComp.getSize().subtractInsets(htmlComp.getInsets()),
-    bodySize;
+  var htmlContainer = scout.HtmlComponent.get($container),
+    htmlGbBody = this._getHtmlGbBody($container),
+    gbBodySize;
 
-  $.log.trace('(GroupBoxLayout#layout) contSize=' + contSize);
+  gbBodySize = htmlContainer.getSize()
+    .subtract(htmlContainer.getInsets())
+    .subtract(htmlGbBody.getMargins());
+  gbBodySize.height -= this._getTitleHeight($container);
+  gbBodySize.height -= this._getButtonBarHeight($container);
 
-  bodySize = new scout.Dimension(
-      contSize.width,
-      contSize.height -
-        this._getTitleHeight($container) -
-        this._getButtonBarHeight($container));
-  this._getHtmlBody($container).setSize(bodySize);
+  $.log.trace('(GroupBoxLayout#layout) gbBodySize=' + gbBodySize);
+  htmlGbBody.setSize(gbBodySize);
 };
 
 scout.GroupBoxLayout.prototype.preferredLayoutSize = function($container) {
-  var htmlComp = scout.HtmlComponent.get($container),
-    bodySize = this._getHtmlBody($container).getPreferredSize().addInsets(htmlComp.getInsets());
+  var htmlContainer = scout.HtmlComponent.get($container),
+    htmlGbBody = this._getHtmlGbBody($container),
+    prefSize;
 
-  return new scout.Dimension(
-      bodySize.width,
-      bodySize.height +
-        this._getTitleHeight($container) +
-        this._getButtonBarHeight($container));
+  prefSize = htmlGbBody.getPreferredSize()
+    .add(htmlContainer.getInsets())
+    .add(htmlGbBody.getMargins());
+  prefSize.height += this._getTitleHeight($container);
+  prefSize.height += this._getButtonBarHeight($container);
+
+  return prefSize;
 };
 
 scout.GroupBoxLayout.prototype._getTitleHeight = function($container) {
-  return scout.graphics.getVisibleSize($container.children('.group-box-title')).height;
+  return scout.graphics.getVisibleSize($container.children('.group-box-title'), true).height;
 };
 
 scout.GroupBoxLayout.prototype._getButtonBarHeight = function($container) {
-  return scout.graphics.getVisibleSize($container.children('.button-bar')).height;
+  return scout.graphics.getVisibleSize($container.children('.button-bar'), true).height;
 };
 
-scout.GroupBoxLayout.prototype._getHtmlBody = function($container) {
-  return scout.HtmlComponent.get($container.children('.group-box-body'));
+scout.GroupBoxLayout.prototype._getHtmlGbBody = function($container) {
+  return scout.HtmlComponent.get($container.children('.group-box-body'), true);
 };
 
 /**
@@ -121,9 +128,8 @@ scout.FormFieldLayout = function(formField) {
 scout.inherits(scout.FormFieldLayout, scout.AbstractLayout);
 
 scout.FormFieldLayout.prototype.layout = function($container) {
-  var fieldBounds, htmlField;
-  var htmlComp = scout.HtmlComponent.get($container),
-    contSize = htmlComp.getSize().subtractInsets(htmlComp.getInsets()),
+  var htmlContainer = scout.HtmlComponent.get($container),
+    containerSize, fieldSize, fieldBounds, htmlField,
     leftWidth = 0,
     rightWidth = 0,
     $label = this.formField.$label,
@@ -138,10 +144,13 @@ scout.FormFieldLayout.prototype.layout = function($container) {
     $icon = this.formField.$icon,
     tooltip = this.formField.tooltip;
 
+  containerSize = htmlContainer.getSize()
+    .subtract(htmlContainer.getInsets());
+
   if ($label.isVisible()) {
-    scout.graphics.setBounds($label, 0, 0, this.labelWidth, contSize.height);
+    scout.graphics.setBounds($label, 0, 0, this.labelWidth, containerSize.height);
     // with this property we achieve "vertical-align:middle" which doesn't work for non-table-cell elements
-    $label.css('line-height', contSize.height + 'px');
+    $label.css('line-height', containerSize.height + 'px');
     leftWidth += this.labelWidth;
   }
   if ($mandatory) {
@@ -151,12 +160,13 @@ scout.FormFieldLayout.prototype.layout = function($container) {
   if ($status && this.formField.statusVisible) {
     // can not check for $status.isVisible() since we want to reserve
     // space used for status even when $status is invisible.
-    $status.css('line-height', contSize.height + 'px');
+    $status.css('line-height', containerSize.height + 'px');
     rightWidth += $status.outerWidth(true);
   }
 
   if ($fieldContainer) {
-    fieldBounds = new scout.Rectangle(leftWidth, 0, contSize.width - leftWidth - rightWidth, contSize.height);
+    fieldSize = containerSize.subtract(scout.graphics.getMargins($field));
+    fieldBounds = new scout.Rectangle(leftWidth, 0, fieldSize.width - leftWidth - rightWidth, fieldSize.height);
     htmlField = scout.HtmlComponent.optGet($fieldContainer);
     // TODO AWE: (layout) dafür sorgen, dass wir hier immer ein get() machen können
     if (htmlField) {
@@ -179,13 +189,16 @@ scout.FormFieldLayout.prototype.layout = function($container) {
 
 scout.FormFieldLayout.prototype.preferredLayoutSize = function($container) {
   var width = 0,
+    htmlContainer = scout.HtmlComponent.get($container),
     height = scout.HtmlEnvironment.formRowHeight,
     $label = $container.children('label'),
     $status = $container.children('.status'),
     $mandatory = $container.children('.mandatory-indicator'),
     // TODO AWE/CGU: (form-field) inkosistent! oben greifen wir auf formField zu,
     // hier verwenden wir JQuery selectors
-    $field = $container.children('.field');
+    $field = $container.children('.field'),
+    prefSize, htmlField;
+
   if ($label.isVisible()) {
     width += this.labelWidth;
   }
@@ -197,15 +210,18 @@ scout.FormFieldLayout.prototype.preferredLayoutSize = function($container) {
   }
   if ($field.isVisible()) {
     // TODO AWE: (layout) dafür sorgen, dass wir hier immer ein get() machen können
-    var prefSize, htmlField = scout.HtmlComponent.optGet($field);
+    htmlField = scout.HtmlComponent.optGet($field);
     if (htmlField) {
-      prefSize = htmlField.getPreferredSize();
+      prefSize = htmlField.getPreferredSize()
+        .add(htmlContainer.getInsets())
+        .add(htmlField.getMargins());
     } else {
       prefSize = new scout.Dimension($field.width(), $field.height());
     }
     width += prefSize.width;
     height = Math.max(height, prefSize.height);
   }
+
   return new scout.Dimension(width, height);
 };
 
@@ -241,6 +257,7 @@ scout.ButtonFieldLayout.prototype.preferredLayoutSize = function($container) {
     hMargin = $button.outerWidth(true) - $button.width(),
     vMargin = $button.outerHeight(true) - $button.height(),
     textSize = scout.graphics.measureString($button.html());
+
   return new scout.Dimension(textSize.width + hMargin, textSize.height + vMargin);
 };
 
@@ -253,37 +270,41 @@ scout.TabBoxLayout = function() {
 scout.inherits(scout.TabBoxLayout, scout.AbstractLayout);
 
 scout.TabBoxLayout.prototype.layout = function($container) {
-  var htmlCont = scout.HtmlComponent.get($container),
-    contSize = htmlCont.getSize().subtractInsets(htmlCont.getInsets()),
+  var htmlContainer = scout.HtmlComponent.get($container),
+    $tabContent = $container.children('.tab-content'),
+    htmlTabContent = scout.HtmlComponent.get($tabContent),
     $tabArea =  $container.children('.tab-area'),
-    tabAreaHeight = 0;
+    tabAreaHeight = 0,
+    containerSize, tabContentSize;
+
+  containerSize = htmlContainer.getSize()
+    .subtract(htmlContainer.getInsets());
+
   if ($tabArea.isVisible()) {
-    // TODO AWE: (tab-box) tabArea neu layouten, inkl. tab-runs - muss noch definiert werden, wie wir das darstellen
-    // TODO AWE: (layout) function machen um "nur width" zu setzen.
-    $tabArea.css('width', contSize.width + 'px');
+    $tabArea.cssWidth(containerSize.width);
     tabAreaHeight = $tabArea.outerHeight(true);
   }
-  scout.HtmlComponent.get($container.children('.tab-content')).setSize(
-      new scout.Dimension(contSize.width, contSize.height - tabAreaHeight));
+
+  tabContentSize = containerSize.subtract(htmlTabContent.getMargins());
+  tabContentSize.height -= tabAreaHeight;
+
+  htmlTabContent.setSize(tabContentSize);
 };
 
 scout.TabBoxLayout.prototype.preferredLayoutSize = function($container) {
-  var $tabArea = $container.children('.tab-area'),
+  var htmlContainer = scout.HtmlComponent.get($container),
+    $tabArea = $container.children('.tab-area'),
     $tabContent = $container.children('.tab-content'),
-    tabAreaSize = scout.graphics.getVisibleSize($tabArea),
-    tabContentSize = scout.HtmlComponent.get($tabContent).getPreferredSize();
-  //TODO AWE: (tab-box) impl. prefSize
-  // size of tab-area
-  // ... calculate tab-runs = Die container breite nehmen, mit buttons
-  //     füllen, wenn die summe der buttons > breite ist, eine neue zeile
-  //     beginnen.
-  // size of content (find largest group-box)
-  // ... hier haben wir das problem, das die content-panes nicht visible
-  //     bzw. gar nicht im DOM sind. Trotzdem müssen wir irgendwie die
-  //     grösse der groupbox berechnen können
-  return new scout.Dimension(
-    Math.max(tabAreaSize.width, tabContentSize.width),
-    tabAreaSize.height + tabContentSize.height);
+    htmlTabContent = scout.HtmlComponent.get($tabContent),
+    tabAreaSize = scout.graphics.getVisibleSize($tabArea, true),
+    tabContentPrefSize;
+
+  tabContentPrefSize = htmlTabContent.getPreferredSize()
+    .add(htmlContainer.getInsets())
+    .add(htmlTabContent.getMargins());
+  tabContentPrefSize.height += tabAreaSize.height;
+
+  return tabContentPrefSize;
 };
 
 /**
@@ -316,9 +337,11 @@ scout.SingleLayout.prototype.preferredLayoutSize = function($container) {
 };
 
 scout.SingleLayout.prototype.layout = function($container) {
-  var htmlComp = scout.HtmlComponent.get($container);
-  this._getHtmlSingleChild($container).setSize(
-      htmlComp.getSize().subtractInsets(htmlComp.getInsets()));
+  var htmlContainer = scout.HtmlComponent.get($container);
+  var childSize = htmlContainer.getSize()
+    .subtract(htmlContainer.getInsets());
+
+  this._getHtmlSingleChild($container).setSize(childSize);
 };
 
 scout.SingleLayout.prototype._getHtmlSingleChild = function($container) {

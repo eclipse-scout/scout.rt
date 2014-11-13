@@ -115,7 +115,7 @@ describe("HtmlComponent", function() {
 
       var htmlComp = new scout.HtmlComponent(jqueryMock, session);
       var expected = new scout.Insets(15, 18, 21, 24);
-      var actual = htmlComp.getInsets();
+      var actual = htmlComp.getInsets({includeMargin: true});
       expect(actual).toEqual(expected);
     });
 
