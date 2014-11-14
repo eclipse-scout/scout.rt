@@ -1,6 +1,6 @@
 .table-header-menu {
   position: absolute;
-  z-index: 4;
+  z-index: 6;
   border-top: 1px solid @color-bench;
   .menu-context;
   width: 225px;

@@ -29,10 +29,15 @@
 }
 
 .sort-icon(@icon) {
+  position: absolute;
+  top: 0px;
+  right: 6px;
   .font-icon;
   content: @icon;
-  margin-left: 4px;
-  line-height: normal;
+  height: 100%;
+  vertical-align: middle;
+  font-weight: 100;
+  color: @palette-light-gray-0;
 }
 
 .header-item {
@@ -47,20 +52,21 @@
   border-left: 1px solid transparent;
   border-right: 1px solid transparent;
 
-  &.sort-asc, &.sort-desc,  &.filter, &.group-all,   &.group-sort {
-    color: @active-color;
-  }
 
   &.sort-desc:after {
-    .sort-icon(@icon-caret-down);
+    .sort-icon(@icon-long-arrow-down);
   }
 
   &.sort-asc:after {
-    .sort-icon(@icon-caret-up);
+    .sort-icon(@icon-long-arrow-up);
   }
 
   &:hover, &.header-move{
     color: @hover-color;
+  }
+
+  &.header-move:after, &.menu-open:after {
+    display: none;
   }
 
   &.menu-open {

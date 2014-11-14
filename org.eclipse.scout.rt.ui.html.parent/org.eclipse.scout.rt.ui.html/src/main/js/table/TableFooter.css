@@ -28,6 +28,7 @@
   width: 100%;
   height: 0px;
   display: none;
+  z-index: 5;
 }
 
 .control-content {
