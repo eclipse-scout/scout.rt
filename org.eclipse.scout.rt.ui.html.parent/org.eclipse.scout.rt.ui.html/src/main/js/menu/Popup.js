@@ -75,49 +75,56 @@ scout.PopupMenuItem.prototype.render = function($parent) {
   if (dataIcon && text) {
     this.$head.addClass('menu-textandicon');
   }
-  if (this.$menuItem.hasClass('has-submenu')) {
-    this.$head.addClass('has-submenu');
-  }
+  this._copyCssClass('has-submenu');
+  this._copyCssClass('taskbar');
   return this.$container;
+};
+
+scout.PopupMenuItem.prototype._copyCssClass = function(className) {
+  if (this.$menuItem.hasClass(className)) {
+    this.$head.addClass(className);
+  }
 };
 
 scout.PopupMenuItem.prototype.alignTo = function() {
   var pos = this.$menuItem.offset(),
-    headWidth = this.$head.outerWidth(true),
-    bodyWidth = this.$body.outerWidth(true);
+    headSize = scout.graphics.getSize(this.$head, true),
+    bodyWidth = scout.graphics.getSize(this.$body, true).width;
 
   // body min-width
-  if (bodyWidth < headWidth) {
-    this.$body.width(headWidth - 2);
-    bodyWidth = headWidth;
+  if (bodyWidth < headSize.width) {
+    this.$body.width(headSize.width - 2);
+    bodyWidth = headSize.width;
   }
 
   // horiz. alignment
-  var itemInsets = scout.graphics.getInsets(this.$menuItem),
+  var left = pos.left,
+    top = pos.top,
     headInsets = scout.graphics.getInsets(this.$head),
-    left = pos.left,
-    top = pos.top + itemInsets.top - 1;
+    bodyTop = headSize.height;
 
-  $.log.debug('headWidth=' + headWidth + ' bodyWidth=' + bodyWidth + ' pos=[left' + pos.left + ' top=' + pos.top +
-      '] itemInsets=' + itemInsets + ' headInsets=' + headInsets + ' left=' + left + ' top=' + top);
+  $.log.debug('bodyWidth=' + bodyWidth + ' pos=[left' + pos.left + ' top=' + pos.top + '] headSize=' + headSize +
+    ' headInsets=' + headInsets + ' left=' + left + ' top=' + top);
+  this.$body.cssTop(bodyTop);
+  this.$deco.cssTop(bodyTop);
   if (this.$menuItem.hasClass('menu-right')) {
     // when we use float:right, browser uses fractions of pixels, that's why we must
     // use the subPixelCorr variable. It corrects some visual pixel-shifting issues.
-    var widthDiff = bodyWidth - headWidth,
+    var widthDiff = bodyWidth - headSize.width,
       subPixelCorr = left - Math.floor(left);
     left -= widthDiff + headInsets.left;
-    this.$head.css('left', widthDiff);
-    this.$body.css('left', subPixelCorr);
+    this.$head.cssLeft(widthDiff);
+    this.$body.cssLeft(subPixelCorr);
     this.$deco.
-      css('left', widthDiff + 1).
-      width(headWidth - 2 + subPixelCorr);
+      cssLeft(widthDiff + 1).
+      width(headSize.width - 2 + subPixelCorr);
     $.log.debug('right alignment: widthDiff=' + widthDiff + ' subPixelCorr=' + subPixelCorr);
   } else {
     left -= headInsets.left;
-    this.$head.css('left', 0);
+    this.$head.cssLeft(0);
     this.$deco.
-      css('left', 1).
-      width(headWidth - 2);
+      cssLeft(1).
+      width(headSize.width - 2);
   }
 
   this.setLocation(new scout.Point(left, top));

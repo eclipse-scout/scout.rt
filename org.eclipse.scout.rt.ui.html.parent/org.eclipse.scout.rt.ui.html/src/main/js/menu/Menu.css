@@ -171,18 +171,24 @@
     position: absolute;
     box-sizing: border-box;
     line-height: 39px;
-    padding: 0px 13px;
+    padding: 0 13px;
     white-space: nowrap;
     background-color: white;
     border: solid 1px @menu-border-color;
     border-bottom: none;
     .drop-shadow();
+
+    /* alternate styling for popup-head when used in taskbar */
+    &.taskbar {
+      border-top: none;
+      padding-top: 6px;
+      padding-bottom: 4px;
+    }
   }
 }
 
 .popup-body {
   position: absolute;
-  top: 39px;
   border: solid 1px @menu-border-color;
   background-color: @palette-white;
   .drop-shadow();
@@ -218,9 +224,8 @@
 
 .popup-deco {
   position: absolute;
-  top: 39px;
   height: 1px;
   left: 1px;
-  background-color: @palette-white;
+  background-color:@body-background-color;
 }
 

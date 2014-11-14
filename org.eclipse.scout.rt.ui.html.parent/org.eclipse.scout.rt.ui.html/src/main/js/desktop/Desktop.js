@@ -38,7 +38,7 @@ scout.Desktop.prototype.onChildAdapterCreated = function(propertyName, adapter) 
 };
 
 scout.Desktop.prototype._render = function($parent) {
-  var i, form, messageBox;
+  var i, form, messageBox, action;
 
   this.$parent = $parent;
 
@@ -69,8 +69,12 @@ scout.Desktop.prototype._render = function($parent) {
     this.addOns[i].render($parent);
   }
 
+  // we set the menuStyle property to render a menu with a different style
+  // depending on where the menu is located (taskbar VS menubar).
   for (i = 0; i < this.actions.length; i++) {
-    this.actions[i].render(this.$toolbar);
+    action = this.actions[i];
+    action.menuStyle = 'taskbar';
+    action.render(this.$toolbar);
   }
 
   this.navigation.onOutlineChanged(this.outline);
