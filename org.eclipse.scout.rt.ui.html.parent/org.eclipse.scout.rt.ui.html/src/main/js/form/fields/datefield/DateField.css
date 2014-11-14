@@ -65,6 +65,10 @@
   border-radius: 50%;
   border: 1px solid transparent;
 
+  &.center-nice{
+    padding-right: 2px;
+  }
+
   &:hover {
     color: @active-color;
   }
@@ -72,7 +76,6 @@
   &.date-box-out{
     color: @palette-light-gray-3;
   }
-
 
   &.date-box-weekend{
     color:#777777;

@@ -188,6 +188,7 @@ scout.DatePicker.prototype._createDateBox = function () {
   // Create days
   for (i = 0; i < 42; i++){
     start.setDate(start.getDate() + 1);
+    dayInMonth = start.getDate();
 
     if ((start.getDay() === 6) || (start.getDay() === 0)) {
       cl = (start.getMonth() != this.viewDate.getMonth() ? ' date-box-out-weekend' : ' date-box-weekend');
@@ -204,7 +205,10 @@ scout.DatePicker.prototype._createDateBox = function () {
       cl += ' date-box-select';
     }
 
-    dayInMonth = start.getDate();
+    if (dayInMonth > 9 && dayInMonth < 20) {
+      cl += ' center-nice';
+    }
+
     day = (dayInMonth <= 9 ? '0' + dayInMonth : dayInMonth);
     $day = $box.
       appendDIV('date-box-day ' + cl, day).
