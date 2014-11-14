@@ -65,7 +65,7 @@ public class SplashProgressMonitor extends NullProgressMonitor {
 
   private void setNameInternal() {
     m_displayText = "";
-    if (m_showPercentage && m_totalWork > 0 && m_worked > 0) {
+    if (m_showPercentage && m_totalWork > 0 && m_worked > 0 && m_worked < m_totalWork) {
       m_displayText += (int) Math.floor(100d * (double) m_worked / (double) m_totalWork) + "% ";
     }
     if (m_name2 != null) {
