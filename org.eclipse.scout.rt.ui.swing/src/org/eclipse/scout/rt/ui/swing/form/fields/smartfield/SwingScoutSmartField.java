@@ -711,19 +711,24 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<IContent
 
     @Override
     public void insertString(FilterBypass fb, int offset, String s, AttributeSet a) throws BadLocationException {
-      checkStringTooLong(fb, s, fb.getDocument().getLength() + s.length());
+      int stringLength = s == null ? 0 : s.length();
+      checkStringTooLong(fb, s, fb.getDocument().getLength() + stringLength);
       s = ensureConfiguredTextFormat(s);
       super.insertString(fb, offset, s, a);
     }
 
     @Override
     public void replace(FilterBypass fb, int offset, int length, String s, AttributeSet a) throws BadLocationException {
-      checkStringTooLong(fb, s, fb.getDocument().getLength() + s.length() - length);
+      int stringLength = s == null ? 0 : s.length();
+      checkStringTooLong(fb, s, fb.getDocument().getLength() + stringLength - length);
       s = ensureConfiguredTextFormat(s);
       super.replace(fb, offset, length, s, a);
     }
 
     private String ensureConfiguredTextFormat(String s) {
+      if (s == null) {
+        return null;
+      }
       s = StringUtility.trimNewLines(s);
       // replace newlines by spaces
       return s.replaceAll("\r\n", " ").replaceAll("[\r\n]", " ");
