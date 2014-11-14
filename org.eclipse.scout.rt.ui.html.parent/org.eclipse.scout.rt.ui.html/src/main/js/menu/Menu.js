@@ -3,6 +3,7 @@ scout.Menu = function() {
   this.childMenus = [];
   this._addAdapterProperties('childMenus');
 };
+//FIXME CGU extend from Action.js
 scout.inherits(scout.Menu, scout.ModelAdapter);
 
 scout.Menu.EVENT_ABOUT_TO_SHOW = 'aboutToShow';

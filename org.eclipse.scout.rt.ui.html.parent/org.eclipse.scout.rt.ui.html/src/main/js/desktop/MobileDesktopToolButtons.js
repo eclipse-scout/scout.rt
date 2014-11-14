@@ -2,7 +2,7 @@
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
 scout.MobileDesktopToolButtons = function(toolButtons, session) {
-  this.$div;
+  this.$container;
   this.$parent;
   this.toolButtons = toolButtons;
 };
@@ -10,7 +10,7 @@ scout.MobileDesktopToolButtons = function(toolButtons, session) {
 scout.MobileDesktopToolButtons.prototype.render = function($desktop) {
   this.$parent = $desktop;
   var $desktopTools = $desktop.appendDiv('DesktopTools');
-  this.$div = $desktopTools;
+  this.$container = $desktopTools;
 
   // create tool-buttons
   for (var i = 0; i < this.toolButtons.length; i++) {

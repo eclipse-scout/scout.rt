@@ -1190,10 +1190,8 @@ describe("Table", function() {
         expect(table._header).toBeDefined();
         expect(table._$header.is(':visible')).toBe(true);
 
-        var event = new scout.Event('property', table.id, {
-          "properties": {
-            "headerVisible": false
-          }
+        var event = createPropertyChangeEvent(table, {
+          "headerVisible": false
         });
         table.onModelPropertyChange(event);
 

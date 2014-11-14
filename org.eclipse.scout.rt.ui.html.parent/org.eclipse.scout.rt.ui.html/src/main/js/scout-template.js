@@ -27,6 +27,7 @@
 //@include("session/Reconnector.js");
 //@include("datamodel/DataModel.js");
 //@include("layout/BorderLayout.js");
+//@include("action/Action.js");
 //@include("menu/Menu.js");
 //@include("menu/menus.js");
 //@include("menu/Menubar.js")

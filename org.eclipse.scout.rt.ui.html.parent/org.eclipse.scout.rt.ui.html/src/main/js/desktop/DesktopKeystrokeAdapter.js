@@ -10,7 +10,7 @@ scout.DesktopKeystrokeAdapter = function(navigation, bench) {
 
   //FIXME read keycodes from model
   if (this._taskbar) {
-    $('.taskbar-item', this._taskbar.$div).each(function(i, element) {
+    $('.taskbar-item', this._taskbar.$container).each(function(i, element) {
       var keystroke = $(element).attr('data-shortcut');
       if (keystroke) {
         keystroke = keystroke.toUpperCase();
@@ -145,7 +145,7 @@ scout.DesktopKeystrokeAdapter = function(navigation, bench) {
 
 scout.DesktopKeystrokeAdapter.prototype.drawKeyBox = function() {
   if (this._taskbar) {
-    $('.taskbar-item', this._taskbar.$div).each(function(i, e) {
+    $('.taskbar-item', this._taskbar.$container).each(function(i, e) {
       $(e).appendDiv('', 'key-box', $(e).attr('data-shortcut'));
     });
   }

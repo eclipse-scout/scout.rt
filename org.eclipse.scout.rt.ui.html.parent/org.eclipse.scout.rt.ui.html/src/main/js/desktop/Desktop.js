@@ -61,7 +61,7 @@ scout.Desktop.prototype._render = function($parent) {
   this.$toolbar = this.$bar.appendDIV('taskbar-tools');
   this.$bench = this.$parent.appendDIV('desktop-bench');
   new scout.HtmlComponent(this.$bench, this.session);
-  this.$toolContainer = this.$parent.appendDIV('desktop-tool-container');
+  this.$toolContainer = this.$parent.appendDIV('desktop-tool-container').hide();
 
   this._outlineTab = new scout.Desktop.TabAndContent();
 
@@ -111,7 +111,7 @@ scout.Desktop.TabAndContent = function(content, title, subtitle) {
   this.content = content;
   this.title = title;
   this.subtitle = subtitle;
-  this.$div;
+  this.$container;
   this.$storage;
 };
 
@@ -131,18 +131,18 @@ scout.Desktop.TabAndContent.prototype._update = function(content, title, subtitl
 // bereits geöffneten Tab/Dialog zu wecheseln. Oder das Menü-Item disablen.
 
 scout.Desktop.prototype._addTab = function(tab, prepend) {
-  tab.$div = $.makeDIV('taskbar-tab-item').
+  tab.$container = $.makeDIV('taskbar-tab-item').
      append($.makeDIV('title', tab.title).attr('title', tab.title)).
      append($.makeDIV('subtitle', 'Bearbeiten')); // TODO AWE: (desktop) sub-titel für forms
      // müsste abhängig von Handler gesetzt werden.
 
   if (prepend) {
-    tab.$div.prependTo(this.$tabbar);
+    tab.$container.prependTo(this.$tabbar);
   } else {
-    tab.$div.appendTo(this.$tabbar);
+    tab.$container.appendTo(this.$tabbar);
   }
 
-  tab.$div.on('click', function onTabClicked() {
+  tab.$container.on('click', function onTabClicked() {
     if (tab !== this._selectedTab) {
       this._selectTab(tab);
     }
@@ -158,7 +158,7 @@ scout.Desktop.prototype._isTabVisible = function(tab) {
 
 scout.Desktop.prototype._updateTab = function(tab) {
   var setTitle = function(selector, title) {
-    var $e = tab.$div.children(selector);
+    var $e = tab.$container.children(selector);
     if (title) {
       $e.text(title).attr('title', title).setVisible(true);
     } else {
@@ -172,11 +172,11 @@ scout.Desktop.prototype._updateTab = function(tab) {
 scout.Desktop.prototype._removeTab = function(tab) {
   scout.arrays.remove(this._allTabs, tab);
 
-  if (tab.$div.isSelected() && this._allTabs.length > 0) {
+  if (tab.$container.isSelected() && this._allTabs.length > 0) {
     this._selectTab(this._allTabs[this._allTabs.length - 1]);
   }
 
-  tab.$div.remove();
+  tab.$container.remove();
 };
 
 scout.Desktop.prototype._selectTab = function(tab) {
@@ -184,7 +184,7 @@ scout.Desktop.prototype._selectTab = function(tab) {
     this._unselectTab(this._selectedTab);
   }
 
-  tab.$div.select(true);
+  tab.$container.select(true);
   this._selectedTab = tab;
   if (tab.$storage && tab.$storage.length > 0) {
     this.$bench.append(tab.$storage);
@@ -201,7 +201,7 @@ scout.Desktop.prototype._unselectTab = function(tab) {
   var $children = this.$bench.children();
   scout.Tooltip.removeTooltips($children);
   $children.detach();
-  tab.$div.select(false);
+  tab.$container.select(false);
 };
 
 /* handling of forms */

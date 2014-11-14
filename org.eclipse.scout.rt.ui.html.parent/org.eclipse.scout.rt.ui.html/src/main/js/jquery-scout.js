@@ -234,6 +234,15 @@
     return this;
   };
 
+  $.fn.placeholder = function(placeholder) {
+    if (placeholder) {
+      this.attr('placeholder', placeholder);
+    } else {
+      this.removeAttr('placeholder');
+    }
+    return this;
+  };
+
   // TODO AWE: search/replace for other uses of is(':visible') - in der Table wird das noch verwendet
   // C.GU fragen ob es Ok ist, wenn wir das mit isVisible() ersetzen.
 

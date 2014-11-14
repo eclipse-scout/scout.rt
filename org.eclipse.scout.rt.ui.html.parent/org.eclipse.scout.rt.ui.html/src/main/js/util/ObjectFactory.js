@@ -137,6 +137,11 @@ scout.defaultObjectFactories = [{
     return new scout.MessageBox();
   }
 }, {
+  objectType: 'Action',
+  create: function() {
+    return new scout.Action();
+  }
+}, {
   objectType: 'Menu',
   create: function() {
     return new scout.Menu();
