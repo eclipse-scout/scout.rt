@@ -51,6 +51,7 @@
       border-bottom: solid 1px @border-color;
       padding: 5px 0 7px 10px;
       margin: 0;
+      cursor: pointer;
 
       &.selected {
         background-color: @selection-background-color;

@@ -67,10 +67,15 @@ scout.SmartFieldMultiline.prototype._getInputBounds = function() {
 };
 
 scout.SmartFieldMultiline.prototype._splitValue = function(value) {
-  var tmp = value.split("\n");
+  var tmp, firstLine = '', multiLines = '<br/><br/>';
+  if (value) {
+    tmp = value.split("\n");
+    firstLine = tmp.shift();
+    multiLines = tmp.join('<br/>');
+  }
   return {
-    firstLine: tmp.shift(),
-    multiLines: tmp.join('<br/>')
+    firstLine: firstLine,
+    multiLines: multiLines
   };
 };
 

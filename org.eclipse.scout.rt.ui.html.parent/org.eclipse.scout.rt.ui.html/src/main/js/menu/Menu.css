@@ -63,6 +63,7 @@
   background-color: @button-background-color;
   border: 1px solid @border-color;
   border-radius: @border-radius;
+  cursor: pointer;
 
   &:not(.last) {
     margin-right:14px;
