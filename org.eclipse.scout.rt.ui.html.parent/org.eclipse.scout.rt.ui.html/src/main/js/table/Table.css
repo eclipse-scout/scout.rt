@@ -30,14 +30,12 @@
 
 .sort-icon(@icon) {
   position: absolute;
-  top: 0px;
+  top: -2px;
   right: 6px;
-  .font-icon;
   content: @icon;
   height: 100%;
   vertical-align: middle;
-  font-weight: 100;
-  color: @palette-light-gray-0;
+  color: @palette-dark-gray-4;
 }
 
 .header-item {
@@ -52,13 +50,12 @@
   border-left: 1px solid transparent;
   border-right: 1px solid transparent;
 
-
   &.sort-desc:after {
-    .sort-icon(@icon-long-arrow-down);
+    .sort-icon('\2193');
   }
 
   &.sort-asc:after {
-    .sort-icon(@icon-long-arrow-up);
+    .sort-icon('\2191')
   }
 
   &:hover, &.header-move{
