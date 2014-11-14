@@ -1,3 +1,4 @@
+
 /* main element */
 
 .desktop-navigation {
@@ -25,6 +26,10 @@
 
   .navigation-breadcrumb & {
     height: calc(~"100%" - 2 * @size-desktop-tools);
+  }
+
+  & .search-status {
+    padding: 10px;
   }
 }
 
@@ -110,7 +115,6 @@
   height: @size-desktop-tools;
   white-space: nowrap;
   .font-text-large;
-  line-height: @size-desktop-tools;
   overflow: hidden;
   text-overflow: ellipsis;
   display: none;
@@ -124,6 +128,10 @@
     text-align: center;
     border-bottom: 1px solid @color-bench;
   }
+}
+
+.navigation-tab-outline-title {
+  line-height: @size-desktop-tools;
 }
 
 .navigation-tab-outline-title {

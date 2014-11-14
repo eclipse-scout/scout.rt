@@ -8,7 +8,8 @@ scout.texts = {
       'options':'{0} Optionen',
       'invalidDateFormat':'Das Datum ist in einem ungültigen Format',
       'resetColumns':'Spalten zurücksetzen',
-      'filterBy':'Filtern nach ...'
+      'filterBy':'Filtern nach ...',
+      'searchFor':'Suchen nach ...'
   }
 };
 
@@ -18,6 +19,7 @@ scout.texts = {
  * @param [optional1, optional2, ...] used to replace placeholders in the text-string {0}
  * TODO AWE: (framework) load texts from server on client start-up, remove hardcoded texts
  */
+//FIXME CGU this should be moved to session -> locale may be different for each session
 scout.texts.get = function(textKey) {
   if (scout.texts.textMap.hasOwnProperty(textKey)) {
     var len = arguments.length,

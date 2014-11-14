@@ -24,7 +24,7 @@ scout.Desktop = function() {
    */
   this.selectedTool;
 
-  this._addAdapterProperties(['viewButtons', 'actions', 'forms', 'outline', 'messageBoxes', 'addOns']);
+  this._addAdapterProperties(['viewButtons', 'actions', 'forms', 'outline', 'searchOutline', 'messageBoxes', 'addOns']);
 };
 scout.inherits(scout.Desktop, scout.BaseDesktop);
 

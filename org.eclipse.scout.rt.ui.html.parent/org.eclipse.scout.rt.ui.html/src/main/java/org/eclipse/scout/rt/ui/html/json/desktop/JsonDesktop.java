@@ -77,6 +77,7 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
     if (!isFormBased()) {
       attachAdapters(getModel().getViewButtons());
       optAttachAdapter(getModel().getOutline());
+      optAttachAdapter(getSearchOutline());
     }
     optAttachAdapter(getBreadcrumbNavigation());
   }
@@ -153,6 +154,7 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
       // FIXME CGU: view and tool buttons should be removed from desktop by device transformer
       putAdapterIdsProperty(json, "viewButtons", getModel().getViewButtons());
       optPutAdapterIdProperty(json, "outline", getModel().getOutline());
+      optPutAdapterIdProperty(json, "searchOutline", getSearchOutline());
     }
     optPutAdapterIdProperty(json, "breadCrumbNavigation", getBreadcrumbNavigation());
     return json;
@@ -274,7 +276,7 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
     // Important: Consider tomcat form auth problem, see scout rap logout mechanism for details
   }
 
-  protected void handleSearch(JsonEvent event) {
+  protected void handleUiSearch(JsonEvent event) {
     ISearchOutline searchOutline = getSearchOutline();
     String query = event.getData().optString("query");
     try {
@@ -302,28 +304,20 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
   @Override
   public void handleUiEvent(JsonEvent event, JsonResponse res) {
     if ("search".equals(event.getType())) {
-      handleSearch(event);
+      handleUiSearch(event);
     }
-    else if ("desktopTabClicked".equals(event.getType())) {
-      handleDesktopTabClicked(event);
+    else if ("outlineChanged".equals(event.getType())) {
+      handleUiOutlineChanged(event);
     }
     else {
       super.handleUiEvent(event, res);
     }
   }
 
-  private void handleDesktopTabClicked(JsonEvent event) {
-    String tabId = event.getData().optString("tabId");
-    if ("search".equals(tabId)) {
-      IOutline activeOutline = getModel().getOutline();
-      if (!(activeOutline instanceof ISearchOutline)) {
-        m_previousOutline = activeOutline;
-        getModel().setOutline(getSearchOutline());
-      }
-    }
-    else {
-      getModel().setOutline(m_previousOutline);
-    }
+  private void handleUiOutlineChanged(JsonEvent event) {
+    String outlineId = JsonObjectUtility.getString(event.getData(), "outlineId");
+    IJsonAdapter<?> jsonOutline = getJsonSession().getJsonAdapter(outlineId);
+    getModel().setOutline((IOutline) jsonOutline.getModel());
   }
 
   /**

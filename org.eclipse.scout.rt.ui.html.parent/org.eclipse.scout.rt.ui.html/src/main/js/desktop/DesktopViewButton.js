@@ -1,7 +1,7 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-
+//FIXME CGU vielleicht brauchen wir einen NavigationView.js oder so ähnlich, welches eine Outline.js beinhalten kann aber nicht muss (anstatt view button wrappers)
 scout.DesktopViewButton = function() {
   scout.DesktopViewButton.parent.call(this);
   this._addAdapterProperties('outline');
