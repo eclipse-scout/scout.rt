@@ -24,6 +24,7 @@ scout.DatePicker.prototype.show = function(viewDate, selectedDate, animated) {
     this._$header = this._createHeader().appendTo(this.$popup);
     this._$header.find('.date-box-left-y, .date-box-left-m, .date-box-right-m, .date-box-right-y').mousedown(this._onNavigationMouseDown.bind(this));
 
+    this.$popup.appendDIV('date-box-separator');
     this.$viewport = this.$popup.appendDIV('date-box-viewport');
     this._viewportTop = this.$viewport.position().top;
     this._viewportLeft = this.$viewport.position().left;
@@ -101,7 +102,7 @@ scout.DatePicker.prototype._appendAnimated = function(viewDateDiff, $box) {
   //At first: stop existing animation when shifting multiple dates in a row (e.g. with mouse wheel)
   this.$viewport.
     stop(true).
-    animate({ left: newLeft }, 200, function() {
+    animate({ left: newLeft }, 300, function() {
       //Remove every month box beside the new one
       //Its important to use that.$currentBox because $box may already be removed
       //if a new day in the current month has been chosen while the animation is in progress (e.g. by holding down key)

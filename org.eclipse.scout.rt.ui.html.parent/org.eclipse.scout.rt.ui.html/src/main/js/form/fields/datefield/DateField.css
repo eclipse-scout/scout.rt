@@ -19,11 +19,10 @@
 
 .date-box {
   margin-top: 5px;
-  height: 224px;
-  width: 224px;
+  height: 233px;
+  width: 252px;
   position: absolute;
   background-color: @control-background-color;
-  padding: 6px;
   z-index: 100;
   border: 1px solid @popup-border-color;
   border-radius: @border-radius;
@@ -37,6 +36,8 @@
 .date-box-viewport {
   position: relative;
   height: 100%;
+  padding: 0px 6px;
+
 }
 
 /* necessary for animation */
@@ -44,66 +45,75 @@
   display: inline-block;
 }
 
-.date-box-weekday,
-.date-box-day{
-  width: 30px;
-  margin: 0px;
-  height: 26px;
-  line-height: 26px;
-  float: left;
-  left: 100px;
-  text-align: center;
-  cursor: default;
-}
-
-.date-box-day:hover {
-  color: @active-color;
-}
-
 .date-box-weekday{
-  font-weight: bold;
-  color: #000;
+  width: 34px;
+  height: 30px;
+  line-height: 30px;
+  float: left;
+  text-align: center;
 }
+
 
 .date-box-day{
-  cursor: pointer;
-}
-
-.date-box-weekend{
-  color:#777777;
-}
-
-.date-box-out{
-  color:#d2d2d2;
-}
-
-.date-box-out-weekend{
-  color: #aaa;
-}
-
-.date-box-now{
-  font-weight: bold !important;
-}
-
-.date-box-select{
-  width: 30px;
-  line-height: 26px;
+  width: 26px;
+  margin: 1px 4px 1px 4px;
   height: 26px;
-  font-weight:normal;
-  background-color: #ededed;
+  line-height: 25px;
+  float: left;
+  text-align: center;
+  cursor: pointer;
+  border-radius: 50%;
+  border: 1px solid transparent;
+
+  &:hover {
+    color: @active-color;
+  }
+
+  &.date-box-out{
+    color: @palette-light-gray-3;
+  }
+
+
+  &.date-box-weekend{
+    color:#777777;
+  }
+
+  &.date-box-out-weekend{
+    color: #aaa;
+  }
+
+  &.date-box-now{
+    background-color: @palette-light-gray-4;
+  }
+
+  &.date-box-select{
+    background-color: @palette-bsi-light-green-0;
+    border: 1px solid @active-color;
+  }
 }
 
 .date-box-header{
-  line-height: 26px;
-  height: 26px;
-  color: @active-color;
-  margin: 0px 0px 5px 0px;
+  line-height: 30px;
+  height: 30px;
+  padding: 0px 18px;
+  background-color: @color-bench-light;
+  border-bottom: 1px solid @color-bench-light-border;
+}
+
+.date-box-separator{
+  position: absolute;
+  top: 59px;
+  left: 0px;
+  height: 1px;
+  width: 100%;
+  border-bottom: 1px solid @color-bench-light-border;
 }
 
 .date-box-header-month{
   text-align: center;
   cursor: default;
-  font-size:13px;
+  font-size: 13px;
+  padding-top: 1px;
 }
 
 .date-box-left-y,
@@ -111,19 +121,16 @@
 .date-box-right-y,
 .date-box-right-m{
   text-align: center;
-  width: 20px;
-  height: 14px;
+  width: 22px;
+  line-height: 30px;
+  height: 30px;
   cursor: pointer;
   .font-icon;
-  margin: 0px 2px 0px 0px;
-  font-size: 18px;
-}
+  font-size: 17px;
 
-.date-box-left-y:hover,
-.date-box-left-m:hover,
-.date-box-right-y:hover,
-.date-box-right-m:hover{
-  color: @highlight-color;
+  &:hover{
+    color: @active-color;
+  }
 }
 
 .date-box-left-y,

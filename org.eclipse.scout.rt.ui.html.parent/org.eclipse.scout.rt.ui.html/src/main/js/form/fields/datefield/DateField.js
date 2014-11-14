@@ -123,7 +123,7 @@ scout.DateField.prototype._onKeyDown = function(event) {
     }
 
     this._picker.shiftSelectedDate(years, months, days);
-    return;
+    return false;
   }
 
   //Use set timeout because field value is not set when keydown is fried. Keydown is used because keyup feels laggy.
