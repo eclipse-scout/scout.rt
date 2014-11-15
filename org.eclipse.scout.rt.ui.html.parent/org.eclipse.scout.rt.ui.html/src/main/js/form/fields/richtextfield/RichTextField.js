@@ -12,7 +12,7 @@ scout.RichTextField.prototype._render = function($parent) {
 
   // create editable div
   this.addField(
-    $.makeDIV('field', 'Beispieltext').
+    $.makeDIV('', 'Beispieltext').
       attr('contentEditable', 'true').
       blur(this._onFieldBlur.bind(this)).
       // return should not create div
@@ -29,34 +29,28 @@ scout.RichTextField.prototype._render = function($parent) {
   this.$commandFormat = this.$commandBar.appendDIV('rich-text-bar-group');
 
   this.$commandFormat.appendDIV('rich-text-command rich-text-bar-bold', 'a')
-    .data('command', 'bold').data('attribute', '');
-  this.$commandFormat.appendDIV('rich-text-command rich-text-bar-underline', 'a')
-    .data('command', 'underline').data('attribute', '');
+    .data('command', 'bold');
   this.$commandFormat.appendDIV('rich-text-command rich-text-bar-strike', 'a')
-    .data('command', 'strikeThrough').data('attribute', '');
+    .data('command', 'strikeThrough');
+  this.$commandFormat.appendDIV('rich-text-command rich-text-bar-underline', 'a')
+    .data('command', 'underline');
 
   this.$commandMark = this.$commandBar.appendDIV('rich-text-bar-group');
   this.$commandMark.appendDIV('rich-text-command rich-text-bar-white', '&nbsp')
-    .data('command', 'BackColor').data('attribute', 'white');
+    .data('command', 'BackColor');
   this.$commandMark.appendDIV('rich-text-command rich-text-bar-yellow', '&nbsp')
-    .data('command', 'BackColor').data('attribute', 'yellow');
+    .data('command', 'BackColor');
   this.$commandMark.appendDIV('rich-text-command rich-text-bar-green', '&nbsp')
-    .data('command', 'BackColor').data('attribute', 'green');
+    .data('command', 'BackColor');
 
   this.$commandList = this.$commandBar.appendDIV('rich-text-bar-group');
-  this.$commandList.appendDIV('rich-text-command rich-text-bar-plain', 'ohne')
-    .data('command', 'outdent').data('attribute', '');
-  this.$commandList.appendDIV('rich-text-command rich-text-bar-bullet', 'bullet')
-    .data('command', 'insertunorderedlist').data('attribute', '');
-  this.$commandList.appendDIV('rich-text-command rich-text-bar-number', 'num')
-    .data('command', 'insertorderedlist').data('attribute', 'green');
+  this.$commandList.appendDIV('rich-text-command rich-text-bar-plain')
+    .data('command', 'outdent');
+  this.$commandList.appendDIV('rich-text-command rich-text-bar-bullet')
+    .data('command', 'insertunorderedlist');
+  this.$commandList.appendDIV('rich-text-command rich-text-bar-number')
+    .data('command', 'insertorderedlist');
 
-  this.$commandList = this.$commandBar.appendDIV('rich-text-bar-group');
-  this.$commandList.appendDIV('rich-text-command rich-text-bar-line', 'line')
-    .data('command', 'inserthorizontalrule').data('attribute', '');
-
-  this.$commandList.appendDIV('rich-text-command rich-text-bar-line', 'numline')
-    .data('command', 'inserthorizontalrule').data('attribute', '');
 
   $('.rich-text-command', this.$commandBar).click((this._onCommandClick.bind(this)));
 
@@ -68,8 +62,16 @@ scout.RichTextField.prototype._render = function($parent) {
 
 scout.RichTextField.prototype._onCommandClick = function(event) {
   var command = $(event.target).data('command'),
-    attribute = $(event.target).data('attribute');
-  document.execCommand (command, false, attribute);
-  // in some cases set cursor at the end of selection
-  // todo
+    niceHeader = $(event.target).data('nice-header'),
+    attribute = '';
+
+  if (command === 'BackColor') {
+    attribute = $(event.target).css('background-color');
+  }
+
+  document.execCommand(command, false, attribute);
+
+  if (command === 'BackColor') {
+    window.getSelection().collapse(this.$field[0].firstChild, 1);
+  }
 };

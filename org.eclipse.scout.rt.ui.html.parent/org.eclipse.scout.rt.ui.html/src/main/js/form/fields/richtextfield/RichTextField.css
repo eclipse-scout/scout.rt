@@ -1,33 +1,133 @@
+.rich-text-color(@color) {
+  width: 26px;
+  height: 26px;
+  padding: 2px;
+  margin: 5px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 1px solid transparent;
+  background-clip: content-box;
+  background-color: @color;
+
+  &:hover{
+    border: 1px solid @active-color;
+  }
+}
+
+.rich-text-icon(@icon) {
+  &:before {
+    position: relative;
+    left: 1px;
+    .font-icon;
+    content: @icon-format-plain;
+    font-size: 22px;
+    color: @palette-light-gray-0;
+    content: @icon;
+  }
+}
+
 .rich-text-field {
   position: relative;
+  width: 100%;
 
   & .field {
+    counter-reset: hr;
     height: 100%;
-    width: ~"calc(100% - 150px)";
+    width: 100%;
+    line-height: 20px;
+    white-space: pre-wrap;
+    border: 1px solid @border-color;
+    padding: 5px 130px 5px @text-field-padding;
+    border-radius: @border-radius;
+    color: @text-color;
+    background-color: @control-background-color;
+
+    &:focus {
+      .focus-border;
+    }
+
+    & * {
+      line-height: 20px;
+    }
+
+    &::selection, & *::selection {
+      background: @selection-background;
+      color: @selection-color;
+    }
+  }
+
+  & ol {
+    counter-reset:li;
+    margin: 0;
+    padding-left: 15px;
+  }
+
+  & ol > li {
+    position: relative;
+    list-style: none;
+
+    &:before {
+      content: counter(li) ".";
+      counter-increment: li;
+      position :absolute;
+      left: -15px;
+    }
+  }
+
+  & ul {
+    margin: 0;
+    padding-left: 15px;
+  }
+
+  & ul > li {
+    position: relative;
+    list-style: none;
+
+    &:before {
+      .font-icon;
+      content: @icon-angle-double-right;
+      position :absolute;
+      left: -15px;
+    }
+  }
+
+  & .nice-header{
+    background-color: red;
   }
 
   & .rich-text-bar {
     position: absolute;
-    top: 0px;
-    right: 0px;
-    height: 100%;
-    width: 150px;
+    overflow: hidden;
+    background-color: @color-bench-light;
+    border: 1px solid transparent;
+    border-left: 1px solid @color-bench-light-border;
+    border-top-right-radius: @border-radius;
+    border-bottom-right-radius: @border-radius;
+    top: 1px;
+    right: 1px;
+    height: ~"calc(100% - 2px)";
   }
 
   & .rich-text-bar-group{
     display: block;
-    margin-bottom: 10px;
+    border-bottom: 1px solid @color-bench-light-border;
+    padding: 0 5px;
   }
 
   & .rich-text-command {
     display: inline-block;
-    height: 30px;
-    width: 50px;
+    position: relative;
+    height: 36px;
+    width: 36px;
+    line-height: 36px;
     text-align: center;
-    line-height: 30px;
     cursor: pointer;
 
     &:hover{
+      color: @active-color;
+    }
+
+    &:hover:before{
       color: @active-color;
     }
   }
@@ -48,27 +148,26 @@
   }
 
   & .rich-text-bar-white {
-    background-clip:content-box;
-    padding: 4px;
-    background-color: #eee;
+    .rich-text-color(@palette-white);
   }
 
   & .rich-text-bar-yellow {
-    background-clip:content-box;
-    padding: 4px;
-    background-color: yellow;
+    .rich-text-color(@marker-yellow);
   }
 
   & .rich-text-bar-green {
-    background-clip:content-box;
-    padding: 4px;
-    background-color: green;
+    .rich-text-color(@marker-green);
   }
 
   & .rich-text-bar-plain {
+    .rich-text-icon(@icon-format-plain);
   }
+
   & .rich-text-bar-bullet {
+    .rich-text-icon(@icon-format-bullet);
   }
+
   & .rich-text-bar-number {
+    .rich-text-icon(@icon-format-number);
   }
 }
