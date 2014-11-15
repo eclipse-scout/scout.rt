@@ -54,9 +54,9 @@ input[type=text] {
     .glow(@color-error);
   }
 
-  &::-moz-selection {
-    background-color: @palette-bsi-light-green;
-    color: @palette-white;
+  &::selection {
+    background: @selection-background;
+    color: @selection-color;
   }
 }
 

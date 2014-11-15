@@ -26,6 +26,8 @@
 @palette-bsi-green: #0082A1;
 @palette-bsi-light-green-0: #ECF3F7;
 @palette-bsi-light-green: #389DB6;
+@palette-bsi-dark-green: #006983;
+
 
 /* ------------------------ */
 /* Global Color Definitions */
@@ -75,4 +77,11 @@
 
 @footer-color: @palette-gray;
 @footer-disabled-color: @palette-light-gray-4;
+
+@marker-yellow: #FFFF00;
+@marker-green: #00FF00;
+@marker-blue: #00FFFF;
+
+@selection-color: @palette-white;
+@selection-background: @palette-bsi-dark-green;
 
