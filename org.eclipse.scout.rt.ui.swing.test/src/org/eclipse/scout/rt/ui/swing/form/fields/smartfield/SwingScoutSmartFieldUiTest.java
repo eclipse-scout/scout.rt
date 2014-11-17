@@ -35,8 +35,8 @@ import org.junit.Test;
  */
 public class SwingScoutSmartFieldUiTest {
 
-  P_SwingScoutSmartField m_smartField;
-  AbstractDocument m_ad;
+  private P_SwingScoutSmartField m_smartField;
+  private AbstractDocument m_ad;
 
   @Before
   public void setup() {
@@ -58,17 +58,17 @@ public class SwingScoutSmartFieldUiTest {
     m_smartField.setDisplayTextFromScout("test text");
     // behaviour with an empty string
     m_ad.replace(0, 9, "", null);
-    assertTrue(m_ad.getText(0, m_ad.getLength()).equals("")); // TODO
+    assertTrue("".equals(m_ad.getText(0, m_ad.getLength())));
 
     m_smartField.setDisplayTextFromScout("test text");
     // behaviour with a regular string
     m_ad.replace(0, 9, "test", null);
-    assertTrue(m_ad.getText(0, m_ad.getLength()).equals("test"));
+    assertTrue("test".equals(m_ad.getText(0, m_ad.getLength())));
 
     m_smartField.setDisplayTextFromScout("test text");
     // behaviour with a very long string
     m_ad.replace(0, 9, "test with a very long string", null);
-    assertTrue(m_ad.getText(0, m_ad.getLength()).equals("test with a very lon"));
+    assertTrue("test with a very lon".equals(m_ad.getText(0, m_ad.getLength())));
 
   }
 
@@ -78,22 +78,22 @@ public class SwingScoutSmartFieldUiTest {
     m_smartField.setDisplayTextFromScout("test text");
     // null behaviour
     m_ad.insertString(4, null, null);
-    assertTrue(m_ad.getText(0, m_ad.getLength()).equals("test text"));
+    assertTrue("test text".equals(m_ad.getText(0, m_ad.getLength())));
 
     m_smartField.setDisplayTextFromScout("test text");
     // behaviour with an empty string
     m_ad.insertString(4, "", null);
-    assertTrue(m_ad.getText(0, m_ad.getLength()).equals("test text"));
+    assertTrue("test text".equals(m_ad.getText(0, m_ad.getLength())));
 
     m_smartField.setDisplayTextFromScout("test text");
     // behaviour with a regular string
     m_ad.insertString(4, " test", null);
-    assertTrue(m_ad.getText(0, m_ad.getLength()).equals("test test text"));
+    assertTrue("test test text".equals(m_ad.getText(0, m_ad.getLength())));
 
     m_smartField.setDisplayTextFromScout("test text");
     // behaviour with a very long string
     m_ad.insertString(4, " test with a very long string", null);
-    assertTrue(m_ad.getText(0, m_ad.getLength()).equals("test test with  text"));
+    assertTrue("test test with  text".equals(m_ad.getText(0, m_ad.getLength())));
 
   }
 

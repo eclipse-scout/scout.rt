@@ -30,7 +30,7 @@ public class SwingProgressProviderTest {
 
   private int m_count;
 
-  SwingProgressProvider prov = new SwingProgressProvider();
+  private SwingProgressProvider m_prov = new SwingProgressProvider();
 
   /**
    * Property change must be fired when properties on the _same_ monitor
@@ -38,7 +38,7 @@ public class SwingProgressProviderTest {
    */
   @Test
   public void testSetActiveMonitor() throws Exception {
-    prov.addPropertyChangeListener(
+    m_prov.addPropertyChangeListener(
         SwingProgressProvider.PROP_MONITOR_PROPERTIES,
         new PropertyChangeListener() {
           @Override
@@ -51,9 +51,9 @@ public class SwingProgressProviderTest {
         });
     SwingProgressMonitor monitor = new SwingProgressMonitor();
     monitor.setTaskName("foo");
-    prov.setActiveMonitor(monitor);
+    m_prov.setActiveMonitor(monitor);
     monitor.setTaskName("bar");
-    prov.setActiveMonitor(monitor);
+    m_prov.setActiveMonitor(monitor);
     Assert.assertEquals(2, m_count);
   }
 
@@ -62,7 +62,7 @@ public class SwingProgressProviderTest {
    */
   @Test
   public void testSetActiveMonitor_Null() throws Exception {
-    prov.addPropertyChangeListener(
+    m_prov.addPropertyChangeListener(
         SwingProgressProvider.PROP_MONITOR_PROPERTIES,
         new PropertyChangeListener() {
           @Override
@@ -78,8 +78,8 @@ public class SwingProgressProviderTest {
         });
     SwingProgressMonitor monitor = new SwingProgressMonitor();
     monitor.subTask("bar");
-    prov.setActiveMonitor(monitor);
-    prov.setActiveMonitor(null);
+    m_prov.setActiveMonitor(monitor);
+    m_prov.setActiveMonitor(null);
     Assert.assertEquals(2, m_count);
   }
 

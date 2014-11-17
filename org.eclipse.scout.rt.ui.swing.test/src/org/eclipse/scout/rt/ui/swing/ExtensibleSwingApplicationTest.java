@@ -29,7 +29,7 @@ import org.junit.Test;
  */
 public class ExtensibleSwingApplicationTest {
 
-  ExtensibleSwingApplication app;
+  private ExtensibleSwingApplication m_app;
 
   @Test
   public void testStop() {
@@ -39,9 +39,9 @@ public class ExtensibleSwingApplicationTest {
     cs.stopSession();
     EasyMock.expectLastCall();
     replay(ext, cs);
-    app = new ExtensibleSwingApplication(Collections.singletonList(ext));
+    m_app = new ExtensibleSwingApplication(Collections.singletonList(ext));
 
-    app.stop();
+    m_app.stop();
     verify(ext, cs);
   }
 
@@ -52,8 +52,8 @@ public class ExtensibleSwingApplicationTest {
    */
   @Test
   public void testStart_ExtensionAbort() throws Exception {
-    assertStart(app, IApplication.EXIT_OK, null, IApplication.EXIT_OK);
-    assertStart(app, IApplication.EXIT_RELAUNCH, IApplication.EXIT_RELAUNCH, IApplication.EXIT_OK);
+    assertStart(m_app, IApplication.EXIT_OK, null, IApplication.EXIT_OK);
+    assertStart(m_app, IApplication.EXIT_RELAUNCH, IApplication.EXIT_RELAUNCH, IApplication.EXIT_OK);
     // assertStart(?, null, null) causes the super.start() method to be called
     // which results in a call to startSubject. These cases are testet in the testStartInSubject* methods
   }
@@ -73,8 +73,8 @@ public class ExtensibleSwingApplicationTest {
     ISwingApplicationExtension ext = EasyMock.createMock(ISwingApplicationExtension.class);
     expect(ext.execStartInSubject(null, null)).andReturn(IApplication.EXIT_OK);
     replay(ext);
-    app = new ExtensibleSwingApplication(Collections.singletonList(ext));
-    assertEquals(IApplication.EXIT_OK, app.startInSubject(null));
+    m_app = new ExtensibleSwingApplication(Collections.singletonList(ext));
+    assertEquals(IApplication.EXIT_OK, m_app.startInSubject(null));
   }
 
   @Test
@@ -87,15 +87,15 @@ public class ExtensibleSwingApplicationTest {
     env.showGUI(cs);
     EasyMock.expectLastCall();
     replay(ext, env, cs);
-    app = new ExtensibleSwingApplication(Collections.singletonList(ext));
-    app.startGUI();
+    m_app = new ExtensibleSwingApplication(Collections.singletonList(ext));
+    m_app.startGUI();
     verify(ext, env, cs);
   }
 
   @Test
   public void testRunWhileActive_NoExtensions() throws Exception {
-    app = new ExtensibleSwingApplication(Collections.<ISwingApplicationExtension> emptyList());
-    assertEquals(IApplication.EXIT_OK, Integer.valueOf(app.runWhileActive()));
+    m_app = new ExtensibleSwingApplication(Collections.<ISwingApplicationExtension> emptyList());
+    assertEquals(IApplication.EXIT_OK, Integer.valueOf(m_app.runWhileActive()));
   }
 
   /**
@@ -126,6 +126,7 @@ public class ExtensibleSwingApplicationTest {
           Thread.sleep(250);
         }
         catch (InterruptedException e) {
+          //nop
         }
         synchronized (stateLock) {
           stateLock.notifyAll();
@@ -134,8 +135,8 @@ public class ExtensibleSwingApplicationTest {
     };
     t.start();
 
-    app = new ExtensibleSwingApplication(Collections.singletonList(ext));
-    assertEquals(IApplication.EXIT_RELAUNCH, Integer.valueOf(app.runWhileActive()));
+    m_app = new ExtensibleSwingApplication(Collections.singletonList(ext));
+    assertEquals(IApplication.EXIT_RELAUNCH, Integer.valueOf(m_app.runWhileActive()));
   }
 
   @Test
@@ -144,8 +145,8 @@ public class ExtensibleSwingApplicationTest {
     ext.initializeSwing();
     EasyMock.expectLastCall();
     replay(ext);
-    app = new ExtensibleSwingApplication(Collections.singletonList(ext));
-    app.initializeSwing();
+    m_app = new ExtensibleSwingApplication(Collections.singletonList(ext));
+    m_app.initializeSwing();
     verify(ext);
   }
 

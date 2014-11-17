@@ -23,7 +23,7 @@ import org.junit.Test;
 
 /**
  * This class contains JUnit tests for JActivityMapHeaderValidator
- * 
+ *
  * @since 3.9.0
  */
 public class JActivityMapHeaderValidatorTest {
@@ -612,9 +612,7 @@ public class JActivityMapHeaderValidatorTest {
     textDataMap.put(ActivityMapColumnModel.SMALL, smallTextData);
 
     List<String> resultTexts = new ArrayList<String>();
-    List<Rectangle> resultRectangles = new ArrayList<Rectangle>();
-
-    resultRectangles = m_validator.mergeTexts(textDataMap, resultTexts);
+    List<Rectangle> resultRectangles = m_validator.mergeTexts(textDataMap, resultTexts);
 
     assertEquals(4, resultTexts.size());
     assertEquals(4, resultRectangles.size());
@@ -745,7 +743,7 @@ public class JActivityMapHeaderValidatorTest {
   /**
    * Since EasyMock is not able to mock abstract classes, this class subtypes from FontMetrics
    * and implements an own mocking method for stringWidth which is used in
-   * 
+   *
    * @link{JActivityMapHeaderValidator.validateAllTexts
    *                                                    and @link{JActivityMapHeaderValidator.validateTexts}
    *                                                    As soon as Mockito is used as a mocking framework in Scout 3.10,
