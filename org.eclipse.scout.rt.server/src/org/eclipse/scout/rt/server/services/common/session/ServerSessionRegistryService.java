@@ -14,21 +14,29 @@ import javax.security.auth.Subject;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.server.IServerJobFactory;
+import org.eclipse.scout.rt.server.IServerJobService;
 import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.server.ServerJob;
-import org.eclipse.scout.rt.server.ThreadContext;
+import org.eclipse.scout.rt.server.ITransactionRunnable;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.service.AbstractService;
+import org.eclipse.scout.service.SERVICES;
 import org.osgi.framework.Bundle;
 
 public class ServerSessionRegistryService extends AbstractService implements IServerSessionRegistryService {
-  public static final IScoutLogger LOG = ScoutLogManager.getLogger(ServerSessionRegistryService.class);
+
+  private final IServerJobService m_backendService;
+
+  public ServerSessionRegistryService() {
+    m_backendService = SERVICES.getService(IServerJobService.class);
+  }
+
+  protected IServerJobService getBackendService() {
+    return m_backendService;
+  }
 
   @Override
   public <T extends IServerSession> T newServerSession(Class<T> clazz, Subject subject) throws ProcessingException {
@@ -38,6 +46,14 @@ public class ServerSessionRegistryService extends AbstractService implements ISe
   @Override
   @SuppressWarnings("unchecked")
   public <T extends IServerSession> T newServerSession(Class<T> clazz, Subject subject, UserAgent userAgent) throws ProcessingException {
+    final IServerSession serverSession = createSessionInstance(clazz);
+    serverSession.setUserAgent(userAgent);
+    final IServerJobFactory jobFactory = getBackendService().createJobFactory(serverSession, subject);
+    runLoadSessionJob(serverSession, jobFactory);
+    return (T) serverSession;
+  }
+
+  protected <T extends IServerSession> IServerSession createSessionInstance(Class<T> clazz) throws ProcessingException {
     IServerSession serverSession;
     try {
       serverSession = clazz.newInstance();
@@ -45,20 +61,18 @@ public class ServerSessionRegistryService extends AbstractService implements ISe
     catch (Throwable t) {
       throw new ProcessingException("create instance of " + clazz, t);
     }
-    serverSession.setUserAgent(userAgent);
-    ServerJob initJob = new ServerJob("new " + clazz.getSimpleName(), serverSession, subject) {
+    return serverSession;
+  }
+
+  protected void runLoadSessionJob(final IServerSession serverSession, final IServerJobFactory jobFactory) throws ProcessingException {
+    jobFactory.runNow("loading session " + serverSession.getClass().getSimpleName(), new ITransactionRunnable() {
       @Override
-      protected IStatus runTransaction(IProgressMonitor monitor) throws Exception {
-        // load session
-        IServerSession serverSessionInside = ThreadContext.getServerSession();
-        String symbolicName = serverSessionInside.getClass().getPackage().getName();
+      public IStatus run(IProgressMonitor monitor) throws ProcessingException {
+        String symbolicName = serverSession.getClass().getPackage().getName();
         Bundle bundle = Platform.getBundle(symbolicName);
-        serverSessionInside.loadSession(bundle);
+        serverSession.loadSession(bundle);
         return Status.OK_STATUS;
       }
-    };
-    initJob.runNow(new NullProgressMonitor());
-    initJob.throwOnError();
-    return (T) serverSession;
+    });
   }
 }

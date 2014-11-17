@@ -25,11 +25,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.IExtension;
-import org.eclipse.core.runtime.IExtensionPoint;
-import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -48,6 +43,7 @@ import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
 import org.eclipse.scout.rt.server.commons.servletfilter.HttpServletEx;
 import org.eclipse.scout.rt.server.commons.servletfilter.helper.HttpAuthJaasFilter;
 import org.eclipse.scout.rt.server.internal.Activator;
+import org.eclipse.scout.rt.server.internal.ServerSessionClassFinder;
 import org.eclipse.scout.rt.server.services.common.session.IServerSessionRegistryService;
 import org.eclipse.scout.rt.shared.servicetunnel.DefaultServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
@@ -56,8 +52,6 @@ import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.service.SERVICES;
 import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
 import org.osgi.framework.Version;
 
 /**
@@ -76,6 +70,7 @@ import org.osgi.framework.Version;
  * When using RAP (rich ajax platform) as the ui web app then there must be a {@link WebSessionIdPrincipal} in the
  * subject, in order to map those requests to virtual sessions instead of (the unique) http session.
  */
+@SuppressWarnings("deprecation")
 public class ServiceTunnelServlet extends HttpServletEx {
   public static final String HTTP_DEBUG_PARAM = "org.eclipse.scout.rt.server.http.debug";
 
@@ -115,42 +110,49 @@ public class ServiceTunnelServlet extends HttpServletEx {
     m_requestMinVersion = initRequestMinVersion(config);
   }
 
-  @SuppressWarnings("unchecked")
   protected void lazyInit(HttpServletRequest req, HttpServletResponse res) throws ServletException {
     if (m_serverSessionClass == null) {
       m_serverSessionClass = locateServerSessionClass(req, res);
     }
-
     if (m_serverSessionClass == null) {
-      String qname = getServletConfig().getInitParameter("session");
-      if (qname != null) {
-        int i = qname.lastIndexOf('.');
-        try {
-          m_serverSessionClass = (Class<? extends IServerSession>) Platform.getBundle(qname.substring(0, i)).loadClass(qname);
-        }
-        catch (ClassNotFoundException e) {
-          throw new ServletException("Loading class " + qname, e);
-        }
-      }
+      m_serverSessionClass = loadSessionClassByParam();
     }
     if (m_serverSessionClass == null) {
-      // find bundle that defines this servlet
-      try {
-        Bundle bundle = findServletContributor(req.getServletPath());
-        if (bundle != null) {
-          m_serverSessionClass = (Class<? extends IServerSession>) bundle.loadClass(bundle.getSymbolicName() + ".ServerSession");
-        }
-      }
-      catch (Throwable t) {
-        // nop
-      }
+      //legacy support
+      m_serverSessionClass = new ServerSessionClassFinder().findClassByConvention(req.getServletPath());
     }
     if (m_serverSessionClass == null) {
       throw new ServletException("Expected init-param \"session\"");
     }
   }
 
+  /**
+   * Load the IServerSession class by servlet config parameter
+   *
+   * @throws ServletException
+   */
+  @SuppressWarnings("unchecked")
+  private Class<? extends IServerSession> loadSessionClassByParam() throws ServletException {
+    String qname = getServletConfig().getInitParameter("session");
+    if (qname != null) {
+      int i = qname.lastIndexOf('.');
+      try {
+        m_serverSessionClass = (Class<? extends IServerSession>) Platform.getBundle(qname.substring(0, i)).loadClass(qname);
+      }
+      catch (ClassNotFoundException e) {
+        throw new ServletException("Loading class " + qname, e);
+      }
+    }
+    return null;
+  }
+
   protected Class<? extends IServerSession> locateServerSessionClass(HttpServletRequest req, HttpServletResponse res) {
+    try {
+      return SERVICES.getService(IServerJobService.class).getServerSessionClass();
+    }
+    catch (ProcessingException e) {
+      LOG.debug("No server session found");
+    }
     return null;
   }
 
@@ -384,35 +386,6 @@ public class ServiceTunnelServlet extends HttpServletEx {
     httpResponse.setHeader("pragma", "no-cache");
     httpResponse.setContentType("text/xml");
     getServiceTunnelContentHandler().writeResponse(httpResponse.getOutputStream(), res);
-  }
-
-  private Bundle findServletContributor(String alias) throws CoreException {
-    BundleContext context = Activator.getDefault().getBundle().getBundleContext();
-    ServiceReference ref = context.getServiceReference(IExtensionRegistry.class.getName());
-    Bundle bundle = null;
-    if (ref != null) {
-      IExtensionRegistry reg = (IExtensionRegistry) context.getService(ref);
-      if (reg != null) {
-        IExtensionPoint xpServlet = reg.getExtensionPoint("org.eclipse.equinox.http.registry.servlets");
-        if (xpServlet != null) {
-          for (IExtension xServlet : xpServlet.getExtensions()) {
-            for (IConfigurationElement cServlet : xServlet.getConfigurationElements()) {
-              if ("servlet".equals(cServlet.getName())) {
-                if (this.getClass().getName().equals(cServlet.getAttribute("class"))) {
-                  // half match, go on looping
-                  bundle = Platform.getBundle(xServlet.getContributor().getName());
-                  if (alias.equals(cServlet.getAttribute("alias"))) {
-                    // full match, return
-                    return bundle;
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-    return bundle;
   }
 
   /**

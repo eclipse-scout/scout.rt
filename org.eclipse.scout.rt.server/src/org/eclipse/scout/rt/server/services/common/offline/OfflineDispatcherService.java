@@ -26,7 +26,10 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.server.IServerJobFactory;
+import org.eclipse.scout.rt.server.IServerJobService;
 import org.eclipse.scout.rt.server.IServerSession;
+import org.eclipse.scout.rt.server.ITransactionRunnable;
 import org.eclipse.scout.rt.server.ServerJob;
 import org.eclipse.scout.rt.server.ThreadContext;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;
@@ -178,13 +181,14 @@ public class OfflineDispatcherService extends AbstractService implements IOfflin
         }
       }
       final Holder<ServiceTunnelResponse> responseHolder = new Holder<ServiceTunnelResponse>(ServiceTunnelResponse.class);
-      ServerJob job = new ServerJob("Offline invokation", m_serverSession, subject) {
+      final IServerJobFactory jobFactory = SERVICES.getService(IServerJobService.class).createJobFactory(m_serverSession, subject);
+      ServerJob job = jobFactory.create("Offline invokation", new ITransactionRunnable() {
         @Override
-        protected IStatus runTransaction(IProgressMonitor monitor) throws Exception {
+        public IStatus run(IProgressMonitor monitor) throws ProcessingException {
           responseHolder.setValue(callService(request));
           return Status.OK_STATUS;
         }
-      };
+      });
       IStatus status = job.runNow(new NullProgressMonitor());
       if (!status.isOK()) {
         return new ServiceTunnelResponse(null, null, new ProcessingException(status));
@@ -196,7 +200,7 @@ public class OfflineDispatcherService extends AbstractService implements IOfflin
     }
   }
 
-  private ServiceTunnelResponse callService(IServiceTunnelRequest serviceReq) throws Exception {
+  private ServiceTunnelResponse callService(IServiceTunnelRequest serviceReq) throws ProcessingException {
     try {
       IServerSession serverSession = ThreadContext.getServerSession();
       Class<?> serviceInterfaceClass = serverSession.getBundle().loadClass(serviceReq.getServiceInterfaceClassName());

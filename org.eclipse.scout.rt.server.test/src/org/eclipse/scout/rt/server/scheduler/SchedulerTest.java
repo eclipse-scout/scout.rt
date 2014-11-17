@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.scheduler;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.util.Calendar;
 
 import javax.security.auth.Subject;
@@ -18,7 +21,6 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.server.testenvironment.TestEnvironmentServerSession;
 import org.eclipse.scout.rt.testing.server.runner.ScoutServerTestRunner;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -32,20 +34,20 @@ public class SchedulerTest {
     IScheduler scheduler = new Scheduler(new Subject(), TestEnvironmentServerSession.class, new Ticker(Calendar.SECOND));
     scheduler.addJob(new JobAcceptTick("groupId", "jobIdAccept"));
     scheduler.addJob(new JobDontAcceptTick("groupId", "jobIdDontAccept"));
-    Assert.assertEquals("JobCount must be 2", 2, scheduler.getJobCount());
+    assertEquals("JobCount must be 2", 2, scheduler.getJobCount());
     scheduler.start();
 
     Thread.sleep(1500); //now, JobAcceptTick should be running
-    Assert.assertEquals("JobAcceptTick should be running only", 1, scheduler.getRunningJobCount());
-    Assert.assertEquals("JobAcceptTick should be running only", 1, scheduler.getRunningJobs(null, null).size());
-    Assert.assertEquals("2 Jobs should be in the Scheduler", 2, scheduler.getAllJobs().size());
-    Assert.assertEquals("2 Jobs should be in the Scheduler", 2, scheduler.getJobCount());
+    assertEquals("JobAcceptTick should be running only", 1, scheduler.getRunningJobCount());
+    assertEquals("JobAcceptTick should be running only", 1, scheduler.getRunningJobs(null, null).size());
+    assertEquals("2 Jobs should be in the Scheduler", 2, scheduler.getAllJobs().size());
+    assertEquals("2 Jobs should be in the Scheduler", 2, scheduler.getJobCount());
 
     Thread.sleep(1000); //now JobAcceptTick should be finished
-    Assert.assertEquals("No running job left", 0, scheduler.getRunningJobCount());
-    Assert.assertEquals("No running job left", 0, scheduler.getRunningJobs(null, null).size());
-    Assert.assertEquals("jobDontAccept should be in the Scheduler", 1, scheduler.getAllJobs().size());
-    Assert.assertEquals("jobDontAccept should be in the Scheduler", 1, scheduler.getJobCount());
+    assertEquals("No running job left", 0, scheduler.getRunningJobCount());
+    assertEquals("No running job left", 0, scheduler.getRunningJobs(null, null).size());
+    assertEquals("jobDontAccept should be in the Scheduler", 1, scheduler.getAllJobs().size());
+    assertEquals("jobDontAccept should be in the Scheduler", 1, scheduler.getJobCount());
   }
 
   @Test
@@ -59,8 +61,9 @@ public class SchedulerTest {
     scheduler.handleJobExecution(job, tick);
     scheduler.stop();
     jobFinderThread.join();
-    Assert.assertTrue("The 'Scheduler.groupId.jobIdAccept' Job wasn't found", jobFinderThread.foundJob());
+    assertTrue("The 'Scheduler.groupId.jobIdAccept' Job wasn't found", jobFinderThread.foundJob());
   }
+
 }
 
 class JobAcceptTick extends AbstractSchedulerJob {

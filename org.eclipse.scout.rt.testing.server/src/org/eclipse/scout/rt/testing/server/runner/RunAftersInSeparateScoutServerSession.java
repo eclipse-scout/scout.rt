@@ -4,7 +4,9 @@ import java.util.List;
 
 import javax.security.auth.Subject;
 
+import org.eclipse.scout.rt.server.IServerJobFactory;
 import org.eclipse.scout.rt.server.IServerSession;
+import org.eclipse.scout.rt.server.ServerJobFactory;
 import org.eclipse.scout.rt.testing.shared.runner.AbstractRunAftersInSeparateScoutSession;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
@@ -16,14 +18,22 @@ import org.junit.runners.model.Statement;
 public class RunAftersInSeparateScoutServerSession extends AbstractRunAftersInSeparateScoutSession {
   private final ScoutServerJobWrapperStatement m_aftersStatement;
 
-  public RunAftersInSeparateScoutServerSession(IServerSession serverSession, Subject subject, Statement statement, List<FrameworkMethod> afters, Object target) {
+  public RunAftersInSeparateScoutServerSession(IServerJobFactory factory, Statement statement, List<FrameworkMethod> afters, Object target) {
     super(statement, afters, target);
-    m_aftersStatement = new ScoutServerJobWrapperStatement(serverSession, subject, new Statement() {
+    m_aftersStatement = new ScoutServerJobWrapperStatement(factory, new Statement() {
       @Override
       public void evaluate() throws Throwable {
         evaluateAfters();
       }
     });
+  }
+
+  /**
+   * @deprecated use RunAftersInSeparateScoutServerSession(IServerJobFactory, Statement, List<FrameworkMethod>, Object)
+   */
+  @Deprecated
+  public RunAftersInSeparateScoutServerSession(IServerSession serverSession, Subject subject, Statement statement, List<FrameworkMethod> afters, Object target) {
+    this(new ServerJobFactory(serverSession, subject), statement, afters, target);
   }
 
   @Override

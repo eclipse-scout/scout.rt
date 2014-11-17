@@ -23,6 +23,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.holders.ObjectHolder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -31,9 +32,13 @@ import org.eclipse.scout.jaxws.annotation.ScoutWebService;
 import org.eclipse.scout.jaxws.internal.ContextHelper;
 import org.eclipse.scout.jaxws.internal.SessionHelper;
 import org.eclipse.scout.jaxws.session.IServerSessionFactory;
+import org.eclipse.scout.rt.server.IServerJobFactory;
+import org.eclipse.scout.rt.server.IServerJobService;
 import org.eclipse.scout.rt.server.IServerSession;
+import org.eclipse.scout.rt.server.ITransactionRunnable;
 import org.eclipse.scout.rt.server.ServerJob;
 import org.eclipse.scout.rt.server.ThreadContext;
+import org.eclipse.scout.service.SERVICES;
 
 import com.sun.xml.internal.ws.api.message.Packet;
 import com.sun.xml.internal.ws.api.server.Invoker;
@@ -151,10 +156,11 @@ public class ScoutInstanceResolver<T> extends AbstractMultiInstanceResolver<T> {
         final Holder<IllegalAccessException> illegalAccessExceptionHolder = new Holder<IllegalAccessException>(IllegalAccessException.class);
         final Holder<RuntimeException> runtimeExceptionHolder = new Holder<RuntimeException>(RuntimeException.class);
         // run server job
-        ServerJob serverJob = new ServerJob("Tx", session, subject) {
+        final IServerJobFactory jobFactory = SERVICES.getService(IServerJobService.class).createJobFactory(session, subject);
+        ServerJob serverJob = jobFactory.create("Tx", new ITransactionRunnable() {
 
           @Override
-          protected IStatus runTransaction(IProgressMonitor monitor) throws Exception {
+          public IStatus run(IProgressMonitor monitor) throws ProcessingException {
             try {
               resultHolder.setValue(method.invoke(portType, aobj));
             }
@@ -185,7 +191,7 @@ public class ScoutInstanceResolver<T> extends AbstractMultiInstanceResolver<T> {
 
             return Status.OK_STATUS;
           }
-        };
+        });
         serverJob.setSystem(true);
         serverJob.runNow(new NullProgressMonitor());
         if (invocationTargetExceptionHolder.getValue() != null) {

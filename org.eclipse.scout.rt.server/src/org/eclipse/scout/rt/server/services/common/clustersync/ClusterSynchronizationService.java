@@ -24,22 +24,21 @@ import javax.security.auth.Subject;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.commons.security.SimplePrincipal;
+import org.eclipse.scout.rt.server.IServerJobFactory;
+import org.eclipse.scout.rt.server.IServerJobService;
 import org.eclipse.scout.rt.server.IServerSession;
+import org.eclipse.scout.rt.server.ITransactionRunnable;
 import org.eclipse.scout.rt.server.ServerJob;
 import org.eclipse.scout.rt.server.ThreadContext;
 import org.eclipse.scout.rt.server.internal.Activator;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationMessage;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationMessageProperties;
-import org.eclipse.scout.rt.server.services.common.clustersync.internal.ServerSessionClassFinder;
-import org.eclipse.scout.rt.server.services.common.session.IServerSessionRegistryService;
 import org.eclipse.scout.rt.server.transaction.AbstractTransactionMember;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.service.AbstractService;
@@ -51,7 +50,6 @@ public class ClusterSynchronizationService extends AbstractService implements IC
   private static final String TRANSACTION_MEMBER_ID = ClusterSynchronizationService.class.getName();
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ClusterSynchronizationService.class);
 
-  public static final String CLUSTER_SYNC_BACKEND_SESSION_ID = "org.eclipse.scout.rt.server.clustersync.BackendSessionId";
   private static final String CLUSTER_NODE_ID_PARAM = "org.eclipse.scout.rt.server.clusterNodeId";
   private final EventListenerList m_listenerList = new EventListenerList();
   private final ClusterNodeStatusInfo m_statusInfo = new ClusterNodeStatusInfo();
@@ -59,6 +57,7 @@ public class ClusterSynchronizationService extends AbstractService implements IC
   // variables must not be synchronized as they are only set at initialization
   private String m_nodeId;
   private IServerSession m_session;
+  private IServerJobFactory m_jobFactory;
 
   private volatile boolean m_enabled;
   private volatile IPublishSubscribeMessageService m_messageService;
@@ -68,6 +67,16 @@ public class ClusterSynchronizationService extends AbstractService implements IC
     super.initializeService(registration);
     m_nodeId = createNodeId();
     m_session = createBackendSession();
+    m_jobFactory = createJobFactory();
+
+  }
+
+  protected IServerJobFactory getJobFactory() {
+    return m_jobFactory;
+  }
+
+  private IServerJobFactory createJobFactory() {
+    return SERVICES.getService(IServerJobService.class).createJobFactory(getBackendSession(), getBackendSession().getSubject());
   }
 
   protected String createNodeId() {
@@ -108,11 +117,9 @@ public class ClusterSynchronizationService extends AbstractService implements IC
   }
 
   protected IServerSession createBackendSession() {
-    Class<? extends IServerSession> sessionClazz = ServerSessionClassFinder.find();
     IServerSession serverSession = null;
     try {
-      serverSession = SERVICES.getService(IServerSessionRegistryService.class).newServerSession(sessionClazz, createBackendSubject());
-      serverSession.setIdInternal(CLUSTER_SYNC_BACKEND_SESSION_ID);
+      serverSession = SERVICES.getService(IServerJobService.class).createServerSession();
     }
     catch (ProcessingException e) {
       LOG.error("Error creating backend session for cluster synchronization.", e);
@@ -120,10 +127,12 @@ public class ClusterSynchronizationService extends AbstractService implements IC
     return serverSession;
   }
 
+  /**
+   * @deprecated use {@link IBackendSessionFactoryService} to create backend subject. Will be removed in N-Release.
+   */
+  @Deprecated
   protected Subject createBackendSubject() {
-    Subject subject = new Subject();
-    subject.getPrincipals().add(new SimplePrincipal("server"));
-    return subject;
+    return SERVICES.getService(IServerJobService.class).getServerSubject();
   }
 
   protected EventListenerList getListenerList() {
@@ -278,14 +287,19 @@ public class ClusterSynchronizationService extends AbstractService implements IC
     String originNode = message.getProperties().getOriginNode();
     if (!getNodeId().equals(originNode)) {
       getClusterNodeStatusInfo().updateReceiveStatus(message);
-      new ServerJob("NotificationProcessingJob", getBackendSession(), getBackendSession().getSubject()) {
+      try {
+        m_jobFactory.runNow("NotificationProcessingJob", new ITransactionRunnable() {
 
-        @Override
-        protected IStatus runTransaction(IProgressMonitor monitor) throws Exception {
-          notifyListeners(message);
-          return Status.OK_STATUS;
-        }
-      }.runNow(new NullProgressMonitor());
+          @Override
+          public IStatus run(IProgressMonitor monitor) throws ProcessingException {
+            notifyListeners(message);
+            return Status.OK_STATUS;
+          }
+        });
+      }
+      catch (ProcessingException e) {
+        LOG.error("Error processing message", e);
+      }
     }
   }
 

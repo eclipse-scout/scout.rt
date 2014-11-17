@@ -15,7 +15,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.scout.rt.testing.server.runner.parameterized.ParameterizedScoutServerTestRunner;
 import org.eclipse.scout.rt.testing.shared.runner.parameterized.AbstractScoutTestParameter;
 import org.eclipse.scout.rt.testing.shared.runner.parameterized.IScoutTestParameter;
 import org.junit.Test;

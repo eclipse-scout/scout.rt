@@ -10,78 +10,94 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.testing.server.runner;
 
+import static org.junit.Assert.fail;
+
 import java.util.List;
 
 import javax.security.auth.Subject;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.server.IServerJobFactory;
 import org.eclipse.scout.rt.server.IServerSession;
+import org.eclipse.scout.rt.server.ITransactionRunnable;
 import org.eclipse.scout.rt.server.ServerJob;
+import org.eclipse.scout.rt.server.ServerJobFactory;
 import org.eclipse.scout.rt.testing.shared.Activator;
-import org.eclipse.scout.rt.testing.commons.ScoutAssert;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.testing.shared.services.common.exceptionhandler.WrappingProcessingRuntimeExceptionHandlerService;
 import org.junit.runners.model.Statement;
 import org.osgi.framework.ServiceRegistration;
 
 /**
- * JUnit statements that runs the JUnit test within a Scout server session.
+ * JUnit statements that runs the JUnit test within a Scout {@link ServerJob}.
  */
 public class ScoutServerJobWrapperStatement extends Statement {
-
-  private final IServerSession m_serverSession;
-  private final Subject m_subject;
+  private static final int EXCEPTIONHANDLER_SERVICE_RANKING = 1000;
   private final Statement m_statement;
+  private final IServerJobFactory m_factory;
 
-  public ScoutServerJobWrapperStatement(IServerSession serverSession, Subject subject, Statement statement) {
-    m_serverSession = serverSession;
-    m_subject = subject;
+  public ScoutServerJobWrapperStatement(IServerJobFactory factory, Statement statement) {
     m_statement = statement;
+    m_factory = factory;
+  }
+
+  /**
+   * @deprecated use {@link ScoutServerJobWrapperStatement(IServerJobFactory,Statement} instead. Will be removed in
+   *             N-release.
+   * @param serverSession
+   * @param subject
+   * @param statement
+   */
+  @Deprecated
+  public ScoutServerJobWrapperStatement(IServerSession serverSession, Subject subject, Statement statement) {
+    this(new ServerJobFactory(serverSession, subject), statement);
   }
 
   @Override
   public void evaluate() throws Throwable {
     if (ServerJob.getCurrentSession() != null) {
-      doEvaluate();
+      doEvaluateWrappingExceptions();
     }
     else {
-      ServerJob job = new ServerJob("JUnit Server Job Runner", m_serverSession, m_subject) {
+      ServerJob job = m_factory.create("JUnit Server Job Runner", new ITransactionRunnable() {
         @Override
-        protected IStatus runTransaction(IProgressMonitor monitor) throws Exception {
-          doEvaluate();
+        public IStatus run(IProgressMonitor monitor) throws ProcessingException {
+          doEvaluateWrappingExceptions();
           return Status.OK_STATUS;
         }
-      };
-      job.schedule();
-      job.join();
-      ScoutAssert.jobSuccessfullyCompleted(job);
+      });
+      job.setSystem(true);
+      job.runNow(new NullProgressMonitor());
+      if (job.getResult() != null && !job.getResult().isOK()) {
+        fail(job.getResult().getMessage());
+      }
     }
   }
 
-  private void doEvaluate() throws Exception {
+  protected void doEvaluateWrappingExceptions() throws ProcessingException {
     List<ServiceRegistration> serviceReg = null;
     try {
       WrappingProcessingRuntimeExceptionHandlerService handler = new WrappingProcessingRuntimeExceptionHandlerService();
-      serviceReg = TestingUtility.registerServices(Activator.getDefault().getBundle(), 1000, handler);
-      try {
-        m_statement.evaluate();
-      }
-      catch (Exception e) {
-        throw e;
-      }
-      catch (Error e) {
-        throw e;
-      }
-      catch (Throwable e) {
-        throw new Exception(e);
-      }
+      serviceReg = TestingUtility.registerServices(Activator.getDefault().getBundle(), EXCEPTIONHANDLER_SERVICE_RANKING, handler);
+      doEvaluate();
     }
     finally {
       if (serviceReg != null) {
         TestingUtility.unregisterServices(serviceReg);
       }
+    }
+  }
+
+  protected void doEvaluate() throws ProcessingException {
+    try {
+      m_statement.evaluate();
+    }
+    catch (Throwable e) {
+      throw new ProcessingException(e.getMessage(), e);
     }
   }
 }

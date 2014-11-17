@@ -21,14 +21,19 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.commons.RunnableWithException;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.jaxws.annotation.ScoutTransaction;
 import org.eclipse.scout.jaxws.session.IServerSessionFactory;
+import org.eclipse.scout.rt.server.IServerJobFactory;
+import org.eclipse.scout.rt.server.IServerJobService;
 import org.eclipse.scout.rt.server.IServerSession;
+import org.eclipse.scout.rt.server.ITransactionRunnable;
 import org.eclipse.scout.rt.server.ServerJob;
+import org.eclipse.scout.service.SERVICES;
 
 public class ScoutTransactionDelegate {
 
@@ -62,10 +67,12 @@ public class ScoutTransactionDelegate {
     final IHolder<RuntimeException> errorHolder = new Holder<RuntimeException>(RuntimeException.class);
 
     Subject subject = Subject.getSubject(AccessController.getContext());
-    ServerJob serverJob = new ServerJob("Transactional handler", serverSession, subject) {
+
+    final IServerJobFactory jobFactory = SERVICES.getService(IServerJobService.class).createJobFactory(serverSession, subject);
+    ServerJob serverJob = jobFactory.create("Transactional handler", new ITransactionRunnable() {
 
       @Override
-      protected IStatus runTransaction(IProgressMonitor monitor) throws Exception {
+      public IStatus run(IProgressMonitor monitor) throws ProcessingException {
         try {
           T result = ScoutTransactionDelegate.this.doRun(runnable);
           resultHolder.setValue(result);
@@ -75,7 +82,7 @@ public class ScoutTransactionDelegate {
         }
         return Status.OK_STATUS;
       }
-    };
+    });
     serverJob.setSystem(true);
     serverJob.runNow(new NullProgressMonitor());
 

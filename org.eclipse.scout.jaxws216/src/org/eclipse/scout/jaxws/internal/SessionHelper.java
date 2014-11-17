@@ -18,10 +18,11 @@ import javax.security.auth.Subject;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.jaxws.Activator;
 import org.eclipse.scout.jaxws.session.IServerSessionFactory;
+import org.eclipse.scout.rt.server.IServerJobService;
 import org.eclipse.scout.rt.server.IServerSession;
+import org.eclipse.scout.service.SERVICES;
 
 /**
  * Helper to create a session
@@ -35,7 +36,7 @@ public final class SessionHelper {
 
   /**
    * To create a new session
-   * 
+   *
    * @param factory
    *          the factory to be used to create the session
    * @return
@@ -60,9 +61,7 @@ public final class SessionHelper {
         LOG.warn("No subject found in calling AccessContext. That is why the principal 'anonymous' is registered with the subject. This subject is used to create sessions for transactional handlers as long as the request is not authenticated. The default principal can be changed by configuring the prinicipal in '" + Activator.PROP_DEFAULT_PRINCIPAL + "' in config.ini.");
         principalName = "anonymous";
       }
-      subject = new Subject();
-      subject.getPrincipals().add(new SimplePrincipal(principalName));
-      subject.setReadOnly();
+      subject = SERVICES.getService(IServerJobService.class).createSubject(principalName);
     }
 
     // create the new session on behalf of the subject

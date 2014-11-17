@@ -22,12 +22,17 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.jaxws.Activator;
+import org.eclipse.scout.rt.server.IServerJobService;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.ServiceTunnelServlet;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 
+/**
+ * @deprecated use {@link IServerJobService} instead. Will be removed with the N-Release.
+ */
+@Deprecated
 public class ServerSessionClassFinder {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ServerSessionClassFinder.class);
 
@@ -37,7 +42,7 @@ public class ServerSessionClassFinder {
    * <li>based on config.ini parameters {@link PROP_QN_SESSION} and {@link PROP_SN_BUNDLE}</li>
    * <li>based on default-naming-convention in bundle of servlet contributor for {@link ServiceTunnelServlet}</li>
    * </ol>
-   * 
+   *
    * @return the found server session class or null if not found
    */
   public static Class<? extends IServerSession> find() {

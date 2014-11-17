@@ -99,7 +99,7 @@ public class Activator extends Plugin {
       }
     }
     catch (Throwable t) {
-      t.printStackTrace();
+      LOG.error("Error starting application", t);
     }
   }
 
