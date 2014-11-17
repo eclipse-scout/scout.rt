@@ -46,21 +46,26 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
 
   var $sortAsc = $commandSort.appendDiv('HeaderCommandSortAsc', 'header-command')
     .data('label', 'aufsteigend')
+    .click(this.remove.bind(this))
     .click(function() {
       sort('asc', false, $(this).hasClass('selected'));
     });
   var $sortDesc = $commandSort.appendDiv('HeaderCommandSortDesc', 'header-command')
     .data('label', 'absteigend')
+    .click(this.remove.bind(this))
     .click(function() {
       sort('desc', false, $(this).hasClass('selected'));
     });
+
   var $sortAscAdd = $commandSort.appendDiv('HeaderCommandSortAscAdd', 'header-command')
     .data('label', 'zusätzlich aufsteigend')
+    .click(this.remove.bind(this))
     .click(function() {
       sort('asc', true, $(this).hasClass('selected'));
     });
   var $sortDescAdd = $commandSort.appendDiv('HeaderCommandSortDescAdd', 'header-command')
     .data('label', 'zusätzlich absteigend')
+    .click(this.remove.bind(this))
     .click(function() {
       sort('desc', true, $(this).hasClass('selected'));
     });
@@ -75,10 +80,12 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
 
     var $groupAll = $commandGroup.appendDiv('HeaderCommandGroupAll', 'header-command')
       .data('label', 'über alles')
+      .click(this.remove.bind(this))
       .click(groupAll);
 
     var $groupSort = $commandGroup.appendDiv('HeaderCommandGroupSort', 'header-command')
       .data('label', 'gruppiert')
+      .click(this.remove.bind(this))
       .click(groupSort);
 
     groupSelect();
@@ -92,15 +99,19 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
 
     $commandColor.appendDiv('HeaderCommandColorRed', 'header-command')
       .data('label', 'von Rot nach Grün')
+      .click(this.remove.bind(this))
       .click(colorRed);
     $commandColor.appendDiv('HeaderCommandColorGreen', 'header-command')
       .data('label', 'von Grün nach Rot')
+      .click(this.remove.bind(this))
       .click(colorGreen);
     $commandColor.appendDiv('HeaderCommandColorBar', 'header-command')
       .data('label', 'mit Balkendiagramm')
+      .click(this.remove.bind(this))
       .click(colorBar);
     $commandColor.appendDiv('HeaderCommandColorRemove', 'header-command')
       .data('label', 'entfernen')
+      .click(this.remove.bind(this))
       .click(colorRemove);
   }
 

@@ -34,6 +34,10 @@
 /* ------------------------ */
 @color-nav: #41525E;
 @color-nav-semi: #506678;
+
+//@color-nav: @palette-bsi-dark-green;
+//@color-nav-semi: @palette-bsi-green;
+
 @color-nav-select: @palette-white;
 @color-nav-text: @palette-white;
 
