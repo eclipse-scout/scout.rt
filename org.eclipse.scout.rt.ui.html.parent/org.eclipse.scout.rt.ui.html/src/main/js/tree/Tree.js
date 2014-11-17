@@ -369,6 +369,18 @@ scout.Tree.prototype._onNodeExpanded = function(nodeId, expanded) {
   }
 };
 
+scout.Tree.prototype._onNodeChanged = function(nodeId, cell) {
+  var node = this._nodeMap[nodeId];
+  node.text = cell.text;
+
+  if (this.rendered) {
+    var $node = this._findNodeById(node.id);
+    $node.text(node.text);
+    //text() removes complete content -> add tree item control again
+    this._renderTreeItemControl($node);
+  }
+};
+
 /**
  *
  * @param $parentNode optional. If not provided, parentNodeId will be used to find $parentNode.
@@ -417,10 +429,7 @@ scout.Tree.prototype._addNodes = function(nodes, $parent) {
       .attr('data-level', level)
       .css('padding-left', this._computeTreeItemPaddingLeft(level));
 
-    // decorate with (close) control
-    var $control = $node.prependDiv('', 'tree-item-control')
-      .on('click', '', this._onNodeControlClick.bind(this))
-      .on('dblclick', '', this._onNodeControlClick.bind(this)); //_onNodeControlClick immediately returns with false to prevent bubbling
+    this._renderTreeItemControl($node);
 
     // append first node and successors
     if ($parent) {
@@ -434,6 +443,12 @@ scout.Tree.prototype._addNodes = function(nodes, $parent) {
       this._addNodes(node.childNodes, $node);
     }
   }
+};
+
+scout.Tree.prototype._renderTreeItemControl = function($node) {
+  $node.prependDIV('tree-item-control')
+    .on('click', '', this._onNodeControlClick.bind(this))
+    .on('dblclick', '', this._onNodeControlClick.bind(this)); //_onNodeControlClick immediately returns with false to prevent bubbling
 };
 
 scout.Tree.prototype._onNodeClick = function(event) {
@@ -586,6 +601,8 @@ scout.Tree.prototype.onModelAction = function(event) {
     this._onNodesSelected(event.nodeIds);
   } else if (event.type == 'nodeExpanded') {
     this._onNodeExpanded(event.nodeId, event.expanded);
+  } else if (event.type == 'nodeChanged') {
+    this._onNodeChanged(event.nodeId, event);
   } else {
     $.log.warn('Model event not handled. Widget: Tree. Event: ' + event.type + '.');
   }

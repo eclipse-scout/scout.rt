@@ -565,5 +565,57 @@ describe("Tree", function() {
         expect(jasmine.Ajax.requests.count()).toBe(0);
       });
     });
+
+    describe("nodeChanged event", function() {
+      var model;
+      var tree;
+      var node0;
+      var child0;
+
+      function createNodeChangedEvent(model, nodeId) {
+        return {
+          id: model.id,
+          nodeId: nodeId,
+          type: 'nodeChanged'
+        };
+      }
+
+      beforeEach(function() {
+        model = createModelFixture(3, 3, false);
+        tree = createTree(model);
+        node0 = model.nodes[0];
+        child0 = node0.childNodes[0];
+      });
+
+      it("updates the text of the model node", function() {
+        var event = createNodeChangedEvent(model, node0.id);
+        event.text = 'new Text';
+        var message = {
+          events: [event]
+        };
+        session._processSuccessResponse(message);
+
+        expect(node0.text).toBe(event.text);
+      });
+
+      it("updates the text of the html node", function() {
+        tree.render(session.$entryPoint);
+
+        var event = createNodeChangedEvent(model, node0.id);
+        event.text = 'new Text';
+        var message = {
+          events: [event]
+        };
+        session._processSuccessResponse(message);
+
+        //Check gui
+        var $node0 = tree._findNodeById(node0.id);
+        expect($node0.text()).toBe(event.text);
+
+        //Check whether tree-control is still there
+        expect($node0.children('.tree-item-control').length).toBe(1);
+      });
+
+    });
   });
 });

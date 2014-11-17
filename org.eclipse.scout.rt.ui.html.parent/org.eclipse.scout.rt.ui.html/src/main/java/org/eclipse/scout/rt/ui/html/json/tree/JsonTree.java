@@ -10,6 +10,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ContextMenuEvent;
+import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree5;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
@@ -31,14 +32,16 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonTree.class);
   public static final String EVENT_NODE_CLICKED = "nodeClicked";
   public static final String EVENT_NODE_ACTION = "nodeAction";
-  public static final String EVENT_NODES_SELECTED = "nodesSelected";
   public static final String EVENT_NODE_EXPANDED = "nodeExpanded";
+  public static final String EVENT_NODE_CHANGED = "nodeChanged";
+  public static final String EVENT_NODES_SELECTED = "nodesSelected";
   public static final String EVENT_NODES_DELETED = "nodesDeleted";
   public static final String EVENT_NODES_INSERTED = "nodesInserted";
   public static final String EVENT_ALL_NODES_DELETED = "allNodesDeleted";
   public static final String PROP_NODE_ID = "nodeId";
   public static final String PROP_NODE_IDS = "nodeIds";
   public static final String PROP_COMMON_PARENT_NODE_ID = "commonParentNodeId";
+  public static final String PROP_NODE = "node";
   public static final String PROP_NODES = "nodes";
   public static final String PROP_SELECTED_NODE_IDS = "selectedNodeIds";
 
@@ -167,7 +170,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
       }
       case TreeEvent.TYPE_NODE_EXPANDED:
       case TreeEvent.TYPE_NODE_COLLAPSED: {
-        if (!getModel().isRootNodeVisible() && getModel().getRootNode() == event.getNode()) {
+        if (isInvisibleRootNode(event.getNode())) {
           //Not necessary to send events for invisible root node
           return;
         }
@@ -176,6 +179,10 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
       }
       case TreeEvent.TYPE_NODES_SELECTED: {
         handleModelNodesSelected(event.getNodes());
+        break;
+      }
+      case TreeEvent.TYPE_NODE_CHANGED: {
+        handleModelNodeChanged(event.getNode());
         break;
       }
     }
@@ -225,6 +232,13 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     addActionEvent(EVENT_NODES_SELECTED, jsonEvent);
   }
 
+  protected void handleModelNodeChanged(ITreeNode modelNode) {
+    JSONObject jsonEvent = new JSONObject();
+    putProperty(jsonEvent, PROP_NODE_ID, getOrCreateNodeId(modelNode));
+    putCellProperties(jsonEvent, modelNode.getCell());
+    addActionEvent(EVENT_NODE_CHANGED, jsonEvent);
+  }
+
   protected JSONArray nodeIdsToJson(Collection<ITreeNode> modelNodes) {
     JSONArray jsonNodeIds = new JSONArray();
     for (ITreeNode node : modelNodes) {
@@ -250,7 +264,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     if (node == null) {
       return null;
     }
-    if (!getModel().isRootNodeVisible() && node == getModel().getRootNode()) {
+    if (isInvisibleRootNode(node)) {
       return null;
     }
 
@@ -264,13 +278,21 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     return id;
   }
 
+  protected boolean isInvisibleRootNode(ITreeNode node) {
+    return !getModel().isRootNodeVisible() && getModel().getRootNode() == node;
+  }
+
+  protected void putCellProperties(JSONObject json, ICell cell) {
+    putProperty(json, "text", cell.getText());
+  }
+
   protected JSONObject treeNodeToJson(ITreeNode node) {
     String id = getOrCreateNodeId(node);
     JSONObject json = new JSONObject();
     putProperty(json, "id", id);
-    putProperty(json, "text", node.getCell().getText());
     putProperty(json, "expanded", node.isExpanded());
     putProperty(json, "leaf", node.isLeaf());
+    putCellProperties(json, node.getCell());
     JSONArray jsonChildNodes = new JSONArray();
     if (node.getChildNodeCount() > 0) {
       for (ITreeNode childNode : node.getChildNodes()) {
