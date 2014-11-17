@@ -1,7 +1,7 @@
 @text-field-padding: 10px;
 
-.glow(@color) {
-  box-shadow: 0 0 5px @color;
+.glow(@color, @radius: 5px) {
+  box-shadow: 0 0 @radius @color;
 }
 
 .drop-shadow(@x: 2px, @y: 6px, @blur: 14px, @spread: -6px, @alpha: 0.2) {

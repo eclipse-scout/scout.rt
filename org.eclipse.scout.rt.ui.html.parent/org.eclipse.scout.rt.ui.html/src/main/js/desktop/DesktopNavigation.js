@@ -7,16 +7,17 @@ scout.DesktopNavigation = function(desktop) {
   this.$container;
 
   this.activeTab;
+  this.outlineTab;
+  this.searchTab;
+  this.$queryField;
   this.$outlineTitle;
   this.previousOutline;
 };
 
 scout.DesktopNavigation.prototype.render = function($parent) {
-  // create main element
   this.$navigation = $parent.appendDIV('desktop-navigation');
   this.$header = this.$navigation.appendDIV('navigation-header');
 
-  //  create outline tabs
   this.outlineTab = new scout.DesktopNavigation.TabAndContent(this._createOutlinesTab());
   this.outlineTab.$tab.on('click', function() {
     //Switch tab if search outline is selected. Otherwise outline menu gets opened
@@ -31,15 +32,12 @@ scout.DesktopNavigation.prototype.render = function($parent) {
     }
   }.bind(this));
 
-  //  create search tabs
-  var searchTab = new scout.DesktopNavigation.TabAndContent(this._createSearchTab());
-  searchTab.$tab.on('click', function() {
-    this._selectTab(searchTab, this.desktop.searchOutline);
+  this.searchTab = new scout.DesktopNavigation.TabAndContent(this._createSearchTab());
+  this.searchTab.$tab.on('click', function() {
+    this._selectTab(this.searchTab, this.desktop.searchOutline);
   }.bind(this));
 
   this.$container = this.$navigation.appendDIV('navigation-container');
-  this._setActiveTab(this.outlineTab);
-
   this._addSplitter();
 };
 
@@ -96,7 +94,7 @@ scout.DesktopNavigation.prototype._onMenuButtonClicked = function(event) {
 
 scout.DesktopNavigation.prototype._openMenu = function() {
   this.$header.addClass('tab-menu-open');
-  $(document).one('mousedown.remove keydown.remove', onCloseEvent.bind(this));
+  $(document).on('mousedown.remove keydown.remove', onCloseEvent.bind(this));
 
   function onCloseEvent(event) {
     if ($(event.target).is(this.$menuButton)) {
@@ -120,7 +118,7 @@ scout.DesktopNavigation.prototype._createSearchTab = function() {
   var $tab = this.$header.appendDIV('navigation-tab-search');
 
   // create field
-  var $queryField = $('<input>')
+  this.$queryField = $('<input>')
     .addClass('navigation-tab-search-field')
     .placeholder(scout.texts.get('searchFor'))
     .appendTo($tab);
@@ -129,11 +127,15 @@ scout.DesktopNavigation.prototype._createSearchTab = function() {
   $tab.appendDIV('navigation-tab-search-button')
     .on('click', function() {
       this.session.send('search', this.desktop.id, {
-        'query': $queryField.val()
+        'query': this.$queryField.val()
       });
     }.bind(this));
 
   return $tab;
+};
+
+scout.DesktopNavigation.prototype.renderSearchQuery = function(searchQuery) {
+  this.$queryField.val(searchQuery);
 };
 
 // tab state and container handling
@@ -146,10 +148,6 @@ scout.DesktopNavigation.prototype._setActiveTab = function(tab) {
 
   if (oldTab) {
     oldTab.$tab.removeClass('tab-active');
-    //FIXME CGU remove ?
-//    oldTab.$storage = this.$container.children();
-//    this.$container.children().detach();
-//    this.$container.append(newTab.$storage);
   }
 
   tab.$tab.addClass('tab-active');
@@ -168,19 +166,19 @@ scout.DesktopNavigation.prototype.onOutlineChanged = function(outline) {
     this.outline.remove();
   }
 
-  //Remember previous outline when switching to search outline
   if (outline === this.desktop.searchOutline) {
+    //Remember previous outline when switching to search outline
     this.previousOutline = this.outline;
+
+    this._setActiveTab(this.searchTab);
+  } else {
+    this._setActiveTab(this.outlineTab);
   }
+
   this.outline = outline;
   this.outline.render(this.$container);
   this.$outlineTitle.html(this.outline.title);
   this.$header.removeClass('tab-menu-open');
-};
-
-scout.DesktopNavigation.prototype.onSearchPerformed = function(event) {
-//FIXME CGU search status in SearchOutline.js schieben?
-//  this.$container.empty().appendDIV('search-status', event.status);
 };
 
 //vertical splitter

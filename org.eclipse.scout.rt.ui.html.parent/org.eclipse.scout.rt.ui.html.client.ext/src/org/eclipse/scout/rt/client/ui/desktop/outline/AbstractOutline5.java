@@ -11,15 +11,20 @@
 package org.eclipse.scout.rt.client.ui.desktop.outline;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.AbstractClientSession;
+import org.eclipse.scout.rt.client.ClientJob;
+import org.eclipse.scout.rt.client.Scout5ExtensionUtil;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -36,6 +41,19 @@ public class AbstractOutline5 extends AbstractExtensibleOutline implements IOutl
   @Override
   public IForm getDefaultDetailForm() {
     return m_defaultDetailForm;
+  }
+
+  protected boolean getConfiguredSelectFirstPageOnOutlineChange() {
+    return true;
+  }
+
+  @Override
+  public void selectNodes(Collection<? extends ITreeNode> nodes, boolean append) {
+    if (!getConfiguredSelectFirstPageOnOutlineChange() && Scout5ExtensionUtil.IDesktop_isOutlineChanging(ClientJob.getCurrentSession(AbstractClientSession.class).getDesktop())) {
+      //Prevent selecting the first node when changing the outline
+      return;
+    }
+    super.selectNodes(nodes, append);
   }
 
   public void setDefaultDetailForm(IForm form) {

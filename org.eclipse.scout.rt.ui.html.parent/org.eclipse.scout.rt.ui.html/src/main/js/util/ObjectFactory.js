@@ -62,6 +62,11 @@ scout.defaultObjectFactories = [{
     return new scout.Desktop();
   }
 }, {
+  objectType: 'SearchOutline',
+  create: function() {
+    return new scout.SearchOutline();
+  }
+}, {
   objectType: 'Outline',
   create: function() {
     return new scout.Outline();

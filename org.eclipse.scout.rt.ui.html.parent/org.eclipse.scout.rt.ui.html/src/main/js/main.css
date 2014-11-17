@@ -29,7 +29,7 @@ div {
 -moz-user-select: none;
 }
 
-input[type=text] {
+input {
   background-color: @control-background-color;
   padding: 0 @text-field-padding;
   border: 1px solid @border-color;

@@ -16,6 +16,7 @@ import java.util.List;
 public abstract class AbstractDesktop5 extends AbstractDesktop implements IDesktop5 {
 
   private List<Object> m_addOns = new ArrayList<>();
+  public boolean outlineChanging;
 
   @Override
   public List<Object> getAddOns() {

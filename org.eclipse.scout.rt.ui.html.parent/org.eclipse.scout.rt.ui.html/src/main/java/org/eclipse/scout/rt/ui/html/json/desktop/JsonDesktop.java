@@ -22,6 +22,7 @@ import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.Scout5ExtensionUtil;
 import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigation;
 import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigationService;
 import org.eclipse.scout.rt.client.ui.action.IAction;
@@ -35,7 +36,6 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTreeForm;
 import org.eclipse.scout.rt.client.ui.desktop.outline.ISearchOutline;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
-import org.eclipse.scout.rt.ui.html.Scout5ExtensionUtil;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
@@ -281,11 +281,6 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
     String query = event.getData().optString("query");
     try {
       searchOutline.search(query);
-      // TODO AWE: (search) C.GU fragen wie such-ergebnisse ans GUI übermittelt werden event-technisch
-      String status = searchOutline.getSearchStatus();
-      JSONObject json = new JSONObject();
-      JsonObjectUtility.putProperty(json, "status", status);
-      addActionEvent("searchPerformed", json);
     }
     catch (ProcessingException e) {
       throw new JsonException(e);

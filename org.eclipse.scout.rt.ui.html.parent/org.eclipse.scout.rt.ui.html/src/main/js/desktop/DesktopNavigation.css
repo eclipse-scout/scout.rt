@@ -1,3 +1,4 @@
+@search-button-size: @size-desktop-tools;
 
 /* main element */
 
@@ -30,6 +31,12 @@
 
   & .search-status {
     padding: 10px;
+    text-align: right;
+  }
+
+  .navigation-breadcrumb & .search-status {
+    padding-top: 0px;
+    padding-right: 14px;
   }
 }
 
@@ -71,8 +78,8 @@
 .navigation-tab-search-button {
   padding: 0px 10px 0px 10px;
   text-align: center;
-  height: @size-desktop-tools;
-  width: @size-desktop-tools;
+  height: @search-button-size;
+  width: @search-button-size;
   .font-text-large;
   line-height: @size-desktop-tools;
 
@@ -109,8 +116,7 @@
 
 /* navigation header fields */
 
-.navigation-tab-outline-title,
-.navigation-tab-search-field {
+.navigation-tab-outline-title {
   padding: 0px 10px 0px 10px;
   height: @size-desktop-tools;
   white-space: nowrap;
@@ -140,19 +146,30 @@
 
 .navigation-tab-search-field {
   float: left;
-  width: calc(~"100% - 2px" - @size-desktop-tools );
+  border: 1px solid @color-nav;
+  height: 32px;
+  border-radius: 5px;
+  margin: 10px 2px 10px 12px;
+  width: calc(~"100%" - (@search-button-size + 2px + 12x));
+  display: none;
+  background-color: #fefefe;
+  .tab-active > & {
+    display: block;
+  }
 
-  outline:0;
-  border: 0;
-
-  background-color: @color-nav;
-  color: @color-bench;
+   &:focus {
+    border-color: @color-nav;
+    .glow(@color-bench);
+  }
 
   .navigation-breadcrumb & {
     position: absolute;
+    margin-right: 12px;
     top:  @size-desktop-tools;
     left: -100%;
+    width: calc(~"200%" - (12px + 12x));
   }
+
 }
 
 /* navigation outline menu */

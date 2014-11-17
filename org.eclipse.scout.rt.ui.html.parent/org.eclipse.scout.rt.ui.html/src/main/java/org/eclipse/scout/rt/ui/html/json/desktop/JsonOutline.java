@@ -27,9 +27,9 @@ import org.eclipse.scout.rt.ui.html.json.table.JsonTable;
 import org.eclipse.scout.rt.ui.html.json.tree.JsonTree;
 import org.json.JSONObject;
 
-public class JsonOutline extends JsonTree<IOutline> {
+public class JsonOutline<T extends IOutline> extends JsonTree<T> {
 
-  public JsonOutline(IOutline model, IJsonSession jsonSession, String id) {
+  public JsonOutline(T model, IJsonSession jsonSession, String id) {
     super(model, jsonSession, id);
   }
 
