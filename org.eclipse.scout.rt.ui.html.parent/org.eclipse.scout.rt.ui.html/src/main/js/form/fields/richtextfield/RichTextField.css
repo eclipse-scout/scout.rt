@@ -19,7 +19,6 @@
     position: relative;
     left: 1px;
     .font-icon;
-    content: @icon-format-plain;
     font-size: 22px;
     color: @palette-light-gray-0;
     content: @icon;
@@ -160,14 +159,14 @@
   }
 
   & .rich-text-bar-plain {
-    .rich-text-icon(@icon-format-plain);
+    .rich-text-icon(@icon-menu);
   }
 
   & .rich-text-bar-bullet {
-    .rich-text-icon(@icon-format-bullet);
+    .rich-text-icon(@icon-list-ul);
   }
 
   & .rich-text-bar-number {
-    .rich-text-icon(@icon-format-number);
+    .rich-text-icon(@icon-list-ol);
   }
 }

@@ -51,11 +51,11 @@
   border-right: 1px solid transparent;
 
   &.sort-desc:after {
-    .sort-icon('\2193');
+    .sort-icon(@icon-arial-long-arrow-down);
   }
 
   &.sort-asc:after {
-    .sort-icon('\2191')
+    .sort-icon(@icon-arial-long-arrow-up)
   }
 
   &:hover, &.header-move{
