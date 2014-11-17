@@ -49,10 +49,16 @@
       line-height: 20px;
     }
 
-    &::selection, & *::selection {
-      background: @selection-background;
-      color: @selection-color;
+    &::selection, & *::selection
+    {
+      .selection();
     }
+
+    &::-moz-selection, & *::-moz-selection
+    {
+      .selection();
+    }
+
   }
 
   & ol {

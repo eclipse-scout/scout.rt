@@ -20,6 +20,11 @@
   transform: @args;
 }
 
+.selection() {
+    background: @selection-background;
+    color: @selection-color;
+}
+
 .overlay(@left: 0px, @top: 0px, @diffW: 0px, @diffH: 0px) {
   position: absolute;
   content: '';

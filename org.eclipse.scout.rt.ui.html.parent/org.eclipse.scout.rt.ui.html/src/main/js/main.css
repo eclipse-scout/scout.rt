@@ -54,10 +54,14 @@ input[type=text] {
     .glow(@color-error);
   }
 
-  &::selection {
-    background: @selection-background;
-    color: @selection-color;
+  &::selection{
+    .selection();
   }
+
+  &::-moz-selection{
+    .selection();
+  }
+
 }
 
 textarea {
