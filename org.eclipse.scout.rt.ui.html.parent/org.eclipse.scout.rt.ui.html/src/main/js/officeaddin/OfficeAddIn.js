@@ -14,7 +14,7 @@ scout.OfficeAddIn.prototype._render = function($parent) {
   this._notImplementedMessage = JSON.stringify({
     'op' : '0',
     'status' : 'error',
-    'message' : 'Office is not attached'
+    'message' : 'ERR-9000 Office is not attached'
   });
 };
 
