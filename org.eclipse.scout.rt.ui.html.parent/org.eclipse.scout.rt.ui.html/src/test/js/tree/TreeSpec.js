@@ -274,6 +274,111 @@ describe("Tree", function() {
 
   describe("onModelAction", function() {
 
+    describe("nodesInserted event", function() {
+      var model;
+      var tree;
+      var node0;
+      var node1;
+      var node2;
+
+      function createNodesInsertedEvent(model, nodes, commonParentNodeId) {
+        return {
+          id: model.id,
+          commonParentNodeId: commonParentNodeId,
+          nodes: nodes,
+          type: 'nodesInserted'
+        };
+      }
+
+      beforeEach(function() {
+        model = createModelFixture(3, 1, true);
+        tree = createTree(model);
+        node0 = model.nodes[0];
+        node1 = model.nodes[1];
+        node2 = model.nodes[2];
+      });
+
+      describe("inserting a child", function() {
+
+        it("updates model", function() {
+          var newNode0Child3 = createModelNode('0_3', 'newNode0Child3');
+          expect(tree.nodes.length).toBe(3);
+          expect(Object.keys(tree._nodeMap).length).toBe(12);
+
+          var message = {
+            events: [createNodesInsertedEvent(model, [newNode0Child3], node0.id)]
+          };
+          session._processSuccessResponse(message);
+
+          expect(node0.childNodes.length).toBe(4);
+          expect(node0.childNodes[3].text).toBe(newNode0Child3.text);
+          expect(Object.keys(tree._nodeMap).length).toBe(13);
+        });
+
+        it("updates html document if parent is expanded", function() {
+          tree.render(session.$entryPoint);
+
+          var newNode0Child3 = createModelNode('0_3', 'newNode0Child3');
+          expect(findAllNodes(tree).length).toBe(12);
+
+          var message = {
+            events: [createNodesInsertedEvent(model, [newNode0Child3], node0.id)]
+          };
+          session._processSuccessResponse(message);
+
+          expect(findAllNodes(tree).length).toBe(13);
+          expect(tree._findNodeById(node0.childNodes[3].id).text()).toBe(newNode0Child3.text);
+        });
+
+        it("only updates the model if parent is collapsed", function() {
+          node0.expanded = false;
+          tree.render(session.$entryPoint);
+
+          var newNode0Child3 = createModelNode('0_3', 'newNode0Child3');
+          expect(findAllNodes(tree).length).toBe(9);
+
+          var message = {
+            events: [createNodesInsertedEvent(model, [newNode0Child3], node0.id)]
+          };
+          session._processSuccessResponse(message);
+
+          //Check that the model was updated correctly
+          expect(node0.childNodes.length).toBe(4);
+          expect(node0.childNodes[3].text).toBe(newNode0Child3.text);
+          expect(Object.keys(tree._nodeMap).length).toBe(13);
+
+          //Check that no dom manipulation happened
+          expect(findAllNodes(tree).length).toBe(9);
+          expect(tree._findNodeById(node0.childNodes[3].id).length).toBe(0);
+        });
+
+        it("expands the parent if parent.expanded = true and the new inserted nodes are the first child nodes", function() {
+          model = createModelFixture(3, 0, true);
+          tree = createTree(model);
+          node0 = model.nodes[0];
+          node1 = model.nodes[1];
+          node2 = model.nodes[2];
+          tree.render(session.$entryPoint);
+
+          var newNode0Child3 = createModelNode('0_3', 'newNode0Child3');
+          var $node0 = tree._findNodeById(node0.id);
+          expect($node0).not.toHaveClass('expanded');
+          expect(findAllNodes(tree).length).toBe(3);
+
+          var message = {
+            events: [createNodesInsertedEvent(model, [newNode0Child3], node0.id)]
+          };
+          session._processSuccessResponse(message);
+
+          expect(findAllNodes(tree).length).toBe(4);
+          expect(tree._findNodeById(node0.childNodes[0].id).text()).toBe(newNode0Child3.text);
+          expect($node0).toHaveClass('expanded');
+        });
+
+      });
+
+    });
+
     describe("nodesDeleted event", function() {
       var model;
       var tree;

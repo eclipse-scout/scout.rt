@@ -234,6 +234,13 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
 
   protected void handleModelNodeChanged(ITreeNode modelNode) {
     JSONObject jsonEvent = new JSONObject();
+    String nodeId = m_treeNodeIds.get(modelNode);
+    if (nodeId == null) {
+      //Don't send events for not yet created nodes
+      //FIXME CGU This is actually a scout model bug
+      return;
+    }
+
     putProperty(jsonEvent, PROP_NODE_ID, getOrCreateNodeId(modelNode));
     putCellProperties(jsonEvent, modelNode.getCell());
     addActionEvent(EVENT_NODE_CHANGED, jsonEvent);
