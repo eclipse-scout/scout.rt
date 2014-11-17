@@ -7,22 +7,26 @@ P2 Navigation in Forms: in Forms ein zusätzliches Item als Button hervorheben (
   klicken zu müssen
   --> am UI Meeting besprechen (Vorschläge gemalt)
 
+Not implemented ausblenden // % Texte
+
 [CGU]
+P1 Globale Suche: wie Design-Vorschlag, Baum mit Fake-Suchresultaten anzeigen
+
 Telefon-Form: anzeigen, verpasste Anrufe, Steuerung (an-/abmelden), gerne mit Telefonbuch
 
 Such-Forms schöner
 
+
 [CRU]
+P2 Table-Header: ganz feiner Pfeil wie in Excel ausprobieren, keine Farben für Header-Text
+
 
 ===================================
  BACKLOG
 -----------------------------------
-
-P1 Globale Suche: wie Design-Vorschlag, Baum mit Fake-Suchresultaten anzeigen
+P1 Dashboard / Imagefield
 
 P2 Navigation im Tree überdenken. Was ist wenn es viele Elemente hat? Braucht es "Alle anzeigen"? Hypothese: unter 10 immer alle anzeigen.
-
-P2 Table-Header: ganz feiner Pfeil wie in Excel ausprobieren, keine Farben für Header-Text
 
 P3 Animation: im Tree bei Wechsel zwischen Search und Views
 
@@ -45,7 +49,6 @@ P3 Menüs: sollen neu auf mousedown reagieren und nicht bei mouseup
 
 TableField: Tab-Reihenfolge ändern, Menüs sollen tabbable sein. Fokusrahmen um Tabelle weg. Selektion grau, wenn nicht fokussiert.
 
-Table-Menü bündig mit Table-Header
 
 ===================================
  DONE
@@ -66,7 +69,7 @@ AWE Desktop-Tabs: 2-zeilig gut, 2te Zeile evtl. grau machen? V-Align top, nicht 
     2te Zeile, andere Farbe: nicht umgesetzt -> sieht unruhig aus.
 AWE Menü in Top-Level Desktop-Toolbar soll auch bis "nach oben gehen" und den gleichen Abstand haben wie Tool-Forms
 AWE Scrollbars: für UGM JS-Scrollbars einschalten + Event-Handling in Smartfield-Popup fixen
-   
+
 
 CGU TableField: row-height === logicalGridHeight (text-field)?
 CGU Table: Row-Text nicht genau zentriert
@@ -77,6 +80,8 @@ CGU Stern durch Teilen-Icon ersetzen
 CGU Tree: Pfeil/-Text, vertikale Ausrichtung korrigieren
 CGU MessageBox: Nur Fokus-Farbe, kein Default-Button. Default-Button ist initial fokussiert.
 CGU Fokus-Farbe: überall grün
+CGU Table-Menü bündig mit Table-Header
+
 
 CRU Ausprobieren: Dickerer top-border, 2 oder 3 px oben an Table-Controls
 CRU P1 Rechenfunktionen bei Numberfield

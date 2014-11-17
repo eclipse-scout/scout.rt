@@ -9,7 +9,7 @@
   color: @color-bench;
 }
 
-.navigation-header{
+.navigation-header {
   width: 100%;
   height: @size-desktop-tools;
   .font-text-large;
@@ -19,7 +19,7 @@
   }
 }
 
-.navigation-container{
+.navigation-container {
   width: 100%;
   height: calc(~"100%" - @size-desktop-tools);
   top: @size-desktop-tools;
@@ -33,7 +33,7 @@
   }
 }
 
-.navigation-splitter-vertical{
+.navigation-splitter-vertical {
   position: absolute;
   top: 0px;
   right: -8px;
@@ -135,7 +135,7 @@
 }
 
 .navigation-tab-outline-title {
-  min-width: @size-desktop-breadcrumb - 2 * @size-desktop-tools;
+  min-width: 190px - 2 * @size-desktop-tools;
 }
 
 .navigation-tab-search-field {

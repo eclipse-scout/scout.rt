@@ -48,10 +48,10 @@
 
 .taskbar-tab-item,
 .taskbar-tool-item {
-  vertical-align:top;
+  vertical-align: top;
   display: inline-block;
   height: @size-desktop-tools;
-  padding: 6px 20px 0px 20px;
+  padding: 6px 20px 0 20px;
 
   cursor: pointer;
   background-color: @color-bench-light;
@@ -92,7 +92,7 @@
 
 .taskbar-tab-item {
   border-right: 1px solid @color-bench-light-border;
-  width:220px;
+  width: 220px;
 }
 
 .taskbar-tool-item {

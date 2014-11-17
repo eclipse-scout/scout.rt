@@ -6,7 +6,7 @@
   .font-icon;
   display: inline-block;
   font-size: 22px;
-  line-height: @size-desktop-menu - 1px;
+  line-height: 29px;
   content: @icon;
   color: @icon-color;
   vertical-align: -3px;
@@ -66,7 +66,7 @@
   cursor: pointer;
 
   &:not(.last) {
-    margin-right:14px;
+    margin-right: @menu-item-margin-right;
   }
 
   &.default-button {
@@ -143,10 +143,15 @@
    .sub-menu-icon;
   }
 
-}
+  &.taskbar {
+    padding: 6px 0;
+    /* TODO AWE: (menu) this margin property is a hack for UGM. We must treat and style toolbar-item
+     * and menu-item in the taskbar the same way. Additionally we must also use Popup.js to display
+     * tool-forms.
+     */
+    margin-left: 20px;
+  }
 
-.taskbar-tools .menu-item {
-  padding-top: 6px;
 }
 
 .menu-right {
