@@ -18,6 +18,7 @@ import java.util.Map;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 
 // TODO AWE/CGU: (scout) siehe Desktop von Widget-App. Reflection Hack entfernen wenn
@@ -59,8 +60,8 @@ public final class Scout5ExtensionUtil {
   public static boolean IDesktop_isOutlineChanging(IDesktop desktop) {
     Field outlineChangingField;
     try {
-      //FIXME CGU does not work
-      outlineChangingField = desktop.getClass().getDeclaredField("m_outlineChanging");
+      outlineChangingField = AbstractDesktop.class.getDeclaredField("m_outlineChanging");
+      outlineChangingField.setAccessible(true);
       return (boolean) outlineChangingField.get(desktop);
     }
     catch (Exception e) {

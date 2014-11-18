@@ -121,21 +121,43 @@ scout.DesktopNavigation.prototype._createSearchTab = function() {
   this.$queryField = $('<input>')
     .addClass('navigation-tab-search-field')
     .placeholder(scout.texts.get('searchFor'))
+    .on('input', this._onQueryFieldInput.bind(this))
+    .on('keypress', this._onQueryFieldKeyPress.bind(this))
     .appendTo($tab);
 
   // create button
   $tab.appendDIV('navigation-tab-search-button')
-    .on('click', function() {
-      this.session.send('search', this.desktop.id, {
-        'query': this.$queryField.val()
-      });
-    }.bind(this));
+    .on('click', this._onSearchButtonClick.bind(this));
 
   return $tab;
 };
 
 scout.DesktopNavigation.prototype.renderSearchQuery = function(searchQuery) {
   this.$queryField.val(searchQuery);
+  this.$queryField[0].select();
+};
+
+scout.DesktopNavigation.prototype.performSearch  = function(query) {
+  this.session.send('search', this.desktop.id, {
+    'query': this.desktop.searchOutline.searchQuery
+  });
+};
+
+scout.DesktopNavigation.prototype._onSearchButtonClick = function(event) {
+  if (this.activeTab === this.searchTab) {
+    this.performSearch();
+  }
+};
+
+scout.DesktopNavigation.prototype._onQueryFieldInput = function(event) {
+  //Store locally so that the value persists when changing the outline without performing the search
+  this.desktop.searchOutline.searchQuery = this.$queryField.val();
+};
+
+scout.DesktopNavigation.prototype._onQueryFieldKeyPress  = function(event) {
+  if (event.which === scout.keys.ENTER) {
+    this.performSearch();
+  }
 };
 
 // tab state and container handling
@@ -171,6 +193,7 @@ scout.DesktopNavigation.prototype.onOutlineChanged = function(outline) {
     this.previousOutline = this.outline;
 
     this._setActiveTab(this.searchTab);
+    this.$queryField.focus();
   } else {
     this._setActiveTab(this.outlineTab);
   }
