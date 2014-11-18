@@ -25,6 +25,12 @@ public class JsonImageField<T extends IImageField> extends JsonFormField<T> {
         return getModel().getImageId();
       }
     });
+    putJsonProperty(new JsonProperty<T>(IImageField.PROP_SCROLL_BAR_ENABLED, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isScrollBarEnabled();
+      }
+    });
 
   }
 }

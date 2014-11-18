@@ -1,12 +1,25 @@
 scout.ImageField = function() {
   scout.ImageField.parent.call(this);
+  //FIXME CGU viewport is the wrong name -> refactor every viewport occurrence (maybe $content?)
+  this._$viewport;
 };
 scout.inherits(scout.ImageField, scout.FormField);
 
 scout.ImageField.prototype._render = function($parent) {
-  var $fieldContainer = $('<div>');
-  var $field = $('<img>')
-    .appendTo($fieldContainer);
+  var $fieldContainer, $field;
+
+  //Create div to avoid resizing of the <img>
+  $fieldContainer = $('<div>').css('overflow', 'hidden');
+
+  if (this.scrollBarEnabled) {
+    this._$viewport = scout.Scrollbar2.install($fieldContainer, {
+      invertColors: true
+    });
+  } else {
+    this._$viewport = $fieldContainer;
+  }
+
+  $field = $('<img>').appendTo(this._$viewport);
 
   this.addContainer($parent, 'image-field');
   this.addLabel();
@@ -22,5 +35,5 @@ scout.ImageField.prototype._renderProperties = function() {
 
 scout.ImageField.prototype._renderImageId = function(imageId) {
   this.$field.attr('src', imageId);
+  this.$field.on('load', scout.Scrollbar2.update.bind(this, this._$viewport));
 };
-

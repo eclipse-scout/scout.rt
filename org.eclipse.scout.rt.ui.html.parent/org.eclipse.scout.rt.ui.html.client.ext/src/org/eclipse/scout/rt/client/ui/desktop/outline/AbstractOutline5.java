@@ -29,6 +29,8 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.extension.client.ui.desktop.outline.AbstractExtensibleOutline;
+import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
+import org.eclipse.scout.service.SERVICES;
 
 public class AbstractOutline5 extends AbstractExtensibleOutline implements IOutline5 {
   private IForm m_defaultDetailForm;
@@ -36,6 +38,19 @@ public class AbstractOutline5 extends AbstractExtensibleOutline implements IOutl
   @Override
   protected IPageChangeStrategy createPageChangeStrategy() {
     return new DefaultPageChangeStrategy5();
+  }
+
+  @Override
+  protected void initConfig() {
+    super.initConfig();
+
+    try {
+      ensureDefaultDetailFormCreated();
+      ensureDefaultDetailFormStarted();
+    }
+    catch (ProcessingException e) {
+      SERVICES.getService(IExceptionHandlerService.class);
+    }
   }
 
   @Override
@@ -49,16 +64,8 @@ public class AbstractOutline5 extends AbstractExtensibleOutline implements IOutl
 
   @Override
   public void selectNodes(Collection<? extends ITreeNode> nodes, boolean append) {
-    //Prevent selecting the first node when changing the outline
     if (!getConfiguredSelectFirstPageOnOutlineChange() && Scout5ExtensionUtil.IDesktop_isOutlineChanging(ClientJob.getCurrentSession(AbstractClientSession.class).getDesktop())) {
-      //FIXME CGU make it work
-//      try {
-//        execCreateDefaultDetailForm();
-//        ensureDefaultDetailFormStarted();
-//      }
-//      catch (ProcessingException e) {
-//        e.printStackTrace();
-//      }
+      //Prevent selecting the first node when changing the outline
       return;
     }
     super.selectNodes(nodes, append);
