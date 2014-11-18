@@ -7,7 +7,6 @@ P2 Navigation in Forms: in Forms ein zusätzliches Item als Button hervorheben (
   klicken zu müssen
   --> am UI Meeting besprechen (Vorschläge gemalt)
 
-Not implemented ausblenden // % Texte
 
 [CGU]
 P1 Globale Suche: wie Design-Vorschlag, Baum mit Fake-Suchresultaten anzeigen
@@ -69,6 +68,7 @@ AWE Desktop-Tabs: 2-zeilig gut, 2te Zeile evtl. grau machen? V-Align top, nicht 
     2te Zeile, andere Farbe: nicht umgesetzt -> sieht unruhig aus.
 AWE Menü in Top-Level Desktop-Toolbar soll auch bis "nach oben gehen" und den gleichen Abstand haben wie Tool-Forms
 AWE Scrollbars: für UGM JS-Scrollbars einschalten + Event-Handling in Smartfield-Popup fixen
+AWE Not implemented ausblenden / % Texte
 
 
 CGU TableField: row-height === logicalGridHeight (text-field)?
