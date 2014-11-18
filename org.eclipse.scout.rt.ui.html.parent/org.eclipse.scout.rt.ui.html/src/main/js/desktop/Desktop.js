@@ -76,7 +76,9 @@ scout.Desktop.prototype._render = function($parent) {
     action.menuStyle = 'taskbar';
     action.render(this.$toolbar);
   }
-  action.$container.addClass('last');
+  if(action){
+    action.$container.addClass('last');
+  }
 
   this.navigation.onOutlineChanged(this.outline);
 
