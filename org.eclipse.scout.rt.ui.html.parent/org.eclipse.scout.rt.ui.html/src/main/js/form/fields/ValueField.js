@@ -1,5 +1,5 @@
 scout.ValueField = function() {
-  scout.FormField.parent.call(this);
+  scout.ValueField.parent.call(this);
 };
 scout.inherits(scout.ValueField, scout.FormField);
 

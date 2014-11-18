@@ -49,8 +49,16 @@ public class AbstractOutline5 extends AbstractExtensibleOutline implements IOutl
 
   @Override
   public void selectNodes(Collection<? extends ITreeNode> nodes, boolean append) {
+    //Prevent selecting the first node when changing the outline
     if (!getConfiguredSelectFirstPageOnOutlineChange() && Scout5ExtensionUtil.IDesktop_isOutlineChanging(ClientJob.getCurrentSession(AbstractClientSession.class).getDesktop())) {
-      //Prevent selecting the first node when changing the outline
+      //FIXME CGU make it work
+//      try {
+//        execCreateDefaultDetailForm();
+//        ensureDefaultDetailFormStarted();
+//      }
+//      catch (ProcessingException e) {
+//        e.printStackTrace();
+//      }
       return;
     }
     super.selectNodes(nodes, append);

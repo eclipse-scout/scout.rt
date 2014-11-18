@@ -265,12 +265,12 @@ scout.Desktop.prototype.updateOutlineTab = function(content, title, subtitle) {
     var selectedNodes = this.outline.getSelectedModelNodes();
     if (selectedNodes.length > 0) {
       content.staticMenus = [new scout.OutlineNavigateUpMenu(this.outline, selectedNodes[0])];
-      content.render(this.$bench);
-
-      // FIXME CGU: maybe include in render?
-      content.htmlComp.layout();
-      content.htmlComp.validateRoot = true;
     }
+    content.render(this.$bench);
+
+    // FIXME CGU: maybe include in render?
+    content.htmlComp.layout();
+    content.htmlComp.validateRoot = true;
   }
 };
 

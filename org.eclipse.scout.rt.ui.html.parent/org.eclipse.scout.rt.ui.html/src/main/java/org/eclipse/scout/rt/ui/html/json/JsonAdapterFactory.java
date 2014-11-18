@@ -37,6 +37,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.checkbox.ICheckBox;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
+import org.eclipse.scout.rt.client.ui.form.fields.imagebox.IImageField;
 import org.eclipse.scout.rt.client.ui.form.fields.labelfield.ILabelField;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.INumberField;
 import org.eclipse.scout.rt.client.ui.form.fields.richtextfield.IRichTextField;
@@ -62,6 +63,7 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.button.JsonButton;
 import org.eclipse.scout.rt.ui.html.json.form.fields.checkbox.JsonCheckBoxField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.groupbox.JsonGroupBox;
+import org.eclipse.scout.rt.ui.html.json.form.fields.imagefield.JsonImageField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.labelfield.JsonLabelField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.numberfield.JsonNumberField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.richtextfield.JsonRichTextField;
@@ -115,6 +117,9 @@ public class JsonAdapterFactory {
     }
     else if (model instanceof ILabelField) {
       return new JsonLabelField((ILabelField) model, session, id);
+    }
+    else if (model instanceof IImageField) {
+      return new JsonImageField((IImageField) model, session, id);
     }
     else if (model instanceof ITableField<?>) {
       return new JsonTableField((ITableField) model, session, id);

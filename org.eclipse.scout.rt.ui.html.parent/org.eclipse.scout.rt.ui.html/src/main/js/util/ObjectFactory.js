@@ -172,6 +172,11 @@ scout.defaultObjectFactories = [{
     return new scout.LabelField();
   }
 }, {
+  objectType: 'ImageField',
+  create: function() {
+    return new scout.ImageField();
+  }
+}, {
   objectType: 'NumberField',
   create: function() {
     return new scout.NumberField();
