@@ -196,12 +196,12 @@ public class ClusterSynchronizationService extends AbstractService implements IC
       IService definingService = SERVICES.getService(contributingService.getDefiningServiceInterface());
       if (contributingService == definingService) {
         if (!currentListeners.contains(contributingService)) {
-          addListener(contributingService);
+          addListener(contributingService.getClusterNotificationListener());
         }
       }
       else {
         if (currentListeners.contains(contributingService)) {
-          removeListener(contributingService);
+          removeListener(contributingService.getClusterNotificationListener());
         }
       }
     }

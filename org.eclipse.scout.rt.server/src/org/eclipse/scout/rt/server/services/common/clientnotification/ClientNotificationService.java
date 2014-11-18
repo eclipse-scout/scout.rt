@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.server.services.common.clientnotification.internal.C
 import org.eclipse.scout.rt.server.services.common.clientnotification.internal.ClientNotificationQueueElement;
 import org.eclipse.scout.rt.server.services.common.clientnotification.internal.ConsumableClientNotificationQueueElement;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterNotification;
+import org.eclipse.scout.rt.server.services.common.clustersync.IClusterNotificationListener;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterNotificationListenerService;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterNotificationMessage;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterSynchronizationService;
@@ -133,14 +134,6 @@ public class ClientNotificationService extends AbstractService implements IClien
     return IClientNotificationService.class;
   }
 
-  @Override
-  public void onNotification(IClusterNotificationMessage notification) throws ProcessingException {
-    if (accept(notification.getNotification())) {
-      ClientNotificationClusterNotification n = (ClientNotificationClusterNotification) notification.getNotification();
-      SERVICES.getService(IClientNotificationService.class).putNonClusterDistributedNotification(n.getQueueElement().getNotification(), n.getQueueElement().getFilter());
-    }
-  }
-
   protected boolean accept(IClusterNotification notification) {
     return (notification instanceof ClientNotificationClusterNotification) &&
         ((ClientNotificationClusterNotification) notification).getQueueElement().isActive();
@@ -199,5 +192,19 @@ public class ClientNotificationService extends AbstractService implements IClien
     @Override
     public void release() {
     }
+  }
+
+  @Override
+  public IClusterNotificationListener getClusterNotificationListener() {
+    return new IClusterNotificationListener() {
+
+      @Override
+      public void onNotification(IClusterNotificationMessage message) throws ProcessingException {
+        if (accept(message.getNotification())) {
+          ClientNotificationClusterNotification n = (ClientNotificationClusterNotification) message.getNotification();
+          SERVICES.getService(IClientNotificationService.class).putNonClusterDistributedNotification(n.getQueueElement().getNotification(), n.getQueueElement().getFilter());
+        }
+      }
+    };
   }
 }

@@ -28,6 +28,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterNotification;
+import org.eclipse.scout.rt.server.services.common.clustersync.IClusterNotificationListener;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterNotificationListenerService;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterNotificationMessage;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterSynchronizationService;
@@ -276,16 +277,22 @@ public class AbstractAccessControlService extends AbstractService implements IAc
   }
 
   @Override
-  public void onNotification(IClusterNotificationMessage notification) {
-    IClusterNotification clusterNotification = notification.getNotification();
-    if ((clusterNotification instanceof AccessControlCacheChangedClusterNotification)) {
-      AccessControlCacheChangedClusterNotification n = (AccessControlCacheChangedClusterNotification) clusterNotification;
-      if (n.getUserIds().isEmpty()) {
-        clearCacheNoFire();
+  public IClusterNotificationListener getClusterNotificationListener() {
+    return new IClusterNotificationListener() {
+
+      @Override
+      public void onNotification(IClusterNotificationMessage message) throws ProcessingException {
+        IClusterNotification clusterNotification = message.getNotification();
+        if ((clusterNotification instanceof AccessControlCacheChangedClusterNotification)) {
+          AccessControlCacheChangedClusterNotification n = (AccessControlCacheChangedClusterNotification) clusterNotification;
+          if (n.getUserIds().isEmpty()) {
+            clearCacheNoFire();
+          }
+          else {
+            clearCacheOfUserIdsNoFire(n.getUserIds());
+          }
+        }
       }
-      else {
-        clearCacheOfUserIdsNoFire(n.getUserIds());
-      }
-    }
+    };
   }
 }

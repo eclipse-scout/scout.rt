@@ -28,6 +28,7 @@ import org.eclipse.scout.commons.osgi.BundleClassDescriptor;
 import org.eclipse.scout.commons.runtime.BundleBrowser;
 import org.eclipse.scout.rt.server.internal.Activator;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterNotification;
+import org.eclipse.scout.rt.server.services.common.clustersync.IClusterNotificationListener;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterNotificationListenerService;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterNotificationMessage;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterSynchronizationService;
@@ -244,7 +245,7 @@ public class CodeService extends AbstractService implements ICodeService, IClust
    * Checks whether the given bundle should be scanned for code type classes. The default implementations accepts
    * all bundles that are not fragments (because classes from fragments are automatically read when browsing the host
    * bundle).
-   * 
+   *
    * @return Returns <code>true</code> if the given bundle meets the requirements to be scanned for code type classes.
    *         <code>false</code> otherwise.
    */
@@ -256,7 +257,7 @@ public class CodeService extends AbstractService implements ICodeService, IClust
    * Checks whether the given class name is a potential code type class. Class names that do not meet the
    * requirements of this method are not considered further, i.e. the "expensive" class instantiation is skipped.
    * The default implementation checks whether the class name contains <code>"CodeType"</code>.
-   * 
+   *
    * @param bundle
    *          The class's hosting bundle
    * @param className
@@ -278,7 +279,7 @@ public class CodeService extends AbstractService implements ICodeService, IClust
    * <li>not <code>abstract</code>
    * <li>the class's simple name does not start with <code>"Abstract"</code> (convenience check)
    * </ul>
-   * 
+   *
    * @param bundle
    *          The class's hosting bundle
    * @param c
@@ -303,11 +304,16 @@ public class CodeService extends AbstractService implements ICodeService, IClust
   }
 
   @Override
-  public void onNotification(IClusterNotificationMessage notification) throws ProcessingException {
-    IClusterNotification clusterNotification = notification.getNotification();
-    if (clusterNotification instanceof UnloadCodeTypeCacheClusterNotification) {
-      UnloadCodeTypeCacheClusterNotification n = (UnloadCodeTypeCacheClusterNotification) clusterNotification;
-      reloadCodeTypesNoFire(n.getTypes());
-    }
+  public IClusterNotificationListener getClusterNotificationListener() {
+    return new IClusterNotificationListener() {
+      @Override
+      public void onNotification(IClusterNotificationMessage message) throws ProcessingException {
+        IClusterNotification clusterNotification = message.getNotification();
+        if (clusterNotification instanceof UnloadCodeTypeCacheClusterNotification) {
+          UnloadCodeTypeCacheClusterNotification n = (UnloadCodeTypeCacheClusterNotification) clusterNotification;
+          reloadCodeTypesNoFire(n.getTypes());
+        }
+      }
+    };
   }
 }
