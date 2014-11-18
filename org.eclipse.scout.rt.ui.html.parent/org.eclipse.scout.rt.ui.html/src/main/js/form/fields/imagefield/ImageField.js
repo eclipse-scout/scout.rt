@@ -4,11 +4,11 @@ scout.ImageField = function() {
 scout.inherits(scout.ImageField, scout.FormField);
 
 scout.ImageField.prototype._render = function($parent) {
-  var $fieldContainer, $field;
+  var $fieldContainer = $('<div>');
+  var $field = $('<img>')
+    .appendTo($fieldContainer);
 
-  $fieldContainer = $('<div>');
-  $field = $('<img>').appendTo($fieldContainer);
-  this.addContainer($parent, 'form-field');
+  this.addContainer($parent, 'image-field');
   this.addLabel();
   this.addField($field, $fieldContainer);
   this.addStatus();

@@ -46,6 +46,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
+import org.eclipse.scout.rt.client.ui.form.fields.tagcloudfield.ITagCloudField;
 import org.eclipse.scout.rt.client.ui.form.fields.treefield.ITreeField;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.shared.data.model.IDataModel;
@@ -73,6 +74,7 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.stringfield.JsonStringField
 import org.eclipse.scout.rt.ui.html.json.form.fields.tabbox.JsonTabBox;
 import org.eclipse.scout.rt.ui.html.json.form.fields.tabbox.JsonTabItem;
 import org.eclipse.scout.rt.ui.html.json.form.fields.tablefield.JsonTableField;
+import org.eclipse.scout.rt.ui.html.json.form.fields.tagcloudfield.JsonTagCloudField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.treefield.JsonTreeField;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonMenu;
@@ -132,6 +134,9 @@ public class JsonAdapterFactory {
     }
     else if (model instanceof IRichTextField) {
       return new JsonRichTextField((IRichTextField) model, session, id);
+    }
+    else if (model instanceof ITagCloudField) {
+      return new JsonTagCloudField((ITagCloudField) model, session, id);
     }
     else if (model instanceof IStringField) {
       return new JsonStringField((IStringField) model, session, id);
