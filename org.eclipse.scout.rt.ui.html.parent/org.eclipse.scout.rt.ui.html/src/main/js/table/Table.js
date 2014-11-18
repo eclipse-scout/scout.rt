@@ -425,8 +425,7 @@ scout.Table.prototype._drawData = function(startRow) {
       var popup = new scout.Popup();
       popup.render();
       scout.menus.appendMenuItems(popup, that._getRowMenus($selectedRows, false));
-      popup.setLocation(new scout.Point(x, y - 40)); // TODO AWE: (menu) check offset, remove hacky magic number
-      // seems to be the height of the selected row.
+      popup.setLocation(new scout.Point(x, y));
     }
   }
 
