@@ -31,7 +31,11 @@
 
   & .search-status {
     padding: 10px;
+    padding-left: 15px;
     text-align: right;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 
   .navigation-breadcrumb & .search-status {

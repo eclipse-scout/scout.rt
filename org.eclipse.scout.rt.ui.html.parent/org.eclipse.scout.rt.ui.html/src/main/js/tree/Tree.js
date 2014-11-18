@@ -126,7 +126,6 @@ scout.Tree.prototype._renderExpansion = function(node, $node, expanded) {
   if (expanded) {
     this._addNodes(node.childNodes, $node);
     this._updateItemPath();
-    scout.Scrollbar2.update(this._$viewport); // TODO AWE: (scrollbar) trigger resize event instead
 
     if (this._breadcrumb) {
       $node.addClass('expanded');
@@ -145,7 +144,6 @@ scout.Tree.prototype._renderExpansion = function(node, $node, expanded) {
         var h = $newNodes.height() * $newNodes.length;
         var removeContainer = function() {
           $(this).replaceWith($(this).contents());
-          scout.Scrollbar2.update(that._$viewport);
         };
 
         $wrapper.css('height', 0).
@@ -393,9 +391,12 @@ scout.Tree.prototype._onNodeChanged = function(nodeId, cell) {
  */
 scout.Tree.prototype._removeNodes = function(nodes, parentNodeId, $parentNode) {
   var i, $node, node, childNodes;
+  if (nodes.length === 0) {
+    return;
+  }
 
-  //Find parentNode to increase search performance. If there is only one child there is no benefit by searching its parent first.
-  if (!$parentNode && parentNodeId >= 0 && nodes.length > 1) {
+  //Find parentNode to increase search performance and to reset expansion state
+  if (!$parentNode && parentNodeId >= 0) {
     $parentNode = this._findNodeById(parentNodeId);
   }
 
@@ -409,13 +410,25 @@ scout.Tree.prototype._removeNodes = function(nodes, parentNodeId, $parentNode) {
 
     $node.remove();
   }
+
+
+  //If every child node was deleted mark node as collapsed (independent of the model state)
+  //--> makes it consistent with addNodes and expand (expansion is not allowed if there are no child nodes)
+  if ($parentNode) {
+    childNodes = $parentNode.data('node').childNodes;
+    if (!childNodes || childNodes.length === 0) {
+      $parentNode.removeClass('expanded');
+    }
+  }
+
+  scout.Scrollbar2.update(this._$viewport);
 };
 
 scout.Tree.prototype._addNodes = function(nodes, $parent) {
   var node, state, level, $node,
     $predecessor = $parent;
 
-  if (!nodes) {
+  if (!nodes || nodes.length === 0) {
     return;
   }
 
@@ -453,6 +466,8 @@ scout.Tree.prototype._addNodes = function(nodes, $parent) {
       $predecessor = $node;
     }
   }
+
+  scout.Scrollbar2.update(this._$viewport);
 
   //return the last created node
   return $node;

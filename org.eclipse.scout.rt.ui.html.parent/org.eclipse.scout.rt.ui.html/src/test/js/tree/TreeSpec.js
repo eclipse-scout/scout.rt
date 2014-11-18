@@ -75,6 +75,57 @@ describe("Tree", function() {
     return tree._$viewport.find('.tree-item');
   }
 
+  function createNodeExpandedEvent(model, nodeId, expanded) {
+    return {
+      id: model.id,
+      nodeId: nodeId,
+      expanded: expanded,
+      type: 'nodeExpanded'
+    };
+  }
+
+  function createNodesSelectedEvent(model, nodeIds) {
+    return {
+      id: model.id,
+      nodeIds: nodeIds,
+      type: 'nodesSelected'
+    };
+  }
+
+  function createNodesInsertedEvent(model, nodes, commonParentNodeId) {
+    return {
+      id: model.id,
+      commonParentNodeId: commonParentNodeId,
+      nodes: nodes,
+      type: 'nodesInserted'
+    };
+  }
+
+  function createNodesDeletedEvent(model, nodeIds, commonParentNodeId) {
+    return {
+      id: model.id,
+      commonParentNodeId: commonParentNodeId,
+      nodeIds: nodeIds,
+      type: 'nodesDeleted'
+    };
+  }
+
+  function createAllNodesDeletedEvent(model, commonParentNodeId) {
+    return {
+      id: model.id,
+      commonParentNodeId: commonParentNodeId,
+      type: 'allNodesDeleted'
+    };
+  }
+
+  function createNodeChangedEvent(model, nodeId) {
+    return {
+      id: model.id,
+      nodeId: nodeId,
+      type: 'nodeChanged'
+    };
+  }
+
   describe("creation", function() {
     it("adds nodes", function() {
 
@@ -281,14 +332,6 @@ describe("Tree", function() {
       var node1;
       var node2;
 
-      function createNodesInsertedEvent(model, nodes, commonParentNodeId) {
-        return {
-          id: model.id,
-          commonParentNodeId: commonParentNodeId,
-          nodes: nodes,
-          type: 'nodesInserted'
-        };
-      }
 
       beforeEach(function() {
         model = createModelFixture(3, 1, true);
@@ -330,51 +373,51 @@ describe("Tree", function() {
           expect(tree._findNodeById(node0.childNodes[3].id).text()).toBe(newNode0Child3.text);
         });
 
-        it("only updates the model if parent is collapsed", function() {
-          node0.expanded = false;
-          tree.render(session.$entryPoint);
+      });
 
-          var newNode0Child3 = createModelNode('0_3', 'newNode0Child3');
-          expect(findAllNodes(tree).length).toBe(9);
+      it("only updates the model if parent is collapsed", function() {
+        node0.expanded = false;
+        tree.render(session.$entryPoint);
 
-          var message = {
-            events: [createNodesInsertedEvent(model, [newNode0Child3], node0.id)]
-          };
-          session._processSuccessResponse(message);
+        var newNode0Child3 = createModelNode('0_3', 'newNode0Child3');
+        expect(findAllNodes(tree).length).toBe(9);
 
-          //Check that the model was updated correctly
-          expect(node0.childNodes.length).toBe(4);
-          expect(node0.childNodes[3].text).toBe(newNode0Child3.text);
-          expect(Object.keys(tree._nodeMap).length).toBe(13);
+        var message = {
+          events: [createNodesInsertedEvent(model, [newNode0Child3], node0.id)]
+        };
+        session._processSuccessResponse(message);
 
-          //Check that no dom manipulation happened
-          expect(findAllNodes(tree).length).toBe(9);
-          expect(tree._findNodeById(node0.childNodes[3].id).length).toBe(0);
-        });
+        //Check that the model was updated correctly
+        expect(node0.childNodes.length).toBe(4);
+        expect(node0.childNodes[3].text).toBe(newNode0Child3.text);
+        expect(Object.keys(tree._nodeMap).length).toBe(13);
 
-        it("expands the parent if parent.expanded = true and the new inserted nodes are the first child nodes", function() {
-          model = createModelFixture(3, 0, true);
-          tree = createTree(model);
-          node0 = model.nodes[0];
-          node1 = model.nodes[1];
-          node2 = model.nodes[2];
-          tree.render(session.$entryPoint);
+        //Check that no dom manipulation happened
+        expect(findAllNodes(tree).length).toBe(9);
+        expect(tree._findNodeById(node0.childNodes[3].id).length).toBe(0);
+      });
 
-          var newNode0Child3 = createModelNode('0_3', 'newNode0Child3');
-          var $node0 = tree._findNodeById(node0.id);
-          expect($node0).not.toHaveClass('expanded');
-          expect(findAllNodes(tree).length).toBe(3);
+      it("expands the parent if parent.expanded = true and the new inserted nodes are the first child nodes", function() {
+        model = createModelFixture(3, 0, true);
+        tree = createTree(model);
+        node0 = model.nodes[0];
+        node1 = model.nodes[1];
+        node2 = model.nodes[2];
+        tree.render(session.$entryPoint);
 
-          var message = {
-            events: [createNodesInsertedEvent(model, [newNode0Child3], node0.id)]
-          };
-          session._processSuccessResponse(message);
+        var newNode0Child3 = createModelNode('0_3', 'newNode0Child3');
+        var $node0 = tree._findNodeById(node0.id);
+        expect($node0).not.toHaveClass('expanded');
+        expect(findAllNodes(tree).length).toBe(3);
 
-          expect(findAllNodes(tree).length).toBe(4);
-          expect(tree._findNodeById(node0.childNodes[0].id).text()).toBe(newNode0Child3.text);
-          expect($node0).toHaveClass('expanded');
-        });
+        var message = {
+          events: [createNodesInsertedEvent(model, [newNode0Child3], node0.id)]
+        };
+        session._processSuccessResponse(message);
 
+        expect(findAllNodes(tree).length).toBe(4);
+        expect(tree._findNodeById(node0.childNodes[0].id).text()).toBe(newNode0Child3.text);
+        expect($node0).toHaveClass('expanded');
       });
 
     });
@@ -385,15 +428,6 @@ describe("Tree", function() {
       var node0;
       var node1;
       var node2;
-
-      function createNodesDeletedEvent(model, nodeIds, commonParentNodeId) {
-        return {
-          id: model.id,
-          commonParentNodeId: commonParentNodeId,
-          nodeIds: nodeIds,
-          type: 'nodesDeleted'
-        };
-      }
 
       beforeEach(function() {
         model = createModelFixture(3, 1, true);
@@ -511,15 +545,6 @@ describe("Tree", function() {
       var node1Child1;
       var node1Child2;
 
-      function createAllNodesDeletedEvent(model, commonParentNodeId) {
-        return {
-          id: model.id,
-          commonParentNodeId: commonParentNodeId,
-          type: 'allNodesDeleted'
-        };
-      }
-
-
       beforeEach(function() {
         model = createModelFixture(3, 1, true);
         tree = createTree(model);
@@ -598,14 +623,6 @@ describe("Tree", function() {
       var child0;
       var grandchild0;
 
-      function createNodesSelectedEvent(model, nodeIds) {
-        return {
-          id: model.id,
-          nodeIds: nodeIds,
-          type: 'nodesSelected'
-        };
-      }
-
       beforeEach(function() {
         model = createModelFixture(3, 3, false);
         tree = createTree(model);
@@ -677,14 +694,6 @@ describe("Tree", function() {
       var node0;
       var child0;
 
-      function createNodeChangedEvent(model, nodeId) {
-        return {
-          id: model.id,
-          nodeId: nodeId,
-          type: 'nodeChanged'
-        };
-      }
-
       beforeEach(function() {
         model = createModelFixture(3, 3, false);
         tree = createTree(model);
@@ -721,6 +730,71 @@ describe("Tree", function() {
         expect($node0.children('.tree-item-control').length).toBe(1);
       });
 
+    });
+
+    describe("multiple events", function() {
+
+      var model;
+      var tree;
+      var node0;
+      var node1;
+      var node2;
+
+
+      beforeEach(function() {
+        model = createModelFixture(3, 1, true);
+        tree = createTree(model);
+        node0 = model.nodes[0];
+        node1 = model.nodes[1];
+        node2 = model.nodes[2];
+      });
+
+      it("handles delete, collapse, insert, expand events correctly", function() {
+        tree.render(session.$entryPoint);
+
+        //Delete child nodes from node0
+        var message = {
+          events: [createAllNodesDeletedEvent(model, node0.id)]
+        };
+        session._processSuccessResponse(message);
+        expect(node0.childNodes.length).toBe(0);
+        expect(findAllNodes(tree).length).toBe(9);
+
+        //Collapse node0
+        var $node0 = tree._findNodeById(node0.id);
+        message = {
+          events: [createNodeExpandedEvent(model, node0.id, false)]
+        };
+        session._processSuccessResponse(message);
+        expect(node0.expanded).toBe(false);
+        expect($node0).not.toHaveClass('expanded');
+
+        //Insert new child node at node0
+        var newNode0Child3 = createModelNode('0_3', 'newNode0Child3');
+        message = {
+          events: [createNodesInsertedEvent(model, [newNode0Child3], node0.id)]
+        };
+        session._processSuccessResponse(message);
+
+        //Model should be updated, html nodes not added because node still is collapsed
+        expect(node0.childNodes.length).toBe(1);
+        expect(node0.childNodes[0].text).toBe(newNode0Child3.text);
+        expect(Object.keys(tree._nodeMap).length).toBe(10);
+        expect(findAllNodes(tree).length).toBe(9); //Still 9 nodes
+
+        //Expand again
+        message = {
+          events: [createNodeExpandedEvent(model, node0.id, true)]
+        };
+        session._processSuccessResponse(message);
+
+        expect(node0.expanded).toBe(true);
+        expect($node0).toHaveClass('expanded');
+
+        //Html nodes should now be added
+        expect(findAllNodes(tree).length).toBe(10);
+        expect(tree._findNodeById(node0.childNodes[0].id).length).toBe(1);
+      });
     });
   });
 });
