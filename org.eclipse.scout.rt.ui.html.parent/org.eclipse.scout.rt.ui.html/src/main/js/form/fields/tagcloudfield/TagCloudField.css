@@ -1,4 +1,28 @@
 .tag-cloud-field {
-  text-align: center;
-  margin-top: 250px;
+  padding: 20px 0px;
+
+  & svg.tag-cloud {
+    width: 100%;
+    height: 100%;
+  }
+
+  & text.tag-text-0 {
+    fill: @palette-bsi-orange;
+  }
+
+  & text.tag-text-1 {
+    fill: @palette-bsi-green;
+  }
+
+  & text.tag-text-2 {
+    fill: @palette-bsi-light-green;
+  }
+
+  & text.tag-text-3 {
+    fill: @palette-dark-gray-4;
+  }
+
+  & text.tag-text-4 {
+    fill: @palette-light-gray-0;
+  }
 }

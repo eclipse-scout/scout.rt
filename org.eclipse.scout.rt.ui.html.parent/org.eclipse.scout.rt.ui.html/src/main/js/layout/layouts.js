@@ -147,7 +147,7 @@ scout.FormFieldLayout.prototype.layout = function($container) {
   containerSize = htmlContainer.getSize()
     .subtract(htmlContainer.getInsets());
 
-  if ($label.isVisible()) {
+  if ($label && $label.isVisible()) {
     scout.graphics.setBounds($label, 0, 0, this.labelWidth, containerSize.height);
     // with this property we achieve "vertical-align:middle" which doesn't work for non-table-cell elements
     $label.css('line-height', containerSize.height + 'px');
