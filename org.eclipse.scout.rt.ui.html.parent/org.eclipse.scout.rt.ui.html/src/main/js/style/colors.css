@@ -32,11 +32,13 @@
 /* ------------------------ */
 /* Global Color Definitions */
 /* ------------------------ */
-@color-nav: #41525E;
-@color-nav-semi: #506678;
+//@color-nav: #41525E;
+//@color-nav-semi: #506678;
 
-//@color-nav: @palette-bsi-dark-green;
-//@color-nav-semi: @palette-bsi-green;
+
+// for UGM;)
+@color-nav: #004A5C;
+@color-nav-semi: #00657D;
 
 @color-nav-select: @palette-white;
 @color-nav-text: @palette-white;

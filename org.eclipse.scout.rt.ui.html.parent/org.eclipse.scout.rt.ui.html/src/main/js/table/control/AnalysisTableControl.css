@@ -121,7 +121,7 @@ text.venn-circle-text {
   top: 20px;
   height: 20px;
   width: 30px;
-  left: 780px;
+  left: 680px;
 
   &:before {
     position: relative;
@@ -142,8 +142,8 @@ text.venn-circle-text {
   position: absolute;
   top: 20px;
   height: 20px;
-  width: calc(50% - 30px);
-  left: 810px;
+  width: ~"calc(100% - 800px)";
+  left: 710px;
 }
 
 .criteria-navigation-item {
@@ -191,8 +191,8 @@ text.venn-circle-text {
   position: absolute;
   top: 45px;
   height: 275px;
-  width: ~"calc(100% - 800px)";
-  left: 780px;
+  width: ~"calc(100% - 700px)";
+  left: 680px;
 }
 
 .criteria-attribute, .criteria-entity {

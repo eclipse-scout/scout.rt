@@ -65,6 +65,9 @@ scout.AnalysisTableControl.prototype._renderContent = function($parent) {
 
   if (this.rootEntity) {
     addCriteria();
+    drawCriteria($criteriaContainer, that.rootEntity);
+    appendMap($criteriaContainer, that.rootEntity.text);
+
   }
 
   // draw buttons
@@ -90,8 +93,6 @@ scout.AnalysisTableControl.prototype._renderContent = function($parent) {
       updateCriteria();
       selectCriteria($div);
       drawVenn();
-      drawCriteria($criteriaContainer, that.rootEntity);
-      appendMap($criteriaContainer, that.rootEntity.text);
     }
   }
 
@@ -310,7 +311,7 @@ scout.AnalysisTableControl.prototype._renderContent = function($parent) {
   }
 
   function searchMap(event) {
-    var $criteriaContainerTest = that.$container.appendDiv('', 'criteria-container');
+    var $criteriaContainerTest = that.$parent.appendDiv('', 'criteria-container');
     drawCriteria($criteriaContainerTest, that.rootEntity, $(event.target).val());
 
     var $oldBoxes = $criteriaContainer.children(),
