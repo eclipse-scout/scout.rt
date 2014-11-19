@@ -33,6 +33,7 @@ import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHa
 import org.eclipse.scout.service.SERVICES;
 
 public abstract class AbstractOutline5 extends AbstractExtensibleOutline implements IOutline5 {
+
   private IForm m_defaultDetailForm;
 
   @Override
@@ -143,5 +144,10 @@ public abstract class AbstractOutline5 extends AbstractExtensibleOutline impleme
       return;
     }
     execStartDefaultDetailForm(getDefaultDetailForm());
+  }
+
+  @Override
+  public void fireOutlineEvent(OutlineEvent event) {
+    fireTreeEventInternal(event);
   }
 }

@@ -10,17 +10,25 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.outline;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
+import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
+import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 
-public interface IOutline5 extends IOutline {
+public class OutlineEvent extends TreeEvent {
 
-  IForm getDefaultDetailForm();
+  /**
+   * A page has changed (for instance visibility of detailForm or detailTable).
+   */
+  public static final int TYPE_PAGE_CHANGED = 1001;
 
-  void ensureDefaultDetailFormCreated() throws ProcessingException;
+  private static final long serialVersionUID = 1L;
 
-  void ensureDefaultDetailFormStarted() throws ProcessingException;
+  public OutlineEvent(ITree source, int type) {
+    super(source, type);
+  }
 
-  void fireOutlineEvent(OutlineEvent event);
+  public OutlineEvent(ITree source, int type, ITreeNode node) {
+    super(source, type, node);
+  }
 
 }

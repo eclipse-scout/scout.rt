@@ -16,11 +16,15 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable5;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline5;
+import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineEvent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineNavigateDownMenu;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.service.SERVICES;
 
 public abstract class AbstractPageWithTable5<T extends ITable5> extends AbstractPageWithTable<T> implements IPage5 {
+
+  private boolean m_detailFormVisible = true;
 
   @Override
   protected void initConfig() {
@@ -32,10 +36,9 @@ public abstract class AbstractPageWithTable5<T extends ITable5> extends Abstract
   public void setTreeInternal(ITree tree, boolean includeSubtree) {
     super.setTreeInternal(tree, includeSubtree);
 
-    //FIXME how to do this properly? Das menu dürfte auch nicht auf den Baum synchronisiert werden
+    // FIXME how to do this properly? Das menu dürfte auch nicht auf den Baum synchronisiert werden
     if (getTable().getDefaultMenu() == null && !isLeaf()) {
       List<IMenu> tableMenus = getTable().getContextMenu().getChildActions();
-
       OutlineNavigateDownMenu menu = new OutlineNavigateDownMenu(getOutline());
       try {
         menu.initAction();
@@ -43,9 +46,20 @@ public abstract class AbstractPageWithTable5<T extends ITable5> extends Abstract
       catch (ProcessingException e) {
         SERVICES.getService(IExceptionHandlerService.class).handleException(e);
       }
-
       tableMenus.add(0, menu);
       getTable().getContextMenu().setChildActions(tableMenus);
     }
   }
+
+  @Override
+  public boolean isDetailFormVisible() {
+    return m_detailFormVisible;
+  }
+
+  @Override
+  public void setDetailFormVisible(boolean visible) {
+    m_detailFormVisible = visible;
+    ((IOutline5) getOutline()).fireOutlineEvent(new OutlineEvent(getTree(), OutlineEvent.TYPE_PAGE_CHANGED, this));
+  }
+
 }

@@ -182,8 +182,15 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
         handleModelNodeChanged(event.getNode());
         break;
       default:
-        // NOP
+        handleOtherTreeEvent(event);
+        break;
     }
+  }
+
+  /**
+   * Default impl. does nothing. Override this method to handle custom tree-events.
+   */
+  protected void handleOtherTreeEvent(TreeEvent event) {
   }
 
   protected void handleModelNodeExpanded(ITreeNode modelNode) {

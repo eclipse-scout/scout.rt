@@ -59,7 +59,7 @@ scout.Outline.prototype._updateOutlineTab = function(node) {
       node.detailForm = null;
     }
 
-    if (node.detailForm) {
+    if (node.detailForm && node.detailFormVisible) {
       content = node.detailForm;
     } else {
       content = node.detailTable;
@@ -113,7 +113,8 @@ scout.Outline.prototype.onTableChanged = function(nodeId, detailTable) {
   if (nodeId >= 0) {
     node = this._nodeMap[nodeId];
     node.detailTable = this.session.getOrCreateModelAdapter(detailTable, this);
-    //If the following condition is false, the selection state is not synchronized yet which means there is a selection event in the queue which will be processed right afterwards.
+    // If the following condition is false, the selection state is not synchronized yet which means
+    // there is a selection event in the queue which will be processed right afterwards.
     if (this.selectedNodeIds.indexOf(node.id) >= 0) {
       this._updateOutlineTab(node);
     }
@@ -123,11 +124,35 @@ scout.Outline.prototype.onTableChanged = function(nodeId, detailTable) {
   }
 };
 
+scout.Outline.prototype.onPageChanged = function(nodeId, detailFormVisible) {
+  var node;
+  if (nodeId >= 0) {
+    node = this._nodeMap[nodeId];
+    if (node.detailFormVisible != detailFormVisible) {
+      node.detailFormVisible = detailFormVisible;
+      this._updateOutlineTab(node);
+    }
+  }
+};
+
+scout.Outline.prototype.setDetailFormVisible = function(nodeId, visible) {
+  var node;
+  if (nodeId >= 0) {
+    node = this._nodeMap[nodeId];
+    if (node.detailFormVisible != visible) {
+      node.detailFormVisible = visible;
+      node.session.send('pageChanged', this.id, {nodeId: nodeId, detailFormVisible: visible});
+    }
+  }
+};
+
 scout.Outline.prototype.onModelAction = function(event) {
   if (event.type === 'detailFormChanged') {
     this.onFormChanged(event.nodeId, event.detailForm);
   } else if (event.type === 'detailTableChanged') {
     this.onTableChanged(event.nodeId, event.detailTable);
+  } else if (event.type == 'pageChanged') {
+    this.onPageChanged(event.nodeId, event.detailFormVisible);
   } else {
     scout.Outline.parent.prototype.onModelAction.call(this, event);
   }

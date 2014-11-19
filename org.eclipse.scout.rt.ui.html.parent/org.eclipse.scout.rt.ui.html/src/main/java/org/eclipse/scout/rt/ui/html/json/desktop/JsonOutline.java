@@ -17,17 +17,24 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline5;
+import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineEvent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage5;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithNodes;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
+import org.eclipse.scout.rt.ui.html.json.JsonEvent;
+import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
+import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.table.JsonTable;
 import org.eclipse.scout.rt.ui.html.json.tree.JsonTree;
 import org.json.JSONObject;
 
 public class JsonOutline<T extends IOutline> extends JsonTree<T> {
+
+  private static final String EVENT_PAGE_CHANGED = "pageChanged";
 
   public JsonOutline(T model, IJsonSession jsonSession, String id) {
     super(model, jsonSession, id);
@@ -127,6 +134,22 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
     }
   }
 
+  // TODO AWE: (scout) remove these two methods when *5-classes are merged into scout RT
+  private boolean getDetailFormVisible(IPage page) {
+    if (page instanceof IPage5) {
+      return ((IPage5) page).isDetailFormVisible();
+    }
+    else {
+      return true;
+    }
+  }
+
+  private void setDetailFormVisible(IPage page, boolean visible) {
+    if (page instanceof IPage5) {
+      ((IPage5) page).setDetailFormVisible(visible);
+    }
+  }
+
   @Override
   protected JSONObject treeNodeToJson(ITreeNode node) {
     JSONObject json = super.treeNodeToJson(node);
@@ -136,7 +159,10 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
     }
     IPage page = (IPage) node;
 
+    // TODO AWE: (menu-navi) discuss with C.GU - müsste man hier nicht IPage.PROP_DETAIL_FORM verwenden?
+    // müsste die Methode nicht pageToJson heissen?
     optPutAdapterIdProperty(json, IOutline.PROP_DETAIL_FORM, page.getDetailForm());
+    putProperty(json, IPage5.PROP_DETAIL_FORM_VISIBLE, getDetailFormVisible(page));
 
     String pageType = "";
     if (page instanceof IPageWithTable) {
@@ -218,6 +244,23 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
   }
 
   @Override
+  protected void handleOtherTreeEvent(TreeEvent event) {
+    switch (event.getType()) {
+      case OutlineEvent.TYPE_PAGE_CHANGED:
+        handleModelPageChanged(event);
+        break;
+    }
+  }
+
+  private void handleModelPageChanged(TreeEvent event) {
+    JSONObject jsonEvent = new JSONObject();
+    IPage page = (IPage) event.getNode();
+    putProperty(jsonEvent, PROP_NODE_ID, getOrCreateNodeId(page));
+    putProperty(jsonEvent, IPage5.PROP_DETAIL_FORM_VISIBLE, getDetailFormVisible(page));
+    addActionEvent("pageChanged", jsonEvent);
+  }
+
+  @Override
   protected void handleModelPropertyChange(String propertyName, Object newValue) {
     if (IOutline.PROP_DETAIL_FORM.equals(propertyName)) {
       handleModelDetailFormChanged((IForm) newValue);
@@ -229,4 +272,22 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
       super.handleModelPropertyChange(propertyName, newValue);
     }
   }
+
+  private void handleUiPageChanged(JsonEvent event) {
+    JSONObject data = event.getData();
+    IPage page = (IPage) getTreeNodeForNodeId(JsonObjectUtility.getString(data, PROP_NODE_ID));
+    boolean detailFormVisible = JsonObjectUtility.getBoolean(data, IPage5.PROP_DETAIL_FORM_VISIBLE);
+    setDetailFormVisible(page, detailFormVisible);
+  }
+
+  @Override
+  public void handleUiEvent(JsonEvent event, JsonResponse res) {
+    if (EVENT_PAGE_CHANGED.equals(event.getType())) {
+      handleUiPageChanged(event);
+    }
+    else {
+      super.handleUiEvent(event, res);
+    }
+  }
+
 }

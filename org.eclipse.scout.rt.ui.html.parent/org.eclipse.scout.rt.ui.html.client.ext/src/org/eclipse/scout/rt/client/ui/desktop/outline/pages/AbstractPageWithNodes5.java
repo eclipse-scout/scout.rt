@@ -20,6 +20,9 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.basic.table.internal.TablePageTreeMenuWrapper;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline5;
+import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineEvent;
+import org.eclipse.scout.rt.client.ui.desktop.outline.ToggleDetailFormMenu;
 import org.eclipse.scout.rt.client.ui.form.FormMenuType;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IForm5;
@@ -29,7 +32,9 @@ import org.eclipse.scout.rt.shared.ui.menu.IMenu5;
 import org.eclipse.scout.rt.shared.ui.menu.MenuWrapper;
 import org.eclipse.scout.service.SERVICES;
 
-public abstract class AbstractPageWithNodes5 extends AbstractExtensiblePageWithNodes {
+public abstract class AbstractPageWithNodes5 extends AbstractExtensiblePageWithNodes implements IPage5 {
+
+  private boolean m_detailFormVisible = true;
 
   public AbstractPageWithNodes5() {
     super();
@@ -123,7 +128,7 @@ public abstract class AbstractPageWithNodes5 extends AbstractExtensiblePageWithN
 
     //Add page menus to the form
     for (IMenu menu : getOutline().getContextMenu().getChildActions()) {
-      //FIXME CGU improve this
+      // FIXME CGU improve this
       if (menu instanceof TablePageTreeMenuWrapper && ((TablePageTreeMenuWrapper) menu).getWrappedMenu().getClass().getSimpleName().contains("OutlineNavigateDownMenu")) {
         continue;
       }
@@ -140,6 +145,26 @@ public abstract class AbstractPageWithNodes5 extends AbstractExtensiblePageWithN
       MenuWrapper menuWrapper = new MenuWrapper(menu, types);
       menus.add(menuWrapper);
     }
+
+    ToggleDetailFormMenu menu = new ToggleDetailFormMenu(this, false);
+    try {
+      menu.initAction();
+    }
+    catch (ProcessingException e) {
+      SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+    }
+    menus.add(menu);
+  }
+
+  @Override
+  public boolean isDetailFormVisible() {
+    return m_detailFormVisible;
+  }
+
+  @Override
+  public void setDetailFormVisible(boolean visible) {
+    m_detailFormVisible = visible;
+    ((IOutline5) getOutline()).fireOutlineEvent(new OutlineEvent(getTree(), OutlineEvent.TYPE_PAGE_CHANGED, this));
   }
 
 }

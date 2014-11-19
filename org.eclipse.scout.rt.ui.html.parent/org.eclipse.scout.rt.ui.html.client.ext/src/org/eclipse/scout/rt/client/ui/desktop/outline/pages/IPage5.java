@@ -10,7 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
-
 public interface IPage5 extends IPage {
+
+  String PROP_TABLE_VISIBLE = "tableVisible";
+
+  String PROP_DETAIL_FORM_VISIBLE = "detailFormVisible";
+
+  boolean isDetailFormVisible();
+
+  void setDetailFormVisible(boolean visible);
 
 }
