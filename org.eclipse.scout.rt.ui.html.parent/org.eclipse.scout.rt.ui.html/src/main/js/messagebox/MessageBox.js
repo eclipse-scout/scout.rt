@@ -79,6 +79,7 @@ scout.MessageBox.prototype.position = function() {
 };
 
 scout.MessageBox.prototype._createButton = function(option, text) {
+  text = $.removeAmpersand(text);
   return $('<button>')
     .text(text)
     .on('click', this._onButtonClicked.bind(this))

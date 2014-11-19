@@ -80,6 +80,14 @@
     return text.replace(/\n/g,"<br>");
   };
 
+  $.removeAmpersand = function(text) {
+    if (!text) {
+      return text;
+    }
+
+    return text.replace('&', '');
+  };
+
   //== $.prototype extensions
 
   // prepend - and return new div for chaining
@@ -184,6 +192,7 @@
     return this;
   };
 
+  //todo cgu geht auch mit toggle Class nicht?
   $.fn.updateClass = function(condition, cssClass) {
     if (condition) {
       this.addClass(cssClass);

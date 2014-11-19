@@ -30,7 +30,7 @@ scout.Button.prototype._renderLabel = function(label) {
   if (!label) {
     label = '';
   } else {
-    label = label.replace('&', '');
+    label = $.removeAmpersand(label);
   }
   this.$field.text(label);
 };

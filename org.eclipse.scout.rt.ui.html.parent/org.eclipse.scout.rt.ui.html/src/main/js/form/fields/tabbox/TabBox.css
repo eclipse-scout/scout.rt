@@ -38,7 +38,7 @@
 
     &:focus:before {
       .font-icon;
-      content: @icon-caret-right;
+      content: @icon-angle-right;
       color: @active-color;
       position: absolute;
       left: @tabbox-padding-x - @tabbox-focus-arrow-width;
