@@ -379,7 +379,7 @@ scout.Tree.prototype._onNodeChanged = function(nodeId, cell) {
 
   if (this.rendered) {
     var $node = this._findNodeById(node.id);
-    $node.text(node.text);
+    $node.html(node.text);
     //text() removes complete content -> add tree item control again
     this._renderTreeItemControl($node);
   }
