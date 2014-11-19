@@ -134,7 +134,6 @@ scout.DesktopNavigation.prototype._createSearchTab = function() {
 
 scout.DesktopNavigation.prototype.renderSearchQuery = function(searchQuery) {
   this.$queryField.val(searchQuery);
-  this.$queryField[0].select();
 };
 
 scout.DesktopNavigation.prototype.performSearch  = function(query) {
@@ -193,7 +192,6 @@ scout.DesktopNavigation.prototype.onOutlineChanged = function(outline) {
     this.previousOutline = this.outline;
 
     this._setActiveTab(this.searchTab);
-    this.$queryField.focus();
   } else {
     this._setActiveTab(this.outlineTab);
   }
@@ -202,6 +200,12 @@ scout.DesktopNavigation.prototype.onOutlineChanged = function(outline) {
   this.outline.render(this.$container);
   this.$outlineTitle.html(this.outline.title);
   this.$header.removeClass('tab-menu-open');
+
+  if (outline === this.desktop.searchOutline) {
+    //Focus and select content AFTER the search outline was rendered (and therefore the query field filled)
+    this.$queryField.focus();
+    this.$queryField[0].select();
+  }
 };
 
 //vertical splitter
