@@ -136,15 +136,9 @@ scout.DesktopNavigation.prototype.renderSearchQuery = function(searchQuery) {
   this.$queryField.val(searchQuery);
 };
 
-scout.DesktopNavigation.prototype.performSearch  = function(query) {
-  this.session.send('search', this.desktop.id, {
-    'query': this.desktop.searchOutline.searchQuery
-  });
-};
-
 scout.DesktopNavigation.prototype._onSearchButtonClick = function(event) {
   if (this.activeTab === this.searchTab) {
-    this.performSearch();
+    this.desktop.searchOutline.performSearch();
   }
 };
 
@@ -155,7 +149,7 @@ scout.DesktopNavigation.prototype._onQueryFieldInput = function(event) {
 
 scout.DesktopNavigation.prototype._onQueryFieldKeyPress  = function(event) {
   if (event.which === scout.keys.ENTER) {
-    this.performSearch();
+    this.desktop.searchOutline.performSearch();
   }
 };
 

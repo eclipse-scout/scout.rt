@@ -276,17 +276,6 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
     // Important: Consider tomcat form auth problem, see scout rap logout mechanism for details
   }
 
-  protected void handleUiSearch(JsonEvent event) {
-    ISearchOutline searchOutline = getSearchOutline();
-    String query = event.getData().optString("query");
-    try {
-      searchOutline.search(query);
-    }
-    catch (ProcessingException e) {
-      throw new JsonException(e);
-    }
-  }
-
   private ISearchOutline getSearchOutline() {
     for (IOutline outline : getModel().getAvailableOutlines()) {
       if (outline instanceof ISearchOutline) {
@@ -298,10 +287,7 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
 
   @Override
   public void handleUiEvent(JsonEvent event, JsonResponse res) {
-    if ("search".equals(event.getType())) {
-      handleUiSearch(event);
-    }
-    else if ("outlineChanged".equals(event.getType())) {
+    if ("outlineChanged".equals(event.getType())) {
       handleUiOutlineChanged(event);
     }
     else {

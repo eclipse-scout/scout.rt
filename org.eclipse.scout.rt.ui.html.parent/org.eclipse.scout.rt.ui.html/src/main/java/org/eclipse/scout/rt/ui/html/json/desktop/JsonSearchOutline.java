@@ -10,8 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.desktop;
 
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.desktop.outline.ISearchOutline;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
+import org.eclipse.scout.rt.ui.html.json.JsonEvent;
+import org.eclipse.scout.rt.ui.html.json.JsonException;
+import org.eclipse.scout.rt.ui.html.json.JsonResponse;
+import org.eclipse.scout.rt.ui.html.json.PropertyChangeEventFilterCondition;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonProperty;
 
 public class JsonSearchOutline<T extends ISearchOutline> extends JsonOutline<T> {
@@ -41,6 +46,31 @@ public class JsonSearchOutline<T extends ISearchOutline> extends JsonOutline<T> 
         return getModel().getSearchStatus();
       }
     });
+  }
+
+  @Override
+  public void handleUiEvent(JsonEvent event, JsonResponse res) {
+    if ("search".equals(event.getType())) {
+      handleUiSearch(event);
+    }
+    else {
+      super.handleUiEvent(event, res);
+    }
+  }
+
+  protected void handleUiSearch(JsonEvent event) {
+    String query = event.getData().optString("query");
+    PropertyChangeEventFilterCondition condition = new PropertyChangeEventFilterCondition(ISearchOutline.PROP_SEARCH_QUERY, query);
+    getPropertyEventFilter().addCondition(condition);
+    try {
+      getModel().search(query);
+    }
+    catch (ProcessingException e) {
+      throw new JsonException(e);
+    }
+    finally {
+      getPropertyEventFilter().removeCondition(condition);
+    }
   }
 
 }

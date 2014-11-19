@@ -29,3 +29,9 @@ scout.SearchOutline.prototype._renderSearchQuery = function(searchQuery) {
 scout.SearchOutline.prototype._renderSearchStatus = function(searchStatus) {
   this.$searchStatus.text(searchStatus);
 };
+
+scout.SearchOutline.prototype.performSearch  = function(query) {
+  this.session.send('search', this.id, {
+    'query': this.searchQuery
+  });
+};
