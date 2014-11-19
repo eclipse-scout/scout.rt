@@ -17,6 +17,10 @@ scout.TagCloudField.prototype._render = function($parent) {
   this.addContainer($parent, 'tag-cloud-field');
   this.$cloud = this.$container.appendSVG('svg', '', 'tag-cloud');
 
+  this.addLabel();
+  this.addStatus();
+
+
   // hack? wait until svg is complete renderd
   setTimeout(this._init.bind(this), 0);
 };
@@ -60,6 +64,10 @@ scout.TagCloudField.prototype._init = function() {
 };
 
 scout.TagCloudField.prototype._change = function() {
+  if (this.$container === null) {
+    return false;
+  }
+
   var data = this.demo,
     that = this,
     $t, count, entity;
@@ -72,10 +80,8 @@ scout.TagCloudField.prototype._change = function() {
     if (Math.random() > 0.2) {
       count = parseFloat($t.attr('count')) + Math.ceil(Math.random() * 10);
       $t.attr('count', count);
-
       entity = $t.attr('entity');
 
-      $.l(count, entity);
       $t[0].textContent = that.session.locale.decimalFormat.format(count) + ' ' + entity;
     }
   });
@@ -85,6 +91,10 @@ scout.TagCloudField.prototype._change = function() {
 };
 
 scout.TagCloudField.prototype._iterate = function() {
+  if (this.$container === null) {
+    return false;
+  }
+
   var $t, x, y, w, h, driftX, driftY,
     wCloud = this.$container.width(),
     hCloud = this.$container.height();
