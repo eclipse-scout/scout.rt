@@ -5,7 +5,7 @@ scout.SmartField = function() {
 scout.inherits(scout.SmartField, scout.AbstractSmartField);
 
 scout.SmartField.prototype._filterOptionsImpl = function(query) {
-  var statusText, match, numVisibleOptions = 0,
+  var match, numVisibleOptions = 0,
     showAll = !query || '*' === query,
     regexp = new RegExp(query, 'i');
   this._get$Options().each(function() {

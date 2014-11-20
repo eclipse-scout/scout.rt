@@ -80,20 +80,6 @@ scout.Table.prototype._renderProperties = function() {
   this._renderEnabled(this.enabled);
 };
 
-//scout.Table.prototype._renderDataHeight = function() {
-//  var height = 0;
-//  if (this.menubar.$container.isVisible()){
-//    height += this.menubar.$container.outerHeight(true);
-//  }
-//  if (this.footer) {
-//    height += this.footer.$container.outerHeight(true);
-//  }
-//  if (this._$header.isVisible()) {
-//    height += this._$header.outerHeight(true);
-//  }
-//  this.$data.css('height', 'calc(100% - '+ height + 'px)');
-//};
-
 scout.Table.prototype._isFooterVisible = function() {
   return this.tableStatusVisible || this.controls.length > 0;
 };
@@ -459,7 +445,7 @@ scout.Table.prototype._drawData = function(startRow) {
 };
 
 scout.Table.prototype._getRowMenus = function($selectedRows, all) {
-  var menus, check;
+  var check;
 
   if (all) {
     check = ['Table.EmptySpace', 'Table.Header'];
@@ -848,7 +834,6 @@ scout.Table.prototype.filter = function() {
 
   $allRows.each(function() {
     var $row = $(this),
-      rowText = $row.text().toLowerCase(),
       show = true,
       i;
 

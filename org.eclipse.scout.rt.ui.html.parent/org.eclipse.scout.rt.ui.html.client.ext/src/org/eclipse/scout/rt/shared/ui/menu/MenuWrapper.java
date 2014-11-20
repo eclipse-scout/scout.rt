@@ -8,7 +8,6 @@ import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ITypeWithClassId;
-import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.IActionUIFacade;
@@ -23,7 +22,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.internal.TablePageTreeMenuWrap
 public class MenuWrapper implements IMenu {
 
   private IMenu m_wrappedMenu;
-  private IPropertyObserver m_menuOwner;
   private List<IMenu> m_childMenus;
   private boolean m_localEnabled = true;
   private boolean m_localEnabledInheritAccessibility = true;

@@ -108,9 +108,7 @@ scout.Tree.prototype.setNodeExpanded = function(node, $node, expanded) {
 };
 
 scout.Tree.prototype._renderExpansion = function(node, $node, expanded) {
-  var $wrapper;
-  var that = this;
-
+  var $wrapper, level;
   if (expanded === $node.hasClass('expanded')) {
     return;
   }
@@ -120,8 +118,7 @@ scout.Tree.prototype._renderExpansion = function(node, $node, expanded) {
     return true;
   }
 
-  var level = $node.attr('data-level'),
-    $control;
+  level = $node.attr('data-level');
 
   if (expanded) {
     this._addNodes(node.childNodes, $node);
@@ -189,7 +186,7 @@ scout.Tree.prototype.setNodesSelected = function(nodes, $nodes) {
  * @param $nodes if undefined the nodes will be resolved using this.selectedNodeIds
  */
 scout.Tree.prototype._renderSelection = function($nodes) {
-  var i, parentNode, $parentNode, node, $node, that = this;
+  var i, node, $node;
 
   //If $nodes are given collect the nodes based on this.selectedNodeIds
   if (!$nodes) {
@@ -327,7 +324,7 @@ scout.Tree.prototype._onNodesDeleted = function(nodeIds, parentNodeId) {
 };
 
 scout.Tree.prototype._onAllNodesDeleted = function(parentNodeId) {
-  var updateNodeMap, parentNode, i, node, nodes;
+  var updateNodeMap, parentNode, nodes;
 
   //Update model and nodemap
   updateNodeMap = function(parentNode, node) {

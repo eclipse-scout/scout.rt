@@ -18,8 +18,6 @@ scout.Menu.prototype.sendMenuAction = function(event) {
 };
 
 scout.Menu.prototype._render = function($parent) {
-  var text = this.text;
-
   if (this.hasButtonStyle()) {
     this.$container = $('<button>').
       appendTo($parent).

@@ -13,8 +13,7 @@ scout.MapTableControl.prototype._renderContent = function($parent) {
     .attrSVG('viewBox', '5000 -100000 200000 83000')
     .attrSVG('preserveAspectRatio', 'xMidYMid');
 
-  var filter = {},
-    that = this,
+  var that = this,
     countries = this.map.objects.countries.geometries;
 
   this._filterResetListener = this.table.events.on(scout.Table.GUI_EVENT_FILTER_RESETTED, function(event) {

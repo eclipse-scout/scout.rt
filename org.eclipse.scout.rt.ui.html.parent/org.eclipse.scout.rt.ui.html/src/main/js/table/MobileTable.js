@@ -33,7 +33,6 @@ scout.MobileTable.prototype._buildRowDiv = function(row) {
     cellContent = '',
     columns = this.columns,
     numColumnsUsed = 0,
-    table = this.model,
     column, value, headerText = '';
 
   for (var c = 0; c < row.cells.length; c++) {

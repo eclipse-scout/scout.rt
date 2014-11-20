@@ -62,7 +62,6 @@ scout.RichTextField.prototype._render = function($parent) {
 
 scout.RichTextField.prototype._onCommandClick = function(event) {
   var command = $(event.target).data('command'),
-    niceHeader = $(event.target).data('nice-header'),
     attribute = '';
 
   if (command === 'BackColor') {

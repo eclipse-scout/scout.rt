@@ -24,9 +24,6 @@ scout.DetachFormMenu.prototype.render = function($parent) {
 };
 
 scout.DetachFormMenu.prototype._onMenuClicked = function(event) {
-  var $detachButton = $('<button>')
-    .attr('title', "Detach form"); //FIXME Translation
-
   // FIXME BSH Set correct url or write content
   //        w.document.write('<html><head><title>Test</title></head><body>Hello</body></html>');
   //        w.document.close(); //finish "loading" the page

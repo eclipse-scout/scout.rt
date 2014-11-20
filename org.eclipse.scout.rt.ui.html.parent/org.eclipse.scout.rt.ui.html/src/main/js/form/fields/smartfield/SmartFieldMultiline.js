@@ -28,7 +28,7 @@ scout.SmartFieldMultiline.prototype._render = function($parent) {
 
 // FIXME AWE: (smartfield) remove copy&paste when todo in header is solved
 scout.SmartFieldMultiline.prototype._filterOptionsImpl = function(query) {
-  var statusText, match, numVisibleOptions = 0,
+  var match, numVisibleOptions = 0,
     showAll = !query || '*' === query,
     regexp = new RegExp(query, 'im');
   this._get$Options().each(function() {

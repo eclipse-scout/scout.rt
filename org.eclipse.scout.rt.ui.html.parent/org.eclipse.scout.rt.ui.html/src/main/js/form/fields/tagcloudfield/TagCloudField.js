@@ -30,7 +30,7 @@ scout.TagCloudField.prototype._init = function() {
   var data = this.demo,
     wCloud = this.$container.width(),
     hCloud = this.$container.height(),
-    i, minCount, maxCount, x, y, $t, size, color, driftX, driftY;
+    i, minCount, maxCount, $t, size, color, driftX, driftY;
 
   // find min and max
   for (i = 0; i < data.length; i++) {
@@ -68,8 +68,7 @@ scout.TagCloudField.prototype._change = function() {
     return false;
   }
 
-  var data = this.demo,
-    that = this,
+  var that = this,
     $t, count, entity;
 
   // simulate new data

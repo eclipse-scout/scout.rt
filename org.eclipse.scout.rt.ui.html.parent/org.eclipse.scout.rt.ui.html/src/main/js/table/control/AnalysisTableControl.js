@@ -37,10 +37,10 @@ scout.AnalysisTableControl.prototype._renderContent = function($parent) {
   appendRect($vennContainer, 'venn-all');
 
   // criteria container
-  var $criteriaBack = $parent.appendDiv('', 'criteria-back')
+  $parent.appendDiv('', 'criteria-back')
     .on('click', '', backMap);
   var $criteriaNavigation = $parent.appendDiv('', 'criteria-navigation');
-  var $criteriaSearch = $parent.append('<input class="criteria-search"></input>')
+  $parent.append('<input class="criteria-search"></input>')
     .on('input paste', '', searchMap)
     .attr('placeholder', scout.texts.get('filterBy'));
   var $criteriaContainer = $parent.appendDiv('', 'criteria-container');
@@ -433,7 +433,7 @@ scout.AnalysisTableControl.prototype._renderContent = function($parent) {
 
     // init variables
     var x0, x1, x2, y0, y1, y2, r0, r1, r2;
-    var ret, d, d01, d02, d12;
+    var ret, d01, d02, d12;
     var alpha, beta;
 
     // move circle, draw text and set

@@ -135,7 +135,6 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
   var group = (column.type === 'date') ?  3 : -1,
     matrix = new scout.ChartTableControlMatrix(table, session),
     xAxis = matrix.addAxis(column, group),
-    dataAxis = matrix.addData(-1, -1),
     cube = matrix.calculateCube();
 
   var $headerFilterContainer = $headerFilter.appendDIV('header-filter-container'),

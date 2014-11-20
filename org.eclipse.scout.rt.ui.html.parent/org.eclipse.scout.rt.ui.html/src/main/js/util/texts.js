@@ -20,7 +20,12 @@ scout.texts = {
       'numRowsFilteredBy': '{0} gefiltert durch {1}',
       'removeFilter': 'Filter entfernen',
       'numRowsLoaded': '{0} geladen',
-      'reloadData': 'Daten neu laden'
+      'reloadData': 'Daten neu laden',
+      'showEveryDate': 'jedes Datum anzeigen',
+      'groupedByWeekday': 'gruppiert nach Wochentag',
+      'groupedByMonth': 'gruppiert nach Monat',
+      'groupedByYear': 'gruppiert nach Jahr',
+      'count': 'Anzahl'
   }
 };
 

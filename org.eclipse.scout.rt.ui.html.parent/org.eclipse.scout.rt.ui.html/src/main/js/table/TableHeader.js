@@ -254,7 +254,7 @@ scout.TableHeader.prototype.onColumnMoved = function($header, oldPos, newPos, dr
 };
 
 scout.TableHeader.prototype.onOrderChanged = function(oldColumnOrder) {
-  var column, newPos, oldPos, i, $header, $headerResize;
+  var column, i, $header, $headerResize;
   var $headers = this.findHeaderItems();
 
   // store old position of headers

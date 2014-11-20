@@ -460,7 +460,6 @@ describe("Tree", function() {
           tree.render(session.$entryPoint);
 
           var node2Child0 = node2.childNodes[0];
-          var node2Child1 = node2.childNodes[1];
 
           expect(findAllNodes(tree).length).toBe(12);
           expect(tree._findNodeById(node2Child0.id).length).toBe(1);
@@ -669,7 +668,6 @@ describe("Tree", function() {
 
         sendQueuedAjaxCalls();
 
-        var requestData = mostRecentJsonRequest();
         var event0 = new scout.Event('nodeExpanded', tree.id, {"nodeId": node0.id, expanded: true});
         var event1 = new scout.Event('nodeExpanded', tree.id, {"nodeId": child0.id, expanded: true});
         expect(mostRecentJsonRequest()).toContainEvents([event0, event1]);

@@ -23,7 +23,7 @@ describe("TabBox", function() {
   }
 
   describe("render", function() {
-    var field;
+//    var field;
 
     //FIXME CGU requires possibility to build adapterDataCache
 //    beforeEach(function() {

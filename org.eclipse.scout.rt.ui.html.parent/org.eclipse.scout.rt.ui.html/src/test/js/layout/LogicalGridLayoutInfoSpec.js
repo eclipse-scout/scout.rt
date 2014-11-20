@@ -30,13 +30,13 @@ describe("LogicalGridLayoutInfo", function() {
       };
     };
 
-    var mockHtmlComp = function(jquery) {
+    function mockHtmlComp(jquery) {
       return {
         getPreferredSize:function() {
           return new scout.Dimension(1, 1);
         }
       };
-    };
+    }
 
     var components = [
       mockJquery('DateField'),
@@ -64,7 +64,7 @@ describe("LogicalGridLayoutInfo", function() {
     var parentInsets = new scout.Insets(0, 0, 0, 0);
 
     it("calculates bounds", function() {
-      var bounds = lgli.layoutCellBounds(parentSize, parentInsets);
+      lgli.layoutCellBounds(parentSize, parentInsets);
 
       var rows = lgli.layoutCellBounds(parentSize, parentInsets);
       expect(rows.length).toBe(1);
@@ -82,7 +82,6 @@ describe("LogicalGridLayoutInfo", function() {
       expect(cell.y).toBe(0);
       expect(cell.width).toBe(425);
       expect(cell.height).toBe(30);
-
     });
 
   });

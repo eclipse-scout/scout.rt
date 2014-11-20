@@ -2,7 +2,6 @@
 describe("Table", function() {
   var session;
   var helper;
-  var menuHelper;
 
   beforeEach(function() {
     setFixtures(sandbox());
@@ -643,8 +642,6 @@ describe("Table", function() {
       table.render(session.$entryPoint);
 
       var $rows = table._$viewport.children();
-      var $row0 = $rows.eq(0);
-      var $row1 = $rows.eq(1);
 
       var $colHeaders = table._$header.find('.header-item');
       var $header0 = $colHeaders.eq(0);

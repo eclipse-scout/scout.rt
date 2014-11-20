@@ -13,7 +13,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
   this.$parent = $parent;
 
   // group functions for dates
-  var dateDesc = [scout.texts.get('showEveryDate'), scout.texts.get('chartGroupedByWeekday'),
+  var dateDesc = [scout.texts.get('showEveryDate'), scout.texts.get('groupedByWeekday'),
     scout.texts.get('groupedByMonth'), scout.texts.get('groupedByYear')
   ],
     countDesc = scout.texts.get('count');
