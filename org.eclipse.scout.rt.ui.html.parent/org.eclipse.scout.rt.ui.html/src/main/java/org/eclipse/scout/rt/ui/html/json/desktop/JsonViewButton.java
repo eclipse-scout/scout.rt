@@ -11,18 +11,18 @@ import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonEventType;
 import org.eclipse.scout.rt.ui.html.json.JsonException;
+import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
-import org.eclipse.scout.rt.ui.html.json.form.fields.JsonProperty;
 import org.json.JSONObject;
 
-public class JsonViewButton extends AbstractJsonPropertyObserver<IViewButton> {
+public class JsonViewButton<T extends IViewButton> extends AbstractJsonPropertyObserver<T> {
 
-  public JsonViewButton(IViewButton model, IJsonSession jsonSession, String id) {
+  public JsonViewButton(T model, IJsonSession jsonSession, String id) {
     super(model, jsonSession, id);
   }
 
   @Override
-  protected void initJsonProperties(IViewButton model) {
+  protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
 
     putJsonProperty(new JsonProperty<IViewButton>(IViewButton.PROP_TEXT, model) {

@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.ui.html.json.form.fields.groupbox;
 import static org.junit.Assert.assertEquals;
 
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
+import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.ui.html.json.form.fields.BaseFormFieldTest;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -24,7 +25,7 @@ public class JsonGroupBoxTest extends BaseFormFieldTest {
   AbstractGroupBox model = new AbstractGroupBox() {
   };
 
-  JsonGroupBox groupBox = new JsonGroupBox(model, session, session.createUniqueIdFor(null));
+  JsonGroupBox groupBox = new JsonGroupBox<IGroupBox>(model, session, session.createUniqueIdFor(null));
 
   @Before
   public void setUp() {

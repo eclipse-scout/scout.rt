@@ -16,14 +16,14 @@ import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
 
-public class JsonTreeField extends JsonFormField<ITreeField> {
+public class JsonTreeField<T extends ITreeField> extends JsonFormField<T> {
 
-  public JsonTreeField(ITreeField model, IJsonSession session, String id) {
+  public JsonTreeField(T model, IJsonSession session, String id) {
     super(model, session, id);
   }
 
   @Override
-  protected void initJsonProperties(ITreeField model) {
+  protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
 
     putJsonProperty(new JsonAdapterProperty<ITreeField>(ITreeField.PROP_TREE, model, getJsonSession()) {

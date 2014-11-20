@@ -14,21 +14,21 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonEventType;
+import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
-import org.eclipse.scout.rt.ui.html.json.form.fields.JsonProperty;
 
-public class JsonButton extends JsonFormField<IButton> {
+public class JsonButton<T extends IButton> extends JsonFormField<T> {
 
   public final static String PROP_SYSTEM_TYPE = "systemType";
   public final static String PROP_PROCESS_BUTTON = "processButton";
 
-  public JsonButton(IButton model, IJsonSession jsonSession, String id) {
+  public JsonButton(T model, IJsonSession jsonSession, String id) {
     super(model, jsonSession, id);
   }
 
   @Override
-  protected void initJsonProperties(IButton model) {
+  protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
     putJsonProperty(new JsonProperty<IButton>(PROP_SYSTEM_TYPE, model) {
       @Override

@@ -15,16 +15,16 @@ import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
-import org.eclipse.scout.rt.ui.html.json.form.fields.JsonProperty;
+import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.groupbox.JsonGroupBox;
 
-public class JsonTabItem extends JsonGroupBox {
+public class JsonTabItem<T extends IGroupBox> extends JsonGroupBox<T> {
 
   public static final String PROP_MARKED = "marked";
 
   private boolean m_marked;
 
-  public JsonTabItem(IGroupBox model, IJsonSession jsonSession, String id) {
+  public JsonTabItem(T model, IJsonSession jsonSession, String id) {
     super(model, jsonSession, id);
   }
 
@@ -34,7 +34,7 @@ public class JsonTabItem extends JsonGroupBox {
   }
 
   @Override
-  protected void initJsonProperties(IGroupBox model) {
+  protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
     putJsonProperty(new JsonProperty<IGroupBox>(PROP_MARKED, model) {
       @Override

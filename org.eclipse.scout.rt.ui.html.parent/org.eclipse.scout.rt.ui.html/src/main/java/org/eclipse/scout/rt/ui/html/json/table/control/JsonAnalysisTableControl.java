@@ -15,9 +15,9 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.json.JSONObject;
 
-public class JsonAnalysisTableControl extends JsonTableControl<IAnalysisTableControl> {
+public class JsonAnalysisTableControl<T extends IAnalysisTableControl> extends JsonTableControl<T> {
 
-  public JsonAnalysisTableControl(IAnalysisTableControl model, IJsonSession jsonSession, String id) {
+  public JsonAnalysisTableControl(T model, IJsonSession jsonSession, String id) {
     super(model, jsonSession, id);
   }
 

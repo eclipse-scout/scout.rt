@@ -2,8 +2,8 @@ package org.eclipse.scout.rt.ui.html.json.form.fields.imagefield;
 
 import org.eclipse.scout.rt.client.ui.form.fields.imagebox.IImageField;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
+import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
-import org.eclipse.scout.rt.ui.html.json.form.fields.JsonProperty;
 
 public class JsonImageField<T extends IImageField> extends JsonFormField<T> {
 

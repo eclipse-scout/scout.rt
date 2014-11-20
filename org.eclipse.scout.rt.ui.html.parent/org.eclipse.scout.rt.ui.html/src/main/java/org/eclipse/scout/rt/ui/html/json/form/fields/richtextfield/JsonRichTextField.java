@@ -14,9 +14,9 @@ import org.eclipse.scout.rt.client.ui.form.fields.richtextfield.IRichTextField;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 
-public class JsonRichTextField extends JsonValueField<IRichTextField> {
+public class JsonRichTextField<T extends IRichTextField> extends JsonValueField<T> {
 
-  public JsonRichTextField(IRichTextField model, IJsonSession session, String id) {
+  public JsonRichTextField(T model, IJsonSession session, String id) {
     super(model, session, id);
   }
 

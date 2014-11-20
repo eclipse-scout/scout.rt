@@ -19,11 +19,11 @@ import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 
-public class JsonContextMenu extends AbstractJsonPropertyObserver<IContextMenu> {
+public class JsonContextMenu<T extends IContextMenu> extends AbstractJsonPropertyObserver<T> {
 
   private ContextMenuListener m_contextMenuListener;
 
-  public JsonContextMenu(IContextMenu model, IJsonSession jsonSession, String id) {
+  public JsonContextMenu(T model, IJsonSession jsonSession, String id) {
     super(model, jsonSession, id);
   }
 

@@ -46,7 +46,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.service.SERVICES;
 import org.json.JSONObject;
 
-public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
+public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserver<T> {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonDesktop.class);
 
@@ -58,7 +58,7 @@ public class JsonDesktop extends AbstractJsonPropertyObserver<IDesktop> {
 
   private IOutline m_previousOutline;
 
-  public JsonDesktop(IDesktop desktop, IJsonSession jsonSession, String id) {
+  public JsonDesktop(T desktop, IJsonSession jsonSession, String id) {
     super(desktop, jsonSession, id);
   }
 

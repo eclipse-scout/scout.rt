@@ -17,22 +17,22 @@ import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
+import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
-import org.eclipse.scout.rt.ui.html.json.form.fields.JsonProperty;
 import org.json.JSONObject;
 
-public class JsonMessageBox extends AbstractJsonPropertyObserver<IMessageBox> {
+public class JsonMessageBox<T extends IMessageBox> extends AbstractJsonPropertyObserver<T> {
   public String EVENT_ACTION = "action";
   public String EVENT_CLOSED = "closed";
 
   private MessageBoxListener m_messageBoxListener;
 
-  public JsonMessageBox(IMessageBox model, IJsonSession jsonSession, String id) {
+  public JsonMessageBox(T model, IJsonSession jsonSession, String id) {
     super(model, jsonSession, id);
   }
 
   @Override
-  protected void initJsonProperties(IMessageBox model) {
+  protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
 
     putJsonProperty(new JsonProperty<IMessageBox>("title", model) {

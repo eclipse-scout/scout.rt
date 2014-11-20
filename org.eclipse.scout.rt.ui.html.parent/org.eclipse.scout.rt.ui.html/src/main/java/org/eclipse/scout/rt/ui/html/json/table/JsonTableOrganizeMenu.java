@@ -14,9 +14,9 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonMenu;
 
-public class JsonTableOrganizeMenu extends JsonMenu {
+public class JsonTableOrganizeMenu<T extends IMenu> extends JsonMenu<T> {
 
-  public JsonTableOrganizeMenu(IMenu model, IJsonSession jsonSession, String id) {
+  public JsonTableOrganizeMenu(T model, IJsonSession jsonSession, String id) {
     super(model, jsonSession, id);
   }
 

@@ -21,8 +21,8 @@ public class TableEventFilterCondition {
   private static final long serialVersionUID = 1L;
 
   private int m_type;
-  private List<? extends ITableRow> m_rows;
-  private List<? extends IColumn<?>> m_columns;
+  private List<ITableRow> m_rows;
+  private List<IColumn<?>> m_columns;
   private boolean m_checkRows;
   private boolean m_checkColumns;
 
@@ -45,7 +45,7 @@ public class TableEventFilterCondition {
     m_checkRows = true;
   }
 
-  public List<? extends IColumn<?>> getColumns() {
+  public List<IColumn<?>> getColumns() {
     return m_columns;
   }
 

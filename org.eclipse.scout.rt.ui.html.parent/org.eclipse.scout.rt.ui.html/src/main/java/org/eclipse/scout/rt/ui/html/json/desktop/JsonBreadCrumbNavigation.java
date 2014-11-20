@@ -29,7 +29,7 @@ import org.eclipse.scout.rt.ui.html.json.form.JsonForm;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class JsonBreadCrumbNavigation extends AbstractJsonAdapter<IBreadCrumbsNavigation> {
+public class JsonBreadCrumbNavigation<T extends IBreadCrumbsNavigation> extends AbstractJsonAdapter<T> {
   public static final String EVENT_ACTIVATE = "activate";
   public static final String EVENT_CHANGED = "changed";
   public static final String PROP_BREAD_CRUMBS = "breadcrumbs";
@@ -37,7 +37,7 @@ public class JsonBreadCrumbNavigation extends AbstractJsonAdapter<IBreadCrumbsNa
 
   private BreadCrumbsListener m_breadCrumbsListener;
 
-  public JsonBreadCrumbNavigation(IBreadCrumbsNavigation model, IJsonSession jsonSession, String id) {
+  public JsonBreadCrumbNavigation(T model, IJsonSession jsonSession, String id) {
     super(model, jsonSession, id);
   }
 

@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonGridData;
 import org.eclipse.scout.rt.ui.html.json.JsonProcessingStatus;
+import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 
 // TODO AWE: make JsonFormField abstract (later), direktes instanzieren soll nicht mehr möglich sein
 public class JsonFormField<T extends IFormField> extends AbstractJsonPropertyObserver<T> implements IJsonFormField<T> {

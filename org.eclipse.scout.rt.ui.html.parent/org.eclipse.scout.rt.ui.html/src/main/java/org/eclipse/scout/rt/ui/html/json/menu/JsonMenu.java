@@ -20,11 +20,11 @@ import org.eclipse.scout.rt.shared.ui.menu.IMenu5;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
+import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
-import org.eclipse.scout.rt.ui.html.json.form.fields.JsonProperty;
 import org.json.JSONObject;
 
-public class JsonMenu extends AbstractJsonPropertyObserver<IMenu> {
+public class JsonMenu<T extends IMenu> extends AbstractJsonPropertyObserver<T> {
 
   public static final String EVENT_MENU_ACTION = "menuAction";
   public static final String EVENT_ABOUT_TO_SHOW = "aboutToShow";
@@ -33,12 +33,12 @@ public class JsonMenu extends AbstractJsonPropertyObserver<IMenu> {
   public static final String PROP_CHILD_MENUS = "childMenus";
   public static final String PROP_SYSTEM_TYPE = "systemType";
 
-  public JsonMenu(IMenu model, IJsonSession jsonSession, String id) {
+  public JsonMenu(T model, IJsonSession jsonSession, String id) {
     super(model, jsonSession, id);
   }
 
   @Override
-  protected void initJsonProperties(IMenu model) {
+  protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
     putJsonProperty(new JsonProperty<IMenu>(IMenu.PROP_TEXT, model) {
       @Override

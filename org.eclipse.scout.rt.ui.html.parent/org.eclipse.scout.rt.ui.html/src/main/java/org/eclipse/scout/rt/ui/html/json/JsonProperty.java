@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.html.json.form.fields;
+package org.eclipse.scout.rt.ui.html.json;
 
 /**
  * This property class is used to map a model object property to a JSON property and is used to automatically create a

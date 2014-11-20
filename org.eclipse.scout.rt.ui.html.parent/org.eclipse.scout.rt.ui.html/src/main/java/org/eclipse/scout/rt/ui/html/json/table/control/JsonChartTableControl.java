@@ -13,9 +13,9 @@ package org.eclipse.scout.rt.ui.html.json.table.control;
 import org.eclipse.scout.rt.client.ui.basic.table.control.IChartTableControl;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 
-public class JsonChartTableControl extends JsonTableControl<IChartTableControl> {
+public class JsonChartTableControl<T extends IChartTableControl> extends JsonTableControl<T> {
 
-  public JsonChartTableControl(IChartTableControl model, IJsonSession jsonSession, String id) {
+  public JsonChartTableControl(T model, IJsonSession jsonSession, String id) {
     super(model, jsonSession, id);
   }
 

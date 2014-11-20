@@ -14,15 +14,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.ui.html.json.AbstractEventFilter;
 
 public class TableEventFilter extends AbstractEventFilter<TableEvent, TableEventFilterCondition> {
 
-  private JsonTable m_jsonTable;
+  private JsonTable<? extends ITable> m_jsonTable;
 
-  public TableEventFilter(JsonTable jsonTable) {
+  public TableEventFilter(JsonTable<? extends ITable> jsonTable) {
     m_jsonTable = jsonTable;
   }
 
@@ -38,7 +39,7 @@ public class TableEventFilter extends AbstractEventFilter<TableEvent, TableEvent
             return null;
           }
 
-          TableEvent newEvent = new TableEvent(m_jsonTable.getModel(), event.getType(), rows);
+          TableEvent newEvent = new TableEvent((ITable) m_jsonTable.getModel(), event.getType(), rows);
           return newEvent;
         }
         else if (condition.checkColumns()) {

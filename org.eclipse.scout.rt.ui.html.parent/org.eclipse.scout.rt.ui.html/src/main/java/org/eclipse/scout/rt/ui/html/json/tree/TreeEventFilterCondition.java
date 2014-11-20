@@ -20,7 +20,7 @@ public class TreeEventFilterCondition {
   private static final long serialVersionUID = 1L;
 
   private int m_type;
-  private List<? extends ITreeNode> m_nodes;
+  private List<ITreeNode> m_nodes;
   private boolean m_checkNodes;
 
   public TreeEventFilterCondition(int type) {

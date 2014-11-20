@@ -34,7 +34,7 @@ import org.junit.runner.RunWith;
 public class JsonDesktopTest {
 
   IDesktop desktop;
-  JsonDesktop jsonDesktop;
+  JsonDesktop<IDesktop> jsonDesktop;
   IJsonSession session;
 
   @Before
@@ -45,7 +45,7 @@ public class JsonDesktopTest {
   private void setUp(IDesktop desktop) {
     this.desktop = desktop;
     session = new JsonSessionMock();
-    jsonDesktop = new JsonDesktop(desktop, session, session.createUniqueIdFor(null));
+    jsonDesktop = new JsonDesktop<IDesktop>(desktop, session, session.createUniqueIdFor(null));
     jsonDesktop.attach();
   }
 

@@ -12,19 +12,19 @@ package org.eclipse.scout.rt.ui.html.json.form.fields.groupbox;
 
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
+import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
-import org.eclipse.scout.rt.ui.html.json.form.fields.JsonProperty;
 import org.json.JSONObject;
 
 /**
  * This class creates JSON output for an <code>IGroupBox</code>.
  */
 // TODO AWE: JsonCompositeField für group / seq. / etc.
-public class JsonGroupBox extends JsonFormField<IGroupBox> {
+public class JsonGroupBox<T extends IGroupBox> extends JsonFormField<T> {
 
   public static final String PROP_MAIN_BOX = "mainBox";
 
-  public JsonGroupBox(IGroupBox model, IJsonSession session, String id) {
+  public JsonGroupBox(T model, IJsonSession session, String id) {
     super(model, session, id);
   }
 
@@ -34,7 +34,7 @@ public class JsonGroupBox extends JsonFormField<IGroupBox> {
   }
 
   @Override
-  protected void initJsonProperties(IGroupBox model) {
+  protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
 
     putJsonProperty(new JsonProperty<IGroupBox>(IGroupBox.PROP_BORDER_DECORATION, model) {

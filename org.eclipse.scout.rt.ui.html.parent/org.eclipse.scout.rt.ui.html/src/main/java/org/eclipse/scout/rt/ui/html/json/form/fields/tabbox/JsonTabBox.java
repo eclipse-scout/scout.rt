@@ -17,20 +17,20 @@ import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonEventType;
+import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.PropertyChangeEventFilterCondition;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
-import org.eclipse.scout.rt.ui.html.json.form.fields.JsonProperty;
 import org.json.JSONObject;
 
-public class JsonTabBox extends JsonFormField<ITabBox> {
+public class JsonTabBox<T extends ITabBox> extends JsonFormField<T> {
 
-  public JsonTabBox(ITabBox model, IJsonSession session, String id) {
+  public JsonTabBox(T model, IJsonSession session, String id) {
     super(model, session, id);
   }
 
   @Override
-  protected void initJsonProperties(ITabBox model) {
+  protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
 
     // instead of returning a whole adapter here, we simply return the index of the group-box (=tab)

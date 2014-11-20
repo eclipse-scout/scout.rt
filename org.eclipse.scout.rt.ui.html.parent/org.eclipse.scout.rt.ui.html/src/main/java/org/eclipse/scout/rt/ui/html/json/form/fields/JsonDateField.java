@@ -13,9 +13,9 @@ package org.eclipse.scout.rt.ui.html.json.form.fields;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 
-public class JsonDateField extends JsonValueField<IDateField> {
+public class JsonDateField<T extends IDateField> extends JsonValueField<T> {
 
-  public JsonDateField(IDateField model, IJsonSession session, String id) {
+  public JsonDateField(T model, IJsonSession session, String id) {
     super(model, session, id);
   }
 

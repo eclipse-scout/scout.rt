@@ -14,9 +14,9 @@ import org.eclipse.scout.rt.client.ui.form.fields.numberfield.INumberField;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 
-public class JsonNumberField extends JsonValueField<INumberField> {
+public class JsonNumberField<T extends INumberField> extends JsonValueField<T> {
 
-  public JsonNumberField(INumberField model, IJsonSession session, String id) {
+  public JsonNumberField(T model, IJsonSession session, String id) {
     super(model, session, id);
   }
 

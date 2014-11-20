@@ -26,33 +26,28 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonException;
+import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
-import org.eclipse.scout.rt.ui.html.json.form.fields.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class JsonSmartField extends JsonValueField<ISmartField> {
+public class JsonSmartField<T extends ISmartField> extends JsonValueField<T> {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonSmartField.class);
-
   private static final String PROP_CACHING_ENABLED = "cachingEnabled";
-
   private static final String PROP_OPTIONS = "options";
-
   private static final String PROP_MULTI_LINE = "multiline";
-
   private static final int MAX_OPTIONS = 100;
 
   private List<? extends ILookupRow<?>> m_options = new ArrayList<>();
 
-  public JsonSmartField(ISmartField model, IJsonSession session, String id) {
+  public JsonSmartField(T model, IJsonSession session, String id) {
     super(model, session, id);
-
   }
 
   @Override
-  protected void initJsonProperties(ISmartField model) {
+  protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
     // TODO AWE: (smartfield) prüfen ob wir die properties brauchen oder
     // ob wir's über den objectType lösen wollen

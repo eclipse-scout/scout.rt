@@ -15,9 +15,9 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.ISearchOutline;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonException;
+import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.PropertyChangeEventFilterCondition;
-import org.eclipse.scout.rt.ui.html.json.form.fields.JsonProperty;
 
 public class JsonSearchOutline<T extends ISearchOutline> extends JsonOutline<T> {
 

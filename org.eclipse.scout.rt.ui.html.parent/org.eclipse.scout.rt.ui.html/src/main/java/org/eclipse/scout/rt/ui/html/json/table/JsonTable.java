@@ -44,15 +44,15 @@ import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonException;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
+import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
-import org.eclipse.scout.rt.ui.html.json.form.fields.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.menu.IContextMenuOwner;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements IContextMenuOwner {
+public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T> implements IContextMenuOwner {
   public static final String EVENT_ROW_CLICKED = "rowClicked";
   public static final String EVENT_ROW_ACTION = "rowAction";
   public static final String EVENT_ROWS_SELECTED = "rowsSelected";
@@ -77,7 +77,7 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
   private Map<ITableRow, String> m_tableRowIds;
   private TableEventFilter m_tableEventFilter;
 
-  public JsonTable(ITable model, IJsonSession jsonSession, String id) {
+  public JsonTable(T model, IJsonSession jsonSession, String id) {
     super(model, jsonSession, id);
     m_tableRows = new HashMap<>();
     m_tableRowIds = new HashMap<>();
@@ -85,7 +85,7 @@ public class JsonTable extends AbstractJsonPropertyObserver<ITable> implements I
   }
 
   @Override
-  protected void initJsonProperties(ITable model) {
+  protected void initJsonProperties(T model) {
     putJsonProperty(new JsonProperty<ITable>(ITable.PROP_ENABLED, model) {
       @Override
       protected Boolean modelValue() {

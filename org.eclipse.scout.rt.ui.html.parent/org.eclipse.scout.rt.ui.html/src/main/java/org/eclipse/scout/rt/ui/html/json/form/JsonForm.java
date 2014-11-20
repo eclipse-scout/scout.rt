@@ -29,10 +29,10 @@ import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.menu.IContextMenuOwner;
 import org.json.JSONObject;
 
-public class JsonForm extends AbstractJsonPropertyObserver<IForm> implements IContextMenuOwner {
+public class JsonForm<T extends IForm> extends AbstractJsonPropertyObserver<T> implements IContextMenuOwner {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonForm.class);
 
-  public JsonForm(IForm model, IJsonSession jsonSession, String id) {
+  public JsonForm(T model, IJsonSession jsonSession, String id) {
     super(model, jsonSession, id);
   }
 

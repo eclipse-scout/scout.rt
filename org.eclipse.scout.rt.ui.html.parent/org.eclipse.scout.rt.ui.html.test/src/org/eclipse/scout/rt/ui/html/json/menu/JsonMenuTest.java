@@ -14,6 +14,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.lang.reflect.Field;
 
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.fixtures.JsonSessionMock;
@@ -35,7 +36,7 @@ public class JsonMenuTest {
     menu.setText("foo");
 
     // when adapter has been created we have the complete adapter in the adapter-data section of the JSON response
-    JsonMenu menuAdapter = jsonSession.getOrCreateJsonAdapter(menu);
+    JsonMenu<IMenu> menuAdapter = jsonSession.getOrCreateJsonAdapter(menu);
     JSONObject json = jsonSession.currentJsonResponse().toJson();
     JSONObject adpaterData = JsonTestUtility.getAdapterData(json, menuAdapter.getId());
     assertEquals("foo", adpaterData.getString("text"));

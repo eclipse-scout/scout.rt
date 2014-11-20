@@ -18,11 +18,11 @@ import org.json.JSONObject;
 /**
  * This class creates JSON output for an <code>ISequenceBox</code>.
  */
-public class JsonSequenceBox extends JsonFormField<ISequenceBox> {
+public class JsonSequenceBox<T extends ISequenceBox> extends JsonFormField<T> {
 
   public static final String PROP_FIELDS = "fields";
 
-  public JsonSequenceBox(ISequenceBox model, IJsonSession session, String id) {
+  public JsonSequenceBox(T model, IJsonSession session, String id) {
     super(model, session, id);
   }
 

@@ -15,16 +15,16 @@ import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonEventType;
+import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
-import org.eclipse.scout.rt.ui.html.json.form.fields.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 
 /**
  * This class creates JSON output for an IBooleanField used as a check-box.
  */
-public class JsonCheckBoxField extends JsonValueField<IBooleanField> {
+public class JsonCheckBoxField<T extends IBooleanField> extends JsonValueField<T> {
 
-  public JsonCheckBoxField(IBooleanField model, IJsonSession session, String id) {
+  public JsonCheckBoxField(T model, IJsonSession session, String id) {
     super(model, session, id);
   }
 
@@ -34,7 +34,7 @@ public class JsonCheckBoxField extends JsonValueField<IBooleanField> {
   }
 
   @Override
-  protected void initJsonProperties(IBooleanField model) {
+  protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
     putJsonProperty(new JsonProperty<IBooleanField>(IBooleanField.PROP_VALUE, model) {
       @Override

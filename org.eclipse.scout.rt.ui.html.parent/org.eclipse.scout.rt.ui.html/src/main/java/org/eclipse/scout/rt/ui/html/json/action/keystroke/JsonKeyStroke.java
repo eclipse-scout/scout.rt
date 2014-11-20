@@ -14,20 +14,20 @@ import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
+import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
-import org.eclipse.scout.rt.ui.html.json.form.fields.JsonProperty;
 
 // TODO BSH Combine with JsonMenu --> JsonAction?
-public class JsonKeyStroke extends AbstractJsonPropertyObserver<IKeyStroke> {
+public class JsonKeyStroke<T extends IKeyStroke> extends AbstractJsonPropertyObserver<T> {
 
   public static final String EVENT_KEYSTROKE_ACTION = "keystrokeAction";
 
-  public JsonKeyStroke(IKeyStroke model, IJsonSession jsonSession, String id) {
+  public JsonKeyStroke(T model, IJsonSession jsonSession, String id) {
     super(model, jsonSession, id);
   }
 
   @Override
-  protected void initJsonProperties(IKeyStroke model) {
+  protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
 
     putJsonProperty(new JsonProperty<IKeyStroke>(IKeyStroke.PROP_ENABLED, model) {

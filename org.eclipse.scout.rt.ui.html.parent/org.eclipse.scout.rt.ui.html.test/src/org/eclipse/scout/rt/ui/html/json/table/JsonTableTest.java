@@ -117,7 +117,7 @@ public class JsonTableTest {
     ITableRow row2 = table.getRow(2);
     ITableRow row4 = table.getRow(4);
 
-    JsonTable jsonTable = createJsonTableWithMocks(table);
+    JsonTable<ITable> jsonTable = createJsonTableWithMocks(table);
     JsonEvent event = createJsonSelectedEvent(jsonTable.getOrCreatedRowId(row2));
 
     assertFalse(row2.isSelected());
@@ -156,7 +156,7 @@ public class JsonTableTest {
     ITableRow row4 = table.getRow(4);
     table.selectRow(row2);
 
-    JsonTable jsonTable = createJsonTableWithMocks(table);
+    JsonTable<ITable> jsonTable = createJsonTableWithMocks(table);
     JsonEvent event = createJsonSelectedEvent(null);
 
     assertTrue(row2.isSelected());
@@ -282,9 +282,9 @@ public class JsonTableTest {
     return table;
   }
 
-  public static JsonTable createJsonTableWithMocks(ITable table) {
+  public static JsonTable<ITable> createJsonTableWithMocks(ITable table) {
     JsonSessionMock jsonSession = new JsonSessionMock();
-    JsonTable jsonTable = new JsonTable(table, jsonSession, jsonSession.createUniqueIdFor(null));
+    JsonTable<ITable> jsonTable = new JsonTable<ITable>(table, jsonSession, jsonSession.createUniqueIdFor(null));
     jsonTable.attach();
     return jsonTable;
   }

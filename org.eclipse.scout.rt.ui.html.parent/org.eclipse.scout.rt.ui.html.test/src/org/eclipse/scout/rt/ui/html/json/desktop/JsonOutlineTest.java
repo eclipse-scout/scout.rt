@@ -52,7 +52,7 @@ public class JsonOutlineTest {
     rowPage = (IPage) tablePage.resolveVirtualChildNode((rowPage));
     outline.selectNode(rowPage);
 
-    JsonOutline jsonOutline = createJsonOutlineWithMocks(outline);
+    JsonOutline<IOutline> jsonOutline = createJsonOutlineWithMocks(outline);
     IJsonSession jsonSession = jsonOutline.getJsonSession();
 
     Assert.assertNotNull(jsonSession.getJsonAdapter(nodePage.getDetailForm()));
@@ -81,9 +81,9 @@ public class JsonOutlineTest {
 //    Assert.assertNotNull(jsonNode.opt(IOutline.PROP_DETAIL_TABLE));
   }
 
-  public static JsonOutline createJsonOutlineWithMocks(IOutline outline) {
+  public static JsonOutline<IOutline> createJsonOutlineWithMocks(IOutline outline) {
     JsonSessionMock jsonSession = new JsonSessionMock();
-    JsonOutline jsonOutline = new JsonOutline(outline, jsonSession, jsonSession.createUniqueIdFor(null));
+    JsonOutline<IOutline> jsonOutline = new JsonOutline<IOutline>(outline, jsonSession, jsonSession.createUniqueIdFor(null));
     jsonOutline.attach();
     return jsonOutline;
   }

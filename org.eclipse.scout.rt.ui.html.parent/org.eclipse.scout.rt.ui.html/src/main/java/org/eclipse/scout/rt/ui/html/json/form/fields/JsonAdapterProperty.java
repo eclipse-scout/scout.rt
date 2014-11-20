@@ -17,6 +17,7 @@ import java.util.List;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
+import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 
 public abstract class JsonAdapterProperty<T> extends JsonProperty<T> {
   private IJsonSession m_jsonSession;
