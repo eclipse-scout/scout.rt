@@ -13,22 +13,19 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
   this.$parent = $parent;
 
   // group functions for dates
-  // todo
-  var dateDesc = ['jedes Datum anzeigen', 'gruppiert nach Wochentag',
-    'gruppiert nach Monat', 'gruppiert nach Jahr'
+  var dateDesc = [scout.texts.get('showEveryDate'), scout.texts.get('chartGroupedByWeekday'),
+    scout.texts.get('groupedByMonth'), scout.texts.get('groupedByYear')
   ],
-    countDesc = 'Anzahl';
+    countDesc = scout.texts.get('count');
 
   var removeChart = null,
     columns = this.table.columns,
     xAxis,
     yAxis,
-    filter = {},
     that = this;
 
 
   this._filterResetListener = this.table.events.on(scout.Table.GUI_EVENT_FILTER_RESETTED, function(event) {
-    //  $('.main-chart.selected, .map-item.selected').removeClassSVG('selected');
     that.$parent.find('.main-chart.selected').removeClassSVG('selected');
   });
 

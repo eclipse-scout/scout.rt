@@ -124,7 +124,8 @@ scout.TableFooter.prototype.setTableStatusVisible= function(visible) {
 
 scout.TableFooter.prototype._updateInfoLoad = function() {
   var numRows = this._table.rows.length;
-  var info = this._computeCountInfo(numRows) + ' geladen<br><span class="info-button">Daten neu laden</span>';
+  var info = scout.texts.get('numRowsLoaded', this._computeCountInfo(numRows));
+  info +='<br><span class="info-button">' + scout.texts.get('reloadData') + '</span>';
   if (this._$infoLoad.html() === info) {
     return;
   }
@@ -137,8 +138,12 @@ scout.TableFooter.prototype._updateInfoFilter = function() {
   if (filteredBy.length > 0) {
     filteredBy = filteredBy.join(', ');
   }
-  var numFilteredRows = this._table.filteredRowCount;
-  var info = this._computeCountInfo(numFilteredRows) + ' gefiltert' + (filteredBy ? ' durch ' + filteredBy : '') + '<br><span class="info-button">Filter entfernen</span>';
+  var numRowsFiltered = this._table.filteredRowCount;
+  var info = scout.texts.get('numRowsFiltered', this._computeCountInfo(numRowsFiltered));
+  if (filteredBy) {
+    info = scout.texts.get('numRowsFilteredBy', this._computeCountInfo(numRowsFiltered), filteredBy);
+  }
+  info += '<br><span class="info-button">' + scout.texts.get('removeFilter') + '</span>';
   if (this._$infoFilter.html() === info) {
     return;
   }
@@ -148,7 +153,7 @@ scout.TableFooter.prototype._updateInfoFilter = function() {
 
 scout.TableFooter.prototype._updateInfoSelection = function(numSelectedRows, all) {
   var numRows = this._table.rows.length;
-  var allText, info;
+  var selectAllText, info;
 
   if (numSelectedRows === undefined) {
     numSelectedRows = this._table.selectedRowIds.length;
@@ -157,8 +162,14 @@ scout.TableFooter.prototype._updateInfoSelection = function(numSelectedRows, all
     all = numRows === numSelectedRows;
   }
 
-  allText = all ? 'Keine' : 'Alle';
-  info = this._computeCountInfo(numSelectedRows) + ' selektiert<br><span class="info-button">' + (allText) + ' selektieren</span>'; //FIXME get translations from server;
+  if (all) {
+    selectAllText = scout.texts.get('selectNone');
+  } else {
+    selectAllText = scout.texts.get('selectAll');
+  }
+
+  info = scout.texts.get('numRowsSelected', this._computeCountInfo(numSelectedRows));
+  info += '<br><span class="info-button">' + selectAllText + '</span>';
   if (this._$infoSelection.html() === info) {
     return;
   }
@@ -191,11 +202,11 @@ scout.TableFooter.prototype._setInfoVisible = function($info, visible) {
 
 scout.TableFooter.prototype._computeCountInfo = function(n) {
   if (n === 0) {
-    return 'Keine Zeile';
+    return scout.texts.get('tableRowCount0');
   } else if (n == 1) {
-    return 'Eine Zeile';
+    return scout.texts.get('tableRowCount1');
   } else {
-    return n + ' Zeilen';
+    return scout.texts.get('tableRowCount', n);
   }
 };
 

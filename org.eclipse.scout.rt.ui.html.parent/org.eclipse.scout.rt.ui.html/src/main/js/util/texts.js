@@ -9,7 +9,18 @@ scout.texts = {
       'invalidDateFormat':'Das Datum ist in einem ungültigen Format',
       'resetColumns':'Spalten zurücksetzen',
       'filterBy':'Filtern nach ...',
-      'searchFor':'Suchen nach ...'
+      'searchFor':'Suchen nach ...',
+      'tableRowCount0': 'Keine Zeile',
+      'tableRowCount1': 'Eine Zeile',
+      'tableRowCount': '{0} Zeilen',
+      'numRowsSelected': '{0} selektiert',
+      'selectAll': 'Alle selektieren',
+      'selectNone': 'Keine selektieren',
+      'numRowsFiltered': '{0} gefiltert',
+      'numRowsFilteredBy': '{0} gefiltert durch {1}',
+      'removeFilter': 'Filter entfernen',
+      'numRowsLoaded': '{0} geladen',
+      'reloadData': 'Daten neu laden'
   }
 };
 
