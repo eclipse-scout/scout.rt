@@ -79,10 +79,10 @@ public class ScriptProcessor {
   }
 
   public String process() throws IOException {
-    if (m_inputType.equalsIgnoreCase("js")) {
+    if ("js".equals(m_inputType)) {
       return processJavascript();
     }
-    if (m_inputType.equalsIgnoreCase("css")) {
+    if ("css".equals(m_inputType)) {
       return processCss();
     }
     System.err.println("Unexpected inputType: " + m_inputType);
@@ -137,11 +137,11 @@ public class ScriptProcessor {
           String[] lines = text.split("[\\n]");
           for (String line : lines) {
             buf.append((insideBlockComment ? "//" : "/*")).
-                append(name).append(":").
-                append(String.format("%-" + ((lines.length + "").length()) + "d", lineNo)).
-                append((insideBlockComment ? "//" : "*/")).append(" ").
-                append(line).
-                append("\n");
+            append(name).append(":").
+            append(String.format("%-" + ((lines.length + "").length()) + "d", lineNo)).
+            append((insideBlockComment ? "//" : "*/")).append(" ").
+            append(line).
+            append("\n");
             if (lineIsBeginOfMultilineBlockComment(line, insideBlockComment)) {
               //also if line is endMLBC AND beginMLBC
               insideBlockComment = true;

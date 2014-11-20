@@ -20,8 +20,8 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
 
 public class JsonButton<T extends IButton> extends JsonFormField<T> {
 
-  public final static String PROP_SYSTEM_TYPE = "systemType";
-  public final static String PROP_PROCESS_BUTTON = "processButton";
+  public static final String PROP_SYSTEM_TYPE = "systemType";
+  public static final String PROP_PROCESS_BUTTON = "processButton";
 
   public JsonButton(T model, IJsonSession jsonSession, String id) {
     super(model, jsonSession, id);

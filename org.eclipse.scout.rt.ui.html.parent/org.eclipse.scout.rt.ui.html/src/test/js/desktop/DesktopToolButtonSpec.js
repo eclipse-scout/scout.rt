@@ -6,8 +6,8 @@ describe("DesktopToolButton", function() {
     setFixtures(sandbox());
     session = new scout.Session($('#sandbox'), '1.1');
     desktop = {
-        $parent: session.$entryPoint,
-        $toolContainer: session.$entryPoint.appendDIV('desktop-tool-container').hide(),
+      $parent: session.$entryPoint,
+      $toolContainer: session.$entryPoint.appendDIV('desktop-tool-container').hide()
     };
   });
 
@@ -16,7 +16,7 @@ describe("DesktopToolButton", function() {
       id = createUniqueAdapterId();
     }
 
-    var model =  {
+    var model = {
       "id": id,
       "enabled": true,
       "visible": true
@@ -26,14 +26,14 @@ describe("DesktopToolButton", function() {
   }
 
   var formMock = {
-      render : function() {},
-      htmlComp : {
-        pack: function() {}
-      }
+    render: function() {},
+    htmlComp: {
+      pack: function() {}
+    }
   };
 
   function createAction(model) {
-    var action =  new scout.DesktopToolButton();
+    var action = new scout.DesktopToolButton();
     action.init(model, session);
     action.desktop = desktop;
     action.form = formMock;

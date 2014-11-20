@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.ui.html.json.menu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ContextMenuEvent;
 
 public interface IContextMenuOwner {
-  public static final String PROP_MENUS = "menus";
+  String PROP_MENUS = "menus";
 
   void handleModelContextMenuChanged(ContextMenuEvent event);
 }

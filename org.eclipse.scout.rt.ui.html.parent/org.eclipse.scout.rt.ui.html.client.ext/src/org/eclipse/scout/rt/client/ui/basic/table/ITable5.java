@@ -19,8 +19,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
 public interface ITable5 extends ITable {
   String PROP_TABLE_STATUS_VISIBLE = "tableStatusVisible";
   String PROP_MENU_BAR_POSITION = "menubarPosition";
-
-  public static final String MENUBAR_POSITION_BOTTOM = "bottom";
+  String MENUBAR_POSITION_BOTTOM = "bottom";
 
   List<ITableControl> getControls();
 

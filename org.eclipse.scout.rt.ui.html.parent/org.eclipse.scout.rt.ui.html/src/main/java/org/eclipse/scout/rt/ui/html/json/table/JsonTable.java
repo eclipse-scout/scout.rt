@@ -352,6 +352,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
         }
       }
       catch (ProcessingException e) {
+        throw new JsonException("", e);
       }
     }
     finally {
@@ -616,38 +617,30 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
       return;
     }
     switch (event.getType()) {
-      case TableEvent.TYPE_ROWS_INSERTED: {
+      case TableEvent.TYPE_ROWS_INSERTED:
         handleModelRowsInserted(event);
         break;
-      }
-      case TableEvent.TYPE_ROWS_DELETED: {
+      case TableEvent.TYPE_ROWS_DELETED:
         handleModelRowsDeleted(event.getRows());
         break;
-      }
-      case TableEvent.TYPE_ALL_ROWS_DELETED: {
+      case TableEvent.TYPE_ALL_ROWS_DELETED:
         handleModelAllRowsDeleted(event.getRows());
         break;
-      }
-      case TableEvent.TYPE_ROWS_SELECTED: {
+      case TableEvent.TYPE_ROWS_SELECTED:
         handleModelRowsSelected(event.getRows());
         break;
-      }
-      case TableEvent.TYPE_ROW_ORDER_CHANGED: {
+      case TableEvent.TYPE_ROW_ORDER_CHANGED:
         handleModelRowOrderChanged(event.getRows());
         break;
-      }
-      case TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED: {
+      case TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED:
         handleModelColumnStructureChanged();
         break;
-      }
-      case TableEvent.TYPE_COLUMN_ORDER_CHANGED: {
+      case TableEvent.TYPE_COLUMN_ORDER_CHANGED:
         handleModelColumnOrderChanged();
         break;
-      }
-      case TableEvent.TYPE_COLUMN_HEADERS_UPDATED: {
+      case TableEvent.TYPE_COLUMN_HEADERS_UPDATED:
         handleModelColumnHeadersUpdated(event.getColumns());
         break;
-      }
       default:
         // NOP
     }

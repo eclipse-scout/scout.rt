@@ -75,6 +75,7 @@ public class JsonTestUtility {
         Thread.sleep(50);
       }
       catch (InterruptedException e) {
+        // NOP
       }
     }
     Assert.fail("Potential memory leak, object " + ref.get() + "still exists after gc");

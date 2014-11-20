@@ -52,7 +52,7 @@ public class TablePage extends AbstractPageWithTable<Table> {
     return m_nodePageFactory.create(row);
   }
 
-  public static interface INodePageFactory {
+  public interface INodePageFactory {
     IPage create(ITableRow row);
   }
 

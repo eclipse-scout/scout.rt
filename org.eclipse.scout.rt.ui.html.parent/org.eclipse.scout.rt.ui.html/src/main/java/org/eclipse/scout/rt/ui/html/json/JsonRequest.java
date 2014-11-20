@@ -13,11 +13,14 @@ package org.eclipse.scout.rt.ui.html.json;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class JsonRequest {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonRequest.class);
 
   public static final String PROP_STARTUP = "startup";
   public static final String PROP_UNLOAD = "unload";
@@ -73,6 +76,7 @@ public class JsonRequest {
       return m_request.toString(2);
     }
     catch (JSONException e) {
+      LOG.warn("", e);
       return m_request.toString();
     }
   }

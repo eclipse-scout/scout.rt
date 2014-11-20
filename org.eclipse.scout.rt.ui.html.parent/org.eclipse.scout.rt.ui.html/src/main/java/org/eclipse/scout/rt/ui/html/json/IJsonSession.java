@@ -17,7 +17,7 @@ import org.json.JSONObject;
 
 public interface IJsonSession {
 
-  void init(HttpServletRequest request, JsonStartupRequest jsonStartupRequest) throws JsonException;
+  void init(HttpServletRequest request, JsonStartupRequest jsonStartupRequest);
 
   void dispose();
 
@@ -55,7 +55,7 @@ public interface IJsonSession {
 
   HttpServletRequest currentHttpRequest();
 
-  JSONObject processRequest(HttpServletRequest httpReq, JsonRequest jsonReq) throws JsonException;
+  JSONObject processRequest(HttpServletRequest httpReq, JsonRequest jsonReq);
 
   /**
    * Performs clean-up operations on the current session, after a request has been processed.

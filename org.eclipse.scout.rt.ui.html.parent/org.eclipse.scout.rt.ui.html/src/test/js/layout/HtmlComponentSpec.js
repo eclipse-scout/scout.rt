@@ -8,11 +8,10 @@ describe("HtmlComponent", function() {
   });
 
   var jqueryMock = {
-    data:function(htmlComp) {
-    }
+    data: function(htmlComp) {}
   };
 
-  var LayoutMock = function(){
+  var LayoutMock = function() {
     LayoutMock.parent.call(this);
   };
   scout.inherits(LayoutMock, scout.AbstractLayout);
@@ -91,23 +90,23 @@ describe("HtmlComponent", function() {
 
     it("reads padding, margin and border correctly", function() {
       var jqueryMock = {
-        data:function(key, value) {
+        data: function(key, value) {
           // NOP
         },
-        css:function(key) {
+        css: function(key) {
           var props = {
-              'margin-top':'1px',
-              'margin-right':'2px',
-              'margin-bottom':'3px',
-              'margin-left':'4px',
-              'padding-top':'5px',
-              'padding-right':'6px',
-              'padding-bottom':'7px',
-              'padding-left':'8px',
-              'border-top-width':'9px',
-              'border-right-width':'10px',
-              'border-bottom-width':'11px',
-              'border-left-width':'12px',
+            'margin-top': '1px',
+            'margin-right': '2px',
+            'margin-bottom': '3px',
+            'margin-left': '4px',
+            'padding-top': '5px',
+            'padding-right': '6px',
+            'padding-bottom': '7px',
+            'padding-left': '8px',
+            'border-top-width': '9px',
+            'border-right-width': '10px',
+            'border-bottom-width': '11px',
+            'border-left-width': '12px'
           };
           return props[key];
         }
@@ -115,7 +114,9 @@ describe("HtmlComponent", function() {
 
       var htmlComp = new scout.HtmlComponent(jqueryMock, session);
       var expected = new scout.Insets(15, 18, 21, 24);
-      var actual = htmlComp.getInsets({includeMargin: true});
+      var actual = htmlComp.getInsets({
+        includeMargin: true
+      });
       expect(actual).toEqual(expected);
     });
 
@@ -124,7 +125,7 @@ describe("HtmlComponent", function() {
   describe("getBounds", function() {
 
     var jqueryMock = {
-      css:function(key) {
+      css: function(key) {
         if (key === 'top') {
           return '5px';
         } else if (key === 'left') {

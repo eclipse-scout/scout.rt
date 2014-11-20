@@ -1,4 +1,10 @@
 var JasmineMavenReporter = function(options) {
+  var noopTimer = {
+    start: function() {},
+    elapsed: function() {
+      return 0;
+    }
+  };
   var timer = options.timer || noopTimer,
     status = 'loaded';
 
@@ -71,12 +77,5 @@ var JasmineMavenReporter = function(options) {
 
   this.executionTime = function() {
     return executionTime;
-  };
-
-  var noopTimer = {
-    start: function() {},
-    elapsed: function() {
-      return 0;
-    }
   };
 };

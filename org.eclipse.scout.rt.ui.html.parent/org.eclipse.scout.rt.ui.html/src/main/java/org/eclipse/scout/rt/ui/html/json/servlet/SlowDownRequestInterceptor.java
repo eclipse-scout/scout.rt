@@ -103,7 +103,7 @@ public class SlowDownRequestInterceptor extends AbstractService implements IServ
       return;
     }
 
-    if (value.equalsIgnoreCase("true") || value.equalsIgnoreCase("false")) {
+    if ("true".equalsIgnoreCase(value) || "false".equalsIgnoreCase(value)) {
       enabled = Boolean.parseBoolean(value);
     }
     else {

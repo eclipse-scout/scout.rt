@@ -399,7 +399,7 @@ scout.AnalysisTableControl.prototype._renderContent = function($parent) {
 
       if ($close.hasClass('criteria-attribute-container')) {
         hideAttribute($close);
-      } else if ($close.hasClass('criteria-attribute')) {} else {
+      } else {
         $close.children('div').animateAVCSD('opacity', 0, $.removeThis);
       }
     }

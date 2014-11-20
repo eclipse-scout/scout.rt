@@ -94,7 +94,7 @@ public class JsonSmartField<T extends ISmartField> extends JsonValueField<T> {
     super.attachModel();
     m_options = isCachingEnabled() ?
         loadOptions(IContentAssistField.BROWSE_ALL_TEXT) :
-          Collections.<ILookupRow<?>> emptyList();
+        Collections.<ILookupRow<?>> emptyList();
   }
 
   private JSONArray optionsToJson(List<? extends ILookupRow<?>> options) {
@@ -124,7 +124,7 @@ public class JsonSmartField<T extends ISmartField> extends JsonValueField<T> {
   private JSONObject addOptions(JSONObject json) {
     // TODO AWE: (smartfield) überlegen ob wir die optionen wirklich hier laden wollen oder besser erst,
     // wenn das popup im UI zum ersten mal geöffnet wird.
-    return putProperty(json, "options", loadOptions(IContentAssistField.BROWSE_ALL_TEXT));
+    return putProperty(json, PROP_OPTIONS, loadOptions(IContentAssistField.BROWSE_ALL_TEXT));
   }
 
   private List<? extends ILookupRow<?>> loadOptions(final String query) {
@@ -151,7 +151,7 @@ public class JsonSmartField<T extends ISmartField> extends JsonValueField<T> {
     String query = event.getData().optString("query");
     LOG.debug("load options for query=" + query);
     JSONArray options = optionsToJson(loadOptions(query));
-    addActionEvent("optionsLoaded", putProperty(new JSONObject(), "options", options));
+    addActionEvent("optionsLoaded", putProperty(new JSONObject(), PROP_OPTIONS, options));
   }
 
   @Override

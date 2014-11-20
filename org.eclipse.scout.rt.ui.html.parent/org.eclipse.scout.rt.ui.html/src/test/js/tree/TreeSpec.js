@@ -20,7 +20,7 @@ describe("Tree", function() {
 
   function createModel(id, nodes) {
     var model = {
-      "id": id,
+      "id": id
     };
 
     if (nodes) {
@@ -286,13 +286,13 @@ describe("Tree", function() {
         allNodes.push(node);
       });
 
-      for (i=0; i < allNodes.length; i++) {
+      for (i = 0; i < allNodes.length; i++) {
         expect(allNodes[i].expanded).toBe(true);
       }
 
       tree.collapseAll();
 
-      for (i=0; i < allNodes.length; i++) {
+      for (i = 0; i < allNodes.length; i++) {
         expect(allNodes[i].expanded).toBe(false);
       }
 
@@ -331,7 +331,6 @@ describe("Tree", function() {
       var node0;
       var node1;
       var node2;
-
 
       beforeEach(function() {
         model = createModelFixture(3, 1, true);
@@ -668,8 +667,14 @@ describe("Tree", function() {
 
         sendQueuedAjaxCalls();
 
-        var event0 = new scout.Event('nodeExpanded', tree.id, {"nodeId": node0.id, expanded: true});
-        var event1 = new scout.Event('nodeExpanded', tree.id, {"nodeId": child0.id, expanded: true});
+        var event0 = new scout.Event('nodeExpanded', tree.id, {
+          "nodeId": node0.id,
+          expanded: true
+        });
+        var event1 = new scout.Event('nodeExpanded', tree.id, {
+          "nodeId": child0.id,
+          expanded: true
+        });
         expect(mostRecentJsonRequest()).toContainEvents([event0, event1]);
       });
 
@@ -677,8 +682,8 @@ describe("Tree", function() {
         tree.render(session.$entryPoint);
 
         var message = {
-            events: [createNodesSelectedEvent(model, [node0.id])]
-          };
+          events: [createNodesSelectedEvent(model, [node0.id])]
+        };
         session._processSuccessResponse(message);
 
         sendQueuedAjaxCalls();
@@ -737,7 +742,6 @@ describe("Tree", function() {
       var node0;
       var node1;
       var node2;
-
 
       beforeEach(function() {
         model = createModelFixture(3, 1, true);

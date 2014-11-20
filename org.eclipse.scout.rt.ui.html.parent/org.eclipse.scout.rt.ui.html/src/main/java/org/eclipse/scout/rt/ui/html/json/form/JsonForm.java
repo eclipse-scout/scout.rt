@@ -131,10 +131,9 @@ public class JsonForm<T extends IForm> extends AbstractJsonPropertyObserver<T> i
 
   protected void handleModelFormChanged(FormEvent event) {
     switch (event.getType()) {
-      case FormEvent.TYPE_CLOSED: {
+      case FormEvent.TYPE_CLOSED:
         handleModelFormClosed(event.getForm());
         break;
-      }
       default:
         // NOP
     }

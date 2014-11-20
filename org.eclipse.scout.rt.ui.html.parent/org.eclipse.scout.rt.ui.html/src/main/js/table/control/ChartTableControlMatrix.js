@@ -151,7 +151,7 @@ scout.ChartTableControlMatrix.prototype.addAxis = function(axis, axisGroup) {
 
 scout.ChartTableControlMatrix.prototype.calculateCube = function() {
   var cube = {},
-    r, v, k, data, key;
+    r, v, k, data, key, normData, normKey;
 
   // collect data from table
   for (r = 0; r < this._rows.length; r++) {
@@ -159,7 +159,7 @@ scout.ChartTableControlMatrix.prototype.calculateCube = function() {
     var keys = [];
     for (k = 0; k < this._allAxis.length; k++) {
       key = this._table.getCellValue(this._allAxis[k].column, this._rows[r]);
-      var normKey = this._allAxis[k].norm(key);
+      normKey = this._allAxis[k].norm(key);
 
       if (normKey !== undefined) {
         this._allAxis[k].add(normKey);
@@ -173,7 +173,7 @@ scout.ChartTableControlMatrix.prototype.calculateCube = function() {
     for (v = 0; v < this._allData.length; v++) {
       data = this._table.getCellValue(this._allData[v].column, this._rows[r]);
       normData = this._allData[v].norm(data);
-      var normData = this._allData[v].norm(data);
+      normData = this._allData[v].norm(data);
       if (normData !== undefined) {
         values.push(normData);
       }

@@ -89,15 +89,15 @@ scout.TableControl.prototype.setLabel = function (link) {
       ', ' + ((x1 + x2) / 2) + ', ' + ((y1 + y2) / 2) + ')');
 };
 
-// disolve crossing links
+// dissolve crossing links
 scout.TableControl.prototype.disolveLinks = function () {
   for (var l1 = 0; l1 < this.graph.links.length; l1++) {
     var link1 = this.graph.links[l1],
       E = {}, F = {};
 
-    E.x = this.getPos(link1, 'x1'),
-    E.y = this.getPos(link1, 'y1'),
-    F.x = this.getPos(link1, 'x2'),
+    E.x = this.getPos(link1, 'x1');
+    E.y = this.getPos(link1, 'y1');
+    F.x = this.getPos(link1, 'x2');
     F.y = this.getPos(link1, 'y2');
 
     for (var l2 = 0; l2 < this.graph.links.length; l2++) {
@@ -106,9 +106,9 @@ scout.TableControl.prototype.disolveLinks = function () {
       var link2 = this.graph.links[l2],
         P = {}, Q = {};
 
-      P.x = this.getPos(link2, 'x1'),
-      P.y = this.getPos(link2, 'y1'),
-      Q.x = this.getPos(link2, 'x2'),
+      P.x = this.getPos(link2, 'x1');
+      P.y = this.getPos(link2, 'y1');
+      Q.x = this.getPos(link2, 'x2');
       Q.y = this.getPos(link2, 'y2');
 
       // ckeck if crossing exists, if yes: change position
@@ -137,8 +137,7 @@ scout.TableControl.prototype.doPhysics = function () {
     var node = this.graph.nodes[n],
       x = this.getPos(node, 'x'),
       y = this.getPos(node, 'y'),
-      dx,dy;
-    dx = 0, dy = 0;
+      dx = 0, dy = 0;
 
     // move center to the middle
     if (node.type === 'center') {

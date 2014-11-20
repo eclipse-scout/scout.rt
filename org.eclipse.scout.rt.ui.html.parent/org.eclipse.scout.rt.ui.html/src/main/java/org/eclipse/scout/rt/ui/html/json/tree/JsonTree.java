@@ -43,6 +43,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   public static final String PROP_COMMON_PARENT_NODE_ID = "commonParentNodeId";
   public static final String PROP_NODE = "node";
   public static final String PROP_NODES = "nodes";
+  public static final String PROP_EXPANDED = "expanded";
   public static final String PROP_SELECTED_NODE_IDS = "selectedNodeIds";
 
   private P_ModelTreeListener m_modelTreeListener;
@@ -160,31 +161,26 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
       return;
     }
     switch (event.getType()) {
-      case TreeEvent.TYPE_NODES_INSERTED: {
+      case TreeEvent.TYPE_NODES_INSERTED:
         handleModelNodesInserted(event);
         break;
-      }
-      case TreeEvent.TYPE_NODES_DELETED: {
+      case TreeEvent.TYPE_NODES_DELETED:
         handleModelNodesDeleted(event);
         break;
-      }
       case TreeEvent.TYPE_NODE_EXPANDED:
-      case TreeEvent.TYPE_NODE_COLLAPSED: {
+      case TreeEvent.TYPE_NODE_COLLAPSED:
         if (isInvisibleRootNode(event.getNode())) {
           //Not necessary to send events for invisible root node
           return;
         }
         handleModelNodeExpanded(event.getNode());
         break;
-      }
-      case TreeEvent.TYPE_NODES_SELECTED: {
+      case TreeEvent.TYPE_NODES_SELECTED:
         handleModelNodesSelected(event.getNodes());
         break;
-      }
-      case TreeEvent.TYPE_NODE_CHANGED: {
+      case TreeEvent.TYPE_NODE_CHANGED:
         handleModelNodeChanged(event.getNode());
         break;
-      }
       default:
         // NOP
     }
@@ -193,7 +189,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   protected void handleModelNodeExpanded(ITreeNode modelNode) {
     JSONObject jsonEvent = new JSONObject();
     putProperty(jsonEvent, PROP_NODE_ID, getOrCreateNodeId(modelNode));
-    putProperty(jsonEvent, "expanded", modelNode.isExpanded());
+    putProperty(jsonEvent, PROP_EXPANDED, modelNode.isExpanded());
     addActionEvent(EVENT_NODE_EXPANDED, jsonEvent);
   }
 
@@ -299,7 +295,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     String id = getOrCreateNodeId(node);
     JSONObject json = new JSONObject();
     putProperty(json, "id", id);
-    putProperty(json, "expanded", node.isExpanded());
+    putProperty(json, PROP_EXPANDED, node.isExpanded());
     putProperty(json, "leaf", node.isLeaf());
     putCellProperties(json, node.getCell());
     JSONArray jsonChildNodes = new JSONArray();
@@ -375,7 +371,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
 
   protected void handleUiNodeExpanded(JsonEvent event, JsonResponse res) {
     ITreeNode node = getTreeNodeForNodeId(JsonObjectUtility.getString(event.getData(), PROP_NODE_ID));
-    boolean expanded = JsonObjectUtility.getBoolean(event.getData(), "expanded");
+    boolean expanded = JsonObjectUtility.getBoolean(event.getData(), PROP_EXPANDED);
     int eventType = TreeEvent.TYPE_NODE_EXPANDED;
     if (!expanded) {
       eventType = TreeEvent.TYPE_NODE_COLLAPSED;

@@ -49,7 +49,7 @@ public abstract class AbstractOutline5 extends AbstractExtensibleOutline impleme
       ensureDefaultDetailFormStarted();
     }
     catch (ProcessingException e) {
-      SERVICES.getService(IExceptionHandlerService.class);
+      SERVICES.getService(IExceptionHandlerService.class).handleException(e);
     }
   }
 

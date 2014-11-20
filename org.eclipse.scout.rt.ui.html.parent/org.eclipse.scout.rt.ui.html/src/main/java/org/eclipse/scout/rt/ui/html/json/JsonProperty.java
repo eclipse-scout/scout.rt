@@ -36,7 +36,7 @@ public abstract class JsonProperty<T> {
     return m_model;
   }
 
-  abstract protected Object modelValue();
+  protected abstract Object modelValue();
 
   public Object prepareValueForToJson(Object value) {
     return value;
