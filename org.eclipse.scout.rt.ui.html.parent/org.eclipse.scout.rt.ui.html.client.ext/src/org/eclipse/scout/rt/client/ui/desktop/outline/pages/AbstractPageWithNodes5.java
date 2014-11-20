@@ -29,7 +29,7 @@ import org.eclipse.scout.rt.shared.ui.menu.IMenu5;
 import org.eclipse.scout.rt.shared.ui.menu.MenuWrapper;
 import org.eclipse.scout.service.SERVICES;
 
-public class AbstractPageWithNodes5 extends AbstractExtensiblePageWithNodes {
+public abstract class AbstractPageWithNodes5 extends AbstractExtensiblePageWithNodes {
 
   public AbstractPageWithNodes5() {
     super();

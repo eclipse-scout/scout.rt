@@ -34,7 +34,7 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
 
   public AbstractJsonPropertyObserver(T model, IJsonSession jsonSession, String id) {
     super(model, jsonSession, id);
-    m_propertyEventFilter = new PropertyEventFilter(getModel());
+    m_propertyEventFilter = new PropertyEventFilter();
   }
 
   @Override

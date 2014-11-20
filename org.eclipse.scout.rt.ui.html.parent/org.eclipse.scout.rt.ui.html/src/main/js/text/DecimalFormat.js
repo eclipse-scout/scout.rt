@@ -13,7 +13,6 @@ scout.DecimalFormat = function(locale, pattern) {
     pattern = locale.decimalFormatPatternDefault;
   }
 
-
   //FIXME HALF_UP is the default, other rounding modes need to be considered as well.
   //this._roundingMode ='HALF_UP';
   this._symbols = locale.decimalFormatSymbols;
@@ -30,14 +29,14 @@ scout.DecimalFormat = function(locale, pattern) {
   //  find prefix and suffix for negative numbers
   var split = pattern.split(this._symbols.patternSeparator);
   if (split.length > 1) {
-    this.negPrefix = split[1].slice(0, _find(split[1], this._symbols.zeroDigit + this._symbols.digit, 1));
-    this.negSuffix = split[1].slice(_find(split[1], this._symbols.zeroDigit + this._symbols.digit, -1) + 1);
+    this.negPrefix = split[1].slice(0, find(split[1], this._symbols.zeroDigit + this._symbols.digit, 1));
+    this.negSuffix = split[1].slice(find(split[1], this._symbols.zeroDigit + this._symbols.digit, -1) + 1);
     pattern = split[0];
   }
 
   // find group length
-  var start = _find(pattern, this._symbols.groupingSeparator, -1),
-    end = _find(pattern, this._symbols.decimalSeparator, 1) || pattern.length;
+  var start = find(pattern, this._symbols.groupingSeparator, -1),
+    end = find(pattern, this._symbols.decimalSeparator, 1) || pattern.length;
   if (start && end) this.groupLength = end - start - 1;
   pattern = pattern.replace(this._symbols.groupingSeparator, '');
 
@@ -45,24 +44,24 @@ scout.DecimalFormat = function(locale, pattern) {
   split = pattern.split(this._symbols.decimalSeparator);
 
   // find digits before and after decimal point
-  this.zeroBefore = _count(split[0], this._symbols.zeroDigit);
-  this.zeroAfter = _count(split[1], this._symbols.zeroDigit);
-  this.allAfter = this.zeroAfter + _count(split[1], this._symbols.digit);
+  this.zeroBefore = count(split[0], this._symbols.zeroDigit);
+  this.zeroAfter = count(split[1], this._symbols.zeroDigit);
+  this.allAfter = this.zeroAfter + count(split[1], this._symbols.digit);
 
   // helper function
-  function _find(string, chars, dir) {
+  function find(string, chars, dir) {
     for (var i = ((dir === 1) ? 0 : string.length - 1); i < string.length && i > -1; i += dir) {
       if (chars.indexOf(string[i]) > -1) return i;
     }
     return null;
   }
 
-  function _count(str, separator) {
+  function count(str, separator) {
     return str.split(separator).length - 1;
   }
 };
 
-scout.DecimalFormat.prototype.format = function format(number) {
+scout.DecimalFormat.prototype.format = function(number) {
   /*jshint newcap: false */
 
   if (number < 0) return this.negPrefix + this.format(-number) + this.negSuffix;

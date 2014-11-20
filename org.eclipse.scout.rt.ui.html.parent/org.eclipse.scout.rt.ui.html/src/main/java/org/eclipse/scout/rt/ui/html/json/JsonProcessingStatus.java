@@ -19,14 +19,14 @@ import org.json.JSONObject;
  */
 public class JsonProcessingStatus implements IJsonMapper {
 
-  private final IProcessingStatus processingStatus;
+  private final IProcessingStatus m_processingStatus;
 
   public JsonProcessingStatus(IProcessingStatus processingStatus) {
-    this.processingStatus = processingStatus;
+    this.m_processingStatus = processingStatus;
   }
 
   public IProcessingStatus getProcessingStatus() {
-    return processingStatus;
+    return m_processingStatus;
   }
 
   @Override
@@ -38,7 +38,7 @@ public class JsonProcessingStatus implements IJsonMapper {
   }
 
   private String getIconUrl() {
-    switch (processingStatus.getSeverity()) {
+    switch (m_processingStatus.getSeverity()) {
       case IProcessingStatus.FATAL:
       case IProcessingStatus.ERROR:
         return AbstractIcons.StatusError;
@@ -51,14 +51,14 @@ public class JsonProcessingStatus implements IJsonMapper {
 
   private String getMessage() {
     StringBuilder sb = new StringBuilder();
-    if (processingStatus.getTitle() != null) {
-      sb.append(processingStatus.getTitle());
+    if (m_processingStatus.getTitle() != null) {
+      sb.append(m_processingStatus.getTitle());
     }
-    if (processingStatus.getMessage() != null) {
+    if (m_processingStatus.getMessage() != null) {
       if (sb.length() > 0) {
         sb.append("\n");
       }
-      sb.append(processingStatus.getMessage());
+      sb.append(m_processingStatus.getMessage());
     }
     return sb.toString();
   }

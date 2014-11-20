@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineNavigateDownMenu;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.service.SERVICES;
 
-public class AbstractPageWithTable5<T extends ITable5> extends AbstractPageWithTable<T> implements IPage5 {
+public abstract class AbstractPageWithTable5<T extends ITable5> extends AbstractPageWithTable<T> implements IPage5 {
 
   @Override
   protected void initConfig() {

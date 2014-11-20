@@ -26,7 +26,7 @@ import org.eclipse.scout.rt.ui.html.json.PropertyChangeEventFilterCondition;
  * @param <T>
  */
 public class JsonValueField<T extends IValueField<?>> extends JsonFormField<T> {
-  public String EVENT_DISPLAY_TEXT_CHANGED = "displayTextChanged";
+  public static final String EVENT_DISPLAY_TEXT_CHANGED = "displayTextChanged";
 
   public JsonValueField(T model, IJsonSession session, String id) {
     super(model, session, id);

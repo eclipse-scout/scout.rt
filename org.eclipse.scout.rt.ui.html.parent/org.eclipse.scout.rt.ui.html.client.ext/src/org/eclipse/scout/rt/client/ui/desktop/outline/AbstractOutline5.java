@@ -32,7 +32,7 @@ import org.eclipse.scout.rt.extension.client.ui.desktop.outline.AbstractExtensib
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.service.SERVICES;
 
-public class AbstractOutline5 extends AbstractExtensibleOutline implements IOutline5 {
+public abstract class AbstractOutline5 extends AbstractExtensibleOutline implements IOutline5 {
   private IForm m_defaultDetailForm;
 
   @Override

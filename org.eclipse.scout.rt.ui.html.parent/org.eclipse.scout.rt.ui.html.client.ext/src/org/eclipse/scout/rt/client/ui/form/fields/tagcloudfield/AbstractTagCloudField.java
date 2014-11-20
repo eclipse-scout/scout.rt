@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.tagcloudfield;
 
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 
-public class AbstractTagCloudField extends AbstractFormField implements ITagCloudField {
+public abstract class AbstractTagCloudField extends AbstractFormField implements ITagCloudField {
 
   public AbstractTagCloudField() {
     this(true);

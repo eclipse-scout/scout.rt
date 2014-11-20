@@ -56,7 +56,7 @@ scout.DateFormat = function(locale, pattern) {
   }, {
     term: 'MM',
     func: function(date) {
-      return _padding(date.getMonth() + 1);
+      return padding(date.getMonth() + 1);
     }
   }, {
     term: 'M',
@@ -68,31 +68,31 @@ scout.DateFormat = function(locale, pattern) {
   patternLibrary['week in year'] = [{
     term: 'ww',
     func: function(date) {
-      return _padding(_weekInYear(date));
+      return padding(weekInYear(date));
     }
   }, {
     term: 'w',
     func: function(date) {
-      return _weekInYear(date);
+      return weekInYear(date);
     }
   }];
 
   patternLibrary['week in month'] = [{
     term: 'WW',
     func: function(date) {
-      return _padding(_weekInMonth(date));
+      return padding(weekInMonth(date));
     }
   }, {
     term: 'W',
     func: function(date) {
-      return _weekInMonth(date);
+      return weekInMonth(date);
     }
   }];
 
   patternLibrary['day in month'] = [{
     term: 'dd',
     func: function(date) {
-      return _padding(date.getDate());
+      return padding(date.getDate());
     }
   }, {
     term: 'd',
@@ -116,7 +116,7 @@ scout.DateFormat = function(locale, pattern) {
   patternLibrary['hour: 0 - 23'] = [{
     term: 'HH',
     func: function(date) {
-      return _padding(date.getHours());
+      return padding(date.getHours());
     }
   }, {
     term: 'H',
@@ -128,7 +128,7 @@ scout.DateFormat = function(locale, pattern) {
   patternLibrary['hour: 1 - 12'] = [{
     term: 'KK',
     func: function(date) {
-      return _padding((date.getHours() + 11) % 12 + 1);
+      return padding((date.getHours() + 11) % 12 + 1);
     }
   }, {
     term: 'K',
@@ -147,7 +147,7 @@ scout.DateFormat = function(locale, pattern) {
   patternLibrary['minutes'] = [{
     term: 'mm',
     func: function(date) {
-      return _padding(date.getMinutes());
+      return padding(date.getMinutes());
     }
   }, {
     term: 'm',
@@ -159,7 +159,7 @@ scout.DateFormat = function(locale, pattern) {
   patternLibrary['seconds'] = [{
     term: 'ss',
     func: function(date) {
-      return _padding(date.getSeconds());
+      return padding(date.getSeconds());
     }
   }, {
     term: 's',
@@ -196,16 +196,16 @@ scout.DateFormat = function(locale, pattern) {
     }
   }
 
-  function _padding(number) {
+  function padding(number) {
     return (number <= 9 ? '0' + number : number);
   }
 
-  function _weekInYear(date) {
+  function weekInYear(date) {
     var onejan = new Date(date.getFullYear(), 0, 1);
     return Math.ceil((((date - onejan) / 86400000) + onejan.getDay() + 1) / 7);
   }
 
-  function _weekInMonth(date) {
+  function weekInMonth(date) {
     var onemon = new Date(date.getFullYear(), date.getMonth(), 1);
     return Math.ceil((((date - onemon) / 86400000) + onemon.getDay() + 1) / 7);
   }

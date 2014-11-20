@@ -20,23 +20,23 @@ import org.junit.Test;
 
 public class JsonFormFieldTest extends BaseFormFieldTest {
 
-  AbstractGroupBox model = new AbstractGroupBox() {
+  AbstractGroupBox m_model = new AbstractGroupBox() {
   };
 
-  JsonFormField formField = new JsonFormField<>(model, session, session.createUniqueIdFor(null));
+  JsonFormField m_formField = new JsonFormField<>(m_model, m_session, m_session.createUniqueIdFor(null));
 
   @Before
   public void setUp() {
-    model.setLabel("fooBar");
-    model.setEnabled(false);
-    model.setVisible(false);
-    model.setMandatory(true);
-    model.setErrorStatus("allesFalsch");
+    m_model.setLabel("fooBar");
+    m_model.setEnabled(false);
+    m_model.setVisible(false);
+    m_model.setMandatory(true);
+    m_model.setErrorStatus("allesFalsch");
   }
 
   @Test
   public void testToJson() throws JSONException {
-    JSONObject json = formField.toJson();
+    JSONObject json = m_formField.toJson();
     assertEquals("fooBar", json.get("label"));
     assertEquals(Boolean.FALSE, json.get("enabled"));
     assertEquals(Boolean.FALSE, json.get("visible"));

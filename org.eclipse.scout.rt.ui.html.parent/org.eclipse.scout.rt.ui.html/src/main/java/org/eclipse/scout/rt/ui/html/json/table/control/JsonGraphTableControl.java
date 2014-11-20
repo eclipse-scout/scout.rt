@@ -18,7 +18,7 @@ import org.json.JSONObject;
 public class JsonGraphTableControl<T extends IGraphTableControl> extends JsonTableControl<T> {
 
   //FIXME add to model
-  private String GRAPH = "{\"nodes\": [{\"id\": 0, \"name\": \"Daniel Anders\", \"type\": \"center\"}," +
+  private static final String GRAPH = "{\"nodes\": [{\"id\": 0, \"name\": \"Daniel Anders\", \"type\": \"center\"}," +
       "                            {\"id\": 1, \"name\": \"VISECA\", \"type\": \"company\"}," +
       "                            {\"id\": 2, \"name\": \"Markus Brunold\", \"type\": \"internal\"}," +
       "                            {\"id\": 3, \"name\": \"Hansruedi Näf\", \"type\": \"person\"}," +

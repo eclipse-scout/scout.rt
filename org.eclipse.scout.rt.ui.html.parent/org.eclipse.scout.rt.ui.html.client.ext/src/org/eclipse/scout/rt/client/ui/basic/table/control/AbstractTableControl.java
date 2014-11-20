@@ -16,7 +16,7 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.service.SERVICES;
 
-public class AbstractTableControl extends AbstractPropertyObserver implements ITableControl {
+public abstract class AbstractTableControl extends AbstractPropertyObserver implements ITableControl {
   private String m_cssClass;
   private String m_group;
 

@@ -23,37 +23,37 @@ import org.mockito.Mockito;
 
 public class JsonResponseTest {
 
-  JsonSessionMock jsonSession = new JsonSessionMock();
+  JsonSessionMock m_jsonSession = new JsonSessionMock();
 
   @Test
   public void testJsonEventPropertyChangeEvent() throws JSONException {
     // Check empty response
-    JSONObject json = jsonSession.currentJsonResponse().toJson();
+    JSONObject json = m_jsonSession.currentJsonResponse().toJson();
 
     assertNotNull(json);
     JSONArray events = json.getJSONArray("events");
     assertEquals(0, events.length());
 
     // Check single property change event
-    final String TEST_ID = "ID007";
-    final String TEST_PROP_NAME = "a stränge prøpertÿ name";
-    final String TEST_VALUE = "#";
-    jsonSession.currentJsonResponse().addPropertyChangeEvent(TEST_ID, TEST_PROP_NAME, TEST_VALUE);
-    json = jsonSession.currentJsonResponse().toJson();
+    final String testId = "ID007";
+    final String testPropName = "a stränge prøpertÿ name";
+    final String testValue = "#";
+    m_jsonSession.currentJsonResponse().addPropertyChangeEvent(testId, testPropName, testValue);
+    json = m_jsonSession.currentJsonResponse().toJson();
 
     assertNotNull(json);
     events = json.getJSONArray("events");
     assertEquals(1, events.length());
 
     JSONObject event = events.getJSONObject(0);
-    assertEquals(TEST_ID, event.get("id"));
+    assertEquals(testId, event.get("id"));
     assertEquals("property", event.get("type"));
     JSONObject props = event.getJSONObject("properties");
     assertNotNull(props);
     assertEquals(1, props.length());
-    assertEquals(TEST_PROP_NAME, props.keys().next());
-    Object value = props.get(TEST_PROP_NAME);
-    assertEquals(TEST_VALUE, value);
+    assertEquals(testPropName, props.keys().next());
+    Object value = props.get(testPropName);
+    assertEquals(testValue, value);
   }
 
   /**
@@ -61,8 +61,8 @@ public class JsonResponseTest {
    */
   @Test
   public void testJsonEventPropertyNullToEmptyString() throws JSONException {
-    jsonSession.currentJsonResponse().addPropertyChangeEvent("-1", "name", null);
-    JSONObject json = jsonSession.currentJsonResponse().toJson();
+    m_jsonSession.currentJsonResponse().addPropertyChangeEvent("-1", "name", null);
+    JSONObject json = m_jsonSession.currentJsonResponse().toJson();
     JSONArray events = json.getJSONArray("events");
     JSONObject props = events.getJSONObject(0).getJSONObject("properties");
     assertEquals(props.get("name"), "");

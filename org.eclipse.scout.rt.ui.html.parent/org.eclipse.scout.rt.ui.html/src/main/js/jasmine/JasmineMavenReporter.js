@@ -1,83 +1,82 @@
-  function JasmineMavenReporter(options) {
-    var timer = options.timer || noopTimer,
-      status = 'loaded';
+var JasmineMavenReporter = function(options) {
+  var timer = options.timer || noopTimer,
+    status = 'loaded';
 
-    this.started = false;
-    this.finished = false;
+  this.started = false;
+  this.finished = false;
 
-    this.jasmineStarted = function() {
-      this.started = true;
-      status = 'started';
-      timer.start();
-    };
+  this.jasmineStarted = function() {
+    this.started = true;
+    status = 'started';
+    timer.start();
+  };
 
-    var executionTime;
+  var executionTime;
 
-    this.jasmineDone = function() {
-      this.finished = true;
-      executionTime = timer.elapsed();
-      status = 'done';
-    };
+  this.jasmineDone = function() {
+    this.finished = true;
+    executionTime = timer.elapsed();
+    status = 'done';
+  };
 
-    this.status = function() {
-      return status;
-    };
+  this.status = function() {
+    return status;
+  };
 
-    var suites = [];
+  var suites = [];
 
-    this.suiteStarted = function(result) {
-      suites.push(result);
-
-      //api for maven plugin
-      result.children = [];
-      result.name = '';
-    };
-
-    this.suiteDone = function(result) {
-    };
+  this.suiteStarted = function(result) {
+    suites.push(result);
 
     //api for maven plugin
-    this.suites = function() {
-      return suites;
-    };
+    result.children = [];
+    result.name = '';
+  };
 
-    var specs = {};
-    this.specStarted = function(result) {
-      //api for maven plugin
-      suites[suites.length-1].children.push(result);
-      result.children = [];
-    };
+  this.suiteDone = function(result) {};
 
-    this.specDone = function(result) {
-      specs[result.id] = result;
+  //api for maven plugin
+  this.suites = function() {
+    return suites;
+  };
 
-      //api for maven plugin
-      result.name = result.fullName;
-      result.type = 'spec';
-      result.result = result.status;
-      result.messages = result.failedExpectations;
-      for (var i = 0; i < result.messages.length; i++) {
-        result.messages[i].type = '';
-      }
-    };
+  var specs = {};
+  this.specStarted = function(result) {
+    //api for maven plugin
+    suites[suites.length - 1].children.push(result);
+    result.children = [];
+  };
+
+  this.specDone = function(result) {
+    specs[result.id] = result;
 
     //api for maven plugin
-    this.results = function() {
-      return specs;
-    };
+    result.name = result.fullName;
+    result.type = 'spec';
+    result.result = result.status;
+    result.messages = result.failedExpectations;
+    for (var i = 0; i < result.messages.length; i++) {
+      result.messages[i].type = '';
+    }
+  };
 
-    this.specs = function() {
-      return specs;
-    };
+  //api for maven plugin
+  this.results = function() {
+    return specs;
+  };
 
-    this.executionTime = function() {
-      return executionTime;
-    };
+  this.specs = function() {
+    return specs;
+  };
 
-    var noopTimer = {
-      start: function() {},
-      elapsed: function() {
-        return 0;
-      }
-    };
-  }
+  this.executionTime = function() {
+    return executionTime;
+  };
+
+  var noopTimer = {
+    start: function() {},
+    elapsed: function() {
+      return 0;
+    }
+  };
+};

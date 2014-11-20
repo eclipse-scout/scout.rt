@@ -26,7 +26,7 @@ import org.eclipse.scout.rt.shared.ui.UiLayer2;
 import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
 import org.eclipse.scout.service.SERVICES;
 
-public class AbstractTable5 extends AbstractExtensibleTable implements ITable5 {
+public abstract class AbstractTable5 extends AbstractExtensibleTable implements ITable5 {
   private List<ITableControl> m_tableControls;
   private IReloadHandler m_reloadHandler;
 

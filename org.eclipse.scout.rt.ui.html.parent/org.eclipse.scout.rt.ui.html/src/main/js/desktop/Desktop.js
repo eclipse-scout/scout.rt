@@ -76,7 +76,7 @@ scout.Desktop.prototype._render = function($parent) {
     action.menuStyle = 'taskbar';
     action.render(this.$toolbar);
   }
-  if(action){
+  if (action) {
     action.$container.addClass('last');
   }
 
@@ -138,10 +138,10 @@ scout.Desktop.TabAndContent.prototype._update = function(content, title, subtitl
 // bereits geöffneten Tab/Dialog zu wecheseln. Oder das Menü-Item disablen.
 
 scout.Desktop.prototype._addTab = function(tab, prepend) {
-  tab.$container = $.makeDIV('taskbar-tab-item').
-     append($.makeDIV('title', tab.title).attr('title', tab.title)).
-     append($.makeDIV('subtitle', 'Bearbeiten')); // TODO AWE: (desktop) sub-titel für forms
-     // müsste abhängig von Handler gesetzt werden.
+  tab.$container = $.makeDIV('taskbar-tab-item')
+    .append($.makeDIV('title', tab.title).attr('title', tab.title))
+    .append($.makeDIV('subtitle', 'Bearbeiten')); // TODO AWE: (desktop) sub-titel für forms
+  //TODO müsste abhängig von Handler gesetzt werden.
 
   if (prepend) {
     tab.$container.prependTo(this.$tabbar);
@@ -149,7 +149,7 @@ scout.Desktop.prototype._addTab = function(tab, prepend) {
     tab.$container.appendTo(this.$tabbar);
   }
 
-  tab.$container.on('click', function onTabClicked() {
+  tab.$container.on('click', function() {
     if (tab !== this._selectedTab) {
       this._selectTab(tab);
     }

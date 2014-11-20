@@ -12,14 +12,9 @@ package org.eclipse.scout.rt.ui.html.json;
 
 import java.beans.PropertyChangeEvent;
 
-import org.eclipse.scout.commons.beans.IPropertyObserver;
-
 public class PropertyEventFilter extends AbstractEventFilter<PropertyChangeEvent, PropertyChangeEventFilterCondition> {
 
-  private IPropertyObserver m_source;
-
-  public PropertyEventFilter(IPropertyObserver source) {
-    m_source = source;
+  public PropertyEventFilter() {
   }
 
   /**

@@ -648,6 +648,8 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
         handleModelColumnHeadersUpdated(event.getColumns());
         break;
       }
+      default:
+        // NOP
     }
   }
 

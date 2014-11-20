@@ -32,7 +32,7 @@ import org.eclipse.scout.rt.shared.ui.menu.ActionListener;
 import org.eclipse.scout.rt.shared.ui.menu.IMenu5;
 import org.eclipse.scout.service.SERVICES;
 
-public class AbstractForm5 extends AbstractForm implements IForm5 {
+public abstract class AbstractForm5 extends AbstractForm implements IForm5 {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractForm5.class);
   private P_SystemMenuListener m_systemMenuListener;
   private HashSet<Integer> m_enabledSystemTypes;

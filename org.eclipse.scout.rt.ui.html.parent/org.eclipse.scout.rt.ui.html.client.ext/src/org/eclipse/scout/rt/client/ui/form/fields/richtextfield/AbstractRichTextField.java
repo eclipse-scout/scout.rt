@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.richtextfield;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractBasicField;
 import org.eclipse.scout.rt.client.ui.form.fields.IBasicFieldUIFacade;
 
-public class AbstractRichTextField extends AbstractBasicField implements IRichTextField {
+public abstract class AbstractRichTextField extends AbstractBasicField implements IRichTextField {
   private IBasicFieldUIFacade m_uiFacade;
 
   public AbstractRichTextField() {

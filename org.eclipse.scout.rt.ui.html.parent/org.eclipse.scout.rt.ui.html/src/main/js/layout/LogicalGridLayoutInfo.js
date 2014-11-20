@@ -140,9 +140,9 @@ scout.LogicalGridLayoutInfo.prototype._initializeColumns = function(compSize, hg
   var compCount = compSize.length;
   var prefWidths = scout.arrays.init(this.cols, 0);
   var fixedWidths = scout.arrays.init(this.cols, false);
-  var i, j, k, prefw;
+  var i, j, k, prefw, cons;
   for (i = 0; i < compCount; i++) {
-      var cons = this.gridDatas[i];
+      cons = this.gridDatas[i];
       if (cons.gridw === 1) {
         if (cons.widthHint > 0) {
           prefw = cons.widthHint;
@@ -162,7 +162,7 @@ scout.LogicalGridLayoutInfo.prototype._initializeColumns = function(compSize, hg
       }
     }
     for (i = 0; i < compCount; i++) {
-      var cons = this.gridDatas[i];
+      cons = this.gridDatas[i];
       if (cons.gridw > 1) {
         var hSpan = cons.gridw;
         var spanWidth = 0;
@@ -229,7 +229,7 @@ scout.LogicalGridLayoutInfo.prototype._initializeColumns = function(compSize, hg
         var weightSum = 0;
         var weightCount = 0;
         for (k = 0; k < compCount; k++) {
-          var cons = this.gridDatas[k];
+          cons = this.gridDatas[k];
           if (cons.weightx > 0 && cons.gridx <= i && i <= cons.gridx + cons.gridw - 1) {
             weightSum += (cons.weightx / cons.gridw);
             weightCount++;
@@ -254,9 +254,9 @@ scout.LogicalGridLayoutInfo.prototype._initializeRows = function(compSize, vgap)
   var compCount = compSize.length;
   var prefHeights = scout.arrays.init(this.rows, 0);
   var fixedHeights = scout.arrays.init(this.rows, false);
-  var i, j, k, prefh;
+  var i, j, k, prefh, cons;
   for (i = 0; i < compCount; i++) {
-      var cons = this.gridDatas[i];
+      cons = this.gridDatas[i];
       if (cons.gridh === 1) {
         if (cons.heightHint > 0) {
           prefh = cons.heightHint;
@@ -276,7 +276,7 @@ scout.LogicalGridLayoutInfo.prototype._initializeRows = function(compSize, vgap)
       }
     }
     for (i = 0; i < compCount; i++) {
-      var cons = this.gridDatas[i];
+      cons = this.gridDatas[i];
       if (cons.gridh > 1) {
         var vSpan = cons.gridh;
         var spanHeight = 0;
@@ -335,7 +335,7 @@ scout.LogicalGridLayoutInfo.prototype._initializeRows = function(compSize, vgap)
         var weightSum = 0;
         var weightCount = 0;
         for (k = 0; k < compCount; k++) {
-          var cons = this.gridDatas[k];
+          cons = this.gridDatas[k];
           if (cons.weighty > 0 && cons.gridy <= i && i <= cons.gridy + cons.gridh - 1) {
             weightSum += (cons.weighty / cons.gridh);
             weightCount++;

@@ -185,6 +185,8 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
         handleModelNodeChanged(event.getNode());
         break;
       }
+      default:
+        // NOP
     }
   }
 

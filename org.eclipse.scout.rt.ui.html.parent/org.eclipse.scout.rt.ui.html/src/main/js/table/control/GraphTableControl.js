@@ -112,7 +112,7 @@ scout.TableControl.prototype.disolveLinks = function () {
       Q.y = this.getPos(link2, 'y2');
 
       // ckeck if crossing exists, if yes: change position
-      if ((_test(E, P, Q) !== _test(F, P, Q)) && (_test(E, F, P) !== _test(E, F, Q))) {
+      if ((test(E, P, Q) !== test(F, P, Q)) && (test(E, F, P) !== test(E, F, Q))) {
         var n1 = this.graph.nodes[link1.target],
           n2 = this.graph.nodes[link2.target],
           dx = this.getPos(n1, 'x') - this.getPos(n2, 'x'),
@@ -124,7 +124,7 @@ scout.TableControl.prototype.disolveLinks = function () {
     }
   }
 
-  function _test(p1, p2, p3) {
+  function test(p1, p2, p3) {
     return (p3.y - p1.y) * (p2.x - p1.x) > (p2.y - p1.y) * (p3.x - p1.x);
   }
 };

@@ -124,8 +124,9 @@ public class JsonForm<T extends IForm> extends AbstractJsonPropertyObserver<T> i
         return "popupDialog";
       case IForm.DISPLAY_HINT_POPUP_WINDOW:
         return "popupWindow";
+      default:
+        return null;
     }
-    return null;
   }
 
   protected void handleModelFormChanged(FormEvent event) {
@@ -134,6 +135,8 @@ public class JsonForm<T extends IForm> extends AbstractJsonPropertyObserver<T> i
         handleModelFormClosed(event.getForm());
         break;
       }
+      default:
+        // NOP
     }
   }
 

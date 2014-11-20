@@ -19,7 +19,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 
-public class AbstractMenu5 extends AbstractMenu implements IMenu5 {
+public abstract class AbstractMenu5 extends AbstractMenu implements IMenu5 {
   private final EventListenerList m_listenerList = new EventListenerList();
   private int m_systemType;
   private boolean m_default;

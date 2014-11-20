@@ -15,6 +15,6 @@ import org.eclipse.scout.rt.ui.html.json.fixtures.JsonSessionMock;
 
 public class BaseFormFieldTest {
 
-  protected IJsonSession session = new JsonSessionMock();
+  protected IJsonSession m_session = new JsonSessionMock();
 
 }

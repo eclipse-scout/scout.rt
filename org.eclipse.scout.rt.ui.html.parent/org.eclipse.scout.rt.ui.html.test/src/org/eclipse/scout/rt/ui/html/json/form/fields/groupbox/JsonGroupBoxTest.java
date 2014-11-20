@@ -22,20 +22,20 @@ import org.junit.Test;
 
 public class JsonGroupBoxTest extends BaseFormFieldTest {
 
-  AbstractGroupBox model = new AbstractGroupBox() {
+  AbstractGroupBox m_model = new AbstractGroupBox() {
   };
 
-  JsonGroupBox groupBox = new JsonGroupBox<IGroupBox>(model, session, session.createUniqueIdFor(null));
+  JsonGroupBox m_groupBox = new JsonGroupBox<IGroupBox>(m_model, m_session, m_session.createUniqueIdFor(null));
 
   @Before
   public void setUp() {
-    model.setBorderDecoration("x");
-    model.setBorderVisible(true);
+    m_model.setBorderDecoration("x");
+    m_model.setBorderVisible(true);
   }
 
   @Test
   public void testToJson() throws JSONException {
-    JSONObject json = groupBox.toJson();
+    JSONObject json = m_groupBox.toJson();
     assertEquals("x", json.get("borderDecoration"));
     assertEquals(Boolean.TRUE, json.get("borderVisible"));
   }

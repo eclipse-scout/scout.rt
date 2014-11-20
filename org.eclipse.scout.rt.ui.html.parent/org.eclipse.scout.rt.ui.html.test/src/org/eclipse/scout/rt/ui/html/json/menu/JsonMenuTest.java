@@ -28,7 +28,7 @@ import org.junit.runner.RunWith;
 @RunWith(ScoutClientTestRunner.class)
 public class JsonMenuTest {
 
-  JsonSessionMock jsonSession = new JsonSessionMock();
+  JsonSessionMock m_jsonSession = new JsonSessionMock();
 
   @Test
   public void testInitialVSPropertyChange() throws Exception {
@@ -36,8 +36,8 @@ public class JsonMenuTest {
     menu.setText("foo");
 
     // when adapter has been created we have the complete adapter in the adapter-data section of the JSON response
-    JsonMenu<IMenu> menuAdapter = jsonSession.getOrCreateJsonAdapter(menu);
-    JSONObject json = jsonSession.currentJsonResponse().toJson();
+    JsonMenu<IMenu> menuAdapter = m_jsonSession.getOrCreateJsonAdapter(menu);
+    JSONObject json = m_jsonSession.currentJsonResponse().toJson();
     JSONObject adpaterData = JsonTestUtility.getAdapterData(json, menuAdapter.getId());
     assertEquals("foo", adpaterData.getString("text"));
 
@@ -45,7 +45,7 @@ public class JsonMenuTest {
 
     // when a property change occurs we assert an event is created for the adapter to update, containing only the changed property
     menu.setText("bar");
-    json = jsonSession.currentJsonResponse().toJson();
+    json = m_jsonSession.currentJsonResponse().toJson();
     JSONObject event = JsonTestUtility.getPropertyChange(json, 0);
     assertEquals("bar", event.getString("text"));
   }
@@ -57,7 +57,7 @@ public class JsonMenuTest {
   private void simulateProcessRequestOnJsonSession() throws Exception {
     Field field = AbstractJsonSession.class.getDeclaredField("m_currentJsonResponse");
     field.setAccessible(true);
-    field.set(jsonSession, new JsonResponse());
+    field.set(m_jsonSession, new JsonResponse());
   }
 
 }

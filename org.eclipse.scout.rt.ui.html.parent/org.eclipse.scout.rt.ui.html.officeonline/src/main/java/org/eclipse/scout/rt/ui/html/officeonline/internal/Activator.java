@@ -5,7 +5,7 @@ import org.osgi.framework.BundleContext;
 
 public class Activator extends Plugin {
 
-  public static String PLUGIN_ID = "org.eclipse.scout.rt.ui.html.officeonline";
+  public static final String PLUGIN_ID = "org.eclipse.scout.rt.ui.html.officeonline";
 
   private static BundleContext bundleContext;
 

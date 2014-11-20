@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.client.ui.form.FormMenuType;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.ui.menu.AbstractMenu5;
 
-public class AbstractCancelMenu extends AbstractMenu5 {
+public abstract class AbstractCancelMenu extends AbstractMenu5 {
 
   @Override
   protected Set<? extends IMenuType> getConfiguredMenuTypes() {

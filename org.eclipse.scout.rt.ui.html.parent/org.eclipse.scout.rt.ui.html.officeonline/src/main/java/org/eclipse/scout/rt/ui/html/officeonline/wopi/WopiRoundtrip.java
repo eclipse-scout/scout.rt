@@ -33,7 +33,7 @@ public class WopiRoundtrip {
 
   /**
    * <code>/wopi/files/a.docx/contents</code>
-   * 
+   *
    * @param tokens
    *          0="", 1="wopi", 2="files", 3="a.docx", 4="contents"
    */
@@ -250,7 +250,7 @@ public class WopiRoundtrip {
     WriteWopiResponseHeaders(req, res);
     res.setContentLength(atom.length);
     atom.CopyTo(context.Response.OutputStream);
-    */
+     */
     handleError(501);
   }
 
@@ -272,8 +272,7 @@ public class WopiRoundtrip {
     StringBuilder buf = new StringBuilder();
     buf.append("############## HTTP ###############\n");
     buf.append("HTTP " + m_req.getMethod() + " " + m_req.getPathInfo() + "\n");
-    for (@SuppressWarnings("unchecked")
-    Enumeration<String> en = m_req.getHeaderNames(); en.hasMoreElements();) {
+    for (Enumeration<String> en = m_req.getHeaderNames(); en.hasMoreElements();) {
       String key = en.nextElement();
       String value = m_req.getHeader(key);
       buf.append("" + key + ": " + value + "\n");

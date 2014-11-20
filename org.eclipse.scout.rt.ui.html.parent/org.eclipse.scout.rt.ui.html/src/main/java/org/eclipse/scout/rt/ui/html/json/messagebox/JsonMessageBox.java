@@ -22,8 +22,8 @@ import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.json.JSONObject;
 
 public class JsonMessageBox<T extends IMessageBox> extends AbstractJsonPropertyObserver<T> {
-  public String EVENT_ACTION = "action";
-  public String EVENT_CLOSED = "closed";
+  public static final String EVENT_ACTION = "action";
+  public static final String EVENT_CLOSED = "closed";
 
   private MessageBoxListener m_messageBoxListener;
 
@@ -125,6 +125,8 @@ public class JsonMessageBox<T extends IMessageBox> extends AbstractJsonPropertyO
       case MessageBoxEvent.TYPE_CLOSED:
         handleModelClosed();
         break;
+      default:
+        // NOP
     }
   }
 

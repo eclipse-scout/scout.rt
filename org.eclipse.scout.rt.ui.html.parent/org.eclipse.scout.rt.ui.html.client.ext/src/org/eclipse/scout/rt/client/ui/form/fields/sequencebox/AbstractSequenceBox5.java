@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.sequencebox;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 
-public class AbstractSequenceBox5 extends AbstractSequenceBox {
+public abstract class AbstractSequenceBox5 extends AbstractSequenceBox {
 
   @Override
   protected void initConfig() {

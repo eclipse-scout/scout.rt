@@ -230,6 +230,8 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
       case DesktopEvent.TYPE_DESKTOP_CLOSED:
         handleModelDesktopClosed();
         break;
+      default:
+        // NOP
     }
   }
 

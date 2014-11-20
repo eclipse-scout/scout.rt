@@ -33,9 +33,9 @@ import org.junit.runner.RunWith;
 @RunWith(ScoutClientTestRunner.class)
 public class JsonDesktopTest {
 
-  IDesktop desktop;
-  JsonDesktop<IDesktop> jsonDesktop;
-  IJsonSession session;
+  IDesktop m_desktop;
+  JsonDesktop<IDesktop> m_jsonDesktop;
+  IJsonSession m_session;
 
   @Before
   public void setUp() {
@@ -43,10 +43,10 @@ public class JsonDesktopTest {
   }
 
   private void setUp(IDesktop desktop) {
-    this.desktop = desktop;
-    session = new JsonSessionMock();
-    jsonDesktop = new JsonDesktop<IDesktop>(desktop, session, session.createUniqueIdFor(null));
-    jsonDesktop.attach();
+    this.m_desktop = desktop;
+    m_session = new JsonSessionMock();
+    m_jsonDesktop = new JsonDesktop<IDesktop>(desktop, m_session, m_session.createUniqueIdFor(null));
+    m_jsonDesktop.attach();
   }
 
   @Test
@@ -61,10 +61,10 @@ public class JsonDesktopTest {
   }
 
   private void assertGc() {
-    WeakReference<?> ref = new WeakReference<IJsonAdapter>(jsonDesktop);
-    jsonDesktop.dispose();
-    session.flush();
-    jsonDesktop = null;
+    WeakReference<?> ref = new WeakReference<IJsonAdapter>(m_jsonDesktop);
+    m_jsonDesktop.dispose();
+    m_session.flush();
+    m_jsonDesktop = null;
     JsonTestUtility.assertGC(ref);
   }
 
@@ -73,15 +73,15 @@ public class JsonDesktopTest {
     FormWithOneField form = new FormWithOneField();
     form.setAutoAddRemoveOnDesktop(false);
 
-    JsonForm formAdapter = (JsonForm) session.getJsonAdapter(form);
+    JsonForm formAdapter = (JsonForm) m_session.getJsonAdapter(form);
     assertNull(formAdapter);
 
-    desktop.addForm(form);
+    m_desktop.addForm(form);
 
-    formAdapter = (JsonForm) session.getJsonAdapter(form);
+    formAdapter = (JsonForm) m_session.getJsonAdapter(form);
     assertNotNull(formAdapter);
 
-    JsonResponse jsonResp = session.currentJsonResponse();
+    JsonResponse jsonResp = m_session.currentJsonResponse();
     List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(jsonResp, "formAdded");
     assertTrue(responseEvents.size() == 1);
 
@@ -89,7 +89,7 @@ public class JsonDesktopTest {
     String formId = event.getData().getString("form");
 
     // Add event must contain reference (by ID) to form.
-    assertEquals(jsonDesktop.getId(), event.getId());
+    assertEquals(m_jsonDesktop.getId(), event.getId());
     assertEquals(formAdapter.getId(), formId);
 
     // adapter-data for form must exist in 'adapterData' property of response
@@ -103,16 +103,16 @@ public class JsonDesktopTest {
     // we could continue to test the reference structure in the JSON response,
     // but for the moment this should be enough...
 
-    desktop.removeForm(form);
+    m_desktop.removeForm(form);
 
-    responseEvents = JsonTestUtility.extractEventsFromResponse(session.currentJsonResponse(), "formRemoved");
+    responseEvents = JsonTestUtility.extractEventsFromResponse(m_session.currentJsonResponse(), "formRemoved");
     assertTrue(responseEvents.size() == 1);
 
     event = responseEvents.get(0);
     formId = event.getData().getString("form");
 
     // Remove event must only contain the id, no other properties
-    assertEquals(jsonDesktop.getId(), event.getId());
+    assertEquals(m_jsonDesktop.getId(), event.getId());
     assertEquals(formAdapter.getId(), formId);
   }
 
@@ -121,24 +121,24 @@ public class JsonDesktopTest {
     FormWithOneField form = new FormWithOneField();
     form.setAutoAddRemoveOnDesktop(false);
 
-    JsonForm jsonForm = (JsonForm) session.getJsonAdapter(form);
+    JsonForm jsonForm = (JsonForm) m_session.getJsonAdapter(form);
     assertNull(jsonForm);
 
-    desktop.addForm(form);
+    m_desktop.addForm(form);
 
-    jsonForm = (JsonForm) session.getJsonAdapter(form);
+    jsonForm = (JsonForm) m_session.getJsonAdapter(form);
     assertNotNull(jsonForm);
 
-    List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(session.currentJsonResponse(), "formAdded");
+    List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(m_session.currentJsonResponse(), "formAdded");
     assertTrue(responseEvents.size() == 1);
 
     form.start();
     form.doClose();
-    responseEvents = JsonTestUtility.extractEventsFromResponse(session.currentJsonResponse(), "formClosed");
+    responseEvents = JsonTestUtility.extractEventsFromResponse(m_session.currentJsonResponse(), "formClosed");
     assertTrue(responseEvents.size() == 1);
 
-    desktop.removeForm(form);
-    responseEvents = JsonTestUtility.extractEventsFromResponse(session.currentJsonResponse(), "formRemoved");
+    m_desktop.removeForm(form);
+    responseEvents = JsonTestUtility.extractEventsFromResponse(m_session.currentJsonResponse(), "formRemoved");
     assertTrue(responseEvents.size() == 1);
   }
 
