@@ -125,9 +125,9 @@ describe("HtmlComponent", function() {
 
     var jqueryMock = {
       css:function(key) {
-        if (key == 'top') {
+        if (key === 'top') {
           return '5px';
-        } else if (key == 'left') {
+        } else if (key === 'left') {
           return '4px';
         } else {
           throw new Error('unexpected CSS key');

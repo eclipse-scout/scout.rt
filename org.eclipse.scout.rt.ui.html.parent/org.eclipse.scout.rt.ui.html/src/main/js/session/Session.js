@@ -108,7 +108,7 @@ scout.Session.prototype.getOrCreateModelAdapter = function(id, parent) {
   if (!id) {
     return;
   }
-  if (typeof id != 'string') {
+  if (typeof id !== 'string') {
     throw new Error('typeof id must be string');
   }
   if (!parent) {

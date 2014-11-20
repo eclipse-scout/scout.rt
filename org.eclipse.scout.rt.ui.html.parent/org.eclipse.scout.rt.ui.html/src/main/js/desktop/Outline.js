@@ -124,9 +124,9 @@ scout.Outline.prototype.onTableChanged = function(nodeId, detailTable) {
 };
 
 scout.Outline.prototype.onModelAction = function(event) {
-  if (event.type == 'detailFormChanged') {
+  if (event.type === 'detailFormChanged') {
     this.onFormChanged(event.nodeId, event.detailForm);
-  } else if (event.type == 'detailTableChanged') {
+  } else if (event.type === 'detailTableChanged') {
     this.onTableChanged(event.nodeId, event.detailTable);
   } else {
     scout.Outline.parent.prototype.onModelAction.call(this, event);

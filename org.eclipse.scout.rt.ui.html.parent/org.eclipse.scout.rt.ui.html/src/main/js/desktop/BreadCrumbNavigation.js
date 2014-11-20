@@ -65,7 +65,7 @@ scout.BreadCrumbNavigation.prototype._addBreadCrumbForm = function(form) {
 };
 
 scout.BreadCrumbNavigation.prototype.onModelAction = function(event) {
-  if (event.type == 'changed') {
+  if (event.type === 'changed') {
     this.breadcrumbs = event.breadcrumbs;
     this.currentFormId = event.currentFormId;
     this.$container.find('.breadcrumb-home').remove();

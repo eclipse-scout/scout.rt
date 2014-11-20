@@ -24,10 +24,10 @@ scout.MapTableControl.prototype._renderContent = function($parent) {
   var tableCountries = [];
   for (var i = 0; i < this.table.columns.length; i++) {
     for (var j = 0; j < this.columnIds.length; j++) {
-      if (this.table.columns[i].id == this.columnIds[j]) {
+      if (this.table.columns[i].id === this.columnIds[j]) {
         for (var r = 0; r < this.table.rows.length; r++) {
           var value = this.table.rows[r].cells[i];
-          if (tableCountries.indexOf(value) == -1) tableCountries.push(value);
+          if (tableCountries.indexOf(value) === -1) tableCountries.push(value);
         }
       }
     }
@@ -41,7 +41,7 @@ scout.MapTableControl.prototype._renderContent = function($parent) {
     // per country: loop boundaries
     for (var b = 0; b < borders.length; b++) {
       // inconsistent: if any more than one boundary exists, hidden in sub array
-      var border = (typeof borders[b][0] != 'number') ? borders[b][0] : borders[b],
+      var border = (typeof borders[b][0] !== 'number') ? borders[b][0] : borders[b],
         mainArray = [];
 
       // build arcs of every boundary
@@ -59,7 +59,7 @@ scout.MapTableControl.prototype._renderContent = function($parent) {
           // first point is absolute, all other delta
           if (s === 0) {
             // todo: alaska and russia have overlap
-            if ((countries[c].id == 'Russland') && (line[0] < 3000)) line[0] += 100000;
+            if ((countries[c].id === 'Russland') && (line[0] < 3000)) line[0] += 100000;
             x = line[0];
             y = line[1];
           } else {

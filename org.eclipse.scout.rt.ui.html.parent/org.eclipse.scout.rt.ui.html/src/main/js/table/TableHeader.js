@@ -146,7 +146,7 @@ scout.TableHeader = function(table, $tableHeader, session) {
     }
 
     function realMiddle($div) {
-      if ($div.css('text-align') == 'right') {
+      if ($div.css('text-align') === 'right') {
         return $div.offset().left + $div.outerWidth() - realWidth($div) / 2;
       } else {
         return $div.offset().left + realWidth($div) / 2;
@@ -162,7 +162,7 @@ scout.TableHeader = function(table, $tableHeader, session) {
       var h = (diff < 0) ? $otherHeaders : $($otherHeaders.get().reverse());
 
       h.each(function(i) {
-        if ($(this).css('left') != '0px') {
+        if ($(this).css('left') !== '0px') {
           newPos = that.getColumnViewIndex($(this));
           return false;
         }

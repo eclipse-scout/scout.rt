@@ -20,7 +20,7 @@ describe("LogicalGridLayoutInfo", function() {
       var jquery = this;
       return {
         data:function(dataKey) {
-          if ('htmlComponent' == dataKey) {
+          if ('htmlComponent' === dataKey) {
             return mockHtmlComp(jquery);
           }
         },

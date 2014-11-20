@@ -41,14 +41,14 @@ scout.TableSelectionHandler.prototype._onRowsDrawn = function($rows) {
       //Click on the already selected row must not clear the selection it to avoid another selection event sent to the server
       //Right click on already selected rows must not clear the selection
       if (!$row.isSelected() ||
-          ($selectedRows.length > 1 && event.which != 3)) {
+          ($selectedRows.length > 1 && event.which !== 3)) {
         $selectedRows.select(false);
         that._clearSelectionBorder($selectedRows);
       }
     }
 
     // just a click... right click do not select if clicked in selection
-    if (event.which != 3 || !$row.is($selectedRows)) {
+    if (event.which !== 3 || !$row.is($selectedRows)) {
       selectData(event);
     }
 

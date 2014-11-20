@@ -104,7 +104,7 @@ scout.AnalysisTableControl.prototype._renderContent = function($parent) {
     // remove circle
     var $selected = $('.selected', $vennContainer);
     for (var c = 0; c < $criteria.length; c++) {
-      if ($criteria[c][0] == $selected[0]) {
+      if ($criteria[c][0] === $selected[0]) {
         $criteria[c].animateSVG('r', 0, 300, $.removeThis);
         $criteria.splice(c, 1);
         break;
@@ -164,7 +164,7 @@ scout.AnalysisTableControl.prototype._renderContent = function($parent) {
 
     // TODO cru: correct for umlaut
     map.sort(function(a, b) {
-      return ((a.text < b.text) ? -1 : ((a.text == b.text) ? 0 : 1));
+      return ((a.text < b.text) ? -1 : ((a.text === b.text) ? 0 : 1));
     });
 
     // draw boxes
@@ -201,7 +201,7 @@ scout.AnalysisTableControl.prototype._renderContent = function($parent) {
 
         // sort attributes
         attributes.sort(function(a, b) {
-          return ((a.text < b.text) ? -1 : ((a.text == b.text) ? 0 : 1));
+          return ((a.text < b.text) ? -1 : ((a.text === b.text) ? 0 : 1));
         });
 
         // draw boxes
@@ -480,10 +480,10 @@ scout.AnalysisTableControl.prototype._renderContent = function($parent) {
 
       // draw text
       if (count.total && !show) {
-        if (count['0'] == count['01']) {
+        if (count['0'] === count['01']) {
           drawText(count['0'], x0, y0);
           drawText(count['1'], x1 - (d01 - r1 - r0) / 2, y1);
-        } else if (count['1'] == count['01']) {
+        } else if (count['1'] === count['01']) {
           drawText(count['0'], x0 + (d01 - r0 - r1) / 2, y0);
           drawText(count['1'], x1, y1);
         } else if (count['01'] === 0) {
@@ -616,11 +616,11 @@ scout.AnalysisTableControl.prototype._renderContent = function($parent) {
   function findD(ca, cb, cab, ra, rb) {
     var ret = {};
 
-    if (ca == cab) {
+    if (ca === cab) {
       ret.ra = ra - DIST_R;
       ret.rb = rb + DIST_R;
       ret.d = rb - ra;
-    } else if (cb == cab) {
+    } else if (cb === cab) {
       ret.ra = ra + DIST_R;
       ret.rb = rb - DIST_R;
       ret.d = ra - rb;

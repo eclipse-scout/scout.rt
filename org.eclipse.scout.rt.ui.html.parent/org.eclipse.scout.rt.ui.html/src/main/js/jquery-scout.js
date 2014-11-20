@@ -325,11 +325,11 @@
       newW = this.css('width', 'auto').outerWidth(),
       finalWidth = this.data('finalWidth');
 
-    if (newW != oldW) {
+    if (newW !== oldW) {
       this.css('width', oldW);
     }
 
-    if (newW != finalWidth) {
+    if (newW !== finalWidth) {
       this.data('finalWidth', newW);
       this.stop().animateAVCSD('width', newW, null, function() {
         $(this).data('finalWidth', null);
@@ -346,11 +346,11 @@
       newH = this.css('height', 'auto').outerHeight(),
       finalHeight = this.data('finalHeight');
 
-    if (newH != oldH) {
+    if (newH !== oldH) {
       this.css('height', oldH);
     }
 
-    if (newH != finalHeight) {
+    if (newH !== finalHeight) {
       this.data('finalHeight', newH);
       this.stop().animateAVCSD('height', newH, null, function() {
         $(this).data('finalHeight', null);

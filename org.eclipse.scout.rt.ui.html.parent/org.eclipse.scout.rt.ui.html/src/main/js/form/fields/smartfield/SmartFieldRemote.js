@@ -37,7 +37,7 @@ scout.SmartFieldRemote.prototype._openPopup = function() {
 };
 
 scout.SmartFieldRemote.prototype.onModelAction = function(event) {
-  if (event.type == 'optionsLoaded') {
+  if (event.type === 'optionsLoaded') {
     this._onOptionsLoaded(event.options);
   } else {
     scout.SmartFieldRemote.parent.prototype.onModelAction.call(this, event);

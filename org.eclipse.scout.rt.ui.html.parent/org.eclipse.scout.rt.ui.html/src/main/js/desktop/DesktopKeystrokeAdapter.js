@@ -18,7 +18,7 @@ scout.DesktopKeystrokeAdapter = function(navigation, bench) {
         that.handlers.push({
           $element: $(element),
           accept: function(event) {
-            if (event && event.which == shortcut && event.ctrlKey) {
+            if (event && event.which === shortcut && event.ctrlKey) {
               return true;
             }
             return false;
@@ -72,7 +72,7 @@ scout.DesktopKeystrokeAdapter = function(navigation, bench) {
         var $targetNode;
 
         // left: up in tree
-        if (keycode == 37) {
+        if (keycode === 37) {
           if ($currentNode.hasClass('expanded')) {
             $currentNode.children('.tree-item-control').click(); //FIXME Use tree.setNodeExpanded instead
           } else {
@@ -84,7 +84,7 @@ scout.DesktopKeystrokeAdapter = function(navigation, bench) {
           }
         }
         // right: down in tree
-        else if (keycode == 39) {
+        else if (keycode === 39) {
           if (!$currentNode.hasClass('expanded')) {
             $currentNode.children('.tree-item-control').click(); //FIXME Use tree.setNodeExpanded instead
           } else {
@@ -96,8 +96,8 @@ scout.DesktopKeystrokeAdapter = function(navigation, bench) {
           }
         }
         // +/-: open and close tree
-        else if (keycode == 109 || keycode == 107) {
-          if ((!$currentNode.hasClass('expanded') && keycode == 107) || ($currentNode.hasClass('expanded') && keycode == 109)) {
+        else if (keycode === 109 || keycode === 107) {
+          if ((!$currentNode.hasClass('expanded') && keycode === 107) || ($currentNode.hasClass('expanded') && keycode === 109)) {
             $currentNode.children('.tree-item-control').click();
           }
         }
@@ -121,7 +121,7 @@ scout.DesktopKeystrokeAdapter = function(navigation, bench) {
         var $targetNode;
 
         // ctrl-up: go up (same level)
-        if (keycode == 38) {
+        if (keycode === 38) {
           $targetNode = $currentNode.prevAll('.tree-item[data-level=' + $currentNode.attr('data-level') + ']').first();
           if ($targetNode.attr('id')) {
             // FIXME BSH "scroll into view"
@@ -129,7 +129,7 @@ scout.DesktopKeystrokeAdapter = function(navigation, bench) {
           }
         }
         // ctrl-down: go down (same level)
-        else if (keycode == 40) {
+        else if (keycode === 40) {
           $targetNode = $currentNode.nextAll('.tree-item[data-level=' + $currentNode.attr('data-level') + ']').first();
           if ($targetNode.attr('id')) {
             // FIXME BSH "scroll into view"

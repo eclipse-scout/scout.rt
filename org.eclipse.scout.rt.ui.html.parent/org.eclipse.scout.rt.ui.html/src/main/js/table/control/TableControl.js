@@ -104,7 +104,7 @@ scout.TableControl.prototype.setSelected = function(selected) {
 };
 
 scout.TableControl.prototype._renderSelected = function(selected) {
-  if (selected == this.$control.isSelected()) {
+  if (selected === this.$control.isSelected()) {
     return;
   }
   var previouslySelectedControl = this.tableFooter.selectedControl;

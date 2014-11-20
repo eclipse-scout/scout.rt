@@ -57,7 +57,7 @@ scout.arrays = {
       return true;
     } else if (!arr || !arr2) {
       return false;
-    } else if (arr.length != arr2.length) {
+    } else if (arr.length !== arr2.length) {
       return false;
     }
     return scout.arrays.containsAll(arr, arr2);
@@ -69,7 +69,7 @@ scout.arrays = {
       return true;
     } else if (!arr || !arr2) {
       return false;
-    } else if (arr.length != arr2.length) {
+    } else if (arr.length !== arr2.length) {
       return false;
     }
 

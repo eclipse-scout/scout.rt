@@ -203,7 +203,7 @@ scout.TableFooter.prototype._setInfoVisible = function($info, visible) {
 scout.TableFooter.prototype._computeCountInfo = function(n) {
   if (n === 0) {
     return scout.texts.get('tableRowCount0');
-  } else if (n == 1) {
+  } else if (n === 1) {
     return scout.texts.get('tableRowCount1');
   } else {
     return scout.texts.get('tableRowCount', n);

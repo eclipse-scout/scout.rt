@@ -44,8 +44,8 @@ scout.Form.prototype._render = function($parent) {
   for (i = 0; i < systemButtons.length; i++) {
     btn = systemButtons[i];
     if (btn.visible &&
-      (btn.systemType == scout.Button.SYSTEM_TYPE.CANCEL ||
-        btn.systemType == scout.Button.SYSTEM_TYPE.CLOSE)) {
+      (btn.systemType === scout.Button.SYSTEM_TYPE.CANCEL ||
+        btn.systemType === scout.Button.SYSTEM_TYPE.CLOSE)) {
       closeable = true;
     }
   }

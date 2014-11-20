@@ -105,13 +105,13 @@ scout.DateField.prototype._onKeyDown = function(event) {
     return;
   }
 
-  if (event.which == scout.keys.PAGE_UP || event.which == scout.keys.PAGE_DOWN) {
+  if (event.which === scout.keys.PAGE_UP || event.which === scout.keys.PAGE_DOWN) {
     months = (event.which === scout.keys.PAGE_UP ? -1 : 1);
     this._picker.shiftSelectedDate(0, months, 0);
     return;
   }
 
-  if (event.which == scout.keys.UP || event.which == scout.keys.DOWN) {
+  if (event.which === scout.keys.UP || event.which === scout.keys.DOWN) {
     diff = (event.which === scout.keys.UP ? -1 : 1);
 
     if (event.ctrlKey) {

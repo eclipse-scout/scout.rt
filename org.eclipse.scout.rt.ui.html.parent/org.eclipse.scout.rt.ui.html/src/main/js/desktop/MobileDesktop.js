@@ -42,7 +42,7 @@ scout.MobileDesktop.prototype._resolveViewContainer = function(form) {
  */
 scout.MobileDesktop.prototype.addForm = function(form) {
   var layoutDirty = false;
-  if (form.displayHint == 'view') {
+  if (form.displayHint === 'view') {
     var position = form.displayViewId;
     if (position !== 'C' && position !== 'E') {
       position = 'C';
@@ -82,7 +82,7 @@ scout.MobileDesktop.prototype._createMainArea = function() {
 scout.MobileDesktop.prototype.removeForm = function(form) {
   scout.MobileDesktop.parent.prototype.removeForm.call(this, form);
 
-  if (form.displayHint == 'view') {
+  if (form.displayHint === 'view') {
     var position = form.displayViewId;
     if (position !== 'C' && position !== 'E') {
       position = 'C';

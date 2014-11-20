@@ -62,12 +62,12 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
   for (var c1 = 0; c1 < columns.length; c1++) {
     var column1 = columns[c1];
 
-    if (column1.type == 'key') continue;
+    if (column1.type === 'key') continue;
 
     var $div = $.makeDiv('', 'select-axis', column1.text)
       .data('column', column1);
 
-    if (column1.type == 'date') {
+    if (column1.type === 'date') {
       $div.appendDiv('', 'select-axis-group', dateDesc[0]);
       $div.data('group', 0);
     }
@@ -91,11 +91,11 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
   columnCount.sort(comp);
 
   $xAxisSelect.children().each(function() {
-    if ($(this).data('column') == columnCount[0][0]) $(this).addClass('selected');
+    if ($(this).data('column') === columnCount[0][0]) $(this).addClass('selected');
   });
 
   $yAxisSelect.children().each(function() {
-    if ($(this).data('column') == columnCount[1][0]) $(this).addClass('selected');
+    if ($(this).data('column') === columnCount[1][0]) $(this).addClass('selected');
   });
 
   // create container for data
@@ -107,7 +107,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
   for (var c2 = 0; c2 < columns.length; c2++) {
     var column2 = columns[c2];
 
-    if ((column2.type == 'number')) {
+    if ((column2.type === 'number')) {
       $dataSelect.appendDIV('select-data data-sum', column2.text)
         .data('column', column2);
     }
@@ -653,7 +653,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
 
     //  prepare filter
     var filters = [],
-      oneDim = $('.selected', $chartSelect).attr('id') != 'ChartScatter';
+      oneDim = $('.selected', $chartSelect).attr('id') !== 'ChartScatter';
 
     //  find all filter
     $('.main-chart.selected').each(function() {

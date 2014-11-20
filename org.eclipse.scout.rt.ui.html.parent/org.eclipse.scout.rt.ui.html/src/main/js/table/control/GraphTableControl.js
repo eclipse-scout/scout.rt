@@ -61,12 +61,12 @@ scout.TableControl.prototype.setNode = function (node, dx, dy) {
   for (var l = 0; l < this.graph.links.length; l++) {
     var link = this.graph.links[l];
 
-    if (link.source == node.id) {
+    if (link.source === node.id) {
       link.$div
         .attr('x1', x + dx + this.wBox / 2)
         .attr('y1', y + dy + this.hBox / 2);
       this.setLabel(link);
-    } else if (link.target == node.id) {
+    } else if (link.target === node.id) {
       link.$div
         .attr('x2', x + dx + this.wBox / 2)
         .attr('y2', y + dy + this.hBox / 2);
@@ -101,7 +101,7 @@ scout.TableControl.prototype.disolveLinks = function () {
     F.y = this.getPos(link1, 'y2');
 
     for (var l2 = 0; l2 < this.graph.links.length; l2++) {
-      if (l1 == l2) continue;
+      if (l1 === l2) continue;
 
       var link2 = this.graph.links[l2],
         P = {}, Q = {};
@@ -112,7 +112,7 @@ scout.TableControl.prototype.disolveLinks = function () {
       Q.y = this.getPos(link2, 'y2');
 
       // ckeck if crossing exists, if yes: change position
-      if ((_test(E, P, Q) != _test(F, P, Q)) && (_test(E, F, P) != _test(E, F, Q))) {
+      if ((_test(E, P, Q) !== _test(F, P, Q)) && (_test(E, F, P) !== _test(E, F, Q))) {
         var n1 = this.graph.nodes[link1.target],
           n2 = this.graph.nodes[link2.target],
           dx = this.getPos(n1, 'x') - this.getPos(n2, 'x'),
@@ -141,7 +141,7 @@ scout.TableControl.prototype.doPhysics = function () {
     dx = 0, dy = 0;
 
     // move center to the middle
-    if (node.type == 'center') {
+    if (node.type === 'center') {
       dx += ((this.wContainer - this.wBox) / 2 - x) / 40;
       dy += ((this.hContainer - this.hBox) / 2 - y) / 40;
     }
@@ -159,7 +159,7 @@ scout.TableControl.prototype.doPhysics = function () {
     // repulsion force
     for (var o = 0; o < this.graph.nodes.length; o++) {
       var otherNode = this.graph.nodes[o];
-      if (o != n) {
+      if (o !== n) {
         var oX = this.getPos(otherNode, 'x'),
           oY = this.getPos(otherNode, 'y'),
           repForce = 100 / (Math.pow(x - oX, 2) + Math.pow(y - oY, 2));

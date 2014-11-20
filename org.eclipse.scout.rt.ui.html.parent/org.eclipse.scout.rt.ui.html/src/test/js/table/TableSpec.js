@@ -641,8 +641,6 @@ describe("Table", function() {
       var table = helper.createTable(model);
       table.render(session.$entryPoint);
 
-      var $rows = table._$viewport.children();
-
       var $colHeaders = table._$header.find('.header-item');
       var $header0 = $colHeaders.eq(0);
       var $header1 = $colHeaders.eq(1);

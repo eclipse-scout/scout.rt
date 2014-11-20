@@ -129,7 +129,7 @@ scout.TableKeystrokeAdapter = function(table) {
         if (event.shiftKey) {
           $newRowSelection = $rowsSelected.add($newRowSelection);
         }
-        for (i = 0; typeof($newRowSelection[i]) != 'undefined'; i++) {
+        for (i = 0; typeof($newRowSelection[i]) !== 'undefined'; i++) {
           rowIds.push($newRowSelection[i].getAttribute('id'));
         }
         that._table.selectRowsByIds(rowIds);

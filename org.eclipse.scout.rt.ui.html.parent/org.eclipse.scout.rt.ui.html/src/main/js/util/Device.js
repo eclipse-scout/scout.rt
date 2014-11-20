@@ -69,7 +69,7 @@ scout.Device.prototype.parseUserAgent = function(userAgent) {
   var iosDevices = ['iPad', 'iPhone'];
   for (var i = 0; i < iosDevices.length; i++) {
     var device = iosDevices[i];
-    if (userAgent.indexOf(device) != -1) {
+    if (userAgent.indexOf(device) !== -1) {
       this.device = device;
       this.system = scout.Device.SYSTEM_IOS;
     }

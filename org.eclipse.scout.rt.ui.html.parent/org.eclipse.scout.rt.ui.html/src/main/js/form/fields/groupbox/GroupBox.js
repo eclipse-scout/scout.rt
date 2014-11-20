@@ -60,7 +60,7 @@ scout.GroupBox.prototype._createFieldArraysByType = function() {
     if (field instanceof scout.Button) {
       if (field.processButton) {
         this.processButtons.push(field);
-        if (field.systemType != scout.Button.SYSTEM_TYPE.NONE) {
+        if (field.systemType !== scout.Button.SYSTEM_TYPE.NONE) {
           this.systemButtons.push(field);
         }
         else {

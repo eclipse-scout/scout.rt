@@ -453,7 +453,7 @@ scout.Table.prototype._getRowMenus = function($selectedRows, all) {
     check = [];
   }
 
-  if ($selectedRows && $selectedRows.length == 1) {
+  if ($selectedRows && $selectedRows.length === 1) {
     check.push('Table.SingleSelection');
   } else if ($selectedRows && $selectedRows.length > 1) {
     check.push('Table.MultiSelection');
@@ -570,7 +570,7 @@ scout.Table.prototype._group = function() {
       column = this.columns[c];
       var value = this.getCellValue(column, row);
 
-      if (column.type == 'number') {
+      if (column.type === 'number') {
         sum[c] = (sum[c] || 0) + value;
       }
     }
@@ -579,16 +579,16 @@ scout.Table.prototype._group = function() {
     var nextRowId = $rows.eq(r + 1).attr('id');
     var nextRow = this.getModelRowById(nextRowId);
 
-    if ((r == $rows.length - 1) || (!all && this.getCellText(groupColumn, row) != this.getCellText(groupColumn, nextRow)) && sum.length > 0) {
+    if ((r === $rows.length - 1) || (!all && this.getCellText(groupColumn, row) !== this.getCellText(groupColumn, nextRow)) && sum.length > 0) {
       for (c = 0; c < this.columns.length; c++) {
         var $cell;
 
         column = this.columns[c];
         alignment = scout.Table.parseHorizontalAlignment(column.horizontalAlignment);
-        if (typeof sum[c] == 'number') {
+        if (typeof sum[c] === 'number') {
           $cell = $.makeDiv('', 'table-cell', sum[c])
             .css('text-align', alignment);
-        } else if (!all && column == groupColumn) {
+        } else if (!all && column === groupColumn) {
           $cell = $.makeDiv('', 'table-cell', this.getCellText(groupColumn, row))
             .css('text-align', alignment);
         } else {
@@ -674,7 +674,7 @@ scout.Table.prototype.colorData = function(mode, colorColumn) {
   $rows = $('.table-row:visible', this._$viewport);
 
   $('.header-item', this.$container).each(function(i) {
-    if ($(this).data('column') == colorColumn) c = i;
+    if ($(this).data('column') === colorColumn) c = i;
   });
 
   for (var s = 0; s < $rows.length; s++) {
@@ -1062,7 +1062,7 @@ scout.Table.prototype.triggerRowsSelected = function($rows) {
     allSelected = false;
 
   if ($rows) {
-    allSelected = $rows.length == rowCount;
+    allSelected = $rows.length === rowCount;
   }
 
   var type = scout.Table.GUI_EVENT_ROWS_SELECTED;
@@ -1220,21 +1220,21 @@ scout.Table.prototype._onColumnHeadersUpdated = function(columns) {
 };
 
 scout.Table.prototype.onModelAction = function(event) {
-  if (event.type == 'rowsInserted') {
+  if (event.type === 'rowsInserted') {
     this._onRowsInserted(event.rows);
-  } else if (event.type == 'rowsDeleted') {
+  } else if (event.type === 'rowsDeleted') {
     this._onRowsDeleted(event.rowIds);
-  } else if (event.type == 'allRowsDeleted') {
+  } else if (event.type === 'allRowsDeleted') {
     this._onAllRowsDeleted();
-  } else if (event.type == 'rowsSelected') {
+  } else if (event.type === 'rowsSelected') {
     this._onRowsSelected(event.rowIds);
-  } else if (event.type == 'rowOrderChanged') {
+  } else if (event.type === 'rowOrderChanged') {
     this._onRowOrderChanged(event.rowIds);
-  } else if (event.type == 'columnStructureChanged') {
+  } else if (event.type === 'columnStructureChanged') {
     this._onColumnStructureChanged(event.columns);
-  } else if (event.type == 'columnOrderChanged') {
+  } else if (event.type === 'columnOrderChanged') {
     this._onColumnOrderChanged(event.columnIds);
-  } else if (event.type == 'columnHeadersUpdated') {
+  } else if (event.type === 'columnHeadersUpdated') {
     this._onColumnHeadersUpdated(event.columns);
   } else {
     $.log.warn('Model event not handled. Widget: scout.Table. Event: ' + event.type + '.');

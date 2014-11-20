@@ -616,17 +616,17 @@ scout.Tree.prototype.getSelectedModelNodes = function() {
 };
 
 scout.Tree.prototype.onModelAction = function(event) {
-  if (event.type == 'nodesInserted') {
+  if (event.type === 'nodesInserted') {
     this._onNodesInserted(event.nodes, event.commonParentNodeId);
-  } else if (event.type == 'nodesDeleted') {
+  } else if (event.type === 'nodesDeleted') {
     this._onNodesDeleted(event.nodeIds, event.commonParentNodeId);
-  } else if (event.type == 'allNodesDeleted') {
+  } else if (event.type === 'allNodesDeleted') {
     this._onAllNodesDeleted(event.commonParentNodeId);
-  } else if (event.type == 'nodesSelected') {
+  } else if (event.type === 'nodesSelected') {
     this._onNodesSelected(event.nodeIds);
-  } else if (event.type == 'nodeExpanded') {
+  } else if (event.type === 'nodeExpanded') {
     this._onNodeExpanded(event.nodeId, event.expanded);
-  } else if (event.type == 'nodeChanged') {
+  } else if (event.type === 'nodeChanged') {
     this._onNodeChanged(event.nodeId, event);
   } else {
     $.log.warn('Model event not handled. Widget: Tree. Event: ' + event.type + '.');

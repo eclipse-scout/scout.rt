@@ -69,7 +69,7 @@ scout.DesktopViewButton.prototype.onModelPropertyChange = function(event) {
 
   //Update navigation as well if properties for current outline have changed
   var navigation = this.session.desktop.navigation;
-  if (navigation.outline == this.outline) {
+  if (navigation.outline === this.outline) {
     navigation.onOutlinePropertyChange(event);
   }
 };

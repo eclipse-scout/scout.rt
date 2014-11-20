@@ -30,7 +30,7 @@ scout.TabBox.prototype._render = function($parent) {
       on('mousedown', this.onMousedown.bind(this)).
       on('keydown', this._onKeydown.bind(this));
     // only the selected tab is focusable
-    if (i != this.selectedTab) {
+    if (i !== this.selectedTab) {
       $tab.attr('tabindex', -1);
     }
   }

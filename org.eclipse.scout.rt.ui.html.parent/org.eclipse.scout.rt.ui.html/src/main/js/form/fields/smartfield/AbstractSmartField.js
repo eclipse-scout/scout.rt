@@ -172,7 +172,7 @@ scout.AbstractSmartField.prototype._showPopup = function(numOptions, vararg) {
 
 /**
  * Returns the bounds of the text-input element. Subclasses may override this method when their
- * text-field is not == this.$field.
+ * text-field is not === this.$field.
  * @returns
  */
 scout.AbstractSmartField.prototype._getInputBounds = function() {

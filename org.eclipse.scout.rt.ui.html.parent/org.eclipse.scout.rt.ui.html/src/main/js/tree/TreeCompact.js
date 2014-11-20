@@ -107,7 +107,7 @@ scout.TreeCompact.prototype._moveSelection = function(diff) {
   } else if (tmpSelectedNode < 0) {
     tmpSelectedNode = numNodes - 1;
   }
-  if (oldSelectedNode != tmpSelectedNode) {
+  if (oldSelectedNode !== tmpSelectedNode) {
     $.log.debug('_moveSelection to node with index='+ tmpSelectedNode);
     this._selectedNode = tmpSelectedNode;
     $($nodes[oldSelectedNode]).removeClass('selected');

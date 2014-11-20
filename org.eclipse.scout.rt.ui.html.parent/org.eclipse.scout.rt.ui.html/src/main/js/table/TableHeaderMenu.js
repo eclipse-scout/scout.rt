@@ -244,7 +244,7 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
 
     $('.header-command', $commandSort).removeClass('selected');
 
-    if (sortCount == 1) {
+    if (sortCount === 1) {
       if ($header.hasClass('sort-asc')) {
         $sortAsc.addClass('selected');
         addIcon = null;

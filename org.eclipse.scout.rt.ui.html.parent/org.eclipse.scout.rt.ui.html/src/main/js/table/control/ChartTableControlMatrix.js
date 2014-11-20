@@ -29,14 +29,14 @@ scout.ChartTableControlMatrix.prototype.addData = function(data, dataGroup) {
   };
 
   // count, sum, avg
-  if (dataGroup == -1) {
+  if (dataGroup === -1) {
     dataAxis.norm = function(f) {
       return 1;
     };
     dataAxis.group = function(array) {
       return array.length;
     };
-  } else if (dataGroup == 1) {
+  } else if (dataGroup === 1) {
     dataAxis.norm = function(f) {
       return parseFloat(f);
     };
@@ -45,7 +45,7 @@ scout.ChartTableControlMatrix.prototype.addData = function(data, dataGroup) {
         return a + b;
       });
     };
-  } else if (dataGroup == 2) {
+  } else if (dataGroup === 2) {
     dataAxis.norm = function(f) {
       return parseFloat(f);
     };
@@ -73,7 +73,7 @@ scout.ChartTableControlMatrix.prototype.addAxis = function(axis, axisGroup) {
 
   // add a key to the axis
   keyAxis.add = function(k) {
-    if (keyAxis.indexOf(k) == -1) keyAxis.push(k);
+    if (keyAxis.indexOf(k) === -1) keyAxis.push(k);
   };
 
   // default sorts function
@@ -82,7 +82,7 @@ scout.ChartTableControlMatrix.prototype.addAxis = function(axis, axisGroup) {
   };
 
   // norm and format depends of datatype and group functionality
-  if (axis.type == 'date') {
+  if (axis.type === 'date') {
     if (axisGroup === 0) {
       keyAxis.norm = function(f) {
         if (f) {
@@ -121,7 +121,7 @@ scout.ChartTableControlMatrix.prototype.addAxis = function(axis, axisGroup) {
         return String(n);
       };
     }
-  } else if (axis.type == 'number') {
+  } else if (axis.type === 'number') {
     keyAxis.norm = function(f) {
       return parseFloat(f);
     };
@@ -131,7 +131,7 @@ scout.ChartTableControlMatrix.prototype.addAxis = function(axis, axisGroup) {
   } else {
     keyAxis.norm = function(f) {
       var index = keyAxis.normTable.indexOf(f);
-      if (index == -1) {
+      if (index === -1) {
         return keyAxis.normTable.push(f) - 1;
       } else {
         return index;
@@ -252,7 +252,7 @@ scout.ChartTableControlMatrix.prototype.columnCount = function() {
 
     for (var r = 0; r < this._rows.length; r++) {
       var v = this._table.getCellValue(column, this._rows[r]);
-      if (colCount[c][1].indexOf(v) == -1) colCount[c][1].push(v);
+      if (colCount[c][1].indexOf(v) === -1) colCount[c][1].push(v);
     }
 
     colCount[c][1] = colCount[c][1].length;

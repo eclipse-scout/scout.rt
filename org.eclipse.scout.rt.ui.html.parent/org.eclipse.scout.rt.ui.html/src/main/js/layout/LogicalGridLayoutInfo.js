@@ -143,7 +143,7 @@ scout.LogicalGridLayoutInfo.prototype._initializeColumns = function(compSize, hg
   var i, j, k, prefw;
   for (i = 0; i < compCount; i++) {
       var cons = this.gridDatas[i];
-      if (cons.gridw == 1) {
+      if (cons.gridw === 1) {
         if (cons.widthHint > 0) {
           prefw = cons.widthHint;
         }
@@ -257,7 +257,7 @@ scout.LogicalGridLayoutInfo.prototype._initializeRows = function(compSize, vgap)
   var i, j, k, prefh;
   for (i = 0; i < compCount; i++) {
       var cons = this.gridDatas[i];
-      if (cons.gridh == 1) {
+      if (cons.gridh === 1) {
         if (cons.heightHint > 0) {
           prefh = cons.heightHint;
         }

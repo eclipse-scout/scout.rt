@@ -191,10 +191,10 @@ scout.DatePicker.prototype._createDateBox = function () {
     dayInMonth = start.getDate();
 
     if ((start.getDay() === 6) || (start.getDay() === 0)) {
-      cl = (start.getMonth() != this.viewDate.getMonth() ? ' date-box-out-weekend' : ' date-box-weekend');
+      cl = (start.getMonth() !== this.viewDate.getMonth() ? ' date-box-out-weekend' : ' date-box-weekend');
     }
     else {
-      cl = (start.getMonth() != this.viewDate.getMonth() ? ' date-box-out' : '');
+      cl = (start.getMonth() !== this.viewDate.getMonth() ? ' date-box-out' : '');
     }
 
     if (start.setHours(0, 0, 0, 0) === now.setHours(0, 0, 0, 0)){

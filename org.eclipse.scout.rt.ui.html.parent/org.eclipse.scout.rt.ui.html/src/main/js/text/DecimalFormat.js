@@ -51,7 +51,7 @@ scout.DecimalFormat = function(locale, pattern) {
 
   // helper function
   function _find(string, chars, dir) {
-    for (var i = ((dir == 1) ? 0 : string.length - 1); i < string.length && i > -1; i += dir) {
+    for (var i = ((dir === 1) ? 0 : string.length - 1); i < string.length && i > -1; i += dir) {
       if (chars.indexOf(string[i]) > -1) return i;
     }
     return null;
@@ -83,7 +83,7 @@ scout.DecimalFormat.prototype.format = function format(number) {
   var after = number.toFixed(this.allAfter);
   after = after.slice(after.indexOf('.') + 1);
   for (var j = after.length - 1; j > this.zeroAfter - 1; j--) {
-    if (after[j] != '0') break;
+    if (after[j] !== '0') break;
     after = after.slice(0, -1);
   }
 

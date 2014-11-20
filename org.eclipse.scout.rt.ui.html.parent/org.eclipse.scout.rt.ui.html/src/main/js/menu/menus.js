@@ -39,7 +39,7 @@ scout.menus.filter = function(menus, types) {
   }
 
   //Ignore menus with only separators
-  if (separatorCount == filteredMenus.length) {
+  if (separatorCount === filteredMenus.length) {
     return [];
   }
 
