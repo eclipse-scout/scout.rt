@@ -15,8 +15,8 @@ scout.graphics = {
    * in favor of width/height() functions.
    */
   /**
-   * Returns the current size of the component, insets included.
-   * TODO AWE: (layout) prüfen ob hier tatsächlich die insets included sind. Müssten wir dann nicht outerWidth/-Height verwenden?
+   * Returns the size of the component, insets included.
+   * @param includeMargins when set to true, returned dimensions include margins of component
    */
   getSize: function($comp, includeMargins) {
     if (includeMargins === undefined) {

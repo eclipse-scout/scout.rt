@@ -36,29 +36,29 @@ scout.HtmlComponent.optGet = function($comp) {
 };
 
 /**
- * Returns the parent or $comp. Creates a new instance of HtmlComponent if the parent DOM element has no linked instance.
+ * Returns the parent or $comp or null when $comp has no parent.
+ * Creates a new instance of HtmlComponent if the parent DOM element has no linked instance yet.
  */
 scout.HtmlComponent.prototype.getParent = function() {
-  var $parent = this.$comp.parent(),
-    htmlParent = scout.HtmlComponent.optGet($parent);
-
+  var $parent = this.$comp.parent();
   if ($parent.length === 0) {
     return null;
+  } else {
+    return scout.HtmlComponent.optGet($parent);
   }
-  return htmlParent;
 };
 
+/**
+ * Calls the layout manager of the component to layout its children.
+ * @exception when component has no layout manager
+ */
 scout.HtmlComponent.prototype.layout = function() {
   if (!this.layoutManager) {
-    $.log.warn('(HtmlComponent#layout) Called layout() but component ' + this.debug() + ' has no layout manager');
-    // throw 'Tried to layout component ' + this.debug() +' but component has no layout manager';
-    // TODO AWE: (layout) entscheiden, ob wir dieses throw "scharf machen" wollen oder nicht
-    return;
+    throw new Error('Called layout() but component has no layout manager');
   }
-
   if (!this.valid) {
     this.layoutManager.layout(this.$comp);
-    //Save size for later use (necessary if pixelBasedSizing is set to false)
+    // Save size for later use (necessary if pixelBasedSizing is set to false)
     this.size = this.getSize();
     this.valid = true;
   }
@@ -85,11 +85,9 @@ scout.HtmlComponent.prototype.isValidateRoot = function() {
   if (this.validateRoot) {
     return true;
   }
-
   if (!this.layoutData || !this.layoutData.isValidateRoot) {
     return false;
   }
-
   return this.layoutData.isValidateRoot();
 };
 
@@ -102,18 +100,16 @@ scout.HtmlComponent.prototype.setLayout = function(layoutManager) {
 
 /**
  * Returns the preferred size of the component, insets included.
+ * @exception When component has no layout manager
  */
 scout.HtmlComponent.prototype.getPreferredSize = function() {
-  var prefSize;
   if (this.layoutManager) {
-    prefSize = this.layoutManager.preferredLayoutSize(this.$comp);
-    $.log.trace('(HtmlComponent#getPreferredSize) ' + this.debug() + ' impl. preferredSize=' + prefSize);
+    var prefSize = this.layoutManager.preferredLayoutSize(this.$comp);
+    $.log.trace('(HtmlComponent#getPreferredSize) ' + this.debug() + ' preferredSize=' + prefSize);
+    return prefSize;
   } else {
-    // TODO AWE: (layout) hier koennten wir eigentlich einen fehler werfen, weil das nicht passieren sollte
-    prefSize = scout.Dimension(this.$comp.width(), this.$comp.height());
-    $.log.trace('(HtmlComponent#getPreferredSize) ' + this.debug() + ' size of HTML element=' + prefSize);
+    throw new Error('Called getPreferredSize() but component has no layout manager');
   }
-  return prefSize;
 };
 
 /**
@@ -128,8 +124,8 @@ scout.HtmlComponent.prototype.getMargins = function() {
 };
 
 /**
- * Returns the current size of the component, insets included.
- * TODO AWE: (layout) prüfen ob hier tatsächlich die insets included sind. Müssten wir dann nicht outerWidth/-Height verwenden?
+ * Returns the size of the component, insets included.
+ * @param includeMargins when set to true, returned dimensions include margins of component
  */
 scout.HtmlComponent.prototype.getSize = function(includeMargins) {
   return scout.graphics.getSize(this.$comp, includeMargins);
