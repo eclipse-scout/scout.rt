@@ -22,7 +22,6 @@
 //@include("session/UserAgent.js");
 //@include("session/Reconnector.js");
 //@include("datamodel/DataModel.js");
-//@include("layout/BorderLayout.js");
 //@include("table/Table.js");
 //@include("table/MobileTable.js");
 //@include("table/TableHeader.js");

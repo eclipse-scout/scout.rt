@@ -79,11 +79,10 @@ scout.graphics = {
       includeBorder: false
     });
   },
-  // TODO AWE: (unit-test) getBounds + auto
   getBounds: function($comp) {
     var parseCssPosition = function(prop) {
       var value = $comp.css(prop);
-      return 'auto' === value ? 0 :  parseInt(value, 10);
+      return 'auto' === value ? 0 : parseInt(value, 10);
     };
     return new scout.Rectangle(
         parseCssPosition('left'),

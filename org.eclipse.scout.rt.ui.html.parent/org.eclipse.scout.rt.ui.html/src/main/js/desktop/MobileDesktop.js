@@ -21,12 +21,9 @@ scout.MobileDesktop.prototype._render = function($parent) {
   //    tools.render($parent);
   //    marginTop = tools.$div.outerHeight();
   //  }
-
-  this.layout = new scout.BorderLayout(marginTop, 0, 'desktop-area');
   if (this.breadCrumbNavigation) {
     this.breadCrumbNavigation.render($parent);
   }
-
   scout.MobileDesktop.parent.prototype._render.call(this, $parent);
 };
 

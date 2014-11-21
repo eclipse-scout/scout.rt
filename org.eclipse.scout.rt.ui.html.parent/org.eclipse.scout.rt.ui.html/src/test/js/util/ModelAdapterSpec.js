@@ -76,4 +76,45 @@ describe("ModelAdapter", function() {
     expect(modelAdapter.o2.id).toBe('4');
   });
 
+  it("_syncPropertiesOnPropertyChange calls _sync* method or sets property", function() {
+    var adapter = new scout.ModelAdapter(),
+      oldValues = {},
+      newValues = {
+        foo: 6,
+        bar: 7
+      };
+    adapter.foo = 1;
+    adapter.bar = 2;
+    adapter._syncFoo = function(value) {
+      this.foo = value;
+    };
+    spyOn(adapter, '_syncFoo').and.callThrough();
+    adapter._syncPropertiesOnPropertyChange(oldValues, newValues);
+    expect(adapter.foo).toBe(6);
+    expect(adapter.bar).toBe(7);
+    expect(adapter._syncFoo).toHaveBeenCalled();
+    expect(oldValues.foo).toBe(1);
+    expect(oldValues.bar).toBe(2);
+  });
+
+  describe("_renderPropertiesOnPropertyChange", function() {
+
+    it("for non-adapter property -> expects a _render* method", function() {
+      var adapter = new scout.ModelAdapter(),
+        $div = $('<div>');
+      adapter._renderFoo = function(value) {
+        $div.text(value);
+      };
+      adapter._renderPropertiesOnPropertyChange({}, {foo: 'bar'});
+      expect($div.text()).toBe('bar');
+    });
+
+    it("for non-adapter property -> throw when _render* method does not exist", function() {
+      var adapter = new scout.ModelAdapter();
+      expect(adapter._renderPropertiesOnPropertyChange.bind(adapter, {}, {foo: 'bar'})).toThrow();
+    });
+
+  });
+
+
 });

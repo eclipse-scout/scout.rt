@@ -32,6 +32,29 @@ public abstract class AbstractOutlineNavigationMenu extends AbstractMenu5 {
   private IOutline m_outline;
   private String m_text1;
   private String m_text2;
+  // TODO AWE: (scout) wir brauchen eine execDispose() methode - sonst kann der listener nie
+  // entfernt werden (memory-leak). Evtl. können wir auf diese methode aber auch verzichten
+  // wenn wir das menü konzeptionell ändern und diese beiden buttons neu zur outline gehören.
+  private TreeListener m_treeListener = new TreeListener() {
+
+    @Override
+    public void treeChangedBatch(List<? extends TreeEvent> batch) {
+      for (TreeEvent e : batch) {
+        acceptEvent(e);
+      }
+    }
+
+    @Override
+    public void treeChanged(TreeEvent e) {
+      acceptEvent(e);
+    }
+
+    private void acceptEvent(TreeEvent e) {
+      if (TreeEvent.TYPE_NODES_SELECTED == e.getType() || OutlineEvent.TYPE_PAGE_CHANGED == e.getType()) {
+        updateMenuState();
+      }
+    }
+  };
 
   public AbstractOutlineNavigationMenu(IOutline outline, String text1, String text2) {
     super(false);
@@ -39,26 +62,7 @@ public abstract class AbstractOutlineNavigationMenu extends AbstractMenu5 {
     m_text1 = TEXTS.get(text1);
     m_text2 = TEXTS.get(text2);
     callInitializer();
-    m_outline.addTreeListener(new TreeListener() {
-
-      @Override
-      public void treeChangedBatch(List<? extends TreeEvent> batch) {
-        for (TreeEvent e : batch) {
-          acceptEvent(e);
-        }
-      }
-
-      @Override
-      public void treeChanged(TreeEvent e) {
-        acceptEvent(e);
-      }
-
-      private void acceptEvent(TreeEvent e) {
-        if (TreeEvent.TYPE_NODES_SELECTED == e.getType() || OutlineEvent.TYPE_PAGE_CHANGED == e.getType()) {
-          updateMenuState();
-        }
-      }
-    });
+    m_outline.addTreeListener(m_treeListener);
   }
 
   @Override

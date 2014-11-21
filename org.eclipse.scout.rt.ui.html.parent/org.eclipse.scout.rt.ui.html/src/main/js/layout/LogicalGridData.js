@@ -48,7 +48,7 @@ scout.LogicalGridData = function(vararg) {
 
 scout.LogicalGridData.prototype.validate = function() {
   if (!this.model) {
-    return; // FIXME AWE: hacky, solve with subclass?
+    return;
   }
 
   var data = this.model.gridData;
@@ -69,8 +69,8 @@ scout.LogicalGridData.prototype.validate = function() {
   }
   this.useUiWidth = data.useUiWidth;
 
+  // TODO AWE: (layout) schauen ob wir label-position unterstützen wollen für Html UI
   // when having the label on top the container of the field must not have a fix size but use the calculated ui height instead.
-  // FIXME AWE: (layout) schauen ob wir label-position unterstützen wollen für Html UI
   // if (this.formField.getLabelPosition() === IFormField.LABEL_POSITION_TOP) {
   // this.useUiHeight = true;
   // } else {

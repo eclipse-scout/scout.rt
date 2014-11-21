@@ -86,7 +86,7 @@ public class LocalBundleResourceProvider extends AbstractService implements ISer
   }
 
   /**
-   * TODO AWE: gerrit commit for FileUtilty.
+   * TODO AWE: (scout) In org.eclipse.scout.commons.FileUtility hinzufügen
    * see: http://stackoverflow.com/questions/4212861/what-is-a-correct-mime-type-for-docx-pptx-etc
    */
   private static final Map<String, String> EXT_TO_MIME_TYPE_MAP = new HashMap<>();
@@ -155,7 +155,7 @@ public class LocalBundleResourceProvider extends AbstractService implements ISer
   /**
    * Checks whether the file needs to be returned or not, depending on the request headers and file modification state.
    * Also writes cache headers (last modified and etag) if the file needs to be returned.
-   *
+   * 
    * @return {@link HttpServletResponse#SC_NOT_MODIFIED} if the file hasn't changed in the meantime or
    *         {@link HttpServletResponse#SC_ACCEPTED} if the content of the file needs to be returned.
    */

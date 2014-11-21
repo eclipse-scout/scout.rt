@@ -53,10 +53,6 @@ scout.CheckBoxField.prototype._renderEnabled = function(enabled) {
   this._$checkBox.setEnabled(enabled);
 };
 
-// FIXME AWE/CGU label visible logic in scout for checkboxes is strange.
-// LabelVisible removes not the label but instead the empty space before the checkbox
-// A.WE: removed overridden _setLabelVisible method, default impl. is Ok in my opinion.
-
 /**
  * @override
  */

@@ -117,22 +117,17 @@ scout.ModelAdapter.prototype.removeChild = function(childAdapter) {
 };
 
 /**
- * Loops through all properties of the given model (optional ignores the given properties).
- * Creates an ModelAdapter instance for the given property when the propertyName is in the
- * _adapterProperties array.
+ * Loops through all properties of the given model. Creates an ModelAdapter instance
+ * for the given property when the propertyName is in the _adapterProperties array.
  */
-scout.ModelAdapter.prototype._eachProperty = function(model, func, ignore) {
+scout.ModelAdapter.prototype._eachProperty = function(model, func) {
   var propertyName, value, i, j, adapter, adapters;
 
-  //Loop through primitive properties
+  // Loop through primitive properties
   for (propertyName in model) {
-    if (typeof ignore !== 'undefined' && ignore.indexOf(propertyName) >= 0) {
-      continue;
-    }
     if (this._adapterProperties.indexOf(propertyName) > -1) {
       continue; // will be handled below
     }
-
     value = model[propertyName];
     func(propertyName, value);
   }
@@ -171,9 +166,9 @@ scout.ModelAdapter.prototype._eachProperty = function(model, func, ignore) {
  * and calls the right function to update the UI. For each property a corresponding function-name
  * must exist (property-name 'myValue', function-name 'setMyValue').
  *
- * This happes in two steps:
- * 1.) Synchronizing: Apply properties on adapter
- * 2.) Rendering: Call setter function to update UI
+ * This happens in two steps:
+ * 1.) Synchronizing: when a sync[propertyName] method exists, call that method - otherwise simply set the property [propertyName]
+ * 2.) Rendering: Call render[propertyName] function to update UI
  *
  * You can always rely that these two steps are processed in that order, but you cannot rely that
  * individual properties are processed in a certain order.
@@ -188,7 +183,7 @@ scout.ModelAdapter.prototype.onModelPropertyChange = function(event) {
   if (this.rendered) {
     this._renderPropertiesOnPropertyChange(oldValues, event.properties);
   }
-}; // TODO AWE: (form) jasmine-test this!
+};
 
 /**
  * The default impl. only logs a warning that the event is not supported.
@@ -197,36 +192,33 @@ scout.ModelAdapter.prototype.onModelAction = function(event) {
   $.log.warn('Model action "' + event.type + '" is not supported by model-adapter ' + this.objectType);
 };
 
-scout.ModelAdapter.prototype._syncPropertiesOnPropertyChange = function(oldValues, newValues, ignore) {
+scout.ModelAdapter.prototype._syncPropertiesOnPropertyChange = function(oldValues, newValues) {
   this._eachProperty(newValues, function(propertyName, value) {
     var onFuncName = '_sync' + scout.ModelAdapter.preparePropertyNameForFunctionCal(propertyName);
     oldValues[propertyName] = this[propertyName];
-
     if (this[onFuncName]) {
       this[onFuncName](value);
     } else {
       this[propertyName] = value;
     }
-  }.bind(this), ignore);
+  }.bind(this));
 };
 
-scout.ModelAdapter.prototype._renderPropertiesOnPropertyChange = function(oldValues, newValues, ignore) {
+scout.ModelAdapter.prototype._renderPropertiesOnPropertyChange = function(oldValues, newValues) {
   this._eachProperty(newValues, function(propertyName, value) {
     var renderFuncName = '_render' + scout.ModelAdapter.preparePropertyNameForFunctionCal(propertyName);
     $.log.debug('call ' + renderFuncName + '(' + value + ')');
-
+    // Call the render function for regular properties, for adapters see onChildAdapterChange
     if (this._adapterProperties.indexOf(propertyName) > -1) {
       this.onChildAdapterChange(propertyName, oldValues[propertyName], value);
     }
     else {
-      //Call the render function for regular properties, for adapters see onChildAdapterChange
       if (!this[renderFuncName]) {
         throw new Error('Render function ' + renderFuncName + ' does not exist in model adapter');
       }
       this[renderFuncName](value);
     }
-
-  }.bind(this), ignore);
+  }.bind(this));
 };
 
 scout.ModelAdapter.preparePropertyNameForFunctionCal = function(propertyName) {

@@ -18,4 +18,32 @@ describe("scout.Dimension", function() {
 
   });
 
+  describe("getBounds", function() {
+
+    var $div = $('<div>').
+      css('left', '6px').
+      css('top', '7px').
+      css('width', '8px').
+      css('height', '9px').
+      css('margin', '10px');
+
+    it("returns JQuery.outerWidth/Height(true)", function() {
+      var rect = scout.graphics.getBounds($div);
+      expect(rect.x).toBe(6);
+      expect(rect.y).toBe(7);
+      expect(rect.width).toBe(28);
+      expect(rect.height).toBe(29);
+    });
+
+    it("returns 0 when left/right is set to auto", function() {
+      $div.
+        css('left', 'auto').
+        css('top', 'auto');
+      var rect = scout.graphics.getBounds($div);
+      expect(rect.x).toBe(0);
+      expect(rect.y).toBe(0);
+    });
+
+  });
+
 });
