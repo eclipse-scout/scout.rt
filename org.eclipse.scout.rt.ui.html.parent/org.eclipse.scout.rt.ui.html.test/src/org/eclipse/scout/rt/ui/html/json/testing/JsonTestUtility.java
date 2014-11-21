@@ -29,7 +29,10 @@ import org.json.JSONObject;
 import org.junit.Assert;
 import org.mockito.Mockito;
 
-public class JsonTestUtility {
+public final class JsonTestUtility {
+
+  private JsonTestUtility() {
+  }
 
   public static IJsonSession createAndInitializeJsonSession() {
     String jsonSessionId = "1.1";

@@ -89,18 +89,12 @@ public abstract class AbstractOutlineNavigationMenu extends AbstractMenu5 {
       if (page5 instanceof IPageWithTable) {
         return true;
       }
-      else {
-        if (page5.getDetailForm() != null && isDetail(page5)) {
-          return false;
-        }
-        else {
-          return true;
-        }
+      if (page5.getDetailForm() != null && isDetail(page5)) {
+        return false;
       }
-    }
-    else {
       return true;
     }
+    return true;
   }
 
   @Override

@@ -249,6 +249,8 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
       case OutlineEvent.TYPE_PAGE_CHANGED:
         handleModelPageChanged(event);
         break;
+      default:
+        //NOP
     }
   }
 

@@ -284,7 +284,7 @@ public class BrowserInfoBuilder {
       for (int i = 1; i <= 3; i++) {
         String versionPart = m.group(i);
         if (StringUtility.hasText(versionPart)) {
-          vArr[i - 1] = Integer.valueOf(versionPart);
+          vArr[i - 1] = Integer.parseInt(versionPart);
         }
       }
     }

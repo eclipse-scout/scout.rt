@@ -17,8 +17,6 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 //FIXME CGU Harmonize form creation with AbstractTableControl and AbstractPageWithNodes5 (searchform / detailform) -> Never add to desktop, form should be managed by the responsible control -> allows javascript button to directly show the form without the need to go to the server first
 public abstract class AbstractFormToolButton5 extends AbstractToolButton implements IFormToolButton5 {
 
-  private boolean m_previousSelectionState = false;
-
   @Override
   protected boolean getConfiguredToggleAction() {
     return true;

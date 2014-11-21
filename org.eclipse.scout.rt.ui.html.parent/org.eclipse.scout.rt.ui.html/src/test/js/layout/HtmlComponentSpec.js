@@ -133,7 +133,7 @@ describe("HtmlComponent", function() {
         } else {
           throw new Error('unexpected CSS key');
         }
-      },
+      }
     };
 
     addWidthHeightMock(jqueryMock);
