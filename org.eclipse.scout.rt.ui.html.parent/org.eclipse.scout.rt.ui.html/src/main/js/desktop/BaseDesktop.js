@@ -18,8 +18,8 @@ scout.BaseDesktop.prototype.showMessage = function(message, type) {
 scout.BaseDesktop.prototype.goOffline = function() {
   scout.BaseDesktop.parent.prototype.goOffline.call(this);
 
-  var message = 'Die Netzwerkverbindung ist unterbrochen.',
-    $reconnect; //FIXME CGU translate
+  var message = scout.texts.get('connectionInterrupted'),
+    $reconnect;
 
   if (this.$offline) {
     return;
@@ -64,7 +64,7 @@ scout.BaseDesktop.prototype.onReconnecting = function() {
 };
 
 scout.BaseDesktop.prototype.onReconnectingSucceeded = function() {
-  var message = 'Die Verbindung wurde wieder hergestellt.'; //FIXME CGU translate
+  var message = scout.texts.get('connectionReestablished');
   if (!this.$offline) {
     return;
   }

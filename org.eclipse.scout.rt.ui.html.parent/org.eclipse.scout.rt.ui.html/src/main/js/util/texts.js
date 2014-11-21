@@ -25,7 +25,9 @@ scout.texts = {
       'groupedByWeekday': 'gruppiert nach Wochentag',
       'groupedByMonth': 'gruppiert nach Monat',
       'groupedByYear': 'gruppiert nach Jahr',
-      'count': 'Anzahl'
+      'count': 'Anzahl',
+      'connectionInterrupted': 'Die Netzwerkverbindung ist unterbrochen.',
+      'connectionReestablished': 'Die Verbindung wurde wieder hergestellt.'
   }
 };
 

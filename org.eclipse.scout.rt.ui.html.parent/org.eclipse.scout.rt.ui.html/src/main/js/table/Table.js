@@ -313,7 +313,6 @@ scout.Table.prototype._buildRowDiv = function(row) {
   if (this.selectedRowIds && this.selectedRowIds.indexOf(row.id) > -1) {
     rowClass += 'selected ';
   }
-  // FIXME Check if possible to use $.makeDiv (but maybe it's too slow)
   var unselectable = (scout.device.supportsCssUserSelect() ? '' : ' unselectable="on"'); // workaround for IE 9
 
   var rowDiv = '<div id="' + row.id + '" class="' + rowClass + '" style="width: ' + rowWidth + 'px"' + unselectable + '>';
