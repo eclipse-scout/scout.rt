@@ -23,8 +23,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.internal.TablePageTreeMenuWrapper;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline5;
 import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineEvent;
-import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineNavigateDownMenu;
-import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineNavigateUpMenu;
+import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineNavigation;
 import org.eclipse.scout.rt.client.ui.form.FormMenuType;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IForm5;
@@ -49,8 +48,8 @@ public abstract class AbstractPageWithNodes5 extends AbstractExtensiblePageWithN
   @Override
   protected void execInitPage() throws ProcessingException {
     ITable table = getInternalTable();
-    table.addMenu(new OutlineNavigateUpMenu(getOutline()));
-    table.addMenu(new OutlineNavigateDownMenu(getOutline()));
+    table.addMenu(OutlineNavigation.createUp(getOutline()));
+    table.addMenu(OutlineNavigation.createDown(getOutline()));
   }
 
   /**
@@ -135,7 +134,7 @@ public abstract class AbstractPageWithNodes5 extends AbstractExtensiblePageWithN
 
   protected void adaptDetailFormMenus(List<IMenu> menus) throws ProcessingException {
     List<IMenu> copy = new LinkedList<IMenu>(menus);
-    //Remove system menus (ok cancel)
+    // Remove system menus (ok cancel)
     for (IMenu menu : copy) {
       if (menu instanceof IMenu5) {
         if (((IMenu5) menu).getSystemType() != IMenu5.SYSTEM_TYPE_NONE) {
@@ -144,7 +143,10 @@ public abstract class AbstractPageWithNodes5 extends AbstractExtensiblePageWithN
       }
     }
 
-    //Add page menus to the form
+    menus.add(OutlineNavigation.createUp(getOutline()));
+    menus.add(OutlineNavigation.createDown(getOutline()));
+
+    // Add page menus to the form
     for (IMenu menu : getOutline().getContextMenu().getChildActions()) {
       // FIXME CGU improve this
       if (menu instanceof TablePageTreeMenuWrapper && ((TablePageTreeMenuWrapper) menu).getWrappedMenu().getClass().getSimpleName().contains("OutlineNavigateDownMenu")) {
@@ -163,12 +165,6 @@ public abstract class AbstractPageWithNodes5 extends AbstractExtensiblePageWithN
       MenuWrapper menuWrapper = new MenuWrapper(menu, types);
       menus.add(menuWrapper);
     }
-
-    OutlineNavigateUpMenu menu = new OutlineNavigateUpMenu(getOutline());
-    menus.add(menu);
-
-    OutlineNavigateDownMenu menu2 = new OutlineNavigateDownMenu(this.getOutline());
-    menus.add(menu2);
   }
 
   @Override

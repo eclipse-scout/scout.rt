@@ -114,18 +114,18 @@ scout.Desktop.prototype.onResize = function() {
   }
 };
 
-scout.Desktop.TabAndContent = function(content, title, subtitle) {
+scout.Desktop.TabAndContent = function(content, title, subTitle) {
   this.content = content;
   this.title = title;
-  this.subtitle = subtitle;
+  this.subTitle = subTitle;
   this.$container;
   this.$storage;
 };
 
-scout.Desktop.TabAndContent.prototype._update = function(content, title, subtitle) {
+scout.Desktop.TabAndContent.prototype._update = function(content, title, subTitle) {
   this.content = content;
   this.title = title;
-  this.subtitle = subtitle;
+  this.subTitle = subTitle;
 };
 
 /* Tab-handling */
@@ -140,9 +140,7 @@ scout.Desktop.TabAndContent.prototype._update = function(content, title, subtitl
 scout.Desktop.prototype._addTab = function(tab, prepend) {
   tab.$container = $.makeDIV('taskbar-tab-item')
     .append($.makeDIV('title', tab.title).attr('title', tab.title))
-    .append($.makeDIV('subtitle', 'Bearbeiten')); // TODO AWE: (desktop) sub-titel für forms
-  //TODO müsste abhängig von Handler gesetzt werden.
-
+    .append($.makeDIV('sub-title', tab.subTitle));
   if (prepend) {
     tab.$container.prependTo(this.$tabbar);
   } else {
@@ -173,7 +171,7 @@ scout.Desktop.prototype._updateTab = function(tab) {
     }
   };
   setTitle('.title', tab.title);
-  setTitle('.subtitle', tab.subtitle);
+  setTitle('.sub-title', tab.subTitle);
 };
 
 scout.Desktop.prototype._removeTab = function(tab) {
@@ -214,7 +212,7 @@ scout.Desktop.prototype._unselectTab = function(tab) {
 /* handling of forms */
 
 scout.Desktop.prototype._addForm = function(form) {
-  var tab = new scout.Desktop.TabAndContent(form, form.title, '%Modus%');
+  var tab = new scout.Desktop.TabAndContent(form, form.title, form.subTitle);
   this._addTab(tab);
   form.render(this.$bench);
 
@@ -242,7 +240,7 @@ scout.Desktop.prototype._openUrlInBrowser = function(event) {
 
 /* communication with outline */
 
-scout.Desktop.prototype.updateOutlineTab = function(content, title, subtitle) {
+scout.Desktop.prototype.updateOutlineTab = function(content, title, subTitle) {
   if (this._outlineTab.content && this._outlineTab.content !== content) {
     this._outlineTab.content.remove();
     // Also remove storage to make sure selectTab does not restore the content
@@ -259,7 +257,7 @@ scout.Desktop.prototype.updateOutlineTab = function(content, title, subtitle) {
     this._addTab(this._outlineTab, true);
   }
 
-  this._outlineTab._update(content, title, subtitle);
+  this._outlineTab._update(content, title, subTitle);
   this._updateTab(this._outlineTab);
   this._selectTab(this._outlineTab);
 

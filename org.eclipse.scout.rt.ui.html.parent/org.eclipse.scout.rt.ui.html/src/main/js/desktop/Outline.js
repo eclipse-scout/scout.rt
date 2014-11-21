@@ -49,7 +49,7 @@ scout.Outline.prototype._renderSelection = function($nodes) {
 };
 
 scout.Outline.prototype._updateOutlineTab = function(node) {
-  var content, parentText, nodeText, title, subtitle;
+  var content, parentText, nodeText, title, subTitle;
   if (node) {
     // Unlink detail form if it was closed.
     // May happen in the following case:
@@ -76,7 +76,7 @@ scout.Outline.prototype._updateOutlineTab = function(node) {
 
     if (parentText && nodeText) {
       title = parentText;
-      subtitle = nodeText;
+      subTitle = nodeText;
     } else if (parentText) {
       title = parentText;
     } else if (nodeText) {
@@ -87,7 +87,7 @@ scout.Outline.prototype._updateOutlineTab = function(node) {
     content = this.defaultDetailForm;
     title = this.defaultDetailForm.title;
   }
-  this.session.desktop.updateOutlineTab(content, title, subtitle);
+  this.session.desktop.updateOutlineTab(content, title, subTitle);
 };
 
 /* event handling */

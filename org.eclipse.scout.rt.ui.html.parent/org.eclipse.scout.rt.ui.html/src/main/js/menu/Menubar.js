@@ -39,19 +39,6 @@ scout.Menubar.prototype.updateItems = function(menus) {
   // in case of no menus: finish
   if (!menus || menus.length === 0) return;
 
-  // FIXME AWE HACK [begin]
-  // find Anzeigen menu, move to group left1Menus and change style
-  var menu;
-  for (i = 0; i < menus.length; i++) {
-    menu = menus[i];
-    if ('Anzeigen' === menu.text) {
-      menu.menuTypes = ['Table.EmptySpace', 'Form.System'];
-      menu.defaultMenu = true;
-      break;
-    }
-  }
-  // HACK [end]
-
   // add menus for the first left area
   left1Menus = scout.menus.filter(menus, this.menuTypesForLeft1);
   hasLeft1Menus = left1Menus && left1Menus.length > 0;

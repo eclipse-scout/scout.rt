@@ -12,16 +12,12 @@ package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable5;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline5;
 import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineEvent;
-import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineNavigateDownMenu;
-import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineNavigateUpMenu;
-import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
-import org.eclipse.scout.service.SERVICES;
+import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineNavigation;
 
 public abstract class AbstractPageWithTable5<T extends ITable5> extends AbstractPageWithTable<T> implements IPage5 {
 
@@ -40,18 +36,8 @@ public abstract class AbstractPageWithTable5<T extends ITable5> extends Abstract
     // FIXME CGU: how to do this properly? Das menu dürfte auch nicht auf den Baum synchronisiert werden
     if (getTable().getDefaultMenu() == null && !isLeaf()) {
       List<IMenu> tableMenus = getTable().getContextMenu().getChildActions();
-      OutlineNavigateDownMenu menu = new OutlineNavigateDownMenu(getOutline());
-      try {
-        menu.initAction();
-      }
-      catch (ProcessingException e) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(e);
-      }
-      tableMenus.add(0, menu);
-
-      OutlineNavigateUpMenu upMenu = new OutlineNavigateUpMenu(getOutline());
-      tableMenus.add(0, upMenu);
-
+      tableMenus.add(0, OutlineNavigation.createUp(getOutline()));
+      tableMenus.add(1, OutlineNavigation.createDown(getOutline()));
       getTable().getContextMenu().setChildActions(tableMenus);
     }
   }

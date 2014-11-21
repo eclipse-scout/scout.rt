@@ -21,6 +21,11 @@ public class OutlineNavigateDownMenu extends AbstractOutlineNavigationMenu {
   }
 
   @Override
+  public boolean isDefault() {
+    return true;
+  }
+
+  @Override
   void showDetail(IPage page) {
     ((IPage5) page).setDetailFormVisible(false);
   }

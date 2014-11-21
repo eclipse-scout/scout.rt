@@ -41,6 +41,10 @@ public abstract class AbstractForm5 extends AbstractForm implements IForm5 {
     super(true);
   }
 
+  // TODO AWE: (scout) remove method private void composeTitle() in AbstractForm
+  // title and sub-title are separated in the new UI, concatenation should be done
+  // in the UI, if required at all.
+
   public AbstractForm5(boolean callInitializer) throws ProcessingException {
     super(callInitializer);
   }
@@ -97,7 +101,7 @@ public abstract class AbstractForm5 extends AbstractForm implements IForm5 {
   /**
    * Override this internal method only in order to make use of dynamic menus<br>
    * Used to manage menu list and add/remove menus
-   *
+   * 
    * @param menuList
    *          live and mutable list of configured menus
    */
