@@ -9,7 +9,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage5;
 public class OutlineNavigateUpMenu extends AbstractOutlineNavigationMenu {
 
   public OutlineNavigateUpMenu(IOutline outline) {
-    super(outline, "Aufwärts", "Zurück"); // TODO AWE: i18n (auch oben)
+    super(outline, "Up", "Back");
   }
 
   @Override

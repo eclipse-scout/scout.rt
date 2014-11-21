@@ -12,7 +12,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 public class OutlineNavigateDownMenu extends AbstractOutlineNavigationMenu {
 
   public OutlineNavigateDownMenu(IOutline outline) {
-    super(outline, "Anzeigen", "Weiter"); // TODO AWE: i18n (auch oben)
+    super(outline, "Show", "Continue");
   }
 
   @Override
@@ -34,21 +34,23 @@ public class OutlineNavigateDownMenu extends AbstractOutlineNavigationMenu {
   protected void doDrill(IPage page) {
     ITreeNode node;
     ITableRow selectedRow;
+    // TODO AWE: (scout) find common interface for pages with tables, currently the methods get(Internal)Table and getTreeNodeFor()
+    // are on IPageWithTable and IPageWithNodes but the have no common super class. That's why we must duplicate code here.
+    // FIXME CGU: UIFacade seems wrong...  copied from OutlineMediator
     if (page instanceof IPageWithTable<?>) {
-      IPageWithTable<?> selectedTablePage = (IPageWithTable<?>) page;
-      selectedRow = selectedTablePage.getTable().getSelectedRow();
-      node = selectedTablePage.getTreeNodeFor(selectedRow);
-      // FIXME CGU: UIFacade seems wrong...  copied from OutlineMediator
+      IPageWithTable<?> pageWt = (IPageWithTable<?>) page;
+      selectedRow = pageWt.getTable().getSelectedRow();
+      node = pageWt.getTreeNodeFor(selectedRow);
       getOutline().getUIFacade().setNodeSelectedAndExpandedFromUI(node);
     }
     else if (page instanceof IPageWithNodes) {
-      IPageWithNodes pwnPage = (IPageWithNodes) page;
-      selectedRow = pwnPage.getInternalTable().getSelectedRow();
-      node = pwnPage.getTreeNodeFor(selectedRow);
+      IPageWithNodes pageWn = (IPageWithNodes) page;
+      selectedRow = pageWn.getInternalTable().getSelectedRow();
+      node = pageWn.getTreeNodeFor(selectedRow);
       getOutline().getUIFacade().setNodeSelectedAndExpandedFromUI(node);
     }
     else {
-      throw new IllegalStateException("Navigate down only works on table pages");
+      throw new IllegalStateException("Navigate down only works on pages with (internal) table");
     }
   }
 

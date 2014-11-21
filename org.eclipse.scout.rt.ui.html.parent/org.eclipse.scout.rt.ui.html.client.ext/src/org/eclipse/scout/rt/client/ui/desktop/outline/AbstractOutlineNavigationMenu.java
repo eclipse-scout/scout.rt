@@ -22,6 +22,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage5;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.FormMenuType;
+import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.ui.menu.AbstractMenu5;
 
 // TODO AWE: (navi) wenn klick in baum, wieder detailForm anzeigen
@@ -36,8 +37,8 @@ public abstract class AbstractOutlineNavigationMenu extends AbstractMenu5 {
   public AbstractOutlineNavigationMenu(IOutline outline, String text1, String text2) {
     super(false);
     m_outline = outline;
-    m_text1 = text1;
-    m_text2 = text2;
+    m_text1 = TEXTS.get(text1);
+    m_text2 = TEXTS.get(text2);
     callInitializer();
     m_outline.addTreeListener(new TreeListener() {
 
