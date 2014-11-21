@@ -1,53 +1,55 @@
 package org.eclipse.scout.rt.client.ui.desktop.outline;
 
-import java.util.Set;
-
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage5;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithNodes;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
-import org.eclipse.scout.rt.shared.ui.menu.AbstractMenu5;
 
-public class OutlineNavigateDownMenu extends AbstractMenu5 {
-  private IOutline m_outline;
+public class OutlineNavigateDownMenu extends AbstractOutlineNavigationMenu {
 
   public OutlineNavigateDownMenu(IOutline outline) {
-    super(false);
-    m_outline = outline;
-    callInitializer();
+    super(outline, "Anzeigen", "Weiter"); // TODO AWE: i18n (auch oben)
   }
 
   @Override
-  protected String getConfiguredText() {
-    return "Anzeigen"; //FIXME CGU translation
+  boolean isDetail(IPage5 page5) {
+    return page5.isDetailFormVisible();
   }
 
   @Override
-  protected Set<? extends IMenuType> getConfiguredMenuTypes() {
-    return CollectionUtility.hashSet(TableMenuType.SingleSelection);
+  void showDetail(IPage page) {
+    ((IPage5) page).setDetailFormVisible(false);
   }
 
-  //FIXME CGU maybe do this in gui to make it more responsive?
   @Override
-  protected void execAction() throws ProcessingException {
-    ITreeNode node = null;
-    ITableRow selectedRow = null;
+  IMenuType getMenuType() {
+    return TableMenuType.SingleSelection;
+  }
 
-    IPage selectedPage = (IPage) m_outline.getSelectedNode();
-    if (selectedPage instanceof IPageWithTable<?>) {
-      IPageWithTable<?> selectedTablePage = ((IPageWithTable<?>) selectedPage);
+  @Override
+  protected void doDrill(IPage page) {
+    ITreeNode node;
+    ITableRow selectedRow;
+    if (page instanceof IPageWithTable<?>) {
+      IPageWithTable<?> selectedTablePage = (IPageWithTable<?>) page;
       selectedRow = selectedTablePage.getTable().getSelectedRow();
       node = selectedTablePage.getTreeNodeFor(selectedRow);
-
-      //FIXME UIFacade seems wrong...  copied from OutlineMediator
-      m_outline.getUIFacade().setNodeSelectedAndExpandedFromUI(node);
+      // FIXME CGU: UIFacade seems wrong...  copied from OutlineMediator
+      getOutline().getUIFacade().setNodeSelectedAndExpandedFromUI(node);
+    }
+    else if (page instanceof IPageWithNodes) {
+      IPageWithNodes pwnPage = (IPageWithNodes) page;
+      selectedRow = pwnPage.getInternalTable().getSelectedRow();
+      node = pwnPage.getTreeNodeFor(selectedRow);
+      getOutline().getUIFacade().setNodeSelectedAndExpandedFromUI(node);
     }
     else {
       throw new IllegalStateException("Navigate down only works on table pages");
     }
   }
+
 }

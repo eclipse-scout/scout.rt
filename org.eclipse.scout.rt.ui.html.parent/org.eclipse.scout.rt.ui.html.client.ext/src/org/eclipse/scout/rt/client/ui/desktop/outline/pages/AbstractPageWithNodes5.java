@@ -19,10 +19,12 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
+import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.internal.TablePageTreeMenuWrapper;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline5;
 import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineEvent;
-import org.eclipse.scout.rt.client.ui.desktop.outline.ToggleDetailFormMenu;
+import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineNavigateDownMenu;
+import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineNavigateUpMenu;
 import org.eclipse.scout.rt.client.ui.form.FormMenuType;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IForm5;
@@ -42,6 +44,13 @@ public abstract class AbstractPageWithNodes5 extends AbstractExtensiblePageWithN
 
   public AbstractPageWithNodes5(boolean callInitializer) {
     super(callInitializer);
+  }
+
+  @Override
+  protected void execInitPage() throws ProcessingException {
+    ITable table = getInternalTable();
+    table.addMenu(new OutlineNavigateUpMenu(getOutline()));
+    table.addMenu(new OutlineNavigateDownMenu(getOutline()));
   }
 
   /**
@@ -108,6 +117,15 @@ public abstract class AbstractPageWithNodes5 extends AbstractExtensiblePageWithN
     setDetailForm(form);
   }
 
+  @Override
+  public void setDetailForm(IForm form) {
+    IForm oldDetailForm = getDetailForm();
+    if (oldDetailForm != form) {
+      super.setDetailForm(form);
+      ((IOutline5) getOutline()).fireOutlineEvent(new OutlineEvent(getTree(), OutlineEvent.TYPE_PAGE_CHANGED, this));
+    }
+  }
+
   protected void ensureDetailFormStarted() throws ProcessingException {
     if (getDetailForm() == null || getDetailForm().isFormOpen()) {
       return;
@@ -146,14 +164,11 @@ public abstract class AbstractPageWithNodes5 extends AbstractExtensiblePageWithN
       menus.add(menuWrapper);
     }
 
-    ToggleDetailFormMenu menu = new ToggleDetailFormMenu(this, false);
-    try {
-      menu.initAction();
-    }
-    catch (ProcessingException e) {
-      SERVICES.getService(IExceptionHandlerService.class).handleException(e);
-    }
+    OutlineNavigateUpMenu menu = new OutlineNavigateUpMenu(getOutline());
     menus.add(menu);
+
+    OutlineNavigateDownMenu menu2 = new OutlineNavigateDownMenu(this.getOutline());
+    menus.add(menu2);
   }
 
   @Override
@@ -163,8 +178,11 @@ public abstract class AbstractPageWithNodes5 extends AbstractExtensiblePageWithN
 
   @Override
   public void setDetailFormVisible(boolean visible) {
-    m_detailFormVisible = visible;
-    ((IOutline5) getOutline()).fireOutlineEvent(new OutlineEvent(getTree(), OutlineEvent.TYPE_PAGE_CHANGED, this));
+    boolean oldVisible = m_detailFormVisible;
+    if (oldVisible != visible) {
+      m_detailFormVisible = visible;
+      ((IOutline5) getOutline()).fireOutlineEvent(new OutlineEvent(getTree(), OutlineEvent.TYPE_PAGE_CHANGED, this));
+    }
   }
 
 }

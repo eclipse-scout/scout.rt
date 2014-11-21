@@ -30,8 +30,8 @@
   content: '';
   left: @left;
   top: @top;
-  width: calc(~"100% + " @diffW);
-  height: calc(~"100% + " @diffH);
+  width: calc(~"100% +" @diffW);
+  height: calc(~"100% +" @diffH);
 }
 
 /* Expects a sibling html element with class 'icon' **/

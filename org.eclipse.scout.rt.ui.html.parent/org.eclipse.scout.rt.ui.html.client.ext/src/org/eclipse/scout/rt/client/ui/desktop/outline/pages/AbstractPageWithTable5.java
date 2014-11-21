@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline5;
 import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineEvent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineNavigateDownMenu;
+import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineNavigateUpMenu;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.service.SERVICES;
 
@@ -36,7 +37,7 @@ public abstract class AbstractPageWithTable5<T extends ITable5> extends Abstract
   public void setTreeInternal(ITree tree, boolean includeSubtree) {
     super.setTreeInternal(tree, includeSubtree);
 
-    // FIXME how to do this properly? Das menu dürfte auch nicht auf den Baum synchronisiert werden
+    // FIXME CGU: how to do this properly? Das menu dürfte auch nicht auf den Baum synchronisiert werden
     if (getTable().getDefaultMenu() == null && !isLeaf()) {
       List<IMenu> tableMenus = getTable().getContextMenu().getChildActions();
       OutlineNavigateDownMenu menu = new OutlineNavigateDownMenu(getOutline());
@@ -47,9 +48,15 @@ public abstract class AbstractPageWithTable5<T extends ITable5> extends Abstract
         SERVICES.getService(IExceptionHandlerService.class).handleException(e);
       }
       tableMenus.add(0, menu);
+
+      OutlineNavigateUpMenu upMenu = new OutlineNavigateUpMenu(getOutline());
+      tableMenus.add(0, upMenu);
+
       getTable().getContextMenu().setChildActions(tableMenus);
     }
   }
+
+  // TODO AWE: (scout) gemeinsame basis klasse für page5, copy/paste für detaiLFormVisible entfernen
 
   @Override
   public boolean isDetailFormVisible() {
@@ -58,8 +65,11 @@ public abstract class AbstractPageWithTable5<T extends ITable5> extends Abstract
 
   @Override
   public void setDetailFormVisible(boolean visible) {
-    m_detailFormVisible = visible;
-    ((IOutline5) getOutline()).fireOutlineEvent(new OutlineEvent(getTree(), OutlineEvent.TYPE_PAGE_CHANGED, this));
+    boolean oldVisible = m_detailFormVisible;
+    if (oldVisible != visible) {
+      m_detailFormVisible = visible;
+      ((IOutline5) getOutline()).fireOutlineEvent(new OutlineEvent(getTree(), OutlineEvent.TYPE_PAGE_CHANGED, this));
+    }
   }
 
 }

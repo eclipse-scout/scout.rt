@@ -11,7 +11,6 @@ scout.Table = function() {
   this._keystrokeAdapter;
   this.controls = [];
   this.menus = [];
-  this.staticMenus = [];
   this.rows = [];
   this._addAdapterProperties(['controls', 'menus']);
   this.events = new scout.EventSupport();
@@ -65,7 +64,6 @@ scout.Table.prototype._render = function($parent) {
   this.menubar.menuTypesForLeft1 = ['Table.EmptySpace'];
   this.menubar.menuTypesForLeft2 = ['Table.SingleSelection', 'Table.MultiSelection'];
   this.menubar.menuTypesForRight = ['Table.Header'];
-  this.menubar.staticMenus = this.staticMenus;
 
   if (this._isFooterVisible()) {
     this.footer = this._createFooter();
