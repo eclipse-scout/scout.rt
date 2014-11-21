@@ -26,11 +26,13 @@ scout.CheckBoxField.prototype._render = function($parent) {
     attr('title', this.label).
     appendTo(this.$field);
 
-  this._$checkBox.on('click', function() {
-    this.session.send('click', this.id);
-  }.bind(this));
-
+  this._$checkBox.on('click', this._onClick.bind(this));
   this.addStatus();
+};
+
+scout.CheckBoxField.prototype._onClick = function() {
+  var uiChecked = this._$checkBox[0].checked;
+  this.session.send('click', this.id, {checked: uiChecked});
 };
 
 scout.CheckBoxField.prototype._renderProperties = function() {
@@ -40,9 +42,9 @@ scout.CheckBoxField.prototype._renderProperties = function() {
 
 scout.CheckBoxField.prototype._renderValue = function(value) {
   if (value) {
-    this._$checkBox.attr('checked', 'checked');
+    this._$checkBox[0].checked = 'checked';
   } else {
-    this._$checkBox.removeAttr('checked');
+    this._$checkBox[0].checked = '';
   }
 };
 

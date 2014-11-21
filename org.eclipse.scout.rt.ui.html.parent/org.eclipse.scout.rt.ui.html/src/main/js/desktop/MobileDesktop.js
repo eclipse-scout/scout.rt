@@ -12,15 +12,13 @@ scout.inherits(scout.MobileDesktop, scout.BaseDesktop);
  * @override
  */
 scout.MobileDesktop.prototype._render = function($parent) {
-  var  marginTop=0;
   this.$parent = $parent;
-
-  //FIXME CGU in menu auslagern, bzw. wichtigste rechts oben darstellen
-  //  if (this.toolButtons) {
-  //    tools = new scout.MobileDesktopToolButtons(this.toolButtons, this.session);
-  //    tools.render($parent);
-  //    marginTop = tools.$div.outerHeight();
-  //  }
+  // FIXME CGU in menu auslagern, bzw. wichtigste rechts oben darstellen
+  // if (this.toolButtons) {
+  //   tools = new scout.MobileDesktopToolButtons(this.toolButtons, this.session);
+  //   tools.render($parent);
+  //   marginTop = tools.$div.outerHeight();
+  // }
   if (this.breadCrumbNavigation) {
     this.breadCrumbNavigation.render($parent);
   }

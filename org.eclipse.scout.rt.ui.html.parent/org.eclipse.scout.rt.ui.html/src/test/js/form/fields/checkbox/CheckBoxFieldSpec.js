@@ -17,6 +17,15 @@ describe("CheckBoxField", function() {
       expect(scout.ValueField.prototype.isPrototypeOf(checkBox)).toBe(true);
     });
 
+    it("_renderValue sets checked property", function() {
+      var $div = $('<div>');
+      checkBox._render($div);
+      checkBox._renderValue(true);
+      expect(checkBox._$checkBox[0].checked).toBe(true);
+      checkBox._renderValue(false);
+      expect(checkBox._$checkBox[0].checked).toBe(false);
+    });
+
   });
 
 });
