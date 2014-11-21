@@ -61,7 +61,7 @@ scout.Table.prototype._render = function($parent) {
   this.menubar = new scout.Menubar(this.$container, {
     position: this.menubarPosition
   });
-  this.menubar.menuTypesForLeft1 = ['Table.EmptySpace'];
+  this.menubar.menuTypesForLeft1 = ['Outline.Navigation', 'Table.EmptySpace'];
   this.menubar.menuTypesForLeft2 = ['Table.SingleSelection', 'Table.MultiSelection'];
   this.menubar.menuTypesForRight = ['Table.Header'];
 

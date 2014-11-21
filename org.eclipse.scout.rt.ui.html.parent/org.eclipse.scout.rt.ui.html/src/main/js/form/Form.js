@@ -58,7 +58,7 @@ scout.Form.prototype._render = function($parent) {
   this.menubar = new scout.Menubar(this.$container, {
     position: this.menubarPosition
   });
-  this.menubar.menuTypesForLeft1 = ['Form.System'];
+  this.menubar.menuTypesForLeft1 = ['Outline.Navigation', 'Form.System'];
   this.menubar.menuTypesForLeft2 = ['Form.Regular'];
   this.menubar.menuTypesForRight = ['Form.Tool'];
   this.menubar.staticMenus = this.staticMenus;

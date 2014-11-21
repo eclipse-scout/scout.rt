@@ -21,7 +21,6 @@ import org.eclipse.scout.rt.client.ui.basic.tree.TreeListener;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage5;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
-import org.eclipse.scout.rt.client.ui.form.FormMenuType;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.ui.menu.AbstractMenu5;
 
@@ -80,7 +79,7 @@ public abstract class AbstractOutlineNavigationMenu extends AbstractMenu5 {
 
   @Override
   protected Set<? extends IMenuType> getConfiguredMenuTypes() {
-    return CollectionUtility.hashSet(FormMenuType.System, getMenuType());
+    return CollectionUtility.hashSet(OutlineMenuType.Navigation, getMenuType());
   }
 
   private boolean isDrill(IPage page) {

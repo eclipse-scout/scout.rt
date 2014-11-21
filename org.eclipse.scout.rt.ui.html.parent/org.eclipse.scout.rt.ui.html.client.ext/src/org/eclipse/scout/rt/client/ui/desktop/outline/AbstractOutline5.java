@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.Scout5ExtensionUtil;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.MenuSeparator;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -67,7 +68,7 @@ public abstract class AbstractOutline5 extends AbstractExtensibleOutline impleme
   @Override
   public void selectNodes(Collection<? extends ITreeNode> nodes, boolean append) {
     if (!getConfiguredSelectFirstPageOnOutlineChange() && Scout5ExtensionUtil.IDesktop_isOutlineChanging(ClientJob.getCurrentSession(AbstractClientSession.class).getDesktop())) {
-      //Prevent selecting the first node when changing the outline
+      // Prevent selecting the first node when changing the outline
       return;
     }
     super.selectNodes(nodes, append);
@@ -102,7 +103,7 @@ public abstract class AbstractOutline5 extends AbstractExtensibleOutline impleme
       if (pageWithTable.isShowEmptySpaceMenus()) {
         ITable table = pageWithTable.getTable();
         List<IMenu> emptySpaceMenus = ActionUtility.getActions(table.getMenus(),
-            ActionUtility.createMenuFilterMenuTypes(CollectionUtility.hashSet(TableMenuType.EmptySpace), false));
+            ActionUtility.createMenuFilterMenuTypes(CollectionUtility.<IMenuType> hashSet(OutlineMenuType.Navigation, TableMenuType.EmptySpace), false));
         if (emptySpaceMenus.size() > 0) {
           menus.add(new MenuSeparator());
           for (IMenu menu : emptySpaceMenus) {
@@ -120,7 +121,8 @@ public abstract class AbstractOutline5 extends AbstractExtensibleOutline impleme
       ITable table = pageWithTable.getTable();
       if (row != null) {
         table.getUIFacade().setSelectedRowsFromUI(CollectionUtility.arrayList(row));
-        List<IMenu> parentTableMenus = ActionUtility.getActions(table.getContextMenu().getChildActions(), ActionUtility.createMenuFilterMenuTypes(CollectionUtility.hashSet(TableMenuType.SingleSelection), false));
+        List<IMenu> parentTableMenus = ActionUtility.getActions(table.getContextMenu().getChildActions(),
+            ActionUtility.createMenuFilterMenuTypes(CollectionUtility.<IMenuType> hashSet(OutlineMenuType.Navigation, TableMenuType.SingleSelection), false));
         if (parentTableMenus.size() > 0) {
           menus.add(new MenuSeparator());
           for (IMenu menu : parentTableMenus) {
@@ -129,6 +131,7 @@ public abstract class AbstractOutline5 extends AbstractExtensibleOutline impleme
         }
       }
     }
+
     return menus;
   }
 
@@ -137,8 +140,7 @@ public abstract class AbstractOutline5 extends AbstractExtensibleOutline impleme
     if (getDefaultDetailForm() != null) {
       return;
     }
-    IForm form = execCreateDefaultDetailForm();
-    setDefaultDetailForm(form);
+    setDefaultDetailForm(execCreateDefaultDetailForm());
   }
 
   @Override

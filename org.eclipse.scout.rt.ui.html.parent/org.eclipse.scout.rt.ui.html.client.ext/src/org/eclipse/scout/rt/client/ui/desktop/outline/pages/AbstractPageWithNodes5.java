@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.internal.TablePageTreeMenuWrapper;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline5;
 import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineEvent;
+import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineMenuType;
 import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineNavigation;
 import org.eclipse.scout.rt.client.ui.form.FormMenuType;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -154,16 +155,14 @@ public abstract class AbstractPageWithNodes5 extends AbstractExtensiblePageWithN
       }
       Set<IMenuType> types = new HashSet<IMenuType>();
       for (IMenuType type : menu.getMenuTypes()) {
-        if (type instanceof FormMenuType) {
+        if (type instanceof OutlineMenuType || type instanceof FormMenuType) {
           types.add(type);
         }
       }
-
       if (types.isEmpty()) {
         types.add(FormMenuType.Regular);
       }
-      MenuWrapper menuWrapper = new MenuWrapper(menu, types);
-      menus.add(menuWrapper);
+      menus.add(new MenuWrapper(menu, types));
     }
   }
 
