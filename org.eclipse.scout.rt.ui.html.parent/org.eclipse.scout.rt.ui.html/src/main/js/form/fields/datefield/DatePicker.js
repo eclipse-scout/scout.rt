@@ -43,7 +43,7 @@ scout.DatePicker.prototype.show = function(viewDate, selectedDate, animated) {
     }
   }
   if (this.viewDate && viewDate) {
-    viewDateDiff = scout.dates.compareYearAndMonth(viewDate, this.viewDate);
+    viewDateDiff = scout.dates.compareMonths(viewDate, this.viewDate);
   }
   this.viewDate = viewDate;
 
@@ -197,11 +197,11 @@ scout.DatePicker.prototype._createDateBox = function () {
       cl = (start.getMonth() !== this.viewDate.getMonth() ? ' date-box-out' : '');
     }
 
-    if (start.setHours(0, 0, 0, 0) === now.setHours(0, 0, 0, 0)){
+    if (scout.dates.isSameDay(start, now)){
       cl += ' date-box-now';
     }
 
-    if (this.selectedDate && (start.setHours(0, 0, 0, 0) === this.selectedDate.setHours(0, 0, 0, 0))){
+    if (this.selectedDate && scout.dates.isSameDay(start, this.selectedDate)){
       cl += ' date-box-select';
     }
 

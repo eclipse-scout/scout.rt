@@ -256,7 +256,12 @@ scout.DateFormat.prototype.parse = function (text) {
     year += 2000;
   }
 
-  return new Date(year, dateInfo.month - 1, dateInfo.day);
+  var date = new Date(0);
+  date.setUTCFullYear(year);
+  date.setUTCMonth(dateInfo.month - 1);
+  date.setUTCDate(dateInfo.day);
+
+  return date;
 };
 
 scout.DateFormat.orderWeekdays = function(weekdays, firstDayOfWeek) {
