@@ -58,8 +58,8 @@ public class JsonGroupBox<T extends IGroupBox> extends JsonFormField<T> {
   }
 
   @Override
-  protected void createChildAdapters() {
-    super.createChildAdapters();
+  protected void attachChildAdapters() {
+    super.attachChildAdapters();
     attachAdapters(getModel().getFields());
   }
 

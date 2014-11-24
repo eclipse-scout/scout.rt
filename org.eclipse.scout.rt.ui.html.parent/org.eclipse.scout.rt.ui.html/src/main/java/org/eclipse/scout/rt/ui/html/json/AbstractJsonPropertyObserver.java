@@ -72,8 +72,8 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
   }
 
   @Override
-  protected void createChildAdapters() {
-    super.createChildAdapters();
+  protected void attachChildAdapters() {
+    super.attachChildAdapters();
     for (JsonProperty<?> prop : m_jsonProperties.values()) {
       if (prop instanceof JsonAdapterProperty) {
         ((JsonAdapterProperty) prop).attachAdapters();

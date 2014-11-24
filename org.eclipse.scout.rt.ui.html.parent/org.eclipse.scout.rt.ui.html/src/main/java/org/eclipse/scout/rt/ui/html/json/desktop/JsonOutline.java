@@ -74,8 +74,8 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
   }
 
   @Override
-  protected void createChildAdapters() {
-    super.createChildAdapters();
+  protected void attachChildAdapters() {
+    super.attachChildAdapters();
     if (getModel().isRootNodeVisible()) {
       attachPage(getModel().getRootPage());
     }

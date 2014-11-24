@@ -68,8 +68,8 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
   }
 
   @Override
-  protected void createChildAdapters() {
-    super.createChildAdapters();
+  protected void attachChildAdapters() {
+    super.attachChildAdapters();
     attachAdapters(getForms());
     attachAdapters(getModel().getMessageBoxStack());
     attachAdapters(filterModelActions());

@@ -35,8 +35,8 @@ public class JsonTreeField<T extends ITreeField> extends JsonFormField<T> {
   }
 
   @Override
-  protected void createChildAdapters() {
-    super.createChildAdapters();
+  protected void attachChildAdapters() {
+    super.attachChildAdapters();
     attachAdapter(getModel().getTree());
   }
 

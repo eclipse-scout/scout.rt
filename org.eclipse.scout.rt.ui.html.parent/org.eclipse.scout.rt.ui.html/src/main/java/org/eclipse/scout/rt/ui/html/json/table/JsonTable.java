@@ -180,8 +180,8 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   }
 
   @Override
-  protected void createChildAdapters() {
-    super.createChildAdapters();
+  protected void attachChildAdapters() {
+    super.attachChildAdapters();
     attachAdapter(getModel().getContextMenu());
     attachAdapters(getModel().getMenus());
     if (getModel() instanceof ITable5) {

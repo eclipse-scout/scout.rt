@@ -73,8 +73,8 @@ public class JsonTableControl<T extends ITableControl> extends AbstractJsonPrope
   }
 
   @Override
-  protected void createChildAdapters() {
-    super.createChildAdapters();
+  protected void attachChildAdapters() {
+    super.attachChildAdapters();
     optAttachAdapter(getModel().getForm());
   }
 

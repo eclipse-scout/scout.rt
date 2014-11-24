@@ -22,8 +22,8 @@ public class JsonAnalysisTableControl<T extends IAnalysisTableControl> extends J
   }
 
   @Override
-  protected void createChildAdapters() {
-    super.createChildAdapters();
+  protected void attachChildAdapters() {
+    super.attachChildAdapters();
     attachAdapter(getModel().getDataModel());
   }
 

@@ -76,8 +76,8 @@ public class JsonTabBox<T extends ITabBox> extends JsonFormField<T> {
   }
 
   @Override
-  protected void createChildAdapters() {
-    super.createChildAdapters();
+  protected void attachChildAdapters() {
+    super.attachChildAdapters();
     attachAdapters(getModel().getGroupBoxes());
   }
 

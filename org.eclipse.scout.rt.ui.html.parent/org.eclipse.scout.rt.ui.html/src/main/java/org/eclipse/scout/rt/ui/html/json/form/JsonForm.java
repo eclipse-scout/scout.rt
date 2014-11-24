@@ -57,8 +57,8 @@ public class JsonForm<T extends IForm> extends AbstractJsonPropertyObserver<T> i
   }
 
   @Override
-  protected void createChildAdapters() {
-    super.createChildAdapters();
+  protected void attachChildAdapters() {
+    super.attachChildAdapters();
     attachAdapter(getModel().getRootGroupBox());
     if (getModel() instanceof IForm5) {
       attachAdapter(((IForm5) getModel()).getContextMenu());

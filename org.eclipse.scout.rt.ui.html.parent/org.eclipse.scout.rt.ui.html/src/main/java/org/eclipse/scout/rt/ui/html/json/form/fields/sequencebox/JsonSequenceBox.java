@@ -32,12 +32,9 @@ public class JsonSequenceBox<T extends ISequenceBox> extends JsonFormField<T> {
   }
 
   @Override
-  protected void createChildAdapters() {
-    super.createChildAdapters();
+  protected void attachChildAdapters() {
+    super.attachChildAdapters();
     attachAdapters(getModel().getFields());
-    // TODO AWE: ask C.GU ... müsste das jetzt nicht ins attach rein?
-    // wollen wir vielleicht auch noch ein attachChildAdapters machen?
-    // naming ist auch falsch irgendwie getOrCreateAndAttach :)
   }
 
   @Override

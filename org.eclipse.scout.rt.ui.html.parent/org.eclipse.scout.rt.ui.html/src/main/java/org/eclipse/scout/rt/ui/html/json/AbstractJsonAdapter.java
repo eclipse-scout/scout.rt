@@ -36,7 +36,7 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
   }
 
   protected void init() {
-    createChildAdapters();
+    attachChildAdapters();
   }
 
   @Override
@@ -53,7 +53,11 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     return m_model;
   }
 
-  protected void createChildAdapters() {
+  /**
+   * Attach child adapters of this adapter instance here by calling the <code>attachAdapter[s](model[s])</code> methods.
+   * This will also <em>create</em> a new JSON adapter instance when the adapter does not yet exist for the given model.
+   */
+  protected void attachChildAdapters() {
   }
 
   protected void disposeChildAdapters() {
