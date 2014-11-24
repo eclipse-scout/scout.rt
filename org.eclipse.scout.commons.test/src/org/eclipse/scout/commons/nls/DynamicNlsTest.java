@@ -32,8 +32,16 @@ public class DynamicNlsTest {
     assertTrue(textMap.isEmpty());
   }
 
+  @Test(timeout = 1000)
+  public void testMissingKeyPerformance() {
+    TestResourceBundleTexts nls = TestResourceBundleTexts.getInstance();
+    for (int i = 0; i < 1000000; i++) {
+      nls.getText(Locale.GERMAN, "non-existing-key");
+    }
+  }
+
   private static class MissingResourceBundleTexts extends DynamicNls {
-    public static final String RESOURCE_BUNDLE_NAME = "resources.texts.NonExistingTexts";//$NON-NLS-1$
+    public static final String RESOURCE_BUNDLE_NAME = "testResources.texts.NonExistingTexts";//$NON-NLS-1$
     private static MissingResourceBundleTexts instance = new MissingResourceBundleTexts();
 
     public static MissingResourceBundleTexts getInstance() {
@@ -46,6 +54,23 @@ public class DynamicNlsTest {
 
     protected MissingResourceBundleTexts() {
       registerResourceBundle(RESOURCE_BUNDLE_NAME, MissingResourceBundleTexts.class);
+    }
+  }
+
+  private static class TestResourceBundleTexts extends DynamicNls {
+    public static final String RESOURCE_BUNDLE_NAME = "testResources.texts.Texts";//$NON-NLS-1$
+    private static TestResourceBundleTexts instance = new TestResourceBundleTexts();
+
+    public static TestResourceBundleTexts getInstance() {
+      return instance;
+    }
+
+    public static String get(String key, String... messageArguments) {
+      return getInstance().getText(key, messageArguments);
+    }
+
+    protected TestResourceBundleTexts() {
+      registerResourceBundle(RESOURCE_BUNDLE_NAME, TestResourceBundleTexts.class);
     }
   }
 }
