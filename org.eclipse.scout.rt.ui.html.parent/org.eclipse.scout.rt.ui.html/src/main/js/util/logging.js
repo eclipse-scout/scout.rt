@@ -1,37 +1,37 @@
 /* global log4javascript */
 scout.logging = {
-  defaultLevel : 'trace',
+  defaultLevel: 'trace',
+
   /***
    * Loads log4javascript.min.js if logging is enabled.
    *
    * @returns $.deferred
    */
-  init : function() {
+  init: function() {
     var $deferred;
     var location = new scout.URL();
     var enabled = location.getParameter('logging');
     if (enabled) {
       $deferred = $.getCachedScript("res/log4javascript.min.js")
-      .done(function(script, textStatus) {
-        var logLevel = scout.logging.parseLevel(location.getParameter('logLevel'));
-        if (!logLevel) {
-          logLevel = scout.logging.parseLevel(scout.logging.defaultLevel);
-        }
-        log4javascript.getDefaultLogger().setLevel(logLevel);
-        $.log = log4javascript.getDefaultLogger();
-      });
-    }
-    else {
+        .done(function(script, textStatus) {
+          var logLevel = scout.logging.parseLevel(location.getParameter('logLevel'));
+          if (!logLevel) {
+            logLevel = scout.logging.parseLevel(scout.logging.defaultLevel);
+          }
+          log4javascript.getDefaultLogger().setLevel(logLevel);
+          $.log = log4javascript.getDefaultLogger();
+        });
+    } else {
       $.log = new scout.NullLogger();
     }
-
     return $deferred;
   },
-  parseLevel : function(level) {
+
+  parseLevel: function(level) {
     if (!level) {
       return;
     }
-    level =  level.toLowerCase();
+    level = level.toLowerCase();
     switch (level) {
       case 'trace':
         return log4javascript.Level.TRACE;
@@ -49,9 +49,10 @@ scout.logging = {
   }
 };
 
-scout.NullLogger = function () {
+scout.NullLogger = function() {
+  // empty
 };
-scout.NullLogger.prototype =  {
+scout.NullLogger.prototype = {
   trace: function() {},
   debug: function() {},
   info: function() {},
