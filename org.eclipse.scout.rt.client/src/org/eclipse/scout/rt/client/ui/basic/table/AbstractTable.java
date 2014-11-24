@@ -190,7 +190,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * an {@link AbstractTableField} having its own title / label.
    * <p>
    * Subclasses can override this method. Default is {@code null}.
-   * 
+   *
    * @return Title of this table.
    */
   @ConfigProperty(ConfigProperty.TEXT)
@@ -203,7 +203,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * Configures the default icon for this table. The default icon is used for each row in the table.
    * <p>
    * Subclasses can override this method. Default is {@code null}.
-   * 
+   *
    * @return the ID (name) of the icon
    * @see IIconProviderService
    */
@@ -217,7 +217,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * Configures whether only one row can be selected at once in this table.
    * <p>
    * Subclasses can override this method. Default is {@code true}.
-   * 
+   *
    * @return {@code true} if more then one row in this table can be selected at once, {@code false} otherwise.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -231,7 +231,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * {@link #getConfiguredCheckable()} is {@code true} .
    * <p>
    * Subclasses can override this method. Default is {@code true}.
-   * 
+   *
    * @return {@code true} if more then one row in this table can be checked, {@code false} otherwise.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -244,7 +244,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * Configures the default menu that is used on the ENTER (action key) or the double click on a table row.
    * <p>
    * Subclasses can override this method. Default is {@code null}.
-   * 
+   *
    * @return The default menu to use.
    */
   @ConfigProperty(ConfigProperty.MENU_CLASS)
@@ -255,7 +255,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   /**
    * Interception method used for customizing the default menu. Should be used by the framework only.
-   * 
+   *
    * @since 3.8.1
    */
   protected Class<? extends IMenu> getDefaultMenuInternal() {
@@ -266,7 +266,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * Configures whether deleted rows are automatically erased or cached for later processing (service deletion).
    * <p>
    * Subclasses can override this method. Default is {@code false}.
-   * 
+   *
    * @return {@code true} if deleted rows are automatically erased, {@code false} if deleted nodes are cached for later
    *         processing.
    */
@@ -282,7 +282,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * If sort is disabled, the table rows are not sorted and the user cannot change the sorting.
    * <p>
    * Subclasses can override this method. Default is {@code true}.
-   * 
+   *
    * @return {@code true} if sort is enabled, {@code false} otherwise.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -295,7 +295,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * Configures whether the header row is visible. The header row contains the titles of each column.
    * <p>
    * Subclasses can override this method. Default is {@code true}.
-   * 
+   *
    * @return {@code true} if the header row is visible, {@code false} otherwise.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -309,7 +309,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * horizontal scrolling. This is especially useful for tables inside a form.
    * <p>
    * Subclasses can override this method. Default is {@code false}.
-   * 
+   *
    * @return {@code true} if the columns are auto resized, {@code false} otherwise.
    * @see {@link AbstractColumn#getConfiguredWidth()}
    */
@@ -327,7 +327,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * Subclasses can override this method. Default is {@code false}. If the method is not overridden and at least one
    * string column has set the {@link AbstractStringColumn#getConfiguredTextWrap()} to true, the multiline property is
    * set automatically to true.
-   * 
+   *
    * @return {@code true} if the table supports multiline text, {@code false} otherwise.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -350,7 +350,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * table.
    * </p>
    * Subclasses can override this method. Default is {@code -1}.
-   * 
+   *
    * @return Table row height hint in pixels.
    */
   @ConfigProperty(ConfigProperty.INTEGER)
@@ -363,7 +363,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * Configures whether the table is checkable.
    * <p>
    * Subclasses can override this method. Default is {@code false}.
-   * 
+   *
    * @return {@code true} if the table is checkable, {@code false} otherwise.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -377,7 +377,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * or not. If no checkable column is configured, only the row itself represents if the row was checked or not.
    * <p>
    * Subclasses can override this method. Default is {@code null}.
-   * 
+   *
    * @return A column class extending {@link AbstractBooleanColumn} that represents the row check state.
    */
   @ConfigProperty(ConfigProperty.TABLE_COLUMN)
@@ -390,7 +390,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * Configures the drop support of this table.
    * <p>
    * Subclasses can override this method. Default is {@code 0} (no drop support).
-   * 
+   *
    * @return {@code 0} for no support or one or more of {@link IDNDSupport#TYPE_FILE_TRANSFER},
    *         {@link IDNDSupport#TYPE_IMAGE_TRANSFER}, {@link IDNDSupport#TYPE_JAVA_ELEMENT_TRANSFER} or
    *         {@link IDNDSupport#TYPE_TEXT_TRANSFER} (e.g. {@code TYPE_TEXT_TRANSFER | TYPE_FILE_TRANSFER}).
@@ -405,7 +405,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * Configures the drag support of this table.
    * <p>
    * Subclasses can override this method. Default is {@code 0} (no drag support).
-   * 
+   *
    * @return {@code 0} for no support or one or more of {@link IDNDSupport#TYPE_FILE_TRANSFER},
    *         {@link IDNDSupport#TYPE_IMAGE_TRANSFER}, {@link IDNDSupport#TYPE_JAVA_ELEMENT_TRANSFER} or
    *         {@link IDNDSupport#TYPE_TEXT_TRANSFER} (e.g. {@code TYPE_TEXT_TRANSFER | TYPE_FILE_TRANSFER}).
@@ -421,7 +421,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * in the table. Now starting to type some letters, the row matching the typed letters in the column will be selected.
    * <p>
    * Subclasses can override this method. Default is {@code true}.
-   * 
+   *
    * @return {@code true} if the keyboard navigation is supported, {@code false} otherwise.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -435,7 +435,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * the table is scrolled to the selection so that the selected row is visible.
    * <p>
    * Subclasses can override this method. Default is {@code false}.
-   * 
+   *
    * @return {@code true} if the table scrolls to the selection, {@code false} otherwise.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -448,7 +448,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * Called after a drag operation was executed on one or several table rows.
    * <p>
    * Subclasses can override this method. The default does nothing.
-   * 
+   *
    * @param rows
    *          Table rows that were dragged (unmodifiable list).
    * @return A transferable object representing the given rows.
@@ -464,7 +464,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * Called after a drop operation was executed on the table.
    * <p>
    * Subclasses can override this method. The default does nothing.
-   * 
+   *
    * @param row
    *          Table row on which the transferable object was dropped (row may be null for empty space drop).
    * @param t
@@ -481,7 +481,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * <p>
    * Subclasses can override this method. The default creates a {@link TextTransferObject} of the table content (HTML
    * table).
-   * 
+   *
    * @param rows
    *          The selected table rows to copy.
    * @return A transferable object representing the given rows or null to not populate the clipboard.
@@ -562,7 +562,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * Called after the table content changed, rows were added, removed or changed.
    * <p>
    * Subclasses can override this method. The default does nothing.
-   * 
+   *
    * @throws ProcessingException
    */
   @ConfigOperation
@@ -574,7 +574,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * Called after {@link AbstractColumn#execDecorateCell(Cell,ITableRow)} on the column to decorate the cell.
    * <p>
    * Subclasses can override this method. The default does nothing.
-   * 
+   *
    * @throws ProcessingException
    */
   @ConfigOperation
@@ -586,7 +586,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * Called during initialization of this table, after the columns were initialized.
    * <p>
    * Subclasses can override this method. The default does nothing.
-   * 
+   *
    * @throws ProcessingException
    */
   @ConfigOperation
@@ -598,7 +598,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * Called when this table is disposed, after the columns were disposed.
    * <p>
    * Subclasses can override this method. The default does nothing.
-   * 
+   *
    * @throws ProcessingException
    */
   @ConfigOperation
@@ -618,7 +618,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * Called when the user clicks on a row in this table.
    * <p>
    * Subclasses can override this method. The default fires a {@link TableEvent#TYPE_ROW_CLICK} event.
-   * 
+   *
    * @param Row
    *          that was clicked (never null).
    * @param mouseButton
@@ -638,7 +638,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * <p>
    * Subclasses can override this method. The default opens the configured default menu or if no default menu is
    * configured, fires a {@link TableEvent#TYPE_ROW_ACTION} event.
-   * 
+   *
    * @param Row
    *          that was activated (never null).
    * @throws ProcessingException
@@ -668,7 +668,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * Called when one or more rows are selected.
    * <p>
    * Subclasses can override this method. The default does nothing.
-   * 
+   *
    * @param rows
    *          a unmodifiable list of selected rows.
    *          that were selected.
@@ -683,7 +683,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * Called when the row is going to be decorated.
    * <p>
    * Subclasses can override this method. The default does nothing.
-   * 
+   *
    * @param row
    *          that is going to be decorated.
    * @throws ProcessingException
@@ -698,7 +698,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * the context column ({@link #getContextColumn()}).
    * <p>
    * Subclasses can override this method. The default does nothing.
-   * 
+   *
    * @param url
    *          Hyperlink to process.
    * @param path
@@ -715,7 +715,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   /**
    * This method is called during initializing the table and is thought to add header menus to the given list of menus.
    * Menus added in this method should be of menu type {@link ITableMenu.TableMenuType#Header}
-   * 
+   *
    * @param menuList
    *          a live list of the menus. Add additional header menus to this list optionally add some separators at the
    *          end.
@@ -960,7 +960,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   /**
    * Override this internal method only in order to make use of dynamic fields<br>
    * Used to manage column list and add/remove columns
-   * 
+   *
    * @param columnList
    *          live and mutable list of configured columns, not yet initialized
    */
@@ -974,7 +974,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   /**
    * Override this internal method only in order to make use of dynamic menus<br>
    * Used to manage menu list and add/remove menus
-   * 
+   *
    * @param menuList
    *          live and mutable list of configured menus
    */
@@ -1509,7 +1509,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   /**
    * Creates a {@link TableRowDataMapper} that is used for reading and writing data from the given
    * {@link AbstractTableRowData} type.
-   * 
+   *
    * @param rowType
    * @return
    * @throws ProcessingException
@@ -1691,7 +1691,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   @Override
-  public <T extends IMenu> T getMenu(final Class<T> menuType) throws ProcessingException {
+  public <T extends IMenu> T getMenu(final Class<T> menuType) {
     IContextMenu contextMenu = getContextMenu();
     if (contextMenu != null) {
       final Holder<T> resultHolder = new Holder<T>();
@@ -1740,7 +1740,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   /**
    * Checks whether the menu with the given class has been replaced by another menu. If so, the replacing
    * menu's class is returned. Otherwise the given class itself.
-   * 
+   *
    * @param c
    * @return Returns the possibly available replacing menu class for the given class.
    * @see Replace
@@ -3699,7 +3699,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * Called when the columns are reset.
    * <p>
    * Subclasses can override this method. The default does nothing.
-   * 
+   *
    * @param visiblity
    *          {@code true} if the visibility is reset.
    * @param order
@@ -3907,7 +3907,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * <p>
    * Subclasses can override this method. The default add menus for add, modifying and removing custom column and menus
    * for reseting, organizing and filtering the columns.
-   * 
+   *
    * @param e
    *          Table event of type {@link TableEvent#TYPE_HEADER_POPUP}.
    * @throws ProcessingException
