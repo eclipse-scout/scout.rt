@@ -94,7 +94,7 @@ public class JsonTabBox<T extends ITabBox> extends JsonFormField<T> {
 
   @Override
   public void handleUiEvent(JsonEvent event, JsonResponse res) {
-    if (JsonEventType.SELECT.matches(event)) {
+    if (JsonEventType.SELECTED.matches(event)) {
       handleUiTabSelected(event);
     }
     else {

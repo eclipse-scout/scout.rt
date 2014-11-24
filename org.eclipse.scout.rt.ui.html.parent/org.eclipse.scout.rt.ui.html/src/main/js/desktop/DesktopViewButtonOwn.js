@@ -21,7 +21,7 @@ scout.DesktopViewButtonOwn.prototype._render = function($parent) {
     that._$viewButton.selectOne();
     //FIXME what to do on session?
     /*
-      session.send('click', fhat.id);
+      session.send('clicked', that.id);
        */
   }
 

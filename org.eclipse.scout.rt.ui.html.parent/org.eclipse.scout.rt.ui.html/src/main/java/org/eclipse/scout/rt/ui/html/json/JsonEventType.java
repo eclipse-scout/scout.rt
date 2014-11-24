@@ -12,18 +12,14 @@ package org.eclipse.scout.rt.ui.html.json;
 
 /**
  * This enum defines common JSON event names.
- * 
- * @author awe
  */
 public enum JsonEventType {
 
-  // TODO AWE: add more common UI events
-
-  CLICK("click"),
+  CLICKED("clicked"),
 
   PROPERTY("property"),
 
-  SELECT("select");
+  SELECTED("selected");
 
   private String m_eventType;
 

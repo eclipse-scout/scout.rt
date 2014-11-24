@@ -47,7 +47,7 @@ public class JsonCheckBoxField<T extends IBooleanField> extends JsonValueField<T
 
   @Override
   public void handleUiEvent(JsonEvent event, JsonResponse res) {
-    if (JsonEventType.CLICK.matches(event)) {
+    if (JsonEventType.CLICKED.matches(event)) {
       handleUiClick(event, JsonObjectUtility.getBoolean(event.getData(), "checked"));
     }
     else {

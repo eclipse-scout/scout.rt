@@ -17,11 +17,11 @@ scout.DesktopViewButton.prototype._render = function($parent) {
       return;
     }
 
-    //don't await server response to make it more responsive and offline capable
+    // don't await server response to make it more responsive and offline capable
     if (this.outline) {
       this.desktop.changeOutline(that.outline);
     }
-    this.session.send('click', that.id);
+    this.session.send('clicked', that.id);
   }.bind(this));
 };
 

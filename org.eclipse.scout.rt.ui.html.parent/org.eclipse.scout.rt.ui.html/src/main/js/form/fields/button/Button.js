@@ -22,7 +22,7 @@ scout.Button.prototype._render = function($parent) {
   this.addContainer($parent, 'button', new scout.ButtonFieldLayout());
   this.addField($('<button>').
     on('click', function() {
-      this.session.send('click', this.id);
+      this.session.send('clicked', this.id);
     }.bind(this)));
 };
 

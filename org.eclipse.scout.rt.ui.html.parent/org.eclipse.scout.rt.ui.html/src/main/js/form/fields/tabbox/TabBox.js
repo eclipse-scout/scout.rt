@@ -52,7 +52,7 @@ scout.TabBox.prototype.onMousedown = function(e) {
 
 scout.TabBox.prototype._selectTab = function(tabIndex) {
   this.selectedTab = tabIndex;
-  this.session.send('select', this.id, {'tabIndex':tabIndex});
+  this.session.send('selected', this.id, {'tabIndex':tabIndex});
   this._renderSelectedTab(tabIndex);
 };
 

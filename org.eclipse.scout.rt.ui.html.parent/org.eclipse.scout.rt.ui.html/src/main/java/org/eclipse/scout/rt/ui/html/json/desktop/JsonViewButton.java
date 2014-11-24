@@ -68,7 +68,7 @@ public class JsonViewButton<T extends IViewButton> extends AbstractJsonPropertyO
     optDisposeAdapter(getOutline());
   }
 
-  //FIXME provide proper api on AbstractOutlineViewButton
+  // FIXME CGU: provide proper api on AbstractOutlineViewButton
   private IOutline getOutline() {
     Field field;
     try {
@@ -85,7 +85,7 @@ public class JsonViewButton<T extends IViewButton> extends AbstractJsonPropertyO
 
   @Override
   public void handleUiEvent(JsonEvent event, JsonResponse res) {
-    if (JsonEventType.CLICK.matches(event)) {
+    if (JsonEventType.CLICKED.matches(event)) {
       handleUiClick(event, res);
     }
     else {

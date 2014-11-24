@@ -360,17 +360,15 @@ scout.Session.prototype.areRequestsPending = function() {
 };
 
 scout.Session.prototype._processEvents = function(events) {
-  var session = this;
-  // TODO AWE: convert plain JS event object in Event class
-  for (var i = 0; i < events.length; i++) {
-    var event = events[i];
+  var i, event, adapter;
+  for (i = 0; i < events.length; i++) {
+    event = events[i];
     $.log.debug("Processing event '" + event.type + "' for adapter with ID " + event.id);
-    var adapter = session.getOrCreateModelAdapter(event.id, this);
+    adapter = this.getOrCreateModelAdapter(event.id, this);
     if (!adapter) {
       throw new Error('No adapter registered for ID ' + event.id);
     }
-
-    if (event.type === 'property') { // Special handling for 'property' type
+    if ('property' === event.type) { // Special handling for 'property' type
       adapter.onModelPropertyChange(event);
     }
     else {

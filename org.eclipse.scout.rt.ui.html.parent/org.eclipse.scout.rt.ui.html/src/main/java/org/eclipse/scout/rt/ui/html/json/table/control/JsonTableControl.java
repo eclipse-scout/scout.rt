@@ -15,6 +15,7 @@ import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
+import org.eclipse.scout.rt.ui.html.json.JsonEventType;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.json.JSONObject;
@@ -95,7 +96,7 @@ public class JsonTableControl<T extends ITableControl> extends AbstractJsonPrope
 
   @Override
   public void handleUiEvent(JsonEvent event, JsonResponse res) {
-    if ("selected".equals(event.getType())) {
+    if (JsonEventType.SELECTED.matches(event)) {
       // Lazy loading content on selection. FIXME CGU Should this be controlled by the model?
       if (!getModel().isSelected() && !m_contentLoaded) {
         handleUiLoadContent();

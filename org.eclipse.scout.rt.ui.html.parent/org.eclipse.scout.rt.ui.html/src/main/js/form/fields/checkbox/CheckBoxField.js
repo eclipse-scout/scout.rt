@@ -32,7 +32,7 @@ scout.CheckBoxField.prototype._render = function($parent) {
 
 scout.CheckBoxField.prototype._onClick = function() {
   var uiChecked = this._$checkBox[0].checked;
-  this.session.send('click', this.id, {checked: uiChecked});
+  this.session.send('clicked', this.id, {checked: uiChecked});
 };
 
 scout.CheckBoxField.prototype._renderProperties = function() {
