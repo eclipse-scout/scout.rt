@@ -82,7 +82,7 @@ public class DynamicNls {
     for (NlsResourceBundleCache c : m_resourceBundles) {
       try {
         ResourceBundle resourceBundle = c.getResourceBundle(locale);
-        if (resourceBundle != null) {
+        if (resourceBundle != null && resourceBundle.containsKey(key)) {
           return resourceBundle.getString(key);
         }
       }
