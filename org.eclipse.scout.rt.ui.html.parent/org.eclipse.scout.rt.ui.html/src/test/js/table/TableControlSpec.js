@@ -174,7 +174,7 @@ describe("TableControl", function() {
         }),
         new scout.Event('selected', action2.id, {
           "selected": true
-        }),
+        })
       ];
       expect(mostRecentJsonRequest()).toContainEvents(events);
     });
