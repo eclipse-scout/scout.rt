@@ -50,11 +50,9 @@ scout.DesktopToolButton.prototype._openContainer = function() {
     .css('right', right)
     .show();
 
-  // find the 1st focusable element in the $container
-  // TODO AWE wollen wir nicht einfach JQuery UI :focusable dafür verwenden?
-  // SetTimeout is used because the container is opened on mouse down
+  // setTimeout is required because the container is opened on mouse-down
   setTimeout(function() {
-    this.desktop.$toolContainer.find('input').first().focus();
+    this.desktop.$toolContainer.find(':focusable').first().focus();
   }.bind(this), 0);
 };
 
