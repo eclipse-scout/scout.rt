@@ -78,10 +78,7 @@ scout.Form.prototype._render = function($parent) {
 };
 
 scout.Form.prototype.onResize = function() {
-  // TODO AWE/CGU: dieses event müssten wir auch bekommen, wenn man den Divider zwischen
-  // Tree und Working Area schiebt.
   $.log.trace('(Form#onResize) window was resized -> layout Form container');
-
   var htmlCont = scout.HtmlComponent.get(this.$container);
   var $parent = this.$container.parent();
   var parentSize = new scout.Dimension($parent.width(), $parent.height());

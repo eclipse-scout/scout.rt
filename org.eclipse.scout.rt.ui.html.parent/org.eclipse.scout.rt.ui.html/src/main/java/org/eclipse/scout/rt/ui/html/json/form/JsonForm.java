@@ -112,7 +112,6 @@ public class JsonForm<T extends IForm> extends AbstractJsonPropertyObserver<T> i
     if (getModel() instanceof IForm5) {
       putAdapterIdsProperty(json, PROP_MENUS, ((IForm5) getModel()).getMenus());
     }
-    // TODO AWE: return other props
     return json;
   }
 

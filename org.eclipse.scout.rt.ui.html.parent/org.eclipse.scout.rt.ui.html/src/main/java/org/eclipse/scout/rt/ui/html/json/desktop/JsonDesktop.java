@@ -83,7 +83,7 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
   }
 
   /**
-   * TODO CGU/AWE: (scout) mit Judith besprechen: Aufräumaktion im Bereich IToolButton/IViewButton
+   * TODO AWE/CGU: (scout) mit Judith besprechen: Aufräumaktion im Bereich IToolButton/IViewButton
    * Anstelle der vielen Marker interfaces möchten wir nur noch IActions haben. Alle IActions werden dann
    * rechts oben angezeigt (es können Menüs und Buttons sein). Die Outlines werden einfach anhand der
    * konfigurierten Outlines erzeugt, ohne dass dafür noch ein Button konfiguriert werden muss. Dann
