@@ -16,22 +16,22 @@
 
     <script>
     $(document).ready(function() {
+      var deferreds = [];
       if (scout.device.isIos()) {
         //We use fastscript to prevent the 300ms delay when touching an element.
         //With Chrome 32 the issue is solved, so no need to load the script for other devices than ios
-        $.getCachedScript("res/fastclickmod-1.0.1.min.js")
-        .done(function(script, textStatus) {
-          FastClick.attach(document.body);
-          init();
-        });
-      }
-      else {
-        init();
+        deferreds.push($
+          .getCachedScript("res/fastclickmod-1.0.1.min.js")
+          .done(function(script, textStatus) {
+            FastClick.attach(document.body);
+            init();
+          })
+        );
       }
 
-      function init() {
-        scout.init({'userAgent': new scout.UserAgent(scout.UserAgent.DEVICE_TYPE_MOBILE), 'objectFactories': scout.mobileObjectFactories});
-      }
+      $.when.apply($, deferreds).done(function() {
+        scout.init();
+      });
     });
     </script>
   </head>
