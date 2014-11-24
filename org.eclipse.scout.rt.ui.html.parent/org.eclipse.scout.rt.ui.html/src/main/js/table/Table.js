@@ -16,6 +16,7 @@ scout.Table = function() {
   this.events = new scout.EventSupport();
   this.selectionHandler = new scout.TableSelectionHandler(this);
   this._filterMap = {};
+  this.selectedRowIds = [];
 };
 scout.inherits(scout.Table, scout.ModelAdapter);
 

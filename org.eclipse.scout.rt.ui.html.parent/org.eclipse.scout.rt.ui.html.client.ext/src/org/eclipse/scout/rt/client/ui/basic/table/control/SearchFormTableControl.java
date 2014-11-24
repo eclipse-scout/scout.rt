@@ -22,7 +22,7 @@ public class SearchFormTableControl extends AbstractTableControl {
     super.initConfig();
 
     setCssClass("control-query");
-    setLabel("Suche");
+    setTooltipText("Suche");
     setGroup("Suche");
   }
 

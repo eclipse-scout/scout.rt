@@ -24,7 +24,7 @@ public class GraphTableControl extends AbstractTableControl implements IGraphTab
   protected void initConfig() {
     super.initConfig();
 
-    setLabel("Netzwerk");
+    setTooltipText("Netzwerk");
     setCssClass("control-graph");
     setGroup("Anzeige");
   }

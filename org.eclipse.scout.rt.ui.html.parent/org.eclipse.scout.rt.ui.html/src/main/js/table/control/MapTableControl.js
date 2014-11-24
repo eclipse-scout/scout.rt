@@ -8,7 +8,7 @@ scout.inherits(scout.MapTableControl, scout.TableControl);
 scout.MapTableControl.FILTER_KEY = 'MAP';
 
 scout.MapTableControl.prototype._renderContent = function($parent) {
-  this.$container = $parent
+  this.$contentContainer = $parent
     .appendSVG('svg', '', 'map-container')
     .attrSVG('viewBox', '5000 -100000 200000 83000')
     .attrSVG('preserveAspectRatio', 'xMidYMid');
@@ -17,7 +17,7 @@ scout.MapTableControl.prototype._renderContent = function($parent) {
     countries = this.map.objects.countries.geometries;
 
   this._filterResetListener = this.table.events.on(scout.Table.GUI_EVENT_FILTER_RESETTED, function(event) {
-    that.$container.find('.map-item.selected').removeClassSVG('selected');
+    that.$contentContainer.find('.map-item.selected').removeClassSVG('selected');
   });
 
   // find all countries in table
@@ -83,7 +83,7 @@ scout.MapTableControl.prototype._renderContent = function($parent) {
     }
 
     // finally: append country as svg path
-    var $country = this.$container.appendSVG('path', countries[c].id, 'map-item')
+    var $country = this.$contentContainer.appendSVG('path', countries[c].id, 'map-item')
       .attr('d', pathString)
       .click(clickMap);
 
@@ -130,8 +130,8 @@ scout.MapTableControl.prototype._renderContent = function($parent) {
 };
 
 scout.MapTableControl.prototype._removeContent = function() {
-  if (this.$container) {
-    this.$container.remove();
+  if (this.$contentContainer) {
+    this.$contentContainer.remove();
   }
 };
 

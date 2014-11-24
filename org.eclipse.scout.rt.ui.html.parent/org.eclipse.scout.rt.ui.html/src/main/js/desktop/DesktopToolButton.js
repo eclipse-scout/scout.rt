@@ -10,20 +10,25 @@ scout.DesktopToolButton.prototype._render = function($parent) {
   this.$container = $parent.appendDIV('taskbar-tool-item');
 };
 
-scout.DesktopToolButton.prototype._onMouseDown = function() {
+scout.DesktopToolButton.prototype.toggle = function() {
   if (this.desktop.selectedTool === this) {
-    this.desktop.selectedTool.setSelected(false);
-  } else if (this.desktop.selectedTool) {
-    this.desktop.selectedTool.setSelected(false);
-    this.setSelected(true);
+    this.setSelected(false);
   } else {
     this.setSelected(true);
   }
 };
 
+scout.DesktopToolButton.prototype._onMouseDown = function() {
+  this.toggle();
+};
+
 scout.DesktopToolButton.prototype.setSelected = function(selected) {
   if (selected === this.selected) {
     return;
+  }
+
+  if (this.desktop.selectedTool && this.desktop.selectedTool !== this) {
+    this.desktop.selectedTool.setSelected(false);
   }
 
   this.selected = selected;

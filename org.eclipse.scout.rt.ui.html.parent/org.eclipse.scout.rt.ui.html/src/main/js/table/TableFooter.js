@@ -7,7 +7,8 @@ scout.TableFooter.FILTER_KEY = 'TEXTFIELD';
 scout.TableFooter.CONTAINER_SIZE = 340;
 
 scout.TableFooter.prototype._render = function($parent) {
-  var that = this, i, control, $group;
+  var that = this,
+    i, control, $group;
   var filter = this._table.getFilter(scout.TableFooter.FILTER_KEY),
     filterText;
 
@@ -16,9 +17,9 @@ scout.TableFooter.prototype._render = function($parent) {
   }
 
   this.$container = $parent.appendDIV('table-footer');
-  this._$controlContainer  = this.$container.appendDIV('control-container');
-  this._addResize(this._$controlContainer );
-  this.$controlContent = this._$controlContainer .appendDIV('control-content');
+  this._$controlContainer = this.$container.appendDIV('control-container').hide();
+  this._addResize(this._$controlContainer);
+  this.$controlContent = this._$controlContainer.appendDIV('control-content');
 
   this._controlGroups = {};
 
@@ -35,11 +36,11 @@ scout.TableFooter.prototype._render = function($parent) {
   }
 
   scout.fields.new$TextField().
-    addClass('control-filter').
-    appendTo(this.$container).
-    on('input paste', '', $.debounce(this._onFilterInput.bind(this))).
-    attr('placeholder', scout.texts.get('filterBy')).
-    val(filterText);
+  addClass('control-filter').
+  appendTo(this.$container).
+  on('input paste', '', $.debounce(this._onFilterInput.bind(this))).
+  attr('placeholder', scout.texts.get('filterBy')).
+  val(filterText);
 
   // info section
   this._$controlInfo = this.$container
@@ -116,7 +117,7 @@ scout.TableFooter.prototype.remove = function() {
   this.$container.remove();
 };
 
-scout.TableFooter.prototype.setTableStatusVisible= function(visible) {
+scout.TableFooter.prototype.setTableStatusVisible = function(visible) {
   this._updateInfoLoadVisibility();
   this._updateInfoSelectionVisibility();
   this._updateInfoFilterVisibility();
@@ -125,7 +126,7 @@ scout.TableFooter.prototype.setTableStatusVisible= function(visible) {
 scout.TableFooter.prototype._updateInfoLoad = function() {
   var numRows = this._table.rows.length;
   var info = scout.texts.get('numRowsLoaded', this._computeCountInfo(numRows));
-  info +='<br><span class="info-button">' + scout.texts.get('reloadData') + '</span>';
+  info += '<br><span class="info-button">' + scout.texts.get('reloadData') + '</span>';
   if (this._$infoLoad.html() === info) {
     return;
   }
@@ -186,7 +187,7 @@ scout.TableFooter.prototype._updateInfoLoadVisibility = function() {
 };
 
 scout.TableFooter.prototype._updateInfoFilterVisibility = function() {
-  var visible =  this._table.tableStatusVisible && this._table.filteredBy().length > 0;
+  var visible = this._table.tableStatusVisible && this._table.filteredBy().length > 0;
   this._setInfoVisible(this._$infoFilter, visible);
 };
 
@@ -218,31 +219,31 @@ scout.TableFooter.prototype._addGroup = function(title) {
 
 /* open, close and resize of the container */
 
-scout.TableFooter.prototype.openTableControl = function() {
+scout.TableFooter.prototype.openControlContainer = function() {
   var insets = scout.graphics.getInsets(this._$controlContainer);
   var contentHeight = scout.TableFooter.CONTAINER_SIZE - insets.top - insets.bottom;
 
-  //adjust table
+  // adjust table
   this._resizeData(scout.TableFooter.CONTAINER_SIZE);
 
-  //adjust content
+  // adjust content
   this.$controlContent.outerHeight(contentHeight);
 
-  //adjust container
-  this._$controlContainer.show().animateAVCSD('height', scout.TableFooter.CONTAINER_SIZE, null, null, 500);
+  // open container, stop existing (close) animations before
+  this._$controlContainer.stop(true).show().animateAVCSD('height', scout.TableFooter.CONTAINER_SIZE, null, null, 500);
 
   this.open = true;
 };
 
-scout.TableFooter.prototype.closeTableControl = function(control) {
-  //adjust table and container
+scout.TableFooter.prototype.closeControlContainer = function(control) {
+  // adjust table and container
   this._resizeData(0);
 
   // adjust container
-  this._$controlContainer .animateAVCSD('height', 0, null, null, 500);
-  this._$controlContainer .promise().done(function() {
-    this._$controlContainer .hide();
-    control.onClosed();
+  this._$controlContainer.animateAVCSD('height', 0, null, null, 500);
+  this._$controlContainer.promise().done(function() {
+    this._$controlContainer.hide();
+    control.onControlContainerClosed();
   }.bind(this));
 
   this.open = false;
@@ -275,7 +276,7 @@ scout.TableFooter.prototype._addResize = function($parent) {
     .on('mousedown', '', resize);
   var that = this;
 
-  function resize (event){
+  function resize(event) {
     $('body').addClass('row-resize')
       .on('mousemove', '', resizeMove)
       .one('mouseup', '', resizeEnd);
@@ -283,15 +284,15 @@ scout.TableFooter.prototype._addResize = function($parent) {
     function resizeMove(event) {
       var h = that._table.$container.height() - event.pageY;
       that._resizeData(h);
-      that._$controlContainer .height(h);
-      that.$controlContent .outerHeight(h);
+      that._$controlContainer.height(h);
+      that.$controlContent.outerHeight(h);
 
       that._table.updateScrollbar();
       that.onResize();
     }
 
     function resizeEnd() {
-      if (that._$controlContainer .height() < 75) {
+      if (that._$controlContainer.height() < 75) {
         $('.selected', that.$container).click();
       }
 

@@ -519,6 +519,9 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   }
 
   protected JSONArray rowIdsToJson(Collection<ITableRow> modelRows) {
+    if (modelRows.size() == 0) {
+      return null;
+    }
     JSONArray jsonRowIds = new JSONArray();
     for (ITableRow row : modelRows) {
       jsonRowIds.put(getOrCreatedRowId(row));

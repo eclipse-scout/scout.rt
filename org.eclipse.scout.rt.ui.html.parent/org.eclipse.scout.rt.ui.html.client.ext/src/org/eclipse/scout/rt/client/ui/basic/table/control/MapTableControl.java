@@ -29,7 +29,7 @@ public class MapTableControl extends AbstractTableControl implements IMapTableCo
   protected void initConfig() {
     super.initConfig();
 
-    setLabel("Karte");
+    setTooltipText("Karte");
     setCssClass("control-map");
     setGroup("Anzeige");
     setColumns(getConfiguredColumns());

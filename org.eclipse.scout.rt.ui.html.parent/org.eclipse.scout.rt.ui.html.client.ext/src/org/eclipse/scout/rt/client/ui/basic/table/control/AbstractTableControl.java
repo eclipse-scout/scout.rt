@@ -10,13 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.control;
 
-import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.ui.action.AbstractAction;
 import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
-import org.eclipse.scout.service.SERVICES;
 
-public abstract class AbstractTableControl extends AbstractPropertyObserver implements ITableControl {
+public abstract class AbstractTableControl extends AbstractAction implements ITableControl {
   private String m_cssClass;
   private String m_group;
 
@@ -30,53 +28,8 @@ public abstract class AbstractTableControl extends AbstractPropertyObserver impl
     }
   }
 
-  protected void callInitializer() {
-    initConfig();
-    setEnabled(true);
-  }
-
-  protected void initConfig() {
-  }
-
-  protected void execControlActivated() throws ProcessingException {
-    if (getForm() == null) {
-      IForm form = execStartForm();
-
-      setForm(form);
-    }
-
-    setSelected(!isSelected());
-  }
-
   protected IForm execStartForm() throws ProcessingException {
     return null;
-  }
-
-  public void setSelected(boolean selected) {
-    propertySupport.setPropertyBool(PROP_SELECTED, selected);
-  }
-
-  @Override
-  public boolean isSelected() {
-    return propertySupport.getPropertyBool(PROP_SELECTED);
-  }
-
-  public void setEnabled(boolean enabled) {
-    propertySupport.setPropertyBool(PROP_ENABLED, enabled);
-  }
-
-  @Override
-  public boolean isEnabled() {
-    return propertySupport.getPropertyBool(PROP_ENABLED);
-  }
-
-  @Override
-  public String getLabel() {
-    return propertySupport.getPropertyString(PROP_LABEL);
-  }
-
-  public void setLabel(String label) {
-    propertySupport.setPropertyString(PROP_LABEL, label);
   }
 
   public void setForm(IForm form) {
@@ -101,20 +54,24 @@ public abstract class AbstractTableControl extends AbstractPropertyObserver impl
     return m_group;
   }
 
-  // FIXME CGU create ui facade
   @Override
-  public void fireActivatedFromUI() {
-    try {
-      execControlActivated();
-    }
-    catch (ProcessingException e) {
-      SERVICES.getService(IExceptionHandlerService.class).handleException(e);
-    }
+  protected boolean getConfiguredToggleAction() {
+    return true;
   }
 
   @Override
-  public IForm getForm() {
+  public final IForm getForm() {
     return (IForm) propertySupport.getProperty(PROP_FORM);
+  }
+
+  @Override
+  protected void execSelectionChanged(boolean selected) throws ProcessingException {
+    if (selected && getForm() == null) {
+      IForm form = execStartForm();
+      if (form != null) {
+        setForm(form);
+      }
+    }
   }
 
 }

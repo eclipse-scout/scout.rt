@@ -24,7 +24,8 @@ public class AnalysisTableControl extends AbstractTableControl implements IAnaly
 
   @Override
   protected void initConfig() {
-    setLabel("Analyse");
+    super.initConfig();
+    setTooltipText("Analyse");
     setCssClass("control-analysis");
     setGroup("Suche");
   }

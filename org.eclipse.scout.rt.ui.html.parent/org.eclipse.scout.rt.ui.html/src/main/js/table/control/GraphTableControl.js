@@ -7,21 +7,21 @@ scout.GraphTableControl = function() {
 scout.inherits(scout.GraphTableControl, scout.TableControl);
 
 scout.GraphTableControl.prototype._renderContent = function($parent) {
-  this.$container = $parent.appendSVG('svg', '', 'graph-container');
+  this.$contentContainer = $parent.appendSVG('svg', '', 'graph-container');
 
   // some basics
   this.wBox = 120;
   this.hBox = 60;
   this.kelvin = 1000;
-  this.wContainer = this.$container.width();
-  this.hContainer = this.$container.height();
+  this.wContainer = this.$contentContainer.width();
+  this.hContainer = this.$contentContainer.height();
 
   // create all links with label
   for (var l = 0; l < this.graph.links.length; l++) {
     var link = this.graph.links[l];
 
-    link.$div = this.$container.appendSVG('line', null, 'graph-link');
-    link.$divText = this.$container.appendSVG('text', null, 'graph-link-text', link.label)
+    link.$div = this.$contentContainer.appendSVG('line', null, 'graph-link');
+    link.$divText = this.$contentContainer.appendSVG('text', null, 'graph-link-text', link.label)
       .attr('dy', -5);
   }
 
@@ -29,12 +29,12 @@ scout.GraphTableControl.prototype._renderContent = function($parent) {
   for (var n = 0; n < this.graph.nodes.length; n++) {
     var node = this.graph.nodes[n];
 
-    node.$div = this.$container.appendSVG('rect', null, 'graph-node ' + node.type)
+    node.$div = this.$contentContainer.appendSVG('rect', null, 'graph-node ' + node.type)
       .attr('width', this.wBox).attr('height', this.hBox)
       .attr('x', 0).attr('y', 0)
       .on('mousedown', this.moveNode.bind(this));
 
-    node.$divText = this.$container.appendSVG('text', null, 'graph-node-text', node.name)
+    node.$divText = this.$contentContainer.appendSVG('text', null, 'graph-node-text', node.name)
       .on('mousedown', this.moveNode.bind(this));
 
     this.setNode(node, Math.random() * (this.wContainer - this.wBox), Math.random() * (this.hContainer - this.hBox));
@@ -237,7 +237,7 @@ scout.GraphTableControl.prototype.getPos = function(e, d) {
 };
 
 scout.GraphTableControl.prototype._removeContent = function() {
-  this.$container.remove();
+  this.$contentContainer.remove();
 };
 
 scout.GraphTableControl.prototype._renderGraph = function(graph) {
@@ -250,8 +250,8 @@ scout.GraphTableControl.prototype.isContentAvailable = function() {
 
 scout.GraphTableControl.prototype.onResize = function() {
   if (this.contentRendered) {
-    this.wContainer = this.$container.width();
-    this.hContainer = this.$container.height();
+    this.wContainer = this.$contentContainer.width();
+    this.hContainer = this.$contentContainer.height();
     this.kelvin = 600;
     this.doPhysics();
   }

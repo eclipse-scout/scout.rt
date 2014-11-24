@@ -39,10 +39,18 @@ public class JsonAction<T extends IAction> extends AbstractJsonPropertyObserver<
         return getModel().getText();
       }
     });
+
     putJsonProperty(new JsonProperty<T>(IAction.PROP_ICON_ID, model) {
       @Override
       protected String modelValue() {
         return getModel().getIconId();
+      }
+    });
+
+    putJsonProperty(new JsonProperty<T>(IAction.PROP_TOOLTIP_TEXT, model) {
+      @Override
+      protected String modelValue() {
+        return getModel().getTooltipText();
       }
     });
 

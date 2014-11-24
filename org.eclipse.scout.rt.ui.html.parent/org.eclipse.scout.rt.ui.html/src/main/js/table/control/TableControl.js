@@ -1,12 +1,11 @@
 scout.TableControl = function() {
   scout.TableControl.parent.call(this);
-  this.table;
+  this.tableFooter;
   this.form;
-  this.$control;
   this._addAdapterProperties('form');
   this.contentRendered = false;
 };
-scout.inherits(scout.TableControl, scout.ModelAdapter);
+scout.inherits(scout.TableControl, scout.Action);
 
 scout.TableControl.prototype._render = function($parent) {
   var classes = 'control ';
@@ -14,15 +13,8 @@ scout.TableControl.prototype._render = function($parent) {
     classes += this.cssClass;
   }
 
-  this.$control = $parent.appendDiv('', classes)
+  this.$container = $parent.appendDIV(classes)
     .data('control', this);
-};
-
-scout.TableControl.prototype._renderProperties = function() {
-  scout.TableControl.parent.prototype._renderProperties.call(this);
-
-  this._renderEnabled(this.enabled);
-  this._renderSelected(this.selected);
 };
 
 scout.TableControl.prototype.remove = function() {
@@ -57,29 +49,30 @@ scout.TableControl.prototype.removeContent = function() {
   }
 };
 
+/**
+ * Renders the content if not already rendered.<br>
+ * Opens the container if the container is not already open.<br>
+ * Does nothing if the content is not available yet to -> don't open container if content is not rendered yet to prevent blank container or laggy opening.
+ */
 scout.TableControl.prototype.renderContent = function() {
-  if (this.contentRendered) {
-    throw new Error('Already rendered');
-  }
-
-  if (!this.isContentAvailable()) {
+  if (!this.contentRendered && !this.isContentAvailable()) {
     return;
   }
 
-  //FIXME CGU opening should be controllable. Check current implementation of table page: is search form always opened automatically on activation?
   if (!this.tableFooter.open) {
-    this.tableFooter.openTableControl();
+    this.tableFooter.openControlContainer();
   }
 
-  if (this.cssClass) {
-    this.tableFooter.$controlContent.addClass(this.cssClass + '-content');
+  if (!this.contentRendered) {
+    if (this.cssClass) {
+      this.tableFooter.$controlContent.addClass(this.cssClass + '-content');
+    }
+    this._renderContent(this.tableFooter.$controlContent);
+    this.contentRendered = true;
   }
-  this._renderContent(this.tableFooter.$controlContent);
-
-  this.contentRendered = true;
 };
 
-scout.TableControl.prototype.onClosed = function() {
+scout.TableControl.prototype.onControlContainerClosed = function() {
   this.removeContent();
 };
 
@@ -98,82 +91,63 @@ scout.TableControl.prototype.isContentAvailable = function() {
   return this.form;
 };
 
-scout.TableControl.prototype.setSelected = function(selected) {
-  this._renderSelected(selected);
-  this.session.send('selected', this.id);
+scout.TableControl.prototype._onMouseDown = function() {
+  this.toggle();
 };
 
-scout.TableControl.prototype._renderSelected = function(selected) {
-  if (selected === this.$control.isSelected()) {
+scout.TableControl.prototype.toggle = function() {
+  if (this.tableFooter.selectedControl === this) {
+    this.setSelected(false);
+  } else {
+    this.setSelected(true);
+  }
+};
+
+scout.TableControl.prototype.setSelected = function(selected, closeWhenUnselected) {
+  if (selected === this.selected) {
     return;
   }
-  var previouslySelectedControl = this.tableFooter.selectedControl;
+
+  if (this.tableFooter.selectedControl && this.tableFooter.selectedControl !== this) {
+    this.tableFooter.selectedControl.setSelected(false, false);
+  }
+
+  this.selected = selected;
+  this.session.send('selected', this.id, {
+    selected: selected
+  });
+  this._renderSelected(this.selected, closeWhenUnselected);
+};
+
+scout.TableControl.prototype._renderSelected = function(selected, closeWhenUnselected) {
+  closeWhenUnselected = closeWhenUnselected !== undefined ? closeWhenUnselected : true;
+
+  this.$container.select(selected);
+
   if (selected) {
-    this.tableFooter.selectedControl = this;
-
-    if (!this.$control.isSelected()) {
-      this.$control.select(true);
-    }
-
-    if (previouslySelectedControl) {
-      previouslySelectedControl.setSelected(false);
-    }
-
     this.renderContent();
-
+    this.tableFooter.selectedControl = this;
   } else {
-    this.$control.select(false);
 
-    //When clicking on the already selected control, close the pane
-    if (previouslySelectedControl === this) {
-      //The control gets removed after the close operation
-      this.tableFooter.closeTableControl(this);
+    //Don't modify the state initially
+    if (this.rendered) {
+
+      if (closeWhenUnselected) {
+        //Don't remove immediately, wait for the animation to finish (handled by onControlContainerClosed)
+        this.tableFooter.closeControlContainer(this);
+      } else {
+        this.removeContent();
+      }
+
       this.tableFooter.selectedControl = null;
-    } else {
-      this.removeContent();
     }
   }
 };
 
-scout.TableControl.prototype._renderEnabled = function(enabled) {
-  var tooltip;
-
-  if (enabled) {
-    this.$control
-      .removeClass('disabled')
-      .hover(onControlHoverIn.bind(this), onControlHoverOut.bind(this))
-      .click(onControlClicked.bind(this));
-  } else {
-    this.$control.addClass('disabled')
-      .off('mouseenter mouseleave')
-      .off('click');
-  }
-
-  function onControlHoverIn(event) {
-    if (this.selected) {
-      return;
-    }
-
-    tooltip = new scout.Tooltip({
-      text: this.label,
-      $origin: this.$control,
-      arrowPosition: 50,
-      arrowPositionUnit: '%',
-      cssClass: 'table-control'
-    });
-    tooltip.render();
-  }
-
-  function onControlHoverOut(event) {
-    if (tooltip) {
-      tooltip.remove();
-      tooltip = null;
-    }
-  }
-
-  function onControlClicked(event) {
-    this.setSelected(!this.$control.isSelected());
-  }
+scout.TableControl.prototype._configureTooltip = function() {
+  var options = scout.TableControl.parent.prototype._configureTooltip.call(this);
+  options.cssClass = 'table-control';
+  return options;
 };
 
 scout.TableControl.prototype.goOffline = function() {
@@ -191,7 +165,6 @@ scout.TableControl.prototype.goOnline = function() {
     this._renderEnabled(true);
   }
 };
-
 
 scout.TableControl.prototype.onResize = function() {
   if (this.form && this.form.rendered) {

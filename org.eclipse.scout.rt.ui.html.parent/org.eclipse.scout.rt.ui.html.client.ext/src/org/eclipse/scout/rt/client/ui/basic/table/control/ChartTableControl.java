@@ -24,7 +24,7 @@ public class ChartTableControl extends AbstractTableControl implements IChartTab
   protected void initConfig() {
     super.initConfig();
 
-    setLabel("Diagramm");
+    setTooltipText("Diagramm");
     setCssClass("control-chart");
     setGroup("Anzeige");
   }

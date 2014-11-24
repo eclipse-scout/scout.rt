@@ -11,16 +11,14 @@
 package org.eclipse.scout.rt.ui.html.json.table.control;
 
 import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
-import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
-import org.eclipse.scout.rt.ui.html.json.JsonEventType;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
-import org.eclipse.scout.rt.ui.html.json.JsonResponse;
+import org.eclipse.scout.rt.ui.html.json.action.JsonAction;
 import org.json.JSONObject;
 
-public class JsonTableControl<T extends ITableControl> extends AbstractJsonPropertyObserver<T> {
+public class JsonTableControl<T extends ITableControl> extends JsonAction<T> {
   protected boolean m_contentLoaded = false;
 
   public JsonTableControl(T model, IJsonSession jsonSession, String id) {
@@ -30,13 +28,6 @@ public class JsonTableControl<T extends ITableControl> extends AbstractJsonPrope
   @Override
   protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
-
-    putJsonProperty(new JsonProperty<ITableControl>(ITableControl.PROP_LABEL, model) {
-      @Override
-      protected String modelValue() {
-        return getModel().getLabel();
-      }
-    });
 
     putJsonProperty(new JsonProperty<ITableControl>("cssClass", model) {
       @Override
@@ -49,20 +40,6 @@ public class JsonTableControl<T extends ITableControl> extends AbstractJsonPrope
       @Override
       protected String modelValue() {
         return getModel().getGroup();
-      }
-    });
-
-    putJsonProperty(new JsonProperty<ITableControl>(ITableControl.PROP_SELECTED, model) {
-      @Override
-      protected Boolean modelValue() {
-        return getModel().isSelected();
-      }
-    });
-
-    putJsonProperty(new JsonProperty<ITableControl>(ITableControl.PROP_ENABLED, model) {
-      @Override
-      protected Boolean modelValue() {
-        return getModel().isEnabled();
       }
     });
   }
@@ -95,14 +72,13 @@ public class JsonTableControl<T extends ITableControl> extends AbstractJsonPrope
   }
 
   @Override
-  public void handleUiEvent(JsonEvent event, JsonResponse res) {
-    if (JsonEventType.SELECTED.matches(event)) {
-      // Lazy loading content on selection. FIXME CGU Should this be controlled by the model?
-      if (!getModel().isSelected() && !m_contentLoaded) {
-        handleUiLoadContent();
-        m_contentLoaded = true;
-      }
-      getModel().fireActivatedFromUI();
+  protected void handleUiSelected(JsonEvent event) {
+    super.handleUiSelected(event);
+
+    // Lazy loading content on selection. FIXME CGU Should this be controlled by the model?
+    if (getModel().isSelected() && !m_contentLoaded) {
+      handleUiLoadContent();
+      m_contentLoaded = true;
     }
   }
 
