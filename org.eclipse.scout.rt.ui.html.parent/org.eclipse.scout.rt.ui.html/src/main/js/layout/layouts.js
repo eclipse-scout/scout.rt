@@ -194,7 +194,7 @@ scout.FormFieldLayout.prototype.preferredLayoutSize = function($container) {
     $label = $container.children('label'),
     $status = $container.children('.status'),
     $mandatory = $container.children('.mandatory-indicator'),
-    // TODO AWE/CGU: (form-field) inkosistent! oben greifen wir auf formField zu,
+    // TODO AWE/CGU: (form-field) inkonsistent! oben greifen wir auf formField zu,
     // hier verwenden wir JQuery selectors
     $field = $container.children('.field'),
     prefSize, htmlField;
@@ -251,14 +251,13 @@ scout.ButtonFieldLayout.prototype.layout = function($container) {
   // button has no children - nothing to do here
 };
 
-// TODO AWE: (layout) use HtmlComponent#getInsets here
 scout.ButtonFieldLayout.prototype.preferredLayoutSize = function($container) {
   var $button = $container.children('button'),
-    hMargin = $button.outerWidth(true) - $button.width(),
-    vMargin = $button.outerHeight(true) - $button.height(),
+    insets = scout.graphics.getInsets($button),
     textSize = scout.graphics.measureString($button.html());
-
-  return new scout.Dimension(textSize.width + hMargin, textSize.height + vMargin);
+  return new scout.Dimension(
+      textSize.width + insets.left + insets.right,
+      textSize.height + insets.top + insets.bottom);
 };
 
 /**

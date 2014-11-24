@@ -145,29 +145,11 @@ scout.Session.prototype.getOrCreateModelAdapters = function(ids, parent) {
   return adapters;
 };
 
-// FIXME IMO: commented by A.WE
-/*
- scout.Session.prototype._createRootModelAdapters = function() {
- var $parent=this.$entryPoint;
- var id, data;
- for (id in this._adapterDataCache) {
- data=this._adapterDataCache[id];
- if(data.root){
- this.objectFactory.
- create(this._getAdapterData(data.id)).
- render($parent);
- }
- }
- };
- */
-
 /**
- *
  * Sends the request asynchronously and processes the response later.<br>
  * Furthermore, the request is sent delayed. If send is called multiple times
  * during the same user interaction, the events are collected and sent in one
  * request at the end of the user interaction
- *
  */
 scout.Session.prototype.send = function(type, id, data) {
   this._asyncEvents.push(new scout.Event(type, id, data));
@@ -178,7 +160,6 @@ scout.Session.prototype.send = function(type, id, data) {
       that._asyncRequestQueued = false;
       that._asyncEvents = [];
     }, 0);
-
     this._asyncRequestQueued = true;
   }
 };
@@ -411,9 +392,6 @@ scout.Session.prototype.onModelAction = function(event) {
     var desktopData = this._getAdapterData(sessionData.desktop);
     this.desktop = this.objectFactory.create(desktopData);
     this.desktop.render(this.$entryPoint);
-    // FIXME IMO: commented by A.WE
-    //    this._createRootModelAdapters();
-    //    this.desktop = this.getModelAdapter(sessionData.desktop);
   }
 };
 
