@@ -117,4 +117,16 @@ describe("ModelAdapter", function() {
   });
 
 
+  describe("init", function() {
+
+    it("check if model properties are copied to adapter", function() {
+      var model = { foo: 6 },
+        adapter = new scout.ModelAdapter();
+      adapter.id = '123';
+      adapter.init(model, session);
+      expect(adapter.foo).toBe(6);
+    });
+
+  });
+
 });

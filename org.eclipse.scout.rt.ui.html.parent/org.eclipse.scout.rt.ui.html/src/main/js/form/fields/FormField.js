@@ -32,10 +32,9 @@ scout.FormField.prototype._render = function($parent) {
   // FormField directly. Currently this is required as a placeholder for un-implemented form-fields.
   this.addContainer($parent, 'form-field');
   this.addLabel();
-  this.addField($('<div>'));
-    // TODO AWE: (UGM) temporär auskommentiert
-    // text('not implemented yet').
-    // addClass('not-implemented'));
+  this.addField($('<div>').
+    text('not implemented yet').
+    addClass('not-implemented'));
   this.addMandatoryIndicator();
   this.addStatus();
 };

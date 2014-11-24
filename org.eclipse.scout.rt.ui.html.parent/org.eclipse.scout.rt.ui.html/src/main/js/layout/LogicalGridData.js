@@ -22,22 +22,7 @@ scout.LogicalGridData = function(vararg) {
 
   if (vararg instanceof scout.LogicalGridData) {
     // copy properties from LGD template
-    // TODO AWE: impl. generic copyProperties?
-    this.gridx = vararg.gridx;
-    this.gridy = vararg.gridy;
-    this.gridw = vararg.gridw;
-    this.gridh = vararg.gridh;
-    this.weightx = vararg.weightx;
-    this.weighty = vararg.weighty;
-    this.useUiWidth = vararg.useUiWidth;
-    this.useUiHeight = vararg.useUiHeight;
-    this.widthHint = vararg.widthHint;
-    this.heightHint = vararg.heightHint;
-    this.horizontalAlignment = vararg.horizontalAlignment;
-    this.verticalAlignment = vararg.verticalAlignment;
-    this.fillHorizontal = vararg.fillHorizontal;
-    this.fillVertical = vararg.fillVertical;
-    this.topInset = vararg.topInset;
+    scout.objects.copyProperties(vararg, this);
   } else if (vararg instanceof scout.FormField) {
     // work with model / validate
     this.model = vararg;
