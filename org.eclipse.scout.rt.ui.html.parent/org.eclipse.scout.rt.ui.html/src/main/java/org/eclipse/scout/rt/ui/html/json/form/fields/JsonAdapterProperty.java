@@ -36,7 +36,6 @@ public abstract class JsonAdapterProperty<T> extends JsonProperty<T> {
     if (value == null) {
       return null;
     }
-
     if (value instanceof Collection) {
       Collection models = (Collection) value;
       List<IJsonAdapter<?>> adapters = new ArrayList<>(models.size());
@@ -51,32 +50,32 @@ public abstract class JsonAdapterProperty<T> extends JsonProperty<T> {
   }
 
   public void attachAdapters() {
-    if (modelValue() == null) {
+    Object modelValue = modelValue();
+    if (modelValue == null) {
       return;
     }
-
-    if (modelValue() instanceof Collection) {
-      for (Object model : (Collection) modelValue()) {
+    if (modelValue instanceof Collection) {
+      for (Object model : (Collection) modelValue) {
         m_jsonSession.getOrCreateJsonAdapter(model);
       }
     }
     else {
-      m_jsonSession.getOrCreateJsonAdapter(modelValue());
+      m_jsonSession.getOrCreateJsonAdapter(modelValue);
     }
   }
 
   public void disposeAdapters() {
-    if (modelValue() == null) {
+    Object modelValue = modelValue();
+    if (modelValue == null) {
       return;
     }
-
-    if (modelValue() instanceof Collection) {
-      for (Object model : (Collection) modelValue()) {
+    if (modelValue instanceof Collection) {
+      for (Object model : (Collection) modelValue) {
         disposeAdapter(model);
       }
     }
     else {
-      disposeAdapter(modelValue());
+      disposeAdapter(modelValue);
     }
   }
 

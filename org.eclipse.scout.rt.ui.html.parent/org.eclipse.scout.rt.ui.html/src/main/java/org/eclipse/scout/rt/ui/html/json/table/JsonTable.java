@@ -146,33 +146,6 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
         return getModel().isAutoResizeColumns();
       }
     });
-    putJsonProperty(new JsonProperty<ITable>(ITable.PROP_CONTEXT_COLUMN, model) {
-      @Override
-      protected IColumn<?> modelValue() {
-        return getModel().getContextColumn();
-      }
-
-      @Override
-      public Object prepareValueForToJson(Object value) {
-        // XXX BSH Convert to JSON (or remove property entirely)
-        return null;
-      }
-    });
-    /* Commented out by AWE: causes errors in JS because setter for property columnFilterManager
-     * does not exist. BSH should check how to solve this.
-    putJsonProperty(new JsonProperty<ITable>(ITable.PROP_COLUMN_FILTER_MANAGER, model) {
-      @Override
-      protected ITableColumnFilterManager modelValue() {
-        return getModel().getColumnFilterManager();
-      }
-
-      @Override
-      public Object prepareValueForToJson(Object value) {
-        // XXX BSH Convert to JSON (or remove property entirely)
-        return null;
-      }
-    });
-     */
     putJsonProperty(new JsonAdapterProperty<ITable>(ITable.PROP_KEY_STROKES, model, getJsonSession()) {
       @Override
       protected List<IKeyStroke> modelValue() {
@@ -199,18 +172,6 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
         }
       });
     }
-//    putJsonProperty(new JsonProperty<ITable, ITypeWithClassId>(ITable.PROP_CONTAINER, model) { //FIXME BSH CGU: only send properties when needed, do we need this one?
-//      @Override
-//      protected ITypeWithClassId getValueImpl() {
-//        return getModel().getContainer();
-//      }
-//
-//      @Override
-//      public Object valueToJson(Object value) {
-//        // XXX BSH Convert to JSON (or remove property entirely)
-//        return null;
-//      }
-//    });
   }
 
   @Override
@@ -442,17 +403,17 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   protected Object cellToJson(ICell cell, IColumn column) {
     JSONObject jsonCell = new JSONObject();
     putProperty(jsonCell, "value", getCellValue(cell, column));
+    putProperty(jsonCell, "text", cell.getText());
+    putProperty(jsonCell, "iconId", cell.getIconId());
+    putProperty(jsonCell, "tooltipText", cell.getTooltipText());
+    putProperty(jsonCell, "horizontalAlignment", cell.getHorizontalAlignment());
     putProperty(jsonCell, "foregroundColor", cell.getForegroundColor());
     putProperty(jsonCell, "backgroundColor", cell.getBackgroundColor());
-    //FIXME implement missing
-    if (jsonCell.length() > 0) {
-      putProperty(jsonCell, "text", cell.getText());
-      return jsonCell;
-    }
-    else {
-      //Don't generate an object if only the text is returned to reduce the amount of data
-      return cell.getText();
-    }
+    putProperty(jsonCell, "font", (cell.getFont() == null ? null : cell.getFont().toPattern()));
+    putProperty(jsonCell, "enabled", cell.isEnabled());
+    putProperty(jsonCell, "editable", cell.isEditable());
+    // TODO BSH Table | Add property "errorStatus"
+    return jsonCell;
   }
 
   protected Object getCellValue(ICell cell, IColumn column) {
