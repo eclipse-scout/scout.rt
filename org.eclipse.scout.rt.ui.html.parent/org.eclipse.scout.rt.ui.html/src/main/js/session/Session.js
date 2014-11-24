@@ -166,8 +166,8 @@ scout.Session.prototype.send = function(type, id, data) {
 
 scout.Session.prototype._sendNow = function(events, deferred) {
   var request = {
-    jsonSessionId : this.jsonSessionId,
-    events : events
+    jsonSessionId: this.jsonSessionId,
+    events: events
   };
 
   if (this._startup) {
@@ -201,14 +201,14 @@ scout.Session.prototype._sendRequest = function(request) {
   var that = this;
   this._requestsPendingCounter++;
   $.ajax({
-    async : true,
-    type : 'POST',
-    dataType : 'json',
-    contentType : 'application/json; charset=UTF-8',
-    cache : false,
-    url : this.url,
-    data : JSON.stringify(request),
-    context : request
+    async: true,
+    type: 'POST',
+    dataType: 'json',
+    contentType: 'application/json; charset=UTF-8',
+    cache: false,
+    url: this.url,
+    data: JSON.stringify(request),
+    context: request
   }).done(function(data) {
     that._processSuccessResponse(data);
   }).fail(function(jqXHR, textStatus, errorThrown) {
@@ -226,8 +226,7 @@ scout.Session.prototype._processSuccessResponse = function(message) {
   try {
     this._processEvents(message.events);
     this.layoutValidator.validate();
-  }
-  finally {
+  } finally {
     this.processingEvents = false;
     var cacheSize = scout.countProperties(this._adapterDataCache);
     if (cacheSize > 0) {
@@ -282,8 +281,7 @@ scout.Session.prototype._processErrorResponse = function(request, jqXHR, textSta
     this.$entryPoint.html('');
     if (this.desktop) {
       this.desktop.showMessage(jsonResponse.errorMessage, 'timeout');
-    }
-    else {
+    } else {
       this.$entryPoint.text(jsonResponse.errorMessage);
     }
     return;
@@ -351,8 +349,7 @@ scout.Session.prototype._processEvents = function(events) {
     }
     if ('property' === event.type) { // Special handling for 'property' type
       adapter.onModelPropertyChange(event);
-    }
-    else {
+    } else {
       adapter.onModelAction(event);
     }
   }
@@ -384,8 +381,7 @@ scout.Session.prototype.onModelAction = function(event) {
   if (event.type === 'localeChanged') {
     this.locale = new scout.Locale(event);
     // FIXME inform components to reformat display text?
-  }
-  else if (event.type === 'initialized') {
+  } else if (event.type === 'initialized') {
     // cannot use getOrCreateModelAdapter here since Session doesn't have a parent
     var sessionData = this._getAdapterData(event.clientSession);
     this.locale = new scout.Locale(sessionData.locale);

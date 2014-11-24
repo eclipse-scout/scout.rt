@@ -3,11 +3,10 @@
  */
 scout.init = function(initOptions) {
   var tabId = '' + new Date().getTime();
-  window.scout.sessions = []; // FIXME BSH Needed for detaching windows, but can
-  // we do this better???
+  window.scout.sessions = []; // FIXME BSH Needed for detaching windows, but can we do this better???
   $('.scout').each(function() {
     var portletPartId = $(this).data('partid') || '0';
-    var jsonSessionId = [ portletPartId, tabId ].join(':');
+    var jsonSessionId = [portletPartId, tabId].join(':');
     var session = new scout.Session($(this), jsonSessionId, initOptions);
     session.init();
     window.scout.sessions.push(session);
@@ -50,23 +49,20 @@ scout.openWindow = function(url, windowId, popupWidth, popupHeight) {
     var popupLeft = ((parentWidth / 2) - (popupWidth / 2)) + parentLeft;
     var popupTop = ((parentHeight / 2) - (popupHeight / 2)) + parentTop;
     windowSpec = [
-    // Should be the default, just to be sure
-    'scrollbars=yes',
-    // Explicitly enable location bar for IE (Firefox and Chrome always show the
-    // location bar)
-    'location=yes',
-    // Explicitly enable window resizing for IE (Firefox and Chrome always
-    // enable resize)
-    'resizable=yes',
-    // Top left position (is only accurate in Firefox, see below)
-    'left=' + popupLeft, 'top=' + popupTop,
-    // Target outerWidth/outerHeight is only respected by Firefox
-    'outerWidth=' + popupWidth, 'outerHeight=' + popupHeight,
-    // Fallback for IE and Chrome (window is not really centered, but it's the
-    // best we can do)
-    'width=' + popupWidth, 'height=' + popupHeight ].join(',');
-  }
-  else {
+      // Should be the default, just to be sure
+      'scrollbars=yes',
+      // Explicitly enable location bar for IE (Firefox and Chrome always show the location bar)
+      'location=yes',
+      // Explicitly enable window resizing for IE (Firefox and Chrome always enable resize)
+      'resizable=yes',
+      // Top left position (is only accurate in Firefox, see below)
+      'left=' + popupLeft, 'top=' + popupTop,
+      // Target outerWidth/outerHeight is only respected by Firefox
+      'outerWidth=' + popupWidth, 'outerHeight=' + popupHeight,
+      // Fallback for IE and Chrome (window is not really centered, but it's the best we can do)
+      'width=' + popupWidth, 'height=' + popupHeight
+    ].join(',');
+  } else {
     windowId = '_' + windowId;
   }
 
@@ -139,7 +135,7 @@ scout.getTimestamp = function() {
  */
 scout.countProperties = function(obj) {
   var count = 0;
-  for ( var prop in obj) {
+  for (var prop in obj) {
     if (obj.hasOwnProperty(prop)) {
       count++;
     }
