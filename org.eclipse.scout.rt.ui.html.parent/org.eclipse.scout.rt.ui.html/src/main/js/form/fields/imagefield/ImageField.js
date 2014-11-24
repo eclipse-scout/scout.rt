@@ -12,7 +12,7 @@ scout.ImageField.prototype._render = function($parent) {
   $fieldContainer = $('<div>').css('overflow', 'hidden');
 
   if (this.scrollBarEnabled) {
-    this._$viewport = scout.Scrollbar2.install($fieldContainer, {
+    this._$viewport = scout.scrollbars.install($fieldContainer, {
       invertColors: true
     });
   } else {
@@ -35,5 +35,5 @@ scout.ImageField.prototype._renderProperties = function() {
 
 scout.ImageField.prototype._renderImageId = function(imageId) {
   this.$field.attr('src', imageId);
-  this.$field.on('load', scout.Scrollbar2.update.bind(this, this._$viewport));
+  this.$field.on('load', scout.scrollbars.update.bind(this, this._$viewport));
 };

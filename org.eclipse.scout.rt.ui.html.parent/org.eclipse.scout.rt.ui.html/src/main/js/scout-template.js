@@ -91,8 +91,8 @@
 //@include("form/fields/treefield/TreeField.js");
 //@include("form/fields/tabbox/TabBox.js");
 //@include("form/fields/tabbox/TabItem.js");
+//@include("scrollbar/scrollbars.js");
 //@include("scrollbar/Scrollbar.js");
-//@include("scrollbar/Scrollbar2.js");
 //@include("text/DecimalFormat.js");
 //@include("text/DateFormat.js");
 //@include("officeaddin/OfficeAddIn.js");

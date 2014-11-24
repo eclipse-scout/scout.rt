@@ -56,7 +56,7 @@ scout.Table.prototype._render = function($parent) {
   this._$header = this.$container.appendDIV('table-header');
   this._header = new scout.TableHeader(this, this._$header, this.session);
   this.$data = this.$container.appendDIV('table-data');
-  this._$viewport = scout.Scrollbar2.install(this.$data);
+  this._$viewport = scout.scrollbars.install(this.$data);
 
   this.menubar = new scout.Menubar(this.$container, {
     position: this.menubarPosition
@@ -99,7 +99,7 @@ scout.Table.prototype.toggleSelection = function() {
 };
 
 scout.Table.prototype.updateScrollbar = function() {
-  scout.Scrollbar2.update(this._$viewport);
+  scout.scrollbars.update(this._$viewport);
 };
 
 scout.Table.prototype._sort = function() {
@@ -740,7 +740,7 @@ scout.Table.prototype._onAllRowsDeleted = function() {
 };
 
 scout.Table.prototype.scrollTo = function($selection) {
-  scout.Scrollbar2.scrollTo(this._$viewport, $selection);
+  scout.scrollbars.scrollTo(this._$viewport, $selection);
 };
 
 scout.Table.prototype.selectRowsByIds = function(rowIds) {

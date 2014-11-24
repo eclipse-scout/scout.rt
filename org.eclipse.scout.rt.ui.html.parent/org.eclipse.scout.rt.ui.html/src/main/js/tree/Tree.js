@@ -45,7 +45,7 @@ scout.Tree.prototype._visitNodes = function(nodes, func, parentNode) {
 scout.Tree.prototype._render = function($parent) {
   this.$parent = $parent;
   this.$container = $parent.appendDIV('tree');
-  this._$viewport = scout.Scrollbar2.install(this.$container);
+  this._$viewport = scout.scrollbars.install(this.$container);
   this._addNodes(this.nodes);
   if (this.selectedNodeIds.length > 0) {
     this._renderSelection();
@@ -144,7 +144,7 @@ scout.Tree.prototype._renderExpansion = function(node, $node, expanded) {
         };
 
         $wrapper.css('height', 0).
-          animateAVCSD('height', h, removeContainer, scout.Scrollbar2.update.bind(this, this._$viewport), 200);
+          animateAVCSD('height', h, removeContainer, scout.scrollbars.update.bind(this, this._$viewport), 200);
       }
     }
     $node.addClass('expanded');
@@ -156,7 +156,7 @@ scout.Tree.prototype._renderExpansion = function(node, $node, expanded) {
       return $(this).attr('data-level') <= level;
     }).wrapAll('<div class="animationWrapper">)').parent();
 
-    $wrapper.animateAVCSD('height', 0, $.removeThis, scout.Scrollbar2.update.bind(this, this._$viewport), 200);
+    $wrapper.animateAVCSD('height', 0, $.removeThis, scout.scrollbars.update.bind(this, this._$viewport), 200);
   }
 };
 
@@ -418,7 +418,7 @@ scout.Tree.prototype._removeNodes = function(nodes, parentNodeId, $parentNode) {
     }
   }
 
-  scout.Scrollbar2.update(this._$viewport);
+  scout.scrollbars.update(this._$viewport);
 };
 
 scout.Tree.prototype._addNodes = function(nodes, $parent) {
@@ -464,7 +464,7 @@ scout.Tree.prototype._addNodes = function(nodes, $parent) {
     }
   }
 
-  scout.Scrollbar2.update(this._$viewport);
+  scout.scrollbars.update(this._$viewport);
 
   //return the last created node
   return $node;

@@ -34,7 +34,7 @@ scout.AbstractSmartField.prototype._get$OptionsDiv = function() {
 };
 
 scout.AbstractSmartField.prototype._updateScrollbar = function() {
-  scout.Scrollbar2.update(this._$viewport);
+  scout.scrollbars.update(this._$viewport);
 };
 
 scout.AbstractSmartField.prototype._isNavigationKey = function(e) {
@@ -86,7 +86,7 @@ scout.AbstractSmartField.prototype._selectOption = function($options, pos) {
   var $selectedOption = $($options[pos]);
   $selectedOption.addClass('selected');
   this._selectedOption = pos;
-  scout.Scrollbar2.scrollTo(this._$viewport, $selectedOption);
+  scout.scrollbars.scrollTo(this._$viewport, $selectedOption);
 };
 
 scout.AbstractSmartField.prototype._onKeyup = function(e) {
@@ -165,7 +165,7 @@ scout.AbstractSmartField.prototype._showPopup = function(numOptions, vararg) {
   scout.graphics.setBounds(this._$popup, popupBounds);
   // layout options and status-div
   var $optionsDiv = this._get$OptionsDiv();
-  this._$viewport = scout.Scrollbar2.install($optionsDiv, {invertColors:true});
+  this._$viewport = scout.scrollbars.install($optionsDiv, {invertColors:true});
   scout.graphics.setSize($optionsDiv, fieldBounds.width - 4, popupHeight - 24 - 3);
   this._setStatusText(vararg);
 };

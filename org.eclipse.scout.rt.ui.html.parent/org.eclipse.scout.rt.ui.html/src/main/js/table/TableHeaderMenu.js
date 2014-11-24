@@ -138,7 +138,7 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
     cube = matrix.calculateCube();
 
   var $headerFilterContainer = $headerFilter.appendDIV('header-filter-container'),
-    $headerFilterScroll = scout.Scrollbar2.install($headerFilterContainer);
+    $headerFilterScroll = scout.scrollbars.install($headerFilterContainer);
 
   for (var a = 0; a < xAxis.length; a++) {
     var key = xAxis[a],
