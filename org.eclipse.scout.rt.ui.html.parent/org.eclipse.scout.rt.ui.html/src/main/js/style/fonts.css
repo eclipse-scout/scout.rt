@@ -48,10 +48,8 @@ Try these to switch between fonts:
 }
 
 .font-icon {
-  font-family: scoutIcons;
+  font-family: scoutIcons, @defaultFont;
   speak: none;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-
-

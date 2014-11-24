@@ -82,12 +82,12 @@
   &:before{
     .font-icon;
     font-size: 20px;
-    content: "\00a0";
     vertical-align: -2px;
+    content: @icon-angle-right;
   }
 
-  .tree-item.can-expand > &:before {
-    content: @icon-angle-right;
+  .tree-item.leaf > &:before {
+    content: '';
   }
 
   .tree-item:selected > &:before{
@@ -99,8 +99,8 @@
   }
 
   .tree-item.expanded > & {
-  /* Adding 0.001 is necessary for firefox, otherwise it shifts the icon left a little when the animation finishes.
-    See https://bugzilla.mozilla.org/show_bug.cgi?id=739176 */
+    /* Adding 0.001 is necessary for firefox, otherwise it shifts the icon left a little when the animation finishes. */
+    /* See https://bugzilla.mozilla.org/show_bug.cgi?id=739176 */
     .transform(rotate(90.001deg));
   }
 
@@ -111,40 +111,42 @@
 
 /* bread crumb arrows */
 
-.navigation-breadcrumb .can-expand.parent:before,
-.navigation-breadcrumb .can-expand.selected:before,
-.navigation-breadcrumb .can-expand.parent:after{
+.navigation-breadcrumb .parent:before,
+.navigation-breadcrumb .parent:after,
+.navigation-breadcrumb .selected:before {
   position: absolute;
   left: 50%;
   margin-left: -13px;
   border: solid transparent;
-  content: "";
+  content: '';
   height: 0;
   width: 0;
   z-index: 3;
 }
-
-
-.navigation-breadcrumb .tree-item.parent:before {
+.navigation-breadcrumb .parent:before {
   border-color: @color-bench transparent transparent transparent;
   border-width: 8px 13px 0 13px;
   bottom: -9px;
 }
-
-.navigation-breadcrumb .tree-item.parent:after {
+.navigation-breadcrumb .parent:after {
   border-color: @color-nav-semi transparent transparent transparent;
   border-width: 8px 13px 0 13px;
   bottom: -8px;
 }
-
-.navigation-breadcrumb .tree-item.selected:before {
+.navigation-breadcrumb .selected:before {
   border-color: @color-bench transparent transparent transparent;
   border-width: 8px 13px 0 13px;
   bottom: -9px;
 }
 
+.navigation-breadcrumb .parent.leaf:before,
+.navigation-breadcrumb .parent.leaf:after,
+.navigation-breadcrumb .selected.leaf:before {
+  display: none;
+}
 
 /* key handling */
+
 .tree-item .key-box {
   left: 3px;
   top: 7px;

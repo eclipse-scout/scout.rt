@@ -1,4 +1,12 @@
-/* custom icons */
+/* default font icons (sans-serif, arial) */
+@icon-nbsp: '\00a0';
+@icon-sum: '\03a3';
+@icon-median: '\2300';
+@icon-count: '\2317';
+@icon-arial-long-arrow-down: '\2193';
+@icon-arial-long-arrow-up: '\2191';
+
+/* scoutIcons: custom icons */
 @icon-error: '\E001';
 @icon-info: '\E002';
 @icon-calendar: '\E003';
@@ -16,15 +24,7 @@
 @icon-star: '\E032';
 @icon-share: '\E033';
 
-/* default font icons (sans-serif, arial) */
-@icon-nbsp: '\00a0';
-@icon-sum: '\03a3';
-@icon-median: '\2300';
-@icon-count: '\2317';
-@icon-arial-long-arrow-down: '\2193';
-@icon-arial-long-arrow-up: '\2191';
-
-/* awesome icons */
+/* scoutIcons: awesome icons */
 @icon-list-ul: '\F0CA';
 @icon-list-ol: '\F0CB';
 @icon-menu: '\F0C9';

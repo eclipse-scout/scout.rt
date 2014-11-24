@@ -161,7 +161,7 @@ scout.DesktopKeystrokeAdapter.prototype.drawKeyBox = function() {
       $prev = $node.prev('.tree-item'),
       $next = $node.next('.tree-item');
 
-    if ($node.hasClass('can-expand')) {
+    if (!$node.hasClass('leaf')) { // can expand
       if ($node.hasClass('expanded')) {
         $node.appendDiv('', 'key-box large', '-');
       } else {

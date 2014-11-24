@@ -130,7 +130,7 @@ scout.Tree.prototype._renderExpansion = function(node, $node, expanded) {
     }
 
     // animated opening
-    if ($node.hasClass('can-expand') && !$node.hasClass('expanded')) {
+    if (!$node.hasClass('leaf') && !$node.hasClass('expanded')) { // can expand
       var $newNodes = $node.nextUntil(
         function() {
           return $(this).attr('data-level') <= level;
@@ -422,21 +422,21 @@ scout.Tree.prototype._removeNodes = function(nodes, parentNodeId, $parentNode) {
 };
 
 scout.Tree.prototype._addNodes = function(nodes, $parent) {
-  var node, state, level, $node,
-    $predecessor = $parent;
+  var node, state, level, $node, $predecessor;
 
   if (!nodes || nodes.length === 0) {
     return;
   }
 
+  $predecessor = $parent;
   for (var i = 0; i < nodes.length; i++) {
     node = nodes[i];
     state = '';
     if (node.expanded && node.childNodes.length > 0) {
       state = 'expanded ';
     }
-    if (!node.leaf) {
-      state += 'can-expand '; //TODO rename to leaf
+    if (node.leaf) {
+      state += 'leaf ';
     }
     level = $parent ? $parent.data('level') + 1 : 0;
 
