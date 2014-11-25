@@ -352,7 +352,12 @@ public class BasicPropertySupport implements IEventListenerSource {
         children = new ArrayList<Object>();
         m_childListeners.put(propertyName, children);
       }
-      children.add(listener);
+      if (listener instanceof WeakEventListener) {
+        children.add(new WeakReference<PropertyChangeListener>(listener));
+      }
+      else {
+        children.add(listener);
+      }
     }
   }
 
