@@ -23,6 +23,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.html.officeonline.internal.Activator;
 import org.eclipse.scout.rt.ui.html.officeonline.wopi.FileInfo;
 import org.eclipse.scout.rt.ui.html.officeonline.wopi.IWopiContentProvider;
+import org.eclipse.scout.rt.ui.html.officeonline.wopi.WopiConstants;
 import org.eclipse.scout.service.AbstractService;
 import org.osgi.framework.ServiceRegistration;
 
@@ -34,7 +35,7 @@ import org.osgi.framework.ServiceRegistration;
  * {@link #CONFIG_INI_COBALT_SERVICE_FEED_URL}
  */
 @Priority(0)
-public class CobaltImplementationService extends AbstractService implements IWopiContentProvider {
+public class CobaltImplementationService extends AbstractService implements IWopiContentProvider, WopiConstants {
   private static final long serialVersionUID = 1L;
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(CobaltImplementationService.class);
 
@@ -59,7 +60,7 @@ public class CobaltImplementationService extends AbstractService implements IWop
   public String getWopiBaseUrl() {
     String cobaltServiceWopiUrl = Activator.getBundleContext().getProperty(CONFIG_INI_COBALT_SERVICE_WOPI_URL);
     if (cobaltServiceWopiUrl == null) {
-      LOG.warn("Missing config.ini parameter " + CONFIG_INI_COBALT_SERVICE_WOPI_URL + "; COBALT will not be available");
+      LOG.warn(missingInitParamMessage(CONFIG_INI_COBALT_SERVICE_WOPI_URL));
     }
     return cobaltServiceWopiUrl;
   }
@@ -67,7 +68,7 @@ public class CobaltImplementationService extends AbstractService implements IWop
   protected String getFeedUrl() {
     String cobaltServiceFeedUrl = Activator.getBundleContext().getProperty(CONFIG_INI_COBALT_SERVICE_FEED_URL);
     if (cobaltServiceFeedUrl == null) {
-      LOG.warn("Missing config.ini parameter " + CONFIG_INI_COBALT_SERVICE_FEED_URL + "; COBALT will not be available");
+      LOG.warn(missingInitParamMessage(CONFIG_INI_COBALT_SERVICE_FEED_URL));
     }
     return cobaltServiceFeedUrl;
   }
@@ -82,7 +83,7 @@ public class CobaltImplementationService extends AbstractService implements IWop
   public void setFileContent(String fileId, byte[] content) throws IOException {
     String feedUrl = getFeedUrl();
     if (feedUrl == null) {
-      throw new IOException("Missing config.ini parameter " + CONFIG_INI_COBALT_SERVICE_WOPI_URL + "; COBALT will not be available");
+      throw new IOException(missingInitParamMessage(CONFIG_INI_COBALT_SERVICE_WOPI_URL));
     }
     try {
       URL url = new URL(feedUrl + "/" + fileId + "/contents");
@@ -106,13 +107,13 @@ public class CobaltImplementationService extends AbstractService implements IWop
   public byte[] getFileContent(String fileId, boolean removeRemoteDocument) throws IOException {
     String feedUrl = getFeedUrl();
     if (feedUrl == null) {
-      throw new IOException("Missing config.ini parameter " + CONFIG_INI_COBALT_SERVICE_WOPI_URL + "; COBALT will not be available");
+      throw new IOException(missingInitParamMessage(CONFIG_INI_COBALT_SERVICE_WOPI_URL));
     }
     try {
       URL url = new URL(feedUrl + "/" + fileId + "/contents");
       URLConnection conn = url.openConnection();
       if (removeRemoteDocument) {
-        conn.setRequestProperty("X-BSI-Hint", "Delete");
+        conn.setRequestProperty(X_BSI_HINT, DELETE);
       }
       InputStream in = conn.getInputStream();
       try {
@@ -132,6 +133,10 @@ public class CobaltImplementationService extends AbstractService implements IWop
     catch (IOException io) {
       throw new IOException("fileId=" + fileId, io);
     }
+  }
+
+  private static String missingInitParamMessage(String name) {
+    return "Missing config.ini parameter " + name + "; COBALT will not be available";
   }
 
 }

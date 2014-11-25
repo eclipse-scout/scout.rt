@@ -9,22 +9,26 @@ public final class WopiUtility {
   private WopiUtility() {
   }
 
-  //{59CCD75F-0687-4F86-BBCF-059126640640},1
+  /**
+   * @return wopi file version guid <code>{59CCD75F-0687-4F86-BBCF-059126640640},1</code>
+   */
   public static String createWopiFileVersion(FileInfo fi) {
     GregorianCalendar cal = new GregorianCalendar();
     cal.setTimeZone(TimeZone.getTimeZone("UTC"));
     cal.setTimeInMillis(fi.getLastModified());
     long t = cal.getTimeInMillis();
     byte[] a = new byte[8];
-    for (int i = 0; i < a.length; i++)
-    {
+    for (int i = 0; i < a.length; i++) {
       a[i] = (byte) (t & 0xff);
       t = t >> 8;
     }
     return "{00000000-0000-0000-0000-" + HexUtility.encodeHex(a) + "},1";
   }
 
+  /**
+   * @return wopi locale in the format de-CH, en-US
+   */
   public static String createWopiLocale(Locale locale) {
-    return locale.getLanguage() + "-" + locale.getCountry();//de-CH, en-US
+    return locale.getLanguage() + "-" + locale.getCountry();
   }
 }
