@@ -96,7 +96,7 @@ public class OfficeWebAppsService extends AbstractService implements IOfficeWebA
             continue;
           }
           String ext = actionNode.getStringAttribute("ext");
-          if (!app.getFileExtension().equals(ext)) {
+          if (!app.ext.equals(ext)) {
             continue;
           }
           String urlsrc = actionNode.getStringAttribute("urlsrc");

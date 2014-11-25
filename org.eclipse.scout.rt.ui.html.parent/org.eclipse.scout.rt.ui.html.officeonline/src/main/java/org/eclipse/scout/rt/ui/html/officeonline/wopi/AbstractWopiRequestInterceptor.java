@@ -31,7 +31,7 @@ import org.eclipse.scout.service.AbstractService;
  * The url /wopi/files/* should be open and is protected by the wopi-token in the url
  * <p>
  * Typical URLs have the form
- *
+ * 
  * <pre>
  * http://localhost:8080/.../wopi/files/fileid123?access_token=1&access_token_ttl=0
  * http://localhost:8080/.../wopi/files/fileid123/contents?access_token=1&access_token_ttl=0
@@ -94,7 +94,7 @@ public abstract class AbstractWopiRequestInterceptor extends AbstractService imp
       if (t instanceof IOException) {
         throw (IOException) t;
       }
-      throw new ServletException("Unexpected", e);
+      throw new ServletException("Unexpected", t);
     }
   }
 
