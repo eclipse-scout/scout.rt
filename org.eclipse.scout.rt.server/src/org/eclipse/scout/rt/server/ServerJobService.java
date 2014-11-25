@@ -66,7 +66,7 @@ public class ServerJobService extends AbstractService implements IServerJobServi
     if (!StringUtility.isNullOrEmpty(sessionName)) {
       return loadSessionClass(sessionName);
     }
-    LOG.error("No server session class defined: Set org.eclipse.scout.rt.server.ServerJobService#serverSessionClassName in your confit.ini ");
+    LOG.error("No server session class defined: Set org.eclipse.scout.rt.server.ServerJobService#serverSessionClassName in your config.ini.");
     //legacy support
     final String classNameByConvention = new ServerSessionClassFinder().findClassNameByConvention();
     if (classNameByConvention != null) {
