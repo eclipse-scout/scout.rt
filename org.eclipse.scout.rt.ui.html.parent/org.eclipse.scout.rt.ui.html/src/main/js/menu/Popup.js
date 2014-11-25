@@ -11,9 +11,9 @@ scout.Popup = function() {
 scout.Popup.prototype.render = function() {
   var $docBody = $('body');
   this.$body = $.makeDIV('popup-body');
-  this.$container = $.makeDIV('popup').
-    append(this.$body).
-    appendTo($docBody);
+  this.$container = $.makeDIV('popup')
+    .append(this.$body)
+    .appendTo($docBody);
   this._attachCloseHandler();
   return this.$container;
 };
@@ -40,9 +40,9 @@ scout.Popup.prototype.remove = function() {
 };
 
 scout.Popup.prototype.setLocation = function(location) {
-  this.$container.
-   css('left', location.x).
-   css('top', location.y);
+  this.$container
+    .css('left', location.x)
+    .css('top', location.y);
 };
 
 /** ---- PopupMenuItem ----
@@ -53,7 +53,7 @@ scout.PopupMenuItem = function($menuItem) {
   scout.PopupMenuItem.parent.call(this);
   this.$menuItem = $menuItem;
   this.$head;
-  this.deco;
+  this.$deco;
 };
 scout.inherits(scout.PopupMenuItem, scout.Popup);
 
@@ -61,9 +61,9 @@ scout.PopupMenuItem.prototype.render = function($parent) {
   scout.PopupMenuItem.parent.prototype.render($parent);
   this.$head = $.makeDIV('popup-head');
   this.$deco = $.makeDIV('popup-deco');
-  this.$container.
-    prepend(this.$head).
-    append(this.$deco);
+  this.$container
+    .prepend(this.$head)
+    .append(this.$deco);
 
   var text = this.$menuItem.text(),
     dataIcon = this.$menuItem.attr('data-icon');
@@ -115,18 +115,13 @@ scout.PopupMenuItem.prototype.alignTo = function() {
     left -= widthDiff + headInsets.left;
     this.$head.cssLeft(widthDiff);
     this.$body.cssLeft(subPixelCorr);
-    this.$deco.
-      cssLeft(widthDiff + 1).
-      width(headSize.width - 2 + subPixelCorr);
+    this.$deco.cssLeft(widthDiff + 1).width(headSize.width - 2 + subPixelCorr);
     $.log.debug('right alignment: widthDiff=' + widthDiff + ' subPixelCorr=' + subPixelCorr);
   } else {
     left -= headInsets.left;
     this.$head.cssLeft(0);
-    this.$deco.
-      cssLeft(1).
-      width(headSize.width - 2);
+    this.$deco.cssLeft(1).width(headSize.width - 2);
   }
 
   this.setLocation(new scout.Point(left, top));
 };
-

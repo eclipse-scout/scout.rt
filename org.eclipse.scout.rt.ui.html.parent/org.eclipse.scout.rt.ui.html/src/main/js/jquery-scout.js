@@ -5,10 +5,11 @@
 /*global console: false */
 (function($) {
 
+  // === $ extensions ===
+
   // chris' shortcut
   $.l = console.log.bind(console);
 
-  //== $ extensions
   $.makeDiv = function(id, cssClass, htmlContent) {
     if (id === 0) {
       //Allow 0 as id (!id would result in false)
@@ -76,7 +77,6 @@
     if (!text) {
       return text;
     }
-
     return text.replace(/\n/g,"<br>");
   };
 
@@ -84,11 +84,12 @@
     if (!text) {
       return text;
     }
-
     return text.replace('&', '');
   };
 
-  //== $.prototype extensions
+  // === $.prototype extensions ===
+
+  // FIXME BSH Cleanup 'div' methods: as ID variant is almost never used, remove it
 
   // prepend - and return new div for chaining
   $.fn.prependDiv = function(id, cssClass, htmlContent) {
@@ -129,7 +130,6 @@
   $.fn.beforeDIV = function(cssClass, htmlContent) {
     return $.makeDiv(undefined, cssClass, htmlContent).insertBefore(this);
   };
-
 
   // append svg
   $.fn.appendSVG = function(type, id, cssClass, htmlContent) {
