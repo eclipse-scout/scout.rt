@@ -21,7 +21,7 @@ import org.eclipse.scout.commons.TTLCache;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 
-public class WopiRoundtrip {
+public class WopiRoundtrip implements WopiConstants {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(WopiRoundtrip.class);
 
   private final TTLCache<String/*fileId*/, String/*lockId*/> m_fileLocks;
@@ -53,9 +53,9 @@ public class WopiRoundtrip {
   }
 
   public void handle() throws IOException {
-    boolean httpGet = "GET".equals(m_req.getMethod());
+    boolean httpGet = WopiConstants.GET.equals(m_req.getMethod());
     boolean httpPost = !httpGet;
-    if (m_tokens.length < 4 || !m_tokens[2].equals("files")) {
+    if (m_tokens.length < 4 || !FILES.equals(m_tokens[2])) {
       handleError(501);
       return;
     }
@@ -65,32 +65,32 @@ public class WopiRoundtrip {
       handleCheckFileInfo();
       return;
     }
-    if (httpGet && m_tokens.length == 5 && m_tokens[4].equals("contents"))
+    if (httpGet && m_tokens.length == 5 && CONTENTS.equals(m_tokens[4]))
     {
       handleGetFileContent();
       return;
     }
-    if (httpPost && m_tokens.length == 5 && m_tokens[4].equals("contents"))
+    if (httpPost && m_tokens.length == 5 && CONTENTS.equals(m_tokens[4]))
     {
-      handleSetFileContent(m_req.getHeader("X-WOPI-Lock"));
+      handleSetFileContent(m_req.getHeader(X_WOPI_LOCK));
       return;
     }
-    if (httpPost && m_tokens.length == 4 && "LOCK".equals(m_req.getHeader("X-WOPI-Override")))
+    if (httpPost && m_tokens.length == 4 && LOCK.equals(m_req.getHeader(X_WOPI_OVERRIDE)))
     {
-      handleLock(m_req.getHeader("X-WOPI-OldLock"), m_req.getHeader("X-WOPI-Lock"));
+      handleLock(m_req.getHeader(X_WOPI_OLDLOCK), m_req.getHeader(X_WOPI_LOCK));
       return;
     }
-    if (httpPost && m_tokens.length == 4 && "UNLOCK".equals(m_req.getHeader("X-WOPI-Override")))
+    if (httpPost && m_tokens.length == 4 && UNLOCK.equals(m_req.getHeader(X_WOPI_OVERRIDE)))
     {
-      handleUnlock(m_req.getHeader("X-WOPI-Lock"));
+      handleUnlock(m_req.getHeader(X_WOPI_LOCK));
       return;
     }
-    if (httpPost && m_tokens.length == 4 && "REFRESH_LOCK".equals(m_req.getHeader("X-WOPI-Override")))
+    if (httpPost && m_tokens.length == 4 && REFRESH_LOCK.equals(m_req.getHeader(X_WOPI_OVERRIDE)))
     {
-      handleRefreshLock(m_req.getHeader("X-WOPI-Lock"));
+      handleRefreshLock(m_req.getHeader(X_WOPI_LOCK));
       return;
     }
-    if (httpPost && m_tokens.length == 4 && "COBALT".equals(m_req.getHeader("X-WOPI-Override")))
+    if (httpPost && m_tokens.length == 4 && COBALT.equals(m_req.getHeader(X_WOPI_OVERRIDE)))
     {
       handleExecuteCellStorageRequest();
       return;
@@ -214,7 +214,7 @@ public class WopiRoundtrip {
     }
     m_fileLocks.put(m_fileInfo.getFileId(), lockId);
     writeWopiResponseHeaders();
-    m_res.setHeader("X-WOPI-OldLock", oldLockId);
+    m_res.setHeader(X_WOPI_OLDLOCK, oldLockId);
   }
 
   protected void handleUnlock(String lockId) throws IOException {
@@ -262,10 +262,10 @@ public class WopiRoundtrip {
   }
 
   protected void writeWopiResponseHeaders() throws IOException {
-    m_res.setHeader("X-WOPI-ServerVersion", "2");
-    m_res.setHeader("X-WOPI-MachineName", m_req.getLocalName());
-    //res.setHeader("X-WOPI-PerfTrace", "true");
-    //res.setHeader("X-WOPI-ServerError", "");
+    m_res.setHeader(X_WOPI_SERVERVERSION, "2");
+    m_res.setHeader(X_WOPI_MACHINENAME, m_req.getLocalName());
+    //res.setHeader(X_WOPI_PERFTRACE, "true");
+    //res.setHeader(X_WOPI_SERVERERROR, "");
   }
 
   protected void dumpHttpRequest() throws IOException {

@@ -29,7 +29,7 @@ public interface IOfficeWebAppsService extends IService {
   /**
    * registry of office web apps urls, for example
    * https://office-web-apps-server/hosting/discovery
-   * 
+   *
    * @return the url defined by {@link #CONFIG_INI_DISCOVERY_URL}
    */
   String getDiscoveryUrl();
@@ -44,23 +44,23 @@ public interface IOfficeWebAppsService extends IService {
   String createIFrameUrl(Zone zone, App app, Action action, String wopiSrcUrl, String accessToken) throws ProcessingException;
 
   enum Zone {
-    InternalHttps("internal-https"),
-    ExternalHttps("external-https");
+    INTERNAL_HTTPS("internal-https"),
+    EXTERNAL_HTTPS("external-https");
 
-    public final String xmlName;
+    private final String m_xmlName;
 
     private Zone(String xmlName) {
-      this.xmlName = xmlName;
+      m_xmlName = xmlName;
     }
 
     @Override
     public String toString() {
-      return xmlName;
+      return m_xmlName;
     }
 
     public static Zone parse(String name) {
       for (Zone elem : values()) {
-        if (elem.xmlName.equals(name)) {
+        if (elem.m_xmlName.equals(name)) {
           return elem;
         }
       }
@@ -69,26 +69,30 @@ public interface IOfficeWebAppsService extends IService {
   }
 
   enum App {
-    Word("Word", "docx"),
-    Excel("Excel", "xlsx"),
-    PowerPoint("PowerPoint", "pptx");
+    WORD("Word", "docx"),
+    EXCEL("Excel", "xlsx"),
+    POWERPOINT("PowerPoint", "pptx");
 
-    public final String xmlName;
-    public final String ext;
+    private final String m_xmlName;
+    private final String m_ext;
 
     private App(String xmlName, String ext) {
-      this.xmlName = xmlName;
-      this.ext = ext;
+      m_xmlName = xmlName;
+      m_ext = ext;
+    }
+
+    public String getFileExtension() {
+      return m_ext;
     }
 
     @Override
     public String toString() {
-      return xmlName;
+      return m_xmlName;
     }
 
     public static App parse(String name) {
       for (App elem : values()) {
-        if (elem.xmlName.equals(name)) {
+        if (elem.m_xmlName.equals(name)) {
           return elem;
         }
       }
@@ -98,26 +102,26 @@ public interface IOfficeWebAppsService extends IService {
   }
 
   enum Action {
-    View("view"),
-    EmbedView("embedview"),
-    Edit("edit"),
-    EditNew("editnew"),
-    MobileView("mobileView");
+    VIEW("view"),
+    EMBED_VIEW("embedview"),
+    EDIT("edit"),
+    EDIT_NEW("editnew"),
+    MOBILE_VIEW("mobileView");
 
-    public final String xmlName;
+    private final String m_xmlName;
 
     private Action(String xmlName) {
-      this.xmlName = xmlName;
+      m_xmlName = xmlName;
     }
 
     @Override
     public String toString() {
-      return xmlName;
+      return m_xmlName;
     }
 
     public static Action parse(String name) {
       for (Action elem : values()) {
-        if (elem.xmlName.equals(name)) {
+        if (elem.m_xmlName.equals(name)) {
           return elem;
         }
       }
