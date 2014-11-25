@@ -139,16 +139,16 @@
   }
 }
 
-
 .taskbar-logo {
   float: right;
   margin-top: 8px;
   margin-left: 20px;
   margin-right: 13px;
-  width: 40px; /* original size 225px ;*/
+  width: 40px;
   height: 33px;
   background: url("logo.png");
-  background-size: cover;
+  background-size: contain;
+  background-repeat: no-repeat;
 }
 
 /* table / form */
