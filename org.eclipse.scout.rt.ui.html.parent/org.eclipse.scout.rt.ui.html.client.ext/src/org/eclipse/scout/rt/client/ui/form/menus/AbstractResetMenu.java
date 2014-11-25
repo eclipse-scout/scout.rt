@@ -38,8 +38,4 @@ public abstract class AbstractResetMenu extends AbstractMenu5 {
     return ScoutTexts.get("ResetButton");
   }
 
-  @Override
-  protected String getConfiguredTooltipText() {
-    return ScoutTexts.get("ResetButtonTooltip");
-  }
 }

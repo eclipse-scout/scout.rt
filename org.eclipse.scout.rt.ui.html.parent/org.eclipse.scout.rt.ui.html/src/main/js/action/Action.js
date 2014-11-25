@@ -12,6 +12,7 @@ scout.Action.prototype._renderProperties = function() {
   this._renderKeystroke(this.keystroke);
   this._renderEnabled(this.enabled);
   this._renderSelected(this.selected);
+  this._renderVisible(this.visible);
 };
 
 scout.Action.prototype._renderText = function(text) {
@@ -25,12 +26,15 @@ scout.Action.prototype._renderIconId = function(iconId) {
 };
 
 scout.Action.prototype._renderEnabled = function(enabled) {
-  if (enabled) {
-    this.$container.on('mousedown', '', this._onMouseDown.bind(this));
-  } else {
-    this.$container.off('mousedown');
-  }
   this.$container.setEnabled(enabled);
+};
+
+scout.Action.prototype._renderVisible = function(enabled) {
+  this.$container.setVisible(enabled);
+};
+
+scout.Action.prototype._renderSelected = function(selected) {
+  this.$container.select(selected);
 };
 
 scout.Action.prototype._renderKeystroke = function(keystroke) {
@@ -42,7 +46,7 @@ scout.Action.prototype._renderTooltipText = function(tooltipText) {
   if (tooltipText && !this.hoverBound) {
     this.$container.hover(this._onHoverIn.bind(this), this._onHoverOut.bind(this));
     this.hoverBound = true;
-  } else if (!tooltipText && this.hoverBound){
+  } else if (!tooltipText && this.hoverBound) {
     this.$container.off('mouseenter mouseleave');
     this.hoverBound = false;
   }
@@ -69,7 +73,8 @@ scout.Action.prototype._configureTooltip = function() {
     text: this.tooltipText,
     $origin: this.$container,
     arrowPosition: 50,
-    arrowPositionUnit: '%'
+    arrowPositionUnit: '%',
+    position: this.tooltipPosition
   };
 };
 
@@ -78,4 +83,22 @@ scout.Action.prototype._removeTooltip = function() {
     this.tooltip.remove();
     this.tooltip = null;
   }
+};
+
+scout.Action.prototype._goOffline = function() {
+  this._renderEnabled(false);
+};
+
+scout.Action.prototype._goOnline = function() {
+  this._renderEnabled(true);
+};
+
+scout.Action.prototype.sendDoAction = function() {
+  this.session.send('doAction', this.id);
+};
+
+scout.Action.prototype.sendSelected = function(selected) {
+  this.session.send('selected', this.id, {
+    selected: selected
+  });
 };

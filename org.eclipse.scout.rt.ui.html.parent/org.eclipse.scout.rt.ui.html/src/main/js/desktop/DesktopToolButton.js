@@ -32,9 +32,7 @@ scout.DesktopToolButton.prototype.setSelected = function(selected) {
   }
 
   this.selected = selected;
-  this.session.send('selected', this.id, {
-    selected: selected
-  });
+  this.sendSelected(selected);
   this._renderSelected(this.selected);
 };
 
@@ -100,4 +98,13 @@ scout.DesktopToolButton.prototype._renderSelected = function(selected) {
       this.desktop.selectedTool = null;
     }
   }
+};
+
+scout.DesktopToolButton.prototype._renderEnabled = function(enabled) {
+  if (enabled) {
+    this.$container.on('mousedown', '', this._onMouseDown.bind(this));
+  } else {
+    this.$container.off('mousedown');
+  }
+  this.$container.setEnabled(enabled);
 };

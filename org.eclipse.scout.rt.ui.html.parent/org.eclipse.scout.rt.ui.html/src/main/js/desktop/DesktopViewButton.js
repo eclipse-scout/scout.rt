@@ -47,18 +47,14 @@ scout.DesktopViewButton.prototype._renderOutline = function(outline) {
   // nop
 };
 
-scout.DesktopViewButton.prototype.goOffline = function() {
-  scout.DesktopViewButton.parent.prototype.goOffline.call(this);
-
+scout.DesktopViewButton.prototype._goOffline = function() {
   //Disable if outline has not been loaded yet
   if (!this.outline) {
     this._renderEnabled(false);
   }
 };
 
-scout.DesktopViewButton.prototype.goOnline = function() {
-  scout.DesktopViewButton.parent.prototype.goOnline.call(this);
-
+scout.DesktopViewButton.prototype._goOnline = function() {
   if (this.enabled) {
     this._renderEnabled(true);
   }

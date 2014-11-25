@@ -277,6 +277,11 @@ scout.ModelAdapter.prototype.goOffline = function() {
     }
     this.children[i].goOffline();
   }
+  this._goOffline();
+};
+
+scout.ModelAdapter.prototype._goOffline = function() {
+  // NOP may be implemented by subclasses
 };
 
 scout.ModelAdapter.prototype.goOnline = function() {
@@ -288,4 +293,9 @@ scout.ModelAdapter.prototype.goOnline = function() {
     }
     this.children[i].goOnline();
   }
+  this._goOnline();
+};
+
+scout.ModelAdapter.prototype._goOnline = function() {
+  // NOP may be implemented by subclasses
 };

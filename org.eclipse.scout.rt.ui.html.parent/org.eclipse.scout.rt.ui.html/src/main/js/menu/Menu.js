@@ -3,33 +3,25 @@ scout.Menu = function() {
   this.childMenus = [];
   this._addAdapterProperties('childMenus');
 };
-//FIXME CGU extend from Action.js
-scout.inherits(scout.Menu, scout.ModelAdapter);
-
-scout.Menu.EVENT_ABOUT_TO_SHOW = 'aboutToShow';
-scout.Menu.EVENT_MENU_ACTION = 'menuAction';
+scout.inherits(scout.Menu, scout.Action);
 
 scout.Menu.prototype.sendAboutToShow = function(event) {
-  this.session.send(scout.Menu.EVENT_ABOUT_TO_SHOW, this.id);
-};
-
-scout.Menu.prototype.sendMenuAction = function(event) {
-  this.session.send(scout.Menu.EVENT_MENU_ACTION, this.id);
+  this.session.send('aboutToShow', this.id);
 };
 
 scout.Menu.prototype._render = function($parent) {
   if (this.hasButtonStyle()) {
-    this.$container = $('<button>').
-      appendTo($parent).
-      addClass('menu-button').
-      on('click', '', onClicked.bind(this));
+    this.$container = $('<button>')
+      .appendTo($parent)
+      .addClass('menu-button')
+      .on('click', '', onClicked.bind(this));
     if (this.defaultMenu) {
       this.$container.addClass('default-button');
     }
   } else {
-    this.$container = $parent.
-       appendDIV('menu-item').
-       on('click', '', onClicked.bind(this));
+    this.$container = $parent
+      .appendDIV('menu-item')
+      .on('click', '', onClicked.bind(this));
   }
 
   if ('taskbar' === this.menuStyle) {
@@ -58,49 +50,21 @@ scout.Menu.prototype._onMenuClicked = function(event) {
     scout.menus.appendMenuItems(popup, this.children);
     popup.alignTo();
   } else {
-    this.sendMenuAction();
+    this.sendDoAction();
   }
-};
-
-scout.Menu.prototype._renderProperties = function() {
-  this._renderText(this.text);
-  this._renderIconId(this.iconId);
-  this._renderEnabled(this.enabled);
-  this._renderVisible(this.visible);
 };
 
 scout.Menu.prototype._renderText = function(text) {
-  if (!text) {
-    text = '';
-  }
-  this.$container.text(text);
+  scout.Menu.parent.prototype._renderText.call(this, text);
+  this._updateIconAndTextStyle();
+};
+
+scout.Menu.prototype._renderIconId = function(iconId) {
+  scout.Menu.parent.prototype._renderIconId.call(this, iconId);
   this._updateIconAndTextStyle();
 };
 
 scout.Menu.prototype._updateIconAndTextStyle = function() {
   var textAndIcon = (this.text && this.text.length > 0 && this.iconId);
-  this.$container.toggleClass('menu-textandicon', !!textAndIcon);
-};
-
-scout.Menu.prototype._renderIconId = function(iconId) {
-  this.$container.icon(iconId);
-  this._updateIconAndTextStyle();
-};
-
-scout.Menu.prototype._renderEnabled = function(enabled) {
-  this.$container.setEnabled(enabled);
-};
-
-scout.Menu.prototype._renderVisible = function(visible) {
-  this.$container.setVisible(visible);
-};
-
-scout.Menu.prototype.goOffline = function() {
-  scout.Menu.parent.prototype.goOffline.call(this);
-  this._renderEnabled(false);
-};
-
-scout.Menu.prototype.goOnline = function() {
-  scout.Menu.parent.prototype.goOnline.call(this);
-  this._renderEnabled(true);
+  this.$container.toggleClass('menu-textandicon', !! textAndIcon);
 };

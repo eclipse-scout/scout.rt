@@ -10,6 +10,7 @@ scout.Tooltip = function(options) {
   this.autoRemove = options.autoRemove !== undefined ? options.autoRemove : true;
   this.$context = options.$context;
   this.cssClass = options.cssClass;
+  this.tooltipPosition = options.position || 'top';
 };
 
 scout.Tooltip.prototype.render = function($parent) {
@@ -77,7 +78,7 @@ scout.Tooltip.prototype.position = function() {
   }
 
   //Move tooltip to the bottom, arrow on top
-  if (overlapY < 0) {
+  if (this.tooltipPosition === 'bottom' || overlapY < 0) {
     this.$arrow.addClass('arrow-top');
     top = y + origin.height + arrowHeight;
   } else {
@@ -85,9 +86,9 @@ scout.Tooltip.prototype.position = function() {
   }
 
   this.$arrow.cssLeft(this.arrowPosition);
-  this.$container.
-    cssLeft(left).
-    cssTop(top);
+  this.$container
+    .cssLeft(left)
+    .cssTop(top);
 };
 
 scout.Tooltip.computeHypotenuse = function(x) {
@@ -111,14 +112,14 @@ scout.Tooltip.prototype._onTooltipClicked = function(event) {
  * Removes every tooltip which belongs to one of the given $contexts
  */
 scout.Tooltip.removeTooltips = function($contexts, $parent) {
-  var $context,  $tooltips;
+  var $context, $tooltips, i, j;
   if (!$parent) {
     $parent = $('body');
   }
   $tooltips = $parent.find('.tooltip');
 
-  for (var i=0; i < $tooltips.length; i++) {
-    for (var j=0; j < $contexts.length; j++) {
+  for (i = 0; i < $tooltips.length; i++) {
+    for (j = 0; j < $contexts.length; j++) {
       $context = $tooltips.eq(i).data('tooltipContext');
 
       if ($context[0] === $contexts.eq(j)[0]) {

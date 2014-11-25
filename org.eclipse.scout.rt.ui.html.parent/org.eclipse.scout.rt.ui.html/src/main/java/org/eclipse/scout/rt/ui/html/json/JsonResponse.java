@@ -65,7 +65,6 @@ public class JsonResponse {
     }
 
     // If text is null it won't be transferred -> set to empty string
-    // FIXME CGU check if it is necessary on client to convert '' to null. Maybe not because !value also checks for empty string
     if (newValue == null) {
       newValue = "";
     }

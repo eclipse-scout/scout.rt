@@ -131,6 +131,10 @@
     color: @disabled-color;
   }
 
+  &[data-icon].disabled:before {
+    color: @disabled-color;
+  }
+
   &:not(.last) {
     margin-right: @menu-item-margin-right;
   }
@@ -156,7 +160,6 @@
 
 .menu-right {
   float: right;
-  height: 23px;
 
   &:not(.last) {
     margin-right: 33px;

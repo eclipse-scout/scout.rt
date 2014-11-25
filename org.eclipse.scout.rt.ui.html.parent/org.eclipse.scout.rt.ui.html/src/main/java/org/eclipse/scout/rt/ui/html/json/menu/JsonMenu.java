@@ -15,18 +15,16 @@ import java.util.Set;
 
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
-import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.shared.ui.menu.IMenu5;
-import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
+import org.eclipse.scout.rt.ui.html.json.action.JsonAction;
 import org.json.JSONObject;
 
-public class JsonMenu<T extends IMenu> extends AbstractJsonPropertyObserver<T> {
+public class JsonMenu<T extends IMenu> extends JsonAction<T> {
 
-  public static final String EVENT_MENU_ACTION = "menuAction";
   public static final String EVENT_ABOUT_TO_SHOW = "aboutToShow";
   public static final String PROP_SEPARATOR = "separator";
   public static final String PROP_MENU_TYPES = "menuTypes";
@@ -40,31 +38,7 @@ public class JsonMenu<T extends IMenu> extends AbstractJsonPropertyObserver<T> {
   @Override
   protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
-    putJsonProperty(new JsonProperty<IMenu>(IMenu.PROP_TEXT, model) {
-      @Override
-      protected String modelValue() {
-        return getModel().getText();
-      }
-    });
-    putJsonProperty(new JsonProperty<IMenu>(IMenu.PROP_ICON_ID, model) {
-      @Override
-      protected String modelValue() {
-        return getModel().getIconId();//FIXME CGU how to handle resources?
-      }
-    });
 
-    putJsonProperty(new JsonProperty<IMenu>(IMenu.PROP_ENABLED, model) {
-      @Override
-      protected Boolean modelValue() {
-        return getModel().isEnabled();
-      }
-    });
-    putJsonProperty(new JsonProperty<IMenu>(IFormField.PROP_VISIBLE, model) {
-      @Override
-      protected Boolean modelValue() {
-        return getModel().isVisible();
-      }
-    });
     putJsonProperty(new JsonProperty<IMenu>(PROP_SEPARATOR, model) {
       @Override
       protected Boolean modelValue() {
@@ -135,16 +109,12 @@ public class JsonMenu<T extends IMenu> extends AbstractJsonPropertyObserver<T> {
 
   @Override
   public void handleUiEvent(JsonEvent event, JsonResponse res) {
-    if (EVENT_MENU_ACTION.equals(event.getType())) {
-      handleUiMenuAction(event, res);
-    }
-    else if (EVENT_ABOUT_TO_SHOW.equals(event.getType())) {
+    if (EVENT_ABOUT_TO_SHOW.equals(event.getType())) {
       handleUiMenuAboutToShow(event, res);
     }
-  }
-
-  public void handleUiMenuAction(JsonEvent event, JsonResponse res) {
-    getModel().getUIFacade().fireActionFromUI();
+    else {
+      super.handleUiEvent(event, res);
+    }
   }
 
   public void handleUiMenuAboutToShow(JsonEvent event, JsonResponse res) {

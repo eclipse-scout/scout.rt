@@ -36,11 +36,6 @@ public abstract class AbstractOkMenu extends AbstractMenu5 {
   }
 
   @Override
-  protected String getConfiguredTooltipText() {
-    return ScoutTexts.get("OkButtonTooltip");
-  }
-
-  @Override
   protected boolean getConfiguredIsDefault() {
     return true;
   }

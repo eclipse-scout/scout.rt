@@ -206,14 +206,11 @@ scout.FormField.prototype._hideStatusMessage = function() {
   }
 };
 
-scout.FormField.prototype.goOffline = function() {
-  scout.FormField.parent.prototype.goOffline.call(this);
+scout.FormField.prototype._goOffline = function() {
   this._renderEnabled(false);
 };
 
-scout.FormField.prototype.goOnline = function() {
-  scout.FormField.parent.prototype.goOnline.call(this);
-
+scout.FormField.prototype._goOnline = function() {
   if (this.enabled) {
     this._renderEnabled(true);
   }

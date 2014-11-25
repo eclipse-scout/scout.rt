@@ -1,6 +1,6 @@
 scout.Menubar = function($parent, options) {
   options = options || {};
-  var position = options.position || 'top';
+  this.position = options.position || 'top';
 
   this.menus = [];
   this.lastMenu;
@@ -10,7 +10,7 @@ scout.Menubar = function($parent, options) {
   this.staticMenus = [];
 
   this.$container = $.makeDIV('menubar').hide();
-  if (position === 'top') {
+  if (this.position === 'top') {
     $parent.prepend(this.$container);
   } else {
     this.$container.addClass('bottom');
@@ -96,6 +96,7 @@ scout.Menubar.prototype.updateItems = function(menus) {
 };
 
 scout.Menubar.prototype._addMenuItem = function(menu) {
+  menu.tooltipPosition = this.position === 'top' ? 'bottom' : 'top';
   menu.render(this.$container);
   if (scout.menus.checkType(menu, this.menuTypesForRight)) {
     menu.$container.addClass('menu-right');

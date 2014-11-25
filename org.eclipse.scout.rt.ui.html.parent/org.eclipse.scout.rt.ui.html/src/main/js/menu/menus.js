@@ -92,7 +92,7 @@ scout.menus.appendMenuItems = function(popup, menus) {
     onMenuItemClicked = function() {
       var menu = $(this).data('menu');
       popup.remove();
-      menu.sendMenuAction();
+      menu.sendDoAction();
     };
 
   for (i = 0; i < menus.length; i++) {

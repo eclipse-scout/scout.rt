@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.basic.table.menus;
 
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
+import org.eclipse.scout.rt.shared.TEXTS;
 
 @ClassId("b4810839-8bfd-42ba-b295-5df38241bb3c")
 public class TableOrganizeMenu extends OrganizeColumnsMenu {
@@ -23,6 +24,11 @@ public class TableOrganizeMenu extends OrganizeColumnsMenu {
   @Override
   protected String getConfiguredIconId() {
     return "\uE031";
+  }
+
+  @Override
+  protected String getConfiguredTooltipText() {
+    return TEXTS.get("TableOrganize");
   }
 
   @Override

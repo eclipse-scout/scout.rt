@@ -35,8 +35,4 @@ public abstract class AbstractCancelMenu extends AbstractMenu5 {
     return ScoutTexts.get("CancelButton"); //TODO change to CancelMenu
   }
 
-  @Override
-  protected String getConfiguredTooltipText() {
-    return ScoutTexts.get("CancelButtonTooltip");
-  }
 }

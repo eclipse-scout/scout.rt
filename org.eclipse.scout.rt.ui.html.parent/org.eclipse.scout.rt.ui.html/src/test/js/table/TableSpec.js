@@ -558,7 +558,7 @@ describe("Table", function() {
       sendQueuedAjaxCalls();
 
       var requestData = mostRecentJsonRequest();
-      var event = new scout.Event(scout.Menu.EVENT_ABOUT_TO_SHOW, menuModel.id);
+      var event = new scout.Event('aboutToShow', menuModel.id);
       expect(requestData).toContainEvents(event);
     });
 

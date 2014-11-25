@@ -15,9 +15,7 @@ scout.BaseDesktop.prototype.showMessage = function(message, type) {
   this.$message.text(message);
 };
 
-scout.BaseDesktop.prototype.goOffline = function() {
-  scout.BaseDesktop.parent.prototype.goOffline.call(this);
-
+scout.BaseDesktop.prototype._goOffline = function() {
   var message = scout.texts.get('connectionInterrupted'),
     $reconnect;
 
@@ -36,9 +34,7 @@ scout.BaseDesktop.prototype.goOffline = function() {
   }
 };
 
-scout.BaseDesktop.prototype.goOnline = function() {
-  scout.BaseDesktop.parent.prototype.goOnline.call(this);
-
+scout.BaseDesktop.prototype._goOnline = function() {
   if (!this.hideOfflineMessagePending) {
     this.hideOfflineMessage();
   }

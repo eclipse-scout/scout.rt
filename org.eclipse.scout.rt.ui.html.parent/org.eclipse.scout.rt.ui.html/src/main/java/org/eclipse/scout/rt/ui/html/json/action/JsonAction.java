@@ -20,6 +20,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.PropertyChangeEventFilterCondition;
 
 public class JsonAction<T extends IAction> extends AbstractJsonPropertyObserver<T> {
+  public static final String EVENT_DO_ACTION = "doAction";
 
   public JsonAction(T model, IJsonSession jsonSession, String id) {
     super(model, jsonSession, id);
@@ -68,6 +69,13 @@ public class JsonAction<T extends IAction> extends AbstractJsonPropertyObserver<
       }
     });
 
+    putJsonProperty(new JsonProperty<T>(IAction.PROP_VISIBLE, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isVisible();
+      }
+    });
+
     putJsonProperty(new JsonProperty<T>(IAction.PROP_KEYSTROKE, model) {
       @Override
       protected String modelValue() {
@@ -78,9 +86,16 @@ public class JsonAction<T extends IAction> extends AbstractJsonPropertyObserver<
 
   @Override
   public void handleUiEvent(JsonEvent event, JsonResponse res) {
-    if (IAction.PROP_SELECTED.equals(event.getType())) {
+    if (EVENT_DO_ACTION.equals(event.getType())) {
+      handleUiDoAction(event, res);
+    }
+    else if (IAction.PROP_SELECTED.equals(event.getType())) {
       handleUiSelected(event);
     }
+  }
+
+  public void handleUiDoAction(JsonEvent event, JsonResponse res) {
+    getModel().getUIFacade().fireActionFromUI();
   }
 
   protected void handleUiSelected(JsonEvent event) {

@@ -113,9 +113,7 @@ scout.TableControl.prototype.setSelected = function(selected, closeWhenUnselecte
   }
 
   this.selected = selected;
-  this.session.send('selected', this.id, {
-    selected: selected
-  });
+  this.sendSelected(selected);
   this._renderSelected(this.selected, closeWhenUnselected);
 };
 
@@ -144,23 +142,28 @@ scout.TableControl.prototype._renderSelected = function(selected, closeWhenUnsel
   }
 };
 
+scout.TableControl.prototype._renderEnabled = function(enabled) {
+  if (enabled) {
+    this.$container.on('mousedown', '', this._onMouseDown.bind(this));
+  } else {
+    this.$container.off('mousedown');
+  }
+  this.$container.setEnabled(enabled);
+};
+
 scout.TableControl.prototype._configureTooltip = function() {
   var options = scout.TableControl.parent.prototype._configureTooltip.call(this);
   options.cssClass = 'table-control';
   return options;
 };
 
-scout.TableControl.prototype.goOffline = function() {
-  scout.TableControl.parent.prototype.goOffline.call(this);
-
+scout.TableControl.prototype._goOffline = function() {
   if (!this.isContentAvailable()) {
     this._renderEnabled(false);
   }
 };
 
-scout.TableControl.prototype.goOnline = function() {
-  scout.TableControl.parent.prototype.goOnline.call(this);
-
+scout.TableControl.prototype._goOnline = function() {
   if (!this.isContentAvailable() && this.enabled) {
     this._renderEnabled(true);
   }
