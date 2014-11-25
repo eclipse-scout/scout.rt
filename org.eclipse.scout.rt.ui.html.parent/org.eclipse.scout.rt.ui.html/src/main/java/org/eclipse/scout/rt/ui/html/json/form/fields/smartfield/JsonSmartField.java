@@ -32,15 +32,15 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class JsonSmartField<T extends ISmartField> extends JsonValueField<T> {
+public class JsonSmartField<V, T extends ISmartField<V>> extends JsonValueField<T> {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonSmartField.class);
-  private static final String PROP_CACHING_ENABLED = "cachingEnabled";
+  private static final String PROP_LOOKUP_STRATEGY = "lookupStrategy";
   private static final String PROP_OPTIONS = "options";
   private static final String PROP_MULTI_LINE = "multiline";
   private static final int MAX_OPTIONS = 100;
 
-  private List<? extends ILookupRow<?>> m_options = new ArrayList<>();
+  private List<? extends ILookupRow<V>> m_options = new ArrayList<>();
 
   public JsonSmartField(T model, IJsonSession session, String id) {
     super(model, session, id);
@@ -49,29 +49,28 @@ public class JsonSmartField<T extends ISmartField> extends JsonValueField<T> {
   @Override
   protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
-    // TODO AWE: (smartfield) prüfen ob wir die properties brauchen oder
-    // ob wir's über den objectType lösen wollen
     putJsonProperty(new JsonProperty<ISmartField<?>>(PROP_MULTI_LINE, model) {
       @Override
       protected Boolean modelValue() {
         return isMultiline();
       }
     });
-    putJsonProperty(new JsonProperty<ISmartField<?>>(PROP_CACHING_ENABLED, model) {
+    putJsonProperty(new JsonProperty<ISmartField<?>>(PROP_LOOKUP_STRATEGY, model) {
       @Override
-      protected Boolean modelValue() {
-        return isCachingEnabled();
+      protected String modelValue() {
+        return getLookupStrategy();
       }
     });
     putJsonProperty(new JsonProperty<ISmartField<?>>(PROP_OPTIONS, model) {
       @Override
-      protected List<? extends ILookupRow<?>> modelValue() {
+      protected List<? extends ILookupRow<V>> modelValue() {
         return m_options;
       }
 
       @Override
+      @SuppressWarnings("unchecked")
       public Object prepareValueForToJson(Object value) {
-        return optionsToJson((List<? extends ILookupRow<?>>) value);
+        return optionsToJson((List<ILookupRow<V>>) value);
       }
     });
   }
@@ -81,11 +80,8 @@ public class JsonSmartField<T extends ISmartField> extends JsonValueField<T> {
     if (isMultiline()) {
       return "SmartFieldMultiline";
     }
-    else if (isCachingEnabled()) {
-      return "SmartField";
-    }
     else {
-      return "SmartFieldRemote";
+      return "SmartField";
     }
   }
 
@@ -94,12 +90,12 @@ public class JsonSmartField<T extends ISmartField> extends JsonValueField<T> {
     super.attachModel();
     m_options = isCachingEnabled() ?
         loadOptions(IContentAssistField.BROWSE_ALL_TEXT) :
-        Collections.<ILookupRow<?>> emptyList();
+        Collections.<ILookupRow<V>> emptyList();
   }
 
-  private JSONArray optionsToJson(List<? extends ILookupRow<?>> options) {
+  private JSONArray optionsToJson(List<? extends ILookupRow<V>> options) {
     JSONArray optionsArray = new JSONArray();
-    for (ILookupRow<?> lr : options) {
+    for (ILookupRow<V> lr : options) {
       optionsArray.put(lr.getText());
     }
     return optionsArray;
@@ -117,6 +113,10 @@ public class JsonSmartField<T extends ISmartField> extends JsonValueField<T> {
     return getModel().getClass().isAnnotationPresent(CachingEnabled.class);
   }
 
+  private String getLookupStrategy() {
+    return isCachingEnabled() ? "cached" : "remote";
+  }
+
   private boolean isMultiline() {
     return getModel().getClass().isAnnotationPresent(Multiline.class);
   }
@@ -127,7 +127,7 @@ public class JsonSmartField<T extends ISmartField> extends JsonValueField<T> {
     return putProperty(json, PROP_OPTIONS, loadOptions(IContentAssistField.BROWSE_ALL_TEXT));
   }
 
-  private List<? extends ILookupRow<?>> loadOptions(final String query) {
+  private List<? extends ILookupRow<V>> loadOptions(final String query) {
     try {
       m_options = getModel().callBrowseLookup(query, MAX_OPTIONS);
       return m_options;
@@ -157,10 +157,11 @@ public class JsonSmartField<T extends ISmartField> extends JsonValueField<T> {
   @Override
   protected void handleUiDisplayTextChangedImpl(String displayText, boolean whileTyping) {
     if (StringUtility.isNullOrEmpty(displayText)) {
-      getModel().setValue(null);
+      T model = getModel();
+      model.setValue(null);
     }
     else {
-      for (ILookupRow<?> lr : m_options) {
+      for (ILookupRow<V> lr : m_options) {
         if (displayText.equals(lr.getText())) {
           getModel().setValue(lr.getKey());
           break;

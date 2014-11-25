@@ -78,9 +78,9 @@
 //@include("form/fields/richtextfield/RichTextField.js");
 //@include("form/fields/stringfield/StringField.js");
 //@include("form/fields/smartfield/AbstractSmartField.js");
+//@include("form/fields/smartfield/LookupStrategy.js");
 //@include("form/fields/smartfield/SmartField.js");
 //@include("form/fields/smartfield/SmartFieldMultiline.js");
-//@include("form/fields/smartfield/SmartFieldRemote.js");
 //@include("form/fields/tagcloudfield/TagCloudField.js");
 //@include("form/fields/datefield/DateField.js");
 //@include("form/fields/datefield/DatePicker.js");

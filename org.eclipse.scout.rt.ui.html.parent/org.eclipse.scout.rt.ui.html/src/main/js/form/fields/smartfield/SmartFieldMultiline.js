@@ -1,7 +1,5 @@
-// TODO AWE: (smartfield) multiline oder remote muss zu einem behavior werden
-// weil single/multi und local/remote in beliebigen kombinationen kommen können
-scout.SmartFieldMultiline = function() {
-  scout.SmartFieldMultiline.parent.call(this);
+scout.SmartFieldMultiline = function(lookupStrategy) {
+  scout.SmartFieldMultiline.parent.call(this, lookupStrategy);
   this.options;
   this._$multilineField;
 };
@@ -24,31 +22,6 @@ scout.SmartFieldMultiline.prototype._render = function($parent) {
   this._$multilineField = $.makeDIV('multiline-field', '<br/><br/>').
     appendTo($fieldContainer);
   this.addStatus();
-};
-
-// FIXME AWE: (smartfield) remove copy&paste when todo in header is solved
-scout.SmartFieldMultiline.prototype._filterOptionsImpl = function(query) {
-  var match, numVisibleOptions = 0,
-    showAll = !query || '*' === query,
-    regexp = new RegExp(query, 'im');
-  this._get$Options().each(function() {
-    if (showAll) {
-      $(this).setVisible(true);
-    } else {
-      match = $(this).html().match(regexp);
-      if (match) { numVisibleOptions++; }
-      $.log.debug('regexp='+regexp + ' html='+$(this).html());
-      $(this).setVisible(match);
-    }
-  });
-  if (showAll) { numVisibleOptions = this.options.length; }
-  this._setStatusText(numVisibleOptions);
-};
-
-scout.SmartFieldMultiline.prototype._openPopup = function() {
-  var numOptions = this.options.length;
-  this._showPopup(Math.min(10, numOptions), numOptions);
-  this._renderOptions(this.options);
 };
 
 //@override ValueField.js

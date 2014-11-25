@@ -11,15 +11,9 @@ describe("ObjectFactory", function() {
         objectType: factory.objectType
       };
 
-      object = null;
-      try {
-        object = factory.create();
-        object.init(model, session);
-        session.registerModelAdapter(object); //FIXME CGU remove after moving to constructor
-      } catch (e) {
-        //Object probably not registered, check SpecRunnerMaven.html
-        expect(object).toBeTruthy();
-      }
+      object = factory.create(model);
+      object.init(model, session);
+      session.registerModelAdapter(object);
 
       modelAdapter = session.getModelAdapter(model.id);
       expect(modelAdapter).toBe(object);
@@ -27,16 +21,14 @@ describe("ObjectFactory", function() {
   }
 
   it("creates objects which are getting registered in the widget map", function() {
-    var session = new scout.Session($('#sandbox'), '1.1');
-    var factories = scout.defaultObjectFactories;
-
+    var session = new scout.Session($('#sandbox'), '1.1'),
+      factories = scout.defaultObjectFactories;
     verifyCreationAndRegistration(session, factories);
   });
 
   it("distinguishes between mobile and desktop objects", function() {
-    var session = new scout.Session($('#sandbox'), '1.1');
-    var factories = scout.mobileObjectFactories;
-
+    var session = new scout.Session($('#sandbox'), '1.1'),
+      factories = scout.mobileObjectFactories;
     verifyCreationAndRegistration(session, factories);
   });
 

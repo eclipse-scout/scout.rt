@@ -26,7 +26,7 @@ scout.ObjectFactory.prototype.create = function(model) {
   if (!factory) {
     throw new Error('No factory registered for objectType ' + model.objectType);
   }
-  var object = factory.create();
+  var object = factory.create(model);
   object.init(model, this.session);
   return object;
 };
@@ -198,18 +198,15 @@ scout.defaultObjectFactories = [{
   }
 }, {
   objectType: 'SmartField',
-  create: function() {
-    return new scout.SmartField();
+  create: function(model) {
+    return new scout.SmartField('remote' === model.lookupStrategy ?
+        new scout.RemoteLookupStrategy() : new scout.CachedLookupStrategy());
   }
 }, {
   objectType: 'SmartFieldMultiline',
-  create: function() {
-    return new scout.SmartFieldMultiline();
-  }
-}, {
-  objectType: 'SmartFieldRemote',
-  create: function() {
-    return new scout.SmartFieldRemote();
+  create: function(model) {
+    return new scout.SmartFieldMultiline('remote' === model.lookupStrategy ?
+        new scout.RemoteLookupStrategy() : new scout.CachedLookupStrategy());
   }
 }, {
   objectType: 'DateField',

@@ -1,10 +1,13 @@
-scout.AbstractSmartField = function() {
+scout.AbstractSmartField = function(lookupStrategy) {
   scout.AbstractSmartField.parent.call(this);
   this._$popup;
   this._$viewport;
   this.options;
   this._selectedOption = -1;
   this._oldVal;
+  this._lookupStrategy = lookupStrategy;
+
+  lookupStrategy._smartField = this;
 };
 scout.inherits(scout.AbstractSmartField, scout.ValueField);
 
@@ -45,7 +48,6 @@ scout.AbstractSmartField.prototype._isNavigationKey = function(e) {
 };
 
 scout.AbstractSmartField.prototype._onClick = function(e) {
-  // FIXME AWE: (smartfield) continue... options not loaded on click!
   if (!this._$popup) {
     setTimeout(function() {
       this._openPopup();
@@ -114,7 +116,7 @@ scout.AbstractSmartField.prototype._onKeyup = function(e) {
   }
 
   // ensure popup is opened for following operations
-  if (!this._$popup) {
+  if (!this._$popup) { // FIXME AWE: können wir hier copy/paste reduzieren?
     setTimeout(function() {
       this._openPopup();
     }.bind(this));
@@ -143,7 +145,7 @@ scout.AbstractSmartField.prototype._filterOptions = function() {
     return;
   }
   this._selectedOption = -1;
-  this._filterOptionsImpl(val);
+  this._lookupStrategy.filterOptions(val);
   this._oldVal = val;
   $.log.debug('updated oldVal=' + this._oldVal);
   this._updateScrollbar();
@@ -211,9 +213,7 @@ scout.AbstractSmartField.prototype._emptyOptions = function(options) {
 scout.AbstractSmartField.prototype._onOptionMousedown = function(e) {
   var selectedOption = $(e.target).data('option');
   $.log.info('option selected ' + selectedOption);
-  this._applyOption(selectedOption); // FIXME AWE: (smartfield) ist das nicht genau der gleiche code?
-  // andere vewendung von applyOption suchen, vielleicht kann noch mehr zusammengelegt werden
-  // this.$field.val(selectedText);
+  this._applyOption(selectedOption);
   this._closePopup();
 };
 
@@ -251,3 +251,18 @@ scout.AbstractSmartField.prototype._setStatusText = function(vararg) {
   this._$popup.children('.status').text(text);
 };
 
+scout.AbstractSmartField.prototype._openPopup = function() {
+  this._lookupStrategy.openPopup();
+};
+
+scout.AbstractSmartField.prototype._onOptionsLoaded = function(options) {
+  this._lookupStrategy.onOptionsLoaded(options);
+};
+
+scout.AbstractSmartField.prototype.onModelAction = function(event) {
+  if (event.type === 'optionsLoaded') {
+    this._onOptionsLoaded(event.options);
+  } else {
+    scout.AbstractSmartField.parent.prototype.onModelAction.call(this, event);
+  }
+};
