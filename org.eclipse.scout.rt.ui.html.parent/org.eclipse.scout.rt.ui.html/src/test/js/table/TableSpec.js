@@ -20,12 +20,42 @@ describe("Table", function() {
 
   describe("render", function() {
 
-    it("draws a table header", function() {
+    it("renders a table header", function() {
       var model = helper.createModelFixture(2);
       var table = helper.createTable(model);
       table.render(session.$entryPoint);
 
       expect(table._header).not.toBeUndefined();
+    });
+
+    describe("renders table rows", function() {
+
+      it("accepts rows with cells", function() {
+        var model = helper.createModelFixture(3, 1);
+        model.rows[0] = helper.createModelRowByTexts(1, ['cell1', '' , '0']);
+        var table = helper.createTable(model);
+        table.render(session.$entryPoint);
+
+        var $row0 = table.findRows().eq(0);
+        var $cells = $row0.find('.table-cell');
+        expect($cells.eq(0).text()).toBe('cell1');
+        expect($cells.eq(1).text()).toBe('');
+        expect($cells.eq(2).text()).toBe('0');
+      });
+
+      it("accepts rows with text only", function() {
+        var model = helper.createModelFixture(3, 1);
+        model.rows[0] = helper.createModelRowByTexts(1, ['cell1', '' , '0'], true);
+        var table = helper.createTable(model);
+        table.render(session.$entryPoint);
+
+        var $row0 = table.findRows().eq(0);
+        var $cells = $row0.find('.table-cell');
+        expect($cells.eq(0).text()).toBe('cell1');
+        expect($cells.eq(1).text()).toBe('');
+        expect($cells.eq(2).text()).toBe('0');
+      });
+
     });
 
     it("considers horizontal alignment", function() {
@@ -358,7 +388,7 @@ describe("Table", function() {
           return;
         }
 
-        var model = helper.createModelFixtureByTexts(1, ['Österreich', 'Italien', 'Zypern']);
+        var model = helper.createModelSingleColumnByTexts(1, ['Österreich', 'Italien', 'Zypern']);
         var table = helper.createTable(model);
         table.render(session.$entryPoint);
         $colHeaders = table._$header.find('.header-item');
@@ -380,7 +410,7 @@ describe("Table", function() {
       });
 
       it("sorts number columns", function() {
-        var model = helper.createModelFixtureByValues(1, [11, 1, 8], 'number');
+        var model = helper.createModelSingleColumnByValues([11, 1, 8], 'number');
         var table = helper.createTable(model);
         table.render(session.$entryPoint);
         $colHeaders = table._$header.find('.header-item');
@@ -394,7 +424,7 @@ describe("Table", function() {
       });
 
       it("sorts date columns", function() {
-        var model = helper.createModelFixtureByValues(1, [new Date('2012-08-10'), new Date('2014-03-01'), new Date('1999-01-10')], 'date');
+        var model = helper.createModelSingleColumnByValues([new Date('2012-08-10'), new Date('2014-03-01'), new Date('1999-01-10')], 'date');
         var table = helper.createTable(model);
         table.render(session.$entryPoint);
         $colHeaders = table._$header.find('.header-item');

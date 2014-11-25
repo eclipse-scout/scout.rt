@@ -522,19 +522,19 @@ scout.Table.prototype.getCellValue = function(col, row) {
   if (cell.value !== undefined) {
     return cell.value;
   }
-  return cell.text;
+  return cell.text || '';
 };
 
 scout.Table.prototype.getCellText = function(col, row) {
   var cell = row.cells[col.index];
 
-  if (cell === null) { //cell may be a number so don't use !cell
+  if (!cell) {
     return '';
   }
   if (typeof cell !== 'object') {
     return cell;
   }
-  return cell.text;
+  return cell.text || '';
 };
 
 scout.Table.prototype._group = function() {

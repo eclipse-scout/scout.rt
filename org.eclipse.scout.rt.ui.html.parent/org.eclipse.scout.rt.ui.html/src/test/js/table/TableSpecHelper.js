@@ -36,8 +36,9 @@ TableSpecHelper.prototype.createModelRow = function(id, cells) {
 /**
  *
  * @param texts array of texts for the cells in the new row or a string if only one cell should be created.
+ * @param withoutCells true if only text instead of cells should be created (server only sends text without a cell object if no other properties are set)
  */
-TableSpecHelper.prototype.createModelRowByTexts = function(id, texts) {
+TableSpecHelper.prototype.createModelRowByTexts = function(id, texts, withoutCells) {
   //Make sure texts is an array
   if (!Array.isArray(texts)) {
     texts = [texts];
@@ -45,7 +46,11 @@ TableSpecHelper.prototype.createModelRowByTexts = function(id, texts) {
 
   var cells = [];
   for (var i = 0; i < texts.length; i++) {
-    cells[i] = this.createModelCell(texts[i]);
+    if (!withoutCells) {
+      cells[i] = this.createModelCell(texts[i]);
+    } else {
+      cells [i] = texts[i];
+    }
   }
   return this.createModelRow(id, cells);
 };
@@ -76,10 +81,14 @@ TableSpecHelper.prototype.createModelColumn = function(id, text, type) {
 };
 
 TableSpecHelper.prototype.createModelCell = function(text, value) {
-  return {
-    "text": text,
-    "value": value
-  };
+  var cell = {};
+  if (text) {
+    cell.text = text;
+  }
+  if (value) {
+    cell.value = value;
+  }
+  return cell;
 };
 
 TableSpecHelper.prototype.createMenuModel = function(id, text, icon) {
@@ -121,20 +130,20 @@ TableSpecHelper.prototype.createModelRows = function(colCount, rowCount) {
   return rows;
 };
 
-TableSpecHelper.prototype.createModelFixtureByTexts = function(colCount, texts) {
+TableSpecHelper.prototype.createModelSingleColumnByTexts = function(texts) {
   var rows = [];
   for (var i=0; i < texts.length; i++) {
     rows.push(this.createModelRowByTexts(i, texts[i]));
   }
-  return this.createModel('t1', this.createModelColumns(colCount), rows);
+  return this.createModel('t1', this.createModelColumns(1), rows);
 };
 
-TableSpecHelper.prototype.createModelFixtureByValues = function(colCount, values, columnType) {
+TableSpecHelper.prototype.createModelSingleColumnByValues = function(values, columnType) {
   var rows = [];
   for (var i=0; i < values.length; i++) {
     rows.push(this.createModelRowByValues(i, values[i]));
   }
-  return this.createModel('t1', this.createModelColumns(colCount, columnType), rows);
+  return this.createModel('t1', this.createModelColumns(1, columnType), rows);
 };
 
 TableSpecHelper.prototype.createModelFixture = function(colCount, rowCount) {
