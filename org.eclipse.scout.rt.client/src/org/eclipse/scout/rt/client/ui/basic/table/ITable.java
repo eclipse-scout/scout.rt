@@ -117,7 +117,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * {@link org.eclipse.scout.rt.client.ui.form.fields.plannerfield.IPlannerField IPlannerField}
    * <p>
    * https://bugs.eclipse.org/bugs/show_bug.cgi?id=388227
-   * 
+   *
    * @since 3.8.1
    */
   String PROP_CONTAINER = "container";
@@ -312,7 +312,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   /**
    * Convenience to find a menu, uses {@link org.eclipse.scout.rt.client.ui.action.ActionFinder ActionFinder}
    */
-  <T extends IMenu> T getMenu(Class<T> menuType) throws ProcessingException;
+  <T extends IMenu> T getMenu(Class<T> menuType);
 
   List<IKeyStroke> getKeyStrokes();
 
@@ -321,7 +321,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   /**
    * Run a menu The menu is first prepared and only executed when it is visible
    * and enabled
-   * 
+   *
    * @return true if menu was executed
    */
   boolean runMenu(Class<? extends IMenu> menuType) throws ProcessingException;
@@ -372,7 +372,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * composite cell containing the union of all values of this rows that are in
    * a column with property summary=true when no summary column visible or there
    * are none, this defaults to the first defined visible column
-   * 
+   *
    * @see IColumn#isSummary()
    */
   ICell getSummaryCell(ITableRow row);
@@ -452,7 +452,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * This hint defines the table row height in pixels being used as the row height for all table rows of this table
    * dependent of the GUI port.
    * </p>
-   * 
+   *
    * @return the hint in pixels, default is -1
    */
   int getRowHeightHint();
@@ -701,7 +701,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * rows newRows have valid references to their coresponding ITableRow and the
    * new ITableRows are returned Using insertIndexes: assume the rows have been
    * added to the table; insertIndexes = what indexes should they cover
-   * 
+   *
    * @return added rows in order as they were passed to the method
    */
   List<ITableRow> addRows(List<? extends ITableRow> newRows, boolean markAsInserted, int[] insertIndexes) throws ProcessingException;
@@ -798,7 +798,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * {@link org.eclipse.scout.rt.client.ui.form.fields.plannerfield.IPlannerField IPlannerField}
    * <p>
    * https://bugs.eclipse.org/bugs/show_bug.cgi?id=388227
-   * 
+   *
    * @since 3.8.1
    */
   ITypeWithClassId getContainer();
@@ -861,7 +861,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * Exports the contents of this table into the given {@link AbstractTableFieldBeanData}. The mapping from
    * {@link IColumn}s to {@link AbstractTableRowData} properties is based on the property name and the
    * {@link IColumn#getColumnId()}.
-   * 
+   *
    * @param target
    * @throws ProcessingException
    * @since 3.10.0-M3
@@ -871,7 +871,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   /**
    * Imports the contents of the given {@link AbstractTableFieldBeanData}. The mapping from {@link AbstractTableRowData}
    * properties to {@link IColumn}s is based on the property name and the {@link IColumn#getColumnId()}.
-   * 
+   *
    * @param source
    * @throws ProcessingException
    * @since 3.10.0-M3
@@ -881,7 +881,7 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   /**
    * Creates a {@link TableRowDataMapper} that is used for reading and writing data from the given
    * {@link AbstractTableRowData} type.
-   * 
+   *
    * @param rowType
    * @return
    * @throws ProcessingException
