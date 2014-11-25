@@ -254,7 +254,11 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   protected JSONArray nodeIdsToJson(Collection<ITreeNode> modelNodes) {
     JSONArray jsonNodeIds = new JSONArray();
     for (ITreeNode node : modelNodes) {
-      jsonNodeIds.put(getOrCreateNodeId(node));
+      String nodeId = getOrCreateNodeId(node);
+      //May be null if its the invisible root node
+      if (nodeId != null) {
+        jsonNodeIds.put(nodeId);
+      }
     }
     return jsonNodeIds;
   }
