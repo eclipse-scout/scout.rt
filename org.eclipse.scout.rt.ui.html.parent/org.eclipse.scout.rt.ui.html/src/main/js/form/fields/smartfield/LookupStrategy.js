@@ -19,12 +19,16 @@ scout.CachedLookupStrategy.prototype = {
           $(this).setVisible(true);
         } else {
           match = $(this).html().match(regexp);
-          if (match) { numVisibleOptions++; }
+          if (match) {
+            numVisibleOptions++;
+          }
           $.log.debug('regexp=' + regexp + ' html=' + $(this).html());
           $(this).setVisible(match);
         }
       });
-      if (showAll) { numVisibleOptions = sf.options.length; }
+      if (showAll) {
+        numVisibleOptions = sf.options.length;
+      }
       sf._setStatusText(numVisibleOptions);
     },
 

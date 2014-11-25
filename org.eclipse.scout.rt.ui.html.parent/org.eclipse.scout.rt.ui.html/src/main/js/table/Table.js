@@ -9,6 +9,7 @@ scout.Table = function() {
   this._header;
   this.selectionHandler;
   this._keystrokeAdapter;
+  this.columns = [];
   this.controls = [];
   this.menus = [];
   this.rows = [];

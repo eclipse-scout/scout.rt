@@ -1,20 +1,22 @@
 describe("ObjectFactory", function() {
 
+  /**
+   * When this test fails with a message like 'TypeError: scout.[ObjectType] is not a constructor...'
+   * you should check if the required .js File is registered in SpecRunnerMaven.html.
+   */
   function verifyCreationAndRegistration(session, factories) {
+    var i, model, factory, object, modelAdapter;
     session.objectFactory.register(factories);
 
-    var i, model, factory, object, modelAdapter;
     for (i = 0; i < factories.length; i++) {
       factory = factories[i];
       model = {
         id: i,
         objectType: factory.objectType
       };
-
       object = factory.create(model);
       object.init(model, session);
       session.registerModelAdapter(object);
-
       modelAdapter = session.getModelAdapter(model.id);
       expect(modelAdapter).toBe(object);
     }
