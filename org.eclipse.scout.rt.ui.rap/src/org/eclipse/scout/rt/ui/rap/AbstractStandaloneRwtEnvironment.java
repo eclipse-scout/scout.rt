@@ -19,6 +19,7 @@ import java.util.TreeMap;
 
 import javax.security.auth.Subject;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -246,9 +247,28 @@ public abstract class AbstractStandaloneRwtEnvironment extends AbstractRwtEnviro
   protected void contributePatches(List<URL> patches) {
     super.contributePatches(patches);
 
-    // Install patch to mark editable cells with a visual marker.
+    // Patch to install a visual marker on editable cells.
+    contributeEditableCellMarkerPatch(patches);
+  }
+
+  /**
+   * Contribute the patch to render editable cells with a visual marker.
+   *
+   * @param patches
+   *          live-list of the JavaScript-Files to be installed.
+   */
+  protected void contributeEditableCellMarkerPatch(List<URL> patches) {
+    // Make the visual image marker available for download.
     registerEditableCellMarkerIcon();
-    patches.add(Activator.class.getResource("/resources/patches/EditableCellMarkerPatch.js"));
+
+    // Depending on the RAP version used another patch needs to be installed.
+    Bundle rwtBundle = Platform.getBundle("org.eclipse.rap.rwt");
+    if (rwtBundle != null && rwtBundle.getVersion().getMajor() >= 3) {
+      patches.add(Activator.class.getResource("/resources/patches/EditableCellMarkerPatch_v3.x.x.js"));
+    }
+    else {
+      patches.add(Activator.class.getResource("/resources/patches/EditableCellMarkerPatch_v2.x.x.js"));
+    }
   }
 
   protected void registerEditableCellMarkerIcon() {
