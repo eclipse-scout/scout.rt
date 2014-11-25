@@ -4,7 +4,8 @@
   "evil":true,
   "undef": true,
   "browser": true,
-  "es3": true, // trailing comma
+  "es3": true, // trailing comma,
+  "curly": true,
   "globals": {
     "scout": false,
     "jQuery": false,

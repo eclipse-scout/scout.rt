@@ -105,7 +105,8 @@ scout.Table.prototype.updateScrollbar = function() {
 };
 
 scout.Table.prototype._sort = function() {
-  var sortColumns = [], column, sortIndex;
+  var column, sortIndex,
+    sortColumns = [];
 
   // find all sort columns
   for (var c = 0; c < this.columns.length; c++) {
@@ -235,11 +236,12 @@ scout.Table.prototype._renderRowOrderChanges = function() {
  * @param additional true to add the column to list of sorted columns. False to use this column exclusively as sort column (reset other columns)
  */
 scout.Table.prototype.sort = function($header, dir, additional, remove) {
-  var maxIndex = -1, sortIndex, siblingsResetted;
-  var column = $header.data('column');
-  var data = {
-    columnId: column.id
-  };
+  var sortIndex, siblingsResetted,
+    maxIndex = -1,
+    column = $header.data('column'),
+    data = {
+      columnId: column.id
+    };
 
   // Update model
   if (remove) {
@@ -259,7 +261,7 @@ scout.Table.prototype.sort = function($header, dir, additional, remove) {
 
       // If not already sorted set the appropriate sort index
       if (!column.sortActive) {
-        for (var i=0; i < this.columns.length; i++) {
+        for (var i = 0; i < this.columns.length; i++) {
           sortIndex = this.columns[i].sortIndex;
           if (sortIndex >= 0) {
             maxIndex = Math.max(sortIndex, maxIndex);
@@ -631,8 +633,12 @@ scout.Table.prototype.colorData = function(mode, colorColumn) {
     row = this.rows[r];
     v = this.getCellValue(colorColumn, row);
 
-    if (v < minValue || minValue === undefined) minValue = v;
-    if (v > maxValue || maxValue === undefined) maxValue = v;
+    if (v < minValue || minValue === undefined) {
+      minValue = v;
+    }
+    if (v > maxValue || maxValue === undefined) {
+      maxValue = v;
+    }
   }
 
   if (mode === 'red') {
@@ -664,16 +670,19 @@ scout.Table.prototype.colorData = function(mode, colorColumn) {
       cell.css('background-color', '#fff');
       cell.css('background-image', 'linear-gradient(to left, #80c1d0 0%, #80c1d0 ' + level + '%, white ' + level + '%, white 100% )');
     };
-  } else if (mode === 'remove')
+  } else if (mode === 'remove') {
     colorFunc = function(cell, value) {
       cell.css('background-image', '');
       cell.css('background-color', '#fff');
     };
+  }
 
   $rows = $('.table-row:visible', this._$viewport);
 
   $('.header-item', this.$container).each(function(i) {
-    if ($(this).data('column') === colorColumn) c = i;
+    if ($(this).data('column') === colorColumn) {
+      c = i;
+    }
   });
 
   for (var s = 0; s < $rows.length; s++) {
@@ -990,8 +999,8 @@ scout.Table.prototype.resizeColumn = function($header, width, summaryWidth, resi
 scout.Table.prototype.resizingColumnFinished = function($header, width) {
   var column = $header.data('column');
   var data = {
-      columnId: column.id,
-      width: width
+    columnId: column.id,
+    width: width
   };
   this.session.send('columnResized', this.id, data);
 };
@@ -1022,7 +1031,8 @@ scout.Table.prototype.moveColumn = function($header, oldPos, newPos, dragged) {
 };
 
 scout.Table.prototype._renderColumnOrderChanges = function(oldColumnOrder) {
-  var column, i, j, $orderedCells, $cell, $cells, that = this, $row;
+  var column, i, j, $orderedCells, $cell, $cells, that = this,
+    $row;
 
   this._header.onOrderChanged(oldColumnOrder);
 
@@ -1107,12 +1117,10 @@ scout.Table.prototype._renderTableStatusVisible = function(tableStatusVisible) {
   if (footerVisible) {
     if (!this.footer) {
       this.footer = this._createFooter();
-    }
-    else {
+    } else {
       this.footer.setTableStatusVisible(tableStatusVisible);
     }
-  }
-  else if (!footerVisible && this.footer){
+  } else if (!footerVisible && this.footer) {
     this.footer.remove();
     this.footer = null;
   }
@@ -1201,7 +1209,8 @@ scout.Table.prototype._onColumnOrderChanged = function(columnIds) {
  * @param columns array of columns which were updated.
  */
 scout.Table.prototype._onColumnHeadersUpdated = function(columns) {
-  var updatedColumns = [], column;
+  var column,
+    updatedColumns = [];
 
   //Update model columns
   for (var i = 0; i < columns.length; i++) {

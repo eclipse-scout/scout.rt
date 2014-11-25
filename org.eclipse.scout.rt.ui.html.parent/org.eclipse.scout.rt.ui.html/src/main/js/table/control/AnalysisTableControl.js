@@ -23,7 +23,6 @@ scout.AnalysisTableControl.prototype._renderContent = function($parent) {
   $commandContainer.appendDiv('', 'command search', 'Daten suchen');
   $commandContainer.appendDiv('', 'command simulator', 'Simulator').click(simulateServer);
 
-
   // svg container for venn
   var $vennContainer = $parent
     .appendSVG('svg', '', 'venn-container')
@@ -78,7 +77,6 @@ scout.AnalysisTableControl.prototype._renderContent = function($parent) {
   $vennContainer.appendSVG('text', '', 'venn-button', 'Vereinigungsmenge')
     .attr('x', 490).attr('y', 307)
     .click(setUnion);
-
 
   function addCriteria() {
     // reset count
@@ -171,7 +169,9 @@ scout.AnalysisTableControl.prototype._renderContent = function($parent) {
     oneIteration($container, map, 0, 0, 1, 1);
 
     // in not too much boxes: show attributes!
-    if (map.length < 7) showAttribute($container.children());
+    if (map.length < 7) {
+      showAttribute($container.children());
+    }
   }
 
   function oneIteration($container, list, top, left, height, width) {
@@ -606,7 +606,6 @@ scout.AnalysisTableControl.prototype._renderContent = function($parent) {
     // move buttons on top
     $vennContainer.append($('.venn-button', $vennContainer));
 
-
   }
 
   function calcR(size, limit) {
@@ -657,9 +656,15 @@ scout.AnalysisTableControl.prototype._renderContent = function($parent) {
   function drawSetOuter(ra, dxa, dya, rb, dxb, dyb, rc, dxc, dyc) {
     var $mask = $vennDefs.empty().appendSVG('mask', 'maskAll', '');
     appendRect($mask, '', 'white');
-    if (ra) appendCircle($mask, dxa, dya, ra);
-    if (rb) appendCircle($mask, dxb, dyb, rb);
-    if (rc) appendCircle($mask, dxc, dyc, rc);
+    if (ra) {
+      appendCircle($mask, dxa, dya, ra);
+    }
+    if (rb) {
+      appendCircle($mask, dxb, dyb, rb);
+    }
+    if (rc) {
+      appendCircle($mask, dxc, dyc, rc);
+    }
 
     appendRect($vennContainer, 'venn-set')
       .attr('mask', 'url(#maskAll)')
@@ -672,8 +677,12 @@ scout.AnalysisTableControl.prototype._renderContent = function($parent) {
       .attr('width', 490).attr('height', 300)
       .attr('rx', 5).attr('ry', 8);
 
-    if (claz) $rect.attr('class', claz);
-    if (fill) $rect.attr('fill', fill);
+    if (claz) {
+      $rect.attr('class', claz);
+    }
+    if (fill) {
+      $rect.attr('fill', fill);
+    }
 
     return $rect;
   }
@@ -684,8 +693,12 @@ scout.AnalysisTableControl.prototype._renderContent = function($parent) {
       .attr('cy', MID_Y + dy)
       .attr('r', r);
 
-    if (claz) $circle.attr('class', claz);
-    if (fill) $circle.attr('fill', fill);
+    if (claz) {
+      $circle.attr('class', claz);
+    }
+    if (fill) {
+      $circle.attr('fill', fill);
+    }
 
     return $circle;
   }
@@ -693,8 +706,12 @@ scout.AnalysisTableControl.prototype._renderContent = function($parent) {
   function drawSetMain(id, ra, dxa, dya, rb, dxb, dyb, rc, dxc, dyc) {
     var $mask = $vennDefs.appendSVG('mask', 'set' + id, '');
     appendCircle($mask, dxa, dya, ra, '', 'white');
-    if (rb) appendCircle($mask, dxb, dyb, rb);
-    if (rc) appendCircle($mask, dxc, dyc, rc);
+    if (rb) {
+      appendCircle($mask, dxb, dyb, rb);
+    }
+    if (rc) {
+      appendCircle($mask, dxc, dyc, rc);
+    }
 
     appendCircle($vennContainer, dxa, dya, ra, 'venn-set')
       .attr('mask', 'url(#set' + id + ')')
@@ -736,7 +753,9 @@ scout.AnalysisTableControl.prototype._renderContent = function($parent) {
       select = $('.selected', $vennContainer)[0].id,
       next;
 
-    if (candidate.length === 0) return;
+    if (candidate.length === 0) {
+      return;
+    }
 
     candidate.push(candidate[0]);
     next = candidate[candidate.indexOf(select) + 1];

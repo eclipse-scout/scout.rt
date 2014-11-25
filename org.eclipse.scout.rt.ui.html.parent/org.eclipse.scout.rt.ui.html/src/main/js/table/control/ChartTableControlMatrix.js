@@ -73,7 +73,9 @@ scout.ChartTableControlMatrix.prototype.addAxis = function(axis, axisGroup) {
 
   // add a key to the axis
   keyAxis.add = function(k) {
-    if (keyAxis.indexOf(k) === -1) keyAxis.push(k);
+    if (keyAxis.indexOf(k) === -1) {
+      keyAxis.push(k);
+    }
   };
 
   // default sorts function
@@ -208,8 +210,12 @@ scout.ChartTableControlMatrix.prototype.calculateCube = function() {
         cube[k][v] = newValue;
         data.total += newValue;
 
-        if (newValue < data.min || data.min === null) data.min = newValue;
-        if (newValue > data.max || data.min === null) data.max = newValue;
+        if (newValue < data.min || data.min === null) {
+          data.min = newValue;
+        }
+        if (newValue > data.max || data.min === null) {
+          data.max = newValue;
+        }
       }
     }
 
@@ -252,7 +258,9 @@ scout.ChartTableControlMatrix.prototype.columnCount = function() {
 
     for (var r = 0; r < this._rows.length; r++) {
       var v = this._table.getCellValue(column, this._rows[r]);
-      if (colCount[c][1].indexOf(v) === -1) colCount[c][1].push(v);
+      if (colCount[c][1].indexOf(v) === -1) {
+        colCount[c][1].push(v);
+      }
     }
 
     colCount[c][1] = colCount[c][1].length;

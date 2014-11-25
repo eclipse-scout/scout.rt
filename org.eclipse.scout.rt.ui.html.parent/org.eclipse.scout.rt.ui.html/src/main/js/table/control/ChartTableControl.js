@@ -24,7 +24,6 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
     yAxis,
     that = this;
 
-
   this._filterResetListener = this.table.events.on(scout.Table.GUI_EVENT_FILTER_RESETTED, function(event) {
     that.$parent.find('.main-chart.selected').removeClassSVG('selected');
   });
@@ -62,7 +61,9 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
   for (var c1 = 0; c1 < columns.length; c1++) {
     var column1 = columns[c1];
 
-    if (column1.type === 'key') continue;
+    if (column1.type === 'key') {
+      continue;
+    }
 
     var $div = $.makeDiv('', 'select-axis', column1.text)
       .data('column', column1);
@@ -91,11 +92,15 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
   columnCount.sort(comp);
 
   $xAxisSelect.children().each(function() {
-    if ($(this).data('column') === columnCount[0][0]) $(this).addClass('selected');
+    if ($(this).data('column') === columnCount[0][0]) {
+      $(this).addClass('selected');
+    }
   });
 
   $yAxisSelect.children().each(function() {
-    if ($(this).data('column') === columnCount[1][0]) $(this).addClass('selected');
+    if ($(this).data('column') === columnCount[1][0]) {
+      $(this).addClass('selected');
+    }
   });
 
   // create container for data
@@ -251,7 +256,9 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
     // remove axis and chart
     $chartMain.children('.main-axis, .main-axis-x, .main-axis-y')
       .animateSVG('opacity', 0, 200, $.removeThis);
-    if (removeChart) removeChart();
+    if (removeChart) {
+      removeChart();
+    }
 
     // find xAxis and dataAxis
     var axis = $('.selected', $xAxisSelect).data('column'),
@@ -430,7 +437,9 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
 
     // draw values
     for (var a = 0; a < xAxis.length; a++) {
-      if (a === 0) continue;
+      if (a === 0) {
+        continue;
+      }
 
       var key1 = xAxis[a - 1],
         key2 = xAxis[a],

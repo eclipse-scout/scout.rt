@@ -37,7 +37,9 @@ scout.DecimalFormat = function(locale, pattern) {
   // find group length
   var start = find(pattern, this._symbols.groupingSeparator, -1),
     end = find(pattern, this._symbols.decimalSeparator, 1) || pattern.length;
-  if (start && end) this.groupLength = end - start - 1;
+  if (start && end) {
+    this.groupLength = end - start - 1;
+  }
   pattern = pattern.replace(this._symbols.groupingSeparator, '');
 
   // split on decimal point
@@ -51,7 +53,9 @@ scout.DecimalFormat = function(locale, pattern) {
   // helper function
   function find(string, chars, dir) {
     for (var i = ((dir === 1) ? 0 : string.length - 1); i < string.length && i > -1; i += dir) {
-      if (chars.indexOf(string[i]) > -1) return i;
+      if (chars.indexOf(string[i]) > -1) {
+        return i;
+      }
     }
     return null;
   }
@@ -64,7 +68,9 @@ scout.DecimalFormat = function(locale, pattern) {
 scout.DecimalFormat.prototype.format = function(number) {
   /*jshint newcap: false */
 
-  if (number < 0) return this.negPrefix + this.format(-number) + this.negSuffix;
+  if (number < 0) {
+    return this.negPrefix + this.format(-number) + this.negSuffix;
+  }
 
   // before decimal point
   var before = Math.floor(number);
@@ -82,7 +88,9 @@ scout.DecimalFormat.prototype.format = function(number) {
   var after = number.toFixed(this.allAfter);
   after = after.slice(after.indexOf('.') + 1);
   for (var j = after.length - 1; j > this.zeroAfter - 1; j--) {
-    if (after[j] !== '0') break;
+    if (after[j] !== '0') {
+      break;
+    }
     after = after.slice(0, -1);
   }
 

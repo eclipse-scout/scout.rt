@@ -37,7 +37,9 @@ scout.Menubar.prototype.updateItems = function(menus) {
   }
 
   // in case of no menus: finish
-  if (!menus || menus.length === 0) return;
+  if (!menus || menus.length === 0) {
+    return;
+  }
 
   // add menus for the first left area
   left1Menus = scout.menus.filter(menus, this.menuTypesForLeft1);

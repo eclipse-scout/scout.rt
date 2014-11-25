@@ -69,10 +69,14 @@ scout.AbstractSmartField.prototype._onKeydown = function(e) {
     var pos = this._selectedOption,
         $options = this._get$Options(true);
     switch (e.which) {
-      case scout.keys.PAGE_UP: pos -= 10; break;
-      case scout.keys.PAGE_DOWN: pos += 10; break;
-      case scout.keys.UP: pos--; break;
-      case scout.keys.DOWN: pos++; break;
+      case scout.keys.PAGE_UP: pos -= 10;
+      break;
+      case scout.keys.PAGE_DOWN: pos += 10;
+      break;
+      case scout.keys.UP: pos--;
+      break;
+      case scout.keys.DOWN: pos++;
+      break;
     }
     pos = Math.min(Math.max(0, pos), $options.length - 1);
     if (pos !== this._selectedOption) {

@@ -36,12 +36,11 @@ scout.TableSelectionHandler.prototype._onRowsDrawn = function($rows) {
       first = $allRows.index($selectedRows.first());
     } else if (that.table.multiSelect && event.ctrlKey) {
       add = !$row.isSelected();
-    }
-    else {
+    } else {
       //Click on the already selected row must not clear the selection it to avoid another selection event sent to the server
       //Right click on already selected rows must not clear the selection
       if (!$row.isSelected() ||
-          ($selectedRows.length > 1 && event.which !== 3)) {
+        ($selectedRows.length > 1 && event.which !== 3)) {
         $selectedRows.select(false);
         that._clearSelectionBorder($selectedRows);
       }
@@ -116,7 +115,6 @@ scout.TableSelectionHandler.prototype.drawSelection = function() {
   this.table.onRowsSelected($selectedRows);
 };
 
-
 scout.TableSelectionHandler.prototype.clearSelection = function(dontFire) {
   var $selectedRows = this.table.findSelectedRows();
   $selectedRows.select(false);
@@ -143,10 +141,18 @@ scout.TableSelectionHandler.prototype._drawSelectionBorder = function($selectedR
     var hasPrev = $(this).prevAll('div:not(.invisible):first').isSelected();
     var hasNext = $(this).nextAll('div:not(.invisible):first').isSelected();
 
-    if (hasPrev && hasNext) $(this).addClass('select-middle');
-    if (!hasPrev && hasNext) $(this).addClass('select-top');
-    if (hasPrev && !hasNext) $(this).addClass('select-bottom');
-    if (!hasPrev && !hasNext) $(this).addClass('select-single');
+    if (hasPrev && hasNext) {
+      $(this).addClass('select-middle');
+    }
+    if (!hasPrev && hasNext) {
+      $(this).addClass('select-top');
+    }
+    if (hasPrev && !hasNext) {
+      $(this).addClass('select-bottom');
+    }
+    if (!hasPrev && !hasNext) {
+      $(this).addClass('select-single');
+    }
   });
 };
 
@@ -166,7 +172,7 @@ scout.TableSelectionHandler.prototype.selectAll = function() {
 
 scout.TableSelectionHandler.prototype.toggleSelection = function() {
   if (this.table.selectedRowIds &&
-      this.table.selectedRowIds.length === this.table.rows.length) {
+    this.table.selectedRowIds.length === this.table.rows.length) {
     this.clearSelection();
   } else {
     this.selectAll();

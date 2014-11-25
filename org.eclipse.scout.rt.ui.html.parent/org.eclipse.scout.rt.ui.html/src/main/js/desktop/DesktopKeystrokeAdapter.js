@@ -152,7 +152,9 @@ scout.DesktopKeystrokeAdapter.prototype.drawKeyBox = function() {
 
   if (this._viewButtonBar) {
     $('.view-item', this._viewButtonBar.$div).each(function(i, element) {
-      if (i < 9) $(element).appendDiv('', 'key-box', i + 1);
+      if (i < 9) {
+        $(element).appendDiv('', 'key-box', i + 1);
+      }
     });
   }
 

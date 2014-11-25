@@ -1,5 +1,5 @@
 /**
-* This file contains helpers for graphical operations and JavaScript ports from java.awt classes
+ * This file contains helpers for graphical operations and JavaScript ports from java.awt classes
  */
 scout.graphics = {
   measureString: function(text) {
@@ -23,15 +23,15 @@ scout.graphics = {
       includeMargins = false;
     }
     return new scout.Dimension(
-        $comp.outerWidth(includeMargins),
-        $comp.outerHeight(includeMargins));
+      $comp.outerWidth(includeMargins),
+      $comp.outerHeight(includeMargins));
   },
   setSize: function($comp, vararg, height) {
     var size = vararg instanceof scout.Dimension ?
-        vararg : new scout.Dimension(vararg, height);
-    $comp.
-      cssWidth(size.width).
-      cssHeight(size.height);
+      vararg : new scout.Dimension(vararg, height);
+    $comp
+      .cssWidth(size.width)
+      .cssHeight(size.height);
   },
   /**
    * Returns the size of a visible component or (0,0) when component is invisible.
@@ -85,19 +85,19 @@ scout.graphics = {
       return 'auto' === value ? 0 : parseInt(value, 10);
     };
     return new scout.Rectangle(
-        parseCssPosition('left'),
-        parseCssPosition('top'),
-        $comp.outerWidth(true),
-        $comp.outerHeight(true));
+      parseCssPosition('left'),
+      parseCssPosition('top'),
+      $comp.outerWidth(true),
+      $comp.outerHeight(true));
   },
   setBounds: function($comp, vararg, y, width, height) {
     var bounds = vararg instanceof scout.Rectangle ?
-        vararg : new scout.Rectangle(vararg, y, width, height);
-    $comp.
-      cssLeft(bounds.x).
-      cssTop(bounds.y).
-      cssWidth(bounds.width).
-      cssHeight(bounds.height);
+      vararg : new scout.Rectangle(vararg, y, width, height);
+    $comp
+      .cssLeft(bounds.x)
+      .cssTop(bounds.y)
+      .cssWidth(bounds.width)
+      .cssHeight(bounds.height);
   },
   offsetBounds: function($elem, includeMargins) {
     if (includeMargins === undefined) {
@@ -172,14 +172,14 @@ scout.Dimension.prototype.equals = function(o) {
 
 scout.Dimension.prototype.subtract = function(insets) {
   return new scout.Dimension(
-      this.width - insets.left - insets.right,
-      this.height - insets.top - insets.bottom);
+    this.width - insets.left - insets.right,
+    this.height - insets.top - insets.bottom);
 };
 
 scout.Dimension.prototype.add = function(insets) {
   return new scout.Dimension(
-      this.width + insets.left + insets.right,
-      this.height + insets.top + insets.bottom);
+    this.width + insets.left + insets.right,
+    this.height + insets.top + insets.bottom);
 };
 
 /**
@@ -200,7 +200,7 @@ scout.Rectangle.prototype.equals = function(o) {
 };
 
 scout.Rectangle.prototype.toString = function() {
- return 'Rectangle[x=' + this.x + ' y=' + this.y + ' width=' + this.width + ' height=' + this.height + ']';
+  return 'Rectangle[x=' + this.x + ' y=' + this.y + ' width=' + this.width + ' height=' + this.height + ']';
 };
 
 scout.Rectangle.prototype.union = function(r) {
@@ -228,17 +228,29 @@ scout.Rectangle.prototype.union = function(r) {
   var ry1 = r.y;
   rx2 += rx1;
   ry2 += ry1;
-  if (tx1 > rx1) tx1 = rx1;
-  if (ty1 > ry1) ty1 = ry1;
-  if (tx2 < rx2) tx2 = rx2;
-  if (ty2 < ry2) ty2 = ry2;
+  if (tx1 > rx1) {
+    tx1 = rx1;
+  }
+  if (ty1 > ry1) {
+    ty1 = ry1;
+  }
+  if (tx2 < rx2) {
+    tx2 = rx2;
+  }
+  if (ty2 < ry2) {
+    ty2 = ry2;
+  }
   tx2 -= tx1;
   ty2 -= ty1;
   // tx2,ty2 will never underflow since both original rectangles
   // were already proven to be non-empty
   // they might overflow, though...
-  if (tx2 > Number.MAX_VALUE) tx2 = Number.MAX_VALUE;
-  if (ty2 > Number.MAX_VALUE) ty2 = Number.MAX_VALUE;
+  if (tx2 > Number.MAX_VALUE) {
+    tx2 = Number.MAX_VALUE;
+  }
+  if (ty2 > Number.MAX_VALUE) {
+    ty2 = Number.MAX_VALUE;
+  }
   return new scout.Rectangle(tx1, ty1, tx2, ty2);
 };
 

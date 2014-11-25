@@ -132,7 +132,7 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
   $headerFilter.appendDIV('header-text')
     .data('label', 'Filtern nach');
 
-  var group = (column.type === 'date') ?  3 : -1,
+  var group = (column.type === 'date') ? 3 : -1,
     matrix = new scout.ChartTableControlMatrix(table, session),
     xAxis = matrix.addAxis(column, group),
     cube = matrix.calculateCube();
@@ -150,7 +150,9 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
       .click(filterClick)
       .attr('data-value', value);
 
-    if (column.filter.indexOf(key) > -1) $filter.addClass('selected');
+    if (column.filter.indexOf(key) > -1) {
+      $filter.addClass('selected');
+    }
   }
 
   var containerHeight = $headerFilterContainer.get(0).offsetHeight,
@@ -173,9 +175,15 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
     .on('mouseleave', '.header-command', leaveCommand);
 
   // copy flags to menu
-  if ($header.hasClass('sort-asc')) $menuHeader.addClass('sort-asc');
-  if ($header.hasClass('sort-desc')) $menuHeader.addClass('sort-desc');
-  if ($header.hasClass('filter')) $menuHeader.addClass('filter');
+  if ($header.hasClass('sort-asc')) {
+    $menuHeader.addClass('sort-asc');
+  }
+  if ($header.hasClass('sort-desc')) {
+    $menuHeader.addClass('sort-desc');
+  }
+  if ($header.hasClass('filter')) {
+    $menuHeader.addClass('filter');
+  }
 
   var that = this;
 
@@ -276,7 +284,7 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
   function getSortColumnCount() {
     var sortCount = 0;
 
-    for (var i=0; i<table.columns.length; i++) {
+    for (var i = 0; i < table.columns.length; i++) {
       if (table.columns[i].sortActive) {
         sortCount++;
       }
@@ -299,12 +307,16 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
     groupSelect();
   }
 
-  function groupSelect () {
+  function groupSelect() {
     $groupAll.removeClass('selected');
     $groupSort.removeClass('selected');
 
-    if ($header.parent().hasClass('group-all')) $groupAll.addClass('selected');
-    if ($header.hasClass('group-sort')) $groupSort.addClass('selected');
+    if ($header.parent().hasClass('group-all')) {
+      $groupAll.addClass('selected');
+    }
+    if ($header.hasClass('group-sort')) {
+      $groupSort.addClass('selected');
+    }
   }
 
   function colorRed() {
@@ -322,7 +334,6 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
   function colorRemove() {
     table.colorData('remove', column);
   }
-
 
   function columnAdd() {}
 

@@ -46,7 +46,7 @@ scout.GraphTableControl.prototype._renderContent = function($parent) {
 };
 
 // moving nodes and links by dx and dy
-scout.TableControl.prototype.setNode = function (node, dx, dy) {
+scout.TableControl.prototype.setNode = function(node, dx, dy) {
   var x = this.getPos(node, 'x'),
     y = this.getPos(node, 'y');
 
@@ -76,7 +76,7 @@ scout.TableControl.prototype.setNode = function (node, dx, dy) {
 };
 
 // set label of a link
-scout.TableControl.prototype.setLabel = function (link) {
+scout.TableControl.prototype.setLabel = function(link) {
   var x1 = this.getPos(link, 'x1'),
     y1 = this.getPos(link, 'y1'),
     x2 = this.getPos(link, 'x2'),
@@ -90,7 +90,7 @@ scout.TableControl.prototype.setLabel = function (link) {
 };
 
 // dissolve crossing links
-scout.TableControl.prototype.disolveLinks = function () {
+scout.TableControl.prototype.disolveLinks = function() {
   for (var l1 = 0; l1 < this.graph.links.length; l1++) {
     var link1 = this.graph.links[l1],
       E = {}, F = {};
@@ -101,7 +101,9 @@ scout.TableControl.prototype.disolveLinks = function () {
     F.y = this.getPos(link1, 'y2');
 
     for (var l2 = 0; l2 < this.graph.links.length; l2++) {
-      if (l1 === l2) continue;
+      if (l1 === l2) {
+        continue;
+      }
 
       var link2 = this.graph.links[l2],
         P = {}, Q = {};
@@ -129,15 +131,16 @@ scout.TableControl.prototype.disolveLinks = function () {
   }
 };
 
-  // force the nodes to their place
-scout.TableControl.prototype.doPhysics = function () {
+// force the nodes to their place
+scout.TableControl.prototype.doPhysics = function() {
   var totalDiff = 0;
 
   for (var n = 0; n < this.graph.nodes.length; n++) {
     var node = this.graph.nodes[n],
       x = this.getPos(node, 'x'),
       y = this.getPos(node, 'y'),
-      dx = 0, dy = 0;
+      dx = 0,
+      dy = 0;
 
     // move center to the middle
     if (node.type === 'center') {
@@ -197,11 +200,13 @@ scout.TableControl.prototype.doPhysics = function () {
   }
 
   // cool down, heat up
-  if (this.kelvin-- > 0) setTimeout(this.doPhysics.bind(this), 0);
+  if (this.kelvin-- > 0) {
+    setTimeout(this.doPhysics.bind(this), 0);
+  }
 };
 
 // move node by mouse
-scout.GraphTableControl.prototype.moveNode = function (event) {
+scout.GraphTableControl.prototype.moveNode = function(event) {
   var startX = event.pageX,
     startY = event.pageY,
     clickedNode,

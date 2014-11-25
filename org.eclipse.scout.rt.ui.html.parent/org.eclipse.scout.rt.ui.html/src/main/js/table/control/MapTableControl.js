@@ -27,7 +27,9 @@ scout.MapTableControl.prototype._renderContent = function($parent) {
       if (this.table.columns[i].id === this.columnIds[j]) {
         for (var r = 0; r < this.table.rows.length; r++) {
           var value = this.table.rows[r].cells[i];
-          if (tableCountries.indexOf(value) === -1) tableCountries.push(value);
+          if (tableCountries.indexOf(value) === -1) {
+            tableCountries.push(value);
+          }
         }
       }
     }
@@ -58,13 +60,17 @@ scout.MapTableControl.prototype._renderContent = function($parent) {
 
           // first point is absolute, all other delta
           if (s === 0) {
-            // todo: alaska and russia have overlap
-            if ((countries[c].id === 'Russland') && (line[0] < 3000)) line[0] += 100000;
+            // TODU CRU: alaska and russia have overlap
+            if ((countries[c].id === 'Russland') && (line[0] < 3000)) {
+              line[0] += 100000;
+            }
             x = line[0];
             y = line[1];
           } else {
-            // todo: some pacific islands
-            if (Math.abs(line[0]) > 8000) line[0] = 0;
+            // TODO CRU: some pacific islands
+            if (Math.abs(line[0]) > 8000) {
+              line[0] = 0;
+            }
             x += line[0];
             y += line[1];
           }
@@ -87,7 +93,9 @@ scout.MapTableControl.prototype._renderContent = function($parent) {
       .attr('d', pathString)
       .click(clickMap);
 
-    if (tableCountries.indexOf(countries[c].id) > -1) $country.addClassSVG('has-data');
+    if (tableCountries.indexOf(countries[c].id) > -1) {
+      $country.addClassSVG('has-data');
+    }
   }
 
   function clickMap(event) {
@@ -114,7 +122,9 @@ scout.MapTableControl.prototype._renderContent = function($parent) {
     var filterFunc = function($row) {
       for (var c = 0; c < that.table.columns.length; c++) {
         var text = $row.children().eq(c).text();
-        if (countries.indexOf(text) > -1) return true;
+        if (countries.indexOf(text) > -1) {
+          return true;
+        }
       }
       return false;
     };
