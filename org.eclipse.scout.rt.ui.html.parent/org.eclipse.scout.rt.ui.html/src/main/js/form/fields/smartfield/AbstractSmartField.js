@@ -64,10 +64,7 @@ scout.AbstractSmartField.prototype._onIconClick = function(event) {
 scout.AbstractSmartField.prototype._onKeydown = function(e) {
   if (this._isNavigationKey(e)) {
     // ensure popup is opened for following operations
-    if (!this._$popup) {
-      setTimeout(function() {
-        this._openPopup();
-      }.bind(this));
+    if (this._openPopupLater()) {
       return;
     }
 
@@ -117,7 +114,6 @@ scout.AbstractSmartField.prototype._onKeyup = function(e) {
     return;
   }
 
-  // TODO AWE: (smartfield) das geht sicher noch schöner --> check preventDefault/stopPropagation
   if (e.which === scout.keys.TAB ||
       e.which === scout.keys.SHIFT ||
       this._isNavigationKey(e)) {
@@ -125,10 +121,7 @@ scout.AbstractSmartField.prototype._onKeyup = function(e) {
   }
 
   // ensure popup is opened for following operations
-  if (!this._$popup) { // FIXME AWE: können wir hier copy/paste reduzieren?
-    setTimeout(function() {
-      this._openPopup();
-    }.bind(this));
+  if (this._openPopupLater()) {
     return;
   }
 
@@ -166,18 +159,18 @@ scout.AbstractSmartField.prototype._filterOptions = function() {
  */
 scout.AbstractSmartField.prototype._showPopup = function(numOptions, vararg) {
   var fieldBounds = this._getInputBounds(),
-    popupHeight = numOptions * 29 + 29 + 3, // TODO AWE: (smartfield) popup-layout dynamischer,
+    optionHeight = scout.HtmlEnvironment.formRowHeight,
+    popupHeight = (numOptions + 1) * optionHeight,
     popupBounds = new scout.Rectangle(fieldBounds.x, fieldBounds.y + fieldBounds.height, fieldBounds.width, popupHeight);
-  this._$popup = $('<div>').
-    addClass('smart-field-popup').
-    append($('<div>').addClass('options')).
-    append($('<div>').addClass('status')).
+  this._$popup = $.makeDIV('smart-field-popup').
+    append($.makeDIV('options')).
+    append($.makeDIV('status')).
     appendTo(this.$container);
   scout.graphics.setBounds(this._$popup, popupBounds);
   // layout options and status-div
   var $optionsDiv = this._get$OptionsDiv();
-  this._$viewport = scout.scrollbars.install($optionsDiv, {invertColors:true});
-  scout.graphics.setSize($optionsDiv, fieldBounds.width - 4, popupHeight - 24 - 3);
+  this._$viewport = scout.scrollbars.install($optionsDiv, {invertColors: true});
+  scout.graphics.setSize($optionsDiv, fieldBounds.width - 2, popupHeight - optionHeight);
   this._setStatusText(vararg);
 };
 
@@ -196,7 +189,7 @@ scout.AbstractSmartField.prototype._getInputBounds = function() {
 scout.AbstractSmartField.prototype._renderOptions = function(options) {
   var i, option, htmlOption, selectedPos = -1,
     val = this.$field.val();
-  for (i=0; i<options.length; i++) {
+  for (i = 0; i < options.length; i++) {
     option = options[i];
     htmlOption = option.replace(/\n/gi, "<br/>");
     $('<p>').
