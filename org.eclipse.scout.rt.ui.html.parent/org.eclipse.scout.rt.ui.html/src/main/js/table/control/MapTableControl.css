@@ -1,8 +1,4 @@
-.control-map:before {
-  content: @icon-world;
-}
-
-.control-map-content {
+.control-content-map {
   padding: @table-control-content-padding;
 }
 

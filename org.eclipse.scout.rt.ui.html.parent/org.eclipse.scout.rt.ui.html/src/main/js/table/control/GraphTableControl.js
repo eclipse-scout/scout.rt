@@ -3,6 +3,7 @@
 
 scout.GraphTableControl = function() {
   scout.GraphTableControl.parent.call(this);
+  this.cssClass = 'graph';
 };
 scout.inherits(scout.GraphTableControl, scout.TableControl);
 

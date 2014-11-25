@@ -25,7 +25,7 @@ public class ChartTableControl extends AbstractTableControl implements IChartTab
     super.initConfig();
 
     setTooltipText("Diagramm");
-    setCssClass("control-chart");
+    setIconId("\uE022"); //Icons.Chart
     setGroup("Anzeige");
   }
 

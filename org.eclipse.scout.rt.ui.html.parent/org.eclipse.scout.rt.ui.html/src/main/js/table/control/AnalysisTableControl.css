@@ -1,8 +1,4 @@
-.control-analysis:before {
-  content: @icon-target;
-}
-
-.control-analysis-content {
+.control-content-analysis {
   padding: @table-control-content-padding;
 }
 
@@ -39,11 +35,21 @@
     content: @icon-add;
   }
 
-  & .command.delete:before { content: @icon-remove;  }
-  & .command.search:before { content: @icon-search;  }
+  & .command.delete:before {
+    content: @icon-remove;
+  }
 
-  & .command:hover { color: @active-color; }
-  & .command:hover:before { color: @active-color; }
+  & .command.search:before {
+    content: @icon-search;
+  }
+
+  & .command:hover {
+    color: @active-color;
+  }
+
+  & .command:hover:before {
+    color: @active-color;
+  }
 
   & .simulator {
     padding: 10px 5px 0px 5px;

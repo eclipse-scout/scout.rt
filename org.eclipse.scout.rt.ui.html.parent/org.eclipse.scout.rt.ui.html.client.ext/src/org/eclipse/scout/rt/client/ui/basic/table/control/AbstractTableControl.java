@@ -15,7 +15,6 @@ import org.eclipse.scout.rt.client.ui.action.AbstractAction;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 
 public abstract class AbstractTableControl extends AbstractAction implements ITableControl {
-  private String m_cssClass;
   private String m_group;
 
   public AbstractTableControl() {
@@ -34,15 +33,6 @@ public abstract class AbstractTableControl extends AbstractAction implements ITa
 
   public void setForm(IForm form) {
     propertySupport.setProperty(PROP_FORM, form);
-  }
-
-  public void setCssClass(String cssClass) {
-    m_cssClass = cssClass;
-  }
-
-  @Override
-  public String getCssClass() {
-    return m_cssClass;
   }
 
   public void setGroup(String group) {

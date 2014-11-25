@@ -21,7 +21,7 @@ public class SearchFormTableControl extends AbstractTableControl {
   protected void initConfig() {
     super.initConfig();
 
-    setCssClass("control-query");
+    setIconId("\uF002"); //Icons.Search
     setTooltipText("Suche");
     setGroup("Suche");
   }

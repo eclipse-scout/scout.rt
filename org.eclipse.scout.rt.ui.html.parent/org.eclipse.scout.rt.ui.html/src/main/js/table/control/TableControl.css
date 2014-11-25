@@ -1,0 +1,50 @@
+.control {
+  position: relative;
+  display: inline-block;
+  padding: 0 @table-control-padding;
+  cursor: pointer;
+  margin-top: -1px;
+  height: @table-footer-height;
+  line-height: @table-footer-height;
+  border: 1px solid transparent;
+
+  &[data-icon]:before {
+    .font-icon;
+    font-size: 22px;
+    color: @footer-color;
+    content: attr(data-icon);
+  }
+
+  &:last-child:after {
+    content: ' ';
+    position: absolute;
+    top: @table-control-padding / 2  + 2px;
+    right: -1px;
+    height: @table-footer-height - @table-control-padding - 4px;
+    border-right: 1px solid @color-bench-light-border;
+  }
+
+  &:hover:before {
+    color: @active-color;
+  }
+
+  &.disabled:hover, &.disabled:before{
+    cursor: default;
+    color: @footer-disabled-color;
+  }
+
+  &.selected:before {
+    color: @active-color !important;
+  }
+
+  &.selected {
+    border-left: 1px solid @color-bench-light-border;
+    border-right: 1px solid @color-bench-light-border;
+    border-top: 1px solid @palette-white;
+    background-color: @palette-white;
+  }
+}
+
+.tooltip.table-control {
+  margin-top: 10px;
+}

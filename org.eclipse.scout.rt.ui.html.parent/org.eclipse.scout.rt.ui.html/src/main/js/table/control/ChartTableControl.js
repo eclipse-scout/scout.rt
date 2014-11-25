@@ -3,6 +3,7 @@
 
 scout.ChartTableControl = function() {
   scout.ChartTableControl.parent.call(this);
+  this.cssClass = 'chart';
 };
 
 scout.inherits(scout.ChartTableControl, scout.TableControl);

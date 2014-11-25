@@ -394,3 +394,13 @@ Das Konzept für die MenuBar muss überarbeitet werden. Wichtige Punkte sind dab
 - Wie werden die Menu-Contributions von Form, Page, Selection sinnvoll zusammengesetzt? Welche Möglichkeiten soll
   es geben, diese per Konfiguration zu steuern? Brauchen wir frei konfigurierbare logische Gruppen wie in Eclipse
   RCP? oder reicht ein horiz. Alignment wie heute?
+
+ 25.11.2014 AWE, CGU - Überlegungen zu Icons
+- Wir behalten getConfiguredIconId
+- Icons.java beinhaltet Konstanten zu den Icons (wie heute)
+- Icons können Font-Icons sein oder gewöhnliche Resourcen
+- Die Information ist codiert in der IconId. z.B. scoutIcons:\E002 für Font Icons mit der Font scoutIcons.
+- Für Ressource-Icons muss dem Client noch mitgeteilt werden, welche States es für die Icons gibt (hover, disabled, selected, etc).
+- Die State-Icons sind entweder als einzelne Resourcen verfügbar oder als Sprite (am besten ein Sprite mit allen States pro Icon)
+- Die State-Info sollte vorzugsweise gecached sein auf dem Client (IconRegistry). Der Json Layer könnte eine analoge Registry haben (JsonIconRegistrY),
+  damit der Server weiss, bei welchen Icons nur der Key oder die komplette State-Info mitgeschickt werden muss (ähnlich wie AdapterRegistry)

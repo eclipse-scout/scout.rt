@@ -29,13 +29,6 @@ public class JsonTableControl<T extends ITableControl> extends JsonAction<T> {
   protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
 
-    putJsonProperty(new JsonProperty<ITableControl>("cssClass", model) {
-      @Override
-      protected String modelValue() {
-        return getModel().getCssClass();
-      }
-    });
-
     putJsonProperty(new JsonProperty<ITableControl>("group", model) {
       @Override
       protected String modelValue() {

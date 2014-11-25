@@ -1,8 +1,4 @@
-.control-chart:before {
-  content:@icon-chart;
-}
-
-.control-chart-content {
+.control-content-chart {
   padding: @table-control-content-padding;
 }
 

@@ -18,8 +18,5 @@ public interface ITableControl extends IAction {
 
   IForm getForm();
 
-  //FIXME CGU better use icon instead?
-  String getCssClass();
-
   String getGroup();
 }

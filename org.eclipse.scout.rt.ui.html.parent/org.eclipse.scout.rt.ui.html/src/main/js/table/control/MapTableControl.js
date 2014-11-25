@@ -2,6 +2,7 @@
 
 scout.MapTableControl = function() {
   scout.MapTableControl.parent.call(this);
+  this.cssClass = 'map';
 };
 scout.inherits(scout.MapTableControl, scout.TableControl);
 

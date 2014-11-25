@@ -1,7 +1,7 @@
 scout.AnalysisTableControl = function() {
   scout.AnalysisTableControl.parent.call(this);
-
   this._addAdapterProperties('dataModel');
+  this.cssClass = 'analysis';
 };
 
 scout.inherits(scout.AnalysisTableControl, scout.TableControl);
