@@ -116,7 +116,8 @@ public class JavascriptDebugRequestInterceptor extends AbstractService implement
   }
 
   protected URL findBundleResource(String bundlePath) {
-    for (IServletResourceProvider provider : SERVICES.getServices(IServletResourceProvider.class)) {
+    IServletResourceProvider[] providers = SERVICES.getServices(IServletResourceProvider.class);
+    for (IServletResourceProvider provider : providers) {
       URL url = provider.resolveBundleResource(bundlePath);
       if (url != null) {
         return url;

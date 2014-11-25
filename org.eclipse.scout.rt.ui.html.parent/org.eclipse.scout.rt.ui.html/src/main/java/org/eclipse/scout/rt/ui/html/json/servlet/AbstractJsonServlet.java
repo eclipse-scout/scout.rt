@@ -52,12 +52,12 @@ public abstract class AbstractJsonServlet extends HttpServletEx {
     }
 
     try {
-      for (IServletRequestInterceptor service : SERVICES.getServices(IServletRequestInterceptor.class)) {
-        if (service.interceptGet(this, req, resp)) {
+      IServletRequestInterceptor[] interceptors = SERVICES.getServices(IServletRequestInterceptor.class);
+      for (IServletRequestInterceptor interceptor : interceptors) {
+        if (interceptor.interceptGet(this, req, resp)) {
           return;
         }
       }
-
     }
     catch (Throwable t) {
       LOG.error("Exception while processing GET request: " + req.getRequestURI(), t);
@@ -72,8 +72,9 @@ public abstract class AbstractJsonServlet extends HttpServletEx {
   protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     LOG.info("POST request started: " + req.getRequestURI());
     try {
-      for (IServletRequestInterceptor service : SERVICES.getServices(IServletRequestInterceptor.class)) {
-        if (service.interceptPost(this, req, resp)) {
+      IServletRequestInterceptor[] interceptors = SERVICES.getServices(IServletRequestInterceptor.class);
+      for (IServletRequestInterceptor interceptor : interceptors) {
+        if (interceptor.interceptPost(this, req, resp)) {
           return;
         }
       }
