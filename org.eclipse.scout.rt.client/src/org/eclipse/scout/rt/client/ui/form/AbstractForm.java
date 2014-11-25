@@ -935,8 +935,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
         FindFieldByFormDataIdVisitor v = new FindFieldByFormDataIdVisitor(fieldQId, this);
         visitFields(v);
         IFormField f = v.getField();
-        if (formFieldFilter == null || formFieldFilter.accept(f)) {
-          if (f != null) {
+        if (f != null) {
+          if (formFieldFilter == null || formFieldFilter.accept(f)) {
             dataMap.put(f, data);
             if (f.getMasterField() != null) {
               int index = slaveList.indexOf(f.getMasterField());
