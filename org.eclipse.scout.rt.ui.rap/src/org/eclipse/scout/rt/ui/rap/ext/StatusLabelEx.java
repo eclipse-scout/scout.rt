@@ -38,6 +38,7 @@ public class StatusLabelEx extends Composite implements ILabelComposite {
 
   private IProcessingStatus m_status;
   private boolean m_mandatory;
+  private boolean m_enabled;
   private Control m_label;
 
   private Label m_statusLabel;
@@ -64,6 +65,7 @@ public class StatusLabelEx extends Composite implements ILabelComposite {
 
     m_nonMandatoryFont = m_label.getFont();
     m_nonMandatoryForegroundColor = m_label.getForeground();
+    m_enabled = super.getEnabled();
   }
 
   protected void createLayout() {
@@ -176,7 +178,12 @@ public class StatusLabelEx extends Composite implements ILabelComposite {
 
   @Override
   public void setEnabled(boolean enabled) {
-    super.setEnabled(enabled);
+    if (m_enabled == enabled) {
+      return;
+    }
+
+    // only mark/display it disabled otherwise the tooltip caused by shortened label text is only visible in enabled state
+    m_enabled = enabled;
 
     if (enabled) {
       setForeground(null);
@@ -184,6 +191,17 @@ public class StatusLabelEx extends Composite implements ILabelComposite {
     else {
       setForeground(getUiEnvironment().getColor(UiDecorationExtensionPoint.getLookAndFeel().getColorForegroundDisabled()));
     }
+  }
+
+  /**
+   * @return always returns <code>true</code> because RAP only presents tooltips for enabled widgets.
+   * @see EventHandler.js#_onmouseevent_post: <code>... if(vDispatchTarget.getEnabled()) ...</code>
+   * @see Bugzilla https://bugs.eclipse.org/bugs/show_bug.cgi?id=445192
+   * @see Bugzilla https://bugs.eclipse.org/bugs/show_bug.cgi?id=383073
+   */
+  @Override
+  public boolean getEnabled() {
+    return true;
   }
 
   protected void updateMandatoryStatus() {

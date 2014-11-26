@@ -143,15 +143,15 @@ public abstract class RwtScoutFieldComposite<T extends IFormField> extends RwtSc
       }
     }
     if (getUiLabel() != null) {
-      if (getUiLabel().getEnabled() != b) {
-        getUiLabel().setEnabled(b);
-      }
+      // No guard for changing the enability because 'StatusLabelEx#getEnabled' always returns true.
+      // See Bugzilla https://bugs.eclipse.org/bugs/show_bug.cgi?id=445192; https://bugs.eclipse.org/bugs/show_bug.cgi?id=383073.
+      getUiLabel().setEnabled(b);
     }
   }
 
   /**
    * used to change enabled into read only
-   * 
+   *
    * @param field
    * @param enabled
    */
