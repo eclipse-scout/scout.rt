@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.MouseButton;
@@ -132,10 +133,6 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     m_treeNodes.clear();
   }
 
-  public TreeEventFilter getTreeEventFilter() {
-    return m_treeEventFilter;
-  }
-
   @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
@@ -156,7 +153,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   }
 
   protected void handleModelTreeEvent(TreeEvent event) {
-    event = getTreeEventFilter().filter(event);
+    event = m_treeEventFilter.filter(event);
     if (event == null) {
       return;
     }
@@ -368,33 +365,22 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     getModel().getUIFacade().fireNodeActionFromUI(node);
   }
 
+  private void addTreeEventFilterCondition(int type, List<ITreeNode> nodes) {
+    m_treeEventFilter.addCondition(new TreeEventFilterCondition(type, nodes));
+  }
+
   protected void handleUiNodesSelected(JsonEvent event, JsonResponse res) {
     final List<ITreeNode> nodes = extractTreeNodes(event.getData());
-    TreeEventFilterCondition condition = new TreeEventFilterCondition(TreeEvent.TYPE_NODES_SELECTED, nodes);
-    getTreeEventFilter().addCondition(condition);
-    try {
-      getModel().getUIFacade().setNodesSelectedFromUI(nodes);
-    }
-    finally {
-      getTreeEventFilter().removeCondition(condition);
-    }
+    addTreeEventFilterCondition(TreeEvent.TYPE_NODES_SELECTED, nodes);
+    getModel().getUIFacade().setNodesSelectedFromUI(nodes);
   }
 
   protected void handleUiNodeExpanded(JsonEvent event, JsonResponse res) {
     ITreeNode node = getTreeNodeForNodeId(JsonObjectUtility.getString(event.getData(), PROP_NODE_ID));
     boolean expanded = JsonObjectUtility.getBoolean(event.getData(), PROP_EXPANDED);
-    int eventType = TreeEvent.TYPE_NODE_EXPANDED;
-    if (!expanded) {
-      eventType = TreeEvent.TYPE_NODE_COLLAPSED;
-    }
-    TreeEventFilterCondition condition = new TreeEventFilterCondition(eventType, node);
-    getTreeEventFilter().addCondition(condition);
-    try {
-      getModel().getUIFacade().setNodeExpandedFromUI(node, expanded);
-    }
-    finally {
-      getTreeEventFilter().removeCondition(condition);
-    }
+    int eventType = expanded ? TreeEvent.TYPE_NODE_EXPANDED : TreeEvent.TYPE_NODE_COLLAPSED;
+    addTreeEventFilterCondition(eventType, CollectionUtility.arrayList(node));
+    getModel().getUIFacade().setNodeExpandedFromUI(node, expanded);
   }
 
   private class P_ModelTreeListener implements TreeListener {
@@ -407,6 +393,12 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     public void treeChangedBatch(List<? extends TreeEvent> events) {
       handleModelTreeEventBatch(events);
     }
+  }
+
+  @Override
+  public void cleanUpEventFilters() {
+    super.cleanUpEventFilters();
+    m_treeEventFilter.removeAllConditions();
   }
 
 }

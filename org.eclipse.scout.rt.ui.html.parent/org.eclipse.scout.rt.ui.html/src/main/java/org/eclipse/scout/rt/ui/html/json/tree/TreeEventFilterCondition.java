@@ -28,10 +28,6 @@ public class TreeEventFilterCondition {
     m_checkNodes = false;
   }
 
-  public TreeEventFilterCondition(int type, ITreeNode node) {
-    this(type, CollectionUtility.arrayList(node));
-  }
-
   public TreeEventFilterCondition(int type, List<? extends ITreeNode> nodes) {
     m_nodes = CollectionUtility.arrayList(nodes);
     m_type = type;

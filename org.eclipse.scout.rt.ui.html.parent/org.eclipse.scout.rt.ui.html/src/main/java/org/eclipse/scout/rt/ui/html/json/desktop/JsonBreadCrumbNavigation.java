@@ -122,7 +122,7 @@ public class JsonBreadCrumbNavigation<T extends IBreadCrumbsNavigation> extends 
 
   }
 
-  // FIXME verify with AWE - really necessary to hold a state? Not extendable
+  // FIXME CGU: verify with A.WE - really necessary to hold a state? Not extendable
   private class JsonBreadCrumb implements IJsonMapper {
     private IBreadCrumb m_breadCrumb;
 

@@ -58,6 +58,7 @@ public class JsonEventProcessor {
     try {
       LOG.info("Handling event. Type: " + event.getType() + ", Id: " + id);
       jsonAdapter.handleUiEvent(event, response);
+      jsonAdapter.cleanUpEventFilters();
     }
     catch (Throwable t) {
       LOG.error("Handling event. Type: " + event.getType() + ", Id: " + id, t);

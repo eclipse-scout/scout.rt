@@ -16,7 +16,6 @@ import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
-import org.eclipse.scout.rt.ui.html.json.PropertyChangeEventFilterCondition;
 
 /**
  * Base class used to create JSON output for Scout form-fields with a value. When a sub-class need to provide a custom
@@ -61,18 +60,11 @@ public class JsonValueField<T extends IValueField<?>> extends JsonFormField<T> {
   protected void handleUiDisplayTextChanged(JsonEvent event) {
     String displayText = JsonObjectUtility.getString(event.getData(), IValueField.PROP_DISPLAY_TEXT);
     boolean whileTyping = event.getData().optBoolean("whileTyping");
-
-    PropertyChangeEventFilterCondition condition = new PropertyChangeEventFilterCondition(IValueField.PROP_DISPLAY_TEXT, displayText);
-    getPropertyEventFilter().addCondition(condition);
-    try {
-      handleUiDisplayTextChangedImpl(displayText, whileTyping);
-    }
-    finally {
-      getPropertyEventFilter().removeCondition(condition);
-    }
+    addPropertyEventFilterCondition(IValueField.PROP_DISPLAY_TEXT, displayText);
+    handleUiDisplayTextChangedImpl(displayText, whileTyping);
   }
 
   protected void handleUiDisplayTextChangedImpl(String displayText, boolean whileTyping) {
-    //NOP may be implemented by subclasses
+    // NOP may be implemented by subclasses
   }
 }

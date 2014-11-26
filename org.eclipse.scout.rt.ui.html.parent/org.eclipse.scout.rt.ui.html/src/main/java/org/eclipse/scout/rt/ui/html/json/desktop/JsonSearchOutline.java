@@ -17,7 +17,6 @@ import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonException;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
-import org.eclipse.scout.rt.ui.html.json.PropertyChangeEventFilterCondition;
 
 public class JsonSearchOutline<T extends ISearchOutline> extends JsonOutline<T> {
 
@@ -60,16 +59,12 @@ public class JsonSearchOutline<T extends ISearchOutline> extends JsonOutline<T> 
 
   protected void handleUiSearch(JsonEvent event) {
     String query = event.getData().optString("query");
-    PropertyChangeEventFilterCondition condition = new PropertyChangeEventFilterCondition(ISearchOutline.PROP_SEARCH_QUERY, query);
-    getPropertyEventFilter().addCondition(condition);
+    addPropertyEventFilterCondition(ISearchOutline.PROP_SEARCH_QUERY, query);
     try {
       getModel().search(query);
     }
     catch (ProcessingException e) {
       throw new JsonException(e);
-    }
-    finally {
-      getPropertyEventFilter().removeCondition(condition);
     }
   }
 

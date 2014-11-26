@@ -28,7 +28,7 @@ scout.FormField.LABEL_POSITION_RIGHT = 3;
 scout.FormField.LABEL_POSITION_TOP = 4;
 
 scout.FormField.prototype._render = function($parent) {
-  // TODO AWE: (form) remove this code when FormField is "abstract". There should be no reason to instantiate a
+  // TODO AWE: [P2] remove this code when FormField is "abstract". There should be no reason to instantiate a
   // FormField directly. Currently this is required as a placeholder for un-implemented form-fields.
   this.addContainer($parent, 'form-field');
   this.addLabel();

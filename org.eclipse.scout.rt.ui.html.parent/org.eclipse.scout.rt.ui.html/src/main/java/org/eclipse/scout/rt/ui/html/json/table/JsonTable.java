@@ -217,10 +217,6 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     }
   }
 
-  public TableEventFilter getTableEventFilter() {
-    return m_tableEventFilter;
-  }
-
   @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
@@ -278,17 +274,16 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     getModel().getUIFacade().fireRowClickFromUI(tableRow, MouseButton.Left);
   }
 
+  private TableEventFilterCondition addTableEventFilterCondition(int tableEventType) {
+    TableEventFilterCondition conditon = new TableEventFilterCondition(tableEventType);
+    m_tableEventFilter.addCondition(conditon);
+    return conditon;
+  }
+
   protected void handleUiRowsSelected(JsonEvent event, JsonResponse res) {
     List<ITableRow> tableRows = extractTableRows(event.getData());
-    TableEventFilterCondition filterCondition = new TableEventFilterCondition(TableEvent.TYPE_ROWS_SELECTED);
-    filterCondition.setRows(tableRows);
-    getTableEventFilter().addCondition(filterCondition);
-    try {
-      getModel().getUIFacade().setSelectedRowsFromUI(tableRows);
-    }
-    finally {
-      getTableEventFilter().removeCondition(filterCondition);
-    }
+    addTableEventFilterCondition(TableEvent.TYPE_ROWS_SELECTED).setRows(tableRows);
+    getModel().getUIFacade().setSelectedRowsFromUI(tableRows);
   }
 
   protected void handleUiReload(JsonEvent event, JsonResponse res) {
@@ -329,27 +324,19 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     IColumn column = extractColumn(event.getData());
     boolean multiSort = event.getData().optBoolean("multiSort");
     boolean sortingRemoved = event.getData().optBoolean("sortingRemoved");
-
-    TableEventFilterCondition filterCondition = new TableEventFilterCondition(TableEvent.TYPE_ROW_ORDER_CHANGED);
-    getTableEventFilter().addCondition(filterCondition);
-    try {
-      fireSortRowsFromUi(column, multiSort, sortingRemoved);
-    }
-    finally {
-      getTableEventFilter().removeCondition(filterCondition);
-    }
+    addTableEventFilterCondition(TableEvent.TYPE_ROW_ORDER_CHANGED);
+    fireSortRowsFromUi(column, multiSort, sortingRemoved);
   }
 
   protected void handleUiSortRows(JsonEvent event, JsonResponse res) {
     IColumn column = extractColumn(event.getData());
     boolean multiSort = event.getData().optBoolean("multiSort");
     boolean sortingRemoved = event.getData().optBoolean("sortingRemoved");
-
     fireSortRowsFromUi(column, multiSort, sortingRemoved);
   }
 
   protected void fireSortRowsFromUi(IColumn<?> column, boolean multiSort, boolean sortingRemoved) {
-    //FIXME CGU add filter for HEADER_UPDATE event with json data of column (execDecorateHeaderCell is called which may change other header properties (text etc)
+    // FIXME CGU add filter for HEADER_UPDATE event with json data of column (execDecorateHeaderCell is called which may change other header properties (text etc)
     if (sortingRemoved && getModel() instanceof ITable5) {
       ((ITable5) getModel()).fireSortColumnRemovedFromUI(column);
     }
@@ -362,19 +349,12 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     IColumn column = extractColumn(event.getData());
     int viewIndex = JsonObjectUtility.getInt(event.getData(), "index");
 
-    //Create column list with expected order
-    TableEventFilterCondition filterCondition = new TableEventFilterCondition(TableEvent.TYPE_COLUMN_ORDER_CHANGED);
+    // Create column list with expected order
     List<IColumn<?>> columns = getColumns();
     columns.remove(column);
     columns.add(viewIndex, column);
-    filterCondition.setColumns(columns);
-    getTableEventFilter().addCondition(filterCondition);
-    try {
-      getModel().getUIFacade().fireColumnMovedFromUI(column, viewIndex);
-    }
-    finally {
-      getTableEventFilter().removeCondition(filterCondition);
-    }
+    addTableEventFilterCondition(TableEvent.TYPE_COLUMN_ORDER_CHANGED).setColumns(columns);
+    getModel().getUIFacade().fireColumnMovedFromUI(column, viewIndex);
   }
 
   protected void handleUiColumnResized(JsonEvent event, JsonResponse res) {
@@ -575,10 +555,10 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   }
 
   protected void handleModelTableEvent(TableEvent event) {
-    //FIXME CGU we need to coalesce the events during the same request (something like AbstractTable.processEventBuffer). I don't think the developer should be responsible for this (using setTableChanging(true))
-    //Example: The developer calls addRow several times for the same table -> must generate only one json event -> reduces data and improves redrawing performance on client
-    //Another usecase: If a table row gets edited the developer typically reloads the whole table -> transmits every row again -> actually only the difference needs to be sent. Not sure if this is easy to solve
-    event = getTableEventFilter().filter(event);
+    // FIXME CGU we need to coalesce the events during the same request (something like AbstractTable.processEventBuffer). I don't think the developer should be responsible for this (using setTableChanging(true))
+    // Example: The developer calls addRow several times for the same table -> must generate only one json event -> reduces data and improves redrawing performance on client
+    // Another usecase: If a table row gets edited the developer typically reloads the whole table -> transmits every row again -> actually only the difference needs to be sent. Not sure if this is easy to solve
+    event = m_tableEventFilter.filter(event);
     if (event == null) {
       return;
     }
@@ -691,5 +671,11 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     public void tableChangedBatch(List<? extends TableEvent> events) {
       handleModelTableEventBatch(events);
     }
+  }
+
+  @Override
+  public void cleanUpEventFilters() {
+    super.cleanUpEventFilters();
+    m_tableEventFilter.removeAllConditions();
   }
 }

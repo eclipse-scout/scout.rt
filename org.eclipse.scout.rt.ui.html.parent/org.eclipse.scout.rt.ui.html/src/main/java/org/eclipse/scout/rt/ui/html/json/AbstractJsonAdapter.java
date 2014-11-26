@@ -226,4 +226,8 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     getJsonSession().currentJsonResponse().addPropertyChangeEvent(getId(), propertyName, newValue);
   }
 
+  @Override
+  public void cleanUpEventFilters() {
+  }
+
 }

@@ -19,7 +19,6 @@ import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonEventType;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
-import org.eclipse.scout.rt.ui.html.json.PropertyChangeEventFilterCondition;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
 import org.json.JSONObject;
 
@@ -35,9 +34,6 @@ public class JsonTabBox<T extends ITabBox> extends JsonFormField<T> {
 
     // instead of returning a whole adapter here, we simply return the index of the group-box (=tab)
     putJsonProperty(new JsonProperty<ITabBox>(ITabBox.PROP_SELECTED_TAB, model) {
-
-      // TODO AWE: (tab-box) feuert als folge von getModel().getUIFacade().setSelectedTabFromUI(groupBox);
-      // einen PC event, den wir gerne filtern würden - wie machen wir das am elegantesten?
 
       @Override
       public Integer prepareValueForToJson(Object value) {
@@ -102,20 +98,13 @@ public class JsonTabBox<T extends ITabBox> extends JsonFormField<T> {
     }
   }
 
-  private void handleUiTabSelected(JsonEvent event) {
+  void handleUiTabSelected(JsonEvent event) {
     int tabIndex = event.getData().optInt("tabIndex");
     List<IGroupBox> groupBoxes = getModel().getGroupBoxes();
     if (tabIndex >= 0 && tabIndex < groupBoxes.size()) {
       IGroupBox groupBox = groupBoxes.get(tabIndex);
-      // TODO AWE: (filter) anschauen --> evtl. filter am ende vom request abräumen
-      PropertyChangeEventFilterCondition condition = new PropertyChangeEventFilterCondition(ITabBox.PROP_SELECTED_TAB, groupBox);
-      getPropertyEventFilter().addCondition(condition);
-      try {
-        getModel().getUIFacade().setSelectedTabFromUI(groupBox);
-      }
-      finally {
-        getPropertyEventFilter().removeCondition(condition);
-      }
+      addPropertyEventFilterCondition(ITabBox.PROP_SELECTED_TAB, groupBox);
+      getModel().getUIFacade().setSelectedTabFromUI(groupBox);
     }
   }
 }

@@ -17,6 +17,7 @@ import java.util.List;
 import org.eclipse.scout.commons.CollectionUtility;
 
 public abstract class AbstractEventFilter<EVENT extends EventObject, CONDITION> {
+
   private List<CONDITION> m_conditions;
 
   public AbstractEventFilter() {
@@ -36,4 +37,12 @@ public abstract class AbstractEventFilter<EVENT extends EventObject, CONDITION> 
   public void removeCondition(CONDITION event) {
     m_conditions.remove(event);
   }
+
+  /**
+   * Removes all conditions from this filter.
+   */
+  public void removeAllConditions() {
+    m_conditions.clear();
+  }
+
 }

@@ -27,6 +27,7 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
   private P_PropertyChangeListener m_propertyChangeListener;
   private PropertyEventFilter m_propertyEventFilter;
   private boolean m_initializingProperties;
+
   /**
    * Key = propertyName.
    */
@@ -40,11 +41,9 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
   @Override
   protected void init() {
     m_jsonProperties = new HashMap<>();
-
     m_initializingProperties = true;
     initJsonProperties(getModel());
     m_initializingProperties = false;
-
     super.init();
   }
 
@@ -67,8 +66,15 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
     return m_jsonProperties.get(name);
   }
 
-  public PropertyEventFilter getPropertyEventFilter() {
-    return m_propertyEventFilter;
+  /**
+   * Adds a filter condition for the given property and value to the current response. When later in this event
+   * handler a property change event occurs with the same value, the event is not sent back to the client (=filtered).
+   *
+   * @param propertyName
+   * @param value
+   */
+  protected void addPropertyEventFilterCondition(String propertyName, Object value) {
+    m_propertyEventFilter.addCondition(new PropertyChangeEventFilterCondition(propertyName, value));
   }
 
   @Override
@@ -84,11 +90,11 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
   @Override
   protected void disposeChildAdapters() {
     super.disposeChildAdapters();
-    //FIXME CGU this is actually wrong. attach adapters does not necessarily create a new adapter (It may if there is non for the given model).
-    //Dispose however always disposes. If the model is used elsewhere, it will fail because there is no adapter anymore
-    //Possible solutions:
-    //- Dispose removes just the owning adapter (this) from a set of references. Only if the list is empty dispose the adapter. BUT: Aussuming the property is set to null before disposing the owning adapter, the child adapter never gets disposed.
-    //- Don't create an adapter for each model instance. Instead always create an adapter if the owning adapter needs one (getOrCreate -> create). But: May influence traffic and offline behaviour. Needs to be considered very well.
+    // FIXME CGU this is actually wrong. attach adapters does not necessarily create a new adapter (It may if there is non for the given model).
+    // Dispose however always disposes. If the model is used elsewhere, it will fail because there is no adapter anymore
+    // Possible solutions:
+    // - Dispose removes just the owning adapter (this) from a set of references. Only if the list is empty dispose the adapter. BUT: Assuming the property is set to null before disposing the owning adapter, the child adapter never gets disposed.
+    // - Don't create an adapter for each model instance. Instead always create an adapter if the owning adapter needs one (getOrCreate -> create). But: May influence traffic and offline behaviour. Needs to be considered very well.
     for (JsonProperty<?> prop : m_jsonProperties.values()) {
       if (prop instanceof JsonAdapterProperty) {
         ((JsonAdapterProperty) prop).disposeAdapters();
@@ -134,12 +140,17 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
   private class P_PropertyChangeListener implements PropertyChangeListener {
     @Override
     public void propertyChange(PropertyChangeEvent event) {
-      event = getPropertyEventFilter().filter(event);
+      event = m_propertyEventFilter.filter(event);
       if (event == null) {
         return;
       }
       handleModelPropertyChange(event.getPropertyName(), event.getNewValue());
     }
+  }
+
+  @Override
+  public void cleanUpEventFilters() {
+    m_propertyEventFilter.removeAllConditions();
   }
 
 }

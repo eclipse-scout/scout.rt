@@ -17,7 +17,6 @@ import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
-import org.eclipse.scout.rt.ui.html.json.PropertyChangeEventFilterCondition;
 
 public class JsonAction<T extends IAction> extends AbstractJsonPropertyObserver<T> {
   public static final String EVENT_DO_ACTION = "doAction";
@@ -100,15 +99,8 @@ public class JsonAction<T extends IAction> extends AbstractJsonPropertyObserver<
 
   protected void handleUiSelected(JsonEvent event) {
     boolean selected = JsonObjectUtility.getBoolean(event.getData(), IAction.PROP_SELECTED);
-
-    PropertyChangeEventFilterCondition condition = new PropertyChangeEventFilterCondition(IAction.PROP_SELECTED, selected);
-    getPropertyEventFilter().addCondition(condition);
-    try {
-      getModel().getUIFacade().setSelectedFromUI(selected);
-    }
-    finally {
-      getPropertyEventFilter().removeCondition(condition);
-    }
+    addPropertyEventFilterCondition(IAction.PROP_SELECTED, selected);
+    getModel().getUIFacade().setSelectedFromUI(selected);
   }
 
 }
