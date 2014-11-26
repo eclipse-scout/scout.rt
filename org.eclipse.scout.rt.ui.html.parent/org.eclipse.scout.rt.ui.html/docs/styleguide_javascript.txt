@@ -4,6 +4,8 @@
 
 Als Basis dient der Google JavaScript StyleGuide:
 https://google-styleguide.googlecode.com/svn/trunk/javascriptguide.xml
+Bei einigen Punkten wurde auch der StyleGuide von jQuery zu Rate gezogen:
+http://contribute.jquery.org/style-guide/js/
 
 
 ### Variablen
@@ -30,7 +32,6 @@ var x = (y > 0 ? 1 : 2), y = $('h1').children('.myClass').first().text();
                                  y = 3,
                                  value = $('h1').text();
 
-
 Links:
 - http://benalman.com/news/2012/05/multiple-var-statements-javascript/
 
@@ -41,14 +42,15 @@ Wir verwenden _ als Prefix für private Members einer Klasse. Solche Members dü
 
 ### Pruefen, ob eine Variable oder ein Property existiert
 
-Varianten fuer Properties:
-  1. if (obj.x === undefined)
-  2. if (typeof obj.x === 'undefined')
-  3. if (obj.hasOwnProperty('x'))
-
-Varianten fuer Variablen:
-  1. if (y === undefined)
-  2. if (typeof y === 'undefined')
+        +-------------------------------------+----------------------------------+
+        | FUER PROPERTIES:                    | FUER VARIABLEN:                  |
+ +------+-------------------------------------+----------------------------------+
+ | #1   | if (obj.x === undefined)            | if (y === undefined)             |
+ |      |                                     |                                  |
+ | #2   | if (typeof obj.x === 'undefined')   | if (typeof y === 'undefined')    |
+ |      |                                     |                                  |
+ | #3   | if (obj.hasOwnProperty('x'))        | -                                |
+ +------+-------------------------------------+----------------------------------+
 
 Bewertung:
 - #1 funktioniert bei Properties, aber nicht bei Variablen. Wenn die Variable nicht
@@ -159,25 +161,64 @@ Die Implementierung von setSize ist wie folgt:
 Bei Konstruktoren moechte man oft auch einen Default-Konstruktor, das Beispiel oben liesse sich
 dann wie folgt erweitern:
 
-      this.width = vararg || 0;
-      this.height = height || 0;
+  this.width = vararg || 0;
+  this.height = height || 0;
 
-Für Konstruktoren mit vielen Parametern bietet es sich an, ein einzelnes Objekt als Parameter zu verwenden. Wir nennen dieses Objekt "options".
-Dies macht die Erzeugung eines Objektes einiges übersichtlicher:
+Für Konstruktoren mit vielen Parametern bietet es sich an, ein einzelnes Objekt als Parameter zu
+verwenden. Wir nennen dieses Objekt "options". Dies macht die Erzeugung eines Objektes einiges
+übersichtlicher:
 
-scout.MyObject = function(options) {
-  options = options || {};
-  var param1 = options.param1 || 'default';
-  var param2 = options.param2 !== undefined ? options.param2 : true
-}
+  scout.MyObject = function(options) {
+    options = options || {};
+    var param1 = options.param1 || 'default';
+    var param2 = options.param2 !== undefined ? options.param2 : true
+  }
 
-var obj = new scout.MyObject({
-  param1: 'abc',
-  param2: false
-}
+  var obj = new scout.MyObject({
+    param1: 'abc',
+    param2: false
+  }
 
-Achtung: Falls '', 0 oder false als Werte erlaubt sind, kann || nicht verwendet werden -> ? Notation verwenden
-Alternativ kann auch $.extend eingesetzt werden.
+Achtung: Falls '', 0 oder false als Werte erlaubt sind, kann || nicht verwendet werden.
+In diesen Faellen die ? Notation verwenden. Alternativ kann auch $.extend eingesetzt werden.
+
 
 ### Properties
-Wir erzeugen keine getter und setter für einfache Properties (ohne Logik). Man soll direkt auf die Variable zugreifen. Hauptgrund -> Code wird nicht unnötig aufgeblasen.
+
+Wir erzeugen keine Getter und Setter für einfache Properties (ohne Logik). Man soll direkt auf die
+Variable zugreifen. Hauptgrund: Code wird nicht unnötig aufgeblasen.
+
+
+### Einzeilige if-Statements / Geschweifte Klammern
+
+Bei 'if' soll die Bedingung immer auf einer separaten Zeile. Die einzelnen Klauseln sollen immer
+in geschweifte Klammern eingefasst sein.
+
+NOK:
+  if (hasPrev && hasNext) $(this).addClass('select-middle');
+OK:
+  if (hasPrev && hasNext) {
+    $(this).addClass('select-middle');
+  }
+
+Begruendung:
+- Code wird robuster gegenueber unbeabsichtigt geaendertem Verhalten bei Refactorings.
+- Wir machen es im Java-Code auch so.
+
+
+### Method Chaining
+
+Wenn eine Anweisung mit durch '.' verbundenen Methodenaufrufen auf mehrere Zeilen verteilt
+werden soll, dann sollen die Punkte immer am Anfang der naechsten Zeile stehen.
+
+  OK:                                      NOK:
+  ----------------------------             -----------------------------
+  $("#p1").css("color", "red")             $("#p1").css("color", "red").
+    .slideUp(2000)                           slideUp(2000).
+    .slideDown(2000);                        slideDown(2000);
+
+Begruendung:
+- Die Style-Guides sind sich nicht einig. Google macht die Punkte hinten, jQuery hingegen vorne.
+  Da wir viele jQuery-Funktionen verwenden, halten wir uns an den jQuery-Styleguide.
+- Der JS-Formatter in Eclipse beherrscht aktuell nur die Punkte vorne. Deshalb verwenden wir
+  diesen Stil, obwohl er anders ist als im Java-Code.
