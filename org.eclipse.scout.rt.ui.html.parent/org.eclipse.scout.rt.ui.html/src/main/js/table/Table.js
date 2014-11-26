@@ -310,7 +310,7 @@ scout.Table.prototype.drawData = function() {
 };
 
 scout.Table.prototype._buildRowDiv = function(row) {
-  var column, width, style, align, value, alignment;
+  var column, style, value, tooltipText, tooltip;
   var rowWidth = this._header.totalWidth + this._getTableRowBorderWidth();
   var rowClass = 'table-row ';
 
@@ -322,13 +322,12 @@ scout.Table.prototype._buildRowDiv = function(row) {
   var rowDiv = '<div id="' + row.id + '" class="' + rowClass + '" style="width: ' + rowWidth + 'px"' + unselectable + '>';
   for (var c = 0; c < this.columns.length; c++) {
     column = this.columns[c];
-    width = column.width;
-    style = (width === 0) ? 'display: none; ' : 'min-width: ' + width + 'px; max-width: ' + width + 'px; ';
-    alignment = scout.Table.parseHorizontalAlignment(column.horizontalAlignment);
-    align = alignment !== 'left' ? 'text-align: ' + alignment + '; ' : '';
+    style = this.getCellStyle(column, row);
     value = this.getCellText(column, row);
+    tooltipText = this.getCellTooltipText(column, row);
+    tooltip = (!scout.strings.hasText(tooltipText) ? '' : ' title="' + tooltipText + '"');
 
-    rowDiv += '<div class="table-cell" style="' + style + align + '"' + unselectable + '>' + value + '</div>';
+    rowDiv += '<div class="table-cell" style="' + style + '"' + tooltip + unselectable + '>' + value + '</div>';
   }
   rowDiv += '</div>';
 
@@ -512,8 +511,8 @@ scout.Table.prototype.sendReload = function() {
   this.session.send('reload', this.id);
 };
 
-scout.Table.prototype.getCellValue = function(col, row) {
-  var cell = row.cells[col.index];
+scout.Table.prototype.getCellValue = function(column, row) {
+  var cell = row.cells[column.index];
 
   if (cell === null) { //cell may be a number so don't use !cell
     return null;
@@ -527,8 +526,8 @@ scout.Table.prototype.getCellValue = function(col, row) {
   return cell.text || '';
 };
 
-scout.Table.prototype.getCellText = function(col, row) {
-  var cell = row.cells[col.index];
+scout.Table.prototype.getCellText = function(column, row) {
+  var cell = row.cells[column.index];
 
   if (!cell) {
     return '';
@@ -537,6 +536,55 @@ scout.Table.prototype.getCellText = function(col, row) {
     return cell;
   }
   return cell.text || '';
+};
+
+scout.Table.prototype.getCellStyle = function(column, row) {
+  var cell = row.cells[column.index];
+
+  var width = column.width;
+  if (width === 0) {
+    return 'display: none;';
+  }
+  var style = 'min-width: ' + width + 'px; max-width: ' + width + 'px; ';
+
+  var hAlign = scout.Table.parseHorizontalAlignment(column.horizontalAlignment);
+  if (typeof cell === 'object' && cell !== null) {
+    if (cell.horizontalAlignment) {
+      hAlign = scout.Table.parseHorizontalAlignment(cell.horizontalAlignment);
+    }
+    if (cell.foregroundColor) {
+      style += 'color: #' + cell.foregroundColor + '; ';
+    }
+    if (cell.backgroundColor) {
+      style += 'background-color: #' + cell.backgroundColor + '; ';
+    }
+    if (cell.font) {
+      var fontSpec = scout.helpers.parseFontSpec(cell.font);
+      if (fontSpec.bold) {
+        style += 'font-weight: bold; ';
+      }
+      if (fontSpec.italic) {
+        style += 'font-style: italic; ';
+      }
+      if (fontSpec.size) {
+        style += 'font-size: ' + fontSpec.size + 'pt; ';
+      }
+      if (fontSpec.name) {
+        style += 'font-family: ' + fontSpec.name + '; ';
+      }
+    }
+    // TODO BSH: iconId, enabled, editable
+  }
+  style += (hAlign === 'left' ? '' : 'text-align: ' + hAlign + '; ');
+  return style;
+};
+
+scout.Table.prototype.getCellTooltipText = function(column, row) {
+  var cell = row.cells[column.index];
+  if (typeof cell === 'object' && cell !== null && scout.strings.hasText(cell.tooltipText)) {
+    return cell.tooltipText;
+  }
+  return '';
 };
 
 scout.Table.prototype._group = function() {

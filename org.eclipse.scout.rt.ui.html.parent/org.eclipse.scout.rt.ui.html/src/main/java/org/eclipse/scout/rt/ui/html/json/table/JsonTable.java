@@ -403,16 +403,21 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   protected Object cellToJson(ICell cell, IColumn column) {
     JSONObject jsonCell = new JSONObject();
     putProperty(jsonCell, "value", getCellValue(cell, column));
-    putProperty(jsonCell, "text", cell.getText());
     putProperty(jsonCell, "iconId", cell.getIconId());
     putProperty(jsonCell, "tooltipText", cell.getTooltipText());
-    putProperty(jsonCell, "horizontalAlignment", cell.getHorizontalAlignment());
+    putProperty(jsonCell, "horizontalAlignment", (cell.getHorizontalAlignment() == -1 ? null : Integer.valueOf(cell.getHorizontalAlignment())));
     putProperty(jsonCell, "foregroundColor", cell.getForegroundColor());
     putProperty(jsonCell, "backgroundColor", cell.getBackgroundColor());
     putProperty(jsonCell, "font", (cell.getFont() == null ? null : cell.getFont().toPattern()));
-    putProperty(jsonCell, "enabled", cell.isEnabled());
-    putProperty(jsonCell, "editable", cell.isEditable());
+    putProperty(jsonCell, "editable", (!cell.isEditable() ? null : Boolean.valueOf(cell.isEditable())));
     // TODO BSH Table | Add property "errorStatus"
+    // TODO BSH Table | Handle "default" values
+    // TODO BSH Table | Add generic "cssStyle" property
+    if (jsonCell.length() == 0) {
+      // To reduce the amount of data, don't generate an object if only the text is returned
+      return cell.getText();
+    }
+    putProperty(jsonCell, "text", cell.getText());
     return jsonCell;
   }
 
@@ -555,7 +560,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     return rows;
   }
 
-  private ITableRow getTableRowForRowId(String rowId) {
+  protected ITableRow getTableRowForRowId(String rowId) {
     ITableRow row = m_tableRows.get(rowId);
     if (row == null) {
       throw new JsonException("No row found for id " + rowId);
