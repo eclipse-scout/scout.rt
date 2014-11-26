@@ -94,6 +94,11 @@ scout.Desktop.prototype._render = function($parent) {
 
   $(window).on('resize', this.onResize.bind(this));
 
+  // Switch off browser's default context menu for the entire scout desktop
+  $parent.bind("contextmenu", function(event) {
+    event.preventDefault();
+  });
+
   // TODO CRU: split and move
   // scout.keystrokeManager.installAdapter($parent, new scout.DesktopKeystrokeAdapter(this.navigation, this.taskbar));
 };
