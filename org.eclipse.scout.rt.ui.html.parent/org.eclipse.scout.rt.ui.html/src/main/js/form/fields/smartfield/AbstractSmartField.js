@@ -49,9 +49,14 @@ scout.AbstractSmartField.prototype._isNavigationKey = function(e) {
 
 scout.AbstractSmartField.prototype._onClick = function(e) {
   if (!this._$popup) {
-    setTimeout(function() {
-      this._openPopup();
-    }.bind(this));
+    this._openPopup();
+  }
+};
+
+scout.AbstractSmartField.prototype._onIconClick = function(event) {
+  scout.AbstractSmartField.parent.prototype._onIconClick.call(this, event);
+  if (!this._$popup) {
+    this._openPopup();
   }
 };
 

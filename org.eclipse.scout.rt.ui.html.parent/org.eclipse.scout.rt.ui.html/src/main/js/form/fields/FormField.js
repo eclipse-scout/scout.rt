@@ -32,9 +32,9 @@ scout.FormField.prototype._render = function($parent) {
   // FormField directly. Currently this is required as a placeholder for un-implemented form-fields.
   this.addContainer($parent, 'form-field');
   this.addLabel();
-  this.addField($('<div>').
-    text('not implemented yet').
-    addClass('not-implemented'));
+  this.addField($('<div>')
+    .text('not implemented yet')
+    .addClass('not-implemented'));
   this.addMandatoryIndicator();
   this.addStatus();
 };
@@ -51,29 +51,31 @@ scout.FormField.prototype._renderProperties = function() {
 };
 
 scout.FormField.prototype._renderMandatory = function(mandatory) {
-  this.$container.updateClass(mandatory, 'mandatory');
+  this.$container.toggleClass('mandatory', mandatory);
 };
 
 scout.FormField.prototype._renderErrorStatus = function(errorStatus) {
   errorStatus = this.errorStatusUi || this.errorStatus;
-  this.$container.updateClass(errorStatus, 'has-error');
+  this.$container.toggleClass('has-error', !! errorStatus);
 
   if (this.$field) {
-    this.$field.updateClass(errorStatus, 'has-error');
+    this.$field.toggleClass('has-error', !! errorStatus);
   }
 
   if (errorStatus) {
-    this._showStatusMessage({autoRemove: false});
+    this._showStatusMessage({
+      autoRemove: false
+    });
   } else {
     this._hideStatusMessage();
   }
 };
 
 scout.FormField.prototype._renderTooltipText = function(tooltipText) {
-  this.$container.updateClass(tooltipText, 'has-tooltip');
+  this.$container.toggleClass('has-tooltip', !! tooltipText);
 
   if (this.$field) {
-    this.$field.updateClass(tooltipText, 'has-tooltip');
+    this.$field.toggleClass('has-tooltip', !! tooltipText);
   }
 };
 
@@ -100,8 +102,7 @@ scout.FormField.prototype._renderLabel = function(label) {
     if (this.$label) {
       this.$label.html('');
     }
-  }
-  else if (this.$label) {
+  } else if (this.$label) {
     this._removePlaceholder();
     this.$label.html(label);
   }
@@ -196,7 +197,9 @@ scout.FormField.prototype.getForm = function() {
 
 scout.FormField.prototype._showStatusMessageOnError = function() {
   if (this.$container.hasClass('has-error')) {
-    this._showStatusMessage({autoRemove: false});
+    this._showStatusMessage({
+      autoRemove: false
+    });
   }
 };
 
@@ -220,9 +223,9 @@ scout.FormField.prototype._goOnline = function() {
  * Appends a LABEL element to this.$container and sets the this.$label property.
  */
 scout.FormField.prototype.addLabel = function() {
-  this.$label = $('<label>').
-    appendTo(this.$container).
-    attr('title', this.label);
+  this.$label = $('<label>')
+    .appendTo(this.$container)
+    .attr('title', this.label);
 };
 
 /**
@@ -258,16 +261,16 @@ scout.FormField.prototype.removeField = function() {
  * Appends a SPAN element for form-field status to this.$container and sets the this.$status property.
  */
 scout.FormField.prototype.addStatus = function() {
-  this.$status = $('<span>').
-    addClass('status').
-    click(this._onStatusClick.bind(this)).
-    appendTo(this.$container);
+  this.$status = $('<span>')
+    .addClass('status')
+    .click(this._onStatusClick.bind(this))
+    .appendTo(this.$container);
 };
 
 scout.FormField.prototype.addMandatoryIndicator = function() {
-  this.$mandatory = $('<span>').
-    addClass('mandatory-indicator').
-    appendTo(this.$container);
+  this.$mandatory = $('<span>')
+    .addClass('mandatory-indicator')
+    .appendTo(this.$container);
 };
 
 /**
@@ -279,12 +282,14 @@ scout.FormField.prototype.addIcon = function($parent) {
   if (!$parent) {
     $parent = this.$container;
   }
-  this.$icon = $('<span>').
-    addClass('icon').
-    click(function() {
-      this.$field.focus();
-    }.bind(this)).
-    appendTo($parent);
+  this.$icon = $('<span>')
+    .addClass('icon')
+    .click(this._onIconClick.bind(this))
+    .appendTo($parent);
+};
+
+scout.FormField.prototype._onIconClick = function(event) {
+  this.$field.focus();
 };
 
 /**
@@ -299,13 +304,13 @@ scout.FormField.prototype.addIcon = function($parent) {
  */
 scout.FormField.prototype.addContainer = function($parent, typeName, layout) {
   this.$container =
-    $.makeDIV('form-field').
-      appendTo($parent);
+    $.makeDIV('form-field')
+    .appendTo($parent);
 
   if (typeName) {
-    this.$container.
-      addClass(typeName).
-      attr('id', this._generateId(typeName));
+    this.$container
+      .addClass(typeName)
+      .attr('id', this._generateId(typeName));
   }
 
   var htmlComp = new scout.HtmlComponent(this.$container, this.session);
@@ -321,7 +326,7 @@ scout.FormField.prototype._generateId = function(cssClass) {
   var i,
     idParts = cssClass.split('-');
 
-  for (i=0; i < idParts.length; i++) {
+  for (i = 0; i < idParts.length; i++) {
     idParts[i] = idParts[i].charAt(0).toUpperCase() + idParts[i].substring(1);
   }
   return idParts.join('') + '-' + this.id;

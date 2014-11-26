@@ -178,18 +178,8 @@
     return this;
   };
 
-  //todo cgu geht auch mit toggle Class nicht?
-  $.fn.updateClass = function(condition, cssClass) {
-    if (condition) {
-      this.addClass(cssClass);
-    } else {
-      this.removeClass(cssClass);
-    }
-    return this;
-  };
-
   $.fn.select = function(selected) {
-    return this.updateClass(selected, 'selected');
+    return this.toggleClass('selected', selected);
   };
 
   $.fn.isSelected = function() {
