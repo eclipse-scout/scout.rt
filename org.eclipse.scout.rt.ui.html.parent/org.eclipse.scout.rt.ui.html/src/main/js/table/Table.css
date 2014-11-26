@@ -103,6 +103,7 @@
 .table-data {
   position: relative;
   overflow: hidden;
+  margin-top: -1px;
 }
 
 /* table rows */
