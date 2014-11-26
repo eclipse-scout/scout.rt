@@ -62,6 +62,15 @@ public final class JsonObjectUtility {
     }
   }
 
+  public static String getString(JSONArray json, int index) {
+    try {
+      return json.getString(index);
+    }
+    catch (JSONException e) {
+      throw toRuntimeException(e);
+    }
+  }
+
   public static int getInt(JSONObject json, String key) {
     try {
       return json.getInt(key);
@@ -71,9 +80,45 @@ public final class JsonObjectUtility {
     }
   }
 
+  public static int getInt(JSONArray json, int index) {
+    try {
+      return json.getInt(index);
+    }
+    catch (JSONException e) {
+      throw toRuntimeException(e);
+    }
+  }
+
+  public static long getLong(JSONObject json, String key) {
+    try {
+      return json.getLong(key);
+    }
+    catch (JSONException e) {
+      throw toRuntimeException(e);
+    }
+  }
+
+  public static long getLong(JSONArray json, int index) {
+    try {
+      return json.getLong(index);
+    }
+    catch (JSONException e) {
+      throw toRuntimeException(e);
+    }
+  }
+
   public static boolean getBoolean(JSONObject json, String key) {
     try {
       return json.getBoolean(key);
+    }
+    catch (JSONException e) {
+      throw toRuntimeException(e);
+    }
+  }
+
+  public static boolean getBoolean(JSONArray json, int index) {
+    try {
+      return json.getBoolean(index);
     }
     catch (JSONException e) {
       throw toRuntimeException(e);
@@ -101,6 +146,15 @@ public final class JsonObjectUtility {
   public static JSONArray getJSONArray(JSONObject json, String key) {
     try {
       return json.getJSONArray(key);
+    }
+    catch (JSONException e) {
+      throw toRuntimeException(e);
+    }
+  }
+
+  public static JSONArray getJSONArray(JSONArray json, int index) {
+    try {
+      return json.getJSONArray(index);
     }
     catch (JSONException e) {
       throw toRuntimeException(e);
@@ -169,16 +223,24 @@ public final class JsonObjectUtility {
    *
    * @param o
    *          the java bean
+   * @return {@link JSONObject}, {@link JSONArray} or a basic type
    */
   public static Object javaToJson(Object o) {
     if (o == null) {
       return null;
     }
     Class<?> type = o.getClass();
-    //blob
+    //basic types
+    if (type == String.class) {
+      return o;
+    }
+    if (type.isPrimitive() || type == Integer.class || type == Long.class || type == Boolean.class) {
+      return o.toString();
+    }
     if (type == byte[].class) {
       JSONObject b64 = new JSONObject();
       putProperty(b64, "b64", Base64Utility.encode((byte[]) o));
+      return b64;
     }
     //array
     if (type.isArray()) {
@@ -188,12 +250,6 @@ public final class JsonObjectUtility {
         jarray.put(javaToJson(Array.get(o, i)));
       }
       return jarray;
-    }
-    if (type == String.class) {
-      return o;
-    }
-    if (type.isPrimitive() || type == Integer.class || type == Long.class || type == Boolean.class) {
-      return o.toString();
     }
     //bean
     if (type.getName().startsWith("java.")) {
@@ -227,61 +283,82 @@ public final class JsonObjectUtility {
   }
 
   /**
-   * Convert a json object to a java bean.
+   * Convert a json object property to java
    * <p>
    * The java class may have public fields or getter/setter methods.
    * <p>
    * Valid data types are: boolean, int, long, String, byte[], array of before mentioned types.
    *
-   * @param jsonObjectOrArray
+   * @param jsonObject
+   *          {@link JSONObject}
    * @param type
    * @param throwForMissingProperty
    *          when set to true then throws an exception if a json property does not exist in the java object, when set
    *          to false ignores this event.
    */
+  public static <T> T jsonObjectPropertyToJava(JSONObject jsonObject, String propertyName, Class<T> type, boolean throwForMissingProperty) {
+    Object jval = getTyped(jsonObject, propertyName, type);
+    return jsonValueToJava(jval, type, throwForMissingProperty);
+  }
+
+  /**
+   * Convert a json array element to java
+   * <p>
+   * The java class may have public fields or getter/setter methods.
+   * <p>
+   * Valid data types are: boolean, int, long, String, byte[], array of before mentioned types.
+   *
+   * @param jsonArray
+   *          {@link JSONArray}
+   * @param type
+   * @param throwForMissingProperty
+   *          when set to true then throws an exception if a json property does not exist in the java object, when set
+   *          to false ignores this event.
+   */
+  public static <T> T jsonArrayElementToJava(JSONArray jsonArray, int index, Class<T> type, boolean throwForMissingProperty) {
+    Object jval = getTyped(jsonArray, index, type);
+    return jsonValueToJava(jval, type, throwForMissingProperty);
+  }
+
   @SuppressWarnings("unchecked")
-  public static <T> T jsonToJava(Object jsonObjectOrArray, Class<T> type, boolean throwForMissingProperty) {
-    Object jo = jsonObjectOrArray;
-    if (jo == null || jo == JSONObject.NULL) {
+  private static <T> T jsonValueToJava(Object jval, Class<T> type, boolean throwForMissingProperty) {
+    if (jval == null || jval == JSONObject.NULL) {
       return null;
     }
-    //blob
+    //basic types
     if (type == byte[].class) {
-      return (T) Base64Utility.decode(getString((JSONObject) jo, "b64"));
+      return (T) jval;
+    }
+    if (type == String.class) {
+      return (T) jval;
+    }
+    if (type == int.class || type == Integer.class) {
+      return (T) jval;
+    }
+    if (type == long.class || type == Long.class) {
+      return (T) jval;
+    }
+    if (type == boolean.class || type == Boolean.class) {
+      return (T) jval;
     }
     //array
-    if (jo instanceof JSONArray) {
-      JSONArray jarray = (JSONArray) jo;
+    if (jval instanceof JSONArray) {
+      JSONArray jarray = (JSONArray) jval;
       int n = jarray.length();
       T array = (T) Array.newInstance(type.getComponentType(), n);
       for (int i = 0; i < n; i++) {
-        Array.set(array, i, jsonToJava(jarray.opt(i), type.getComponentType(), throwForMissingProperty));
+        Array.set(array, i, jsonArrayElementToJava(jarray, i, type.getComponentType(), throwForMissingProperty));
       }
       return array;
     }
-    if (type == String.class) {
-      return (T) jo;
-    }
-    if (type == int.class || type == Integer.class) {
-      return (T) new Integer((String) jo);
-    }
-    if (type == long.class || type == Long.class) {
-      return (T) new Long((String) jo);
-    }
-    if (type == boolean.class || type == Boolean.class) {
-      return (T) new Boolean((String) jo);
-    }
     //bean
-    if (type.getName().startsWith("java.")) {
-      throw new IllegalArgumentException("Cannot convert " + type + " from json to java object");
-    }
-    JSONObject jbean = (JSONObject) jo;
+    JSONObject jbean = (JSONObject) jval;
     T o;
     try {
       o = (T) type.newInstance();
     }
     catch (Exception e) {
-      throw new IllegalArgumentException("type " + type + " object " + jo, e);
+      throw new IllegalArgumentException("type " + type + " object " + jval, e);
     }
     try {
       String[] nameArray = JSONObject.getNames(jbean);
@@ -292,7 +369,7 @@ public final class JsonObjectUtility {
           if (Modifier.isStatic(f.getModifiers())) {
             continue;
           }
-          Object val = jsonToJava(jbean.opt(key), f.getType(), throwForMissingProperty);
+          Object val = jsonObjectPropertyToJava(jbean, key, f.getType(), throwForMissingProperty);
           f.set(o, val);
           missingNames.remove(key);
         }
@@ -308,7 +385,7 @@ public final class JsonObjectUtility {
             continue;
           }
           String key = desc.getName();
-          Object val = jsonToJava(jbean.opt(key), m.getParameterTypes()[0], throwForMissingProperty);
+          Object val = jsonObjectPropertyToJava(jbean, key, m.getParameterTypes()[0], throwForMissingProperty);
           m.invoke(o, val);
           missingNames.remove(key);
         }
@@ -321,6 +398,82 @@ public final class JsonObjectUtility {
     catch (Exception e) {
       throw new IllegalArgumentException(jbean + " to " + type, e);
     }
+  }
+
+  /**
+   * @return null, {@link JSONObject}, {@link JSONArray} or a basic type (int, long, boolean, byte[], String) depending
+   *         on the value of <code>type</code>
+   * @throws JSONException
+   */
+  private static Object getTyped(JSONObject jsonObject, String propertyName, Class<?> type) {
+    Object jval = jsonObject.opt(propertyName);
+    //null
+    if (jval == null || jval == JSONObject.NULL) {
+      return null;
+    }
+    //blob
+    if (type == byte[].class) {
+      return Base64Utility.decode(getString(getJSONObject(jsonObject, propertyName), "b64"));
+    }
+    //array
+    if (jval instanceof JSONArray) {
+      return (JSONArray) jval;
+    }
+    if (type == String.class) {
+      return getString(jsonObject, propertyName);
+    }
+    if (type == int.class || type == Integer.class) {
+      return getInt(jsonObject, propertyName);
+    }
+    if (type == long.class || type == Long.class) {
+      return getLong(jsonObject, propertyName);
+    }
+    if (type == boolean.class || type == Boolean.class) {
+      return getBoolean(jsonObject, propertyName);
+    }
+    //bean
+    if (type.getName().startsWith("java.")) {
+      throw new IllegalArgumentException("Cannot convert " + type + " from json to java object");
+    }
+    return getJSONObject(jsonObject, propertyName);
+  }
+
+  /**
+   * @return null, {@link JSONObject}, {@link JSONArray} or a basic type (int, long, boolean, byte[], String) depending
+   *         on the value of <code>type</code>
+   * @throws JSONException
+   */
+  private static Object getTyped(JSONArray jsonArray, int index, Class<?> type) {
+    Object jval = jsonArray.opt(index);
+    //null
+    if (jval == null || jval == JSONObject.NULL) {
+      return null;
+    }
+    //blob
+    if (type == byte[].class) {
+      return Base64Utility.decode(getString(getJSONObject(jsonArray, index), "b64"));
+    }
+    //array
+    if (jval instanceof JSONArray) {
+      return (JSONArray) jval;
+    }
+    if (type == String.class) {
+      return getString(jsonArray, index);
+    }
+    if (type == int.class || type == Integer.class) {
+      return getInt(jsonArray, index);
+    }
+    if (type == long.class || type == Long.class) {
+      return getLong(jsonArray, index);
+    }
+    if (type == boolean.class || type == Boolean.class) {
+      return getBoolean(jsonArray, index);
+    }
+    //bean
+    if (type.getName().startsWith("java.")) {
+      throw new IllegalArgumentException("Cannot convert " + type + " from json to java object");
+    }
+    return getJSONObject(jsonArray, index);
   }
 
 }
