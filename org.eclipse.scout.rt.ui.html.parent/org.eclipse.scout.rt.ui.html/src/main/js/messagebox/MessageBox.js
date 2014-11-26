@@ -79,7 +79,7 @@ scout.MessageBox.prototype.position = function() {
 };
 
 scout.MessageBox.prototype._createButton = function(option, text) {
-  text = $.removeAmpersand(text);
+  text = scout.strings.removeAmpersand(text);
   return $('<button>')
     .text(text)
     .on('click', this._onButtonClicked.bind(this))
@@ -94,7 +94,7 @@ scout.MessageBox.prototype._onButtonClicked = function(event) {
 };
 
 scout.MessageBox.prototype._renderTitle = function(title) {
-  this.$title.html($.nl2br(title));
+  this.$title.html(scout.strings.nl2br(title));
   this.$title.setVisible(title);
 };
 
@@ -110,12 +110,12 @@ scout.MessageBox.prototype._renderSeverity = function(severity) {
 };
 
 scout.MessageBox.prototype._renderIntroText = function(text) {
-  this.$introText.html($.nl2br(text));
+  this.$introText.html(scout.strings.nl2br(text));
   this.$introText.setVisible(text);
 };
 
 scout.MessageBox.prototype._renderActionText = function(text) {
-  this.$actionText.html($.nl2br(text));
+  this.$actionText.html(scout.strings.nl2br(text));
   this.$actionText.setVisible(text);
 };
 

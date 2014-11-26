@@ -39,7 +39,7 @@ scout.Session = function($entryPoint, jsonSessionId, initOptions) {
   if (!initOptions.clientSessionId) {
     initOptions.clientSessionId = sessionStorage.getItem('scout:clientSessionId');
     if (!initOptions.clientSessionId) {
-      initOptions.clientSessionId = scout.numberToBase62(scout.getTimestamp());
+      initOptions.clientSessionId = scout.numbers.toBase62(scout.dates.timestamp());
       sessionStorage.setItem('scout:clientSessionId', initOptions.clientSessionId);
     }
   }
@@ -228,7 +228,7 @@ scout.Session.prototype._processSuccessResponse = function(message) {
     this.layoutValidator.validate();
   } finally {
     this.processingEvents = false;
-    var cacheSize = scout.countProperties(this._adapterDataCache);
+    var cacheSize = scout.objects.countProperties(this._adapterDataCache);
     if (cacheSize > 0) {
       $.log.debug('size of _adapterDataCache after response has been processed: ' + cacheSize);
     }
@@ -358,12 +358,14 @@ scout.Session.prototype._processEvents = function(events) {
 scout.Session.prototype.init = function() {
   this._startup = true;
   this._sendNow();
+
   // Ask if child windows should be closed as well
   $(window).on('beforeunload', function() {
     if (this._childWindows.length > 0) {
       return 'There are windows in DETACHED state.'; // FIXME BSH Text
     }
   }.bind(this));
+
   // Destroy json session on server when page is closed or reloaded
   $(window).on('unload', function() {
     // Destroy JSON session on server
@@ -374,6 +376,7 @@ scout.Session.prototype.init = function() {
       childWindow.close();
     });
   }.bind(this));
+
   this.objectFactory.register(this._initOptions.objectFactories);
 };
 

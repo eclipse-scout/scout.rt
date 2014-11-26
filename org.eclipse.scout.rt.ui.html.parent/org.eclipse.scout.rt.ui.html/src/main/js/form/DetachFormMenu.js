@@ -27,7 +27,7 @@ scout.DetachFormMenu.prototype._onMenuClicked = function(event) {
   // FIXME BSH Set correct url or write content
   //        w.document.write('<html><head><title>Test</title></head><body>Hello</body></html>');
   //        w.document.close(); //finish "loading" the page
-  var childWindow = scout.openWindow(window.location.href, 'scout:form:' + this.id, 800, 600);
+  var childWindow = scout.helpers.openWindow(window.location.href, 'scout:form:' + this.id, 800, 600);
   $(childWindow).one('load', function() {
     // Cannot call this directly, because we get an unload event right after that (and
     // would therefore unregister the window again). This is because the browser starts

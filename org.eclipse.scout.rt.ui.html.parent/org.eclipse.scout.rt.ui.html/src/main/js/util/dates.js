@@ -1,4 +1,5 @@
 scout.dates = {
+
   shift: function(date, years, months, days) {
     var newDate = new Date(date.toISOString());
     years = years !== undefined ? years : 0;
@@ -23,11 +24,13 @@ scout.dates = {
     }
     return newDate;
   },
+
   isSameDay: function(date, date2) {
     return date.getUTCFullYear() === date2.getUTCFullYear() &&
       date.getUTCMonth() === date2.getUTCMonth() &&
       date.getUTCDate() === date2.getUTCDate();
   },
+
   /**
    * @return the difference of the two dates in number of months.
    */
@@ -42,5 +45,24 @@ scout.dates = {
       return monthDiff;
     }
     return (d1Year - d2Year) * 12 + monthDiff;
+  },
+
+  /**
+   * Returns the time (with milliseconds) for the given date as a string in the format
+   * [year#4][month#2][day#2][hour#2][minute#2][second#2][#millisecond#3]. All characters
+   * are guaranteed to be digits. If the date argument is omitted, the current date is
+   * used.
+   */
+  timestamp: function(date) {
+    var padZeroLeft = function(s, padding) {
+      if ((s + '').length >= padding) {
+        return s;
+      }
+      var z = new Array(padding + 1).join('0') + s;
+      return z.slice(-padding);
+    };
+    var d = date || new Date();
+    return d.getFullYear() + padZeroLeft(d.getMonth() + 1, 2) + padZeroLeft(d.getDate(), 2) + padZeroLeft(d.getHours(), 2) + padZeroLeft(d.getMinutes(), 2) + padZeroLeft(d.getSeconds(), 2) + padZeroLeft(d.getMilliseconds(), 3);
   }
+
 };

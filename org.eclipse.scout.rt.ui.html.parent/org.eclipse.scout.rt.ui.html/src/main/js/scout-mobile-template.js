@@ -15,6 +15,9 @@
 //@include("util/NullAdapter.js");
 //@include("util/ObjectFactory.js");
 //@include("util/Device.js");
+//@include("util/helpers.js");
+//@include("util/numbers.js");
+//@include("util/strings.js");
 //@include("util/URL.js");
 //@include("session/Session.js");
 //@include("session/Event.js");

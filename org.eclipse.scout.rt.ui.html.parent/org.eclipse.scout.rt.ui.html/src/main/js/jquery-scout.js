@@ -73,20 +73,6 @@
     return jQuery.ajax(options);
   };
 
-  $.nl2br = function(text) {
-    if (!text) {
-      return text;
-    }
-    return text.replace(/\n/g,"<br>");
-  };
-
-  $.removeAmpersand = function(text) {
-    if (!text) {
-      return text;
-    }
-    return text.replace('&', '');
-  };
-
   // === $.prototype extensions ===
 
   // FIXME BSH Cleanup 'div' methods: as ID variant is almost never used, remove it

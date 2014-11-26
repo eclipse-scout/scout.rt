@@ -15,10 +15,13 @@
 //@include("util/KeystrokeManager.js");
 //@include("util/ModelAdapter.js");
 //@include("util/NullAdapter.js");
+//@include("util/numbers.js");
 //@include("util/ObjectFactory.js");
 //@include("util/dates.js");
 //@include("util/Device.js");
+//@include("util/helpers.js");
 //@include("util/objects.js");
+//@include("util/strings.js");
 //@include("util/texts.js");
 //@include("util/URL.js");
 //@include("session/Session.js");
