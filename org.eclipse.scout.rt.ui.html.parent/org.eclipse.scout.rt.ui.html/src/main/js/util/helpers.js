@@ -62,9 +62,7 @@ scout.helpers = {
     parseFontSpec: function(pattern) {
       var fontSpec = {};
       if (scout.strings.hasText(pattern)) {
-        var name, style, size;
         var tokens = pattern.split(/[-_,\/.;]/);
-
         for (var i = 0; i < tokens.length; i++) {
           var token = tokens[i].toUpperCase();
           // styles
