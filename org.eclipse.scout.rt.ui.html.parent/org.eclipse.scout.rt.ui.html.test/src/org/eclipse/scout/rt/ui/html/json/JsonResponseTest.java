@@ -31,8 +31,8 @@ public class JsonResponseTest {
     JSONObject json = m_jsonSession.currentJsonResponse().toJson();
 
     assertNotNull(json);
-    JSONArray events = json.getJSONArray(JsonResponse.PROP_EVENTS);
-    assertEquals(0, events.length());
+    JSONArray events = json.optJSONArray(JsonResponse.PROP_EVENTS);
+    assertEquals(null, events);
 
     // Check single property change event
     final String testId = "ID007";
@@ -82,7 +82,7 @@ public class JsonResponseTest {
     Mockito.when(mockAdapter.getId()).thenReturn("foo");
     resp.addAdapter(mockAdapter);
     json = resp.toJson();
-    assertEquals(0, json.getJSONArray(JsonResponse.PROP_EVENTS).length());
+    assertEquals(null, json.optJSONArray(JsonResponse.PROP_EVENTS));
   }
 
 }

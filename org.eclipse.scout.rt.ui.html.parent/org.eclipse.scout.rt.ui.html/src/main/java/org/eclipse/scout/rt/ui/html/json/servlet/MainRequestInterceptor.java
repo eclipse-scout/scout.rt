@@ -145,10 +145,6 @@ public class MainRequestInterceptor extends AbstractService implements IServletR
         LOG.debug("Received: " + jsonData);
       }
       return (jsonData == null ? new JSONObject() : new JSONObject(jsonData));
-//      if (StringUtility.isNullOrEmpty(jsonData)) {
-//        jsonData = "{}"; // FIXME
-//      }
-//      return new JSONObject(jsonData);
     }
     catch (ProcessingException | IOException | JSONException e) {
       throw new JsonException(e.getMessage(), e);
