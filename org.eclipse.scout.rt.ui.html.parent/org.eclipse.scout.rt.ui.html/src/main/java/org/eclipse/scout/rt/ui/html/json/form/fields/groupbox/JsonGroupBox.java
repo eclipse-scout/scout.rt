@@ -19,7 +19,6 @@ import org.json.JSONObject;
 /**
  * This class creates JSON output for an <code>IGroupBox</code>.
  */
-// TODO AWE: JsonCompositeField für group / seq. / etc.
 public class JsonGroupBox<T extends IGroupBox> extends JsonFormField<T> {
 
   public static final String PROP_MAIN_BOX = "mainBox";

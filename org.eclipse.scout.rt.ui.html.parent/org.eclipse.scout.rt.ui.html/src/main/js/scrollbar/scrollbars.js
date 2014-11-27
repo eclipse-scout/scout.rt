@@ -24,7 +24,7 @@ scout.scrollbars = {
       $.log.debug('install JS-scrollbars for container ' + scout.graphics.debugOutput($container) +  ' and add viewport DIV');
       var $viewport = $container.appendDIV('viewport'),
         scrollbar = new scout.Scrollbar($viewport, options);
-      scrollbar.initThumb();
+      scrollbar.updateThumb();
       $viewport.data('scrollbar', scrollbar);
       return $viewport;
     }
@@ -33,7 +33,7 @@ scout.scrollbars = {
   update: function($viewport) {
     var scrollbar = $viewport.data('scrollbar');
     if (scrollbar) {
-      scrollbar.initThumb();
+      scrollbar.updateThumb();
     }
   },
 

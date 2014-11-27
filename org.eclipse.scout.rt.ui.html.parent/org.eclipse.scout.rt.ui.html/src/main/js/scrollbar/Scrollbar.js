@@ -1,12 +1,5 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
-
-// TODO AWE: (scrollbar) discuss with C.GU, C.RU:
-// - bugfix: Scrollbar impl. cannot deal with scrollTo()
-// - bugfix: Scrollbar should not change insets (padding, margin) of scrollable container
-// - rename initThumb to update
-// - pass options object to Ctor instead of multiple arguments
-
 scout.Scrollbar = function($parent, options) {
 
   this.defaultOptions = {
@@ -21,7 +14,7 @@ scout.Scrollbar = function($parent, options) {
   this._thumbRange;
   this._scroll;
   this._offset;
-  this._initThumbPending = false;
+  this._updateThumbPending = false;
 
   // create scrollbar
   this._$scrollbar = $parent.beforeDiv('', 'scrollbar');
@@ -39,11 +32,11 @@ scout.Scrollbar = function($parent, options) {
   var begin = 0,
     that = this;
 
-  //event handling
+  // event handling
   $parent.parent().on('DOMMouseScroll mousewheel', '', scrollWheel);
   this._$scrollbar.on('mousedown', scrollEnd);
   this._$thumb.on('mousedown', '', scrollStart);
-  $(window).on('load resize', this.initThumb.bind(this));
+  $(window).on('load resize', this.updateThumb.bind(this));
 
   function scrollWheel(event) {
     if (event.ctrlKey) {
@@ -81,26 +74,26 @@ scout.Scrollbar = function($parent, options) {
 /**
  * Use this function (from outside) if size of tree content changes
  */
-scout.Scrollbar.prototype.initThumb = function() {
+scout.Scrollbar.prototype.updateThumb = function() {
   // Thumb is (re)initialized, but only after the current thread has finished.
   // Additionally, the call is scheduled at most once. This prevents unnecessary
   // executions of the same code while the UI is updated.
-  if (this._initThumbPending) {
+  if (this._updateThumbPending) {
     return;
   }
   var that = this;
   setTimeout(function() {
-    that._initThumbImpl();
-    that._initThumbPending = false;
+    that._updateThumbImpl();
+    that._updateThumbPending = false;
   }, 0);
-  this._initThumbPending = true;
+  this._updateThumbPending = true;
 };
 
 
 /**
  * do not use this internal method
  */
-scout.Scrollbar.prototype._initThumbImpl = function() {
+scout.Scrollbar.prototype._updateThumbImpl = function() {
   this._offset = this._$parent[0]['offset' + this._dim];
   this._scroll = this._$parent[0]['scroll' + this._dim];
 

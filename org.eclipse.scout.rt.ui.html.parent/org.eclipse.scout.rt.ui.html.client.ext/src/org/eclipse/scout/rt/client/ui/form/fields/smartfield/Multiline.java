@@ -15,7 +15,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-// TODO AWE: (smartfield, scout) mit Scout-team besprechen: annotation VS property
+// TODO AWE: (scout, smartfield) mit Scout-team besprechen: annotation VS property
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)

@@ -85,7 +85,4 @@ public class JsonResponseTest {
     assertEquals(0, json.getJSONArray("events").length());
   }
 
-  // TODO AWE: (json) test hinzufügen für offline-problem, bzw. wenn im selben request ein adapter erzeugt und gleich wieder
-  // disposed wird.
-
 }

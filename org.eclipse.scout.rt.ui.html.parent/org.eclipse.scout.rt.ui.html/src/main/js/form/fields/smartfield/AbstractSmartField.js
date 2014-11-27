@@ -64,7 +64,7 @@ scout.AbstractSmartField.prototype._onIconClick = function(event) {
 scout.AbstractSmartField.prototype._onKeydown = function(e) {
   if (this._isNavigationKey(e)) {
     // ensure popup is opened for following operations
-    if (this._openPopupLater()) {
+    if (this._openPopup()) {
       return;
     }
 
@@ -121,7 +121,7 @@ scout.AbstractSmartField.prototype._onKeyup = function(e) {
   }
 
   // ensure popup is opened for following operations
-  if (this._openPopupLater()) {
+  if (this._openPopup()) {
     return;
   }
 

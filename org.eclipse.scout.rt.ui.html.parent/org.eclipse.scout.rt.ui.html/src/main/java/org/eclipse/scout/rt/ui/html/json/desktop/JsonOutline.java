@@ -134,7 +134,7 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
     }
   }
 
-  // TODO AWE: (scout) remove these two methods when *5-classes are merged into scout RT
+  // TODO AWE: (scout) remove these two methods when x5-classes are merged into scout RT
   private boolean getDetailFormVisible(IPage page) {
     if (page instanceof IPage5) {
       return ((IPage5) page).isDetailFormVisible();
