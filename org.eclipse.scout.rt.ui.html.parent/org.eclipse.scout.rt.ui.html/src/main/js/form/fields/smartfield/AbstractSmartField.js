@@ -14,11 +14,11 @@ scout.inherits(scout.AbstractSmartField, scout.ValueField);
 scout.AbstractSmartField.prototype._render = function($parent) {
   this.addContainer($parent, 'smart-field');
   this.addLabel();
-  this.addField(scout.fields.new$TextField().
-    blur(this._onFieldBlur.bind(this)).
-    click(this._onClick.bind(this)).
-    keyup(this._onKeyup.bind(this)).
-    keydown(this._onKeydown.bind(this)));
+  this.addField(scout.fields.new$TextField()
+    .blur(this._onFieldBlur.bind(this))
+    .click(this._onClick.bind(this))
+    .keyup(this._onKeyup.bind(this))
+    .keydown(this._onKeydown.bind(this)));
   this.addMandatoryIndicator();
   this.addIcon();
   this.addStatus();
@@ -69,16 +69,20 @@ scout.AbstractSmartField.prototype._onKeydown = function(e) {
     }
 
     var pos = this._selectedOption,
-        $options = this._get$Options(true);
+      $options = this._get$Options(true);
     switch (e.which) {
-      case scout.keys.PAGE_UP: pos -= 10;
-      break;
-      case scout.keys.PAGE_DOWN: pos += 10;
-      break;
-      case scout.keys.UP: pos--;
-      break;
-      case scout.keys.DOWN: pos++;
-      break;
+      case scout.keys.PAGE_UP:
+        pos -= 10;
+        break;
+      case scout.keys.PAGE_DOWN:
+        pos += 10;
+        break;
+      case scout.keys.UP:
+        pos--;
+        break;
+      case scout.keys.DOWN:
+        pos++;
+        break;
     }
     pos = Math.min(Math.max(0, pos), $options.length - 1);
     if (pos !== this._selectedOption) {
@@ -115,8 +119,8 @@ scout.AbstractSmartField.prototype._onKeyup = function(e) {
   }
 
   if (e.which === scout.keys.TAB ||
-      e.which === scout.keys.SHIFT ||
-      this._isNavigationKey(e)) {
+    e.which === scout.keys.SHIFT ||
+    this._isNavigationKey(e)) {
     return;
   }
 
@@ -135,9 +139,9 @@ scout.AbstractSmartField.prototype._onKeyup = function(e) {
  * @param option
  */
 scout.AbstractSmartField.prototype._applyOption = function(option) {
-  this.$field.
-    val(option).
-    get(0).select();
+  this.$field
+    .val(option)
+    .get(0).select();
 };
 
 scout.AbstractSmartField.prototype._filterOptions = function() {
@@ -162,16 +166,25 @@ scout.AbstractSmartField.prototype._showPopup = function(numOptions, vararg) {
     optionHeight = scout.HtmlEnvironment.formRowHeight,
     popupHeight = (numOptions + 1) * optionHeight,
     popupBounds = new scout.Rectangle(fieldBounds.x, fieldBounds.y + fieldBounds.height, fieldBounds.width, popupHeight);
-  this._$popup = $.makeDIV('smart-field-popup').
-    append($.makeDIV('options')).
-    append($.makeDIV('status')).
-    appendTo(this.$container);
+
+  this._$popup = $.makeDIV('smart-field-popup')
+    .on('mousedown', this._onPopupMousedown.bind(this))
+    .append($.makeDIV('options'))
+    .append($.makeDIV('status'))
+    .appendTo(this.$container);
   scout.graphics.setBounds(this._$popup, popupBounds);
   // layout options and status-div
   var $optionsDiv = this._get$OptionsDiv();
-  this._$viewport = scout.scrollbars.install($optionsDiv, {invertColors: true});
+  this._$viewport = scout.scrollbars.install($optionsDiv, {
+    invertColors: true
+  });
   scout.graphics.setSize($optionsDiv, fieldBounds.width - 2, popupHeight - optionHeight);
   this._setStatusText(vararg);
+};
+
+scout.AbstractSmartField.prototype._onPopupMousedown = function(event) {
+  //Make sure field blur won't be triggered -> popup must not be closed on mouse down
+  event.preventDefault();
 };
 
 /**
@@ -189,14 +202,15 @@ scout.AbstractSmartField.prototype._getInputBounds = function() {
 scout.AbstractSmartField.prototype._renderOptions = function(options) {
   var i, option, htmlOption, selectedPos = -1,
     val = this.$field.val();
+
   for (i = 0; i < options.length; i++) {
     option = options[i];
     htmlOption = option.replace(/\n/gi, "<br/>");
-    $('<p>').
-      on('mousedown', this._onOptionMousedown.bind(this)).
-      appendTo(this._$viewport).
-      data('option', option). // stores the original text as received from the server
-      html(htmlOption);
+    $('<p>')
+      .on('click', this._onOptionClick.bind(this))
+      .appendTo(this._$viewport)
+      .data('option', option) // stores the original text as received from the server
+    .html(htmlOption);
     if (option === val) {
       selectedPos = i;
     }
@@ -212,7 +226,7 @@ scout.AbstractSmartField.prototype._emptyOptions = function(options) {
   this._updateScrollbar();
 };
 
-scout.AbstractSmartField.prototype._onOptionMousedown = function(e) {
+scout.AbstractSmartField.prototype._onOptionClick = function(e) {
   var selectedOption = $(e.target).data('option');
   $.log.info('option selected ' + selectedOption);
   this._applyOption(selectedOption);

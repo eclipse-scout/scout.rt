@@ -16,9 +16,10 @@ scout.DatePicker.prototype.selectDate = function(date, animated) {
 scout.DatePicker.prototype.show = function(viewDate, selectedDate, animated) {
   var viewDateDiff = 0;
   if (!this.$popup) {
-    this.$popup = $.makeDIV('date-box').
-      cssLeft(this._dateField.$field.position().left).
-      cssTop(this._dateField.$field.innerBottom());
+    this.$popup = $.makeDIV('date-box')
+      .cssLeft(this._dateField.$field.position().left)
+      .cssTop(this._dateField.$field.innerBottom())
+      .mousedown(this._onMouseDown.bind(this));
     this._dateField.$field.after(this.$popup);
 
     this._$header = this._createHeader().appendTo(this.$popup);
@@ -50,7 +51,7 @@ scout.DatePicker.prototype.show = function(viewDate, selectedDate, animated) {
   this._updateHeader(viewDate);
 
   var $box = this._createDateBox();
-  $box.find('.date-box-day').mousedown(this._onDayMouseDown.bind(this));
+  $box.find('.date-box-day').click(this._onDayClick.bind(this));
   $box[0].addEventListener("mousewheel", this._onMouseWheel.bind(this), false);
 
   if (animated && this.$currentBox && viewDateDiff) {
@@ -117,24 +118,26 @@ scout.DatePicker.prototype._onNavigationMouseDown = function(event) {
   var $target = $(event.currentTarget);
   var diff = $target.data('shift');
   this.shiftViewDate(0, diff, 0);
-
-  //Prevent closing the box
-  event.preventDefault();
 };
 
-scout.DatePicker.prototype._onDayMouseDown = function(event) {
-  //FIXME CGU click would be better but comes after field.blur -> ignore blur when clicking inside box and close box here
+scout.DatePicker.prototype._onDayClick = function(event) {
   var $target = $(event.currentTarget);
   var date = $target.data('date');
   this._dateField.onDateSelected(date);
+  this.close();
 };
 
 scout.DatePicker.prototype._onMouseWheel = function(event) {
   event = event || window.event;
   var wheelData = event.wheelDelta ? event.wheelDelta / 10 : -event.detail * 3;
   var diff = (wheelData >= 0 ? -1 : 1);
-
   this.shiftViewDate(0, diff, 0);
+
+  event.preventDefault();
+};
+
+scout.DatePicker.prototype._onMouseDown = function(event) {
+  //Make sure field blur won't be triggered -> popup must not be closed on mouse down
   event.preventDefault();
 };
 
