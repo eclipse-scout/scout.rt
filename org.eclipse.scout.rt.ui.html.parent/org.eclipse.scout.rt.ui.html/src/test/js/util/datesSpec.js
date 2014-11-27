@@ -187,7 +187,7 @@ describe("scout.dates", function() {
       expect(ts.length).toBe(17);
       expect(/^\d+$/.test(ts)).toBe(true);
 
-      var date = new Date('2014-11-21 00:00:00');
+      var date = new Date('2014-11-21T00:00:00');
       expect(scout.dates.timestamp(date)).toBe('20141121000000000');
     });
 
