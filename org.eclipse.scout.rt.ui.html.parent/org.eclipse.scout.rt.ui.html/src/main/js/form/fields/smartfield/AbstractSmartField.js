@@ -60,8 +60,22 @@ scout.AbstractSmartField.prototype._onIconClick = function(event) {
   }
 };
 
+scout.AbstractSmartField.prototype._selectedOptionData = function() {
+  var option = this._get$Options(true).get(this._selectedOption);
+  return $(option).data('option');
+};
+
 // navigate in options
 scout.AbstractSmartField.prototype._onKeydown = function(e) {
+  if (e.which === scout.keys.TAB) {
+    if (this._selectedOption > -1) {
+      var value = this._selectedOptionData();
+      this._applyOption(value);
+      this._closePopup();
+    }
+    return;
+  }
+
   if (this._isNavigationKey(e)) {
     // ensure popup is opened for following operations
     if (this._openPopup()) {
@@ -111,15 +125,14 @@ scout.AbstractSmartField.prototype._onKeyup = function(e) {
   // enter
   if (e.which === scout.keys.ENTER) {
     if (this._selectedOption > -1) {
-      var value = $(this._get$Options(true).get(this._selectedOption)).data('option');
+      var value = this._selectedOptionData();
       this._applyOption(value);
       this._closePopup();
     }
     return;
   }
 
-  if (e.which === scout.keys.TAB ||
-    e.which === scout.keys.SHIFT ||
+  if (e.which === scout.keys.SHIFT ||
     this._isNavigationKey(e)) {
     return;
   }
@@ -169,8 +182,8 @@ scout.AbstractSmartField.prototype._showPopup = function(numOptions, vararg) {
 
   this._$popup = $.makeDiv('smart-field-popup')
     .on('mousedown', this._onPopupMousedown.bind(this))
-    .append($.makeDIV('options'))
-    .append($.makeDIV('status'))
+    .append($.makeDiv('options'))
+    .append($.makeDiv('status'))
     .appendTo(this.$container);
   scout.graphics.setBounds(this._$popup, popupBounds);
   // layout options and status-div
