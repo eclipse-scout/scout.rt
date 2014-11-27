@@ -29,8 +29,8 @@ BSI Business Systems Integration AG - initial API and implementation
    </license>
 
    <url>
-      <update label="Luna" url="http://download.eclipse.org/releases/luna"/>
-      <discovery label="Luna" url="http://download.eclipse.org/releases/luna"/>
+      <update label="Luna" url="http://download.eclipse.org/releases/mars"/>
+      <discovery label="Luna" url="http://download.eclipse.org/releases/mars"/>
    </url>
 
    <requires>

@@ -21,8 +21,8 @@
    </license>
 
    <url>
-      <update label="%updateSiteName" url="http://download.eclipse.org/releases/luna"/>
-      <discovery label="%updateSiteName" url="http://download.eclipse.org/releases/luna"/>
+      <update label="%updateSiteName" url="http://download.eclipse.org/releases/mars"/>
+      <discovery label="%updateSiteName" url="http://download.eclipse.org/releases/mars"/>
    </url>
 
    <includes
