@@ -1,37 +1,34 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-scout.TableHeader = function(table, $tableHeader, session) {
+scout.TableHeader = function(table, session) {
   var that = this,
     columns = table.columns,
     column, $header, alignment;
 
-  this.totalWidth = 0;
   this.dragDone = false;
-  this._$tableHeader = $tableHeader;
+  this.$container = table.$data.beforeDiv('table-header');
   this.table = table;
   this.columns = table.columns;
 
   for (var i = 0; i < columns.length; i++) {
     column = columns[i];
-    $header = $tableHeader.appendDiv('header-item')
+    $header = this.$container.appendDiv('header-item')
       .data('column', column)
       .css('min-width', column.width + 'px') // 17 is width of header-resize handle, see table.css (.header-resize)
-      .css('max-width', column.width + 'px')
+    .css('max-width', column.width + 'px')
       .on('click', '', onHeaderClick)
       .on('mousedown', '', dragHeader);
 
     this._applyColumnText($header, column);
     this._applyColumnSorting($header, column);
 
-    alignment =  scout.Table.parseHorizontalAlignment(column.horizontalAlignment);
-    if (alignment !== 'left')  {
+    alignment = scout.Table.parseHorizontalAlignment(column.horizontalAlignment);
+    if (alignment !== 'left') {
       $header.css('text-align', alignment);
     }
 
-    this.totalWidth += columns[i].width;
-
-    $tableHeader.appendDiv('header-resize', '')
+    this.$container.appendDiv('header-resize', '')
       .on('mousedown', '', resizeHeader);
 
     column.$div = $header;
@@ -45,12 +42,12 @@ scout.TableHeader = function(table, $tableHeader, session) {
       that.dragDone = false;
     } else if (event.shiftKey || event.ctrlKey) {
       table.sort($header, $header.hasClass('sort-asc') ? 'desc' : 'asc', event.shiftKey);
-    } else if (that._tableHeaderMenu && that._tableHeaderMenu.isOpenFor($(event.target))){
+    } else if (that._tableHeaderMenu && that._tableHeaderMenu.isOpenFor($(event.target))) {
       that._tableHeaderMenu.remove();
       that._tableHeaderMenu = null;
     } else {
-      var x = $header.position().left + $tableHeader.position().left + parseFloat($tableHeader.css('margin-left')),
-        y = $header.position().top +  $tableHeader.position().top;
+      var x = $header.position().left + that.$container.position().left + parseFloat(that.$container.css('margin-left')),
+        y = $header.position().top + that.$container.position().top;
       that._tableHeaderMenu = new scout.TableHeaderMenu(table, $header, x, y, session);
     }
 
@@ -58,7 +55,7 @@ scout.TableHeader = function(table, $tableHeader, session) {
   }
 
   function resizeHeader(event) {
-    var startX = event.pageX ,
+    var startX = event.pageX,
       $header = $(this).prev(),
       headerWidth = parseFloat($header.css('min-width')),
       totalWidth = parseFloat(that.table.findRows().eq(0).css('width'));
@@ -68,7 +65,7 @@ scout.TableHeader = function(table, $tableHeader, session) {
       .one('mouseup', '', resizeEnd);
 
     function resizeMove(event) {
-      var diff = event.pageX  - startX,
+      var diff = event.pageX - startX,
         wHeader = headerWidth + diff,
         wSummary = totalWidth + diff;
 
@@ -91,7 +88,7 @@ scout.TableHeader = function(table, $tableHeader, session) {
       startX = event.pageX,
       $header = $(this),
       oldPos = that.getColumnViewIndex($header),
-      newPos =  oldPos,
+      newPos = oldPos,
       move = $header.outerWidth(),
       $otherHeaders = $header.siblings('.header-item');
 
@@ -107,7 +104,7 @@ scout.TableHeader = function(table, $tableHeader, session) {
       // change css of dragged header
       $header.css('z-index', 50)
         .addClass('header-move');
-      $tableHeader.addClass('header-move');
+      that.$container.addClass('header-move');
 
       // move dragged header
       $header.css('left', diff);
@@ -153,7 +150,6 @@ scout.TableHeader = function(table, $tableHeader, session) {
       }
     }
 
-
     function dragEnd(event) {
       // remove events
       $('body').off('mousemove');
@@ -169,7 +165,7 @@ scout.TableHeader = function(table, $tableHeader, session) {
       });
 
       // in case of no movement: return
-      if (!that.dragDone)  {
+      if (!that.dragDone) {
         return true;
       }
 
@@ -178,7 +174,9 @@ scout.TableHeader = function(table, $tableHeader, session) {
         table.moveColumn($header, oldPos, newPos, true);
         that.dragDone = false;
       } else {
-        $header.animateAVCSD('left', '', function () {that.dragDone = false;});
+        $header.animateAVCSD('left', '', function() {
+          that.dragDone = false;
+        });
       }
 
       // reset css of dragged header
@@ -189,9 +187,13 @@ scout.TableHeader = function(table, $tableHeader, session) {
       $header.css('z-index', '')
         .css('background', '')
         .removeClass('header-move');
-      $tableHeader.removeClass('header-move');
+      that.$container.removeClass('header-move');
     }
   }
+};
+
+scout.TableHeader.prototype.remove = function() {
+  this.$container.remove();
 };
 
 scout.TableHeader.prototype.onColumnResized = function($header, width) {
@@ -201,7 +203,7 @@ scout.TableHeader.prototype.onColumnResized = function($header, width) {
 };
 
 scout.TableHeader.prototype.onSortingChanged = function() {
-  for (var i=0; i<this.table.columns.length; i++) {
+  for (var i = 0; i < this.table.columns.length; i++) {
     var column = this.table.columns[i];
     this._applyColumnSorting(column.$div, column);
   }
@@ -237,7 +239,7 @@ scout.TableHeader.prototype.onColumnMoved = function($header, oldPos, newPos, dr
   // move menu
   if (this._tableHeaderMenu && this._tableHeaderMenu.isOpen()) {
     var left = $header.position().left;
-    var marginLeft = this._$tableHeader.cssMarginLeft();
+    var marginLeft = this.$container.cssMarginLeft();
     this._tableHeaderMenu.$headerMenu.animateAVCSD('left', left + marginLeft);
   }
 
@@ -245,7 +247,7 @@ scout.TableHeader.prototype.onColumnMoved = function($header, oldPos, newPos, dr
   if (dragged) {
     $header.css('left', parseInt($header.css('left'), 0) + $header.data('old-pos') - $header.offset().left)
       .animateAVCSD('left', 0);
-    } else {
+  } else {
     $headers.each(function() {
       $(this).css('left', $(this).data('old-pos') - $(this).offset().left)
         .animateAVCSD('left', 0);
@@ -263,13 +265,13 @@ scout.TableHeader.prototype.onOrderChanged = function(oldColumnOrder) {
   });
 
   // change order in dom of header
-  for (i=0; i < this.table.columns.length; i++) {
+  for (i = 0; i < this.table.columns.length; i++) {
     column = this.table.columns[i];
     $header = column.$div;
     $headerResize = $header.next('.header-resize');
 
-    this._$tableHeader.append($header);
-    this._$tableHeader.append($headerResize);
+    this.$container.append($header);
+    this.$container.append($headerResize);
   }
 
   // move menu
@@ -291,14 +293,14 @@ scout.TableHeader.prototype.getColumnViewIndex = function($header) {
 };
 
 scout.TableHeader.prototype.findHeaderItems = function() {
-  return this._$tableHeader.find('.header-item');
+  return this.$container.find('.header-item');
 };
 
 /**
  * Updates the column headers visualization of the text and sorting state
  */
 scout.TableHeader.prototype.updateHeaders = function(columns) {
-  for (var i=0;i<columns.length;i++) {
+  for (var i = 0; i < columns.length; i++) {
     var column = columns[i];
     var $header = columns[i].$div;
     this._applyColumnText($header, column);

@@ -6,7 +6,7 @@ scout.Table = function() {
   this.$container;
   this.$data;
   this._$scrollable;
-  this._header;
+  this.header;
   this.selectionHandler;
   this._keystrokeAdapter;
   this.columns = [];
@@ -35,10 +35,11 @@ scout.Table.prototype.init = function(model, session) {
 };
 
 scout.Table.prototype._render = function($parent) {
+  var i, layout;
+
   this._$parent = $parent;
   this.$container = this._$parent.appendDiv('table');
-
-  var layout = new scout.TableLayout(this);
+  layout = new scout.TableLayout(this);
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(layout);
   this.htmlComp.pixelBasedSizing = false;
@@ -55,8 +56,6 @@ scout.Table.prototype._render = function($parent) {
     scout.keystrokeManager.installAdapter(this.$container, this._keystrokeAdapter);
   }
 
-  this._$header = this.$container.appendDiv('table-header');
-  this._header = new scout.TableHeader(this, this._$header, this.session);
   this.$data = this.$container.appendDiv('table-data');
   this._$scrollable = scout.scrollbars.install(this.$data);
 
@@ -67,16 +66,22 @@ scout.Table.prototype._render = function($parent) {
   this.menubar.menuTypesForLeft2 = ['Table.SingleSelection', 'Table.MultiSelection'];
   this.menubar.menuTypesForRight = ['Table.Header'];
 
+  if (this.headerVisible) {
+    this.header = this._createHeader();
+  }
   if (this._isFooterVisible()) {
     this.footer = this._createFooter();
   }
 
-  // load data and create rows
+  this._totalWidth = 0;
+  for (i = 0; i < this.columns.length; i++) {
+    this._totalWidth += this.columns[i].width;
+  }
+
   this.drawData();
 };
 
 scout.Table.prototype._renderProperties = function() {
-  this._renderHeaderVisible(this.headerVisible);
   this._renderEnabled(this.enabled);
 };
 
@@ -84,8 +89,12 @@ scout.Table.prototype._isFooterVisible = function() {
   return this.tableStatusVisible || this.controls.length > 0;
 };
 
+scout.Table.prototype._createHeader = function() {
+  return new scout.TableHeader(this, this.session);
+};
+
 scout.Table.prototype._createFooter = function() {
-  return new scout.TableFooter(this, this.$container, this.session);
+  return new scout.TableFooter(this);
 };
 
 scout.Table.prototype.dispose = function() {
@@ -288,7 +297,7 @@ scout.Table.prototype.sort = function($header, dir, additional, remove) {
     column.sortActive = true;
   }
 
-  this._header.onSortingChanged();
+  this.header.onSortingChanged();
 
   // sort model
   var sorted = this._sort();
@@ -311,7 +320,7 @@ scout.Table.prototype.drawData = function() {
 
 scout.Table.prototype._buildRowDiv = function(row) {
   var column, style, value, tooltipText, tooltip;
-  var rowWidth = this._header.totalWidth + this._getTableRowBorderWidth();
+  var rowWidth = this._totalWidth + this._tableRowBorderWidth();
   var rowClass = 'table-row ';
 
   if (this.selectedRowIds && this.selectedRowIds.indexOf(row.id) > -1) {
@@ -334,7 +343,7 @@ scout.Table.prototype._buildRowDiv = function(row) {
   return rowDiv;
 };
 
-scout.Table.prototype._getTableRowBorderWidth = function() {
+scout.Table.prototype._tableRowBorderWidth = function() {
   if (this._tablRowBorderWidth !== undefined) {
     return this._tablRowBorderWidth;
   }
@@ -650,7 +659,7 @@ scout.Table.prototype._group = function() {
       }
 
       $sumRow.insertAfter($rows.eq(r))
-        .width(this._header.totalWidth + 4)
+        .width(this._totalWidth + this._tableRowBorderWidth())
         .hide()
         .slideDown();
 
@@ -668,7 +677,7 @@ scout.Table.prototype.group = function($header, draw, all) {
     if (!all) {
       this.sort($header, 'asc', false);
     }
-    this._header.onGroupingChanged($header, all);
+    this.header.onGroupingChanged($header, all);
   }
 
   this._group();
@@ -1024,20 +1033,20 @@ scout.Table.prototype.hideRow = function($row) {
 /**
  * @param resizingInProgress set this to true when calling this function several times in a row. If resizing is finished you have to call resizingColumnFinished.
  */
-scout.Table.prototype.resizeColumn = function($header, width, summaryWidth, resizingInProgress) {
-  var colNum = this._header.getColumnViewIndex($header) + 1;
+scout.Table.prototype.resizeColumn = function($header, width, totalWidth, resizingInProgress) {
+  var colNum = this.header.getColumnViewIndex($header) + 1;
   var column = $header.data('column');
 
   column.width = width;
+  this._totalWidth = totalWidth;
 
   this.findCellsForColIndex(colNum, true)
     .css('min-width', width)
     .css('max-width', width);
   this.findRows(true)
-    .css('min-width', summaryWidth)
-    .css('max-width', summaryWidth);
+    .css('width', totalWidth);
 
-  this._header.onColumnResized($header, width);
+  this.header.onColumnResized($header, width);
 
   if (!resizingInProgress) {
     this.resizingColumnFinished($header, width);
@@ -1065,7 +1074,7 @@ scout.Table.prototype.moveColumn = function($header, oldPos, newPos, dragged) {
   };
   this.session.send('columnMoved', this.id, data);
 
-  this._header.onColumnMoved($header, oldPos, newPos, dragged);
+  this.header.onColumnMoved($header, oldPos, newPos, dragged);
 
   // move cells
   this.findRows(true).each(function() {
@@ -1082,7 +1091,9 @@ scout.Table.prototype._renderColumnOrderChanges = function(oldColumnOrder) {
   var column, i, j, $orderedCells, $cell, $cells, that = this,
     $row;
 
-  this._header.onOrderChanged(oldColumnOrder);
+  if (this.header) {
+    this.header.onOrderChanged(oldColumnOrder);
+  }
 
   // move cells
   this.findRows(true).each(function() {
@@ -1145,16 +1156,12 @@ scout.Table.prototype._triggerFilterResetted = function() {
 };
 
 scout.Table.prototype._renderHeaderVisible = function(headerVisible) {
-  //FIXME CGU this would be better than show/hide, but buildRow relies on header -> refactor
-  //  if (this.headerVisible && !this._header) {
-  //      this._$header = $('table-header').prependTo(this.$data);
-  //      this._header = new scout.TableHeader(this, this._$header, this.session);
-  //    }
-  //  else if (!this.headerVisible && this._header) {
-  //    this._$header.remove();
-  //    this._header = null;
-  //  }
-  this._$header.setVisible(headerVisible);
+  if (this.headerVisible && !this.header) {
+    this.header = this._createHeader();
+  } else if (!this.headerVisible && this.header) {
+    this.header.remove();
+    this.header = null;
+  }
   if (this.rendered) {
     this.htmlComp.revalidate();
   }
@@ -1219,8 +1226,10 @@ scout.Table.prototype._onColumnStructureChanged = function(columns) {
   this.columns = columns;
 
   if (this.rendered) {
-    this._$header.empty();
-    this._header = new scout.TableHeader(this, this._$header, this.session);
+    if (this.header) {
+      this.header.remove();
+      this.header = this._createHeader();
+    }
     this.drawData();
   }
 };
@@ -1270,8 +1279,8 @@ scout.Table.prototype._onColumnHeadersUpdated = function(columns) {
     updatedColumns.push(column);
   }
 
-  if (this.rendered) {
-    this._header.updateHeaders(updatedColumns);
+  if (this.rendered && this.header) {
+    this.header.updateHeaders(updatedColumns);
   }
 };
 

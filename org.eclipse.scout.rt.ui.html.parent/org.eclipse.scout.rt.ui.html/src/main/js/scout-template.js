@@ -44,6 +44,7 @@
 //@include("layout/LogicalGridLayoutInfo.js");
 //@include("layout/LogicalGridLayout.js");
 //@include("table/Table.js");
+//@include("table/TableLayout.js");
 //@include("table/TableHeader.js");
 //@include("table/TableFooter.js");
 //@include("table/TableHeaderMenu.js");

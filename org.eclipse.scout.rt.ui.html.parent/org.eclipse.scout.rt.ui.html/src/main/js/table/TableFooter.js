@@ -1,6 +1,6 @@
-scout.TableFooter = function(table, $parent) {
+scout.TableFooter = function(table) {
   this._table = table;
-  this._render($parent);
+  this._render(table.$container);
 };
 
 scout.TableFooter.FILTER_KEY = 'TEXTFIELD';
@@ -8,8 +8,8 @@ scout.TableFooter.CONTAINER_SIZE = 340;
 
 scout.TableFooter.prototype._render = function($parent) {
   var that = this,
-    i, control, $group;
-  var filter = this._table.getFilter(scout.TableFooter.FILTER_KEY),
+    i, control, $group,
+    filter = this._table.getFilter(scout.TableFooter.FILTER_KEY),
     filterText;
 
   if (filter) {
@@ -87,6 +87,10 @@ scout.TableFooter.prototype._render = function($parent) {
   });
 };
 
+scout.TableFooter.prototype.remove = function() {
+  this.$container.remove();
+};
+
 scout.TableFooter.prototype._onFilterInput = function(event) {
   var $input = $(event.currentTarget);
   $input.val($input.val().toLowerCase());
@@ -111,10 +115,6 @@ scout.TableFooter.prototype._onFilterInput = function(event) {
 
   this._table.filter();
   event.stopPropagation();
-};
-
-scout.TableFooter.prototype.remove = function() {
-  this.$container.remove();
 };
 
 scout.TableFooter.prototype.setTableStatusVisible = function(visible) {
@@ -250,13 +250,16 @@ scout.TableFooter.prototype.closeControlContainer = function(control) {
 };
 
 scout.TableFooter.prototype._resizeData = function(sizeContainer) {
-  var that = this;
+  var sizeMenubar, sizeFooter, sizeHeader, newOffset,
+    that = this;
 
   // new size of container and table data
-  var sizeMenubar = parseFloat(that._table.menubar.$container.css('height')),
-    sizeHeader = parseFloat(that._table._$header.css('height')),
-    sizeFooter = parseFloat(that.$container.css('height')),
-    newOffset = sizeMenubar + sizeHeader + sizeFooter + sizeContainer;
+  sizeMenubar = parseFloat(that._table.menubar.$container.css('height'));
+  sizeFooter = parseFloat(that.$container.css('height'));
+  if (that._table.header) {
+    sizeHeader = parseFloat(that._table.header.$container.css('height'));
+  }
+  newOffset = sizeMenubar + sizeHeader + sizeFooter + sizeContainer;
 
   var oldH = this._table.$data.height(),
     newH = this._table.$data.css('height', 'calc(100% - ' + newOffset + 'px)').height();

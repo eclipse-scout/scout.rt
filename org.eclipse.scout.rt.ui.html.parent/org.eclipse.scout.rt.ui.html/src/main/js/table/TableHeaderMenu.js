@@ -2,7 +2,7 @@
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
 scout.TableHeaderMenu = function(table, $header, x, y, session) {
-  var pos = table._header.getColumnViewIndex($header),
+  var pos = table.header.getColumnViewIndex($header),
     column = $header.data('column');
 
   // label title
@@ -219,22 +219,22 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
 
   function moveTop() {
     table.moveColumn($header, pos, 0);
-    pos = table._header.getColumnViewIndex($header);
+    pos = table.header.getColumnViewIndex($header);
   }
 
   function moveUp() {
     table.moveColumn($header, pos, Math.max(pos - 1, 0));
-    pos = table._header.getColumnViewIndex($header);
+    pos = table.header.getColumnViewIndex($header);
   }
 
   function moveDown() {
-    table.moveColumn($header, pos, Math.min(pos + 1, table._header.findHeaderItems().length - 1));
-    pos = table._header.getColumnViewIndex($header);
+    table.moveColumn($header, pos, Math.min(pos + 1, table.header.findHeaderItems().length - 1));
+    pos = table.header.getColumnViewIndex($header);
   }
 
   function moveBottom() {
-    table.moveColumn($header, pos, table._header.findHeaderItems().length - 1);
-    pos = table._header.getColumnViewIndex($header);
+    table.moveColumn($header, pos, table.header.findHeaderItems().length - 1);
+    pos = table.header.getColumnViewIndex($header);
   }
 
   function sort(dir, additional, remove) {

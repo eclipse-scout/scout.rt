@@ -25,7 +25,7 @@ describe("Table", function() {
       var table = helper.createTable(model);
       table.render(session.$entryPoint);
 
-      expect(table._header).not.toBeUndefined();
+      expect(table.header).not.toBeUndefined();
     });
 
     describe("renders table rows", function() {
@@ -65,7 +65,7 @@ describe("Table", function() {
       var table = helper.createTable(model);
       table.render(session.$entryPoint);
 
-      var $headerItems = table._$header.find('.header-item');
+      var $headerItems = table.header.$container.find('.header-item');
       var $headerItem0 = $headerItems.eq(0);
       var $headerItem1 = $headerItems.eq(1);
       var $headerItem2 = $headerItems.eq(2);
@@ -177,7 +177,7 @@ describe("Table", function() {
       var table = helper.createTable(model);
       table.render(session.$entryPoint);
 
-      var $colHeaders = table._$header.find('.header-item');
+      var $colHeaders = table.header.$container.find('.header-item');
       var $header0 = $colHeaders.eq(0);
 
       expect(table.columns[0].width).not.toBe(100);
@@ -199,7 +199,7 @@ describe("Table", function() {
       var table = helper.createTable(model);
       table.render(session.$entryPoint);
 
-      var $colHeaders = table._$header.find('.header-item');
+      var $colHeaders = table.header.$container.find('.header-item');
       var $header0 = $colHeaders.eq(0);
 
       table.resizeColumn($header0, 50, 100, true);
@@ -215,7 +215,7 @@ describe("Table", function() {
       var table = helper.createTable(model);
       table.render(session.$entryPoint);
 
-      var $colHeaders = table._$header.find('.header-item');
+      var $colHeaders = table.header.$container.find('.header-item');
       var $header0 = $colHeaders.eq(0);
 
       table.resizeColumn($header0, 50, 100, true);
@@ -250,7 +250,7 @@ describe("Table", function() {
 
     function render(table) {
       table.render(session.$entryPoint);
-      $colHeaders = table._$header.find('.header-item');
+      $colHeaders = table.header.$container.find('.header-item');
       $header0 = $colHeaders.eq(0);
       $header1 = $colHeaders.eq(1);
       $header2 = $colHeaders.eq(2);
@@ -391,7 +391,7 @@ describe("Table", function() {
         var model = helper.createModelSingleColumnByTexts(1, ['Österreich', 'Italien', 'Zypern']);
         var table = helper.createTable(model);
         table.render(session.$entryPoint);
-        $colHeaders = table._$header.find('.header-item');
+        $colHeaders = table.header.$container.find('.header-item');
         $header0 = $colHeaders.eq(0);
 
         table.sort($header0, 'desc');
@@ -413,7 +413,7 @@ describe("Table", function() {
         var model = helper.createModelSingleColumnByValues([11, 1, 8], 'number');
         var table = helper.createTable(model);
         table.render(session.$entryPoint);
-        $colHeaders = table._$header.find('.header-item');
+        $colHeaders = table.header.$container.find('.header-item');
         $header0 = $colHeaders.eq(0);
 
         table.sort($header0, 'desc');
@@ -427,7 +427,7 @@ describe("Table", function() {
         var model = helper.createModelSingleColumnByValues([new Date('2012-08-10'), new Date('2014-03-01'), new Date('1999-01-10')], 'date');
         var table = helper.createTable(model);
         table.render(session.$entryPoint);
-        $colHeaders = table._$header.find('.header-item');
+        $colHeaders = table.header.$container.find('.header-item');
         $header0 = $colHeaders.eq(0);
 
         table.sort($header0, 'desc');
@@ -671,26 +671,26 @@ describe("Table", function() {
       var table = helper.createTable(model);
       table.render(session.$entryPoint);
 
-      var $colHeaders = table._$header.find('.header-item');
+      var $colHeaders = table.header.$container.find('.header-item');
       var $header0 = $colHeaders.eq(0);
       var $header1 = $colHeaders.eq(1);
       var $header2 = $colHeaders.eq(2);
 
-      expect(table._header.getColumnViewIndex($header0)).toBe(0);
-      expect(table._header.getColumnViewIndex($header1)).toBe(1);
-      expect(table._header.getColumnViewIndex($header2)).toBe(2);
+      expect(table.header.getColumnViewIndex($header0)).toBe(0);
+      expect(table.header.getColumnViewIndex($header1)).toBe(1);
+      expect(table.header.getColumnViewIndex($header2)).toBe(2);
 
       table.moveColumn($header0, 0, 2);
 
-      expect(table._header.getColumnViewIndex($header1)).toBe(0);
-      expect(table._header.getColumnViewIndex($header2)).toBe(1);
-      expect(table._header.getColumnViewIndex($header0)).toBe(2);
+      expect(table.header.getColumnViewIndex($header1)).toBe(0);
+      expect(table.header.getColumnViewIndex($header2)).toBe(1);
+      expect(table.header.getColumnViewIndex($header0)).toBe(2);
 
       table.moveColumn($header2, 1, 0);
 
-      expect(table._header.getColumnViewIndex($header2)).toBe(0);
-      expect(table._header.getColumnViewIndex($header1)).toBe(1);
-      expect(table._header.getColumnViewIndex($header0)).toBe(2);
+      expect(table.header.getColumnViewIndex($header2)).toBe(0);
+      expect(table.header.getColumnViewIndex($header1)).toBe(1);
+      expect(table.header.getColumnViewIndex($header0)).toBe(2);
     });
 
   });
@@ -973,7 +973,7 @@ describe("Table", function() {
       it("redraws the header to reflect header cell changes (text)", function() {
         table.render(session.$entryPoint);
 
-        var $colHeaders = table._header.findHeaderItems();
+        var $colHeaders = table.header.findHeaderItems();
         expect($colHeaders.eq(0).text()).toBe(column0.text);
         expect($colHeaders.eq(1).text()).toBe(column1.text);
         expect($colHeaders.eq(2).text()).toBe(column2.text);
@@ -987,7 +987,7 @@ describe("Table", function() {
         session._processSuccessResponse(message);
 
         //Check column header text
-        $colHeaders = table._header.findHeaderItems();
+        $colHeaders = table.header.findHeaderItems();
         expect($colHeaders.eq(0).text()).toBe(column0.text);
         expect($colHeaders.eq(1).text()).toBe(column1.text);
         expect($colHeaders.eq(2).text()).toBe(column2.text);
@@ -996,7 +996,7 @@ describe("Table", function() {
       it("redraws the columns to reflect column order changes", function() {
         table.render(session.$entryPoint);
 
-        var $colHeaders = table._header.findHeaderItems();
+        var $colHeaders = table.header.findHeaderItems();
         expect($colHeaders.length).toBe(3);
         expect($colHeaders.eq(0).data('column')).toBe(column0);
         expect($colHeaders.eq(1).data('column')).toBe(column1);
@@ -1019,7 +1019,7 @@ describe("Table", function() {
         session._processSuccessResponse(message);
 
         //Check column header order
-        $colHeaders = table._header.findHeaderItems();
+        $colHeaders = table.header.findHeaderItems();
         expect($colHeaders.length).toBe(2);
         expect($colHeaders.eq(0).data('column')).toBe(column2);
         expect($colHeaders.eq(1).data('column')).toBe(column1);
@@ -1069,7 +1069,7 @@ describe("Table", function() {
       it("reorders the html nodes", function() {
         table.render(session.$entryPoint);
 
-        var $colHeaders = table._header.findHeaderItems();
+        var $colHeaders = table.header.findHeaderItems();
         expect($colHeaders.length).toBe(3);
         expect($colHeaders.eq(0).data('column')).toBe(column0);
         expect($colHeaders.eq(1).data('column')).toBe(column1);
@@ -1092,7 +1092,7 @@ describe("Table", function() {
         session._processSuccessResponse(message);
 
         //Check column header order
-        $colHeaders = table._header.findHeaderItems();
+        $colHeaders = table.header.findHeaderItems();
         expect($colHeaders.length).toBe(3);
         expect($colHeaders.eq(0).data('column')).toBe(column2);
         expect($colHeaders.eq(1).data('column')).toBe(column0);
@@ -1114,12 +1114,12 @@ describe("Table", function() {
 //      it("moves the table header menu if it is open", function() {
 //        table.render(session.$entryPoint);
 //
-//        var $colHeaders = table._header.findHeaderItems();
+//        var $colHeaders = table.header.findHeaderItems();
 //
 //        var $clickedHeader = $colHeaders.eq(0);
 //        $clickedHeader.triggerClick();
 //
-//        var tableHeaderMenu = table._header._tableHeaderMenu;
+//        var tableHeaderMenu = table.header._tableHeaderMenu;
 //        var menuLeftPosition = tableHeaderMenu.$headerMenu.position().left;
 //        expect(tableHeaderMenu.isOpen()).toBe(true);
 //
@@ -1178,7 +1178,7 @@ describe("Table", function() {
       it("updates the text and sorting state of html table header nodes", function() {
         table.render(session.$entryPoint);
 
-        var $colHeaders = table._header.findHeaderItems();
+        var $colHeaders = table.header.findHeaderItems();
         expect($colHeaders.eq(0).text()).toBe(column0.text);
         expect($colHeaders.eq(1).text()).toBe(column1.text);
         expect($colHeaders.eq(1)).not.toHaveClass('sort-asc');
@@ -1194,7 +1194,7 @@ describe("Table", function() {
         };
         session._processSuccessResponse(message);
 
-        $colHeaders = table._header.findHeaderItems();
+        $colHeaders = table.header.findHeaderItems();
         expect($colHeaders.eq(0).text()).toBe(column0.text);
         expect($colHeaders.eq(1).text()).toBe(column1.text);
         expect($colHeaders.eq(1)).toHaveClass('sort-asc');
@@ -1212,16 +1212,14 @@ describe("Table", function() {
         var table = helper.createTable(model);
         table.render(session.$entryPoint);
 
-        expect(table._header).toBeDefined();
-        expect(table._$header.is(':visible')).toBe(true);
+        expect(table.header).toBeTruthy();
 
         var event = createPropertyChangeEvent(table, {
           "headerVisible": false
         });
         table.onModelPropertyChange(event);
 
-        expect(table._header).toBeDefined();
-        expect(table._$header.is(':visible')).toBe(false);
+        expect(table.header).toBeFalsy();
       });
 
     });
