@@ -951,9 +951,9 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
               masterList.add(f);
             }
           }
-          else {
-            LOG.warn("cannot find field data for '" + fieldQId + " in form " + getClass().getName() + "'");
-          }
+        }
+        else {
+          LOG.warn("cannot find field data for '" + fieldQId + " in form " + getClass().getName() + "'");
         }
       }
     }
