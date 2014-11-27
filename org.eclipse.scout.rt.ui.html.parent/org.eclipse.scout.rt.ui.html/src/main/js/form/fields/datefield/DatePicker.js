@@ -5,8 +5,8 @@ scout.DatePicker = function(dateFormat, dateField) {
   this.viewDate = null;
   this.$popup = null;
   this.$currentBox = null;
-  this.$viewport = null;
-  this._viewportLeft;
+  this.$scrollable = null;
+  this._scrollableLeft;
 };
 
 scout.DatePicker.prototype.selectDate = function(date, animated) {
@@ -26,11 +26,11 @@ scout.DatePicker.prototype.show = function(viewDate, selectedDate, animated) {
     this._$header.find('.date-box-left-y, .date-box-left-m, .date-box-right-m, .date-box-right-y').mousedown(this._onNavigationMouseDown.bind(this));
 
     this.$popup.appendDiv('date-box-separator');
-    this.$viewport = this.$popup.appendDiv('date-box-viewport');
-    this._viewportTop = this.$viewport.position().top;
-    this._viewportLeft = this.$viewport.position().left;
-    //Fix the position of the viewport in order to to proper viewport shifting (see _appendAnimated)
-    this.$viewport.css({'position': 'absolute', left: this._viewportLeft, top: this._viewportTop});
+    this.$scrollable = this.$popup.appendDiv('date-box-scrollable');
+    this._scrollableTop = this.$scrollable.position().top;
+    this._scrollableLeft = this.$scrollable.position().left;
+    //Fix the position of the scrollable in order to to proper scrollable shifting (see _appendAnimated)
+    this.$scrollable.css({'position': 'absolute', left: this._scrollableLeft, top: this._scrollableTop});
   }
 
   this.selectedDate = selectedDate;
@@ -61,7 +61,7 @@ scout.DatePicker.prototype.show = function(viewDate, selectedDate, animated) {
     if (this.$currentBox) {
       this.$currentBox.remove();
     }
-    $box.appendTo(this.$viewport);
+    $box.appendTo(this.$scrollable);
 
     //Measure box size for the animation
     if (!this._boxWidth) {
@@ -77,8 +77,8 @@ scout.DatePicker.prototype.show = function(viewDate, selectedDate, animated) {
 scout.DatePicker.prototype._appendAnimated = function(viewDateDiff, $box) {
   var $currentBox = this.$currentBox;
   var newLeft = 0, that = this;
-  var monthBoxCount = this.$viewport.find('.date-box-month').length + 1;
-  var viewportWidth = monthBoxCount * this._boxWidth;
+  var monthBoxCount = this.$scrollable.find('.date-box-month').length + 1;
+  var scrollableWidth = monthBoxCount * this._boxWidth;
 
   //Fix the size of the boxes
   $currentBox
@@ -90,18 +90,18 @@ scout.DatePicker.prototype._appendAnimated = function(viewDateDiff, $box) {
 
   if (viewDateDiff > 0) {
     //New view date is larger -> shift left
-    $box.appendTo(this.$viewport);
-    newLeft = this._viewportLeft - (viewportWidth - this._boxWidth);
+    $box.appendTo(this.$scrollable);
+    newLeft = this._scrollableLeft - (scrollableWidth - this._boxWidth);
   } else {
     //New view date is smaller -> shift right
-    this.$viewport.cssLeft(this._viewportLeft - this._boxWidth);
-    $box.prependTo(this.$viewport);
-    newLeft = this._viewportLeft;
+    this.$scrollable.cssLeft(this._scrollableLeft - this._boxWidth);
+    $box.prependTo(this.$scrollable);
+    newLeft = this._scrollableLeft;
   }
 
   //Animate
   //At first: stop existing animation when shifting multiple dates in a row (e.g. with mouse wheel)
-  this.$viewport.
+  this.$scrollable.
     stop(true).
     animate({ left: newLeft }, 300, function() {
       //Remove every month box beside the new one
@@ -109,8 +109,8 @@ scout.DatePicker.prototype._appendAnimated = function(viewDateDiff, $box) {
       //if a new day in the current month has been chosen while the animation is in progress (e.g. by holding down key)
       that.$currentBox.siblings('.date-box-month').remove();
 
-      //Reset viewport settings
-      that.$viewport.cssLeft(that._viewportLeft);
+      //Reset scrollable settings
+      that.$scrollable.cssLeft(that._scrollableLeft);
     });
 };
 

@@ -45,7 +45,7 @@ scout.Tree.prototype._visitNodes = function(nodes, func, parentNode) {
 scout.Tree.prototype._render = function($parent) {
   this.$parent = $parent;
   this.$container = $parent.appendDiv('tree');
-  this._$viewport = scout.scrollbars.install(this.$container);
+  this._$scrollable = scout.scrollbars.install(this.$container);
   this._addNodes(this.nodes);
   if (this.selectedNodeIds.length > 0) {
     this._renderSelection();
@@ -80,7 +80,7 @@ scout.Tree.prototype.collapseAll = function() {
   var that = this;
 
   //Collapse root nodes
-  this._$viewport.find('[data-level="0"]').each(function() {
+  this._$scrollable.find('[data-level="0"]').each(function() {
     var $node = $(this);
     that.setNodeExpanded($node.data('node'), $node , false);
   });
@@ -144,7 +144,7 @@ scout.Tree.prototype._renderExpansion = function(node, $node, expanded) {
         };
 
         $wrapper.css('height', 0).
-          animateAVCSD('height', h, removeContainer, scout.scrollbars.update.bind(this, this._$viewport), 200);
+          animateAVCSD('height', h, removeContainer, scout.scrollbars.update.bind(this, this._$scrollable), 200);
       }
     }
     $node.addClass('expanded');
@@ -156,7 +156,7 @@ scout.Tree.prototype._renderExpansion = function(node, $node, expanded) {
       return $(this).attr('data-level') <= level;
     }).wrapAll('<div class="animationWrapper">)').parent();
 
-    $wrapper.animateAVCSD('height', 0, $.removeThis, scout.scrollbars.update.bind(this, this._$viewport), 200);
+    $wrapper.animateAVCSD('height', 0, $.removeThis, scout.scrollbars.update.bind(this, this._$scrollable), 200);
   }
 };
 
@@ -208,7 +208,7 @@ scout.Tree.prototype._renderSelection = function($nodes) {
     }
   }
 
-  this._$viewport.children().select(false);
+  this._$scrollable.children().select(false);
 
   // render selection
   for (i=0; i < $nodes.length; i++) {
@@ -418,7 +418,7 @@ scout.Tree.prototype._removeNodes = function(nodes, parentNodeId, $parentNode) {
     }
   }
 
-  scout.scrollbars.update(this._$viewport);
+  scout.scrollbars.update(this._$scrollable);
 };
 
 scout.Tree.prototype._addNodes = function(nodes, $parent) {
@@ -453,7 +453,7 @@ scout.Tree.prototype._addNodes = function(nodes, $parent) {
     if ($predecessor) {
       $node.insertAfter($predecessor);
     } else {
-      $node.appendTo(this._$viewport);
+      $node.appendTo(this._$scrollable);
     }
 
     // if model demands children, create them
@@ -464,7 +464,7 @@ scout.Tree.prototype._addNodes = function(nodes, $parent) {
     }
   }
 
-  scout.scrollbars.update(this._$viewport);
+  scout.scrollbars.update(this._$scrollable);
 
   //return the last created node
   return $node;
@@ -531,7 +531,7 @@ scout.Tree.prototype._onNodeControlClick = function(event) {
 
 scout.Tree.prototype._updateItemPath = function() {
   var $selected = this._findSelectedNodes(),
-    $allNodes = this._$viewport.children(),
+    $allNodes = this._$scrollable.children(),
     level = parseFloat($selected.attr('data-level'));
 
   // first remove and select selected
@@ -599,12 +599,12 @@ scout.Tree.prototype._findNodeById = function(nodeId, $parent) {
   if ($parent) {
     return $parent.next('#' + nodeId);
   } else {
-    return this._$viewport.find('#' + nodeId);
+    return this._$scrollable.find('#' + nodeId);
   }
 };
 
 scout.Tree.prototype._findSelectedNodes = function() {
-  return this._$viewport.find('.selected');
+  return this._$scrollable.find('.selected');
 };
 
 scout.Tree.prototype.getSelectedModelNodes = function() {

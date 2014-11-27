@@ -236,7 +236,7 @@ scout.DesktopNavigation.prototype._addSplitter = function() {
         that.outline.setBreadcrumb(false);
       }
 
-      scout.scrollbars.update(that.outline._$viewport);
+      scout.scrollbars.update(that.outline._$scrollable);
     }
 
     function resizeEnd() {

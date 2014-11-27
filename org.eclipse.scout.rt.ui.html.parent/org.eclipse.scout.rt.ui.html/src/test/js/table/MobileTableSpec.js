@@ -24,7 +24,7 @@ describe("MobileTable", function() {
 //      var model = helper.createModelFixture(2);
 //      var table = helper.createMobileTable(model);
 //      table.render(session.$entryPoint);
-//      expect(table.$data).toBe(table._$viewport);
+//      expect(table.$data).toBe(table._$scrollable);
 //    });
 
     it("does not display context menus", function() {
@@ -33,7 +33,7 @@ describe("MobileTable", function() {
       table.render(session.$entryPoint);
 
       model.menus = [helper.createMenuModel('1','menu')];
-      var $row0 = table._$viewport.children().eq(0);
+      var $row0 = table._$scrollable.children().eq(0);
       $row0.triggerContextMenu();
 
       var $menu = helper.getDisplayingContextMenu(table);

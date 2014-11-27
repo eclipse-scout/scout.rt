@@ -1,7 +1,7 @@
 scout.AbstractSmartField = function(lookupStrategy) {
   scout.AbstractSmartField.parent.call(this);
   this._$popup;
-  this._$viewport;
+  this._$scrollable;
   this.options;
   this._selectedOption = -1;
   this._oldVal;
@@ -29,7 +29,7 @@ scout.AbstractSmartField.prototype._render = function($parent) {
  */
 scout.AbstractSmartField.prototype._get$Options = function(visible) {
   var filter = visible === true ? ':visible' : undefined;
-  return this._$viewport.children(filter);
+  return this._$scrollable.children(filter);
 };
 
 scout.AbstractSmartField.prototype._get$OptionsDiv = function() {
@@ -37,7 +37,7 @@ scout.AbstractSmartField.prototype._get$OptionsDiv = function() {
 };
 
 scout.AbstractSmartField.prototype._updateScrollbar = function() {
-  scout.scrollbars.update(this._$viewport);
+  scout.scrollbars.update(this._$scrollable);
 };
 
 scout.AbstractSmartField.prototype._isNavigationKey = function(e) {
@@ -112,7 +112,7 @@ scout.AbstractSmartField.prototype._selectOption = function($options, pos) {
   var $selectedOption = $($options[pos]);
   $selectedOption.addClass('selected');
   this._selectedOption = pos;
-  scout.scrollbars.scrollTo(this._$viewport, $selectedOption);
+  scout.scrollbars.scrollTo(this._$scrollable, $selectedOption);
 };
 
 scout.AbstractSmartField.prototype._onKeyup = function(e) {
@@ -188,7 +188,7 @@ scout.AbstractSmartField.prototype._showPopup = function(numOptions, vararg) {
   scout.graphics.setBounds(this._$popup, popupBounds);
   // layout options and status-div
   var $optionsDiv = this._get$OptionsDiv();
-  this._$viewport = scout.scrollbars.install($optionsDiv, {
+  this._$scrollable = scout.scrollbars.install($optionsDiv, {
     invertColors: true
   });
   scout.graphics.setSize($optionsDiv, fieldBounds.width - 2, popupHeight - optionHeight);
@@ -221,7 +221,7 @@ scout.AbstractSmartField.prototype._renderOptions = function(options) {
     htmlOption = option.replace(/\n/gi, "<br/>");
     $('<p>')
       .on('click', this._onOptionClick.bind(this))
-      .appendTo(this._$viewport)
+      .appendTo(this._$scrollable)
       .data('option', option) // stores the original text as received from the server
     .html(htmlOption);
     if (option === val) {
@@ -235,7 +235,7 @@ scout.AbstractSmartField.prototype._renderOptions = function(options) {
 };
 
 scout.AbstractSmartField.prototype._emptyOptions = function(options) {
-  this._$viewport.empty();
+  this._$scrollable.empty();
   this._updateScrollbar();
 };
 

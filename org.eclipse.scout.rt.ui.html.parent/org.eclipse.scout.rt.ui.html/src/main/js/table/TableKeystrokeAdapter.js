@@ -135,7 +135,7 @@ scout.TableKeystrokeAdapter = function(table) {
         that._table.selectRowsByIds(rowIds);
       }
 
-      // scroll selection into viewport (if not visible)
+      // scroll selection into scrollable (if not visible)
       if ($newRowSelection.length > 0) {
         that._table.scrollTo($newRowSelection);
       }

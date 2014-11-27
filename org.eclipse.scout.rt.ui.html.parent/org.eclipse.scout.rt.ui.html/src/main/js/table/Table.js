@@ -5,7 +5,7 @@ scout.Table = function() {
   scout.Table.parent.call(this);
   this.$container;
   this.$data;
-  this._$viewport;
+  this._$scrollable;
   this._header;
   this.selectionHandler;
   this._keystrokeAdapter;
@@ -58,7 +58,7 @@ scout.Table.prototype._render = function($parent) {
   this._$header = this.$container.appendDiv('table-header');
   this._header = new scout.TableHeader(this, this._$header, this.session);
   this.$data = this.$container.appendDiv('table-data');
-  this._$viewport = scout.scrollbars.install(this.$data);
+  this._$scrollable = scout.scrollbars.install(this.$data);
 
   this.menubar = new scout.Menubar(this.$container, {
     position: this.menubarPosition
@@ -101,7 +101,7 @@ scout.Table.prototype.toggleSelection = function() {
 };
 
 scout.Table.prototype.updateScrollbar = function() {
-  scout.scrollbars.update(this._$viewport);
+  scout.scrollbars.update(this._$scrollable);
 };
 
 scout.Table.prototype._sort = function() {
@@ -217,7 +217,7 @@ scout.Table.prototype._renderRowOrderChanges = function() {
   }
 
   // change order in dom
-  this._$viewport.prepend($sortedRows);
+  this._$scrollable.prepend($sortedRows);
 
   // for less than animationRowLimit rows: move to old position and then animate
   if (animate) {
@@ -339,7 +339,7 @@ scout.Table.prototype._getTableRowBorderWidth = function() {
     return this._tablRowBorderWidth;
   }
 
-  var $tableRowDummy = this._$viewport.appendDiv('table-row');
+  var $tableRowDummy = this._$scrollable.appendDiv('table-row');
   this._tablRowBorderWidth = $tableRowDummy.cssBorderLeftWidth() + $tableRowDummy.cssBorderRightWidth();
   $tableRowDummy.remove();
   return this._tablRowBorderWidth;
@@ -362,7 +362,7 @@ scout.Table.prototype._drawData = function(startRow) {
 
     // append block of rows
     $rows = $(rowString);
-    $rows.appendTo(this._$viewport)
+    $rows.appendTo(this._$scrollable)
       .on('mousedown', '', onMouseDown)
       .on('mouseup', '', onMouseUp)
       .on('dblclick', '', onDoubleClick)
@@ -605,7 +605,7 @@ scout.Table.prototype._group = function() {
   }
 
   // prepare data
-  var $rows = $('.table-row:visible', this._$viewport),
+  var $rows = $('.table-row:visible', this._$scrollable),
     $sumRow = $.makeDiv('table-row-sum'),
     sum = [];
 
@@ -725,7 +725,7 @@ scout.Table.prototype.colorData = function(mode, colorColumn) {
     };
   }
 
-  $rows = $('.table-row:visible', this._$viewport);
+  $rows = $('.table-row:visible', this._$scrollable);
 
   $('.header-item', this.$container).each(function(i) {
     if ($(this).data('column') === colorColumn) {
@@ -799,7 +799,7 @@ scout.Table.prototype._onAllRowsDeleted = function() {
 };
 
 scout.Table.prototype.scrollTo = function($selection) {
-  scout.scrollbars.scrollTo(this._$viewport, $selection);
+  scout.scrollbars.scrollTo(this._$scrollable, $selection);
 };
 
 scout.Table.prototype.selectRowsByIds = function(rowIds) {
@@ -815,10 +815,10 @@ scout.Table.prototype.selectRowsByIds = function(rowIds) {
 };
 
 scout.Table.prototype.findSelectedRows = function() {
-  if (!this._$viewport) {
+  if (!this._$scrollable) {
     return $();
   }
-  return this._$viewport.find('.selected');
+  return this._$scrollable.find('.selected');
 };
 
 scout.Table.prototype.findRows = function(includeSumRows) {
@@ -826,11 +826,11 @@ scout.Table.prototype.findRows = function(includeSumRows) {
   if (includeSumRows) {
     selector += ', .table-row-sum';
   }
-  return this._$viewport.find(selector);
+  return this._$scrollable.find(selector);
 };
 
 scout.Table.prototype.findSumRows = function() {
-  return this._$viewport.find('.table-row-sum');
+  return this._$scrollable.find('.table-row-sum');
 };
 
 scout.Table.prototype.findCellsForColIndex = function(colIndex, includeSumRows) {
@@ -838,11 +838,11 @@ scout.Table.prototype.findCellsForColIndex = function(colIndex, includeSumRows) 
   if (includeSumRows) {
     selector += ', .table-row-sum > div:nth-of-type(' + colIndex + ' )';
   }
-  return this._$viewport.find(selector);
+  return this._$scrollable.find(selector);
 };
 
 scout.Table.prototype.findRowById = function(rowId) {
-  return this._$viewport.find('#' + rowId);
+  return this._$scrollable.find('#' + rowId);
 };
 
 scout.Table.prototype.getModelRowById = function(rowId) {
@@ -917,7 +917,7 @@ scout.Table.prototype.filter = function() {
 
   this._triggerRowsFiltered(rowCount, this.filteredBy());
 
-  $(':animated', that._$viewport).promise().done(function() {
+  $(':animated', that._$scrollable).promise().done(function() {
     that._group();
   });
 };
@@ -1179,7 +1179,7 @@ scout.Table.prototype._renderTableStatusVisible = function(tableStatusVisible) {
 
 scout.Table.prototype._renderEnabled = function(enabled) {
   // FIXME CGU remove/add events. Maybe extend jquery to not fire on disabled events?
-  this._$viewport.setEnabled(enabled);
+  this._$scrollable.setEnabled(enabled);
 };
 
 scout.Table.prototype._renderMultiSelect = function(multiSelect) {

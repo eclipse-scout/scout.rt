@@ -4,7 +4,7 @@ scout.strings = {
     if (!text) {
       return text;
     }
-    return text.replace(/\n/g,'<br>');
+    return text.replace(/\n/g, '<br>');
   },
 
   removeAmpersand: function(text) {
@@ -28,7 +28,7 @@ scout.strings = {
   /**
    * Fastest algorithm (source: http://stackoverflow.com/a/5450113)
    */
-  repeat: function (pattern, count) {
+  repeat: function(pattern, count) {
     if (pattern === undefined || pattern === null) {
       return pattern;
     }
@@ -37,11 +37,11 @@ scout.strings = {
     }
     var result = '';
     while (count > 1) {
-        if (count & 1) {
-          result += pattern;
-        }
-        count >>= 1;
-        pattern += pattern;
+      if (count & 1) {
+        result += pattern;
+      }
+      count >>= 1;
+      pattern += pattern;
     }
     return result + pattern;
   },

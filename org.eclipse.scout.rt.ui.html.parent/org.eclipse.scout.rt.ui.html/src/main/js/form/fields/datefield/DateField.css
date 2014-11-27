@@ -33,11 +33,10 @@
 }
 
 /* necessary for animation */
-.date-box-viewport {
+.date-box-scrollable {
   position: relative;
   height: 100%;
   padding: 0px 6px;
-
 }
 
 /* necessary for animation */
