@@ -9,7 +9,7 @@ scout.DesktopViewButton = function() {
 scout.inherits(scout.DesktopViewButton, scout.ModelAdapter);
 
 scout.DesktopViewButton.prototype._render = function($parent) {
-  this.$container = $parent.appendDIV('outline-menu-item');
+  this.$container = $parent.appendDiv('outline-menu-item');
 
   var that = this;
   this.$container.on('click', '', function() {

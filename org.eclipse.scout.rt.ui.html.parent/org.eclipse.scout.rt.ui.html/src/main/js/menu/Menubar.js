@@ -9,7 +9,7 @@ scout.Menubar = function($parent, options) {
   this.menuTypesForRight = [];
   this.staticMenus = [];
 
-  this.$container = $.makeDIV('menubar').hide();
+  this.$container = $.makeDiv('menubar').hide();
   if (this.position === 'top') {
     $parent.prepend(this.$container);
   } else {
@@ -106,6 +106,6 @@ scout.Menubar.prototype._addMenuItem = function(menu) {
 };
 
 scout.Menubar.prototype._addMenuSeparator = function () {
-  var s = this.$container.appendDIV('menu-separator');
+  var s = this.$container.appendDiv('menu-separator');
   this.menus.push(s);
 };

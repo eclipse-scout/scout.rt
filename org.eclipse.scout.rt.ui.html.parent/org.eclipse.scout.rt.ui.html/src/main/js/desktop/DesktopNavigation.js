@@ -15,8 +15,8 @@ scout.DesktopNavigation = function(desktop) {
 };
 
 scout.DesktopNavigation.prototype.render = function($parent) {
-  this.$navigation = $parent.appendDIV('desktop-navigation');
-  this.$header = this.$navigation.appendDIV('navigation-header');
+  this.$navigation = $parent.appendDiv('desktop-navigation');
+  this.$header = this.$navigation.appendDiv('navigation-header');
 
   this.outlineTab = new scout.DesktopNavigation.TabAndContent(this._createOutlinesTab());
   this.outlineTab.$tab.on('click', function() {
@@ -37,7 +37,7 @@ scout.DesktopNavigation.prototype.render = function($parent) {
     this._selectTab(this.searchTab, this.desktop.searchOutline);
   }.bind(this));
 
-  this.$container = this.$navigation.appendDIV('navigation-container');
+  this.$container = this.$navigation.appendDiv('navigation-container');
   this._addSplitter();
 };
 
@@ -58,22 +58,22 @@ scout.DesktopNavigation.prototype._createOutlinesTab = function() {
   var that = this;
 
   // create tab
-  var $tab = this.$header.appendDIV('navigation-tab-outline');
+  var $tab = this.$header.appendDiv('navigation-tab-outline');
 
   // create button
-  this.$menuButton = $tab.appendDIV('navigation-tab-outline-button')
+  this.$menuButton = $tab.appendDiv('navigation-tab-outline-button')
     .on('mousedown', this._onMenuButtonClicked.bind(this));
 
   // create menu
   // TODO AWE: use Popup class here, maybe a new "head" style is required here
   // than we could use the same popup for the phone-form
-  this.$outlinesMenu = $tab.appendDIV('navigation-tab-outline-menu');
+  this.$outlinesMenu = $tab.appendDiv('navigation-tab-outline-menu');
   for (var i = 0; i < this.desktop.viewButtons.length; i++) {
     this.desktop.viewButtons[i].render(this.$outlinesMenu);
   }
 
   // create title of active outline
-  var $outlineTitle = $tab.appendDIV('navigation-tab-outline-title');
+  var $outlineTitle = $tab.appendDiv('navigation-tab-outline-title');
   $outlineTitle.click(function() {
     that.outline.clearSelection();
     that.outline.collapseAll();
@@ -115,7 +115,7 @@ scout.DesktopNavigation.prototype._closeMenu = function() {
 
 scout.DesktopNavigation.prototype._createSearchTab = function() {
   // create tab
-  var $tab = this.$header.appendDIV('navigation-tab-search');
+  var $tab = this.$header.appendDiv('navigation-tab-search');
 
   // create field
   this.$queryField = $('<input>')
@@ -126,7 +126,7 @@ scout.DesktopNavigation.prototype._createSearchTab = function() {
     .appendTo($tab);
 
   // create button
-  $tab.appendDIV('navigation-tab-search-button')
+  $tab.appendDiv('navigation-tab-search-button')
     .on('click', this._onSearchButtonClick.bind(this));
 
   return $tab;
@@ -205,7 +205,7 @@ scout.DesktopNavigation.prototype.onOutlineChanged = function(outline) {
 //vertical splitter
 
 scout.DesktopNavigation.prototype._addSplitter = function() {
-  this._$splitter = this.$navigation.appendDIV('navigation-splitter-vertical')
+  this._$splitter = this.$navigation.appendDiv('navigation-splitter-vertical')
     .on('mousedown', '', resize);
 
   var WIDTH_BREADCRUMB = 190;

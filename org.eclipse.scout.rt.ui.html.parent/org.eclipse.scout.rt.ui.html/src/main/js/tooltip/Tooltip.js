@@ -18,7 +18,7 @@ scout.Tooltip.prototype.render = function($parent) {
     $parent = $('body');
   }
 
-  this.$container = $.makeDIV('tooltip')
+  this.$container = $.makeDiv('tooltip')
     .hide()
     .data('tooltip', this)
     .data('tooltipContext', this.$context)
@@ -28,8 +28,8 @@ scout.Tooltip.prototype.render = function($parent) {
     this.$container.addClass(this.cssClass);
   }
 
-  this.$arrow = $.makeDIV('tooltip-arrow').appendTo(this.$container);
-  this.$container.appendDIV('tooltip-content', this.text);
+  this.$arrow = $.makeDiv('tooltip-arrow').appendTo(this.$container);
+  this.$container.appendDiv('tooltip-content', this.text);
   this.position();
   this.$container.show();
 

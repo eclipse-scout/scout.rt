@@ -19,7 +19,7 @@ scout.SmartFieldMultiline.prototype._render = function($parent) {
       appendTo($fieldContainer);
   this.addField($field, $fieldContainer);
   this.addIcon($fieldContainer);
-  this._$multilineField = $.makeDIV('multiline-field', '<br/><br/>').
+  this._$multilineField = $.makeDiv('multiline-field', '<br/><br/>').
     appendTo($fieldContainer);
   this.addStatus();
 };

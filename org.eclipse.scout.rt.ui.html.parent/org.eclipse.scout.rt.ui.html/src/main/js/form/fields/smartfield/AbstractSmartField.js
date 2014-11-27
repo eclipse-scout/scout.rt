@@ -167,7 +167,7 @@ scout.AbstractSmartField.prototype._showPopup = function(numOptions, vararg) {
     popupHeight = (numOptions + 1) * optionHeight,
     popupBounds = new scout.Rectangle(fieldBounds.x, fieldBounds.y + fieldBounds.height, fieldBounds.width, popupHeight);
 
-  this._$popup = $.makeDIV('smart-field-popup')
+  this._$popup = $.makeDiv('smart-field-popup')
     .on('mousedown', this._onPopupMousedown.bind(this))
     .append($.makeDIV('options'))
     .append($.makeDIV('status'))

@@ -16,12 +16,12 @@ scout.AnalysisTableControl.prototype._renderContent = function($parent) {
   this.$parent = $parent;
 
   // commands
-  var $commandContainer = $parent.appendDiv('', 'command-container');
+  var $commandContainer = $parent.appendDiv('command-container');
 
-  $commandContainer.appendDiv('', 'command new', 'Neues Kriterium').click(addCriteria);
-  $commandContainer.appendDiv('', 'command delete', 'Kriterium verwerfen').click(removeCriteria);
-  $commandContainer.appendDiv('', 'command search', 'Daten suchen');
-  $commandContainer.appendDiv('', 'command simulator', 'Simulator').click(simulateServer);
+  $commandContainer.appendDiv('command new', 'Neues Kriterium').click(addCriteria);
+  $commandContainer.appendDiv('command delete', 'Kriterium verwerfen').click(removeCriteria);
+  $commandContainer.appendDiv('command search', 'Daten suchen');
+  $commandContainer.appendDiv('command simulator', 'Simulator').click(simulateServer);
 
   // svg container for venn
   var $vennContainer = $parent
@@ -36,13 +36,13 @@ scout.AnalysisTableControl.prototype._renderContent = function($parent) {
   appendRect($vennContainer, 'venn-all');
 
   // criteria container
-  $parent.appendDiv('', 'criteria-back')
+  $parent.appendDiv('criteria-back')
     .on('click', '', backMap);
   var $criteriaNavigation = $parent.appendDiv('', 'criteria-navigation');
   $parent.append('<input class="criteria-search"></input>')
     .on('input paste', '', searchMap)
     .attr('placeholder', scout.texts.get('filterBy'));
-  var $criteriaContainer = $parent.appendDiv('', 'criteria-container');
+  var $criteriaContainer = $parent.appendDiv('criteria-container');
   var containerWidth = parseFloat($criteriaContainer.css('width')),
     containerHeight = parseFloat($criteriaContainer.css('height'));
 
@@ -181,7 +181,7 @@ scout.AnalysisTableControl.prototype._renderContent = function($parent) {
 
     } else if (list.length === 1) {
       // draw rect
-      var $div = $container.appendDiv('', 'criteria-entity', list[0].text)
+      var $div = $container.appendDiv('criteria-entity', list[0].text)
         .css('top', top * 100 + '%')
         .css('left', left * 100 + '%')
         .css('height', height * 100 + '%')
@@ -208,7 +208,7 @@ scout.AnalysisTableControl.prototype._renderContent = function($parent) {
         for (var b = 0; b < y; b++) {
           for (var a = 0; a < x; a++) {
             if ((a + b * x) < attributes.length) {
-              $div.appendDiv('', 'criteria-attribute', attributes[a + b * x].text)
+              $div.appendDiv('criteria-attribute', attributes[a + b * x].text)
                 .css('top', (top + b * (1 / y)) * 100 + '%')
                 .css('left', (left + a * (1 / x)) * 100 + '%')
                 .css('height', (1 / y) * 100 + '%')
@@ -301,7 +301,7 @@ scout.AnalysisTableControl.prototype._renderContent = function($parent) {
 
   function appendMap($container, text) {
     $criteriaNavigation
-      .appendDiv('', 'criteria-navigation-item', text)
+      .appendDiv('criteria-navigation-item', text)
       .data('open-map', $container)
       .click(closeMap);
   }
@@ -311,7 +311,7 @@ scout.AnalysisTableControl.prototype._renderContent = function($parent) {
   }
 
   function searchMap(event) {
-    var $criteriaContainerTest = that.$parent.appendDiv('', 'criteria-container');
+    var $criteriaContainerTest = that.$parent.appendDiv('criteria-container');
     drawCriteria($criteriaContainerTest, that.rootEntity, $(event.target).val());
 
     var $oldBoxes = $criteriaContainer.children(),

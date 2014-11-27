@@ -9,7 +9,7 @@ scout.MobileDesktopToolButtons = function(toolButtons, session) {
 
 scout.MobileDesktopToolButtons.prototype.render = function($desktop) {
   this.$parent = $desktop;
-  var $desktopTools = $desktop.appendDiv('DesktopTools');
+  var $desktopTools = $desktop.appendDiv('', '', 'DesktopTools'); // TODO CGU Check if #DesktopTools should really be an ID and not a class
   this.$container = $desktopTools;
 
   // create tool-buttons
@@ -19,9 +19,8 @@ scout.MobileDesktopToolButtons.prototype.render = function($desktop) {
       shortcut = this.toolButtons[i].shortcut || '';
 
     var $tool = $desktopTools
-      .appendDiv(this.toolButtons[i].id, 'tool-button ' + state)
+      .appendDiv('tool-button ' + state, '', this.toolButtons[i].id)
       .attr('data-icon', icon).attr('data-shortcut', shortcut);
-
 
     if (!$tool.hasClass('disabled')) {
       $tool.on('click', '', clickTool);
@@ -29,7 +28,7 @@ scout.MobileDesktopToolButtons.prototype.render = function($desktop) {
   }
 
   // create container for dialogs
-  $desktopTools.appendDiv('DesktopDialogs');
+  $desktopTools.appendDiv('', '', 'DesktopDialogs'); // TODO CGU Check if #DesktopDialogs should really be an ID and not a class
 
   var that = this;
   function clickTool() {
@@ -44,7 +43,7 @@ scout.MobileDesktopToolButtons.prototype.open = function($tool) {
     $tool.removeClass('selected');
   } else {
     $tool.selectOne();
-    $('#DesktopTools').beforeDiv('', 'tool-open')
+    $('#DesktopTools').beforeDiv('tool-open')
       .animateAVCSD('height', this.$parent.height(), null, null, 500);
   }
 };

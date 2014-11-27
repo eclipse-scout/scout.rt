@@ -7,7 +7,7 @@ scout.DesktopToolButton = function() {
 scout.inherits(scout.DesktopToolButton, scout.Action);
 
 scout.DesktopToolButton.prototype._render = function($parent) {
-  this.$container = $parent.appendDIV('taskbar-tool-item');
+  this.$container = $parent.appendDiv('taskbar-tool-item');
 };
 
 scout.DesktopToolButton.prototype.toggle = function() {

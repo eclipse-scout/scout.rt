@@ -10,7 +10,7 @@ scout.BaseDesktop.prototype.showMessage = function(message, type) {
   type = type || 'info';
 
   if (!this.$message) {
-    this.$message = this.$parent.prependDiv('', type + '-message');
+    this.$message = this.$parent.prependDiv(type + '-message');
   }
   this.$message.text(message);
 };
@@ -23,9 +23,9 @@ scout.BaseDesktop.prototype._goOffline = function() {
     return;
   }
 
-  this.$offline = this.$parent.prependDiv('', 'offline-message');
+  this.$offline = this.$parent.prependDiv('offline-message');
   this.$offline.text(message);
-  $reconnect = this.$offline.appendDiv('', 'reconnect');
+  $reconnect = this.$offline.appendDiv('reconnect');
   $reconnect
     .text('Reconnecting...')
     .hide();

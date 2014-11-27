@@ -36,7 +36,7 @@ scout.Table.prototype.init = function(model, session) {
 
 scout.Table.prototype._render = function($parent) {
   this._$parent = $parent;
-  this.$container = this._$parent.appendDIV('table');
+  this.$container = this._$parent.appendDiv('table');
 
   var layout = new scout.TableLayout(this);
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
@@ -55,9 +55,9 @@ scout.Table.prototype._render = function($parent) {
     scout.keystrokeManager.installAdapter(this.$container, this._keystrokeAdapter);
   }
 
-  this._$header = this.$container.appendDIV('table-header');
+  this._$header = this.$container.appendDiv('table-header');
   this._header = new scout.TableHeader(this, this._$header, this.session);
-  this.$data = this.$container.appendDIV('table-data');
+  this.$data = this.$container.appendDiv('table-data');
   this._$viewport = scout.scrollbars.install(this.$data);
 
   this.menubar = new scout.Menubar(this.$container, {
@@ -339,7 +339,7 @@ scout.Table.prototype._getTableRowBorderWidth = function() {
     return this._tablRowBorderWidth;
   }
 
-  var $tableRowDummy = this._$viewport.appendDIV('table-row');
+  var $tableRowDummy = this._$viewport.appendDiv('table-row');
   this._tablRowBorderWidth = $tableRowDummy.cssBorderLeftWidth() + $tableRowDummy.cssBorderRightWidth();
   $tableRowDummy.remove();
   return this._tablRowBorderWidth;
@@ -606,7 +606,7 @@ scout.Table.prototype._group = function() {
 
   // prepare data
   var $rows = $('.table-row:visible', this._$viewport),
-    $sumRow = $.makeDiv('', 'table-row-sum'),
+    $sumRow = $.makeDiv('table-row-sum'),
     sum = [];
 
   for (var r = 0; r < $rows.length; r++) {
@@ -635,13 +635,13 @@ scout.Table.prototype._group = function() {
         column = this.columns[c];
         alignment = scout.Table.parseHorizontalAlignment(column.horizontalAlignment);
         if (typeof sum[c] === 'number') {
-          $cell = $.makeDiv('', 'table-cell', sum[c])
+          $cell = $.makeDiv('table-cell', sum[c])
             .css('text-align', alignment);
         } else if (!all && column === groupColumn) {
-          $cell = $.makeDiv('', 'table-cell', this.getCellText(groupColumn, row))
+          $cell = $.makeDiv('table-cell', this.getCellText(groupColumn, row))
             .css('text-align', alignment);
         } else {
-          $cell = $.makeDiv('', 'table-cell', '&nbsp');
+          $cell = $.makeDiv('table-cell', '&nbsp');
         }
 
         $cell.appendTo($sumRow)
@@ -654,7 +654,7 @@ scout.Table.prototype._group = function() {
         .hide()
         .slideDown();
 
-      $sumRow = $.makeDiv('', 'table-row-sum');
+      $sumRow = $.makeDiv('table-row-sum');
       sum = [];
     }
   }

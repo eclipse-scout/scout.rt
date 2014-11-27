@@ -151,17 +151,17 @@ scout.TableKeystrokeAdapter = function(table) {
 scout.TableKeystrokeAdapter.prototype.drawKeyBox = function() {
   var $tableData = $('.table-data', this._table.$container);
   if ($tableData.length) {
-    $tableData.appendDiv('', 'key-box top3', 'Home');
-    $tableData.appendDiv('', 'key-box top2', 'PgUp');
-    $tableData.appendDiv('', 'key-box top1', '↑');
-    $tableData.appendDiv('', 'key-box bottom1', '↓');
-    $tableData.appendDiv('', 'key-box bottom2', 'PgDn');
-    $tableData.appendDiv('', 'key-box bottom3', 'End');
+    $tableData.appendDiv('key-box top3', 'Home');
+    $tableData.appendDiv('key-box top2', 'PgUp');
+    $tableData.appendDiv('key-box top1', '↑');
+    $tableData.appendDiv('key-box bottom1', '↓');
+    $tableData.appendDiv('key-box bottom2', 'PgDn');
+    $tableData.appendDiv('key-box bottom3', 'End');
   }
 
   // keys for header
   var $tableHeader = $('.table-header', this._table.$container);
   if ($tableHeader.length) {
-    $tableHeader.prependDiv('', 'key-box char', 'a - z');
+    $tableHeader.prependDiv('key-box char', 'a - z');
   }
 };

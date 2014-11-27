@@ -102,7 +102,7 @@ scout.menus.appendMenuItems = function(popup, menus) {
     }
     menu.sendAboutToShow();
     popup.appendToBody(
-      $.makeDIV('menu-item').
+      $.makeDiv('menu-item').
         text(menu.text).
         data('menu', menu).
         on('click', '', onMenuItemClicked).

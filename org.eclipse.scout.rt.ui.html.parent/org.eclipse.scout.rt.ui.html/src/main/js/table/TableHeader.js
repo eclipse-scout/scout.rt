@@ -14,7 +14,7 @@ scout.TableHeader = function(table, $tableHeader, session) {
 
   for (var i = 0; i < columns.length; i++) {
     column = columns[i];
-    $header = $tableHeader.appendDIV('header-item')
+    $header = $tableHeader.appendDiv('header-item')
       .data('column', column)
       .css('min-width', column.width + 'px') // 17 is width of header-resize handle, see table.css (.header-resize)
       .css('max-width', column.width + 'px')
@@ -31,7 +31,7 @@ scout.TableHeader = function(table, $tableHeader, session) {
 
     this.totalWidth += columns[i].width;
 
-    $tableHeader.appendDIV('header-resize', '')
+    $tableHeader.appendDiv('header-resize', '')
       .on('mousedown', '', resizeHeader);
 
     column.$div = $header;

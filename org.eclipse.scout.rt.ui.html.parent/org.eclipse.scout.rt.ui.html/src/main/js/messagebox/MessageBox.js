@@ -4,14 +4,14 @@ scout.MessageBox = function() {
 scout.inherits(scout.MessageBox, scout.ModelAdapter);
 
 scout.MessageBox.prototype._render = function($parent) {
-  this.$container = $.makeDIV('messagebox').hide().appendTo($parent);
+  this.$container = $.makeDiv('messagebox').hide().appendTo($parent);
 
-  this.$content = this.$container.appendDIV('messagebox-content');
-  this.$title = this.$content.appendDIV('messagebox-label');
-  this.$introText = this.$content.appendDIV('messagebox-label messagebox-intro-text');
-  this.$actionText = this.$content.appendDIV('messagebox-label messagebox-action-text');
+  this.$content = this.$container.appendDiv('messagebox-content');
+  this.$title = this.$content.appendDiv('messagebox-label');
+  this.$introText = this.$content.appendDiv('messagebox-label messagebox-intro-text');
+  this.$actionText = this.$content.appendDiv('messagebox-label messagebox-action-text');
 
-  this.$buttons = this.$container.appendDIV('messagebox-buttons');
+  this.$buttons = this.$container.appendDiv('messagebox-buttons');
 
   if (this.yesButtonText) {
     this.$yesButton = this._createButton('yes', this.yesButtonText);

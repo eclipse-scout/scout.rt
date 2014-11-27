@@ -29,10 +29,10 @@ scout.GroupBox.prototype._render = function($parent) {
 
   this.$label = $('<span>').html(this.label);
   this._$groupBoxTitle = this.$container.
-    appendDiv('', 'group-box-title').
+    appendDiv('group-box-title').
     append(this.$label);
 
-  this._$body = this.$container.appendDiv('', 'group-box-body');
+  this._$body = this.$container.appendDiv('group-box-body');
   var env = scout.HtmlEnvironment;
   var htmlBody = new scout.HtmlComponent(this._$body, this.session);
   htmlBody.setLayout(new scout.LogicalGridLayout(env.formColumnGap, env.formRowGap));

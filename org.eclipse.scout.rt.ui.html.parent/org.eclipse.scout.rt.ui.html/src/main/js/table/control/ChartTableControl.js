@@ -30,7 +30,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
   });
 
   // create container
-  var $chartSelect = $parent.appendDIV('chart-select');
+  var $chartSelect = $parent.appendDiv('chart-select');
 
   // create chart types for selection
   addSelectBar($chartSelect);
@@ -55,8 +55,8 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
   $('svg.select-chart').first().addClassSVG('selected');
 
   // create container for x/y-axis
-  var $xAxisSelect = $parent.appendDIV('xaxis-select'),
-    $yAxisSelect = $parent.appendDIV('yaxis-select');
+  var $xAxisSelect = $parent.appendDiv('xaxis-select'),
+    $yAxisSelect = $parent.appendDiv('yaxis-select');
 
   // all x/y-axis for selection
   for (var c1 = 0; c1 < columns.length; c1++) {
@@ -66,11 +66,11 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
       continue;
     }
 
-    var $div = $.makeDiv('', 'select-axis', column1.text)
+    var $div = $.makeDiv('select-axis', column1.text)
       .data('column', column1);
 
     if (column1.type === 'date') {
-      $div.appendDiv('', 'select-axis-group', dateDesc[0]);
+      $div.appendDiv('select-axis-group', dateDesc[0]);
       $div.data('group', 0);
     }
 
@@ -105,8 +105,8 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
   });
 
   // create container for data
-  var $dataSelect = $parent.appendDIV('data-select');
-  $dataSelect.appendDIV('select-data data-count', countDesc)
+  var $dataSelect = $parent.appendDiv('data-select');
+  $dataSelect.appendDiv('select-data data-count', countDesc)
     .data('column', -1);
 
   // all data for selection
@@ -114,7 +114,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
     var column2 = columns[c2];
 
     if ((column2.type === 'number')) {
-      $dataSelect.appendDIV('select-data data-sum', column2.text)
+      $dataSelect.appendDiv('select-data data-sum', column2.text)
         .data('column', column2);
     }
   }

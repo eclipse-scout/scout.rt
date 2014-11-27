@@ -16,10 +16,10 @@ scout.TableFooter.prototype._render = function($parent) {
     filterText = filter.text;
   }
 
-  this.$container = $parent.appendDIV('table-footer');
-  this._$controlContainer = this.$container.appendDIV('control-container').hide();
+  this.$container = $parent.appendDiv('table-footer');
+  this._$controlContainer = this.$container.appendDiv('control-container').hide();
   this._addResize(this._$controlContainer);
-  this.$controlContent = this._$controlContainer.appendDIV('control-content');
+  this.$controlContent = this._$controlContainer.appendDiv('control-content');
 
   this._controlGroups = {};
 
@@ -44,16 +44,16 @@ scout.TableFooter.prototype._render = function($parent) {
 
   // info section
   this._$controlInfo = this.$container
-    .appendDIV('control-info');
+    .appendDiv('control-info');
 
   this._$infoLoad = this._$controlInfo
-    .appendDIV('table-info-load')
+    .appendDiv('table-info-load')
     .on('click', '', this._table.sendReload.bind(this._table));
   this._$infoFilter = this._$controlInfo
-    .appendDIV('table-info-filter')
+    .appendDiv('table-info-filter')
     .on('click', '', this._table.resetFilter.bind(this._table));
   this._$infoSelection = this._$controlInfo
-    .appendDIV('table-info-selection')
+    .appendDiv('table-info-selection')
     .on('click', '', this._table.toggleSelection.bind(this._table));
 
   this._updateInfoLoad();
@@ -212,7 +212,7 @@ scout.TableFooter.prototype._computeCountInfo = function(n) {
 };
 
 scout.TableFooter.prototype._addGroup = function(title) {
-  var $group = $.makeDIV('control-group').attr('data-title', title).appendTo(this.$container);
+  var $group = $.makeDiv('control-group').attr('data-title', title).appendTo(this.$container);
   this._controlGroups[title] = $group;
   return $group;
 };
@@ -272,7 +272,7 @@ scout.TableFooter.prototype._resizeData = function(sizeContainer) {
 };
 
 scout.TableFooter.prototype._addResize = function($parent) {
-  this._$controlResize = $parent.appendDIV('control-resize')
+  this._$controlResize = $parent.appendDiv('control-resize')
     .on('mousedown', '', resize);
   var that = this;
 

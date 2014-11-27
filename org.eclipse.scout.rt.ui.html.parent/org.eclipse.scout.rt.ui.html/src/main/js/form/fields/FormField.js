@@ -303,7 +303,7 @@ scout.FormField.prototype._onIconClick = function(event) {
  */
 scout.FormField.prototype.addContainer = function($parent, typeName, layout) {
   this.$container =
-    $.makeDIV('form-field')
+    $.makeDiv('form-field')
     .appendTo($parent);
 
   if (typeName) {

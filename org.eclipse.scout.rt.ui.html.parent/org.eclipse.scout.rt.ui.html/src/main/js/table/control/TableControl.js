@@ -13,7 +13,7 @@ scout.TableControl.prototype._render = function($parent) {
     classes += this.cssClass;
   }
 
-  this.$container = $parent.appendDIV(classes)
+  this.$container = $parent.appendDiv(classes)
     .data('control', this);
 };
 

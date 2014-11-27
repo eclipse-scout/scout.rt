@@ -4,8 +4,8 @@ scout.BreadCrumbNavigation = function() {
 scout.inherits(scout.BreadCrumbNavigation, scout.ModelAdapter);
 
 scout.BreadCrumbNavigation.prototype._render = function($parent) {
-  this.$container = $parent.appendDiv(undefined, 'breadcrumbs');
-  this.$scrollContainer= this.$container.appendDiv(undefined, 'scrollable-x');
+  this.$container = $parent.appendDiv('breadcrumbs');
+  this.$scrollContainer= this.$container.appendDiv('scrollable-x');
 
   this._renderBreadCrumbs();
 };
@@ -42,12 +42,12 @@ scout.BreadCrumbNavigation.prototype._addBreadCrumbForm = function(form) {
   var cssClasses = 'breadcrumb ';
   if (homeCrumb) {
     cssClasses += 'breadcrumb-home';
-    $breadcrumb = this.$scrollContainer.beforeDiv(undefined, cssClasses, form.title);
+    $breadcrumb = this.$scrollContainer.beforeDiv(cssClasses, form.title);
     //necessary since scrollable is an inline element, see css
     this.$scrollContainer.width('calc(100% - '+$breadcrumb.outerWidth()+'px)');
   }
   else {
-    $breadcrumb = this.$scrollContainer.appendDiv(undefined, cssClasses, form.title);
+    $breadcrumb = this.$scrollContainer.appendDiv(cssClasses, form.title);
   }
 
   $breadcrumb

@@ -11,7 +11,7 @@ scout.DetachFormMenu = function(form, session) {
 
 scout.DetachFormMenu.prototype.render = function($parent) {
   this.$container = $parent
-    .appendDIV('menu-item detach-menu')
+    .appendDiv('menu-item detach-menu')
     .on('click', '', onClicked.bind(this));
 
   function onClicked(event) {

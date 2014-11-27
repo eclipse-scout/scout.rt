@@ -146,14 +146,14 @@ scout.DesktopKeystrokeAdapter = function(navigation, bench) {
 scout.DesktopKeystrokeAdapter.prototype.drawKeyBox = function() {
   if (this._taskbar) {
     $('.taskbar-item', this._taskbar.$container).each(function(i, e) {
-      $(e).appendDiv('', 'key-box', $(e).attr('data-shortcut'));
+      $(e).appendDiv('key-box', $(e).attr('data-shortcut'));
     });
   }
 
   if (this._viewButtonBar) {
     $('.view-item', this._viewButtonBar.$div).each(function(i, element) {
       if (i < 9) {
-        $(element).appendDiv('', 'key-box', i + 1);
+        $(element).appendDiv('key-box', i + 1);
       }
     });
   }
@@ -165,20 +165,20 @@ scout.DesktopKeystrokeAdapter.prototype.drawKeyBox = function() {
 
     if (!$node.hasClass('leaf')) { // can expand
       if ($node.hasClass('expanded')) {
-        $node.appendDiv('', 'key-box large', '-');
+        $node.appendDiv('key-box large', '-');
       } else {
-        $node.appendDiv('', 'key-box large', '+');
+        $node.appendDiv('key-box large', '+');
       }
       $node.children('.tree-item-control').css('display', 'none');
     }
 
     if ($prev.length) {
-      $prev.appendDiv('', 'key-box', '←');
+      $prev.appendDiv('key-box', '←');
       $prev.children('.tree-item-control').css('display', 'none');
     }
 
     if ($next.length) {
-      $next.appendDiv('', 'key-box', '→');
+      $next.appendDiv('key-box', '→');
       $next.children('.tree-item-control').css('display', 'none');
     }
   }

@@ -20,7 +20,7 @@ scout.inherits(scout.TabBox, scout.CompositeField);
 scout.TabBox.prototype._render = function($parent) {
   this.addContainer($parent, 'tab-box', new scout.TabBoxLayout());
 
-  this._$tabArea = this.$container.appendDiv('', 'tab-area');
+  this._$tabArea = this.$container.appendDiv('tab-area');
   var htmlComp = new scout.HtmlComponent(this._$tabArea, this.session);
   htmlComp.setLayout(new scout.NullLayout());
   var i, tabItem, $tab;
@@ -35,7 +35,7 @@ scout.TabBox.prototype._render = function($parent) {
     }
   }
 
-  this._$tabContent = this.$container.appendDiv('', 'tab-content');
+  this._$tabContent = this.$container.appendDiv('tab-content');
   htmlComp = new scout.HtmlComponent(this._$tabContent, this.session);
   htmlComp.setLayout(new scout.SingleLayout());
 };

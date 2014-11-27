@@ -16,7 +16,7 @@ scout.DatePicker.prototype.selectDate = function(date, animated) {
 scout.DatePicker.prototype.show = function(viewDate, selectedDate, animated) {
   var viewDateDiff = 0;
   if (!this.$popup) {
-    this.$popup = $.makeDIV('date-box')
+    this.$popup = $.makeDiv('date-box')
       .cssLeft(this._dateField.$field.position().left)
       .cssTop(this._dateField.$field.innerBottom())
       .mousedown(this._onMouseDown.bind(this));
@@ -25,8 +25,8 @@ scout.DatePicker.prototype.show = function(viewDate, selectedDate, animated) {
     this._$header = this._createHeader().appendTo(this.$popup);
     this._$header.find('.date-box-left-y, .date-box-left-m, .date-box-right-m, .date-box-right-y').mousedown(this._onNavigationMouseDown.bind(this));
 
-    this.$popup.appendDIV('date-box-separator');
-    this.$viewport = this.$popup.appendDIV('date-box-viewport');
+    this.$popup.appendDiv('date-box-separator');
+    this.$viewport = this.$popup.appendDiv('date-box-viewport');
     this._viewportTop = this.$viewport.position().top;
     this._viewportLeft = this.$viewport.position().left;
     //Fix the position of the viewport in order to to proper viewport shifting (see _appendAnimated)
@@ -172,11 +172,11 @@ scout.DatePicker.prototype._createDateBox = function () {
   var weekdays = this._dateFormat.symbols.weekdaysShortOrdered;
   var start = new Date(this.viewDate);
 
-  var $box = $.makeDIV('date-box-month').data('viewDate', this.viewDate);
+  var $box = $.makeDiv('date-box-month').data('viewDate', this.viewDate);
 
   // Create weekday header
   for (i in weekdays){
-    $box.appendDIV('date-box-weekday', weekdays[i]);
+    $box.appendDiv('date-box-weekday', weekdays[i]);
   }
 
   // Find start date (-1)
@@ -214,7 +214,7 @@ scout.DatePicker.prototype._createDateBox = function () {
 
     day = (dayInMonth <= 9 ? '0' + dayInMonth : dayInMonth);
     $day = $box.
-      appendDIV('date-box-day ' + cl, day).
+      appendDiv('date-box-day ' + cl, day).
       data('date', new Date(start));
   }
 

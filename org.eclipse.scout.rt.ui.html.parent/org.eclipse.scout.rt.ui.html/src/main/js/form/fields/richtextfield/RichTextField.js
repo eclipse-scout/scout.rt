@@ -12,7 +12,7 @@ scout.RichTextField.prototype._render = function($parent) {
 
   // create editable div
   this.addField(
-    $.makeDIV('', 'Beispieltext').
+    $.makeDiv('', 'Beispieltext').
       attr('contentEditable', 'true').
       blur(this._onFieldBlur.bind(this)).
       // return should not create div
@@ -24,31 +24,31 @@ scout.RichTextField.prototype._render = function($parent) {
       }));
 
   // command bar
-  this.$commandBar = this.$container.appendDIV('rich-text-bar');
+  this.$commandBar = this.$container.appendDiv('rich-text-bar');
 
-  this.$commandFormat = this.$commandBar.appendDIV('rich-text-bar-group');
+  this.$commandFormat = this.$commandBar.appendDiv('rich-text-bar-group');
 
-  this.$commandFormat.appendDIV('rich-text-command rich-text-bar-bold', 'a')
+  this.$commandFormat.appendDiv('rich-text-command rich-text-bar-bold', 'a')
     .data('command', 'bold');
-  this.$commandFormat.appendDIV('rich-text-command rich-text-bar-strike', 'a')
+  this.$commandFormat.appendDiv('rich-text-command rich-text-bar-strike', 'a')
     .data('command', 'strikeThrough');
-  this.$commandFormat.appendDIV('rich-text-command rich-text-bar-underline', 'a')
+  this.$commandFormat.appendDiv('rich-text-command rich-text-bar-underline', 'a')
     .data('command', 'underline');
 
-  this.$commandMark = this.$commandBar.appendDIV('rich-text-bar-group');
-  this.$commandMark.appendDIV('rich-text-command rich-text-bar-white', '&nbsp')
+  this.$commandMark = this.$commandBar.appendDiv('rich-text-bar-group');
+  this.$commandMark.appendDiv('rich-text-command rich-text-bar-white', '&nbsp')
     .data('command', 'BackColor');
-  this.$commandMark.appendDIV('rich-text-command rich-text-bar-yellow', '&nbsp')
+  this.$commandMark.appendDiv('rich-text-command rich-text-bar-yellow', '&nbsp')
     .data('command', 'BackColor');
-  this.$commandMark.appendDIV('rich-text-command rich-text-bar-green', '&nbsp')
+  this.$commandMark.appendDiv('rich-text-command rich-text-bar-green', '&nbsp')
     .data('command', 'BackColor');
 
-  this.$commandList = this.$commandBar.appendDIV('rich-text-bar-group');
-  this.$commandList.appendDIV('rich-text-command rich-text-bar-plain')
+  this.$commandList = this.$commandBar.appendDiv('rich-text-bar-group');
+  this.$commandList.appendDiv('rich-text-command rich-text-bar-plain')
     .data('command', 'outdent');
-  this.$commandList.appendDIV('rich-text-command rich-text-bar-bullet')
+  this.$commandList.appendDiv('rich-text-command rich-text-bar-bullet')
     .data('command', 'insertunorderedlist');
-  this.$commandList.appendDIV('rich-text-command rich-text-bar-number')
+  this.$commandList.appendDiv('rich-text-command rich-text-bar-number')
     .data('command', 'insertorderedlist');
 
 

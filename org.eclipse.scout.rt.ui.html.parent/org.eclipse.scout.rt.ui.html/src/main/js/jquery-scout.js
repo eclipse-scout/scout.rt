@@ -10,7 +10,7 @@
   // chris' shortcut
   $.l = console.log.bind(console);
 
-  $.makeDiv = function(id, cssClass, htmlContent) {
+  $.makeDiv = function(cssClass, htmlContent, id) {
     if (id === 0) {
       //Allow 0 as id (!id would result in false)
       id = '0';
@@ -23,10 +23,6 @@
       (htmlContent || '') +
       '</div>'
     );
-  };
-
-  $.makeDIV = function(cssClass, htmlContent) {
-    return $.makeDiv(undefined, cssClass, htmlContent);
   };
 
   // used by some animate functions
@@ -75,46 +71,24 @@
 
   // === $.prototype extensions ===
 
-  // FIXME BSH Cleanup 'div' methods: as ID variant is almost never used, remove it
-
   // prepend - and return new div for chaining
-  $.fn.prependDiv = function(id, cssClass, htmlContent) {
-    return $.makeDiv(id, cssClass, htmlContent).prependTo(this);
+  $.fn.prependDiv = function(cssClass, htmlContent, id) {
+    return $.makeDiv(cssClass, htmlContent, id).prependTo(this);
   };
 
   // append - and return new div for chaining
-  $.fn.appendDiv = function(id, cssClass, htmlContent) {
-    return $.makeDiv(id, cssClass, htmlContent).appendTo(this);
+  $.fn.appendDiv = function(cssClass, htmlContent, id) {
+    return $.makeDiv(cssClass, htmlContent, id).appendTo(this);
   };
 
   // insert after - and return new div for chaining
-  $.fn.afterDiv = function(id, cssClass, htmlContent) {
-    return $.makeDiv(id, cssClass, htmlContent).insertAfter(this);
+  $.fn.afterDiv = function(cssClass, htmlContent, id) {
+    return $.makeDiv(cssClass, htmlContent, id).insertAfter(this);
   };
 
   // insert before - and return new div for chaining
-  $.fn.beforeDiv = function(id, cssClass, htmlContent) {
-    return $.makeDiv(id, cssClass, htmlContent).insertBefore(this);
-  };
-
-  // prepend without id - and return new div for chaining
-  $.fn.prependDIV = function(cssClass, htmlContent) {
-    return $.makeDiv(undefined, cssClass, htmlContent).prependTo(this);
-  };
-
-  // append without id - and return new div for chaining
-  $.fn.appendDIV = function(cssClass, htmlContent) {
-    return $.makeDiv(undefined, cssClass, htmlContent).appendTo(this);
-  };
-
-  // insert after without id - and return new div for chaining
-  $.fn.afterDIV = function(cssClass, htmlContent) {
-    return $.makeDiv(undefined, cssClass, htmlContent).insertAfter(this);
-  };
-
-  // insert before without id - and return new div for chaining
-  $.fn.beforeDIV = function(cssClass, htmlContent) {
-    return $.makeDiv(undefined, cssClass, htmlContent).insertBefore(this);
+  $.fn.beforeDiv = function(cssClass, htmlContent, id) {
+    return $.makeDiv(cssClass, htmlContent, id).insertBefore(this);
   };
 
   // append svg

@@ -9,10 +9,10 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
   $header.addClass('menu-open');
 
   // create container
-  var $menuHeader = table.$container.appendDIV('table-header-menu')
+  var $menuHeader = table.$container.appendDiv('table-header-menu')
     .css('left', x).css('top', y + $header.parent().height() + 1);
 
-  $menuHeader.appendDIV('table-header-menu-whiter').width($header[0].offsetWidth - 2);
+  $menuHeader.appendDiv('table-header-menu-whiter').width($header[0].offsetWidth - 2);
 
   this.$headerMenu = $menuHeader;
   this.$header = $header;
@@ -22,48 +22,48 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
   $('body').on('keydown.remove', removeMenu);
 
   // create buttons in command for order
-  var $commandMove = $menuHeader.appendDIV('header-group');
-  $commandMove.appendDIV('header-text')
+  var $commandMove = $menuHeader.appendDiv('header-group');
+  $commandMove.appendDiv('header-text')
     .data('label', 'Verschieben');
 
-  $commandMove.appendDiv('HeaderCommandMoveTop', 'header-command')
+  $commandMove.appendDiv('header-command', '', 'HeaderCommandMoveTop')
     .data('label', 'an den Anfang')
     .click(moveTop);
-  $commandMove.appendDiv('HeaderCommandMoveUp', 'header-command')
+  $commandMove.appendDiv('header-command', '', 'HeaderCommandMoveUp')
     .data('label', 'nach vorne')
     .click(moveUp);
-  $commandMove.appendDiv('HeaderCommandMoveDown', 'header-command')
+  $commandMove.appendDiv('header-command', '', 'HeaderCommandMoveDown')
     .data('label', 'nach hinten')
     .click(moveDown);
-  $commandMove.appendDiv('HeaderCommandMoveBottom', 'header-command')
+  $commandMove.appendDiv('header-command', '', 'HeaderCommandMoveBottom')
     .data('label', 'an das Ende')
     .click(moveBottom);
 
   // create buttons in command for sorting
-  var $commandSort = $menuHeader.appendDIV('header-group');
-  $commandSort.appendDIV('header-text')
+  var $commandSort = $menuHeader.appendDiv('header-group');
+  $commandSort.appendDiv('header-text')
     .data('label', 'Sortierung');
 
-  var $sortAsc = $commandSort.appendDiv('HeaderCommandSortAsc', 'header-command')
+  var $sortAsc = $commandSort.appendDiv('header-command', '', 'HeaderCommandSortAsc')
     .data('label', 'aufsteigend')
     .click(this.remove.bind(this))
     .click(function() {
       sort('asc', false, $(this).hasClass('selected'));
     });
-  var $sortDesc = $commandSort.appendDiv('HeaderCommandSortDesc', 'header-command')
+  var $sortDesc = $commandSort.appendDiv('header-command', '', 'HeaderCommandSortDesc')
     .data('label', 'absteigend')
     .click(this.remove.bind(this))
     .click(function() {
       sort('desc', false, $(this).hasClass('selected'));
     });
 
-  var $sortAscAdd = $commandSort.appendDiv('HeaderCommandSortAscAdd', 'header-command')
+  var $sortAscAdd = $commandSort.appendDiv('header-command', '', 'HeaderCommandSortAscAdd')
     .data('label', 'zusätzlich aufsteigend')
     .click(this.remove.bind(this))
     .click(function() {
       sort('asc', true, $(this).hasClass('selected'));
     });
-  var $sortDescAdd = $commandSort.appendDiv('HeaderCommandSortDescAdd', 'header-command')
+  var $sortDescAdd = $commandSort.appendDiv('header-command', '', 'HeaderCommandSortDescAdd')
     .data('label', 'zusätzlich absteigend')
     .click(this.remove.bind(this))
     .click(function() {
@@ -74,16 +74,16 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
 
   // create buttons in command for grouping
   if (column.type === 'text' || column.type === 'date') {
-    var $commandGroup = $menuHeader.appendDIV('header-group');
-    $commandGroup.appendDIV('header-text')
+    var $commandGroup = $menuHeader.appendDiv('header-group');
+    $commandGroup.appendDiv('header-text')
       .data('label', 'Summe');
 
-    var $groupAll = $commandGroup.appendDiv('HeaderCommandGroupAll', 'header-command')
+    var $groupAll = $commandGroup.appendDiv('header-command', '', 'HeaderCommandGroupAll')
       .data('label', 'über alles')
       .click(this.remove.bind(this))
       .click(groupAll);
 
-    var $groupSort = $commandGroup.appendDiv('HeaderCommandGroupSort', 'header-command')
+    var $groupSort = $commandGroup.appendDiv('header-command', '', 'HeaderCommandGroupSort')
       .data('label', 'gruppiert')
       .click(this.remove.bind(this))
       .click(groupSort);
@@ -93,43 +93,43 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
 
   // create buttons in command for coloring
   if (column.type === 'number') {
-    var $commandColor = $menuHeader.appendDIV('header-group');
-    $commandColor.appendDIV('header-text')
+    var $commandColor = $menuHeader.appendDiv('header-group');
+    $commandColor.appendDiv('header-text')
       .data('label', 'Einfärben');
 
-    $commandColor.appendDiv('HeaderCommandColorRed', 'header-command')
+    $commandColor.appendDiv('header-command', '', 'HeaderCommandColorRed')
       .data('label', 'von Rot nach Grün')
       .click(this.remove.bind(this))
       .click(colorRed);
-    $commandColor.appendDiv('HeaderCommandColorGreen', 'header-command')
+    $commandColor.appendDiv('header-command', '', 'HeaderCommandColorGreen')
       .data('label', 'von Grün nach Rot')
       .click(this.remove.bind(this))
       .click(colorGreen);
-    $commandColor.appendDiv('HeaderCommandColorBar', 'header-command')
+    $commandColor.appendDiv('header-command', '', 'HeaderCommandColorBar')
       .data('label', 'mit Balkendiagramm')
       .click(this.remove.bind(this))
       .click(colorBar);
-    $commandColor.appendDiv('HeaderCommandColorRemove', 'header-command')
+    $commandColor.appendDiv('header-command', '', 'HeaderCommandColorRemove')
       .data('label', 'entfernen')
       .click(this.remove.bind(this))
       .click(colorRemove);
   }
 
   // create buttons in command for new columns
-  var $commandColumn = $menuHeader.appendDIV('header-group');
-  $commandColumn.appendDIV('header-text')
+  var $commandColumn = $menuHeader.appendDiv('header-group');
+  $commandColumn.appendDiv('header-text')
     .data('label', 'Spalte');
 
-  $commandColumn.appendDiv('HeaderCommandColumnAdd', 'header-command')
+  $commandColumn.appendDiv('header-command', '', 'HeaderCommandColumnAdd')
     .data('label', 'hinzufügen')
     .click(columnAdd);
-  $commandColumn.appendDiv('HeaderCommandColumnRemove', 'header-command')
+  $commandColumn.appendDiv('header-command', '', 'HeaderCommandColumnRemove')
     .data('label', 'entfernen')
     .click(columnRemove);
 
   // filter
-  var $headerFilter = $menuHeader.appendDIV('header-group-filter');
-  $headerFilter.appendDIV('header-text')
+  var $headerFilter = $menuHeader.appendDiv('header-group-filter');
+  $headerFilter.appendDiv('header-text')
     .data('label', 'Filtern nach');
 
   var group = (column.type === 'date') ? 3 : -1,
@@ -137,7 +137,7 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
     xAxis = matrix.addAxis(column, group),
     cube = matrix.calculateCube();
 
-  var $headerFilterContainer = $headerFilter.appendDIV('header-filter-container'),
+  var $headerFilterContainer = $headerFilter.appendDiv('header-filter-container'),
     $headerFilterScroll = scout.scrollbars.install($headerFilterContainer);
 
   for (var a = 0; a < xAxis.length; a++) {
@@ -145,7 +145,7 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
       mark = xAxis.format(key),
       value = cube.getValue([key])[0];
 
-    var $filter = $headerFilterScroll.appendDiv('', 'header-filter', mark)
+    var $filter = $headerFilterScroll.appendDiv('header-filter', mark)
       .attr('data-xAxis', key)
       .click(filterClick)
       .attr('data-value', value);

@@ -17,8 +17,8 @@ scout.Scrollbar = function($parent, options) {
   this._updateThumbPending = false;
 
   // create scrollbar
-  this._$scrollbar = $parent.beforeDiv('', 'scrollbar');
-  this._$thumb = this._$scrollbar.appendDiv('', 'scrollbar-thumb');
+  this._$scrollbar = $parent.beforeDiv('scrollbar');
+  this._$thumb = this._$scrollbar.appendDiv('scrollbar-thumb');
   if (this.options.invertColors === true) {
     this._$thumb.addClass('inverted');
   }

@@ -10,8 +10,8 @@ scout.Popup = function() {
  */
 scout.Popup.prototype.render = function() {
   var $docBody = $('body');
-  this.$body = $.makeDIV('popup-body');
-  this.$container = $.makeDIV('popup')
+  this.$body = $.makeDiv('popup-body');
+  this.$container = $.makeDiv('popup')
     .append(this.$body)
     .appendTo($docBody);
   this._attachCloseHandler();
@@ -59,8 +59,8 @@ scout.inherits(scout.PopupMenuItem, scout.Popup);
 
 scout.PopupMenuItem.prototype.render = function($parent) {
   scout.PopupMenuItem.parent.prototype.render($parent);
-  this.$head = $.makeDIV('popup-head');
-  this.$deco = $.makeDIV('popup-deco');
+  this.$head = $.makeDiv('popup-head');
+  this.$deco = $.makeDiv('popup-deco');
   this.$container
     .prepend(this.$head)
     .append(this.$deco);

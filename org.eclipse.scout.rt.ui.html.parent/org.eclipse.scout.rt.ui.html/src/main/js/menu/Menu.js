@@ -20,7 +20,7 @@ scout.Menu.prototype._render = function($parent) {
     }
   } else {
     this.$container = $parent
-      .appendDIV('menu-item')
+      .appendDiv('menu-item')
       .on('click', '', onClicked.bind(this));
   }
 

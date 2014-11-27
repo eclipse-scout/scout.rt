@@ -12,7 +12,7 @@ scout.TreeCompact = function() {
 scout.inherits(scout.TreeCompact, scout.ModelAdapter);
 
 scout.TreeCompact.prototype._render = function($parent) {
-  this.$container = $parent.appendDIV('compact-tree');
+  this.$container = $parent.appendDiv('compact-tree');
   this._$filter = $('<input>').
     attr('type', 'text').
     attr('placeholder', scout.texts.get('filterBy')).
@@ -21,9 +21,9 @@ scout.TreeCompact.prototype._render = function($parent) {
     on('input', this._onInput.bind(this)).
     keydown(this._onKeydown.bind(this));
 
-  var $nodesWrapperDiv = $.makeDIV('nodes-wrapper').appendTo(this.$container);
+  var $nodesWrapperDiv = $.makeDiv('nodes-wrapper').appendTo(this.$container);
   this._$viewport = scout.scrollbars.install($nodesWrapperDiv, {invertColors:true, borderless:true});
-  this._$nodesDiv = $.makeDIV('nodes').appendTo(this._$viewport);
+  this._$nodesDiv = $.makeDiv('nodes').appendTo(this._$viewport);
   this._renderNodes();
 };
 
@@ -31,12 +31,12 @@ scout.TreeCompact.prototype._renderNodes = function(filter) {
   var i, j, node, $node, childNode, $childNode;
   for (i=0; i<this.nodes.length; i++) {
     node = this.nodes[i];
-    $node = $.makeDIV('section').appendTo(this._$nodesDiv);
-    $.makeDIV('title').appendTo($node).text(node.text);
+    $node = $.makeDiv('section').appendTo(this._$nodesDiv);
+    $.makeDiv('title').appendTo($node).text(node.text);
     this._domMap[node.id] = $node;
     for (j=0; j<node.childNodes.length; j++) {
       childNode = node.childNodes[j];
-      $childNode = $.makeDIV('process').
+      $childNode = $.makeDiv('process').
         data('node', childNode).
         click(this._onNodeClick.bind(this)).
         text(childNode.text).

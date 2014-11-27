@@ -44,7 +44,7 @@ scout.Tree.prototype._visitNodes = function(nodes, func, parentNode) {
 
 scout.Tree.prototype._render = function($parent) {
   this.$parent = $parent;
-  this.$container = $parent.appendDIV('tree');
+  this.$container = $parent.appendDiv('tree');
   this._$viewport = scout.scrollbars.install(this.$container);
   this._addNodes(this.nodes);
   if (this.selectedNodeIds.length > 0) {
@@ -440,7 +440,7 @@ scout.Tree.prototype._addNodes = function(nodes, $parent) {
     }
     level = $parent ? $parent.data('level') + 1 : 0;
 
-    $node = $.makeDiv(node.id, 'tree-item ' + state, node.text)
+    $node = $.makeDiv('tree-item ' + state, node.text, node.id)
       .on('click', '', this._onNodeClick.bind(this))
       .on('dblclick', '', this._onNodeDoubleClick.bind(this))
       .data('node', node)
@@ -471,7 +471,7 @@ scout.Tree.prototype._addNodes = function(nodes, $parent) {
 };
 
 scout.Tree.prototype._renderTreeItemControl = function($node) {
-  $node.prependDIV('tree-item-control')
+  $node.prependDiv('tree-item-control')
     .on('click', '', this._onNodeControlClick.bind(this))
     .on('dblclick', '', this._onNodeControlClick.bind(this)); //_onNodeControlClick immediately returns with false to prevent bubbling
 };

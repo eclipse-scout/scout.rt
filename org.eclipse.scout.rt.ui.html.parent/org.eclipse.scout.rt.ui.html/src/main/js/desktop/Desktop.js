@@ -45,8 +45,8 @@ scout.Desktop.prototype._render = function($parent) {
   this.navigation = new scout.DesktopNavigation(this);
   this.navigation.render($parent);
 
-  this.$bar = $parent.appendDIV('desktop-taskbar');
-  this.$bar.appendDIV('taskbar-logo')
+  this.$bar = $parent.appendDiv('desktop-taskbar');
+  this.$bar.appendDiv('taskbar-logo')
     .delay(1000)
     .animateAVCSD('width', 40, null, null, 1000)
     .on('click', function() {
@@ -57,11 +57,11 @@ scout.Desktop.prototype._render = function($parent) {
       }
     }.bind(this));
 
-  this.$tabbar = this.$bar.appendDIV('taskbar-tabs');
-  this.$toolbar = this.$bar.appendDIV('taskbar-tools');
-  this.$bench = this.$parent.appendDIV('desktop-bench');
+  this.$tabbar = this.$bar.appendDiv('taskbar-tabs');
+  this.$toolbar = this.$bar.appendDiv('taskbar-tools');
+  this.$bench = this.$parent.appendDiv('desktop-bench');
   new scout.HtmlComponent(this.$bench, this.session);
-  this.$toolContainer = this.$parent.appendDIV('desktop-tool-container').hide();
+  this.$toolContainer = this.$parent.appendDiv('desktop-tool-container').hide();
 
   this._outlineTab = new scout.Desktop.TabAndContent();
 
@@ -143,9 +143,9 @@ scout.Desktop.TabAndContent.prototype._update = function(content, title, subTitl
 // bereits geöffneten Tab/Dialog zu wecheseln. Oder das Menü-Item disablen.
 
 scout.Desktop.prototype._addTab = function(tab, prepend) {
-  tab.$container = $.makeDIV('taskbar-tab-item')
-    .append($.makeDIV('title', tab.title).attr('title', tab.title))
-    .append($.makeDIV('sub-title', tab.subTitle));
+  tab.$container = $.makeDiv('taskbar-tab-item')
+    .append($.makeDiv('title', tab.title).attr('title', tab.title))
+    .append($.makeDiv('sub-title', tab.subTitle));
   if (prepend) {
     tab.$container.prependTo(this.$tabbar);
   } else {
@@ -283,7 +283,7 @@ scout.Desktop.prototype.changeOutline = function(outline) {
 
 scout.Desktop.prototype.addMessageBox = function(messageBox) {
   if (!this.$glasspane) {
-    this.$glasspane = this.$parent.appendDIV('glasspane');
+    this.$glasspane = this.$parent.appendDiv('glasspane');
   }
   messageBox.render(this.$glasspane);
 };

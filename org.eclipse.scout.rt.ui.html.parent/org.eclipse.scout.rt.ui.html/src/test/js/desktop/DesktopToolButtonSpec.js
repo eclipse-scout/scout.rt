@@ -7,7 +7,7 @@ describe("DesktopToolButton", function() {
     session = new scout.Session($('#sandbox'), '1.1');
     desktop = {
       $parent: session.$entryPoint,
-      $toolContainer: session.$entryPoint.appendDIV('desktop-tool-container').hide()
+      $toolContainer: session.$entryPoint.appendDiv('desktop-tool-container').hide()
     };
   });
 

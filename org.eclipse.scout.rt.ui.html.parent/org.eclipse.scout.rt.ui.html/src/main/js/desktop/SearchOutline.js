@@ -6,7 +6,7 @@ scout.inherits(scout.SearchOutline, scout.Outline);
 scout.SearchOutline.prototype._render = function($parent) {
   scout.SearchOutline.parent.prototype._render.call(this, $parent);
 
-  this.$searchStatus = $parent.prependDIV('search-status');
+  this.$searchStatus = $parent.prependDiv('search-status');
 };
 
 scout.SearchOutline.prototype._remove = function() {
