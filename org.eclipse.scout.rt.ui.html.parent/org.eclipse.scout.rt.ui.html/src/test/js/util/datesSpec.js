@@ -179,4 +179,18 @@ describe("scout.dates", function() {
 
   });
 
+  describe("timestamp", function() {
+
+    it("returns a string of the expected length withonly digits", function() {
+      var ts = scout.dates.timestamp();
+      expect(typeof ts).toBe('string');
+      expect(ts.length).toBe(17);
+      expect(/^\d+$/.test(ts)).toBe(true);
+
+      var date = new Date('2014-11-21 00:00:00');
+      expect(scout.dates.timestamp(date)).toBe('20141121000000000');
+    });
+
+  });
+
 });

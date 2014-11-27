@@ -54,15 +54,14 @@ scout.dates = {
    * used.
    */
   timestamp: function(date) {
-    var padZeroLeft = function(s, padding) {
-      if ((s + '').length >= padding) {
-        return s;
-      }
-      var z = new Array(padding + 1).join('0') + s;
-      return z.slice(-padding);
-    };
     var d = date || new Date();
-    return d.getFullYear() + padZeroLeft(d.getMonth() + 1, 2) + padZeroLeft(d.getDate(), 2) + padZeroLeft(d.getHours(), 2) + padZeroLeft(d.getMinutes(), 2) + padZeroLeft(d.getSeconds(), 2) + padZeroLeft(d.getMilliseconds(), 3);
+    return '' + d.getFullYear() +
+      scout.strings.padZeroLeft(d.getMonth() + 1, 2) +
+      scout.strings.padZeroLeft(d.getDate(), 2) +
+      scout.strings.padZeroLeft(d.getHours(), 2) +
+      scout.strings.padZeroLeft(d.getMinutes(), 2) +
+      scout.strings.padZeroLeft(d.getSeconds(), 2) +
+      scout.strings.padZeroLeft(d.getMilliseconds(), 3);
   }
 
 };
