@@ -57,7 +57,7 @@ scout.Session = function($entryPoint, jsonSessionId, initOptions) {
   this.locale;
   this._asyncEvents = [];
   this._asyncRequestQueued;
-  this.parentJsonSession; // FIXME BSH Improve this
+  this.parentJsonSession; // FIXME BSH Detach | Improve this
   this._childWindows = []; // for detached windows
   this._deferred;
   this._startup;
@@ -67,7 +67,7 @@ scout.Session = function($entryPoint, jsonSessionId, initOptions) {
   this._adapterDataCache = {};
   this.objectFactory = new scout.ObjectFactory(this);
 
-  // FIXME BSH Improve this
+  // FIXME BSH Detach | Improve this
   // If this is a popup window, re-register with parent (in case the user reloaded the popup window)
   if (window.opener && window.opener.scout && window.opener.scout.sessions) {
     // Should never happen, as forms are not detachable when multiple sessions are alive (see Form.js)
@@ -362,7 +362,7 @@ scout.Session.prototype.init = function() {
   // Ask if child windows should be closed as well
   $(window).on('beforeunload', function() {
     if (this._childWindows.length > 0) {
-      return 'There are windows in DETACHED state.'; // FIXME BSH Text
+      return 'There are windows in DETACHED state.'; // FIXME BSH Detach | Text
     }
   }.bind(this));
 

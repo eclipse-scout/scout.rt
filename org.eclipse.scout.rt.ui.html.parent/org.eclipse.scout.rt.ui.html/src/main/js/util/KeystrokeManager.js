@@ -1,10 +1,10 @@
 //FIXME keystrokes should consider focused fields. Maybe better to attach those keystrokes directly to the field? What with focused table?
 scout.KeystrokeManager = function() {
 
-  this._adapters = []; // FIXME BSH Check if we really need this
+  this._adapters = []; // FIXME BSH Keystroke | Check if we really need this
 
   // alt and f1-help
-  // FIXME BSH Alt-Key is a bad choice on IE, see http://superuser.com/questions/470064/is-it-possible-to-disable-the-alt-key-as-it-is-used-for-default-windows-things
+  // FIXME BSH Keystroke | Alt-Key is a bad choice on IE, see http://superuser.com/questions/470064/is-it-possible-to-disable-the-alt-key-as-it-is-used-for-default-windows-things
   $(document).keydown(function(event) {
     if (event.which === scout.keys.ALT) {
       removeKeyBox();
@@ -15,7 +15,7 @@ scout.KeystrokeManager = function() {
   $(document).keyup(function(event) {
     if (event.which === scout.keys.ALT) {
       removeKeyBox();
-      // FIXME BSH This cannot work... See http://stackoverflow.com/questions/6220300/jquery-keyup-how-do-i-prevent-the-default-behavior-of-the-arrow-up-down-an
+      // FIXME BSH Keystroke | This cannot work... See http://stackoverflow.com/questions/6220300/jquery-keyup-how-do-i-prevent-the-default-behavior-of-the-arrow-up-down-an
       return false;
     }
   });

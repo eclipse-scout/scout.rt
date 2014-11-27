@@ -573,7 +573,7 @@ scout.Table.prototype.getCellStyle = function(column, row) {
         style += 'font-family: ' + fontSpec.name + '; ';
       }
     }
-    // TODO BSH: iconId, enabled, editable
+    // TODO BSH Table | iconId, editable, errorStatus
   }
   style += (hAlign === 'left' ? '' : 'text-align: ' + hAlign + '; ');
   return style;

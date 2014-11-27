@@ -78,7 +78,7 @@ scout.DesktopKeystrokeAdapter = function(navigation, bench) {
           } else {
             $targetNode = $currentNode.prevAll('.tree-item[data-level=' + (+$currentNode.attr('data-level') - 1) + ']');
             if ($targetNode.attr('id')) {
-              // FIXME BSH "scroll into view"
+              // FIXME BSH Keystroke | "scroll into view"
               that._tree.desktopTree.setNodesSelected([$targetNode.data('node')]);
             }
           }
@@ -90,7 +90,7 @@ scout.DesktopKeystrokeAdapter = function(navigation, bench) {
           } else {
             $targetNode = $currentNode.next('.tree-item[data-level=' + (+$currentNode.attr('data-level') + 1) + ']');
             if ($targetNode.attr('id')) {
-              // FIXME BSH "scroll into view"
+              // FIXME BSH Keystroke | "scroll into view"
               that._tree.desktopTree.setNodesSelected([$targetNode.data('node')]);
             }
           }
@@ -124,7 +124,7 @@ scout.DesktopKeystrokeAdapter = function(navigation, bench) {
         if (keycode === 38) {
           $targetNode = $currentNode.prevAll('.tree-item[data-level=' + $currentNode.attr('data-level') + ']').first();
           if ($targetNode.attr('id')) {
-            // FIXME BSH "scroll into view"
+            // FIXME BSH Keystroke | "scroll into view"
             that._tree.desktopTree.setNodesSelected([$targetNode.data('node')]);
           }
         }
@@ -132,7 +132,7 @@ scout.DesktopKeystrokeAdapter = function(navigation, bench) {
         else if (keycode === 40) {
           $targetNode = $currentNode.nextAll('.tree-item[data-level=' + $currentNode.attr('data-level') + ']').first();
           if ($targetNode.attr('id')) {
-            // FIXME BSH "scroll into view"
+            // FIXME BSH Keystroke | "scroll into view"
             that._tree.desktopTree.setNodesSelected([$targetNode.data('node')]);
           }
         }
