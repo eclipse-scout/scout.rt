@@ -44,10 +44,6 @@ import org.json.JSONObject;
 public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBindingListener {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractJsonSession.class);
 
-  private JsonClientSession m_jsonClientSession;
-
-  // TODO AWE: JsonAdapterFactory überschreibbar machen, via Scout-service
-  // FIXME BSH Allgemein Thema Erweiterbarkeit: es fehlen protected Getter/Setter fuer private Felder, finale Objekte in Konstruktor koennen nicht customized werden
   private final JsonAdapterFactory m_jsonAdapterFactory;
   private final JsonAdapterRegistry m_jsonAdapterRegistry;
 
@@ -58,8 +54,9 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
    * where an event in the response, references an adapter that has already been disposed. With
    * this solution this situation is avoided.
    */
-  private final Set<String> m_unregisterAdapterSet;
+  private final Set<String> m_unregisterAdapterSet = new HashSet<String>();
 
+  private JsonClientSession m_jsonClientSession;
   private String m_jsonSessionId;
   private long m_jsonAdapterSeq;
   private JsonResponse m_currentJsonResponse;
@@ -68,14 +65,21 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   private JsonEventProcessor m_jsonEventProcessor;
 
   public AbstractJsonSession() {
-    m_currentJsonResponse = new JsonResponse();
+    m_currentJsonResponse = createJsonResponse();
     m_jsonAdapterFactory = createJsonAdapterFactory();
-    m_jsonAdapterRegistry = new JsonAdapterRegistry();
-    m_unregisterAdapterSet = new HashSet<String>();
+    m_jsonAdapterRegistry = createJsonAdapterRegistry();
+  }
+
+  protected JsonResponse createJsonResponse() {
+    return new JsonResponse();
   }
 
   protected JsonAdapterFactory createJsonAdapterFactory() {
     return new JsonAdapterFactory();
+  }
+
+  protected JsonAdapterRegistry createJsonAdapterRegistry() {
+    return new JsonAdapterRegistry();
   }
 
   @Override
@@ -120,7 +124,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
       }
     }
     m_jsonClientSession = (JsonClientSession) getOrCreateJsonAdapter(clientSession);
-    m_jsonEventProcessor = new JsonEventProcessor(m_jsonClientSession);
+    m_jsonEventProcessor = createJsonEventProcessor();
     startUpClientSession(clientSession);
 
     JSONObject jsonEvent = new JSONObject();
@@ -134,6 +138,10 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
    *         {@link IClientSession#startSession(org.osgi.framework.Bundle)} was not yet called
    */
   protected abstract IClientSession createClientSession();
+
+  protected JsonEventProcessor createJsonEventProcessor() {
+    return new JsonEventProcessor(m_jsonClientSession);
+  }
 
   /**
    * initialize the properties of the {@link IClientSession} but does not yet start it
@@ -214,6 +222,14 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     return m_jsonClientSession.getModel();
   }
 
+  public JsonClientSession getJsonClientSession() {
+    return m_jsonClientSession;
+  }
+
+  public long getJsonAdapterSeq() {
+    return m_jsonAdapterSeq;
+  }
+
   @Override
   public String createUniqueIdFor(IJsonAdapter jsonAdapter) {
     //FIXME CGU create id based on scout object for automatic gui testing, use @classId? or CustomWidgetIdGenerator from scout.ui.rwt bundle?
@@ -277,9 +293,17 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     return m_currentJsonResponse;
   }
 
+  protected JsonRequest currentJsonRequest() {
+    return m_currentJsonRequest;
+  }
+
   @Override
   public HttpServletRequest currentHttpRequest() {
     return m_currentHttpRequest;
+  }
+
+  public JsonEventProcessor getJsonEventProcessor() {
+    return m_jsonEventProcessor;
   }
 
   @Override
@@ -296,7 +320,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     finally {
       // FIXME CGU really finally? what if exception occurs and some events are already delegated to the model?
       // reset event map (aka jsonResponse) when response has been sent to client
-      m_currentJsonResponse = new JsonResponse();
+      m_currentJsonResponse = createJsonResponse();
       flush();
     }
   }
