@@ -18,7 +18,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.commons.IOUtility;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -145,10 +144,11 @@ public class MainRequestInterceptor extends AbstractService implements IServletR
       if (LOG.isDebugEnabled()) {
         LOG.debug("Received: " + jsonData);
       }
-      if (StringUtility.isNullOrEmpty(jsonData)) {
-        jsonData = "{}"; // FIXME
-      }
-      return new JSONObject(jsonData);
+      return (jsonData == null ? new JSONObject() : new JSONObject(jsonData));
+//      if (StringUtility.isNullOrEmpty(jsonData)) {
+//        jsonData = "{}"; // FIXME
+//      }
+//      return new JSONObject(jsonData);
     }
     catch (ProcessingException | IOException | JSONException e) {
       throw new JsonException(e.getMessage(), e);

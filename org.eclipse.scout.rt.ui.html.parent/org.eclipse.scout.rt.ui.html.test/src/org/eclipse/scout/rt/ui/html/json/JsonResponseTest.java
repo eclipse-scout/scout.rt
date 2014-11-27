@@ -31,7 +31,7 @@ public class JsonResponseTest {
     JSONObject json = m_jsonSession.currentJsonResponse().toJson();
 
     assertNotNull(json);
-    JSONArray events = json.getJSONArray("events");
+    JSONArray events = json.getJSONArray(JsonResponse.PROP_EVENTS);
     assertEquals(0, events.length());
 
     // Check single property change event
@@ -42,7 +42,7 @@ public class JsonResponseTest {
     json = m_jsonSession.currentJsonResponse().toJson();
 
     assertNotNull(json);
-    events = json.getJSONArray("events");
+    events = json.getJSONArray(JsonResponse.PROP_EVENTS);
     assertEquals(1, events.length());
 
     JSONObject event = events.getJSONObject(0);
@@ -63,7 +63,7 @@ public class JsonResponseTest {
   public void testJsonEventPropertyNullToEmptyString() throws JSONException {
     m_jsonSession.currentJsonResponse().addPropertyChangeEvent("-1", "name", null);
     JSONObject json = m_jsonSession.currentJsonResponse().toJson();
-    JSONArray events = json.getJSONArray("events");
+    JSONArray events = json.getJSONArray(JsonResponse.PROP_EVENTS);
     JSONObject props = events.getJSONObject(0).getJSONObject("properties");
     assertEquals(props.get("name"), "");
   }
@@ -82,7 +82,7 @@ public class JsonResponseTest {
     Mockito.when(mockAdapter.getId()).thenReturn("foo");
     resp.addAdapter(mockAdapter);
     json = resp.toJson();
-    assertEquals(0, json.getJSONArray("events").length());
+    assertEquals(0, json.getJSONArray(JsonResponse.PROP_EVENTS).length());
   }
 
 }

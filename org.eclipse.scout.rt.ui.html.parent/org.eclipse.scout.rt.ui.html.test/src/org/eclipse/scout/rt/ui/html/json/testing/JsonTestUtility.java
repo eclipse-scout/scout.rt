@@ -85,11 +85,11 @@ public final class JsonTestUtility {
   }
 
   public static JSONObject getAdapterData(JSONObject json, String id) throws JSONException {
-    return json.getJSONObject("adapterData").getJSONObject(id);
+    return json.getJSONObject(JsonResponse.PROP_ADAPTER_DATA).getJSONObject(id);
   }
 
   public static JSONObject getEvent(JSONObject json, int index) throws JSONException {
-    return (JSONObject) json.getJSONArray("events").get(index);
+    return (JSONObject) json.getJSONArray(JsonResponse.PROP_EVENTS).get(index);
   }
 
   public static JSONObject getPropertyChange(JSONObject json, int index) throws JSONException {

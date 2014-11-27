@@ -24,10 +24,14 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class JsonResponse {
-
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonResponse.class);
 
   public static final int ERR_SESSION_TIMEOUT = 10;
+
+  public static final String PROP_EVENTS = "events";
+  public static final String PROP_ADAPTER_DATA = "adapterData";
+  public static final String PROP_ERROR_CODE = "errorCode";
+  public static final String PROP_ERROR_MESSAGE = "errorMessage";
 
   private Integer m_errorCode;
   private String m_errorMessage;
@@ -151,10 +155,10 @@ public class JsonResponse {
         }
       }
 
-      JsonObjectUtility.putProperty(json, "events", eventArray);
-      JsonObjectUtility.putProperty(json, "adapterData", adapterData);
-      JsonObjectUtility.putProperty(json, "errorCode", m_errorCode);
-      JsonObjectUtility.putProperty(json, "errorMessage", m_errorMessage);
+      JsonObjectUtility.putProperty(json, PROP_EVENTS, (eventArray.length() == 0 ? null : eventArray));
+      JsonObjectUtility.putProperty(json, PROP_ADAPTER_DATA, (adapterData.length() == 0 ? null : adapterData));
+      JsonObjectUtility.putProperty(json, PROP_ERROR_CODE, m_errorCode);
+      JsonObjectUtility.putProperty(json, PROP_ERROR_MESSAGE, m_errorMessage);
     }
     finally {
       m_toJsonInProgress = false;

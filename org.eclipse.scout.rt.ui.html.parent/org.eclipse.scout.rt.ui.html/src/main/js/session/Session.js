@@ -218,6 +218,14 @@ scout.Session.prototype._sendRequest = function(request) {
 };
 
 scout.Session.prototype._processSuccessResponse = function(message) {
+  // Normalize
+  if (message.adapterData === undefined) {
+    message.adapterData = {};
+  }
+  if (message.events === undefined) {
+    message.events = {};
+  }
+
   this._queuedRequest = null;
   this._requestsPendingCounter--;
 
