@@ -126,6 +126,10 @@
       color: @active-color;
     }
   }
+
+  &.disabled:before {
+    color: @disabled-color;
+  }
 }
 
 .taskbar-tab-item .key-box,
