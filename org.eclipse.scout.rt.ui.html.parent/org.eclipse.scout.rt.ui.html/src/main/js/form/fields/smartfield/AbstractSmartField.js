@@ -268,7 +268,12 @@ scout.AbstractSmartField.prototype._setStatusText = function(vararg) {
 };
 
 scout.AbstractSmartField.prototype._openPopup = function() {
-  this._lookupStrategy.openPopup();
+  if (this._$popup) {
+    return false;
+  } else {
+    this._lookupStrategy.openPopup();
+    return true;
+  }
 };
 
 scout.AbstractSmartField.prototype._onOptionsLoaded = function(options) {
