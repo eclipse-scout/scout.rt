@@ -39,10 +39,7 @@ TableSpecHelper.prototype.createModelRow = function(id, cells) {
  * @param withoutCells true if only text instead of cells should be created (server only sends text without a cell object if no other properties are set)
  */
 TableSpecHelper.prototype.createModelRowByTexts = function(id, texts, withoutCells) {
-  //Make sure texts is an array
-  if (!Array.isArray(texts)) {
-    texts = [texts];
-  }
+  texts = scout.arrays.ensure(texts);
 
   var cells = [];
   for (var i = 0; i < texts.length; i++) {
@@ -60,10 +57,7 @@ TableSpecHelper.prototype.createModelRowByTexts = function(id, texts, withoutCel
 * @param texts array of texts for the cells in the new row or a string if only one cell should be created.
 */
 TableSpecHelper.prototype.createModelRowByValues = function(id, values) {
- //Make sure values is an array
- if (!Array.isArray(values)) {
-   values = [values];
- }
+ values = scout.arrays.ensure(values);
 
  var cells = [];
  for (var i = 0; i < values.length; i++) {

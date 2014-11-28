@@ -100,7 +100,7 @@ scout.Desktop.prototype._render = function($parent) {
   });
 
   // TODO CRU: split and move
-  // scout.keystrokeManager.installAdapter($parent, new scout.DesktopKeystrokeAdapter(this.navigation, this.taskbar));
+   scout.keystrokeManager.installAdapter($parent, new scout.DesktopKeystrokeAdapter(this.navigation, this.taskbar));
 };
 
 scout.Desktop.prototype.onResize = function() {

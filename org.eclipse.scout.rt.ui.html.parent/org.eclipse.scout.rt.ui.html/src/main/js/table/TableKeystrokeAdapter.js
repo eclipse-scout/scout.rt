@@ -20,6 +20,7 @@ scout.TableKeystrokeAdapter = function(table) {
     // FIXME CGU/AWE: (key-handling) better remove adapter on detach and reinstall on attach to increase performance?
     // also refactor selectedTool-if below when activeForm is implemented on desktop (see Desktop.js)
     return inputFocused ||
+      !that._table.rendered ||
       !that._table.$container.isAttached() ||
       table.session.desktop.selectedTool;
   }

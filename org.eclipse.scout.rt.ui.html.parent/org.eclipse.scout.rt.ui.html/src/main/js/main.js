@@ -12,7 +12,7 @@ scout.init = function(initOptions) {
       portletPartId = $(this).data('partid') || '0',
       focusFirstPart = initOptions.focusFirstPart !== undefined ? initOptions.focusFirstPart : true;
 
-    jsonSessionId = [portletPartId, tabId].join(':'),
+    jsonSessionId = [portletPartId, tabId].join(':');
     session = new scout.Session($container, jsonSessionId, initOptions);
     session.init();
     scout.sessions.push(session);

@@ -56,7 +56,7 @@ scout.Tree.prototype.setBreadcrumb = function(bread) {
   if (bread) {
     this._breadcrumb = true;
 
-    var $selected = this._findSelectedNodes();
+    var $selected = this.$selectedNodes();
 
     if ($selected.length > 0) {
       var nodeId = $selected.attr('id'),
@@ -82,7 +82,7 @@ scout.Tree.prototype.collapseAll = function() {
   //Collapse root nodes
   this._$scrollable.find('[data-level="0"]').each(function() {
     var $node = $(this);
-    that.setNodeExpanded($node.data('node'), $node , false);
+    that.setNodeExpanded($node.data('node'), $node, false);
   });
 
   //Collapse all expanded child nodes (only model)
@@ -143,8 +143,8 @@ scout.Tree.prototype._renderExpansion = function(node, $node, expanded) {
           $(this).replaceWith($(this).contents());
         };
 
-        $wrapper.css('height', 0).
-          animateAVCSD('height', h, removeContainer, scout.scrollbars.update.bind(this, this._$scrollable), 200);
+        $wrapper.css('height', 0)
+          .animateAVCSD('height', h, removeContainer, scout.scrollbars.update.bind(this, this._$scrollable), 200);
       }
     }
     $node.addClass('expanded');
@@ -165,8 +165,12 @@ scout.Tree.prototype.clearSelection = function() {
 };
 
 scout.Tree.prototype.setNodesSelected = function(nodes, $nodes) {
-  var nodeIds = new Array(nodes.length), i;
-  for (i=0; i < nodes.length; i++) {
+  var nodeIds = new Array(nodes.length),
+    i;
+  nodes = scout.arrays.ensure(nodes);
+  $nodes = scout.arrays.ensure($nodes);
+
+  for (i = 0; i < nodes.length; i++) {
     nodeIds[i] = nodes[i].id;
   }
 
@@ -177,7 +181,7 @@ scout.Tree.prototype.setNodesSelected = function(nodes, $nodes) {
       'nodeIds': nodeIds
     });
   }
-
+  // FIXME BSH Keystroke | "scroll into view"
   this._renderSelection($nodes);
 };
 
@@ -189,16 +193,16 @@ scout.Tree.prototype._renderSelection = function($nodes) {
   var i, node, $node;
 
   //If $nodes are given collect the nodes based on this.selectedNodeIds
-  if (!$nodes) {
+  if (!$nodes || $nodes.length === 0) {
     $nodes = [];
-    for (i=0; i < this.selectedNodeIds.length; i++) {
+    for (i = 0; i < this.selectedNodeIds.length; i++) {
       node = this._nodeMap[this.selectedNodeIds[i]];
-      $node = this._findNodeById(node.id);
+      $node = this.$nodeById(node.id);
 
       //If $node is currently not displayed (due to a collapsed parent node), expand the parents
       if ($node.length === 0) {
         this._expandAllParentNodes(node);
-        $node = this._findNodeById(node.id);
+        $node = this.$nodeById(node.id);
         if ($node.length === 0) {
           throw new Error('Still no node found. node=' + node);
         }
@@ -211,8 +215,8 @@ scout.Tree.prototype._renderSelection = function($nodes) {
   this._$scrollable.children().select(false);
 
   // render selection
-  for (i=0; i < $nodes.length; i++) {
-    $node = $nodes [i];
+  for (i = 0; i < $nodes.length; i++) {
+    $node = $nodes[i];
     $node.select(true);
 
     // in case of breadcrumb, expand
@@ -229,7 +233,8 @@ scout.Tree.prototype._computeTreeItemPaddingLeft = function(level, selected) {
 };
 
 scout.Tree.prototype._expandAllParentNodes = function(node) {
-  var parentNodes = [], i, $parentNode, currNode = node;
+  var i, $parentNode, currNode = node,
+    parentNodes = [];
 
   currNode = node;
   while (currNode.parentNode) {
@@ -239,7 +244,7 @@ scout.Tree.prototype._expandAllParentNodes = function(node) {
 
   for (i = parentNodes.length - 1; i >= 0; i--) {
     if (!parentNodes[i].expanded) {
-      $parentNode = this._findNodeById(parentNodes[i].id);
+      $parentNode = this.$nodeById(parentNodes[i].id);
       if ($parentNode.length === 0) {
         throw new Error('Illegal state, $parentNode should be displayed. Rendered: ' + this.rendered + ', parentNode: ' + parentNodes[i]);
       }
@@ -264,7 +269,7 @@ scout.Tree.prototype._onNodesInserted = function(nodes, parentNodeId) {
     scout.arrays.pushAll(parentNode.childNodes, nodes);
 
     if (this.rendered) {
-      $parentNode = this._findNodeById(parentNode.id);
+      $parentNode = this.$nodeById(parentNode.id);
       if (parentNode.expanded) {
         //If parent is already expanded just add the nodes at the end.
         //Otherwise render the expansion
@@ -352,7 +357,7 @@ scout.Tree.prototype._onAllNodesDeleted = function(parentNodeId) {
   }
 };
 
-scout.Tree.prototype._onNodesSelected =  function(nodeIds) {
+scout.Tree.prototype._onNodesSelected = function(nodeIds) {
   this.selectedNodeIds = nodeIds;
 
   if (this.rendered) {
@@ -365,7 +370,7 @@ scout.Tree.prototype._onNodeExpanded = function(nodeId, expanded) {
   node.expanded = expanded;
 
   if (this.rendered) {
-    var $node = this._findNodeById(node.id);
+    var $node = this.$nodeById(node.id);
     this._renderExpansion(node, $node, expanded);
   }
 };
@@ -375,7 +380,7 @@ scout.Tree.prototype._onNodeChanged = function(nodeId, cell) {
   node.text = cell.text;
 
   if (this.rendered) {
-    var $node = this._findNodeById(node.id);
+    var $node = this.$nodeById(node.id);
     $node.html(node.text);
     //text() removes complete content -> add tree item control again
     this._renderTreeItemControl($node);
@@ -394,12 +399,12 @@ scout.Tree.prototype._removeNodes = function(nodes, parentNodeId, $parentNode) {
 
   //Find parentNode to increase search performance and to reset expansion state
   if (!$parentNode && parentNodeId >= 0) {
-    $parentNode = this._findNodeById(parentNodeId);
+    $parentNode = this.$nodeById(parentNodeId);
   }
 
   for (i = 0; i < nodes.length; i++) {
     node = nodes[i];
-    $node = this._findNodeById(node.id, $parentNode);
+    $node = this.$nodeById(node.id, $parentNode);
 
     if (node.childNodes.length > 0) {
       this._removeNodes(node.childNodes, node.id, $node);
@@ -407,7 +412,6 @@ scout.Tree.prototype._removeNodes = function(nodes, parentNodeId, $parentNode) {
 
     $node.remove();
   }
-
 
   //If every child node was deleted mark node as collapsed (independent of the model state)
   //--> makes it consistent with addNodes and expand (expansion is not allowed if there are no child nodes)
@@ -530,7 +534,7 @@ scout.Tree.prototype._onNodeControlClick = function(event) {
 };
 
 scout.Tree.prototype._updateItemPath = function() {
-  var $selected = this._findSelectedNodes(),
+  var $selected = this.$selectedNodes(),
     $allNodes = this._$scrollable.children(),
     level = parseFloat($selected.attr('data-level'));
 
@@ -595,7 +599,7 @@ scout.Tree.prototype._updateItemPath = function() {
 /**
  * @param $parent if specified only the elements after parent are considered (faster lookup)
  */
-scout.Tree.prototype._findNodeById = function(nodeId, $parent) {
+scout.Tree.prototype.$nodeById = function(nodeId, $parent) {
   if ($parent) {
     return $parent.next('#' + nodeId);
   } else {
@@ -603,13 +607,13 @@ scout.Tree.prototype._findNodeById = function(nodeId, $parent) {
   }
 };
 
-scout.Tree.prototype._findSelectedNodes = function() {
+scout.Tree.prototype.$selectedNodes = function() {
   return this._$scrollable.find('.selected');
 };
 
-scout.Tree.prototype.getSelectedModelNodes = function() {
+scout.Tree.prototype.selectedNodes = function() {
   var nodes = [];
-  for (var i=0;i<this.selectedNodeIds.length;i++) {
+  for (var i = 0; i < this.selectedNodeIds.length; i++) {
     nodes.push(this._nodeMap[this.selectedNodeIds[i]]);
   }
   return nodes;

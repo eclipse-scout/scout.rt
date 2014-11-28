@@ -35,7 +35,7 @@ scout.Outline.prototype._renderSelection = function($nodes) {
 
   if (!$nodes) {
     //Outline does not support multi selection -> [0]
-    $nodes = [this._findNodeById(this.selectedNodeIds[0])];
+    $nodes = [this.$nodeById(this.selectedNodeIds[0])];
   }
 
   if ($nodes.length === 0) {

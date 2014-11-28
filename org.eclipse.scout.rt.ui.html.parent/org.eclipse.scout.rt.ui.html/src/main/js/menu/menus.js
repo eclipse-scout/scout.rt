@@ -1,5 +1,4 @@
-scout.menus = function() {
-};
+scout.menus = function() {};
 
 scout.menus.CLOSING_EVENTS = 'mousedown.contextMenu keydown.contextMenu mousewheel.contextMenu';
 
@@ -7,9 +6,7 @@ scout.menus.filter = function(menus, types) {
   if (!menus) {
     return;
   }
-  if (types && !Array.isArray(types)) {
-    types = [types];
-  }
+  types = scout.arrays.ensure(types);
 
   var filteredMenus = [];
   var separatorCount = 0;
@@ -48,9 +45,7 @@ scout.menus.filter = function(menus, types) {
 
 scout.menus.checkType = function(menu, types) {
   var childMenus;
-  if (types && !Array.isArray(types)) {
-    types = [types];
-  }
+  types = scout.arrays.ensure(types);
 
   if (menu.childMenus.length > 0) {
     childMenus = scout.menus.filter(menu.childMenus, types);
@@ -102,11 +97,6 @@ scout.menus.appendMenuItems = function(popup, menus) {
     }
     menu.sendAboutToShow();
     popup.appendToBody(
-      $.makeDiv('menu-item').
-        text(menu.text).
-        data('menu', menu).
-        on('click', '', onMenuItemClicked).
-        one(scout.menus.CLOSING_EVENTS, $.suppressEvent));
+      $.makeDiv('menu-item').text(menu.text).data('menu', menu).on('click', '', onMenuItemClicked).one(scout.menus.CLOSING_EVENTS, $.suppressEvent));
   }
 };
-
