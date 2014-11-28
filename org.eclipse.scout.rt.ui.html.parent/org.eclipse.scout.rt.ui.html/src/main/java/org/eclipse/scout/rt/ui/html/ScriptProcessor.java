@@ -34,29 +34,27 @@ public class ScriptProcessor {
       }
     }
     if (processor.m_input == null) {
-      usage("missing --i");
-      System.exit(-1);
+      usageAndExit("missing --i");
       return;
     }
     if (outputFile == null) {
-      usage("missing --o");
-      System.exit(-1);
+      usageAndExit("missing --o");
       return;
     }
     if (processor.m_includeFileLoader == null) {
-      usage("missing --root");
-      System.exit(-1);
+      usageAndExit("missing --root");
       return;
     }
     outputFile.getAbsoluteFile().getParentFile().mkdirs();
     TextFileUtil.writeUTF8(outputFile, processor.process());
   }
 
-  public static void usage(String errorMessage) {
+  private static void usageAndExit(String errorMessage) {
     if (errorMessage != null) {
       System.err.println("ERROR: " + errorMessage);
     }
     System.err.println("Usage: " + ScriptProcessor.class.getName() + " --i inputfilename --o outputfilename --root rootDirForIncludes");
+    System.exit(-1);
   }
 
   private String m_input;

@@ -31,8 +31,57 @@ import org.eclipse.scout.service.SERVICES;
  * Ajax requests are processed as "/json" using HTTP POST
  */
 public abstract class AbstractJsonServlet extends HttpServletEx {
+
   private static final long serialVersionUID = 1L;
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractJsonServlet.class);
+
+  /**
+   * Template pattern.
+   */
+  private abstract class P_AbstractInterceptor {
+
+    private final String m_requestType;
+
+    P_AbstractInterceptor(String requestType) {
+      m_requestType = requestType;
+    }
+
+    void intercept(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+      try {
+        IServletRequestInterceptor[] interceptors = SERVICES.getServices(IServletRequestInterceptor.class);
+        for (IServletRequestInterceptor interceptor : interceptors) {
+          if (intercept(interceptor, req, resp)) {
+            return;
+          }
+        }
+      }
+      catch (Exception t) {
+        LOG.error("Exception while processing " + m_requestType + " request: " + req.getRequestURI(), t);
+        resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      }
+      finally {
+        LOG.info(m_requestType + " request finished: " + req.getRequestURI());
+      }
+    }
+
+    abstract boolean intercept(IServletRequestInterceptor interceptor, HttpServletRequest req, HttpServletResponse resp)
+        throws ServletException, IOException;
+
+  }
+
+  private P_AbstractInterceptor m_interceptGet = new P_AbstractInterceptor("GET") {
+    @Override
+    boolean intercept(IServletRequestInterceptor interceptor, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+      return interceptor.interceptGet(AbstractJsonServlet.this, req, resp);
+    }
+  };
+
+  private P_AbstractInterceptor m_interceptPost = new P_AbstractInterceptor("POST") {
+    @Override
+    boolean intercept(IServletRequestInterceptor interceptor, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+      return interceptor.interceptPost(AbstractJsonServlet.this, req, resp);
+    }
+  };
 
   protected AbstractJsonServlet() {
   }
@@ -46,48 +95,20 @@ public abstract class AbstractJsonServlet extends HttpServletEx {
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     LOG.info("GET request started: " + req.getRequestURI());
 
-    //The servlet is registered at '/'. To make relative urls work we need to make sure the request url has a trailing '/'.
-    //It is not possible to just check for an empty pathInfo because the container returns "/" even if the user has not entered a '/' at the end.
+    // The servlet is registered at '/'. To make relative URLs work, we need to make sure the request URL has a trailing '/'.
+    // It is not possible to just check for an empty pathInfo because the container returns "/" even if the user has not entered a '/' at the end.
     String contextPath = getServletContext().getContextPath();
     if (StringUtility.hasText(contextPath) && req.getRequestURI().endsWith(contextPath)) {
       resp.sendRedirect(req.getRequestURI() + "/");
       return;
     }
 
-    try {
-      IServletRequestInterceptor[] interceptors = SERVICES.getServices(IServletRequestInterceptor.class);
-      for (IServletRequestInterceptor interceptor : interceptors) {
-        if (interceptor.interceptGet(this, req, resp)) {
-          return;
-        }
-      }
-    }
-    catch (Throwable t) {
-      LOG.error("Exception while processing GET request: " + req.getRequestURI(), t);
-      resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-    }
-    finally {
-      LOG.info("GET request finished: " + req.getRequestURI());
-    }
+    m_interceptGet.intercept(req, resp);
   }
 
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     LOG.info("POST request started: " + req.getRequestURI());
-    try {
-      IServletRequestInterceptor[] interceptors = SERVICES.getServices(IServletRequestInterceptor.class);
-      for (IServletRequestInterceptor interceptor : interceptors) {
-        if (interceptor.interceptPost(this, req, resp)) {
-          return;
-        }
-      }
-    }
-    catch (Throwable t) {
-      LOG.error("Exception while processing POST request: " + req.getRequestURI(), t);
-      resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-    }
-    finally {
-      LOG.info("POST request finished: " + req.getRequestURI());
-    }
+    m_interceptPost.intercept(req, resp);
   }
 }

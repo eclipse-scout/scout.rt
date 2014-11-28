@@ -31,7 +31,7 @@ public final class Scout5ExtensionUtil {
       Method method = clientSession.getClass().getMethod("initCustomParams", Map.class);
       method.invoke(clientSession, customParams);
     }
-    catch (Throwable e) {
+    catch (ReflectiveOperationException e) {
       LOG.warn("method initCustomParams does not exist in " + clientSession);
     }
   }
@@ -42,7 +42,7 @@ public final class Scout5ExtensionUtil {
       Method method = desktop.getClass().getMethod("getAddOns");
       return (List<Object>) method.invoke(desktop);
     }
-    catch (Throwable e) {
+    catch (ReflectiveOperationException e) {
       LOG.warn("method getAddOns does not exist in " + desktop);
       return Collections.emptyList();
     }

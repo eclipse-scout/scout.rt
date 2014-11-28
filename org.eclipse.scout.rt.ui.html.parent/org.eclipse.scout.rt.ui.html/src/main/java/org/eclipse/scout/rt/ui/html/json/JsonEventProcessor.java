@@ -25,6 +25,8 @@ import org.eclipse.scout.rt.client.ClientSyncJob;
  */
 public class JsonEventProcessor {
 
+  private static final int SLEEP_TIME = 25;
+
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonEventProcessor.class);
 
   private final JsonClientSession m_jsonSession;
@@ -60,7 +62,7 @@ public class JsonEventProcessor {
       jsonAdapter.handleUiEvent(event, response);
       jsonAdapter.cleanUpEventFilters();
     }
-    catch (Throwable t) {
+    catch (Exception t) {
       LOG.error("Handling event. Type: " + event.getType() + ", Id: " + id, t);
       throw new JsonException(t);
     }
@@ -76,35 +78,34 @@ public class JsonEventProcessor {
         LOG.info("Job list is empty. Finish request");
         return;
       }
-      else {
-        int numJobs = jobList.size();
-        int numSync = 0;
-        int numWaitFor = 0;
-        for (ClientJob job : jobList) {
-          if (job.isWaitFor()) {
-            numWaitFor++;
-          }
-          else if (job.isSync()) {
-            numSync++;
-          }
-        }
-        LOG.trace("Jobs: " + numJobs + ", sync (running): " + numSync + ", waitFor (blocking): " + numWaitFor);
-        if (numSync > 0) {
-          LOG.trace("There are still running sync jobs - must wait until they have finished");
-        }
-        else if (numJobs == numWaitFor) {
-          LOG.trace("Only 'waitFor' jobs left in the queue - it's allowed to finish the request");
-          return;
-        }
 
-        // TODO AWE: (jobs) prüfen, ob das mit IJobChangeListener schöner geht (sleep/notify)
-        LOG.trace("Going to sleep before checking the job queue again...");
-        try {
-          Thread.sleep(25);
+      int numJobs = jobList.size();
+      int numSync = 0;
+      int numWaitFor = 0;
+      for (ClientJob job : jobList) {
+        if (job.isWaitFor()) {
+          numWaitFor++;
         }
-        catch (InterruptedException e) {
-          // NOP
+        else if (job.isSync()) {
+          numSync++;
         }
+      }
+      LOG.trace("Jobs: " + numJobs + ", sync (running): " + numSync + ", waitFor (blocking): " + numWaitFor);
+      if (numSync > 0) {
+        LOG.trace("There are still running sync jobs - must wait until they have finished");
+      }
+      else if (numJobs == numWaitFor) {
+        LOG.trace("Only 'waitFor' jobs left in the queue - it's allowed to finish the request");
+        return;
+      }
+
+      // TODO AWE: (jobs) prüfen, ob das mit IJobChangeListener schöner geht (sleep/notify)
+      LOG.trace("Going to sleep before checking the job queue again...");
+      try {
+        Thread.sleep(SLEEP_TIME);
+      }
+      catch (InterruptedException e) {
+        // NOP
       }
     }
   }
