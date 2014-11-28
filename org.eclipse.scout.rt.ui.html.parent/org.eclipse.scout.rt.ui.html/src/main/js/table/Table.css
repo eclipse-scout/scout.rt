@@ -140,6 +140,18 @@
 .table-row.selected {
   background-color: @selection-background-color;
   border-color: @selection-border-color;
+
+  &.select-top,
+  &.select-middle {
+    border-bottom: 0;
+  }
+
+  &.select-top:after,
+  &.select-middle:after {
+    border-bottom: 1px solid @color-bench-light-border;
+    content: '';
+    display: block;
+  }
 }
 
 .table-row.select-single,
