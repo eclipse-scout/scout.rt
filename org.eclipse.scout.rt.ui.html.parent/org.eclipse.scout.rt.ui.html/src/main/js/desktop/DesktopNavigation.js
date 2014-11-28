@@ -120,7 +120,7 @@ scout.DesktopNavigation.prototype._createSearchTab = function() {
   // create field
   this.$queryField = $('<input>')
     .addClass('navigation-tab-search-field')
-    .placeholder(scout.texts.get('searchFor'))
+    .placeholder(this.session.text('SearchFor'))
     .on('input', this._onQueryFieldInput.bind(this))
     .on('keypress', this._onQueryFieldKeyPress.bind(this))
     .appendTo($tab);

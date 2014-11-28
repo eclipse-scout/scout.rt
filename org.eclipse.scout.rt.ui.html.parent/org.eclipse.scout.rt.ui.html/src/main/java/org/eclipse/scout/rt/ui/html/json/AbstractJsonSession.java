@@ -11,8 +11,10 @@
 package org.eclipse.scout.rt.ui.html.json;
 
 import java.security.AccessController;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -32,6 +34,7 @@ import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.Scout5ExtensionUtil;
+import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.ui.IUiDeviceType;
 import org.eclipse.scout.rt.shared.ui.IUiLayer;
 import org.eclipse.scout.rt.shared.ui.UiDeviceType;
@@ -82,6 +85,50 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     return new JsonAdapterRegistry();
   }
 
+  /**
+   * Returns a list of text keys (which must exist in a *.nls file) that are sent to the HTML client on start-up.
+   * The texts returned by this method should be used as static UI texts. All other texts are are sent as regular
+   * (form-)data and must not be added here.
+   */
+  protected List<String> getTextKeys() {
+    return Arrays.asList(
+        "LoadOptions",
+        "NoOptions",
+        "OneOption",
+        "NumOptions",
+        "InvalidDateFormat",
+        "ResetTableColumns",
+        "FilterBy",
+        "SearchFor",
+        "TableRowCount0",
+        "TableRowCount1",
+        "TableRowCount",
+        "NumRowsSelected",
+        "SelectAll",
+        "SelectNone",
+        "NumRowsFiltered",
+        "NumRowsFilteredBy",
+        "RemoveFilter",
+        "NumRowsLoaded",
+        "ReloadData",
+        "ShowEveryDate",
+        "GroupedByWeekday",
+        "GroupedByMonth",
+        "GroupedByYear",
+        "Count",
+        "ConnectionInterrupted",
+        "ConnectionReestablished",
+        "Reconnecting");
+  }
+
+  private JSONObject getTextMap() {
+    JSONObject map = new JSONObject();
+    for (String textKey : getTextKeys()) {
+      JsonObjectUtility.putProperty(map, textKey, TEXTS.get(textKey));
+    }
+    return map;
+  }
+
   @Override
   public void init(HttpServletRequest request, JsonStartupRequest jsonStartupRequest) {
     m_currentHttpRequest = request;
@@ -129,6 +176,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
     JSONObject jsonEvent = new JSONObject();
     JsonObjectUtility.putProperty(jsonEvent, "clientSession", m_jsonClientSession.getId());
+    JsonObjectUtility.putProperty(jsonEvent, "textMap", getTextMap());
     m_currentJsonResponse.addActionEvent(m_jsonSessionId, "initialized", jsonEvent);
     LOG.info("JsonSession with ID " + m_jsonSessionId + " initialized");
   }

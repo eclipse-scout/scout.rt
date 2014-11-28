@@ -31,7 +31,7 @@ describe("Session", function() {
 
       sendQueuedAjaxCalls();
 
-      //after executing setTimeout there must be exactly one ajax request
+      // after executing setTimeout there must be exactly one ajax request
       expect(jasmine.Ajax.requests.count()).toBe(1);
 
       // check that content is complete and in correct order
@@ -84,6 +84,25 @@ describe("Session", function() {
 
       requestData = mostRecentJsonRequest();
       expect(requestData.userAgent).toBeUndefined();
+    });
+
+  });
+
+  describe("texts", function() {
+
+    var session = createSession();
+    // In production mode these texts are sent by the server in the initialize event
+    session._textMap = {
+      NoOptions: 'Keine Übereinstimmung',
+      Options: '{0} Optionen'
+    };
+
+    it("check if correct text is returned", function() {
+      expect(session.text('NoOptions')).toBe('Keine Übereinstimmung');
+    });
+
+    it("check if arguments are replaced in text", function() {
+      expect(session.text('Options', 3)).toBe('3 Optionen');
     });
 
   });

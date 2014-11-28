@@ -14,12 +14,14 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
   this.$parent = $parent;
 
   // group functions for dates
-  var dateDesc = [scout.texts.get('showEveryDate'), scout.texts.get('groupedByWeekday'),
-    scout.texts.get('groupedByMonth'), scout.texts.get('groupedByYear')
-  ],
-    countDesc = scout.texts.get('count');
-
-  var removeChart = null,
+  var dateDesc = [
+      this.session.text('ShowEveryDate'),
+      this.session.text('GroupedByWeekday'),
+      this.session.text('GroupedByMonth'),
+      this.session.text('GroupedByYear')
+    ],
+    countDesc = this.session.text('Count'),
+    removeChart = null,
     columns = this.table.columns,
     xAxis,
     yAxis,

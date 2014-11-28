@@ -15,7 +15,7 @@ scout.TreeCompact.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('compact-tree');
   this._$filter = $('<input>').
     attr('type', 'text').
-    attr('placeholder', scout.texts.get('filterBy')).
+    attr('placeholder', this.session.text('FilterBy')).
     addClass('text-field').
     appendTo(this.$container).
     on('input', this._onInput.bind(this)).

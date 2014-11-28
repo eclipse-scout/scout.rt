@@ -39,7 +39,7 @@ scout.TableFooter.prototype._render = function($parent) {
   addClass('control-filter').
   appendTo(this.$container).
   on('input paste', '', $.debounce(this._onFilterInput.bind(this))).
-  attr('placeholder', scout.texts.get('filterBy')).
+  attr('placeholder', this._table.session.text('FilterBy')).
   val(filterText);
 
   // info section
@@ -125,8 +125,8 @@ scout.TableFooter.prototype.setTableStatusVisible = function(visible) {
 
 scout.TableFooter.prototype._updateInfoLoad = function() {
   var numRows = this._table.rows.length;
-  var info = scout.texts.get('numRowsLoaded', this._computeCountInfo(numRows));
-  info += '<br><span class="info-button">' + scout.texts.get('reloadData') + '</span>';
+  var info = this._table.session.text('NumRowsLoaded', this._computeCountInfo(numRows));
+  info += '<br><span class="info-button">' + this._table.session.text('ReloadData') + '</span>';
   if (this._$infoLoad.html() === info) {
     return;
   }
@@ -140,11 +140,11 @@ scout.TableFooter.prototype._updateInfoFilter = function() {
     filteredBy = filteredBy.join(', ');
   }
   var numRowsFiltered = this._table.filteredRowCount;
-  var info = scout.texts.get('numRowsFiltered', this._computeCountInfo(numRowsFiltered));
+  var info = this._table.session.text('NumRowsFiltered', this._computeCountInfo(numRowsFiltered));
   if (filteredBy) {
-    info = scout.texts.get('numRowsFilteredBy', this._computeCountInfo(numRowsFiltered), filteredBy);
+    info = this._table.session.text('NumRowsFilteredBy', this._computeCountInfo(numRowsFiltered), filteredBy);
   }
-  info += '<br><span class="info-button">' + scout.texts.get('removeFilter') + '</span>';
+  info += '<br><span class="info-button">' + this._table.session.text('RemoveFilter') + '</span>';
   if (this._$infoFilter.html() === info) {
     return;
   }
@@ -164,12 +164,12 @@ scout.TableFooter.prototype._updateInfoSelection = function(numSelectedRows, all
   }
 
   if (all) {
-    selectAllText = scout.texts.get('selectNone');
+    selectAllText = this._table.session.text('SelectNone');
   } else {
-    selectAllText = scout.texts.get('selectAll');
+    selectAllText = this._table.session.text('SelectAll');
   }
 
-  info = scout.texts.get('numRowsSelected', this._computeCountInfo(numSelectedRows));
+  info = this._table.session.text('NumRowsSelected', this._computeCountInfo(numSelectedRows));
   info += '<br><span class="info-button">' + selectAllText + '</span>';
   if (this._$infoSelection.html() === info) {
     return;
@@ -203,11 +203,11 @@ scout.TableFooter.prototype._setInfoVisible = function($info, visible) {
 
 scout.TableFooter.prototype._computeCountInfo = function(n) {
   if (n === 0) {
-    return scout.texts.get('tableRowCount0');
+    return this._table.session.text('TableRowCount0');
   } else if (n === 1) {
-    return scout.texts.get('tableRowCount1');
+    return this._table.session.text('TableRowCount1');
   } else {
-    return scout.texts.get('tableRowCount', n);
+    return this._table.session.text('TableRowCount', n);
   }
 };
 

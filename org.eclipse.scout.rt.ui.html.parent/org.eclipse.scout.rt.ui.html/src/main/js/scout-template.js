@@ -22,7 +22,6 @@
 //@include("util/helpers.js");
 //@include("util/objects.js");
 //@include("util/strings.js");
-//@include("util/texts.js");
 //@include("util/URL.js");
 //@include("session/Session.js");
 //@include("session/Event.js");

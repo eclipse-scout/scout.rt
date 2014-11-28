@@ -268,11 +268,11 @@ scout.AbstractSmartField.prototype._setStatusText = function(vararg) {
   var text;
   if ($.isNumeric(vararg)) {
     if (vararg === 0) {
-      text = scout.texts.get('noOptions');
+      text = this.session.text('NoOptions');
     } else if (vararg === 1) {
-      text = scout.texts.get('oneOption');
+      text = this.session.text('OneOption');
     } else {
-      text = scout.texts.get('options', vararg);
+      text = this.session.text('NumOptions', vararg);
     }
   } else {
     text = vararg;

@@ -14,7 +14,7 @@ scout.TableOrganizeMenu.prototype._onMenuClicked = function(event) {
 
 scout.TableOrganizeMenu.prototype._createBody = function(popup) {
   return $('<button>').
-    text(scout.texts.get('resetColumns')).
+    text(this.session.text('ResetTableColumns')).
     click(function() {
       var table = this.parent;
       popup.remove();

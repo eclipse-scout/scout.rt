@@ -106,7 +106,7 @@ scout.DateField.prototype._onKeyDown = function(event) {
     this._picker.close();
     return;
   }
-  
+
   if (event.which === scout.keys.RIGHT && cursorPos === displayText.length) {
     //Move cursor one right and apply next char of the prediction
     if (prediction) {
@@ -114,13 +114,13 @@ scout.DateField.prototype._onKeyDown = function(event) {
     }
     return;
   }
-  
+
   if (event.which === scout.keys.PAGE_UP || event.which === scout.keys.PAGE_DOWN) {
     months = (event.which === scout.keys.PAGE_UP ? -1 : 1);
     this._picker.shiftSelectedDate(0, months, 0);
     return;
   }
-  
+
   if (event.which === scout.keys.UP || event.which === scout.keys.DOWN) {
     diff = (event.which === scout.keys.UP ? -1 : 1);
 
@@ -187,7 +187,7 @@ scout.DateField.prototype._validateDisplayText = function(text) {
   }
   if (!valid) {
     return {
-      message: scout.texts.get('invalidDateFormat')
+      message: this.session.text('InvalidDateFormat')
     };
   }
 };

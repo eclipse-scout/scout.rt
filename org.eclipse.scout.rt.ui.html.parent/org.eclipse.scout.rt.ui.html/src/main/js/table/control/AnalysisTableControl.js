@@ -8,7 +8,6 @@ scout.inherits(scout.AnalysisTableControl, scout.TableControl);
 
 scout.AnalysisTableControl.prototype.init = function(model, session) {
   scout.AnalysisTableControl.parent.prototype.init.call(this, model, session);
-
   this._initRootEntity();
 };
 
@@ -41,7 +40,7 @@ scout.AnalysisTableControl.prototype._renderContent = function($parent) {
   var $criteriaNavigation = $parent.appendDiv('', 'criteria-navigation');
   $parent.append('<input class="criteria-search"></input>')
     .on('input paste', '', searchMap)
-    .attr('placeholder', scout.texts.get('filterBy'));
+    .attr('placeholder', this.session.text('FilterBy'));
   var $criteriaContainer = $parent.appendDiv('criteria-container');
   var containerWidth = parseFloat($criteriaContainer.css('width')),
     containerHeight = parseFloat($criteriaContainer.css('height'));

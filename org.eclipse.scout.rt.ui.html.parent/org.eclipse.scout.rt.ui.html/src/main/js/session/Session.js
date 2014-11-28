@@ -66,6 +66,7 @@ scout.Session = function($entryPoint, jsonSessionId, initOptions) {
   this.url = 'json';
   this._adapterDataCache = {};
   this.objectFactory = new scout.ObjectFactory(this);
+  this._textMap = {};
 
   // FIXME BSH Detach | Improve this
   // If this is a popup window, re-register with parent (in case the user reloaded the popup window)
@@ -393,6 +394,7 @@ scout.Session.prototype.onModelAction = function(event) {
     this.locale = new scout.Locale(event);
     // FIXME inform components to reformat display text?
   } else if (event.type === 'initialized') {
+    this._textMap = event.textMap;
     // cannot use getOrCreateModelAdapter here since Session doesn't have a parent
     var sessionData = this._getAdapterData(event.clientSession);
     this.locale = new scout.Locale(sessionData.locale);
@@ -429,4 +431,24 @@ scout.Session.prototype.registerChildWindow = function(childWindow) {
       this._childWindows.splice(i, 1);
     }
   }.bind(this));
+};
+
+
+scout.Session.prototype.text = function(textKey) {
+  if (this._textMap.hasOwnProperty(textKey)) {
+    var len = arguments.length,
+        text = this._textMap[textKey];
+    if (len === 1) {
+      return text;
+    } else {
+      var i, placeholder;
+      for (i = 1; i < len; i++) {
+        placeholder = '{' + (i - 1) + '}';
+        text = text.replace(placeholder, arguments[i]);
+      }
+      return text;
+    }
+  } else {
+    return '[undefined text: ' + textKey + ']';
+  }
 };
