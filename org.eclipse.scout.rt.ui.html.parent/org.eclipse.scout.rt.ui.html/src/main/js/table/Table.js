@@ -18,6 +18,7 @@ scout.Table = function() {
   this.selectionHandler = new scout.TableSelectionHandler(this);
   this._filterMap = {};
   this.selectedRowIds = [];
+  this.animationRowLimit = 25;
 };
 scout.inherits(scout.Table, scout.ModelAdapter);
 
@@ -190,10 +191,9 @@ scout.Table.prototype._renderRowOrderChanges = function() {
   var $row, oldTop, i, rowWasInserted, animate, that = this;
   var $rows = this.findRows();
   var $sortedRows = $();
-  var animationRowLimit = 50;
 
   //store old position
-  if ($rows.length < animationRowLimit) {
+  if ($rows.length < that.animationRowLimit) {
     $rows.each(function() {
       $row = $(this);
 
@@ -898,6 +898,9 @@ scout.Table.prototype.filter = function() {
   that.clearSelection();
   this.findSumRows().hide();
 
+  // Filter rows
+  var rowsToHide = [];
+  var rowsToShow = [];
   $allRows.each(function() {
     var $row = $(this),
       show = true,
@@ -915,11 +918,24 @@ scout.Table.prototype.filter = function() {
     }
 
     if (show) {
-      that.showRow($row);
+      if ($row.hasClass('invisible')) {
+        rowsToShow.push($row);
+      }
       rowCount++;
     } else {
-      that.hideRow($row);
+      if (!$row.hasClass('invisible')) {
+        rowsToHide.push($row);
+      }
     }
+  });
+
+  // Show / hide rows that changed their state during filtering
+  var useAnimation = ((rowsToShow.length + rowsToHide.length) <= that.animationRowLimit);
+  $(rowsToHide).each(function() {
+    that.hideRow($(this), useAnimation);
+  });
+  $(rowsToShow).each(function() {
+    that.showRow($(this), useAnimation);
   });
 
   //Used by table footer
@@ -955,8 +971,9 @@ scout.Table.prototype.resetFilter = function() {
 
   // reset rows
   var that = this;
-  this.findRows().each(function() {
-    that.showRow($(this));
+  var $rows = this.findRows();
+  $rows.each(function() {
+    that.showRow($(this), ($rows.length <= that.animationRowLimit));
   });
   this._group();
 
@@ -997,38 +1014,46 @@ scout.Table.prototype.unregisterFilter = function(key) {
   delete this._filterMap[key];
 };
 
-scout.Table.prototype.showRow = function($row) {
+scout.Table.prototype.showRow = function($row, useAnimation) {
   var that = this;
+  if (!$row.hasClass('invisible')) {
+    return;
+  }
 
-  // FIXME is(), slideDown() and the complete callback are very slow, which blocks
-  //       the UI when filtering many rows (1000+). Therefore we use no animation.
-  //       Could this be optimized, maybe depending on the number for rows?
-  $row.show();
-  $row.removeClass('invisible');
-  that.updateScrollbar();
-  //  if ($row.is(':hidden')) {
-  //    $row.stop().slideDown({
-  //      complete: function() {
-  //        that.updateScrollbar();
-  //      }
-  //    });
-  //  }
+  if (useAnimation) {
+    $row.stop().slideDown({
+      complete: function() {
+        $row.removeClass('invisible');
+        that.updateScrollbar();
+      }
+    });
+  }
+  else {
+    $row.show();
+    $row.removeClass('invisible');
+    that.updateScrollbar();
+  }
 };
 
-scout.Table.prototype.hideRow = function($row) {
+scout.Table.prototype.hideRow = function($row, useAnimation) {
   var that = this;
+  if ($row.hasClass('invisible')) {
+    return;
+  }
 
-  // FIXME Same issue as in showRow()
-  $row.hide();
-  $row.addClass('invisible');
-  that.updateScrollbar();
-  //  if ($row.is(':visible')) {
-  //    $row.stop().slideUp({
-  //      complete: function() {
-  //        that.updateScrollbar();
-  //      }
-  //    });
-  //  }
+  if (useAnimation) {
+    $row.stop().slideUp({
+      complete: function() {
+        $row.addClass('invisible');
+        that.updateScrollbar();
+      }
+    });
+  }
+  else {
+    $row.hide();
+    $row.addClass('invisible');
+    that.updateScrollbar();
+  }
 };
 
 /**
