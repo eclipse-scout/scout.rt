@@ -27,7 +27,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.ui.swt.basic.SwtScoutComposite;
 import org.eclipse.scout.rt.ui.swt.form.fields.ISwtScoutFormField;
-import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
 import org.eclipse.scout.rt.ui.swt.window.popup.SwtScoutDropDownPopup;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
@@ -38,9 +37,18 @@ import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Shell;
 
 /**
+ * <p>
  * Wraps a {@link IFormField} to be displayed as popup cell editor.
+ * </p>
+ * Thereby, {@link SwtScoutComposite} is constructed as following:
+ * <ul>
+ * <li>{@link SwtScoutComposite#getSwtField()}: references the the UI representation of the FormField that is displayed
+ * within the popup {@link Shell}; is lazy bound the time the {@link Shell} is painted for the first time</li>
+ * <li>{@link SwtScoutComposite#getSwtContainer()}: references the owner control the Shell is bound to</li>
+ * </ul>
  */
 public class SwtScoutFormFieldPopup extends SwtScoutComposite<IFormField> {
 
@@ -54,8 +62,6 @@ public class SwtScoutFormFieldPopup extends SwtScoutComposite<IFormField> {
   private int m_minHeight;
   private int m_prefHeight;
   private int m_style;
-
-  private Control m_swtFormField;
 
   private final Set<IFormFieldPopupListener> m_listeners = Collections.synchronizedSet(new HashSet<IFormFieldPopupListener>());
 
@@ -127,10 +133,12 @@ public class SwtScoutFormFieldPopup extends SwtScoutComposite<IFormField> {
         final IForm form = createForm();
         if (form != null) {
           m_swtScoutPopup.showForm(form);
-          m_swtFormField = findSwtFormField(m_swtScoutPopup.getUiForm().getSwtField(), getScoutObject());
-          if (m_swtFormField == null) {
+
+          final Control swtFormField = findSwtFormField(m_swtScoutPopup.getUiForm().getSwtField(), getScoutObject());
+          if (swtFormField == null) {
             LOG.warn("UI-FormField could not be found in UI-Form");
           }
+          setSwtField(swtFormField);
 
           // Install listener to be notified about traversal events.
           installTraverseListener(m_swtScoutPopup.getShell(), traverseListener);
@@ -165,15 +173,6 @@ public class SwtScoutFormFieldPopup extends SwtScoutComposite<IFormField> {
    */
   public void closePopup() {
     m_swtScoutPopup.closePart();
-  }
-
-  /**
-   * Touches the field to write its UI value back to the model.
-   */
-  public void touch() {
-    if (m_swtFormField != null && !m_swtFormField.isDisposed()) {
-      SwtUtility.runSwtInputVerifier(m_swtFormField);
-    }
   }
 
   public void addListener(IFormFieldPopupListener listener) {

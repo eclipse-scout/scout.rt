@@ -134,7 +134,7 @@ public class TableMultilineListener implements Listener {
         Image img = mitem.getImage(event.index);
         int editableIconOffset = 0;
         if (img != null) {
-          editableIconOffset = 1;//isEditableIconNeeded(event, mitem) ? m_editableMarkerWidth : 1;
+          editableIconOffset = 1;
           Rectangle imgBounds = img.getBounds();
           img.getBounds().width += editableIconOffset;
           mSize.x += imgBounds.width + 2;
@@ -160,7 +160,7 @@ public class TableMultilineListener implements Listener {
 
         /* center column 1 vertically */
         Rectangle itemBounds = pitem.getBounds(event.index);
-        editableIconOffset = 1;//isEditableIconNeeded(event, pitem) ? m_editableMarkerWidth : 1;
+        editableIconOffset = 1;
         int xImageOffset = itemBounds.x;
         int xTextOffset = xImageOffset + m_text_margin_x;
         int yOffset = itemBounds.y + m_text_margin_y;
@@ -230,14 +230,6 @@ public class TableMultilineListener implements Listener {
       }
     }
     return text;
-  }
-
-  private boolean isEditableIconNeeded(Event event, TableItem item) {
-    IColumn<?> col = ((IColumn<?>) item.getParent().getColumn(event.index).getData(ISwtScoutTable.KEY_SCOUT_COLUMN));
-    if (col != null && col.isEditable() && !col.getDataType().isAssignableFrom(Boolean.class)) {
-      return true;
-    }
-    return false;
   }
 
   /**

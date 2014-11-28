@@ -323,8 +323,8 @@
                value="true">
          </property>
          <property
-               name="table.multilineTooltipSupport.enabled"
-               value="false">
+               name="table.useNativeToolTips"
+               value="true">
          </property>
       </properties>
    </extension>

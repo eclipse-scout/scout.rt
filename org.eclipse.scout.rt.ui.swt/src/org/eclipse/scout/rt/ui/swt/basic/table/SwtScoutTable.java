@@ -23,8 +23,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.viewers.ArrayContentProvider;
-import org.eclipse.jface.viewers.CellEditor;
-import org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
@@ -59,7 +57,7 @@ import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.SwtMenuUtility;
 import org.eclipse.scout.rt.ui.swt.action.menu.SwtScoutContextMenu;
 import org.eclipse.scout.rt.ui.swt.basic.SwtScoutComposite;
-import org.eclipse.scout.rt.ui.swt.basic.table.celleditor.SwtScoutTableCellEditor;
+import org.eclipse.scout.rt.ui.swt.basic.table.celleditor.TableEditingSupport;
 import org.eclipse.scout.rt.ui.swt.ext.table.TableEx;
 import org.eclipse.scout.rt.ui.swt.ext.table.util.TableRolloverSupport;
 import org.eclipse.scout.rt.ui.swt.extension.UiDecorationExtensionPoint;
@@ -113,7 +111,6 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
   private Listener m_columnListener = new P_TableColumnListener();
   private SelectionListener m_columnSortListener = new P_ColumnSortListener();
   private TableColumnManager m_columnManager = new TableColumnManager();
-  private SwtScoutTableCellEditor m_cellEditorComposite;
   private int[] m_uiColumnOrder;
   private Menu m_contextMenu;
   private Menu m_headerMenu;
@@ -141,6 +138,7 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
     TableEx table = getEnvironment().getFormToolkit().createTable(parent, style, getScoutObject());
     table.setLinesVisible(false);
     table.setHeaderVisible(true);
+
     new TableRolloverSupport(table);
     table.addDisposeListener(new DisposeListener() {
       @Override
@@ -157,9 +155,6 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
     viewer.setUseHashlookup(true);
     setSwtTableViewer(viewer);
     setSwtField(table);
-
-    //cell editing support
-    m_cellEditorComposite = new SwtScoutTableCellEditor(this);
 
     // header menu
     m_headerMenu = new Menu(viewer.getTable().getShell(), SWT.POP_UP);
@@ -238,10 +233,8 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
       for (TableColumn col : getSwtField().getColumns()) {
         col.dispose();
       }
-      /*
-       * bug: swt table first column can not be aligned nor an image can be set.
-       * see also SwtScoutTableCellEditor
-       */
+
+      // SWT bug 43910: Create an invisible dummy column to omit SWT indention bug.
       TableColumn dummyCol = new TableColumn(getSwtField(), SWT.LEFT);
       dummyCol.setWidth(0);
       dummyCol.setResizable(false);
@@ -260,35 +253,54 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
         m_columnManager = new TableColumnManager();
       }
       m_columnManager.initialize(scoutColumnsOrdered);
+
+      boolean hasEditors = false;
       for (IColumn<?> scoutColumn : scoutColumnsOrdered) {
         IHeaderCell headerCell = scoutColumn.getHeaderCell();
-        int style = SwtUtility.getHorizontalAlignment(headerCell.getHorizontalAlignment());
-        TableColumn swtCol = new TableColumn(getSwtField(), style);
-        swtCol.setData(KEY_SCOUT_COLUMN, scoutColumn);
 
-        TableViewerColumn viewerColumn = new TableViewerColumn(getSwtTableViewer(), swtCol);
+        int style = SwtUtility.getHorizontalAlignment(headerCell.getHorizontalAlignment());
+        final TableViewerColumn viewerColumn = new TableViewerColumn(getSwtTableViewer(), style);
+        TableColumn swtColumn = viewerColumn.getColumn();
+        swtColumn.setData(KEY_SCOUT_COLUMN, scoutColumn);
+
+        // Install the column's LabelProvider.
         viewerColumn.setLabelProvider(new SwtScoutCellLabelProvider(scoutColumn, getEnvironment()));
 
-        swtCol.setMoveable(true);
-        swtCol.setToolTipText(headerCell.getTooltipText());
-        updateHeaderText(swtCol, scoutColumn);
-        swtCol.setWidth(scoutColumn.getWidth());
+        // Install editable support.
+        if (scoutColumn.isEditable()) {
+          viewerColumn.setEditingSupport(new TableEditingSupport(getSwtTableViewer(), swtColumn, getEnvironment()));
+          hasEditors = true;
+        }
+
+        swtColumn.setMoveable(true);
+        swtColumn.setToolTipText(headerCell.getTooltipText());
+        updateHeaderText(swtColumn, scoutColumn);
+        swtColumn.setWidth(scoutColumn.getWidth());
         if (scoutColumn.isFixedWidth()) {
-          swtCol.setResizable(false);
+          swtColumn.setResizable(false);
         }
         if (headerCell.isSortActive()) {
-          getSwtField().setSortColumn(swtCol);
+          getSwtField().setSortColumn(swtColumn);
           getSwtField().setSortDirection(headerCell.isSortAscending() ? SWT.UP : SWT.DOWN);
         }
         if (sortEnabled) {
-          swtCol.addSelectionListener(m_columnSortListener);
+          swtColumn.addSelectionListener(m_columnSortListener);
         }
-        swtCol.addListener(SWT.Move, m_columnListener);
-        swtCol.addListener(SWT.Resize, m_columnListener);
+        swtColumn.addListener(SWT.Move, m_columnListener);
+        swtColumn.addListener(SWT.Resize, m_columnListener);
       }
+
+      // increase row height when editors are present.
+      if (hasEditors) {
+        getSwtTableViewer().getTable().addListener(SWT.MeasureItem, new Listener() {
+          @Override
+          public void handleEvent(Event event) {
+            event.height = Math.max(event.height, UiDecorationExtensionPoint.getLookAndFeel().getLogicalGridLayoutRowHeight());
+          }
+        });
+      }
+
       m_uiColumnOrder = getSwtField().getColumnOrder();
-      //update cell editors
-      m_cellEditorComposite.initialize();
     }
     finally {
       m_redrawHandler.popControlChanging();
@@ -512,7 +524,7 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
         break;
       }
       case TableEvent.TYPE_REQUEST_FOCUS_IN_CELL: {
-        //start editing
+        // start edit-mode when entering editable cell by traversal key.
         int swtCol = -1;
         TableColumn[] swtColumns = getSwtField().getColumns();
         for (int c = 0; c < swtColumns.length; c++) {
@@ -993,18 +1005,7 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
     }
 
     @Override
-    protected void triggerEditorActivationEvent(ColumnViewerEditorActivationEvent event) {
-      //Make sure editor is closed when clicking on another cell. Mainly necessary when using the second mouse button to open the context menu
-      for (CellEditor editor : getCellEditors()) {
-        if (editor != null && editor.isActivated()) {
-          applyEditorValue();
-        }
-      }
-      super.triggerEditorActivationEvent(event);
-    }
-
-    @Override
-    public void applyEditorValue() {
+    public void applyEditorValue() { // public visibility to close editor in case of an empty row click.
       super.applyEditorValue();
     }
   }
@@ -1079,8 +1080,8 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
       TableViewer swtTableViewer = getSwtTableViewer();
       switch (event.type) {
         case SWT.MouseDown: {
-          //Close cell editor on empty space click
-          if (swtTableViewer.getTable().getItem(new Point(event.y, event.y)) == null && swtTableViewer instanceof P_TableViewerEx) {
+          // Close cell editor on empty space click.
+          if (swtTableViewer.isCellEditorActive() && swtTableViewer.getTable().getItem(new Point(event.y, event.y)) == null) {
             ((P_TableViewerEx) swtTableViewer).applyEditorValue();
           }
 
