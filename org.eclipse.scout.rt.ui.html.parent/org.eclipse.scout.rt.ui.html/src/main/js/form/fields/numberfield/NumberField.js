@@ -1,4 +1,3 @@
-// TODO AWE: gemeinsame basis-klasse für widgets mit text-feld
 scout.NumberField = function() {
   scout.NumberField.parent.call(this);
 };

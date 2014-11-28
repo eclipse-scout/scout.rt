@@ -25,8 +25,8 @@ import org.mockito.Mockito;
 
 public class JsonTabBoxTest {
 
-  JsonTabBox<ITabBox> tabBox;
-  ITabBox tabBoxModel;
+  JsonTabBox<ITabBox> m_tabBox;
+  ITabBox m_tabBoxModel;
   ITabBoxUIFacade m_uiFacade;
   IGroupBox m_groupBox1;
   IGroupBox m_groupBox2;
@@ -34,13 +34,13 @@ public class JsonTabBoxTest {
   @Before
   public void setUp() {
     JsonSessionMock jsonSession = new JsonSessionMock();
-    tabBoxModel = Mockito.mock(ITabBox.class);
+    m_tabBoxModel = Mockito.mock(ITabBox.class);
     m_groupBox1 = Mockito.mock(IGroupBox.class);
     m_groupBox2 = Mockito.mock(IGroupBox.class);
     m_uiFacade = Mockito.mock(ITabBoxUIFacade.class);
-    Mockito.when(tabBoxModel.getGroupBoxes()).thenReturn(Arrays.asList(m_groupBox1, m_groupBox2));
-    Mockito.when(tabBoxModel.getUIFacade()).thenReturn(m_uiFacade);
-    tabBox = new JsonTabBox<ITabBox>(tabBoxModel, jsonSession, "123");
+    Mockito.when(m_tabBoxModel.getGroupBoxes()).thenReturn(Arrays.asList(m_groupBox1, m_groupBox2));
+    Mockito.when(m_tabBoxModel.getUIFacade()).thenReturn(m_uiFacade);
+    m_tabBox = new JsonTabBox<ITabBox>(m_tabBoxModel, jsonSession, "123");
   }
 
   @Test
@@ -54,7 +54,7 @@ public class JsonTabBoxTest {
   private void handleUiTabSelected(int tabIndex) {
     JSONObject data = new JSONObject();
     JsonObjectUtility.putProperty(data, "tabIndex", tabIndex);
-    tabBox.handleUiTabSelected(new JsonEvent("?", "?", data));
+    m_tabBox.handleUiTabSelected(new JsonEvent("?", "?", data));
   }
 
 }

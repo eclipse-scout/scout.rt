@@ -8,12 +8,19 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
+package org.eclipse.scout.rt.client.ui.form.fields;
 
-public interface IPage5 extends IPage {
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-  boolean isDetailFormVisible();
+// TODO AWE: (scout) mit Scout-team besprechen: annotation VS property
 
-  void setDetailFormVisible(boolean visible);
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+public @interface ModelVariant {
+
+  String value();
 
 }

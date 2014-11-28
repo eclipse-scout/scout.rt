@@ -13,10 +13,10 @@ package org.eclipse.scout.rt.ui.html.json.desktop.fixtures;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
+import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline5;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 
-public class Outline extends AbstractOutline {
+public class Outline extends AbstractOutline5 {
   private List<IPage> m_pages;
 
   public Outline(List<IPage> pages) {

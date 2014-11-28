@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.eclipse.scout.rt.client.ui.form.fields.ModelVariant;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -100,9 +101,20 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
   @Override
   public JSONObject toJson() {
     JSONObject json = new JSONObject();
-    putProperty(json, "objectType", getObjectType());
+    putProperty(json, "objectType", getObjectTypeVariant());
     putProperty(json, "id", getId());
     return json;
+  }
+
+  private String getObjectTypeVariant() {
+    String objectType = getObjectType();
+    if (getModel().getClass().isAnnotationPresent(ModelVariant.class)) {
+      ModelVariant modelVariant = getModel().getClass().getAnnotation(ModelVariant.class);
+      return objectType + "." + modelVariant.value();
+    }
+    else {
+      return objectType;
+    }
   }
 
   @Override

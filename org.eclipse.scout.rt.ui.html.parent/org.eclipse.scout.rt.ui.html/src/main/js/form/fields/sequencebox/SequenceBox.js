@@ -19,10 +19,11 @@ scout.SequenceBox.prototype._render = function($parent) {
   }
 };
 
-// TODO AWE: (sequence-box) es braucht auch die sonderbehandlung vom status, siehe SwingScoutSequenceBox
+// TODO AWE: (scout, sequence-box) remove _modifyLabel when CheckboxForm uses SequenceBox5
+// The new sequence-box sets the label to invisible on the model.
 scout.SequenceBox.prototype._modifyLabel = function(field) {
   if (field instanceof scout.CheckBoxField) {
-    field.$label.setVisible(false);
+    field.labelVisible = false;
   }
 };
 

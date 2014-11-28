@@ -38,6 +38,14 @@ public abstract class AbstractOutline5 extends AbstractExtensibleOutline impleme
 
   private IForm m_defaultDetailForm;
 
+  protected AbstractOutline5() {
+    super();
+  }
+
+  protected AbstractOutline5(boolean callInitialzier) {
+    super(callInitialzier);
+  }
+
   @Override
   protected IPageChangeStrategy createPageChangeStrategy() {
     return new DefaultPageChangeStrategy5();

@@ -83,15 +83,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
 
   @Override
   public String getObjectType() {
-    if (getModel() instanceof ITree5) {
-      // TODO AWE/CGU: (json-layer) diskutieren wie wir das am besten lösen
-      // custom model/widget? eigentlich würde ich gerne das Tree model verwenden
-      // und nur ein anderes JS rendering machen.
-      return "Tree.Compact";
-    }
-    else {
-      return "Tree";
-    }
+    return "Tree";
   }
 
   @Override

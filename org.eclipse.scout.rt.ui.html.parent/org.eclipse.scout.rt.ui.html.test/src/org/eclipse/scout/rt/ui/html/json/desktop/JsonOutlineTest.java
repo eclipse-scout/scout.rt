@@ -75,10 +75,9 @@ public class JsonOutlineTest {
     JSONObject jsonNode = jsonOutline.toJson().getJSONArray("nodes").getJSONObject(0);
     Assert.assertNull(jsonNode.opt(IOutline.PROP_DETAIL_TABLE));
 
-    //FIXME CGU/AWE this does not work because no adapter is created. How to solve it? Property Change event necessary? Store tableVisible on jsonOutline and forbid dynamic changes? Remove attachAdapters?
-//    nodePage.setTableVisible(true);
-//    jsonNode = jsonOutline.toJson().getJSONArray("nodes").getJSONObject(0);
-//    Assert.assertNotNull(jsonNode.opt(IOutline.PROP_DETAIL_TABLE));
+    nodePage.setTableVisible(true);
+    jsonNode = jsonOutline.toJson().getJSONArray("nodes").getJSONObject(0);
+    Assert.assertNotNull(jsonNode.opt(IOutline.PROP_DETAIL_TABLE));
   }
 
   public static JsonOutline<IOutline> createJsonOutlineWithMocks(IOutline outline) {

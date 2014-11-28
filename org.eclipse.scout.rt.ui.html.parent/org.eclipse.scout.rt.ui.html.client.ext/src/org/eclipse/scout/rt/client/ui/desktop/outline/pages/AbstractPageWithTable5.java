@@ -42,7 +42,7 @@ public abstract class AbstractPageWithTable5<T extends ITable5> extends Abstract
     }
   }
 
-  // TODO AWE: (scout) gemeinsame basis klasse für page5, copy/paste für detaiLFormVisible entfernen
+  // TODO AWE: (scout) gemeinsame basis klasse für page5, copy/paste für detailForm|TableVisible entfernen
 
   @Override
   public boolean isDetailFormVisible() {
@@ -54,7 +54,25 @@ public abstract class AbstractPageWithTable5<T extends ITable5> extends Abstract
     boolean oldVisible = m_detailFormVisible;
     if (oldVisible != visible) {
       m_detailFormVisible = visible;
-      ((IOutline5) getOutline()).fireOutlineEvent(new OutlineEvent(getTree(), OutlineEvent.TYPE_PAGE_CHANGED, this));
+      fireOutlineEvent(OutlineEvent.TYPE_PAGE_CHANGED);
+    }
+  }
+
+  @Override
+  public void setTableVisible(boolean visible) {
+    boolean oldVisible = isTableVisible();
+    if (oldVisible != visible) {
+      super.setTableVisible(visible);
+      fireOutlineEvent(OutlineEvent.TYPE_PAGE_CHANGED);
+    }
+  }
+
+  /**
+   * Note: set*Visible methods are called by initConfig(), at this point getTree() is still null.
+   */
+  private void fireOutlineEvent(int eventType) {
+    if (getTree() != null) {
+      ((IOutline5) getOutline()).fireOutlineEvent(new OutlineEvent(getTree(), eventType, this));
     }
   }
 

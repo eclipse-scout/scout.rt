@@ -78,7 +78,6 @@ scout.DateField.prototype._renderDisplayText = function(text) {
  */
 scout.DateField.prototype._renderErrorStatus = function(errorStatus) {
   scout.DateField.parent.prototype._renderErrorStatus.call(this, errorStatus);
-
   if (this._$predict) {
     this._$predict.toggleClass('has-error', !! errorStatus);
   }
@@ -88,28 +87,26 @@ scout.DateField.prototype._onKeyDown = function(event) {
   var years = 0,
     months = 0,
     days = 0,
-    diff = 0;
-  var cursorPos = this.$field[0].selectionStart;
-  var displayText = this.$field.val();
-  var prediction = this._$predict.val();
+    diff = 0,
+    cursorPos = this.$field[0].selectionStart,
+    displayText = this.$field.val(),
+    prediction = this._$predict.val();
 
   if (event.which === scout.keys.TAB ||
     event.which === scout.keys.SHIFT) {
     return;
   }
-
   if (event.which === scout.keys.ENTER) {
     //Update model and close picker
     this._updateDisplayText(this.$field.val(), false);
     this._picker.close();
     return;
   }
-
   if (event.which === scout.keys.ESC) {
     this._picker.close();
     return;
   }
-
+  
   if (event.which === scout.keys.RIGHT && cursorPos === displayText.length) {
     //Move cursor one right and apply next char of the prediction
     if (prediction) {
@@ -117,13 +114,13 @@ scout.DateField.prototype._onKeyDown = function(event) {
     }
     return;
   }
-
+  
   if (event.which === scout.keys.PAGE_UP || event.which === scout.keys.PAGE_DOWN) {
     months = (event.which === scout.keys.PAGE_UP ? -1 : 1);
     this._picker.shiftSelectedDate(0, months, 0);
     return;
   }
-
+  
   if (event.which === scout.keys.UP || event.which === scout.keys.DOWN) {
     diff = (event.which === scout.keys.UP ? -1 : 1);
 
@@ -256,7 +253,6 @@ scout.DateField.prototype._createPredictionField = function() {
     .attr('tabIndex', '-1');
 
   $predict.val('');
-
   this.$field.before($predict);
   return $predict;
 };

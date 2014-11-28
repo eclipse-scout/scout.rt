@@ -69,15 +69,13 @@ public class JsonClientSession extends AbstractJsonAdapter<IClientSession> {
     // since the desktop is not yet created when attachModel runs.
     // see AbstractJsonSession#init()
     attachAdapter(getModel().getDesktop());
-    
-    
+
     if (!getModel().getDesktop().isOpened()) {
       getModel().getDesktop().getUIFacade().fireDesktopOpenedFromUI();
     }
     if (!getModel().getDesktop().isGuiAvailable()) {
       getModel().getDesktop().getUIFacade().fireGuiAttached();
     }
-
 
     m_started = true;
   }

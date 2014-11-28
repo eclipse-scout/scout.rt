@@ -35,6 +35,9 @@ import org.json.JSONObject;
 public class JsonOutline<T extends IOutline> extends JsonTree<T> {
 
   private static final String EVENT_PAGE_CHANGED = "pageChanged";
+  private static final String PROP_DETAIL_FORM = "detailForm";
+  private static final String PROP_DETAIL_TABLE = "detailTable";
+  private static final String PROP_DETAIL_FORM_VISIBLE = "detailFormVisible";
 
   public JsonOutline(T model, IJsonSession jsonSession, String id) {
     super(model, jsonSession, id);
@@ -48,7 +51,6 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
   @Override
   protected void attachModel() {
     super.attachModel();
-
     if (getModel() instanceof IOutline5) {
       optAttachAdapter(((IOutline5) getModel()).getDefaultDetailForm());
     }
@@ -57,7 +59,6 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
   @Override
   protected void detachModel() {
     super.detachModel();
-
     if (getModel() instanceof IOutline5) {
       disposeAdapter(((IOutline5) getModel()).getDefaultDetailForm());
     }
@@ -66,7 +67,6 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
   @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
-
     if (getModel() instanceof IOutline5) {
       optPutAdapterIdProperty(json, "defaultDetailForm", ((IOutline5) getModel()).getDefaultDetailForm());
     }
@@ -103,39 +103,34 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
     for (IPage childPage : page.getChildPages()) {
       attachPage(childPage);
     }
-
-    optAttachAdapter(page.getDetailForm());
-    //FIXME CGU What if there is a detailform AND a table? We should give the possibility on the gui to show both. Currently one of them overlaps the other
-    if (page.isTableVisible()) {
-      if (page instanceof IPageWithTable) {
-        IPageWithTable<?> pageWithTable = (IPageWithTable<?>) page;
-        attachAdapter(pageWithTable.getTable());
-      }
-      else if (page instanceof IPageWithNodes) {
-        IPageWithNodes pageWithNodes = (IPageWithNodes) page;
-        attachAdapter(pageWithNodes.getInternalTable());
-      }
+    if (isDetailFormVisible(page)) {
+      optAttachAdapter(page.getDetailForm());
     }
+    if (page.isTableVisible()) {
+      attachAdapter(getTable(page));
+    }
+  }
+
+  private ITable getTable(IPage page) {
+    if (page instanceof IPageWithTable) {
+      return ((IPageWithTable<?>) page).getTable();
+    }
+    else if (page instanceof IPageWithNodes) {
+      return ((IPageWithNodes) page).getInternalTable();
+    }
+    return null;
   }
 
   protected void disposePage(IPage page) {
     for (IPage childPage : page.getChildPages()) {
       disposePage(childPage);
     }
-
     optDisposeAdapter(page.getDetailForm());
-    if (page instanceof IPageWithTable) {
-      IPageWithTable<?> pageWithTable = (IPageWithTable<?>) page;
-      disposeAdapter(pageWithTable.getTable());
-    }
-    else if (page instanceof IPageWithNodes) {
-      IPageWithNodes pageWithNodes = (IPageWithNodes) page;
-      disposeAdapter(pageWithNodes.getInternalTable());
-    }
+    disposeAdapter(getTable(page));
   }
 
   // TODO AWE: (scout) remove these two methods when x5-classes are merged into scout RT
-  private boolean getDetailFormVisible(IPage page) {
+  private boolean isDetailFormVisible(IPage page) {
     if (page instanceof IPage5) {
       return ((IPage5) page).isDetailFormVisible();
     }
@@ -152,24 +147,20 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
 
   @Override
   protected JSONObject treeNodeToJson(ITreeNode node) {
-    JSONObject json = super.treeNodeToJson(node);
-
     if (!(node instanceof IPage)) {
       throw new IllegalArgumentException("Expected node to be a page. " + node);
     }
     IPage page = (IPage) node;
-
-    // TODO AWE: (menu-navi) discuss with C.GU - müsste man hier nicht IPage.PROP_DETAIL_FORM verwenden?
-    // müsste die Methode nicht pageToJson heissen?
-    optPutAdapterIdProperty(json, IOutline.PROP_DETAIL_FORM, page.getDetailForm());
-    putProperty(json, IPage5.PROP_DETAIL_FORM_VISIBLE, getDetailFormVisible(page));
+    JSONObject json = super.treeNodeToJson(node);
+    optPutAdapterIdProperty(json, PROP_DETAIL_FORM, page.getDetailForm());
+    putProperty(json, PROP_DETAIL_FORM_VISIBLE, isDetailFormVisible(page));
 
     String pageType = "";
     if (page instanceof IPageWithTable) {
       pageType = "table";
       if (page.isTableVisible()) {
         IPageWithTable<?> pageWithTable = (IPageWithTable<?>) page;
-        putAdapterIdProperty(json, IOutline.PROP_DETAIL_TABLE, pageWithTable.getTable());
+        putAdapterIdProperty(json, PROP_DETAIL_TABLE, pageWithTable.getTable());
       }
     }
     else if (page instanceof IPageWithNodes) {
@@ -177,7 +168,7 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
       if (page.isTableVisible()) {
         IPageWithNodes pageWithNodes = (IPageWithNodes) page;
         ITable table = pageWithNodes.getInternalTable();
-        putAdapterIdProperty(json, IOutline.PROP_DETAIL_TABLE, table);
+        putAdapterIdProperty(json, PROP_DETAIL_TABLE, table);
       }
     }
     putProperty(json, "type", pageType);
@@ -194,7 +185,6 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
       IPage page = (IPage) node;
       attachPage(page);
     }
-
     super.handleModelNodesInserted(event);
   }
 
@@ -204,7 +194,7 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
 
     Collection<ITreeNode> nodes = event.getNodes();
     for (ITreeNode node : nodes) {
-      //FIXME CGU really dispose? Or better keep for offline? Memory issue?
+      // FIXME CGU really dispose? Or better keep for offline? Memory issue?
       if (node instanceof IPageWithTable) {
         IPageWithTable<?> pageWithTable = (IPageWithTable<?>) node;
         JsonTable table = (JsonTable) getJsonSession().getJsonAdapter(pageWithTable.getTable());
@@ -220,11 +210,11 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
     ITreeNode selectedNode = getModel().getSelectedNode();
     putProperty(jsonEvent, PROP_NODE_ID, getOrCreateNodeId(selectedNode));
     if (detailForm == null) {
-      putProperty(jsonEvent, IOutline.PROP_DETAIL_FORM, null);
+      putProperty(jsonEvent, PROP_DETAIL_FORM, null);
     }
     else {
       IJsonAdapter<?> detailFormAdapter = attachAdapter(detailForm);
-      putProperty(jsonEvent, IOutline.PROP_DETAIL_FORM, detailFormAdapter.getId());
+      putProperty(jsonEvent, PROP_DETAIL_FORM, detailFormAdapter.getId());
     }
     addActionEvent("detailFormChanged", jsonEvent);
   }
@@ -234,11 +224,11 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
     ITreeNode selectedNode = getModel().getSelectedNode();
     putProperty(jsonEvent, PROP_NODE_ID, getOrCreateNodeId(selectedNode));
     if (detailTable == null) {
-      putProperty(jsonEvent, IOutline.PROP_DETAIL_TABLE, null);
+      putProperty(jsonEvent, PROP_DETAIL_TABLE, null);
     }
     else {
       IJsonAdapter<?> detailFormAdapter = attachAdapter(detailTable);
-      putProperty(jsonEvent, IOutline.PROP_DETAIL_TABLE, detailFormAdapter.getId());
+      putProperty(jsonEvent, PROP_DETAIL_TABLE, detailFormAdapter.getId());
     }
     addActionEvent("detailTableChanged", jsonEvent);
   }
@@ -255,19 +245,25 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
   }
 
   private void handleModelPageChanged(TreeEvent event) {
+    IPage5 page = (IPage5) event.getNode();
+    if (page.isDetailFormVisible()) {
+      optAttachAdapter(page.getDetailForm());
+    }
+    if (page.isTableVisible()) {
+      attachAdapter(getTable(page));
+    }
     JSONObject jsonEvent = new JSONObject();
-    IPage page = (IPage) event.getNode();
     putProperty(jsonEvent, PROP_NODE_ID, getOrCreateNodeId(page));
-    putProperty(jsonEvent, IPage5.PROP_DETAIL_FORM_VISIBLE, getDetailFormVisible(page));
+    putProperty(jsonEvent, PROP_DETAIL_FORM_VISIBLE, page.isDetailFormVisible());
     addActionEvent("pageChanged", jsonEvent);
   }
 
   @Override
   protected void handleModelPropertyChange(String propertyName, Object newValue) {
-    if (IOutline.PROP_DETAIL_FORM.equals(propertyName)) {
+    if (PROP_DETAIL_FORM.equals(propertyName)) {
       handleModelDetailFormChanged((IForm) newValue);
     }
-    else if (IOutline.PROP_DETAIL_TABLE.equals(propertyName)) {
+    else if (PROP_DETAIL_TABLE.equals(propertyName)) {
       handleModelDetailTableChanged((ITable) newValue);
     }
     else {
@@ -278,7 +274,7 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
   private void handleUiPageChanged(JsonEvent event) {
     JSONObject data = event.getData();
     IPage page = (IPage) getTreeNodeForNodeId(JsonObjectUtility.getString(data, PROP_NODE_ID));
-    boolean detailFormVisible = JsonObjectUtility.getBoolean(data, IPage5.PROP_DETAIL_FORM_VISIBLE);
+    boolean detailFormVisible = JsonObjectUtility.getBoolean(data, PROP_DETAIL_FORM_VISIBLE);
     setDetailFormVisible(page, detailFormVisible);
   }
 
