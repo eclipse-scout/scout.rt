@@ -51,17 +51,17 @@ scout.dates = {
    * Returns the time (with milliseconds) for the given date as a string in the format
    * [year#4][month#2][day#2][hour#2][minute#2][second#2][#millisecond#3]. All characters
    * are guaranteed to be digits. If the date argument is omitted, the current date is
-   * used.
+   * used. Note: The date is returned in UTC.
    */
   timestamp: function(date) {
     var d = date || new Date();
-    return '' + d.getFullYear() +
-      scout.strings.padZeroLeft(d.getMonth() + 1, 2) +
-      scout.strings.padZeroLeft(d.getDate(), 2) +
-      scout.strings.padZeroLeft(d.getHours(), 2) +
-      scout.strings.padZeroLeft(d.getMinutes(), 2) +
-      scout.strings.padZeroLeft(d.getSeconds(), 2) +
-      scout.strings.padZeroLeft(d.getMilliseconds(), 3);
+    return '' + d.getUTCFullYear() +
+      scout.strings.padZeroLeft(d.getUTCMonth() + 1, 2) +
+      scout.strings.padZeroLeft(d.getUTCDate(), 2) +
+      scout.strings.padZeroLeft(d.getUTCHours(), 2) +
+      scout.strings.padZeroLeft(d.getUTCMinutes(), 2) +
+      scout.strings.padZeroLeft(d.getUTCSeconds(), 2) +
+      scout.strings.padZeroLeft(d.getUTCMilliseconds(), 3);
   }
 
 };
