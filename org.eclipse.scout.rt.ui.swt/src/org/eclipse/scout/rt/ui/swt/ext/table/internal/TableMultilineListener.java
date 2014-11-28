@@ -71,7 +71,7 @@ public class TableMultilineListener implements Listener {
 
   /**
    * Wraps the text to fit the bounds. Line breaks are inserted at word breaks.
-   * 
+   *
    * @param gc
    *          the graphics context
    * @param text
@@ -248,14 +248,17 @@ public class TableMultilineListener implements Listener {
    * @return true, if the column is wrapped, false otherwise
    */
   private boolean isWrapped(int uiColumnIndex, Table table) {
-    int columnIndex = ((IColumn<?>) table.getColumn(uiColumnIndex).getData(ISwtScoutTable.KEY_SCOUT_COLUMN)).getColumnIndex();
-    return CollectionUtility.containsAny(m_wrapTextColumns, columnIndex);
+    IColumn<?> scoutColumn = (IColumn<?>) table.getColumn(uiColumnIndex).getData(ISwtScoutTable.KEY_SCOUT_COLUMN);
+    if (scoutColumn == null) {
+      return false; // Dummy SWT-column due to SWT bug 43910 (see SwtScoutTable#initializeColumns).
+    }
+    return CollectionUtility.containsAny(m_wrapTextColumns, scoutColumn.getColumnIndex());
   }
 
   /**
    * Trims a given text to the maximum row height of the table. If the row height is <=0 or the line height is <=0, the
    * complete text is returned.
-   * 
+   *
    * @param text
    *          the text to trim
    * @param lineHeight
