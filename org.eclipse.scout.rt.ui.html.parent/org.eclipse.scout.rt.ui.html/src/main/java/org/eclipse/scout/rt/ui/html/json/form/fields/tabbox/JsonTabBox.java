@@ -57,13 +57,6 @@ public class JsonTabBox<T extends ITabBox> extends JsonFormField<T> {
       }
     });
 
-    // FIXME CGU really needed?
-    putJsonProperty(new JsonProperty<ITabBox>(ITabBox.PROP_MARK_STRATEGY, model) {
-      @Override
-      protected Integer modelValue() {
-        return getModel().getMarkStrategy();
-      }
-    });
   }
 
   @Override

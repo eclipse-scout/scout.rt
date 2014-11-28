@@ -68,7 +68,7 @@ public class JsonTableControl<T extends ITableControl> extends JsonAction<T> {
   protected void handleUiSelected(JsonEvent event) {
     super.handleUiSelected(event);
 
-    // Lazy loading content on selection. FIXME CGU Should this be controlled by the model?
+    // Lazy loading content on selection.
     if (getModel().isSelected() && !m_contentLoaded) {
       handleUiLoadContent();
       m_contentLoaded = true;

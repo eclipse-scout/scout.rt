@@ -74,7 +74,7 @@ scout.DesktopKeystrokeAdapter = function(navigation, bench) {
         // left: up in tree
         if (keycode === 37) {
           if ($currentNode.hasClass('expanded')) {
-            $currentNode.children('.tree-item-control').click(); //FIXME Use tree.setNodeExpanded instead
+            $currentNode.children('.tree-item-control').click(); //FIXME CGU Use tree.setNodeExpanded instead
           } else {
             $targetNode = $currentNode.prevAll('.tree-item[data-level=' + (+$currentNode.attr('data-level') - 1) + ']');
             if ($targetNode.attr('id')) {
@@ -86,7 +86,7 @@ scout.DesktopKeystrokeAdapter = function(navigation, bench) {
         // right: down in tree
         else if (keycode === 39) {
           if (!$currentNode.hasClass('expanded')) {
-            $currentNode.children('.tree-item-control').click(); //FIXME Use tree.setNodeExpanded instead
+            $currentNode.children('.tree-item-control').click(); //FIXME CGU Use tree.setNodeExpanded instead
           } else {
             $targetNode = $currentNode.next('.tree-item[data-level=' + (+$currentNode.attr('data-level') + 1) + ']');
             if ($targetNode.attr('id')) {

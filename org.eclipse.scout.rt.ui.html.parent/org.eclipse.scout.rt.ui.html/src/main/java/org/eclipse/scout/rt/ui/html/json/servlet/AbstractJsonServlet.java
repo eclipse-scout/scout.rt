@@ -37,7 +37,10 @@ public abstract class AbstractJsonServlet extends HttpServletEx {
   protected AbstractJsonServlet() {
   }
 
-  public abstract IJsonSession createUninitializedJsonSession();
+  /**
+   * @return a new uninitialized JsonSession
+   */
+  public abstract IJsonSession createJsonSession();
 
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

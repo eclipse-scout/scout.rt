@@ -311,8 +311,9 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     try {
       m_currentHttpRequest = httpRequest;
       m_currentJsonRequest = jsonRequest;
-      // FIXME CGU should only be done after pressing reload, maybe on get request? first we need to fix reload bug, see FIXME in AbstractJsonServlet
-      m_jsonClientSession.processRequestLocale(httpRequest.getLocale());
+      if (jsonRequest.isStartupRequest()) {
+        m_jsonClientSession.processRequestLocale(httpRequest.getLocale());
+      }
       JsonResponse jsonResponse = currentJsonResponse();
       m_jsonEventProcessor.processEvents(m_currentJsonRequest, jsonResponse);
       return jsonResponse.toJson();

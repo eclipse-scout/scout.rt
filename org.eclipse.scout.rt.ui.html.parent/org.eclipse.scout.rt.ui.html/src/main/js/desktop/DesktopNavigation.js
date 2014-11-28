@@ -20,11 +20,11 @@ scout.DesktopNavigation.prototype.render = function($parent) {
 
   this.outlineTab = new scout.DesktopNavigation.TabAndContent(this._createOutlinesTab());
   this.outlineTab.$tab.on('click', function() {
-    //Switch tab if search outline is selected. Otherwise outline menu gets opened
+    // Switch tab if search outline is selected. Otherwise outline menu gets opened
     if (this.desktop.outline === this.desktop.searchOutline) {
       if (!this.previousOutline) {
-        //FIXME CGU passiert nach F5 in der Search outline. irgendwie fehlt eine initiale outline, aktueller Workaround: open Menu
-//        this.previousOutline = this.desktop.initialOutline;
+        // Open menu if previous outline is not set.
+        // Happens after reloading the page. Reason: The model does know nothing about the previous outline
         this._openMenu();
       } else {
         this._selectTab(this.outlineTab, this.previousOutline);

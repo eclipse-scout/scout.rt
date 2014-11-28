@@ -749,7 +749,6 @@ scout.Table.prototype.colorData = function(mode, colorColumn) {
     value = this.getCellValue(colorColumn, row);
 
     colorFunc($rows.eq(s).children().eq(c), value);
-
   }
 };
 
@@ -1332,12 +1331,8 @@ scout.Table.prototype.onModelAction = function(event) {
   }
 };
 
-scout.Table.prototype.onMenuPropertyChange = function(event) {
-  //FIXME CGU implement
-};
-
 /*
- * Helpers
+ * Static helpers
  */
 
 scout.Table.parseHorizontalAlignment = function(alignment) {
