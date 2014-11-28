@@ -32,7 +32,7 @@ public interface ILookAndFeelProperties {
   String PROP_MESSAGE_BOX_MIN_WIDTH = "messageBox.minWidth";
   String PROP_MESSAGE_BOX_MIN_HEIGHT = "messageBox.minHeight";
   String PROP_TABLE_MOUSE_MOVE_SELECTION_SUPPORT_ENABLED = "table.mouseMoveSelectionSupport.enabled";
-  String PROP_TABLE_MULTILINE_TOOLTIP_SUPPORT_ENABLED = "table.multilineTooltipSupport.enabled";
+  String PROP_TABLE_USE_NATIVE_TOOLTIPS = "table.useNativeToolTips";
 
   int getScope();
 
