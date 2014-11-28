@@ -471,7 +471,7 @@ scout.Tree.prototype._addNodes = function(nodes, $parent) {
   scout.scrollbars.update(this._$scrollable);
 
   //return the last created node
-  return $node;
+  return $predecessor;
 };
 
 scout.Tree.prototype._renderTreeItemControl = function($node) {
