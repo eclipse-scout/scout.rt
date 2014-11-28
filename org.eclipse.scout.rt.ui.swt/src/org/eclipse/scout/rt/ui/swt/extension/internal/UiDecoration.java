@@ -41,7 +41,7 @@ public class UiDecoration implements IUiDecoration {
   private int m_messageBoxMinWidth = 400;
   private int m_messageBoxMinHeight = 100;
   private boolean m_tableMouseMoveSelectionSupportEnabled;
-  private boolean m_tableMultilineTooltipSupportEnabled;
+  private boolean m_useNativeToolTips = true;
 
   /**
    * one of SWT.RIGHT SWT.LEFT SWT.CENTER
@@ -255,12 +255,16 @@ public class UiDecoration implements IUiDecoration {
     return m_tableMouseMoveSelectionSupportEnabled;
   }
 
-  public void setTableMultilineTooltipSupportEnabled(boolean tableMultilineTooltipSupportEnabled) {
-    m_tableMultilineTooltipSupportEnabled = tableMultilineTooltipSupportEnabled;
+  /**
+   * @param useNativeToolTips
+   *          <code>true</code> to use native over synthetic tool tips.
+   */
+  public void useNativeToolTips(boolean useNativeToolTips) {
+    m_useNativeToolTips = useNativeToolTips;
   }
 
   @Override
-  public boolean isTableMultilineTooltipSupportEnabled() {
-    return m_tableMultilineTooltipSupportEnabled;
+  public boolean useNativeToolTips() {
+    return m_useNativeToolTips;
   }
 }

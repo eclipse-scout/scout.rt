@@ -60,5 +60,8 @@ public interface IUiDecoration {
 
   boolean isTableMouseMoveSelectionSupportEnabled();
 
-  boolean isTableMultilineTooltipSupportEnabled();
+  /**
+   * @return <code>true</code> if native tool tips should be used.
+   */
+  boolean useNativeToolTips();
 }
