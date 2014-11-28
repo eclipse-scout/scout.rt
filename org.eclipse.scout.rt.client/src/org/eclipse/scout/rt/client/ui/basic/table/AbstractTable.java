@@ -3780,7 +3780,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   private void fireRowClick(ITableRow row, MouseButton mouseButton) {
     if (row != null) {
       try {
-        interceptRowClickSingleObserver(row);
+        interceptRowClickSingleObserver(row, mouseButton);
         execRowClick(row, mouseButton);
       }
       catch (ProcessingException ex) {
@@ -3792,32 +3792,36 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
-  protected void interceptRowClickSingleObserver(ITableRow row) throws ProcessingException {
-    // single observer for checkable tables
-    // if row click is targetted to cell editor, do not interpret click as check/uncheck event
-    if (row.isEnabled() && isEnabled()) {
-      IColumn<?> ctxCol = getContextColumn();
-      if (isCellEditable(row, ctxCol)) {
-        //cell-level checkbox
-        if (ctxCol instanceof IBooleanColumn) {
-          //editable boolean columns consume this click
-          IFormField field = ctxCol.prepareEdit(row);
-          if (field instanceof IBooleanField) {
-            IBooleanField bfield = (IBooleanField) field;
-            bfield.setChecked(!bfield.isChecked());
-            ctxCol.completeEdit(row, field);
-          }
-        }
-        else {
-          //other editable columns have no effect HERE, the ui will open an editor
+  protected void interceptRowClickSingleObserver(ITableRow row, MouseButton mouseButton) throws ProcessingException {
+    // Only toggle checked state if the table and row are enabled.
+    if (!row.isEnabled() || !isEnabled()) {
+      return;
+    }
+
+    // Only toggle checked state if being fired by the left mousebutton (https://bugs.eclipse.org/bugs/show_bug.cgi?id=453543).
+    if (mouseButton != MouseButton.Left) {
+      return;
+    }
+
+    IColumn<?> ctxCol = getContextColumn();
+    if (isCellEditable(row, ctxCol)) {
+      //cell-level checkbox
+      if (ctxCol instanceof IBooleanColumn) {
+        //editable boolean columns consume this click
+        IFormField field = ctxCol.prepareEdit(row);
+        if (field instanceof IBooleanField) {
+          IBooleanField bfield = (IBooleanField) field;
+          bfield.setChecked(!bfield.isChecked());
+          ctxCol.completeEdit(row, field);
         }
       }
       else {
-        //row-level checkbox
-        if (isCheckable()) {
-          row.setChecked(!row.isChecked());
-        }
+        //other editable columns have no effect HERE, the ui will open an editor
       }
+    }
+    else if (isCheckable()) {
+      //row-level checkbox
+      row.setChecked(!row.isChecked());
     }
   }
 
