@@ -25,9 +25,6 @@ scout.strings = {
     return !/^\s*$/.test(text);
   },
 
-  /**
-   * Fastest algorithm (source: http://stackoverflow.com/a/5450113)
-   */
   repeat: function(pattern, count) {
     if (pattern === undefined || pattern === null) {
       return pattern;
@@ -36,14 +33,10 @@ scout.strings = {
       return '';
     }
     var result = '';
-    while (count > 1) {
-      if (count & 1) {
-        result += pattern;
-      }
-      count >>= 1;
-      pattern += pattern;
+    for (var i = 0; i < count; i++) {
+      result += pattern;
     }
-    return result + pattern;
+    return result;
   },
 
   padZeroLeft: function(s, padding) {
