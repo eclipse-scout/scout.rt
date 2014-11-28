@@ -17,9 +17,9 @@ scout.Desktop = function() {
   this._selectedTab;
 
   /**
-   * TODO AWE/CGU: (forms) wird nun auch als 'activeForm' verwendet (siehe TableKeystrokeAdapter.js)
-   * Wahrscheinlich müssen wir das refactoren und eine activeForm property verwenden
-   * Diese Property muss mit dem Server synchronisiert werden, damit auch das server-seitige desktop.getActiveForm() stimmt.
+   * TODO AWE/CGU: (key-handling, forms) wird nun auch als 'activeForm' verwendet (siehe TableKeystrokeAdapter.js)
+   * Wahrscheinlich müssen wir das refactoren und eine activeForm property verwenden.  Diese Property muss
+   * mit dem Server synchronisiert werden, damit auch das server-seitige desktop.getActiveForm() stimmt.
    * Auch im zusammenhang mit focus-handling nochmals überdenken.
    */
   this.selectedTool;
@@ -141,6 +141,8 @@ scout.Desktop.TabAndContent.prototype._update = function(content, title, subTitl
 // - ein weiterer Tab geht auf, kann man beliebig wiederholen
 // Lösungen besprechen. Eine Möglichkeit wäre, bei Klick auf Auftrag bearbeiten in den
 // bereits geöffneten Tab/Dialog zu wecheseln. Oder das Menü-Item disablen.
+
+// ist schon in AbstractForm mit execStartExclusive gelöst - muss von CRM überall implementiert werden.
 
 scout.Desktop.prototype._addTab = function(tab, prepend) {
   tab.$container = $.makeDiv('taskbar-tab-item')

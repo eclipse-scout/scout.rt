@@ -83,14 +83,19 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
   }
 
   /**
-   * TODO AWE/CGU: (scout) mit Judith besprechen: Aufräumaktion im Bereich IToolButton/IViewButton
+   * TODO AWE/CGU: (scout, actions) mit Judith besprechen: Aufräumaktion im Bereich IToolButton/IViewButton
    * Anstelle der vielen Marker interfaces möchten wir nur noch IActions haben. Alle IActions werden dann
    * rechts oben angezeigt (es können Menüs und Buttons sein). Die Outlines werden einfach anhand der
    * konfigurierten Outlines erzeugt, ohne dass dafür noch ein Button konfiguriert werden muss. Dann
-   * können alle Interfaces und abstrakten Klasse die es heute gibt gelöscht werden. <br/>
-   * An dieser Stelle filtern wir einfach alle Actions weg, die wir im MiniCRM nicht sehen wollen.
-   * Wenn wir den Fork haben, können wir die Konfiguration anpassen. Nach dem Refactoring diese Methode
-   * entfernen und nur noch model.getActions() verwenden.
+   * können alle Interfaces und abstrakten Klasse die es heute gibt gelöscht werden.
+   * <p>
+   * An dieser Stelle filtern wir einfach alle Actions weg, die wir im MiniCRM nicht sehen wollen. Wenn wir den Fork
+   * haben, können wir die Konfiguration anpassen. Nach dem Refactoring diese Methode entfernen und nur noch
+   * model.getActions() verwenden.
+   * <p>
+   * Mit Scout-Team besprechen, wie wir mit Menüs in Zukunft umgehen wollen. Wollen wir die Menü-Bar im Model abbilden?
+   * (GroupBox, Table, Desktop) Brauchen wir all die Menü-Types dann noch? Können wir die Menü-Logik überhaupt nochmals
+   * refactoren? Was machen wir mit der heutigen Button-Bar?
    */
   private List<IAction> filterModelActions() {
     List<IAction> result = new ArrayList<>();

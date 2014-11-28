@@ -121,6 +121,7 @@ scout.GroupBox.prototype._computeBorderVisible = function() {
  */
 scout.GroupBox.prototype._renderLabelVisible = function(visible) {
   // TODO AWE: (concept) discuss with C.GU -> auf dem GUI server korrigieren oder im Browser UI?
+  // --> kein hack für main-box, wenn die auf dem model ein label hat, hat es im UI auch eins
   this._$groupBoxTitle.setVisible(visible && this.label && !this.mainBox);
 };
 

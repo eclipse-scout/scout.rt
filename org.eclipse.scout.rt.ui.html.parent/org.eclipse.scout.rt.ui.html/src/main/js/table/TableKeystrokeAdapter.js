@@ -17,8 +17,8 @@ scout.TableKeystrokeAdapter = function(table) {
     }
 
     // Don't accept if focus is already in a input field or table is detached or when tool-form is opened.
-    // FIXME CGU/AWE: better remove adapter on detach and reinstall on attach to increase performance?
-    // also refactor selectedTool-if below when activeForm is implemented on desktop
+    // FIXME CGU/AWE: (key-handling) better remove adapter on detach and reinstall on attach to increase performance?
+    // also refactor selectedTool-if below when activeForm is implemented on desktop (see Desktop.js)
     return inputFocused ||
       !that._table.$container.isAttached() ||
       table.session.desktop.selectedTool;
