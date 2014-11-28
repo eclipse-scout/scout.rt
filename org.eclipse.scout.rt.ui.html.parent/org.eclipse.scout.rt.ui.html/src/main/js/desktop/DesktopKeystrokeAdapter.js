@@ -69,27 +69,34 @@ scout.DesktopKeystrokeAdapter = function(navigation, taskbar) {
           currentNode = $currentNode.data('node');
 
         if (keycode === scout.keys.UP) {
-          $targetNode = $currentNode.prev('.tree-item');
-          targetNode = $targetNode.data('node');
+          if ($currentNode.length === 0) {
+            $targetNode = outline.$nodes().last();
+            targetNode = $targetNode.data('node');
+          } else {
+            $targetNode = $currentNode.prev('.tree-item');
+            targetNode = $targetNode.data('node');
+          }
           if (targetNode) {
             outline.setNodesSelected(targetNode, $targetNode);
           }
-        }
-        else if (keycode === scout.keys.DOWN) {
-          $targetNode = $currentNode.next('.tree-item');
-          targetNode = $targetNode.data('node');
+        } else if (keycode === scout.keys.DOWN) {
+          if ($currentNode.length === 0) {
+            $targetNode = outline.$nodes().first();
+            targetNode = $targetNode.data('node');
+          } else {
+            $targetNode = $currentNode.next('.tree-item');
+            targetNode = $targetNode.data('node');
+          }
           if (targetNode) {
             outline.setNodesSelected(targetNode, $targetNode);
           }
-        }
-        else if (keycode === scout.keys.LEFT) {
+        } else if (currentNode && keycode === scout.keys.LEFT) {
           if (currentNode.expanded) {
             outline.setNodeExpanded(currentNode, $currentNode, false);
           } else if (currentNode.parentNode) {
             outline.setNodesSelected(currentNode.parentNode);
           }
-        }
-        else if (keycode === scout.keys.RIGHT) {
+        } else if (currentNode && keycode === scout.keys.RIGHT) {
           if (!currentNode.expanded && !currentNode.leaf) {
             outline.setNodeExpanded(currentNode, $currentNode, true);
           } else if (currentNode.childNodes.length > 0) {

@@ -611,6 +611,10 @@ scout.Tree.prototype.$selectedNodes = function() {
   return this._$scrollable.find('.selected');
 };
 
+scout.Tree.prototype.$nodes = function() {
+  return this._$scrollable.find('.tree-item');
+};
+
 scout.Tree.prototype.selectedNodes = function() {
   var nodes = [];
   for (var i = 0; i < this.selectedNodeIds.length; i++) {
