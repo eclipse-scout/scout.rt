@@ -36,7 +36,7 @@ describe("Table", function() {
         var table = helper.createTable(model);
         table.render(session.$entryPoint);
 
-        var $row0 = table.findRows().eq(0);
+        var $row0 = table.$rows().eq(0);
         var $cells = $row0.find('.table-cell');
         expect($cells.eq(0).text()).toBe('cell1');
         expect($cells.eq(1).text()).toBe('');
@@ -49,7 +49,7 @@ describe("Table", function() {
         var table = helper.createTable(model);
         table.render(session.$entryPoint);
 
-        var $row0 = table.findRows().eq(0);
+        var $row0 = table.$rows().eq(0);
         var $cells = $row0.find('.table-cell');
         expect($cells.eq(0).text()).toBe('cell1');
         expect($cells.eq(1).text()).toBe('');
@@ -69,7 +69,7 @@ describe("Table", function() {
       var $headerItem0 = $headerItems.eq(0);
       var $headerItem1 = $headerItems.eq(1);
       var $headerItem2 = $headerItems.eq(2);
-      var $rows = table.findRows();
+      var $rows = table.$rows();
       var $cells0 = $rows.eq(0).find('.table-cell');
       var $cells1 = $rows.eq(1).find('.table-cell');
 
@@ -95,7 +95,7 @@ describe("Table", function() {
       var table = helper.createTable(model);
       table.render(session.$entryPoint);
 
-      var $selectedRows = table.findSelectedRows();
+      var $selectedRows = table.$selectedRows();
       expect($selectedRows.length).toBe(0);
 
       helper.selectRowsAndAssert(table, ['0', '4']);
@@ -139,7 +139,7 @@ describe("Table", function() {
       var table = helper.createTable(model);
       table.render(session.$entryPoint);
 
-      var $selectedRows = table.findSelectedRows();
+      var $selectedRows = table.$selectedRows();
       expect($selectedRows.length).toBe(0);
 
       table.toggleSelection();
@@ -153,7 +153,7 @@ describe("Table", function() {
       var table = helper.createTable(model);
       table.render(session.$entryPoint);
 
-      var $selectedRows = table.findSelectedRows();
+      var $selectedRows = table.$selectedRows();
       expect($selectedRows.length).toBe(0);
 
       helper.selectRowsAndAssert(table, helper.getRowIds(model.rows));
@@ -447,7 +447,7 @@ describe("Table", function() {
     function clickRowAndAssertSelection(table, $row) {
       $row.triggerClick();
 
-      var $selectedRows = table.findSelectedRows();
+      var $selectedRows = table.$selectedRows();
       expect($selectedRows.length).toBe(1);
 
       var $selectedRow = $selectedRows.first();
@@ -459,7 +459,7 @@ describe("Table", function() {
       var table = helper.createTable(model);
       table.render(session.$entryPoint);
 
-      var $selectedRows = table.findSelectedRows();
+      var $selectedRows = table.$selectedRows();
       expect($selectedRows.length).toBe(0);
 
       var $rows = table._$scrollable.children();
@@ -763,24 +763,24 @@ describe("Table", function() {
       it("deletes single rows from model html document", function() {
         table.render(session.$entryPoint);
 
-        expect(table.findRows().length).toBe(3);
+        expect(table.$rows().length).toBe(3);
 
         var message = {
           events: [createRowsDeletedEvent(model, [row0.id])]
         };
         session._processSuccessResponse(message);
 
-        expect(table.findRows().length).toBe(2);
-        expect(table.findRowById(row0.id).length).toBe(0);
-        expect(table.findRowById(row1.id).length).toBe(1);
-        expect(table.findRowById(row2.id).length).toBe(1);
+        expect(table.$rows().length).toBe(2);
+        expect(table.$rowById(row0.id).length).toBe(0);
+        expect(table.$rowById(row1.id).length).toBe(1);
+        expect(table.$rowById(row2.id).length).toBe(1);
 
         message = {
           events: [createRowsDeletedEvent(model, [row1.id, row2.id])]
         };
         session._processSuccessResponse(message);
 
-        expect(table.findRows().length).toBe(0);
+        expect(table.$rows().length).toBe(0);
       });
 
     });
@@ -817,14 +817,14 @@ describe("Table", function() {
       it("deletes all rows from html document", function() {
         table.render(session.$entryPoint);
 
-        expect(table.findRows().length).toBe(3);
+        expect(table.$rows().length).toBe(3);
 
         var message = {
           events: [createAllRowsDeletedEvent(model)]
         };
         session._processSuccessResponse(message);
 
-        expect(table.findRows().length).toBe(0);
+        expect(table.$rows().length).toBe(0);
       });
 
     });
@@ -897,7 +897,7 @@ describe("Table", function() {
         };
         session._processSuccessResponse(message);
 
-        var $rows = table.findRows();
+        var $rows = table.$rows();
         expect($rows.eq(0).attr('id')).toBe('2');
         expect($rows.eq(1).attr('id')).toBe('1');
         expect($rows.eq(2).attr('id')).toBe('0');
@@ -926,7 +926,7 @@ describe("Table", function() {
 
         //Check if animation is not done for the inserted rows
         //The animation should be done for the other rows (row0 and 1 are switched -> visualize)
-        var $rows = table.findRows();
+        var $rows = table.$rows();
         $rows.each(function() {
           var $row = $(this);
           var oldTop = $row.data('old-top');
@@ -1002,7 +1002,7 @@ describe("Table", function() {
         expect($colHeaders.eq(1).data('column')).toBe(column1);
         expect($colHeaders.eq(2).data('column')).toBe(column2);
 
-        var $rows = table.findRows();
+        var $rows = table.$rows();
         var $cells0 = $rows.eq(0).find('.table-cell');
         var $cells1 = $rows.eq(1).find('.table-cell');
 
@@ -1025,7 +1025,7 @@ describe("Table", function() {
         expect($colHeaders.eq(1).data('column')).toBe(column1);
 
         //Check cells order
-        $rows = table.findRows();
+        $rows = table.$rows();
         $cells0 = $rows.eq(0).find('.table-cell');
         $cells1 = $rows.eq(1).find('.table-cell');
         expect($cells0.eq(0).text()).toBe('2');
@@ -1075,7 +1075,7 @@ describe("Table", function() {
         expect($colHeaders.eq(1).data('column')).toBe(column1);
         expect($colHeaders.eq(2).data('column')).toBe(column2);
 
-        var $rows = table.findRows();
+        var $rows = table.$rows();
         var $cells0 = $rows.eq(0).find('.table-cell');
         var $cells1 = $rows.eq(1).find('.table-cell');
 
@@ -1099,7 +1099,7 @@ describe("Table", function() {
         expect($colHeaders.eq(2).data('column')).toBe(column1);
 
         //Check cells order
-        $rows = table.findRows();
+        $rows = table.$rows();
         $cells0 = $rows.eq(0).find('.table-cell');
         $cells1 = $rows.eq(1).find('.table-cell');
         expect($cells0.eq(0).text()).toBe('2');

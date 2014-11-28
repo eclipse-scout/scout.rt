@@ -64,8 +64,8 @@ scout.TableKeystrokeAdapter = function(table) {
     handle: function(event) {
       var $newRowSelection, $prev, i, rowIds;
       var keycode = event.which;
-      var $rowsAll = that._table.findRows();
-      var $rowsSelected = that._table.findSelectedRows();
+      var $rowsAll = that._table.$rows();
+      var $rowsSelected = that._table.$selectedRows();
 
       // up: move up
       if (keycode === scout.keys.UP) {

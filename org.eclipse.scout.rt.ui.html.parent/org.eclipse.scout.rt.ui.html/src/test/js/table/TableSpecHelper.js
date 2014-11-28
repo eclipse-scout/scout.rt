@@ -170,7 +170,7 @@ TableSpecHelper.prototype.selectRowsAndAssert = function(table, rowIds) {
 };
 
 TableSpecHelper.prototype.assertSelection = function(table, rowIds) {
-  var $selectedRows = table.findSelectedRows();
+  var $selectedRows = table.$selectedRows();
   expect($selectedRows.length).toBe(rowIds.length);
 
   var selectedRowIds = [];

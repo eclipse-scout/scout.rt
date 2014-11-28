@@ -189,7 +189,7 @@ scout.Table.prototype._prepareColumnsForSorting = function(sortColumns) {
 
 scout.Table.prototype._renderRowOrderChanges = function() {
   var $row, oldTop, i, rowWasInserted, animate, that = this;
-  var $rows = this.findRows();
+  var $rows = this.$rows();
   var $sortedRows = $();
 
   //store old position
@@ -214,7 +214,7 @@ scout.Table.prototype._renderRowOrderChanges = function() {
   }
 
   for (i = 0; i < this.rows.length; i++) {
-    $row = this.findRowById(this.rows[i].id);
+    $row = this.$rowById(this.rows[i].id);
     $sortedRows.push($row[0]);
   }
 
@@ -306,7 +306,7 @@ scout.Table.prototype.sort = function($header, dir, additional, remove) {
 };
 
 scout.Table.prototype.drawData = function() {
-  this.findRows().remove();
+  this.$rows().remove();
   this._drawData(0);
   this.selectionHandler.dataDrawn();
 };
@@ -387,7 +387,7 @@ scout.Table.prototype._drawData = function(startRow) {
   function onContextMenu(event) {
     event.preventDefault();
 
-    var $selectedRows = that.findSelectedRows(),
+    var $selectedRows = that.$selectedRows(),
       x = event.pageX,
       y = event.pageY;
 
@@ -420,7 +420,7 @@ scout.Table.prototype._drawData = function(startRow) {
     function showMenuPopup() {
       var popup = new scout.Popup();
       popup.render();
-      scout.menus.appendMenuItems(popup, that._getRowMenus($selectedRows, false));
+      scout.menus.appendMenuItems(popup, that._rowMenus($selectedRows, false));
       popup.setLocation(new scout.Point(x, y));
     }
   }
@@ -454,7 +454,7 @@ scout.Table.prototype._drawData = function(startRow) {
 
 };
 
-scout.Table.prototype._getRowMenus = function($selectedRows, all) {
+scout.Table.prototype._rowMenus = function($selectedRows, all) {
   var check;
 
   if (all) {
@@ -473,12 +473,12 @@ scout.Table.prototype._getRowMenus = function($selectedRows, all) {
 };
 
 scout.Table.prototype._renderMenus = function(menus) {
-  var $selectedRows = this.findSelectedRows();
+  var $selectedRows = this.$selectedRows();
   this._renderRowMenus($selectedRows);
 };
 
 scout.Table.prototype._renderRowMenus = function($selectedRows) {
-  var menus = this._getRowMenus($selectedRows, true);
+  var menus = this._rowMenus($selectedRows, true);
   this.menubar.updateItems(menus);
 };
 
@@ -603,7 +603,7 @@ scout.Table.prototype._group = function() {
     $group = $('.group-sort', this.$container);
 
   // remove all sum rows
-  this.findSumRows().animateAVCSD('height', 0, $.removeThis, that.updateScrollbar.bind(that));
+  this.$sumRows().animateAVCSD('height', 0, $.removeThis, that.updateScrollbar.bind(that));
 
   // find group type
   if ($('.group-all', this.$container).length) {
@@ -621,8 +621,8 @@ scout.Table.prototype._group = function() {
 
   for (var r = 0; r < $rows.length; r++) {
     var rowId = $rows.eq(r).attr('id');
-    // FIXME CGU is it possible to link row to $row? because table.getModelRowById does a lookup
-    var row = this.getModelRowById(rowId);
+    // FIXME CGU is it possible to link row to $row? because table.rowById does a lookup
+    var row = this.rowById(rowId);
 
     // calculate sum per column
     for (var c = 0; c < this.columns.length; c++) {
@@ -636,7 +636,7 @@ scout.Table.prototype._group = function() {
 
     // test if sum should be shown, if yes: reset sum-array
     var nextRowId = $rows.eq(r + 1).attr('id');
-    var nextRow = this.getModelRowById(nextRowId);
+    var nextRow = this.rowById(nextRowId);
 
     if ((r === $rows.length - 1) || (!all && this.getCellText(groupColumn, row) !== this.getCellText(groupColumn, nextRow)) && sum.length > 0) {
       for (c = 0; c < this.columns.length; c++) {
@@ -745,7 +745,7 @@ scout.Table.prototype.colorData = function(mode, colorColumn) {
 
   for (var s = 0; s < $rows.length; s++) {
     rowId = $rows.eq(s).attr('id');
-    row = this.getModelRowById(rowId);
+    row = this.rowById(rowId);
     value = this.getCellValue(colorColumn, row);
 
     colorFunc($rows.eq(s).children().eq(c), value);
@@ -783,7 +783,7 @@ scout.Table.prototype._onRowsDeleted = function(rowIds) {
   var rows, $row, i, row;
 
   //update model
-  rows = this.getModelRowsByIds(rowIds);
+  rows = this.rowsByIds(rowIds);
   for (i = 0; i < rows.length; i++) {
     row = rows[i];
     scout.arrays.remove(this.rows, row);
@@ -792,7 +792,7 @@ scout.Table.prototype._onRowsDeleted = function(rowIds) {
   //update html doc
   if (this.rendered) {
     for (i = 0; i < rowIds.length; i++) {
-      $row = this.findRowById(rowIds[i]);
+      $row = this.$rowById(rowIds[i]);
       $row.remove();
     }
     this.updateScrollbar();
@@ -823,14 +823,14 @@ scout.Table.prototype.selectRowsByIds = function(rowIds) {
   this.selectionHandler.drawSelection();
 };
 
-scout.Table.prototype.findSelectedRows = function() {
+scout.Table.prototype.$selectedRows = function() {
   if (!this._$scrollable) {
     return $();
   }
   return this._$scrollable.find('.selected');
 };
 
-scout.Table.prototype.findRows = function(includeSumRows) {
+scout.Table.prototype.$rows = function(includeSumRows) {
   var selector = '.table-row';
   if (includeSumRows) {
     selector += ', .table-row-sum';
@@ -838,11 +838,11 @@ scout.Table.prototype.findRows = function(includeSumRows) {
   return this._$scrollable.find(selector);
 };
 
-scout.Table.prototype.findSumRows = function() {
+scout.Table.prototype.$sumRows = function() {
   return this._$scrollable.find('.table-row-sum');
 };
 
-scout.Table.prototype.findCellsForColIndex = function(colIndex, includeSumRows) {
+scout.Table.prototype.$cellsForColIndex = function(colIndex, includeSumRows) {
   var selector = '.table-row > div:nth-of-type(' + colIndex + ' )';
   if (includeSumRows) {
     selector += ', .table-row-sum > div:nth-of-type(' + colIndex + ' )';
@@ -850,11 +850,11 @@ scout.Table.prototype.findCellsForColIndex = function(colIndex, includeSumRows) 
   return this._$scrollable.find(selector);
 };
 
-scout.Table.prototype.findRowById = function(rowId) {
+scout.Table.prototype.$rowById = function(rowId) {
   return this._$scrollable.find('#' + rowId);
 };
 
-scout.Table.prototype.getModelRowById = function(rowId) {
+scout.Table.prototype.rowById = function(rowId) {
   var row, i;
   for (i = 0; i < this.rows.length; i++) {
     row = this.rows[i];
@@ -864,17 +864,7 @@ scout.Table.prototype.getModelRowById = function(rowId) {
   }
 };
 
-scout.Table.prototype.getModelColumnById = function(columnId) {
-  var column, i;
-  for (i = 0; i < this.columns.length; i++) {
-    column = this.columns[i];
-    if (column.id === columnId) {
-      return column;
-    }
-  }
-};
-
-scout.Table.prototype.getModelRowsByIds = function(rowIds) {
+scout.Table.prototype.rowsByIds = function(rowIds) {
   var i, row, rows = [];
 
   for (i = 0; i < this.rows.length; i++) {
@@ -889,13 +879,23 @@ scout.Table.prototype.getModelRowsByIds = function(rowIds) {
   return rows;
 };
 
+scout.Table.prototype.columnById = function(columnId) {
+  var column, i;
+  for (i = 0; i < this.columns.length; i++) {
+    column = this.columns[i];
+    if (column.id === columnId) {
+      return column;
+    }
+  }
+};
+
 scout.Table.prototype.filter = function() {
   var that = this,
     rowCount = 0,
-    $allRows = this.findRows();
+    $allRows = this.$rows();
 
   that.clearSelection();
-  this.findSumRows().hide();
+  this.$sumRows().hide();
 
   // Filter rows
   var rowsToHide = [];
@@ -970,7 +970,7 @@ scout.Table.prototype.resetFilter = function() {
 
   // reset rows
   var that = this;
-  var $rows = this.findRows();
+  var $rows = this.$rows();
   $rows.each(function() {
     that.showRow($(this), ($rows.length <= that.animationRowLimit));
   });
@@ -1065,10 +1065,10 @@ scout.Table.prototype.resizeColumn = function($header, width, totalWidth, resizi
   column.width = width;
   this._totalWidth = totalWidth;
 
-  this.findCellsForColIndex(colNum, true)
+  this.$cellsForColIndex(colNum, true)
     .css('min-width', width)
     .css('max-width', width);
-  this.findRows(true)
+  this.$rows(true)
     .css('width', totalWidth);
 
   this.header.onColumnResized($header, width);
@@ -1102,7 +1102,7 @@ scout.Table.prototype.moveColumn = function($header, oldPos, newPos, dragged) {
   this.header.onColumnMoved($header, oldPos, newPos, dragged);
 
   // move cells
-  this.findRows(true).each(function() {
+  this.$rows(true).each(function() {
     var $cells = $(this).children();
     if (newPos < oldPos) {
       $cells.eq(newPos).before($cells.eq(oldPos));
@@ -1121,7 +1121,7 @@ scout.Table.prototype._renderColumnOrderChanges = function(oldColumnOrder) {
   }
 
   // move cells
-  this.findRows(true).each(function() {
+  this.$rows(true).each(function() {
     $row = $(this);
     $orderedCells = $();
     $cells = $row.children();
@@ -1269,7 +1269,7 @@ scout.Table.prototype._onColumnOrderChanged = function(columnIds) {
 
   for (i = 0; i < columnIds.length; i++) {
     columnId = columnIds[i];
-    column = this.getModelColumnById(columnId);
+    column = this.columnById(columnId);
     currentPosition = this.columns.indexOf(column);
     if (currentPosition < 0) {
       throw new Error('Column with id ' + columnId + 'not found.');
@@ -1296,7 +1296,7 @@ scout.Table.prototype._onColumnHeadersUpdated = function(columns) {
 
   //Update model columns
   for (var i = 0; i < columns.length; i++) {
-    column = this.getModelColumnById(columns[i].id);
+    column = this.columnById(columns[i].id);
     column.text = columns[i].text;
     column.sortActive = columns[i].sortActive;
     column.sortAscending = columns[i].sortAscending;

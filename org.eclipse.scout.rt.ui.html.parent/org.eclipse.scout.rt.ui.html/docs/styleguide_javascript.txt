@@ -187,6 +187,20 @@ In diesen Faellen die ? Notation verwenden. Alternativ kann auch $.extend einges
 
 Wir erzeugen keine Getter und Setter für einfache Properties (ohne Logik). Man soll direkt auf die
 Variable zugreifen. Hauptgrund: Code wird nicht unnötig aufgeblasen.
+Wenn der Getter/Setter Logik enthalten soll, dann erstellt man eine Methode aber ohne get/set.
+Es ist ein Setter, wenn es ein Argument hat.
+Beispiel:
+  $.fn.cssMarginLeft = function(value) {
+    if (value !== undefined) {
+      return this.css('margin-left', value + 'px');
+    }
+    return $.pxToNumber(this.css('margin-left'));
+  };
+
+### Methoden mit jQuery-Objekten als Return-Werte
+
+Wenn eine Methode ein jQuery-Objekt zurückgibt, soll dies im Namen ersichtlich sein.
+z.B. var $selectedRows =  table.$selectedRows();
 
 
 ### Einzeilige if-Statements / Geschweifte Klammern

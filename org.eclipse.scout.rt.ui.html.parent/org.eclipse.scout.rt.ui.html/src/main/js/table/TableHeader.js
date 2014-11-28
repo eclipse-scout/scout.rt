@@ -58,7 +58,7 @@ scout.TableHeader = function(table, session) {
     var startX = event.pageX,
       $header = $(this).prev(),
       headerWidth = parseFloat($header.css('min-width')),
-      totalWidth = parseFloat(that.table.findRows().eq(0).css('width'));
+      totalWidth = parseFloat(that.table.$rows().eq(0).css('width'));
 
     $('body').addClass('col-resize')
       .on('mousemove', '', resizeMove)

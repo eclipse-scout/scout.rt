@@ -27,8 +27,8 @@ scout.TableSelectionHandler.prototype._onRowsDrawn = function($rows) {
     var $row = $(event.delegateTarget),
       add = true,
       first,
-      $selectedRows = that.table.findSelectedRows(),
-      $allRows = that.table.findRows(),
+      $selectedRows = that.table.$selectedRows(),
+      $allRows = that.table.$rows(),
       selectionChanged = false;
 
     // click without ctrl always starts new selection, with ctrl toggle
@@ -80,7 +80,7 @@ scout.TableSelectionHandler.prototype._onRowsDrawn = function($rows) {
         that._clearSelectionBorder($selectedRows);
       }
 
-      $selectedRows = that.table.findSelectedRows();
+      $selectedRows = that.table.$selectedRows();
       that._clearSelectionBorder($selectedRows);
       that._drawSelectionBorder($selectedRows);
       that.table.triggerRowsSelected($selectedRows);
@@ -116,7 +116,7 @@ scout.TableSelectionHandler.prototype.drawSelection = function() {
 };
 
 scout.TableSelectionHandler.prototype.clearSelection = function(dontFire) {
-  var $selectedRows = this.table.findSelectedRows();
+  var $selectedRows = this.table.$selectedRows();
   $selectedRows.select(false);
   this._clearSelectionBorder($selectedRows);
 
@@ -126,7 +126,7 @@ scout.TableSelectionHandler.prototype.clearSelection = function(dontFire) {
 };
 
 scout.TableSelectionHandler.prototype.dataDrawn = function() {
-  var $selectedRows = this.table.findSelectedRows();
+  var $selectedRows = this.table.$selectedRows();
 
   this._clearSelectionBorder($selectedRows);
   this._drawSelectionBorder($selectedRows);
@@ -163,7 +163,7 @@ scout.TableSelectionHandler.prototype._clearSelectionBorder = function($selected
 scout.TableSelectionHandler.prototype.selectAll = function() {
   this.clearSelection(true);
 
-  var $rows = this.table.findRows();
+  var $rows = this.table.$rows();
   $rows.select(true);
 
   this._drawSelectionBorder($rows);
