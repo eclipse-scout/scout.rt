@@ -56,6 +56,9 @@ scout.KeystrokeManager.prototype.installAdapter = function($element, adapter) {
   if (!adapter) {
     throw new Error("missing argument 'adapter'");
   }
+  if (this.isAdapterInstalled(adapter)) {
+    return;
+  }
 
   var controller = function(event) {
     var i, handler, accepted;
@@ -84,6 +87,10 @@ scout.KeystrokeManager.prototype.installAdapter = function($element, adapter) {
   adapter.$target = $element;
   adapter.controller = controller;
   $element.keydown(controller);
+};
+
+scout.KeystrokeManager.prototype.isAdapterInstalled = function(adapter) {
+  return this._adapters.indexOf(adapter) > -1;
 };
 
 scout.KeystrokeManager.prototype.uninstallAdapter = function(adapter) {

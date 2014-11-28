@@ -8,7 +8,7 @@ scout.Table = function() {
   this._$scrollable;
   this.header;
   this.selectionHandler;
-  this._keystrokeAdapter;
+  this.keystrokeAdapter;
   this.columns = [];
   this.controls = [];
   this.menus = [];
@@ -28,7 +28,7 @@ scout.Table.GUI_EVENT_FILTER_RESETTED = 'filterResetted';
 
 scout.Table.prototype.init = function(model, session) {
   scout.Table.parent.prototype.init.call(this, model, session);
-  this._keystrokeAdapter = new scout.TableKeystrokeAdapter(this);
+  this.keystrokeAdapter = new scout.TableKeystrokeAdapter(this);
   for (var i = 0; i < this.columns.length; i++) {
     this.columns[i].index = i;
   }
@@ -44,16 +44,9 @@ scout.Table.prototype._render = function($parent) {
   this.htmlComp.setLayout(layout);
   this.htmlComp.pixelBasedSizing = false;
 
-  if ($parent.hasClass('desktop-bench')) {
-    // TODO cru: desktop table (no input focus required to trigger table keystrokes), is body ok?
-    // input A.WE eine komponente sollte nie etwas von seinen parents wissen,
-    //   das reduziert die wiederverwendbarkeit der komponente --> refactor: bench oder form
-    //   _setzen_ einen keystroke adapter auf der Table.
-    scout.keystrokeManager.installAdapter($('body'), this._keystrokeAdapter);
-  } else {
-    // independent table, i.e. inside form (input focus required to trigger table keystrokes)
+  if (!scout.keystrokeManager.isAdapterInstalled(this.keystrokeAdapter)) {
     this.$container.attr('tabIndex', 0);
-    scout.keystrokeManager.installAdapter(this.$container, this._keystrokeAdapter);
+    scout.keystrokeManager.installAdapter(this.$container, this.keystrokeAdapter);
   }
 
   this.$data = this.$container.appendDiv('table-data');
@@ -98,7 +91,7 @@ scout.Table.prototype._createFooter = function() {
 };
 
 scout.Table.prototype.dispose = function() {
-  scout.keystrokeManager.uninstallAdapter(this._keystrokeAdapter);
+  scout.keystrokeManager.uninstallAdapter(this.keystrokeAdapter);
 };
 
 scout.Table.prototype.clearSelection = function() {

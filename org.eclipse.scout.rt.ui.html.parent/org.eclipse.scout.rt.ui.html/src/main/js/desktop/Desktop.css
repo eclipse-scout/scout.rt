@@ -1,14 +1,18 @@
 /* main elements */
 .desktop {
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   bottom: 0;
   right: 0;
+
+  &:focus {
+    outline: none;
+  }
 }
 
 .desktop-bench {
-  position: fixed;
+  position: absolute;
   top: @size-desktop-tools;
   left: @size-desktop-navigation;
   right: 0;
@@ -28,7 +32,7 @@
 /* taskbar */
 
 .desktop-taskbar {
-  position: fixed;
+  position: absolute;
   top: 0px;
   left: @size-desktop-navigation;
   right: 0px;

@@ -32,7 +32,7 @@ scout.Form.prototype._render = function($parent) {
   } else {
     detachable = this.displayHint === 'dialog' && !this.modal;
   }
-  if (window.scout.sessions.length > 1 || this.session.parentJsonSession) {
+  if (scout.sessions.length > 1 || this.session.parentJsonSession) {
     // Cannot detach if...
     // 1. there is more than one session inside the window (portlets), because
     //    we would not know which session to attach to.

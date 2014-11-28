@@ -269,6 +269,10 @@ scout.Desktop.prototype.updateOutlineTab = function(content, title, subTitle) {
   this._selectTab(this._outlineTab);
 
   if (!content.rendered) {
+    if (content.objectType === 'Table') {
+      // Install adapter on parent (no table focus required)
+      scout.keystrokeManager.installAdapter(this.$parent, content.keystrokeAdapter);
+    }
     content.render(this.$bench);
     // FIXME CGU: maybe include in render?
     content.htmlComp.layout();

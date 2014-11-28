@@ -3,13 +3,25 @@
  */
 scout.init = function(initOptions) {
   var tabId = '' + new Date().getTime();
-  window.scout.sessions = []; // FIXME BSH Detach | Needed for detaching windows, but can we do this better???
+  initOptions = initOptions || {};
+
+  scout.sessions = [];
   $('.scout').each(function() {
-    var portletPartId = $(this).data('partid') || '0';
-    var jsonSessionId = [portletPartId, tabId].join(':');
-    var session = new scout.Session($(this), jsonSessionId, initOptions);
+    var $focusedPart, session, jsonSessionId,
+      $container = $(this),
+      portletPartId = $(this).data('partid') || '0',
+      focusFirstPart = initOptions.focusFirstPart !== undefined ? initOptions.focusFirstPart : true;
+
+    jsonSessionId = [portletPartId, tabId].join(':'),
+    session = new scout.Session($container, jsonSessionId, initOptions);
     session.init();
-    window.scout.sessions.push(session);
+    scout.sessions.push(session);
+
+    $container.attr('tabindex', portletPartId);
+    if (focusFirstPart && !$focusedPart) {
+      $focusedPart = $container;
+      $focusedPart.focus();
+    }
   });
 };
 
