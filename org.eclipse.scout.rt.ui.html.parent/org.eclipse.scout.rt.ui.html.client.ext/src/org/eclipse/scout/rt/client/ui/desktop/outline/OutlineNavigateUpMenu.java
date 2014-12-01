@@ -13,17 +13,17 @@ public class OutlineNavigateUpMenu extends AbstractOutlineNavigationMenu {
   }
 
   @Override
-  boolean isDetail(IPage5 page5) {
+  protected boolean isDetail(IPage5 page5) {
     return !page5.isDetailFormVisible();
   }
 
   @Override
-  void showDetail(IPage page) {
+  protected void showDetail(IPage page) {
     ((IPage5) page).setDetailFormVisible(true);
   }
 
   @Override
-  IMenuType getMenuType() {
+  protected IMenuType getMenuType() {
     return TableMenuType.EmptySpace;
   }
 

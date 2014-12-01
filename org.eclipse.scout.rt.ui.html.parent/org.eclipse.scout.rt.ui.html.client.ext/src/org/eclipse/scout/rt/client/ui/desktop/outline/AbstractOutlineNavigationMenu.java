@@ -26,7 +26,7 @@ import org.eclipse.scout.rt.shared.ui.menu.AbstractMenu5;
 
 // TODO AWE: (navi) wenn klick in baum, wieder detailForm anzeigen
 // - home button implementieren, wenn auf top-level
-
+// TODO BSH OutlineNavigationButton | Cleanup and comment this class
 public abstract class AbstractOutlineNavigationMenu extends AbstractMenu5 {
 
   private IOutline m_outline;
@@ -70,10 +70,10 @@ public abstract class AbstractOutlineNavigationMenu extends AbstractMenu5 {
     return false;
   }
 
-  private void updateMenuState() {
+  protected void updateMenuState() {
     IPage activePage = m_outline.getActivePage();
     setText(isDrill(activePage) ? m_text1 : m_text2);
-    setEnabled(activePage.getTreeLevel() > 0);
+    setEnabled(activePage != null && activePage.getTreeLevel() > 0);
   }
 
   @Override
@@ -86,7 +86,7 @@ public abstract class AbstractOutlineNavigationMenu extends AbstractMenu5 {
     return CollectionUtility.hashSet(OutlineMenuType.Navigation, getMenuType());
   }
 
-  private boolean isDrill(IPage page) {
+  protected boolean isDrill(IPage page) {
     if (page instanceof IPage5) {
       IPage5 page5 = (IPage5) page;
       if (page5 instanceof IPageWithTable) {
@@ -111,16 +111,15 @@ public abstract class AbstractOutlineNavigationMenu extends AbstractMenu5 {
     }
   }
 
-  final IOutline getOutline() {
+  protected final IOutline getOutline() {
     return m_outline;
   }
 
-  abstract boolean isDetail(IPage5 page5);
+  protected abstract boolean isDetail(IPage5 page5);
 
-  abstract void showDetail(IPage page);
+  protected abstract void showDetail(IPage page);
 
-  abstract void doDrill(IPage page);
+  protected abstract void doDrill(IPage page);
 
-  abstract IMenuType getMenuType();
-
+  protected abstract IMenuType getMenuType();
 }
