@@ -14,12 +14,28 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class AbstractDesktop5 extends AbstractDesktop implements IDesktop5 {
-
   private List<Object> m_addOns = new ArrayList<>();
+
+  protected AbstractDesktop5() {
+    super();
+  }
+
+//FIXME imo scout erweiterung in IDesktop
+  protected AbstractDesktop5(boolean callInitializer) {
+    // super(callInitializer);
+  }
+
+  protected void callInitializer() {
+    // initConfig();
+  }
 
   @Override
   public List<Object> getAddOns() {
     return m_addOns;
+  }
+
+  public void addAddOn(Object addOn) {
+    m_addOns.add(addOn);
   }
 
 }

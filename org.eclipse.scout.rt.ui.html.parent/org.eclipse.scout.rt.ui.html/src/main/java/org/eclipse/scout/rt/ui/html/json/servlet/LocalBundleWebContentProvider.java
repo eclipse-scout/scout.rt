@@ -28,6 +28,8 @@ public class LocalBundleWebContentProvider extends AbstractService implements IS
   private static final String LAST_MODIFIED = "Last-Modified"; //$NON-NLS-1$
   private static final String IF_MODIFIED_SINCE = "If-Modified-Since"; //$NON-NLS-1$
   private static final String IF_NONE_MATCH = "If-None-Match"; //$NON-NLS-1$
+  private static final int SIZE_8192 = 8192;
+  private static final int IF_MODIFIED_SINCE_DELTA = 999;
   private static final String ETAG = "ETag"; //$NON-NLS-1$
 
   private Bundle m_bundle;
@@ -138,7 +140,7 @@ public class LocalBundleWebContentProvider extends AbstractService implements IS
     if (pathInfo == null) {
       return null;
     }
-    if (pathInfo.equals("/")) {
+    if ("/".equals(pathInfo)) {
       pathInfo = getIndexResolver().resolve(req);
     }
     return getBundleWebContentFolder() + pathInfo;
@@ -155,7 +157,7 @@ public class LocalBundleWebContentProvider extends AbstractService implements IS
   /**
    * Checks whether the file needs to be returned or not, depending on the request headers and file modification state.
    * Also writes cache headers (last modified and etag) if the file needs to be returned.
-   * 
+   *
    * @return {@link HttpServletResponse#SC_NOT_MODIFIED} if the file hasn't changed in the meantime or
    *         {@link HttpServletResponse#SC_ACCEPTED} if the content of the file needs to be returned.
    */
@@ -179,7 +181,7 @@ public class LocalBundleWebContentProvider extends AbstractService implements IS
       // for purposes of comparison we add 999 to ifModifiedSince since the
       // fidelity
       // of the IMS header generally doesn't include milli-seconds
-      if (ifModifiedSince > -1 && lastModified > 0 && lastModified <= (ifModifiedSince + 999)) {
+      if (ifModifiedSince > -1 && lastModified > 0 && lastModified <= (ifModifiedSince + IF_MODIFIED_SINCE_DELTA)) {
         return HttpServletResponse.SC_NOT_MODIFIED;
       }
     }
@@ -199,7 +201,7 @@ public class LocalBundleWebContentProvider extends AbstractService implements IS
     ByteArrayOutputStream os = new ByteArrayOutputStream();
     InputStream is = url.openStream();
     try {
-      byte[] buffer = new byte[8192];
+      byte[] buffer = new byte[SIZE_8192];
       int bytesRead = is.read(buffer);
       while (bytesRead != -1) {
         os.write(buffer, 0, bytesRead);
