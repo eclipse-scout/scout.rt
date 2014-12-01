@@ -4,7 +4,7 @@
    <extension
          point="org.eclipse.scout.service.services">
       <service
-            class="org.eclipse.scout.rt.ui.html.json.servlet.LocalBundleResourceProvider"
+            class="org.eclipse.scout.rt.ui.html.json.servlet.LocalBundleWebContentProvider"
             createImmediately="false">
       </service>
       <service

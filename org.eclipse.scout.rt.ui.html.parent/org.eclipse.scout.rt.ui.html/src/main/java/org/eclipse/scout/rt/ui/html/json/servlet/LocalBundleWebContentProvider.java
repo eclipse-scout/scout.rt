@@ -22,9 +22,9 @@ import org.osgi.framework.ServiceRegistration;
 /**
  * Serve files from the contributing bundles 'WebContent' folder as "/"
  */
-public class LocalBundleResourceProvider extends AbstractService implements IServletResourceProvider {
+public class LocalBundleWebContentProvider extends AbstractService implements IServletWebContentProvider {
   private static final long serialVersionUID = 1L;
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(LocalBundleResourceProvider.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(LocalBundleWebContentProvider.class);
   private static final String LAST_MODIFIED = "Last-Modified"; //$NON-NLS-1$
   private static final String IF_MODIFIED_SINCE = "If-Modified-Since"; //$NON-NLS-1$
   private static final String IF_NONE_MATCH = "If-None-Match"; //$NON-NLS-1$

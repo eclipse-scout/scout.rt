@@ -42,8 +42,8 @@ public class MainRequestInterceptor extends AbstractService implements IServletR
   @Override
   public boolean interceptGet(AbstractJsonServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     //delegate to static resources
-    IServletResourceProvider[] providers = SERVICES.getServices(IServletResourceProvider.class);
-    for (IServletResourceProvider provider : providers) {
+    IServletWebContentProvider[] providers = SERVICES.getServices(IServletWebContentProvider.class);
+    for (IServletWebContentProvider provider : providers) {
       if (provider.handle(servlet, req, resp)) {
         return true;
       }

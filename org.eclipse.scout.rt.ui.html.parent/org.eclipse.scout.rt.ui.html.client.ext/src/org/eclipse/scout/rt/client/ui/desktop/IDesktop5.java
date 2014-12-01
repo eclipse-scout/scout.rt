@@ -16,9 +16,11 @@ public interface IDesktop5 extends IDesktop {
 
   /**
    * Returns a list of untyped add-ons for the Desktop.
-   * 
+   *
    * @return
    */
   List<Object> getAddOns();
 
+  //FIXME imo also add
+  //void addAddOn(Object addOn) ;
 }

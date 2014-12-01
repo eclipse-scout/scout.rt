@@ -12,9 +12,9 @@ import org.eclipse.scout.service.IService;
 /**
  * This interceptor contributes static web resources to the {@link AbstractJsonServlet}
  * <p>
- * {@link LocalBundleResourceProvider} serve files from the bundles 'WebContent' folder
+ * {@link LocalBundleWebContentProvider} serve files from the bundles 'WebContent' folder
  */
-public interface IServletResourceProvider extends IService {
+public interface IServletWebContentProvider extends IService {
 
   /**
    * @return true if the request was consumed by the provider, no further action is then necessary

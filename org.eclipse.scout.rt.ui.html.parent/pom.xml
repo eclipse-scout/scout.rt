@@ -36,7 +36,6 @@
     <module>org.eclipse.scout.rt.ui.html-feature</module>
     <module>org.eclipse.scout.rt.ui.html.updatesite</module>
     <module>org.eclipse.scout.rt.ui.html.client.ext</module>
-    <module>org.eclipse.scout.rt.ui.html.officeonline</module>
     <module>org.eclipse.scout.rt.ui.html.less</module>
   </modules>
 
