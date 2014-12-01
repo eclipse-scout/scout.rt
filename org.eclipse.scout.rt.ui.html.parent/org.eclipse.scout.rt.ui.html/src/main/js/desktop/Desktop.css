@@ -154,7 +154,7 @@
   margin-right: 13px;
   width: 40px;
   height: 33px;
-  background: url("logo.png");
+  background: url('logo.png');
   background-size: contain;
   background-repeat: no-repeat;
 }
@@ -200,15 +200,6 @@ Middle rows dont have 2px border so no need to do it for those. */
 
 /* base desktop */
 
-.timeout-message {
-  border: 1px solid red;
-  background-color: rgb(255, 200, 200);
-  padding: 5px;
-  color: rgb(150,0,0);
-  max-width: 300px;
-  margin: 20px auto;
-}
-
 .offline-message {
   border: 1px solid @palette-bsi-green;
   background-color: #eee;
@@ -232,7 +223,7 @@ Middle rows dont have 2px border so no need to do it for those. */
 
 .reconnect-animated:before {
   .animation(rotation 0.9s linear infinite);
-  content: " ";
+  content: '';
   display: inline-block;
   vertical-align: middle;
   margin-left: 6px;
@@ -251,5 +242,6 @@ Middle rows dont have 2px border so no need to do it for those. */
   left: 0;
   bottom: 0;
   right: 0;
-  background-color: rgba(0,0,0,0.1);
+  background-color: rgba(0, 0, 0, 0.2);
+  z-index: 9999;
 }

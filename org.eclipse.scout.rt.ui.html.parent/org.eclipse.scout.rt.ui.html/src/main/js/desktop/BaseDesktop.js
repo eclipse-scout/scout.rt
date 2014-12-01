@@ -6,13 +6,22 @@ scout.BaseDesktop = function() {
 };
 scout.inherits(scout.BaseDesktop, scout.ModelAdapter);
 
-scout.BaseDesktop.prototype.showMessage = function(message, type) {
-  type = type || 'info';
-
-  if (!this.$message) {
-    this.$message = this.$parent.prependDiv(type + '-message');
-  }
-  this.$message.text(message);
+scout.BaseDesktop.prototype.showFatalMessage = function(title, text, buttonName, buttonAction) {
+  var that = this;
+  var $glasspane = this.$parent.appendDiv('glasspane');
+  var ui = new scout.MessageBoxUI({
+    title: title,
+    iconId: undefined,
+    severity: 4,
+    introText: text,
+    actionText: undefined,
+    yesButtonText: buttonName,
+    onButtonClicked: function($button, event) {
+      buttonAction.apply(that);
+    }
+  });
+  ui.render($glasspane);
+  ui.renderProperties();
 };
 
 scout.BaseDesktop.prototype._goOffline = function() {

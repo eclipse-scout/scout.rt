@@ -1,6 +1,7 @@
 /* ------------------------ */
 /* Color Palette Definition */
 /* ------------------------ */
+
 @palette-black:#000;
 
 @palette-dark-gray-1: #333;
@@ -28,14 +29,12 @@
 @palette-bsi-light-green: #389DB6;
 @palette-bsi-dark-green: #006983;
 
-
 /* ------------------------ */
 /* Global Color Definitions */
 /* ------------------------ */
+
 //@color-nav: #41525E;
 //@color-nav-semi: #506678;
-
-
 // for UGM;)
 @color-nav: #004A5C;
 @color-nav-semi: #00657D;
@@ -49,6 +48,7 @@
 
 @color-error: @palette-red;
 @color-error-light: @palette-light-red;
+@color-error-glow: fade(@color-error, 50%);
 
 @body-background-color: @palette-light-gray-6;
 @border-color: @palette-light-gray-3;
@@ -68,7 +68,7 @@
 @disabled-color: @palette-light-gray-1;
 @hover-color: @palette-bsi-green;
 @focus-color: @palette-bsi-green;
-@focus-color-glow: rgba(0, 130, 161, 0.5);
+@focus-color-glow: fade(@focus-color, 50%);
 @active-color: @palette-bsi-green;
 @highlight-color: @palette-bsi-orange;
 @selection-background-color: @palette-bsi-light-green-0;
@@ -90,4 +90,3 @@
 
 @selection-color: @palette-white;
 @selection-background: @palette-bsi-dark-green;
-

@@ -287,10 +287,18 @@ scout.Session.prototype._processErrorResponse = function(request, jqXHR, textSta
 
   var jsonResponse = jqXHR.responseJSON;
   if (jsonResponse && jsonResponse.errorMessage) {
-    this.$entryPoint.html('');
     if (this.desktop) {
-      this.desktop.showMessage(jsonResponse.errorMessage, 'timeout');
+      var buttonName, buttonAction;
+      // TODO BSH Text | Reload, Serverfehler
+      if (jsonResponse.errorCode === 10) {
+        buttonName = 'Reload';
+        buttonAction = function() {
+          window.location.reload();
+        };
+      }
+      this.desktop.showFatalMessage('Serverfehler', jsonResponse.errorMessage, buttonName, buttonAction);
     } else {
+      this.$entryPoint.html('');
       this.$entryPoint.text(jsonResponse.errorMessage);
     }
     return;

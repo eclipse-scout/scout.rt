@@ -107,8 +107,7 @@
 
   // append svg
   $.fn.appendSVG = function(type, id, cssClass, htmlContent) {
-    return $.makeSVG(type, id, cssClass, htmlContent)
-      .appendTo(this);
+    return $.makeSVG(type, id, cssClass, htmlContent).appendTo(this);
   };
 
   $.pxToNumber = function(pixel) {
@@ -375,6 +374,30 @@
 
   $.fn.disableSpellcheck = function() {
     return this.attr('spellcheck', false);
+  };
+
+  /**
+   * Makes any element movable with the mouse. If the argument '$handle' is missing, the entire
+   * element can be used as a handle.
+   */
+  $.fn.makeDraggable = function($handle) {
+    var $draggable = this;
+    $handle = $handle || $draggable;
+    return $handle.on("mousedown.draggable", function(event) {
+      var orig_offset = $draggable.offset();
+      var orig_event = event;
+      $handle.parents()
+        .on("mousemove.dragging", function(event) {
+          $draggable.offset({
+            top: orig_offset.top + (event.pageY - orig_event.pageY),
+            left: orig_offset.left + (event.pageX - orig_event.pageX)
+          });
+        })
+        .on("mouseup.dragging", function(e) {
+          $handle.parents().off('.dragging');
+        });
+      event.preventDefault();
+    });
   };
 
 }(jQuery));

@@ -14,6 +14,17 @@
   &.severity-error {
     border-top-color: @color-error;
   }
+
+  & .drag-handle {
+    content: '';
+    width: 100%;
+    height: 20px;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    margin-top: -5px; /* same as border top of .messagebox */
+    cursor: move;
+  }
 }
 
 .messagebox.shown {
@@ -42,6 +53,7 @@
     padding: 12px;
     background-color: @palette-light-gray-5;
     border: 1px solid @color-messagebox-border;
+    cursor: pointer;
   }
 
   & > button:first-child {
@@ -56,15 +68,14 @@
     border-left-width: 0px;
   }
 
-  & > button:focus{
+  & > button:focus {
     outline: none;
   }
 
-  & > button:focus:before{
+  & > button:focus:before {
     .focus-border;
-    z-index: 1;
-
     .overlay(2px, 2px, -4px, -4px);
+    z-index: 1;
   }
 
   & > button:first-child:focus:before {
@@ -73,5 +84,10 @@
 
   & > button:last-child:focus:before {
     border-bottom-right-radius: @border-radius;
+  }
+
+  .severity-error & > button:focus:before {
+    border-color: @color-error;
+    .glow(@color-error-glow);
   }
 }
