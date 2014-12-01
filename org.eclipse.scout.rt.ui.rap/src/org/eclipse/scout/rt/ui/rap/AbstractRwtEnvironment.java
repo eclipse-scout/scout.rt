@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.ui.rap;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,6 +31,9 @@ import javax.servlet.http.HttpSessionBindingListener;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.ISafeRunnable;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.rap.rwt.RWT;
 import org.eclipse.rap.rwt.application.AbstractEntryPoint;
@@ -40,6 +42,7 @@ import org.eclipse.rap.rwt.internal.protocol.RequestMessage;
 import org.eclipse.rap.rwt.internal.protocol.ResponseMessage;
 import org.eclipse.rap.rwt.internal.remote.MessageFilter;
 import org.eclipse.rap.rwt.internal.remote.MessageFilterChain;
+import org.eclipse.rap.rwt.service.UISession;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.EventListenerList;
@@ -128,6 +131,8 @@ import org.osgi.framework.Bundle;
 @SuppressWarnings({"restriction", "deprecation"})
 public abstract class AbstractRwtEnvironment extends AbstractEntryPoint implements IRwtEnvironment {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractRwtEnvironment.class);
+
+  private static final String CLIENT_SESSION_LIFECYCLE = AbstractRwtEnvironment.class.getName() + "#CSL";
 
   private Subject m_subject;
 
@@ -449,35 +454,84 @@ public abstract class AbstractRwtEnvironment extends AbstractEntryPoint implemen
   }
 
   /**
-   * As default, the {@link IClientSession} is attached to the http session. This means, the client session lives as
-   * long the http session lives. If the http session expires, the client session will be stopped.
-   * <p>
-   * This method creates and loads a new client session if there is no client session attached to the http session yet.
-   * If there already is one attached, the attached session will be returned.
+   * This method is called every time a new {@link UISession} is created. This happens if:
+   * <ul>
+   * <li>the user visits the web application for the first time;</li>
+   * <li>the user reloads the web application by either the browser's address bar or reload button;</li>
+   * </ul>
+   * To enhance the user's experience, a new {@link IClientSession} is only created once the user enters the application
+   * for the first time, accesses the web application in another resolution (e.g. /tablet instead of /web) or a
+   * different {@link Subject} or the {@link HttpSession} was invalidated due to a session timeout.
    */
   protected IClientSession initClientSession(UserAgent userAgent) {
-    HttpSession httpSession = RWT.getUISession().getHttpSession();
-    IClientSession clientSession = (IClientSession) httpSession.getAttribute(IClientSession.class.getName());
-    if (clientSession != null) {
-      //If the subject has changed always create a new clientSession
-      //Also create a new clientSession if the userAgent changed (f.e. switch from /web to /mobile)
-      if (!getSubject().equals(clientSession.getSubject()) || !userAgent.equals(clientSession.getUserAgent())) {
-        // Force the current client session to be closed. This call blocks until the client session is terminated (see P_HttpSessionInvalidationListener).
-        // Removing the object from the httpSession will trigger the valueUnbound method, which actually closes the application.
-        httpSession.setAttribute(P_HttpSessionInvalidationListener.class.getName(), null);
+    final HttpSession httpSession = RWT.getUISession().getHttpSession();
+    final IClientSession clientSession = (IClientSession) httpSession.getAttribute(IClientSession.class.getName());
 
-        //Make sure a new client session will be initialized
-        clientSession = null;
-      }
-    }
+    // Create ClientSession at first login.
     if (clientSession == null || !clientSession.isActive()) {
-      LocaleThreadLocal.set(RwtUtility.getBrowserInfo().getLocale());
-      clientSession = SERVICES.getService(IClientSessionRegistryService.class).newClientSession(m_clientSessionClazz, getSubject(), UUID.randomUUID().toString(), userAgent);
-
-      httpSession.setAttribute(IClientSession.class.getName(), clientSession);
-      httpSession.setAttribute(P_HttpSessionInvalidationListener.class.getName(), new P_HttpSessionInvalidationListener(clientSession, this));
+      return createNewSession(httpSession, userAgent);
     }
 
+    // Create ClientSession at subject or userAgent change.
+    boolean subjectChanged = !getSubject().equals(clientSession.getSubject());
+    boolean userAgentChanged = !userAgent.equals(clientSession.getUserAgent());
+
+    if (subjectChanged || userAgentChanged) {
+      httpSession.setAttribute(CLIENT_SESSION_LIFECYCLE, null); // Close the current session by removing the attribute from the httpSession - this triggers the valueUnbound method which in turn destroys the ClientSession.
+      return createNewSession(httpSession, userAgent);
+    }
+
+    return clientSession;
+  }
+
+  /**
+   * Callback for creating a new {@link IClientSession}.
+   */
+  protected IClientSession createNewSession(HttpSession httpSession, UserAgent userAgent) {
+    // Create and register a new ClientSession.
+    LocaleThreadLocal.set(RwtUtility.getBrowserInfo().getLocale());
+    final IClientSession clientSession = SERVICES.getService(IClientSessionRegistryService.class).newClientSession(m_clientSessionClazz, getSubject(), UUID.randomUUID().toString(), userAgent);
+
+    httpSession.setAttribute(IClientSession.class.getName(), clientSession);
+
+    // Register callback for HttpSession-invalidation.
+    httpSession.setAttribute(CLIENT_SESSION_LIFECYCLE, new HttpSessionBindingListener() {
+
+      @Override
+      public void valueBound(HttpSessionBindingEvent event) {
+        // NOOP
+      }
+
+      @Override
+      public void valueUnbound(final HttpSessionBindingEvent event) {
+        // Use SafeRunner to never propagate an exception which might crash the application server.
+        SafeRunner.run(new ISafeRunnable() {
+
+          @Override
+          public void run() throws Exception {
+            destroyApplication(event, clientSession);
+          }
+
+          @Override
+          public void handleException(Throwable e) {
+            String msg = new StringBuffer()
+                .append(" [thread=").append(Thread.currentThread())
+                .append(", httpSession=").append(event.getSession().getId())
+                .append(", clientSession=").append(clientSession)
+                .append(", environment=").append(AbstractRwtEnvironment.this)
+                .append(", userAgent=").append(clientSession.getUserAgent())
+                .append("]").toString();
+
+            if (Platform.isRunning()) {
+              LOG.error("Failed to stop application." + msg, e);
+            }
+            else {
+              LOG.warn("Failed to stop application because platform was already terminated." + msg, e);
+            }
+          }
+        });
+      }
+    });
     return clientSession;
   }
 
@@ -1478,60 +1532,47 @@ public abstract class AbstractRwtEnvironment extends AbstractEntryPoint implemen
 
   }
 
-  private static final class P_HttpSessionInvalidationListener implements HttpSessionBindingListener, Serializable {
-    private static final long serialVersionUID = 7099577980770179637L;
-    private final IClientSession m_clientSession;
-    private final AbstractRwtEnvironment m_environment;
-
-    public P_HttpSessionInvalidationListener(IClientSession clientSession, AbstractRwtEnvironment environment) {
-      m_clientSession = clientSession;
-      m_environment = environment;
+  /**
+   * Destroys the application by stopping the {@link IClientSession}.
+   */
+  protected void destroyApplication(HttpSessionBindingEvent event, IClientSession clientSession) {
+    // Only stop the session if not already done, e.g. by a manual logout of the user.
+    final IDesktop desktop = clientSession.getDesktop();
+    if (!clientSession.isActive() || desktop == null || !desktop.isOpened()) {
+      return;
     }
 
-    @Override
-    public void valueBound(HttpSessionBindingEvent event) {
+    if (LOG.isInfoEnabled()) {
+      String msg = "ClientSession is going down [thread={0}, httpSession={1}, clientSession={2}, environment={3}, userAgent={4}]";
+      LOG.info(msg, new Object[]{Thread.currentThread(), event.getSession().getId(), clientSession, this, clientSession.getUserAgent()});
     }
 
-    @Override
-    public void valueUnbound(HttpSessionBindingEvent event) {
-      // Only stop the session if not already done, e.g. by a manual logout of the user.
-      final IDesktop desktop = m_clientSession.getDesktop();
-      if (!m_clientSession.isActive() || desktop == null || !desktop.isOpened()) {
-        return;
+    // Synchronize with Scout model job to stop the application.
+    ClientJob job = new ClientSyncJob("HTTP session invalidator", clientSession) {
+
+      @Override
+      protected void runVoid(IProgressMonitor monitor) throws Throwable {
+        // Fire a forced close request to prevent the user from interrupting the process in Desktop#execBeforeClosing.
+        // Mostly the shutdown process cannot be prevented anyway because #valueUnbound is called when the HttpSession gets expired
+        // except for being invoked when the user agent is switched. (see AbstractRwtEnvironment#initClientSession).
+        desktop.getUIFacade().fireDesktopClosingFromUI(true);
       }
+    };
+    job.schedule();
 
-      if (LOG.isInfoEnabled()) {
-        String msg = "ClientSession is going down [thread={0}, httpSession={1}, clientSession={2}, environment={3}, userAgent={4}]";
-        LOG.info(msg, new Object[]{Thread.currentThread(), event.getSession().getId(), m_clientSession, m_environment, m_clientSession.getUserAgent()});
+    // Wait for the ClientSession to be stopped for maximal 30 seconds.
+    // This is necessary if the session is stopped due to an userAgent switch; otherwise, cleanup might occur on the newly created client session.
+    Object sessionLock = clientSession.getStateLock();
+    long timeoutMillis = TimeUnit.SECONDS.toMillis(30);
+    long timeoutExpires = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(timeoutMillis);
+    synchronized (sessionLock) {
+      try {
+        while (clientSession.isActive() && System.nanoTime() < timeoutExpires) { // Conditional guard against spurious wakeup.
+          sessionLock.wait(timeoutMillis);
+        }
       }
-
-      // Synchronize with Scout model job to stop the application.
-      ClientJob job = new ClientSyncJob("HTTP session invalidator", m_clientSession) {
-
-        @Override
-        protected void runVoid(IProgressMonitor monitor) throws Throwable {
-          // Fire a forced close request to prevent the user from interrupting the process in Desktop#execBeforeClosing.
-          // Mostly the shutdown process cannot be prevented anyway because #valueUnbound is called when the HttpSession gets expired
-          // except for being invoked when the user agent is switched. (see AbstractRwtEnvironment#initClientSession).
-          desktop.getUIFacade().fireDesktopClosingFromUI(true);
-        }
-      };
-      job.schedule();
-
-      // Wait for the ClientSession to be stopped for maximal 30 seconds.
-      // This is necessary if the session is stopped due to an userAgent switch; otherwise, cleanup might occur on the newly created client session.
-      Object sessionLock = m_clientSession.getStateLock();
-      long timeoutMillis = TimeUnit.SECONDS.toMillis(30);
-      long timeoutExpires = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(timeoutMillis);
-      synchronized (sessionLock) {
-        try {
-          while (m_clientSession.isActive() && System.nanoTime() < timeoutExpires) { // Conditional guard against spurious wakeup.
-            sessionLock.wait(timeoutMillis);
-          }
-        }
-        catch (InterruptedException e) {
-          LOG.error("Interrupted while waiting for the ClientSession to be stopped.", e);
-        }
+      catch (InterruptedException e) {
+        LOG.error("Interrupted while waiting for the ClientSession to be stopped.", e);
       }
     }
   }
