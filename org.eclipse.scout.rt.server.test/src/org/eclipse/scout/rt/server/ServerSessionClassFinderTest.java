@@ -26,6 +26,7 @@ import org.junit.Test;
 /**
  * Test for {@link ServerSessionClassFinder}
  */
+@SuppressWarnings("deprecation")
 public class ServerSessionClassFinderTest {
   final IExtensionPoint servletExtensionPoint = mock(IExtensionPoint.class);
   final IExtension servletConfig = mock(IExtension.class);

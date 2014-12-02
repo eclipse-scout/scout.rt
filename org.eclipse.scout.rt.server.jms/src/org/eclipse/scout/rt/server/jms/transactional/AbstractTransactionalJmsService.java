@@ -29,7 +29,6 @@ import org.eclipse.scout.rt.server.transaction.ITransaction;
  * <p>
  * Before you can use any of the send or receive methods you must call {@link #setupConnection()}.
  */
-@SuppressWarnings("restriction")
 public abstract class AbstractTransactionalJmsService<T> extends AbstractJmsService<T> {
   private static IScoutLogger LOG = ScoutLogManager.getLogger(AbstractTransactionalJmsService.class);
 

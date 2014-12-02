@@ -50,7 +50,6 @@ import org.eclipse.scout.service.SERVICES;
  * @param <T>
  *          the type of message that should be sent and received
  */
-@SuppressWarnings("restriction")
 public abstract class AbstractJmsService<T> extends AbstractJndiService {
   private static IScoutLogger LOG = ScoutLogManager.getLogger(AbstractJmsService.class);
 

@@ -32,7 +32,6 @@ import org.eclipse.scout.rt.server.transaction.ITransactionMember;
  * @param <T>
  *          the type of message that should be sent and received
  */
-@SuppressWarnings("restriction")
 public class JmsTransactionMember<T> extends AbstractTransactionMember {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JmsTransactionMember.class);
 

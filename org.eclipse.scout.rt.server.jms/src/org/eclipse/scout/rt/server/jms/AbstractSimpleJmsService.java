@@ -42,7 +42,6 @@ import org.eclipse.scout.rt.server.transaction.ITransactionMember;
  * can start receiving messages by calling {@link #startMessageConsumerJob()} and stopping by calling
  * {@link #stopMessageConsumerJob()}.
  */
-@SuppressWarnings("restriction")
 public abstract class AbstractSimpleJmsService<T> extends AbstractJmsService<T> {
   private static IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSimpleJmsService.class);
 

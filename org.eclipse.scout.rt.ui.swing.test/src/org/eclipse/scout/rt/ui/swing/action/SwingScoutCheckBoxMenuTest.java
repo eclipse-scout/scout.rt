@@ -114,6 +114,7 @@ public class SwingScoutCheckBoxMenuTest {
       m_execActionCount.incrementAndGet();
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     protected void execToggleAction(boolean selected) throws ProcessingException {
       m_execToggleActionHolder.setValue(selected);

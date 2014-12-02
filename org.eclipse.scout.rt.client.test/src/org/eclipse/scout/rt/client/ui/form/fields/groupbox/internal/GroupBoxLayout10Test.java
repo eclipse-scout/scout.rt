@@ -24,7 +24,7 @@ import org.junit.Test;
 
 /**
  * <h4>Vertical</h4>
- * 
+ *
  * <pre>
  * -----------------------------------------
  *    Field01   |   Field02   |   Field05
@@ -34,9 +34,9 @@ import org.junit.Test;
  *    Field04   |   Field06   |   Field06
  * -----------------------------------------
  * </pre>
- * 
+ *
  * <h4>Horizontal</h4>
- * 
+ *
  * <pre>
  * -----------------------------------------
  *    Field01   |   Field02   |
@@ -46,7 +46,7 @@ import org.junit.Test;
  *    Field05   |   Field06   |   Field06
  * -----------------------------------------
  * </pre>
- * 
+ *
  * @author Andreas Hoegger
  * @since 4.0.0 M6 25.02.2014
  */
@@ -206,7 +206,7 @@ public class GroupBoxLayout10Test extends AbstractGroupBoxLayoutTest {
       }
 
       @Override
-      protected void execToggleAction(boolean selected) throws ProcessingException {
+      protected void execSelectionChanged(boolean selected) throws ProcessingException {
         getFieldByClass(Field03.class).setVisible(selected);
       }
     }

@@ -111,6 +111,7 @@ public class SwingScoutRadioButtonTest {
       m_execClickActionCount.incrementAndGet();
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     protected void execToggleAction(boolean selected) throws ProcessingException {
       m_execToggleActionHolder.setValue(selected);
