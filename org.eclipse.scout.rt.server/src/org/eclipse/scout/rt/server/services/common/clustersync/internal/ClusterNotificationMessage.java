@@ -38,4 +38,13 @@ public class ClusterNotificationMessage implements IClusterNotificationMessage {
   public String toString() {
     return "ClusterNotificationMessage [m_notification=" + m_notification + ", m_props=" + m_props + "]";
   }
+
+  @Override
+  public boolean coalesce(IClusterNotificationMessage newMessage) {
+    return (m_notification == newMessage.getNotification()) ||
+        (newMessage.getNotification().getClass() == m_notification.getClass()
+            && newMessage.getProperties().equals(m_props)
+            && newMessage.getNotification().coalesce(m_notification));
+  }
+
 }

@@ -15,6 +15,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -338,6 +339,13 @@ public class ClusterSynchronizationService extends AbstractService implements IC
     }
 
     public synchronized void addMessage(IClusterNotificationMessage m) {
+      // check if new message can be merged with existing or if it is replacing a new one
+      for (Iterator<IClusterNotificationMessage> it = m_messageQueue.iterator(); it.hasNext();) {
+        IClusterNotificationMessage existingElem = it.next();
+        if (existingElem.coalesce(m)) {
+          it.remove();
+        }
+      }
       m_messageQueue.add(m);
     }
 

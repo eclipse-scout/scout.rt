@@ -17,4 +17,13 @@ import java.io.Serializable;
  */
 public interface IClusterNotification extends Serializable {
 
+  /**
+   * Merge with another notifications of the same type.<br>
+   * Same type means notification1.getClass()==notification2.getClass()
+   *
+   * @return true if the given notification is coalesced and therefore is consumed. The given notification will be
+   *         removed from the queue.
+   */
+  boolean coalesce(IClusterNotification existingNotification0);
+
 }
