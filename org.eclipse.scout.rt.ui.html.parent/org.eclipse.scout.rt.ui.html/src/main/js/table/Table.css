@@ -103,7 +103,15 @@
 .table-data {
   position: relative;
   overflow: hidden;
+
+  /* Draw the .table-data DIV one pixel higher, over the header (for selection border). */
+  /* - To make height calculation correct, this margin has to be subtracted again */
+  /*   from .table-data's height. See TableLayout.layout() and TableFooter._resizeData(). */
+  /* - To make scrolling correct, we have to add 1px padding to the top of the scrollable. */
   margin-top: -1px;
+  & > .scrollable {
+    padding-top: 1px;
+  }
 }
 
 /* table rows */
@@ -114,10 +122,6 @@
   border-left: 1px solid transparent;
   border-right: 1px solid transparent;
   border-bottom: 1px solid @color-bench-light-border;
-}
-
-.table-row:first-child {
-  border-top: 1px solid transparent;
 }
 
 .table-row .table-cell,
@@ -159,11 +163,6 @@
   border-top: 1px solid @selection-border-color;
   /* Move the row 1px up to cover the bottom border of the previous row. */
   margin-top: -1px;
-}
-
-.table-row:first-child.selected {
-  /* The first row has a 1px transparent border-top because it is not possible to move the row 1px up due to the overlapping header. */
-  margin-top: 0px;
 }
 
 /* key box */

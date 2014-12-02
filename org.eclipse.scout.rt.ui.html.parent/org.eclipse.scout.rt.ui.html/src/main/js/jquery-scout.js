@@ -112,6 +112,7 @@
 
   $.pxToNumber = function(pixel) {
     var value = pixel.replace('px', '');
+    // TODO CGU Use parseFloat instead?
     return parseInt(value, 10);
   };
 
@@ -331,31 +332,44 @@
     return this.css('height', height + 'px');
   };
 
-  $.fn.cssMarginLeft = function(value) {
-    if (value !== undefined) {
-      return this.css('margin-left', value + 'px');
+  $.fn.cssValue = function(margin, value) {
+    margin = margin || 'margin';
+    if (value === undefined) {
+      return $.pxToNumber(this.css(margin));
     }
-    return $.pxToNumber(this.css('margin-left'));
+    return this.css(margin, value + 'px');
   };
 
-  $.fn.cssMarginBottom = function() {
-    return $.pxToNumber(this.css('margin-bottom'));
+  $.fn.cssMarginLeft = function(value) {
+    return this.cssValue('margin-left', value);
   };
 
-  $.fn.cssMarginRight = function() {
-    return $.pxToNumber(this.css('margin-right'));
+  $.fn.cssMarginBottom = function(value) {
+    return this.cssValue('margin-bottom', value);
   };
 
-  $.fn.cssBorderBottomWidth = function() {
-    return $.pxToNumber(this.css('border-bottom-width'));
+  $.fn.cssMarginRight = function(value) {
+    return this.cssValue('margin-right', value);
   };
 
-  $.fn.cssBorderLeftWidth = function() {
-    return $.pxToNumber(this.css('border-left-width'));
+  $.fn.cssMarginTop = function(value) {
+    return this.cssValue('margin-top', value);
   };
 
-  $.fn.cssBorderRightWidth = function() {
-    return $.pxToNumber(this.css('border-right-width'));
+  $.fn.cssBorderBottomWidth = function(value) {
+    return this.cssValue('border-bottom-width', value);
+  };
+
+  $.fn.cssBorderLeftWidth = function(value) {
+    return this.cssValue('border-left-width', value);
+  };
+
+  $.fn.cssBorderRightWidth = function(value) {
+    return this.cssValue('border-right-width', value);
+  };
+
+  $.fn.cssBorderTopWidth = function(value) {
+    return this.cssValue('border-top-width', value);
   };
 
   /**

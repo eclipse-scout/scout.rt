@@ -264,10 +264,13 @@ scout.TableFooter.prototype._resizeData = function(sizeContainer) {
     sizeHeader = parseFloat(that._table.header.$container.css('height'));
   }
   newOffset = sizeMenubar + sizeHeader + sizeFooter + sizeContainer;
+  newOffset += this._table.$data.cssMarginTop() + this._table.$data.cssMarginBottom();
 
   var oldH = this._table.$data.height(),
     newH = this._table.$data.css('height', 'calc(100% - ' + newOffset + 'px)').height();
 
+  // TODO CRU When dragging the table control downwards, the drawing of $data is extremely slow
+  // TODO CRU Enforce min/max height to avoid drawing errors
   //adjust table
   this._table.$data.css('height', oldH)
     .animateAVCSD('height', newH,
