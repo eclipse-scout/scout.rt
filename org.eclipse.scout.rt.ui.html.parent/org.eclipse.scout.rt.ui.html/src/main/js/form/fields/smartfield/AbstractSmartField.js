@@ -175,6 +175,8 @@ scout.AbstractSmartField.prototype._filterOptions = function() {
  * @param vararg same as in #_setStatusText(vararg)
  */
 scout.AbstractSmartField.prototype._showPopup = function(numOptions, vararg) {
+  // TODO BSH Smartfield | Diese Logik mit derjenigen in LookupStrategy.js zusammenlegen?
+  // TODO BSH Smartfield | formRowHeight stimmt nicht (css hat keine Hoehe). Insbesondere nicht mit multiline Smartfields!
   var fieldBounds = this._getInputBounds(),
     optionHeight = scout.HtmlEnvironment.formRowHeight,
     popupHeight = (numOptions + 1) * optionHeight,
@@ -191,7 +193,7 @@ scout.AbstractSmartField.prototype._showPopup = function(numOptions, vararg) {
   this._$scrollable = scout.scrollbars.install($optionsDiv, {
     invertColors: true
   });
-  scout.graphics.setSize($optionsDiv, fieldBounds.width - 2, popupHeight - optionHeight);
+  scout.graphics.setSize($optionsDiv, fieldBounds.width, popupHeight - optionHeight);
   this._setStatusText(vararg);
 };
 
@@ -203,7 +205,6 @@ scout.AbstractSmartField.prototype._onPopupMousedown = function(event) {
 /**
  * Returns the bounds of the text-input element. Subclasses may override this method when their
  * text-field is not === this.$field.
- * @returns
  */
 scout.AbstractSmartField.prototype._getInputBounds = function() {
   return scout.graphics.getBounds(this.$field);
@@ -213,12 +214,12 @@ scout.AbstractSmartField.prototype._getInputBounds = function() {
  * Adds the given options to the DOM, tries to select the selected option by comparing to the value of the text-field.
  */
 scout.AbstractSmartField.prototype._renderOptions = function(options) {
-  var i, option, htmlOption, selectedPos = -1,
+  var i, option, htmlOption, selectedPos,
     val = this.$field.val();
 
   for (i = 0; i < options.length; i++) {
     option = options[i];
-    htmlOption = option.replace(/\n/gi, "<br/>");
+    htmlOption = scout.strings.nl2br(option);
     $('<p>')
       .on('click', this._onOptionClick.bind(this))
       .appendTo(this._$scrollable)
@@ -228,7 +229,7 @@ scout.AbstractSmartField.prototype._renderOptions = function(options) {
       selectedPos = i;
     }
   }
-  if (selectedPos > -1) {
+  if (selectedPos !== undefined) {
     this._selectOption(this._get$Options(true), selectedPos);
   }
   this._updateScrollbar();

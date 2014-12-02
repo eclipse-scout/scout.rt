@@ -6,7 +6,6 @@ scout.CachedLookupStrategy = function() {
   this._smartField;
 };
 
-
 scout.CachedLookupStrategy.prototype = {
 
     filterOptions: function(query) {
@@ -70,10 +69,11 @@ scout.RemoteLookupStrategy.prototype = {
 
     // adjust size of popup to loaded options (cannot know in advance)
     var oldBounds = scout.graphics.getBounds(sf._$popup),
-      popupHeight = Math.min(10, options.length) * 29 + 29 + 3,
+      optionHeight = scout.HtmlEnvironment.formRowHeight,
+      popupHeight = (Math.min(10, options.length) + 1) * optionHeight,
       newBounds = new scout.Rectangle(oldBounds.x, oldBounds.y, oldBounds.width, popupHeight);
     scout.graphics.setBounds(sf._$popup, newBounds);
-    scout.graphics.setSize(sf._get$OptionsDiv(), newBounds.width - 4, popupHeight - 29 - 3);
+    scout.graphics.setSize(sf._get$OptionsDiv(), newBounds.width, popupHeight - optionHeight);
     sf._updateScrollbar();
     sf._renderOptions(options);
     sf._setStatusText(options.length);
