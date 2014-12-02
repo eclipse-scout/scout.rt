@@ -700,6 +700,8 @@ scout.Table.prototype.colorData = function(mode, colorColumn) {
     }
   }
 
+  // TODO CRU Don't use hardcoded colors (or make them customizable)
+  // TODO CRU Handle case where model already has set specific cell background colors
   if (mode === 'red') {
     colorFunc = function(cell, value) {
       var level = (value - minValue) / (maxValue - minValue);
@@ -726,13 +728,13 @@ scout.Table.prototype.colorData = function(mode, colorColumn) {
     colorFunc = function(cell, value) {
       var level = Math.ceil((value - minValue) / (maxValue - minValue) * 100) + '';
 
-      cell.css('background-color', '#fff');
-      cell.css('background-image', 'linear-gradient(to left, #80c1d0 0%, #80c1d0 ' + level + '%, white ' + level + '%, white 100% )');
+      cell.css('background-color', 'transparent');
+      cell.css('background-image', 'linear-gradient(to left, #80c1d0 0%, #80c1d0 ' + level + '%, transparent ' + level + '%, transparent 100% )');
     };
   } else if (mode === 'remove') {
     colorFunc = function(cell, value) {
       cell.css('background-image', '');
-      cell.css('background-color', '#fff');
+      cell.css('background-color', 'transparent');
     };
   }
 
