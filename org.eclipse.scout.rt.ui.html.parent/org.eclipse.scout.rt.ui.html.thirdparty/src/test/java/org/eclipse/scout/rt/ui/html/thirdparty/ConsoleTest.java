@@ -1,0 +1,22 @@
+/*******************************************************************************
+ * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+package org.eclipse.scout.rt.ui.html.thirdparty;
+
+
+public class ConsoleTest implements ExampleScripts {
+
+  public static void main(String[] args) throws Exception {
+    ThirdPartyScriptProcessorImpl impl = new ThirdPartyScriptProcessorImpl();
+    System.out.println("minifyJs: " + impl.minifyJs(JS_INPUT));
+    System.out.println("compileCss: " + impl.compileCss(CSS_INPUT));
+    System.out.println("minifyCss: " + impl.minifyCss(CSS_INPUT));
+  }
+}

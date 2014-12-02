@@ -15,51 +15,28 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.scout.commons.FileUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.service.AbstractService;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.ServiceRegistration;
 
 /**
- * Serve files from the contributing bundles 'WebContent' folder as "/"
+ * serve a file as a servlet resource using caches
  */
-public class LocalBundleWebContentProvider extends AbstractService implements IServletWebContentProvider {
+public class StaticResourceHandler {
   private static final long serialVersionUID = 1L;
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(LocalBundleWebContentProvider.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(StaticResourceHandler.class);
   private static final String LAST_MODIFIED = "Last-Modified"; //$NON-NLS-1$
   private static final String IF_MODIFIED_SINCE = "If-Modified-Since"; //$NON-NLS-1$
   private static final String IF_NONE_MATCH = "If-None-Match"; //$NON-NLS-1$
-  private static final int SIZE_8192 = 8192;
   private static final int IF_MODIFIED_SINCE_DELTA = 999;
   private static final String ETAG = "ETag"; //$NON-NLS-1$
+  private static final int ANY_SIZE = 8192;
 
-  private Bundle m_bundle;
-  private String m_bundleWebContentFolder;
-  private IndexResolver m_indexResolver;
-
-  @Override
-  public void initializeService(ServiceRegistration registration) {
-    super.initializeService(registration);
-    setBundle(registration.getReference().getBundle());
-    setBundleWebContentFolder("WebContent");
-    setIndexResolver(new IndexResolver());
-  }
-
-  @Override
-  public boolean handle(AbstractJsonServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    String pathInfo = req.getPathInfo();
-    pathInfo = resolvePath(req, pathInfo);
-    URL url = resolveBundleResource(pathInfo);
-    if (url == null) {
-      return false;
-    }
-
+  public void handle(AbstractJsonServlet servlet, HttpServletRequest req, HttpServletResponse resp, URL url) throws ServletException, IOException {
     URLConnection connection = url.openConnection();
     long lastModified = connection.getLastModified();
     int contentLength = connection.getContentLength();
     int status = processCacheHeaders(req, resp, lastModified, contentLength);
     if (status == HttpServletResponse.SC_NOT_MODIFIED) {
       resp.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
-      return true;
+      return;
     }
 
     //Return file regularly if the client (browser) does not already have it or if the file has changed in the meantime
@@ -67,9 +44,13 @@ public class LocalBundleWebContentProvider extends AbstractService implements IS
     resp.setContentLength(content.length);
 
     //Prefer mime type mapping from container
-    String contentType = servlet.getServletContext().getMimeType(pathInfo);
-    int lastDot = pathInfo.lastIndexOf('.');
-    String fileExtension = lastDot >= 0 ? pathInfo.substring(lastDot + 1) : pathInfo;
+    String path = url.getPath();
+    int lastSlash = path.lastIndexOf('/');
+    int lastDot = path.lastIndexOf('.');
+    String fileName = lastSlash >= 0 ? path.substring(lastSlash + 1) : path;
+    String fileExtension = lastDot >= 0 ? path.substring(lastDot + 1) : path;
+
+    String contentType = servlet.getServletContext().getMimeType(fileName);
     if (contentType == null) {
       contentType = getMsOfficeMimeTypes(fileExtension);
     }
@@ -77,14 +58,13 @@ public class LocalBundleWebContentProvider extends AbstractService implements IS
       contentType = FileUtility.getContentTypeForExtension(fileExtension);
     }
     if (contentType == null) {
-      LOG.warn("Could not determine content type of file " + pathInfo);
+      LOG.warn("Could not determine content type of file " + path);
     }
     else {
       resp.setContentType(contentType);
     }
 
     resp.getOutputStream().write(content);
-    return true;
   }
 
   /**
@@ -110,48 +90,6 @@ public class LocalBundleWebContentProvider extends AbstractService implements IS
 
   private String getMsOfficeMimeTypes(String fileExtension) {
     return EXT_TO_MIME_TYPE_MAP.get(fileExtension.toLowerCase());
-  }
-
-  protected Bundle getBundle() {
-    return m_bundle;
-  }
-
-  protected void setBundle(Bundle bundle) {
-    m_bundle = bundle;
-  }
-
-  protected String getBundleWebContentFolder() {
-    return m_bundleWebContentFolder;
-  }
-
-  protected void setBundleWebContentFolder(String folder) {
-    m_bundleWebContentFolder = folder;
-  }
-
-  protected IndexResolver getIndexResolver() {
-    return m_indexResolver;
-  }
-
-  protected void setIndexResolver(IndexResolver indexResolver) {
-    m_indexResolver = indexResolver;
-  }
-
-  protected String resolvePath(HttpServletRequest req, String pathInfo) {
-    if (pathInfo == null) {
-      return null;
-    }
-    if ("/".equals(pathInfo)) {
-      pathInfo = getIndexResolver().resolve(req);
-    }
-    return getBundleWebContentFolder() + pathInfo;
-  }
-
-  @Override
-  public URL resolveBundleResource(String resourceName) {
-    if (resourceName == null) {
-      return null;
-    }
-    return getBundle().getEntry(resourceName);
   }
 
   /**
@@ -201,7 +139,7 @@ public class LocalBundleWebContentProvider extends AbstractService implements IS
     ByteArrayOutputStream os = new ByteArrayOutputStream();
     InputStream is = url.openStream();
     try {
-      byte[] buffer = new byte[SIZE_8192];
+      byte[] buffer = new byte[ANY_SIZE];
       int bytesRead = is.read(buffer);
       while (bytesRead != -1) {
         os.write(buffer, 0, bytesRead);

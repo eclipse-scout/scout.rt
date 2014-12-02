@@ -28,30 +28,19 @@ import org.eclipse.scout.rt.ui.html.json.JsonRequest;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.JsonStartupRequest;
 import org.eclipse.scout.service.AbstractService;
-import org.eclipse.scout.service.SERVICES;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * This interceptor contributes to the {@link AbstractJsonServlet} as the default interceptor
+ * This interceptor contributes to the {@link AbstractJsonServlet} as the default json message handler
  */
-@Priority(-100)
-public class MainRequestInterceptor extends AbstractService implements IServletRequestInterceptor {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(MainRequestInterceptor.class);
+@Priority(-10)
+public class JsonMessageRequestInterceptor extends AbstractService implements IServletRequestInterceptor {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonMessageRequestInterceptor.class);
 
   @Override
   public boolean interceptGet(AbstractJsonServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    //delegate to static resources
-    IServletWebContentProvider[] providers = SERVICES.getServices(IServletWebContentProvider.class);
-    for (IServletWebContentProvider provider : providers) {
-      if (provider.handle(servlet, req, resp)) {
-        return true;
-      }
-    }
-    LOG.error("Requested file not found: " + req.getPathInfo());
-    resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-    resp.getOutputStream().print("Not Found: " + req.getPathInfo());
-    return true;
+    return false;
   }
 
   @Override

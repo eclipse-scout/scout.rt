@@ -8,13 +8,25 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.html;
+package org.eclipse.scout.rt.ui.html.thirdparty.internal.impl;
 
 import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
 
-/**
- *
- */
-public interface ITextFileLoader {
-  String read(String path) throws IOException;
+import com.yahoo.platform.yui.compressor.CssCompressor;
+
+public class MinifyCssWithYui {
+
+  public String run(String content) throws IOException {
+    try (
+        StringReader reader = new StringReader(content);
+        StringWriter writer = new StringWriter();) {
+      CssCompressor compressor = new CssCompressor(reader);
+      compressor.compress(writer, -1);
+      writer.flush();
+      return writer.toString();
+    }
+  }
+
 }

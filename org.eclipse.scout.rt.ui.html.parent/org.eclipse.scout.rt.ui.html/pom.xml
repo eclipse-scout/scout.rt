@@ -80,138 +80,22 @@
         </configuration>
       </plugin>
 
-    <plugin>
-      <groupId>org.codehaus.mojo</groupId>
-      <artifactId>exec-maven-plugin</artifactId>
-      <version>1.2.1</version>
-      <executions>
-        <execution>
-          <id>process-css</id>
-          <phase>prepare-package</phase>
-          <goals>
-            <goal>java</goal>
-          </goals>
-          <configuration>
-            <mainClass>org.eclipse.scout.rt.ui.html.ScriptProcessor</mainClass>
-            <arguments>
-              <argument>--i</argument>
-              <argument>${script.input.dir}/scout-template.css</argument>
-              <argument>--o</argument>
-              <argument>${project.build.directory}/process_script/scout-${scout.script.version}.css</argument>
-              <argument>--root</argument>
-              <argument>${project.basedir}/src/main/js</argument>
-            </arguments>
-            <classpathScope>compile</classpathScope>
-          </configuration>
-        </execution>
-        <execution>
-          <id>process-mobile-css</id>
-          <phase>prepare-package</phase>
-          <goals>
-            <goal>java</goal>
-          </goals>
-          <configuration>
-            <mainClass>org.eclipse.scout.rt.ui.html.ScriptProcessor</mainClass>
-            <arguments>
-              <argument>--i</argument>
-              <argument>${script.input.dir}/scout-mobile-template.css</argument>
-              <argument>--o</argument>
-              <argument>${project.build.directory}/process_script/scout-mobile-${scout.script.version}.css</argument>
-              <argument>--root</argument>
-              <argument>${project.basedir}/src/main/js</argument>
-            </arguments>
-            <classpathScope>compile</classpathScope>
-          </configuration>
-        </execution>
-        <execution>
-          <id>process-js</id>
-          <phase>prepare-package</phase>
-          <goals>
-            <goal>java</goal>
-          </goals>
-          <configuration>
-            <mainClass>org.eclipse.scout.rt.ui.html.ScriptProcessor</mainClass>
-            <arguments>
-              <argument>--i</argument>
-              <argument>${script.input.dir}/scout-template.js</argument>
-              <argument>--o</argument>
-              <argument>${project.build.directory}/process_script/scout-${scout.script.version}.js</argument>
-              <argument>--root</argument>
-              <argument>${project.basedir}/src/main/js</argument>
-            </arguments>
-            <classpathScope>compile</classpathScope>
-          </configuration>
-        </execution>
-        <execution>
-          <id>process-mobile-js</id>
-          <phase>prepare-package</phase>
-          <goals>
-            <goal>java</goal>
-          </goals>
-          <configuration>
-            <mainClass>org.eclipse.scout.rt.ui.html.ScriptProcessor</mainClass>
-            <arguments>
-              <argument>--i</argument>
-              <argument>${script.input.dir}/scout-mobile-template.js</argument>
-              <argument>--o</argument>
-              <argument>${project.build.directory}/process_script/scout-mobile-${scout.script.version}.js</argument>
-              <argument>--root</argument>
-              <argument>${project.basedir}/src/main/js</argument>
-            </arguments>
-            <classpathScope>compile</classpathScope>
-          </configuration>
-        </execution>
-      </executions>
-    </plugin>
-
-    <plugin>
-      <groupId>org.apache.maven.plugins</groupId>
-      <artifactId>maven-antrun-plugin</artifactId>
-      <version>1.7</version>
-      <executions>
-        <execution>
-          <id>copy</id>
-          <phase>prepare-package</phase>
-          <configuration>
-            <target name="copy fastclick to process_script for minimizing">
-              <copy file="${project.basedir}/libjs/fastclickmod-1.0.1.js" tofile="${project.build.directory}/process_script/fastclickmod-1.0.1.js" />
-            </target>
-          </configuration>
-          <goals>
-            <goal>run</goal>
-          </goals>
-        </execution>
-      </executions>
-    </plugin>
-
-
-    <!-- Minifying -->
-    <plugin>
-      <groupId>net.alchim31.maven</groupId>
-      <artifactId>yuicompressor-maven-plugin</artifactId>
-      <version>1.4.0</version>
-      <executions>
-        <execution>
-          <id>minify</id>
-          <phase>prepare-package</phase>
-          <goals>
-            <goal>compress</goal>
-          </goals>
-        </execution>
-      </executions>
-      <configuration>
-        <nosuffix>false</nosuffix>
-        <suffix>.min</suffix>
-        <force>true</force>
-        <sourceDirectory>${project.build.directory}/process_script</sourceDirectory>
-        <outputDirectory>${script.output.dir}</outputDirectory>
-      </configuration>
-    </plugin>
 
   </plugins>
 
   <pluginManagement>
     <plugins>
+
+      <!-- Disable jgit warning in workspace, when some files are not yet
+        committed -->
+      <plugin>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>tycho-packaging-plugin</artifactId>
+        <configuration>
+          <timestampProvider>jgit</timestampProvider>
+          <jgit.dirtyWorkingTree>warning</jgit.dirtyWorkingTree>
+        </configuration>
+      </plugin>
 
       <!-- Disable error message in m2e. This long xml section is only necessary
         in tycho to make it not display a red error marker... -->
@@ -224,25 +108,6 @@
         <configuration>
           <lifecycleMappingMetadata>
             <pluginExecutions>
-              <pluginExecution>
-                <pluginExecutionFilter>
-                  <groupId>
-                    net.alchim31.maven
-                  </groupId>
-                  <artifactId>
-                    yuicompressor-maven-plugin
-                  </artifactId>
-                  <versionRange>
-                    [1.4.0,)
-                  </versionRange>
-                  <goals>
-                    <goal>compress</goal>
-                  </goals>
-                </pluginExecutionFilter>
-                <action>
-                  <ignore></ignore>
-                </action>
-              </pluginExecution>
               <pluginExecution>
                 <pluginExecutionFilter>
                   <groupId>com.github.klieber</groupId>
