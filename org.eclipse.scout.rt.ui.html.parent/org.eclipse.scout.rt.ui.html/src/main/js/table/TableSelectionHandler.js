@@ -23,6 +23,8 @@ scout.TableSelectionHandler.prototype._onRowsDrawn = function($rows) {
 
   var that = this;
 
+  // TODO BSH Table Selection | Improve selection handling (up, down)
+  // TODO BSH Table Selection | Try to merge this with TableKeystrokeAdapter
   function onMouseDown(event) {
     var $row = $(event.delegateTarget),
       add = true,
@@ -90,6 +92,7 @@ scout.TableSelectionHandler.prototype._onRowsDrawn = function($rows) {
     }
 
     function onMouseUp(event) {
+      // TODO BSH Table Selection | This is way too inefficient for many rows!
       $allRows.off('.selectionHandler');
 
       that.table.onRowsSelected($selectedRows);

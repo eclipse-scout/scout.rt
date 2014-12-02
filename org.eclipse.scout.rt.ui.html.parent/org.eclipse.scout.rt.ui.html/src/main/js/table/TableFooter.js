@@ -8,13 +8,7 @@ scout.TableFooter.CONTAINER_SIZE = 340;
 
 scout.TableFooter.prototype._render = function($parent) {
   var that = this,
-    i, control, $group,
-    filter = this._table.getFilter(scout.TableFooter.FILTER_KEY),
-    filterText;
-
-  if (filter) {
-    filterText = filter.text;
-  }
+    i, control, $group, filter, filterText;
 
   this.$container = $parent.appendDiv('table-footer');
   this._$controlContainer = this.$container.appendDiv('control-container').hide();
@@ -25,7 +19,6 @@ scout.TableFooter.prototype._render = function($parent) {
 
   for (i = 0; i < this._table.controls.length; i++) {
     control = this._table.controls[i];
-
     $group = this._controlGroups[control.group];
     if (!$group) {
       $group = this._addGroup(control.group);
@@ -35,12 +28,15 @@ scout.TableFooter.prototype._render = function($parent) {
     control.render($group);
   }
 
-  scout.fields.new$TextField().
-  addClass('control-filter').
-  appendTo(this.$container).
-  on('input paste', '', $.debounce(this._onFilterInput.bind(this))).
-  attr('placeholder', this._table.session.text('FilterBy')).
-  val(filterText);
+  this._$filterField = scout.fields.new$TextField()
+    .addClass('control-filter')
+    .appendTo(this.$container)
+    .on('input paste', '', $.debounce(this._onFilterInput.bind(this)))
+    .attr('placeholder', this._table.session.text('FilterBy'));
+  filter = this._table.getFilter(scout.TableFooter.FILTER_KEY);
+  if (filter) {
+    this._$filterField.val(filter.text);
+  }
 
   // info section
   this._$controlInfo = this.$container
@@ -48,26 +44,32 @@ scout.TableFooter.prototype._render = function($parent) {
 
   this._$infoLoad = this._$controlInfo
     .appendDiv('table-info-load')
-    .on('click', '', this._table.sendReload.bind(this._table));
+    .on('click', '', this._onClickInfoLoad.bind(this));
   this._$infoFilter = this._$controlInfo
     .appendDiv('table-info-filter')
-    .on('click', '', this._table.resetFilter.bind(this._table));
+    .on('click', '', this._onClickInfoFilter.bind(this));
   this._$infoSelection = this._$controlInfo
     .appendDiv('table-info-selection')
-    .on('click', '', this._table.toggleSelection.bind(this._table));
+    .on('click', '', this._onClickInfoSelection.bind(this));
 
   this._updateInfoLoad();
   this._updateInfoLoadVisibility();
-  this._updateInfoSelection();
-  this._updateInfoSelectionVisibility();
   this._updateInfoFilter();
   this._updateInfoFilterVisibility();
+  this._updateInfoSelection();
+  this._updateInfoSelectionVisibility();
 
   this._table.events.on(scout.Table.GUI_EVENT_ROWS_DRAWN, function(event) {
     that._updateInfoLoad();
     that._updateInfoLoadVisibility();
   });
-
+  this._table.events.on(scout.Table.GUI_EVENT_ROWS_FILTERED, function(event) {
+    that._updateInfoFilter();
+    that._updateInfoFilterVisibility();
+  });
+  this._table.events.on(scout.Table.GUI_EVENT_FILTER_RESETTED, function(event) {
+    that._setInfoVisible(that._$infoFilter, false);
+  });
   this._table.events.on(scout.Table.GUI_EVENT_ROWS_SELECTED, function(event) {
     var numRows = 0;
     if (event.$rows) {
@@ -75,15 +77,6 @@ scout.TableFooter.prototype._render = function($parent) {
     }
     that._updateInfoSelection(numRows, event.allSelected);
     that._updateInfoSelectionVisibility();
-  });
-
-  this._table.events.on(scout.Table.GUI_EVENT_ROWS_FILTERED, function(event) {
-    that._updateInfoFilter();
-    that._updateInfoFilterVisibility();
-  });
-
-  this._table.events.on(scout.Table.GUI_EVENT_FILTER_RESETTED, function(event) {
-    that._setInfoVisible(that._$infoFilter, false);
   });
 };
 
@@ -130,7 +123,6 @@ scout.TableFooter.prototype._updateInfoLoad = function() {
   if (this._$infoLoad.html() === info) {
     return;
   }
-
   this._$infoLoad.html(info);
 };
 
@@ -148,7 +140,6 @@ scout.TableFooter.prototype._updateInfoFilter = function() {
   if (this._$infoFilter.html() === info) {
     return;
   }
-
   this._$infoFilter.html(info);
 };
 
@@ -178,10 +169,6 @@ scout.TableFooter.prototype._updateInfoSelection = function(numSelectedRows, all
   this._$infoSelection.html(info);
 };
 
-scout.TableFooter.prototype._updateInfoSelectionVisibility = function() {
-  this._setInfoVisible(this._$infoSelection, this._table.tableStatusVisible);
-};
-
 scout.TableFooter.prototype._updateInfoLoadVisibility = function() {
   this._setInfoVisible(this._$infoLoad, this._table.tableStatusVisible);
 };
@@ -189,6 +176,10 @@ scout.TableFooter.prototype._updateInfoLoadVisibility = function() {
 scout.TableFooter.prototype._updateInfoFilterVisibility = function() {
   var visible = this._table.tableStatusVisible && this._table.filteredBy().length > 0;
   this._setInfoVisible(this._$infoFilter, visible);
+};
+
+scout.TableFooter.prototype._updateInfoSelectionVisibility = function() {
+  this._setInfoVisible(this._$infoSelection, this._table.tableStatusVisible);
 };
 
 scout.TableFooter.prototype._setInfoVisible = function($info, visible) {
@@ -199,6 +190,19 @@ scout.TableFooter.prototype._setInfoVisible = function($info, visible) {
       $(this).hide();
     });
   }
+};
+
+scout.TableFooter.prototype._onClickInfoLoad = function() {
+  this._table.sendReload();
+};
+
+scout.TableFooter.prototype._onClickInfoFilter = function() {
+  this._table.resetFilter();
+  this._$filterField.val('');
+};
+
+scout.TableFooter.prototype._onClickInfoSelection = function() {
+  this._table.toggleSelection();
 };
 
 scout.TableFooter.prototype._computeCountInfo = function(n) {

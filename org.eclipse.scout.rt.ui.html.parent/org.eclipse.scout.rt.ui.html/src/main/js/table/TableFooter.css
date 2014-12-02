@@ -71,7 +71,7 @@
   line-height: 19px;
 
   &:before{
-    content: ' ';
+    content: '';
     position: absolute;
     top: @table-control-padding / 2  + 2px;
     left: 0px;

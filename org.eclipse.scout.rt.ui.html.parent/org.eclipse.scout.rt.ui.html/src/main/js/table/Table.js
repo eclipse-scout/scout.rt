@@ -659,6 +659,7 @@ scout.Table.prototype._group = function() {
           .css('max-width', column.width);
       }
 
+      // TODO BSH Table Sum | There is something wrong here...
       $sumRow.insertAfter($rows.eq(r))
         .width(this._totalWidth + this._tableRowBorderWidth())
         .hide()
@@ -894,7 +895,9 @@ scout.Table.prototype.filter = function() {
     rowCount = 0,
     $allRows = this.$rows();
 
+  // TODO BSH Table Selection | Selection should be preserved if possible
   that.clearSelection();
+  // TODO BSH Table Sum | See also _group(), this does not seem to be too good
   this.$sumRows().hide();
 
   // Filter rows
@@ -1021,6 +1024,7 @@ scout.Table.prototype.showRow = function($row, useAnimation) {
 
   if (useAnimation) {
     $row.stop().slideDown({
+      duration: 250,
       complete: function() {
         $row.removeClass('invisible');
         that.updateScrollbar();
@@ -1042,6 +1046,7 @@ scout.Table.prototype.hideRow = function($row, useAnimation) {
 
   if (useAnimation) {
     $row.stop().slideUp({
+      duration: 250,
       complete: function() {
         $row.addClass('invisible');
         that.updateScrollbar();

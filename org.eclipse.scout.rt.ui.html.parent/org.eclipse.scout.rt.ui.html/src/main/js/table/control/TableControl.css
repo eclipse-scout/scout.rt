@@ -16,7 +16,7 @@
   }
 
   &:last-child:after {
-    content: ' ';
+    content: '';
     position: absolute;
     top: @table-control-padding / 2  + 2px;
     right: -1px;
