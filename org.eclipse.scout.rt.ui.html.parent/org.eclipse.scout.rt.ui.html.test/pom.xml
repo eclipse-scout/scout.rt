@@ -19,12 +19,13 @@
   <artifactId>org.eclipse.scout.rt.ui.html.test</artifactId>
   <packaging>eclipse-test-plugin</packaging>
 <build>
-<plugins>
+
+    <plugins>
+
       <plugin>
         <groupId>org.eclipse.tycho</groupId>
         <artifactId>tycho-surefire-plugin</artifactId>
         <configuration>
-          <testClass>org.eclipse.scout.rt.ui.html.json.ScriptBuilderRunnerTest</testClass>
           <testSuite>org.eclipse.scout.rt.ui.html.test</testSuite>
         </configuration>
       </plugin>
