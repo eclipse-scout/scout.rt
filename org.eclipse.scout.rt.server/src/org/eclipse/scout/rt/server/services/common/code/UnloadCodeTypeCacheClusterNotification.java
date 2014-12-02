@@ -32,4 +32,14 @@ public class UnloadCodeTypeCacheClusterNotification implements IClusterNotificat
   public String toString() {
     return "UnloadCodeTypeCacheClusterNotification [m_types=" + m_types + "]";
   }
+
+  @Override
+  public boolean coalesce(IClusterNotification existingNotification0) {
+    if (existingNotification0 instanceof UnloadCodeTypeCacheClusterNotification) {
+      UnloadCodeTypeCacheClusterNotification existingNotification = (UnloadCodeTypeCacheClusterNotification) existingNotification0;
+      getTypes().addAll(existingNotification.getTypes());
+      return true;
+    }
+    return false;
+  }
 }

@@ -37,4 +37,14 @@ public class AccessControlCacheChangedClusterNotification implements IClusterNot
   public String toString() {
     return "AccessControlCacheChangedClusterNotification [m_userIds=" + m_userIds + "]";
   }
+
+  @Override
+  public boolean coalesce(IClusterNotification existingNotification0) {
+    if (existingNotification0 instanceof AccessControlCacheChangedClusterNotification) {
+      AccessControlCacheChangedClusterNotification existingNotification = (AccessControlCacheChangedClusterNotification) existingNotification0;
+      m_userIds.addAll(existingNotification.getUserIds());
+      return true;
+    }
+    return false;
+  }
 }
