@@ -21,4 +21,6 @@ public interface IClientNotificationQueueElement extends Serializable {
   IClientNotificationFilter getFilter();
 
   boolean isActive();
+
+  boolean isReplacableBy(IClientNotificationQueueElement newElem);
 }

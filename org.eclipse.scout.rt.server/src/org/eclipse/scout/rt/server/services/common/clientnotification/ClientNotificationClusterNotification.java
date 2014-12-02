@@ -32,4 +32,13 @@ public class ClientNotificationClusterNotification implements IClusterNotificati
   public String toString() {
     return "ClientNotificationClusterNotification [m_queueElement=" + m_queueElement + "]";
   }
+
+  @Override
+  public boolean coalesce(IClusterNotification existingNotification0) {
+    if (existingNotification0 instanceof ClientNotificationClusterNotification) {
+      ClientNotificationClusterNotification existingNotification = (ClientNotificationClusterNotification) existingNotification0;
+      return existingNotification.getQueueElement().isReplacableBy(getQueueElement());
+    }
+    return false;
+  }
 }

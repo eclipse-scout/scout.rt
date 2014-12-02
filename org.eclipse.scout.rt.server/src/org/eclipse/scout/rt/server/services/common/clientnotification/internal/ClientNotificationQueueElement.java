@@ -49,10 +49,11 @@ public class ClientNotificationQueueElement implements IClientNotificationQueueE
     return System.currentTimeMillis() >= m_valid_until;
   }
 
+  @Override
   public boolean isReplacableBy(IClientNotificationQueueElement newElem) {
     return (m_notification == newElem.getNotification())
         || (
-        newElem.getNotification().getClass() == m_notification.getClass()
+            newElem.getNotification().getClass() == m_notification.getClass()
             && newElem.getFilter().equals(m_filter)
             && newElem.getNotification().coalesce(m_notification));
   }
