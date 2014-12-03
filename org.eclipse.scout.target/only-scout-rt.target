@@ -4,7 +4,7 @@
   <locations>
     <!-- Scout Nightly update site containing only RT features -->
     <location includeAllPlatforms="true" includeMode="slicer" includeSource="true" type="InstallableUnit">
-      <repository id="scout_nightly" location="http://download.eclipse.org/scout/nightly"/>
+      <repository id="scout_nightly_4.3" location="http://download.eclipse.org/scout/nightly/4.3"/>
 
       <unit id="org.eclipse.scout.rt.source.feature.group" version="0.0.0"/>
       <unit id="org.eclipse.scout.rt.testing.source.feature.group" version="0.0.0"/>
