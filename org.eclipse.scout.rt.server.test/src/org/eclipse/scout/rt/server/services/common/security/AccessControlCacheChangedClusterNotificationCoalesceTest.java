@@ -16,6 +16,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.scout.rt.server.services.common.clientnotification.ClientNotificationClusterNotification;
+import org.eclipse.scout.rt.server.services.common.clustersync.AbstractClusterNotificationCoalesceTest;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterNotification;
 import org.junit.BeforeClass;
 
@@ -24,28 +25,33 @@ import org.junit.BeforeClass;
  */
 public class AccessControlCacheChangedClusterNotificationCoalesceTest extends AbstractClusterNotificationCoalesceTest<AccessControlCacheChangedClusterNotification> {
 
-  private static Set<String> m_userIds1;
-  private static Set<String> m_userIds2;
+  private static Set<String> s_userIds1;
+  private static Set<String> s_userIds2;
 
   @BeforeClass
   public static void beforeClass() {
-    m_userIds1 = new HashSet<String>();
-    m_userIds1.add("User1");
-    m_userIds1.add("User2");
+    s_userIds1 = new HashSet<String>();
+    s_userIds1.add("User1");
+    s_userIds1.add("User2");
 
-    m_userIds2 = new HashSet<String>();
-    m_userIds2.add("Person1");
-    m_userIds2.add("Person2");
+    s_userIds2 = new HashSet<String>();
+    s_userIds2.add("Person1");
+    s_userIds2.add("Person2");
   }
 
   @Override
   protected AccessControlCacheChangedClusterNotification createExistingNotification() {
-    return new AccessControlCacheChangedClusterNotification(new HashSet<String>(m_userIds1));
+    return new AccessControlCacheChangedClusterNotification(new HashSet<String>(s_userIds1));
   }
 
   @Override
   protected AccessControlCacheChangedClusterNotification createNewNotification() {
-    return new AccessControlCacheChangedClusterNotification(new HashSet<String>(m_userIds2));
+    return new AccessControlCacheChangedClusterNotification(new HashSet<String>(s_userIds2));
+  }
+
+  @Override
+  protected AccessControlCacheChangedClusterNotification createNewNonMergeableNotification() {
+    return null; // can always be merged -> use null
   }
 
   @Override
@@ -59,15 +65,20 @@ public class AccessControlCacheChangedClusterNotificationCoalesceTest extends Ab
   }
 
   @Override
-  protected void checkCoalesceResultSuccess(AccessControlCacheChangedClusterNotification notificationToCheck) {
-    Set<String> userIds = new HashSet<String>(m_userIds1);
-    userIds.addAll(m_userIds2);
+  protected void checkCoalesceResult(AccessControlCacheChangedClusterNotification notificationToCheck) {
+    Set<String> userIds = new HashSet<String>(s_userIds1);
+    userIds.addAll(s_userIds2);
     assertEquals(userIds, notificationToCheck.getUserIds());
   }
 
   @Override
-  protected void checkCoalesceResultFail(AccessControlCacheChangedClusterNotification notificationToCheck) {
-    Set<String> expectedList = new HashSet<String>(m_userIds1);
+  protected void checkCoalesceFailResult(AccessControlCacheChangedClusterNotification notificationToCheck) {
+    // can always be merged -> no check needed
+  }
+
+  @Override
+  protected void checkCoalesceDifferentNotificationResult(AccessControlCacheChangedClusterNotification notificationToCheck) {
+    Set<String> expectedList = new HashSet<String>(s_userIds1);
     assertEquals(expectedList, notificationToCheck.getUserIds());
   }
 }

@@ -8,12 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.server.services.common.security;
+package org.eclipse.scout.rt.server.services.common.clustersync;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.eclipse.scout.rt.server.services.common.clustersync.IClusterNotification;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -22,9 +21,10 @@ import org.junit.Test;
  */
 public abstract class AbstractClusterNotificationCoalesceTest<T extends IClusterNotification> {
 
-  protected T m_existingNotification;
-  protected T m_newNotification;
-  protected IClusterNotification m_differenNotification; // has to be another notification than T to check coalesce with mixed Notifications
+  private T m_existingNotification;
+  private T m_newNotification;
+  private T m_newNonMergeableNotification;
+  private IClusterNotification m_differenNotification; // has to be another notification than T to check coalesce with mixed Notifications
 
   public T getExistingNotification() {
     return m_existingNotification;
@@ -32,6 +32,10 @@ public abstract class AbstractClusterNotificationCoalesceTest<T extends ICluster
 
   public T getNewNotification() {
     return m_newNotification;
+  }
+
+  public T getNewNonMegeableNotification() {
+    return m_newNonMergeableNotification;
   }
 
   public IClusterNotification getDifferenNotification() {
@@ -42,14 +46,17 @@ public abstract class AbstractClusterNotificationCoalesceTest<T extends ICluster
   public void before() {
     m_existingNotification = createExistingNotification();
     m_newNotification = createNewNotification();
+    m_newNonMergeableNotification = createNewNonMergeableNotification();
     m_differenNotification = createDifferentNotification();
   }
 
-  abstract protected T createExistingNotification();
+  protected abstract T createExistingNotification();
 
-  abstract protected T createNewNotification();
+  protected abstract T createNewNotification();
 
-  abstract protected IClusterNotification createDifferentNotification();
+  protected abstract T createNewNonMergeableNotification();
+
+  protected abstract IClusterNotification createDifferentNotification();
 
   @Test
   public void testCoalesce() {
@@ -60,21 +67,27 @@ public abstract class AbstractClusterNotificationCoalesceTest<T extends ICluster
       assertFalse(getExistingNotification().coalesce(getNewNotification()));
     }
 
-    checkCoalesceResultSuccess(getExistingNotification());
+    checkCoalesceResult(getExistingNotification());
   }
 
   protected abstract boolean isCoalesceExpected();
 
-  abstract protected void checkCoalesceResultSuccess(T notificationToCheck);
+  protected abstract void checkCoalesceResult(T notificationToCheck);
 
   @Test
   public void testCoalesceFail() {
-
-    assertFalse(getExistingNotification().coalesce(getDifferenNotification()));
-
-    checkCoalesceResultFail(getExistingNotification());
+    assertFalse(getExistingNotification().coalesce(getNewNonMegeableNotification()));
+    checkCoalesceFailResult(getExistingNotification());
   }
 
-  abstract protected void checkCoalesceResultFail(T notificationToCheck);
+  protected abstract void checkCoalesceFailResult(T notificationToCheck);
 
+  @Test
+  public void testCoalesceWithDifferentNotification() {
+    assertFalse(getExistingNotification().coalesce(getDifferenNotification()));
+
+    checkCoalesceDifferentNotificationResult(getExistingNotification());
+  }
+
+  protected abstract void checkCoalesceDifferentNotificationResult(T notificationToCheck);
 }

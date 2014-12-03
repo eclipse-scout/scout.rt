@@ -10,12 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.clientnotification;
 
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import org.eclipse.scout.rt.server.services.common.clientnotification.internal.ClientNotificationQueueElement;
+import org.eclipse.scout.rt.server.services.common.clustersync.AbstractClusterNotificationCoalesceTest;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterNotification;
-import org.eclipse.scout.rt.server.services.common.security.AbstractClusterNotificationCoalesceTest;
 import org.eclipse.scout.rt.server.services.common.security.AccessControlCacheChangedClusterNotification;
+import org.eclipse.scout.rt.shared.services.common.security.AccessControlChangedNotification;
 import org.eclipse.scout.rt.shared.services.common.security.ResetAccessControlChangedNotification;
-import org.junit.Assert;
 import org.junit.Before;
 
 /**
@@ -25,12 +28,14 @@ public class ClientNotificationClusterNotificationCoalesceTest extends AbstractC
 
   private IClientNotificationQueueElement m_queueElement1;
   private IClientNotificationQueueElement m_queueElement2;
+  private IClientNotificationQueueElement m_queueElement3;
 
   @Before
   @Override
   public void before() {
     m_queueElement1 = new ClientNotificationQueueElement(new ResetAccessControlChangedNotification(), new SingleUserFilter(null, 0L));
     m_queueElement2 = new ClientNotificationQueueElement(new ResetAccessControlChangedNotification(), new SingleUserFilter(null, 0L));
+    m_queueElement3 = new ClientNotificationQueueElement(new AccessControlChangedNotification(null), new SingleUserFilter(null, 0L));
     super.before();
   }
 
@@ -45,6 +50,11 @@ public class ClientNotificationClusterNotificationCoalesceTest extends AbstractC
   }
 
   @Override
+  protected ClientNotificationClusterNotification createNewNonMergeableNotification() {
+    return new ClientNotificationClusterNotification(m_queueElement3);
+  }
+
+  @Override
   protected IClusterNotification createDifferentNotification() {
     return new AccessControlCacheChangedClusterNotification();
   }
@@ -55,19 +65,23 @@ public class ClientNotificationClusterNotificationCoalesceTest extends AbstractC
   }
 
   @Override
-  protected void checkCoalesceResultSuccess(ClientNotificationClusterNotification notificationToCheck) {
+  protected void checkCoalesceResult(ClientNotificationClusterNotification notificationToCheck) {
+    checkNotification(notificationToCheck);
+  }
+
+  @Override
+  protected void checkCoalesceFailResult(ClientNotificationClusterNotification notificationToCheck) {
+    checkNotification(notificationToCheck);
+  }
+
+  @Override
+  protected void checkCoalesceDifferentNotificationResult(ClientNotificationClusterNotification notificationToCheck) {
     checkNotification(notificationToCheck);
   }
 
   protected void checkNotification(ClientNotificationClusterNotification notificationToCheck) {
-    Assert.assertTrue(notificationToCheck.getQueueElement().getNotification() instanceof ResetAccessControlChangedNotification);
-    Assert.assertTrue(notificationToCheck.getQueueElement().getFilter() instanceof SingleUserFilter);
-    Assert.assertNull(((SingleUserFilter) notificationToCheck.getQueueElement().getFilter()).getUserId());
+    assertTrue(notificationToCheck.getQueueElement().getNotification() instanceof ResetAccessControlChangedNotification);
+    assertTrue(notificationToCheck.getQueueElement().getFilter() instanceof SingleUserFilter);
+    assertNull(((SingleUserFilter) notificationToCheck.getQueueElement().getFilter()).getUserId());
   }
-
-  @Override
-  protected void checkCoalesceResultFail(ClientNotificationClusterNotification notificationToCheck) {
-    checkNotification(notificationToCheck);
-  }
-
 }
