@@ -14,7 +14,7 @@
   <parent>
     <groupId>com.bsiag.tools.rt</groupId>
     <artifactId>tools.rt</artifactId>
-    <version>4.3.0-SNAPSHOT</version>
+    <version>5.1.0-SNAPSHOT</version>
   </parent>
 
   <groupId>org.eclipse.scout.rt.ui.html.parent</groupId>

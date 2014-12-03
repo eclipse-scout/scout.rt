@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Thirdparty libs for Scout Html UI
 Bundle-SymbolicName: org.eclipse.scout.rt.ui.html.thirdparty;singleton:=true
-Bundle-Version: 4.3.0.qualifier
+Bundle-Version: 5.1.0.qualifier
 Bundle-ClassPath: .,
  src/main/resources/yui-compressor/yuicompressor-2.4.8.jar,
  src/main/resources/less-engine/commons-cli-1.2.jar,
@@ -12,6 +12,6 @@ Bundle-ClassPath: .,
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: BSI Business Systems Integration AG
 Bundle-ActivationPolicy: lazy
-Require-Bundle: org.eclipse.scout.rt.ui.html;bundle-version="4.3.0",
+Require-Bundle: org.eclipse.scout.rt.ui.html;bundle-version="5.1.0",
  org.junit4;bundle-version="4.8.1";resolution:=optional
 Bundle-Activator: org.eclipse.scout.rt.ui.html.thirdparty.internal.loader.Activator
