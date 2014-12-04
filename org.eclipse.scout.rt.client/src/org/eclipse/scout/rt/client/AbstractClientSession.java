@@ -107,6 +107,9 @@ public abstract class AbstractClientSession implements IClientSession {
     return false;
   }
 
+  /**
+   * Returns the userId of the subject holding the current session
+   */
   @Override
   public String getUserId() {
     return getSharedContextVariable("userId", String.class);
@@ -267,11 +270,23 @@ public abstract class AbstractClientSession implements IClientSession {
     }
   }
 
+  /**
+   * Initialize the properties of the client session.
+   * This method is called in the process of the initialization right before the session is activated.
+   *
+   * @throws ProcessingException
+   */
   @ConfigOperation
   @Order(10)
   protected void execLoadSession() throws ProcessingException {
   }
 
+  /**
+   * This method is called just before the session is stopped and can be overwritten to persist properties of the client
+   * session
+   *
+   * @throws ProcessingException
+   */
   @ConfigOperation
   @Order(20)
   protected void execStoreSession() throws ProcessingException {
