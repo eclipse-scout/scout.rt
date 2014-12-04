@@ -52,6 +52,13 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
   /*
    * Configuration
    */
+  /**
+   * Whether a file or a folder should be selected using this {@link AbstractFileChooserField}.
+   * <ul>
+   * <li><code>true</code> = only possible to select folders</li>
+   * <li><code>false</code> = only possible to select files</li>
+   * </ul>
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(240)
   protected boolean getConfiguredFolderMode() {
