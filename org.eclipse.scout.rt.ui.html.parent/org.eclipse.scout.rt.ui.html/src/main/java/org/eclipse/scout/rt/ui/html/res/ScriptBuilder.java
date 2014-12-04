@@ -25,8 +25,8 @@ import org.eclipse.scout.service.SERVICES;
  * <p>
  * js and css files are automatically compiled if the name matches the names defined in {@link Script}
  * <p>
- * Version is <code>1.2.3.qualifier</code> If the qualifier is the text "qualifier" then cache control is handled
- * automatically.
+ * Version is <code>1.2.3[-qualifier]</code> If the qualifier is the text "qualifier" then cache control is handled
+ * automatically in production mode.
  * <p>
  * The js and css compilation can be turned on and off using the url param ?debug=true which only builds the js and css
  * but does not compile/minimize it
@@ -37,9 +37,9 @@ public class ScriptBuilder {
   private static final Pattern INCLUDE_PAT = Pattern.compile("//\\s*@include\\s*\\(\\s*\"([^\"]+)\"\\s*\\)");
 
   /**
-   * $1$2-$3.min.$4 with $1=path, $2=basename, $3=version, $4="js" or "css"
+   * $1$2-$3.min.$4 with $1=path, $2=basename, $3=version, (-qualifier), $4="js" or "css"
    */
-  public static final Pattern NON_FRAGMENT_PATH_PATTERN = Pattern.compile("(.*/)([-_\\w]+)-([0-9.]+)(?:\\.qualifier)?\\.min\\.(js|css)");
+  public static final Pattern NON_FRAGMENT_PATH_PATTERN = Pattern.compile("(.*/)([-_\\w]+)-([0-9.]+)(?:\\-\\w+)?\\.min\\.(js|css)");
 
   private final IWebArchiveResourceLocator m_resourceLocator;
   private final IScriptProcessorService m_scriptProcessorService;
@@ -273,11 +273,11 @@ public class ScriptBuilder {
     String[] lines = text.split("[\\n]");
     for (String line : lines) {
       buf.append((insideBlockComment ? "//" : "/*")).
-      append(filename).append(":").
-      append(String.format("%-" + ((lines.length + "").length()) + "d", lineNo)).
-      append((insideBlockComment ? "//" : "*/")).append(" ").
-      append(line).
-      append("\n");
+          append(filename).append(":").
+          append(String.format("%-" + ((lines.length + "").length()) + "d", lineNo)).
+          append((insideBlockComment ? "//" : "*/")).append(" ").
+          append(line).
+          append("\n");
       if (lineIsBeginOfMultilineBlockComment(line, insideBlockComment)) {
         //also if line is endMLBC AND beginMLBC
         insideBlockComment = true;

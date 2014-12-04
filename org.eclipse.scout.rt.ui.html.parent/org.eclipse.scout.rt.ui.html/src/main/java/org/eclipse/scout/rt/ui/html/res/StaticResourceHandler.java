@@ -1,6 +1,5 @@
 package org.eclipse.scout.rt.ui.html.res;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -13,6 +12,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.commons.FileUtility;
+import org.eclipse.scout.commons.IOUtility;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.html.AbstractScoutAppServlet;
@@ -101,7 +102,8 @@ public class StaticResourceHandler {
    *         {@link HttpServletResponse#SC_ACCEPTED} if the content of the file needs to be returned.
    */
   protected int processCacheHeaders(final HttpServletRequest req, final HttpServletResponse resp, long lastModified, int contentLength) {
-    resp.setHeader("cache-control", "private, max-age=0, no-cache, no-store, must-revalidate");
+    resp.setHeader("cache-control", "private, max-age=0, no-cache, no-store, must-revalidate");//FIXME imo
+    //resp.setHeader("cache-control", "public, max-age=240, s-maxage=240");
 
     String etag = null;
     if (lastModified != -1L && contentLength != -1L) {
@@ -145,20 +147,12 @@ public class StaticResourceHandler {
   }
 
   protected byte[] fileContent(URL url) throws IOException {
-    ByteArrayOutputStream os = new ByteArrayOutputStream();
-    InputStream is = url.openStream();
-    try {
-      byte[] buffer = new byte[ANY_SIZE];
-      int bytesRead = is.read(buffer);
-      while (bytesRead != -1) {
-        os.write(buffer, 0, bytesRead);
-        bytesRead = is.read(buffer);
-      }
+    try (InputStream in = url.openStream()) {
+      return IOUtility.getContent(in);
     }
-    finally {
-      is.close();
+    catch (ProcessingException e) {
+      throw new IOException(e.getMessage());
     }
-    return os.toByteArray();
   }
 
 }

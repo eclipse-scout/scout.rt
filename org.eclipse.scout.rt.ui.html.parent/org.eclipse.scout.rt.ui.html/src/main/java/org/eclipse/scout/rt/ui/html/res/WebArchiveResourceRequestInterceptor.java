@@ -24,7 +24,6 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.html.AbstractScoutAppServlet;
 import org.eclipse.scout.rt.ui.html.IServletRequestInterceptor;
-import org.eclipse.scout.rt.ui.html.IndexHtmlResolver;
 import org.eclipse.scout.service.AbstractService;
 
 /**
@@ -40,7 +39,7 @@ public class WebArchiveResourceRequestInterceptor extends AbstractService implem
   private static final String SESSION_ATTR_DEBUG_SCRIPT_ENABLED = WebArchiveResourceRequestInterceptor.class.getSimpleName() + ".enabled";
   private static final String DEBUG_PARAM = "debug";
 
-  //TODO imo change once we switch from OSGI to JEE
+  //TODO imo change once we switch from OSGI to JEE; move WebContent to src/main/resources/META-INF/resources/WebContent, move src/main/js to src/main/resources/META-INF/resources/js
   private IWebArchiveResourceLocator m_resourceLocator = new OsgiWebArchiveResourceLocator();
 
   @Override
@@ -72,11 +71,21 @@ public class WebArchiveResourceRequestInterceptor extends AbstractService implem
       return true;
     }
 
-    //static resources such images, html, unprocessed js, css etc.
     URL url = m_resourceLocator.getWebContentResource(pathInfo);
+
+    //html
+    /*XXX imo
+    if (url != null && pathInfo.endsWith(".html")) {
+      LOG.info("processing html: " + pathInfo);
+      createHtmlFileHandler().handle(servlet, req, resp, url);
+      return true;
+    }
+     */
+
+    //static resources such as images, icons, fonts
     if (url != null) {
-      LOG.info("processing resource: " + pathInfo);
-      new StaticResourceHandler().handle(servlet, req, resp, url);
+      LOG.info("processing static resource: " + pathInfo);
+      createStaticResourceHandler().handle(servlet, req, resp, url);
       return true;
     }
 
@@ -116,12 +125,20 @@ public class WebArchiveResourceRequestInterceptor extends AbstractService implem
       return null;
     }
     if ("/".equals(pathInfo)) {
-      pathInfo = createIndexResolver().resolve(req);
+      pathInfo = createIndexHtmlResolver().resolve(req);
     }
     return pathInfo;
   }
 
-  protected IndexHtmlResolver createIndexResolver() {
+  protected IndexHtmlResolver createIndexHtmlResolver() {
     return new IndexHtmlResolver();
+  }
+
+  protected HtmlFileHandler createHtmlFileHandler() {
+    return new HtmlFileHandler();
+  }
+
+  protected StaticResourceHandler createStaticResourceHandler() {
+    return new StaticResourceHandler();
   }
 }

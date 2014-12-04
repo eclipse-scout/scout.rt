@@ -8,10 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.html;
+package org.eclipse.scout.rt.ui.html.res;
 
 import javax.servlet.http.HttpServletRequest;
 
+/**
+ * Decide which index.html is to be used depending onthe browser type
+ */
 public class IndexHtmlResolver {
   public static final String INDEX_HTML = "/index.html";
   public static final String MOBILE_INDEX_HTML = "/index-mobile.html";
