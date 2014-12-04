@@ -26,14 +26,14 @@ public class ThirdPartyScriptProcessorImpl {
   public ThirdPartyScriptProcessorImpl() {
     //set up an external private class loader
     m_yuiLoader = new SandboxClassLoaderBuilder().
-        addLocalJar("yui-compressor/yuicompressor-2.4.8.jar").
+        addLocalJar("yui-compressor/yuicompressor.jar").
         addJarContaining(ThirdPartyScriptProcessorImpl.class).
         build(null);
     m_lessLoader = new SandboxClassLoaderBuilder().
-        addLocalJar("less-engine/commons-cli-1.2.jar").
-        addLocalJar("less-engine/commons-logging-1.2.jar").
-        addLocalJar("less-engine/org.mozilla.javascript_1.7.4.v201209142200.jar").
-        addLocalJar("less-engine/lesscss-engine-1.7.4-SNAPSHOT.jar").
+        addLocalJar("less-engine/commons-cli.jar").
+        addLocalJar("less-engine/commons-logging.jar").
+        addLocalJar("less-engine/rhino.jar").
+        addLocalJar("less-engine/lesscss-engine.jar").
         addJarContaining(ThirdPartyScriptProcessorImpl.class).
         build(null);
   }
