@@ -34,7 +34,7 @@ public abstract class AbstractPageWithTable5<T extends ITable5> extends Abstract
     super.setTreeInternal(tree, includeSubtree);
 
     // FIXME CGU: how to do this properly? Das menu dürfte auch nicht auf den Baum synchronisiert werden
-    if (getTable().getDefaultMenu() == null && !isLeaf()) {
+    if (getOutline() != null && getTable().getDefaultMenu() == null && !isLeaf()) {
       List<IMenu> tableMenus = getTable().getContextMenu().getChildActions();
       tableMenus.add(0, OutlineNavigation.createUp(getOutline()));
       tableMenus.add(1, OutlineNavigation.createDown(getOutline()));
