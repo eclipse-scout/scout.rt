@@ -4,15 +4,17 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swing.login.internal;
 
+import java.io.Serializable;
 import java.net.URL;
 
-public class AuthStatus {
+public class AuthStatus implements Serializable {
+  private static final long serialVersionUID = 2706075249746839460L;
   private Boolean m_ok;
   private String m_username;
   private String m_password;
