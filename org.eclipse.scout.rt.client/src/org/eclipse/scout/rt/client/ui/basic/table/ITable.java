@@ -32,6 +32,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldData;
+import org.eclipse.scout.rt.shared.services.common.code.ICode;
 
 /**
  * The table is by default multi-select Columns are defined as inner classes for
@@ -908,4 +909,93 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * @return the invisible root menu container of all table menus.
    */
   ITableContextMenu getContextMenu();
+
+  /**
+   * Creates an empty table row.
+   * The created row is not added to the table yet.
+   *
+   * @return the created table row
+   * @throws ProcessingException
+   */
+  ITableRow createRow() throws ProcessingException;
+
+  /**
+   * Creates table rows for the given matrix of row values. The created rows are not added to the table yet.
+   * One row is created for each row in the matrix. The row state of each created row is set to
+   * {@link ITableRow#STATUS_INSERTED}.
+   * <p/>
+   * Performance note:<br>
+   * Since the matrix may contain large amounts of data, the matrix can be passed as an
+   * <code>new AtomicReference&lt;Object&gt;</code>(Object[][]) so that the further processing can set the content of the
+   * holder to null while processing.
+   *
+   * @param dataMatrixOrReference
+   *          Can be an Object[][] or an <code>AtomicReference&lt;Object&gt;</code>(that holds Object[][])
+   * @return the list of the created table rows
+   * @throws ProcessingException
+   */
+  List<ITableRow> createRowsByMatrix(Object dataMatrixOrReference) throws ProcessingException;
+
+  /**
+   * Creates table rows from the given matrix of row values. The created rows are not added to the table yet.
+   * One row is created for each row in the matrix. The row state of each created row is set according to the
+   * <code>rowStatus</code> parameter.
+   * <p/>
+   * Performance note:<br>
+   * Since the matrix may contain large amounts of data, the matrix can be passed as an
+   * <code>new AtomicReference&lt;Object&gt;</code>(Object[][]) so that the further processing can set the content of the
+   * holder to null while processing.
+   *
+   * @param dataMatrixOrReference
+   * @param rowStatus
+   *          The row status to be set for each created table row
+   * @return the list of the created table rows
+   * @throws ProcessingException
+   */
+  List<ITableRow> createRowsByMatrix(Object dataMatrixOrReference, int rowStatus) throws ProcessingException;
+
+  /**
+   * Creates table rows from the codes. The created rows are not added to the table yet.
+   *
+   * @param codes
+   * @return the list of the created table rows
+   * @throws ProcessingException
+   */
+  List<ITableRow> createRowsByCodes(Collection<? extends ICode<?>> codes) throws ProcessingException;
+
+  /**
+   * Creates a new table row from the <code>rowValues</code> argument.
+   * The created row is not added to the table yet.
+   *
+   * @param rowValues
+   *          The values to be filled into the new table row. Must be an array.
+   * @return the created table row
+   * @throws ProcessingException
+   */
+  ITableRow createRow(Object rowValues) throws ProcessingException;
+
+  /**
+   * Creates new table rows from the given (one dimensional) array.
+   * The created rows are not added to the table yet.
+   *
+   * @param dataArray
+   *          The values to be filled into the new table rows.
+   * @return the list of the created table rows
+   * @throws ProcessingException
+   */
+  List<ITableRow> createRowsByArray(Object dataArray) throws ProcessingException;
+
+  /**
+   * Creates new table rows from the given (one dimensional) array.
+   * The created rows are not added to the table yet. The row state of each created row is set according to the
+   * <code>rowStatus</code> parameter.
+   *
+   * @param dataArray
+   *          The values to be filled into the new table rows.
+   * @param rowStatus
+   *          The row status to be set for each created table row
+   * @return the list of the created table rows
+   * @throws ProcessingException
+   */
+  List<ITableRow> createRowsByArray(Object dataArray, int rowStatus) throws ProcessingException;
 }
