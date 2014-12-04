@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.testing.shared.services.common.code;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -39,7 +40,7 @@ import org.osgi.framework.FrameworkUtil;
  * register and remove the service themselves.
  * <p/>
  * <b>Example</b>:
- * 
+ *
  * <pre>
  * List<ServiceRegistration> reg = TestingUtility.registerServices(Activator.getDefault().getBundle(), 1000, new TestingCodeService(new MyCodeType()));
  * CODES.getCodeType(MyCodeType.class);
@@ -48,7 +49,7 @@ import org.osgi.framework.FrameworkUtil;
  * [..]
  * TestingUtility.unregisterServices(reg);
  * </pre>
- * 
+ *
  * @since 3.8.0
  */
 public class TestingCodeService extends AbstractService implements ICodeService {
@@ -62,6 +63,10 @@ public class TestingCodeService extends AbstractService implements ICodeService 
     m_codeTypes = new HashMap<Class<? extends ICodeType<?, ?>>, ICodeType<?, ?>>();
     m_codeTypeMapLock = new Object();
     addCodeTypes(codeTypes);
+  }
+
+  public TestingCodeService(ICodeType<?, ?>... codeTypes) {
+    this(Arrays.asList(codeTypes));
   }
 
   @SuppressWarnings("unchecked")
