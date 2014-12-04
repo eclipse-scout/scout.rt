@@ -188,6 +188,9 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     return null;
   }
 
+  /**
+   * @return the localized sub-title property of the form. Use {@link TEXTS}.
+   */
   @ConfigProperty(ConfigProperty.TEXT)
   @Order(11)
   protected String getConfiguredSubTitle() {
