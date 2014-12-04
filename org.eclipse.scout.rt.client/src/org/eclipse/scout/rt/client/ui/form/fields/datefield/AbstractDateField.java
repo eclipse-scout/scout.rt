@@ -328,13 +328,15 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
   protected Date validateValueInternal(Date rawValue) throws ProcessingException {
     Date validValue = null;
     rawValue = super.validateValueInternal(rawValue);
-    try {
-      // apply format
-      DateFormat df = getDateFormat();
-      rawValue = df.parse(df.format(rawValue));
-    }
-    catch (Throwable t) {
-      // nop, take raw value
+    if (rawValue != null) {
+      try {
+        // apply format
+        DateFormat df = getDateFormat();
+        rawValue = df.parse(df.format(rawValue));
+      }
+      catch (Throwable t) {
+        // nop, take raw value
+      }
     }
     validValue = rawValue;
     return validValue;
