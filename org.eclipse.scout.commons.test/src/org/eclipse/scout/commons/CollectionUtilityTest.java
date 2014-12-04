@@ -14,6 +14,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -164,6 +165,17 @@ public class CollectionUtilityTest {
         put(-1, "-1");
       }
     }));
+  }
+
+  /**
+   * Test for {@link CollectionUtility#containsAny(Collection, Collection)
+
+   */
+  @Test
+  public void testContainsAny() {
+    assertEquals(false, CollectionUtility.containsAny(Collections.emptyList(), Collections.emptyList()));
+    assertEquals(false, CollectionUtility.containsAny(null, Collections.emptyList()));
+    assertEquals(false, CollectionUtility.containsAny(Arrays.asList("a"), Arrays.asList("b")));
   }
 
   /**
