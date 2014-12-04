@@ -39,6 +39,8 @@ import org.eclipse.scout.rt.shared.TextsThreadLocal;
 import org.eclipse.scout.rt.shared.services.common.context.SharedContextChangedNotification;
 import org.eclipse.scout.rt.shared.services.common.context.SharedVariableMap;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
+import org.eclipse.scout.rt.shared.ui.IUiDeviceType;
+import org.eclipse.scout.rt.shared.ui.IUiLayer;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.service.SERVICES;
 import org.osgi.framework.Bundle;
@@ -237,6 +239,10 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
     return m_singleThreadSession;
   }
 
+  /**
+   * @return information about the kind of user interface used on the client side like {@link IUiLayer} and
+   *         {@link IUiDeviceType}.
+   */
   @Override
   public UserAgent getUserAgent() {
     return m_userAgent;
