@@ -310,6 +310,30 @@ public class DateUtilityTest {
     }
   }
 
+  /**
+   * Test for {@link DateUtility#addMonths(Date d, int count)}
+   *
+   * @throws ParseException
+   */
+  @Test
+  public void testAddMonthstoNullFull() throws ParseException {
+    assertNull(DateUtility.addMonths(null, -1));
+  }
+
+  /**
+   * Test for {@link DateUtility#addMonths(Date d, int count)}
+   *
+   * @throws ParseException
+   */
+  @Test
+  public void testAddMonthsFull() throws ParseException {
+    SimpleDateFormat sdf = new SimpleDateFormat(YEAR_DATE_TIME_PATTERN);
+    Date date1 = sdf.parse("2013-12-10_10:10:10.111");
+    Date date2 = sdf.parse("2014-01-10_10:10:10.111");
+    assertEquals(date2.getTime(), DateUtility.addMonths(date1, 1).getTime());
+    assertEquals(date1.getTime(), DateUtility.addMonths(date2, -1).getTime());
+  }
+
   @Test
   public void testIsInDateRange() {
     Date from = DateUtility.parse("01-02-2011 00:00", DATE_TIME_PATTERN);
