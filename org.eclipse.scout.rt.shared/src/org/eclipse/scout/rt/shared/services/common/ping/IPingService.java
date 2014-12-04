@@ -11,14 +11,21 @@
 package org.eclipse.scout.rt.shared.services.common.ping;
 
 import org.eclipse.scout.commons.annotations.Priority;
-import org.eclipse.scout.rt.shared.validate.InputValidation;
 import org.eclipse.scout.rt.shared.validate.IValidationStrategy;
+import org.eclipse.scout.rt.shared.validate.InputValidation;
 import org.eclipse.scout.service.IService;
 
 @Priority(-3)
 @InputValidation(IValidationStrategy.PROCESS.class)
 public interface IPingService extends IService {
 
+  /**
+   * Simple ping request (echo).
+   *
+   * @param s
+   *          Text to transmit
+   * @return Return value, as provided in argument
+   */
   String ping(String s);
 
 }
