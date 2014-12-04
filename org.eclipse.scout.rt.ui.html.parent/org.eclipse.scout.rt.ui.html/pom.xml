@@ -67,7 +67,7 @@
             <!-- jasmine files are explicitly included in SpecRunnerMaven.html because the need to be before actual sources-->
             <sourceExclude>**/jasmine/*.js</sourceExclude>
             <!-- for tests, scout namespace is defined in boot.ext.js -->
-            <sourceExclude>scout-4.0.1-template.js</sourceExclude>
+            <sourceExclude>scout-4.0.1-module.js</sourceExclude>
           </sourceExcludes>
           <!-- HtmlUnitDriver does not work with jQuery 2.1.0, throws exception -->
           <webDriverClassName>org.openqa.selenium.phantomjs.PhantomJSDriver</webDriverClassName>

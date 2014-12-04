@@ -55,7 +55,7 @@ Wir verwenden _ als Prefix für private Members einer Klasse. Solche Members dü
 Bewertung:
 - #1 funktioniert bei Properties, aber nicht bei Variablen. Wenn die Variable nicht
   definiert ist, gibt es eine Exception. Weiteres (theoretisches) Problem: Jemand
-  koennte die Variable 'undefined' umdefinieren. (wir stellen jedoch im scout-template.js
+  koennte die Variable 'undefined' umdefinieren. (wir stellen jedoch im scout-module.js
   sicher, dass dies nicht geschehen kann).
 - #2 funktioniert immer. Bei Properties werden auch diejenigen der Protoypen
   beruecksichtigt.

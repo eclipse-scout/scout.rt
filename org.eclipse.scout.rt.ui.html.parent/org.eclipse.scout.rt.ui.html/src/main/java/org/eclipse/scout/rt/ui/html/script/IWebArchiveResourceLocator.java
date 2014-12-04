@@ -17,20 +17,20 @@ import javax.servlet.ServletContext;
 /**
  * Locate script and other web resources in either osgi or java jee environments
  */
-public interface IWebContentResourceLocator {
+public interface IWebArchiveResourceLocator {
 
   /**
    * @return the source (or template file) of a js or css script out of the folders
-   *         <code>anyJarFile!/META-INF/resources/src/main/js</code>
+   *         <code>anyJarFile!/META-INF/resources/js</code>
    *         <p>
    *         See {@link ServletContext#getResourcePaths(String)}
    */
-  Script getScriptSource(String scriptPath);
+  URL getScriptResource(String path);
 
   /**
    * @return a resource out of the folders <code>anyJarFile!/META-INF/resources/WebContent</code>
    *         <p>
    *         See {@link ServletContext#getResourcePaths(String)}
    */
-  URL getWebContentResource(String resourcePath);
+  URL getWebContentResource(String path);
 }
