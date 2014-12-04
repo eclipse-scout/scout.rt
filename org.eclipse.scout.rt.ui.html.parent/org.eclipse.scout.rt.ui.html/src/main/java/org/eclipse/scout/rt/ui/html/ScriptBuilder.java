@@ -46,8 +46,8 @@ public class ScriptBuilder {
 
   public String buildJsScript(Script script, boolean minify) throws IOException {
     String outputFile = processIncludes(script, !minify);
+    outputFile = compileJs(outputFile);
     if (minify) {
-      outputFile = compileJs(outputFile);
       outputFile = minifyJs(outputFile);
     }
     return outputFile;
@@ -69,8 +69,8 @@ public class ScriptBuilder {
 
   public String buildCssScript(Script script, boolean minify) throws IOException {
     String outputFile = processIncludes(script, false);
+    outputFile = compileCss(outputFile);
     if (minify) {
-      outputFile = compileCss(outputFile);
       outputFile = minifyCss(outputFile);
     }
     return outputFile;
@@ -172,18 +172,22 @@ public class ScriptBuilder {
   }
 
   protected boolean lineIsBeginOfMultilineBlockComment(String line, boolean insideBlockComment) {
+    if (insideBlockComment) {
+      return false;
+    }
     int a = line.lastIndexOf("/*");
     int b = line.lastIndexOf("*/");
     int c = line.lastIndexOf("/*/");
-    boolean flag = a >= 0 && (b < 0 || b < a || (c == a));//because of sonar only allowing 3 conditions in sequence...
-    return flag && !insideBlockComment;
+    return (a >= 0 && (b < 0 || b < a || (c == a)));
   }
 
   protected boolean lineIsEndOfMultilineBlockComment(String line, boolean insideBlockComment) {
+    if (!insideBlockComment) {
+      return false;
+    }
     int a = line.indexOf("/*");
     int b = line.indexOf("*/");
     int c = line.lastIndexOf("/*/");
-    boolean flag = b >= 0 && (a < 0 || a < b || (c == a));//because of sonar only allowing 3 conditions in sequence...
-    return flag && insideBlockComment;
+    return (b >= 0 && (a < 0 || a < b || (c == a)));
   }
 }
