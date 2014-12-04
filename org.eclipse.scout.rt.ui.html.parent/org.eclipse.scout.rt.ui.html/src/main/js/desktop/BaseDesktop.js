@@ -9,7 +9,7 @@ scout.inherits(scout.BaseDesktop, scout.ModelAdapter);
 scout.BaseDesktop.prototype.showFatalMessage = function(title, text, buttonName, buttonAction) {
   var that = this;
   var $glasspane = this.$parent.appendDiv('glasspane');
-  var ui = new scout.MessageBoxUI({
+  var ui = new scout.MessageBox({
     title: title,
     iconId: undefined,
     severity: 4,

@@ -139,7 +139,7 @@ scout.defaultObjectFactories = [{
 }, {
   objectType: 'MessageBox',
   create: function() {
-    return new scout.MessageBox();
+    return new scout.MessageBoxModelAdapter();
   }
 }, {
   objectType: 'Action',
