@@ -193,6 +193,18 @@ public final class DateUtility {
     return new Date(c.getTime().getTime());
   }
 
+  public static Date truncDateToHour(Date d) {
+    if (d == null) {
+      return null;
+    }
+    Calendar c = Calendar.getInstance();
+    c.setTime(d);
+    c.set(Calendar.MINUTE, 0);
+    c.set(Calendar.SECOND, 0);
+    c.set(Calendar.MILLISECOND, 0);
+    return new Date(c.getTime().getTime());
+  }
+
   public static Date truncDateToMinute(Date d) {
     if (d == null) {
       return null;

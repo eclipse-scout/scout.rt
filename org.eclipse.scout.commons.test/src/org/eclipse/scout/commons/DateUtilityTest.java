@@ -615,6 +615,32 @@ public class DateUtilityTest {
     assertEquals("Conversion Date <" + input + "> to DoubleTime and to Date", input, DateUtility.convertDateToDoubleTime(DateUtility.convertDoubleTimeToDate(input)));
   }
 
+  @Test
+  public void testTruncDateToHour() {
+    assertNull("Trunc <null> to hour", DateUtility.truncDateToHour(null));
+    testTruncDateToHour("01-01-1970 00:01", "01-01-1970 00:00");
+    testTruncDateToHour("01-01-1970 00:59", "01-01-1970 00:00");
+    testTruncDateToHour("01-01-1970 10:43", "01-01-1970 10:00");
+    testTruncDateToHour("01-01-1970 13:43", "01-01-1970 13:00");
+    testTruncDateToHour("01-01-1970 23:00", "01-01-1970 23:00");
+    testTruncDateToHour("01-01-1970 23:59", "01-01-1970 23:00");
+  }
+
+  /**
+   * @param input
+   *          date to be truncated to hour. Format is "dd-MM-yyyy HH:mm"
+   * @param expected
+   *          date to be expected. Format is "dd-MM-yyyy HH:mm"
+   */
+  private void testTruncDateToHour(String input, String expected) {
+    Date inputDate = DateUtility.parse(input, DATE_TIME_PATTERN);
+    Date expectedDate = DateUtility.parse(expected, DATE_TIME_PATTERN);
+    Date value = DateUtility.truncDateToHour(inputDate);
+
+    String message = "Trunc <" + input + "> to hour";
+    assertDateEquals(message, expectedDate, value);
+  }
+
   /**
    * @param message
    * @param expected
