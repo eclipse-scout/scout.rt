@@ -108,7 +108,7 @@ public class WebContentRequestInterceptor extends AbstractService implements ISe
     if (sessionFlag != null) {
       return sessionFlag.booleanValue();
     }
-    if (Platform.inDevelopmentMode()) { // TODO IMO Check this condition
+    if (Platform.inDevelopmentMode()) {
       return true;
     }
     return false;

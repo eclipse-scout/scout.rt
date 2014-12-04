@@ -154,11 +154,11 @@ public class ScriptBuilder {
     String[] lines = text.split("[\\n]");
     for (String line : lines) {
       buf.append((insideBlockComment ? "//" : "/*")).
-          append(filename).append(":").
-          append(String.format("%-" + ((lines.length + "").length()) + "d", lineNo)).
-          append((insideBlockComment ? "//" : "*/")).append(" ").
-          append(line).
-          append("\n");
+      append(filename).append(":").
+      append(String.format("%-" + ((lines.length + "").length()) + "d", lineNo)).
+      append((insideBlockComment ? "//" : "*/")).append(" ").
+      append(line).
+      append("\n");
       if (lineIsBeginOfMultilineBlockComment(line, insideBlockComment)) {
         //also if line is endMLBC AND beginMLBC
         insideBlockComment = true;
