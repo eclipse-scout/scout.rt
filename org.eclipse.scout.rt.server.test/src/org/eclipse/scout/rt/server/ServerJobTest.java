@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.server;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -20,6 +21,8 @@ import java.util.List;
 import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
+
+import javax.security.auth.Subject;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -100,6 +103,33 @@ public class ServerJobTest {
       }
       return false;
     }
+  }
+
+  private boolean executed;
+
+  /**
+   * Tests if runNow() executes runTransaction()
+   *
+   * @throws Exception
+   */
+  @Test
+  public void testRun() throws Exception {
+    ServerJob job = new ServerJob("TestJob", mock(IServerSession.class), new Subject()) {
+
+      private void setExecuted() {
+        executed = true;
+      }
+
+      @Override
+      protected IStatus runTransaction(IProgressMonitor monitor) throws Exception {
+        setExecuted();
+        return mock(IStatus.class);
+      }
+    };
+
+    executed = false;
+    job.runNow(new NullProgressMonitor());
+    assertTrue(executed);
   }
 
 }
