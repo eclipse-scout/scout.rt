@@ -1,4 +1,5 @@
 scout.Action = function() {
+  this._hoverBound = false;
   scout.Action.parent.call(this);
 };
 scout.inherits(scout.Action, scout.ModelAdapter);
@@ -13,6 +14,11 @@ scout.Action.prototype._renderProperties = function() {
   this._renderEnabled(this.enabled);
   this._renderSelected(this.selected);
   this._renderVisible(this.visible);
+};
+
+scout.Action.prototype._remove = function() {
+  scout.Action.parent.prototype._remove.call(this);
+  this._hoverBound = false;
 };
 
 scout.Action.prototype._renderText = function(text) {
@@ -43,12 +49,12 @@ scout.Action.prototype._renderKeystroke = function(keystroke) {
 };
 
 scout.Action.prototype._renderTooltipText = function(tooltipText) {
-  if (tooltipText && !this.hoverBound) {
+  if (tooltipText && !this._hoverBound) {
     this.$container.hover(this._onHoverIn.bind(this), this._onHoverOut.bind(this));
-    this.hoverBound = true;
+    this._hoverBound = true;
   } else if (!tooltipText && this.hoverBound) {
     this.$container.off('mouseenter mouseleave');
-    this.hoverBound = false;
+    this._hoverBound = false;
   }
 };
 

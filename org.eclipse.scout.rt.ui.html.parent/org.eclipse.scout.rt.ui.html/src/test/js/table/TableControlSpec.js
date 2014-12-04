@@ -117,6 +117,24 @@ describe("TableControl", function() {
         expect(action.$container.hover.calls.count()).toEqual(1);
       });
 
+      it("attaches hover listener, even when re rendering", function() {
+        var action = createAction(createModel());
+        table.controls = [action];
+        table.addChild(action);
+        table.render(session.$entryPoint);
+
+        table.remove();
+        table.render(session.$entryPoint);
+        spyOn(action.$container, 'hover').and.callThrough();
+
+        var event = createPropertyChangeEvent(action, {
+          "tooltipText": 'my tooltip'
+        });
+        action.onModelPropertyChange(event);
+
+        expect(action.$container.hover.calls.count()).toEqual(1);
+      });
+
     });
 
   });
