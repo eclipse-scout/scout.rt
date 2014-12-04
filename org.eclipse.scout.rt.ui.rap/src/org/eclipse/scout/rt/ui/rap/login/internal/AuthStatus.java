@@ -10,9 +10,11 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.login.internal;
 
+import java.io.Serializable;
 import java.net.URL;
 
-public class AuthStatus {
+public class AuthStatus implements Serializable {
+  private static final long serialVersionUID = -7282339263638467073L;
   private Boolean m_ok;
   private String m_username;
   private String m_password;
