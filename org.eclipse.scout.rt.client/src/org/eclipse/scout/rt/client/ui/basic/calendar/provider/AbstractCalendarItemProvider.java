@@ -81,6 +81,9 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
   /*
    * Configuration
    */
+  /**
+   * @return true, if this calendar item should be draggable in the UI, false otherwise.
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(10)
   protected boolean getConfiguredMoveItemEnabled() {
