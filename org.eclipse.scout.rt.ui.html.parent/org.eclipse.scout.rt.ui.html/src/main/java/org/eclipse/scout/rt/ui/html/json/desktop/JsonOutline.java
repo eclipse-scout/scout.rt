@@ -249,7 +249,7 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
     if (page.isDetailFormVisible()) {
       optAttachAdapter(page.getDetailForm());
     }
-    if (page.isTableVisible()) {
+    if (page.isTableVisible()) {//FIXME AWE from CGU: this is always true, intended?
       attachAdapter(getTable(page));
     }
     JSONObject jsonEvent = new JSONObject();

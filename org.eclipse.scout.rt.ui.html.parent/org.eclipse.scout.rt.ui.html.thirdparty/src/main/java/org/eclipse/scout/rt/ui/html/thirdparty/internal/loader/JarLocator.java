@@ -28,7 +28,7 @@ public class JarLocator {
         return url;
       }
       //path in development workspace
-      url = m_osgiBundle.getEntry("src/main/resources/" + resourceName);
+      url = m_osgiBundle.getEntry("lib/" + resourceName);
       if (url != null) {
         return url;
       }
@@ -40,7 +40,7 @@ public class JarLocator {
         return url;
       }
       //path in development workspace
-      url = m_loaderClass.getResource("/src/main/resources/" + resourceName);
+      url = m_loaderClass.getResource("/lib/" + resourceName);
       if (url != null) {
         return url;
       }
