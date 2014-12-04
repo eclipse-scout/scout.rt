@@ -37,8 +37,7 @@ public class JmsPublishSubscribeMessageService extends AbstractSimpleJmsService<
   @Override
   public void subscribe() throws ProcessingException {
     if (!isEnabled()) {
-      LOG.info("Cluster synchronization is not enabled: missing connectionFactory or topic configuration properties.");
-      return;
+      throw new ProcessingException("Cluster synchronization is not enabled: missing connectionFactory or topic configuration properties.");
     }
     setupConnection();
     startMessageConsumerJob();
@@ -48,7 +47,7 @@ public class JmsPublishSubscribeMessageService extends AbstractSimpleJmsService<
   @Override
   public void unsubsribe() throws ProcessingException {
     if (!isEnabled()) {
-      LOG.trace("Cluster synchronization is not enabled");
+      LOG.info("Cluster synchronization is not enabled");
       return;
     }
     try {
