@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.commons;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
@@ -135,6 +136,13 @@ public class StringUtilityTest {
     assertEquals("abc", StringUtility.join(null, Arrays.asList("a", "b", "c")));
     assertEquals("123", StringUtility.join(null, Arrays.asList(1, 2, 3)));
     assertEquals("11", StringUtility.join(null, Arrays.asList(1, null, BigDecimal.ONE)));
+  }
+
+  @Test
+  public void testSplit() {
+    assertEquals(0, StringUtility.split(null, null).length);
+    assertEquals(0, StringUtility.split("", null).length);
+    assertArrayEquals(new String[]{"boo", "and", "foo"}, StringUtility.split("boo:and:foo", ":"));
   }
 
   @Test

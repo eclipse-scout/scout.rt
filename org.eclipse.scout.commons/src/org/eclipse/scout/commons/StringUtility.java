@@ -553,10 +553,10 @@ public final class StringUtility {
     while (startPos < text.length() && (a = getStartTag(text, tagName, startPos)).begin >= 0 && (b = text.indexOf("</" + tagName + ">", a.end)) > 0) {
       text =
           text.substring(0, a.begin) +
-              start +
-              text.substring(a.end, b) +
-              end +
-              text.substring(b + tagName.length() + 3);
+          start +
+          text.substring(a.end, b) +
+          end +
+          text.substring(b + tagName.length() + 3);
       //next
       startPos = a.begin + start.length();
     }
@@ -1168,6 +1168,11 @@ public final class StringUtility {
     }
   }
 
+  /**
+   * Splits the string around matches of the regex.
+   * Returns an empty array if the provided string is null or has length null.
+   * Otherwise, the method returns the result of {@link java.lang.String#split}.
+   */
   public static String[] split(String s, String regex) {
     if (s == null || s.length() == 0) {
       return new String[0];
@@ -1190,7 +1195,7 @@ public final class StringUtility {
             "(?<=[^A-Z])(?=[A-Z])",
             "(?<=[A-Za-z])(?=[^A-Za-z])"
             ),
-        " "
+            " "
         );
   }
 
