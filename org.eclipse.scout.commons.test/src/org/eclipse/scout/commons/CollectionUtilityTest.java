@@ -11,7 +11,11 @@
 package org.eclipse.scout.commons;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -212,6 +216,67 @@ public class CollectionUtilityTest {
     assertEquals(0, CollectionUtility.size(new ArrayList<Object>()));
     assertEquals(1, CollectionUtility.size(createList("1")));
     assertEquals(2, CollectionUtility.size(createList("1", "2")));
+  }
+
+  @Test
+  public void testContainsAny() {
+    // Test for single valued list
+    assertTrue(CollectionUtility.containsAny(createList(2L, 1L), createList(1L)));
+    assertFalse(CollectionUtility.containsAny(createList(2L, 3L), createList(1L)));
+    // Test for null collections
+    assertFalse(CollectionUtility.containsAny(createList(2L, 3L), (Collection<?>) null));
+    assertFalse(CollectionUtility.containsAny(null, createList(2L, 3L)));
+    assertFalse(CollectionUtility.containsAny((Collection<Long>) null, (Collection<Long>) null));
+    // Test for null elements
+    assertTrue(CollectionUtility.containsAny(createList(null, 1L), createList(new Object[]{null})));
+  }
+
+  @Test
+  public void testContainsAnyArray() {
+    // Test for single valued list
+    assertTrue(CollectionUtility.containsAny(createList(2L, 1L), new Object[]{1L}));
+    assertFalse(CollectionUtility.containsAny(createList(2L, 3L), new Object[]{1L}));
+    // Test for null collections
+    assertFalse(CollectionUtility.containsAny(createList(2L, 3L), (Object[]) null));
+    assertFalse(CollectionUtility.containsAny(null, new Object[]{2L, 3L}));
+    assertFalse(CollectionUtility.containsAny((Collection<Object>) null, (Object[]) null));
+
+    // Test for null elements
+    assertTrue(CollectionUtility.containsAny(createList(null, 1L), createList(new Object[]{null})));
+  }
+
+  @Test
+  public void testGetElement() {
+    // Test that the item is returned from the position - not a copy or similar
+    String item = "1";
+    assertSame(item, CollectionUtility.getElement(createList("1", item, "1"), 1));
+    // Test out of bounds
+    assertNull(CollectionUtility.getElement(createList(1L, 2L, 3L), -1));
+    assertNull(CollectionUtility.getElement(createList(1L, 2L, 3L), 3));
+  }
+
+  @Test
+  public void testTruncateList() {
+    List<Object> list = Collections.unmodifiableList(createList(1L, 2L, 3L, 4L, 5L));
+    ArrayList<Object> newList = CollectionUtility.truncateList(list, 3);
+    assertNotNull(newList);
+    assertEquals(3, newList.size());
+    assertEquals(1L, list.get(0));
+    assertEquals(2L, list.get(1));
+    assertEquals(3L, list.get(2));
+
+    // Test size is equal to actual size
+    newList = CollectionUtility.truncateList(list, 5);
+    assertEquals(list, newList); // Compare collection
+
+    // Test max size larger than actual size
+    newList = CollectionUtility.truncateList(list, 6);
+    assertEquals(list, newList); // Compare collection
+
+    // Test null
+    newList = CollectionUtility.truncateList(null, 1);
+    assertNotNull(newList);
+    assertTrue(newList.isEmpty());
   }
 
   private List<Object> createList(Object... elements) {
