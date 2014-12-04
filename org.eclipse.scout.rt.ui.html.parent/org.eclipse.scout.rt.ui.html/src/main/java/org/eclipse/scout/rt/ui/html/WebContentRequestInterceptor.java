@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.html.json.servlet;
+package org.eclipse.scout.rt.ui.html;
 
 import java.io.IOException;
 import java.net.URL;
@@ -24,15 +24,11 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.ui.html.JEEWebContentResourceLocator;
-import org.eclipse.scout.rt.ui.html.OsgiWebContentService;
-import org.eclipse.scout.rt.ui.html.Script;
-import org.eclipse.scout.rt.ui.html.ScriptBuilder;
 import org.eclipse.scout.service.AbstractService;
 import org.eclipse.scout.service.SERVICES;
 
 /**
- * This interceptor contributes to the {@link AbstractJsonServlet} as the default GET handler for static resources
+ * This interceptor contributes to the {@link AbstractScoutAppServlet} as the default GET handler for static resources
  * contained in this bundles /WebContent directory
  * <p>
  * js and css files are automatically compiled if the name matches
@@ -55,7 +51,7 @@ public class WebContentRequestInterceptor extends AbstractService implements ISe
   private static final String DEBUG_PARAM = "debug";
 
   @Override
-  public boolean interceptGet(AbstractJsonServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+  public boolean interceptGet(AbstractScoutAppServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     String pathInfo = resolvePathInfo(req);
 
     //debug flag
@@ -91,7 +87,7 @@ public class WebContentRequestInterceptor extends AbstractService implements ISe
   }
 
   @Override
-  public boolean interceptPost(AbstractJsonServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+  public boolean interceptPost(AbstractScoutAppServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     return false;
   }
 
@@ -129,7 +125,7 @@ public class WebContentRequestInterceptor extends AbstractService implements ISe
     return new IndexResolver();
   }
 
-  protected Script findScriptSource(AbstractJsonServlet servlet, String scriptPath) {
+  protected Script findScriptSource(AbstractScoutAppServlet servlet, String scriptPath) {
     //osgi only!
     for (OsgiWebContentService w : SERVICES.getServices(OsgiWebContentService.class)) {
       Script script = w.getLocator().getScriptSource(scriptPath);
@@ -141,7 +137,7 @@ public class WebContentRequestInterceptor extends AbstractService implements ISe
     return new JEEWebContentResourceLocator(servlet.getServletContext()).getScriptSource(scriptPath);
   }
 
-  protected URL findWebContentResource(AbstractJsonServlet servlet, String resourcePath) {
+  protected URL findWebContentResource(AbstractScoutAppServlet servlet, String resourcePath) {
     //osgi only!
     for (OsgiWebContentService w : SERVICES.getServices(OsgiWebContentService.class)) {
       URL url = w.getLocator().getWebContentResource(resourcePath);

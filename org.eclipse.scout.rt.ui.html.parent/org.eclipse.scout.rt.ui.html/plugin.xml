@@ -4,11 +4,11 @@
    <extension
          point="org.eclipse.scout.service.services">
       <service
-            class="org.eclipse.scout.rt.ui.html.json.servlet.WebContentRequestInterceptor"
+            class="org.eclipse.scout.rt.ui.html.WebContentRequestInterceptor"
             createImmediately="false">
       </service>
       <service
-            class="org.eclipse.scout.rt.ui.html.json.servlet.JsonMessageRequestInterceptor"
+            class="org.eclipse.scout.rt.ui.html.json.JsonMessageRequestInterceptor"
             createImmediately="false">
       </service>
       <service

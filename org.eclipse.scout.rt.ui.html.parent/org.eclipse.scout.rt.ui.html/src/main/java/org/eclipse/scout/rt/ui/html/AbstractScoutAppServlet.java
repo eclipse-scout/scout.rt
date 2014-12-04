@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.html.json.servlet;
+package org.eclipse.scout.rt.ui.html;
 
 import java.io.IOException;
 
@@ -30,10 +30,10 @@ import org.eclipse.scout.service.SERVICES;
  * <p>
  * Ajax requests are processed as "/json" using HTTP POST
  */
-public abstract class AbstractJsonServlet extends HttpServletEx {
+public abstract class AbstractScoutAppServlet extends HttpServletEx {
 
   private static final long serialVersionUID = 1L;
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractJsonServlet.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractScoutAppServlet.class);
 
   /**
    * Template pattern.
@@ -72,18 +72,18 @@ public abstract class AbstractJsonServlet extends HttpServletEx {
   private P_AbstractInterceptor m_interceptGet = new P_AbstractInterceptor("GET") {
     @Override
     boolean intercept(IServletRequestInterceptor interceptor, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-      return interceptor.interceptGet(AbstractJsonServlet.this, req, resp);
+      return interceptor.interceptGet(AbstractScoutAppServlet.this, req, resp);
     }
   };
 
   private P_AbstractInterceptor m_interceptPost = new P_AbstractInterceptor("POST") {
     @Override
     boolean intercept(IServletRequestInterceptor interceptor, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-      return interceptor.interceptPost(AbstractJsonServlet.this, req, resp);
+      return interceptor.interceptPost(AbstractScoutAppServlet.this, req, resp);
     }
   };
 
-  protected AbstractJsonServlet() {
+  protected AbstractScoutAppServlet() {
   }
 
   /**

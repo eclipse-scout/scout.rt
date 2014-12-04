@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.html.json.servlet;
+package org.eclipse.scout.rt.ui.html;
 
 import java.io.IOException;
 
@@ -31,7 +31,7 @@ public class SlowDownRequestInterceptor extends AbstractService implements IServ
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SlowDownRequestInterceptor.class);
 
   @Override
-  public boolean interceptPost(AbstractJsonServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+  public boolean interceptPost(AbstractScoutAppServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     if (!isEnabledOnSession(req)) {
       return false;
     }
@@ -51,7 +51,7 @@ public class SlowDownRequestInterceptor extends AbstractService implements IServ
   }
 
   @Override
-  public boolean interceptGet(AbstractJsonServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+  public boolean interceptGet(AbstractScoutAppServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     updateState(req);
 
     return false;

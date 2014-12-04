@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.html.json.servlet;
+package org.eclipse.scout.rt.ui.html.json;
 
 import java.io.IOException;
 
@@ -22,29 +22,26 @@ import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.ui.html.json.IJsonSession;
-import org.eclipse.scout.rt.ui.html.json.JsonException;
-import org.eclipse.scout.rt.ui.html.json.JsonRequest;
-import org.eclipse.scout.rt.ui.html.json.JsonResponse;
-import org.eclipse.scout.rt.ui.html.json.JsonStartupRequest;
+import org.eclipse.scout.rt.ui.html.AbstractScoutAppServlet;
+import org.eclipse.scout.rt.ui.html.IServletRequestInterceptor;
 import org.eclipse.scout.service.AbstractService;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * This interceptor contributes to the {@link AbstractJsonServlet} as the default json message handler
+ * This interceptor contributes to the {@link AbstractScoutAppServlet} as the default json message handler
  */
 @Priority(-10)
 public class JsonMessageRequestInterceptor extends AbstractService implements IServletRequestInterceptor {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonMessageRequestInterceptor.class);
 
   @Override
-  public boolean interceptGet(AbstractJsonServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+  public boolean interceptGet(AbstractScoutAppServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     return false;
   }
 
   @Override
-  public boolean interceptPost(AbstractJsonServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+  public boolean interceptPost(AbstractScoutAppServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     //serve only /json
     String pathInfo = req.getPathInfo();
     if (pathInfo == null || !"/json".equals(pathInfo)) {
@@ -71,7 +68,7 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
     return true;
   }
 
-  protected IJsonSession getOrCreateJsonSession(AbstractJsonServlet servlet, HttpServletRequest req, HttpServletResponse resp, JsonRequest jsonReq) throws ServletException, IOException {
+  protected IJsonSession getOrCreateJsonSession(AbstractScoutAppServlet servlet, HttpServletRequest req, HttpServletResponse resp, JsonRequest jsonReq) throws ServletException, IOException {
     String jsonSessionAttributeName = "scout.htmlui.session.json." + jsonReq.getJsonSessionId();
     HttpSession httpSession = req.getSession();
 

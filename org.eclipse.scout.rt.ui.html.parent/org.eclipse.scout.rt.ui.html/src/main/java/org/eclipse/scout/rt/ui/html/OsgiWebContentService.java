@@ -1,6 +1,5 @@
 package org.eclipse.scout.rt.ui.html;
 
-import org.eclipse.scout.rt.ui.html.json.servlet.WebContentRequestInterceptor;
 import org.eclipse.scout.service.AbstractService;
 import org.osgi.framework.ServiceRegistration;
 

@@ -8,12 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.html.json.servlet;
+package org.eclipse.scout.rt.ui.html;
 
 import javax.servlet.http.HttpServletRequest;
-
-import org.eclipse.scout.rt.ui.html.BrowserInfo;
-import org.eclipse.scout.rt.ui.html.BrowserInfoBuilder;
 
 public class IndexResolver {
   public static final String INDEX_HTML = "/index.html";

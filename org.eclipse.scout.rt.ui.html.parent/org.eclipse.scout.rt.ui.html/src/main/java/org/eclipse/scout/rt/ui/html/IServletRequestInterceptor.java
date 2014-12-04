@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.html.json.servlet;
+package org.eclipse.scout.rt.ui.html;
 
 import java.io.IOException;
 
@@ -19,17 +19,17 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.scout.service.IService;
 
 /**
- * This interceptor contributes to the {@link AbstractJsonServlet}
+ * This interceptor contributes to the {@link AbstractScoutAppServlet}
  */
 public interface IServletRequestInterceptor extends IService {
 
   /**
    * @return true if the request was consumed by the interceptor, no further action is then necessary
    */
-  boolean interceptPost(AbstractJsonServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException;
+  boolean interceptPost(AbstractScoutAppServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException;
 
   /**
    * @return true if the request was consumed by the interceptor, no further action is then necessary
    */
-  boolean interceptGet(AbstractJsonServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException;
+  boolean interceptGet(AbstractScoutAppServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException;
 }

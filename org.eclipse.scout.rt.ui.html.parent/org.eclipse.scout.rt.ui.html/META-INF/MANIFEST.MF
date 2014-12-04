@@ -29,7 +29,6 @@ Export-Package: org.eclipse.scout.rt.ui.html,
  org.eclipse.scout.rt.ui.html.json.form.fields.tabbox,
  org.eclipse.scout.rt.ui.html.json.form.fields.tablefield,
  org.eclipse.scout.rt.ui.html.json.menu,
- org.eclipse.scout.rt.ui.html.json.servlet,
  org.eclipse.scout.rt.ui.html.json.table,
  org.eclipse.scout.rt.ui.html.json.table.control,
  org.eclipse.scout.rt.ui.html.json.tree

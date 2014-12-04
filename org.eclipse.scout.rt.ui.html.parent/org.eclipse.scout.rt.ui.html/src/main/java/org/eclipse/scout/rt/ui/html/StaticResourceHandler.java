@@ -1,4 +1,4 @@
-package org.eclipse.scout.rt.ui.html.json.servlet;
+package org.eclipse.scout.rt.ui.html;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -29,7 +29,7 @@ public class StaticResourceHandler {
   private static final String ETAG = "ETag"; //$NON-NLS-1$
   private static final int ANY_SIZE = 8192;
 
-  public void handle(AbstractJsonServlet servlet, HttpServletRequest req, HttpServletResponse resp, URL url) throws ServletException, IOException {
+  public void handle(AbstractScoutAppServlet servlet, HttpServletRequest req, HttpServletResponse resp, URL url) throws ServletException, IOException {
     URLConnection connection = url.openConnection();
     long lastModified = connection.getLastModified();
     int contentLength = connection.getContentLength();
