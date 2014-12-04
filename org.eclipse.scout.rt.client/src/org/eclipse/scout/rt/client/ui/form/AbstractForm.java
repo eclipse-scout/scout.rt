@@ -251,6 +251,9 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     return false;
   }
 
+  /**
+   * @return defines if the form is initially minimized
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(110)
   protected boolean getConfiguredMinimized() {
