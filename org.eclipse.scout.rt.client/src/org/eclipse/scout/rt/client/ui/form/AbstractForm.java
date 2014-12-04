@@ -287,6 +287,12 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     return false;
   }
 
+  /**
+   * AskIfNeedSave defines if a message box with yes, no and cancel option is shown to the user for confirmation
+   * after having made at least one change in the form and then having pressed the cancel button.
+   *
+   * @return <code>true</code> if message box is shown for confirmation, <code>false</code> otherwise.
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(150)
   protected boolean getConfiguredAskIfNeedSave() {
