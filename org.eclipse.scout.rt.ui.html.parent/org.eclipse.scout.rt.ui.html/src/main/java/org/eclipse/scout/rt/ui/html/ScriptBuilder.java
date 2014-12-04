@@ -17,7 +17,6 @@ import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -49,9 +48,7 @@ public class ScriptBuilder {
     String outputFile = processIncludes(script, !minify);
     if (minify) {
       outputFile = compileJs(outputFile);
-      if (!Platform.inDevelopmentMode()) { // TODO IMO Check this condition
-        outputFile = minifyJs(outputFile);
-      }
+      outputFile = minifyJs(outputFile);
     }
     return outputFile;
   }
@@ -74,9 +71,7 @@ public class ScriptBuilder {
     String outputFile = processIncludes(script, false);
     if (minify) {
       outputFile = compileCss(outputFile);
-      if (!Platform.inDevelopmentMode()) { // TODO IMO Check this condition
-        outputFile = minifyCss(outputFile);
-      }
+      outputFile = minifyCss(outputFile);
     }
     return outputFile;
   }
@@ -92,9 +87,10 @@ public class ScriptBuilder {
     if (m_thirdPartyScriptProcessorService == null) {
       return content;
     }
+    /*FIXME imo, cgu, now working with separate classloader? ->not yet destroys css!
+     * return m_thirdPartyScriptProcessorService.minifyCss(content);
+     */
     return content;
-    //FIXME imo, cgu, now working with separate classloader? ->not yet destroys css!
-    //return m_thirdPartyScriptProcessorService.minifyCss(content);
   }
 
   protected String processIncludes(Script script, boolean addLineNumbers) throws IOException {
@@ -134,6 +130,7 @@ public class ScriptBuilder {
         return IOUtility.getContentUtf8(in);
       }
       catch (ProcessingException e) {
+        LOG.warn("reading " + url, e);
         throw new IOException(e.getMessage());
       }
     }
@@ -157,11 +154,11 @@ public class ScriptBuilder {
     String[] lines = text.split("[\\n]");
     for (String line : lines) {
       buf.append((insideBlockComment ? "//" : "/*")).
-      append(filename).append(":").
-      append(String.format("%-" + ((lines.length + "").length()) + "d", lineNo)).
-      append((insideBlockComment ? "//" : "*/")).append(" ").
-      append(line).
-      append("\n");
+          append(filename).append(":").
+          append(String.format("%-" + ((lines.length + "").length()) + "d", lineNo)).
+          append((insideBlockComment ? "//" : "*/")).append(" ").
+          append(line).
+          append("\n");
       if (lineIsBeginOfMultilineBlockComment(line, insideBlockComment)) {
         //also if line is endMLBC AND beginMLBC
         insideBlockComment = true;
@@ -178,13 +175,15 @@ public class ScriptBuilder {
     int a = line.lastIndexOf("/*");
     int b = line.lastIndexOf("*/");
     int c = line.lastIndexOf("/*/");
-    return a >= 0 && (b < 0 || b < a || (c == a)) && !insideBlockComment;
+    boolean flag = a >= 0 && (b < 0 || b < a || (c == a));//because of sonar only allowing 3 conditions in sequence...
+    return flag && !insideBlockComment;
   }
 
   protected boolean lineIsEndOfMultilineBlockComment(String line, boolean insideBlockComment) {
     int a = line.indexOf("/*");
     int b = line.indexOf("*/");
     int c = line.lastIndexOf("/*/");
-    return b >= 0 && (a < 0 || a < b || (c == a)) && insideBlockComment;
+    boolean flag = b >= 0 && (a < 0 || a < b || (c == a));//because of sonar only allowing 3 conditions in sequence...
+    return flag && insideBlockComment;
   }
 }

@@ -23,9 +23,7 @@ public class CompileCssWithLess {
       return engine.compile(content);
     }
     catch (LessException e) {
-      System.err.println("Failed to parse CSS content with LESS");
-      e.printStackTrace(System.err);
-      return content;
+      throw new IOException("Failed to parse CSS content with LESS", e);
     }
   }
 

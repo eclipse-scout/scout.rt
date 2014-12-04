@@ -14,4 +14,3 @@ Bundle-Vendor: BSI Business Systems Integration AG
 Bundle-ActivationPolicy: lazy
 Require-Bundle: org.eclipse.scout.rt.ui.html;bundle-version="5.1.0",
  org.junit4;bundle-version="4.8.1";resolution:=optional
-Bundle-Activator: org.eclipse.scout.rt.ui.html.thirdparty.internal.loader.Activator

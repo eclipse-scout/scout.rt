@@ -10,8 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.thirdparty;
 
+public final class ConsoleTest implements ExampleScripts {
 
-public class ConsoleTest implements ExampleScripts {
+  private ConsoleTest() {
+  }
 
   public static void main(String[] args) throws Exception {
     ThirdPartyScriptProcessorImpl impl = new ThirdPartyScriptProcessorImpl();

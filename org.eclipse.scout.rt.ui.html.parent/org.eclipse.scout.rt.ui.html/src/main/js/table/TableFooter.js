@@ -8,7 +8,7 @@ scout.TableFooter.CONTAINER_SIZE = 340;
 
 scout.TableFooter.prototype._render = function($parent) {
   var that = this,
-    i, control, $group, filter, filterText;
+    i, control, $group, filter;
 
   this.$container = $parent.appendDiv('table-footer');
   this._$controlContainer = this.$container.appendDiv('control-container').hide();

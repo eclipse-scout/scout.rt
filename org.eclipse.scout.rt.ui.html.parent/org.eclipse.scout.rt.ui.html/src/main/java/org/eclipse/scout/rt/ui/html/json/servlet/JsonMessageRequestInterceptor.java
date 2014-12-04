@@ -47,7 +47,7 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
   public boolean interceptPost(AbstractJsonServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     //serve only /json
     String pathInfo = req.getPathInfo();
-    if (pathInfo == null || !pathInfo.equals("/json")) {
+    if (pathInfo == null || !"/json".equals(pathInfo)) {
       resp.sendError(HttpServletResponse.SC_NOT_FOUND);
       return true;
     }
@@ -58,13 +58,26 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
       return true;
     }
 
+    IJsonSession jsonSession = getOrCreateJsonSession(servlet, req, resp, jsonReq);
+    if (jsonSession == null) {
+      return true;
+    }
+
+    // GUI requests for the same session must be processed consecutively
+    synchronized (jsonSession) {
+      JSONObject json = jsonSession.processRequest(req, jsonReq);
+      writeResponse(resp, json);
+    }
+    return true;
+  }
+
+  protected IJsonSession getOrCreateJsonSession(AbstractJsonServlet servlet, HttpServletRequest req, HttpServletResponse resp, JsonRequest jsonReq) throws ServletException, IOException {
     String jsonSessionAttributeName = "scout.htmlui.session.json." + jsonReq.getJsonSessionId();
     HttpSession httpSession = req.getSession();
 
     //FIXME cgu really synchronize on this? blocks every call, maybe introduce a lock object saved on httpSession or even better use java.util.concurrent.locks.ReadWriteLock
-    IJsonSession jsonSession = null;
     synchronized (httpSession) {
-      jsonSession = (IJsonSession) httpSession.getAttribute(jsonSessionAttributeName);
+      IJsonSession jsonSession = (IJsonSession) httpSession.getAttribute(jsonSessionAttributeName);
 
       if (jsonReq.isUnloadRequest()) {
         LOG.info("Unloading JSON session with ID " + jsonReq.getJsonSessionId() + " (requested by UI)");
@@ -72,14 +85,14 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
           jsonSession.dispose();
           httpSession.removeAttribute(jsonSessionAttributeName);
         }
-        return true;
+        return null;
       }
 
       if (jsonSession == null) {
         if (!jsonReq.isStartupRequest()) {
           LOG.info("Request cannot be processed due to JSON session timeout [id=" + jsonReq.getJsonSessionId() + "]");
           writeError(resp, createSessionTimeoutJsonResponse());
-          return true;
+          return null;
         }
         LOG.info("Creating new JSON session with ID " + jsonReq.getJsonSessionId() + "...");
         jsonSession = servlet.createJsonSession();
@@ -89,14 +102,8 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
       else if (jsonReq.isStartupRequest()) {
         throw new IllegalStateException("Startup requested for existing JSON session with ID " + jsonReq.getJsonSessionId());
       }
+      return jsonSession;
     }
-
-    // GUI requests for the same session must be processed consecutively
-    synchronized (jsonSession) {
-      JSONObject json = jsonSession.processRequest(req, jsonReq);
-      writeResponse(resp, json);
-    }
-    return true;
   }
 
   protected JsonResponse createSessionTimeoutJsonResponse() {

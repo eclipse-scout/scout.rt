@@ -16,10 +16,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.LinkedHashMap;
 
+import org.osgi.framework.FrameworkUtil;
+
 public final class SandboxClassLoaderBuilder {
-  private final LinkedHashMap<URL, URL> m_urls = new LinkedHashMap<URL, URL>();
+  private static final int ANY_SIZE = 10240;
+  private final LinkedHashMap<String, URL> m_urls = new LinkedHashMap<String, URL>();
   private final JarLocator m_loc;
 
   public SandboxClassLoaderBuilder() {
@@ -27,28 +32,33 @@ public final class SandboxClassLoaderBuilder {
   }
 
   public SandboxClassLoaderBuilder(JarLocator loc) {
-    m_loc = loc != null ? loc : new JarLocator(SandboxClassLoaderBuilder.class, Activator.getContext() != null ? Activator.getContext().getBundle() : null);
+    m_loc = (loc != null ? loc : new JarLocator(SandboxClassLoaderBuilder.class, FrameworkUtil.getBundle(SandboxClassLoaderBuilder.class)));
   }
 
   public SandboxClassLoaderBuilder addJar(URL url) {
-    m_urls.put(url, unwrapNestedJar(notNull(url)));
+    m_urls.put(url.toExternalForm(), unwrapNestedJar(notNull(url)));
     return this;
   }
 
   public SandboxClassLoaderBuilder addLocalJar(String path) {
     URL url = m_loc.getResource(path);
-    m_urls.put(url, unwrapNestedJar(notNull(url)));
+    m_urls.put(url.toExternalForm(), unwrapNestedJar(notNull(url)));
     return this;
   }
 
   public SandboxClassLoaderBuilder addJarContaining(Class<?> clazz) {
     URL url = m_loc.getJarContaining(clazz);
-    m_urls.put(url, unwrapNestedJar(notNull(url)));
+    m_urls.put(url.toExternalForm(), unwrapNestedJar(notNull(url)));
     return this;
   }
 
-  public ClassLoader build(ClassLoader parent) {
-    return new URLClassLoader(m_urls.values().toArray(new URL[0]), parent);
+  public ClassLoader build(final ClassLoader parent) {
+    return AccessController.doPrivileged(new PrivilegedAction<URLClassLoader>() {
+      @Override
+      public URLClassLoader run() {
+        return new URLClassLoader(m_urls.values().toArray(new URL[0]), parent);
+      }
+    });
   }
 
   protected static URL notNull(URL url) {
@@ -60,7 +70,7 @@ public final class SandboxClassLoaderBuilder {
 
   protected static URL unwrapNestedJar(URL url) {
     try {
-      if (!url.getProtocol().equals("file")) {
+      if (!"file".equals(url.getProtocol())) {
         //copy to tmp location
         String name = url.getPath();
         int i = name.lastIndexOf('/');
@@ -71,7 +81,7 @@ public final class SandboxClassLoaderBuilder {
         try (
             InputStream in = url.openStream();
             FileOutputStream out = new FileOutputStream(f);) {
-          byte[] buf = new byte[10240];
+          byte[] buf = new byte[ANY_SIZE];
           int n;
           while ((n = in.read(buf)) > 0) {
             out.write(buf, 0, n);

@@ -111,7 +111,7 @@ public class StaticResourceHandler {
     // We should prefer ETag validation as the guarantees are stronger and all
     // HTTP 1.1 clients should be using it
     String ifNoneMatch = req.getHeader(IF_NONE_MATCH);
-    if (ifNoneMatch != null && etag != null && ifNoneMatch.indexOf(etag) != -1) {
+    if (notModified(ifNoneMatch, etag)) {
       return HttpServletResponse.SC_NOT_MODIFIED;
     }
     else {
@@ -119,7 +119,7 @@ public class StaticResourceHandler {
       // for purposes of comparison we add 999 to ifModifiedSince since the
       // fidelity
       // of the IMS header generally doesn't include milli-seconds
-      if (ifModifiedSince > -1 && lastModified > 0 && lastModified <= (ifModifiedSince + IF_MODIFIED_SINCE_DELTA)) {
+      if (notModifiedSince(ifModifiedSince, lastModified)) {
         return HttpServletResponse.SC_NOT_MODIFIED;
       }
     }
@@ -133,6 +133,14 @@ public class StaticResourceHandler {
     }
 
     return HttpServletResponse.SC_ACCEPTED;
+  }
+
+  protected boolean notModified(String ifNoneMatch, String etag) {
+    return (ifNoneMatch != null && etag != null && ifNoneMatch.indexOf(etag) != -1);
+  }
+
+  protected boolean notModifiedSince(long ifModifiedSince, long lastModified) {
+    return (ifModifiedSince > -1 && lastModified > 0 && lastModified <= (ifModifiedSince + IF_MODIFIED_SINCE_DELTA));
   }
 
   protected byte[] fileContent(URL url) throws IOException {

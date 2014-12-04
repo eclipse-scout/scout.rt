@@ -67,10 +67,10 @@ public class ThirdPartyScriptProcessorImpl {
       if (t instanceof IOException) {
         throw (IOException) t;
       }
-      throw new IOException("Failed running " + classname, t);
+      throw new IOException("Failed running " + classname, e0);
     }
-    catch (Throwable t) {
-      throw new IOException("Failed running " + classname, t);
+    catch (Exception e1) {
+      throw new IOException("Failed running " + classname, e1);
     }
   }
 

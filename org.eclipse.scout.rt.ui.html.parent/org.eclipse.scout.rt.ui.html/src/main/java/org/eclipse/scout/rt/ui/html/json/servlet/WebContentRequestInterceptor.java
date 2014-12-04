@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -99,13 +100,16 @@ public class WebContentRequestInterceptor extends AbstractService implements ISe
     if (session == null) {
       return false;
     }
-    String flag = req.getParameter(DEBUG_PARAM);
-    if (flag != null) {
-      session.setAttribute(SESSION_ATTR_DEBUG_SCRIPT_ENABLED, "true".equals(flag));
+    String requestParam = req.getParameter(DEBUG_PARAM);
+    if (requestParam != null) {
+      session.setAttribute(SESSION_ATTR_DEBUG_SCRIPT_ENABLED, "true".equals(requestParam));
     }
-    Boolean active = (Boolean) session.getAttribute(SESSION_ATTR_DEBUG_SCRIPT_ENABLED);
-    if (active != null) {
-      return active.booleanValue();
+    Boolean sessionFlag = (Boolean) session.getAttribute(SESSION_ATTR_DEBUG_SCRIPT_ENABLED);
+    if (sessionFlag != null) {
+      return sessionFlag.booleanValue();
+    }
+    if (Platform.inDevelopmentMode()) { // TODO IMO Check this condition
+      return true;
     }
     return false;
   }
