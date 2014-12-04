@@ -17,6 +17,7 @@ import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -48,7 +49,9 @@ public class ScriptBuilder {
     String outputFile = processIncludes(script, !minify);
     if (minify) {
       outputFile = compileJs(outputFile);
-      outputFile = minifyJs(outputFile);
+      if (!Platform.inDevelopmentMode()) { // TODO IMO Check this condition
+        outputFile = minifyJs(outputFile);
+      }
     }
     return outputFile;
   }
@@ -71,7 +74,9 @@ public class ScriptBuilder {
     String outputFile = processIncludes(script, false);
     if (minify) {
       outputFile = compileCss(outputFile);
-      outputFile = minifyCss(outputFile);
+      if (!Platform.inDevelopmentMode()) { // TODO IMO Check this condition
+        outputFile = minifyCss(outputFile);
+      }
     }
     return outputFile;
   }
