@@ -172,6 +172,10 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
     return false;
   }
 
+  /**
+   * @return true if the AbstractAction should be rendered as a separating line.
+   *         If true, the AbstractAction can not trigger any action ({@link #execAction()})
+   */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(100)
   protected boolean getConfiguredSeparator() {
