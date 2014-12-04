@@ -14,7 +14,6 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.rt.shared.Activator;
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCodeType;
@@ -35,8 +34,7 @@ public class CodeTypeNameExtractorTest {
 
   @BeforeClass
   public static void beforeClass() throws Exception {
-    @SuppressWarnings("unchecked")
-    TestingCodeService codeService = new TestingCodeService(CollectionUtility.arrayList(new TestCodeType(), new MissingTextCodeType()));
+    TestingCodeService codeService = new TestingCodeService(new TestCodeType(), new MissingTextCodeType());
     DefaultCodeLookupCallFactoryService codeLookupCallFactoryService = new DefaultCodeLookupCallFactoryService();
     s_services = TestingUtility.registerServices(Activator.getDefault().getBundle(), 1000, codeService, codeLookupCallFactoryService);
   }
