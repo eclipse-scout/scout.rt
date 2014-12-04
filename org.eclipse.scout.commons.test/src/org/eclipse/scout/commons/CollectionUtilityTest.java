@@ -18,6 +18,7 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -179,6 +180,54 @@ public class CollectionUtilityTest {
     assertNull(CollectionUtility.lastElement(new ArrayList<Object>()));
     assertEquals("a", CollectionUtility.lastElement(createList("a")));
     assertEquals("b", CollectionUtility.lastElement(createList("a", "b")));
+  }
+
+  /**
+   * Test for {@link CollectionUtility#slice(List, int, int)}
+   */
+  @Test
+  public void testSlice() {
+    List<String> nullList = null;
+    List<String> emptyList = new ArrayList<String>();
+    List<String> testList = Arrays.asList("foo", "bar", "test");
+    List<String> testList_1 = Arrays.asList("foo");
+    List<String> testList_23 = Arrays.asList("bar", "test");
+    List<String> testList_3 = Arrays.asList("test");
+
+    // empty and null input lists
+    assertEquals(emptyList, CollectionUtility.slice(nullList, 0, 0));
+    assertEquals(emptyList, CollectionUtility.slice(emptyList, 0, 0));
+
+    // negative indices
+    assertEquals(testList, CollectionUtility.slice(testList, 0, -1));
+    assertEquals(testList_23, CollectionUtility.slice(testList, 1, -1));
+    assertEquals(testList_3, CollectionUtility.slice(testList, -1, -1));
+
+    // positive indices
+    assertEquals(testList, CollectionUtility.slice(testList, 0, 2));
+    assertEquals(testList_1, CollectionUtility.slice(testList, 0, 0));
+    assertEquals(testList_23, CollectionUtility.slice(testList, 1, 2));
+    assertEquals(testList_3, CollectionUtility.slice(testList, 2, 2));
+  }
+
+  @Test(expected = IndexOutOfBoundsException.class)
+  public void testSliceExceptionTo1() throws Exception {
+    CollectionUtility.slice(Arrays.asList("foo", "bar", "test"), -4, 2);
+  }
+
+  @Test(expected = IndexOutOfBoundsException.class)
+  public void testSliceExceptionTo2() throws Exception {
+    CollectionUtility.slice(Arrays.asList("foo", "bar", "test"), 3, 2);
+  }
+
+  @Test(expected = IndexOutOfBoundsException.class)
+  public void testSliceExceptionFrom1() throws Exception {
+    CollectionUtility.slice(Arrays.asList("foo", "bar", "test"), 0, -4);
+  }
+
+  @Test(expected = IndexOutOfBoundsException.class)
+  public void testSliceExceptionFrom2() throws Exception {
+    CollectionUtility.slice(Arrays.asList("foo", "bar", "test"), 0, 3);
   }
 
   /**

@@ -125,6 +125,54 @@ public final class CollectionUtility {
   }
 
   /**
+   * Returns a sub list with the provided indices.
+   * This methods supports negative indices in the sense that -1 addresses the last element and -2 the 2nd last.
+   * For positive indices, the methods uses {@link java.util.List#subList(int, int)} with one change: It is returning
+   * the sub list starting with c[fromIndex] to c[toIndex].
+   * slice(c, 0, 0): first element of c
+   * slice(c, 0, -3): c without the last two elements
+   *
+   * @param c
+   * @param fromIndex
+   * @param toIndex
+   * @return
+   */
+  public static <T> List<T> slice(List<T> c, int fromIndex, int toIndex) {
+    List<T> result = new ArrayList<T>();
+
+    // null check
+    if (c == null) {
+      return result;
+    }
+
+    int len = c.size();
+
+    // arguments check
+    if (fromIndex > len || toIndex > len || fromIndex < -len || toIndex < -len) {
+      throw new IndexOutOfBoundsException("fromIndex or toIndex out of bounds");
+    }
+
+    // special case for empty list
+    if (len > 0 && fromIndex >= len) {
+      throw new IndexOutOfBoundsException("fromIndex or toIndex out of bounds");
+    }
+
+    // map negative indices
+    if (fromIndex < 0) {
+      fromIndex += len;
+    }
+
+    if (toIndex < 0) {
+      toIndex += len + 1;
+    }
+    else if (toIndex == 0 && len > 0 || toIndex > 0) {
+      toIndex++;
+    }
+
+    return new ArrayList<T>(c.subList(fromIndex, toIndex));
+  }
+
+  /**
    * @param c
    * @param values
    * @return <code>true</code> if the collection contains one of the values.
