@@ -1,4 +1,4 @@
-package org.eclipse.scout.rt.ui.html.script;
+package org.eclipse.scout.rt.ui.html.res;
 
 import org.eclipse.scout.service.AbstractService;
 import org.osgi.framework.Bundle;

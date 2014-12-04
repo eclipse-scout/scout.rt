@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.html.script;
+package org.eclipse.scout.rt.ui.html.res;
 
 import java.io.IOException;
 import java.net.URL;
@@ -17,7 +17,7 @@ import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.ui.html.script.Script.NodeType;
+import org.eclipse.scout.rt.ui.html.res.Script.NodeType;
 import org.eclipse.scout.service.SERVICES;
 
 /**

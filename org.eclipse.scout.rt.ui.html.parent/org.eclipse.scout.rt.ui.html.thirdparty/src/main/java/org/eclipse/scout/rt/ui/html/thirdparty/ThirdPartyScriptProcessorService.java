@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.ui.html.thirdparty;
 
 import java.io.IOException;
 
-import org.eclipse.scout.rt.ui.html.script.IScriptProcessorService;
+import org.eclipse.scout.rt.ui.html.res.IScriptProcessorService;
 import org.eclipse.scout.service.AbstractService;
 import org.osgi.framework.ServiceRegistration;
 

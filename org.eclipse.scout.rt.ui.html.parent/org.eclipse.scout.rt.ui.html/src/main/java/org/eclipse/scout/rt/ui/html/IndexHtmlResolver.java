@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.ui.html;
 
 import javax.servlet.http.HttpServletRequest;
 
-public class IndexResolver {
+public class IndexHtmlResolver {
   public static final String INDEX_HTML = "/index.html";
   public static final String MOBILE_INDEX_HTML = "/index-mobile.html";
 
