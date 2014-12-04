@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.html;
+package org.eclipse.scout.rt.ui.html.script;
 
 import java.io.IOException;
 
@@ -19,7 +19,7 @@ import org.eclipse.scout.service.IService;
  * <p>
  * Default implementation is in org.eclipse.scout.rt.ui.html.thirdparty
  */
-public interface IThirdPartyScriptProcessorService extends IService {
+public interface IScriptProcessorService extends IService {
 
   String compileCss(String content) throws IOException;
 

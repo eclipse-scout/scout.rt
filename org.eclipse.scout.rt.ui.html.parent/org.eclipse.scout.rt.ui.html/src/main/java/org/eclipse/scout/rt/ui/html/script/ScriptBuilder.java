@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.html;
+package org.eclipse.scout.rt.ui.html.script;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -31,17 +31,17 @@ public class ScriptBuilder {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ScriptBuilder.class);
   private static final Pattern INCLUDE_PAT = Pattern.compile("//\\s*@include\\s*\\(\\s*\"([^\"]+)\"\\s*\\)");
 
-  private final IThirdPartyScriptProcessorService m_thirdPartyScriptProcessorService;
+  private final IScriptProcessorService m_scriptProcessorService;
 
   public ScriptBuilder() {
-    this(SERVICES.getService(IThirdPartyScriptProcessorService.class));
+    this(SERVICES.getService(IScriptProcessorService.class));
   }
 
-  public ScriptBuilder(IThirdPartyScriptProcessorService thirdPartyScriptProcessorService) {
-    if (thirdPartyScriptProcessorService == null) {
-      LOG.warn("there is no implementor for " + IThirdPartyScriptProcessorService.class);
+  public ScriptBuilder(IScriptProcessorService scriptProcessorService) {
+    if (scriptProcessorService == null) {
+      LOG.warn("there is no implementor for " + IScriptProcessorService.class);
     }
-    m_thirdPartyScriptProcessorService = thirdPartyScriptProcessorService;
+    m_scriptProcessorService = scriptProcessorService;
   }
 
   public String buildJsScript(Script script, boolean minify) throws IOException {
@@ -54,17 +54,17 @@ public class ScriptBuilder {
   }
 
   protected String compileJs(String content) throws IOException {
-    if (m_thirdPartyScriptProcessorService == null) {
+    if (m_scriptProcessorService == null) {
       return content;
     }
-    return m_thirdPartyScriptProcessorService.compileJs(content);
+    return m_scriptProcessorService.compileJs(content);
   }
 
   protected String minifyJs(String content) throws IOException {
-    if (m_thirdPartyScriptProcessorService == null) {
+    if (m_scriptProcessorService == null) {
       return content;
     }
-    return m_thirdPartyScriptProcessorService.minifyJs(content);
+    return m_scriptProcessorService.minifyJs(content);
   }
 
   public String buildCssScript(Script script, boolean minify) throws IOException {
@@ -77,14 +77,14 @@ public class ScriptBuilder {
   }
 
   protected String compileCss(String content) throws IOException {
-    if (m_thirdPartyScriptProcessorService == null) {
+    if (m_scriptProcessorService == null) {
       return content;
     }
-    return m_thirdPartyScriptProcessorService.compileCss(content);
+    return m_scriptProcessorService.compileCss(content);
   }
 
   protected String minifyCss(String content) throws IOException {
-    if (m_thirdPartyScriptProcessorService == null) {
+    if (m_scriptProcessorService == null) {
       return content;
     }
     /*FIXME imo, cgu, now working with separate classloader? ->not yet destroys css!

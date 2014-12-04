@@ -4,7 +4,7 @@
    <extension
          point="org.eclipse.scout.service.services">
       <service
-            class="org.eclipse.scout.rt.ui.html.WebContentRequestInterceptor"
+            class="org.eclipse.scout.rt.ui.html.script.WebContentRequestInterceptor"
             createImmediately="false">
       </service>
       <service
@@ -12,7 +12,7 @@
             createImmediately="false">
       </service>
       <service
-            class="org.eclipse.scout.rt.ui.html.OsgiWebContentService"
+            class="org.eclipse.scout.rt.ui.html.script.OsgiWebContentService"
             createImmediately="false">
       </service>
    </extension>

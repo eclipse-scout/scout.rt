@@ -1,4 +1,4 @@
-package org.eclipse.scout.rt.ui.html;
+package org.eclipse.scout.rt.ui.html.script;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.scout.commons.FileUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.ui.html.AbstractScoutAppServlet;
 
 /**
  * serve a file as a servlet resource using caches
