@@ -40,7 +40,7 @@ import org.eclipse.scout.rt.shared.services.common.bookmark.TablePageState;
 /**
  * A limited navigation history for storing the navigation history and navigating in that
  * history.
- * 
+ *
  * @see org.eclipse.scout.rt.client.ui.desktop.navigation.internal.NavigationHistoryService
  *      NavigationHistoryService
  */
@@ -108,7 +108,7 @@ public class UserNavigationHistory {
    * Logs a warning and returns <code>null</code> for the bookmark that should
    * be used in
    * case of the error.
-   * 
+   *
    * @param t
    *          error to be handled
    * @param bm
@@ -126,7 +126,7 @@ public class UserNavigationHistory {
 
   protected void activateBookmark(Bookmark b) throws ProcessingException {
     IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
-    desktop.activateBookmark(b, false);
+    desktop.activateBookmark(b);
     //scroll to tree selection
     IOutline outline = desktop.getOutline();
     if (outline != null) {
@@ -158,7 +158,7 @@ public class UserNavigationHistory {
    * </p>
    * Truncates the history to the maximum number of elements.
    * </p>
-   * 
+   *
    * @param bm
    *          bookmark to add
    * @return added bookmark

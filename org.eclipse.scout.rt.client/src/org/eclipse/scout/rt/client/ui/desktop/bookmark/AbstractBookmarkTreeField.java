@@ -345,7 +345,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
     protected void execNodeAction(ITreeNode node) throws ProcessingException {
       if (isBookmarkNode(node)) {
         Bookmark bm = (Bookmark) node.getCell().getValue();
-        ClientSyncJob.getCurrentSession().getDesktop().activateBookmark(bm, false);
+        ClientSyncJob.getCurrentSession().getDesktop().activateBookmark(bm);
       }
     }
 
@@ -721,7 +721,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
           m_openBookmarkCommand.openBookmark(bm);
         }
         else {
-          ClientSyncJob.getCurrentSession().getDesktop().activateBookmark(bm, false);
+          ClientSyncJob.getCurrentSession().getDesktop().activateBookmark(bm);
         }
       }
     }

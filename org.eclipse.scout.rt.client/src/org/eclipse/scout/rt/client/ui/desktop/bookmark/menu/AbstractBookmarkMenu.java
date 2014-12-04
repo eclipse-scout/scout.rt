@@ -224,7 +224,7 @@ public abstract class AbstractBookmarkMenu extends AbstractMenu {
         Bookmark b = service.getStartBookmark();
         if (b != null) {
           try {
-            ClientSyncJob.getCurrentSession().getDesktop().activateBookmark(b, false);
+            ClientSyncJob.getCurrentSession().getDesktop().activateBookmark(b);
           }
           catch (Throwable t) {
             LOG.error(null, t);
