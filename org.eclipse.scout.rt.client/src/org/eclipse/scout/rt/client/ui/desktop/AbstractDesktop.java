@@ -715,10 +715,8 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   @Override
   public void ensureVisible(IForm form) {
-    if (form != null) {
-      if (m_viewStack.contains(form) || m_dialogStack.contains(form)) {
-        fireFormEnsureVisible(form);
-      }
+    if (form != null && (m_viewStack.contains(form) || m_dialogStack.contains(form))) {
+      fireFormEnsureVisible(form);
     }
   }
 

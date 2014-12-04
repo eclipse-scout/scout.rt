@@ -204,17 +204,17 @@ public final class StringUtility {
     return returnValue;
   }
 
-  private static final Set<String> booleanTrue = new HashSet<String>(3);
+  private static final Set<String> BOOLEAN_TRUE = new HashSet<String>(3);
   static {
-    booleanTrue.add("true");
-    booleanTrue.add("yes");
-    booleanTrue.add("1");
+    BOOLEAN_TRUE.add("true");
+    BOOLEAN_TRUE.add("yes");
+    BOOLEAN_TRUE.add("1");
   }
-  private static final Set<String> booleanFalse = new HashSet<String>(3);
+  private static final Set<String> BOOLEAN_FLASE = new HashSet<String>(3);
   static {
-    booleanFalse.add("false");
-    booleanFalse.add("no");
-    booleanFalse.add("0");
+    BOOLEAN_FLASE.add("false");
+    BOOLEAN_FLASE.add("no");
+    BOOLEAN_FLASE.add("0");
   }
 
   /**
@@ -241,10 +241,10 @@ public final class StringUtility {
     }
     s = s.toLowerCase().trim();
     if (defaultValue) {
-      return !booleanFalse.contains(s);
+      return !BOOLEAN_FLASE.contains(s);
     }
     else {
-      return booleanTrue.contains(s);
+      return BOOLEAN_TRUE.contains(s);
     }
   }
 
@@ -581,22 +581,20 @@ public final class StringUtility {
       return null;
     }
     StringBuilder buf = new StringBuilder();
-    if (s != null) {
-      char[] ch = s.toCharArray();
-      int col = 0;
-      for (int i = 0; i < ch.length; i++) {
-        if (ch[i] == '\n' || ch[i] == '\r') {
-          col = 0;
-          buf.append(ch[i]);
+    char[] ch = s.toCharArray();
+    int col = 0;
+    for (int i = 0; i < ch.length; i++) {
+      if (ch[i] == '\n' || ch[i] == '\r') {
+        col = 0;
+        buf.append(ch[i]);
+      }
+      else {
+        col++;
+        if (col > lineSize) {
+          buf.append('\n');
+          col = 1;
         }
-        else {
-          col++;
-          if (col > lineSize) {
-            buf.append('\n');
-            col = 1;
-          }
-          buf.append(ch[i]);
-        }
+        buf.append(ch[i]);
       }
     }
     return buf.toString();
@@ -1006,10 +1004,8 @@ public final class StringUtility {
    * @since 3.10.0-M4
    */
   public static boolean containsNewLines(String s) {
-    if (s != null) {
-      if (s.indexOf('\n') >= 0 || s.indexOf('\r') >= 0) {
-        return true;
-      }
+    if (s != null && (s.indexOf('\n') >= 0 || s.indexOf('\r') >= 0)) {
+      return true;
     }
     return false;
   }
@@ -1596,10 +1592,8 @@ public final class StringUtility {
    */
   public static String removePrefixes(String s, String... prefixes) {
     for (int i = 0; i < prefixes.length; i++) {
-      if (prefixes[i] != null) {
-        if (s.toLowerCase().startsWith(prefixes[i].toLowerCase())) {
-          s = s.substring(prefixes[i].length());
-        }
+      if (prefixes[i] != null && s.toLowerCase().startsWith(prefixes[i].toLowerCase())) {
+        s = s.substring(prefixes[i].length());
       }
     }
     return s;
