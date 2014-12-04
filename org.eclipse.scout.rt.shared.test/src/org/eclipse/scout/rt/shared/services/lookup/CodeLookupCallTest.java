@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.Activator;
@@ -56,7 +55,7 @@ public class CodeLookupCallTest {
 
   @BeforeClass
   public static void beforeClass() throws Exception {
-    s_services = TestingUtility.registerServices(Activator.getDefault().getBundle(), 1000, new TestingCodeService(CollectionUtility.arrayList(new CodeLookupCallTestCodeType())));
+    s_services = TestingUtility.registerServices(Activator.getDefault().getBundle(), 1000, new TestingCodeService(new CodeLookupCallTestCodeType()));
   }
 
   @AfterClass

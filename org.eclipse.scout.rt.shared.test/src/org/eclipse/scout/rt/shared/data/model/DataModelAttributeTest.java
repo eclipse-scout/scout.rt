@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.DateUtility;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.LocaleThreadLocal;
@@ -58,7 +57,7 @@ public class DataModelAttributeTest {
 
   @BeforeClass
   public static void beforeClass() throws Exception {
-    TestingCodeService codeService = new TestingCodeService(CollectionUtility.arrayList(new AttributeTestCodeType()));
+    TestingCodeService codeService = new TestingCodeService(new AttributeTestCodeType());
     DefaultCodeLookupCallFactoryService codeLookupCallFactoryService = new DefaultCodeLookupCallFactoryService();
     s_services = TestingUtility.registerServices(Activator.getDefault().getBundle(), 1000, codeService, codeLookupCallFactoryService);
   }
