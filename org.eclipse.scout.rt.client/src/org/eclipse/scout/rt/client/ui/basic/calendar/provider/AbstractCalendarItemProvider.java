@@ -87,6 +87,9 @@ public abstract class AbstractCalendarItemProvider extends AbstractPropertyObser
     return false;
   }
 
+  /**
+   * Returns the refresh intervall
+   */
   @ConfigProperty(ConfigProperty.LONG)
   @Order(20)
   protected long getConfiguredRefreshIntervallMillis() {
