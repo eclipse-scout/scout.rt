@@ -176,6 +176,9 @@ public class CollectionUtilityTest {
     assertEquals(false, CollectionUtility.containsAny(Collections.emptyList(), Collections.emptyList()));
     assertEquals(false, CollectionUtility.containsAny(null, Collections.emptyList()));
     assertEquals(false, CollectionUtility.containsAny(Arrays.asList("a"), Arrays.asList("b")));
+    assertEquals(true, CollectionUtility.containsAny(Arrays.asList("a", "b"), Arrays.asList("b")));
+    assertEquals(true, CollectionUtility.containsAny(Arrays.asList("a", "b"), Arrays.asList("b", "c")));
+    assertEquals(false, CollectionUtility.containsAny(Arrays.asList("a", "b"), Arrays.asList("c")));
   }
 
   /**
