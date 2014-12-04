@@ -20,32 +20,5 @@
   <packaging>eclipse-test-plugin</packaging>
 <build>
 
-    <plugins>
-
-      <plugin>
-        <groupId>org.eclipse.tycho</groupId>
-        <artifactId>tycho-surefire-plugin</artifactId>
-        <configuration>
-          <testSuite>org.eclipse.scout.rt.ui.html.test</testSuite>
-        </configuration>
-      </plugin>
-</plugins>
-
-<pluginManagement>
-    <plugins>
-
-      <!-- Disable jgit warning in workspace, when some files are not yet
-        committed -->
-      <plugin>
-        <groupId>org.eclipse.tycho</groupId>
-        <artifactId>tycho-packaging-plugin</artifactId>
-        <configuration>
-          <timestampProvider>jgit</timestampProvider>
-          <jgit.dirtyWorkingTree>warning</jgit.dirtyWorkingTree>
-        </configuration>
-      </plugin>
-  </plugins>
-</pluginManagement>
-
 </build>
 </project>
