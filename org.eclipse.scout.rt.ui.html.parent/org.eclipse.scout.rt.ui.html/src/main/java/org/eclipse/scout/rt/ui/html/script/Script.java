@@ -90,6 +90,7 @@ public class Script {
     if (url == null) {
       throw new IllegalArgumentException(requestPath + ": url is null");
     }
+    LOG.info("locate script '" + requestPath + "' -> " + nodeType + " " + url);
     m_requestPath = requestPath;
     m_url = url;
     m_fileType = fileType;

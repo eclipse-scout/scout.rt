@@ -67,7 +67,7 @@
 //@include("desktop/Outline.js")
 //@include("desktop/SearchOutline.js")
 //@include("messagebox/MessageBox.js")
-//@include("messagebox/MessageBoxUI.js")
+//@include("messagebox/MessageBoxModelAdapter.js")
 //@include("form/Form.js")
 //@include("form/DetachFormMenu.js")
 //@include("form/fields/fields.js")
