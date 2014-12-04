@@ -24,6 +24,13 @@ public interface IPublishSubscribeMessageService extends IService {
 
   IPublishSubscribeMessageListener getListener();
 
+  /**
+   * Initialize the service and start listening to events. Usually one should set the listener
+   * {@link #setListener(IPublishSubscribeMessageListener)} before calling subscribe.
+   *
+   * @throws ProcessingException
+   *           if because of some reason the service could not be fully initialized
+   */
   void subscribe() throws ProcessingException;
 
   void unsubsribe() throws ProcessingException;
