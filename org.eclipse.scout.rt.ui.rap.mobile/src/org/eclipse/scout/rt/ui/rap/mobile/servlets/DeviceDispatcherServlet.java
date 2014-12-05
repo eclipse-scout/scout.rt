@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.ui.rap.util.BrowserInfo;
 import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
 
@@ -32,7 +33,7 @@ import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
  * {@link BrowserInfo#isTablet()} for more details.
  * <p>
  * The registering of the dispatcher servlet is typically done with the equinox servlet extension point:
- * 
+ *
  * <pre>
  * {@code
  * <extension point="org.eclipse.equinox.http.registry.servlets">
@@ -43,7 +44,7 @@ import org.eclipse.scout.rt.ui.rap.util.RwtUtility;
  * </extension>
  * }
  * </pre>
- * 
+ *
  * @since 3.9.0
  */
 public class DeviceDispatcherServlet extends HttpServlet {
@@ -64,7 +65,8 @@ public class DeviceDispatcherServlet extends HttpServlet {
   }
 
   private void dispatch(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    if ("/".equals(request.getPathInfo())) {
+    String pathInfo = request.getPathInfo();
+    if (StringUtility.isNullOrEmpty(pathInfo) || "/".equals(pathInfo)) {
       String targetServlet = computeBrandingServletName(request);
       response.sendRedirect(response.encodeRedirectURL(targetServlet));
     }
