@@ -58,12 +58,12 @@ public class JsonEventProcessor {
       throw new JsonException("No adapter found for id " + id);
     }
     try {
-      LOG.info("Handling event. Type: " + event.getType() + ", Id: " + id);
+      LOG.info("Handling event: ID=" + event.getId() + ", Type=" + event.getType());
       jsonAdapter.handleUiEvent(event, response);
       jsonAdapter.cleanUpEventFilters();
     }
     catch (Exception t) {
-      LOG.error("Handling event. Type: " + event.getType() + ", Id: " + id, t);
+      LOG.error("Error while handling event [ID=" + id + ", Type=" + event.getType() + "]", t);
       throw new JsonException(t);
     }
   }
