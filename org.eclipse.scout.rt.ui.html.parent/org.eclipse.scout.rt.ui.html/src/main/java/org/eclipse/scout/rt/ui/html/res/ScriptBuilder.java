@@ -83,12 +83,11 @@ public class ScriptBuilder {
     Matcher mat = NON_FRAGMENT_PATH_PATTERN.matcher(requestPath);
     URL libraryMinimizedUrl = m_resourceLocator.getWebContentResource(requestPath);
     if (!mat.matches()) {
-      Script.FileType fileType = (requestPath.endsWith(".js") ? Script.FileType.JS : Script.FileType.CSS);
-      URL url = libraryMinimizedUrl;
-      if (url == null) {
-        throw new IOException("locate " + requestPath + ": does not match NON_FRAGMENT_PATH_PATTERN(" + NON_FRAGMENT_PATH_PATTERN.pattern() + ") and does not exist");
+      if (libraryMinimizedUrl == null) {
+        throw new IOException("locate " + requestPath + ": does not match NON_FRAGMENT_PATH_PATTERN (" + NON_FRAGMENT_PATH_PATTERN.pattern() + ") and does not exist");
       }
-      return new Script(requestPath, url, fileType, Script.NodeType.LIBRARY);
+      Script.FileType fileType = (requestPath.endsWith(".js") ? Script.FileType.JS : Script.FileType.CSS);
+      return new Script(requestPath, libraryMinimizedUrl, fileType, Script.NodeType.LIBRARY);
     }
 
     final Script.NodeType[] nodeTypes;
@@ -272,14 +271,13 @@ public class ScriptBuilder {
     StringBuilder buf = new StringBuilder();
     String[] lines = text.split("[\\n]");
     for (String line : lines) {
-      buf.append((insideBlockComment ? "//" : "/*")).
-          append(filename).append(":").
-          append(String.format("%-" + ((lines.length + "").length()) + "d", lineNo)).
-          append((insideBlockComment ? "//" : "*/")).append(" ").
-          append(line).
-          append("\n");
+      buf.append((insideBlockComment ? "//" : "/*"));
+      buf.append(filename).append(":");
+      buf.append(String.format("%-" + ((lines.length + "").length()) + "d", lineNo));
+      buf.append((insideBlockComment ? "//" : "*/")).append(" ");
+      buf.append(line).append("\n");
       if (lineIsBeginOfMultilineBlockComment(line, insideBlockComment)) {
-        //also if line is endMLBC AND beginMLBC
+        // also if line is endMLBC AND beginMLBC
         insideBlockComment = true;
       }
       else if (lineIsEndOfMultilineBlockComment(line, insideBlockComment)) {
