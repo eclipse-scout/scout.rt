@@ -17,12 +17,12 @@ import org.json.JSONObject;
  */
 public class JsonEvent implements IJsonMapper {
 
-  public static final String TYPE = "type";
   public static final String ID = "id";
+  public static final String TYPE = "type";
 
-  private final JSONObject m_data;
   private final String m_id;
   private final String m_type;
+  private final JSONObject m_data;
 
   /**
    * @param type
@@ -46,12 +46,12 @@ public class JsonEvent implements IJsonMapper {
     }
   }
 
-  public String getType() {
-    return m_type;
-  }
-
   public String getId() {
     return m_id;
+  }
+
+  public String getType() {
+    return m_type;
   }
 
   public JSONObject getData() {
@@ -80,6 +80,6 @@ public class JsonEvent implements IJsonMapper {
 
   @Override
   public String toString() {
-    return "Id: " + m_id + ". Type: " + m_type + ". Data: " + m_data;
+    return "ID: " + m_id + ". Type: " + m_type + ". Data: " + m_data;
   }
 }
