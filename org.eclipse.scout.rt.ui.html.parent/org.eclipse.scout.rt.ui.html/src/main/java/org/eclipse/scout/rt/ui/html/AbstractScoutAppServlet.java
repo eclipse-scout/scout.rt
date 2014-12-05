@@ -83,7 +83,19 @@ public abstract class AbstractScoutAppServlet extends HttpServletEx {
     }
   };
 
+  private final IWebArchiveResourceLocator m_resourceLocator;
+
   protected AbstractScoutAppServlet() {
+    m_resourceLocator = createResourceLocator();
+  }
+
+  protected IWebArchiveResourceLocator createResourceLocator() {
+    //TODO imo change once we switch from OSGI to JEE; move WebContent to src/main/resources/META-INF/resources/WebContent, move src/main/js to src/main/resources/META-INF/resources/js
+    return new OsgiWebArchiveResourceLocator();
+  }
+
+  public IWebArchiveResourceLocator getResourceLocator() {
+    return m_resourceLocator;
   }
 
   /**

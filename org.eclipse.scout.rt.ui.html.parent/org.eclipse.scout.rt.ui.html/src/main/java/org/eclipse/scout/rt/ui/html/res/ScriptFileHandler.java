@@ -21,24 +21,34 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.html.AbstractRequestHandler;
 import org.eclipse.scout.rt.ui.html.AbstractScoutAppServlet;
 
-/**
- * Process script tags in html files and enable automatic version and cache control handling
- * <p>
- * All script urls matching {@link ScriptBuilder#NON_FRAGMENT_PATH_PATTERN} and that contain the "qualifier" text are
- * replaced
- */
-public class HtmlFileHandler extends AbstractRequestHandler {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(HtmlFileHandler.class);
+public class ScriptFileHandler extends AbstractRequestHandler {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ScriptFileHandler.class);
 
-  public HtmlFileHandler(AbstractScoutAppServlet servlet, HttpServletRequest req, HttpServletResponse resp, String pathInfo) {
+  public ScriptFileHandler(AbstractScoutAppServlet servlet, HttpServletRequest req, HttpServletResponse resp, String pathInfo) {
     super(servlet, req, resp, pathInfo);
   }
 
   @Override
   public boolean handle() throws ServletException, IOException {
     String pathInfo = getPathInfo();
-    LOG.info("processing html: " + pathInfo);
-    return false;
+    LOG.info("processing script: " + pathInfo);
+    ScriptBuilder builder = new ScriptBuilder(getServlet().getResourceLocator());
+    builder.setDebug(isDebug());
+    try {
+      byte[] outputBytes = builder.buildScript(pathInfo);
+      if (pathInfo.endsWith(".js")) {
+        getHttpServletResponse().setContentType("application/javascript");
+      }
+      else {
+        getHttpServletResponse().setContentType("text/css");
+      }
+      getHttpServletResponse().getOutputStream().write(outputBytes);
+    }
+    catch (Exception ex) {
+      LOG.error("SCRIPT_BUILD_ERROR: " + pathInfo, ex);
+      getHttpServletResponse().sendError(HttpServletResponse.SC_NOT_FOUND);
+    }
+    return true;
   }
 
 }

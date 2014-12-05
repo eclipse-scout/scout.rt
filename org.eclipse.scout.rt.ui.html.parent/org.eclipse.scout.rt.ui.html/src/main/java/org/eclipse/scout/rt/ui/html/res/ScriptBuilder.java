@@ -17,6 +17,7 @@ import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.ui.html.IWebArchiveResourceLocator;
 import org.eclipse.scout.rt.ui.html.res.Script.NodeType;
 import org.eclipse.scout.service.SERVICES;
 

@@ -1,4 +1,4 @@
-package org.eclipse.scout.rt.ui.html.res;
+package org.eclipse.scout.rt.ui.html;
 
 import java.net.URL;
 

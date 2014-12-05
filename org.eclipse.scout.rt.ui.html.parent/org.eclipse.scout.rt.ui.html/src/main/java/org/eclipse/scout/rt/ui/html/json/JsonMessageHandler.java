@@ -22,9 +22,8 @@ import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.ui.html.AbstractRequestHandler;
 import org.eclipse.scout.rt.ui.html.AbstractScoutAppServlet;
-import org.eclipse.scout.rt.ui.html.IServletRequestInterceptor;
-import org.eclipse.scout.service.AbstractService;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -32,45 +31,44 @@ import org.json.JSONObject;
  * This interceptor contributes to the {@link AbstractScoutAppServlet} as the default json message handler
  */
 @Priority(-10)
-public class JsonMessageRequestInterceptor extends AbstractService implements IServletRequestInterceptor {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonMessageRequestInterceptor.class);
+public class JsonMessageHandler extends AbstractRequestHandler {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonMessageHandler.class);
 
-  @Override
-  public boolean interceptGet(AbstractScoutAppServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    return false;
+  public JsonMessageHandler(AbstractScoutAppServlet servlet, HttpServletRequest req, HttpServletResponse resp, String pathInfo) {
+    super(servlet, req, resp, pathInfo);
   }
 
   @Override
-  public boolean interceptPost(AbstractScoutAppServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+  public boolean handle() throws ServletException, IOException {
     //serve only /json
-    String pathInfo = req.getPathInfo();
+    String pathInfo = getPathInfo();
     if (pathInfo == null || !"/json".equals(pathInfo)) {
-      resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+      getHttpServletResponse().sendError(HttpServletResponse.SC_NOT_FOUND);
       return true;
     }
 
-    JsonRequest jsonReq = new JsonRequest(toJSON(req));
+    JsonRequest jsonReq = new JsonRequest(decodeJSONRequest());
     if (jsonReq.isPingRequest()) {
-      writeResponse(resp, createPingJsonResponse().toJson());
+      writeResponse(createPingJsonResponse().toJson());
       return true;
     }
 
-    IJsonSession jsonSession = getOrCreateJsonSession(servlet, req, resp, jsonReq);
+    IJsonSession jsonSession = getOrCreateJsonSession(jsonReq);
     if (jsonSession == null) {
       return true;
     }
 
     // GUI requests for the same session must be processed consecutively
     synchronized (jsonSession) {
-      JSONObject json = jsonSession.processRequest(req, jsonReq);
-      writeResponse(resp, json);
+      JSONObject json = jsonSession.processRequest(getHttpServletRequest(), jsonReq);
+      writeResponse(json);
     }
     return true;
   }
 
-  protected IJsonSession getOrCreateJsonSession(AbstractScoutAppServlet servlet, HttpServletRequest req, HttpServletResponse resp, JsonRequest jsonReq) throws ServletException, IOException {
+  protected IJsonSession getOrCreateJsonSession(JsonRequest jsonReq) throws ServletException, IOException {
     String jsonSessionAttributeName = "scout.htmlui.session.json." + jsonReq.getJsonSessionId();
-    HttpSession httpSession = req.getSession();
+    HttpSession httpSession = getHttpServletRequest().getSession();
 
     //FIXME cgu really synchronize on this? blocks every call, maybe introduce a lock object saved on httpSession or even better use java.util.concurrent.locks.ReadWriteLock
     synchronized (httpSession) {
@@ -88,12 +86,12 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
       if (jsonSession == null) {
         if (!jsonReq.isStartupRequest()) {
           LOG.info("Request cannot be processed due to JSON session timeout [id=" + jsonReq.getJsonSessionId() + "]");
-          writeError(resp, createSessionTimeoutJsonResponse());
+          writeError(createSessionTimeoutJsonResponse());
           return null;
         }
         LOG.info("Creating new JSON session with ID " + jsonReq.getJsonSessionId() + "...");
-        jsonSession = servlet.createJsonSession();
-        jsonSession.init(req, new JsonStartupRequest(jsonReq));
+        jsonSession = getServlet().createJsonSession();
+        jsonSession.init(getHttpServletRequest(), new JsonStartupRequest(jsonReq));
         httpSession.setAttribute(jsonSessionAttributeName, jsonSession);
       }
       else if (jsonReq.isStartupRequest()) {
@@ -114,7 +112,8 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
     return new JsonResponse();
   }
 
-  protected void writeResponse(HttpServletResponse resp, JSONObject json) throws IOException {
+  protected void writeResponse(JSONObject json) throws IOException {
+    HttpServletResponse resp = getHttpServletResponse();
     String jsonText = json.toString();
     byte[] data = jsonText.getBytes("UTF-8");
     resp.setContentLength(data.length);
@@ -126,14 +125,14 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
     }
   }
 
-  protected void writeError(HttpServletResponse resp, JsonResponse jsonResp) throws IOException {
-    resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-    writeResponse(resp, jsonResp.toJson());
+  protected void writeError(JsonResponse jsonResp) throws IOException {
+    getHttpServletResponse().setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+    writeResponse(jsonResp.toJson());
   }
 
-  protected JSONObject toJSON(HttpServletRequest req) {
+  protected JSONObject decodeJSONRequest() {
     try {
-      String jsonData = IOUtility.getContent(req.getReader());
+      String jsonData = IOUtility.getContent(getHttpServletRequest().getReader());
       if (LOG.isDebugEnabled()) {
         LOG.debug("Received: " + jsonData);
       }
@@ -143,4 +142,5 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
       throw new JsonException(e.getMessage(), e);
     }
   }
+
 }

@@ -1,14 +1,14 @@
-package org.eclipse.scout.rt.ui.html.res;
+package org.eclipse.scout.rt.ui.html;
 
 import org.eclipse.scout.service.AbstractService;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.ServiceRegistration;
 
 /**
- * Support for contributing a "/WebContent" folder to {@link WebArchiveResourceRequestInterceptor}
+ * Support for contributing a "/WebContent" folder to {@link DefaultRequestInterceptor}
  * <p>
  * TODO imo once osgi support is dropped, then this class is no longer needed, it is replaced by
- * {@link ClassLoader#getResources(String)} inside {@link WebArchiveResourceRequestInterceptor}
+ * {@link ClassLoader#getResources(String)} inside {@link DefaultRequestInterceptor}
  */
 public class OsgiWebArchiveService extends AbstractService {
   private Bundle m_bundle;

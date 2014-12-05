@@ -16,12 +16,13 @@ import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.ui.html.AbstractRequestHandler;
 import org.eclipse.scout.rt.ui.html.AbstractScoutAppServlet;
 
 /**
  * serve a file as a servlet resource using caches
  */
-public class StaticResourceHandler {
+public class StaticResourceHandler extends AbstractRequestHandler {
   private static final long serialVersionUID = 1L;
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(StaticResourceHandler.class);
   private static final String LAST_MODIFIED = "Last-Modified"; //$NON-NLS-1$
@@ -31,14 +32,23 @@ public class StaticResourceHandler {
   private static final String ETAG = "ETag"; //$NON-NLS-1$
   private static final int ANY_SIZE = 8192;
 
-  public void handle(AbstractScoutAppServlet servlet, HttpServletRequest req, HttpServletResponse resp, URL url) throws ServletException, IOException {
+  public StaticResourceHandler(AbstractScoutAppServlet servlet, HttpServletRequest req, HttpServletResponse resp, String pathInfo) {
+    super(servlet, req, resp, pathInfo);
+  }
+
+  @Override
+  public boolean handle() throws ServletException, IOException {
+    HttpServletRequest req = getHttpServletRequest();
+    HttpServletResponse resp = getHttpServletResponse();
+    URL url = getServlet().getResourceLocator().getWebContentResource(getPathInfo());
+
     URLConnection connection = url.openConnection();
     long lastModified = connection.getLastModified();
     int contentLength = connection.getContentLength();
-    int status = processCacheHeaders(req, resp, lastModified, contentLength);
+    int status = processCacheHeaders(lastModified, contentLength);
     if (status == HttpServletResponse.SC_NOT_MODIFIED) {
       resp.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
-      return;
+      return true;
     }
 
     //Return file regularly if the client (browser) does not already have it or if the file has changed in the meantime
@@ -52,7 +62,7 @@ public class StaticResourceHandler {
     String fileName = lastSlash >= 0 ? path.substring(lastSlash + 1) : path;
     String fileExtension = lastDot >= 0 ? path.substring(lastDot + 1) : path;
 
-    String contentType = servlet.getServletContext().getMimeType(fileName);
+    String contentType = getServlet().getServletContext().getMimeType(fileName);
     if (contentType == null) {
       contentType = getMsOfficeMimeTypes(fileExtension);
     }
@@ -67,6 +77,7 @@ public class StaticResourceHandler {
     }
 
     resp.getOutputStream().write(content);
+    return true;
   }
 
   /**
@@ -101,7 +112,10 @@ public class StaticResourceHandler {
    * @return {@link HttpServletResponse#SC_NOT_MODIFIED} if the file hasn't changed in the meantime or
    *         {@link HttpServletResponse#SC_ACCEPTED} if the content of the file needs to be returned.
    */
-  protected int processCacheHeaders(final HttpServletRequest req, final HttpServletResponse resp, long lastModified, int contentLength) {
+  protected int processCacheHeaders(long lastModified, int contentLength) {
+    HttpServletRequest req = getHttpServletRequest();
+    HttpServletResponse resp = getHttpServletResponse();
+
     resp.setHeader("cache-control", "private, max-age=0, no-cache, no-store, must-revalidate");//FIXME imo
     //resp.setHeader("cache-control", "public, max-age=240, s-maxage=240");
 
