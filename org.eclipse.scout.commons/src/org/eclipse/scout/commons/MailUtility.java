@@ -43,6 +43,7 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.internet.MimePart;
+import javax.mail.internet.MimeUtility;
 import javax.mail.util.ByteArrayDataSource;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -555,7 +556,7 @@ public final class MailUtility {
           FileDataSource fds = new FileDataSource(attachment);
           DataHandler handler = new DataHandler(fds);
           part.setDataHandler(handler);
-          part.setFileName(attachment.getName());
+          part.setFileName(MimeUtility.encodeText(attachment.getName()));
           multiPart.addBodyPart(part);
         }
       }
@@ -587,6 +588,9 @@ public final class MailUtility {
       return mimeMessage;
     }
     catch (MessagingException e) {
+      throw new ProcessingException("Error occured while creating MIME-message", e);
+    }
+    catch (UnsupportedEncodingException e) {
       throw new ProcessingException("Error occured while creating MIME-message", e);
     }
   }
@@ -780,7 +784,7 @@ public final class MailUtility {
         MimeBodyPart bodyPart = new MimeBodyPart();
         DataSource source = new FileDataSource(attachment);
         bodyPart.setDataHandler(new DataHandler(source));
-        bodyPart.setFileName(attachment.getName());
+        bodyPart.setFileName(MimeUtility.encodeText(attachment.getName()));
         multiPart.addBodyPart(bodyPart);
       }
       msg.saveChanges();
