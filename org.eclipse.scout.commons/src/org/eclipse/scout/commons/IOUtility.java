@@ -108,10 +108,8 @@ public final class IOUtility {
     }
     finally {
       try {
-        if (autoClose) {
-          if (in != null) {
-            in.close();
-          }
+        if (autoClose && in != null) {
+          in.close();
         }
       }
       catch (IOException e) {
@@ -176,10 +174,8 @@ public final class IOUtility {
     }
     finally {
       try {
-        if (autoClose) {
-          if (out != null) {
-            out.close();
-          }
+        if (autoClose && out != null) {
+          out.close();
         }
       }
       catch (IOException e) {
@@ -222,10 +218,8 @@ public final class IOUtility {
     }
     finally {
       try {
-        if (autoClose) {
-          if (stream != null) {
-            stream.close();
-          }
+        if (autoClose && stream != null) {
+          stream.close();
         }
       }
       catch (IOException e) {
@@ -261,10 +255,8 @@ public final class IOUtility {
 
     finally {
       try {
-        if (autoClose) {
-          if (in != null) {
-            in.close();
-          }
+        if (autoClose && in != null) {
+          in.close();
         }
       }
       catch (IOException e) {
