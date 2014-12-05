@@ -22,7 +22,7 @@ import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
  * <b>Example:</b> The NameExField replaces the NameField in the original BaseForm without changing its order within the
  * FirstGroupBox. <b>Note:</b> the weird looking super constructor call is required for initializing the extended
  * <em>inner class</em>.
- * 
+ *
  * <pre>
  * public class BaseForm extends AbstractForm {
  *   &#064;Order(10)
@@ -45,12 +45,48 @@ import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
  *   }
  * }
  * </pre>
+ *
+ * If the field is not defined on the form itself, but on a template class, the template class must be replaced first
+ * and the field itself must be replaced below the replaced template class, for example:
+ *
+ * <pre>
+ * public abstract class AbstractFirstGroupBox extends AbstractGroupBox {
+ *   &#064;Order(10)
+ *   public class NameField extends AbstractStringField {
+ *   }
+ * }
  * 
+ * public class BaseForm extends AbstractForm {
+ *   &#064;Order(10)
+ *   public class MainBox extends AbstractGroupBox {
+ *     &#064;Order(10)
+ *     public class FirstGroupBox extends AbstractFirstGroupBox {
+ *     }
+ *   }
+ * }
+ * 
+ * public class ExtendedForm extends BaseForm {
+ *   &#064;Replace
+ *   public class FirstGroupBoxEx extends FirstGroupBox {
+ *     public FirstGroupBoxEx(BaseForm.MainBox container) {
+ *       container.super();
+ *     }
+ * 
+ *     &#064;Replace
+ *     public class NameExField extends AbstractFirstGroupBox.NameField {
+ *       public NameExField(AbstractFirstGroupBox container) {
+ *         container.super();
+ *       }
+ *     }
+ *   }
+ * }
+ * </pre>
+ *
  * <h3>Usage on table columns</h3> The annotation can be used to modify or move columns within a table. By default, the
  * replaced column uses the same {@link Order} of the replaced column.
  * <p/>
  * <b>Example 1:</b> The FirstExColumn replaces the FirstColumn in the original Table without changing its order.
- * 
+ *
  * <pre>
  * public class Table extends AbstractTable {
  *   &#064;Order(10)
@@ -68,9 +104,9 @@ import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
  *   }
  * }
  * </pre>
- * 
+ *
  * <b>Example 2:</b> Modifying the table of a table field requires to replace the table field as well:
- * 
+ *
  * <pre>
  * public class BaseForm extends AbstractForm {
  *   &#064;Order(10)
@@ -104,12 +140,12 @@ import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
  *   }
  * }
  * </pre>
- * 
+ *
  * <h3>Usage on action containers</h3> The annotation can be used to change the behavior of an action. Menus, key
  * strokes, tool buttons and view buttons are actions as well.
  * <p/>
  * <b>Example:</b> Modify the behavior of a menu defined on a smart field:
- * 
+ *
  * <pre>
  * public class BaseForm extends AbstractForm {
  *   &#064;Order(10)
@@ -136,7 +172,7 @@ import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
  *   }
  * }
  * </pre>
- * 
+ *
  * @since 3.8.2
  */
 @Retention(RetentionPolicy.RUNTIME)
