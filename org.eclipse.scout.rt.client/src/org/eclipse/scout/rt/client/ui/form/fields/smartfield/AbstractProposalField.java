@@ -132,6 +132,10 @@ public abstract class AbstractProposalField<KEY_TYPE> extends AbstractContentAss
 
   @Override
   protected String formatValueInternal(String validKey) {
+    if (!isCurrentLookupRowValid(validKey)) {
+      setCurrentLookupRow(null);
+    }
+
     if (getCurrentLookupRow() != null) {
       installLookupRowContext(getCurrentLookupRow());
       String text = getCurrentLookupRow().getText();

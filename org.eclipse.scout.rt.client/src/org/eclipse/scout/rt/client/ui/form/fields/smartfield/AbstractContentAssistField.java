@@ -722,7 +722,7 @@ public abstract class AbstractContentAssistField<VALUE_TYPE, KEY_TYPE> extends A
    * To provide a custom proposal form create a custom proposal form provider and inject it with
    * {@link #createProposalFormProvider()} or {@link #setProposalFormProvider()}.
    * </p>
-   * 
+   *
    * @return {@link#ISmartFieldProposalForm}
    * @throws ProcessingException
    */
@@ -736,6 +736,21 @@ public abstract class AbstractContentAssistField<VALUE_TYPE, KEY_TYPE> extends A
 
   protected IContentAssistFieldProposalFormProvider<KEY_TYPE> createProposalFormProvider() {
     return new DefaultContentAssistFieldProposalFormProvider<KEY_TYPE>();
+  }
+
+  /**
+   * Checks if the current context row is still valid. If the current context row is not set, it is considered valid.
+   *
+   * @param validKey
+   *          Valid key
+   * @return {@code true} if the current context row is valid, {@code false} otherwise.
+   */
+  protected boolean isCurrentLookupRowValid(VALUE_TYPE validKey) {
+    if (getCurrentLookupRow() == null) {
+      return true;
+    }
+
+    return validKey == getCurrentLookupRow().getKey() || (validKey != null && validKey.equals(getCurrentLookupRow().getKey()));
   }
 
   @Override
