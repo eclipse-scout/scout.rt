@@ -46,40 +46,35 @@ public class DefaultRequestInterceptor extends AbstractService implements IServl
     updateDebugScriptEnabledFlag(req);
 
     //js and css
-    if (pathInfo.endsWith(".js") || pathInfo.endsWith(".css")) {
-      if (createScriptFileHandler(servlet, req, resp, pathInfo).handle()) {
-        return true;
-      }
+    if ((pathInfo.endsWith(".js") || pathInfo.endsWith(".css")) && createScriptFileHandler(servlet, req, resp, pathInfo).handle()) {
+      return true;
     }
 
     //html
-    if (pathInfo.endsWith(".html")) {
-      if (createHtmlFileHandler(servlet, req, resp, pathInfo).handle()) {
-        return true;
-      }
+    if (pathInfo.endsWith(".html") && createHtmlFileHandler(servlet, req, resp, pathInfo).handle()) {
+      return true;
     }
 
     //static resources such as images, icons, fonts
-    LOG.info("processing static resource: " + pathInfo);
     if (createStaticResourceHandler(servlet, req, resp, pathInfo).handle()) {
       return true;
     }
 
-    //not found
-    LOG.info("404_RESOURCE_NOT_FOUND: " + pathInfo);
+    LOG.info("404_NOT_FOUND_GET: " + pathInfo);
     resp.sendError(HttpServletResponse.SC_NOT_FOUND);
     return true;
   }
 
   @Override
   public boolean interceptPost(AbstractScoutAppServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    //serve only /json
+
+    //serve json
     String pathInfo = req.getPathInfo();
-    if ("/json".equals(pathInfo)) {
-      if (createJsonMessageHandler(servlet, req, resp, pathInfo).handle()) {
-        return true;
-      }
+    if ("/json".equals(pathInfo) && createJsonMessageHandler(servlet, req, resp, pathInfo).handle()) {
+      return true;
     }
+
+    LOG.info("404_NOT_FOUND_POST: " + pathInfo);
     resp.sendError(HttpServletResponse.SC_NOT_FOUND);
     return true;
   }

@@ -16,10 +16,14 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.commons.servletfilter.HttpServletEx;
+import org.eclipse.scout.rt.ui.html.cache.HttpCacheControlInDevelopment;
+import org.eclipse.scout.rt.ui.html.cache.HttpCacheControlInProduction;
+import org.eclipse.scout.rt.ui.html.cache.IHttpCacheControl;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.service.SERVICES;
 
@@ -84,9 +88,11 @@ public abstract class AbstractScoutAppServlet extends HttpServletEx {
   };
 
   private final IWebArchiveResourceLocator m_resourceLocator;
+  private final IHttpCacheControl m_httpCacheControl;
 
   protected AbstractScoutAppServlet() {
     m_resourceLocator = createResourceLocator();
+    m_httpCacheControl = createHttpCacheControl();
   }
 
   protected IWebArchiveResourceLocator createResourceLocator() {
@@ -96,6 +102,14 @@ public abstract class AbstractScoutAppServlet extends HttpServletEx {
 
   public IWebArchiveResourceLocator getResourceLocator() {
     return m_resourceLocator;
+  }
+
+  protected IHttpCacheControl createHttpCacheControl() {
+    return Platform.inDevelopmentMode() ? new HttpCacheControlInDevelopment() : new HttpCacheControlInProduction();
+  }
+
+  public IHttpCacheControl getHttpCacheControl() {
+    return m_httpCacheControl;
   }
 
   /**
