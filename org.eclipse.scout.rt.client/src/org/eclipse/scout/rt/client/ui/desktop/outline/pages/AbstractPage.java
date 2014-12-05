@@ -260,7 +260,7 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
         if (desktop != null) {
           Bookmark bm = desktop.createBookmark();
           setChildrenDirty(true);
-          desktop.activateBookmark(bm, false);
+          desktop.activateBookmark(bm);
         }
       }
       catch (ProcessingException e) {

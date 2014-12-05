@@ -218,8 +218,15 @@ public class VirtualDesktop implements IDesktop {
     throw createUnsupportedOperationException();
   }
 
+  @SuppressWarnings("deprecation")
   @Override
+  @Deprecated
   public void activateBookmark(Bookmark bm, boolean forceReload) throws ProcessingException {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
+  public void activateBookmark(Bookmark bm) throws ProcessingException {
     throw createUnsupportedOperationException();
   }
 

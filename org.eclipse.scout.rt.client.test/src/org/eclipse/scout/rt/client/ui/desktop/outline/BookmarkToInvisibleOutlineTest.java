@@ -48,7 +48,7 @@ public class BookmarkToInvisibleOutlineTest {
     Thread.sleep(400);
     Exception err = null;
     try {
-      desktop.activateBookmark(bm, true);
+      desktop.activateBookmark(bm);
     }
     catch (Exception e) {
       err = e;

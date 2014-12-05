@@ -40,6 +40,7 @@ import org.eclipse.scout.rt.client.ui.form.PrintDevice;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
+import org.eclipse.scout.rt.shared.services.common.bookmark.AbstractPageState;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 
 /**
@@ -129,7 +130,7 @@ public interface IDesktop extends IPropertyObserver {
 
   /**
    * fires a ensure visible event
-   * 
+   *
    * @param form
    */
   void ensureVisible(IForm form);
@@ -253,7 +254,7 @@ public interface IDesktop extends IPropertyObserver {
   /**
    * Call this method to refresh all listeners on that dataTypes.<br>
    * These might include pages, forms, fields etc.<br>
-   * 
+   *
    * @see {@link AbstractForm#execDataChanged(Object...)} {@link AbstractForm#execDataChanged(Object...)}
    *      {@link AbstractFormField#execDataChanged(Object...)} {@link AbstractFormField#execDataChanged(Object...)}
    *      {@link AbstractPage#execDataChanged(Object...)} {@link AbstractPage#execDataChanged(Object...)}
@@ -264,7 +265,7 @@ public interface IDesktop extends IPropertyObserver {
    * Called after a page was loaded or reloaded.
    * <p>
    * Default minimizes page search form when data was found.
-   * 
+   *
    * @param page
    */
   void afterTablePageLoaded(IPageWithTable<?> page) throws ProcessingException;
@@ -351,7 +352,7 @@ public interface IDesktop extends IPropertyObserver {
   /**
    * set the detail table form of the active (selected) page {@link IPage#getTable()} of the active outline
    * {@link IOutline#getDetailTable()}
-   * 
+   *
    * @see {@link #setOutlineTableFormVisible(boolean)}
    */
   void setOutlineTableForm(IOutlineTableForm f);
@@ -426,7 +427,7 @@ public interface IDesktop extends IPropertyObserver {
 
   /**
    * Opens the link in the browser.
-   * 
+   *
    * @param target
    *          used to specify where the url should be opened. Only considered by the web ui.
    */
@@ -448,9 +449,33 @@ public interface IDesktop extends IPropertyObserver {
   void printDesktop(PrintDevice device, Map<String, Object> parameters);
 
   /**
-   * Activates a bookmark
+   * Activates a {@link Bookmark} on this desktop.
+   * <p />
+   * First the specific {@link Bookmark#getOutlineClassName()} is evaluated and selected, afterwards every page from the
+   * {@link Bookmark#getPath()} will be selected (respecting the {@link AbstractPageState}).
+   * <p />
+   * Finally the path will be expanded. Possible exceptions might occur if no outline is set in the {@link Bookmark} or
+   * the outline is not available.
+   *
+   * @param forceReload
+   *          parameter without any function
+   * @deprecated see https://bugs.eclipse.org/bugs/show_bug.cgi?id=439867, parameter forceReload is without any
+   *             function, therefore a method without this parameter has been created, this method might be removed in
+   *             the future.
    */
+  @Deprecated
   void activateBookmark(Bookmark bm, boolean forceReload) throws ProcessingException;
+
+  /**
+   * Activates a {@link Bookmark} on this desktop.
+   * <p />
+   * First the specific {@link Bookmark#getOutlineClassName()} is evaluated and selected, afterwards every page from the
+   * {@link Bookmark#getPath()} will be selected (respecting the {@link AbstractPageState}).
+   * <p />
+   * Finally the path will be expanded. Possible exceptions might occur if no outline is set in the {@link Bookmark} or
+   * the outline is not available.
+   */
+  void activateBookmark(Bookmark bm) throws ProcessingException;
 
   /**
    * Creates a bookmark of the active page
@@ -459,7 +484,7 @@ public interface IDesktop extends IPropertyObserver {
 
   /**
    * Creates a bookmark of the given page
-   * 
+   *
    * @since 3.8.0
    */
   Bookmark createBookmark(IPage page) throws ProcessingException;
@@ -484,7 +509,7 @@ public interface IDesktop extends IPropertyObserver {
    * process.
    * <p>
    * Subclasses can override this method.
-   * 
+   *
    * @return <code>true</code> to allow the desktop to proceed with closing. Otherwise <code>false</code> to veto the
    *         closing process.
    */
@@ -495,7 +520,7 @@ public interface IDesktop extends IPropertyObserver {
    * traversal
    * as defined by the UI layer.<br>
    * This operation is not supported in the RAP UI!
-   * 
+   *
    * @since 4.0.0
    */
   void traverseFocusNext();
@@ -505,14 +530,14 @@ public interface IDesktop extends IPropertyObserver {
    * focus
    * traversal as defined by the UI layer.<br>
    * This operation is not supported in the RAP UI!
-   * 
+   *
    * @since 4.0.0
    */
   void traverseFocusPrevious();
 
   /**
    * Gets the currently active (focused) {@link IForm}.
-   * 
+   *
    * @return The currently active {@link IForm} or <code>null</code> if no {@link IForm} is active.
    * @since 4.2.0
    */

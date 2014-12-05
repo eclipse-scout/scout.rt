@@ -169,7 +169,7 @@ public class BookmarkService extends AbstractService implements IBookmarkService
   public void activate(Bookmark b) throws ProcessingException {
     if (b != null) {
       try {
-        ClientSyncJob.getCurrentSession().getDesktop().activateBookmark(b, false);
+        ClientSyncJob.getCurrentSession().getDesktop().activateBookmark(b);
       }
       catch (Throwable t) {
         LOG.error(null, t);

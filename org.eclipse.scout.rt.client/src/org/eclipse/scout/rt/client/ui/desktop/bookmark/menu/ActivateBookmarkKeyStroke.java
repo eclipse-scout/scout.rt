@@ -36,7 +36,7 @@ public class ActivateBookmarkKeyStroke extends KeyStroke {
   protected void execAction() throws ProcessingException {
     if (m_bookmark != null) {
       try {
-        ClientSyncJob.getCurrentSession().getDesktop().activateBookmark(m_bookmark, false);
+        ClientSyncJob.getCurrentSession().getDesktop().activateBookmark(m_bookmark);
       }
       catch (Throwable t) {
         LOG.error(null, t);
