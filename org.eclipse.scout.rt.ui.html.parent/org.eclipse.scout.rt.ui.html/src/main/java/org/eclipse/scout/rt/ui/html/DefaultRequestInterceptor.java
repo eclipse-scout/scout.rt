@@ -22,7 +22,6 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.html.json.JsonMessageHandler;
 import org.eclipse.scout.rt.ui.html.res.HtmlFileHandler;
-import org.eclipse.scout.rt.ui.html.res.IndexHtmlResolver;
 import org.eclipse.scout.rt.ui.html.res.ScriptFileHandler;
 import org.eclipse.scout.rt.ui.html.res.StaticResourceHandler;
 import org.eclipse.scout.service.AbstractService;

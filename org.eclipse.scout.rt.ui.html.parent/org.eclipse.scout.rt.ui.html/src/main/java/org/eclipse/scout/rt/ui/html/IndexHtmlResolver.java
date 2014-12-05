@@ -8,9 +8,12 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.html.res;
+package org.eclipse.scout.rt.ui.html;
 
 import javax.servlet.http.HttpServletRequest;
+
+import org.eclipse.scout.rt.ui.html.res.BrowserInfo;
+import org.eclipse.scout.rt.ui.html.res.BrowserInfoBuilder;
 
 /**
  * Decide which index.html is to be used depending onthe browser type
