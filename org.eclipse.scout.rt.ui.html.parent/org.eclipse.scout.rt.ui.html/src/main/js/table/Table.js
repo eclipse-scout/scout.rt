@@ -1338,10 +1338,11 @@ scout.Table.prototype.onModelAction = function(event) {
   }
 };
 
-/*
- * Static helpers
- */
+/* --- STATIC HELPERS ------------------------------------------------------------- */
 
+/**
+ * @memberOf scout.Table
+ */
 scout.Table.parseHorizontalAlignment = function(alignment) {
   if (alignment > 0) {
     return 'right';

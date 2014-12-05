@@ -91,10 +91,6 @@ scout.Tooltip.prototype.position = function() {
     .cssTop(top);
 };
 
-scout.Tooltip.computeHypotenuse = function(x) {
-  return Math.sqrt(Math.pow(x, 2) + Math.pow(x, 2));
-};
-
 scout.Tooltip.prototype.remove = function() {
   this.rendered = false;
   $(document).off('mousedown.tooltip keydown.tooltip');
@@ -108,8 +104,19 @@ scout.Tooltip.prototype._onTooltipClicked = function(event) {
   }
 };
 
+/* --- STATIC HELPERS ------------------------------------------------------------- */
+
+/**
+ * @memberOf scout.Tooltip
+ */
+scout.Tooltip.computeHypotenuse = function(x) {
+  return Math.sqrt(Math.pow(x, 2) + Math.pow(x, 2));
+};
+
 /**
  * Removes every tooltip which belongs to one of the given $contexts
+ *
+ * @memberOf scout.Tooltip
  */
 scout.Tooltip.removeTooltips = function($contexts, $parent) {
   var $context, $tooltips, i, j;

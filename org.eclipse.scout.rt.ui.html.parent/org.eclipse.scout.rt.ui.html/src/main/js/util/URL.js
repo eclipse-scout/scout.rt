@@ -15,59 +15,6 @@ scout.URL = function(url) {
   this.parameterMap = scout.URL._parse(this._queryPartRaw);
 };
 
-// Helper function to sort arrays alphabetically, nulls in front
-scout.URL._sorter = function(a, b) {
-  return a === null ? -1 : b === null ? 1 : a.toString().localeCompare(b);
-};
-
-// Helper function to build a query parameter with value
-scout.URL._formatQueryParam = function(key, value) {
-  var s = encodeURIComponent(key);
-  if (typeof value !== 'undefined' && value !== null) {
-    s += '=' + encodeURIComponent(value);
-  }
-  return s;
-};
-
-// Helper function to add an key-value pair to a map. If the key is added multiple
-// times, the value is converted to an array.
-scout.URL._addToMap = function(map, key, value) {
-  if (typeof map === 'undefined') {
-    throw new Error("Argument 'map' must not be null");
-  }
-  if (typeof key === 'undefined') {
-    throw new Error("Argument 'key' must not be null");
-  }
-  if (key in map) {
-    var oldValue = map[key];
-    if (Array.isArray(oldValue)) {
-      oldValue.push(value);
-    } else {
-      map[key] = [oldValue, value];
-    }
-  } else {
-    map[key] = value;
-  }
-};
-
-// Helper function to parse the given (encoded) query string and return
-// it as (un-encoded) map of key-value pairs.
-scout.URL._parse = function(queryPart) {
-  var queryString = (queryPart || '').replace(/\+/g, ' ');
-  var pattern = /([^&=]+)(=?)([^&]*)/g;
-  var map = {};
-  var m, key, value;
-  while ((m = pattern.exec(queryString))) {
-    key = decodeURIComponent(m[1]);
-    value = decodeURIComponent(m[3]);
-    if (value === '' && m[2] !== '=') {
-      value = null;
-    }
-    scout.URL._addToMap(map, key, value);
-  }
-  return map;
-};
-
 scout.URL.prototype.getParameter = function(param) {
   if (typeof param !== 'string') {
     throw new Error('Illegal argument type: ' + param);
@@ -134,4 +81,76 @@ scout.URL.prototype.toString = function() {
   }
 
   return result;
+};
+
+/* --- STATIC HELPERS ------------------------------------------------------------- */
+
+/**
+ * Helper function to sort arrays alphabetically, nulls in front
+ *
+ * @memberOf scout.URL
+ */
+scout.URL._sorter = function(a, b) {
+  return a === null ? -1 : b === null ? 1 : a.toString().localeCompare(b);
+};
+
+/**
+ * Helper function to build a query parameter with value
+ *
+ * @memberOf scout.URL
+ */
+//
+scout.URL._formatQueryParam = function(key, value) {
+  var s = encodeURIComponent(key);
+  if (typeof value !== 'undefined' && value !== null) {
+    s += '=' + encodeURIComponent(value);
+  }
+  return s;
+};
+
+/**
+ * Helper function to add an key-value pair to a map. If the key is added multiple
+ * times, the value is converted to an array.
+ *
+ * @memberOf scout.URL
+ */
+scout.URL._addToMap = function(map, key, value) {
+  if (typeof map === 'undefined') {
+    throw new Error("Argument 'map' must not be null");
+  }
+  if (typeof key === 'undefined') {
+    throw new Error("Argument 'key' must not be null");
+  }
+  if (key in map) {
+    var oldValue = map[key];
+    if (Array.isArray(oldValue)) {
+      oldValue.push(value);
+    } else {
+      map[key] = [oldValue, value];
+    }
+  } else {
+    map[key] = value;
+  }
+};
+
+/**
+ * Helper function to parse the given (encoded) query string and return
+ * it as (un-encoded) map of key-value pairs.
+ *
+ * @memberOf scout.URL
+ */
+scout.URL._parse = function(queryPart) {
+  var queryString = (queryPart || '').replace(/\+/g, ' ');
+  var pattern = /([^&=]+)(=?)([^&]*)/g;
+  var map = {};
+  var m, key, value;
+  while ((m = pattern.exec(queryString))) {
+    key = decodeURIComponent(m[1]);
+    value = decodeURIComponent(m[3]);
+    if (value === '' && m[2] !== '=') {
+      value = null;
+    }
+    scout.URL._addToMap(map, key, value);
+  }
+  return map;
 };

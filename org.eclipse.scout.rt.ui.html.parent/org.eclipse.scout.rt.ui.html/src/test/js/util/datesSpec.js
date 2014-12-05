@@ -193,4 +193,20 @@ describe("scout.dates", function() {
 
   });
 
+  describe("orderWeekdays", function() {
+
+    it("orders weekdays", function() {
+      var weekdays = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+      var check0 = scout.dates.orderWeekdays(weekdays, 0);
+      var check1 = scout.dates.orderWeekdays(weekdays, 1);
+      var check2 = scout.dates.orderWeekdays(weekdays, 2);
+      var check3 = scout.dates.orderWeekdays(weekdays, 3);
+      expect(check0.join('-')).toBe('So-Mo-Di-Mi-Do-Fr-Sa');
+      expect(check1.join('-')).toBe('Mo-Di-Mi-Do-Fr-Sa-So');
+      expect(check2.join('-')).toBe('Di-Mi-Do-Fr-Sa-So-Mo');
+      expect(check3.join('-')).toBe('Mi-Do-Fr-Sa-So-Mo-Di');
+    });
+
+  });
+
 });

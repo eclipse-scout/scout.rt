@@ -23,8 +23,8 @@ scout.DateFormat = function(locale, pattern) {
 
   this.symbols = locale.dateFormatSymbols;
   this.symbols.firstDayOfWeek = 1; // monday //FIXME deliver from server
-  this.symbols.weekdaysOrdered = scout.DateFormat.orderWeekdays(this.symbols.weekdays, this.symbols.firstDayOfWeek);
-  this.symbols.weekdaysShortOrdered = scout.DateFormat.orderWeekdays(this.symbols.weekdaysShort, this.symbols.firstDayOfWeek);
+  this.symbols.weekdaysOrdered = scout.dates.orderWeekdays(this.symbols.weekdays, this.symbols.firstDayOfWeek);
+  this.symbols.weekdaysShortOrdered = scout.dates.orderWeekdays(this.symbols.weekdaysShort, this.symbols.firstDayOfWeek);
   this.formatFunc = [];
   this.pattern = pattern;
 
@@ -264,10 +264,3 @@ scout.DateFormat.prototype.parse = function (text) {
   return date;
 };
 
-scout.DateFormat.orderWeekdays = function(weekdays, firstDayOfWeek) {
-  var weekdaysOrdered = [];
-  for (var i=0; i < 7; i++) {
-    weekdaysOrdered[i] = weekdays[(i + firstDayOfWeek) % 7];
-  }
-  return weekdaysOrdered;
-};

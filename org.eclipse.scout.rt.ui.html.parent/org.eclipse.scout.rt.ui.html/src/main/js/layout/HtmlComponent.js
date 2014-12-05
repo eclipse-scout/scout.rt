@@ -20,22 +20,6 @@ scout.HtmlComponent = function($comp, session) {
 };
 
 /**
- * Static method to get the HtmlComponent associated with the given DOM $comp.
- * Throws an error when data 'htmlComponent' is not set.
- */
-scout.HtmlComponent.get = function($comp) {
-  var htmlComp = this.optGet($comp);
-  if (!htmlComp) {
-    throw new Error('data "htmlComponent" is undefined');
-  }
-  return htmlComp;
-};
-
-scout.HtmlComponent.optGet = function($comp) {
-  return $comp.data('htmlComponent');
-};
-
-/**
  * Returns the parent or $comp or null when $comp has no parent.
  * Creates a new instance of HtmlComponent if the parent DOM element has no linked instance yet.
  */
@@ -169,4 +153,27 @@ scout.HtmlComponent.prototype.pack = function() {
 
 scout.HtmlComponent.prototype.debug = function() {
   return scout.graphics.debugOutput(this.$comp);
+};
+
+/* --- STATIC HELPERS ------------------------------------------------------------- */
+
+/**
+ * Static method to get the HtmlComponent associated with the given DOM $comp.
+ * Throws an error when data 'htmlComponent' is not set.
+ *
+ * @memberOf scout.HtmlComponent
+ */
+scout.HtmlComponent.get = function($comp) {
+  var htmlComp = this.optGet($comp);
+  if (!htmlComp) {
+    throw new Error('data "htmlComponent" is undefined');
+  }
+  return htmlComp;
+};
+
+/**
+ * @memberOf scout.HtmlComponent
+ */
+scout.HtmlComponent.optGet = function($comp) {
+  return $comp.data('htmlComponent');
 };

@@ -47,11 +47,6 @@ scout.DesktopNavigation.prototype._selectTab = function(tab, outline) {
    this._setActiveTab(tab);
 };
 
-scout.DesktopNavigation.TabAndContent = function($tab) {
-  this.$tab = $tab;
-  this.$storage = null;
-};
-
 // outline tab creation
 
 scout.DesktopNavigation.prototype._createOutlinesTab = function() {
@@ -265,4 +260,11 @@ scout.DesktopNavigation.prototype.onOutlinePropertyChange = function(event) {
       this.$outlineTitle.text(event.properties[propertyName]);
     }
   }
+};
+
+/* --- INNER TYPES ---------------------------------------------------------------- */
+
+scout.DesktopNavigation.TabAndContent = function($tab) {
+  this.$tab = $tab;
+  this.$storage = null;
 };

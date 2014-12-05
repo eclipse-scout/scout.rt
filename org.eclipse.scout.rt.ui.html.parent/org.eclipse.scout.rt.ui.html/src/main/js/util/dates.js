@@ -1,5 +1,8 @@
 scout.dates = {
 
+  /**
+   * @memberOf scout.dates
+   */
   shift: function(date, years, months, days) {
     var newDate = new Date(date.toISOString());
     years = years !== undefined ? years : 0;
@@ -62,6 +65,14 @@ scout.dates = {
       scout.strings.padZeroLeft(d.getUTCMinutes(), 2) +
       scout.strings.padZeroLeft(d.getUTCSeconds(), 2) +
       scout.strings.padZeroLeft(d.getUTCMilliseconds(), 3);
+  },
+
+  orderWeekdays: function(weekdays, firstDayOfWeek) {
+    var weekdaysOrdered = [];
+    for (var i=0; i < 7; i++) {
+      weekdaysOrdered[i] = weekdays[(i + firstDayOfWeek) % 7];
+    }
+    return weekdaysOrdered;
   }
 
 };

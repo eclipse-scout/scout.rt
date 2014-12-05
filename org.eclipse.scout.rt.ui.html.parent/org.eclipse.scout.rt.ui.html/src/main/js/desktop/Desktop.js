@@ -100,7 +100,7 @@ scout.Desktop.prototype._render = function($parent) {
   });
 
   // TODO CRU: split and move
-   scout.keystrokeManager.installAdapter($parent, new scout.DesktopKeystrokeAdapter(this.navigation, this.taskbar));
+  scout.keystrokeManager.installAdapter($parent, new scout.DesktopKeystrokeAdapter(this.navigation, this.taskbar));
 };
 
 scout.Desktop.prototype.onResize = function() {
@@ -117,20 +117,6 @@ scout.Desktop.prototype.onResize = function() {
   if (this._outlineTab.content) {
     this._outlineTab.content.onResize();
   }
-};
-
-scout.Desktop.TabAndContent = function(content, title, subTitle) {
-  this.content = content;
-  this.title = title;
-  this.subTitle = subTitle;
-  this.$container;
-  this.$storage;
-};
-
-scout.Desktop.TabAndContent.prototype._update = function(content, title, subTitle) {
-  this.content = content;
-  this.title = title;
-  this.subTitle = subTitle;
 };
 
 /* Tab-handling */
@@ -328,4 +314,20 @@ scout.Desktop.prototype.onModelAction = function(event) {
   } else {
     scout.Desktop.parent.prototype.onModelAction.call(this, event);
   }
+};
+
+/* --- INNER TYPES ---------------------------------------------------------------- */
+
+scout.Desktop.TabAndContent = function(content, title, subTitle) {
+  this.content = content;
+  this.title = title;
+  this.subTitle = subTitle;
+  this.$container;
+  this.$storage;
+};
+
+scout.Desktop.TabAndContent.prototype._update = function(content, title, subTitle) {
+  this.content = content;
+  this.title = title;
+  this.subTitle = subTitle;
 };

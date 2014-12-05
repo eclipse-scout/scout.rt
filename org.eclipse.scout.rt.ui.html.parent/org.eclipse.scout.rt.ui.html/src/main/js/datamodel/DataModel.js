@@ -14,9 +14,13 @@ scout.DataModel.prototype.init = function(model, session) {
       this.entities.push(entity);
     }
   }
-
 };
 
+/* --- STATIC HELPERS ------------------------------------------------------------- */
+
+/**
+ * @memberOf scout.DataModel
+ */
 scout.DataModel.resolveEntity = function(model, entityRef) {
   var entity, j, k, attribute, attributeRef;
   entity = model[entityRef];
