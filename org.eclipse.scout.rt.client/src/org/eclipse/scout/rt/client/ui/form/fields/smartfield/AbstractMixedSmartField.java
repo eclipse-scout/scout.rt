@@ -44,7 +44,7 @@ import org.eclipse.scout.service.SERVICES;
  * The default implementation of {@link #convertKeyToValue(Object)} and {@link #convertValueToKey(Object)} methods works
  * for any case where <VALUE_TYPE extends LOOKUP_CALL_KEY_TYPE>. For all other cases provide your own conversion
  * methods.
- * 
+ *
  * @param <VALUE_TYPE>
  * @param <LOOKUP_CALL_KEY_TYPE>
  */
@@ -64,7 +64,7 @@ public class AbstractMixedSmartField<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE> extends A
 
   /**
    * the default implementation simply casts one to the other type
-   * 
+   *
    * @param key
    * @return
    */
@@ -77,7 +77,7 @@ public class AbstractMixedSmartField<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE> extends A
 
   /**
    * the default implementation simply casts one to the other type
-   * 
+   *
    * @param key
    * @return
    */
@@ -185,15 +185,10 @@ public class AbstractMixedSmartField<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE> extends A
 
   @Override
   protected String formatValueInternal(VALUE_TYPE validKey) {
-    // check if current context row is still valid
-    if (getCurrentLookupRow() != null) {
-      if (validKey == getCurrentLookupRow().getKey() || (validKey != null && validKey.equals(getCurrentLookupRow().getKey()))) {
-        // still valid
-      }
-      else {
-        setCurrentLookupRow(null);
-      }
+    if (!isCurrentLookupRowValid(validKey)) {
+      setCurrentLookupRow(null);
     }
+
     /*
      * Ticket 76232
      */
