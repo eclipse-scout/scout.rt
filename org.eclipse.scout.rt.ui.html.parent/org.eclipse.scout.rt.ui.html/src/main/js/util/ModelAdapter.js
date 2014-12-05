@@ -1,10 +1,13 @@
 scout.ModelAdapter = function() {
-  this.session;
-  this.parent;
+  this.session = undefined;
+  this.parent = undefined;
   this.children = [];
   this._adapterProperties = [];
   this.rendered = false;
   this.destroyed = false;
+  this.$container = undefined;
+
+  this.ui = undefined;
 };
 
 scout.ModelAdapter.prototype.init = function(model, session) {
@@ -19,18 +22,31 @@ scout.ModelAdapter.prototype.init = function(model, session) {
 };
 
 scout.ModelAdapter.prototype.render = function($parent) {
-  if (this.rendered) {
+  if (this.rendered || this.ui) {
     throw new Error('Already rendered');
   }
   if (this.destroyed) {
     throw new Error('Object is destroyed');
   }
-  this._render($parent);
-  this._renderProperties();
+  this.ui = this._createUi();
+  if (this.ui) {
+    this.ui.render($parent);
+  }
+  else {
+    this._render($parent);
+    this._renderProperties();
+  }
   this.rendered = true;
   if (this.session.offline) {
     this.goOffline();
   }
+};
+
+/**
+ * @returns the UI widget to use when rendering the model adapter
+ */
+scout.ModelAdapter.prototype._createUi = function() {
+  return null;
 };
 
 /**
@@ -83,6 +99,9 @@ scout.ModelAdapter.prototype._remove = function() {
   if (this.$container) {
     this.$container.remove();
     this.$container = null;
+  }
+  if (this.ui) {
+    this.ui.remove();
   }
 };
 
@@ -189,7 +208,7 @@ scout.ModelAdapter.prototype.onModelAction = function(event) {
 
 scout.ModelAdapter.prototype._syncPropertiesOnPropertyChange = function(oldValues, newValues) {
   this._eachProperty(newValues, function(propertyName, value) {
-    var onFuncName = '_sync' + scout.ModelAdapter.preparePropertyNameForFunctionCal(propertyName);
+    var onFuncName = '_sync' + scout.ModelAdapter._preparePropertyNameForFunctionCall(propertyName);
     oldValues[propertyName] = this[propertyName];
     if (this[onFuncName]) {
       this[onFuncName](value);
@@ -201,23 +220,20 @@ scout.ModelAdapter.prototype._syncPropertiesOnPropertyChange = function(oldValue
 
 scout.ModelAdapter.prototype._renderPropertiesOnPropertyChange = function(oldValues, newValues) {
   this._eachProperty(newValues, function(propertyName, value) {
-    var renderFuncName = '_render' + scout.ModelAdapter.preparePropertyNameForFunctionCal(propertyName);
+    var renderFuncName = '_render' + scout.ModelAdapter._preparePropertyNameForFunctionCall(propertyName);
     $.log.debug('call ' + renderFuncName + '(' + value + ')');
     // Call the render function for regular properties, for adapters see onChildAdapterChange
     if (this._adapterProperties.indexOf(propertyName) > -1) {
       this.onChildAdapterChange(propertyName, oldValues[propertyName], value);
     }
     else {
-      if (!this[renderFuncName]) {
-        throw new Error('Render function ' + renderFuncName + ' does not exist in model adapter');
+      var funcTarget = this.ui || this;
+      if (!funcTarget[renderFuncName]) {
+        throw new Error('Render function ' + renderFuncName + ' does not exist in ' + (funcTarget === this ? 'model adapter' : 'UI'));
       }
-      this[renderFuncName](value);
+      funcTarget[renderFuncName](value);
     }
   }.bind(this));
-};
-
-scout.ModelAdapter.preparePropertyNameForFunctionCal = function(propertyName) {
-  return propertyName.substring(0, 1).toUpperCase() + propertyName.substring(1);
 };
 
 /**
@@ -225,14 +241,15 @@ scout.ModelAdapter.preparePropertyNameForFunctionCal = function(propertyName) {
  * To prevent this behavior just implement the method _renderPropertyName or _removePropertyName (e.g _removeTable).
  */
 scout.ModelAdapter.prototype.onChildAdapterChange = function(propertyName, oldValue, newValue) {
-  var funcName = scout.ModelAdapter.preparePropertyNameForFunctionCal(propertyName);
+  var funcName = scout.ModelAdapter._preparePropertyNameForFunctionCall(propertyName);
   var renderFuncName = '_render' + funcName;
   var removeFuncName = '_remove' + funcName;
   var i;
+  var funcTarget = this.ui || this;
 
   // Remove old adapter, if there is one
   if (oldValue) {
-    if (!this[removeFuncName]) {
+    if (!funcTarget[removeFuncName]) {
       if (Array.isArray(oldValue)) {
         for (i = 0; i < oldValue.length; i++) {
           oldValue[i].remove();
@@ -241,22 +258,23 @@ scout.ModelAdapter.prototype.onChildAdapterChange = function(propertyName, oldVa
         oldValue.remove();
       }
     } else {
-      this[removeFuncName](oldValue);
+      funcTarget[removeFuncName](oldValue);
     }
   }
 
   // Render new adapter, if there is one
   if (newValue) {
-    if (!this[renderFuncName] && this.$container) {
+    var $container = this.$container || (this.ui ? this.ui.$container : undefined);
+    if (!funcTarget[renderFuncName] && $container) {
       if (Array.isArray(oldValue)) {
         for (i = 0; i < oldValue.length; i++) {
-          newValue[i].render(this.$container);
+          newValue[i].render($container);
         }
       } else {
-        newValue.render(this.$container);
+        newValue.render($container);
       }
     } else {
-      this[renderFuncName](newValue);
+      funcTarget[renderFuncName](newValue);
     }
   }
 };
@@ -265,7 +283,6 @@ scout.ModelAdapter.prototype.onChildAdapterChange = function(propertyName, oldVa
  * Maybe overridden to influence creation. Default is emtpy.
  */
 scout.ModelAdapter.prototype.onChildAdapterCreated = function(propertyName) {
-
 };
 
 scout.ModelAdapter.prototype.goOffline = function() {
@@ -298,4 +315,13 @@ scout.ModelAdapter.prototype.goOnline = function() {
 
 scout.ModelAdapter.prototype._goOnline = function() {
   // NOP may be implemented by subclasses
+};
+
+/* --- STATIC HELPERS ------------------------------------------------------------- */
+
+/**
+ * @memberOf scout.ModelAdapter
+ */
+scout.ModelAdapter._preparePropertyNameForFunctionCall = function(propertyName) {
+  return propertyName.substring(0, 1).toUpperCase() + propertyName.substring(1);
 };

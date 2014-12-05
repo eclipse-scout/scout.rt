@@ -21,7 +21,6 @@ scout.BaseDesktop.prototype.showFatalMessage = function(title, text, buttonName,
     }
   });
   ui.render($glasspane);
-  ui.renderProperties();
 };
 
 scout.BaseDesktop.prototype._goOffline = function() {

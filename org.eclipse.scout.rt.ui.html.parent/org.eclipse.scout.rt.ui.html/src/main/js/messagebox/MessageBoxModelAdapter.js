@@ -1,20 +1,15 @@
 scout.MessageBoxModelAdapter = function() {
   scout.MessageBoxModelAdapter.parent.call(this);
-  this._ui = new scout.MessageBox(this);
 };
 scout.inherits(scout.MessageBoxModelAdapter, scout.ModelAdapter);
 
-scout.MessageBoxModelAdapter.prototype._render = function($parent) {
-  this._ui.render($parent);
+scout.MessageBoxModelAdapter.prototype._createUi = function() {
+  return new scout.MessageBox(this);
 };
 
-scout.MessageBoxModelAdapter.prototype._renderProperties = function() {
-  this._ui.renderProperties();
-};
-
-scout.MessageBoxModelAdapter.prototype._remove = function() {
-  scout.MessageBoxModelAdapter.parent.prototype._remove.call(this);
-  this._ui.remove();
+scout.MessageBoxModelAdapter.prototype.render = function($parent) {
+  var ui = new scout.MessageBox(this);
+  scout.MessageBoxModelAdapter.parent.prototype.render.call(this, $parent, ui);
 };
 
 scout.MessageBoxModelAdapter.prototype.onButtonClicked = function($button, event) {

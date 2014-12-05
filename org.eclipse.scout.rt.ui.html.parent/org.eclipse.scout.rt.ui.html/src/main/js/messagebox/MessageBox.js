@@ -1,5 +1,17 @@
 scout.MessageBox = function(modelAdapter) {
   this.modelAdapter = modelAdapter || {};
+  this.$container;
+  this.$content;
+  this.$title;
+  this.$introText;
+  this.$actionText;
+  this.$buttons;
+  this.$yesButton;
+  this.$defaultButton;
+  this.$noButton;
+  this.$cancelButton;
+  this.previouslyFocusedElement;
+  this.focusListener;
 };
 
 scout.MessageBox.prototype.render = function($parent) {
@@ -37,7 +49,7 @@ scout.MessageBox.prototype.render = function($parent) {
   }
   this._updateButtonWidths();
 
-  this.previouslyFocusedElemenet = document.activeElement;
+  this.previouslyFocusedElement = document.activeElement;
   setTimeout(function() {
     // Class 'shown' is used for css animation
     this.$container.addClass('shown').show();
@@ -58,9 +70,8 @@ scout.MessageBox.prototype.render = function($parent) {
     }
   }.bind(this);
   document.addEventListener("focus", this.focusListener, true);
-};
 
-scout.MessageBox.prototype.renderProperties = function() {
+  // Render properties
   this._renderTitle(this.modelAdapter.title);
   this._renderIconId(this.modelAdapter.iconId);
   this._renderSeverity(this.modelAdapter.severity);
@@ -72,10 +83,15 @@ scout.MessageBox.prototype.renderProperties = function() {
 };
 
 scout.MessageBox.prototype.remove = function() {
+  if (this.$container) {
+    this.$container.remove();
+    this.$container = null;
+  }
+
   document.removeEventListener("focus", this.focusListener, true);
 
   //FIXME CGU does not work, because button gets disabled when clicked (why??).
-  this.previouslyFocusedElemenet.focus();
+  this.previouslyFocusedElement.focus();
 };
 
 scout.MessageBox.prototype._position = function() {
