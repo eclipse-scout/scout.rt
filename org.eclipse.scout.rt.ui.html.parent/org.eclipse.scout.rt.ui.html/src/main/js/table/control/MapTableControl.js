@@ -51,7 +51,7 @@ scout.MapTableControl.prototype._renderContent = function($parent) {
       for (var a = 0; a < border.length; a++) {
         // negative arc-numbers are in reverse order
         var reverse = (border[a] < 0),
-          arc = reverse ? ~border[a] : border[a],
+          arc = reverse ? -1 - border[a] : border[a],
           localArray = [],
           x, y;
 

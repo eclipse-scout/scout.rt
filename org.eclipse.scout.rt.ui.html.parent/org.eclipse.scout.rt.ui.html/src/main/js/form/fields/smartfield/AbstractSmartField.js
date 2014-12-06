@@ -28,7 +28,7 @@ scout.AbstractSmartField.prototype._render = function($parent) {
  * @param visible [optional] when true, returns only visible options from the DOM, otherwise return all options regardless of their visible state.
  */
 scout.AbstractSmartField.prototype._get$Options = function(visible) {
-  var filter = visible === true ? ':visible' : undefined;
+  var filter = visible ? ':visible' : undefined;
   return this._$scrollable.children(filter);
 };
 

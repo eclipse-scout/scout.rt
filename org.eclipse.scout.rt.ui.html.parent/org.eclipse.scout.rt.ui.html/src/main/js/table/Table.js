@@ -376,12 +376,10 @@ scout.Table.prototype._drawData = function(startRow) {
   this.updateScrollbar();
 
   // repaint and append next block
-  if (this.rows.length > 0) {
-    if (numRowsLoaded < this.rows.length) {
-      setTimeout(function() {
-        that._drawData(startRow + 100);
-      }, 0);
-    }
+  if (this.rows.length > numRowsLoaded) {
+    setTimeout(function() {
+      that._drawData(startRow + 100);
+    }, 0);
   }
 
   function onContextMenu(event) {
@@ -1232,7 +1230,7 @@ scout.Table.prototype._onRowOrderChanged = function(rowIds) {
   }
 
   // update model
-  rows = new Array(this.rows.length);
+  rows = scout.array.create(this.rows.length);
   for (var i = 0; i < this.rows.length; i++) {
     row = this.rows[i];
     newPos = rowIds.indexOf(this.rows[i].id);

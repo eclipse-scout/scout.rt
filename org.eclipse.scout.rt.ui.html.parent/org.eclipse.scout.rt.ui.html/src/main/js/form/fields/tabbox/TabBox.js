@@ -64,9 +64,16 @@ scout.TabBox.prototype._onKeydown = function(e) {
   if (!navigationKey) {
     return true;
   }
+
   tabIndex = $(e.target).data('tabIndex');
-  if (e.which === scout.keys.LEFT) { tabIndex--; }
-  if (e.which === scout.keys.RIGHT) { tabIndex++; }
+  if (e.which === scout.keys.LEFT) {
+    tabIndex--;
+  }
+
+  if (e.which === scout.keys.RIGHT) {
+    tabIndex++;
+  }
+
   if (tabIndex >= 0 && tabIndex < this.tabItems.length) {
     setTimeout(function() {
       if (tabIndex >= 0 && tabIndex < this.tabItems.length) {

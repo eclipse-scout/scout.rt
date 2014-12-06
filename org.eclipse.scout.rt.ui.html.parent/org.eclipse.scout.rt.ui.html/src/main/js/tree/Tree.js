@@ -165,7 +165,7 @@ scout.Tree.prototype.clearSelection = function() {
 };
 
 scout.Tree.prototype.setNodesSelected = function(nodes, $nodes) {
-  var nodeIds = new Array(nodes.length),
+  var nodeIds = scout.arrays.create(nodes.length),
     i;
   nodes = scout.arrays.ensure(nodes);
   $nodes = scout.arrays.ensure($nodes);

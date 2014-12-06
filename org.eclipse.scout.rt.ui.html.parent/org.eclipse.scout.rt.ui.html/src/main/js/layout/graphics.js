@@ -206,7 +206,7 @@ scout.Rectangle.prototype.toString = function() {
 scout.Rectangle.prototype.union = function(r) {
   var tx2 = this.width;
   var ty2 = this.height;
-  if ((tx2 | ty2) < 0) {
+  if (tx2 < 0 || ty2 < 0) {
     // This rectangle has negative dimensions...
     // If r has non-negative dimensions then it is the answer.
     // If r is non-existant (has a negative dimension), then both
@@ -217,7 +217,7 @@ scout.Rectangle.prototype.union = function(r) {
   }
   var rx2 = r.width;
   var ry2 = r.height;
-  if ((rx2 | ry2) < 0) {
+  if (rx2 < 0 || ry2 < 0) {
     return new scout.Rectangle(this.x, this.y, this.width, this.height);
   }
   var tx1 = this.x;

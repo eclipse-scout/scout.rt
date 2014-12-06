@@ -140,10 +140,11 @@ scout.URL._addToMap = function(map, key, value) {
  * @memberOf scout.URL
  */
 scout.URL._parse = function(queryPart) {
-  var queryString = (queryPart || '').replace(/\+/g, ' ');
-  var pattern = /([^&=]+)(=?)([^&]*)/g;
-  var map = {};
-  var m, key, value;
+  var queryString = (queryPart || '').replace(/\+/g, ' '),
+    pattern = /([^&=]+)(=?)([^&]*)/g,
+    map = {},
+    m, key, value;
+
   while ((m = pattern.exec(queryString))) {
     key = decodeURIComponent(m[1]);
     value = decodeURIComponent(m[3]);

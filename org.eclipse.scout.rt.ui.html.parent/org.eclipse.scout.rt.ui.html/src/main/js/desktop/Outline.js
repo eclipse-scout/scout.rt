@@ -128,7 +128,7 @@ scout.Outline.prototype.onPageChanged = function(nodeId, detailFormVisible) {
   var node;
   if (nodeId >= 0) {
     node = this._nodeMap[nodeId];
-    if (node.detailFormVisible != detailFormVisible) {
+    if (node.detailFormVisible !== detailFormVisible) {
       node.detailFormVisible = detailFormVisible;
       this._updateOutlineTab(node);
     }
@@ -139,7 +139,7 @@ scout.Outline.prototype.setDetailFormVisible = function(nodeId, visible) {
   var node;
   if (nodeId >= 0) {
     node = this._nodeMap[nodeId];
-    if (node.detailFormVisible != visible) {
+    if (node.detailFormVisible !== visible) {
       node.detailFormVisible = visible;
       node.session.send('pageChanged', this.id, {nodeId: nodeId, detailFormVisible: visible});
     }
@@ -151,7 +151,7 @@ scout.Outline.prototype.onModelAction = function(event) {
     this.onFormChanged(event.nodeId, event.detailForm);
   } else if (event.type === 'detailTableChanged') {
     this.onTableChanged(event.nodeId, event.detailTable);
-  } else if (event.type == 'pageChanged') {
+  } else if (event.type === 'pageChanged') {
     this.onPageChanged(event.nodeId, event.detailFormVisible);
   } else {
     scout.Outline.parent.prototype.onModelAction.call(this, event);
