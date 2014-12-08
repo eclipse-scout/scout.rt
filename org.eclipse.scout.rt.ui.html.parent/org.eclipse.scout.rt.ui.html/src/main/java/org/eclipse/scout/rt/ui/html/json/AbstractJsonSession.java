@@ -94,6 +94,8 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     return Arrays.asList(
         // From org.eclipse.scout.rt.client
         "ResetTableColumns",
+        "ColumnSorting",
+        "Column",
         // From org.eclipse.scout.rt.ui.html
         "LoadOptions_",
         "NoOptions",
@@ -114,17 +116,36 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
         "NumRowsLoaded",
         "ReloadData",
         "Reload",
-        "ShowEveryDate",
-        "GroupedByWeekday",
-        "GroupedByMonth",
-        "GroupedByYear",
+        "showEveryDate",
+        "groupedByWeekday",
+        "groupedByMonth",
+        "groupedByYear",
         "Count",
         "ConnectionInterrupted",
         "ConnectionReestablished",
         "Reconnecting_",
         "ServerError",
         "SessionTimeout",
-        "SessionExpiredMsg"
+        "SessionExpiredMsg",
+        "Move",
+        "toBegin",
+        "forward",
+        "backward",
+        "toEnd",
+        "ascending",
+        "descending",
+        "ascendingAdditionally",
+        "descendingAdditionally",
+        "Sum",
+        "overEverything",
+        "grouped",
+        "ColorCells",
+        "fromRedToGreen",
+        "fromGreenToRed",
+        "withBarChart",
+        "remove",
+        "add",
+        "FilterBy"
         );
   }
 

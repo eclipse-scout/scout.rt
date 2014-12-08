@@ -15,10 +15,10 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
 
   // group functions for dates
   var dateDesc = [
-      this.session.text('ShowEveryDate'),
-      this.session.text('GroupedByWeekday'),
-      this.session.text('GroupedByMonth'),
-      this.session.text('GroupedByYear')
+      this.session.text('showEveryDate'),
+      this.session.text('groupedByWeekday'),
+      this.session.text('groupedByMonth'),
+      this.session.text('groupedByYear')
     ],
     countDesc = this.session.text('Count'),
     removeChart = null,
