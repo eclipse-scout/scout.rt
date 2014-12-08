@@ -28,7 +28,7 @@
     color: @active-color;
   }
 
-  &.disabled:hover, &.disabled:before{
+  &.disabled:hover, &.disabled:before {
     cursor: default;
     color: @footer-disabled-color;
   }

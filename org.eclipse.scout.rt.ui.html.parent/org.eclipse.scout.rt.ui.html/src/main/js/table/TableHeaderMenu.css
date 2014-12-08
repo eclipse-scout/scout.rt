@@ -17,15 +17,15 @@
   background-color: @color-bench;
 }
 
-.header-group{
+.header-group {
   padding: 10px 0px 35px 10px;
 }
 
-.header-group-filter{
+.header-group-filter {
   padding: 10px 0px 7px 10px;
 }
 
-.header-text{
+.header-text {
   .font-text-normal(@bold);
   font-weight:bold;
   color: @text-color;
@@ -34,7 +34,7 @@
   overflow: hidden;
 }
 
-.header-command{
+.header-command {
   float: left;
   width: 43px;
   margin-right: 10px;
@@ -51,13 +51,13 @@
     color: @hover-color;
   }
 
-  &.selected{
+  &.selected {
     background-color: @highlight-color;
     border: 1px solid @highlight-color;
   }
 
   &.selected:before,
-  &.selected:after{
+  &.selected:after {
     color: @color-bench;
   }
 }
@@ -117,7 +117,7 @@
 #HeaderCommandSortDesc.selected:hover:before,
 #HeaderCommandSortDescAdd.selected:hover:before,
 #HeaderCommandGroupAll.selected:hover:before,
-#HeaderCommandGroupSort.selected:hover:before{
+#HeaderCommandGroupSort.selected:hover:before {
   top: 0px;
   font-size: 17px;
   line-height: 20px;
@@ -130,7 +130,7 @@
 #HeaderCommandSortDesc.selected:hover:after,
 #HeaderCommandSortDescAdd.selected:hover:after,
 #HeaderCommandGroupAll.selected:hover:after,
-#HeaderCommandGroupSort.selected:hover:after{
+#HeaderCommandGroupSort.selected:hover:after {
   content: "";
 }
 
@@ -152,14 +152,14 @@
   content: @icon-nbsp;
 }
 
-#HeaderCommandColorRed{
+#HeaderCommandColorRed {
   background-image: linear-gradient(to right, #ffafaf, #abd693);
 }
 
 #HeaderCommandColorGreen:after {
   content: @icon-nbsp;
 }
-#HeaderCommandColorGreen{
+#HeaderCommandColorGreen {
   background-image: linear-gradient(to right, #abd693, #ffafaf);
 }
 
@@ -167,7 +167,7 @@
   content: @icon-nbsp;
 }
 
-#HeaderCommandColorBar{
+#HeaderCommandColorBar {
   background-image: linear-gradient(to right, #80c1d0 0%, #80c1d0 65%, white 65%, white 100% );
   border: 1px solid #80c1d0;
   width: 43px;
@@ -178,7 +178,7 @@
   content: @icon-nbsp;
 }
 
-#HeaderCommandColorRemove{
+#HeaderCommandColorRemove {
   background: #fff;
   border: 1px solid #80c1d0;
   width: 43px;
@@ -193,14 +193,14 @@
   content: @icon-remove;
 }
 
-.header-filter-container{
+.header-filter-container {
   position: relative;
   overflow:hidden;
   height: 226px;
   padding: 0px;
 }
 
-.header-filter-container > .scrollbar{
+.header-filter-container > .scrollbar {
   right: 14px;
   margin-top: 5px;
   margin-bottom: 5px;

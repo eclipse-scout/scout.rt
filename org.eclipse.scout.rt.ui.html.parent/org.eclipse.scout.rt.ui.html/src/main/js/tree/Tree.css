@@ -9,12 +9,12 @@
   }
 
   & .scrollbar-thumb-move,
-  & .scrollbar-thumb:hover{
+  & .scrollbar-thumb:hover {
     background-color: rgba(205, 205, 205, 0.6);
   }
 }
 
-.tree-item{
+.tree-item {
   position: relative;
   width: 100%;
   max-height: 37px;
@@ -44,7 +44,7 @@
 
 }
 
-.navigation-breadcrumb .tree-item{
+.navigation-breadcrumb .tree-item {
   overflow: visible;
   white-space: initial !important;
   text-align: center  !important;
@@ -66,7 +66,7 @@
   }
 }
 
-.tree-item-control{
+.tree-item-control {
   position: relative;
   display: inline-block;
   top: 0px;
@@ -79,7 +79,7 @@
   margin-right: -15px;
   transition: transform 0.3s;
 
-  &:before{
+  &:before {
     .font-icon;
     font-size: 20px;
     vertical-align: -2px;
@@ -90,11 +90,11 @@
     content: '';
   }
 
-  .tree-item:selected > &:before{
+  .tree-item:selected > &:before {
     color: @text-color;
   }
 
-  &.tree-item-control:hover{
+  &.tree-item-control:hover {
     color: @highlight-color;
   }
 

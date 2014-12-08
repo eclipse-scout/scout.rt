@@ -3,18 +3,19 @@
 }
 
 /* chart - type select */
-.chart-select{
+
+.chart-select {
   float: left;
   padding: 10px 40px 10px 30px;
 }
 
-svg.select-chart{
+svg.select-chart {
   height: 60px;
   width: 65px;
   display: block;
 }
 
-rect.select-events{
+rect.select-events {
   cursor: pointer;
 }
 
@@ -68,7 +69,7 @@ svg.select-chart.selected {
   overflow: hidden;
 }
 
-.xaxis-select{
+.xaxis-select {
   margin-right: 15px;
 }
 
@@ -76,11 +77,10 @@ svg.select-chart.selected {
   width: 0px;
 }
 
-.data-select{
+.data-select {
   margin-left: 15px;
   margin-right: 15px;
 }
-
 
 .select-axis, .select-data {
   position: relative;
@@ -101,7 +101,7 @@ svg.select-chart.selected {
     color: @active-color;
   }
 
-  &:last-child{
+  &:last-child {
     border-bottom: 1px solid @color-bench-light-border;
   }
 
@@ -139,7 +139,6 @@ svg.select-chart.selected {
     top: 6px;
     .font-icon;
   }
-
 
   &.axis-ver.selected:before {
   content: @icon-long-arrow-down;
@@ -179,6 +178,7 @@ svg.select-chart.selected {
 }
 
 /* chart - main */
+
 .chart-main {
   width: 1000px;
   height: 320px;
@@ -223,7 +223,6 @@ svg.select-chart.selected {
     fill: @highlight-color;
   }
 }
-
 
 line.main-axis {
   stroke: @chart-color-axis-line;

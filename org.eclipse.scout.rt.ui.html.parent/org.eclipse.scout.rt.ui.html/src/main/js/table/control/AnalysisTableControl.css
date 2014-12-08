@@ -8,7 +8,6 @@
   float: left;
   padding: 15px 20px 10px 20px;
 
-
   & .command {
     position: relative;
     width: 90px;
@@ -71,20 +70,20 @@ rect.venn-all {
   stroke-width: 2;
 }
 
-text.venn-all-text{
+text.venn-all-text {
   fill: @chart-color-axis-text;
   font-size: 10px;
   text-anchor: end;
 }
 
-text.venn-button{
+text.venn-button {
   fill: @chart-color-axis-text;
   font-size: 10px;
   cursor: pointer;
   text-anchor: end;
   text-decoration: underline;
 
-  &:hover{
+  &:hover {
     fill: @active-color;
   }
 }
@@ -96,7 +95,7 @@ circle.venn-circle {
   cursor: pointer;
   stroke-opacity: 1;
 
-  &.selected, &:hover{
+  &.selected, &:hover {
     stroke: @highlight-color;
   }
 }
@@ -143,7 +142,6 @@ text.venn-circle-text {
   }
 }
 
-
 .criteria-navigation {
   position: absolute;
   top: 20px;
@@ -168,7 +166,7 @@ text.venn-circle-text {
     cursor: default;
   }
 
-  &:after{
+  &:after {
     .font-icon;
     content:  @icon-angle-right;
     position: relative;
@@ -180,7 +178,6 @@ text.venn-circle-text {
     content: "";
     left: 0px;
   }
-
 }
 
 .criteria-search {
@@ -202,30 +199,30 @@ text.venn-circle-text {
 }
 
 .criteria-attribute, .criteria-entity {
-position: absolute;
-background-color: #e2e2e2;
-border: 1px solid white;
-padding: 2px 4px 2px 4px;
-font-size:12px;
-white-space: normal;
-cursor: pointer;
-word-wrap: break-word;
+  position: absolute;
+  background-color: #e2e2e2;
+  border: 1px solid white;
+  padding: 2px 4px 2px 4px;
+  font-size:12px;
+  white-space: normal;
+  cursor: pointer;
+  word-wrap: break-word;
 }
 
 .criteria-attribute-container {
-border: 0;
+  border: 0;
 }
 
-.criteria-attribute{
-background-color: #f2f2f2;
-color: #f2f2f2;
+.criteria-attribute {
+  background-color: #f2f2f2;
+  color: #f2f2f2;
 }
 
 .criteria-attribute:hover {
-background-color: #ccc;
-color: #ccc;
+  background-color: #ccc;
+  color: #ccc;
 }
 
 .criteria-entity:hover {
-background-color: #ccc;
+  background-color: #ccc;
 }

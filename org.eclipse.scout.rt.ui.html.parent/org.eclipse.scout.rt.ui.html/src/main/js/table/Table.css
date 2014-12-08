@@ -58,7 +58,7 @@
     .sort-icon(@icon-arial-long-arrow-up)
   }
 
-  &:hover, &.header-move{
+  &:hover, &.header-move {
     color: @hover-color;
   }
 
@@ -93,7 +93,7 @@
     background-color: @color-bench-light;
   }
 
-  .menu-open + &.header-resize{
+  .menu-open + &.header-resize {
     background-color: @color-bench-light;
   }
 }
@@ -167,7 +167,7 @@
 
 /* key box */
 
-.table .key-box{
+.table .key-box {
   right: 24px;
   width: 32px;
 }

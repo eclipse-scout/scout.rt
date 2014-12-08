@@ -142,7 +142,7 @@
   top: 8px;
   width: 22px;
 
-  &.disabled{
+  &.disabled {
     background-color: @disabled-color;
   }
 }

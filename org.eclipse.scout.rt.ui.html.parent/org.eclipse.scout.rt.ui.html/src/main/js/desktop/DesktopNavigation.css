@@ -87,7 +87,7 @@
   .font-text-large;
   line-height: @size-desktop-tools;
 
-  &:before{
+  &:before {
     .font-icon;
     font-size: 24px;
   }
@@ -105,7 +105,7 @@
     background-color: @color-bench;
   }
 
-  &:before{
+  &:before {
     content: @icon-menu;
   }
 }
@@ -113,7 +113,7 @@
 .navigation-tab-search-button {
   float: right;
 
-  &:before{
+  &:before {
     content: @icon-search;
   }
 }
@@ -200,7 +200,7 @@
   cursor: pointer;
   color: @text-color;
 
-  &:hover{
+  &:hover {
     color: @hover-color;
   }
 

@@ -9,7 +9,7 @@
   background-clip: content-box;
   background-color: @color;
 
-  &:hover{
+  &:hover {
     border: 1px solid @active-color;
   }
 }
@@ -96,7 +96,7 @@
     }
   }
 
-  & .nice-header{
+  & .nice-header {
     background-color: red;
   }
 
@@ -113,7 +113,7 @@
     height: ~"calc(100% - 2px)";
   }
 
-  & .rich-text-bar-group{
+  & .rich-text-bar-group {
     display: block;
     border-bottom: 1px solid @color-bench-light-border;
     padding: 0 5px;
@@ -128,11 +128,11 @@
     text-align: center;
     cursor: pointer;
 
-    &:hover{
+    &:hover {
       color: @active-color;
     }
 
-    &:hover:before{
+    &:hover:before {
       color: @active-color;
     }
   }

@@ -61,14 +61,13 @@ input {
     .glow(@color-error);
   }
 
-  &::selection{
+  &::selection {
     .selection();
   }
 
-  &::-moz-selection{
+  &::-moz-selection {
     .selection();
   }
-
 }
 
 textarea {

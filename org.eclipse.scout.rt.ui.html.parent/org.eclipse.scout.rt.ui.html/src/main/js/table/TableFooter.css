@@ -59,7 +59,7 @@
 
 .table-info-load,
 .table-info-filter,
-.table-info-selection{
+.table-info-selection {
   float: left;
   padding: @table-control-padding / 2 @table-control-padding 0px @table-control-padding;
   position: relative;
@@ -70,7 +70,7 @@
   cursor: pointer;
   line-height: 19px;
 
-  &:before{
+  &:before {
     content: '';
     position: absolute;
     top: @table-control-padding / 2  + 2px;
@@ -79,11 +79,11 @@
     border-right: 1px solid @color-bench-light-border;
   }
 
-  & span.info-button{
+  & span.info-button {
    text-decoration: underline;
   }
 
-  &:hover span.info-button{
+  &:hover span.info-button {
    color: @active-color;
   }
 }

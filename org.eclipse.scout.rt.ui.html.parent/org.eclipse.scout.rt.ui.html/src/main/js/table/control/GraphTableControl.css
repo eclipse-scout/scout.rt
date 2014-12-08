@@ -13,19 +13,19 @@
   stroke-width: 2px;
   cursor: pointer;
 
-  &.center {fill: @highlight-color;}
-  &.internal {fill: @palette-light-gray-1;}
-  &.person {fill: @palette-gray;}
-  &.department {fill: #80c1d0;}
-  &.company {fill: #ffcc8a;}
+  &.center { fill: @highlight-color; }
+  &.internal { fill: @palette-light-gray-1; }
+  &.person { fill: @palette-gray; }
+  &.department { fill: #80c1d0; }
+  &.company { fill: #ffcc8a; }
 }
 
-.graph-node-text{
+.graph-node-text {
   fill: #fff;
   text-anchor: middle;
   dominant-baseline: central;
 
-  &:hover{
+  &:hover {
     cursor: pointer;
   }
 }
@@ -35,7 +35,7 @@
   stroke-width: 2;
 }
 
-.graph-link-text{
+.graph-link-text {
   fill: #9C9C9C;
   text-anchor: middle;
   dy: 20px;
