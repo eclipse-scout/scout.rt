@@ -38,7 +38,7 @@
   float: left;
   width: 43px;
   margin-right: 10px;
-  heigth: 29px;
+  height: 29px;
   .font-icon;
   font-size: 17px;
   line-height: 29px;
@@ -51,6 +51,14 @@
     color: @hover-color;
   }
 
+  &:after {
+    position: relative;
+    left: 3px;
+    top: -6px;
+    font-size: 10px;
+    line-height: 10px;
+  }
+
   &.selected {
     background-color: @highlight-color;
     border: 1px solid @highlight-color;
@@ -60,137 +68,125 @@
   &.selected:after {
     color: @color-bench;
   }
-}
 
-.header-command:after {
-  position: relative;
-  left: 3px;
-  top: -6px;
-  font-size: 10px;
-  line-height: 10px;
-}
+  &.move-top:before,
+  &.move-up:before,
+  &.move-down:before,
+  &.move-bottom:before {
+    font-size: 20px;
+    line-height: 20px;
+  }
 
+  &.move-top:before {
+    content: @icon-angle-double-left;
+  }
+  &.move-up:before {
+    content: @icon-angle-left;
+  }
+  &.move-down:before {
+   content: @icon-angle-right;
+  }
+  &.move-bottom:before {
+    content: @icon-angle-double-right;
+  }
 
-#HeaderCommandMoveTop:before,
-#HeaderCommandMoveUp:before,
-#HeaderCommandMoveDown:before,
-#HeaderCommandMoveBottom:before {
-  font-size: 20px;
-  line-height: 20px;
-}
+  &.sort-asc:before,
+  &.sort-asc-add:before {
+    content: @icon-long-arrow-up;
+  }
 
-#HeaderCommandMoveTop:before {
-  content: @icon-angle-double-left;
-}
-#HeaderCommandMoveUp:before {
-  content: @icon-angle-left;
-}
-#HeaderCommandMoveDown:before {
- content: @icon-angle-right;
-}
-#HeaderCommandMoveBottom:before {
-  content: @icon-angle-double-right;
-}
+  &.sort-desc:before,
+  &.sort-desc-add:before {
+    content: @icon-long-arrow-down;
+  }
 
-#HeaderCommandSortAsc:before,
-#HeaderCommandSortAscAdd:before {
-  content: @icon-long-arrow-up;
-}
+  &.sort-asc-add:after,
+  &.sort-desc-add:after {
+    content: attr(data-icon);
+  }
 
-#HeaderCommandSortDesc:before,
-#HeaderCommandSortDescAdd:before {
-  content: @icon-long-arrow-down;
-}
+  &.sort-asc:before,
+  &.sort-asc-add:before {
+    content: @icon-long-arrow-up;
+  }
 
-#HeaderCommandSortAscAdd:after,
-#HeaderCommandSortDescAdd:after {
-  content: attr(data-icon);
-}
+  &.sort-asc.selected:hover:before,
+  &.sort-asc-add.selected:hover:before,
+  &.sort-desc.selected:hover:before,
+  &.sort-desc-add.selected:hover:before,
+  &.group-all.selected:hover:before,
+  &.group-sort.selected:hover:before {
+    top: 0px;
+    font-size: 17px;
+    line-height: 20px;
+    .font-icon;
+    content: @icon-remove;
+  }
 
-#HeaderCommandSortAsc:before,
-#HeaderCommandSortAscAdd:before {
-  content: @icon-long-arrow-up;
-}
+  &.sort-asc.selected:hover:after,
+  &.sort-asc-add.selected:hover:after,
+  &.sort-desc.selected:hover:after,
+  &.sort-desc-add.selected:hover:after,
+  &.group-all.selected:hover:after,
+  &.group-sort.selected:hover:after {
+    content: '';
+  }
 
-#HeaderCommandSortAsc.selected:hover:before,
-#HeaderCommandSortAscAdd.selected:hover:before,
-#HeaderCommandSortDesc.selected:hover:before,
-#HeaderCommandSortDescAdd.selected:hover:before,
-#HeaderCommandGroupAll.selected:hover:before,
-#HeaderCommandGroupSort.selected:hover:before {
-  top: 0px;
-  font-size: 17px;
-  line-height: 20px;
-  .font-icon;
-  content: @icon-remove;
-}
+  &.group-all:before,
+  &.group-sort:before {
+    position: relative;
+    top: 2px;
+    font-family: sans-serif;
+    font-size: 20px;
+    line-height: 20px;
+    content: @icon-sum;
+  }
 
-#HeaderCommandSortAsc.selected:hover:after,
-#HeaderCommandSortAscAdd.selected:hover:after,
-#HeaderCommandSortDesc.selected:hover:after,
-#HeaderCommandSortDescAdd.selected:hover:after,
-#HeaderCommandGroupAll.selected:hover:after,
-#HeaderCommandGroupSort.selected:hover:after {
-  content: "";
-}
+  &.group-sort:after {
+    content: @icon-th-list;
+  }
 
-#HeaderCommandGroupAll:before,
-#HeaderCommandGroupSort:before {
-  position: relative;
-  top: 2px;
-  font-family: sans-serif;
-  font-size: 20px;
-  line-height: 20px;
-  content: @icon-sum;
-}
+  &.color-red:after {
+    content: @icon-nbsp;
+  }
+  &.color-red {
+    background-image: linear-gradient(to right, #ffafaf, #abd693);
+  }
 
-#HeaderCommandGroupSort:after {
-  content: @icon-th-list;
-}
+  &.color-green:after {
+    content: @icon-nbsp;
+  }
+  &.color-green {
+    background-image: linear-gradient(to right, #abd693, #ffafaf);
+  }
 
-#HeaderCommandColorRed:after {
-  content: @icon-nbsp;
-}
+  &.color-bar:after {
+    content: @icon-nbsp;
+  }
+  &.color-bar {
+    background-image: linear-gradient(to right, #80c1d0 0%, #80c1d0 65%, white 65%, white 100% );
+    border: 1px solid #80c1d0;
+    width: 43px;
+    line-height: 29px;
+  }
 
-#HeaderCommandColorRed {
-  background-image: linear-gradient(to right, #ffafaf, #abd693);
-}
+  &.color-remove:after {
+    content: @icon-nbsp;
+  }
+  &.color-remove {
+    background: #fff;
+    border: 1px solid #80c1d0;
+    width: 43px;
+    line-height: 29px;
+  }
 
-#HeaderCommandColorGreen:after {
-  content: @icon-nbsp;
-}
-#HeaderCommandColorGreen {
-  background-image: linear-gradient(to right, #abd693, #ffafaf);
-}
+  &.column-add:before {
+    content: @icon-add;
+  }
 
-#HeaderCommandColorBar:after {
-  content: @icon-nbsp;
-}
-
-#HeaderCommandColorBar {
-  background-image: linear-gradient(to right, #80c1d0 0%, #80c1d0 65%, white 65%, white 100% );
-  border: 1px solid #80c1d0;
-  width: 43px;
-  line-height: 29px;
-}
-
-#HeaderCommandColorRemove:after {
-  content: @icon-nbsp;
-}
-
-#HeaderCommandColorRemove {
-  background: #fff;
-  border: 1px solid #80c1d0;
-  width: 43px;
-  line-height: 29px;
-}
-
-#HeaderCommandColumnAdd:before {
-  content: @icon-add;
-}
-
-#HeaderCommandColumnRemove:before {
-  content: @icon-remove;
+  &.column-remove:before {
+    content: @icon-remove;
+  }
 }
 
 .header-filter-container {
@@ -206,13 +202,12 @@
   margin-bottom: 5px;
 }
 
-
 .header-filter {
   position:relative;
   width: 200px;
   float: left;
   clear: both;
-  heigth: 30px;
+  height: 30px;
   line-height: 30px;
   cursor: pointer;
   padding: 0px 20px 0px 8px;
@@ -244,5 +239,4 @@
   &.selected:last-child {
     border-bottom: @highlight-color;
   }
-
 }
