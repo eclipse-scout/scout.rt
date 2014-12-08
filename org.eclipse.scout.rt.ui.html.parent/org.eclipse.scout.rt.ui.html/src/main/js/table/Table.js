@@ -1228,7 +1228,7 @@ scout.Table.prototype._onRowOrderChanged = function(rowIds) {
   }
 
   // update model
-  rows = scout.arrays.create(this.rows.length);
+  rows = scout.arrays.init(this.rows.length, 0);
   for (var i = 0; i < this.rows.length; i++) {
     row = this.rows[i];
     newPos = rowIds.indexOf(this.rows[i].id);
