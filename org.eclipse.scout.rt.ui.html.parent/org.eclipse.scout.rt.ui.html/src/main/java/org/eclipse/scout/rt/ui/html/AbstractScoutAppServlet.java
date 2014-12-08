@@ -39,50 +39,18 @@ public abstract class AbstractScoutAppServlet extends HttpServletEx {
   private static final long serialVersionUID = 1L;
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractScoutAppServlet.class);
 
-  /**
-   * Template pattern.
-   */
-  private abstract class P_AbstractInterceptor {
-
-    private final String m_requestType;
-
-    P_AbstractInterceptor(String requestType) {
-      m_requestType = requestType;
-    }
-
-    void intercept(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-      try {
-        IServletRequestInterceptor[] interceptors = SERVICES.getServices(IServletRequestInterceptor.class);
-        for (IServletRequestInterceptor interceptor : interceptors) {
-          if (intercept(interceptor, req, resp)) {
-            return;
-          }
-        }
-      }
-      catch (Exception t) {
-        LOG.error("Exception while processing " + m_requestType + " request: " + req.getRequestURI(), t);
-        resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-      }
-      finally {
-        LOG.info(m_requestType + " request finished: " + req.getRequestURI());
-      }
-    }
-
-    abstract boolean intercept(IServletRequestInterceptor interceptor, HttpServletRequest req, HttpServletResponse resp)
-        throws ServletException, IOException;
-
-  }
-
   private P_AbstractInterceptor m_interceptGet = new P_AbstractInterceptor("GET") {
+
     @Override
-    boolean intercept(IServletRequestInterceptor interceptor, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected boolean intercept(IServletRequestInterceptor interceptor, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
       return interceptor.interceptGet(AbstractScoutAppServlet.this, req, resp);
     }
   };
 
   private P_AbstractInterceptor m_interceptPost = new P_AbstractInterceptor("POST") {
+
     @Override
-    boolean intercept(IServletRequestInterceptor interceptor, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected boolean intercept(IServletRequestInterceptor interceptor, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
       return interceptor.interceptPost(AbstractScoutAppServlet.this, req, resp);
     }
   };
@@ -148,5 +116,37 @@ public abstract class AbstractScoutAppServlet extends HttpServletEx {
       LOG.error("POST " + req.getRequestURI(), ex);
       resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
     }
+  }
+
+  /**
+   * Template pattern.
+   */
+  protected abstract class P_AbstractInterceptor {
+
+    private final String m_requestType;
+
+    protected P_AbstractInterceptor(String requestType) {
+      m_requestType = requestType;
+    }
+
+    protected void intercept(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+      try {
+        IServletRequestInterceptor[] interceptors = SERVICES.getServices(IServletRequestInterceptor.class);
+        for (IServletRequestInterceptor interceptor : interceptors) {
+          if (intercept(interceptor, req, resp)) {
+            return;
+          }
+        }
+      }
+      catch (Exception t) {
+        LOG.error("Exception while processing " + m_requestType + " request: " + req.getRequestURI(), t);
+        resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+      }
+      finally {
+        LOG.info(m_requestType + " request finished: " + req.getRequestURI());
+      }
+    }
+
+    protected abstract boolean intercept(IServletRequestInterceptor interceptor, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException;
   }
 }
