@@ -94,15 +94,50 @@ describe("Session", function() {
     // In production mode these texts are sent by the server in the initialize event
     session._textMap = {
       NoOptions: 'Keine Übereinstimmung',
-      Options: '{0} Optionen'
+      NumOptions: '{0} Optionen',
+      Greeting: 'Hello {0}, my name is {2}, {1}.',
+      Empty: '',
+      Null: null
     };
 
     it("check if correct text is returned", function() {
       expect(session.text('NoOptions')).toBe('Keine Übereinstimmung');
     });
 
+    it("check if empty text is returned", function() {
+      expect(session.text('Empty')).toBe('');
+    });
+
+    it("check if null text is returned", function() {
+      expect(session.text('Null')).toBe(null);
+    });
+
     it("check if arguments are replaced in text", function() {
-      expect(session.text('Options', 3)).toBe('3 Optionen');
+      expect(session.text('NumOptions', 3)).toBe('3 Optionen');
+    });
+
+    it("check if multiple arguments are replaced in text", function() {
+      expect(session.text('Greeting', 'Computer', 'nice to meet you', 'User')).toBe('Hello Computer, my name is User, nice to meet you.');
+    });
+
+    it("check if undefined texts return an error message", function() {
+      expect(session.text('DoesNotExist')).toBe('[undefined text: DoesNotExist]');
+    });
+
+    it("optText returns undefined if key is not found", function() {
+      expect(session.optText('DoesNotExist')).toBe(undefined);
+    });
+
+    it("optText returns default value if key is not found", function() {
+      expect(session.optText('DoesNotExist', '#Default', 'Any argument')).toBe('#Default');
+    });
+
+    it("optText returns text if key found", function() {
+      expect(session.optText('NoOptions')).toBe('Keine Übereinstimmung');
+    });
+
+    it("optText returns text if key found, with arguments", function() {
+      expect(session.optText('NumOptions', '#Default', 7)).toBe('7 Optionen');
     });
 
   });

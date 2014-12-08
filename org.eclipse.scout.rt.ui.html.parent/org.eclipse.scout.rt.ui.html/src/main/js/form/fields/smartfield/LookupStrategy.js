@@ -81,7 +81,7 @@ scout.RemoteLookupStrategy.prototype = {
 
   openPopup: function() {
     var sf = this._smartField;
-    sf._showPopup(1, sf.session.text('LoadOptions'));
+    sf._showPopup(1, sf.session.text('LoadOptions_'));
     this._loadOptions('*');
   },
 

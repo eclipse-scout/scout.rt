@@ -11,6 +11,9 @@
             class="org.eclipse.scout.rt.ui.html.OsgiWebArchiveService"
             createImmediately="false">
       </service>
+      <service
+            class="org.eclipse.scout.rt.ui.html.HtmlTextProviderService"
+            createImmediately="false">
+      </service>
    </extension>
-
 </plugin>

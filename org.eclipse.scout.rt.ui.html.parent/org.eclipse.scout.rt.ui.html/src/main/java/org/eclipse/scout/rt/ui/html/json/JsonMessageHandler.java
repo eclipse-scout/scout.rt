@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -41,7 +42,7 @@ public class JsonMessageHandler extends AbstractRequestHandler {
   public boolean handle() throws ServletException, IOException {
     //serve only /json
     String pathInfo = getPathInfo();
-    if (pathInfo == null || !"/json".equals(pathInfo)) {
+    if (CompareUtility.notEquals(pathInfo, "/json")) {
       getHttpServletResponse().sendError(HttpServletResponse.SC_NOT_FOUND);
       return true;
     }
@@ -107,7 +108,7 @@ public class JsonMessageHandler extends AbstractRequestHandler {
   protected JsonResponse createSessionTimeoutJsonResponse() {
     JsonResponse jsonResp = new JsonResponse();
     jsonResp.setErrorCode(JsonResponse.ERR_SESSION_TIMEOUT);
-    jsonResp.setErrorMessage("The session has expired, please reload the page."); // TODO BSH Text | Session expired
+    jsonResp.setErrorMessage("The session has expired, please reload the page."); // will be translated in client, see Session.js
     return jsonResp;
   }
 

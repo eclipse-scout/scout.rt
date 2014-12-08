@@ -86,20 +86,22 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   }
 
   /**
-   * Returns a list of text keys (which must exist in a *.nls file) that are sent to the HTML client on start-up.
-   * The texts returned by this method should be used as static UI texts. All other texts are are sent as regular
+   * Returns a list of text keys (which must exist in a NLS property file) that are sent to the HTML client on start-up.
+   * The texts returned by this method should be used as static UI texts. All other texts are sent as regular
    * (form-)data and must not be added here.
    */
   protected List<String> getTextKeys() {
     return Arrays.asList(
-        "LoadOptions",
+        // From org.eclipse.scout.rt.client
+        "ResetTableColumns",
+        // From org.eclipse.scout.rt.ui.html
+        "LoadOptions_",
         "NoOptions",
         "OneOption",
         "NumOptions",
         "InvalidDateFormat",
-        "ResetTableColumns",
-        "FilterBy",
-        "SearchFor",
+        "FilterBy_",
+        "SearchFor_",
         "TableRowCount0",
         "TableRowCount1",
         "TableRowCount",
@@ -111,6 +113,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
         "RemoveFilter",
         "NumRowsLoaded",
         "ReloadData",
+        "Reload",
         "ShowEveryDate",
         "GroupedByWeekday",
         "GroupedByMonth",
@@ -118,7 +121,11 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
         "Count",
         "ConnectionInterrupted",
         "ConnectionReestablished",
-        "Reconnecting");
+        "Reconnecting_",
+        "ServerError",
+        "SessionTimeout",
+        "SessionExpiredMsg"
+        );
   }
 
   private JSONObject getTextMap() {

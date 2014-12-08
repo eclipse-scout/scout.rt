@@ -269,7 +269,7 @@ scout.Session.prototype._copyAdapterData = function(adapterData) {
 };
 
 /**
- * @param textStatus timeout, abort, error or parseerror
+ * @param textStatus 'timeout', 'abort', 'error' or 'parseerror' (see http://api.jquery.com/jquery.ajax/)
  */
 scout.Session.prototype._processErrorResponse = function(request, jqXHR, textStatus, errorThrown) {
   $.log.error('errorResponse: status=' + jqXHR.status + ', textStatus=' + textStatus + ', errorThrown=' + errorThrown);
@@ -288,15 +288,23 @@ scout.Session.prototype._processErrorResponse = function(request, jqXHR, textSta
   var jsonResponse = jqXHR.responseJSON;
   if (jsonResponse && jsonResponse.errorMessage) {
     if (this.desktop) {
-      var buttonName, buttonAction;
-      // TODO BSH Text | Reload, Serverfehler
-      if (jsonResponse.errorCode === 10) {
-        buttonName = 'Reload';
+      var buttonName, buttonAction,
+        title = this.text('ServerError'),
+        text = jsonResponse.errorMessage;
+      if (jsonResponse.errorCode === 10) { // JsonResponse.ERR_SESSION_TIMEOUT
+        title = this.optText('SessionTimeout', title);
+        text = this.optText('SessionExpiredMsg', text);
+        buttonName = this.text('Reload');
         buttonAction = function() {
-          window.location.reload();
+          // Hide everything
+          this.session.$entryPoint.html('');
+          // Reload window (using setTimeout, to overcome drawing issues in IE)
+          setTimeout(function() {
+            window.location.reload();
+          });
         };
       }
-      this.desktop.showFatalMessage('Serverfehler', jsonResponse.errorMessage, buttonName, buttonAction);
+      this.desktop.showFatalMessage(title, text, buttonName, buttonAction);
     } else {
       this.$entryPoint.html('');
       this.$entryPoint.text(jsonResponse.errorMessage);
@@ -441,9 +449,8 @@ scout.Session.prototype.registerChildWindow = function(childWindow) {
   }.bind(this));
 };
 
-
 scout.Session.prototype.text = function(textKey) {
-  if (this._textMap.hasOwnProperty(textKey)) {
+  if (this.textExists(textKey)) {
     var len = arguments.length,
         text = this._textMap[textKey];
     if (len === 1) {
@@ -459,4 +466,21 @@ scout.Session.prototype.text = function(textKey) {
   } else {
     return '[undefined text: ' + textKey + ']';
   }
+};
+
+scout.Session.prototype.optText = function(textKey, defaultValue) {
+  if (!this.textExists(textKey)) {
+    return defaultValue;
+  }
+  if (arguments.length > 2) {
+    // dynamically call text() without 'defaultValue' argument
+    var args = Array.prototype.slice.call(arguments, 2);
+    args.unshift(textKey); // add textKey as first argument
+    return scout.Session.prototype.text.apply(this, args);
+  }
+  return this.text(textKey);
+};
+
+scout.Session.prototype.textExists = function(textKey) {
+  return this._textMap.hasOwnProperty(textKey);
 };

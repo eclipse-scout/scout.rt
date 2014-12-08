@@ -48,6 +48,13 @@ scout.strings = {
     }
     var z = scout.strings.repeat('0', padding) + s;
     return z.slice(-padding);
+  },
+
+  nvl: function(s, defaultValue) {
+    if (s === undefined || s === null) {
+      return defaultValue;
+    }
+    return s;
   }
 
 };

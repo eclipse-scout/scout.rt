@@ -35,7 +35,7 @@ scout.BaseDesktop.prototype._goOffline = function() {
   this.$offline.text(message);
   $reconnect = this.$offline.appendDiv('reconnect');
   $reconnect
-    .text(this.session.text('Reconnecting'))
+    .text(this.session.text('Reconnecting_'))
     .hide();
   if (scout.device.supportsCssAnimation()) {
     $reconnect.addClass('reconnect-animated');

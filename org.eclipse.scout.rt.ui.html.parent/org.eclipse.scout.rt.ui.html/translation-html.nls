@@ -1,0 +1,6 @@
+################################################
+# This file is maintained by the nls editor.   #
+# To ensure a properly working nls support     #
+# keep this file untouched.                    #
+################################################
+Nls-Class=org.eclipse.scout.rt.ui.html.HtmlTextProviderService
