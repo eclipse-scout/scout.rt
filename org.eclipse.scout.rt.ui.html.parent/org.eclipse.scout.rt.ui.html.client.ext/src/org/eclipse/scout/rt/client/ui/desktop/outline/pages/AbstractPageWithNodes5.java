@@ -38,6 +38,8 @@ public abstract class AbstractPageWithNodes5 extends AbstractExtensiblePageWithN
 
   private boolean m_detailFormVisible = true;
 
+  private boolean m_navigateUp;
+
   public AbstractPageWithNodes5() {
     super();
   }
@@ -75,6 +77,7 @@ public abstract class AbstractPageWithNodes5 extends AbstractExtensiblePageWithN
   @Override
   public void pageActivatedNotify() {
     super.pageActivatedNotify();
+    handleNavigateUp();
     try {
       ensureDetailFormCreated();
       ensureDetailFormStarted();
@@ -82,6 +85,20 @@ public abstract class AbstractPageWithNodes5 extends AbstractExtensiblePageWithN
     catch (ProcessingException e) {
       SERVICES.getService(IExceptionHandlerService.class).handleException(e);
     }
+  }
+
+  private void handleNavigateUp() {
+    if (m_navigateUp) {
+      m_navigateUp = false;
+    }
+    else {
+      setDetailFormVisible(true);
+    }
+  }
+
+  @Override
+  public void setNavigateUp() {
+    m_navigateUp = true;
   }
 
   @Override
@@ -137,10 +154,8 @@ public abstract class AbstractPageWithNodes5 extends AbstractExtensiblePageWithN
     List<IMenu> copy = new LinkedList<IMenu>(menus);
     // Remove system menus (ok cancel)
     for (IMenu menu : copy) {
-      if (menu instanceof IMenu5) {
-        if (((IMenu5) menu).getSystemType() != IMenu5.SYSTEM_TYPE_NONE) {
-          menus.remove(menu);
-        }
+      if (menu instanceof IMenu5 && ((IMenu5) menu).getSystemType() != IMenu5.SYSTEM_TYPE_NONE) {
+        menus.remove(menu);
       }
     }
 

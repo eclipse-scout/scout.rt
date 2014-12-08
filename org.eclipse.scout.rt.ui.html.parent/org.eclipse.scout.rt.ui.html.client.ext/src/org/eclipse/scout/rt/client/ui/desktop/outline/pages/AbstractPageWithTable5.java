@@ -23,10 +23,32 @@ public abstract class AbstractPageWithTable5<T extends ITable5> extends Abstract
 
   private boolean m_detailFormVisible = true;
 
+  private boolean m_navigateUp;
+
   @Override
   protected void initConfig() {
     super.initConfig();
     getTable().setTableStatusVisible(true);
+  }
+
+  @Override
+  public void pageActivatedNotify() {
+    super.pageActivatedNotify();
+    handleNavigateUp();
+  }
+
+  private void handleNavigateUp() {
+    if (m_navigateUp) {
+      m_navigateUp = false;
+    }
+    else {
+      setDetailFormVisible(true);
+    }
+  }
+
+  @Override
+  public void setNavigateUp() {
+    m_navigateUp = true;
   }
 
   @Override

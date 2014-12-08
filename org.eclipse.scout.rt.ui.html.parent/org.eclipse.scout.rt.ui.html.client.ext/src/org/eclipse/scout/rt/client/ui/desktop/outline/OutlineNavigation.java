@@ -16,6 +16,9 @@ import org.eclipse.scout.service.SERVICES;
 
 public final class OutlineNavigation {
 
+  private OutlineNavigation() {
+  }
+
   public static AbstractOutlineNavigationMenu createUp(IOutline outline) {
     return initMenu(new OutlineNavigateUpMenu(outline));
   }

@@ -1,6 +1,7 @@
 scout.Outline = function() {
   scout.Outline.parent.call(this);
   this._addAdapterProperties('defaultDetailForm');
+  this._navigateUp = false;
 };
 scout.inherits(scout.Outline, scout.Tree);
 
@@ -45,6 +46,21 @@ scout.Outline.prototype._renderSelection = function($nodes) {
   var node = $nodes[0].data('node');
   if (node) {
     this._updateOutlineTab(node);
+  }
+};
+
+
+scout.Outline.prototype.setNodesSelected = function(nodes, $nodes) {
+  scout.Outline.parent.prototype.setNodesSelected.call(this, nodes, $nodes);
+  // FIXME AWE: (navi) hier müssen wir die navigateUp Logik von Abstract*Page5 nach-implementieren
+  // Wahrscheinlich müssen wir's im setNodesSelected machen, da wir hier im fall vom UI event als
+  // auch vom Server event durchkommen (ungünstig)
+  if (this._navigateUp) {
+   this._navigateUp = false;
+  } else {
+    if (nodes.length === 1) {
+      nodes[0].detailFormVisible = true;
+    }
   }
 };
 

@@ -16,4 +16,6 @@ public interface IPage5 extends IPage {
 
   void setDetailFormVisible(boolean visible);
 
+  void setNavigateUp();
+
 }
