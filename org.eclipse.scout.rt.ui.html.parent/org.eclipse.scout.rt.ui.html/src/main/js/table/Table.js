@@ -414,10 +414,13 @@ scout.Table.prototype._drawData = function(startRow) {
     }
 
     function showMenuPopup() {
-      var popup = new scout.Popup();
-      popup.render();
-      scout.menus.appendMenuItems(popup, that._rowMenus($selectedRows, false));
-      popup.setLocation(new scout.Point(x, y));
+      var menuItems = that._rowMenus($selectedRows, false);
+      if (menuItems.length > 0) {
+        var popup = new scout.Popup();
+        popup.render();
+        scout.menus.appendMenuItems(popup, menuItems);
+        popup.setLocation(new scout.Point(x, y));
+      }
     }
   }
 
