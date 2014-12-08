@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.html.IWebArchiveResourceLocator;
-import org.eclipse.scout.rt.ui.html.StreamUtil;
+import org.eclipse.scout.rt.ui.html.StreamUtility;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
 import org.eclipse.scout.rt.ui.html.res.Script.NodeType;
 import org.eclipse.scout.service.SERVICES;
@@ -49,7 +49,7 @@ public class ScriptBuilder {
 
   private final IWebArchiveResourceLocator m_resourceLocator;
   private final IScriptProcessorService m_scriptProcessorService;
-  private boolean m_debug;
+  private boolean m_minifyEnabled;
 
   public ScriptBuilder(IWebArchiveResourceLocator locator) {
     this(locator, SERVICES.getService(IScriptProcessorService.class));
@@ -63,19 +63,19 @@ public class ScriptBuilder {
     }
   }
 
-  public void setDebug(boolean debug) {
-    m_debug = debug;
+  public boolean isMinifyEnabled() {
+    return m_minifyEnabled;
   }
 
-  public boolean isDebug() {
-    return m_debug;
+  public void setMinifyEnabled(boolean minifyEnabled) {
+    m_minifyEnabled = minifyEnabled;
   }
 
   public HttpCacheObject buildScript(String pathInfo) throws IOException {
     Script script = locateNonFragmentScript(pathInfo);
     switch (script.getNodeType()) {
       case LIBRARY: {
-        return new HttpCacheObject(pathInfo, StreamUtil.readResource(script.getURL()), script.getURL().openConnection().getLastModified());
+        return new HttpCacheObject(pathInfo, StreamUtility.readResource(script.getURL()), script.getURL().openConnection().getLastModified());
       }
       case MACRO: {
         return processMacroWithIncludesRec(pathInfo, script);
@@ -101,32 +101,32 @@ public class ScriptBuilder {
 
     final Script.NodeType[] nodeTypes;
     final URL[] urls;
-    if (isDebug()) {
+    if (isMinifyEnabled()) {
       nodeTypes = new Script.NodeType[]{
+          Script.NodeType.LIBRARY,
           Script.NodeType.LIBRARY,
           Script.NodeType.MACRO,
           Script.NodeType.SRC_MODULE,
-          Script.NodeType.LIBRARY,
       };
       urls = new URL[]{
+          libraryMinimizedUrl, //libraryMinimizedUrl
           m_resourceLocator.getWebContentResource(mat.group(1) + mat.group(2) + "-" + mat.group(3) + "." + mat.group(4)), //libraryNonMinimizedUrl
           m_resourceLocator.getWebContentResource(mat.group(1) + mat.group(2) + "-macro." + mat.group(4)), //macroUrl
           m_resourceLocator.getScriptResource("" + mat.group(2) + "-module." + mat.group(4)), //srcModuleUrl
-          libraryMinimizedUrl, //libraryMinimizedUrl
       };
     }
     else {
       nodeTypes = new Script.NodeType[]{
           Script.NodeType.LIBRARY,
-          Script.NodeType.LIBRARY,
           Script.NodeType.MACRO,
           Script.NodeType.SRC_MODULE,
+          Script.NodeType.LIBRARY,
       };
       urls = new URL[]{
-          libraryMinimizedUrl, //libraryMinimizedUrl
           m_resourceLocator.getWebContentResource(mat.group(1) + mat.group(2) + "-" + mat.group(3) + "." + mat.group(4)), //libraryNonMinimizedUrl
           m_resourceLocator.getWebContentResource(mat.group(1) + mat.group(2) + "-macro." + mat.group(4)), //macroUrl
           m_resourceLocator.getScriptResource("" + mat.group(2) + "-module." + mat.group(4)), //srcModuleUrl
+          libraryMinimizedUrl, //libraryMinimizedUrl
       };
     }
 
@@ -172,7 +172,7 @@ public class ScriptBuilder {
     }
     ByteArrayOutputStream buf = new ByteArrayOutputStream();
     long lastModified = script.getURL().openConnection().getLastModified();
-    String content = new String(StreamUtil.readResource(script.getURL()), UTF_8);
+    String content = new String(StreamUtility.readResource(script.getURL()), UTF_8);
     Matcher mat = INCLUDE_PAT.matcher(content);
     int pos = 0;
     while (mat.find()) {
@@ -182,7 +182,7 @@ public class ScriptBuilder {
       byte[] replacement;
       switch (includeScript.getNodeType()) {
         case LIBRARY: {
-          replacement = StreamUtil.readResource(includeScript.getURL());
+          replacement = StreamUtility.readResource(includeScript.getURL());
           lastModified = Math.max(lastModified, includeScript.getURL().openConnection().getLastModified());
           break;
         }
@@ -214,7 +214,7 @@ public class ScriptBuilder {
     }
     StringBuilder buf = new StringBuilder();
     long lastModified = script.getURL().openConnection().getLastModified();
-    String content = new String(StreamUtil.readResource(script.getURL()), UTF_8);
+    String content = new String(StreamUtility.readResource(script.getURL()), UTF_8);
     Matcher mat = INCLUDE_PAT.matcher(content);
     int pos = 0;
     while (mat.find()) {
@@ -224,9 +224,9 @@ public class ScriptBuilder {
       String replacement;
       switch (includeFragment.getNodeType()) {
         case SRC_FRAGMENT: {
-          replacement = new String(StreamUtil.readResource(includeFragment.getURL()), UTF_8);
+          replacement = new String(StreamUtility.readResource(includeFragment.getURL()), UTF_8);
           lastModified = Math.max(lastModified, includeFragment.getURL().openConnection().getLastModified());
-          if (isDebug() && includeFragment.getFileType() == Script.FileType.JS) {
+          if (!isMinifyEnabled() && includeFragment.getFileType() == Script.FileType.JS) {
             replacement = insertLineNumbers(includePath, replacement);
           }
           break;
@@ -241,7 +241,7 @@ public class ScriptBuilder {
     String result = buf.toString();
     //compile, minimize
     result = compileModule(script.getFileType(), result);
-    if (!isDebug()) {
+    if (isMinifyEnabled()) {
       result = minifyModule(script.getFileType(), result);
     }
     return new HttpCacheObject(pathInfo, result.getBytes(UTF_8), lastModified);

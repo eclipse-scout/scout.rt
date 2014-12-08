@@ -25,7 +25,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.html.AbstractRequestHandler;
 import org.eclipse.scout.rt.ui.html.AbstractScoutAppServlet;
-import org.eclipse.scout.rt.ui.html.StreamUtil;
+import org.eclipse.scout.rt.ui.html.StreamUtility;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheInfo;
 
 /**
@@ -37,7 +37,7 @@ import org.eclipse.scout.rt.ui.html.cache.HttpCacheInfo;
  */
 public class StaticResourceHandler extends AbstractRequestHandler {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(StaticResourceHandler.class);
-  private static int MAX_AGE_4_HOURS = 4 * 3600;
+  private static final int MAX_AGE_4_HOURS = 4 * 3600;
 
   public StaticResourceHandler(AbstractScoutAppServlet servlet, HttpServletRequest req, HttpServletResponse resp, String pathInfo) {
     super(servlet, req, resp, pathInfo);
@@ -45,6 +45,8 @@ public class StaticResourceHandler extends AbstractRequestHandler {
 
   @Override
   public boolean handle() throws ServletException, IOException {
+    HttpServletRequest req = getHttpServletRequest();
+    HttpServletResponse resp = getHttpServletResponse();
     URL url = getServlet().getResourceLocator().getWebContentResource(getPathInfo());
     if (url == null) {
       return false;
@@ -55,13 +57,13 @@ public class StaticResourceHandler extends AbstractRequestHandler {
     //check cache state
     URLConnection connection = url.openConnection();
     HttpCacheInfo info = new HttpCacheInfo(connection.getContentLength(), connection.getLastModified(), MAX_AGE_4_HOURS);
-    if (HttpServletResponse.SC_NOT_MODIFIED == getServlet().getHttpCacheControl().enableCache(getHttpServletRequest(), getHttpServletResponse(), info)) {
-      getHttpServletResponse().setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+    if (getServlet().getHttpCacheControl().checkAndUpdateCacheHeaders(req, resp, info)) {
+      resp.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
       return true;
     }
 
-    byte[] content = StreamUtil.readResource(url);
-    getHttpServletResponse().setContentLength(content.length);
+    byte[] content = StreamUtility.readResource(url);
+    resp.setContentLength(content.length);
 
     //Prefer mime type mapping from container
     String path = url.getPath();
@@ -81,10 +83,10 @@ public class StaticResourceHandler extends AbstractRequestHandler {
       LOG.warn("Could not determine content type of file " + path);
     }
     else {
-      getHttpServletResponse().setContentType(contentType);
+      resp.setContentType(contentType);
     }
 
-    getHttpServletResponse().getOutputStream().write(content);
+    resp.getOutputStream().write(content);
     return true;
   }
 

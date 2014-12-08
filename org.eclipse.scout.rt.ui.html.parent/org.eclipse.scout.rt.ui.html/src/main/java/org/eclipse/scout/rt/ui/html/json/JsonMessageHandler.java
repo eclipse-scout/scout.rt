@@ -49,7 +49,7 @@ public class JsonMessageHandler extends AbstractRequestHandler {
 
     //disable cache
     HttpCacheInfo info = new HttpCacheInfo(-1, -1, -1);
-    getServlet().getHttpCacheControl().disableCache(getHttpServletRequest(), getHttpServletResponse(), info);
+    getServlet().getHttpCacheControl().disableCacheHeaders(getHttpServletRequest(), getHttpServletResponse(), info);
 
     JsonRequest jsonReq = new JsonRequest(decodeJSONRequest());
     if (jsonReq.isPingRequest()) {

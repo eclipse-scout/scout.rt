@@ -22,9 +22,9 @@ import java.net.URLConnection;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-public final class StreamUtil {
+public final class StreamUtility {
 
-  private StreamUtil() {
+  private StreamUtility() {
   }
 
   public static byte[] compressGZIP(byte[] b) throws IOException {

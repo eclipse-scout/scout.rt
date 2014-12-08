@@ -15,6 +15,8 @@ Require-Bundle: org.eclipse.scout.rt.client;bundle-version="[5.1.0,5.2.0)";visib
  org.eclipse.scout.rt.client.mobile;bundle-version="[5.1.0,5.2.0)",
  org.eclipse.scout.rt.ui.html.client.ext;bundle-version="[5.1.0,5.2.0)"
 Export-Package: org.eclipse.scout.rt.ui.html,
+ org.eclipse.scout.rt.ui.html.cache,
+ org.eclipse.scout.rt.ui.html.gzip,
  org.eclipse.scout.rt.ui.html.json,
  org.eclipse.scout.rt.ui.html.json.action.keystroke,
  org.eclipse.scout.rt.ui.html.json.desktop,

@@ -27,14 +27,14 @@ public interface IHttpCacheControl {
   String IF_NONE_MATCH = "If-None-Match"; //$NON-NLS-1$
   String ETAG = "ETag"; //$NON-NLS-1$
 
-  void putCacheObject(HttpCacheObject o);
+  void putCacheObject(HttpServletRequest req, HttpCacheObject o);
 
-  HttpCacheObject getCacheObject(String pathInfo);
+  HttpCacheObject getCacheObject(HttpServletRequest req, String pathInfo);
 
   /**
    * @return the removed object or null if it was not cached
    */
-  HttpCacheObject removeCacheObject(String pathInfo);
+  HttpCacheObject removeCacheObject(HttpServletRequest req, String pathInfo);
 
   /**
    * @return the "qualifier" replacement string used in html files with script and css tags
@@ -47,14 +47,15 @@ public interface IHttpCacheControl {
    * <p>
    * If info is null, then this method does nothing
    *
-   * @return {@link HttpServletResponse#SC_NOT_MODIFIED} if the file hasn't changed in the meantime or
-   *         {@link HttpServletResponse#SC_ACCEPTED} if the content of the file needs to be returned.
+   * @return true if the file hasn't changed in the meantime (the caller should return
+   *         {@link HttpServletResponse#SC_NOT_MODIFIED} ) or
+   *         false if the content of the file needs to be returned.
    */
-  int enableCache(HttpServletRequest req, HttpServletResponse resp, HttpCacheInfo info);
+  boolean checkAndUpdateCacheHeaders(HttpServletRequest req, HttpServletResponse resp, HttpCacheInfo info);
 
   /**
    * Disable cache for this resource
    */
-  void disableCache(HttpServletRequest req, HttpServletResponse resp, HttpCacheInfo info);
+  void disableCacheHeaders(HttpServletRequest req, HttpServletResponse resp, HttpCacheInfo info);
 
 }

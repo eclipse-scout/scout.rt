@@ -20,6 +20,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.html.AbstractRequestHandler;
 import org.eclipse.scout.rt.ui.html.AbstractScoutAppServlet;
+import org.eclipse.scout.rt.ui.html.ScoutAppHints;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheInfo;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
 
@@ -38,33 +39,35 @@ public class ScriptFileHandler extends AbstractRequestHandler {
 
   @Override
   public boolean handle() throws ServletException, IOException {
+    HttpServletRequest req = getHttpServletRequest();
+    HttpServletResponse resp = getHttpServletResponse();
     String pathInfo = getPathInfo();
     LOG.info("processing script: " + pathInfo);
 
     //performance: did we already create a cached version?
-    HttpCacheObject cacheObj = getServlet().getHttpCacheControl().getCacheObject(pathInfo);
+    HttpCacheObject cacheObj = getServlet().getHttpCacheControl().getCacheObject(req, pathInfo);
     if (cacheObj == null) {
       ScriptBuilder builder = createScriptBuilder();
-      builder.setDebug(isDebug());
+      builder.setMinifyEnabled(ScoutAppHints.isMinifyHint(req));
       cacheObj = builder.buildScript(pathInfo);
-      getServlet().getHttpCacheControl().putCacheObject(cacheObj);
+      getServlet().getHttpCacheControl().putCacheObject(req, cacheObj);
     }
 
     //check cache state
     HttpCacheInfo info = new HttpCacheInfo(cacheObj.getContent().length, cacheObj.getLastModified(), MAX_AGE_30_DAYS);
-    if (HttpServletResponse.SC_NOT_MODIFIED == getServlet().getHttpCacheControl().enableCache(getHttpServletRequest(), getHttpServletResponse(), info)) {
-      getHttpServletResponse().setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+    if (getServlet().getHttpCacheControl().checkAndUpdateCacheHeaders(req, resp, info)) {
+      resp.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
       return true;
     }
 
     if (pathInfo.endsWith(".js")) {
-      getHttpServletResponse().setContentType("application/javascript");
+      resp.setContentType("application/javascript");
     }
     else {
-      getHttpServletResponse().setContentType("text/css");
+      resp.setContentType("text/css");
     }
-    getHttpServletResponse().setContentLength(cacheObj.getContent().length);
-    getHttpServletResponse().getOutputStream().write(cacheObj.getContent());
+    resp.setContentLength(cacheObj.getContent().length);
+    resp.getOutputStream().write(cacheObj.getContent());
     return true;
   }
 

@@ -15,7 +15,6 @@ import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -33,17 +32,12 @@ import org.eclipse.scout.service.AbstractService;
 public class DefaultRequestInterceptor extends AbstractService implements IServletRequestInterceptor {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(DefaultRequestInterceptor.class);
 
-  private static final String URL_PARAM_DEBUG = "debug";
-
   //TODO imo change once we switch from OSGI to JEE; move WebContent to src/main/resources/META-INF/resources/WebContent, move src/main/js to src/main/resources/META-INF/resources/js
   private IWebArchiveResourceLocator m_resourceLocator = new OsgiWebArchiveResourceLocator();
 
   @Override
   public boolean interceptGet(AbstractScoutAppServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     String pathInfo = resolvePathInfo(req);
-
-    //debug flag
-    updateDebugScriptEnabledFlag(req);
 
     //js and css
     if ((pathInfo.endsWith(".js") || pathInfo.endsWith(".css")) && createScriptFileHandler(servlet, req, resp, pathInfo).handle()) {
@@ -77,17 +71,6 @@ public class DefaultRequestInterceptor extends AbstractService implements IServl
     LOG.info("404_NOT_FOUND_POST: " + pathInfo);
     resp.sendError(HttpServletResponse.SC_NOT_FOUND);
     return true;
-  }
-
-  protected void updateDebugScriptEnabledFlag(HttpServletRequest req) {
-    HttpSession session = req.getSession(false);
-    if (session == null) {
-      return;
-    }
-    String requestParam = req.getParameter(URL_PARAM_DEBUG);
-    if (requestParam != null) {
-      session.setAttribute(AbstractRequestHandler.SESSION_ATTR_DEBUG_ENABLED, "true".equals(requestParam));
-    }
   }
 
   protected String resolvePathInfo(HttpServletRequest req) {

@@ -35,8 +35,8 @@ import org.eclipse.scout.service.SERVICES;
  * Ajax requests are processed as "/json" using HTTP POST
  */
 public abstract class AbstractScoutAppServlet extends HttpServletEx {
-
   private static final long serialVersionUID = 1L;
+
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractScoutAppServlet.class);
 
   private P_AbstractInterceptor m_interceptGet = new P_AbstractInterceptor("GET") {
@@ -50,7 +50,7 @@ public abstract class AbstractScoutAppServlet extends HttpServletEx {
   private P_AbstractInterceptor m_interceptPost = new P_AbstractInterceptor("POST") {
 
     @Override
-    protected boolean intercept(IServletRequestInterceptor interceptor, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    boolean intercept(IServletRequestInterceptor interceptor, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
       return interceptor.interceptPost(AbstractScoutAppServlet.this, req, resp);
     }
   };

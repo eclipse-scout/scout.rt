@@ -23,7 +23,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.html.AbstractRequestHandler;
 import org.eclipse.scout.rt.ui.html.AbstractScoutAppServlet;
-import org.eclipse.scout.rt.ui.html.StreamUtil;
+import org.eclipse.scout.rt.ui.html.StreamUtility;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheInfo;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
 import org.eclipse.scout.rt.ui.html.cache.IHttpCacheControl;
@@ -38,7 +38,7 @@ import org.eclipse.scout.rt.ui.html.cache.IHttpCacheControl;
 public class HtmlFileHandler extends AbstractRequestHandler {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(HtmlFileHandler.class);
   private static final Pattern QUALIFIER_PATTERN = Pattern.compile("(?<=[-])qualifier(?=.)");
-  private static int MAX_AGE_4_HOURS = 4 * 3600;
+  private static final int MAX_AGE_4_HOURS = 4 * 3600;
 
   public HtmlFileHandler(AbstractScoutAppServlet servlet, HttpServletRequest req, HttpServletResponse resp, String pathInfo) {
     super(servlet, req, resp, pathInfo);
@@ -46,6 +46,8 @@ public class HtmlFileHandler extends AbstractRequestHandler {
 
   @Override
   public boolean handle() throws ServletException, IOException {
+    HttpServletRequest req = getHttpServletRequest();
+    HttpServletResponse resp = getHttpServletResponse();
     String pathInfo = getPathInfo();
     URL url = getServlet().getResourceLocator().getWebContentResource(getPathInfo());
     if (url == null) {
@@ -54,24 +56,24 @@ public class HtmlFileHandler extends AbstractRequestHandler {
     LOG.info("processing html: " + pathInfo + " using " + url);
 
     //performance: did we already create a cached version?
-    HttpCacheObject cacheObj = getServlet().getHttpCacheControl().getCacheObject(pathInfo);
+    HttpCacheObject cacheObj = getServlet().getHttpCacheControl().getCacheObject(req, pathInfo);
     if (cacheObj == null) {
-      byte[] content = StreamUtil.readResource(url);
+      byte[] content = StreamUtility.readResource(url);
       content = replaceQualifiers(content);
       cacheObj = new HttpCacheObject(pathInfo, content, System.currentTimeMillis());
-      getServlet().getHttpCacheControl().putCacheObject(cacheObj);
+      getServlet().getHttpCacheControl().putCacheObject(req, cacheObj);
     }
 
     //check cache state
     HttpCacheInfo info = new HttpCacheInfo(cacheObj.getContent().length, cacheObj.getLastModified(), MAX_AGE_4_HOURS);
-    if (HttpServletResponse.SC_NOT_MODIFIED == getServlet().getHttpCacheControl().enableCache(getHttpServletRequest(), getHttpServletResponse(), info)) {
-      getHttpServletResponse().setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+    if (getServlet().getHttpCacheControl().checkAndUpdateCacheHeaders(req, resp, info)) {
+      resp.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
       return true;
     }
 
-    getHttpServletResponse().setContentType("text/html");
-    getHttpServletResponse().setContentLength(cacheObj.getContent().length);
-    getHttpServletResponse().getOutputStream().write(cacheObj.getContent());
+    resp.setContentType("text/html; charset=UTF-8");
+    resp.setContentLength(cacheObj.getContent().length);
+    resp.getOutputStream().write(cacheObj.getContent());
     return true;
   }
 
@@ -82,9 +84,7 @@ public class HtmlFileHandler extends AbstractRequestHandler {
    */
   protected byte[] replaceQualifiers(byte[] content) throws IOException {
     String s = new String(content, "UTF-8");
-    System.out.println("BEFORE: " + s);
     s = QUALIFIER_PATTERN.matcher(s).replaceAll(getServlet().getHttpCacheControl().getQualifierReplacement());
-    System.out.println("AFTER:  " + s);
     return s.getBytes("UTF-8");
   }
 
