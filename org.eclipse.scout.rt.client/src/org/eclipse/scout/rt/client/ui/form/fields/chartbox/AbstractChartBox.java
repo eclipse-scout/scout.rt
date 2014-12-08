@@ -16,6 +16,7 @@ import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.chartbox.IChartBoxExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 
 @ClassId("4b06de6a-09c5-4500-ba64-8d886467ffd8")
@@ -103,6 +104,18 @@ public abstract class AbstractChartBox extends AbstractFormField implements ICha
   private class P_UIFacade implements IChartBoxUIFacade {
     // empty so far
 
+  }
+
+  protected static class LocalChartBoxExtension<OWNER extends AbstractChartBox> extends LocalFormFieldExtension<OWNER> implements IChartBoxExtension<OWNER> {
+
+    public LocalChartBoxExtension(OWNER owner) {
+      super(owner);
+    }
+  }
+
+  @Override
+  protected IChartBoxExtension<? extends AbstractChartBox> createLocalExtension() {
+    return new LocalChartBoxExtension<AbstractChartBox>(this);
   }
 
 }

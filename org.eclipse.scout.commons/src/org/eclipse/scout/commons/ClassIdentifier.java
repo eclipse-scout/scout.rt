@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -19,7 +19,7 @@ import java.util.Arrays;
  * especially required to identify extended template classes.
  * <p>
  * <b>Example</b>:
- * 
+ *
  * <pre>
  * public abstract class Template {
  *   public class InnerClass {
@@ -34,7 +34,7 @@ import java.util.Arrays;
  *   }
  * }
  * </pre>
- * 
+ *
  * A class identifier distinguishes between the <code>InnerClass</code> used within <code>Foo.A</code> and the one used
  * within <code>Foo.B</code>. I.e <code>new ClassIdentifier(Foo.A.class, Foo.A.InnerClass.class)</code> is not the same
  * as <code>new ClassIdentifier(Foo.B.class, Foo.B.InnerClass.class)</code>, whereas
@@ -46,19 +46,26 @@ public class ClassIdentifier implements Serializable {
   private static final long serialVersionUID = 1L;
 
   private final Class<?>[] m_segments;
+  private final int m_hash;
 
   public ClassIdentifier(Class<?>... segments) throws IllegalArgumentException {
     if (segments == null || segments.length == 0) {
       throw new IllegalArgumentException("The given classes array must not be null or empty");
     }
+    for (Class<?> segment : segments) {
+      if (segment == null) {
+        throw new IllegalArgumentException("null segments are not allowed.");
+      }
+    }
     m_segments = segments;
+    m_hash = Arrays.hashCode(m_segments);
   }
 
   /**
    * @return Returns the array of segments represented by this class identifier.
    */
   public Class<?>[] getClasses() {
-    return m_segments;
+    return Arrays.copyOf(m_segments, m_segments.length);
   }
 
   /**
@@ -68,10 +75,21 @@ public class ClassIdentifier implements Serializable {
     return m_segments[m_segments.length - 1];
   }
 
+  public Class<?> getSegment(int i) {
+    if (i < 0 || i >= m_segments.length) {
+      throw new IllegalArgumentException("index out of bounds");
+    }
+    return m_segments[i];
+  }
+
+  public int size() {
+    return m_segments.length;
+  }
+
   /**
    * Converts the given array of classes into an array of {@link ClassIdentifier}s. The method returns always a non-null
    * result. Null entries in the given class array are not transformed into a class identifier.
-   * 
+   *
    * @param classes
    * @return
    */
@@ -90,10 +108,7 @@ public class ClassIdentifier implements Serializable {
 
   @Override
   public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + Arrays.hashCode(m_segments);
-    return result;
+    return m_hash;
   }
 
   @Override
@@ -101,16 +116,15 @@ public class ClassIdentifier implements Serializable {
     if (this == obj) {
       return true;
     }
-    if (obj == null) {
-      return false;
-    }
-    if (getClass() != obj.getClass()) {
+    if (!(obj instanceof ClassIdentifier)) {
       return false;
     }
     ClassIdentifier other = (ClassIdentifier) obj;
-    if (!Arrays.equals(m_segments, other.m_segments)) {
-      return false;
-    }
-    return true;
+    return Arrays.equals(m_segments, other.m_segments);
+  }
+
+  @Override
+  public String toString() {
+    return "ClassIdentifier [" + Arrays.toString(m_segments) + "]";
   }
 }

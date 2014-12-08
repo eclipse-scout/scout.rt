@@ -14,7 +14,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,9 +24,10 @@ import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.InjectFieldTo;
+import org.eclipse.scout.commons.annotations.OrderedComparator;
 import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.holders.Holder;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.ICompositeFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.DefaultFormFieldInjection;
 import org.eclipse.scout.rt.client.ui.form.FormFieldInjectionThreadLocal;
@@ -46,6 +47,7 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
 
   private List<IFormField> m_fields;
   private Map<Class<?>, Class<? extends IFormField>> m_formFieldReplacements;
+  private Map<Class<? extends IFormField>, IFormField> m_movedFormFieldsByClass;
 
   public AbstractCompositeField() {
     this(true);
@@ -55,9 +57,9 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
     super(callInitializer);
   }
 
-  protected List<Class<? extends IFormField>> getConfiguredFields() {
+  protected List<Class<IFormField>> getConfiguredFields() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    return ConfigurationUtility.sortFilteredClassesByOrderAnnotation(Arrays.asList(dca), IFormField.class);
+    return ConfigurationUtility.filterClasses(dca, IFormField.class);
   }
 
   /**
@@ -77,11 +79,13 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
      * after field creation. -> all fields would have the enabled state of the MainBox.
      */
     m_fields = CollectionUtility.emptyArrayList();
+    m_movedFormFieldsByClass = new HashMap<Class<? extends IFormField>, IFormField>();
     super.initConfig();
     // prepare injected fields
     DefaultFormFieldInjection injectedFields = null;
-    List<Class<? extends IFormField>> configuredFields = new ArrayList<Class<? extends IFormField>>();
-    for (Class<? extends IFormField> clazz : getConfiguredFields()) {
+    List<Class<IFormField>> declaredFields = getConfiguredFields();
+    List<Class<? extends IFormField>> configuredFields = new ArrayList<Class<? extends IFormField>>(declaredFields.size());
+    for (Class<? extends IFormField> clazz : declaredFields) {
       if (ConfigurationUtility.isInjectFieldAnnotationPresent(clazz)) {
         if (injectedFields == null) {
           injectedFields = new DefaultFormFieldInjection(this);
@@ -92,14 +96,17 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
         configuredFields.add(clazz);
       }
     }
-    List<IFormField> fieldList = new ArrayList<IFormField>();
+
     try {
+      List<IFormField> contributedFields = m_contributionHolder.getContributionsByClass(IFormField.class);
       if (injectedFields != null) {
         FormFieldInjectionThreadLocal.push(injectedFields);
       }
       FormFieldInjectionThreadLocal.pushContainerField(this);
-      //
       filterFieldsInternal(configuredFields);
+
+      // create instances
+      List<IFormField> fieldList = new ArrayList<IFormField>(configuredFields.size() + contributedFields.size());
       for (Class<? extends IFormField> clazz : configuredFields) {
         try {
           IFormField f = ConfigurationUtility.newInnerInstance(this, clazz);
@@ -109,7 +116,26 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
           SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + clazz.getName() + "'.", t));
         }
       }
+
+      // handle contributions
+      fieldList.addAll(contributedFields);
+
       injectFieldsInternal(fieldList);
+
+      // sort fields
+      Collections.sort(fieldList, new OrderedComparator());
+
+      // connect
+      for (IFormField f : fieldList) {
+        f.setParentFieldInternal(this);
+      }
+
+      m_fields = fieldList;
+
+      // attach a proxy controller to each child field in the group for: visible, saveNeeded
+      for (IFormField f : m_fields) {
+        f.addPropertyChangeListener(new P_FieldPropertyChangeListener());
+      }
     }
     finally {
       if (injectedFields != null) {
@@ -118,15 +144,27 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
       }
       FormFieldInjectionThreadLocal.popContainerField(this);
     }
-    for (IFormField f : fieldList) {
-      f.setParentFieldInternal(this);
-    }
-    m_fields = fieldList;
-    // attach a proxy controller to each child field in the group for: visible, saveNeeded
-    for (IFormField f : m_fields) {
-      f.addPropertyChangeListener(new P_FieldPropertyChangeListener());
-    }
     handleFieldVisibilityChanged();
+  }
+
+  @Override
+  public void addField(IFormField f) {
+    CompositeFieldUtility.addField(f, this, m_fields);
+  }
+
+  @Override
+  public void removeField(IFormField f) {
+    CompositeFieldUtility.removeField(f, this, m_fields);
+  }
+
+  @Override
+  public void moveFieldTo(IFormField f, ICompositeField newContainer) {
+    CompositeFieldUtility.moveFieldTo(f, this, newContainer, m_movedFormFieldsByClass);
+  }
+
+  @Override
+  public Map<Class<? extends IFormField>, IFormField> getMovedFields() {
+    return Collections.unmodifiableMap(m_movedFormFieldsByClass);
   }
 
   /**
@@ -241,54 +279,18 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
   }
 
   @Override
-  public IFormField getFieldById(final String id) {
-    final Holder<IFormField> found = new Holder<IFormField>(IFormField.class);
-    IFormFieldVisitor v = new IFormFieldVisitor() {
-      @Override
-      public boolean visitField(IFormField field, int level, int fieldIndex) {
-        if (field.getFieldId().equals(id)) {
-          found.setValue(field);
-        }
-        return found.getValue() == null;
-      }
-    };
-    visitFields(v, 0);
-    return found.getValue();
+  public IFormField getFieldById(String id) {
+    return CompositeFieldUtility.getFieldById(this, id);
   }
 
   @Override
-  public <T extends IFormField> T getFieldById(final String id, final Class<T> type) {
-    final Holder<T> found = new Holder<T>(type);
-    IFormFieldVisitor v = new IFormFieldVisitor() {
-      @Override
-      @SuppressWarnings("unchecked")
-      public boolean visitField(IFormField field, int level, int fieldIndex) {
-        if (type.isAssignableFrom(field.getClass()) && field.getFieldId().equals(id)) {
-          found.setValue((T) field);
-        }
-        return found.getValue() == null;
-      }
-    };
-    visitFields(v, 0);
-    return found.getValue();
+  public <T extends IFormField> T getFieldById(String id, Class<T> type) {
+    return CompositeFieldUtility.getFieldById(this, id, type);
   }
 
   @Override
   public <T extends IFormField> T getFieldByClass(Class<T> c) {
-    final Class<? extends T> formFieldClass = getReplacingFieldClass(c);
-    final Holder<T> found = new Holder<T>(c);
-    IFormFieldVisitor v = new IFormFieldVisitor() {
-      @Override
-      @SuppressWarnings("unchecked")
-      public boolean visitField(IFormField field, int level, int fieldIndex) {
-        if (field.getClass() == formFieldClass) {
-          found.setValue((T) field);
-        }
-        return found.getValue() == null;
-      }
-    };
-    visitFields(v, 0);
-    return found.getValue();
+    return CompositeFieldUtility.getFieldByClass(this, getReplacingFieldClass(c));
   }
 
   /**
@@ -510,4 +512,16 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
       }
     }
   }// end private class
+
+  protected static class LocalCompositeFieldExtension<OWNER extends AbstractCompositeField> extends LocalFormFieldExtension<OWNER> implements ICompositeFieldExtension<OWNER> {
+
+    public LocalCompositeFieldExtension(OWNER owner) {
+      super(owner);
+    }
+  }
+
+  @Override
+  protected ICompositeFieldExtension<? extends AbstractCompositeField> createLocalExtension() {
+    return new LocalCompositeFieldExtension<AbstractCompositeField>(this);
+  }
 }

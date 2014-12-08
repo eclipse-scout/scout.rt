@@ -10,6 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
-public interface IProposalColumn<T> extends IContentAssistColumn<String, T> {
+public interface IProposalColumn<LOOKUP_TYPE> extends IContentAssistColumn<String, LOOKUP_TYPE> {
 
 }

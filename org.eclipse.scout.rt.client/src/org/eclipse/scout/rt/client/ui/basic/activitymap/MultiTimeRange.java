@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.basic.activitymap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.SortedMap;
 import java.util.TreeMap;
 

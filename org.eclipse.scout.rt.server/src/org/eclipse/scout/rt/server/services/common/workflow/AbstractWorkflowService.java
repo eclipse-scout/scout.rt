@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
@@ -22,6 +23,8 @@ import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.shared.extension.ContributionComposite;
+import org.eclipse.scout.rt.shared.extension.IContributionOwner;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.rt.shared.services.common.workflow.AbstractWorkflowData;
@@ -29,13 +32,12 @@ import org.eclipse.scout.rt.shared.services.common.workflow.AbstractWorkflowStep
 import org.eclipse.scout.service.AbstractService;
 import org.eclipse.scout.service.SERVICES;
 
-public abstract class AbstractWorkflowService<T extends AbstractWorkflowData> extends AbstractService implements IWorkflowService<T> {
-  private ArrayList<IWorkflowStep> m_stepList;
-  private HashMap<Class<? extends IWorkflowStep>, IWorkflowStep> m_stepMap;
+public abstract class AbstractWorkflowService<T extends AbstractWorkflowData> extends AbstractService implements IWorkflowService<T>, IContributionOwner {
+  private List<IWorkflowStep> m_stepList;
+  private Map<Class<? extends IWorkflowStep>, IWorkflowStep> m_stepMap;
+  private IContributionOwner m_contributionHolder;
 
   public AbstractWorkflowService() {
-    m_stepList = new ArrayList<IWorkflowStep>();
-    m_stepMap = new HashMap<Class<? extends IWorkflowStep>, IWorkflowStep>();
     initConfig();
   }
 
@@ -46,6 +48,21 @@ public abstract class AbstractWorkflowService<T extends AbstractWorkflowData> ex
       a = new AbstractWorkflowData[0];
     }
     return a;
+  }
+
+  @Override
+  public final List<Object> getAllContributions() {
+    return m_contributionHolder.getAllContributions();
+  }
+
+  @Override
+  public final <TYPE> List<TYPE> getContributionsByClass(Class<TYPE> type) {
+    return m_contributionHolder.getContributionsByClass(type);
+  }
+
+  @Override
+  public final <TYPE> TYPE getContribution(Class<TYPE> contribution) {
+    return m_contributionHolder.getContribution(contribution);
   }
 
   @Override
@@ -339,16 +356,29 @@ public abstract class AbstractWorkflowService<T extends AbstractWorkflowData> ex
   }
 
   protected void initConfig() {
-    for (Class<? extends IWorkflowStep> c : getConfiguredSteps()) {
+    m_contributionHolder = new ContributionComposite(this);
+    List<IWorkflowStep> contributedSteps = m_contributionHolder.getContributionsByClass(IWorkflowStep.class);
+    List<Class<? extends IWorkflowStep>> configuredSteps = getConfiguredSteps();
+    int size = contributedSteps.size() + configuredSteps.size();
+    List<IWorkflowStep> stepList = new ArrayList<IWorkflowStep>(size);
+    Map<Class<? extends IWorkflowStep>, IWorkflowStep> stepMap = new HashMap<Class<? extends IWorkflowStep>, IWorkflowStep>(size);
+    for (Class<? extends IWorkflowStep> c : configuredSteps) {
       try {
         IWorkflowStep step = ConfigurationUtility.newInnerInstance(this, c);
-        m_stepList.add(step);
-        m_stepMap.put(c, step);
+        stepList.add(step);
+        stepMap.put(c, step);
       }
       catch (Exception e) {
         SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + c.getName() + "'.", e));
       }
     }
+    stepList.addAll(contributedSteps);
+    for (IWorkflowStep s : contributedSteps) {
+      stepMap.put(s.getClass(), s);
+    }
+
+    m_stepList = stepList;
+    m_stepMap = stepMap;
   }
 
 }

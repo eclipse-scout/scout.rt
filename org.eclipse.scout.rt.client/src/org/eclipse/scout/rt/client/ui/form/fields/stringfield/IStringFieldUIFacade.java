@@ -23,7 +23,7 @@ public interface IStringFieldUIFacade extends IBasicFieldUIFacade {
    * handling has to be done by overriding the execLinkAction on the string
    * field. If the text can not be transformed into an URL the execLinkAction
    * method is called with null.
-   * 
+   *
    * @param text
    */
   void fireLinkActionFromUI(String text);

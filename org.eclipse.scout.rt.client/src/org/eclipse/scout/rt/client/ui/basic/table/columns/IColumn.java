@@ -15,6 +15,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.scout.commons.ITypeWithClassId;
+import org.eclipse.scout.commons.annotations.IOrdered;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.ColumnSet;
@@ -24,7 +25,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 
-public interface IColumn<T> extends IPropertyObserver, ITypeWithClassId {
+public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOrdered {
   /**
    * type boolean
    */
@@ -93,25 +94,11 @@ public interface IColumn<T> extends IPropertyObserver, ITypeWithClassId {
 
   int compareTableRows(ITableRow r1, ITableRow r2);
 
-  T getValue(int rowIndex);
+  VALUE getValue(int rowIndex);
 
-  T getValue(ITableRow r);
+  VALUE getValue(ITableRow r);
 
-  List<T> getValues(Collection<? extends ITableRow> rows);
-
-  /**
-   * <p>
-   * Updates the value of the given row.
-   * </p>
-   * <p>
-   * If any cell editor is active, editing is canceled and it's value rejected.
-   * </p>
-   * 
-   * @param r
-   * @param value
-   * @throws ProcessingException
-   */
-  void setValue(ITableRow r, T value) throws ProcessingException;
+  List<VALUE> getValues(Collection<? extends ITableRow> rows);
 
   /**
    * <p>
@@ -120,31 +107,45 @@ public interface IColumn<T> extends IPropertyObserver, ITypeWithClassId {
    * <p>
    * If any cell editor is active, editing is canceled and it's value rejected.
    * </p>
-   * 
+   *
    * @param r
    * @param value
    * @throws ProcessingException
    */
-  void setValue(int rowIndex, T value) throws ProcessingException;
+  void setValue(ITableRow r, VALUE value) throws ProcessingException;
+
+  /**
+   * <p>
+   * Updates the value of the given row.
+   * </p>
+   * <p>
+   * If any cell editor is active, editing is canceled and it's value rejected.
+   * </p>
+   *
+   * @param r
+   * @param value
+   * @throws ProcessingException
+   */
+  void setValue(int rowIndex, VALUE value) throws ProcessingException;
 
   /**
    * fill all values in this column with the new value
    */
-  void fill(T rawValue) throws ProcessingException;
+  void fill(VALUE rawValue) throws ProcessingException;
 
-  List<T> getValues();
+  List<VALUE> getValues();
 
-  List<T> getValues(boolean includeDeleted);
+  List<VALUE> getValues(boolean includeDeleted);
 
-  List<T> getSelectedValues();
+  List<VALUE> getSelectedValues();
 
-  List<T> getInsertedValues();
+  List<VALUE> getInsertedValues();
 
-  List<T> getUpdatedValues();
+  List<VALUE> getUpdatedValues();
 
-  List<T> getDeletedValues();
+  List<VALUE> getDeletedValues();
 
-  List<T> getNotDeletedValues();
+  List<VALUE> getNotDeletedValues();
 
   /**
    * @return display text for this row's cell on this column
@@ -166,23 +167,23 @@ public interface IColumn<T> extends IPropertyObserver, ITypeWithClassId {
    */
   List<String> getSelectedDisplayTexts();
 
-  Class<T> getDataType();
+  Class<VALUE> getDataType();
 
   /**
    * first selected value
    */
-  T getSelectedValue();
+  VALUE getSelectedValue();
 
-  List<ITableRow> findRows(Collection<? extends T> values);
+  List<ITableRow> findRows(Collection<? extends VALUE> values);
 
-  List<ITableRow> findRows(T value);
+  List<ITableRow> findRows(VALUE value);
 
-  ITableRow findRow(T value);
+  ITableRow findRow(VALUE value);
 
   /**
    * @return true if column contains value at least one time
    */
-  boolean contains(T value);
+  boolean contains(VALUE value);
 
   /**
    * @return true if column is not unique, that means at least one value occurs
@@ -206,16 +207,15 @@ public interface IColumn<T> extends IPropertyObserver, ITypeWithClassId {
   void setInitialVisible(boolean b);
 
   /**
-   * @return Returns the column's view order. It determines where this column is arranged in the view.
+   * @deprecated Will be removed in the 6.0 Release. Use {@link IColumn#getOrder()} instead.
    */
+  @Deprecated
   double getViewOrder();
 
   /**
-   * Sets the column's view order used for ordering all columns of a table. It is initialized with the column's model
-   * order (given by @Order annotation), i.e. the column order values are filled into the table.
-   * 
-   * @param order
+   * @deprecated Will be removed in the 6.0 Release. Use {@link IColumn#setOrder(double)} instead.
    */
+  @Deprecated
   void setViewOrder(double order);
 
   int getInitialSortIndex();
@@ -367,32 +367,28 @@ public interface IColumn<T> extends IPropertyObserver, ITypeWithClassId {
    * @throws ProcessingException
    *           parse AND validate value
    */
-  T/* validValue */parseValue(ITableRow row, Object rawValue) throws ProcessingException;
+  VALUE/* validValue */parseValue(ITableRow row, Object rawValue) throws ProcessingException;
 
   /**
    * validate cell value on a row
    */
-  T/* validValue */validateValue(ITableRow row, T rawValue) throws ProcessingException;
+  VALUE/* validValue */validateValue(ITableRow row, VALUE rawValue) throws ProcessingException;
 
   /**
    * Prepare editing of a cell in the table.
    * <p>
    * Cell editing is canceled (normally by typing escape) or saved (normally by clicking another cell, typing enter).
    * <p>
-   * When saved, the method {@link #completeEdit(ITableRow, IFormField)} /
-   * {@link #execCompleteEdit(ITableRow, IFormField)} is called on this column.
-   * 
+   * When saved, the method {@link #completeEdit(ITableRow, IFormField)} is called on this column.
+   *
    * @param row
    *          on which editing occurs
-   * @return a field for editing, use super.{@link #execPrepareEdit(ITableRow)} for the default implementation.
+   * @return a field for editing, use super.{@link #prepareEdit(ITableRow)} for the default implementation.
    */
   IFormField prepareEdit(ITableRow row) throws ProcessingException;
 
   /**
    * Complete editing of a cell
-   * <p>
-   * By default this calls {@link #setValue(ITableRow, Object)} and delegates to
-   * {@link #execParseValue(ITableRow, Object)} and {@link #execValidateValue(ITableRow, Object)}.
    */
   void completeEdit(ITableRow row, IFormField editingField) throws ProcessingException;
 

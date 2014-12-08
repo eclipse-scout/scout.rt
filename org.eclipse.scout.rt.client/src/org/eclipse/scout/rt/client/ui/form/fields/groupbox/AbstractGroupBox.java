@@ -20,6 +20,7 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.groupbox.IGroupBoxExtension;
 import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
 import org.eclipse.scout.rt.client.ui.action.keystroke.DefaultFormEnterKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.keystroke.DefaultFormEscapeKeyStroke;
@@ -72,7 +73,7 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
    * {@link AbstractFormField#getConfiguredGridW()}.
    * <p>
    * Subclasses can override this method. Default is -1 which typically means 2 columns.
-   * 
+   *
    * @return the number of columns used in this group box
    */
   @ConfigProperty(ConfigProperty.INTEGER)
@@ -103,7 +104,7 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
    * {@link #getConfiguredBorderVisible()} with {@code true} instead.
    * <p>
    * Subclasses can override this method. Default is {@code true}.
-   * 
+   *
    * @return {@code true} if the border is visible, {@code false} otherwise.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -119,7 +120,7 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
    * {@link IGroupBox#BORDER_DECORATION_AUTO}.
    * <p>
    * Subclasses can override this method. Default is {@code false}.
-   * 
+   *
    * @return {@code true} if the group box should be expandable, {@code false} otherwise.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -134,7 +135,7 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
    * {@link #getConfiguredExpandable()}.
    * <p>
    * Subclasses can override this method. Default is {@code true}.
-   * 
+   *
    * @return {@code true} if the group box should be initially expanded, {@code false} otherwise.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -150,7 +151,7 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
    * {@link #getConfiguredBorderVisible()}.
    * <p>
    * Subclasses can override this method. Default is {@link IGroupBox#BORDER_DECORATION_AUTO}.
-   * 
+   *
    * @return the border decoration of the group box
    */
   @ConfigProperty(ConfigProperty.BORDER_DECORATION)
@@ -163,7 +164,7 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
    * Configures the background image for this group box.
    * <p>
    * Subclasses can override this method. Default is {@code null}.
-   * 
+   *
    * @return the ID (name) of the image
    * @see IIconProviderService
    */
@@ -179,7 +180,7 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
    * {@link #getConfiguredBackgroundImageName()}
    * <p>
    * Subclasses can override this method. Default alignment is center.
-   * 
+   *
    * @return -1 for left, 0 for center and 1 for right alignment
    */
   @ConfigProperty(ConfigProperty.HORIZONTAL_ALIGNMENT)
@@ -194,7 +195,7 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
    * {@link #getConfiguredBackgroundImageName()}
    * <p>
    * Subclasses can override this method. Default alignment is center.
-   * 
+   *
    * @return -1 for top, 0 for center and 1 for bottom alignment
    */
   @ConfigProperty(ConfigProperty.VERTICAL_ALIGNMENT)
@@ -208,7 +209,7 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
    * If the property is set to true, a vertical scrollbar will appear if the content is too large to be displayed.
    * <p>
    * Subclasses can override this method. Default is false.
-   * 
+   *
    * @return {@code true} if the group box should be scrollable, {@code false} otherwise.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -228,7 +229,7 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
    * <p>
    * Subclasses can override this method. Default is {@link IFormField#FULL_WIDTH} which means it spans every column of
    * the container.
-   * 
+   *
    * @return the number of columns to span
    */
   @Override
@@ -253,6 +254,20 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
     m_customProcessButtonGrid = new GroupBoxProcessButtonGrid(this, true, false);
     m_systemProcessButtonGrid = new GroupBoxProcessButtonGrid(this, false, true);
     super.initConfig();
+    categorizeFields();
+
+    setExpandable(getConfiguredExpandable());
+    setExpanded(getConfiguredExpanded());
+    setBorderVisible(getConfiguredBorderVisible());
+    setBorderDecoration(getConfiguredBorderDecoration());
+    setGridColumnCountHint(getConfiguredGridColumnCount());
+    setBackgroundImageName(getConfiguredBackgroundImageName());
+    setBackgroundImageHorizontalAlignment(getConfiguredBackgroundImageHorizontalAlignment());
+    setBackgroundImageVerticalAlignment(getConfiguredBackgroundImageVerticalAlignment());
+    setScrollable(getConfiguredScrollable());
+  }
+
+  private void categorizeFields() {
     // categorize items
     List<IFormField> controlList = new ArrayList<IFormField>();
     List<IGroupBox> groupList = new ArrayList<IGroupBox>();
@@ -285,16 +300,19 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
     m_groupBoxes = groupList;
     m_customButtons = customButtonList;
     m_systemButtons = systemButtonList;
+  }
 
-    setExpandable(getConfiguredExpandable());
-    setExpanded(getConfiguredExpanded());
-    setBorderVisible(getConfiguredBorderVisible());
-    setBorderDecoration(getConfiguredBorderDecoration());
-    setGridColumnCountHint(getConfiguredGridColumnCount());
-    setBackgroundImageName(getConfiguredBackgroundImageName());
-    setBackgroundImageHorizontalAlignment(getConfiguredBackgroundImageHorizontalAlignment());
-    setBackgroundImageVerticalAlignment(getConfiguredBackgroundImageVerticalAlignment());
-    setScrollable(getConfiguredScrollable());
+  private void ensureCategorized() {
+    if (m_controlFields == null || m_groupBoxes == null || m_customButtons == null || m_systemButtons == null) {
+      categorizeFields();
+    }
+  }
+
+  private void clearCategorization() {
+    m_controlFields = null;
+    m_groupBoxes = null;
+    m_customButtons = null;
+    m_systemButtons = null;
   }
 
   @Override
@@ -381,26 +399,42 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
 
   @Override
   public List<IGroupBox> getGroupBoxes() {
+    ensureCategorized();
     return CollectionUtility.arrayList(m_groupBoxes);
   }
 
   @Override
   public List<IFormField> getControlFields() {
+    ensureCategorized();
     return CollectionUtility.arrayList(m_controlFields);
   }
 
   @Override
   public List<IButton> getCustomProcessButtons() {
+    ensureCategorized();
     return CollectionUtility.arrayList(m_customButtons);
   }
 
   @Override
   public List<IButton> getSystemProcessButtons() {
+    ensureCategorized();
     return CollectionUtility.arrayList(m_systemButtons);
   }
 
   public void setBodyGrid(IGroupBoxBodyGrid bodyGrid) {
     m_bodyGrid = bodyGrid;
+  }
+
+  @Override
+  public void addField(IFormField f) {
+    super.addField(f);
+    clearCategorization();
+  }
+
+  @Override
+  public void removeField(IFormField f) {
+    super.removeField(f);
+    clearCategorization();
   }
 
   @Override
@@ -552,5 +586,17 @@ public abstract class AbstractGroupBox extends AbstractCompositeField implements
     public void setExpandedFromUI(boolean expanded) {
       setExpanded(expanded);
     }
+  }
+
+  protected static class LocalGroupBoxExtension<OWNER extends AbstractGroupBox> extends LocalCompositeFieldExtension<OWNER> implements IGroupBoxExtension<OWNER> {
+
+    public LocalGroupBoxExtension(OWNER owner) {
+      super(owner);
+    }
+  }
+
+  @Override
+  protected IGroupBoxExtension<? extends AbstractGroupBox> createLocalExtension() {
+    return new LocalGroupBoxExtension<AbstractGroupBox>(this);
   }
 }

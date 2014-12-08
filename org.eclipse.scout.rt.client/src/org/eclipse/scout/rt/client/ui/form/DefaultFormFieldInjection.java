@@ -21,7 +21,6 @@ import java.util.Set;
 import org.eclipse.scout.commons.BeanUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.annotations.InjectFieldTo;
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -32,9 +31,9 @@ import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHa
 import org.eclipse.scout.service.SERVICES;
 
 /**
- * Default implementation that inserts new fields at the right place based on their {@link Order} annotation and that
- * replaces existing fields using the {@link Replace} annotation.
- * 
+ * Default implementation that inserts new fields and that replaces existing fields using the {@link Replace}
+ * annotation.
+ *
  * @since 3.8.2
  */
 public class DefaultFormFieldInjection implements IFormFieldInjection {
@@ -50,7 +49,7 @@ public class DefaultFormFieldInjection implements IFormFieldInjection {
 
   /**
    * Creates a new instance for the given enclosing context (i.e. an {@link IForm} or an {@link ICompositeField}).
-   * 
+   *
    * @param enclosingContext
    */
   public DefaultFormFieldInjection(Object enclosingContext) {
@@ -82,8 +81,8 @@ public class DefaultFormFieldInjection implements IFormFieldInjection {
     m_replacingFields = null;
   }
 
-  public void addFields(Class<? extends IFormField>[] fieldClasses) {
-    for (Class<? extends IFormField> c : fieldClasses) {
+  public void addFields(List<Class<IFormField>> fieldClasses) {
+    for (Class<IFormField> c : fieldClasses) {
       addField(c);
     }
   }
@@ -180,9 +179,8 @@ public class DefaultFormFieldInjection implements IFormFieldInjection {
     Set<Class<? extends IFormField>> replacingFields = m_replacingFormFieldsByContainer.remove(container);
     if (replacingFields != null) {
       for (Class<? extends IFormField> replacingField : replacingFields) {
-        // compute order and create field
-        Order order = getOrder(replacingField);
-        createAndInsertField(container, fieldList, replacingField, order);
+        // create field
+        createAndInsertField(container, fieldList, replacingField);
         addReplacementMappings(replacingField);
       }
     }
@@ -194,8 +192,7 @@ public class DefaultFormFieldInjection implements IFormFieldInjection {
         tmpClass = tmpClass.getSuperclass();
       }
       if (tmpClass.getAnnotation(InjectFieldTo.class).value() == container.getClass()) {
-        Order order = getOrder(injectedField);
-        createAndInsertField(container, fieldList, injectedField, order);
+        createAndInsertField(container, fieldList, injectedField);
         addReplacementMappings(injectedField);
       }
     }
@@ -204,7 +201,7 @@ public class DefaultFormFieldInjection implements IFormFieldInjection {
   /**
    * Adds class mappings from replaced classes to the given one. This method does nothing if the given
    * <code>field</code> is not annotated with {@link Replace}.
-   * 
+   *
    * @param field
    */
   private void addReplacementMappings(Class<? extends IFormField> field) {
@@ -216,9 +213,9 @@ public class DefaultFormFieldInjection implements IFormFieldInjection {
   }
 
   /**
-   * Adds the field f to the list at the right place regarding the {@link Order} annotation.
+   * Adds the field f to the end of the list. If the field is already part of the given list, this method does nothing.
    */
-  private void createAndInsertField(IFormField container, List<IFormField> list, Class<? extends IFormField> fieldClass, Order order) {
+  private void createAndInsertField(IFormField container, List<IFormField> list, Class<? extends IFormField> fieldClass) {
     //check if list already contains the field
     for (IFormField f : list) {
       if (f.getClass() == fieldClass) {
@@ -228,21 +225,6 @@ public class DefaultFormFieldInjection implements IFormFieldInjection {
 
     try {
       IFormField f = newInnerInstance(container, fieldClass);
-
-      // add ordered
-      if (order != null) {
-        double orderValue = order.value();
-        for (int i = 0, n = list.size(); i < n; i++) {
-          Class<?> existingClazz = list.get(i).getClass();
-          Order existingClazzOrder = getOrder(existingClazz);
-          if (existingClazzOrder != null && orderValue < existingClazzOrder.value()) {
-            list.add(i, f);
-            return;
-          }
-        }
-      }
-
-      // default at end
       list.add(f);
     }
     catch (Exception e) {
@@ -251,20 +233,8 @@ public class DefaultFormFieldInjection implements IFormFieldInjection {
   }
 
   /**
-   * Returns the first {@link Order} annotation found up the replacement hierarchy.
-   */
-  private Order getOrder(Class<?> c) {
-    Order order = c.getAnnotation(Order.class);
-    while (order == null && c.isAnnotationPresent(Replace.class)) {
-      c = c.getSuperclass();
-      order = c.getAnnotation(Order.class);
-    }
-    return order;
-  }
-
-  /**
    * Creates a new form field instance within the given container.
-   * 
+   *
    * @param container
    * @param fieldClass
    */

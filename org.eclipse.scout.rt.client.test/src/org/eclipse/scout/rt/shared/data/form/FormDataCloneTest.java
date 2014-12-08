@@ -36,6 +36,7 @@ public class FormDataCloneTest {
   private int m_inCount;
 
   @Test
+  @SuppressWarnings("resource")
   public void test() throws Exception {
     CompanySearchFormData d = new CompanySearchFormData();
     d.getActive().setValue(true);

@@ -104,16 +104,12 @@ public class SwingScoutRadioButtonTest {
     @Override
     protected void execSelectionChanged(boolean selection) throws ProcessingException {
       m_execSelectionChangedHolder.setValue(selection);
+      m_execToggleActionHolder.setValue(selection);
     }
 
     @Override
     protected void execClickAction() throws ProcessingException {
       m_execClickActionCount.incrementAndGet();
-    }
-
-    @Override
-    protected void execToggleAction(boolean selected) throws ProcessingException {
-      m_execToggleActionHolder.setValue(selected);
     }
   }
 }

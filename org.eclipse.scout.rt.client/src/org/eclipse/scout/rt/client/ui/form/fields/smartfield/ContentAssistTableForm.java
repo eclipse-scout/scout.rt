@@ -42,28 +42,28 @@ import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHa
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.service.SERVICES;
 
-public class ContentAssistTableForm<KEY_TYPE> extends AbstractContentAssistFieldProposalForm<KEY_TYPE> {
+public class ContentAssistTableForm<LOOKUP_KEY> extends AbstractContentAssistFieldProposalForm<LOOKUP_KEY> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ContentAssistTableForm.class);
 
   private JobEx m_dataLoadJob;
-  private KEY_TYPE m_lastSelectedKey;
+  private LOOKUP_KEY m_lastSelectedKey;
 
-  public ContentAssistTableForm(IContentAssistField<?, KEY_TYPE> contentAssistField, boolean allowCustomText) throws ProcessingException {
+  public ContentAssistTableForm(IContentAssistField<?, LOOKUP_KEY> contentAssistField, boolean allowCustomText) throws ProcessingException {
     super(contentAssistField, allowCustomText);
   }
 
   @Override
   public void forceProposalSelection() throws ProcessingException {
     @SuppressWarnings("unchecked")
-    ContentAssistTableForm<KEY_TYPE>.MainBox.ResultTableField tableField = getResultTableField();
-    IContentAssistFieldTable<KEY_TYPE> table = tableField.getTable();
+    ContentAssistTableForm<LOOKUP_KEY>.MainBox.ResultTableField tableField = getResultTableField();
+    IContentAssistFieldTable<LOOKUP_KEY> table = tableField.getTable();
     table.selectNextRow();
   }
 
   @SuppressWarnings("unchecked")
   @Override
-  protected void dataFetchedDelegateImpl(IContentAssistFieldDataFetchResult<KEY_TYPE> result, int maxCount) {
-    List<? extends ILookupRow<KEY_TYPE>> rows = null;
+  protected void dataFetchedDelegateImpl(IContentAssistFieldDataFetchResult<LOOKUP_KEY> result, int maxCount) {
+    List<? extends ILookupRow<LOOKUP_KEY>> rows = null;
     boolean selectCurrentValue = false;
     ProcessingException failed = null;
     String searchText = null;
@@ -79,19 +79,19 @@ public class ContentAssistTableForm<KEY_TYPE> extends AbstractContentAssistField
 
     try {
       // populate table
-      IContentAssistFieldTable<KEY_TYPE> table = (IContentAssistFieldTable<KEY_TYPE>) getResultTableField().getTable();
+      IContentAssistFieldTable<LOOKUP_KEY> table = (IContentAssistFieldTable<LOOKUP_KEY>) getResultTableField().getTable();
       table.setTableChanging(true);
       table.setLookupRows(CollectionUtility.truncateList(rows, maxCount));
       try {
         //restore selection
-        KEY_TYPE keyToSelect = null;
+        LOOKUP_KEY keyToSelect = null;
         if (selectCurrentValue) {
           m_lastSelectedKey = getContentAssistField().getValueAsLookupKey();
           keyToSelect = m_lastSelectedKey;
         }
         else if (rows.size() == 1 && !isAllowCustomText()) {
           // select first
-          keyToSelect = (KEY_TYPE) CollectionUtility.firstElement(rows).getKey();
+          keyToSelect = (LOOKUP_KEY) CollectionUtility.firstElement(rows).getKey();
         }
         if (keyToSelect != null) {
           table.select(keyToSelect);
@@ -144,13 +144,13 @@ public class ContentAssistTableForm<KEY_TYPE> extends AbstractContentAssistField
    */
   @ConfigOperation
   @Order(120)
-  protected ILookupRow<KEY_TYPE> execGetSingleMatch() {
+  protected ILookupRow<LOOKUP_KEY> execGetSingleMatch() {
     int matchCount = 0;
-    ILookupRow<KEY_TYPE> foundRow = null;
+    ILookupRow<LOOKUP_KEY> foundRow = null;
     @SuppressWarnings("unchecked")
-    IContentAssistFieldTable<KEY_TYPE> table = (IContentAssistFieldTable<KEY_TYPE>) getResultTableField().getTable();
-    List<ILookupRow<KEY_TYPE>> values = table.getLookupRows();
-    for (ILookupRow<KEY_TYPE> row : values) {
+    IContentAssistFieldTable<LOOKUP_KEY> table = (IContentAssistFieldTable<LOOKUP_KEY>) getResultTableField().getTable();
+    List<ILookupRow<LOOKUP_KEY>> values = table.getLookupRows();
+    for (ILookupRow<LOOKUP_KEY> row : values) {
       if (row.isEnabled()) {
         foundRow = row;
         matchCount++;
@@ -165,11 +165,11 @@ public class ContentAssistTableForm<KEY_TYPE> extends AbstractContentAssistField
   }
 
   /**
-   * Override this method to change the behaviour when a row is clicked in the result {@link Table}.
+   * Override this method to change the behavior when a row is clicked in the result {@link IContentAssistFieldTable}.
    * <p>
    * By default the form is closed with {@link #doOk()}.
    * </p>
-   * 
+   *
    * @param row
    * @throws ProcessingException
    */
@@ -177,16 +177,16 @@ public class ContentAssistTableForm<KEY_TYPE> extends AbstractContentAssistField
   @Order(130)
   protected void execResultTableRowClicked(ITableRow row) throws ProcessingException {
     @SuppressWarnings("unchecked")
-    IContentAssistFieldTable<KEY_TYPE> table = (IContentAssistFieldTable<KEY_TYPE>) getResultTableField().getTable();
-    ILookupRow<KEY_TYPE> lrow = table.getSelectedLookupRow();
+    IContentAssistFieldTable<LOOKUP_KEY> table = (IContentAssistFieldTable<LOOKUP_KEY>) getResultTableField().getTable();
+    ILookupRow<LOOKUP_KEY> lrow = table.getSelectedLookupRow();
     if (lrow != null && lrow.isEnabled()) {
       doOk();
     }
   }
 
   @Override
-  public ILookupRow<KEY_TYPE> getAcceptedProposal() throws ProcessingException {
-    ILookupRow<KEY_TYPE> row = getSelectedLookupRow();
+  public ILookupRow<LOOKUP_KEY> getAcceptedProposal() throws ProcessingException {
+    ILookupRow<LOOKUP_KEY> row = getSelectedLookupRow();
     if (row != null && row.isEnabled()) {
       return row;
     }
@@ -199,17 +199,17 @@ public class ContentAssistTableForm<KEY_TYPE> extends AbstractContentAssistField
   }
 
   @SuppressWarnings("unchecked")
-  public ILookupRow<KEY_TYPE> getSelectedLookupRow() {
-    IContentAssistFieldTable<KEY_TYPE> table = (IContentAssistFieldTable<KEY_TYPE>) getResultTableField().getTable();
-    ILookupRow<KEY_TYPE> row = null;
+  public ILookupRow<LOOKUP_KEY> getSelectedLookupRow() {
+    IContentAssistFieldTable<LOOKUP_KEY> table = (IContentAssistFieldTable<LOOKUP_KEY>) getResultTableField().getTable();
+    ILookupRow<LOOKUP_KEY> row = null;
     if (table.isCheckable()) {
       Collection<ITableRow> checkedRows = table.getCheckedRows();
       if (CollectionUtility.hasElements(checkedRows)) {
-        row = (ILookupRow<KEY_TYPE>) table.getCheckedLookupRow();
+        row = (ILookupRow<LOOKUP_KEY>) table.getCheckedLookupRow();
       }
     }
     else {
-      row = (ILookupRow<KEY_TYPE>) table.getSelectedLookupRow();
+      row = (ILookupRow<LOOKUP_KEY>) table.getSelectedLookupRow();
     }
 
     return row;
@@ -246,7 +246,7 @@ public class ContentAssistTableForm<KEY_TYPE> extends AbstractContentAssistField
   /**
    * might be used to add special listeners to the smart table.
    */
-  protected void execDecorateTable(IContentAssistFieldTable<KEY_TYPE> table) {
+  protected void execDecorateTable(IContentAssistFieldTable<LOOKUP_KEY> table) {
 
   }
 
@@ -274,7 +274,7 @@ public class ContentAssistTableForm<KEY_TYPE> extends AbstractContentAssistField
     }
 
     @Order(10)
-    public class ResultTableField extends AbstractTableField<IContentAssistFieldTable<KEY_TYPE>> {
+    public class ResultTableField extends AbstractTableField<IContentAssistFieldTable<LOOKUP_KEY>> {
 
       public ResultTableField() {
         super();
@@ -282,11 +282,11 @@ public class ContentAssistTableForm<KEY_TYPE> extends AbstractContentAssistField
 
       @SuppressWarnings("unchecked")
       @Override
-      protected IContentAssistFieldTable<KEY_TYPE> createTable() {
+      protected IContentAssistFieldTable<LOOKUP_KEY> createTable() {
         Class<?> contentAssistFieldTableClazz = getContentAssistField().getContentAssistFieldTableClass();
         if (contentAssistFieldTableClazz != null) {
           try {
-            return (IContentAssistFieldTable<KEY_TYPE>) ConfigurationUtility.newInnerInstance(getContentAssistField(), contentAssistFieldTableClazz);
+            return (IContentAssistFieldTable<LOOKUP_KEY>) ConfigurationUtility.newInnerInstance(getContentAssistField(), contentAssistFieldTableClazz);
           }
           catch (Exception e) {
             SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + contentAssistFieldTableClazz.getName() + "'.", e));

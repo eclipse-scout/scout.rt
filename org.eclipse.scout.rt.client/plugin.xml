@@ -52,5 +52,11 @@
           createImmediately="false"
           factory="org.eclipse.scout.rt.client.services.ClientServiceFactory">
     </service>
+    <service
+          class="org.eclipse.scout.rt.client.services.extension.ClientContainerValidationService"
+          createImmediately="false"
+          factory="org.eclipse.scout.service.DefaultServiceFactory"
+          ranking="1000">
+    </service>
   </extension>
 </plugin>

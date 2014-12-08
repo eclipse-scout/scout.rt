@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.form.fields.imagebox;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EventListener;
 import java.util.List;
 
@@ -20,10 +21,15 @@ import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.annotations.OrderedComparator;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.imagebox.IImageFieldExtension;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.imagebox.ImageFieldChains.ImageFieldDragRequestChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.imagebox.ImageFieldChains.ImageFieldDropRequestChain;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
@@ -166,8 +172,7 @@ public abstract class AbstractImageField extends AbstractFormField implements II
   protected List<Class<? extends IMenu>> getDeclaredMenus() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     List<Class<IMenu>> filtered = ConfigurationUtility.filterClasses(dca, IMenu.class);
-    List<Class<? extends IMenu>> foca = ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IMenu.class);
-    return ConfigurationUtility.removeReplacedClasses(foca);
+    return ConfigurationUtility.removeReplacedClasses(filtered);
   }
 
   @Override
@@ -189,9 +194,12 @@ public abstract class AbstractImageField extends AbstractFormField implements II
     setDragType(getConfiguredDragType());
     setDropType(getConfiguredDropType());
     setScrollBarEnabled(getConfiguredScrollBarEnabled());
+
     // menus
-    List<IMenu> menuList = new ArrayList<IMenu>();
-    for (Class<? extends IMenu> menuClazz : getDeclaredMenus()) {
+    List<Class<? extends IMenu>> declaredMenus = getDeclaredMenus();
+    List<IMenu> contributedMenus = m_contributionHolder.getContributionsByClass(IMenu.class);
+    List<IMenu> menuList = new ArrayList<IMenu>(declaredMenus.size() + contributedMenus.size());
+    for (Class<? extends IMenu> menuClazz : declaredMenus) {
       try {
         menuList.add(ConfigurationUtility.newInnerInstance(this, menuClazz));
       }
@@ -199,12 +207,16 @@ public abstract class AbstractImageField extends AbstractFormField implements II
         SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + menuClazz.getName() + "'.", e));
       }
     }
+    menuList.addAll(contributedMenus);
+
     try {
       injectMenusInternal(menuList);
     }
     catch (Exception e) {
       LOG.error("error occured while dynamically contributing menus.", e);
     }
+    new MoveActionNodesHandler<IMenu>(menuList).moveModelObjects();
+    Collections.sort(menuList, new OrderedComparator());
     m_contextMenu = new FormFieldContextMenu<IImageField>(this, menuList);
     m_contextMenu.setContainerInternal(this);
   }
@@ -488,7 +500,7 @@ public abstract class AbstractImageField extends AbstractFormField implements II
     public TransferObject fireDragRequestFromUI() {
       TransferObject t = null;
       try {
-        t = execDragRequest();
+        t = interceptDragRequest();
       }
       catch (ProcessingException e) {
         LOG.warn(null, e);
@@ -499,7 +511,7 @@ public abstract class AbstractImageField extends AbstractFormField implements II
     @Override
     public void fireDropActionFromUi(TransferObject scoutTransferable) {
       try {
-        execDropRequest(scoutTransferable);
+        interceptDropRequest(scoutTransferable);
       }
       catch (ProcessingException e) {
         LOG.warn(null, e);
@@ -507,5 +519,45 @@ public abstract class AbstractImageField extends AbstractFormField implements II
     }
 
   }// end private class
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public List<? extends IImageFieldExtension<? extends AbstractImageField>> getAllExtensions() {
+    return (List<? extends IImageFieldExtension<? extends AbstractImageField>>) super.getAllExtensions();
+  }
+
+  protected final TransferObject interceptDragRequest() throws ProcessingException {
+    List<? extends IImageFieldExtension<? extends AbstractImageField>> extensions = getAllExtensions();
+    ImageFieldDragRequestChain chain = new ImageFieldDragRequestChain(extensions);
+    return chain.execDragRequest();
+  }
+
+  protected final void interceptDropRequest(TransferObject transferObject) throws ProcessingException {
+    List<? extends IImageFieldExtension<? extends AbstractImageField>> extensions = getAllExtensions();
+    ImageFieldDropRequestChain chain = new ImageFieldDropRequestChain(extensions);
+    chain.execDropRequest(transferObject);
+  }
+
+  protected static class LocalImageFieldExtension<OWNER extends AbstractImageField> extends LocalFormFieldExtension<OWNER> implements IImageFieldExtension<OWNER> {
+
+    public LocalImageFieldExtension(OWNER owner) {
+      super(owner);
+    }
+
+    @Override
+    public TransferObject execDragRequest(ImageFieldDragRequestChain chain) throws ProcessingException {
+      return getOwner().execDragRequest();
+    }
+
+    @Override
+    public void execDropRequest(ImageFieldDropRequestChain chain, TransferObject transferObject) throws ProcessingException {
+      getOwner().execDropRequest(transferObject);
+    }
+  }
+
+  @Override
+  protected IImageFieldExtension<? extends AbstractImageField> createLocalExtension() {
+    return new LocalImageFieldExtension<AbstractImageField>(this);
+  }
 
 }

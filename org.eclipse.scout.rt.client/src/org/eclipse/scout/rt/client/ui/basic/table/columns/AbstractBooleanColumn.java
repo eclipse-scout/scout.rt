@@ -16,6 +16,7 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.IBooleanColumnExtension;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.AbstractBooleanField;
@@ -99,5 +100,17 @@ public abstract class AbstractBooleanColumn extends AbstractColumn<Boolean> impl
   @Order(200)
   protected int getConfiguredVerticalAlignment() {
     return -1; // top position
+  }
+
+  protected static class LocalBooleanColumnExtension<OWNER extends AbstractBooleanColumn> extends LocalColumnExtension<Boolean, OWNER> implements IBooleanColumnExtension<OWNER> {
+
+    public LocalBooleanColumnExtension(OWNER owner) {
+      super(owner);
+    }
+  }
+
+  @Override
+  protected IBooleanColumnExtension<? extends AbstractBooleanColumn> createLocalExtension() {
+    return new LocalBooleanColumnExtension<AbstractBooleanColumn>(this);
   }
 }

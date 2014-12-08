@@ -18,6 +18,7 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.doublefield.IDoubleFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.decimalfield.AbstractDecimalField;
 import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 
@@ -101,5 +102,17 @@ public abstract class AbstractDoubleField extends AbstractDecimalField<Double> i
       retVal = Double.valueOf(parsedVal.doubleValue());
     }
     return retVal;
+  }
+
+  protected static class LocalDoubleFieldExtension<OWNER extends AbstractDoubleField> extends LocalDecimalFieldExtension<Double, OWNER> implements IDoubleFieldExtension<OWNER> {
+
+    public LocalDoubleFieldExtension(OWNER owner) {
+      super(owner);
+    }
+  }
+
+  @Override
+  protected IDoubleFieldExtension<? extends AbstractDoubleField> createLocalExtension() {
+    return new LocalDoubleFieldExtension<AbstractDoubleField>(this);
   }
 }

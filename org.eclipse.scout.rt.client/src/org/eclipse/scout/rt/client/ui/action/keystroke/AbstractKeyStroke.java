@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.action.keystroke;
 
+import org.eclipse.scout.rt.client.extension.ui.action.keystroke.IKeyStrokeExtension;
 import org.eclipse.scout.rt.client.ui.action.AbstractAction;
 
 public abstract class AbstractKeyStroke extends AbstractAction implements IKeyStroke {
@@ -31,6 +32,18 @@ public abstract class AbstractKeyStroke extends AbstractAction implements IKeySt
   @Override
   public String toString() {
     return getClass().getSimpleName() + "[key=" + getKeyStroke() + "]";
+  }
+
+  protected static class LocalKeyStrokeExtension<OWNER extends AbstractKeyStroke> extends LocalActionExtension<OWNER> implements IKeyStrokeExtension<OWNER> {
+
+    public LocalKeyStrokeExtension(OWNER owner) {
+      super(owner);
+    }
+  }
+
+  @Override
+  protected IKeyStrokeExtension<? extends AbstractKeyStroke> createLocalExtension() {
+    return new LocalKeyStrokeExtension<AbstractKeyStroke>(this);
   }
 
 }

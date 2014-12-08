@@ -10,8 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.outline;
 
+import java.util.List;
+
+import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.extension.ui.desktop.outline.FormToolButtonChains.FormToolButtonStartFormChain;
+import org.eclipse.scout.rt.client.extension.ui.desktop.outline.IFormToolButtonExtension;
 import org.eclipse.scout.rt.client.ui.action.tool.AbstractToolButton;
 import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -88,6 +93,7 @@ public abstract class AbstractFormToolButton<FORM extends IForm> extends Abstrac
    * }
    * </pre></code> Call {@link #setForm(IForm)} to change the current form.
    */
+  @ConfigOperation
   protected void execStartForm() throws ProcessingException {
   }
 
@@ -108,7 +114,7 @@ public abstract class AbstractFormToolButton<FORM extends IForm> extends Abstrac
       }
       // show form
       FORM oldForm = getForm();
-      execStartForm();
+      interceptStartForm();
       if (oldForm == m_form) {
         if (m_form != null) {
           m_previousSelectionState = true;
@@ -129,5 +135,34 @@ public abstract class AbstractFormToolButton<FORM extends IForm> extends Abstrac
     f.setAutoAddRemoveOnDesktop(false);
     f.setDisplayHint(IForm.DISPLAY_HINT_VIEW);
     f.setDisplayViewId(IForm.VIEW_ID_E);
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public List<? extends IFormToolButtonExtension<FORM, ? extends AbstractFormToolButton<? extends IForm>>> getAllExtensions() {
+    return (List<? extends IFormToolButtonExtension<FORM, ? extends AbstractFormToolButton<? extends IForm>>>) super.getAllExtensions();
+  }
+
+  protected final void interceptStartForm() throws ProcessingException {
+    List<? extends IFormToolButtonExtension<? extends IForm, ? extends AbstractFormToolButton<? extends IForm>>> extensions = getAllExtensions();
+    FormToolButtonStartFormChain<FORM> chain = new FormToolButtonStartFormChain<FORM>(extensions);
+    chain.execStartForm();
+  }
+
+  protected static class LocalFormToolButtonExtension<FORM extends IForm, OWNER extends AbstractFormToolButton<FORM>> extends LocalToolButtonExtension<OWNER> implements IFormToolButtonExtension<FORM, OWNER> {
+
+    public LocalFormToolButtonExtension(OWNER owner) {
+      super(owner);
+    }
+
+    @Override
+    public void execStartForm(FormToolButtonStartFormChain<? extends IForm> chain) throws ProcessingException {
+      getOwner().execStartForm();
+    }
+  }
+
+  @Override
+  protected IFormToolButtonExtension<FORM, ? extends AbstractFormToolButton<FORM>> createLocalExtension() {
+    return new LocalFormToolButtonExtension<FORM, AbstractFormToolButton<FORM>>(this);
   }
 }

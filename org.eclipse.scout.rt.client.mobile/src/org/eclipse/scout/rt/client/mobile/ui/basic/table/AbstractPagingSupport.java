@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 /**
  * @since 3.9.0
  */
-public class AbstractPagingSupport {
+public abstract class AbstractPagingSupport {
 
   private int m_pageSize;
   private int m_pageIndex;

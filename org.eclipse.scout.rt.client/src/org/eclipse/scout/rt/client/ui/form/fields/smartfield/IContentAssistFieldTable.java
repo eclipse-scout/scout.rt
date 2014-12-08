@@ -19,18 +19,18 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 /**
  *
  */
-public interface IContentAssistFieldTable<KEY_TYPE> extends ITable {
+public interface IContentAssistFieldTable<LOOKUP_KEY> extends ITable {
 
-  void setLookupRows(List<? extends ILookupRow<KEY_TYPE>> lookupRows) throws ProcessingException;
+  void setLookupRows(List<? extends ILookupRow<LOOKUP_KEY>> lookupRows) throws ProcessingException;
 
-  List<ILookupRow<KEY_TYPE>> getLookupRows();
+  List<ILookupRow<LOOKUP_KEY>> getLookupRows();
 
-  ILookupRow<KEY_TYPE> getSelectedLookupRow();
+  ILookupRow<LOOKUP_KEY> getSelectedLookupRow();
 
-  ILookupRow<KEY_TYPE> getCheckedLookupRow();
+  ILookupRow<LOOKUP_KEY> getCheckedLookupRow();
 
-  boolean select(ILookupRow<KEY_TYPE> lookupRow) throws ProcessingException;
+  boolean select(ILookupRow<LOOKUP_KEY> lookupRow) throws ProcessingException;
 
-  boolean select(KEY_TYPE key) throws ProcessingException;
+  boolean select(LOOKUP_KEY key) throws ProcessingException;
 
 }

@@ -31,7 +31,7 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.pagefield.AbstractPageField;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 
-public class AbstractMemoryPolicy implements IMemoryPolicy {
+public abstract class AbstractMemoryPolicy implements IMemoryPolicy {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractMemoryPolicy.class);
 
   public static class SearchFormState {

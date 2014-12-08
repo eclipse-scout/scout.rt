@@ -11,6 +11,6 @@
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
 
-public interface ISmartColumn<T> extends IMixedSmartColumn<T, T> {
+public interface ISmartColumn<VALUE> extends IMixedSmartColumn<VALUE, VALUE> {
 
 }

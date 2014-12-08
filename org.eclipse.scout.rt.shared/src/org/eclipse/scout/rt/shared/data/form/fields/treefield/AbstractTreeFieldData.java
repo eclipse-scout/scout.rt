@@ -10,35 +10,31 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.data.form.fields.treefield;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 
 public abstract class AbstractTreeFieldData extends AbstractFormFieldData {
   private static final long serialVersionUID = 1L;
 
-  private ArrayList<TreeNodeData> m_rootList = new ArrayList<TreeNodeData>();
-
-  public AbstractTreeFieldData() {
-  }
-
-  @Override
-  protected void initConfig() {
-    super.initConfig();
-  }
+  private List<TreeNodeData> m_rootList;
 
   public int getRootCount() {
-    return m_rootList.size();
+    return CollectionUtility.size(m_rootList);
   }
 
   public List<TreeNodeData> getRoots() {
-    return m_rootList;
+    return CollectionUtility.arrayList(m_rootList);
   }
 
   public void setRoots(List<TreeNodeData> rootList) {
-    m_rootList = rootList != null ? new ArrayList<TreeNodeData>(rootList) : new ArrayList<TreeNodeData>(0);
+    if (rootList == null) {
+      m_rootList = null;
+    }
+    else {
+      m_rootList = CollectionUtility.arrayList(rootList);
+    }
     setValueSet(true);
   }
-
 }

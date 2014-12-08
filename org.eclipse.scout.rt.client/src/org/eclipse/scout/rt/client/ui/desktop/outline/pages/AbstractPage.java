@@ -25,6 +25,13 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IMemoryPolicy;
+import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.IPageExtension;
+import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageDataChangedChain;
+import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageDisposePageChain;
+import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageInitPageChain;
+import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PagePageActivatedChain;
+import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PagePageDataLoadedChain;
+import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PagePageDeactivatedChain;
 import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.WeakDataChangeListener;
@@ -200,7 +207,7 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
    * Subclasses can override this method. The default does nothing.
    *
    * @throws ProcessingException
-   * @see #execPageActivated()
+   * @see #interceptPageActivated()
    */
   @ConfigOperation
   @Order(40)
@@ -349,7 +356,7 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
     if (cell.getIconId() == null && getConfiguredIconId() != null) {
       cell.setIconId(getConfiguredIconId());
     }
-    execInitPage();
+    interceptInitPage();
   }
 
   @Override
@@ -363,8 +370,6 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
   }
 
   @Override
-  @ConfigOperation
-  @Order(95)
   public final String getUserPreferenceContext() {
     return m_userPreferenceContext;
   }
@@ -431,7 +436,7 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
   @Override
   public void nodeRemovedNotify() {
     try {
-      execDisposePage();
+      interceptDisposePage();
     }
     catch (ProcessingException e) {
       SERVICES.getService(IExceptionHandlerService.class).handleException(e);
@@ -451,7 +456,7 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
   @Override
   public void pageActivatedNotify() {
     try {
-      execPageActivated();
+      interceptPageActivated();
     }
     catch (ProcessingException t) {
       SERVICES.getService(IExceptionHandlerService.class).handleException(t);
@@ -464,7 +469,7 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
   @Override
   public void pageDeactivatedNotify() {
     try {
-      execPageDeactivated();
+      interceptPageDeactivated();
     }
     catch (ProcessingException p) {
       SERVICES.getService(IExceptionHandlerService.class).handleException(p);
@@ -509,7 +514,7 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
       m_internalDataChangeListener = new WeakDataChangeListener() {
         @Override
         public void dataChanged(Object... innerDataTypes) throws ProcessingException {
-          execDataChanged(innerDataTypes);
+          interceptDataChanged(innerDataTypes);
         }
       };
     }
@@ -523,7 +528,7 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
   @Override
   public void dataChanged(Object... dataTypes) {
     try {
-      execDataChanged(dataTypes);
+      interceptDataChanged(dataTypes);
     }
     catch (ProcessingException p) {
       SERVICES.getService(IExceptionHandlerService.class).handleException(p);
@@ -573,7 +578,7 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
   @Override
   public void loadChildren() throws ProcessingException {
     super.loadChildren();
-    execPageDataLoaded();
+    interceptPageDataLoaded();
   }
 
   @Override
@@ -594,6 +599,90 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
   @Override
   public <T> T getAdapter(Class<T> clazz) {
     return null;
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public List<? extends IPageExtension<? extends AbstractPage>> getAllExtensions() {
+    return (List<? extends IPageExtension<? extends AbstractPage>>) super.getAllExtensions();
+  }
+
+  protected final void interceptPageDataLoaded() throws ProcessingException {
+    List<? extends IPageExtension<? extends AbstractPage>> extensions = getAllExtensions();
+    PagePageDataLoadedChain chain = new PagePageDataLoadedChain(extensions);
+    chain.execPageDataLoaded();
+  }
+
+  protected final void interceptPageActivated() throws ProcessingException {
+    List<? extends IPageExtension<? extends AbstractPage>> extensions = getAllExtensions();
+    PagePageActivatedChain chain = new PagePageActivatedChain(extensions);
+    chain.execPageActivated();
+  }
+
+  protected final void interceptDataChanged(Object... dataTypes) throws ProcessingException {
+    List<? extends IPageExtension<? extends AbstractPage>> extensions = getAllExtensions();
+    PageDataChangedChain chain = new PageDataChangedChain(extensions);
+    chain.execDataChanged(dataTypes);
+  }
+
+  protected final void interceptInitPage() throws ProcessingException {
+    List<? extends IPageExtension<? extends AbstractPage>> extensions = getAllExtensions();
+    PageInitPageChain chain = new PageInitPageChain(extensions);
+    chain.execInitPage();
+  }
+
+  protected final void interceptPageDeactivated() throws ProcessingException {
+    List<? extends IPageExtension<? extends AbstractPage>> extensions = getAllExtensions();
+    PagePageDeactivatedChain chain = new PagePageDeactivatedChain(extensions);
+    chain.execPageDeactivated();
+  }
+
+  protected final void interceptDisposePage() throws ProcessingException {
+    List<? extends IPageExtension<? extends AbstractPage>> extensions = getAllExtensions();
+    PageDisposePageChain chain = new PageDisposePageChain(extensions);
+    chain.execDisposePage();
+  }
+
+  protected static class LocalPageExtension<OWNER extends AbstractPage> extends LocalTreeNodeExtension<OWNER> implements IPageExtension<OWNER> {
+
+    public LocalPageExtension(OWNER owner) {
+      super(owner);
+    }
+
+    @Override
+    public void execPageDataLoaded(PagePageDataLoadedChain chain) throws ProcessingException {
+      getOwner().execPageDataLoaded();
+    }
+
+    @Override
+    public void execPageActivated(PagePageActivatedChain chain) throws ProcessingException {
+      getOwner().execPageActivated();
+    }
+
+    @Override
+    public void execDataChanged(PageDataChangedChain chain, Object... dataTypes) throws ProcessingException {
+      getOwner().execDataChanged(dataTypes);
+    }
+
+    @Override
+    public void execInitPage(PageInitPageChain chain) throws ProcessingException {
+      getOwner().execInitPage();
+    }
+
+    @Override
+    public void execPageDeactivated(PagePageDeactivatedChain chain) throws ProcessingException {
+      getOwner().execPageDeactivated();
+    }
+
+    @Override
+    public void execDisposePage(PageDisposePageChain chain) throws ProcessingException {
+      getOwner().execDisposePage();
+    }
+  }
+
+  @Override
+  protected IPageExtension<? extends AbstractPage> createLocalExtension() {
+    return new LocalPageExtension<AbstractPage>(this);
   }
 
 }

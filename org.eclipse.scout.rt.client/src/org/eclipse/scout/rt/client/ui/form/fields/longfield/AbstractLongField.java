@@ -18,6 +18,7 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.longfield.ILongFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.AbstractNumberField;
 import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 
@@ -107,6 +108,18 @@ public abstract class AbstractLongField extends AbstractNumberField<Long> implem
       retVal = Long.valueOf(parsedVal.longValueExact());
     }
     return retVal;
+  }
+
+  protected static class LocalLongFieldExtension<OWNER extends AbstractLongField> extends LocalNumberFieldExtension<Long, OWNER> implements ILongFieldExtension<OWNER> {
+
+    public LocalLongFieldExtension(OWNER owner) {
+      super(owner);
+    }
+  }
+
+  @Override
+  protected ILongFieldExtension<? extends AbstractLongField> createLocalExtension() {
+    return new LocalLongFieldExtension<AbstractLongField>(this);
   }
 
 }

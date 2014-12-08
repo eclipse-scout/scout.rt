@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.action.menu.checkbox;
 
+import org.eclipse.scout.rt.client.extension.ui.action.menu.checkbox.ICheckBoxMenuExtension;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 
 public abstract class AbstractCheckBoxMenu extends AbstractMenu implements ICheckBoxMenu {
@@ -50,6 +51,18 @@ public abstract class AbstractCheckBoxMenu extends AbstractMenu implements IChec
       throw new UnsupportedOperationException("setToggleAction on " + AbstractCheckBoxMenu.class.getSimpleName() + " is not supported!");
     }
     // void here
+  }
+
+  protected static class LocalCheckBoxMenuExtension<OWNER extends AbstractCheckBoxMenu> extends LocalMenuExtension<OWNER> implements ICheckBoxMenuExtension<OWNER> {
+
+    public LocalCheckBoxMenuExtension(OWNER owner) {
+      super(owner);
+    }
+  }
+
+  @Override
+  protected ICheckBoxMenuExtension<? extends AbstractCheckBoxMenu> createLocalExtension() {
+    return new LocalCheckBoxMenuExtension<AbstractCheckBoxMenu>(this);
   }
 
 }

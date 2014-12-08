@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
  *
  */
 
-public interface IContentAssistFieldDataFetchResult<KEY_TYPE> {
+public interface IContentAssistFieldDataFetchResult<LOOKUP_KEY> {
   String getSearchText();
 
   /**
@@ -30,7 +30,7 @@ public interface IContentAssistFieldDataFetchResult<KEY_TYPE> {
   /**
    * @return
    */
-  List<? extends ILookupRow<KEY_TYPE>> getLookupRows();
+  List<? extends ILookupRow<LOOKUP_KEY>> getLookupRows();
 
   /**
    * @return

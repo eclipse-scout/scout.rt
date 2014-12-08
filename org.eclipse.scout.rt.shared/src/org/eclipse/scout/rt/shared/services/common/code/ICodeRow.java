@@ -29,4 +29,14 @@ public interface ICodeRow<KEY_TYPE> extends ILookupRow<KEY_TYPE> {
 
   void setExtKey(String extKey);
 
+  /**
+   * @return
+   */
+  double getOrder();
+
+  /**
+   * @param order
+   */
+  void setOrder(double order);
+
 }

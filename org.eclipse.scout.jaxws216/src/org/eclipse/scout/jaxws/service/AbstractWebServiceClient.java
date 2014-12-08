@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -59,7 +59,7 @@ import com.sun.xml.internal.ws.client.BindingProviderProperties;
  * {@link AbstractWebServiceClient#getConfiguredUrl()}. If it is about a dynamic URL, it also can be set at runtime when
  * obtaining the port type.</li>
  * </ul>
- * 
+ *
  * @param <S>
  *          The service to be proxied. The service is unique among all services defined within in the enclosing WSDL
  *          document and groups a set of related ports together.
@@ -70,7 +70,7 @@ import com.sun.xml.internal.ws.client.BindingProviderProperties;
  */
 @SuppressWarnings("restriction")
 @ScoutWebServiceClient
-public class AbstractWebServiceClient<S extends Service, P> extends AbstractService implements IWebServiceClient {
+public abstract class AbstractWebServiceClient<S extends Service, P> extends AbstractService implements IWebServiceClient {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractWebServiceClient.class);
 
@@ -119,7 +119,7 @@ public class AbstractWebServiceClient<S extends Service, P> extends AbstractServ
    * Please be in mind, that the endpoint URL is set on port type level. Therefore, when working directly on the
    * service, you have to set the endpoint URL manually when calling the service. <br/>
    * By using {@link AbstractWebServiceClient#getPortType()}, the URL is set accordingly.
-   * 
+   *
    * @return
    */
   @SuppressWarnings("unchecked")
@@ -174,7 +174,7 @@ public class AbstractWebServiceClient<S extends Service, P> extends AbstractServ
 
   /**
    * To get the port type specified by generic type parameter {@link P}.
-   * 
+   *
    * @return
    */
   public P getPortType() {
@@ -183,7 +183,7 @@ public class AbstractWebServiceClient<S extends Service, P> extends AbstractServ
 
   /**
    * To get the port type specified by generic type parameter {@link P}.
-   * 
+   *
    * @param url
    *          {@link URL} to connect with endpoint. Do not use this method to distinguish between development and
    *          production {@link URL}. Use property in config.ini instead.
@@ -216,7 +216,7 @@ public class AbstractWebServiceClient<S extends Service, P> extends AbstractServ
   /**
    * To be overwritten if WSDL file is located somewhere else than specified in {@link WebServiceClient#wsdlLocation()}.
    * This location can be specified when generating the stub with the option -wsdllocation.
-   * 
+   *
    * @return URL to WSDL file
    */
   @ConfigProperty(ConfigProperty.OBJECT)
@@ -236,7 +236,7 @@ public class AbstractWebServiceClient<S extends Service, P> extends AbstractServ
 
   /**
    * To configure a static endpoint URL
-   * 
+   *
    * @return
    */
   @ConfigProperty(ConfigProperty.STRING)
@@ -247,7 +247,7 @@ public class AbstractWebServiceClient<S extends Service, P> extends AbstractServ
 
   /**
    * To be overwritten if service name to be called is different from {@link WebServiceClient#name()} in {@link Service}
-   * 
+   *
    * @return unqualified service name to be called.
    */
   @Order(40)
@@ -258,7 +258,7 @@ public class AbstractWebServiceClient<S extends Service, P> extends AbstractServ
   /**
    * To be overwritten if targetNamespace of service to be called is different from
    * {@link WebServiceClient#targetNamespace()} in {@link Service}
-   * 
+   *
    * @return
    */
   @Order(50)
@@ -268,7 +268,7 @@ public class AbstractWebServiceClient<S extends Service, P> extends AbstractServ
 
   /**
    * To configure a static user's credential
-   * 
+   *
    * @return
    */
   @ConfigProperty(ConfigProperty.STRING)
@@ -279,7 +279,7 @@ public class AbstractWebServiceClient<S extends Service, P> extends AbstractServ
 
   /**
    * To configure a static user's credential
-   * 
+   *
    * @return
    */
   @ConfigProperty(ConfigProperty.STRING)
@@ -290,7 +290,7 @@ public class AbstractWebServiceClient<S extends Service, P> extends AbstractServ
 
   /**
    * To configure the maximum timeout in milliseconds to wait for the connection to be established.
-   * 
+   *
    * @See {@link HttpURLConnection#setConnectTimeout(int)}
    * @return the maximal timeout to wait for the connection to be established.
    */
@@ -302,7 +302,7 @@ public class AbstractWebServiceClient<S extends Service, P> extends AbstractServ
 
   /**
    * To configure the maximum timeout in milliseconds to wait for response data to be ready to be read.
-   * 
+   *
    * @See {@link HttpURLConnection#setReadTimeout(int)}
    * @return the maximal timeout to wait for response data to be ready to be read.
    */
@@ -314,7 +314,7 @@ public class AbstractWebServiceClient<S extends Service, P> extends AbstractServ
 
   /**
    * Is called before the authentication handler is installed.
-   * 
+   *
    * @param authenticationHandler
    *          the authentication handler
    * @return true to install the authentication handler or false to not install it
@@ -328,7 +328,7 @@ public class AbstractWebServiceClient<S extends Service, P> extends AbstractServ
 
   /**
    * Add custom handlers to the handler chain
-   * 
+   *
    * @param handlers
    *          handlers to be installed
    * @throws ProcessingException

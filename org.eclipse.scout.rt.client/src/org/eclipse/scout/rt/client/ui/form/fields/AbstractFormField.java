@@ -27,6 +27,7 @@ import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
+import org.eclipse.scout.commons.annotations.IOrdered;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
@@ -38,6 +39,17 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.xmlparser.SimpleXmlElement;
 import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains.FormFieldAddSearchTermsChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains.FormFieldCalculateVisibleChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains.FormFieldChangedMasterValueChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains.FormFieldDataChangedChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains.FormFieldDisposeFieldChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains.FormFieldInitFieldChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains.FormFieldIsEmptyChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains.FormFieldIsSaveNeededChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains.FormFieldMarkSavedChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.services.common.search.ISearchFilterService;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.WeakDataChangeListener;
@@ -53,6 +65,12 @@ import org.eclipse.scout.rt.client.ui.profiler.DesktopProfiler;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
+import org.eclipse.scout.rt.shared.extension.AbstractExtension;
+import org.eclipse.scout.rt.shared.extension.ContributionComposite;
+import org.eclipse.scout.rt.shared.extension.IContributionOwner;
+import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
+import org.eclipse.scout.rt.shared.extension.IExtension;
+import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
@@ -61,7 +79,7 @@ import org.eclipse.scout.service.SERVICES;
 @SuppressWarnings("deprecation")
 @ClassId("cb3204c4-71bf-4dc6-88a4-3a8f81a7ca10")
 @FormData(value = AbstractFormFieldData.class, sdkCommand = SdkCommand.USE)
-public abstract class AbstractFormField extends AbstractPropertyObserver implements IFormField {
+public abstract class AbstractFormField extends AbstractPropertyObserver implements IFormField, IContributionOwner, IExtensibleObject {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractFormField.class);
 
   private IForm m_form;
@@ -96,7 +114,9 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   private BasicPropertySupport m_subtreePropertyChangeSupport;
   private P_MasterListener m_currentMasterListener;// my master
   private DataChangeListener m_internalDataChangeListener;
-  //
+  protected IContributionOwner m_contributionHolder;
+  private final ObjectExtensions<AbstractFormField, IFormFieldExtension<? extends AbstractFormField>> m_objectExtensions;
+
   private String m_initialLabel;
 
   public AbstractFormField() {
@@ -111,23 +131,52 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     m_enabledSlave = true;
     m_enabledProcessingButton = true;
     m_visibleGranted = true;
+    m_objectExtensions = new ObjectExtensions<AbstractFormField, IFormFieldExtension<? extends AbstractFormField>>(this);
     if (callInitializer) {
       callInitializer();
     }
   }
 
-  protected void callInitializer() {
+  @Override
+  public final List<Object> getAllContributions() {
+    return m_contributionHolder.getAllContributions();
+  }
+
+  @Override
+  public final <T> List<T> getContributionsByClass(Class<T> type) {
+    return m_contributionHolder.getContributionsByClass(type);
+  }
+
+  @Override
+  public final <T> T getContribution(Class<T> contribution) {
+    return m_contributionHolder.getContribution(contribution);
+  }
+
+  protected final void callInitializer() {
     if (!m_initialized) {
       try {
         setValueChangeTriggerEnabled(false);
-        //
-        initConfig();
+        interceptInitConfig();
       }
       finally {
         setValueChangeTriggerEnabled(true);
       }
       m_initialized = true;
     }
+  }
+
+  @Override
+  public List<? extends IFormFieldExtension<? extends AbstractFormField>> getAllExtensions() {
+    return m_objectExtensions.getAllExtensions();
+  }
+
+  protected IFormFieldExtension<? extends AbstractFormField> createLocalExtension() {
+    return new LocalFormFieldExtension<AbstractFormField>(this);
+  }
+
+  @Override
+  public <T extends IExtension<?>> T getExtension(Class<T> c) {
+    return m_objectExtensions.getExtension(c);
   }
 
   public static String parseFormFieldId(String className) {
@@ -234,19 +283,18 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   /**
-   * Configures the view order of this form field. The view order determines the order in which the field appear. The
-   * view
-   * order of field with no view order configured ({@code < 0}) is initialized based on the order annotation of the
-   * column class.
+   * Configures the view order of this form field. The view order determines the order in which the field appears.<br>
+   * The view order of field with no configured view order ({@code < 0}) is initialized based on the {@link Order}
+   * annotation of the form field class.
    * <p>
-   * Subclasses can override this method. Default is {@code -1}.
+   * Subclasses can override this method. The default is {@link IOrdered#DEFAULT_ORDER}.
    *
-   * @return View order of this column.
+   * @return View order of this form field.
    */
   @ConfigProperty(ConfigProperty.DOUBLE)
   @Order(145)
   protected double getConfiguredViewOrder() {
-    return -1;
+    return IOrdered.DEFAULT_ORDER;
   }
 
   @ConfigProperty(ConfigProperty.TEXT)
@@ -695,12 +743,13 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
 
   @Override
   public final void applySearch(SearchFilter search) {
-    execAddSearchTerms(search);
+    interceptAddSearchTerms(search);
   }
 
   /**
    * add verbose information to the search filter
    */
+  @ConfigOperation
   protected void execAddSearchTerms(SearchFilter search) {
     applySearchInternal(search);
   }
@@ -723,17 +772,25 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   protected void execChangedMasterValue(Object newMasterValue) throws ProcessingException {
   }
 
+  protected final void interceptInitConfig() {
+    m_objectExtensions.initConfig(createLocalExtension(), new Runnable() {
+      @Override
+      public void run() {
+        initConfig();
+      }
+    });
+  }
+
   protected void initConfig() {
     m_gridData = new GridData(-1, -1, 1, 1, -1, -1);
     m_gridDataHints = new GridData(-1, -1, 1, 1, -1, -1);
     propertySupport.setPropertyBool(PROP_EMPTY, true);
+    m_contributionHolder = new ContributionComposite(this);
+
     setEnabled(getConfiguredEnabled());
     setVisible(getConfiguredVisible());
     setMandatory(getConfiguredMandatory());
-
-    double viewOrder = calculateViewOrder();
-    setViewOrder(viewOrder);
-
+    setOrder(calculateViewOrder());
     setTooltipText(getConfiguredTooltipText());
     setInitialLabel(getConfiguredLabel());
     setLabel(getConfiguredLabel());
@@ -779,8 +836,8 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    */
   protected double calculateViewOrder() {
     double viewOrder = getConfiguredViewOrder();
-    Class<?> cls = getClass();
-    if (viewOrder < 0) {
+    if (viewOrder == IOrdered.DEFAULT_ORDER) {
+      Class<?> cls = getClass();
       while (cls != null && IFormField.class.isAssignableFrom(cls)) {
         if (cls.isAnnotationPresent(Order.class)) {
           Order order = (Order) cls.getAnnotation(Order.class);
@@ -846,13 +903,18 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
       setValueChangeTriggerEnabled(false);
       //
       initFieldInternal();
-      execInitField();
+      interceptExecInitField();
       // init key strokes
       ActionUtility.initActions(getKeyStrokes());
     }
     finally {
       setValueChangeTriggerEnabled(true);
     }
+  }
+
+  protected final void interceptExecInitField() throws ProcessingException {
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
+    new FormFieldChains.FormFieldInitFieldChain(extensions).execInitField();
   }
 
   protected void initFieldInternal() throws ProcessingException {
@@ -869,7 +931,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
       LOG.warn("Field " + getClass().getName(), t);
     }
     try {
-      execDisposeField();
+      interceptDisposeField();
     }
     catch (Throwable t) {
       LOG.warn("Field " + getClass().getName(), t);
@@ -892,7 +954,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
       m_internalDataChangeListener = new WeakDataChangeListener() {
         @Override
         public void dataChanged(Object... innerDataTypes) throws ProcessingException {
-          execDataChanged(innerDataTypes);
+          interceptDataChanged(innerDataTypes);
         }
       };
     }
@@ -1435,7 +1497,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   /**
-   * Default implementation just calls {@link #execIsSaveNeeded()}<br>
+   * Default implementation just calls {@link #interceptIsSaveNeeded()}<br>
    * For thread-safety-reason this method is final
    *
    * @throws ProcessingException
@@ -1444,7 +1506,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   public final void checkSaveNeeded() {
     if (isInitialized()) {
       try {
-        propertySupport.setPropertyBool(PROP_SAVE_NEEDED, m_touched || execIsSaveNeeded());
+        propertySupport.setPropertyBool(PROP_SAVE_NEEDED, m_touched || interceptIsSaveNeeded());
       }
       catch (ProcessingException e) {
         SERVICES.getService(IExceptionHandlerService.class).handleException(e);
@@ -1465,7 +1527,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   public final void markSaved() {
     try {
       m_touched = false;
-      execMarkSaved();
+      interceptMarkSaved();
       checkSaveNeeded();
     }
     catch (ProcessingException e) {
@@ -1479,14 +1541,14 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   /**
-   * Default implementation just calls {@link #execIsEmpty()}
+   * Default implementation just calls {@link #interceptIsEmpty()}
    *
    * @throws ProcessingException
    */
   protected final void checkEmpty() {
     if (isInitialized()) {
       try {
-        propertySupport.setPropertyBool(PROP_EMPTY, execIsEmpty());
+        propertySupport.setPropertyBool(PROP_EMPTY, interceptIsEmpty());
       }
       catch (ProcessingException e) {
         SERVICES.getService(IExceptionHandlerService.class).handleException(e);
@@ -1516,9 +1578,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     calculateVisibleInternal();
   }
 
-  /**
-   * do not use this internal method
-   */
+  @ConfigOperation
   protected boolean execCalculateVisible() {
     return true;
   }
@@ -1542,10 +1602,10 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     }
     boolean changed;
     if (applyAccessControl) {
-      changed = propertySupport.setPropertyBool(PROP_VISIBLE, m_visibleGranted && m_visibleProperty && execCalculateVisible());
+      changed = propertySupport.setPropertyBool(PROP_VISIBLE, m_visibleGranted && m_visibleProperty && interceptCalculateVisible());
     }
     else {
-      changed = propertySupport.setPropertyBool(PROP_VISIBLE, m_visibleProperty && execCalculateVisible());
+      changed = propertySupport.setPropertyBool(PROP_VISIBLE, m_visibleProperty && interceptCalculateVisible());
     }
     if (changed) {
       if (getForm() != null) {
@@ -1565,12 +1625,12 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   @Override
-  public double getViewOrder() {
+  public double getOrder() {
     return propertySupport.getPropertyDouble(PROP_VIEW_ORDER);
   }
 
   @Override
-  public void setViewOrder(double order) {
+  public void setOrder(double order) {
     propertySupport.setPropertyDouble(PROP_VIEW_ORDER, order);
   }
 
@@ -1804,16 +1864,27 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   @Override
   public List<IKeyStroke> getLocalKeyStrokes() {
     List<Class<? extends IKeyStroke>> configuredKeyStrokes = getConfiguredKeyStrokes();
-    Map<String, IKeyStroke> ksMap = new HashMap<String, IKeyStroke>(configuredKeyStrokes.size());
+    List<IKeyStroke> contributedKeyStrokes = m_contributionHolder.getContributionsByClass(IKeyStroke.class);
+
+    Map<String, IKeyStroke> ksMap = new HashMap<String, IKeyStroke>(configuredKeyStrokes.size() + contributedKeyStrokes.size());
     for (Class<? extends IKeyStroke> keystrokeClazz : configuredKeyStrokes) {
-      IKeyStroke ks;
       try {
-        ks = ConfigurationUtility.newInnerInstance(this, keystrokeClazz);
+        IKeyStroke ks = ConfigurationUtility.newInnerInstance(this, keystrokeClazz);
         ks.initAction();
         ksMap.put(ks.getKeyStroke().toUpperCase(), ks);
       }
       catch (Throwable t) {
         SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + keystrokeClazz.getName() + "'.", t));
+      }
+    }
+
+    for (IKeyStroke ks : contributedKeyStrokes) {
+      try {
+        ks.initAction();
+        ksMap.put(ks.getKeyStroke().toUpperCase(), ks);
+      }
+      catch (Throwable t) {
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error initializing key stroke '" + ks.getClass().getName() + "'.", t));
       }
     }
     return CollectionUtility.arrayList(ksMap.values());
@@ -1832,7 +1903,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
         m_enabledSlave = (newMasterValue != null || !isMasterRequired());
         setEnabledGranted(m_enabledGranted);
         try {
-          execChangedMasterValue(newMasterValue);
+          interceptChangedMasterValue(newMasterValue);
         }
         catch (ProcessingException e) {
           SERVICES.getService(IExceptionHandlerService.class).handleException(e);
@@ -1841,4 +1912,114 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     }
   }// end class
 
+  /**
+   * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
+   * any further chain elements.
+   */
+  protected static class LocalFormFieldExtension<OWNER extends AbstractFormField> extends AbstractExtension<OWNER> implements IFormFieldExtension<OWNER> {
+
+    public LocalFormFieldExtension(OWNER owner) {
+      super(owner);
+    }
+
+    @Override
+    public void execDataChanged(FormFieldDataChangedChain chain, Object... dataTypes) throws ProcessingException {
+      getOwner().execDataChanged(dataTypes);
+    }
+
+    @Override
+    public void execAddSearchTerms(FormFieldAddSearchTermsChain chain, SearchFilter search) {
+      getOwner().execAddSearchTerms(search);
+    }
+
+    @Override
+    public void execChangedMasterValue(FormFieldChangedMasterValueChain chain, Object newMasterValue) throws ProcessingException {
+      getOwner().execChangedMasterValue(newMasterValue);
+    }
+
+    @Override
+    public void execDisposeField(FormFieldDisposeFieldChain chain) throws ProcessingException {
+      getOwner().execDisposeField();
+    }
+
+    @Override
+    public void execInitField(FormFieldInitFieldChain chain) throws ProcessingException {
+      getOwner().execInitField();
+    }
+
+    @Override
+    public boolean execCalculateVisible(FormFieldCalculateVisibleChain chain) {
+      return getOwner().execCalculateVisible();
+    }
+
+    @Override
+    public void execMarkSaved(FormFieldMarkSavedChain chain) throws ProcessingException {
+      getOwner().execMarkSaved();
+    }
+
+    @Override
+    public boolean execIsEmpty(FormFieldIsEmptyChain chain) throws ProcessingException {
+      return getOwner().execIsEmpty();
+    }
+
+    @Override
+    public boolean execIsSaveNeeded(FormFieldIsSaveNeededChain chain) throws ProcessingException {
+      return getOwner().execIsSaveNeeded();
+    }
+
+  }
+
+  protected final void interceptDataChanged(Object... dataTypes) throws ProcessingException {
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
+    FormFieldDataChangedChain chain = new FormFieldDataChangedChain(extensions);
+    chain.execDataChanged(dataTypes);
+  }
+
+  protected final void interceptAddSearchTerms(SearchFilter search) {
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
+    FormFieldAddSearchTermsChain chain = new FormFieldAddSearchTermsChain(extensions);
+    chain.execAddSearchTerms(search);
+  }
+
+  protected final void interceptChangedMasterValue(Object newMasterValue) throws ProcessingException {
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
+    FormFieldChangedMasterValueChain chain = new FormFieldChangedMasterValueChain(extensions);
+    chain.execChangedMasterValue(newMasterValue);
+  }
+
+  protected final void interceptDisposeField() throws ProcessingException {
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
+    FormFieldDisposeFieldChain chain = new FormFieldDisposeFieldChain(extensions);
+    chain.execDisposeField();
+  }
+
+  protected final void interceptInitField() throws ProcessingException {
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
+    FormFieldInitFieldChain chain = new FormFieldInitFieldChain(extensions);
+    chain.execInitField();
+  }
+
+  protected final boolean interceptCalculateVisible() {
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
+    FormFieldCalculateVisibleChain chain = new FormFieldCalculateVisibleChain(extensions);
+    return chain.execCalculateVisible();
+  }
+
+  protected final void interceptMarkSaved() throws ProcessingException {
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
+    FormFieldMarkSavedChain chain = new FormFieldMarkSavedChain(extensions);
+    chain.execMarkSaved();
+  }
+
+  protected final boolean interceptIsEmpty() throws ProcessingException {
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
+    FormFieldIsEmptyChain chain = new FormFieldIsEmptyChain(extensions);
+    return chain.execIsEmpty();
+  }
+
+  protected final boolean interceptIsSaveNeeded() throws ProcessingException {
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
+    FormFieldIsSaveNeededChain chain = new FormFieldIsSaveNeededChain(extensions);
+    return chain.execIsSaveNeeded();
+  }
 }

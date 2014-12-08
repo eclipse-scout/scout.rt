@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.shared.services.common.code;
 import java.util.List;
 
 import org.eclipse.scout.commons.ITypeWithClassId;
+import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 
 /**
  * Code types are dynamic enumerations used in front- and back-end. <br>
@@ -21,7 +22,7 @@ import org.eclipse.scout.commons.ITypeWithClassId;
  * If partitions are used, a context contains to a certain partition and
  * receives only his codes.
  */
-public interface ICodeType<CODE_TYPE_ID, CODE_ID> extends ITypeWithClassId {
+public interface ICodeType<CODE_TYPE_ID, CODE_ID> extends IExtensibleObject, ITypeWithClassId {
 
   /**
    * property into ISharedContextService's Map to get default partitionId of
@@ -75,7 +76,7 @@ public interface ICodeType<CODE_TYPE_ID, CODE_ID> extends ITypeWithClassId {
 
   /**
    * visits per default only the active codes
-   * 
+   *
    * @param visitor
    * @return
    */

@@ -38,7 +38,7 @@ import org.eclipse.scout.rt.shared.ScoutTexts;
 /**
  * <h3>DefaultWizardContainerForm</h3> A container form containing a wizard form
  * area (current step) a status area. see {@link AbstractWizard#execCreateContainerForm()}
- * 
+ *
  * @since 24.11.2009
  */
 public class DefaultWizardContainerForm extends AbstractWizardContainerForm implements IWizardContainerForm {

@@ -34,7 +34,7 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
  *
  */
 @FormData(value = AbstractTableRowData.class, sdkCommand = FormData.SdkCommand.USE, defaultSubtypeSdkCommand = FormData.DefaultSubtypeSdkCommand.CREATE)
-public class ContentAssistFieldTable<KEY> extends AbstractTable implements IContentAssistFieldTable<KEY> {
+public class ContentAssistFieldTable<LOOKUP_KEY> extends AbstractTable implements IContentAssistFieldTable<LOOKUP_KEY> {
 
   @Override
   protected boolean getConfiguredAutoResizeColumns() {
@@ -78,7 +78,7 @@ public class ContentAssistFieldTable<KEY> extends AbstractTable implements ICont
    * @param row
    */
   protected void decorateCellWithLookupRow(Cell cell, ITableRow row) {
-    ILookupRow<KEY> lookupRow = getKeyColumn().getValue(row);
+    ILookupRow<LOOKUP_KEY> lookupRow = getKeyColumn().getValue(row);
     cell.setTooltipText(lookupRow.getTooltipText());
     cell.setBackgroundColor(lookupRow.getBackgroundColor());
     cell.setForegroundColor(lookupRow.getForegroundColor());
@@ -89,9 +89,9 @@ public class ContentAssistFieldTable<KEY> extends AbstractTable implements ICont
   }
 
   @Override
-  public void setLookupRows(List<? extends ILookupRow<KEY>> lookupRows) throws ProcessingException {
+  public void setLookupRows(List<? extends ILookupRow<LOOKUP_KEY>> lookupRows) throws ProcessingException {
     List<ITableRow> rows = new ArrayList<ITableRow>();
-    for (ILookupRow<KEY> lookupRow : lookupRows) {
+    for (ILookupRow<LOOKUP_KEY> lookupRow : lookupRows) {
       ITableRow row = createRow();
       row.getCellForUpdate(getKeyColumn()).setValue(lookupRow);
       rows.add(row);
@@ -113,23 +113,23 @@ public class ContentAssistFieldTable<KEY> extends AbstractTable implements ICont
   }
 
   @Override
-  public List<ILookupRow<KEY>> getLookupRows() {
+  public List<ILookupRow<LOOKUP_KEY>> getLookupRows() {
     return getKeyColumn().getValues();
   }
 
   @Override
-  public ILookupRow<KEY> getSelectedLookupRow() {
+  public ILookupRow<LOOKUP_KEY> getSelectedLookupRow() {
     return getKeyColumn().getSelectedValue();
   }
 
   @Override
-  public ILookupRow<KEY> getCheckedLookupRow() {
+  public ILookupRow<LOOKUP_KEY> getCheckedLookupRow() {
     return getKeyColumn().getValue(CollectionUtility.firstElement(getCheckedRows()));
   }
 
   @Override
-  public boolean select(ILookupRow<KEY> lookupRow) throws ProcessingException {
-    KEY key = null;
+  public boolean select(ILookupRow<LOOKUP_KEY> lookupRow) throws ProcessingException {
+    LOOKUP_KEY key = null;
     if (lookupRow != null) {
       key = lookupRow.getKey();
     }
@@ -137,7 +137,7 @@ public class ContentAssistFieldTable<KEY> extends AbstractTable implements ICont
   }
 
   @Override
-  public boolean select(KEY key) throws ProcessingException {
+  public boolean select(LOOKUP_KEY key) throws ProcessingException {
     for (ITableRow row : getRows()) {
       if (CompareUtility.equals(key, getKeyColumn().getValue(row).getKey())) {
         selectRow(row);
@@ -152,7 +152,7 @@ public class ContentAssistFieldTable<KEY> extends AbstractTable implements ICont
 
   @Order(10.0)
   @ColumnData(SdkColumnCommand.IGNORE)
-  public class KeyColumn extends AbstractColumn<ILookupRow<KEY>> {
+  public class KeyColumn extends AbstractColumn<ILookupRow<LOOKUP_KEY>> {
     @Override
     protected String getConfiguredHeaderText() {
       return TEXTS.get("Key");
@@ -190,7 +190,7 @@ public class ContentAssistFieldTable<KEY> extends AbstractTable implements ICont
 
     @Override
     protected void execDecorateCell(Cell cell, ITableRow row) {
-      ILookupRow<KEY> lookupRow = getKeyColumn().getValue(row);
+      ILookupRow<LOOKUP_KEY> lookupRow = getKeyColumn().getValue(row);
       cell.setText(lookupRow.getText());
       decorateCellWithLookupRow(cell, row);
     }

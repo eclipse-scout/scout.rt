@@ -14,6 +14,7 @@ import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ILongColumnExtension;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.longfield.AbstractLongField;
 import org.eclipse.scout.rt.client.ui.form.fields.longfield.ILongField;
@@ -72,6 +73,18 @@ public abstract class AbstractLongColumn extends AbstractNumberColumn<Long> impl
   protected ILongField getEditorField() {
     return new AbstractLongField() {
     };
+  }
+
+  protected static class LocalLongColumnExtension<OWNER extends AbstractLongColumn> extends LocalNumberColumnExtension<Long, OWNER> implements ILongColumnExtension<OWNER> {
+
+    public LocalLongColumnExtension(OWNER owner) {
+      super(owner);
+    }
+  }
+
+  @Override
+  protected ILongColumnExtension<? extends AbstractLongColumn> createLocalExtension() {
+    return new LocalLongColumnExtension<AbstractLongColumn>(this);
   }
 
 }

@@ -41,6 +41,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.annotations.OrderedComparator;
 import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.dnd.TextTransferObject;
@@ -49,6 +50,23 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.ITableExtension;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableAddHeaderMenusChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableContentChangedChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableCopyChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableCreateTableRowDataMapperChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableDecorateCellChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableDecorateRowChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableDisposeTableChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableDragChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableDropChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableHyperlinkActionChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableInitTableChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableResetColumnsChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableRowActionChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableRowClickChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableRowsSelectedChain;
 import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
@@ -91,6 +109,13 @@ import org.eclipse.scout.rt.client.ui.profiler.DesktopProfiler;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldData;
+import org.eclipse.scout.rt.shared.extension.AbstractExtension;
+import org.eclipse.scout.rt.shared.extension.ContributionComposite;
+import org.eclipse.scout.rt.shared.extension.ExtensionUtility;
+import org.eclipse.scout.rt.shared.extension.IContributionOwner;
+import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
+import org.eclipse.scout.rt.shared.extension.IExtension;
+import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 import org.eclipse.scout.rt.shared.services.common.code.ICode;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.services.lookup.BatchLookupCall;
@@ -106,7 +131,7 @@ import org.eclipse.scout.service.SERVICES;
  * for every inner column class there is a generated getXYColumn method directly
  * on the table
  */
-public abstract class AbstractTable extends AbstractPropertyObserver implements ITable {
+public abstract class AbstractTable extends AbstractPropertyObserver implements ITable, IContributionOwner, IExtensibleObject {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractTable.class);
 
   private boolean m_initialized;
@@ -118,7 +143,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   private final List<ITableRow> m_rows;
   private final Object m_cachedRowsLock;
   private List<ITableRow> m_cachedRows;
-  private final HashMap<CompositeObject, ITableRow> m_deletedRows;
+  private final Map<CompositeObject, ITableRow> m_deletedRows;
   private List<ITableRow/* ordered by rowIndex */> m_selectedRows = new ArrayList<ITableRow>();
   private Map<Class<?>, Class<? extends IMenu>> m_menuReplacementMapping;
   private ITableUIFacade m_uiFacade;
@@ -138,13 +163,15 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   private final EventListenerList m_listenerList = new EventListenerList();
   //cell editing
   private P_CellEditorContext m_editContext;
-  private Set<ITableRow> m_rowValidty;
+  private final Set<ITableRow> m_rowValidty;
   //checkable table
   private IBooleanColumn m_checkableColumn;
   //auto filter
   private final Object m_cachedFilteredRowsLock;
   private List<ITableRow> m_cachedFilteredRows;
   private IEventHistory<TableEvent> m_eventHistory;
+  private IContributionOwner m_contributionHolder;
+  private final ObjectExtensions<AbstractTable, ITableExtension<? extends AbstractTable>> m_objectExtensions;
   // only do one action at a time
   private boolean m_actionRunning;
 
@@ -165,6 +192,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     m_rowFilters = new ArrayList<ITableRowFilter>(1);
     m_initLock = new OptimisticLock();
     m_actionRunning = false;
+    m_objectExtensions = new ObjectExtensions<AbstractTable, ITableExtension<? extends AbstractTable>>(this);
     //add single observer listener
     addTableListener(new P_TableListener());
     if (callInitializer) {
@@ -172,13 +200,42 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
+  @Override
+  public List<? extends ITableExtension<? extends AbstractTable>> getAllExtensions() {
+    return m_objectExtensions.getAllExtensions();
+  }
+
+  protected ITableExtension<? extends AbstractTable> createLocalExtension() {
+    return new LocalTableExtension<AbstractTable>(this);
+  }
+
+  @Override
+  public <T extends IExtension<?>> T getExtension(Class<T> c) {
+    return m_objectExtensions.getExtension(c);
+  }
+
   protected void callInitializer() {
-    initConfig();
+    interceptInitConfig();
   }
 
   @Override
   public String classId() {
     return ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass()) + ITypeWithClassId.ID_CONCAT_SYMBOL + getContainer().classId();
+  }
+
+  @Override
+  public final List<Object> getAllContributions() {
+    return m_contributionHolder.getAllContributions();
+  }
+
+  @Override
+  public final <T> List<T> getContributionsByClass(Class<T> type) {
+    return m_contributionHolder.getContributionsByClass(type);
+  }
+
+  @Override
+  public final <T> T getContribution(Class<T> contribution) {
+    return m_contributionHolder.getContribution(contribution);
   }
 
   /*
@@ -607,7 +664,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   /**
-   * @deprecated use {@link #execRowClick(ITableRow, MouseButton)} instead. Will be removed with V5.0.
+   * @deprecated use {@link #interceptRowClick(ITableRow, MouseButton)} instead. Will be removed with V5.0.
    */
   @Deprecated
   protected void execRowClick(ITableRow row) throws ProcessingException {
@@ -740,25 +797,34 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   protected List<Class<? extends IMenu>> getDeclaredMenus() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     List<Class<IMenu>> filtered = ConfigurationUtility.filterClasses(dca, IMenu.class);
-    List<Class<? extends IMenu>> foca = ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IMenu.class);
-    return ConfigurationUtility.removeReplacedClasses(foca);
+    return ConfigurationUtility.removeReplacedClasses(filtered);
   }
 
-  private List<? extends Class<? extends IColumn>> getConfiguredColumns() {
+  private List<Class<? extends IColumn>> getConfiguredColumns() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    List<Class<? extends IColumn>> foca = ConfigurationUtility.sortFilteredClassesByOrderAnnotation(CollectionUtility.arrayList(dca), IColumn.class);
+    List<Class<IColumn>> foca = ConfigurationUtility.filterClasses(dca, IColumn.class);
     return ConfigurationUtility.removeReplacedClasses(foca);
   }
 
-  private List<? extends Class<? extends IKeyStroke>> getConfiguredKeyStrokes() {
+  private List<Class<? extends IKeyStroke>> getConfiguredKeyStrokes() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     List<Class<IKeyStroke>> fca = ConfigurationUtility.filterClasses(dca, IKeyStroke.class);
     return ConfigurationUtility.removeReplacedClasses(fca);
   }
 
+  protected final void interceptInitConfig() {
+    m_objectExtensions.initConfig(createLocalExtension(), new Runnable() {
+      @Override
+      public void run() {
+        initConfig();
+      }
+    });
+  }
+
   protected void initConfig() {
     m_eventHistory = createEventHistory();
     m_uiFacade = createUIFacade();
+    m_contributionHolder = new ContributionComposite(this);
     setTitle(getConfiguredTitle());
     setAutoDiscardOnDelete(getConfiguredAutoDiscardOnDelete());
     setSortEnabled(getConfiguredSortEnabled());
@@ -781,9 +847,9 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     // columns
     createColumnsInternal();
     // menus
-    List<IMenu> menuList = new ArrayList<IMenu>();
 
     List<Class<? extends IMenu>> ma = getDeclaredMenus();
+    List<IMenu> menuList = new ArrayList<IMenu>(ma.size());
     Map<Class<?>, Class<? extends IMenu>> replacements = ConfigurationUtility.getReplacementMapping(ma);
     if (!replacements.isEmpty()) {
       m_menuReplacementMapping = replacements;
@@ -801,12 +867,17 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + className + "'.", t));
       }
     }
+    List<IMenu> contributedMenus = m_contributionHolder.getContributionsByClass(IMenu.class);
+    menuList.addAll(contributedMenus);
     try {
       injectMenusInternal(menuList);
     }
     catch (Exception e) {
       LOG.error("error occured while dynamically contributing menus.", e);
     }
+    new MoveActionNodesHandler<IMenu>(menuList).moveModelObjects();
+    Collections.sort(menuList, new OrderedComparator());
+
     execCreateHeaderMenus(menuList);
     //set container on menus
     for (IMenu menu : menuList) {
@@ -816,9 +887,9 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     setContextMenu(contextMenu);
 
     // key strokes
-    List<IKeyStroke> ksList = new ArrayList<IKeyStroke>();
-    List<? extends Class<? extends IKeyStroke>> ksArray = getConfiguredKeyStrokes();
-    for (Class<? extends IKeyStroke> clazz : ksArray) {
+    List<Class<? extends IKeyStroke>> ksClasses = getConfiguredKeyStrokes();
+    ArrayList<IKeyStroke> ksList = new ArrayList<IKeyStroke>(ksClasses.size());
+    for (Class<? extends IKeyStroke> clazz : ksClasses) {
       try {
         IKeyStroke ks = ConfigurationUtility.newInnerInstance(this, clazz);
         ksList.add(ks);
@@ -841,7 +912,11 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         }
       });
     }
+    // add keystroke contributions
+    List<IKeyStroke> contributedKeyStrokes = m_contributionHolder.getContributionsByClass(IKeyStroke.class);
+    ksList.addAll(contributedKeyStrokes);
     setKeyStrokes(ksList);
+
     // add Convenience observer for drag & drop callbacks and event history
     addTableListener(new TableAdapter() {
       @Override
@@ -856,7 +931,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
           case TableEvent.TYPE_ROWS_DRAG_REQUEST: {
             if (e.getDragObject() == null) {
               try {
-                e.setDragObject(execDrag(e.getRows()));
+                e.setDragObject(interceptDrag(e.getRows()));
               }
               catch (ProcessingException ex) {
                 SERVICES.getService(IExceptionHandlerService.class).handleException(ex);
@@ -867,7 +942,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
           case TableEvent.TYPE_ROW_DROP_ACTION: {
             if (e.getDropObject() != null) {
               try {
-                execDrop(e.getFirstRow(), e.getDropObject());
+                interceptDrop(e.getFirstRow(), e.getDropObject());
               }
               catch (ProcessingException ex) {
                 SERVICES.getService(IExceptionHandlerService.class).handleException(ex);
@@ -878,7 +953,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
           case TableEvent.TYPE_ROWS_COPY_REQUEST: {
             if (e.getCopyObject() == null) {
               try {
-                e.setCopyObject(execCopy(e.getRows()));
+                e.setCopyObject(interceptCopy(e.getRows()));
               }
               catch (ProcessingException ex) {
                 SERVICES.getService(IExceptionHandlerService.class).handleException(ex);
@@ -891,7 +966,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
           case TableEvent.TYPE_ROWS_INSERTED:
           case TableEvent.TYPE_ROWS_UPDATED: {
             try {
-              execContentChanged();
+              interceptContentChanged();
             }
             catch (ProcessingException ex) {
               SERVICES.getService(IExceptionHandlerService.class).handleException(ex);
@@ -927,8 +1002,10 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   private void createColumnsInternal() {
-    List<? extends Class<? extends IColumn>> ca = getConfiguredColumns();
-    ArrayList<IColumn<?>> colList = new ArrayList<IColumn<?>>();
+    List<Class<? extends IColumn>> ca = getConfiguredColumns();
+    ArrayList<IColumn<?>> colList = new ArrayList<IColumn<?>>(ca.size());
+
+    // configured columns
     for (Class<? extends IColumn> clazz : ca) {
       try {
         IColumn<?> column = ConfigurationUtility.newInnerInstance(this, clazz);
@@ -942,15 +1019,29 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + className + "'.", e));
       }
     }
+
+    // contributed columns
+    List<IColumn> contributedColumns = m_contributionHolder.getContributionsByClass(IColumn.class);
+    colList.ensureCapacity(colList.size() + contributedColumns.size());
+    for (IColumn c : contributedColumns) {
+      colList.add(c);
+    }
+
+    // dynamically injected columns
     try {
       injectColumnsInternal(colList);
     }
     catch (Exception e) {
       LOG.error("error occured while dynamically contribute columns.", e);
     }
-    List<IColumn<?>> completeList = new ArrayList<IColumn<?>>();
-    completeList.addAll(colList);
-    m_columnSet = new ColumnSet(this, completeList);
+
+    // move columns
+    ExtensionUtility.moveModelObjects(colList);
+
+    // sort columns
+    Collections.sort(colList, new OrderedComparator());
+
+    m_columnSet = new ColumnSet(this, colList);
     if (getConfiguredCheckableColumn() != null) {
       AbstractBooleanColumn checkableColumn = getColumnSet().getColumnByClass(getConfiguredCheckableColumn());
       setCheckableColumn(checkableColumn);
@@ -1021,7 +1112,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
           //
           initTableInternal();
           ActionUtility.initActions(getMenus());
-          execInitTable();
+          interceptInitTable();
         }
         finally {
           setTableChanging(false);
@@ -1045,7 +1136,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   public final void disposeTable() {
     try {
       disposeTableInternal();
-      execDisposeTable();
+      interceptDisposeTable();
     }
     catch (Throwable t) {
       LOG.warn(getClass().getName(), t);
@@ -1067,7 +1158,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         if (col != null) {
           setContextColumn(col);
         }
-        execHyperlinkAction(url, url.getPath(), url != null && url.getHost().equals(LOCAL_URL_HOST));
+        interceptHyperlinkAction(url, url.getPath(), url != null && url.getHost().equals(LOCAL_URL_HOST));
       }
       finally {
         m_actionRunning = false;
@@ -1503,7 +1594,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   @Override
   public ITableRowDataMapper createTableRowDataMapper(Class<? extends AbstractTableRowData> rowType) throws ProcessingException {
-    return execCreateTableRowDataMapper(rowType);
+    return interceptCreateTableRowDataMapper(rowType);
   }
 
   /**
@@ -1551,7 +1642,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     clearValidatedValuesOnAllColumns();
     clearAllRowsValidity();
     int deleteCount = 0;
-    List<ITableRow> newRows = new ArrayList<ITableRow>();
+    List<ITableRow> newRows = new ArrayList<ITableRow>(rowDatas.size());
     ITableRowDataMapper mapper = createTableRowDataMapper(rowType);
     for (int i = 0, ni = rowDatas.size(); i < ni; i++) {
       AbstractTableRowData rowData = rowDatas.get(i);
@@ -3171,7 +3262,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
           m_sortValid = false;
         }
         resetColumnsInternal(visibility, order, sorting, widths);
-        execResetColumns(visibility, order, sorting, widths);
+        interceptResetColumns(visibility, order, sorting, widths);
       }
       catch (Throwable t) {
         LOG.error("reset columns " + visibility + "," + order + "," + sorting + "," + widths, t);
@@ -3205,7 +3296,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       int index = 0;
       for (IColumn<?> col : getColumns()) {
         if (col.isDisplayable() && col.isVisible()) {
-          orderMap.put(new CompositeObject(col.getViewOrder(), index), col);
+          orderMap.put(new CompositeObject(col.getOrder(), index), col);
           index++;
         }
       }
@@ -3638,7 +3729,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     Cell cell = row.getCellForUpdate(col.getColumnIndex());
     decorateCellInternal(cell, row, col);
     try {
-      execDecorateCell(cell, row, col);
+      interceptDecorateCell(cell, row, col);
     }
     catch (ProcessingException e) {
       SERVICES.getService(IExceptionHandlerService.class).handleException(e);
@@ -3675,7 +3766,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   public final void decorateRow(ITableRow row) {
     decorateRowInternal(row);
     try {
-      execDecorateRow(row);
+      interceptDecorateRow(row);
     }
     catch (ProcessingException e) {
       SERVICES.getService(IExceptionHandlerService.class).handleException(e);
@@ -3781,7 +3872,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     if (row != null) {
       try {
         interceptRowClickSingleObserver(row, mouseButton);
-        execRowClick(row, mouseButton);
+        interceptRowClick(row, mouseButton);
       }
       catch (ProcessingException ex) {
         SERVICES.getService(IExceptionHandlerService.class).handleException(ex);
@@ -3831,7 +3922,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         m_actionRunning = true;
         if (row != null) {
           try {
-            execRowAction(row);
+            interceptRowAction(row);
           }
           catch (ProcessingException ex) {
             SERVICES.getService(IExceptionHandlerService.class).handleException(ex);
@@ -4391,7 +4482,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         case TableEvent.TYPE_ROWS_SELECTED: {
           // single observer exec
           try {
-            execRowsSelected(e.getRows());
+            interceptRowsSelected(e.getRows());
           }
           catch (ProcessingException ex) {
             SERVICES.getService(IExceptionHandlerService.class).handleException(ex);
@@ -4427,5 +4518,177 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     public IFormField getFormField() {
       return m_formField;
     }
+  }
+
+  protected static class LocalTableExtension<TABLE extends AbstractTable> extends AbstractExtension<TABLE> implements ITableExtension<TABLE> {
+
+    public LocalTableExtension(TABLE owner) {
+      super(owner);
+    }
+
+    @Override
+    public void execHyperlinkAction(TableHyperlinkActionChain chain, URL url, String path, boolean local) throws ProcessingException {
+      getOwner().execHyperlinkAction(url, path, local);
+    }
+
+    @Override
+    public void execRowAction(TableRowActionChain chain, ITableRow row) throws ProcessingException {
+      getOwner().execRowAction(row);
+    }
+
+    @Override
+    public void execContentChanged(TableContentChangedChain chain) throws ProcessingException {
+      getOwner().execContentChanged();
+    }
+
+    @Override
+    public ITableRowDataMapper execCreateTableRowDataMapper(TableCreateTableRowDataMapperChain chain, Class<? extends AbstractTableRowData> rowType) throws ProcessingException {
+      return getOwner().execCreateTableRowDataMapper(rowType);
+    }
+
+    @Override
+    public void execInitTable(TableInitTableChain chain) throws ProcessingException {
+      getOwner().execInitTable();
+    }
+
+    @Override
+    public void execResetColumns(TableResetColumnsChain chain, boolean visibility, boolean order, boolean sorting, boolean widths) throws ProcessingException {
+      getOwner().execResetColumns(visibility, order, sorting, widths);
+    }
+
+    @Override
+    public void execDecorateCell(TableDecorateCellChain chain, Cell view, ITableRow row, IColumn<?> col) throws ProcessingException {
+      getOwner().execDecorateCell(view, row, col);
+    }
+
+    @Override
+    public void execDrop(TableDropChain chain, ITableRow row, TransferObject t) throws ProcessingException {
+      getOwner().execDrop(row, t);
+    }
+
+    @Override
+    public void execDisposeTable(TableDisposeTableChain chain) throws ProcessingException {
+      getOwner().execDisposeTable();
+    }
+
+    @Override
+    public void execAddHeaderMenus(TableAddHeaderMenusChain chain, TableEvent e) throws ProcessingException {
+      getOwner().execAddHeaderMenus(e);
+    }
+
+    @Override
+    public void execRowClick(TableRowClickChain chain, ITableRow row, MouseButton mouseButton) throws ProcessingException {
+      getOwner().execRowClick(row, mouseButton);
+    }
+
+    @Override
+    public void execDecorateRow(TableDecorateRowChain chain, ITableRow row) throws ProcessingException {
+      getOwner().execDecorateRow(row);
+    }
+
+    @Override
+    public TransferObject execCopy(TableCopyChain chain, List<? extends ITableRow> rows) throws ProcessingException {
+      return getOwner().execCopy(rows);
+    }
+
+    @Override
+    public void execRowsSelected(TableRowsSelectedChain chain, List<? extends ITableRow> rows) throws ProcessingException {
+      getOwner().execRowsSelected(rows);
+    }
+
+    @Override
+    public TransferObject execDrag(TableDragChain chain, List<ITableRow> rows) throws ProcessingException {
+      return getOwner().execDrag(rows);
+    }
+  }
+
+  protected final void interceptHyperlinkAction(URL url, String path, boolean local) throws ProcessingException {
+    List<? extends ITableExtension<? extends AbstractTable>> extensions = getAllExtensions();
+    TableHyperlinkActionChain chain = new TableHyperlinkActionChain(extensions);
+    chain.execHyperlinkAction(url, path, local);
+  }
+
+  protected final void interceptRowAction(ITableRow row) throws ProcessingException {
+    List<? extends ITableExtension<? extends AbstractTable>> extensions = getAllExtensions();
+    TableRowActionChain chain = new TableRowActionChain(extensions);
+    chain.execRowAction(row);
+  }
+
+  protected final void interceptContentChanged() throws ProcessingException {
+    List<? extends ITableExtension<? extends AbstractTable>> extensions = getAllExtensions();
+    TableContentChangedChain chain = new TableContentChangedChain(extensions);
+    chain.execContentChanged();
+  }
+
+  protected final ITableRowDataMapper interceptCreateTableRowDataMapper(Class<? extends AbstractTableRowData> rowType) throws ProcessingException {
+    List<? extends ITableExtension<? extends AbstractTable>> extensions = getAllExtensions();
+    TableCreateTableRowDataMapperChain chain = new TableCreateTableRowDataMapperChain(extensions);
+    return chain.execCreateTableRowDataMapper(rowType);
+  }
+
+  protected final void interceptInitTable() throws ProcessingException {
+    List<? extends ITableExtension<? extends AbstractTable>> extensions = getAllExtensions();
+    TableInitTableChain chain = new TableInitTableChain(extensions);
+    chain.execInitTable();
+  }
+
+  protected final void interceptResetColumns(boolean visibility, boolean order, boolean sorting, boolean widths) throws ProcessingException {
+    List<? extends ITableExtension<? extends AbstractTable>> extensions = getAllExtensions();
+    TableResetColumnsChain chain = new TableResetColumnsChain(extensions);
+    chain.execResetColumns(visibility, order, sorting, widths);
+  }
+
+  protected final void interceptDecorateCell(Cell view, ITableRow row, IColumn<?> col) throws ProcessingException {
+    List<? extends ITableExtension<? extends AbstractTable>> extensions = getAllExtensions();
+    TableDecorateCellChain chain = new TableDecorateCellChain(extensions);
+    chain.execDecorateCell(view, row, col);
+  }
+
+  protected final void interceptDrop(ITableRow row, TransferObject t) throws ProcessingException {
+    List<? extends ITableExtension<? extends AbstractTable>> extensions = getAllExtensions();
+    TableDropChain chain = new TableDropChain(extensions);
+    chain.execDrop(row, t);
+  }
+
+  protected final void interceptDisposeTable() throws ProcessingException {
+    List<? extends ITableExtension<? extends AbstractTable>> extensions = getAllExtensions();
+    TableDisposeTableChain chain = new TableDisposeTableChain(extensions);
+    chain.execDisposeTable();
+  }
+
+  protected final void interceptAddHeaderMenus(TableEvent e) throws ProcessingException {
+    List<? extends ITableExtension<? extends AbstractTable>> extensions = getAllExtensions();
+    TableAddHeaderMenusChain chain = new TableAddHeaderMenusChain(extensions);
+    chain.execAddHeaderMenus(e);
+  }
+
+  protected final void interceptRowClick(ITableRow row, MouseButton mouseButton) throws ProcessingException {
+    List<? extends ITableExtension<? extends AbstractTable>> extensions = getAllExtensions();
+    TableRowClickChain chain = new TableRowClickChain(extensions);
+    chain.execRowClick(row, mouseButton);
+  }
+
+  protected final void interceptDecorateRow(ITableRow row) throws ProcessingException {
+    List<? extends ITableExtension<? extends AbstractTable>> extensions = getAllExtensions();
+    TableDecorateRowChain chain = new TableDecorateRowChain(extensions);
+    chain.execDecorateRow(row);
+  }
+
+  protected final TransferObject interceptCopy(List<? extends ITableRow> rows) throws ProcessingException {
+    List<? extends ITableExtension<? extends AbstractTable>> extensions = getAllExtensions();
+    TableCopyChain chain = new TableCopyChain(extensions);
+    return chain.execCopy(rows);
+  }
+
+  protected final void interceptRowsSelected(List<? extends ITableRow> rows) throws ProcessingException {
+    List<? extends ITableExtension<? extends AbstractTable>> extensions = getAllExtensions();
+    TableRowsSelectedChain chain = new TableRowsSelectedChain(extensions);
+    chain.execRowsSelected(rows);
+  }
+
+  protected final TransferObject interceptDrag(List<ITableRow> rows) throws ProcessingException {
+    List<? extends ITableExtension<? extends AbstractTable>> extensions = getAllExtensions();
+    TableDragChain chain = new TableDragChain(extensions);
+    return chain.execDrag(rows);
   }
 }

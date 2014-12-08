@@ -21,6 +21,7 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.filechooserfield.IFileChooserFieldExtension;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.FileChooser;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
@@ -142,7 +143,7 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
     m_folderMode = b;
     if (isInitialized()) {
       if (shouldUpdateDisplayText(false)) {
-        setDisplayText(execFormatValue(getValue()));
+        setDisplayText(interceptFormatValue(getValue()));
       }
     }
   }
@@ -160,7 +161,7 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
     }
     if (isInitialized()) {
       if (shouldUpdateDisplayText(false)) {
-        setDisplayText(execFormatValue(getValue()));
+        setDisplayText(interceptFormatValue(getValue()));
       }
     }
   }
@@ -175,7 +176,7 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
     m_showFileName = b;
     if (isInitialized()) {
       if (shouldUpdateDisplayText(false)) {
-        setDisplayText(execFormatValue(getValue()));
+        setDisplayText(interceptFormatValue(getValue()));
       }
     }
   }
@@ -190,7 +191,7 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
     m_showFileExtension = b;
     if (isInitialized()) {
       if (shouldUpdateDisplayText(false)) {
-        setDisplayText(execFormatValue(getValue()));
+        setDisplayText(interceptFormatValue(getValue()));
       }
     }
   }
@@ -425,6 +426,18 @@ public abstract class AbstractFileChooserField extends AbstractValueField<String
       }
       return parseValue(newText);
     }
+  }
+
+  protected static class LocalFileChooserFieldExtension<OWNER extends AbstractFileChooserField> extends LocalValueFieldExtension<String, OWNER> implements IFileChooserFieldExtension<OWNER> {
+
+    public LocalFileChooserFieldExtension(OWNER owner) {
+      super(owner);
+    }
+  }
+
+  @Override
+  protected IFileChooserFieldExtension<? extends AbstractFileChooserField> createLocalExtension() {
+    return new LocalFileChooserFieldExtension<AbstractFileChooserField>(this);
   }
 
 }

@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.placeholder;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.placeholder.IPlaceholderFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 
 @ClassId("1c651d5d-f327-4c60-8bf4-4a4714bc22cc")
@@ -30,6 +31,18 @@ public abstract class AbstractPlaceholderField extends AbstractFormField impleme
   @Override
   protected void initConfig() {
     super.initConfig();
+  }
+
+  protected static class LocalPlaceholderFieldExtension<OWNER extends AbstractPlaceholderField> extends LocalFormFieldExtension<OWNER> implements IPlaceholderFieldExtension<OWNER> {
+
+    public LocalPlaceholderFieldExtension(OWNER owner) {
+      super(owner);
+    }
+  }
+
+  @Override
+  protected IPlaceholderFieldExtension<? extends AbstractPlaceholderField> createLocalExtension() {
+    return new LocalPlaceholderFieldExtension<AbstractPlaceholderField>(this);
   }
 
 }

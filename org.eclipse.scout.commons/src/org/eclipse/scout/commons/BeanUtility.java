@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.commons;
 
-import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -149,11 +148,10 @@ public final class BeanUtility {
 
   /**
    * Get all properties from this class up to (and excluding) stopClazz
-   * 
+   *
    * @param filter
-   * @throws IntrospectionException
    */
-  public static FastPropertyDescriptor[] getFastPropertyDescriptors(Class<?> clazz, Class<?> stopClazz, IPropertyFilter filter) throws IntrospectionException {
+  public static FastPropertyDescriptor[] getFastPropertyDescriptors(Class<?> clazz, Class<?> stopClazz, IPropertyFilter filter) {
     FastBeanInfo info = getFastBeanInfo(clazz, stopClazz);
     FastPropertyDescriptor[] a = info.getPropertyDescriptors();
     ArrayList<FastPropertyDescriptor> filteredProperties = new ArrayList<FastPropertyDescriptor>(a.length);
@@ -171,7 +169,7 @@ public final class BeanUtility {
 
   /**
    * Creates a new instance of the given class and init parameters. The constructor is derived from the parameter types.
-   * 
+   *
    * @param <T>
    * @param c
    *          The class a new instance is created for.
@@ -199,7 +197,7 @@ public final class BeanUtility {
   /**
    * Creates a new instance of the given class using the constructor that matches the given parameter types. The
    * resulting object is initialized with the given parameters.
-   * 
+   *
    * @param <T>
    * @param c
    *          The class a new instance is created for.
@@ -229,12 +227,12 @@ public final class BeanUtility {
   }
 
   /**
-   * Finds the best matching constructor in the given class having the given parameter types or superclasses of them.
-   * 
+   * Finds the best matching constructor in the given class having the given parameter types or super classes of them.
+   *
    * @param c
    *          The class the constructor is searched for.
    * @param parameterTypes
-   *          A possibly empty varag list of required constructor parameter types.
+   *          A possibly empty vararg list of required constructor parameter types.
    * @return Returns the exact constructor of the given class and the given list of parameter types, the best matching
    *         one or <code>null</code>, if none can be found.
    * @throws ProcessingException
@@ -336,7 +334,7 @@ public final class BeanUtility {
    * <em>n</em></td>
    * </tr>
    * </table>
-   * 
+   *
    * @param declaredType
    *          The method parameter's declared type.
    * @param actualType

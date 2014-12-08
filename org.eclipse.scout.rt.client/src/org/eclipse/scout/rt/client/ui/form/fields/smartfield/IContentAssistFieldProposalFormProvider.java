@@ -17,6 +17,6 @@ import org.eclipse.scout.commons.exception.ProcessingException;
  * 
  * @since 3.8.0
  */
-public interface IContentAssistFieldProposalFormProvider<KEY_TYPE> {
-  IContentAssistFieldProposalForm<KEY_TYPE> createProposalForm(IContentAssistField<?, KEY_TYPE> smartField, boolean allowCustomText) throws ProcessingException;
+public interface IContentAssistFieldProposalFormProvider<LOOKUP_KEY> {
+  IContentAssistFieldProposalForm<LOOKUP_KEY> createProposalForm(IContentAssistField<?, LOOKUP_KEY> smartField, boolean allowCustomText) throws ProcessingException;
 }

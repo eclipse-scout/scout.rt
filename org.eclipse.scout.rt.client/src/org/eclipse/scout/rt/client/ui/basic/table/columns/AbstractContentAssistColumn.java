@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
+import java.util.List;
+
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
@@ -17,6 +19,9 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ContentAssistColumnChains.ContentAssistColumnConvertValueToKeyChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ContentAssistColumnChains.ContentAssistColumnPrepareLookupChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.IContentAssistColumnExtension;
 import org.eclipse.scout.rt.client.services.lookup.ILookupCallProvisioningService;
 import org.eclipse.scout.rt.client.services.lookup.TableProvisioningContext;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -26,7 +31,7 @@ import org.eclipse.scout.rt.shared.services.lookup.CodeLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.service.SERVICES;
 
-public abstract class AbstractContentAssistColumn<VALUE_TYPE, LOOKUP_TYPE> extends AbstractColumn<VALUE_TYPE> implements IContentAssistColumn<VALUE_TYPE, LOOKUP_TYPE> {
+public abstract class AbstractContentAssistColumn<VALUE, LOOKUP_TYPE> extends AbstractColumn<VALUE> implements IContentAssistColumn<VALUE, LOOKUP_TYPE> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractContentAssistColumn.class);
 
   // DO NOT init members, this has the same effect as if they were set AFTER
@@ -46,7 +51,7 @@ public abstract class AbstractContentAssistColumn<VALUE_TYPE, LOOKUP_TYPE> exten
    * Configures the lookup call used to determine the display text of the smart column value.
    * <p>
    * Subclasses can override this method. Default is {@code null}.
-   * 
+   *
    * @return Lookup call class for this column.
    */
   @ConfigProperty(ConfigProperty.LOOKUP_CALL)
@@ -60,7 +65,7 @@ public abstract class AbstractContentAssistColumn<VALUE_TYPE, LOOKUP_TYPE> exten
    * {@link #getConfiguredLookupCall()}), this configuration has no effect (lookup call is used instead of code type).
    * <p>
    * Subclasses can override this method. Default is {@code null}.
-   * 
+   *
    * @return Code type class for this column.
    */
   @ConfigProperty(ConfigProperty.CODE_TYPE)
@@ -74,7 +79,7 @@ public abstract class AbstractContentAssistColumn<VALUE_TYPE, LOOKUP_TYPE> exten
    * vs. hierarchical data).
    * <p>
    * Subclasses can override this method. Default is {@code false}.
-   * 
+   *
    * @return {@code true} if data behind the smart column is hierarchical (and the smartfield should represent it that
    *         way), {@code false} otherwise.
    */
@@ -125,14 +130,14 @@ public abstract class AbstractContentAssistColumn<VALUE_TYPE, LOOKUP_TYPE> exten
 
   /**
    * the default implementation simply casts one to the other type
-   * 
+   *
    * @param key
    * @return
    */
   @SuppressWarnings("unchecked")
   @ConfigOperation
   @Order(410)
-  protected LOOKUP_TYPE execConvertValueToKey(VALUE_TYPE value) {
+  protected LOOKUP_TYPE execConvertValueToKey(VALUE value) {
     return (LOOKUP_TYPE) value;
   }
 
@@ -140,11 +145,11 @@ public abstract class AbstractContentAssistColumn<VALUE_TYPE, LOOKUP_TYPE> exten
   public ILookupCall<LOOKUP_TYPE> prepareLookupCall(ITableRow row) {
     if (getLookupCall() != null) {
       ILookupCall<LOOKUP_TYPE> call = SERVICES.getService(ILookupCallProvisioningService.class).newClonedInstance(getLookupCall(), new TableProvisioningContext(getTable(), row, this));
-      call.setKey(execConvertValueToKey(getValueInternal(row)));
+      call.setKey(interceptConvertValueToKey(getValueInternal(row)));
       call.setText(null);
       call.setAll(null);
       call.setRec(null);
-      execPrepareLookup(call, row);
+      interceptPrepareLookup(call, row);
       return call;
     }
     else {
@@ -205,13 +210,13 @@ public abstract class AbstractContentAssistColumn<VALUE_TYPE, LOOKUP_TYPE> exten
 
   @SuppressWarnings("unchecked")
   @Override
-  protected VALUE_TYPE parseValueInternal(ITableRow row, Object rawValue) throws ProcessingException {
-    VALUE_TYPE validValue = null;
+  protected VALUE parseValueInternal(ITableRow row, Object rawValue) throws ProcessingException {
+    VALUE validValue = null;
     if (rawValue == null) {
       validValue = null;
     }
     else if (getDataType().isAssignableFrom(rawValue.getClass())) {
-      validValue = (VALUE_TYPE) rawValue;
+      validValue = (VALUE) rawValue;
     }
     else {
       try {
@@ -222,6 +227,46 @@ public abstract class AbstractContentAssistColumn<VALUE_TYPE, LOOKUP_TYPE> exten
       }
     }
     return validValue;
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public List<? extends IContentAssistColumnExtension<VALUE, LOOKUP_TYPE, ? extends AbstractContentAssistColumn<VALUE, LOOKUP_TYPE>>> getAllExtensions() {
+    return (List<? extends IContentAssistColumnExtension<VALUE, LOOKUP_TYPE, ? extends AbstractContentAssistColumn<VALUE, LOOKUP_TYPE>>>) super.getAllExtensions();
+  }
+
+  protected final LOOKUP_TYPE interceptConvertValueToKey(VALUE value) {
+    List<? extends IContentAssistColumnExtension<VALUE, LOOKUP_TYPE, ? extends AbstractContentAssistColumn<VALUE, LOOKUP_TYPE>>> extensions = getAllExtensions();
+    ContentAssistColumnConvertValueToKeyChain<VALUE, LOOKUP_TYPE> chain = new ContentAssistColumnConvertValueToKeyChain<VALUE, LOOKUP_TYPE>(extensions);
+    return chain.execConvertValueToKey(value);
+  }
+
+  protected final void interceptPrepareLookup(ILookupCall<LOOKUP_TYPE> call, ITableRow row) {
+    List<? extends IContentAssistColumnExtension<VALUE, LOOKUP_TYPE, ? extends AbstractContentAssistColumn<VALUE, LOOKUP_TYPE>>> extensions = getAllExtensions();
+    ContentAssistColumnPrepareLookupChain<VALUE, LOOKUP_TYPE> chain = new ContentAssistColumnPrepareLookupChain<VALUE, LOOKUP_TYPE>(extensions);
+    chain.execPrepareLookup(call, row);
+  }
+
+  protected static class LocalContentAssistColumnExtension<VALUE, LOOKUP_TYPE, OWNER extends AbstractContentAssistColumn<VALUE, LOOKUP_TYPE>> extends LocalColumnExtension<VALUE, OWNER> implements IContentAssistColumnExtension<VALUE, LOOKUP_TYPE, OWNER> {
+
+    public LocalContentAssistColumnExtension(OWNER owner) {
+      super(owner);
+    }
+
+    @Override
+    public LOOKUP_TYPE execConvertValueToKey(ContentAssistColumnConvertValueToKeyChain<VALUE, LOOKUP_TYPE> chain, VALUE value) {
+      return getOwner().execConvertValueToKey(value);
+    }
+
+    @Override
+    public void execPrepareLookup(ContentAssistColumnPrepareLookupChain<VALUE, LOOKUP_TYPE> chain, ILookupCall<LOOKUP_TYPE> call, ITableRow row) {
+      getOwner().execPrepareLookup(call, row);
+    }
+  }
+
+  @Override
+  protected IContentAssistColumnExtension<VALUE, LOOKUP_TYPE, ? extends AbstractContentAssistColumn<VALUE, LOOKUP_TYPE>> createLocalExtension() {
+    return new LocalContentAssistColumnExtension<VALUE, LOOKUP_TYPE, AbstractContentAssistColumn<VALUE, LOOKUP_TYPE>>(this);
   }
 
 }

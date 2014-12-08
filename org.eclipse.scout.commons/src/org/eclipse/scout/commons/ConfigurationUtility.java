@@ -14,7 +14,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -23,7 +22,6 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.eclipse.scout.commons.annotations.ClassId;
-import org.eclipse.scout.commons.annotations.IOrdered;
 import org.eclipse.scout.commons.annotations.InjectFieldTo;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.Replace;
@@ -75,45 +73,6 @@ public final class ConfigurationUtility {
   }
 
   /**
-   * Sorts the elements according to their order:
-   * <ol>
-   * <li>If an {@link Order} annotation is present, its {@link Order#value()} is used</li>
-   * <li>If a {@link Replace} annotation is present, the superclass' order is used</li>
-   * <li>If the object implements {@link IOrdered}, {@link IOrdered#getOrder()} is used</li>
-   * <li>Finally, the index in the original collection is used</li>
-   * </ol>
-   *
-   * @since 3.8.1
-   */
-  public static <T> List<T> sortByOrder(Collection<T> list) {
-    if (list == null) {
-      return null;
-    }
-    TreeMap<CompositeObject, T> sortMap = new TreeMap<CompositeObject, T>();
-    int index = 0;
-    for (T element : list) {
-      Class<?> c = element.getClass();
-      double order;
-      Order orderAnnotation;
-      while ((orderAnnotation = c.getAnnotation(Order.class)) == null && c.isAnnotationPresent(Replace.class)) {
-        c = c.getSuperclass();
-      }
-      if (orderAnnotation != null) {
-        order = orderAnnotation.value();
-      }
-      else if (element instanceof IOrdered) {
-        order = ((IOrdered) element).getOrder();
-      }
-      else {
-        order = (double) index;
-      }
-      sortMap.put(new CompositeObject(order, index), element);
-      index++;
-    }
-    return CollectionUtility.arrayList(sortMap.values());
-  }
-
-  /**
    * Filters the given class array and returns the first occurrence of an
    * instantiable class of filter
    *
@@ -160,7 +119,7 @@ public final class ConfigurationUtility {
    */
   @SuppressWarnings("unchecked")
   public static <T> List<Class<T>> filterClasses(Class[] classes, Class<T> filter) {
-    List<Class<T>> result = new ArrayList<Class<T>>();
+    List<Class<T>> result = new ArrayList<Class<T>>(classes.length);
     for (Class c : classes) {
       if (filter.isAssignableFrom(c) && !Modifier.isAbstract(c.getModifiers())) {
         result.add(c);
@@ -176,8 +135,8 @@ public final class ConfigurationUtility {
    * @since 3.8.1
    */
   @SuppressWarnings("unchecked")
-  public static <T> Class<T>[] filterClassesIgnoringInjectFieldAnnotation(Class[] classes, Class<T> filter) {
-    ArrayList<Class<T>> list = new ArrayList<Class<T>>();
+  public static <T> List<Class<T>> filterClassesIgnoringInjectFieldAnnotation(Class[] classes, Class<T> filter) {
+    List<Class<T>> list = new ArrayList<Class<T>>(classes.length);
     for (Class c : classes) {
       if (filter.isAssignableFrom(c) && !Modifier.isAbstract(c.getModifiers())) {
         if (!isInjectFieldAnnotationPresent(c)) {
@@ -185,7 +144,7 @@ public final class ConfigurationUtility {
         }
       }
     }
-    return list.toArray(new Class[0]);
+    return list;
   }
 
   /**
@@ -195,8 +154,8 @@ public final class ConfigurationUtility {
    * @since 3.8.1
    */
   @SuppressWarnings("unchecked")
-  public static <T> Class<T>[] filterClassesWithInjectFieldAnnotation(Class[] classes, Class<T> filter) {
-    ArrayList<Class<T>> list = new ArrayList<Class<T>>();
+  public static <T> List<Class<T>> filterClassesWithInjectFieldAnnotation(Class[] classes, Class<T> filter) {
+    List<Class<T>> list = new ArrayList<Class<T>>(classes.length);
     for (Class c : classes) {
       if (filter.isAssignableFrom(c) && !Modifier.isAbstract(c.getModifiers())) {
         if (isInjectFieldAnnotationPresent(c)) {
@@ -204,7 +163,7 @@ public final class ConfigurationUtility {
         }
       }
     }
-    return list.toArray(new Class[0]);
+    return list;
   }
 
   /**
@@ -400,7 +359,7 @@ public final class ConfigurationUtility {
    */
   public static <T> Set<Class<? extends T>> getReplacingLeafClasses(List<? extends Class<? extends T>> classes) {
     // gather all replacing and replaced classes (i.e. those annotated with @Replace and their super classes)
-    Set<Class<? extends T>> replacingClasses = new HashSet<Class<? extends T>>();
+    Set<Class<? extends T>> replacingClasses = new HashSet<Class<? extends T>>(classes.size());
     Set<Class<?>> replacedClasses = new HashSet<Class<?>>();
     for (Class<? extends T> c : classes) {
       if (c.isAnnotationPresent(Replace.class)) {

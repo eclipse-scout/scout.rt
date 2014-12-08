@@ -20,6 +20,7 @@ import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.IDateColumnExtension;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -237,6 +238,18 @@ public abstract class AbstractDateColumn extends AbstractColumn<Date> implements
       df.setLenient(true);
     }
     return df;
+  }
+
+  protected static class LocalDateColumnExtension<OWNER extends AbstractDateColumn> extends LocalColumnExtension<Date, OWNER> implements IDateColumnExtension<OWNER> {
+
+    public LocalDateColumnExtension(OWNER owner) {
+      super(owner);
+    }
+  }
+
+  @Override
+  protected IDateColumnExtension<? extends AbstractDateColumn> createLocalExtension() {
+    return new LocalDateColumnExtension<AbstractDateColumn>(this);
   }
 
 }

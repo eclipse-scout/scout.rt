@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.htmlfield;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
@@ -25,6 +26,8 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.htmlfield.HtmlFieldChains.HtmlFieldHyperlinkActionChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.htmlfield.IHtmlFieldExtension;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.browserfield.AbstractBrowserField;
@@ -126,7 +129,7 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
   @Override
   public void doHyperlinkAction(URL url) throws ProcessingException {
     if (url != null) {
-      execHyperlinkAction(url, url.getPath(), "local".equals(url.getHost()));
+      interceptHyperlinkAction(url, url.getPath(), "local".equals(url.getHost()));
     }
   }
 
@@ -287,5 +290,34 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
    */
   public void setSpellCheckAsYouTypeEnabled(boolean monitorSpelling) {
     m_monitorSpelling = Boolean.valueOf(monitorSpelling);
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public List<? extends IHtmlFieldExtension<? extends AbstractHtmlField>> getAllExtensions() {
+    return (List<? extends IHtmlFieldExtension<? extends AbstractHtmlField>>) super.getAllExtensions();
+  }
+
+  protected final void interceptHyperlinkAction(URL url, String path, boolean local) throws ProcessingException {
+    List<? extends IHtmlFieldExtension<? extends AbstractHtmlField>> extensions = getAllExtensions();
+    HtmlFieldHyperlinkActionChain chain = new HtmlFieldHyperlinkActionChain(extensions);
+    chain.execHyperlinkAction(url, path, local);
+  }
+
+  protected static class LocalHtmlFieldExtension<OWNER extends AbstractHtmlField> extends LocalValueFieldExtension<String, OWNER> implements IHtmlFieldExtension<OWNER> {
+
+    public LocalHtmlFieldExtension(OWNER owner) {
+      super(owner);
+    }
+
+    @Override
+    public void execHyperlinkAction(HtmlFieldHyperlinkActionChain chain, URL url, String path, boolean local) throws ProcessingException {
+      getOwner().execHyperlinkAction(url, path, local);
+    }
+  }
+
+  @Override
+  protected IHtmlFieldExtension<? extends AbstractHtmlField> createLocalExtension() {
+    return new LocalHtmlFieldExtension<AbstractHtmlField>(this);
   }
 }

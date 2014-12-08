@@ -10,10 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.button;
 
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.button.IRadioButtonExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.AbstractRadioButtonGroup;
-import org.eclipse.scout.commons.annotations.ClassId;
 
 /**
  * Abstract class for a RadioButton.
@@ -67,5 +68,17 @@ public abstract class AbstractRadioButton<T> extends AbstractButton implements I
   @Override
   public void setRadioValue(T o) {
     propertySupport.setProperty(PROP_RADIOVALUE, o);
+  }
+
+  protected static class LocalRadioButtonExtension<T, OWNER extends AbstractRadioButton<T>> extends LocalButtonExtension<OWNER> implements IRadioButtonExtension<T, OWNER> {
+
+    public LocalRadioButtonExtension(OWNER owner) {
+      super(owner);
+    }
+  }
+
+  @Override
+  protected IRadioButtonExtension<T, ? extends AbstractRadioButton<T>> createLocalExtension() {
+    return new LocalRadioButtonExtension<T, AbstractRadioButton<T>>(this);
   }
 }

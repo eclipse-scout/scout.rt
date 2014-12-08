@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.splitbox;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.splitbox.ISplitBoxExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractCompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.splitbox.internal.SplitBoxGrid;
 
@@ -171,5 +172,17 @@ public abstract class AbstractSplitBox extends AbstractCompositeField implements
 
   private class P_UIFacade implements ISplitboxUIFacade {
   } // end UIFacade
+
+  protected static class LocalSplitBoxExtension<OWNER extends AbstractSplitBox> extends LocalCompositeFieldExtension<OWNER> implements ISplitBoxExtension<OWNER> {
+
+    public LocalSplitBoxExtension(OWNER owner) {
+      super(owner);
+    }
+  }
+
+  @Override
+  protected ISplitBoxExtension<? extends AbstractSplitBox> createLocalExtension() {
+    return new LocalSplitBoxExtension<AbstractSplitBox>(this);
+  }
 
 }

@@ -6,7 +6,7 @@ import org.eclipse.scout.rt.client.mobile.Icons;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.service.SERVICES;
 
-public class AbstractMobileBackAction extends AbstractMenu {
+public abstract class AbstractMobileBackAction extends AbstractMenu {
   private P_BreadCrumbsListener m_breadCrumbsListener;
 
   @Override

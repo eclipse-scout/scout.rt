@@ -29,6 +29,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.BeanUtility;
@@ -42,6 +43,7 @@ import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.annotations.OrderedComparator;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.beans.FastPropertyDescriptor;
 import org.eclipse.scout.commons.beans.IPropertyFilter;
@@ -49,23 +51,41 @@ import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.holders.Holder;
+import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.xmlparser.SimpleXmlElement;
 import org.eclipse.scout.rt.client.BlockingCondition;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormAddSearchTermsChain;
+import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormCheckFieldsChain;
+import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormCloseTimerChain;
+import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormCreateFormDataChain;
+import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormDataChangedChain;
+import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormDisposeFormChain;
+import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormFormActivatedChain;
+import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormInactivityTimerChain;
+import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormInitFormChain;
+import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormOnCloseRequestChain;
+import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormOnVetoExceptionChain;
+import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormResetSearchFilterChain;
+import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormStoredChain;
+import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormTimerChain;
+import org.eclipse.scout.rt.client.extension.ui.form.FormChains.FormValidateChain;
+import org.eclipse.scout.rt.client.extension.ui.form.IFormExtension;
+import org.eclipse.scout.rt.client.extension.ui.form.MoveFormFieldsHandler;
 import org.eclipse.scout.rt.client.services.common.search.ISearchFilterService;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.WeakDataChangeListener;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
-import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.FileChooser;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormFieldFilter;
 import org.eclipse.scout.rt.client.ui.form.fields.IValidateContentDescriptor;
@@ -88,17 +108,27 @@ import org.eclipse.scout.rt.client.ui.wizard.IWizardStep;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
+import org.eclipse.scout.rt.shared.data.form.FormDataUtility;
+import org.eclipse.scout.rt.shared.data.form.IPropertyHolder;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldData;
 import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
+import org.eclipse.scout.rt.shared.extension.AbstractExtension;
+import org.eclipse.scout.rt.shared.extension.ContributionComposite;
+import org.eclipse.scout.rt.shared.extension.ExtensionUtility;
+import org.eclipse.scout.rt.shared.extension.IContributionOwner;
+import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
+import org.eclipse.scout.rt.shared.extension.IExtension;
+import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.eclipse.scout.service.SERVICES;
 
 @FormData(value = AbstractFormData.class, sdkCommand = SdkCommand.USE)
-public abstract class AbstractForm extends AbstractPropertyObserver implements IForm {
+public abstract class AbstractForm extends AbstractPropertyObserver implements IForm, IExtensibleObject, IContributionOwner {
+
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractForm.class);
 
   private boolean m_initialized;
@@ -138,13 +168,15 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   // current timers
   private P_CloseTimer m_scoutCloseTimer;
-  private HashMap<String, P_Timer> m_scoutTimerMap;
+  private Map<String, P_Timer> m_scoutTimerMap;
   private String m_iconId;
   private DataChangeListener m_internalDataChangeListener;
-  private IEventHistory<FormEvent> m_eventHistory;
+  private final IEventHistory<FormEvent> m_eventHistory;
 
   // field replacement support
   private Map<Class<?>, Class<? extends IFormField>> m_fieldReplacements;
+  private IContributionOwner m_contributionHolder;
+  private final ObjectExtensions<AbstractForm, IFormExtension<? extends AbstractForm>> m_objectExtensions;
 
   private String m_classId;
 
@@ -163,17 +195,47 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     m_visibleGranted = true;
     m_formLoading = true;
     m_blockingCondition = new BlockingCondition(false);
+    m_objectExtensions = new ObjectExtensions<AbstractForm, IFormExtension<? extends AbstractForm>>(this);
     if (callInitializer) {
       callInitializer();
     }
   }
 
+  @Override
+  public List<? extends IFormExtension<? extends AbstractForm>> getAllExtensions() {
+    return m_objectExtensions.getAllExtensions();
+  }
+
+  @Override
+  public <T extends IExtension<?>> T getExtension(Class<T> c) {
+    return m_objectExtensions.getExtension(c);
+  }
+
+  @Override
+  public final List<Object> getAllContributions() {
+    return m_contributionHolder.getAllContributions();
+  }
+
+  @Override
+  public final <T> List<T> getContributionsByClass(Class<T> type) {
+    return m_contributionHolder.getContributionsByClass(type);
+  }
+
+  @Override
+  public final <T> T getContribution(Class<T> contribution) {
+    return m_contributionHolder.getContribution(contribution);
+  }
+
   protected void callInitializer() throws ProcessingException {
     if (!m_initialized) {
-      initConfig();
+      interceptInitConfig();
       postInitConfig();
       m_initialized = true;
     }
+  }
+
+  protected IFormExtension<? extends AbstractForm> createLocalExtension() {
+    return new LocalFormExtension<AbstractForm>(this);
   }
 
   /*
@@ -357,7 +419,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
   /**
    * This method is called in order to check field validity.<br>
-   * This method is called before {@link IFormHandler#execCheckFields()} and
+   * This method is called before {@link IFormHandler#interceptCheckFields()} and
    * before the form is validated and stored.<br>
    * After this method, the form is checking fields itself and displaying a
    * dialog with missing and invalid fields.
@@ -377,7 +439,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   /**
    * This method is called in order to update derived states like button
    * enablings.<br>
-   * This method is called before {@link IFormHandler#execValidate()} and before
+   * This method is called before {@link IFormHandler#interceptValidate()} and before
    * the form is stored.
    *
    * @return true when validate is successful, false to silently cancel the
@@ -469,72 +531,98 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   protected void execAddSearchTerms(SearchFilter search) {
   }
 
-  private List<Class<IKeyStroke>> getConfiguredKeyStrokes() {
-    Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    return ConfigurationUtility.filterClasses(dca, IKeyStroke.class);
-  }
-
   private Class<? extends IGroupBox> getConfiguredMainBox() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     return ConfigurationUtility.filterClassIgnoringInjectFieldAnnotation(dca, IGroupBox.class);
   }
 
-  private Class<? extends IFormField>[] getConfiguredInjectedFields() {
+  private List<Class<IFormField>> getConfiguredInjectedFields() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     return ConfigurationUtility.filterClassesWithInjectFieldAnnotation(dca, IFormField.class);
   }
 
-  protected List<Class<? extends IToolButton>> getConfiguredToolButtons() {
+  protected List<Class<IToolButton>> getConfiguredToolButtons() {
     Class<?>[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    List<Class<IToolButton>> filtered = ConfigurationUtility.filterClasses(dca, IToolButton.class);
-    return ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IToolButton.class);
+    return ConfigurationUtility.filterClasses(dca, IToolButton.class);
+  }
+
+  protected final void interceptInitConfig() throws ProcessingException {
+    final Holder<ProcessingException> exceptionHolder = new Holder<ProcessingException>(ProcessingException.class, null);
+    m_objectExtensions.initConfig(createLocalExtension(), new Runnable() {
+      @Override
+      public void run() {
+        try {
+          initConfig();
+        }
+        catch (ProcessingException e) {
+          exceptionHolder.setValue(e);
+        }
+      }
+    });
+    if (exceptionHolder.getValue() != null) {
+      throw exceptionHolder.getValue();
+    }
   }
 
   protected void initConfig() throws ProcessingException {
     m_uiFacade = new P_UIFacade();
     m_scoutTimerMap = new HashMap<String, P_Timer>();
     m_autoRegisterInDesktopOnStart = true;
+    m_contributionHolder = new ContributionComposite(this);
     setToolbarLocation(getConfiguredToolbarLocation());
-    // toolbuttons
-    List<IToolButton> toolButtonList = new ArrayList<IToolButton>();
-    for (Class<? extends IToolButton> clazz : getConfiguredToolButtons()) {
+
+    // tool buttons
+    List<Class<IToolButton>> configuredToolButtons = getConfiguredToolButtons();
+    List<IToolButton> toolButtonList = new ArrayList<IToolButton>(configuredToolButtons.size());
+    for (Class<? extends IToolButton> clazz : configuredToolButtons) {
       try {
         IToolButton b = ConfigurationUtility.newInnerInstance(this, clazz);
         toolButtonList.add(b);
-      }// end try
+      }
       catch (Throwable t) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("toobutton: " + clazz.getName(), t));
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unable to create ToolButton '" + clazz.getName() + "'.", t));
       }
     }
+    List<IToolButton> contributedToolButtons = m_contributionHolder.getContributionsByClass(IToolButton.class);
+    toolButtonList.addAll(contributedToolButtons);
+    ExtensionUtility.moveModelObjects(toolButtonList);
+    Collections.sort(toolButtonList, new OrderedComparator());
+
     m_toolbuttons = toolButtonList;
+
     // prepare injected fields
-    Class<? extends IFormField>[] fieldArray = getConfiguredInjectedFields();
+    List<Class<IFormField>> fieldArray = getConfiguredInjectedFields();
     DefaultFormFieldInjection injectedFields = null;
+
     IGroupBox rootBox = getRootGroupBox();
     try {
-      if (fieldArray.length > 0) {
+      if (fieldArray.size() > 0) {
         injectedFields = new DefaultFormFieldInjection(this);
         injectedFields.addFields(fieldArray);
         FormFieldInjectionThreadLocal.push(injectedFields);
       }
-      //
+
       // add mainbox if getter returns null
       if (rootBox == null) {
-        Class<? extends IGroupBox> mainBoxClass = getConfiguredMainBox();
-        try {
-          m_mainBox = ConfigurationUtility.newInnerInstance(this, mainBoxClass);
-        }
-        catch (Throwable t) {
-          String mainBoxName = null;
-          if (mainBoxClass == null) {
-            mainBoxName = "null";
+        List<IGroupBox> contributedFields = m_contributionHolder.getContributionsByClass(IGroupBox.class);
+        rootBox = CollectionUtility.firstElement(contributedFields);
+        if (rootBox == null) {
+          Class<? extends IGroupBox> mainBoxClass = getConfiguredMainBox();
+          try {
+            rootBox = ConfigurationUtility.newInnerInstance(this, mainBoxClass);
           }
-          else {
-            mainBoxName = mainBoxClass.getName();
+          catch (Throwable t) {
+            String mainBoxName = null;
+            if (mainBoxClass == null) {
+              mainBoxName = "null";
+            }
+            else {
+              mainBoxName = mainBoxClass.getName();
+            }
+            SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + mainBoxName + "'.", t));
           }
-          SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + mainBoxName + "'.", t));
         }
-        rootBox = getRootGroupBox();
+        m_mainBox = rootBox;
       }
     }
     finally {
@@ -543,9 +631,15 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
         FormFieldInjectionThreadLocal.pop(injectedFields);
       }
     }
-    rootBox.setFormInternal(this);
-    rootBox.setMainBox(true);
-    rootBox.updateKeyStrokes();
+    if (rootBox != null) {
+      rootBox.setFormInternal(this);
+      rootBox.setMainBox(true);
+      rootBox.updateKeyStrokes();
+    }
+
+    // move form fields
+    new MoveFormFieldsHandler(this).moveFields();
+
     //
     if (getConfiguredCloseTimer() > 0) {
       setCloseTimer(getConfiguredCloseTimer());
@@ -705,7 +799,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       m_internalDataChangeListener = new WeakDataChangeListener() {
         @Override
         public void dataChanged(Object... innerDataTypes) throws ProcessingException {
-          execDataChanged(innerDataTypes);
+          interceptDataChanged(innerDataTypes);
         }
       };
     }
@@ -794,7 +888,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       e.addContextMessage(AbstractForm.this.getClass().getSimpleName());
       disposeFormInternal();
       if (e instanceof VetoException) {
-        execOnVetoException((VetoException) e, e.getStatus().getCode());
+        interceptOnVetoException((VetoException) e, e.getStatus().getCode());
       }
       else {
         throw e;
@@ -864,31 +958,78 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     }
   }
 
+  private void exportExtensionProperties(Object o, IPropertyHolder target) throws ProcessingException {
+    if (!(o instanceof IExtensibleObject)) {
+      return;
+    }
+    for (IExtension<?> ex : ((IExtensibleObject) o).getAllExtensions()) {
+      Class<?> dto = FormDataUtility.getDataAnnotationValue(ex.getClass());
+      if (dto != null && !Object.class.equals(dto)) {
+        Object propertyTarget = target.getContribution(dto);
+        Map<String, Object> fieldProperties = BeanUtility.getProperties(ex, AbstractFormField.class, new FormDataPropertyFilter());
+        BeanUtility.setProperties(propertyTarget, fieldProperties, false, null);
+      }
+    }
+  }
+
   @Override
-  public void exportFormData(AbstractFormData target) throws ProcessingException {
+  public void exportFormData(final AbstractFormData target) throws ProcessingException {
     // locally declared form properties
     Map<String, Object> properties = BeanUtility.getProperties(this, AbstractForm.class, new FormDataPropertyFilter());
     BeanUtility.setProperties(target, properties, false, null);
+    // properties in extensions of form
+    exportExtensionProperties(this, target);
+    final Set<IFormField> exportedFields = new HashSet<IFormField>();
+
     // all fields
     Map<Integer, Map<String/* qualified field id */, AbstractFormFieldData>> breathFirstMap = target.getAllFieldsRec();
     for (Map<String/* qualified field id */, AbstractFormFieldData> targetMap : breathFirstMap.values()) {
       for (Map.Entry<String, AbstractFormFieldData> e : targetMap.entrySet()) {
         String fieldQId = e.getKey();
         AbstractFormFieldData data = e.getValue();
+
         FindFieldByFormDataIdVisitor v = new FindFieldByFormDataIdVisitor(fieldQId, this);
         visitFields(v);
         IFormField f = v.getField();
         if (f != null) {
-          // locally declared field properties
+          // field properties
           properties = BeanUtility.getProperties(f, AbstractFormField.class, new FormDataPropertyFilter());
           BeanUtility.setProperties(data, properties, false, null);
+          exportExtensionProperties(f, data);
+
           // field state
           f.exportFormFieldData(data);
+
+          // remember exported fields
+          exportedFields.add(f);
         }
         else {
-          LOG.warn("cannot find field data for '" + fieldQId + "' in form " + getClass().getName() + "'");
+          LOG.warn("Cannot find field with id '" + fieldQId + "' in form '" + getClass().getName() + "' for DTO '" + data.getClass().getName() + "'.");
         }
       }
+    }
+
+    // visit remaining fields (there could be an extension with properties e.g. on a groupbox)
+    final Holder<ProcessingException> exHolder = new Holder<ProcessingException>(ProcessingException.class);
+    visitFields(new IFormFieldVisitor() {
+      @Override
+      public boolean visitField(IFormField field, int level, int fieldIndex) {
+        if (exportedFields.contains(field)) {
+          // already exported -> skip
+          return true;
+        }
+
+        try {
+          exportExtensionProperties(field, target);
+        }
+        catch (ProcessingException e) {
+          exHolder.setValue(e);
+        }
+        return exHolder.getValue() == null;
+      }
+    });
+    if (exHolder.getValue() != null) {
+      throw exHolder.getValue();
     }
   }
 
@@ -907,26 +1048,122 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     importFormData(source, valueChangeTriggersEnabled, filter, null);
   }
 
+  private void removeNotSetProperties(IPropertyHolder dto, Map<String, Object> properties) {
+    for (Iterator<String> it = properties.keySet().iterator(); it.hasNext();) {
+      String propertyId = it.next();
+      AbstractPropertyData pd = dto.getPropertyById(propertyId);
+      if (pd != null && !pd.isValueSet()) {
+        it.remove();
+      }
+    }
+  }
+
+  private void importProperties(IPropertyHolder source, Object target, Class<?> stopClass, IPropertyFilter filter) throws ProcessingException {
+    // local properties
+    Map<String, Object> properties = BeanUtility.getProperties(source, stopClass, filter);
+    if (!properties.isEmpty()) {
+      removeNotSetProperties(source, properties);
+      BeanUtility.setProperties(target, properties, false, null);
+    }
+
+    // properties of the extensions
+    List<Object> allContributions = source.getAllContributions();
+    if (!allContributions.isEmpty()) {
+      for (Object con : allContributions) {
+        if (con instanceof IPropertyHolder) {
+          IPropertyHolder data = (IPropertyHolder) con;
+          Map<String, Object> extensionProperties = BeanUtility.getProperties(data, stopClass, filter);
+          if (!extensionProperties.isEmpty()) {
+            Object clientPart = getClientPartOfExtensionOrContributionRec(data, target);
+            if (clientPart != null) {
+              removeNotSetProperties(data, extensionProperties);
+              BeanUtility.setProperties(clientPart, extensionProperties, false, null);
+            }
+            else {
+              LOG.warn("cannot find extension for property data '" + data.getClass().getName() + "' in form '" + this.getClass().getName() + "'.");
+            }
+          }
+        }
+      }
+    }
+  }
+
+  private Object getClientPartOfExtensionOrContribution(Object extToSearch, Object owner) {
+    if (owner instanceof IExtensibleObject) {
+      IExtensibleObject exOwner = (IExtensibleObject) owner;
+      for (IExtension<?> ex : exOwner.getAllExtensions()) {
+        Class<?> dto = FormDataUtility.getDataAnnotationValue(ex.getClass());
+        if (extToSearch.getClass().equals(dto)) {
+          return ex;
+        }
+      }
+    }
+    if (owner instanceof IContributionOwner) {
+      IContributionOwner compOwner = (IContributionOwner) owner;
+      for (Object o : compOwner.getAllContributions()) {
+        FormData annotation = o.getClass().getAnnotation(FormData.class);
+        if (annotation != null && annotation.value().equals(extToSearch.getClass())) {
+          return o;
+        }
+      }
+    }
+    return null;
+  }
+
+  private Object getClientPartOfExtensionOrContributionRec(final Object extToSearch, Object owner) {
+    Object ext = getClientPartOfExtensionOrContribution(extToSearch, owner);
+    if (ext != null) {
+      return ext;
+    }
+
+    // search for the extension in the children
+    final IHolder<Object> result = new Holder<Object>(Object.class);
+    IFormFieldVisitor visitor = new IFormFieldVisitor() {
+      @Override
+      public boolean visitField(IFormField field, int level, int fieldIndex) {
+        result.setValue(getClientPartOfExtensionOrContribution(extToSearch, field));
+        return result.getValue() == null;
+      }
+    };
+    if (owner instanceof IForm) {
+      ((IForm) owner).visitFields(visitor);
+    }
+    else if (owner instanceof ICompositeField) {
+      ((ICompositeField) owner).visitFields(visitor, 0);
+    }
+    else if (owner instanceof IWrappedFormField) {
+      ((IWrappedFormField) owner).visitFields(visitor, 0);
+    }
+    return result.getValue();
+  }
+
+  private static Class<?> getFieldStopClass(Object data) {
+    if (data instanceof AbstractTableFieldData) {
+      return AbstractTableFieldData.class;
+    }
+    else if (data instanceof AbstractValueFieldData) {
+      return AbstractValueFieldData.class;
+    }
+    else {
+      return AbstractFormFieldData.class;
+    }
+  }
+
   @Override
   public void importFormData(AbstractFormData source, boolean valueChangeTriggersEnabled, IPropertyFilter filter, IFormFieldFilter formFieldFilter) throws ProcessingException {
     if (filter == null) {
       filter = new FormDataPropertyFilter();
     }
-    // locally declared form properties
-    Map<String, Object> properties = BeanUtility.getProperties(source, AbstractFormData.class, filter);
-    for (Iterator<String> it = properties.keySet().iterator(); it.hasNext();) {
-      AbstractPropertyData pd = source.getPropertyById(it.next());
-      if (pd != null && !pd.isValueSet()) {
-        it.remove();
-      }
-    }
-    BeanUtility.setProperties(this, properties, false, null);
-    // sort fields, first non-slave fields, then slave fields in transitive
-    // order
+
+    // form properties
+    importProperties(source, this, AbstractFormData.class, filter);
+
+    // sort fields, first non-slave fields, then slave fields in transitive order
     LinkedList<IFormField> masterList = new LinkedList<IFormField>();
     LinkedList<IFormField> slaveList = new LinkedList<IFormField>();
     HashMap<IFormField, AbstractFormFieldData> dataMap = new HashMap<IFormField, AbstractFormFieldData>();
-    // all fields
+
+    // collect fields and split them into masters/slaves
     Map<Integer, Map<String/* qualified field id */, AbstractFormFieldData>> breathFirstMap = source.getAllFieldsRec();
     for (Map<String/* qualified field id */, AbstractFormFieldData> sourceMap : breathFirstMap.values()) {
       for (Map.Entry<String, AbstractFormFieldData> e : sourceMap.entrySet()) {
@@ -944,7 +1181,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
                 slaveList.add(index + 1, f);
               }
               else {
-                slaveList.add(0, f);
+                slaveList.addFirst(f);
               }
             }
             else {
@@ -952,59 +1189,25 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
             }
           }
           else {
-            LOG.warn("cannot find field data for '" + fieldQId + " in form " + getClass().getName() + "'");
+            LOG.warn("cannot find field data for '" + fieldQId + "' in form '" + getClass().getName() + "'.");
           }
         }
       }
     }
     for (IFormField f : masterList) {
-      AbstractFormFieldData data = dataMap.get(f);
-      // locally declared field properties
-      Class stopClass;
-      if (data instanceof AbstractTableFieldData) {
-        stopClass = AbstractTableFieldData.class;
-      }
-      else if (data instanceof AbstractValueFieldData) {
-        stopClass = AbstractValueFieldData.class;
-      }
-      else {
-        stopClass = AbstractFormFieldData.class;
-      }
-      properties = BeanUtility.getProperties(data, stopClass, filter);
-      for (Iterator<String> it = properties.keySet().iterator(); it.hasNext();) {
-        AbstractPropertyData pd = data.getPropertyById(it.next());
-        if (pd != null && !pd.isValueSet()) {
-          it.remove();
-        }
-      }
-      BeanUtility.setProperties(f, properties, false, null);
-      // field state
-      f.importFormFieldData(data, valueChangeTriggersEnabled);
+      importFormField(f, dataMap, valueChangeTriggersEnabled, filter);
     }
     for (IFormField f : slaveList) {
-      AbstractFormFieldData data = dataMap.get(f);
-      // locally declared field properties
-      Class stopClass;
-      if (data instanceof AbstractTableFieldData) {
-        stopClass = AbstractTableFieldData.class;
-      }
-      else if (data instanceof AbstractValueFieldData) {
-        stopClass = AbstractValueFieldData.class;
-      }
-      else {
-        stopClass = AbstractFormFieldData.class;
-      }
-      properties = BeanUtility.getProperties(data, stopClass, filter);
-      for (Iterator<String> it = properties.keySet().iterator(); it.hasNext();) {
-        AbstractPropertyData pd = data.getPropertyById(it.next());
-        if (pd != null && !pd.isValueSet()) {
-          it.remove();
-        }
-      }
-      BeanUtility.setProperties(f, properties, false, null);
-      // field state
-      f.importFormFieldData(data, valueChangeTriggersEnabled);
+      importFormField(f, dataMap, valueChangeTriggersEnabled, filter);
     }
+  }
+
+  private void importFormField(IFormField f, Map<IFormField, AbstractFormFieldData> dataMap, boolean valueChangeTriggersEnabled, IPropertyFilter filter) throws ProcessingException {
+    AbstractFormFieldData data = dataMap.get(f);
+    // form field properties
+    importProperties(data, f, getFieldStopClass(data), filter);
+    // field state
+    f.importFormFieldData(data, valueChangeTriggersEnabled);
   }
 
   public static String parseFormId(String className) {
@@ -1148,7 +1351,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       m_searchFilter = filter;
     }
     try {
-      execResetSearchFilter(m_searchFilter);
+      interceptResetSearchFilter(m_searchFilter);
     }
     catch (ProcessingException e) {
       SERVICES.getService(IExceptionHandlerService.class).handleException(e);
@@ -1167,7 +1370,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
    * <p>
    * May call {@link #setSearchFilter(SearchFilter)}
    * <p>
-   * Implement {@link #execCreateFormData()} to automatically attach a filled form data to the search filter (since
+   * Implement {@link #interceptCreateFormData()} to automatically attach a filled form data to the search filter (since
    * 3.8).
    *
    * @param searchFilter
@@ -1181,10 +1384,10 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     // do not use visitor, so children can block traversal on whole subtrees
     getRootGroupBox().applySearch(searchFilter);
     // add verbose form texts
-    execAddSearchTerms(searchFilter);
+    interceptAddSearchTerms(searchFilter);
     // override may add form data
     try {
-      AbstractFormData data = execCreateFormData();
+      AbstractFormData data = interceptCreateFormData();
       if (data != null) {
         exportFormData(data);
         getSearchFilter().setFormData(data);
@@ -1201,7 +1404,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   /**
    * Convenience to add form data to search filter and load/store form data.
    * override this method to create an empty search form data that can be used for example by
-   * {@link #execResetSearchFilter(SearchFilter)}
+   * {@link #interceptResetSearchFilter(SearchFilter)}
    *
    * @since 3.8
    */
@@ -1284,7 +1487,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     FormUtility.initFormFields(this);
     ActionUtility.initActions(getToolButtons());
     // custom
-    execInitForm();
+    interceptInitForm();
   }
 
   protected void initFormInternal() throws ProcessingException {
@@ -1346,7 +1549,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       rebuildSearchFilter();
       m_searchFilter.setCompleted(true);
       getHandler().onStore();
-      execStored();
+      interceptStored();
       if (!m_formStored) {
         //the form was marked as not stored in AbstractFormHandler#execStore() or AbstractForm#execStored().
         ProcessingException e = new ProcessingException("Form was marked as not stored.");
@@ -1402,7 +1605,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   protected void throwVetoExceptionInternal(ProcessingException e) throws ProcessingException {
     if (e instanceof VetoException) {
       if (!e.isConsumed()) {
-        execOnVetoException((VetoException) e, e.getStatus().getCode());
+        interceptOnVetoException((VetoException) e, e.getStatus().getCode());
         // if it was not re-thrown it is assumed to be consumed
         e.consume();
       }
@@ -1420,7 +1623,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   @Override
   public void validateForm() throws ProcessingException {
     m_currentValidateContentDescriptor = null;
-    if (!execCheckFields()) {
+    if (!interceptCheckFields()) {
       VetoException veto = new VetoException("Validate " + getClass().getSimpleName());
       veto.consume();
       throw veto;
@@ -1477,7 +1680,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       VetoException veto = new VetoException(introText, buf.toString());
       throw veto;
     }
-    if (!execValidate()) {
+    if (!interceptValidate()) {
       VetoException veto = new VetoException("Validate " + getClass().getSimpleName());
       veto.consume();
       throw veto;
@@ -1808,7 +2011,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
           for (IButton b : enabledSystemButtons) {
             b.setEnabledProcessingButton(false);
           }
-          execOnCloseRequest(kill, enabledSystemTypes);
+          interceptOnCloseRequest(kill, enabledSystemTypes);
         }
         finally {
           for (IButton b : enabledSystemButtons) {
@@ -1873,7 +2076,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     FormUtility.disposeFormFields(this);
     // dispose form configuration
     try {
-      execDisposeForm();
+      interceptDisposeForm();
     }
     catch (Throwable t) {
       LOG.warn("Form " + getClass().getName(), t);
@@ -2295,7 +2498,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
    */
   private void fireFormActivated() {
     try {
-      execFormActivated();
+      interceptFormActivated();
       fireFormEvent(new FormEvent(this, FormEvent.TYPE_ACTIVATED));
 
     }
@@ -2754,7 +2957,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
                   if (LOG.isInfoEnabled()) {
                     LOG.info("timer " + m_timerId);
                   }
-                  execTimer(m_timerId);
+                  interceptTimer(m_timerId);
                 }
                 catch (ProcessingException se) {
                   se.addContextMessage(ScoutTexts.get("FormTimerActivated") + " " + getTitle() + "." + m_timerId);
@@ -2811,7 +3014,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
           protected void runVoid(IProgressMonitor monitor) throws Throwable {
             try {
               if (isCloseTimerArmed()) {
-                execCloseTimer();
+                interceptCloseTimer();
               }
               else {
                 setSubTitle(null);
@@ -2870,4 +3073,183 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     }
   }// end private class
 
+  /**
+   * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
+   * any further chain elements.
+   */
+  protected static class LocalFormExtension<FORM extends AbstractForm> extends AbstractExtension<FORM> implements IFormExtension<FORM> {
+
+    /**
+     * @param owner
+     */
+    public LocalFormExtension(FORM owner) {
+      super(owner);
+    }
+
+    @Override
+    public void execCloseTimer(FormCloseTimerChain chain) throws ProcessingException {
+      getOwner().execCloseTimer();
+    }
+
+    @Override
+    public void execInactivityTimer(FormInactivityTimerChain chain) throws ProcessingException {
+      getOwner().execInactivityTimer();
+    }
+
+    @Override
+    public void execStored(FormStoredChain chain) throws ProcessingException {
+      getOwner().execStored();
+    }
+
+    @Override
+    public boolean execCheckFields(FormCheckFieldsChain chain) throws ProcessingException {
+      return getOwner().execCheckFields();
+    }
+
+    @Override
+    public void execResetSearchFilter(FormResetSearchFilterChain chain, SearchFilter searchFilter) throws ProcessingException {
+      getOwner().execResetSearchFilter(searchFilter);
+    }
+
+    @Override
+    public void execAddSearchTerms(FormAddSearchTermsChain chain, SearchFilter search) {
+      getOwner().execAddSearchTerms(search);
+    }
+
+    @Override
+    public void execOnVetoException(FormOnVetoExceptionChain chain, VetoException e, int code) throws ProcessingException {
+      getOwner().execOnVetoException(e, code);
+    }
+
+    @Override
+    public void execFormActivated(FormFormActivatedChain chain) throws ProcessingException {
+      getOwner().execFormActivated();
+    }
+
+    @Override
+    public void execDisposeForm(FormDisposeFormChain chain) throws ProcessingException {
+      getOwner().execDisposeForm();
+    }
+
+    @Override
+    public void execTimer(FormTimerChain chain, String timerId) throws ProcessingException {
+      getOwner().execTimer(timerId);
+    }
+
+    @Override
+    public AbstractFormData execCreateFormData(FormCreateFormDataChain chain) throws ProcessingException {
+      return getOwner().execCreateFormData();
+    }
+
+    @Override
+    public void execInitForm(FormInitFormChain chain) throws ProcessingException {
+      getOwner().execInitForm();
+    }
+
+    @Override
+    public boolean execValidate(FormValidateChain chain) throws ProcessingException {
+      return getOwner().execValidate();
+    }
+
+    @Override
+    public void execOnCloseRequest(FormOnCloseRequestChain chain, boolean kill, HashSet<Integer> enabledButtonSystemTypes) throws ProcessingException {
+      getOwner().execOnCloseRequest(kill, enabledButtonSystemTypes);
+    }
+
+    @Override
+    public void execDataChanged(FormDataChangedChain chain, Object... dataTypes) throws ProcessingException {
+      getOwner().execDataChanged(dataTypes);
+    }
+
+  }
+
+  protected final void interceptCloseTimer() throws ProcessingException {
+    List<? extends IFormExtension<? extends AbstractForm>> extensions = getAllExtensions();
+    FormCloseTimerChain chain = new FormCloseTimerChain(extensions);
+    chain.execCloseTimer();
+  }
+
+  protected final void interceptInactivityTimer() throws ProcessingException {
+    List<? extends IFormExtension<? extends AbstractForm>> extensions = getAllExtensions();
+    FormInactivityTimerChain chain = new FormInactivityTimerChain(extensions);
+    chain.execInactivityTimer();
+  }
+
+  protected final void interceptStored() throws ProcessingException {
+    List<? extends IFormExtension<? extends AbstractForm>> extensions = getAllExtensions();
+    FormStoredChain chain = new FormStoredChain(extensions);
+    chain.execStored();
+  }
+
+  protected final boolean interceptCheckFields() throws ProcessingException {
+    List<? extends IFormExtension<? extends AbstractForm>> extensions = getAllExtensions();
+    FormCheckFieldsChain chain = new FormCheckFieldsChain(extensions);
+    return chain.execCheckFields();
+  }
+
+  protected final void interceptResetSearchFilter(SearchFilter searchFilter) throws ProcessingException {
+    List<? extends IFormExtension<? extends AbstractForm>> extensions = getAllExtensions();
+    FormResetSearchFilterChain chain = new FormResetSearchFilterChain(extensions);
+    chain.execResetSearchFilter(searchFilter);
+  }
+
+  protected final void interceptAddSearchTerms(SearchFilter search) {
+    List<? extends IFormExtension<? extends AbstractForm>> extensions = getAllExtensions();
+    FormAddSearchTermsChain chain = new FormAddSearchTermsChain(extensions);
+    chain.execAddSearchTerms(search);
+  }
+
+  protected final void interceptOnVetoException(VetoException e, int code) throws ProcessingException {
+    List<? extends IFormExtension<? extends AbstractForm>> extensions = getAllExtensions();
+    FormOnVetoExceptionChain chain = new FormOnVetoExceptionChain(extensions);
+    chain.execOnVetoException(e, code);
+  }
+
+  protected final void interceptFormActivated() throws ProcessingException {
+    List<? extends IFormExtension<? extends AbstractForm>> extensions = getAllExtensions();
+    FormFormActivatedChain chain = new FormFormActivatedChain(extensions);
+    chain.execFormActivated();
+  }
+
+  protected final void interceptDisposeForm() throws ProcessingException {
+    List<? extends IFormExtension<? extends AbstractForm>> extensions = getAllExtensions();
+    FormDisposeFormChain chain = new FormDisposeFormChain(extensions);
+    chain.execDisposeForm();
+  }
+
+  protected final void interceptTimer(String timerId) throws ProcessingException {
+    List<? extends IFormExtension<? extends AbstractForm>> extensions = getAllExtensions();
+    FormTimerChain chain = new FormTimerChain(extensions);
+    chain.execTimer(timerId);
+  }
+
+  protected final AbstractFormData interceptCreateFormData() throws ProcessingException {
+    List<? extends IFormExtension<? extends AbstractForm>> extensions = getAllExtensions();
+    FormCreateFormDataChain chain = new FormCreateFormDataChain(extensions);
+    return chain.execCreateFormData();
+  }
+
+  protected final void interceptInitForm() throws ProcessingException {
+    List<? extends IFormExtension<? extends AbstractForm>> extensions = getAllExtensions();
+    FormInitFormChain chain = new FormInitFormChain(extensions);
+    chain.execInitForm();
+  }
+
+  protected final boolean interceptValidate() throws ProcessingException {
+    List<? extends IFormExtension<? extends AbstractForm>> extensions = getAllExtensions();
+    FormValidateChain chain = new FormValidateChain(extensions);
+    return chain.execValidate();
+  }
+
+  protected final void interceptOnCloseRequest(boolean kill, HashSet<Integer> enabledButtonSystemTypes) throws ProcessingException {
+    List<? extends IFormExtension<? extends AbstractForm>> extensions = getAllExtensions();
+    FormOnCloseRequestChain chain = new FormOnCloseRequestChain(extensions);
+    chain.execOnCloseRequest(kill, enabledButtonSystemTypes);
+  }
+
+  protected final void interceptDataChanged(Object... dataTypes) throws ProcessingException {
+    List<? extends IFormExtension<? extends AbstractForm>> extensions = getAllExtensions();
+    FormDataChangedChain chain = new FormDataChangedChain(extensions);
+    chain.execDataChanged(dataTypes);
+  }
 }

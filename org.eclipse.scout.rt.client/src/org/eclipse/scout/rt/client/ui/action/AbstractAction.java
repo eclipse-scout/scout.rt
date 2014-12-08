@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.action;
 
 import java.security.Permission;
+import java.util.List;
 
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.EventListenerList;
@@ -19,21 +20,30 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
+import org.eclipse.scout.commons.annotations.IOrdered;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.extension.ui.action.ActionChains.ActionActionChain;
+import org.eclipse.scout.rt.client.extension.ui.action.ActionChains.ActionInitActionChain;
+import org.eclipse.scout.rt.client.extension.ui.action.ActionChains.ActionSelectionChangedChain;
+import org.eclipse.scout.rt.client.extension.ui.action.IActionExtension;
 import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
 import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStrokeNormalizer;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
+import org.eclipse.scout.rt.shared.extension.AbstractExtension;
+import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
+import org.eclipse.scout.rt.shared.extension.IExtension;
+import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.eclipse.scout.service.SERVICES;
 
-public abstract class AbstractAction extends AbstractPropertyObserver implements IAction {
+public abstract class AbstractAction extends AbstractPropertyObserver implements IAction, IExtensibleObject {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractAction.class);
 
   private boolean m_initialized;
@@ -50,6 +60,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   private boolean m_toggleAction;
 
   private boolean m_separator;
+  private final ObjectExtensions<AbstractAction, IActionExtension<? extends AbstractAction>> m_objectExtensions;
 
   public AbstractAction() {
     this(true);
@@ -61,6 +72,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
     m_enabledProcessingAction = true;
     m_enabledInheritAccessibility = true;
     m_visibleGranted = true;
+    m_objectExtensions = new ObjectExtensions<AbstractAction, IActionExtension<? extends AbstractAction>>(this);
     if (callInitializer) {
       callInitializer();
     }
@@ -68,7 +80,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
 
   protected void callInitializer() {
     if (!m_initialized) {
-      initConfig();
+      interceptInitConfig();
       m_initialized = true;
     }
   }
@@ -79,7 +91,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
    */
   @Override
   public final void initAction() throws ProcessingException {
-    execInitAction();
+    interceptInitAction();
   }
 
   /*
@@ -188,6 +200,21 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   }
 
   /**
+   * Configures the view order of this action. The view order determines the order in which the action appears.<br>
+   * The view order of actions with no view order configured ({@code < 0}) is initialized based on the {@link Order}
+   * annotation of the class.
+   * <p>
+   * Subclasses can override this method. The default is {@link IOrdered#DEFAULT_ORDER}.
+   *
+   * @return View order of this action.
+   */
+  @ConfigProperty(ConfigProperty.DOUBLE)
+  @Order(120)
+  protected double getConfiguredViewOrder() {
+    return IOrdered.DEFAULT_ORDER;
+  }
+
+  /**
    * called by {@link #initAction()}<br>
    * this way a menu can for example add/remove custom child menus
    */
@@ -216,7 +243,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   }
 
   /**
-   * @deprecated will be removed in release 5.0; use {@link AbstractAction#execSelectionChanged(boolean)} instead.
+   * @deprecated will be removed in release 5.0; use {@link AbstractAction#interceptSelectionChanged(boolean)} instead.
    */
   @Deprecated
   protected void execToggleAction(boolean selected) throws ProcessingException {
@@ -234,6 +261,15 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   protected void execSelectionChanged(boolean selection) throws ProcessingException {
   }
 
+  protected final void interceptInitConfig() {
+    m_objectExtensions.initConfig(createLocalExtension(), new Runnable() {
+      @Override
+      public void run() {
+        initConfig();
+      }
+    });
+  }
+
   protected void initConfig() {
     setIconId(getConfiguredIconId());
     setText(getConfiguredText());
@@ -244,11 +280,25 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
     setVisible(getConfiguredVisible());
     setToggleAction(getConfiguredToggleAction());
     setSeparator(getConfiguredSeparator());
-
+    setOrder(calculateViewOrder());
   }
 
   protected IActionUIFacade createUIFacade() {
     return new P_UIFacade();
+  }
+
+  protected IActionExtension<? extends AbstractAction> createLocalExtension() {
+    return new LocalActionExtension<AbstractAction>(this);
+  }
+
+  @Override
+  public List<? extends IActionExtension<? extends AbstractAction>> getAllExtensions() {
+    return m_objectExtensions.getAllExtensions();
+  }
+
+  @Override
+  public <T extends IExtension<?>> T getExtension(Class<T> c) {
+    return m_objectExtensions.getExtension(c);
   }
 
   @Override
@@ -263,6 +313,27 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
       default:
         return IActionVisitor.CONTINUE;
     }
+  }
+
+  /**
+   * Calculates the actions's view order, e.g. if the @Order annotation is set to 30.0, the method will
+   * return 30.0. If no {@link Order} annotation is set, the method checks its super classes for an @Order annotation.
+   *
+   * @since 4.0.1
+   */
+  protected double calculateViewOrder() {
+    double viewOrder = getConfiguredViewOrder();
+    if (viewOrder == IOrdered.DEFAULT_ORDER) {
+      Class<?> cls = getClass();
+      while (cls != null && IAction.class.isAssignableFrom(cls)) {
+        if (cls.isAnnotationPresent(Order.class)) {
+          Order order = (Order) cls.getAnnotation(Order.class);
+          return order.value();
+        }
+        cls = cls.getSuperclass();
+      }
+    }
+    return viewOrder;
   }
 
   @Override
@@ -307,12 +378,13 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
 
   /**
    * Please double check if implementing this method!
-   * Consider using {@link #execAction()} instead. If no other option ensure super call when overriding this method.
+   * Consider using {@link #interceptAction()} instead. If no other option ensure super call when overriding this
+   * method.
    *
    * @throws ProcessingException
    */
   protected void doActionInternal() throws ProcessingException {
-    execAction();
+    interceptAction();
   }
 
   @Override
@@ -347,6 +419,16 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
       propertySupport.setPropertyString(PROP_TEXT_WITH_MNEMONIC, null);
       propertySupport.setProperty(PROP_MNEMONIC, (char) 0x0);
     }
+  }
+
+  @Override
+  public double getOrder() {
+    return propertySupport.getPropertyDouble(PROP_VIEW_ORDER);
+  }
+
+  @Override
+  public void setOrder(double order) {
+    propertySupport.setPropertyDouble(PROP_VIEW_ORDER, order);
   }
 
   @Override
@@ -424,7 +506,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   public void setSelected(boolean b) {
     if (setSelectedInternal(b)) {
       try {
-        execSelectionChanged(b);
+        interceptSelectionChanged(b);
         execToggleAction(b);
       }
       catch (ProcessingException e) {
@@ -639,5 +721,50 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
     public void setSelectedFromUI(boolean b) {
       setSelected(b);
     }
+  }
+
+  /**
+   * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
+   * any further chain elements.
+   */
+  protected static class LocalActionExtension<OWNER extends AbstractAction> extends AbstractExtension<OWNER> implements IActionExtension<OWNER> {
+
+    public LocalActionExtension(OWNER owner) {
+      super(owner);
+    }
+
+    @Override
+    public void execSelectionChanged(ActionSelectionChangedChain chain, boolean selection) throws ProcessingException {
+      getOwner().execSelectionChanged(selection);
+    }
+
+    @Override
+    public void execAction(ActionActionChain chain) throws ProcessingException {
+      getOwner().execAction();
+    }
+
+    @Override
+    public void execInitAction(ActionInitActionChain chain) throws ProcessingException {
+      getOwner().execInitAction();
+    }
+
+  }
+
+  protected final void interceptSelectionChanged(boolean selection) throws ProcessingException {
+    List<? extends IActionExtension<? extends AbstractAction>> extensions = getAllExtensions();
+    ActionSelectionChangedChain chain = new ActionSelectionChangedChain(extensions);
+    chain.execSelectionChanged(selection);
+  }
+
+  protected final void interceptAction() throws ProcessingException {
+    List<? extends IActionExtension<? extends AbstractAction>> extensions = getAllExtensions();
+    ActionActionChain chain = new ActionActionChain(extensions);
+    chain.execAction();
+  }
+
+  protected final void interceptInitAction() throws ProcessingException {
+    List<? extends IActionExtension<? extends AbstractAction>> extensions = getAllExtensions();
+    ActionInitActionChain chain = new ActionInitActionChain(extensions);
+    chain.execInitAction();
   }
 }

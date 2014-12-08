@@ -19,6 +19,7 @@ import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.IProposalFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.ParsingFailedStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
@@ -31,7 +32,7 @@ import org.eclipse.scout.service.SERVICES;
  * This field is similar to the smart field but also allows custom text. A proposal field is always of the value type
  * {@link String}. The proposals are delivered as lookup rows of any type.
  */
-public abstract class AbstractProposalField<KEY_TYPE> extends AbstractContentAssistField<String, KEY_TYPE> implements IProposalField<KEY_TYPE> {
+public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentAssistField<String, LOOKUP_KEY> implements IProposalField<LOOKUP_KEY> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractProposalField.class);
   private P_UIFacade m_uiFacade;
 
@@ -60,18 +61,18 @@ public abstract class AbstractProposalField<KEY_TYPE> extends AbstractContentAss
   }
 
   @Override
-  public KEY_TYPE getValueAsLookupKey() {
+  public LOOKUP_KEY getValueAsLookupKey() {
     return null;
   }
 
   @Override
-  public void acceptProposal(ILookupRow<KEY_TYPE> row) {
+  public void acceptProposal(ILookupRow<LOOKUP_KEY> row) {
     setCurrentLookupRow(row);
     setValue(row.getText());
   }
 
   @Override
-  protected void installLookupRowContext(ILookupRow<KEY_TYPE> row) {
+  protected void installLookupRowContext(ILookupRow<LOOKUP_KEY> row) {
     setCurrentLookupRow(row);
     super.installLookupRowContext(row);
   }
@@ -81,8 +82,8 @@ public abstract class AbstractProposalField<KEY_TYPE> extends AbstractContentAss
     if (text != null && text.length() == 0) {
       text = null;
     }
-    IContentAssistFieldProposalForm<KEY_TYPE> smartForm = getProposalForm();
-    ILookupRow<KEY_TYPE> acceptedProposalRow = null;
+    IContentAssistFieldProposalForm<LOOKUP_KEY> smartForm = getProposalForm();
+    ILookupRow<LOOKUP_KEY> acceptedProposalRow = null;
     if (smartForm != null && StringUtility.equalsIgnoreNewLines(smartForm.getSearchText(), text)) {
       acceptedProposalRow = smartForm.getAcceptedProposal();
     }
@@ -148,15 +149,15 @@ public abstract class AbstractProposalField<KEY_TYPE> extends AbstractContentAss
   }
 
   @Override
-  protected IContentAssistFieldProposalForm<KEY_TYPE> createProposalForm() throws ProcessingException {
+  protected IContentAssistFieldProposalForm<LOOKUP_KEY> createProposalForm() throws ProcessingException {
     return createProposalForm(true);
   }
 
   @Override
-  protected void handleProposalFormClosed(IContentAssistFieldProposalForm<KEY_TYPE> proposalForm) throws ProcessingException {
+  protected void handleProposalFormClosed(IContentAssistFieldProposalForm<LOOKUP_KEY> proposalForm) throws ProcessingException {
     if (getProposalForm() == proposalForm) {
       if (proposalForm.getCloseSystemType() == IButton.SYSTEM_TYPE_OK) {
-        ILookupRow<KEY_TYPE> row = proposalForm.getAcceptedProposal();
+        ILookupRow<LOOKUP_KEY> row = proposalForm.getAcceptedProposal();
         if (row != null) {
           acceptProposal(row);
         }
@@ -166,25 +167,25 @@ public abstract class AbstractProposalField<KEY_TYPE> extends AbstractContentAss
   }
 
   @Override
-  protected void filterKeyLookup(ILookupCall<KEY_TYPE> call, List<ILookupRow<KEY_TYPE>> result) throws ProcessingException {
+  protected void filterKeyLookup(ILookupCall<LOOKUP_KEY> call, List<ILookupRow<LOOKUP_KEY>> result) throws ProcessingException {
     super.filterKeyLookup(call, result);
     /*
      * ticket 79027
      */
     if (result.size() == 0) {
       String key = "" + call.getKey();
-      result.add(new LookupRow<KEY_TYPE>(call.getKey(), key));
+      result.add(new LookupRow<LOOKUP_KEY>(call.getKey(), key));
     }
   }
 
   @Override
-  protected void handleFetchResult(IContentAssistFieldDataFetchResult<KEY_TYPE> result) {
-    IContentAssistFieldProposalForm<KEY_TYPE> smartForm = getProposalForm();
+  protected void handleFetchResult(IContentAssistFieldDataFetchResult<LOOKUP_KEY> result) {
+    IContentAssistFieldProposalForm<LOOKUP_KEY> smartForm = getProposalForm();
     if (result == null) {
       unregisterProposalFormInternal(smartForm);
     }
     else {
-      Collection<? extends ILookupRow<KEY_TYPE>> rows = result.getLookupRows();
+      Collection<? extends ILookupRow<LOOKUP_KEY>> rows = result.getLookupRows();
       if (rows == null || rows.isEmpty()) {
         unregisterProposalFormInternal(smartForm);
       }
@@ -209,7 +210,7 @@ public abstract class AbstractProposalField<KEY_TYPE> extends AbstractContentAss
     @Override
     public boolean setTextFromUI(String text) {
       String currentValidText = getValue();
-      IContentAssistFieldProposalForm<KEY_TYPE> smartForm = getProposalForm();
+      IContentAssistFieldProposalForm<LOOKUP_KEY> smartForm = getProposalForm();
       // accept proposal form if either input text matches search text or
       // existing display text is valid
       try {
@@ -306,6 +307,18 @@ public abstract class AbstractProposalField<KEY_TYPE> extends AbstractContentAss
     public void unregisterProposalFormFromUI(IContentAssistFieldProposalForm form) {
       unregisterProposalFormInternal(form);
     }
+  }
+
+  protected static class LocalProposalFieldExtension<LOOKUP_KEY, OWNER extends AbstractProposalField<LOOKUP_KEY>> extends LocalContentAssistFieldExtension<String, LOOKUP_KEY, OWNER> implements IProposalFieldExtension<LOOKUP_KEY, OWNER> {
+
+    public LocalProposalFieldExtension(OWNER owner) {
+      super(owner);
+    }
+  }
+
+  @Override
+  protected IProposalFieldExtension<LOOKUP_KEY, ? extends AbstractProposalField<LOOKUP_KEY>> createLocalExtension() {
+    return new LocalProposalFieldExtension<LOOKUP_KEY, AbstractProposalField<LOOKUP_KEY>>(this);
   }
 
 }

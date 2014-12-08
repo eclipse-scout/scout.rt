@@ -14,6 +14,7 @@ import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.IIntegerColumnExtension;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.integerfield.AbstractIntegerField;
 import org.eclipse.scout.rt.client.ui.form.fields.integerfield.IIntegerField;
@@ -77,6 +78,18 @@ public abstract class AbstractIntegerColumn extends AbstractNumberColumn<Integer
   protected IIntegerField getEditorField() {
     return new AbstractIntegerField() {
     };
+  }
+
+  protected static class LocalIntegerColumnExtension<OWNER extends AbstractIntegerColumn> extends LocalNumberColumnExtension<Integer, OWNER> implements IIntegerColumnExtension<OWNER> {
+
+    public LocalIntegerColumnExtension(OWNER owner) {
+      super(owner);
+    }
+  }
+
+  @Override
+  protected IIntegerColumnExtension<? extends AbstractIntegerColumn> createLocalExtension() {
+    return new LocalIntegerColumnExtension<AbstractIntegerColumn>(this);
   }
 
 }

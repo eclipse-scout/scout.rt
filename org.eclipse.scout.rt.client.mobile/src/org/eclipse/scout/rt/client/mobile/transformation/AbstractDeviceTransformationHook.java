@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.client.mobile.transformation;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 
-public class AbstractDeviceTransformationHook implements IDeviceTransformationHook {
+public abstract class AbstractDeviceTransformationHook implements IDeviceTransformationHook {
 
   @Override
   public void beforeFormTransformation(IForm form) {

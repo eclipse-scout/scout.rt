@@ -10,6 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
-public interface ISmartField<T> extends IContentAssistField<T, T> {
+public interface ISmartField<VALUE> extends IMixedSmartField<VALUE, VALUE> {
 
 }

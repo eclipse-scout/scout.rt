@@ -1,5 +1,7 @@
 package org.eclipse.scout.rt.client.ui.form.fields.documentfield;
 
+import java.util.List;
+
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
@@ -9,6 +11,8 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.documentfield.DocumentFieldChains.DocumentFieldComReadyStatusChangedChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.documentfield.IDocumentFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.documentfield.eventdata.SaveAsData;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
@@ -202,7 +206,7 @@ public abstract class AbstractDocumentField extends AbstractValueField<RemoteFil
     public void fireComReadyFromUI(boolean comReady) {
       try {
         if (propertySupport.setPropertyBool(PROP_COM_READY, comReady)) {
-          execComReadyStatusChanged(comReady);
+          interceptComReadyStatusChanged(comReady);
         }
       }
       catch (ProcessingException e) {
@@ -212,5 +216,34 @@ public abstract class AbstractDocumentField extends AbstractValueField<RemoteFil
         SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
       }
     }
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public List<? extends IDocumentFieldExtension<? extends AbstractDocumentField>> getAllExtensions() {
+    return (List<? extends IDocumentFieldExtension<? extends AbstractDocumentField>>) super.getAllExtensions();
+  }
+
+  protected final void interceptComReadyStatusChanged(boolean ready) throws ProcessingException {
+    List<? extends IDocumentFieldExtension<? extends AbstractDocumentField>> extensions = getAllExtensions();
+    DocumentFieldComReadyStatusChangedChain chain = new DocumentFieldComReadyStatusChangedChain(extensions);
+    chain.execComReadyStatusChanged(ready);
+  }
+
+  protected static class LocalDocumentFieldExtension<OWNER extends AbstractDocumentField> extends LocalValueFieldExtension<RemoteFile, OWNER> implements IDocumentFieldExtension<OWNER> {
+
+    public LocalDocumentFieldExtension(OWNER owner) {
+      super(owner);
+    }
+
+    @Override
+    public void execComReadyStatusChanged(DocumentFieldComReadyStatusChangedChain chain, boolean ready) throws ProcessingException {
+      getOwner().execComReadyStatusChanged(ready);
+    }
+  }
+
+  @Override
+  protected IDocumentFieldExtension<? extends AbstractDocumentField> createLocalExtension() {
+    return new LocalDocumentFieldExtension<AbstractDocumentField>(this);
   }
 }

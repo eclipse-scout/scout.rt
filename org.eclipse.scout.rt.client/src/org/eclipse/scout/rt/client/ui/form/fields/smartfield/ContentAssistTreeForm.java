@@ -28,6 +28,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.rt.client.ClientAsyncJob;
 import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree;
@@ -59,7 +60,7 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.service.SERVICES;
 
-public class ContentAssistTreeForm<LOOKUP_TYPE> extends AbstractContentAssistFieldProposalForm<LOOKUP_TYPE> {
+public class ContentAssistTreeForm<LOOKUP_KEY> extends AbstractContentAssistFieldProposalForm<LOOKUP_KEY> {
   /**
    * Boolean marker on {@link Job#getProperty(QualifiedName)} that can be used to detect that the tree is loading some
    * nodes.
@@ -75,7 +76,7 @@ public class ContentAssistTreeForm<LOOKUP_TYPE> extends AbstractContentAssistFie
   private boolean m_populateInitialTreeDone;
   private JobEx m_populateInitialTreeJob;
 
-  public ContentAssistTreeForm(IContentAssistField<?, LOOKUP_TYPE> contentAssistField, boolean allowCustomText) throws ProcessingException {
+  public ContentAssistTreeForm(IContentAssistField<?, LOOKUP_KEY> contentAssistField, boolean allowCustomText) throws ProcessingException {
     super(contentAssistField, allowCustomText);
   }
 
@@ -89,7 +90,7 @@ public class ContentAssistTreeForm<LOOKUP_TYPE> extends AbstractContentAssistFie
    * <p>
    * loadIncremnental only loads the roots, whereas !loadIncremental loads the complete tree. Normally the latter is
    * configured together with {@link IContentAssistField#isBrowseAutoExpandAll()}
-   * 
+   *
    * @throws ProcessingException
    */
   private void startPopulateInitialTree() throws ProcessingException {
@@ -104,9 +105,9 @@ public class ContentAssistTreeForm<LOOKUP_TYPE> extends AbstractContentAssistFie
       getStatusField().setValue(ScoutTexts.get("searchingProposals"));
       getStatusField().setVisible(true);
       //go async to fetch data
-      m_populateInitialTreeJob = getContentAssistField().callBrowseLookupInBackground(IContentAssistField.BROWSE_ALL_TEXT, 100000, TriState.UNDEFINED, new ILookupCallFetcher<LOOKUP_TYPE>() {
+      m_populateInitialTreeJob = getContentAssistField().callBrowseLookupInBackground(IContentAssistField.BROWSE_ALL_TEXT, 100000, TriState.UNDEFINED, new ILookupCallFetcher<LOOKUP_KEY>() {
         @Override
-        public void dataFetched(List<? extends ILookupRow<LOOKUP_TYPE>> rows, ProcessingException failed) {
+        public void dataFetched(List<? extends ILookupRow<LOOKUP_KEY>> rows, ProcessingException failed) {
           if (failed == null) {
             try {
               getStatusField().setVisible(false);
@@ -143,7 +144,7 @@ public class ContentAssistTreeForm<LOOKUP_TYPE> extends AbstractContentAssistFie
   /**
    * Called when the initial tree has been loaded and the form is therefore ready to accept
    * {@link #update(boolean, boolean)} requests.
-   * 
+   *
    * @throws ProcessingException
    */
   private void commitPopulateInitialTree(ITree tree) throws ProcessingException {
@@ -212,9 +213,9 @@ public class ContentAssistTreeForm<LOOKUP_TYPE> extends AbstractContentAssistFie
   @ConfigOperation
   @Order(110)
   protected boolean execAcceptNodeByTreeFilter(Pattern filterPattern, ITreeNode node, int level) {
-    IContentAssistField<?, LOOKUP_TYPE> sf = getContentAssistField();
+    IContentAssistField<?, LOOKUP_KEY> sf = getContentAssistField();
     @SuppressWarnings("unchecked")
-    ILookupRow<LOOKUP_TYPE> row = (ILookupRow<LOOKUP_TYPE>) node.getCell().getValue();
+    ILookupRow<LOOKUP_KEY> row = (ILookupRow<LOOKUP_KEY>) node.getCell().getValue();
     if (node.isChildrenLoaded()) {
       if (row != null) {
         String q1 = node.getTree().getPathText(node, "\n");
@@ -246,12 +247,12 @@ public class ContentAssistTreeForm<LOOKUP_TYPE> extends AbstractContentAssistFie
    */
   @ConfigOperation
   @Order(120)
-  protected ILookupRow<LOOKUP_TYPE> execGetSingleMatch() {
+  protected ILookupRow<LOOKUP_KEY> execGetSingleMatch() {
     // when load incremental is set, don't visit the tree but use text-to-key
     // lookup method on smartfield.
     if (getContentAssistField().isBrowseLoadIncremental()) {
       try {
-        List<? extends ILookupRow<LOOKUP_TYPE>> rows = getContentAssistField().callTextLookup(getSearchText(), 2);
+        List<? extends ILookupRow<LOOKUP_KEY>> rows = getContentAssistField().callTextLookup(getSearchText(), 2);
         if (rows != null && rows.size() == 1) {
           return rows.get(0);
         }
@@ -265,13 +266,13 @@ public class ContentAssistTreeForm<LOOKUP_TYPE> extends AbstractContentAssistFie
       }
     }
     else {
-      final List<ILookupRow<LOOKUP_TYPE>> foundLeafs = new ArrayList<ILookupRow<LOOKUP_TYPE>>();
+      final List<ILookupRow<LOOKUP_KEY>> foundLeafs = new ArrayList<ILookupRow<LOOKUP_KEY>>();
       ITreeVisitor v = new ITreeVisitor() {
         @Override
         public boolean visit(ITreeNode node) {
           if (node.isEnabled() && node.isLeaf()) {
             @SuppressWarnings("unchecked")
-            ILookupRow<LOOKUP_TYPE> row = (ILookupRow<LOOKUP_TYPE>) node.getCell().getValue();
+            ILookupRow<LOOKUP_KEY> row = (ILookupRow<LOOKUP_KEY>) node.getCell().getValue();
             if (row != null && row.isEnabled()) {
               foundLeafs.add(row);
             }
@@ -309,7 +310,7 @@ public class ContentAssistTreeForm<LOOKUP_TYPE> extends AbstractContentAssistFie
   }
 
   @Override
-  protected void dataFetchedDelegateImpl(IContentAssistFieldDataFetchResult<LOOKUP_TYPE> result, int maxCount) {
+  protected void dataFetchedDelegateImpl(IContentAssistFieldDataFetchResult<LOOKUP_KEY> result, int maxCount) {
     String searchText = null;
     boolean selectCurrentValue = false;
     if (result != null) {
@@ -367,8 +368,8 @@ public class ContentAssistTreeForm<LOOKUP_TYPE> extends AbstractContentAssistFie
   }
 
   @Override
-  public ILookupRow<LOOKUP_TYPE> getAcceptedProposal() throws ProcessingException {
-    ILookupRow<LOOKUP_TYPE> row = getSelectedLookupRow();
+  public ILookupRow<LOOKUP_KEY> getAcceptedProposal() throws ProcessingException {
+    ILookupRow<LOOKUP_KEY> row = getSelectedLookupRow();
     if (row != null && row.isEnabled()) {
       return row;
     }
@@ -381,8 +382,8 @@ public class ContentAssistTreeForm<LOOKUP_TYPE> extends AbstractContentAssistFie
   }
 
   @SuppressWarnings("unchecked")
-  public ILookupRow<LOOKUP_TYPE> getSelectedLookupRow() {
-    ILookupRow<LOOKUP_TYPE> row = null;
+  public ILookupRow<LOOKUP_KEY> getSelectedLookupRow() {
+    ILookupRow<LOOKUP_KEY> row = null;
     ITree tree = getResultTreeField().getTree();
     ITreeNode node = null;
     if (tree.isCheckable()) {
@@ -395,7 +396,7 @@ public class ContentAssistTreeForm<LOOKUP_TYPE> extends AbstractContentAssistFie
       node = tree.getSelectedNode();
     }
     if (node != null && node.isFilterAccepted() && node.isEnabled()) {
-      row = (ILookupRow<LOOKUP_TYPE>) node.getCell().getValue();
+      row = (ILookupRow<LOOKUP_KEY>) node.getCell().getValue();
     }
 
     return row;
@@ -434,7 +435,7 @@ public class ContentAssistTreeForm<LOOKUP_TYPE> extends AbstractContentAssistFie
   }
 
   private boolean selectCurrentValueInternal() throws ProcessingException {
-    final LOOKUP_TYPE selectedKey = getContentAssistField().getValueAsLookupKey();
+    final LOOKUP_KEY selectedKey = getContentAssistField().getValueAsLookupKey();
     if (selectedKey != null) {
       //check existing tree
       ITree tree = getResultTreeField().getTree();
@@ -484,11 +485,11 @@ public class ContentAssistTreeForm<LOOKUP_TYPE> extends AbstractContentAssistFie
     }
   }
 
-  private ITreeNode loadNodeWithKey(LOOKUP_TYPE key) throws ProcessingException {
-    ArrayList<ILookupRow<LOOKUP_TYPE>> path = new ArrayList<ILookupRow<LOOKUP_TYPE>>();
-    LOOKUP_TYPE t = key;
+  private ITreeNode loadNodeWithKey(LOOKUP_KEY key) throws ProcessingException {
+    ArrayList<ILookupRow<LOOKUP_KEY>> path = new ArrayList<ILookupRow<LOOKUP_KEY>>();
+    LOOKUP_KEY t = key;
     while (t != null) {
-      ILookupRow<LOOKUP_TYPE> row = getLookupRowFor(t);
+      ILookupRow<LOOKUP_KEY> row = getLookupRowFor(t);
       if (row != null) {
         path.add(0, row);
         t = row.getParentKey();
@@ -518,13 +519,13 @@ public class ContentAssistTreeForm<LOOKUP_TYPE> extends AbstractContentAssistFie
     return parentNode;
   }
 
-  private ILookupRow<LOOKUP_TYPE> getLookupRowFor(LOOKUP_TYPE key) throws ProcessingException {
+  private ILookupRow<LOOKUP_KEY> getLookupRowFor(LOOKUP_KEY key) throws ProcessingException {
     if (key instanceof Number && ((Number) key).longValue() == 0) {
       key = null;
     }
     if (key != null) {
-      IContentAssistField<?, LOOKUP_TYPE> sf = (IContentAssistField<?, LOOKUP_TYPE>) getContentAssistField();
-      for (ILookupRow<LOOKUP_TYPE> row : sf.callKeyLookup(key)) {
+      IContentAssistField<?, LOOKUP_KEY> sf = (IContentAssistField<?, LOOKUP_KEY>) getContentAssistField();
+      for (ILookupRow<LOOKUP_KEY> row : sf.callKeyLookup(key)) {
         return row;
       }
     }
@@ -583,7 +584,7 @@ public class ContentAssistTreeForm<LOOKUP_TYPE> extends AbstractContentAssistFie
       @SuppressWarnings("unchecked")
       @Override
       protected void execLoadChildNodes(ITreeNode parentNode) throws ProcessingException {
-        IContentAssistField<?, LOOKUP_TYPE> contentAssistField = getContentAssistField();
+        IContentAssistField<?, LOOKUP_KEY> contentAssistField = getContentAssistField();
         if (contentAssistField.isBrowseLoadIncremental()) {
           Job currentJob = Job.getJobManager().currentJob();
           //show loading status
@@ -593,8 +594,8 @@ public class ContentAssistTreeForm<LOOKUP_TYPE> extends AbstractContentAssistFie
           try {
             currentJob.setProperty(JOB_PROPERTY_LOAD_TREE, Boolean.TRUE);
             //load node
-            ILookupRow<LOOKUP_TYPE> b = (LookupRow) (parentNode != null ? parentNode.getCell().getValue() : null);
-            List<? extends ILookupRow<LOOKUP_TYPE>> data = contentAssistField.callSubTreeLookup(b != null ? b.getKey() : null, TriState.UNDEFINED);
+            ILookupRow<LOOKUP_KEY> b = (LookupRow) (parentNode != null ? parentNode.getCell().getValue() : null);
+            List<? extends ILookupRow<LOOKUP_KEY>> data = contentAssistField.callSubTreeLookup(b != null ? b.getKey() : null, TriState.UNDEFINED);
             List<ITreeNode> subTree = new P_TreeNodeBuilder().createTreeNodes(data, ITreeNode.STATUS_NON_CHANGED, false);
             updateSubTree(getTree(), parentNode, subTree);
           }
@@ -608,7 +609,7 @@ public class ContentAssistTreeForm<LOOKUP_TYPE> extends AbstractContentAssistFie
         else {
           //nop, since complete tree is already loaded (via async job)
         }
-        */
+         */
       }
 
       /*
@@ -643,10 +644,9 @@ public class ContentAssistTreeForm<LOOKUP_TYPE> extends AbstractContentAssistFie
         }
 
         @Override
-        protected void execNodeClick(ITreeNode node) throws ProcessingException {
+        protected void execNodeClick(ITreeNode node, MouseButton mouseButton) throws ProcessingException {
           execResultTreeNodeClick(node);
         }
-
       }
     }
 
@@ -812,7 +812,7 @@ public class ContentAssistTreeForm<LOOKUP_TYPE> extends AbstractContentAssistFie
     }
   }
 
-  private class P_TreeNodeBuilder extends AbstractTreeNodeBuilder<LOOKUP_TYPE> {
+  private class P_TreeNodeBuilder extends AbstractTreeNodeBuilder<LOOKUP_KEY> {
     @Override
     protected ITreeNode createEmptyTreeNode() throws ProcessingException {
       ITree tree = getResultTreeField().getTree();

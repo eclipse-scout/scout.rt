@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.form.fields.mailfield;
 
 import java.io.File;
 import java.net.URL;
+import java.util.List;
 
 import javax.mail.internet.MimeMessage;
 
@@ -20,6 +21,9 @@ import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.mailfield.IMailFieldExtension;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.mailfield.MailFieldChains.MailFieldAttachementActionChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.mailfield.MailFieldChains.MailFieldHyperlinkActionChain;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
@@ -201,11 +205,11 @@ public abstract class AbstractMailField extends AbstractValueField<MimeMessage> 
   }
 
   public void doAttachementAction(File file) throws ProcessingException {
-    execAttachementAction(file);
+    interceptAttachementAction(file);
   }
 
   public void doHyperlinkAction(URL url) throws ProcessingException {
-    execHyperlinkAction(url, url.getPath(), url != null && url.getHost().equals("local"));
+    interceptHyperlinkAction(url, url.getPath(), url != null && url.getHost().equals("local"));
   }
 
   private class P_UIFacade implements IMailFieldUIFacade {
@@ -237,6 +241,46 @@ public abstract class AbstractMailField extends AbstractValueField<MimeMessage> 
       }
     }
 
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public List<? extends IMailFieldExtension<? extends AbstractMailField>> getAllExtensions() {
+    return (List<? extends IMailFieldExtension<? extends AbstractMailField>>) super.getAllExtensions();
+  }
+
+  protected final void interceptHyperlinkAction(URL url, String path, boolean local) throws ProcessingException {
+    List<? extends IMailFieldExtension<? extends AbstractMailField>> extensions = getAllExtensions();
+    MailFieldHyperlinkActionChain chain = new MailFieldHyperlinkActionChain(extensions);
+    chain.execHyperlinkAction(url, path, local);
+  }
+
+  protected final void interceptAttachementAction(File file) throws ProcessingException {
+    List<? extends IMailFieldExtension<? extends AbstractMailField>> extensions = getAllExtensions();
+    MailFieldAttachementActionChain chain = new MailFieldAttachementActionChain(extensions);
+    chain.execAttachementAction(file);
+  }
+
+  protected static class LocalMailFieldExtension<OWNER extends AbstractMailField> extends LocalValueFieldExtension<MimeMessage, OWNER> implements IMailFieldExtension<OWNER> {
+
+    public LocalMailFieldExtension(OWNER owner) {
+      super(owner);
+    }
+
+    @Override
+    public void execHyperlinkAction(MailFieldHyperlinkActionChain chain, URL url, String path, boolean local) throws ProcessingException {
+      getOwner().execHyperlinkAction(url, path, local);
+    }
+
+    @Override
+    public void execAttachementAction(MailFieldAttachementActionChain chain, File file) throws ProcessingException {
+      getOwner().execAttachementAction(file);
+    }
+  }
+
+  @Override
+  protected IMailFieldExtension<? extends AbstractMailField> createLocalExtension() {
+    return new LocalMailFieldExtension<AbstractMailField>(this);
   }
 
 }

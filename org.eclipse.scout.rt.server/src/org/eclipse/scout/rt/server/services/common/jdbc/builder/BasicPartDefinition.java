@@ -126,8 +126,9 @@ public class BasicPartDefinition implements DataModelConstants {
       else {
         throw new IllegalArgumentException("" + c + " is not of type AbstractPropertyData or AbstractFormFieldData");
       }
-      for (int i = 0; i < classIdentifier.getClasses().length - 1; i++) {
-        Class<?> containerClass = classIdentifier.getClasses()[i];
+      Class<?>[] classes = classIdentifier.getClasses();
+      for (int i = 0; i < classes.length - 1; i++) {
+        Class<?> containerClass = classes[i];
         if (AbstractFormFieldData.class.isAssignableFrom(containerClass)) {
           // ok
         }

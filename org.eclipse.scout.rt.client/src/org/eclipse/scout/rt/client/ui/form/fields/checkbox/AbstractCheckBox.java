@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.form.fields.checkbox;
 
 import org.eclipse.scout.commons.annotations.ClassId;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.checkbox.ICheckBoxExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.AbstractBooleanField;
 
 /**
@@ -27,5 +28,17 @@ public abstract class AbstractCheckBox extends AbstractBooleanField implements I
 
   public AbstractCheckBox(boolean callInitializer) {
     super(callInitializer);
+  }
+
+  protected static class LocalCheckBoxExtension<OWNER extends AbstractCheckBox> extends LocalBooleanFieldExtension<OWNER> implements ICheckBoxExtension<OWNER> {
+
+    public LocalCheckBoxExtension(OWNER owner) {
+      super(owner);
+    }
+  }
+
+  @Override
+  protected ICheckBoxExtension<? extends AbstractCheckBox> createLocalExtension() {
+    return new LocalCheckBoxExtension<AbstractCheckBox>(this);
   }
 }

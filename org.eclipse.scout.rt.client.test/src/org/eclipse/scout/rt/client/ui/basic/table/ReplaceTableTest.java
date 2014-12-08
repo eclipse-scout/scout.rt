@@ -372,7 +372,7 @@ public class ReplaceTableTest {
   public static class ExtendedTestColumnWithoutReplace extends BaseColumn {
   }
 
-  public static class TestColumnWithCustomColumnId extends AbstractColumn {
+  public static class TestColumnWithCustomColumnId extends AbstractColumn<Object> {
     @Override
     public String getColumnId() {
       return "Custom";

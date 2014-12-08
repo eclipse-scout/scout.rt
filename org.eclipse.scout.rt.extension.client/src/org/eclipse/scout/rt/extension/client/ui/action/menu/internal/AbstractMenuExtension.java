@@ -16,7 +16,7 @@ import org.eclipse.scout.rt.extension.client.ui.action.menu.IMenuExtensionFilter
 /**
  * @since 3.9.0
  */
-public class AbstractMenuExtension {
+public abstract class AbstractMenuExtension {
 
   private final IMenuExtensionFilter m_filter;
   private final Class<? extends IMenu> m_menuClass;

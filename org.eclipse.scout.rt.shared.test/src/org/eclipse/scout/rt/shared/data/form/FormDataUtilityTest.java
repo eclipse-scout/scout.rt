@@ -17,14 +17,14 @@ import org.junit.Test;
 
 /**
  * JUnit tests for {@link FormDataUtility}
- * 
+ *
  * @since 3.8.0
  */
 public class FormDataUtilityTest {
 
   @Test
   public void testGetFieldDataId() {
-    assertNull(FormDataUtility.getFieldDataId(null));
+    assertNull(FormDataUtility.getFieldDataId((String) null));
     assertNull(FormDataUtility.getFieldDataId(""));
     assertNull(FormDataUtility.getFieldDataId("   "));
     assertEquals("Test", FormDataUtility.getFieldDataId("Test"));

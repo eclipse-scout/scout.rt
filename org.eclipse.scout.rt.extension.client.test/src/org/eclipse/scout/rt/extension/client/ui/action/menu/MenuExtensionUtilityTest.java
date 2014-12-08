@@ -86,21 +86,21 @@ public class MenuExtensionUtilityTest {
     P_AnchorNodePage container = anchor;
     List<IMenu> menuList = new ArrayList<IMenu>();
     //
-    MenuExtensionUtility.contributeMenus(anchor, container, null, menuList, false);
+    MenuExtensionUtility.contributeMenus(anchor, container, null, menuList);
     assertTrue(menuList.isEmpty());
     //
-    MenuExtensionUtility.contributeMenus(anchor, container, Collections.<MenuContributionExtension> emptyList(), menuList, false);
+    MenuExtensionUtility.contributeMenus(anchor, container, Collections.<MenuContributionExtension> emptyList(), menuList);
     assertTrue(menuList.isEmpty());
     //
     menuList.add(m_a);
     menuList.add(m_b);
     menuList.add(m_c);
-    MenuExtensionUtility.contributeMenus(anchor, container, Collections.<MenuContributionExtension> emptyList(), menuList, false);
+    MenuExtensionUtility.contributeMenus(anchor, container, Collections.<MenuContributionExtension> emptyList(), menuList);
     assertEquals(Arrays.asList(m_a, m_b, m_c), menuList);
     //
     List<MenuContributionExtension> menuExtensions = new ArrayList<MenuContributionExtension>();
     menuExtensions.add(new MenuContributionExtension(P_ADynamicMenu.class, new MenuAnchorFilter(P_AnchorNodePage.class), 15d));
-    MenuExtensionUtility.contributeMenus(anchor, container, menuExtensions, menuList, false);
+    MenuExtensionUtility.contributeMenus(anchor, container, menuExtensions, menuList);
     assertEquals(4, menuList.size());
     assertSame(m_a, menuList.get(0));
     assertTrue(menuList.get(1) instanceof P_ADynamicMenu);
@@ -113,7 +113,7 @@ public class MenuExtensionUtilityTest {
     menuList.add(m_b);
     menuExtensions.add(0, new MenuContributionExtension(P_BDynamicMenu.class, new MenuAnchorFilter(P_AnchorNodePage.class), 100d));
     menuExtensions.add(new MenuContributionExtension(P_CDynamicMenu.class, new MenuAnchorFilter(P_OtherNodePage.class), 15d));
-    MenuExtensionUtility.contributeMenus(anchor, container, menuExtensions, menuList, false);
+    MenuExtensionUtility.contributeMenus(anchor, container, menuExtensions, menuList);
     assertEquals(5, menuList.size());
     assertSame(m_a, menuList.get(0));
     assertTrue(menuList.get(1) instanceof P_ADynamicMenu);
@@ -134,7 +134,7 @@ public class MenuExtensionUtilityTest {
     menuList.add(m_c);
     List<MenuContributionExtension> menuExtensions = new ArrayList<MenuContributionExtension>();
     menuExtensions.add(new MenuContributionExtension(P_ADynamicMenu.class, new MenuAnchorFilter(P_AnchorNodePage.class), 15d));
-    MenuExtensionUtility.contributeMenus(anchor, container, menuExtensions, menuList, true);
+    MenuExtensionUtility.contributeMenus(anchor, container, menuExtensions, menuList);
     assertEquals(4, menuList.size());
     assertSame(m_a, menuList.get(0));
     //

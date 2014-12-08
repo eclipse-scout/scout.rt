@@ -14,9 +14,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
@@ -31,6 +33,13 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IMemoryPolicy;
+import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.IPageWithTableExtension;
+import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithTableChains.PageWithTableCreateChildPageChain;
+import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithTableChains.PageWithTableCreateVirtualChildPageChain;
+import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithTableChains.PageWithTableInitSearchFormChain;
+import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithTableChains.PageWithTableLoadDataChain;
+import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithTableChains.PageWithTableLoadTableDataChain;
+import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithTableChains.PageWithTablePopulateTableChain;
 import org.eclipse.scout.rt.client.services.common.search.ISearchFilterService;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
@@ -50,6 +59,7 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.page.AbstractTablePageData;
+import org.eclipse.scout.rt.shared.extension.IContributionOwner;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
@@ -59,7 +69,7 @@ import org.eclipse.scout.service.SERVICES;
  * A page containing a list of "menu" entries<br>
  * child pages are explicitly added
  */
-public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPage implements IPageWithTable<T> {
+public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPage implements IPageWithTable<T>, IContributionOwner {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractPageWithTable.class);
 
   private T m_table;
@@ -70,8 +80,8 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   private boolean m_limitedResult;
   private boolean m_showEmptySpaceMenus;
   private boolean m_showTableRowMenus;
-  private final HashMap<ITableRow, IPage> m_tableRowToPageMap = new HashMap<ITableRow, IPage>();
-  private final HashMap<IPage, ITableRow> m_pageToTableRowMap = new HashMap<IPage, ITableRow>();
+  private final Map<ITableRow, IPage> m_tableRowToPageMap = new HashMap<ITableRow, IPage>();
+  private final Map<IPage, ITableRow> m_pageToTableRowMap = new HashMap<IPage, ITableRow>();
 
   public AbstractPageWithTable() {
     this(true, null, null);
@@ -165,9 +175,9 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * or whether loading the table data must be triggered explicitly by the user. Set this property to {@code true} if
    * you expect large amount of data for an unconstrained search.
    * <p>
-   * This property is read by {@link #execPopulateTable()}, if you override that method, this configuration property
-   * might not have any effect. This configuration property does not have any effect if no search form is configured for
-   * this table page.
+   * This property is read by {@link #interceptPopulateTable()}, if you override that method, this configuration
+   * property might not have any effect. This configuration property does not have any effect if no search form is
+   * configured for this table page.
    * <p>
    * Subclasses can override this method. Default is {@code false}.
    *
@@ -228,8 +238,8 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * getTable().importFromTableBeanData(pageData);
    * </pre>
    * <p/>
-   * This default implementation invokes {@link #execLoadTableData(SearchFilter)} to fetch the tabular data and loads it
-   * into the table using {@link ITable#replaceRowsByMatrix(Object)}.
+   * This default implementation invokes {@link #interceptLoadTableData(SearchFilter)} to fetch the tabular data and
+   * loads it into the table using {@link ITable#replaceRowsByMatrix(Object)}.
    *
    * @param filter
    *          a search filter, guaranteed not to be {@code null}
@@ -240,7 +250,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   @Order(85)
   protected void execLoadData(SearchFilter filter) throws ProcessingException {
     //do NOT reference the result data object and warp it into a ref, so the processor is allowed to delete the contents to free up memory sooner
-    getTable().replaceRowsByMatrix(new AtomicReference<Object>(execLoadTableData(filter)));
+    getTable().replaceRowsByMatrix(new AtomicReference<Object>(interceptLoadTableData(filter)));
   }
 
   /**
@@ -248,8 +258,8 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * Typically this method will query a (backend) service for the data. Make
    * sure the returned content (including type definitions) matches the table columns.
    * <p>
-   * This method is called by {@link #execPopulateTable()} and overriding this method generally is the most convenient
-   * way to populate a table page. If you need more control over populating a table page, consider overriding
+   * This method is called by {@link #interceptPopulateTable()} and overriding this method generally is the most
+   * convenient way to populate a table page. If you need more control over populating a table page, consider overriding
    * {@code execPopulateTable()} instead.
    * <p>
    * Subclasses can override this method. The default returns {@code null}.
@@ -272,10 +282,10 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * ITable.addRows} because in the former case the outline tree structure below the changing rows is not discarded but
    * only marked as dirty. The subtree is lazily reloaded when the user clicks next time on a child node.
    * <p>
-   * Subclasses can override this method. In most cases it is sufficient to override {@link #execLoadData(SearchFilter)}
-   * or {@link #execLoadTableData(SearchFilter)} instead.<br/>
+   * Subclasses can override this method. In most cases it is sufficient to override
+   * {@link #interceptLoadData(SearchFilter)} or {@link #interceptLoadTableData(SearchFilter)} instead.<br/>
    * This default implementation does the following: It queries methods {@link #isSearchActive()} and
-   * {@link #isSearchRequired()} and then calls {@link #execLoadData(SearchFilter)} if appropriate.
+   * {@link #isSearchRequired()} and then calls {@link #interceptLoadData(SearchFilter)} if appropriate.
    *
    * @throws ProcessingException
    */
@@ -288,12 +298,12 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
         // create a copy of the filter, just in case the subprocess is modifying
         // or extending the filter
         filter = (SearchFilter) filter.clone();
-        execLoadData(filter);
+        interceptLoadData(filter);
       }
     }
     else {
       // searchFilter should never be null
-      execLoadData(new SearchFilter());
+      interceptLoadData(new SearchFilter());
     }
     //update table data status
     if (isSearchActive() && getSearchFilter() != null && (!getSearchFilter().isCompleted()) && isSearchRequired()) {
@@ -330,7 +340,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   }
 
   protected IPage createChildPageInternal(ITableRow row) throws ProcessingException {
-    return execCreateChildPage(row);
+    return interceptCreateChildPage(row);
   }
 
   /**
@@ -340,7 +350,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * pages are never activated, but solely displayed in the outline tree.
    * <p>
    * Subclasses can override this method. In most cases it is preferable to override
-   * {@link #execCreateChildPage(ITableRow)} instead.<br/>
+   * {@link #interceptCreateChildPage(ITableRow)} instead.<br/>
    * This default implementation checks whether {@code execCreateChildPage} is overridden and returns a new virtual
    * page, or {@code null} otherwise.
    *
@@ -366,8 +376,8 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * This implementation does the following:
    * <ul>
    * <li>returns {@code null} if no table row is linked to {@code node}
-   * <li>else creates a new child page by calling {@link #execCreateChildPage(ITableRow)}, links the table row to the
-   * new tree node and returns the new node.
+   * <li>else creates a new child page by calling {@link #interceptCreateChildPage(ITableRow)}, links the table row to
+   * the new tree node and returns the new node.
    * </ul>
    *
    * @param node
@@ -409,10 +419,21 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     setSearchRequired(getConfiguredSearchRequired());
     setShowEmptySpaceMenus(getConfiguredShowEmptySpaceMenus());
     setShowTableRowMenus(getConfiguredShowTableRowMenus());
-    Class<? extends ITable> tableClass = getConfiguredTable();
-    if (tableClass != null) {
-      try {
-        m_table = (T) ConfigurationUtility.newInnerInstance(this, tableClass);
+
+    try {
+      List<ITable> contributedFields = m_contributionHolder.getContributionsByClass(ITable.class);
+      m_table = (T) CollectionUtility.firstElement(contributedFields);
+      if (m_table == null) {
+        Class<? extends ITable> tableClass = getConfiguredTable();
+        if (tableClass != null) {
+          m_table = (T) ConfigurationUtility.newInnerInstance(this, tableClass);
+        }
+        else {
+          LOG.warn("there is no inner class of type ITable in " + getClass().getName());
+        }
+      }
+
+      if (m_table != null) {
         if (m_table instanceof AbstractTable) {
           ((AbstractTable) m_table).setContainerInternal(this);
         }
@@ -422,23 +443,9 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
         m_table.setUserPreferenceContext(getUserPreferenceContext());
         m_table.initTable();
       }
-      catch (Exception e) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + tableClass + "'.", e));
-      }
     }
-    // legacy-support for searchform-inner classes
-    if (getConfiguredSearchForm() == null) {
-      Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-      Class<? extends ISearchForm> searchFormClass = ConfigurationUtility.filterClass(dca, ISearchForm.class);
-      if (searchFormClass != null) {
-        LOG.warn("inner searchforms are deprecated...");
-        try {
-          setSearchForm(ConfigurationUtility.newInnerInstance(this, searchFormClass));
-        }
-        catch (Exception e) {
-          SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + searchFormClass.getName() + "'.", e));
-        }
-      }
+    catch (Exception e) {
+      SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating inner table of class '" + getClass().getName() + "'.", e));
     }
   }
 
@@ -528,7 +535,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     };
     m_searchForm.addFormListener(m_searchFormListener);
     try {
-      execInitSearchForm();
+      interceptInitSearchForm();
     }
     catch (Exception e) {
       LOG.warn(null, e);
@@ -714,7 +721,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
         //
         ensureSearchFormCreated();
         ensureSearchFormStarted();
-        execPopulateTable();
+        interceptPopulateTable();
       }
       catch (Throwable t) {
         m_table.discardAllRows();
@@ -960,7 +967,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
             List<ITableRow> tableRows = e.getRows();
             for (ITableRow element : tableRows) {
               try {
-                IPage childPage = execCreateVirtualChildPage(element);
+                IPage childPage = interceptCreateVirtualChildPage(element);
                 if (childPage != null) {
                   ICell tableCell = m_table.getSummaryCell(element);
                   childPage.getCellForUpdate().updateFrom(tableCell);
@@ -1014,6 +1021,90 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
       }// end switch
     }
 
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public List<? extends IPageWithTableExtension<T, ? extends AbstractPageWithTable<? extends ITable>>> getAllExtensions() {
+    return (List<? extends IPageWithTableExtension<T, ? extends AbstractPageWithTable<? extends ITable>>>) super.getAllExtensions();
+  }
+
+  protected final void interceptLoadData(SearchFilter filter) throws ProcessingException {
+    List<? extends IPageWithTableExtension<? extends ITable, ? extends AbstractPageWithTable<? extends ITable>>> extensions = getAllExtensions();
+    PageWithTableLoadDataChain<T> chain = new PageWithTableLoadDataChain<T>(extensions);
+    chain.execLoadData(filter);
+  }
+
+  protected final IPage interceptCreateChildPage(ITableRow row) throws ProcessingException {
+    List<? extends IPageWithTableExtension<? extends ITable, ? extends AbstractPageWithTable<? extends ITable>>> extensions = getAllExtensions();
+    PageWithTableCreateChildPageChain<T> chain = new PageWithTableCreateChildPageChain<T>(extensions);
+    return chain.execCreateChildPage(row);
+  }
+
+  protected final Object[][] interceptLoadTableData(SearchFilter filter) throws ProcessingException {
+    List<? extends IPageWithTableExtension<? extends ITable, ? extends AbstractPageWithTable<? extends ITable>>> extensions = getAllExtensions();
+    PageWithTableLoadTableDataChain<T> chain = new PageWithTableLoadTableDataChain<T>(extensions);
+    return chain.execLoadTableData(filter);
+  }
+
+  protected final void interceptPopulateTable() throws ProcessingException {
+    List<? extends IPageWithTableExtension<? extends ITable, ? extends AbstractPageWithTable<? extends ITable>>> extensions = getAllExtensions();
+    PageWithTablePopulateTableChain<T> chain = new PageWithTablePopulateTableChain<T>(extensions);
+    chain.execPopulateTable();
+  }
+
+  protected final IPage interceptCreateVirtualChildPage(ITableRow row) throws ProcessingException {
+    List<? extends IPageWithTableExtension<? extends ITable, ? extends AbstractPageWithTable<? extends ITable>>> extensions = getAllExtensions();
+    PageWithTableCreateVirtualChildPageChain<T> chain = new PageWithTableCreateVirtualChildPageChain<T>(extensions);
+    return chain.execCreateVirtualChildPage(row);
+  }
+
+  protected final void interceptInitSearchForm() throws ProcessingException {
+    List<? extends IPageWithTableExtension<? extends ITable, ? extends AbstractPageWithTable<? extends ITable>>> extensions = getAllExtensions();
+    PageWithTableInitSearchFormChain<T> chain = new PageWithTableInitSearchFormChain<T>(extensions);
+    chain.execInitSearchForm();
+  }
+
+  protected static class LocalPageWithTableExtension<T extends ITable, OWNER extends AbstractPageWithTable<T>> extends LocalPageExtension<OWNER> implements IPageWithTableExtension<T, OWNER> {
+
+    public LocalPageWithTableExtension(OWNER owner) {
+      super(owner);
+    }
+
+    @Override
+    public void execLoadData(PageWithTableLoadDataChain<? extends ITable> chain, SearchFilter filter) throws ProcessingException {
+      getOwner().execLoadData(filter);
+    }
+
+    @Override
+    public IPage execCreateChildPage(PageWithTableCreateChildPageChain<? extends ITable> chain, ITableRow row) throws ProcessingException {
+      return getOwner().execCreateChildPage(row);
+    }
+
+    @Override
+    public Object[][] execLoadTableData(PageWithTableLoadTableDataChain<? extends ITable> chain, SearchFilter filter) throws ProcessingException {
+      return getOwner().execLoadTableData(filter);
+    }
+
+    @Override
+    public void execPopulateTable(PageWithTablePopulateTableChain<? extends ITable> chain) throws ProcessingException {
+      getOwner().execPopulateTable();
+    }
+
+    @Override
+    public IPage execCreateVirtualChildPage(PageWithTableCreateVirtualChildPageChain<? extends ITable> chain, ITableRow row) throws ProcessingException {
+      return getOwner().execCreateVirtualChildPage(row);
+    }
+
+    @Override
+    public void execInitSearchForm(PageWithTableInitSearchFormChain<? extends ITable> chain) throws ProcessingException {
+      getOwner().execInitSearchForm();
+    }
+  }
+
+  @Override
+  protected IPageWithTableExtension<T, ? extends AbstractPageWithTable<T>> createLocalExtension() {
+    return new LocalPageWithTableExtension<T, AbstractPageWithTable<T>>(this);
   }
 
 }

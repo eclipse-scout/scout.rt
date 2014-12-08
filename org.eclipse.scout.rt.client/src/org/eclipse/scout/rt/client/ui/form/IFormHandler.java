@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -61,7 +61,7 @@ public interface IFormHandler {
    * before the form is validated and stored.<br>
    * After this method, the form is checking fields itself and displaying a
    * dialog with missing and invalid fields.
-   * 
+   *
    * @return true when this check is done and further checks can continue, false
    *         to silently cancel the current process
    * @throws ProcessingException
@@ -75,7 +75,7 @@ public interface IFormHandler {
    * enablings.<br>
    * This method is called after the {@link IForm#execValidate()} but before the
    * form is stored.<br>
-   * 
+   *
    * @return true when validate is successful, false to silently cancel the
    *         current process
    * @throws ProcessingException

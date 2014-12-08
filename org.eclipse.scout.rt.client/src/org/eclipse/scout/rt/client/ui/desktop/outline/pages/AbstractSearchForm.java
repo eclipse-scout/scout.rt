@@ -10,11 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
-import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.ISearchFormExtension;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.FormUtility;
-import org.eclipse.scout.rt.client.ui.form.IFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 
 /**
@@ -37,7 +36,7 @@ public abstract class AbstractSearchForm extends AbstractForm implements ISearch
     // mark strategy
     FormUtility.setTabBoxMarkStrategy(this, ITabBox.MARK_STRATEGY_SAVE_NEEDED);
     // custom
-    execInitForm();
+    interceptInitForm();
   }
 
   @Override
@@ -50,12 +49,15 @@ public abstract class AbstractSearchForm extends AbstractForm implements ISearch
     return false;
   }
 
-  private Class<? extends IFormHandler> getConfiguredSearchHandler() {
-    Class<?>[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    return ConfigurationUtility.filterClass(dca, IFormHandler.class);
+  protected static class LocalSearchFormExtension<OWNER extends AbstractSearchForm> extends LocalFormExtension<OWNER> implements ISearchFormExtension<OWNER> {
+
+    public LocalSearchFormExtension(OWNER owner) {
+      super(owner);
+    }
   }
 
   @Override
-  public abstract void startSearch() throws ProcessingException;
-
+  protected ISearchFormExtension<? extends AbstractSearchForm> createLocalExtension() {
+    return new LocalSearchFormExtension<AbstractSearchForm>(this);
+  }
 }

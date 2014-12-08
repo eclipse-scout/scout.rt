@@ -69,7 +69,8 @@ public class ServiceTunnelServletTest {
 
   @Before
   public void setup() throws ServletException {
-    m_serviceReg = TestingUtility.registerServices(Activator.getDefault().getBundle(), TEST_SERVICE_RANKING, new StickySessionCacheService(), new AbstractAccessControlService());
+    m_serviceReg = TestingUtility.registerServices(Activator.getDefault().getBundle(), TEST_SERVICE_RANKING, new StickySessionCacheService(), new AbstractAccessControlService() {
+    });
     m_testServiceTunnelServlet = getServiceTunnelServletWithTestSession();
     m_testServiceTunnelServlet.lazyInit(null, null);
     m_requestMock = mock(HttpServletRequest.class);

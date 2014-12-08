@@ -22,6 +22,8 @@ import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.IPageWithNodesExtension;
+import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithNodesChains.PageWithNodesCreateChildPagesChain;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
@@ -101,7 +103,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
    * Called by {@link #loadChildren()} to load data for this page. Allows to add multiple child pages to this page.
    * <p>
    * Subclasses can override this method. The default does nothing.
-   * 
+   *
    * @param pageList
    *          live collection to add child pages to this page
    * @throws ProcessingException
@@ -112,7 +114,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
   }
 
   protected void createChildPagesInternal(List<IPage> pageList) throws ProcessingException {
-    execCreateChildPages(pageList);
+    interceptCreateChildPages(pageList);
   }
 
   @Override
@@ -142,7 +144,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
    * If the cell has changed (e.g. the text) we inform our parent as well.
    * If the parent page is a {@link IPageWithNodes}, update its table accordingly.
    * Since the table {@link P_Table} has only one column, we update the first column.
-   * 
+   *
    * @since 3.10.0-M5
    */
   protected void updateParentTableRow(ICell cell) {
@@ -176,7 +178,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
    * Subclasses can override this method.<br/>
    * This implementation sets the title of the internal table used by this page to the path from the root node to this
    * page.
-   * 
+   *
    * @throws ProcessingException
    */
   @Override
@@ -445,6 +447,35 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
       }
 
     }
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public List<? extends IPageWithNodesExtension<? extends AbstractPageWithNodes>> getAllExtensions() {
+    return (List<? extends IPageWithNodesExtension<? extends AbstractPageWithNodes>>) super.getAllExtensions();
+  }
+
+  protected final void interceptCreateChildPages(List<IPage> pageList) throws ProcessingException {
+    List<? extends IPageWithNodesExtension<? extends AbstractPageWithNodes>> extensions = getAllExtensions();
+    PageWithNodesCreateChildPagesChain chain = new PageWithNodesCreateChildPagesChain(extensions);
+    chain.execCreateChildPages(pageList);
+  }
+
+  protected static class LocalPageWithNodesExtension<OWNER extends AbstractPageWithNodes> extends LocalPageExtension<OWNER> implements IPageWithNodesExtension<OWNER> {
+
+    public LocalPageWithNodesExtension(OWNER owner) {
+      super(owner);
+    }
+
+    @Override
+    public void execCreateChildPages(PageWithNodesCreateChildPagesChain chain, List<IPage> pageList) throws ProcessingException {
+      getOwner().execCreateChildPages(pageList);
+    }
+  }
+
+  @Override
+  protected IPageWithNodesExtension<? extends AbstractPageWithNodes> createLocalExtension() {
+    return new LocalPageWithNodesExtension<AbstractPageWithNodes>(this);
   }
 
 }
