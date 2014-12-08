@@ -23,23 +23,36 @@ public class HttpCacheControlInDevelopment implements IHttpCacheControl {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(HttpCacheControlInDevelopment.class);
 
   @Override
-  public void putCacheInfo(HttpCacheInfo info) {
+  public void putCacheObject(HttpCacheObject o) {
+    //no caching in dev
   }
 
   @Override
-  public HttpCacheInfo getCacheInfo(String requestPath) {
+  public HttpCacheObject getCacheObject(String pathInfo) {
+    //no caching in dev
     return null;
   }
 
   @Override
-  public HttpCacheInfo removeCacheInfo(String requestPath) {
+  public HttpCacheObject removeCacheObject(String pathInfo) {
+    //no caching in dev
     return null;
   }
 
   @Override
-  public int processCacheHeaders(HttpServletRequest req, HttpServletResponse resp, HttpCacheInfo info) {
+  public String getQualifierReplacement() {
+    //no special qualifier in dev
+    return "dev";
+  }
+
+  @Override
+  public int enableCache(HttpServletRequest req, HttpServletResponse resp, HttpCacheInfo info) {
     resp.setHeader("cache-control", "private, max-age=0, no-cache, no-store, must-revalidate");
     return HttpServletResponse.SC_ACCEPTED;
   }
 
+  @Override
+  public void disableCache(HttpServletRequest req, HttpServletResponse resp, HttpCacheInfo info) {
+    resp.setHeader("cache-control", "private, max-age=0, no-cache, no-store, must-revalidate");
+  }
 }

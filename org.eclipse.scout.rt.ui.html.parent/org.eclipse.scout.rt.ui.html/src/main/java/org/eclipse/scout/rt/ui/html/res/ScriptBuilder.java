@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.res;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.regex.Matcher;
@@ -18,6 +19,8 @@ import java.util.regex.Pattern;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.html.IWebArchiveResourceLocator;
+import org.eclipse.scout.rt.ui.html.StreamUtil;
+import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
 import org.eclipse.scout.rt.ui.html.res.Script.NodeType;
 import org.eclipse.scout.service.SERVICES;
 
@@ -37,10 +40,12 @@ public class ScriptBuilder {
 
   private static final Pattern INCLUDE_PAT = Pattern.compile("//\\s*@include\\s*\\(\\s*\"([^\"]+)\"\\s*\\)");
 
+  private static final String UTF_8 = "UTF-8";
+
   /**
    * $1$2-$3.min.$4 with $1=path, $2=basename, $3=version, (-qualifier), $4="js" or "css"
    */
-  public static final Pattern NON_FRAGMENT_PATH_PATTERN = Pattern.compile("(.*/)([-_\\w]+)-([0-9.]+)(?:\\-\\w+)?\\.min\\.(js|css)");
+  private static final Pattern NON_FRAGMENT_PATH_PATTERN = Pattern.compile("(.*/)([-_\\w]+)-([0-9.]+)(?:\\-\\w+)?\\.min\\.(js|css)");
 
   private final IWebArchiveResourceLocator m_resourceLocator;
   private final IScriptProcessorService m_scriptProcessorService;
@@ -66,15 +71,18 @@ public class ScriptBuilder {
     return m_debug;
   }
 
-  public byte[] buildScript(String path) throws IOException {
-    Script script = locateNonFragmentScript(path);
+  public HttpCacheObject buildScript(String pathInfo) throws IOException {
+    Script script = locateNonFragmentScript(pathInfo);
     switch (script.getNodeType()) {
-      case LIBRARY:
-        return script.getContentRaw();
-      case MACRO:
-        return processMacroWithIncludesRec(script).getBytes("UTF-8");
-      case SRC_MODULE:
-        return processModuleWithIncludes(script).getBytes("UTF-8");
+      case LIBRARY: {
+        return new HttpCacheObject(pathInfo, StreamUtil.readResource(script.getURL()), script.getURL().openConnection().getLastModified());
+      }
+      case MACRO: {
+        return processMacroWithIncludesRec(pathInfo, script);
+      }
+      case SRC_MODULE: {
+        return processModuleWithIncludes(pathInfo, script);
+      }
       default:
         throw new IOException("Unexpected " + NodeType.class.getSimpleName() + " " + script.getNodeType());
     }
@@ -151,7 +159,7 @@ public class ScriptBuilder {
     return -1;
   }
 
-  protected String processMacroWithIncludesRec(Script script) throws IOException {
+  protected HttpCacheObject processMacroWithIncludesRec(String pathInfo, Script script) throws IOException {
     if (script.getNodeType() != Script.NodeType.MACRO) {
       throw new IOException(script.getRequestPath() + " / " + script.getURL() + ": expected " + NodeType.MACRO);
     }
@@ -162,41 +170,51 @@ public class ScriptBuilder {
     else {
       basePath = basePath.substring(0, basePath.lastIndexOf('/') + 1);
     }
-    String content = script.getContentUTF8();
-    StringBuilder buf = new StringBuilder();
+    ByteArrayOutputStream buf = new ByteArrayOutputStream();
+    long lastModified = script.getURL().openConnection().getLastModified();
+    String content = new String(StreamUtil.readResource(script.getURL()), UTF_8);
     Matcher mat = INCLUDE_PAT.matcher(content);
     int pos = 0;
     while (mat.find()) {
-      buf.append(content.substring(pos, mat.start()));
+      buf.write(content.substring(pos, mat.start()).getBytes(UTF_8));
       String includePath = basePath + mat.group(1);
       Script includeScript = locateNonFragmentScript(includePath);
-      String replacement;
+      byte[] replacement;
       switch (includeScript.getNodeType()) {
-        case LIBRARY:
-          replacement = includeScript.getContentUTF8();
+        case LIBRARY: {
+          replacement = StreamUtil.readResource(includeScript.getURL());
+          lastModified = Math.max(lastModified, includeScript.getURL().openConnection().getLastModified());
           break;
-        case MACRO:
-          replacement = processMacroWithIncludesRec(includeScript);
+        }
+        case MACRO: {
+          HttpCacheObject sub = processMacroWithIncludesRec(includePath, includeScript);
+          replacement = sub.getContent();
+          lastModified = Math.max(lastModified, sub.getLastModified());
           break;
-        case SRC_MODULE:
-          replacement = processModuleWithIncludes(includeScript);
+        }
+        case SRC_MODULE: {
+          HttpCacheObject sub = processModuleWithIncludes(includePath, includeScript);
+          replacement = sub.getContent();
+          lastModified = Math.max(lastModified, sub.getLastModified());
           break;
+        }
         default:
           throw new IOException("Unexpected " + NodeType.class.getSimpleName() + " " + includeScript.getNodeType());
       }
-      buf.append(replacement);
+      buf.write(replacement);
       pos = mat.end();
     }
-    buf.append(content.substring(pos));
-    return buf.toString();
+    buf.write(content.substring(pos).getBytes(UTF_8));
+    return new HttpCacheObject(pathInfo, buf.toByteArray(), lastModified);
   }
 
-  protected String processModuleWithIncludes(Script script) throws IOException {
+  protected HttpCacheObject processModuleWithIncludes(String pathInfo, Script script) throws IOException {
     if (script.getNodeType() != Script.NodeType.SRC_MODULE) {
       throw new IOException(script.getRequestPath() + " / " + script.getURL() + ": expected " + NodeType.SRC_MODULE);
     }
-    String content = script.getContentUTF8();
     StringBuilder buf = new StringBuilder();
+    long lastModified = script.getURL().openConnection().getLastModified();
+    String content = new String(StreamUtil.readResource(script.getURL()), UTF_8);
     Matcher mat = INCLUDE_PAT.matcher(content);
     int pos = 0;
     while (mat.find()) {
@@ -205,12 +223,14 @@ public class ScriptBuilder {
       Script includeFragment = locateFragmentScript(includePath);
       String replacement;
       switch (includeFragment.getNodeType()) {
-        case SRC_FRAGMENT:
-          replacement = includeFragment.getContentUTF8();
+        case SRC_FRAGMENT: {
+          replacement = new String(StreamUtil.readResource(includeFragment.getURL()), UTF_8);
+          lastModified = Math.max(lastModified, includeFragment.getURL().openConnection().getLastModified());
           if (isDebug() && includeFragment.getFileType() == Script.FileType.JS) {
             replacement = insertLineNumbers(includePath, replacement);
           }
           break;
+        }
         default:
           throw new IOException("Unexpected " + NodeType.class.getSimpleName() + " " + includeFragment.getNodeType());
       }
@@ -224,7 +244,7 @@ public class ScriptBuilder {
     if (!isDebug()) {
       result = minifyModule(script.getFileType(), result);
     }
-    return result;
+    return new HttpCacheObject(pathInfo, result.getBytes(UTF_8), lastModified);
   }
 
   protected String compileModule(Script.FileType fileType, String content) throws IOException {

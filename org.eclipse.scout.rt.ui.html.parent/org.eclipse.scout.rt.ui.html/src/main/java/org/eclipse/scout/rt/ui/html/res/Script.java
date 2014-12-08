@@ -10,14 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.res;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 
 import javax.servlet.ServletContext;
 
-import org.eclipse.scout.commons.IOUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 
@@ -90,7 +86,9 @@ public class Script {
     if (url == null) {
       throw new IllegalArgumentException(requestPath + ": url is null");
     }
-    LOG.info("locate script '" + requestPath + "' -> " + nodeType + " " + url);
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("locate script '" + requestPath + "' -> " + nodeType + " " + url);
+    }
     m_requestPath = requestPath;
     m_url = url;
     m_fileType = fileType;
@@ -111,26 +109,6 @@ public class Script {
 
   public Script.NodeType getNodeType() {
     return m_nodeType;
-  }
-
-  public String getContentUTF8() throws IOException {
-    try (InputStream in = m_url.openStream()) {
-      return IOUtility.getContentUtf8(in);
-    }
-    catch (ProcessingException e) {
-      LOG.warn("reading " + m_url, e);
-      throw new IOException(e.getMessage());
-    }
-  }
-
-  public byte[] getContentRaw() throws IOException {
-    try (InputStream in = m_url.openStream()) {
-      return IOUtility.getContent(in);
-    }
-    catch (ProcessingException e) {
-      LOG.warn("reading " + m_url, e);
-      throw new IOException(e.getMessage());
-    }
   }
 
 }

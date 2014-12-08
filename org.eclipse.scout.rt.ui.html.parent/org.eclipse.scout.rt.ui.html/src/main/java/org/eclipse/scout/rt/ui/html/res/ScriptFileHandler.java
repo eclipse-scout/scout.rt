@@ -20,9 +20,17 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.html.AbstractRequestHandler;
 import org.eclipse.scout.rt.ui.html.AbstractScoutAppServlet;
+import org.eclipse.scout.rt.ui.html.cache.HttpCacheInfo;
+import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
 
+/**
+ * Serve CSS and JS files as a servlet resource using caches.
+ * <p>
+ * see {@link ScriptBuilder}
+ */
 public class ScriptFileHandler extends AbstractRequestHandler {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ScriptFileHandler.class);
+  private static final int MAX_AGE_30_DAYS = 30 * 24 * 3600;
 
   public ScriptFileHandler(AbstractScoutAppServlet servlet, HttpServletRequest req, HttpServletResponse resp, String pathInfo) {
     super(servlet, req, resp, pathInfo);
@@ -32,23 +40,36 @@ public class ScriptFileHandler extends AbstractRequestHandler {
   public boolean handle() throws ServletException, IOException {
     String pathInfo = getPathInfo();
     LOG.info("processing script: " + pathInfo);
-    ScriptBuilder builder = new ScriptBuilder(getServlet().getResourceLocator());
-    builder.setDebug(isDebug());
-    try {
-      byte[] outputBytes = builder.buildScript(pathInfo);
-      if (pathInfo.endsWith(".js")) {
-        getHttpServletResponse().setContentType("application/javascript");
-      }
-      else {
-        getHttpServletResponse().setContentType("text/css");
-      }
-      getHttpServletResponse().getOutputStream().write(outputBytes);
+
+    //performance: did we already create a cached version?
+    HttpCacheObject cacheObj = getServlet().getHttpCacheControl().getCacheObject(pathInfo);
+    if (cacheObj == null) {
+      ScriptBuilder builder = createScriptBuilder();
+      builder.setDebug(isDebug());
+      cacheObj = builder.buildScript(pathInfo);
+      getServlet().getHttpCacheControl().putCacheObject(cacheObj);
     }
-    catch (Exception ex) {
-      LOG.error("SCRIPT_BUILD_ERROR: " + pathInfo, ex);
-      getHttpServletResponse().sendError(HttpServletResponse.SC_NOT_FOUND);
+
+    //check cache state
+    HttpCacheInfo info = new HttpCacheInfo(cacheObj.getContent().length, cacheObj.getLastModified(), MAX_AGE_30_DAYS);
+    if (HttpServletResponse.SC_NOT_MODIFIED == getServlet().getHttpCacheControl().enableCache(getHttpServletRequest(), getHttpServletResponse(), info)) {
+      getHttpServletResponse().setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+      return true;
     }
+
+    if (pathInfo.endsWith(".js")) {
+      getHttpServletResponse().setContentType("application/javascript");
+    }
+    else {
+      getHttpServletResponse().setContentType("text/css");
+    }
+    getHttpServletResponse().setContentLength(cacheObj.getContent().length);
+    getHttpServletResponse().getOutputStream().write(cacheObj.getContent());
     return true;
+  }
+
+  protected ScriptBuilder createScriptBuilder() {
+    return new ScriptBuilder(getServlet().getResourceLocator());
   }
 
 }

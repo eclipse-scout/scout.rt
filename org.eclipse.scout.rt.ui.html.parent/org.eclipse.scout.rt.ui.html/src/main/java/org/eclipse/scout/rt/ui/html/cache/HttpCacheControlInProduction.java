@@ -10,6 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.cache;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -19,23 +23,32 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 public class HttpCacheControlInProduction implements IHttpCacheControl {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(HttpCacheControlInProduction.class);
 
+  private Map<String, HttpCacheObject> m_cache = Collections.synchronizedMap(new HashMap<String, HttpCacheObject>());
+
   @Override
-  public void putCacheInfo(HttpCacheInfo info) {
+  public void putCacheObject(HttpCacheObject o) {
+    m_cache.put(o.getPathInfo(), o);
   }
 
   @Override
-  public HttpCacheInfo getCacheInfo(String requestPath) {
-    return null;
+  public HttpCacheObject getCacheObject(String pathInfo) {
+    return m_cache.get(pathInfo);
   }
 
   @Override
-  public HttpCacheInfo removeCacheInfo(String requestPath) {
-    return null;
+  public HttpCacheObject removeCacheObject(String pathInfo) {
+    return m_cache.remove(pathInfo);
   }
 
   @Override
-  public int processCacheHeaders(HttpServletRequest req, HttpServletResponse resp, HttpCacheInfo info) {
-    resp.setHeader("cache-control", "public, max-age=240, s-maxage=240");//FIXME imo depending on resource type some other times
+  public String getQualifierReplacement() {
+    return "5.0.0";//FIXME imo where to get?
+  }
+
+  @Override
+  public int enableCache(HttpServletRequest req, HttpServletResponse resp, HttpCacheInfo info) {
+    int maxAge = info.getPreferredCacheMaxAge();
+    resp.setHeader("cache-control", "public, max-age=" + maxAge + ", s-maxage=" + maxAge);
 
     String etag = info.createETag();
 
@@ -44,17 +57,18 @@ public class HttpCacheControlInProduction implements IHttpCacheControl {
     // HTTP 1.1 clients should be using it
     String ifNoneMatch = req.getHeader(IF_NONE_MATCH);
     if (notModified(ifNoneMatch, etag)) {
+      LOG.info("http-cache (etag): " + req.getPathInfo());
       return HttpServletResponse.SC_NOT_MODIFIED;
     }
     else {
       long ifModifiedSince = req.getDateHeader(IF_MODIFIED_SINCE);
       // for purposes of comparison we add 999 to ifModifiedSince since the fidelity of the IMS header generally doesn't include milli-seconds
       if (notModifiedSince(ifModifiedSince, info.getLastModified())) {
+        LOG.info("http-cache (ifModifiedSince): " + req.getPathInfo());
         return HttpServletResponse.SC_NOT_MODIFIED;
       }
     }
 
-    // File needs to be returned regularly, write cache headers
     if (info.getLastModified() > 0) {
       resp.setDateHeader(LAST_MODIFIED, info.getLastModified());
     }
@@ -63,6 +77,11 @@ public class HttpCacheControlInProduction implements IHttpCacheControl {
     }
 
     return HttpServletResponse.SC_ACCEPTED;
+  }
+
+  @Override
+  public void disableCache(HttpServletRequest req, HttpServletResponse resp, HttpCacheInfo info) {
+    resp.setHeader("cache-control", "private, max-age=0, no-cache, no-store, must-revalidate");
   }
 
   protected boolean notModified(String ifNoneMatch, String etag) {

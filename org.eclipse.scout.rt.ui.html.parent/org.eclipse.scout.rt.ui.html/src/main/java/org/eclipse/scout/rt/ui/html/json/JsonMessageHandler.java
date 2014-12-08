@@ -18,19 +18,18 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.commons.IOUtility;
-import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.html.AbstractRequestHandler;
 import org.eclipse.scout.rt.ui.html.AbstractScoutAppServlet;
+import org.eclipse.scout.rt.ui.html.cache.HttpCacheInfo;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * This interceptor contributes to the {@link AbstractScoutAppServlet} as the default json message handler
+ * Handle HTTP POST requests containing a JSON message
  */
-@Priority(-10)
 public class JsonMessageHandler extends AbstractRequestHandler {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonMessageHandler.class);
 
@@ -46,6 +45,10 @@ public class JsonMessageHandler extends AbstractRequestHandler {
       getHttpServletResponse().sendError(HttpServletResponse.SC_NOT_FOUND);
       return true;
     }
+
+    //disable cache
+    HttpCacheInfo info = new HttpCacheInfo(-1, -1, -1);
+    getServlet().getHttpCacheControl().disableCache(getHttpServletRequest(), getHttpServletResponse(), info);
 
     JsonRequest jsonReq = new JsonRequest(decodeJSONRequest());
     if (jsonReq.isPingRequest()) {

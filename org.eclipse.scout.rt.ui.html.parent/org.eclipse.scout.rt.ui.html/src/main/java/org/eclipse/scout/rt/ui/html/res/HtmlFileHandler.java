@@ -11,6 +11,9 @@
 package org.eclipse.scout.rt.ui.html.res;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URL;
+import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -20,15 +23,22 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.html.AbstractRequestHandler;
 import org.eclipse.scout.rt.ui.html.AbstractScoutAppServlet;
+import org.eclipse.scout.rt.ui.html.StreamUtil;
+import org.eclipse.scout.rt.ui.html.cache.HttpCacheInfo;
+import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
+import org.eclipse.scout.rt.ui.html.cache.IHttpCacheControl;
 
 /**
+ * Serve HTML files as a servlet resource using caches.
+ * <p>
  * Process script tags in html files and enable automatic version and cache control handling
  * <p>
- * All script urls matching {@link ScriptBuilder#NON_FRAGMENT_PATH_PATTERN} and that contain the "qualifier" text are
- * replaced
+ * All occurrences of "-qualifier." are replaced by {@link IHttpCacheControl#getQualifierReplacement()}
  */
 public class HtmlFileHandler extends AbstractRequestHandler {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(HtmlFileHandler.class);
+  private static final Pattern QUALIFIER_PATTERN = Pattern.compile("(?<=[-])qualifier(?=.)");
+  private static int MAX_AGE_4_HOURS = 4 * 3600;
 
   public HtmlFileHandler(AbstractScoutAppServlet servlet, HttpServletRequest req, HttpServletResponse resp, String pathInfo) {
     super(servlet, req, resp, pathInfo);
@@ -37,8 +47,45 @@ public class HtmlFileHandler extends AbstractRequestHandler {
   @Override
   public boolean handle() throws ServletException, IOException {
     String pathInfo = getPathInfo();
-    LOG.info("processing html: " + pathInfo);
-    return false;
+    URL url = getServlet().getResourceLocator().getWebContentResource(getPathInfo());
+    if (url == null) {
+      return false;
+    }
+    LOG.info("processing html: " + pathInfo + " using " + url);
+
+    //performance: did we already create a cached version?
+    HttpCacheObject cacheObj = getServlet().getHttpCacheControl().getCacheObject(pathInfo);
+    if (cacheObj == null) {
+      byte[] content = StreamUtil.readResource(url);
+      content = replaceQualifiers(content);
+      cacheObj = new HttpCacheObject(pathInfo, content, System.currentTimeMillis());
+      getServlet().getHttpCacheControl().putCacheObject(cacheObj);
+    }
+
+    //check cache state
+    HttpCacheInfo info = new HttpCacheInfo(cacheObj.getContent().length, cacheObj.getLastModified(), MAX_AGE_4_HOURS);
+    if (HttpServletResponse.SC_NOT_MODIFIED == getServlet().getHttpCacheControl().enableCache(getHttpServletRequest(), getHttpServletResponse(), info)) {
+      getHttpServletResponse().setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+      return true;
+    }
+
+    getHttpServletResponse().setContentType("text/html");
+    getHttpServletResponse().setContentLength(cacheObj.getContent().length);
+    getHttpServletResponse().getOutputStream().write(cacheObj.getContent());
+    return true;
+  }
+
+  /**
+   * Replace all script "qualifer" texts in script and css tags by {@link IHttpCacheControl#getQualifierReplacement()}
+   *
+   * @throws UnsupportedEncodingException
+   */
+  protected byte[] replaceQualifiers(byte[] content) throws IOException {
+    String s = new String(content, "UTF-8");
+    System.out.println("BEFORE: " + s);
+    s = QUALIFIER_PATTERN.matcher(s).replaceAll(getServlet().getHttpCacheControl().getQualifierReplacement());
+    System.out.println("AFTER:  " + s);
+    return s.getBytes("UTF-8");
   }
 
 }

@@ -27,14 +27,19 @@ public interface IHttpCacheControl {
   String IF_NONE_MATCH = "If-None-Match"; //$NON-NLS-1$
   String ETAG = "ETag"; //$NON-NLS-1$
 
-  void putCacheInfo(HttpCacheInfo info);
+  void putCacheObject(HttpCacheObject o);
 
-  HttpCacheInfo getCacheInfo(String requestPath);
+  HttpCacheObject getCacheObject(String pathInfo);
 
   /**
-   * @return the removed info or null if it was not even present
+   * @return the removed object or null if it was not cached
    */
-  HttpCacheInfo removeCacheInfo(String requestPath);
+  HttpCacheObject removeCacheObject(String pathInfo);
+
+  /**
+   * @return the "qualifier" replacement string used in html files with script and css tags
+   */
+  String getQualifierReplacement();
 
   /**
    * Checks whether the file needs to be returned or not, depending on the request headers and file modification state.
@@ -45,6 +50,11 @@ public interface IHttpCacheControl {
    * @return {@link HttpServletResponse#SC_NOT_MODIFIED} if the file hasn't changed in the meantime or
    *         {@link HttpServletResponse#SC_ACCEPTED} if the content of the file needs to be returned.
    */
-  int processCacheHeaders(HttpServletRequest req, HttpServletResponse resp, HttpCacheInfo info);
+  int enableCache(HttpServletRequest req, HttpServletResponse resp, HttpCacheInfo info);
+
+  /**
+   * Disable cache for this resource
+   */
+  void disableCache(HttpServletRequest req, HttpServletResponse resp, HttpCacheInfo info);
 
 }

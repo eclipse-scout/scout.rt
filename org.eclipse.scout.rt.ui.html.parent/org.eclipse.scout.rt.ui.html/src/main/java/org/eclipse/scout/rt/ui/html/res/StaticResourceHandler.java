@@ -1,7 +1,16 @@
+/*******************************************************************************
+ * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.res;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.HashMap;
@@ -12,19 +21,23 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.commons.FileUtility;
-import org.eclipse.scout.commons.IOUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.html.AbstractRequestHandler;
 import org.eclipse.scout.rt.ui.html.AbstractScoutAppServlet;
+import org.eclipse.scout.rt.ui.html.StreamUtil;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheInfo;
 
 /**
- * serve a file as a servlet resource using caches
+ * Serve static files such as PNG, JPG, PDF, DOCX etc. as a servlet resource using caches.
+ * <p>
+ * HTML is handled by {@link HtmlFileHandler}
+ * <p>
+ * CSS and JS is handled by {@link ScriptFileHandler}
  */
 public class StaticResourceHandler extends AbstractRequestHandler {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(StaticResourceHandler.class);
+  private static int MAX_AGE_4_HOURS = 4 * 3600;
 
   public StaticResourceHandler(AbstractScoutAppServlet servlet, HttpServletRequest req, HttpServletResponse resp, String pathInfo) {
     super(servlet, req, resp, pathInfo);
@@ -37,16 +50,17 @@ public class StaticResourceHandler extends AbstractRequestHandler {
       return false;
     }
 
-    LOG.info("processing static resource: " + getPathInfo() + " " + url);
+    LOG.info("processing static resource: " + getPathInfo() + " using " + url);
+
+    //check cache state
     URLConnection connection = url.openConnection();
-    HttpCacheInfo info = new HttpCacheInfo(getPathInfo(), connection.getLastModified(), connection.getContentLength());
-    if (HttpServletResponse.SC_NOT_MODIFIED == getServlet().getHttpCacheControl().processCacheHeaders(getHttpServletRequest(), getHttpServletResponse(), info)) {
+    HttpCacheInfo info = new HttpCacheInfo(connection.getContentLength(), connection.getLastModified(), MAX_AGE_4_HOURS);
+    if (HttpServletResponse.SC_NOT_MODIFIED == getServlet().getHttpCacheControl().enableCache(getHttpServletRequest(), getHttpServletResponse(), info)) {
       getHttpServletResponse().setStatus(HttpServletResponse.SC_NOT_MODIFIED);
       return true;
     }
 
-    //Return file regularly if the client (browser) does not already have it or if the file has changed in the meantime
-    byte[] content = fileContent(url);
+    byte[] content = StreamUtil.readResource(url);
     getHttpServletResponse().setContentLength(content.length);
 
     //Prefer mime type mapping from container
@@ -72,15 +86,6 @@ public class StaticResourceHandler extends AbstractRequestHandler {
 
     getHttpServletResponse().getOutputStream().write(content);
     return true;
-  }
-
-  protected byte[] fileContent(URL url) throws IOException {
-    try (InputStream in = url.openStream()) {
-      return IOUtility.getContent(in);
-    }
-    catch (ProcessingException e) {
-      throw new IOException(e.getMessage());
-    }
   }
 
   /**

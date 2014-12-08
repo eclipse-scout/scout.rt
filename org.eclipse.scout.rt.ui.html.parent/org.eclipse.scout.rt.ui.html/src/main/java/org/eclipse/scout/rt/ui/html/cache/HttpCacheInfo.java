@@ -14,26 +14,26 @@ package org.eclipse.scout.rt.ui.html.cache;
  * Used in {@link IHttpCacheControl}
  */
 public class HttpCacheInfo {
-  private final String m_requestPath;
+  private final long m_contentLength;
   private final long m_lastModified;
-  private final int m_contentLength;
+  private final int m_preferredCacheMaxAge;
 
-  public HttpCacheInfo(String requestPath, long lastModified, int contentLength) {
-    m_requestPath = requestPath;
-    m_lastModified = lastModified;
+  public HttpCacheInfo(long contentLength, long lastModified, int preferredCacheMaxAge) {
     m_contentLength = contentLength;
+    m_lastModified = lastModified;
+    m_preferredCacheMaxAge = preferredCacheMaxAge;
   }
 
-  public String getRequestPath() {
-    return m_requestPath;
+  public long getContentLength() {
+    return m_contentLength;
   }
 
   public long getLastModified() {
     return m_lastModified;
   }
 
-  public int getContentLength() {
-    return m_contentLength;
+  public int getPreferredCacheMaxAge() {
+    return m_preferredCacheMaxAge;
   }
 
   /**

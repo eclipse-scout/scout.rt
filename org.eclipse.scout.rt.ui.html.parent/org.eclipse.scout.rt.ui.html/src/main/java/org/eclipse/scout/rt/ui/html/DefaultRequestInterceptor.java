@@ -33,7 +33,7 @@ import org.eclipse.scout.service.AbstractService;
 public class DefaultRequestInterceptor extends AbstractService implements IServletRequestInterceptor {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(DefaultRequestInterceptor.class);
 
-  private static final String DEBUG_PARAM = "debug";
+  private static final String URL_PARAM_DEBUG = "debug";
 
   //TODO imo change once we switch from OSGI to JEE; move WebContent to src/main/resources/META-INF/resources/WebContent, move src/main/js to src/main/resources/META-INF/resources/js
   private IWebArchiveResourceLocator m_resourceLocator = new OsgiWebArchiveResourceLocator();
@@ -84,7 +84,7 @@ public class DefaultRequestInterceptor extends AbstractService implements IServl
     if (session == null) {
       return;
     }
-    String requestParam = req.getParameter(DEBUG_PARAM);
+    String requestParam = req.getParameter(URL_PARAM_DEBUG);
     if (requestParam != null) {
       session.setAttribute(AbstractRequestHandler.SESSION_ATTR_DEBUG_ENABLED, "true".equals(requestParam));
     }

@@ -129,12 +129,24 @@ public abstract class AbstractScoutAppServlet extends HttpServletEx {
       return;
     }
 
-    m_interceptGet.intercept(req, resp);
+    try {
+      m_interceptGet.intercept(req, resp);
+    }
+    catch (Exception ex) {
+      LOG.error("GET " + req.getRequestURI(), ex);
+      resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+    }
   }
 
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     LOG.info("POST request started: " + req.getRequestURI());
-    m_interceptPost.intercept(req, resp);
+    try {
+      m_interceptPost.intercept(req, resp);
+    }
+    catch (Exception ex) {
+      LOG.error("POST " + req.getRequestURI(), ex);
+      resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+    }
   }
 }
