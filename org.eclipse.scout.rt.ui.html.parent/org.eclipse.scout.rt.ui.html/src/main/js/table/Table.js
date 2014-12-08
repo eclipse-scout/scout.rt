@@ -315,13 +315,11 @@ scout.Table.prototype._buildRowDiv = function(row) {
   var column, style, value, tooltipText, tooltip;
   var rowWidth = this._totalWidth + this._tableRowBorderWidth();
   var rowClass = 'table-row ';
-
   if (this.selectedRowIds && this.selectedRowIds.indexOf(row.id) > -1) {
     rowClass += 'selected ';
   }
-  var unselectable = (scout.device.supportsCssUserSelect() ? '' : ' unselectable="on"'); // workaround for IE 9
 
-  var rowDiv = '<div id="' + row.id + '" class="' + rowClass + '" style="width: ' + rowWidth + 'px"' + unselectable + '>';
+  var rowDiv = '<div id="' + row.id + '" class="' + rowClass + '" style="width: ' + rowWidth + 'px"' + scout.device.unselectableAttribute + '>';
   for (var c = 0; c < this.columns.length; c++) {
     column = this.columns[c];
     style = this.getCellStyle(column, row);
@@ -329,7 +327,7 @@ scout.Table.prototype._buildRowDiv = function(row) {
     tooltipText = this.getCellTooltipText(column, row);
     tooltip = (!scout.strings.hasText(tooltipText) ? '' : ' title="' + tooltipText + '"');
 
-    rowDiv += '<div class="table-cell" style="' + style + '"' + tooltip + unselectable + '>' + value + '</div>';
+    rowDiv += '<div class="table-cell" style="' + style + '"' + tooltip + scout.device.unselectableAttribute + '>' + value + '</div>';
   }
   rowDiv += '</div>';
 

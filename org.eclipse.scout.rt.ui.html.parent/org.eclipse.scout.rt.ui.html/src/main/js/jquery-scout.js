@@ -18,7 +18,7 @@
     return $('<div' +
       (id ? ' id="' + id + '"' : '') +
       (cssClass ? ' class="' + cssClass + '"' : '') +
-      (scout.device.supportsCssUserSelect() ? '' : ' unselectable="on"') + // workaround for IE 9
+      scout.device.unselectableAttribute +
       '>' +
       (htmlContent || '') +
       '</div>'

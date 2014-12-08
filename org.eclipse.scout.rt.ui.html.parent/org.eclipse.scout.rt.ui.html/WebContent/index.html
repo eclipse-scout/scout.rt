@@ -13,6 +13,7 @@
       $(document).ready(function() {
         var deferreds = [];
         deferreds.push(scout.logging.init());
+        deferreds.push(scout.device.initUnselectableAttribute());
 
         $.when.apply($, deferreds).done(function() {
           scout.init();

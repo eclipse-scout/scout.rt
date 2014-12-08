@@ -8,6 +8,7 @@ scout.Device = function(userAgent) {
   this.features = {};
   this.device;
   this._userAgentParsed = false;
+  this.unselectableAttribute = ''; // see initUnselectableAttribute()
 };
 
 scout.Device.vendorPrefixes = ['Webkit', 'Moz', 'O', 'ms', 'Khtml'];
@@ -52,6 +53,12 @@ scout.Device.prototype.supportsCssProperty = function(property) {
     }
 
     return false;
+  }
+};
+
+scout.Device.prototype.initUnselectableAttribute = function() {
+  if (!this.supportsCssUserSelect()) {
+    this.unselectableAttribute = ' unselectable="on"'; // workaround for IE 9
   }
 };
 
