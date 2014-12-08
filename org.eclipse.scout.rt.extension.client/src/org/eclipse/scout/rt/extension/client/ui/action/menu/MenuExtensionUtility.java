@@ -13,11 +13,7 @@ package org.eclipse.scout.rt.extension.client.ui.action.menu;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.TreeMap;
 
-import org.eclipse.scout.commons.CompositeObject;
-import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -112,42 +108,17 @@ public final class MenuExtensionUtility {
       return;
     }
 
-    // add existing menus to ordered list
-    TreeMap<CompositeObject, IMenu> orderedMenus = new TreeMap<CompositeObject, IMenu>();
-    int counter = 0;
-    for (IMenu m : menuList) {
-      double order;
-      Class<?> tmpClass = m.getClass();
-      Order orderAnnotation;
-      while ((orderAnnotation = tmpClass.getAnnotation(Order.class)) == null && m.getClass().isAnnotationPresent(Replace.class)) {
-        tmpClass = tmpClass.getSuperclass();
-      }
-      if (orderAnnotation != null) {
-        order = orderAnnotation.value();
-      }
-      else {
-        order = Double.MAX_VALUE;
-      }
-      orderedMenus.put(new CompositeObject(order, counter), m);
-      counter++;
-    }
-
     // create new menus
     for (MenuContributionExtension e : matchingExtensions) {
       try {
         IMenu m = e.createContribution(anchor, container);
         m.setOrder(e.getOrder());
-        orderedMenus.put(new CompositeObject(e.getOrder(), counter), m);
-        counter++;
+        menuList.add(m);
       }
       catch (Throwable t) {
         LOG.error("Exception while creating an instance of contributed menu " + e, t);
       }
     }
-
-    // reorder existing and add new pages
-    menuList.clear();
-    menuList.addAll(orderedMenus.values());
   }
 
   static <T> void removeMenus(T anchor, Object container, List<MenuRemoveExtension> extensions, List<IMenu> menuList) {

@@ -11,8 +11,6 @@
 package org.eclipse.scout.rt.extension.client.ui.action.menu;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
@@ -24,6 +22,7 @@ import java.util.List;
 
 import org.eclipse.scout.commons.annotations.IOrdered;
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.annotations.OrderedComparator;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithNodes;
@@ -31,9 +30,9 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractButton;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
-import org.eclipse.scout.rt.extension.client.IWrappedObject;
 import org.eclipse.scout.rt.extension.client.ui.action.menu.internal.MenuAnchorFilter;
 import org.eclipse.scout.rt.extension.client.ui.action.menu.internal.MenuContributionExtension;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -101,6 +100,7 @@ public class MenuExtensionUtilityTest {
     List<MenuContributionExtension> menuExtensions = new ArrayList<MenuContributionExtension>();
     menuExtensions.add(new MenuContributionExtension(P_ADynamicMenu.class, new MenuAnchorFilter(P_AnchorNodePage.class), 15d));
     MenuExtensionUtility.contributeMenus(anchor, container, menuExtensions, menuList);
+    Collections.sort(menuList, new OrderedComparator());
     assertEquals(4, menuList.size());
     assertSame(m_a, menuList.get(0));
     assertTrue(menuList.get(1) instanceof P_ADynamicMenu);
@@ -114,6 +114,7 @@ public class MenuExtensionUtilityTest {
     menuExtensions.add(0, new MenuContributionExtension(P_BDynamicMenu.class, new MenuAnchorFilter(P_AnchorNodePage.class), 100d));
     menuExtensions.add(new MenuContributionExtension(P_CDynamicMenu.class, new MenuAnchorFilter(P_OtherNodePage.class), 15d));
     MenuExtensionUtility.contributeMenus(anchor, container, menuExtensions, menuList);
+    Collections.sort(menuList, new OrderedComparator());
     assertEquals(5, menuList.size());
     assertSame(m_a, menuList.get(0));
     assertTrue(menuList.get(1) instanceof P_ADynamicMenu);
@@ -135,19 +136,15 @@ public class MenuExtensionUtilityTest {
     List<MenuContributionExtension> menuExtensions = new ArrayList<MenuContributionExtension>();
     menuExtensions.add(new MenuContributionExtension(P_ADynamicMenu.class, new MenuAnchorFilter(P_AnchorNodePage.class), 15d));
     MenuExtensionUtility.contributeMenus(anchor, container, menuExtensions, menuList);
+    Collections.sort(menuList, new OrderedComparator());
     assertEquals(4, menuList.size());
     assertSame(m_a, menuList.get(0));
     //
     IMenu dynamicMenu = menuList.get(1);
     assertTrue(dynamicMenu instanceof IMenu);
-    assertTrue(dynamicMenu instanceof IWrappedObject);
     assertTrue(dynamicMenu instanceof IOrdered);
-    assertFalse(dynamicMenu instanceof P_ADynamicMenu);
-    @SuppressWarnings("unchecked")
-    IMenu wrappedMeny = ((IWrappedObject<IMenu>) dynamicMenu).getWrappedObject();
-    assertNotNull(wrappedMeny);
-    assertTrue(wrappedMeny instanceof P_ADynamicMenu);
-    //
+    assertTrue(dynamicMenu instanceof P_ADynamicMenu);
+    Assert.assertEquals(15d, dynamicMenu.getOrder(), 0.0);
     assertSame(m_b, menuList.get(2));
     assertSame(m_c, menuList.get(3));
   }
