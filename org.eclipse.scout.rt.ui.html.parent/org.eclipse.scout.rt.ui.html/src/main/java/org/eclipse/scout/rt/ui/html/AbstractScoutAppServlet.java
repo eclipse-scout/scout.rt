@@ -50,7 +50,7 @@ public abstract class AbstractScoutAppServlet extends HttpServletEx {
   private P_AbstractInterceptor m_interceptPost = new P_AbstractInterceptor("POST") {
 
     @Override
-    boolean intercept(IServletRequestInterceptor interceptor, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected boolean intercept(IServletRequestInterceptor interceptor, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
       return interceptor.interceptPost(AbstractScoutAppServlet.this, req, resp);
     }
   };
