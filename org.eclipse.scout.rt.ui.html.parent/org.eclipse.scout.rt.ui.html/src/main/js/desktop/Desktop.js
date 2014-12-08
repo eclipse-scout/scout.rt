@@ -94,9 +94,11 @@ scout.Desktop.prototype._render = function($parent) {
 
   $(window).on('resize', this.onResize.bind(this));
 
-  // Switch off browser's default context menu for the entire scout desktop
+  // Switch off browser's default context menu for the entire scout desktop (except input fields)
   $parent.bind("contextmenu", function(event) {
-    event.preventDefault();
+    if (event.target.nodeName !== "INPUT" && event.target.nodeName !== "TEXTAREA") {
+      event.preventDefault();
+    }
   });
 
   // TODO CRU: split and move
