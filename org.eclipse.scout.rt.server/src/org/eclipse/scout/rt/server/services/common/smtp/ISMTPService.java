@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.server.services.common.smtp;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
-import org.eclipse.scout.commons.MailUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.service.IService;
 
@@ -21,7 +20,7 @@ import org.eclipse.scout.service.IService;
  * <h3>ISMTPService</h3> The service to send messages over the smtp protocol. <br>
  * <p>
  * Usage Example:
- * 
+ *
  * <pre>
  * DataSource att = MailUtility.createDataSource(new File(&quot;D:\\pictures\\backgroundCorsaire.jpg&quot;));
  * MimeMessage message = MailUtility.createMimeMessage(&quot;Some body part&quot;, &quot;&lt;html&gt;&lt;body&gt;&lt;b&gt;TEST&lt;/b&gt; Mail&lt;/body&gt;&lt;/html&gt;&quot;, new DataSource[]{att});
@@ -30,8 +29,8 @@ import org.eclipse.scout.service.IService;
  * message.setFrom(new InternetAddress(&quot;aho@bsiag.com&quot;, &quot;Andreas Hoegger&quot;));
  * service.sendMessage(message);
  * </pre>
- * 
- * @see MailUtility
+ *
+ * @see org.eclipse.scout.commons.mail.MailUtility
  */
 @SuppressWarnings("restriction")
 public interface ISMTPService extends IService {
@@ -39,7 +38,7 @@ public interface ISMTPService extends IService {
   /**
    * sends the message over the configured session. Ensure to have set receiver
    * email addresses, sender email addresses, subject and body parts.
-   * 
+   *
    * @param message
    * @throws ProcessingException
    * @see {@link MailUtility} to create a message
@@ -49,7 +48,7 @@ public interface ISMTPService extends IService {
   /**
    * sends the message over the session given as an argument. Ensure to have set
    * receiver email addresses, sender email addresses, subject and body parts.
-   * 
+   *
    * @param session
    *          to send the message.
    * @throws ProcessingException
@@ -80,7 +79,7 @@ public interface ISMTPService extends IService {
    * The prefix will be added to every emails subject sent with the smtp
    * service. <br>
    * subject = prefix+message.subject
-   * 
+   *
    * @param prefix
    */
   void setSubjectPrefix(String prefix);
@@ -93,7 +92,7 @@ public interface ISMTPService extends IService {
 
   /**
    * This email is used when no sender address is set on the message to send.
-   * 
+   *
    * @return
    */
   String getDebugReceiverEmail();
@@ -107,7 +106,7 @@ public interface ISMTPService extends IService {
   /**
    * Controls whether the communication between this service and the SMTP
    * host is encrypted (i.e. is using SMTPS)
-   * 
+   *
    * @param useSmtps
    */
   void setUseSmtps(boolean useSmtps);
@@ -121,7 +120,7 @@ public interface ISMTPService extends IService {
   /**
    * Sets the list of supported SSL protocols used for establishing a
    * connection to the SMTP host.
-   * 
+   *
    * @param sslProtocols
    *          comma-separated list of protocol names.
    */
