@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.shared.extension.data.model.DataModelEntityChains.Da
 /**
  *
  */
-public class AbstractDataModelEntityExtension<OWNER extends AbstractDataModelEntity> extends AbstractSerializableExtension<OWNER> implements IDataModelEntityExtension<OWNER> {
+public abstract class AbstractDataModelEntityExtension<OWNER extends AbstractDataModelEntity> extends AbstractSerializableExtension<OWNER> implements IDataModelEntityExtension<OWNER> {
   private static final long serialVersionUID = 1L;
 
   public AbstractDataModelEntityExtension(OWNER owner) {
