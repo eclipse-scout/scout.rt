@@ -18,10 +18,16 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.html.StreamUtility;
 
 class GZIPServletResponseWrapper extends HttpServletResponseWrapper {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(GZIPServletResponseWrapper.class);
+
   private BufferedServletOutputStream m_buf;
+  private int m_compressedLength = -1;
+  private int m_uncompressedLength = -1;
   //one of these two is used
   private ServletOutputStream m_servletOut;
   private PrintWriter m_writer;
@@ -35,6 +41,14 @@ class GZIPServletResponseWrapper extends HttpServletResponseWrapper {
       m_buf = new BufferedServletOutputStream(getResponse().getOutputStream());
     }
     return m_buf;
+  }
+
+  public int getCompressedLength() {
+    return m_compressedLength;
+  }
+
+  public int getUncompressedLength() {
+    return m_uncompressedLength;
   }
 
   @Override
@@ -81,11 +95,16 @@ class GZIPServletResponseWrapper extends HttpServletResponseWrapper {
     }
     if (m_buf != null) {
       m_buf.close();
+      byte[] raw = m_buf.getContent();
+      m_uncompressedLength = raw.length;
+      m_buf = null;
+      byte[] gzipped = StreamUtility.compressGZIP(raw);
+      m_compressedLength = gzipped.length;
+      raw = null;
       HttpServletResponse res = (HttpServletResponse) getResponse();
-      byte[] bytes = StreamUtility.compressGZIP(m_buf.getContent());
       res.addHeader(GZIPServletFilter.CONTENT_ENCODING, GZIPServletFilter.GZIP);
-      res.setContentLength(bytes.length);
-      res.getOutputStream().write(bytes);
+      res.setContentLength(gzipped.length);
+      res.getOutputStream().write(gzipped);
       super.flushBuffer();
     }
   }

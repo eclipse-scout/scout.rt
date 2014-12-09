@@ -97,6 +97,8 @@ public abstract class AbstractScoutAppServlet extends HttpServletEx {
       return;
     }
 
+    ScoutAppHints.updateHints(req);
+
     try {
       m_interceptGet.intercept(req, resp);
     }

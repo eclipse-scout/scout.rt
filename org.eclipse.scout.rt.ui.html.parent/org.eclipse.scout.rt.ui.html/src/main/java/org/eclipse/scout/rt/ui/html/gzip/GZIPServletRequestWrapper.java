@@ -13,6 +13,9 @@ package org.eclipse.scout.rt.ui.html.gzip;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
 
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -26,6 +29,8 @@ class GZIPServletRequestWrapper extends HttpServletRequestWrapper {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(GZIPServletRequestWrapper.class);
 
   private BufferedServletInputStream m_buf;
+  private int m_compressedLength = -1;
+  private int m_uncompressedLength = -1;
 
   public GZIPServletRequestWrapper(HttpServletRequest req) throws IOException {
     super(req);
@@ -33,9 +38,20 @@ class GZIPServletRequestWrapper extends HttpServletRequestWrapper {
 
   protected BufferedServletInputStream ensureBufferedStream() throws IOException {
     if (m_buf == null) {
-      m_buf = new BufferedServletInputStream(StreamUtility.uncompressGZIP(StreamUtility.readStream(super.getInputStream(), super.getContentLength())));
+      byte[] gzipped = StreamUtility.readStream(super.getInputStream(), super.getContentLength());
+      m_compressedLength = gzipped.length;
+      m_buf = new BufferedServletInputStream(StreamUtility.uncompressGZIP(gzipped));
+      m_uncompressedLength = m_buf.getLength();
     }
     return m_buf;
+  }
+
+  public int getUncompressedLength() {
+    return m_uncompressedLength;
+  }
+
+  public int getCompressedLength() {
+    return m_compressedLength;
   }
 
   @Override
@@ -62,6 +78,33 @@ class GZIPServletRequestWrapper extends HttpServletRequestWrapper {
       LOG.warn("reading gzip content", ex);
       return -1;
     }
+  }
+
+  @Override
+  public String getHeader(String name) {
+    if (GZIPServletFilter.CONTENT_ENCODING.equals(name)) {
+      return null;
+    }
+    return super.getHeader(name);
+  }
+
+  @Override
+  public Enumeration<String> getHeaders(String name) {
+    if (GZIPServletFilter.CONTENT_ENCODING.equals(name)) {
+      return Collections.emptyEnumeration();
+    }
+    return super.getHeaders(name);
+  }
+
+  @Override
+  public Enumeration<String> getHeaderNames() {
+    Enumeration<String> names = super.getHeaderNames();
+    if (names != null) {
+      ArrayList<String> list = Collections.list(names);
+      list.remove(GZIPServletFilter.CONTENT_ENCODING);
+      return Collections.enumeration(list);
+    }
+    return names;
   }
 
 }

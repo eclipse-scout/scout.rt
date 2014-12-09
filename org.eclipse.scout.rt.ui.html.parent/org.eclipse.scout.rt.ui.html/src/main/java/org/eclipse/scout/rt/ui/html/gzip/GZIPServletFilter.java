@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.html.gzip;
 
 import java.io.IOException;
+import java.util.regex.Pattern;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -25,6 +26,17 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.html.ScoutAppHints;
 
+/**
+ * Supports the servlet init-params
+ * <p>
+ * get_min_size = minimum size that is compressed, default {@value #DEFAULT_GET_MIN_SIZE} = 64
+ * <p>
+ * post_min_size = minimum size that is compressed, default {@link #DEFAULT_POST_MIN_SIZE} = 64
+ * <p>
+ * get_pattern = regex of pathInfo that is compressed, default {@link #DEFAULT_GET_PATTERN} = '*(html|css|js)'
+ * <p>
+ * post_pattern = regex of pathInfo that is compressed, default {@link #DEFAULT_POST_PATTERN} = '/json'
+ */
 public class GZIPServletFilter implements Filter {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(GZIPServletFilter.class);
 
@@ -32,8 +44,41 @@ public class GZIPServletFilter implements Filter {
   public static final String CONTENT_ENCODING = "Content-Encoding";
   public static final String GZIP = "gzip";
 
+  public static final int DEFAULT_GET_MIN_SIZE = 64;
+  public static final int DEFAULT_POST_MIN_SIZE = 64;
+
+  public static final Pattern DEFAULT_GET_PATTERN = Pattern.compile(".*\\.(html|css|js)", Pattern.CASE_INSENSITIVE);
+  public static final Pattern DEFAULT_POST_PATTERN = Pattern.compile(".*/json", Pattern.CASE_INSENSITIVE);
+
+  private int m_getMinSize = DEFAULT_GET_MIN_SIZE;
+  private int m_postMinSize = DEFAULT_POST_MIN_SIZE;
+
+  private Pattern m_getPattern = DEFAULT_GET_PATTERN;
+  private Pattern m_postPattern = DEFAULT_POST_PATTERN;
+
   @Override
   public void init(FilterConfig filterConfig) throws ServletException {
+    String s;
+
+    s = filterConfig.getInitParameter("get_min_size");
+    if (s != null) {
+      m_getMinSize = Integer.parseInt(s);
+    }
+
+    s = filterConfig.getInitParameter("post_min_size");
+    if (s != null) {
+      m_getMinSize = Integer.parseInt(s);
+    }
+
+    s = filterConfig.getInitParameter("get_pattern");
+    if (s != null) {
+      m_getPattern = Pattern.compile(s, Pattern.CASE_INSENSITIVE);
+    }
+
+    s = filterConfig.getInitParameter("post_pattern");
+    if (s != null) {
+      m_postPattern = Pattern.compile(s, Pattern.CASE_INSENSITIVE);
+    }
   }
 
   @Override
@@ -42,18 +87,24 @@ public class GZIPServletFilter implements Filter {
     HttpServletResponse resp = (HttpServletResponse) resp0;
 
     if (requestHasGZIPEncoding(req)) {
-      LOG.info("GZIP request: " + req.getPathInfo());
-      req = new GZIPServletRequestWrapper(req);
+      GZIPServletRequestWrapper gzipReq = new GZIPServletRequestWrapper(req);
+      req = gzipReq;
+      if (LOG.isInfoEnabled()) {
+        LOG.info("GZIP request[size " + (gzipReq.getCompressedLength() * 100 / gzipReq.getUncompressedLength()) + "%, compressed: " + gzipReq.getCompressedLength() + ", uncompressed: " + gzipReq.getUncompressedLength() + "]: " + req.getPathInfo());
+      }
     }
-    if (requestAcceptsGZIPEncoding(req) && ScoutAppHints.isCompressHint(req)) {
-      LOG.info("GZIP response: " + req.getPathInfo());
+    if (requestAcceptsGZIPEncoding(req) && supportsGZIPEncoding(req)) {
       resp = new GZIPServletResponseWrapper(resp);
     }
 
     chain.doFilter(req, resp);
 
     if (resp instanceof GZIPServletResponseWrapper) {
-      ((GZIPServletResponseWrapper) resp).finish();
+      GZIPServletResponseWrapper gzipResp = (GZIPServletResponseWrapper) resp;
+      gzipResp.finish();
+      if (LOG.isInfoEnabled()) {
+        LOG.info("GZIP response[size " + (gzipResp.getCompressedLength() * 100 / gzipResp.getUncompressedLength()) + "%, uncompressed: " + gzipResp.getUncompressedLength() + ", compressed: " + gzipResp.getCompressedLength() + "]: " + req.getPathInfo());
+      }
     }
   }
 
@@ -65,6 +116,28 @@ public class GZIPServletFilter implements Filter {
   private boolean requestAcceptsGZIPEncoding(HttpServletRequest req) {
     String h = req.getHeader(ACCEPT_ENCODING);
     return h != null && h.contains(GZIP);
+  }
+
+  protected boolean supportsGZIPEncoding(HttpServletRequest req) {
+    if (!ScoutAppHints.isCompressHint(req)) {
+      return false;
+    }
+    String pathInfo = req.getPathInfo();
+    if (pathInfo == null) {
+      return false;
+    }
+    int len = req.getContentLength();
+    if ("GET".equals(req.getMethod()) && lengthAtLeast(len, m_getMinSize) && m_getPattern.matcher(pathInfo).matches()) {
+      return true;
+    }
+    if ("POST".equals(req.getMethod()) && lengthAtLeast(len, m_postMinSize) && m_postPattern.matcher(pathInfo).matches()) {
+      return true;
+    }
+    return false;
+  }
+
+  private boolean lengthAtLeast(int len, int minSize) {
+    return len < 0 || len >= minSize;
   }
 
   @Override
