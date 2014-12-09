@@ -1,0 +1,81 @@
+/*******************************************************************************
+ * Copyright (c) 2014 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+package org.eclipse.scout.rt.client.extension.ui.form.fields;
+
+import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains.FormFieldAddSearchTermsChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains.FormFieldCalculateVisibleChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains.FormFieldChangedMasterValueChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains.FormFieldDataChangedChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains.FormFieldDisposeFieldChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains.FormFieldInitFieldChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains.FormFieldIsEmptyChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains.FormFieldIsSaveNeededChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains.FormFieldMarkSavedChain;
+import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
+import org.eclipse.scout.rt.shared.extension.AbstractExtension;
+import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
+
+/**
+ *
+ */
+public abstract class AbstractFormFieldExtension<OWNER_FIELD extends AbstractFormField> extends AbstractExtension<OWNER_FIELD>
+implements IFormFieldExtension<OWNER_FIELD> {
+
+  public AbstractFormFieldExtension(OWNER_FIELD owner) {
+    super(owner);
+  }
+
+  @Override
+  public void execDataChanged(FormFieldDataChangedChain chain, Object... dataTypes) throws ProcessingException {
+    chain.execDataChanged(dataTypes);
+  }
+
+  @Override
+  public void execAddSearchTerms(FormFieldAddSearchTermsChain chain, SearchFilter search) {
+    chain.execAddSearchTerms(search);
+  }
+
+  @Override
+  public void execChangedMasterValue(FormFieldChangedMasterValueChain chain, Object newMasterValue) throws ProcessingException {
+    chain.execChangedMasterValue(newMasterValue);
+  }
+
+  @Override
+  public void execDisposeField(FormFieldDisposeFieldChain chain) throws ProcessingException {
+    chain.execDisposeField();
+  }
+
+  @Override
+  public void execInitField(FormFieldInitFieldChain chain) throws ProcessingException {
+    chain.execInitField();
+  }
+
+  @Override
+  public boolean execCalculateVisible(FormFieldCalculateVisibleChain chain) {
+    return chain.execCalculateVisible();
+  }
+
+  @Override
+  public void execMarkSaved(FormFieldMarkSavedChain chain) throws ProcessingException {
+    chain.execMarkSaved();
+  }
+
+  @Override
+  public boolean execIsEmpty(FormFieldIsEmptyChain chain) throws ProcessingException {
+    return chain.execIsEmpty();
+  }
+
+  @Override
+  public boolean execIsSaveNeeded(FormFieldIsSaveNeededChain chain) throws ProcessingException {
+    return chain.execIsSaveNeeded();
+  }
+}

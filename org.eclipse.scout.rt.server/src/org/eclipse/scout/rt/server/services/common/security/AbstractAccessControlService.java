@@ -46,7 +46,7 @@ import org.osgi.framework.ServiceRegistration;
  * Implementations should override {@link #execLoadPermissions()}
  */
 @Priority(-1)
-public class AbstractAccessControlService extends AbstractService implements IAccessControlService, IClusterNotificationListenerService {
+public abstract class AbstractAccessControlService extends AbstractService implements IAccessControlService, IClusterNotificationListenerService {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractAccessControlService.class);
 
   private AccessControlStore m_accessControlStore;

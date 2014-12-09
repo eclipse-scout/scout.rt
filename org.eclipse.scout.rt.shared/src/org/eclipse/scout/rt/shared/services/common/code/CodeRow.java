@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.shared.services.common.code;
 
 import org.eclipse.scout.commons.TypeCastUtility;
+import org.eclipse.scout.commons.annotations.IOrdered;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 
@@ -30,6 +31,7 @@ public class CodeRow<ID_TYPE> implements ICodeRow<ID_TYPE> {
   private String m_extKey;
   private Number m_value;
   private long m_partitionId;
+  private double m_order;
   private AbstractTableRowData m_additionalTableRowData;
 
   public CodeRow(Object[] cells) {
@@ -51,7 +53,8 @@ public class CodeRow<ID_TYPE> implements ICodeRow<ID_TYPE> {
    * [9] String extKey <br>
    * [10] Number value <br>
    * [11] Long enabled (0 or 1) <br>
-   * [12] Long partitionId
+   * [12] Long partitionId<br>
+   * [13] Double order
    */
   @SuppressWarnings("unchecked")
   public CodeRow(Object[] cells, int maxColumnIndex) {
@@ -120,6 +123,15 @@ public class CodeRow<ID_TYPE> implements ICodeRow<ID_TYPE> {
               m_partitionId = ((Number) cells[index]).longValue();
               break;
             }
+            case 13:
+              Double val = TypeCastUtility.castValue(cells[index], Double.class);
+              if (val != null) {
+                setOrder(val.doubleValue());
+              }
+              else {
+                setOrder(IOrdered.DEFAULT_ORDER);
+              }
+              break;
           }
         }
       }
@@ -140,15 +152,21 @@ public class CodeRow<ID_TYPE> implements ICodeRow<ID_TYPE> {
         t.isActive(),
         t.getExtKey(),
         t.getValue(),
-        t.getPartitionId());
+        t.getPartitionId(),
+        t.getOrder());
   }
 
   public CodeRow(ID_TYPE key, String text) {
     m_key = key;
     m_text = text;
+    m_order = Double.MAX_VALUE;
   }
 
   public CodeRow(ID_TYPE key, String text, String iconId, String tooltip, String backgroundColor, String foregroundColor, FontSpec font, boolean enabled, ID_TYPE parentKey, boolean active, String extKey, Number value, long partitionId) {
+    this(key, text, iconId, tooltip, backgroundColor, foregroundColor, font, enabled, parentKey, active, extKey, value, partitionId, IOrdered.DEFAULT_ORDER);
+  }
+
+  public CodeRow(ID_TYPE key, String text, String iconId, String tooltip, String backgroundColor, String foregroundColor, FontSpec font, boolean enabled, ID_TYPE parentKey, boolean active, String extKey, Number value, long partitionId, double order) {
     m_key = key;
     m_text = text;
     m_iconId = iconId;
@@ -162,6 +180,7 @@ public class CodeRow<ID_TYPE> implements ICodeRow<ID_TYPE> {
     m_extKey = extKey;
     m_value = value;
     m_partitionId = partitionId;
+    m_order = order;
   }
 
   /*
@@ -321,5 +340,15 @@ public class CodeRow<ID_TYPE> implements ICodeRow<ID_TYPE> {
   @Override
   public void setAdditionalTableRowData(AbstractTableRowData bean) {
     m_additionalTableRowData = bean;
+  }
+
+  @Override
+  public double getOrder() {
+    return m_order;
+  }
+
+  @Override
+  public void setOrder(double order) {
+    m_order = order;
   }
 }

@@ -19,8 +19,6 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -42,26 +40,6 @@ import org.junit.Test;
  */
 public class ConfigurationUtilityTest {
   private static final String TEST_CLASS_ID = "TEST_CLASS_ID";
-
-  @Test
-  public void sortByOrder() {
-    // null and empty
-    assertNull(ConfigurationUtility.sortByOrder(null));
-    assertTrue(ConfigurationUtility.sortByOrder(Collections.emptyList()).isEmpty());
-    //
-    OrderStatic10 static10 = new OrderStatic10();
-    OrderStatic20Dynamic0 static20Dynamic0 = new OrderStatic20Dynamic0();
-    OrderDynamic30 dynamic30 = new OrderDynamic30();
-    //
-    List<Object> orderedElements = Arrays.asList(dynamic30, static20Dynamic0, static10);
-    Collection<Object> sorted = ConfigurationUtility.sortByOrder(orderedElements);
-    assertArrayEquals(new Object[]{static10, static20Dynamic0, dynamic30}, sorted.toArray());
-    //
-    ReplaceOrderStatic10 replaceOrderStatic10 = new ReplaceOrderStatic10();
-    orderedElements = Arrays.<Object> asList(dynamic30, static20Dynamic0, replaceOrderStatic10);
-    sorted = ConfigurationUtility.sortByOrder(orderedElements);
-    assertArrayEquals(new Object[]{replaceOrderStatic10, static20Dynamic0, dynamic30}, sorted.toArray());
-  }
 
   @Test
   @SuppressWarnings("deprecation")
@@ -383,12 +361,20 @@ public class ConfigurationUtilityTest {
     public double getOrder() {
       return 0;
     }
+
+    @Override
+    public void setOrder(double order) {
+    }
   }
 
   public static class OrderDynamic30 implements IOrdered {
     @Override
     public double getOrder() {
       return 30;
+    }
+
+    @Override
+    public void setOrder(double order) {
     }
   }
 
@@ -397,6 +383,10 @@ public class ConfigurationUtilityTest {
     @Override
     public double getOrder() {
       return 40;
+    }
+
+    @Override
+    public void setOrder(double order) {
     }
   }
 

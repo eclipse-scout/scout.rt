@@ -13,11 +13,14 @@ package org.eclipse.scout.rt.shared.data.form.properties;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
+import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.holders.IHolder;
 
 public abstract class AbstractPropertyData<T> implements IHolder<T>, Serializable {
+
+  private static final Pattern PROPERTY_SUFFIX = Pattern.compile("Property$");
   private static final long serialVersionUID = 1L;
 
   private T m_value;
@@ -55,7 +58,7 @@ public abstract class AbstractPropertyData<T> implements IHolder<T>, Serializabl
   public String getPropertyId() {
     String s = getClass().getSimpleName();
     if (s.endsWith("Property")) {
-      s = s.replaceAll("Property$", "");
+      s = PROPERTY_SUFFIX.matcher(s).replaceAll("");
     }
     return s;
   }

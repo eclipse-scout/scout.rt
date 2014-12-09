@@ -35,6 +35,13 @@ import org.eclipse.scout.commons.exception.ProcessingStatus;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.xmlparser.SimpleXmlElement;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.tablefield.ITableFieldExtension;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.tablefield.TableFieldChains.TableFieldReloadTableDataChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.tablefield.TableFieldChains.TableFieldSaveChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.tablefield.TableFieldChains.TableFieldSaveDeletedRowChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.tablefield.TableFieldChains.TableFieldSaveInsertedRowChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.tablefield.TableFieldChains.TableFieldSaveUpdatedRowChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.tablefield.TableFieldChains.TableFieldUpdateTableStatusChain;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
@@ -81,7 +88,7 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
    * Called when the table data is reloaded, i.e. when {@link #reloadTableData()} is called.
    * <p>
    * Subclasses can override this method. The default does nothing.
-   * 
+   *
    * @throws ProcessingException
    */
   @ConfigOperation
@@ -148,7 +155,7 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
    * <p>
    * Subclasses can override this method. The default calls {@link #createDefaultTableStatus()} and
    * {@link #setTableStatus(String)} if the table status is visible.
-   * 
+   *
    * @throws ProcessingException
    */
   @ConfigOperation
@@ -164,7 +171,7 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
    * Called for batch processing when the table is saved. See {@link #doSave()} for the call order.
    * <p>
    * Subclasses can override this method. The default does nothing.
-   * 
+   *
    * @throws ProcessingException
    */
   @ConfigOperation
@@ -176,7 +183,7 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
    * Called to handle deleted rows when the table is saved. See {@link #doSave()} for the call order.
    * <p>
    * Subclasses can override this method. The default does nothing.
-   * 
+   *
    * @throws ProcessingException
    */
   @ConfigOperation
@@ -188,7 +195,7 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
    * Called to handle inserted rows when the table is saved. See {@link #doSave()} for the call order.
    * <p>
    * Subclasses can override this method. The default does nothing.
-   * 
+   *
    * @throws ProcessingException
    */
   @ConfigOperation
@@ -200,7 +207,7 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
    * Called to handle updated rows when the table is saved. See {@link #doSave()} for the call order.
    * <p>
    * Subclasses can override this method. The default does nothing.
-   * 
+   *
    * @throws ProcessingException
    */
   @ConfigOperation
@@ -217,7 +224,7 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
    * Configures the visibility of the table status.
    * <p>
    * Subclasses can override this method. Default is {@code false}.
-   * 
+   *
    * @return {@code true} if the table status is visible, {@code false} otherwise.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -265,12 +272,19 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
 
   @SuppressWarnings("unchecked")
   protected T createTable() {
-    if (getConfiguredTable() != null) {
+    List<ITable> contributedFields = m_contributionHolder.getContributionsByClass(ITable.class);
+    ITable result = CollectionUtility.firstElement(contributedFields);
+    if (result != null) {
+      return (T) result;
+    }
+
+    Class<? extends ITable> configuredTable = getConfiguredTable();
+    if (configuredTable != null) {
       try {
-        return (T) ConfigurationUtility.newInnerInstance(this, getConfiguredTable());
+        return (T) ConfigurationUtility.newInnerInstance(this, configuredTable);
       }
       catch (Exception e) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + getConfiguredTable().getName() + "'.", e));
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + configuredTable.getName() + "'.", e));
       }
     }
     return null;
@@ -611,7 +625,7 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
   @Override
   public void updateTableStatus() {
     try {
-      execUpdateTableStatus();
+      interceptUpdateTableStatus();
     }
     catch (Throwable t) {
       LOG.warn("Updating status of " + AbstractTableField.this.getClass().getName(), t);
@@ -621,10 +635,10 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
   /**
    * Saves the table. The call order is as follows:
    * <ol>
-   * <li>{@link #execSave(ITableRow[], ITableRow[], ITableRow[])}</li>
-   * <li>{@link #execSaveDeletedRow(ITableRow)}</li>
-   * <li>{@link #execSaveInsertedRow(ITableRow)}</li>
-   * <li>{@link #execSaveUpdatedRow(ITableRow)}</li>
+   * <li>{@link #interceptSave(ITableRow[], ITableRow[], ITableRow[])}</li>
+   * <li>{@link #interceptSaveDeletedRow(ITableRow)}</li>
+   * <li>{@link #interceptSaveInsertedRow(ITableRow)}</li>
+   * <li>{@link #interceptSaveUpdatedRow(ITableRow)}</li>
    * </ol>
    */
   @Override
@@ -634,21 +648,21 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
         m_table.setTableChanging(true);
         //
         // 1. batch
-        execSave(m_table.getInsertedRows(), m_table.getUpdatedRows(), m_table.getDeletedRows());
+        interceptSave(m_table.getInsertedRows(), m_table.getUpdatedRows(), m_table.getDeletedRows());
         // 2. per row
         // deleted rows
         for (ITableRow deletedRow : m_table.getDeletedRows()) {
-          execSaveDeletedRow(deletedRow);
+          interceptSaveDeletedRow(deletedRow);
         }
         // inserted rows
         for (ITableRow insertedRow : m_table.getInsertedRows()) {
-          execSaveInsertedRow(insertedRow);
+          interceptSaveInsertedRow(insertedRow);
           insertedRow.setStatusNonchanged();
           m_table.updateRow(insertedRow);
         }
         // updated rows
         for (ITableRow updatedRow : m_table.getUpdatedRows()) {
-          execSaveUpdatedRow(updatedRow);
+          interceptSaveUpdatedRow(updatedRow);
           updatedRow.setStatusNonchanged();
           m_table.updateRow(updatedRow);
         }
@@ -663,11 +677,11 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
   /**
    * Reloads the table data.
    * <p>
-   * The default implementation calls {@link #execReloadTableData()}.
+   * The default implementation calls {@link #interceptReloadTableData()}.
    */
   @Override
   public void reloadTableData() throws ProcessingException {
-    execReloadTableData();
+    interceptReloadTableData();
   }
 
   @Override
@@ -711,5 +725,89 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
         }
       }
     }
+  }
+
+  protected static class LocalTableFieldExtension<T extends ITable, OWNER extends AbstractTableField<T>> extends LocalFormFieldExtension<OWNER> implements ITableFieldExtension<T, OWNER> {
+
+    public LocalTableFieldExtension(OWNER owner) {
+      super(owner);
+    }
+
+    @Override
+    public void execReloadTableData(TableFieldReloadTableDataChain<? extends ITable> chain) throws ProcessingException {
+      getOwner().execReloadTableData();
+    }
+
+    @Override
+    public void execUpdateTableStatus(TableFieldUpdateTableStatusChain<? extends ITable> chain) {
+      getOwner().execUpdateTableStatus();
+    }
+
+    @Override
+    public void execSaveInsertedRow(TableFieldSaveInsertedRowChain<? extends ITable> chain, ITableRow row) throws ProcessingException {
+      getOwner().execSaveInsertedRow(row);
+    }
+
+    @Override
+    public void execSaveUpdatedRow(TableFieldSaveUpdatedRowChain<? extends ITable> chain, ITableRow row) throws ProcessingException {
+      getOwner().execSaveUpdatedRow(row);
+    }
+
+    @Override
+    public void execSaveDeletedRow(TableFieldSaveDeletedRowChain<? extends ITable> chain, ITableRow row) throws ProcessingException {
+      getOwner().execSaveDeletedRow(row);
+    }
+
+    @Override
+    public void execSave(TableFieldSaveChain<? extends ITable> chain, List<? extends ITableRow> insertedRows, List<? extends ITableRow> updatedRows, List<? extends ITableRow> deletedRows) {
+      getOwner().execSave(insertedRows, updatedRows, deletedRows);
+    }
+  }
+
+  @Override
+  protected ITableFieldExtension<T, ? extends AbstractTableField<T>> createLocalExtension() {
+    return new LocalTableFieldExtension<T, AbstractTableField<T>>(this);
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public List<? extends ITableFieldExtension<T, ? extends AbstractTableField<? extends ITable>>> getAllExtensions() {
+    return (List<? extends ITableFieldExtension<T, ? extends AbstractTableField<? extends ITable>>>) super.getAllExtensions();
+  }
+
+  protected final void interceptReloadTableData() throws ProcessingException {
+    List<? extends ITableFieldExtension<? extends ITable, ? extends AbstractTableField<? extends ITable>>> extensions = getAllExtensions();
+    TableFieldReloadTableDataChain<T> chain = new TableFieldReloadTableDataChain<T>(extensions);
+    chain.execReloadTableData();
+  }
+
+  protected final void interceptUpdateTableStatus() {
+    List<? extends ITableFieldExtension<? extends ITable, ? extends AbstractTableField<? extends ITable>>> extensions = getAllExtensions();
+    TableFieldUpdateTableStatusChain<T> chain = new TableFieldUpdateTableStatusChain<T>(extensions);
+    chain.execUpdateTableStatus();
+  }
+
+  protected final void interceptSaveInsertedRow(ITableRow row) throws ProcessingException {
+    List<? extends ITableFieldExtension<? extends ITable, ? extends AbstractTableField<? extends ITable>>> extensions = getAllExtensions();
+    TableFieldSaveInsertedRowChain<T> chain = new TableFieldSaveInsertedRowChain<T>(extensions);
+    chain.execSaveInsertedRow(row);
+  }
+
+  protected final void interceptSaveUpdatedRow(ITableRow row) throws ProcessingException {
+    List<? extends ITableFieldExtension<? extends ITable, ? extends AbstractTableField<? extends ITable>>> extensions = getAllExtensions();
+    TableFieldSaveUpdatedRowChain<T> chain = new TableFieldSaveUpdatedRowChain<T>(extensions);
+    chain.execSaveUpdatedRow(row);
+  }
+
+  protected final void interceptSaveDeletedRow(ITableRow row) throws ProcessingException {
+    List<? extends ITableFieldExtension<? extends ITable, ? extends AbstractTableField<? extends ITable>>> extensions = getAllExtensions();
+    TableFieldSaveDeletedRowChain<T> chain = new TableFieldSaveDeletedRowChain<T>(extensions);
+    chain.execSaveDeletedRow(row);
+  }
+
+  protected final void interceptSave(List<? extends ITableRow> insertedRows, List<? extends ITableRow> updatedRows, List<? extends ITableRow> deletedRows) {
+    List<? extends ITableFieldExtension<? extends ITable, ? extends AbstractTableField<? extends ITable>>> extensions = getAllExtensions();
+    TableFieldSaveChain<T> chain = new TableFieldSaveChain<T>(extensions);
+    chain.execSave(insertedRows, updatedRows, deletedRows);
   }
 }

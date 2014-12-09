@@ -21,6 +21,7 @@ import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.INumberColumnExtension;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -31,7 +32,7 @@ import org.eclipse.scout.rt.client.ui.valuecontainer.INumberValueContainer;
  * Column holding Number
  */
 @ClassId("6b77a24f-8685-4023-b353-cbbe7d4bf22a")
-public abstract class AbstractNumberColumn<T extends Number> extends AbstractColumn<T> implements INumberColumn<T> {
+public abstract class AbstractNumberColumn<NUMBER extends Number> extends AbstractColumn<NUMBER> implements INumberColumn<NUMBER> {
   // DO NOT init members, this has the same effect as if they were set AFTER
   // initConfig()
   private boolean m_validateOnAnyKey;
@@ -43,12 +44,12 @@ public abstract class AbstractNumberColumn<T extends Number> extends AbstractCol
   /**
    * Default for {@link INumberColumnd#setMinValue(Number)}
    */
-  protected abstract T getConfiguredMinValue();
+  protected abstract NUMBER getConfiguredMinValue();
 
   /**
    * Default for {@link INumberColumn#setMaxValue(Number)}
    */
-  protected abstract T getConfiguredMaxValue();
+  protected abstract NUMBER getConfiguredMaxValue();
 
   @ConfigProperty(ConfigProperty.INTEGER)
   @Order(280)
@@ -236,8 +237,8 @@ public abstract class AbstractNumberColumn<T extends Number> extends AbstractCol
    * used only for editing
    */
   @Override
-  public void setMaxValue(T maxValue) {
-    T min = getMinValue();
+  public void setMaxValue(NUMBER maxValue) {
+    NUMBER min = getMinValue();
     if (maxValue != null && min != null && compareInternal(maxValue, min) < 0) {
       propertySupport.setProperty(PROP_MIN_VALUE, maxValue);
     }
@@ -247,11 +248,11 @@ public abstract class AbstractNumberColumn<T extends Number> extends AbstractCol
 
   @SuppressWarnings("unchecked")
   @Override
-  public T getMaxValue() {
-    return (T) propertySupport.getProperty(PROP_MAX_VALUE);
+  public NUMBER getMaxValue() {
+    return (NUMBER) propertySupport.getProperty(PROP_MAX_VALUE);
   }
 
-  private int compareInternal(T a, T b) {
+  private int compareInternal(NUMBER a, NUMBER b) {
     return CompareUtility.compareTo(NumberUtility.numberToBigDecimal(a), NumberUtility.numberToBigDecimal(b));
   }
 
@@ -262,8 +263,8 @@ public abstract class AbstractNumberColumn<T extends Number> extends AbstractCol
    * used only for editing
    */
   @Override
-  public void setMinValue(T minValue) {
-    T max = getMaxValue();
+  public void setMinValue(NUMBER minValue) {
+    NUMBER max = getMaxValue();
     if (minValue != null && max != null && compareInternal(minValue, max) > 0) {
       propertySupport.setProperty(PROP_MAX_VALUE, minValue);
     }
@@ -273,8 +274,8 @@ public abstract class AbstractNumberColumn<T extends Number> extends AbstractCol
 
   @SuppressWarnings("unchecked")
   @Override
-  public T getMinValue() {
-    return (T) propertySupport.getProperty(PROP_MIN_VALUE);
+  public NUMBER getMinValue() {
+    return (NUMBER) propertySupport.getProperty(PROP_MIN_VALUE);
   }
 
   @Override
@@ -287,16 +288,16 @@ public abstract class AbstractNumberColumn<T extends Number> extends AbstractCol
     return m_validateOnAnyKey;
   }
 
-  protected abstract INumberField<T> getEditorField();
+  protected abstract INumberField<NUMBER> getEditorField();
 
   @Override
   protected IFormField prepareEditInternal(ITableRow row) throws ProcessingException {
-    INumberField<T> f = getEditorField();
+    INumberField<NUMBER> f = getEditorField();
     mapEditorFieldProperties(f);
     return f;
   }
 
-  protected void mapEditorFieldProperties(INumberField<T> f) {
+  protected void mapEditorFieldProperties(INumberField<NUMBER> f) {
     super.mapEditorFieldProperties(f);
     f.setFormat(getFormat());
     f.setMinValue(getMinValue());
@@ -313,5 +314,17 @@ public abstract class AbstractNumberColumn<T extends Number> extends AbstractCol
     else {
       cell.setText("");
     }
+  }
+
+  protected static class LocalNumberColumnExtension<NUMBER extends Number, OWNER extends AbstractNumberColumn<NUMBER>> extends LocalColumnExtension<NUMBER, OWNER> implements INumberColumnExtension<NUMBER, OWNER> {
+
+    public LocalNumberColumnExtension(OWNER owner) {
+      super(owner);
+    }
+  }
+
+  @Override
+  protected INumberColumnExtension<NUMBER, ? extends AbstractNumberColumn<NUMBER>> createLocalExtension() {
+    return new LocalNumberColumnExtension<NUMBER, AbstractNumberColumn<NUMBER>>(this);
   }
 }

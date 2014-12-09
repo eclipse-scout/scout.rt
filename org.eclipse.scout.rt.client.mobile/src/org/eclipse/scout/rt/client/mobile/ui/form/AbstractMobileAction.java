@@ -16,7 +16,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 /**
  * @since 3.9.0
  */
-public class AbstractMobileAction extends AbstractMenu implements IMobileAction {
+public abstract class AbstractMobileAction extends AbstractMenu implements IMobileAction {
 
   public AbstractMobileAction() {
     super();

@@ -206,8 +206,8 @@ public class GroupBoxLayout10Test extends AbstractGroupBoxLayoutTest {
       }
 
       @Override
-      protected void execSelectionChanged(boolean selected) throws ProcessingException {
-        getFieldByClass(Field03.class).setVisible(selected);
+      protected void execSelectionChanged(boolean selection) throws ProcessingException {
+        getFieldByClass(Field03.class).setVisible(selection);
       }
     }
 

@@ -408,10 +408,11 @@ public final class NumberUtility {
    * @return the converted int. Returns 0 if the parameter is <code>null</code>.
    */
   public static int parseInt(String s) {
-    if (s == null) {
+    if (StringUtility.isNullOrEmpty(s)) {
       return 0;
     }
-    return TypeCastUtility.castValue(s, Integer.class);
+    Integer intValue = TypeCastUtility.castValue(s, Integer.class);
+    return intValue;
   }
 
   /**
@@ -420,10 +421,11 @@ public final class NumberUtility {
    * @return The converted long. Returns 0 if the parameter is <code>null</code>.
    */
   public static long parseLong(String s) {
-    if (s == null) {
+    if (StringUtility.isNullOrEmpty(s)) {
       return 0;
     }
-    return TypeCastUtility.castValue(s, Long.class);
+    Long longValue = TypeCastUtility.castValue(s, Long.class);
+    return longValue;
   }
 
   /**
@@ -432,10 +434,11 @@ public final class NumberUtility {
    * @return The converted double. Returns 0 if the parameter is <code>null</code>.
    */
   public static double parseDouble(String s) {
-    if (s == null) {
+    if (StringUtility.isNullOrEmpty(s)) {
       return 0;
     }
-    return TypeCastUtility.castValue(s, Double.class);
+    Double doubleValue = TypeCastUtility.castValue(s, Double.class);
+    return doubleValue;
   }
 
   /**

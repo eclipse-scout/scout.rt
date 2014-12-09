@@ -18,6 +18,7 @@ import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.IDecimalColumnExtension;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.decimalfield.IDecimalField;
@@ -27,7 +28,7 @@ import org.eclipse.scout.rt.client.ui.valuecontainer.IDecimalValueContainer;
  * Column holding Decimal number
  */
 @ClassId("961989bf-d585-40a2-ab9f-b7e545baaac9")
-public abstract class AbstractDecimalColumn<T extends Number> extends AbstractNumberColumn<T> implements IDecimalColumn<T> {
+public abstract class AbstractDecimalColumn<NUMBER extends Number> extends AbstractNumberColumn<NUMBER> implements IDecimalColumn<NUMBER> {
 
   public AbstractDecimalColumn() {
     super();
@@ -201,17 +202,29 @@ public abstract class AbstractDecimalColumn<T extends Number> extends AbstractNu
   }
 
   @Override
-  protected abstract IDecimalField<T> getEditorField();
+  protected abstract IDecimalField<NUMBER> getEditorField();
 
   @Override
   protected IFormField prepareEditInternal(ITableRow row) throws ProcessingException {
-    IDecimalField<T> f = getEditorField();
+    IDecimalField<NUMBER> f = getEditorField();
     mapEditorFieldProperties(f);
     return f;
   }
 
-  protected void mapEditorFieldProperties(IDecimalField<T> f) {
+  protected void mapEditorFieldProperties(IDecimalField<NUMBER> f) {
     super.mapEditorFieldProperties(f);
     f.setFractionDigits(getFractionDigits());
+  }
+
+  protected static class LocalDecimalColumnExtension<NUMBER extends Number, OWNER extends AbstractDecimalColumn<NUMBER>> extends LocalNumberColumnExtension<NUMBER, OWNER> implements IDecimalColumnExtension<NUMBER, OWNER> {
+
+    public LocalDecimalColumnExtension(OWNER owner) {
+      super(owner);
+    }
+  }
+
+  @Override
+  protected IDecimalColumnExtension<NUMBER, ? extends AbstractDecimalColumn<NUMBER>> createLocalExtension() {
+    return new LocalDecimalColumnExtension<NUMBER, AbstractDecimalColumn<NUMBER>>(this);
   }
 }

@@ -32,7 +32,7 @@ public final class CustomDataModelExtension {
 
   /**
    * Inject top level attributes into the provided list
-   * 
+   *
    * @param entityInstance
    * @param attributeList
    *          Attribute list to inject attributes to
@@ -46,7 +46,7 @@ public final class CustomDataModelExtension {
 
   /**
    * Inject top level entities into the provided list
-   * 
+   *
    * @param entityInstance
    * @param entityList
    *          Entity list to inject entities to
@@ -60,7 +60,7 @@ public final class CustomDataModelExtension {
 
   /**
    * Inject top level attributes into the provided list
-   * 
+   *
    * @param entityInstance
    * @param attributeList
    *          Attribute list to inject attributes to
@@ -89,7 +89,7 @@ public final class CustomDataModelExtension {
       m_id = id;
       setText(text);
       //
-      callInitConfig();
+      callInitializer();
     }
 
     /**
@@ -136,7 +136,7 @@ public final class CustomDataModelExtension {
       setText(text);
       setType(type);
       //
-      callInitConfig();
+      callInitializer();
     }
 
     /**

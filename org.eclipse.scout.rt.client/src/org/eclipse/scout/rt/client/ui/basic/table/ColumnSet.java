@@ -56,12 +56,12 @@ public class ColumnSet {
   /**
    * class to model
    */
-  private final HashMap<Class, IColumn> m_classIndexes = new HashMap<Class, IColumn>();
+  private final Map<Class, IColumn> m_classIndexes = new HashMap<Class, IColumn>();
 
   /**
    * ID to model
    */
-  private final HashMap<String, IColumn> m_idIndexes = new HashMap<String, IColumn>();
+  private final Map<String, IColumn> m_idIndexes = new HashMap<String, IColumn>();
 
   private final Map<Class<?>, Class<? extends IColumn>> m_columnReplacements;
 
@@ -123,7 +123,7 @@ public class ColumnSet {
       IColumn col = getColumn(modelIndex);
       double viewHint = col.getVisibleColumnIndexHint();
       if (viewHint < 0) {
-        viewHint = col.getViewOrder();
+        viewHint = col.getOrder();
       }
       if (viewHint < 0) {
         viewHint = viewIndex;
@@ -311,7 +311,7 @@ public class ColumnSet {
   /**
    * Checks whether the column with the given class has been replaced by another column. If so, the replacing
    * column's class is returned. Otherwise the given class itself.
-   * 
+   *
    * @param c
    * @return Returns the possibly available replacing column class for the given class.
    * @see Replace
@@ -975,7 +975,7 @@ public class ColumnSet {
       if (col.isDisplayable() && col.isVisible()) {
         double viewHint = col.getVisibleColumnIndexHint();
         if (viewHint < 0) {
-          viewHint = col.getViewOrder();
+          viewHint = col.getOrder();
         }
         if (viewHint < 0) {
           viewHint = viewIndex;

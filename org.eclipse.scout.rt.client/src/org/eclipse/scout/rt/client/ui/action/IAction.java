@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.action;
 import java.security.Permission;
 
 import org.eclipse.scout.commons.ITypeWithClassId;
+import org.eclipse.scout.commons.annotations.IOrdered;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -26,7 +27,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
  * A typical NEW menu on a table that is only visible on the empty space of the table and only when the table field is
  * enabled would have emptySpaceAction=false;
  */
-public interface IAction extends IPropertyObserver, ITypeWithClassId {
+public interface IAction extends IPropertyObserver, ITypeWithClassId, IOrdered {
 
   String PROP_CONTAINER = "container";
   String PROP_ICON_ID = "iconId";
@@ -38,6 +39,7 @@ public interface IAction extends IPropertyObserver, ITypeWithClassId {
   String PROP_VISIBLE = "visible";
   String PROP_MNEMONIC = "mnemonic";
   String PROP_KEYSTROKE = "keystroke";
+  String PROP_VIEW_ORDER = "viewOrder";
 
   /**
    * @throws ProcessingException
@@ -153,7 +155,7 @@ public interface IAction extends IPropertyObserver, ITypeWithClassId {
 
   /**
    * Actions set the property to false while in work.
-   * 
+   *
    * @return true if action is not in {@link IAction#doAction()}
    */
   boolean isEnabledProcessingAction();
@@ -186,7 +188,7 @@ public interface IAction extends IPropertyObserver, ITypeWithClassId {
 
   /**
    * called before this action is used
-   * 
+   *
    * @deprecated will be removed with V 5.0 use prepare on {@link IMenu} instead (for all not menus prepare does not
    *             make any sense).
    */
@@ -202,14 +204,14 @@ public interface IAction extends IPropertyObserver, ITypeWithClassId {
 
   /**
    * Looks this action and its every parent are enabled
-   * 
+   *
    * @since 3.8.1
    */
   boolean isThisAndParentsEnabled();
 
   /**
    * Looks this action and its every parent are visible
-   * 
+   *
    * @since 3.8.1
    */
   boolean isThisAndParentsVisible();

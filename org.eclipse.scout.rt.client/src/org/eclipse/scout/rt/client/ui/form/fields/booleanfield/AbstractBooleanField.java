@@ -16,6 +16,7 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.booleanfield.IBooleanFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
@@ -41,7 +42,7 @@ public abstract class AbstractBooleanField extends AbstractValueField<Boolean> i
     /* setAutoDisplayText(false); */
     propertySupport.setProperty(PROP_VALUE, false);
     // ticket 79554
-    propertySupport.setProperty(PROP_DISPLAY_TEXT, execFormatValue(getValue()));
+    propertySupport.setProperty(PROP_DISPLAY_TEXT, interceptFormatValue(getValue()));
   }
 
   @Override
@@ -124,5 +125,17 @@ public abstract class AbstractBooleanField extends AbstractValueField<Boolean> i
         setChecked(b);
       }
     }
+  }
+
+  protected static class LocalBooleanFieldExtension<OWNER extends AbstractBooleanField> extends LocalValueFieldExtension<Boolean, OWNER> implements IBooleanFieldExtension<OWNER> {
+
+    public LocalBooleanFieldExtension(OWNER owner) {
+      super(owner);
+    }
+  }
+
+  @Override
+  protected IBooleanFieldExtension<? extends AbstractBooleanField> createLocalExtension() {
+    return new LocalBooleanFieldExtension<AbstractBooleanField>(this);
   }
 }

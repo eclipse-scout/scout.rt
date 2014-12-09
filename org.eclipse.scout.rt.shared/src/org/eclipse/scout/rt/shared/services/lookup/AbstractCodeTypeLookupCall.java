@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
  * @deprecated will be removed with version 3.11
  */
 @Deprecated
-public class AbstractCodeTypeLookupCall extends LocalLookupCall {
+public abstract class AbstractCodeTypeLookupCall extends LocalLookupCall {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractCodeTypeLookupCall.class);
   private static final long serialVersionUID = 1L;
 

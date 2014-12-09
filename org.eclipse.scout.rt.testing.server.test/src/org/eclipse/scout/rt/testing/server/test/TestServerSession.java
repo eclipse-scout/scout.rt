@@ -6,7 +6,7 @@ public class TestServerSession extends AbstractServerSession {
   private static final long serialVersionUID = 1L;
 
   public TestServerSession() {
-    super(false);
+    super(true);
   }
 
 }

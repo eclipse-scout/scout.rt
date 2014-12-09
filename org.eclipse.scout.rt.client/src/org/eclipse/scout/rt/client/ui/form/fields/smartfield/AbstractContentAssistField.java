@@ -35,6 +35,18 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.ContentAssistFieldChains.ContentAssistFieldBrowseNewChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.ContentAssistFieldChains.ContentAssistFieldFilterBrowseLookupResultChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.ContentAssistFieldChains.ContentAssistFieldFilterKeyLookupResultChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.ContentAssistFieldChains.ContentAssistFieldFilterLookupResultChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.ContentAssistFieldChains.ContentAssistFieldFilterRecLookupResultChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.ContentAssistFieldChains.ContentAssistFieldFilterTextLookupResultChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.ContentAssistFieldChains.ContentAssistFieldPrepareBrowseLookupChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.ContentAssistFieldChains.ContentAssistFieldPrepareKeyLookupChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.ContentAssistFieldChains.ContentAssistFieldPrepareLookupChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.ContentAssistFieldChains.ContentAssistFieldPrepareRecLookupChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.ContentAssistFieldChains.ContentAssistFieldPrepareTextLookupChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.IContentAssistFieldExtension;
 import org.eclipse.scout.rt.client.services.lookup.FormFieldProvisioningContext;
 import org.eclipse.scout.rt.client.services.lookup.ILookupCallProvisioningService;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -60,21 +72,21 @@ import org.eclipse.scout.service.SERVICES;
  * instead.
  */
 @ScoutSdkIgnore
-public abstract class AbstractContentAssistField<VALUE_TYPE, KEY_TYPE> extends AbstractValueField<VALUE_TYPE> implements IContentAssistField<VALUE_TYPE, KEY_TYPE> {
+public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends AbstractValueField<VALUE> implements IContentAssistField<VALUE, LOOKUP_KEY> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractContentAssistField.class);
 
-  public final ILookupRow<KEY_TYPE> EMPTY_LOOKUP_ROW = new LookupRow<KEY_TYPE>(null, "", null, null, null, null, null, true);
+  public final ILookupRow<LOOKUP_KEY> EMPTY_LOOKUP_ROW = new LookupRow<LOOKUP_KEY>(null, "", null, null, null, null, null, true);
 
   private final EventListenerList m_listenerList = new EventListenerList();
   // chooser security
-  private Class<? extends ICodeType<?, KEY_TYPE>> m_codeTypeClass;
-  private ILookupCall<KEY_TYPE> m_lookupCall;
+  private Class<? extends ICodeType<?, LOOKUP_KEY>> m_codeTypeClass;
+  private ILookupCall<LOOKUP_KEY> m_lookupCall;
 
   // cached lookup row
   private P_ProposalFormListener m_proposalFormListener;
-  private IContentAssistFieldProposalFormProvider<KEY_TYPE> m_proposalFormProvider;
+  private IContentAssistFieldProposalFormProvider<LOOKUP_KEY> m_proposalFormProvider;
   private P_LookupRowFetcherPropertyListener m_lookupRowFetcherPropertyListener;
-  private IContentAssistFieldLookupRowFetcher<KEY_TYPE> m_lookupRowFetcher;
+  private IContentAssistFieldLookupRowFetcher<LOOKUP_KEY> m_lookupRowFetcher;
   private int m_maxRowCount;
   private String m_browseNewText;
   private boolean m_installingRowContext = false;
@@ -87,9 +99,9 @@ public abstract class AbstractContentAssistField<VALUE_TYPE, KEY_TYPE> extends A
   private boolean m_loadIncremental;
   private int m_proposalFormHeight;
 
-  private ILookupRow<KEY_TYPE> m_currentLookupRow;
+  private ILookupRow<LOOKUP_KEY> m_currentLookupRow;
 
-  private Class<? extends IContentAssistFieldTable<VALUE_TYPE>> m_contentAssistTableClazz;
+  private Class<? extends IContentAssistFieldTable<VALUE>> m_contentAssistTableClazz;
 
   public AbstractContentAssistField() {
     this(true);
@@ -156,7 +168,7 @@ public abstract class AbstractContentAssistField<VALUE_TYPE, KEY_TYPE> extends A
   /**
    * When the smart proposal finds no matching records and this property is not
    * null, then it displays a link or menu with this label.<br>
-   * When clicked the method {@link #execBrowseNew(String)} is invoked, which in
+   * When clicked the method {@link #interceptBrowseNew(String)} is invoked, which in
    * most cases is implemented as opening a "New XY..." dialog
    */
   @ConfigProperty(ConfigProperty.STRING)
@@ -171,7 +183,7 @@ public abstract class AbstractContentAssistField<VALUE_TYPE, KEY_TYPE> extends A
   @ConfigProperty(ConfigProperty.CODE_TYPE)
   @Order(260)
   @ValidationRule(ValidationRule.CODE_TYPE)
-  protected Class<? extends ICodeType<?, KEY_TYPE>> getConfiguredCodeType() {
+  protected Class<? extends ICodeType<?, LOOKUP_KEY>> getConfiguredCodeType() {
     return null;
   }
 
@@ -184,7 +196,7 @@ public abstract class AbstractContentAssistField<VALUE_TYPE, KEY_TYPE> extends A
   @ConfigProperty(ConfigProperty.LOOKUP_CALL)
   @Order(250)
   @ValidationRule(ValidationRule.LOOKUP_CALL)
-  protected Class<? extends ILookupCall<KEY_TYPE>> getConfiguredLookupCall() {
+  protected Class<? extends ILookupCall<LOOKUP_KEY>> getConfiguredLookupCall() {
     return null;
   }
 
@@ -215,7 +227,7 @@ public abstract class AbstractContentAssistField<VALUE_TYPE, KEY_TYPE> extends A
   }
 
   @Order(290)
-  protected Class<? extends IContentAssistFieldTable<VALUE_TYPE>> getConfiguredContentAssistTable() {
+  protected Class<? extends IContentAssistFieldTable<VALUE>> getConfiguredContentAssistTable() {
     return null;
   }
 
@@ -230,7 +242,7 @@ public abstract class AbstractContentAssistField<VALUE_TYPE, KEY_TYPE> extends A
    */
   @ConfigOperation
   @Order(225)
-  protected ILookupRow<KEY_TYPE> execBrowseNew(String searchText) throws ProcessingException {
+  protected ILookupRow<LOOKUP_KEY> execBrowseNew(String searchText) throws ProcessingException {
     return null;
   }
 
@@ -239,7 +251,7 @@ public abstract class AbstractContentAssistField<VALUE_TYPE, KEY_TYPE> extends A
    */
   @ConfigOperation
   @Order(230)
-  protected void execPrepareLookup(ILookupCall<KEY_TYPE> call) throws ProcessingException {
+  protected void execPrepareLookup(ILookupCall<LOOKUP_KEY> call) throws ProcessingException {
   }
 
   /**
@@ -247,7 +259,7 @@ public abstract class AbstractContentAssistField<VALUE_TYPE, KEY_TYPE> extends A
    */
   @ConfigOperation
   @Order(240)
-  protected void execPrepareKeyLookup(ILookupCall<KEY_TYPE> call, KEY_TYPE key) throws ProcessingException {
+  protected void execPrepareKeyLookup(ILookupCall<LOOKUP_KEY> call, LOOKUP_KEY key) throws ProcessingException {
   }
 
   /**
@@ -255,7 +267,7 @@ public abstract class AbstractContentAssistField<VALUE_TYPE, KEY_TYPE> extends A
    */
   @ConfigOperation
   @Order(250)
-  protected void execPrepareTextLookup(ILookupCall<KEY_TYPE> call, String text) throws ProcessingException {
+  protected void execPrepareTextLookup(ILookupCall<LOOKUP_KEY> call, String text) throws ProcessingException {
   }
 
   /**
@@ -263,7 +275,7 @@ public abstract class AbstractContentAssistField<VALUE_TYPE, KEY_TYPE> extends A
    */
   @ConfigOperation
   @Order(260)
-  protected void execPrepareBrowseLookup(ILookupCall<KEY_TYPE> call, String browseHint) throws ProcessingException {
+  protected void execPrepareBrowseLookup(ILookupCall<LOOKUP_KEY> call, String browseHint) throws ProcessingException {
   }
 
   /**
@@ -271,7 +283,7 @@ public abstract class AbstractContentAssistField<VALUE_TYPE, KEY_TYPE> extends A
    */
   @ConfigOperation
   @Order(270)
-  protected void execPrepareRecLookup(ILookupCall<KEY_TYPE> call, KEY_TYPE parentKey) throws ProcessingException {
+  protected void execPrepareRecLookup(ILookupCall<LOOKUP_KEY> call, LOOKUP_KEY parentKey) throws ProcessingException {
   }
 
   /**
@@ -283,7 +295,7 @@ public abstract class AbstractContentAssistField<VALUE_TYPE, KEY_TYPE> extends A
    */
   @ConfigOperation
   @Order(280)
-  protected void execFilterLookupResult(ILookupCall<KEY_TYPE> call, List<ILookupRow<KEY_TYPE>> result) throws ProcessingException {
+  protected void execFilterLookupResult(ILookupCall<LOOKUP_KEY> call, List<ILookupRow<LOOKUP_KEY>> result) throws ProcessingException {
   }
 
   /**
@@ -295,7 +307,7 @@ public abstract class AbstractContentAssistField<VALUE_TYPE, KEY_TYPE> extends A
    */
   @ConfigOperation
   @Order(290)
-  protected void execFilterKeyLookupResult(ILookupCall<KEY_TYPE> call, List<ILookupRow<KEY_TYPE>> result) throws ProcessingException {
+  protected void execFilterKeyLookupResult(ILookupCall<LOOKUP_KEY> call, List<ILookupRow<LOOKUP_KEY>> result) throws ProcessingException {
   }
 
   /**
@@ -307,7 +319,7 @@ public abstract class AbstractContentAssistField<VALUE_TYPE, KEY_TYPE> extends A
    */
   @ConfigOperation
   @Order(300)
-  protected void execFilterTextLookupResult(ILookupCall<KEY_TYPE> call, List<ILookupRow<KEY_TYPE>> result) throws ProcessingException {
+  protected void execFilterTextLookupResult(ILookupCall<LOOKUP_KEY> call, List<ILookupRow<LOOKUP_KEY>> result) throws ProcessingException {
   }
 
   /**
@@ -319,7 +331,7 @@ public abstract class AbstractContentAssistField<VALUE_TYPE, KEY_TYPE> extends A
    */
   @ConfigOperation
   @Order(310)
-  protected void execFilterBrowseLookupResult(ILookupCall<KEY_TYPE> call, List<ILookupRow<KEY_TYPE>> result) throws ProcessingException {
+  protected void execFilterBrowseLookupResult(ILookupCall<LOOKUP_KEY> call, List<ILookupRow<LOOKUP_KEY>> result) throws ProcessingException {
   }
 
   /**
@@ -331,11 +343,11 @@ public abstract class AbstractContentAssistField<VALUE_TYPE, KEY_TYPE> extends A
    */
   @ConfigOperation
   @Order(320)
-  protected void execFilterRecLookupResult(ILookupCall<KEY_TYPE> call, List<ILookupRow<KEY_TYPE>> result) throws ProcessingException {
+  protected void execFilterRecLookupResult(ILookupCall<LOOKUP_KEY> call, List<ILookupRow<LOOKUP_KEY>> result) throws ProcessingException {
   }
 
   @Override
-  public boolean acceptBrowseHierarchySelection(KEY_TYPE value, int level, boolean leaf) {
+  public boolean acceptBrowseHierarchySelection(LOOKUP_KEY value, int level, boolean leaf) {
     return true;
   }
 
@@ -385,7 +397,7 @@ public abstract class AbstractContentAssistField<VALUE_TYPE, KEY_TYPE> extends A
   @Override
   protected void initConfig() {
     m_activeFilter = TriState.TRUE;
-    m_decorationRow = new LookupRow<KEY_TYPE>(null, "", null, null, null, null, null, true);
+    m_decorationRow = new LookupRow<LOOKUP_KEY>(null, "", null, null, null, null, null, true);
     super.initConfig();
     setActiveFilterEnabled(getConfiguredActiveFilterEnabled());
     setBrowseHierarchy(getConfiguredBrowseHierarchy());
@@ -398,19 +410,19 @@ public abstract class AbstractContentAssistField<VALUE_TYPE, KEY_TYPE> extends A
     setProposalFormProvider(createProposalFormProvider());
     setProposalFormHeight(getConfiguredProposalFormHeight());
     // content assist table
-    Class<? extends IContentAssistFieldTable<VALUE_TYPE>> contentAssistTableClazz = getConfiguredContentAssistTable();
+    Class<? extends IContentAssistFieldTable<VALUE>> contentAssistTableClazz = getConfiguredContentAssistTable();
     // if no table is configured try to find a fitting inner class
     if (contentAssistTableClazz == null) {
       // try to find inner class
       Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-      contentAssistTableClazz = (Class<? extends IContentAssistFieldTable<VALUE_TYPE>>) ConfigurationUtility.filterClass(dca, IContentAssistFieldTable.class);
+      contentAssistTableClazz = (Class<? extends IContentAssistFieldTable<VALUE>>) ConfigurationUtility.filterClass(dca, IContentAssistFieldTable.class);
     }
     // if no inner class use default
     if (contentAssistTableClazz == null) {
-      contentAssistTableClazz = (Class<? extends IContentAssistFieldTable<VALUE_TYPE>>) ContentAssistFieldTable.class;
+      contentAssistTableClazz = (Class<? extends IContentAssistFieldTable<VALUE>>) ContentAssistFieldTable.class;
     }
     setContentAssistTableClass(contentAssistTableClazz);
-    IContentAssistFieldLookupRowFetcher<KEY_TYPE> lookupRowFetcher = createLookupRowFetcher();
+    IContentAssistFieldLookupRowFetcher<LOOKUP_KEY> lookupRowFetcher = createLookupRowFetcher();
     lookupRowFetcher.addPropertyChangeListener(new P_LookupRowFetcherPropertyListener());
     setLookupRowFetcher(lookupRowFetcher);
     // code type
@@ -418,10 +430,10 @@ public abstract class AbstractContentAssistField<VALUE_TYPE, KEY_TYPE> extends A
       setCodeTypeClass(getConfiguredCodeType());
     }
     // lookup call
-    Class<? extends ILookupCall<KEY_TYPE>> lsCls = getConfiguredLookupCall();
+    Class<? extends ILookupCall<LOOKUP_KEY>> lsCls = getConfiguredLookupCall();
     if (lsCls != null) {
       try {
-        ILookupCall<KEY_TYPE> call = lsCls.newInstance();
+        ILookupCall<LOOKUP_KEY> call = lsCls.newInstance();
         setLookupCall(call);
       }
       catch (Exception e) {
@@ -491,23 +503,23 @@ public abstract class AbstractContentAssistField<VALUE_TYPE, KEY_TYPE> extends A
   /**
    * @param configuredContentAssistTableClass
    */
-  private void setContentAssistTableClass(Class<? extends IContentAssistFieldTable<VALUE_TYPE>> configuredContentAssistTableClass) {
+  private void setContentAssistTableClass(Class<? extends IContentAssistFieldTable<VALUE>> configuredContentAssistTableClass) {
     m_contentAssistTableClazz = configuredContentAssistTableClass;
   }
 
   @Override
-  public Class<? extends IContentAssistFieldTable<VALUE_TYPE>> getContentAssistFieldTableClass() {
+  public Class<? extends IContentAssistFieldTable<VALUE>> getContentAssistFieldTableClass() {
     return m_contentAssistTableClazz;
   }
 
   /**
-   * see {@link AbstractSmartField#execBrowseNew(String)}
+   * see {@link AbstractSmartField#interceptBrowseNew(String)}
    */
   @Override
   public void doBrowseNew(String newText) {
     if (getBrowseNewText() != null) {
       try {
-        ILookupRow<KEY_TYPE> newRow = execBrowseNew(newText);
+        ILookupRow<LOOKUP_KEY> newRow = interceptBrowseNew(newText);
         if (newRow == null) {
           // nop
         }
@@ -595,12 +607,12 @@ public abstract class AbstractContentAssistField<VALUE_TYPE, KEY_TYPE> extends A
   }
 
   @Override
-  public Class<? extends ICodeType<?, KEY_TYPE>> getCodeTypeClass() {
+  public Class<? extends ICodeType<?, LOOKUP_KEY>> getCodeTypeClass() {
     return m_codeTypeClass;
   }
 
   @Override
-  public void setCodeTypeClass(Class<? extends ICodeType<?, KEY_TYPE>> codeType) {
+  public void setCodeTypeClass(Class<? extends ICodeType<?, LOOKUP_KEY>> codeType) {
     m_codeTypeClass = codeType;
     // create lookup service call
     m_lookupCall = null;
@@ -616,20 +628,20 @@ public abstract class AbstractContentAssistField<VALUE_TYPE, KEY_TYPE> extends A
   }
 
   @Override
-  public ILookupCall<KEY_TYPE> getLookupCall() {
+  public ILookupCall<LOOKUP_KEY> getLookupCall() {
     return m_lookupCall;
   }
 
   @Override
-  public void setLookupCall(ILookupCall<KEY_TYPE> call) {
+  public void setLookupCall(ILookupCall<LOOKUP_KEY> call) {
     m_lookupCall = call;
   }
 
   @Override
   public void setUniquelyDefinedValue(boolean background) throws ProcessingException {
-    ILookupCallFetcher<KEY_TYPE> fetcher = new ILookupCallFetcher<KEY_TYPE>() {
+    ILookupCallFetcher<LOOKUP_KEY> fetcher = new ILookupCallFetcher<LOOKUP_KEY>() {
       @Override
-      public void dataFetched(List<? extends ILookupRow<KEY_TYPE>> rows, ProcessingException failed) {
+      public void dataFetched(List<? extends ILookupRow<LOOKUP_KEY>> rows, ProcessingException failed) {
         if (failed == null) {
           if (rows.size() == 1) {
             acceptProposal(rows.get(0));
@@ -647,11 +659,11 @@ public abstract class AbstractContentAssistField<VALUE_TYPE, KEY_TYPE> extends A
 
   @SuppressWarnings("unchecked")
   @Override
-  public IContentAssistFieldProposalForm<KEY_TYPE> getProposalForm() {
-    return (IContentAssistFieldProposalForm<KEY_TYPE>) propertySupport.getProperty(PROP_PROPOSAL_FORM);
+  public IContentAssistFieldProposalForm<LOOKUP_KEY> getProposalForm() {
+    return (IContentAssistFieldProposalForm<LOOKUP_KEY>) propertySupport.getProperty(PROP_PROPOSAL_FORM);
   }
 
-  protected void registerProposalFormInternal(IContentAssistFieldProposalForm<KEY_TYPE> form) {
+  protected void registerProposalFormInternal(IContentAssistFieldProposalForm<LOOKUP_KEY> form) {
     IContentAssistFieldProposalForm oldForm = getProposalForm();
     if (oldForm == form) {
       return;
@@ -697,22 +709,22 @@ public abstract class AbstractContentAssistField<VALUE_TYPE, KEY_TYPE> extends A
   }
 
   @Override
-  public IContentAssistFieldProposalFormProvider<KEY_TYPE> getProposalFormProvider() {
+  public IContentAssistFieldProposalFormProvider<LOOKUP_KEY> getProposalFormProvider() {
     return m_proposalFormProvider;
   }
 
   @Override
-  public void setProposalFormProvider(IContentAssistFieldProposalFormProvider<KEY_TYPE> provider) {
+  public void setProposalFormProvider(IContentAssistFieldProposalFormProvider<LOOKUP_KEY> provider) {
     m_proposalFormProvider = provider;
   }
 
-  protected abstract IContentAssistFieldProposalForm<KEY_TYPE> createProposalForm() throws ProcessingException;
+  protected abstract IContentAssistFieldProposalForm<LOOKUP_KEY> createProposalForm() throws ProcessingException;
 
-  public IContentAssistFieldLookupRowFetcher<KEY_TYPE> getLookupRowFetcher() {
+  public IContentAssistFieldLookupRowFetcher<LOOKUP_KEY> getLookupRowFetcher() {
     return m_lookupRowFetcher;
   }
 
-  public void setLookupRowFetcher(IContentAssistFieldLookupRowFetcher<KEY_TYPE> fetcher) {
+  public void setLookupRowFetcher(IContentAssistFieldLookupRowFetcher<LOOKUP_KEY> fetcher) {
     m_lookupRowFetcher = fetcher;
   }
 
@@ -726,16 +738,16 @@ public abstract class AbstractContentAssistField<VALUE_TYPE, KEY_TYPE> extends A
    * @return {@link#ISmartFieldProposalForm}
    * @throws ProcessingException
    */
-  protected IContentAssistFieldProposalForm<KEY_TYPE> createProposalForm(boolean allowCustomText) throws ProcessingException {
-    IContentAssistFieldProposalFormProvider<KEY_TYPE> proposalFormProvider = getProposalFormProvider();
+  protected IContentAssistFieldProposalForm<LOOKUP_KEY> createProposalForm(boolean allowCustomText) throws ProcessingException {
+    IContentAssistFieldProposalFormProvider<LOOKUP_KEY> proposalFormProvider = getProposalFormProvider();
     if (proposalFormProvider == null) {
       return null;
     }
     return proposalFormProvider.createProposalForm(this, allowCustomText);
   }
 
-  protected IContentAssistFieldProposalFormProvider<KEY_TYPE> createProposalFormProvider() {
-    return new DefaultContentAssistFieldProposalFormProvider<KEY_TYPE>();
+  protected IContentAssistFieldProposalFormProvider<LOOKUP_KEY> createProposalFormProvider() {
+    return new DefaultContentAssistFieldProposalFormProvider<LOOKUP_KEY>();
   }
 
   /**
@@ -745,7 +757,7 @@ public abstract class AbstractContentAssistField<VALUE_TYPE, KEY_TYPE> extends A
    *          Valid key
    * @return {@code true} if the current context row is valid, {@code false} otherwise.
    */
-  protected boolean isCurrentLookupRowValid(VALUE_TYPE validKey) {
+  protected boolean isCurrentLookupRowValid(VALUE validKey) {
     if (getCurrentLookupRow() == null) {
       return true;
     }
@@ -754,12 +766,12 @@ public abstract class AbstractContentAssistField<VALUE_TYPE, KEY_TYPE> extends A
   }
 
   @Override
-  protected final VALUE_TYPE execValidateValue(VALUE_TYPE rawValue) throws ProcessingException {
+  protected final VALUE execValidateValue(VALUE rawValue) throws ProcessingException {
     return rawValue;
   }
 
   @Override
-  protected VALUE_TYPE validateValueInternal(VALUE_TYPE rawKey) throws ProcessingException {
+  protected VALUE validateValueInternal(VALUE rawKey) throws ProcessingException {
     if (rawKey instanceof Number) {
       if (getConfiguredTreat0AsNull()) {
         if (((Number) rawKey).longValue() == 0) {
@@ -786,7 +798,7 @@ public abstract class AbstractContentAssistField<VALUE_TYPE, KEY_TYPE> extends A
    * Notice: This method is called from a worker originated outside the scout
    * thread (sync into scout model thread)
    */
-  protected void installLookupRowContext(ILookupRow<KEY_TYPE> row) {
+  protected void installLookupRowContext(ILookupRow<LOOKUP_KEY> row) {
     try {
       m_installingRowContext = true;
       String text = row.getText();
@@ -864,23 +876,23 @@ public abstract class AbstractContentAssistField<VALUE_TYPE, KEY_TYPE> extends A
 
   @Override
   public void doSearch(String searchText, boolean selectCurrentValue, boolean synchronous) {
-    IContentAssistFieldProposalForm<KEY_TYPE> proposalForm = getProposalForm();
+    IContentAssistFieldProposalForm<LOOKUP_KEY> proposalForm = getProposalForm();
     if (proposalForm != null) {
       proposalForm.setTablePopulateStatus(new ProcessingStatus(ScoutTexts.get("searchingProposals"), ProcessingStatus.WARNING));
     }
     getLookupRowFetcher().update(searchText, selectCurrentValue, synchronous);
   }
 
-  public void setCurrentLookupRow(ILookupRow<KEY_TYPE> row) {
+  public void setCurrentLookupRow(ILookupRow<LOOKUP_KEY> row) {
     m_currentLookupRow = row;
   }
 
-  public ILookupRow<KEY_TYPE> getCurrentLookupRow() {
+  public ILookupRow<LOOKUP_KEY> getCurrentLookupRow() {
     return m_currentLookupRow;
   }
 
   @Override
-  public void prepareKeyLookup(ILookupCall<KEY_TYPE> call, KEY_TYPE key) throws ProcessingException {
+  public void prepareKeyLookup(ILookupCall<LOOKUP_KEY> call, LOOKUP_KEY key) throws ProcessingException {
     call.setKey(key);
     call.setText(null);
     call.setAll(null);
@@ -890,12 +902,12 @@ public abstract class AbstractContentAssistField<VALUE_TYPE, KEY_TYPE> extends A
     if (getMasterValue() != null || getLookupCall() == null || getLookupCall().getMaster() == null) {
       call.setMaster(getMasterValue());
     }
-    execPrepareLookup(call);
-    execPrepareKeyLookup(call, key);
+    interceptPrepareLookup(call);
+    interceptPrepareKeyLookup(call, key);
   }
 
   @Override
-  public void prepareTextLookup(ILookupCall<KEY_TYPE> call, String text) throws ProcessingException {
+  public void prepareTextLookup(ILookupCall<LOOKUP_KEY> call, String text) throws ProcessingException {
     String textPattern = text;
     if (textPattern == null) {
       textPattern = "";
@@ -917,12 +929,12 @@ public abstract class AbstractContentAssistField<VALUE_TYPE, KEY_TYPE> extends A
     if (getMasterValue() != null || getLookupCall() == null || getLookupCall().getMaster() == null) {
       call.setMaster(getMasterValue());
     }
-    execPrepareLookup(call);
-    execPrepareTextLookup(call, text);
+    interceptPrepareLookup(call);
+    interceptPrepareTextLookup(call, text);
   }
 
   @Override
-  public void prepareBrowseLookup(ILookupCall<KEY_TYPE> call, String browseHint, TriState activeState) throws ProcessingException {
+  public void prepareBrowseLookup(ILookupCall<LOOKUP_KEY> call, String browseHint, TriState activeState) throws ProcessingException {
     call.setKey(null);
     call.setText(null);
     call.setAll(browseHint);
@@ -932,12 +944,12 @@ public abstract class AbstractContentAssistField<VALUE_TYPE, KEY_TYPE> extends A
     if (getMasterValue() != null || getLookupCall() == null || getLookupCall().getMaster() == null) {
       call.setMaster(getMasterValue());
     }
-    execPrepareLookup(call);
-    execPrepareBrowseLookup(call, browseHint);
+    interceptPrepareLookup(call);
+    interceptPrepareBrowseLookup(call, browseHint);
   }
 
   @Override
-  public void prepareRecLookup(ILookupCall<KEY_TYPE> call, KEY_TYPE parentKey, TriState activeState) throws ProcessingException {
+  public void prepareRecLookup(ILookupCall<LOOKUP_KEY> call, LOOKUP_KEY parentKey, TriState activeState) throws ProcessingException {
     call.setKey(null);
     call.setText(null);
     call.setAll(null);
@@ -947,51 +959,51 @@ public abstract class AbstractContentAssistField<VALUE_TYPE, KEY_TYPE> extends A
       call.setMaster(getMasterValue());
     }
     call.setActive(activeState);
-    execPrepareLookup(call);
-    execPrepareRecLookup(call, parentKey);
+    interceptPrepareLookup(call);
+    interceptPrepareRecLookup(call, parentKey);
   }
 
-  protected void filterKeyLookup(ILookupCall<KEY_TYPE> call, List<ILookupRow<KEY_TYPE>> result) throws ProcessingException {
-    execFilterLookupResult(call, result);
-    execFilterKeyLookupResult(call, result);
+  protected void filterKeyLookup(ILookupCall<LOOKUP_KEY> call, List<ILookupRow<LOOKUP_KEY>> result) throws ProcessingException {
+    interceptFilterLookupResult(call, result);
+    interceptFilterKeyLookupResult(call, result);
   }
 
-  private void filterTextLookup(ILookupCall<KEY_TYPE> call, List<ILookupRow<KEY_TYPE>> result) throws ProcessingException {
-    execFilterLookupResult(call, result);
-    execFilterTextLookupResult(call, result);
+  private void filterTextLookup(ILookupCall<LOOKUP_KEY> call, List<ILookupRow<LOOKUP_KEY>> result) throws ProcessingException {
+    interceptFilterLookupResult(call, result);
+    interceptFilterTextLookupResult(call, result);
   }
 
-  private void filterBrowseLookup(ILookupCall<KEY_TYPE> call, List<ILookupRow<KEY_TYPE>> result) throws ProcessingException {
-    execFilterLookupResult(call, result);
-    execFilterBrowseLookupResult(call, result);
+  private void filterBrowseLookup(ILookupCall<LOOKUP_KEY> call, List<ILookupRow<LOOKUP_KEY>> result) throws ProcessingException {
+    interceptFilterLookupResult(call, result);
+    interceptFilterBrowseLookupResult(call, result);
   }
 
-  private void filterRecLookup(ILookupCall<KEY_TYPE> call, List<ILookupRow<KEY_TYPE>> result) throws ProcessingException {
-    execFilterLookupResult(call, result);
-    execFilterRecLookupResult(call, result);
+  private void filterRecLookup(ILookupCall<LOOKUP_KEY> call, List<ILookupRow<LOOKUP_KEY>> result) throws ProcessingException {
+    interceptFilterLookupResult(call, result);
+    interceptFilterRecLookupResult(call, result);
   }
 
   @Override
-  public List<? extends ILookupRow<KEY_TYPE>> callKeyLookup(KEY_TYPE key) throws ProcessingException {
-    List<? extends ILookupRow<KEY_TYPE>> data = null;
-    ILookupCall<KEY_TYPE> call = getLookupCall();
+  public List<? extends ILookupRow<LOOKUP_KEY>> callKeyLookup(LOOKUP_KEY key) throws ProcessingException {
+    List<? extends ILookupRow<LOOKUP_KEY>> data = null;
+    ILookupCall<LOOKUP_KEY> call = getLookupCall();
     if (call != null) {
       call = SERVICES.getService(ILookupCallProvisioningService.class).newClonedInstance(call, new FormFieldProvisioningContext(AbstractContentAssistField.this));
       prepareKeyLookup(call, key);
       data = call.getDataByKey();
     }
-    List<ILookupRow<KEY_TYPE>> result = CollectionUtility.arrayList(data);
+    List<ILookupRow<LOOKUP_KEY>> result = CollectionUtility.arrayList(data);
     filterKeyLookup(call, result);
     return cleanupResultList(result);
   }
 
   @Override
-  public List<? extends ILookupRow<KEY_TYPE>> callTextLookup(String text, int maxRowCount) throws ProcessingException {
-    final Holder<List<? extends ILookupRow<KEY_TYPE>>> rowsHolder = new Holder<List<? extends ILookupRow<KEY_TYPE>>>();
+  public List<? extends ILookupRow<LOOKUP_KEY>> callTextLookup(String text, int maxRowCount) throws ProcessingException {
+    final Holder<List<? extends ILookupRow<LOOKUP_KEY>>> rowsHolder = new Holder<List<? extends ILookupRow<LOOKUP_KEY>>>();
     final Holder<ProcessingException> failedHolder = new Holder<ProcessingException>(ProcessingException.class, new ProcessingException("callback was not invoked"));
-    callTextLookupInternal(text, maxRowCount, new ILookupCallFetcher<KEY_TYPE>() {
+    callTextLookupInternal(text, maxRowCount, new ILookupCallFetcher<LOOKUP_KEY>() {
       @Override
-      public void dataFetched(List<? extends ILookupRow<KEY_TYPE>> rows, ProcessingException failed) {
+      public void dataFetched(List<? extends ILookupRow<LOOKUP_KEY>> rows, ProcessingException failed) {
         rowsHolder.setValue(rows);
         failedHolder.setValue(failed);
       }
@@ -1005,21 +1017,21 @@ public abstract class AbstractContentAssistField<VALUE_TYPE, KEY_TYPE> extends A
   }
 
   @Override
-  public JobEx callTextLookupInBackground(String text, int maxRowCount, ILookupCallFetcher<KEY_TYPE> fetcher) {
+  public JobEx callTextLookupInBackground(String text, int maxRowCount, ILookupCallFetcher<LOOKUP_KEY> fetcher) {
     return callTextLookupInternal(text, maxRowCount, fetcher, true);
   }
 
-  private JobEx callTextLookupInternal(String text, int maxRowCount, final ILookupCallFetcher<KEY_TYPE> fetcher, final boolean background) {
-    final ILookupCall<KEY_TYPE> call = (getLookupCall() != null ? SERVICES.getService(ILookupCallProvisioningService.class).newClonedInstance(getLookupCall(), new FormFieldProvisioningContext(AbstractContentAssistField.this)) : null);
+  private JobEx callTextLookupInternal(String text, int maxRowCount, final ILookupCallFetcher<LOOKUP_KEY> fetcher, final boolean background) {
+    final ILookupCall<LOOKUP_KEY> call = (getLookupCall() != null ? SERVICES.getService(ILookupCallProvisioningService.class).newClonedInstance(getLookupCall(), new FormFieldProvisioningContext(AbstractContentAssistField.this)) : null);
     final IClientSession session = ClientSyncJob.getCurrentSession();
-    ILookupCallFetcher<KEY_TYPE> internalFetcher = new ILookupCallFetcher<KEY_TYPE>() {
+    ILookupCallFetcher<LOOKUP_KEY> internalFetcher = new ILookupCallFetcher<LOOKUP_KEY>() {
       @Override
-      public void dataFetched(final List<? extends ILookupRow<KEY_TYPE>> rows, final ProcessingException failed) {
+      public void dataFetched(final List<? extends ILookupRow<LOOKUP_KEY>> rows, final ProcessingException failed) {
         ClientSyncJob scoutSyncJob = new ClientSyncJob("Smartfield text lookup", session) {
           @Override
           protected void runVoid(IProgressMonitor monitor) throws Throwable {
             if (failed == null) {
-              ArrayList<ILookupRow<KEY_TYPE>> result = new ArrayList<ILookupRow<KEY_TYPE>>(rows);
+              ArrayList<ILookupRow<LOOKUP_KEY>> result = new ArrayList<ILookupRow<LOOKUP_KEY>>(rows);
               try {
                 filterTextLookup(call, result);
                 fetcher.dataFetched(cleanupResultList(result), null);
@@ -1069,23 +1081,23 @@ public abstract class AbstractContentAssistField<VALUE_TYPE, KEY_TYPE> extends A
       }
     }
     else {
-      internalFetcher.dataFetched(new ArrayList<ILookupRow<KEY_TYPE>>(), null);
+      internalFetcher.dataFetched(new ArrayList<ILookupRow<LOOKUP_KEY>>(), null);
     }
     return null;
   }
 
   @Override
-  public List<? extends ILookupRow<KEY_TYPE>> callBrowseLookup(String browseHint, int maxRowCount) throws ProcessingException {
+  public List<? extends ILookupRow<LOOKUP_KEY>> callBrowseLookup(String browseHint, int maxRowCount) throws ProcessingException {
     return callBrowseLookup(browseHint, maxRowCount, isActiveFilterEnabled() ? getActiveFilter() : TriState.TRUE);
   }
 
   @Override
-  public List<? extends ILookupRow<KEY_TYPE>> callBrowseLookup(String browseHint, int maxRowCount, TriState activeState) throws ProcessingException {
-    final Holder<List<? extends ILookupRow<KEY_TYPE>>> rowsHolder = new Holder<List<? extends ILookupRow<KEY_TYPE>>>();
+  public List<? extends ILookupRow<LOOKUP_KEY>> callBrowseLookup(String browseHint, int maxRowCount, TriState activeState) throws ProcessingException {
+    final Holder<List<? extends ILookupRow<LOOKUP_KEY>>> rowsHolder = new Holder<List<? extends ILookupRow<LOOKUP_KEY>>>();
     final Holder<ProcessingException> failedHolder = new Holder<ProcessingException>(ProcessingException.class, new ProcessingException("callback was not invoked"));
-    callBrowseLookupInternal(browseHint, maxRowCount, activeState, new ILookupCallFetcher<KEY_TYPE>() {
+    callBrowseLookupInternal(browseHint, maxRowCount, activeState, new ILookupCallFetcher<LOOKUP_KEY>() {
       @Override
-      public void dataFetched(List<? extends ILookupRow<KEY_TYPE>> rows, ProcessingException failed) {
+      public void dataFetched(List<? extends ILookupRow<LOOKUP_KEY>> rows, ProcessingException failed) {
         rowsHolder.setValue(rows);
         failedHolder.setValue(failed);
       }
@@ -1099,26 +1111,26 @@ public abstract class AbstractContentAssistField<VALUE_TYPE, KEY_TYPE> extends A
   }
 
   @Override
-  public JobEx callBrowseLookupInBackground(String browseHint, int maxRowCount, ILookupCallFetcher<KEY_TYPE> fetcher) {
+  public JobEx callBrowseLookupInBackground(String browseHint, int maxRowCount, ILookupCallFetcher<LOOKUP_KEY> fetcher) {
     return callBrowseLookupInBackground(browseHint, maxRowCount, isActiveFilterEnabled() ? getActiveFilter() : TriState.TRUE, fetcher);
   }
 
   @Override
-  public JobEx callBrowseLookupInBackground(String browseHint, int maxRowCount, TriState activeState, ILookupCallFetcher<KEY_TYPE> fetcher) {
+  public JobEx callBrowseLookupInBackground(String browseHint, int maxRowCount, TriState activeState, ILookupCallFetcher<LOOKUP_KEY> fetcher) {
     return callBrowseLookupInternal(browseHint, maxRowCount, activeState, fetcher, true);
   }
 
-  private JobEx callBrowseLookupInternal(String browseHint, int maxRowCount, TriState activeState, final ILookupCallFetcher<KEY_TYPE> fetcher, final boolean background) {
-    final ILookupCall<KEY_TYPE> call = (getLookupCall() != null ? SERVICES.getService(ILookupCallProvisioningService.class).newClonedInstance(getLookupCall(), new FormFieldProvisioningContext(AbstractContentAssistField.this)) : null);
+  private JobEx callBrowseLookupInternal(String browseHint, int maxRowCount, TriState activeState, final ILookupCallFetcher<LOOKUP_KEY> fetcher, final boolean background) {
+    final ILookupCall<LOOKUP_KEY> call = (getLookupCall() != null ? SERVICES.getService(ILookupCallProvisioningService.class).newClonedInstance(getLookupCall(), new FormFieldProvisioningContext(AbstractContentAssistField.this)) : null);
     final IClientSession session = ClientSyncJob.getCurrentSession();
-    ILookupCallFetcher<KEY_TYPE> internalFetcher = new ILookupCallFetcher<KEY_TYPE>() {
+    ILookupCallFetcher<LOOKUP_KEY> internalFetcher = new ILookupCallFetcher<LOOKUP_KEY>() {
       @Override
-      public void dataFetched(final List<? extends ILookupRow<KEY_TYPE>> rows, final ProcessingException failed) {
+      public void dataFetched(final List<? extends ILookupRow<LOOKUP_KEY>> rows, final ProcessingException failed) {
         ClientSyncJob scoutSyncJob = new ClientSyncJob("ContentAssistField browse lookup", session) {
           @Override
           protected void runVoid(IProgressMonitor monitor) throws Throwable {
             if (failed == null) {
-              ArrayList<ILookupRow<KEY_TYPE>> result = new ArrayList<ILookupRow<KEY_TYPE>>(rows);
+              ArrayList<ILookupRow<LOOKUP_KEY>> result = new ArrayList<ILookupRow<LOOKUP_KEY>>(rows);
               try {
                 filterBrowseLookup(call, result);
                 fetcher.dataFetched(cleanupResultList(result), null);
@@ -1168,40 +1180,40 @@ public abstract class AbstractContentAssistField<VALUE_TYPE, KEY_TYPE> extends A
       }
     }
     else {
-      internalFetcher.dataFetched(new ArrayList<ILookupRow<KEY_TYPE>>(), null);
+      internalFetcher.dataFetched(new ArrayList<ILookupRow<LOOKUP_KEY>>(), null);
     }
     return null;
   }
 
   @Override
-  public List<ILookupRow<KEY_TYPE>> callSubTreeLookup(KEY_TYPE parentKey) throws ProcessingException {
+  public List<ILookupRow<LOOKUP_KEY>> callSubTreeLookup(LOOKUP_KEY parentKey) throws ProcessingException {
     return callSubTreeLookup(parentKey, isActiveFilterEnabled() ? getActiveFilter() : TriState.TRUE);
   }
 
   @Override
-  public List<ILookupRow<KEY_TYPE>> callSubTreeLookup(KEY_TYPE parentKey, TriState activeState) throws ProcessingException {
-    List<? extends ILookupRow<KEY_TYPE>> data = null;
-    ILookupCall<KEY_TYPE> call = getLookupCall();
+  public List<ILookupRow<LOOKUP_KEY>> callSubTreeLookup(LOOKUP_KEY parentKey, TriState activeState) throws ProcessingException {
+    List<? extends ILookupRow<LOOKUP_KEY>> data = null;
+    ILookupCall<LOOKUP_KEY> call = getLookupCall();
     if (call != null) {
       call = SERVICES.getService(ILookupCallProvisioningService.class).newClonedInstance(call, new FormFieldProvisioningContext(AbstractContentAssistField.this));
       call.setMaxRowCount(getBrowseMaxRowCount());
       prepareRecLookup(call, parentKey, activeState);
       data = call.getDataByRec();
     }
-    ArrayList<ILookupRow<KEY_TYPE>> result;
+    ArrayList<ILookupRow<LOOKUP_KEY>> result;
     if (data != null) {
-      result = new ArrayList<ILookupRow<KEY_TYPE>>(data);
+      result = new ArrayList<ILookupRow<LOOKUP_KEY>>(data);
     }
     else {
-      result = new ArrayList<ILookupRow<KEY_TYPE>>(0);
+      result = new ArrayList<ILookupRow<LOOKUP_KEY>>(0);
     }
     filterRecLookup(call, result);
     return cleanupResultList(result);
   }
 
-  protected List<ILookupRow<KEY_TYPE>> cleanupResultList(List<ILookupRow<KEY_TYPE>> list) {
-    List<ILookupRow<KEY_TYPE>> rows = new ArrayList<ILookupRow<KEY_TYPE>>();
-    for (ILookupRow<KEY_TYPE> r : list) {
+  protected List<ILookupRow<LOOKUP_KEY>> cleanupResultList(List<ILookupRow<LOOKUP_KEY>> list) {
+    List<ILookupRow<LOOKUP_KEY>> rows = new ArrayList<ILookupRow<LOOKUP_KEY>>();
+    for (ILookupRow<LOOKUP_KEY> r : list) {
       if (r != null) {
         rows.add(r);
       }
@@ -1209,19 +1221,19 @@ public abstract class AbstractContentAssistField<VALUE_TYPE, KEY_TYPE> extends A
     return rows;
   }
 
-  protected abstract void handleProposalFormClosed(IContentAssistFieldProposalForm<KEY_TYPE> proposalForm) throws ProcessingException;
+  protected abstract void handleProposalFormClosed(IContentAssistFieldProposalForm<LOOKUP_KEY> proposalForm) throws ProcessingException;
 
   /**
    * @param newValue
    */
-  protected abstract void handleFetchResult(IContentAssistFieldDataFetchResult<KEY_TYPE> result);
+  protected abstract void handleFetchResult(IContentAssistFieldDataFetchResult<LOOKUP_KEY> result);
 
-  protected IContentAssistFieldLookupRowFetcher<KEY_TYPE> createLookupRowFetcher() {
+  protected IContentAssistFieldLookupRowFetcher<LOOKUP_KEY> createLookupRowFetcher() {
     if (isBrowseHierarchy()) {
-      return new HierachycalContentAssistDataFetcher<KEY_TYPE>(this);
+      return new HierachycalContentAssistDataFetcher<LOOKUP_KEY>(this);
     }
     else {
-      return new ContentAssistFieldDataFetcher<KEY_TYPE>(this);
+      return new ContentAssistFieldDataFetcher<LOOKUP_KEY>(this);
     }
   }
 
@@ -1237,7 +1249,7 @@ public abstract class AbstractContentAssistField<VALUE_TYPE, KEY_TYPE> extends A
     public void formChanged(FormEvent e) throws ProcessingException {
       switch (e.getType()) {
         case FormEvent.TYPE_CLOSED: {
-          handleProposalFormClosed((IContentAssistFieldProposalForm<KEY_TYPE>) e.getForm());
+          handleProposalFormClosed((IContentAssistFieldProposalForm<LOOKUP_KEY>) e.getForm());
           break;
         }
       }
@@ -1250,10 +1262,149 @@ public abstract class AbstractContentAssistField<VALUE_TYPE, KEY_TYPE> extends A
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
       if (IContentAssistFieldLookupRowFetcher.PROP_SEARCH_RESULT.equals(evt.getPropertyName())) {
-        handleFetchResult((IContentAssistFieldDataFetchResult<KEY_TYPE>) evt.getNewValue());
+        handleFetchResult((IContentAssistFieldDataFetchResult<LOOKUP_KEY>) evt.getNewValue());
       }
     }
 
+  }
+
+  protected static class LocalContentAssistFieldExtension<VALUE, LOOKUP_KEY, OWNER extends AbstractContentAssistField<VALUE, LOOKUP_KEY>> extends LocalValueFieldExtension<VALUE, OWNER> implements IContentAssistFieldExtension<VALUE, LOOKUP_KEY, OWNER> {
+
+    public LocalContentAssistFieldExtension(OWNER owner) {
+      super(owner);
+    }
+
+    @Override
+    public void execFilterBrowseLookupResult(ContentAssistFieldFilterBrowseLookupResultChain<VALUE, LOOKUP_KEY> chain, ILookupCall<LOOKUP_KEY> call, List<ILookupRow<LOOKUP_KEY>> result) throws ProcessingException {
+      getOwner().execFilterBrowseLookupResult(call, result);
+    }
+
+    @Override
+    public ILookupRow<LOOKUP_KEY> execBrowseNew(ContentAssistFieldBrowseNewChain<VALUE, LOOKUP_KEY> chain, String searchText) throws ProcessingException {
+      return getOwner().execBrowseNew(searchText);
+    }
+
+    @Override
+    public void execFilterKeyLookupResult(ContentAssistFieldFilterKeyLookupResultChain<VALUE, LOOKUP_KEY> chain, ILookupCall<LOOKUP_KEY> call, List<ILookupRow<LOOKUP_KEY>> result) throws ProcessingException {
+      getOwner().execFilterKeyLookupResult(call, result);
+    }
+
+    @Override
+    public void execPrepareLookup(ContentAssistFieldPrepareLookupChain<VALUE, LOOKUP_KEY> chain, ILookupCall<LOOKUP_KEY> call) throws ProcessingException {
+      getOwner().execPrepareLookup(call);
+    }
+
+    @Override
+    public void execPrepareTextLookup(ContentAssistFieldPrepareTextLookupChain<VALUE, LOOKUP_KEY> chain, ILookupCall<LOOKUP_KEY> call, String text) throws ProcessingException {
+      getOwner().execPrepareTextLookup(call, text);
+    }
+
+    @Override
+    public void execPrepareBrowseLookup(ContentAssistFieldPrepareBrowseLookupChain<VALUE, LOOKUP_KEY> chain, ILookupCall<LOOKUP_KEY> call, String browseHint) throws ProcessingException {
+      getOwner().execPrepareBrowseLookup(call, browseHint);
+    }
+
+    @Override
+    public void execFilterTextLookupResult(ContentAssistFieldFilterTextLookupResultChain<VALUE, LOOKUP_KEY> chain, ILookupCall<LOOKUP_KEY> call, List<ILookupRow<LOOKUP_KEY>> result) throws ProcessingException {
+      getOwner().execFilterTextLookupResult(call, result);
+    }
+
+    @Override
+    public void execPrepareRecLookup(ContentAssistFieldPrepareRecLookupChain<VALUE, LOOKUP_KEY> chain, ILookupCall<LOOKUP_KEY> call, LOOKUP_KEY parentKey) throws ProcessingException {
+      getOwner().execPrepareRecLookup(call, parentKey);
+    }
+
+    @Override
+    public void execFilterLookupResult(ContentAssistFieldFilterLookupResultChain<VALUE, LOOKUP_KEY> chain, ILookupCall<LOOKUP_KEY> call, List<ILookupRow<LOOKUP_KEY>> result) throws ProcessingException {
+      getOwner().execFilterLookupResult(call, result);
+    }
+
+    @Override
+    public void execFilterRecLookupResult(ContentAssistFieldFilterRecLookupResultChain<VALUE, LOOKUP_KEY> chain, ILookupCall<LOOKUP_KEY> call, List<ILookupRow<LOOKUP_KEY>> result) throws ProcessingException {
+      getOwner().execFilterRecLookupResult(call, result);
+    }
+
+    @Override
+    public void execPrepareKeyLookup(ContentAssistFieldPrepareKeyLookupChain<VALUE, LOOKUP_KEY> chain, ILookupCall<LOOKUP_KEY> call, LOOKUP_KEY key) throws ProcessingException {
+      getOwner().execPrepareKeyLookup(call, key);
+    }
+  }
+
+  @Override
+  protected IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>> createLocalExtension() {
+    return new LocalContentAssistFieldExtension<VALUE, LOOKUP_KEY, AbstractContentAssistField<VALUE, LOOKUP_KEY>>(this);
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public List<? extends IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>>> getAllExtensions() {
+    return (List<? extends IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>>>) super.getAllExtensions();
+  }
+
+  protected final void interceptFilterBrowseLookupResult(ILookupCall<LOOKUP_KEY> call, List<ILookupRow<LOOKUP_KEY>> result) throws ProcessingException {
+    List<? extends IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>>> extensions = getAllExtensions();
+    ContentAssistFieldFilterBrowseLookupResultChain<VALUE, LOOKUP_KEY> chain = new ContentAssistFieldFilterBrowseLookupResultChain<VALUE, LOOKUP_KEY>(extensions);
+    chain.execFilterBrowseLookupResult(call, result);
+  }
+
+  protected final ILookupRow<LOOKUP_KEY> interceptBrowseNew(String searchText) throws ProcessingException {
+    List<? extends IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>>> extensions = getAllExtensions();
+    ContentAssistFieldBrowseNewChain<VALUE, LOOKUP_KEY> chain = new ContentAssistFieldBrowseNewChain<VALUE, LOOKUP_KEY>(extensions);
+    return chain.execBrowseNew(searchText);
+  }
+
+  protected final void interceptFilterKeyLookupResult(ILookupCall<LOOKUP_KEY> call, List<ILookupRow<LOOKUP_KEY>> result) throws ProcessingException {
+    List<? extends IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>>> extensions = getAllExtensions();
+    ContentAssistFieldFilterKeyLookupResultChain<VALUE, LOOKUP_KEY> chain = new ContentAssistFieldFilterKeyLookupResultChain<VALUE, LOOKUP_KEY>(extensions);
+    chain.execFilterKeyLookupResult(call, result);
+  }
+
+  protected final void interceptPrepareLookup(ILookupCall<LOOKUP_KEY> call) throws ProcessingException {
+    List<? extends IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>>> extensions = getAllExtensions();
+    ContentAssistFieldPrepareLookupChain<VALUE, LOOKUP_KEY> chain = new ContentAssistFieldPrepareLookupChain<VALUE, LOOKUP_KEY>(extensions);
+    chain.execPrepareLookup(call);
+  }
+
+  protected final void interceptPrepareTextLookup(ILookupCall<LOOKUP_KEY> call, String text) throws ProcessingException {
+    List<? extends IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>>> extensions = getAllExtensions();
+    ContentAssistFieldPrepareTextLookupChain<VALUE, LOOKUP_KEY> chain = new ContentAssistFieldPrepareTextLookupChain<VALUE, LOOKUP_KEY>(extensions);
+    chain.execPrepareTextLookup(call, text);
+  }
+
+  protected final void interceptPrepareBrowseLookup(ILookupCall<LOOKUP_KEY> call, String browseHint) throws ProcessingException {
+    List<? extends IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>>> extensions = getAllExtensions();
+    ContentAssistFieldPrepareBrowseLookupChain<VALUE, LOOKUP_KEY> chain = new ContentAssistFieldPrepareBrowseLookupChain<VALUE, LOOKUP_KEY>(extensions);
+    chain.execPrepareBrowseLookup(call, browseHint);
+  }
+
+  protected final void interceptFilterTextLookupResult(ILookupCall<LOOKUP_KEY> call, List<ILookupRow<LOOKUP_KEY>> result) throws ProcessingException {
+    List<? extends IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>>> extensions = getAllExtensions();
+    ContentAssistFieldFilterTextLookupResultChain<VALUE, LOOKUP_KEY> chain = new ContentAssistFieldFilterTextLookupResultChain<VALUE, LOOKUP_KEY>(extensions);
+    chain.execFilterTextLookupResult(call, result);
+  }
+
+  protected final void interceptPrepareRecLookup(ILookupCall<LOOKUP_KEY> call, LOOKUP_KEY parentKey) throws ProcessingException {
+    List<? extends IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>>> extensions = getAllExtensions();
+    ContentAssistFieldPrepareRecLookupChain<VALUE, LOOKUP_KEY> chain = new ContentAssistFieldPrepareRecLookupChain<VALUE, LOOKUP_KEY>(extensions);
+    chain.execPrepareRecLookup(call, parentKey);
+  }
+
+  protected final void interceptFilterLookupResult(ILookupCall<LOOKUP_KEY> call, List<ILookupRow<LOOKUP_KEY>> result) throws ProcessingException {
+    List<? extends IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>>> extensions = getAllExtensions();
+    ContentAssistFieldFilterLookupResultChain<VALUE, LOOKUP_KEY> chain = new ContentAssistFieldFilterLookupResultChain<VALUE, LOOKUP_KEY>(extensions);
+    chain.execFilterLookupResult(call, result);
+  }
+
+  protected final void interceptFilterRecLookupResult(ILookupCall<LOOKUP_KEY> call, List<ILookupRow<LOOKUP_KEY>> result) throws ProcessingException {
+    List<? extends IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>>> extensions = getAllExtensions();
+    ContentAssistFieldFilterRecLookupResultChain<VALUE, LOOKUP_KEY> chain = new ContentAssistFieldFilterRecLookupResultChain<VALUE, LOOKUP_KEY>(extensions);
+    chain.execFilterRecLookupResult(call, result);
+  }
+
+  protected final void interceptPrepareKeyLookup(ILookupCall<LOOKUP_KEY> call, LOOKUP_KEY key) throws ProcessingException {
+    List<? extends IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>>> extensions = getAllExtensions();
+    ContentAssistFieldPrepareKeyLookupChain<VALUE, LOOKUP_KEY> chain = new ContentAssistFieldPrepareKeyLookupChain<VALUE, LOOKUP_KEY>(extensions);
+    chain.execPrepareKeyLookup(call, key);
   }
 
 }

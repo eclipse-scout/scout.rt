@@ -14,6 +14,7 @@ import java.security.Permission;
 import java.util.List;
 
 import org.eclipse.scout.commons.ITypeWithClassId;
+import org.eclipse.scout.commons.annotations.IOrdered;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
@@ -25,7 +26,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithNodes;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 
-public interface IOutline extends ITree, ITypeWithClassId {
+public interface IOutline extends ITree, ITypeWithClassId, IOrdered {
 
   /**
    * {@link Boolean}
@@ -52,6 +53,8 @@ public interface IOutline extends ITree, ITypeWithClassId {
    */
   String PROP_SEARCH_FORM = "searchForm";
 
+  String PROP_VIEW_ORDER = "viewOrder";
+
   /**
    * alias to {@link ITree#getSelectedNode()}
    */
@@ -63,7 +66,7 @@ public interface IOutline extends ITree, ITypeWithClassId {
 
   /**
    * Find a specific page by its type in the outline tree
-   * 
+   *
    * @return the first found occurrence of the page
    */
   <T extends IPage> T findPage(final Class<T> pageType);
@@ -144,7 +147,7 @@ public interface IOutline extends ITree, ITypeWithClassId {
    * <li>If the page is a {@link IPageWithNodes} and it's parent a {@link IPageWithTable} all
    * {@link TableMenuType#SingleSelection} menus of the parents table page will be included.</li>
    * </ul>
-   * 
+   *
    * @param page
    * @return
    */

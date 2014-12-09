@@ -20,6 +20,7 @@ import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.holders.BooleanHolder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.extension.ui.action.menu.root.IContextMenuExtension;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.IActionFilter;
@@ -196,6 +197,18 @@ public abstract class AbstractContextMenu extends AbstractMenu implements IConte
       }
       calculateLocalVisibility();
     }
+  }
+
+  protected static class LocalContextMenuExtension<OWNER extends AbstractContextMenu> extends LocalMenuExtension<OWNER> implements IContextMenuExtension<OWNER> {
+
+    public LocalContextMenuExtension(OWNER owner) {
+      super(owner);
+    }
+  }
+
+  @Override
+  protected IContextMenuExtension<? extends AbstractContextMenu> createLocalExtension() {
+    return new LocalContextMenuExtension<AbstractContextMenu>(this);
   }
 
 }

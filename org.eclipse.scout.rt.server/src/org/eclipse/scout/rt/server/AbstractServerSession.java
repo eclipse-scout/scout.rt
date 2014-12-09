@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -31,11 +32,17 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.server.extension.IServerSessionExtension;
+import org.eclipse.scout.rt.server.extension.ServerSessionChains.ServerSessionLoadSessionChain;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;
 import org.eclipse.scout.rt.server.services.common.clientnotification.SessionFilter;
 import org.eclipse.scout.rt.shared.OfflineState;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.TextsThreadLocal;
+import org.eclipse.scout.rt.shared.extension.AbstractExtension;
+import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
+import org.eclipse.scout.rt.shared.extension.IExtension;
+import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 import org.eclipse.scout.rt.shared.services.common.context.SharedContextChangedNotification;
 import org.eclipse.scout.rt.shared.services.common.context.SharedVariableMap;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
@@ -45,7 +52,7 @@ import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.service.SERVICES;
 import org.osgi.framework.Bundle;
 
-public abstract class AbstractServerSession implements IServerSession, Serializable {
+public abstract class AbstractServerSession implements IServerSession, Serializable, IExtensibleObject {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractServerSession.class);
 
   private static final long serialVersionUID = 1L;
@@ -64,14 +71,16 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
   private Subject m_subject;
   private String m_sessionId;
   private String m_symbolicBundleName;
+  private final ObjectExtensions<AbstractServerSession, IServerSessionExtension<? extends AbstractServerSession>> m_objectExtensions;
 
   public AbstractServerSession(boolean autoInitConfig) {
     m_locale = LocaleThreadLocal.get();
     m_attributesLock = new Object();
     m_attributes = new HashMap<String, Object>();
     m_sharedVariableMap = new SharedVariableMap();
+    m_objectExtensions = new ObjectExtensions<AbstractServerSession, IServerSessionExtension<? extends AbstractServerSession>>(this);
     if (autoInitConfig) {
-      initConfig();
+      interceptInitConfig();
     }
   }
 
@@ -179,6 +188,15 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
     }
   }
 
+  protected final void interceptInitConfig() {
+    m_objectExtensions.initConfig(createLocalExtension(), new Runnable() {
+      @Override
+      public void run() {
+        initConfig();
+      }
+    });
+  }
+
   protected void initConfig() {
     m_singleThreadSession = getConfiguredSingleThreadSession();
     if (!isSingleThreadSession()) {
@@ -196,6 +214,20 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
       return;
     }
     m_initialized = true;
+  }
+
+  @Override
+  public List<? extends IServerSessionExtension<? extends AbstractServerSession>> getAllExtensions() {
+    return m_objectExtensions.getAllExtensions();
+  }
+
+  protected IServerSessionExtension<? extends AbstractServerSession> createLocalExtension() {
+    return new LocalServerSessionExtension<AbstractServerSession>(this);
+  }
+
+  @Override
+  public <T extends IExtension<?>> T getExtension(Class<T> c) {
+    return m_objectExtensions.getExtension(c);
   }
 
   @Override
@@ -218,7 +250,7 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
     // explicitly set the just created instance to the ThreadLocal because it was not available yet, when the job was started.
     TextsThreadLocal.set(m_scoutTexts);
     assignUserId();
-    execLoadSession();
+    interceptLoadSession();
   }
 
   /**
@@ -281,5 +313,28 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
   @Override
   public String getId() {
     return m_sessionId;
+  }
+
+  /**
+   * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
+   * any further chain elements.
+   */
+  protected static class LocalServerSessionExtension<OWNER extends AbstractServerSession> extends AbstractExtension<OWNER> implements IServerSessionExtension<OWNER> {
+
+    public LocalServerSessionExtension(OWNER owner) {
+      super(owner);
+    }
+
+    @Override
+    public void execLoadSession(ServerSessionLoadSessionChain chain) throws ProcessingException {
+      getOwner().execLoadSession();
+    }
+
+  }
+
+  protected final void interceptLoadSession() throws ProcessingException {
+    List<? extends IServerSessionExtension<? extends AbstractServerSession>> extensions = getAllExtensions();
+    ServerSessionLoadSessionChain chain = new ServerSessionLoadSessionChain(extensions);
+    chain.execLoadSession();
   }
 }

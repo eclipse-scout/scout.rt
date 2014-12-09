@@ -39,7 +39,7 @@ import org.eclipse.scout.service.SERVICES;
  * @since 3.9.0
  */
 @ClassId("349c912d-0e60-42a0-bd8d-b4c6c08ec62a")
-public class AbstractRowSummaryColumn extends AbstractStringColumn implements IRowSummaryColumn {
+public abstract class AbstractRowSummaryColumn extends AbstractStringColumn implements IRowSummaryColumn {
   private boolean m_initialized;
 
   private IColumn<?> m_cellHeaderColumn;

@@ -16,6 +16,7 @@ import org.eclipse.scout.commons.UTCDate;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.datefield.IUTCDateFieldExtension;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractUTCFieldData;
 
 /**
@@ -36,6 +37,18 @@ public abstract class AbstractUTCDateField extends AbstractDateField implements 
   @Override
   public Class<Date> getHolderType() {
     return super.getHolderType();
+  }
+
+  protected static class LocalUTCDateFieldExtension<OWNER extends AbstractUTCDateField> extends LocalDateFieldExtension<OWNER> implements IUTCDateFieldExtension<OWNER> {
+
+    public LocalUTCDateFieldExtension(OWNER owner) {
+      super(owner);
+    }
+  }
+
+  @Override
+  protected IUTCDateFieldExtension<? extends AbstractUTCDateField> createLocalExtension() {
+    return new LocalUTCDateFieldExtension<AbstractUTCDateField>(this);
   }
 
 }

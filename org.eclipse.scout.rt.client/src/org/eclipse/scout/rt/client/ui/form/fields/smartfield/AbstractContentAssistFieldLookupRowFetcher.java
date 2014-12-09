@@ -17,12 +17,12 @@ import org.eclipse.scout.commons.beans.BasicPropertySupport;
 /**
  *
  */
-public abstract class AbstractContentAssistFieldLookupRowFetcher<KEY_TYPE> implements IContentAssistFieldLookupRowFetcher<KEY_TYPE> {
+public abstract class AbstractContentAssistFieldLookupRowFetcher<LOOKUP_KEY> implements IContentAssistFieldLookupRowFetcher<LOOKUP_KEY> {
 
   private BasicPropertySupport propertySupport;
-  private final IContentAssistField<?, KEY_TYPE> m_contentAssistField;
+  private final IContentAssistField<?, LOOKUP_KEY> m_contentAssistField;
 
-  public AbstractContentAssistFieldLookupRowFetcher(IContentAssistField<?, KEY_TYPE> contentAssistField) {
+  public AbstractContentAssistFieldLookupRowFetcher(IContentAssistField<?, LOOKUP_KEY> contentAssistField) {
     m_contentAssistField = contentAssistField;
     propertySupport = new BasicPropertySupport(this);
   }
@@ -67,17 +67,17 @@ public abstract class AbstractContentAssistFieldLookupRowFetcher<KEY_TYPE> imple
     propertySupport.removePropertyChangeListener(propertyName, listener);
   }
 
-  public IContentAssistField<?, KEY_TYPE> getContentAssistField() {
+  public IContentAssistField<?, LOOKUP_KEY> getContentAssistField() {
     return m_contentAssistField;
   }
 
   @SuppressWarnings("unchecked")
   @Override
-  public IContentAssistFieldDataFetchResult<KEY_TYPE> getResult() {
-    return (IContentAssistFieldDataFetchResult<KEY_TYPE>) propertySupport.getProperty(PROP_SEARCH_RESULT);
+  public IContentAssistFieldDataFetchResult<LOOKUP_KEY> getResult() {
+    return (IContentAssistFieldDataFetchResult<LOOKUP_KEY>) propertySupport.getProperty(PROP_SEARCH_RESULT);
   }
 
-  protected void setResult(IContentAssistFieldDataFetchResult<KEY_TYPE> result) {
+  protected void setResult(IContentAssistFieldDataFetchResult<LOOKUP_KEY> result) {
     // Always propagate the event of an executed search to the listeners even if the search result did not change. Thus, the proposal popup is opened for every search.
     propertySupport.setPropertyAlwaysFire(PROP_SEARCH_RESULT, result);
   }

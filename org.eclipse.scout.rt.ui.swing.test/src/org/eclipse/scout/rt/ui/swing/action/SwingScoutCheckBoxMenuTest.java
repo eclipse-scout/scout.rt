@@ -107,6 +107,7 @@ public class SwingScoutCheckBoxMenuTest {
     @Override
     protected void execSelectionChanged(boolean selection) throws ProcessingException {
       m_execSelectionChangedHolder.setValue(selection);
+      m_execToggleActionHolder.setValue(selection);
     }
 
     @Override

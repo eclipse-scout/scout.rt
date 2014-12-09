@@ -31,6 +31,17 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.xmlparser.SimpleXmlElement;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.composer.ComposerFieldChains.ComposerFieldCreateAdditionalOrNodeChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.composer.ComposerFieldChains.ComposerFieldCreateAttributeNodeChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.composer.ComposerFieldChains.ComposerFieldCreateDataModelChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.composer.ComposerFieldChains.ComposerFieldCreateEitherNodeChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.composer.ComposerFieldChains.ComposerFieldCreateEntityNodeChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.composer.ComposerFieldChains.ComposerFieldCreateRootNodeChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.composer.ComposerFieldChains.ComposerFieldResolveAttributePathChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.composer.ComposerFieldChains.ComposerFieldResolveEntityPathChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.composer.ComposerFieldChains.ComposerFieldResolveRootPathForTopLevelAttributeChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.composer.ComposerFieldChains.ComposerFieldResolveRootPathForTopLevelEntityChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.composer.IComposerFieldExtension;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
@@ -39,8 +50,6 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITreeVisitor;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
-import org.eclipse.scout.rt.client.ui.form.fields.composer.attribute.IComposerAttribute;
-import org.eclipse.scout.rt.client.ui.form.fields.composer.entity.IComposerEntity;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.node.AttributeNode;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.node.EitherOrNode;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.node.EntityNode;
@@ -66,7 +75,6 @@ import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHa
 import org.eclipse.scout.service.SERVICES;
 
 @ClassId("8e7f7eb8-be18-48e5-9efe-8a5b3459e247")
-@SuppressWarnings("deprecation")
 @FormData(value = AbstractComposerData.class, sdkCommand = SdkCommand.USE, defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.CREATE)
 public abstract class AbstractComposerField extends AbstractFormField implements IComposerField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractComposerField.class);
@@ -108,7 +116,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
   }
 
   /**
-   * see {@link #execResolveEntityPath(EntityNode)}
+   * see {@link #interceptResolveEntityPath(EntityNode)}
    */
   @ConfigOperation
   @Order(98)
@@ -121,7 +129,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
   }
 
   /**
-   * see {@link #execResolveAttributePath(AttributeNode)}
+   * see {@link #interceptResolveAttributePath(AttributeNode)}
    */
   @ConfigOperation
   @Order(98)
@@ -143,7 +151,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
    * <p>
    * The default traverses the tree up to the root and collects all non-null {@link EntityNode#getEntity()}
    * <p>
-   * This is prefixed with {@link #execResolveRootPathForTopLevelEntity(IDataModelEntity, List)}
+   * This is prefixed with {@link #interceptResolveRootPathForTopLevelEntity(IDataModelEntity, List)}
    */
   @ConfigOperation
   @Order(99)
@@ -158,7 +166,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
       tmp = tmp.getAncestorNode(EntityNode.class);
     }
     if (list.size() > 0) {
-      execResolveRootPathForTopLevelEntity(list.get(0), list);
+      interceptResolveRootPathForTopLevelEntity(list.get(0), list);
     }
     return new EntityPath(list);
   }
@@ -167,7 +175,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
    * see {@link #execResolveEntityPathForEntityExport(EntityNode)}, {@link AttributePath} for more details
    * <p>
    * The path in the composer tree is prefixed with
-   * {@link #execResolveRootPathForTopLevelAttribute(IDataModelAttribute, List)}
+   * {@link #interceptResolveRootPathForTopLevelAttribute(IDataModelAttribute, List)}
    */
   @ConfigOperation
   @Order(99)
@@ -185,10 +193,10 @@ public abstract class AbstractComposerField extends AbstractFormField implements
       tmp = tmp.getAncestorNode(EntityNode.class);
     }
     if (list.size() > 0) {
-      execResolveRootPathForTopLevelEntity(list.get(0), list);
+      interceptResolveRootPathForTopLevelEntity(list.get(0), list);
     }
     else {
-      execResolveRootPathForTopLevelAttribute(node.getAttribute(), list);
+      interceptResolveRootPathForTopLevelAttribute(node.getAttribute(), list);
     }
     return new AttributePath(list, node.getAttribute());
   }
@@ -214,10 +222,10 @@ public abstract class AbstractComposerField extends AbstractFormField implements
 
   /**
    * Override this method to decorate or enhance new nodes whenever they are created
-   * 
+   *
    * @return the new node, must not be null
    *         <p>
-   *         Normally overrides call super. {@link #execCreateRootNode()}
+   *         Normally overrides call super. {@link #interceptCreateRootNode()}
    */
   @ConfigOperation
   @Order(100)
@@ -227,7 +235,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
 
   /**
    * Override this method to decorate or enhance new nodes whenever they are created
-   * 
+   *
    * @return the new node or null to ignore the add of a new node of this type
    *         <p>
    *         Normally overrides call super. {@link #execCreateEntityNode(ITreeNode, IDataModelEntity, boolean, Object[],
@@ -246,7 +254,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
 
   /**
    * Override this method to decorate or enhance new nodes whenever they are created
-   * 
+   *
    * @return the new node or null to ignore the add of a new node of this type
    *         <p>
    *         Normally overrides call super. {@link #execCreateAttributeNode(ITreeNode, IDataModelAttribute, Integer,
@@ -269,10 +277,10 @@ public abstract class AbstractComposerField extends AbstractFormField implements
 
   /**
    * Override this method to decorate or enhance new nodes whenever they are created
-   * 
+   *
    * @return the new node or null to ignore the add of a new node of this type
    *         <p>
-   *         Normally overrides call super.{@link #execCreateEitherNode(ITreeNode, boolean)}
+   *         Normally overrides call super.{@link #interceptCreateEitherNode(ITreeNode, boolean)}
    */
   @ConfigOperation
   @Order(130)
@@ -285,10 +293,10 @@ public abstract class AbstractComposerField extends AbstractFormField implements
 
   /**
    * Override this method to decorate or enhance new nodes whenever they are created
-   * 
+   *
    * @return the new node or null to ignore the add of a new node of this type
    *         <p>
-   *         Normally overrides call super.{@link #execCreateAdditionalOrNode(ITreeNode, boolean)}
+   *         Normally overrides call super.{@link #interceptCreateAdditionalOrNode(ITreeNode, boolean)}
    */
   @ConfigOperation
   @Order(140)
@@ -303,12 +311,21 @@ public abstract class AbstractComposerField extends AbstractFormField implements
   protected void initConfig() {
     m_uiFacade = new P_UIFacade();
     super.initConfig();
-    m_dataModel = execCreateDataModel();
+    m_dataModel = interceptCreateDataModel();
     // tree
-    if (getConfiguredTree() != null) {
-      try {
-        m_tree = ConfigurationUtility.newInnerInstance(this, getConfiguredTree());
-        RootNode rootNode = execCreateRootNode();
+    try {
+      List<ITree> contributedTrees = m_contributionHolder.getContributionsByClass(ITree.class);
+      m_tree = CollectionUtility.firstElement(contributedTrees);
+
+      if (m_tree == null) {
+        Class<? extends ITree> configuredTree = getConfiguredTree();
+        if (configuredTree != null) {
+          m_tree = ConfigurationUtility.newInnerInstance(this, configuredTree);
+        }
+      }
+
+      if (m_tree != null) {
+        RootNode rootNode = interceptCreateRootNode();
         rootNode.getCellForUpdate().setText(getLabel());
         m_tree.setRootNode(rootNode);
         m_tree.setNodeExpanded(rootNode, true);
@@ -329,23 +346,24 @@ public abstract class AbstractComposerField extends AbstractFormField implements
               }
             }
             );
+
+        // local enabled listener
+        addPropertyChangeListener(PROP_ENABLED, new PropertyChangeListener() {
+          @Override
+          public void propertyChange(PropertyChangeEvent e) {
+            if (m_tree != null) {
+              m_tree.setEnabled(isEnabled());
+            }
+          }
+        });
       }
-      catch (Exception e) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + getConfiguredTree().getName() + "'.", e));
+      else {
+        LOG.warn("there is no inner class of type ITree in " + getClass().getName());
       }
     }
-    else {
-      LOG.warn("there is no inner class of type ITree in " + getClass());
+    catch (Exception e) {
+      SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating tree for composer field '" + getClass().getName() + "'.", e));
     }
-    // local enabled listener
-    addPropertyChangeListener(PROP_ENABLED, new PropertyChangeListener() {
-      @Override
-      public void propertyChange(PropertyChangeEvent e) {
-        if (m_tree != null) {
-          m_tree.setEnabled(isEnabled());
-        }
-      }
-    });
   }
 
   /*
@@ -370,8 +388,8 @@ public abstract class AbstractComposerField extends AbstractFormField implements
 
   @Override
   public void exportFormFieldData(AbstractFormFieldData target) throws ProcessingException {
-    AbstractTreeFieldData treeFieldData = (AbstractTreeFieldData) target;
     if (m_tree != null) {
+      AbstractTreeFieldData treeFieldData = (AbstractTreeFieldData) target;
       m_tree.exportTreeData(treeFieldData);
     }
   }
@@ -405,36 +423,6 @@ public abstract class AbstractComposerField extends AbstractFormField implements
   @Override
   public List<IDataModelEntity> getEntities() {
     return m_dataModel.getEntities();
-  }
-
-  /**
-   * @deprecated use {@link #getEntities()} instead. Will be removed in the 5.0 Release.
-   */
-  @Deprecated
-  public List<IComposerEntity> getComposerEntities() {
-    List<IDataModelEntity> entities = m_dataModel.getEntities();
-    List<IComposerEntity> result = new ArrayList<IComposerEntity>(entities.size());
-    for (IDataModelEntity e : entities) {
-      if (e instanceof IComposerEntity) {
-        result.add((IComposerEntity) e);
-      }
-    }
-    return result;
-  }
-
-  /**
-   * @deprecated use {@link #getAttributes()} instead. Will be removed in the 5.0 Release.
-   */
-  @Deprecated
-  public List<IComposerAttribute> getComposerAttributes() {
-    List<IDataModelAttribute> attributes = m_dataModel.getAttributes();
-    List<IComposerAttribute> result = new ArrayList<IComposerAttribute>(attributes.size());
-    for (IDataModelAttribute attribute : attributes) {
-      if (attribute instanceof IComposerAttribute) {
-        result.add((IComposerAttribute) attribute);
-      }
-    }
-    return result;
   }
 
   @Override
@@ -562,7 +550,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
       if (node instanceof EntityNode) {
         EntityNode entityNode = (EntityNode) node;
         SimpleXmlElement xEntity = new SimpleXmlElement("entity");
-        xEntity.setAttribute("id", DataModelUtility.entityPathToExternalId(getDataModel(), execResolveEntityPath(entityNode)));
+        xEntity.setAttribute("id", DataModelUtility.entityPathToExternalId(getDataModel(), interceptResolveEntityPath(entityNode)));
         xEntity.setAttribute("negated", (entityNode.isNegative() ? "true" : "false"));
         List<String> texts = entityNode.getTexts();
         xEntity.setAttribute("displayValues", CollectionUtility.hasElements(texts) ? StringUtility.emptyIfNull(CollectionUtility.firstElement(texts)) : null);
@@ -573,7 +561,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
       else if (node instanceof AttributeNode) {
         AttributeNode attNode = (AttributeNode) node;
         SimpleXmlElement xAtt = new SimpleXmlElement("attribute");
-        xAtt.setAttribute("id", DataModelUtility.attributePathToExternalId(getDataModel(), execResolveAttributePath(attNode)));
+        xAtt.setAttribute("id", DataModelUtility.attributePathToExternalId(getDataModel(), interceptResolveAttributePath(attNode)));
         IDataModelAttributeOp op = attNode.getOp();
         try {
           xAtt.setAttribute("op", op.getOperator());
@@ -643,7 +631,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
 
   @Override
   public EntityNode addEntityNode(ITreeNode parentNode, IDataModelEntity e, boolean negated, List<? extends Object> values, List<String> texts) {
-    EntityNode node = execCreateEntityNode(parentNode, e, negated, values, texts);
+    EntityNode node = interceptCreateEntityNode(parentNode, e, negated, values, texts);
     if (node != null) {
       getTree().addChildNode(parentNode, node);
       getTree().setNodeExpanded(node, true);
@@ -653,7 +641,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
 
   @Override
   public EitherOrNode addEitherNode(ITreeNode parentNode, boolean negated) {
-    EitherOrNode node = execCreateEitherNode(parentNode, negated);
+    EitherOrNode node = interceptCreateEitherNode(parentNode, negated);
     if (node != null) {
       getTree().addChildNode(parentNode, node);
       getTree().setNodeExpanded(node, true);
@@ -663,7 +651,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
 
   @Override
   public EitherOrNode addAdditionalOrNode(ITreeNode eitherOrNode, boolean negated) {
-    EitherOrNode node = execCreateAdditionalOrNode(eitherOrNode, negated);
+    EitherOrNode node = interceptCreateAdditionalOrNode(eitherOrNode, negated);
     if (node != null) {
       getTree().addChildNode(eitherOrNode.getChildNodeIndex() + 1, eitherOrNode.getParentNode(), node);
       getTree().setNodeExpanded(node, true);
@@ -673,7 +661,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
 
   @Override
   public AttributeNode addAttributeNode(ITreeNode parentNode, IDataModelAttribute a, Integer aggregationType, IDataModelAttributeOp op, List<? extends Object> values, List<String> texts) {
-    AttributeNode node = execCreateAttributeNode(parentNode, a, aggregationType, op, values, texts);
+    AttributeNode node = interceptCreateAttributeNode(parentNode, a, aggregationType, op, values, texts);
     if (node != null) {
       getTree().addChildNode(parentNode, node);
     }
@@ -766,7 +754,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
     protected TreeNodeData exportTreeNodeData(ITreeNode node, AbstractTreeFieldData treeData) throws ProcessingException {
       if (node instanceof EntityNode) {
         EntityNode enode = (EntityNode) node;
-        String externalId = DataModelUtility.entityPathToExternalId(getDataModel(), execResolveEntityPath(enode));
+        String externalId = DataModelUtility.entityPathToExternalId(getDataModel(), interceptResolveEntityPath(enode));
         if (externalId == null) {
           if (LOG.isInfoEnabled()) {
             LOG.info("could not find entity data for: " + enode.getEntity());
@@ -780,7 +768,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
       }
       else if (node instanceof AttributeNode) {
         AttributeNode anode = (AttributeNode) node;
-        String externalId = DataModelUtility.attributePathToExternalId(getDataModel(), execResolveAttributePath(anode));
+        String externalId = DataModelUtility.attributePathToExternalId(getDataModel(), interceptResolveAttributePath(anode));
         if (externalId == null) {
           if (LOG.isInfoEnabled()) {
             LOG.info("could not find attribute data for: " + anode.getAttribute());
@@ -882,5 +870,133 @@ public abstract class AbstractComposerField extends AbstractFormField implements
         }
       }
     }
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public List<? extends IComposerFieldExtension<? extends AbstractComposerField>> getAllExtensions() {
+    return (List<? extends IComposerFieldExtension<? extends AbstractComposerField>>) super.getAllExtensions();
+  }
+
+  protected final EntityPath interceptResolveEntityPath(EntityNode node) {
+    List<? extends IComposerFieldExtension<? extends AbstractComposerField>> extensions = getAllExtensions();
+    ComposerFieldResolveEntityPathChain chain = new ComposerFieldResolveEntityPathChain(extensions);
+    return chain.execResolveEntityPath(node);
+  }
+
+  protected final void interceptResolveRootPathForTopLevelEntity(IDataModelEntity e, List<IDataModelEntity> lifeList) {
+    List<? extends IComposerFieldExtension<? extends AbstractComposerField>> extensions = getAllExtensions();
+    ComposerFieldResolveRootPathForTopLevelEntityChain chain = new ComposerFieldResolveRootPathForTopLevelEntityChain(extensions);
+    chain.execResolveRootPathForTopLevelEntity(e, lifeList);
+  }
+
+  protected final RootNode interceptCreateRootNode() {
+    List<? extends IComposerFieldExtension<? extends AbstractComposerField>> extensions = getAllExtensions();
+    ComposerFieldCreateRootNodeChain chain = new ComposerFieldCreateRootNodeChain(extensions);
+    return chain.execCreateRootNode();
+  }
+
+  protected final AttributePath interceptResolveAttributePath(AttributeNode node) {
+    List<? extends IComposerFieldExtension<? extends AbstractComposerField>> extensions = getAllExtensions();
+    ComposerFieldResolveAttributePathChain chain = new ComposerFieldResolveAttributePathChain(extensions);
+    return chain.execResolveAttributePath(node);
+  }
+
+  protected final AttributeNode interceptCreateAttributeNode(ITreeNode parentNode, IDataModelAttribute a, Integer aggregationType, IDataModelAttributeOp op, List<? extends Object> values, List<String> texts) {
+    List<? extends IComposerFieldExtension<? extends AbstractComposerField>> extensions = getAllExtensions();
+    ComposerFieldCreateAttributeNodeChain chain = new ComposerFieldCreateAttributeNodeChain(extensions);
+    return chain.execCreateAttributeNode(parentNode, a, aggregationType, op, values, texts);
+  }
+
+  protected final IDataModel interceptCreateDataModel() {
+    List<? extends IComposerFieldExtension<? extends AbstractComposerField>> extensions = getAllExtensions();
+    ComposerFieldCreateDataModelChain chain = new ComposerFieldCreateDataModelChain(extensions);
+    return chain.execCreateDataModel();
+  }
+
+  protected final EitherOrNode interceptCreateEitherNode(ITreeNode parentNode, boolean negated) {
+    List<? extends IComposerFieldExtension<? extends AbstractComposerField>> extensions = getAllExtensions();
+    ComposerFieldCreateEitherNodeChain chain = new ComposerFieldCreateEitherNodeChain(extensions);
+    return chain.execCreateEitherNode(parentNode, negated);
+  }
+
+  protected final void interceptResolveRootPathForTopLevelAttribute(IDataModelAttribute a, List<IDataModelEntity> lifeList) {
+    List<? extends IComposerFieldExtension<? extends AbstractComposerField>> extensions = getAllExtensions();
+    ComposerFieldResolveRootPathForTopLevelAttributeChain chain = new ComposerFieldResolveRootPathForTopLevelAttributeChain(extensions);
+    chain.execResolveRootPathForTopLevelAttribute(a, lifeList);
+  }
+
+  protected final EitherOrNode interceptCreateAdditionalOrNode(ITreeNode eitherOrNode, boolean negated) {
+    List<? extends IComposerFieldExtension<? extends AbstractComposerField>> extensions = getAllExtensions();
+    ComposerFieldCreateAdditionalOrNodeChain chain = new ComposerFieldCreateAdditionalOrNodeChain(extensions);
+    return chain.execCreateAdditionalOrNode(eitherOrNode, negated);
+  }
+
+  protected final EntityNode interceptCreateEntityNode(ITreeNode parentNode, IDataModelEntity e, boolean negated, List<? extends Object> values, List<String> texts) {
+    List<? extends IComposerFieldExtension<? extends AbstractComposerField>> extensions = getAllExtensions();
+    ComposerFieldCreateEntityNodeChain chain = new ComposerFieldCreateEntityNodeChain(extensions);
+    return chain.execCreateEntityNode(parentNode, e, negated, values, texts);
+  }
+
+  protected static class LocalComposerFieldExtension<OWNER extends AbstractComposerField> extends LocalFormFieldExtension<OWNER> implements IComposerFieldExtension<OWNER> {
+
+    public LocalComposerFieldExtension(OWNER owner) {
+      super(owner);
+    }
+
+    @Override
+    public EntityPath execResolveEntityPath(ComposerFieldResolveEntityPathChain chain, EntityNode node) {
+      return getOwner().execResolveEntityPath(node);
+    }
+
+    @Override
+    public void execResolveRootPathForTopLevelEntity(ComposerFieldResolveRootPathForTopLevelEntityChain chain, IDataModelEntity e, List<IDataModelEntity> lifeList) {
+      getOwner().execResolveRootPathForTopLevelEntity(e, lifeList);
+    }
+
+    @Override
+    public RootNode execCreateRootNode(ComposerFieldCreateRootNodeChain chain) {
+      return getOwner().execCreateRootNode();
+    }
+
+    @Override
+    public AttributePath execResolveAttributePath(ComposerFieldResolveAttributePathChain chain, AttributeNode node) {
+      return getOwner().execResolveAttributePath(node);
+    }
+
+    @Override
+    public AttributeNode execCreateAttributeNode(ComposerFieldCreateAttributeNodeChain chain, ITreeNode parentNode, IDataModelAttribute a, Integer aggregationType, IDataModelAttributeOp op, List<? extends Object> values, List<String> texts) {
+      return getOwner().execCreateAttributeNode(parentNode, a, aggregationType, op, values, texts);
+    }
+
+    @Override
+    public IDataModel execCreateDataModel(ComposerFieldCreateDataModelChain chain) {
+      return getOwner().execCreateDataModel();
+    }
+
+    @Override
+    public EitherOrNode execCreateEitherNode(ComposerFieldCreateEitherNodeChain chain, ITreeNode parentNode, boolean negated) {
+      return getOwner().execCreateEitherNode(parentNode, negated);
+    }
+
+    @Override
+    public void execResolveRootPathForTopLevelAttribute(ComposerFieldResolveRootPathForTopLevelAttributeChain chain, IDataModelAttribute a, List<IDataModelEntity> lifeList) {
+      getOwner().execResolveRootPathForTopLevelAttribute(a, lifeList);
+    }
+
+    @Override
+    public EitherOrNode execCreateAdditionalOrNode(ComposerFieldCreateAdditionalOrNodeChain chain, ITreeNode eitherOrNode, boolean negated) {
+      return getOwner().execCreateAdditionalOrNode(eitherOrNode, negated);
+    }
+
+    @Override
+    public EntityNode execCreateEntityNode(ComposerFieldCreateEntityNodeChain chain, ITreeNode parentNode, IDataModelEntity e, boolean negated, List<? extends Object> values, List<String> texts) {
+      return getOwner().execCreateEntityNode(parentNode, e, negated, values, texts);
+    }
+  }
+
+  @Override
+  protected IComposerFieldExtension<? extends AbstractComposerField> createLocalExtension() {
+    return new LocalComposerFieldExtension<AbstractComposerField>(this);
   }
 }

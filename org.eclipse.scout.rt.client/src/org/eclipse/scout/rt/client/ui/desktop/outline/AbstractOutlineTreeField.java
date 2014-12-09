@@ -15,13 +15,14 @@ import java.beans.PropertyChangeListener;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.extension.ui.desktop.outline.IOutlineTreeFieldExtension;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.fields.treefield.AbstractTreeField;
 
-public abstract class AbstractOutlineTreeField extends AbstractTreeField {
+public abstract class AbstractOutlineTreeField extends AbstractTreeField implements IOutlineTreeField {
   private DesktopListener m_desktopListener;
   private PropertyChangeListener m_treePropertyListener;
 
@@ -85,5 +86,17 @@ public abstract class AbstractOutlineTreeField extends AbstractTreeField {
       getTree().addPropertyChangeListener(m_treePropertyListener);
       setLabel(getTree().getTitle());
     }
+  }
+
+  protected static class LocalOutlineTreeFieldExtension<OWNER extends AbstractOutlineTreeField> extends LocalTreeFieldExtension<OWNER> implements IOutlineTreeFieldExtension<OWNER> {
+
+    public LocalOutlineTreeFieldExtension(OWNER owner) {
+      super(owner);
+    }
+  }
+
+  @Override
+  protected IOutlineTreeFieldExtension<? extends AbstractOutlineTreeField> createLocalExtension() {
+    return new LocalOutlineTreeFieldExtension<AbstractOutlineTreeField>(this);
   }
 }

@@ -1,0 +1,38 @@
+/*******************************************************************************
+ * Copyright (c) 2014 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+package org.eclipse.scout.rt.shared.extension;
+
+import java.util.List;
+
+import org.eclipse.scout.commons.annotations.IOrdered;
+import org.eclipse.scout.service.SERVICES;
+
+public final class ExtensionUtility {
+
+  private ExtensionUtility() {
+  }
+
+  /**
+   * Applies move descriptors registered on {@link IExtensionRegistry#registerMove(Class, double)} to all objects of the
+   * given list.
+   * <p/>
+   * <b>Important</b>: The list is not sorted by this method.
+   */
+  public static void moveModelObjects(List<? extends IOrdered> modelObjects) {
+    IInternalExtensionRegistry extensionRegistry = SERVICES.getService(IInternalExtensionRegistry.class);
+    for (IOrdered m : modelObjects) {
+      MoveDescriptor<IOrdered> moveDesc = extensionRegistry.createModelMoveDescriptorFor(m, null);
+      if (moveDesc != null && moveDesc.getNewOrder() != null) {
+        m.setOrder(moveDesc.getNewOrder());
+      }
+    }
+  }
+}

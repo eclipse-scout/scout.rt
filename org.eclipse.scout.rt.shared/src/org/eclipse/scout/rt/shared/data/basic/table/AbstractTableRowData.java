@@ -15,14 +15,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.scout.commons.holders.ITableBeanRowHolder;
+import org.eclipse.scout.rt.shared.extension.AbstractContributionComposite;
 
 /**
  * Bean that stores the contents of a scout table row. This class is intended to be extended for every table type and
  * the column values are expected to be added as Java bean properties.
- * 
+ *
  * @since 3.8.2
  */
-public abstract class AbstractTableRowData implements ITableBeanRowHolder, Serializable {
+public abstract class AbstractTableRowData extends AbstractContributionComposite implements ITableBeanRowHolder, Serializable {
   private static final long serialVersionUID = 1L;
 
   private int m_rowState;
@@ -42,7 +43,7 @@ public abstract class AbstractTableRowData implements ITableBeanRowHolder, Seria
 
   /**
    * Sets this row's state
-   * 
+   *
    * @param rowState
    * @see #STATUS_NON_CHANGED
    * @see #STATUS_INSERTED
@@ -62,7 +63,7 @@ public abstract class AbstractTableRowData implements ITableBeanRowHolder, Seria
 
   /**
    * Sets a map with custom column values.
-   * 
+   *
    * @param customColumnValues
    */
   public void setCustomColumnValues(Map<String, Object> customColumnValues) {
@@ -71,7 +72,7 @@ public abstract class AbstractTableRowData implements ITableBeanRowHolder, Seria
 
   /**
    * Returns the custom column value with the given <code>columnId</code> or <code>null</code> if it does not exist.
-   * 
+   *
    * @param columnId
    * @return
    */
@@ -85,7 +86,7 @@ public abstract class AbstractTableRowData implements ITableBeanRowHolder, Seria
   /**
    * Sets a custom column value for the given <code>columnId</code>. If <code>value</code> is <code>null</code>, the
    * custom column entry is removed by {@link #removeCustomColumnValue(String)}.
-   * 
+   *
    * @param columnId
    * @param value
    */
@@ -107,7 +108,7 @@ public abstract class AbstractTableRowData implements ITableBeanRowHolder, Seria
    * Returns the custom column value to which the map previously associated the <code>columnId</code>, or
    * <code>null</code> if the map contained no mapping for the <code>columnId</code>.
    * </p>
-   * 
+   *
    * @param columnId
    *          columnId whose mapping is to be removed
    * @return the previous custom column value associated with <code>columnId</code>, or <code>null</code> if there was

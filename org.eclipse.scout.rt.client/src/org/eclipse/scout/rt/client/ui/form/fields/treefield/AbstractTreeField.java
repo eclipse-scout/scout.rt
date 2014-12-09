@@ -24,6 +24,12 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.treefield.ITreeFieldExtension;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.treefield.TreeFieldChains.TreeFieldLoadChildNodesChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.treefield.TreeFieldChains.TreeFieldSaveChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.treefield.TreeFieldChains.TreeFieldSaveDeletedNodeChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.treefield.TreeFieldChains.TreeFieldSaveInsertedNodeChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.treefield.TreeFieldChains.TreeFieldSaveUpdatedNodeChain;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
@@ -92,7 +98,7 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
    * </pre>
    * </code>
    * <p>
-   * 
+   *
    * @see the createTreeNode methods for creating new nodes
    */
   @ConfigOperation
@@ -145,14 +151,20 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
   protected void initConfig() {
     super.initConfig();
     setAutoExpandAll(getConfiguredAutoExpandAll());
-    if (getConfiguredTree() != null) {
-      try {
-        setTreeInternal(ConfigurationUtility.newInnerInstance(this, getConfiguredTree()));
-      }
-      catch (Exception e) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + getConfiguredTree().getName() + "'.", e));
+    List<ITree> contributedTrees = m_contributionHolder.getContributionsByClass(ITree.class);
+    ITree tree = CollectionUtility.firstElement(contributedTrees);
+    if (tree == null) {
+      Class<? extends ITree> configuredTree = getConfiguredTree();
+      if (configuredTree != null) {
+        try {
+          tree = ConfigurationUtility.newInnerInstance(this, configuredTree);
+        }
+        catch (Exception e) {
+          SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + configuredTree.getName() + "'.", e));
+        }
       }
     }
+    setTreeInternal(tree);
     // local enabled listener
     addPropertyChangeListener(PROP_ENABLED, new PropertyChangeListener() {
       @Override
@@ -290,7 +302,7 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
       try {
         m_tree.setTreeChanging(true);
         //
-        execLoadChildNodes(parentNode);
+        interceptLoadChildNodes(parentNode);
       }
       finally {
         m_tree.setTreeChanging(false);
@@ -369,22 +381,22 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
         m_tree.setTreeChanging(true);
         //
         // 1. batch
-        execSave(m_tree.getInsertedNodes(), m_tree.getUpdatedNodes(), m_tree.getDeletedNodes());
+        interceptSave(m_tree.getInsertedNodes(), m_tree.getUpdatedNodes(), m_tree.getDeletedNodes());
         // 2. per node
         // deleted nodes
         for (ITreeNode iTreeNode : m_tree.getDeletedNodes()) {
-          execSaveDeletedNode(iTreeNode);
+          interceptSaveDeletedNode(iTreeNode);
         }
         m_tree.clearDeletedNodes();
         // inserted nodes
         for (ITreeNode insertedNode : m_tree.getInsertedNodes()) {
-          execSaveInsertedNode(insertedNode);
+          interceptSaveInsertedNode(insertedNode);
           insertedNode.setStatusInternal(ITreeNode.STATUS_NON_CHANGED);
           m_tree.updateNode(insertedNode);
         }
         // updated rows
         for (ITreeNode updatedNode : m_tree.getUpdatedNodes()) {
-          execSaveUpdatedNode(updatedNode);
+          interceptSaveUpdatedNode(updatedNode);
           updatedNode.setStatusInternal(ITreeNode.STATUS_NON_CHANGED);
           m_tree.updateNode(updatedNode);
         }
@@ -421,6 +433,79 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
         }
       }
     }
+  }
+
+  protected static class LocalTreeFieldExtension<OWNER extends AbstractTreeField> extends LocalFormFieldExtension<OWNER> implements ITreeFieldExtension<OWNER> {
+
+    public LocalTreeFieldExtension(OWNER owner) {
+      super(owner);
+    }
+
+    @Override
+    public void execSave(TreeFieldSaveChain chain, Collection<? extends ITreeNode> insertedNodes, Collection<? extends ITreeNode> updatedNodes, Collection<? extends ITreeNode> deletedNodes) {
+      getOwner().execSave(insertedNodes, updatedNodes, deletedNodes);
+    }
+
+    @Override
+    public void execSaveDeletedNode(TreeFieldSaveDeletedNodeChain chain, ITreeNode row) throws ProcessingException {
+      getOwner().execSaveDeletedNode(row);
+    }
+
+    @Override
+    public void execSaveUpdatedNode(TreeFieldSaveUpdatedNodeChain chain, ITreeNode row) throws ProcessingException {
+      getOwner().execSaveUpdatedNode(row);
+    }
+
+    @Override
+    public void execLoadChildNodes(TreeFieldLoadChildNodesChain chain, ITreeNode parentNode) throws ProcessingException {
+      getOwner().execLoadChildNodes(parentNode);
+    }
+
+    @Override
+    public void execSaveInsertedNode(TreeFieldSaveInsertedNodeChain chain, ITreeNode row) throws ProcessingException {
+      getOwner().execSaveInsertedNode(row);
+    }
+  }
+
+  @Override
+  protected ITreeFieldExtension<? extends AbstractTreeField> createLocalExtension() {
+    return new LocalTreeFieldExtension<AbstractTreeField>(this);
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public List<? extends ITreeFieldExtension<? extends AbstractTreeField>> getAllExtensions() {
+    return (List<? extends ITreeFieldExtension<? extends AbstractTreeField>>) super.getAllExtensions();
+  }
+
+  protected final void interceptSave(Collection<? extends ITreeNode> insertedNodes, Collection<? extends ITreeNode> updatedNodes, Collection<? extends ITreeNode> deletedNodes) {
+    List<? extends ITreeFieldExtension<? extends AbstractTreeField>> extensions = getAllExtensions();
+    TreeFieldSaveChain chain = new TreeFieldSaveChain(extensions);
+    chain.execSave(insertedNodes, updatedNodes, deletedNodes);
+  }
+
+  protected final void interceptSaveDeletedNode(ITreeNode row) throws ProcessingException {
+    List<? extends ITreeFieldExtension<? extends AbstractTreeField>> extensions = getAllExtensions();
+    TreeFieldSaveDeletedNodeChain chain = new TreeFieldSaveDeletedNodeChain(extensions);
+    chain.execSaveDeletedNode(row);
+  }
+
+  protected final void interceptSaveUpdatedNode(ITreeNode row) throws ProcessingException {
+    List<? extends ITreeFieldExtension<? extends AbstractTreeField>> extensions = getAllExtensions();
+    TreeFieldSaveUpdatedNodeChain chain = new TreeFieldSaveUpdatedNodeChain(extensions);
+    chain.execSaveUpdatedNode(row);
+  }
+
+  protected final void interceptLoadChildNodes(ITreeNode parentNode) throws ProcessingException {
+    List<? extends ITreeFieldExtension<? extends AbstractTreeField>> extensions = getAllExtensions();
+    TreeFieldLoadChildNodesChain chain = new TreeFieldLoadChildNodesChain(extensions);
+    chain.execLoadChildNodes(parentNode);
+  }
+
+  protected final void interceptSaveInsertedNode(ITreeNode row) throws ProcessingException {
+    List<? extends ITreeFieldExtension<? extends AbstractTreeField>> extensions = getAllExtensions();
+    TreeFieldSaveInsertedNodeChain chain = new TreeFieldSaveInsertedNodeChain(extensions);
+    chain.execSaveInsertedNode(row);
   }
 
 }

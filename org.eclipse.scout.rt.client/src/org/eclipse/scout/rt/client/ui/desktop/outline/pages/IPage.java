@@ -101,7 +101,7 @@ public interface IPage extends ITreeNode, ITypeWithClassId {
    * <p>
    * This method is temporary and will be removed in future releases (long term) when the {@link IPage} is legacy and
    * replaced by a simple page with just N forms.
-   * 
+   *
    * @since 3.8.2
    */
   IProcessingStatus getPagePopulateStatus();
@@ -111,7 +111,7 @@ public interface IPage extends ITreeNode, ITypeWithClassId {
    * <p>
    * This method is temporary and will be removed in future releases (long term) when the {@link IPage} is legacy and
    * replaced by a simple page with just N forms.
-   * 
+   *
    * @since 3.8.2
    */
   void setPagePopulateStatus(IProcessingStatus status);
@@ -119,7 +119,7 @@ public interface IPage extends ITreeNode, ITypeWithClassId {
   /**
    * Call this method to refresh all listeners on that dataTypes.<br>
    * These might include pages, forms, fields etc.<br>
-   * 
+   *
    * @see {@link AbstractForm#execDataChanged(Object...)} {@link AbstractForm#execDataChanged(Object...)}
    *      {@link AbstractFormField#execDataChanged(Object...)} {@link AbstractFormField#execDataChanged(Object...)}
    *      {@link AbstractPage#execDataChanged(Object...)} {@link AbstractPage#execDataChanged(Object...)}
@@ -133,7 +133,7 @@ public interface IPage extends ITreeNode, ITypeWithClassId {
   /**
    * Adapter pattern. A page may contribute adapters when asked for a given adapter class. This way, functionality can
    * be added to {@link IPage} without changing its lean interface
-   * 
+   *
    * @param clazz
    *          the adapter interface class, usually something like IXxxAdapter
    * @return the contributed adapter instance or <code>null</code>

@@ -15,19 +15,19 @@ package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 /**
  *
  */
-public class HierachycalContentAssistDataFetcher<LOOKUP_TYPE> extends AbstractContentAssistFieldLookupRowFetcher<LOOKUP_TYPE> {
+public class HierachycalContentAssistDataFetcher<LOOKUP_KEY> extends AbstractContentAssistFieldLookupRowFetcher<LOOKUP_KEY> {
 
   /**
    * @param contentAssistField
    */
-  public HierachycalContentAssistDataFetcher(IContentAssistField<?, LOOKUP_TYPE> contentAssistField) {
+  public HierachycalContentAssistDataFetcher(IContentAssistField<?, LOOKUP_KEY> contentAssistField) {
     super(contentAssistField);
   }
 
   @Override
   public void update(String searchText, boolean selectCurrentValue, boolean synchronous) {
     // in case of hierarchical simply delegate the searchText
-    setResult(new ContentAssistFieldDataFetchResult<LOOKUP_TYPE>(null, null, searchText, selectCurrentValue));
+    setResult(new ContentAssistFieldDataFetchResult<LOOKUP_KEY>(null, null, searchText, selectCurrentValue));
   }
 
 }

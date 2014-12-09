@@ -14,7 +14,7 @@ import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
 @ClassId("008cee2c-630b-4377-a76f-a1a48a69ec2c")
-public abstract class AbstractCloseButton extends AbstractButton implements IButton {
+public abstract class AbstractCloseButton extends AbstractButton {
 
   public AbstractCloseButton() {
     this(true);

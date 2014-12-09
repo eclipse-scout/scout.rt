@@ -14,6 +14,7 @@ import java.beans.PropertyChangeListener;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -37,6 +38,9 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.security.SimplePrincipal;
+import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionLoadSessionChain;
+import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionStoreSessionChain;
+import org.eclipse.scout.rt.client.extension.IClientSessionExtension;
 import org.eclipse.scout.rt.client.services.common.clientnotification.ClientNotificationConsumerEvent;
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerListener;
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerService;
@@ -50,6 +54,10 @@ import org.eclipse.scout.rt.client.ui.desktop.internal.VirtualDesktop;
 import org.eclipse.scout.rt.shared.OfflineState;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.TextsThreadLocal;
+import org.eclipse.scout.rt.shared.extension.AbstractExtension;
+import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
+import org.eclipse.scout.rt.shared.extension.IExtension;
+import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 import org.eclipse.scout.rt.shared.services.common.context.SharedContextChangedNotification;
 import org.eclipse.scout.rt.shared.services.common.context.SharedVariableMap;
 import org.eclipse.scout.rt.shared.services.common.prefs.IUserPreferencesStorageService;
@@ -60,7 +68,7 @@ import org.osgi.framework.Bundle;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
-public abstract class AbstractClientSession implements IClientSession {
+public abstract class AbstractClientSession implements IClientSession, IExtensibleObject {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractClientSession.class);
 
@@ -89,6 +97,7 @@ public abstract class AbstractClientSession implements IClientSession {
   private UserAgent m_userAgent;
   private Vector<ILocaleListener> m_localeListener = new Vector<ILocaleListener>();
   private long m_maxShutdownWaitTime = 4567;
+  private final ObjectExtensions<AbstractClientSession, IClientSessionExtension<? extends AbstractClientSession>> m_objectExtensions;
 
   public AbstractClientSession(boolean autoInitConfig) {
     m_clientSessionData = new HashMap<String, Object>();
@@ -96,9 +105,33 @@ public abstract class AbstractClientSession implements IClientSession {
     m_isStopping = false;
     m_sharedVariableMap = new SharedVariableMap();
     m_locale = LocaleThreadLocal.get();
+    m_objectExtensions = new ObjectExtensions<AbstractClientSession, IClientSessionExtension<? extends AbstractClientSession>>(this);
     if (autoInitConfig) {
-      initConfig();
+      interceptInitConfig();
     }
+  }
+
+  @Override
+  public List<? extends IClientSessionExtension<? extends AbstractClientSession>> getAllExtensions() {
+    return m_objectExtensions.getAllExtensions();
+  }
+
+  @Override
+  public <T extends IExtension<?>> T getExtension(Class<T> c) {
+    return m_objectExtensions.getExtension(c);
+  }
+
+  protected IClientSessionExtension<? extends AbstractClientSession> createLocalExtension() {
+    return new LocalClientSessionExtension<AbstractClientSession>(this);
+  }
+
+  protected final void interceptInitConfig() {
+    m_objectExtensions.initConfig(createLocalExtension(), new Runnable() {
+      @Override
+      public void run() {
+        initConfig();
+      }
+    });
   }
 
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -261,7 +294,7 @@ public abstract class AbstractClientSession implements IClientSession {
       m_scoutTexts = new ScoutTexts();
       // explicitly set the just created instance to the ThreadLocal because it was not available yet, when the job was started.
       TextsThreadLocal.set(m_scoutTexts);
-      execLoadSession();
+      interceptLoadSession();
       setActive(true);
     }
     catch (Throwable t) {
@@ -376,7 +409,7 @@ public abstract class AbstractClientSession implements IClientSession {
     }
     m_exitCode = exitCode;
     try {
-      execStoreSession();
+      interceptStoreSession();
     }
     catch (Throwable t) {
       LOG.error("Failed to store the client session.", t);
@@ -640,5 +673,39 @@ public abstract class AbstractClientSession implements IClientSession {
    */
   public long getMaxShutdownWaitTime() {
     return m_maxShutdownWaitTime;
+  }
+
+  /**
+   * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
+   * any further chain elements.
+   */
+  protected static class LocalClientSessionExtension<OWNER extends AbstractClientSession> extends AbstractExtension<OWNER> implements IClientSessionExtension<OWNER> {
+
+    public LocalClientSessionExtension(OWNER owner) {
+      super(owner);
+    }
+
+    @Override
+    public void execStoreSession(ClientSessionStoreSessionChain chain) throws ProcessingException {
+      getOwner().execStoreSession();
+    }
+
+    @Override
+    public void execLoadSession(ClientSessionLoadSessionChain chain) throws ProcessingException {
+      getOwner().execLoadSession();
+    }
+
+  }
+
+  protected final void interceptStoreSession() throws ProcessingException {
+    List<? extends IClientSessionExtension<? extends AbstractClientSession>> extensions = getAllExtensions();
+    ClientSessionStoreSessionChain chain = new ClientSessionStoreSessionChain(extensions);
+    chain.execStoreSession();
+  }
+
+  protected final void interceptLoadSession() throws ProcessingException {
+    List<? extends IClientSessionExtension<? extends AbstractClientSession>> extensions = getAllExtensions();
+    ClientSessionLoadSessionChain chain = new ClientSessionLoadSessionChain(extensions);
+    chain.execLoadSession();
   }
 }

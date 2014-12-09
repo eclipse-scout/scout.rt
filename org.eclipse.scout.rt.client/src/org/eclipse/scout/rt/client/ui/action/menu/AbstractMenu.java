@@ -13,19 +13,20 @@ package org.eclipse.scout.rt.client.ui.action.menu;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.extension.ui.action.menu.IMenuExtension;
+import org.eclipse.scout.rt.client.extension.ui.action.menu.MenuChains.MenuAboutToShowChain;
+import org.eclipse.scout.rt.client.extension.ui.action.menu.MenuChains.MenuOwnerValueChangedChain;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.tree.AbstractActionNode;
@@ -59,7 +60,7 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
    * In case the menu is added on any other component (different from {@link ITable}, {@link ITree}, {@link IValueField}
    * , {@link IActivityMap} )
    * the menu type does not have any affect.
-   * 
+   *
    * @see TableMenuType
    * @see TreeMenuType
    * @see ValueFieldMenuType
@@ -73,56 +74,23 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
         ValueFieldMenuType.NotNull, ActivityMapMenuType.Activity);
   }
 
-  /**
-   * @deprecated Will be removed in Scout 5.0.<br>
-   *             Use {@link TableMenuType#SingleSelection} and/or {@link TreeMenuType#SingleSelection} in
-   *             {@link #getConfiguredMenuTypes()} instead.
-   */
-  @Deprecated
-  @Order(60)
-  protected boolean getConfiguredSingleSelectionAction() {
-    return true;
-  }
-
-  /**
-   * @deprecated Will be removed in Scout 5.0.<br>
-   *             Use {@link TableMenuType#MultiSelection} and/or {@link TreeMenuType#MultiSelection} in
-   *             {@link #getConfiguredMenuTypes()} instead.
-   */
-  @Deprecated
-  @Order(70)
-  protected boolean getConfiguredMultiSelectionAction() {
-    return false;
-  }
-
-  /**
-   * @deprecated Will be removed in Scout 5.0.<br>
-   *             Use {@link TableMenuType#EmptySpace} and/or {@link TreeMenuType#EmptySpace} in
-   *             {@link #getConfiguredMenuTypes()} instead.
-   */
-  @Deprecated
-  @Order(90)
-  protected boolean getConfiguredEmptySpaceAction() {
-    return false;
-  }
-
   @Override
   public final void handleOwnerValueChanged(Object newValue) throws ProcessingException {
     if (!CompareUtility.equals(m_ownerValue, newValue)) {
       m_ownerValue = newValue;
-      execOwnerValueChanged(newValue);
+      interceptOwnerValueChanged(newValue);
     }
   }
 
   /**
    * This method is called after a new valid owner value was stored in the model. The owner is the {@link ITable},
    * {@link ITree} or {@link IValueField} the menu belongs to. To get changes of other fields use a
-   * {@link PropertyChangeListener} an add it to a certain other field in the {@link AbstractMenu#execInitAction()}
+   * {@link PropertyChangeListener} and add it to a certain other field in the {@link AbstractMenu#execInitAction()}
    * method. <h3>NOTE</h3> <b>
    * This method is only called for menus without submenus (leafs) on a {@link ITable}, {@link ITree},
    * {@link IValueField}! For all other fields
    * this method will NEVER be called.</b> <br>
-   * 
+   *
    * @param newOwnerValue
    *          depending on the owner the newOwnerValue differs.
    *          <ul>
@@ -144,7 +112,7 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
    * menu in this method unless it is no other option available!</b> <br>
    * Menus are considered to listen whatever changes of the application model to update their visibility and structure.
    * This is the only way a GUI layer can reflect menu changes immediately.
-   * 
+   *
    * @throws ProcessingException
    */
   @ConfigOperation
@@ -157,7 +125,7 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
   public final void aboutToShow() {
     try {
       aboutToShowInternal();
-      execAboutToShow();
+      interceptAboutToShow();
     }
     catch (Throwable t) {
       LOG.warn("Action " + getClass().getName(), t);
@@ -172,7 +140,7 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
 
   /**
    * converts a untyped collection into a type collection of table rows.
-   * 
+   *
    * @param input
    * @return null if the input is null or not all elements of the input are {@link ITableRow}s.
    */
@@ -194,7 +162,7 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
 
   /**
    * converts a untyped collection into a type collection of tree nodes.
-   * 
+   *
    * @param input
    * @return null if the input is null or not all elements of the input are {@link ITreeNode}s.
    */
@@ -217,46 +185,7 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
   @Override
   protected void initConfig() {
     super.initConfig();
-    setEmptySpaceAction(getConfiguredEmptySpaceAction());
-    setSingleSelectionAction(getConfiguredSingleSelectionAction());
-    setMultiSelectionAction(getConfiguredMultiSelectionAction());
-    if (isSingleSelectionAction() || isMultiSelectionAction() || isEmptySpaceAction()) {
-      // ok
-    }
-    else {
-      // legacy case of implicit new menu
-      setEmptySpaceAction(true);
-    }
-    if (!ConfigurationUtility.isMethodOverwrite(AbstractMenu.class, "getConfiguredMenuTypes", new Class[0], this.getClass())) {
-
-      // legacy
-      Set<IMenuType> menuTypes = new HashSet<IMenuType>();
-      if (isSingleSelectionAction()) {
-        menuTypes.add(TableMenuType.SingleSelection);
-        menuTypes.add(TreeMenuType.SingleSelection);
-        menuTypes.add(ValueFieldMenuType.NotNull);
-        menuTypes.add(ActivityMapMenuType.Activity);
-        menuTypes.add(CalendarMenuType.CalendarComponent);
-      }
-      if (isMultiSelectionAction()) {
-        menuTypes.add(TableMenuType.MultiSelection);
-        menuTypes.add(TreeMenuType.MultiSelection);
-        menuTypes.add(ValueFieldMenuType.NotNull);
-        menuTypes.add(ActivityMapMenuType.Activity);
-        menuTypes.add(CalendarMenuType.CalendarComponent);
-      }
-      if (isEmptySpaceAction()) {
-        menuTypes.add(TableMenuType.EmptySpace);
-        menuTypes.add(TreeMenuType.EmptySpace);
-        menuTypes.add(ValueFieldMenuType.Null);
-        menuTypes.add(ActivityMapMenuType.Selection);
-        menuTypes.add(CalendarMenuType.EmptySpace);
-      }
-      setMenuTypes(menuTypes);
-    }
-    else {
-      setMenuTypes(getConfiguredMenuTypes());
-    }
+    setMenuTypes(getConfiguredMenuTypes());
   }
 
   @Override
@@ -332,46 +261,44 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
     propertySupport.setProperty(PROP_MENU_TYPES, CollectionUtility.<IMenuType> hashSet(menuTypes));
   }
 
-  @SuppressWarnings("deprecation")
-  @Deprecated
   @Override
-  public boolean isSingleSelectionAction() {
-    return m_singleSelectionAction;
+  @SuppressWarnings("unchecked")
+  public List<? extends IMenuExtension<? extends AbstractMenu>> getAllExtensions() {
+    return (List<? extends IMenuExtension<? extends AbstractMenu>>) super.getAllExtensions();
   }
 
-  @SuppressWarnings("deprecation")
-  @Deprecated
-  @Override
-  public void setSingleSelectionAction(boolean b) {
-    m_singleSelectionAction = b;
+  protected final void interceptAboutToShow() throws ProcessingException {
+    List<? extends IMenuExtension<? extends AbstractMenu>> extensions = getAllExtensions();
+    MenuAboutToShowChain chain = new MenuAboutToShowChain(extensions);
+    chain.execAboutToShow();
   }
 
-  @SuppressWarnings("deprecation")
-  @Deprecated
-  @Override
-  public boolean isMultiSelectionAction() {
-    return m_multiSelectionAction;
+  protected final void interceptOwnerValueChanged(Object newOwnerValue) throws ProcessingException {
+    List<? extends IMenuExtension<? extends AbstractMenu>> extensions = getAllExtensions();
+    MenuOwnerValueChangedChain chain = new MenuOwnerValueChangedChain(extensions);
+    chain.execOwnerValueChanged(newOwnerValue);
   }
 
-  @SuppressWarnings("deprecation")
-  @Deprecated
-  @Override
-  public void setMultiSelectionAction(boolean b) {
-    m_multiSelectionAction = b;
+  protected static class LocalMenuExtension<OWNER extends AbstractMenu> extends LocalActionNodeExtension<IMenu, OWNER> implements IMenuExtension<OWNER> {
+
+    public LocalMenuExtension(OWNER owner) {
+      super(owner);
+    }
+
+    @Override
+    public void execAboutToShow(MenuAboutToShowChain chain) throws ProcessingException {
+      getOwner().execAboutToShow();
+    }
+
+    @Override
+    public void execOwnerValueChanged(MenuOwnerValueChangedChain chain, Object newOwnerValue) throws ProcessingException {
+      getOwner().execOwnerValueChanged(newOwnerValue);
+    }
   }
 
-  @SuppressWarnings("deprecation")
-  @Deprecated
   @Override
-  public boolean isEmptySpaceAction() {
-    return m_emptySpaceAction;
-  }
-
-  @SuppressWarnings("deprecation")
-  @Deprecated
-  @Override
-  public void setEmptySpaceAction(boolean b) {
-    m_emptySpaceAction = b;
+  protected IMenuExtension<? extends AbstractMenu> createLocalExtension() {
+    return new LocalMenuExtension<AbstractMenu>(this);
   }
 
 }

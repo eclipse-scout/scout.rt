@@ -10,9 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table;
 
-import java.beans.IntrospectionException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -28,17 +29,21 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
+import org.eclipse.scout.rt.shared.data.form.FormDataUtility;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
+import org.eclipse.scout.rt.shared.extension.IExtension;
+import org.eclipse.scout.rt.shared.extension.IInternalExtensionRegistry;
+import org.eclipse.scout.service.SERVICES;
 
 /**
  * Default implementation of {@link ITableRowDataMapper}.
- * 
+ *
  * @since 3.8.2
  */
 public class TableRowDataMapper implements ITableRowDataMapper {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(TableRowDataMapper.class);
 
-  private final Map<IColumn, FastPropertyDescriptor> m_propertyDescriptorByColumn = new HashMap<IColumn, FastPropertyDescriptor>();
+  private final Map<IColumn, FastPropertyDescriptor> m_propertyDescriptorByColumn;
   private final ColumnSet m_columnSet;
   private final Set<IColumn<?>> m_ignoredColumns;
 
@@ -49,21 +54,29 @@ public class TableRowDataMapper implements ITableRowDataMapper {
     if (columnSet == null) {
       throw new IllegalArgumentException("columnSet must not be null");
     }
+
     m_columnSet = columnSet;
-    try {
-      FastPropertyDescriptor[] props = BeanUtility.getFastPropertyDescriptors(rowType, AbstractTableRowData.class, createPropertyFilter());
-      for (FastPropertyDescriptor rowDataPropertyDesc : props) {
-        IColumn column = findColumn(columnSet, rowDataPropertyDesc);
-        if (column != null) {
-          m_propertyDescriptorByColumn.put(column, rowDataPropertyDesc);
-        }
-        else {
-          LOG.warn("No column found for property [" + rowDataPropertyDesc.getBeanClass().getName() + "#" + rowDataPropertyDesc.getName() + "]");
-        }
+    IPropertyFilter filter = createPropertyFilter();
+    List<FastPropertyDescriptor> props = new LinkedList<FastPropertyDescriptor>();
+    for (FastPropertyDescriptor desc : BeanUtility.getFastPropertyDescriptors(rowType, AbstractTableRowData.class, filter)) {
+      props.add(desc);
+    }
+    Set<Class<?>> contributions = SERVICES.getService(IInternalExtensionRegistry.class).getContributionsFor(rowType);
+    for (Class<?> contribution : contributions) {
+      for (FastPropertyDescriptor desc : BeanUtility.getFastPropertyDescriptors(contribution, Object.class, filter)) {
+        props.add(desc);
       }
     }
-    catch (IntrospectionException e) {
-      throw new ProcessingException("Could not determine property descriptors", e);
+
+    m_propertyDescriptorByColumn = new HashMap<IColumn, FastPropertyDescriptor>(props.size());
+    for (FastPropertyDescriptor rowDataPropertyDesc : props) {
+      IColumn column = findColumn(columnSet, rowDataPropertyDesc);
+      if (column != null) {
+        m_propertyDescriptorByColumn.put(column, rowDataPropertyDesc);
+      }
+      else {
+        LOG.warn("No column found for property [" + rowDataPropertyDesc.getBeanClass().getName() + "#" + rowDataPropertyDesc.getName() + "]");
+      }
     }
     // compute ignored columns
     Set<IColumn<?>> ignoredColumns = null;
@@ -92,7 +105,7 @@ public class TableRowDataMapper implements ITableRowDataMapper {
 
   /**
    * Returns the {@link IColumn} that corresponds to the given property description.
-   * 
+   *
    * @param columnset
    * @param rowDataPropertyDesc
    */
@@ -139,7 +152,8 @@ public class TableRowDataMapper implements ITableRowDataMapper {
       FastPropertyDescriptor propertyDesc = m_propertyDescriptorByColumn.get(column);
       if (propertyDesc != null) {
         try {
-          value = propertyDesc.getReadMethod().invoke(rowData);
+          Object dto = getDataContainer(column, rowData);
+          value = propertyDesc.getReadMethod().invoke(dto);
         }
         catch (Throwable t) {
           LOG.warn("Error reading row data property for column [" + column.getClass().getName() + "]", t);
@@ -163,7 +177,8 @@ public class TableRowDataMapper implements ITableRowDataMapper {
       FastPropertyDescriptor propertyDesc = m_propertyDescriptorByColumn.get(column);
       if (propertyDesc != null) {
         try {
-          propertyDesc.getWriteMethod().invoke(rowData, value);
+          Object dto = getDataContainer(column, rowData);
+          propertyDesc.getWriteMethod().invoke(dto, value);
         }
         catch (Throwable t) {
           LOG.warn("Error writing row data property for column [" + column.getClass().getName() + "]", t);
@@ -176,6 +191,22 @@ public class TableRowDataMapper implements ITableRowDataMapper {
     rowData.setRowState(row.getStatus());
   }
 
+  protected Object getDataContainer(IColumn column, AbstractTableRowData rowData) {
+    Class<?> dtoClass = FormDataUtility.getDataAnnotationValue(column.getClass());
+    if (dtoClass == null) {
+      Class<?> declaringClass = column.getClass().getDeclaringClass();
+      if (declaringClass != null && IExtension.class.isAssignableFrom(declaringClass)) {
+        dtoClass = FormDataUtility.getDataAnnotationValue(declaringClass);
+      }
+    }
+    if (dtoClass == null || rowData.getClass().equals(dtoClass)) {
+      return rowData;
+    }
+    else {
+      return rowData.getContribution(dtoClass);
+    }
+  }
+
   @Override
   public boolean acceptExport(ITableRow row) throws ProcessingException {
     return true;
@@ -186,26 +217,11 @@ public class TableRowDataMapper implements ITableRowDataMapper {
     return true;
   }
 
-  public static class TableRowDataPropertyFilter implements IPropertyFilter {
-    @Override
-    public boolean accept(FastPropertyDescriptor descriptor) {
-      Class<?> propertyType = descriptor.getPropertyType();
-      if (propertyType == null) {
-        return false;
-      }
-      if (descriptor.getReadMethod() == null) {
-        return false;
-      }
-      if (descriptor.getWriteMethod() == null) {
-        return false;
-      }
-      if ("rowState".equals(descriptor.getName())) {
-        return false;
-      }
-      if ("customColumnValues".equals(descriptor.getName())) {
-        return false;
-      }
-      return true;
-    }
+  /**
+   * @deprecated use {@link org.eclipse.scout.rt.shared.data.form.fields.tablefield.TableRowDataPropertyFilter} instead.
+   *             This class will be removed in the N release.
+   */
+  @Deprecated
+  public static class TableRowDataPropertyFilter extends org.eclipse.scout.rt.shared.data.form.fields.tablefield.TableRowDataPropertyFilter {
   }
 }

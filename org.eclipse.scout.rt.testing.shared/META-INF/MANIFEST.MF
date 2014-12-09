@@ -8,7 +8,8 @@ Bundle-Vendor: Eclipse Scout Project
 Require-Bundle: org.eclipse.core.runtime;bundle-version="[3.6.0,4.0.0)",
  org.eclipse.scout.rt.shared;bundle-version="[5.1.0,5.2.0)",
  org.eclipse.scout.rt.testing.commons;bundle-version="[5.1.0,5.2.0)"
-Export-Package: org.eclipse.scout.rt.testing.shared,
+Export-Package: org.eclipse.scout.extension,
+ org.eclipse.scout.rt.testing.shared,
  org.eclipse.scout.rt.testing.shared.runner,
  org.eclipse.scout.rt.testing.shared.runner.parameterized,
  org.eclipse.scout.rt.testing.shared.services.common.code,

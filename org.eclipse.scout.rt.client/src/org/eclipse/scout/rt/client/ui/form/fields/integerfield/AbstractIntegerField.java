@@ -18,6 +18,7 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.integerfield.IIntegerFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.AbstractNumberField;
 import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 
@@ -107,6 +108,18 @@ public abstract class AbstractIntegerField extends AbstractNumberField<Integer> 
       retVal = Integer.valueOf(parsedVal.intValueExact());
     }
     return retVal;
+  }
+
+  protected static class LocalIntegerFieldExtension<OWNER extends AbstractIntegerField> extends LocalNumberFieldExtension<Integer, OWNER> implements IIntegerFieldExtension<OWNER> {
+
+    public LocalIntegerFieldExtension(OWNER owner) {
+      super(owner);
+    }
+  }
+
+  @Override
+  protected IIntegerFieldExtension<? extends AbstractIntegerField> createLocalExtension() {
+    return new LocalIntegerFieldExtension<AbstractIntegerField>(this);
   }
 
 }

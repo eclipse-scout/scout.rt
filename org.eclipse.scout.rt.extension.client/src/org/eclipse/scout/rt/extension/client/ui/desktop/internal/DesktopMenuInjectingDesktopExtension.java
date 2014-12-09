@@ -34,7 +34,7 @@ import org.eclipse.scout.rt.extension.client.ui.action.menu.MenuExtensionUtility
  * <b>Note</b>: Menus provided by this extension are wrapped by an {@link OrderedMenuWrapper}. Hence any instance and
  * class comparisons must be performed on the unwrapped menu, that is retrieved by
  * {@link OrderedMenuWrapper#getWrappedObject()}.
- * 
+ *
  * @since 3.9.0
  */
 public class DesktopMenuInjectingDesktopExtension implements IDesktopExtension {
@@ -57,7 +57,7 @@ public class DesktopMenuInjectingDesktopExtension implements IDesktopExtension {
     List<IMenu> menuList = new ActionFinder().findActions(new ArrayList<IAction>(actions), IMenu.class, false);
     actions.removeAll(menuList);
     // contribute menus to menuList and add them to the original actions collection
-    MenuExtensionUtility.adaptMenus(getCoreDesktop(), getCoreDesktop(), menuList, true);
+    MenuExtensionUtility.adaptMenus(getCoreDesktop(), getCoreDesktop(), menuList);
     actions.addAll(menuList);
   }
 

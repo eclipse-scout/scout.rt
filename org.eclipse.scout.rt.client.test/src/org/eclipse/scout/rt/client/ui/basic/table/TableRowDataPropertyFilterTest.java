@@ -19,6 +19,7 @@ import java.util.Map;
 import org.eclipse.scout.commons.BeanUtility;
 import org.eclipse.scout.commons.beans.FastPropertyDescriptor;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
+import org.eclipse.scout.rt.shared.data.form.fields.tablefield.TableRowDataPropertyFilter;
 import org.junit.Test;
 
 /**
@@ -28,7 +29,7 @@ public class TableRowDataPropertyFilterTest {
 
   @Test
   public void testTableRowDataPropertyFilter() throws Exception {
-    TableRowDataMapper.TableRowDataPropertyFilter propertyFilter = new TableRowDataMapper.TableRowDataPropertyFilter();
+    TableRowDataPropertyFilter propertyFilter = new TableRowDataPropertyFilter();
     FastPropertyDescriptor[] props = BeanUtility.getFastPropertyDescriptors(P_TableRowData.class, AbstractTableRowData.class, propertyFilter);
     Map<String, FastPropertyDescriptor> propertyDescriptorsByName = new HashMap<String, FastPropertyDescriptor>();
     for (FastPropertyDescriptor prop : props) {

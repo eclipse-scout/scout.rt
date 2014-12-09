@@ -15,6 +15,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,12 +23,16 @@ import org.eclipse.scout.commons.DateUtility;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
+import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.BooleanHolder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.datefield.DateFieldChains.DateFieldShiftDateChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.datefield.DateFieldChains.DateFieldShiftTimeChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.datefield.IDateFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractBasicField;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
@@ -152,6 +157,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
    * <p>
    * see {@link #adjustDate(int, int, int)}
    */
+  @ConfigOperation
   protected void execShiftDate(int level, int value) throws ProcessingException {
     switch (level) {
       case 0: {
@@ -179,6 +185,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
    * <p>
    * see {@link #adjustDate(int, int, int)}
    */
+  @ConfigOperation
   protected void execShiftTime(int level, int value) throws ProcessingException {
     switch (level) {
       case 0: {
@@ -212,7 +219,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
     m_format = s;
     if (isInitialized()) {
       if (shouldUpdateDisplayText(false)) {
-        setDisplayText(execFormatValue(getValue()));
+        setDisplayText(interceptFormatValue(getValue()));
       }
     }
   }
@@ -1112,7 +1119,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
     @Override
     public void fireDateShiftActionFromUI(int level, int value) {
       try {
-        execShiftDate(level, value);
+        interceptShiftDate(level, value);
       }
       catch (ProcessingException e) {
         SERVICES.getService(IExceptionHandlerService.class).handleException(e);
@@ -1125,7 +1132,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
     @Override
     public void fireTimeShiftActionFromUI(int level, int value) {
       try {
-        execShiftTime(level, value);
+        interceptShiftTime(level, value);
       }
       catch (ProcessingException e) {
         SERVICES.getService(IExceptionHandlerService.class).handleException(e);
@@ -1144,5 +1151,45 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
       setWhileTyping(whileTyping);
       return parseValue(newText);
     }
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public List<? extends IDateFieldExtension<? extends AbstractDateField>> getAllExtensions() {
+    return (List<? extends IDateFieldExtension<? extends AbstractDateField>>) super.getAllExtensions();
+  }
+
+  protected final void interceptShiftTime(int level, int value) throws ProcessingException {
+    List<? extends IDateFieldExtension<? extends AbstractDateField>> extensions = getAllExtensions();
+    DateFieldShiftTimeChain chain = new DateFieldShiftTimeChain(extensions);
+    chain.execShiftTime(level, value);
+  }
+
+  protected final void interceptShiftDate(int level, int value) throws ProcessingException {
+    List<? extends IDateFieldExtension<? extends AbstractDateField>> extensions = getAllExtensions();
+    DateFieldShiftDateChain chain = new DateFieldShiftDateChain(extensions);
+    chain.execShiftDate(level, value);
+  }
+
+  protected static class LocalDateFieldExtension<OWNER extends AbstractDateField> extends LocalBasicFieldExtension<Date, OWNER> implements IDateFieldExtension<OWNER> {
+
+    public LocalDateFieldExtension(OWNER owner) {
+      super(owner);
+    }
+
+    @Override
+    public void execShiftTime(DateFieldShiftTimeChain chain, int level, int value) throws ProcessingException {
+      getOwner().execShiftTime(level, value);
+    }
+
+    @Override
+    public void execShiftDate(DateFieldShiftDateChain chain, int level, int value) throws ProcessingException {
+      getOwner().execShiftDate(level, value);
+    }
+  }
+
+  @Override
+  protected IDateFieldExtension<? extends AbstractDateField> createLocalExtension() {
+    return new LocalDateFieldExtension<AbstractDateField>(this);
   }
 }

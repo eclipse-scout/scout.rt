@@ -16,6 +16,7 @@ import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.EventListener;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -31,6 +32,7 @@ import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.annotations.OrderedComparator;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -41,6 +43,19 @@ import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
+import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopAddTrayMenusChain;
+import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopBeforeClosingChain;
+import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopClosingChain;
+import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopGuiAttachedChain;
+import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopGuiDetachedChain;
+import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopInitChain;
+import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopOpenedChain;
+import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopOutlineChangedChain;
+import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopPageDetailFormChangedChain;
+import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopPageDetailTableChangedChain;
+import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopPageSearchFormChangedChain;
+import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopTablePageLoadedChain;
 import org.eclipse.scout.rt.client.services.common.bookmark.internal.BookmarkUtility;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.action.ActionFinder;
@@ -75,6 +90,13 @@ import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxEvent;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxListener;
 import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.extension.AbstractExtension;
+import org.eclipse.scout.rt.shared.extension.ContributionComposite;
+import org.eclipse.scout.rt.shared.extension.ExtensionUtility;
+import org.eclipse.scout.rt.shared.extension.IContributionOwner;
+import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
+import org.eclipse.scout.rt.shared.extension.IExtension;
+import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.services.common.shell.IShellService;
@@ -99,7 +121,7 @@ import org.eclipse.scout.service.SERVICES;
  * The Eclipse Scout SDK creates a subclass of this class that can be used as
  * initial desktop.
  */
-public abstract class AbstractDesktop extends AbstractPropertyObserver implements IDesktop {
+public abstract class AbstractDesktop extends AbstractPropertyObserver implements IDesktop, IContributionOwner, IExtensibleObject {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractDesktop.class);
 
@@ -131,12 +153,18 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   private boolean m_desktopInited;
   private boolean m_trayVisible;
   private boolean m_isForcedClosing = false;
+  private IContributionOwner m_contributionHolder;
+  private final ObjectExtensions<AbstractDesktop, org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> m_objectExtensions;
 
   /**
    * do not instantiate a new desktop<br>
    * get it via {@code ClientScoutSession.getSession().getModelManager()}
    */
   public AbstractDesktop() {
+    this(true);
+  }
+
+  public AbstractDesktop(boolean callInitializer) {
     m_localDesktopExtension = new P_LocalDesktopExtension();
     m_listenerList = new EventListenerList();
     m_dataChangeListenerList = new HashMap<Object, EventListenerList>();
@@ -148,8 +176,29 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     m_outlineTableFormVisible = true;
     m_activatedFormListener = new P_ActivatedFormListener();
     m_lastActiveFormList = new LinkedList<WeakReference<IForm>>();
+    m_objectExtensions = new ObjectExtensions<AbstractDesktop, org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>>(this);
+    if (callInitializer) {
+      callInitializer();
+    }
+  }
 
-    initConfig();
+  protected final void callInitializer() {
+    interceptInitConfig();
+  }
+
+  @Override
+  public final List<Object> getAllContributions() {
+    return m_contributionHolder.getAllContributions();
+  }
+
+  @Override
+  public final <T> List<T> getContributionsByClass(Class<T> type) {
+    return m_contributionHolder.getContributionsByClass(type);
+  }
+
+  @Override
+  public final <T> T getContribution(Class<T> contribution) {
+    return m_contributionHolder.getContribution(contribution);
   }
 
   /*
@@ -177,7 +226,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    * Subclasses can override this method. Default is {@code false}.
    *
    * @return {@code true} if this application should be visible in the system tray, {@code false} otherwise
-   * @see #execAddTrayMenus(List)
+   * @see #interceptAddTrayMenus(List)
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(15)
@@ -423,11 +472,36 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     return m_localDesktopExtension;
   }
 
+  protected org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop> createLocalExtension() {
+    return new LocalDesktopExtension<AbstractDesktop>(this);
+  }
+
+  @Override
+  public List<? extends org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> getAllExtensions() {
+    return m_objectExtensions.getAllExtensions();
+  }
+
+  @Override
+  public <T extends IExtension<?>> T getExtension(Class<T> c) {
+    return m_objectExtensions.getExtension(c);
+  }
+
+  protected final void interceptInitConfig() {
+    m_objectExtensions.initConfig(createLocalExtension(), new Runnable() {
+      @Override
+      public void run() {
+        initConfig();
+      }
+    });
+  }
+
   protected void initConfig() {
     initDesktopExtensions();
     setTitle(getConfiguredTitle());
     setTrayVisible(getConfiguredTrayVisible());
     List<IDesktopExtension> extensions = getDesktopExtensions();
+    m_contributionHolder = new ContributionComposite(this);
+
     //outlines
     List<IOutline> outlineList = new ArrayList<IOutline>();
     for (IDesktopExtension ext : extensions) {
@@ -438,7 +512,17 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
         LOG.error("contrinuting outlines by " + ext, t);
       }
     }
-    m_availableOutlines = CollectionUtility.arrayList(ConfigurationUtility.sortByOrder(outlineList));
+    List<IOutline> contributedOutlines = m_contributionHolder.getContributionsByClass(IOutline.class);
+    outlineList.addAll(contributedOutlines);
+
+    // move outlines
+    ExtensionUtility.moveModelObjects(outlineList);
+
+    OrderedComparator orderedComparator = new OrderedComparator();
+    Collections.sort(outlineList, orderedComparator);
+
+    m_availableOutlines = outlineList;
+
     //actions (keyStroke, menu, viewButton, toolButton)
     List<IAction> actionList = new ArrayList<IAction>();
     for (IDesktopExtension ext : extensions) {
@@ -449,6 +533,9 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
         LOG.error("contrinuting actions by " + ext, t);
       }
     }
+
+    List<IAction> contributedActions = m_contributionHolder.getContributionsByClass(IAction.class);
+    actionList.addAll(contributedActions);
     //extract keystroke hints from menus
     for (IMenu menu : new ActionFinder().findActions(actionList, IMenu.class, true)) {
       if (menu.getKeyStroke() != null) {
@@ -462,13 +549,22 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
         }
       }
     }
-    //build completed menu, viewButton, toolButton arrays
+    //build completed menu, viewButton, toolButton lists
     List<IMenu> menuList = new ActionFinder().findActions(actionList, IMenu.class, false); // only top level menus
-    m_menus = CollectionUtility.arrayList(ConfigurationUtility.sortByOrder(menuList));
+    new MoveActionNodesHandler<IMenu>(menuList).moveModelObjects();
+    Collections.sort(menuList, orderedComparator);
+    m_menus = menuList;
+
     List<IViewButton> viewButtonList = new ActionFinder().findActions(actionList, IViewButton.class, false);
-    m_viewButtons = CollectionUtility.arrayList(ConfigurationUtility.sortByOrder(viewButtonList));
+    ExtensionUtility.moveModelObjects(viewButtonList);
+    Collections.sort(viewButtonList, orderedComparator);
+    m_viewButtons = viewButtonList;
+
     List<IToolButton> toolButtonList = new ActionFinder().findActions(actionList, IToolButton.class, false);
-    m_toolButtons = CollectionUtility.arrayList(ConfigurationUtility.sortByOrder(toolButtonList).toArray(new IToolButton[toolButtonList.size()]));
+    ExtensionUtility.moveModelObjects(toolButtonList);
+    Collections.sort(toolButtonList, orderedComparator);
+    m_toolButtons = toolButtonList;
+
     //add dynamic keyStrokes
     List<IKeyStroke> ksList = new ActionFinder().findActions(actionList, IKeyStroke.class, true);
     for (IKeyStroke ks : ksList) {
@@ -480,6 +576,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       }
     }
     addKeyStrokes(ksList.toArray(new IKeyStroke[ksList.size()]));
+
     //init outlines
     for (IOutline o : m_availableOutlines) {
       try {
@@ -489,6 +586,12 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
         LOG.error(null, t);
       }
     }
+  }
+
+  protected final void interceptInit() throws ProcessingException {
+    List<? extends org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop>> extensions = getAllExtensions();
+    DesktopInitChain chain = new DesktopInitChain(extensions);
+    chain.execInit();
   }
 
   private void initDesktopExtensions() {
@@ -1820,43 +1923,43 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
     @Override
     public ContributionCommand initDelegate() throws ProcessingException {
-      execInit();
+      interceptInit();
       return ContributionCommand.Continue;
     }
 
     @Override
     public ContributionCommand desktopOpenedDelegate() throws ProcessingException {
-      execOpened();
+      interceptOpened();
       return ContributionCommand.Continue;
     }
 
     @Override
     public ContributionCommand desktopBeforeClosingDelegate() throws ProcessingException {
-      execBeforeClosing();
+      interceptBeforeClosing();
       return ContributionCommand.Continue;
     }
 
     @Override
     public ContributionCommand desktopClosingDelegate() throws ProcessingException {
-      execClosing();
+      interceptClosing();
       return ContributionCommand.Continue;
     }
 
     @Override
     public ContributionCommand guiAttachedDelegate() throws ProcessingException {
-      execGuiAttached();
+      interceptGuiAttached();
       return ContributionCommand.Continue;
     }
 
     @Override
     public ContributionCommand guiDetachedDelegate() throws ProcessingException {
-      execGuiDetached();
+      interceptGuiDetached();
       return ContributionCommand.Continue;
     }
 
     @Override
     public ContributionCommand outlineChangedDelegate(IOutline oldOutline, IOutline newOutline) throws ProcessingException {
-      execOutlineChanged(oldOutline, newOutline);
+      interceptOutlineChanged(oldOutline, newOutline);
       return ContributionCommand.Continue;
     }
 
@@ -1867,31 +1970,31 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
     @Override
     public ContributionCommand pageSearchFormChangedDelegate(IForm oldForm, IForm newForm) throws ProcessingException {
-      execPageSearchFormChanged(oldForm, newForm);
+      interceptPageSearchFormChanged(oldForm, newForm);
       return ContributionCommand.Continue;
     }
 
     @Override
     public ContributionCommand pageDetailFormChangedDelegate(IForm oldForm, IForm newForm) throws ProcessingException {
-      execPageDetailFormChanged(oldForm, newForm);
+      interceptPageDetailFormChanged(oldForm, newForm);
       return ContributionCommand.Continue;
     }
 
     @Override
     public ContributionCommand pageDetailTableChangedDelegate(ITable oldTable, ITable newTable) throws ProcessingException {
-      execPageDetailTableChanged(oldTable, newTable);
+      interceptPageDetailTableChanged(oldTable, newTable);
       return ContributionCommand.Continue;
     }
 
     @Override
     public ContributionCommand tablePageLoadedDelegate(IPageWithTable<?> tablePage) throws ProcessingException {
-      execTablePageLoaded(tablePage);
+      interceptTablePageLoaded(tablePage);
       return ContributionCommand.Continue;
     }
 
     @Override
     public ContributionCommand addTrayMenusDelegate(List<IMenu> menus) throws ProcessingException {
-      execAddTrayMenus(menus);
+      interceptAddTrayMenus(menus);
       return ContributionCommand.Continue;
     }
   }
@@ -2087,5 +2190,143 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       }
     }
     return saveNeededForms;
+  }
+
+  /**
+   * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
+   * any further chain elements.
+   */
+  protected static class LocalDesktopExtension<DESKTOP extends AbstractDesktop> extends AbstractExtension<DESKTOP> implements org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<DESKTOP> {
+
+    public LocalDesktopExtension(DESKTOP desktop) {
+      super(desktop);
+    }
+
+    @Override
+    public void execInit(DesktopInitChain chain) throws ProcessingException {
+      getOwner().execInit();
+    }
+
+    @Override
+    public void execOpened(DesktopOpenedChain chain) throws ProcessingException {
+      getOwner().execOpened();
+    }
+
+    @Override
+    public void execAddTrayMenus(DesktopAddTrayMenusChain chain, List<IMenu> menus) throws ProcessingException {
+      getOwner().execAddTrayMenus(menus);
+    }
+
+    @Override
+    public void execBeforeClosing(DesktopBeforeClosingChain chain) throws ProcessingException {
+      getOwner().execBeforeClosing();
+    }
+
+    @Override
+    public void execPageDetailFormChanged(DesktopPageDetailFormChangedChain chain, IForm oldForm, IForm newForm) throws ProcessingException {
+      getOwner().execPageDetailFormChanged(oldForm, newForm);
+    }
+
+    @Override
+    public void execTablePageLoaded(DesktopTablePageLoadedChain chain, IPageWithTable<?> tablePage) throws ProcessingException {
+      getOwner().execTablePageLoaded(tablePage);
+    }
+
+    @Override
+    public void execOutlineChanged(DesktopOutlineChangedChain chain, IOutline oldOutline, IOutline newOutline) throws ProcessingException {
+      getOwner().execOutlineChanged(oldOutline, newOutline);
+    }
+
+    @Override
+    public void execClosing(DesktopClosingChain chain) throws ProcessingException {
+      getOwner().execClosing();
+    }
+
+    @Override
+    public void execPageSearchFormChanged(DesktopPageSearchFormChangedChain chain, IForm oldForm, IForm newForm) throws ProcessingException {
+      getOwner().execPageSearchFormChanged(oldForm, newForm);
+    }
+
+    @Override
+    public void execPageDetailTableChanged(DesktopPageDetailTableChangedChain chain, ITable oldTable, ITable newTable) throws ProcessingException {
+      getOwner().execPageDetailTableChanged(oldTable, newTable);
+    }
+
+    @Override
+    public void execGuiAttached(DesktopGuiAttachedChain chain) throws ProcessingException {
+      getOwner().execGuiAttached();
+    }
+
+    @Override
+    public void execGuiDetached(DesktopGuiDetachedChain chain) throws ProcessingException {
+      getOwner().execGuiDetached();
+    }
+
+  }
+
+  protected final void interceptOpened() throws ProcessingException {
+    List<? extends org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> extensions = getAllExtensions();
+    DesktopOpenedChain chain = new DesktopOpenedChain(extensions);
+    chain.execOpened();
+  }
+
+  protected final void interceptAddTrayMenus(List<IMenu> menus) throws ProcessingException {
+    List<? extends org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> extensions = getAllExtensions();
+    DesktopAddTrayMenusChain chain = new DesktopAddTrayMenusChain(extensions);
+    chain.execAddTrayMenus(menus);
+  }
+
+  protected final void interceptBeforeClosing() throws ProcessingException {
+    List<? extends org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> extensions = getAllExtensions();
+    DesktopBeforeClosingChain chain = new DesktopBeforeClosingChain(extensions);
+    chain.execBeforeClosing();
+  }
+
+  protected final void interceptPageDetailFormChanged(IForm oldForm, IForm newForm) throws ProcessingException {
+    List<? extends org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> extensions = getAllExtensions();
+    DesktopPageDetailFormChangedChain chain = new DesktopPageDetailFormChangedChain(extensions);
+    chain.execPageDetailFormChanged(oldForm, newForm);
+  }
+
+  protected final void interceptTablePageLoaded(IPageWithTable<?> tablePage) throws ProcessingException {
+    List<? extends org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> extensions = getAllExtensions();
+    DesktopTablePageLoadedChain chain = new DesktopTablePageLoadedChain(extensions);
+    chain.execTablePageLoaded(tablePage);
+  }
+
+  protected final void interceptOutlineChanged(IOutline oldOutline, IOutline newOutline) throws ProcessingException {
+    List<? extends org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> extensions = getAllExtensions();
+    DesktopOutlineChangedChain chain = new DesktopOutlineChangedChain(extensions);
+    chain.execOutlineChanged(oldOutline, newOutline);
+  }
+
+  protected final void interceptClosing() throws ProcessingException {
+    List<? extends org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> extensions = getAllExtensions();
+    DesktopClosingChain chain = new DesktopClosingChain(extensions);
+    chain.execClosing();
+  }
+
+  protected final void interceptPageSearchFormChanged(IForm oldForm, IForm newForm) throws ProcessingException {
+    List<? extends org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> extensions = getAllExtensions();
+    DesktopPageSearchFormChangedChain chain = new DesktopPageSearchFormChangedChain(extensions);
+    chain.execPageSearchFormChanged(oldForm, newForm);
+  }
+
+  protected final void interceptPageDetailTableChanged(ITable oldTable, ITable newTable) throws ProcessingException {
+    List<? extends org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> extensions = getAllExtensions();
+    DesktopPageDetailTableChangedChain chain = new DesktopPageDetailTableChangedChain(extensions);
+    chain.execPageDetailTableChanged(oldTable, newTable);
+  }
+
+  protected final void interceptGuiAttached() throws ProcessingException {
+    List<? extends org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> extensions = getAllExtensions();
+    DesktopGuiAttachedChain chain = new DesktopGuiAttachedChain(extensions);
+    chain.execGuiAttached();
+  }
+
+  protected final void interceptGuiDetached() throws ProcessingException {
+    List<? extends org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> extensions = getAllExtensions();
+    DesktopGuiDetachedChain chain = new DesktopGuiDetachedChain(extensions);
+    chain.execGuiDetached();
   }
 }

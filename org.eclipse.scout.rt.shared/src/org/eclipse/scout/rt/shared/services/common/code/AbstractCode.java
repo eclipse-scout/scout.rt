@@ -13,22 +13,34 @@ package org.eclipse.scout.rt.shared.services.common.code;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.commons.ConfigurationUtility;
+import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
+import org.eclipse.scout.commons.annotations.IOrdered;
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.annotations.OrderedComparator;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
+import org.eclipse.scout.rt.shared.extension.AbstractSerializableExtension;
+import org.eclipse.scout.rt.shared.extension.ContributionComposite;
+import org.eclipse.scout.rt.shared.extension.IContributionOwner;
+import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
+import org.eclipse.scout.rt.shared.extension.IExtension;
+import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
+import org.eclipse.scout.rt.shared.extension.services.common.code.CodeChains.CodeCreateChildCodesChain;
+import org.eclipse.scout.rt.shared.extension.services.common.code.ICodeExtension;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.service.SERVICES;
 
-public abstract class AbstractCode<T> implements ICode<T>, Serializable {
+public abstract class AbstractCode<T> implements ICode<T>, Serializable, IContributionOwner, IExtensibleObject {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractCode.class);
   private static final long serialVersionUID = 1L;
 
@@ -37,19 +49,52 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable {
   private transient ICode<T> m_parentCode;
   private transient Map<T, ICode<T>> m_codeMap = null;
   private List<ICode<T>> m_codeList = null;
+  protected IContributionOwner m_contributionHolder;
+  private final ObjectExtensions<AbstractCode<T>, ICodeExtension<T, ? extends AbstractCode<T>>> m_objectExtensions;
 
-  /**
-   * Dynamic
-   */
-  public AbstractCode(ICodeRow<T> row) {
-    m_row = row;
+  @Override
+  public final List<Object> getAllContributions() {
+    return m_contributionHolder.getAllContributions();
+  }
+
+  @Override
+  public final <TYPE> List<TYPE> getContributionsByClass(Class<TYPE> type) {
+    return m_contributionHolder.getContributionsByClass(type);
+  }
+
+  @Override
+  public final <TYPE> TYPE getContribution(Class<TYPE> contribution) {
+    return m_contributionHolder.getContribution(contribution);
   }
 
   /**
    * Configured
    */
   public AbstractCode() {
-    initConfig();
+    this(true);
+  }
+
+  public AbstractCode(boolean callInitializer) {
+    this(null, callInitializer);
+  }
+
+  public AbstractCode(ICodeRow<T> row) {
+    this(row, true);
+  }
+
+  /**
+   * Dynamic
+   */
+  public AbstractCode(ICodeRow<T> row, boolean callInitializer) {
+    m_row = row;
+    m_objectExtensions = new ObjectExtensions<AbstractCode<T>, ICodeExtension<T, ? extends AbstractCode<T>>>(this);
+    if (callInitializer) {
+      callInitializer();
+    }
+  }
+
+  protected final void callInitializer() {
+    interceptInitConfig();
   }
 
   @ConfigProperty(ConfigProperty.TEXT)
@@ -112,43 +157,109 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable {
     return null;
   }
 
-  protected final List<Class<? extends ICode>> getConfiguredCodes() {
+  /**
+   * Configures the view order of this code. The view order determines the order in which the codes appear. The
+   * order of codes with no view order configured ({@code < 0}) is initialized based on the {@link Order} annotation
+   * of the code class.
+   * <p>
+   * Subclasses can override this method. The default is {@link IOrdered#DEFAULT_ORDER}.
+   *
+   * @return View order of this code.
+   */
+  @ConfigProperty(ConfigProperty.DOUBLE)
+  @Order(90)
+  protected double getConfiguredViewOrder() {
+    return IOrdered.DEFAULT_ORDER;
+  }
+
+  /**
+   * Calculates the column's view order, e.g. if the @Order annotation is set to 30.0, the method will
+   * return 30.0. If no {@link Order} annotation is set, the method checks its super classes for an @Order annotation.
+   *
+   * @since 3.10.0-M4
+   */
+  protected double calculateViewOrder() {
+    double viewOrder = getConfiguredViewOrder();
+    Class<?> cls = getClass();
+    if (viewOrder == IOrdered.DEFAULT_ORDER) {
+      while (cls != null && ICode.class.isAssignableFrom(cls)) {
+        if (cls.isAnnotationPresent(Order.class)) {
+          Order order = (Order) cls.getAnnotation(Order.class);
+          return order.value();
+        }
+        cls = cls.getSuperclass();
+      }
+    }
+    return viewOrder;
+  }
+
+  protected final List<Class<ICode>> getConfiguredCodes() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    List<Class<ICode>> filtered = ConfigurationUtility.filterClasses(dca, ICode.class);
-    return ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, ICode.class);
+    return ConfigurationUtility.filterClasses(dca, ICode.class);
+  }
+
+  protected final void interceptInitConfig() {
+    m_objectExtensions.initConfig(createLocalExtension(), new Runnable() {
+      @Override
+      public void run() {
+        initConfig();
+      }
+    });
   }
 
   protected void initConfig() {
-    m_row = interceptCodeRow(new CodeRow<T>(
-        getId(),
-        getConfiguredText(),
-        getConfiguredIconId(),
-        getConfiguredTooltipText() != null ? getConfiguredTooltipText() : null,
-        (getConfiguredBackgroundColor()),
-        (getConfiguredForegroundColor()),
-        FontSpec.parse(getConfiguredFont()),
-        getConfiguredEnabled(),
-        null,
-        getConfiguredActive(),
-        getConfiguredExtKey(),
-        getConfiguredValue(),
-        0
-        ));
+    if (m_row == null) {
+      m_row = interceptCodeRow(new CodeRow<T>(
+          getId(),
+          getConfiguredText(),
+          getConfiguredIconId(),
+          getConfiguredTooltipText() != null ? getConfiguredTooltipText() : null,
+              (getConfiguredBackgroundColor()),
+              (getConfiguredForegroundColor()),
+              FontSpec.parse(getConfiguredFont()),
+              getConfiguredEnabled(),
+              null,
+              getConfiguredActive(),
+              getConfiguredExtKey(),
+              getConfiguredValue(),
+              0,
+              calculateViewOrder()
+          ));
+    }
+    m_contributionHolder = new ContributionComposite(this);
     // add configured child codes
-    for (ICode<T> childCode : execCreateChildCodes()) {
+    for (ICode<T> childCode : interceptCreateChildCodes()) {
       addChildCodeInternal(-1, childCode);
     }
+  }
+
+  protected ICodeExtension<T, ? extends AbstractCode<T>> createLocalExtension() {
+    return new LocalCodeExtension<T, AbstractCode<T>>(this);
+  }
+
+  @Override
+  public List<? extends ICodeExtension<T, ? extends AbstractCode<T>>> getAllExtensions() {
+    return m_objectExtensions.getAllExtensions();
+  }
+
+  @Override
+  public <E extends IExtension<?>> E getExtension(Class<E> c) {
+    return m_objectExtensions.getExtension(c);
   }
 
   /**
    * @return Creates and returns child codes. Note: {@link #addChildCodeInternal(ICode)} must not be invoked.
    * @since 3.8.3
    */
+  @ConfigOperation
+  @SuppressWarnings("unchecked")
   protected List<? extends ICode<T>> execCreateChildCodes() {
-    List<ICode<T>> codes = new ArrayList<ICode<T>>();
-    for (Class<? extends ICode> codeClazz : getConfiguredCodes()) {
+    List<Class<ICode>> configuredCodes = getConfiguredCodes();
+    List<ICode> contributedCodes = m_contributionHolder.getContributionsByClass(ICode.class);
+
+    List<ICode<T>> codes = new ArrayList<ICode<T>>(configuredCodes.size() + contributedCodes.size());
+    for (Class<? extends ICode> codeClazz : configuredCodes) {
       try {
-        @SuppressWarnings("unchecked")
         ICode<T> code = ConfigurationUtility.newInnerInstance(this, codeClazz);
         codes.add(code);
       }
@@ -156,6 +267,11 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable {
         SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + codeClazz.getName() + "'.", e));
       }
     }
+    for (ICode<?> c : contributedCodes) {
+      codes.add((ICode<T>) c);
+    }
+    Collections.sort(codes, new OrderedComparator());
+
     return codes;
   }
 
@@ -164,7 +280,7 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable {
    * <p>
    * Override this method to change that code row used by this code or to return a different code row than the default.
    * <p>
-   * The defaukt does nothing and returns the argument row.
+   * The default does nothing and returns the argument row.
    */
   protected ICodeRow<T> interceptCodeRow(ICodeRow<T> row) {
     return row;
@@ -255,6 +371,16 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable {
   @Override
   public Number getValue() {
     return m_row.getValue();
+  }
+
+  @Override
+  public double getOrder() {
+    return m_row.getOrder();
+  }
+
+  @Override
+  public void setOrder(double order) {
+    m_row.setOrder(order);
   }
 
   @Override
@@ -433,5 +559,28 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable {
   @Override
   public String classId() {
     return ConfigurationUtility.getAnnotatedClassIdWithFallback(getClass());
+  }
+
+  /**
+   * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
+   * any further chain elements.
+   */
+  protected static class LocalCodeExtension<T, OWNER extends AbstractCode<T>> extends AbstractSerializableExtension<OWNER> implements ICodeExtension<T, OWNER> {
+    private static final long serialVersionUID = 1L;
+
+    public LocalCodeExtension(OWNER owner) {
+      super(owner);
+    }
+
+    @Override
+    public List<? extends ICode<T>> execCreateChildCodes(CodeCreateChildCodesChain<T> chain) {
+      return getOwner().execCreateChildCodes();
+    }
+  }
+
+  protected final List<? extends ICode<T>> interceptCreateChildCodes() {
+    List<? extends ICodeExtension<T, ? extends AbstractCode<T>>> extensions = getAllExtensions();
+    CodeCreateChildCodesChain<T> chain = new CodeCreateChildCodesChain<T>(extensions);
+    return chain.execCreateChildCodes();
   }
 }

@@ -21,11 +21,13 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.shared.data.form.FormDataUtility;
+import org.eclipse.scout.rt.shared.data.form.IPropertyHolder;
 import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
+import org.eclipse.scout.rt.shared.extension.AbstractContributionComposite;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.service.SERVICES;
 
-public abstract class AbstractFormFieldData implements Serializable {
+public abstract class AbstractFormFieldData extends AbstractContributionComposite implements IPropertyHolder, Serializable {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractFormFieldData.class);
   private static final long serialVersionUID = 1L;
 
@@ -35,7 +37,6 @@ public abstract class AbstractFormFieldData implements Serializable {
   private boolean m_valueSet;
 
   public AbstractFormFieldData() {
-    initConfig();
   }
 
   private List<Class<AbstractPropertyData>> getConfiguredPropertyDatas() {
@@ -49,34 +50,39 @@ public abstract class AbstractFormFieldData implements Serializable {
     return ConfigurationUtility.removeReplacedClasses(fca);
   }
 
+  @Override
   protected void initConfig() {
     // add properties
-    m_propertyMap = new HashMap<Class<? extends AbstractPropertyData>, AbstractPropertyData>();
-    for (Class<AbstractPropertyData> propertyDataClazz : getConfiguredPropertyDatas()) {
-      AbstractPropertyData p;
+    List<Class<AbstractPropertyData>> configuredPropertyDatas = getConfiguredPropertyDatas();
+    Map<Class<? extends AbstractPropertyData>, AbstractPropertyData> propMap = new HashMap<Class<? extends AbstractPropertyData>, AbstractPropertyData>(configuredPropertyDatas.size());
+    for (Class<AbstractPropertyData> propertyDataClazz : configuredPropertyDatas) {
       try {
-        p = ConfigurationUtility.newInnerInstance(this, propertyDataClazz);
-        m_propertyMap.put(p.getClass(), p);
-      }// end try
+        AbstractPropertyData p = ConfigurationUtility.newInnerInstance(this, propertyDataClazz);
+        propMap.put(p.getClass(), p);
+      }
       catch (Exception e) {
         SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + propertyDataClazz.getName() + "'.", e));
       }
-
     }
+
     // add fields
-    HashMap<Class<? extends AbstractFormFieldData>, AbstractFormFieldData> map = new HashMap<Class<? extends AbstractFormFieldData>, AbstractFormFieldData>();
     List<Class<? extends AbstractFormFieldData>> fieldDataClasses = getConfiguredFieldDatas();
+    Map<Class<? extends AbstractFormFieldData>, AbstractFormFieldData> map = new HashMap<Class<? extends AbstractFormFieldData>, AbstractFormFieldData>(fieldDataClasses.size());
     for (Class<? extends AbstractFormFieldData> formFieldDataClazz : fieldDataClasses) {
-      AbstractFormFieldData f;
       try {
-        f = ConfigurationUtility.newInnerInstance(this, formFieldDataClazz);
+        AbstractFormFieldData f = ConfigurationUtility.newInnerInstance(this, formFieldDataClazz);
         map.put(f.getClass(), f);
-      }// end try
+      }
       catch (Exception e) {
         SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + formFieldDataClazz.getName() + "'.", e));
       }
     }
-    if (map.size() > 0) {
+
+    if (!propMap.isEmpty()) {
+      m_propertyMap = propMap;
+    }
+
+    if (!map.isEmpty()) {
       m_fieldMap = map;
       Map<Class<?>, Class<? extends AbstractFormFieldData>> replacements = ConfigurationUtility.getReplacementMapping(fieldDataClasses);
       if (!replacements.isEmpty()) {
@@ -113,7 +119,11 @@ public abstract class AbstractFormFieldData implements Serializable {
     m_valueSet = b;
   }
 
+  @Override
   public AbstractPropertyData getPropertyById(String id) {
+    if (m_propertyMap == null) {
+      return null;
+    }
     for (AbstractPropertyData p : m_propertyMap.values()) {
       if (p.getPropertyId().equalsIgnoreCase(id)) {
         return p;
@@ -122,20 +132,31 @@ public abstract class AbstractFormFieldData implements Serializable {
     return null;
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public <T extends AbstractPropertyData> T getPropertyByClass(Class<T> c) {
+    if (m_propertyMap == null) {
+      return null;
+    }
     return (T) m_propertyMap.get(c);
   }
 
+  @Override
   public <T extends AbstractPropertyData> void setPropertyByClass(Class<T> c, T v) {
     if (v == null) {
-      m_propertyMap.remove(c);
+      if (m_propertyMap != null) {
+        m_propertyMap.remove(c);
+      }
     }
     else {
+      if (m_propertyMap == null) {
+        m_propertyMap = new HashMap<Class<? extends AbstractPropertyData>, AbstractPropertyData>();
+      }
       m_propertyMap.put(c, v);
     }
   }
 
+  @Override
   public AbstractPropertyData[] getAllProperties() {
     return m_propertyMap != null ? m_propertyMap.values().toArray(new AbstractPropertyData[m_propertyMap.size()]) : new AbstractPropertyData[0];
   }
@@ -146,7 +167,7 @@ public abstract class AbstractFormFieldData implements Serializable {
     }
     String fieldDataId = FormDataUtility.getFieldDataId(id);
     for (AbstractFormFieldData f : m_fieldMap.values()) {
-      if (f.getFieldId().equals(fieldDataId)) {
+      if (FormDataUtility.getFieldDataId(f).equals(fieldDataId)) {
         return f;
       }
     }
@@ -180,7 +201,7 @@ public abstract class AbstractFormFieldData implements Serializable {
   /**
    * Checks whether the form field data with the given class has been replaced by another field. If so, the replacing
    * form field data's class is returned. Otherwise the given class itself.
-   * 
+   *
    * @param c
    * @return Returns the possibly available replacing field data class for the given class.
    * @see Replace

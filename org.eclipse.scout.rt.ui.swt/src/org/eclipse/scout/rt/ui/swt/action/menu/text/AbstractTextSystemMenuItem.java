@@ -22,7 +22,7 @@ import org.eclipse.swt.widgets.MenuItem;
 /**
  *
  */
-public class AbstractTextSystemMenuItem extends MenuItem {
+public abstract class AbstractTextSystemMenuItem extends MenuItem {
   private ITextAccess m_textAccess;
 
   public AbstractTextSystemMenuItem(Menu menu, String label, ITextAccess textAccess) {

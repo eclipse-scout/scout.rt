@@ -13,8 +13,6 @@ package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 import java.util.List;
 
 import org.eclipse.scout.commons.TriState;
-import org.eclipse.scout.commons.annotations.ConfigOperation;
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree;
@@ -27,12 +25,12 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 
 /**
- * @param <VALUE_TYPE>
+ * @param <VALUE>
  *          type of the value
- * @param <KEY_TYPE>
+ * @param <LOOKUP_KEY>
  *          type of the key of the lookup call
  */
-public interface IContentAssistField<VALUE_TYPE, KEY_TYPE> extends IValueField<VALUE_TYPE> {
+public interface IContentAssistField<VALUE, LOOKUP_KEY> extends IValueField<VALUE> {
 
   /**
    * {@link IContentAssistFieldProposalForm}
@@ -53,11 +51,11 @@ public interface IContentAssistField<VALUE_TYPE, KEY_TYPE> extends IValueField<V
 
   void removeSmartFieldListener(ContentAssistFieldListener listener);
 
-  IContentAssistFieldProposalForm<KEY_TYPE> getProposalForm();
+  IContentAssistFieldProposalForm<LOOKUP_KEY> getProposalForm();
 
-  IContentAssistFieldProposalFormProvider<KEY_TYPE> getProposalFormProvider();
+  IContentAssistFieldProposalFormProvider<LOOKUP_KEY> getProposalFormProvider();
 
-  void setProposalFormProvider(IContentAssistFieldProposalFormProvider<KEY_TYPE> provider);
+  void setProposalFormProvider(IContentAssistFieldProposalFormProvider<LOOKUP_KEY> provider);
 
   /**
    * true: inactive rows are display and can be also be parsed using the UI
@@ -141,36 +139,34 @@ public interface IContentAssistField<VALUE_TYPE, KEY_TYPE> extends IValueField<V
    * single-root tree with invisible root node. level=-1 is the invisible
    * (anonymous) root level=0 are the multiple roots of the smart tree ...
    */
-  @ConfigOperation
-  @Order(330)
-  boolean acceptBrowseHierarchySelection(KEY_TYPE value, int level, boolean leaf);
+  boolean acceptBrowseHierarchySelection(LOOKUP_KEY value, int level, boolean leaf);
 
   /**
    * variant A
    */
-  Class<? extends ICodeType<?, KEY_TYPE>> getCodeTypeClass();
+  Class<? extends ICodeType<?, LOOKUP_KEY>> getCodeTypeClass();
 
-  void setCodeTypeClass(Class<? extends ICodeType<?, KEY_TYPE>> codeType);
+  void setCodeTypeClass(Class<? extends ICodeType<?, LOOKUP_KEY>> codeType);
 
   /**
    * variant B
    */
-  ILookupCall<KEY_TYPE> getLookupCall();
+  ILookupCall<LOOKUP_KEY> getLookupCall();
 
-  void setLookupCall(ILookupCall<KEY_TYPE> call);
+  void setLookupCall(ILookupCall<LOOKUP_KEY> call);
 
-  void prepareKeyLookup(ILookupCall<KEY_TYPE> call, KEY_TYPE key) throws ProcessingException;
+  void prepareKeyLookup(ILookupCall<LOOKUP_KEY> call, LOOKUP_KEY key) throws ProcessingException;
 
-  void prepareTextLookup(ILookupCall<KEY_TYPE> call, String text) throws ProcessingException;
+  void prepareTextLookup(ILookupCall<LOOKUP_KEY> call, String text) throws ProcessingException;
 
-  void prepareBrowseLookup(ILookupCall<KEY_TYPE> call, String browseHint, TriState activeState) throws ProcessingException;
+  void prepareBrowseLookup(ILookupCall<LOOKUP_KEY> call, String browseHint, TriState activeState) throws ProcessingException;
 
-  void prepareRecLookup(ILookupCall<KEY_TYPE> call, KEY_TYPE parentKey, TriState activeState) throws ProcessingException;
+  void prepareRecLookup(ILookupCall<LOOKUP_KEY> call, LOOKUP_KEY parentKey, TriState activeState) throws ProcessingException;
 
   /**
    * If the browse lookup call yields exactly one value, assign it to the
    * smartfield, otherwise do nothing.
-   * 
+   *
    * @param background
    *          true (default) if assignment should be done later which allows for
    *          one batch call for all smartfields. Using background=false assigns
@@ -183,7 +179,7 @@ public interface IContentAssistField<VALUE_TYPE, KEY_TYPE> extends IValueField<V
 
   /**
    * updates the lookup rows with the same search text as last time.
-   * 
+   *
    * @param selectCurrentValue
    * @param synchronous
    */
@@ -207,61 +203,61 @@ public interface IContentAssistField<VALUE_TYPE, KEY_TYPE> extends IValueField<V
   /**
    * This method is normally used by a {@link IContentAssistFieldProposalForm#acceptProposal()}
    */
-  void acceptProposal(ILookupRow<KEY_TYPE> row);
+  void acceptProposal(ILookupRow<LOOKUP_KEY> row);
 
-  List<? extends ILookupRow<KEY_TYPE>> callKeyLookup(KEY_TYPE key) throws ProcessingException;
+  List<? extends ILookupRow<LOOKUP_KEY>> callKeyLookup(LOOKUP_KEY key) throws ProcessingException;
 
-  List<? extends ILookupRow<KEY_TYPE>> callTextLookup(String text, int maxRowCount) throws ProcessingException;
+  List<? extends ILookupRow<LOOKUP_KEY>> callTextLookup(String text, int maxRowCount) throws ProcessingException;
 
   /**
    * Note: {@link ILookupCallFetcher#dataFetched(LookupRow[], ProcessingException)} is
    * called back in the model thread. The smartfield is automatically starting
    * an internal background thread and syncs the result back into the model
    * thread.
-   * 
+   *
    * @return the created async job if applicable or null, see
    *         {@link LookupCall#getDataByTextInBackground(ILookupCallFetcher)}
    */
-  JobEx callTextLookupInBackground(String text, int maxRowCount, ILookupCallFetcher<KEY_TYPE> fetcher);
+  JobEx callTextLookupInBackground(String text, int maxRowCount, ILookupCallFetcher<LOOKUP_KEY> fetcher);
 
-  List<? extends ILookupRow<KEY_TYPE>> callBrowseLookup(String browseHint, int maxRowCount) throws ProcessingException;
+  List<? extends ILookupRow<LOOKUP_KEY>> callBrowseLookup(String browseHint, int maxRowCount) throws ProcessingException;
 
-  List<? extends ILookupRow<KEY_TYPE>> callBrowseLookup(String browseHint, int maxRowCount, TriState activeState) throws ProcessingException;
-
-  /**
-   * Note: {@link ILookupCallFetcher#dataFetched(LookupRow[], ProcessingException)} is
-   * called back in the model thread. The smartfield is automatically starting
-   * an internal background thread and syncs the result back into the model
-   * thread.
-   * 
-   * @return the created async job if applicable or null, see
-   *         {@link LookupCall#getDataByAllInBackground(ILookupCallFetcher)}
-   */
-  JobEx callBrowseLookupInBackground(String browseHint, int maxRowCount, ILookupCallFetcher<KEY_TYPE> fetcher);
+  List<? extends ILookupRow<LOOKUP_KEY>> callBrowseLookup(String browseHint, int maxRowCount, TriState activeState) throws ProcessingException;
 
   /**
    * Note: {@link ILookupCallFetcher#dataFetched(LookupRow[], ProcessingException)} is
    * called back in the model thread. The smartfield is automatically starting
    * an internal background thread and syncs the result back into the model
    * thread.
-   * 
+   *
    * @return the created async job if applicable or null, see
    *         {@link LookupCall#getDataByAllInBackground(ILookupCallFetcher)}
    */
-  JobEx callBrowseLookupInBackground(String browseHint, int maxRowCount, TriState activeState, ILookupCallFetcher<KEY_TYPE> fetcher);
+  JobEx callBrowseLookupInBackground(String browseHint, int maxRowCount, ILookupCallFetcher<LOOKUP_KEY> fetcher);
 
-  List<? extends ILookupRow<KEY_TYPE>> callSubTreeLookup(KEY_TYPE parentKey) throws ProcessingException;
+  /**
+   * Note: {@link ILookupCallFetcher#dataFetched(LookupRow[], ProcessingException)} is
+   * called back in the model thread. The smartfield is automatically starting
+   * an internal background thread and syncs the result back into the model
+   * thread.
+   *
+   * @return the created async job if applicable or null, see
+   *         {@link LookupCall#getDataByAllInBackground(ILookupCallFetcher)}
+   */
+  JobEx callBrowseLookupInBackground(String browseHint, int maxRowCount, TriState activeState, ILookupCallFetcher<LOOKUP_KEY> fetcher);
 
-  List<? extends ILookupRow<KEY_TYPE>> callSubTreeLookup(KEY_TYPE parentKey, TriState activeState) throws ProcessingException;
+  List<? extends ILookupRow<LOOKUP_KEY>> callSubTreeLookup(LOOKUP_KEY parentKey) throws ProcessingException;
+
+  List<? extends ILookupRow<LOOKUP_KEY>> callSubTreeLookup(LOOKUP_KEY parentKey, TriState activeState) throws ProcessingException;
 
   IContentAssistFieldUIFacade getUIFacade();
 
-  KEY_TYPE getValueAsLookupKey();
+  LOOKUP_KEY getValueAsLookupKey();
 
   /**
    * Sets the height of the proposal form in pixel. (The proposal form is smaller if there are not enought values to
    * fill the proposal.)
-   * 
+   *
    * @param proposalFormHeight
    *          height in pixel
    */
@@ -275,6 +271,6 @@ public interface IContentAssistField<VALUE_TYPE, KEY_TYPE> extends IValueField<V
   /**
    * @return
    */
-  Class<? extends IContentAssistFieldTable<VALUE_TYPE>> getContentAssistFieldTableClass();
+  Class<? extends IContentAssistFieldTable<VALUE>> getContentAssistFieldTableClass();
 
 }

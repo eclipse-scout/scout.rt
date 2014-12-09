@@ -13,7 +13,9 @@ package org.eclipse.scout.rt.client.ui.form.fields.calendarfield;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Date;
+import java.util.List;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.annotations.ClassId;
@@ -22,6 +24,7 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.calendarfield.ICalendarFieldExtension;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.basic.calendar.AbstractCalendar;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
@@ -63,15 +66,25 @@ public abstract class AbstractCalendarField<T extends ICalendar> extends Abstrac
   @SuppressWarnings("unchecked")
   protected void initConfig() {
     m_valueSelectionMediator = new OptimisticLock();
+
     super.initConfig();
-    final ClientUIPreferences env = ClientUIPreferences.getInstance();
-    if (getConfiguredCalendar() != null) {
-      try {
-        m_calendar = (T) ConfigurationUtility.newInnerInstance(this, getConfiguredCalendar());
+
+    List<ICalendar> contributedCalendars = m_contributionHolder.getContributionsByClass(ICalendar.class);
+    m_calendar = (T) CollectionUtility.firstElement(contributedCalendars);
+
+    try {
+      if (m_calendar == null) {
+        Class<? extends ICalendar> configuredCalendar = getConfiguredCalendar();
+        m_calendar = (T) ConfigurationUtility.newInnerInstance(this, configuredCalendar);
+      }
+
+      if (m_calendar != null) {
         if (m_calendar instanceof AbstractCalendar) {
           ((AbstractCalendar) m_calendar).setContainerInternal(this);
         }
+
         // restore calendar settings
+        ClientUIPreferences env = ClientUIPreferences.getInstance();
         m_calendar.setDisplayMode(env.getCalendarDisplayMode(ICalendar.DISPLAY_MODE_MONTH));
         m_calendar.setDisplayCondensed(env.getCalendarDisplayCondensed(true));
         /*
@@ -90,12 +103,12 @@ public abstract class AbstractCalendarField<T extends ICalendar> extends Abstrac
             );
         syncCalendarToCalendarField();
       }
-      catch (Exception e) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + getConfiguredCalendar().getName() + "'.", e));
+      else {
+        LOG.warn("there is no inner class of type ICalendar in " + getClass().getName());
       }
     }
-    else {
-      LOG.warn("there is no inner class of type ICalendar in " + getClass());
+    catch (Exception e) {
+      SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating calendar of calendar field '" + getClass().getName() + "'.", e));
     }
   }
 
@@ -165,6 +178,18 @@ public abstract class AbstractCalendarField<T extends ICalendar> extends Abstrac
   @Override
   public void reloadCalendarItems() {
     getCalendar().reloadCalendarItems();
+  }
+
+  protected static class LocalCalendarFieldExtension<T extends ICalendar, OWNER extends AbstractCalendarField<T>> extends LocalValueFieldExtension<Date, OWNER> implements ICalendarFieldExtension<T, OWNER> {
+
+    public LocalCalendarFieldExtension(OWNER owner) {
+      super(owner);
+    }
+  }
+
+  @Override
+  protected ICalendarFieldExtension<T, ? extends AbstractCalendarField<T>> createLocalExtension() {
+    return new LocalCalendarFieldExtension<T, AbstractCalendarField<T>>(this);
   }
 
 }

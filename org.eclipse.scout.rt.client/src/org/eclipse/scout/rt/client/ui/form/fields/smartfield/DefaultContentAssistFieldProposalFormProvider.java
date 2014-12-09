@@ -15,16 +15,16 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 /**
  * @since 3.8.0
  */
-public class DefaultContentAssistFieldProposalFormProvider<LOOKUP_TYPE> implements IContentAssistFieldProposalFormProvider<LOOKUP_TYPE> {
+public class DefaultContentAssistFieldProposalFormProvider<LOOKUP_KEY> implements IContentAssistFieldProposalFormProvider<LOOKUP_KEY> {
 
   @Override
-  public IContentAssistFieldProposalForm<LOOKUP_TYPE> createProposalForm(IContentAssistField<?, LOOKUP_TYPE> smartField, boolean allowCustomText) throws ProcessingException {
-    IContentAssistFieldProposalForm<LOOKUP_TYPE> form;
+  public IContentAssistFieldProposalForm<LOOKUP_KEY> createProposalForm(IContentAssistField<?, LOOKUP_KEY> smartField, boolean allowCustomText) throws ProcessingException {
+    IContentAssistFieldProposalForm<LOOKUP_KEY> form;
     if (smartField.isBrowseHierarchy()) {
-      form = new ContentAssistTreeForm<LOOKUP_TYPE>(smartField, allowCustomText);
+      form = new ContentAssistTreeForm<LOOKUP_KEY>(smartField, allowCustomText);
     }
     else {
-      form = new ContentAssistTableForm<LOOKUP_TYPE>(smartField, allowCustomText);
+      form = new ContentAssistTableForm<LOOKUP_KEY>(smartField, allowCustomText);
     }
     form.setAutoAddRemoveOnDesktop(false);
     return form;

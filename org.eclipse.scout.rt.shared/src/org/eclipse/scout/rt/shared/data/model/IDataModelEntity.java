@@ -14,10 +14,11 @@ import java.security.Permission;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.scout.commons.annotations.IOrdered;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 
-public interface IDataModelEntity extends IPropertyObserver {
+public interface IDataModelEntity extends IPropertyObserver, IOrdered {
 
   String PROP_VISIBLE = "visible";
 
@@ -55,23 +56,7 @@ public interface IDataModelEntity extends IPropertyObserver {
 
   IDataModelEntity getEntity(Class<? extends IDataModelEntity> entityClazz);
 
-  /**
-   * Client code should not call this method, it is used internally to set up a {@link IDataModel} structure.
-   * If you would like to work with paths of Entites/Attributes use {@link EntityPath} and {@link AttributePath}.
-   *
-   * @deprecated Will be removed in the 5.0 Release.
-   */
-  @Deprecated
   IDataModelEntity getParentEntity();
-
-  /**
-   * Client code should not call this method, it is used internally to set up a {@link IDataModel} structure
-   * If you would like to work with paths of Entites/Attributes use {@link EntityPath} and {@link AttributePath}.
-   *
-   * @deprecated Will be removed in the 5.0 Release.
-   */
-  @Deprecated
-  void setParentEntity(IDataModelEntity parent);
 
   /**
    * In order to avoid loop cycles, this initializer is called by the composer field to load the child entity graph,

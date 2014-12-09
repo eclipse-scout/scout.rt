@@ -21,12 +21,15 @@ import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
+import org.eclipse.scout.commons.annotations.IOrdered;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.extension.ui.desktop.outline.IOutlineExtension;
+import org.eclipse.scout.rt.client.extension.ui.desktop.outline.OutlineChains.OutlineCreateChildPagesChain;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.MenuSeparator;
@@ -81,7 +84,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
    * Configures whether this outline is enabled.
    * <p>
    * Subclasses can override this method. Default is {@code true}.
-   * 
+   *
    * @return {@code true} if this outline is enabled, {@code false} otherwise
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -94,7 +97,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
    * Configures the visibility of this outline.
    * <p>
    * Subclasses can override this method. Default is {@code true}.
-   * 
+   *
    * @return {@code true} if this outline is visible, {@code false} otherwise
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -108,7 +111,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
    * documentation. This method is typically processed by a documentation generation tool or similar.
    * <p>
    * Subclasses can override this method. Default is {@code null}.
-   * 
+   *
    * @deprecated: Use a {@link ClassId} annotation as key for Doc-Text. Will be removed in the 5.0 Release.
    * @return a documentation text, suitable to be included in external documents
    */
@@ -119,11 +122,26 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   }
 
   /**
+   * Configures the view order of this outline. The view order determines the order in which the outline appears.<br>
+   * The view order of outlines with no view order configured ({@code < 0}) is initialized based on the {@link Order}
+   * annotation of the class.
+   * <p>
+   * Subclasses can override this method. The default is {@link IOrdered#DEFAULT_ORDER}.
+   *
+   * @return View order of this outline.
+   */
+  @ConfigProperty(ConfigProperty.DOUBLE)
+  @Order(120)
+  protected double getConfiguredViewOrder() {
+    return IOrdered.DEFAULT_ORDER;
+  }
+
+  /**
    * Called during initialization of this outline. Allows to add child pages to the outline tree. All added pages are
    * roots of the visible tree.
    * <p>
    * Subclasses can override this method. The default does nothing.
-   * 
+   *
    * @param pageList
    *          live collection to add pages to the outline tree
    * @throws ProcessingException
@@ -134,7 +152,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   }
 
   protected void createChildPagesInternal(List<IPage> pageList) throws ProcessingException {
-    execCreateChildPages(pageList);
+    interceptCreateChildPages(pageList);
   }
 
   /**
@@ -165,6 +183,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     setRootNode(rootPage);
     setEnabled(getConfiguredEnabled());
     setVisible(getConfiguredVisible());
+    setOrder(calculateViewOrder());
   }
 
   /*
@@ -174,6 +193,27 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   @Override
   public IPage getActivePage() {
     return (IPage) getSelectedNode();
+  }
+
+  /**
+   * Calculates the actions's view order, e.g. if the @Order annotation is set to 30.0, the method will
+   * return 30.0. If no {@link Order} annotation is set, the method checks its super classes for an @Order annotation.
+   *
+   * @since 4.0.1
+   */
+  protected double calculateViewOrder() {
+    double viewOrder = getConfiguredViewOrder();
+    if (viewOrder == IOrdered.DEFAULT_ORDER) {
+      Class<?> cls = getClass();
+      while (cls != null && IOutline.class.isAssignableFrom(cls)) {
+        if (cls.isAnnotationPresent(Order.class)) {
+          Order order = (Order) cls.getAnnotation(Order.class);
+          return order.value();
+        }
+        cls = cls.getSuperclass();
+      }
+    }
+    return viewOrder;
   }
 
   @Override
@@ -356,6 +396,16 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   @Override
   public void setSearchForm(IForm form) {
     propertySupport.setProperty(PROP_SEARCH_FORM, form);
+  }
+
+  @Override
+  public double getOrder() {
+    return propertySupport.getPropertyDouble(PROP_VIEW_ORDER);
+  }
+
+  @Override
+  public void setOrder(double order) {
+    propertySupport.setPropertyDouble(PROP_VIEW_ORDER, order);
   }
 
   @Override
@@ -638,6 +688,35 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     protected void execCreateChildPages(List<IPage> pageList) throws ProcessingException {
       AbstractOutline.this.createChildPagesInternal(pageList);
     }
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public List<? extends IOutlineExtension<? extends AbstractOutline>> getAllExtensions() {
+    return (List<? extends IOutlineExtension<? extends AbstractOutline>>) super.getAllExtensions();
+  }
+
+  protected final void interceptCreateChildPages(List<IPage> pageList) throws ProcessingException {
+    List<? extends IOutlineExtension<? extends AbstractOutline>> extensions = getAllExtensions();
+    OutlineCreateChildPagesChain chain = new OutlineCreateChildPagesChain(extensions);
+    chain.execCreateChildPages(pageList);
+  }
+
+  protected static class LocalOutlineExtension<OWNER extends AbstractOutline> extends LocalTreeExtension<OWNER> implements IOutlineExtension<OWNER> {
+
+    public LocalOutlineExtension(OWNER owner) {
+      super(owner);
+    }
+
+    @Override
+    public void execCreateChildPages(OutlineCreateChildPagesChain chain, List<IPage> pageList) throws ProcessingException {
+      getOwner().execCreateChildPages(pageList);
+    }
+  }
+
+  @Override
+  protected IOutlineExtension<? extends AbstractOutline> createLocalExtension() {
+    return new LocalOutlineExtension<AbstractOutline>(this);
   }
 
 }
