@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 /**
  *
  */
-public class AbstractActionExtension<OWNER extends AbstractAction> extends AbstractExtension<OWNER> implements IActionExtension<OWNER> {
+public abstract class AbstractActionExtension<OWNER extends AbstractAction> extends AbstractExtension<OWNER> implements IActionExtension<OWNER> {
 
   public AbstractActionExtension(OWNER owner) {
     super(owner);
