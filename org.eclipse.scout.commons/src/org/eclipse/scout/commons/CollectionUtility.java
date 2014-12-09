@@ -498,7 +498,8 @@ public final class CollectionUtility {
   }
 
   /**
-   * @deprecated Will be removed in Scout 5.0. Use {@link #copyMap(Map)} if required.
+   * @deprecated Will be removed in Scout 5.0. Use {@link #emptyHashMap()} to obtain an empty map, or
+   *             {@link #copyMap(Map)} to create a copy of an existing map.
    */
   @Deprecated
   public static <T, U> Map<T, U> getEmptyMap(Map<T, U> m) {
@@ -573,6 +574,17 @@ public final class CollectionUtility {
   @Deprecated
   public static <T, U> SortedMap<T, U> getEmptySortedMap(SortedMap<T, U> m) {
     return new TreeMap<T, U>();
+  }
+
+  /**
+   * Returns a new empty {@link HashMap}.<br>
+   * This method differs to {@link Collections#emptyMap()} in that way that the {@link HashMap} returned by this
+   * method can be modified hence is no shared instance.
+   *
+   * @return An empty but modifiable {@link HashMap} with an initial capacity of <code>0</code>.
+   */
+  public static <T, U> HashMap<T, U> emptyHashMap() {
+    return new HashMap<T, U>(0);
   }
 
   public static <T, U> U lastElement(SortedMap<T, U> m) {
