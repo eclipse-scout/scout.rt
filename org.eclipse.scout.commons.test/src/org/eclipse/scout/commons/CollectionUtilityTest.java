@@ -11,13 +11,18 @@
 package org.eclipse.scout.commons;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Queue;
 import java.util.SortedMap;
@@ -246,6 +251,36 @@ public class CollectionUtilityTest {
     assertEquals(0, CollectionUtility.size(new ArrayList<Object>()));
     assertEquals(1, CollectionUtility.size(createList("1")));
     assertEquals(2, CollectionUtility.size(createList("1", "2")));
+  }
+
+  @Test
+  public void testEmptyArrayList() {
+    ArrayList<Integer> list = CollectionUtility.emptyArrayList();
+    assertNotNull(list);
+    // Test that it is a mutable list.
+    assertTrue(list.isEmpty());
+    list.add(1);
+    assertFalse(list.isEmpty());
+  }
+
+  @Test
+  public void testEmptyHashSet() {
+    HashSet<Integer> set = CollectionUtility.emptyHashSet();
+    assertNotNull(set);
+    // Test that it is a mutable set.
+    assertTrue(set.isEmpty());
+    set.add(1);
+    assertFalse(set.isEmpty());
+  }
+
+  @Test
+  public void testEmptyHashMap() {
+    HashMap<Integer, String> map = CollectionUtility.emptyHashMap();
+    assertNotNull(map);
+    // Test that it is a mutable map.
+    assertTrue(map.isEmpty());
+    map.put(1, "I love Scout");
+    assertFalse(map.isEmpty());
   }
 
   private List<Object> createList(Object... elements) {
