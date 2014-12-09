@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.basic.tree;
 import java.security.Permission;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -22,9 +23,15 @@ import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.annotations.OrderedComparator;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
+import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeNodeExtension;
+import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeNodeChains.TreeNodeDecorateCellChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeNodeChains.TreeNodeInitTreeNodeChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeNodeChains.TreeNodeResolveVirtualChildNodeChain;
 import org.eclipse.scout.rt.client.ui.action.ActionFinder;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -32,11 +39,17 @@ import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICellObserver;
 import org.eclipse.scout.rt.client.ui.profiler.DesktopProfiler;
+import org.eclipse.scout.rt.shared.extension.AbstractExtension;
+import org.eclipse.scout.rt.shared.extension.ContributionComposite;
+import org.eclipse.scout.rt.shared.extension.IContributionOwner;
+import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
+import org.eclipse.scout.rt.shared.extension.IExtension;
+import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.eclipse.scout.service.SERVICES;
 
-public abstract class AbstractTreeNode implements ITreeNode, ICellObserver {
+public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, IContributionOwner, IExtensibleObject {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractTreeNode.class);
 
   private boolean m_initialized;
@@ -67,9 +80,11 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver {
   private boolean m_visible;
   private boolean m_visibleGranted;
   private boolean m_visibleProperty;
+  protected IContributionOwner m_contributionHolder;
   // hash code is received from a virtual tree node when resolving to this node
   // this node is not attached to a virtual node if m_hashCode is null
   private Integer m_hashCode = null;
+  private final ObjectExtensions<AbstractTreeNode, ITreeNodeExtension<? extends AbstractTreeNode>> m_objectExtensions;
 
   public AbstractTreeNode() {
     this(true);
@@ -88,6 +103,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver {
     m_childNodeList = new ArrayList<ITreeNode>(0);
     m_filteredChildNodesLock = new Object();
     m_cell = new Cell(this);
+    m_objectExtensions = new ObjectExtensions<AbstractTreeNode, ITreeNodeExtension<? extends AbstractTreeNode>>(this);
     if (callInitializer) {
       callInitializer();
     }
@@ -95,10 +111,25 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver {
 
   protected void callInitializer() {
     if (!m_initialized) {
-      initConfig();
+      interceptInitConfig();
       initTreeNode();
       m_initialized = true;
     }
+  }
+
+  @Override
+  public final List<Object> getAllContributions() {
+    return m_contributionHolder.getAllContributions();
+  }
+
+  @Override
+  public final <T> List<T> getContributionsByClass(Class<T> type) {
+    return m_contributionHolder.getContributionsByClass(type);
+  }
+
+  @Override
+  public final <T> T getContribution(Class<T> contribution) {
+    return m_contributionHolder.getContribution(contribution);
   }
 
   protected void ensureInitialized() {
@@ -144,8 +175,16 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver {
   protected List<Class<? extends IMenu>> getDeclaredMenus() {
     Class<?>[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     List<Class<IMenu>> filtered = ConfigurationUtility.filterClasses(dca, IMenu.class);
-    List<Class<? extends IMenu>> foca = ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IMenu.class);
-    return ConfigurationUtility.removeReplacedClasses(foca);
+    return ConfigurationUtility.removeReplacedClasses(filtered);
+  }
+
+  protected final void interceptInitConfig() {
+    m_objectExtensions.initConfig(createLocalExtension(), new Runnable() {
+      @Override
+      public void run() {
+        initConfig();
+      }
+    });
   }
 
   protected void initConfig() {
@@ -153,9 +192,13 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver {
     setEnabledInternal(getConfiguredEnabled());
     setExpandedInternal(getConfiguredExpanded());
     m_defaultExpanded = getConfiguredExpanded();
+    m_contributionHolder = new ContributionComposite(this);
     // menus
-    List<IMenu> menuList = new ArrayList<IMenu>();
-    for (Class<? extends IMenu> menuClazz : getDeclaredMenus()) {
+    List<Class<? extends IMenu>> declaredMenus = getDeclaredMenus();
+    List<IMenu> contributedMenus = m_contributionHolder.getContributionsByClass(IMenu.class);
+
+    List<IMenu> menuList = new ArrayList<IMenu>(declaredMenus.size() + contributedMenus.size());
+    for (Class<? extends IMenu> menuClazz : declaredMenus) {
       try {
         IMenu menu = ConfigurationUtility.newInnerInstance(this, menuClazz);
         menuList.add(menu);
@@ -171,13 +214,31 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver {
     catch (Exception e) {
       LOG.error("error occured while dynamically contribute menus.", e);
     }
+    menuList.addAll(contributedMenus);
+    new MoveActionNodesHandler<IMenu>(menuList).moveModelObjects();
+    Collections.sort(menuList, new OrderedComparator());
+
     m_menus = menuList;
+  }
+
+  @Override
+  public List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> getAllExtensions() {
+    return m_objectExtensions.getAllExtensions();
+  }
+
+  protected ITreeNodeExtension<? extends AbstractTreeNode> createLocalExtension() {
+    return new LocalTreeNodeExtension<AbstractTreeNode>(this);
+  }
+
+  @Override
+  public <T extends IExtension<?>> T getExtension(Class<T> c) {
+    return m_objectExtensions.getExtension(c);
   }
 
   /**
    * Override this internal method only in order to make use of dynamic menus<br>
    * Used to manage menu list and add/remove menus
-   * 
+   *
    * @param menuList
    *          live and mutable list of configured menus
    */
@@ -195,7 +256,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver {
   /**
    * This method sets the internally used hash code. Should only be used by {@link VirtualTreeNode} when resolving this
    * real node.
-   * 
+   *
    * @param hashCode
    */
   void setHashCode(int hashCode) {
@@ -226,7 +287,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver {
     catch (ProcessingException e) {
       LOG.error("could not initialize actions.", e);
     }
-    execInitTreeNode();
+    interceptInitTreeNode();
   }
 
   @Override
@@ -324,7 +385,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver {
           try {
             m_tree.setTreeChanging(true);
             //
-            ITreeNode resolvedNode = execResolveVirtualChildNode((IVirtualTreeNode) node);
+            ITreeNode resolvedNode = interceptResolveVirtualChildNode((IVirtualTreeNode) node);
             if (node != resolvedNode) {
               if (resolvedNode == null) {
                 m_tree.removeChildNode(this, node);
@@ -358,7 +419,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver {
   @Override
   public final void decorateCell() {
     try {
-      execDecorateCell(m_cell);
+      interceptDecorateCell(m_cell);
     }
     catch (Throwable t) {
       LOG.warn("node " + getClass() + " " + getCell().getText(), t);
@@ -972,5 +1033,50 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver {
   @Override
   public Object validateValue(ICell cell, Object value) throws ProcessingException {
     return value;
+  }
+
+  /**
+   * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
+   * any further chain elements.
+   */
+  protected static class LocalTreeNodeExtension<OWNER extends AbstractTreeNode> extends AbstractExtension<OWNER> implements ITreeNodeExtension<OWNER> {
+
+    public LocalTreeNodeExtension(OWNER owner) {
+      super(owner);
+    }
+
+    @Override
+    public void execDecorateCell(TreeNodeDecorateCellChain chain, Cell cell) {
+      getOwner().execDecorateCell(cell);
+    }
+
+    @Override
+    public void execInitTreeNode(TreeNodeInitTreeNodeChain chain) {
+      getOwner().execInitTreeNode();
+    }
+
+    @Override
+    public ITreeNode execResolveVirtualChildNode(TreeNodeResolveVirtualChildNodeChain chain, IVirtualTreeNode node) throws ProcessingException {
+      return getOwner().execResolveVirtualChildNode(node);
+    }
+
+  }
+
+  protected final void interceptDecorateCell(Cell cell) {
+    List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
+    TreeNodeDecorateCellChain chain = new TreeNodeDecorateCellChain(extensions);
+    chain.execDecorateCell(cell);
+  }
+
+  protected final void interceptInitTreeNode() {
+    List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
+    TreeNodeInitTreeNodeChain chain = new TreeNodeInitTreeNodeChain(extensions);
+    chain.execInitTreeNode();
+  }
+
+  protected final ITreeNode interceptResolveVirtualChildNode(IVirtualTreeNode node) throws ProcessingException {
+    List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
+    TreeNodeResolveVirtualChildNodeChain chain = new TreeNodeResolveVirtualChildNodeChain(extensions);
+    return chain.execResolveVirtualChildNode(node);
   }
 }

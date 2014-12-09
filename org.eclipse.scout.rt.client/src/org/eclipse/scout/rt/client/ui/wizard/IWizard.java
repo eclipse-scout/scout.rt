@@ -104,7 +104,7 @@ public interface IWizard extends IPropertyObserver, ITypeWithClassId {
    * when the wizard is changed (for example the state) all these changes are
    * accumulated and then fired in single events Therefore the whole block is
    * normally inside a try...finally
-   * 
+   *
    * @see IWizard#doNextStep()
    */
   void setChanging(boolean b);
@@ -239,7 +239,7 @@ public interface IWizard extends IPropertyObserver, ITypeWithClassId {
 
   /**
    * Convenience method
-   * 
+   *
    * @return {@link IWizardStep#STEP_NEXT} or {@link IWizardStep#STEP_PREVIOUS} Note: If from or to is null then
    *         STEP_NEXT is returned.
    */
@@ -247,35 +247,35 @@ public interface IWizard extends IPropertyObserver, ITypeWithClassId {
 
   /**
    * Convenience method
-   * 
+   *
    * @return an array of all steps between from and to
    */
   List<IWizardStep<? extends IForm>> getStepSpan(IWizardStep<? extends IForm> from, boolean includeFrom, IWizardStep<? extends IForm> to, boolean includeTo);
 
   /**
    * Convenience method
-   * 
+   *
    * @return step before active step
    */
   IWizardStep<? extends IForm> getPreviousStep();
 
   /**
    * Convenience method
-   * 
+   *
    * @return step after active step
    */
   IWizardStep<? extends IForm> getNextStep();
 
   /**
    * Convenience method
-   * 
+   *
    * @return first step before active step that is enabled
    */
   IWizardStep<? extends IForm> getPreviousEnabledStep();
 
   /**
    * Convenience method
-   * 
+   *
    * @return first step after active step that is enabled
    */
   IWizardStep<? extends IForm> getNextEnabledStep();
@@ -294,7 +294,7 @@ public interface IWizard extends IPropertyObserver, ITypeWithClassId {
 
   /**
    * set the current wizard state
-   * 
+   *
    * @param jumpForward
    *          true simply jumps to the new step, false activates/deactivates
    *          every step inbetween the old and the new step
@@ -342,7 +342,7 @@ public interface IWizard extends IPropertyObserver, ITypeWithClassId {
    * This is a delegate methode that is normally called by the wizard status
    * field (html field) in the {@link IWizardContainerForm} whenever a link is
    * clicked.
-   * 
+   *
    * @param url
    * @param path
    *          {@link URL#getPath()}

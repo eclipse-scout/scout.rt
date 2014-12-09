@@ -21,6 +21,7 @@ import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.decimalfield.IDecimalFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.AbstractNumberField;
 import org.eclipse.scout.rt.client.ui.valuecontainer.IDecimalValueContainer;
 
@@ -147,7 +148,7 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractNum
       //
       if (isInitialized()) {
         if (shouldUpdateDisplayText(false)) {
-          setDisplayText(execFormatValue(getValue()));
+          setDisplayText(interceptFormatValue(getValue()));
         }
       }
     }
@@ -171,7 +172,7 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractNum
       setFormat(format);
       if (isInitialized()) {
         if (shouldUpdateDisplayText(false)) {
-          setDisplayText(execFormatValue(getValue()));
+          setDisplayText(interceptFormatValue(getValue()));
         }
       }
     }
@@ -204,7 +205,7 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractNum
 
       if (isInitialized()) {
         if (shouldUpdateDisplayText(false)) {
-          setDisplayText(execFormatValue(getValue()));
+          setDisplayText(interceptFormatValue(getValue()));
         }
       }
     }
@@ -267,7 +268,7 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractNum
   /**
    * Rounds the parsed value according {@link #getRoundingMode()} and {@link #getParsingFractionDigits()}. (The maximum
    * fraction digits used for parsing is adapted to {@link #getMultiplier()} if needed.)
-   * 
+   *
    * @throws ArithmeticException
    *           if roundingMode is {@link RoundingMode#UNNECESSARY} but rounding would be needed
    */
@@ -294,5 +295,17 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractNum
       return parseValue(newText);
     }
 
+  }
+
+  protected static class LocalDecimalFieldExtension<T extends Number, OWNER extends AbstractDecimalField<T>> extends LocalNumberFieldExtension<T, OWNER> implements IDecimalFieldExtension<T, OWNER> {
+
+    public LocalDecimalFieldExtension(OWNER owner) {
+      super(owner);
+    }
+  }
+
+  @Override
+  protected IDecimalFieldExtension<T, ? extends AbstractDecimalField<T>> createLocalExtension() {
+    return new LocalDecimalFieldExtension<T, AbstractDecimalField<T>>(this);
   }
 }

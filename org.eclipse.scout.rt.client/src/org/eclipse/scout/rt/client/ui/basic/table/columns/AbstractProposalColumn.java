@@ -14,6 +14,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.IProposalColumnExtension;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -61,7 +62,7 @@ public abstract class AbstractProposalColumn<LOOKUP_TYPE> extends AbstractConten
 
       @Override
       protected void execPrepareLookup(ILookupCall<LOOKUP_TYPE> call) throws ProcessingException {
-        AbstractProposalColumn.this.execPrepareLookup(call, row);
+        AbstractProposalColumn.this.interceptPrepareLookup(call, row);
       }
     };
 
@@ -92,5 +93,17 @@ public abstract class AbstractProposalColumn<LOOKUP_TYPE> extends AbstractConten
     else {
       return super.compareTableRows(r1, r2);
     }
+  }
+
+  protected static class LocalProposalColumnExtension<LOOKUP_TYPE, OWNER extends AbstractProposalColumn<LOOKUP_TYPE>> extends LocalContentAssistColumnExtension<String, LOOKUP_TYPE, OWNER> implements IProposalColumnExtension<LOOKUP_TYPE, OWNER> {
+
+    public LocalProposalColumnExtension(OWNER owner) {
+      super(owner);
+    }
+  }
+
+  @Override
+  protected IProposalColumnExtension<LOOKUP_TYPE, ? extends AbstractProposalColumn<LOOKUP_TYPE>> createLocalExtension() {
+    return new LocalProposalColumnExtension<LOOKUP_TYPE, AbstractProposalColumn<LOOKUP_TYPE>>(this);
   }
 }

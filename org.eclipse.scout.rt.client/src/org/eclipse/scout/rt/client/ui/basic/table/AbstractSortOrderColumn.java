@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.basic.table;
 
 import org.eclipse.scout.commons.annotations.ClassId;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.ISortOrderColumnExtension;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 
@@ -18,6 +19,18 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
  *
  */
 @ClassId("a92f1e53-7443-4e2a-b8d2-43826c959c84")
-public class AbstractSortOrderColumn extends AbstractColumn<IColumn> implements ISortOrderColumn {
+public abstract class AbstractSortOrderColumn extends AbstractColumn<IColumn> implements ISortOrderColumn {
+
+  protected static class LocalSortOrderColumnExtension<OWNER extends AbstractSortOrderColumn> extends LocalColumnExtension<IColumn, OWNER> implements ISortOrderColumnExtension<OWNER> {
+
+    public LocalSortOrderColumnExtension(OWNER owner) {
+      super(owner);
+    }
+  }
+
+  @Override
+  protected ISortOrderColumnExtension<? extends AbstractSortOrderColumn> createLocalExtension() {
+    return new LocalSortOrderColumnExtension<AbstractSortOrderColumn>(this);
+  }
 
 }

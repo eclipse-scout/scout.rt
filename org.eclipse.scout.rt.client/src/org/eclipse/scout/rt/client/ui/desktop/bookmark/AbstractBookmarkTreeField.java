@@ -734,11 +734,6 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
       }
 
       @Override
-      protected void execOwnerValueChanged(Object newOwnerValue) throws ProcessingException {
-        super.execOwnerValueChanged(newOwnerValue);
-      }
-
-      @Override
       protected void execAboutToShow() throws ProcessingException {
         List<Bookmark> bookmarks = new ArrayList<Bookmark>();
         ITree tree = getTree();

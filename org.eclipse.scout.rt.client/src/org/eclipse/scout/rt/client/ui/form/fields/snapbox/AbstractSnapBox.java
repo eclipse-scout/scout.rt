@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.form.fields.snapbox;
 
 import org.eclipse.scout.commons.annotations.ClassId;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.snapbox.ISnapBoxExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractCompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.snapbox.internal.SnapBoxGrid;
 
@@ -60,6 +61,18 @@ public abstract class AbstractSnapBox extends AbstractCompositeField implements 
   @Override
   public final int getGridRowCount() {
     return m_grid.getGridRowCount();
+  }
+
+  protected static class LocalSnapBoxExtension<OWNER extends AbstractSnapBox> extends LocalCompositeFieldExtension<OWNER> implements ISnapBoxExtension<OWNER> {
+
+    public LocalSnapBoxExtension(OWNER owner) {
+      super(owner);
+    }
+  }
+
+  @Override
+  protected ISnapBoxExtension<? extends AbstractSnapBox> createLocalExtension() {
+    return new LocalSnapBoxExtension<AbstractSnapBox>(this);
   }
 
 }

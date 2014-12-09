@@ -15,8 +15,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.commons.ITypeWithSettableClassId;
-import org.eclipse.scout.commons.annotations.ConfigOperation;
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.beans.IPropertyFilter;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -116,14 +114,12 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId {
    * This method is called to get an exclusive key of the form. The key is used
    * to open the same form with the same handler only once. Obviously this
    * behavior can only be used for view forms.
-   * 
+   *
    * @see AbstractDesktop#getSimilarViewForms(IForm)
    * @return null for exclusive form behavior an exclusive key to ensure similar
    *         handling.
    * @throws ProcessingException
    */
-  @ConfigOperation
-  @Order(5)
   Object computeExclusiveKey() throws ProcessingException;
 
   /*
@@ -140,7 +136,7 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId {
   /**
    * Puts the form to front in terms of UI visibility<br>
    * This will send a desktop event {@link FormEvent#TYPE_TO_FRONT}
-   * 
+   *
    * @since 06.07.2009
    */
   void toFront();
@@ -231,7 +227,7 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId {
 
   /**
    * apply FormData to this form
-   * 
+   *
    * @param source
    *          the FormData to import
    * @throws ProcessingException
@@ -240,7 +236,7 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId {
 
   /**
    * apply FormData to this form
-   * 
+   *
    * @param source
    *          the FormData to import
    * @param valueChangeTriggersEnabled
@@ -252,7 +248,7 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId {
 
   /**
    * apply FormData to this form
-   * 
+   *
    * @param source
    *          the FormData to import
    * @param valueChangeTriggersEnabled
@@ -267,7 +263,7 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId {
 
   /**
    * apply FormData to this form
-   * 
+   *
    * @param source
    *          the FormData to import
    * @param valueChangeTriggersEnabledspecifies
@@ -436,7 +432,7 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId {
 
   /**
    * The system button (type) that triggered the save
-   * 
+   *
    * @see IButton.SYSTEM_TYPE_...
    */
   int getCloseSystemType();
@@ -479,7 +475,7 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId {
 
   /**
    * Computes a key which is used when saving the bounds of the form.
-   * 
+   *
    * @return a key to distinguish the forms. It must not be null.
    */
   String computeCacheBoundsKey();
@@ -533,7 +529,7 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId {
 
   /**
    * Returns a read only list of all tool buttons
-   * 
+   *
    * @return list of all tool buttons
    * @since Scout 4.0.0-M7
    */
@@ -541,7 +537,7 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId {
 
   /**
    * Returns the tool button identified with the {@link IToolButton} class
-   * 
+   *
    * @param clazz
    *          the class of the tool button
    * @return toolbutton

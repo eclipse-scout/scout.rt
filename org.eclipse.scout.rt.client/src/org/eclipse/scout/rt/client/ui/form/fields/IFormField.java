@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.commons.ITypeWithClassId;
+import org.eclipse.scout.commons.annotations.IOrdered;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -58,10 +59,10 @@ import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
  * </ul>
  * </li>
  * </ul>
- * 
+ *
  * @see IForm
  */
-public interface IFormField extends IPropertyObserver, ITypeWithClassId {
+public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdered {
   /*
    * Properties
    */
@@ -424,7 +425,7 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId {
 
   /**
    * This property is used by buttons. Buttons set the property to false while in work.
-   * 
+   *
    * @return true if process button is not in
    *         {@link org.eclipse.scout.rt.client.ui.form.fields.button.IButton#doClick() IButton#doClick()} action
    */
@@ -457,19 +458,6 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId {
   boolean isMandatory();
 
   void setMandatory(boolean b);
-
-  /**
-   * @return Returns the field's view order. It determines where this field is arranged in the view.
-   */
-  double getViewOrder();
-
-  /**
-   * Sets the field's view order used for ordering all fields in a group box. It is initialized with the fields's model
-   * order (given by @Order annotation).
-   * 
-   * @param order
-   */
-  void setViewOrder(double order);
 
   /**
    * @return null iff value is valid, non-null if the currently set value has

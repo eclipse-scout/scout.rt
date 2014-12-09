@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.form.fields.textfield;
 
 import org.eclipse.scout.commons.annotations.ClassId;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.textfield.ITextFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 
 /**
@@ -27,5 +28,17 @@ public abstract class AbstractTextField extends AbstractStringField implements I
 
   public AbstractTextField(boolean callInitializer) {
     super(callInitializer);
+  }
+
+  protected static class LocalTextFieldExtension<OWNER extends AbstractTextField> extends LocalStringFieldExtension<OWNER> implements ITextFieldExtension<OWNER> {
+
+    public LocalTextFieldExtension(OWNER owner) {
+      super(owner);
+    }
+  }
+
+  @Override
+  protected ITextFieldExtension<? extends AbstractTextField> createLocalExtension() {
+    return new LocalTextFieldExtension<AbstractTextField>(this);
   }
 }

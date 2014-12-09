@@ -15,6 +15,7 @@ import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.rt.client.services.common.bookmark.internal.BookmarkUtility;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
+import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.action.keystroke.AbstractKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.OrganizeColumnsForm.MainBox.CancelButton;
@@ -382,7 +383,7 @@ public class OrganizeColumnsForm extends AbstractForm {
           }
 
           @Override
-          protected void execRowClick(ITableRow row) throws ProcessingException {
+          protected void execRowClick(ITableRow row, MouseButton mouseButton) throws ProcessingException {
             if (row != null && getContextColumn() == getVisibleColumn() && getKeyColumn().getValue(row) != null) {
               Boolean oldValue = getVisibleColumn().getValue(row);
               setColumnVisible(row, !oldValue);

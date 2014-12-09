@@ -13,9 +13,10 @@ package org.eclipse.scout.rt.shared.services.common.code;
 import java.util.List;
 
 import org.eclipse.scout.commons.ITypeWithClassId;
+import org.eclipse.scout.commons.annotations.IOrdered;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 
-public interface ICode<T> extends ITypeWithClassId {
+public interface ICode<T> extends ITypeWithClassId, IOrdered {
 
   /**
    * The id represented by this code, this is <b>not</b> the same as {@link #getValue()}
@@ -42,7 +43,7 @@ public interface ICode<T> extends ITypeWithClassId {
    * {@link ICodeType}
    * <p>
    * Add a new code as child of this code, owerwrite (drop) existing code
-   * 
+   *
    * @since 4.0
    * @param index
    *          if index is -1 and the codeId existed before, then it is replaced at the same position. If index is -1
@@ -55,7 +56,7 @@ public interface ICode<T> extends ITypeWithClassId {
    * {@link ICodeType}
    * <p>
    * Remove a child code of this code
-   * 
+   *
    * @since 4.0
    * @return the index the code had in the list or -1
    */

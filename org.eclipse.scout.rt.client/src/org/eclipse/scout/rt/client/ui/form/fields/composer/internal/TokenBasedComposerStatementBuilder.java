@@ -13,8 +13,6 @@ import java.util.List;
 
 import org.eclipse.scout.rt.client.services.common.search.TokenBasedSearchFilterService;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
-import org.eclipse.scout.rt.client.ui.form.fields.composer.attribute.AbstractComposerAttribute;
-import org.eclipse.scout.rt.client.ui.form.fields.composer.entity.AbstractComposerEntity;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.node.AttributeNode;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.node.EitherOrNode;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.node.EntityNode;
@@ -24,10 +22,9 @@ import org.eclipse.scout.rt.shared.services.common.jdbc.TokenBasedSearchFilter.E
 import org.eclipse.scout.rt.shared.services.common.jdbc.TokenBasedSearchFilter.OrNodeToken;
 import org.eclipse.scout.rt.shared.services.common.jdbc.TokenBasedSearchFilter.TreeNodeToken;
 
-@SuppressWarnings("deprecation")
 public class TokenBasedComposerStatementBuilder {
 
-  TokenBasedSearchFilterService m_service;
+  private final TokenBasedSearchFilterService m_service;
 
   public TokenBasedComposerStatementBuilder(TokenBasedSearchFilterService service) {
     m_service = service;
@@ -95,7 +92,7 @@ public class TokenBasedComposerStatementBuilder {
   }
 
   private EntityNodeToken visitEntityNode(EntityNode node) {
-    Integer tokenId = m_service.resolveTokenIdByClass(((AbstractComposerEntity) node.getEntity()).getClass());
+    Integer tokenId = m_service.resolveTokenIdByClass(node.getEntity().getClass());
     if (tokenId == null) {
       return null;
     }
@@ -111,7 +108,7 @@ public class TokenBasedComposerStatementBuilder {
   }
 
   private AttributeNodeToken visitAttributeNode(AttributeNode node) {
-    Integer tokenId = m_service.resolveTokenIdByClass(((AbstractComposerAttribute) node.getAttribute()).getClass());
+    Integer tokenId = m_service.resolveTokenIdByClass(node.getAttribute().getClass());
     if (tokenId == null) {
       return null;
     }

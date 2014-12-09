@@ -11,11 +11,12 @@
 package org.eclipse.scout.rt.client.ui.wizard;
 
 import org.eclipse.scout.commons.ITypeWithClassId;
+import org.eclipse.scout.commons.annotations.IOrdered;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 
-public interface IWizardStep<T extends IForm> extends IPropertyObserver, ITypeWithClassId {
+public interface IWizardStep<FORM extends IForm> extends IPropertyObserver, ITypeWithClassId, IOrdered {
 
   String PROP_ENABLED = "enabled";
   String PROP_TITLE = "title";
@@ -23,6 +24,8 @@ public interface IWizardStep<T extends IForm> extends IPropertyObserver, ITypeWi
   String PROP_TITLE_HTML = "titleHtml";
   String PROP_DESCRIPTION_HTML = "descriptionHtml";
   String PROP_ICON_ID = "iconId";
+  String PROP_VIEW_ORDER = "viewOrder";
+
   /**
    * The step was activated by a "next" operation
    */
@@ -66,12 +69,12 @@ public interface IWizardStep<T extends IForm> extends IPropertyObserver, ITypeWi
   /**
    * @return the cached for this step or null
    */
-  T getForm();
+  FORM getForm();
 
   /**
    * cache the form for this step for later usage
    */
-  void setForm(T form);
+  void setForm(FORM form);
 
   /**
    * @param stepKind

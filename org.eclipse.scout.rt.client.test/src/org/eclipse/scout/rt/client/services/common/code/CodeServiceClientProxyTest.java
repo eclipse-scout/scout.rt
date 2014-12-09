@@ -40,7 +40,7 @@ import org.mockito.stubbing.Answer;
 
 /**
  * JUnit test class for {@link CodeServiceClientProxy}.
- * 
+ *
  * @since Scout 4.1-M2
  */
 @RunWith(ScoutClientTestRunner.class)

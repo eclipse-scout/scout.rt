@@ -29,13 +29,14 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.numberfield.INumberFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractBasicField;
 import org.eclipse.scout.rt.client.ui.form.fields.decimalfield.AbstractDecimalField;
 import org.eclipse.scout.rt.client.ui.valuecontainer.INumberValueContainer;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
 @ClassId("05955664-a6c7-4b3a-8622-3e166fe8ff79")
-public abstract class AbstractNumberField<T extends Number> extends AbstractBasicField<T> implements INumberField<T> {
+public abstract class AbstractNumberField<NUMBER extends Number> extends AbstractBasicField<NUMBER> implements INumberField<NUMBER> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractNumberField.class);
 
   @SuppressWarnings("deprecation")
@@ -95,12 +96,12 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractBasi
   /**
    * Default for {@link INumberField#setMinValue(Number)}
    */
-  protected abstract T getConfiguredMinValue();
+  protected abstract NUMBER getConfiguredMinValue();
 
   /**
    * Default for {@link INumberField#setMaxValue(Number)}
    */
-  protected abstract T getConfiguredMaxValue();
+  protected abstract NUMBER getConfiguredMaxValue();
 
   /**
    * Default used for {@link INumberField#setMaxIntegerDigits(int)}
@@ -154,7 +155,7 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractBasi
       setFormat(format);
       if (isInitialized()) {
         if (shouldUpdateDisplayText(false)) {
-          setDisplayText(execFormatValue(getValue()));
+          setDisplayText(interceptFormatValue(getValue()));
         }
       }
     }
@@ -181,7 +182,7 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractBasi
       propertySupport.setProperty(INumberValueContainer.PROP_DECIMAL_FORMAT, newFormat);
       if (isInitialized()) {
         if (shouldUpdateDisplayText(false)) {
-          setDisplayText(execFormatValue(getValue()));
+          setDisplayText(interceptFormatValue(getValue()));
         }
       }
     }
@@ -213,7 +214,7 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractBasi
       setFormat(format);
       if (isInitialized()) {
         if (shouldUpdateDisplayText(false)) {
-          setDisplayText(execFormatValue(getValue()));
+          setDisplayText(interceptFormatValue(getValue()));
         }
       }
     }
@@ -235,7 +236,7 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractBasi
       setFormat(format);
       if (isInitialized()) {
         if (shouldUpdateDisplayText(false)) {
-          setDisplayText(execFormatValue(getValue()));
+          setDisplayText(interceptFormatValue(getValue()));
         }
       }
     }
@@ -254,12 +255,12 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractBasi
    * {@link #getMinPossibleValue()}.
    */
   @Override
-  public void setMinValue(T value) {
-    T n = (value == null) ? getMinPossibleValue() : value;
+  public void setMinValue(NUMBER value) {
+    NUMBER n = (value == null) ? getMinPossibleValue() : value;
     try {
       setFieldChanging(true);
       //
-      T max = getMaxValue();
+      NUMBER max = getMaxValue();
       if (n != null && max != null && compareInternal(n, max) > 0) {
         propertySupport.setProperty(PROP_MAX_VALUE, n);
       }
@@ -275,8 +276,8 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractBasi
 
   @SuppressWarnings("unchecked")
   @Override
-  public T getMinValue() {
-    return (T) propertySupport.getProperty(PROP_MIN_VALUE);
+  public NUMBER getMinValue() {
+    return (NUMBER) propertySupport.getProperty(PROP_MIN_VALUE);
   }
 
   /**
@@ -284,12 +285,12 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractBasi
    * {@link #getMaxPossibleValue()}.
    */
   @Override
-  public void setMaxValue(T value) {
-    T n = (value == null) ? getMaxPossibleValue() : value;
+  public void setMaxValue(NUMBER value) {
+    NUMBER n = (value == null) ? getMaxPossibleValue() : value;
     try {
       setFieldChanging(true);
       //
-      T min = getMinValue();
+      NUMBER min = getMinValue();
       if (n != null && min != null && compareInternal(n, min) < 0) {
         propertySupport.setProperty(PROP_MIN_VALUE, n);
       }
@@ -305,27 +306,27 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractBasi
 
   @SuppressWarnings("unchecked")
   @Override
-  public T getMaxValue() {
-    return (T) propertySupport.getProperty(PROP_MAX_VALUE);
+  public NUMBER getMaxValue() {
+    return (NUMBER) propertySupport.getProperty(PROP_MAX_VALUE);
   }
 
-  private int compareInternal(T a, T b) {
+  private int compareInternal(NUMBER a, NUMBER b) {
     return CompareUtility.compareTo(NumberUtility.numberToBigDecimal(a), NumberUtility.numberToBigDecimal(b));
   }
 
   /**
    * Lower bound for the value (depending on the type)
    */
-  protected abstract T getMinPossibleValue();
+  protected abstract NUMBER getMinPossibleValue();
 
   /**
    * Upper bound for the value (depending on the type)
    */
-  protected abstract T getMaxPossibleValue();
+  protected abstract NUMBER getMaxPossibleValue();
 
   @Override
-  protected T validateValueInternal(T rawValue) throws ProcessingException {
-    T validValue = null;
+  protected NUMBER validateValueInternal(NUMBER rawValue) throws ProcessingException {
+    NUMBER validValue = null;
     rawValue = super.validateValueInternal(rawValue);
     if (rawValue == null) {
       validValue = null;
@@ -343,7 +344,7 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractBasi
   }
 
   @Override
-  protected String formatValueInternal(T validValue) {
+  protected String formatValueInternal(NUMBER validValue) {
     if (validValue == null) {
       return "";
     }
@@ -382,7 +383,7 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractBasi
   }
 
   @Override
-  protected abstract T parseValueInternal(String text) throws ProcessingException;
+  protected abstract NUMBER parseValueInternal(String text) throws ProcessingException;
 
   /**
    * Parses text input into a BigDecimal.
@@ -594,5 +595,17 @@ public abstract class AbstractNumberField<T extends Number> extends AbstractBasi
       }
     }
     return result.toString();
+  }
+
+  protected static class LocalNumberFieldExtension<NUMBER extends Number, OWNER extends AbstractNumberField<NUMBER>> extends LocalBasicFieldExtension<NUMBER, OWNER> implements INumberFieldExtension<NUMBER, OWNER> {
+
+    public LocalNumberFieldExtension(OWNER owner) {
+      super(owner);
+    }
+  }
+
+  @Override
+  protected INumberFieldExtension<NUMBER, ? extends AbstractNumberField<NUMBER>> createLocalExtension() {
+    return new LocalNumberFieldExtension<NUMBER, AbstractNumberField<NUMBER>>(this);
   }
 }

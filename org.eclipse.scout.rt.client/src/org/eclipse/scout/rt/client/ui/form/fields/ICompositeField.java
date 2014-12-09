@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.form.fields;
 
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 
@@ -76,4 +77,28 @@ public interface ICompositeField extends IFormField {
    */
   int getGridRowCount();
 
+  /**
+   * Removes the given field from this container. This operation is supported only as long as the form has not been
+   * started.
+   */
+  void removeField(IFormField f);
+
+  /**
+   * Adds the given field to this container. This operation is supported only as long as the form has not been started.
+   */
+  void addField(IFormField f);
+
+  /**
+   * Moves a field of this composite field into another one.
+   * <p/>
+   * Implementing classes are required to keep track of moved fields so that the following methods still return moved
+   * fields: {@link #getFieldByClass(Class)}, {@link #getFieldById(String)} and {@link #getFieldById(String, Class)}.
+   */
+  void moveFieldTo(IFormField f, ICompositeField newContainer);
+
+  /**
+   * @return Returns an <b>unmodifiable</b> map with all fields by their actual class that were moved from this
+   *         composite field into another one. Never returns null.
+   */
+  Map<Class<? extends IFormField>, IFormField> getMovedFields();
 }

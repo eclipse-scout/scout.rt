@@ -19,14 +19,14 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 /**
  *
  */
-public class ContentAssistFieldDataFetchResult<LOOKUP_TYPE> implements IContentAssistFieldDataFetchResult<LOOKUP_TYPE> {
+public class ContentAssistFieldDataFetchResult<LOOKUP_KEY> implements IContentAssistFieldDataFetchResult<LOOKUP_KEY> {
 
-  private final List<? extends ILookupRow<LOOKUP_TYPE>> m_lookupRows;
+  private final List<? extends ILookupRow<LOOKUP_KEY>> m_lookupRows;
   private final ProcessingException m_processingException;
   private final String m_searchText;
   private final boolean m_selectCurrentValue;
 
-  public ContentAssistFieldDataFetchResult(List<? extends ILookupRow<LOOKUP_TYPE>> rows, ProcessingException failed, String searchText, boolean selectCurrentValue) {
+  public ContentAssistFieldDataFetchResult(List<? extends ILookupRow<LOOKUP_KEY>> rows, ProcessingException failed, String searchText, boolean selectCurrentValue) {
     m_lookupRows = rows;
     m_processingException = failed;
     m_searchText = searchText;
@@ -34,7 +34,7 @@ public class ContentAssistFieldDataFetchResult<LOOKUP_TYPE> implements IContentA
   }
 
   @Override
-  public List<? extends ILookupRow<LOOKUP_TYPE>> getLookupRows() {
+  public List<? extends ILookupRow<LOOKUP_KEY>> getLookupRows() {
     return m_lookupRows;
   }
 

@@ -16,11 +16,11 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 
-public interface IContentAssistFieldProposalForm<KEY_TYPE> extends IForm {
+public interface IContentAssistFieldProposalForm<LOOKUP_KEY> extends IForm {
 
   String PROP_SEARCH_RESULT = "searchResult";
 
-  IContentAssistField<?, KEY_TYPE> getContentAssistField();
+  IContentAssistField<?, LOOKUP_KEY> getContentAssistField();
 
   void startForm() throws ProcessingException;
 
@@ -34,7 +34,7 @@ public interface IContentAssistFieldProposalForm<KEY_TYPE> extends IForm {
   /**
    * @return the displayed result.
    */
-  IContentAssistFieldDataFetchResult<KEY_TYPE> getSearchResult();
+  IContentAssistFieldDataFetchResult<LOOKUP_KEY> getSearchResult();
 
   /**
    * This method may call {@link IContentAssistField#acceptProposal(LookupRow)}
@@ -42,7 +42,7 @@ public interface IContentAssistFieldProposalForm<KEY_TYPE> extends IForm {
    * @return true if a propsal was accepted (might be a single match or the
    *         selcted one that is enabled)
    */
-  ILookupRow<KEY_TYPE> getAcceptedProposal() throws ProcessingException;
+  ILookupRow<LOOKUP_KEY> getAcceptedProposal() throws ProcessingException;
 
   /**
    * @param rows
@@ -50,7 +50,7 @@ public interface IContentAssistFieldProposalForm<KEY_TYPE> extends IForm {
    * @param maxCount
    * @param selectCurrentValue
    */
-  void dataFetchedDelegate(IContentAssistFieldDataFetchResult<KEY_TYPE> result, int maxCount);
+  void dataFetchedDelegate(IContentAssistFieldDataFetchResult<LOOKUP_KEY> result, int maxCount);
 
   /**
    * @param status

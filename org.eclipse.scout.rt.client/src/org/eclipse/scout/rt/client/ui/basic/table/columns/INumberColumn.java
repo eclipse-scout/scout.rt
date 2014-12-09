@@ -14,7 +14,7 @@ import java.text.NumberFormat;
 
 import org.eclipse.scout.rt.client.ui.valuecontainer.INumberValueContainer;
 
-public interface INumberColumn<T extends Number> extends IColumn<T>, INumberValueContainer<T> {
+public interface INumberColumn<NUMBER extends Number> extends IColumn<NUMBER>, INumberValueContainer<NUMBER> {
 
   void setValidateOnAnyKey(boolean b);
 

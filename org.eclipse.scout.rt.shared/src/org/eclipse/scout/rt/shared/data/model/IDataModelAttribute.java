@@ -14,13 +14,14 @@ import java.security.Permission;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.scout.commons.annotations.IOrdered;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 
-public interface IDataModelAttribute extends IPropertyObserver, DataModelConstants {
+public interface IDataModelAttribute extends IPropertyObserver, DataModelConstants, IOrdered {
 
   void initAttribute() throws ProcessingException;
 
@@ -100,23 +101,7 @@ public interface IDataModelAttribute extends IPropertyObserver, DataModelConstan
 
   void setActiveFilterEnabled(boolean active);
 
-  /**
-   * Client code should not call this method, it is used internally to set up a {@link IDataModel} structure
-   * 
-   * @deprecated will be renamed to setParentEntityInternal and set to package private. Will be removed in the 5.0
-   *             Release.
-   */
-  @Deprecated
   IDataModelEntity getParentEntity();
-
-  /**
-   * Client code should not call this method, it is used internally to set up a {@link IDataModel} structure
-   * 
-   * @deprecated will be renamed to setParentEntityInternal and set to package private. Will be removed in the 5.0
-   *             Release.
-   */
-  @Deprecated
-  void setParentEntity(IDataModelEntity parent);
 
   /**
    * @return meta data for the attribute, default returns null
@@ -142,7 +127,7 @@ public interface IDataModelAttribute extends IPropertyObserver, DataModelConstan
    * </ul>
    * <p>
    * A multi valued attribute behaves same as {@link IDataModelEntity#isOneToMany()}
-   * 
+   *
    * @return Returns <code>true</code> if this attribute holds multiple values. <code>false</code> otherwise.
    * @since 3.8.0
    */
@@ -150,7 +135,7 @@ public interface IDataModelAttribute extends IPropertyObserver, DataModelConstan
 
   /**
    * Formats the provided raw value according to the defined attribute type.
-   * 
+   *
    * @param rawValue
    *          Raw value to format.
    * @return Formatted value

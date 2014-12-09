@@ -8,7 +8,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.service.SERVICES;
 
 @Order(20)
-public class AbstractMobileHomeAction extends AbstractMenu {
+public abstract class AbstractMobileHomeAction extends AbstractMenu {
   private P_BreadCrumbsListener m_breadCrumbsListener;
 
   @Override

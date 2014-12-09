@@ -49,7 +49,7 @@ public class FastPropertyDescriptor {
 
   /**
    * Gets the Class object for the property.
-   * 
+   *
    * @return The Java type info for the property. Note that
    *         the "Class" object may describe a built-in Java type such as "int".
    *         The result may be "null" if this is an indexed property that
@@ -63,7 +63,7 @@ public class FastPropertyDescriptor {
 
   /**
    * Gets the method that should be used to read the property value.
-   * 
+   *
    * @return The method that should be used to read the property value.
    *         May return null if the property can't be read.
    */
@@ -86,7 +86,7 @@ public class FastPropertyDescriptor {
 
   /**
    * Gets the method that should be used to write the property value.
-   * 
+   *
    * @return The method that should be used to write the property value.
    *         May return null if the property can't be written.
    */
@@ -143,4 +143,8 @@ public class FastPropertyDescriptor {
     return false;
   }
 
+  @Override
+  public String toString() {
+    return "FastPropertyDescriptor [" + m_beanClass + " / " + m_name + "]";
+  }
 }

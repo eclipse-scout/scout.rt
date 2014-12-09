@@ -54,7 +54,7 @@ public interface ITree extends IPropertyObserver, IDNDSupport {
    * Container of this tree, {@link IPage}, {@link ITreeField}, {@link ITreeBox}
    * <p>
    * https://bugs.eclipse.org/bugs/show_bug.cgi?id=388227
-   * 
+   *
    * @since 3.8.1
    */
   String PROP_CONTAINER = "container";
@@ -284,7 +284,7 @@ public interface ITree extends IPropertyObserver, IDNDSupport {
    * Container of this tree, {@link IPage}, {@link ITreeField}, {@link ITreeBox}
    * <p>
    * https://bugs.eclipse.org/bugs/show_bug.cgi?id=388227
-   * 
+   *
    * @since 3.8.1
    */
   Object getContainer();
@@ -342,7 +342,7 @@ public interface ITree extends IPropertyObserver, IDNDSupport {
    * (such as rap/rwt).
    * <p>
    * This hint defines the node height in pixels being used as the fixed node height for all nodes of this tree.
-   * 
+   *
    * @return the hint in pixels, default is -1
    */
   int getNodeHeightHint();
@@ -496,7 +496,7 @@ public interface ITree extends IPropertyObserver, IDNDSupport {
   /**
    * informs the attached UI that a node has changed in a way that may affect its presentation (e.g. text, font,
    * color...) but no structural changes occurred
-   * 
+   *
    * @param abstractTreeNode
    * @since 3.10.0-M5
    */

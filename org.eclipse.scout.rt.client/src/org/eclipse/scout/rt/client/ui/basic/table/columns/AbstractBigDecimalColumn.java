@@ -19,6 +19,7 @@ import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.IBigDecimalColumnExtension;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield.AbstractBigDecimalField;
 import org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield.IBigDecimalField;
@@ -69,6 +70,18 @@ public abstract class AbstractBigDecimalColumn extends AbstractDecimalColumn<Big
   protected IBigDecimalField getEditorField() {
     return new AbstractBigDecimalField() {
     };
+  }
+
+  protected static class LocalBigDecimalColumnExtension<OWNER extends AbstractBigDecimalColumn> extends LocalDecimalColumnExtension<BigDecimal, OWNER> implements IBigDecimalColumnExtension<OWNER> {
+
+    public LocalBigDecimalColumnExtension(OWNER owner) {
+      super(owner);
+    }
+  }
+
+  @Override
+  protected IBigDecimalColumnExtension<? extends AbstractBigDecimalColumn> createLocalExtension() {
+    return new LocalBigDecimalColumnExtension<AbstractBigDecimalColumn>(this);
   }
 
 }

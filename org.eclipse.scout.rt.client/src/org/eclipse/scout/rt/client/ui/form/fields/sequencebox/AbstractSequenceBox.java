@@ -14,6 +14,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.OptimisticLock;
@@ -25,6 +26,10 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.holders.IHolder;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.sequencebox.ISequenceBoxExtension;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.sequencebox.SequenceBoxChains.SequenceBoxCheckFromToChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.sequencebox.SequenceBoxChains.SequenceBoxCreateLabelSuffixChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.sequencebox.SequenceBoxChains.SequenceBoxIsLabelSuffixCandidateChain;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractCompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
@@ -60,7 +65,7 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
    *         box have consistent (ascending values) by calling {@link #execCheckFromTo(IValueField)}
    *         <p>
    *         Examples:
-   * 
+   *
    *         <pre>
    * fromField.value &lt;= toField.value
    * minField.value &lt;= preferredField.value &lt;= maxField.value
@@ -87,7 +92,7 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
    * Default implementation ensures that all fields in the range box have
    * ascending values.<br>
    * Only active when {@link #isAutoCheckFromTo()} resp. {@link #getConfiguredAutoCheckFromTo()} is set to true
-   * 
+   *
    * @param valueFields
    *          all value fields in the range box that have the same {@link IHolder#getHolderType()} and are comparable
    * @param changedIndex
@@ -151,7 +156,7 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
   /**
    * Validate all fields including own and remove error status when it is an
    * InvalidSequenceStatus
-   * 
+   *
    * @param valueFields
    */
   private void clearInvalidSequenceStatus(IValueField[] valueFields) {
@@ -290,7 +295,7 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
   @SuppressWarnings("unchecked")
   private void checkFromTo(IValueField[] valueFields, int changedIndex) {
     try {
-      execCheckFromTo(valueFields, changedIndex);
+      interceptCheckFromTo(valueFields, changedIndex);
     }
     catch (VetoException e) {
       valueFields[changedIndex].setErrorStatus(e.getStatus());
@@ -307,7 +312,7 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
 
     try {
       if (m_labelCompositionLock.acquire()) {
-        m_labelSuffix = execCreateLabelSuffix();
+        m_labelSuffix = interceptCreateLabelSuffix();
 
         computeCompoundLabel();
       }
@@ -323,7 +328,7 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
    * </p>
    * <p>
    * As default it returns the label of the first field for which the function
-   * {@link #execIsLabelSuffixCandidate(IFormField)} returns true.
+   * {@link #interceptIsLabelSuffixCandidate(IFormField)} returns true.
    * </p>
    */
   @ConfigOperation
@@ -334,7 +339,7 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
     }
 
     for (IFormField formField : getFields()) {
-      if (execIsLabelSuffixCandidate(formField)) {
+      if (interceptIsLabelSuffixCandidate(formField)) {
         formField.setLabelSuppressed(true);
         return formField.getLabel();
       }
@@ -346,7 +351,7 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
   /**
    * <p>
    * Computes whether the given formField should be considered when creating the compound label in
-   * {@link #execCreateLabelSuffix()}.
+   * {@link #interceptCreateLabelSuffix()}.
    * </p>
    */
   @ConfigOperation
@@ -408,5 +413,56 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
       b.append(s);
     }
     return b.toString();
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public List<? extends ISequenceBoxExtension<? extends AbstractSequenceBox>> getAllExtensions() {
+    return (List<? extends ISequenceBoxExtension<? extends AbstractSequenceBox>>) super.getAllExtensions();
+  }
+
+  protected final boolean interceptIsLabelSuffixCandidate(IFormField formField) {
+    List<? extends ISequenceBoxExtension<? extends AbstractSequenceBox>> extensions = getAllExtensions();
+    SequenceBoxIsLabelSuffixCandidateChain chain = new SequenceBoxIsLabelSuffixCandidateChain(extensions);
+    return chain.execIsLabelSuffixCandidate(formField);
+  }
+
+  protected final <T extends Comparable<T>> void interceptCheckFromTo(IValueField<T>[] valueFields, int changedIndex) throws ProcessingException {
+    List<? extends ISequenceBoxExtension<? extends AbstractSequenceBox>> extensions = getAllExtensions();
+    SequenceBoxCheckFromToChain chain = new SequenceBoxCheckFromToChain(extensions);
+    chain.execCheckFromTo(valueFields, changedIndex);
+  }
+
+  protected final String interceptCreateLabelSuffix() {
+    List<? extends ISequenceBoxExtension<? extends AbstractSequenceBox>> extensions = getAllExtensions();
+    SequenceBoxCreateLabelSuffixChain chain = new SequenceBoxCreateLabelSuffixChain(extensions);
+    return chain.execCreateLabelSuffix();
+  }
+
+  protected static class LocalSequenceBoxExtension<OWNER extends AbstractSequenceBox> extends LocalCompositeFieldExtension<OWNER> implements ISequenceBoxExtension<OWNER> {
+
+    public LocalSequenceBoxExtension(OWNER owner) {
+      super(owner);
+    }
+
+    @Override
+    public boolean execIsLabelSuffixCandidate(SequenceBoxIsLabelSuffixCandidateChain chain, IFormField formField) {
+      return getOwner().execIsLabelSuffixCandidate(formField);
+    }
+
+    @Override
+    public <T extends Comparable<T>> void execCheckFromTo(SequenceBoxCheckFromToChain chain, IValueField<T>[] valueFields, int changedIndex) throws ProcessingException {
+      getOwner().execCheckFromTo(valueFields, changedIndex);
+    }
+
+    @Override
+    public String execCreateLabelSuffix(SequenceBoxCreateLabelSuffixChain chain) {
+      return getOwner().execCreateLabelSuffix();
+    }
+  }
+
+  @Override
+  protected ISequenceBoxExtension<? extends AbstractSequenceBox> createLocalExtension() {
+    return new LocalSequenceBoxExtension<AbstractSequenceBox>(this);
   }
 }

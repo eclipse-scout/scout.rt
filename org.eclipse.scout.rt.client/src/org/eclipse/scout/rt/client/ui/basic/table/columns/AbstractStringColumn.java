@@ -15,6 +15,7 @@ import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.IStringColumnExtension;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -44,7 +45,7 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
    * in case of editable cells.
    * <p>
    * Subclasses can override this method. Default is {@code 4000}.
-   * 
+   *
    * @return Maximum length of text in an editable cell.
    */
   @ConfigProperty(ConfigProperty.INTEGER)
@@ -58,7 +59,7 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
    * configuration only masks the input in the string field in case of an editable cell.
    * <p>
    * Subclasses can override this method. Default is {@code false}.
-   * 
+   *
    * @return {@code true} if the input in the string field in case of an editable cell is masked, {@code false}
    *         otherwise.
    */
@@ -72,7 +73,7 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
    * Configures the display format of this column.
    * <p>
    * Subclasses can override this method. Default is {@code null}.
-   * 
+   *
    * @return Either {@code null}, {@link IStringColumn#FORMAT_LOWER} or {@link IStringColumn#FORMAT_UPPER}.
    */
   @ConfigProperty(ConfigProperty.STRING)
@@ -86,7 +87,7 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
    * is only wrapped if the text is too long to fit in one row.
    * <p>
    * Subclasses can override this method. Default is {@code false}.
-   * 
+   *
    * @return {@code true} if the text is wrapped, {@code false} otherwise.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -287,5 +288,17 @@ public abstract class AbstractStringColumn extends AbstractColumn<String> implem
     String s1 = getValue(r1);
     String s2 = getValue(r2);
     return StringUtility.compareIgnoreCase(s1, s2);
+  }
+
+  protected static class LocalStringColumnExtension<OWNER extends AbstractStringColumn> extends LocalColumnExtension<String, OWNER> implements IStringColumnExtension<OWNER> {
+
+    public LocalStringColumnExtension(OWNER owner) {
+      super(owner);
+    }
+  }
+
+  @Override
+  protected IStringColumnExtension<? extends AbstractStringColumn> createLocalExtension() {
+    return new LocalStringColumnExtension<AbstractStringColumn>(this);
   }
 }

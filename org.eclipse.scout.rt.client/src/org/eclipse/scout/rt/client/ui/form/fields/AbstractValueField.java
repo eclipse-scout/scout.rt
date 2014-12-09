@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.form.fields;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EventListener;
 import java.util.List;
 
@@ -28,6 +29,7 @@ import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.commons.annotations.FormData.DefaultSubtypeSdkCommand;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.annotations.OrderedComparator;
 import org.eclipse.scout.commons.annotations.ScoutSdkIgnore;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -37,6 +39,14 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.xmlparser.SimpleXmlElement;
 import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.AbstractValueFieldExtension;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.IValueFieldExtension;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.ValueFieldChains.ValueFieldChangedValueChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.ValueFieldChains.ValueFieldExecValidateChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.ValueFieldChains.ValueFieldFormatValueChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.ValueFieldChains.ValueFieldParseValueChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.ValueFieldChains.ValueFieldValidateValueChain;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -52,13 +62,13 @@ import org.eclipse.scout.service.SERVICES;
 @ScoutSdkIgnore
 @ClassId("dfc4615d-a38d-450a-8592-e4d2c536d7cb")
 @FormData(value = AbstractValueFieldData.class, defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.CREATE, sdkCommand = SdkCommand.USE, genericOrdinal = 0)
-public abstract class AbstractValueField<T> extends AbstractFormField implements IValueField<T> {
+public abstract class AbstractValueField<VALUE> extends AbstractFormField implements IValueField<VALUE> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractValueField.class);
 
   private int m_valueChanging;
   private int m_valueParsing;
   private int m_valueValidating;
-  private T m_initValue;
+  private VALUE m_initValue;
   private EventListenerList m_listeningSlaves;// my slaves
 
   public AbstractValueField() {
@@ -67,6 +77,17 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
 
   public AbstractValueField(boolean callInitializer) {
     super(callInitializer);
+  }
+
+  @Override
+  protected IValueFieldExtension<VALUE, ? extends AbstractValueField<VALUE>> createLocalExtension() {
+    return new LocalValueFieldExtension<VALUE, AbstractValueField<VALUE>>(this);
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public List<? extends IValueFieldExtension<VALUE, ? extends AbstractValueField<VALUE>>> getAllExtensions() {
+    return (List<? extends AbstractValueFieldExtension<VALUE, ? extends IValueField<VALUE>>>) super.getAllExtensions();
   }
 
   /*
@@ -81,7 +102,7 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
 
   /**
    * Specifies if the default system menus (cut, copy, paste) should be available on this field.
-   * 
+   *
    * @return true if the default system menus should be available, false otherwise.
    */
   @Order(210)
@@ -99,7 +120,8 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
 
     // menus
     List<Class<? extends IMenu>> declaredMenus = getDeclaredMenus();
-    List<IMenu> menuList = new ArrayList<IMenu>(declaredMenus.size() + 4);
+    List<IMenu> contributedMenus = m_contributionHolder.getContributionsByClass(IMenu.class);
+    List<IMenu> menuList = new ArrayList<IMenu>(declaredMenus.size() + contributedMenus.size());
     for (Class<? extends IMenu> menuClazz : declaredMenus) {
       try {
         menuList.add(ConfigurationUtility.newInnerInstance(this, menuClazz));
@@ -108,12 +130,17 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
         SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + menuClazz.getName() + "'.", e));
       }
     }
+
+    menuList.addAll(contributedMenus);
+
     try {
       injectMenusInternal(menuList);
     }
     catch (Exception e) {
       LOG.error("error occured while dynamically contributing menus.", e);
     }
+    new MoveActionNodesHandler<IMenu>(menuList).moveModelObjects();
+    Collections.sort(menuList, new OrderedComparator());
     //set container on menus
     IValueFieldContextMenu contextMenu = new ValueFieldContextMenu(this, menuList);
     contextMenu.setContainerInternal(this);
@@ -123,7 +150,7 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
   /**
    * Override this internal method only in order to make use of dynamic menus<br>
    * Used to manage menu list and add/remove menus
-   * 
+   *
    * @param menuList
    *          live and mutable list of configured menus
    */
@@ -154,8 +181,7 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
   protected List<Class<? extends IMenu>> getDeclaredMenus() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     List<Class<IMenu>> filtered = ConfigurationUtility.filterClasses(dca, IMenu.class);
-    List<Class<? extends IMenu>> foca = ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IMenu.class);
-    return ConfigurationUtility.removeReplacedClasses(foca);
+    return ConfigurationUtility.removeReplacedClasses(filtered);
   }
 
   @Override
@@ -169,29 +195,29 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
   @SuppressWarnings("unchecked")
   @Override
   public void exportFormFieldData(AbstractFormFieldData target) throws ProcessingException {
-    AbstractValueFieldData<T> v = (AbstractValueFieldData<T>) target;
+    AbstractValueFieldData<VALUE> v = (AbstractValueFieldData<VALUE>) target;
     v.setValue(this.getValue());
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public void importFormFieldData(AbstractFormFieldData source, boolean valueChangeTriggersEnabled) {
-    AbstractValueFieldData<T> v = (AbstractValueFieldData<T>) source;
+    AbstractValueFieldData<VALUE> v = (AbstractValueFieldData<VALUE>) source;
     if (v.isValueSet()) {
       try {
         if (!valueChangeTriggersEnabled) {
           setValueChangeTriggerEnabled(false);
         }
         //
-        T newValue;
+        VALUE newValue;
         Object o = v.getValue();
         if (o != null) {
           Class castType = getHolderType();
           if (castType.isAssignableFrom(o.getClass())) {
-            newValue = (T) o;
+            newValue = (VALUE) o;
           }
           else {
-            newValue = (T) TypeCastUtility.castValue(o, castType);
+            newValue = (VALUE) TypeCastUtility.castValue(o, castType);
           }
         }
         else {
@@ -213,7 +239,7 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
   @Override
   public void storeXML(SimpleXmlElement x) throws ProcessingException {
     super.storeXML(x);
-    T value = getValue();
+    VALUE value = getValue();
     try {
       x.setObjectAttribute("value", value);
     }
@@ -228,7 +254,7 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
   public void loadXML(SimpleXmlElement x) throws ProcessingException {
     super.loadXML(x);
     try {
-      T value = TypeCastUtility.castValue(x.getObjectAttribute("value", null), getHolderType());
+      VALUE value = TypeCastUtility.castValue(x.getObjectAttribute("value", null), getHolderType());
       setValue(value);
     }
     catch (Exception e) {
@@ -239,7 +265,7 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
 
   @Override
   public void resetValue() {
-    T newValue = getInitValue();
+    VALUE newValue = getInitValue();
     setValue(newValue);
     checkSaveNeeded();
     checkEmpty();
@@ -248,7 +274,7 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
   @Override
   public void refreshDisplayText() {
     if (shouldUpdateDisplayText(false)) {
-      String t = execFormatValue(getValue());
+      String t = interceptFormatValue(getValue());
       setDisplayText(t);
     }
   }
@@ -267,7 +293,7 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
     // fire listeners
     EventListener[] a = m_listeningSlaves.getListeners(MasterListener.class);
     if (a != null && a.length > 0) {
-      T masterValue = getValue();
+      VALUE masterValue = getValue();
       for (int i = 0; i < a.length; i++) {
         ((MasterListener) a[i]).masterChanged(masterValue);
       }
@@ -275,12 +301,12 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
   }
 
   @Override
-  public void setInitValue(T initValue) {
+  public void setInitValue(VALUE initValue) {
     m_initValue = initValue;
   }
 
   @Override
-  public T getInitValue() {
+  public VALUE getInitValue() {
     return m_initValue;
   }
 
@@ -292,7 +318,7 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
   @Override
   protected void execMarkSaved() throws ProcessingException {
     super.execMarkSaved();
-    T value = getValue();
+    VALUE value = getValue();
     setInitValue(value);
   }
 
@@ -303,7 +329,7 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
 
   @Override
   @SuppressWarnings("unchecked")
-  public T getValue() {
+  public VALUE getValue() {
     if (isValueValidating() && ClientSyncJob.isSyncClientJob()) {
       throw new IllegalStateException("The value of " + getClass().getSimpleName() + " can not be accessed while the value is beeing validated");
     }
@@ -321,11 +347,11 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
         i++;
       }
     }
-    return (T) propertySupport.getProperty(PROP_VALUE);
+    return (VALUE) propertySupport.getProperty(PROP_VALUE);
   }
 
   @Override
-  public final void setValue(T rawValue) {
+  public final void setValue(VALUE rawValue) {
     /**
      * @rn imo, 22.02.2006, set verifyInput flag while firing triggers when a
      *     message box is shown, the doOK of the form might overrun this
@@ -340,7 +366,7 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
       setFieldChanging(true);
       setValueChanging(true);
       //
-      T validatedValue = null;
+      VALUE validatedValue = null;
 
       if (getErrorStatus() instanceof ValidationFailedStatus) {
         clearErrorStatus();
@@ -370,11 +396,11 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
         return;
       }
       //
-      T oldValue = getValue();
+      VALUE oldValue = getValue();
       boolean changed = propertySupport.setPropertyNoFire(PROP_VALUE, validatedValue);
       // change text if auto-set-text enabled
       if (shouldUpdateDisplayText(CompareUtility.notEquals(rawValue, validatedValue))) {
-        String t = execFormatValue(validatedValue);
+        String t = interceptFormatValue(validatedValue);
         setDisplayText(t);
       }
       if (changed) {
@@ -386,7 +412,7 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
         fireMasterChanged();
         if (isValueChangeTriggerEnabled()) {
           try {
-            execChangedValue();
+            interceptChangedValue();
           }
           catch (ProcessingException ex) {
             SERVICES.getService(IExceptionHandlerService.class).handleException(ex);
@@ -402,7 +428,7 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
 
   /**
    * Computes if the displayText should be computed and displayed in the field.
-   * 
+   *
    * @param validValueDiffersFromRawValue
    *          indicates if there is business logic in {@link #validateValue(Object)} that changed the value of the field
    *          (in comparison to what has been parsed).
@@ -469,7 +495,7 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
       setValueChanging(true);
       //
       try {
-        execChangedValue();
+        interceptChangedValue();
       }
       catch (ProcessingException ex) {
         SERVICES.getService(IExceptionHandlerService.class).handleException(ex);
@@ -481,13 +507,19 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
     }
   }
 
-  private T validateValue(T rawValue) throws ProcessingException {
+  protected final VALUE interceptValidateValue(VALUE rawValue) throws ProcessingException {
+    List<? extends IValueFieldExtension<VALUE, ? extends AbstractValueField<VALUE>>> formFieldExtensions = getAllExtensions();
+    ValueFieldExecValidateChain<VALUE> chain = new ValueFieldExecValidateChain<VALUE>(formFieldExtensions);
+    return chain.execValidateValue(rawValue);
+  }
+
+  private VALUE validateValue(VALUE rawValue) throws ProcessingException {
     try {
       setValueValidating(true);
-      //
-      T o = rawValue;
+
+      VALUE o = rawValue;
       o = validateValueInternal(o);
-      o = execValidateValue(o);
+      o = interceptValidateValue(o);
       return o;
     }
     finally {
@@ -498,7 +530,7 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
   /**
    * override this method to perform detailed validation in subclasses
    */
-  protected T validateValueInternal(T rawValue) throws ProcessingException {
+  protected VALUE validateValueInternal(VALUE rawValue) throws ProcessingException {
     return rawValue;
   }
 
@@ -508,12 +540,12 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
    * Check the new proposed value and either make it valid by returning this or
    * another valid value or reject by throwing a {@link VetoException}, it will
    * then appear red in the gui.
-   * 
+   *
    * @return the validated value or throws an exception
    */
   @ConfigOperation
   @Order(190)
-  protected T execValidateValue(T rawValue) throws ProcessingException {
+  protected VALUE execValidateValue(VALUE rawValue) throws ProcessingException {
     return rawValue;
   }
 
@@ -543,7 +575,7 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
       setFieldChanging(true);
       setValueParsing(true);
       //
-      T parsedValue = execParseValue(text);
+      VALUE parsedValue = interceptParseValue(text);
 
       //
       IProcessingStatus oldErrorStatus = getErrorStatus();
@@ -588,36 +620,36 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
   /**
    * override this method to perform detailed parsing in subclasses
    */
-  protected T parseValueInternal(String text) throws ProcessingException {
+  protected VALUE parseValueInternal(String text) throws ProcessingException {
     throw new ProcessingException("Not implemented");
   }
 
   /**
    * parse input text and create an appropriate value
-   * 
+   *
    * @return parsed value, not yet validated
    */
   @ConfigOperation
   @Order(200)
-  protected T execParseValue(String text) throws ProcessingException {
+  protected VALUE execParseValue(String text) throws ProcessingException {
     return parseValueInternal(text);
   }
 
   /**
    * format a valid value for display
-   * 
+   *
    * @return formatted value
    */
   @ConfigOperation
   @Order(210)
-  protected String execFormatValue(T validValue) {
+  protected String execFormatValue(VALUE validValue) {
     return formatValueInternal(validValue);
   }
 
   /**
    * override this method to perform detailed formatting in subclasses
    */
-  protected String formatValueInternal(T validValue) {
+  protected String formatValueInternal(VALUE validValue) {
     return validValue != null ? validValue.toString() : "";
   }
 
@@ -661,11 +693,11 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
 
   @Override
   @SuppressWarnings("unchecked")
-  public Class<T> getHolderType() {
+  public Class<VALUE> getHolderType() {
     return TypeCastUtility.getGenericsParameterClass(getClass(), IHolder.class);
   }
 
-  public void updateFrom(IHolder<T> other) {
+  public void updateFrom(IHolder<VALUE> other) {
     setValue(other.getValue());
   }
 
@@ -680,6 +712,61 @@ public abstract class AbstractValueField<T> extends AbstractFormField implements
       }
     }
     return b;
+  }
+
+  /**
+   * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
+   * any further chain elements.
+   */
+  protected static class LocalValueFieldExtension<VALUE, OWNER extends AbstractValueField<VALUE>> extends AbstractFormField.LocalFormFieldExtension<OWNER>
+      implements IValueFieldExtension<VALUE, OWNER> {
+
+    public LocalValueFieldExtension(OWNER owner) {
+      super(owner);
+    }
+
+    @Override
+    public VALUE execValidateValue(ValueFieldExecValidateChain<VALUE> chain, VALUE rawValue) throws ProcessingException {
+      return getOwner().execValidateValue(rawValue);
+    }
+
+    @Override
+    public String execFormatValue(ValueFieldFormatValueChain<VALUE> chain, VALUE validValue) {
+      return getOwner().execFormatValue(validValue);
+    }
+
+    @Override
+    public VALUE execValidateValue(ValueFieldValidateValueChain<VALUE> chain, VALUE rawValue) throws ProcessingException {
+      return getOwner().execValidateValue(rawValue);
+    }
+
+    @Override
+    public void execChangedValue(ValueFieldChangedValueChain<VALUE> chain) throws ProcessingException {
+      getOwner().execChangedValue();
+    }
+
+    @Override
+    public VALUE execParseValue(ValueFieldParseValueChain<VALUE> chain, String text) throws ProcessingException {
+      return getOwner().execParseValue(text);
+    }
+  }
+
+  protected final String interceptFormatValue(VALUE validValue) {
+    List<? extends IValueFieldExtension<VALUE, ? extends AbstractValueField<VALUE>>> extensions = getAllExtensions();
+    ValueFieldFormatValueChain<VALUE> chain = new ValueFieldFormatValueChain<VALUE>(extensions);
+    return chain.execFormatValue(validValue);
+  }
+
+  protected final void interceptChangedValue() throws ProcessingException {
+    List<? extends IValueFieldExtension<VALUE, ? extends AbstractValueField<VALUE>>> extensions = getAllExtensions();
+    ValueFieldChangedValueChain<VALUE> chain = new ValueFieldChangedValueChain<VALUE>(extensions);
+    chain.execChangedValue();
+  }
+
+  protected final VALUE interceptParseValue(String text) throws ProcessingException {
+    List<? extends IValueFieldExtension<VALUE, ? extends AbstractValueField<VALUE>>> extensions = getAllExtensions();
+    ValueFieldParseValueChain<VALUE> chain = new ValueFieldParseValueChain<VALUE>(extensions);
+    return chain.execParseValue(text);
   }
 
 }

@@ -10,15 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.data.form.fields.composer;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.shared.data.form.fields.treefield.AbstractTreeFieldData;
 
 /**
  * Data representation for a composer tree field
  */
 public abstract class AbstractComposerData extends AbstractTreeFieldData {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractComposerData.class);
   private static final long serialVersionUID = 1L;
 
   public AbstractComposerData() {

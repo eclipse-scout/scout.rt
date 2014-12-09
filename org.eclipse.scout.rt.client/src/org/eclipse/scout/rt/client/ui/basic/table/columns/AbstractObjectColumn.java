@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.IObjectColumnExtension;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 
 /**
@@ -49,5 +50,17 @@ public abstract class AbstractObjectColumn extends AbstractColumn<Object> implem
       c = StringUtility.compareIgnoreCase(o1.toString(), o2.toString());
     }
     return c;
+  }
+
+  protected static class LocalObjectColumnExtension<OWNER extends AbstractObjectColumn> extends LocalColumnExtension<Object, OWNER> implements IObjectColumnExtension<OWNER> {
+
+    public LocalObjectColumnExtension(OWNER owner) {
+      super(owner);
+    }
+  }
+
+  @Override
+  protected IObjectColumnExtension<? extends AbstractObjectColumn> createLocalExtension() {
+    return new LocalObjectColumnExtension<AbstractObjectColumn>(this);
   }
 }

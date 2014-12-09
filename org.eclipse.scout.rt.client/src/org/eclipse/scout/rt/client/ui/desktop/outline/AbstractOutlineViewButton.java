@@ -14,6 +14,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.extension.ui.desktop.outline.IOutlineViewButtonExtension;
 import org.eclipse.scout.rt.client.ui.action.view.AbstractViewButton;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
@@ -24,7 +25,7 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 
-public abstract class AbstractOutlineViewButton extends AbstractViewButton {
+public abstract class AbstractOutlineViewButton extends AbstractViewButton implements IOutlineViewButton {
 
   private final IDesktop m_desktop;
   private final IOutline m_outline;
@@ -181,6 +182,28 @@ public abstract class AbstractOutlineViewButton extends AbstractViewButton {
   @Override
   protected final boolean getConfiguredVisible() {
     return super.getConfiguredVisible();
+  }
+
+  @Override
+  public IDesktop getDesktop() {
+    return m_desktop;
+  }
+
+  @Override
+  public IOutline getOutline() {
+    return m_outline;
+  }
+
+  protected static class LocalOutlineViewButtonExtension<OWNER extends AbstractOutlineViewButton> extends LocalViewButtonExtension<OWNER> implements IOutlineViewButtonExtension<OWNER> {
+
+    public LocalOutlineViewButtonExtension(OWNER owner) {
+      super(owner);
+    }
+  }
+
+  @Override
+  protected IOutlineViewButtonExtension<? extends AbstractOutlineViewButton> createLocalExtension() {
+    return new LocalOutlineViewButtonExtension<AbstractOutlineViewButton>(this);
   }
 
 }

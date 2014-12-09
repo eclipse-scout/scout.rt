@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 /**
  * empty implementation
  */
-public class AbstractTableCustomizer implements ITableCustomizer {
+public abstract class AbstractTableCustomizer implements ITableCustomizer {
 
   @Override
   public void addColumn() throws ProcessingException {

@@ -16,9 +16,9 @@ import org.eclipse.scout.rt.client.ui.valuecontainer.INumberValueContainer;
 /**
  * Field type representing a number
  * 
- * @param <T>
+ * @param <NUMBER>
  */
-public interface INumberField<T extends Number> extends IBasicField<T>, INumberValueContainer<T> {
+public interface INumberField<NUMBER extends Number> extends IBasicField<NUMBER>, INumberValueContainer<NUMBER> {
 
   /**
    * @deprecated use the facade defined by {@link IBasicField#getUIFacade()}. Will be removed with Scout 5.0

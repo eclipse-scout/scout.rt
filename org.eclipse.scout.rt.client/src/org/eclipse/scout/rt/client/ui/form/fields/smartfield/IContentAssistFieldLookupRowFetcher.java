@@ -16,7 +16,7 @@ import java.beans.PropertyChangeListener;
  *
  */
 
-public interface IContentAssistFieldLookupRowFetcher<KEY_TYPE> {
+public interface IContentAssistFieldLookupRowFetcher<LOOKUP_KEY> {
 
   String PROP_SEARCH_RESULT = "searchResult";
 
@@ -57,7 +57,7 @@ public interface IContentAssistFieldLookupRowFetcher<KEY_TYPE> {
    */
   void update(String searchText, boolean selectCurrentValue, boolean synchronous);
 
-  IContentAssistFieldDataFetchResult<KEY_TYPE> getResult();
+  IContentAssistFieldDataFetchResult<LOOKUP_KEY> getResult();
 
   /**
    * @return

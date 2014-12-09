@@ -20,7 +20,7 @@ import org.junit.Test;
 /**
  *
  */
-public class AbstractColumnTest extends AbstractColumn {
+public class AbstractColumnTest extends AbstractColumn<Object> {
 
   @Test
   public void testMapEditorFieldProperties() {

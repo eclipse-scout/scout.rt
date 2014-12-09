@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.form.fields.browserfield;
 
 import java.net.URL;
+import java.util.List;
 
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
@@ -20,6 +21,9 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.browserfield.BrowserFieldChains.BrowserFieldAcceptLocationChangeChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.browserfield.BrowserFieldChains.BrowserFieldLocationChangedChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.browserfield.IBrowserFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
@@ -141,7 +145,7 @@ public abstract class AbstractBrowserField extends AbstractValueField<RemoteFile
         catch (Throwable t) {
           //nop
         }
-        return execAcceptLocationChange(location, url != null ? url.getPath() : null, url != null && "local".equals(url.getHost()));
+        return interceptAcceptLocationChange(location, url != null ? url.getPath() : null, url != null && "local".equals(url.getHost()));
       }
       catch (Throwable t) {
         LOG.error("location: " + location, t);
@@ -159,12 +163,52 @@ public abstract class AbstractBrowserField extends AbstractValueField<RemoteFile
         catch (Throwable t) {
           //nop
         }
-        execLocationChanged(location, url != null ? url.getPath() : null, url != null && "local".equals(url.getHost()));
+        interceptLocationChanged(location, url != null ? url.getPath() : null, url != null && "local".equals(url.getHost()));
       }
       catch (Throwable t) {
         LOG.error("location: " + location, t);
       }
     }
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public List<? extends IBrowserFieldExtension<? extends AbstractBrowserField>> getAllExtensions() {
+    return (List<? extends IBrowserFieldExtension<? extends AbstractBrowserField>>) super.getAllExtensions();
+  }
+
+  protected final void interceptLocationChanged(String location, String path, boolean local) throws ProcessingException {
+    List<? extends IBrowserFieldExtension<? extends AbstractBrowserField>> extensions = getAllExtensions();
+    BrowserFieldLocationChangedChain chain = new BrowserFieldLocationChangedChain(extensions);
+    chain.execLocationChanged(location, path, local);
+  }
+
+  protected final boolean interceptAcceptLocationChange(String location, String path, boolean local) throws ProcessingException {
+    List<? extends IBrowserFieldExtension<? extends AbstractBrowserField>> extensions = getAllExtensions();
+    BrowserFieldAcceptLocationChangeChain chain = new BrowserFieldAcceptLocationChangeChain(extensions);
+    return chain.execAcceptLocationChange(location, path, local);
+  }
+
+  protected static class LocalBrowserFieldExtension<OWNER extends AbstractBrowserField> extends LocalValueFieldExtension<RemoteFile, OWNER> implements IBrowserFieldExtension<OWNER> {
+
+    public LocalBrowserFieldExtension(OWNER owner) {
+      super(owner);
+    }
+
+    @Override
+    public void execLocationChanged(BrowserFieldLocationChangedChain chain, String location, String path, boolean local) throws ProcessingException {
+      getOwner().execLocationChanged(location, path, local);
+    }
+
+    @Override
+    public boolean execAcceptLocationChange(BrowserFieldAcceptLocationChangeChain chain, String location, String path, boolean local) throws ProcessingException {
+      return getOwner().execAcceptLocationChange(location, path, local);
+    }
+  }
+
+  @Override
+  protected IBrowserFieldExtension<? extends AbstractBrowserField> createLocalExtension() {
+    return new LocalBrowserFieldExtension<AbstractBrowserField>(this);
   }
 
 }

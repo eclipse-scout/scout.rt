@@ -15,6 +15,7 @@ import java.beans.PropertyChangeListener;
 
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.pagefield.IPageFieldExtension;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
@@ -190,6 +191,18 @@ public abstract class AbstractPageField<T extends IPage> extends AbstractGroupBo
       return true;
     }
 
+  }
+
+  protected static class LocalPageFieldExtension<T extends IPage, OWNER extends AbstractPageField<T>> extends LocalGroupBoxExtension<OWNER> implements IPageFieldExtension<T, OWNER> {
+
+    public LocalPageFieldExtension(OWNER owner) {
+      super(owner);
+    }
+  }
+
+  @Override
+  protected IPageFieldExtension<T, ? extends AbstractPageField<T>> createLocalExtension() {
+    return new LocalPageFieldExtension<T, AbstractPageField<T>>(this);
   }
 
 }

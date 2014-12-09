@@ -31,7 +31,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Widget;
 
 @SuppressWarnings("restriction")
-public class AbstractRwtMenuAction {
+public abstract class AbstractRwtMenuAction {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractRwtMenuAction.class);
 
   private final IAction m_scoutAction;

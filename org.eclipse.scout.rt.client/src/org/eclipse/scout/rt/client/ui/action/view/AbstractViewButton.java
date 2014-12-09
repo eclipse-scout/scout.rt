@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.action.view;
 
+import org.eclipse.scout.rt.client.extension.ui.action.view.IViewButtonExtension;
 import org.eclipse.scout.rt.client.ui.action.AbstractAction;
 
 public abstract class AbstractViewButton extends AbstractAction implements IViewButton {
@@ -20,5 +21,17 @@ public abstract class AbstractViewButton extends AbstractAction implements IView
 
   public AbstractViewButton(boolean callInitializer) {
     super(callInitializer);
+  }
+
+  protected static class LocalViewButtonExtension<OWNER extends AbstractViewButton> extends LocalActionExtension<OWNER> implements IViewButtonExtension<OWNER> {
+
+    public LocalViewButtonExtension(OWNER owner) {
+      super(owner);
+    }
+  }
+
+  @Override
+  protected IViewButtonExtension<? extends AbstractViewButton> createLocalExtension() {
+    return new LocalViewButtonExtension<AbstractViewButton>(this);
   }
 }

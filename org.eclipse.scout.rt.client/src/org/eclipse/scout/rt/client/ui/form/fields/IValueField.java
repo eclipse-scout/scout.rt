@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.root.IValueFieldContextMenu;
  * @see ITextField, ISmartField, INumberField, IDateField, IFileChooser,
  *      IListBox, ITreeBox, ICheckBox, IRadioButton, IToogleButton
  */
-public interface IValueField<T> extends IFormField, IHolder<T> {
+public interface IValueField<VALUE> extends IFormField, IHolder<VALUE> {
   /*
    * Properties
    */
@@ -75,15 +75,15 @@ public interface IValueField<T> extends IFormField, IHolder<T> {
   /**
    * Value
    */
-  T getInitValue();
+  VALUE getInitValue();
 
-  void setInitValue(T initValue);
+  void setInitValue(VALUE initValue);
 
   /**
    * get currently validated value
    */
   @Override
-  T getValue();
+  VALUE getValue();
 
   /**
    * set a new value The new value is validated calls validateInternal and then
@@ -91,7 +91,7 @@ public interface IValueField<T> extends IFormField, IHolder<T> {
    * execChangedValue
    */
   @Override
-  void setValue(T o);
+  void setValue(VALUE o);
 
   /**
    * parse a new value The new value is parsed calls execParseValue which

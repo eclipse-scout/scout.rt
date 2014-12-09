@@ -20,11 +20,11 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 /**
  *
  */
-public class ContentAssistFieldDataFetcher<LOOKUP_TYPE> extends AbstractContentAssistFieldLookupRowFetcher<LOOKUP_TYPE> {
+public class ContentAssistFieldDataFetcher<LOOKUP_KEY> extends AbstractContentAssistFieldLookupRowFetcher<LOOKUP_KEY> {
 
   private JobEx m_dataLoadJob;
 
-  public ContentAssistFieldDataFetcher(IContentAssistField<?, LOOKUP_TYPE> proposalField) {
+  public ContentAssistFieldDataFetcher(IContentAssistField<?, LOOKUP_KEY> proposalField) {
     super(proposalField);
 
   }
@@ -40,11 +40,11 @@ public class ContentAssistFieldDataFetcher<LOOKUP_TYPE> extends AbstractContentA
     if (m_dataLoadJob != null) {
       m_dataLoadJob.cancel();
     }
-    ILookupCallFetcher<LOOKUP_TYPE> fetcher = new P_LookupCallFetcher(searchText, selectCurrentValue);
+    ILookupCallFetcher<LOOKUP_KEY> fetcher = new P_LookupCallFetcher(searchText, selectCurrentValue);
     // go async/sync
     if (synchronous) {
       try {
-        List<? extends ILookupRow<LOOKUP_TYPE>> rows;
+        List<? extends ILookupRow<LOOKUP_KEY>> rows;
         if (IContentAssistField.BROWSE_ALL_TEXT.equals(text)) {
           rows = getContentAssistField().callBrowseLookup(text, maxCount > 0 ? maxCount + 1 : 0);
         }
@@ -73,7 +73,7 @@ public class ContentAssistFieldDataFetcher<LOOKUP_TYPE> extends AbstractContentA
     }
   }
 
-  private class P_LookupCallFetcher implements ILookupCallFetcher<LOOKUP_TYPE> {
+  private class P_LookupCallFetcher implements ILookupCallFetcher<LOOKUP_KEY> {
     private String m_searchText;
     private boolean m_selectCurrentValue;
 
@@ -84,8 +84,8 @@ public class ContentAssistFieldDataFetcher<LOOKUP_TYPE> extends AbstractContentA
     }
 
     @Override
-    public void dataFetched(List<? extends ILookupRow<LOOKUP_TYPE>> rows, ProcessingException failed) {
-      setResult(new ContentAssistFieldDataFetchResult<LOOKUP_TYPE>(rows, failed, m_searchText, m_selectCurrentValue));
+    public void dataFetched(List<? extends ILookupRow<LOOKUP_KEY>> rows, ProcessingException failed) {
+      setResult(new ContentAssistFieldDataFetchResult<LOOKUP_KEY>(rows, failed, m_searchText, m_selectCurrentValue));
     }
   }
 }

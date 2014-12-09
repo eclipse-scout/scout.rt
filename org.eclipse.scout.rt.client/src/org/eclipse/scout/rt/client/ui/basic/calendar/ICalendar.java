@@ -99,7 +99,7 @@ public interface ICalendar extends IPropertyObserver {
    * Container of this calendar, {@link ICalendarField}
    * <p>
    * https://bugs.eclipse.org/bugs/show_bug.cgi?id=388227
-   * 
+   *
    * @since 3.8.1
    */
   String PROP_CONTAINER = "container";
@@ -172,7 +172,7 @@ public interface ICalendar extends IPropertyObserver {
 
   /**
    * when performing a batch mutation use this marker like
-   * 
+   *
    * <pre>
    * try{
    *   setCalendarChanging(true);
@@ -192,7 +192,7 @@ public interface ICalendar extends IPropertyObserver {
    * Together with getEndHour and getOverflowCells is defines the timeline of a day.
    * <p>
    * Default {@code 6}.
-   * 
+   *
    * @see getEndHour
    * @see getUseOverflowCells
    */
@@ -205,7 +205,7 @@ public interface ICalendar extends IPropertyObserver {
    * Together with getStartHour and getUseOverflowCells is defines the timeline of a day.
    * <p>
    * Default {@code 19}.
-   * 
+   *
    * @see getStartHour
    * @see getUseOverflowCells
    */
@@ -221,7 +221,7 @@ public interface ICalendar extends IPropertyObserver {
    * Appointments that are outside the defined hours of the calender are still shown in the first and last cell.
    * <p>
    * Default {@code true}.
-   * 
+   *
    * @see getEndHour
    * @see getStartHour
    */
@@ -264,7 +264,7 @@ public interface ICalendar extends IPropertyObserver {
    * Container of this calendar, {@link ICalendarField}
    * <p>
    * {@link IListBox} https://bugs.eclipse.org/bugs/show_bug.cgi?id=388227
-   * 
+   *
    * @since 3.8.1
    */
   Object getContainer();

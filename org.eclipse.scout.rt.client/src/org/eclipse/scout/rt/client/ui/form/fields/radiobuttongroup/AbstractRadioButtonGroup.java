@@ -13,8 +13,11 @@ package org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
@@ -24,15 +27,19 @@ import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.annotations.OrderedComparator;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.radiobuttongroup.IRadioButtonGroupExtension;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.radiobuttongroup.RadioButtonGroupChains.RadioButtonGroupFilterLookupResultChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.radiobuttongroup.RadioButtonGroupChains.RadioButtonGroupPrepareLookupChain;
 import org.eclipse.scout.rt.client.services.lookup.FormFieldProvisioningContext;
 import org.eclipse.scout.rt.client.services.lookup.ILookupCallProvisioningService;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
+import org.eclipse.scout.rt.client.ui.form.fields.CompositeFieldUtility;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractRadioButton;
@@ -65,6 +72,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
   private RadioButtonGroupGrid m_grid;
   private List<IFormField> m_fields;
   private List<IRadioButton<T>> m_radioButtons;
+  private Map<Class<? extends IFormField>, IFormField> m_movedFormFieldsByClass;
 
   public AbstractRadioButtonGroup() {
     this(true);
@@ -91,7 +99,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
   /**
    * All codes returned by the configured {@link ICodeType} are used as radio
    * buttons.<br>
-   * However, the {@link #execFilterLookupResult(LookupCall, List)} can be used
+   * However, the {@link #interceptFilterLookupResult(LookupCall, List)} can be used
    * to manipulate the codes which shall be used.
    */
   @ConfigProperty(ConfigProperty.CODE_TYPE)
@@ -131,6 +139,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
   @Override
   protected void initConfig() {
     m_fields = CollectionUtility.emptyArrayList();
+    m_movedFormFieldsByClass = new HashMap<Class<? extends IFormField>, IFormField>();
     m_grid = new RadioButtonGroupGrid(this);
     super.initConfig();
     // Configured CodeType
@@ -149,8 +158,9 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
       }
     }
     // add fields
-    List<Class<? extends IFormField>> configuredFields = getConfiguredFields();
-    List<IFormField> fieldList = new ArrayList<IFormField>(configuredFields.size());
+    List<Class<IFormField>> configuredFields = getConfiguredFields();
+    List<IFormField> contributedFields = m_contributionHolder.getContributionsByClass(IFormField.class);
+    List<IFormField> fieldList = new ArrayList<IFormField>(configuredFields.size() + contributedFields.size());
     for (Class<? extends IFormField> fieldClazz : configuredFields) {
       try {
         fieldList.add(ConfigurationUtility.newInnerInstance(this, fieldClazz));
@@ -159,7 +169,9 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
         SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + fieldClazz.getName() + "'.", t));
       }
     }
+    fieldList.addAll(contributedFields);
     injectFieldsInternal(fieldList);
+    Collections.sort(fieldList, new OrderedComparator());
     for (IFormField f : fieldList) {
       f.setParentFieldInternal(this);
     }
@@ -177,7 +189,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
       }
     }
     m_radioButtons = buttonList;
-    //decorate radiobuttons
+    //decorate radio buttons
     for (IRadioButton b : m_radioButtons) {
       b.addPropertyChangeListener(new P_ButtonPropertyChangeListener());
     }
@@ -203,7 +215,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
   /**
    * do not use this internal method<br>
    * Used to manage field list and add/remove fields (see {@link AbstractGroupBox} with wizard buttons)
-   * 
+   *
    * @param fieldList
    *          live and mutable list of configured fields, not yet initialized
    *          and added to composite field
@@ -229,6 +241,26 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
         SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException(this.getClass().getSimpleName(), e));
       }
     }
+  }
+
+  @Override
+  public void addField(IFormField f) {
+    CompositeFieldUtility.addField(f, this, m_fields);
+  }
+
+  @Override
+  public void removeField(IFormField f) {
+    CompositeFieldUtility.removeField(f, this, m_fields);
+  }
+
+  @Override
+  public void moveFieldTo(IFormField f, ICompositeField newContainer) {
+    CompositeFieldUtility.moveFieldTo(f, this, newContainer, m_movedFormFieldsByClass);
+  }
+
+  @Override
+  public Map<Class<? extends IFormField>, IFormField> getMovedFields() {
+    return Collections.unmodifiableMap(m_movedFormFieldsByClass);
   }
 
   public ILookupCall<T> getLookupCall() {
@@ -257,10 +289,9 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
     }
   }
 
-  protected List<Class<? extends IFormField>> getConfiguredFields() {
+  protected List<Class<IFormField>> getConfiguredFields() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    List<Class<IFormField>> filtered = ConfigurationUtility.filterClasses(dca, IFormField.class);
-    return ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IFormField.class);
+    return ConfigurationUtility.filterClasses(dca, IFormField.class);
   }
 
   /*
@@ -279,7 +310,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
   /**
    * Returns the LookupRows using {@link #getLookupCall()}, {@link #prepareLookupCall(LookupCall)} and
    * {@link #filterLookup(LookupCall, List)}.
-   * 
+   *
    * @return
    * @throws ProcessingException
    */
@@ -304,7 +335,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
 
   private void prepareLookupCall(ILookupCall<T> call) {
     prepareLookupCallInternal(call);
-    execPrepareLookup(call);
+    interceptPrepareLookup(call);
   }
 
   private void prepareLookupCallInternal(ILookupCall<T> call) {
@@ -316,7 +347,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
   }
 
   private void filterLookup(ILookupCall<T> call, List<ILookupRow<T>> result) throws ProcessingException {
-    execFilterLookupResult(call, result);
+    interceptFilterLookupResult(call, result);
 
     // filter invalid rows
     Iterator<ILookupRow<T>> resultIt = result.iterator();
@@ -467,53 +498,18 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public <F extends IFormField> F getFieldByClass(final Class<F> c) {
-    final Holder<IFormField> found = new Holder<IFormField>(IFormField.class);
-    IFormFieldVisitor v = new IFormFieldVisitor() {
-      @Override
-      public boolean visitField(IFormField field, int level, int fieldIndex) {
-        if (field.getClass() == c) {
-          found.setValue(field);
-        }
-        return found.getValue() == null;
-      }
-    };
-    visitFields(v, 0);
-    return (F) found.getValue();
+  public <F extends IFormField> F getFieldByClass(Class<F> c) {
+    return CompositeFieldUtility.getFieldByClass(this, c);
   }
 
   @Override
-  public IFormField getFieldById(final String id) {
-    final Holder<IFormField> found = new Holder<IFormField>(IFormField.class);
-    IFormFieldVisitor v = new IFormFieldVisitor() {
-      @Override
-      public boolean visitField(IFormField field, int level, int fieldIndex) {
-        if (field.getFieldId().equals(id)) {
-          found.setValue(field);
-        }
-        return found.getValue() == null;
-      }
-    };
-    visitFields(v, 0);
-    return found.getValue();
+  public IFormField getFieldById(String id) {
+    return CompositeFieldUtility.getFieldById(this, id);
   }
 
   @Override
-  public <X extends IFormField> X getFieldById(final String id, final Class<X> type) {
-    final Holder<X> found = new Holder<X>(type);
-    IFormFieldVisitor v = new IFormFieldVisitor() {
-      @Override
-      @SuppressWarnings("unchecked")
-      public boolean visitField(IFormField field, int level, int fieldIndex) {
-        if (type.isAssignableFrom(field.getClass()) && field.getFieldId().equals(id)) {
-          found.setValue((X) field);
-        }
-        return found.getValue() == null;
-      }
-    };
-    visitFields(v, 0);
-    return found.getValue();
+  public <X extends IFormField> X getFieldById(String id, Class<X> type) {
+    return CompositeFieldUtility.getFieldById(this, id, type);
   }
 
   @Override
@@ -640,5 +636,45 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
     protected void initConfig() {
       super.initConfig();
     }
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public List<? extends IRadioButtonGroupExtension<T, ? extends AbstractRadioButtonGroup<T>>> getAllExtensions() {
+    return (List<? extends IRadioButtonGroupExtension<T, ? extends AbstractRadioButtonGroup<T>>>) super.getAllExtensions();
+  }
+
+  protected final void interceptPrepareLookup(ILookupCall<T> call) {
+    List<? extends IRadioButtonGroupExtension<T, ? extends AbstractRadioButtonGroup<T>>> extensions = getAllExtensions();
+    RadioButtonGroupPrepareLookupChain<T> chain = new RadioButtonGroupPrepareLookupChain<T>(extensions);
+    chain.execPrepareLookup(call);
+  }
+
+  protected final void interceptFilterLookupResult(ILookupCall<T> call, List<ILookupRow<T>> result) throws ProcessingException {
+    List<? extends IRadioButtonGroupExtension<T, ? extends AbstractRadioButtonGroup<T>>> extensions = getAllExtensions();
+    RadioButtonGroupFilterLookupResultChain<T> chain = new RadioButtonGroupFilterLookupResultChain<T>(extensions);
+    chain.execFilterLookupResult(call, result);
+  }
+
+  protected static class LocalRadioButtonGroupExtension<T, OWNER extends AbstractRadioButtonGroup<T>> extends LocalValueFieldExtension<T, OWNER> implements IRadioButtonGroupExtension<T, OWNER> {
+
+    public LocalRadioButtonGroupExtension(OWNER owner) {
+      super(owner);
+    }
+
+    @Override
+    public void execPrepareLookup(RadioButtonGroupPrepareLookupChain<T> chain, ILookupCall<T> call) {
+      getOwner().execPrepareLookup(call);
+    }
+
+    @Override
+    public void execFilterLookupResult(RadioButtonGroupFilterLookupResultChain<T> chain, ILookupCall<T> call, List<ILookupRow<T>> result) throws ProcessingException {
+      getOwner().execFilterLookupResult(call, result);
+    }
+  }
+
+  @Override
+  protected IRadioButtonGroupExtension<T, ? extends AbstractRadioButtonGroup<T>> createLocalExtension() {
+    return new LocalRadioButtonGroupExtension<T, AbstractRadioButtonGroup<T>>(this);
   }
 }

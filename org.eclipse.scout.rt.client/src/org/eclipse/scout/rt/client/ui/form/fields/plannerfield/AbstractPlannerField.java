@@ -25,6 +25,11 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.plannerfield.IPlannerFieldExtension;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.plannerfield.PlannerFieldChains.PlannerFieldLoadActivityMapDataChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.plannerfield.PlannerFieldChains.PlannerFieldLoadResourceTableDataChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.plannerfield.PlannerFieldChains.PlannerFieldPopulateActivitiesChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.plannerfield.PlannerFieldChains.PlannerFieldPopulateResourceTableChain;
 import org.eclipse.scout.rt.client.ui.basic.activitymap.AbstractActivityMap;
 import org.eclipse.scout.rt.client.ui.basic.activitymap.ActivityCell;
 import org.eclipse.scout.rt.client.ui.basic.activitymap.IActivityMap;
@@ -93,12 +98,12 @@ public abstract class AbstractPlannerField<T extends ITable, P extends IActivity
   }
 
   /**
-   * interceptor is called after data was fetched from LookupCall and is adding
+   * Interceptor is called after data was fetched from LookupCall and is adding
    * a table row for every LookupRow using IListBoxTable.createTableRow(row) and
    * ITable.addRows()
    * <p>
    * For most cases the override of just {@link #execLoadTableData()} is sufficient
-   * 
+   *
    * <pre>
    * Object[][] data = execLoadResourceTableData();
    * getResourceTable().replaceRowsByMatrix(data);
@@ -107,7 +112,7 @@ public abstract class AbstractPlannerField<T extends ITable, P extends IActivity
   @ConfigOperation
   @Order(20)
   protected void execPopulateResourceTable() throws ProcessingException {
-    Object[][] data = execLoadResourceTableData();
+    Object[][] data = interceptLoadResourceTableData();
     getResourceTable().replaceRowsByMatrix(data);
   }
 
@@ -133,14 +138,15 @@ public abstract class AbstractPlannerField<T extends ITable, P extends IActivity
 
   /**
    * Load activity data<br>
-   * By default loads data using {@link #execLoadActivityMapData(List, List)}, transforms to {@link ActivityCell}, maps
+   * By default loads data using {@link #interceptLoadActivityMapData(List, List)}, transforms to {@link ActivityCell},
+   * maps
    * to resources using the resourceId, and sets the {@link ActivityCell}s on the
    * corresponding activtyRow.
    */
   @ConfigOperation
   @Order(10)
   protected void execPopulateActivities(List<RI> resourceIds, List<ITableRow> resourceRows) throws ProcessingException {
-    Object[][] data = execLoadActivityMapData(resourceIds, resourceRows);
+    Object[][] data = interceptLoadActivityMapData(resourceIds, resourceRows);
     ArrayList<ActivityCell<RI, AI>> list = new ArrayList<ActivityCell<RI, AI>>();
     for (Object[] row : data) {
       ActivityCell<RI, AI> cell = new ActivityCell<RI, AI>(row);
@@ -157,51 +163,71 @@ public abstract class AbstractPlannerField<T extends ITable, P extends IActivity
     super.initConfig();
     setMiniCalendarCount(getConfiguredMiniCalendarCount());
     setSplitterPosition(getConfiguredSplitterPosition());
-    if (getConfiguredResourceTable() != null) {
-      try {
-        m_resourceTable = (T) ConfigurationUtility.newInnerInstance(this, getConfiguredResourceTable());
-        if (m_resourceTable instanceof AbstractTable) {
-          ((AbstractTable) m_resourceTable).setContainerInternal(this);
+
+    List<ITable> contributedTables = m_contributionHolder.getContributionsByClass(ITable.class);
+    m_resourceTable = (T) CollectionUtility.firstElement(contributedTables);
+    if (m_resourceTable == null) {
+      Class<? extends ITable> configuredResourceTable = getConfiguredResourceTable();
+      if (configuredResourceTable != null) {
+        try {
+          m_resourceTable = (T) ConfigurationUtility.newInnerInstance(this, configuredResourceTable);
         }
-        m_resourceTable.setEnabled(isEnabled());
+        catch (Exception e) {
+          SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + getConfiguredResourceTable().getName() + "'.", e));
+        }
       }
-      catch (Exception e) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + getConfiguredResourceTable().getName() + "'.", e));
+    }
+
+    if (m_resourceTable != null) {
+      if (m_resourceTable instanceof AbstractTable) {
+        ((AbstractTable) m_resourceTable).setContainerInternal(this);
       }
+      m_resourceTable.setEnabled(isEnabled());
+
       for (IColumn c : getResourceTable().getColumnSet().getKeyColumns()) {
         m_resourceIdColumn = c;
         break;
       }
+
+      // add mediator between resource table and activity map table
+      m_resourceTable.addTableListener(new P_ResourceTableListener());
     }
     else {
       LOG.warn("there is no inner class of type ITable in " + getClass());
     }
-    if (getConfiguredActivityMap() != null) {
-      try {
-        m_activityMap = (P) ConfigurationUtility.newInnerInstance(this, getConfiguredActivityMap());
+
+    List<IActivityMap> contributedActivityMaps = m_contributionHolder.getContributionsByClass(IActivityMap.class);
+    m_activityMap = (P) CollectionUtility.firstElement(contributedActivityMaps);
+    if (m_activityMap == null) {
+      Class<? extends IActivityMap> configuredActivityMap = getConfiguredActivityMap();
+      if (configuredActivityMap != null) {
+        try {
+          m_activityMap = (P) ConfigurationUtility.newInnerInstance(this, configuredActivityMap);
+        }
+        catch (Exception e) {
+          SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + configuredActivityMap.getName() + "'.", e));
+        }
       }
-      catch (Exception e) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + getConfiguredActivityMap().getName() + "'.", e));
-      }
+    }
+
+    if (m_activityMap != null) {
       if (m_activityMap instanceof AbstractActivityMap) {
         ((AbstractActivityMap) m_activityMap).setContainerInternal(this);
       }
+      m_activityMap.addPropertyChangeListener(
+          new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent e) {
+              if (e.getPropertyName().equals(IActivityMap.PROP_SELECTED_RESOURCE_IDS)) {
+                syncSelectionFromActivityToResource();
+              }
+            }
+          }
+          );
     }
     else {
       LOG.warn("there is no inner class of type IActivityMap in " + getClass());
     }
-    // add mediator between resource table and activitymap table
-    m_resourceTable.addTableListener(new P_ResourceTableListener());
-    m_activityMap.addPropertyChangeListener(
-        new PropertyChangeListener() {
-          @Override
-          public void propertyChange(PropertyChangeEvent e) {
-            if (e.getPropertyName().equals(IActivityMap.PROP_SELECTED_RESOURCE_IDS)) {
-              syncSelectionFromActivityToResource();
-            }
-          }
-        }
-        );
   }
 
   /*
@@ -261,7 +287,7 @@ public abstract class AbstractPlannerField<T extends ITable, P extends IActivity
 
   @Override
   public void loadResourceTableData() throws ProcessingException {
-    execPopulateResourceTable();
+    interceptPopulateResourceTable();
   }
 
   @Override
@@ -278,7 +304,7 @@ public abstract class AbstractPlannerField<T extends ITable, P extends IActivity
     List<RI> resourceIds = getResourceIdColumnInternal().getValues(resourceRows);
     try {
       getActivityMap().setActivityMapChanging(true);
-      execPopulateActivities(CollectionUtility.arrayList(resourceIds), CollectionUtility.arrayList(resourceRows));
+      interceptPopulateActivities(CollectionUtility.arrayList(resourceIds), CollectionUtility.arrayList(resourceRows));
     }
     finally {
       getActivityMap().setActivityMapChanging(false);
@@ -417,6 +443,68 @@ public abstract class AbstractPlannerField<T extends ITable, P extends IActivity
         }
       }
     }
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public List<? extends IPlannerFieldExtension<T, P, RI, AI, ? extends AbstractPlannerField<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI>>> getAllExtensions() {
+    return (List<? extends IPlannerFieldExtension<T, P, RI, AI, ? extends AbstractPlannerField<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI>>>) super.getAllExtensions();
+  }
+
+  protected final void interceptPopulateActivities(List<RI> resourceIds, List<ITableRow> resourceRows) throws ProcessingException {
+    List<? extends IPlannerFieldExtension<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI, ? extends AbstractPlannerField<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI>>> extensions = getAllExtensions();
+    PlannerFieldPopulateActivitiesChain<T, P, RI, AI> chain = new PlannerFieldPopulateActivitiesChain<T, P, RI, AI>(extensions);
+    chain.execPopulateActivities(resourceIds, resourceRows);
+  }
+
+  protected final Object[][] interceptLoadResourceTableData() throws ProcessingException {
+    List<? extends IPlannerFieldExtension<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI, ? extends AbstractPlannerField<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI>>> extensions = getAllExtensions();
+    PlannerFieldLoadResourceTableDataChain<T, P, RI, AI> chain = new PlannerFieldLoadResourceTableDataChain<T, P, RI, AI>(extensions);
+    return chain.execLoadResourceTableData();
+  }
+
+  protected final void interceptPopulateResourceTable() throws ProcessingException {
+    List<? extends IPlannerFieldExtension<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI, ? extends AbstractPlannerField<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI>>> extensions = getAllExtensions();
+    PlannerFieldPopulateResourceTableChain<T, P, RI, AI> chain = new PlannerFieldPopulateResourceTableChain<T, P, RI, AI>(extensions);
+    chain.execPopulateResourceTable();
+  }
+
+  protected final Object[][] interceptLoadActivityMapData(List<? extends RI> resourceIds, List<? extends ITableRow> resourceRows) throws ProcessingException {
+    List<? extends IPlannerFieldExtension<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI, ? extends AbstractPlannerField<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI>>> extensions = getAllExtensions();
+    PlannerFieldLoadActivityMapDataChain<T, P, RI, AI> chain = new PlannerFieldLoadActivityMapDataChain<T, P, RI, AI>(extensions);
+    return chain.execLoadActivityMapData(resourceIds, resourceRows);
+  }
+
+  protected static class LocalPlannerFieldExtension<T extends ITable, P extends IActivityMap<RI, AI>, RI, AI, OWNER extends AbstractPlannerField<T, P, RI, AI>> extends LocalFormFieldExtension<OWNER> implements IPlannerFieldExtension<T, P, RI, AI, OWNER> {
+
+    public LocalPlannerFieldExtension(OWNER owner) {
+      super(owner);
+    }
+
+    @Override
+    public void execPopulateActivities(PlannerFieldPopulateActivitiesChain<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI> chain, List<RI> resourceIds, List<ITableRow> resourceRows) throws ProcessingException {
+      getOwner().execPopulateActivities(resourceIds, resourceRows);
+    }
+
+    @Override
+    public Object[][] execLoadResourceTableData(PlannerFieldLoadResourceTableDataChain<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI> chain) throws ProcessingException {
+      return getOwner().execLoadResourceTableData();
+    }
+
+    @Override
+    public void execPopulateResourceTable(PlannerFieldPopulateResourceTableChain<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI> chain) throws ProcessingException {
+      getOwner().execPopulateResourceTable();
+    }
+
+    @Override
+    public Object[][] execLoadActivityMapData(PlannerFieldLoadActivityMapDataChain<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI> chain, List<? extends RI> resourceIds, List<? extends ITableRow> resourceRows) throws ProcessingException {
+      return getOwner().execLoadActivityMapData(resourceIds, resourceRows);
+    }
+  }
+
+  @Override
+  protected IPlannerFieldExtension<T, P, RI, AI, ? extends AbstractPlannerField<T, P, RI, AI>> createLocalExtension() {
+    return new LocalPlannerFieldExtension<T, P, RI, AI, AbstractPlannerField<T, P, RI, AI>>(this);
   }
 
 }

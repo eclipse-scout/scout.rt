@@ -1,0 +1,74 @@
+/*******************************************************************************
+ * Copyright (c) 2014 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+package org.eclipse.scout.rt.shared.extension.services.common.code;
+
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+
+import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.annotations.OrderedComparator;
+import org.eclipse.scout.rt.shared.extension.AbstractMoveModelObjectHandler;
+import org.eclipse.scout.rt.shared.services.common.code.ICode;
+
+public class MoveCodesHandler<CODE_ID, CODE extends ICode<CODE_ID>> extends AbstractMoveModelObjectHandler<CODE> {
+
+  public MoveCodesHandler(List<CODE> rootModelObjects) {
+    super("code", rootModelObjects);
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  protected CODE getParent(CODE child) {
+    return (CODE) child.getParentCode();
+  }
+
+  @Override
+  protected void removeChild(CODE parent, CODE child) {
+    parent.removeChildCodeInternal(child.getId());
+  }
+
+  @Override
+  protected void addChild(CODE parent, CODE child) {
+    parent.addChildCodeInternal(-1, child);
+    sortChildren(parent);
+  }
+
+  @Override
+  protected void sortChildren(CODE parent) {
+    List<? extends ICode<CODE_ID>> childCodes = parent.getChildCodes(false);
+    Collections.sort(childCodes, new OrderedComparator());
+    int index = 0;
+    for (ICode<CODE_ID> code : childCodes) {
+      parent.addChildCodeInternal(index, code);
+      index++;
+    }
+  }
+
+  @Override
+  protected List<CODE> collectAllModelObjects() {
+    List<CODE> allCodes = new LinkedList<CODE>();
+    collectAllCodes(getRootModelObjects(), allCodes);
+    return allCodes;
+  }
+
+  private void collectAllCodes(List<? extends CODE> codes, List<CODE> allCodes) {
+    if (CollectionUtility.isEmpty(codes)) {
+      return;
+    }
+    allCodes.addAll(codes);
+    for (CODE actionNode : codes) {
+      @SuppressWarnings("unchecked")
+      List<? extends CODE> childCodes = (List<? extends CODE>) actionNode.getChildCodes(false);
+      collectAllCodes(childCodes, allCodes);
+    }
+  }
+}

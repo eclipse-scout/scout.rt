@@ -15,6 +15,7 @@ import java.beans.PropertyChangeListener;
 import java.util.HashSet;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.extension.ui.wizard.IWizardContainerFormExtension;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 
@@ -146,6 +147,18 @@ public abstract class AbstractWizardContainerForm extends AbstractForm implement
     public void propertyChange(PropertyChangeEvent evt) {
       handleWizardPropertyChanged(evt.getPropertyName(), evt.getOldValue(), evt.getNewValue());
     }
+  }
+
+  protected static class LocalWizardContainerFormExtension<OWNER extends AbstractWizardContainerForm> extends LocalFormExtension<OWNER> implements IWizardContainerFormExtension<OWNER> {
+
+    public LocalWizardContainerFormExtension(OWNER owner) {
+      super(owner);
+    }
+  }
+
+  @Override
+  protected IWizardContainerFormExtension<? extends AbstractWizardContainerForm> createLocalExtension() {
+    return new LocalWizardContainerFormExtension<AbstractWizardContainerForm>(this);
   }
 
 }

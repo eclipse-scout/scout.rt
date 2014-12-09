@@ -15,6 +15,7 @@ import java.math.BigInteger;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.IBigIntegerColumnExtension;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.bigintegerfield.AbstractBigIntegerField;
 
@@ -67,6 +68,18 @@ public abstract class AbstractBigIntegerColumn extends AbstractNumberColumn<BigI
   protected AbstractBigIntegerField getEditorField() {
     return new AbstractBigIntegerField() {
     };
+  }
+
+  protected static class LocalBigIntegerColumnExtension<OWNER extends AbstractBigIntegerColumn> extends LocalNumberColumnExtension<BigInteger, OWNER> implements IBigIntegerColumnExtension<OWNER> {
+
+    public LocalBigIntegerColumnExtension(OWNER owner) {
+      super(owner);
+    }
+  }
+
+  @Override
+  protected IBigIntegerColumnExtension<? extends AbstractBigIntegerColumn> createLocalExtension() {
+    return new LocalBigIntegerColumnExtension<AbstractBigIntegerColumn>(this);
   }
 
 }

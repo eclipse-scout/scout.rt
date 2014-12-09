@@ -44,47 +44,4 @@ public interface IMenu extends IActionNode<IMenu> {
    * @throws ProcessingException
    */
   void handleOwnerValueChanged(Object newValue) throws ProcessingException;
-
-  /**
-   * action is chosen on a single selected item
-   *
-   * @deprecated will be removed with V 5.0 use {@link AbstractMenu#execOwnerValueChanged(Object)} instead
-   */
-  @Deprecated
-  boolean isSingleSelectionAction();
-
-  /**
-   * @deprecated will be removed with V 5.0 use {@link AbstractMenu#execOwnerValueChanged(Object)} instead
-   */
-  @Deprecated
-  void setSingleSelectionAction(boolean b);
-
-  /**
-   * action is chosen on any of multiple (>=2) selected items
-   *
-   * @deprecated will be removed with V 5.0 use {@link AbstractMenu#execOwnerValueChanged(Object)} instead
-   */
-  @Deprecated
-  boolean isMultiSelectionAction();
-
-  /**
-   * @deprecated will be removed with V 5.0 use {@link AbstractMenu#execOwnerValueChanged(Object)} instead
-   */
-  @Deprecated
-  void setMultiSelectionAction(boolean b);
-
-  /**
-   * action is chosen on empty space (not on items)
-   *
-   * @deprecated will be removed with V 5.0 use {@link AbstractMenu#execOwnerValueChanged(Object)} instead
-   */
-  @Deprecated
-  boolean isEmptySpaceAction();
-
-  /**
-   * @deprecated will be removed with V 5.0 use {@link AbstractMenu#execOwnerValueChanged(Object)} instead
-   */
-  @Deprecated
-  void setEmptySpaceAction(boolean b);
-
 }

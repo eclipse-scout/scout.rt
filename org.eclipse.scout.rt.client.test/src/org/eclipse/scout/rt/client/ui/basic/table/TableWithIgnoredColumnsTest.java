@@ -237,6 +237,7 @@ public class TableWithIgnoredColumnsTest {
   private static class P_TableDefault extends P_Table {
 
     @Replace
+    @Order(40)
     public class DefaultDefaultColumn extends AbstractStringColumn {
     }
 

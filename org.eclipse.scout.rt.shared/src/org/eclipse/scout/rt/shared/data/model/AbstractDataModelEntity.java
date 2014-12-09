@@ -13,39 +13,55 @@ package org.eclipse.scout.rt.shared.data.model;
 import java.io.Serializable;
 import java.security.Permission;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
+import org.eclipse.scout.commons.annotations.IOrdered;
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.annotations.OrderedComparator;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.shared.extension.AbstractSerializableExtension;
+import org.eclipse.scout.rt.shared.extension.ContributionComposite;
+import org.eclipse.scout.rt.shared.extension.ExtensionUtility;
+import org.eclipse.scout.rt.shared.extension.IContributionOwner;
+import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
+import org.eclipse.scout.rt.shared.extension.IExtension;
+import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
+import org.eclipse.scout.rt.shared.extension.data.model.DataModelEntityChains.DataModelEntityInitEntityChain;
+import org.eclipse.scout.rt.shared.extension.data.model.IDataModelEntityExtension;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.eclipse.scout.service.SERVICES;
 
-@SuppressWarnings("deprecation")
-public abstract class AbstractDataModelEntity extends AbstractPropertyObserver implements IDataModelEntity, Serializable {
+public abstract class AbstractDataModelEntity extends AbstractPropertyObserver implements IDataModelEntity, Serializable, IContributionOwner, IExtensibleObject {
   private static final long serialVersionUID = 1L;
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractDataModelEntity.class);
 
   private String m_id;
+  private double m_order;
   private Permission m_visiblePermission;
   private boolean m_visibleGranted;
   private boolean m_visibleProperty;
   private boolean m_oneToMany;
   private String m_text;
   private String m_iconId;
-  private ArrayList<IDataModelAttribute> m_attributes;
-  private ArrayList<IDataModelEntity> m_entities;
+  private List<IDataModelAttribute> m_attributes;
+  private List<IDataModelEntity> m_entities;
   private IDataModelEntity m_parentEntity;
   private boolean m_initializedChildEntities;
   private boolean m_initialized;
+  private IContributionOwner m_contributionHolder;
+  private final ObjectExtensions<AbstractDataModelEntity, IDataModelEntityExtension<? extends AbstractDataModelEntity>> m_objectExtensions;
 
   public AbstractDataModelEntity() {
     this(true);
@@ -53,19 +69,56 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
 
   /**
    * @param callInitConfig
-   *          true if {@link #callInitConfig()} should automcatically be invoked, false if the subclass invokes
-   *          {@link #callInitConfig()} itself
+   *          true if {@link #callInitializer()} should automatically be invoked, false if the subclass invokes
+   *          {@link #callInitializer()} itself
    */
   public AbstractDataModelEntity(boolean callInitConfig) {
     m_attributes = new ArrayList<IDataModelAttribute>();
     m_entities = new ArrayList<IDataModelEntity>();
+    m_objectExtensions = new ObjectExtensions<AbstractDataModelEntity, IDataModelEntityExtension<? extends AbstractDataModelEntity>>(this);
     if (callInitConfig) {
-      callInitConfig();
+      callInitializer();
     }
   }
 
-  protected void callInitConfig() {
-    initConfig();
+  @Override
+  public final List<Object> getAllContributions() {
+    return m_contributionHolder.getAllContributions();
+  }
+
+  @Override
+  public final <T> List<T> getContributionsByClass(Class<T> type) {
+    return m_contributionHolder.getContributionsByClass(type);
+  }
+
+  @Override
+  public final <T> T getContribution(Class<T> contribution) {
+    return m_contributionHolder.getContribution(contribution);
+  }
+
+  protected final void callInitializer() {
+    interceptInitConfig();
+  }
+
+  /**
+   * Calculates the column's view order, e.g. if the @Order annotation is set to 30.0, the method will
+   * return 30.0. If no {@link Order} annotation is set, the method checks its super classes for an @Order annotation.
+   *
+   * @since 3.10.0-M4
+   */
+  protected double calculateViewOrder() {
+    double viewOrder = getConfiguredViewOrder();
+    Class<?> cls = getClass();
+    if (viewOrder == IOrdered.DEFAULT_ORDER) {
+      while (cls != null && IDataModelEntity.class.isAssignableFrom(cls)) {
+        if (cls.isAnnotationPresent(Order.class)) {
+          Order order = (Order) cls.getAnnotation(Order.class);
+          return order.value();
+        }
+        cls = cls.getSuperclass();
+      }
+    }
+    return viewOrder;
   }
 
   /*
@@ -97,6 +150,21 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
   }
 
   /**
+   * Configures the view order of this data model entity. The view order determines the order in which the entities
+   * appear. The order of entities with no view order configured ({@code < 0}) is initialized based on the {@link Order}
+   * annotation of the entity class.
+   * <p>
+   * Subclasses can override this method. The default is {@link IOrdered#DEFAULT_ORDER}.
+   *
+   * @return View order of this entity.
+   */
+  @ConfigProperty(ConfigProperty.DOUBLE)
+  @Order(60)
+  protected double getConfiguredViewOrder() {
+    return IOrdered.DEFAULT_ORDER;
+  }
+
+  /**
    * Initialize this entity.
    */
   @ConfigOperation
@@ -104,26 +172,39 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
   protected void execInitEntity() throws ProcessingException {
   }
 
-  private List<Class<? extends IDataModelAttribute>> getConfiguredAttributes() {
+  private List<Class<IDataModelAttribute>> getConfiguredAttributes() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    List<Class<IDataModelAttribute>> filtered = ConfigurationUtility.filterClasses(dca, IDataModelAttribute.class);
-    return ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IDataModelAttribute.class);
+    return ConfigurationUtility.filterClasses(dca, IDataModelAttribute.class);
   }
 
-  private List<Class<? extends IDataModelEntity>> getConfiguredEntities() {
+  private List<Class<IDataModelEntity>> getConfiguredEntities() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    List<Class<IDataModelEntity>> filtered = ConfigurationUtility.filterClasses(dca, IDataModelEntity.class);
-    return ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IDataModelEntity.class);
+    return ConfigurationUtility.filterClasses(dca, IDataModelEntity.class);
+  }
+
+  protected final void interceptInitConfig() {
+    m_objectExtensions.initConfig(createLocalExtension(), new Runnable() {
+      @Override
+      public void run() {
+        initConfig();
+      }
+    });
   }
 
   protected void initConfig() {
     m_visibleGranted = true;
+    m_contributionHolder = new ContributionComposite(this);
     setText(getConfiguredText());
     setIconId(getConfiguredIconId());
     setVisible(getConfiguredVisible());
     setOneToMany(getConfiguredOneToMany());
-    ArrayList<IDataModelAttribute> attributes = new ArrayList<IDataModelAttribute>();
-    for (Class<? extends IDataModelAttribute> c : getConfiguredAttributes()) {
+    setOrder(calculateViewOrder());
+
+    List<Class<IDataModelAttribute>> configuredAttributes = getConfiguredAttributes();
+    List<IDataModelAttribute> contributedAttributes = m_contributionHolder.getContributionsByClass(IDataModelAttribute.class);
+
+    List<IDataModelAttribute> attributes = new ArrayList<IDataModelAttribute>(configuredAttributes.size() + contributedAttributes.size());
+    for (Class<? extends IDataModelAttribute> c : configuredAttributes) {
       try {
         attributes.add(ConfigurationUtility.newInnerInstance(this, c));
       }
@@ -131,13 +212,35 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
         SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + c.getName() + "'.", e));
       }
     }
+
+    attributes.addAll(contributedAttributes);
+
     injectAttributesInternal(attributes);
-    m_attributes = new ArrayList<IDataModelAttribute>(attributes);
+    ExtensionUtility.moveModelObjects(attributes);
+    Collections.sort(attributes, new OrderedComparator());
+    m_attributes = attributes;
+
     for (IDataModelAttribute a : m_attributes) {
-      a.setParentEntity(this);
+      if (a instanceof AbstractDataModelAttribute) {
+        ((AbstractDataModelAttribute) a).setParentEntity(this);
+      }
     }
     //lazy create entities at point when setParentEntity is set, this is necessary to avoid cyclic loops
     m_entities = new ArrayList<IDataModelEntity>();
+  }
+
+  @Override
+  public List<? extends IDataModelEntityExtension<? extends AbstractDataModelEntity>> getAllExtensions() {
+    return m_objectExtensions.getAllExtensions();
+  }
+
+  protected IDataModelEntityExtension<? extends AbstractDataModelEntity> createLocalExtension() {
+    return new LocalDataModelEntityExtension<AbstractDataModelEntity>(this);
+  }
+
+  @Override
+  public <T extends IExtension<?>> T getExtension(Class<T> c) {
+    return m_objectExtensions.getExtension(c);
   }
 
   @Override
@@ -156,7 +259,7 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
     }
 
     try {
-      execInitEntity();
+      interceptInitEntity();
     }
     catch (Throwable t) {
       LOG.error("entity " + this, t);
@@ -251,6 +354,16 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
   }
 
   @Override
+  public double getOrder() {
+    return m_order;
+  }
+
+  @Override
+  public void setOrder(double order) {
+    m_order = order;
+  }
+
+  @Override
   public String getIconId() {
     return m_iconId;
   }
@@ -305,7 +418,6 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
     return m_parentEntity;
   }
 
-  @Override
   public void setParentEntity(IDataModelEntity parent) {
     m_parentEntity = parent;
   }
@@ -314,9 +426,13 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
   public void initializeChildEntities(Map<Class<? extends IDataModelEntity>, IDataModelEntity> instanceMap) {
     if (!m_initializedChildEntities) {
       m_initializedChildEntities = true;
-      ArrayList<IDataModelEntity> newConfiguredInstances = new ArrayList<IDataModelEntity>();
-      ArrayList<IDataModelEntity> entities = new ArrayList<IDataModelEntity>();
-      for (Class<? extends IDataModelEntity> c : getConfiguredEntities()) {
+      List<Class<IDataModelEntity>> configuredEntities = getConfiguredEntities();
+      List<IDataModelEntity> contributedEntities = m_contributionHolder.getContributionsByClass(IDataModelEntity.class);
+      int numEntities = configuredEntities.size() + contributedEntities.size();
+
+      Set<IDataModelEntity> newConfiguredInstances = new HashSet<IDataModelEntity>(numEntities);
+      List<IDataModelEntity> entities = new ArrayList<IDataModelEntity>(numEntities);
+      for (Class<? extends IDataModelEntity> c : configuredEntities) {
         try {
           //check if a parent is of same type, in that case use reference
           IDataModelEntity e = instanceMap.get(c);
@@ -331,12 +447,21 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
           SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + c.getName() + "'.", ex));
         }
       }
+      newConfiguredInstances.addAll(contributedEntities);
+      entities.addAll(contributedEntities);
       injectEntitiesInternal(entities);
+      ExtensionUtility.moveModelObjects(entities);
+      Collections.sort(entities, new OrderedComparator());
+
       m_entities.clear();
       m_entities.addAll(entities);
+
       for (IDataModelEntity e : m_entities) {
-        if (e.getParentEntity() != this) {
-          e.setParentEntity(this);
+        if (e instanceof AbstractDataModelEntity) {
+          AbstractDataModelEntity adme = (AbstractDataModelEntity) e;
+          if (adme.getParentEntity() != this) {
+            adme.setParentEntity(this);
+          }
         }
       }
       for (IDataModelEntity e : m_entities) {
@@ -350,7 +475,7 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
   /**
    * do not use this internal method<br>
    * Used add/remove attributes
-   * 
+   *
    * @param attributeList
    *          live and mutable list of configured attributes
    */
@@ -362,10 +487,34 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
    * Used add/remove entities
    * <p>
    * Note that {@link #initializeChildEntities(Map)} is also called on injected entities
-   * 
+   *
    * @param entityList
    *          live and mutable list of configured attributes
    */
   protected void injectEntitiesInternal(List<IDataModelEntity> entityList) {
+  }
+
+  /**
+   * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
+   * any further chain elements.
+   */
+  protected static class LocalDataModelEntityExtension<OWNER extends AbstractDataModelEntity> extends AbstractSerializableExtension<OWNER> implements IDataModelEntityExtension<OWNER> {
+    private static final long serialVersionUID = 1L;
+
+    public LocalDataModelEntityExtension(OWNER owner) {
+      super(owner);
+    }
+
+    @Override
+    public void execInitEntity(DataModelEntityInitEntityChain chain) throws ProcessingException {
+      getOwner().execInitEntity();
+    }
+
+  }
+
+  protected final void interceptInitEntity() throws ProcessingException {
+    List<? extends IDataModelEntityExtension<? extends AbstractDataModelEntity>> extensions = getAllExtensions();
+    DataModelEntityInitEntityChain chain = new DataModelEntityInitEntityChain(extensions);
+    chain.execInitEntity();
   }
 }

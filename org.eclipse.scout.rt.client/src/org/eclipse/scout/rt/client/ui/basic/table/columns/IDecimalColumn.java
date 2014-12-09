@@ -12,6 +12,6 @@ package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
 import org.eclipse.scout.rt.client.ui.valuecontainer.IDecimalValueContainer;
 
-public interface IDecimalColumn<T extends Number> extends INumberColumn<T>, IDecimalValueContainer<T> {
+public interface IDecimalColumn<NUMBER extends Number> extends INumberColumn<NUMBER>, IDecimalValueContainer<NUMBER> {
 
 }

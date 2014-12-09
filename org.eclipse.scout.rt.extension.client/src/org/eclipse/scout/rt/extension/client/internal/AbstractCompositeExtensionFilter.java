@@ -19,7 +19,7 @@ import org.eclipse.scout.commons.TypeCastUtility;
 /**
  * @since 3.9.0
  */
-public class AbstractCompositeExtensionFilter<T> {
+public abstract class AbstractCompositeExtensionFilter<T> {
 
   private final List<T> m_filters;
 

@@ -83,7 +83,7 @@ public interface IActivityMap<RI, AI> extends IPropertyObserver {
   String PROP_DRAW_SECTIONS = "drawSections";
   /**
    * {@link Object} Container of this map, {@link IPlannerField} https://bugs.eclipse.org/bugs/show_bug.cgi?id=388227
-   * 
+   *
    * @since 3.8.1
    */
   String PROP_CONTAINER = "container";
@@ -108,7 +108,7 @@ public interface IActivityMap<RI, AI> extends IPropertyObserver {
 
   /**
    * when performing a batch mutation use this marker like
-   * 
+   *
    * <pre>
    * try{
    *   setActivityMapChanging(true);
@@ -123,7 +123,7 @@ public interface IActivityMap<RI, AI> extends IPropertyObserver {
 
   /**
    * Create a time scalewith {@link MajorTimeColumn}s and {@link MinorTimeColumn}s
-   * 
+   *
    * @see {@link #getPlanningMode()} and {@link #getDays()}
    */
   void createTimeScale();
@@ -240,7 +240,7 @@ public interface IActivityMap<RI, AI> extends IPropertyObserver {
 
   /**
    * Create a planned activity that includes one of the selected persons.
-   * 
+   *
    * @param singleMatch
    *          true=plan an activity for only one of the selected resource.
    *          false=plan an activity for all of the selected resources
@@ -308,7 +308,7 @@ public interface IActivityMap<RI, AI> extends IPropertyObserver {
    * Indicates whether the selected sections in the activity
    * map should be visualized (by a rectangle with red and
    * green borders).
-   * 
+   *
    * @return true if the activity map draws these sections,
    *         false if not.
    */
@@ -318,7 +318,7 @@ public interface IActivityMap<RI, AI> extends IPropertyObserver {
    * Sets whether the selected sections in the activity
    * map should be visualized (by a rectangle with red and
    * green borders).
-   * 
+   *
    * @param drawSections
    *          true if the activity map should draw these sections,
    *          false if not.
@@ -331,7 +331,7 @@ public interface IActivityMap<RI, AI> extends IPropertyObserver {
    * Container of this map, {@link IPlannerField}
    * <p>
    * https://bugs.eclipse.org/bugs/show_bug.cgi?id=388227
-   * 
+   *
    * @since 3.8.1
    */
   Object getContainer();

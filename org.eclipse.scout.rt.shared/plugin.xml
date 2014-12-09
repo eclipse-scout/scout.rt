@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.scout.service.services">
+      <service
+            class="org.eclipse.scout.rt.shared.extension.ExtensionRegistry"
+            createImmediately="false"
+            factory="org.eclipse.scout.service.DefaultServiceFactory"
+            ranking="-50">
+      </service>
+      <service
+            class="org.eclipse.scout.rt.shared.services.extension.SharedContainerValidationService"
+            createImmediately="false"
+            factory="org.eclipse.scout.service.DefaultServiceFactory"
+            ranking="500">
+      </service>
+   </extension>
+
+</plugin>

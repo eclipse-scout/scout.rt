@@ -14,6 +14,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.EventListener;
 import java.util.HashMap;
@@ -34,10 +35,16 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.annotations.OrderedComparator;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
+import org.eclipse.scout.rt.client.extension.ui.basic.calendar.CalendarChains.CalendarDisposeCalendarChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.calendar.CalendarChains.CalendarFilterCalendarItemsChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.calendar.CalendarChains.CalendarInitCalendarChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.calendar.ICalendarExtension;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.CalendarMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -45,6 +52,12 @@ import org.eclipse.scout.rt.client.ui.action.menu.root.ICalendarContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.internal.CalendarContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.calendar.provider.ICalendarItemProvider;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
+import org.eclipse.scout.rt.shared.extension.AbstractExtension;
+import org.eclipse.scout.rt.shared.extension.ContributionComposite;
+import org.eclipse.scout.rt.shared.extension.IContributionOwner;
+import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
+import org.eclipse.scout.rt.shared.extension.IExtension;
+import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarItem;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.service.SERVICES;
@@ -52,7 +65,7 @@ import org.eclipse.scout.service.SERVICES;
 /**
  * {@link ICalendarItemProducer} are defined as inner classes<br>
  */
-public abstract class AbstractCalendar extends AbstractPropertyObserver implements ICalendar {
+public abstract class AbstractCalendar extends AbstractPropertyObserver implements ICalendar, IContributionOwner, IExtensibleObject {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractCalendar.class);
 
   private boolean m_initialized;
@@ -63,6 +76,8 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
   private final DateTimeFormatFactory m_dateTimeFormatFactory;
   private List<CalendarEvent> m_calendarEventBuffer;
   private final EventListenerList m_listenerList;
+  private IContributionOwner m_contributionHolder;
+  private final ObjectExtensions<AbstractCalendar, ICalendarExtension<? extends AbstractCalendar>> m_objectExtensions;
 
   // internal usage of menus temporarily added of the current item provider
   private List<IMenu> m_inheritedMenusOfSelectedProvider;
@@ -76,9 +91,25 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
     m_listenerList = new EventListenerList();
     m_dateTimeFormatFactory = new DateTimeFormatFactory();
     m_componentsByProvider = new HashMap<Class<? extends ICalendarItemProvider>, Collection<CalendarComponent>>();
+    m_objectExtensions = new ObjectExtensions<AbstractCalendar, ICalendarExtension<? extends AbstractCalendar>>(this);
     if (callInitializer) {
-      initConfig();
+      interceptInitConfig();
     }
+  }
+
+  @Override
+  public final List<Object> getAllContributions() {
+    return m_contributionHolder.getAllContributions();
+  }
+
+  @Override
+  public final <T> List<T> getContributionsByClass(Class<T> type) {
+    return m_contributionHolder.getContributionsByClass(type);
+  }
+
+  @Override
+  public final <T> T getContribution(Class<T> contribution) {
+    return m_contributionHolder.getContribution(contribution);
   }
 
   protected void callInitializer() {
@@ -143,8 +174,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
   protected List<Class<? extends IMenu>> getDeclaredMenus() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     List<Class<IMenu>> filtered = ConfigurationUtility.filterClasses(dca, IMenu.class);
-    List<Class<? extends IMenu>> foca = ConfigurationUtility.sortFilteredClassesByOrderAnnotation(filtered, IMenu.class);
-    return ConfigurationUtility.removeReplacedClasses(foca);
+    return ConfigurationUtility.removeReplacedClasses(filtered);
   }
 
   @ConfigOperation
@@ -159,7 +189,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
 
   /**
    * Filter and resolve item conflicts after some {@link ICalendarItemProvider} changed their items
-   * 
+   *
    * @param changedProviders
    *          is the list of provider types that changed their provided items
    * @param componentsByProvider
@@ -178,8 +208,18 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
   protected void execFilterCalendarItems(Set<Class<? extends ICalendarItemProvider>> changedProviderTypes, Map<Class<? extends ICalendarItemProvider>, Collection<CalendarComponent>> componentsByProvider) {
   }
 
+  protected final void interceptInitConfig() {
+    m_objectExtensions.initConfig(createLocalExtension(), new Runnable() {
+      @Override
+      public void run() {
+        initConfig();
+      }
+    });
+  }
+
   protected void initConfig() {
     m_uiFacade = new P_UIFacade();
+    m_contributionHolder = new ContributionComposite(this);
     setTitle(getConfiguredTitle());
     setSelectedDate(new Date());
     setStartHour(getConfiguredStartHour());
@@ -190,8 +230,9 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
     setMarkOutOfMonthDays(getConfiguredMarkOutOfMonthDays());
 
     // menus
-    List<IMenu> menuList = new ArrayList<IMenu>();
-    for (Class<? extends IMenu> menuClazz : getDeclaredMenus()) {
+    List<Class<? extends IMenu>> declaredMenus = getDeclaredMenus();
+    List<IMenu> menuList = new ArrayList<IMenu>(declaredMenus.size());
+    for (Class<? extends IMenu> menuClazz : declaredMenus) {
       try {
         IMenu menu = ConfigurationUtility.newInnerInstance(this, menuClazz);
         menuList.add(menu);
@@ -200,16 +241,15 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
         SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + menuClazz.getName() + "'.", e));
       }
     }
-    try {
-      injectMenusInternal(menuList);
-    }
-    catch (Exception e) {
-      LOG.error("error occured while dynamically contributing menus.", e);
-    }
+    List<IMenu> contributedMenus = m_contributionHolder.getContributionsByClass(IMenu.class);
+    menuList.addAll(contributedMenus);
 
     // producers
-    List<ICalendarItemProvider> producerList = new ArrayList<ICalendarItemProvider>();
-    for (Class<? extends ICalendarItemProvider> itemProviderClazz : getConfiguredProducers()) {
+    List<Class<? extends ICalendarItemProvider>> configuredProducers = getConfiguredProducers();
+    List<ICalendarItemProvider> contributedProducers = m_contributionHolder.getContributionsByClass(ICalendarItemProvider.class);
+
+    List<ICalendarItemProvider> producerList = new ArrayList<ICalendarItemProvider>(configuredProducers.size() + contributedProducers.size());
+    for (Class<? extends ICalendarItemProvider> itemProviderClazz : configuredProducers) {
       try {
         ICalendarItemProvider provider = ConfigurationUtility.newInnerInstance(this, itemProviderClazz);
         producerList.add(provider);
@@ -220,8 +260,17 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
         SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + itemProviderClazz.getName() + "'.", e));
       }
     }
+    producerList.addAll(contributedProducers);
     m_providers = producerList;
 
+    try {
+      injectMenusInternal(menuList);
+    }
+    catch (Exception e) {
+      LOG.error("error occured while dynamically contributing menus.", e);
+    }
+    new MoveActionNodesHandler<IMenu>(menuList).moveModelObjects();
+    Collections.sort(menuList, new OrderedComparator());
     ICalendarContextMenu contextMenu = new CalendarContextMenu(this, menuList);
     setContextMenu(contextMenu);
 
@@ -245,10 +294,24 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
     }
   }
 
+  @Override
+  public List<? extends ICalendarExtension<? extends AbstractCalendar>> getAllExtensions() {
+    return m_objectExtensions.getAllExtensions();
+  }
+
+  protected ICalendarExtension<? extends AbstractCalendar> createLocalExtension() {
+    return new LocalCalendarExtension<AbstractCalendar>(this);
+  }
+
+  @Override
+  public <T extends IExtension<?>> T getExtension(Class<T> c) {
+    return m_objectExtensions.getExtension(c);
+  }
+
   /**
    * Override this internal method only in order to make use of dynamic menus<br>
    * Used to manage menu list and add/remove menus
-   * 
+   *
    * @param menuList
    *          live and mutable list of configured menus
    */
@@ -267,7 +330,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
   public void initCalendar() throws ProcessingException {
     // init menus
     ActionUtility.initActions(getMenus());
-    execInitCalendar();
+    interceptInitCalendar();
     /*
      * add property change listener to - reload calendar items when view range
      * changes
@@ -298,7 +361,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
   public void disposeCalendar() {
     disposeCalendarInternal();
     try {
-      execDisposeCalendar();
+      interceptDisposeCalendar();
     }
     catch (Throwable t) {
       LOG.warn(getClass().getName(), t);
@@ -592,7 +655,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
       for (ICalendarItemProvider provider : changedProviders) {
         providerTypes.add(provider.getClass());
       }
-      execFilterCalendarItems(providerTypes, m_componentsByProvider);
+      interceptFilterCalendarItems(providerTypes, m_componentsByProvider);
       // complete list
       TreeMap<CompositeObject, CalendarComponent> sortMap = new TreeMap<CompositeObject, CalendarComponent>();
       int index = 0;
@@ -906,5 +969,50 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
         popUIProcessor();
       }
     }
+  }
+
+  /**
+   * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
+   * any further chain elements.
+   */
+  protected static class LocalCalendarExtension<OWNER extends AbstractCalendar> extends AbstractExtension<OWNER> implements ICalendarExtension<OWNER> {
+
+    public LocalCalendarExtension(OWNER owner) {
+      super(owner);
+    }
+
+    @Override
+    public void execFilterCalendarItems(CalendarFilterCalendarItemsChain chain, Set<Class<? extends ICalendarItemProvider>> changedProviderTypes, Map<Class<? extends ICalendarItemProvider>, Collection<CalendarComponent>> componentsByProvider) {
+      getOwner().execFilterCalendarItems(changedProviderTypes, componentsByProvider);
+    }
+
+    @Override
+    public void execDisposeCalendar(CalendarDisposeCalendarChain chain) throws ProcessingException {
+      getOwner().execDisposeCalendar();
+    }
+
+    @Override
+    public void execInitCalendar(CalendarInitCalendarChain chain) throws ProcessingException {
+      getOwner().execInitCalendar();
+    }
+
+  }
+
+  protected final void interceptFilterCalendarItems(Set<Class<? extends ICalendarItemProvider>> changedProviderTypes, Map<Class<? extends ICalendarItemProvider>, Collection<CalendarComponent>> componentsByProvider) {
+    List<? extends ICalendarExtension<? extends AbstractCalendar>> extensions = getAllExtensions();
+    CalendarFilterCalendarItemsChain chain = new CalendarFilterCalendarItemsChain(extensions);
+    chain.execFilterCalendarItems(changedProviderTypes, componentsByProvider);
+  }
+
+  protected final void interceptDisposeCalendar() throws ProcessingException {
+    List<? extends ICalendarExtension<? extends AbstractCalendar>> extensions = getAllExtensions();
+    CalendarDisposeCalendarChain chain = new CalendarDisposeCalendarChain(extensions);
+    chain.execDisposeCalendar();
+  }
+
+  protected final void interceptInitCalendar() throws ProcessingException {
+    List<? extends ICalendarExtension<? extends AbstractCalendar>> extensions = getAllExtensions();
+    CalendarInitCalendarChain chain = new CalendarInitCalendarChain(extensions);
+    chain.execInitCalendar();
   }
 }

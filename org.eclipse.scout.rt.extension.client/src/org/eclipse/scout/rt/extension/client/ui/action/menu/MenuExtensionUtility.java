@@ -13,11 +13,7 @@ package org.eclipse.scout.rt.extension.client.ui.action.menu;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.TreeMap;
 
-import org.eclipse.scout.commons.CompositeObject;
-import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -32,7 +28,6 @@ import org.eclipse.scout.rt.extension.client.ui.action.menu.internal.MenuExtensi
 import org.eclipse.scout.rt.extension.client.ui.action.menu.internal.MenuModificationExtension;
 import org.eclipse.scout.rt.extension.client.ui.action.menu.internal.MenuRemoveExtension;
 import org.eclipse.scout.rt.extension.client.ui.basic.table.AbstractExtensibleTable;
-import org.eclipse.scout.rt.extension.client.ui.desktop.internal.OrderedMenuWrapper;
 import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.AbstractExtensiblePageWithNodes;
 import org.eclipse.scout.rt.extension.client.ui.form.fields.button.AbstractExtensibleButton;
 import org.eclipse.scout.rt.extension.client.ui.form.fields.filechooserfield.AbstractExtensibleFileChooserField;
@@ -51,7 +46,7 @@ import org.eclipse.scout.rt.extension.client.ui.form.fields.smartfield.AbstractE
  * <li>{@link AbstractExtensibleSmartField}</li>
  * <li>{@link AbstractExtensibleTable}</li>
  * </ul>
- * 
+ *
  * @since 3.9.0
  */
 public final class MenuExtensionUtility {
@@ -85,22 +80,18 @@ public final class MenuExtensionUtility {
   }
 
   public static <T> void adaptMenus(T anchor, Object container, List<IMenu> menuList) {
-    adaptMenus(anchor, container, menuList, false);
-  }
-
-  public static <T> void adaptMenus(T anchor, Object container, List<IMenu> menuList, boolean createOrderedMenuWrapper) {
     Class<T> anchorType = getAnchorType(anchor);
     if (anchorType == null || anchor == null || container == null) {
       return;
     }
 
     MenuExtensionManager extensionManager = Activator.getDefault().getMenuExtensionManager();
-    contributeMenus(anchor, container, extensionManager.getMenuContributionExtensions(anchorType), menuList, createOrderedMenuWrapper);
+    contributeMenus(anchor, container, extensionManager.getMenuContributionExtensions(anchorType), menuList);
     removeMenus(anchor, container, extensionManager.getMenuRemoveExtensions(anchorType), menuList);
     modifyMenus(anchor, container, extensionManager.getMenuModificationExtensions(anchorType), menuList);
   }
 
-  static <T> void contributeMenus(T anchor, Object container, List<MenuContributionExtension> extensions, List<IMenu> menuList, boolean createOrderedMenuWrapper) {
+  static <T> void contributeMenus(T anchor, Object container, List<MenuContributionExtension> extensions, List<IMenu> menuList) {
     if (extensions == null || extensions.isEmpty()) {
       return;
     }
@@ -117,44 +108,17 @@ public final class MenuExtensionUtility {
       return;
     }
 
-    // add existing menus to ordered list
-    TreeMap<CompositeObject, IMenu> orderedMenus = new TreeMap<CompositeObject, IMenu>();
-    int counter = 0;
-    for (IMenu m : menuList) {
-      double order;
-      Class<?> tmpClass = m.getClass();
-      Order orderAnnotation;
-      while ((orderAnnotation = tmpClass.getAnnotation(Order.class)) == null && m.getClass().isAnnotationPresent(Replace.class)) {
-        tmpClass = tmpClass.getSuperclass();
-      }
-      if (orderAnnotation != null) {
-        order = orderAnnotation.value();
-      }
-      else {
-        order = Double.MAX_VALUE;
-      }
-      orderedMenus.put(new CompositeObject(order, counter), m);
-      counter++;
-    }
-
     // create new menus
     for (MenuContributionExtension e : matchingExtensions) {
       try {
         IMenu m = e.createContribution(anchor, container);
-        if (createOrderedMenuWrapper) {
-          m = new OrderedMenuWrapper(m, e.getOrder());
-        }
-        orderedMenus.put(new CompositeObject(e.getOrder(), counter), m);
-        counter++;
+        m.setOrder(e.getOrder());
+        menuList.add(m);
       }
       catch (Throwable t) {
         LOG.error("Exception while creating an instance of contributed menu " + e, t);
       }
     }
-
-    // reorder existing and add new pages
-    menuList.clear();
-    menuList.addAll(orderedMenus.values());
   }
 
   static <T> void removeMenus(T anchor, Object container, List<MenuRemoveExtension> extensions, List<IMenu> menuList) {

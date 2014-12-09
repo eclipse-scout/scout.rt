@@ -34,7 +34,7 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
  * inactive keys that are not reflected in the listbox<br>
  * Therefore an empty listbox table is not the same as a listbox with an empty value (null)
  */
-public interface IListBox<T> extends IValueField<Set<T>>, ICompositeField {
+public interface IListBox<KEY> extends IValueField<Set<KEY>>, ICompositeField {
 
   /**
    * {@link boolean}
@@ -90,7 +90,7 @@ public interface IListBox<T> extends IValueField<Set<T>>, ICompositeField {
 
   void setFilterActiveRowsValue(TriState t);
 
-  void prepareLookupCall(ILookupCall<T> call) throws ProcessingException;
+  void prepareLookupCall(ILookupCall<KEY> call) throws ProcessingException;
 
   /**
    * Populate table with data from data service<br>
@@ -100,16 +100,16 @@ public interface IListBox<T> extends IValueField<Set<T>>, ICompositeField {
    */
   void loadListBoxData() throws ProcessingException;
 
-  ILookupCall<T> getLookupCall();
+  ILookupCall<KEY> getLookupCall();
 
-  void setLookupCall(ILookupCall<T> call);
+  void setLookupCall(ILookupCall<KEY> call);
 
-  Class<? extends ICodeType<?, T>> getCodeTypeClass();
+  Class<? extends ICodeType<?, KEY>> getCodeTypeClass();
 
-  void setCodeTypeClass(Class<? extends ICodeType<?, T>> codeTypeClass);
+  void setCodeTypeClass(Class<? extends ICodeType<?, KEY>> codeTypeClass);
 
   @Override
-  Set<T> getValue();
+  Set<KEY> getValue();
 
   /**
    * Convenience for getting the first value of {@link #getValue()}
@@ -120,32 +120,32 @@ public interface IListBox<T> extends IValueField<Set<T>>, ICompositeField {
    *         <p>
    *         When it is made non-checkable, its value is the array of all selected keys
    */
-  T getSingleValue();
+  KEY getSingleValue();
 
   /**
    * Convenience for setting a single value with {@link #setValue(Object)}
    */
-  void setSingleValue(T value);
+  void setSingleValue(KEY value);
 
   int getCheckedKeyCount();
 
-  T getCheckedKey();
+  KEY getCheckedKey();
 
-  Set<T> getCheckedKeys();
+  Set<KEY> getCheckedKeys();
 
-  ILookupRow<T> getCheckedLookupRow();
+  ILookupRow<KEY> getCheckedLookupRow();
 
-  Set<ILookupRow<T>> getCheckedLookupRows();
+  Set<ILookupRow<KEY>> getCheckedLookupRows();
 
-  void checkKeys(Collection<? extends T> keys);
+  void checkKeys(Collection<? extends KEY> keys);
 
-  void checkKey(T key);
+  void checkKey(KEY key);
 
   /**
    * @return the keys that have been checked with regard to the initial keys of
    *         the listbox. Initial keys are those after the last save or init
    */
-  Set<T> getUncheckedKeys();
+  Set<KEY> getUncheckedKeys();
 
   /**
    * check all available keys, regardless of active/inactive flag
