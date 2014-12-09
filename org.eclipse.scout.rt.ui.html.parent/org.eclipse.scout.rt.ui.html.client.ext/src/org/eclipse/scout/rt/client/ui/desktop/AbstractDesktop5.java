@@ -17,16 +17,12 @@ public abstract class AbstractDesktop5 extends AbstractDesktop implements IDeskt
   private List<Object> m_addOns = new ArrayList<>();
 
   protected AbstractDesktop5() {
-    super();
+    super(false);
   }
 
 //FIXME imo scout erweiterung in IDesktop
   protected AbstractDesktop5(boolean callInitializer) {
     // super(callInitializer);
-  }
-
-  protected void callInitializer() {
-    // initConfig();
   }
 
   @Override

@@ -36,7 +36,7 @@ import org.eclipse.scout.service.SERVICES;
 
 public abstract class AbstractPageWithNodes5 extends AbstractExtensiblePageWithNodes implements IPage5 {
 
-  private boolean m_detailFormVisible = true;
+  private boolean m_detailFormVisible = true; 
 
   private boolean m_navigateUp;
 

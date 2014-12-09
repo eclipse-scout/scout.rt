@@ -101,7 +101,7 @@ public abstract class AbstractForm5 extends AbstractForm implements IForm5 {
   /**
    * Override this internal method only in order to make use of dynamic menus<br>
    * Used to manage menu list and add/remove menus
-   * 
+   *
    * @param menuList
    *          live and mutable list of configured menus
    */

@@ -46,7 +46,7 @@ public abstract class AbstractOutline5 extends AbstractExtensibleOutline impleme
     super(callInitialzier);
   }
 
-  @Override
+  @Override 
   protected IPageChangeStrategy createPageChangeStrategy() {
     return new DefaultPageChangeStrategy5();
   }

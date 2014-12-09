@@ -67,42 +67,6 @@ public class MenuWrapper implements IMenu {
     return m_wrappedMenu;
   }
 
-  @SuppressWarnings("deprecation")
-  @Override
-  public boolean isSingleSelectionAction() {
-    return m_wrappedMenu.isSingleSelectionAction();
-  }
-
-  @SuppressWarnings("deprecation")
-  @Override
-  public void setSingleSelectionAction(boolean b) {
-    throw new UnsupportedOperationException("read only wrapper");
-  }
-
-  @SuppressWarnings("deprecation")
-  @Override
-  public boolean isMultiSelectionAction() {
-    return m_wrappedMenu.isMultiSelectionAction();
-  }
-
-  @SuppressWarnings("deprecation")
-  @Override
-  public void setMultiSelectionAction(boolean b) {
-    throw new UnsupportedOperationException("read only wrapper");
-  }
-
-  @SuppressWarnings("deprecation")
-  @Override
-  public boolean isEmptySpaceAction() {
-    return m_wrappedMenu.isEmptySpaceAction();
-  }
-
-  @SuppressWarnings("deprecation")
-  @Override
-  public void setEmptySpaceAction(boolean b) {
-    throw new UnsupportedOperationException("read only wrapper");
-  }
-
   @Override
   public void handleOwnerValueChanged(Object newValue) throws ProcessingException {
     // void
@@ -432,6 +396,16 @@ public class MenuWrapper implements IMenu {
   @Override
   public String classId() {
     return m_wrappedMenu.classId();
+  }
+
+  @Override
+  public double getOrder() {
+    return m_wrappedMenu.getOrder();
+  }
+
+  @Override
+  public void setOrder(double order) {
+    m_wrappedMenu.setOrder(order);
   }
 
   @Override

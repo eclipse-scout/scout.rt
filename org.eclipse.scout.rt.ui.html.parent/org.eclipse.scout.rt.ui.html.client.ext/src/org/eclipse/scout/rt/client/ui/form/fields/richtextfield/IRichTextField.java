@@ -12,6 +12,6 @@ package org.eclipse.scout.rt.client.ui.form.fields.richtextfield;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IBasicField;
 
-public interface IRichTextField extends IBasicField {
+public interface IRichTextField extends IBasicField<String> {
 
 }

@@ -19,7 +19,7 @@ public abstract class AbstractTableControl extends AbstractAction implements ITa
 
   public AbstractTableControl() {
     this(true);
-  }
+  } 
 
   public AbstractTableControl(boolean callInitializer) {
     if (callInitializer) {

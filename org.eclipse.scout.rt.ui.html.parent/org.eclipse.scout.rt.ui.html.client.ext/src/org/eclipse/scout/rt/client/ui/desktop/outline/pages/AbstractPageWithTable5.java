@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineNavigation;
 public abstract class AbstractPageWithTable5<T extends ITable5> extends AbstractPageWithTable<T> implements IPage5 {
 
   private boolean m_detailFormVisible = true;
-
+ 
   private boolean m_navigateUp;
 
   @Override

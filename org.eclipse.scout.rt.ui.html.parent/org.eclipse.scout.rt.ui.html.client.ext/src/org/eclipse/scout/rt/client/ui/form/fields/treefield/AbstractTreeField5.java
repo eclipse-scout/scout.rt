@@ -20,6 +20,6 @@ import org.eclipse.scout.rt.shared.data.form.fields.treefield.AbstractTreeFieldD
  * FIXME imo scout is missing this formdata annotation
  */
 @FormData(value = AbstractTreeFieldData.class, sdkCommand = SdkCommand.USE, defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.CREATE)
-public class AbstractTreeField5 extends AbstractTreeField {
+public abstract class AbstractTreeField5 extends AbstractTreeField {
 
 }
