@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.html.json.table;
 
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.desktop.IJsonOutlineAdapter;
 import org.json.JSONObject;
@@ -20,8 +21,8 @@ public class JsonOutlineTable<T extends ITable> extends JsonTable<T> {
 
   private final IJsonOutlineAdapter m_jsonOutline;
 
-  public JsonOutlineTable(T model, IJsonSession jsonSession, String id, IJsonOutlineAdapter jsonOutline) {
-    super(model, jsonSession, id);
+  public JsonOutlineTable(T model, IJsonSession jsonSession, String id, IJsonOutlineAdapter jsonOutline, IJsonAdapter<?> parent) {
+    super(model, jsonSession, id, parent);
     m_jsonOutline = jsonOutline;
   }
 

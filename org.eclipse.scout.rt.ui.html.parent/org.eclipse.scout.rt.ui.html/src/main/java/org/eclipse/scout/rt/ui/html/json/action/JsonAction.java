@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.html.json.action;
 
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
+import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
@@ -21,8 +22,8 @@ import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 public class JsonAction<T extends IAction> extends AbstractJsonPropertyObserver<T> {
   public static final String EVENT_DO_ACTION = "doAction";
 
-  public JsonAction(T model, IJsonSession jsonSession, String id) {
-    super(model, jsonSession, id);
+  public JsonAction(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
+    super(model, jsonSession, id, parent);
   }
 
   @Override

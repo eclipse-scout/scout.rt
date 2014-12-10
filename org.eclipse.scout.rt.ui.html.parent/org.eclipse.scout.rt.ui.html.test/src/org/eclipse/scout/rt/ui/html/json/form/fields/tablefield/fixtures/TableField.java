@@ -8,22 +8,27 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.html.json.table;
+package org.eclipse.scout.rt.ui.html.json.form.fields.tablefield.fixtures;
 
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
-import org.eclipse.scout.rt.ui.html.json.IJsonSession;
-import org.eclipse.scout.rt.ui.html.json.menu.JsonMenu;
+import org.eclipse.scout.rt.client.ui.basic.table.ITable;
+import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 
-public class JsonTableOrganizeMenu<T extends IMenu> extends JsonMenu<T> {
+public class TableField<T extends ITable> extends AbstractTableField<T> {
+  private T m_table;
 
-  public JsonTableOrganizeMenu(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
-    super(model, jsonSession, id, parent);
+  public TableField() {
+    this(null);
+  }
+
+  public TableField(T table) {
+    super(false);
+    m_table = table;
+    callInitializer();
   }
 
   @Override
-  public String getObjectType() {
-    return "TableOrganizeMenu";
+  protected T createTable() {
+    return m_table;
   }
 
 }

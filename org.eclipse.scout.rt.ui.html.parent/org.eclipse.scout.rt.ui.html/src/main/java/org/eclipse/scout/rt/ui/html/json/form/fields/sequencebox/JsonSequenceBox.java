@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.html.json.form.fields.sequencebox;
 
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
+import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
 import org.json.JSONObject;
@@ -22,8 +23,8 @@ public class JsonSequenceBox<T extends ISequenceBox> extends JsonFormField<T> {
 
   public static final String PROP_FIELDS = "fields";
 
-  public JsonSequenceBox(T model, IJsonSession session, String id) {
-    super(model, session, id);
+  public JsonSequenceBox(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
+    super(model, jsonSession, id, parent);
   }
 
   @Override
@@ -35,12 +36,6 @@ public class JsonSequenceBox<T extends ISequenceBox> extends JsonFormField<T> {
   protected void attachChildAdapters() {
     super.attachChildAdapters();
     attachAdapters(getModel().getFields());
-  }
-
-  @Override
-  protected void disposeChildAdapters() {
-    super.disposeChildAdapters();
-    disposeAdapters(getModel().getFields());
   }
 
   @Override

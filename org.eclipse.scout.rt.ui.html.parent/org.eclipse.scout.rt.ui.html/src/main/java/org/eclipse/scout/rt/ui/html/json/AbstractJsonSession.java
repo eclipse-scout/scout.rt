@@ -49,6 +49,14 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
   private final JsonAdapterFactory m_jsonAdapterFactory;
   private final JsonAdapterRegistry m_jsonAdapterRegistry;
+  private P_RootAdapter m_rootJsonAdapter;
+  private JsonClientSession<? extends IClientSession> m_jsonClientSession;
+  private String m_jsonSessionId;
+  private long m_jsonAdapterSeq;
+  private JsonResponse m_currentJsonResponse;
+  private JsonRequest m_currentJsonRequest;
+  private HttpServletRequest m_currentHttpRequest;
+  private JsonEventProcessor m_jsonEventProcessor;
 
   /**
    * Contains IDs to adapters which must be removed <i>after</i> a request has been processed.
@@ -59,18 +67,11 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
    */
   private final Set<String> m_unregisterAdapterSet = new HashSet<String>();
 
-  private JsonClientSession m_jsonClientSession;
-  private String m_jsonSessionId;
-  private long m_jsonAdapterSeq;
-  private JsonResponse m_currentJsonResponse;
-  private JsonRequest m_currentJsonRequest;
-  private HttpServletRequest m_currentHttpRequest;
-  private JsonEventProcessor m_jsonEventProcessor;
-
   public AbstractJsonSession() {
     m_currentJsonResponse = createJsonResponse();
     m_jsonAdapterFactory = createJsonAdapterFactory();
     m_jsonAdapterRegistry = createJsonAdapterRegistry();
+    m_rootJsonAdapter = new P_RootAdapter(this);
   }
 
   protected JsonResponse createJsonResponse() {
@@ -161,6 +162,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     return map;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public void init(HttpServletRequest request, JsonStartupRequest jsonStartupRequest) {
     m_currentHttpRequest = request;
@@ -211,7 +213,8 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
         }
       }
     }
-    m_jsonClientSession = (JsonClientSession) getOrCreateJsonAdapter(clientSession);
+
+    m_jsonClientSession = (JsonClientSession) createJsonAdapter(clientSession, m_rootJsonAdapter, null);
     m_jsonEventProcessor = createJsonEventProcessor();
     startUpClientSession(clientSession);
 
@@ -302,6 +305,11 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   }
 
   @Override
+  public IJsonAdapter<?> getRootJsonAdapter() {
+    return m_rootJsonAdapter;
+  }
+
+  @Override
   public String getJsonSessionId() {
     return m_jsonSessionId;
   }
@@ -311,7 +319,8 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     return m_jsonClientSession.getModel();
   }
 
-  public JsonClientSession getJsonClientSession() {
+  @Override
+  public JsonClientSession<? extends IClientSession> getJsonClientSession() {
     return m_jsonClientSession;
   }
 
@@ -325,55 +334,76 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     return "" + (++m_jsonAdapterSeq);
   }
 
-  /**
-   * Creates an adapter instance for the given model using the given factory and calls the <code>attach()</code> method
-   * on the created instance.
-   */
-  protected IJsonAdapter<?> createJsonAdapter(Object model, IJsonAdapterFactory adapterFactory) {
-    String id = createUniqueIdFor(null); // FIXME CGU
-    IJsonAdapter<?> adapter = adapterFactory.createJsonAdapter(model, this, id);
-    adapter.init();
-    return adapter;
-  }
-
-  /**
-   * Creates an adapter instance for the given model and calls the <code>attach()</code> method on the created instance.
-   */
-  protected IJsonAdapter<?> createJsonAdapter(Object model) {
-    return createJsonAdapter(model, m_jsonAdapterFactory);
-  }
-
   @Override
   public IJsonAdapter<?> getJsonAdapter(String id) {
     return m_jsonAdapterRegistry.getJsonAdapter(id);
   }
 
   @Override
-  public <M, A extends IJsonAdapter<? super M>> A getJsonAdapter(M model) {
-    return m_jsonAdapterRegistry.getJsonAdapter(model);
+  public List<IJsonAdapter<?>> getJsonChildAdapters(IJsonAdapter<?> parent) {
+    return m_jsonAdapterRegistry.getJsonAdapters(parent);
   }
 
   @Override
-  public <M, A extends IJsonAdapter<? super M>> A getOrCreateJsonAdapter(M model) {
-    return getOrCreateJsonAdapter(model, m_jsonAdapterFactory);
+  public <M, A extends IJsonAdapter<? super M>> A getJsonAdapter(M model, IJsonAdapter<?> parent) {
+    return getJsonAdapter(model, parent, true);
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public <M, A extends IJsonAdapter<? super M>> A getOrCreateJsonAdapter(M model, IJsonAdapterFactory adapterFactory) {
-    A jsonAdapter = getJsonAdapter(model);
-    if (jsonAdapter != null) {
-      return jsonAdapter;
+  public <M, A extends IJsonAdapter<? super M>> A getJsonAdapter(M model, IJsonAdapter<?> parent, boolean checkRoot) {
+    A jsonAdapter = m_jsonAdapterRegistry.getJsonAdapter(model, parent);
+    if (jsonAdapter == null && checkRoot) {
+      jsonAdapter = m_jsonAdapterRegistry.getJsonAdapter(model, getRootJsonAdapter());
     }
-    jsonAdapter = (A) createJsonAdapter(model, adapterFactory);
-    // because it's a new adapter we must add it to the response
-    m_currentJsonResponse.addAdapter(jsonAdapter); // TODO AWE: (json) in registerJsonAdapter verschieben? analog unregisterJsonAdapter
     return jsonAdapter;
   }
 
   @Override
-  public void registerJsonAdapter(IJsonAdapter<?> adapter) {
-    m_jsonAdapterRegistry.addJsonAdapter(adapter);
+  public <M, A extends IJsonAdapter<? super M>> A getOrCreateJsonAdapter(M model, IJsonAdapter<?> parent) {
+    return getOrCreateJsonAdapter(model, parent, null);
+  }
+
+  @Override
+  public <M, A extends IJsonAdapter<? super M>> A getOrCreateJsonAdapter(M model, IJsonAdapter<?> parent, IJsonAdapterFactory adapterFactory) {
+    A jsonAdapter = getJsonAdapter(model, parent);
+    if (jsonAdapter != null) {
+      return jsonAdapter;
+    }
+    return createJsonAdapter(model, parent, adapterFactory);
+  }
+
+  @Override
+  public <M, A extends IJsonAdapter<? super M>> A createJsonAdapter(M model, IJsonAdapter<?> parent) {
+    return createJsonAdapter(model, parent, null);
+  }
+
+  @Override
+  public <M, A extends IJsonAdapter<? super M>> A createJsonAdapter(M model, IJsonAdapter<?> parent, IJsonAdapterFactory adapterFactory) {
+    A jsonAdapter = newJsonAdapter(model, parent, adapterFactory);
+
+    // because it's a new adapter we must add it to the response
+    m_currentJsonResponse.addAdapter(jsonAdapter);
+    return jsonAdapter;
+  }
+
+  /**
+   * Creates an adapter instance for the given model using the given factory and calls the <code>init()</code> method
+   * on the created instance.
+   */
+  @SuppressWarnings("unchecked")
+  public <M, A extends IJsonAdapter<? super M>> A newJsonAdapter(M model, IJsonAdapter<?> parent, IJsonAdapterFactory adapterFactory) {
+    if (adapterFactory == null) {
+      adapterFactory = m_jsonAdapterFactory;
+    }
+    String id = createUniqueIdFor(null); // FIXME CGU
+    A adapter = (A) adapterFactory.createJsonAdapter(model, this, id, parent);
+    adapter.init();
+    return adapter;
+  }
+
+  @Override
+  public void registerJsonAdapter(IJsonAdapter<?> jsonAdapter) {
+    m_jsonAdapterRegistry.addJsonAdapter(jsonAdapter, jsonAdapter.getParent());
   }
 
   @Override
@@ -480,5 +510,18 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
       LOG.info("Client session with ID " + m_clientSessionId + " terminated.");
     }
+  }
+
+  private static class P_RootAdapter extends AbstractJsonAdapter<Object> {
+
+    public P_RootAdapter(IJsonSession jsonSession) {
+      super(new Object(), jsonSession, jsonSession.createUniqueIdFor(null), null);
+    }
+
+    @Override
+    public String getObjectType() {
+      return null;
+    }
+
   }
 }

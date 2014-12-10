@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumb;
 import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigation;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonAdapter;
+import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonMapper;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
@@ -37,8 +38,8 @@ public class JsonBreadCrumbNavigation<T extends IBreadCrumbsNavigation> extends 
 
   private BreadCrumbsListener m_breadCrumbsListener;
 
-  public JsonBreadCrumbNavigation(T model, IJsonSession jsonSession, String id) {
-    super(model, jsonSession, id);
+  public JsonBreadCrumbNavigation(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
+    super(model, jsonSession, id, parent);
   }
 
   @Override
@@ -77,7 +78,7 @@ public class JsonBreadCrumbNavigation<T extends IBreadCrumbsNavigation> extends 
   }
 
   private JsonForm getJsonForm(IForm form) {
-    return (JsonForm) getJsonSession().getJsonAdapter(form);
+    return (JsonForm) getAdapter(form);
   }
 
   protected JSONArray breadCrumbsToJson(Collection<IBreadCrumb> breadCrumbs) {

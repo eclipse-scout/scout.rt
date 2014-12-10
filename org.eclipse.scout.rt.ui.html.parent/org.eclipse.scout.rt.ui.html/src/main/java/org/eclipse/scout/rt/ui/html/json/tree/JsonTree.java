@@ -10,7 +10,7 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.MouseButton;
-import org.eclipse.scout.rt.client.ui.action.menu.root.ContextMenuEvent;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree5;
@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.menu.IContextMenuOwner;
+import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -52,8 +53,8 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   private Map<ITreeNode, String> m_treeNodeIds;
   private TreeEventFilter m_treeEventFilter;
 
-  public JsonTree(T model, IJsonSession jsonSession, String id) {
-    super(model, jsonSession, id);
+  public JsonTree(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
+    super(model, jsonSession, id, parent);
     m_treeNodes = new HashMap<>();
     m_treeNodeIds = new HashMap<>();
     m_treeEventFilter = new TreeEventFilter(getModel());
@@ -90,14 +91,6 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   protected void attachChildAdapters() {
     super.attachChildAdapters();
     attachAdapter(getModel().getContextMenu());
-    attachAdapters(getModel().getMenus());
-  }
-
-  @Override
-  protected void disposeChildAdapters() {
-    super.disposeChildAdapters();
-    disposeAdapter(getModel().getContextMenu());
-    disposeAdapters(getModel().getMenus());
   }
 
   @Override
@@ -140,7 +133,10 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     }
     putProperty(json, PROP_NODES, jsonNodes);
     putProperty(json, PROP_SELECTED_NODE_IDS, nodeIdsToJson(getModel().getSelectedNodes()));
-    putAdapterIdsProperty(json, PROP_MENUS, getModel().getMenus());
+    JsonContextMenu<IContextMenu> jsonContextMenu = getAdapter(getModel().getContextMenu());
+    if (jsonContextMenu != null) {
+      JsonObjectUtility.putProperty(json, PROP_MENUS, adapterIdsToJson(jsonContextMenu.getJsonChildActions()));
+    }
     return json;
   }
 
@@ -259,10 +255,8 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   }
 
   @Override
-  public void handleModelContextMenuChanged(ContextMenuEvent event) {
-    //FIXME dispose former menus? Keep list of menu adapters? Currently switching a page always creates new menus.
-    List<IJsonAdapter<?>> menuAdapters = attachAdapters(getModel().getMenus());
-    addPropertyChangeEvent(PROP_MENUS, getAdapterIds(menuAdapters));
+  public void handleModelContextMenuChanged(List<IJsonAdapter<?>> menuAdapters) {
+    addPropertyChangeEvent(PROP_MENUS, adapterIdsToJson(menuAdapters));
   }
 
   protected String getOrCreateNodeId(ITreeNode node) {

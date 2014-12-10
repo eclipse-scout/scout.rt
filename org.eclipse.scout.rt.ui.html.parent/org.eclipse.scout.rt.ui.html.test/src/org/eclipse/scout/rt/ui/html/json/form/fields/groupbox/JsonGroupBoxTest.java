@@ -25,7 +25,7 @@ public class JsonGroupBoxTest extends BaseFormFieldTest {
   AbstractGroupBox m_model = new AbstractGroupBox() {
   };
 
-  JsonGroupBox m_groupBox = new JsonGroupBox<IGroupBox>(m_model, m_session, m_session.createUniqueIdFor(null));
+  JsonGroupBox m_groupBox = new JsonGroupBox<IGroupBox>(m_model, m_session, m_session.createUniqueIdFor(null), null);
 
   @Before
   public void setUp() {

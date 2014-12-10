@@ -20,8 +20,8 @@ package org.eclipse.scout.rt.ui.html.json;
 public abstract class JsonProperty<T> {
 
   private final String m_propertyName;
-
   private final T m_model;
+  private IJsonAdapter<?> m_parentJsonAdapter;
 
   public JsonProperty(String propertyName, T model) {
     m_propertyName = propertyName;
@@ -34,6 +34,14 @@ public abstract class JsonProperty<T> {
 
   protected T getModel() {
     return m_model;
+  }
+
+  public void setParentJsonAdapter(IJsonAdapter<?> parentJsonAdapter) {
+    m_parentJsonAdapter = parentJsonAdapter;
+  }
+
+  public IJsonAdapter<?> getParentJsonAdapter() {
+    return m_parentJsonAdapter;
   }
 
   protected abstract Object modelValue();
@@ -51,4 +59,11 @@ public abstract class JsonProperty<T> {
     return m_propertyName + ": " + m_model;
   }
 
+  public Object onPropertyChange(Object oldValue, Object newValue) {
+    return prepareValueForToJson(newValue);
+  }
+
+  public void onCreate() {
+
+  }
 }

@@ -61,7 +61,7 @@ public class AbstractJsonSessionTest {
   public void testCreateDisposeInSameRequest() throws Exception {
     AbstractJsonSession session = new TestEnvironmentJsonSession();
     IStringField model = Mockito.mock(IStringField.class);
-    IJsonAdapter<?> adapter = session.createJsonAdapter(model);
+    IJsonAdapter<?> adapter = session.getOrCreateJsonAdapter(model, null);
     assertEquals(0, getAdapterCount(session));
     adapter.dispose();
     assertEquals(1, getAdapterCount(session));

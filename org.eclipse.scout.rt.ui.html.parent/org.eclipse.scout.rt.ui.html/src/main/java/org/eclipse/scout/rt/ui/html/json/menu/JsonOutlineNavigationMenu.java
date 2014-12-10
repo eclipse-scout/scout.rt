@@ -12,21 +12,22 @@ package org.eclipse.scout.rt.ui.html.json.menu;
 
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutlineNavigationMenu;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
+import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
-import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
+import org.eclipse.scout.rt.ui.html.json.form.fields.JsonGlobalAdapterProperty;
 
 public class JsonOutlineNavigationMenu<T extends AbstractOutlineNavigationMenu> extends JsonMenu<T> {
 
   private static final String PROP_OUTLINE = "outline";
 
-  public JsonOutlineNavigationMenu(T model, IJsonSession jsonSession, String id) {
-    super(model, jsonSession, id);
+  public JsonOutlineNavigationMenu(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
+    super(model, jsonSession, id, parent);
   }
 
   @Override
   protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
-    putJsonProperty(new JsonAdapterProperty<T>(PROP_OUTLINE, model, getJsonSession()) {
+    putJsonProperty(new JsonGlobalAdapterProperty<T>(PROP_OUTLINE, model, getJsonSession()) {
       @Override
       protected IOutline modelValue() {
         return getModel().getOutline();

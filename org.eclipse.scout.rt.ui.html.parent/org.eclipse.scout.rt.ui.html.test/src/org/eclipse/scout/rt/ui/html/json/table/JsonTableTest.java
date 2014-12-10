@@ -38,11 +38,18 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(ScoutClientTestRunner.class)
 public class JsonTableTest {
+  private JsonSessionMock m_jsonSession;
+
+  @Before
+  public void setUp() {
+    m_jsonSession = new JsonSessionMock();
+  }
 
   /**
    * Tests whether the model row gets correctly selected
@@ -54,7 +61,7 @@ public class JsonTableTest {
     assertNull(table.getSelectedRow());
 
     ITableRow row = table.getRow(2);
-    JsonTable jsonTable = createJsonTableWithMocks(table);
+    JsonTable<ITable> jsonTable = m_jsonSession.newJsonAdapter(table, null, null);
 
     JsonEvent event = createJsonSelectedEvent(jsonTable.getOrCreatedRowId(row));
     jsonTable.handleUiEvent(event, new JsonResponse());
@@ -74,7 +81,7 @@ public class JsonTableTest {
 
     assertTrue(row1.isSelected());
 
-    JsonTable jsonTable = createJsonTableWithMocks(table);
+    JsonTable<ITable> jsonTable = m_jsonSession.newJsonAdapter(table, null, null);
     JsonEvent event = createJsonSelectedEvent(null);
 
     jsonTable.handleUiEvent(event, new JsonResponse());
@@ -90,13 +97,13 @@ public class JsonTableTest {
     Table table = createTableFixture(5);
 
     ITableRow row = table.getRow(2);
-    JsonTable jsonTable = createJsonTableWithMocks(table);
+    JsonTable<ITable> jsonTable = m_jsonSession.newJsonAdapter(table, null, null);
 
     JsonEvent event = createJsonSelectedEvent(jsonTable.getOrCreatedRowId(row));
     jsonTable.handleUiEvent(event, new JsonResponse());
 
     List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(
-        jsonTable.getJsonSession().currentJsonResponse(), JsonTable.EVENT_ROWS_SELECTED);
+        m_jsonSession.currentJsonResponse(), JsonTable.EVENT_ROWS_SELECTED);
     assertTrue(responseEvents.size() == 0);
   }
 
@@ -117,7 +124,7 @@ public class JsonTableTest {
     ITableRow row2 = table.getRow(2);
     ITableRow row4 = table.getRow(4);
 
-    JsonTable<ITable> jsonTable = createJsonTableWithMocks(table);
+    JsonTable<ITable> jsonTable = m_jsonSession.newJsonAdapter(table, null, null);
     JsonEvent event = createJsonSelectedEvent(jsonTable.getOrCreatedRowId(row2));
 
     assertFalse(row2.isSelected());
@@ -129,7 +136,7 @@ public class JsonTableTest {
     assertTrue(row4.isSelected());
 
     List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(
-        jsonTable.getJsonSession().currentJsonResponse(), JsonTable.EVENT_ROWS_SELECTED);
+        m_jsonSession.currentJsonResponse(), JsonTable.EVENT_ROWS_SELECTED);
     assertTrue(responseEvents.size() == 1);
 
     List<ITableRow> tableRows = jsonTable.extractTableRows(responseEvents.get(0).getData());
@@ -156,7 +163,7 @@ public class JsonTableTest {
     ITableRow row4 = table.getRow(4);
     table.selectRow(row2);
 
-    JsonTable<ITable> jsonTable = createJsonTableWithMocks(table);
+    JsonTable<ITable> jsonTable = m_jsonSession.newJsonAdapter(table, null, null);
     JsonEvent event = createJsonSelectedEvent(null);
 
     assertTrue(row2.isSelected());
@@ -168,7 +175,7 @@ public class JsonTableTest {
     assertTrue(row4.isSelected());
 
     List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(
-        jsonTable.getJsonSession().currentJsonResponse(), JsonTable.EVENT_ROWS_SELECTED);
+        m_jsonSession.currentJsonResponse(), JsonTable.EVENT_ROWS_SELECTED);
     assertTrue(responseEvents.size() == 1);
 
     List<ITableRow> tableRows = jsonTable.extractTableRows(responseEvents.get(0).getData());
@@ -184,7 +191,7 @@ public class JsonTableTest {
 
     IColumn<?> column0 = table.getColumns().get(0);
     IColumn<?> column1 = table.getColumns().get(1);
-    JsonTable jsonTable = createJsonTableWithMocks(table);
+    JsonTable<ITable> jsonTable = m_jsonSession.newJsonAdapter(table, null, null);
 
     assertEquals(table.getColumnSet().getVisibleColumn(0), column0);
     assertEquals(table.getColumnSet().getVisibleColumn(1), column1);
@@ -212,13 +219,13 @@ public class JsonTableTest {
     table.resetDisplayableColumns();
 
     IColumn<?> column = table.getColumns().get(0);
-    JsonTable jsonTable = createJsonTableWithMocks(table);
+    JsonTable<ITable> jsonTable = m_jsonSession.newJsonAdapter(table, null, null);
 
     JsonEvent event = createJsonColumnMovedEvent(column.getColumnId(), 2);
     jsonTable.handleUiEvent(event, new JsonResponse());
 
     List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(
-        jsonTable.getJsonSession().currentJsonResponse(), "columnOrderChanged");
+        m_jsonSession.currentJsonResponse(), "columnOrderChanged");
     assertTrue(responseEvents.size() == 0);
   }
 
@@ -267,10 +274,12 @@ public class JsonTableTest {
   @Test
   public void testDispose() {
     Table table = new Table();
-    JsonTable object = createJsonTableWithMocks(table);
+    JsonTable<ITable> object = m_jsonSession.newJsonAdapter(table, null, null);
+
     WeakReference<JsonTable> ref = new WeakReference<JsonTable>(object);
     object.dispose();
-    object.getJsonSession().flush();
+    m_jsonSession.flush();
+    m_jsonSession = null;
     object = null;
     JsonTestUtility.assertGC(ref);
   }
@@ -280,13 +289,6 @@ public class JsonTableTest {
     table.fill(numRows);
     table.initTable();
     return table;
-  }
-
-  public static JsonTable<ITable> createJsonTableWithMocks(ITable table) {
-    JsonSessionMock jsonSession = new JsonSessionMock();
-    JsonTable<ITable> jsonTable = new JsonTable<ITable>(table, jsonSession, jsonSession.createUniqueIdFor(null));
-    jsonTable.attach();
-    return jsonTable;
   }
 
   public static JsonEvent createJsonSelectedEvent(String rowId) throws JSONException {

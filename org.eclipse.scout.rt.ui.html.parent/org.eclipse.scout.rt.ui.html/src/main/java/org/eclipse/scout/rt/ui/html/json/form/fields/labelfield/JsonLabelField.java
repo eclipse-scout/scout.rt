@@ -11,14 +11,15 @@
 package org.eclipse.scout.rt.ui.html.json.form.fields.labelfield;
 
 import org.eclipse.scout.rt.client.ui.form.fields.labelfield.ILabelField;
+import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 
 public class JsonLabelField<T extends ILabelField> extends JsonValueField<T> {
 
-  public JsonLabelField(T model, IJsonSession session, String id) {
-    super(model, session, id);
+  public JsonLabelField(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
+    super(model, jsonSession, id, parent);
   }
 
   @Override

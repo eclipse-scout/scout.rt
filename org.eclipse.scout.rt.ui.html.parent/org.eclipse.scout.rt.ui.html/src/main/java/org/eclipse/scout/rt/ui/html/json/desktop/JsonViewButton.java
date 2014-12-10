@@ -17,8 +17,8 @@ import org.json.JSONObject;
 
 public class JsonViewButton<T extends IViewButton> extends AbstractJsonPropertyObserver<T> {
 
-  public JsonViewButton(T model, IJsonSession jsonSession, String id) {
-    super(model, jsonSession, id);
+  public JsonViewButton(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
+    super(model, jsonSession, id, parent);
   }
 
   @Override
@@ -56,16 +56,10 @@ public class JsonViewButton<T extends IViewButton> extends AbstractJsonPropertyO
 
     //Only return if attached
     IOutline outline = getOutline();
-    if (getJsonSession().getJsonAdapter(outline) != null) {
+    if (getAdapter(outline) != null) {
       putAdapterIdProperty(json, "outline", outline);
     }
     return json;
-  }
-
-  @Override
-  protected void disposeChildAdapters() {
-    super.disposeChildAdapters();
-    optDisposeAdapter(getOutline());
   }
 
   // FIXME CGU: provide proper api on AbstractOutlineViewButton
@@ -94,10 +88,12 @@ public class JsonViewButton<T extends IViewButton> extends AbstractJsonPropertyO
   }
 
   protected void handleUiClick(JsonEvent event, JsonResponse res) {
-    //Lazy attaching
+    // Lazy attaching
     IOutline outline = getOutline();
-    if (outline != null && getJsonSession().getJsonAdapter(outline) == null) {
-      IJsonAdapter<?> jsonOutline = attachAdapter(outline);
+    IJsonAdapter<?> rootJsonAdapter = getJsonSession().getRootJsonAdapter();
+    if (outline != null && rootJsonAdapter.getAdapter(outline) == null) {
+      // Outline is global -> let JsonRootAdapter manage those to make sure JsonOutline does not get disposed when disposing a view button
+      IJsonAdapter<?> jsonOutline = rootJsonAdapter.attachAdapter(outline);
       addPropertyChangeEvent("outline", jsonOutline.getId());
     }
 

@@ -8,22 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.html.json.table;
+package org.eclipse.scout.rt.ui.html.json.form.fields;
 
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
-import org.eclipse.scout.rt.ui.html.json.menu.JsonMenu;
 
-public class JsonTableOrganizeMenu<T extends IMenu> extends JsonMenu<T> {
+public abstract class JsonGlobalAdapterProperty<T> extends JsonAdapterProperty<T> {
 
-  public JsonTableOrganizeMenu(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
-    super(model, jsonSession, id, parent);
+  public JsonGlobalAdapterProperty(String propertyName, T model, IJsonSession session) {
+    super(propertyName, model, session, true);
   }
-
-  @Override
-  public String getObjectType() {
-    return "TableOrganizeMenu";
-  }
-
 }

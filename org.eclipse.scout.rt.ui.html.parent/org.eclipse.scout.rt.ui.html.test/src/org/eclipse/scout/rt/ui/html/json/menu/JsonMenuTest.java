@@ -36,7 +36,7 @@ public class JsonMenuTest {
     menu.setText("foo");
 
     // when adapter has been created we have the complete adapter in the adapter-data section of the JSON response
-    JsonMenu<IMenu> menuAdapter = m_jsonSession.getOrCreateJsonAdapter(menu);
+    JsonMenu<IMenu> menuAdapter = m_jsonSession.getOrCreateJsonAdapter(menu, null);
     JSONObject json = m_jsonSession.currentJsonResponse().toJson();
     JSONObject adpaterData = JsonTestUtility.getAdapterData(json, menuAdapter.getId());
     assertEquals("foo", adpaterData.getString("text"));

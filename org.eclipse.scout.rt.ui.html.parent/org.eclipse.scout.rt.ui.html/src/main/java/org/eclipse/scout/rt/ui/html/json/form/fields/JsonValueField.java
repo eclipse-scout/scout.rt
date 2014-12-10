@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.html.json.form.fields;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
+import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
@@ -27,8 +28,8 @@ import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 public class JsonValueField<T extends IValueField<?>> extends JsonFormField<T> {
   public static final String EVENT_DISPLAY_TEXT_CHANGED = "displayTextChanged";
 
-  public JsonValueField(T model, IJsonSession session, String id) {
-    super(model, session, id);
+  public JsonValueField(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
+    super(model, jsonSession, id, parent);
   }
 
   @Override

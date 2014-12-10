@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistField
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.Multiline;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
+import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonException;
@@ -42,8 +43,8 @@ public class JsonSmartField<V, T extends ISmartField<V>> extends JsonValueField<
 
   private List<? extends ILookupRow<V>> m_options = new ArrayList<>();
 
-  public JsonSmartField(T model, IJsonSession session, String id) {
-    super(model, session, id);
+  public JsonSmartField(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
+    super(model, jsonSession, id, parent);
   }
 
   @Override

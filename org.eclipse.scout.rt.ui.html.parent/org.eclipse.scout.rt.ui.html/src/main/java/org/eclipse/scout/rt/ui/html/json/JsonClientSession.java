@@ -31,19 +31,22 @@ import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ILocaleListener;
 import org.eclipse.scout.rt.client.LocaleChangeEvent;
+import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.ui.html.Activator;
+import org.eclipse.scout.rt.ui.html.json.desktop.JsonDesktop;
 import org.json.JSONObject;
 
-public class JsonClientSession extends AbstractJsonAdapter<IClientSession> {
+public class JsonClientSession<T extends IClientSession> extends AbstractJsonAdapter<T> {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonClientSession.class);
 
   private ILocaleListener m_localeListener;
   private boolean m_localeManagedByModel;
   private boolean m_started;
+  private JsonDesktop<IDesktop> m_jsonDesktop;
 
-  public JsonClientSession(IClientSession model, IJsonSession jsonSession, String id) {
-    super(model, jsonSession, id);
+  public JsonClientSession(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
+    super(model, jsonSession, id, parent);
     m_localeManagedByModel = false;
     m_started = false;
   }
@@ -64,11 +67,11 @@ public class JsonClientSession extends AbstractJsonAdapter<IClientSession> {
       // FIXME CGU: copied from session service. Moved here to be able to attach locale listener first
       getModel().startSession(Activator.getDefault().getBundle());
     }
-    
+
     // attach child adapters - we cannot do this in attachModel() as normal
     // since the desktop is not yet created when attachModel runs.
     // see AbstractJsonSession#init()
-    attachAdapter(getModel().getDesktop());
+    m_jsonDesktop = attachAdapter(getModel().getDesktop());
 
     if (!getModel().getDesktop().isOpened()) {
       getModel().getDesktop().getUIFacade().fireDesktopOpenedFromUI();
@@ -82,6 +85,11 @@ public class JsonClientSession extends AbstractJsonAdapter<IClientSession> {
 
   public boolean isStarted() {
     return m_started;
+  }
+
+  @Override
+  public JsonDesktop<IDesktop> getJsonDesktop() {
+    return m_jsonDesktop;
   }
 
   @Override

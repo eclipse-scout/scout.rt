@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.html.json.form.fields.groupbox;
 
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
+import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
@@ -23,8 +24,8 @@ public class JsonGroupBox<T extends IGroupBox> extends JsonFormField<T> {
 
   public static final String PROP_MAIN_BOX = "mainBox";
 
-  public JsonGroupBox(T model, IJsonSession session, String id) {
-    super(model, session, id);
+  public JsonGroupBox(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
+    super(model, jsonSession, id, parent);
   }
 
   @Override
@@ -60,12 +61,6 @@ public class JsonGroupBox<T extends IGroupBox> extends JsonFormField<T> {
   protected void attachChildAdapters() {
     super.attachChildAdapters();
     attachAdapters(getModel().getFields());
-  }
-
-  @Override
-  protected void disposeChildAdapters() {
-    super.disposeChildAdapters();
-    disposeAdapters(getModel().getFields());
   }
 
   @Override

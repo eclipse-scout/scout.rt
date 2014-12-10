@@ -10,10 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.menu;
 
-import org.eclipse.scout.rt.client.ui.action.menu.root.ContextMenuEvent;
+import java.util.List;
+
+import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 
 public interface IContextMenuOwner {
   String PROP_MENUS = "menus";
 
-  void handleModelContextMenuChanged(ContextMenuEvent event);
+  void handleModelContextMenuChanged(List<IJsonAdapter<?>> menuAdapters);
 }

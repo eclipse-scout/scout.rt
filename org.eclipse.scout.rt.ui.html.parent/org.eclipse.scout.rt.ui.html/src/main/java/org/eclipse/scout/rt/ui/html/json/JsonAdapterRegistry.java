@@ -11,6 +11,8 @@
 package org.eclipse.scout.rt.ui.html.json;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.commons.CollectionUtility;
@@ -23,9 +25,7 @@ class JsonAdapterRegistry {
   private static class P_RegistryValue {
 
     private final String m_id;
-
     private final IJsonAdapter<?> m_jsonAdapter;
-
     private final Object m_model;
 
     P_RegistryValue(String id, Object model, IJsonAdapter<?> jsonAdapter) {
@@ -42,29 +42,33 @@ class JsonAdapterRegistry {
   private final Map<String, P_RegistryValue> m_idAdapterMap;
 
   /**
-   * Maps a Scout model instance to an IJsonAdapter instance (wrapped by a composite).
+   * Maps Scout model instance to an IJsonAdapter instance (wrapped by a composite), grouped by parents
    */
-  private final Map<Object, P_RegistryValue> m_modelAdapterMap;
+  private final Map<IJsonAdapter<?>, Map<Object, P_RegistryValue>> m_parentAdapterMap;
 
   JsonAdapterRegistry() {
     m_idAdapterMap = new HashMap<>();
-    m_modelAdapterMap = new HashMap<>();
+    m_parentAdapterMap = new HashMap<>();
   }
 
-  void addJsonAdapter(IJsonAdapter jsonAdapter) {
+  void addJsonAdapter(IJsonAdapter jsonAdapter, IJsonAdapter<?> parent) {
     String id = jsonAdapter.getId();
     Object model = jsonAdapter.getModel();
 
     P_RegistryValue value = new P_RegistryValue(id, model, jsonAdapter);
     m_idAdapterMap.put(id, value);
-    m_modelAdapterMap.put(model, value);
+    Map<Object, P_RegistryValue> modelAdapterMap = m_parentAdapterMap.get(parent);
+    if (modelAdapterMap == null) {
+      modelAdapterMap = new HashMap<Object, JsonAdapterRegistry.P_RegistryValue>();
+      m_parentAdapterMap.put(parent, modelAdapterMap);
+    }
+    modelAdapterMap.put(model, value);
   }
 
   void removeJsonAdapter(String id) {
     P_RegistryValue value = m_idAdapterMap.remove(id);
-    if (value != null) {
-      //FIXME CGU not null check necessary for tests, check with awe
-      m_modelAdapterMap.remove(value.m_model);
+    for (Map<Object, P_RegistryValue> modelAdapterMap : m_parentAdapterMap.values()) {
+      modelAdapterMap.remove(value.m_model);
     }
   }
 
@@ -73,14 +77,28 @@ class JsonAdapterRegistry {
   }
 
   @SuppressWarnings("unchecked")
-  <M, A extends IJsonAdapter<? super M>> A getJsonAdapter(M model) {
-    P_RegistryValue value = m_modelAdapterMap.get(model);
+  <M, A extends IJsonAdapter<? super M>> A getJsonAdapter(M model, IJsonAdapter<?> parent) {
+    Map<Object, P_RegistryValue> modelAdapterMap = m_parentAdapterMap.get(parent);
+    if (modelAdapterMap == null) {
+      return null;
+    }
+    P_RegistryValue value = modelAdapterMap.get(model);
     if (value == null) {
       return null;
     }
-    else {
-      return (A) value.m_jsonAdapter;
+    return (A) value.m_jsonAdapter;
+  }
+
+  List<IJsonAdapter<?>> getJsonAdapters(IJsonAdapter<?> parent) {
+    List<IJsonAdapter<?>> childAdapters = new LinkedList<IJsonAdapter<?>>();
+    Map<Object, P_RegistryValue> modelAdapterMap = m_parentAdapterMap.get(parent);
+    if (modelAdapterMap == null) {
+      return childAdapters;
     }
+    for (P_RegistryValue value : modelAdapterMap.values()) {
+      childAdapters.add(value.m_jsonAdapter);
+    }
+    return childAdapters;
   }
 
   void dispose() {
@@ -90,7 +108,7 @@ class JsonAdapterRegistry {
       removeJsonAdapter(jsonAdapter.getId());
     }
     assert m_idAdapterMap.isEmpty();
-    assert m_modelAdapterMap.isEmpty();
+    assert m_parentAdapterMap.isEmpty();
   }
 
 }

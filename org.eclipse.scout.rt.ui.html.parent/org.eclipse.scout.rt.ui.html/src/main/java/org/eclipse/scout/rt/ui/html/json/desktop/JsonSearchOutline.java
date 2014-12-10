@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.html.json.desktop;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.desktop.outline.ISearchOutline;
+import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonException;
@@ -20,8 +21,8 @@ import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 
 public class JsonSearchOutline<T extends ISearchOutline> extends JsonOutline<T> {
 
-  public JsonSearchOutline(T model, IJsonSession jsonSession, String id) {
-    super(model, jsonSession, id);
+  public JsonSearchOutline(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
+    super(model, jsonSession, id, parent);
   }
 
   @Override

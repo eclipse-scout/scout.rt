@@ -18,7 +18,6 @@ import java.util.Map;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.json.JSONObject;
 
 public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> extends AbstractJsonAdapter<T> {
@@ -33,8 +32,8 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
    */
   private Map<String, JsonProperty> m_jsonProperties;
 
-  public AbstractJsonPropertyObserver(T model, IJsonSession jsonSession, String id) {
-    super(model, jsonSession, id);
+  public AbstractJsonPropertyObserver(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
+    super(model, jsonSession, id, parent);
     m_propertyEventFilter = new PropertyEventFilter();
     m_jsonProperties = new HashMap<>();
   }
@@ -55,10 +54,12 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
    * which means they're automatically included in the object returned by the <code>toJson()</code> method and also
    * are propagated to the browser-side client when a property change event occurs.
    */
+  @SuppressWarnings("unchecked")
   protected void putJsonProperty(JsonProperty jsonProperty) {
     if (!m_initializingProperties) {
       throw new IllegalStateException("Putting properties is only allowed in initJsonProperties.");
     }
+    jsonProperty.setParentJsonAdapter(this);
     m_jsonProperties.put(jsonProperty.getPropertyName(), jsonProperty);
   }
 
@@ -69,9 +70,6 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
   /**
    * Adds a filter condition for the given property and value to the current response. When later in this event
    * handler a property change event occurs with the same value, the event is not sent back to the client (=filtered).
-   *
-   * @param propertyName
-   * @param value
    */
   protected void addPropertyEventFilterCondition(String propertyName, Object value) {
     m_propertyEventFilter.addCondition(new PropertyChangeEventFilterCondition(propertyName, value));
@@ -81,24 +79,7 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
   protected void attachChildAdapters() {
     super.attachChildAdapters();
     for (JsonProperty<?> prop : m_jsonProperties.values()) {
-      if (prop instanceof JsonAdapterProperty) {
-        ((JsonAdapterProperty) prop).attachAdapters();
-      }
-    }
-  }
-
-  @Override
-  protected void disposeChildAdapters() {
-    super.disposeChildAdapters();
-    // FIXME CGU this is actually wrong. attach adapters does not necessarily create a new adapter (It may if there is non for the given model).
-    // Dispose however always disposes. If the model is used elsewhere, it will fail because there is no adapter anymore
-    // Possible solutions:
-    // - Dispose removes just the owning adapter (this) from a set of references. Only if the list is empty dispose the adapter. BUT: Assuming the property is set to null before disposing the owning adapter, the child adapter never gets disposed.
-    // - Don't create an adapter for each model instance. Instead always create an adapter if the owning adapter needs one (getOrCreate -> create). But: May influence traffic and offline behaviour. Needs to be considered very well.
-    for (JsonProperty<?> prop : m_jsonProperties.values()) {
-      if (prop instanceof JsonAdapterProperty) {
-        ((JsonAdapterProperty) prop).disposeAdapters();
-      }
+      prop.onCreate();
     }
   }
 
@@ -129,10 +110,10 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
     return json;
   }
 
-  protected void handleModelPropertyChange(String propertyName, Object newValue) {
+  protected void handleModelPropertyChange(String propertyName, Object oldValue, Object newValue) {
     if (m_jsonProperties.containsKey(propertyName)) {
       JsonProperty jsonProperty = m_jsonProperties.get(propertyName);
-      addPropertyChangeEvent(propertyName, jsonProperty.prepareValueForToJson(newValue));
+      addPropertyChangeEvent(propertyName, jsonProperty.onPropertyChange(oldValue, newValue));
       LOG.debug("Added property change event '" + propertyName + ": " + newValue + "' for " + getObjectType() + " with id " + getId() + ". Model: " + getModel());
     }
   }
@@ -144,7 +125,7 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
       if (event == null) {
         return;
       }
-      handleModelPropertyChange(event.getPropertyName(), event.getNewValue());
+      handleModelPropertyChange(event.getPropertyName(), event.getOldValue(), event.getNewValue());
     }
   }
 

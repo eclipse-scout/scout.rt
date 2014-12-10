@@ -45,7 +45,7 @@ public class JsonDesktopTest {
   private void setUp(IDesktop desktop) {
     this.m_desktop = desktop;
     m_session = new JsonSessionMock();
-    m_jsonDesktop = new JsonDesktop<IDesktop>(desktop, m_session, m_session.createUniqueIdFor(null));
+    m_jsonDesktop = new JsonDesktop<IDesktop>(desktop, m_session, m_session.createUniqueIdFor(null), null);
     m_jsonDesktop.attach();
   }
 
@@ -73,12 +73,12 @@ public class JsonDesktopTest {
     FormWithOneField form = new FormWithOneField();
     form.setAutoAddRemoveOnDesktop(false);
 
-    JsonForm formAdapter = (JsonForm) m_session.getJsonAdapter(form);
+    JsonForm formAdapter = (JsonForm) m_jsonDesktop.getAdapter(form);
     assertNull(formAdapter);
 
     m_desktop.addForm(form);
 
-    formAdapter = (JsonForm) m_session.getJsonAdapter(form);
+    formAdapter = (JsonForm) m_jsonDesktop.getAdapter(form);
     assertNotNull(formAdapter);
 
     JsonResponse jsonResp = m_session.currentJsonResponse();
@@ -121,12 +121,12 @@ public class JsonDesktopTest {
     FormWithOneField form = new FormWithOneField();
     form.setAutoAddRemoveOnDesktop(false);
 
-    JsonForm jsonForm = (JsonForm) m_session.getJsonAdapter(form);
+    JsonForm jsonForm = (JsonForm) m_jsonDesktop.getAdapter(form);
     assertNull(jsonForm);
 
     m_desktop.addForm(form);
 
-    jsonForm = (JsonForm) m_session.getJsonAdapter(form);
+    jsonForm = (JsonForm) m_jsonDesktop.getAdapter(form);
     assertNotNull(jsonForm);
 
     List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(m_session.currentJsonResponse(), "formAdded");

@@ -10,13 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form;
 
-import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
-import org.eclipse.scout.rt.client.ui.action.menu.root.ContextMenuEvent;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -25,15 +25,17 @@ import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
+import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.menu.IContextMenuOwner;
+import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.json.JSONObject;
 
 public class JsonForm<T extends IForm> extends AbstractJsonPropertyObserver<T> implements IContextMenuOwner {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonForm.class);
 
-  public JsonForm(T model, IJsonSession jsonSession, String id) {
-    super(model, jsonSession, id);
+  public JsonForm(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
+    super(model, jsonSession, id, parent);
   }
 
   public static final String EVENT_FORM_CLOSING = "formClosing";
@@ -62,17 +64,6 @@ public class JsonForm<T extends IForm> extends AbstractJsonPropertyObserver<T> i
     attachAdapter(getModel().getRootGroupBox());
     if (getModel() instanceof IForm5) {
       attachAdapter(((IForm5) getModel()).getContextMenu());
-      attachAdapters(((IForm5) getModel()).getMenus());
-    }
-  }
-
-  @Override
-  protected void disposeChildAdapters() {
-    super.disposeChildAdapters();
-    disposeAdapter(getModel().getRootGroupBox());
-    if (getModel() instanceof IForm5) {
-      disposeAdapter(((IForm5) getModel()).getContextMenu());
-      disposeAdapters(((IForm5) getModel()).getMenus());
     }
   }
 
@@ -110,7 +101,10 @@ public class JsonForm<T extends IForm> extends AbstractJsonPropertyObserver<T> i
     putProperty(json, PROP_DISPLAY_VIEW_ID, model.getDisplayViewId());
     putProperty(json, "rootGroupBox", getAdapterIdForModel(model.getRootGroupBox()));
     if (getModel() instanceof IForm5) {
-      putAdapterIdsProperty(json, PROP_MENUS, ((IForm5) getModel()).getMenus());
+      JsonContextMenu<IContextMenu> jsonContextMenu = getAdapter(((IForm5) getModel()).getContextMenu());
+      if (jsonContextMenu != null) {
+        JsonObjectUtility.putProperty(json, PROP_MENUS, adapterIdsToJson(jsonContextMenu.getJsonChildActions()));
+      }
     }
     return json;
   }
@@ -151,11 +145,8 @@ public class JsonForm<T extends IForm> extends AbstractJsonPropertyObserver<T> i
   }
 
   @Override
-  public void handleModelContextMenuChanged(ContextMenuEvent event) {
-    if (getModel() instanceof IForm5) {
-      Collection<IJsonAdapter<?>> menuAdapters = attachAdapters(((IForm5) getModel()).getMenus());
-      addPropertyChangeEvent(PROP_MENUS, getAdapterIds(menuAdapters));
-    }
+  public void handleModelContextMenuChanged(List<IJsonAdapter<?>> menuAdapters) {
+    addPropertyChangeEvent(PROP_MENUS, adapterIdsToJson(menuAdapters));
   }
 
   @Override

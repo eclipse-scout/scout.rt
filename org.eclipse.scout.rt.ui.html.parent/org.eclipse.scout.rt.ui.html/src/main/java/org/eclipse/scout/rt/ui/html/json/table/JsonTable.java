@@ -25,7 +25,7 @@ import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
-import org.eclipse.scout.rt.client.ui.action.menu.root.ContextMenuEvent;
+import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable5;
@@ -48,6 +48,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.json.menu.IContextMenuOwner;
+import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -77,8 +78,8 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   private Map<ITableRow, String> m_tableRowIds;
   private TableEventFilter m_tableEventFilter;
 
-  public JsonTable(T model, IJsonSession jsonSession, String id) {
-    super(model, jsonSession, id);
+  public JsonTable(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
+    super(model, jsonSession, id, parent);
     m_tableRows = new HashMap<>();
     m_tableRowIds = new HashMap<>();
     m_tableEventFilter = new TableEventFilter(this);
@@ -183,19 +184,8 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   protected void attachChildAdapters() {
     super.attachChildAdapters();
     attachAdapter(getModel().getContextMenu());
-    attachAdapters(getModel().getMenus());
     if (getModel() instanceof ITable5) {
       attachAdapters(((ITable5) getModel()).getControls());
-    }
-  }
-
-  @Override
-  protected void disposeChildAdapters() {
-    super.disposeChildAdapters();
-    disposeAdapter(getModel().getContextMenu());
-    disposeAdapters(getModel().getMenus());
-    if (getModel() instanceof ITable5) {
-      disposeAdapters(((ITable5) getModel()).getControls());
     }
   }
 
@@ -227,7 +217,10 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
       jsonRows.put(jsonRow);
     }
     putProperty(json, "rows", jsonRows);
-    putAdapterIdsProperty(json, PROP_MENUS, getModel().getMenus());
+    JsonContextMenu<IContextMenu> jsonContextMenu = getAdapter(getModel().getContextMenu());
+    if (jsonContextMenu != null) {
+      JsonObjectUtility.putProperty(json, PROP_MENUS, adapterIdsToJson(jsonContextMenu.getJsonChildActions()));
+    }
     if (getModel() instanceof ITable5) {
       putAdapterIdsProperty(json, "controls", ((ITable5) getModel()).getControls());
     }
@@ -656,9 +649,8 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   }
 
   @Override
-  public void handleModelContextMenuChanged(ContextMenuEvent event) {
-    Collection<IJsonAdapter<?>> menuAdapters = attachAdapters(getModel().getMenus());
-    addPropertyChangeEvent(PROP_MENUS, getAdapterIds(menuAdapters));
+  public void handleModelContextMenuChanged(List<IJsonAdapter<?>> menuAdapters) {
+    addPropertyChangeEvent(PROP_MENUS, adapterIdsToJson(menuAdapters));
   }
 
   private class P_ModelTableListener implements TableListener {

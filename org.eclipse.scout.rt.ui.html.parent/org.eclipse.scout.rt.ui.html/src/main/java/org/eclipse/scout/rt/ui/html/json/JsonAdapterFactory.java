@@ -98,136 +98,136 @@ public class JsonAdapterFactory implements IJsonAdapterFactory {
 
   @Override
   @SuppressWarnings("unchecked")
-  public IJsonAdapter<?> createJsonAdapter(Object model, IJsonSession session, String id) {
+  public IJsonAdapter<?> createJsonAdapter(Object model, IJsonSession session, String id, IJsonAdapter<?> parent) {
     // form fields
     if (model instanceof IGroupBox) {
       // we must distinct between normal group-boxes and group-boxes in tab-boxes
       // the use the same model, but we need different adapters
       IGroupBox groupBox = (IGroupBox) model;
       if (groupBox.getParentField() instanceof ITabBox) {
-        return new JsonTabItem(groupBox, session, id);
+        return new JsonTabItem(groupBox, session, id, parent);
       }
       else {
-        return new JsonGroupBox(groupBox, session, id);
+        return new JsonGroupBox(groupBox, session, id, parent);
       }
     }
     else if (model instanceof ISequenceBox) {
-      return new JsonSequenceBox((ISequenceBox) model, session, id);
+      return new JsonSequenceBox((ISequenceBox) model, session, id, parent);
     }
     else if (model instanceof ITabBox) {
-      return new JsonTabBox((ITabBox) model, session, id);
+      return new JsonTabBox((ITabBox) model, session, id, parent);
     }
     else if (model instanceof ICheckBox) {
-      return new JsonCheckBoxField((IBooleanField) model, session, id);
+      return new JsonCheckBoxField((IBooleanField) model, session, id, parent);
     }
     else if (model instanceof ILabelField) {
-      return new JsonLabelField((ILabelField) model, session, id);
+      return new JsonLabelField((ILabelField) model, session, id, parent);
     }
     else if (model instanceof IImageField) {
-      return new JsonImageField((IImageField) model, session, id);
+      return new JsonImageField((IImageField) model, session, id, parent);
     }
     else if (model instanceof ITableField<?>) {
-      return new JsonTableField((ITableField) model, session, id);
+      return new JsonTableField((ITableField) model, session, id, parent);
     }
     else if (model instanceof ITreeField) {
-      return new JsonTreeField((ITreeField) model, session, id);
+      return new JsonTreeField((ITreeField) model, session, id, parent);
     }
     else if (model instanceof IButton) {
-      return new JsonButton((IButton) model, session, id);
+      return new JsonButton((IButton) model, session, id, parent);
     }
     else if (model instanceof IRichTextField) {
-      return new JsonRichTextField((IRichTextField) model, session, id);
+      return new JsonRichTextField((IRichTextField) model, session, id, parent);
     }
     else if (model instanceof ITagCloudField) {
-      return new JsonTagCloudField((ITagCloudField) model, session, id);
+      return new JsonTagCloudField((ITagCloudField) model, session, id, parent);
     }
     else if (model instanceof IStringField) {
-      return new JsonStringField((IStringField) model, session, id);
+      return new JsonStringField((IStringField) model, session, id, parent);
     }
     else if (model instanceof INumberField) {
-      return new JsonNumberField((INumberField) model, session, id);
+      return new JsonNumberField((INumberField) model, session, id, parent);
     }
     else if (model instanceof ISmartField) {
-      return new JsonSmartField((ISmartField) model, session, id);
+      return new JsonSmartField((ISmartField) model, session, id, parent);
     }
     else if (model instanceof IDateField) {
-      return new JsonDateField((IDateField) model, session, id);
+      return new JsonDateField((IDateField) model, session, id, parent);
     }
     else if (model instanceof IFormField) {
-      return new JsonFormField((IFormField) model, session, id);
+      return new JsonFormField((IFormField) model, session, id, parent);
     }
     // other model objects
     else if (model instanceof IDesktop) {
-      return new JsonDesktop((IDesktop) model, session, id);
+      return new JsonDesktop((IDesktop) model, session, id, parent);
     }
     else if (model instanceof IContextMenu) {
-      return new JsonContextMenu((IContextMenu) model, session, id);
+      return new JsonContextMenu((IContextMenu) model, session, id, parent);
     }
     else if (model instanceof TableOrganizeMenu) { //Needs to be before IMenu
-      return new JsonTableOrganizeMenu((TableOrganizeMenu) model, session, id);
+      return new JsonTableOrganizeMenu((TableOrganizeMenu) model, session, id, parent);
     }
     else if (model instanceof AbstractOutlineNavigationMenu) {
-      return new JsonOutlineNavigationMenu((AbstractOutlineNavigationMenu) model, session, id);
+      return new JsonOutlineNavigationMenu((AbstractOutlineNavigationMenu) model, session, id, parent);
     }
     else if (model instanceof IMenu) {
-      return new JsonMenu((IMenu) model, session, id);
+      return new JsonMenu((IMenu) model, session, id, parent);
     }
     else if (model instanceof IKeyStroke) {
-      return new JsonKeyStroke((IKeyStroke) model, session, id);
+      return new JsonKeyStroke((IKeyStroke) model, session, id, parent);
     }
     else if (model instanceof IForm) {
-      return new JsonForm((IForm) model, session, id);
+      return new JsonForm((IForm) model, session, id, parent);
     }
     else if (model instanceof IMessageBox) {
-      return new JsonMessageBox((IMessageBox) model, session, id);
+      return new JsonMessageBox((IMessageBox) model, session, id, parent);
     }
     else if (model instanceof IViewButton) {
-      return new JsonViewButton((IViewButton) model, session, id);
+      return new JsonViewButton((IViewButton) model, session, id, parent);
     }
     else if (model instanceof IFormToolButton) {
-      return new NullAdapter(model, session, id);
+      return new NullAdapter(model, session, id, parent);
     }
     else if (model instanceof IFormToolButton5) {
-      return new JsonFormToolButton((IFormToolButton5) model, session, id);
+      return new JsonFormToolButton((IFormToolButton5) model, session, id, parent);
     }
     else if (model instanceof ISearchOutline) {
-      return new JsonSearchOutline((ISearchOutline) model, session, id);
+      return new JsonSearchOutline((ISearchOutline) model, session, id, parent);
     }
     else if (model instanceof IOutline) {
-      return new JsonOutline((IOutline) model, session, id);
+      return new JsonOutline((IOutline) model, session, id, parent);
     }
     else if (model instanceof ITree) {
-      return new JsonTree((ITree) model, session, id);
+      return new JsonTree((ITree) model, session, id, parent);
     }
     else if (model instanceof ITable) {
-      return new JsonTable((ITable) model, session, id);
+      return new JsonTable((ITable) model, session, id, parent);
     }
     else if (model instanceof IChartTableControl) {//Needs to be before ITableControl
-      return new JsonChartTableControl((IChartTableControl) model, session, id);
+      return new JsonChartTableControl((IChartTableControl) model, session, id, parent);
     }
     else if (model instanceof IGraphTableControl) {//Needs to be before ITableControl
-      return new JsonGraphTableControl((IGraphTableControl) model, session, id);
+      return new JsonGraphTableControl((IGraphTableControl) model, session, id, parent);
     }
     else if (model instanceof IMapTableControl) {//Needs to be before ITableControl
-      return new JsonMapTableControl((IMapTableControl) model, session, id);
+      return new JsonMapTableControl((IMapTableControl) model, session, id, parent);
     }
     else if (model instanceof IAnalysisTableControl) {//Needs to be before ITableControl
-      return new JsonAnalysisTableControl((IAnalysisTableControl) model, session, id);
+      return new JsonAnalysisTableControl((IAnalysisTableControl) model, session, id, parent);
     }
     else if (model instanceof ITableControl) {
-      return new JsonTableControl((ITableControl) model, session, id);
+      return new JsonTableControl((ITableControl) model, session, id, parent);
     }
     else if (model instanceof IAction) {
-      return new JsonAction((IAction) model, session, id);
+      return new JsonAction((IAction) model, session, id, parent);
     }
     else if (model instanceof IClientSession) {
-      return new JsonClientSession((IClientSession) model, session, id);
+      return new JsonClientSession((IClientSession) model, session, id, parent);
     }
     else if (model instanceof IDataModel) {
-      return new JsonDataModel((IDataModel) model, session, id);
+      return new JsonDataModel((IDataModel) model, session, id, parent);
     }
     else if (model instanceof IBreadCrumbsNavigation) {
-      return new JsonBreadCrumbNavigation((IBreadCrumbsNavigation) model, session, id);
+      return new JsonBreadCrumbNavigation((IBreadCrumbsNavigation) model, session, id, parent);
     }
     throw new IllegalArgumentException("Cannot create JSON-adapter for model-object " + model);
   }
@@ -235,8 +235,8 @@ public class JsonAdapterFactory implements IJsonAdapterFactory {
   //FIXME CGU only needed temporarily, remove when switched to FormToolButton2
   public static class NullAdapter extends AbstractJsonAdapter<Object> {
 
-    public NullAdapter(Object model, IJsonSession jsonSession, String id) {
-      super(model, jsonSession, id);
+    public NullAdapter(Object model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
+      super(model, jsonSession, id, parent);
     }
 
     @Override

@@ -17,20 +17,14 @@ import org.json.JSONObject;
 
 public class JsonAnalysisTableControl<T extends IAnalysisTableControl> extends JsonTableControl<T> {
 
-  public JsonAnalysisTableControl(T model, IJsonSession jsonSession, String id) {
-    super(model, jsonSession, id);
+  public JsonAnalysisTableControl(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
+    super(model, jsonSession, id, parent);
   }
 
   @Override
   protected void attachChildAdapters() {
     super.attachChildAdapters();
-    attachAdapter(getModel().getDataModel());
-  }
-
-  @Override
-  protected void disposeChildAdapters() {
-    super.disposeChildAdapters();
-    disposeAdapter(getModel().getDataModel());
+    attachGlobalAdapter(getModel().getDataModel());
   }
 
   @Override
@@ -56,17 +50,17 @@ public class JsonAnalysisTableControl<T extends IAnalysisTableControl> extends J
   }
 
   private void addPropertyDataModelChangeEvent() {
-    IJsonAdapter<?> dataModelAdapter = attachAdapter(getModel().getDataModel());
+    IJsonAdapter<?> dataModelAdapter = getAdapter(getModel().getDataModel());
     addPropertyChangeEvent(IAnalysisTableControl.PROP_DATA_MODEL, dataModelAdapter.getId());
   }
 
   @Override
-  protected void handleModelPropertyChange(String propertyName, Object newValue) {
+  protected void handleModelPropertyChange(String propertyName, Object oldValue, Object newValue) {
     if (IAnalysisTableControl.PROP_DATA_MODEL.equals(propertyName) && m_contentLoaded) {
       addPropertyDataModelChangeEvent();
     }
     else {
-      super.handleModelPropertyChange(propertyName, newValue);
+      super.handleModelPropertyChange(propertyName, oldValue, newValue);
     }
   }
 }

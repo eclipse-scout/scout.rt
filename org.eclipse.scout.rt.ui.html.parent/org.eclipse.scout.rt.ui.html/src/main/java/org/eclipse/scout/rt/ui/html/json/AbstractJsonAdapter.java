@@ -14,7 +14,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.fields.ModelVariant;
+import org.eclipse.scout.rt.ui.html.json.desktop.JsonDesktop;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -24,14 +26,16 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
   private final T m_model;
   private final String m_id;
   private boolean m_attached;
+  private IJsonAdapter<?> m_parent;
 
-  public AbstractJsonAdapter(T model, IJsonSession jsonSession, String id) {
+  public AbstractJsonAdapter(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
     if (model == null) {
       throw new IllegalArgumentException("model must not be null");
     }
     m_model = model;
     m_jsonSession = jsonSession;
     m_id = id;
+    m_parent = parent;
     m_jsonSession.registerJsonAdapter(this);
   }
 
@@ -54,6 +58,15 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     return m_jsonSession;
   }
 
+  protected JsonDesktop<IDesktop> getJsonDesktop() {
+    return getJsonSession().getJsonClientSession().getJsonDesktop();
+  }
+
+  @Override
+  public IJsonAdapter<?> getParent() {
+    return m_parent;
+  }
+
   @Override
   public T getModel() {
     return m_model;
@@ -67,6 +80,10 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
   }
 
   protected void disposeChildAdapters() {
+    List<IJsonAdapter<?>> childAdapters = getJsonSession().getJsonChildAdapters(this);
+    for (IJsonAdapter<?> childAdapter : childAdapters) {
+      childAdapter.dispose();
+    }
   }
 
   @Override
@@ -90,6 +107,7 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
   public void dispose() {
     if (m_attached) {
       detachModel();
+      m_attached = false;
     }
     disposeChildAdapters();
     m_jsonSession.unregisterJsonAdapter(m_id);
@@ -131,38 +149,16 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     return JsonObjectUtility.putProperty(json, key, value);
   }
 
-  protected final void disposeAdapters(Collection<? extends Object> models) {
-    for (Object model : models) {
-      disposeAdapter(model);
+  @Override
+  public final <A extends IJsonAdapter<?>> A attachAdapter(Object model) {
+    if (model == null) {
+      return null;
     }
+    return attachAdapter(model, null);
   }
 
-  protected final void optDisposeAdapter(Object model) {
-    if (model != null) {
-      disposeAdapter(model);
-    }
-  }
-
-  protected final void disposeAdapter(Object model) {
-    IJsonAdapter<?> jsonAdapter = m_jsonSession.getJsonAdapter(model);
-    // on session dispose, the adapters get disposed in random order, so they may already be disposed when calling this method
-    if (jsonAdapter != null) {
-      jsonAdapter.dispose();
-    }
-  }
-
-  protected final void optAttachAdapter(Object model) {
-    if (model != null) {
-      attachAdapter(model);
-    }
-  }
-
-  protected final IJsonAdapter<?> attachAdapter(Object model) {
-    return m_jsonSession.getOrCreateJsonAdapter(model);
-  }
-
-  protected final IJsonAdapter<?> attachAdapter(Object model, IJsonAdapterFactory adapterFactory) {
-    return m_jsonSession.getOrCreateJsonAdapter(model, adapterFactory);
+  protected final <A extends IJsonAdapter<?>> A attachAdapter(Object model, IJsonAdapterFactory adapterFactory) {
+    return m_jsonSession.getOrCreateJsonAdapter(model, this, adapterFactory);
   }
 
   protected final List<IJsonAdapter<?>> attachAdapters(Collection<?> models) {
@@ -177,16 +173,49 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
    * Returns an existing adapter for the given model. When no adapter is registered for the given model this method will
    * return null. This method is a shortcut for <code>getJsonSession().getJsonAdapter(model)</code>.
    */
-  protected final IJsonAdapter<?> getAdapter(Object model) {
-    return getJsonSession().getJsonAdapter(model);
+  @Override
+  public final <A extends IJsonAdapter<?>> A getAdapter(Object model) {
+    return m_jsonSession.getJsonAdapter(model, this);
   }
 
-  protected final Collection<IJsonAdapter<?>> getAdapters(Collection<?> models) {
+  public final <A extends IJsonAdapter<?>> A getGlobalAdapter(Object model) {
+    return m_jsonSession.getJsonAdapter(model, getJsonSession().getRootJsonAdapter());
+  }
+
+  @Override
+  public final Collection<IJsonAdapter<?>> getAdapters(Collection<?> models) {
     List<IJsonAdapter<?>> adapters = new ArrayList<>(models.size());
     for (Object model : models) {
       adapters.add(getAdapter(model));
     }
     return adapters;
+  }
+
+  protected final List<IJsonAdapter<?>> attachGlobalAdapters(Collection<?> models) {
+    List<IJsonAdapter<?>> adapters = new ArrayList<>(models.size());
+    for (Object model : models) {
+      adapters.add(attachAdapter(model));
+    }
+    return adapters;
+  }
+
+  /**
+   * A global adapter is registered under the root json adapter and may be used by other adapters.
+   * <p>
+   * Rule: Always create a global adapter if the model is able to dispose itself (Form, MessageBox, etc). In every other
+   * case you have to be very careful. If you dispose a global adapter it may influence others which are using it.
+   * <p>
+   * Global adapters (like every other) get disposed on session disposal.
+   */
+  protected final IJsonAdapter<?> attachGlobalAdapter(Object model) {
+    return attachGlobalAdapter(model, null);
+  }
+
+  protected final IJsonAdapter<?> attachGlobalAdapter(Object model, IJsonAdapterFactory adapterFactory) {
+    if (model == null) {
+      return null;
+    }
+    return m_jsonSession.getOrCreateJsonAdapter(model, getJsonSession().getRootJsonAdapter(), adapterFactory);
   }
 
   /**
@@ -199,7 +228,7 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     if (adapter == null) {
       throw new IllegalArgumentException("No adapter registered for model=" + model);
     }
-    // can assert already isAttached() here?
+    //FIXME AWE can assert already isAttached() here?
     return adapter.getId();
   }
 
@@ -209,27 +238,22 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
    * The method will never create a new adapter instance.
    */
   protected final JSONArray getAdapterIdsForModels(Collection<?> models) {
-    return getAdapterIds(getAdapters(models));
+    return adapterIdsToJson(getAdapters(models));
   }
 
+  //FIXME cgu besser static imports
   /**
    * Returns a list of IDs of the JSON adapters for the given adapters.
    */
-  protected final JSONArray getAdapterIds(Collection<IJsonAdapter<?>> adapters) {
+  protected final JSONArray adapterIdsToJson(Collection<IJsonAdapter<?>> adapters) {
     return JsonObjectUtility.adapterIdsToJson(adapters);
   }
 
   protected final JSONObject putAdapterIdProperty(JSONObject json, String key, Object model) {
-    return JsonObjectUtility.putProperty(json, key, getAdapterIdForModel(model));
-  }
-
-  protected final JSONObject optPutAdapterIdProperty(JSONObject json, String key, Object model) {
     if (model == null) {
       return json;
     }
-    else {
-      return JsonObjectUtility.putProperty(json, key, getAdapterIdForModel(model));
-    }
+    return JsonObjectUtility.putProperty(json, key, getAdapterIdForModel(model));
   }
 
   protected final JSONObject putAdapterIdsProperty(JSONObject json, String key, Collection<?> models) {

@@ -40,7 +40,7 @@ public class JsonTabBoxTest {
     m_uiFacade = Mockito.mock(ITabBoxUIFacade.class);
     Mockito.when(m_tabBoxModel.getGroupBoxes()).thenReturn(Arrays.asList(m_groupBox1, m_groupBox2));
     Mockito.when(m_tabBoxModel.getUIFacade()).thenReturn(m_uiFacade);
-    m_tabBox = new JsonTabBox<ITabBox>(m_tabBoxModel, jsonSession, "123");
+    m_tabBox = new JsonTabBox<ITabBox>(m_tabBoxModel, jsonSession, "123", null);
   }
 
   @Test

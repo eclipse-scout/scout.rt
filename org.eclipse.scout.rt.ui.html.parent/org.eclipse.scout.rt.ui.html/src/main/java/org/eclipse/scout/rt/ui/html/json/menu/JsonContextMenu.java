@@ -10,21 +10,24 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.menu;
 
+import java.util.Collection;
+import java.util.List;
+
+import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ContextMenuEvent;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ContextMenuListener;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
-import org.eclipse.scout.rt.ui.html.json.JsonEvent;
-import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 
 public class JsonContextMenu<T extends IContextMenu> extends AbstractJsonPropertyObserver<T> {
 
   private ContextMenuListener m_contextMenuListener;
+  private List<IMenu> m_menus;
 
-  public JsonContextMenu(T model, IJsonSession jsonSession, String id) {
-    super(model, jsonSession, id);
+  public JsonContextMenu(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
+    super(model, jsonSession, id, parent);
   }
 
   @Override
@@ -46,12 +49,15 @@ public class JsonContextMenu<T extends IContextMenu> extends AbstractJsonPropert
   }
 
   @Override
-  public String getObjectType() {
-    return "ContextMenu";
+  protected void attachChildAdapters() {
+    super.attachChildAdapters();
+    m_menus = getModel().getChildActions();
+    attachAdapters(m_menus);
   }
 
   @Override
-  public void handleUiEvent(JsonEvent event, JsonResponse res) {
+  public String getObjectType() {
+    return "ContextMenu";
   }
 
   public void handleModelContextMenuChanged(ContextMenuEvent event) {
@@ -61,10 +67,24 @@ public class JsonContextMenu<T extends IContextMenu> extends AbstractJsonPropert
   }
 
   public void handleModelContextMenuStructureChanged(ContextMenuEvent event) {
-    IJsonAdapter<?> owner = getAdapter(event.getSource().getOwner());
-    if (owner instanceof IContextMenuOwner) {
-      ((IContextMenuOwner) owner).handleModelContextMenuChanged(event);
+    //Dispose the removed menus
+    m_menus.removeAll(getModel().getChildActions());
+    for (Object model : m_menus) {
+      IJsonAdapter<Object> jsonAdapter = getJsonSession().getJsonAdapter(model, this, false);
+      jsonAdapter.dispose();
     }
+    m_menus = getModel().getChildActions();
+
+    IJsonAdapter<?> owner = getAdapter(event.getSource().getOwner());
+    List<IJsonAdapter<?>> menuAdapters = attachAdapters(m_menus);
+    if (owner instanceof IContextMenuOwner) {
+      ((IContextMenuOwner) owner).handleModelContextMenuChanged(menuAdapters);
+    }
+  }
+
+  public Collection<IJsonAdapter<?>> getJsonChildActions() {
+    Collection<IJsonAdapter<?>> adapters = getAdapters(getModel().getChildActions());
+    return adapters;
   }
 
   protected class P_ContextMenuListener implements ContextMenuListener {

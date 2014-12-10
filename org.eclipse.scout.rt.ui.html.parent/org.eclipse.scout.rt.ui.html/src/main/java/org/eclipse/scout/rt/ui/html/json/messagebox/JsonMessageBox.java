@@ -14,6 +14,7 @@ import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxEvent;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxListener;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
+import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
@@ -27,8 +28,8 @@ public class JsonMessageBox<T extends IMessageBox> extends AbstractJsonPropertyO
 
   private MessageBoxListener m_messageBoxListener;
 
-  public JsonMessageBox(T model, IJsonSession jsonSession, String id) {
-    super(model, jsonSession, id);
+  public JsonMessageBox(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
+    super(model, jsonSession, id, parent);
   }
 
   @Override

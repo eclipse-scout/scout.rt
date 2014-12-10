@@ -11,6 +11,8 @@
 package org.eclipse.scout.rt.ui.html.json.desktop;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -31,7 +33,6 @@ import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.table.JsonOutlineTable;
-import org.eclipse.scout.rt.ui.html.json.table.JsonTable;
 import org.eclipse.scout.rt.ui.html.json.tree.JsonTree;
 import org.json.JSONObject;
 
@@ -41,9 +42,10 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
   private static final String PROP_DETAIL_FORM = "detailForm";
   private static final String PROP_DETAIL_TABLE = "detailTable";
   private static final String PROP_DETAIL_FORM_VISIBLE = "detailFormVisible";
+  private Set<IJsonAdapter<?>> m_jsonDetailTables = new HashSet<IJsonAdapter<?>>();
 
-  public JsonOutline(T model, IJsonSession jsonSession, String id) {
-    super(model, jsonSession, id);
+  public JsonOutline(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
+    super(model, jsonSession, id, parent);
   }
 
   @Override
@@ -52,26 +54,10 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
   }
 
   @Override
-  protected void attachModel() {
-    super.attachModel();
-    if (getModel() instanceof IOutline5) {
-      optAttachAdapter(((IOutline5) getModel()).getDefaultDetailForm());
-    }
-  }
-
-  @Override
-  protected void detachModel() {
-    super.detachModel();
-    if (getModel() instanceof IOutline5) {
-      disposeAdapter(((IOutline5) getModel()).getDefaultDetailForm());
-    }
-  }
-
-  @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
     if (getModel() instanceof IOutline5) {
-      optPutAdapterIdProperty(json, "defaultDetailForm", ((IOutline5) getModel()).getDefaultDetailForm());
+      putAdapterIdProperty(json, "defaultDetailForm", ((IOutline5) getModel()).getDefaultDetailForm());
     }
     return json;
   }
@@ -79,6 +65,9 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
   @Override
   protected void attachChildAdapters() {
     super.attachChildAdapters();
+    if (getModel() instanceof IOutline5) {
+      attachAdapter(((IOutline5) getModel()).getDefaultDetailForm());
+    }
     if (getModel().isRootNodeVisible()) {
       attachPage(getModel().getRootPage());
     }
@@ -92,13 +81,10 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
   @Override
   protected void disposeChildAdapters() {
     super.disposeChildAdapters();
-    if (getModel().isRootNodeVisible()) {
-      disposePage(getModel().getRootPage());
-    }
-    else {
-      for (IPage page : getModel().getRootPage().getChildPages()) {
-        disposePage(page);
-      }
+    // Detail tables are global to make them reusable by other components (e.g. table field)
+    // Therefore we have to dispose them by our own (although this is not very likely because outlines don't die before a session disposal)
+    for (IJsonAdapter<?> childAdapter : m_jsonDetailTables) {
+      childAdapter.dispose();
     }
   }
 
@@ -107,11 +93,11 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
       attachPage(childPage);
     }
     if (isDetailFormVisible(page)) {
-      optAttachAdapter(page.getDetailForm());
+      attachGlobalAdapter(page.getDetailForm());
     }
     if (page.isTableVisible()) {
       // Create 'outline' variant for table
-      attachAdapter(getTable(page), new P_JsonOutlineTableFactory(page));
+      attachDetailTable(getTable(page), page);
     }
   }
 
@@ -123,14 +109,6 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
       return ((IPageWithNodes) page).getInternalTable();
     }
     return null;
-  }
-
-  protected void disposePage(IPage page) {
-    for (IPage childPage : page.getChildPages()) {
-      disposePage(childPage);
-    }
-    optDisposeAdapter(page.getDetailForm());
-    disposeAdapter(getTable(page));
   }
 
   // TODO AWE: (scout) remove these two methods when x5-classes are merged into scout RT
@@ -156,7 +134,7 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
     }
     IPage page = (IPage) node;
     JSONObject json = super.treeNodeToJson(node);
-    optPutAdapterIdProperty(json, PROP_DETAIL_FORM, page.getDetailForm());
+    putAdapterIdProperty(json, PROP_DETAIL_FORM, page.getDetailForm());
     putProperty(json, PROP_DETAIL_FORM_VISIBLE, isDetailFormVisible(page));
 
     String pageType = "";
@@ -197,12 +175,13 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
 
     Collection<ITreeNode> nodes = event.getNodes();
     for (ITreeNode node : nodes) {
-      // FIXME CGU really dispose? Or better keep for offline? Memory issue?
-      if (node instanceof IPageWithTable) {
-        IPageWithTable<?> pageWithTable = (IPageWithTable<?>) node;
-        JsonTable table = (JsonTable) getJsonSession().getJsonAdapter(pageWithTable.getTable());
-        if (table != null) {
-          table.dispose();
+      IPage page = (IPage) node;
+      ITable table = getTable(page);
+      if (table != null) {
+        IJsonAdapter<?> jsonAdapter = getGlobalAdapter(table);
+        if (jsonAdapter != null) {
+          m_jsonDetailTables.remove(jsonAdapter);
+          jsonAdapter.dispose();
         }
       }
     }
@@ -216,7 +195,7 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
       putProperty(jsonEvent, PROP_DETAIL_FORM, null);
     }
     else {
-      IJsonAdapter<?> detailFormAdapter = attachAdapter(detailForm);
+      IJsonAdapter<?> detailFormAdapter = attachGlobalAdapter(detailForm);
       putProperty(jsonEvent, PROP_DETAIL_FORM, detailFormAdapter.getId());
     }
     addActionEvent("detailFormChanged", jsonEvent);
@@ -225,15 +204,22 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
   protected void handleModelDetailTableChanged(ITable detailTable) {
     JSONObject jsonEvent = new JSONObject();
     ITreeNode selectedNode = getModel().getSelectedNode();
+    IPage page = (IPage) selectedNode;
     putProperty(jsonEvent, PROP_NODE_ID, getOrCreateNodeId(selectedNode));
     if (detailTable == null) {
       putProperty(jsonEvent, PROP_DETAIL_TABLE, null);
     }
     else {
-      IJsonAdapter<?> detailFormAdapter = attachAdapter(detailTable);
-      putProperty(jsonEvent, PROP_DETAIL_TABLE, detailFormAdapter.getId());
+      IJsonAdapter<?> detailTableAdapter = attachDetailTable(detailTable, page);
+      putProperty(jsonEvent, PROP_DETAIL_TABLE, detailTableAdapter.getId());
     }
     addActionEvent("detailTableChanged", jsonEvent);
+  }
+
+  protected IJsonAdapter<?> attachDetailTable(ITable detailTable, IPage page) {
+    IJsonAdapter<?> detailTableAdapter = attachGlobalAdapter(detailTable, new P_JsonOutlineTableFactory(page));
+    m_jsonDetailTables.add(detailTableAdapter);
+    return detailTableAdapter;
   }
 
   @Override
@@ -250,10 +236,10 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
   private void handleModelPageChanged(TreeEvent event) {
     IPage5 page = (IPage5) event.getNode();
     if (page.isDetailFormVisible()) {
-      optAttachAdapter(page.getDetailForm());
+      attachGlobalAdapter(page.getDetailForm());
     }
-    if (page.isTableVisible()) {//FIXME AWE from CGU: this is always true, intended?
-      attachAdapter(getTable(page), new P_JsonOutlineTableFactory(page));
+    if (page.isTableVisible()) {
+      attachDetailTable(getTable(page), page);
     }
     JSONObject jsonEvent = new JSONObject();
     putProperty(jsonEvent, PROP_NODE_ID, getOrCreateNodeId(page));
@@ -262,7 +248,7 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
   }
 
   @Override
-  protected void handleModelPropertyChange(String propertyName, Object newValue) {
+  protected void handleModelPropertyChange(String propertyName, Object oldValue, Object newValue) {
     if (PROP_DETAIL_FORM.equals(propertyName)) {
       handleModelDetailFormChanged((IForm) newValue);
     }
@@ -270,7 +256,7 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
       handleModelDetailTableChanged((ITable) newValue);
     }
     else {
-      super.handleModelPropertyChange(propertyName, newValue);
+      super.handleModelPropertyChange(propertyName, oldValue, newValue);
     }
   }
 
@@ -328,8 +314,8 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
 
     @Override
     @SuppressWarnings("unchecked")
-    public IJsonAdapter<?> createJsonAdapter(Object model, IJsonSession jsonSession, String id) {
-      return new JsonOutlineTable((ITable) model, jsonSession, id, new P_JsonOutlineAdapter(m_page));
+    public IJsonAdapter<?> createJsonAdapter(Object model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
+      return new JsonOutlineTable((ITable) model, jsonSession, id, new P_JsonOutlineAdapter(m_page), parent);
     }
 
   }

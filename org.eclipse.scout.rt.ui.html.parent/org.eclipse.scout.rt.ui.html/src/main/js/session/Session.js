@@ -411,6 +411,9 @@ scout.Session.prototype.onModelAction = function(event) {
  * registry which too exists on this session object.
  */
 scout.Session.prototype._getAdapterData = function(id) {
+  if (id === "28") {
+    console.log(id);
+  }
   var adapterData = this._adapterDataCache[id];
   delete this._adapterDataCache[id];
   return adapterData;

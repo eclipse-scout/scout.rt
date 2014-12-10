@@ -8,10 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.html.json;
+package org.eclipse.scout.rt.ui.html.json.desktop.fixtures;
 
-public interface IJsonAdapterFactory {
+import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractFormToolButton5;
 
-  IJsonAdapter<?> createJsonAdapter(Object model, IJsonSession session, String id, IJsonAdapter<?> parent);
+public class FormToolButton extends AbstractFormToolButton5 {
 
 }

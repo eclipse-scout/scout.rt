@@ -19,10 +19,10 @@ import org.eclipse.scout.rt.ui.html.Activator;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class JsonDataModel extends AbstractJsonAdapter<IDataModel> {
+public class JsonDataModel<T extends IDataModel> extends AbstractJsonAdapter<T> {
 
-  public JsonDataModel(IDataModel model, IJsonSession jsonSession, String id) {
-    super(model, jsonSession, id);
+  public JsonDataModel(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
+    super(model, jsonSession, id, parent);
   }
 
   @Override

@@ -55,11 +55,10 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
   public static final String PROP_MESSAGE_BOX = "messageBox";
 
   private DesktopListener m_desktopListener;
-
   private IOutline m_previousOutline;
 
-  public JsonDesktop(T desktop, IJsonSession jsonSession, String id) {
-    super(desktop, jsonSession, id);
+  public JsonDesktop(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
+    super(model, jsonSession, id, parent);
   }
 
   @Override
@@ -70,16 +69,16 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
   @Override
   protected void attachChildAdapters() {
     super.attachChildAdapters();
-    attachAdapters(getForms());
-    attachAdapters(getModel().getMessageBoxStack());
+    attachGlobalAdapters(getForms());
+    attachGlobalAdapters(getModel().getMessageBoxStack());
     attachAdapters(filterModelActions());
     attachAdapters(Scout5ExtensionUtil.IDesktop_getAddOns(getModel()));
     if (!isFormBased()) {
       attachAdapters(getModel().getViewButtons());
-      optAttachAdapter(getModel().getOutline());
-      optAttachAdapter(getSearchOutline());
+      attachGlobalAdapter(getModel().getOutline());
+      attachGlobalAdapter(getSearchOutline());
     }
-    optAttachAdapter(getBreadcrumbNavigation());
+    attachAdapter(getBreadcrumbNavigation());
   }
 
   /**
@@ -118,19 +117,6 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
   }
 
   @Override
-  protected void disposeChildAdapters() {
-    disposeAdapters(getForms());
-    disposeAdapters(getModel().getMessageBoxStack());
-    disposeAdapters(filterModelActions());
-    disposeAdapters(Scout5ExtensionUtil.IDesktop_getAddOns(getModel()));
-    if (!isFormBased()) {
-      disposeAdapters(getModel().getViewButtons());
-      optDisposeAdapter(getModel().getOutline());
-    }
-    optDisposeAdapter(getBreadcrumbNavigation());
-  }
-
-  @Override
   protected void attachModel() {
     super.attachModel();
     if (m_desktopListener == null) {
@@ -158,10 +144,10 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
     if (!isFormBased()) {
       // FIXME CGU: view and tool buttons should be removed from desktop by device transformer
       putAdapterIdsProperty(json, "viewButtons", getModel().getViewButtons());
-      optPutAdapterIdProperty(json, "outline", getModel().getOutline());
-      optPutAdapterIdProperty(json, "searchOutline", getSearchOutline());
+      putAdapterIdProperty(json, "outline", getModel().getOutline());
+      putAdapterIdProperty(json, "searchOutline", getSearchOutline());
     }
-    optPutAdapterIdProperty(json, "breadCrumbNavigation", getBreadcrumbNavigation());
+    putAdapterIdProperty(json, "breadCrumbNavigation", getBreadcrumbNavigation());
     return json;
   }
 
@@ -251,36 +237,49 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
     if (isFormBased()) {
       return;
     }
-    addActionEvent("outlineChanged", attachToJsonId(PROP_OUTLINE, outline));
+
+    JSONObject jsonEvent = new JSONObject();
+    IJsonAdapter<?> jsonAdapter = attachGlobalAdapter(outline);
+    putProperty(jsonEvent, PROP_OUTLINE, jsonAdapter.getId());
+    addActionEvent("outlineChanged", jsonEvent);
   }
 
   protected void handleModelFormAdded(IForm form) {
     if (isFormBlocked(form)) {
       return;
     }
-    addActionEvent("formAdded", attachToJsonId(PROP_FORM, form));
+
+    JSONObject jsonEvent = new JSONObject();
+    IJsonAdapter<?> jsonAdapter = attachGlobalAdapter(form);
+    putProperty(jsonEvent, PROP_FORM, jsonAdapter.getId());
+    addActionEvent("formAdded", jsonEvent);
   }
 
   protected void handleModelFormRemoved(IForm form) {
-    IJsonAdapter<?> formAdapter = getAdapter(form);
-    if (formAdapter != null) {
-      addActionEvent("formRemoved", toJsonId(PROP_FORM, formAdapter));
+    IJsonAdapter<?> jsonAdapter = getAdapter(form);
+    if (jsonAdapter != null) {
+      JSONObject jsonEvent = new JSONObject();
+      putProperty(jsonEvent, PROP_FORM, jsonAdapter.getId());
+      addActionEvent("formRemoved", jsonEvent);
     }
   }
 
   protected void handleModelFormEnsureVisible(IForm form) {
-    addActionEvent("formEnsureVisible", toJsonId(PROP_FORM, getAdapter(form)));
+    JSONObject jsonEvent = new JSONObject();
+    IJsonAdapter<?> jsonAdapter = getAdapter(form);
+    putProperty(jsonEvent, PROP_FORM, jsonAdapter.getId());
+    addActionEvent("formEnsureVisible", jsonEvent);
   }
 
   protected void handleModelMessageBoxAdded(final IMessageBox messageBox) {
-    addActionEvent("messageBoxAdded", attachToJsonId(PROP_MESSAGE_BOX, messageBox));
+    JSONObject jsonEvent = new JSONObject();
+    IJsonAdapter<?> jsonAdapter = attachGlobalAdapter(messageBox);
+    putProperty(jsonEvent, PROP_MESSAGE_BOX, jsonAdapter.getId());
+    addActionEvent("messageBoxAdded", jsonEvent);
   }
 
   protected void handleModelDesktopClosed() {
     dispose();
-    // FIXME CGU: what to do? probably http session invalidation -> will terminate EVERY json session (if login is done
-    // for all, logout is done for all as well, gmail does the same).
-    // Important: Consider tomcat form auth problem, see scout rap logout mechanism for details
   }
 
   private ISearchOutline getSearchOutline() {
@@ -306,21 +305,6 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
     String outlineId = JsonObjectUtility.getString(event.getData(), "outlineId");
     IJsonAdapter<?> jsonOutline = getJsonSession().getJsonAdapter(outlineId);
     getModel().setOutline((IOutline) jsonOutline.getModel());
-  }
-
-  /**
-   * Creates an adapter instance, attaches the adapter and returns a JSON object with a single property where the value
-   * is the ID of the adapter.
-   */
-  private JSONObject attachToJsonId(String popertyName, Object model) {
-    return toJsonId(popertyName, attachAdapter(model));
-  }
-
-  /**
-   * Returns a JSON object with a single property where the value is the ID of the adapter.
-   */
-  private JSONObject toJsonId(String propertyName, IJsonAdapter<?> jsonAdapter) {
-    return putProperty(new JSONObject(), propertyName, jsonAdapter.getId());
   }
 
   protected class P_DesktopListener implements DesktopListener {

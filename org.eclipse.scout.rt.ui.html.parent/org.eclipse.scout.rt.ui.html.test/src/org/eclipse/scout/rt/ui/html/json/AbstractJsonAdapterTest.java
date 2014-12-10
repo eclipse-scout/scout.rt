@@ -11,6 +11,8 @@
 package org.eclipse.scout.rt.ui.html.json;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.eclipse.scout.rt.client.ui.form.fields.ModelVariant;
 import org.eclipse.scout.rt.ui.html.json.fixtures.JsonSessionMock;
@@ -38,8 +40,18 @@ public class AbstractJsonAdapterTest {
     assertEquals("Foo.Bar", json.optString("objectType"));
   }
 
+  @Test
+  public void testIsAttached() {
+    AbstractJsonAdapter<?> adapter = newAdapter(new Object());
+    adapter.attach();
+    assertTrue(adapter.isAttached());
+
+    adapter.dispose();
+    assertFalse(adapter.isAttached());
+  }
+
   private AbstractJsonAdapter<?> newAdapter(Object model) {
-    AbstractJsonAdapter<?> adapter = new AbstractJsonAdapter<Object>(model, new JsonSessionMock(), "x") {
+    AbstractJsonAdapter<?> adapter = new AbstractJsonAdapter<Object>(model, new JsonSessionMock(), "x", null) {
       @Override
       public String getObjectType() {
         return "Foo";

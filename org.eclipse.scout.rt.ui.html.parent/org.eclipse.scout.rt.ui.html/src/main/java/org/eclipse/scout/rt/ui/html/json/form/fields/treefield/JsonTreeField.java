@@ -12,14 +12,15 @@ package org.eclipse.scout.rt.ui.html.json.form.fields.treefield;
 
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.form.fields.treefield.ITreeField;
+import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
 
 public class JsonTreeField<T extends ITreeField> extends JsonFormField<T> {
 
-  public JsonTreeField(T model, IJsonSession session, String id) {
-    super(model, session, id);
+  public JsonTreeField(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
+    super(model, jsonSession, id, parent);
   }
 
   @Override
@@ -32,18 +33,6 @@ public class JsonTreeField<T extends ITreeField> extends JsonFormField<T> {
         return getModel().getTree();
       }
     });
-  }
-
-  @Override
-  protected void attachChildAdapters() {
-    super.attachChildAdapters();
-    attachAdapter(getModel().getTree());
-  }
-
-  @Override
-  protected void disposeChildAdapters() {
-    super.disposeChildAdapters();
-    disposeAdapter(getModel().getTree());
   }
 
   @Override

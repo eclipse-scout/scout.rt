@@ -21,8 +21,8 @@ import org.json.JSONObject;
 public class JsonTableControl<T extends ITableControl> extends JsonAction<T> {
   protected boolean m_contentLoaded = false;
 
-  public JsonTableControl(T model, IJsonSession jsonSession, String id) {
-    super(model, jsonSession, id);
+  public JsonTableControl(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
+    super(model, jsonSession, id, parent);
   }
 
   @Override
@@ -45,20 +45,15 @@ public class JsonTableControl<T extends ITableControl> extends JsonAction<T> {
   @Override
   protected void attachChildAdapters() {
     super.attachChildAdapters();
-    optAttachAdapter(getModel().getForm());
-  }
-
-  @Override
-  protected void disposeChildAdapters() {
-    super.disposeChildAdapters();
-    optDisposeAdapter(getModel().getForm());
+    //FIXME CGU create property
+    attachGlobalAdapter(getModel().getForm());
   }
 
   @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
     if (getModel().isSelected()) {
-      optPutAdapterIdProperty(json, ITableControl.PROP_FORM, getModel().getForm());
+      putAdapterIdProperty(json, ITableControl.PROP_FORM, getModel().getForm());
       m_contentLoaded = true;
     }
     return json;
@@ -82,19 +77,19 @@ public class JsonTableControl<T extends ITableControl> extends JsonAction<T> {
   private void addPropertyFormChangeEvent() {
     String formId = null;
     if (getModel().getForm() != null) {
-      IJsonAdapter<?> formAdapter = attachAdapter(getModel().getForm());
+      IJsonAdapter<?> formAdapter = attachGlobalAdapter(getModel().getForm());
       formId = formAdapter.getId();
     }
     addPropertyChangeEvent(ITableControl.PROP_FORM, formId);
   }
 
   @Override
-  protected void handleModelPropertyChange(String propertyName, Object newValue) {
+  protected void handleModelPropertyChange(String propertyName, Object oldValue, Object newValue) {
     if (ITableControl.PROP_FORM.equals(propertyName) && m_contentLoaded) {
       addPropertyFormChangeEvent();
     }
     else {
-      super.handleModelPropertyChange(propertyName, newValue);
+      super.handleModelPropertyChange(propertyName, oldValue, newValue);
     }
   }
 

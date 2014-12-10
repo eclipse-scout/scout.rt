@@ -16,6 +16,7 @@ import java.util.Set;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.shared.ui.menu.IMenu5;
+import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
@@ -31,8 +32,8 @@ public class JsonMenu<T extends IMenu> extends JsonAction<T> {
   public static final String PROP_CHILD_MENUS = "childMenus";
   public static final String PROP_SYSTEM_TYPE = "systemType";
 
-  public JsonMenu(T model, IJsonSession jsonSession, String id) {
-    super(model, jsonSession, id);
+  public JsonMenu(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
+    super(model, jsonSession, id, parent);
   }
 
   @Override
@@ -80,21 +81,21 @@ public class JsonMenu<T extends IMenu> extends JsonAction<T> {
   }
 
   @Override
-  protected void handleModelPropertyChange(String propertyName, Object newValue) {
+  protected void attachChildAdapters() {
+    super.attachChildAdapters();
+    attachAdapters(getModel().getChildActions());
+  }
+
+  @Override
+  protected void handleModelPropertyChange(String propertyName, Object oldValue, Object newValue) {
     if (IMenu.PROP_MENU_TYPES.equals(propertyName)) {
       //FIXME CGU name of IMenu.PROP_MENU_TYPES is propMenuTypes which is bad -> fix it and remove the following lines
       JsonProperty jsonProperty = getJsonProperty(PROP_MENU_TYPES);
       addPropertyChangeEvent(propertyName, jsonProperty.prepareValueForToJson(newValue));
     }
     else {
-      super.handleModelPropertyChange(propertyName, newValue);
+      super.handleModelPropertyChange(propertyName, oldValue, newValue);
     }
-  }
-
-  @Override
-  protected void attachModel() {
-    super.attachModel();
-    attachAdapters(getModel().getChildActions());
   }
 
   @Override

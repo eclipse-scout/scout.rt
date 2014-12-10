@@ -1,5 +1,7 @@
 package org.eclipse.scout.rt.ui.html.json;
 
+import java.util.Collection;
+
 /**
  * Creates JSON output for a Scout model object.
  *
@@ -41,4 +43,11 @@ public interface IJsonAdapter<T extends Object> extends IJsonMapper {
    */
   void cleanUpEventFilters();
 
+  <A extends IJsonAdapter<?>> A attachAdapter(Object model);
+
+  <A extends IJsonAdapter<?>> A getAdapter(Object model);
+
+  Collection<IJsonAdapter<?>> getAdapters(Collection<?> models);
+
+  IJsonAdapter<?> getParent();
 }

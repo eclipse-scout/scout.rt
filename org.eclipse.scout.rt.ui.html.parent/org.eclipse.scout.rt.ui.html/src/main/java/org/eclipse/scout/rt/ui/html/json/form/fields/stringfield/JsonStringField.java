@@ -11,14 +11,15 @@
 package org.eclipse.scout.rt.ui.html.json.form.fields.stringfield;
 
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
+import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 
-public class JsonStringField extends JsonValueField<IStringField> {
+public class JsonStringField<T extends IStringField> extends JsonValueField<T> {
 
-  public JsonStringField(IStringField model, IJsonSession session, String id) {
-    super(model, session, id);
+  public JsonStringField(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
+    super(model, jsonSession, id, parent);
   }
 
   @Override
@@ -27,7 +28,7 @@ public class JsonStringField extends JsonValueField<IStringField> {
   }
 
   @Override
-  protected void initJsonProperties(IStringField model) {
+  protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
     putJsonProperty(new JsonProperty<IStringField>(IStringField.PROP_MULTILINE_TEXT, model) {
       @Override

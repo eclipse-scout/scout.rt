@@ -10,26 +10,37 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.desktop;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
-import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.NodePageWithForm;
 import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.Outline;
+import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.OutlineWithOneNode;
 import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.TablePage;
 import org.eclipse.scout.rt.ui.html.json.fixtures.JsonSessionMock;
+import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
+import org.eclipse.scout.rt.ui.html.json.tree.JsonTree;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(ScoutClientTestRunner.class)
 public class JsonOutlineTest {
+  private JsonSessionMock m_jsonSession;
+
+  @Before
+  public void setUp() {
+    m_jsonSession = new JsonSessionMock();
+  }
 
   /**
    * Tests whether the adapters for the detail forms get created
@@ -52,11 +63,10 @@ public class JsonOutlineTest {
     rowPage = (IPage) tablePage.resolveVirtualChildNode((rowPage));
     outline.selectNode(rowPage);
 
-    JsonOutline<IOutline> jsonOutline = createJsonOutlineWithMocks(outline);
-    IJsonSession jsonSession = jsonOutline.getJsonSession();
+    JsonOutline<IOutline> jsonOutline = m_jsonSession.newJsonAdapter(outline, null, null);
 
-    Assert.assertNotNull(jsonSession.getJsonAdapter(nodePage.getDetailForm()));
-    Assert.assertNotNull(jsonSession.getJsonAdapter(rowPage.getDetailForm()));
+    Assert.assertNotNull(jsonOutline.getAdapter(nodePage.getDetailForm()));
+    Assert.assertNotNull(jsonOutline.getAdapter(rowPage.getDetailForm()));
   }
 
   /**
@@ -70,7 +80,7 @@ public class JsonOutlineTest {
     List<IPage> pages = new ArrayList<IPage>();
     pages.add(nodePage);
     IOutline outline = new Outline(pages);
-    JsonOutline jsonOutline = createJsonOutlineWithMocks(outline);
+    JsonOutline<IOutline> jsonOutline = m_jsonSession.newJsonAdapter(outline, null, null);
 
     JSONObject jsonNode = jsonOutline.toJson().getJSONArray("nodes").getJSONObject(0);
     Assert.assertNull(jsonNode.opt(IOutline.PROP_DETAIL_TABLE));
@@ -80,11 +90,17 @@ public class JsonOutlineTest {
     Assert.assertNotNull(jsonNode.opt(IOutline.PROP_DETAIL_TABLE));
   }
 
-  public static JsonOutline<IOutline> createJsonOutlineWithMocks(IOutline outline) {
-    JsonSessionMock jsonSession = new JsonSessionMock();
-    JsonOutline<IOutline> jsonOutline = new JsonOutline<IOutline>(outline, jsonSession, jsonSession.createUniqueIdFor(null));
-    jsonOutline.init();
-    return jsonOutline;
+  @Test
+  public void testDispose() {
+    ITree tree = new OutlineWithOneNode();
+    JsonTree<ITree> object = m_jsonSession.newJsonAdapter(tree, null, null);
+    WeakReference<JsonTree> ref = new WeakReference<JsonTree>(object);
+
+    object.dispose();
+    m_jsonSession.flush();
+    m_jsonSession = null;
+    object = null;
+    JsonTestUtility.assertGC(ref);
   }
 
 }

@@ -8,26 +8,21 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.html.json.form.fields.richtextfield;
+package org.eclipse.scout.rt.ui.html.json.fixtures;
 
-import org.eclipse.scout.rt.client.ui.form.fields.richtextfield.IRichTextField;
+import org.eclipse.scout.rt.ui.html.json.AbstractJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
-import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 
-public class JsonRichTextField<T extends IRichTextField> extends JsonValueField<T> {
+public class JsonAdapterMock<T> extends AbstractJsonAdapter<T> {
 
-  public JsonRichTextField(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
+  public JsonAdapterMock(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
     super(model, jsonSession, id, parent);
   }
 
   @Override
   public String getObjectType() {
-    return "RichTextField";
-  }
-
-  @Override
-  protected void handleUiDisplayTextChangedImpl(String displayText, boolean whileTyping) {
+    return "generic";
   }
 
 }

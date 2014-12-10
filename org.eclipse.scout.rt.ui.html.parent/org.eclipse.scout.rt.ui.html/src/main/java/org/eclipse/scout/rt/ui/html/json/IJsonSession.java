@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.eclipse.scout.rt.client.IClientSession;
@@ -20,34 +22,6 @@ public interface IJsonSession {
   void init(HttpServletRequest request, JsonStartupRequest jsonStartupRequest);
 
   void dispose();
-
-  String getJsonSessionId();
-
-  IClientSession getClientSession();
-
-  String createUniqueIdFor(IJsonAdapter<?> adapter);
-
-  /**
-   * Returns an existing IJsonAdapter instance for the given adapter ID.
-   */
-  IJsonAdapter<?> getJsonAdapter(String id);
-
-  /**
-   * Returns an existing IJsonAdapter instance for the given model object.
-   */
-  <M, A extends IJsonAdapter<? super M>> A getJsonAdapter(M model);
-
-  /**
-   * Creates a new IJsonAdapter instance for the given model or returns an existing instance.
-   * As a side-effect a newly created adapter is added to the current JSON response.
-   */
-  <M, A extends IJsonAdapter<? super M>> A getOrCreateJsonAdapter(M model);
-
-  <M, A extends IJsonAdapter<? super M>> A getOrCreateJsonAdapter(M model, IJsonAdapterFactory adapterFactory);
-
-  void registerJsonAdapter(IJsonAdapter<?> adapter);
-
-  void unregisterJsonAdapter(String id);
 
   /**
    * @return the current ui response that is collecting changes for the next
@@ -64,4 +38,43 @@ public interface IJsonSession {
    */
   void flush();
 
+  String getJsonSessionId();
+
+  IClientSession getClientSession();
+
+  JsonClientSession<? extends IClientSession> getJsonClientSession();
+
+  IJsonAdapter<?> getRootJsonAdapter();
+
+  /**
+   * Returns an existing IJsonAdapter instance for the given adapter ID.
+   */
+  IJsonAdapter<?> getJsonAdapter(String id);
+
+  /**
+   * Returns an existing IJsonAdapter instance for the given model object.
+   */
+  <M, A extends IJsonAdapter<? super M>> A getJsonAdapter(M model, IJsonAdapter<?> parent);
+
+  <M, A extends IJsonAdapter<? super M>> A getJsonAdapter(M model, IJsonAdapter<?> parent, boolean checkRoot);
+
+  List<IJsonAdapter<?>> getJsonChildAdapters(IJsonAdapter<?> parent);
+
+  /**
+   * Creates a new initialized IJsonAdapter instance for the given model or returns an existing instance.
+   * As a side-effect a newly created adapter is added to the current JSON response.
+   */
+  <M, A extends IJsonAdapter<? super M>> A getOrCreateJsonAdapter(M model, IJsonAdapter<?> parent);
+
+  <M, A extends IJsonAdapter<? super M>> A getOrCreateJsonAdapter(M model, IJsonAdapter<?> parent, IJsonAdapterFactory adapterFactory);
+
+  <M, A extends IJsonAdapter<? super M>> A createJsonAdapter(M model, IJsonAdapter<?> parent, IJsonAdapterFactory adapterFactory);
+
+  <M, A extends IJsonAdapter<? super M>> A createJsonAdapter(M model, IJsonAdapter<?> parent);
+
+  String createUniqueIdFor(IJsonAdapter<?> adapter);
+
+  void registerJsonAdapter(IJsonAdapter<?> adapter);
+
+  void unregisterJsonAdapter(String id);
 }
