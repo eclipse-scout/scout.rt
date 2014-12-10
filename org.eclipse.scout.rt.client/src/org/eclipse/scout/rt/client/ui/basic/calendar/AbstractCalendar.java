@@ -92,7 +92,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
     m_componentsByProvider = new HashMap<Class<? extends ICalendarItemProvider>, Collection<CalendarComponent>>();
     m_objectExtensions = new ObjectExtensions<AbstractCalendar, ICalendarExtension<? extends AbstractCalendar>>(this);
     if (callInitializer) {
-      interceptInitConfig();
+      callInitializer();
     }
   }
 
@@ -113,7 +113,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
 
   protected void callInitializer() {
     if (!m_initialized) {
-      initConfig();
+      interceptInitConfig();
       m_initialized = true;
     }
   }
