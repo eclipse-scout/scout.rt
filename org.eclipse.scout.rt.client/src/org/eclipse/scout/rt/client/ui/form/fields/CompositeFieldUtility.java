@@ -95,7 +95,10 @@ public final class CompositeFieldUtility {
           found.setValue(formFieldClass.cast(field));
         }
         else if (field instanceof ICompositeField) {
-          found.setValue(getMovedFieldByClass((ICompositeField) field, formFieldClass));
+          T movedFieldByClass = getMovedFieldByClass((ICompositeField) field, formFieldClass);
+          if (movedFieldByClass != null) {
+            found.setValue(movedFieldByClass);
+          }
         }
         return found.getValue() == null;
       }
@@ -129,7 +132,10 @@ public final class CompositeFieldUtility {
           found.setValue(type.cast(field));
         }
         else if (field instanceof ICompositeField) {
-          found.setValue(getMovedFieldById((ICompositeField) field, id, type));
+          T movedFieldById = getMovedFieldById((ICompositeField) field, id, type);
+          if (movedFieldById != null) {
+            found.setValue(movedFieldById);
+          }
         }
         return found.getValue() == null;
       }
