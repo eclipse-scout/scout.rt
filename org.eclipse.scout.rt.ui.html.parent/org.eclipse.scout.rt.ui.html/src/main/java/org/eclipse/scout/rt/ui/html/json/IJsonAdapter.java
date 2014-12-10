@@ -25,6 +25,8 @@ public interface IJsonAdapter<T extends Object> extends IJsonMapper {
    */
   T getModel();
 
+  void init();
+
   void attach();
 
   boolean isAttached();

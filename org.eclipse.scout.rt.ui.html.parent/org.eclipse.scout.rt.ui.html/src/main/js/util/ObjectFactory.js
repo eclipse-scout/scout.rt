@@ -156,6 +156,11 @@ scout.defaultObjectFactories = [{
   create: function() {
     return new scout.MenuNavigateUp();
   }
+}, {
+  objectType: 'Menu.NavigateDown',
+  create: function() {
+    return new scout.MenuNavigateDown();
+  }
 }, {  objectType: 'FormField',
   create: function() {
     return new scout.FormField();

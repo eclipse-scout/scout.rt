@@ -2,6 +2,7 @@ scout.Outline = function() {
   scout.Outline.parent.call(this);
   this._addAdapterProperties('defaultDetailForm');
   this._navigateUp = false;
+  this.events = new scout.EventSupport();
 };
 scout.inherits(scout.Outline, scout.Tree);
 
@@ -52,9 +53,6 @@ scout.Outline.prototype._renderSelection = function($nodes) {
 
 scout.Outline.prototype.setNodesSelected = function(nodes, $nodes) {
   scout.Outline.parent.prototype.setNodesSelected.call(this, nodes, $nodes);
-  // FIXME AWE: (navi) hier müssen wir die navigateUp Logik von Abstract*Page5 nach-implementieren
-  // Wahrscheinlich müssen wir's im setNodesSelected machen, da wir hier im fall vom UI event als
-  // auch vom Server event durchkommen (ungünstig)
   if (this._navigateUp) {
    this._navigateUp = false;
   } else {
@@ -104,6 +102,7 @@ scout.Outline.prototype._updateOutlineTab = function(node) {
     title = this.defaultDetailForm.title;
   }
   this.session.desktop.updateOutlineTab(content, title, subTitle);
+  this.events.trigger('outlineUpdated', {node: node});
 };
 
 /* event handling */
@@ -172,4 +171,25 @@ scout.Outline.prototype.onModelAction = function(event) {
   } else {
     scout.Outline.parent.prototype.onModelAction.call(this, event);
   }
+};
+
+/**
+ * Returns the selected row or null when no row is selected. When multiple rows are selected
+ * the first selected row is returned.
+ */
+scout.Outline.prototype.selectedRow = function() {
+  var table, rowId, node, nodes = this.selectedNodes();
+  if (nodes.length === 0) {
+    return null;
+  }
+  node = nodes[0];
+  if (!node.detailTable) {
+    return null;
+  }
+  table = node.detailTable;
+  if (!table.selectedRowIds || table.selectedRowIds.length === 0) {
+    return null;
+  }
+  rowId = table.selectedRowIds[0];
+  return table.rowById(rowId);
 };

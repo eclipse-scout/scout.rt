@@ -145,8 +145,12 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
         "withBarChart",
         "remove",
         "add",
-        "FilterBy"
-        );
+        "FilterBy",
+        "Reconnecting",
+        "Show",
+        "Up",
+        "Back",
+        "Continue");
   }
 
   private JSONObject getTextMap() {
@@ -313,13 +317,21 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   }
 
   /**
+   * Creates an adapter instance for the given model using the given factory and calls the <code>attach()</code> method
+   * on the created instance.
+   */
+  protected IJsonAdapter<?> createJsonAdapter(Object model, IJsonAdapterFactory adapterFactory) {
+    String id = createUniqueIdFor(null); // FIXME CGU
+    IJsonAdapter<?> adapter = adapterFactory.createJsonAdapter(model, this, id);
+    adapter.init();
+    return adapter;
+  }
+
+  /**
    * Creates an adapter instance for the given model and calls the <code>attach()</code> method on the created instance.
    */
   protected IJsonAdapter<?> createJsonAdapter(Object model) {
-    String id = createUniqueIdFor(null); // FIXME CGU
-    IJsonAdapter<?> adapter = m_jsonAdapterFactory.createJsonAdapter(model, this, id);
-    adapter.attach();
-    return adapter;
+    return createJsonAdapter(model, m_jsonAdapterFactory);
   }
 
   @Override
@@ -332,14 +344,19 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     return m_jsonAdapterRegistry.getJsonAdapter(model);
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public <M, A extends IJsonAdapter<? super M>> A getOrCreateJsonAdapter(M model) {
+    return getOrCreateJsonAdapter(model, m_jsonAdapterFactory);
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public <M, A extends IJsonAdapter<? super M>> A getOrCreateJsonAdapter(M model, IJsonAdapterFactory adapterFactory) {
     A jsonAdapter = getJsonAdapter(model);
     if (jsonAdapter != null) {
       return jsonAdapter;
     }
-    jsonAdapter = (A) createJsonAdapter(model);
+    jsonAdapter = (A) createJsonAdapter(model, adapterFactory);
     // because it's a new adapter we must add it to the response
     m_currentJsonResponse.addAdapter(jsonAdapter); // TODO AWE: (json) in registerJsonAdapter verschieben? analog unregisterJsonAdapter
     return jsonAdapter;

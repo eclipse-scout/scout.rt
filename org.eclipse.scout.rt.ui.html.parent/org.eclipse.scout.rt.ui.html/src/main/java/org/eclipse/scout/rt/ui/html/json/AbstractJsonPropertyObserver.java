@@ -36,11 +36,11 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
   public AbstractJsonPropertyObserver(T model, IJsonSession jsonSession, String id) {
     super(model, jsonSession, id);
     m_propertyEventFilter = new PropertyEventFilter();
+    m_jsonProperties = new HashMap<>();
   }
 
   @Override
-  protected void init() {
-    m_jsonProperties = new HashMap<>();
+  public void init() {
     m_initializingProperties = true;
     initJsonProperties(getModel());
     m_initializingProperties = false;

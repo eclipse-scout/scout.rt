@@ -30,6 +30,7 @@
 //@include("datamodel/DataModel.js")
 //@include("action/Action.js")
 //@include("menu/Menu.js")
+//@include("menu/MenuNavigateDown.js");
 //@include("menu/MenuNavigateUp.js");
 //@include("menu/menus.js")
 //@include("menu/Menubar.js")

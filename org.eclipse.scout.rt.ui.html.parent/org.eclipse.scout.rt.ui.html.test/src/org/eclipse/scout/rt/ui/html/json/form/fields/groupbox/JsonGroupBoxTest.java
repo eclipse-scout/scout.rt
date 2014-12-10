@@ -29,6 +29,7 @@ public class JsonGroupBoxTest extends BaseFormFieldTest {
 
   @Before
   public void setUp() {
+    m_groupBox.init();
     m_model.setBorderDecoration("x");
     m_model.setBorderVisible(true);
   }

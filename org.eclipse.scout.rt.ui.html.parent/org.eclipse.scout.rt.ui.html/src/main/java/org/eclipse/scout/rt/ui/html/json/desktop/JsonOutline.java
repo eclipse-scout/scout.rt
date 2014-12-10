@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.ui.html.json.desktop;
 import java.util.Collection;
 
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
+import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
@@ -24,10 +25,12 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithNodes;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
+import org.eclipse.scout.rt.ui.html.json.IJsonAdapterFactory;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
+import org.eclipse.scout.rt.ui.html.json.table.JsonOutlineTable;
 import org.eclipse.scout.rt.ui.html.json.table.JsonTable;
 import org.eclipse.scout.rt.ui.html.json.tree.JsonTree;
 import org.json.JSONObject;
@@ -107,7 +110,8 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
       optAttachAdapter(page.getDetailForm());
     }
     if (page.isTableVisible()) {
-      attachAdapter(getTable(page));
+      // Create 'outline' variant for table
+      attachAdapter(getTable(page), new P_JsonOutlineTableFactory(page));
     }
   }
 
@@ -167,8 +171,7 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
       pageType = "node";
       if (page.isTableVisible()) {
         IPageWithNodes pageWithNodes = (IPageWithNodes) page;
-        ITable table = pageWithNodes.getInternalTable();
-        putAdapterIdProperty(json, PROP_DETAIL_TABLE, table);
+        putAdapterIdProperty(json, PROP_DETAIL_TABLE, pageWithNodes.getInternalTable());
       }
     }
     putProperty(json, "type", pageType);
@@ -250,7 +253,7 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
       optAttachAdapter(page.getDetailForm());
     }
     if (page.isTableVisible()) {//FIXME AWE from CGU: this is always true, intended?
-      attachAdapter(getTable(page));
+      attachAdapter(getTable(page), new P_JsonOutlineTableFactory(page));
     }
     JSONObject jsonEvent = new JSONObject();
     putProperty(jsonEvent, PROP_NODE_ID, getOrCreateNodeId(page));
@@ -286,6 +289,49 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
     else {
       super.handleUiEvent(event, res);
     }
+  }
+
+  private class P_JsonOutlineAdapter implements IJsonOutlineAdapter {
+
+    private final IPage m_page;
+
+    private P_JsonOutlineAdapter(IPage page) {
+      m_page = page;
+    }
+
+    @Override
+    public String getNodeId(ITableRow tableRow) {
+      ITreeNode treeNode;
+      // TODO AWE: (scout) find common interface for pages with tables, currently the methods get(Internal)Table and getTreeNodeFor()
+      // are on IPageWithTable and IPageWithNodes but the have no common super class. That's why we must duplicate code here.
+      if (m_page instanceof IPageWithNodes) {
+        treeNode = ((IPageWithNodes) m_page).getTreeNodeFor(tableRow);
+      }
+      else if (m_page instanceof IPageWithTable) {
+        treeNode = ((IPageWithTable) m_page).getTreeNodeFor(tableRow);
+      }
+      else {
+        throw new IllegalArgumentException("invalid type for m_page");
+      }
+      return JsonOutline.this.getOrCreateNodeId(treeNode);
+    }
+
+  }
+
+  private class P_JsonOutlineTableFactory implements IJsonAdapterFactory {
+
+    private final IPage m_page;
+
+    private P_JsonOutlineTableFactory(IPage page) {
+      m_page = page;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public IJsonAdapter<?> createJsonAdapter(Object model, IJsonSession jsonSession, String id) {
+      return new JsonOutlineTable((ITable) model, jsonSession, id, new P_JsonOutlineAdapter(m_page));
+    }
+
   }
 
 }

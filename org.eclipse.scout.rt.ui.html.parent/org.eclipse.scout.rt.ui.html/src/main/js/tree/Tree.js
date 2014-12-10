@@ -635,7 +635,15 @@ scout.Tree.prototype.onModelAction = function(event) {
   } else if (event.type === 'nodeExpanded') {
     this._onNodeExpanded(event.nodeId, event.expanded);
   } else if (event.type === 'nodeChanged') {
-    this._onNodeChanged(event.nodeId, event);
+    // FIXME AWE/CGU: das problem ist hier, dass dieser event für die neue node kommt bevor die nodes inserted wurden!
+    if (this._nodeMap[event.nodeId]) {
+      this._onNodeChanged(event.nodeId, event);
+    } else {
+      // do later hack --> events sortieren?
+      setTimeout(function() {
+        this._onNodeChanged(event.nodeId, event);
+      }.bind(this));
+    }
   } else {
     $.log.warn('Model event not handled. Widget: Tree. Event: ' + event.type + '.');
   }

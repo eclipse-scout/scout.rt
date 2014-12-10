@@ -14,24 +14,17 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeListener;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
-import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage5;
-import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
-import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.ui.menu.AbstractMenu5;
 
-// TODO AWE: (navi) wenn klick in baum, wieder detailForm anzeigen
-// - home button implementieren, wenn auf top-level
+// TODO AWE: (navi) home button implementieren, wenn auf top-level
 // TODO BSH OutlineNavigationButton | Cleanup and comment this class
 public abstract class AbstractOutlineNavigationMenu extends AbstractMenu5 {
 
   private IOutline m_outline;
-  private String m_text1;
-  private String m_text2;
   // TODO AWE: (scout) wir brauchen eine execDispose() methode - sonst kann der listener nie
   // entfernt werden (memory-leak). Evtl. können wir auf diese methode aber auch verzichten
   // wenn wir das menü konzeptionell ändern und diese beiden buttons neu zur outline gehören.
@@ -56,11 +49,9 @@ public abstract class AbstractOutlineNavigationMenu extends AbstractMenu5 {
     }
   };
 
-  public AbstractOutlineNavigationMenu(IOutline outline, String text1, String text2) {
+  public AbstractOutlineNavigationMenu(IOutline outline) {
     super(false);
     m_outline = outline;
-    m_text1 = TEXTS.get(text1);
-    m_text2 = TEXTS.get(text2);
     callInitializer();
     m_outline.addTreeListener(m_treeListener);
   }
@@ -72,13 +63,7 @@ public abstract class AbstractOutlineNavigationMenu extends AbstractMenu5 {
 
   protected void updateMenuState() {
     IPage activePage = m_outline.getActivePage();
-    setText(isDrill(activePage) ? m_text1 : m_text2);
     setEnabled(activePage != null && activePage.getTreeLevel() > 0);
-  }
-
-  @Override
-  protected String getConfiguredText() {
-    return m_text1;
   }
 
   @Override
@@ -86,40 +71,10 @@ public abstract class AbstractOutlineNavigationMenu extends AbstractMenu5 {
     return CollectionUtility.hashSet(OutlineMenuType.Navigation, getMenuType());
   }
 
-  protected boolean isDrill(IPage page) {
-    if (page instanceof IPage5) {
-      IPage5 page5 = (IPage5) page;
-      if (page5 instanceof IPageWithTable) {
-        return true;
-      }
-      if (page5.getDetailForm() != null && isDetail(page5)) {
-        return false;
-      }
-      return true;
-    }
-    return true;
-  }
+  protected abstract IMenuType getMenuType();
 
-  @Override
-  protected void execAction() throws ProcessingException {
-    IPage activePage = m_outline.getActivePage();
-    if (isDrill(activePage)) {
-      doDrill(activePage);
-    }
-    else {
-      showDetail(activePage);
-    }
-  }
-
-  protected final IOutline getOutline() {
+  public final IOutline getOutline() {
     return m_outline;
   }
 
-  protected abstract boolean isDetail(IPage5 page5);
-
-  protected abstract void showDetail(IPage page);
-
-  protected abstract void doDrill(IPage page);
-
-  protected abstract IMenuType getMenuType();
 }

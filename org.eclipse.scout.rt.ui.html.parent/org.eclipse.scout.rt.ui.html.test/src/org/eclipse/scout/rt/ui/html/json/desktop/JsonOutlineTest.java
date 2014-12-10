@@ -44,7 +44,7 @@ public class JsonOutlineTest {
     pages.add(tablePage);
     IOutline outline = new Outline(pages);
 
-    //Activate nodes (forms get created lazily on activation)
+    // Activate nodes (forms get created lazily on activation)
     outline.selectNode(nodePage);
     outline.selectNode(tablePage);
 
@@ -83,7 +83,7 @@ public class JsonOutlineTest {
   public static JsonOutline<IOutline> createJsonOutlineWithMocks(IOutline outline) {
     JsonSessionMock jsonSession = new JsonSessionMock();
     JsonOutline<IOutline> jsonOutline = new JsonOutline<IOutline>(outline, jsonSession, jsonSession.createUniqueIdFor(null));
-    jsonOutline.attach();
+    jsonOutline.init();
     return jsonOutline;
   }
 

@@ -27,6 +27,7 @@ public class JsonFormFieldTest extends BaseFormFieldTest {
 
   @Before
   public void setUp() {
+    m_formField.init();
     m_model.setLabel("fooBar");
     m_model.setEnabled(false);
     m_model.setVisible(false);

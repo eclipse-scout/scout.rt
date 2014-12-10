@@ -7,10 +7,59 @@
  */
 scout.MenuNavigateUp = function() {
   scout.MenuNavigateUp.parent.call(this);
+  this._addAdapterProperties('outline');
+  this._clickBehavior = function() {};
+  this._listener;
 };
 scout.inherits(scout.MenuNavigateUp, scout.Menu);
 
+scout.MenuNavigateUp.prototype.init = function(model, session) {
+  scout.MenuNavigateUp.parent.prototype.init.call(this, model, session);
+  this._listener = function(event) {
+    var text, $node, node = event.node;
+    if (node.detailForm && !node.detailFormVisible) {
+      this._clickBehavior = this._showDetailForm.bind(this, node);
+      text = session.text('Back');
+    } else {
+      this._clickBehavior = this._drillUp.bind(this);
+      text = session.text('Up');
+    }
+    $(this.$container).text(text);
+    $node = this.outline.$nodeById(node.id);
+    this.enabled = $node.attr('data-level') > 0;
+    $.log.debug('data-level' + $node.attr('data-level') + ' enabled=' + this.enabled);
+    if (this.rendered) {
+      this._renderEnabled(this.enabled);
+    }
+  }.bind(this);
+  this.outline.events.on('outlineUpdated', this._listener);
+};
+
 scout.MenuNavigateUp.prototype._onMenuClicked = function(event) {
-  this.session.desktop.outline._navigateUp = true;
-  scout.MenuNavigateUp.parent.prototype._onMenuClicked.call(this, event);
+  this._clickBehavior.call(this);
+};
+
+scout.MenuNavigateUp.prototype._showDetailForm = function(node) {
+  node.detailFormVisible = true;
+  $.log.debug('show detail-form');
+  this.outline._updateOutlineTab(node);
+};
+
+scout.MenuNavigateUp.prototype._drillUp = function() {
+  var nodes, parentNode, $parentNode;
+  this.outline._navigateUp = true;
+  nodes = this.outline.selectedNodes();
+  if (nodes.length >= 1) {
+    parentNode = nodes[0].parentNode;
+    $parentNode = this.outline.$nodeById(parentNode.id);
+    $.log.debug('drill up to node ' + parentNode);
+
+    this.outline.setNodesSelected([parentNode], [$parentNode]);
+    this.outline.setNodeExpanded(parentNode, $parentNode, false);
+  }
+};
+
+scout.MenuNavigateUp.prototype.dispose = function() {
+  scout.MenuNavigateUp.parent.prototype.dispose.call(this);
+  this.outline.events.off('outlineUpdated', this._listener);
 };

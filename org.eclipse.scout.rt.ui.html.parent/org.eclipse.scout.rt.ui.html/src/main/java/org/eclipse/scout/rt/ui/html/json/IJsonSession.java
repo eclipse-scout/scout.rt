@@ -43,6 +43,8 @@ public interface IJsonSession {
    */
   <M, A extends IJsonAdapter<? super M>> A getOrCreateJsonAdapter(M model);
 
+  <M, A extends IJsonAdapter<? super M>> A getOrCreateJsonAdapter(M model, IJsonAdapterFactory adapterFactory);
+
   void registerJsonAdapter(IJsonAdapter<?> adapter);
 
   void unregisterJsonAdapter(String id);

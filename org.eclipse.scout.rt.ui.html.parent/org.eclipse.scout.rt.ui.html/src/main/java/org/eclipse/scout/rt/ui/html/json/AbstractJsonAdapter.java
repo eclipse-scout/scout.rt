@@ -33,10 +33,15 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     m_jsonSession = jsonSession;
     m_id = id;
     m_jsonSession.registerJsonAdapter(this);
-    init();
   }
 
-  protected void init() {
+  /**
+   * Init method which is called by the factory <em>after</em> the constructor has been executed. The default
+   * implementation calls <code>attach()</code> and <code>attachChildAdapters()</code>.
+   */
+  @Override
+  public void init() {
+    attach();
     attachChildAdapters();
   }
 
@@ -154,6 +159,10 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
 
   protected final IJsonAdapter<?> attachAdapter(Object model) {
     return m_jsonSession.getOrCreateJsonAdapter(model);
+  }
+
+  protected final IJsonAdapter<?> attachAdapter(Object model, IJsonAdapterFactory adapterFactory) {
+    return m_jsonSession.getOrCreateJsonAdapter(model, adapterFactory);
   }
 
   protected final List<IJsonAdapter<?>> attachAdapters(Collection<?> models) {

@@ -42,6 +42,9 @@ scout.ModelAdapter.prototype.render = function($parent) {
   }
 };
 
+// FIXME BSH/AWE/CGU: konzept für 'widgets' ohne model-adapter bzw. ohne server-kommunikation erarbeiten
+// evtl. könnte auch ein strategy-pattern eingesetzt werden um server-calls zu ersetzen.
+
 /**
  * @returns the UI widget to use when rendering the model adapter
  */
