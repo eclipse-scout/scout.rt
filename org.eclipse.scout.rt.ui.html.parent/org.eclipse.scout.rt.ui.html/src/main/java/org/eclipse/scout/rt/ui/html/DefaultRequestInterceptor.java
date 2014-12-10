@@ -61,7 +61,6 @@ public class DefaultRequestInterceptor extends AbstractService implements IServl
 
   @Override
   public boolean interceptPost(AbstractScoutAppServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
     //serve json
     String pathInfo = req.getPathInfo();
     if ("/json".equals(pathInfo) && createJsonMessageHandler(servlet, req, resp, pathInfo).handle()) {

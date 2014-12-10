@@ -36,7 +36,7 @@ scout.Form.prototype._render = function($parent) {
     // Cannot detach if...
     // 1. there is more than one session inside the window (portlets), because
     //    we would not know which session to attach to.
-    // 2. the window is already a child window (cannot detatch further).
+    // 2. the window is already a child window (cannot detach further).
     detachable = false;
   }
 

@@ -43,8 +43,7 @@ public class Script {
 
     /**
      * A library or thirdparty library is available in minimized and/or non-minimized form with the file name pattern
-     * *.min.js
-     * or *.min.css respectively *.js or *.css
+     * *.min.js or *.min.css respectively *.js or *.css
      * <p>
      * Typically placed inside <code>/META-INF/resources/WebContent/res</code>
      * <p>
@@ -110,5 +109,4 @@ public class Script {
   public Script.NodeType getNodeType() {
     return m_nodeType;
   }
-
 }

@@ -16,7 +16,7 @@ import org.eclipse.scout.rt.ui.html.res.BrowserInfo;
 import org.eclipse.scout.rt.ui.html.res.BrowserInfoBuilder;
 
 /**
- * Decide which index.html is to be used depending onthe browser type
+ * Decide which index.html is to be used depending on the browser type.
  */
 public class IndexHtmlResolver {
   public static final String INDEX_HTML = "/index.html";

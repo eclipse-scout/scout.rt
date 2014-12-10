@@ -28,36 +28,29 @@
  * 'customParams': {'addinType': 'word', 'addInToken': '234jh523jk5hb235'}
  * }
  */
-scout.Session = function($entryPoint, jsonSessionId, initOptions) {
-  var prop;
-  var customParamMap = new scout.URL().parameterMap;
+scout.Session = function($entryPoint, jsonSessionId, options) {
+  options = options || {};
 
-  //validate params and use defaults
-  initOptions = initOptions || {};
-  initOptions.userAgent = initOptions.userAgent || new scout.UserAgent(scout.UserAgent.DEVICE_TYPE_DESKTOP);
-  initOptions.objectFactories = initOptions.objectFactories || scout.defaultObjectFactories;
-  if (!initOptions.clientSessionId) {
-    initOptions.clientSessionId = sessionStorage.getItem('scout:clientSessionId');
-    if (!initOptions.clientSessionId) {
-      initOptions.clientSessionId = scout.numbers.toBase62(scout.dates.timestamp());
-      sessionStorage.setItem('scout:clientSessionId', initOptions.clientSessionId);
-    }
+  // Prepare clientSessionId
+  var clientSessionId = options.clientSessionId;
+  if (!clientSessionId) {
+    clientSessionId = sessionStorage.getItem('scout:clientSessionId');
   }
-  for (prop in customParamMap) {
-    initOptions.customParams = initOptions.customParams || {};
-    initOptions.customParams[prop] = customParamMap[prop];
+  if (!clientSessionId) {
+    clientSessionId = scout.numbers.toBase62(scout.dates.timestamp());
+    sessionStorage.setItem('scout:clientSessionId', clientSessionId);
   }
 
-  //set members
+  // Set members
   this.$entryPoint = $entryPoint;
   this.jsonSessionId = jsonSessionId;
-  this._initOptions = initOptions;
-  this.userAgent = initOptions.userAgent;
+  this.parentJsonSession;
+  this.clientSessionId = clientSessionId;
+  this.userAgent = options.userAgent || new scout.UserAgent(scout.UserAgent.DEVICE_TYPE_DESKTOP);
   this.modelAdapterRegistry = {};
   this.locale;
   this._asyncEvents = [];
   this._asyncRequestQueued;
-  this.parentJsonSession; // FIXME BSH Detach | Improve this
   this._childWindows = []; // for detached windows
   this._deferred;
   this._startup;
@@ -67,6 +60,9 @@ scout.Session = function($entryPoint, jsonSessionId, initOptions) {
   this._adapterDataCache = {};
   this.objectFactory = new scout.ObjectFactory(this);
   this._textMap = {};
+  this._customParams;
+  this._requestsPendingCounter = 0; // TODO CGU do we really want to have multiple requests pending?
+  this.layoutValidator = new scout.LayoutValidator();
 
   // FIXME BSH Detach | Improve this
   // If this is a popup window, re-register with parent (in case the user reloaded the popup window)
@@ -78,16 +74,18 @@ scout.Session = function($entryPoint, jsonSessionId, initOptions) {
     }
     var parentJsonSession = window.opener.scout.sessions[0];
     parentJsonSession.registerChildWindow(window);
-    this.parentJsonSession = parentJsonSession;
+    this.parentJsonSession = parentJsonSession; // TODO BSH Detach | Get from options instead?
   }
 
-  // FIXME do we really want to have multiple requests pending?
-  this._requestsPendingCounter = 0;
+  this.modelAdapterRegistry[jsonSessionId] = this; // FIXME CGU maybe better separate session object from event processing, create ClientSession.js?
+  this.objectFactory.register(options.objectFactories || scout.defaultObjectFactories);
 
-  // FIXME maybe better separate session object from event processing, create
-  // ClientSession.js?
-  this.modelAdapterRegistry[jsonSessionId] = this;
-  this.layoutValidator = new scout.LayoutValidator();
+  // Extract custom parameters from URL
+  var customParamMap = new scout.URL().parameterMap;
+  for (var prop in customParamMap) {
+    this._customParams = this._customParams || {};
+    this._customParams[prop] = customParamMap[prop];
+  }
 };
 
 scout.Session.prototype.unregisterModelAdapter = function(modelAdapter) {
@@ -172,22 +170,16 @@ scout.Session.prototype._sendNow = function(events, deferred) {
   };
 
   if (this._startup) {
-    request.clientSessionId = this._initOptions.clientSessionId;
-    request.startup = true;
     this._startup = false;
-
-    if (this._initOptions.userAgent.deviceType !== scout.UserAgent.DEVICE_TYPE_DESKTOP) {
-      request.userAgent = this._initOptions.userAgent;
+    request.startup = true;
+    request.clientSessionId = this.clientSessionId;
+    if (this.userAgent.deviceType !== scout.UserAgent.DEVICE_TYPE_DESKTOP) {
+      request.userAgent = this.userAgent;
     }
-    if (this._initOptions.customParams) {
-      request.customParams = this._initOptions.customParams;
-    }
+    request.customParams = this._customParams;
   }
   if (this._unload) {
     request.unload = true;
-  }
-  if (this.parentJsonSession) {
-    request.parentJsonSessionId = this.parentJsonSession.jsonSessionId;
   }
 
   this._sendRequest(request);
@@ -387,7 +379,7 @@ scout.Session.prototype.init = function() {
   // Ask if child windows should be closed as well
   $(window).on('beforeunload', function() {
     if (this._childWindows.length > 0) {
-      return 'There are windows in DETACHED state.'; // FIXME BSH Detach | Text
+      return 'There are windows in DETACHED state.'; // TODO BSH Detach | Text
     }
   }.bind(this));
 
@@ -401,8 +393,6 @@ scout.Session.prototype.init = function() {
       childWindow.close();
     });
   }.bind(this));
-
-  this.objectFactory.register(this._initOptions.objectFactories);
 };
 
 scout.Session.prototype.onModelAction = function(event) {

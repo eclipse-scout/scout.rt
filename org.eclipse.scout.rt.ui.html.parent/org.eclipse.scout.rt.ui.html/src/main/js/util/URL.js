@@ -6,11 +6,11 @@ scout.URL = function(url) {
   if (typeof url === 'undefined') {
     url = window.location.href;
   }
-  var a = /^([^?#]*)(?:\?([^#]*))?(?:#(.*))?$/.exec(url || '');
+  var urlParts = /^([^?#]*)(?:\?([^#]*))?(?:#(.*))?$/.exec(url || '');
   // encoded
-  this._baseUrlRaw = a[1];
-  this._queryPartRaw = a[2];
-  this._hashPartRaw = a[3];
+  this._baseUrlRaw = urlParts[1];
+  this._queryPartRaw = urlParts[2];
+  this._hashPartRaw = urlParts[3];
   // un-encoded (!)
   this.parameterMap = scout.URL._parse(this._queryPartRaw);
 };

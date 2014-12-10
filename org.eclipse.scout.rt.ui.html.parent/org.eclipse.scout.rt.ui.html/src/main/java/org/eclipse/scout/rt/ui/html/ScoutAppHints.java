@@ -18,7 +18,16 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 
 /**
- * Manager url param hints for the {@link AbstractScoutAppServlet}
+ * Helper to manage url param hints for the {@link AbstractScoutAppServlet}.
+ * <p>
+ * The following hints are supported:
+ * <ul>
+ * <li><b><code>?cache=(true|false)</code></b>: Enable/disable HTTP caching of resources.
+ * <li><b><code>?compress=(true|false)</code></b>: Enable/disable GZIP compression (if client supports it).
+ * <li><b><code>?minify=(true|false)</code></b>: Enable/disable "minification" of JS/CSS files.
+ * <li><b><code>?debug=(true|false)</code></b>: Enable/disable all of the above flags.
+ * </ul>
+ * All values are <code>true</code> by default, unless the application is run in development mode.
  */
 public final class ScoutAppHints {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ScoutAppHints.class);
@@ -31,6 +40,10 @@ public final class ScoutAppHints {
   private static final String SESSION_ATTRIBUTE_CACHE_HINT = ScoutAppHints.class.getName() + "#cache";
   private static final String SESSION_ATTRIBUTE_COMPRESS_HINT = ScoutAppHints.class.getName() + "#compress";
   private static final String SESSION_ATTRIBUTE_MINIFY_HINT = ScoutAppHints.class.getName() + "#minify";
+
+  private ScoutAppHints() {
+    // static access only
+  }
 
   public static void updateHints(HttpServletRequest req) {
     updateHint(req, URL_PARAM_ALL_HINTS, SESSION_ATTRIBUTE_CACHE_HINT, SESSION_ATTRIBUTE_COMPRESS_HINT, SESSION_ATTRIBUTE_MINIFY_HINT);
@@ -76,8 +89,5 @@ public final class ScoutAppHints {
       return hint.booleanValue();
     }
     return defaultValue;
-  }
-
-  private ScoutAppHints() {
   }
 }

@@ -1,24 +1,21 @@
-/**
- * See javadoc for Session.js
- */
-scout.init = function(initOptions) {
-  var tabId = '' + new Date().getTime();
-  initOptions = initOptions || {};
+scout.sessions = [];
 
-  scout.sessions = [];
+scout.init = function(options) {
+  var tabId = scout.dates.timestamp();
+  options = options || {};
+
+  var $focusedPart;
   $('.scout').each(function() {
-    var $focusedPart, session, jsonSessionId,
-      $container = $(this),
-      portletPartId = $(this).data('partid') || '0',
-      focusFirstPart = initOptions.focusFirstPart !== undefined ? initOptions.focusFirstPart : true;
+    var $container = $(this);
 
-    jsonSessionId = [portletPartId, tabId].join(':');
-    session = new scout.Session($container, jsonSessionId, initOptions);
+    var portletPartId = $container.data('partid') || '0';
+    var jsonSessionId = [portletPartId, tabId].join(':');
+    var session = new scout.Session($container, jsonSessionId, options);
     session.init();
     scout.sessions.push(session);
 
     $container.attr('tabindex', portletPartId);
-    if (focusFirstPart && !$focusedPart) {
+    if (options.focusFirstPart && !$focusedPart) {
       $focusedPart = $container;
       $focusedPart.focus();
     }

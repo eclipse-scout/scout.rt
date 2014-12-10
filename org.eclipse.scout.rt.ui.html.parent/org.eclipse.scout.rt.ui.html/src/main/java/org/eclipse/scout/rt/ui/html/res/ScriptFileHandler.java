@@ -74,5 +74,4 @@ public class ScriptFileHandler extends AbstractRequestHandler {
   protected ScriptBuilder createScriptBuilder() {
     return new ScriptBuilder(getServlet().getResourceLocator());
   }
-
 }
