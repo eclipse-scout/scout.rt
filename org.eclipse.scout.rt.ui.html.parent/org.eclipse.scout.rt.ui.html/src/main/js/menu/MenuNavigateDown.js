@@ -18,7 +18,7 @@ scout.MenuNavigateDown.prototype.init = function(model, session) {
     }
     $(this.$container).text(text);
   }.bind(this);
-  this.outline.events.on('outlineUpdated', this._listener);
+  this.outline.events.on('outlineUpdated nodesSelected', this._listener);
 };
 
 scout.MenuNavigateDown.prototype._onMenuClicked = function(event) {
@@ -49,7 +49,7 @@ scout.MenuNavigateDown.prototype._drillDown = function(node) {
 
 scout.MenuNavigateDown.prototype.dispose = function() {
   scout.MenuNavigateDown.parent.prototype.dispose.call(this);
-  this.outline.events.off('outlineUpdated', this._listener);
+  this.outline.events.off('outlineUpdated nodesSelected', this._listener);
 };
 
 

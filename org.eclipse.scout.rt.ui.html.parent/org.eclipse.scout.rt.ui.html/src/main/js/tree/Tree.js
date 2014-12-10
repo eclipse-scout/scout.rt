@@ -9,6 +9,7 @@ scout.Tree = function() {
   this._breadcrumb = false;
   this._treeItemPaddingLeft = 30;
   this._treeItemPaddingLevel = 20;
+  this.events = new scout.EventSupport();
 };
 scout.inherits(scout.Tree, scout.ModelAdapter);
 
@@ -165,28 +166,29 @@ scout.Tree.prototype.clearSelection = function() {
 };
 
 scout.Tree.prototype.setNodesSelected = function(nodes, $nodes) {
-  var nodeIds = scout.arrays.init(nodes.length),
-    i;
+  var i, nodeIds = scout.arrays.init(nodes.length);
+
   nodes = scout.arrays.ensure(nodes);
   $nodes = scout.arrays.ensure($nodes);
-
   for (i = 0; i < nodes.length; i++) {
     nodeIds[i] = nodes[i].id;
   }
-
   if (!scout.arrays.equalsIgnoreOrder(nodeIds, this.selectedNodeIds)) {
     this.selectedNodeIds = nodeIds;
-
     this.session.send('nodesSelected', this.id, {
       'nodeIds': nodeIds
     });
   }
   // FIXME BSH Keystroke | "scroll into view"
   this._renderSelection($nodes);
+  this._triggerNodesSelected(nodeIds);
+};
+
+scout.Tree.prototype._triggerNodesSelected = function(nodeIds) {
+  this.events.trigger('nodesSelected', {nodeIds: nodeIds});
 };
 
 /**
- *
  * @param $nodes if undefined the nodes will be resolved using this.selectedNodeIds
  */
 scout.Tree.prototype._renderSelection = function($nodes) {
@@ -359,10 +361,10 @@ scout.Tree.prototype._onAllNodesDeleted = function(parentNodeId) {
 
 scout.Tree.prototype._onNodesSelected = function(nodeIds) {
   this.selectedNodeIds = nodeIds;
-
   if (this.rendered) {
     this._renderSelection();
   }
+  this._triggerNodesSelected(nodeIds);
 };
 
 scout.Tree.prototype._onNodeExpanded = function(nodeId, expanded) {

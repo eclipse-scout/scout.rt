@@ -50,8 +50,22 @@ scout.EventSupport.prototype.trigger = function(type, event) {
   var listener;
   for (var i = 0; i < this._eventListeners.length; i++) {
     listener = this._eventListeners[i];
-    if (!listener.type || listener.type === event.type) {
+    if (!listener.type || typeMatches(event.type, listener.type)) {
       listener.func(event);
     }
+  }
+
+  function typeMatches(eventType, listenerType) {
+    var i, types = listenerType.split(' ');
+    if (types.length === 1) {
+      return eventType === listenerType;
+    }
+    // support for multi type definition 'type1 type2 [...]'
+    for (i = 0; i < types.length; i++) {
+      if (eventType === types[i]) {
+        return true;
+      }
+    }
+    return false;
   }
 };

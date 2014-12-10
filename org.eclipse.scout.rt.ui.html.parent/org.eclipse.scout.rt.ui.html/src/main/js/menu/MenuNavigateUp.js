@@ -27,12 +27,11 @@ scout.MenuNavigateUp.prototype.init = function(model, session) {
     $(this.$container).text(text);
     $node = this.outline.$nodeById(node.id);
     this.enabled = $node.attr('data-level') > 0;
-    $.log.debug('data-level' + $node.attr('data-level') + ' enabled=' + this.enabled);
     if (this.rendered) {
       this._renderEnabled(this.enabled);
     }
   }.bind(this);
-  this.outline.events.on('outlineUpdated', this._listener);
+  this.outline.events.on('outlineUpdated nodesSelected', this._listener);
 };
 
 scout.MenuNavigateUp.prototype._onMenuClicked = function(event) {
@@ -61,5 +60,5 @@ scout.MenuNavigateUp.prototype._drillUp = function() {
 
 scout.MenuNavigateUp.prototype.dispose = function() {
   scout.MenuNavigateUp.parent.prototype.dispose.call(this);
-  this.outline.events.off('outlineUpdated', this._listener);
+  this.outline.events.off('outlineUpdated nodesSelected', this._listener);
 };

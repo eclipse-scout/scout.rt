@@ -2,7 +2,6 @@ scout.Outline = function() {
   scout.Outline.parent.call(this);
   this._addAdapterProperties('defaultDetailForm');
   this._navigateUp = false;
-  this.events = new scout.EventSupport();
 };
 scout.inherits(scout.Outline, scout.Tree);
 
