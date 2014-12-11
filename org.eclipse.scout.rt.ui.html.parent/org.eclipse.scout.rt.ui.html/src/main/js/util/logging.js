@@ -12,15 +12,24 @@ scout.logging = {
     var location = new scout.URL();
     var enabled = location.getParameter('logging');
     if (enabled) {
-      $deferred = $.getCachedScript("res/log4javascript.min.js")
-        .done(function(script, textStatus) {
-          var logLevel = scout.logging.parseLevel(location.getParameter('logLevel'));
-          if (!logLevel) {
-            logLevel = scout.logging.parseLevel(scout.logging.defaultLevel);
-          }
-          log4javascript.getDefaultLogger().setLevel(logLevel);
-          $.log = log4javascript.getDefaultLogger();
-        });
+      var initLog4Javascript = function() {
+        var logLevel = scout.logging.parseLevel(location.getParameter('logLevel'));
+        if (!logLevel) {
+          logLevel = scout.logging.parseLevel(scout.logging.defaultLevel);
+        }
+        log4javascript.getDefaultLogger().setLevel(logLevel);
+        $.log = log4javascript.getDefaultLogger();
+      };
+      if (log4javascript === undefined) {
+        // If log4javascript is not yet installed, dynamically load the library
+        $deferred = $.getCachedScript('res/log4javascript.min.js')
+          .done(function(script, textStatus) {
+            initLog4Javascript();
+          });
+      }
+      else {
+        initLog4Javascript();
+      }
     } else {
       $.log = new scout.NullLogger();
     }

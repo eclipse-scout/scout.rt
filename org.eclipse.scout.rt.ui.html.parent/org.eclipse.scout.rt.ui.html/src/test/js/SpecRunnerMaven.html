@@ -142,14 +142,14 @@
   <script type="text/javascript" src="src/main/js/util/mobileObjectFactories.js"></script>
   <script type="text/javascript" src="src/main/js/util/NullAdapter.js"></script>
 
+  <script type="text/javascript">
+    <!-- This is usually done in index.html, but here, we have to do it manually -->
+    scout.logging.init();
+  </script>
+
   $specScriptTags$
 </head>
 <body>
-  <script type="text/javascript">
-  if(window.location.href.indexOf("ManualSpecRunner.html") !== -1) {
-    document.body.appendChild(document.createTextNode("Warning: opening this HTML file directly from the file system is deprecated. You should instead try running `mvn jasmine:bdd` from the command line, and then visit `http://localhost:8234` in your browser. "))
-  }
-  </script>
   <!-- Test for UTF-8 encoding: äöü -->
 </body>
 </html>

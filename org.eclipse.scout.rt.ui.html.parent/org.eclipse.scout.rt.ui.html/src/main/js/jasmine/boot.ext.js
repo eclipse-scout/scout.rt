@@ -1,11 +1,8 @@
 /*jshint -W079 */
-/*global JasmineMavenReporter, log4javascript*/
+/*global JasmineMavenReporter*/
 
 // Since we don't use a IIF to wrap the scout code when running tests, we need to define the scout namespace here
 var scout = {};
-
-// Logger gets initialized by index.html so we need to do it here again
-$.log = log4javascript.getDefaultLogger();
 
 // Patches necessary for phantomJs
 // bind does not exist, see https://github.com/ariya/phantomjs/issues/10522
