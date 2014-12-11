@@ -17,6 +17,7 @@ import javax.security.auth.Subject;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.server.IServerJobFactory;
 import org.eclipse.scout.rt.server.IServerJobService;
@@ -45,8 +46,7 @@ public class Scheduler extends AbstractScheduler implements IScheduler {
 
   @Override
   public void handleJobExecution(final ISchedulerJob job, final TickSignal signal) throws ProcessingException {
-    final String jobName = "Scheduler." + job.getGroupId() + "." + job.getJobId();
-    m_serverJobFactory.runNow(jobName, new ITransactionRunnable() {
+    m_serverJobFactory.runNow(getJobName(job), new ITransactionRunnable() {
 
       @Override
       public IStatus run(IProgressMonitor monitor) throws ProcessingException {
@@ -55,4 +55,12 @@ public class Scheduler extends AbstractScheduler implements IScheduler {
       }
     });
   }
+
+  /**
+   * @return name of the Scheduler {@link Job}
+   */
+  protected String getJobName(ISchedulerJob job) {
+    return "Scheduler." + job.getGroupId() + "." + job.getJobId();
+  }
+
 }

@@ -86,7 +86,7 @@ public final class ScoutAssert {
   /**
    * Compare 2 comparable with {@link Comparable#compareTo(Object)} (expect to obtain 0).
    * This can be useful when two {@link java.math.BigDecimal} are compared.
-   * 
+   *
    * @since 3.10.0-M3
    */
   public static <T extends Comparable<T>> void assertComparableEquals(T expected, T actual) {
@@ -96,7 +96,7 @@ public final class ScoutAssert {
   /**
    * Compare 2 comparable with {@link Comparable#compareTo(Object)} (expect to obtain 0).
    * This can be useful when two {@link java.math.BigDecimal} are compared.
-   * 
+   *
    * @since 3.10.0-M3
    */
   public static <T extends Comparable<T>> void assertComparableEquals(String message, T expected, T actual) {
@@ -120,6 +120,11 @@ public final class ScoutAssert {
     return s + "expected:<" + expected + "> but was:<" + actual + ">";
   }
 
+  /**
+   * @param job
+   * @throws Throwable
+   *           throws the original exception of the job error, if a job completes with an error.
+   */
   public static void jobSuccessfullyCompleted(JobEx job) throws Throwable {
     assertEquals(job.getState(), Job.NONE);
     try {
@@ -127,8 +132,8 @@ public final class ScoutAssert {
     }
     catch (ProcessingException e) {
       // unpack original exception if required
-      if (job.getResult() != null) {
-        Throwable originalException = job.getResult().getException();
+      if (job.getLastResult() != null) {
+        Throwable originalException = job.getLastResult().getException();
         if (originalException != null && originalException != e) {
           throw originalException;
         }
@@ -136,14 +141,14 @@ public final class ScoutAssert {
       throw e;
     }
     // if there is no exception, but job result is not ok
-    if (job.getResult() != null && !job.getResult().isOK()) {
-      fail(job.getResult().getMessage());
+    if (job.getLastResult() != null && !job.getLastResult().isOK()) {
+      fail(job.getLastResult().getMessage());
     }
   }
 
   /**
    * compares two textfiles
-   * 
+   *
    * @param expectedFile
    * @param actualFile
    * @param charsetName

@@ -30,7 +30,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
  * </ul>
  */
 public abstract class JobEx extends Job {
-  private IStatus m_statusOfRunNow;
+  private IStatus m_runNowStatus;
 
   public JobEx(String name) {
     super(name);
@@ -38,7 +38,7 @@ public abstract class JobEx extends Job {
 
   @Override
   public final boolean shouldRun() {
-    m_statusOfRunNow = null;
+    m_runNowStatus = null;
     return super.shouldRun();
   }
 
@@ -47,9 +47,22 @@ public abstract class JobEx extends Job {
    * can be run immediately.
    */
   public IStatus runNow(IProgressMonitor monitor) {
-    m_statusOfRunNow = null;
-    m_statusOfRunNow = run(monitor);
-    return m_statusOfRunNow;
+    m_runNowStatus = null;
+    m_runNowStatus = run(monitor);
+    return m_runNowStatus;
+  }
+
+  /**
+   * @return status of the last result executed with {@link #runNow(IProgressMonitor)} or as a regular job.<br>
+   *         {@link #getResult()} does not include results of {@link #runNow(IProgressMonitor)}
+   */
+  public IStatus getLastResult() {
+    if (m_runNowStatus == null) {
+      return getResult();
+    }
+    else {
+      return m_runNowStatus;
+    }
   }
 
   /**
@@ -57,10 +70,7 @@ public abstract class JobEx extends Job {
    * result contains an exception
    */
   public void throwOnError() throws ProcessingException {
-    IStatus status = getResult();
-    if (status == null) {
-      status = m_statusOfRunNow;
-    }
+    IStatus status = getLastResult();
     if (status != null && status.getSeverity() == Status.ERROR) {
       Throwable t = status.getException();
       if (t instanceof ProcessingException) {
@@ -108,7 +118,7 @@ public abstract class JobEx extends Job {
    * Similar to {@link #join()} but with the difference that it waits at most the specified time.
    * <p>
    * A value of &lt;= 0 is equivalent to calling {@link #join()}.
-   * 
+   *
    * @throws InterruptedException
    */
   public final void join(final long millis) throws InterruptedException {

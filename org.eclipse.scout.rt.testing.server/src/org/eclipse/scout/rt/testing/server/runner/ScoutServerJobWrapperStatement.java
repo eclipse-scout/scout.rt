@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.testing.server.runner;
 
-import static org.junit.Assert.fail;
-
 import java.util.List;
 
 import javax.security.auth.Subject;
@@ -26,6 +24,7 @@ import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.ITransactionRunnable;
 import org.eclipse.scout.rt.server.ServerJob;
 import org.eclipse.scout.rt.server.ServerJobFactory;
+import org.eclipse.scout.rt.testing.commons.ScoutAssert;
 import org.eclipse.scout.rt.testing.shared.Activator;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.testing.shared.services.common.exceptionhandler.WrappingProcessingRuntimeExceptionHandlerService;
@@ -72,9 +71,7 @@ public class ScoutServerJobWrapperStatement extends Statement {
       });
       job.setSystem(true);
       job.runNow(new NullProgressMonitor());
-      if (job.getResult() != null && !job.getResult().isOK()) {
-        fail(job.getResult().getMessage());
-      }
+      ScoutAssert.jobSuccessfullyCompleted(job);
     }
   }
 
