@@ -17,8 +17,14 @@ import java.awt.event.ComponentEvent;
 import javax.swing.TransferHandler;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
+import javax.swing.text.Element;
 import javax.swing.text.Highlighter;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.View;
+import javax.swing.text.ViewFactory;
+import javax.swing.text.html.HTML;
 import javax.swing.text.html.HTMLEditorKit;
+import javax.swing.text.html.InlineView;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.client.ui.form.fields.labelfield.ILabelField;
@@ -103,11 +109,51 @@ public class SwingScoutLabelField extends SwingScoutValueFieldComposite<ILabelFi
 
   /**
    * Create and return the HTMLEditorKit. Override this method to use a custom HTMLEditorKit
-   * 
+   *
    * @since 3.10.0-M5
    */
   protected HTMLEditorKit createEditorKit() {
-    return new HTMLEditorKit();
+    return new HTMLEditorKit() {
+      private static final long serialVersionUID = 1L;
+
+      @Override
+      public ViewFactory getViewFactory() {
+        return new HTMLFactory() {
+          @Override
+          public View create(Element elem) {
+            View v = super.create(elem);
+            if (v instanceof InlineView) {
+              // javax.swing.text.html.BRView (the <br> tag) is also a LabelView but
+              // our overridden class must not change it's behavior
+              // javax.swing.text.html.BRView is not visible, use HTML tag to check
+              Object o = elem.getAttributes().getAttribute(StyleConstants.NameAttribute);
+              if ((o instanceof HTML.Tag) && o == HTML.Tag.BR) {
+                return v;
+              }
+              return new InlineView(elem) {
+                @Override
+                public float getMinimumSpan(int axis) {
+                  // default behavior if no text wrap required
+                  if (!m_textWrap) {
+                    return super.getMinimumSpan(axis);
+                  }
+                  // to support word wrapping we have to return "0" for the X_AXIS
+                  switch (axis) {
+                    case View.X_AXIS:
+                      return 0;
+                    case View.Y_AXIS:
+                      return super.getMinimumSpan(axis);
+                    default:
+                      throw new IllegalArgumentException("Invalid axis: " + axis);
+                  }
+                }
+              };
+            }
+            return v;
+          }
+        };
+      }
+    };
   }
 
   /**
@@ -123,7 +169,7 @@ public class SwingScoutLabelField extends SwingScoutValueFieldComposite<ILabelFi
 
   /**
    * Creates a border to have correct alignment for customized look and feel (e.g. Rayo)
-   * 
+   *
    * @since 3.10.0-M2
    */
   protected void setTopMarginForField() {
@@ -138,9 +184,9 @@ public class SwingScoutLabelField extends SwingScoutValueFieldComposite<ILabelFi
     return (JTextPaneEx) getSwingField();
   }
 
-  /*
-   * scout properties
-   */
+/*
+ * scout properties
+ */
 
   @Override
   protected void attachScout() {
@@ -157,7 +203,7 @@ public class SwingScoutLabelField extends SwingScoutValueFieldComposite<ILabelFi
 
   /**
    * Defines if the label should be selectable or not
-   * 
+   *
    * @since 3.10.0-M6
    */
   protected void setSelectableFromScout(boolean b) {
@@ -241,7 +287,7 @@ public class SwingScoutLabelField extends SwingScoutValueFieldComposite<ILabelFi
 
   /**
    * Update the text in the GUI
-   * 
+   *
    * @since 3.10.0-M5
    */
   protected void updateTextInGUI() {
