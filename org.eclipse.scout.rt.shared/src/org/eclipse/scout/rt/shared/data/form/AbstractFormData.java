@@ -139,7 +139,7 @@ public abstract class AbstractFormData extends AbstractContributionComposite imp
   public AbstractFormFieldData getFieldById(String id) {
     String fieldDataId = FormDataUtility.getFieldDataId(id);
     for (AbstractFormFieldData f : m_fieldMap.values()) {
-      if (FormDataUtility.getFieldDataId(f).equals(fieldDataId)) {
+      if (f.getFieldId().equals(fieldDataId)) {
         return f;
       }
     }
@@ -194,7 +194,7 @@ public abstract class AbstractFormData extends AbstractContributionComposite imp
    * @return all fields of the form data and all its external template field
    *         datas in a map with qualified ids<br>
    *         The array of returned fields is the result of a top-down
-   *         breath-first tree traversal
+   *         breadth-first tree traversal
    *         <p>
    *         Example:
    *
@@ -212,52 +212,61 @@ public abstract class AbstractFormData extends AbstractContributionComposite imp
    *         would be returned as A B U V X Y E F
    */
   public Map<Integer, Map<String/* qualified field id */, AbstractFormFieldData>> getAllFieldsRec() {
-    TreeMap<Integer, Map<String, AbstractFormFieldData>> breathFirstMap = new TreeMap<Integer, Map<String, AbstractFormFieldData>>();
+    TreeMap<Integer, Map<String, AbstractFormFieldData>> breadthFirstMap = new TreeMap<Integer, Map<String, AbstractFormFieldData>>();
     for (AbstractFormFieldData child : getFields()) {
-      collectAllFieldsRec(child, breathFirstMap, 0, "", false);
+      collectAllFieldsRec(child, breadthFirstMap, 0, "", false);
     }
 
-    collectFieldDatasInContributions(this, breathFirstMap, "");
+    collectFieldDatasInContributions(this, breadthFirstMap, "");
 
-    return breathFirstMap;
+    return breadthFirstMap;
   }
 
-  private static void collectFieldDatasInContributions(IContributionOwner comp, Map<Integer, Map<String, AbstractFormFieldData>> breathFirstMap, String prefix) {
-    collectInContributedFormDatas(comp.getContributionsByClass(AbstractFormData.class), breathFirstMap, prefix);
-    collectInContributedFormFieldDatas(comp.getContributionsByClass(AbstractFormFieldData.class), breathFirstMap, prefix);
+  private static void collectFieldDatasInContributions(IContributionOwner comp, Map<Integer, Map<String, AbstractFormFieldData>> breadthFirstMap, String prefix) {
+    collectInContributedFormDatas(comp.getContributionsByClass(AbstractFormData.class), breadthFirstMap, prefix);
+    collectInContributedFormFieldDatas(comp.getContributionsByClass(AbstractFormFieldData.class), breadthFirstMap, prefix);
   }
 
-  private static void collectInContributedFormFieldDatas(Collection<AbstractFormFieldData> contributions, Map<Integer, Map<String, AbstractFormFieldData>> breathFirstMap, String prefix) {
+  private static void collectInContributedFormFieldDatas(Collection<AbstractFormFieldData> contributions, Map<Integer, Map<String, AbstractFormFieldData>> breadthFirstMap, String prefix) {
     for (AbstractFormFieldData ffd : contributions) {
-      collectAllFieldsRec(ffd, breathFirstMap, 0, prefix, !(ffd instanceof IHolder<?>));
+      collectAllFieldsRec(ffd, breadthFirstMap, 0, prefix, !(ffd instanceof IHolder));
     }
   }
 
-  private static void collectInContributedFormDatas(Collection<AbstractFormData> contributions, Map<Integer, Map<String, AbstractFormFieldData>> breathFirstMap, String prefix) {
+  private static void collectInContributedFormDatas(Collection<AbstractFormData> contributions, Map<Integer, Map<String, AbstractFormFieldData>> breadthFirstMap, String prefix) {
     for (AbstractFormData fd : contributions) {
       for (AbstractFormFieldData child : fd.getFields()) {
-        collectAllFieldsRec(child, breathFirstMap, 0, prefix, false);
+        collectAllFieldsRec(child, breadthFirstMap, 0, prefix, false);
       }
     }
   }
 
-  private static void collectAllFieldsRec(AbstractFormFieldData field, Map<Integer/* level */, Map<String/* qualified field id */, AbstractFormFieldData>> breathFirstMap, int level, String prefix, boolean isExtension) {
-    Map<String/* qualified field id */, AbstractFormFieldData> subMap = breathFirstMap.get(level);
+  private static void collectAllFieldsRec(AbstractFormFieldData field, Map<Integer/* level */, Map<String/* qualified field id */, AbstractFormFieldData>> breadthFirstMap, int level, String prefix, boolean isContributionTopLevelContainer) {
+    Map<String/* qualified field id */, AbstractFormFieldData> subMap = breadthFirstMap.get(level);
     if (subMap == null) {
       subMap = new HashMap<String/* qualified field id */, AbstractFormFieldData>();
-      breathFirstMap.put(level, subMap);
+      breadthFirstMap.put(level, subMap);
     }
-    if (!isExtension) {
-      subMap.put(prefix + FormDataUtility.getFieldDataId(field), field);
+    boolean isTopLevel = field.getClass().getDeclaringClass() == null;
+    String fieldId = null;
+    if (isTopLevel || isContributionTopLevelContainer) {
+      fieldId = FormDataUtility.getFieldDataId(field);
+    }
+    else {
+      fieldId = field.getFieldId();
+    }
+
+    if (!isContributionTopLevelContainer) {
+      subMap.put(prefix + fieldId, field);
     }
 
     String fieldPrefix = prefix;
-    if (!isExtension) {
-      fieldPrefix = prefix + FormDataUtility.getFieldDataId(field) + FIELD_PATH_DELIM;
+    if (!isContributionTopLevelContainer) {
+      fieldPrefix = prefix + fieldId + FIELD_PATH_DELIM;
     }
-    collectFieldDatasInContributions(field, breathFirstMap, fieldPrefix);
+    collectFieldDatasInContributions(field, breadthFirstMap, fieldPrefix);
     for (AbstractFormFieldData child : field.getFields()) {
-      collectAllFieldsRec(child, breathFirstMap, level + 1, fieldPrefix, false);
+      collectAllFieldsRec(child, breadthFirstMap, level + 1, fieldPrefix, false);
     }
   }
 
@@ -265,8 +274,8 @@ public abstract class AbstractFormData extends AbstractContributionComposite imp
    * Searches the given form field data in this form data as well as in all externally referenced template
    * field data.
    *
-   * @param breathFirstMap
-   *          The breath-first search map as returned by {@link AbstractFormData#getAllFieldsRec()}. If
+   * @param breadthFirstMap
+   *          The breadth-first search map as returned by {@link AbstractFormData#getAllFieldsRec()}. If
    *          <code>null</code>, a new map is created.
    * @param valueTypeIdentifier
    *          The class identifier to be searched in the form data.
@@ -274,12 +283,12 @@ public abstract class AbstractFormData extends AbstractContributionComposite imp
    *         does not exist.
    * @throws ProcessingException
    */
-  public AbstractFormFieldData findFieldByClass(Map<Integer, Map<String, AbstractFormFieldData>> breathFirstMap, ClassIdentifier valueTypeIdentifier) throws ProcessingException {
-    if (breathFirstMap == null) {
-      breathFirstMap = getAllFieldsRec();
+  public AbstractFormFieldData findFieldByClass(Map<Integer, Map<String, AbstractFormFieldData>> breadthFirstMap, ClassIdentifier valueTypeIdentifier) throws ProcessingException {
+    if (breadthFirstMap == null) {
+      breadthFirstMap = getAllFieldsRec();
     }
     AbstractFormFieldData candidate = null;
-    for (Map<String, AbstractFormFieldData> subMap : breathFirstMap.values()) {
+    for (Map<String, AbstractFormFieldData> subMap : breadthFirstMap.values()) {
       for (Entry<String, AbstractFormFieldData> entry : subMap.entrySet()) {
         AbstractFormFieldData fd = entry.getValue();
         String fieldId = entry.getKey();
@@ -298,7 +307,7 @@ public abstract class AbstractFormData extends AbstractContributionComposite imp
    * @return all properties of the form data and all its external template field
    *         data in a map with qualified ids<br>
    *         The array of returned fields is the result of a top-down
-   *         breath-first tree traversal
+   *         breadth-first tree traversal
    *         <p>
    *         Example:
    *
@@ -316,29 +325,29 @@ public abstract class AbstractFormData extends AbstractContributionComposite imp
    *         would be returned as p1, p4, p2, p3
    */
   public Map<Integer, Map<String/* qualified property id */, AbstractPropertyData<?>>> getAllPropertiesRec() {
-    TreeMap<Integer, Map<String, AbstractPropertyData<?>>> breathFirstMap = new TreeMap<Integer, Map<String, AbstractPropertyData<?>>>();
+    TreeMap<Integer, Map<String, AbstractPropertyData<?>>> breadthFirstMap = new TreeMap<Integer, Map<String, AbstractPropertyData<?>>>();
     HashMap<String, AbstractPropertyData<?>> rootMap = new HashMap<String/* qualified field id */, AbstractPropertyData<?>>();
-    breathFirstMap.put(0, rootMap);
+    breadthFirstMap.put(0, rootMap);
     for (AbstractPropertyData<?> prop : getAllProperties()) {
       rootMap.put(prop.getClass().getSimpleName(), prop);
     }
     for (AbstractFormFieldData child : getFields()) {
-      collectAllPropertiesRec(child, breathFirstMap, 1, FormDataUtility.getFieldDataId(child) + FIELD_PATH_DELIM);
+      collectAllPropertiesRec(child, breadthFirstMap, 1, child.getFieldId() + FIELD_PATH_DELIM);
     }
-    return breathFirstMap;
+    return breadthFirstMap;
   }
 
-  private void collectAllPropertiesRec(AbstractFormFieldData field, Map<Integer/* level */, Map<String/* qualified field id */, AbstractPropertyData<?>>> breathFirstMap, int level, String prefix) {
-    Map<String/* qualified field id */, AbstractPropertyData<?>> subMap = breathFirstMap.get(level);
+  private void collectAllPropertiesRec(AbstractFormFieldData field, Map<Integer/* level */, Map<String/* qualified field id */, AbstractPropertyData<?>>> breadthFirstMap, int level, String prefix) {
+    Map<String/* qualified field id */, AbstractPropertyData<?>> subMap = breadthFirstMap.get(level);
     if (subMap == null) {
       subMap = new HashMap<String/* qualified field id */, AbstractPropertyData<?>>();
-      breathFirstMap.put(level, subMap);
+      breadthFirstMap.put(level, subMap);
     }
     for (AbstractPropertyData<?> prop : field.getAllProperties()) {
       subMap.put(prefix + prop.getClass().getSimpleName(), prop);
     }
     for (AbstractFormFieldData child : field.getFields()) {
-      collectAllPropertiesRec(child, breathFirstMap, level + 1, prefix + FormDataUtility.getFieldDataId(child) + FIELD_PATH_DELIM);
+      collectAllPropertiesRec(child, breadthFirstMap, level + 1, prefix + child.getFieldId() + FIELD_PATH_DELIM);
     }
   }
 
@@ -346,8 +355,8 @@ public abstract class AbstractFormData extends AbstractContributionComposite imp
    * Searches the given property data in this form data as well as in all externally referenced template
    * field data.
    *
-   * @param breathFirstMap
-   *          The breath-first search map as returned by {@link AbstractFormData#getAllPropertiesRec()}. If
+   * @param breadthFirstMap
+   *          The breadth-first search map as returned by {@link AbstractFormData#getAllPropertiesRec()}. If
    *          <code>null</code>, a new map is created.
    * @param valueType
    *          The type to be searched in the form data.
@@ -355,12 +364,12 @@ public abstract class AbstractFormData extends AbstractContributionComposite imp
    *         does not exist.
    * @throws ProcessingException
    */
-  public AbstractPropertyData<?> findPropertyByClass(Map<Integer, Map<String, AbstractPropertyData<?>>> breathFirstMap, ClassIdentifier valueTypeClassIdentifier) throws ProcessingException {
-    if (breathFirstMap == null) {
-      breathFirstMap = getAllPropertiesRec();
+  public AbstractPropertyData<?> findPropertyByClass(Map<Integer, Map<String, AbstractPropertyData<?>>> breadthFirstMap, ClassIdentifier valueTypeClassIdentifier) throws ProcessingException {
+    if (breadthFirstMap == null) {
+      breadthFirstMap = getAllPropertiesRec();
     }
     AbstractPropertyData<?> candidate = null;
-    for (Map<String, AbstractPropertyData<?>> subMap : breathFirstMap.values()) {
+    for (Map<String, AbstractPropertyData<?>> subMap : breadthFirstMap.values()) {
       for (Map.Entry<String, AbstractPropertyData<?>> entry : subMap.entrySet()) {
         String propertyId = entry.getKey();
         AbstractPropertyData<?> pd = entry.getValue();
