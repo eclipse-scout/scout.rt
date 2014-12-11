@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.services.common.shell;
 import java.io.File;
 import java.io.IOException;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ClientSyncJob;
@@ -28,9 +29,20 @@ import org.eclipse.scout.service.AbstractService;
 public class DefaultShellService extends AbstractService implements IShellService {
 
   @Override
-  public void shellOpen(String path) throws ProcessingException {
+  public void shellOpen(final String path) throws ProcessingException {
     if (UserAgentUtility.isWebClient()) {
-      ClientSyncJob.getCurrentSession().getDesktop().openUrlInBrowser(path);
+      // Bug 454897: Need to be in model thread for call
+      if (ClientSyncJob.isSyncClientJob()) {
+        ClientSyncJob.getCurrentSession().getDesktop().openUrlInBrowser(path);
+      }
+      else {
+        new ClientSyncJob("Open url in browser", ClientSyncJob.getCurrentSession()) {
+          @Override
+          protected void runVoid(IProgressMonitor monitor) throws Throwable {
+            ClientSyncJob.getCurrentSession().getDesktop().openUrlInBrowser(path);
+          }
+        }.schedule();
+      }
     }
     else {
       openWithRuntimeExec(path);
