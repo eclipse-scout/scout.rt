@@ -2,31 +2,20 @@
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
 /**
- * See javadoc for JsonStartupRequest.java for details of the defaults and origins of the property values.
- * All parameters are optional, the following json bean shows all valid properties.
- * {
- * 'clientSessionId': '',
- * 'userAgent': '',
- * 'objectFactories': '',
- * 'customParams': ''
- * }
+ * $entryPoint and jsonSessionId are required to create a new session. The 'options'
+ * argument holds all optional values that may be used during initialization (it is
+ * the same object passed to the scout.init() function).
  *
- * minimal example:
- * {}
- *
- * example defining mobile devices:
- * {
- * 'userAgent': new scout.UserAgent(scout.UserAgent.DEVICE_TYPE_MOBILE),
- * 'objectFactories': scout.mobileObjectFactories
- * }
- *
- * example forcing clientSessionId, setting all values directly and using custom properties:
- * {
- * 'clientSessionId': '1234567',
- * 'userAgent': new scout.UserAgent(scout.UserAgent.DEVICE_TYPE_DESKTOP),
- * 'objectFactories': scout.defaultObjectFactories,
- * 'customParams': {'addinType': 'word', 'addInToken': '234jh523jk5hb235'}
- * }
+ * The following properties are read by this constructor function:
+ *   [clientSessionId]
+ *     Identifies the 'client instance' on the UI server. If the property is not set
+ *     (which is the default case), the clientSessionId is taken from the browser's
+ *     session storage (per browser window, survives F5 refresh of page). If no
+ *     clientSessionId can be found, a new one is generated.
+ *   [userAgent]
+ *     Default: DESKTOP
+ *   [objectFactories]
+ *     Factories to build model adapters. Default: scout.defaultObjectFactories.
  */
 scout.Session = function($entryPoint, jsonSessionId, options) {
   options = options || {};
@@ -64,7 +53,7 @@ scout.Session = function($entryPoint, jsonSessionId, options) {
   this._requestsPendingCounter = 0; // TODO CGU do we really want to have multiple requests pending?
   this.layoutValidator = new scout.LayoutValidator();
 
-  // FIXME BSH Detach | Improve this
+  // TODO BSH Detach | Check if there is another way
   // If this is a popup window, re-register with parent (in case the user reloaded the popup window)
   if (window.opener && window.opener.scout && window.opener.scout.sessions) {
     // Should never happen, as forms are not detachable when multiple sessions are alive (see Form.js)
@@ -171,13 +160,18 @@ scout.Session.prototype._sendNow = function(events, deferred) {
 
   if (this._startup) {
     this._startup = false;
+    // Build startup request (see JavaDoc for JsonStartupRequest.java for details)
     request.startup = true;
     request.clientSessionId = this.clientSessionId;
+    if (this.parentJsonSession) {
+      request.parentJsonSessionId = this.parentJsonSession.jsonSessionId;
+    }
     if (this.userAgent.deviceType !== scout.UserAgent.DEVICE_TYPE_DESKTOP) {
       request.userAgent = this.userAgent;
     }
     request.customParams = this._customParams;
   }
+
   if (this._unload) {
     request.unload = true;
   }

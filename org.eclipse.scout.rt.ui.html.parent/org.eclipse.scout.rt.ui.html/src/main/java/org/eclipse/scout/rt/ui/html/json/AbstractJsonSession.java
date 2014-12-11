@@ -201,6 +201,15 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
         httpSession.setAttribute(clientSessionAttributeName, clientSession);
         httpSession.setAttribute(clientSessionAttributeName + ".cleanup", new P_ClientSessionCleanupHandler(clientSessionId, clientSession));
       }
+      // Handle detach
+      String parentJsonSessionId = jsonStartupRequest.getParentJsonSessionId();
+      if (parentJsonSessionId != null) {
+        IJsonSession parentJsonSession = (IJsonSession) httpSession.getAttribute("scout.htmlui.session.json." + parentJsonSessionId);
+        if (parentJsonSession != null) {
+          LOG.info("Attaching jsonSession '" + m_jsonSessionId + "' to parentJsonSession '" + parentJsonSessionId + "'");
+          // TODO BSH Detach | Actually do something
+        }
+      }
     }
     m_jsonClientSession = (JsonClientSession) getOrCreateJsonAdapter(clientSession);
     m_jsonEventProcessor = createJsonEventProcessor();

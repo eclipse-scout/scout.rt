@@ -24,9 +24,7 @@ scout.DetachFormMenu.prototype.render = function($parent) {
 };
 
 scout.DetachFormMenu.prototype._onMenuClicked = function(event) {
-  // FIXME BSH Detach | Set correct url or write content
-  //        w.document.write('<html><head><title>Test</title></head><body>Hello</body></html>');
-  //        w.document.close(); //finish "loading" the page
+  // TODO BSH Detach | How to pass form to popup? How to handle F5 in popup?
   var childWindow = scout.helpers.openWindow(window.location.href, 'scout:form:' + this.id, 800, 600);
   $(childWindow).one('load', function() {
     // Cannot call this directly, because we get an unload event right after that (and
