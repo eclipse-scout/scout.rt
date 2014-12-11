@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 
@@ -154,10 +155,10 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
         "Continue");
   }
 
-  private JSONObject getTextMap() {
+  private JSONObject getTextMap(Locale locale) {
     JSONObject map = new JSONObject();
     for (String textKey : getTextKeys()) {
-      JsonObjectUtility.putProperty(map, textKey, TEXTS.get(textKey));
+      JsonObjectUtility.putProperty(map, textKey, TEXTS.get(locale, textKey));
     }
     return map;
   }
@@ -220,7 +221,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
     JSONObject jsonEvent = new JSONObject();
     JsonObjectUtility.putProperty(jsonEvent, "clientSession", m_jsonClientSession.getId());
-    JsonObjectUtility.putProperty(jsonEvent, "textMap", getTextMap());
+    JsonObjectUtility.putProperty(jsonEvent, "textMap", getTextMap(request.getLocale()));
     m_currentJsonResponse.addActionEvent(m_jsonSessionId, "initialized", jsonEvent);
     LOG.info("JsonSession with ID " + m_jsonSessionId + " initialized");
   }
