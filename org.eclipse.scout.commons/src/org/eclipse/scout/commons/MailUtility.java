@@ -10,67 +10,46 @@
  ******************************************************************************/
 package org.eclipse.scout.commons;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Array;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.activation.CommandMap;
-import javax.activation.DataHandler;
 import javax.activation.DataSource;
-import javax.activation.FileDataSource;
-import javax.activation.MailcapCommandMap;
-import javax.activation.MimetypesFileTypeMap;
-import javax.mail.BodyPart;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Multipart;
 import javax.mail.Part;
 import javax.mail.Session;
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
-import javax.mail.internet.MimePart;
-import javax.mail.internet.MimeUtility;
-import javax.mail.util.ByteArrayDataSource;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.mail.MailAttachment;
 
+/**
+ * @deprecated Will be removed in N release. Use org.eclipse.scout.commons.mail.MailUtility instead. See method comments
+ *             for detailed migration notes.
+ */
+@Deprecated
 @SuppressWarnings("restriction")
 public final class MailUtility {
 
   public static final IScoutLogger LOG = ScoutLogManager.getLogger(MailUtility.class);
 
-  public static final String CONTENT_TYPE_ID = "Content-Type";
+  public static final String CONTENT_TYPE_ID = org.eclipse.scout.commons.mail.MailUtility.CONTENT_TYPE_ID;
 
-  public static final String CONTENT_TRANSFER_ENCODING_ID = "Content-Transfer-Encoding";
-  public static final String QUOTED_PRINTABLE = "quoted-printable";
+  public static final String CONTENT_TRANSFER_ENCODING_ID = org.eclipse.scout.commons.mail.MailUtility.CONTENT_TRANSFER_ENCODING_ID;
+  public static final String QUOTED_PRINTABLE = org.eclipse.scout.commons.mail.MailUtility.QUOTED_PRINTABLE;
 
-  public static final String CONTENT_TYPE_TEXT_HTML = "text/html; charset=\"UTF-8\"";
-  public static final String CONTENT_TYPE_TEXT_PLAIN = "text/plain; charset=\"UTF-8\"";
-  public static final String CONTENT_TYPE_MESSAGE_RFC822 = "message/rfc822";
-  public static final String CONTENT_TYPE_MULTIPART = "alternative";
+  public static final String CONTENT_TYPE_TEXT_HTML = org.eclipse.scout.commons.mail.MailUtility.CONTENT_TYPE_TEXT_HTML;
+  public static final String CONTENT_TYPE_TEXT_PLAIN = org.eclipse.scout.commons.mail.MailUtility.CONTENT_TYPE_TEXT_PLAIN;
+  public static final String CONTENT_TYPE_MESSAGE_RFC822 = org.eclipse.scout.commons.mail.MailUtility.CONTENT_TYPE_MESSAGE_RFC822;
+  public static final String CONTENT_TYPE_MULTIPART = org.eclipse.scout.commons.mail.MailUtility.CONTENT_TYPE_MULTIPART;
 
-  private static final String UTF_8 = "UTF-8";
-
-  public static final Pattern wordPatternItem = Pattern.compile("item\\d{3,4}\\.xml");
-  public static final Pattern wordPatternProps = Pattern.compile("props\\d{3,4}\\.xml");
-
-  private static MailUtility instance = new MailUtility();
+  @SuppressWarnings("deprecation")
+  public static final Pattern wordPatternItem = WordMailUtility.wordPatternItem;
+  @SuppressWarnings("deprecation")
+  public static final Pattern wordPatternProps = WordMailUtility.wordPatternProps;
 
   private MailUtility() {
   }
@@ -78,8 +57,11 @@ public final class MailUtility {
   /**
    * Container for the mail body in plain text and html.
    * For the correct html representation it contains also a list of files referenced in the html.
+   *
+   * @deprecated Will be removed in N release. Replacement: none.
    */
-  public class MailMessage {
+  @Deprecated
+  public static class MailMessage {
 
     private String m_plainText;
     private String m_htmlText;
@@ -104,32 +86,34 @@ public final class MailUtility {
     }
   }
 
+  /**
+   * @deprecated Will be removed in N release. Use {@link org.eclipse.scout.commons.mail.MailUtility#getBodyParts(Part)}
+   *             instead.
+   */
+  @Deprecated
   public static Part[] getBodyParts(Part message) throws ProcessingException {
-    return instance.getBodyPartsImpl(message);
-  }
-
-  private Part[] getBodyPartsImpl(Part message) throws ProcessingException {
     List<Part> bodyCollector = new ArrayList<Part>();
-    collectMailPartsReqImpl(message, bodyCollector, null, null);
+    collectMailParts(message, bodyCollector, null, null);
     return bodyCollector.toArray(new Part[bodyCollector.size()]);
   }
 
+  /**
+   * @deprecated Will be removed in N release. Use
+   *             {@link org.eclipse.scout.commons.mail.MailUtility#getAttachmentParts(Part)} instead.
+   */
+  @Deprecated
   public static Part[] getAttachmentParts(Part message) throws ProcessingException {
-    return instance.getAttachmentPartsImpl(message);
-  }
-
-  private Part[] getAttachmentPartsImpl(Part message) throws ProcessingException {
     List<Part> attachmentCollector = new ArrayList<Part>();
-    collectMailPartsReqImpl(message, null, attachmentCollector, null);
+    collectMailParts(message, null, attachmentCollector, null);
     return attachmentCollector.toArray(new Part[attachmentCollector.size()]);
   }
 
+  /**
+   * @deprecated Will be removed in N release. Use {@link #collectMailParts(Part, List, List, List) instead.
+   */
+  @Deprecated
   public static void collectMailParts(Part message, List<Part> bodyCollector, List<Part> attachmentCollector) throws ProcessingException {
-    collectMailParts(message, bodyCollector, attachmentCollector, null);
-  }
-
-  public static void collectMailParts(Part message, List<Part> bodyCollector, List<Part> attachmentCollector, List<Part> inlineAttachmentCollector) throws ProcessingException {
-    instance.collectMailPartsReqImpl(message, bodyCollector, attachmentCollector, inlineAttachmentCollector);
+    org.eclipse.scout.commons.mail.MailUtility.collectMailParts(message, bodyCollector, attachmentCollector, null);
   }
 
   /**
@@ -146,58 +130,12 @@ public final class MailUtility {
    * @param inlineAttachmentCollector
    *          Inline attachment collector (optional)
    * @throws ProcessingException
+   * @deprecated Will be removed in N release. Use
+   *             {@link org.eclipse.scout.commons.mail.MailUtility#collectMailParts(Part, List, List, List)} instead.
    */
-  private void collectMailPartsReqImpl(Part part, List<Part> bodyCollector, List<Part> attachmentCollector, List<Part> inlineAttachmentCollector) throws ProcessingException {
-    if (part == null) {
-      return;
-    }
-    try {
-      String disp = part.getDisposition();
-      if (disp != null && disp.equalsIgnoreCase(Part.ATTACHMENT)) {
-        if (attachmentCollector != null) {
-          attachmentCollector.add(part);
-        }
-      }
-      else if (part.getContent() instanceof Multipart) {
-        Multipart multiPart = (Multipart) part.getContent();
-        for (int i = 0; i < multiPart.getCount(); i++) {
-          collectMailPartsReqImpl(multiPart.getBodyPart(i), bodyCollector, attachmentCollector, inlineAttachmentCollector);
-        }
-      }
-      else {
-        if (part.isMimeType(CONTENT_TYPE_TEXT_PLAIN)) {
-          if (bodyCollector != null) {
-            bodyCollector.add(part);
-          }
-        }
-        else if (part.isMimeType(CONTENT_TYPE_TEXT_HTML)) {
-          if (bodyCollector != null) {
-            bodyCollector.add(part);
-          }
-        }
-        else if (part.isMimeType(CONTENT_TYPE_MESSAGE_RFC822) && part.getContent() instanceof MimeMessage) {
-          // its a MIME message in rfc822 format as attachment therefore we have to set the filename for the attachment correctly.
-          if (attachmentCollector != null) {
-            MimeMessage msg = (MimeMessage) part.getContent();
-            String filteredSubjectText = StringUtility.filterText(msg.getSubject(), "a-zA-Z0-9_-", "");
-            String fileName = (StringUtility.hasText(filteredSubjectText) ? filteredSubjectText : "originalMessage") + ".eml";
-            RFCWrapperPart wrapperPart = new RFCWrapperPart(part, fileName);
-            attachmentCollector.add(wrapperPart);
-          }
-        }
-        else if (disp != null && disp.equals(Part.INLINE)) {
-          if (inlineAttachmentCollector != null) {
-            inlineAttachmentCollector.add(part);
-          }
-        }
-      }
-    }
-    catch (ProcessingException e) {
-      throw e;
-    }
-    catch (Throwable t) {
-      throw new ProcessingException("Unexpected: ", t);
-    }
+  @Deprecated
+  public static void collectMailParts(Part part, List<Part> bodyCollector, List<Part> attachmentCollector, List<Part> inlineAttachmentCollector) throws ProcessingException {
+    org.eclipse.scout.commons.mail.MailUtility.collectMailParts(part, bodyCollector, attachmentCollector, inlineAttachmentCollector);
   }
 
   /**
@@ -205,87 +143,37 @@ public final class MailUtility {
    * @return the plainText part encoded with the encoding given in the MIME header or UTF-8 encoded or null if the
    *         plainText Part is not given
    * @throws ProcessingException
+   * @deprecated Will be removed in N release. Use {@link org.eclipse.scout.commons.mail.MailUtility#getPlainText(Part)}
+   *             instead.
    */
+  @Deprecated
   public static String getPlainText(Part part) throws ProcessingException {
-    return instance.getPlainTextImpl(part);
+    return org.eclipse.scout.commons.mail.MailUtility.getPlainText(part);
   }
 
-  private String getPlainTextImpl(Part part) throws ProcessingException {
-    String text = null;
-    try {
-      Part[] bodyParts = getBodyPartsImpl(part);
-      Part plainTextPart = getPlainTextPart(bodyParts);
-
-      if (plainTextPart instanceof MimePart) {
-        MimePart mimePart = (MimePart) plainTextPart;
-        byte[] content = IOUtility.getContent(mimePart.getInputStream());
-        if (content != null) {
-          try {
-            text = new String(content, getCharacterEncodingOfMimePart(mimePart));
-          }
-          catch (UnsupportedEncodingException e) {
-            text = new String(content);
-          }
-
-        }
-      }
-    }
-    catch (ProcessingException e) {
-      throw e;
-    }
-    catch (Throwable t) {
-      throw new ProcessingException("Unexpected: ", t);
-    }
-    return text;
-  }
-
+  /**
+   * @deprecated Will be removed in N release. Use {@link #getHtmlPart(List)} instead.
+   */
+  @Deprecated
   public static Part getHtmlPart(Part[] bodyParts) throws ProcessingException {
-    for (Part p : bodyParts) {
-      try {
-        if (p != null && p.isMimeType(CONTENT_TYPE_TEXT_HTML)) {
-          return p;
-        }
-      }
-      catch (Throwable t) {
-        throw new ProcessingException("Unexpected: ", t);
-      }
-    }
-    return null;
+    return org.eclipse.scout.commons.mail.MailUtility.getHtmlPart(CollectionUtility.arrayList(bodyParts));
   }
 
+  /**
+   * @deprecated Will be removed in N release. Use {@link #getPlainTextPart(List)} instead.
+   */
+  @Deprecated
   public static Part getPlainTextPart(Part[] bodyParts) throws ProcessingException {
-    for (Part p : bodyParts) {
-      try {
-        if (p != null && p.isMimeType(CONTENT_TYPE_TEXT_PLAIN)) {
-          return p;
-        }
-      }
-      catch (Throwable t) {
-        throw new ProcessingException("Unexpected: ", t);
-      }
-    }
-    return null;
+    return org.eclipse.scout.commons.mail.MailUtility.getPlainTextPart(CollectionUtility.arrayList(bodyParts));
   }
 
+  /**
+   * @deprecated Will be removed in N release. Use
+   *             {@link org.eclipse.scout.commons.mail.MailUtility#createDataSource(File))} instead.
+   */
+  @Deprecated
   public static DataSource createDataSource(File file) throws ProcessingException {
-    try {
-      int indexDot = file.getName().lastIndexOf('.');
-      if (indexDot > 0) {
-        String fileName = file.getName();
-        String ext = fileName.substring(indexDot + 1);
-        return instance.createDataSourceImpl(new FileInputStream(file), fileName, ext);
-      }
-      else {
-        return null;
-      }
-    }
-    catch (Throwable t) {
-      throw new ProcessingException("Unexpected: ", t);
-    }
-  }
-
-  public static DataSource createDataSource(InputStream inStream, String fileName, String fileExtension) throws ProcessingException {
-    return instance.createDataSourceImpl(inStream, fileName, fileExtension);
+    return org.eclipse.scout.commons.mail.MailUtility.createDataSource(file);
   }
 
   /**
@@ -296,436 +184,131 @@ public final class MailUtility {
    *          e.g. "txt", "jpg"
    * @return
    * @throws ProcessingException
+   * @deprecated Will be removed in N release. Use
+   *             {@link org.eclipse.scout.commons.mail.MailUtility#createDataSource(InputStream, String, String)}
+   *             instead.
    */
-  private DataSource createDataSourceImpl(InputStream inStream, String fileName, String fileExtension) throws ProcessingException {
-    try {
-      String mimeType = getContentTypeForExtension(fileExtension);
-      if (mimeType == null) {
-        mimeType = "application/octet-stream";
-      }
-      ByteArrayDataSource item = new ByteArrayDataSource(inStream, mimeType);
-      item.setName(fileName);
-      return item;
-    }
-    catch (Throwable t) {
-      throw new ProcessingException("Unexpected: ", t);
-    }
+  @Deprecated
+  public static DataSource createDataSource(InputStream inStream, String fileName, String fileExtension) throws ProcessingException {
+    return org.eclipse.scout.commons.mail.MailUtility.createDataSource(inStream, fileName, fileExtension);
   }
 
+  /**
+   * @deprecated Will be removed in N release. Replacement: none.
+   */
+  @SuppressWarnings("deprecation")
+  @Deprecated
   public static MailMessage extractMailMessageFromWordArchive(File archiveFile) {
-    return instance.extractMailMessageFromWordArchiveInternal(archiveFile);
+    return WordMailUtility.extractMailMessageFromWordArchive(archiveFile);
   }
 
-  private MailMessage extractMailMessageFromWordArchiveInternal(File archiveFile) {
-    MailMessage mailMessage = null;
-    File tempDir = extractWordArchive(archiveFile);
-    String simpleName = extractSimpleNameFromWordArchive(archiveFile);
-    String messagePlainText = extractPlainTextFromWordArchiveInternal(tempDir, simpleName);
-    String messageHtml = extractHtmlFromWordArchiveInternal(tempDir, simpleName);
-    // replace directory entry
-    // replace all paths to the 'files directory' with the root directory
-    File attachmentFolder = null;
-    if (tempDir.isDirectory()) {
-      for (File file : tempDir.listFiles()) {
-        if (file.isDirectory() && file.getName().startsWith(simpleName)) {
-          attachmentFolder = file;
-          break;
-        }
-      }
-    }
-    String folderName = null;
-    if (attachmentFolder != null) {
-      folderName = attachmentFolder.getName();
-    }
-    messageHtml = messageHtml.replaceAll(folderName + "/", "");
-    messageHtml = removeWordTags(messageHtml);
-    // now loop through the directory and search all the files needed for a correct representation of the html mail
-    List<File> attachmentList = new ArrayList<File>();
-    if (attachmentFolder != null) {
-      for (File attFile : attachmentFolder.listFiles()) {
-        // exclude Microsoft Word specific directory file. This is only used to edit HTML in Word.
-        if (!attFile.isDirectory() && !isWordSpecificFile(attFile.getName())) {
-          attachmentList.add(attFile);
-        }
-      }
-    }
-    mailMessage = new MailMessage(messagePlainText, messageHtml, attachmentList);
-    return mailMessage;
-  }
-
-  private String extractHtmlFromWordArchiveInternal(File dir, String simpleName) {
-    String txt = null;
-    try {
-      txt = extractTextFromWordArchiveInternal(dir, simpleName, "html");
-    }
-    catch (Exception e) {
-      LOG.error("Error occured while trying to extract plain text file", e);
-    }
-    return txt;
-  }
-
-  private String extractSimpleNameFromWordArchive(File archiveFile) {
-    String simpleName = archiveFile.getName();
-    if (archiveFile.getName().lastIndexOf('.') != -1) {
-      simpleName = archiveFile.getName().substring(0, archiveFile.getName().lastIndexOf('.'));
-    }
-    return simpleName;
-  }
-
-  private File extractWordArchive(File archiveFile) {
-    File tempDir = null;
-    try {
-      tempDir = IOUtility.createTempDirectory("");
-      FileUtility.extractArchive(archiveFile, tempDir);
-    }
-    catch (Exception e) {
-      LOG.error("Error occured while trying to extract word archive", e);
-    }
-    return tempDir;
-  }
-
+  /**
+   * @deprecated Will be removed in N release. Replacement: none.
+   */
+  @SuppressWarnings("deprecation")
+  @Deprecated
   public static String extractPlainTextFromWordArchive(File archiveFile) {
-    return instance.extractPlainTextFromWordArchiveInternal(archiveFile);
-  }
-
-  private String extractPlainTextFromWordArchiveInternal(File archiveFile) {
-    File tempDir = extractWordArchive(archiveFile);
-    String simpleName = extractSimpleNameFromWordArchive(archiveFile);
-    return extractPlainTextFromWordArchiveInternal(tempDir, simpleName);
-  }
-
-  private String extractPlainTextFromWordArchiveInternal(File dir, String simpleName) {
-    String plainText = null;
-    try {
-      plainText = extractTextFromWordArchiveInternal(dir, simpleName, "txt");
-    }
-    catch (Exception e) {
-      LOG.error("Error occured while trying to extract plain text file", e);
-    }
-    return plainText;
-  }
-
-  private String extractTextFromWordArchiveInternal(File dir, String simpleName, String fileType) throws ProcessingException, IOException {
-    String txt = null;
-    File plainTextFile = new File(dir, simpleName + "." + fileType);
-    if (plainTextFile.exists() && plainTextFile.canRead()) {
-      txt = IOUtility.getContentInEncoding(plainTextFile.getPath(), UTF_8);
-    }
-    return txt;
+    return WordMailUtility.extractPlainTextFromWordArchive(archiveFile);
   }
 
   /**
    * Create {@link MimeMessage} from plain text fields.
    *
    * @rn aho, 19.01.2009
+   * @deprecated Will be removed in N release. Use
+   *             {@link #createMimeMessage(org.eclipse.scout.commons.mail.MailMessage)} instead. SentDate
+   *             is not set anymore, if required, use msg.setSentDate(new java.util.Date());
    */
+  @Deprecated
   public static MimeMessage createMimeMessage(String[] toRecipients, String sender, String subject, String bodyTextPlain, DataSource[] attachments) throws ProcessingException {
-    return instance.createMimeMessageInternal(toRecipients, null, null, sender, subject, bodyTextPlain, attachments);
+    return createMimeMessage(toRecipients, null, null, sender, subject, bodyTextPlain, attachments);
   }
 
   /**
    * Create {@link MimeMessage} from plain text fields.
    *
    * @rn aho, 19.01.2009
+   * @deprecated Will be removed in N release. Use
+   *             {@link #createMimeMessage(org.eclipse.scout.commons.mail.MailMessage)} instead. SentDate
+   *             is not set anymore, if required, use msg.setSentDate(new java.util.Date());
    */
+  @Deprecated
   public static MimeMessage createMimeMessage(String[] toRecipients, String[] ccRecipients, String[] bccRecipients, String sender, String subject, String bodyTextPlain, DataSource[] attachments) throws ProcessingException {
-    return instance.createMimeMessageInternal(toRecipients, ccRecipients, bccRecipients, sender, subject, bodyTextPlain, attachments);
-  }
-
-  private MimeMessage createMimeMessageInternal(String[] toRecipients, String[] ccRecipients, String[] bccRecipients, String sender, String subject, String bodyTextPlain, DataSource[] attachments) throws ProcessingException {
-    try {
-      MimeMessage msg = MailUtility.createMimeMessage(bodyTextPlain, null, attachments);
-      if (sender != null) {
-        InternetAddress addrSender = new InternetAddress(sender);
-        msg.setFrom(addrSender);
-        msg.setSender(addrSender);
+    org.eclipse.scout.commons.mail.MailMessage mailMessage = new org.eclipse.scout.commons.mail.MailMessage();
+    mailMessage.addToRecipients(CollectionUtility.arrayList(toRecipients));
+    mailMessage.addCcRecipients(CollectionUtility.arrayList(ccRecipients));
+    mailMessage.addBccRecipients(CollectionUtility.arrayList(bccRecipients));
+    mailMessage.setSender(sender);
+    mailMessage.setSubject(subject);
+    mailMessage.setBodyPlainText(bodyTextPlain);
+    if (attachments != null && attachments.length > 0) {
+      for (DataSource source : attachments) {
+        mailMessage.addAttachment(new MailAttachment(source, null));
       }
-      msg.setSentDate(new java.util.Date());
-      //
-      msg.setSubject(subject, UTF_8);
-      //
-      msg.setRecipients(Message.RecipientType.TO, parseAddresses(toRecipients));
-      msg.setRecipients(Message.RecipientType.CC, parseAddresses(ccRecipients));
-      msg.setRecipients(Message.RecipientType.BCC, parseAddresses(bccRecipients));
-      return msg;
     }
-    catch (ProcessingException pe) {
-      throw pe;
-    }
-    catch (Exception e) {
-      throw new ProcessingException("Failed to create MimeMessage.", e);
-    }
-  }
-
-  public static MimeMessage createMimeMessage(String messagePlain, String messageHtml, DataSource[] attachments) throws ProcessingException {
-    return instance.createMimeMessageInternal(messagePlain, messageHtml, attachments);
-  }
-
-  public static MimeMessage createMimeMessageFromWordArchiveDirectory(File archiveDir, String simpleName, File[] attachments, boolean markAsUnsent) throws ProcessingException {
-    return instance.createMimeMessageFromWordArchiveInternal(archiveDir, simpleName, attachments, markAsUnsent);
-  }
-
-  public static MimeMessage createMimeMessageFromWordArchive(File archiveFile, File[] attachments) throws ProcessingException {
-    return createMimeMessageFromWordArchive(archiveFile, attachments, false);
-  }
-
-  public static MimeMessage createMimeMessageFromWordArchive(File archiveFile, File[] attachments, boolean markAsUnsent) throws ProcessingException {
-    try {
-      File tempDir = IOUtility.createTempDirectory("");
-      FileUtility.extractArchive(archiveFile, tempDir);
-
-      String simpleName = archiveFile.getName();
-      if (archiveFile.getName().lastIndexOf('.') != -1) {
-        simpleName = archiveFile.getName().substring(0, archiveFile.getName().lastIndexOf('.'));
-      }
-      return instance.createMimeMessageFromWordArchiveInternal(tempDir, simpleName, attachments, markAsUnsent);
-    }
-    catch (ProcessingException pe) {
-      throw pe;
-    }
-    catch (IOException e) {
-      throw new ProcessingException("Error occured while accessing files", e);
-    }
-  }
-
-  private MimeMessage createMimeMessageFromWordArchiveInternal(File archiveDir, String simpleName, File[] attachments, boolean markAsUnsent) throws ProcessingException {
-    try {
-      File plainTextFile = new File(archiveDir, simpleName + ".txt");
-      String plainTextMessage = null;
-      boolean hasPlainText = false;
-      if (plainTextFile.exists()) {
-        plainTextMessage = IOUtility.getContentInEncoding(plainTextFile.getPath(), UTF_8);
-        hasPlainText = StringUtility.hasText(plainTextMessage);
-      }
-
-      String folderName = null;
-      List<DataSource> htmlDataSourceList = new ArrayList<DataSource>();
-      for (File filesFolder : archiveDir.listFiles()) {
-        // in this archive file, exactly one directory should exist
-        // word names this directory differently depending on the language
-        if (filesFolder.isDirectory() && filesFolder.getName().startsWith(simpleName)) {
-          // we accept the first directory that meets the constraint above
-          // add all auxiliary files as attachment
-          folderName = filesFolder.getName();
-          for (File file : filesFolder.listFiles()) {
-            // exclude Microsoft Word specific directory file. This is only used to edit HTML in Word.
-            String filename = file.getName();
-            if (!isWordSpecificFile(filename)) {
-              FileDataSource fds = new FileDataSource(file);
-              htmlDataSourceList.add(fds);
-            }
-          }
-          break;
-        }
-      }
-
-      File htmlFile = new File(archiveDir, simpleName + ".html");
-      String htmlMessage = null;
-      boolean hasHtml = false;
-      if (htmlFile.exists()) {
-        htmlMessage = IOUtility.getContentInEncoding(htmlFile.getPath(), UTF_8);
-        // replace directory entry
-        // replace all paths to the 'files directory' with the root directory
-        htmlMessage = htmlMessage.replaceAll("\"" + folderName + "/", "\"cid:");
-
-        htmlMessage = removeWordTags(htmlMessage);
-        // remove any VML elements
-        htmlMessage = htmlMessage.replaceAll("<!--\\[if gte vml 1(.*\\r?\\n)*?.*?endif\\]-->", "");
-        // remove any VML elements part2
-        htmlMessage = Pattern.compile("<!\\[if !vml\\]>(.*?)<!\\[endif\\]>", Pattern.DOTALL).matcher(htmlMessage).replaceAll("$1");
-        // remove not referenced attachments
-        for (Iterator<DataSource> it = htmlDataSourceList.iterator(); it.hasNext();) {
-          DataSource ds = it.next();
-          if (!htmlMessage.contains("cid:" + ds.getName())) {
-            it.remove();
-          }
-        }
-        hasHtml = StringUtility.hasText(htmlMessage);
-      }
-
-      if (!hasPlainText && !hasHtml) {
-        throw new ProcessingException("message has no body");
-      }
-
-      MimeMessage mimeMessage = new CharsetSafeMimeMessage();
-      MimePart bodyPart = null;
-      if (attachments != null && attachments.length > 0) {
-        MimeMultipart multiPart = new MimeMultipart(); //mixed
-        mimeMessage.setContent(multiPart);
-        //add a holder for the body text
-        MimeBodyPart multiPartBody = new MimeBodyPart();
-        multiPart.addBodyPart(multiPartBody);
-        bodyPart = multiPartBody;
-        //add the attachments
-        for (File attachment : attachments) {
-          MimeBodyPart part = new MimeBodyPart();
-          FileDataSource fds = new FileDataSource(attachment);
-          DataHandler handler = new DataHandler(fds);
-          part.setDataHandler(handler);
-          part.setFileName(MimeUtility.encodeText(attachment.getName()));
-          multiPart.addBodyPart(part);
-        }
-      }
-      else {
-        //no attachments -> no need for multipart/mixed element
-        bodyPart = mimeMessage;
-      }
-
-      if (hasPlainText && hasHtml) {
-        MimeMultipart alternativePart = new MimeMultipart("alternative");
-        bodyPart.setContent(alternativePart);
-        MimeBodyPart plainBodyPart = new MimeBodyPart();
-        alternativePart.addBodyPart(plainBodyPart);
-        writePlainBody(plainBodyPart, plainTextMessage);
-        MimeBodyPart htmlBodyPart = new MimeBodyPart();
-        alternativePart.addBodyPart(htmlBodyPart);
-        writeHtmlBody(htmlBodyPart, htmlMessage, htmlDataSourceList);
-      }
-      else if (hasPlainText) { //plain text only
-        writePlainBody(bodyPart, plainTextMessage);
-      }
-      else { //html only
-        writeHtmlBody(bodyPart, htmlMessage, htmlDataSourceList);
-      }
-
-      if (markAsUnsent) {
-        mimeMessage.setHeader("X-Unsent", "1"); // only supported in Outlook 2010
-      }
-      return mimeMessage;
-    }
-    catch (MessagingException e) {
-      throw new ProcessingException("Error occured while creating MIME-message", e);
-    }
-    catch (UnsupportedEncodingException e) {
-      throw new ProcessingException("Error occured while creating MIME-message", e);
-    }
-  }
-
-  private String removeWordTags(String htmlMessage) {
-    // remove special/unused files
-    htmlMessage = htmlMessage.replaceAll("<link rel=File-List href=\"cid:filelist.xml\">", "");
-    htmlMessage = htmlMessage.replaceAll("<link rel=colorSchemeMapping href=\"cid:colorschememapping.xml\">", "");
-    htmlMessage = htmlMessage.replaceAll("<link rel=themeData href=\"cid:themedata.thmx\">", "");
-    htmlMessage = htmlMessage.replaceAll("<link rel=Edit-Time-Data href=\"cid:editdata.mso\">", "");
-
-    // remove Microsoft Word tags
-    htmlMessage = htmlMessage.replaceAll("<!--\\[if gte mso(.*\\r?\\n)*?.*?endif\\]-->", "");
-
-    return htmlMessage;
+    return org.eclipse.scout.commons.mail.MailUtility.createMimeMessage(mailMessage);
   }
 
   /**
-   * Checks if file is a Microsoft Word specific directory file. They are only used to edit HTML in Word.
+   * @deprecated Will be removed in N release. Use
+   *             {@link #createMimeMessage(org.eclipse.scout.commons.mail.MailMessage)} instead.
    */
-  private boolean isWordSpecificFile(String filename) {
-    return "filelist.xml".equalsIgnoreCase(filename)
-        || "colorschememapping.xml".equalsIgnoreCase(filename)
-        || "themedata.thmx".equalsIgnoreCase(filename)
-        || "header.html".equalsIgnoreCase(filename)
-        || "editdata.mso".equalsIgnoreCase(filename)
-        || wordPatternItem.matcher(filename).matches()
-        || wordPatternProps.matcher(filename).matches();
-  }
-
-  private static void writeHtmlBody(MimePart htmlBodyPart, String htmlMessage, List<DataSource> htmlDataSourceList) throws MessagingException {
-    Multipart multiPartHtml = new MimeMultipart("related");
-    htmlBodyPart.setContent(multiPartHtml);
-    MimeBodyPart part = new MimeBodyPart();
-    part.setContent(htmlMessage, CONTENT_TYPE_TEXT_HTML);
-    part.setHeader(CONTENT_TYPE_ID, CONTENT_TYPE_TEXT_HTML);
-    part.setHeader(CONTENT_TRANSFER_ENCODING_ID, QUOTED_PRINTABLE);
-    multiPartHtml.addBodyPart(part);
-    for (DataSource source : htmlDataSourceList) {
-      part = new MimeBodyPart();
-      DataHandler handler = new DataHandler(source);
-      part.setDataHandler(handler);
-      part.setFileName(source.getName());
-      part.addHeader("Content-ID", "<" + source.getName() + ">");
-      multiPartHtml.addBodyPart(part);
-    }
-  }
-
-  private static void writePlainBody(MimePart plainBodyPart, String plainTextMessage) throws MessagingException {
-    plainBodyPart.setText(plainTextMessage, UTF_8);
-    plainBodyPart.setHeader(CONTENT_TYPE_ID, CONTENT_TYPE_TEXT_PLAIN);
-    plainBodyPart.setHeader(CONTENT_TRANSFER_ENCODING_ID, QUOTED_PRINTABLE);
-  }
-
-  private MimeMessage createMimeMessageInternal(String bodyTextPlain, String bodyTextHtml, DataSource[] attachments) throws ProcessingException {
-    try {
-      CharsetSafeMimeMessage m = new CharsetSafeMimeMessage();
-      MimeMultipart multiPart = new MimeMultipart();
-      BodyPart bodyPart = createBodyPart(bodyTextPlain, bodyTextHtml);
-      if (bodyPart == null) {
-        return null;
+  @Deprecated
+  public static MimeMessage createMimeMessage(String messagePlain, String messageHtml, DataSource[] attachments) throws ProcessingException {
+    org.eclipse.scout.commons.mail.MailMessage mailMessage = new org.eclipse.scout.commons.mail.MailMessage();
+    mailMessage.setBodyPlainText(messagePlain);
+    mailMessage.setBodyHtml(messageHtml);
+    if (attachments != null && attachments.length > 0) {
+      for (DataSource source : attachments) {
+        mailMessage.addAttachment(new MailAttachment(source, null));
       }
-      multiPart.addBodyPart(bodyPart);
-      // attachments
-      if (attachments != null) {
-        for (DataSource source : attachments) {
-          MimeBodyPart part = new MimeBodyPart();
-          DataHandler handler = new DataHandler(source);
-          part.setDataHandler(handler);
-          part.setFileName(source.getName());
-          multiPart.addBodyPart(part);
-        }
-      }
-      m.setContent(multiPart);
-      return m;
     }
-    catch (Throwable t) {
-      throw new ProcessingException("Failed to create MimeMessage.", t);
-    }
+    return org.eclipse.scout.commons.mail.MailUtility.createMimeMessage(mailMessage);
   }
 
-  private BodyPart createBodyPart(String bodyTextPlain, String bodyTextHtml) throws MessagingException {
-    if (!StringUtility.isNullOrEmpty(bodyTextPlain) && !StringUtility.isNullOrEmpty(bodyTextHtml)) {
-      // multipart
-      MimeBodyPart plainPart = new MimeBodyPart();
-      plainPart.setText(bodyTextPlain, UTF_8);
-      plainPart.addHeader(CONTENT_TYPE_ID, CONTENT_TYPE_TEXT_PLAIN);
-      MimeBodyPart htmlPart = new MimeBodyPart();
-      htmlPart.setText(bodyTextHtml, UTF_8);
-      htmlPart.addHeader(CONTENT_TYPE_ID, CONTENT_TYPE_TEXT_HTML);
-
-      Multipart multiPart = new MimeMultipart("alternative");
-      multiPart.addBodyPart(plainPart);
-      multiPart.addBodyPart(htmlPart);
-      MimeBodyPart multiBodyPart = new MimeBodyPart();
-      multiBodyPart.setContent(multiPart);
-      return multiBodyPart;
-    }
-    else if (!StringUtility.isNullOrEmpty(bodyTextPlain)) {
-      MimeBodyPart part = new MimeBodyPart();
-      part.setText(bodyTextPlain, UTF_8);
-      part.addHeader(CONTENT_TYPE_ID, CONTENT_TYPE_TEXT_PLAIN);
-      return part;
-    }
-    else if (!StringUtility.isNullOrEmpty(bodyTextHtml)) {
-      MimeBodyPart part = new MimeBodyPart();
-      part.setText(bodyTextHtml, UTF_8);
-      part.addHeader(CONTENT_TYPE_ID, CONTENT_TYPE_TEXT_HTML);
-      return part;
-    }
-    return null;
+  /**
+   * @deprecated Will be removed in N release. Replacement: none.
+   */
+  @SuppressWarnings("deprecation")
+  @Deprecated
+  public static MimeMessage createMimeMessageFromWordArchiveDirectory(File archiveDir, String simpleName, File[] attachments, boolean markAsUnsent) throws ProcessingException {
+    return WordMailUtility.createMimeMessageFromWordArchiveDirectory(archiveDir, simpleName, attachments, markAsUnsent);
   }
 
+  /**
+   * @deprecated Will be removed in N release. Replacement: none.
+   */
+  @SuppressWarnings("deprecation")
+  @Deprecated
+  public static MimeMessage createMimeMessageFromWordArchive(File archiveFile, File[] attachments) throws ProcessingException {
+    return WordMailUtility.createMimeMessageFromWordArchive(archiveFile, attachments);
+  }
+
+  /**
+   * @deprecated Will be removed in N release. Replacement: none.
+   */
+  @SuppressWarnings("deprecation")
+  @Deprecated
+  public static MimeMessage createMimeMessageFromWordArchive(File archiveFile, File[] attachments, boolean markAsUnsent) throws ProcessingException {
+    return WordMailUtility.createMimeMessageFromWordArchive(archiveFile, attachments, markAsUnsent);
+  }
+
+  /**
+   * @deprecated Will be removed in N release. Use
+   *             {@link org.eclipse.scout.commons.mail.MailUtility#createMessageFromBytes(byte[])} instead.
+   */
+  @Deprecated
   public static MimeMessage createMessageFromBytes(byte[] bytes) throws ProcessingException {
-    return instance.createMessageFromBytesImpl(bytes, null);
+    return org.eclipse.scout.commons.mail.MailUtility.createMessageFromBytes(bytes);
   }
 
+  /**
+   * @deprecated Will be removed in N release. Use
+   *             {@link org.eclipse.scout.commons.mail.MailUtility#createMessageFromBytes(byte[], Session)} instead.
+   */
+  @Deprecated
   public static MimeMessage createMessageFromBytes(byte[] bytes, Session session) throws ProcessingException {
-    return instance.createMessageFromBytesImpl(bytes, session);
-  }
-
-  private MimeMessage createMessageFromBytesImpl(byte[] bytes, Session session) throws ProcessingException {
-    try {
-      ByteArrayInputStream st = new ByteArrayInputStream(bytes);
-      return new MimeMessage(session, st);
-    }
-    catch (Throwable t) {
-      throw new ProcessingException("Unexpected: ", t);
-    }
+    return org.eclipse.scout.commons.mail.MailUtility.createMessageFromBytes(bytes, session);
   }
 
   /**
@@ -737,174 +320,23 @@ public final class MailUtility {
    *          List of attachments (files).
    * @throws ProcessingException
    * @since 4.1
+   * @deprecated Will be removed in N release. Use
+   *             {@link org.eclipse.scout.commons.mail.MailUtility#addAttachmentsToMimeMessage(MimeMessage, List)}
+   *             instead.
    */
+  @Deprecated
   public static void addAttachmentsToMimeMessage(MimeMessage msg, List<File> attachments) throws ProcessingException {
-    if (CollectionUtility.isEmpty(attachments)) {
-      return;
-    }
-
-    try {
-      Object messageContent = msg.getContent();
-
-      Multipart multiPart = null;
-      if (messageContent instanceof Multipart && StringUtility.contains(((Multipart) messageContent).getContentType(), "multipart/mixed")) {
-        // already contains attachments
-        // use the existing multipart
-        multiPart = (Multipart) messageContent;
-      }
-      else if (messageContent instanceof Multipart) {
-        MimeBodyPart multiPartBody = new MimeBodyPart();
-        multiPartBody.setContent((Multipart) messageContent);
-
-        multiPart = new MimeMultipart(); //mixed
-        msg.setContent(multiPart);
-
-        multiPart.addBodyPart(multiPartBody);
-      }
-      else if (messageContent instanceof String) {
-        MimeBodyPart multiPartBody = new MimeBodyPart();
-        String message = (String) messageContent;
-
-        String contentTypeHeader = StringUtility.join(" ", msg.getHeader(CONTENT_TYPE_ID));
-        if (StringUtility.contains(contentTypeHeader, "html")) {
-          // html
-          multiPartBody.setContent(message, MailUtility.CONTENT_TYPE_TEXT_HTML);
-          multiPartBody.setHeader(CONTENT_TYPE_ID, MailUtility.CONTENT_TYPE_TEXT_HTML);
-          multiPartBody.setHeader(CONTENT_TRANSFER_ENCODING_ID, QUOTED_PRINTABLE);
-        }
-        else {
-          // plain text
-          multiPartBody.setText(message);
-        }
-
-        multiPart = new MimeMultipart(); //mixed
-        msg.setContent(multiPart);
-
-        multiPart.addBodyPart(multiPartBody);
-      }
-      else {
-        throw new ProcessingException("Unsupported mime message format. Unable to add attachments.");
-      }
-
-      for (File attachment : attachments) {
-        MimeBodyPart bodyPart = new MimeBodyPart();
-        DataSource source = new FileDataSource(attachment);
-        bodyPart.setDataHandler(new DataHandler(source));
-        bodyPart.setFileName(MimeUtility.encodeText(attachment.getName()));
-        multiPart.addBodyPart(bodyPart);
-      }
-      msg.saveChanges();
-    }
-    catch (MessagingException e) {
-      throw new ProcessingException("Failed to add attachment to existing mime message", e);
-    }
-    catch (IOException e) {
-      throw new ProcessingException("Failed to add attachment to existing mime message", e);
-    }
+    org.eclipse.scout.commons.mail.MailUtility.addAttachmentsToMimeMessage(msg, attachments);
   }
 
   /**
    * @since 2.7
+   * @deprecated Will be removed in N release. Use
+   *             {@link org.eclipse.scout.commons.mail.MailUtility#getContentTypeForExtension(String)} instead.
    */
+  @Deprecated
   public static String getContentTypeForExtension(String ext) {
-    if (ext == null) {
-      return null;
-    }
-    if (ext.startsWith(".")) {
-      ext = ext.substring(1);
-    }
-    ext = ext.toLowerCase();
-    String type = FileUtility.getContentTypeForExtension(ext);
-    if (type == null) {
-      type = MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType("tmp." + ext);
-    }
-    return type;
+    return org.eclipse.scout.commons.mail.MailUtility.getContentTypeForExtension(ext);
   }
 
-  /**
-   * Careful: this method returns null when the list of addresses is empty! This is a (stupid) default by
-   * javax.mime.Message
-   */
-  private InternetAddress[] parseAddresses(String[] addresses) throws AddressException {
-    if (addresses == null) {
-      return null;
-    }
-    ArrayList<InternetAddress> addrList = new ArrayList<InternetAddress>();
-    for (int i = 0; i < Array.getLength(addresses); i++) {
-      addrList.add(new InternetAddress(addresses[i]));
-    }
-    if (addrList.size() == 0) {
-      return null;
-    }
-    else {
-      return addrList.toArray(new InternetAddress[addrList.size()]);
-    }
-  }
-
-  private String getCharacterEncodingOfMimePart(MimePart part) throws MessagingException {
-    Pattern pattern = Pattern.compile("charset=\".*\"", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
-    Matcher matcher = pattern.matcher(part.getContentType());
-    String characterEncoding = UTF_8; // default, a good guess in Europe
-    if (matcher.find()) {
-      if (matcher.group(0).split("\"").length >= 2) {
-        characterEncoding = matcher.group(0).split("\"")[1];
-      }
-    }
-    else {
-      final String chartsetEquals = "charset=";
-      if (part.getContentType().contains(chartsetEquals)) {
-        if (part.getContentType().split(chartsetEquals).length == 2) {
-          characterEncoding = part.getContentType().split(chartsetEquals)[1];
-        }
-      }
-    }
-    return characterEncoding;
-  }
-
-  static {
-    fixMailcapCommandMap();
-  }
-
-  /**
-   * jax-ws in jre 1.6.0 and priopr to 1.2.7 breaks support for "Umlaute" ä, ö, ü due to a bug in
-   * StringDataContentHandler.writeTo
-   * <p>
-   * This patch uses reflection to eliminate this buggy mapping from the command map and adds the default text_plain
-   * mapping (if available, e.g. sun jre)
-   */
-  @SuppressWarnings("unchecked")
-  private static void fixMailcapCommandMap() {
-    try {
-      //set the com.sun.mail.handlers.text_plain to level 0 (programmatic) to prevent others from overriding in level 0
-      final String className = "com.sun.mail.handlers.text_plain";
-      Class textPlainClass;
-      try {
-        textPlainClass = Class.forName(className);
-      }
-      catch (Throwable t) {
-        //class not found, cancel
-        return;
-      }
-      CommandMap cmap = MailcapCommandMap.getDefaultCommandMap();
-      if (!(cmap instanceof MailcapCommandMap)) {
-        return;
-      }
-      ((MailcapCommandMap) cmap).addMailcap("text/plain;;x-java-content-handler=" + textPlainClass.getName());
-      //use reflection to clear out all other mappings of text/plain in level 0
-      Field f = MailcapCommandMap.class.getDeclaredField("DB");
-      f.setAccessible(true);
-      Object[] dbArray = (Object[]) f.get(cmap);
-      f = Class.forName("com.sun.activation.registries.MailcapFile").getDeclaredField("type_hash");
-      f.setAccessible(true);
-      Map<Object, Object> db0 = (Map<Object, Object>) f.get(dbArray[0]);
-      Map<Object, Object> typeMap = (Map<Object, Object>) db0.get("text/plain");
-      List<String> handlerList = (List<String>) typeMap.get("content-handler");
-      //put text_plain in front
-      handlerList.remove(className);
-      handlerList.add(0, className);
-    }
-    catch (Throwable t) {
-      ScoutLogManager.getLogger(MailUtility.class).warn("Failed fixing MailcapComandMap string handling: " + t);
-    }
-  }
 }
