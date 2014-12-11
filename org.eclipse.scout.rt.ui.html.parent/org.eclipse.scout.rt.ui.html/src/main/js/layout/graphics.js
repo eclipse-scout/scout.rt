@@ -2,14 +2,19 @@
  * This file contains helpers for graphical operations and JavaScript ports from java.awt classes
  */
 scout.graphics = {
+
   measureString: function(text) {
+    text = text || '';
     var $div = $('#StringMeasurement');
-    if ($div.length === 0) {
-      throw new Error('DIV StringMeasurement does\'nt exist');
+    if ($div.length === 0) { // create dynamically
+      $div = $('body').appendDiv('', '', 'StringMeasurement');
     }
-    $div.html(text);
-    return new scout.Dimension($div.width(), $div.height());
+    $div.html(text.replace(/\s/g, "&nbsp;"));
+    var dimension = new scout.Dimension($div.width(), $div.height());
+    $div.html(''); // clear text after measurement (faster than removing the entire element from the DOM tree)
+    return dimension;
   },
+
   /* These functions are designed to be used with box-sizing:box-model. The only reliable
    * way to set the size of a component when working with box model is to use css('width/height'...)
    * in favor of width/height() functions.
@@ -26,6 +31,7 @@ scout.graphics = {
       $comp.outerWidth(includeMargins),
       $comp.outerHeight(includeMargins));
   },
+
   setSize: function($comp, vararg, height) {
     var size = vararg instanceof scout.Dimension ?
       vararg : new scout.Dimension(vararg, height);
@@ -33,6 +39,7 @@ scout.graphics = {
       .cssWidth(size.width)
       .cssHeight(size.height);
   },
+
   /**
    * Returns the size of a visible component or (0,0) when component is invisible.
    */
@@ -43,6 +50,7 @@ scout.graphics = {
       return new scout.Dimension(0, 0);
     }
   },
+
   /**
    * Returns the inset-dimensions of the component (padding, margin, border).
    */
@@ -72,6 +80,7 @@ scout.graphics = {
     }
     return new scout.Insets(insets[0], insets[1], insets[2], insets[3]);
   },
+
   getMargins: function($comp) {
     return scout.graphics.getInsets($comp, {
       includeMargin: true,
@@ -79,6 +88,7 @@ scout.graphics = {
       includeBorder: false
     });
   },
+
   getBounds: function($comp) {
     var parseCssPosition = function(prop) {
       var value = $comp.css(prop);
@@ -90,6 +100,7 @@ scout.graphics = {
       $comp.outerWidth(true),
       $comp.outerHeight(true));
   },
+
   setBounds: function($comp, vararg, y, width, height) {
     var bounds = vararg instanceof scout.Rectangle ?
       vararg : new scout.Rectangle(vararg, y, width, height);
@@ -99,6 +110,7 @@ scout.graphics = {
       .cssWidth(bounds.width)
       .cssHeight(bounds.height);
   },
+
   offsetBounds: function($elem, includeMargins) {
     if (includeMargins === undefined) {
       includeMargins = false;
@@ -106,6 +118,7 @@ scout.graphics = {
     var pos = $elem.offset();
     return new scout.Rectangle(pos.left, pos.top, $elem.outerWidth(includeMargins), $elem.outerHeight(includeMargins));
   },
+
   debugOutput: function($comp) {
     var attrs = '';
     if ($comp.attr('id')) {
@@ -137,9 +150,7 @@ scout.Point.prototype.equals = function(o) {
   if (!o) {
     return false;
   }
-
-  return this.x === o.x &&
-    this.y === o.y;
+  return (this.x === o.x && this.y === o.y);
 };
 
 /**
@@ -165,9 +176,7 @@ scout.Dimension.prototype.equals = function(o) {
   if (!o) {
     return false;
   }
-
-  return this.width === o.width &&
-    this.height === o.height;
+  return (this.width === o.width && this.height === o.height);
 };
 
 scout.Dimension.prototype.subtract = function(insets) {
@@ -193,10 +202,10 @@ scout.Rectangle = function(x, y, width, height) {
 };
 
 scout.Rectangle.prototype.equals = function(o) {
-  return this.x === o.x &&
-    this.y === o.y &&
-    this.width === o.width &&
-    this.height === o.height;
+  if (!o) {
+    return false;
+  }
+  return (this.x === o.x && this.y === o.y && this.width === o.width && this.height === o.height);
 };
 
 scout.Rectangle.prototype.toString = function() {
