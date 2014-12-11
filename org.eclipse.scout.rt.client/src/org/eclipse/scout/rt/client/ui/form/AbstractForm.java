@@ -982,8 +982,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     final Set<IFormField> exportedFields = new HashSet<IFormField>();
 
     // all fields
-    Map<Integer, Map<String/* qualified field id */, AbstractFormFieldData>> breathFirstMap = target.getAllFieldsRec();
-    for (Map<String/* qualified field id */, AbstractFormFieldData> targetMap : breathFirstMap.values()) {
+    Map<Integer, Map<String/* qualified field id */, AbstractFormFieldData>> breadthFirstMap = target.getAllFieldsRec();
+    for (Map<String/* qualified field id */, AbstractFormFieldData> targetMap : breadthFirstMap.values()) {
       for (Map.Entry<String, AbstractFormFieldData> e : targetMap.entrySet()) {
         String fieldQId = e.getKey();
         AbstractFormFieldData data = e.getValue();
@@ -1164,8 +1164,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     HashMap<IFormField, AbstractFormFieldData> dataMap = new HashMap<IFormField, AbstractFormFieldData>();
 
     // collect fields and split them into masters/slaves
-    Map<Integer, Map<String/* qualified field id */, AbstractFormFieldData>> breathFirstMap = source.getAllFieldsRec();
-    for (Map<String/* qualified field id */, AbstractFormFieldData> sourceMap : breathFirstMap.values()) {
+    Map<Integer, Map<String/* qualified field id */, AbstractFormFieldData>> breadthFirstMap = source.getAllFieldsRec();
+    for (Map<String/* qualified field id */, AbstractFormFieldData> sourceMap : breadthFirstMap.values()) {
       for (Map.Entry<String, AbstractFormFieldData> e : sourceMap.entrySet()) {
         String fieldQId = e.getKey();
         AbstractFormFieldData data = e.getValue();

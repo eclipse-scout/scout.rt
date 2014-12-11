@@ -167,7 +167,7 @@ public abstract class AbstractFormFieldData extends AbstractContributionComposit
     }
     String fieldDataId = FormDataUtility.getFieldDataId(id);
     for (AbstractFormFieldData f : m_fieldMap.values()) {
-      if (FormDataUtility.getFieldDataId(f).equals(fieldDataId)) {
+      if (f.getFieldId().equals(fieldDataId)) {
         return f;
       }
     }
