@@ -41,6 +41,7 @@
               <!-- <debugPort>18081</debugPort> -->
               <excludes>
                 <exclude>**/Mail*Test.java</exclude>
+                <exclude>**/WordMail*Test.java</exclude>
               </excludes>
             </configuration>
           </plugin>

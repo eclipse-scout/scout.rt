@@ -56,10 +56,10 @@ import javax.swing.text.html.StyleSheet;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.HTMLUtility;
 import org.eclipse.scout.commons.IOUtility;
-import org.eclipse.scout.commons.MailUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.mail.MailUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.FileChooser;
@@ -313,7 +313,7 @@ public class SwingScoutMailField extends SwingScoutValueFieldComposite<IMailFiel
     Address[] ccAddresses = new Address[0];
     try {
       if (message != null) {
-        MailUtility.collectMailParts(message, bodyCollector, attachementCollector);
+        MailUtility.collectMailParts(message, bodyCollector, attachementCollector, null);
         subject = message.getSubject();
         Date received = message.getSentDate();
         if (received != null) {
@@ -330,7 +330,7 @@ public class SwingScoutMailField extends SwingScoutValueFieldComposite<IMailFiel
     }
     setAttachements(attachementCollector.toArray(new Part[attachementCollector.size()]));
     try {
-      setBodyParts(bodyCollector.toArray(new Part[bodyCollector.size()]));
+      setBodyParts(bodyCollector);
     }
     catch (Exception e) {
       LOG.warn("could not parse message.", e);
@@ -367,7 +367,7 @@ public class SwingScoutMailField extends SwingScoutValueFieldComposite<IMailFiel
     }
   }
 
-  protected void setBodyParts(Part[] bodyParts) throws MessagingException, ProcessingException, IOException {
+  protected void setBodyParts(List<Part> bodyParts) throws MessagingException, ProcessingException, IOException {
     StringBuilder buf = new StringBuilder();
     if (bodyParts != null) {
       Part bodyPart = MailUtility.getHtmlPart(bodyParts);
