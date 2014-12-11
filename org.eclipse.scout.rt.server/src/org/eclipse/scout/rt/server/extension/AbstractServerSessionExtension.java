@@ -13,12 +13,13 @@ package org.eclipse.scout.rt.server.extension;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.server.AbstractServerSession;
 import org.eclipse.scout.rt.server.extension.ServerSessionChains.ServerSessionLoadSessionChain;
-import org.eclipse.scout.rt.shared.extension.AbstractExtension;
+import org.eclipse.scout.rt.shared.extension.AbstractSerializableExtension;
 
 /**
  *
  */
-public abstract class AbstractServerSessionExtension<OWNER extends AbstractServerSession> extends AbstractExtension<OWNER> implements IServerSessionExtension<OWNER> {
+public abstract class AbstractServerSessionExtension<OWNER extends AbstractServerSession> extends AbstractSerializableExtension<OWNER> implements IServerSessionExtension<OWNER> {
+  private static final long serialVersionUID = 1L;
 
   public AbstractServerSessionExtension(OWNER owner) {
     super(owner);

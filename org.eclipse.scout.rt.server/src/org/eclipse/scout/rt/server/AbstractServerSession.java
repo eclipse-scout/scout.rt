@@ -39,7 +39,7 @@ import org.eclipse.scout.rt.server.services.common.clientnotification.SessionFil
 import org.eclipse.scout.rt.shared.OfflineState;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.TextsThreadLocal;
-import org.eclipse.scout.rt.shared.extension.AbstractExtension;
+import org.eclipse.scout.rt.shared.extension.AbstractSerializableExtension;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
@@ -319,7 +319,8 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
    * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
    * any further chain elements.
    */
-  protected static class LocalServerSessionExtension<OWNER extends AbstractServerSession> extends AbstractExtension<OWNER> implements IServerSessionExtension<OWNER> {
+  protected static class LocalServerSessionExtension<OWNER extends AbstractServerSession> extends AbstractSerializableExtension<OWNER> implements IServerSessionExtension<OWNER> {
+    private static final long serialVersionUID = 1L;
 
     public LocalServerSessionExtension(OWNER owner) {
       super(owner);
