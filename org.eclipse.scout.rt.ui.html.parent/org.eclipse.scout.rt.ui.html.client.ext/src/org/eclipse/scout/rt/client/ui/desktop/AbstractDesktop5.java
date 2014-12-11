@@ -22,7 +22,7 @@ public abstract class AbstractDesktop5 extends AbstractDesktop implements IDeskt
 
 //FIXME imo scout erweiterung in IDesktop
   protected AbstractDesktop5(boolean callInitializer) {
-    // super(callInitializer);
+    super(callInitializer);
   }
 
   @Override
