@@ -1,3 +1,4 @@
+// TODO AWE: (navi) gemeinsame basis-klasse für die beiden navi-buttons
 scout.MenuNavigateDown = function() {
   scout.MenuNavigateDown.parent.call(this);
   this._addAdapterProperties('outline');
@@ -8,17 +9,29 @@ scout.inherits(scout.MenuNavigateDown, scout.Menu);
 scout.MenuNavigateDown.prototype.init = function(model, session) {
   scout.MenuNavigateDown.parent.prototype.init.call(this, model, session);
   this._listener = function(event) {
-    var text, node = event.node;
-    if (node.detailForm && node.detailFormVisible) {
-      this._clickBehavior = this._showDetailTable.bind(this, node);
-      text = session.text('Continue');
+    if (event.node) {
+      this._setEnabled(true);
+      var text, node = event.node;
+      if (node.detailForm && node.detailFormVisible) {
+        this._clickBehavior = this._showDetailTable.bind(this, node);
+        text = session.text('Continue');
+      } else {
+        this._clickBehavior = this._drillDown.bind(this, node);
+        text = session.text('Show');
+      }
+      $(this.$container).text(text);
     } else {
-      this._clickBehavior = this._drillDown.bind(this, node);
-      text = session.text('Show');
+      this._setEnabled(false);
     }
-    $(this.$container).text(text);
   }.bind(this);
   this.outline.events.on('outlineUpdated nodesSelected', this._listener);
+};
+
+scout.MenuNavigateDown.prototype._setEnabled = function(enabled) {
+  this.enabled = enabled;
+  if (this.rendered) {
+    this._renderEnabled(enabled);
+  }
 };
 
 scout.MenuNavigateDown.prototype._onMenuClicked = function(event) {
