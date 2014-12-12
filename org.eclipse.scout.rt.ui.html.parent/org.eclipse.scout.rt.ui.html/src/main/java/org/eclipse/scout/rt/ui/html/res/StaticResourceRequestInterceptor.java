@@ -116,10 +116,6 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
     }
     int lastDot = path.lastIndexOf('.');
     String fileExtension = lastDot >= 0 ? path.substring(lastDot + 1) : path;
-    contentType = FileUtility5.getContentTypeForExtension(fileExtension);
-    if (contentType != null) {
-      return contentType;
-    }
     return FileUtility.getContentTypeForExtension(fileExtension);
   }
 
