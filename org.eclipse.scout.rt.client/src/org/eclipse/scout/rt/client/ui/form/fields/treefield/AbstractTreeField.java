@@ -20,6 +20,9 @@ import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
+import org.eclipse.scout.commons.annotations.FormData;
+import org.eclipse.scout.commons.annotations.FormData.DefaultSubtypeSdkCommand;
+import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -44,6 +47,7 @@ import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHa
 import org.eclipse.scout.service.SERVICES;
 
 @ClassId("bfbf00d0-b70a-48d4-8481-4faff294f37f")
+@FormData(value = AbstractTreeFieldData.class, sdkCommand = SdkCommand.USE, defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.CREATE)
 public abstract class AbstractTreeField extends AbstractFormField implements ITreeField {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractTreeField.class);
 
