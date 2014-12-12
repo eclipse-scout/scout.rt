@@ -110,7 +110,7 @@ public final class FileUtility {
     EXT_TO_MIME_TYPE_MAP.put("jpe", "image/jpeg");
     EXT_TO_MIME_TYPE_MAP.put("jpeg", "image/jpeg");
     EXT_TO_MIME_TYPE_MAP.put("jpg", "image/jpeg");
-    EXT_TO_MIME_TYPE_MAP.put("js", "application/x-javascript");
+    EXT_TO_MIME_TYPE_MAP.put("js", "application/javascript");
     EXT_TO_MIME_TYPE_MAP.put("kar", "audio/midi");
     EXT_TO_MIME_TYPE_MAP.put("latex", "application/x-latex");
     EXT_TO_MIME_TYPE_MAP.put("lha", "application/octet-stream");
@@ -215,6 +215,18 @@ public final class FileUtility {
     EXT_TO_MIME_TYPE_MAP.put("xlm", "application/vnd.ms-excel");
     EXT_TO_MIME_TYPE_MAP.put("xls", "application/vnd.ms-excel");
     EXT_TO_MIME_TYPE_MAP.put("xlw", "application/vnd.ms-excel");
+    EXT_TO_MIME_TYPE_MAP.put("xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    EXT_TO_MIME_TYPE_MAP.put("xltx", "application/vnd.openxmlformats-officedocument.spreadsheetml.template");
+    EXT_TO_MIME_TYPE_MAP.put("potx", "application/vnd.openxmlformats-officedocument.presentationml.template");
+    EXT_TO_MIME_TYPE_MAP.put("ppsx", "application/vnd.openxmlformats-officedocument.presentationml.slideshow");
+    EXT_TO_MIME_TYPE_MAP.put("pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation");
+    EXT_TO_MIME_TYPE_MAP.put("xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    EXT_TO_MIME_TYPE_MAP.put("sldx", "application/vnd.openxmlformats-officedocument.presentationml.slide");
+    EXT_TO_MIME_TYPE_MAP.put("docx", "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+    EXT_TO_MIME_TYPE_MAP.put("xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    EXT_TO_MIME_TYPE_MAP.put("dotx", "application/vnd.openxmlformats-officedocument.wordprocessingml.template");
+    EXT_TO_MIME_TYPE_MAP.put("xlam", "application/vnd.ms-excel.addin.macroEnabled.12");
+    EXT_TO_MIME_TYPE_MAP.put("xlsb", "application/vnd.ms-excel.sheet.binary.macroEnabled.12");
     EXT_TO_MIME_TYPE_MAP.put("xml", "text/xml");
     EXT_TO_MIME_TYPE_MAP.put("xpm", "image/x-xpixmap");
     EXT_TO_MIME_TYPE_MAP.put("xwd", "image/x-xwindowdump");
