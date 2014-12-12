@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form;
 
-import static org.eclipse.scout.rt.ui.html.json.JsonObjectUtility.adapterIdsToJson;
-
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -105,7 +103,7 @@ public class JsonForm<T extends IForm> extends AbstractJsonPropertyObserver<T> i
     if (getModel() instanceof IForm5) {
       JsonContextMenu<IContextMenu> jsonContextMenu = getAdapter(((IForm5) getModel()).getContextMenu());
       if (jsonContextMenu != null) {
-        JsonObjectUtility.putProperty(json, PROP_MENUS, adapterIdsToJson(jsonContextMenu.getJsonChildActions()));
+        JsonObjectUtility.putProperty(json, PROP_MENUS, JsonObjectUtility.adapterIdsToJson(jsonContextMenu.getJsonChildActions()));
       }
     }
     return json;
@@ -148,7 +146,7 @@ public class JsonForm<T extends IForm> extends AbstractJsonPropertyObserver<T> i
 
   @Override
   public void handleModelContextMenuChanged(List<IJsonAdapter<?>> menuAdapters) {
-    addPropertyChangeEvent(PROP_MENUS, adapterIdsToJson(menuAdapters));
+    addPropertyChangeEvent(PROP_MENUS, JsonObjectUtility.adapterIdsToJson(menuAdapters));
   }
 
   @Override

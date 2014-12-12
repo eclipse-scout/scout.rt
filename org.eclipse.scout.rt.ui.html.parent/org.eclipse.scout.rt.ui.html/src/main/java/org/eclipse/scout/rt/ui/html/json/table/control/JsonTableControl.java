@@ -10,13 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.table.control;
 
+import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
+import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.action.JsonAction;
-import org.json.JSONObject;
+import org.eclipse.scout.rt.ui.html.json.form.fields.JsonGlobalAdapterProperty;
 
 public class JsonTableControl<T extends ITableControl> extends JsonAction<T> {
   protected boolean m_contentLoaded = false;
@@ -35,6 +37,18 @@ public class JsonTableControl<T extends ITableControl> extends JsonAction<T> {
         return getModel().getGroup();
       }
     });
+    putJsonProperty(new JsonGlobalAdapterProperty<ITableControl>(ITableControl.PROP_FORM, model, getJsonSession()) {
+      @Override
+      protected IForm modelValue() {
+        return getModel().getForm();
+      }
+
+      @Override
+      public boolean accept() {
+        return getModel().isSelected();
+      }
+    });
+    getJsonProperty(IAction.PROP_SELECTED).addSlaveProperty(getJsonProperty(ITableControl.PROP_FORM));
   }
 
   @Override
@@ -43,27 +57,10 @@ public class JsonTableControl<T extends ITableControl> extends JsonAction<T> {
   }
 
   @Override
-  protected void attachChildAdapters() {
-    super.attachChildAdapters();
-    //FIXME CGU create property
-    attachGlobalAdapter(getModel().getForm());
-  }
-
-  @Override
-  public JSONObject toJson() {
-    JSONObject json = super.toJson();
-    if (getModel().isSelected()) {
-      putAdapterIdProperty(json, ITableControl.PROP_FORM, getModel().getForm());
-      m_contentLoaded = true;
-    }
-    return json;
-  }
-
-  @Override
   protected void handleUiSelected(JsonEvent event) {
     super.handleUiSelected(event);
 
-    // Lazy loading content on selection.
+    // Lazy loading content on selection (temporary used for subclasses until subclasses are finally implemented)
     if (getModel().isSelected() && !m_contentLoaded) {
       handleUiLoadContent();
       m_contentLoaded = true;
@@ -71,26 +68,6 @@ public class JsonTableControl<T extends ITableControl> extends JsonAction<T> {
   }
 
   protected void handleUiLoadContent() {
-    addPropertyFormChangeEvent();
-  }
-
-  private void addPropertyFormChangeEvent() {
-    String formId = null;
-    if (getModel().getForm() != null) {
-      IJsonAdapter<?> formAdapter = attachGlobalAdapter(getModel().getForm());
-      formId = formAdapter.getId();
-    }
-    addPropertyChangeEvent(ITableControl.PROP_FORM, formId);
-  }
-
-  @Override
-  protected void handleModelPropertyChange(String propertyName, Object oldValue, Object newValue) {
-    if (ITableControl.PROP_FORM.equals(propertyName) && m_contentLoaded) {
-      addPropertyFormChangeEvent();
-    }
-    else {
-      super.handleModelPropertyChange(propertyName, oldValue, newValue);
-    }
   }
 
 }

@@ -14,8 +14,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.ui.form.IForm;
-import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.fixtures.JsonSessionMock;
 import org.eclipse.scout.rt.ui.html.json.form.fixtures.FormWithOneField;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
@@ -25,7 +23,7 @@ import org.junit.runner.RunWith;
 
 @RunWith(ScoutClientTestRunner.class)
 public class JsonFormTest {
-  private IJsonSession m_jsonSession;
+  private JsonSessionMock m_jsonSession;
 
   @Before
   public void before() {
@@ -38,7 +36,7 @@ public class JsonFormTest {
   @Test
   public void testFormDisposalOnClose() throws ProcessingException {
     FormWithOneField form = new FormWithOneField();
-    createJsonForm(form, m_jsonSession);
+    m_jsonSession.newJsonAdapter(form, m_jsonSession.getRootJsonAdapter(), null);
 
     form.start();
     assertNotNull(m_jsonSession.getJsonAdapter(form, m_jsonSession.getRootJsonAdapter()));
@@ -46,12 +44,6 @@ public class JsonFormTest {
     form.doClose();
     m_jsonSession.flush();
     assertNull(m_jsonSession.getJsonAdapter(form, m_jsonSession.getRootJsonAdapter()));
-  }
-
-  public static JsonForm<IForm> createJsonForm(IForm model, IJsonSession jsonSession) {
-    JsonForm<IForm> jsonAdapter = new JsonForm<IForm>(model, jsonSession, jsonSession.createUniqueIdFor(null), jsonSession.getRootJsonAdapter());
-    jsonAdapter.attach();
-    return jsonAdapter;
   }
 
 }

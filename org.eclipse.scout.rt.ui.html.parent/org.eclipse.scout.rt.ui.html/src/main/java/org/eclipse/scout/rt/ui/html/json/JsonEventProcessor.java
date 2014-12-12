@@ -29,9 +29,9 @@ public class JsonEventProcessor {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonEventProcessor.class);
 
-  private final JsonClientSession m_jsonSession;
+  private final IJsonSession m_jsonSession;
 
-  public JsonEventProcessor(JsonClientSession jsonSession) {
+  public JsonEventProcessor(IJsonSession jsonSession) {
     m_jsonSession = jsonSession;
   }
 
@@ -41,7 +41,7 @@ public class JsonEventProcessor {
       // context. JsonAdapter instanzen müssen somit nicht immer einen ClientSyncJob starten wenn sie z.B.
       // einen Scout-service aufrufen wollen. Es wurde bewusst für jedes processEvent ein eigener Job gestartet
       // und nicht für den ganzen Loop.
-      new ClientSyncJob("processEvent", m_jsonSession.getJsonSession().getClientSession()) {
+      new ClientSyncJob("processEvent", m_jsonSession.getClientSession()) {
         @Override
         protected void runVoid(IProgressMonitor monitor) throws Throwable {
           processEvent(event, response);
@@ -53,7 +53,7 @@ public class JsonEventProcessor {
 
   private void processEvent(JsonEvent event, JsonResponse response) {
     final String id = event.getId();
-    final IJsonAdapter jsonAdapter = m_jsonSession.getJsonSession().getJsonAdapter(id);
+    final IJsonAdapter jsonAdapter = m_jsonSession.getJsonAdapter(id);
     if (jsonAdapter == null) {
       throw new JsonException("No adapter found for id " + id);
     }
@@ -118,7 +118,7 @@ public class JsonEventProcessor {
     for (Job job : Job.getJobManager().find(ClientJob.class)) {
       if (job instanceof ClientJob) {
         ClientJob clientJob = (ClientJob) job;
-        if (clientJob.getClientSession() == m_jsonSession.getJsonSession().getClientSession()) {
+        if (clientJob.getClientSession() == m_jsonSession.getClientSession()) {
           jobList.add(clientJob);
         }
       }

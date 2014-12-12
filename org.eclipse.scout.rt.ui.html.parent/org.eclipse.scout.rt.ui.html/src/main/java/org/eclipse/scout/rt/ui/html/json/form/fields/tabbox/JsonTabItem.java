@@ -61,12 +61,14 @@ public class JsonTabItem<T extends IGroupBox> extends JsonGroupBox<T> {
 
   @Override
   protected void handleModelPropertyChange(String propertyName, Object oldValue, Object newValue) {
-    super.handleModelPropertyChange(propertyName, oldValue, newValue);
     if (IGroupBox.PROP_EMPTY.equals(propertyName)) {
       setEmptyFromScout();
     }
     else if (IGroupBox.PROP_SAVE_NEEDED.equals(propertyName)) {
       setSaveNeededFromScout();
+    }
+    else {
+      super.handleModelPropertyChange(propertyName, oldValue, newValue);
     }
   }
 

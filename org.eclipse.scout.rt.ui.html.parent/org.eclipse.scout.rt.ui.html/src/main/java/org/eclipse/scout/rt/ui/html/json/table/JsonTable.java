@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.table;
 
-import static org.eclipse.scout.rt.ui.html.json.JsonObjectUtility.adapterIdsToJson;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
@@ -221,7 +219,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     putProperty(json, "rows", jsonRows);
     JsonContextMenu<IContextMenu> jsonContextMenu = getAdapter(getModel().getContextMenu());
     if (jsonContextMenu != null) {
-      JsonObjectUtility.putProperty(json, PROP_MENUS, adapterIdsToJson(jsonContextMenu.getJsonChildActions()));
+      JsonObjectUtility.putProperty(json, PROP_MENUS, JsonObjectUtility.adapterIdsToJson(jsonContextMenu.getJsonChildActions()));
     }
     if (getModel() instanceof ITable5) {
       putAdapterIdsProperty(json, "controls", ((ITable5) getModel()).getControls());
@@ -652,7 +650,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
 
   @Override
   public void handleModelContextMenuChanged(List<IJsonAdapter<?>> menuAdapters) {
-    addPropertyChangeEvent(PROP_MENUS, adapterIdsToJson(menuAdapters));
+    addPropertyChangeEvent(PROP_MENUS, JsonObjectUtility.adapterIdsToJson(menuAdapters));
   }
 
   private class P_ModelTableListener implements TableListener {

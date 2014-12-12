@@ -12,11 +12,7 @@ package org.eclipse.scout.rt.ui.html.json.menu;
 
 import static org.junit.Assert.assertEquals;
 
-import java.lang.reflect.Field;
-
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.ui.html.json.AbstractJsonSession;
-import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.fixtures.JsonSessionMock;
 import org.eclipse.scout.rt.ui.html.json.menu.fixtures.Menu;
 import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
@@ -55,9 +51,7 @@ public class JsonMenuTest {
    * would be ignored because a new adapter exists in the current JSON response.
    */
   private void simulateProcessRequestOnJsonSession() throws Exception {
-    Field field = AbstractJsonSession.class.getDeclaredField("m_currentJsonResponse");
-    field.setAccessible(true);
-    field.set(m_jsonSession, new JsonResponse());
+    JsonTestUtility.endRequest(m_jsonSession);
   }
 
 }

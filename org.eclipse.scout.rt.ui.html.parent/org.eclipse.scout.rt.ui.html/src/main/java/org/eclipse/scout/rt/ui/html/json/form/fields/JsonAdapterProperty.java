@@ -10,13 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form.fields;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
-import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
+import org.eclipse.scout.rt.ui.html.json.JsonAdapterUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 
 public abstract class JsonAdapterProperty<T> extends JsonProperty<T> {
@@ -38,12 +36,12 @@ public abstract class JsonAdapterProperty<T> extends JsonProperty<T> {
   }
 
   @Override
-  public Object onPropertyChange(Object oldValue, Object newValue) {
+  public Object valueToJsonOnPropertyChange(Object oldValue, Object newValue) {
     if (!m_global && oldValue != null) {
       disposeAdapter(oldValue);
     }
     createAdapters(newValue);
-    return super.onPropertyChange(oldValue, newValue);
+    return super.valueToJsonOnPropertyChange(oldValue, newValue);
   }
 
   @Override
@@ -52,16 +50,9 @@ public abstract class JsonAdapterProperty<T> extends JsonProperty<T> {
       return null;
     }
     if (value instanceof Collection) {
-      Collection models = (Collection) value;
-      List<IJsonAdapter<?>> adapters = new ArrayList<>(models.size());
-      for (Object model : models) {
-        adapters.add(m_jsonSession.getJsonAdapter(model, getParentJsonAdapter()));
-      }
-      return JsonObjectUtility.adapterIdsToJson(adapters);
+      return JsonAdapterUtility.getAdapterIdsForModel(getJsonSession(), (Collection) value, getParentJsonAdapter());
     }
-    else {
-      return m_jsonSession.getJsonAdapter(value, getParentJsonAdapter()).getId();
-    }
+    return JsonAdapterUtility.getAdapterIdForModel(getJsonSession(), value, getParentJsonAdapter());
   }
 
   public void createAdapters() {
@@ -117,7 +108,7 @@ public abstract class JsonAdapterProperty<T> extends JsonProperty<T> {
   }
 
   @Override
-  public void onCreate() {
+  public void attachChildAdapters() {
     createAdapters();
   }
 

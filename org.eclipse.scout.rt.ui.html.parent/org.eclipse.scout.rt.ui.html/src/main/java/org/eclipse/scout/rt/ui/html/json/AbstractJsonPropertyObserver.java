@@ -30,7 +30,7 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
   /**
    * Key = propertyName.
    */
-  private Map<String, JsonProperty> m_jsonProperties;
+  private Map<String, JsonProperty<?>> m_jsonProperties;
 
   public AbstractJsonPropertyObserver(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
     super(model, jsonSession, id, parent);
@@ -63,7 +63,7 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
     m_jsonProperties.put(jsonProperty.getPropertyName(), jsonProperty);
   }
 
-  protected JsonProperty getJsonProperty(String name) {
+  protected JsonProperty<?> getJsonProperty(String name) {
     return m_jsonProperties.get(name);
   }
 
@@ -79,7 +79,9 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
   protected void attachChildAdapters() {
     super.attachChildAdapters();
     for (JsonProperty<?> prop : m_jsonProperties.values()) {
-      prop.onCreate();
+      if (prop.accept()) {
+        prop.attachChildAdapters();
+      }
     }
   }
 
@@ -104,16 +106,50 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
   @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
-    for (JsonProperty<?> prop : m_jsonProperties.values()) {
-      putProperty(json, prop.getPropertyName(), prop.valueToJson());
+    for (JsonProperty<?> jsonProperty : m_jsonProperties.values()) {
+      if (jsonProperty.accept()) {
+        putProperty(json, jsonProperty.getPropertyName(), jsonProperty.valueToJson());
+        jsonProperty.setValueSent(true);
+      }
     }
     return json;
   }
 
-  protected void handleModelPropertyChange(String propertyName, Object oldValue, Object newValue) {
+  protected void handleModelPropertyChange(PropertyChangeEvent event) {
+    String propertyName = event.getPropertyName();
     if (m_jsonProperties.containsKey(propertyName)) {
-      JsonProperty jsonProperty = m_jsonProperties.get(propertyName);
-      addPropertyChangeEvent(propertyName, jsonProperty.onPropertyChange(oldValue, newValue));
+      JsonProperty<?> jsonProperty = m_jsonProperties.get(propertyName);
+      handleSlaveJsonProperties(jsonProperty);
+      event = m_propertyEventFilter.filter(event);
+      if (event != null && jsonProperty.accept()) {
+        handleJsonPropertyChange(jsonProperty, event.getOldValue(), event.getNewValue());
+      }
+    }
+    else {
+      event = m_propertyEventFilter.filter(event);
+      if (event != null) {
+        handleModelPropertyChange(propertyName, event.getOldValue(), event.getNewValue());
+      }
+    }
+  }
+
+  protected void handleModelPropertyChange(String propertyName, Object oldValue, Object newValue) {
+  }
+
+  private void handleSlaveJsonProperties(JsonProperty<?> masterProperty) {
+    for (JsonProperty<?> slave : masterProperty.getSlaveProperties()) {
+      Object modelValue = slave.modelValue();
+      if (!slave.isValueSent() && modelValue != null) {
+        handleJsonPropertyChange(slave, null, modelValue);
+      }
+    }
+  }
+
+  private void handleJsonPropertyChange(JsonProperty<?> jsonProperty, Object oldValue, Object newValue) {
+    String propertyName = jsonProperty.getPropertyName();
+    if (jsonProperty.accept()) {
+      addPropertyChangeEvent(propertyName, jsonProperty.valueToJsonOnPropertyChange(oldValue, newValue));
+      jsonProperty.setValueSent(true);
       LOG.debug("Added property change event '" + propertyName + ": " + newValue + "' for " + getObjectType() + " with id " + getId() + ". Model: " + getModel());
     }
   }
@@ -121,11 +157,7 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
   private class P_PropertyChangeListener implements PropertyChangeListener {
     @Override
     public void propertyChange(PropertyChangeEvent event) {
-      event = m_propertyEventFilter.filter(event);
-      if (event == null) {
-        return;
-      }
-      handleModelPropertyChange(event.getPropertyName(), event.getOldValue(), event.getNewValue());
+      handleModelPropertyChange(event);
     }
   }
 

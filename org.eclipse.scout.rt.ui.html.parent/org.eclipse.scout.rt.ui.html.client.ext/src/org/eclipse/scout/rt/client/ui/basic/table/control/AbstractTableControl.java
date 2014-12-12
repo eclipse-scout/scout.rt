@@ -19,7 +19,7 @@ public abstract class AbstractTableControl extends AbstractAction implements ITa
 
   public AbstractTableControl() {
     this(true);
-  } 
+  }
 
   public AbstractTableControl(boolean callInitializer) {
     if (callInitializer) {
@@ -31,6 +31,7 @@ public abstract class AbstractTableControl extends AbstractAction implements ITa
     return null;
   }
 
+  @Override
   public void setForm(IForm form) {
     propertySupport.setProperty(PROP_FORM, form);
   }

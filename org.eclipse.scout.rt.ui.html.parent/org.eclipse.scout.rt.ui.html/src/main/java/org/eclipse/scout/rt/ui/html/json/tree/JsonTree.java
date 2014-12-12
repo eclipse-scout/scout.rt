@@ -1,7 +1,5 @@
 package org.eclipse.scout.rt.ui.html.json.tree;
 
-import static org.eclipse.scout.rt.ui.html.json.JsonObjectUtility.adapterIdsToJson;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -258,7 +256,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
 
   @Override
   public void handleModelContextMenuChanged(List<IJsonAdapter<?>> menuAdapters) {
-    addPropertyChangeEvent(PROP_MENUS, adapterIdsToJson(menuAdapters));
+    addPropertyChangeEvent(PROP_MENUS, JsonObjectUtility.adapterIdsToJson(menuAdapters));
   }
 
   protected String getOrCreateNodeId(ITreeNode node) {

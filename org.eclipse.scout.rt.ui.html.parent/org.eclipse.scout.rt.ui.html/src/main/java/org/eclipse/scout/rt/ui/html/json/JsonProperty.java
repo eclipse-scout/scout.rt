@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json;
 
+import java.util.LinkedList;
+import java.util.List;
+
 /**
  * This property class is used to map a model object property to a JSON property and is used to automatically create a
  * JSON object for a model and also to propagate property change events to the browser-side client.
@@ -22,6 +25,8 @@ public abstract class JsonProperty<T> {
   private final String m_propertyName;
   private final T m_model;
   private IJsonAdapter<?> m_parentJsonAdapter;
+  private List<JsonProperty<?>> m_slaveProperties = new LinkedList<JsonProperty<?>>();
+  private boolean m_valueSent;
 
   public JsonProperty(String propertyName, T model) {
     m_propertyName = propertyName;
@@ -44,6 +49,26 @@ public abstract class JsonProperty<T> {
     return m_parentJsonAdapter;
   }
 
+  public void addSlaveProperty(JsonProperty<?> property) {
+    m_slaveProperties.add(property);
+  }
+
+  public List<JsonProperty<?>> getSlaveProperties() {
+    return m_slaveProperties;
+  }
+
+  public void setValueSent(boolean valueSent) {
+    m_valueSent = valueSent;
+  }
+
+  public boolean isValueSent() {
+    return m_valueSent;
+  }
+
+  public boolean accept() {
+    return true;
+  }
+
   protected abstract Object modelValue();
 
   public Object prepareValueForToJson(Object value) {
@@ -54,16 +79,16 @@ public abstract class JsonProperty<T> {
     return prepareValueForToJson(modelValue());
   }
 
-  @Override
-  public String toString() {
-    return m_propertyName + ": " + m_model;
-  }
-
-  public Object onPropertyChange(Object oldValue, Object newValue) {
+  public Object valueToJsonOnPropertyChange(Object oldValue, Object newValue) {
     return prepareValueForToJson(newValue);
   }
 
-  public void onCreate() {
+  public void attachChildAdapters() {
 
+  }
+
+  @Override
+  public String toString() {
+    return m_propertyName + ": " + m_model;
   }
 }

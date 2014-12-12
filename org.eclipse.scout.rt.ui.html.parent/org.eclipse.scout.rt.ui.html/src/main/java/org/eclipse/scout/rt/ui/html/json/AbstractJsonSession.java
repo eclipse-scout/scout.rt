@@ -232,7 +232,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   protected abstract IClientSession createClientSession();
 
   protected JsonEventProcessor createJsonEventProcessor() {
-    return new JsonEventProcessor(m_jsonClientSession);
+    return new JsonEventProcessor(this);
   }
 
   /**
@@ -444,10 +444,10 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
       m_currentHttpRequest = httpRequest;
       m_currentJsonRequest = jsonRequest;
       if (jsonRequest.isStartupRequest()) {
-        m_jsonClientSession.processRequestLocale(httpRequest.getLocale());
+        getJsonClientSession().processRequestLocale(httpRequest.getLocale());
       }
       JsonResponse jsonResponse = currentJsonResponse();
-      m_jsonEventProcessor.processEvents(m_currentJsonRequest, jsonResponse);
+      getJsonEventProcessor().processEvents(m_currentJsonRequest, jsonResponse);
       return jsonResponse.toJson();
     }
     finally {

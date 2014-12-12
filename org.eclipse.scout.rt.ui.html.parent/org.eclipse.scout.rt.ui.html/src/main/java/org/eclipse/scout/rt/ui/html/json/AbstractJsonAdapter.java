@@ -17,7 +17,6 @@ import java.util.List;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.fields.ModelVariant;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonDesktop;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
@@ -214,37 +213,15 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     return m_jsonSession.getOrCreateJsonAdapter(model, getJsonSession().getRootJsonAdapter(), adapterFactory);
   }
 
-  /**
-   * Returns the ID of the JSON adapter for the given model.
-   * This method requires that the adapter has already been created before.
-   * The method will never create a new adapter instance.
-   */
-  protected final String getAdapterIdForModel(Object model) {
-    IJsonAdapter<?> adapter = getAdapter(model);
-    if (adapter == null) {
-      throw new IllegalArgumentException("No adapter registered for model=" + model);
-    }
-    return adapter.getId();
-  }
-
-  /**
-   * Returns a list of IDs of the JSON adapters for the given models.
-   * This method requires that the adapter has already been created before.
-   * The method will never create a new adapter instance.
-   */
-  protected final JSONArray adapterIdsToJsonForModel(Collection<?> models) {
-    return JsonObjectUtility.adapterIdsToJson(getAdapters(models));
-  }
-
   protected final JSONObject putAdapterIdProperty(JSONObject json, String key, Object model) {
     if (model == null) {
       return json;
     }
-    return JsonObjectUtility.putProperty(json, key, getAdapterIdForModel(model));
+    return JsonObjectUtility.putProperty(json, key, JsonAdapterUtility.getAdapterIdForModel(getJsonSession(), model, this));
   }
 
   protected final JSONObject putAdapterIdsProperty(JSONObject json, String key, Collection<?> models) {
-    return JsonObjectUtility.putProperty(json, key, adapterIdsToJsonForModel(models));
+    return JsonObjectUtility.putProperty(json, key, JsonAdapterUtility.getAdapterIdsForModel(getJsonSession(), models, this));
   }
 
   protected final JSONObject putProperty(JSONObject json, String key, Object value) {

@@ -8,17 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui.basic.table.control;
+package org.eclipse.scout.rt.ui.html.json.table.fixtures;
 
-import org.eclipse.scout.rt.client.ui.action.IAction;
-import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.client.ui.basic.table.control.AbstractTableControl;
 
-public interface ITableControl extends IAction {
-  String PROP_FORM = "form";
+public class TableControl extends AbstractTableControl {
 
-  void setForm(IForm form);
-
-  IForm getForm();
-
-  String getGroup();
 }

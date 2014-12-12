@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.html.json.testing;
 
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -18,8 +19,12 @@ import java.util.Locale;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.ui.html.json.AbstractJsonSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
+import org.eclipse.scout.rt.ui.html.json.JsonEventType;
 import org.eclipse.scout.rt.ui.html.json.JsonException;
 import org.eclipse.scout.rt.ui.html.json.JsonRequest;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
@@ -30,6 +35,7 @@ import org.junit.Assert;
 import org.mockito.Mockito;
 
 public final class JsonTestUtility {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonTestUtility.class);
 
   private JsonTestUtility() {
   }
@@ -57,14 +63,51 @@ public final class JsonTestUtility {
     return jsonSession;
   }
 
-  public static List<JsonEvent> extractEventsFromResponse(JsonResponse response, String eventType) throws JSONException {
+  /**
+   * Empties the response object and flushes the session
+   */
+  public static void endRequest(IJsonSession jsonSession) throws Exception {
+    Field field = AbstractJsonSession.class.getDeclaredField("m_currentJsonResponse");
+    field.setAccessible(true);
+    field.set(jsonSession, new JsonResponse());
+
+    jsonSession.flush();
+  }
+
+  /**
+   * @param adapterId
+   *          Optional. If set only events for the given id will be returned.
+   */
+  public static List<JsonEvent> extractEventsFromResponse(JsonResponse response, String eventType, String adapterId) throws JSONException {
     List<JsonEvent> list = new ArrayList<>();
     for (JsonEvent event : response.getEventList()) {
-      if (event.getType().equals(eventType)) {
+      if (event.getType().equals(eventType)
+          && (adapterId == null || adapterId.equals(event.getId()))) {
         list.add(event);
       }
     }
     return list;
+  }
+
+  public static List<JsonEvent> extractEventsFromResponse(JsonResponse response, String eventType) throws JSONException {
+    return extractEventsFromResponse(response, eventType, null);
+  }
+
+  public static List<JsonEvent> extractPropertyChangeEvents(JsonResponse response, String adapterId) throws JSONException {
+    return extractEventsFromResponse(response, JsonEventType.PROPERTY.getEventType(), adapterId);
+  }
+
+  public static <T> T extractProperty(JsonResponse response, String adapterId, String propertyName) throws JSONException {
+    List<JsonEvent> properties = JsonTestUtility.extractPropertyChangeEvents(response, adapterId);
+    if (properties.size() > 0) {
+      return extractProperty(properties.get(0).getData(), propertyName);
+    }
+    return null;
+  }
+
+  @SuppressWarnings("unchecked")
+  public static <T> T extractProperty(JSONObject data, String propertyName) throws JSONException {
+    return (T) data.getJSONObject("properties").get(propertyName);
   }
 
   public static void assertGC(WeakReference<?> ref) {
