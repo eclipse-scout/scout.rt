@@ -1,4 +1,4 @@
-package org.eclipse.scout.rt.ui.html;
+package org.eclipse.scout.rt.ui.html.res;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -9,20 +9,20 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 
 /**
- * Default implementation of a {@link IWebArchiveResourceLocator} that searches in the complete jee environment (war
+ * Default implementation of a {@link IWebContentResourceLocator} that searches in the complete jee environment (war
  * file)
  */
-public class JEEWebArchiveResourceLocator implements IWebArchiveResourceLocator {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JEEWebArchiveResourceLocator.class);
+public class JEEWebContentResourceLocator implements IWebContentResourceLocator {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JEEWebContentResourceLocator.class);
 
   private ServletContext m_servletContext;
 
-  public JEEWebArchiveResourceLocator(ServletContext servletContext) {
+  public JEEWebContentResourceLocator(ServletContext servletContext) {
     m_servletContext = servletContext;
   }
 
   @Override
-  public URL getScriptResource(String path) {
+  public URL getScriptSource(String path) {
     if (path.startsWith("/")) {
       path = path.substring(1);
     }

@@ -4,11 +4,15 @@
    <extension
          point="org.eclipse.scout.service.services">
       <service
-            class="org.eclipse.scout.rt.ui.html.DefaultRequestInterceptor"
+            class="org.eclipse.scout.rt.ui.html.json.JsonMessageRequestInterceptor"
             createImmediately="false">
       </service>
       <service
-            class="org.eclipse.scout.rt.ui.html.OsgiWebArchiveService"
+            class="org.eclipse.scout.rt.ui.html.res.StaticResourceRequestInterceptor"
+            createImmediately="false">
+      </service>
+      <service
+            class="org.eclipse.scout.rt.ui.html.res.OsgiWebContentService"
             createImmediately="false">
       </service>
       <service

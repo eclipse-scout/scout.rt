@@ -1,16 +1,16 @@
-package org.eclipse.scout.rt.ui.html;
+package org.eclipse.scout.rt.ui.html.res;
 
 import java.net.URL;
 
 import org.eclipse.scout.service.SERVICES;
 
 /**
- * Default implementation of a {@link IWebArchiveResourceLocator} that searches in local osgi bundle
+ * Default implementation of a {@link IWebContentResourceLocator} that searches in local osgi bundle
  */
-public class OsgiWebArchiveResourceLocator implements IWebArchiveResourceLocator {
+public class OsgiWebContentResourceLocator implements IWebContentResourceLocator {
 
   @Override
-  public URL getScriptResource(String path) {
+  public URL getScriptSource(String path) {
     if (path.startsWith("/")) {
       path = path.substring(1);
     }
@@ -34,7 +34,7 @@ public class OsgiWebArchiveResourceLocator implements IWebArchiveResourceLocator
   }
 
   protected URL getResourceImpl(String resourcePath) {
-    for (OsgiWebArchiveService s : SERVICES.getServices(OsgiWebArchiveService.class)) {
+    for (OsgiWebContentService s : SERVICES.getServices(OsgiWebContentService.class)) {
       URL url = s.getBundle().getEntry(resourcePath);
       if (url != null) {
         return url;

@@ -19,60 +19,63 @@ import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.IOUtility;
+import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.ui.html.AbstractRequestHandler;
 import org.eclipse.scout.rt.ui.html.AbstractScoutAppServlet;
-import org.eclipse.scout.rt.ui.html.cache.HttpCacheInfo;
+import org.eclipse.scout.rt.ui.html.IServletRequestInterceptor;
+import org.eclipse.scout.service.AbstractService;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * Handle HTTP POST requests containing a JSON message
+ * This interceptor contributes to the {@link AbstractScoutAppServlet} as the default POST handler
  */
-public class JsonMessageHandler extends AbstractRequestHandler {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonMessageHandler.class);
+@Priority(-10)
+public class JsonMessageRequestInterceptor extends AbstractService implements IServletRequestInterceptor {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonMessageRequestInterceptor.class);
 
-  public JsonMessageHandler(AbstractScoutAppServlet servlet, HttpServletRequest req, HttpServletResponse resp, String pathInfo) {
-    super(servlet, req, resp, pathInfo);
+  @Override
+  public boolean interceptGet(AbstractScoutAppServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    return false;
   }
 
   @Override
-  public boolean handle() throws ServletException, IOException {
+  public boolean interceptPost(AbstractScoutAppServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     //serve only /json
-    String pathInfo = getPathInfo();
+    String pathInfo = req.getPathInfo();
     if (CompareUtility.notEquals(pathInfo, "/json")) {
-      getHttpServletResponse().sendError(HttpServletResponse.SC_NOT_FOUND);
+      LOG.info("404_NOT_FOUND_POST: " + pathInfo);
+      resp.sendError(HttpServletResponse.SC_NOT_FOUND);
       return true;
     }
 
     //disable cache
-    HttpCacheInfo info = new HttpCacheInfo(-1, -1, -1);
-    getServlet().getHttpCacheControl().disableCacheHeaders(getHttpServletRequest(), getHttpServletResponse(), info);
+    servlet.getHttpCacheControl().disableCacheHeaders(req, resp);
 
-    JsonRequest jsonReq = new JsonRequest(decodeJSONRequest());
+    JsonRequest jsonReq = new JsonRequest(decodeJSONRequest(req));
     if (jsonReq.isPingRequest()) {
-      writeResponse(createPingJsonResponse().toJson());
+      writeResponse(resp, createPingJsonResponse().toJson());
       return true;
     }
 
-    IJsonSession jsonSession = getOrCreateJsonSession(jsonReq);
+    IJsonSession jsonSession = getOrCreateJsonSession(servlet, req, resp, jsonReq);
     if (jsonSession == null) {
       return true;
     }
 
     // GUI requests for the same session must be processed consecutively
     synchronized (jsonSession) {
-      JSONObject json = jsonSession.processRequest(getHttpServletRequest(), jsonReq);
-      writeResponse(json);
+      JSONObject json = jsonSession.processRequest(req, jsonReq);
+      writeResponse(resp, json);
     }
     return true;
   }
 
-  protected IJsonSession getOrCreateJsonSession(JsonRequest jsonReq) throws ServletException, IOException {
+  protected IJsonSession getOrCreateJsonSession(AbstractScoutAppServlet servlet, HttpServletRequest req, HttpServletResponse resp, JsonRequest jsonReq) throws ServletException, IOException {
     String jsonSessionAttributeName = "scout.htmlui.session.json." + jsonReq.getJsonSessionId();
-    HttpSession httpSession = getHttpServletRequest().getSession();
+    HttpSession httpSession = req.getSession();
 
     //FIXME cgu really synchronize on this? blocks every call, maybe introduce a lock object saved on httpSession or even better use java.util.concurrent.locks.ReadWriteLock
     synchronized (httpSession) {
@@ -90,12 +93,12 @@ public class JsonMessageHandler extends AbstractRequestHandler {
       if (jsonSession == null) {
         if (!jsonReq.isStartupRequest()) {
           LOG.info("Request cannot be processed due to JSON session timeout [id=" + jsonReq.getJsonSessionId() + "]");
-          writeError(createSessionTimeoutJsonResponse());
+          writeErrorResponse(resp, createSessionTimeoutJsonResponse());
           return null;
         }
         LOG.info("Creating new JSON session with ID " + jsonReq.getJsonSessionId() + "...");
-        jsonSession = getServlet().createJsonSession();
-        jsonSession.init(getHttpServletRequest(), new JsonStartupRequest(jsonReq));
+        jsonSession = servlet.createJsonSession();
+        jsonSession.init(req, new JsonStartupRequest(jsonReq));
         httpSession.setAttribute(jsonSessionAttributeName, jsonSession);
       }
       else if (jsonReq.isStartupRequest()) {
@@ -116,8 +119,12 @@ public class JsonMessageHandler extends AbstractRequestHandler {
     return new JsonResponse();
   }
 
-  protected void writeResponse(JSONObject json) throws IOException {
-    HttpServletResponse resp = getHttpServletResponse();
+  protected void writeErrorResponse(HttpServletResponse resp, JsonResponse jsonErrorResp) throws IOException {
+    resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+    writeResponse(resp, jsonErrorResp.toJson());
+  }
+
+  protected void writeResponse(HttpServletResponse resp, JSONObject json) throws IOException {
     String jsonText = json.toString();
     byte[] data = jsonText.getBytes("UTF-8");
     resp.setContentLength(data.length);
@@ -129,14 +136,9 @@ public class JsonMessageHandler extends AbstractRequestHandler {
     }
   }
 
-  protected void writeError(JsonResponse jsonResp) throws IOException {
-    getHttpServletResponse().setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-    writeResponse(jsonResp.toJson());
-  }
-
-  protected JSONObject decodeJSONRequest() {
+  protected JSONObject decodeJSONRequest(HttpServletRequest req) {
     try {
-      String jsonData = IOUtility.getContent(getHttpServletRequest().getReader());
+      String jsonData = IOUtility.getContent(req.getReader());
       if (LOG.isDebugEnabled()) {
         LOG.debug("Received: " + jsonData);
       }

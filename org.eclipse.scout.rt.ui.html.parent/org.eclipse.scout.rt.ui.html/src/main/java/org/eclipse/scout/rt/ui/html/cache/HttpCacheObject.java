@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.cache;
 
+import java.util.zip.Adler32;
+
 /**
  * Used in {@link IHttpCacheControl}
  */
@@ -17,11 +19,15 @@ public class HttpCacheObject {
   private final String m_pathInfo;
   private final byte[] m_content;
   private final long m_lastModified;
+  private final long m_fingerprint;
 
   public HttpCacheObject(String pathInfo, byte[] content, long lastModified) {
     m_pathInfo = pathInfo;
     m_content = content;
     m_lastModified = lastModified;
+    Adler32 a = new Adler32();
+    a.update(content);
+    m_fingerprint = a.getValue();
   }
 
   public String getPathInfo() {
@@ -34,5 +40,20 @@ public class HttpCacheObject {
 
   public long getLastModified() {
     return m_lastModified;
+  }
+
+  public long getFingerprint() {
+    return m_fingerprint;
+  }
+
+  /**
+   * Convenience for creating a {@link HttpCacheInfo} out of this object
+   */
+  public HttpCacheInfo toCacheInfo() {
+    HttpCacheInfo info = new HttpCacheInfo();
+    info.setContentLength(m_content.length);
+    info.setFingerprint(m_fingerprint);
+    info.setLastModified(m_lastModified);
+    return info;
   }
 }

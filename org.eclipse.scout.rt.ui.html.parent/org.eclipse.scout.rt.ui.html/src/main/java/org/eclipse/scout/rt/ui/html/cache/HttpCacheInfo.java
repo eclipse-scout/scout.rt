@@ -14,34 +14,55 @@ package org.eclipse.scout.rt.ui.html.cache;
  * Used in {@link IHttpCacheControl}
  */
 public class HttpCacheInfo {
-  private final long m_contentLength;
-  private final long m_lastModified;
-  private final int m_preferredCacheMaxAge;
+  private long m_contentLength = -1;
+  private long m_fingerprint = -1;
+  private long m_lastModified = -1;
+  private int m_preferredCacheMaxAge = -1;
 
-  public HttpCacheInfo(long contentLength, long lastModified, int preferredCacheMaxAge) {
-    m_contentLength = contentLength;
-    m_lastModified = lastModified;
-    m_preferredCacheMaxAge = preferredCacheMaxAge;
+  public HttpCacheInfo() {
   }
 
   public long getContentLength() {
     return m_contentLength;
   }
 
+  public void setContentLength(long contentLength) {
+    m_contentLength = contentLength;
+  }
+
+  public long getFingerprint() {
+    return m_fingerprint;
+  }
+
+  public void setFingerprint(long fingerprint) {
+    m_fingerprint = fingerprint;
+  }
+
   public long getLastModified() {
     return m_lastModified;
   }
 
+  public void setLastModified(long lastModified) {
+    m_lastModified = lastModified;
+  }
+
+  /**
+   * @return the preferred max age or -1 or 0 in oder to omit a max-age header
+   */
   public int getPreferredCacheMaxAge() {
     return m_preferredCacheMaxAge;
   }
 
+  public void setPreferredCacheMaxAge(int preferredCacheMaxAge) {
+    m_preferredCacheMaxAge = preferredCacheMaxAge;
+  }
+
   /**
-   * @return an ETAG if {@link #getLastModified()} and {@link #getContentLength()} are both not -1
+   * @return an ETAG if {@link #getContentLength()} and {@link #getFingerprint()} are both not -1
    */
   public String createETag() {
-    if (m_lastModified != -1L && m_contentLength != -1L) {
-      return "W/\"" + m_contentLength + "-" + m_lastModified + "\"";
+    if (m_fingerprint != -1L && m_contentLength != -1L) {
+      return "W/\"" + m_contentLength + "-" + m_fingerprint + "\"";
     }
     return null;
   }

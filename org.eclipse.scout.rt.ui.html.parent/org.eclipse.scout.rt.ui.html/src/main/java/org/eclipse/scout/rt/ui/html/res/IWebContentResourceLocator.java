@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.html;
+package org.eclipse.scout.rt.ui.html.res;
 
 import java.net.URL;
 
@@ -17,7 +17,7 @@ import javax.servlet.ServletContext;
 /**
  * Locate script and other web resources in either osgi or java jee environments
  */
-public interface IWebArchiveResourceLocator {
+public interface IWebContentResourceLocator {
 
   /**
    * @return the source (or template file) of a js or css script out of the folders
@@ -25,7 +25,7 @@ public interface IWebArchiveResourceLocator {
    *         <p>
    *         See {@link ServletContext#getResourcePaths(String)}
    */
-  URL getScriptResource(String path);
+  URL getScriptSource(String path);
 
   /**
    * @return a resource out of the folders <code>anyJarFile!/META-INF/resources/WebContent</code>

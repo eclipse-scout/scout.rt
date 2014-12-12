@@ -43,10 +43,16 @@ class GZIPServletResponseWrapper extends HttpServletResponseWrapper {
     return m_buf;
   }
 
+  /**
+   * only valid after {@link #finish(int)} was called
+   */
   public int getCompressedLength() {
     return m_compressedLength;
   }
 
+  /**
+   * only valid after {@link #finish(int)} was called
+   */
   public int getUncompressedLength() {
     return m_uncompressedLength;
   }
@@ -89,24 +95,40 @@ class GZIPServletResponseWrapper extends HttpServletResponseWrapper {
     super.flushBuffer();
   }
 
-  public void finish() throws IOException {
+  /**
+   * @param minimumLengthToCompress
+   *          is the minimum uncompressed size that is compressed, -1 disables compression
+   * @return true if the content was compressed
+   */
+  public boolean finish(int minimumLengthToCompress) throws IOException {
     if (m_writer != null) {
       m_writer.close();
+      m_writer = null;
     }
+    boolean compressed = false;
     if (m_buf != null) {
       m_buf.close();
       byte[] raw = m_buf.getContent();
       m_uncompressedLength = raw.length;
       m_buf = null;
-      byte[] gzipped = StreamUtility.compressGZIP(raw);
+
+      HttpServletResponse res = (HttpServletResponse) getResponse();
+      byte[] gzipped;
+      if (minimumLengthToCompress >= 0 && m_uncompressedLength >= minimumLengthToCompress) {
+        gzipped = StreamUtility.compressGZIP(raw);
+        res.addHeader(GZIPServletFilter.CONTENT_ENCODING, GZIPServletFilter.GZIP);
+        compressed = true;
+      }
+      else {
+        gzipped = raw;
+      }
       m_compressedLength = gzipped.length;
       raw = null;
-      HttpServletResponse res = (HttpServletResponse) getResponse();
-      res.addHeader(GZIPServletFilter.CONTENT_ENCODING, GZIPServletFilter.GZIP);
       res.setContentLength(gzipped.length);
       res.getOutputStream().write(gzipped);
       super.flushBuffer();
     }
+    return compressed;
   }
 
 }

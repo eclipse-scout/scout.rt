@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.ui.html.IWebArchiveResourceLocator;
+import org.eclipse.scout.rt.ui.html.ScoutAppHints;
 import org.eclipse.scout.rt.ui.html.StreamUtility;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
 import org.eclipse.scout.rt.ui.html.res.Script.NodeType;
@@ -29,33 +29,42 @@ import org.eclipse.scout.service.SERVICES;
  * <p>
  * js and css files are automatically compiled if the name matches the names defined in {@link Script}
  * <p>
- * Version is <code>1.2.3[-qualifier]</code> If the qualifier is the text "qualifier" then cache control is handled
- * automatically in production mode.
+ * Version is <code>1.2.3</code> or <code>1.2.3-fingerprint</code> where fingerprint is a hex number
  * <p>
- * The js and css compilation can be turned on and off using the url param ?debug=true which only builds the js and css
- * but does not compile/minimize it
+ * If the fingerprint is the text "fingerprint" then
+ * {@link StaticResourceRequestInterceptor#resolveIndexHtml(javax.servlet.http.HttpServletRequest)} replaces it with the
+ * effective hex fingerprint.
+ * <p>
+ * The js and css minify can be turned on and off using the url param ?minify=true, see {@link ScoutAppHints}
  */
-public class ScriptBuilder {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ScriptBuilder.class);
+public class ScriptFileBuilder {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ScriptFileBuilder.class);
 
   private static final Pattern INCLUDE_PAT = Pattern.compile("//\\s*@include\\s*\\(\\s*\"([^\"]+)\"\\s*\\)");
 
   private static final String UTF_8 = "UTF-8";
 
   /**
-   * $1$2-$3.min.$4 with $1=path, $2=basename, $3=version, (-qualifier), $4="js" or "css"
+   * Pattern for a script url that is not a {@link NodeType#SRC_FRAGMENT}
+   * <p>
+   * <code>path/basename-1.0.0.min.js</code> <code>path/basename-1.0.0-34fce3bc.min.js</code>
+   * <p>
+   *
+   * <pre>
+   * $1$2-$3[-$4].min.$5 with $1=path, $2=basename, $3=version, $4=fingerprint, $5="js" or "css"
+   * </pre>
    */
-  private static final Pattern NON_FRAGMENT_PATH_PATTERN = Pattern.compile("(.*/)([-_\\w]+)-([0-9.]+)(?:\\-\\w+)?\\.min\\.(js|css)");
+  public static final Pattern SCRIPT_URL_PATTERN = Pattern.compile("([^\"']*/)([-_\\w]+)-([0-9.]+)(?:\\-([a-f0-9]+|fingerprint))?\\.min\\.(js|css)");
 
-  private final IWebArchiveResourceLocator m_resourceLocator;
+  private final IWebContentResourceLocator m_resourceLocator;
   private final IScriptProcessorService m_scriptProcessorService;
   private boolean m_minifyEnabled;
 
-  public ScriptBuilder(IWebArchiveResourceLocator locator) {
+  public ScriptFileBuilder(IWebContentResourceLocator locator) {
     this(locator, SERVICES.getService(IScriptProcessorService.class));
   }
 
-  public ScriptBuilder(IWebArchiveResourceLocator locator, IScriptProcessorService scriptProcessorService) {
+  public ScriptFileBuilder(IWebContentResourceLocator locator, IScriptProcessorService scriptProcessorService) {
     m_resourceLocator = locator;
     m_scriptProcessorService = scriptProcessorService;
     if (m_scriptProcessorService == null) {
@@ -89,11 +98,11 @@ public class ScriptBuilder {
   }
 
   protected Script locateNonFragmentScript(String requestPath) throws IOException {
-    Matcher mat = NON_FRAGMENT_PATH_PATTERN.matcher(requestPath);
+    Matcher mat = SCRIPT_URL_PATTERN.matcher(requestPath);
     URL libraryMinimizedUrl = m_resourceLocator.getWebContentResource(requestPath);
     if (!mat.matches()) {
       if (libraryMinimizedUrl == null) {
-        throw new IOException("locate " + requestPath + ": does not match NON_FRAGMENT_PATH_PATTERN (" + NON_FRAGMENT_PATH_PATTERN.pattern() + ") and does not exist");
+        throw new IOException("locate " + requestPath + ": does not match SCRIPT_URL_PATTERN (" + SCRIPT_URL_PATTERN.pattern() + ") and does not exist");
       }
       Script.FileType fileType = (requestPath.endsWith(".js") ? Script.FileType.JS : Script.FileType.CSS);
       return new Script(requestPath, libraryMinimizedUrl, fileType, Script.NodeType.LIBRARY);
@@ -110,9 +119,9 @@ public class ScriptBuilder {
       };
       urls = new URL[]{
           libraryMinimizedUrl, //libraryMinimizedUrl
-          m_resourceLocator.getWebContentResource(mat.group(1) + mat.group(2) + "-" + mat.group(3) + "." + mat.group(4)), //libraryNonMinimizedUrl
-          m_resourceLocator.getWebContentResource(mat.group(1) + mat.group(2) + "-macro." + mat.group(4)), //macroUrl
-          m_resourceLocator.getScriptResource("" + mat.group(2) + "-module." + mat.group(4)), //srcModuleUrl
+          m_resourceLocator.getWebContentResource(mat.group(1) + mat.group(2) + "-" + mat.group(3) + "." + mat.group(5)), //libraryNonMinimizedUrl
+          m_resourceLocator.getWebContentResource(mat.group(1) + mat.group(2) + "-macro." + mat.group(5)), //macroUrl
+          m_resourceLocator.getScriptSource("" + mat.group(2) + "-module." + mat.group(5)), //srcModuleUrl
       };
     }
     else {
@@ -123,9 +132,9 @@ public class ScriptBuilder {
           Script.NodeType.LIBRARY,
       };
       urls = new URL[]{
-          m_resourceLocator.getWebContentResource(mat.group(1) + mat.group(2) + "-" + mat.group(3) + "." + mat.group(4)), //libraryNonMinimizedUrl
-          m_resourceLocator.getWebContentResource(mat.group(1) + mat.group(2) + "-macro." + mat.group(4)), //macroUrl
-          m_resourceLocator.getScriptResource("" + mat.group(2) + "-module." + mat.group(4)), //srcModuleUrl
+          m_resourceLocator.getWebContentResource(mat.group(1) + mat.group(2) + "-" + mat.group(3) + "." + mat.group(5)), //libraryNonMinimizedUrl
+          m_resourceLocator.getWebContentResource(mat.group(1) + mat.group(2) + "-macro." + mat.group(5)), //macroUrl
+          m_resourceLocator.getScriptSource("" + mat.group(2) + "-module." + mat.group(5)), //srcModuleUrl
           libraryMinimizedUrl, //libraryMinimizedUrl
       };
     }
@@ -134,12 +143,12 @@ public class ScriptBuilder {
     if (index < 0) {
       throw new IOException("locate " + requestPath + ": does not exist (no library, macro and source module)");
     }
-    Script.FileType fileType = ("js".equals(mat.group(4)) ? Script.FileType.JS : Script.FileType.CSS);
+    Script.FileType fileType = ("js".equals(mat.group(5)) ? Script.FileType.JS : Script.FileType.CSS);
     return new Script(requestPath, urls[index], fileType, nodeTypes[index]);
   }
 
   protected Script locateFragmentScript(String fragmentPath) throws IOException {
-    URL url = m_resourceLocator.getScriptResource(fragmentPath);
+    URL url = m_resourceLocator.getScriptSource(fragmentPath);
     if (url == null) {
       throw new IOException("locate fragment " + fragmentPath + ": does not exist");
     }

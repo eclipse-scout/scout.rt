@@ -21,15 +21,15 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.html.ScoutAppHints;
 
-public abstract class AbstractHttpCacheControl implements IHttpCacheControl {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractHttpCacheControl.class);
+public class DefaultHttpCacheControl implements IHttpCacheControl {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(DefaultHttpCacheControl.class);
 
   /**
    * This cache is servlet-wide (all sessions)
    */
   private Map<String, HttpCacheObject> m_cache = Collections.synchronizedMap(new HashMap<String, HttpCacheObject>());
 
-  protected AbstractHttpCacheControl() {
+  public DefaultHttpCacheControl() {
   }
 
   @Override
@@ -59,27 +59,30 @@ public abstract class AbstractHttpCacheControl implements IHttpCacheControl {
   @Override
   public boolean checkAndUpdateCacheHeaders(HttpServletRequest req, HttpServletResponse resp, HttpCacheInfo info) {
     if (!ScoutAppHints.isCacheHint(req)) {
-      disableCacheHeaders(req, resp, info);
+      disableCacheHeaders(req, resp);
       return false;
     }
     int maxAge = info.getPreferredCacheMaxAge();
-    resp.setHeader("cache-control", "public, max-age=" + maxAge + ", s-maxage=" + maxAge);
+    if (maxAge > 0) {
+      resp.setHeader("cache-control", "public, max-age=" + maxAge + ", s-maxage=" + maxAge);
+    }
+    else {
+      resp.setHeader("cache-control", "private, max-age=0, must-revalidate");
+    }
 
     String etag = info.createETag();
-
-    // Check for cache revalidation.
-    // We should prefer ETag validation as the guarantees are stronger and all
-    // HTTP 1.1 clients should be using it
     String ifNoneMatch = req.getHeader(IF_NONE_MATCH);
     if (notModified(ifNoneMatch, etag)) {
-      LOG.info("http-cache (etag): " + req.getPathInfo());
+      LOG.info("use http cached object (etag): " + req.getPathInfo());
+      resp.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
       return true;
     }
     else {
       long ifModifiedSince = req.getDateHeader(IF_MODIFIED_SINCE);
       // for purposes of comparison we add 999 to ifModifiedSince since the fidelity of the IMS header generally doesn't include milli-seconds
       if (notModifiedSince(ifModifiedSince, info.getLastModified())) {
-        LOG.info("http-cache (ifModifiedSince): " + req.getPathInfo());
+        LOG.info("use http cached object (ifModifiedSince): " + req.getPathInfo());
+        resp.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
         return true;
       }
     }
@@ -95,7 +98,7 @@ public abstract class AbstractHttpCacheControl implements IHttpCacheControl {
   }
 
   @Override
-  public void disableCacheHeaders(HttpServletRequest req, HttpServletResponse resp, HttpCacheInfo info) {
+  public void disableCacheHeaders(HttpServletRequest req, HttpServletResponse resp) {
     resp.setHeader("cache-control", "private, max-age=0, no-cache, no-store, must-revalidate");
   }
 

@@ -16,23 +16,29 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.commons.servletfilter.HttpServletEx;
-import org.eclipse.scout.rt.ui.html.cache.HttpCacheControlInDevelopment;
-import org.eclipse.scout.rt.ui.html.cache.HttpCacheControlInProduction;
+import org.eclipse.scout.rt.ui.html.cache.DefaultHttpCacheControl;
 import org.eclipse.scout.rt.ui.html.cache.IHttpCacheControl;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
+import org.eclipse.scout.rt.ui.html.json.JsonMessageRequestInterceptor;
+import org.eclipse.scout.rt.ui.html.res.IWebContentResourceLocator;
+import org.eclipse.scout.rt.ui.html.res.OsgiWebContentResourceLocator;
+import org.eclipse.scout.rt.ui.html.res.StaticResourceRequestInterceptor;
 import org.eclipse.scout.service.SERVICES;
 
 /**
  * Instances of this class must be registered as servlet root path "/"
  * <p>
- * The index.html is served as "/" or "/index.html" using HTTP GET
+ * The index.html is served as "/" or "/index.html" using HTTP GET, see {@link StaticResourceRequestInterceptor}
  * <p>
- * Ajax requests are processed as "/json" using HTTP POST
+ * Scripts js and css are served using HTTP GET, see {@link StaticResourceRequestInterceptor}
+ * <p>
+ * Images and fonts are served using HTTP GET, see {@link StaticResourceRequestInterceptor}
+ * <p>
+ * Ajax requests are processed as "/json" using HTTP POST, see {@link JsonMessageRequestInterceptor}
  */
 public abstract class AbstractScoutAppServlet extends HttpServletEx {
   private static final long serialVersionUID = 1L;
@@ -55,7 +61,7 @@ public abstract class AbstractScoutAppServlet extends HttpServletEx {
     }
   };
 
-  private final IWebArchiveResourceLocator m_resourceLocator;
+  private final IWebContentResourceLocator m_resourceLocator;
   private final IHttpCacheControl m_httpCacheControl;
 
   protected AbstractScoutAppServlet() {
@@ -63,17 +69,17 @@ public abstract class AbstractScoutAppServlet extends HttpServletEx {
     m_httpCacheControl = createHttpCacheControl();
   }
 
-  protected IWebArchiveResourceLocator createResourceLocator() {
+  protected IWebContentResourceLocator createResourceLocator() {
     //TODO imo change once we switch from OSGI to JEE; move WebContent to src/main/resources/META-INF/resources/WebContent, move src/main/js to src/main/resources/META-INF/resources/js
-    return new OsgiWebArchiveResourceLocator();
+    return new OsgiWebContentResourceLocator();
   }
 
-  public IWebArchiveResourceLocator getResourceLocator() {
+  public IWebContentResourceLocator getResourceLocator() {
     return m_resourceLocator;
   }
 
   protected IHttpCacheControl createHttpCacheControl() {
-    return Platform.inDevelopmentMode() ? new HttpCacheControlInDevelopment() : new HttpCacheControlInProduction();
+    return new DefaultHttpCacheControl();
   }
 
   public IHttpCacheControl getHttpCacheControl() {

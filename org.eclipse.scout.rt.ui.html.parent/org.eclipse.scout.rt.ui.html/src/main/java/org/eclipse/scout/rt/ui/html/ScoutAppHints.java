@@ -32,7 +32,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 public final class ScoutAppHints {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ScoutAppHints.class);
 
-  private static final String URL_PARAM_ALL_HINTS = "debug";//enables cache, compress, minify
+  private static final String URL_PARAM_DEBUG = "debug";//enables/disbles cache, compress, minify
   private static final String URL_PARAM_CACHE_HINT = "cache";
   private static final String URL_PARAM_COMPRESS_HINT = "compress";
   private static final String URL_PARAM_MINIFY_HINT = "minify";
@@ -46,25 +46,32 @@ public final class ScoutAppHints {
   }
 
   public static void updateHints(HttpServletRequest req) {
-    updateHint(req, URL_PARAM_ALL_HINTS, SESSION_ATTRIBUTE_CACHE_HINT, SESSION_ATTRIBUTE_COMPRESS_HINT, SESSION_ATTRIBUTE_MINIFY_HINT);
-    updateHint(req, URL_PARAM_CACHE_HINT, SESSION_ATTRIBUTE_CACHE_HINT);
-    updateHint(req, URL_PARAM_COMPRESS_HINT, SESSION_ATTRIBUTE_COMPRESS_HINT);
-    updateHint(req, URL_PARAM_MINIFY_HINT, SESSION_ATTRIBUTE_MINIFY_HINT);
+    Boolean debug = getRequestParameterBoolean(req, URL_PARAM_DEBUG);
+    if (debug != null) {
+      updateHint(req, !debug.booleanValue(), SESSION_ATTRIBUTE_CACHE_HINT, SESSION_ATTRIBUTE_COMPRESS_HINT, SESSION_ATTRIBUTE_MINIFY_HINT);
+    }
+    updateHint(req, getRequestParameterBoolean(req, URL_PARAM_CACHE_HINT), SESSION_ATTRIBUTE_CACHE_HINT);
+    updateHint(req, getRequestParameterBoolean(req, URL_PARAM_COMPRESS_HINT), SESSION_ATTRIBUTE_COMPRESS_HINT);
+    updateHint(req, getRequestParameterBoolean(req, URL_PARAM_MINIFY_HINT), SESSION_ATTRIBUTE_MINIFY_HINT);
   }
 
-  private static void updateHint(HttpServletRequest req, String urlParamNameToReadFrom, String... sessionAttributeNameToStoreTo) {
-    String s = req.getParameter(urlParamNameToReadFrom);
-    if (s == null) {
+  private static void updateHint(HttpServletRequest req, Boolean value, String... sessionAttributeNameToStoreTo) {
+    if (value == null) {
       return;
     }
     HttpSession session = req.getSession(false);
     if (session == null) {
       return;
     }
-    boolean hint = ("true".equals(s));
     for (String attName : sessionAttributeNameToStoreTo) {
-      session.setAttribute(attName, hint);
+      LOG.info("set ScoputAppHint: " + attName + "=" + value);
+      session.setAttribute(attName, value);
     }
+  }
+
+  private static Boolean getRequestParameterBoolean(HttpServletRequest req, String name) {
+    String s = req.getParameter(name);
+    return s != null ? ("true".equals(s)) : null;
   }
 
   public static boolean isCacheHint(HttpServletRequest req) {

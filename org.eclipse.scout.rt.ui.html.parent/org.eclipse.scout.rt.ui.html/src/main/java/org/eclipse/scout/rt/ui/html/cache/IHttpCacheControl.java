@@ -27,6 +27,9 @@ public interface IHttpCacheControl {
   String IF_NONE_MATCH = "If-None-Match"; //$NON-NLS-1$
   String ETAG = "ETag"; //$NON-NLS-1$
 
+  int MAX_AGE_ONE_YEAR = 365 * 24 * 3600;
+  int MAX_AGE_4_HOURS = 4 * 3600;
+
   void putCacheObject(HttpServletRequest req, HttpCacheObject o);
 
   HttpCacheObject getCacheObject(HttpServletRequest req, String pathInfo);
@@ -37,25 +40,22 @@ public interface IHttpCacheControl {
   HttpCacheObject removeCacheObject(HttpServletRequest req, String pathInfo);
 
   /**
-   * @return the "qualifier" replacement string used in html files with script and css tags
-   */
-  String getQualifierReplacement();
-
-  /**
    * Checks whether the file needs to be returned or not, depending on the request headers and file modification state.
    * Also writes cache headers (last modified and etag) if the file needs to be returned.
    * <p>
    * If info is null, then this method does nothing
    *
-   * @return true if the file hasn't changed in the meantime (the caller should return
-   *         {@link HttpServletResponse#SC_NOT_MODIFIED} ) or
-   *         false if the content of the file needs to be returned.
+   * @return true if the file hasn't changed in the meantime. The {@link HttpServletResponse#SC_NOT_MODIFIED} reponse is
+   *         then sent by this method and the caller should end its processing of this request.
+   *         <p>
+   *         false if the content of the file needs to be returned, Etag, IfModifiedSince and MaxAge headers were set if
+   *         appropriate.
    */
   boolean checkAndUpdateCacheHeaders(HttpServletRequest req, HttpServletResponse resp, HttpCacheInfo info);
 
   /**
    * Disable cache for this resource
    */
-  void disableCacheHeaders(HttpServletRequest req, HttpServletResponse resp, HttpCacheInfo info);
+  void disableCacheHeaders(HttpServletRequest req, HttpServletResponse resp);
 
 }

@@ -101,9 +101,11 @@ public class GZIPServletFilter implements Filter {
 
     if (resp instanceof GZIPServletResponseWrapper) {
       GZIPServletResponseWrapper gzipResp = (GZIPServletResponseWrapper) resp;
-      gzipResp.finish();
-      if (LOG.isInfoEnabled()) {
-        LOG.info("GZIP response[size " + (gzipResp.getCompressedLength() * 100 / gzipResp.getUncompressedLength()) + "%, uncompressed: " + gzipResp.getUncompressedLength() + ", compressed: " + gzipResp.getCompressedLength() + "]: " + req.getPathInfo());
+      boolean compressed = gzipResp.finish(minimumLengthToCompress(req));
+      if (compressed) {
+        if (LOG.isInfoEnabled()) {
+          LOG.info("GZIP response[size " + (gzipResp.getCompressedLength() * 100 / gzipResp.getUncompressedLength()) + "%, uncompressed: " + gzipResp.getUncompressedLength() + ", compressed: " + gzipResp.getCompressedLength() + "]: " + req.getPathInfo());
+        }
       }
     }
   }
@@ -126,14 +128,23 @@ public class GZIPServletFilter implements Filter {
     if (pathInfo == null) {
       return false;
     }
-    int len = req.getContentLength();
-    if ("GET".equals(req.getMethod()) && lengthAtLeast(len, m_getMinSize) && m_getPattern.matcher(pathInfo).matches()) {
+    if ("GET".equals(req.getMethod()) && m_getPattern.matcher(pathInfo).matches()) {
       return true;
     }
-    if ("POST".equals(req.getMethod()) && lengthAtLeast(len, m_postMinSize) && m_postPattern.matcher(pathInfo).matches()) {
+    if ("POST".equals(req.getMethod()) && m_postPattern.matcher(pathInfo).matches()) {
       return true;
     }
     return false;
+  }
+
+  protected int minimumLengthToCompress(HttpServletRequest req) {
+    if ("GET".equals(req.getMethod())) {
+      return m_getMinSize;
+    }
+    if ("POST".equals(req.getMethod())) {
+      return m_postMinSize;
+    }
+    return -1;
   }
 
   private boolean lengthAtLeast(int len, int minSize) {
