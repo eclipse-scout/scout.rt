@@ -20,7 +20,7 @@ scout.logging = {
         log4javascript.getDefaultLogger().setLevel(logLevel);
         $.log = log4javascript.getDefaultLogger();
       };
-      if (log4javascript === undefined) {
+      if (typeof log4javascript === 'undefined') {
         // If log4javascript is not yet installed, dynamically load the library
         $deferred = $.getCachedScript('res/log4javascript.min.js')
           .done(function(script, textStatus) {
