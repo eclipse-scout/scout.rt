@@ -277,6 +277,13 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
   }
 
   @Override
+  public void initCustomParams(Map<String, String> customParams) {
+    if (LOG.isInfoEnabled()) {
+      LOG.info("customParams: " + customParams);
+    }
+  }
+
+  @Override
   public final void startSession(Bundle bundle) {
     m_bundle = bundle;
     if (isActive()) {

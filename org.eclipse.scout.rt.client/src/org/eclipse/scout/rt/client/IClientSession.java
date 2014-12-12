@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client;
 
+import java.util.Map;
+
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -32,6 +34,14 @@ public interface IClientSession extends ISession {
   boolean isLoaded();
 
   Throwable getLoadError();
+
+  /**
+   * Called before {@link #startSession(Bundle)} in order to prepare the state used to start the session with some
+   * custom and runtime options
+   * 
+   * @since 4.2
+   */
+  void initCustomParams(Map<String, String> customParams);
 
   /**
    * Start model thread with job queue<br>
