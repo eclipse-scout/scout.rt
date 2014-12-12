@@ -3,6 +3,7 @@ package org.eclipse.scout.rt.client.ui.desktop.outline;
 import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.form.fields.ModelVariant;
 import org.eclipse.scout.rt.shared.TEXTS;
@@ -13,6 +14,7 @@ import org.eclipse.scout.rt.shared.TEXTS;
  * form (if one exists). So the behavior is slightly different in these two cases.
  */
 @ModelVariant("NavigateUp")
+@Order(-200)
 public class OutlineNavigateUpMenu extends AbstractOutlineNavigationMenu {
 
   public OutlineNavigateUpMenu(IOutline outline) {
