@@ -19,7 +19,7 @@ scout.Button.SYSTEM_TYPE = {
  * Container and field are the same thing.
  */
 scout.Button.prototype._render = function($parent) {
-  this.addContainer($parent, 'button', new scout.ButtonFieldLayout());
+  this.addContainer($parent, 'button', new scout.ButtonLayout());
   this.addField($('<button>').
     on('click', function() {
       this.session.send('clicked', this.id);
