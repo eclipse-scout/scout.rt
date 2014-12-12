@@ -7,10 +7,15 @@ scout.inherits(scout.SmartFieldMultiline, scout.AbstractSmartField);
 
 scout.SmartFieldMultiline.prototype._render = function($parent) {
   this.addContainer($parent, 'smart-field');
+
   this.addLabel();
   this.addMandatoryIndicator();
-  var $fieldContainer = $('<div>'),
-    $field = scout.fields.new$TextField().
+
+  var $fieldContainer = $('<div>');
+  var htmlComp = new scout.HtmlComponent($fieldContainer, this.session);
+  htmlComp.setLayout(new scout.SmartFieldMultilineLayout());
+
+  var $field = scout.fields.new$TextField().
       addClass('multiline').
       blur(this._onFieldBlur.bind(this)).
       click(this._onClick.bind(this)).
@@ -19,8 +24,9 @@ scout.SmartFieldMultiline.prototype._render = function($parent) {
       appendTo($fieldContainer);
   this.addField($field, $fieldContainer);
   this.addIcon($fieldContainer);
-  this._$multilineField = $.makeDiv('multiline-field', '<br/><br/>').
-    appendTo($fieldContainer);
+  this._$multilineField = $.makeDiv('multiline-field')
+    .appendTo($fieldContainer);
+
   this.addStatus();
 };
 
@@ -40,9 +46,9 @@ scout.SmartFieldMultiline.prototype._getInputBounds = function() {
 };
 
 scout.SmartFieldMultiline.prototype._splitValue = function(value) {
-  var tmp, firstLine = '', multiLines = '<br/><br/>';
+  var firstLine = '', multiLines = '';
   if (value) {
-    tmp = value.split("\n");
+    var tmp = value.split("\n");
     firstLine = tmp.shift();
     multiLines = tmp.join('<br/>');
   }

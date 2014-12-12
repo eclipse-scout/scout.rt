@@ -25,6 +25,8 @@
     border-bottom-left-radius: @border-radius;
     border-top: none;
     padding: 3px 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
    & input.multiline ~ .icon {
