@@ -40,7 +40,7 @@ public class JsonSequenceBox<T extends ISequenceBox> extends JsonFormField<T> {
 
   @Override
   public JSONObject toJson() {
-    return putProperty(super.toJson(), PROP_FIELDS, getAdapterIdsForModels(getModel().getFields()));
+    return putAdapterIdsProperty(super.toJson(), PROP_FIELDS, getModel().getFields());
   }
 
 }

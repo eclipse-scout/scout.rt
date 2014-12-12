@@ -15,15 +15,11 @@ public interface IJsonAdapter<T extends Object> extends IJsonMapper {
   /**
    * Returns a string used to identify the object-type in the JSON output
    * (JSON attribute 'objectType').
-   *
-   * @return
    */
   String getObjectType();
 
   /**
    * Returns the Scout model object.
-   *
-   * @return
    */
   T getModel();
 

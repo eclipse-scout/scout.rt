@@ -145,10 +145,6 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     throw new IllegalStateException("Event not handled. " + event);
   }
 
-  protected final JSONObject putProperty(JSONObject json, String key, Object value) {
-    return JsonObjectUtility.putProperty(json, key, value);
-  }
-
   @Override
   public final <A extends IJsonAdapter<?>> A attachAdapter(Object model) {
     if (model == null) {
@@ -228,7 +224,6 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     if (adapter == null) {
       throw new IllegalArgumentException("No adapter registered for model=" + model);
     }
-    //FIXME AWE can assert already isAttached() here?
     return adapter.getId();
   }
 
@@ -237,16 +232,8 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
    * This method requires that the adapter has already been created before.
    * The method will never create a new adapter instance.
    */
-  protected final JSONArray getAdapterIdsForModels(Collection<?> models) {
-    return adapterIdsToJson(getAdapters(models));
-  }
-
-  //FIXME cgu besser static imports
-  /**
-   * Returns a list of IDs of the JSON adapters for the given adapters.
-   */
-  protected final JSONArray adapterIdsToJson(Collection<IJsonAdapter<?>> adapters) {
-    return JsonObjectUtility.adapterIdsToJson(adapters);
+  protected final JSONArray adapterIdsToJsonForModel(Collection<?> models) {
+    return JsonObjectUtility.adapterIdsToJson(getAdapters(models));
   }
 
   protected final JSONObject putAdapterIdProperty(JSONObject json, String key, Object model) {
@@ -257,7 +244,11 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
   }
 
   protected final JSONObject putAdapterIdsProperty(JSONObject json, String key, Collection<?> models) {
-    return JsonObjectUtility.putProperty(json, key, getAdapterIdsForModels(models));
+    return JsonObjectUtility.putProperty(json, key, adapterIdsToJsonForModel(models));
+  }
+
+  protected final JSONObject putProperty(JSONObject json, String key, Object value) {
+    return JsonObjectUtility.putProperty(json, key, value);
   }
 
   protected final void addActionEvent(String eventName, JSONObject json) {

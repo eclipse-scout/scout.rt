@@ -23,7 +23,7 @@ describe("ModelAdapter", function() {
 
     // Create a dummy object
     var modelAdapter = new scout.ModelAdapter();
-    modelAdapter.id = '2';
+    model.id = '2';
     modelAdapter.init(model, session);
     session.registerModelAdapter(modelAdapter);
 
@@ -122,7 +122,7 @@ describe("ModelAdapter", function() {
     it("check if model properties are copied to adapter", function() {
       var model = { foo: 6 },
         adapter = new scout.ModelAdapter();
-      adapter.id = '123';
+      model.id = '123';
       adapter.init(model, session);
       expect(adapter.foo).toBe(6);
     });

@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form;
 
+import static org.eclipse.scout.rt.ui.html.json.JsonObjectUtility.adapterIdsToJson;
+
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -99,7 +101,7 @@ public class JsonForm<T extends IForm> extends AbstractJsonPropertyObserver<T> i
     putProperty(json, PROP_MODAL, model.isModal());
     putProperty(json, PROP_DISPLAY_HINT, displayHintToJson(model.getDisplayHint()));
     putProperty(json, PROP_DISPLAY_VIEW_ID, model.getDisplayViewId());
-    putProperty(json, "rootGroupBox", getAdapterIdForModel(model.getRootGroupBox()));
+    putAdapterIdProperty(json, "rootGroupBox", model.getRootGroupBox());
     if (getModel() instanceof IForm5) {
       JsonContextMenu<IContextMenu> jsonContextMenu = getAdapter(((IForm5) getModel()).getContextMenu());
       if (jsonContextMenu != null) {

@@ -32,7 +32,7 @@ public class JsonAnalysisTableControl<T extends IAnalysisTableControl> extends J
     JSONObject json = super.toJson();
     if (getModel().isSelected()) {
       putProperty(json, "rootEntityRef", "e140"); //FIXME CGU
-      putProperty(json, IAnalysisTableControl.PROP_DATA_MODEL, getAdapterIdForModel(getModel().getDataModel()));
+      putAdapterIdProperty(json, IAnalysisTableControl.PROP_DATA_MODEL, getModel().getDataModel());
       m_contentLoaded = true;
     }
     return json;

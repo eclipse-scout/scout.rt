@@ -32,9 +32,7 @@ public class JsonSessionMock extends AbstractJsonSession {
   public void init(HttpServletRequest request, JsonStartupRequest jsonStartupRequest) {
     m_jsonClientSession = Mockito.mock(JsonClientSession.class);
     m_jsonDesktopMock = new JsonDesktopMock(Mockito.mock(IDesktop.class), this, createUniqueIdFor(null), m_jsonClientSession);
-//    JsonAdapterMock<Object> jsonDesktop = new JsonAdapterMock<Object>(new Object(), this, createUniqueIdFor(null), m_jsonClientSession)
     Mockito.when(m_jsonClientSession.getJsonDesktop()).thenReturn(m_jsonDesktopMock);
-//    Mockito.when(jsonDesktop.getJsonSession()).thenReturn(this);
 
     // For a fully initialized jsonSession use TestEnvironmentJsonSession
   }

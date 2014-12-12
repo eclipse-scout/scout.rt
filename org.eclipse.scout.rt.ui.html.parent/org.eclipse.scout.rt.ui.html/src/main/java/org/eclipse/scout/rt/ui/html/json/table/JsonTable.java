@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.table;
 
+import static org.eclipse.scout.rt.ui.html.json.JsonObjectUtility.adapterIdsToJson;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
