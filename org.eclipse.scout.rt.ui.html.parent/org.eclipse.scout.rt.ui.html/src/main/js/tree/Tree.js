@@ -380,7 +380,6 @@ scout.Tree.prototype._onNodeExpanded = function(nodeId, expanded) {
 scout.Tree.prototype._onNodeChanged = function(nodeId, cell) {
   var node = this._nodeMap[nodeId];
   node.text = cell.text;
-
   if (this.rendered) {
     var $node = this.$nodeById(node.id);
     $node.html(node.text);
@@ -527,7 +526,7 @@ scout.Tree.prototype._onNodeControlClick = function(event) {
     expanded = !$node.hasClass('expanded'),
     node = $node.data('node');
 
-  //TODO cru/cgu: talk about click on not seleced nodes
+  //TODO cru/cgu: talk about click on not selected nodes
   this.setNodesSelected([node], [$node]);
   this.setNodeExpanded(node, $node, expanded);
 
@@ -637,15 +636,7 @@ scout.Tree.prototype.onModelAction = function(event) {
   } else if (event.type === 'nodeExpanded') {
     this._onNodeExpanded(event.nodeId, event.expanded);
   } else if (event.type === 'nodeChanged') {
-    // FIXME AWE/CGU: das problem ist hier, dass dieser event für die neue node kommt bevor die nodes inserted wurden!
-    if (this._nodeMap[event.nodeId]) {
       this._onNodeChanged(event.nodeId, event);
-    } else {
-      // do later hack --> events sortieren?
-      setTimeout(function() {
-        this._onNodeChanged(event.nodeId, event);
-      }.bind(this));
-    }
   } else {
     $.log.warn('Model event not handled. Widget: Tree. Event: ' + event.type + '.');
   }

@@ -49,12 +49,11 @@ public class TreeEventFilter extends AbstractEventFilter<TreeEvent, TreeEventFil
         Collection<ITreeNode> nodes = new ArrayList<>(event.getNodes());
         nodes.removeAll(condition.getNodes());
         if (nodes.size() == 0) {
-          //Event should be ignored if no nodes remain or if the event contained no nodes at all
+          // Event should be ignored if no nodes remain or if the event contained no nodes at all
           return null;
         }
 
-        TreeEvent newEvent = new TreeEvent(m_source, event.getType(), event.getCommonParentNode(), nodes);
-        return newEvent;
+        return new TreeEvent(m_source, event.getType(), event.getCommonParentNode(), nodes);
       }
     }
     return event;

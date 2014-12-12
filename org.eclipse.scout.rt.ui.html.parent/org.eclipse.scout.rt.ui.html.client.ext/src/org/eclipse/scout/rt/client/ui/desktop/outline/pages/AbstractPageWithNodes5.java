@@ -122,7 +122,7 @@ public abstract class AbstractPageWithNodes5 extends AbstractExtensiblePageWithN
       return;
     }
     IForm form = execCreateDetailForm();
-    if (form != null && form instanceof IForm) {
+    if (form instanceof IForm) {
       IForm5 form5 = (IForm5) form;
       List<IMenu> menus = form5.getContextMenu().getChildActions();
       adaptDetailFormMenus(menus);

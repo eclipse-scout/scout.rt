@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.html.json;
 
 import java.io.IOException;
+import java.net.URL;
 
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -32,9 +33,13 @@ public class JsonDataModel<T extends IDataModel> extends AbstractJsonAdapter<T> 
 
   @Override
   public JSONObject toJson() {
+    URL url = Activator.getDefault().getBundle().getResource("resources/dummy_datamodel.json");
+    if (url == null) {
+      throw new JsonException("Failed to load dummy_datamodel.json");
+    }
     try {
-      //FIXME read from model
-      String jsonData = new String(IOUtility.getContent(Activator.getDefault().getBundle().getResource("resources/dummy_datamodel.json").openStream()), "utf-8");
+      // FIXME read from model
+      String jsonData = new String(IOUtility.getContent(url.openStream()), "utf-8");
       JSONObject json = new JSONObject(jsonData);
       putProperty(json, "objectType", getObjectType());
       putProperty(json, "id", getId());

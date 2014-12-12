@@ -548,9 +548,17 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   }
 
   protected void handleModelTableEvent(TableEvent event) {
-    // FIXME CGU we need to coalesce the events during the same request (something like AbstractTable.processEventBuffer). I don't think the developer should be responsible for this (using setTableChanging(true))
-    // Example: The developer calls addRow several times for the same table -> must generate only one json event -> reduces data and improves redrawing performance on client
-    // Another usecase: If a table row gets edited the developer typically reloads the whole table -> transmits every row again -> actually only the difference needs to be sent. Not sure if this is easy to solve
+    /* FIXME CGU we need to coalesce the events during the same request (something like AbstractTable.processEventBuffer). I don't think the developer should be responsible for this (using setTableChanging(true))
+     * Example: The developer calls addRow several times for the same table -> must generate only one json event -> reduces data and improves redrawing performance on client
+     * Another usecase: If a table row gets edited the developer typically reloads the whole table -> transmits every row again -> actually only the difference needs to be sent. Not sure if this is easy to solve
+     *
+     * Detected by A.WE: when the Firma-Node is loaded the following happens:
+     * - event rowsInserted (3 rows)
+     * - event allRowsDeleted
+     * - event rowsInserted again (the same 3 rows)
+     *
+     * Only one rowsInserted event should be sent. Must analyze what happens in the model.
+     */
     event = m_tableEventFilter.filter(event);
     if (event == null) {
       return;

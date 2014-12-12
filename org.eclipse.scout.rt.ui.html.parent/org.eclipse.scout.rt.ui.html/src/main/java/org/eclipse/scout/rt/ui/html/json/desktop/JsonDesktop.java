@@ -98,9 +98,9 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
   private List<IAction> filterModelActions() {
     List<IAction> result = new ArrayList<>();
     for (IAction a : getModel().getActions()) {
-      if (hasClassName(a, "UserProfileMenu") ||
-          hasClassName(a, "PhoneFormToolButton") ||
-          hasClassName(a, "ProcessAssistantFormToolButton")) {
+      if (hasClassName(a, "UserProfileMenu")
+          || hasClassName(a, "PhoneFormToolButton")
+          || hasClassName(a, "ProcessAssistantFormToolButton")) {
         result.add(a);
       }
     }

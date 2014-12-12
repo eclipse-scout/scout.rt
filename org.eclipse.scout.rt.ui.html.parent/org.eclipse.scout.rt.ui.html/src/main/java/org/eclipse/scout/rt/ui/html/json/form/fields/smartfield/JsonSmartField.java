@@ -89,9 +89,7 @@ public class JsonSmartField<V, T extends ISmartField<V>> extends JsonValueField<
   @Override
   protected void attachModel() {
     super.attachModel();
-    m_options = isCachingEnabled() ?
-        loadOptions(IContentAssistField.BROWSE_ALL_TEXT) :
-        Collections.<ILookupRow<V>> emptyList();
+    m_options = isCachingEnabled() ? loadOptions(IContentAssistField.BROWSE_ALL_TEXT) : Collections.<ILookupRow<V>> emptyList();
   }
 
   private JSONArray optionsToJson(List<? extends ILookupRow<V>> options) {

@@ -43,7 +43,4 @@ public class JsonGridData implements IJsonMapper {
     return json;
   }
 
-  // TODO AWE: (json) klassen wie diese sollten statisch sein, oder evtl. in eine factory verschoben werden?
-  // siehe auch JsonProcessingStatus
-
 }
