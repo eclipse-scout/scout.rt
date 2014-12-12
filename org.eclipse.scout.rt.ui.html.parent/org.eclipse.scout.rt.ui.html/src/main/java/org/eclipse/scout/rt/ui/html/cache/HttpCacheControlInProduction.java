@@ -15,7 +15,7 @@ public class HttpCacheControlInProduction extends AbstractHttpCacheControl {
   @Override
   public String getQualifierReplacement() {
     //FIXME imo where to get?
-    return "5.0.0";
+    return "653563432";
   }
 
 }
