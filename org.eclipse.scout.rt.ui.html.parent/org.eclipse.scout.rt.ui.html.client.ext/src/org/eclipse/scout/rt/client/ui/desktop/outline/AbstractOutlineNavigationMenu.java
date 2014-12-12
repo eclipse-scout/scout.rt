@@ -10,13 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.outline;
 
-import java.util.Set;
-
-import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.shared.ui.menu.AbstractMenu5;
 
-// TODO AWE: (navi) home button implementieren, wenn auf top-level
+// TODO AWE: (navi) home button implementieren, wenn auf top-level, wollen wir das wirklich?
 // TODO BSH OutlineNavigationButton | Cleanup and comment this class
 public abstract class AbstractOutlineNavigationMenu extends AbstractMenu5 {
 
@@ -32,13 +28,6 @@ public abstract class AbstractOutlineNavigationMenu extends AbstractMenu5 {
   public boolean isInheritAccessibility() {
     return false;
   }
-
-  @Override
-  protected Set<? extends IMenuType> getConfiguredMenuTypes() {
-    return CollectionUtility.hashSet(OutlineMenuType.Navigation, getMenuType());
-  }
-
-  protected abstract IMenuType getMenuType();
 
   public final IOutline getOutline() {
     return m_outline;

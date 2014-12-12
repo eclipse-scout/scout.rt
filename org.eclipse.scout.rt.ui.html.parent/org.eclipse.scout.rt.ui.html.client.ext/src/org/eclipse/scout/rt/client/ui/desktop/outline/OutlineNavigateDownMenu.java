@@ -1,5 +1,8 @@
 package org.eclipse.scout.rt.client.ui.desktop.outline;
 
+import java.util.Set;
+
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.form.fields.ModelVariant;
@@ -18,8 +21,9 @@ public class OutlineNavigateDownMenu extends AbstractOutlineNavigationMenu {
   }
 
   @Override
-  protected IMenuType getMenuType() {
-    return TableMenuType.SingleSelection;
+  @SuppressWarnings("unchecked")
+  protected Set<? extends IMenuType> getConfiguredMenuTypes() {
+    return CollectionUtility.hashSet(OutlineMenuType.Navigation, TableMenuType.SingleSelection);
   }
 
   @Override

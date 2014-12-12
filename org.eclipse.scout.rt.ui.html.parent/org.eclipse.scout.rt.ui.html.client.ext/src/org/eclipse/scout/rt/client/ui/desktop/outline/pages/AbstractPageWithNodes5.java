@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.internal.TablePageTreeMenuWrapper;
+import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutlineNavigationMenu;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline5;
 import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineEvent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineMenuType;
@@ -36,7 +37,7 @@ import org.eclipse.scout.service.SERVICES;
 
 public abstract class AbstractPageWithNodes5 extends AbstractExtensiblePageWithNodes implements IPage5 {
 
-  private boolean m_detailFormVisible = true; 
+  private boolean m_detailFormVisible = true;
 
   private boolean m_navigateUp;
 
@@ -121,14 +122,12 @@ public abstract class AbstractPageWithNodes5 extends AbstractExtensiblePageWithN
       return;
     }
     IForm form = execCreateDetailForm();
-    if (form != null) {
-      if (form instanceof IForm5) {
-        IForm5 form5 = (IForm5) form;
-        List<IMenu> menus = form5.getContextMenu().getChildActions();
-        adaptDetailFormMenus(menus);
-        if (!CollectionUtility.equalsCollection(menus, ((IForm5) form).getContextMenu().getChildActions())) {
-          form5.getContextMenu().setChildActions(menus);
-        }
+    if (form != null && form instanceof IForm) {
+      IForm5 form5 = (IForm5) form;
+      List<IMenu> menus = form5.getContextMenu().getChildActions();
+      adaptDetailFormMenus(menus);
+      if (!CollectionUtility.equalsCollection(menus, ((IForm5) form).getContextMenu().getChildActions())) {
+        form5.getContextMenu().setChildActions(menus);
       }
     }
     setDetailForm(form);
@@ -165,7 +164,7 @@ public abstract class AbstractPageWithNodes5 extends AbstractExtensiblePageWithN
     // Add page menus to the form
     for (IMenu menu : getOutline().getContextMenu().getChildActions()) {
       // FIXME CGU improve this
-      if (menu instanceof TablePageTreeMenuWrapper && ((TablePageTreeMenuWrapper) menu).getWrappedMenu().getClass().getSimpleName().contains("OutlineNavigateDownMenu")) {
+      if (menu instanceof TablePageTreeMenuWrapper && ((TablePageTreeMenuWrapper) menu).getWrappedMenu() instanceof AbstractOutlineNavigationMenu) {
         continue;
       }
       Set<IMenuType> types = new HashSet<IMenuType>();
