@@ -62,7 +62,7 @@ public class DefaultHttpCacheControl implements IHttpCacheControl {
       disableCacheHeaders(req, resp);
       return false;
     }
-    int maxAge = info.getPreferredCacheMaxAge();
+    int maxAge = getMaxAgeFor(req, resp, info);
     if (maxAge > 0) {
       resp.setHeader("cache-control", "public, max-age=" + maxAge + ", s-maxage=" + maxAge);
     }
@@ -95,6 +95,23 @@ public class DefaultHttpCacheControl implements IHttpCacheControl {
     }
 
     return false;
+  }
+
+  /**
+   * @return the preferred max age or 0/negative in oder to omit a max-age header
+   */
+  protected int getMaxAgeFor(HttpServletRequest req, HttpServletResponse resp, HttpCacheInfo info) {
+    if (info.getPreferredCacheMaxAge() > 0) {
+      return info.getPreferredCacheMaxAge();
+    }
+    String pathInfo = req.getPathInfo();
+    if (pathInfo == null) {
+      return MAX_AGE_4_HOURS;
+    }
+    if (pathInfo.endsWith("js") || pathInfo.endsWith("css")) {
+      return MAX_AGE_ONE_YEAR;
+    }
+    return MAX_AGE_4_HOURS;
   }
 
   @Override

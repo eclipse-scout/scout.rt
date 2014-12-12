@@ -27,7 +27,15 @@ public interface IHttpCacheControl {
   String IF_NONE_MATCH = "If-None-Match"; //$NON-NLS-1$
   String ETAG = "ETag"; //$NON-NLS-1$
 
+  /**
+   * default value used for js and css in
+   * {@link DefaultHttpCacheControl#getMaxAgeFor(HttpServletRequest, HttpServletResponse, HttpCacheInfo)}
+   */
   int MAX_AGE_ONE_YEAR = 365 * 24 * 3600;
+  /**
+   * default value used for html, jpg, gif etc. in
+   * {@link DefaultHttpCacheControl#getMaxAgeFor(HttpServletRequest, HttpServletResponse, HttpCacheInfo)}
+   */
   int MAX_AGE_4_HOURS = 4 * 3600;
 
   void putCacheObject(HttpServletRequest req, HttpCacheObject o);

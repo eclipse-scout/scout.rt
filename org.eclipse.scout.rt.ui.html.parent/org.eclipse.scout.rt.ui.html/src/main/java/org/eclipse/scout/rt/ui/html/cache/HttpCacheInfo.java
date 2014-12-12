@@ -47,7 +47,7 @@ public class HttpCacheInfo {
   }
 
   /**
-   * @return the preferred max age or -1 or 0 in oder to omit a max-age header
+   * @return the preferred max age or 0/negative in oder to omit a max-age header
    */
   public int getPreferredCacheMaxAge() {
     return m_preferredCacheMaxAge;
