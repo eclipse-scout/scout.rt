@@ -36,6 +36,7 @@ import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.WeakDataChangeListener;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
+import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
@@ -56,6 +57,10 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
   private DataChangeListener m_internalDataChangeListener;
   private final String m_userPreferenceContext;
   private IProcessingStatus m_pagePopulateStatus;
+  /**
+   * This flag is used to suppress change events while the page is initializing, see {@link #initPage()}.
+   */
+  private boolean m_pageInitialized;
 
   /**
    * use this static method to create a string based on the vargs that can be used as userPreferenceContext
@@ -349,6 +354,7 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
    */
   @Override
   public void initPage() throws ProcessingException {
+    m_pageInitialized = false;
     Cell cell = getCellForUpdate();
     if (cell.getText() == null && getConfiguredTitle() != null) {
       cell.setText(getConfiguredTitle());
@@ -357,6 +363,14 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
       cell.setIconId(getConfiguredIconId());
     }
     interceptInitPage();
+    m_pageInitialized = true;
+  }
+
+  @Override
+  public void cellChanged(ICell cell, int changedBit) {
+    if (m_pageInitialized) {
+      super.cellChanged(cell, changedBit);
+    }
   }
 
   @Override
