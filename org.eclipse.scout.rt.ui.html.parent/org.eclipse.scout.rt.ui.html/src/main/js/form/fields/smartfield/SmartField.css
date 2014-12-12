@@ -6,7 +6,7 @@
 
   /* Multiline SmartField */
   & .multiline {
-    border-bottom-color:  @palette-light-gray-5;
+    border-bottom-color: @palette-light-gray-5;
     border-top-left-radius: @border-radius;
     border-top-right-radius: @border-radius;
     border-bottom-right-radius: 0;
@@ -14,6 +14,11 @@
     width: 100%;
     padding-left: 10px;
     height: 28px;
+  }
+
+  &.disabled .multiline {
+    /* color and background-color inherited from input.disabled */
+    border-bottom-color: @palette-light-gray-4;
   }
 
   & .multiline-field {
@@ -27,6 +32,11 @@
     padding: 3px 10px;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+
+  &.disabled .multiline-field {
+    background-color: @palette-light-gray-5;
+    color: @palette-dark-gray-4;
   }
 
    & input.multiline ~ .icon {
