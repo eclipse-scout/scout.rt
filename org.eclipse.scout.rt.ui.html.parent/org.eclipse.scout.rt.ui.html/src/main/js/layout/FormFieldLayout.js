@@ -8,6 +8,7 @@ scout.FormFieldLayout = function(formField) {
   scout.FormFieldLayout.parent.call(this);
   this.formField = formField;
   this.labelWidth = scout.HtmlEnvironment.fieldLabelWidth;
+  this.rowHeight = scout.HtmlEnvironment.formRowHeight;
 };
 scout.inherits(scout.FormFieldLayout, scout.AbstractLayout);
 
@@ -23,9 +24,9 @@ scout.FormFieldLayout.prototype.layout = function($container) {
     subtract(htmlContainer.getInsets());
 
   if (f.$label && f.labelVisible) {
-    scout.graphics.setBounds(f.$label, 0, 0, this.labelWidth, containerSize.height);
+    scout.graphics.setBounds(f.$label, 0, 0, this.labelWidth, this.rowHeight);
     // with this property we achieve "vertical-align:middle" which doesn't work for non-table-cell elements
-    f.$label.css('line-height', containerSize.height + 'px');
+    f.$label.css('line-height', this.rowHeight + 'px');
     leftWidth += this.labelWidth;
   }
   if (f.$mandatory) {
@@ -35,7 +36,7 @@ scout.FormFieldLayout.prototype.layout = function($container) {
   if (f.$status && f.statusVisible) {
     // can not check for $status.isVisible() since we want to reserve
     // space used for status even when $status is invisible.
-    f.$status.css('line-height', containerSize.height + 'px');
+    f.$status.css('line-height', this.rowHeight + 'px');
     rightWidth += f.$status.outerWidth(true);
   }
 

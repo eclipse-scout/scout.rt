@@ -23,8 +23,8 @@ scout.TabBox.prototype._render = function($parent) {
   this._$tabArea = this.$container.appendDiv('tab-area');
   var htmlComp = new scout.HtmlComponent(this._$tabArea, this.session);
   htmlComp.setLayout(new scout.NullLayout());
-  var i, tabItem, $tab;
-  for (i = 0; i < this.tabItems.length; i++) {
+  var tabItem, $tab;
+  for (var i = 0; i < this.tabItems.length; i++) {
     tabItem = this.tabItems[i];
     $tab = tabItem.renderTab(this._$tabArea, i).
       on('mousedown', this.onMousedown.bind(this)).
