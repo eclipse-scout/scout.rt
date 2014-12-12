@@ -153,6 +153,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   private boolean m_desktopInited;
   private boolean m_trayVisible;
   private boolean m_isForcedClosing = false;
+  private final ArrayList<Object> m_addOns;
   private IContributionOwner m_contributionHolder;
   private final ObjectExtensions<AbstractDesktop, org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> m_objectExtensions;
 
@@ -176,6 +177,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     m_outlineTableFormVisible = true;
     m_activatedFormListener = new P_ActivatedFormListener();
     m_lastActiveFormList = new LinkedList<WeakReference<IForm>>();
+    m_addOns = new ArrayList<Object>();
     m_objectExtensions = new ObjectExtensions<AbstractDesktop, org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>>(this);
     if (callInitializer) {
       callInitializer();
@@ -1864,6 +1866,16 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       }
     }
     return false;
+  }
+
+  @Override
+  public Collection<Object> getAddOns() {
+    return Collections.unmodifiableCollection(m_addOns);
+  }
+
+  @Override
+  public void addAddOn(Object addOn) {
+    m_addOns.add(addOn);
   }
 
   @Override

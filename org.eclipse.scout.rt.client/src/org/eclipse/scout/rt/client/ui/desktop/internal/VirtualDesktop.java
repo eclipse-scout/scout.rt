@@ -600,4 +600,14 @@ public class VirtualDesktop implements IDesktop {
   public IForm getActiveForm() {
     throw createUnsupportedOperationException();
   }
+
+  @Override
+  public void addAddOn(Object addOn) {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
+  public Collection<Object> getAddOns() {
+    throw createUnsupportedOperationException();
+  }
 }
