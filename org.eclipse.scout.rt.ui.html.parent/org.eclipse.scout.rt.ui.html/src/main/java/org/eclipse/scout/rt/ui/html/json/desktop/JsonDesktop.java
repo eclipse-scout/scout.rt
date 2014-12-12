@@ -22,7 +22,6 @@ import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
-import org.eclipse.scout.rt.client.Scout5ExtensionUtil;
 import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigation;
 import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigationService;
 import org.eclipse.scout.rt.client.ui.action.IAction;
@@ -72,7 +71,7 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
     attachGlobalAdapters(getForms());
     attachGlobalAdapters(getModel().getMessageBoxStack());
     attachAdapters(filterModelActions());
-    attachAdapters(Scout5ExtensionUtil.IDesktop_getAddOns(getModel()));
+    attachAdapters(getModel().getAddOns());
     if (!isFormBased()) {
       attachAdapters(getModel().getViewButtons());
       attachGlobalAdapter(getModel().getOutline());
@@ -140,7 +139,7 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
     putAdapterIdsProperty(json, "forms", getForms());
     putAdapterIdsProperty(json, "messageBoxes", getModel().getMessageBoxStack());
     putAdapterIdsProperty(json, "actions", filterModelActions());
-    putAdapterIdsProperty(json, "addOns", Scout5ExtensionUtil.IDesktop_getAddOns(getModel()));
+    putAdapterIdsProperty(json, "addOns", getModel().getAddOns());
     if (!isFormBased()) {
       // FIXME CGU: view and tool buttons should be removed from desktop by device transformer
       putAdapterIdsProperty(json, "viewButtons", getModel().getViewButtons());

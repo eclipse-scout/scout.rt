@@ -11,10 +11,6 @@
 package org.eclipse.scout.rt.client;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -25,37 +21,6 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 // in Scout erweitert
 public final class Scout5ExtensionUtil {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(Scout5ExtensionUtil.class);
-
-  public static void ISession_initCustomParams(IClientSession clientSession, Map<String, String> customParams) {
-    try {
-      Method method = clientSession.getClass().getMethod("initCustomParams", Map.class);
-      method.invoke(clientSession, customParams);
-    }
-    catch (ReflectiveOperationException e) {
-      LOG.warn("method initCustomParams does not exist in " + clientSession);
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  public static List<Object> IDesktop_getAddOns(IDesktop desktop) {
-    try {
-      Method method = desktop.getClass().getMethod("getAddOns");
-      return (List<Object>) method.invoke(desktop);
-    }
-    catch (ReflectiveOperationException e) {
-      LOG.warn("method getAddOns does not exist in " + desktop);
-      return Collections.emptyList();
-    }
-  }
-
-  public static <T> T IDesktop_getAddOn(IDesktop desktop, Class<T> addOnInterface) {
-    for (Object addOn : IDesktop_getAddOns(desktop)) {
-      if (addOnInterface.isInstance(addOn)) {
-        return addOnInterface.cast(addOn);
-      }
-    }
-    return null;
-  }
 
   public static boolean IDesktop_isOutlineChanging(IDesktop desktop) {
     Field outlineChangingField;
