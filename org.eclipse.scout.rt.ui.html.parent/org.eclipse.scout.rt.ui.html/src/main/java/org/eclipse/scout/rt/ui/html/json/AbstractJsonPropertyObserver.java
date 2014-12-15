@@ -23,7 +23,7 @@ import org.json.JSONObject;
 public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> extends AbstractJsonAdapter<T> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractJsonPropertyObserver.class);
 
-  private P_PropertyChangeListener m_propertyChangeListener;
+  private PropertyChangeListener m_propertyChangeListener;
   private PropertyEventFilter m_propertyEventFilter;
   private boolean m_initializingProperties;
 
@@ -88,19 +88,21 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
   @Override
   protected void attachModel() {
     super.attachModel();
-    if (m_propertyChangeListener == null) {
-      m_propertyChangeListener = new P_PropertyChangeListener();
-      getModel().addPropertyChangeListener(m_propertyChangeListener);
+    if (m_propertyChangeListener != null) {
+      throw new IllegalStateException();
     }
+    m_propertyChangeListener = new P_PropertyChangeListener();
+    getModel().addPropertyChangeListener(m_propertyChangeListener);
   }
 
   @Override
   protected void detachModel() {
     super.detachModel();
-    if (m_propertyChangeListener != null) {
-      getModel().removePropertyChangeListener(m_propertyChangeListener);
-      m_propertyChangeListener = null;
+    if (m_propertyChangeListener == null) {
+      throw new IllegalStateException();
     }
+    getModel().removePropertyChangeListener(m_propertyChangeListener);
+    m_propertyChangeListener = null;
   }
 
   @Override

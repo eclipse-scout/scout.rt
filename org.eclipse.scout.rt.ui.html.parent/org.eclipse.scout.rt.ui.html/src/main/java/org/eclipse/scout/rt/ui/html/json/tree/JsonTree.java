@@ -46,7 +46,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   public static final String PROP_EXPANDED = "expanded";
   public static final String PROP_SELECTED_NODE_IDS = "selectedNodeIds";
 
-  private P_ModelTreeListener m_modelTreeListener;
+  private TreeListener m_treeListener;
   private Map<String, ITreeNode> m_treeNodes;
   private Map<ITreeNode, String> m_treeNodeIds;
   private TreeEventFilter m_treeEventFilter;
@@ -94,19 +94,21 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   @Override
   protected void attachModel() {
     super.attachModel();
-    if (m_modelTreeListener == null) { //FIXME CGU illegal state when null
-      m_modelTreeListener = new P_ModelTreeListener();
-      getModel().addUITreeListener(m_modelTreeListener);
+    if (m_treeListener != null) {
+      throw new IllegalStateException();
     }
+    m_treeListener = new P_TreeListener();
+    getModel().addUITreeListener(m_treeListener);
   }
 
   @Override
   protected void detachModel() {
     super.detachModel();
-    if (m_modelTreeListener != null) {
-      getModel().removeTreeListener(m_modelTreeListener);
-      m_modelTreeListener = null;
+    if (m_treeListener == null) {
+      throw new IllegalStateException();
     }
+    getModel().removeTreeListener(m_treeListener);
+    m_treeListener = null;
   }
 
   @Override
@@ -360,7 +362,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     getModel().getUIFacade().setNodeExpandedFromUI(node, expanded);
   }
 
-  private class P_ModelTreeListener implements TreeListener {
+  private class P_TreeListener implements TreeListener {
     @Override
     public void treeChanged(final TreeEvent e) {
       handleModelTreeEvent(e);

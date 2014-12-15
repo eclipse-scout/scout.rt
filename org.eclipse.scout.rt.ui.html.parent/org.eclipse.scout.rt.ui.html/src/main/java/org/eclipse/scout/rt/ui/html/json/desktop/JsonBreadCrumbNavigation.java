@@ -50,19 +50,21 @@ public class JsonBreadCrumbNavigation<T extends IBreadCrumbsNavigation> extends 
   @Override
   protected void attachModel() {
     super.attachModel();
-    if (m_breadCrumbsListener == null) {
-      m_breadCrumbsListener = new P_BreadCrumbsListener();
-      getModel().addBreadCrumbsListener(m_breadCrumbsListener);
+    if (m_breadCrumbsListener != null) {
+      throw new IllegalStateException();
     }
+    m_breadCrumbsListener = new P_BreadCrumbsListener();
+    getModel().addBreadCrumbsListener(m_breadCrumbsListener);
   }
 
   @Override
   protected void detachModel() {
     super.detachModel();
-    if (m_breadCrumbsListener != null) {
-      getModel().removeBreadCrumbsListener(m_breadCrumbsListener);
-      m_breadCrumbsListener = null;
+    if (m_breadCrumbsListener == null) {
+      throw new IllegalStateException();
     }
+    getModel().removeBreadCrumbsListener(m_breadCrumbsListener);
+    m_breadCrumbsListener = null;
   }
 
   @Override

@@ -51,7 +51,7 @@ public class JsonForm<T extends IForm> extends AbstractJsonPropertyObserver<T> i
   public static final String PROP_DISPLAY_HINT = "displayHint";
   public static final String PROP_DISPLAY_VIEW_ID = "displayViewId";
 
-  private FormListener m_modelFormListener;
+  private FormListener m_formListener;
 
   @Override
   public String getObjectType() {
@@ -70,19 +70,21 @@ public class JsonForm<T extends IForm> extends AbstractJsonPropertyObserver<T> i
   @Override
   protected void attachModel() {
     super.attachModel();
-    if (m_modelFormListener == null) {
-      m_modelFormListener = new P_ModelFormListener();
-      getModel().addFormListener(m_modelFormListener);
+    if (m_formListener != null) {
+      throw new IllegalStateException();
     }
+    m_formListener = new P_FormListener();
+    getModel().addFormListener(m_formListener);
   }
 
   @Override
   protected void detachModel() {
     super.detachModel();
-    if (m_modelFormListener != null) {
-      getModel().removeFormListener(m_modelFormListener);
-      m_modelFormListener = null;
+    if (m_formListener == null) {
+      throw new IllegalStateException();
     }
+    getModel().removeFormListener(m_formListener);
+    m_formListener = null;
   }
 
   @Override
@@ -160,7 +162,7 @@ public class JsonForm<T extends IForm> extends AbstractJsonPropertyObserver<T> i
     getModel().getUIFacade().fireFormClosingFromUI();
   }
 
-  protected class P_ModelFormListener implements FormListener {
+  protected class P_FormListener implements FormListener {
 
     @Override
     public void formChanged(FormEvent e) throws ProcessingException {

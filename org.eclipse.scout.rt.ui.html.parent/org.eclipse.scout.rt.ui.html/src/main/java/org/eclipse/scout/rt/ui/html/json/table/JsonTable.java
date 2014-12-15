@@ -73,7 +73,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   public static final String PROP_CONTROLS = "controls";
   public static final String PROP_SELECTED_ROW_IDS = "selectedRowIds";
 
-  private P_ModelTableListener m_modelTableListener;
+  private TableListener m_tableListener;
   private Map<String, ITableRow> m_tableRows;
   private Map<ITableRow, String> m_tableRowIds;
   private TableEventFilter m_tableEventFilter;
@@ -192,19 +192,21 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   @Override
   protected void attachModel() {
     super.attachModel();
-    if (m_modelTableListener == null) {
-      m_modelTableListener = new P_ModelTableListener();
-      getModel().addUITableListener(m_modelTableListener);
+    if (m_tableListener != null) {
+      throw new IllegalStateException();
     }
+    m_tableListener = new P_TableListener();
+    getModel().addUITableListener(m_tableListener);
   }
 
   @Override
   protected void detachModel() {
     super.detachModel();
-    if (m_modelTableListener != null) {
-      getModel().removeTableListener(m_modelTableListener);
-      m_modelTableListener = null;
+    if (m_tableListener == null) {
+      throw new IllegalStateException();
     }
+    getModel().removeTableListener(m_tableListener);
+    m_tableListener = null;
   }
 
   @Override
@@ -661,7 +663,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     addPropertyChangeEvent(PROP_MENUS, JsonObjectUtility.adapterIdsToJson(menuAdapters));
   }
 
-  private class P_ModelTableListener implements TableListener {
+  private class P_TableListener implements TableListener {
     @Override
     public void tableChanged(final TableEvent e) {
       handleModelTableEvent(e);

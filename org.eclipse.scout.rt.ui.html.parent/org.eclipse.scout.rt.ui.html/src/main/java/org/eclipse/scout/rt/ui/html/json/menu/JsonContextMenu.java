@@ -33,19 +33,21 @@ public class JsonContextMenu<T extends IContextMenu> extends AbstractJsonPropert
   @Override
   protected void attachModel() {
     super.attachModel();
-    if (m_contextMenuListener == null) {
-      m_contextMenuListener = new P_ContextMenuListener();
-      getModel().addContextMenuListener(m_contextMenuListener);
+    if (m_contextMenuListener != null) {
+      throw new IllegalStateException();
     }
+    m_contextMenuListener = new P_ContextMenuListener();
+    getModel().addContextMenuListener(m_contextMenuListener);
   }
 
   @Override
   protected void detachModel() {
     super.detachModel();
-    if (m_contextMenuListener != null) {
-      getModel().removeContextMenuListener(m_contextMenuListener);
-      m_contextMenuListener = null;
+    if (m_contextMenuListener == null) {
+      throw new IllegalStateException();
     }
+    getModel().removeContextMenuListener(m_contextMenuListener);
+    m_contextMenuListener = null;
   }
 
   @Override

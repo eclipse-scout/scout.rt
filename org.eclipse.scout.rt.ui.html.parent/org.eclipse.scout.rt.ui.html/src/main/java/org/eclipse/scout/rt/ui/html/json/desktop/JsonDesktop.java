@@ -113,19 +113,21 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
   @Override
   protected void attachModel() {
     super.attachModel();
-    if (m_desktopListener == null) {
-      m_desktopListener = new P_DesktopListener();
-      getModel().addDesktopListener(m_desktopListener);
+    if (m_desktopListener != null) {
+      throw new IllegalStateException();
     }
+    m_desktopListener = new P_DesktopListener();
+    getModel().addDesktopListener(m_desktopListener);
   }
 
   @Override
   protected void detachModel() {
     super.detachModel();
-    if (m_desktopListener != null) {
-      getModel().removeDesktopListener(m_desktopListener);
-      m_desktopListener = null;
+    if (m_desktopListener == null) {
+      throw new IllegalStateException();
     }
+    getModel().removeDesktopListener(m_desktopListener);
+    m_desktopListener = null;
   }
 
   @Override

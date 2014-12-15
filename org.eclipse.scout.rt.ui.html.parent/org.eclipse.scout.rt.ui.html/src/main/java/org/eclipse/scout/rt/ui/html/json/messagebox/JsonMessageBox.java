@@ -101,19 +101,21 @@ public class JsonMessageBox<T extends IMessageBox> extends AbstractJsonPropertyO
   @Override
   protected void attachModel() {
     super.attachModel();
-    if (m_messageBoxListener == null) {
-      m_messageBoxListener = new P_MessageBoxListener();
-      getModel().addMessageBoxListener(m_messageBoxListener);
+    if (m_messageBoxListener != null) {
+      throw new IllegalStateException();
     }
+    m_messageBoxListener = new P_MessageBoxListener();
+    getModel().addMessageBoxListener(m_messageBoxListener);
   }
 
   @Override
   protected void detachModel() {
     super.detachModel();
-    if (m_messageBoxListener != null) {
-      getModel().removeMessageBoxListener(m_messageBoxListener);
-      m_messageBoxListener = null;
+    if (m_messageBoxListener == null) {
+      throw new IllegalStateException();
     }
+    getModel().removeMessageBoxListener(m_messageBoxListener);
+    m_messageBoxListener = null;
   }
 
   protected void handleModelClosed() {
