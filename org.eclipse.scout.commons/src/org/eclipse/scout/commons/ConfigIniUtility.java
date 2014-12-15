@@ -125,6 +125,11 @@ public final class ConfigIniUtility {
           externalConfigPaths.add(line.split("=", 2)[1]);
         }
       }
+
+      String furtherExternalConfigFile = System.getProperty("external.configuration.file");
+      if (furtherExternalConfigFile != null) {
+        externalConfigPaths.add(furtherExternalConfigFile);
+      }
     }
     catch (Throwable t) {
       if (in != null) {
