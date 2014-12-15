@@ -8,6 +8,7 @@ Require-Bundle: org.eclipse.core.runtime;bundle-version="[3.4.0,4.0.0)",
  org.eclipse.scout.commons;bundle-version="[5.1.0,5.2.0)";visibility:=reexport,
  org.eclipse.scout.rt.client;bundle-version="[5.1.0,5.2.0)";visibility:=reexport
 Export-Package: org.eclipse.scout.svg.client,
+ org.eclipse.scout.svg.client.extension.svgfield,
  org.eclipse.scout.svg.client.svgfield
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
