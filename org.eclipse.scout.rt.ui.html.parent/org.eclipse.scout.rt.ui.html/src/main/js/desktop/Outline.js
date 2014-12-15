@@ -63,6 +63,11 @@ scout.Outline.prototype.setNodesSelected = function(nodes, $nodes) {
 
 scout.Outline.prototype._updateOutlineTab = function(node) {
   var content, parentText, nodeText, title, subTitle;
+  if (this.session.desktop.outline !== this) {
+    // only update desktop if the outline is the active one
+    return;
+  }
+
   if (node) {
     // Unlink detail form if it was closed.
     // May happen in the following case:
