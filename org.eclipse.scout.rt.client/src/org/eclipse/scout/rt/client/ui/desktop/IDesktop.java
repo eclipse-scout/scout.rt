@@ -554,14 +554,14 @@ public interface IDesktop extends IPropertyObserver {
 
   /**
    * @return the collection of untyped add-ons in this Desktop
-   * @since 4.2.0
+   * @since 5.1.0
    */
   Collection<Object> getAddOns();
 
   /**
    * add an untyped add-on to the Desktop
    *
-   * @since 4.2.0
+   * @since 5.1.0
    */
   void addAddOn(Object addOn);
 
