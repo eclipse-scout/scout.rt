@@ -14,7 +14,10 @@ import java.util.Collection;
 
 import org.json.JSONArray;
 
-public class JsonAdapterUtility {
+public final class JsonAdapterUtility {
+
+  private JsonAdapterUtility() {
+  }
 
   /**
    * Returns the ID of the JSON adapter for the given model.
