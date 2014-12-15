@@ -20,8 +20,6 @@
   <packaging>eclipse-plugin</packaging>
 
   <properties>
-    <script.input.dir>${project.basedir}/src/main/js</script.input.dir>
-    <script.output.dir>${project.basedir}/WebContent/res</script.output.dir>
     <scout.script.version>5.0.0</scout.script.version>
   </properties>
 
@@ -59,8 +57,12 @@
         <configuration>
           <mainClass>org.eclipse.scout.rt.ui.html.res.GenerateTestScripts</mainClass>
           <arguments>
-            <argument>arg0</argument>
-            <argument>arg1</argument>
+            <argument>${project.basedir}/src/main/js</argument>
+            <argument>${project.basedir}/src/test/js</argument>
+            <argument>scout-5.0.0.min.js</argument>
+            <argument>scout-5.0.0.min.css</argument>
+            <argument>scout-mobile-5.0.0.min.js</argument>
+            <argument>scout-mobile-5.0.0.min.css</argument>
           </arguments>
         </configuration>
       </execution>

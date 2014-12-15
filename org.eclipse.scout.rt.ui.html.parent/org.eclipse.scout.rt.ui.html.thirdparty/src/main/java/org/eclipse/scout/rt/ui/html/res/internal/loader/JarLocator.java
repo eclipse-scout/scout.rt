@@ -1,16 +1,12 @@
-package org.eclipse.scout.rt.ui.html.thirdparty.internal.loader;
+package org.eclipse.scout.rt.ui.html.res.internal.loader;
 
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.osgi.framework.Bundle;
 
 public class JarLocator {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JarLocator.class);
-
   private Class<?> m_loaderClass;
   private Bundle m_osgiBundle;
 
@@ -72,7 +68,6 @@ public class JarLocator {
     catch (MalformedURLException e) {
       //nop
     }
-    LOG.warn("could not verify if the url exists: " + url);
     return url;
   }
 }

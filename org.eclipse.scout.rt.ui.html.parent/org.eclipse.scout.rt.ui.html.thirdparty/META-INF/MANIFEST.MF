@@ -12,5 +12,6 @@ Bundle-ClassPath: .,
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: BSI Business Systems Integration AG
 Bundle-ActivationPolicy: lazy
-Require-Bundle: org.eclipse.scout.rt.ui.html;bundle-version="5.1.0",
- org.junit4;bundle-version="4.8.1";resolution:=optional
+Require-Bundle: org.junit4;bundle-version="4.8.1";resolution:=optional,
+ org.eclipse.osgi;bundle-version="3.6.2";resolution:=optional
+Export-Package: org.eclipse.scout.rt.ui.html.res

@@ -38,7 +38,7 @@ import org.eclipse.scout.service.AbstractService;
 @Priority(-10)
 public class StaticResourceRequestInterceptor extends AbstractService implements IServletRequestInterceptor {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(StaticResourceRequestInterceptor.class);
-  
+
   public static final String INDEX_HTML = "/index.html";
   public static final String MOBILE_INDEX_HTML = "/index-mobile.html";
 

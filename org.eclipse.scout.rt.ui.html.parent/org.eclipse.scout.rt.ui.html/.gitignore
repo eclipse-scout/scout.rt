@@ -1,5 +1,5 @@
 node_modules
-/WebContent/res/scout*.min.css
-/WebContent/res/scout*.min.js
+/src/test/js/*.min.css
+/src/test/js/*.min.js
 /WebContent/res/fastclickmod*.min.js
 phantomjsdriver.log

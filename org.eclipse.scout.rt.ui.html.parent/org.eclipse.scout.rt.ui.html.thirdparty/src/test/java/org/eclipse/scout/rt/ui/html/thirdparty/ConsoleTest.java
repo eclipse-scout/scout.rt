@@ -10,13 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.thirdparty;
 
+import org.eclipse.scout.rt.ui.html.res.ScriptProcessor;
+
 public final class ConsoleTest implements ExampleScripts {
 
   private ConsoleTest() {
   }
 
   public static void main(String[] args) throws Exception {
-    ThirdPartyScriptProcessorImpl impl = new ThirdPartyScriptProcessorImpl();
+    ScriptProcessor impl = new ScriptProcessor();
     System.out.println("minifyJs: " + impl.minifyJs(JS_INPUT));
     System.out.println("compileCss: " + impl.compileCss(CSS_INPUT));
     System.out.println("minifyCss: " + impl.minifyCss(CSS_INPUT));

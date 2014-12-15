@@ -16,13 +16,10 @@ import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.html.ScoutAppHints;
 import org.eclipse.scout.rt.ui.html.StreamUtility;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
 import org.eclipse.scout.rt.ui.html.res.Script.NodeType;
-import org.eclipse.scout.service.SERVICES;
 
 /**
  * Process JS and CSS script templates such as <code>scout-module.js</code>
@@ -38,8 +35,6 @@ import org.eclipse.scout.service.SERVICES;
  * The js and css minify can be turned on and off using the url param ?minify=true, see {@link ScoutAppHints}
  */
 public class ScriptFileBuilder {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ScriptFileBuilder.class);
-
   private static final Pattern INCLUDE_PAT = Pattern.compile("//\\s*@include\\s*\\(\\s*\"([^\"]+)\"\\s*\\)");
 
   private static final String UTF_8 = "UTF-8";
@@ -57,19 +52,12 @@ public class ScriptFileBuilder {
   public static final Pattern SCRIPT_URL_PATTERN = Pattern.compile("([^\"']*/)([-_\\w]+)-([0-9.]+)(?:\\-([a-f0-9]+|fingerprint))?\\.min\\.(js|css)");
 
   private final IWebContentResourceLocator m_resourceLocator;
-  private final IScriptProcessorService m_scriptProcessorService;
+  private final ScriptProcessor m_scriptProcessor;
   private boolean m_minifyEnabled;
 
   public ScriptFileBuilder(IWebContentResourceLocator locator) {
-    this(locator, SERVICES.getService(IScriptProcessorService.class));
-  }
-
-  public ScriptFileBuilder(IWebContentResourceLocator locator, IScriptProcessorService scriptProcessorService) {
     m_resourceLocator = locator;
-    m_scriptProcessorService = scriptProcessorService;
-    if (m_scriptProcessorService == null) {
-      LOG.warn("there is no implementor for " + IScriptProcessorService.class);
-    }
+    m_scriptProcessor = new ScriptProcessor();
   }
 
   public boolean isMinifyEnabled() {
@@ -257,26 +245,20 @@ public class ScriptFileBuilder {
   }
 
   protected String compileModule(Script.FileType fileType, String content) throws IOException {
-    if (m_scriptProcessorService == null) {
-      return content;
-    }
     switch (fileType) {
       case JS:
-        return m_scriptProcessorService.compileJs(content);
+        return m_scriptProcessor.compileJs(content);
       case CSS:
-        return m_scriptProcessorService.compileCss(content);
+        return m_scriptProcessor.compileCss(content);
       default:
         return content;
     }
   }
 
   protected String minifyModule(Script.FileType fileType, String content) throws IOException {
-    if (m_scriptProcessorService == null) {
-      return content;
-    }
     switch (fileType) {
       case JS:
-        return m_scriptProcessorService.minifyJs(content);
+        return m_scriptProcessor.minifyJs(content);
       case CSS:
         /*FIXME imo, cgu: destroys css!
          * return m_thirdPartyScriptProcessorService.minifyCss(content);
