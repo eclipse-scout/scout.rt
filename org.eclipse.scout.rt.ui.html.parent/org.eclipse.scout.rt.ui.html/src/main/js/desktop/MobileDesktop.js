@@ -15,7 +15,7 @@ scout.MobileDesktop.prototype._render = function($parent) {
   this.$parent = $parent;
   // FIXME CGU in menu auslagern, bzw. wichtigste rechts oben darstellen
   // if (this.toolButtons) {
-  //   tools = new scout.MobileDesktopToolButtons(this.toolButtons, this.session);
+  //   tools = new scout.MobileFormToolButtons(this.toolButtons, this.session);
   //   tools.render($parent);
   //   marginTop = tools.$div.outerHeight();
   // }

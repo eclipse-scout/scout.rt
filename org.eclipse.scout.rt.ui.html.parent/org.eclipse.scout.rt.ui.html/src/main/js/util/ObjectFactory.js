@@ -72,14 +72,14 @@ scout.defaultObjectFactories = [{
     return new scout.Outline();
   }
 }, {
-  objectType: 'ViewButton',
+  objectType: 'OutlineViewButton',
   create: function() {
-    return new scout.DesktopViewButton();
+    return new scout.OutlineViewButton();
   }
 }, {
   objectType: 'ToolButton',
   create: function() {
-    return new scout.DesktopToolButton();
+    return new scout.FormToolButton();
   }
 }, {
   objectType: 'DataModel',

@@ -1,13 +1,13 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
-scout.MobileDesktopToolButtons = function(toolButtons, session) {
+scout.MobileFormToolButtons = function(toolButtons, session) {
   this.$container;
   this.$parent;
   this.toolButtons = toolButtons;
 };
 
-scout.MobileDesktopToolButtons.prototype.render = function($desktop) {
+scout.MobileFormToolButtons.prototype.render = function($desktop) {
   this.$parent = $desktop;
   var $desktopTools = $desktop.appendDiv('', '', 'DesktopTools'); // TODO CGU Check if #DesktopTools should really be an ID and not a class
   this.$container = $desktopTools;
@@ -36,7 +36,7 @@ scout.MobileDesktopToolButtons.prototype.render = function($desktop) {
   }
 };
 
-scout.MobileDesktopToolButtons.prototype.open = function($tool) {
+scout.MobileFormToolButtons.prototype.open = function($tool) {
   $('.tool-open').animateAVCSD('height', 0, $.removeThis, null, 500);
 
   if ($tool.hasClass('selected')) {

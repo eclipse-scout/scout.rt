@@ -1,4 +1,4 @@
-describe("DesktopToolButton", function() {
+describe("FormToolButton", function() {
   var session;
   var desktop;
 
@@ -33,7 +33,7 @@ describe("DesktopToolButton", function() {
   };
 
   function createAction(model) {
-    var action = new scout.DesktopToolButton();
+    var action = new scout.FormToolButton();
     action.init(model, session);
     action.desktop = desktop;
     action.form = formMock;

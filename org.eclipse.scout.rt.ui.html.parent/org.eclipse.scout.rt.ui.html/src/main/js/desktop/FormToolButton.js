@@ -1,16 +1,16 @@
-scout.DesktopToolButton = function() {
-  scout.DesktopToolButton.parent.call(this);
+scout.FormToolButton = function() {
+  scout.FormToolButton.parent.call(this);
   this.desktop;
   this.$storage;
   this._addAdapterProperties('form');
 };
-scout.inherits(scout.DesktopToolButton, scout.Action);
+scout.inherits(scout.FormToolButton, scout.Action);
 
-scout.DesktopToolButton.prototype._render = function($parent) {
+scout.FormToolButton.prototype._render = function($parent) {
   this.$container = $parent.appendDiv('taskbar-tool-item');
 };
 
-scout.DesktopToolButton.prototype.toggle = function() {
+scout.FormToolButton.prototype.toggle = function() {
   if (this.desktop.selectedTool === this) {
     this.setSelected(false);
   } else {
@@ -18,11 +18,11 @@ scout.DesktopToolButton.prototype.toggle = function() {
   }
 };
 
-scout.DesktopToolButton.prototype._onMouseDown = function() {
+scout.FormToolButton.prototype._onMouseDown = function() {
   this.toggle();
 };
 
-scout.DesktopToolButton.prototype.setSelected = function(selected) {
+scout.FormToolButton.prototype.setSelected = function(selected) {
   if (selected === this.selected) {
     return;
   }
@@ -36,7 +36,7 @@ scout.DesktopToolButton.prototype.setSelected = function(selected) {
   this._renderSelected(this.selected);
 };
 
-scout.DesktopToolButton.prototype._openContainer = function() {
+scout.FormToolButton.prototype._openContainer = function() {
   if (this.$storage && this.$storage.length > 0) {
     this.desktop.$toolContainer.append(this.$storage);
   } else if (this.form) {
@@ -59,7 +59,7 @@ scout.DesktopToolButton.prototype._openContainer = function() {
   }.bind(this), 0);
 };
 
-scout.DesktopToolButton.prototype._closeContainer = function() {
+scout.FormToolButton.prototype._closeContainer = function() {
   if (this.desktop.$toolContainer.data('toolButton') !== this) {
     //Don't close container of other buttons
     return;
@@ -73,7 +73,7 @@ scout.DesktopToolButton.prototype._closeContainer = function() {
 
 /* event handling */
 
-scout.DesktopToolButton.prototype._renderForm = function() {
+scout.FormToolButton.prototype._renderForm = function() {
   if (!this.rendered) {
     //Don't execute initially since _renderSelected will be executed
     return;
@@ -81,7 +81,7 @@ scout.DesktopToolButton.prototype._renderForm = function() {
   this._renderSelected(this.selected);
 };
 
-scout.DesktopToolButton.prototype._renderSelected = function(selected) {
+scout.FormToolButton.prototype._renderSelected = function(selected) {
   this.$container.select(selected);
 
   if (selected) {
@@ -100,7 +100,7 @@ scout.DesktopToolButton.prototype._renderSelected = function(selected) {
   }
 };
 
-scout.DesktopToolButton.prototype._renderEnabled = function(enabled) {
+scout.FormToolButton.prototype._renderEnabled = function(enabled) {
   if (enabled) {
     this.$container.on('mousedown', '', this._onMouseDown.bind(this));
   } else {

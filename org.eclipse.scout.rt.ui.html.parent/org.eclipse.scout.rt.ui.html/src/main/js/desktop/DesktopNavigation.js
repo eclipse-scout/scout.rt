@@ -252,7 +252,7 @@ scout.DesktopNavigation.prototype._addSplitter = function() {
 };
 
 /**
- * Called by DesktopViewButton.js
+ * Called by OutlineViewButton.js
  */
 scout.DesktopNavigation.prototype.onOutlinePropertyChange = function(event) {
   for (var propertyName in event.properties) {

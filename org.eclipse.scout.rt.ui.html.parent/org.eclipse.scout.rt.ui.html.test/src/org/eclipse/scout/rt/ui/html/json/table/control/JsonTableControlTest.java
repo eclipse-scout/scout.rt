@@ -87,6 +87,23 @@ public class JsonTableControlTest {
     assertNull(formId);
   }
 
+  @Test
+  public void testNonLazyLoadingFormWhenSelected() throws ProcessingException, JSONException {
+    FormWithOneField form = new FormWithOneField();
+
+    ITableControl control = new TableControl();
+    control.setSelected(true);
+    control.setForm(form);
+    JsonTableControl<ITableControl> jsonControl = m_jsonSession.newJsonAdapter(control, null, null);
+
+    IJsonAdapter<?> formAdapter = jsonControl.getAdapter(form);
+    assertNotNull(formAdapter);
+
+    // Expects formId is sent along with the control and not with a separate property change event
+    String formId = JsonTestUtility.extractProperty(m_jsonSession.currentJsonResponse(), jsonControl.getId(), "form");
+    assertNull(formId);
+  }
+
   public static JsonEvent createJsonSelectedEvent(String adapterId, boolean selected) throws JSONException {
     JSONObject data = new JSONObject();
     data.put("selected", selected);

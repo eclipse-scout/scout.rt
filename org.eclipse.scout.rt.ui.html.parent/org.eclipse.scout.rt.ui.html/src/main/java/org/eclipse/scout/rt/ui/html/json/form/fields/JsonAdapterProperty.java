@@ -86,7 +86,7 @@ public abstract class JsonAdapterProperty<T> extends JsonProperty<T> {
     disposeAdapter(modelValue());
   }
 
-  private void disposeAdatpers(Object modelValue) {
+  private void disposeAdapters(Object modelValue) {
     if (modelValue == null) {
       return;
     }

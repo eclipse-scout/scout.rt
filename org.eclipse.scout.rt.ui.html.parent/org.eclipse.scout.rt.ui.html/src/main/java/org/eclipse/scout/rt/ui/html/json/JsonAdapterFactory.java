@@ -16,7 +16,6 @@ import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
-import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.control.IAnalysisTableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.control.IChartTableControl;
@@ -30,6 +29,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutlineNavigationM
 import org.eclipse.scout.rt.client.ui.desktop.outline.IFormToolButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IFormToolButton5;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineViewButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.ISearchOutline;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -57,8 +57,8 @@ import org.eclipse.scout.rt.ui.html.json.desktop.JsonBreadCrumbNavigation;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonDesktop;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonFormToolButton;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonOutline;
+import org.eclipse.scout.rt.ui.html.json.desktop.JsonOutlineViewButton;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonSearchOutline;
-import org.eclipse.scout.rt.ui.html.json.desktop.JsonViewButton;
 import org.eclipse.scout.rt.ui.html.json.form.JsonForm;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonDateField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
@@ -181,8 +181,8 @@ public class JsonAdapterFactory implements IJsonAdapterFactory {
     else if (model instanceof IMessageBox) {
       return new JsonMessageBox((IMessageBox) model, session, id, parent);
     }
-    else if (model instanceof IViewButton) {
-      return new JsonViewButton((IViewButton) model, session, id, parent);
+    else if (model instanceof IOutlineViewButton) {
+      return new JsonOutlineViewButton((IOutlineViewButton) model, session, id, parent);
     }
     else if (model instanceof IFormToolButton) {
       return new NullAdapter(model, session, id, parent);
