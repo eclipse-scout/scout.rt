@@ -280,6 +280,16 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
+  public void setDataChanging(boolean b) {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
+  public boolean isDataChanging() {
+    throw createUnsupportedOperationException();
+  }
+
+  @Override
   public void ensureViewStackVisible() {
     throw createUnsupportedOperationException();
   }
@@ -583,5 +593,4 @@ public class VirtualDesktop implements IDesktop {
   public IForm getActiveForm() {
     throw createUnsupportedOperationException();
   }
-
 }

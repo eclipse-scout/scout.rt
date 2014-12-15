@@ -128,6 +128,8 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   private final IDesktopExtension m_localDesktopExtension;
   private List<IDesktopExtension> m_desktopExtensions;
   private final EventListenerList m_listenerList;
+  private int m_dataChanging;
+  private final List<Object[]> m_dataChangeEventBuffer;
   private final Map<Object, EventListenerList> m_dataChangeListenerList;
   private final IDesktopUIFacade m_uiFacade;
   private List<IOutline> m_availableOutlines;
@@ -166,6 +168,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     m_localDesktopExtension = new P_LocalDesktopExtension();
     m_listenerList = new EventListenerList();
     m_dataChangeListenerList = new HashMap<Object, EventListenerList>();
+    m_dataChangeEventBuffer = new ArrayList<Object[]>();
     m_viewStack = new ArrayList<IForm>();
     m_dialogStack = new ArrayList<IForm>();
     m_messageBoxStack = new ArrayList<IMessageBox>();
@@ -1440,7 +1443,49 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
+  public boolean isDataChanging() {
+    return m_dataChanging > 0;
+  }
+
+  @Override
+  public void setDataChanging(boolean b) {
+    if (b) {
+      m_dataChanging++;
+    }
+    else {
+      if (m_dataChanging > 0) {
+        m_dataChanging--;
+        if (m_dataChanging == 0) {
+          processDataChangeBuffer();
+        }
+      }
+    }
+  }
+
+  @Override
   public void dataChanged(Object... dataTypes) {
+    if (isDataChanging()) {
+      if (dataTypes != null && dataTypes.length > 0) {
+        m_dataChangeEventBuffer.add(dataTypes);
+      }
+    }
+    else {
+      fireDataChangedImpl(dataTypes);
+    }
+  }
+
+  private void processDataChangeBuffer() {
+    Set<Object> knownEvents = new HashSet<Object>();
+    for (Object[] dataTypes : m_dataChangeEventBuffer) {
+      for (Object dataType : dataTypes) {
+        knownEvents.add(dataType);
+      }
+    }
+    m_dataChangeEventBuffer.clear();
+    fireDataChangedImpl(knownEvents.toArray(new Object[knownEvents.size()]));
+  }
+
+  private void fireDataChangedImpl(Object... dataTypes) {
     if (dataTypes != null && dataTypes.length > 0) {
       HashMap<DataChangeListener, Set<Object>> map = new HashMap<DataChangeListener, Set<Object>>();
       for (Object dataType : dataTypes) {

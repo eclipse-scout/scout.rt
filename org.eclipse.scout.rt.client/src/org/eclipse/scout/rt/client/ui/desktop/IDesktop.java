@@ -261,6 +261,15 @@ public interface IDesktop extends IPropertyObserver {
   void dataChanged(Object... dataTypes);
 
   /**
+   * marks desktop data as changing and all data changed events are cached until the change is done
+   * <p>
+   * when done, all cached events are coalesced and sent as a batch
+   */
+  void setDataChanging(boolean b);
+
+  boolean isDataChanging();
+
+  /**
    * Called after a page was loaded or reloaded.
    * <p>
    * Default minimizes page search form when data was found.

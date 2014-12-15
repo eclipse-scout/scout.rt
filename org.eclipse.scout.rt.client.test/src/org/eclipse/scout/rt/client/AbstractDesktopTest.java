@@ -16,7 +16,9 @@ import static org.junit.Assert.assertTrue;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.rt.client.AbstractDesktopTest.CheckSaveTestForm.MainBox.MessageField;
+import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
@@ -37,6 +39,9 @@ import org.junit.runner.RunWith;
  */
 @RunWith(ScoutClientTestRunner.class)
 public class AbstractDesktopTest {
+  private static final Object TEST_DATA_TYPE_1 = new Object();
+  private static final Object TEST_DATA_TYPE_2 = new Object();
+
   private CheckSaveTestForm m_testForm;
 
   @Before
@@ -79,6 +84,55 @@ public class AbstractDesktopTest {
     m_testForm.getMessageField().setValue("test");
     IDesktop d = ClientSyncJob.getCurrentSession().getDesktop();
     assertTrue(d.getUnsavedForms().contains(m_testForm));
+  }
+
+  @Test
+  public void testDataChangedSimple() throws ProcessingException {
+    AbstractDesktop d = new AbstractDesktop() {
+    };
+    final Holder<Object[]> resultHolder = new Holder<Object[]>(Object[].class);
+    d.addDataChangeListener(new DataChangeListener() {
+
+      @Override
+      public void dataChanged(Object... dataTypes) throws ProcessingException {
+        resultHolder.setValue(dataTypes);
+      }
+    }, TEST_DATA_TYPE_1, TEST_DATA_TYPE_2);
+
+    d.dataChanged(TEST_DATA_TYPE_1, TEST_DATA_TYPE_2);
+
+    verifyDataChanged(resultHolder);
+  }
+
+  @Test
+  public void testDataChangedChanging() throws ProcessingException {
+    AbstractDesktop d = new AbstractDesktop() {
+    };
+    final Holder<Object[]> resultHolder = new Holder<Object[]>(Object[].class);
+    d.addDataChangeListener(new DataChangeListener() {
+
+      @Override
+      public void dataChanged(Object... dataTypes) throws ProcessingException {
+        resultHolder.setValue(dataTypes);
+      }
+    }, TEST_DATA_TYPE_1, TEST_DATA_TYPE_2);
+
+    d.setDataChanging(true);
+    d.dataChanged(TEST_DATA_TYPE_1);
+    d.dataChanged(TEST_DATA_TYPE_1, TEST_DATA_TYPE_1, TEST_DATA_TYPE_1);
+    d.dataChanged(TEST_DATA_TYPE_2, TEST_DATA_TYPE_2);
+    d.dataChanged(TEST_DATA_TYPE_1, TEST_DATA_TYPE_2);
+    d.dataChanged(TEST_DATA_TYPE_1);
+    d.dataChanged(TEST_DATA_TYPE_2);
+    d.setDataChanging(false);
+    verifyDataChanged(resultHolder);
+  }
+
+  protected void verifyDataChanged(Holder<Object[]> resultHolder) throws ProcessingException {
+    Object[] result = resultHolder.getValue();
+    assertTrue(result.length == 2);
+    assertTrue(result[0] == TEST_DATA_TYPE_1 && result[1] == TEST_DATA_TYPE_2 ||
+        result[0] == TEST_DATA_TYPE_2 && result[1] == TEST_DATA_TYPE_1);
   }
 
   @ClassId("d090cc19-ba7a-4f79-b147-e58765a837fb")
