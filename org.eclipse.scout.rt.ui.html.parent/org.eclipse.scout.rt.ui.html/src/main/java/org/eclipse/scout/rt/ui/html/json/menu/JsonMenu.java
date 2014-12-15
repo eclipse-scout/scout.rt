@@ -28,7 +28,6 @@ public class JsonMenu<T extends IMenu> extends JsonAction<T> {
 
   public static final String EVENT_ABOUT_TO_SHOW = "aboutToShow";
   public static final String PROP_SEPARATOR = "separator";
-  public static final String PROP_MENU_TYPES = "menuTypes";
   public static final String PROP_CHILD_MENUS = "childMenus";
   public static final String PROP_SYSTEM_TYPE = "systemType";
 
@@ -46,7 +45,7 @@ public class JsonMenu<T extends IMenu> extends JsonAction<T> {
         return getModel().isSeparator();
       }
     });
-    putJsonProperty(new JsonProperty<IMenu>(PROP_MENU_TYPES, model) {
+    putJsonProperty(new JsonProperty<IMenu>(IMenu.PROP_MENU_TYPES, model) {
       @Override
       protected Set<IMenuType> modelValue() {
         return getModel().getMenuTypes();
@@ -89,8 +88,7 @@ public class JsonMenu<T extends IMenu> extends JsonAction<T> {
   @Override
   protected void handleModelPropertyChange(String propertyName, Object oldValue, Object newValue) {
     if (IMenu.PROP_MENU_TYPES.equals(propertyName)) {
-      //FIXME CGU name of IMenu.PROP_MENU_TYPES is propMenuTypes which is bad -> fix it and remove the following lines
-      JsonProperty jsonProperty = getJsonProperty(PROP_MENU_TYPES);
+      JsonProperty jsonProperty = getJsonProperty(IMenu.PROP_MENU_TYPES);
       addPropertyChangeEvent(propertyName, jsonProperty.prepareValueForToJson(newValue));
     }
     else {
