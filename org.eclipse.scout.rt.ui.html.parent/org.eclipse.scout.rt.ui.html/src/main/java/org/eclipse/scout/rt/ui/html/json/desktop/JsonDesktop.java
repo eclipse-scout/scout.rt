@@ -19,8 +19,6 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.holders.IHolder;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigation;
 import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigationService;
@@ -47,14 +45,11 @@ import org.json.JSONObject;
 
 public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserver<T> {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonDesktop.class);
-
   public static final String PROP_OUTLINE = "outline";
   public static final String PROP_FORM = "form";
   public static final String PROP_MESSAGE_BOX = "messageBox";
 
   private DesktopListener m_desktopListener;
-  private IOutline m_previousOutline;
 
   public JsonDesktop(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
     super(model, jsonSession, id, parent);
@@ -95,7 +90,7 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
    * (GroupBox, Table, Desktop) Brauchen wir all die Menü-Types dann noch? Können wir die Menü-Logik überhaupt nochmals
    * refactoren? Was machen wir mit der heutigen Button-Bar?
    */
-  private List<IAction> filterModelActions() {
+  protected List<IAction> filterModelActions() {
     List<IAction> result = new ArrayList<>();
     for (IAction a : getModel().getActions()) {
       if (hasClassName(a, "UserProfileMenu")
@@ -150,7 +145,7 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
     return json;
   }
 
-  private IBreadCrumbsNavigation getBreadcrumbNavigation() {
+  protected IBreadCrumbsNavigation getBreadcrumbNavigation() {
     final IHolder<IBreadCrumbsNavigation> breadCrumbsNavigation = new Holder<>();
     ClientSyncJob job = new ClientSyncJob("AbstractJsonSession#init", getJsonSession().getClientSession()) {
       @Override
@@ -225,7 +220,7 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
     }
   }
 
-  private void handleModelOpenUrlInBrowser(String path, IUrlTarget urlTarget) {
+  protected void handleModelOpenUrlInBrowser(String path, IUrlTarget urlTarget) {
     JSONObject json = new JSONObject();
     putProperty(json, "path", path);
     putProperty(json, "urlTarget", urlTarget.toString());
@@ -236,7 +231,6 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
     if (isFormBased()) {
       return;
     }
-
     JSONObject jsonEvent = new JSONObject();
     IJsonAdapter<?> jsonAdapter = attachGlobalAdapter(outline);
     putProperty(jsonEvent, PROP_OUTLINE, jsonAdapter.getId());
@@ -247,7 +241,6 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
     if (isFormBlocked(form)) {
       return;
     }
-
     JSONObject jsonEvent = new JSONObject();
     IJsonAdapter<?> jsonAdapter = attachGlobalAdapter(form);
     putProperty(jsonEvent, PROP_FORM, jsonAdapter.getId());
@@ -281,7 +274,7 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
     dispose();
   }
 
-  private ISearchOutline getSearchOutline() {
+  protected ISearchOutline getSearchOutline() {
     for (IOutline outline : getModel().getAvailableOutlines()) {
       if (outline instanceof ISearchOutline) {
         return (ISearchOutline) outline;
@@ -300,7 +293,7 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
     }
   }
 
-  private void handleUiOutlineChanged(JsonEvent event) {
+  protected void handleUiOutlineChanged(JsonEvent event) {
     String outlineId = JsonObjectUtility.getString(event.getData(), "outlineId");
     IJsonAdapter<?> jsonOutline = getJsonSession().getJsonAdapter(outlineId);
     getModel().setOutline((IOutline) jsonOutline.getModel());
@@ -313,5 +306,4 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
       handleModelDesktopEvent(e);
     }
   }
-
 }

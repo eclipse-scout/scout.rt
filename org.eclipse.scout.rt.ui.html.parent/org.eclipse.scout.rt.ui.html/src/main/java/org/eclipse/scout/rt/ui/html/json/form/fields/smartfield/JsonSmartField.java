@@ -47,6 +47,14 @@ public class JsonSmartField<V, T extends ISmartField<V>> extends JsonValueField<
     super(model, jsonSession, id, parent);
   }
 
+  protected List<? extends ILookupRow<V>> getOptions() {
+    return m_options;
+  }
+
+  protected void setOptions(List<? extends ILookupRow<V>> options) {
+    m_options = options;
+  }
+
   @Override
   protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
@@ -92,7 +100,7 @@ public class JsonSmartField<V, T extends ISmartField<V>> extends JsonValueField<
     m_options = isCachingEnabled() ? loadOptions(IContentAssistField.BROWSE_ALL_TEXT) : Collections.<ILookupRow<V>> emptyList();
   }
 
-  private JSONArray optionsToJson(List<? extends ILookupRow<V>> options) {
+  protected JSONArray optionsToJson(List<? extends ILookupRow<V>> options) {
     JSONArray optionsArray = new JSONArray();
     for (ILookupRow<V> lr : options) {
       optionsArray.put(lr.getText());
@@ -108,25 +116,26 @@ public class JsonSmartField<V, T extends ISmartField<V>> extends JsonValueField<
    * When allowed, the client does not send any requests to the server while the
    * smart-field is used until a value is selected.
    */
-  private boolean isCachingEnabled() {
+  protected boolean isCachingEnabled() {
     return getModel().getClass().isAnnotationPresent(CachingEnabled.class);
   }
 
-  private String getLookupStrategy() {
+  protected String getLookupStrategy() {
     return isCachingEnabled() ? "cached" : "remote";
   }
 
-  private boolean isMultiline() {
+  protected boolean isMultiline() {
     return getModel().getClass().isAnnotationPresent(Multiline.class);
   }
 
-  private JSONObject addOptions(JSONObject json) {
+  // TODO AWE This method is never called!
+  protected JSONObject addOptions(JSONObject json) {
     // TODO AWE: (smartfield) überlegen ob wir die optionen wirklich hier laden wollen oder besser erst,
     // wenn das popup im UI zum ersten mal geöffnet wird.
     return putProperty(json, PROP_OPTIONS, loadOptions(IContentAssistField.BROWSE_ALL_TEXT));
   }
 
-  private List<? extends ILookupRow<V>> loadOptions(final String query) {
+  protected List<? extends ILookupRow<V>> loadOptions(final String query) {
     try {
       m_options = getModel().callBrowseLookup(query, MAX_OPTIONS);
       return m_options;
@@ -146,7 +155,7 @@ public class JsonSmartField<V, T extends ISmartField<V>> extends JsonValueField<
     }
   }
 
-  private void handleLoadOptions(JsonEvent event) {
+  protected void handleLoadOptions(JsonEvent event) {
     String query = event.getData().optString("query");
     LOG.debug("load options for query=" + query);
     JSONArray options = optionsToJson(loadOptions(query));

@@ -20,21 +20,7 @@ import org.eclipse.scout.commons.CollectionUtility;
 /**
  * This class is a per session registry of IJsonAdapter instances.
  */
-class JsonAdapterRegistry {
-
-  private static class P_RegistryValue {
-
-    private final String m_id;
-    private final IJsonAdapter<?> m_jsonAdapter;
-    private final Object m_model;
-
-    P_RegistryValue(String id, Object model, IJsonAdapter<?> jsonAdapter) {
-      m_id = id;
-      m_model = model;
-      m_jsonAdapter = jsonAdapter;
-    }
-
-  }
+public class JsonAdapterRegistry {
 
   /**
    * Maps the JsonAdapter ID to an IJsonAdapter instance (wrapped by a composite).
@@ -46,16 +32,24 @@ class JsonAdapterRegistry {
    */
   private final Map<IJsonAdapter<?>, Map<Object, P_RegistryValue>> m_parentAdapterMap;
 
-  JsonAdapterRegistry() {
+  public JsonAdapterRegistry() {
     m_idAdapterMap = new HashMap<>();
     m_parentAdapterMap = new HashMap<>();
   }
 
-  void addJsonAdapter(IJsonAdapter jsonAdapter, IJsonAdapter<?> parent) {
+  protected Map<String, P_RegistryValue> getIdAdapterMap() {
+    return m_idAdapterMap;
+  }
+
+  protected Map<IJsonAdapter<?>, Map<Object, P_RegistryValue>> getParentAdapterMap() {
+    return m_parentAdapterMap;
+  }
+
+  public void addJsonAdapter(IJsonAdapter jsonAdapter, IJsonAdapter<?> parent) {
     String id = jsonAdapter.getId();
     Object model = jsonAdapter.getModel();
 
-    P_RegistryValue value = new P_RegistryValue(id, model, jsonAdapter);
+    P_RegistryValue value = new P_RegistryValue(model, jsonAdapter);
     m_idAdapterMap.put(id, value);
     Map<Object, P_RegistryValue> modelAdapterMap = m_parentAdapterMap.get(parent);
     if (modelAdapterMap == null) {
@@ -65,19 +59,18 @@ class JsonAdapterRegistry {
     modelAdapterMap.put(model, value);
   }
 
-  void removeJsonAdapter(String id) {
+  public void removeJsonAdapter(String id) {
     P_RegistryValue value = m_idAdapterMap.remove(id);
     for (Map<Object, P_RegistryValue> modelAdapterMap : m_parentAdapterMap.values()) {
-      modelAdapterMap.remove(value.m_model);
+      modelAdapterMap.remove(value.getModel());
     }
   }
 
-  IJsonAdapter<?> getJsonAdapter(String id) {
-    return m_idAdapterMap.get(id).m_jsonAdapter;
+  public IJsonAdapter<?> getJsonAdapter(String id) {
+    return m_idAdapterMap.get(id).getJsonAdapter();
   }
 
-  @SuppressWarnings("unchecked")
-  <M, A extends IJsonAdapter<? super M>> A getJsonAdapter(M model, IJsonAdapter<?> parent) {
+  public <M, A extends IJsonAdapter<? super M>> A getJsonAdapter(M model, IJsonAdapter<?> parent) {
     Map<Object, P_RegistryValue> modelAdapterMap = m_parentAdapterMap.get(parent);
     if (modelAdapterMap == null) {
       return null;
@@ -86,24 +79,26 @@ class JsonAdapterRegistry {
     if (value == null) {
       return null;
     }
-    return (A) value.m_jsonAdapter;
+    @SuppressWarnings("unchecked")
+    A result = (A) value.getJsonAdapter();
+    return result;
   }
 
-  List<IJsonAdapter<?>> getJsonAdapters(IJsonAdapter<?> parent) {
+  public List<IJsonAdapter<?>> getJsonAdapters(IJsonAdapter<?> parent) {
     List<IJsonAdapter<?>> childAdapters = new LinkedList<IJsonAdapter<?>>();
     Map<Object, P_RegistryValue> modelAdapterMap = m_parentAdapterMap.get(parent);
     if (modelAdapterMap == null) {
       return childAdapters;
     }
     for (P_RegistryValue value : modelAdapterMap.values()) {
-      childAdapters.add(value.m_jsonAdapter);
+      childAdapters.add(value.getJsonAdapter());
     }
     return childAdapters;
   }
 
-  void dispose() {
+  public void dispose() {
     for (P_RegistryValue value : CollectionUtility.arrayList(m_idAdapterMap.values())) {
-      IJsonAdapter<?> jsonAdapter = value.m_jsonAdapter;
+      IJsonAdapter<?> jsonAdapter = value.getJsonAdapter();
       jsonAdapter.dispose();
       removeJsonAdapter(jsonAdapter.getId());
     }
@@ -111,4 +106,22 @@ class JsonAdapterRegistry {
     assert m_parentAdapterMap.isEmpty();
   }
 
+  protected static class P_RegistryValue {
+
+    private final IJsonAdapter<?> m_jsonAdapter;
+    private final Object m_model;
+
+    protected P_RegistryValue(Object model, IJsonAdapter<?> jsonAdapter) {
+      m_model = model;
+      m_jsonAdapter = jsonAdapter;
+    }
+
+    protected IJsonAdapter<?> getJsonAdapter() {
+      return m_jsonAdapter;
+    }
+
+    protected Object getModel() {
+      return m_model;
+    }
+  }
 }

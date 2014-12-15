@@ -18,7 +18,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 
 public class TableEventFilterCondition {
-  private static final long serialVersionUID = 1L;
 
   private int m_type;
   private List<ITableRow> m_rows;

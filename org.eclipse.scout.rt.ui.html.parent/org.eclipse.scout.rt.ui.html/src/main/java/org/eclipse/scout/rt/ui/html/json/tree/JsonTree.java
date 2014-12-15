@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
@@ -31,7 +29,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> implements IContextMenuOwner {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonTree.class);
+
   public static final String EVENT_NODE_CLICKED = "nodeClicked";
   public static final String EVENT_NODE_ACTION = "nodeAction";
   public static final String EVENT_NODE_EXPANDED = "nodeExpanded";
@@ -379,5 +377,4 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     super.cleanUpEventFilters();
     m_treeEventFilter.removeAllConditions();
   }
-
 }

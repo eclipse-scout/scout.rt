@@ -17,7 +17,6 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 
 public class TreeEventFilterCondition {
-  private static final long serialVersionUID = 1L;
 
   private int m_type;
   private List<ITreeNode> m_nodes;
