@@ -153,7 +153,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   private boolean m_desktopInited;
   private boolean m_trayVisible;
   private boolean m_isForcedClosing = false;
-  private final ArrayList<Object> m_addOns;
+  private final List<Object> m_addOns;
   private IContributionOwner m_contributionHolder;
   private final ObjectExtensions<AbstractDesktop, org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> m_objectExtensions;
 
