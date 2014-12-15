@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
  * Interface for menus that normally appear in the gui on the menubar
  */
 public interface IMenu extends IActionNode<IMenu> {
-  String PROP_MENU_TYPES = "propMenuTypes";
+  String PROP_MENU_TYPES = "menuTypes";
 
   /**
    * A menu can have several {@link IMenuType}s each menu type describes a certain usage in a specific context (e.g.
