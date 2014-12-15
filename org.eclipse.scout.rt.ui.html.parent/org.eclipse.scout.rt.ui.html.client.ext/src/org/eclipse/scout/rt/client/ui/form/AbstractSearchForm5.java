@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form;
 
-import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
@@ -42,11 +41,6 @@ public abstract class AbstractSearchForm5 extends AbstractForm5 implements ISear
   @Override
   protected boolean getConfiguredAskIfNeedSave() {
     return false;
-  }
-
-  private Class<? extends IFormHandler> getConfiguredSearchHandler() {
-    Class<?>[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
-    return ConfigurationUtility.filterClass(dca, IFormHandler.class);
   }
 
   @Override

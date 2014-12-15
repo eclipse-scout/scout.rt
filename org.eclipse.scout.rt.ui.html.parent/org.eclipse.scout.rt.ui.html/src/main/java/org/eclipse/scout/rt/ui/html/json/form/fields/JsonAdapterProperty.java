@@ -59,7 +59,7 @@ public abstract class JsonAdapterProperty<T> extends JsonProperty<T> {
     createAdapters(modelValue());
   }
 
-  private void createAdapters(Object modelValue) {
+  protected void createAdapters(Object modelValue) {
     if (modelValue == null) {
       return;
     }
@@ -73,7 +73,7 @@ public abstract class JsonAdapterProperty<T> extends JsonProperty<T> {
     }
   }
 
-  private void createAdapter(Object model) {
+  protected void createAdapter(Object model) {
     if (m_global) {
       m_jsonSession.getRootJsonAdapter().attachAdapter(model);
     }
@@ -83,10 +83,10 @@ public abstract class JsonAdapterProperty<T> extends JsonProperty<T> {
   }
 
   public void disposeAdapters() {
-    disposeAdapter(modelValue());
+    disposeAdapters(modelValue());
   }
 
-  private void disposeAdapters(Object modelValue) {
+  protected void disposeAdapters(Object modelValue) {
     if (modelValue == null) {
       return;
     }

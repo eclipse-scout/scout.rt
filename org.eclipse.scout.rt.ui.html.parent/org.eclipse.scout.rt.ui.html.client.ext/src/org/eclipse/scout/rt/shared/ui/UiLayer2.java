@@ -23,10 +23,6 @@ public enum UiLayer2 implements IUiLayer {
     m_webUi = webUi;
   }
 
-  private UiLayer2() {
-    this(false);
-  }
-
   @Override
   public boolean isWebUi() {
     return m_webUi;
