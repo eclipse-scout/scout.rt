@@ -88,7 +88,7 @@ public abstract class AbstractPageWithNodes5 extends AbstractExtensiblePageWithN
     }
   }
 
-  private void handleNavigateUp() {
+  protected void handleNavigateUp() {
     if (m_navigateUp) {
       m_navigateUp = false;
     }
@@ -138,7 +138,7 @@ public abstract class AbstractPageWithNodes5 extends AbstractExtensiblePageWithN
     IForm oldDetailForm = getDetailForm();
     if (oldDetailForm != form) {
       super.setDetailForm(form);
-      ((IOutline5) getOutline()).fireOutlineEvent(new OutlineEvent(getTree(), OutlineEvent.TYPE_PAGE_CHANGED, this));
+      fireOutlineEvent(OutlineEvent.TYPE_PAGE_CHANGED);
     }
   }
 
@@ -205,11 +205,11 @@ public abstract class AbstractPageWithNodes5 extends AbstractExtensiblePageWithN
 
   /**
    * Note: set*Visible methods are called by initConfig(), at this point getTree() is still null.
+   * Tree can also be null during shutdown.
    */
-  private void fireOutlineEvent(int eventType) {
+  protected void fireOutlineEvent(int eventType) {
     if (getTree() != null) {
       ((IOutline5) getOutline()).fireOutlineEvent(new OutlineEvent(getTree(), eventType, this));
     }
   }
-
 }
