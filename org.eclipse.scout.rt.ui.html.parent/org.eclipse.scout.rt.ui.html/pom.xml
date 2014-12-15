@@ -43,7 +43,11 @@
       </configuration>
     </plugin>
 
-      <!-- Generate the js and css scripts -->
+  <!-- Generate the js and css scripts -->
+  <!-- TODO IMO: this is not working in m2e, since classpaths are
+  not resolved correctly. When dropping osgi,
+  the dependencies will be part of all pom.xml
+  and this script generator will work -->
   <plugin>
     <groupId>org.codehaus.mojo</groupId>
     <artifactId>exec-maven-plugin</artifactId>
@@ -153,6 +157,7 @@
               <artifactId>exec-maven-plugin</artifactId>
               <versionRange>[1.1.1,)</versionRange>
               <goals>
+                <goal>exec</goal>
                 <goal>java</goal>
               </goals>
             </pluginExecutionFilter>

@@ -8,25 +8,19 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.html.res.internal.impl;
+package org.eclipse.scout.rt.ui.html.scriptprocessor;
 
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
+import org.eclipse.scout.rt.ui.html.scriptprocessor.ScriptProcessor;
 
-import com.yahoo.platform.yui.compressor.CssCompressor;
+public final class ConsoleTest implements ExampleScripts {
 
-public class MinifyCssWithYui {
-
-  public String run(String content) throws IOException {
-    try (
-        StringReader reader = new StringReader(content);
-        StringWriter writer = new StringWriter();) {
-      CssCompressor compressor = new CssCompressor(reader);
-      compressor.compress(writer, -1);
-      writer.flush();
-      return writer.toString();
-    }
+  private ConsoleTest() {
   }
 
+  public static void main(String[] args) throws Exception {
+    ScriptProcessor impl = new ScriptProcessor();
+    System.out.println("minifyJs: " + impl.minifyJs(JS_INPUT));
+    System.out.println("compileCss: " + impl.compileCss(CSS_INPUT));
+    System.out.println("minifyCss: " + impl.minifyCss(CSS_INPUT));
+  }
 }

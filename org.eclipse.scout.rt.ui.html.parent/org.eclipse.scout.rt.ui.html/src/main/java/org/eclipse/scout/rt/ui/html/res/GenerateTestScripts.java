@@ -11,14 +11,11 @@
 package org.eclipse.scout.rt.ui.html.res;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
-
-import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
 
 /**
  * Generate js and css files used for testing. This java class is run using the maven
@@ -40,6 +37,7 @@ public class GenerateTestScripts implements IWebContentResourceLocator {
       //try to write a log file
       PrintStream out = new PrintStream(new File(args[1], GenerateTestScripts.class.getSimpleName() + "-error.log"));
       ex.printStackTrace(out);
+      out.println(System.getProperty("java.class.path"));
       out.close();
       //re-throw
       throw ex;
@@ -48,6 +46,7 @@ public class GenerateTestScripts implements IWebContentResourceLocator {
 
   private final File m_inDir;
   private final File m_outDir;
+  @SuppressWarnings("unused")
   private final String[] m_moduleNames;
 
   public GenerateTestScripts(File inDir, File outDir, String... moduleNames) {
@@ -60,7 +59,14 @@ public class GenerateTestScripts implements IWebContentResourceLocator {
     m_moduleNames = moduleNames;
   }
 
+  /**
+   * TODO IMO: this is not working in m2e, since classpaths are
+   * not resolved correctly. When dropping osgi,
+   * the dependencies will be part of all pom.xml
+   * and this script generator will work
+   */
   public void run() throws IOException {
+    /*
     ScriptFileBuilder builder = new ScriptFileBuilder(this);
     builder.setMinifyEnabled(false);
     for (String moduleName : m_moduleNames) {
@@ -72,6 +78,7 @@ public class GenerateTestScripts implements IWebContentResourceLocator {
         fout.write(obj.getContent());
       }
     }
+     */
   }
 
   @Override

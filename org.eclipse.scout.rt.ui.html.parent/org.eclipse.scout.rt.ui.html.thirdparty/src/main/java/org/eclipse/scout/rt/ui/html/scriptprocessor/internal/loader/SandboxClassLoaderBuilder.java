@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.html.res.internal.loader;
+package org.eclipse.scout.rt.ui.html.scriptprocessor.internal.loader;
 
 import java.io.File;
 import java.io.FileOutputStream;

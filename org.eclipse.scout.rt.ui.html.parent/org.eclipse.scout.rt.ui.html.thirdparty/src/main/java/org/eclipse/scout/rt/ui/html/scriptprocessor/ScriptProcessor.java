@@ -8,16 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.html.res;
+package org.eclipse.scout.rt.ui.html.scriptprocessor;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import org.eclipse.scout.rt.ui.html.res.internal.impl.CompileCssWithLess;
-import org.eclipse.scout.rt.ui.html.res.internal.impl.MinifyCssWithYui;
-import org.eclipse.scout.rt.ui.html.res.internal.impl.MinifyJsWithYui;
-import org.eclipse.scout.rt.ui.html.res.internal.loader.SandboxClassLoaderBuilder;
+import org.eclipse.scout.rt.ui.html.scriptprocessor.internal.impl.CompileCssWithLess;
+import org.eclipse.scout.rt.ui.html.scriptprocessor.internal.impl.MinifyCssWithYui;
+import org.eclipse.scout.rt.ui.html.scriptprocessor.internal.impl.MinifyJsWithYui;
+import org.eclipse.scout.rt.ui.html.scriptprocessor.internal.loader.SandboxClassLoaderBuilder;
 
 /**
  * Default wrapper for YUI and LESS used to compile and minify javscript and css.

@@ -14,4 +14,4 @@ Bundle-Vendor: BSI Business Systems Integration AG
 Bundle-ActivationPolicy: lazy
 Require-Bundle: org.junit4;bundle-version="4.8.1";resolution:=optional,
  org.eclipse.osgi;bundle-version="3.6.2";resolution:=optional
-Export-Package: org.eclipse.scout.rt.ui.html.res
+Export-Package: org.eclipse.scout.rt.ui.html.scriptprocessor

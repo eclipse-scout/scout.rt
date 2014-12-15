@@ -8,13 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.html.thirdparty;
+package org.eclipse.scout.rt.ui.html.scriptprocessor;
 
-import org.eclipse.scout.rt.ui.html.res.ScriptProcessor;
+import org.eclipse.scout.rt.ui.html.scriptprocessor.ScriptProcessor;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class ThirdPartyScriptProcessorTest implements ExampleScripts {
+public class ScriptProcessorTest implements ExampleScripts {
 
   @Test
   public void testMinifyJsWithYui() throws Exception {

@@ -20,6 +20,7 @@ import org.eclipse.scout.rt.ui.html.ScoutAppHints;
 import org.eclipse.scout.rt.ui.html.StreamUtility;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
 import org.eclipse.scout.rt.ui.html.res.Script.NodeType;
+import org.eclipse.scout.rt.ui.html.scriptprocessor.ScriptProcessor;
 
 /**
  * Process JS and CSS script templates such as <code>scout-module.js</code>
