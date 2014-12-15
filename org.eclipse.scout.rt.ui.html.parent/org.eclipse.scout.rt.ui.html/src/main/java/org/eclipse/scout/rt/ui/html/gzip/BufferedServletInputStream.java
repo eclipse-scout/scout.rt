@@ -16,7 +16,8 @@ import java.io.IOException;
 import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
 
-class BufferedServletInputStream extends ServletInputStream {
+public class BufferedServletInputStream extends ServletInputStream {
+
   private final ByteArrayInputStream m_buf;
   private final int m_len;
 

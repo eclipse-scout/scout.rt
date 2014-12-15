@@ -27,7 +27,7 @@ public final class StreamUtility {
   private StreamUtility() {
   }
 
-  public static byte[] compressGZIP(byte[] b) throws IOException {
+  public static byte[] compressGzip(byte[] b) throws IOException {
     ByteArrayOutputStream buf = new ByteArrayOutputStream();
     try (GZIPOutputStream out = new GZIPOutputStream(buf)) {
       out.write(b);
@@ -35,7 +35,7 @@ public final class StreamUtility {
     return buf.toByteArray();
   }
 
-  public static byte[] uncompressGZIP(byte[] b) throws IOException {
+  public static byte[] uncompressGzip(byte[] b) throws IOException {
     ByteArrayOutputStream out = new ByteArrayOutputStream();
     try (BufferedInputStream in = new BufferedInputStream(new GZIPInputStream(new ByteArrayInputStream(b)))) {
       int val;

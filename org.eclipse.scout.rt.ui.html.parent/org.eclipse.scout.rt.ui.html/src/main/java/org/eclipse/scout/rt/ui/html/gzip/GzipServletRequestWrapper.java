@@ -25,14 +25,14 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.html.StreamUtility;
 
-class GZIPServletRequestWrapper extends HttpServletRequestWrapper {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(GZIPServletRequestWrapper.class);
+public class GzipServletRequestWrapper extends HttpServletRequestWrapper {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(GzipServletRequestWrapper.class);
 
   private BufferedServletInputStream m_buf;
   private int m_compressedLength = -1;
   private int m_uncompressedLength = -1;
 
-  public GZIPServletRequestWrapper(HttpServletRequest req) throws IOException {
+  public GzipServletRequestWrapper(HttpServletRequest req) throws IOException {
     super(req);
   }
 
@@ -40,7 +40,7 @@ class GZIPServletRequestWrapper extends HttpServletRequestWrapper {
     if (m_buf == null) {
       byte[] gzipped = StreamUtility.readStream(super.getInputStream(), super.getContentLength());
       m_compressedLength = gzipped.length;
-      m_buf = new BufferedServletInputStream(StreamUtility.uncompressGZIP(gzipped));
+      m_buf = new BufferedServletInputStream(StreamUtility.uncompressGzip(gzipped));
       m_uncompressedLength = m_buf.getLength();
     }
     return m_buf;
@@ -75,14 +75,14 @@ class GZIPServletRequestWrapper extends HttpServletRequestWrapper {
       return ensureBufferedStream().getLength();
     }
     catch (IOException ex) {
-      LOG.warn("reading gzip content", ex);
+      LOG.warn("Error while reading GZIP content", ex);
       return -1;
     }
   }
 
   @Override
   public String getHeader(String name) {
-    if (GZIPServletFilter.CONTENT_ENCODING.equals(name)) {
+    if (GzipServletFilter.CONTENT_ENCODING.equals(name)) {
       return null;
     }
     return super.getHeader(name);
@@ -90,7 +90,7 @@ class GZIPServletRequestWrapper extends HttpServletRequestWrapper {
 
   @Override
   public Enumeration<String> getHeaders(String name) {
-    if (GZIPServletFilter.CONTENT_ENCODING.equals(name)) {
+    if (GzipServletFilter.CONTENT_ENCODING.equals(name)) {
       return Collections.emptyEnumeration();
     }
     return super.getHeaders(name);
@@ -101,10 +101,9 @@ class GZIPServletRequestWrapper extends HttpServletRequestWrapper {
     Enumeration<String> names = super.getHeaderNames();
     if (names != null) {
       ArrayList<String> list = Collections.list(names);
-      list.remove(GZIPServletFilter.CONTENT_ENCODING);
+      list.remove(GzipServletFilter.CONTENT_ENCODING);
       return Collections.enumeration(list);
     }
     return names;
   }
-
 }

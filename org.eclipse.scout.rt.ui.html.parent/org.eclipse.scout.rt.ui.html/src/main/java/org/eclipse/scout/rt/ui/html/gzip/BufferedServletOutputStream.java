@@ -17,7 +17,8 @@ import java.io.OutputStream;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.WriteListener;
 
-class BufferedServletOutputStream extends ServletOutputStream {
+public class BufferedServletOutputStream extends ServletOutputStream {
+
   private final ByteArrayOutputStream m_buf;
 
   public BufferedServletOutputStream(OutputStream out) throws IOException {
@@ -61,5 +62,4 @@ class BufferedServletOutputStream extends ServletOutputStream {
   public void close() throws IOException {
     m_buf.close();
   }
-
 }

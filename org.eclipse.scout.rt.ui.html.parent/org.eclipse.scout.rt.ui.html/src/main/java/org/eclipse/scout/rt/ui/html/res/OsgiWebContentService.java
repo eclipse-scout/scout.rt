@@ -11,6 +11,7 @@ import org.osgi.framework.ServiceRegistration;
  * {@link ClassLoader#getResources(String)} inside {@link StaticResourceRequestInterceptor}
  */
 public class OsgiWebContentService extends AbstractService {
+
   private Bundle m_bundle;
 
   @Override
@@ -22,5 +23,4 @@ public class OsgiWebContentService extends AbstractService {
   public Bundle getBundle() {
     return m_bundle;
   }
-
 }

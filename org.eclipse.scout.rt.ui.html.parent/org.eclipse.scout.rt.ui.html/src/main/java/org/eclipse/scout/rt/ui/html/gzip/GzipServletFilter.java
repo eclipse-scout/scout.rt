@@ -37,8 +37,8 @@ import org.eclipse.scout.rt.ui.html.ScoutAppHints;
  * <p>
  * post_pattern = regex of pathInfo that is compressed, default {@link #DEFAULT_POST_PATTERN} = '/json'
  */
-public class GZIPServletFilter implements Filter {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(GZIPServletFilter.class);
+public class GzipServletFilter implements Filter {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(GzipServletFilter.class);
 
   public static final String ACCEPT_ENCODING = "Accept-Encoding";
   public static final String CONTENT_ENCODING = "Content-Encoding";
@@ -86,21 +86,21 @@ public class GZIPServletFilter implements Filter {
     HttpServletRequest req = (HttpServletRequest) req0;
     HttpServletResponse resp = (HttpServletResponse) resp0;
 
-    if (requestHasGZIPEncoding(req)) {
-      GZIPServletRequestWrapper gzipReq = new GZIPServletRequestWrapper(req);
+    if (requestHasGzipEncoding(req)) {
+      GzipServletRequestWrapper gzipReq = new GzipServletRequestWrapper(req);
       req = gzipReq;
       if (LOG.isInfoEnabled()) {
         LOG.info("GZIP request[size " + (gzipReq.getCompressedLength() * 100 / gzipReq.getUncompressedLength()) + "%, compressed: " + gzipReq.getCompressedLength() + ", uncompressed: " + gzipReq.getUncompressedLength() + "]: " + req.getPathInfo());
       }
     }
-    if (requestAcceptsGZIPEncoding(req) && supportsGZIPEncoding(req)) {
-      resp = new GZIPServletResponseWrapper(resp);
+    if (requestAcceptsGzipEncoding(req) && supportsGzipEncoding(req)) {
+      resp = new GzipServletResponseWrapper(resp);
     }
 
     chain.doFilter(req, resp);
 
-    if (resp instanceof GZIPServletResponseWrapper) {
-      GZIPServletResponseWrapper gzipResp = (GZIPServletResponseWrapper) resp;
+    if (resp instanceof GzipServletResponseWrapper) {
+      GzipServletResponseWrapper gzipResp = (GzipServletResponseWrapper) resp;
       boolean compressed = gzipResp.finish(minimumLengthToCompress(req));
       if (compressed) {
         if (LOG.isInfoEnabled()) {
@@ -110,17 +110,17 @@ public class GZIPServletFilter implements Filter {
     }
   }
 
-  private boolean requestHasGZIPEncoding(HttpServletRequest req) {
+  protected boolean requestHasGzipEncoding(HttpServletRequest req) {
     String h = req.getHeader(CONTENT_ENCODING);
     return h != null && h.contains(GZIP);
   }
 
-  private boolean requestAcceptsGZIPEncoding(HttpServletRequest req) {
+  protected boolean requestAcceptsGzipEncoding(HttpServletRequest req) {
     String h = req.getHeader(ACCEPT_ENCODING);
     return h != null && h.contains(GZIP);
   }
 
-  protected boolean supportsGZIPEncoding(HttpServletRequest req) {
+  protected boolean supportsGzipEncoding(HttpServletRequest req) {
     if (!ScoutAppHints.isCompressHint(req)) {
       return false;
     }
@@ -145,10 +145,6 @@ public class GZIPServletFilter implements Filter {
       return m_postMinSize;
     }
     return -1;
-  }
-
-  private boolean lengthAtLeast(int len, int minSize) {
-    return len < 0 || len >= minSize;
   }
 
   @Override

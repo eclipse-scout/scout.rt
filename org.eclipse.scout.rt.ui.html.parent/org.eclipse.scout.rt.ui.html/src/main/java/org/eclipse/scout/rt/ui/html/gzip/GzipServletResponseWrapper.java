@@ -18,12 +18,9 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.html.StreamUtility;
 
-class GZIPServletResponseWrapper extends HttpServletResponseWrapper {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(GZIPServletResponseWrapper.class);
+public class GzipServletResponseWrapper extends HttpServletResponseWrapper {
 
   private BufferedServletOutputStream m_buf;
   private int m_compressedLength = -1;
@@ -32,7 +29,7 @@ class GZIPServletResponseWrapper extends HttpServletResponseWrapper {
   private ServletOutputStream m_servletOut;
   private PrintWriter m_writer;
 
-  public GZIPServletResponseWrapper(HttpServletResponse resp) throws IOException {
+  public GzipServletResponseWrapper(HttpServletResponse resp) throws IOException {
     super(resp);
   }
 
@@ -60,7 +57,7 @@ class GZIPServletResponseWrapper extends HttpServletResponseWrapper {
   @Override
   public ServletOutputStream getOutputStream() throws IOException {
     if (m_writer != null) {
-      throw new IllegalStateException("getWriter was called, getOutputStream is not available");
+      throw new IllegalStateException("getWriter was previsouly called, getOutputStream is not available");
     }
     if (m_servletOut == null) {
       m_servletOut = ensureBufferedStream();
@@ -71,7 +68,7 @@ class GZIPServletResponseWrapper extends HttpServletResponseWrapper {
   @Override
   public PrintWriter getWriter() throws IOException {
     if (m_servletOut != null) {
-      throw new IllegalStateException("getOutputStream was called, getWriter is not available");
+      throw new IllegalStateException("getOutputStream was previsouly called, getWriter is not available");
     }
     if (m_writer == null) {
       m_writer = new PrintWriter(new OutputStreamWriter(ensureBufferedStream(), getResponse().getCharacterEncoding()));
@@ -115,8 +112,8 @@ class GZIPServletResponseWrapper extends HttpServletResponseWrapper {
       HttpServletResponse res = (HttpServletResponse) getResponse();
       byte[] gzipped;
       if (minimumLengthToCompress >= 0 && m_uncompressedLength >= minimumLengthToCompress) {
-        gzipped = StreamUtility.compressGZIP(raw);
-        res.addHeader(GZIPServletFilter.CONTENT_ENCODING, GZIPServletFilter.GZIP);
+        gzipped = StreamUtility.compressGzip(raw);
+        res.addHeader(GzipServletFilter.CONTENT_ENCODING, GzipServletFilter.GZIP);
         compressed = true;
       }
       else {
@@ -130,5 +127,4 @@ class GZIPServletResponseWrapper extends HttpServletResponseWrapper {
     }
     return compressed;
   }
-
 }
