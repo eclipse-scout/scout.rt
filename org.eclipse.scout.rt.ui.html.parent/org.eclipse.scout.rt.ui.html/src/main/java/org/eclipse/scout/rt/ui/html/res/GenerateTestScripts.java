@@ -30,23 +30,13 @@ import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
 public class GenerateTestScripts implements IWebContentResourceLocator {
 
   public static void main(String[] args) throws Exception {
-    //XXX
-    if (args.length == 0) {
-      args = new String[]{
-          "D:/git/eclipse.scout/org.eclipse.scout.rt.ui.html.parent/org.eclipse.scout.rt.ui.html/src/main/js",
-          "D:/git/eclipse.scout/org.eclipse.scout.rt.ui.html.parent/org.eclipse.scout.rt.ui.html/src/test/js",
-          "scout-5.0.0.min.js",
-          "scout-5.0.0.min.css"
-      };
-    }
-
-    if (args == null || args.length < 2) {
-      throw new IllegalArgumentException("expected args=[path-to-input-src/main/js, path-to-output-src/test/js]");
+    if (args == null || args.length < 3) {
+      throw new IllegalArgumentException("expected args=[path-to-input-src/main/js, path-to-output-src/test/js, moduleName1, moduleName2, ...]");
     }
     try {
       new GenerateTestScripts(new File(args[0]), new File(args[1]), Arrays.copyOfRange(args, 2, args.length)).run();
     }
-    catch (Exception ex) {
+    catch (Throwable ex) {
       //try to write a log file
       PrintStream out = new PrintStream(new File(args[1], GenerateTestScripts.class.getSimpleName() + "-error.log"));
       ex.printStackTrace(out);
