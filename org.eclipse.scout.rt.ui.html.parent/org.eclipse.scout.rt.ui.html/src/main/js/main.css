@@ -53,12 +53,12 @@ input {
   }
 
   &.has-error {
-    border-color: @color-error;
-    background-color: @color-error-light;
+    border-color: @error-color;
+    background-color: @error-background-color;
   }
 
   &.has-error:focus {
-    .glow(@color-error);
+    .glow(@error-color);
   }
 
   &::selection {

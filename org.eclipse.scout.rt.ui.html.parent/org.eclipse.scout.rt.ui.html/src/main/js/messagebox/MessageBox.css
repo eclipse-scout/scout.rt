@@ -12,7 +12,7 @@
   border-top-right-radius: @border-radius;
 
   &.severity-error {
-    border-top-color: @color-error;
+    border-top-color: @error-color;
   }
 
   & .drag-handle {
@@ -87,7 +87,7 @@
   }
 
   .severity-error & > button:focus:before {
-    border-color: @color-error;
-    .glow(@color-error-glow);
+    border-color: @error-color;
+    .glow(@error-color);
   }
 }

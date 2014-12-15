@@ -21,8 +21,8 @@
 }
 
 .selection() {
-    background: @selection-background;
-    color: @selection-color;
+    background: @selection-background-color;
+    color: @selection-text-color;
 }
 
 .overlay(@left: 0px, @top: 0px, @diffW: 0px, @diffH: 0px) {
@@ -60,7 +60,7 @@
   }
 
   &.has-error ~ .icon:before {
-    color: @color-error;
+    color: @error-color;
   }
 
   &.disabled {

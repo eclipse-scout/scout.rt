@@ -2,7 +2,9 @@
 /* Color Palette Definition */
 /* ------------------------ */
 
-@palette-black:#000;
+@palette-white:#fff;
+
+@palette-black: #000;
 
 @palette-dark-gray-1: #333;
 @palette-dark-gray-2: #5D5D5D;
@@ -17,76 +19,69 @@
 @palette-light-gray-5: #f6f6f6;
 @palette-light-gray-6: #fefefe;
 
-@palette-white:#fff;
-
 @palette-red: #FF6060;
 @palette-light-red: #FFE0E0;
 
+@palette-yellow: #FFFF00;
+
 @palette-bsi-orange: #FE9915;
 
+@palette-green: #00FF00;
+
+@palette-bsi-dark-green: #004A5C;
+@palette-bsi-dark-green-1: #006983;
 @palette-bsi-green: #0082A1;
-@palette-bsi-light-green-0: #ECF3F7;
 @palette-bsi-light-green: #389DB6;
-@palette-bsi-dark-green: #006983;
+@palette-bsi-light-green-1: #ECF3F7;
 
 /* ------------------------ */
 /* Global Color Definitions */
 /* ------------------------ */
 
-//@color-nav: #41525E;
-//@color-nav-semi: #506678;
-// for UGM;)
-@color-nav: #004A5C;
-@color-nav-semi: #00657D;
-
-@color-nav-select: @palette-white;
-@color-nav-text: @palette-white;
-
-@color-bench: @palette-white;
-@color-bench-light: @palette-light-gray-5;
-@color-bench-light-border: @palette-light-gray-2;
-
-@color-error: @palette-red;
-@color-error-light: @palette-light-red;
-@color-error-glow: fade(@color-error, 50%);
+@active-color: @palette-bsi-green;
 
 @body-background-color: @palette-light-gray-6;
 @border-color: @palette-light-gray-3;
+@button-background-color: @palette-light-gray-5;
 
+@chart-color-axis-line: @palette-light-gray-2;
+@chart-color-axis-text: @palette-gray;
 @chart-color-bar: @palette-light-gray-0;
 @chart-color-data: @palette-gray;
 @chart-color-empty: @palette-light-gray-3;
-@chart-color-axis-line: @palette-light-gray-2;
-@chart-color-axis-text: @palette-gray;
-
 @control-background-color: @palette-white;
-@highlight-color: @palette-bsi-orange;
 
-@text-color: @palette-dark-gray-1;
-@icon-color: @palette-dark-gray-3;
-@text-field-icon-color: @palette-gray;
+@default-button-background-color: @palette-bsi-light-green;
+@desktop-background-color: @palette-white;
+@desktop-border-color: @palette-light-gray-2;
 @disabled-color: @palette-light-gray-1;
-@hover-color: @palette-bsi-green;
+
+@error-color: @palette-red;
+@error-background-color: @palette-light-red;
+
 @focus-color: @palette-bsi-green;
 @focus-color-glow: fade(@focus-color, 50%);
-@active-color: @palette-bsi-green;
-@highlight-color: @palette-bsi-orange;
-@selection-background-color: @palette-bsi-light-green-0;
-@selection-border-color: @palette-bsi-green;
-
-@menu-border-color: @palette-light-gray-1;
-@popup-border-color: @palette-bsi-green;
-@button-background-color: @palette-light-gray-5;
-@default-button-background-color: @palette-bsi-light-green;
-
-@title-color: @palette-dark-gray-1;
-
 @footer-color: @palette-gray;
 @footer-disabled-color: @palette-light-gray-4;
 
-@marker-yellow: #FFFF00;
-@marker-green: #00FF00;
-@marker-blue: #00FFFF;
+@highlight-color: @palette-bsi-orange;
+@hover-color: @palette-bsi-green;
 
-@selection-color: @palette-white;
-@selection-background: @palette-bsi-dark-green;
+@icon-color: @palette-dark-gray-3;
+
+@menu-border-color: @palette-light-gray-1;
+
+@navigation-background-color: @palette-bsi-dark-green;
+@navigation-background-active-color: @palette-bsi-dark-green-1;
+@navigation-background-selected-color: @palette-white;
+
+@panel-background-color: @palette-light-gray-5;
+@popup-border-color: @palette-bsi-green;
+
+@selection-text-color: @palette-white;
+@selection-background-color: @palette-bsi-light-green-1;
+@selection-border-color: @palette-bsi-green;
+
+@text-color: @palette-dark-gray-1;
+@text-field-icon-color: @palette-gray;
+@title-color: @palette-dark-gray-1;

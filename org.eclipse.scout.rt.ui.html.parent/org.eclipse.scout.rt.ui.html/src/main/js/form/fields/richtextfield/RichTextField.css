@@ -103,9 +103,9 @@
   & .rich-text-bar {
     position: absolute;
     overflow: hidden;
-    background-color: @color-bench-light;
+    background-color: @panel-background-color;
     border: 1px solid transparent;
-    border-left: 1px solid @color-bench-light-border;
+    border-left: 1px solid @desktop-border-color;
     border-top-right-radius: @border-radius;
     border-bottom-right-radius: @border-radius;
     top: 1px;
@@ -115,7 +115,7 @@
 
   & .rich-text-bar-group {
     display: block;
-    border-bottom: 1px solid @color-bench-light-border;
+    border-bottom: 1px solid @desktop-border-color;
     padding: 0 5px;
   }
 
@@ -157,11 +157,11 @@
   }
 
   & .rich-text-bar-yellow {
-    .rich-text-color(@marker-yellow);
+    .rich-text-color(@palette-yellow);
   }
 
   & .rich-text-bar-green {
-    .rich-text-color(@marker-green);
+    .rich-text-color(@palette-green);
   }
 
   & .rich-text-bar-plain {

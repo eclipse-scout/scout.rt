@@ -21,9 +21,9 @@
 .table-header {
   height: @table-header-height;
   position: relative;
-  background-color: @color-bench-light;
-  border-top: 1px solid @color-bench-light-border;
-  border-bottom: 1px solid @color-bench-light-border;
+  background-color: @panel-background-color;
+  border-top: 1px solid @desktop-border-color;
+  border-bottom: 1px solid @desktop-border-color;
   white-space: nowrap;
   overflow: hidden;
 }
@@ -67,9 +67,9 @@
   }
 
   &.menu-open {
-    border-left: 1px solid @color-bench-light-border;
-    border-right: 1px solid @color-bench-light-border;
-    background-color: @color-bench;
+    border-left: 1px solid @desktop-border-color;
+    border-right: 1px solid @desktop-border-color;
+    background-color: @desktop-background-color;
     color: @active-color;
     z-index: 2;
   }
@@ -84,17 +84,17 @@
   width: 17px;
   padding: 8px;
   margin-left: -8px;
-  background-color: @color-bench-light-border;
+  background-color: @desktop-border-color;
   background-clip: content-box;
   cursor: col-resize;
   z-index: 4;
 
   .header-move & {
-    background-color: @color-bench-light;
+    background-color: @panel-background-color;
   }
 
   .menu-open + &.header-resize {
-    background-color: @color-bench-light;
+    background-color: @panel-background-color;
   }
 }
 
@@ -121,7 +121,7 @@
   overflow: hidden;
   border-left: 1px solid transparent;
   border-right: 1px solid transparent;
-  border-bottom: 1px solid @color-bench-light-border;
+  border-bottom: 1px solid @desktop-border-color;
 }
 
 .table-row .table-cell,
@@ -152,7 +152,7 @@
 
   &.select-top:after,
   &.select-middle:after {
-    border-bottom: 1px solid @color-bench-light-border;
+    border-bottom: 1px solid @desktop-border-color;
     content: '';
     display: block;
   }

@@ -14,7 +14,7 @@
 
 .menu-context {
   .drop-shadow;
-  border: 1px solid @color-bench-light-border;
+  border: 1px solid @desktop-border-color;
 }
 
 .sub-menu-icon {

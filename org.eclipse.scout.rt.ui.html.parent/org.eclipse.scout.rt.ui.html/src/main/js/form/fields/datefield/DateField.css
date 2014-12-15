@@ -14,7 +14,7 @@
 
 /* date box */
 .field.has-error ~ .date-box {
-  border-color: @color-error;
+  border-color: @error-color;
 }
 
 .date-box {
@@ -89,7 +89,7 @@
   }
 
   &.date-box-select {
-    background-color: @palette-bsi-light-green-0;
+    background-color: @palette-bsi-light-green-1;
     border: 1px solid @active-color;
   }
 }
@@ -98,8 +98,8 @@
   line-height: 30px;
   height: 30px;
   padding: 0px 18px;
-  background-color: @color-bench-light;
-  border-bottom: 1px solid @color-bench-light-border;
+  background-color: @panel-background-color;
+  border-bottom: 1px solid @desktop-border-color;
 }
 
 .date-box-separator {
@@ -108,7 +108,7 @@
   left: 0px;
   height: 1px;
   width: 100%;
-  border-bottom: 1px solid @color-bench-light-border;
+  border-bottom: 1px solid @desktop-border-color;
 }
 
 .date-box-header-month {

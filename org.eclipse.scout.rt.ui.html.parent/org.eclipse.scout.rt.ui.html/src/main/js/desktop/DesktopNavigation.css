@@ -6,8 +6,8 @@
   position: relative;
   height: 100%;
   width: @size-desktop-navigation;
-  background-color: @color-nav;
-  color: @color-bench;
+  background-color: @navigation-background-color;
+  color: @desktop-background-color;
 }
 
 .navigation-header {
@@ -102,7 +102,7 @@
 
   .tab-menu-open & {
     color: @hover-color;
-    background-color: @color-bench;
+    background-color: @desktop-background-color;
   }
 
   &:before {
@@ -136,7 +136,7 @@
   .navigation-breadcrumb & {
     width: 200%;
     text-align: center;
-    border-bottom: 1px solid @color-bench;
+    border-bottom: 1px solid @desktop-background-color;
   }
 }
 
@@ -150,7 +150,7 @@
 
 .navigation-tab-search-field {
   float: left;
-  border: 1px solid @color-nav;
+  border: 1px solid @navigation-background-color;
   height: 32px;
   border-radius: 5px;
   margin: 10px 2px 10px 12px;
@@ -162,8 +162,8 @@
   }
 
    &:focus {
-    border-color: @color-nav;
-    .glow(@color-bench);
+    border-color: @navigation-background-color;
+    .glow(@palette-white);
   }
 
   .navigation-breadcrumb & {
@@ -181,7 +181,7 @@
 .navigation-tab-outline-menu {
   position: absolute;
   top: @size-desktop-tools;
-  background-color: @color-bench;
+  background-color: @desktop-background-color;
   z-index: 10;
   white-space: nowrap;
   .menu-context;
@@ -196,7 +196,7 @@
 .outline-menu-item {
   padding: 0px 15px 0px 15px;
   line-height: 50px;
-  border-bottom: 1px solid @color-bench-light-border;
+  border-bottom: 1px solid @desktop-border-color;
   cursor: pointer;
   color: @text-color;
 

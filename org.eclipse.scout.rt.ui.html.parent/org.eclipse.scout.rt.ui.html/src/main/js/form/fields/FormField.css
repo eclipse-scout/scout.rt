@@ -71,7 +71,7 @@
 
     &:before  {
       content: @icon-error;
-      color: @color-error;
+      color: @error-color;
     }
   }
 }

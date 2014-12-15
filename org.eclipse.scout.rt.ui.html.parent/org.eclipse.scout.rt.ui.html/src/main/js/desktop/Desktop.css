@@ -37,7 +37,7 @@
   left: @size-desktop-navigation;
   right: 0px;
   height: @size-desktop-tools;
-  border-bottom: 1px solid @color-bench-light-border;
+  border-bottom: 1px solid @desktop-border-color;
 }
 
 .taskbar-tabs, .taskbar-tools {
@@ -58,9 +58,9 @@
   padding: 6px 20px 0 20px;
 
   cursor: pointer;
-  background-color: @color-bench-light;
+  background-color: @panel-background-color;
   color: @text-color;
-  border-bottom: 1px solid @color-bench-light-border;
+  border-bottom: 1px solid @desktop-border-color;
 
   &:hover {
     color: @hover-color;
@@ -95,14 +95,14 @@
 }
 
 .taskbar-tab-item {
-  border-right: 1px solid @color-bench-light-border;
+  border-right: 1px solid @desktop-border-color;
   width: 220px;
 }
 
 .taskbar-tool-item {
   position: relative;
   .font-text-plus;
-  background-color: @color-bench;
+  background-color: @desktop-background-color;
   border-left: 1px solid transparent;
   border-right: 1px solid transparent;
   padding-top:16px;
@@ -121,8 +121,8 @@
   }
 
   &.selected {
-    border-left: 1px solid @color-bench-light-border;
-    border-right: 1px solid @color-bench-light-border;
+    border-left: 1px solid @desktop-border-color;
+    border-right: 1px solid @desktop-border-color;
     border-bottom: 1px solid @body-background-color;
     cursor: pointer;
 

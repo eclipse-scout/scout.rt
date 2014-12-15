@@ -89,8 +89,8 @@
   }
 
   & > .status {
-    background-color: @color-bench-light;
-    border-top: solid 1px @color-bench-light-border;
+    background-color: @panel-background-color;
+    border-top: solid 1px @desktop-border-color;
     position: absolute;
     bottom: 0;
     width: 100%;

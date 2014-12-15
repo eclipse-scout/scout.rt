@@ -34,7 +34,7 @@
   }
 
   &.group {
-    background-color: @color-nav-semi;
+    background-color: @navigation-background-active-color;
   }
 
   &.selected {
@@ -52,16 +52,16 @@
   max-height: 80px;
   line-height: 21px;
   padding: 12px 2px 12px 2px !important;
-  border-bottom: 1px solid @color-bench;
+  border-bottom: 1px solid @navigation-background-selected-color;
 
   &.parent, &.children, &.selected {
     .font-text-plus;
     display: block;
-    background-color: @color-nav-semi;
+    background-color: @navigation-background-active-color;
   }
 
   &.selected {
-    background-color: @color-bench;
+    background-color: @navigation-background-selected-color;
     color: @text-color;
   }
 }
@@ -124,17 +124,17 @@
   z-index: 3;
 }
 .navigation-breadcrumb .parent:before {
-  border-color: @color-bench transparent transparent transparent;
+  border-color: @navigation-background-selected-color transparent transparent transparent;
   border-width: 8px 13px 0 13px;
   bottom: -9px;
 }
 .navigation-breadcrumb .parent:after {
-  border-color: @color-nav-semi transparent transparent transparent;
+  border-color: @navigation-background-active-color transparent transparent transparent;
   border-width: 8px 13px 0 13px;
   bottom: -8px;
 }
 .navigation-breadcrumb .selected:before {
-  border-color: @color-bench transparent transparent transparent;
+  border-color: @navigation-background-selected-color transparent transparent transparent;
   border-width: 8px 13px 0 13px;
   bottom: -9px;
 }

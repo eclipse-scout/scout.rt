@@ -6,14 +6,14 @@
 }
 
 .form > .menubar {
-  border-bottom: 3px solid @color-bench-light-border;
+  border-bottom: 3px solid @desktop-border-color;
 
   &.bottom {
     position: absolute;
     bottom: 0;
     width: calc(~"100% - " @menu-margin-x*2);
 
-    border-top: 1px solid @color-bench-light-border;
+    border-top: 1px solid @desktop-border-color;
     border-bottom: 0;
   }
 }

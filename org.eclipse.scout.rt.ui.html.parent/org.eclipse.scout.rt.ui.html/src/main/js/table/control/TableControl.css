@@ -21,7 +21,7 @@
     top: @table-control-padding / 2  + 2px;
     right: -1px;
     height: @table-footer-height - @table-control-padding - 4px;
-    border-right: 1px solid @color-bench-light-border;
+    border-right: 1px solid @desktop-border-color;
   }
 
   &:hover:before {
@@ -38,8 +38,8 @@
   }
 
   &.selected {
-    border-left: 1px solid @color-bench-light-border;
-    border-right: 1px solid @color-bench-light-border;
+    border-left: 1px solid @desktop-border-color;
+    border-right: 1px solid @desktop-border-color;
     border-top: 1px solid @palette-white;
     background-color: @palette-white;
   }

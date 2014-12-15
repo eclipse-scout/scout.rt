@@ -15,7 +15,7 @@
 .group-box-title {
   width: 100%;
   margin-top: @group-margin-top;
-  border-bottom: 3px solid @color-bench-light-border;
+  border-bottom: 3px solid @desktop-border-color;
   padding-bottom: 6px;
 
   & span {
