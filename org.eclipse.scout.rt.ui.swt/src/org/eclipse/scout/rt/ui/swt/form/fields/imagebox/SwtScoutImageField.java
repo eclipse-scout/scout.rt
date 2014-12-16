@@ -27,6 +27,7 @@ import org.eclipse.scout.rt.ui.swt.DefaultValidateRoot;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.IValidateRoot;
 import org.eclipse.scout.rt.ui.swt.LogicalGridLayout;
+import org.eclipse.scout.rt.ui.swt.action.menu.MenuPositionCorrectionListener;
 import org.eclipse.scout.rt.ui.swt.action.menu.SwtContextMenuMarkerComposite;
 import org.eclipse.scout.rt.ui.swt.action.menu.SwtScoutContextMenu;
 import org.eclipse.scout.rt.ui.swt.ext.ImageViewer;
@@ -51,7 +52,7 @@ import org.eclipse.swt.widgets.Control;
 
 /**
  * <h3>SwtScoutImageBox</h3> ...
- * 
+ *
  * @since 1.0.9 16.07.2008
  */
 public class SwtScoutImageField extends SwtScoutFieldComposite<IImageField> implements ISwtScoutImageBox {
@@ -141,6 +142,8 @@ public class SwtScoutImageField extends SwtScoutFieldComposite<IImageField> impl
 
     m_contextMenu = new SwtScoutContextMenu(getImageViewer().getShell(), getScoutObject().getContextMenu(), getEnvironment());
     getImageViewer().setMenu(m_contextMenu.getSwtMenu());
+    // correction of menu position
+    getImageViewer().addListener(SWT.MenuDetect, new MenuPositionCorrectionListener(getImageViewer(), MenuPositionCorrectionListener.HORIZONTAL_CENTER | MenuPositionCorrectionListener.VERTICAL_CENTER));
   }
 
   public ImageViewer getImageViewer() {

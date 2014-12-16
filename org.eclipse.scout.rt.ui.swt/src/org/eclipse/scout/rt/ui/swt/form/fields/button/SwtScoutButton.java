@@ -25,6 +25,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.ButtonListener;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.ui.swt.LogicalGridData;
 import org.eclipse.scout.rt.ui.swt.LogicalGridLayout;
+import org.eclipse.scout.rt.ui.swt.action.menu.MenuPositionCorrectionListener;
 import org.eclipse.scout.rt.ui.swt.action.menu.SwtContextMenuMarkerComposite;
 import org.eclipse.scout.rt.ui.swt.action.menu.SwtScoutContextMenu;
 import org.eclipse.scout.rt.ui.swt.ext.MultilineButton;
@@ -49,7 +50,7 @@ import org.eclipse.ui.forms.widgets.Hyperlink;
 
 /**
  * <h3>SwtScoutButton</h3> ...
- * 
+ *
  * @since 1.0.0 07.04.2008
  */
 public class SwtScoutButton<T extends IButton> extends SwtScoutFieldComposite<T> implements ISwtScoutButton<T> {
@@ -198,6 +199,8 @@ public class SwtScoutButton<T extends IButton> extends SwtScoutFieldComposite<T>
     });
     m_contextMenu = new SwtScoutContextMenu(getSwtField().getShell(), getScoutObject().getContextMenu(), getEnvironment());
     getSwtField().setMenu(m_contextMenu.getSwtMenu());
+    // correction of menu position
+    getSwtField().addListener(SWT.MenuDetect, new MenuPositionCorrectionListener(getSwtField()));
   }
 
   @Override

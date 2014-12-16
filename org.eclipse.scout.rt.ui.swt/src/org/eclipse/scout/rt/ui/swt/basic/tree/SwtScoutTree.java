@@ -48,6 +48,7 @@ import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeListener;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.SwtMenuUtility;
+import org.eclipse.scout.rt.ui.swt.action.menu.MenuPositionCorrectionListener;
 import org.eclipse.scout.rt.ui.swt.basic.SwtScoutComposite;
 import org.eclipse.scout.rt.ui.swt.ext.tree.TreeEx;
 import org.eclipse.scout.rt.ui.swt.form.fields.AbstractSwtScoutDndSupport;
@@ -72,7 +73,7 @@ import org.eclipse.swt.widgets.MenuItem;
 
 /**
  * <h3>SwtScoutTree</h3> ...
- * 
+ *
  * @since 1.0.0 23.07.2008
  * @author Andreas Hoegger
  */
@@ -112,6 +113,9 @@ public class SwtScoutTree extends SwtScoutComposite<ITree> implements ISwtScoutT
     m_contextMenu.addMenuListener(new P_ContextMenuListener());
 
     viewer.getTree().setMenu(m_contextMenu);
+
+    // correction of menu position
+    viewer.getTree().addListener(SWT.MenuDetect, new MenuPositionCorrectionListener(viewer.getTree()));
 
   }
 
