@@ -50,6 +50,7 @@
 @chart-color-data: @palette-gray;
 @chart-color-empty: @palette-light-gray-3;
 @control-background-color: @palette-white;
+@control-selection-color: @palette-bsi-green;
 
 @default-button-background-color: @palette-bsi-light-green;
 @desktop-background-color: @palette-white;

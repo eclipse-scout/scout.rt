@@ -21,7 +21,7 @@
 }
 
 .selection() {
-    background: @selection-background-color;
+    background: @control-selection-color;
     color: @selection-text-color;
 }
 
