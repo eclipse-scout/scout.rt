@@ -29,7 +29,13 @@ public abstract class AbstractPageWithTableExtension<T extends ITable, OWNER ext
     return chain.execCreateChildPage(row);
   }
 
+  /**
+   * @deprecated will be removed with the N release. see {@link AbstractPageWithTable#execLoadTableData(SearchFilter)}
+   *             for more information.
+   */
   @Override
+  @Deprecated
+  @SuppressWarnings("deprecation")
   public Object[][] execLoadTableData(PageWithTableLoadTableDataChain<? extends ITable> chain, SearchFilter filter) throws ProcessingException {
     return chain.execLoadTableData(filter);
   }

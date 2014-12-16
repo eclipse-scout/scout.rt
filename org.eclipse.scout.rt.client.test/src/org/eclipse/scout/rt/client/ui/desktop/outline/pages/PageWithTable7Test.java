@@ -69,8 +69,8 @@ public class PageWithTable7Test {
     private String[] data = new String[]{"first", "second", "third", "fourth"};
 
     @Override
-    protected Object[][] execLoadTableData(SearchFilter filter) throws ProcessingException {
-      return new Object[][]{new Object[]{data[m_counter]}};
+    protected void execLoadData(SearchFilter filter) throws ProcessingException {
+      importTableData(new Object[][]{new Object[]{data[m_counter]}});
     }
 
     @Override

@@ -90,11 +90,11 @@ public class BookmarkToInvisibleOutlineTest {
     }
 
     @Override
-    protected Object[][] execLoadTableData(SearchFilter filter) throws ProcessingException {
-      return new Object[][]{
+    protected void execLoadData(SearchFilter filter) throws ProcessingException {
+      importTableData(new Object[][]{
           new Object[]{1L, "5 Tickets"},
           new Object[]{2L, "12 Appointments"},
-          new Object[]{3L, "3 E-Mails"},};
+          new Object[]{3L, "3 E-Mails"},});
     }
 
     public class Table extends AbstractTable {
@@ -129,11 +129,11 @@ public class BookmarkToInvisibleOutlineTest {
     }
 
     @Override
-    protected Object[][] execLoadTableData(SearchFilter filter) throws ProcessingException {
-      return new Object[][]{
+    protected void execLoadData(SearchFilter filter) throws ProcessingException {
+      importTableData(new Object[][]{
           new Object[]{1L, "Rated tickets"},
           new Object[]{2L, "Rated appointments"},
-          new Object[]{3L, "Rated E-Mails"},};
+          new Object[]{3L, "Rated E-Mails"},});
     }
 
     public class Table extends AbstractTable {
@@ -167,11 +167,11 @@ public class BookmarkToInvisibleOutlineTest {
     }
 
     @Override
-    protected Object[][] execLoadTableData(SearchFilter filter) throws ProcessingException {
-      return new Object[][]{
+    protected void execLoadData(SearchFilter filter) throws ProcessingException {
+      importTableData(new Object[][]{
           new Object[]{1L, "User Account"},
           new Object[]{2L, "Guest Account"},
-          new Object[]{3L, "Supervisor Account"},};
+          new Object[]{3L, "Supervisor Account"},});
     }
 
     public class Table extends AbstractTable {
