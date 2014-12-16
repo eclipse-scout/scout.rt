@@ -18,7 +18,6 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.AbstractClientSession;
 import org.eclipse.scout.rt.client.ClientJob;
-import org.eclipse.scout.rt.client.Scout5ExtensionUtil;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
@@ -46,7 +45,7 @@ public abstract class AbstractOutline5 extends AbstractExtensibleOutline impleme
     super(callInitialzier);
   }
 
-  @Override 
+  @Override
   protected IPageChangeStrategy createPageChangeStrategy() {
     return new DefaultPageChangeStrategy5();
   }
@@ -75,7 +74,7 @@ public abstract class AbstractOutline5 extends AbstractExtensibleOutline impleme
 
   @Override
   public void selectNodes(Collection<? extends ITreeNode> nodes, boolean append) {
-    if (!getConfiguredSelectFirstPageOnOutlineChange() && Scout5ExtensionUtil.IDesktop_isOutlineChanging(ClientJob.getCurrentSession(AbstractClientSession.class).getDesktop())) {
+    if (!getConfiguredSelectFirstPageOnOutlineChange() && ClientJob.getCurrentSession(AbstractClientSession.class).getDesktop().isOutlineChanging()) {
       // Prevent selecting the first node when changing the outline
       return;
     }
