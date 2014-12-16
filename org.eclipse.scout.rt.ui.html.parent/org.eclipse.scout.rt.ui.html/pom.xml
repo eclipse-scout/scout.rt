@@ -66,6 +66,7 @@
         </goals>
         <configuration>
           <mainClass>org.eclipse.scout.rt.ui.html.script.GenerateTestScripts</mainClass>
+          <classpathScope>compile</classpathScope>
           <arguments>
             <argument>${project.basedir}/src/main/js</argument>
             <argument>${project.basedir}/WebContent/test-gen</argument>
