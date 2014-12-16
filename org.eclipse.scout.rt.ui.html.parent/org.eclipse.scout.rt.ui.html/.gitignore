@@ -1,4 +1,4 @@
 node_modules
 /WebContent/res/fastclickmod*.min.js
-/WebContent/test/*
+/WebContent/test-gen/*
 phantomjsdriver.log
