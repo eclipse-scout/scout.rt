@@ -23,15 +23,6 @@
     <scout.script.version>5.0.0</scout.script.version>
   </properties>
 
-  <dependencies>
-  <!-- TODO IMO: remove this dependency once osgi is dropped -->
-    <dependency>
-      <groupId>org.eclipse.scout.rt.ui.html.parent</groupId>
-      <artifactId>org.eclipse.scout.rt.ui.html.scriptprocessor</artifactId>
-      <version>5.1.0-SNAPSHOT</version>
-    </dependency>
-  </dependencies>
-
 <build>
   <plugins>
 
@@ -53,14 +44,20 @@
     </plugin>
 
   <!-- Generate the js and css scripts -->
-  <!-- TODO IMO: this is not working in m2e, since classpaths are
-  not resolved correctly. When dropping osgi,
-  the dependencies will be part of all pom.xml
-  and this script generator will work -->
   <plugin>
     <groupId>org.codehaus.mojo</groupId>
     <artifactId>exec-maven-plugin</artifactId>
     <version>1.3.2</version>
+
+  <dependencies>
+  <!-- TODO IMO: remove this dependency once osgi is dropped -->
+    <dependency>
+      <groupId>org.eclipse.scout.rt.ui.html.parent</groupId>
+      <artifactId>org.eclipse.scout.rt.ui.html.scriptprocessor</artifactId>
+      <version>5.1.0-SNAPSHOT</version>
+    </dependency>
+  </dependencies>
+
     <executions>
       <execution>
         <phase>generate-test-resources</phase>
@@ -71,12 +68,12 @@
           <mainClass>org.eclipse.scout.rt.ui.html.script.GenerateTestScripts</mainClass>
           <arguments>
             <argument>${project.basedir}/src/main/js</argument>
-            <argument>${project.basedir}/WebContent/test</argument>
+            <argument>${project.basedir}/WebContent/test-gen</argument>
             <argument>scout-5.0.0.min.js</argument>
             <argument>scout-5.0.0.min.css</argument>
+            <argument>scout-mobile-5.0.0.min.js</argument>
             <!-- TODO cgu -->
             <!--
-            <argument>scout-mobile-5.0.0.min.js</argument>
             <argument>scout-mobile-5.0.0.min.css</argument>
             -->
           </arguments>
