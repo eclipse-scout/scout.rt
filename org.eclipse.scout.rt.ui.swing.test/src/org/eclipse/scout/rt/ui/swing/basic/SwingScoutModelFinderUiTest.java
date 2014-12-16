@@ -341,11 +341,11 @@ public class SwingScoutModelFinderUiTest {
     }
 
     @Override
-    protected Object[][] execLoadTableData(SearchFilter filter) throws ProcessingException {
-      return new Object[][]{
+    protected void execLoadData(SearchFilter filter) throws ProcessingException {
+      importTableData(new Object[][]{
           new Object[]{1L, "Apache"},
           new Object[]{2L, "Eclipse"},
-          new Object[]{3L, "Oracle"},};
+          new Object[]{3L, "Oracle"},});
     }
 
     @Override
