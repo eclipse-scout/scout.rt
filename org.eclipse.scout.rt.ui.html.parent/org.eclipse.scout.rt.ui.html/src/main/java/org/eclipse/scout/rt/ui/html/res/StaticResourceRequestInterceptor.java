@@ -28,6 +28,9 @@ import org.eclipse.scout.rt.ui.html.IServletRequestInterceptor;
 import org.eclipse.scout.rt.ui.html.ScoutAppHints;
 import org.eclipse.scout.rt.ui.html.StreamUtility;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
+import org.eclipse.scout.rt.ui.html.script.ScriptFileBuilder;
+import org.eclipse.scout.rt.ui.html.script.ScriptOutput;
+import org.eclipse.scout.rt.ui.html.scriptprocessor.ScriptProcessor;
 import org.eclipse.scout.service.AbstractService;
 
 /**
@@ -87,6 +90,15 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
     return false;
   }
 
+  private ScriptProcessor m_scriptProcessor;
+
+  protected synchronized ScriptProcessor getSharedScriptProcessor() {
+    if (m_scriptProcessor == null) {
+      m_scriptProcessor = new ScriptProcessor();
+    }
+    return m_scriptProcessor;
+  }
+
   protected String resolvePathInfo(HttpServletRequest req) {
     String pathInfo = req.getPathInfo();
     if (pathInfo == null) {
@@ -136,9 +148,13 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
    * js, css
    */
   protected HttpCacheObject loadScriptFile(AbstractScoutAppServlet servlet, HttpServletRequest req, String pathInfo) throws ServletException, IOException {
-    ScriptFileBuilder builder = new ScriptFileBuilder(servlet.getResourceLocator());
+    ScriptFileBuilder builder = new ScriptFileBuilder(servlet.getResourceLocator(), getSharedScriptProcessor());
     builder.setMinifyEnabled(ScoutAppHints.isMinifyHint(req));
-    return builder.buildScript(pathInfo);
+    ScriptOutput out = builder.buildScript(pathInfo);
+    if (out != null) {
+      return new HttpCacheObject(out.getPathInfo(), out.getContent(), out.getLastModified());
+    }
+    return null;
   }
 
   /**

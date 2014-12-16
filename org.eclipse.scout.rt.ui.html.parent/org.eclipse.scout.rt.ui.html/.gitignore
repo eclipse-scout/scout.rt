@@ -1,5 +1,4 @@
 node_modules
-/src/test/js/*.min.css
-/src/test/js/*.min.js
 /WebContent/res/fastclickmod*.min.js
+/WebContent/test/*
 phantomjsdriver.log

@@ -23,6 +23,16 @@
     <scout.script.version>5.0.0</scout.script.version>
   </properties>
 
+  <dependencies>
+  <!-- TODO IMO: remove this dependency once osgi is dropped -->
+    <dependency>
+      <groupId>org.eclipse.scout.rt.ui.html.parent</groupId>
+      <artifactId>org.eclipse.scout.rt.ui.html.scriptprocessor</artifactId>
+      <version>5.1.0-SNAPSHOT</version>
+      <type>test-jar</type>
+    </dependency>
+  </dependencies>
+
 <build>
   <plugins>
 
@@ -59,14 +69,17 @@
           <goal>java</goal>
         </goals>
         <configuration>
-          <mainClass>org.eclipse.scout.rt.ui.html.res.GenerateTestScripts</mainClass>
+          <mainClass>org.eclipse.scout.rt.ui.html.script.GenerateTestScripts</mainClass>
           <arguments>
             <argument>${project.basedir}/src/main/js</argument>
-            <argument>${project.basedir}/src/test/js</argument>
+            <argument>${project.basedir}/WebContent/test</argument>
             <argument>scout-5.0.0.min.js</argument>
             <argument>scout-5.0.0.min.css</argument>
+            <!-- TODO cgu -->
+            <!--
             <argument>scout-mobile-5.0.0.min.js</argument>
             <argument>scout-mobile-5.0.0.min.css</argument>
+            -->
           </arguments>
         </configuration>
       </execution>

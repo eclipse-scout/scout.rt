@@ -12,8 +12,6 @@ package org.eclipse.scout.rt.ui.html.res;
 
 import java.net.URL;
 
-import javax.servlet.ServletContext;
-
 /**
  * Locate script and other web resources in either osgi or java jee environments
  */
@@ -23,14 +21,14 @@ public interface IWebContentResourceLocator {
    * @return the source (or template file) of a js or css script out of the folders
    *         <code>anyJarFile!/META-INF/resources/js</code>
    *         <p>
-   *         See {@link ServletContext#getResourcePaths(String)}
+   *         See {@link javax.servlet.ServletContext#getResourcePaths(String)}
    */
   URL getScriptSource(String path);
 
   /**
    * @return a resource out of the folders <code>anyJarFile!/META-INF/resources/WebContent</code>
    *         <p>
-   *         See {@link ServletContext#getResourcePaths(String)}
+   *         See {@link javax.servlet.ServletContext#getResourcePaths(String)}
    */
   URL getWebContentResource(String path);
 }
