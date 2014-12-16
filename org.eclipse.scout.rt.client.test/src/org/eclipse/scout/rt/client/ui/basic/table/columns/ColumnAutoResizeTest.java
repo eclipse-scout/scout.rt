@@ -71,8 +71,8 @@ public class ColumnAutoResizeTest {
   public static class PageWithTable extends AbstractPageWithTable<PageWithTable.TestTable> {
 
     @Override
-    protected Object[][] execLoadTableData(SearchFilter filter) throws ProcessingException {
-      return new Object[][]{new Object[]{"a", "b"}};
+    protected void execLoadData(SearchFilter filter) throws ProcessingException {
+      importTableData(new Object[][]{new Object[]{"a", "b"}});
     }
 
     @Override

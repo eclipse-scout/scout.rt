@@ -234,8 +234,21 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * {@link PageData} annotation is present on this class):
    *
    * <pre>
-   * AbstractTablePageData pageData = service.loadPageData(...);
-   * getTable().importFromTableBeanData(pageData);
+   * protected void execLoadData(SearchFilter filter) throws ProcessingException {
+   *   //logic to initialize the service, to handle the search filter...
+   *   AbstractTablePageData pageData = service.loadPageData(...);
+   *   importPageData(pageData);
+   * }
+   * </pre>
+   * <p/>
+   * An other possibility is to import some data array (Object[][]):
+   *
+   * <pre>
+   * protected void execLoadData(SearchFilter filter) throws ProcessingException {
+   *   //logic to initialize the service, to handle the search filter...
+   *   Object[][] data = service.loadTableData(...);
+   *   importTableData(data);
+   * }
    * </pre>
    * <p/>
    * This default implementation invokes {@link #interceptLoadTableData(SearchFilter)} to fetch the tabular data and
@@ -249,28 +262,35 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   @ConfigOperation
   @Order(85)
   protected void execLoadData(SearchFilter filter) throws ProcessingException {
-    //do NOT reference the result data object and warp it into a ref, so the processor is allowed to delete the contents to free up memory sooner
-    getTable().replaceRowsByMatrix(new AtomicReference<Object>(interceptLoadTableData(filter)));
+    importTableData(interceptLoadTableData(filter));
   }
 
   /**
-   * Fetches and returns tabular data to be displayed in this page's table.
-   * Typically this method will query a (backend) service for the data. Make
-   * sure the returned content (including type definitions) matches the table columns.
-   * <p>
-   * This method is called by {@link #interceptPopulateTable()} and overriding this method generally is the most
-   * convenient way to populate a table page. If you need more control over populating a table page, consider overriding
-   * {@code execPopulateTable()} instead.
-   * <p>
-   * Subclasses can override this method. The default returns {@code null}.
+   * Deprecated: use #execLoadData(SearchFilter) instead.
+   * <p/>
+   * If you had something like this:
    *
-   * @param filter
-   *          a search filter, guaranteed not to be {@code null}
-   * @return an {@code Object[][]} representing tabular data to be displayed in this page's table
-   * @throws ProcessingException
+   * <pre>
+   * protected Object[][] execLoadTableData(SearchFilter filter) throws ProcessingException {
+   *   //logic to initialize the service, to handle the search filter...
+   *   return service.loadTableData(..);
+   * }
+   * </pre>
+   * <p/>
+   * You should convert it to:
+   *
+   * <pre>
+   * protected void execLoadData(SearchFilter filter) throws ProcessingException {
+   *   //logic to initialize the service, to handle the search filter...
+   *   importTableData(service.loadTableData(..));
+   * }
+   * </pre>
+   *
+   * @deprecated will be removed with the N release. use #execLoadData(SearchFilter) instead.
    */
   @ConfigOperation
   @Order(90)
+  @Deprecated
   protected Object[][] execLoadTableData(SearchFilter filter) throws ProcessingException {
     return null;
   }
@@ -712,6 +732,18 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   }
 
   /**
+   * Import data (Object[][]) in the table page. Object arrays are not type safe. The preferred way is to use a
+   * bean-based table page data and {@link #importPageData(AbstractTablePageData)}
+   *
+   * @param data
+   * @since 4.2.0 (Mars-M4)
+   */
+  protected void importTableData(Object[][] data) throws ProcessingException {
+    //do NOT reference the result data object and warp it into a ref, so the processor is allowed to delete the contents to free up memory sooner
+    getTable().replaceRowsByMatrix(new AtomicReference<Object>(data));
+  }
+
+  /**
    * load table data
    */
   protected void loadTableDataImpl() throws ProcessingException {
@@ -1041,6 +1073,11 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     return chain.execCreateChildPage(row);
   }
 
+  /**
+   * @deprecated will be removed with the N release. see #execLoadTableData(SearchFilter) for more information.
+   */
+  @Deprecated
+  @SuppressWarnings("deprecation")
   protected final Object[][] interceptLoadTableData(SearchFilter filter) throws ProcessingException {
     List<? extends IPageWithTableExtension<? extends ITable, ? extends AbstractPageWithTable<? extends ITable>>> extensions = getAllExtensions();
     PageWithTableLoadTableDataChain<T> chain = new PageWithTableLoadTableDataChain<T>(extensions);
@@ -1081,7 +1118,13 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
       return getOwner().execCreateChildPage(row);
     }
 
+    /**
+     * @deprecated will be removed with the N release. see {@link AbstractPageWithTable#execLoadTableData(SearchFilter)}
+     *             for more information.
+     */
     @Override
+    @Deprecated
+    @SuppressWarnings("deprecation")
     public Object[][] execLoadTableData(PageWithTableLoadTableDataChain<? extends ITable> chain, SearchFilter filter) throws ProcessingException {
       return getOwner().execLoadTableData(filter);
     }

@@ -30,8 +30,8 @@ public class PageModificationTablePage extends AbstractExtensiblePageWithTable<P
   }
 
   @Override
-  protected Object[][] execLoadTableData(SearchFilter filter) throws ProcessingException {
-    return new Object[][]{{"001"}};
+  protected void execLoadData(SearchFilter filter) throws ProcessingException {
+    importTableData(new Object[][]{{"001"}});
   }
 
   public class Table extends AbstractExtensibleTable {

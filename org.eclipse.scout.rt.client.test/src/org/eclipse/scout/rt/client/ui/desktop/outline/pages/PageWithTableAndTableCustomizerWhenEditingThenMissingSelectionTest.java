@@ -128,11 +128,11 @@ public class PageWithTableAndTableCustomizerWhenEditingThenMissingSelectionTest 
     }
 
     @Override
-    protected Object[][] execLoadTableData(SearchFilter filter) throws ProcessingException {
-      return new Object[][]{
+    protected void execLoadData(SearchFilter filter) throws ProcessingException {
+      importTableData(new Object[][]{
           new Object[]{1, "Account 1"},
           new Object[]{2, "Account 2"},
-          new Object[]{3, "Account 3"},};
+          new Object[]{3, "Account 3"},});
     }
 
     public class Table extends AbstractTable {

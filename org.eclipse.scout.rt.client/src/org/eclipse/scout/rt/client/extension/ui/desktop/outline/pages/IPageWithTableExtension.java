@@ -19,6 +19,11 @@ public interface IPageWithTableExtension<T extends ITable, OWNER extends Abstrac
 
   IPage execCreateChildPage(PageWithTableCreateChildPageChain<? extends ITable> chain, ITableRow row) throws ProcessingException;
 
+  /**
+   * @Deprecated will be removed with the N release. see {@link AbstractPageWithTable#execLoadTableData(SearchFilter)}
+   *             for more information.
+   */
+  @Deprecated
   Object[][] execLoadTableData(PageWithTableLoadTableDataChain<? extends ITable> chain, SearchFilter filter) throws ProcessingException;
 
   void execPopulateTable(PageWithTablePopulateTableChain<? extends ITable> chain) throws ProcessingException;
