@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.eclipse.scout.commons.NumberUtility;
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.ProcessingStatus;
@@ -449,12 +450,12 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
     }
 
     @Override
-    protected void injectFieldsInternal(List<IFormField> fieldList) {
+    protected void injectFieldsInternal(OrderedCollection<IFormField> fields) {
       if (m_mainboxButtons != null) {
-        fieldList.addAll(m_mainboxButtons);
+        fields.addAllLast(m_mainboxButtons);
       }
 
-      super.injectFieldsInternal(fieldList);
+      super.injectFieldsInternal(fields);
     }
 
     @Order(5.0f)

@@ -10,8 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.customizer;
 
-import java.util.List;
-
+import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 
@@ -22,11 +21,11 @@ public interface ITableCustomizer {
 
   /**
    * Append custom columns
-   * 
-   * @param columnList
-   *          live and mutable list of configured columns, not yet initialized
+   *
+   * @param columns
+   *          live and mutable collection of configured columns, not yet initialized
    */
-  void injectCustomColumns(List<IColumn<?>> columnList);
+  void injectCustomColumns(OrderedCollection<IColumn<?>> columns);
 
   /**
    * Add a new custom column to the table by for example showing a form with potential candidates

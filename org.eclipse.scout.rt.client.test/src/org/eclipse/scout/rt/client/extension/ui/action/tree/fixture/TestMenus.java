@@ -10,14 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.extension.ui.action.tree.fixture;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.annotations.OrderedComparator;
+import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
 import org.eclipse.scout.rt.client.ui.action.ActionFinder;
@@ -31,18 +29,17 @@ public class TestMenus {
   private List<IMenu> m_menus;
 
   public TestMenus() {
-    List<IMenu> menus = new ArrayList<IMenu>();
+    OrderedCollection<IMenu> menus = new OrderedCollection<IMenu>();
     for (Class<? extends IMenu> menuClazz : getConfiguredMenus()) {
       try {
-        menus.add(ConfigurationUtility.newInnerInstance(this, menuClazz));
+        menus.addOrdered(ConfigurationUtility.newInnerInstance(this, menuClazz));
       }
       catch (Exception e) {
         SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + menuClazz.getName() + "'.", e));
       }
     }
     new MoveActionNodesHandler<IMenu>(menus).moveModelObjects();
-    Collections.sort(menus, new OrderedComparator());
-    m_menus = menus;
+    m_menus = menus.getOrderedList();
   }
 
   private List<Class<? extends IMenu>> getConfiguredMenus() {

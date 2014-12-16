@@ -18,6 +18,7 @@ import java.util.List;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.mobile.transformation.DeviceTransformationConfig;
 import org.eclipse.scout.rt.client.mobile.transformation.DeviceTransformationUtility;
@@ -108,11 +109,11 @@ public class MobileSmartTreeForm<LOOKUP_TYPE> extends ContentAssistTreeForm<LOOK
   }
 
   @Override
-  protected void injectResultTreeMenus(List<IMenu> menuList) {
-    super.injectResultTreeMenus(menuList);
+  protected void injectResultTreeMenus(OrderedCollection<IMenu> menus) {
+    super.injectResultTreeMenus(menus);
 
     List<IMenu> smartFieldMenus = getContentAssistField().getMenus();
-    menuList.addAll(smartFieldMenus);
+    menus.addAllOrdered(smartFieldMenus);
   }
 
   @Override

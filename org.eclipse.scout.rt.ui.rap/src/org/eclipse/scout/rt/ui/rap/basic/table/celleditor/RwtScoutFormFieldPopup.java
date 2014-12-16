@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -196,8 +197,8 @@ public class RwtScoutFormFieldPopup extends RwtScoutComposite<IFormField> {
     public class MainBox extends AbstractGroupBox {
 
       @Override
-      protected void injectFieldsInternal(List<IFormField> fieldList) {
-        fieldList.add(getScoutObject());
+      protected void injectFieldsInternal(OrderedCollection<IFormField> fields) {
+        fields.addOrdered(getScoutObject());
       }
 
       @Override

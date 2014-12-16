@@ -10,8 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.extension.client.ui.basic.table;
 
-import java.util.List;
-
+import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -27,7 +26,7 @@ import org.eclipse.scout.rt.extension.client.ui.action.menu.MenuExtensionUtility
  * <li>adding, removing and modifying statically configured menus</li>
  * <li>{@link Replace} annotation on columns and menus</li>
  * </ul>
- * 
+ *
  * @since 3.9.0
  */
 public abstract class AbstractExtensibleTable extends AbstractTable implements IExtensibleScoutObject {
@@ -42,11 +41,11 @@ public abstract class AbstractExtensibleTable extends AbstractTable implements I
   }
 
   @Override
-  protected void injectMenusInternal(List<IMenu> menuList) {
-    super.injectMenusInternal(menuList);
+  protected void injectMenusInternal(OrderedCollection<IMenu> menus) {
+    super.injectMenusInternal(menus);
     Object enclosingObject = ExtensionUtility.getEnclosingObject(this);
     if (enclosingObject != null) {
-      MenuExtensionUtility.adaptMenus(enclosingObject, this, menuList);
+      MenuExtensionUtility.adaptMenus(enclosingObject, this, menus);
     }
   }
 }

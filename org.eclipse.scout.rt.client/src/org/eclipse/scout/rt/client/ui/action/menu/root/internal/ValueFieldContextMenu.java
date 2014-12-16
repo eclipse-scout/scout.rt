@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client.ui.action.menu.root.internal;
 
 import java.beans.PropertyChangeEvent;
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -44,13 +45,13 @@ public class ValueFieldContextMenu extends FormFieldContextMenu<IValueField<?>> 
   }
 
   @Override
-  protected void afterChildMenusAdd(List<? extends IMenu> newChildMenus) {
+  protected void afterChildMenusAdd(Collection<? extends IMenu> newChildMenus) {
     super.afterChildMenusAdd(newChildMenus);
     handleOwnerEnabledChanged();
   }
 
   @Override
-  protected void afterChildMenusRemove(List<? extends IMenu> childMenusToRemove) {
+  protected void afterChildMenusRemove(Collection<? extends IMenu> childMenusToRemove) {
     super.afterChildMenusRemove(childMenusToRemove);
     handleOwnerEnabledChanged();
   }

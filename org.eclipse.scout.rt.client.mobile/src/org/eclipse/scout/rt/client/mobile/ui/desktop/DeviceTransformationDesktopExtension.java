@@ -10,9 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.ui.desktop;
 
-import java.util.List;
+import java.util.Collection;
 
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.rt.client.mobile.navigation.AbstractMobileBackAction;
@@ -76,7 +77,7 @@ public class DeviceTransformationDesktopExtension extends AbstractDesktopExtensi
   }
 
   @Override
-  public void contributeActions(List<IAction> actions) {
+  public void contributeActions(Collection<IAction> actions) {
     if (!isActive()) {
       return;
     }
@@ -86,7 +87,7 @@ public class DeviceTransformationDesktopExtension extends AbstractDesktopExtensi
   }
 
   @Override
-  public void contributeOutlines(List<IOutline> outlines) {
+  public void contributeOutlines(OrderedCollection<IOutline> outlines) {
     if (!isActive()) {
       return;
     }

@@ -14,7 +14,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.EventListener;
 import java.util.HashMap;
@@ -35,7 +34,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.annotations.OrderedComparator;
+import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -231,18 +230,18 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
 
     // menus
     List<Class<? extends IMenu>> declaredMenus = getDeclaredMenus();
-    List<IMenu> menuList = new ArrayList<IMenu>(declaredMenus.size());
+    OrderedCollection<IMenu> menus = new OrderedCollection<IMenu>();
     for (Class<? extends IMenu> menuClazz : declaredMenus) {
       try {
         IMenu menu = ConfigurationUtility.newInnerInstance(this, menuClazz);
-        menuList.add(menu);
+        menus.addOrdered(menu);
       }
       catch (Exception e) {
         SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + menuClazz.getName() + "'.", e));
       }
     }
     List<IMenu> contributedMenus = m_contributionHolder.getContributionsByClass(IMenu.class);
-    menuList.addAll(contributedMenus);
+    menus.addAllOrdered(contributedMenus);
 
     // producers
     List<Class<? extends ICalendarItemProvider>> configuredProducers = getConfiguredProducers();
@@ -254,7 +253,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
         ICalendarItemProvider provider = ConfigurationUtility.newInnerInstance(this, itemProviderClazz);
         producerList.add(provider);
         // add empty space menus to the context menu
-        menuList.addAll(ActionUtility.getActions(provider.getMenus(), ActionUtility.createMenuFilterMenuTypes(CollectionUtility.hashSet(CalendarMenuType.EmptySpace), false)));
+        menus.addAllOrdered(ActionUtility.getActions(provider.getMenus(), ActionUtility.createMenuFilterMenuTypes(CollectionUtility.hashSet(CalendarMenuType.EmptySpace), false)));
       }
       catch (Exception e) {
         SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + itemProviderClazz.getName() + "'.", e));
@@ -264,14 +263,13 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
     m_providers = producerList;
 
     try {
-      injectMenusInternal(menuList);
+      injectMenusInternal(menus);
     }
     catch (Exception e) {
       LOG.error("error occured while dynamically contributing menus.", e);
     }
-    new MoveActionNodesHandler<IMenu>(menuList).moveModelObjects();
-    Collections.sort(menuList, new OrderedComparator());
-    ICalendarContextMenu contextMenu = new CalendarContextMenu(this, menuList);
+    new MoveActionNodesHandler<IMenu>(menus).moveModelObjects();
+    ICalendarContextMenu contextMenu = new CalendarContextMenu(this, menus.getOrderedList());
     setContextMenu(contextMenu);
 
     // attach change listener for item updates
@@ -310,12 +308,13 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
 
   /**
    * Override this internal method only in order to make use of dynamic menus<br>
-   * Used to manage menu list and add/remove menus
+   * Used to manage menu list and add/remove menus.<br>
+   * To change the order or specify the insert position use {@link IMenu#setOrder(double)}.
    *
-   * @param menuList
-   *          live and mutable list of configured menus
+   * @param menus
+   *          live and mutable collection of configured menus
    */
-  protected void injectMenusInternal(List<IMenu> menuList) {
+  protected void injectMenusInternal(OrderedCollection<IMenu> menus) {
   }
 
   /*

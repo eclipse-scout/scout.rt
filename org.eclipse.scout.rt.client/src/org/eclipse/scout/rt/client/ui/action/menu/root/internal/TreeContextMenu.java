@@ -58,20 +58,20 @@ public class TreeContextMenu extends AbstractPropertyObserverContextMenu<ITree> 
   }
 
   @Override
-  protected void afterChildMenusAdd(List<? extends IMenu> newChildMenus) {
+  protected void afterChildMenusAdd(Collection<? extends IMenu> newChildMenus) {
     super.afterChildMenusAdd(newChildMenus);
     handleOwnerEnabledChanged();
   }
 
   @Override
-  protected void afterChildMenusRemove(List<? extends IMenu> childMenusToRemove) {
+  protected void afterChildMenusRemove(Collection<? extends IMenu> childMenusToRemove) {
     super.afterChildMenusRemove(childMenusToRemove);
     handleOwnerEnabledChanged();
   }
 
   /**
-  *
-  */
+   *
+   */
   protected void handleOwnerEnabledChanged() {
     if (getOwner() != null) {
       final boolean enabled = getOwner().isEnabled();

@@ -30,6 +30,13 @@ public interface IOrdered {
   double DEFAULT_ORDER = Double.MAX_VALUE;
 
   /**
+   * The default step between two successive elements.
+   *
+   * @since 4.2
+   */
+  double DEFAULT_ORDER_STEP = 1000;
+
+  /**
    * @return Returns the object's order.
    */
   double getOrder();

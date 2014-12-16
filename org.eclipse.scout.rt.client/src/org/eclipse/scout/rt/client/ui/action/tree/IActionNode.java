@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.action.tree;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.action.IAction;
@@ -48,13 +49,13 @@ public interface IActionNode<T extends IActionNode> extends IAction {
    */
   List<T> getChildActions();
 
-  void setChildActions(List<? extends T> actionList);
+  void setChildActions(Collection<? extends T> actionList);
 
   void addChildAction(T action);
 
-  void addChildActions(List<? extends T> actionList);
+  void addChildActions(Collection<? extends T> actionList);
 
   void removeChildAction(T action);
 
-  void removeChildActions(List<? extends T> actionList);
+  void removeChildActions(Collection<? extends T> actionList);
 }

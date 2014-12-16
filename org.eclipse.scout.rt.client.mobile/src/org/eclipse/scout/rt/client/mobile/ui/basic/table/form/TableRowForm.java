@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -39,7 +40,7 @@ import org.eclipse.scout.service.SERVICES;
 
 /**
  * Form which displays a {@link ITableRow} as fields. Only the fields belonging to editable columns are enabled.
- * 
+ *
  * @since 3.9.0
  */
 public class TableRowForm extends AbstractMobileForm implements ITableRowForm {
@@ -118,14 +119,14 @@ public class TableRowForm extends AbstractMobileForm implements ITableRowForm {
   public class MainBox extends AbstractGroupBox {
 
     @Override
-    protected void injectFieldsInternal(List<IFormField> fieldList) {
+    protected void injectFieldsInternal(OrderedCollection<IFormField> fields) {
       if (m_rowField != null) {
-        fieldList.add(m_rowField);
+        fields.addOrdered(m_rowField);
       }
       else {
-        fieldList.add(new P_ColumnFieldsGroupBox());
+        fields.addLast(new P_ColumnFieldsGroupBox());
       }
-      super.injectFieldsInternal(fieldList);
+      super.injectFieldsInternal(fields);
     }
 
     @Order(5)
@@ -233,15 +234,15 @@ public class TableRowForm extends AbstractMobileForm implements ITableRowForm {
   private class P_ColumnFieldsGroupBox extends AbstractGroupBox {
 
     @Override
-    protected void injectFieldsInternal(List<IFormField> fieldList) {
+    protected void injectFieldsInternal(OrderedCollection<IFormField> fields) {
       for (IColumn column : getTable().getColumns()) {
         IFormField field = m_columnFields.get(column);
         if (field != null) {
-          fieldList.add(field);
+          fields.addLast(field);
         }
       }
 
-      super.injectFieldsInternal(fieldList);
+      super.injectFieldsInternal(fields);
     }
 
   }

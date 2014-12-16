@@ -189,7 +189,7 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
   }
 
   @Override
-  public void addChildActions(List<? extends IMenu> actionList) {
+  public void addChildActions(Collection<? extends IMenu> actionList) {
     super.addChildActions(actionList);
     if (CollectionUtility.hasElements(actionList)) {
       afterChildMenusAdd(actionList);
@@ -197,14 +197,14 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
   }
 
   @Override
-  public void removeChildActions(List<? extends IMenu> actionList) {
+  public void removeChildActions(Collection<? extends IMenu> actionList) {
     super.removeChildActions(actionList);
     if (CollectionUtility.hasElements(actionList)) {
       afterChildMenusRemove(actionList);
     }
   }
 
-  protected void afterChildMenusAdd(List<? extends IMenu> newChildMenus) {
+  protected void afterChildMenusAdd(Collection<? extends IMenu> newChildMenus) {
     if (CollectionUtility.hasElements(newChildMenus)) {
       final Object ownerValue = m_ownerValue;
       IActionVisitor visitor = new IActionVisitor() {
@@ -228,7 +228,7 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
     }
   }
 
-  protected void afterChildMenusRemove(List<? extends IMenu> childMenusToRemove) {
+  protected void afterChildMenusRemove(Collection<? extends IMenu> childMenusToRemove) {
     if (CollectionUtility.hasElements(childMenusToRemove)) {
       IActionVisitor visitor = new IActionVisitor() {
         @Override

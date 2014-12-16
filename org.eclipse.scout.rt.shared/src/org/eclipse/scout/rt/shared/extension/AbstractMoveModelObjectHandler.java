@@ -7,50 +7,51 @@ import java.util.Set;
 import org.eclipse.scout.commons.ClassIdentifier;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.annotations.IOrdered;
+import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.service.SERVICES;
 
 /**
  * The top level list is expected to be sorted by the caller.
  */
-public abstract class AbstractMoveModelObjectHandler<T extends IOrdered> {
+public abstract class AbstractMoveModelObjectHandler<ORDERED extends IOrdered> {
 
-  private final List<T> m_rootModelObjects;
+  private final OrderedCollection<ORDERED> m_rootModelObjects;
   private final String m_modelObjectTypeName;
   private final IInternalExtensionRegistry m_extensionRegistry;
 
-  public AbstractMoveModelObjectHandler(String modelObjectTypeName, List<T> rootModelObjects) {
+  public AbstractMoveModelObjectHandler(String modelObjectTypeName, OrderedCollection<ORDERED> rootModelObjects) {
     m_rootModelObjects = rootModelObjects;
     m_modelObjectTypeName = modelObjectTypeName;
     m_extensionRegistry = SERVICES.getService(IInternalExtensionRegistry.class);
   }
 
-  protected abstract T getParent(T child);
+  protected abstract ORDERED getParent(ORDERED child);
 
-  protected abstract void removeChild(T parent, T child);
+  protected abstract void removeChild(ORDERED parent, ORDERED child);
 
-  protected abstract void addChild(T parent, T child);
+  protected abstract void addChild(ORDERED parent, ORDERED child);
 
-  protected abstract void sortChildren(T parent);
+  protected abstract void sortChildren(ORDERED parent);
 
-  protected abstract List<T> collectAllModelObjects();
+  protected abstract List<ORDERED> collectAllModelObjects();
 
-  protected List<? extends T> getRootModelObjects() {
+  protected OrderedCollection<? extends ORDERED> getRootModelObjects() {
     return m_rootModelObjects;
   }
 
   public void moveModelObjects() {
     // collect all model objects and move descriptors
-    List<T> allModelObject = collectAllModelObjects();
-    Set<MoveDescriptor<T>> moveDescriptors = collectMoveDescriptors(allModelObject);
+    List<ORDERED> allModelObject = collectAllModelObjects();
+    Set<MoveDescriptor<ORDERED>> moveDescriptors = collectMoveDescriptors(allModelObject);
 
     if (CollectionUtility.isEmpty(moveDescriptors)) {
       return;
     }
 
     StringBuilder sb = new StringBuilder();
-    for (MoveDescriptor<T> moveDescriptor : moveDescriptors) {
-      T modelObject = moveDescriptor.getModel();
-      T oldParent = getParent(modelObject);
+    for (MoveDescriptor<ORDERED> moveDescriptor : moveDescriptors) {
+      ORDERED modelObject = moveDescriptor.getModel();
+      ORDERED oldParent = getParent(modelObject);
 
       Class<?> newContainer = null;
       ClassIdentifier newContainerIdentifer = moveDescriptor.getNewContainerIdentifer();
@@ -71,7 +72,7 @@ public abstract class AbstractMoveModelObjectHandler<T extends IOrdered> {
         // 2. model object is not in root list, but should be moved into it
         removeChild(oldParent, modelObject);
         applyOrder(moveDescriptor, modelObject);
-        m_rootModelObjects.add(modelObject);
+        m_rootModelObjects.addOrdered(modelObject);
       }
 
       else if (newContainer == null) {
@@ -84,8 +85,8 @@ public abstract class AbstractMoveModelObjectHandler<T extends IOrdered> {
         // 4. model object is moved into another container
 
         // find new parent
-        T newParent = null;
-        for (T a : allModelObject) {
+        ORDERED newParent = null;
+        for (ORDERED a : allModelObject) {
           if (newContainer.isInstance(a) && a != modelObject) {
             newParent = a;
             break;
@@ -121,20 +122,20 @@ public abstract class AbstractMoveModelObjectHandler<T extends IOrdered> {
     }
   }
 
-  protected void applyOrder(MoveDescriptor<T> moveItem, T actionNode) {
+  protected void applyOrder(MoveDescriptor<ORDERED> moveItem, ORDERED ordered) {
     Double newOrder = moveItem.getNewOrder();
     if (newOrder != null) {
-      actionNode.setOrder(newOrder);
+      ordered.setOrder(newOrder);
     }
   }
 
-  protected Set<MoveDescriptor<T>> collectMoveDescriptors(List<T> allActionNodes) {
-    if (CollectionUtility.isEmpty(allActionNodes)) {
+  protected Set<MoveDescriptor<ORDERED>> collectMoveDescriptors(List<ORDERED> orderedObjects) {
+    if (CollectionUtility.isEmpty(orderedObjects)) {
       return null;
     }
-    Set<MoveDescriptor<T>> moveDescriptors = new HashSet<MoveDescriptor<T>>();
-    for (T actionNode : allActionNodes) {
-      MoveDescriptor<T> moveDesc = m_extensionRegistry.createModelMoveDescriptorFor(actionNode, null);
+    Set<MoveDescriptor<ORDERED>> moveDescriptors = new HashSet<MoveDescriptor<ORDERED>>();
+    for (ORDERED o : orderedObjects) {
+      MoveDescriptor<ORDERED> moveDesc = m_extensionRegistry.createModelMoveDescriptorFor(o, null);
       if (moveDesc != null) {
         moveDescriptors.add(moveDesc);
       }

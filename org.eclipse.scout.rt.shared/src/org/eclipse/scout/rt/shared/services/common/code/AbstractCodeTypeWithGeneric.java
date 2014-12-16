@@ -15,7 +15,6 @@ import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -29,7 +28,7 @@ import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.annotations.OrderedComparator;
+import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.IntegerHolder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -157,23 +156,22 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
   protected List<? extends CODE> execCreateCodes() throws ProcessingException {
     List<Class<ICode>> configuredCodes = getConfiguredCodes();
     List<ICode> contributedCodes = m_contributionHolder.getContributionsByClass(ICode.class);
-    List<CODE> list = new ArrayList<CODE>(configuredCodes.size() + contributedCodes.size());
+    OrderedCollection<CODE> codes = new OrderedCollection<CODE>();
     for (Class<? extends ICode> codeClazz : configuredCodes) {
       try {
         CODE code = (CODE) ConfigurationUtility.newInnerInstance(this, codeClazz);
-        list.add(code);
+        codes.addOrdered(code);
       }
       catch (Exception e) {
         SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + codeClazz.getName() + "'.", e));
       }
     }
     for (ICode c : contributedCodes) {
-      list.add((CODE) c);
+      codes.addOrdered((CODE) c);
     }
 
-    new MoveCodesHandler<CODE_ID, CODE>(list).moveModelObjects();
-    Collections.sort(list, new OrderedComparator());
-    return list;
+    new MoveCodesHandler<CODE_ID, CODE>(codes).moveModelObjects();
+    return codes.getOrderedList();
   }
 
   /**

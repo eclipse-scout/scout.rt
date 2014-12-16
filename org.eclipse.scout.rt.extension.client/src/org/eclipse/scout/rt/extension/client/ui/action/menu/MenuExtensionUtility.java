@@ -14,6 +14,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -79,19 +80,19 @@ public final class MenuExtensionUtility {
     return null;
   }
 
-  public static <T> void adaptMenus(T anchor, Object container, List<IMenu> menuList) {
+  public static <T> void adaptMenus(T anchor, Object container, OrderedCollection<IMenu> menus) {
     Class<T> anchorType = getAnchorType(anchor);
     if (anchorType == null || anchor == null || container == null) {
       return;
     }
 
     MenuExtensionManager extensionManager = Activator.getDefault().getMenuExtensionManager();
-    contributeMenus(anchor, container, extensionManager.getMenuContributionExtensions(anchorType), menuList);
-    removeMenus(anchor, container, extensionManager.getMenuRemoveExtensions(anchorType), menuList);
-    modifyMenus(anchor, container, extensionManager.getMenuModificationExtensions(anchorType), menuList);
+    contributeMenus(anchor, container, extensionManager.getMenuContributionExtensions(anchorType), menus);
+    removeMenus(anchor, container, extensionManager.getMenuRemoveExtensions(anchorType), menus);
+    modifyMenus(anchor, container, extensionManager.getMenuModificationExtensions(anchorType), menus);
   }
 
-  static <T> void contributeMenus(T anchor, Object container, List<MenuContributionExtension> extensions, List<IMenu> menuList) {
+  static <T> void contributeMenus(T anchor, Object container, List<MenuContributionExtension> extensions, OrderedCollection<IMenu> menus) {
     if (extensions == null || extensions.isEmpty()) {
       return;
     }
@@ -113,7 +114,7 @@ public final class MenuExtensionUtility {
       try {
         IMenu m = e.createContribution(anchor, container);
         m.setOrder(e.getOrder());
-        menuList.add(m);
+        menus.addOrdered(m);
       }
       catch (Throwable t) {
         LOG.error("Exception while creating an instance of contributed menu " + e, t);
@@ -121,12 +122,12 @@ public final class MenuExtensionUtility {
     }
   }
 
-  static <T> void removeMenus(T anchor, Object container, List<MenuRemoveExtension> extensions, List<IMenu> menuList) {
+  static <T> void removeMenus(T anchor, Object container, List<MenuRemoveExtension> extensions, OrderedCollection<IMenu> menus) {
     if (extensions == null || extensions.isEmpty()) {
       return;
     }
 
-    for (Iterator<IMenu> it = menuList.iterator(); it.hasNext();) {
+    for (Iterator<IMenu> it = menus.iterator(); it.hasNext();) {
       IMenu next = it.next();
       for (MenuRemoveExtension removeExtension : extensions) {
         if (removeExtension.accept(anchor, container, next)) {
@@ -137,13 +138,13 @@ public final class MenuExtensionUtility {
     }
   }
 
-  static <T> void modifyMenus(T anchor, Object container, List<MenuModificationExtension> extensions, List<IMenu> menuList) {
+  static <T> void modifyMenus(T anchor, Object container, List<MenuModificationExtension> extensions, OrderedCollection<IMenu> menus) {
     if (extensions == null || extensions.isEmpty()) {
       return;
     }
 
     for (MenuModificationExtension ext : extensions) {
-      for (IMenu menu : menuList) {
+      for (IMenu menu : menus) {
         try {
           if (ext.accept(anchor, container, menu)) {
             IMenuModifier<IMenu> menuModifier = ext.createMenuModifier();

@@ -10,9 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.holders.IHolder;
@@ -38,14 +40,14 @@ public interface IDesktopExtension {
 
   /**
    * Returns the core desktop that holds this desktop extension.
-   * 
+   *
    * @return the desktop that holds this extension
    */
   IDesktop getCoreDesktop();
 
   /**
    * Sets the core desktop that holds this desktop extension.
-   * 
+   *
    * @param desktop
    *          the desktop that holds this extension
    */
@@ -53,7 +55,7 @@ public interface IDesktopExtension {
 
   /**
    * Called while this desktop extension is initialized.
-   * 
+   *
    * @return {@code ContributionCommand.Continue} if further extensions should be processed,
    *         {@code ContributionCommand.Stop} otherwise
    * @throws ProcessingException
@@ -62,7 +64,7 @@ public interface IDesktopExtension {
 
   /**
    * Called after the core desktop was opened and displayed on the GUI.
-   * 
+   *
    * @return {@code ContributionCommand.Continue} if further extensions should be processed,
    *         {@code ContributionCommand.Stop} otherwise
    * @throws ProcessingException
@@ -73,7 +75,7 @@ public interface IDesktopExtension {
    * Called just after the core desktop receives the request to close the desktop, i.e. before the desktop
    * gets into its closing state.
    * The desktop extension is allowed to veto the closing process by throwing a {@link VetoException}.
-   * 
+   *
    * @return {@code ContributionCommand.Continue} if further extensions should be processed,
    *         {@code ContributionCommand.Stop} otherwise
    * @throws ProcessingException
@@ -82,7 +84,7 @@ public interface IDesktopExtension {
 
   /**
    * Called before the core desktop is being closed.
-   * 
+   *
    * @return {@code ContributionCommand.Continue} if further extensions should be processed,
    *         {@code ContributionCommand.Stop} otherwise
    * @throws ProcessingException
@@ -91,7 +93,7 @@ public interface IDesktopExtension {
 
   /**
    * Called after a UI has been attached to the core desktop. The desktop must not necessarily be open.
-   * 
+   *
    * @return {@code ContributionCommand.Continue} if further extensions should be processed,
    *         {@code ContributionCommand.Stop} otherwise
    * @throws ProcessingException
@@ -100,7 +102,7 @@ public interface IDesktopExtension {
 
   /**
    * Called after a UI has been detached from the core desktop. The desktop must not necessarily be open.
-   * 
+   *
    * @return {@code ContributionCommand.Continue} if further extensions should be processed,
    *         {@code ContributionCommand.Stop} otherwise
    * @throws ProcessingException
@@ -109,7 +111,7 @@ public interface IDesktopExtension {
 
   /**
    * Called whenever a new outline has been activated on the core desktop.
-   * 
+   *
    * @param oldOutline
    *          old outline that was active before
    * @param newOutline
@@ -126,7 +128,7 @@ public interface IDesktopExtension {
    * holder. This allows it to prevent the form being added to the desktop (set
    * reference to {@code null}), do some general modifications needed to be done prior UI instantiation,
    * or even replace it with a different instance.
-   * 
+   *
    * @param formHolder
    *          contains the form that will be added to the core desktop
    * @return {@code ContributionCommand.Continue} if further extensions should be processed,
@@ -137,7 +139,7 @@ public interface IDesktopExtension {
 
   /**
    * Called whenever a new page has been activated (selected) on the core desktop.
-   * 
+   *
    * @param oldForm
    *          is the search form of the old (not selected anymore) page or {@code null}
    * @param newForm
@@ -150,7 +152,7 @@ public interface IDesktopExtension {
 
   /**
    * Called whenever a new page has been activated (selected) on the core desktop.
-   * 
+   *
    * @param oldForm
    *          is the detail form of the old (not selected anymore) page or {@code null}
    * @param newForm
@@ -163,7 +165,7 @@ public interface IDesktopExtension {
 
   /**
    * Called whenever a new page has been activated (selected) on the core desktop.
-   * 
+   *
    * @param oldTable
    *          is the table of the old (not selected anymore) table page or {@code null}
    * @param newTable
@@ -176,7 +178,7 @@ public interface IDesktopExtension {
 
   /**
    * Called after a table page was loaded or reloaded.
-   * 
+   *
    * @param tablePage
    *          the table page that has been (re)loaded
    * @return {@code ContributionCommand.Continue} if further extensions should be processed,
@@ -191,7 +193,7 @@ public interface IDesktopExtension {
    * <p>
    * The (potential) menus added to the {@code menus} list will be post processed. {@link IMenu#prepareAction()} is
    * called on each and then checked if the menu is visible.
-   * 
+   *
    * @param menus
    *          a live list to add menus to the tray
    * @return {@code ContributionCommand.Continue} if further extensions should be processed,
@@ -204,23 +206,25 @@ public interface IDesktopExtension {
    * Adds the outlines configured with this extension to the {@code outlines} collection. This is a live list of
    * contributed outlines. They are NOT yet initialized.
    * <p>
-   * Use the {@link Order} annotation to define the sort order of the contributed outlines.
-   * 
+   * Use the {@link Order} annotation or {@link IOutline#setOrder(double)} to define the sort order of the contributed
+   * outlines.
+   *
    * @param outlines
-   *          a live list to which the contributed outlines are added
+   *          a live collection to which the contributed outlines are added
    */
-  void contributeOutlines(List<IOutline> outlines);
+  void contributeOutlines(OrderedCollection<IOutline> outlines);
 
   /**
    * Adds the actions configured with this extension to the {@code actions} collection. This is a live list of
    * contributed actions ({@link IMenu}, {@link IKeyStroke}, {@link IToolButton}, {@link IViewButton}).
    * They are NOT yet initialized.
    * <p>
-   * Use the {@link Order} annotation to define the sort order of the contributed actions.
-   * 
+   * Use the {@link Order} annotation or {@link IAction#setOrder(double)} to define the sort order of the contributed
+   * actions.
+   *
    * @param actions
    *          a live list to which the contributed actions are added
    */
-  void contributeActions(List<IAction> actions);
+  void contributeActions(Collection<IAction> actions);
 
 }

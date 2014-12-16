@@ -24,7 +24,7 @@ import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.InjectFieldTo;
-import org.eclipse.scout.commons.annotations.OrderedComparator;
+import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.ICompositeFieldExtension;
@@ -106,11 +106,11 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
       filterFieldsInternal(configuredFields);
 
       // create instances
-      List<IFormField> fieldList = new ArrayList<IFormField>(configuredFields.size() + contributedFields.size());
+      OrderedCollection<IFormField> fields = new OrderedCollection<IFormField>();
       for (Class<? extends IFormField> clazz : configuredFields) {
         try {
           IFormField f = ConfigurationUtility.newInnerInstance(this, clazz);
-          fieldList.add(f);
+          fields.addOrdered(f);
         }// end try
         catch (Throwable t) {
           SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + clazz.getName() + "'.", t));
@@ -118,19 +118,16 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
       }
 
       // handle contributions
-      fieldList.addAll(contributedFields);
+      fields.addAllOrdered(contributedFields);
 
-      injectFieldsInternal(fieldList);
-
-      // sort fields
-      Collections.sort(fieldList, new OrderedComparator());
+      injectFieldsInternal(fields);
 
       // connect
-      for (IFormField f : fieldList) {
+      for (IFormField f : fields) {
         f.setParentFieldInternal(this);
       }
 
-      m_fields = fieldList;
+      m_fields = fields.getOrderedList();
 
       // attach a proxy controller to each child field in the group for: visible, saveNeeded
       for (IFormField f : m_fields) {
@@ -182,16 +179,15 @@ public abstract class AbstractCompositeField extends AbstractFormField implement
 
   /**
    * Override this internal method only in order to make use of dynamic fields<br>
-   * Used to manage field list and add/remove fields (see {@link AbstractGroupBox} with wizard buttons)
-   * <p>
+   * To change the order or specify the insert position use {@link IFormField#setOrder(double)}.
    * The default implementation checks for {@link InjectFieldTo} annotations in the enclosing (runtime) classes.
    *
-   * @param fieldList
-   *          live and mutable list of configured fields, not yet initialized
+   * @param fields
+   *          live and mutable collection of configured fields, not yet initialized
    *          and added to composite field
    */
-  protected void injectFieldsInternal(List<IFormField> fieldList) {
-    FormFieldInjectionThreadLocal.injectFields(this, fieldList);
+  protected void injectFieldsInternal(OrderedCollection<IFormField> fields) {
+    FormFieldInjectionThreadLocal.injectFields(this, fields);
   }
 
   @Override

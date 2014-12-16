@@ -10,8 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.extension.client.ui.basic.calendar.provider;
 
-import java.util.List;
-
+import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.calendar.provider.AbstractCalendarItemProvider;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -24,7 +23,7 @@ import org.eclipse.scout.rt.extension.client.ui.action.menu.MenuExtensionUtility
  * <ul>
  * <li>adding, removing and modifying statically configured menus</li>
  * </ul>
- * 
+ *
  * @since 3.9.0
  */
 public abstract class AbstractExtensibleCalendarItemProvider extends AbstractCalendarItemProvider implements IExtensibleScoutObject {
@@ -38,11 +37,11 @@ public abstract class AbstractExtensibleCalendarItemProvider extends AbstractCal
   }
 
   @Override
-  protected void injectMenusInternal(List<IMenu> menuList) {
-    super.injectMenusInternal(menuList);
+  protected void injectMenusInternal(OrderedCollection<IMenu> menus) {
+    super.injectMenusInternal(menus);
     Object enclosingObject = ExtensionUtility.getEnclosingObject(this, IFormField.class);
     if (enclosingObject != null) {
-      MenuExtensionUtility.adaptMenus(enclosingObject, this, menuList);
+      MenuExtensionUtility.adaptMenus(enclosingObject, this, menus);
     }
   }
 }

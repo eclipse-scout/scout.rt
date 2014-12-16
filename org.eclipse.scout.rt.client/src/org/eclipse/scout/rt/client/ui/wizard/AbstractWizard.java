@@ -15,7 +15,6 @@ import java.beans.PropertyChangeListener;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -28,7 +27,7 @@ import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.annotations.OrderedComparator;
+import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -388,23 +387,22 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
     // steps
     List<Class<? extends IWizardStep<? extends IForm>>> configuredAvailableSteps = getConfiguredAvailableSteps();
     List<IWizardStep> contributedSteps = m_contributionHolder.getContributionsByClass(IWizardStep.class);
-    List<IWizardStep<? extends IForm>> list = new ArrayList<IWizardStep<? extends IForm>>(configuredAvailableSteps.size() + contributedSteps.size());
+    OrderedCollection<IWizardStep<? extends IForm>> steps = new OrderedCollection<IWizardStep<? extends IForm>>();
     for (Class<? extends IWizardStep<? extends IForm>> element : configuredAvailableSteps) {
       try {
         IWizardStep<? extends IForm> step = ConfigurationUtility.newInnerInstance(this, element);
-        list.add(step);
+        steps.addOrdered(step);
       }
       catch (Exception e) {
         SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + element.getName() + "'.", e));
       }
     }
     for (IWizardStep step : contributedSteps) {
-      list.add(step);
+      steps.addOrdered(step);
     }
-    injectStepsInternal(list);
-    ExtensionUtility.moveModelObjects(list);
-    Collections.sort(list, new OrderedComparator());
-    setAvailableSteps(list);
+    injectStepsInternal(steps);
+    ExtensionUtility.moveModelObjects(steps);
+    setAvailableSteps(steps.getOrderedList());
 
     // add listener to listen on any field in active form
     m_anyFieldChangeListener = new PropertyChangeListener() {
@@ -448,13 +446,14 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   }
 
   /**
-   * Used to manage wizard steps i.e. to add/remove wizard steps
+   * Override this internal method only in order to make use of dynamic wizard steps<br>
+   * Used to add and/or remove steps<br>
+   * To change the order or specify the insert position use {@link IWizardStep#setOrder(double)}.
    *
    * @param steps
-   *          live and mutable list of configured steps, not yet initialized
-   *          and added to the step list
+   *          live and mutable collection of configured steps, yet not initialized
    */
-  protected void injectStepsInternal(List<IWizardStep<? extends IForm>> steps) {
+  protected void injectStepsInternal(OrderedCollection<IWizardStep<? extends IForm>> steps) {
   }
 
   /*
