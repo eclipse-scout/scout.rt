@@ -57,6 +57,7 @@ import org.eclipse.scout.rt.shared.security.CopyToClipboardPermission;
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.SwtMenuUtility;
+import org.eclipse.scout.rt.ui.swt.action.menu.MenuPositionCorrectionListener;
 import org.eclipse.scout.rt.ui.swt.action.menu.SwtScoutContextMenu;
 import org.eclipse.scout.rt.ui.swt.basic.SwtScoutComposite;
 import org.eclipse.scout.rt.ui.swt.basic.table.celleditor.SwtScoutTableCellEditor;
@@ -146,6 +147,8 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
     TableEx table = getEnvironment().getFormToolkit().createTable(parent, style, getScoutObject());
     table.setLinesVisible(false);
     table.setHeaderVisible(true);
+    // correction of menu position
+    table.addListener(SWT.MenuDetect, new MenuPositionCorrectionListener(table, MenuPositionCorrectionListener.HORIZONTAL_CENTER | MenuPositionCorrectionListener.VERTICAL_CENTER));
     new TableRolloverSupport(table);
     table.addDisposeListener(new DisposeListener() {
       @Override

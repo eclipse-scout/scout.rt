@@ -16,12 +16,14 @@ import java.beans.PropertyChangeListener;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
+import org.eclipse.scout.rt.ui.swt.action.menu.MenuPositionCorrectionListener;
 import org.eclipse.scout.rt.ui.swt.action.menu.SwtContextMenuMarkerComposite;
 import org.eclipse.scout.rt.ui.swt.action.menu.SwtScoutContextMenu;
 import org.eclipse.scout.rt.ui.swt.action.menu.text.TextAccess;
 import org.eclipse.scout.rt.ui.swt.ext.StatusLabelEx;
 import org.eclipse.scout.rt.ui.swt.form.fields.LogicalGridDataBuilder;
 import org.eclipse.scout.rt.ui.swt.internal.TextFieldEditableSupport;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
@@ -91,6 +93,8 @@ public class SwtScoutStringPlainTextField extends SwtScoutStringFieldComposite {
     SwtScoutContextMenu fieldMenu = new SwtScoutContextMenu(getSwtField().getShell(), getScoutObject().getContextMenu(), getEnvironment(),
         getScoutObject().isAutoAddDefaultMenus() ? new TextAccess(getSwtField()) : null, null);
     getSwtField().setMenu(fieldMenu.getSwtMenu());
+    // correction of menu position
+    getSwtField().addListener(SWT.MenuDetect, new MenuPositionCorrectionListener(getSwtField()));
   }
 
   @Override

@@ -20,6 +20,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.colorpickerfield.IColorField;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.ui.swt.LogicalGridData;
 import org.eclipse.scout.rt.ui.swt.LogicalGridLayout;
+import org.eclipse.scout.rt.ui.swt.action.menu.MenuPositionCorrectionListener;
 import org.eclipse.scout.rt.ui.swt.action.menu.SwtContextMenuMarkerComposite;
 import org.eclipse.scout.rt.ui.swt.action.menu.SwtScoutContextMenu;
 import org.eclipse.scout.rt.ui.swt.action.menu.text.StyledTextAccess;
@@ -135,6 +136,8 @@ public class SwtScoutColorField extends SwtScoutBasicFieldComposite<IColorField>
     SwtScoutContextMenu fieldMenu = new SwtScoutContextMenu(getSwtField().getShell(), getScoutObject().getContextMenu(), getEnvironment(),
         getScoutObject().isAutoAddDefaultMenus() ? new StyledTextAccess(getSwtField()) : null, getScoutObject().isAutoAddDefaultMenus() ? getSwtField() : null);
     getSwtField().setMenu(fieldMenu.getSwtMenu());
+    // correction of menu position
+    getSwtField().addListener(SWT.MenuDetect, new MenuPositionCorrectionListener(getSwtField()));
   }
 
   @Override
