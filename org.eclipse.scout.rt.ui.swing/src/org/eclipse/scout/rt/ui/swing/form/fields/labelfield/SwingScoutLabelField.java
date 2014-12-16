@@ -14,11 +14,15 @@ import java.awt.Color;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
+import javax.swing.SizeRequirements;
 import javax.swing.TransferHandler;
 import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.Element;
+import javax.swing.text.GlyphView;
 import javax.swing.text.Highlighter;
+import javax.swing.text.ParagraphView;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.View;
 import javax.swing.text.ViewFactory;
@@ -118,34 +122,98 @@ public class SwingScoutLabelField extends SwingScoutValueFieldComposite<ILabelFi
 
       @Override
       public ViewFactory getViewFactory() {
+
         return new HTMLFactory() {
           @Override
-          public View create(Element elem) {
-            View v = super.create(elem);
+          public View create(Element element) {
+            View v = super.create(element);
             if (v instanceof InlineView) {
               // javax.swing.text.html.BRView (the <br> tag) is also a LabelView but
               // our overridden class must not change it's behavior
-              // javax.swing.text.html.BRView is not visible, use HTML tag to check
-              Object o = elem.getAttributes().getAttribute(StyleConstants.NameAttribute);
+              Object o = element.getAttributes().getAttribute(StyleConstants.NameAttribute);
               if ((o instanceof HTML.Tag) && o == HTML.Tag.BR) {
                 return v;
               }
-              return new InlineView(elem) {
+              return new InlineView(element) {
                 @Override
-                public float getMinimumSpan(int axis) {
+                public int getBreakWeight(int axis, float pos, float len) {
                   // default behavior if no text wrap required
                   if (!m_textWrap) {
-                    return super.getMinimumSpan(axis);
+                    return super.getBreakWeight(axis, pos, len);
                   }
-                  // to support word wrapping we have to return "0" for the X_AXIS
-                  switch (axis) {
-                    case View.X_AXIS:
-                      return 0;
-                    case View.Y_AXIS:
-                      return super.getMinimumSpan(axis);
-                    default:
-                      throw new IllegalArgumentException("Invalid axis: " + axis);
+                  // --> GlyphView.getBreakWeight()
+                  if (axis == View.X_AXIS) {
+                    checkPainter();
+                    int offset = getStartOffset();
+                    int maxPos = getGlyphPainter().getBoundedPosition(this, offset, pos, len);
+                    if (maxPos == offset) {
+                      // can't even fit a single character
+                      return View.BadBreakWeight;
+                    }
+                    // <-- GlyphView.getBreakWeight()
+                    // if line break found enforce break
+                    try {
+                      int separatorIndex = getDocument().getText(offset, maxPos - offset).indexOf(System.getProperty("line.separator"));
+                      if (separatorIndex >= 0) {
+                        return View.ForcedBreakWeight;
+                      }
+                    }
+                    catch (BadLocationException ex) {
+                      //nop
+                    }
                   }
+                  return super.getBreakWeight(axis, pos, len);
+                }
+
+                @Override
+                public View breakView(int axis, int offset, float pos, float len) {
+                  // default behavior if no text wrap required
+                  if (!m_textWrap) {
+                    return super.breakView(axis, offset, pos, len);
+                  }
+                  // --> GlyphView.breakView()
+                  if (axis == View.X_AXIS) {
+                    checkPainter();
+                    int maxPos = getGlyphPainter().getBoundedPosition(this, offset, pos, len);
+                    // <-- GlyphView.breakView()
+                    // if line break found create new text fragment to display
+                    try {
+                      int separatorIndex = getDocument().getText(offset, maxPos - offset).indexOf(System.getProperty("line.separator"));
+                      if (separatorIndex >= 0) {
+                        GlyphView glyphView = (GlyphView) createFragment(offset, offset + separatorIndex + 1);
+                        return glyphView;
+                      }
+                    }
+                    catch (BadLocationException ex) {
+                      //nop
+                    }
+                  }
+                  return super.breakView(axis, offset, pos, len);
+                }
+              };
+            }
+            else if (v instanceof ParagraphView) {
+              return new ParagraphView(element) {
+                @Override
+                protected SizeRequirements calculateMinorAxisRequirements(int axis, SizeRequirements r) {
+                  // default behavior if no text wrap required
+                  if (!m_textWrap) {
+                    return super.calculateMinorAxisRequirements(axis, r);
+                  }
+                  // enforce behavior as defined by FlowView
+                  // --> FlowView.calculateMinorAxisRequirements()
+                  if (r == null) {
+                    r = new SizeRequirements();
+                  }
+                  float pref = layoutPool.getPreferredSpan(axis);
+                  float min = layoutPool.getMinimumSpan(axis);
+                  // Don't include insets, Box.getXXXSpan will include them.
+                  r.minimum = (int) min;
+                  r.preferred = Math.max(r.minimum, (int) pref);
+                  r.maximum = Integer.MAX_VALUE;
+                  r.alignment = 0.5f;
+                  return r;
+                  // <-- FlowView.calculateMinorAxisRequirements()
                 }
               };
             }
