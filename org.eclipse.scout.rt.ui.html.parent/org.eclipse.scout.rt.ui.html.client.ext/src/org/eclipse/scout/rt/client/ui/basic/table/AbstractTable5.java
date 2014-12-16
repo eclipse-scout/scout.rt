@@ -15,6 +15,7 @@ import java.util.List;
 
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
@@ -48,13 +49,13 @@ public abstract class AbstractTable5 extends AbstractExtensibleTable implements 
   //FIXME CGU remove PropertyChangeListener in AbstractColumn constructor -> generates a lot of unnecessary events
 
   @Override
-  protected void execCreateHeaderMenus(List<IMenu> menuList) {
+  protected void addHeaderMenusInternal(OrderedCollection<IMenu> menuList) {
     //FIXME how to distinguish between html ui and others? better create service?
     if (UserAgentUtility.getCurrentUiLayer().equals(UiLayer2.HTML)) {
-      menuList.add(new TableOrganizeMenu(this));
+      menuList.addLast(new TableOrganizeMenu(this));
     }
     else {
-      super.execCreateHeaderMenus(menuList);
+      super.addHeaderMenusInternal(menuList);
     }
   }
 
