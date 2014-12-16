@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.extension;
 
-import java.util.List;
-
 import org.eclipse.scout.commons.annotations.IOrdered;
 import org.eclipse.scout.service.SERVICES;
 
@@ -24,9 +22,9 @@ public final class ExtensionUtility {
    * Applies move descriptors registered on {@link IExtensionRegistry#registerMove(Class, double)} to all objects of the
    * given list.
    * <p/>
-   * <b>Important</b>: The list is not sorted by this method.
+   * <b>Important</b>: The given {@link Iterable} is not sorted by this method.
    */
-  public static void moveModelObjects(List<? extends IOrdered> modelObjects) {
+  public static void moveModelObjects(Iterable<? extends IOrdered> modelObjects) {
     IInternalExtensionRegistry extensionRegistry = SERVICES.getService(IInternalExtensionRegistry.class);
     for (IOrdered m : modelObjects) {
       MoveDescriptor<IOrdered> moveDesc = extensionRegistry.createModelMoveDescriptorFor(m, null);

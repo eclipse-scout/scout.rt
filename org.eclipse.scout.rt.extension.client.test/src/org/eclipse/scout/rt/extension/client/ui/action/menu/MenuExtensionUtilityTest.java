@@ -22,7 +22,7 @@ import java.util.List;
 
 import org.eclipse.scout.commons.annotations.IOrdered;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.annotations.OrderedComparator;
+import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithNodes;
@@ -83,44 +83,42 @@ public class MenuExtensionUtilityTest {
     P_AnchorNodePage anchor = new P_AnchorNodePage();
     // for node pages, anchor and container are the same
     P_AnchorNodePage container = anchor;
-    List<IMenu> menuList = new ArrayList<IMenu>();
+    OrderedCollection<IMenu> menus = new OrderedCollection<IMenu>();
     //
-    MenuExtensionUtility.contributeMenus(anchor, container, null, menuList);
-    assertTrue(menuList.isEmpty());
+    MenuExtensionUtility.contributeMenus(anchor, container, null, menus);
+    assertTrue(menus.isEmpty());
     //
-    MenuExtensionUtility.contributeMenus(anchor, container, Collections.<MenuContributionExtension> emptyList(), menuList);
-    assertTrue(menuList.isEmpty());
+    MenuExtensionUtility.contributeMenus(anchor, container, Collections.<MenuContributionExtension> emptyList(), menus);
+    assertTrue(menus.isEmpty());
     //
-    menuList.add(m_a);
-    menuList.add(m_b);
-    menuList.add(m_c);
-    MenuExtensionUtility.contributeMenus(anchor, container, Collections.<MenuContributionExtension> emptyList(), menuList);
-    assertEquals(Arrays.asList(m_a, m_b, m_c), menuList);
+    menus.addOrdered(m_a);
+    menus.addOrdered(m_b);
+    menus.addOrdered(m_c);
+    MenuExtensionUtility.contributeMenus(anchor, container, Collections.<MenuContributionExtension> emptyList(), menus);
+    assertEquals(Arrays.asList(m_a, m_b, m_c), menus.getOrderedList());
     //
     List<MenuContributionExtension> menuExtensions = new ArrayList<MenuContributionExtension>();
     menuExtensions.add(new MenuContributionExtension(P_ADynamicMenu.class, new MenuAnchorFilter(P_AnchorNodePage.class), 15d));
-    MenuExtensionUtility.contributeMenus(anchor, container, menuExtensions, menuList);
-    Collections.sort(menuList, new OrderedComparator());
-    assertEquals(4, menuList.size());
-    assertSame(m_a, menuList.get(0));
-    assertTrue(menuList.get(1) instanceof P_ADynamicMenu);
-    assertSame(m_b, menuList.get(2));
-    assertSame(m_c, menuList.get(3));
+    MenuExtensionUtility.contributeMenus(anchor, container, menuExtensions, menus);
+    assertEquals(4, menus.size());
+    assertSame(m_a, menus.get(0));
+    assertTrue(menus.get(1) instanceof P_ADynamicMenu);
+    assertSame(m_b, menus.get(2));
+    assertSame(m_c, menus.get(3));
     //
-    menuList.clear();
-    menuList.add(m_a);
-    menuList.add(m_c);
-    menuList.add(m_b);
+    menus.clear();
+    menus.addOrdered(m_a);
+    menus.addOrdered(m_c);
+    menus.addOrdered(m_b);
     menuExtensions.add(0, new MenuContributionExtension(P_BDynamicMenu.class, new MenuAnchorFilter(P_AnchorNodePage.class), 100d));
     menuExtensions.add(new MenuContributionExtension(P_CDynamicMenu.class, new MenuAnchorFilter(P_OtherNodePage.class), 15d));
-    MenuExtensionUtility.contributeMenus(anchor, container, menuExtensions, menuList);
-    Collections.sort(menuList, new OrderedComparator());
-    assertEquals(5, menuList.size());
-    assertSame(m_a, menuList.get(0));
-    assertTrue(menuList.get(1) instanceof P_ADynamicMenu);
-    assertSame(m_b, menuList.get(2));
-    assertSame(m_c, menuList.get(3));
-    assertTrue(menuList.get(4) instanceof P_BDynamicMenu);
+    MenuExtensionUtility.contributeMenus(anchor, container, menuExtensions, menus);
+    assertEquals(5, menus.size());
+    assertSame(m_a, menus.get(0));
+    assertTrue(menus.get(1) instanceof P_ADynamicMenu);
+    assertSame(m_b, menus.get(2));
+    assertSame(m_c, menus.get(3));
+    assertTrue(menus.get(4) instanceof P_BDynamicMenu);
   }
 
   @Test
@@ -128,15 +126,14 @@ public class MenuExtensionUtilityTest {
     P_AnchorNodePage anchor = new P_AnchorNodePage();
     // for node pages, anchor and container are the same
     P_AnchorNodePage container = anchor;
-    List<IMenu> menuList = new ArrayList<IMenu>();
+    OrderedCollection<IMenu> menuList = new OrderedCollection<IMenu>();
     //
-    menuList.add(m_a);
-    menuList.add(m_b);
-    menuList.add(m_c);
+    menuList.addOrdered(m_a);
+    menuList.addOrdered(m_b);
+    menuList.addOrdered(m_c);
     List<MenuContributionExtension> menuExtensions = new ArrayList<MenuContributionExtension>();
     menuExtensions.add(new MenuContributionExtension(P_ADynamicMenu.class, new MenuAnchorFilter(P_AnchorNodePage.class), 15d));
     MenuExtensionUtility.contributeMenus(anchor, container, menuExtensions, menuList);
-    Collections.sort(menuList, new OrderedComparator());
     assertEquals(4, menuList.size());
     assertSame(m_a, menuList.get(0));
     //

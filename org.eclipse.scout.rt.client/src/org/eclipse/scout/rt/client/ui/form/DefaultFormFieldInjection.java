@@ -21,6 +21,7 @@ import java.util.Set;
 import org.eclipse.scout.commons.BeanUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.annotations.InjectFieldTo;
+import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -168,8 +169,8 @@ public class DefaultFormFieldInjection implements IFormFieldInjection {
   }
 
   @Override
-  public void injectFields(IFormField container, List<IFormField> fieldList) {
-    if (container == null || fieldList == null || m_injectedFieldList.isEmpty()) {
+  public void injectFields(IFormField container, OrderedCollection<IFormField> fields) {
+    if (container == null || fields == null || m_injectedFieldList.isEmpty()) {
       return;
     }
 
@@ -180,7 +181,7 @@ public class DefaultFormFieldInjection implements IFormFieldInjection {
     if (replacingFields != null) {
       for (Class<? extends IFormField> replacingField : replacingFields) {
         // create field
-        createAndInsertField(container, fieldList, replacingField);
+        createAndInsertField(container, fields, replacingField);
         addReplacementMappings(replacingField);
       }
     }
@@ -192,7 +193,7 @@ public class DefaultFormFieldInjection implements IFormFieldInjection {
         tmpClass = tmpClass.getSuperclass();
       }
       if (tmpClass.getAnnotation(InjectFieldTo.class).value() == container.getClass()) {
-        createAndInsertField(container, fieldList, injectedField);
+        createAndInsertField(container, fields, injectedField);
         addReplacementMappings(injectedField);
       }
     }
@@ -215,9 +216,9 @@ public class DefaultFormFieldInjection implements IFormFieldInjection {
   /**
    * Adds the field f to the end of the list. If the field is already part of the given list, this method does nothing.
    */
-  private void createAndInsertField(IFormField container, List<IFormField> list, Class<? extends IFormField> fieldClass) {
+  private void createAndInsertField(IFormField container, OrderedCollection<IFormField> fields, Class<? extends IFormField> fieldClass) {
     //check if list already contains the field
-    for (IFormField f : list) {
+    for (IFormField f : fields) {
       if (f.getClass() == fieldClass) {
         return;
       }
@@ -225,7 +226,7 @@ public class DefaultFormFieldInjection implements IFormFieldInjection {
 
     try {
       IFormField f = newInnerInstance(container, fieldClass);
-      list.add(f);
+      fields.addOrdered(f);
     }
     catch (Exception e) {
       SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("exception while injecting field '" + fieldClass.getName() + "'.", e));

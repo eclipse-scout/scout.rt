@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.scout.commons.annotations.InjectFieldTo;
+import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
@@ -110,12 +111,12 @@ public final class FormFieldInjectionThreadLocal {
   /**
    * @param container
    *          is the container field that is being added potential injected fields
-   * @param fieldList
-   *          live and mutable list of currently (configured) fields, not yet initialized
+   * @param fields
+   *          live and mutable collection of currently (configured) fields, not yet initialized
    *          or added to the container field
    */
-  public static void injectFields(IFormField container, List<IFormField> fieldList) {
-    THREAD_LOCAL.get().injectFieldsInternal(container, fieldList);
+  public static void injectFields(IFormField container, OrderedCollection<IFormField> fields) {
+    THREAD_LOCAL.get().injectFieldsInternal(container, fields);
   }
 
   private final ArrayList<IFormFieldInjection> m_stack = new ArrayList<IFormFieldInjection>();
@@ -145,12 +146,12 @@ public final class FormFieldInjectionThreadLocal {
     m_stack.remove(m_stack.size() - 1);
   }
 
-  private void injectFieldsInternal(IFormField container, List<IFormField> fieldList) {
+  private void injectFieldsInternal(IFormField container, OrderedCollection<IFormField> fields) {
     if (m_stack.isEmpty()) {
       return;
     }
     for (IFormFieldInjection i : m_stack) {
-      i.injectFields(container, fieldList);
+      i.injectFields(container, fields);
     }
   }
 

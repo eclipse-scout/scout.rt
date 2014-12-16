@@ -10,9 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.ui.form.fields.tabbox;
 
-import java.util.List;
-
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.mobile.Icons;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.groupbox.GroupBoxPropertyDelegator;
@@ -49,10 +48,10 @@ public class TabForm extends AbstractForm {
       }
 
       @Override
-      protected void injectFieldsInternal(List<IFormField> fieldList) {
-        super.injectFieldsInternal(fieldList);
+      protected void injectFieldsInternal(OrderedCollection<IFormField> fields) {
+        super.injectFieldsInternal(fields);
 
-        fieldList.addAll(m_tabGroupBox.getFields());
+        fields.addAllOrdered(m_tabGroupBox.getFields());
       }
 
       /**

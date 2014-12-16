@@ -18,6 +18,7 @@ import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -176,12 +177,12 @@ public abstract class AbstractMixedSmartColumn<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE>
       }
 
       @Override
-      protected void injectMenusInternal(List<IMenu> menuList) {
+      protected void injectMenusInternal(OrderedCollection<IMenu> menus) {
         Class[] menuCandidates = ConfigurationUtility.getDeclaredPublicClasses(AbstractMixedSmartColumn.this.getClass());
         List<Class<IMenu>> menuClazzes = ConfigurationUtility.filterClasses(menuCandidates, IMenu.class);
         for (Class<? extends IMenu> menuClazz : menuClazzes) {
           try {
-            menuList.add(ConfigurationUtility.newInnerInstance(AbstractMixedSmartColumn.this, menuClazz));
+            menus.addOrdered(ConfigurationUtility.newInnerInstance(AbstractMixedSmartColumn.this, menuClazz));
           }
           catch (Exception e) {
             SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException(this.getClass().getSimpleName(), e));
@@ -189,7 +190,7 @@ public abstract class AbstractMixedSmartColumn<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE>
         }
 
         List<IMenu> contributedMenus = AbstractMixedSmartColumn.this.m_contributionHolder.getContributionsByClass(IMenu.class);
-        menuList.addAll(contributedMenus);
+        menus.addAllOrdered(contributedMenus);
       }
     };
 

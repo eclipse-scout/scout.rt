@@ -10,10 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.extension.ui.action.tree;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
 import org.eclipse.scout.rt.shared.extension.AbstractMoveModelObjectHandler;
 
@@ -22,7 +23,7 @@ import org.eclipse.scout.rt.shared.extension.AbstractMoveModelObjectHandler;
  */
 public class MoveActionNodesHandler<T extends IActionNode<T>> extends AbstractMoveModelObjectHandler<T> {
 
-  public MoveActionNodesHandler(List<T> actionNodes) {
+  public MoveActionNodesHandler(OrderedCollection<T> actionNodes) {
     super("action node", actionNodes);
   }
 
@@ -53,16 +54,16 @@ public class MoveActionNodesHandler<T extends IActionNode<T>> extends AbstractMo
     return allModelObjects;
   }
 
-  private void collectAllActionNodes(List<? extends T> actionNodes, List<T> allActionNodes) {
-    if (CollectionUtility.isEmpty(actionNodes)) {
+  private void collectAllActionNodes(Iterable<? extends T> actionNodes, List<T> allActionNodes) {
+    if (actionNodes == null) {
       return;
     }
-    allActionNodes.addAll(actionNodes);
-    for (T actionNode : actionNodes) {
-      if (!actionNode.hasChildActions()) {
-        continue;
+    for (Iterator<? extends T> it = actionNodes.iterator(); it.hasNext();) {
+      T actionNode = it.next();
+      allActionNodes.add(actionNode);
+      if (actionNode.hasChildActions()) {
+        collectAllActionNodes(actionNode.getChildActions(), allActionNodes);
       }
-      collectAllActionNodes(actionNode.getChildActions(), allActionNodes);
     }
   }
 }

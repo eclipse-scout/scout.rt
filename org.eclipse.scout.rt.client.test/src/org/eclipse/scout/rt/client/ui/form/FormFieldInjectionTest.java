@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.FormFieldInjectionTest.FormFieldInjectionTestForm.MainBox.TopBox;
 import org.eclipse.scout.rt.client.ui.form.FormFieldInjectionTest.FormFieldInjectionTestForm.MainBox.TopBox.StringField;
@@ -60,7 +61,7 @@ public class FormFieldInjectionTest {
     private final List<List<ICompositeField>> m_filterFieldsContainerFields = new ArrayList<List<ICompositeField>>();
 
     @Override
-    public void injectFields(IFormField container, List<IFormField> fieldList) {
+    public void injectFields(IFormField container, OrderedCollection<IFormField> fields) {
       System.out.println("injectFields: " + container);
       m_injectFieldsContainerFields.add(new ArrayList<ICompositeField>(FormFieldInjectionThreadLocal.getContainerFields()));
     }

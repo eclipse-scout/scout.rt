@@ -12,10 +12,10 @@ package org.eclipse.scout.rt.ui.swt.basic.table.celleditor;
 
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -304,8 +304,8 @@ public class SwtScoutFormFieldPopup extends SwtScoutComposite<IFormField> {
     public class MainBox extends AbstractGroupBox {
 
       @Override
-      protected void injectFieldsInternal(List<IFormField> fieldList) {
-        fieldList.add(m_formField);
+      protected void injectFieldsInternal(OrderedCollection<IFormField> fields) {
+        fields.addOrdered(m_formField);
       }
 
       @Override

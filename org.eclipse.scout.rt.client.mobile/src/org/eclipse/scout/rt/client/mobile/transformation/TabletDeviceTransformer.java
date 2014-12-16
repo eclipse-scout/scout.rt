@@ -10,10 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.transformation;
 
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
 import org.eclipse.scout.rt.client.mobile.ui.desktop.MultiPageChangeStrategy;
 import org.eclipse.scout.rt.client.mobile.ui.form.outline.IOutlineChooserForm;
@@ -46,7 +46,7 @@ public class TabletDeviceTransformer extends MobileDeviceTransformer {
   }
 
   @Override
-  public void adaptDesktopOutlines(Collection<IOutline> outlines) {
+  public void adaptDesktopOutlines(OrderedCollection<IOutline> outlines) {
     IPageChangeStrategy strategy = new MultiPageChangeStrategy(getPageFormManager());
     for (IOutline outline : outlines) {
       outline.setPageChangeStrategy(strategy);

@@ -21,6 +21,7 @@ import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormFieldTest.TestForm2.MainBox.SimpleGroupBox2;
@@ -173,12 +174,12 @@ public class AbstractFormFieldTest {
     public class SimpleGroupBox extends AbstractGroupBox {
 
       @Override
-      protected void injectFieldsInternal(List<IFormField> fieldList) {
+      protected void injectFieldsInternal(OrderedCollection<IFormField> fields) {
         SimpleTestFormField s1 = new SimpleTestFormField();
         SimpleTestFormField s2 = new SimpleTestFormField();
-        fieldList.add(s1);
-        fieldList.add(s2);
-        super.injectFieldsInternal(fieldList);
+        fields.addLast(s1);
+        fields.addLast(s2);
+        super.injectFieldsInternal(fields);
       }
     }
   }

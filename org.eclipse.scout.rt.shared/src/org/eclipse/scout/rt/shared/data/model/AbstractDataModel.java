@@ -11,15 +11,13 @@
 package org.eclipse.scout.rt.shared.data.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
-import org.eclipse.scout.commons.annotations.OrderedComparator;
+import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -77,22 +75,19 @@ public abstract class AbstractDataModel implements IDataModel, Serializable, ICo
 
     List<IDataModelAttribute> contributedAttributes = m_contributionHolder.getContributionsByClass(IDataModelAttribute.class);
 
-    List<IDataModelAttribute> attributes = new ArrayList<IDataModelAttribute>(filtered.size() + contributedAttributes.size());
+    OrderedCollection<IDataModelAttribute> attributes = new OrderedCollection<IDataModelAttribute>();
     for (Class<? extends IDataModelAttribute> attributeClazz : filtered) {
       try {
         IDataModelAttribute a = ConfigurationUtility.newInnerInstance(holder, attributeClazz);
-        attributes.add(a);
+        attributes.addOrdered(a);
       }
       catch (Exception e) {
         SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + attributeClazz.getName() + "'.", e));
       }
     }
-    attributes.addAll(contributedAttributes);
-
+    attributes.addAllOrdered(contributedAttributes);
     ExtensionUtility.moveModelObjects(attributes);
-    Collections.sort(attributes, new OrderedComparator());
-
-    return attributes;
+    return attributes.getOrderedList();
   }
 
   protected List<IDataModelEntity> createEntities(Object holder) {
@@ -100,21 +95,20 @@ public abstract class AbstractDataModel implements IDataModel, Serializable, ICo
     List<Class<IDataModelEntity>> filtered = ConfigurationUtility.filterClasses(all, IDataModelEntity.class);
     List<IDataModelEntity> contributedEntities = m_contributionHolder.getContributionsByClass(IDataModelEntity.class);
 
-    List<IDataModelEntity> entities = new ArrayList<IDataModelEntity>(filtered.size() + contributedEntities.size());
+    OrderedCollection<IDataModelEntity> entities = new OrderedCollection<IDataModelEntity>();
     for (Class<? extends IDataModelEntity> dataModelEntityClazz : filtered) {
       try {
-        entities.add(ConfigurationUtility.newInnerInstance(holder, dataModelEntityClazz));
+        entities.addOrdered(ConfigurationUtility.newInnerInstance(holder, dataModelEntityClazz));
       }
       catch (Exception e) {
         SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + dataModelEntityClazz.getName() + "'.", e));
       }
     }
 
-    entities.addAll(contributedEntities);
+    entities.addAllOrdered(contributedEntities);
 
     ExtensionUtility.moveModelObjects(entities);
-    Collections.sort(entities, new OrderedComparator());
-    return entities;
+    return entities.getOrderedList();
   }
 
   protected List<IDataModelAttribute> createAttributes() {

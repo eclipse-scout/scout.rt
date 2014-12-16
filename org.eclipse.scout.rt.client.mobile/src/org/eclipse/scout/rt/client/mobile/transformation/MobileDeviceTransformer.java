@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.mobile.navigation.AbstractMobileBackAction;
@@ -160,7 +161,7 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
   }
 
   @Override
-  public void adaptDesktopOutlines(Collection<IOutline> outlines) {
+  public void adaptDesktopOutlines(OrderedCollection<IOutline> outlines) {
   }
 
   @Override

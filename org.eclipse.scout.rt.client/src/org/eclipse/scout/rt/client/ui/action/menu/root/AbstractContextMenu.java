@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.action.menu.root;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -74,7 +75,6 @@ public abstract class AbstractContextMenu extends AbstractMenu implements IConte
     propertySupport.setProperty(PROP_CURRENT_MENU_TYPES, menuTypes);
   }
 
-
   @Override
   public void addContextMenuListener(ContextMenuListener listener) {
     m_listeners.add(ContextMenuListener.class, listener);
@@ -97,12 +97,12 @@ public abstract class AbstractContextMenu extends AbstractMenu implements IConte
   }
 
   @Override
-  public void addChildActions(List<? extends IMenu> actionList) {
+  public void addChildActions(Collection<? extends IMenu> actionList) {
     super.addChildActions(actionList);
   }
 
   @Override
-  protected void afterChildMenusAdd(List<? extends IMenu> newChildMenus) {
+  protected void afterChildMenusAdd(Collection<? extends IMenu> newChildMenus) {
     super.afterChildMenusAdd(newChildMenus);
     addScoutMenuVisibilityListenerRec(newChildMenus);
     calculateLocalVisibility();
@@ -110,7 +110,7 @@ public abstract class AbstractContextMenu extends AbstractMenu implements IConte
   }
 
   @Override
-  protected void afterChildMenusRemove(List<? extends IMenu> childMenusToRemove) {
+  protected void afterChildMenusRemove(Collection<? extends IMenu> childMenusToRemove) {
     super.afterChildMenusRemove(childMenusToRemove);
     removeScoutMenuVisibilityListenerRec(childMenusToRemove);
     calculateLocalVisibility();
@@ -127,7 +127,7 @@ public abstract class AbstractContextMenu extends AbstractMenu implements IConte
     fireContextMenuEvent(new ContextMenuEvent(this, ContextMenuEvent.TYPE_STRUCTURE_CHANGED));
   }
 
-  protected void addScoutMenuVisibilityListenerRec(List<? extends IMenu> menus) {
+  protected void addScoutMenuVisibilityListenerRec(Collection<? extends IMenu> menus) {
     if (menus != null) {
       for (IMenu m : menus) {
         m.addPropertyChangeListener(IMenu.PROP_CHILD_ACTIONS, m_menuVisibilityListener);
@@ -137,7 +137,7 @@ public abstract class AbstractContextMenu extends AbstractMenu implements IConte
     }
   }
 
-  protected void removeScoutMenuVisibilityListenerRec(List<? extends IMenu> menus) {
+  protected void removeScoutMenuVisibilityListenerRec(Collection<? extends IMenu> menus) {
     if (menus != null) {
       for (IMenu m : menus) {
         m.removePropertyChangeListener(IMenu.PROP_CHILD_ACTIONS, m_menuVisibilityListener);

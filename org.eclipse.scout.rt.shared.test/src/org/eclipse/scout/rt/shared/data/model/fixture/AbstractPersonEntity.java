@@ -10,9 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.data.model.fixture;
 
-import java.util.List;
-
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.rt.shared.data.model.AbstractDataModelAttribute;
 import org.eclipse.scout.rt.shared.data.model.AbstractDataModelEntity;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
@@ -27,15 +26,15 @@ public abstract class AbstractPersonEntity extends AbstractDataModelEntity {
   }
 
   @Override
-  protected void injectAttributesInternal(List<IDataModelAttribute> attributeList) {
-    super.injectAttributesInternal(attributeList);
-    CustomDataModelExtension.injectAttributes(this, attributeList);
+  protected void injectAttributesInternal(OrderedCollection<IDataModelAttribute> attributes) {
+    super.injectAttributesInternal(attributes);
+    CustomDataModelExtension.injectAttributes(this, attributes);
   }
 
   @Override
-  protected void injectEntitiesInternal(List<IDataModelEntity> entityList) {
-    super.injectEntitiesInternal(entityList);
-    CustomDataModelExtension.injectEntities(this, entityList);
+  protected void injectEntitiesInternal(OrderedCollection<IDataModelEntity> entities) {
+    super.injectEntitiesInternal(entities);
+    CustomDataModelExtension.injectEntities(this, entities);
   }
 
   @Order(10.0f)
