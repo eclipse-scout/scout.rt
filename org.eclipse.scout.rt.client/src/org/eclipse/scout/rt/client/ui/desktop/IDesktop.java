@@ -559,10 +559,18 @@ public interface IDesktop extends IPropertyObserver {
   Collection<Object> getAddOns();
 
   /**
-   * add an untyped add-on to the Desktop
+   * Adds an untyped add-on to the Desktop.
    *
    * @since 5.1.0
    */
   void addAddOn(Object addOn);
+
+  /**
+   * Returns true while outline is changing, which happens when <code>setOutline(IOutline)</code> is called.
+   *
+   * @return whether or not outline is changing
+   * @since 5.1.0
+   */
+  boolean isOutlineChanging();
 
 }

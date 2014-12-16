@@ -21,8 +21,6 @@ import java.util.Set;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.action.IAction;
@@ -60,7 +58,6 @@ import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
  * self-references.
  */
 public class VirtualDesktop implements IDesktop {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(VirtualDesktop.class);
 
   private final EventListenerList m_listenerList;
   private final Map<String, EventListenerList> m_propertyChangeListenerMap;
@@ -610,4 +607,10 @@ public class VirtualDesktop implements IDesktop {
   public Collection<Object> getAddOns() {
     throw createUnsupportedOperationException();
   }
+
+  @Override
+  public boolean isOutlineChanging() {
+    throw createUnsupportedOperationException();
+  }
+
 }

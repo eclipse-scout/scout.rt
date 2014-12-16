@@ -955,6 +955,11 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
+  public boolean isOutlineChanging() {
+    return m_outlineChanging;
+  }
+
+  @Override
   public void setOutline(IOutline outline) {
     outline = resolveOutline(outline);
     if (m_outline == outline
