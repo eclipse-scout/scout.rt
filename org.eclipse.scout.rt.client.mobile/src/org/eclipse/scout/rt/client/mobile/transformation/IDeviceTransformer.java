@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.mobile.transformation;
 import java.util.Collection;
 import java.util.List;
 
+import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -39,7 +40,7 @@ public interface IDeviceTransformer {
 
   void adaptDesktopActions(Collection<IAction> actions);
 
-  void adaptDesktopOutlines(Collection<IOutline> outlines);
+  void adaptDesktopOutlines(OrderedCollection<IOutline> outlines);
 
   void notifyTablePageLoaded(IPageWithTable<?> tablePage) throws ProcessingException;
 

@@ -4,14 +4,13 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.testing.client.form;
 
-import java.util.List;
-
+import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 
@@ -31,10 +30,10 @@ public class DynamicGroupBox extends AbstractGroupBox {
    * This is the place to inject fields dynamically
    */
   @Override
-  protected void injectFieldsInternal(List<IFormField> fieldList) {
+  protected void injectFieldsInternal(OrderedCollection<IFormField> fields) {
     if (m_injectedFields != null) {
       for (IFormField f : m_injectedFields) {
-        fieldList.add(f);
+        fields.addLast(f);
       }
     }
   }

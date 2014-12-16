@@ -23,6 +23,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.JobEx;
@@ -295,9 +296,10 @@ public class ContentAssistTreeForm<LOOKUP_KEY> extends AbstractContentAssistFiel
   }
 
   /**
-   * Override this method to adapt the menu list of the result {@link Tree}
+   * Override this method to adapt the menu list of the result {@link Tree}.<br>
+   * To change the order or specify the insert position use {@link IMenu#setOrder(double)}.
    */
-  protected void injectResultTreeMenus(List<IMenu> menuList) {
+  protected void injectResultTreeMenus(OrderedCollection<IMenu> menus) {
   }
 
   /*
@@ -619,8 +621,8 @@ public class ContentAssistTreeForm<LOOKUP_KEY> extends AbstractContentAssistFiel
       public class Tree extends AbstractTree {
 
         @Override
-        protected void injectMenusInternal(List<IMenu> menuList) {
-          injectResultTreeMenus(menuList);
+        protected void injectMenusInternal(OrderedCollection<IMenu> menus) {
+          injectResultTreeMenus(menus);
         }
 
         @Override

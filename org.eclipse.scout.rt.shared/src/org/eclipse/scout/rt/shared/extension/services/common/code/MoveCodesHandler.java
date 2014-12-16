@@ -11,17 +11,18 @@
 package org.eclipse.scout.rt.shared.extension.services.common.code;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.annotations.OrderedComparator;
 import org.eclipse.scout.rt.shared.extension.AbstractMoveModelObjectHandler;
 import org.eclipse.scout.rt.shared.services.common.code.ICode;
 
 public class MoveCodesHandler<CODE_ID, CODE extends ICode<CODE_ID>> extends AbstractMoveModelObjectHandler<CODE> {
 
-  public MoveCodesHandler(List<CODE> rootModelObjects) {
+  public MoveCodesHandler(OrderedCollection<CODE> rootModelObjects) {
     super("code", rootModelObjects);
   }
 
@@ -60,14 +61,15 @@ public class MoveCodesHandler<CODE_ID, CODE extends ICode<CODE_ID>> extends Abst
     return allCodes;
   }
 
-  private void collectAllCodes(List<? extends CODE> codes, List<CODE> allCodes) {
-    if (CollectionUtility.isEmpty(codes)) {
+  private void collectAllCodes(Iterable<? extends CODE> codes, List<CODE> allCodes) {
+    if (codes == null) {
       return;
     }
-    allCodes.addAll(codes);
-    for (CODE actionNode : codes) {
+    for (Iterator<? extends CODE> it = codes.iterator(); it.hasNext();) {
+      CODE code = it.next();
+      allCodes.add(code);
       @SuppressWarnings("unchecked")
-      List<? extends CODE> childCodes = (List<? extends CODE>) actionNode.getChildCodes(false);
+      List<? extends CODE> childCodes = (List<? extends CODE>) code.getChildCodes(false);
       collectAllCodes(childCodes, allCodes);
     }
   }

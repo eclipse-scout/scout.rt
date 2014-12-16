@@ -10,9 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.extension.client.ui.form.fields.smartfield;
 
-import java.util.List;
-
 import org.eclipse.scout.commons.annotations.ClassId;
+import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 import org.eclipse.scout.rt.extension.client.IExtensibleScoutObject;
@@ -23,7 +22,7 @@ import org.eclipse.scout.rt.extension.client.ui.action.menu.MenuExtensionUtility
  * <ul>
  * <li>adding, removing and modifying statically configured menus</li>
  * </ul>
- * 
+ *
  * @since 3.9.0
  */
 @ClassId("b26fb732-b858-4103-9280-b516ccc757f9")
@@ -38,8 +37,8 @@ public abstract class AbstractExtensibleSmartField<T> extends AbstractSmartField
   }
 
   @Override
-  protected void injectMenusInternal(List<IMenu> menuList) {
-    super.injectMenusInternal(menuList);
-    MenuExtensionUtility.adaptMenus(this, this, menuList);
+  protected void injectMenusInternal(OrderedCollection<IMenu> menus) {
+    super.injectMenusInternal(menus);
+    MenuExtensionUtility.adaptMenus(this, this, menus);
   }
 }

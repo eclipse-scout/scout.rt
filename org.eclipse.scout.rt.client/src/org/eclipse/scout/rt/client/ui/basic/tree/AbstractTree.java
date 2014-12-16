@@ -14,7 +14,6 @@ import java.net.URL;
 import java.security.Permission;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.EventListener;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -29,7 +28,7 @@ import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.annotations.OrderedComparator;
+import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -532,28 +531,26 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     List<Class<? extends IMenu>> declaredMenus = getDeclaredMenus();
     List<IMenu> contributedMenus = m_contributionHolder.getContributionsByClass(IMenu.class);
 
-    List<IMenu> menuList = new ArrayList<IMenu>(declaredMenus.size() + contributedMenus.size());
+    OrderedCollection<IMenu> menus = new OrderedCollection<IMenu>();
     for (Class<? extends IMenu> menuClazz : declaredMenus) {
       try {
         IMenu menu = ConfigurationUtility.newInnerInstance(this, menuClazz);
-        menuList.add(menu);
+        menus.addOrdered(menu);
       }
       catch (Exception e) {
         SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + menuClazz.getName() + "'.", e));
       }
     }
     try {
-      injectMenusInternal(menuList);
+      injectMenusInternal(menus);
     }
     catch (Exception e) {
       LOG.error("Error occured while dynamically contributing menus.", e);
     }
 
-    menuList.addAll(contributedMenus);
-    new MoveActionNodesHandler<IMenu>(menuList).moveModelObjects();
-    Collections.sort(menuList, new OrderedComparator());
-
-    TreeContextMenu contextMenu = new TreeContextMenu(this, menuList);
+    menus.addAllOrdered(contributedMenus);
+    new MoveActionNodesHandler<IMenu>(menus).moveModelObjects();
+    TreeContextMenu contextMenu = new TreeContextMenu(this, menus.getOrderedList());
     setContextMenuInternal(contextMenu);
   }
 
@@ -600,12 +597,13 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   /**
    * Override this internal method only in order to make use of dynamic menus<br/>
-   * Used to manage menu list and add/remove menus
+   * Used to manage menu list and add/remove menus.<br>
+   * To change the order or specify the insert position use {@link IMenu#setOrder(double)}.
    *
-   * @param menuList
-   *          live and mutable list of configured menus
+   * @param menus
+   *          live and mutable collection of configured menus
    */
-  protected void injectMenusInternal(List<IMenu> menuList) {
+  protected void injectMenusInternal(OrderedCollection<IMenu> menus) {
   }
 
   @Override

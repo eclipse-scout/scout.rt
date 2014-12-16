@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.imagebox;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.EventListener;
 import java.util.List;
 
@@ -21,7 +19,7 @@ import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.annotations.OrderedComparator;
+import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -198,26 +196,25 @@ public abstract class AbstractImageField extends AbstractFormField implements II
     // menus
     List<Class<? extends IMenu>> declaredMenus = getDeclaredMenus();
     List<IMenu> contributedMenus = m_contributionHolder.getContributionsByClass(IMenu.class);
-    List<IMenu> menuList = new ArrayList<IMenu>(declaredMenus.size() + contributedMenus.size());
+    OrderedCollection<IMenu> menus = new OrderedCollection<IMenu>();
     for (Class<? extends IMenu> menuClazz : declaredMenus) {
       try {
-        menuList.add(ConfigurationUtility.newInnerInstance(this, menuClazz));
+        menus.addOrdered(ConfigurationUtility.newInnerInstance(this, menuClazz));
       }
       catch (Exception e) {
         SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + menuClazz.getName() + "'.", e));
       }
     }
-    menuList.addAll(contributedMenus);
+    menus.addAllOrdered(contributedMenus);
 
     try {
-      injectMenusInternal(menuList);
+      injectMenusInternal(menus);
     }
     catch (Exception e) {
       LOG.error("error occured while dynamically contributing menus.", e);
     }
-    new MoveActionNodesHandler<IMenu>(menuList).moveModelObjects();
-    Collections.sort(menuList, new OrderedComparator());
-    m_contextMenu = new FormFieldContextMenu<IImageField>(this, menuList);
+    new MoveActionNodesHandler<IMenu>(menus).moveModelObjects();
+    m_contextMenu = new FormFieldContextMenu<IImageField>(this, menus.getOrderedList());
     m_contextMenu.setContainerInternal(this);
   }
 
@@ -230,12 +227,13 @@ public abstract class AbstractImageField extends AbstractFormField implements II
 
   /**
    * Override this internal method only in order to make use of dynamic menus<br>
-   * Used to manage menu list and add/remove menus
+   * Used to add and/or remove menus<br>
+   * To change the order or specify the insert position use {@link IMenu#setOrder(double)}.
    *
-   * @param menuList
-   *          live and mutable list of configured menus
+   * @param menus
+   *          live and mutable collection of configured menus
    */
-  protected void injectMenusInternal(List<IMenu> menuList) {
+  protected void injectMenusInternal(OrderedCollection<IMenu> menus) {
   }
 
   /*

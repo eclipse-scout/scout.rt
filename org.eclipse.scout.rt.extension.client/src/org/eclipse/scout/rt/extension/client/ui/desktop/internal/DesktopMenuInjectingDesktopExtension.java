@@ -11,8 +11,10 @@
 package org.eclipse.scout.rt.extension.client.ui.desktop.internal;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
+import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.rt.client.ui.action.ActionFinder;
@@ -52,13 +54,15 @@ public class DesktopMenuInjectingDesktopExtension implements IDesktopExtension {
   }
 
   @Override
-  public void contributeActions(List<IAction> actions) {
+  public void contributeActions(Collection<IAction> actions) {
     // get root menus and remove them from the action collection
     List<IMenu> menuList = new ActionFinder().findActions(new ArrayList<IAction>(actions), IMenu.class, false);
     actions.removeAll(menuList);
+    OrderedCollection<IMenu> menus = new OrderedCollection<IMenu>();
+    menus.addAllOrdered(menuList);
     // contribute menus to menuList and add them to the original actions collection
-    MenuExtensionUtility.adaptMenus(getCoreDesktop(), getCoreDesktop(), menuList);
-    actions.addAll(menuList);
+    MenuExtensionUtility.adaptMenus(getCoreDesktop(), getCoreDesktop(), menus);
+    actions.addAll(menus.getOrderedList());
   }
 
   @Override
@@ -127,7 +131,7 @@ public class DesktopMenuInjectingDesktopExtension implements IDesktopExtension {
   }
 
   @Override
-  public void contributeOutlines(List<IOutline> outlines) {
+  public void contributeOutlines(OrderedCollection<IOutline> outlines) {
   }
 
 }

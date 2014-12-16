@@ -41,7 +41,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.annotations.OrderedComparator;
+import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.dnd.TextTransferObject;
@@ -770,28 +770,29 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   /**
-   * This method is called during initializing the table and is thought to add header menus to the given list of menus.
-   * Menus added in this method should be of menu type {@link ITableMenu.TableMenuType#Header}
+   * This method is called during initializing the table and is thought to add header menus to the given collection of
+   * menus. Menus added in this method should be of menu type {@link ITableMenu.TableMenuType#Header}.<br>
+   * To change the order or specify the insert position use {@link IMenu#setOrder(double)}.
    *
-   * @param menuList
-   *          a live list of the menus. Add additional header menus to this list optionally add some separators at the
-   *          end.
+   * @param menus
+   *          a live collection of the menus. Add additional header menus to this list optionally add some separators at
+   *          the end.
    */
-  protected void execCreateHeaderMenus(List<IMenu> menuList) {
+  protected void execCreateHeaderMenus(OrderedCollection<IMenu> menus) {
     // header menus
     if (getTableCustomizer() != null) {
-      menuList.add(new AddCustomColumnMenu(this));
-      menuList.add(new ModifyCustomColumnMenu(this));
-      menuList.add(new RemoveCustomColumnMenu(this));
+      menus.addLast(new AddCustomColumnMenu(this));
+      menus.addLast(new ModifyCustomColumnMenu(this));
+      menus.addLast(new RemoveCustomColumnMenu(this));
     }
-    if (menuList.size() > 0) {
-      menuList.add(new MenuSeparator());
+    if (menus.size() > 0) {
+      menus.addLast(new MenuSeparator());
     }
-    menuList.add(new ResetColumnsMenu(this));
-    menuList.add(new OrganizeColumnsMenu(this));
-    menuList.add(new ColumnFilterMenu(this));
-    menuList.add(new CopyWidthsOfColumnsMenu(this));
-    menuList.add(new MenuSeparator());
+    menus.addLast(new ResetColumnsMenu(this));
+    menus.addLast(new OrganizeColumnsMenu(this));
+    menus.addLast(new ColumnFilterMenu(this));
+    menus.addLast(new CopyWidthsOfColumnsMenu(this));
+    menus.addLast(new MenuSeparator());
   }
 
   protected List<Class<? extends IMenu>> getDeclaredMenus() {
@@ -849,7 +850,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     // menus
 
     List<Class<? extends IMenu>> ma = getDeclaredMenus();
-    List<IMenu> menuList = new ArrayList<IMenu>(ma.size());
+    OrderedCollection<IMenu> menus = new OrderedCollection<IMenu>();
     Map<Class<?>, Class<? extends IMenu>> replacements = ConfigurationUtility.getReplacementMapping(ma);
     if (!replacements.isEmpty()) {
       m_menuReplacementMapping = replacements;
@@ -857,7 +858,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     for (Class<? extends IMenu> clazz : ma) {
       try {
         IMenu menu = ConfigurationUtility.newInnerInstance(this, clazz);
-        menuList.add(menu);
+        menus.addOrdered(menu);
       }
       catch (Throwable t) {
         String className = "null";
@@ -868,22 +869,22 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       }
     }
     List<IMenu> contributedMenus = m_contributionHolder.getContributionsByClass(IMenu.class);
-    menuList.addAll(contributedMenus);
+    menus.addAllOrdered(contributedMenus);
     try {
-      injectMenusInternal(menuList);
+      injectMenusInternal(menus);
     }
     catch (Exception e) {
       LOG.error("error occured while dynamically contributing menus.", e);
     }
-    new MoveActionNodesHandler<IMenu>(menuList).moveModelObjects();
-    Collections.sort(menuList, new OrderedComparator());
 
-    execCreateHeaderMenus(menuList);
+    execCreateHeaderMenus(menus);
     //set container on menus
-    for (IMenu menu : menuList) {
+    for (IMenu menu : menus) {
       menu.setContainerInternal(this);
     }
-    ITableContextMenu contextMenu = new TableContextMenu(this, menuList);
+
+    new MoveActionNodesHandler<IMenu>(menus).moveModelObjects();
+    ITableContextMenu contextMenu = new TableContextMenu(this, menus.getOrderedList());
     setContextMenu(contextMenu);
 
     // key strokes
@@ -1003,13 +1004,13 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   private void createColumnsInternal() {
     List<Class<? extends IColumn>> ca = getConfiguredColumns();
-    ArrayList<IColumn<?>> colList = new ArrayList<IColumn<?>>(ca.size());
+    OrderedCollection<IColumn<?>> columns = new OrderedCollection<IColumn<?>>();
 
     // configured columns
     for (Class<? extends IColumn> clazz : ca) {
       try {
         IColumn<?> column = ConfigurationUtility.newInnerInstance(this, clazz);
-        colList.add(column);
+        columns.addOrdered(column);
       }
       catch (Exception e) {
         String className = "null";
@@ -1022,26 +1023,22 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
     // contributed columns
     List<IColumn> contributedColumns = m_contributionHolder.getContributionsByClass(IColumn.class);
-    colList.ensureCapacity(colList.size() + contributedColumns.size());
     for (IColumn c : contributedColumns) {
-      colList.add(c);
+      columns.addOrdered(c);
     }
 
     // dynamically injected columns
     try {
-      injectColumnsInternal(colList);
+      injectColumnsInternal(columns);
     }
     catch (Exception e) {
       LOG.error("error occured while dynamically contribute columns.", e);
     }
 
     // move columns
-    ExtensionUtility.moveModelObjects(colList);
+    ExtensionUtility.moveModelObjects(columns);
 
-    // sort columns
-    Collections.sort(colList, new OrderedComparator());
-
-    m_columnSet = new ColumnSet(this, colList);
+    m_columnSet = new ColumnSet(this, columns.getOrderedList());
     if (getConfiguredCheckableColumn() != null) {
       AbstractBooleanColumn checkableColumn = getColumnSet().getColumnByClass(getConfiguredCheckableColumn());
       setCheckableColumn(checkableColumn);
@@ -1049,27 +1046,28 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   /**
-   * Override this internal method only in order to make use of dynamic fields<br>
-   * Used to manage column list and add/remove columns
+   * Override this internal method only in order to make use of dynamic columns<br>
+   * To change the order or specify the insert position use {@link IColumn#setOrder(double)}.
    *
-   * @param columnList
-   *          live and mutable list of configured columns, not yet initialized
+   * @param columns
+   *          live and mutable collection of configured columns, not yet initialized
    */
-  protected void injectColumnsInternal(List<IColumn<?>> columnList) {
+  protected void injectColumnsInternal(OrderedCollection<IColumn<?>> columns) {
     ITableCustomizer c = getTableCustomizer();
     if (c != null) {
-      c.injectCustomColumns(columnList);
+      c.injectCustomColumns(columns);
     }
   }
 
   /**
    * Override this internal method only in order to make use of dynamic menus<br>
-   * Used to manage menu list and add/remove menus
+   * Used to manage menu list and add/remove menus.<br>
+   * To change the order or specify the insert position use {@link IMenu#setOrder(double)}.
    *
-   * @param menuList
-   *          live and mutable list of configured menus
+   * @param menus
+   *          live and mutable collection of configured menus
    */
-  protected void injectMenusInternal(List<IMenu> menuList) {
+  protected void injectMenusInternal(OrderedCollection<IMenu> menus) {
   }
 
   protected ITableUIFacade createUIFacade() {
@@ -4013,7 +4011,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    * @param e
    *          Table event of type {@link TableEvent#TYPE_HEADER_POPUP}.
    * @throws ProcessingException
-   * @Deprecated use {@link #execCreateHeaderMenus(List)} instead.
+   * @Deprecated use {@link #execCreateHeaderMenus(OrderedCollection)} instead.
    */
   @SuppressWarnings("deprecation")
   @ConfigOperation

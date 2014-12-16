@@ -10,8 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.extension.client.ui.form.fields.button;
 
-import java.util.List;
-
+import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractRadioButton;
 import org.eclipse.scout.rt.extension.client.IExtensibleScoutObject;
@@ -36,8 +35,8 @@ public abstract class AbstractExtensibleRadioButton<T> extends AbstractRadioButt
   }
 
   @Override
-  protected void injectMenusInternal(List<IMenu> menuList) {
-    super.injectMenusInternal(menuList);
-    MenuExtensionUtility.adaptMenus(this, this, menuList);
+  protected void injectMenusInternal(OrderedCollection<IMenu> menus) {
+    super.injectMenusInternal(menus);
+    MenuExtensionUtility.adaptMenus(this, this, menus);
   }
 }

@@ -27,7 +27,7 @@ import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.annotations.OrderedComparator;
+import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -45,7 +45,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractRadioButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IRadioButton;
-import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.internal.RadioButtonGroupGrid;
 import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 import org.eclipse.scout.rt.shared.services.common.code.CODES;
@@ -160,22 +159,21 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
     // add fields
     List<Class<IFormField>> configuredFields = getConfiguredFields();
     List<IFormField> contributedFields = m_contributionHolder.getContributionsByClass(IFormField.class);
-    List<IFormField> fieldList = new ArrayList<IFormField>(configuredFields.size() + contributedFields.size());
+    OrderedCollection<IFormField> fields = new OrderedCollection<IFormField>();
     for (Class<? extends IFormField> fieldClazz : configuredFields) {
       try {
-        fieldList.add(ConfigurationUtility.newInnerInstance(this, fieldClazz));
+        fields.addOrdered(ConfigurationUtility.newInnerInstance(this, fieldClazz));
       }
       catch (Throwable t) {
         SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + fieldClazz.getName() + "'.", t));
       }
     }
-    fieldList.addAll(contributedFields);
-    injectFieldsInternal(fieldList);
-    Collections.sort(fieldList, new OrderedComparator());
-    for (IFormField f : fieldList) {
+    fields.addAllOrdered(contributedFields);
+    injectFieldsInternal(fields);
+    for (IFormField f : fields) {
       f.setParentFieldInternal(this);
     }
-    m_fields = fieldList;
+    m_fields = fields.getOrderedList();
     //attach a proxy controller to each child field in the group for: visible, saveNeeded
     for (IFormField f : m_fields) {
       f.addPropertyChangeListener(new P_FieldPropertyChangeListenerEx());
@@ -213,14 +211,14 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
   }
 
   /**
-   * do not use this internal method<br>
-   * Used to manage field list and add/remove fields (see {@link AbstractGroupBox} with wizard buttons)
+   * Override this internal method only in order to make use of dynamic fields<br>
+   * Used to add and/or remove fields<br>
+   * To change the order or specify the insert position use {@link IFormField#setOrder(double)}.
    *
-   * @param fieldList
-   *          live and mutable list of configured fields, not yet initialized
-   *          and added to composite field
+   * @param fields
+   *          live and mutable collection of configured fields, yet not initialized
    */
-  protected void injectFieldsInternal(List<IFormField> fieldList) {
+  protected void injectFieldsInternal(OrderedCollection<IFormField> fields) {
     if (getLookupCall() != null) {
       // Use the LookupCall
       try {
@@ -234,7 +232,7 @@ public abstract class AbstractRadioButtonGroup<T> extends AbstractValueField<T> 
           radioButton.setBackgroundColor(row.getBackgroundColor());
           radioButton.setForegroundColor(row.getForegroundColor());
           radioButton.setFont(row.getFont());
-          fieldList.add(radioButton);
+          fields.addLast(radioButton);
         }
       }
       catch (ProcessingException e) {

@@ -32,6 +32,7 @@ import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.annotations.OrderedComparator;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
@@ -505,25 +506,21 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     m_contributionHolder = new ContributionComposite(this);
 
     //outlines
-    List<IOutline> outlineList = new ArrayList<IOutline>();
+    OrderedCollection<IOutline> outlines = new OrderedCollection<IOutline>();
     for (IDesktopExtension ext : extensions) {
       try {
-        ext.contributeOutlines(outlineList);
+        ext.contributeOutlines(outlines);
       }
       catch (Throwable t) {
         LOG.error("contrinuting outlines by " + ext, t);
       }
     }
     List<IOutline> contributedOutlines = m_contributionHolder.getContributionsByClass(IOutline.class);
-    outlineList.addAll(contributedOutlines);
+    outlines.addAllOrdered(contributedOutlines);
 
     // move outlines
-    ExtensionUtility.moveModelObjects(outlineList);
-
-    OrderedComparator orderedComparator = new OrderedComparator();
-    Collections.sort(outlineList, orderedComparator);
-
-    m_availableOutlines = outlineList;
+    ExtensionUtility.moveModelObjects(outlines);
+    m_availableOutlines = outlines.getOrderedList();
 
     //actions (keyStroke, menu, viewButton, toolButton)
     List<IAction> actionList = new ArrayList<IAction>();
@@ -552,11 +549,13 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       }
     }
     //build completed menu, viewButton, toolButton lists
-    List<IMenu> menuList = new ActionFinder().findActions(actionList, IMenu.class, false); // only top level menus
-    new MoveActionNodesHandler<IMenu>(menuList).moveModelObjects();
-    Collections.sort(menuList, orderedComparator);
-    m_menus = menuList;
+    // only top level menus
+    OrderedCollection<IMenu> menus = new OrderedCollection<IMenu>();
+    menus.addAllOrdered(new ActionFinder().findActions(actionList, IMenu.class, false));
+    new MoveActionNodesHandler<IMenu>(menus).moveModelObjects();
+    m_menus = menus.getOrderedList();
 
+    OrderedComparator orderedComparator = new OrderedComparator();
     List<IViewButton> viewButtonList = new ActionFinder().findActions(actionList, IViewButton.class, false);
     ExtensionUtility.moveModelObjects(viewButtonList);
     Collections.sort(viewButtonList, orderedComparator);
@@ -1911,13 +1910,13 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
 
     @Override
-    public void contributeOutlines(List<IOutline> outlines) {
+    public void contributeOutlines(OrderedCollection<IOutline> outlines) {
       List<Class<? extends IOutline>> configuredOutlines = getConfiguredOutlines();
       if (configuredOutlines != null) {
         for (Class<?> element : configuredOutlines) {
           try {
             IOutline o = (IOutline) element.newInstance();
-            outlines.add(o);
+            outlines.addOrdered(o);
           }
           catch (Throwable t) {
             SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + element.getName() + "'.", t));
@@ -1927,7 +1926,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
 
     @Override
-    public void contributeActions(List<IAction> actions) {
+    public void contributeActions(Collection<IAction> actions) {
       for (Class<? extends IAction> actionClazz : getConfiguredActions()) {
         try {
           actions.add(ConfigurationUtility.newInnerInstance(AbstractDesktop.this, actionClazz));

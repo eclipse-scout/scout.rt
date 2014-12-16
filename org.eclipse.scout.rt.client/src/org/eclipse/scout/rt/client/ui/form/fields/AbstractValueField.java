@@ -11,8 +11,6 @@
 package org.eclipse.scout.rt.client.ui.form.fields;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.EventListener;
 import java.util.List;
 
@@ -29,7 +27,7 @@ import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.commons.annotations.FormData.DefaultSubtypeSdkCommand;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.annotations.OrderedComparator;
+import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.annotations.ScoutSdkIgnore;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -120,40 +118,40 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
     // menus
     List<Class<? extends IMenu>> declaredMenus = getDeclaredMenus();
     List<IMenu> contributedMenus = m_contributionHolder.getContributionsByClass(IMenu.class);
-    List<IMenu> menuList = new ArrayList<IMenu>(declaredMenus.size() + contributedMenus.size());
+    OrderedCollection<IMenu> menus = new OrderedCollection<IMenu>();
     for (Class<? extends IMenu> menuClazz : declaredMenus) {
       try {
-        menuList.add(ConfigurationUtility.newInnerInstance(this, menuClazz));
+        menus.addOrdered(ConfigurationUtility.newInnerInstance(this, menuClazz));
       }
       catch (Exception e) {
         SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + menuClazz.getName() + "'.", e));
       }
     }
 
-    menuList.addAll(contributedMenus);
+    menus.addAllOrdered(contributedMenus);
 
     try {
-      injectMenusInternal(menuList);
+      injectMenusInternal(menus);
     }
     catch (Exception e) {
       LOG.error("error occured while dynamically contributing menus.", e);
     }
-    new MoveActionNodesHandler<IMenu>(menuList).moveModelObjects();
-    Collections.sort(menuList, new OrderedComparator());
+    new MoveActionNodesHandler<IMenu>(menus).moveModelObjects();
     //set container on menus
-    IValueFieldContextMenu contextMenu = new ValueFieldContextMenu(this, menuList);
+    IValueFieldContextMenu contextMenu = new ValueFieldContextMenu(this, menus.getOrderedList());
     contextMenu.setContainerInternal(this);
     setContextMenu(contextMenu);
   }
 
   /**
    * Override this internal method only in order to make use of dynamic menus<br>
-   * Used to manage menu list and add/remove menus
+   * Used to add and/or remove menus<br>
+   * To change the order or specify the insert position use {@link IMenu#setOrder(double)}.
    *
-   * @param menuList
-   *          live and mutable list of configured menus
+   * @param menus
+   *          live and mutable collection of configured menus
    */
-  protected void injectMenusInternal(List<IMenu> menuList) {
+  protected void injectMenusInternal(OrderedCollection<IMenu> menus) {
   }
 
   protected void setContextMenu(IValueFieldContextMenu contextMenu) {
@@ -701,7 +699,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
    * any further chain elements.
    */
   protected static class LocalValueFieldExtension<VALUE, OWNER extends AbstractValueField<VALUE>> extends AbstractFormField.LocalFormFieldExtension<OWNER>
-      implements IValueFieldExtension<VALUE, OWNER> {
+  implements IValueFieldExtension<VALUE, OWNER> {
 
     public LocalValueFieldExtension(OWNER owner) {
       super(owner);

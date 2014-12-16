@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.ui.basic.table.internal;
 import java.beans.PropertyChangeListener;
 import java.security.Permission;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -112,7 +113,7 @@ public class TablePageTreeMenuWrapper implements IMenu {
   }
 
   @Override
-  public void setChildActions(List<? extends IMenu> actionList) {
+  public void setChildActions(Collection<? extends IMenu> actionList) {
     throw new UnsupportedOperationException("read only wrapper");
   }
 
@@ -122,7 +123,7 @@ public class TablePageTreeMenuWrapper implements IMenu {
   }
 
   @Override
-  public void addChildActions(List<? extends IMenu> actionList) {
+  public void addChildActions(Collection<? extends IMenu> actionList) {
     throw new UnsupportedOperationException("read only wrapper");
   }
 
@@ -132,7 +133,7 @@ public class TablePageTreeMenuWrapper implements IMenu {
   }
 
   @Override
-  public void removeChildActions(List<? extends IMenu> actionList) {
+  public void removeChildActions(Collection<? extends IMenu> actionList) {
     throw new UnsupportedOperationException("read only wrapper");
   }
 

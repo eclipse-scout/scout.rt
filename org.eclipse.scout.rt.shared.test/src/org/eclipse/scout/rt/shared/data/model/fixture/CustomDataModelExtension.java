@@ -11,9 +11,9 @@
 package org.eclipse.scout.rt.shared.data.model.fixture;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
+import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.shared.data.model.AbstractDataModelAttribute;
@@ -31,51 +31,51 @@ public final class CustomDataModelExtension {
   }
 
   /**
-   * Inject top level attributes into the provided list
+   * Inject top level attributes into the provided collection
    *
    * @param entityInstance
-   * @param attributeList
-   *          Attribute list to inject attributes to
+   * @param attributes
+   *          Attribute collection to inject attributes to
    */
-  public static void injectAttributes(IDataModelEntity entityInstance, List<IDataModelAttribute> attributeList) {
+  public static void injectAttributes(IDataModelEntity entityInstance, OrderedCollection<IDataModelAttribute> attributes) {
     if (!ENABLED) {
       return;
     }
-    injectMetadataAttributes(new long[]{1, 2, 3}, attributeList);
+    injectMetadataAttributes(new long[]{1, 2, 3}, attributes);
   }
 
   /**
-   * Inject top level entities into the provided list
+   * Inject top level entities into the provided collection
    *
    * @param entityInstance
-   * @param entityList
-   *          Entity list to inject entities to
+   * @param entities
+   *          Entity collection to inject entities to
    */
-  public static void injectEntities(IDataModelEntity entityInstance, List<IDataModelEntity> entityList) {
+  public static void injectEntities(IDataModelEntity entityInstance, OrderedCollection<IDataModelEntity> entities) {
     if (!ENABLED) {
       return;
     }
-    injectMetadataEntities(new long[]{1, 2, 3}, entityList);
+    injectMetadataEntities(new long[]{1, 2, 3}, entities);
   }
 
   /**
-   * Inject top level attributes into the provided list
+   * Inject top level attributes into the provided collection
    *
    * @param entityInstance
-   * @param attributeList
-   *          Attribute list to inject attributes to
+   * @param attributes
+   *          Attribute collection to inject attributes to
    */
-  private static void injectMetadataAttributes(long[] idList, List<IDataModelAttribute> attributeList) {
+  private static void injectMetadataAttributes(long[] idList, OrderedCollection<IDataModelAttribute> attributes) {
     for (long id : idList) {
       ExtendedFieldAttribute a = new ExtendedFieldAttribute(id, "Field " + id, DataModelConstants.TYPE_LONG);
-      attributeList.add(a);
+      attributes.addLast(a);
     }
   }
 
-  private static void injectMetadataEntities(long[] idList, List<IDataModelEntity> entityList) {
+  private static void injectMetadataEntities(long[] idList, OrderedCollection<IDataModelEntity> entities) {
     for (long id : idList) {
       ExtendedFolderEntity e = new ExtendedFolderEntity(id, "Folder " + id);
-      entityList.add(e);
+      entities.addLast(e);
     }
   }
 
@@ -106,8 +106,8 @@ public final class CustomDataModelExtension {
     }
 
     @Override
-    protected void injectAttributesInternal(List<IDataModelAttribute> attributeList) {
-      injectMetadataAttributes(new long[]{11, 12, 13}, attributeList);
+    protected void injectAttributesInternal(OrderedCollection<IDataModelAttribute> attributes) {
+      injectMetadataAttributes(new long[]{11, 12, 13}, attributes);
     }
 
     public Long getId() {

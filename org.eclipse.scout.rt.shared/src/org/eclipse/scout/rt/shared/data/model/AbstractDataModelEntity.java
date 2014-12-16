@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.shared.data.model;
 import java.io.Serializable;
 import java.security.Permission;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -25,7 +24,7 @@ import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.IOrdered;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.annotations.OrderedComparator;
+import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -203,22 +202,21 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
     List<Class<IDataModelAttribute>> configuredAttributes = getConfiguredAttributes();
     List<IDataModelAttribute> contributedAttributes = m_contributionHolder.getContributionsByClass(IDataModelAttribute.class);
 
-    List<IDataModelAttribute> attributes = new ArrayList<IDataModelAttribute>(configuredAttributes.size() + contributedAttributes.size());
+    OrderedCollection<IDataModelAttribute> attributes = new OrderedCollection<IDataModelAttribute>();
     for (Class<? extends IDataModelAttribute> c : configuredAttributes) {
       try {
-        attributes.add(ConfigurationUtility.newInnerInstance(this, c));
+        attributes.addOrdered(ConfigurationUtility.newInnerInstance(this, c));
       }
       catch (Exception e) {
         SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + c.getName() + "'.", e));
       }
     }
 
-    attributes.addAll(contributedAttributes);
+    attributes.addAllOrdered(contributedAttributes);
 
     injectAttributesInternal(attributes);
     ExtensionUtility.moveModelObjects(attributes);
-    Collections.sort(attributes, new OrderedComparator());
-    m_attributes = attributes;
+    m_attributes = attributes.getOrderedList();
 
     for (IDataModelAttribute a : m_attributes) {
       if (a instanceof AbstractDataModelAttribute) {
@@ -431,7 +429,7 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
       int numEntities = configuredEntities.size() + contributedEntities.size();
 
       Set<IDataModelEntity> newConfiguredInstances = new HashSet<IDataModelEntity>(numEntities);
-      List<IDataModelEntity> entities = new ArrayList<IDataModelEntity>(numEntities);
+      OrderedCollection<IDataModelEntity> entities = new OrderedCollection<IDataModelEntity>();
       for (Class<? extends IDataModelEntity> c : configuredEntities) {
         try {
           //check if a parent is of same type, in that case use reference
@@ -441,20 +439,19 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
             newConfiguredInstances.add(e);
             instanceMap.put(c, e);
           }
-          entities.add(e);
+          entities.addOrdered(e);
         }
         catch (Exception ex) {
           SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + c.getName() + "'.", ex));
         }
       }
       newConfiguredInstances.addAll(contributedEntities);
-      entities.addAll(contributedEntities);
+      entities.addAllOrdered(contributedEntities);
       injectEntitiesInternal(entities);
       ExtensionUtility.moveModelObjects(entities);
-      Collections.sort(entities, new OrderedComparator());
 
       m_entities.clear();
-      m_entities.addAll(entities);
+      m_entities.addAll(entities.getOrderedList());
 
       for (IDataModelEntity e : m_entities) {
         if (e instanceof AbstractDataModelEntity) {
@@ -473,25 +470,26 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
   }
 
   /**
-   * do not use this internal method<br>
-   * Used add/remove attributes
+   * Override this internal method only in order to make use of dynamic attributes<br>
+   * Used to add and/or remove attributes<br>
+   * To change the order or specify the insert position use {@link IDataModelAttribute#setOrder(double)}.
    *
-   * @param attributeList
-   *          live and mutable list of configured attributes
+   * @param attributes
+   *          live and mutable collection of configured attributes
    */
-  protected void injectAttributesInternal(List<IDataModelAttribute> attributeList) {
+  protected void injectAttributesInternal(OrderedCollection<IDataModelAttribute> attributes) {
   }
 
   /**
-   * do not use this internal method<br>
-   * Used add/remove entities
-   * <p>
+   * Override this internal method only in order to make use of dynamic entities<br>
+   * Used to add and/or remove entities<br>
+   * To change the order or specify the insert position use {@link IDataModelEntity#setOrder(double)}.<br>
    * Note that {@link #initializeChildEntities(Map)} is also called on injected entities
    *
-   * @param entityList
-   *          live and mutable list of configured attributes
+   * @param entities
+   *          live and mutable collection of configured entities
    */
-  protected void injectEntitiesInternal(List<IDataModelEntity> entityList) {
+  protected void injectEntitiesInternal(OrderedCollection<IDataModelEntity> entities) {
   }
 
   /**

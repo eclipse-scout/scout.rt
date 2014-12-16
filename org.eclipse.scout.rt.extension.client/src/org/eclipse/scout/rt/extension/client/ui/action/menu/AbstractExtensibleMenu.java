@@ -10,8 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.extension.client.ui.action.menu;
 
-import java.util.List;
-
+import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.extension.client.IExtensibleScoutObject;
@@ -21,7 +20,7 @@ import org.eclipse.scout.rt.extension.client.IExtensibleScoutObject;
  * <ul>
  * <li>adding, removing and modifying statically configured sub menus</li>
  * </ul>
- * 
+ *
  * @since 3.9.0
  */
 public abstract class AbstractExtensibleMenu extends AbstractMenu implements IExtensibleScoutObject {
@@ -35,8 +34,8 @@ public abstract class AbstractExtensibleMenu extends AbstractMenu implements IEx
   }
 
   @Override
-  protected void injectActionNodesInternal(List<IMenu> nodeList) {
-    super.injectActionNodesInternal(nodeList);
-    MenuExtensionUtility.adaptMenus(this, this, nodeList);
+  protected void injectActionNodesInternal(OrderedCollection<IMenu> actionNodes) {
+    super.injectActionNodesInternal(actionNodes);
+    MenuExtensionUtility.adaptMenus(this, this, actionNodes);
   }
 }

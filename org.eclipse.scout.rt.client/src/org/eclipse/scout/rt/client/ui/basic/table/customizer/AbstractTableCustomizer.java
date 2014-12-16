@@ -10,8 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.customizer;
 
-import java.util.List;
-
+import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 
@@ -25,7 +24,7 @@ public abstract class AbstractTableCustomizer implements ITableCustomizer {
   }
 
   @Override
-  public void injectCustomColumns(List<IColumn<?>> columnList) {
+  public void injectCustomColumns(OrderedCollection<IColumn<?>> columnList) {
   }
 
   @Override
