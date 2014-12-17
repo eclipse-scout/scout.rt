@@ -7,10 +7,7 @@ describe("ObjectFactory", function() {
    * adapaterDataCache of the Session.
    */
   function createModel(session, id, objectType) {
-    var model = {
-        id: id,
-        objectType: objectType
-      };
+    var model = createSimpleModel(objectType, id);
     if ('Menu.NavigateUp' === objectType || 'Menu.NavigateDown' === objectType) {
       var outlineId = 'outline' + id;
       model.outline = outlineId;

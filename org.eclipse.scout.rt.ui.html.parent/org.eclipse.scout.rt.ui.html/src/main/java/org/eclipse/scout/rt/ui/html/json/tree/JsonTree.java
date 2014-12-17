@@ -88,6 +88,10 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   @Override
   protected void attachChildAdapters() {
     super.attachChildAdapters();
+    attachContextMenu();
+  }
+
+  protected void attachContextMenu() {
     attachAdapter(getModel().getContextMenu());
   }
 
@@ -133,11 +137,15 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     }
     putProperty(json, PROP_NODES, jsonNodes);
     putProperty(json, PROP_SELECTED_NODE_IDS, nodeIdsToJson(getModel().getSelectedNodes()));
+    putContextMenu(json);
+    return json;
+  }
+
+  protected void putContextMenu(JSONObject json) {
     JsonContextMenu<IContextMenu> jsonContextMenu = getAdapter(getModel().getContextMenu());
     if (jsonContextMenu != null) {
       JsonObjectUtility.putProperty(json, PROP_MENUS, JsonObjectUtility.adapterIdsToJson(jsonContextMenu.getJsonChildActions()));
     }
-    return json;
   }
 
   protected void handleModelTreeEvent(TreeEvent event) {

@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.html.json.desktop;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -60,6 +61,22 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
       putAdapterIdProperty(json, "defaultDetailForm", ((IOutline5) getModel()).getDefaultDetailForm());
     }
     return json;
+  }
+
+  // The Outline does not show any menus because the detail form or table does -> don't send them
+  @Override
+  protected void putContextMenu(JSONObject json) {
+    // nop
+  }
+
+  @Override
+  protected void attachContextMenu() {
+    // nop
+  }
+
+  @Override
+  public void handleModelContextMenuChanged(List<IJsonAdapter<?>> menuAdapters) {
+    // nop
   }
 
   @Override

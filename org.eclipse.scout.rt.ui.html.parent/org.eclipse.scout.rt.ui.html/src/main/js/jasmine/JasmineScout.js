@@ -12,9 +12,13 @@ function createUniqueAdapterId() {
   return "" + adapterSeq++;
 }
 
-function createSimpleModel(objectType) {
+function createSimpleModel(objectType, id) {
+  if (id === undefined) {
+    id = createUniqueAdapterId();
+  }
+
   return {
-    'id': createUniqueAdapterId(),
+    'id': id,
     'objectType': objectType
   };
 }
