@@ -577,6 +577,7 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
     }
     //
     if (swtTableEvent != null) {
+      getSwtTableViewer().setInput(getScoutObject().getFilteredRows());
       getSwtTableViewer().refresh();
     }
     // refresh selection, indexes might have changed
