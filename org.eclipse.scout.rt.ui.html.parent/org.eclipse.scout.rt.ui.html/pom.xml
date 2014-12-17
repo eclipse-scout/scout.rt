@@ -43,81 +43,40 @@
       </configuration>
     </plugin>
 
-  <!-- Generate the js and css scripts -->
-  <plugin>
-    <groupId>org.codehaus.mojo</groupId>
-    <artifactId>exec-maven-plugin</artifactId>
-    <version>1.3.2</version>
-
-  <dependencies>
-  <!-- TODO IMO: remove this dependency once osgi is dropped -->
-    <dependency>
-      <groupId>org.eclipse.scout.rt.ui.html.parent</groupId>
-      <artifactId>org.eclipse.scout.rt.ui.html.scriptprocessor</artifactId>
-      <version>5.1.0-SNAPSHOT</version>
-    </dependency>
-  </dependencies>
-
-    <executions>
-      <execution>
-        <phase>generate-test-resources</phase>
-        <goals>
-          <goal>java</goal>
-        </goals>
-        <configuration>
-          <mainClass>org.eclipse.scout.rt.ui.html.script.GenerateTestScripts</mainClass>
-          <classpathScope>compile</classpathScope>
-          <arguments>
-            <argument>${project.basedir}/src/main/js</argument>
-            <argument>${project.basedir}/WebContent/test-gen</argument>
-            <argument>scout-5.0.0.min.js</argument>
-            <argument>scout-5.0.0.min.css</argument>
-            <argument>scout-mobile-5.0.0.min.js</argument>
-            <!-- TODO cgu -->
-            <!--
-            <argument>scout-mobile-5.0.0.min.css</argument>
-            -->
-          </arguments>
-        </configuration>
-      </execution>
-    </executions>
-  </plugin>
-
     <!-- JS testing with Jasmine -->
-      <plugin>
-        <groupId>com.github.searls</groupId>
-        <artifactId>jasmine-maven-plugin</artifactId>
-        <version>1.3.1.4</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>test</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <!-- AWE: do not break build when Jasmine tests fail -->
-          <haltOnFailure>false</haltOnFailure>
-          <jsSrcDir>${project.basedir}/../org.eclipse.scout.rt.ui.html/src/main/js</jsSrcDir>
-          <jsTestSrcDir>${project.basedir}/src/test/js</jsTestSrcDir>
-          <customRunnerTemplate>${project.basedir}/src/test/js/SpecRunnerMaven.html</customRunnerTemplate>
-          <sourceExcludes>
-            <!-- jasmine files are explicitly included in SpecRunnerMaven.html because the need to be before actual sources-->
-            <sourceExclude>**/jasmine/*.js</sourceExclude>
-            <!-- for tests, scout namespace is defined in boot.ext.js -->
-            <sourceExclude>scout-4.0.1-module.js</sourceExclude>
-          </sourceExcludes>
-          <!-- HtmlUnitDriver does not work with jQuery 2.1.0, throws exception -->
-          <webDriverClassName>org.openqa.selenium.phantomjs.PhantomJSDriver</webDriverClassName>
-          <webDriverCapabilities>
-            <capability>
-              <name>phantomjs.binary.path</name>
-              <value>${phantomjs.binary}</value>
-            </capability>
-          </webDriverCapabilities>
-        </configuration>
-      </plugin>
-
+    <plugin>
+      <groupId>com.github.searls</groupId>
+      <artifactId>jasmine-maven-plugin</artifactId>
+      <version>1.3.1.4</version>
+      <executions>
+        <execution>
+          <goals>
+            <goal>test</goal>
+          </goals>
+        </execution>
+      </executions>
+      <configuration>
+        <!-- AWE: do not break build when Jasmine tests fail -->
+        <haltOnFailure>false</haltOnFailure>
+        <jsSrcDir>${project.basedir}/../org.eclipse.scout.rt.ui.html/src/main/js</jsSrcDir>
+        <jsTestSrcDir>${project.basedir}/src/test/js</jsTestSrcDir>
+        <customRunnerTemplate>${project.basedir}/src/test/js/SpecRunnerMaven.html</customRunnerTemplate>
+        <sourceExcludes>
+          <!-- jasmine files are explicitly included in SpecRunnerMaven.html because the need to be before actual sources-->
+          <sourceExclude>**/jasmine/*.js</sourceExclude>
+          <!-- for tests, scout namespace is defined in boot.ext.js -->
+          <sourceExclude>scout-4.0.1-module.js</sourceExclude>
+        </sourceExcludes>
+        <!-- HtmlUnitDriver does not work with jQuery 2.1.0, throws exception -->
+        <webDriverClassName>org.openqa.selenium.phantomjs.PhantomJSDriver</webDriverClassName>
+        <webDriverCapabilities>
+          <capability>
+            <name>phantomjs.binary.path</name>
+            <value>${phantomjs.binary}</value>
+          </capability>
+        </webDriverCapabilities>
+      </configuration>
+    </plugin>
 
   </plugins>
 
