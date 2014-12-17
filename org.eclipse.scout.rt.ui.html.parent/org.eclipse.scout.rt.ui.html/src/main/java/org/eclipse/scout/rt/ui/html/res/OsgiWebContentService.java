@@ -23,4 +23,9 @@ public class OsgiWebContentService extends AbstractService {
   public Bundle getBundle() {
     return m_bundle;
   }
+
+  @Override
+  public String toString() {
+    return getClass().getSimpleName() + "[" + (m_bundle == null ? "null" : m_bundle.getSymbolicName() + "_" + m_bundle.getVersion()) + "]";
+  }
 }

@@ -16,7 +16,20 @@ public class ScriptSource {
 
   public static enum FileType {
     JS,
-    CSS
+    CSS,
+    OTHER;
+
+    public static FileType resolveFromFilename(String filename) {
+      if (filename != null) {
+        if (filename.endsWith(".js")) {
+          return JS;
+        }
+        if (filename.endsWith(".css")) {
+          return CSS;
+        }
+      }
+      return OTHER;
+    }
   }
 
   public static enum NodeType {
@@ -63,7 +76,12 @@ public class ScriptSource {
      * Example: the include <code>tree/Tree.js</code> is mapped to the file
      * <code>/META-INF/resources/js/tree/Tree.js</code>
      */
-    SRC_FRAGMENT
+    SRC_FRAGMENT,
+
+    /**
+     * Fall-back type to prevent NPE in switch statements.
+     */
+    OTHER
   }
 
   private final String m_requestPath;
@@ -77,8 +95,16 @@ public class ScriptSource {
     }
     m_requestPath = requestPath;
     m_url = url;
-    m_fileType = fileType;
-    m_nodeType = nodeType;
+    m_fileType = (fileType == null ? FileType.OTHER : fileType);
+    m_nodeType = (nodeType == null ? NodeType.OTHER : nodeType);
+  }
+
+  /**
+   * Like {@link #ScriptSource(String, URL, FileType, NodeType)} but resolves the file type automatically from the
+   * requestPath
+   */
+  public ScriptSource(String requestPath, URL url, ScriptSource.NodeType nodeType) {
+    this(requestPath, url, FileType.resolveFromFilename(requestPath), nodeType);
   }
 
   public String getRequestPath() {
@@ -89,10 +115,16 @@ public class ScriptSource {
     return m_url;
   }
 
+  /**
+   * Returns never <code>null</code>.
+   */
   public ScriptSource.FileType getFileType() {
     return m_fileType;
   }
 
+  /**
+   * Returns never <code>null</code>.
+   */
   public ScriptSource.NodeType getNodeType() {
     return m_nodeType;
   }

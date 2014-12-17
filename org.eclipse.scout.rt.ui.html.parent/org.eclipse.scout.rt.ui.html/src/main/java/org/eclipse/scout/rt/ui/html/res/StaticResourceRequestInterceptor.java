@@ -45,10 +45,12 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
   public static final String INDEX_HTML = "/index.html";
   public static final String MOBILE_INDEX_HTML = "/index-mobile.html";
 
+  private static final String UTF_8 = "UTF-8";
+
   @Override
   public boolean interceptGet(AbstractScoutAppServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     String pathInfo = resolvePathInfo(req);
-    LOG.info("processing static resource: " + pathInfo + " using " + pathInfo);
+    LOG.debug("processing static resource: " + pathInfo);
 
     //lookup cache or load
     HttpCacheObject cacheObj = servlet.getHttpCacheControl().getCacheObject(req, pathInfo);
@@ -190,7 +192,7 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
    * effective files {@link HttpCacheObject#getFingerprint()} in hex format
    */
   protected byte[] replaceHtmlScriptTags(AbstractScoutAppServlet servlet, HttpServletRequest req, byte[] content) throws IOException, ServletException {
-    String oldHtml = new String(content, "UTF-8");
+    String oldHtml = new String(content, UTF_8);
     Matcher m = ScriptFileBuilder.SCRIPT_URL_PATTERN.matcher(oldHtml);
     StringBuilder buf = new StringBuilder();
     int lastEnd = 0;
@@ -199,18 +201,26 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
       buf.append(oldHtml.substring(lastEnd, m.start()));
       if ("fingerprint".equals(m.group(4))) {
         replaceCount++;
-        HttpCacheObject obj = loadScriptFile(servlet, req, m.group());
-        if (obj == null) {
-          LOG.warn("Failed to locate resource referenced in html file '" + req.getPathInfo() + "': " + m.group());
+        String fingerprint = null;
+        if (ScoutAppHints.isCacheHint(req)) {
+          HttpCacheObject obj = loadScriptFile(servlet, req, m.group());
+          if (obj == null) {
+            LOG.warn("Failed to locate resource referenced in html file '" + req.getPathInfo() + "': " + m.group());
+          }
+          fingerprint = (obj != null ? Long.toHexString(obj.getFingerprint()) : m.group(4));
         }
-        String fingerprint = (obj != null ? Long.toHexString(obj.getFingerprint()) : m.group(4));
         buf.append(m.group(1));
         buf.append(m.group(2));
         buf.append("-");
         buf.append(m.group(3));
-        buf.append("-");
-        buf.append(fingerprint);
-        buf.append(".min.");
+        if (fingerprint != null) {
+          buf.append("-");
+          buf.append(fingerprint);
+        }
+        if (ScoutAppHints.isMinifyHint(req)) {
+          buf.append(".min");
+        }
+        buf.append(".");
         buf.append(m.group(5));
       }
       else {
@@ -224,10 +234,9 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
     }
     buf.append(oldHtml.substring(lastEnd));
     String newHtml = buf.toString();
-    if (LOG.isDebugEnabled()) {
-      LOG.debug("process html script tags:\nINPUT\n" + oldHtml + "\n\nOUTPUT\n" + newHtml);
-
+    if (LOG.isTraceEnabled()) {
+      LOG.trace("process html script tags:\nINPUT\n" + oldHtml + "\n\nOUTPUT\n" + newHtml);
     }
-    return newHtml.getBytes("UTF-8");
+    return newHtml.getBytes(UTF_8);
   }
 }
