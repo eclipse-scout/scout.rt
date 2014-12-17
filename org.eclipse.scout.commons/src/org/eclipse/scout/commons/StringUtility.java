@@ -1234,6 +1234,18 @@ public final class StringUtility {
     return s;
   }
 
+  /**
+   * If the given string is <code>null</code> or equal or longer than <code>len</code> characters, it is returned
+   * unaltered. Otherwise, <code>fill</code> is appended to the string <b>on the left side</b> until the result is
+   * <code>len</code> characters long.
+   * <p>
+   * Examples:
+   *
+   * <pre>
+   * rpad("foo",       "#", 7) = "####foo"
+   * rpad("foobarfoo", "#", 7) = "foobarfoo"
+   * </pre>
+   */
   public static String lpad(String s, String fill, int len) {
     if (s == null || fill == null || s.length() >= len || fill.length() == 0) {
       return s;
@@ -1245,6 +1257,18 @@ public final class StringUtility {
     return buf.substring(buf.length() - len, buf.length());
   }
 
+  /**
+   * If the given string is <code>null</code> or equal or longer than <code>len</code> characters, it is returned
+   * unaltered. Otherwise, <code>fill</code> is appended to the string <b>on the right side</b> until the result is
+   * <code>len</code> characters long.
+   * <p>
+   * Examples:
+   *
+   * <pre>
+   * rpad("foo",       "#", 7) = "foo####"
+   * rpad("foobarfoo", "#", 7) = "foobarfoo"
+   * </pre>
+   */
   public static String rpad(String s, String fill, int len) {
     if (s == null || fill == null || s.length() >= len || fill.length() == 0) {
       return s;

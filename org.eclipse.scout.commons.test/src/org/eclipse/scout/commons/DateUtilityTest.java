@@ -769,4 +769,19 @@ public class DateUtilityTest {
 
     assertEquals(DateUtility.isWeekend(todayCalendar.getTime()), DateUtility.isWeekend(todayCalendar.getTime(), Locale.getDefault()));
   }
+
+  @Test
+  public void testFormatNanos() {
+    assertEquals("0.000000", DateUtility.formatNanos(0L));
+    assertEquals("0.000000", DateUtility.formatNanos(-0L));
+    assertEquals("0.000001", DateUtility.formatNanos(1L));
+    assertEquals("1.000000", DateUtility.formatNanos((long) (1 * 1000 * 1000)));
+    assertEquals("1.234567", DateUtility.formatNanos(1234567L));
+    assertEquals("12.345678", DateUtility.formatNanos(12345678L));
+    assertEquals("123.456789", DateUtility.formatNanos(123456789L));
+    assertEquals("123.000000", DateUtility.formatNanos(123000000L));
+    assertEquals("-0.000001", DateUtility.formatNanos(-1L));
+    assertEquals("9223372036854.775807", DateUtility.formatNanos(Long.MAX_VALUE));
+    assertEquals("-9223372036854.775808", DateUtility.formatNanos(Long.MIN_VALUE));
+  }
 }

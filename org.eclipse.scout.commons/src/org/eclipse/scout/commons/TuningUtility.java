@@ -15,9 +15,6 @@ import java.util.Stack;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
-
 /**
  * <p>
  * Class to help getting timing information without the need of adding attaching a profiler.
@@ -59,7 +56,6 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
  * </pre>
  */
 public final class TuningUtility {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(TuningUtility.class);
 
   private TuningUtility() {
   }
@@ -174,14 +170,6 @@ public final class TuningUtility {
     finishAll(false);
   }
 
-  private static String formatTime(long dtNanos) {
-    String x = "" + dtNanos;
-    while (x.length() < 7) {
-      x = "0" + x;
-    }
-    return x.substring(0, x.length() - 6) + "." + x.substring(x.length() - 6);
-  }
-
   private static void printSingle(String label, long dtNanos) {
     int level = timerStack.size();
     StringBuilder b = new StringBuilder();
@@ -191,7 +179,7 @@ public final class TuningUtility {
     }
     b.append(label);
     b.append(" took ");
-    b.append(formatTime(dtNanos));
+    b.append(DateUtility.formatNanos(dtNanos));
     b.append("ms");
     System.out.println(b);
   }
@@ -206,20 +194,20 @@ public final class TuningUtility {
       for (long n : seriesSorted) {
         sum += n;
       }
-      b.append(" sum=" + formatTime((long) sum));
+      b.append(" sum=" + DateUtility.formatNanos((long) sum));
       long avg = (long) (sum / seriesSorted.length);
       b.append("ms");
       b.append(" min=");
-      b.append(formatTime(seriesSorted[0]));
+      b.append(DateUtility.formatNanos(seriesSorted[0]));
       b.append("ms");
       b.append(" avg=");
-      b.append(formatTime(avg));
+      b.append(DateUtility.formatNanos(avg));
       b.append("ms");
       b.append(" median=");
-      b.append(formatTime(seriesSorted[seriesSorted.length / 2]));
+      b.append(DateUtility.formatNanos(seriesSorted[seriesSorted.length / 2]));
       b.append("ms");
       b.append(" max=");
-      b.append(formatTime(seriesSorted[seriesSorted.length - 1]));
+      b.append(DateUtility.formatNanos(seriesSorted[seriesSorted.length - 1]));
       b.append("ms");
       // remove smallest and largest 1%
       int start = Math.max(1, seriesSorted.length / 100);
@@ -230,24 +218,23 @@ public final class TuningUtility {
         for (int i = start; i <= end; i++) {
           sum += seriesSorted[i];
         }
-        b.append(" sum=" + formatTime((long) sum));
+        b.append(" sum=" + DateUtility.formatNanos((long) sum));
         avg = (long) (sum / (end - start));
         b.append(" min=");
-        b.append(formatTime(seriesSorted[start]));
+        b.append(DateUtility.formatNanos(seriesSorted[start]));
         b.append("ms");
         b.append(" avg=");
-        b.append(formatTime(avg));
+        b.append(DateUtility.formatNanos(avg));
         b.append("ms");
         b.append(" median=");
-        b.append(formatTime(seriesSorted[seriesSorted.length / 2]));
+        b.append(DateUtility.formatNanos(seriesSorted[seriesSorted.length / 2]));
         b.append("ms");
         b.append(" max=");
-        b.append(formatTime(seriesSorted[end]));
+        b.append(DateUtility.formatNanos(seriesSorted[end]));
         b.append("ms");
         b.append("]");
       }
     }
     System.out.println(b);
   }
-
 }

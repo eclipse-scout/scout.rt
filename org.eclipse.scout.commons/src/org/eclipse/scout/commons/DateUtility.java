@@ -635,4 +635,20 @@ public final class DateUtility {
     int numDays = (int) ((endL - startL) / DAY_MILLIS);
     return Math.abs(numDays);
   }
+
+  /**
+   * Fast, accurate formatting of nanoseconds <b>as milliseconds</b>.
+   * <p>
+   * The resulting string always matches the regular expression <code>/^-?[0-9]+\.[0-9]{6}$/</code> (optional minus
+   * sign, one or more digits, exactly one dot sign, exactly 6 digits). The method is therefore mostly suitable for
+   * technical purposes (e.g. logging).
+   */
+  public static String formatNanos(long nanos) {
+    String x = "" + nanos;
+    if (nanos < 0) {
+      x = x.substring(1);
+    }
+    x = StringUtility.lpad(x, "0", 7);
+    return (nanos < 0 ? "-" : "") + x.substring(0, x.length() - 6) + "." + x.substring(x.length() - 6);
+  }
 }
