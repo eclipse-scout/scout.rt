@@ -1224,6 +1224,79 @@ describe("Table", function() {
 
     });
 
+    describe("menus", function() {
+
+      it("creates and registers menu adapters", function() {
+        var model = helper.createModelFixture(2);
+        var table = helper.createTable(model);
+        var menu1 = helper.createMenuModel();
+        var menu2 = helper.createMenuModel();
+
+        var message = {
+          adapterData : createAdapterData([menu1, menu2]),
+          events: [createPropertyChangeEvent(table, {menus: [menu1.id, menu2.id]})]
+        };
+        session._processSuccessResponse(message);
+
+        expect(session.getModelAdapter(menu1.id)).toBe(table.menus[0]);
+        expect(session.getModelAdapter(menu2.id)).toBe(table.menus[1]);
+      });
+
+      it("destroys the old menus", function() {
+        var model = helper.createModelFixture(2);
+        var table = helper.createTable(model);
+        var menu1 = helper.createMenuModel();
+        var menu2 = helper.createMenuModel();
+
+        var message = {
+          adapterData : createAdapterData([menu1, menu2]),
+          events: [createPropertyChangeEvent(table, {menus: [menu1.id, menu2.id]})]
+        };
+        session._processSuccessResponse(message);
+
+        expect(session.getModelAdapter(menu1.id)).toBe(table.menus[0]);
+        expect(session.getModelAdapter(menu2.id)).toBe(table.menus[1]);
+
+        message = {
+          events: [createPropertyChangeEvent(table, {menus: [menu2.id]})]
+        };
+        session._processSuccessResponse(message);
+
+        expect(table.menus.length).toBe(1);
+        expect(session.getModelAdapter(menu2.id)).toBe(table.menus[0]);
+        expect(session.getModelAdapter(menu1.id)).toBeFalsy();
+      });
+
+      it("destroys the old and creates the new menus if the list contains both", function() {
+        var model = helper.createModelFixture(2);
+        var table = helper.createTable(model);
+        var menu1 = helper.createMenuModel();
+        var menu2 = helper.createMenuModel();
+        var menu3 = helper.createMenuModel();
+
+        var message = {
+          adapterData : createAdapterData([menu1, menu2]),
+          events: [createPropertyChangeEvent(table, {menus: [menu1.id, menu2.id]})]
+        };
+        session._processSuccessResponse(message);
+
+        expect(session.getModelAdapter(menu1.id)).toBe(table.menus[0]);
+        expect(session.getModelAdapter(menu2.id)).toBe(table.menus[1]);
+
+        message = {
+          adapterData : createAdapterData(menu3),
+          events: [createPropertyChangeEvent(table, {menus: [menu2.id, menu3.id]})]
+        };
+        session._processSuccessResponse(message);
+
+        expect(table.menus.length).toBe(2);
+        expect(session.getModelAdapter(menu2.id)).toBe(table.menus[0]);
+        expect(session.getModelAdapter(menu3.id)).toBe(table.menus[1]);
+        expect(session.getModelAdapter(menu1.id)).toBeFalsy();
+      });
+
+    });
+
   });
 
 });

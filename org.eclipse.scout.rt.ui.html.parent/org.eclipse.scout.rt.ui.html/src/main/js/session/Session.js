@@ -66,7 +66,9 @@ scout.Session = function($entryPoint, jsonSessionId, options) {
     this.parentJsonSession = parentJsonSession; // TODO BSH Detach | Get from options instead?
   }
 
-  this.modelAdapterRegistry[jsonSessionId] = this; // FIXME CGU maybe better separate session object from event processing, create ClientSession.js?
+  this.modelAdapterRegistry[jsonSessionId] = this; // FIXME CGU maybe better separate session object from event processing, create ClientSession.js?. If yes, desktop should not have rootadapter as parent, see 406
+  this.rootAdapter = new scout.ModelAdapter();
+  this.rootAdapter.init({id: '1'}, this);
   this.objectFactory.register(options.objectFactories || scout.defaultObjectFactories);
 
   // Extract custom parameters from URL
@@ -99,9 +101,6 @@ scout.Session.prototype.getOrCreateModelAdapter = function(id, parent) {
   if (typeof id !== 'string') {
     throw new Error('typeof id must be string');
   }
-  if (!parent) {
-    throw new Error('parent needs to be set');
-  }
 
   var adapter = this.modelAdapterRegistry[id];
   if (adapter) {
@@ -112,12 +111,19 @@ scout.Session.prototype.getOrCreateModelAdapter = function(id, parent) {
   if (!adapterData) {
     throw new Error('no adapterData found for id=' + id);
   }
-  adapter = this.objectFactory.create(adapterData);
 
-  adapter.parent = parent;
-  if (scout.ModelAdapter.prototype.isPrototypeOf(parent)) {
-    parent.addChild(adapter);
+  if (!parent && adapterData.parent === undefined) {
+    this._adapterDataCache[adapterData.id] = adapterData;
+    throw new Error('parent must be defined');
   }
+  // Prefer the parent sent by the server
+  if (adapterData.parent !== undefined) {
+    parent = this.getModelAdapter(adapterData.parent);
+  }
+
+  adapter = this.objectFactory.create(adapterData);
+  adapter.parent = parent;
+  parent.addChild(adapter);
 
   return adapter;
 };
@@ -354,7 +360,7 @@ scout.Session.prototype._processEvents = function(events) {
   for (i = 0; i < events.length; i++) {
     event = events[i];
     $.log.debug("Processing event '" + event.type + "' for adapter with ID " + event.id);
-    adapter = this.getOrCreateModelAdapter(event.id, this);
+    adapter = this.getOrCreateModelAdapter(event.id, scout.rootAdapter);
     if (!adapter) {
       throw new Error('No adapter registered for ID ' + event.id);
     }
@@ -395,11 +401,9 @@ scout.Session.prototype.onModelAction = function(event) {
     // FIXME inform components to reformat display text?
   } else if (event.type === 'initialized') {
     this._textMap = event.textMap;
-    // cannot use getOrCreateModelAdapter here since Session doesn't have a parent
-    var sessionData = this._getAdapterData(event.clientSession);
-    this.locale = new scout.Locale(sessionData.locale);
-    var desktopData = this._getAdapterData(sessionData.desktop);
-    this.desktop = this.objectFactory.create(desktopData);
+    var clientSessionData = this._getAdapterData(event.clientSession);
+    this.locale = new scout.Locale(clientSessionData.locale);
+    this.desktop = this.getOrCreateModelAdapter(clientSessionData.desktop, this.rootAdapter);
     this.desktop.render(this.$entryPoint);
   }
 };

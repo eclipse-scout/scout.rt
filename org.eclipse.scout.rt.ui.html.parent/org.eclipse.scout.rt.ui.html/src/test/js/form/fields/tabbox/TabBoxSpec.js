@@ -1,4 +1,4 @@
-/* global FormFieldSpecHelper */
+/* global FormSpecHelper */
 describe("TabBox", function() {
   var session;
   var helper;
@@ -6,7 +6,7 @@ describe("TabBox", function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = new scout.Session($('#sandbox'), '1.1');
-    helper = new FormFieldSpecHelper(session);
+    helper = new FormSpecHelper(session);
   });
 
   function createField(model) {
@@ -15,8 +15,8 @@ describe("TabBox", function() {
     return field;
   }
 
-  function createModel(id, tabItems) {
-    var model = helper.createModel(id);
+  function createModel(tabItems) {
+    var model = helper.createFieldModel();
     model.tabItems = tabItems;
     model.selectedTab = 0;
     return model;
@@ -28,7 +28,7 @@ describe("TabBox", function() {
     //FIXME CGU requires possibility to build adapterDataCache
 //    beforeEach(function() {
 //      var groupBox = helper.createModel();
-//      field = createField(createModel(undefined, [groupBox.id]));
+//      field = createField(createModel([groupBox.id]));
 //    });
 
 

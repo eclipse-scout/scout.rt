@@ -38,7 +38,7 @@ public abstract class JsonAdapterProperty<T> extends JsonProperty<T> {
   @Override
   public Object valueToJsonOnPropertyChange(Object oldValue, Object newValue) {
     if (!m_global && oldValue != null) {
-      disposeAdapter(oldValue);
+      disposeAdapters(oldValue, newValue);
     }
     createAdapters(newValue);
     return super.valueToJsonOnPropertyChange(oldValue, newValue);
@@ -82,24 +82,29 @@ public abstract class JsonAdapterProperty<T> extends JsonProperty<T> {
     }
   }
 
-  public void disposeAdapters() {
-    disposeAdapters(modelValue());
-  }
-
-  protected void disposeAdapters(Object modelValue) {
-    if (modelValue == null) {
+  /**
+   * If the property is a collection: Disposes every old model if the new list does not contain it.
+   * If the property is not a collection: Dispose the old model.
+   */
+  protected void disposeAdapters(Object oldModels, Object newModels) {
+    if (oldModels == null) {
       return;
     }
-    if (modelValue instanceof Collection) {
-      for (Object model : (Collection) modelValue) {
-        disposeAdapter(model);
+    if (oldModels instanceof Collection) {
+      for (Object oldModel : (Collection) oldModels) {
+        if (newModels == null || !((Collection) newModels).contains(oldModel)) {
+          disposeAdapter(oldModel);
+        }
       }
     }
     else {
-      disposeAdapter(modelValue);
+      disposeAdapter(oldModels);
     }
   }
 
+  /**
+   * Disposes the model, but only if it's not a global adapter.
+   */
   protected void disposeAdapter(Object model) {
     IJsonAdapter<Object> jsonAdapter = m_jsonSession.getJsonAdapter(model, getParentJsonAdapter(), false);
     if (jsonAdapter != null) {

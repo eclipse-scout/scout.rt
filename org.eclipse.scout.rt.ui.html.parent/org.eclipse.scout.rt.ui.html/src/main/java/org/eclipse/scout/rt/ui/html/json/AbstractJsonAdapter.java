@@ -123,8 +123,13 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
   @Override
   public JSONObject toJson() {
     JSONObject json = new JSONObject();
-    putProperty(json, "objectType", getObjectTypeVariant());
     putProperty(json, "id", getId());
+    putProperty(json, "objectType", getObjectTypeVariant());
+
+    // Only send parent if its a global adapter. In the other cases the client may use its creator as parent.
+    if (getParent() == getJsonSession().getRootJsonAdapter()) {
+      putProperty(json, "parent", getParent().getId());
+    }
     return json;
   }
 

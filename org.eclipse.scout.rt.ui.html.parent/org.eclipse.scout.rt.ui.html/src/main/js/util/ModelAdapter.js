@@ -16,7 +16,11 @@ scout.ModelAdapter.prototype.init = function(model, session) {
   this.session.registerModelAdapter(this);
 
   // copy all properties from model to this adapter instance
-  this._eachProperty(model, function(propertyName, value) {
+  this._eachProperty(model, function(propertyName, value, isAdapterProp) {
+    if (isAdapterProp && value) {
+      value = this._createAdapters(propertyName, value);
+    }
+
     this[propertyName] = value;
   }.bind(this));
 };
@@ -113,15 +117,22 @@ scout.ModelAdapter.prototype.dispose = function() {
 };
 
 scout.ModelAdapter.prototype.destroy = function() {
-  this.remove();
+  var i, child,
+    children = this.children.slice();
 
-  //Disconnect from parent
+  for (i = 0; i < children.length; i++) {
+    child = children[i];
+    child.destroy();
+  }
+
+  this.remove();
+  this.session.unregisterModelAdapter(this);
+
+  // Disconnect from parent
   if (this.parent) {
     this.parent.removeChild(this);
     this.parent = null;
   }
-
-  this.session.unregisterModelAdapter(this); //FIXME CGU unregister children?
   this.destroyed = true;
 };
 
@@ -156,25 +167,55 @@ scout.ModelAdapter.prototype._eachProperty = function(model, func) {
     if (value === undefined) {
       continue;
     }
-    // Distinguishing between undefined and '' is important
-    // The value is '' if the server wants to explicitly remove the adapter
-    // -> func() needs to be called for 'empty' adapters
-    if (value !== '') {
-      if (Array.isArray(value)) {
-        adapters = [];
-        for (j = 0; j < value.length; j++) {
-          adapter = this.session.getOrCreateModelAdapter(value[j], this);
-          this.onChildAdapterCreated(propertyName, adapter);
-          adapters.push(adapter);
-        }
-        value = adapters;
-      } else {
-        value = this.session.getOrCreateModelAdapter(value, this);
-        this.onChildAdapterCreated(propertyName, value);
-      }
+
+    func(propertyName, value, true);
+  }
+};
+
+scout.ModelAdapter.prototype._createAdapters = function(propertyName, adapterIds) {
+  return this._processAdapters(adapterIds, function(adapterId) {
+    var adapter = this.session.getOrCreateModelAdapter(adapterId, this);
+    this.onChildAdapterCreated(propertyName, adapter);
+    return adapter;
+  }.bind(this));
+};
+
+scout.ModelAdapter.prototype._destroyAdapters = function(propertyName, oldAdapters, newAdapterIds) {
+  return this._processAdapters(oldAdapters, function(oldAdapter) {
+    // Only destroy it if its linked to this adapter (-> don't destroy global adapters)
+    if (oldAdapter.parent !== this) {
+      return;
     }
 
-    func(propertyName, value);
+    if (Array.isArray(newAdapterIds)) {
+      // If the old adapter is not in the array anymore -> destroy it
+      if (newAdapterIds.indexOf(oldAdapter.id) < 0) {
+        oldAdapter.destroy();
+      }
+    } else {
+      // If the value is not an array, always destroy the oldAdapter
+      oldAdapter.destroy();
+    }
+    return oldAdapter;
+  }.bind(this));
+};
+
+/**
+ * If the value is an array: Loops through the array and calls func.
+ * If the value is not an array: Calls the func.
+ * @returns the processed adapters (either a list or a single adapter) returned by func.
+ */
+scout.ModelAdapter.prototype._processAdapters = function(value, func) {
+  var adapters, adapter, i;
+  if (Array.isArray(value)) {
+    adapters = [];
+    for (i = 0; i < value.length; i++) {
+      adapter = func(value[i]);
+      adapters.push(adapter);
+    }
+    return adapters;
+  } else {
+    return func(value);
   }
 };
 
@@ -191,14 +232,14 @@ scout.ModelAdapter.prototype._eachProperty = function(model, func) {
  * individual properties are processed in a certain order.
  */
 scout.ModelAdapter.prototype.onModelPropertyChange = function(event) {
-  var oldValues = {};
+  var oldProperties = {};
 
   // step 1 synchronizing - apply properties on adapter or calls syncPropertyName if it exists
-  this._syncPropertiesOnPropertyChange(oldValues, event.properties);
+  this._syncPropertiesOnPropertyChange(oldProperties, event.properties);
 
   // step 2 rendering - call render methods to update UI, but only if it is displayed (rendered)
   if (this.rendered) {
-    this._renderPropertiesOnPropertyChange(oldValues, event.properties);
+    this._renderPropertiesOnPropertyChange(oldProperties, event.properties);
   }
 };
 
@@ -209,10 +250,22 @@ scout.ModelAdapter.prototype.onModelAction = function(event) {
   $.log.warn('Model action "' + event.type + '" is not supported by model-adapter ' + this.objectType);
 };
 
-scout.ModelAdapter.prototype._syncPropertiesOnPropertyChange = function(oldValues, newValues) {
-  this._eachProperty(newValues, function(propertyName, value) {
+scout.ModelAdapter.prototype._syncPropertiesOnPropertyChange = function(oldProperties, newProperties) {
+  this._eachProperty(newProperties, function(propertyName, value, isAdapterProp) {
     var onFuncName = '_sync' + scout.ModelAdapter._preparePropertyNameForFunctionCall(propertyName);
-    oldValues[propertyName] = this[propertyName];
+    var oldValue = this[propertyName];
+    oldProperties[propertyName] = oldValue;
+
+    if (isAdapterProp) {
+      if (oldValue) {
+        this._destroyAdapters(propertyName, oldValue, value);
+      }
+
+      if (value) {
+        value = this._createAdapters(propertyName, value);
+      }
+    }
+
     if (this[onFuncName]) {
       this[onFuncName](value);
     } else {
@@ -221,15 +274,14 @@ scout.ModelAdapter.prototype._syncPropertiesOnPropertyChange = function(oldValue
   }.bind(this));
 };
 
-scout.ModelAdapter.prototype._renderPropertiesOnPropertyChange = function(oldValues, newValues) {
-  this._eachProperty(newValues, function(propertyName, value) {
+scout.ModelAdapter.prototype._renderPropertiesOnPropertyChange = function(oldProperties, newProperties) {
+  this._eachProperty(newProperties, function(propertyName, value, isAdapterProp) {
     var renderFuncName = '_render' + scout.ModelAdapter._preparePropertyNameForFunctionCall(propertyName);
     $.log.debug('call ' + renderFuncName + '(' + value + ')');
     // Call the render function for regular properties, for adapters see onChildAdapterChange
-    if (this._adapterProperties.indexOf(propertyName) > -1) {
-      this.onChildAdapterChange(propertyName, oldValues[propertyName], value);
-    }
-    else {
+    if (isAdapterProp) {
+      this.onChildAdapterChange(propertyName, oldProperties[propertyName], value);
+    } else {
       var funcTarget = this.ui || this;
       if (!funcTarget[renderFuncName]) {
         throw new Error('Render function ' + renderFuncName + ' does not exist in ' + (funcTarget === this ? 'model adapter' : 'UI'));

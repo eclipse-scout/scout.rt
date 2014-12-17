@@ -4,7 +4,10 @@ scout.arrays = {
    * Ensures the given parameter is an array
    */
   ensure: function(array) {
-    if (array && !Array.isArray(array)) {
+    if (!array) {
+      return [];
+    }
+    if (!Array.isArray(array)) {
       return [array];
     }
     return array;

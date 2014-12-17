@@ -1,4 +1,4 @@
-/* global FormFieldSpecHelper */
+/* global FormSpecHelper */
 describe("StringField", function() {
   var session;
   var helper;
@@ -6,7 +6,7 @@ describe("StringField", function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = new scout.Session($('#sandbox'), '1.1');
-    helper = new FormFieldSpecHelper(session);
+    helper = new FormSpecHelper(session);
   });
 
   function createField(model) {
@@ -15,8 +15,8 @@ describe("StringField", function() {
     return field;
   }
 
-  function createModel(id) {
-    return helper.createModel();
+  function createModel() {
+    return helper.createFieldModel();
   }
 
   describe("property label position", function() {

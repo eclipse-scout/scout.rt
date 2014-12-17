@@ -62,7 +62,7 @@ scout.menus = {
      * Checks the type of a menu. Don't use this for menu groups.
      */
     _checkType: function(menu, types) {
-      if (!types) {
+      if (!types || types.length === 0) {
         return true;
       }
       if (!menu.menuTypes) {

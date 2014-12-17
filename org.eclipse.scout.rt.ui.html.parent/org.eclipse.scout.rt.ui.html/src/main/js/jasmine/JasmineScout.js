@@ -6,10 +6,17 @@ function mostRecentJsonRequest() {
   }
 }
 
-var m_adapterSeq = 0;
+var adapterSeq = 1;
 
 function createUniqueAdapterId() {
-  return "" + m_adapterSeq++;
+  return "" + adapterSeq++;
+}
+
+function createSimpleModel(objectType) {
+  return {
+    'id': createUniqueAdapterId(),
+    'objectType': objectType
+  };
 }
 
 /**
@@ -38,6 +45,29 @@ function createPropertyChangeEvent(model, properties) {
     properties: properties,
     type: 'property'
   };
+}
+
+function createAdapterData(adapterDataArray) {
+  var i,
+    adapterData = {};
+  adapterDataArray = scout.arrays.ensure(adapterDataArray);
+
+  for (i = 0; i < adapterDataArray.length; i++) {
+    adapterData[adapterDataArray[i].id] = adapterDataArray[i];
+  }
+  return adapterData;
+}
+
+function createAdapter(model, session, adapterDataArray) {
+  var adapterData, adapter;
+  adapterDataArray = scout.arrays.ensure(adapterDataArray);
+  adapterDataArray.push(model);
+
+  adapterData = createAdapterData(adapterDataArray);
+  session._copyAdapterData(adapterData);
+  adapter = session.getOrCreateModelAdapter(model.id);
+  expect(session.getModelAdapter(adapter.id)).toBe(adapter);
+  return adapter;
 }
 
 var jasmineScoutMatchers = {
@@ -110,6 +140,7 @@ var jasmineScoutMatchers = {
         return result;
       }
     };
+
   }
 };
 

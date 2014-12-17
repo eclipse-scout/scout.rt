@@ -22,6 +22,9 @@
     "mostRecentJsonRequest": false,
     "createUniqueAdapterId": false,
     "sendQueuedAjaxCalls": false,
-    "createPropertyChangeEvent": false
+    "createPropertyChangeEvent": false,
+    "createAdapterData": false,
+    "createAdapter": false,
+    "createSimpleModel": false
   }
 }

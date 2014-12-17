@@ -10,6 +10,7 @@ scout.Tree = function() {
   this._treeItemPaddingLeft = 30;
   this._treeItemPaddingLevel = 20;
   this.events = new scout.EventSupport();
+  this._addAdapterProperties('menus');
 };
 scout.inherits(scout.Tree, scout.ModelAdapter);
 

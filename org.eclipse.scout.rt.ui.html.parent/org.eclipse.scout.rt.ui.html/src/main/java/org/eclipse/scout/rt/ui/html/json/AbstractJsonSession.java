@@ -46,13 +46,14 @@ import org.json.JSONObject;
 
 public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBindingListener {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractJsonSession.class);
+  private static final long ROOT_ID = 1;
 
   private final JsonAdapterFactory m_jsonAdapterFactory;
   private final JsonAdapterRegistry m_jsonAdapterRegistry;
   private P_RootAdapter m_rootJsonAdapter;
   private JsonClientSession<? extends IClientSession> m_jsonClientSession;
   private String m_jsonSessionId;
-  private long m_jsonAdapterSeq;
+  private long m_jsonAdapterSeq = ROOT_ID;
   private JsonResponse m_currentJsonResponse;
   private JsonRequest m_currentJsonRequest;
   private HttpServletRequest m_currentHttpRequest;
@@ -515,7 +516,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   private static class P_RootAdapter extends AbstractJsonAdapter<Object> {
 
     public P_RootAdapter(IJsonSession jsonSession) {
-      super(new Object(), jsonSession, jsonSession.createUniqueIdFor(null), null);
+      super(new Object(), jsonSession, ROOT_ID + "", null);
     }
 
     @Override

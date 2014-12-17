@@ -1,4 +1,4 @@
-/* global LocaleSpecHelper, FormFieldSpecHelper */
+/* global LocaleSpecHelper, FormSpecHelper */
 describe("DateField", function() {
   var session;
   var helper;
@@ -7,7 +7,7 @@ describe("DateField", function() {
     setFixtures(sandbox());
     session = new scout.Session($('#sandbox'), '1.1');
     session.locale = new LocaleSpecHelper().createLocale('de');
-    helper = new FormFieldSpecHelper(session);
+    helper = new FormSpecHelper(session);
     jasmine.Ajax.install();
     jasmine.clock().install();
   });
@@ -38,8 +38,8 @@ describe("DateField", function() {
     return dateField;
   }
 
-  function createModel(id) {
-    return helper.createModel(id);
+  function createModel() {
+    return helper.createFieldModel();
   }
 
   function findPicker() {

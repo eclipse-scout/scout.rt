@@ -9,11 +9,12 @@ TableSpecHelper.prototype.createModel = function(id, columns, rows) {
     id = createUniqueAdapterId();
   }
 
-  var model =  {
+  var model = createSimpleModel('Table');
+  $.extend(model, {
     "id": id,
     "headerVisible": true,
     "multiSelect": true
-  };
+  });
 
   //Server will never send undefined -> don't create model with undefined properties.
   if (rows) {
