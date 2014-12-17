@@ -12,7 +12,10 @@ package org.eclipse.scout.rt.client.ui.form.fields;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -227,6 +230,33 @@ public class AbstractFormFieldTest {
       }
     }
 
+  }
+
+  @Test
+  public void testStatusVisible_Default() throws Exception {
+    SimpleTestFormField testField = new SimpleTestFormField();
+    assertTrue(testField.isStatusVisible());
+  }
+
+  /**
+   * Tests if the property change listener is triggered when setStatusVisible() is called
+   * and if the property value is changed as expected.
+   */
+  @Test
+  public void testStatusVisible_setStatusVisible() throws Exception {
+    final boolean[] called = {false};
+    SimpleTestFormField testField = new SimpleTestFormField();
+    testField.addPropertyChangeListener(new PropertyChangeListener() {
+      @Override
+      public void propertyChange(PropertyChangeEvent evt) {
+        if ("statusVisible".equals(evt.getPropertyName()) && evt.getNewValue().equals(Boolean.FALSE)) {
+          called[0] = true;
+        }
+      }
+    });
+    testField.setStatusVisible(false);
+    assertFalse(testField.isStatusVisible());
+    assertTrue(called[0]);
   }
 
 }

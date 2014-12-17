@@ -681,6 +681,17 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   /**
+   * Configures whether or not the status icon is visible.
+   *
+   * @return {@code true} if status icon should be visible, {@code false} otherwise
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(200)
+  protected boolean getConfiguredStatusVisible() {
+    return true;
+  }
+
+  /**
    * @deprecated: Use a {@link ClassId} annotation as key for Doc-Text. Will be removed in the 5.0 Release.
    */
   @Deprecated
@@ -798,6 +809,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     setLabelWidthInPixel(getConfiguredLabelWidthInPixel());
     setLabelHorizontalAlignment(getConfiguredLabelHorizontalAlignment());
     setLabelVisible(getConfiguredLabelVisible());
+    setStatusVisible(getConfiguredStatusVisible());
     if (getConfiguredBackgroundColor() != null) {
       setBackgroundColor((getConfiguredBackgroundColor()));
     }
@@ -1893,6 +1905,16 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   @Override
   public List<IKeyStroke> getKeyStrokes() {
     return CollectionUtility.arrayList(propertySupport.<IKeyStroke> getPropertyList(PROP_KEY_STROKES));
+  }
+
+  @Override
+  public boolean isStatusVisible() {
+    return propertySupport.getPropertyBool(PROP_STATUS_VISIBLE);
+  }
+
+  @Override
+  public void setStatusVisible(boolean statusVisible) {
+    propertySupport.setPropertyBool(PROP_STATUS_VISIBLE, statusVisible);
   }
 
   private class P_MasterListener implements MasterListener {
