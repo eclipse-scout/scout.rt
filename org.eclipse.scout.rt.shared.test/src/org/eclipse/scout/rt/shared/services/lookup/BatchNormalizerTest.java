@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013 BSI Business Systems Integration AG.
+ * Copyright (c) 2014 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.server.services.lookup;
+package org.eclipse.scout.rt.shared.services.lookup;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -16,37 +16,46 @@ import static org.junit.Assert.fail;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.server.internal.Activator;
-import org.eclipse.scout.rt.shared.services.lookup.BatchLookupCall;
-import org.eclipse.scout.rt.shared.services.lookup.BatchLookupNormalizer;
-import org.eclipse.scout.rt.shared.services.lookup.BatchLookupResultCache;
-import org.eclipse.scout.rt.shared.services.lookup.IBatchLookupService;
-import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
-import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
-import org.eclipse.scout.rt.shared.services.lookup.ILookupService;
-import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
-import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
+import org.eclipse.scout.rt.shared.Activator;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.osgi.framework.ServiceRegistration;
 
 /**
  * Test {@link IBatchLookupService} and caching with {@link BatchLookupResultCache}.
- * Test for the deprecated {@link BatchLookupService} (server).
- * This test has been copied to the shared test fragment (for the BatchLookupService in the shared).
- * Will be removed with the N-Release (when the BatchLookupService in the server is removed)
+ *
+ * @since 4.3.0 (Mars-M5)
  */
 public class BatchNormalizerTest {
   private List<ServiceRegistration> m_reg;
-  private static long m_serverInvocations;
+  private IFruitLookupService m_lookupService;
 
   @Before
   public void setUp() throws Exception {
     //register services
-    m_reg = TestingUtility.registerServices(Activator.getDefault().getBundle(), 0, new FruitLookupService());
+    m_lookupService = Mockito.mock(IFruitLookupService.class);
+
+    Answer answer = new Answer<List<ILookupRow<Object>>>() {
+
+      @Override
+      public List<ILookupRow<Object>> answer(InvocationOnMock invocation) throws Throwable {
+        Object[] args = invocation.getArguments();
+        ILookupCall<?> call = (ILookupCall<?>) args[0];
+        return createCallResult(call);
+      }
+
+    };
+    Mockito.doAnswer(answer).when(m_lookupService).getDataByKey(Mockito.<ILookupCall<Object>> any());
+    Mockito.doAnswer(answer).when(m_lookupService).getDataByAll(Mockito.<ILookupCall<Object>> any());
+    Mockito.doAnswer(answer).when(m_lookupService).getDataByText(Mockito.<ILookupCall<Object>> any());
+    Mockito.doAnswer(answer).when(m_lookupService).getDataByRec(Mockito.<ILookupCall<Object>> any());
+
+    m_reg = TestingUtility.registerServices(Activator.getDefault().getBundle(), 0, m_lookupService);
   }
 
   @After
@@ -140,9 +149,7 @@ public class BatchNormalizerTest {
     testInternal(batchCall, 10 + 500, 10 + 500, 0, 1000);
   }
 
-  @SuppressWarnings("deprecation")
-  private void testInternal(BatchLookupCall batchCall, long expectedNormalizedSize, long expectedServerInvocations, long expectedNullArrayCount, long expectedTotalResultRowCount) throws Exception {
-    m_serverInvocations = 0;
+  private void testInternal(BatchLookupCall batchCall, int expectedNormalizedSize, int expectedServerInvocations, int expectedNullArrayCount, int expectedTotalResultRowCount) throws Exception {
     //
     BatchLookupNormalizer normalizer = new BatchLookupNormalizer();
     List<ILookupCall<?>> callArray = batchCall.getCallBatch();
@@ -153,7 +160,7 @@ public class BatchNormalizerTest {
     assertEquals(resultArray.size(), callArray.size());
     assertEquals(normResultArray.size(), normCallArray.size());
     assertEquals(expectedNormalizedSize, normResultArray.size());
-    assertEquals(expectedServerInvocations, m_serverInvocations);
+    Mockito.verify(m_lookupService, Mockito.times(expectedServerInvocations)).getDataByKey(Mockito.<ILookupCall<Object>> any());
     int rowCount = 0;
     int nullArrayCount = 0;
     for (int i = 0; i < resultArray.size(); i++) {
@@ -173,8 +180,8 @@ public class BatchNormalizerTest {
     assertEquals(expectedTotalResultRowCount, rowCount);
   }
 
-  private static List<ILookupRow<?>> createCallResult(ILookupCall call) {
-    List<ILookupRow<?>> result = new ArrayList<ILookupRow<?>>();
+  private static List<ILookupRow<Object>> createCallResult(ILookupCall<?> call) {
+    List<ILookupRow<Object>> result = new ArrayList<ILookupRow<Object>>();
     result.add(new LookupRow<Object>(call.getKey(), dumpCall(call)));
     return result;
   }
@@ -214,33 +221,6 @@ public class BatchNormalizerTest {
     }
   }
 
-  public interface IFruitLookupService extends ILookupService {
-  }
-
-  public static class FruitLookupService extends AbstractLookupService implements IFruitLookupService {
-
-    @Override
-    public List<ILookupRow<?>> getDataByKey(ILookupCall call) throws ProcessingException {
-      m_serverInvocations++;
-      return createCallResult(call);
-    }
-
-    @Override
-    public List<ILookupRow<?>> getDataByText(ILookupCall call) throws ProcessingException {
-      m_serverInvocations++;
-      return createCallResult(call);
-    }
-
-    @Override
-    public List<ILookupRow<?>> getDataByAll(ILookupCall call) throws ProcessingException {
-      m_serverInvocations++;
-      return createCallResult(call);
-    }
-
-    @Override
-    public List<ILookupRow<?>> getDataByRec(ILookupCall call) throws ProcessingException {
-      m_serverInvocations++;
-      return createCallResult(call);
-    }
+  public interface IFruitLookupService extends ILookupService<Object> {
   }
 }

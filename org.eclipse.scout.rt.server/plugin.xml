@@ -9,7 +9,7 @@
      <service class="org.eclipse.scout.rt.server.services.common.security.PermissionService"/>
      <service class="org.eclipse.scout.rt.server.services.common.security.LogoutService" factory="org.eclipse.scout.rt.server.services.ServerServiceFactory" session="org.eclipse.scout.rt.server.IServerSession"/>
      <service class="org.eclipse.scout.rt.server.services.common.session.ServerSessionRegistryService"/>
-     <service class="org.eclipse.scout.rt.server.services.lookup.BatchLookupService" factory="org.eclipse.scout.rt.server.services.ServerServiceFactory" session="org.eclipse.scout.rt.server.IServerSession"/>
+     <service class="org.eclipse.scout.rt.shared.services.lookup.BatchLookupService" factory="org.eclipse.scout.rt.server.services.ServerServiceFactory" session="org.eclipse.scout.rt.server.IServerSession"/>
      <service class="org.eclipse.scout.rt.shared.services.common.exceptionhandler.LogExceptionHandlerService"/>
      <service class="org.eclipse.scout.rt.server.services.common.processing.ServerProcessingCancelService" factory="org.eclipse.scout.rt.server.services.ServerServiceFactory" session="org.eclipse.scout.rt.server.IServerSession"/>
      <service class="org.eclipse.scout.rt.shared.services.common.text.ScoutTextProviderService" factory="org.eclipse.scout.rt.server.services.ServerServiceFactory" session="org.eclipse.scout.rt.server.IServerSession" ranking="-50"/>
