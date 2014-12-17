@@ -40,33 +40,22 @@ import org.eclipse.scout.service.SERVICES;
  * <p>
  * Ajax requests are processed as "/json" using HTTP POST, see {@link JsonMessageRequestInterceptor}
  */
+// TODO BSH Rename (FrontendServlet? UiServlet?)
 public abstract class AbstractScoutAppServlet extends HttpServletEx {
   private static final long serialVersionUID = 1L;
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractScoutAppServlet.class);
 
-  private P_AbstractInterceptor m_interceptGet = new P_AbstractInterceptor("GET") {
-
-    @Override
-    protected boolean intercept(IServletRequestInterceptor interceptor, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-      return interceptor.interceptGet(AbstractScoutAppServlet.this, req, resp);
-    }
-  };
-
-  private P_AbstractInterceptor m_interceptPost = new P_AbstractInterceptor("POST") {
-
-    @Override
-    protected boolean intercept(IServletRequestInterceptor interceptor, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-      return interceptor.interceptPost(AbstractScoutAppServlet.this, req, resp);
-    }
-  };
-
   private final IWebContentResourceLocator m_resourceLocator;
   private final IHttpCacheControl m_httpCacheControl;
+  private final P_AbstractRequestHandler m_requestHandlerGet;
+  private final P_AbstractRequestHandler m_requestHandlerPost;
 
   protected AbstractScoutAppServlet() {
     m_resourceLocator = createResourceLocator();
     m_httpCacheControl = createHttpCacheControl();
+    m_requestHandlerGet = createRequestHandlerGet();
+    m_requestHandlerPost = createRequestHandlerPost();
   }
 
   protected IWebContentResourceLocator createResourceLocator() {
@@ -86,6 +75,14 @@ public abstract class AbstractScoutAppServlet extends HttpServletEx {
     return m_httpCacheControl;
   }
 
+  protected P_AbstractRequestHandler createRequestHandlerGet() {
+    return new P_RequestHandlerGet();
+  }
+
+  protected P_AbstractRequestHandler createRequestHandlerPost() {
+    return new P_RequestHandlerPost();
+  }
+
   /**
    * @return a new uninitialized JsonSession
    */
@@ -93,51 +90,38 @@ public abstract class AbstractScoutAppServlet extends HttpServletEx {
 
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    LOG.info("GET request started: " + req.getRequestURI());
-
-    // The servlet is registered at '/'. To make relative URLs work, we need to make sure the request URL has a trailing '/'.
-    // It is not possible to just check for an empty pathInfo because the container returns "/" even if the user has not entered a '/' at the end.
-    String contextPath = getServletContext().getContextPath();
-    if (StringUtility.hasText(contextPath) && req.getRequestURI().endsWith(contextPath)) {
-      resp.sendRedirect(req.getRequestURI() + "/");
-      return;
-    }
-
-    ScoutAppHints.updateHints(req);
-
-    try {
-      m_interceptGet.intercept(req, resp);
-    }
-    catch (Exception ex) {
-      LOG.error("GET " + req.getRequestURI(), ex);
-      resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-    }
+    m_requestHandlerGet.handleRequest(req, resp);
   }
 
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-    LOG.info("POST request started: " + req.getRequestURI());
-    try {
-      m_interceptPost.intercept(req, resp);
+    m_requestHandlerPost.handleRequest(req, resp);
+  }
+
+  protected static String formatNanos(long nanos) {
+    String x = "" + nanos;
+    while (x.length() < 7) {
+      x = "0" + x;
     }
-    catch (Exception ex) {
-      LOG.error("POST " + req.getRequestURI(), ex);
-      resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-    }
+    return x.substring(0, x.length() - 6) + "." + x.substring(x.length() - 6);
   }
 
   /**
    * Template pattern.
    */
-  protected abstract class P_AbstractInterceptor {
+  protected abstract class P_AbstractRequestHandler {
 
     private final String m_requestType;
 
-    protected P_AbstractInterceptor(String requestType) {
+    protected P_AbstractRequestHandler(String requestType) {
       m_requestType = requestType;
     }
 
-    protected void intercept(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void handleRequest(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+      long start = System.nanoTime();
+      if (LOG.isDebugEnabled()) {
+        LOG.debug(m_requestType + " request " + req.getRequestURI() + " started");
+      }
       try {
         IServletRequestInterceptor[] interceptors = SERVICES.getServices(IServletRequestInterceptor.class);
         for (IServletRequestInterceptor interceptor : interceptors) {
@@ -147,14 +131,55 @@ public abstract class AbstractScoutAppServlet extends HttpServletEx {
         }
       }
       catch (Exception t) {
-        LOG.error("Exception while processing " + m_requestType + " request: " + req.getRequestURI(), t);
+        LOG.error("Exception while processing " + m_requestType + " request " + req.getRequestURI(), t);
         resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
       }
       finally {
-        LOG.info(m_requestType + " request finished: " + req.getRequestURI());
+        if (LOG.isDebugEnabled()) {
+          LOG.debug(m_requestType + " request " + req.getRequestURI() + " completed in " + formatNanos(System.nanoTime() - start) + "ms");
+        }
       }
     }
 
     protected abstract boolean intercept(IServletRequestInterceptor interceptor, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException;
+  }
+
+  protected class P_RequestHandlerGet extends P_AbstractRequestHandler {
+
+    protected P_RequestHandlerGet() {
+      super("GET");
+    }
+
+    @Override
+    protected void handleRequest(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+      // The servlet is registered at '/'. To make relative URLs work, we need to make sure the request URL has a trailing '/'.
+      // It is not possible to just check for an empty pathInfo because the container returns "/" even if the user has not entered a '/' at the end.
+      String contextPath = getServletContext().getContextPath();
+      if (StringUtility.hasText(contextPath) && req.getRequestURI().endsWith(contextPath)) {
+        resp.sendRedirect(req.getRequestURI() + "/");
+        return;
+      }
+
+      ScoutAppHints.updateHints(req);
+
+      super.handleRequest(req, resp);
+    }
+
+    @Override
+    protected boolean intercept(IServletRequestInterceptor interceptor, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+      return interceptor.interceptGet(AbstractScoutAppServlet.this, req, resp);
+    }
+  }
+
+  protected class P_RequestHandlerPost extends P_AbstractRequestHandler {
+
+    protected P_RequestHandlerPost() {
+      super("POST");
+    }
+
+    @Override
+    protected boolean intercept(IServletRequestInterceptor interceptor, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+      return interceptor.interceptPost(AbstractScoutAppServlet.this, req, resp);
+    }
   }
 }
