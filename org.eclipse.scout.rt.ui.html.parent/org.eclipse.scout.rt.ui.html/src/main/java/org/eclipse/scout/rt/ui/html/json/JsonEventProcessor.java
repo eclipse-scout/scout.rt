@@ -51,14 +51,16 @@ public class JsonEventProcessor {
     waitUntilJobsHaveFinished();
   }
 
-  private void processEvent(JsonEvent event, JsonResponse response) {
+  protected void processEvent(JsonEvent event, JsonResponse response) {
     final String id = event.getId();
     final IJsonAdapter jsonAdapter = m_jsonSession.getJsonAdapter(id);
     if (jsonAdapter == null) {
       throw new JsonException("No adapter found for id " + id);
     }
     try {
-      LOG.info("Handling event: ID=" + event.getId() + ", Type=" + event.getType());
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Handling event: ID=" + event.getId() + ", Type=" + event.getType());
+      }
       jsonAdapter.handleUiEvent(event, response);
       jsonAdapter.cleanUpEventFilters();
     }
@@ -71,11 +73,11 @@ public class JsonEventProcessor {
   /**
    * Wait until all sync jobs have been finished or only waitFor jobs are left.
    */
-  private void waitUntilJobsHaveFinished() {
+  protected void waitUntilJobsHaveFinished() {
     while (true) {
       List<ClientJob> jobList = getJobsForClientSession();
       if (jobList.isEmpty()) {
-        LOG.info("Job list is empty. Finish request");
+        LOG.trace("Job list is empty. Finish request");
         return;
       }
 
@@ -113,7 +115,7 @@ public class JsonEventProcessor {
   /**
    * Returns only jobs which belong to the current client session.
    */
-  private List<ClientJob> getJobsForClientSession() {
+  protected List<ClientJob> getJobsForClientSession() {
     List<ClientJob> jobList = new ArrayList<>();
     for (Job job : Job.getJobManager().find(ClientJob.class)) {
       if (job instanceof ClientJob) {
@@ -125,5 +127,4 @@ public class JsonEventProcessor {
     }
     return jobList;
   }
-
 }

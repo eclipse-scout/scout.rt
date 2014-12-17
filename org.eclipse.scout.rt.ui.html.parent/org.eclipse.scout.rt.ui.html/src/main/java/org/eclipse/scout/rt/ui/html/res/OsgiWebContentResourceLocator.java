@@ -40,8 +40,8 @@ public class OsgiWebContentResourceLocator implements IWebContentResourceLocator
     for (OsgiWebContentService s : SERVICES.getServices(OsgiWebContentService.class)) {
       URL url = s.getBundle().getEntry(resourcePath);
       if (url != null) {
-        if (LOG.isDebugEnabled()) {
-          LOG.debug("locate resource '" + resourcePath + "' -> " + url);
+        if (LOG.isTraceEnabled()) {
+          LOG.trace("locate resource '" + resourcePath + "' -> " + url);
         }
         return url;
       }

@@ -40,13 +40,13 @@ public class JEEWebContentResourceLocator implements IWebContentResourceLocator 
   protected URL getResourceImpl(String resourcePath) {
     try {
       URL url = m_servletContext.getResource(resourcePath);
-      if (url != null && LOG.isDebugEnabled()) {
-        LOG.debug("locate resource '" + resourcePath + "' -> " + url);
+      if (url != null && LOG.isTraceEnabled()) {
+        LOG.trace("locate resource '" + resourcePath + "' -> " + url);
       }
       return url;
     }
-    catch (MalformedURLException ex) {
-      LOG.warn("resourcePath: " + resourcePath, ex);
+    catch (MalformedURLException e) {
+      LOG.warn("Invalid URL: " + resourcePath, e);
       return null;
     }
   }
