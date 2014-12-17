@@ -45,6 +45,7 @@ public class InternalTableRow implements ITableRow, ICellObserver {
     if (DesktopProfiler.getInstance().isEnabled()) {
       DesktopProfiler.getInstance().registerTableRow(this);
     }
+    m_filterAccepted = true;
   }
 
   public InternalTableRow(ITable table) {
@@ -52,7 +53,6 @@ public class InternalTableRow implements ITableRow, ICellObserver {
     m_table = table;
     m_enabled = true;
     m_status = STATUS_NON_CHANGED;
-    m_filterAccepted = true;
     m_cells = new ArrayList<Cell>(table.getColumnCount());
     for (int i = 0; i < table.getColumnCount(); i++) {
       m_cells.add(new Cell(this));
