@@ -18,7 +18,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 
 /**
- * Helper to manage url param hints for the {@link AbstractScoutAppServlet}.
+ * Helper to manage url param hints for the {@link AbstractUiServlet}.
  * <p>
  * The following hints are supported:
  * <ul>
@@ -29,19 +29,19 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
  * </ul>
  * All values are <code>true</code> by default, unless the application is run in development mode.
  */
-public final class ScoutAppHints {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ScoutAppHints.class);
+public final class UiHints {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(UiHints.class);
 
   private static final String URL_PARAM_DEBUG = "debug";//enables/disbles cache, compress, minify
   private static final String URL_PARAM_CACHE_HINT = "cache";
   private static final String URL_PARAM_COMPRESS_HINT = "compress";
   private static final String URL_PARAM_MINIFY_HINT = "minify";
 
-  private static final String SESSION_ATTRIBUTE_CACHE_HINT = ScoutAppHints.class.getName() + "#cache";
-  private static final String SESSION_ATTRIBUTE_COMPRESS_HINT = ScoutAppHints.class.getName() + "#compress";
-  private static final String SESSION_ATTRIBUTE_MINIFY_HINT = ScoutAppHints.class.getName() + "#minify";
+  private static final String SESSION_ATTRIBUTE_CACHE_HINT = UiHints.class.getName() + "#cache";
+  private static final String SESSION_ATTRIBUTE_COMPRESS_HINT = UiHints.class.getName() + "#compress";
+  private static final String SESSION_ATTRIBUTE_MINIFY_HINT = UiHints.class.getName() + "#minify";
 
-  private ScoutAppHints() {
+  private UiHints() {
     // static access only
   }
 

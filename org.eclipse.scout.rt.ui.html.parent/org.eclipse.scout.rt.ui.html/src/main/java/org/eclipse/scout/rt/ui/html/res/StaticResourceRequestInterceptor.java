@@ -23,9 +23,9 @@ import org.eclipse.scout.commons.FileUtility;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.ui.html.AbstractScoutAppServlet;
+import org.eclipse.scout.rt.ui.html.AbstractUiServlet;
 import org.eclipse.scout.rt.ui.html.IServletRequestInterceptor;
-import org.eclipse.scout.rt.ui.html.ScoutAppHints;
+import org.eclipse.scout.rt.ui.html.UiHints;
 import org.eclipse.scout.rt.ui.html.StreamUtility;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
 import org.eclipse.scout.rt.ui.html.script.ScriptFileBuilder;
@@ -34,7 +34,7 @@ import org.eclipse.scout.rt.ui.html.scriptprocessor.ScriptProcessor;
 import org.eclipse.scout.service.AbstractService;
 
 /**
- * This interceptor contributes to the {@link AbstractScoutAppServlet} as the default GET handler for
+ * This interceptor contributes to the {@link AbstractUiServlet} as the default GET handler for
  * <p>
  * js, css, html, png, gif, jpg, woff
  */
@@ -48,7 +48,7 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
   private static final String UTF_8 = "UTF-8";
 
   @Override
-  public boolean interceptGet(AbstractScoutAppServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+  public boolean interceptGet(AbstractUiServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     String pathInfo = resolvePathInfo(req);
     LOG.debug("processing static resource: " + pathInfo);
 
@@ -88,7 +88,7 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
   }
 
   @Override
-  public boolean interceptPost(AbstractScoutAppServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+  public boolean interceptPost(AbstractUiServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     return false;
   }
 
@@ -120,7 +120,7 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
     return INDEX_HTML;
   }
 
-  protected String detectContentType(AbstractScoutAppServlet servlet, String path) {
+  protected String detectContentType(AbstractUiServlet servlet, String path) {
     int lastSlash = path.lastIndexOf('/');
     String fileName = lastSlash >= 0 ? path.substring(lastSlash + 1) : path;
     //Prefer mime type mapping from container
@@ -136,7 +136,7 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
   /**
    * create new resource
    */
-  protected HttpCacheObject loadResource(AbstractScoutAppServlet servlet, HttpServletRequest req, String pathInfo) throws ServletException, IOException {
+  protected HttpCacheObject loadResource(AbstractUiServlet servlet, HttpServletRequest req, String pathInfo) throws ServletException, IOException {
     if ((pathInfo.endsWith(".js") || pathInfo.endsWith(".css"))) {
       return loadScriptFile(servlet, req, pathInfo);
     }
@@ -149,9 +149,9 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
   /**
    * js, css
    */
-  protected HttpCacheObject loadScriptFile(AbstractScoutAppServlet servlet, HttpServletRequest req, String pathInfo) throws ServletException, IOException {
+  protected HttpCacheObject loadScriptFile(AbstractUiServlet servlet, HttpServletRequest req, String pathInfo) throws ServletException, IOException {
     ScriptFileBuilder builder = new ScriptFileBuilder(servlet.getResourceLocator(), getSharedScriptProcessor());
-    builder.setMinifyEnabled(ScoutAppHints.isMinifyHint(req));
+    builder.setMinifyEnabled(UiHints.isMinifyHint(req));
     ScriptOutput out = builder.buildScript(pathInfo);
     if (out != null) {
       return new HttpCacheObject(out.getPathInfo(), out.getContent(), out.getLastModified());
@@ -162,7 +162,7 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
   /**
    * html
    */
-  protected HttpCacheObject loadHtmlFile(AbstractScoutAppServlet servlet, HttpServletRequest req, String pathInfo) throws ServletException, IOException {
+  protected HttpCacheObject loadHtmlFile(AbstractUiServlet servlet, HttpServletRequest req, String pathInfo) throws ServletException, IOException {
     URL url = servlet.getResourceLocator().getWebContentResource(pathInfo);
     if (url == null) {
       //not handled here
@@ -176,7 +176,7 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
   /**
    * png, jpg, woff, pdf, docx
    */
-  protected HttpCacheObject loadBinaryFile(AbstractScoutAppServlet servlet, HttpServletRequest req, String pathInfo) throws ServletException, IOException {
+  protected HttpCacheObject loadBinaryFile(AbstractUiServlet servlet, HttpServletRequest req, String pathInfo) throws ServletException, IOException {
     URL url = servlet.getResourceLocator().getWebContentResource(pathInfo);
     if (url == null) {
       //not handled here
@@ -191,7 +191,7 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
    * Process all js and css script tags that contain the marker text "fingerprint". The marker text is replaced by the
    * effective files {@link HttpCacheObject#getFingerprint()} in hex format
    */
-  protected byte[] replaceHtmlScriptTags(AbstractScoutAppServlet servlet, HttpServletRequest req, byte[] content) throws IOException, ServletException {
+  protected byte[] replaceHtmlScriptTags(AbstractUiServlet servlet, HttpServletRequest req, byte[] content) throws IOException, ServletException {
     String oldHtml = new String(content, UTF_8);
     Matcher m = ScriptFileBuilder.SCRIPT_URL_PATTERN.matcher(oldHtml);
     StringBuilder buf = new StringBuilder();
@@ -202,7 +202,7 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
       if ("fingerprint".equals(m.group(4))) {
         replaceCount++;
         String fingerprint = null;
-        if (ScoutAppHints.isCacheHint(req)) {
+        if (UiHints.isCacheHint(req)) {
           HttpCacheObject obj = loadScriptFile(servlet, req, m.group());
           if (obj == null) {
             LOG.warn("Failed to locate resource referenced in html file '" + req.getPathInfo() + "': " + m.group());
@@ -217,7 +217,7 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
           buf.append("-");
           buf.append(fingerprint);
         }
-        if (ScoutAppHints.isMinifyHint(req)) {
+        if (UiHints.isMinifyHint(req)) {
           buf.append(".min");
         }
         buf.append(".");

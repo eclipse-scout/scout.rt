@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.ui.html.ScoutAppHints;
+import org.eclipse.scout.rt.ui.html.UiHints;
 
 public class DefaultHttpCacheControl implements IHttpCacheControl {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(DefaultHttpCacheControl.class);
@@ -34,7 +34,7 @@ public class DefaultHttpCacheControl implements IHttpCacheControl {
 
   @Override
   public void putCacheObject(HttpServletRequest req, HttpCacheObject o) {
-    if (!ScoutAppHints.isCacheHint(req)) {
+    if (!UiHints.isCacheHint(req)) {
       return;
     }
     m_cache.put(o.getPathInfo(), o);
@@ -42,7 +42,7 @@ public class DefaultHttpCacheControl implements IHttpCacheControl {
 
   @Override
   public HttpCacheObject getCacheObject(HttpServletRequest req, String pathInfo) {
-    if (!ScoutAppHints.isCacheHint(req)) {
+    if (!UiHints.isCacheHint(req)) {
       return null;
     }
     return m_cache.get(pathInfo);
@@ -50,7 +50,7 @@ public class DefaultHttpCacheControl implements IHttpCacheControl {
 
   @Override
   public HttpCacheObject removeCacheObject(HttpServletRequest req, String pathInfo) {
-    if (!ScoutAppHints.isCacheHint(req)) {
+    if (!UiHints.isCacheHint(req)) {
       return null;
     }
     return m_cache.remove(pathInfo);
@@ -58,7 +58,7 @@ public class DefaultHttpCacheControl implements IHttpCacheControl {
 
   @Override
   public boolean checkAndUpdateCacheHeaders(HttpServletRequest req, HttpServletResponse resp, HttpCacheInfo info) {
-    if (!ScoutAppHints.isCacheHint(req)) {
+    if (!UiHints.isCacheHint(req)) {
       disableCacheHeaders(req, resp);
       return false;
     }

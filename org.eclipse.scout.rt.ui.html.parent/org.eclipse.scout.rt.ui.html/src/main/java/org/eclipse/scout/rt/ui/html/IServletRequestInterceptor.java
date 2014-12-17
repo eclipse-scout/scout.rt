@@ -19,17 +19,17 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.scout.service.IService;
 
 /**
- * This interceptor contributes to the {@link AbstractScoutAppServlet}
+ * This interceptor contributes to the {@link AbstractUiServlet}
  */
 public interface IServletRequestInterceptor extends IService {
 
   /**
    * @return true if the request was consumed by the interceptor, no further action is then necessary
    */
-  boolean interceptPost(AbstractScoutAppServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException;
+  boolean interceptPost(AbstractUiServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException;
 
   /**
    * @return true if the request was consumed by the interceptor, no further action is then necessary
    */
-  boolean interceptGet(AbstractScoutAppServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException;
+  boolean interceptGet(AbstractUiServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException;
 }

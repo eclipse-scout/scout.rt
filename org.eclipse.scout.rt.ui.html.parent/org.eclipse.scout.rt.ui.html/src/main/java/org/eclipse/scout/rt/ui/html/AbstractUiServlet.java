@@ -16,6 +16,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.eclipse.scout.commons.DateUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -40,18 +41,17 @@ import org.eclipse.scout.service.SERVICES;
  * <p>
  * Ajax requests are processed as "/json" using HTTP POST, see {@link JsonMessageRequestInterceptor}
  */
-// TODO BSH Rename (FrontendServlet? UiServlet?)
-public abstract class AbstractScoutAppServlet extends HttpServletEx {
+public abstract class AbstractUiServlet extends HttpServletEx {
   private static final long serialVersionUID = 1L;
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractScoutAppServlet.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractUiServlet.class);
 
   private final IWebContentResourceLocator m_resourceLocator;
   private final IHttpCacheControl m_httpCacheControl;
   private final P_AbstractRequestHandler m_requestHandlerGet;
   private final P_AbstractRequestHandler m_requestHandlerPost;
 
-  protected AbstractScoutAppServlet() {
+  protected AbstractUiServlet() {
     m_resourceLocator = createResourceLocator();
     m_httpCacheControl = createHttpCacheControl();
     m_requestHandlerGet = createRequestHandlerGet();
@@ -98,14 +98,6 @@ public abstract class AbstractScoutAppServlet extends HttpServletEx {
     m_requestHandlerPost.handleRequest(req, resp);
   }
 
-  protected static String formatNanos(long nanos) {
-    String x = "" + nanos;
-    while (x.length() < 7) {
-      x = "0" + x;
-    }
-    return x.substring(0, x.length() - 6) + "." + x.substring(x.length() - 6);
-  }
-
   /**
    * Template pattern.
    */
@@ -136,7 +128,7 @@ public abstract class AbstractScoutAppServlet extends HttpServletEx {
       }
       finally {
         if (LOG.isDebugEnabled()) {
-          LOG.debug(m_requestType + " request " + req.getRequestURI() + " completed in " + formatNanos(System.nanoTime() - start) + "ms");
+          LOG.debug(m_requestType + " request " + req.getRequestURI() + " completed in " + DateUtility.formatNanos(System.nanoTime() - start) + "ms");
         }
       }
     }
@@ -160,14 +152,14 @@ public abstract class AbstractScoutAppServlet extends HttpServletEx {
         return;
       }
 
-      ScoutAppHints.updateHints(req);
+      UiHints.updateHints(req);
 
       super.handleRequest(req, resp);
     }
 
     @Override
     protected boolean intercept(IServletRequestInterceptor interceptor, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-      return interceptor.interceptGet(AbstractScoutAppServlet.this, req, resp);
+      return interceptor.interceptGet(AbstractUiServlet.this, req, resp);
     }
   }
 
@@ -179,7 +171,7 @@ public abstract class AbstractScoutAppServlet extends HttpServletEx {
 
     @Override
     protected boolean intercept(IServletRequestInterceptor interceptor, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-      return interceptor.interceptPost(AbstractScoutAppServlet.this, req, resp);
+      return interceptor.interceptPost(AbstractUiServlet.this, req, resp);
     }
   }
 }

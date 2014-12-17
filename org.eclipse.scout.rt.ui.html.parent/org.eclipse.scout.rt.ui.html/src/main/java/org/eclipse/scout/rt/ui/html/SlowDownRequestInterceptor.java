@@ -31,7 +31,7 @@ public class SlowDownRequestInterceptor extends AbstractService implements IServ
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SlowDownRequestInterceptor.class);
 
   @Override
-  public boolean interceptPost(AbstractScoutAppServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+  public boolean interceptPost(AbstractUiServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     if (!isEnabledOnSession(req)) {
       return false;
     }
@@ -51,7 +51,7 @@ public class SlowDownRequestInterceptor extends AbstractService implements IServ
   }
 
   @Override
-  public boolean interceptGet(AbstractScoutAppServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+  public boolean interceptGet(AbstractUiServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     updateState(req);
 
     return false;

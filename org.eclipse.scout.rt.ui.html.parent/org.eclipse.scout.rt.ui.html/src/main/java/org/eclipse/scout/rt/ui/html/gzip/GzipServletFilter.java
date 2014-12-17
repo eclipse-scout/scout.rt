@@ -24,7 +24,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.ui.html.ScoutAppHints;
+import org.eclipse.scout.rt.ui.html.UiHints;
 
 /**
  * Supports the servlet init-params
@@ -121,7 +121,7 @@ public class GzipServletFilter implements Filter {
   }
 
   protected boolean supportsGzipEncoding(HttpServletRequest req) {
-    if (!ScoutAppHints.isCompressHint(req)) {
+    if (!UiHints.isCompressHint(req)) {
       return false;
     }
     String pathInfo = req.getPathInfo();

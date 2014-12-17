@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.ui.html.ScoutAppHints;
+import org.eclipse.scout.rt.ui.html.UiHints;
 import org.eclipse.scout.rt.ui.html.StreamUtility;
 import org.eclipse.scout.rt.ui.html.res.IWebContentResourceLocator;
 import org.eclipse.scout.rt.ui.html.res.StaticResourceRequestInterceptor;
@@ -37,7 +37,7 @@ import org.eclipse.scout.rt.ui.html.scriptprocessor.ScriptProcessor;
  * {@link StaticResourceRequestInterceptor#resolveIndexHtml(javax.servlet.http.HttpServletRequest)} replaces it with the
  * effective hex fingerprint.
  * <p>
- * The js and css minify can be turned on and off using the url param ?minify=true, see {@link ScoutAppHints}
+ * The js and css minify can be turned on and off using the url param ?minify=true, see {@link UiHints}
  */
 public class ScriptFileBuilder {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ScriptFileBuilder.class);
