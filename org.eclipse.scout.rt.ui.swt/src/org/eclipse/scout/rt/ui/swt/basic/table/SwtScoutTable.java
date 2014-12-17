@@ -546,10 +546,16 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
         scrollToSelection();
         break;
       }
+      case TableEvent.TYPE_ROWS_DELETED:
+        getSwtTableViewer().remove(e.getRows().toArray());
+        swtTableEvent = new SwtScoutTableEvent();
+        break;
+      case TableEvent.TYPE_ALL_ROWS_DELETED:
+        getSwtTableViewer().getTable().removeAll();
+        swtTableEvent = new SwtScoutTableEvent();
+        break;
       case TableEvent.TYPE_ROWS_INSERTED:
       case TableEvent.TYPE_ROWS_UPDATED:
-      case TableEvent.TYPE_ROWS_DELETED:
-      case TableEvent.TYPE_ALL_ROWS_DELETED:
       case TableEvent.TYPE_ROW_FILTER_CHANGED:
       case TableEvent.TYPE_ROW_ORDER_CHANGED: {
         swtTableEvent = new SwtScoutTableEvent();
