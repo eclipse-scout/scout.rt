@@ -2,20 +2,16 @@ var MenuSpecHelper = function(session) {
   this.session = session;
 };
 
-MenuSpecHelper.prototype.createModel = function(id, text, icon, types) {
-  if (id === undefined) {
-    id = createUniqueAdapterId();
-  }
-
-  return {
-    "id": id,
+MenuSpecHelper.prototype.createModel = function(text, icon, types) {
+  var model = createSimpleModel('Menu');
+  $.extend(model, {
     "text": text,
     "iconId": icon,
     visible: true,
     separator: false,
-    menuTypes: types,
-    "objectType": "Menu"
-  };
+    menuTypes: types
+  });
+  return model;
 };
 
 MenuSpecHelper.prototype.createMenu = function(model) {

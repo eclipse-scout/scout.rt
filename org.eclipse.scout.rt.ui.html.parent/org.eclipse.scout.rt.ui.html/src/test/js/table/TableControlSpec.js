@@ -18,16 +18,12 @@ describe("TableControl", function() {
     jasmine.clock().uninstall();
   });
 
-  function createModel(id) {
-    if (id === undefined) {
-      id = createUniqueAdapterId();
-    }
-
-    var model = {
-      "id": id,
+  function createModel() {
+    var model = createSimpleModel('TableControl');
+    $.extend({
       "enabled": true,
       "visible": true
-    };
+    });
 
     return model;
   }

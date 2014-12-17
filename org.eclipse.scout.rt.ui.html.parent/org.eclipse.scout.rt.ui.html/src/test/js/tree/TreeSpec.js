@@ -15,13 +15,11 @@ describe("Tree", function() {
   });
 
   function createModelFixture(nodeCount, depth, expanded) {
-    return createModel(createUniqueAdapterId(), createModelNodes(nodeCount, depth, expanded));
+    return createModel(createModelNodes(nodeCount, depth, expanded));
   }
 
-  function createModel(id, nodes) {
-    var model = {
-      "id": id
-    };
+  function createModel(nodes) {
+    var model = createSimpleModel('Tree');
 
     if (nodes) {
       model.nodes = nodes;

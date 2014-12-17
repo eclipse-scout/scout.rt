@@ -149,7 +149,7 @@ scout.ModelAdapter.prototype.removeChild = function(childAdapter) {
  * for the given property when the propertyName is in the _adapterProperties array.
  */
 scout.ModelAdapter.prototype._eachProperty = function(model, func) {
-  var propertyName, value, i, j, adapter, adapters;
+  var propertyName, value, i;
 
   // Loop through primitive properties
   for (propertyName in model) {

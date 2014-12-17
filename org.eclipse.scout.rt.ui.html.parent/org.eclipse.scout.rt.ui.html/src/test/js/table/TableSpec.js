@@ -525,11 +525,10 @@ describe("Table", function() {
       var table = helper.createTable(model);
       table.render(session.$entryPoint);
 
-      var menuId = createUniqueAdapterId();
-      var menuModel = helper.createMenuModel(menuId, 'menu');
+      var menuModel = helper.createMenuModel('menu');
       //register adapter
       helper.menuHelper.createMenu(menuModel);
-      table.menus = session.getOrCreateModelAdapters([menuId], table);
+      table.menus = [session.getModelAdapter(menuModel.id)];
       var $row0 = table._$scrollable.children().eq(0);
       $row0.triggerContextMenu();
 
@@ -544,11 +543,10 @@ describe("Table", function() {
       var table = helper.createTable(model);
       table.render(session.$entryPoint);
 
-      var menuId = createUniqueAdapterId();
-      var menuModel = helper.createMenuModel(menuId, 'menu');
+      var menuModel = helper.createMenuModel('menu');
       //register adapter
       helper.menuHelper.createMenu(menuModel);
-      table.menus = session.getOrCreateModelAdapters([menuId], table);
+      table.menus = [session.getModelAdapter(menuModel.id)];
       var $row0 = table._$scrollable.children().eq(0);
       $row0.triggerContextMenu();
 

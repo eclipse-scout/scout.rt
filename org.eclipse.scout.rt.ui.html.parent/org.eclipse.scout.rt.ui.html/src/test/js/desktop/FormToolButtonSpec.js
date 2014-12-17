@@ -11,16 +11,12 @@ describe("FormToolButton", function() {
     };
   });
 
-  function createModel(id) {
-    if (id === undefined) {
-      id = createUniqueAdapterId();
-    }
-
-    var model = {
-      "id": id,
+  function createModel() {
+    var model = createSimpleModel('FormToolButton');
+    $.extend({
       "enabled": true,
       "visible": true
-    };
+    });
 
     return model;
   }

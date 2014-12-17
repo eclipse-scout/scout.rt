@@ -9,34 +9,32 @@ describe("TabBox", function() {
     helper = new FormSpecHelper(session);
   });
 
-  function createField(model) {
-    var field = new scout.TabBox();
-    field.init(model, session);
-    return field;
-  }
+  function createTabBox(tabItems) {
+    var model = helper.createFieldModel('TabBox');
 
-  function createModel(tabItems) {
-    var model = helper.createFieldModel();
-    model.tabItems = tabItems;
+    model.tabItems = [];
+    for (var i=0; i < tabItems.length; i++) {
+      model.tabItems.push(tabItems[i].id);
+    }
     model.selectedTab = 0;
-    return model;
+    model.parent = session.rootAdapter.id;
+
+    return createAdapter(model, session, tabItems);
   }
 
   describe("render", function() {
-//    var field;
+    var field;
 
-    //FIXME CGU requires possibility to build adapterDataCache
-//    beforeEach(function() {
-//      var groupBox = helper.createModel();
-//      field = createField(createModel([groupBox.id]));
-//    });
+    beforeEach(function() {
+      var groupBox = helper.createFieldModel('TabItem');
+      field = createTabBox([groupBox]);
+    });
 
-
-//    it("does NOT call layout for the selected tab on initialization", function() {
-//      var validatorSpy = spyOn(session.layoutValidator, 'revalidate').and.callThrough();
-//      field.render(session.$entryPoint);
-//      expect(validatorSpy.revalidate).not.toHaveBeenCalled();
-//    });
+    it("does NOT call layout for the selected tab on initialization", function() {
+      spyOn(session.layoutValidator, 'revalidate').and.callThrough();
+      field.render(session.$entryPoint);
+      expect(session.layoutValidator.revalidate).not.toHaveBeenCalled();
+    });
 
   });
 

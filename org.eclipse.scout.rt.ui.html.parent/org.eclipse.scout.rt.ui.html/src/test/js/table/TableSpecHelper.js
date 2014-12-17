@@ -4,14 +4,9 @@ var TableSpecHelper = function(session) {
   this.menuHelper = new MenuSpecHelper(session);
 };
 
-TableSpecHelper.prototype.createModel = function(id, columns, rows) {
-  if (id === undefined) {
-    id = createUniqueAdapterId();
-  }
-
+TableSpecHelper.prototype.createModel = function(columns, rows) {
   var model = createSimpleModel('Table');
   $.extend(model, {
-    "id": id,
     "headerVisible": true,
     "multiSelect": true
   });
@@ -86,8 +81,8 @@ TableSpecHelper.prototype.createModelCell = function(text, value) {
   return cell;
 };
 
-TableSpecHelper.prototype.createMenuModel = function(id, text, icon) {
-  return this.menuHelper.createModel(id, text, icon, ['Table.SingleSelection']);
+TableSpecHelper.prototype.createMenuModel = function(text, icon) {
+  return this.menuHelper.createModel(text, icon, ['Table.SingleSelection']);
 };
 
 TableSpecHelper.prototype.createModelColumns = function(count, columnType) {
@@ -130,7 +125,7 @@ TableSpecHelper.prototype.createModelSingleColumnByTexts = function(texts) {
   for (var i=0; i < texts.length; i++) {
     rows.push(this.createModelRowByTexts(i, texts[i]));
   }
-  return this.createModel('t1', this.createModelColumns(1), rows);
+  return this.createModel(this.createModelColumns(1), rows);
 };
 
 TableSpecHelper.prototype.createModelSingleColumnByValues = function(values, columnType) {
@@ -138,11 +133,11 @@ TableSpecHelper.prototype.createModelSingleColumnByValues = function(values, col
   for (var i=0; i < values.length; i++) {
     rows.push(this.createModelRowByValues(i, values[i]));
   }
-  return this.createModel('t1', this.createModelColumns(1, columnType), rows);
+  return this.createModel(this.createModelColumns(1, columnType), rows);
 };
 
 TableSpecHelper.prototype.createModelFixture = function(colCount, rowCount) {
-  return this.createModel(createUniqueAdapterId(), this.createModelColumns(colCount), this.createModelRows(colCount, rowCount));
+  return this.createModel(this.createModelColumns(colCount), this.createModelRows(colCount, rowCount));
 };
 
 TableSpecHelper.prototype.createTable = function(model) {
