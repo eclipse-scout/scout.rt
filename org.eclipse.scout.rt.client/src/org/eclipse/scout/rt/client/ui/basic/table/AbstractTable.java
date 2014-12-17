@@ -1646,7 +1646,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     ITableRowDataMapper mapper = createTableRowDataMapper(rowType);
     for (int i = 0, ni = rowDatas.size(); i < ni; i++) {
       AbstractTableRowData rowData = rowDatas.get(i);
-      if (rowData.getRowState() != AbstractTableFieldData.STATUS_DELETED && mapper.acceptImport(rowData)) {
+      if (rowData.getRowState() != AbstractTableRowData.STATUS_DELETED && mapper.acceptImport(rowData)) {
         ITableRow newTableRow = new TableRow(getColumnSet());
         mapper.importTableRowData(newTableRow, rowData);
         newRows.add(newTableRow);
@@ -1662,7 +1662,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         //
         for (int i = 0, ni = rowDatas.size(); i < ni; i++) {
           AbstractTableRowData rowData = rowDatas.get(i);
-          if (rowData.getRowState() == AbstractTableFieldData.STATUS_DELETED && mapper.acceptImport(rowData)) {
+          if (rowData.getRowState() == AbstractTableRowData.STATUS_DELETED && mapper.acceptImport(rowData)) {
             ITableRow newTableRow = new TableRow(getColumnSet());
             mapper.importTableRowData(newTableRow, rowData);
             newTableRow.setStatus(ITableRow.STATUS_NON_CHANGED);

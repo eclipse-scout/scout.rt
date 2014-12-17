@@ -33,7 +33,7 @@ import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
  * <li>{@link #removeRow(int)}</li>
  * <li>{@link #clearRows()}</li>
  * </ul>
- * 
+ *
  * @since 3.8.2
  */
 public abstract class AbstractTableFieldBeanData extends AbstractFormFieldData implements ITableBeanHolder {
@@ -67,7 +67,7 @@ public abstract class AbstractTableFieldBeanData extends AbstractFormFieldData i
 
   /**
    * Replaces the rows with the given array.
-   * 
+   *
    * @param rows
    */
   public void setRows(AbstractTableRowData[] rows) {
@@ -90,7 +90,7 @@ public abstract class AbstractTableFieldBeanData extends AbstractFormFieldData i
 
   /**
    * Returns the row at the given index.
-   * 
+   *
    * @param index
    * @return
    */
@@ -109,7 +109,7 @@ public abstract class AbstractTableFieldBeanData extends AbstractFormFieldData i
 
   /**
    * Create, adds and returns a new {@link AbstractTableRowData} which row state is initialized with the given value.
-   * 
+   *
    * @param rowState
    * @return
    */
@@ -122,20 +122,20 @@ public abstract class AbstractTableFieldBeanData extends AbstractFormFieldData i
   }
 
   /**
-   * @return Creates a new {@link AbstractTableRowData} without adding it to this {@link AbstractTableFieldData}. Its
-   *         actual type is the one returned by {@link #getRowType()}.
+   * @return Creates a new {@link AbstractTableRowData} without adding it to this {@link AbstractTableFieldBeanData}.
+   *         Its actual type is the one returned by {@link #getRowType()}.
    */
   public abstract AbstractTableRowData createRow();
 
   /**
-   * @return Returns the type of the rows managed by this {@link AbstractTableFieldData}.
+   * @return Returns the type of the rows managed by this {@link AbstractTableFieldBeanData}.
    */
   @Override
   public abstract Class<? extends AbstractTableRowData> getRowType();
 
   /**
    * Removes the row at the given index.
-   * 
+   *
    * @param index
    */
   @Override
@@ -146,7 +146,7 @@ public abstract class AbstractTableFieldBeanData extends AbstractFormFieldData i
 
   /**
    * Removes the given row.
-   * 
+   *
    * @param row
    * @returns Returns <code>true</code> if the row was removed. Otherwise <code>false</code>.
    */
