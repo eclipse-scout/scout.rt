@@ -96,6 +96,14 @@ public class JsonAdapterRegistry {
     return childAdapters;
   }
 
+  public long getJsonAdapterCount() {
+    long size = 0;
+    for (Map<Object, P_RegistryValue> modelAdapterMap : m_parentAdapterMap.values()) {
+      size += modelAdapterMap.size();
+    }
+    return size;
+  }
+
   public void dispose() {
     for (P_RegistryValue value : CollectionUtility.arrayList(m_idAdapterMap.values())) {
       IJsonAdapter<?> jsonAdapter = value.getJsonAdapter();

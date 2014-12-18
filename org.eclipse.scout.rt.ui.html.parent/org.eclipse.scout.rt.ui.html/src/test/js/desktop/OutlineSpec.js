@@ -1,0 +1,116 @@
+describe("Outline", function() {
+  var session;
+
+  beforeEach(function() {
+    setFixtures(sandbox());
+    session = new scout.Session($('#sandbox'), '1.1');
+    jasmine.Ajax.install();
+    jasmine.clock().install();
+  });
+
+  afterEach(function() {
+    session = null;
+    jasmine.Ajax.uninstall();
+    jasmine.clock().uninstall();
+  });
+
+  function createModelFixture(nodeCount, depth, expanded) {
+    return createModel(createModelNodes(nodeCount, depth, expanded));
+  }
+
+  function createModel(nodes) {
+    var model = createSimpleModel('Tree');
+
+    if (nodes) {
+      model.nodes = nodes;
+    }
+
+    return model;
+  }
+
+  function createModelNode(id, text) {
+    return {
+      "id": id,
+      "text": text
+    };
+  }
+
+  function createModelNodes(nodeCount, depth, expanded) {
+    return createModelNodesInternal(nodeCount, depth, expanded);
+  }
+
+  function createModelNodesInternal(nodeCount, depth, expanded, parentNode) {
+    if (!nodeCount) {
+      return;
+    }
+
+    var nodes = [],
+      nodeId;
+    if (!depth) {
+      depth = 0;
+    }
+    for (var i = 0; i < nodeCount; i++) {
+      nodeId = i;
+      if (parentNode) {
+        nodeId = parentNode.id + '_' + nodeId;
+      }
+      nodes[i] = createModelNode(nodeId, 'node ' + i);
+      nodes[i].expanded = expanded;
+      if (depth > 0) {
+        nodes[i].childNodes = createModelNodesInternal(nodeCount, depth - 1, expanded, nodes[i]);
+      }
+    }
+    return nodes;
+  }
+
+  function createOutline(model) {
+    var tree = new scout.Outline();
+    tree.init(model, session);
+    return tree;
+  }
+
+  function createNodesDeletedEvent(model, nodeIds, commonParentNodeId) {
+    return {
+      id: model.id,
+      commonParentNodeId: commonParentNodeId,
+      nodeIds: nodeIds,
+      type: 'nodesDeleted'
+    };
+  }
+
+  describe("onModelAction", function() {
+
+    describe("nodesDeleted event", function() {
+      var model;
+      var tree;
+      var node0;
+      var node1;
+      var node2;
+
+      beforeEach(function() {
+        // A large tree is used to properly test recursion
+        model = createModelFixture(3, 2, true);
+        tree = createOutline(model);
+        node0 = model.nodes[0];
+        node1 = model.nodes[1];
+        node2 = model.nodes[2];
+      });
+
+      describe("deleting a node", function() {
+
+        it("calls onNodeDeleted for every node to be able to cleanup", function() {
+          spyOn(tree, '_onNodeDeleted');
+
+          var message = {
+            events: [createNodesDeletedEvent(model, [node0.id])]
+          };
+          session._processSuccessResponse(message);
+
+          expect(tree._onNodeDeleted.calls.count()).toBe(13);
+        });
+
+      });
+
+    });
+  });
+});

@@ -427,7 +427,8 @@ describe("Tree", function() {
       var node2;
 
       beforeEach(function() {
-        model = createModelFixture(3, 1, true);
+        // A large tree is used to properly test recursion
+        model = createModelFixture(3, 2, true);
         tree = createTree(model);
         node0 = model.nodes[0];
         node1 = model.nodes[1];
@@ -441,7 +442,7 @@ describe("Tree", function() {
           var node2Child1 = node2.childNodes[1];
           expect(tree.nodes.length).toBe(3);
           expect(tree.nodes[0]).toBe(node0);
-          expect(Object.keys(tree._nodeMap).length).toBe(12);
+          expect(Object.keys(tree._nodeMap).length).toBe(39);
 
           var message = {
             events: [createNodesDeletedEvent(model, [node2Child0.id], node2.id)]
@@ -450,7 +451,7 @@ describe("Tree", function() {
 
           expect(tree.nodes[2].childNodes.length).toBe(2);
           expect(tree.nodes[2].childNodes[0]).toBe(node2Child1);
-          expect(Object.keys(tree._nodeMap).length).toBe(11);
+          expect(Object.keys(tree._nodeMap).length).toBe(35);
         });
 
         it("updates html document", function() {
@@ -458,7 +459,7 @@ describe("Tree", function() {
 
           var node2Child0 = node2.childNodes[0];
 
-          expect(findAllNodes(tree).length).toBe(12);
+          expect(findAllNodes(tree).length).toBe(39);
           expect(tree.$nodeById(node2Child0.id).length).toBe(1);
 
           //Delete a child node
@@ -467,7 +468,7 @@ describe("Tree", function() {
           };
           session._processSuccessResponse(message);
 
-          expect(findAllNodes(tree).length).toBe(11);
+          expect(findAllNodes(tree).length).toBe(35);
           expect(tree.$nodeById(node2Child0.id).length).toBe(0);
 
           expect(tree.$nodeById(node0.id).length).toBe(1);
@@ -487,7 +488,7 @@ describe("Tree", function() {
 
           expect(tree.nodes.length).toBe(2);
           expect(tree.nodes[0]).toBe(node1);
-          expect(Object.keys(tree._nodeMap).length).toBe(8);
+          expect(Object.keys(tree._nodeMap).length).toBe(26);
         });
 
         it("updates html document", function() {
@@ -498,11 +499,41 @@ describe("Tree", function() {
           };
           session._processSuccessResponse(message);
 
-          expect(findAllNodes(tree).length).toBe(8);
+          expect(findAllNodes(tree).length).toBe(26);
           expect(tree.$nodeById(node0.id).length).toBe(0);
           expect(tree.$nodeById(node0.childNodes[0].id).length).toBe(0);
           expect(tree.$nodeById(node0.childNodes[1].id).length).toBe(0);
           expect(tree.$nodeById(node0.childNodes[2].id).length).toBe(0);
+        });
+
+        describe("deleting a collapsed root node", function() {
+          it("updates model", function() {
+            node0.expanded = false;
+            var message = {
+              events: [createNodesDeletedEvent(model, [node0.id])]
+            };
+            session._processSuccessResponse(message);
+
+            expect(tree.nodes.length).toBe(2);
+            expect(tree.nodes[0]).toBe(node1);
+            expect(Object.keys(tree._nodeMap).length).toBe(26);
+          });
+
+          it("updates html document", function() {
+            node0.expanded = false;
+            tree.render(session.$entryPoint);
+
+            var message = {
+              events: [createNodesDeletedEvent(model, [node0.id])]
+            };
+            session._processSuccessResponse(message);
+
+            expect(findAllNodes(tree).length).toBe(26);
+            expect(tree.$nodeById(node0.id).length).toBe(0);
+            expect(tree.$nodeById(node0.childNodes[0].id).length).toBe(0);
+            expect(tree.$nodeById(node0.childNodes[1].id).length).toBe(0);
+            expect(tree.$nodeById(node0.childNodes[2].id).length).toBe(0);
+          });
         });
       });
 

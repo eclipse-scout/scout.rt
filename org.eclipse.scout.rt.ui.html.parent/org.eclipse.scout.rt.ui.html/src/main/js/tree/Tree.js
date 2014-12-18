@@ -298,6 +298,9 @@ scout.Tree.prototype._onNodesDeleted = function(nodeIds, parentNodeId) {
   //update model and nodemap
   updateNodeMap = function(parentNode, node) {
     delete this._nodeMap[node.id];
+    if (this._onNodeDeleted) {
+      this._onNodeDeleted(node);
+    }
   }.bind(this);
 
   if (parentNodeId >= 0) {
@@ -319,6 +322,9 @@ scout.Tree.prototype._onNodesDeleted = function(nodeIds, parentNodeId) {
       scout.arrays.remove(this.nodes, node);
     }
     delete this._nodeMap[nodeId];
+    if (this._onNodeDeleted) { // Necessary for subclasses
+      this._onNodeDeleted(node);
+    }
     deletedNodes.push(node);
 
     //remove children from node map
@@ -417,7 +423,7 @@ scout.Tree.prototype._removeNodes = function(nodes, parentNodeId, $parentNode) {
 
   //If every child node was deleted mark node as collapsed (independent of the model state)
   //--> makes it consistent with addNodes and expand (expansion is not allowed if there are no child nodes)
-  if ($parentNode) {
+  if ($parentNode && $parentNode.length > 0) {
     childNodes = $parentNode.data('node').childNodes;
     if (!childNodes || childNodes.length === 0) {
       $parentNode.removeClass('expanded');

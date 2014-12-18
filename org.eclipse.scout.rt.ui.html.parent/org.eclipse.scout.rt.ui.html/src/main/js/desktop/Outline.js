@@ -31,6 +31,14 @@ scout.Outline.prototype._initTreeNode = function(parentNode, node) {
   }
 };
 
+scout.Outline.prototype._onNodeDeleted = function(node) {
+  // Destroy table, which is attached at the root adapter. Form gets destroyed by form close event
+  if (node.detailTable) {
+    node.detailTable.destroy();
+    node.detailTable = null;
+  }
+};
+
 scout.Outline.prototype._renderSelection = function($nodes) {
   scout.Outline.parent.prototype._renderSelection.call(this, $nodes);
 

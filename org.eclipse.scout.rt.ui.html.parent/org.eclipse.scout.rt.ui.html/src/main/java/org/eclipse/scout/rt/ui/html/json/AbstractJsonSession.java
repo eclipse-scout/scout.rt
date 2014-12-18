@@ -441,6 +441,10 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
   @Override
   public JSONObject processRequest(HttpServletRequest httpRequest, JsonRequest jsonRequest) {
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Adapter count before request: " + m_jsonAdapterRegistry.getJsonAdapterCount());
+    }
+
     try {
       m_currentHttpRequest = httpRequest;
       m_currentJsonRequest = jsonRequest;
@@ -449,6 +453,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
       }
       JsonResponse jsonResponse = currentJsonResponse();
       getJsonEventProcessor().processEvents(m_currentJsonRequest, jsonResponse);
+
       return jsonResponse.toJson();
     }
     finally {
@@ -456,6 +461,10 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
       // reset event map (aka jsonResponse) when response has been sent to client
       m_currentJsonResponse = createJsonResponse();
       flush();
+
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("Adapter count after request: " + m_jsonAdapterRegistry.getJsonAdapterCount());
+      }
     }
   }
 

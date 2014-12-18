@@ -20,6 +20,7 @@ import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
+import org.json.JSONObject;
 
 public class JsonContextMenu<T extends IContextMenu> extends AbstractJsonPropertyObserver<T> {
 
@@ -48,6 +49,12 @@ public class JsonContextMenu<T extends IContextMenu> extends AbstractJsonPropert
     }
     getModel().removeContextMenuListener(m_contextMenuListener);
     m_contextMenuListener = null;
+  }
+
+  @Override
+  public JSONObject toJson() {
+    // ContextMenu is just a wrapper, not a real adapter meant to be sent to client
+    return null;
   }
 
   @Override

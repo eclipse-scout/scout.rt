@@ -68,7 +68,9 @@ scout.Session = function($entryPoint, jsonSessionId, options) {
 
   this.modelAdapterRegistry[jsonSessionId] = this; // FIXME CGU maybe better separate session object from event processing, create ClientSession.js?. If yes, desktop should not have rootadapter as parent, see 406
   this.rootAdapter = new scout.ModelAdapter();
-  this.rootAdapter.init({id: '1'}, this);
+  this.rootAdapter.init({
+    id: '1'
+  }, this);
   this.objectFactory.register(options.objectFactories || scout.defaultObjectFactories);
 
   // Extract custom parameters from URL
@@ -80,7 +82,7 @@ scout.Session = function($entryPoint, jsonSessionId, options) {
 };
 
 scout.Session.prototype.unregisterModelAdapter = function(modelAdapter) {
-  this.modelAdapterRegistry[modelAdapter.id] = null;
+  delete this.modelAdapterRegistry[modelAdapter.id];
 };
 
 scout.Session.prototype.registerModelAdapter = function(modelAdapter) {
@@ -211,6 +213,7 @@ scout.Session.prototype._sendRequest = function(request) {
 };
 
 scout.Session.prototype._processSuccessResponse = function(message) {
+  var cacheSize;
   // Normalize
   if (message.adapterData === undefined) {
     message.adapterData = {};
@@ -229,10 +232,13 @@ scout.Session.prototype._processSuccessResponse = function(message) {
     this.layoutValidator.validate();
   } finally {
     this.processingEvents = false;
-    var cacheSize = scout.objects.countProperties(this._adapterDataCache);
-    if (cacheSize > 0) {
-      $.log.debug('size of _adapterDataCache after response has been processed: ' + cacheSize);
-    }
+  }
+
+  if ($.log.isDebugEnabled()) {
+    cacheSize = scout.objects.countProperties(this._adapterDataCache);
+    $.log.debug('size of _adapterDataCache after response has been processed: ' + cacheSize);
+    cacheSize = scout.objects.countProperties(this.modelAdapterRegistry);
+    $.log.debug('size of modelAdapterRegistry after response has been processed: ' + cacheSize);
   }
 
   if (this._deferred) {
@@ -440,7 +446,7 @@ scout.Session.prototype.registerChildWindow = function(childWindow) {
 scout.Session.prototype.text = function(textKey) {
   if (this.textExists(textKey)) {
     var len = arguments.length,
-        text = this._textMap[textKey];
+      text = this._textMap[textKey];
     if (len === 1) {
       return text;
     } else {
