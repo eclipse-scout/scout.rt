@@ -41,10 +41,6 @@ public abstract class AbstractForm5 extends AbstractForm implements IForm5 {
     super(true);
   }
 
-  // TODO AWE: (scout) remove method private void composeTitle() in AbstractForm
-  // title and sub-title are separated in the new UI, concatenation should be done
-  // in the UI, if required at all.
-
   public AbstractForm5(boolean callInitializer) throws ProcessingException {
     super(callInitializer);
   }

@@ -41,7 +41,7 @@ public class JsonForm<T extends IForm> extends AbstractJsonPropertyObserver<T> i
   public static final String EVENT_FORM_CLOSING = "formClosing";
   public static final String PROP_FORM_ID = "formId";
   public static final String PROP_TITLE = IForm.PROP_TITLE;
-  public static final String PROP_SUB_TITLE = "subTitle";
+  public static final String PROP_SUB_TITLE = IForm.PROP_SUB_TITLE;
   public static final String PROP_ICON_ID = IForm.PROP_ICON_ID;
   public static final String PROP_MINIMIZE_ENABLED = IForm.PROP_MINIMIZE_ENABLED;
   public static final String PROP_MAXIMIZE_ENABLED = IForm.PROP_MAXIMIZE_ENABLED;
