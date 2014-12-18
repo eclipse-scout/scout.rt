@@ -107,9 +107,15 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   private final ObjectExtensions<AbstractColumn<VALUE>, IColumnExtension<VALUE, ? extends AbstractColumn<VALUE>>> m_objectExtensions;
 
   public AbstractColumn() {
+    this(true);
+  }
+
+  public AbstractColumn(boolean callInitializer) {
     m_headerCell = new HeaderCell();
     m_objectExtensions = new ObjectExtensions<AbstractColumn<VALUE>, IColumnExtension<VALUE, ? extends AbstractColumn<VALUE>>>(this);
-    interceptInitConfig();
+    if (callInitializer) {
+      callInitializer();
+    }
     propertySupport.addPropertyChangeListener(new PropertyChangeListener() {
       @Override
       public void propertyChange(PropertyChangeEvent evt) {
@@ -124,6 +130,10 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
         }
       }
     });
+  }
+
+  protected final void callInitializer() {
+    interceptInitConfig();
   }
 
   public final void clearValidatedValues() {
