@@ -146,10 +146,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   private boolean m_autoRegisterInDesktopOnStart;
   private int m_displayHint;// no property, is fixed
   private String m_displayViewId;// no property, is fixed
-  private boolean m_displayHintLocked = false;// no property, is fixed
   private int m_closeType = IButton.SYSTEM_TYPE_NONE;
-  private String m_basicTitle;
-  private String m_subTitle;
   private String m_cancelVerificationText;
   private File m_lastXmlFileForStorage;
   private IGroupBox m_mainBox;
@@ -862,7 +859,6 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     }
     setHandler(handler);
     m_closeType = IButton.SYSTEM_TYPE_NONE;
-    m_displayHintLocked = true;
     m_blockingCondition.setBlocking(true);
     try {
       // check if form was made invisible ( = access control denied access)
@@ -1202,7 +1198,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
           }
         }
         else {
-            LOG.warn("cannot find field data for '" + fieldQId + "' in form '" + getClass().getName() + "'.");
+          LOG.warn("cannot find field data for '" + fieldQId + "' in form '" + getClass().getName() + "'.");
         }
       }
     }
@@ -2078,7 +2074,6 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
         ((P_Timer) it.next()).setStopSignal();
       }
       m_scoutTimerMap.clear();
-      m_displayHintLocked = false;
       m_formLoading = true;
     }
     catch (Throwable t) {
@@ -2608,56 +2603,23 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   @Override
-  public String getBasicTitle() {
-    return m_basicTitle;
+  public String getTitle() {
+    return propertySupport.getPropertyString(PROP_TITLE);
   }
 
   @Override
-  public void setBasicTitle(String basicTitle) {
-    m_basicTitle = basicTitle;
-    composeTitle();
+  public void setTitle(String title) {
+    propertySupport.setPropertyString(PROP_TITLE, title);
   }
 
   @Override
   public String getSubTitle() {
-    return m_subTitle;
+    return propertySupport.getPropertyString(PROP_SUB_TITLE);
   }
 
   @Override
   public void setSubTitle(String subTitle) {
-    m_subTitle = subTitle;
-    composeTitle();
-  }
-
-  @Override
-  public void setTitle(String s) {
-    m_basicTitle = s;
-    m_subTitle = null;
-    composeTitle();
-  }
-
-  private void composeTitle() {
-    StringBuffer buf = new StringBuffer();
-    String basic = getBasicTitle();
-    if (basic != null) {
-      if (buf.length() > 0) {
-        buf.append(" - ");
-      }
-      buf.append(basic);
-    }
-    String sub = getSubTitle();
-    if (sub != null) {
-      if (buf.length() > 0) {
-        buf.append(" - ");
-      }
-      buf.append(sub);
-    }
-    propertySupport.setPropertyString(PROP_TITLE, buf.toString());
-  }
-
-  @Override
-  public String getTitle() {
-    return propertySupport.getPropertyString(PROP_TITLE);
+    propertySupport.setPropertyString(PROP_SUB_TITLE, subTitle);
   }
 
   @Override

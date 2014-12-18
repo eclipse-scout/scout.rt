@@ -199,7 +199,7 @@ public class SwtScoutDialog extends Dialog implements ISwtScoutPart {
   protected void setTitleFromScout(String title) {
     IForm f = getForm();
     //
-    String s = f.getBasicTitle();
+    String s = f.getTitle();
     getShell().setText(StringUtility.removeNewLines(s != null ? s : ""));
     //
     s = f.getSubTitle();

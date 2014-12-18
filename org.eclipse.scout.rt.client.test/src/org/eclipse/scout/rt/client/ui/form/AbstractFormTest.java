@@ -14,6 +14,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.Order;
@@ -25,7 +28,7 @@ import org.junit.Test;
 
 /**
  * JUnit tests for {@link AbstractForm}
- * 
+ *
  * @since 3.10.0
  */
 public class AbstractFormTest {
@@ -121,6 +124,42 @@ public class AbstractFormTest {
       public class EmbeddedField extends AbstractWrappedFormField<TestFormWithClassId> {
       }
     }
+  }
+
+  @Test
+  public void testGetSetTitle() throws Exception {
+    final boolean[] called = {false};
+    IForm form = new TestFormWithClassId();
+    PropertyChangeListener l = new PropertyChangeListener() {
+      @Override
+      public void propertyChange(PropertyChangeEvent evt) {
+        if ("title".equals(evt.getPropertyName()) && "foo".equals(evt.getNewValue())) {
+          called[0] = true;
+        }
+      }
+    };
+    form.addPropertyChangeListener(l);
+    form.setTitle("foo");
+    assertEquals("foo", form.getTitle());
+    assertTrue(called[0]);
+  }
+
+  @Test
+  public void testGetSetSubTitle() throws Exception {
+    final boolean[] called = {false};
+    IForm form = new TestFormWithClassId();
+    PropertyChangeListener l = new PropertyChangeListener() {
+      @Override
+      public void propertyChange(PropertyChangeEvent evt) {
+        if ("subTitle".equals(evt.getPropertyName()) && "bar".equals(evt.getNewValue())) {
+          called[0] = true;
+        }
+      }
+    };
+    form.addPropertyChangeListener(l);
+    form.setSubTitle("bar");
+    assertEquals("bar", form.getSubTitle());
+    assertTrue(called[0]);
   }
 
 }

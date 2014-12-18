@@ -50,6 +50,7 @@ import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 public interface IForm extends IPropertyObserver, ITypeWithSettableClassId {
 
   String PROP_TITLE = "title";
+  String PROP_SUB_TITLE = "subTitle";
   String PROP_MINIMIZE_ENABLED = "minimizeEnabled";
   String PROP_MAXIMIZE_ENABLED = "maximizeEnabled";
   String PROP_MINIMIZED = "minimized";
@@ -422,9 +423,9 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId {
 
   boolean isEmpty();
 
-  String getBasicTitle();
+  String getTitle();
 
-  void setBasicTitle(String basicTitle);
+  void setTitle(String title);
 
   String getSubTitle();
 
@@ -438,10 +439,6 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId {
   int getCloseSystemType();
 
   void setCloseSystemType(int saveType);
-
-  String getTitle();
-
-  void setTitle(String s);
 
   /**
    * UI hint that gui should be maximized
