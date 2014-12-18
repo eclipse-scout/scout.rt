@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.desktop.outline;
 import org.eclipse.scout.rt.shared.ui.menu.AbstractMenu5;
 
 // TODO AWE: (navi) home button implementieren, wenn auf top-level, wollen wir das wirklich?
-// TODO BSH OutlineNavigationButton | Cleanup and comment this class
 public abstract class AbstractOutlineNavigationMenu extends AbstractMenu5 {
 
   private IOutline m_outline;
