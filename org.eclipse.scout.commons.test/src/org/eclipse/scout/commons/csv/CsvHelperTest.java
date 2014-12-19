@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.List;
 
@@ -141,5 +142,67 @@ public class CsvHelperTest {
       String[] x = line.split(",");
       assertEquals(x.length, 5);
     }
+  }
+
+  /**
+   * This test methods verifies the default settings of the csv helper regarding separator, text delimiter and line
+   * separator.
+   * If in any case these defaults change, migration notes must be provided.
+   */
+  @Test
+  public void testDefaultSettings() {
+    // empty constructor
+    CsvHelper csvHelper = new CsvHelper();
+    assertEquals("Default separator character is wrong", (char) ',', csvHelper.getSeparatorChar());
+    assertEquals("Default text delimiter character is wrong", (char) '"', csvHelper.getTextDelimiterChar());
+    assertEquals("Default line separator is wrong", "\n", csvHelper.getLineSeparator());
+
+    // non-empty constructor (different default value behavior: separator , vs. ;)
+    csvHelper = new CsvHelper(null, null, null, null);
+    assertEquals("Default separator character is wrong", (char) ';', csvHelper.getSeparatorChar());
+    assertEquals("Default text delimiter character is wrong", (char) '"', csvHelper.getTextDelimiterChar());
+    assertEquals("Default line separator is wrong", "\n", csvHelper.getLineSeparator());
+
+    csvHelper = new CsvHelper(null, (char) 0, (char) 0, null);
+    assertEquals("Default separator character is wrong", (char) ';', csvHelper.getSeparatorChar());
+    assertEquals("Default text delimiter character is wrong", (char) '"', csvHelper.getTextDelimiterChar());
+    assertEquals("Default line separator is wrong", "\n", csvHelper.getLineSeparator());
+  }
+
+  @Test
+  public void testExportDataWithTextEncode() throws ProcessingException {
+    StringWriter writer;
+
+    // no special characters -> not encoded
+    writer = new StringWriter();
+    m_csvHelper.exportDataRow(new Object[]{"ab", "bc", "cd"}, writer, true);
+    assertEquals("ab,bc,cd\n", writer.toString());
+
+    // text containing a character that is neither separator, text delimiter nor line break -> not encode
+    writer = new StringWriter();
+    m_csvHelper.exportDataRow(new Object[]{";ab", "b;c", "cd;"}, writer, true);
+    assertEquals(";ab,b;c,cd;\n", writer.toString());
+
+    // text containing separator -> encoded
+    writer = new StringWriter();
+    m_csvHelper.exportDataRow(new Object[]{",ab", "b,c", "cd,"}, writer, true);
+    assertEquals("\",ab\",\"b,c\",\"cd,\"\n", writer.toString());
+
+    // text containing text delimiter -> encoded (text delimiter inside text is doubled)
+    writer = new StringWriter();
+    m_csvHelper.exportDataRow(new Object[]{"\"ab", "b\"c", "cd\""}, writer, true);
+    assertEquals("\"\"\"ab\",\"b\"\"c\",\"cd\"\"\"\n", writer.toString());
+
+    // text containing line separator -> not encoded (by default)
+    writer = new StringWriter();
+    m_csvHelper.exportDataRow(new Object[]{"\nab", "b\nc", "cd\n"}, writer, true);
+    assertEquals("\nab,b\nc,cd\n\n", writer.toString());
+
+    // text containing line separator with line separator encoding enabled -> encoded
+    CsvHelper csvHelper = new CsvHelper();
+    csvHelper.setEncodeLineSeparator(true);
+    writer = new StringWriter();
+    csvHelper.exportDataRow(new Object[]{"\nab", "b\nc", "cd\n"}, writer, true);
+    assertEquals("\"\nab\",\"b\nc\",\"cd\n\"\n", writer.toString());
   }
 }
