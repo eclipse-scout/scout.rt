@@ -49,15 +49,16 @@ public class CsvHelper {
    */
   public static final String IGNORED_COLUMN_NAME = "null";
 
-  private Locale m_locale;
-  private char m_separatorChar;// ";"
-  private char m_textDelimiterChar;// "\""
-  private String m_lineSeparator;// "\n"
+  private final Locale m_locale;
+  private final char m_separatorChar;// ";"
+  private final char m_textDelimiterChar;// "\""
+  private final String m_lineSeparator;// "\n"
   private int m_colCount;
   private List<String> m_colNames;
   private List<String> m_colTypes;
   private List<Format> m_colFormat;
   private boolean[] m_ignoredColumns;
+  private boolean m_encodeLineSeparator;
 
   public CsvHelper() {
     this(null, ',', '"', "\n");
@@ -73,6 +74,33 @@ public class CsvHelper {
     m_textDelimiterChar = textDelimiterChar != 0x00 ? textDelimiterChar : '"';
     m_lineSeparator = lineSeparator != null ? lineSeparator : "\n";
     m_colFormat = new ArrayList<Format>();
+  }
+
+  public Locale getLocale() {
+    return m_locale;
+  }
+
+  public char getSeparatorChar() {
+    return m_separatorChar;
+  }
+
+  public char getTextDelimiterChar() {
+    return m_textDelimiterChar;
+  }
+
+  public String getLineSeparator() {
+    return m_lineSeparator;
+  }
+
+  public boolean isEncodeLineSeparator() {
+    return m_encodeLineSeparator;
+  }
+
+  /**
+   * Configures whether a text containing the line separator should be encoded.
+   */
+  public void setEncodeLineSeparator(boolean encodeLineSeparator) {
+    m_encodeLineSeparator = encodeLineSeparator;
   }
 
   /**
@@ -490,7 +518,7 @@ public class CsvHelper {
     if (m_textDelimiterChar != 0x00) {
       if (text != null) {
         text = stringReplace(text, "" + m_textDelimiterChar, "" + m_textDelimiterChar + m_textDelimiterChar);
-        if (text.indexOf(m_separatorChar) >= 0 || text.indexOf(m_textDelimiterChar) >= 0) {
+        if (text.indexOf(m_separatorChar) >= 0 || text.indexOf(m_textDelimiterChar) >= 0 || (m_encodeLineSeparator && text.indexOf(m_lineSeparator) >= 0)) {
           text = m_textDelimiterChar + text + m_textDelimiterChar;
         }
       }
