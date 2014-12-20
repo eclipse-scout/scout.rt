@@ -19,8 +19,8 @@ import java.util.regex.Pattern;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.ui.html.UiHints;
 import org.eclipse.scout.rt.ui.html.StreamUtility;
+import org.eclipse.scout.rt.ui.html.UiHints;
 import org.eclipse.scout.rt.ui.html.res.IWebContentResourceLocator;
 import org.eclipse.scout.rt.ui.html.res.StaticResourceRequestInterceptor;
 import org.eclipse.scout.rt.ui.html.script.ScriptSource.NodeType;
@@ -42,7 +42,7 @@ import org.eclipse.scout.rt.ui.html.scriptprocessor.ScriptProcessor;
 public class ScriptFileBuilder {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ScriptFileBuilder.class);
 
-  private static final Pattern INCLUDE_PAT = Pattern.compile("//\\s*@include\\s*\\(\\s*(?:\"([^\"]+)\"|'([^']+)')\\s*\\)");
+  private static final Pattern INCLUDE_PAT = Pattern.compile("(?://\\s*@|__)include\\s*\\(\\s*(?:\"([^\"]+)\"|'([^']+)')\\s*\\)");
 
   private static final String UTF_8 = "UTF-8";
 

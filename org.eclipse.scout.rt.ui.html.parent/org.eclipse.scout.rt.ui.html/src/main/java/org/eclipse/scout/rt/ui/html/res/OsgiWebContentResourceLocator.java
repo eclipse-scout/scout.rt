@@ -33,6 +33,13 @@ public class OsgiWebContentResourceLocator implements IWebContentResourceLocator
     if (path.startsWith("/")) {
       path = path.substring(1);
     }
+
+    //XXX rmeove
+    if (path.startsWith("src")) {
+      return getResourceImpl("/" + path);
+    }
+
+    //FIXME imo handle '../..' hacks
     return getResourceImpl("WebContent/" + path);
   }
 
