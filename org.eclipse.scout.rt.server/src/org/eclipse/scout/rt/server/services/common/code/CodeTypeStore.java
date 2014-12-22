@@ -87,7 +87,7 @@ public class CodeTypeStore {
       cache.unloadCodeTypes(types);
     }
     // notify clients
-    SERVICES.getService(IClientNotificationService.class).putNotification(new CodeTypeChangedNotification(types), new AllUserFilter(120000L));
+    SERVICES.getService(IClientNotificationService.class).putNotification(new CodeTypeChangedNotification(types), new AllUserFilter(AllUserFilter.DEFAULT_TIMEOUT));
   }
 
   private class PartitionLanguageComposite {

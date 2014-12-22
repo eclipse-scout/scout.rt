@@ -10,10 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.code;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -21,14 +23,21 @@ import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.osgi.BundleClassDescriptor;
 import org.eclipse.scout.rt.server.internal.Activator;
+import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationFilter;
+import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;
 import org.eclipse.scout.rt.server.services.common.code.fixture.TestCodeType1;
 import org.eclipse.scout.rt.server.services.common.code.fixture.TestCodeType2;
+import org.eclipse.scout.rt.shared.services.common.code.AbstractCodeType;
+import org.eclipse.scout.rt.shared.services.common.code.CodeTypeChangedNotification;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeService;
+import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.testing.server.runner.ScoutServerTestRunner;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.service.SERVICES;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mockito;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.ServiceRegistration;
 
@@ -150,5 +159,75 @@ public class CodeServiceTest {
     protected boolean acceptClass(Bundle bundle, Class<?> c) {
       return super.acceptClass(bundle, c) && (c != TestCodeType2.class);
     }
+  }
+
+  /* ---------------------------------------------------------------------------------------------- */
+  /* Tests for Bug 444213 - Test that IClientNotificationService is called in unloadCodeTypeCache() */
+  /* ---------------------------------------------------------------------------------------------- */
+
+  @Test
+  public void testReloadCodeType() throws Exception {
+    IClientNotificationService clientNotificationService = Mockito.mock(IClientNotificationService.class);
+    List<ServiceRegistration> reg = TestingUtility.registerServices(Activator.getDefault().getBundle(), 1000, clientNotificationService);
+    try {
+      CodeService codeService = new CodeService();
+      codeService.reloadCodeType(SomeCodeType.class);
+
+      ArgumentCaptor<CodeTypeChangedNotification> notification = ArgumentCaptor.forClass(CodeTypeChangedNotification.class);
+      ArgumentCaptor<IClientNotificationFilter> filter = ArgumentCaptor.forClass(IClientNotificationFilter.class);
+      Mockito.verify(clientNotificationService).putNotification(notification.capture(), filter.capture());
+
+      assertEquals("CodeType list in the notification size", 1, notification.getValue().getCodeTypes().size());
+      assertEquals("CodeType list(0) class", SomeCodeType.class, notification.getValue().getCodeTypes().get(0));
+    }
+    finally {
+      TestingUtility.unregisterServices(reg);
+    }
+  }
+
+  @Test
+  public void testReloadCodeTypes() throws Exception {
+    IClientNotificationService clientNotificationService = Mockito.mock(IClientNotificationService.class);
+    List<ServiceRegistration> reg = TestingUtility.registerServices(Activator.getDefault().getBundle(), 1000, clientNotificationService);
+    try {
+      CodeService codeService = new CodeService();
+      List<Class<? extends ICodeType<?, ?>>> list = new ArrayList<Class<? extends ICodeType<?, ?>>>();
+      list.add(SomeCodeType.class);
+      list.add(DummyCodeType.class);
+      codeService.reloadCodeTypes(list);
+
+      ArgumentCaptor<CodeTypeChangedNotification> notification = ArgumentCaptor.forClass(CodeTypeChangedNotification.class);
+      ArgumentCaptor<IClientNotificationFilter> filter = ArgumentCaptor.forClass(IClientNotificationFilter.class);
+      Mockito.verify(clientNotificationService).putNotification(notification.capture(), filter.capture());
+
+      assertEquals("CodeType list in the notification size", 2, notification.getValue().getCodeTypes().size());
+      assertEquals("CodeType list(0) class", SomeCodeType.class, notification.getValue().getCodeTypes().get(0));
+      assertEquals("CodeType list(1) class", DummyCodeType.class, notification.getValue().getCodeTypes().get(1));
+    }
+    finally {
+      TestingUtility.unregisterServices(reg);
+    }
+  }
+
+  static class SomeCodeType extends AbstractCodeType<Long, String> {
+
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public Long getId() {
+      return 100L;
+    }
+
+  }
+
+  static class DummyCodeType extends AbstractCodeType<Long, String> {
+
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public Long getId() {
+      return 500L;
+    }
+
   }
 }

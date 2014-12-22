@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -46,7 +46,7 @@ public abstract class AbstractUserActivityStateService extends AbstractService i
       m_users.put(userId, status);
       if (oldStatus != status) {
         UserStatusMap map = getUserStatusMap();
-        SERVICES.getService(IClientNotificationService.class).putNotification(new UserActivityClientNotification(map), new AllUserFilter(120000L));
+        SERVICES.getService(IClientNotificationService.class).putNotification(new UserActivityClientNotification(map), new AllUserFilter(AllUserFilter.DEFAULT_TIMEOUT));
       }
     }
   }
