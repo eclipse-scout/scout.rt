@@ -2,7 +2,7 @@ AWE 16.12.2014
 org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop
 API isOutlineChanging hinzugefügt
 
-org.docx4j.org.xhtmlrenderer.pdf.AbstractFormField
+org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField
 API set/isStatusVisible hinzugefügt
 
 AWE 17.12.2014

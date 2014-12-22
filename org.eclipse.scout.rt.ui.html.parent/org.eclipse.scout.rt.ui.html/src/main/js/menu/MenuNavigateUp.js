@@ -16,13 +16,18 @@ scout.MenuNavigateUp.prototype._toggleDetail = function() {
 // Menu is enabled when level of node is > 0
 scout.MenuNavigateUp.prototype._menuEnabled = function(node) {
   var $node = this.outline.$nodeById(node.id);
-  return $node.attr('data-level') > 0;
+  return $node.attr('data-level') >= 0;
 };
 
 scout.MenuNavigateUp.prototype._drill = function(node) {
   var parentNode = node.parentNode;
-  $.log.debug('drill up to node ' + parentNode);
-  this.outline._navigateUp = true;
-  this.outline.setNodesSelected(parentNode);
-  this.outline.setNodeExpanded(parentNode, undefined, false);
+  if (parentNode) {
+    $.log.debug('drill up to node ' + parentNode);
+    this.outline._navigateUp = true;
+    this.outline.setNodesSelected(parentNode);
+    this.outline.setNodeExpanded(parentNode, undefined, false);
+  } else {
+    $.log.debug('show default detail form');
+    this.outline._showDefaultDetailForm();
+  }
 };

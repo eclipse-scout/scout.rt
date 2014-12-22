@@ -10,9 +10,8 @@ scout.inherits(scout.Outline, scout.Tree);
  */
 scout.Outline.prototype._render = function($parent) {
   scout.Outline.parent.prototype._render.call(this, $parent);
-
   if (this.selectedNodeIds.length === 0) {
-    this._updateOutlineTab();
+    this._showDefaultDetailForm();
   }
 };
 
@@ -69,49 +68,54 @@ scout.Outline.prototype.setNodesSelected = function(nodes, $nodes) {
   }
 };
 
+scout.Outline.prototype._showDefaultDetailForm = function() {
+  var form = this.defaultDetailForm;
+  if (form) {
+    this.session.desktop.updateOutlineTab(form, form.title);
+    this.events.trigger('outlineUpdated', {});
+  }
+};
+
 scout.Outline.prototype._updateOutlineTab = function(node) {
-  var content, parentText, nodeText, title, subTitle;
+  // FIXME AWE: (outline) remove these errors if error never occurs in application
+  if (!node) {
+    throw new Error('called updateOutlineTab without node, should call showDefaultDetailForm instead?');
+  }
   if (this.session.desktop.outline !== this) {
-    // only update desktop if the outline is the active one
-    return;
+    throw new Error('called updateOutlineTab but event affects another outline');
   }
 
-  if (node) {
-    // Unlink detail form if it was closed.
-    // May happen in the following case:
-    // The form gets closed on execPageDeactivated.
-    // No detailFormChanged event will be fired because the deactivated page is not selected anymore
-    if (node.detailForm && node.detailForm.destroyed) {
-      node.detailForm = null;
-    }
-
-    if (node.detailForm && node.detailFormVisible) {
-      content = node.detailForm;
-    } else {
-      content = node.detailTable;
-    }
-
-    if (node.parentNode && node.parentNode.text) {
-      parentText = node.parentNode.text;
-    }
-    if (node.detailForm && node.detailForm.title) {
-      nodeText = node.detailForm.title;
-    } else {
-      nodeText = node.text;
-    }
-
-    if (parentText && nodeText) {
-      title = parentText;
-      subTitle = nodeText;
-    } else if (parentText) {
-      title = parentText;
-    } else if (nodeText) {
-      title = nodeText;
-    }
+  // Unlink detail form if it was closed.
+  // May happen in the following case:
+  // The form gets closed on execPageDeactivated.
+  // No detailFormChanged event will be fired because the deactivated page is not selected anymore
+  var content, parentText, nodeText, title, subTitle;
+  if (node.detailForm && node.detailForm.destroyed) {
+    node.detailForm = null;
   }
-  else if (this.defaultDetailForm) {
-    content = this.defaultDetailForm;
-    title = this.defaultDetailForm.title;
+
+  if (node.detailForm && node.detailFormVisible) {
+    content = node.detailForm;
+  } else {
+    content = node.detailTable;
+  }
+
+  if (node.parentNode && node.parentNode.text) {
+    parentText = node.parentNode.text;
+  }
+  if (node.detailForm && node.detailForm.title) {
+    nodeText = node.detailForm.title;
+  } else {
+    nodeText = node.text;
+  }
+
+  if (parentText && nodeText) {
+    title = parentText;
+    subTitle = nodeText;
+  } else if (parentText) {
+    title = parentText;
+  } else if (nodeText) {
+    title = nodeText;
   }
   this.session.desktop.updateOutlineTab(content, title, subTitle);
   this.events.trigger('outlineUpdated', {node: node});
@@ -131,7 +135,7 @@ scout.Outline.prototype.onFormChanged = function(nodeId, detailForm) {
   }
   else {
     this.defaultDetailForm = this.session.getOrCreateModelAdapter(detailForm, this);
-    this._updateOutlineTab();
+    this._showDefaultDetailForm();
   }
 };
 
@@ -147,7 +151,7 @@ scout.Outline.prototype.onTableChanged = function(nodeId, detailTable) {
     }
   }
   else {
-    this._updateOutlineTab();
+    this._showDefaultDetailForm();
   }
 };
 

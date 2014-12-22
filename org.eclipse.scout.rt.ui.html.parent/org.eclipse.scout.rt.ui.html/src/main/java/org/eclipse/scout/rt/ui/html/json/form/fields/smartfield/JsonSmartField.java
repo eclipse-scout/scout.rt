@@ -128,13 +128,6 @@ public class JsonSmartField<V, T extends ISmartField<V>> extends JsonValueField<
     return getModel().getClass().isAnnotationPresent(Multiline.class);
   }
 
-  // TODO AWE This method is never called!
-  protected JSONObject addOptions(JSONObject json) {
-    // TODO AWE: (smartfield) überlegen ob wir die optionen wirklich hier laden wollen oder besser erst,
-    // wenn das popup im UI zum ersten mal geöffnet wird.
-    return putProperty(json, PROP_OPTIONS, loadOptions(IContentAssistField.BROWSE_ALL_TEXT));
-  }
-
   protected List<? extends ILookupRow<V>> loadOptions(final String query) {
     try {
       m_options = getModel().callBrowseLookup(query, MAX_OPTIONS);
