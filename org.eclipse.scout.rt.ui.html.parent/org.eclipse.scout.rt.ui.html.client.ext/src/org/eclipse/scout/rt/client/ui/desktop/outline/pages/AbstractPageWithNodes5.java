@@ -22,8 +22,6 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.internal.TablePageTreeMenuWrapper;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutlineNavigationMenu;
-import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline5;
-import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineEvent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineMenuType;
 import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineNavigation;
 import org.eclipse.scout.rt.client.ui.form.FormMenuType;
@@ -35,11 +33,7 @@ import org.eclipse.scout.rt.shared.ui.menu.IMenu5;
 import org.eclipse.scout.rt.shared.ui.menu.MenuWrapper;
 import org.eclipse.scout.service.SERVICES;
 
-public abstract class AbstractPageWithNodes5 extends AbstractExtensiblePageWithNodes implements IPage5 {
-
-  private boolean m_detailFormVisible = true;
-
-  private boolean m_navigateUp;
+public abstract class AbstractPageWithNodes5 extends AbstractExtensiblePageWithNodes {
 
   public AbstractPageWithNodes5() {
     super();
@@ -51,7 +45,7 @@ public abstract class AbstractPageWithNodes5 extends AbstractExtensiblePageWithN
 
   @Override
   protected void execInitPage() throws ProcessingException {
-    ITable table = getInternalTable();
+    ITable table = getTable();
     table.addMenu(OutlineNavigation.createUp(getOutline()));
     table.addMenu(OutlineNavigation.createDown(getOutline()));
   }
@@ -78,7 +72,6 @@ public abstract class AbstractPageWithNodes5 extends AbstractExtensiblePageWithN
   @Override
   public void pageActivatedNotify() {
     super.pageActivatedNotify();
-    handleNavigateUp();
     try {
       ensureDetailFormCreated();
       ensureDetailFormStarted();
@@ -86,20 +79,6 @@ public abstract class AbstractPageWithNodes5 extends AbstractExtensiblePageWithN
     catch (ProcessingException e) {
       SERVICES.getService(IExceptionHandlerService.class).handleException(e);
     }
-  }
-
-  protected void handleNavigateUp() {
-    if (m_navigateUp) {
-      m_navigateUp = false;
-    }
-    else {
-      setDetailFormVisible(true);
-    }
-  }
-
-  @Override
-  public void setNavigateUp() {
-    m_navigateUp = true;
   }
 
   @Override
@@ -131,15 +110,6 @@ public abstract class AbstractPageWithNodes5 extends AbstractExtensiblePageWithN
       }
     }
     setDetailForm(form);
-  }
-
-  @Override
-  public void setDetailForm(IForm form) {
-    IForm oldDetailForm = getDetailForm();
-    if (oldDetailForm != form) {
-      super.setDetailForm(form);
-      fireOutlineEvent(OutlineEvent.TYPE_PAGE_CHANGED);
-    }
   }
 
   protected void ensureDetailFormStarted() throws ProcessingException {
@@ -180,36 +150,4 @@ public abstract class AbstractPageWithNodes5 extends AbstractExtensiblePageWithN
     }
   }
 
-  @Override
-  public boolean isDetailFormVisible() {
-    return m_detailFormVisible;
-  }
-
-  @Override
-  public void setDetailFormVisible(boolean visible) {
-    boolean oldVisible = m_detailFormVisible;
-    if (oldVisible != visible) {
-      m_detailFormVisible = visible;
-      fireOutlineEvent(OutlineEvent.TYPE_PAGE_CHANGED);
-    }
-  }
-
-  @Override
-  public void setTableVisible(boolean visible) {
-    boolean oldVisible = isTableVisible();
-    if (oldVisible != visible) {
-      super.setTableVisible(visible);
-      fireOutlineEvent(OutlineEvent.TYPE_PAGE_CHANGED);
-    }
-  }
-
-  /**
-   * Note: set*Visible methods are called by initConfig(), at this point getTree() is still null.
-   * Tree can also be null during shutdown.
-   */
-  protected void fireOutlineEvent(int eventType) {
-    if (getTree() != null) {
-      ((IOutline5) getOutline()).fireOutlineEvent(new OutlineEvent(getTree(), eventType, this));
-    }
-  }
 }

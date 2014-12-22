@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.desktop.outline;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
-import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithNodes;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -38,28 +37,22 @@ public class DefaultPageChangeStrategy5 implements IPageChangeStrategy {
     try {
       if (activePage != null) {
         activePage.ensureChildrenLoaded();
-
+        if (activePage.isDetailFormVisible()) { // FIXME AWE: (page) not sure if this if is a good idea ('if' wasn't there initially)
+          detailForm = activePage.getDetailForm();
+        }
+        if (activePage.isTableVisible()) {
+          detailTable = activePage.getTable();
+        }
         if (activePage instanceof IPageWithTable) {
           IPageWithTable tablePage = (IPageWithTable) activePage;
-          detailForm = activePage.getDetailForm();
-          if (activePage.isTableVisible()) {
-            detailTable = tablePage.getTable();
-          }
           if (tablePage.isSearchActive()) {
             searchForm = tablePage.getSearchFormInternal();
-          }
-        }
-        else if (activePage instanceof IPageWithNodes) {
-          IPageWithNodes nodePage = (IPageWithNodes) activePage;
-          detailForm = activePage.getDetailForm();
-          if (activePage.isTableVisible()) {
-            detailTable = nodePage.getInternalTable();
           }
         }
       }
       else {
         if (outline instanceof IOutline5) {
-          //FIXME remove from interface, better do it in AbstractOutline handleActivePageChanged
+          // FIXME CGU: remove from interface, better do it in AbstractOutline handleActivePageChanged
           ((IOutline5) outline).ensureDefaultDetailFormCreated();
           ((IOutline5) outline).ensureDefaultDetailFormStarted();
           detailForm = ((IOutline5) outline).getDefaultDetailForm();

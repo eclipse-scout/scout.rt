@@ -57,11 +57,13 @@ scout.Outline.prototype._renderSelection = function($nodes) {
 };
 
 
+// FIXME AWE: (page) unit-test setNodesSelected
 scout.Outline.prototype.setNodesSelected = function(nodes, $nodes) {
   scout.Outline.parent.prototype.setNodesSelected.call(this, nodes, $nodes);
   if (this._navigateUp) {
    this._navigateUp = false;
   } else {
+    nodes = scout.arrays.ensure(nodes);
     if (nodes.length === 1) {
       nodes[0].detailFormVisible = true;
     }
@@ -128,7 +130,9 @@ scout.Outline.prototype.onFormChanged = function(nodeId, detailForm) {
   if (nodeId >= 0) {
     node = this._nodeMap[nodeId];
     node.detailForm = this.session.getOrCreateModelAdapter(detailForm, this);
-    //If the following condition is false, the selection state is not synchronized yet which means there is a selection event in the queue which will be processed right afterwards.
+//    node.detailFormVisible = true; // FIXME AWE
+    // If the following condition is false, the selection state is not synchronized yet which
+    // means there is a selection event in the queue which will be processed right afterwards.
     if (this.selectedNodeIds.indexOf(node.id) >= 0) {
       this._updateOutlineTab(node);
     }

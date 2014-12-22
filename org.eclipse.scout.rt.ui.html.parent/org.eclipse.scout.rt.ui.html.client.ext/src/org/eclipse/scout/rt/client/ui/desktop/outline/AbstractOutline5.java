@@ -158,9 +158,4 @@ public abstract class AbstractOutline5 extends AbstractExtensibleOutline impleme
     execStartDefaultDetailForm(getDefaultDetailForm());
   }
 
-  @Override
-  public void fireOutlineEvent(OutlineEvent event) {
-    fireTreeEventInternal(event);
-  }
-
 }

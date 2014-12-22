@@ -23,9 +23,6 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline5;
 import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineEvent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
-import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage5;
-import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithNodes;
-import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapterFactory;
@@ -40,7 +37,7 @@ import org.json.JSONObject;
 public class JsonOutline<T extends IOutline> extends JsonTree<T> {
 
   private static final String EVENT_PAGE_CHANGED = "pageChanged";
-  private static final String PROP_DETAIL_FORM = "detailForm";
+  private static final String PROP_DETAIL_FORM = IOutline.PROP_DETAIL_FORM;
   private static final String PROP_DETAIL_TABLE = "detailTable";
   private static final String PROP_DETAIL_FORM_VISIBLE = "detailFormVisible";
   private Set<IJsonAdapter<?>> m_jsonDetailTables = new HashSet<IJsonAdapter<?>>();
@@ -89,7 +86,7 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
       attachPage(getModel().getRootPage());
     }
     else {
-      for (IPage page : getModel().getRootPage().getChildPages()) {
+      for (IPage<?> page : getModel().getRootPage().getChildPages()) {
         attachPage(page);
       }
     }
@@ -105,42 +102,16 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
     }
   }
 
-  protected void attachPage(IPage page) {
-    for (IPage childPage : page.getChildPages()) {
+  protected void attachPage(IPage<?> page) {
+    for (IPage<?> childPage : page.getChildPages()) {
       attachPage(childPage);
     }
-    if (isDetailFormVisible(page)) {
+    if (page.isDetailFormVisible()) {
       attachGlobalAdapter(page.getDetailForm());
     }
     if (page.isTableVisible()) {
       // Create 'outline' variant for table
-      attachDetailTable(getTable(page), page);
-    }
-  }
-
-  private ITable getTable(IPage page) {
-    if (page instanceof IPageWithTable) {
-      return ((IPageWithTable<?>) page).getTable();
-    }
-    else if (page instanceof IPageWithNodes) {
-      return ((IPageWithNodes) page).getInternalTable();
-    }
-    return null;
-  }
-
-  // TODO AWE: (scout) remove these two methods when x5-classes are merged into scout RT
-  private boolean isDetailFormVisible(IPage page) {
-    if (page instanceof IPage5) {
-      return ((IPage5) page).isDetailFormVisible();
-    }
-    else {
-      return true;
-    }
-  }
-
-  private void setDetailFormVisible(IPage page, boolean visible) {
-    if (page instanceof IPage5) {
-      ((IPage5) page).setDetailFormVisible(visible);
+      attachDetailTable(page);
     }
   }
 
@@ -152,25 +123,10 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
     IPage page = (IPage) node;
     JSONObject json = super.treeNodeToJson(node);
     putAdapterIdProperty(json, PROP_DETAIL_FORM, page.getDetailForm());
-    putProperty(json, PROP_DETAIL_FORM_VISIBLE, isDetailFormVisible(page));
-
-    String pageType = "";
-    if (page instanceof IPageWithTable) {
-      pageType = "table";
-      if (page.isTableVisible()) {
-        IPageWithTable<?> pageWithTable = (IPageWithTable<?>) page;
-        putAdapterIdProperty(json, PROP_DETAIL_TABLE, pageWithTable.getTable());
-      }
+    putProperty(json, PROP_DETAIL_FORM_VISIBLE, page.isDetailFormVisible());
+    if (page.isTableVisible()) {
+      putAdapterIdProperty(json, PROP_DETAIL_TABLE, page.getTable());
     }
-    else if (page instanceof IPageWithNodes) {
-      pageType = "node";
-      if (page.isTableVisible()) {
-        IPageWithNodes pageWithNodes = (IPageWithNodes) page;
-        putAdapterIdProperty(json, PROP_DETAIL_TABLE, pageWithNodes.getInternalTable());
-      }
-    }
-    putProperty(json, "type", pageType);
-
     return json;
   }
 
@@ -193,7 +149,7 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
     Collection<ITreeNode> nodes = event.getNodes();
     for (ITreeNode node : nodes) {
       IPage page = (IPage) node;
-      ITable table = getTable(page);
+      ITable table = page.getTable();
       if (table != null) {
         IJsonAdapter<?> jsonAdapter = getGlobalAdapter(table);
         if (jsonAdapter != null) {
@@ -227,14 +183,14 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
       putProperty(jsonEvent, PROP_DETAIL_TABLE, null);
     }
     else {
-      IJsonAdapter<?> detailTableAdapter = attachDetailTable(detailTable, page);
+      IJsonAdapter<?> detailTableAdapter = attachDetailTable(page);
       putProperty(jsonEvent, PROP_DETAIL_TABLE, detailTableAdapter.getId());
     }
     addActionEvent("detailTableChanged", jsonEvent);
   }
 
-  protected IJsonAdapter<?> attachDetailTable(ITable detailTable, IPage page) {
-    IJsonAdapter<?> detailTableAdapter = attachGlobalAdapter(detailTable, new P_JsonOutlineTableFactory(page));
+  protected IJsonAdapter<?> attachDetailTable(IPage page) {
+    IJsonAdapter<?> detailTableAdapter = attachGlobalAdapter(page.getTable(), new P_JsonOutlineTableFactory(page));
     m_jsonDetailTables.add(detailTableAdapter);
     return detailTableAdapter;
   }
@@ -251,12 +207,12 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
   }
 
   private void handleModelPageChanged(TreeEvent event) {
-    IPage5 page = (IPage5) event.getNode();
+    IPage page = (IPage) event.getNode();
     if (page.isDetailFormVisible()) {
       attachGlobalAdapter(page.getDetailForm());
     }
     if (page.isTableVisible()) {
-      attachDetailTable(getTable(page), page);
+      attachDetailTable(page);
     }
     JSONObject jsonEvent = new JSONObject();
     putProperty(jsonEvent, PROP_NODE_ID, getOrCreateNodeId(page));
@@ -281,7 +237,7 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
     JSONObject data = event.getData();
     IPage page = (IPage) getTreeNodeForNodeId(JsonObjectUtility.getString(data, PROP_NODE_ID));
     boolean detailFormVisible = JsonObjectUtility.getBoolean(data, PROP_DETAIL_FORM_VISIBLE);
-    setDetailFormVisible(page, detailFormVisible);
+    page.setDetailFormVisible(detailFormVisible);
   }
 
   @Override
@@ -304,18 +260,7 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
 
     @Override
     public String getNodeId(ITableRow tableRow) {
-      ITreeNode treeNode;
-      // TODO AWE: (scout) find common interface for pages with tables, currently the methods get(Internal)Table and getTreeNodeFor()
-      // are on IPageWithTable and IPageWithNodes but the have no common super class. That's why we must duplicate code here.
-      if (m_page instanceof IPageWithNodes) {
-        treeNode = ((IPageWithNodes) m_page).getTreeNodeFor(tableRow);
-      }
-      else if (m_page instanceof IPageWithTable) {
-        treeNode = ((IPageWithTable) m_page).getTreeNodeFor(tableRow);
-      }
-      else {
-        throw new IllegalArgumentException("invalid type for m_page");
-      }
+      ITreeNode treeNode = m_page.getTreeNodeFor(tableRow);
       return JsonOutline.this.getOrCreateNodeId(treeNode);
     }
 

@@ -21,6 +21,4 @@ public interface IOutline5 extends IOutline {
 
   void ensureDefaultDetailFormStarted() throws ProcessingException;
 
-  void fireOutlineEvent(OutlineEvent event);
-
 }
