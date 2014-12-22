@@ -10,11 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.ui.basic.table.ITable;
+import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
@@ -34,7 +37,9 @@ import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
  * {@link IPageWithTable} In the outline, it is possible to drill down the content of the node (except if the page is
  * configured as a leaf)
  */
-public interface IPage extends ITreeNode, ITypeWithClassId {
+public interface IPage<T extends ITable> extends ITreeNode, ITypeWithClassId {
+
+  T getTable();
 
   void initPage() throws ProcessingException;
 
@@ -85,7 +90,7 @@ public interface IPage extends ITreeNode, ITypeWithClassId {
    *         Note: Calling this method effectively creates all child page objects and may be expensive on pages with
    *         many child pages.
    */
-  List<IPage> getChildPages();
+  List<IPage<?>> getChildPages();
 
   /**
    * Convenience for (IPage)getParentNode()
@@ -138,5 +143,21 @@ public interface IPage extends ITreeNode, ITypeWithClassId {
    *          the adapter interface class, usually something like IXxxAdapter
    * @return the contributed adapter instance or <code>null</code>
    */
-  <T> T getAdapter(Class<T> clazz);
+  <A> A getAdapter(Class<A> clazz);
+
+  boolean isDetailFormVisible();
+
+  void setDetailFormVisible(boolean visible);
+
+  /**
+   * @since 3.8.2
+   */
+  ITreeNode getTreeNodeFor(ITableRow tableRow);
+
+  IPage getPageFor(ITableRow tableRow);
+
+  ITableRow getTableRowFor(ITreeNode treeNode);
+
+  List<ITableRow> getTableRowsFor(Collection<? extends ITreeNode> treeNodes);
+
 }

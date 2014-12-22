@@ -12,8 +12,11 @@ package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
@@ -37,6 +40,8 @@ import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.WeakDataChangeListener;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
+import org.eclipse.scout.rt.client.ui.basic.table.ITable;
+import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
@@ -47,9 +52,10 @@ import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.service.SERVICES;
 
-public abstract class AbstractPage extends AbstractTreeNode implements IPage {
+public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode implements IPage<T> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractPage.class);
 
+  private T m_table;
   private IForm m_detailForm;
   @SuppressWarnings("deprecation")
   private final org.eclipse.scout.rt.shared.ContextMap m_contextMap;
@@ -57,10 +63,69 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
   private DataChangeListener m_internalDataChangeListener;
   private final String m_userPreferenceContext;
   private IProcessingStatus m_pagePopulateStatus;
+  private final Map<ITableRow, IPage> m_tableRowToPageMap = new HashMap<ITableRow, IPage>();
+  private final Map<IPage, ITableRow> m_pageToTableRowMap = new HashMap<IPage, ITableRow>();
+
   /**
    * This flag is used to suppress change events while the page is initializing, see {@link #initPage()}.
    */
   private boolean m_pageInitialized;
+
+  private boolean m_detailFormVisible;
+
+  @Override
+  public T getTable() {
+    return m_table;
+  }
+
+  protected void linkTableRowWithPage(ITableRow tableRow, IPage page) {
+    m_tableRowToPageMap.put(tableRow, page);
+    m_pageToTableRowMap.put(page, tableRow);
+  }
+
+  protected void unlinkAllTableRowWithPage() {
+    m_tableRowToPageMap.clear();
+    m_pageToTableRowMap.clear();
+  }
+
+  @Override
+  public ITreeNode getTreeNodeFor(ITableRow tableRow) {
+    if (tableRow == null) {
+      return null;
+    }
+    else {
+      return m_tableRowToPageMap.get(tableRow);
+    }
+  }
+
+  @Override
+  public IPage getPageFor(ITableRow tableRow) {
+    return (IPage) getTreeNodeFor(tableRow);
+  }
+
+  @Override
+  public ITableRow getTableRowFor(ITreeNode childPage) {
+    return m_pageToTableRowMap.get(childPage);
+  }
+
+  @Override
+  public List<ITableRow> getTableRowsFor(Collection<? extends ITreeNode> childPageNodes) {
+    List<ITableRow> result = new ArrayList<ITableRow>();
+    for (ITreeNode node : childPageNodes) {
+      ITableRow row = getTableRowFor(node);
+      if (row != null) {
+        result.add(row);
+      }
+    }
+    return result;
+  }
+
+  protected void unlinkTableRowWithPage(ITableRow tableRow) {
+    IPage page = m_tableRowToPageMap.remove(tableRow);
+    if (page != null) {
+      m_pageToTableRowMap.remove(page);
+    }
+  }
 
   /**
    * use this static method to create a string based on the vargs that can be used as userPreferenceContext
@@ -131,6 +196,7 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
   @SuppressWarnings("deprecation")
   public AbstractPage(boolean callInitializer, org.eclipse.scout.rt.shared.ContextMap contextMap, String userPreferenceContext) {
     super(false);
+    m_detailFormVisible = true;
     m_contextMap = contextMap;
     m_userPreferenceContext = userPreferenceContext;
     if (callInitializer) {
@@ -334,6 +400,11 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
   }
 
   /**
+   * @return
+   */
+  protected abstract T initTable();
+
+  /**
    * @deprecated Will be removed with Bug 426088.
    *             getter and setter (page variable) instead.
    */
@@ -345,8 +416,9 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
 
   @Override
   protected void initConfig() {
-    setTableVisible(getConfiguredTableVisible());
     super.initConfig();
+    m_table = initTable();
+    setTableVisible(getConfiguredTableVisible());
   }
 
   /*
@@ -413,7 +485,7 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
   }
 
   @Override
-  public List<IPage> getChildPages() {
+  public List<IPage<?>> getChildPages() {
     if (ClientSyncJob.isSyncClientJob()) {
       try {
         getTree().resolveVirtualNodes(getChildNodes());
@@ -422,7 +494,7 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
         LOG.error("failed to create the real page from the virtual page", e);
       }
     }
-    List<IPage> childPages = new ArrayList<IPage>();
+    List<IPage<?>> childPages = new ArrayList<IPage<?>>();
     for (ITreeNode childNode : getChildNodes()) {
       childPages.add((IPage) childNode);
     }
@@ -601,8 +673,34 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
   }
 
   @Override
-  public void setTableVisible(boolean b) {
-    m_tableVisible = b;
+  public void setTableVisible(boolean tableVisible) {
+    if (m_tableVisible != tableVisible) {
+      m_tableVisible = tableVisible;
+      firePageChanged();
+    }
+  }
+
+  @Override
+  public boolean isDetailFormVisible() {
+    return m_detailFormVisible;
+  }
+
+  @Override
+  public void setDetailFormVisible(boolean detailFormVisible) {
+    if (m_detailFormVisible != detailFormVisible) {
+      m_detailFormVisible = detailFormVisible;
+      firePageChanged();
+    }
+  }
+
+  /**
+   * Note: set*Visible methods are called by initConfig(), at this point getTree() is still null.
+   * Tree can also be null during shutdown.
+   */
+  private void firePageChanged() {
+    if (getOutline() != null) {
+      getOutline().firePageChanged(this);
+    }
   }
 
   @Override
@@ -611,7 +709,7 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
   }
 
   @Override
-  public <T> T getAdapter(Class<T> clazz) {
+  public <A> A getAdapter(Class<A> clazz) {
     return null;
   }
 

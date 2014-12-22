@@ -409,7 +409,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   }
 
   @Override
-  public IPage getRootPage() {
+  public IPage<?> getRootPage() {
     return (IPage) getRootNode();
   }
 
@@ -717,6 +717,11 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   @Override
   protected IOutlineExtension<? extends AbstractOutline> createLocalExtension() {
     return new LocalOutlineExtension<AbstractOutline>(this);
+  }
+
+  @Override
+  public void firePageChanged(IPage page) {
+    fireTreeEventInternal(new OutlineEvent(this, OutlineEvent.TYPE_PAGE_CHANGED, page));
   }
 
 }

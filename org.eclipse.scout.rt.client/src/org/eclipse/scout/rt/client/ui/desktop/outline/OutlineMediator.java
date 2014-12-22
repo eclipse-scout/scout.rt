@@ -125,15 +125,7 @@ public class OutlineMediator {
     if (e.isConsumed()) {
       return;
     }
-
-    ITreeNode node = null;
-    if (page instanceof IPageWithNodes) {
-      node = ((IPageWithNodes) page).getTreeNodeFor(e.getFirstRow());
-    }
-    else if (page instanceof IPageWithTable<?>) {
-      node = ((IPageWithTable<?>) page).getTreeNodeFor(e.getFirstRow());
-    }
-
+    ITreeNode node = page.getTreeNodeFor(e.getFirstRow());
     if (node != null) {
       e.consume();
       if (page.getTree() != null) {

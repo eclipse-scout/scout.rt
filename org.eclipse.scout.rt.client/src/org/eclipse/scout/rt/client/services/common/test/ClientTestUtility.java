@@ -135,12 +135,12 @@ public final class ClientTestUtility {
 
   /**
    * @rn aho, 09.03.2009:
-   * @return return the first child page of the given class, iff exists.
+   * @return return the first child page of the given class, if exists.
    */
   @SuppressWarnings("unchecked")
-  public static <T extends IPage> T gotoChildPage(IPage parentPage, Class<T> childPageClass) {
+  public static <T extends IPage> T gotoChildPage(IPage<?> parentPage, Class<T> childPageClass) {
     T childPage = null;
-    for (IPage page : parentPage.getChildPages()) {
+    for (IPage<?> page : parentPage.getChildPages()) {
       if (childPageClass.isAssignableFrom(page.getClass())) {
         IOutline outline = getDesktop().getOutline();
         outline.selectNode(page);

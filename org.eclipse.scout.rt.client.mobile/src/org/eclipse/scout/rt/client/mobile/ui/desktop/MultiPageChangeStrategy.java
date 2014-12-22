@@ -28,8 +28,8 @@ public class MultiPageChangeStrategy implements IPageChangeStrategy {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(MultiPageChangeStrategy.class);
 
   private IOutline m_outline;
-  private IPage m_mainPage;
-  private IPage m_subPage;
+  private IPage<?> m_mainPage;
+  private IPage<?> m_subPage;
   private PageFormManager m_pageFormManager;
   private DefaultPageChangeStrategy m_defaultPageChangeStrategy;
 
@@ -105,20 +105,6 @@ public class MultiPageChangeStrategy implements IPageChangeStrategy {
 
     m_subPage.pageDeactivatedNotify();
     m_subPage = null;
-  }
-
-  private boolean isChildOfMainPage(IPage selectedPage) {
-    if (selectedPage == null || m_mainPage == null || m_mainPage.getChildNodeCount() == 0) {
-      return false;
-    }
-
-    for (IPage childPage : m_mainPage.getChildPages()) {
-      if (selectedPage.equals(childPage)) {
-        return true;
-      }
-    }
-
-    return false;
   }
 
 }

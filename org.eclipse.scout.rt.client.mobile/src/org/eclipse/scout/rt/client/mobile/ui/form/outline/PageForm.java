@@ -21,7 +21,6 @@ import org.eclipse.scout.rt.client.mobile.ui.basic.table.DrillDownStyleMap;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.MobileTable;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.columns.IRowSummaryColumn;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.form.TableRowForm;
-import org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility;
 import org.eclipse.scout.rt.client.mobile.ui.form.AbstractMobileForm;
 import org.eclipse.scout.rt.client.mobile.ui.form.IActionFetcher;
 import org.eclipse.scout.rt.client.mobile.ui.form.fields.table.AbstractMobileTableField;
@@ -184,7 +183,7 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
     if (table != null) {
       if (table.getSelectedRow() == null) {
         //If the parent page has not been selected before there is no row selected -> select it to create the tableRowForm
-        ITableRow row = MobileDesktopUtility.getTableRowFor(m_page.getParentPage(), m_page);
+        ITableRow row = m_page.getParentPage().getTableRowFor(m_page);
         if (row != null) {
           row.getTable().selectRow(row);
         }
@@ -227,8 +226,7 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
     //Don't display detail form field if there is no detail form -> saves space
     boolean hasDetailForm = getPageDetailFormField().getInnerForm() != null;
     getPageDetailFormField().setVisible(hasDetailForm);
-
-    ITable pageTable = MobileDesktopUtility.getPageTable(m_page);
+    ITable pageTable = m_page.getTable();
 
     //Make sure the preview form does only contain folder pages.
     if (!m_pageFormConfig.isTablePageAllowed() && m_page instanceof IPageWithTable) {
@@ -299,7 +297,7 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
       return true;
     }
 
-    return PageFormManager.isDrillDownPage(MobileDesktopUtility.getPageFor(getPage(), tableRow));
+    return PageFormManager.isDrillDownPage(getPage().getPageFor(tableRow));
   }
 
   public void formAddedNotify() throws ProcessingException {
@@ -398,13 +396,13 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
       return;
     }
 
-    ITable pageTable = MobileDesktopUtility.getPageTable(getPage());
+    ITable pageTable = getPage().getTable();
     if (pageTable == null) {
       return;
     }
 
     ITableRow selectedRow = pageTable.getSelectedRow();
-    if (!PageFormManager.isDrillDownPage(MobileDesktopUtility.getPageFor(getPage(), selectedRow))) {
+    if (!PageFormManager.isDrillDownPage(getPage().getPageFor(selectedRow))) {
       if (selectedRow != null) {
         if (m_pageFormConfig.isKeepSelection()) {
           handleTableRowSelected(pageTable, selectedRow);
@@ -604,7 +602,7 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
       rowPage = m_autoLeafPageMap.get(tableRow);
     }
     else {
-      rowPage = MobileDesktopUtility.getPageFor(m_page, tableRow);
+      rowPage = m_page.getPageFor(tableRow);
     }
     if (rowPage == null) {
       //Create auto leaf page including an outline and activate it.
@@ -654,7 +652,7 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
       return;
     }
 
-    IPage pageToSelect = MobileDesktopUtility.getPageFor(m_page, pageDetailTable.getRow(0));
+    IPage pageToSelect = m_page.getPageFor(pageDetailTable.getRow(0));
     if (pageDetailTable.getSelectedRow() == null) {
       if (!PageFormManager.isDrillDownPage(pageToSelect)) {
         pageDetailTable.selectFirstRow();
@@ -674,7 +672,7 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
 
     IPage selectedPage = (IPage) m_page.getOutline().getSelectedNode();
     if (selectedPage != null && selectedPage.getParentPage() == m_page) {
-      ITableRow row = MobileDesktopUtility.getTableRowFor(m_page, selectedPage);
+      ITableRow row = m_page.getTableRowFor(selectedPage);
       if (row != null && !isDrillDownRow(row)) {
         row.getTable().selectRow(row);
       }

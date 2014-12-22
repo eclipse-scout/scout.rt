@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 
@@ -27,15 +26,6 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
  * tree events are delegated to the table<br>
  */
 public interface IPageWithNodes extends IPage {
-
-  ITable getInternalTable();
-
-  ITreeNode getTreeNodeFor(ITableRow tableRow);
-
-  /**
-   * @since 3.8.2
-   */
-  ITableRow getTableRowFor(ITreeNode childPageNode);
 
   /**
    * @param childPageNode

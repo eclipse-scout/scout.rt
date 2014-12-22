@@ -129,7 +129,7 @@ public interface IOutline extends ITree, ITypeWithClassId, IOrdered {
   /**
    * Convenience for (IPage)getRootNode()
    */
-  IPage getRootPage();
+  IPage<?> getRootPage();
 
   OutlineMediator getOutlineMediator();
 
@@ -152,4 +152,7 @@ public interface IOutline extends ITree, ITypeWithClassId, IOrdered {
    * @return
    */
   List<IMenu> getMenusForPage(IPage page);
+
+  void firePageChanged(IPage page);
+
 }

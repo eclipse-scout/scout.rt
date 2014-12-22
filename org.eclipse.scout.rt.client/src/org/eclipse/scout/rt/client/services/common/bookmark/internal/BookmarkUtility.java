@@ -272,7 +272,7 @@ public final class BookmarkUtility {
    * <p />
    * Finally the path will be expanded. Possible exceptions might occur if no outline is set in the {@link Bookmark} or
    * the outline is not available.
-   * 
+   *
    * @param forceReload
    *          parameter without any function
    * @deprecated see https://bugs.eclipse.org/bugs/show_bug.cgi?id=439867, parameter forceReload is without any
@@ -496,7 +496,7 @@ public final class BookmarkUtility {
     }
   }
 
-  public static IBookmarkAdapter getBookmarkAdapter(IPage page) {
+  public static IBookmarkAdapter getBookmarkAdapter(IPage<?> page) {
     IBookmarkAdapter bookmarkAdapter = page.getAdapter(IBookmarkAdapter.class);
     if (bookmarkAdapter != null) {
       return bookmarkAdapter;
@@ -765,7 +765,7 @@ public final class BookmarkUtility {
       nodePage.ensureChildrenLoaded();
       IPage p = BookmarkUtility.resolvePage(nodePage.getChildPages(), childState.getPageClassName(), childState.getBookmarkIdentifier());
       if (p != null) {
-        ITable table = nodePage.getInternalTable();
+        ITable table = nodePage.getTable();
         // reset table column filter if requested
         if (resetViewAndWarnOnFail && !p.isFilterAccepted() && table.getColumnFilterManager() != null && table.getColumnFilterManager().isEnabled()) {
           table.getColumnFilterManager().reset();

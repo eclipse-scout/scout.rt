@@ -11,6 +11,8 @@
 package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -20,6 +22,8 @@ import java.util.List;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.Activator;
+import org.eclipse.scout.rt.client.ui.basic.table.ITable;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
@@ -108,35 +112,64 @@ public class PageTest {
     return svc;
   }
 
+  @Test
+  public void testIsSetDetailFormVisible() throws Exception {
+    AbstractPage p = new P_Page();
+    assertTrue(p.isDetailFormVisible());
+    IOutline outline = Mockito.mock(IOutline.class);
+    p.setTreeInternal(outline, false);
+    p.setDetailFormVisible(false);
+    assertFalse(p.isDetailFormVisible());
+    Mockito.verify(outline).firePageChanged(Mockito.eq(p));
+  }
+
+  @Test
+  public void testIsSetTableVisible() throws Exception {
+    AbstractPage p = new P_Page();
+    assertTrue(p.isTableVisible());
+    IOutline outline = Mockito.mock(IOutline.class);
+    p.setTreeInternal(outline, false);
+    p.setTableVisible(false);
+    assertFalse(p.isTableVisible());
+    Mockito.verify(outline).firePageChanged(Mockito.eq(p));
+  }
+
+  class P_Page extends AbstractPage {
+    @Override
+    protected ITable initTable() {
+      return null;
+    }
+  }
+
   @ClassId(TEST_PAGE_CLASS_ID)
-  class PageWithClassId extends AbstractPage {
+  class PageWithClassId extends P_Page {
   }
 
-  class PageWithoutClassId extends AbstractPage {
+  class PageWithoutClassId extends P_Page {
   }
 
-  class PageExceptionOnActivated extends AbstractPage {
+  class PageExceptionOnActivated extends P_Page {
     @Override
     protected void execPageActivated() throws ProcessingException {
       throw new ProcessingException();
     }
   }
 
-  class PageRuntimeExceptionOnActivated extends AbstractPage {
+  class PageRuntimeExceptionOnActivated extends P_Page {
     @Override
     protected void execPageActivated() throws ProcessingException {
       throw new RuntimeException();
     }
   }
 
-  class PageExceptionOnDeactivated extends AbstractPage {
+  class PageExceptionOnDeactivated extends P_Page {
     @Override
     protected void execPageDeactivated() throws ProcessingException {
       throw new ProcessingException();
     }
   }
 
-  class PageRuntimeExceptionOnDeactivated extends AbstractPage {
+  class PageRuntimeExceptionOnDeactivated extends P_Page {
     @Override
     protected void execPageDeactivated() throws ProcessingException {
       throw new RuntimeException();

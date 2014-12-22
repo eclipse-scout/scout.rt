@@ -10,11 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.ui.basic.table.ITable;
+import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.IVirtualTreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.VirtualTreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
@@ -117,7 +121,42 @@ public class VirtualPage extends VirtualTreeNode implements IPage, IVirtualTreeN
   }
 
   @Override
-  public <T> T getAdapter(Class<T> clazz) {
+  public boolean isDetailFormVisible() {
+    return false;
+  }
+
+  @Override
+  public void setDetailFormVisible(boolean visible) {
+  }
+
+  @Override
+  public ITable getTable() {
     return null;
   }
+
+  @Override
+  public ITreeNode getTreeNodeFor(ITableRow tableRow) {
+    return null;
+  }
+
+  @Override
+  public IPage getPageFor(ITableRow tableRow) {
+    return null;
+  }
+
+  @Override
+  public ITableRow getTableRowFor(ITreeNode treeNode) {
+    return null;
+  }
+
+  @Override
+  public List getTableRowsFor(Collection treeNodes) {
+    return null;
+  }
+
+  @Override
+  public Object getAdapter(Class clazz) {
+    return null;
+  }
+
 }

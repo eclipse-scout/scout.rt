@@ -10,12 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
-import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 
 /**
@@ -29,14 +27,6 @@ import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
  * table events are delegated to the tree<br>
  */
 public interface IPageWithTable<T extends ITable> extends IPage {
-
-  T getTable();
-
-  ITreeNode getTreeNodeFor(ITableRow tableRow);
-
-  ITableRow getTableRowFor(ITreeNode childPageNode);
-
-  List<ITableRow> getTableRowsFor(Collection<? extends ITreeNode> childPageNodes);
 
   /**
    * Computes the list of linked child pages for the given table rows and updates their summary cell.

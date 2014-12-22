@@ -57,9 +57,11 @@ public class DefaultPageChangeStrategy implements IPageChangeStrategy {
       }
       else if (activePage instanceof IPageWithNodes) {
         IPageWithNodes nodePage = (IPageWithNodes) activePage;
-        detailForm = activePage.getDetailForm();
+        if (activePage.isDetailFormVisible()) {
+          detailForm = activePage.getDetailForm();
+        }
         if (activePage.isTableVisible()) {
-          detailTable = nodePage.getInternalTable();
+          detailTable = nodePage.getTable();
         }
       }
     }

@@ -36,7 +36,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
-import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithNodes;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.client.ui.form.FormUtility;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -230,19 +229,12 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
     if (outline == null) {
       return;
     }
-
     final IPage activePage = outline.getActivePage();
     if (activePage == null || activePage.isTableVisible() || isPageDetailTableAllowedToBeClosed(activePage)) {
       return;
     }
     activePage.setTableVisible(true);
-
-    if (activePage instanceof IPageWithNodes) {
-      outline.setDetailTable(((IPageWithNodes) activePage).getInternalTable());
-    }
-    else if (activePage instanceof IPageWithTable<?>) {
-      outline.setDetailTable(((IPageWithTable) activePage).getTable());
-    }
+    outline.setDetailTable(activePage.getTable());
   }
 
   protected boolean isPageDetailTableAllowedToBeClosed(IPage activePage) {
