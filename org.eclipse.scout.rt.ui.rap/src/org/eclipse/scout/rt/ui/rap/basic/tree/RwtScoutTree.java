@@ -787,7 +787,7 @@ public class RwtScoutTree extends RwtScoutComposite<ITree> implements IRwtScoutT
       switch (event.type) {
         case SWT.MouseUp: {
           ViewerCell cell = getUiTreeViewer().getCell(new Point(event.x, event.y));
-          if (cell != null && cell.getElement() instanceof ITreeNode) {
+          if (cell != null && cell.getBounds().contains(event.x, event.y) && cell.getElement() instanceof ITreeNode) {
             ITreeNode nodeToClick = (ITreeNode) cell.getElement();
             handleUiNodeClick(nodeToClick, event.button);
           }
