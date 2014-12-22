@@ -18,6 +18,7 @@ import java.util.Date;
  */
 public class AllUserFilter implements IClientNotificationFilter {
   private static final long serialVersionUID = 1L;
+  public static final long DEFAULT_TIMEOUT = 120000L;
   private final long m_validUntil;
 
   public AllUserFilter(long timeout) {
