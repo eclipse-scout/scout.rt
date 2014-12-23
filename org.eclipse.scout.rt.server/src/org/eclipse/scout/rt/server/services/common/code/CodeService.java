@@ -27,11 +27,14 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.osgi.BundleClassDescriptor;
 import org.eclipse.scout.commons.runtime.BundleBrowser;
 import org.eclipse.scout.rt.server.internal.Activator;
+import org.eclipse.scout.rt.server.services.common.clientnotification.AllUserFilter;
+import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterNotification;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterNotificationListener;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterNotificationListenerService;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterNotificationMessage;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterSynchronizationService;
+import org.eclipse.scout.rt.shared.services.common.code.CodeTypeChangedNotification;
 import org.eclipse.scout.rt.shared.services.common.code.ICode;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeService;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
@@ -121,10 +124,11 @@ public class CodeService extends AbstractService implements ICodeService, IClust
     if (type == null) {
       return null;
     }
-    m_codeTypeStore.unloadCodeTypeCache(type);
-
     List<Class<? extends ICodeType<?, ?>>> codetypeList = new ArrayList<Class<? extends ICodeType<?, ?>>>();
     codetypeList.add(type);
+
+    m_codeTypeStore.unloadCodeTypeCache(codetypeList);
+
     publishCluster(codetypeList);
     return getCodeTypeCache().reloadCodeType(type);
   }
@@ -135,11 +139,16 @@ public class CodeService extends AbstractService implements ICodeService, IClust
       return null;
     }
     m_codeTypeStore.unloadCodeTypeCache(types);
+
     publishCluster(types);
     return getCodeTypeCache().reloadCodeTypes(types);
   }
 
   protected void publishCluster(List<Class<? extends ICodeType<?, ?>>> codetypeList) throws ProcessingException {
+    // notify clients:
+    SERVICES.getService(IClientNotificationService.class).putNotification(new CodeTypeChangedNotification(codetypeList), new AllUserFilter(AllUserFilter.DEFAULT_TIMEOUT));
+
+    // notify clusters:
     IClusterSynchronizationService s = SERVICES.getService(IClusterSynchronizationService.class);
     if (s != null) {
       s.publishNotification(new UnloadCodeTypeCacheClusterNotification(codetypeList));

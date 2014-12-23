@@ -26,11 +26,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.ServerJob;
-import org.eclipse.scout.rt.server.services.common.clientnotification.AllUserFilter;
-import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;
-import org.eclipse.scout.rt.shared.services.common.code.CodeTypeChangedNotification;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
-import org.eclipse.scout.service.SERVICES;
 
 /**
  * CodeType store in servlet context for global code providing to http sessions
@@ -86,8 +82,6 @@ public class CodeTypeStore {
     for (CodeTypeCache cache : m_store.values()) {
       cache.unloadCodeTypes(types);
     }
-    // notify clients
-    SERVICES.getService(IClientNotificationService.class).putNotification(new CodeTypeChangedNotification(types), new AllUserFilter(AllUserFilter.DEFAULT_TIMEOUT));
   }
 
   private class PartitionLanguageComposite {
@@ -97,14 +91,6 @@ public class CodeTypeStore {
     public PartitionLanguageComposite(Long partitionId, String language) {
       this.partitionId = partitionId;
       this.language = language;
-    }
-
-    public Long getPartitionId() {
-      return partitionId;
-    }
-
-    public String getLanguage() {
-      return language;
     }
 
     @Override
