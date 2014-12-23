@@ -12,8 +12,6 @@ package org.eclipse.scout.rt.ui.rap.form.fields.groupbox;
 
 import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
@@ -45,12 +43,11 @@ import org.eclipse.ui.forms.widgets.SizeCache;
  * <h3>RwtScoutGroupBox</h3>
  */
 public class RwtScoutGroupBox extends RwtScoutFieldComposite<IGroupBox> implements IRwtScoutGroupBox {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutGroupBox.class);
 
-  static final String VARIANT_GROUP_BOX_WITH_LINE_FRAME_CONTAINER = "groupBoxWithLineFrameContainer";
-  static final String VARIANT_GROUP_BOX_WITH_LINE_FRAME = "groupBoxWithLineFrame";
-  static final String VARIANT_LABEL = "GroupBoxLabel";
-  static final String VARIANT_LINE = "GroupBoxLine";
+  private static final String VARIANT_GROUP_BOX_WITH_LINE_FRAME_CONTAINER = "groupBoxWithLineFrameContainer";
+  private static final String VARIANT_GROUP_BOX_WITH_LINE_FRAME = "groupBoxWithLineFrame";
+  private static final String VARIANT_LABEL = "GroupBoxLabel";
+  private static final String VARIANT_LINE = "GroupBoxLine";
 
   public static class BorderDecoration {
     /**
@@ -74,7 +71,6 @@ public class RwtScoutGroupBox extends RwtScoutFieldComposite<IGroupBox> implemen
   private RwtScoutGroupBoxButtonbar m_buttonbar;
   // cache
   private BorderDecoration m_borderDecoration;
-  private String m_containerLabel;
   private String m_containerImage;
   private SizeCache m_sizeCache;
 
@@ -107,6 +103,15 @@ public class RwtScoutGroupBox extends RwtScoutFieldComposite<IGroupBox> implemen
           }
         }
       });
+
+      m_bodyPart.setData(IValidateRoot.VALIDATE_ROOT_DATA, new DefaultValidateRoot(m_bodyPart) {
+        @Override
+        public void validate() {
+          if (m_scrolledComposite != null && !m_scrolledComposite.isDisposed()) {
+            m_scrolledComposite.setMinSize(computeScrolledCompositeMinSize(true));
+          }
+        }
+      });
     }
     else {
       m_bodyPart = getUiEnvironment().getFormToolkit().createComposite(rootPane);
@@ -115,14 +120,7 @@ public class RwtScoutGroupBox extends RwtScoutFieldComposite<IGroupBox> implemen
       bodyData.verticalIndent = 0;
       m_bodyPart.setLayoutData(bodyData);
     }
-    m_bodyPart.setData(IValidateRoot.VALIDATE_ROOT_DATA, new DefaultValidateRoot(m_bodyPart) {
-      @Override
-      public void validate() {
-        if (m_scrolledComposite != null && !m_scrolledComposite.isDisposed()) {
-          m_scrolledComposite.setMinSize(computeScrolledCompositeMinSize(true));
-        }
-      }
-    });
+
     if (getScoutObject().getCustomProcessButtonCount() + getScoutObject().getSystemProcessButtonCount() > 0) {
       createButtonbar(rootPane);
     }

@@ -13,11 +13,10 @@ package org.eclipse.scout.rt.ui.swt.form.fields.tabbox;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.RunnableWithData;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 import org.eclipse.scout.rt.ui.swt.form.fields.SwtScoutFieldComposite;
@@ -32,20 +31,17 @@ import org.eclipse.swt.widgets.Listener;
 
 /**
  * <h3>SwtScoutTabBox</h3> ...
- * 
+ *
  * @since 1.0.0 04.04.2008
  */
 public class SwtScoutTabBox extends SwtScoutFieldComposite<ITabBox> implements ISwtScoutTabBox {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwtScoutTabBox.class);
-
-  private HashMap<CTabItem, SwtScoutTabItem> m_tabs;
-  private HashMap<IGroupBox, SwtScoutTabItem> m_scoutTabMapping;
+  private Map<CTabItem, SwtScoutTabItem> m_tabs;
+  private Map<IGroupBox, SwtScoutTabItem> m_scoutTabMapping;
   private Listener m_uiTabFocusListener;
-  private P_TabListener m_tabListener = new P_TabListener();
-  private OptimisticLock m_selectedTabLock;
+  private final P_TabListener m_tabListener = new P_TabListener();
+  private final OptimisticLock m_selectedTabLock = new OptimisticLock();
 
   public SwtScoutTabBox() {
-    m_selectedTabLock = new OptimisticLock();
   }
 
   @Override
@@ -92,7 +88,7 @@ public class SwtScoutTabBox extends SwtScoutFieldComposite<ITabBox> implements I
 
       /**
        * Removes the group box and containing tabs from the local maps and disposes the tab items.
-       * 
+       *
        * @param groupBox
        */
       private void disposeGroupBoxWithTabs(IGroupBox groupBox) {
