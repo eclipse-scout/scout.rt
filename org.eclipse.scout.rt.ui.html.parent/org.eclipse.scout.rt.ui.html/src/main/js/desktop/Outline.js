@@ -41,7 +41,7 @@ scout.Outline.prototype._addOutlineNavigationMenusToForm = function(form, node) 
 
 scout.Outline.prototype._addOutlineNavigationMenus = function(formOrTable, node, upMenuTypes, downMenuTypes) {
   // FIXME AWE: soll node (=page) eine outline property bekommen? Dann müssten wir nicht node + outline übergeben
-  var i, menus = scout.arrays.ensure(formOrTable.staticMenus);
+  var menus = scout.arrays.ensure(formOrTable.staticMenus);
   if (!this._hasMenu(menus, scout.MenuNavigateUp)) {
     menus.push(new scout.MenuNavigateUp(this, node, upMenuTypes));
   }
