@@ -20,8 +20,8 @@ scout.Outline.prototype._render = function($parent) {
  */
 scout.Outline.prototype._initTreeNode = function(parentNode, node) {
   scout.Outline.parent.prototype._initTreeNode.call(this, parentNode, node);
+  // FIXME AWE: (outline) bezeichner detailTable ist nicht konsistent zu java code, dort ist es nur "table"
   if (node.detailTable) {
-    // FIXME AWE: (outline) bezeichner detailTable ist nicht konsistent zu java code, dort ist es nur "table"
     node.detailTable = this.session.getOrCreateModelAdapter(node.detailTable, this);
     this._addOutlineNavigationMenusToTable(node.detailTable, node);
   }
@@ -32,21 +32,21 @@ scout.Outline.prototype._initTreeNode = function(parentNode, node) {
 };
 
 scout.Outline.prototype._addOutlineNavigationMenusToTable = function(table, node) {
-  this._addOutlineNavigationMenus(table, node, ['Table.EmptySpace'], ['Table.SingleSelection']);
+  this._addOutlineNavigationMenus(table, node, 'Table.EmptySpace');
 };
 
 scout.Outline.prototype._addOutlineNavigationMenusToForm = function(form, node) {
-  this._addOutlineNavigationMenus(form, node, ['Form.System'], ['Form.System']);
+  this._addOutlineNavigationMenus(form, node, 'Form.System');
 };
 
-scout.Outline.prototype._addOutlineNavigationMenus = function(formOrTable, node, upMenuTypes, downMenuTypes) {
+scout.Outline.prototype._addOutlineNavigationMenus = function(formOrTable, node, menuType) {
   // FIXME AWE: soll node (=page) eine outline property bekommen? Dann müssten wir nicht node + outline übergeben
   var menus = scout.arrays.ensure(formOrTable.staticMenus);
   if (!this._hasMenu(menus, scout.MenuNavigateUp)) {
-    menus.push(new scout.MenuNavigateUp(this, node, upMenuTypes));
+    menus.push(new scout.MenuNavigateUp(this, node, [menuType]));
   }
   if (!this._hasMenu(menus, scout.MenuNavigateDown)) {
-    menus.push(new scout.MenuNavigateDown(this, node, downMenuTypes));
+    menus.push(new scout.MenuNavigateDown(this, node, [menuType]));
   }
   formOrTable.staticMenus = menus;
 };
@@ -175,6 +175,7 @@ scout.Outline.prototype.onFormChanged = function(nodeId, detailForm) {
   }
 };
 
+// FIXME AWE/CGU: discuss - looks like copy/paste with small differences
 scout.Outline.prototype.onTableChanged = function(nodeId, detailTable) {
   var node;
   if (nodeId >= 0) {
