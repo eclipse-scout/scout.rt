@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt.form.fields.groupbox;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
@@ -40,7 +38,6 @@ import org.eclipse.ui.forms.widgets.Section;
  * <h3>SwtScoutGroupBox</h3>
  */
 public class SwtScoutGroupBox extends SwtScoutFieldComposite<IGroupBox> implements ISwtScoutGroupBox {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwtScoutGroupBox.class);
 
   /**
    * is null if the group box is not a scrolled group box
@@ -53,7 +50,6 @@ public class SwtScoutGroupBox extends SwtScoutFieldComposite<IGroupBox> implemen
   // cache
   private boolean m_containerBorderEnabled;
   private String m_containerBorderDecorationResolved;
-  private String m_containerLabel;
   private String m_containerImage;
 
   @Override
@@ -71,6 +67,16 @@ public class SwtScoutGroupBox extends SwtScoutFieldComposite<IGroupBox> implemen
       bodyData.verticalIndent = 0;
       m_scrolledForm.setLayoutData(bodyData);
 
+      m_swtBodyPart.setData(IValidateRoot.VALIDATE_ROOT_DATA, new DefaultValidateRoot(m_swtBodyPart) {
+        @Override
+        public void validate() {
+          if (m_scrolledForm != null) {
+            if (!m_scrolledForm.isDisposed()) {
+              m_scrolledForm.reflow(true);
+            }
+          }
+        }
+      });
     }
     else {
       m_swtBodyPart = getEnvironment().getFormToolkit().createComposite(rootPane);
@@ -79,16 +85,6 @@ public class SwtScoutGroupBox extends SwtScoutFieldComposite<IGroupBox> implemen
       bodyData.verticalIndent = 0;
       m_swtBodyPart.setLayoutData(bodyData);
     }
-    m_swtBodyPart.setData(IValidateRoot.VALIDATE_ROOT_DATA, new DefaultValidateRoot(m_swtBodyPart) {
-      @Override
-      public void validate() {
-        if (m_scrolledForm != null) {
-          if (!m_scrolledForm.isDisposed()) {
-            m_scrolledForm.reflow(true);
-          }
-        }
-      }
-    });
     m_swtBodyPart.setData(LogicalGridLayoutSpy.GROUP_BOX_MARKER, Boolean.TRUE);
     createButtonbar(rootPane);
 

@@ -1,14 +1,18 @@
 package org.eclipse.scout.rt.ui.rap.basic.table;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.rap.rwt.RWT;
+import org.eclipse.scout.commons.BooleanUtility;
 import org.eclipse.scout.commons.HTMLUtility;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.holders.BooleanHolder;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -27,20 +31,17 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.TableItem;
 
 public class RwtScoutColumnModel extends ColumnLabelProvider {
+
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutColumnModel.class);
   private static final long serialVersionUID = 1L;
 
-  private static final int HTML_ROW_LINE_HIGHT = 19;
-  private static final int NEWLINE_LINE_HIGHT = 15;
-
-  private transient ListenerList listenerList = null;
   private final ITable m_scoutTable;
-  private HashMap<ITableRow, HashMap<IColumn<?>, ICell>> m_cachedCells;
   private final RwtScoutTable m_uiTable;
   private final TableColumnManager m_columnManager;
-  private Image m_imgCheckboxFalse;
-  private Image m_imgCheckboxTrue;
-  private Color m_disabledForegroundColor;
-  private int m_defaultRowHeight;
+  private final Image m_imgCheckboxFalse;
+  private final Image m_imgCheckboxTrue;
+  private final Color m_disabledForegroundColor;
+  private Map<ITableRow, Map<IColumn<?>, ICell>> m_cachedCells;
 
   public RwtScoutColumnModel(ITable scoutTable, RwtScoutTable uiTable, TableColumnManager columnManager) {
     m_scoutTable = scoutTable;
@@ -127,10 +128,6 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
       text = StringUtility.replaceNewLines(text, " ");
     }
     return text;
-  }
-
-  protected int getDefaultRowHeight() {
-    return m_defaultRowHeight;
   }
 
   public Image getColumnImage(ITableRow element, int columnIndex) {
@@ -302,15 +299,40 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
    *
    * @return <code>true</code> if the cell is editable and not of the type {@link Boolean}.
    */
-  protected boolean isEditableIconNeeded(ITableRow row, IColumn<?> column) {
-    return getScoutTable().isCellEditable(row, column) && !column.getDataType().isAssignableFrom(Boolean.class);
+  protected boolean isEditableIconNeeded(final ITableRow row, final IColumn<?> column) {
+    if (column == null || row == null) {
+      return false;
+    }
+
+    if (column.getDataType().isAssignableFrom(Boolean.class)) {
+      return false;
+    }
+
+    final BooleanHolder result = new BooleanHolder(Boolean.FALSE);
+    Runnable r = new Runnable() {
+      @Override
+      public void run() {
+        ITable scoutTable = getScoutTable();
+        if (scoutTable != null) {
+          result.setValue(scoutTable.isCellEditable(row, column));
+        }
+      }
+    };
+
+    try {
+      getUiTable().getUiEnvironment().invokeScoutLater(r, 2345).join(2345);
+    }
+    catch (InterruptedException e) {
+      LOG.warn("Interrupted while waiting for the model to determine the cell's editability.", e);
+    }
+    return BooleanUtility.nvl(result.getValue(), false);
   }
 
   private void rebuildCache() {
-    m_cachedCells = new HashMap<ITableRow, HashMap<IColumn<?>, ICell>>();
+    m_cachedCells = new HashMap<ITableRow, Map<IColumn<?>, ICell>>();
     if (getScoutTable() != null) {
       for (ITableRow scoutRow : getScoutTable().getRows()) {
-        HashMap<IColumn<?>, ICell> cells = new HashMap<IColumn<?>, ICell>();
+        Map<IColumn<?>, ICell> cells = new HashMap<IColumn<?>, ICell>();
         for (IColumn<?> col : getScoutTable().getColumnSet().getVisibleColumns()) {
           cells.put(col, getScoutTable().getCell(scoutRow, col));
         }

@@ -19,8 +19,6 @@ import java.util.Map;
 import org.eclipse.rap.rwt.RWT;
 import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.RunnableWithData;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
@@ -33,22 +31,19 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
 
 public class RwtScoutTabBox extends RwtScoutFieldComposite<ITabBox> implements IRwtScoutTabBox {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutTabBox.class);
-
-  private HashMap<Composite, RwtScoutTabItem> m_tabs;
+  private Map<Composite, RwtScoutTabItem> m_tabs;
   private LinkedList<RwtScoutTabItem> m_tabList;
-  private P_TabListener m_tabListener = new P_TabListener();
-  private OptimisticLock m_selectedTabLock;
-  private OptimisticLock m_rebuildItemsLock = new OptimisticLock();
+
+  private final P_TabListener m_tabListener = new P_TabListener();
+  private final OptimisticLock m_selectedTabLock = new OptimisticLock();
+  private final OptimisticLock m_rebuildItemsLock = new OptimisticLock();
 
   private Composite m_tabboxButtonbar;
   private StackLayout m_stackLayout;
   private Composite m_tabboxContainer;
-
   private RwtScoutTabItem m_selectedItem;
 
   public RwtScoutTabBox() {
-    m_selectedTabLock = new OptimisticLock();
   }
 
   @Override

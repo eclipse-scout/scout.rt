@@ -41,7 +41,7 @@ public class LayoutValidateManager {
       if (v != null) {
         changed = true;
         m_dirtyList.remove(v);
-        m_dirtyList.add(0, v);
+        m_dirtyList.add(v);
       }
       tmp = tmp.getParent();
     }
