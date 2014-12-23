@@ -40,7 +40,7 @@ scout.Menu.prototype._render = function($parent) {
 };
 
 scout.Menu.prototype.hasButtonStyle = function() {
-  return scout.menus.checkType(this, ['Outline.Navigation', 'Form.System']);
+  return scout.menus.checkType(this, ['Form.System']);
 };
 
 scout.Menu.prototype._onMenuClicked = function(event) {

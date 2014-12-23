@@ -20,14 +20,44 @@ scout.Outline.prototype._render = function($parent) {
  */
 scout.Outline.prototype._initTreeNode = function(parentNode, node) {
   scout.Outline.parent.prototype._initTreeNode.call(this, parentNode, node);
-
   if (node.detailTable) {
+    // FIXME AWE: (outline) bezeichner detailTable ist nicht konsistent zu java code, dort ist es nur "table"
     node.detailTable = this.session.getOrCreateModelAdapter(node.detailTable, this);
+    this._addOutlineNavigationMenusToTable(node.detailTable, node);
   }
-
   if (node.detailForm) {
     node.detailForm = this.session.getOrCreateModelAdapter(node.detailForm, this);
+    this._addOutlineNavigationMenusToForm(node.detailForm, node);
   }
+};
+
+scout.Outline.prototype._addOutlineNavigationMenusToTable = function(table, node) {
+  this._addOutlineNavigationMenus(table, node, ['Table.EmptySpace'], ['Table.SingleSelection']);
+};
+
+scout.Outline.prototype._addOutlineNavigationMenusToForm = function(form, node) {
+  this._addOutlineNavigationMenus(form, node, ['Form.System'], ['Form.System']);
+};
+
+scout.Outline.prototype._addOutlineNavigationMenus = function(formOrTable, node, upMenuTypes, downMenuTypes) {
+  // FIXME AWE: soll node (=page) eine outline property bekommen? Dann müssten wir nicht node + outline übergeben
+  var i, menus = scout.arrays.ensure(formOrTable.staticMenus);
+  if (!this._hasMenu(menus, scout.MenuNavigateUp)) {
+    menus.push(new scout.MenuNavigateUp(this, node, upMenuTypes));
+  }
+  if (!this._hasMenu(menus, scout.MenuNavigateDown)) {
+    menus.push(new scout.MenuNavigateDown(this, node, downMenuTypes));
+  }
+  formOrTable.staticMenus = menus;
+};
+
+scout.Outline.prototype._hasMenu = function(menus, menuClass) {
+  for (var i=0; i<menus.length; i++) {
+    if (menus[i] instanceof menuClass) {
+      return true;
+    }
+  }
+  return false;
 };
 
 scout.Outline.prototype._onNodeDeleted = function(node) {
@@ -42,7 +72,7 @@ scout.Outline.prototype._renderSelection = function($nodes) {
   scout.Outline.parent.prototype._renderSelection.call(this, $nodes);
 
   if (!$nodes) {
-    //Outline does not support multi selection -> [0]
+    // Outline does not support multi selection -> [0]
     $nodes = [this.$nodeById(this.selectedNodeIds[0])];
   }
 
@@ -130,7 +160,9 @@ scout.Outline.prototype.onFormChanged = function(nodeId, detailForm) {
   if (nodeId >= 0) {
     node = this._nodeMap[nodeId];
     node.detailForm = this.session.getOrCreateModelAdapter(detailForm, this);
-//    node.detailFormVisible = true; // FIXME AWE
+    if (node.detailForm) {
+      this._addOutlineNavigationMenusToForm(node.detailForm, node);
+    }
     // If the following condition is false, the selection state is not synchronized yet which
     // means there is a selection event in the queue which will be processed right afterwards.
     if (this.selectedNodeIds.indexOf(node.id) >= 0) {
@@ -148,6 +180,9 @@ scout.Outline.prototype.onTableChanged = function(nodeId, detailTable) {
   if (nodeId >= 0) {
     node = this._nodeMap[nodeId];
     node.detailTable = this.session.getOrCreateModelAdapter(detailTable, this);
+    if (node.detailTable) {
+      this._addOutlineNavigationMenusToTable(node.detailTable, node);
+    }
     // If the following condition is false, the selection state is not synchronized yet which means
     // there is a selection event in the queue which will be processed right afterwards.
     if (this.selectedNodeIds.indexOf(node.id) >= 0) {

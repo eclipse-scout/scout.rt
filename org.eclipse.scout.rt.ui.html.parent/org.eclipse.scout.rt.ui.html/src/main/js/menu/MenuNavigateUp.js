@@ -1,26 +1,25 @@
-scout.MenuNavigateUp = function() {
-  scout.MenuNavigateUp.parent.call(this);
+scout.MenuNavigateUp = function(outline, node, menuTypes) {
+  scout.MenuNavigateUp.parent.call(this, outline, node);
   this._text1 = 'Back';
   this._text2 = 'Up';
+  this.menuTypes = menuTypes;
 };
 scout.inherits(scout.MenuNavigateUp, scout.AbstractOutlineNavigationMenu);
 
-scout.MenuNavigateUp.prototype._isDetail = function(node) {
-  return !node.detailFormVisible;
+scout.MenuNavigateUp.prototype._isDetail = function() {
+  return !this.node.detailFormVisible;
 };
 
 scout.MenuNavigateUp.prototype._toggleDetail = function() {
   return true;
 };
 
-// Menu is enabled when level of node is > 0
-scout.MenuNavigateUp.prototype._menuEnabled = function(node) {
-  var $node = this.outline.$nodeById(node.id);
-  return $node.attr('data-level') >= 0;
+scout.MenuNavigateUp.prototype._menuEnabled = function() {
+    return true;
 };
 
-scout.MenuNavigateUp.prototype._drill = function(node) {
-  var parentNode = node.parentNode;
+scout.MenuNavigateUp.prototype._drill = function() {
+  var parentNode = this.node.parentNode;
   if (parentNode) {
     $.log.debug('drill up to node ' + parentNode);
     this.outline._navigateUp = true;

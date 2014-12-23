@@ -110,7 +110,7 @@ public abstract class AbstractOutline5 extends AbstractExtensibleOutline impleme
       if (pageWithTable.isShowEmptySpaceMenus()) {
         ITable table = pageWithTable.getTable();
         List<IMenu> emptySpaceMenus = ActionUtility.getActions(table.getMenus(),
-            ActionUtility.createMenuFilterMenuTypes(CollectionUtility.<IMenuType> hashSet(OutlineMenuType.Navigation, TableMenuType.EmptySpace), false));
+            ActionUtility.createMenuFilterMenuTypes(CollectionUtility.<IMenuType> hashSet(TableMenuType.EmptySpace), false));
         if (emptySpaceMenus.size() > 0) {
           menus.add(new MenuSeparator());
           for (IMenu menu : emptySpaceMenus) {
@@ -129,7 +129,7 @@ public abstract class AbstractOutline5 extends AbstractExtensibleOutline impleme
       if (row != null) {
         table.getUIFacade().setSelectedRowsFromUI(CollectionUtility.arrayList(row));
         List<IMenu> parentTableMenus = ActionUtility.getActions(table.getContextMenu().getChildActions(),
-            ActionUtility.createMenuFilterMenuTypes(CollectionUtility.<IMenuType> hashSet(OutlineMenuType.Navigation, TableMenuType.SingleSelection), false));
+            ActionUtility.createMenuFilterMenuTypes(CollectionUtility.<IMenuType> hashSet(TableMenuType.SingleSelection), false));
         if (parentTableMenus.size() > 0) {
           menus.add(new MenuSeparator());
           for (IMenu menu : parentTableMenus) {

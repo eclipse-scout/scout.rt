@@ -13,6 +13,7 @@ scout.Table = function() {
   this.controls = [];
   this.menus = [];
   this.rows = [];
+  this.staticMenus = [];
   this._addAdapterProperties(['controls', 'menus']);
   this.events = new scout.EventSupport();
   this.selectionHandler = new scout.TableSelectionHandler(this);
@@ -56,9 +57,10 @@ scout.Table.prototype._render = function($parent) {
   this.menubar = new scout.Menubar(this.$container, {
     position: this.menubarPosition
   });
-  this.menubar.menuTypesForLeft1 = ['Outline.Navigation', 'Table.EmptySpace'];
+  this.menubar.menuTypesForLeft1 = ['Table.EmptySpace'];
   this.menubar.menuTypesForLeft2 = ['Table.SingleSelection', 'Table.MultiSelection'];
   this.menubar.menuTypesForRight = ['Table.Header'];
+  this.menubar.staticMenus = this.staticMenus;
 
   if (this.headerVisible) {
     this.header = this._createHeader();
@@ -468,7 +470,7 @@ scout.Table.prototype._renderMenus = function(menus) {
 };
 
 scout.Table.prototype._renderRowMenus = function($selectedRows) {
-  var menuItems = this._filterMenus($selectedRows, ['Outline.Navigation', 'Table.EmptySpace', 'Table.Header']);
+  var menuItems = this._filterMenus($selectedRows, ['Table.EmptySpace', 'Table.Header']);
   this.menubar.updateItems(menuItems);
 };
 

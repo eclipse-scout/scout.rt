@@ -19,11 +19,7 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
-import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.internal.TablePageTreeMenuWrapper;
-import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutlineNavigationMenu;
-import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineMenuType;
-import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineNavigation;
 import org.eclipse.scout.rt.client.ui.form.FormMenuType;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IForm5;
@@ -41,13 +37,6 @@ public abstract class AbstractPageWithNodes5 extends AbstractExtensiblePageWithN
 
   public AbstractPageWithNodes5(boolean callInitializer) {
     super(callInitializer);
-  }
-
-  @Override
-  protected void execInitPage() throws ProcessingException {
-    ITable table = getTable();
-    table.addMenu(OutlineNavigation.createUp(getOutline()));
-    table.addMenu(OutlineNavigation.createDown(getOutline()));
   }
 
   /**
@@ -128,18 +117,12 @@ public abstract class AbstractPageWithNodes5 extends AbstractExtensiblePageWithN
       }
     }
 
-    menus.add(OutlineNavigation.createUp(getOutline()));
-    menus.add(OutlineNavigation.createDown(getOutline()));
-
     // Add page menus to the form
     for (IMenu menu : getOutline().getContextMenu().getChildActions()) {
       // FIXME CGU improve this
-      if (menu instanceof TablePageTreeMenuWrapper && ((TablePageTreeMenuWrapper) menu).getWrappedMenu() instanceof AbstractOutlineNavigationMenu) {
-        continue;
-      }
       Set<IMenuType> types = new HashSet<IMenuType>();
       for (IMenuType type : menu.getMenuTypes()) {
-        if (type instanceof OutlineMenuType || type instanceof FormMenuType) {
+        if (type instanceof FormMenuType) {
           types.add(type);
         }
       }

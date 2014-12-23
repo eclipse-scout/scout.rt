@@ -37,7 +37,7 @@ public class DefaultPageChangeStrategy5 implements IPageChangeStrategy {
     try {
       if (activePage != null) {
         activePage.ensureChildrenLoaded();
-        if (activePage.isDetailFormVisible()) { // FIXME AWE: (page) not sure if this if is a good idea ('if' wasn't there initially)
+        if (activePage.isDetailFormVisible()) {
           detailForm = activePage.getDetailForm();
         }
         if (activePage.isTableVisible()) {
