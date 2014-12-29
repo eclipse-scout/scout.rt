@@ -22,13 +22,13 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Element;
 import javax.swing.text.GlyphView;
 import javax.swing.text.Highlighter;
-import javax.swing.text.ParagraphView;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.View;
 import javax.swing.text.ViewFactory;
 import javax.swing.text.html.HTML;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.InlineView;
+import javax.swing.text.html.ParagraphView;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.client.ui.form.fields.labelfield.ILabelField;
@@ -329,12 +329,12 @@ public class SwingScoutLabelField extends SwingScoutValueFieldComposite<ILabelFi
     Color fgColor = getScoutObject().isEnabled() ? m_foregroundColor : getSwingLabelField().getDisabledTextColor();
 
     getStyledTextCreator().setText(getUnformattedText())
-        .setTextWrap(m_textWrap)
-        .setForegroundColor(fgColor)
-        .setBackgroundColor(bgColor)
-        .setHorizontalAlignment(m_horizontalAlignment)
-        .setVerticalAlignment(m_verticalAlignment)
-        .setHeight(adjustHeight(getSwingLabelField().getHeight()));
+    .setTextWrap(m_textWrap)
+    .setForegroundColor(fgColor)
+    .setBackgroundColor(bgColor)
+    .setHorizontalAlignment(m_horizontalAlignment)
+    .setVerticalAlignment(m_verticalAlignment)
+    .setHeight(adjustHeight(getSwingLabelField().getHeight()));
 
     return getStyledTextCreator().createStyledText();
   }
