@@ -171,6 +171,7 @@ public class CodeServiceTest {
     List<ServiceRegistration> reg = TestingUtility.registerServices(Activator.getDefault().getBundle(), 1000, clientNotificationService);
     try {
       CodeService codeService = new CodeService();
+
       codeService.reloadCodeType(SomeCodeType.class);
 
       ArgumentCaptor<CodeTypeChangedNotification> notification = ArgumentCaptor.forClass(CodeTypeChangedNotification.class);
@@ -191,6 +192,7 @@ public class CodeServiceTest {
     List<ServiceRegistration> reg = TestingUtility.registerServices(Activator.getDefault().getBundle(), 1000, clientNotificationService);
     try {
       CodeService codeService = new CodeService();
+
       List<Class<? extends ICodeType<?, ?>>> list = new ArrayList<Class<? extends ICodeType<?, ?>>>();
       list.add(SomeCodeType.class);
       list.add(DummyCodeType.class);
@@ -209,7 +211,7 @@ public class CodeServiceTest {
     }
   }
 
-  static class SomeCodeType extends AbstractCodeType<Long, String> {
+  public static class SomeCodeType extends AbstractCodeType<Long, String> {
 
     private static final long serialVersionUID = 1L;
 
@@ -220,7 +222,7 @@ public class CodeServiceTest {
 
   }
 
-  static class DummyCodeType extends AbstractCodeType<Long, String> {
+  public static class DummyCodeType extends AbstractCodeType<Long, String> {
 
     private static final long serialVersionUID = 1L;
 
@@ -228,6 +230,5 @@ public class CodeServiceTest {
     public Long getId() {
       return 500L;
     }
-
   }
 }
