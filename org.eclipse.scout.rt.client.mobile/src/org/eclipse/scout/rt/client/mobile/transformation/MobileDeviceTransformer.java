@@ -238,7 +238,7 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
     activePage.setTableVisible(true);
 
     if (activePage instanceof IPageWithNodes) {
-      outline.setDetailTable(((IPageWithNodes) activePage).getInternalTable());
+      outline.setDetailTable(((IPageWithNodes) activePage).getTable());
     }
     else if (activePage instanceof IPageWithTable<?>) {
       outline.setDetailTable(((IPageWithTable) activePage).getTable());

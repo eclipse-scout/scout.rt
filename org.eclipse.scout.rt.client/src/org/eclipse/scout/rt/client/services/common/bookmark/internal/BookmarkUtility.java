@@ -765,7 +765,7 @@ public final class BookmarkUtility {
       nodePage.ensureChildrenLoaded();
       IPage p = BookmarkUtility.resolvePage(nodePage.getChildPages(), childState.getPageClassName(), childState.getBookmarkIdentifier());
       if (p != null) {
-        ITable table = nodePage.getInternalTable();
+        ITable table = nodePage.getTable();
         // reset table column filter if requested
         if (resetViewAndWarnOnFail && !p.isFilterAccepted() && table.getColumnFilterManager() != null && table.getColumnFilterManager().isEnabled()) {
           table.getColumnFilterManager().reset();

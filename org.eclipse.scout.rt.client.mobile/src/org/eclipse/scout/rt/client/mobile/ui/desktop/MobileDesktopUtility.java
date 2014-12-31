@@ -187,6 +187,11 @@ public class MobileDesktopUtility {
     return true;
   }
 
+  /**
+   * @deprecated will be removed with the N-Release. See Bug 456409.
+   *             With the N-Release can call {@link IPage#getTable()} directly.
+   */
+  @Deprecated
   public static ITable getPageTable(IPage page) {
     if (page instanceof IPageWithTable) {
       IPageWithTable tablePage = (IPageWithTable) page;
@@ -194,12 +199,17 @@ public class MobileDesktopUtility {
     }
     else if (page instanceof IPageWithNodes) {
       IPageWithNodes nodePage = (IPageWithNodes) page;
-      return nodePage.getInternalTable();
+      return nodePage.getTable();
     }
 
     return null;
   }
 
+  /**
+   * @deprecated will be removed with the N-Release. See Bug 456409.
+   *             With the N-Release can call {@link IPage#getTreeNodeFor(ITableRow)} directly.
+   */
+  @Deprecated
   public static IPage getPageFor(IPage parentPage, ITableRow tableRow) {
     ITreeNode node = null;
     if (parentPage instanceof IPageWithNodes) {
@@ -212,6 +222,11 @@ public class MobileDesktopUtility {
     return (IPage) node;
   }
 
+  /**
+   * @deprecated will be removed with the N-Release. See Bug 456409.
+   *             With the N-Release can call {@link IPage#getTableRowFor(ITreeNode)} directly.
+   */
+  @Deprecated
   public static ITableRow getTableRowFor(IPage parentPage, IPage page) {
     ITableRow row = null;
     if (parentPage instanceof IPageWithNodes) {

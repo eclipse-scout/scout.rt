@@ -163,13 +163,18 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
 
   @Override
   public ITable getInternalTable() {
+    return getTable();
+  }
+
+  @Override
+  public ITable getTable() {
     return m_table;
   }
 
   @Override
   public void setPagePopulateStatus(IProcessingStatus status) {
     super.setPagePopulateStatus(status);
-    getInternalTable().tablePopulated();
+    getTable().tablePopulated();
   }
 
   /**
@@ -185,8 +190,8 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
   protected void execPageActivated() throws ProcessingException {
     super.execPageActivated();
     // set title of table
-    if (getInternalTable() != null && getTree() != null) {
-      getInternalTable().setTitle(getTree().getPathText(AbstractPageWithNodes.this));
+    if (getTable() != null && getTree() != null) {
+      getTable().setTitle(getTree().getPathText(AbstractPageWithNodes.this));
     }
   }
 
@@ -260,12 +265,12 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
     }
     // copy to table
     try {
-      getInternalTable().setTableChanging(true);
+      getTable().setTableChanging(true);
       rebuildTableInternal();
       setPagePopulateStatus(null);
     }
     finally {
-      getInternalTable().setTableChanging(false);
+      getTable().setTableChanging(false);
     }
     super.loadChildren();
   }
@@ -274,19 +279,19 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
   public void rebuildTableInternal() throws ProcessingException {
     List<ITreeNode> childNodes = getChildNodes();
     try {
-      getInternalTable().setTableChanging(true);
+      getTable().setTableChanging(true);
       //
       unlinkAllTableRowWithPage();
-      getInternalTable().discardAllRows();
+      getTable().discardAllRows();
       for (ITreeNode childNode : childNodes) {
-        ITableRow row = new TableRow(getInternalTable().getColumnSet());
+        ITableRow row = new TableRow(getTable().getColumnSet());
         row.setCell(0, childNode.getCell());
-        ITableRow insertedRow = getInternalTable().addRow(row);
+        ITableRow insertedRow = getTable().addRow(row);
         linkTableRowWithPage(insertedRow, (IPage) childNode);
       }
     }
     finally {
-      getInternalTable().setTableChanging(false);
+      getTable().setTableChanging(false);
     }
   }
 
@@ -328,12 +333,12 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
   protected void updateContextMenusForSelection() {
     // remove old
     if (m_pageMenusOfSelection != null) {
-      getInternalTable().getContextMenu().removeChildActions(m_pageMenusOfSelection);
+      getTable().getContextMenu().removeChildActions(m_pageMenusOfSelection);
       m_pageMenusOfSelection = null;
     }
 
     List<IMenu> pageMenus = new ArrayList<IMenu>();
-    List<ITableRow> selectedRows = getInternalTable().getSelectedRows();
+    List<ITableRow> selectedRows = getTable().getSelectedRows();
     if (CollectionUtility.size(selectedRows) == 1) {
       ITreeNode node = getTreeNodeFor(CollectionUtility.firstElement(selectedRows));
       if (node instanceof IPageWithTable<?>) {
@@ -351,7 +356,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
         }
       }
     }
-    getInternalTable().getContextMenu().addChildActions(pageMenus);
+    getTable().getContextMenu().addChildActions(pageMenus);
     m_pageMenusOfSelection = pageMenus;
 
   }

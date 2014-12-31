@@ -28,7 +28,14 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
  */
 public interface IPageWithNodes extends IPage {
 
+  /**
+   * @deprecated Use {@link #getTable()} instead.
+   *             Will be removed with the N-Release.
+   */
+  @Deprecated
   ITable getInternalTable();
+
+  ITable getTable();
 
   ITreeNode getTreeNodeFor(ITableRow tableRow);
 

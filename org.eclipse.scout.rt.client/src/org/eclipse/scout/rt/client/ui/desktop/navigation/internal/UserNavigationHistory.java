@@ -140,7 +140,7 @@ public class UserNavigationHistory {
         }
       }
       else if (page instanceof IPageWithNodes) {
-        ITable table = ((IPageWithNodes) page).getInternalTable();
+        ITable table = ((IPageWithNodes) page).getTable();
         if (table != null) {
           table.scrollToSelection();
         }
