@@ -422,8 +422,18 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId {
 
   boolean isEmpty();
 
+  /**
+   * @deprecated will be removed with the N-Release. See Bug 456408.
+   *             With the N-Release you should use {@link #getTitle()} instead.
+   */
+  @Deprecated
   String getBasicTitle();
 
+  /**
+   * @deprecated will be removed with the N-Release. See Bug 456408.
+   *             With the N-Release you should use {@link #setTitle(String)} instead.
+   */
+  @Deprecated
   void setBasicTitle(String basicTitle);
 
   String getSubTitle();
