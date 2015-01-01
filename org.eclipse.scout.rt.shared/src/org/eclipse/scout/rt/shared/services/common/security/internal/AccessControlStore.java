@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * Copyright (c) 2015 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.server.services.common.security.internal;
+package org.eclipse.scout.rt.shared.services.common.security.internal;
 
 import java.security.Permissions;
 import java.util.Collection;
@@ -23,7 +23,7 @@ import org.eclipse.scout.service.SERVICES;
 
 /**
  * <p>
- * {@link Permissions} store per userId
+ * {@link Permissions} store per userId without any notifications.
  * </p>
  * <p>
  * Maintains a map of one {@link Permissions} object per userId (derived from their Subject, see
@@ -33,10 +33,8 @@ import org.eclipse.scout.service.SERVICES;
  * The userId is case insensitive, case does not matter.
  * </p>
  *
- * @deprecated use org.eclipse.scout.rt.shared.services.common.security.internal.AccessControlStore instead.
- *             will be removed with the N-Release. See Bug 456476.
+ * @since 4.3.0 (Mars-M5)
  */
-@Deprecated
 public class AccessControlStore {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AccessControlStore.class);
 
@@ -114,14 +112,7 @@ public class AccessControlStore {
    * clears the cache
    */
   public void clearCache() {
-    clearCacheOfUserIds(CollectionUtility.hashSet(m_store.keySet()));
-  }
-
-  /**
-   * clears the cache
-   */
-  public void clearCacheNoFire() {
-    clearCacheOfUserIdsNoFire(CollectionUtility.hashSet(m_store.keySet()));
+    clearCacheOfUserIds(getUserIds());
   }
 
   /**
@@ -131,16 +122,6 @@ public class AccessControlStore {
    *          derived from the Subject, see{@link IAccessControlService#getUserIdOfCurrentSubject()}
    */
   public void clearCacheOfUserIds(Collection<String> userIds0) {
-    clearCacheOfUserIdsNoFire(userIds0);
-  }
-
-  /**
-   * Clears the cache for a set of userIds and sends a notification for these users.
-   * 
-   * @param userIds
-   *          derived from the Subject, see{@link IAccessControlService#getUserIdOfCurrentSubject()}
-   */
-  public void clearCacheOfUserIdsNoFire(Collection<String> userIds0) {
     Set<String> userIds = CollectionUtility.hashSetWithoutNullElements(userIds0);
     if (userIds.isEmpty()) {
       return;
@@ -154,9 +135,9 @@ public class AccessControlStore {
     }
   }
 
-  public String[] getUserIds() {
+  public Collection<String> getUserIds() {
     synchronized (m_storeLock) {
-      return m_store.keySet().toArray(new String[m_store.keySet().size()]);
+      return CollectionUtility.hashSet(m_store.keySet());
     }
   }
 }
