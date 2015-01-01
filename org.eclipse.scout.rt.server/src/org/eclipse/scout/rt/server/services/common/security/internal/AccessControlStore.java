@@ -18,11 +18,7 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.TTLCache;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;
-import org.eclipse.scout.rt.server.services.common.clientnotification.SingleUserFilter;
-import org.eclipse.scout.rt.shared.services.common.security.AccessControlChangedNotification;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
-import org.eclipse.scout.rt.shared.services.common.security.ResetAccessControlChangedNotification;
 import org.eclipse.scout.service.SERVICES;
 
 /**
@@ -64,7 +60,7 @@ public class AccessControlStore {
 
   /**
    * sets permission collection that is associated with the current subject
-   * 
+   *
    * @param p
    *          permission collection
    */
@@ -93,7 +89,7 @@ public class AccessControlStore {
 
   /**
    * associate a permission collection with this userId
-   * 
+   *
    * @param userId
    *          if userId is <code>null</code> the method does nothing
    */
@@ -108,16 +104,12 @@ public class AccessControlStore {
       }
       m_store.put(userId.toLowerCase(), p);
     }
-    // notify clients
-    SERVICES.getService(IClientNotificationService.class).putNotification(new AccessControlChangedNotification(p), new SingleUserFilter(userId, 120000L));
   }
 
   /**
    * clears the cache
    */
   public void clearCache() {
-    // notify with a filter, that will be accepted nowhere
-    SERVICES.getService(IClientNotificationService.class).putNotification(new ResetAccessControlChangedNotification(), new SingleUserFilter(null, 0L));
     clearCacheOfUserIds(CollectionUtility.hashSet(m_store.keySet()));
   }
 
@@ -130,18 +122,12 @@ public class AccessControlStore {
 
   /**
    * Clears the cache for a set of userIds and sends a notification for these users.
-   * 
+   *
    * @param userIds
    *          derived from the Subject, see{@link IAccessControlService#getUserIdOfCurrentSubject()}
    */
   public void clearCacheOfUserIds(Collection<String> userIds0) {
     clearCacheOfUserIdsNoFire(userIds0);
-    //notify clients
-    for (String userId : userIds0) {
-      if (userId != null) {
-        SERVICES.getService(IClientNotificationService.class).putNotification(new AccessControlChangedNotification(null), new SingleUserFilter(userId, 120000L));
-      }
-    }
   }
 
   /**

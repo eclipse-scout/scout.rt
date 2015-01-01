@@ -27,6 +27,8 @@ import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;
+import org.eclipse.scout.rt.server.services.common.clientnotification.SingleUserFilter;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterNotification;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterNotificationListener;
 import org.eclipse.scout.rt.server.services.common.clustersync.IClusterNotificationListenerService;
@@ -36,7 +38,9 @@ import org.eclipse.scout.rt.server.services.common.security.internal.AccessContr
 import org.eclipse.scout.rt.shared.security.BasicHierarchyPermission;
 import org.eclipse.scout.rt.shared.security.RemoteServiceAccessPermission;
 import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
+import org.eclipse.scout.rt.shared.services.common.security.AccessControlChangedNotification;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
+import org.eclipse.scout.rt.shared.services.common.security.ResetAccessControlChangedNotification;
 import org.eclipse.scout.service.AbstractService;
 import org.eclipse.scout.service.IService;
 import org.eclipse.scout.service.SERVICES;
@@ -225,6 +229,11 @@ public abstract class AbstractAccessControlService extends AbstractService imple
     }
     //end legacy
     m_accessControlStore.setPermissionsOfCurrentSubject(p);
+
+    // notify clients:
+    String userId = SERVICES.getService(IAccessControlService.class).getUserIdOfCurrentSubject();
+    SERVICES.getService(IClientNotificationService.class).putNotification(new AccessControlChangedNotification(p), new SingleUserFilter(userId, 120000L));
+
   }
 
   @Override
@@ -236,6 +245,10 @@ public abstract class AbstractAccessControlService extends AbstractService imple
   public void clearCache() {
     clearCacheNoFire();
 
+    //notify clients with a filter, that will be accepted nowhere:
+    SERVICES.getService(IClientNotificationService.class).putNotification(new ResetAccessControlChangedNotification(), new SingleUserFilter(null, 0L));
+
+    //notify clusters:
     try {
       IClusterSynchronizationService s = SERVICES.getService(IClusterSynchronizationService.class);
       if (s != null) {
@@ -250,6 +263,8 @@ public abstract class AbstractAccessControlService extends AbstractService imple
   @Override
   public void clearCacheOfUserIds(Collection<String> userIds) {
     clearCacheOfUserIdsNoFire(userIds);
+
+    //notify clusters:
     try {
       IClusterSynchronizationService s = SERVICES.getService(IClusterSynchronizationService.class);
       if (s != null) {
@@ -260,7 +275,14 @@ public abstract class AbstractAccessControlService extends AbstractService imple
       LOG.error("failed notifying cluster for permission changes", e);
     }
 
-    m_accessControlStore.clearCacheOfUserIds(userIds);
+    clearCacheOfUserIdsNoFire(userIds);
+
+    //notify clients:
+    for (String userId : userIds) {
+      if (userId != null) {
+        SERVICES.getService(IClientNotificationService.class).putNotification(new AccessControlChangedNotification(null), new SingleUserFilter(userId, 120000L));
+      }
+    }
   }
 
   protected void clearCacheNoFire() {
@@ -268,7 +290,7 @@ public abstract class AbstractAccessControlService extends AbstractService imple
   }
 
   protected void clearCacheOfUserIdsNoFire(Collection<String> userIds) {
-    m_accessControlStore.clearCacheOfUserIdsNoFire(userIds);
+    m_accessControlStore.clearCacheOfUserIds(userIds);
   }
 
   @Override
