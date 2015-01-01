@@ -139,7 +139,7 @@ public class AbstractAccessControlServiceTest {
   }
 
   private void callClearCacheOfUserIdsNoFire(Collection<String> testUsers) {
-    m_accessControlService.clearCacheOfUserIdsNoFire(testUsers);
+    ((TestAccessControlService) m_accessControlService).callClearCacheOfUserIdsNoFire(testUsers);
     ThreadContext.getTransaction().commitPhase2();
   }
 
