@@ -349,7 +349,7 @@ public final class BookmarkUtility {
   /**
    * Constructs a list of {@link TableColumnState} objects which
    * describe the set of columns of the given {@link ITable}.
-   * 
+   *
    * @param table
    *          The table with the columns to back-up.
    * @return A {@link List} of {@link TableColumnState} objects that
@@ -385,7 +385,7 @@ public final class BookmarkUtility {
 
   /**
    * Restores a tables columns from the given list of {@link TableColumnState} objects.
-   * 
+   *
    * @param table
    *          The table to be restored.
    * @param oldColumns
@@ -606,18 +606,7 @@ public final class BookmarkUtility {
     // setup table
     try {
       table.setTableChanging(true);
-      //legacy support
-      List<TableColumnState> allColumns = new ArrayList<TableColumnState>();
-      for (TableColumnState tcs : tablePageState.getAvailableColumns()) {
-        if (tcs.getVisible()) {
-          allColumns.add(tcs);
-        }
-      }
-
-      if (allColumns == null || allColumns.size() == 0) {
-        allColumns = tablePageState.getAvailableColumns();
-      }
-      restoreTableColumns(tablePage.getTable(), allColumns);
+      restoreTableColumns(tablePage.getTable(), tablePageState.getAvailableColumns());
     }
     finally {
       table.setTableChanging(false);
