@@ -31,8 +31,11 @@ public class TestAccessControlService extends AbstractAccessControlService {
     return permissions;
   }
 
+  public void callClearCacheNoFire() {
+    clearCacheNoFire();
+  }
+
   public void callClearCacheOfUserIdsNoFire(Collection<String> userIds) {
     clearCacheOfUserIdsNoFire(userIds);
   }
-
 }

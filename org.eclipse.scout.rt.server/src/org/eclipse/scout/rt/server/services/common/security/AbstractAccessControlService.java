@@ -79,8 +79,6 @@ public abstract class AbstractAccessControlService extends AbstractSharedAccessC
       LOG.error("failed notifying cluster for permission changes", e);
     }
 
-    clearCacheOfUserIdsNoFire(userIds);
-
     //notify clients:
     for (String userId : userIds) {
       if (userId != null) {
