@@ -42,7 +42,7 @@ import org.eclipse.scout.rt.ui.html.scriptprocessor.ScriptProcessor;
 public class ScriptFileBuilder {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ScriptFileBuilder.class);
 
-  private static final Pattern INCLUDE_PAT = Pattern.compile("(?://\\s*@|__)include\\s*\\(\\s*(?:\"([^\"]+)\"|'([^']+)')\\s*\\)");
+  private static final Pattern INCLUDE_PAT = Pattern.compile("(?://\\s*@|__)include\\s*\\(\\s*(?:\"([^\"]+)\"|'([^']+)')\\s*\\)[;]*");
 
   private static final String UTF_8 = "UTF-8";
 

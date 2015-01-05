@@ -37,13 +37,13 @@
   <script type="text/javascript" src="WebContent/res/jasmine-2.0.0/boot.js"></script>
   <script type="text/javascript" src="WebContent/res/jasmine-2.0.0/plugins/jasmine-jquery.js"></script>
   <script type="text/javascript" src="WebContent/res/jasmine-2.0.0/plugins/mock-ajax.js"></script>
+  <script type="text/javascript" src="src/main/js/jasmine/JasmineScoutModuleUtil.js"></script>
   <script type="text/javascript" src="src/main/js/jasmine/JasmineScout.js"></script>
   <script type="text/javascript" src="src/main/js/jasmine/JasmineMavenReporter.js"></script>
   <script type="text/javascript" src="src/main/js/jasmine/boot.ext.js"></script>
   $preloadScriptTags$
 
-  <script type="text/javascript" src="src/main/js/jasmine/includeUsingEval.js"></script>
-  <script type="text/javascript" src="src/main/js/scout-module.js"></script>
+  <script type="text/javascript">createDynamicScript('src/main/js/scout-module.js');</script>
 
   <script type="text/javascript" src="src/main/js/desktop/BreadCrumbNavigation.js"></script>
   <script type="text/javascript" src="src/main/js/desktop/MobileDesktop.js"></script>
