@@ -12,3 +12,26 @@ API get/setSubTitle hinzugefügt
 API PROP_SUB_TITLE hinzugefügt
 composeTitle entfernt (GUI-Logik)
 
+AWE 05.01.2014
+org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage
+API merged IPageWithTable and IPageWithNodes and moved duplicated methods to IPage
+   IPage now has a T getTable() method, also changed abstract classes implementing
+   these interfaces. IPage now expects a type parameter for the table.
+API IPage:
+  added T getTable();
+  added boolean isDetailFormVisible();
+  added void setDetailFormVisible(boolean visible);
+  added ITreeNode getTreeNodeFor(ITableRow tableRow);
+  added IPage getPageFor(ITableRow tableRow);
+  added ITableRow getTableRowFor(ITreeNode treeNode);
+  added List<ITableRow> getTableRowsFor(Collection<? extends ITreeNode> treeNodes);
+API IPageWithNodes:
+  replaced by getTable > ITable getInternalTable();
+  moved to IPage > ITreeNode getTreeNodeFor(ITableRow tableRow);
+  moved to IPage > ITableRow getTableRowFor(ITreeNode childPageNode);
+API IPageWithTable:
+  moved to IPage > T getTable();
+  moved to IPage > ITreeNode getTreeNodeFor(ITableRow tableRow);
+  moved to IPage > ITableRow getTableRowFor(ITreeNode childPageNode);
+  moved to IPage > List<ITableRow> getTableRowsFor(Collection<? extends ITreeNode> childPageNodes);
+
