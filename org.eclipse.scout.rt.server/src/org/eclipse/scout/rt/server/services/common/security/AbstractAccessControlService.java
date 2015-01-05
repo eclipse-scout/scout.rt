@@ -234,7 +234,7 @@ public abstract class AbstractAccessControlService extends AbstractService imple
 
   @Override
   public void clearCache() {
-    clearCacheNoFire();
+    m_accessControlStore.clearCache();
 
     try {
       IClusterSynchronizationService s = SERVICES.getService(IClusterSynchronizationService.class);
@@ -264,7 +264,7 @@ public abstract class AbstractAccessControlService extends AbstractService imple
   }
 
   protected void clearCacheNoFire() {
-    m_accessControlStore.clearCache();
+    m_accessControlStore.clearCacheNoFire();
   }
 
   protected void clearCacheOfUserIdsNoFire(Collection<String> userIds) {
