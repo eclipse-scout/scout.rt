@@ -22,7 +22,6 @@ import java.util.List;
 
 import org.eclipse.scout.rt.shared.Activator;
 import org.eclipse.scout.rt.shared.security.BasicHierarchyPermission;
-import org.eclipse.scout.rt.shared.security.RemoteServiceAccessPermission;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.After;
 import org.junit.Before;
@@ -152,7 +151,6 @@ public class SharedAccessControlServiceTest {
     protected Permissions execLoadPermissions() {
       Permissions permissions = new Permissions();
       permissions.add(new SomePermission1());
-      permissions.add(new RemoteServiceAccessPermission("*.shared.*", "*"));
       return permissions;
     }
 
