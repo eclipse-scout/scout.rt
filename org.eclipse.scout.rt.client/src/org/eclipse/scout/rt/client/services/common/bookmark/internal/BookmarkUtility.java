@@ -272,7 +272,7 @@ public final class BookmarkUtility {
    * <p />
    * Finally the path will be expanded. Possible exceptions might occur if no outline is set in the {@link Bookmark} or
    * the outline is not available.
-   * 
+   *
    * @param forceReload
    *          parameter without any function
    * @deprecated see https://bugs.eclipse.org/bugs/show_bug.cgi?id=439867, parameter forceReload is without any
@@ -635,18 +635,7 @@ public final class BookmarkUtility {
     // setup table
     try {
       table.setTableChanging(true);
-      //legacy support
-      List<TableColumnState> allColumns = new ArrayList<TableColumnState>();
-      for (TableColumnState tcs : tablePageState.getAvailableColumns()) {
-        if (tcs.getVisible()) {
-          allColumns.add(tcs);
-        }
-      }
-
-      if (allColumns == null || allColumns.size() == 0) {
-        allColumns = tablePageState.getAvailableColumns();
-      }
-      restoreTableColumns(tablePage.getTable(), allColumns);
+      restoreTableColumns(tablePage.getTable(), tablePageState.getAvailableColumns());
     }
     finally {
       table.setTableChanging(false);
