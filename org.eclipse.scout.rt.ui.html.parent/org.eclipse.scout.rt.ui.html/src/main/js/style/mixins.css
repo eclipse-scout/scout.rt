@@ -21,8 +21,8 @@
 }
 
 .selection() {
-    background: @control-selection-color;
-    color: @selection-text-color;
+  background: @control-selection-color;
+  color: @selection-text-color;
 }
 
 .overlay(@left: 0px, @top: 0px, @diffW: 0px, @diffH: 0px) {

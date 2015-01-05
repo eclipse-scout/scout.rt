@@ -218,7 +218,7 @@
 
   &.has-submenu:after {
     .sub-menu-icon;
-    transform: rotate(180deg);
+    .transform(rotate(180deg));
     padding-right: 10px;
     padding-left: 0;
     top: 5px;
