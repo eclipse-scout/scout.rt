@@ -27,11 +27,8 @@ import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.shared.security.BasicHierarchyPermission;
-import org.eclipse.scout.rt.shared.security.RemoteServiceAccessPermission;
-import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
 import org.eclipse.scout.rt.shared.services.common.security.internal.AccessControlStore;
 import org.eclipse.scout.service.AbstractService;
-import org.eclipse.scout.service.SERVICES;
 import org.osgi.framework.ServiceRegistration;
 
 /**
@@ -199,26 +196,6 @@ public abstract class AbstractSharedAccessControlService extends AbstractService
   }
 
   private void setPermissions(Permissions p) {
-    //legacy support: if there are no remote service permissions available, warn and add default rule to allow shared interfaces
-    //to support legacy functionality, this default also accepts other so far valid requests but generates a warning.
-    //a future release will throw a {@link SecurityException} when no permission is granted.
-    if (p != null) {
-      if (!p.implies(new RemoteServiceAccessPermission(IPingService.class.getName(), "ping"))) {
-        boolean existsAny = false;
-        for (Enumeration<Permission> en = p.elements(); en.hasMoreElements();) {
-          Permission perm = en.nextElement();
-          if (perm instanceof RemoteServiceAccessPermission) {
-            existsAny = true;
-            break;
-          }
-        }
-        if (!existsAny) {
-          LOG.warn("Legacy security hint: missing any RemoteServiceAccessPermissions in AccessController. Please verify the " + SERVICES.getService(IAccessControlService.class).getClass() + " to include such permissions for accessing services using client proxies. Adding default rule to allow services of pattern '*.shared.*'");
-          p.add(new RemoteServiceAccessPermission("*.shared.*", "*"));
-        }
-      }
-    }
-    //end legacy
     m_accessControlStore.setPermissionsOfCurrentSubject(p);
 
     notifySetPermisions(p);
