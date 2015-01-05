@@ -220,6 +220,7 @@ public abstract class AbstractPlannerField<T extends ITable, P extends IActivity
             public void propertyChange(PropertyChangeEvent e) {
               if (e.getPropertyName().equals(IActivityMap.PROP_SELECTED_RESOURCE_IDS)) {
                 syncSelectionFromActivityToResource();
+                m_activityMap.getContextMenu().callOwnerValueChanged();
               }
             }
           }
