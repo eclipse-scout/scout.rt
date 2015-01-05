@@ -118,7 +118,7 @@ public class SharedCodeService extends AbstractService implements ICodeService {
 
     m_codeTypeStore.unloadCodeTypeCache(codetypeList);
 
-    publishCluster(codetypeList);
+    notifyReloadCodeTypes(codetypeList);
     return getCodeTypeCache().reloadCodeType(type);
   }
 
@@ -129,17 +129,18 @@ public class SharedCodeService extends AbstractService implements ICodeService {
     }
     m_codeTypeStore.unloadCodeTypeCache(types);
 
-    publishCluster(types);
+    notifyReloadCodeTypes(types);
     return getCodeTypeCache().reloadCodeTypes(types);
   }
 
   /**
-   * Hooks to notify clients and clusters during {@link #reloadCodeType(Class)} and {@link #reloadCodeTypes(List)}
+   * Hook to notify clients and clusters during {@link #reloadCodeType(Class)} and {@link #reloadCodeTypes(List)}
    *
+   * @since 4.3.0 (Mars-M5)
    * @param codetypeList
    * @throws ProcessingException
    */
-  protected void publishCluster(List<Class<? extends ICodeType<?, ?>>> codetypeList) throws ProcessingException {
+  protected void notifyReloadCodeTypes(List<Class<? extends ICodeType<?, ?>>> codetypeList) throws ProcessingException {
   }
 
   protected List<ICodeType<?, ?>> reloadCodeTypesNoFire(List<Class<? extends ICodeType<?, ?>>> types) throws ProcessingException {
