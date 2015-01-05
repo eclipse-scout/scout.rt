@@ -60,7 +60,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   // visible is defined as: visibleGranted && visibleProperty
   private boolean m_visibleGranted;
   private boolean m_visibleProperty;
-  private IPage m_contextPage;
+  private IPage<?> m_contextPage;
   private IPageChangeStrategy m_pageChangeStrategy;
   private OptimisticLock m_contextPageOptimisticLock;
   private OutlineMediator m_outlineMediator;
@@ -179,7 +179,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     addNodeFilter(new P_TableFilterBasedTreeNodeFilter());
     super.initConfig();
     setRootNodeVisible(false);
-    IPage rootPage = new InvisibleRootPage();
+    IPage<?> rootPage = new InvisibleRootPage();
     setRootNode(rootPage);
     setEnabled(getConfiguredEnabled());
     setVisible(getConfiguredVisible());
@@ -191,7 +191,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
    */
 
   @Override
-  public IPage getActivePage() {
+  public IPage<?> getActivePage() {
     return (IPage) getSelectedNode();
   }
 
@@ -237,7 +237,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     ITreeVisitor v = new ITreeVisitor() {
       @Override
       public boolean visit(ITreeNode node) {
-        IPage page = (IPage) node;
+        IPage<?> page = (IPage) node;
         if (page == null) {
           return true;
         }
@@ -251,7 +251,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
       }
     };
     visitNode(getRootNode(), v);
-    for (IPage page : candidates) {
+    for (IPage<?> page : candidates) {
       if (page.getTree() != null) {
         page.dataChanged();
       }
@@ -261,8 +261,8 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   @Override
   public void releaseUnusedPages() {
     final HashSet<IPage> preservationSet = new HashSet<IPage>();
-    IPage oldSelection = (IPage) getSelectedNode();
-    IPage p = oldSelection;
+    IPage<?> oldSelection = (IPage) getSelectedNode();
+    IPage<?> p = oldSelection;
     if (p != null) {
       while (p != null) {
         preservationSet.add(p);
@@ -272,7 +272,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     ITreeVisitor v = new ITreeVisitor() {
       @Override
       public boolean visit(ITreeNode node) {
-        IPage page = (IPage) node;
+        IPage<?> page = (IPage) node;
         if (preservationSet.contains(page)) {
           // nop
         }
@@ -291,7 +291,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
       setTreeChanging(true);
       visitNode(getRootNode(), v);
       if (oldSelection != null) {
-        IPage selectedPage = (IPage) getSelectedNode();
+        IPage<?> selectedPage = (IPage) getSelectedNode();
         if (selectedPage == null) {
           try {
             getRootNode().ensureChildrenLoaded();
@@ -318,7 +318,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
       @Override
       @SuppressWarnings("unchecked")
       public boolean visit(ITreeNode node) {
-        IPage page = (IPage) node;
+        IPage<?> page = (IPage) node;
         Class<? extends IPage> pageClass = page.getClass();
         if (pageType.isAssignableFrom(pageClass)) {
           result.setValue((T) page);
@@ -460,7 +460,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
 
   @Override
   public void makeActivePageToContextPage() {
-    IPage activePage = getActivePage();
+    IPage<?> activePage = getActivePage();
     if (activePage != null && m_contextPage != activePage) {
       m_contextPage = activePage;
       addMenusOfActivePageToContextMenu(activePage);
@@ -469,7 +469,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   }
 
   @Override
-  public List<IMenu> getMenusForPage(IPage page) {
+  public List<IMenu> getMenusForPage(IPage<?> page) {
     List<IMenu> result = new ArrayList<IMenu>();
     for (IMenu m : getContextMenu().getChildActions()) {
       if (!m_inheritedMenusOfPage.contains(m)) {
@@ -483,7 +483,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   /**
    * @see IOutline#getMenusForPage(IPage)
    */
-  protected List<IMenu> computeInheritedMenusOfPage(IPage activePage) {
+  protected List<IMenu> computeInheritedMenusOfPage(IPage<?> activePage) {
     List<IMenu> menus = new ArrayList<IMenu>();
     if (activePage instanceof IPageWithTable<?>) {
       // in case of a page with table the empty space actions of the table will be added to the context menu of the tree.
@@ -502,7 +502,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     }
 
     // in case of a page with nodes add the single selection menus of its parent table for the current node/row.
-    IPage parentPage = activePage.getParentPage();
+    IPage<?> parentPage = activePage.getParentPage();
     if (parentPage instanceof IPageWithTable<?>) {
       IPageWithTable<?> pageWithTable = (IPageWithTable<?>) parentPage;
       ITableRow row = pageWithTable.getTableRowFor(activePage);
@@ -521,7 +521,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     return menus;
   }
 
-  protected void addMenusOfActivePageToContextMenu(IPage activePage) {
+  protected void addMenusOfActivePageToContextMenu(IPage<?> activePage) {
     List<IMenu> wrappedMenus = new ArrayList<IMenu>();
     for (IMenu m : computeInheritedMenusOfPage(activePage)) {
       if (m.isSeparator()) {
@@ -537,7 +537,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
 
   @Override
   public void clearContextPage() {
-    IPage page = m_contextPage;
+    IPage<?> page = m_contextPage;
     if (page != null) {
       // remove menus of the active page
       removeMenusOfActivePageToContextMenu();
@@ -553,7 +553,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     }
   }
 
-  private void handleActivePageChanged(IPage deselectedPage, IPage selectedPage) {
+  private void handleActivePageChanged(IPage<?> deselectedPage, IPage<?> selectedPage) {
     if (m_pageChangeStrategy == null) {
       return;
     }
@@ -720,7 +720,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   }
 
   @Override
-  public void firePageChanged(IPage page) {
+  public void firePageChanged(IPage<?> page) {
     fireTreeEventInternal(new OutlineEvent(this, OutlineEvent.TYPE_PAGE_CHANGED, page));
   }
 

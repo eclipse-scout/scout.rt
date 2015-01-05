@@ -49,7 +49,7 @@ public final class PageWithTableChains {
       super(extensions);
     }
 
-    public IPage execCreateChildPage(final ITableRow row) throws ProcessingException {
+    public IPage<?> execCreateChildPage(final ITableRow row) throws ProcessingException {
       MethodInvocation<IPage> methodInvocation = new MethodInvocation<IPage>() {
         @Override
         protected void callMethod(IPageWithTableExtension<? extends ITable, ? extends AbstractPageWithTable<? extends ITable>> next) throws ProcessingException {
@@ -118,7 +118,7 @@ public final class PageWithTableChains {
       super(extensions);
     }
 
-    public IPage execCreateVirtualChildPage(final ITableRow row) throws ProcessingException {
+    public IPage<?> execCreateVirtualChildPage(final ITableRow row) throws ProcessingException {
       MethodInvocation<IPage> methodInvocation = new MethodInvocation<IPage>() {
         @Override
         protected void callMethod(IPageWithTableExtension<? extends ITable, ? extends AbstractPageWithTable<? extends ITable>> next) throws ProcessingException {

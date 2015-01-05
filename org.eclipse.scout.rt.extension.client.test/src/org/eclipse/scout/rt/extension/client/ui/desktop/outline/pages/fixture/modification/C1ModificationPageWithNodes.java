@@ -10,10 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.fixture.modification;
 
+
 /**
  * @since 3.9.0
  */
-public class C1ModificationPageWithNodes extends AbstractCModificationPageWithNodes implements IModifiablePage {
+public class C1ModificationPageWithNodes extends AbstractCModificationPageWithNodes {
 
   private boolean m_modified;
 

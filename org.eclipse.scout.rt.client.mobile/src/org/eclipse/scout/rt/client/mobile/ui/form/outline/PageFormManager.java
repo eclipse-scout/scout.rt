@@ -114,7 +114,7 @@ public class PageFormManager {
     m_pageSelectionRunning = pageSelectionRunning;
   }
 
-  public static boolean isDrillDownPage(IPage page) {
+  public static boolean isDrillDownPage(IPage<?> page) {
     return page instanceof IPageWithTable && page.getParentNode() instanceof IPageWithNodes;
   }
 
@@ -138,7 +138,7 @@ public class PageFormManager {
     }
   }
 
-  private void hidePage(IPage page) throws ProcessingException {
+  private void hidePage(IPage<?> page) throws ProcessingException {
     if (page == null) {
       return;
     }
@@ -150,7 +150,7 @@ public class PageFormManager {
     }
   }
 
-  private IPageForm showPage(IPage page) throws ProcessingException {
+  private IPageForm showPage(IPage<?> page) throws ProcessingException {
     IPageForm pageForm = getPageForm(page, true);
     if (pageForm != null) {
       return pageForm;
@@ -166,11 +166,11 @@ public class PageFormManager {
     return showPage(page, displayViewId);
   }
 
-  public IPageForm getPageForm(IPage page, boolean onlyShowing) {
+  public IPageForm getPageForm(IPage<?> page, boolean onlyShowing) {
     return m_pageFormMap.get(page, onlyShowing);
   }
 
-  public String computePageFormSlot(IPage page) {
+  public String computePageFormSlot(IPage<?> page) {
     if (page == null) {
       return null;
     }
@@ -200,7 +200,7 @@ public class PageFormManager {
     return getMiddlePageSlotViewId();
   }
 
-  private IPageForm showPage(IPage page, String viewId) throws ProcessingException {
+  private IPageForm showPage(IPage<?> page, String viewId) throws ProcessingException {
     updateLeftPageIfNecessary(page, viewId);
 
     IPageForm pageForm = m_pageFormMap.get(viewId, page);
@@ -242,7 +242,7 @@ public class PageFormManager {
    * Node page switch: The node page on the right side moves to the left side when selecting a node page, happens on
    * nested PageWithNodes
    */
-  private void updateLeftPageIfNecessary(IPage page, String viewId) throws ProcessingException {
+  private void updateLeftPageIfNecessary(IPage<?> page, String viewId) throws ProcessingException {
     if (getMiddlePageSlotViewId() == null) {
       return;
     }
@@ -257,17 +257,17 @@ public class PageFormManager {
     }
   }
 
-  protected IMainPageForm createMainPageForm(IPage page) throws ProcessingException {
+  protected IMainPageForm createMainPageForm(IPage<?> page) throws ProcessingException {
     PageFormConfig config = createMainPageFormConfig(page);
     return new MainPageForm(page, this, config);
   }
 
-  protected IPageForm createPageForm(IPage page) throws ProcessingException {
+  protected IPageForm createPageForm(IPage<?> page) throws ProcessingException {
     PageFormConfig config = createPageFormConfig(page);
     return new PageForm(page, this, config);
   }
 
-  protected PageFormConfig createMainPageFormConfig(IPage page) {
+  protected PageFormConfig createMainPageFormConfig(IPage<?> page) {
     PageFormConfig config = new PageFormConfig();
     config.setTablePageAllowed(true);
     config.setTableStatusVisible(true);
@@ -281,7 +281,7 @@ public class PageFormManager {
     return config;
   }
 
-  protected PageFormConfig createPageFormConfig(IPage page) {
+  protected PageFormConfig createPageFormConfig(IPage<?> page) {
     PageFormConfig config = new PageFormConfig();
     config.setDetailFormVisible(true);
     return config;
@@ -291,7 +291,7 @@ public class PageFormManager {
     return m_desktop;
   }
 
-  public void pageSelectedNotify(PageForm pageForm, IPage selectedPage) throws ProcessingException {
+  public void pageSelectedNotify(PageForm pageForm, IPage<?> selectedPage) throws ProcessingException {
     if (selectedPage == null) {
       return;
     }
@@ -320,7 +320,7 @@ public class PageFormManager {
    * and additional outline change.
    * TreeChanging must not be set otherwise collecting node menus does not work anymore.
    */
-  private void selectAndExpandPage(IPage page) throws ProcessingException {
+  private void selectAndExpandPage(IPage<?> page) throws ProcessingException {
     try {
       setPageSelectionRunning(true);
 
@@ -371,18 +371,18 @@ public class PageFormManager {
       //So we need to make sure the pageForms of the child pages are properly removed as well.
       handleTreeNodesDeleted(node.getChildNodes());
 
-      if (node instanceof IPage && node.getTree() == null) {
-        IPage page = (IPage) node;
+      if (node instanceof IPage<?> && node.getTree() == null) {
+        IPage<?> page = (IPage) node;
         handlePageRemoved(page);
       }
     }
   }
 
-  public void pageRemovedNotify(PageForm pageForm, IPage page) throws ProcessingException {
+  public void pageRemovedNotify(PageForm pageForm, IPage<?> page) throws ProcessingException {
     handlePageRemoved(page);
   }
 
-  private void handlePageRemoved(IPage page) throws ProcessingException {
+  private void handlePageRemoved(IPage<?> page) throws ProcessingException {
     if (page == null) {
       return;
     }
@@ -401,7 +401,7 @@ public class PageFormManager {
     // Normally, when removing the selected page, the parent page gets selected and the corresponding page form shown.
     // In case of the AutoLeafPageWithNodes, the parent page already is selected, so no selection event will be fired. Therefore we need to show the page form manually.
     if (page instanceof AutoLeafPageWithNodes) {
-      IPage parentPage = ((AutoLeafPageWithNodes) page).getActualParentPage();
+      IPage<?> parentPage = ((AutoLeafPageWithNodes) page).getActualParentPage();
       if (parentPage.isSelectedNode()) {
         showPage(parentPage);
       }

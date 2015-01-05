@@ -118,8 +118,8 @@ public final class ClientTestUtility {
    * @rn aho, 09.03.2009:
    * @return the root page of the desired outline.
    */
-  public static IPage gotoOutline(Class<? extends AbstractOutline> outlineClass) {
-    IPage rootPage = null;
+  public static IPage<?> gotoOutline(Class<? extends AbstractOutline> outlineClass) {
+    IPage<?> rootPage = null;
     for (IOutline outline : getDesktop().getAvailableOutlines()) {
 
       if (outline.getClass().isAssignableFrom(outlineClass)) {
@@ -158,7 +158,7 @@ public final class ClientTestUtility {
    * @return return the first child page of the given class, iff exists.
    */
   public static <T extends IPage> T gotoChildPage(Class<T> childPageClass) {
-    IPage selectedNode = getDesktop().getOutline().getActivePage();
+    IPage<?> selectedNode = getDesktop().getOutline().getActivePage();
     return gotoChildPage(selectedNode, childPageClass);
   }
 

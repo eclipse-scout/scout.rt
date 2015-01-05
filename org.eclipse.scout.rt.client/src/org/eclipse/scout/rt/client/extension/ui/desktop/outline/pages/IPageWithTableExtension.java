@@ -17,7 +17,7 @@ public interface IPageWithTableExtension<T extends ITable, OWNER extends Abstrac
 
   void execLoadData(PageWithTableLoadDataChain<? extends ITable> chain, SearchFilter filter) throws ProcessingException;
 
-  IPage execCreateChildPage(PageWithTableCreateChildPageChain<? extends ITable> chain, ITableRow row) throws ProcessingException;
+  IPage<?> execCreateChildPage(PageWithTableCreateChildPageChain<? extends ITable> chain, ITableRow row) throws ProcessingException;
 
   /**
    * @Deprecated will be removed with the N release. see {@link AbstractPageWithTable#execLoadTableData(SearchFilter)}
@@ -28,7 +28,7 @@ public interface IPageWithTableExtension<T extends ITable, OWNER extends Abstrac
 
   void execPopulateTable(PageWithTablePopulateTableChain<? extends ITable> chain) throws ProcessingException;
 
-  IPage execCreateVirtualChildPage(PageWithTableCreateVirtualChildPageChain<? extends ITable> chain, ITableRow row) throws ProcessingException;
+  IPage<?> execCreateVirtualChildPage(PageWithTableCreateVirtualChildPageChain<? extends ITable> chain, ITableRow row) throws ProcessingException;
 
   void execInitSearchForm(PageWithTableInitSearchFormChain<? extends ITable> chain) throws ProcessingException;
 }

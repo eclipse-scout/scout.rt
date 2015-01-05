@@ -47,7 +47,7 @@ public class ColumnAutoResizeTest {
     desktop.setOutline(PageWithTableOutline.class);
     IOutline outline = desktop.getOutline();
 
-    IPage page = outline.getActivePage();
+    IPage<?> page = outline.getActivePage();
     assertNotNull(page);
     assertTrue(page instanceof AbstractPageWithTable);
     ITable table = ((AbstractPageWithTable) page).getTable();
@@ -76,7 +76,7 @@ public class ColumnAutoResizeTest {
     }
 
     @Override
-    protected IPage execCreateChildPage(ITableRow row) throws ProcessingException {
+    protected IPage<?> execCreateChildPage(ITableRow row) throws ProcessingException {
       return new PageWithNode();
     }
 

@@ -80,7 +80,7 @@ public interface IPage<T extends ITable> extends ITreeNode, ITypeWithClassId {
    *         Note that this is <b>not</b> exactly the same as (IPage)getChildNode().
    *         see {@link VirtualPage} for more details.
    */
-  IPage getChildPage(int index);
+  IPage<?> getChildPage(int index);
 
   /**
    * @return all child pages
@@ -95,7 +95,7 @@ public interface IPage<T extends ITable> extends ITreeNode, ITypeWithClassId {
   /**
    * Convenience for (IPage)getParentNode()
    */
-  IPage getParentPage();
+  IPage<?> getParentPage();
 
   boolean isTableVisible();
 
@@ -154,7 +154,7 @@ public interface IPage<T extends ITable> extends ITreeNode, ITypeWithClassId {
    */
   ITreeNode getTreeNodeFor(ITableRow tableRow);
 
-  IPage getPageFor(ITableRow tableRow);
+  IPage<?> getPageFor(ITableRow tableRow);
 
   ITableRow getTableRowFor(ITreeNode treeNode);
 

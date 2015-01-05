@@ -36,7 +36,7 @@ public class PageFormHeaderActionFetcher extends FormHeaderActionFetcher {
   @Override
   public List<IMenu> fetch() {
     List<IMenu> headerActions = super.fetch();
-    IPage page = getForm().getPage();
+    IPage<?> page = getForm().getPage();
 
     List<IMenu> nodeActions = ActionButtonBarUtility.fetchPageActions(page);
     for (IMenu action : nodeActions) {

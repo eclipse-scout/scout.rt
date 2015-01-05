@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.extension.client.IExtensibleScoutObject;
  * <ul>
  * <li>adding, removing and modifying statically configured pages</li>
  * </ul>
- * 
+ *
  * @since 3.9.0
  */
 public abstract class AbstractExtensiblePageWithTable<T extends ITable> extends AbstractPageWithTable<T> implements IExtensibleScoutObject {
@@ -78,8 +78,8 @@ public abstract class AbstractExtensiblePageWithTable<T extends ITable> extends 
   }
 
   @Override
-  protected IPage createChildPageInternal(ITableRow row) throws ProcessingException {
-    IPage childPage = super.createChildPageInternal(row);
+  protected IPage<?> createChildPageInternal(ITableRow row) throws ProcessingException {
+    IPage<?> childPage = super.createChildPageInternal(row);
     if (childPage != null) {
       PageExtensionUtility.adaptPage(getOutline(), this, childPage);
     }

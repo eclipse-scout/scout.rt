@@ -15,7 +15,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 
 public class MainPageForm extends PageForm implements IMainPageForm {
 
-  public MainPageForm(IPage page, PageFormManager manager, PageFormConfig config) throws ProcessingException {
+  public MainPageForm(IPage<?> page, PageFormManager manager, PageFormConfig config) throws ProcessingException {
     super(page, manager, config);
   }
 

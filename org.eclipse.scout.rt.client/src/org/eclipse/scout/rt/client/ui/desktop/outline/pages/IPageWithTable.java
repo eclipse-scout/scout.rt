@@ -26,7 +26,7 @@ import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
  * tree events are handled manually using exec.. methods<br>
  * table events are delegated to the tree<br>
  */
-public interface IPageWithTable<T extends ITable> extends IPage {
+public interface IPageWithTable<T extends ITable> extends IPage<T> {
 
   /**
    * Computes the list of linked child pages for the given table rows and updates their summary cell.

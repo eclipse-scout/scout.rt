@@ -76,7 +76,7 @@ public class ActionButtonBarUtility {
   /**
    * Fetches the actions of the given page (tree node and table row menus).
    */
-  public static List<IMenu> fetchPageActions(IPage page) {
+  public static List<IMenu> fetchPageActions(IPage<?> page) {
     List<IMenu> pageActions = new LinkedList<IMenu>();
     if (page.getTree() != null) {
       List<IMenu> menusForPage = page.getOutline().getMenusForPage(page);

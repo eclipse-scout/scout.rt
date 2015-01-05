@@ -10,12 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.fixture.modification;
 
+import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 
 /**
  * @since 3.9.0
  */
-public interface IModifiablePage extends IPage {
+public interface IModifiablePage<T extends ITable> extends IPage<T> {
 
   void markModified();
 

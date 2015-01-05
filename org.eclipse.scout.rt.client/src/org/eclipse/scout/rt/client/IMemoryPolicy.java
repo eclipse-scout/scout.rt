@@ -49,7 +49,7 @@ public interface IMemoryPolicy {
    * <p>
    * For search form caching use {@link #pageSearchFormStarted(IPageWithTable)} instead.
    */
-  void pageCreated(IPage page) throws ProcessingException;
+  void pageCreated(IPage<?> page) throws ProcessingException;
 
   /**
    * This method is called just after a search form inside a page was started using {@link ISearchForm#startSearch()}

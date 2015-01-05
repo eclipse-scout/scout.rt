@@ -17,9 +17,9 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 
 public class AutoOutline extends AbstractOutline {
-  private IPage m_page;
+  private IPage<?> m_page;
 
-  public AutoOutline(IPage page) {
+  public AutoOutline(IPage<?> page) {
     super(false);
     m_page = page;
     callInitializer();

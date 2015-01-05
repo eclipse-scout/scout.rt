@@ -10,12 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.fixture.modification;
 
+import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.AbstractExtensiblePageWithNodes;
 
 /**
  * @since 3.9.0
  */
-public class AModificationPageWithNodes extends AbstractExtensiblePageWithNodes implements IModifiablePage {
+public class AModificationPageWithNodes extends AbstractExtensiblePageWithNodes implements IModifiablePage<ITable> {
 
   private boolean m_modified;
 

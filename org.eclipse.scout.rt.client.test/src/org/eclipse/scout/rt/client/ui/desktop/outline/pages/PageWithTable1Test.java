@@ -50,7 +50,7 @@ public class PageWithTable1Test {
     assertNotNull(outline);
     assertSame(PageWithTableOutline.class, outline.getClass());
 
-    IPage page = outline.getActivePage();
+    IPage<?> page = outline.getActivePage();
     assertNotNull(page);
     assertSame(PageWithTable.class, page.getClass());
 
@@ -100,7 +100,7 @@ public class PageWithTable1Test {
     }
 
     @Override
-    protected IPage execCreateChildPage(ITableRow row) throws ProcessingException {
+    protected IPage<?> execCreateChildPage(ITableRow row) throws ProcessingException {
       return new PageWithNode();
     }
 

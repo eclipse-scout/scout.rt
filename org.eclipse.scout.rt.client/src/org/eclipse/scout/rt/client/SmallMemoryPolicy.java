@@ -54,7 +54,7 @@ public class SmallMemoryPolicy extends AbstractMemoryPolicy {
   }
 
   @Override
-  public void pageCreated(IPage p) throws ProcessingException {
+  public void pageCreated(IPage<?> p) throws ProcessingException {
     //nop
   }
 

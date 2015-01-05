@@ -55,12 +55,12 @@ public class VirtualPage extends VirtualTreeNode implements IPage, IVirtualTreeN
   }
 
   @Override
-  public IPage getParentPage() {
+  public IPage<?> getParentPage() {
     return (IPage) getParentNode();
   }
 
   @Override
-  public IPage getChildPage(final int childIndex) {
+  public IPage<?> getChildPage(final int childIndex) {
     return null;
   }
 
@@ -140,7 +140,7 @@ public class VirtualPage extends VirtualTreeNode implements IPage, IVirtualTreeN
   }
 
   @Override
-  public IPage getPageFor(ITableRow tableRow) {
+  public IPage<?> getPageFor(ITableRow tableRow) {
     return null;
   }
 

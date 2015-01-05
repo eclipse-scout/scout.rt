@@ -51,7 +51,7 @@ import org.eclipse.scout.service.SERVICES;
 public class PageForm extends AbstractMobileForm implements IPageForm {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(PageForm.class);
   private List<IButton> m_mainboxButtons;
-  private IPage m_page;
+  private IPage<?> m_page;
   private P_PageTableListener m_pageTableListener;
   private P_PageTableSelectionListener m_pageTableSelectionListener;
   private PageFormConfig m_pageFormConfig;
@@ -59,7 +59,7 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
   private Map<ITableRow, AutoLeafPageWithNodes> m_autoLeafPageMap;
   private boolean m_rowSelectionRequired;
 
-  public PageForm(IPage page, PageFormManager manager, PageFormConfig pageFormConfig) throws ProcessingException {
+  public PageForm(IPage<?> page, PageFormManager manager, PageFormConfig pageFormConfig) throws ProcessingException {
     super(false);
     m_pageFormManager = manager;
     m_pageFormConfig = pageFormConfig;
@@ -122,11 +122,11 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
   }
 
   @Override
-  public final IPage getPage() {
+  public final IPage<?> getPage() {
     return m_page;
   }
 
-  private void setPageInternal(IPage page) throws ProcessingException {
+  private void setPageInternal(IPage<?> page) throws ProcessingException {
     m_page = page;
     m_page = (IPage) m_page.getTree().resolveVirtualNode(m_page);
 
@@ -176,7 +176,7 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
    */
   private TableRowForm createAutoDetailForm() throws ProcessingException {
     ITable table = null;
-    IPage parentPage = m_page.getParentPage();
+    IPage<?> parentPage = m_page.getParentPage();
     if (parentPage instanceof IPageWithTable) {
       table = ((IPageWithTable) parentPage).getTable();
     }
@@ -594,7 +594,7 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
       return;
     }
 
-    IPage rowPage = null;
+    IPage<?> rowPage = null;
     if (table instanceof PlaceholderTable) {
       rowPage = ((PlaceholderTable) table).getActualPage();
     }
@@ -652,7 +652,7 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
       return;
     }
 
-    IPage pageToSelect = m_page.getPageFor(pageDetailTable.getRow(0));
+    IPage<?> pageToSelect = m_page.getPageFor(pageDetailTable.getRow(0));
     if (pageDetailTable.getSelectedRow() == null) {
       if (!PageFormManager.isDrillDownPage(pageToSelect)) {
         pageDetailTable.selectFirstRow();
@@ -670,7 +670,7 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
       return;
     }
 
-    IPage selectedPage = (IPage) m_page.getOutline().getSelectedNode();
+    IPage<?> selectedPage = (IPage) m_page.getOutline().getSelectedNode();
     if (selectedPage != null && selectedPage.getParentPage() == m_page) {
       ITableRow row = m_page.getTableRowFor(selectedPage);
       if (row != null && !isDrillDownRow(row)) {
@@ -680,13 +680,13 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
   }
 
   private class PlaceholderTable extends AbstractTable {
-    private IPage m_actualPage;
+    private IPage<?> m_actualPage;
 
-    public PlaceholderTable(IPage page) {
+    public PlaceholderTable(IPage<?> page) {
       m_actualPage = page;
     }
 
-    public IPage getActualPage() {
+    public IPage<?> getActualPage() {
       return m_actualPage;
     }
 

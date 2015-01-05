@@ -116,14 +116,14 @@ public final class BookmarkUtility {
     return null;
   }
 
-  public static IPage resolvePage(List<? extends IPage> pages, String className, String bookmarkIdentifier) {
+  public static IPage<?> resolvePage(List<? extends IPage> pages, String className, String bookmarkIdentifier) {
     if (className == null) {
       return null;
     }
     TreeMap<CompositeObject, IPage> sortMap = new TreeMap<CompositeObject, IPage>();
     String simpleClassName = className.replaceAll("^.*\\.", "");
     int index = 0;
-    for (IPage p : pages) {
+    for (IPage<?> p : pages) {
       int classNameScore = 0;
       int userPreferenceContextScore = 0;
       if (p.getClass().getName().equals(className)) {
@@ -145,7 +145,7 @@ public final class BookmarkUtility {
       return null;
     }
     CompositeObject bestMatchingKey = sortMap.firstKey();
-    IPage bestMatchingPage = sortMap.remove(bestMatchingKey);
+    IPage<?> bestMatchingPage = sortMap.remove(bestMatchingKey);
     if (!sortMap.isEmpty()) {
       // check ambiguity
       CompositeObject nextKey = sortMap.firstKey();
@@ -308,14 +308,14 @@ public final class BookmarkUtility {
     try {
       outline.setTreeChanging(true);
       //
-      IPage parentPage = outline.getRootPage();
+      IPage<?> parentPage = outline.getRootPage();
       boolean pathFullyRestored = true;
       List<AbstractPageState> path = bm.getPath();
       AbstractPageState parentPageState = path.get(0);
       boolean resetViewAndWarnOnFail = bm.getId() != 0;
       for (int i = 1; i < path.size(); i++) {
         // try to find correct child page (next parentPage)
-        IPage childPage = null;
+        IPage<?> childPage = null;
         AbstractPageState childState = path.get(i);
         if (parentPageState instanceof TablePageState) {
           TablePageState tablePageState = (TablePageState) parentPageState;
@@ -352,7 +352,7 @@ public final class BookmarkUtility {
       /*
        * Expansions of the restored tree path
        */
-      IPage p = parentPage;
+      IPage<?> p = parentPage;
       // last element
       if (pathFullyRestored && parentPageState.isExpanded() != null) {
         p.setExpanded(parentPageState.isExpanded());
@@ -510,11 +510,11 @@ public final class BookmarkUtility {
       return null;
     }
 
-    IPage activePage = outline.getActivePage();
+    IPage<?> activePage = outline.getActivePage();
     return createBookmark(activePage);
   }
 
-  public static Bookmark createBookmark(IPage page) throws ProcessingException {
+  public static Bookmark createBookmark(IPage<?> page) throws ProcessingException {
     if (page == null || page.getOutline() == null) {
       return null;
     }
@@ -603,7 +603,7 @@ public final class BookmarkUtility {
       page = path.get(i);
       if (page instanceof IPageWithTable) {
         IPageWithTable tablePage = (IPageWithTable) page;
-        IPage childPage = null;
+        IPage<?> childPage = null;
         if (i + 1 < path.size()) {
           childPage = path.get(i + 1);
         }
@@ -617,7 +617,7 @@ public final class BookmarkUtility {
     return b;
   }
 
-  private static IPage bmLoadTablePage(IPageWithTable tablePage, TablePageState tablePageState, boolean leafState, boolean resetViewAndWarnOnFail) throws ProcessingException {
+  private static IPage<?> bmLoadTablePage(IPageWithTable tablePage, TablePageState tablePageState, boolean leafState, boolean resetViewAndWarnOnFail) throws ProcessingException {
     ITable table = tablePage.getTable();
     if (tablePageState.getTableCustomizerData() != null && tablePage.getTable().getTableCustomizer() != null) {
       byte[] newData = tablePageState.getTableCustomizerData();
@@ -677,7 +677,7 @@ public final class BookmarkUtility {
         }
       }
     }
-    IPage childPage = null;
+    IPage<?> childPage = null;
     boolean loadChildren = !leafState;
     if (tablePage.isChildrenDirty() || tablePage.isChildrenVolatile()) {
       loadChildren = true;
@@ -759,11 +759,11 @@ public final class BookmarkUtility {
     return childPage;
   }
 
-  private static IPage bmLoadNodePage(IPageWithNodes nodePage, NodePageState nodePageState, AbstractPageState childState, boolean resetViewAndWarnOnFail) throws ProcessingException {
-    IPage childPage = null;
+  private static IPage<?> bmLoadNodePage(IPageWithNodes nodePage, NodePageState nodePageState, AbstractPageState childState, boolean resetViewAndWarnOnFail) throws ProcessingException {
+    IPage<?> childPage = null;
     if (childState != null) {
       nodePage.ensureChildrenLoaded();
-      IPage p = BookmarkUtility.resolvePage(nodePage.getChildPages(), childState.getPageClassName(), childState.getBookmarkIdentifier());
+      IPage<?> p = BookmarkUtility.resolvePage(nodePage.getChildPages(), childState.getPageClassName(), childState.getBookmarkIdentifier());
       if (p != null) {
         ITable table = nodePage.getTable();
         // reset table column filter if requested
@@ -784,7 +784,7 @@ public final class BookmarkUtility {
     return childPage;
   }
 
-  private static TablePageState bmStoreTablePage(IPageWithTable page, IPage childPage) throws ProcessingException {
+  private static TablePageState bmStoreTablePage(IPageWithTable page, IPage<?> childPage) throws ProcessingException {
     ITable table = page.getTable();
     TablePageState state = new TablePageState();
     state.setPageClassName(page.getClass().getName());

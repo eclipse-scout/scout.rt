@@ -119,7 +119,7 @@ public class DefaultOutlineTableForm extends AbstractForm implements IOutlineTab
         // populate status
         IProcessingStatus populateStatus = null;
         if (outline != null && outline.getActivePage() != null) {
-          IPage activePage = outline.getActivePage();
+          IPage<?> activePage = outline.getActivePage();
           populateStatus = activePage.getPagePopulateStatus();
         }
         setTablePopulateStatus(populateStatus);

@@ -970,7 +970,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       try {
         m_outlineChanging = true;
         if (m_outline != null) {
-          IPage oldActivePage = m_outline.getActivePage();
+          IPage<?> oldActivePage = m_outline.getActivePage();
           if (oldActivePage != null) {
             SERVICES.getService(INavigationHistoryService.class).addStep(0, oldActivePage);
           }
@@ -1021,7 +1021,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
           setPageDetailTable(m_outline.getDetailTable());
           setPageSearchForm(m_outline.getSearchForm(), true);
           m_outline.makeActivePageToContextPage();
-          IPage newActivePage = m_outline.getActivePage();
+          IPage<?> newActivePage = m_outline.getActivePage();
           if (newActivePage == null) {
             // if there is no active page, set it now
             if (m_outline.isRootNodeVisible()) {
@@ -1694,7 +1694,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
-  public Bookmark createBookmark(IPage page) throws ProcessingException {
+  public Bookmark createBookmark(IPage<?> page) throws ProcessingException {
     return BookmarkUtility.createBookmark(page);
   }
 
@@ -2076,13 +2076,13 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       switch (e.getType()) {
         case TreeEvent.TYPE_BEFORE_NODES_SELECTED: {
           if (e.getDeselectedNode() instanceof IPage) {
-            IPage deselectedPage = (IPage) e.getDeselectedNode();
+            IPage<?> deselectedPage = (IPage) e.getDeselectedNode();
             SERVICES.getService(INavigationHistoryService.class).addStep(0, deselectedPage);
           }
           break;
         }
         case TreeEvent.TYPE_NODES_SELECTED: {
-          IPage page = m_outline.getActivePage();
+          IPage<?> page = m_outline.getActivePage();
           if (page != null) {
             SERVICES.getService(INavigationHistoryService.class).addStep(0, page);
           }

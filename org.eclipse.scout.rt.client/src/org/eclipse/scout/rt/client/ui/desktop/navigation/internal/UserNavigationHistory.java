@@ -59,7 +59,7 @@ public class UserNavigationHistory {
     m_bookmarks = new LinkedList<Bookmark>();
   }
 
-  public Bookmark addStep(int level, IPage page) {
+  public Bookmark addStep(int level, IPage<?> page) {
     if (!m_addStepEnabled) {
       return null;
     }
@@ -132,7 +132,7 @@ public class UserNavigationHistory {
     if (outline != null) {
       outline.scrollToSelection();
       //scroll to table selection
-      IPage page = outline.getActivePage();
+      IPage<?> page = outline.getActivePage();
       if (page instanceof IPageWithTable<?>) {
         ITable table = ((IPageWithTable<?>) page).getTable();
         if (table != null) {

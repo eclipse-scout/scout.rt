@@ -40,7 +40,7 @@ public interface INavigationHistoryService extends IService {
    * @return the added bookmark
    * @since 3.8.0
    */
-  Bookmark addStep(int level, IPage page);
+  Bookmark addStep(int level, IPage<?> page);
 
   /**
    * @return the navigation history

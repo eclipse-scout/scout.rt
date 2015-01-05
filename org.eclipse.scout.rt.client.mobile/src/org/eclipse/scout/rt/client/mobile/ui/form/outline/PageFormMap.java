@@ -26,11 +26,11 @@ public class PageFormMap {
     m_pageFormMaps = new HashMap<String, List<IPageForm>>();
   }
 
-  public IPageForm get(IPage page) {
+  public IPageForm get(IPage<?> page) {
     return get(page, false);
   }
 
-  public IPageForm get(IPage page, boolean onlyVisible) {
+  public IPageForm get(IPage<?> page, boolean onlyVisible) {
     if (page == null) {
       return null;
     }
@@ -53,7 +53,7 @@ public class PageFormMap {
     return null;
   }
 
-  public IPageForm get(String displayViewId, IPage page) {
+  public IPageForm get(String displayViewId, IPage<?> page) {
     if (displayViewId == null || page == null) {
       return null;
     }
@@ -83,7 +83,7 @@ public class PageFormMap {
     m_pageFormMaps.put(displayViewId, list);
   }
 
-  public void remove(IPage page) {
+  public void remove(IPage<?> page) {
     for (List<IPageForm> pageFormList : m_pageFormMaps.values()) {
       if (pageFormList == null) {
         continue;

@@ -58,7 +58,7 @@ public interface IOutline extends ITree, ITypeWithClassId, IOrdered {
   /**
    * alias to {@link ITree#getSelectedNode()}
    */
-  IPage getActivePage();
+  IPage<?> getActivePage();
 
   void makeActivePageToContextPage();
 
@@ -151,8 +151,8 @@ public interface IOutline extends ITree, ITypeWithClassId, IOrdered {
    * @param page
    * @return
    */
-  List<IMenu> getMenusForPage(IPage page);
+  List<IMenu> getMenusForPage(IPage<?> page);
 
-  void firePageChanged(IPage page);
+  void firePageChanged(IPage<?> page);
 
 }

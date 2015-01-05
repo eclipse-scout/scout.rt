@@ -125,7 +125,7 @@ public class MediumMemoryPolicy extends AbstractMemoryPolicy {
       final AtomicLong nodeCount = new AtomicLong();
       if (desktop.getOutline() != null && desktop.getOutline().getSelectedNode() != null) {
         final HashSet<IPage> preservationSet = new HashSet<IPage>();
-        IPage p = (IPage) desktop.getOutline().getSelectedNode();
+        IPage<?> p = (IPage) desktop.getOutline().getSelectedNode();
         while (p != null) {
           // the tree in the selection is not the topic
           // of the analysis whether we should free up the memory
@@ -136,7 +136,7 @@ public class MediumMemoryPolicy extends AbstractMemoryPolicy {
         ITreeVisitor v = new ITreeVisitor() {
           @Override
           public boolean visit(ITreeNode node) {
-            IPage page = (IPage) node;
+            IPage<?> page = (IPage) node;
             if (preservationSet.contains(page)) {
               // nop
             }

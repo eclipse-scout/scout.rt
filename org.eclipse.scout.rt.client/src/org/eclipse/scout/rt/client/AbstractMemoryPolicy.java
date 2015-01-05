@@ -106,7 +106,7 @@ public abstract class AbstractMemoryPolicy implements IMemoryPolicy {
    * Attaches listener on page contents
    */
   @Override
-  public void pageCreated(IPage p) throws ProcessingException {
+  public void pageCreated(IPage<?> p) throws ProcessingException {
     if (p.getOutline() instanceof AbstractPageField.SimpleOutline) {
       return;
     }
@@ -139,7 +139,7 @@ public abstract class AbstractMemoryPolicy implements IMemoryPolicy {
   /**
    * @return the identifier for the page form
    */
-  protected String registerPageForm(IPage p, IForm f) {
+  protected String registerPageForm(IPage<?> p, IForm f) {
     String id = createUniqueIdForPage(p, f);
     m_formToIdentifierMap.put(f, id);
     f.removeFormListener(m_formListener);
@@ -150,7 +150,7 @@ public abstract class AbstractMemoryPolicy implements IMemoryPolicy {
   /**
    * @return the identifier for the page table or <code>null</code> if the table does not have a column filter manager.
    */
-  protected String registerPageTable(IPage p, ITable t) {
+  protected String registerPageTable(IPage<?> p, ITable t) {
     if (t.getColumnFilterManager() == null) {
       return null;
     }
@@ -161,13 +161,13 @@ public abstract class AbstractMemoryPolicy implements IMemoryPolicy {
     return id;
   }
 
-  protected String createUniqueIdForPage(IPage p, Object o) {
+  protected String createUniqueIdForPage(IPage<?> p, Object o) {
     if (p == null) {
       return null;
     }
     StringBuilder builder = new StringBuilder();
     createIdForPage(builder, p, o);
-    IPage page = p.getParentPage();
+    IPage<?> page = p.getParentPage();
     while (page != null) {
       createIdForPage(builder, page, null);
       page = page.getParentPage();
@@ -177,7 +177,7 @@ public abstract class AbstractMemoryPolicy implements IMemoryPolicy {
     return "" + crc.getValue();
   }
 
-  private void createIdForPage(StringBuilder b, IPage page, Object o) {
+  private void createIdForPage(StringBuilder b, IPage<?> page, Object o) {
     b.append("/");
     b.append(page.getClass().getName());
     if (page.getUserPreferenceContext() != null) {

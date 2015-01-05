@@ -274,7 +274,7 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
-  public Bookmark createBookmark(IPage page) throws ProcessingException {
+  public Bookmark createBookmark(IPage<?> page) throws ProcessingException {
     throw createUnsupportedOperationException();
   }
 

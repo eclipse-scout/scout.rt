@@ -39,7 +39,7 @@ public class MultiPageChangeStrategy implements IPageChangeStrategy {
   }
 
   @Override
-  public void pageChanged(IOutline outline, IPage deselectedPage, IPage selectedPage) {
+  public void pageChanged(IOutline outline, IPage<?> deselectedPage, IPage<?> selectedPage) {
     if (outline == null) {
       return;
     }
@@ -65,7 +65,7 @@ public class MultiPageChangeStrategy implements IPageChangeStrategy {
     }
   }
 
-  private void activateMainPage(IPage deselectedPage, IPage selectedPage) {
+  private void activateMainPage(IPage<?> deselectedPage, IPage<?> selectedPage) {
     if (m_mainPage == selectedPage) {
       return;
     }
@@ -77,7 +77,7 @@ public class MultiPageChangeStrategy implements IPageChangeStrategy {
     LOG.debug("Main page activated: " + selectedPage);
   }
 
-  private void activateSubPage(IPage selectedPage) {
+  private void activateSubPage(IPage<?> selectedPage) {
     if (m_subPage == selectedPage) {
       return;
     }

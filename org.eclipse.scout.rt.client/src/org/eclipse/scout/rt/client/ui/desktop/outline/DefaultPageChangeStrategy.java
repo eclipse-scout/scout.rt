@@ -26,7 +26,7 @@ import org.eclipse.scout.service.SERVICES;
 public class DefaultPageChangeStrategy implements IPageChangeStrategy {
 
   @Override
-  public void pageChanged(IOutline outline, IPage deselectedPage, IPage selectedPage) {
+  public void pageChanged(IOutline outline, IPage<?> deselectedPage, IPage<?> selectedPage) {
     if (outline == null) {
       return;
     }
@@ -37,7 +37,7 @@ public class DefaultPageChangeStrategy implements IPageChangeStrategy {
     ISearchForm searchForm = null;
     // new active page
     outline.makeActivePageToContextPage();
-    IPage activePage = outline.getActivePage();
+    IPage<?> activePage = outline.getActivePage();
     if (activePage != null) {
       try {
         activePage.ensureChildrenLoaded();

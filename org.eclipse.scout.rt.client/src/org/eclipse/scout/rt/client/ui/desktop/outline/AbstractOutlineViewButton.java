@@ -126,10 +126,10 @@ public abstract class AbstractOutlineViewButton extends AbstractViewButton imple
           }
         }
         else {
-          for (IPage root : m_outline.getRootPage().getChildPages()) {
+          for (IPage<?> root : m_outline.getRootPage().getChildPages()) {
             m_outline.collapseAll(root);
           }
-          for (IPage root : m_outline.getRootPage().getChildPages()) {
+          for (IPage<?> root : m_outline.getRootPage().getChildPages()) {
             if (root instanceof AbstractPage && ((AbstractPage) root).isInitialExpanded()) {
               m_outline.setNodeExpanded(root, true);
             }

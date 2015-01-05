@@ -229,7 +229,7 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
     if (outline == null) {
       return;
     }
-    final IPage activePage = outline.getActivePage();
+    final IPage<?> activePage = outline.getActivePage();
     if (activePage == null || activePage.isTableVisible() || isPageDetailTableAllowedToBeClosed(activePage)) {
       return;
     }
@@ -237,7 +237,7 @@ public class MobileDeviceTransformer implements IDeviceTransformer {
     outline.setDetailTable(activePage.getTable());
   }
 
-  protected boolean isPageDetailTableAllowedToBeClosed(IPage activePage) {
+  protected boolean isPageDetailTableAllowedToBeClosed(IPage<?> activePage) {
     return activePage.isLeaf();
   }
 

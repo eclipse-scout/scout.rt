@@ -25,7 +25,7 @@ public abstract class AbstractPageWithTableExtension<T extends ITable, OWNER ext
   }
 
   @Override
-  public IPage execCreateChildPage(PageWithTableCreateChildPageChain<? extends ITable> chain, ITableRow row) throws ProcessingException {
+  public IPage<?> execCreateChildPage(PageWithTableCreateChildPageChain<? extends ITable> chain, ITableRow row) throws ProcessingException {
     return chain.execCreateChildPage(row);
   }
 
@@ -46,7 +46,7 @@ public abstract class AbstractPageWithTableExtension<T extends ITable, OWNER ext
   }
 
   @Override
-  public IPage execCreateVirtualChildPage(PageWithTableCreateVirtualChildPageChain<? extends ITable> chain, ITableRow row) throws ProcessingException {
+  public IPage<?> execCreateVirtualChildPage(PageWithTableCreateVirtualChildPageChain<? extends ITable> chain, ITableRow row) throws ProcessingException {
     return chain.execCreateVirtualChildPage(row);
   }
 

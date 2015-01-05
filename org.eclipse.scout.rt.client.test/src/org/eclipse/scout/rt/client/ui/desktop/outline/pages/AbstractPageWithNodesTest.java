@@ -45,7 +45,7 @@ public class AbstractPageWithNodesTest {
     assertNotNull(outline);
     assertSame(PageWithTableOutline.class, outline.getClass());
 
-    IPage page = outline.getActivePage();
+    IPage<?> page = outline.getActivePage();
     assertNotNull(page);
 
     AbstractPageWithNodes parentPage = (AbstractPageWithNodes) desktop.getOutline().getActivePage();

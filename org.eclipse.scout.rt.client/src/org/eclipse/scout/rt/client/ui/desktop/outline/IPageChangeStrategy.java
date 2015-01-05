@@ -16,6 +16,6 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
  * @since 3.8.1
  */
 public interface IPageChangeStrategy {
-  void pageChanged(IOutline outline, IPage deselectedPage, IPage selectedPage);
+  void pageChanged(IOutline outline, IPage<?> deselectedPage, IPage<?> selectedPage);
 
 }

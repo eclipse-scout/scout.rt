@@ -78,7 +78,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     return m_table;
   }
 
-  protected void linkTableRowWithPage(ITableRow tableRow, IPage page) {
+  protected void linkTableRowWithPage(ITableRow tableRow, IPage<?> page) {
     m_tableRowToPageMap.put(tableRow, page);
     m_pageToTableRowMap.put(page, tableRow);
   }
@@ -99,7 +99,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   }
 
   @Override
-  public IPage getPageFor(ITableRow tableRow) {
+  public IPage<?> getPageFor(ITableRow tableRow) {
     return (IPage) getTreeNodeFor(tableRow);
   }
 
@@ -121,7 +121,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   }
 
   protected void unlinkTableRowWithPage(ITableRow tableRow) {
-    IPage page = m_tableRowToPageMap.remove(tableRow);
+    IPage<?> page = m_tableRowToPageMap.remove(tableRow);
     if (page != null) {
       m_pageToTableRowMap.remove(page);
     }
@@ -466,12 +466,12 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   }
 
   @Override
-  public IPage getParentPage() {
+  public IPage<?> getParentPage() {
     return (IPage) getParentNode();
   }
 
   @Override
-  public IPage getChildPage(final int childIndex) {
+  public IPage<?> getChildPage(final int childIndex) {
     ///make it model thread safe
     if (ClientSyncJob.isSyncClientJob()) {
       try {

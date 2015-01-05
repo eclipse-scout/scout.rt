@@ -68,7 +68,7 @@ public class PageTest {
   @Test
   public void testPageActivatedProcessingException() {
     IExceptionHandlerService service = createMockExceptionHandlerService();
-    final IPage testPage = new PageExceptionOnActivated();
+    final IPage<?> testPage = new PageExceptionOnActivated();
     testPage.pageActivatedNotify();
     verify(service, times(1)).handleException(any(ProcessingException.class));
   }
@@ -79,7 +79,7 @@ public class PageTest {
   @Test
   public void testPageActivatedException() {
     IExceptionHandlerService service = createMockExceptionHandlerService();
-    final IPage testPage = new PageRuntimeExceptionOnActivated();
+    final IPage<?> testPage = new PageRuntimeExceptionOnActivated();
     testPage.pageActivatedNotify();
     verify(service, times(1)).handleException(any(ProcessingException.class));
   }
@@ -90,7 +90,7 @@ public class PageTest {
   @Test
   public void testPageDeactivatedProcessingException() {
     IExceptionHandlerService service = createMockExceptionHandlerService();
-    final IPage testPage = new PageExceptionOnDeactivated();
+    final IPage<?> testPage = new PageExceptionOnDeactivated();
     testPage.pageDeactivatedNotify();
     verify(service, times(1)).handleException(any(ProcessingException.class));
   }
@@ -101,7 +101,7 @@ public class PageTest {
   @Test
   public void testPageDeactivatedException() {
     IExceptionHandlerService service = createMockExceptionHandlerService();
-    final IPage testPage = new PageRuntimeExceptionOnDeactivated();
+    final IPage<?> testPage = new PageRuntimeExceptionOnDeactivated();
     testPage.pageDeactivatedNotify();
     verify(service, times(1)).handleException(any(ProcessingException.class));
   }
@@ -114,7 +114,7 @@ public class PageTest {
 
   @Test
   public void testIsSetDetailFormVisible() throws Exception {
-    AbstractPage p = new P_Page();
+    AbstractPage<?> p = new P_Page();
     assertTrue(p.isDetailFormVisible());
     IOutline outline = Mockito.mock(IOutline.class);
     p.setTreeInternal(outline, false);
@@ -125,7 +125,7 @@ public class PageTest {
 
   @Test
   public void testIsSetTableVisible() throws Exception {
-    AbstractPage p = new P_Page();
+    AbstractPage<?> p = new P_Page();
     assertTrue(p.isTableVisible());
     IOutline outline = Mockito.mock(IOutline.class);
     p.setTreeInternal(outline, false);
@@ -134,7 +134,7 @@ public class PageTest {
     Mockito.verify(outline).firePageChanged(Mockito.eq(p));
   }
 
-  class P_Page extends AbstractPage {
+  class P_Page extends AbstractPage<ITable> {
     @Override
     protected ITable initTable() {
       return null;

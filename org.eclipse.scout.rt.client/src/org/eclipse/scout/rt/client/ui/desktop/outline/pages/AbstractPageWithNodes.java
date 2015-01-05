@@ -49,7 +49,7 @@ import org.eclipse.scout.rt.shared.ScoutTexts;
  * A NodeManagedPage normally contains no menus, actions, etc. because the TableManagedPage handles node events on
  * itself AND its children
  */
-public abstract class AbstractPageWithNodes extends AbstractPage implements IPageWithNodes {
+public abstract class AbstractPageWithNodes extends AbstractPage<ITable> implements IPageWithNodes {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractPageWithNodes.class);
 
@@ -142,7 +142,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
    * @since 3.10.0-M5
    */
   protected void updateParentTableRow(ICell cell) {
-    IPage parent = getParentPage();
+    IPage<?> parent = getParentPage();
     if (parent != null && parent instanceof IPageWithNodes) {
       ITableRow row = ((IPageWithNodes) parent).getTableRowFor(this);
       if (row != null) {
@@ -357,7 +357,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
       @Override
       protected void decorateCellInternal(Cell cell, ITableRow row) {
         // if we encounter a cell change, update the tree as well
-        IPage page = (IPage) getTreeNodeFor(row);
+        IPage<?> page = (IPage) getTreeNodeFor(row);
         if (page != null) {
           page.getCellForUpdate().setText(cell.getText());
         }

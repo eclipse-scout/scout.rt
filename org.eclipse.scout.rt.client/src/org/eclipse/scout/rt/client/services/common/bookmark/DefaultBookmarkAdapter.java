@@ -17,17 +17,17 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
  */
 public class DefaultBookmarkAdapter implements IBookmarkAdapter {
 
-  private IPage m_page;
+  private IPage<?> m_page;
 
-  public DefaultBookmarkAdapter(IPage page) {
+  public DefaultBookmarkAdapter(IPage<?> page) {
     m_page = page;
   }
 
-  protected IPage getPage() {
+  protected IPage<?> getPage() {
     return m_page;
   }
 
-  public void setPage(IPage page) {
+  public void setPage(IPage<?> page) {
     m_page = page;
   }
 

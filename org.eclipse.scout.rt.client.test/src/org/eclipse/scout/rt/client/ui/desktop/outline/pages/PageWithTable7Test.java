@@ -80,7 +80,7 @@ public class PageWithTable7Test {
     }
 
     @Override
-    protected IPage execCreateChildPage(ITableRow row) throws ProcessingException {
+    protected IPage<?> execCreateChildPage(ITableRow row) throws ProcessingException {
       return new PageWithNode();
     }
 

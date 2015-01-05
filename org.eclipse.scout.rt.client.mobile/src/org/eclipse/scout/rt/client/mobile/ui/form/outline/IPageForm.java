@@ -16,7 +16,7 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 
 public interface IPageForm extends IForm {
 
-  IPage getPage();
+  IPage<?> getPage();
 
   PageFormConfig getPageFormConfig();
 

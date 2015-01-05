@@ -35,7 +35,7 @@ public class NavigationHistoryService extends AbstractService implements INaviga
   }
 
   @Override
-  public Bookmark addStep(int level, IPage page) {
+  public Bookmark addStep(int level, IPage<?> page) {
     return getUserNavigationHistory().addStep(level, page);
   }
 

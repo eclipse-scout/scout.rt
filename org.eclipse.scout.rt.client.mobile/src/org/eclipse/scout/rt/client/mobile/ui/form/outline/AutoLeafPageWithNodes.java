@@ -20,9 +20,9 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 
 public class AutoLeafPageWithNodes extends AbstractPageWithNodes {
   private ITableRow m_tableRow;
-  private IPage m_actualParentPage;
+  private IPage<?> m_actualParentPage;
 
-  public AutoLeafPageWithNodes(ITableRow row, IPage parentPage) {
+  public AutoLeafPageWithNodes(ITableRow row, IPage<?> parentPage) {
     if (row == null) {
       throw new IllegalArgumentException("Row must not be null");
     }
@@ -35,7 +35,7 @@ public class AutoLeafPageWithNodes extends AbstractPageWithNodes {
     return m_tableRow;
   }
 
-  public IPage getActualParentPage() {
+  public IPage<?> getActualParentPage() {
     return m_actualParentPage;
   }
 

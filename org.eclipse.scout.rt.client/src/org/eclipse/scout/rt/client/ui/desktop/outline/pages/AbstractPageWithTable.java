@@ -66,7 +66,7 @@ import org.eclipse.scout.service.SERVICES;
  * A page containing a list of "menu" entries<br>
  * child pages are explicitly added
  */
-public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPage implements IPageWithTable<T>, IContributionOwner {
+public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPage<T> implements IPageWithTable<T>, IContributionOwner {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractPageWithTable.class);
 
   private ISearchForm m_searchForm;
@@ -349,11 +349,11 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    */
   @ConfigOperation
   @Order(110)
-  protected IPage execCreateChildPage(ITableRow row) throws ProcessingException {
+  protected IPage<?> execCreateChildPage(ITableRow row) throws ProcessingException {
     return null;
   }
 
-  protected IPage createChildPageInternal(ITableRow row) throws ProcessingException {
+  protected IPage<?> createChildPageInternal(ITableRow row) throws ProcessingException {
     return interceptCreateChildPage(row);
   }
 
@@ -377,7 +377,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    */
   @ConfigOperation
   @Order(111)
-  protected IPage execCreateVirtualChildPage(ITableRow row) throws ProcessingException {
+  protected IPage<?> execCreateVirtualChildPage(ITableRow row) throws ProcessingException {
     if (ConfigurationUtility.isMethodOverwrite(AbstractPageWithTable.class, "execCreateChildPage", new Class[]{ITableRow.class}, AbstractPageWithTable.this.getClass())) {
       return new VirtualPage();
     }
@@ -408,7 +408,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     //remove old association
     unlinkTableRowWithPage(row);
     //add new association
-    IPage childPage = createChildPageInternal(row);
+    IPage<?> childPage = createChildPageInternal(row);
     if (childPage != null) {
       node.setResolvedNode(childPage);
       ICell tableCell = getTable().getSummaryCell(row);
@@ -535,7 +535,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
           case FormEvent.TYPE_STORE_AFTER: {
             // save navigation history
             IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
-            IPage page = AbstractPageWithTable.this;
+            IPage<?> page = AbstractPageWithTable.this;
             if (desktop != null && desktop.getOutline() != null && desktop.getOutline().getActivePage() == page) {
               SERVICES.getService(INavigationHistoryService.class).addStep(0, page);
             }
@@ -602,7 +602,6 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public final T getTable() {
     if (super.getTable() == null) {
       ensureInitialized();
@@ -895,7 +894,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     List<IPage> result = new ArrayList<IPage>();
     try {
       for (ITableRow row : tableRows) {
-        IPage page = getPageFor(row);
+        IPage<?> page = getPageFor(row);
         if (page != null) {
           result.add(page);
           if (updateChildPageCells) {
@@ -959,7 +958,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
             List<ITableRow> tableRows = e.getRows();
             for (ITableRow element : tableRows) {
               try {
-                IPage childPage = interceptCreateVirtualChildPage(element);
+                IPage<?> childPage = interceptCreateVirtualChildPage(element);
                 if (childPage != null) {
                   ICell tableCell = getTable().getSummaryCell(element);
                   childPage.getCellForUpdate().updateFrom(tableCell);
@@ -981,7 +980,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
 
             // check if a page was revoked
             for (ITableRow tableRow : tableRows) {
-              IPage page = getPageFor(tableRow);
+              IPage<?> page = getPageFor(tableRow);
               if (page != null && page.getParentNode() == null) {
                 unlinkTableRowWithPage(tableRow);
               }
@@ -1027,7 +1026,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     chain.execLoadData(filter);
   }
 
-  protected final IPage interceptCreateChildPage(ITableRow row) throws ProcessingException {
+  protected final IPage<?> interceptCreateChildPage(ITableRow row) throws ProcessingException {
     List<? extends IPageWithTableExtension<? extends ITable, ? extends AbstractPageWithTable<? extends ITable>>> extensions = getAllExtensions();
     PageWithTableCreateChildPageChain<T> chain = new PageWithTableCreateChildPageChain<T>(extensions);
     return chain.execCreateChildPage(row);
@@ -1050,7 +1049,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     chain.execPopulateTable();
   }
 
-  protected final IPage interceptCreateVirtualChildPage(ITableRow row) throws ProcessingException {
+  protected final IPage<?> interceptCreateVirtualChildPage(ITableRow row) throws ProcessingException {
     List<? extends IPageWithTableExtension<? extends ITable, ? extends AbstractPageWithTable<? extends ITable>>> extensions = getAllExtensions();
     PageWithTableCreateVirtualChildPageChain<T> chain = new PageWithTableCreateVirtualChildPageChain<T>(extensions);
     return chain.execCreateVirtualChildPage(row);
@@ -1074,7 +1073,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     }
 
     @Override
-    public IPage execCreateChildPage(PageWithTableCreateChildPageChain<? extends ITable> chain, ITableRow row) throws ProcessingException {
+    public IPage<?> execCreateChildPage(PageWithTableCreateChildPageChain<? extends ITable> chain, ITableRow row) throws ProcessingException {
       return getOwner().execCreateChildPage(row);
     }
 
@@ -1095,7 +1094,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     }
 
     @Override
-    public IPage execCreateVirtualChildPage(PageWithTableCreateVirtualChildPageChain<? extends ITable> chain, ITableRow row) throws ProcessingException {
+    public IPage<?> execCreateVirtualChildPage(PageWithTableCreateVirtualChildPageChain<? extends ITable> chain, ITableRow row) throws ProcessingException {
       return getOwner().execCreateVirtualChildPage(row);
     }
 

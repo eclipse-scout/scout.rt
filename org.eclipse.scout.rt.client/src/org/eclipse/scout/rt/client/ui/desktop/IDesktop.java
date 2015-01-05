@@ -496,7 +496,7 @@ public interface IDesktop extends IPropertyObserver {
    *
    * @since 3.8.0
    */
-  Bookmark createBookmark(IPage page) throws ProcessingException;
+  Bookmark createBookmark(IPage<?> page) throws ProcessingException;
 
   /**
    * do not use this internal method.<br>

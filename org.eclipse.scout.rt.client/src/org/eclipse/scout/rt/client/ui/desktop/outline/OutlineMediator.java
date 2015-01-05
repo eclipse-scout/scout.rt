@@ -75,7 +75,7 @@ public class OutlineMediator {
     }
   }
 
-  public void mediateTableRowFilterChanged(IPage page) {
+  public void mediateTableRowFilterChanged(IPage<?> page) {
     if (page == null || page.getTree() == null || page.isLeaf()) {
       return;
     }
@@ -121,7 +121,7 @@ public class OutlineMediator {
     pageWithTable.getTree().removeChildNodes(pageWithTable, childNodes);
   }
 
-  public void mediateTableRowAction(TableEvent e, IPage page) {
+  public void mediateTableRowAction(TableEvent e, IPage<?> page) {
     if (e.isConsumed()) {
       return;
     }
