@@ -77,14 +77,25 @@ public class AbstractAccessControlServiceTest {
   }
 
   /**
-   * Tests that a client notification of {@link ResetAccessControlChangedNotification} is sent when permissions are
-   * loaded {@link AbstractAccessControlService#clearCache()}
+   * Tests that a client notification of {@link ResetAccessControlChangedNotification} is sent when the cache is
+   * cleared: {@link AbstractAccessControlService#clearCache()}
    */
   @Test
   public void testClientNotificationSentForClearCache() {
     callClearCache();
 
     verifyOneNotificationSent(ResetAccessControlChangedNotification.class, SingleUserFilter.class, null);
+  }
+
+  /**
+   * Tests that no client notification at all is sent when the cache is cleared:
+   * {@link AbstractAccessControlService#clearCacheNoFire()}
+   */
+  @Test
+  public void testClientNotificationSentForClearCacheNoFire() {
+    callClearCacheNoFire();
+
+    verifyNoNotificationsSent();
   }
 
   /**
@@ -101,11 +112,11 @@ public class AbstractAccessControlServiceTest {
   }
 
   /**
-   * Tests that no client notification of {@link AccessControlChangedNotification} is sent when the cache is cleared:
+   * Tests that no client notification at all is sent when the cache is cleared:
    * {@link AbstractAccessControlService#clearCacheOfUserIdsNoFire(Collection)}
    */
   @Test
-  public void testClientNotificationSentForClearCacheNoFire() {
+  public void testClientNotificationSentForClearCacheOfUserIdsNoFire() {
     final String testUser = "testuser";
     Set<String> testUsers = Collections.singleton(testUser);
     callClearCacheOfUserIdsNoFire(testUsers);
@@ -114,7 +125,7 @@ public class AbstractAccessControlServiceTest {
   }
 
   /**
-   * Tests that no client notification of {@link AccessControlChangedNotification} is sent when the cache is cleared (no
+   * Tests that no client notification at all is sent when the cache is cleared (no
    * users): {@link AbstractAccessControlService#clearCacheOfUserIds(Collection)}
    */
   @Test
@@ -130,6 +141,11 @@ public class AbstractAccessControlServiceTest {
 
   private void callClearCache() {
     m_accessControlService.clearCache();
+    ThreadContext.getTransaction().commitPhase2();
+  }
+
+  private void callClearCacheNoFire() {
+    ((TestAccessControlService) m_accessControlService).callClearCacheNoFire();
     ThreadContext.getTransaction().commitPhase2();
   }
 
