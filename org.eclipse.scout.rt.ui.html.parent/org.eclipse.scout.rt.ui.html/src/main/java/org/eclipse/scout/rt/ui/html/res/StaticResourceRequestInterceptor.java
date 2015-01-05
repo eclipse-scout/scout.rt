@@ -25,8 +25,8 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.html.AbstractUiServlet;
 import org.eclipse.scout.rt.ui.html.IServletRequestInterceptor;
-import org.eclipse.scout.rt.ui.html.UiHints;
 import org.eclipse.scout.rt.ui.html.StreamUtility;
+import org.eclipse.scout.rt.ui.html.UiHints;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
 import org.eclipse.scout.rt.ui.html.script.ScriptFileBuilder;
 import org.eclipse.scout.rt.ui.html.script.ScriptOutput;
@@ -113,7 +113,7 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
   }
 
   protected String resolveIndexHtml(HttpServletRequest request) {
-    BrowserInfo browserInfo = new BrowserInfoBuilder().createBrowserInfo(request);
+    BrowserInfo browserInfo = BrowserInfo.createFrom(request);
     if (browserInfo.isMobile()) {
       return MOBILE_INDEX_HTML;
     }

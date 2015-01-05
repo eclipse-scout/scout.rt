@@ -10,66 +10,285 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.html.res;
 
+import java.util.Enumeration;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import org.osgi.framework.Version;
+import javax.servlet.http.HttpServletRequest;
 
-//FIXME copied from rap, move to scout.commons? maybe better let client do it
+import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
+
+/**
+ * Helper to retrieve information about the HTTP client by parsing the user agent string.
+ * <p>
+ * This class was originally copied from org.eclipse.scout.rt.ui.rap.
+ */
 public class BrowserInfo {
-  public enum Type {
-    ANDROID, GOOGLE_CHROME, APPLE_SAFARI,
-    OMNI_WEB, SHIRA,
-    BLACKPIXEL_NETNEWSWIRE, REALNETWORKS_REALPLAYER,
-    MOZILLA_FIREFOX, MOZILLA_CAMINO, GNOME_GALOEN,
-    IE, OPERA, KONQUEROR,
-    UNKNOWN
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(BrowserInfo.class);
+
+  public static enum EngineType {
+    ANDROID, CHROME, SAFARI, FIREFOX, IE, OPERA, KONQUEROR, UNKNOWN
   }
 
-  public enum System {
+  public static enum System {
     WINDOWS, UNIX, OSX, IOS, ANDROID, UNKNOWN
   }
 
-  private String m_userAgent = "";
+  public static class BrowserVersion implements Comparable<BrowserVersion> {
 
-  private final Type m_type;
-  private Version m_version;
-  private Version m_systemVersion;
+    private final int m_major;
+    private final int m_minor;
+    private final int m_micro;
 
+    public BrowserVersion(int major, int minor, int micro) {
+      m_major = major;
+      m_minor = minor;
+      m_micro = micro;
+    }
+
+    protected int getMajor() {
+      return m_major;
+    }
+
+    protected int getMinor() {
+      return m_minor;
+    }
+
+    protected int getMicro() {
+      return m_micro;
+    }
+
+    @Override
+    public String toString() {
+      return m_major + "." + m_minor + "." + m_micro;
+    }
+
+    @Override
+    public int hashCode() {
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + m_major;
+      result = prime * result + m_micro;
+      result = prime * result + m_minor;
+      return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (this == obj) {
+        return true;
+      }
+      if (obj == null) {
+        return false;
+      }
+      if (getClass() != obj.getClass()) {
+        return false;
+      }
+      BrowserVersion other = (BrowserVersion) obj;
+      if (m_major != other.m_major) {
+        return false;
+      }
+      if (m_micro != other.m_micro) {
+        return false;
+      }
+      if (m_minor != other.m_minor) {
+        return false;
+      }
+      return true;
+    }
+
+    @Override
+    public int compareTo(BrowserVersion o) {
+      if (o == this) {
+        return 0;
+      }
+      if (o == null) {
+        return 1;
+      }
+      int result = (m_major - o.m_major);
+      if (result != 0) {
+        return result;
+      }
+      result = (m_minor - o.m_minor);
+      if (result != 0) {
+        return result;
+      }
+      result = (m_micro - o.m_micro);
+      if (result != 0) {
+        return result;
+      }
+      return 0;
+    }
+  }
+
+  private final String m_userAgent;
+  private final Locale m_locale;
+
+  private EngineType m_engineType = EngineType.UNKNOWN;
+  private BrowserVersion m_engineVersion;
+  // Basic engine types
   private boolean m_isWebkit = false;
   private boolean m_isGecko = false;
   private boolean m_isMshtml = false;
   private boolean m_isOpera = false;
 
+  private System m_system = System.UNKNOWN;
+  private BrowserVersion m_systemVersion;
+
+  // Flags
   private boolean m_isMobile = false;
   private boolean m_isTablet = false;
   private boolean m_isStandalone = false;
 
-  private System m_system;
-  private Locale m_locale = null;
+  public BrowserInfo(String userAgent, Locale locale) {
+    m_userAgent = (userAgent == null ? "" : userAgent);
+    m_locale = locale;
 
-  public BrowserInfo(Type type, Version version) {
-    this(type, version, System.UNKNOWN);
+    initInfos();
   }
 
-  public BrowserInfo(Type type, Version version, System system) {
-    m_type = type;
-    m_version = version;
-    m_system = system;
+  protected void initInfos() {
+    initBrowserInfo();
+    initSystemInfo();
+  }
+
+  protected void initBrowserInfo() {
+    // Opera
+    String regex = "Opera[\\s\\/]([0-9\\.]*)";
+    boolean isOpera = StringUtility.contains(m_userAgent, regex);
+    if (isOpera) {
+      setOpera(true);
+      setEngineType(EngineType.OPERA);
+      setEngineVersion(extractVersion(m_userAgent, regex));
+      return;
+    }
+
+    // Konqueror
+    regex = "KHTML\\/([0-9-\\.]*)";
+    boolean isKonqueror = StringUtility.contains(m_userAgent, regex);
+    if (isKonqueror) {
+      setWebkit(true);
+      setEngineType(EngineType.KONQUEROR);
+      setEngineVersion(extractVersion(m_userAgent, regex));
+      return;
+    }
+
+    // Webkit Browsers
+    regex = "AppleWebKit\\/([^ ]+)";
+    boolean isWebkit = (m_userAgent.indexOf("AppleWebKit") != -1) && StringUtility.contains(m_userAgent, regex);
+    if (isWebkit) {
+      setWebkit(true);
+      if (m_userAgent.indexOf("Chrome") != -1) {
+        setEngineType(EngineType.CHROME);
+      }
+      else if (m_userAgent.indexOf("Safari") != -1) {
+        if (m_userAgent.indexOf("Android") != -1) {
+          setEngineType(EngineType.ANDROID);
+        }
+        else {
+          setEngineType(EngineType.SAFARI);
+        }
+      }
+      else if (m_userAgent.indexOf("Mobile") != -1) {
+        // iPad reports this in fullscreen mode
+        setEngineType(EngineType.SAFARI);
+        setStandalone(true);
+      }
+      setEngineVersion(extractVersion(m_userAgent, regex));
+      return;
+    }
+
+    // Gecko Browsers (Mozilla)
+    regex = "rv\\:([^\\);]+)(\\)|;)";
+    boolean isGecko = (m_userAgent.indexOf("Gecko") != -1) && StringUtility.contains(m_userAgent, regex);
+    if (isGecko) {
+      setGecko(true);
+      if (m_userAgent.indexOf("Firefox") != -1) {
+        setEngineType(EngineType.FIREFOX);
+      }
+      setEngineVersion(extractVersion(m_userAgent, regex));
+      return;
+    }
+
+    // Internet Explorer
+    regex = "MSIE\\s+([^\\);]+)(\\)|;)";
+    boolean isMshtml = StringUtility.contains(m_userAgent, regex);
+    if (isMshtml) {
+      setMshtml(true);
+      if (m_userAgent.indexOf("MSIE") != -1) {
+        setEngineType(EngineType.IE);
+      }
+      setEngineVersion(extractVersion(m_userAgent, regex));
+      return;
+    }
+  }
+
+  protected void initSystemInfo() {
+    if (m_userAgent.indexOf("Windows") != -1 || m_userAgent.indexOf("Win32") != -1 || m_userAgent.indexOf("Win64") != -1 || m_userAgent.indexOf("Win95") != -1) {
+      setSystem(System.WINDOWS);
+      if (m_userAgent.indexOf("Windows Phone") != -1 || m_userAgent.indexOf("IEMobile") != -1) {
+        setSystemVersion(parseWindowsPhoneVersion(m_userAgent));
+        setMobile(true);
+      }
+      else {
+        setSystemVersion(parseWindowsVersion(m_userAgent));
+      }
+    }
+    else if (m_userAgent.indexOf("Macintosh") != -1 || m_userAgent.indexOf("MacPPC") != -1 || m_userAgent.indexOf("MacIntel") != -1 || m_userAgent.indexOf("Mac_PowerPC") != -1) {
+      setSystem(System.OSX);
+    }
+    else if (m_userAgent.indexOf("Android") != -1) {
+      setSystem(System.ANDROID);
+      setSystemVersion(parseAndroidVersion(m_userAgent));
+
+      // Update mobile/tablet flags based on android version
+      if (getSystemVersion() == null || getSystemVersion().getMajor() <= 2) {
+        setMobile(true);
+      }
+      else if (getSystemVersion().getMajor() == 3) {
+        setTablet(true);
+      }
+      else {
+        // Android 4 is used on smartphones and tablets
+        if (getUserAgent().indexOf("Mobile") != -1) {
+          setMobile(true);
+        }
+        else {
+          setTablet(true);
+        }
+      }
+    }
+    else if (m_userAgent.indexOf("X11") != -1 || m_userAgent.indexOf("Linux") != -1 || m_userAgent.indexOf("BSD") != -1 || m_userAgent.indexOf("SunOS") != -1 || m_userAgent.indexOf("DragonFly") != -1) {
+      setSystem(System.UNIX);
+    }
+    else if (m_userAgent.indexOf("iPad") != -1) {
+      setSystem(System.IOS);
+      setSystemVersion(parseIosVersion(m_userAgent));
+      setTablet(true);
+    }
+    else if (m_userAgent.indexOf("iPhone") != -1 || m_userAgent.indexOf("iPod") != -1) {
+      setSystem(System.IOS);
+      setSystemVersion(parseIosVersion(m_userAgent));
+      setMobile(true);
+    }
   }
 
   public String getUserAgent() {
     return m_userAgent;
   }
 
-  public void setUserAgent(String userAgent) {
-    m_userAgent = userAgent;
+  public Locale getLocale() {
+    return m_locale;
   }
 
   public boolean isWebkit() {
     return m_isWebkit;
   }
 
-  public void setWebkit(boolean isWebkit) {
+  protected void setWebkit(boolean isWebkit) {
     m_isWebkit = isWebkit;
   }
 
@@ -77,7 +296,7 @@ public class BrowserInfo {
     return m_isGecko;
   }
 
-  public void setGecko(boolean isGecko) {
+  protected void setGecko(boolean isGecko) {
     m_isGecko = isGecko;
   }
 
@@ -85,7 +304,7 @@ public class BrowserInfo {
     return m_isMshtml;
   }
 
-  public void setMshtml(boolean isMshtml) {
+  protected void setMshtml(boolean isMshtml) {
     m_isMshtml = isMshtml;
   }
 
@@ -93,7 +312,7 @@ public class BrowserInfo {
     return m_isOpera;
   }
 
-  public void setOpera(boolean isOpera) {
+  protected void setOpera(boolean isOpera) {
     m_isOpera = isOpera;
   }
 
@@ -101,7 +320,7 @@ public class BrowserInfo {
     return m_isMobile;
   }
 
-  public void setMobile(boolean isMobile) {
+  protected void setMobile(boolean isMobile) {
     m_isMobile = isMobile;
   }
 
@@ -109,7 +328,7 @@ public class BrowserInfo {
     return m_isTablet;
   }
 
-  public void setTablet(boolean isTablet) {
+  protected void setTablet(boolean isTablet) {
     m_isTablet = isTablet;
   }
 
@@ -120,69 +339,44 @@ public class BrowserInfo {
     return m_isStandalone;
   }
 
-  public void setStandalone(boolean isStandalone) {
+  protected void setStandalone(boolean isStandalone) {
     m_isStandalone = isStandalone;
   }
 
-  public Type getType() {
-    return m_type;
+  public EngineType getEngineType() {
+    return m_engineType;
+  }
+
+  protected void setEngineType(EngineType engineType) {
+    m_engineType = engineType;
   }
 
   public System getSystem() {
     return m_system;
   }
 
-  public void setSystem(System system) {
+  protected void setSystem(System system) {
     m_system = system;
   }
 
-  public Locale getLocale() {
-    return m_locale;
+  public BrowserVersion getEngineVersion() {
+    return m_engineVersion;
   }
 
-  public void setLocale(Locale locale) {
-    m_locale = locale;
+  protected void setEngineVersion(BrowserVersion engineVersion) {
+    m_engineVersion = engineVersion;
   }
 
-  public boolean isInternetExplorer() {
-    return m_type == Type.IE;
-  }
-
-  public boolean isMozillaFirefox() {
-    return m_type == Type.MOZILLA_FIREFOX;
-  }
-
-  public boolean isGoogleChrome() {
-    return m_type == Type.GOOGLE_CHROME;
-  }
-
-  public boolean isAppleSafari() {
-    return m_type == Type.APPLE_SAFARI;
-  }
-
-  public boolean isUnknown() {
-    return m_type == Type.UNKNOWN;
-  }
-
-  public Version getVersion() {
-    return m_version;
-  }
-
-  public void setVersion(Version version) {
-    m_version = version;
-  }
-
-  public Version getSystemVersion() {
+  public BrowserVersion getSystemVersion() {
     return m_systemVersion;
   }
 
-  public void setSystemVersion(Version systemVersion) {
+  protected void setSystemVersion(BrowserVersion systemVersion) {
     m_systemVersion = systemVersion;
   }
 
   public boolean isDesktop() {
-    return !isTablet()
-        && !isMobile();
+    return !isTablet() && !isMobile();
   }
 
   @Override
@@ -199,9 +393,9 @@ public class BrowserInfo {
     result = prime * result + ((m_locale == null) ? 0 : m_locale.hashCode());
     result = prime * result + ((m_system == null) ? 0 : m_system.hashCode());
     result = prime * result + ((m_systemVersion == null) ? 0 : m_systemVersion.hashCode());
-    result = prime * result + ((m_type == null) ? 0 : m_type.hashCode());
+    result = prime * result + ((m_engineType == null) ? 0 : m_engineType.hashCode());
     result = prime * result + ((m_userAgent == null) ? 0 : m_userAgent.hashCode());
-    result = prime * result + ((m_version == null) ? 0 : m_version.hashCode());
+    result = prime * result + ((m_engineVersion == null) ? 0 : m_engineVersion.hashCode());
     return result;
   }
 
@@ -257,7 +451,7 @@ public class BrowserInfo {
     else if (!m_systemVersion.equals(other.m_systemVersion)) {
       return false;
     }
-    if (m_type != other.m_type) {
+    if (m_engineType != other.m_engineType) {
       return false;
     }
     if (m_userAgent == null) {
@@ -268,12 +462,12 @@ public class BrowserInfo {
     else if (!m_userAgent.equals(other.m_userAgent)) {
       return false;
     }
-    if (m_version == null) {
-      if (other.m_version != null) {
+    if (m_engineVersion == null) {
+      if (other.m_engineVersion != null) {
         return false;
       }
     }
-    else if (!m_version.equals(other.m_version)) {
+    else if (!m_engineVersion.equals(other.m_engineVersion)) {
       return false;
     }
     return true;
@@ -282,27 +476,102 @@ public class BrowserInfo {
   @Override
   public String toString() {
     StringBuffer sb = new StringBuffer("System: ").append(getSystem());
-    sb.append("/ SystemVersion: ").append(getSystemVersion());
+    sb.append(" / SystemVersion: ").append(getSystemVersion());
     if (isWebkit()) {
-      sb.append("/ isWebkit");
+      sb.append(" / isWebkit");
     }
     else if (isGecko()) {
-      sb.append("/ isGecko");
+      sb.append(" / isGecko");
     }
     else if (isMshtml()) {
-      sb.append("/ isMshtml");
+      sb.append(" / isMshtml");
     }
-
     if (isTablet()) {
-      sb.append("/ isTablet");
+      sb.append(" / isTablet");
     }
     else if (isMobile()) {
-      sb.append("/ isMobile");
+      sb.append(" / isMobile");
+    }
+    sb.append(" / EngineType: ").append(getEngineType());
+    sb.append(" / EngineVersion: ").append(getEngineVersion());
+    sb.append(" / UserAgent: ").append(m_userAgent);
+    return sb.toString();
+  }
+
+  public static BrowserInfo createFrom(HttpServletRequest request) {
+    if (LOG.isTraceEnabled()) {
+      Enumeration headerNames = request.getHeaderNames();
+      while (headerNames.hasMoreElements()) {
+        String headerName = (String) headerNames.nextElement();
+        String header = request.getHeader(headerName);
+        headerName = headerName + (headerName.length() <= 11 ? "\t\t" : "\t");
+        LOG.trace(headerName + header);
+      }
     }
 
-    sb.append("/ Browser: ").append(getType());
-    sb.append("/ EngineVersion: ").append(getVersion());
-    sb.append("\nUserAgent: ").append(m_userAgent);
-    return sb.toString();
+    String userAgent = request.getHeader("User-Agent");
+    BrowserInfo info = createFrom(userAgent, request.getLocale());
+    return info;
+  }
+
+  public static BrowserInfo createFrom(String userAgent, Locale locale) {
+    BrowserInfo info = new BrowserInfo(userAgent, locale);
+
+    if (LOG.isTraceEnabled()) {
+      LOG.trace(info.toString());
+    }
+    return info;
+  }
+
+  /**
+   * Applies the given regular expression to the userAgent string. If it matches, the first group is used to create a
+   * version object.
+   * <p>
+   * The regex pattern is automatically enclosed in <code>.*?</code> and <code>.*</code>. This ensures that for mulitple
+   * matches, the 'most left' is used to construct the version.
+   */
+  protected static BrowserVersion extractVersion(String userAgent, String regex) {
+    Matcher matcher = Pattern.compile(".*?" + regex + ".*", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL).matcher(userAgent);
+    if (matcher.matches()) {
+      String s = matcher.group(1);
+      return createVersion(s);
+    }
+
+    return null;
+  }
+
+  protected static BrowserVersion parseAndroidVersion(String userAgent) {
+    return extractVersion(userAgent, "Android\\s([^\\s;]+)");
+  }
+
+  protected static BrowserVersion parseIosVersion(String userAgent) {
+    userAgent = userAgent.replace('_', '.');
+    return extractVersion(userAgent, "\\sOS\\s([^\\s;]+)");
+  }
+
+  protected static BrowserVersion parseWindowsPhoneVersion(String userAgent) {
+    return extractVersion(userAgent, "Windows\\sPhone\\s(?:OS )?([^\\s;]+)");
+  }
+
+  protected static BrowserVersion parseWindowsVersion(String userAgent) {
+    return extractVersion(userAgent, "Windows\\sNT\\s([^\\s;]+)");
+  }
+
+  protected static BrowserVersion createVersion(String versionString) {
+    // Searches for 3 groups containing numbers separated with a dot.
+    // Group 3 is optional (MSIE only has a major and a minor version, no micro)
+    versionString = versionString.replaceAll("^[/\\s]*", "");
+    Matcher matcher = Pattern.compile("([0-9]+)\\.([0-9]+)[\\.]?([0-9]*)").matcher(versionString);
+
+    int[] vArr = new int[]{0, 0, 0};
+    if (matcher.matches()) {
+      for (int i = 1; i <= 3; i++) {
+        String versionPart = matcher.group(i);
+        if (StringUtility.hasText(versionPart)) {
+          vArr[i - 1] = Integer.parseInt(versionPart);
+        }
+      }
+    }
+    return new BrowserVersion(vArr[0], vArr[1], vArr[2]);
   }
 }
