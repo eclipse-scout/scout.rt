@@ -52,7 +52,6 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.ITableExtension;
-import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableAddHeaderMenusChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableContentChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableCopyChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableCreateTableRowDataMapperChain;
@@ -770,6 +769,13 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   /**
+   * @deprecated Will be removed in Scout 6.0. Use {@link #addHeaderMenusInternal(OrderedCollection)} instead.
+   */
+  @Deprecated
+  protected void execCreateHeaderMenus(OrderedCollection<IMenu> menuList) {
+  }
+
+  /**
    * This method is called during initializing the table and is thought to add header menus to the given collection of
    * menus. Menus added in this method should be of menu type {@link ITableMenu.TableMenuType#Header}.<br>
    * To change the order or specify the insert position use {@link IMenu#setOrder(double)}.
@@ -778,7 +784,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    *          a live collection of the menus. Add additional header menus to this list optionally add some separators at
    *          the end.
    */
-  protected void execCreateHeaderMenus(OrderedCollection<IMenu> menus) {
+  protected void addHeaderMenusInternal(OrderedCollection<IMenu> menus) {
     // header menus
     if (getTableCustomizer() != null) {
       menus.addLast(new AddCustomColumnMenu(this));
@@ -878,6 +884,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
 
     execCreateHeaderMenus(menus);
+    addHeaderMenusInternal(menus);
     //set container on menus
     for (IMenu menu : menus) {
       menu.setContainerInternal(this);
@@ -4002,44 +4009,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
   }
 
-  /**
-   * Called before the header menus are displayed.
-   * <p>
-   * Subclasses can override this method. The default add menus for add, modifying and removing custom column and menus
-   * for reseting, organizing and filtering the columns.
-   *
-   * @param e
-   *          Table event of type {@link TableEvent#TYPE_HEADER_POPUP}.
-   * @throws ProcessingException
-   * @Deprecated use {@link #execCreateHeaderMenus(OrderedCollection)} instead.
-   */
-  @SuppressWarnings("deprecation")
-  @ConfigOperation
-  @Order(100)
-  @Deprecated
-  protected void execAddHeaderMenus(TableEvent e) throws ProcessingException {
-    if (getTableCustomizer() != null) {
-      if (e.getPopupMenuCount() > 0) {
-        e.addPopupMenu(new MenuSeparator());
-      }
-      for (IMenu m : new IMenu[]{new AddCustomColumnMenu(this), new ModifyCustomColumnMenu(this), new RemoveCustomColumnMenu(this)}) {
-        m.prepareAction();
-        if (m.isVisible()) {
-          e.addPopupMenu(m);
-        }
-      }
-    }
-    if (e.getPopupMenuCount() > 0) {
-      e.addPopupMenu(new MenuSeparator());
-    }
-    for (IMenu m : new IMenu[]{new ResetColumnsMenu(this), new OrganizeColumnsMenu(this), new ColumnFilterMenu(this), new CopyWidthsOfColumnsMenu(this)}) {
-      m.prepareAction();
-      if (m.isVisible()) {
-        e.addPopupMenu(m);
-      }
-    }
-  }
-
   // main handler
   protected void fireTableEventInternal(TableEvent e) {
     if (isTableChanging()) {
@@ -4577,11 +4546,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
 
     @Override
-    public void execAddHeaderMenus(TableAddHeaderMenusChain chain, TableEvent e) throws ProcessingException {
-      getOwner().execAddHeaderMenus(e);
-    }
-
-    @Override
     public void execRowClick(TableRowClickChain chain, ITableRow row, MouseButton mouseButton) throws ProcessingException {
       getOwner().execRowClick(row, mouseButton);
     }
@@ -4659,12 +4623,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     List<? extends ITableExtension<? extends AbstractTable>> extensions = getAllExtensions();
     TableDisposeTableChain chain = new TableDisposeTableChain(extensions);
     chain.execDisposeTable();
-  }
-
-  protected final void interceptAddHeaderMenus(TableEvent e) throws ProcessingException {
-    List<? extends ITableExtension<? extends AbstractTable>> extensions = getAllExtensions();
-    TableAddHeaderMenusChain chain = new TableAddHeaderMenusChain(extensions);
-    chain.execAddHeaderMenus(e);
   }
 
   protected final void interceptRowClick(ITableRow row, MouseButton mouseButton) throws ProcessingException {

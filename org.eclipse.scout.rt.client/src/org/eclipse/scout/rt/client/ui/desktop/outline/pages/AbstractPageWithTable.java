@@ -477,28 +477,36 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
         setSearchForm(execCreateSearchForm());
       }
       catch (Exception e) {
-        LOG.warn("unable to setSearchForm", e);
+        LOG.warn("unable to create SearchForm for '" + getClass().getName() + "'.", e);
       }
     }
   }
 
   /**
-   * creates the search form, but doesn't start it
-   * called by {@link #ensureSearchFormCreated()}
-   *
-   * @return {@link ISearchForm}
-   * @throws ProcessingException
-   * @since 3.8.2
+   * @deprecated Will be removed in Scout 6.0. Use {@link #createSearchFormInternal()} instead.
    */
+  @Deprecated
   protected ISearchForm execCreateSearchForm() throws ProcessingException {
-    if (getConfiguredSearchForm() == null) {
+    return createSearchFormInternal();
+  }
+
+  /**
+   * creates the search form, but doesn't start it
+   *
+   * @return {@link ISearchForm} or <code>null</code> if the search form could not be created.
+   * @throws ProcessingException
+   */
+  protected ISearchForm createSearchFormInternal() throws ProcessingException {
+    Class<? extends ISearchForm> configuredSearchForm = getConfiguredSearchForm();
+    if (configuredSearchForm == null) {
       return null;
     }
+
     try {
-      return getConfiguredSearchForm().newInstance();
+      return configuredSearchForm.newInstance();
     }
     catch (Exception e) {
-      SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + getConfiguredSearchForm().getName() + "'.", e));
+      SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + configuredSearchForm.getName() + "'.", e));
     }
     return null;
   }
