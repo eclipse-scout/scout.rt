@@ -302,8 +302,8 @@ scout.TableFooter.prototype._addResize = function($parent) {
     }
 
     function resizeEnd() {
-      if (that._$controlContainer.height() < 75) {
-        $('.selected', that.$container).click();
+      if (that._$controlContainer.height() < 100) {
+        that.selectedControl.setSelected(false);
       }
 
       $('body').off('mousemove')
