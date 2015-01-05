@@ -61,7 +61,7 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
    * use this static method to create a string based on the vargs that can be used as userPreferenceContext
    */
   public static String createUserPreferenceContext(Object... vargs) {
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     if (vargs != null) {
       for (Object o : vargs) {
         if (buf.length() > 0) {

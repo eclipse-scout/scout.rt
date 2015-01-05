@@ -162,6 +162,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage implements IPag
    */
 
   @Override
+  @SuppressWarnings("deprecation")
   public ITable getInternalTable() {
     return getTable();
   }

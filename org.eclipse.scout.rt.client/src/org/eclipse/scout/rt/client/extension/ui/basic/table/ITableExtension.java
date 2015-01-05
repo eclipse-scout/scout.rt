@@ -15,7 +15,6 @@ import java.util.List;
 
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableAddHeaderMenusChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableContentChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableCopyChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableCreateTableRowDataMapperChain;
@@ -35,7 +34,6 @@ import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRowDataMapper;
-import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.extension.IExtension;
@@ -59,8 +57,6 @@ public interface ITableExtension<TABLE extends AbstractTable> extends IExtension
   void execDrop(TableDropChain chain, ITableRow row, TransferObject t) throws ProcessingException;
 
   void execDisposeTable(TableDisposeTableChain chain) throws ProcessingException;
-
-  void execAddHeaderMenus(TableAddHeaderMenusChain chain, TableEvent e) throws ProcessingException;
 
   void execRowClick(TableRowClickChain chain, ITableRow row, MouseButton mouseButton) throws ProcessingException;
 

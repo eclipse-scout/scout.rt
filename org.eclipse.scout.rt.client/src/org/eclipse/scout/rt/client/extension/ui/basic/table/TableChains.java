@@ -10,7 +10,6 @@ import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRowDataMapper;
-import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
@@ -209,27 +208,6 @@ public final class TableChains {
         }
       };
       callChain(methodInvocation);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-
-    }
-  }
-
-  public static class TableAddHeaderMenusChain extends AbstractTableChain {
-
-    public TableAddHeaderMenusChain(List<? extends ITableExtension<? extends AbstractTable>> extensions) {
-      super(extensions);
-    }
-
-    public void execAddHeaderMenus(final TableEvent e) throws ProcessingException {
-      MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
-        @Override
-        protected void callMethod(ITableExtension<? extends AbstractTable> next) throws ProcessingException {
-          next.execAddHeaderMenus(TableAddHeaderMenusChain.this, e);
-        }
-      };
-      callChain(methodInvocation, e);
       if (methodInvocation.getException() instanceof ProcessingException) {
         throw (ProcessingException) methodInvocation.getException();
       }
