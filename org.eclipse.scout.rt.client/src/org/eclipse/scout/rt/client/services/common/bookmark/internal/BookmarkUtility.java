@@ -635,18 +635,7 @@ public final class BookmarkUtility {
     // setup table
     try {
       table.setTableChanging(true);
-      //legacy support
-      List<TableColumnState> allColumns = new ArrayList<TableColumnState>();
-      for (TableColumnState tcs : tablePageState.getAvailableColumns()) {
-        if (tcs.getVisible()) {
-          allColumns.add(tcs);
-        }
-      }
-
-      if (allColumns == null || allColumns.size() == 0) {
-        allColumns = tablePageState.getAvailableColumns();
-      }
-      restoreTableColumns(tablePage.getTable(), allColumns);
+      restoreTableColumns(tablePage.getTable(), tablePageState.getAvailableColumns());
     }
     finally {
       table.setTableChanging(false);
