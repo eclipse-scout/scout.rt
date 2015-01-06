@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.ui.html.json.form.fields;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
-import org.eclipse.scout.rt.client.ui.form.fields.IFormField5;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
@@ -73,15 +72,10 @@ public class JsonFormField<T extends IFormField> extends AbstractJsonPropertyObs
         return getModel().getTooltipText();
       }
     });
-    putJsonProperty(new JsonProperty<T>(IFormField5.PROP_STATUS_VISIBLE, model) {
+    putJsonProperty(new JsonProperty<T>(IFormField.PROP_STATUS_VISIBLE, model) {
       @Override
       protected Boolean modelValue() {
-        if (getModel() instanceof IFormField5) {
-          return ((IFormField5) getModel()).isStatusVisible();
-        }
-        else {
-          return true;
-        }
+        return getModel().isStatusVisible();
       }
     });
     putJsonProperty(new JsonProperty<T>(IFormField.PROP_ERROR_STATUS, model) {
