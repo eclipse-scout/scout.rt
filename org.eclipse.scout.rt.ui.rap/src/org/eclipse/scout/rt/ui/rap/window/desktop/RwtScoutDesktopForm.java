@@ -261,6 +261,7 @@ public class RwtScoutDesktopForm extends AbstractRwtScoutPart {
   protected void setTitleFromScout() {
     IForm f = getScoutObject();
     //
+    @SuppressWarnings("deprecation")
     String s = f.getBasicTitle();
     if (m_button != null && !m_button.isDisposed()) {
       m_button.setLabel(StringUtility.removeNewLines(s != null ? s : ""));

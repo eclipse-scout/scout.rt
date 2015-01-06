@@ -48,7 +48,7 @@ import org.eclipse.ui.part.ViewPart;
 
 /**
  * <h3>AbstractScoutView</h3> ...
- * 
+ *
  * @since 1.0.9 03.07.2008
  */
 public abstract class AbstractScoutView extends ViewPart implements ISwtScoutPart, ISaveablePart2 {
@@ -241,6 +241,7 @@ public abstract class AbstractScoutView extends ViewPart implements ISwtScoutPar
       return;
     }
 
+    @SuppressWarnings("deprecation")
     String basicTitle = form.getBasicTitle();
     setPartName(StringUtility.removeNewLines(basicTitle != null ? basicTitle : ""));
 
@@ -334,7 +335,7 @@ public abstract class AbstractScoutView extends ViewPart implements ISwtScoutPar
 
   /**
    * must be implemented by the concrete view to provide an environment
-   * 
+   *
    * @return
    */
   protected abstract ISwtEnvironment getSwtEnvironment();

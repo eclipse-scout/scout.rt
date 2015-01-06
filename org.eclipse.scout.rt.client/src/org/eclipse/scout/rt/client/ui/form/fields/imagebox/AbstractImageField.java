@@ -76,16 +76,6 @@ public abstract class AbstractImageField extends AbstractFormField implements II
     return null;
   }
 
-  /**
-   * @deprecated Will be removed in the 5.0 Release. This property never had any effect and can safely be removed
-   *             without replacement.
-   */
-  @Order(310)
-  @Deprecated
-  protected boolean getConfiguredFocusVisible() {
-    return true;
-  }
-
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(320)
   protected boolean getConfiguredAutoFit() {
@@ -184,7 +174,6 @@ public abstract class AbstractImageField extends AbstractFormField implements II
     super.initConfig();
     setImageTransform(new AffineTransformSpec());
     setAutoFit(getConfiguredAutoFit());
-    setFocusVisible(getConfiguredFocusVisible());
     setImageId(getConfiguredImageId());
     setPanDelta(getConfiguredPanDelta());
     setRotateDelta(getConfiguredRotateDelta());
@@ -344,18 +333,6 @@ public abstract class AbstractImageField extends AbstractFormField implements II
   @Override
   public void setImageTransform(AffineTransformSpec t) {
     propertySupport.setProperty(PROP_IMAGE_TRANSFORM, new AffineTransformSpec(t));
-  }
-
-  @Override
-  @SuppressWarnings("deprecation")
-  public boolean isFocusVisible() {
-    return propertySupport.getPropertyBool(PROP_FOCUS_VISIBLE);
-  }
-
-  @Override
-  @SuppressWarnings("deprecation")
-  public void setFocusVisible(boolean b) {
-    propertySupport.setPropertyBool(PROP_FOCUS_VISIBLE, b);
   }
 
   @Override

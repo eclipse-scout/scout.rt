@@ -29,11 +29,4 @@ public @interface Doc {
    * Definition for the default filtering behavior
    */
   Filtering filter() default Filtering.ACCEPT;
-
-  /**
-   * @deprecated Will be removed with scout 5.0. Uses {@link #filter()} instead. (Is already with scout 3.10 not
-   *             evaluated anymore!)
-   */
-  @Deprecated
-  boolean ignore() default false;
 }

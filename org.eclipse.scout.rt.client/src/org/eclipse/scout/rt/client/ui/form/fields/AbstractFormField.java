@@ -76,7 +76,6 @@ import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.eclipse.scout.service.SERVICES;
 
-@SuppressWarnings("deprecation")
 @ClassId("cb3204c4-71bf-4dc6-88a4-3a8f81a7ca10")
 @FormData(value = AbstractFormFieldData.class, sdkCommand = SdkCommand.USE)
 public abstract class AbstractFormField extends AbstractPropertyObserver implements IFormField, IContributionOwner, IExtensibleObject {
@@ -184,22 +183,6 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     int i = Math.max(s.lastIndexOf('$'), s.lastIndexOf('.'));
     s = s.substring(i + 1);
     return s;
-  }
-
-  /**
-   * @deprecated processing logic belongs to server. Will be removed in the 5.0 Release.
-   */
-  @Deprecated
-  protected String getConfiguredSearchTerm() {
-    return null;
-  }
-
-  /**
-   * @deprecated Will be removed in the 5.0 Release.
-   */
-  @Deprecated
-  public final String getLegacySearchTerm() {
-    return getConfiguredSearchTerm();
   }
 
   /**
@@ -678,15 +661,6 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   @Order(190)
   protected boolean getConfiguredFocusable() {
     return true;
-  }
-
-  /**
-   * @deprecated: Use a {@link ClassId} annotation as key for Doc-Text. Will be removed in the 5.0 Release.
-   */
-  @Deprecated
-  @Order(20)
-  protected String getConfiguredDoc() {
-    return null;
   }
 
   private List<Class<? extends IKeyStroke>> getConfiguredKeyStrokes() {
@@ -1772,11 +1746,6 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     if (form != null) {
       form.requestFocus(this);
     }
-  }
-
-  @Override
-  public boolean fetchFocusRequested() {
-    return false;
   }
 
   @Override

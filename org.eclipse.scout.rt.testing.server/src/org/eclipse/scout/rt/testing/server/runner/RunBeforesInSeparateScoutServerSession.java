@@ -30,7 +30,8 @@ public class RunBeforesInSeparateScoutServerSession extends AbstractRunBeforesIn
 
   /**
    * @deprecated use {@link RunBeforesInSeparateScoutServerSession(IServerJobFactory factory, Statement statement,
-   *             List<FrameworkMethod> befores, Object target)} instead
+   *             List<FrameworkMethod> befores, Object target)} instead. Will be removed in
+   *             N-release.
    */
   @Deprecated
   public RunBeforesInSeparateScoutServerSession(IServerSession serverSession, Subject subject, Statement statement, List<FrameworkMethod> befores, Object target) {

@@ -36,7 +36,6 @@ import org.eclipse.scout.commons.osgi.BundleClassDescriptor;
 import org.eclipse.scout.rt.server.ThreadContext;
 import org.eclipse.scout.rt.server.services.common.jdbc.internal.exec.PreparedStatementCache;
 import org.eclipse.scout.rt.server.services.common.jdbc.internal.exec.StatementProcessor;
-import org.eclipse.scout.rt.server.services.common.jdbc.internal.legacy.LegacyStatementBuilder;
 import org.eclipse.scout.rt.server.services.common.jdbc.internal.pool.SqlConnectionBuilder;
 import org.eclipse.scout.rt.server.services.common.jdbc.internal.pool.SqlConnectionPool;
 import org.eclipse.scout.rt.server.services.common.jdbc.style.ISqlStyle;
@@ -47,9 +46,6 @@ import org.eclipse.scout.rt.server.transaction.ITransactionMember;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeService;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
-import org.eclipse.scout.rt.shared.services.common.jdbc.ILegacySqlQueryService;
-import org.eclipse.scout.rt.shared.services.common.jdbc.LegacySearchFilter;
-import org.eclipse.scout.rt.shared.services.common.jdbc.LegacySearchFilter.WhereToken;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.eclipse.scout.rt.shared.services.common.security.IPermissionService;
 import org.eclipse.scout.service.AbstractService;
@@ -57,8 +53,7 @@ import org.eclipse.scout.service.IServiceInventory;
 import org.eclipse.scout.service.SERVICES;
 import org.osgi.framework.ServiceRegistration;
 
-@SuppressWarnings("deprecation")
-public abstract class AbstractSqlService extends AbstractService implements ISqlService, ILegacySqlQueryService, IAdaptable {
+public abstract class AbstractSqlService extends AbstractService implements ISqlService, IAdaptable {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSqlService.class);
   public static final int DEFAULT_MEMORY_PREFETCH_SIZE = 1048576; // = 1MB default
 
@@ -293,7 +288,7 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
    * <br>
    * ::text(SalutationMr)
    * <p>
-   * 
+   *
    * @return a plain object value or in case of a null value preferrably a {@link IHolder} of the correct value type
    */
   @ConfigOperation
@@ -780,30 +775,6 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
     return createStatementProcessor(s, bindBases, 0).createPlainText();
   }
 
-  @Override
-  public WhereToken resolveSpecialConstraint(Object specialConstraint) throws ProcessingException {
-    if (specialConstraint instanceof LegacySearchFilter.StringLikeConstraint) {
-      LegacySearchFilter.StringLikeConstraint c = (LegacySearchFilter.StringLikeConstraint) specialConstraint;
-      String s = getSqlStyle().toLikePattern(c.getValue());
-      return new LegacySearchFilter.WhereToken(c.getTerm(), s, null);
-    }
-    else if (specialConstraint instanceof LegacySearchFilter.ComposerConstraint) {
-      LegacySearchFilter.ComposerConstraint c = (LegacySearchFilter.ComposerConstraint) specialConstraint;
-      HashMap<String, Object> map = new HashMap<String, Object>();
-      String term = c.getTerm();
-      for (Map.Entry<String, LegacySearchFilter.ComposerAttributeRef> e : c.getAttributeRefMap().entrySet()) {
-        String key = e.getKey();
-        LegacySearchFilter.ComposerAttributeRef att = e.getValue();
-        LegacyStatementBuilder b = new LegacyStatementBuilder(getSqlStyle());
-        String attValue = b.resolveComposerAttribute(att.getOp(), att.getAttribute(), att.getBindName(), att.getValue());
-        map.putAll(b.getBindMap());
-        term = term.replace(key, attValue);
-      }
-      return new LegacySearchFilter.WhereToken(term, null, map);
-    }
-    return null;
-  }
-
   protected IStatementProcessor createStatementProcessor(String s, Object[] bindBases, int maxRowCount) throws ProcessingException {
     return new StatementProcessor(this, s, bindBases, maxRowCount, m_maxFetchMemorySize);
   }
@@ -811,7 +782,7 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
   /**
    * When the service completes work with an exception, a xa rollback is done on
    * ALL used service request resources
-   * 
+   *
    * @see commit
    */
   @Override

@@ -476,21 +476,6 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   }
 
   /**
-   * Provides a documentation text or description of this column. The text is intended to be included in external
-   * documentation. This method is typically processed by a documentation generation tool or similar.
-   * <p>
-   * Subclasses can override this method. Default is {@code null}.
-   *
-   * @deprecated: Use a {@link ClassId} annotation as key for Doc-Text. Will be removed in the 5.0 Release.
-   * @return a documentation text, suitable to be included in external documents
-   */
-  @Deprecated
-  @Order(200)
-  protected String getConfiguredDoc() {
-    return null;
-  }
-
-  /**
    * Configures whether this column value is mandatory / required. This only affects editable columns (see
    * {@link #getConfiguredEditable()} ).
    * <p>

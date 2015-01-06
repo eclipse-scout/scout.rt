@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
-import java.text.NumberFormat;
 
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.LocaleThreadLocal;
@@ -67,30 +66,13 @@ public abstract class AbstractNumberColumn<NUMBER extends Number> extends Abstra
    */
 
   /**
-   * Configures the format used to render the value. See {@link DecimalFormat#applyPattern(String)} for more information
-   * about the expected format.
-   * <p>
-   * If this configuration is not null, the pattern overrides other configurations that are delegated to the internal
-   * {@link DecimalFormat} like for example {@link #setGroupingUsed(boolean)}
-   * <p>
-   * Subclasses can override this method. Default is {@code null}.
-   * 
-   * @deprecated Will be removed in the 5.0 Release. For setting the format override {@link #initConfig()} and call
-   *             {@link #setFormat(DecimalFormat)}.
-   */
-  @Deprecated
-  protected String getConfiguredFormat() {
-    return null;
-  }
-
-  /**
    * Configures whether grouping is used for this column. If grouping is used, the values may be displayed with a digit
    * group separator.
    * <p>
    * Default used for {@link #setGroupingUsed(boolean)}
    * <p>
    * Subclasses can override this method. Default is {@code true}.
-   * 
+   *
    * @return {@code true} if grouping is used for this column, {@code false} otherwise.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -129,9 +111,6 @@ public abstract class AbstractNumberColumn<NUMBER extends Number> extends Abstra
     initFormat();
     setRoundingMode(getConfiguredRoundingMode());
     setGroupingUsed(getConfiguredGroupingUsed());
-    if (getConfiguredFormat() != null) {
-      ((DecimalFormat) propertySupport.getProperty(INumberValueContainer.PROP_DECIMAL_FORMAT)).applyPattern(getConfiguredFormat());
-    }
     setValidateOnAnyKey(getConfiguredValidateOnAnyKey());
     setMaxValue(getConfiguredMaxValue());
     setMinValue(getConfiguredMinValue());
@@ -164,24 +143,6 @@ public abstract class AbstractNumberColumn<NUMBER extends Number> extends Abstra
   @Override
   public DecimalFormat getFormat() {
     return (DecimalFormat) ((DecimalFormat) propertySupport.getProperty(INumberValueContainer.PROP_DECIMAL_FORMAT)).clone();
-  }
-
-  /**
-   * @deprecated Will be removed in the 5.0 Release. Use {@link #setFormat()}.
-   */
-  @Deprecated
-  protected final void setNumberFormat(NumberFormat fmt) {
-    if (fmt instanceof DecimalFormat) {
-      setFormat((DecimalFormat) fmt);
-    }
-    validateColumnValues();
-  }
-
-  @SuppressWarnings("deprecation")
-  @Deprecated
-  @Override
-  public NumberFormat getNumberFormat() {
-    return getFormat();
   }
 
   @Override

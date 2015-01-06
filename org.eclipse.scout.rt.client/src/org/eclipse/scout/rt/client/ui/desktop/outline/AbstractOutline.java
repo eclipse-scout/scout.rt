@@ -107,21 +107,6 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   }
 
   /**
-   * Provides a documentation text or description of this outline. The text is intended to be included in external
-   * documentation. This method is typically processed by a documentation generation tool or similar.
-   * <p>
-   * Subclasses can override this method. Default is {@code null}.
-   *
-   * @deprecated: Use a {@link ClassId} annotation as key for Doc-Text. Will be removed in the 5.0 Release.
-   * @return a documentation text, suitable to be included in external documents
-   */
-  @Deprecated
-  @Order(110)
-  protected String getConfiguredDoc() {
-    return null;
-  }
-
-  /**
    * Configures the view order of this outline. The view order determines the order in which the outline appears.<br>
    * The view order of outlines with no view order configured ({@code < 0}) is initialized based on the {@link Order}
    * annotation of the class.

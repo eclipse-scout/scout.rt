@@ -56,17 +56,6 @@ import org.eclipse.scout.service.SERVICES;
 public abstract class AbstractCalendarItemProvider extends AbstractPropertyObserver implements ICalendarItemProvider, IContributionOwner, IExtensibleObject {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractCalendarItemProvider.class);
 
-  /**
-   * @deprecated: Will be removed in the 5.0 Release.
-   */
-  @Deprecated
-  public static final long DAY_MILLIS = 24L * 3600L * 1000L;
-  /**
-   * @deprecated: Will be removed in the 5.0 Release.
-   */
-  @Deprecated
-  public static final long MONTH_MILLIS = DAY_MILLIS * 32L;
-
   private P_ReloadJob m_reloadJob;
 
   private boolean m_initialized;

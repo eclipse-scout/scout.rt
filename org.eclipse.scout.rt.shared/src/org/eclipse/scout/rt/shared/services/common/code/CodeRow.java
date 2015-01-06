@@ -225,23 +225,6 @@ public class CodeRow<ID_TYPE> implements ICodeRow<ID_TYPE> {
     m_tooltip = tooltipText;
   }
 
-  /**
-   * @return
-   * @deprecated use {@link #getTooltipText()} will be removed with the M Release
-   */
-  @Deprecated
-  public String getTooltip() {
-    return getTooltipText();
-  }
-
-  /**
-   * @deprecated use {@link #setTooltipText(String)} will be removed with the M Release
-   */
-  @Deprecated
-  public void setTooltip(String tooltip) {
-    setTooltipText(tooltip);
-  }
-
   @Override
   public String getForegroundColor() {
     return m_foregroundColor;

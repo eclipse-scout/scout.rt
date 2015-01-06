@@ -29,7 +29,9 @@ public class RunAftersInSeparateScoutServerSession extends AbstractRunAftersInSe
   }
 
   /**
-   * @deprecated use RunAftersInSeparateScoutServerSession(IServerJobFactory, Statement, List<FrameworkMethod>, Object)
+   * @deprecated use RunAftersInSeparateScoutServerSession(IServerJobFactory, Statement, List<FrameworkMethod>, Object).
+   *             Will be removed in
+   *             N-release.
    */
   @Deprecated
   public RunAftersInSeparateScoutServerSession(IServerSession serverSession, Subject subject, Statement statement, List<FrameworkMethod> afters, Object target) {

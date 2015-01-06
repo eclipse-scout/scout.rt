@@ -33,7 +33,6 @@ public class ServiceTunnelRequest implements IServiceTunnelRequest {
   private Locale m_locale;
   private String m_userAgent;
   private String m_version;
-  private Object m_metaData;
   private Set<String> m_consumedNotificationIds;
   /**
    * @since 3.8
@@ -107,24 +106,6 @@ public class ServiceTunnelRequest implements IServiceTunnelRequest {
   @Override
   public Locale getLocale() {
     return m_locale;
-  }
-
-  /**
-   * @return
-   * @deprecated extends this class to add custom information (will be removed with V5.0
-   */
-  @Deprecated
-  public Object getMetaData() {
-    return m_metaData;
-  }
-
-  /**
-   * @return
-   * @deprecated extends this class to add custom information (will be removed with V5.0
-   */
-  @Deprecated
-  public void setMetaData(Object o) {
-    m_metaData = o;
   }
 
   @Override

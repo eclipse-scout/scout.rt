@@ -39,27 +39,6 @@ public abstract class AbstractClientNotification implements IClientNotification 
     return m_notificationId;
   }
 
-  /**
-   * @deprecated use {@link #getOriginalServerNode()}. Will be removed in Release 5.0
-   */
-  @SuppressWarnings("deprecation")
-  @Deprecated
-  @Override
-  public int getOriginNode() {
-    return m_node;
-  }
-
-  /**
-   * @deprecated use {@link #getOriginalServerNode()}. Will be removed in Release 5.0
-   */
-  @SuppressWarnings("deprecation")
-  @Deprecated
-  @Override
-  public void setOriginNode(int node) {
-    m_node = node;
-    m_originServerNode = String.valueOf(node);
-  }
-
   @Override
   public String getOriginalServerNode() {
     return m_originServerNode;

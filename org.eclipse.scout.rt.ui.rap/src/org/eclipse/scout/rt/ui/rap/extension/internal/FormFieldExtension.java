@@ -26,16 +26,6 @@ public class FormFieldExtension implements IFormFieldExtension {
     m_name = name;
   }
 
-  /**
-   * @deprecated use {@link #getContributorBundleId()} instead. Will be removed in the 5.0 Release.
-   */
-  @SuppressWarnings("deprecation")
-  @Deprecated
-  @Override
-  public String getContibuterBundleId() {
-    return m_contributorBundleId;
-  }
-
   @Override
   public String getContributorBundleId() {
     return m_contributorBundleId;

@@ -17,7 +17,6 @@ import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.IOrdered;
@@ -191,15 +190,6 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   }
 
   /**
-   * @deprecated: Use a {@link ClassId} annotation as key for Doc-Text. Will be removed in the 5.0 Release.
-   */
-  @Deprecated
-  @Order(110)
-  protected String getConfiguredDoc() {
-    return null;
-  }
-
-  /**
    * Configures the view order of this action. The view order determines the order in which the action appears.<br>
    * The view order of actions with no view order configured ({@code < 0}) is initialized based on the {@link Order}
    * annotation of the class.
@@ -240,13 +230,6 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   @ConfigOperation
   @Order(30)
   protected void execAction() throws ProcessingException {
-  }
-
-  /**
-   * @deprecated will be removed in release 5.0; use {@link AbstractAction#interceptSelectionChanged(boolean)} instead.
-   */
-  @Deprecated
-  protected void execToggleAction(boolean selected) throws ProcessingException {
   }
 
   /**
@@ -507,7 +490,6 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
     if (setSelectedInternal(b)) {
       try {
         interceptSelectionChanged(b);
-        execToggleAction(b);
       }
       catch (ProcessingException e) {
         SERVICES.getService(IExceptionHandlerService.class).handleException(e);

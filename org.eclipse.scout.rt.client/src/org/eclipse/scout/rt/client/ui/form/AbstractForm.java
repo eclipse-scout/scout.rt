@@ -268,15 +268,6 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     return 0;
   }
 
-  /**
-   * @deprecated: Use a {@link ClassId} annotation as key for Doc-Text. Will be removed in the 5.0 Release.
-   */
-  @Deprecated
-  @Order(60)
-  protected String getConfiguredDoc() {
-    return null;
-  }
-
   @ConfigProperty(ConfigProperty.TEXT)
   @Order(90)
   protected String getConfiguredCancelVerificationText() {
@@ -1190,7 +1181,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
           }
         }
         else {
-            LOG.warn("cannot find field data for '" + fieldQId + "' in form '" + getClass().getName() + "'.");
+          LOG.warn("cannot find field data for '" + fieldQId + "' in form '" + getClass().getName() + "'.");
         }
       }
     }
@@ -2595,11 +2586,23 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     }
   }
 
+  /**
+   * @deprecated will be removed with the N-Release. See Bug 456408.
+   *             With the N-Release you should use {@link #getTitle()} instead.
+   */
+  @SuppressWarnings("deprecation")
+  @Deprecated
   @Override
   public String getBasicTitle() {
     return m_basicTitle;
   }
 
+  /**
+   * @deprecated will be removed with the N-Release. See Bug 456408.
+   *             With the N-Release you should use {@link #getTitle()} instead.
+   */
+  @SuppressWarnings("deprecation")
+  @Deprecated
   @Override
   public void setBasicTitle(String basicTitle) {
     m_basicTitle = basicTitle;

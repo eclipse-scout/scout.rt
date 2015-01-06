@@ -508,15 +508,6 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
     m_serviceTunnel = tunnel;
   }
 
-  /**
-   * @deprecated: use setServiceTunnel(IClientServiceTunnel) instead. Will be removed in the 5.0 Release.
-   */
-  @Deprecated
-  @SuppressWarnings("deprecation")
-  protected void setServiceTunnel(org.eclipse.scout.rt.client.servicetunnel.IServiceTunnel tunnel) {
-    setServiceTunnel((IClientServiceTunnel) tunnel);
-  }
-
   @Override
   public IMemoryPolicy getMemoryPolicy() {
     return m_memoryPolicy;

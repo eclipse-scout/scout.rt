@@ -38,22 +38,11 @@ public interface IClientNotification extends Serializable {
   /**
    * Merge with other notifications of the same type Same type means
    * n1.getClass()==n2.getClass()
-   * 
+   *
    * @return true if existingNotification was coalesced and therefore is
    *         consumed. The existingNotification is then removed from the queue.
    */
   boolean coalesce(IClientNotification existingNotification);
-
-  /**
-   * Gets the node where the notification is orignially fired. This is for
-   * cluster environment.
-   * 
-   * @return node (the property com.bsiag.crm.server#nodeId is one of
-   *         com.bsiag.crm.server#nodeId1...com.bsiag.crm.server#nodeIdn)
-   * @deprecated use {@link #getOriginalServerNode()}. Will be removed in Release 5.0
-   */
-  @Deprecated
-  int getOriginNode();
 
   /**
    * the node where the notification is originally fired. For cluster environments.
@@ -61,20 +50,8 @@ public interface IClientNotification extends Serializable {
   String getOriginalServerNode();
 
   /**
-   * Sets the node where the notification is orignially fired. This is for
-   * cluster environment.
-   * 
-   * @param node
-   *          (the property com.bsiag.crm.server#nodeId is one of
-   *          com.bsiag.crm.server#nodeId1...com.bsiag.crm.server#nodeIdn)
-   * @deprecated use {@link #setOriginalServerNode(String)}. Will be removed in Release 5.0
-   */
-  @Deprecated
-  void setOriginNode(int node);
-
-  /**
    * Sets the node where the notification is originally fired. For cluster environments.
-   * 
+   *
    * @param nodeId
    */
   void setOriginalServerNode(String nodeId);
@@ -86,7 +63,7 @@ public interface IClientNotification extends Serializable {
 
   /**
    * id of the server node delivering the notification to the client
-   * 
+   *
    * @param nodeId
    */
   void setProvidingServerNode(String nodeId);

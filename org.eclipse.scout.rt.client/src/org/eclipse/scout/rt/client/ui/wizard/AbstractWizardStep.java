@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.wizard;
 import java.util.List;
 
 import org.eclipse.scout.commons.ConfigurationUtility;
-import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.IOrdered;
@@ -100,15 +99,6 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
   @ConfigProperty(ConfigProperty.ICON_ID)
   @Order(40)
   protected String getConfiguredIconId() {
-    return null;
-  }
-
-  /**
-   * @deprecated: Use a {@link ClassId} annotation as key for Doc-Text. Will be removed in the 5.0 Release.
-   */
-  @Deprecated
-  @Order(50)
-  protected String getConfiguredDoc() {
     return null;
   }
 

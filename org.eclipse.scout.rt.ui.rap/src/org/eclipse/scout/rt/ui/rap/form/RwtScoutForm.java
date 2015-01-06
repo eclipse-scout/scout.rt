@@ -10,11 +10,9 @@
  *******************************************************************************/
 package org.eclipse.scout.rt.ui.rap.form;
 
-import java.io.File;
 import java.util.WeakHashMap;
 
 import org.eclipse.rap.rwt.RWT;
-import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
@@ -28,7 +26,6 @@ import org.eclipse.scout.rt.ui.rap.IValidateRoot;
 import org.eclipse.scout.rt.ui.rap.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.rap.basic.IRwtScoutComposite;
 import org.eclipse.scout.rt.ui.rap.basic.RwtScoutComposite;
-import org.eclipse.scout.rt.ui.rap.basic.WidgetPrinter;
 import org.eclipse.scout.rt.ui.rap.form.fields.IRwtScoutFormField;
 import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutFieldComposite;
 import org.eclipse.scout.rt.ui.rap.form.fields.RwtScoutFormFieldGridData;
@@ -39,7 +36,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
-@SuppressWarnings("deprecation")
 public class RwtScoutForm extends RwtScoutComposite<IForm> implements IRwtScoutForm {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutForm.class);
   private static final String VARIANT_FORM = "form";
@@ -194,45 +190,7 @@ public class RwtScoutForm extends RwtScoutComposite<IForm> implements IRwtScoutF
   }
 
   protected void handlePrintFromScout(final FormEvent e) {
-    WidgetPrinter wp = null;
-    try {
-      if (getUiFormPane() != null) {
-        if (e.getFormField() != null) {
-          for (Control c : RwtUtility.findChildComponents(getUiContainer(), Control.class)) {
-            IPropertyObserver scoutModel = (IPropertyObserver) c.getData(IRwtScoutFormField.CLIENT_PROPERTY_SCOUT_OBJECT);
-            if (scoutModel == e.getFormField()) {
-              wp = new WidgetPrinter(c);
-              break;
-            }
-          }
-        }
-        if (wp == null) {
-          wp = new WidgetPrinter(getUiFormPane().getShell());
-        }
-      }
-      if (wp != null) {
-        try {
-          wp.print(e.getPrintDevice(), e.getPrintParameters());
-        }
-        catch (Throwable ex) {
-          LOG.error(null, ex);
-        }
-      }
-    }
-    finally {
-      File outputFile = null;
-      if (wp != null) {
-        outputFile = wp.getOutputFile();
-      }
-      final File outputFileFinal = outputFile;
-      Runnable r = new Runnable() {
-        @Override
-        public void run() {
-          getScoutObject().getUIFacade().fireFormPrintedFromUI(outputFileFinal);
-        }
-      };
-      getUiEnvironment().invokeScoutLater(r, 0);
-    }
+    LOG.error("Printing in RAP not supported");
   }
 
   protected void handleRequestFocusFromScout(IFormField modelField, boolean force) {

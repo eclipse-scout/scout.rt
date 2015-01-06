@@ -43,7 +43,6 @@ public class SwingScoutCheckBoxMenuTest {
   private JCheckBoxMenuItem m_swingField;
 
   private BooleanHolder m_execSelectionChangedHolder;
-  private BooleanHolder m_execToggleActionHolder;
   private AtomicInteger m_execActionCount;
 
   @Before
@@ -52,7 +51,6 @@ public class SwingScoutCheckBoxMenuTest {
 
     // create the members to verify the calls to 'execAction' and 'execSelectionChanged'.
     m_execSelectionChangedHolder = new BooleanHolder(null);
-    m_execToggleActionHolder = new BooleanHolder(null);
     m_execActionCount = new AtomicInteger();
 
     // make dispatching into Scout model thread synchronously.
@@ -79,13 +77,11 @@ public class SwingScoutCheckBoxMenuTest {
   public void testClickEvent() throws InterruptedException {
     // Verify initial status.
     assertNull(m_execSelectionChangedHolder.getValue());
-    assertNull(m_execToggleActionHolder.getValue());
     assertEquals(0, m_execActionCount.get());
 
     // Test 1: Check the menu item.
     m_swingField.doClick();
     assertTrue(m_execSelectionChangedHolder.getValue());
-    assertTrue(m_execToggleActionHolder.getValue());
     assertEquals(1, m_execActionCount.get());
 
     resetBooleanHolders();
@@ -93,13 +89,11 @@ public class SwingScoutCheckBoxMenuTest {
     // Test 2: Uncheck the menu item.
     m_swingField.doClick();
     assertFalse(m_execSelectionChangedHolder.getValue());
-    assertFalse(m_execToggleActionHolder.getValue());
     assertEquals(2, m_execActionCount.get());
   }
 
   private void resetBooleanHolders() {
     m_execSelectionChangedHolder.setValue(null);
-    m_execToggleActionHolder.setValue(null);
   }
 
   private class P_TestCheckBoxMenu extends AbstractCheckBoxMenu {
@@ -114,10 +108,5 @@ public class SwingScoutCheckBoxMenuTest {
       m_execActionCount.incrementAndGet();
     }
 
-    @SuppressWarnings("deprecation")
-    @Override
-    protected void execToggleAction(boolean selected) throws ProcessingException {
-      m_execToggleActionHolder.setValue(selected);
-    }
   }
 }

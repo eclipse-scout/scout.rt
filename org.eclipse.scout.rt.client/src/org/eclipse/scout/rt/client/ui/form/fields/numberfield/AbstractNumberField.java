@@ -14,7 +14,6 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.text.ParsePosition;
 import java.util.regex.Pattern;
 
@@ -31,6 +30,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.numberfield.INumberFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractBasicField;
+import org.eclipse.scout.rt.client.ui.form.fields.IBasicFieldUIFacade;
 import org.eclipse.scout.rt.client.ui.form.fields.decimalfield.AbstractDecimalField;
 import org.eclipse.scout.rt.client.ui.valuecontainer.INumberValueContainer;
 import org.eclipse.scout.rt.shared.ScoutTexts;
@@ -39,8 +39,7 @@ import org.eclipse.scout.rt.shared.ScoutTexts;
 public abstract class AbstractNumberField<NUMBER extends Number> extends AbstractBasicField<NUMBER> implements INumberField<NUMBER> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractNumberField.class);
 
-  @SuppressWarnings("deprecation")
-  private INumberFieldUIFacade m_uiFacade;
+  private IBasicFieldUIFacade m_uiFacade;
 
   public AbstractNumberField() {
     this(true);
@@ -53,23 +52,6 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
   /*
    * Configuration
    */
-  /**
-   * Configures the format used to render the value. See {@link DecimalFormat#applyPattern(String)} for more information
-   * about the expected format.
-   * <p>
-   * If this configuration is not null, the pattern overrides other configurations that are delegated to the internal
-   * {@link DecimalFormat} like for example {@link #setGroupingUsed(boolean)}
-   * <p>
-   * Subclasses can override this method. Default is {@code null}.
-   *
-   * @deprecated Will be removed with scout 5.0. For setting the format override {@link #initConfig()} and call
-   *             {@link #setFormat(DecimalFormat)}.
-   */
-  @Deprecated
-  @Order(230)
-  protected String getConfiguredFormat() {
-    return null;
-  }
 
   /**
    * Default used for {@link INumberField#setGroupingUsed(boolean)}
@@ -131,9 +113,6 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
     initFormat();
     setRoundingMode(getConfiguredRoundingMode());
     setGroupingUsed(getConfiguredGroupingUsed());
-    if (getConfiguredFormat() != null) {
-      getFormatInternal().applyPattern(getConfiguredFormat());
-    }
     setMinValue(getConfiguredMinValue());
     setMaxValue(getConfiguredMaxValue());
   }
@@ -352,25 +331,12 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
     return displayValue;
   }
 
-  /**
-   * @deprecated Will be removed with scout 5.0, use {@link #getFormat()}.
-   */
-  @Deprecated
-  protected NumberFormat createNumberFormat() {
-    return getFormat();
-  }
-
-  @SuppressWarnings("deprecation")
   @Override
-  public INumberFieldUIFacade getUIFacade() {
+  public IBasicFieldUIFacade getUIFacade() {
     return m_uiFacade;
   }
 
-  /**
-   * When {@link INumberFieldUIFacade} is removed, this class will implements IBasicFieldUIFacade.
-   */
-  @SuppressWarnings("deprecation")
-  private class P_UIFacade implements INumberFieldUIFacade {
+  private class P_UIFacade implements IBasicFieldUIFacade {
     @Override
     public boolean setTextFromUI(String newText, boolean whileTyping) {
       if (newText != null && newText.length() == 0) {

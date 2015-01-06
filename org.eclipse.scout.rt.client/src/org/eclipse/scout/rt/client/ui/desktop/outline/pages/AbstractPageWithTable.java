@@ -486,7 +486,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   }
 
   /**
-   * @deprecated Will be removed in Scout 6.0. Use {@link #createSearchForm()} instead.
+   *  @deprecated Will be removed with the N-Release. Use {@link #createSearchForm()} instead.
    */
   @Deprecated
   protected ISearchForm execCreateSearchForm() throws ProcessingException {

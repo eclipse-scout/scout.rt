@@ -130,7 +130,7 @@ public class OrderedCollection<ORDERED extends IOrdered> implements Iterable<ORD
   }
 
   /**
-   * @deprecated use {@link #addLast(IOrdered)} instead.
+   * @deprecated use {@link #addLast(IOrdered)} instead. Will be removed in N release.
    */
   @Deprecated
   public boolean add(ORDERED e) {
@@ -138,7 +138,7 @@ public class OrderedCollection<ORDERED extends IOrdered> implements Iterable<ORD
   }
 
   /**
-   * @deprecated use {@link #addAllLast(Collection)} instead.
+   * @deprecated use {@link #addAllLast(Collection)} instead. Will be removed in N release.
    */
   @Deprecated
   public boolean addAll(Collection<? extends ORDERED> c) {
@@ -146,7 +146,7 @@ public class OrderedCollection<ORDERED extends IOrdered> implements Iterable<ORD
   }
 
   /**
-   * @deprecated use {@link #addAt(IOrdered, int)} instead.
+   * @deprecated use {@link #addAt(IOrdered, int)} instead. Will be removed in N release.
    */
   @Deprecated
   public boolean add(int index, ORDERED o) {
@@ -154,7 +154,7 @@ public class OrderedCollection<ORDERED extends IOrdered> implements Iterable<ORD
   }
 
   /**
-   * @deprecated use {@link #addAllAt(Collection, int)} instead.
+   * @deprecated use {@link #addAllAt(Collection, int)} instead. Will be removed in N release.
    */
   @Deprecated
   public boolean addAll(int index, Collection<? extends ORDERED> c) {
@@ -162,7 +162,7 @@ public class OrderedCollection<ORDERED extends IOrdered> implements Iterable<ORD
   }
 
   /**
-   * @deprecated use {@link #removeAt(int)} instead.
+   * @deprecated use {@link #removeAt(int)} instead. Will be removed in N release.
    */
   @Deprecated
   public ORDERED remove(int index) {

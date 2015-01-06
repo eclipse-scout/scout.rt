@@ -92,7 +92,7 @@ public interface ITreeBox<T> extends IValueField<Set<T>>, ICompositeField {
   /**
    * Populate tree with data from service all existing data in the tree is
    * discarded
-   * 
+   *
    * @see execFilterTreeNode
    */
   void loadRootNode() throws ProcessingException;
@@ -150,20 +150,6 @@ public interface ITreeBox<T> extends IValueField<Set<T>>, ICompositeField {
   T getCheckedKey();
 
   Set<T> getCheckedKeys();
-
-  /**
-   * @return
-   * @deprecated Will be removed in the 5.0 Release. Use {@link #getCheckedKey()} instead
-   */
-  @Deprecated
-  ILookupRow getCheckedLookupRow();
-
-  /**
-   * @return
-   * @deprecated Will be removed in the 5.0 Release.. Use {@link #getCheckedKeys()} instead
-   */
-  @Deprecated
-  Set<ILookupRow> getCheckedLookupRows();
 
   void checkKey(T key);
 

@@ -405,7 +405,8 @@ public class ServiceTunnelServlet extends HttpServletEx {
   }
 
   /**
-   * @deprecated use {@link #runServerJobTransactionWithDelegate(IServiceTunnelRequest, Version, boolean)} instead
+   * @deprecated use {@link #runServerJobTransactionWithDelegate(IServiceTunnelRequest, Version, boolean)} instead. Will
+   *             be removed with the N-Release.
    */
   @Deprecated
   protected IServiceTunnelResponse runServerJobTransactionWithDelegate(IServiceTunnelRequest req, Bundle[] loaderBundles, Version requestMinVersion, boolean debug) throws Exception {

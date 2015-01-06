@@ -209,6 +209,7 @@ public abstract class AbstractScoutEditorPart extends EditorPart implements ISwt
     }
     IForm f = getForm();
     //
+    @SuppressWarnings("deprecation")
     String s = f.getBasicTitle();
     setPartName(StringUtility.removeNewLines(s != null ? s : ""));
     //

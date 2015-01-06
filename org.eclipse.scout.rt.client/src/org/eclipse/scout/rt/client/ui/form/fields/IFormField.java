@@ -87,12 +87,7 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdere
   String PROP_LABEL = "label";
   String PROP_LABEL_VISIBLE = "labelVisible";
   String PROP_KEY_STROKES = "keyStrokes";
-  /**
-   * @deprecated since 3.8, sent via {@link org.eclipse.scout.rt.client.ui.form.FormEvent#TYPE_REQUEST_FOCUS
-   *             FormEvent#TYPE_REQUEST_FOCUS}. Will be removed in the 5.0 Release.
-   */
-  @Deprecated
-  String PROP_FOCUS_REQUESTED = "focusRequested";
+
   /**
    * if the field is focusable or not, value is of type {@link Boolean}
    */
@@ -595,12 +590,6 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdere
    * Convenience for {@link IForm#requestFocus(IFormField)}
    */
   void requestFocus();
-
-  /**
-   * @deprecated since 3.8. Use {@link IForm#requestFocus(IFormField)} instead. Will be removed in the 5.0 Release.
-   */
-  @Deprecated
-  boolean fetchFocusRequested();
 
   /**
    * MasterSlave
