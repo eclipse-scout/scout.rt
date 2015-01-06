@@ -143,7 +143,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
         "ColorCells",
         "fromRedToGreen",
         "fromGreenToRed",
-        "withBarChart",
+        "withBarGraph",
         "remove",
         "add",
         "FilterBy",
