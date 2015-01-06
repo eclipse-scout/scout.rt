@@ -73,6 +73,17 @@ public abstract class AbstractTable5 extends AbstractExtensibleTable implements 
     return m_tableControls;
   }
 
+  @SuppressWarnings("unchecked")
+  @Override
+  public <T extends ITableControl> T getControl(Class<T> controlClass) {
+    for (ITableControl control : getControls()) {
+      if (controlClass.isAssignableFrom(control.getClass())) {
+        return (T) control;
+      }
+    }
+    return null;
+  }
+
   @Override
   public void fireTableReloadFromUI() {
     try {

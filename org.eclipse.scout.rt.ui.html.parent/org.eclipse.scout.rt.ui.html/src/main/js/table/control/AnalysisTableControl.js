@@ -12,10 +12,10 @@ scout.AnalysisTableControl.prototype.init = function(model, session) {
 };
 
 scout.AnalysisTableControl.prototype._renderContent = function($parent) {
-  this.$parent = $parent;
+  this.$contentContainer = $parent.appendDiv();
 
   // commands
-  var $commandContainer = $parent.appendDiv('command-container');
+  var $commandContainer = this.$contentContainer.appendDiv('command-container');
 
   $commandContainer.appendDiv('command new', 'Neues Kriterium').click(addCriteria);
   $commandContainer.appendDiv('command delete', 'Kriterium verwerfen').click(removeCriteria);
@@ -23,7 +23,7 @@ scout.AnalysisTableControl.prototype._renderContent = function($parent) {
   $commandContainer.appendDiv('command simulator', 'Simulator').click(simulateServer);
 
   // svg container for venn
-  var $vennContainer = $parent
+  var $vennContainer = this.$contentContainer
     .appendSVG('svg', '', 'venn-container')
     .attrSVG('viewBox', '0 0 500 330')
     .attrSVG('preserveAspectRatio', 'xMinYMin')
@@ -35,13 +35,13 @@ scout.AnalysisTableControl.prototype._renderContent = function($parent) {
   appendRect($vennContainer, 'venn-all');
 
   // criteria container
-  $parent.appendDiv('criteria-back')
+  this.$contentContainer.appendDiv('criteria-back')
     .on('click', '', backMap);
-  var $criteriaNavigation = $parent.appendDiv('', 'criteria-navigation');
-  $parent.append('<input class="criteria-search"></input>')
+  var $criteriaNavigation = this.$contentContainer.appendDiv('', 'criteria-navigation');
+  this.$contentContainer.append('<input class="criteria-search"></input>')
     .on('input paste', '', searchMap)
     .attr('placeholder', this.session.text('FilterBy_'));
-  var $criteriaContainer = $parent.appendDiv('criteria-container');
+  var $criteriaContainer = this.$contentContainer.appendDiv('criteria-container');
   var containerWidth = parseFloat($criteriaContainer.css('width')),
     containerHeight = parseFloat($criteriaContainer.css('height'));
 
@@ -310,7 +310,7 @@ scout.AnalysisTableControl.prototype._renderContent = function($parent) {
   }
 
   function searchMap(event) {
-    var $criteriaContainerTest = that.$parent.appendDiv('criteria-container');
+    var $criteriaContainerTest = that.$contentContainer.appendDiv('criteria-container');
     drawCriteria($criteriaContainerTest, that.rootEntity, $(event.target).val());
 
     var $oldBoxes = $criteriaContainer.children(),
@@ -878,7 +878,7 @@ scout.AnalysisTableControl.prototype._initRootEntity = function() {
 };
 
 scout.AnalysisTableControl.prototype._removeContent = function() {
-  this.$parent.empty();
+  this.$contentContainer.remove();
 };
 
 scout.AnalysisTableControl.prototype._syncDataModel = function(dataModel) {
@@ -891,17 +891,19 @@ scout.AnalysisTableControl.prototype._syncRootEntityRef = function(rootEntityRef
   this._initRootEntity();
 };
 
-scout.AnalysisTableControl.prototype._renderPropertiesOnPropertyChange = function(oldValues, newValues) {
-  var render = false;
-  if (newValues.dataModel !== undefined && newValues.dataModel !== oldValues.dataModel) {
-    render = true;
-  } else if (newValues.rootEntityRef !== undefined && newValues.rootEntityRef !== oldValues.rootEntityRef) {
-    render = true;
-  }
-  if (render) {
+scout.AnalysisTableControl.prototype._removeDataModel = function() {
+  this.removeContent();
+};
+
+scout.AnalysisTableControl.prototype._renderDataModel = function(dataModel) {
+  this.renderContent();
+};
+
+scout.AnalysisTableControl.prototype._renderRootEntityRef = function(rootEntityRef, oldRootEntityRef) {
+  if (oldRootEntityRef !== undefined && oldRootEntityRef !== rootEntityRef) {
     this.removeContent();
-    this.renderContent();
   }
+  this.renderContent();
 };
 
 scout.AnalysisTableControl.prototype.isContentAvailable = function() {

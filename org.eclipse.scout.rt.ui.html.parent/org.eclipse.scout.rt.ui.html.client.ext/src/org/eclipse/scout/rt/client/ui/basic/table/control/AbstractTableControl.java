@@ -12,10 +12,12 @@ package org.eclipse.scout.rt.client.ui.basic.table.control;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.AbstractAction;
+import org.eclipse.scout.rt.client.ui.basic.table.ITable5;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 
 public abstract class AbstractTableControl extends AbstractAction implements ITableControl {
   private String m_group;
+  private ITable5 m_table;
 
   public AbstractTableControl() {
     this(true);
@@ -55,9 +57,22 @@ public abstract class AbstractTableControl extends AbstractAction implements ITa
     return (IForm) propertySupport.getProperty(PROP_FORM);
   }
 
+  public void setTable(ITable5 table) {
+    m_table = table;
+  }
+
   @Override
   protected void execSelectionChanged(boolean selected) throws ProcessingException {
-    if (selected && getForm() == null) {
+    if (!selected) {
+      return;
+    }
+    // Deselect other controls
+    for (ITableControl control : m_table.getControls()) {
+      if (control != this && control.isSelected()) {
+        control.setSelected(false);
+      }
+    }
+    if (getForm() == null) {
       IForm form = execStartForm();
       if (form != null) {
         setForm(form);

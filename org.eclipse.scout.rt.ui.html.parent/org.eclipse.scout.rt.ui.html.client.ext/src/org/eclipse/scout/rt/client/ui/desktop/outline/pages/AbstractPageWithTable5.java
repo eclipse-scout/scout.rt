@@ -10,7 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable5;
+import org.eclipse.scout.rt.client.ui.basic.table.control.AbstractTableControl;
+import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
+import org.eclipse.scout.rt.client.ui.basic.table.control.SearchFormTableControl;
 
 public abstract class AbstractPageWithTable5<T extends ITable5> extends AbstractPageWithTable<T> {
 
@@ -18,6 +22,24 @@ public abstract class AbstractPageWithTable5<T extends ITable5> extends Abstract
   protected void initConfig() {
     super.initConfig();
     getTable().setTableStatusVisible(true);
+  }
+
+  @Override
+  public void initPage() throws ProcessingException {
+    super.initPage();
+    //FIXME CGU move to AbstractTable.initConfig where controls are constructed
+    for (ITableControl control : getTable().getControls()) {
+      ((AbstractTableControl) control).setTable(getTable());
+    }
+  }
+
+  @Override
+  public void pageActivatedNotify() {
+    super.pageActivatedNotify();
+    if (isSearchRequired() && !getSearchFilter().isCompleted()) {
+      SearchFormTableControl control = getTable().getControl(SearchFormTableControl.class);
+      control.setSelected(true);
+    }
   }
 
 }

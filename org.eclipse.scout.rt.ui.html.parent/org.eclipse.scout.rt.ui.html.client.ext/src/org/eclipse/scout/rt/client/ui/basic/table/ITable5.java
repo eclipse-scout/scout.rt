@@ -23,6 +23,8 @@ public interface ITable5 extends ITable {
 
   List<ITableControl> getControls();
 
+  <T extends ITableControl> T getControl(Class<T> controlClass);
+
 //FIXME move to ui facade.
   void fireTableReloadFromUI();
 

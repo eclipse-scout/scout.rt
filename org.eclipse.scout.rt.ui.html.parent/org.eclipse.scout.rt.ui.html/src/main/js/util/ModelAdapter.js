@@ -277,16 +277,17 @@ scout.ModelAdapter.prototype._syncPropertiesOnPropertyChange = function(oldPrope
 scout.ModelAdapter.prototype._renderPropertiesOnPropertyChange = function(oldProperties, newProperties) {
   this._eachProperty(newProperties, function(propertyName, value, isAdapterProp) {
     var renderFuncName = '_render' + scout.ModelAdapter._preparePropertyNameForFunctionCall(propertyName);
+    var oldValue = oldProperties[propertyName];
     $.log.debug('call ' + renderFuncName + '(' + value + ')');
     // Call the render function for regular properties, for adapters see onChildAdapterChange
     if (isAdapterProp) {
-      this.onChildAdapterChange(propertyName, oldProperties[propertyName], value);
+      this.onChildAdapterChange(propertyName, oldValue, value);
     } else {
       var funcTarget = this.ui || this;
       if (!funcTarget[renderFuncName]) {
         throw new Error('Render function ' + renderFuncName + ' does not exist in ' + (funcTarget === this ? 'model adapter' : 'UI'));
-      }
-      funcTarget[renderFuncName](value);
+      } //TODO value and oldValue should be switched to conform with other functions. Or better create remove function as it is done with adapters? currently only "necessary" for AnalysisTableControl
+      funcTarget[renderFuncName](value, oldValue);
     }
   }.bind(this));
 };

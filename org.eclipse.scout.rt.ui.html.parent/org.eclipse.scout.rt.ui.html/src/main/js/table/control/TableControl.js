@@ -127,17 +127,17 @@ scout.TableControl.prototype._renderSelected = function(selected, closeWhenUnsel
     this.tableFooter.selectedControl = this;
   } else {
 
-    //Don't modify the state initially
+    // Don't modify the state initially, only on property change events
     if (this.rendered) {
 
-      if (closeWhenUnselected) {
-        //Don't remove immediately, wait for the animation to finish (handled by onControlContainerClosed)
+      if (closeWhenUnselected && this === this.tableFooter.selectedControl) {
+        // Don't remove immediately, wait for the animation to finish (handled by onControlContainerClosed)
         this.tableFooter.closeControlContainer(this);
+        this.tableFooter.selectedControl = null;
       } else {
         this.removeContent();
       }
 
-      this.tableFooter.selectedControl = null;
     }
   }
 };

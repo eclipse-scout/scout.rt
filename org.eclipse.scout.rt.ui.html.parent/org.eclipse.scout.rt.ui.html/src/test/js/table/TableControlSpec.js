@@ -89,6 +89,38 @@ describe("TableControl", function() {
         expect($controlContainer).toBeHidden();
       });
 
+      it("removes the content of the previous selected control without closing the container", function() {
+        var action = createAction(createModel());
+        var action2 = createAction(createModel());
+        table.controls = [action, action2];
+
+        action.selected = true;
+        table.render(session.$entryPoint);
+        var $controlContainer = table.footer._$controlContainer;
+
+        expect($controlContainer).toBeVisible();
+        expect(action.contentRendered).toBe(true);
+        expect(action2.contentRendered).toBe(false);
+
+        var event = createPropertyChangeEvent(action2, {
+          "selected": true
+        });
+        action2.onModelPropertyChange(event);
+
+        expect($controlContainer).toBeVisible();
+        expect(action2.contentRendered).toBe(true);
+        expect(action2.selected).toBe(true);
+
+        event = createPropertyChangeEvent(action, {
+          "selected": false
+        });
+        action.onModelPropertyChange(event);
+
+        expect($controlContainer).toBeVisible();
+        expect(action.contentRendered).toBe(false);
+        expect(action.selected).toBe(false);
+      });
+
     });
 
     describe("tooltipText", function() {

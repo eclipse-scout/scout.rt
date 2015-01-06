@@ -21,6 +21,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.fixtures.JsonSessionMock;
 import org.eclipse.scout.rt.ui.html.json.form.fixtures.FormWithOneField;
+import org.eclipse.scout.rt.ui.html.json.table.fixtures.Table;
 import org.eclipse.scout.rt.ui.html.json.table.fixtures.TableControl;
 import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
 import org.json.JSONException;
@@ -41,7 +42,8 @@ public class JsonTableControlTest {
   public void testLazyLoadingForm_onModelSelectionChanged() throws ProcessingException, JSONException {
     FormWithOneField form = new FormWithOneField();
 
-    ITableControl control = new TableControl();
+    TableControl control = new TableControl();
+    control.setTable(new Table());
     control.setForm(form);
     JsonTableControl<ITableControl> jsonControl = m_jsonSession.newJsonAdapter(control, null, null);
     assertNull(jsonControl.getAdapter(form));
@@ -58,7 +60,8 @@ public class JsonTableControlTest {
   public void testLazyLoadingForm_onUiSelectionChanged() throws Exception {
     FormWithOneField form = new FormWithOneField();
 
-    ITableControl control = new TableControl();
+    TableControl control = new TableControl();
+    control.setTable(new Table());
     control.setForm(form);
     JsonTableControl<ITableControl> jsonControl = m_jsonSession.newJsonAdapter(control, null, null);
 
@@ -91,7 +94,8 @@ public class JsonTableControlTest {
   public void testNonLazyLoadingFormWhenSelected() throws ProcessingException, JSONException {
     FormWithOneField form = new FormWithOneField();
 
-    ITableControl control = new TableControl();
+    TableControl control = new TableControl();
+    control.setTable(new Table());
     control.setSelected(true);
     control.setForm(form);
     JsonTableControl<ITableControl> jsonControl = m_jsonSession.newJsonAdapter(control, null, null);

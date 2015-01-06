@@ -11,7 +11,7 @@ scout.inherits(scout.ChartTableControl, scout.TableControl);
 scout.ChartTableControl.FILTER_KEY = 'CHART';
 
 scout.ChartTableControl.prototype._renderContent = function($parent) {
-  this.$parent = $parent;
+  this.$contentContainer = $parent.appendDiv();
 
   // group functions for dates
   var dateDesc = [
@@ -28,11 +28,11 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
     that = this;
 
   this._filterResetListener = this.table.events.on(scout.Table.GUI_EVENT_FILTER_RESETTED, function(event) {
-    that.$parent.find('.main-chart.selected').removeClassSVG('selected');
+    that.$contentContainer.find('.main-chart.selected').removeClassSVG('selected');
   });
 
   // create container
-  var $chartSelect = $parent.appendDiv('chart-select');
+  var $chartSelect = this.$contentContainer.appendDiv('chart-select');
 
   // create chart types for selection
   addSelectBar($chartSelect);
@@ -57,8 +57,8 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
   $('svg.select-chart').first().addClassSVG('selected');
 
   // create container for x/y-axis
-  var $xAxisSelect = $parent.appendDiv('xaxis-select'),
-    $yAxisSelect = $parent.appendDiv('yaxis-select');
+  var $xAxisSelect = this.$contentContainer.appendDiv('xaxis-select'),
+    $yAxisSelect = this.$contentContainer.appendDiv('yaxis-select');
 
   // all x/y-axis for selection
   for (var c1 = 0; c1 < columns.length; c1++) {
@@ -107,7 +107,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
   });
 
   // create container for data
-  var $dataSelect = $parent.appendDiv('data-select');
+  var $dataSelect = this.$contentContainer.appendDiv('data-select');
   $dataSelect.appendDiv('select-data data-count', countDesc)
     .data('column', -1);
 
@@ -130,7 +130,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
   $('.select-data').first().addClass('selected');
 
   // draw first chart
-  var $chartMain = $parent.appendSVG('svg', '', 'chart-main')
+  var $chartMain = this.$contentContainer.appendSVG('svg', '', 'chart-main')
     .attrSVG('viewBox', '0 0 1000 320')
     .attr('preserveAspectRatio', 'xMinYMin');
   drawChart();
@@ -702,7 +702,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
 };
 
 scout.ChartTableControl.prototype._removeContent = function() {
-  this.$parent.empty();
+  this.$contentContainer.remove();
 };
 
 scout.ChartTableControl.prototype.dispose = function() {
