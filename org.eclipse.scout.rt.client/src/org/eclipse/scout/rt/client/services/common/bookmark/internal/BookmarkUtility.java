@@ -275,9 +275,8 @@ public final class BookmarkUtility {
    *
    * @param forceReload
    *          parameter without any function
-   * @deprecated see https://bugs.eclipse.org/bugs/show_bug.cgi?id=439867, parameter forceReload is without any
-   *             function, therefore a method without this parameter has been created, this method might be removed in
-   *             the future.
+   * @deprecated use {@link #activateBookmark(IDesktop, Bookmark)}, parameter forceReload is without any
+   *             function. Will be removed in the N-Release
    */
   @Deprecated
   public static void activateBookmark(IDesktop desktop, Bookmark bm, boolean forceReload) throws ProcessingException {
