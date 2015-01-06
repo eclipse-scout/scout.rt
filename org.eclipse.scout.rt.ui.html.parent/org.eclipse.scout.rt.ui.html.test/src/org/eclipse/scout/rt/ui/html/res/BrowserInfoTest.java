@@ -769,20 +769,23 @@ public class BrowserInfoTest {
     BrowserInfo info = BrowserInfo.createFrom(userAgentString, Locale.getDefault());
 
     List<String> failedTests = new ArrayList<>();
-    if (flags.isMobile != null && flags.isMobile != info.isMobile()) {
-      failedTests.add("MOBILE [expected " + flags.isMobile + ", but is " + info.isMobile() + "]");
+    if (flags.isMobile() != null && flags.isMobile() != info.isMobile()) {
+      failedTests.add("MOBILE [expected " + flags.m_isMobile + ", but is " + info.isMobile() + "]");
     }
-    if (flags.isTablet != null && flags.isTablet != info.isTablet()) {
-      failedTests.add("TABLET [expected " + flags.isTablet + ", but is " + info.isTablet() + "]");
+    if (flags.isTablet() != null && flags.m_isTablet != info.isTablet()) {
+      failedTests.add("TABLET [expected " + flags.m_isTablet + ", but is " + info.isTablet() + "]");
     }
-    if (flags.isWindows != null && flags.isWindows != (info.getSystem() == BrowserInfo.System.WINDOWS)) {
-      failedTests.add("WINDOWS [expected " + flags.isWindows + ", but is " + (info.getSystem() == BrowserInfo.System.WINDOWS) + "; system=" + info.getSystem() + "]");
+    boolean isWindows = (info.getSystem() == BrowserInfo.System.WINDOWS);
+    if (flags.isWindows() != null && flags.isWindows() != isWindows) {
+      failedTests.add("WINDOWS [expected " + flags.m_isWindows + ", but is " + isWindows + "; system=" + info.getSystem() + "]");
     }
-    if (flags.isMac != null && flags.isMac != (info.getSystem() == BrowserInfo.System.OSX)) {
-      failedTests.add("MAC [expected " + flags.isMac + ", but is " + (info.getSystem() == BrowserInfo.System.OSX) + "; system=" + info.getSystem() + "]");
+    boolean isMac = (info.getSystem() == BrowserInfo.System.OSX);
+    if (flags.isMac() != null && flags.isMac() != isMac) {
+      failedTests.add("MAC [expected " + flags.m_isMac + ", but is " + isMac + "; system=" + info.getSystem() + "]");
     }
-    if (flags.isLinux != null && flags.isLinux != (info.getSystem() == BrowserInfo.System.UNIX)) {
-      failedTests.add("LINUX [expected " + flags.isLinux + ", but is " + (info.getSystem() == BrowserInfo.System.UNIX) + "; system=" + info.getSystem() + "]");
+    boolean isLinux = (info.getSystem() == BrowserInfo.System.UNIX);
+    if (flags.isLinux() != null && flags.isLinux() != isLinux) {
+      failedTests.add("LINUX [expected " + flags.m_isLinux + ", but is " + isLinux + "; system=" + info.getSystem() + "]");
     }
 
     if (!failedTests.isEmpty()) {
@@ -803,11 +806,12 @@ public class BrowserInfoTest {
   }
 
   private static class P_BrowserTestFlags {
-    public Boolean isMobile;
-    public Boolean isTablet;
-    public Boolean isWindows;
-    public Boolean isMac;
-    public Boolean isLinux;
+
+    private Boolean m_isMobile;
+    private Boolean m_isTablet;
+    private Boolean m_isWindows;
+    private Boolean m_isMac;
+    private Boolean m_isLinux;
 
     public P_BrowserTestFlags() {
     }
@@ -818,61 +822,81 @@ public class BrowserInfoTest {
 
     public P_BrowserTestFlags copy() {
       P_BrowserTestFlags copy = new P_BrowserTestFlags();
-      copy.isMobile = this.isMobile;
-      copy.isTablet = this.isTablet;
-      copy.isWindows = this.isWindows;
-      copy.isMac = this.isMac;
-      copy.isLinux = this.isLinux;
+      copy.m_isMobile = this.m_isMobile;
+      copy.m_isTablet = this.m_isTablet;
+      copy.m_isWindows = this.m_isWindows;
+      copy.m_isMac = this.m_isMac;
+      copy.m_isLinux = this.m_isLinux;
       return copy;
     }
 
+    public Boolean isMobile() {
+      return m_isMobile;
+    }
+
+    public Boolean isTablet() {
+      return m_isTablet;
+    }
+
+    public Boolean isWindows() {
+      return m_isWindows;
+    }
+
+    public Boolean isMac() {
+      return m_isMac;
+    }
+
+    public Boolean isLinux() {
+      return m_isLinux;
+    }
+
     public P_BrowserTestFlags mobile() {
-      this.isMobile = true;
+      this.m_isMobile = true;
       return this;
     }
 
     public P_BrowserTestFlags notMobile() {
-      this.isMobile = false;
+      this.m_isMobile = false;
       return this;
     }
 
     public P_BrowserTestFlags tablet() {
-      this.isTablet = true;
+      this.m_isTablet = true;
       return this;
     }
 
     public P_BrowserTestFlags notTablet() {
-      this.isTablet = false;
+      this.m_isTablet = false;
       return this;
     }
 
     public P_BrowserTestFlags windows() {
-      this.isWindows = true;
+      this.m_isWindows = true;
       return this;
     }
 
     public P_BrowserTestFlags notWindows() {
-      this.isWindows = false;
+      this.m_isWindows = false;
       return this;
     }
 
     public P_BrowserTestFlags mac() {
-      this.isMac = true;
+      this.m_isMac = true;
       return this;
     }
 
     public P_BrowserTestFlags notMac() {
-      this.isMac = false;
+      this.m_isMac = false;
       return this;
     }
 
     public P_BrowserTestFlags linux() {
-      this.isLinux = true;
+      this.m_isLinux = true;
       return this;
     }
 
     public P_BrowserTestFlags notLinux() {
-      this.isLinux = false;
+      this.m_isLinux = false;
       return this;
     }
   }
