@@ -512,7 +512,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
         ext.contributeOutlines(outlines);
       }
       catch (Throwable t) {
-        LOG.error("contrinuting outlines by " + ext, t);
+        LOG.error("contributing outlines by " + ext, t);
       }
     }
     List<IOutline> contributedOutlines = m_contributionHolder.getContributionsByClass(IOutline.class);
@@ -529,7 +529,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
         ext.contributeActions(actionList);
       }
       catch (Throwable t) {
-        LOG.error("contrinuting actions by " + ext, t);
+        LOG.error("contributing actions by " + ext, t);
       }
     }
 

@@ -166,7 +166,6 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   // current timers
   private P_CloseTimer m_scoutCloseTimer;
   private Map<String, P_Timer> m_scoutTimerMap;
-  private String m_iconId;
   private DataChangeListener m_internalDataChangeListener;
   private final IEventHistory<FormEvent> m_eventHistory;
 
@@ -847,6 +846,14 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       }
     }
     return startInternal(handler);
+  }
+
+  @Override
+  public void start() throws ProcessingException {
+    if (getHandler() == null) {
+      throw new ProcessingException("Handler must not be null.");
+    }
+    startInternal(getHandler());
   }
 
   /**

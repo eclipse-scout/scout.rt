@@ -2,7 +2,7 @@ package org.eclipse.scout.rt.client.extension.ui.desktop.outline;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.action.tool.AbstractToolButtonExtension;
-import org.eclipse.scout.rt.client.extension.ui.desktop.outline.FormToolButtonChains.FormToolButtonStartFormChain;
+import org.eclipse.scout.rt.client.extension.ui.desktop.outline.FormToolButtonChains.FormToolButtonInitFormChain;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractFormToolButton;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 
@@ -13,7 +13,7 @@ public abstract class AbstractFormToolButtonExtension<FORM extends IForm, OWNER 
   }
 
   @Override
-  public void execStartForm(FormToolButtonStartFormChain<? extends IForm> chain) throws ProcessingException {
-    chain.execStartForm();
+  public void execInitForm(FormToolButtonInitFormChain<? extends IForm> chain) throws ProcessingException {
+    chain.execInitForm();
   }
 }

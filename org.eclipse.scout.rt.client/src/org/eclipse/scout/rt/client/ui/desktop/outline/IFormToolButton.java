@@ -16,6 +16,8 @@ import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
  * @since 3.8.1
  */
 public interface IFormToolButton<FORM> extends IToolButton {
+  String PROP_FORM = "form";
+
   FORM getForm();
 
   /**
@@ -24,14 +26,4 @@ public interface IFormToolButton<FORM> extends IToolButton {
    * The form is shown whenever the tool button is activated.
    */
   void setForm(FORM f);
-
-  /**
-   * Set a new <b>started</b> form to the tool.
-   * <p>
-   * The form is shown whenever the tool button is activated.
-   * 
-   * @param force
-   *          set 'f' as the new form, event when it is equal to the old form
-   */
-  void setForm(FORM f, boolean force);
 }

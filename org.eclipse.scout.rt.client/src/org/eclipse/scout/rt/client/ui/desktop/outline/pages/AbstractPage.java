@@ -270,6 +270,21 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   }
 
   /**
+   * Configures the detail form to be used with this page. The form is lazily {@linkplain #ensureDetailFormCreated()
+   * created} and {@linkplain #ensureDetailFormStarted() started}.
+   * <p>
+   * Subclasses can override this method. Default is {@code null}.
+   *
+   * @return a form type token
+   * @see {@link #startDetailForm(IForm)} for details how the form gets started
+   */
+  @ConfigProperty(ConfigProperty.FORM)
+  @Order(90)
+  protected Class<? extends IForm> getConfiguredDetailForm() {
+    return null;
+  }
+
+  /**
    * Called after this page has been added to the outline tree. This method may set a detail form or check
    * some parameters.
    * <p>
@@ -400,8 +415,20 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   }
 
   /**
-   * @return
+   * Initializes the detail form associated with this page. This method is called before the
+   * detail form is used for the first time.
+   * <p>
+   * Subclasses can override this method. The default does nothing.
+   *
+   * @throws ProcessingException
+   * @see #ensureDetailFormCreated()
+   * @see #ensureDetailFormStarted()
    */
+  @ConfigOperation
+  @Order(120)
+  protected void execInitDetailForm() throws ProcessingException {
+  }
+
   protected abstract T initTable();
 
   /**
@@ -523,6 +550,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   public void nodeRemovedNotify() {
     try {
       interceptDisposePage();
+      disposeDetailForm();
     }
     catch (ProcessingException e) {
       SERVICES.getService(IExceptionHandlerService.class).handleException(e);
@@ -542,6 +570,8 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   @Override
   public void pageActivatedNotify() {
     try {
+      ensureDetailFormCreated();
+      ensureDetailFormStarted();
       interceptPageActivated();
     }
     catch (ProcessingException t) {
@@ -562,6 +592,52 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     }
     catch (Exception e) {
       SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", e));
+    }
+  }
+
+  protected IForm createDetailForm() throws ProcessingException {
+    if (getConfiguredDetailForm() == null) {
+      return null;
+    }
+    try {
+      return getConfiguredDetailForm().newInstance();
+    }
+    catch (Exception e) {
+      SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + getConfiguredDetailForm().getName() + "'.", e));
+    }
+    return null;
+  }
+
+  /**
+   * Starts the form.
+   * <p>
+   * The default uses {@link IForm#start()} and therefore expects a form handler to be previously set. Override to call
+   * a custom start method or implement a {@link IForm#start()} on the detail form.
+   */
+  protected void startDetailForm() throws ProcessingException {
+    getDetailForm().start();
+  }
+
+  protected void ensureDetailFormCreated() throws ProcessingException {
+    if (getDetailForm() != null) {
+      return;
+    }
+    IForm form = createDetailForm();
+    setDetailForm(form);
+    execInitDetailForm();
+  }
+
+  protected void ensureDetailFormStarted() throws ProcessingException {
+    if (getDetailForm() == null || getDetailForm().isFormOpen()) {
+      return;
+    }
+    startDetailForm();
+  }
+
+  protected void disposeDetailForm() throws ProcessingException {
+    if (getDetailForm() != null) {
+      getDetailForm().doClose();
+      setDetailForm(null);
     }
   }
 

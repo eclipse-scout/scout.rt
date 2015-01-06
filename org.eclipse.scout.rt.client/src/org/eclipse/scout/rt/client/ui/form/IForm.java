@@ -44,7 +44,7 @@ import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
  * <p>
  * A <b>field</b> is where you enter data: a string, a number, a date, a list of values. A <b>button</b> is where you
  * trigger actions: save data, cancel whatever you are doing, go on to the next or return to the previous step. A
- * <b>handler</b> is reponsible for loading from data and storing data. This usually involves calling process services
+ * <b>handler</b> is responsible for loading from data and storing data. This usually involves calling process services
  * on the server. These will in turn contact a persistence layer such as a database.
  */
 public interface IForm extends IPropertyObserver, ITypeWithSettableClassId {
@@ -192,6 +192,14 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId {
    *          automatic load/store should be performed
    */
   void startWizardStep(IWizardStep wizardStep, Class<? extends IFormHandler> handlerType) throws ProcessingException;
+
+  /**
+   * Starts the form using {@link #getHandler()}.
+   *
+   * @throws ProcessingException
+   *           if no handler has been set.
+   */
+  void start() throws ProcessingException;
 
   /**
    * @return true if the form is currently attached to the desktop, false if the

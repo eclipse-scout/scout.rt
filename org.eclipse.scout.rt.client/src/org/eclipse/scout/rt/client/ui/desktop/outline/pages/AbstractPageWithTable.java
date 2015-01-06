@@ -483,11 +483,11 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   }
 
   /**
-   * @deprecated Will be removed in Scout 6.0. Use {@link #createSearchFormInternal()} instead.
+   * @deprecated Will be removed in Scout 6.0. Use {@link #createSearchForm()} instead.
    */
   @Deprecated
   protected ISearchForm execCreateSearchForm() throws ProcessingException {
-    return createSearchFormInternal();
+    return createSearchForm();
   }
 
   /**
@@ -496,7 +496,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * @return {@link ISearchForm} or <code>null</code> if the search form could not be created.
    * @throws ProcessingException
    */
-  protected ISearchForm createSearchFormInternal() throws ProcessingException {
+  protected ISearchForm createSearchForm() throws ProcessingException {
     Class<? extends ISearchForm> configuredSearchForm = getConfiguredSearchForm();
     if (configuredSearchForm == null) {
       return null;
@@ -576,6 +576,13 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     if (m_searchFormListener != null) {
       m_searchForm.removeFormListener(m_searchFormListener);
       m_searchFormListener = null;
+    }
+  }
+
+  protected void disposeSearchForm() throws ProcessingException {
+    if (m_searchForm != null) {
+      m_searchForm.doClose();
+      setSearchForm(null);
     }
   }
 
@@ -718,6 +725,17 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     ensureSearchFormCreated();
     ensureSearchFormStarted();
     super.pageActivatedNotify();
+  }
+
+  @Override
+  public void nodeRemovedNotify() {
+    try {
+      disposeSearchForm();
+      super.nodeRemovedNotify();
+    }
+    catch (ProcessingException e) {
+      SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+    }
   }
 
   @Override

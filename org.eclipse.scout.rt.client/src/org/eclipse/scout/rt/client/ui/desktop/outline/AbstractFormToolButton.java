@@ -13,128 +13,122 @@ package org.eclipse.scout.rt.client.ui.desktop.outline;
 import java.util.List;
 
 import org.eclipse.scout.commons.annotations.ConfigOperation;
+import org.eclipse.scout.commons.annotations.ConfigProperty;
+import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ClientSyncJob;
-import org.eclipse.scout.rt.client.extension.ui.desktop.outline.FormToolButtonChains.FormToolButtonStartFormChain;
+import org.eclipse.scout.rt.client.extension.ui.desktop.outline.FormToolButtonChains.FormToolButtonInitFormChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.IFormToolButtonExtension;
 import org.eclipse.scout.rt.client.ui.action.tool.AbstractToolButton;
 import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
+import org.eclipse.scout.service.SERVICES;
 
 /**
  * A tool button that can be used in the {@link IDesktop} to toggle a form in the tools area.
  */
 public abstract class AbstractFormToolButton<FORM extends IForm> extends AbstractToolButton implements IFormToolButton<FORM> {
 
-  private FORM m_form;
-  private boolean m_previousSelectionState = false;
-
   @Override
   protected boolean getConfiguredToggleAction() {
     return true;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public final FORM getForm() {
-    return m_form;
+    return (FORM) propertySupport.getProperty(PROP_FORM);
   }
 
   @Override
-  public final void setForm(FORM f) {
-    setForm(f, false);
-  }
-
-  @Override
-  public final void setForm(FORM f, boolean force) {
-    if (force || f != m_form) {
-      if (f != null) {
-        decorateForm(f);
-      }
-      FORM oldForm = m_form;
-      m_form = f;
-      //single observer
-      IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
-      if (desktop != null) {
-        if (m_form == null) {
-          // Close the "tab", when the form is null (but remember the previous state)
-          desktop.removeForm(oldForm);
-          m_previousSelectionState = isSelected();
-          setSelected(false);
-          setEnabled(false);
-        }
-        else {
-          setEnabled(true);
-          if (!isSelected()) { // restore selection
-            setSelected(m_previousSelectionState);
-          }
-          if (isSelected()) {
-            if (oldForm != null) {
-              desktop.removeForm(oldForm);
-            }
-            desktop.addForm(m_form);
-          }
-        }
-      }
-    }
+  public final void setForm(IForm f) {
+    propertySupport.setProperty(PROP_FORM, f);
   }
 
   /**
-   * Called every time the tool button is selected.
+   * Configures the form to be used with this button. The form is lazily created and started when the button gets
+   * selected.
    * <p>
-   * Check {@link #getForm()} to see what form is currently represented.
+   * Subclasses can override this method. Default is {@code null}.
+   *
+   * @return a form type token
+   * @see {@link #startForm(IForm)} for details how the form gets started
+   */
+  @ConfigProperty(ConfigProperty.FORM)
+  @Order(90)
+  protected Class<FORM> getConfiguredForm() {
+    return null;
+  }
+
+  /**
+   * Initializes the form associated with this button. This method is called before the
+   * form is used for the first time.
    * <p>
-   * Example code is:<code><pre>
-   * if(getForm()==null){
-   *   f=new MyForm();
-   *   decorate(f);
-   *   f.startForm()
-   *   setForm(f);
-   * }
-   * </pre></code> Call {@link #setForm(IForm)} to change the current form.
+   * Subclasses can override this method. The default does nothing.
+   *
+   * @throws ProcessingException
    */
   @ConfigOperation
-  protected void execStartForm() throws ProcessingException {
+  @Order(120)
+  protected void execInitForm() throws ProcessingException {
   }
 
   @Override
-  protected void execSelectionChanged(boolean selection) throws ProcessingException {
-    IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
-    if (desktop == null) {
+  protected void execSelectionChanged(boolean selected) throws ProcessingException {
+    if (!selected) {
       return;
     }
-    if (selection) {
-      if (isToggleAction()) {
-        // unselect other form tool buttons
-        for (IToolButton b : desktop.getToolButtons()) {
-          if (b != this && b instanceof AbstractFormToolButton && b.isSelected()) {
-            b.setSelected(false);
-          }
-        }
-      }
-      // show form
-      FORM oldForm = getForm();
-      interceptStartForm();
-      if (oldForm == m_form) {
-        if (m_form != null) {
-          m_previousSelectionState = true;
-          desktop.addForm(m_form);
+    if (isToggleAction()) {
+      IDesktop desktop = ClientSyncJob.getCurrentSession().getDesktop();
+      // unselect other form tool buttons
+      for (IToolButton b : desktop.getToolButtons()) {
+        if (b != this && b instanceof IFormToolButton && b.isSelected()) {
+          b.setSelected(false);
         }
       }
     }
-    else {
-      // hide form
-      if (m_form != null) {
-        m_previousSelectionState = false;
-        desktop.removeForm(m_form);
+    if (getForm() == null) {
+      FORM form = createForm();
+      if (form != null) {
+        setForm(form);
+        decorateForm();
+        interceptInitForm();
+        if (!form.isFormOpen()) {
+          startForm();
+        }
       }
     }
   }
 
-  protected void decorateForm(FORM f) {
-    f.setAutoAddRemoveOnDesktop(false);
-    f.setDisplayHint(IForm.DISPLAY_HINT_VIEW);
-    f.setDisplayViewId(IForm.VIEW_ID_E);
+  protected FORM createForm() throws ProcessingException {
+    if (getConfiguredForm() == null) {
+      return null;
+    }
+    try {
+      return getConfiguredForm().newInstance();
+    }
+    catch (Exception e) {
+      SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + getConfiguredForm().getName() + "'.", e));
+    }
+    return null;
+  }
+
+  /**
+   * Starts the form.
+   * <p>
+   * The default uses {@link IForm#start()} and therefore expects a form handler to be previously set. Override to call
+   * a custom start method.
+   */
+  protected void startForm() throws ProcessingException {
+    getForm().start();
+  }
+
+  protected void decorateForm() {
+    getForm().setAutoAddRemoveOnDesktop(false);
+    getForm().setDisplayHint(IForm.DISPLAY_HINT_VIEW);
+    getForm().setDisplayViewId(IForm.VIEW_ID_E);
   }
 
   @Override
@@ -143,10 +137,10 @@ public abstract class AbstractFormToolButton<FORM extends IForm> extends Abstrac
     return (List<? extends IFormToolButtonExtension<FORM, ? extends AbstractFormToolButton<? extends IForm>>>) super.getAllExtensions();
   }
 
-  protected final void interceptStartForm() throws ProcessingException {
+  protected final void interceptInitForm() throws ProcessingException {
     List<? extends IFormToolButtonExtension<? extends IForm, ? extends AbstractFormToolButton<? extends IForm>>> extensions = getAllExtensions();
-    FormToolButtonStartFormChain<FORM> chain = new FormToolButtonStartFormChain<FORM>(extensions);
-    chain.execStartForm();
+    FormToolButtonInitFormChain<FORM> chain = new FormToolButtonInitFormChain<FORM>(extensions);
+    chain.execInitForm();
   }
 
   protected static class LocalFormToolButtonExtension<FORM extends IForm, OWNER extends AbstractFormToolButton<FORM>> extends LocalToolButtonExtension<OWNER> implements IFormToolButtonExtension<FORM, OWNER> {
@@ -156,8 +150,8 @@ public abstract class AbstractFormToolButton<FORM extends IForm> extends Abstrac
     }
 
     @Override
-    public void execStartForm(FormToolButtonStartFormChain<? extends IForm> chain) throws ProcessingException {
-      getOwner().execStartForm();
+    public void execInitForm(FormToolButtonInitFormChain<? extends IForm> chain) throws ProcessingException {
+      getOwner().execInitForm();
     }
   }
 
