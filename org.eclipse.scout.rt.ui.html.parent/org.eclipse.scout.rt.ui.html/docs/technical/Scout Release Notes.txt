@@ -35,3 +35,7 @@ API IPageWithTable:
   moved to IPage > ITableRow getTableRowFor(ITreeNode childPageNode);
   moved to IPage > List<ITableRow> getTableRowsFor(Collection<? extends ITreeNode> childPageNodes);
 
+Migration search/replace:
+  Alle "IPage " suchen und ersetzen mit "IPage<?>"
+  Alle "List<IPage>" suchen und ersetzen mit "List<IPage<?>>"
+

@@ -50,7 +50,7 @@ public class JsonOutlineTest {
     TablePage tablePage = new TablePage(1, new TablePage.NodePageWithFormFactory());
     NodePageWithForm nodePage = new NodePageWithForm();
 
-    List<IPage> pages = new ArrayList<IPage>();
+    List<IPage<?>> pages = new ArrayList<IPage<?>>();
     pages.add(nodePage);
     pages.add(tablePage);
     IOutline outline = new Outline(pages);
@@ -77,7 +77,7 @@ public class JsonOutlineTest {
     NodePageWithForm nodePage = new NodePageWithForm();
     nodePage.setTableVisible(false);
 
-    List<IPage> pages = new ArrayList<IPage>();
+    List<IPage<?>> pages = new ArrayList<IPage<?>>();
     pages.add(nodePage);
     IOutline outline = new Outline(pages);
     JsonOutline<IOutline> jsonOutline = m_jsonSession.newJsonAdapter(outline, null, null);

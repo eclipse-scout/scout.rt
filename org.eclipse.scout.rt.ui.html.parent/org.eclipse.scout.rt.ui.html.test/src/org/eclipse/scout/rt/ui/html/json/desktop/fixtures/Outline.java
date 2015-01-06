@@ -17,16 +17,16 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline5;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 
 public class Outline extends AbstractOutline5 {
-  private List<IPage> m_pages;
+  private List<IPage<?>> m_pages;
 
-  public Outline(List<IPage> pages) {
+  public Outline(List<IPage<?>> pages) {
     super(false);
     m_pages = pages;
     callInitializer();
   }
 
   @Override
-  protected void execCreateChildPages(List<IPage> pageList) throws ProcessingException {
+  protected void execCreateChildPages(List<IPage<?>> pageList) throws ProcessingException {
     for (IPage page : m_pages) {
       pageList.add(page);
     }

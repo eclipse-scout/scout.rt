@@ -98,7 +98,7 @@ public class JsonTableFieldTest {
 
   private IPageWithTable<?> createTablePageAndSelectNode() {
     TablePage tablePage = new TablePage(1, new TablePage.NodePageWithFormFactory());
-    List<IPage> pages = new ArrayList<IPage>();
+    List<IPage<?>> pages = new ArrayList<IPage<?>>();
     pages.add(tablePage);
     IOutline outline = new Outline(pages);
     outline.selectNode(tablePage);

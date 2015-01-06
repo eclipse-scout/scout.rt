@@ -9,7 +9,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 public class OutlineWithOneNode extends AbstractOutline {
 
   @Override
-  protected void execCreateChildPages(List<IPage> pageList) throws ProcessingException {
+  protected void execCreateChildPages(List<IPage<?>> pageList) throws ProcessingException {
     NodePage nodePage = new NodePage();
     pageList.add(nodePage);
   }
