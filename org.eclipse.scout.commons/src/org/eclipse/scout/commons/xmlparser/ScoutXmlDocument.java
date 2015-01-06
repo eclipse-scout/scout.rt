@@ -37,12 +37,12 @@ import org.xml.sax.Attributes;
 
 /**
  * Title : Scout XML Document
- * 
+ *
  * @version 2.0
- * @deprecated Will be removed with the M-Release (scout 5).
+ * @deprecated Will be removed when there is an appropriate replacement.
  */
-@Deprecated
 @SuppressWarnings("deprecation")
+@Deprecated
 public class ScoutXmlDocument implements Serializable {
 
   private static final long serialVersionUID = 1L;
@@ -212,7 +212,7 @@ public class ScoutXmlDocument implements Serializable {
    * Returns true if and only if the String representations of the two
    * ScoutXmlDocument instances are equal. Indents and new-line characters are
    * ignored.
-   * 
+   *
    * @since 1.3
    */
   public boolean equalsSemantically(Object object) {
@@ -470,7 +470,7 @@ public class ScoutXmlDocument implements Serializable {
    * Converts the XML datastructure into an ArrayList[] Works of course only
    * with specific XML documents, for example one which was created with new
    * ScoutXmlDocument(arrayList).
-   * 
+   *
    * @since 1.2
    */
   @SuppressWarnings("unchecked")
@@ -587,7 +587,7 @@ public class ScoutXmlDocument implements Serializable {
 
     /**
      * Returns this node's QName.
-     * 
+     *
      * @return This node's QName.
      * @since 1.0
      */
@@ -596,7 +596,7 @@ public class ScoutXmlDocument implements Serializable {
     /**
      * Returns this node's QName in the expanded form. If the namespace doesn't
      * exist only the localName is returned.
-     * 
+     *
      * @return This node's QName in the expanded form. For example
      *         "{http://namespace}localName".
      * @since 1.0
@@ -608,7 +608,7 @@ public class ScoutXmlDocument implements Serializable {
     /**
      * Returns this node's QName in the prefixed form. If the prefix doesn't
      * exist only the localName is returned.
-     * 
+     *
      * @return This node's QName in the prefixed form. For example
      *         "ns0:localName".
      * @since 1.0
@@ -627,7 +627,7 @@ public class ScoutXmlDocument implements Serializable {
      * '{namespace}localname' and 'prefix:localname'. In the case of a prefixed
      * name, the corresponding namespace is only checked if the document is set
      * to strictly checking.
-     * 
+     *
      * @since 1.0
      */
     public void setName(String name) {
@@ -1113,7 +1113,7 @@ public class ScoutXmlDocument implements Serializable {
 
     /**
      * Returns this element's number of attributes.
-     * 
+     *
      * @since 1.0
      */
     public int countAttributes() {
@@ -1127,7 +1127,7 @@ public class ScoutXmlDocument implements Serializable {
 
     /**
      * Returns this element's number of attributes with the given name.
-     * 
+     *
      * @since 1.0
      */
     public int countAttributes(String name) {
@@ -1136,7 +1136,7 @@ public class ScoutXmlDocument implements Serializable {
 
     /**
      * Returns this element's number of child elements.
-     * 
+     *
      * @since 1.0
      */
     public int countChildren() {
@@ -1162,7 +1162,7 @@ public class ScoutXmlDocument implements Serializable {
 
     /**
      * Returns this element's number of child elements with the given name.
-     * 
+     *
      * @since 1.0
      */
     public int countChildren(String name) {
@@ -1171,7 +1171,7 @@ public class ScoutXmlDocument implements Serializable {
 
     /**
      * Returns this element's number of descendant elements.
-     * 
+     *
      * @since 1.0
      */
     public int countDescendants() {
@@ -1180,7 +1180,7 @@ public class ScoutXmlDocument implements Serializable {
 
     /**
      * Returns this element's number of descendant elements with the given name.
-     * 
+     *
      * @since 1.0
      */
     public int countDescendants(String name) {
@@ -1189,7 +1189,7 @@ public class ScoutXmlDocument implements Serializable {
 
     /**
      * Returns this element's number of sibling elements.
-     * 
+     *
      * @since 1.1
      */
     public int countSiblings() {
@@ -1198,7 +1198,7 @@ public class ScoutXmlDocument implements Serializable {
 
     /**
      * Returns this element's number of sibling elements with the given name.
-     * 
+     *
      * @since 1.1
      */
     public int countSiblings(String name) {
@@ -1212,7 +1212,7 @@ public class ScoutXmlDocument implements Serializable {
 
     /**
      * Returns the number of namespaces which are declared on this element.
-     * 
+     *
      * @since 1.0
      */
     public int countNamespaces() {
@@ -1226,7 +1226,7 @@ public class ScoutXmlDocument implements Serializable {
 
     /**
      * Retrieves an attribute value by name.
-     * 
+     *
      * @param name
      *          The name of the attribute to retrieve.
      * @return The attribute's value.
@@ -1245,7 +1245,7 @@ public class ScoutXmlDocument implements Serializable {
 
     /**
      * Retrieves an attribute value by name.
-     * 
+     *
      * @param name
      *          The name of the attribute to retrieve.
      * @param defaultValue
@@ -1265,7 +1265,7 @@ public class ScoutXmlDocument implements Serializable {
 
     /**
      * Retrieves an attribute value by name.
-     * 
+     *
      * @param name
      *          The name of the attribute to retrieve.
      * @return The attribute's value.
@@ -1284,7 +1284,7 @@ public class ScoutXmlDocument implements Serializable {
 
     /**
      * Retrieves an attribute value by name.
-     * 
+     *
      * @param name
      *          The name of the attribute to retrieve.
      * @param defaultValue
@@ -1304,7 +1304,7 @@ public class ScoutXmlDocument implements Serializable {
 
     /**
      * Retrieves an attribute value by name.
-     * 
+     *
      * @param name
      *          The name of the attribute to retrieve.
      * @param format
@@ -1325,7 +1325,7 @@ public class ScoutXmlDocument implements Serializable {
 
     /**
      * Retrieves an attribute value by name.
-     * 
+     *
      * @param name
      *          The name of the attribute to retrieve.
      * @param format
@@ -1347,7 +1347,7 @@ public class ScoutXmlDocument implements Serializable {
 
     /**
      * Retrieves an attribute value by name.
-     * 
+     *
      * @param name
      *          The name of the attribute to retrieve.
      * @return The attribute's value.
@@ -1366,7 +1366,7 @@ public class ScoutXmlDocument implements Serializable {
 
     /**
      * Retrieves an attribute value by name.
-     * 
+     *
      * @param name
      *          The name of the attribute to retrieve.
      * @param defaultValue
@@ -1386,7 +1386,7 @@ public class ScoutXmlDocument implements Serializable {
 
     /**
      * Retrieves an attribute value by name.
-     * 
+     *
      * @param name
      *          The name of the attribute to retrieve.
      * @return The attribute's value.
@@ -1405,7 +1405,7 @@ public class ScoutXmlDocument implements Serializable {
 
     /**
      * Retrieves an attribute value by name.
-     * 
+     *
      * @param name
      *          The name of the attribute to retrieve.
      * @param defaultValue
@@ -1425,7 +1425,7 @@ public class ScoutXmlDocument implements Serializable {
 
     /**
      * Retrieves an attribute value by name.
-     * 
+     *
      * @param name
      *          The name of the attribute to retrieve.
      * @return The attribute's value.
@@ -1444,7 +1444,7 @@ public class ScoutXmlDocument implements Serializable {
 
     /**
      * Retrieves an attribute value by name.
-     * 
+     *
      * @param name
      *          The name of the attribute to retrieve.
      * @param defaultValue
@@ -1464,7 +1464,7 @@ public class ScoutXmlDocument implements Serializable {
 
     /**
      * Retrieves an attribute value by name.
-     * 
+     *
      * @param name
      *          The name of the attribute to retrieve.
      * @return The attribute's value.
@@ -1478,7 +1478,7 @@ public class ScoutXmlDocument implements Serializable {
 
     /**
      * Retrieves an attribute value by name.
-     * 
+     *
      * @param name
      *          The name of the attribute to retrieve.
      * @param defaultValue
@@ -1498,7 +1498,7 @@ public class ScoutXmlDocument implements Serializable {
 
     /**
      * Retrieves an attribute node by name.
-     * 
+     *
      * @param name
      *          The name of the attribute to retrieve.
      * @return The attribute node or null if it does not exist.
@@ -1596,7 +1596,7 @@ public class ScoutXmlDocument implements Serializable {
     /**
      * Returns this element's children. If there are no children, an empty list
      * is returned.
-     * 
+     *
      * @since 1.0
      */
     @SuppressWarnings("unchecked")
@@ -1799,7 +1799,7 @@ public class ScoutXmlDocument implements Serializable {
     /**
      * Optimizes the memory consumption of this element's data structures
      * Intended to be called by an instance of ScoutXmlParser.
-     * 
+     *
      * @since 1.0
      */
     protected void optimize() {
@@ -1839,7 +1839,7 @@ public class ScoutXmlDocument implements Serializable {
      * Retrieves this element's text. If the element contains mixed content the
      * different text parts are concatenated. If the element contains no text
      * the empty string is returned.
-     * 
+     *
      * @return This element's text.
      * @since 1.0
      */
@@ -1851,7 +1851,7 @@ public class ScoutXmlDocument implements Serializable {
      * Retrieves this element's text. If the element contains mixed content the
      * different text parts are concatenated. If the element contains no text
      * the given defaultValue is returned.
-     * 
+     *
      * @param defaultValue
      *          The default value.
      * @return This element's text.
@@ -1898,7 +1898,7 @@ public class ScoutXmlDocument implements Serializable {
 
     /**
      * Retrieves this element's text.
-     * 
+     *
      * @return The element's text.
      * @throws ScoutXmlException
      *           If the value is invalid.
@@ -1915,7 +1915,7 @@ public class ScoutXmlDocument implements Serializable {
 
     /**
      * Retrieves this element's text.
-     * 
+     *
      * @param defaultValue
      *          The default value.
      * @return The element's text or the default value if the text value is
@@ -1933,7 +1933,7 @@ public class ScoutXmlDocument implements Serializable {
 
     /**
      * Retrieves this element's text.
-     * 
+     *
      * @format The date's format pattern.
      * @return The element's text.
      * @throws ScoutXmlException
@@ -1951,7 +1951,7 @@ public class ScoutXmlDocument implements Serializable {
 
     /**
      * Retrieves this element's text.
-     * 
+     *
      * @format The date's format pattern.
      * @param defaultValue
      *          The default value.
@@ -1970,7 +1970,7 @@ public class ScoutXmlDocument implements Serializable {
 
     /**
      * Retrieves this element's text.
-     * 
+     *
      * @return The element's text.
      * @throws ScoutXmlException
      *           If the value is invalid.
@@ -1987,7 +1987,7 @@ public class ScoutXmlDocument implements Serializable {
 
     /**
      * Retrieves this element's text.
-     * 
+     *
      * @param defaultValue
      *          The default value.
      * @return The element's text or the default value if the text value is
@@ -2005,7 +2005,7 @@ public class ScoutXmlDocument implements Serializable {
 
     /**
      * Retrieves this element's text.
-     * 
+     *
      * @return The element's text.
      * @throws ScoutXmlException
      *           If the value is invalid.
@@ -2022,7 +2022,7 @@ public class ScoutXmlDocument implements Serializable {
 
     /**
      * Retrieves this element's text.
-     * 
+     *
      * @param defaultValue
      *          The default value.
      * @return The element's text or the default value if the text value is
@@ -2040,7 +2040,7 @@ public class ScoutXmlDocument implements Serializable {
 
     /**
      * Retrieves this element's text.
-     * 
+     *
      * @return The element's text.
      * @throws ScoutXmlException
      *           If the value is invalid.
@@ -2057,7 +2057,7 @@ public class ScoutXmlDocument implements Serializable {
 
     /**
      * Retrieves this element's text.
-     * 
+     *
      * @param defaultValue
      *          The default value.
      * @return The element's text or the default value if the text value is
@@ -2075,7 +2075,7 @@ public class ScoutXmlDocument implements Serializable {
 
     /**
      * Retrieves this element's text.
-     * 
+     *
      * @return The element's text.
      * @throws ScoutXmlException
      *           If the value is invalid.
@@ -2092,7 +2092,7 @@ public class ScoutXmlDocument implements Serializable {
 
     /**
      * Retrieves this element's text.
-     * 
+     *
      * @param defaultValue
      *          The default value.
      * @return The element's text or the default value if the text value is
@@ -2184,7 +2184,7 @@ public class ScoutXmlDocument implements Serializable {
     /**
      * Removes this element's attribute which matches the given name. Nothing is
      * done if the attribute can't be found.
-     * 
+     *
      * @since 1.0
      */
     public void removeAttribute(String name) {
@@ -2198,7 +2198,7 @@ public class ScoutXmlDocument implements Serializable {
 
     /**
      * Removes all of this element's attributes.
-     * 
+     *
      * @since 1.0
      */
     public void removeAttributes() {
@@ -2208,7 +2208,7 @@ public class ScoutXmlDocument implements Serializable {
     /**
      * Removes all of this element's attributes which match the given name.
      * Nothing is done if no matching attribute can be found.
-     * 
+     *
      * @since 1.0
      */
     public void removeAttributes(String name) {
@@ -2223,7 +2223,7 @@ public class ScoutXmlDocument implements Serializable {
     /**
      * Removes the the child with the given index. Nothing is done if the child
      * can't be found.
-     * 
+     *
      * @since 1.0
      */
     public void removeChild(int index) {
@@ -2238,7 +2238,7 @@ public class ScoutXmlDocument implements Serializable {
     /**
      * Removes the given child from this element. Nothing is done if the child
      * element doesn't belong to this element.
-     * 
+     *
      * @param child
      *          The element to be removed.
      * @since 1.0
@@ -2260,7 +2260,7 @@ public class ScoutXmlDocument implements Serializable {
     /**
      * Removes the given child from this element. Nothing is done if the child
      * element can't be found.
-     * 
+     *
      * @param child
      *          The element to be removed.
      * @since 1.0
@@ -2276,7 +2276,7 @@ public class ScoutXmlDocument implements Serializable {
 
     /**
      * Removes all children of this element.
-     * 
+     *
      * @since 1.0
      */
     public void removeChildren() {
@@ -2285,7 +2285,7 @@ public class ScoutXmlDocument implements Serializable {
 
     /**
      * Removes the given children.
-     * 
+     *
      * @param children
      * @since 1.0
      */
@@ -2301,7 +2301,7 @@ public class ScoutXmlDocument implements Serializable {
 
     /**
      * Removes all children which match the given name.
-     * 
+     *
      * @param name
      * @since 1.0
      */
@@ -2316,7 +2316,7 @@ public class ScoutXmlDocument implements Serializable {
 
     /**
      * Removes all content of this element. This includes text and children.
-     * 
+     *
      * @since 1.0
      */
     public void removeContent() {
@@ -2344,7 +2344,7 @@ public class ScoutXmlDocument implements Serializable {
 
     /**
      * Removes this element's text.
-     * 
+     *
      * @since 1.0
      */
     public void removeText() {
@@ -2370,7 +2370,7 @@ public class ScoutXmlDocument implements Serializable {
 
     /**
      * Adds a new attribute or modifies an existing one.
-     * 
+     *
      * @param name
      *          The name of the attribute to create or modify.
      * @param value
@@ -2383,7 +2383,7 @@ public class ScoutXmlDocument implements Serializable {
 
     /**
      * Adds a new attribute or modifies an existing one.
-     * 
+     *
      * @param name
      *          The name of the attribute to create or modify.
      * @param value
@@ -2396,7 +2396,7 @@ public class ScoutXmlDocument implements Serializable {
 
     /**
      * Adds a new attribute or modifies an existing one.
-     * 
+     *
      * @param name
      *          The name of the attribute to create or modify.
      * @param value
@@ -2409,7 +2409,7 @@ public class ScoutXmlDocument implements Serializable {
 
     /**
      * Adds a new attribute or modifies an existing one.
-     * 
+     *
      * @param name
      *          The name of the attribute to create or modify.
      * @param value
@@ -2422,7 +2422,7 @@ public class ScoutXmlDocument implements Serializable {
 
     /**
      * Adds a new attribute or modifies an existing one.
-     * 
+     *
      * @param name
      *          The name of the attribute to create or modify.
      * @param value
@@ -2435,7 +2435,7 @@ public class ScoutXmlDocument implements Serializable {
 
     /**
      * Adds a new attribute or modifies an existing one.
-     * 
+     *
      * @param name
      *          The name of the attribute to create or modify.
      * @param value
@@ -2448,7 +2448,7 @@ public class ScoutXmlDocument implements Serializable {
 
     /**
      * Adds a new attribute or modifies an existing one.
-     * 
+     *
      * @param name
      *          The name of the attribute to create or modify.
      * @param value

@@ -40,9 +40,9 @@ import org.xml.sax.helpers.XMLReaderFactory;
 /**
  * Title : Scout XML Parser Description: Copyright : Copyright (c) 2006 BSI AG,
  * ETH Zürich, Stefan Vogt Company : BSI AG www.bsiag.com
- * 
+ *
  * @version 1.0
- * @deprecated Will be removed with the M-Release (scout 5).
+ * @deprecated Will be removed when there is an appropriate replacement.
  */
 @Deprecated
 @SuppressWarnings("deprecation")
@@ -140,7 +140,7 @@ public class ScoutXmlParser {
    * unavailable. But keep in mind that if you ignore the DTD it is possible
    * that some texts differ because entities declared in the DTD can't be
    * resolved.
-   * 
+   *
    * @since 1.0
    */
   public boolean isIgnoreExternalEntities() {
@@ -149,7 +149,7 @@ public class ScoutXmlParser {
 
   /**
    * Returns whether this parser is ignoring recoverable SAX errors.
-   * 
+   *
    * @since 1.0
    */
   public boolean isIgnoreSaxErrors() {
@@ -158,7 +158,7 @@ public class ScoutXmlParser {
 
   /**
    * Returns whether this parser is ignoring SAX warnings.
-   * 
+   *
    * @since 1.0
    */
   public boolean isIgnoreSaxWarnings() {
@@ -167,7 +167,7 @@ public class ScoutXmlParser {
 
   /**
    * Returns whether this parser is validating.
-   * 
+   *
    * @since 1.0
    */
   public boolean isValidating() {
@@ -196,7 +196,7 @@ public class ScoutXmlParser {
 
   /**
    * Parses the given stream and returns the resulting XML document.
-   * 
+   *
    * @param stream
    *          The stream to be parsed.
    * @return ScoutXmlDocument
@@ -210,7 +210,7 @@ public class ScoutXmlParser {
 
   /**
    * Parses the given stream and returns the resulting XML document.
-   * 
+   *
    * @param stream
    *          The stream to be parsed.
    * @param systemId
@@ -234,7 +234,7 @@ public class ScoutXmlParser {
 
   /**
    * Parses the given source and returns the resulting XML document.
-   * 
+   *
    * @param source
    *          The source can be a file's name, an URI or the XML document
    *          itself. Examples for a valid source are: &quot;C:\\test.xml&quot;,
@@ -251,7 +251,7 @@ public class ScoutXmlParser {
 
   /**
    * Parses the given source and returns the resulting XML document.
-   * 
+   *
    * @param source
    *          The source can be a file's name, an URI or the XML document
    *          itself. Examples for a valid source are: &quot;C:\\test.xml&quot;,
@@ -305,7 +305,7 @@ public class ScoutXmlParser {
    * you want to ignore an external DTD which is currently unavailable. But keep
    * in mind that if you ignore the DTD it is possible that some text values
    * differ because entities declared in the DTD can't be resolved or that the
-   * 
+   *
    * @param ignoreExternalEntities
    *          If true all external entities are ignored.
    * @since 1.0
@@ -316,7 +316,7 @@ public class ScoutXmlParser {
 
   /**
    * Sets whether to ignore recoverable SAX parser errors.
-   * 
+   *
    * @param ignoreSaxErrors
    *          If true all recoverable parser errors are ignored, otherwise an
    *          exception is thrown.
@@ -328,7 +328,7 @@ public class ScoutXmlParser {
 
   /**
    * Sets whether to ignore SAX parser warnings.
-   * 
+   *
    * @param ignoreParserErrors
    *          If true all parser warnings are ignored, otherwise the warning is
    *          written to the log.
@@ -340,7 +340,7 @@ public class ScoutXmlParser {
 
   /**
    * Sets whether to validate the document which is to be parsed.
-   * 
+   *
    * @param validating
    *          If true the document is validated, otherwise not.
    * @throws ConfigurationException
