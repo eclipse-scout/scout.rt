@@ -10,14 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.desktop;
 
-import org.eclipse.scout.rt.client.ui.desktop.outline.IFormToolButton5;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IFormToolButton;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.action.JsonAction;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonGlobalAdapterProperty;
 
-public class JsonFormToolButton<T extends IFormToolButton5> extends JsonAction<T> {
+public class JsonFormToolButton<T extends IFormToolButton<IForm>> extends JsonAction<T> {
 
   public JsonFormToolButton(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
     super(model, jsonSession, id, parent);
@@ -27,7 +27,7 @@ public class JsonFormToolButton<T extends IFormToolButton5> extends JsonAction<T
   protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
 
-    putJsonProperty(new JsonGlobalAdapterProperty<IFormToolButton5>(IFormToolButton5.PROP_FORM, model, getJsonSession()) {
+    putJsonProperty(new JsonGlobalAdapterProperty<IFormToolButton<IForm>>(IFormToolButton.PROP_FORM, model, getJsonSession()) {
       @Override
       protected IForm modelValue() {
         return getModel().getForm();

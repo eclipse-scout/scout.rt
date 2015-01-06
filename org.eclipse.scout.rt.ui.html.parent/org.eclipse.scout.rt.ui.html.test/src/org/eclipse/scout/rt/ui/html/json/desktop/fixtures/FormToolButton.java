@@ -10,8 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.desktop.fixtures;
 
-import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractFormToolButton5;
+import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractFormToolButton;
+import org.eclipse.scout.rt.client.ui.form.IForm;
 
-public class FormToolButton extends AbstractFormToolButton5 {
+public class FormToolButton extends AbstractFormToolButton<IForm> {
 
 }

@@ -241,9 +241,4 @@ scout.defaultObjectFactories = [{
   create: function() {
     return new scout.SequenceBox();
   }
-}, { //FIXME CGU: only needed temporarily, remove when switched to FormToolButton2
-  objectType: 'Null',
-  create: function() {
-    return new scout.NullAdapter();
-  }
 }];

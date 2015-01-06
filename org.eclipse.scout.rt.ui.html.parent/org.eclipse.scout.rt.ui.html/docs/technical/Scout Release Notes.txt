@@ -48,3 +48,32 @@ API removed values JSP, JSF, RAP, SWING
 
 org.eclipse.scout.rt.shared.ui.UserAgentUtility
 API removed static boolean isRapUi(), static boolean isSwingUi()
+
+CGU 07.01.2015
+Improved page detail form handling:
+The detail form is now created and started when the page gets activated and closed when the page gets disposed, similar to the search form.
+API added getConfiguredDetailForm, execInitDetailForm, createDetailForm, startDetailForm
+
+Migration:
+Remove the detail form handling code from execPageActivated / execPageDeactivated / execPageDisposed
+and use either getConfiguredDetailForm / execInitDetailForm or createDetailForm.
+
+CGU 07.01.2015
+Improved page search form disposal:
+Search form is now closed when the page gets disposed.
+
+Migration:
+none
+
+CGU 07.01.2015
+Simplified form tool buttons:
+Refactored api to be consistent with detail and search form handling of a page.
+Removed code not necessary for html ui.
+
+Migration:
+Remove the form handling code from execStartForm and use either getConfiguredForm / execInitForm or createForm.
+
+CGU 07.01.2015
+API Added IForm#start()
+Mainly useful for forms with just one handler. (detail forms, tool forms etc.). Maybe implemented by the concrete form.
+The default implementation at AbstractForm uses getHandler() to start the form.

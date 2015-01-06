@@ -14,7 +14,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.ui.desktop.outline.IFormToolButton5;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IFormToolButton;
+import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.FormToolButton;
 import org.eclipse.scout.rt.ui.html.json.fixtures.JsonSessionMock;
@@ -43,7 +44,7 @@ public class JsonFormToolButtonTest {
     form.start();
     button.setForm(form);
 
-    JsonFormToolButton<IFormToolButton5> jsonFormToolButton = m_jsonSession.createJsonAdapter(button, null);
+    JsonFormToolButton<IFormToolButton<IForm>> jsonFormToolButton = m_jsonSession.createJsonAdapter(button, null);
 
     assertNotNull(jsonFormToolButton.getAdapter(form));
     jsonFormToolButton.dispose();

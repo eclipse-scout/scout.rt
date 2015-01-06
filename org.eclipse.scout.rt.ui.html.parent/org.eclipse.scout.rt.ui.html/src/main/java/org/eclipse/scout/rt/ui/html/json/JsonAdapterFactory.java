@@ -26,7 +26,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.menus.TableOrganizeMenu;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IFormToolButton;
-import org.eclipse.scout.rt.client.ui.desktop.outline.IFormToolButton5;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineViewButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.ISearchOutline;
@@ -180,10 +179,7 @@ public class JsonAdapterFactory implements IJsonAdapterFactory {
       return new JsonOutlineViewButton((IOutlineViewButton) model, session, id, parent);
     }
     else if (model instanceof IFormToolButton) {
-      return new NullAdapter(model, session, id, parent);
-    }
-    else if (model instanceof IFormToolButton5) {
-      return new JsonFormToolButton((IFormToolButton5) model, session, id, parent);
+      return new JsonFormToolButton((IFormToolButton) model, session, id, parent);
     }
     else if (model instanceof ISearchOutline) {
       return new JsonSearchOutline((ISearchOutline) model, session, id, parent);
@@ -225,23 +221,5 @@ public class JsonAdapterFactory implements IJsonAdapterFactory {
       return new JsonBreadCrumbNavigation((IBreadCrumbsNavigation) model, session, id, parent);
     }
     throw new IllegalArgumentException("Cannot create JSON-adapter for model-object " + model);
-  }
-
-  //FIXME CGU only needed temporarily, remove when switched to FormToolButton2
-  public static class NullAdapter extends AbstractJsonAdapter<Object> {
-
-    public NullAdapter(Object model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
-      super(model, jsonSession, id, parent);
-    }
-
-    @Override
-    public String getObjectType() {
-      return "Null";
-    }
-
-    @Override
-    public void handleUiEvent(JsonEvent event, JsonResponse res) {
-    }
-
   }
 }

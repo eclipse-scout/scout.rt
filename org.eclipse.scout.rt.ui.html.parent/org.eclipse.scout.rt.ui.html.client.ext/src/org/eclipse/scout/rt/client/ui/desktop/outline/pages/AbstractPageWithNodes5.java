@@ -23,10 +23,8 @@ import org.eclipse.scout.rt.client.ui.form.FormMenuType;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IForm5;
 import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.AbstractExtensiblePageWithNodes;
-import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.shared.ui.menu.IMenu5;
 import org.eclipse.scout.rt.shared.ui.menu.MenuWrapper;
-import org.eclipse.scout.service.SERVICES;
 
 public abstract class AbstractPageWithNodes5 extends AbstractExtensiblePageWithNodes {
 
@@ -58,53 +56,19 @@ public abstract class AbstractPageWithNodes5 extends AbstractExtensiblePageWithN
   }
 
   @Override
-  public void pageActivatedNotify() {
-    super.pageActivatedNotify();
-    try {
-      ensureDetailFormCreated();
-      ensureDetailFormStarted();
-    }
-    catch (ProcessingException e) {
-      SERVICES.getService(IExceptionHandlerService.class).handleException(e);
-    }
-  }
-
-  @Override
-  protected void execDisposePage() throws ProcessingException {
-    if (getDetailForm() != null) {
-      getDetailForm().doClose();
-      setDetailForm(null);
-    }
-  }
-
-  protected IForm execCreateDetailForm() throws ProcessingException {
-    return null;
-  }
-
-  protected void execStartDetailForm(IForm form) throws ProcessingException {
-  }
-
   protected void ensureDetailFormCreated() throws ProcessingException {
     if (getDetailForm() != null) {
       return;
     }
-    IForm form = execCreateDetailForm();
-    if (form instanceof IForm) {
-      IForm5 form5 = (IForm5) form;
-      List<IMenu> menus = form5.getContextMenu().getChildActions();
+    super.ensureDetailFormCreated();
+    if (getDetailForm() instanceof IForm) {
+      IForm5 form = (IForm5) getDetailForm();
+      List<IMenu> menus = form.getContextMenu().getChildActions();
       adaptDetailFormMenus(menus);
-      if (!CollectionUtility.equalsCollection(menus, ((IForm5) form).getContextMenu().getChildActions())) {
-        form5.getContextMenu().setChildActions(menus);
+      if (!CollectionUtility.equalsCollection(menus, form.getContextMenu().getChildActions())) {
+        form.getContextMenu().setChildActions(menus);
       }
     }
-    setDetailForm(form);
-  }
-
-  protected void ensureDetailFormStarted() throws ProcessingException {
-    if (getDetailForm() == null || getDetailForm().isFormOpen()) {
-      return;
-    }
-    execStartDetailForm(getDetailForm());
   }
 
   protected void adaptDetailFormMenus(List<IMenu> menus) throws ProcessingException {
