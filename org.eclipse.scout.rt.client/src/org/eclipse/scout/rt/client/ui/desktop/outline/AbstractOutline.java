@@ -148,10 +148,10 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
    */
   @ConfigOperation
   @Order(90)
-  protected void execCreateChildPages(List<IPage> pageList) throws ProcessingException {
+  protected void execCreateChildPages(List<IPage<?>> pageList) throws ProcessingException {
   }
 
-  protected void createChildPagesInternal(List<IPage> pageList) throws ProcessingException {
+  protected void createChildPagesInternal(List<IPage<?>> pageList) throws ProcessingException {
     interceptCreateChildPages(pageList);
   }
 
@@ -233,7 +233,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
 
   @Override
   public void refreshPages(final List<Class<? extends IPage>> pageTypes) {
-    final List<IPage> candidates = new ArrayList<IPage>();
+    final List<IPage<?>> candidates = new ArrayList<IPage<?>>();
     ITreeVisitor v = new ITreeVisitor() {
       @Override
       public boolean visit(ITreeNode node) {
@@ -685,7 +685,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
 
   private class InvisibleRootPage extends AbstractPageWithNodes {
     @Override
-    protected void execCreateChildPages(List<IPage> pageList) throws ProcessingException {
+    protected void execCreateChildPages(List<IPage<?>> pageList) throws ProcessingException {
       AbstractOutline.this.createChildPagesInternal(pageList);
     }
   }
@@ -696,7 +696,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     return (List<? extends IOutlineExtension<? extends AbstractOutline>>) super.getAllExtensions();
   }
 
-  protected final void interceptCreateChildPages(List<IPage> pageList) throws ProcessingException {
+  protected final void interceptCreateChildPages(List<IPage<?>> pageList) throws ProcessingException {
     List<? extends IOutlineExtension<? extends AbstractOutline>> extensions = getAllExtensions();
     OutlineCreateChildPagesChain chain = new OutlineCreateChildPagesChain(extensions);
     chain.execCreateChildPages(pageList);
@@ -709,7 +709,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     }
 
     @Override
-    public void execCreateChildPages(OutlineCreateChildPagesChain chain, List<IPage> pageList) throws ProcessingException {
+    public void execCreateChildPages(OutlineCreateChildPagesChain chain, List<IPage<?>> pageList) throws ProcessingException {
       getOwner().execCreateChildPages(pageList);
     }
   }

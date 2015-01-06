@@ -525,7 +525,7 @@ public final class BookmarkUtility {
     b.setIconId(bookmarkAdapter.getIconId());
     // outline
     b.setOutlineClassName(bookmarkAdapter.getOutlineClassName());
-    ArrayList<IPage> path = new ArrayList<IPage>();
+    ArrayList<IPage<?>> path = new ArrayList<IPage<?>>();
     ArrayList<String> titleSegments = new ArrayList<String>();
     while (page != null) {
       IBookmarkAdapter currentBookmarkAdapter = getBookmarkAdapter(page);

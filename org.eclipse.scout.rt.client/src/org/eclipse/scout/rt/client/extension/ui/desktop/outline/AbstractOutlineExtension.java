@@ -15,7 +15,7 @@ public abstract class AbstractOutlineExtension<OWNER extends AbstractOutline> ex
   }
 
   @Override
-  public void execCreateChildPages(OutlineCreateChildPagesChain chain, List<IPage> pageList) throws ProcessingException {
+  public void execCreateChildPages(OutlineCreateChildPagesChain chain, List<IPage<?>> pageList) throws ProcessingException {
     chain.execCreateChildPages(pageList);
   }
 }

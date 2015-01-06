@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.AbstractEx
 public class PageRemoveNodePage extends AbstractExtensiblePageWithNodes {
 
   @Override
-  protected void execCreateChildPages(List<IPage> pageList) throws ProcessingException {
+  protected void execCreateChildPages(List<IPage<?>> pageList) throws ProcessingException {
     pageList.add(new ARemovePageWithNodes());
     pageList.add(new BRemovePageWithNodes());
     pageList.add(new C1RemovePageWithNodes());

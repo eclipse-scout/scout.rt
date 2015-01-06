@@ -76,7 +76,7 @@ public class AbstractPageWithNodesTest {
 
   public static class PageWithTableOutline extends AbstractOutline {
     @Override
-    protected void execCreateChildPages(List<IPage> pageList) throws ProcessingException {
+    protected void execCreateChildPages(List<IPage<?>> pageList) throws ProcessingException {
       ParentItemNodePage parentPage = new ParentItemNodePage();
       pageList.add(parentPage);
     }
@@ -90,7 +90,7 @@ public class AbstractPageWithNodesTest {
     }
 
     @Override
-    protected void execCreateChildPages(List<IPage> pageList) throws ProcessingException {
+    protected void execCreateChildPages(List<IPage<?>> pageList) throws ProcessingException {
       ItemNodePage childPage = new ItemNodePage();
       pageList.add(childPage);
     }

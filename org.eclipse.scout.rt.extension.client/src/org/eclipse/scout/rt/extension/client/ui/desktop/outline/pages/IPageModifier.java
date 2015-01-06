@@ -17,16 +17,16 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 /**
  * This interface is used for modifying {@link IPage}s. Classes implementing this interface must provide a default
  * constructor.
- * 
+ *
  * @since 3.9.0
  */
-public interface IPageModifier<T extends IPage> {
+public interface IPageModifier<T extends IPage<?>> {
 
   /**
    * This method allows modifying configured pages. The parameter <code>outline</code> is never <code>null</code>. The
    * parameter <code>parentPage</code> however is <code>null</code> if this method is invoked in the context of an
    * outline.
-   * 
+   *
    * @param outline
    *          the current context's outline instance. Never <code>null</code>.
    * @param parentPage
@@ -34,5 +34,5 @@ public interface IPageModifier<T extends IPage> {
    * @param page
    *          the page to be modified.
    */
-  void modify(IOutline outline, IPage parentPage, T page) throws ProcessingException;
+  void modify(IOutline outline, IPage<?> parentPage, T page) throws ProcessingException;
 }

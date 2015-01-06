@@ -71,7 +71,7 @@ public abstract class AbstractExtensiblePageWithNodes extends AbstractPageWithNo
   }
 
   @Override
-  protected void createChildPagesInternal(List<IPage> pageList) throws ProcessingException {
+  protected void createChildPagesInternal(List<IPage<?>> pageList) throws ProcessingException {
     super.createChildPagesInternal(pageList);
     PageExtensionUtility.adaptPageWithNodes(this, pageList);
   }

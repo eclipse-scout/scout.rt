@@ -890,7 +890,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   }
 
   @Override
-  public List<IPage> getUpdatedChildPagesFor(List<? extends ITableRow> tableRows) {
+  public List<IPage<?>> getUpdatedChildPagesFor(List<? extends ITableRow> tableRows) {
     return getChildPagesFor(tableRows, true);
   }
 
@@ -898,8 +898,8 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * Computes the list of linked child pages for the given table rows. Revalidates the the pages cell
    * if <code>updateChildPageCells</code> is true. Otherwise, the cells are not updated.
    */
-  private List<IPage> getChildPagesFor(List<? extends ITableRow> tableRows, boolean updateChildPageCells) {
-    List<IPage> result = new ArrayList<IPage>();
+  private List<IPage<?>> getChildPagesFor(List<? extends ITableRow> tableRows, boolean updateChildPageCells) {
+    List<IPage<?>> result = new ArrayList<IPage<?>>();
     try {
       for (ITableRow row : tableRows) {
         IPage<?> page = getPageFor(row);
@@ -949,7 +949,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
         case TableEvent.TYPE_ROWS_DELETED: {
           if (!isLeaf()) {
             List<ITableRow> tableRows = e.getRows();
-            List<IPage> childNodes = getChildPagesFor(e.getRows(), false);
+            List<IPage<?>> childNodes = getChildPagesFor(e.getRows(), false);
             for (ITableRow row : tableRows) {
               unlinkTableRowWithPage(row);
             }
@@ -962,7 +962,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
         }
         case TableEvent.TYPE_ROWS_INSERTED: {
           if (!isLeaf()) {
-            ArrayList<IPage> childPageList = new ArrayList<IPage>();
+            ArrayList<IPage<?>> childPageList = new ArrayList<IPage<?>>();
             List<ITableRow> tableRows = e.getRows();
             for (ITableRow element : tableRows) {
               try {

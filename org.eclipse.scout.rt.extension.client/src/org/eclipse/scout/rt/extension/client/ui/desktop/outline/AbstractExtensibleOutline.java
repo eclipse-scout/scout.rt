@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.PageExtens
  * <ul>
  * <li>adding, removing and modifying statically configured pages</li>
  * </ul>
- * 
+ *
  * @since 3.9.0
  */
 public abstract class AbstractExtensibleOutline extends AbstractOutline implements IExtensibleScoutObject {
@@ -37,7 +37,7 @@ public abstract class AbstractExtensibleOutline extends AbstractOutline implemen
   }
 
   @Override
-  protected void createChildPagesInternal(List<IPage> pageList) throws ProcessingException {
+  protected void createChildPagesInternal(List<IPage<?>> pageList) throws ProcessingException {
     super.createChildPagesInternal(pageList);
     PageExtensionUtility.adaptOutline(this, pageList);
   }

@@ -25,7 +25,7 @@ public final class PageWithNodesChains {
       super(extensions);
     }
 
-    public void execCreateChildPages(final List<IPage> pageList) throws ProcessingException {
+    public void execCreateChildPages(final List<IPage<?>> pageList) throws ProcessingException {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
         protected void callMethod(IPageWithNodesExtension<? extends AbstractPageWithNodes> next) throws ProcessingException {

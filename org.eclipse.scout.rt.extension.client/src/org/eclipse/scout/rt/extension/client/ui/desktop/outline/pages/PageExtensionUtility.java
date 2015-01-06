@@ -57,7 +57,7 @@ public final class PageExtensionUtility {
    * @throws ProcessingException
    * @see {@link AbstractExtensiblePageWithNodes}
    */
-  public static void adaptPageWithNodes(IPageWithNodes nodePage, List<IPage> pageList) throws ProcessingException {
+  public static void adaptPageWithNodes(IPageWithNodes nodePage, List<IPage<?>> pageList) throws ProcessingException {
     if (nodePage == null) {
       throw new ProcessingException("nodePage must not be null");
     }
@@ -80,7 +80,7 @@ public final class PageExtensionUtility {
    * @throws ProcessingException
    * @see {@link AbstractExtensibleOutline}
    */
-  public static void adaptOutline(IOutline outline, List<IPage> pageList) throws ProcessingException {
+  public static void adaptOutline(IOutline outline, List<IPage<?>> pageList) throws ProcessingException {
     if (outline == null) {
       throw new ProcessingException("outline must not be null");
     }
@@ -113,10 +113,10 @@ public final class PageExtensionUtility {
       throw new ProcessingException("page must not be null");
     }
     PageExtensionManager extensionManager = Activator.getDefault().getPagesExtensionManager();
-    modifyPages(outline, parentPage, extensionManager.getPageModificationExtensions(), Collections.singletonList(page));
+    modifyPages(outline, parentPage, extensionManager.getPageModificationExtensions(), Collections.<IPage<?>> singletonList(page));
   }
 
-  static void contributePages(IOutline outline, IPageWithNodes parentPage, List<PageContributionExtension> extensions, List<IPage> pageList) throws ProcessingException {
+  static void contributePages(IOutline outline, IPageWithNodes parentPage, List<PageContributionExtension> extensions, List<IPage<?>> pageList) throws ProcessingException {
     if (extensions == null || extensions.isEmpty()) {
       return;
     }
@@ -133,10 +133,10 @@ public final class PageExtensionUtility {
       return;
     }
 
-    Map<CompositeObject,IPage> orderedPages = new TreeMap<CompositeObject, IPage>();
+    Map<CompositeObject, IPage<?>> orderedPages = new TreeMap<CompositeObject, IPage<?>>();
     // assign synthetic order to existing pages
     int counter = 0;
-    for (IPage p : pageList) {
+    for (IPage<?> p : pageList) {
       orderedPages.put(new CompositeObject(Double.valueOf((counter + 1) * 10), counter), p);
       counter++;
     }
@@ -157,13 +157,13 @@ public final class PageExtensionUtility {
     pageList.addAll(orderedPages.values());
   }
 
-  static void removePages(IOutline outline, IPage parentPage, List<PageRemoveExtension> extensions, List<IPage> pageList) {
+  static void removePages(IOutline outline, IPage parentPage, List<PageRemoveExtension> extensions, List<IPage<?>> pageList) {
     if (extensions == null || extensions.isEmpty()) {
       return;
     }
 
-    for (Iterator<IPage> it = pageList.iterator(); it.hasNext();) {
-      IPage page = it.next();
+    for (Iterator<IPage<?>> it = pageList.iterator(); it.hasNext();) {
+      IPage<?> page = it.next();
       for (PageRemoveExtension removeExtension : extensions) {
         if (removeExtension.accept(outline, parentPage, page)) {
           it.remove();
@@ -173,7 +173,7 @@ public final class PageExtensionUtility {
     }
   }
 
-  static void modifyPages(IOutline outline, IPage parentPage, List<PageModificationExtension> extensions, List<IPage> pageList) {
+  static void modifyPages(IOutline outline, IPage parentPage, List<PageModificationExtension> extensions, List<IPage<?>> pageList) {
     if (extensions == null || extensions.isEmpty()) {
       return;
     }

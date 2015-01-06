@@ -41,7 +41,7 @@ import org.junit.runner.RunWith;
 @RunWith(ScoutClientTestRunner.class)
 public class PageExtensionUtilityTest {
 
-  private List<IPage> m_pageList;
+  private List<IPage<?>> m_pageList;
   private P_ConfiguredPageA m_configuredPageA;
   private P_ConfiguredPageB m_configuredPageB;
   private P_ConfiguredPageC m_configuredPageC;
@@ -52,7 +52,7 @@ public class PageExtensionUtilityTest {
     P_ConfiguredPageAModifier.s_counter = 0;
     P_ConfiguredPageCModifier.s_counter = 0;
 
-    m_pageList = new ArrayList<IPage>();
+    m_pageList = new ArrayList<IPage<?>>();
     m_configuredPageA = new P_ConfiguredPageA();
     m_configuredPageB = new P_ConfiguredPageB();
     m_configuredPageC = new P_ConfiguredPageC();

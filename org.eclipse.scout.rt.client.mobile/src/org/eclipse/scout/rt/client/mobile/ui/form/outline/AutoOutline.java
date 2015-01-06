@@ -31,7 +31,7 @@ public class AutoOutline extends AbstractOutline {
   }
 
   @Override
-  protected void execCreateChildPages(List<IPage> pageList) throws ProcessingException {
+  protected void execCreateChildPages(List<IPage<?>> pageList) throws ProcessingException {
     pageList.add(m_page);
   }
 

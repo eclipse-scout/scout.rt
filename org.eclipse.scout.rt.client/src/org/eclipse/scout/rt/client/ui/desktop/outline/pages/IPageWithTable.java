@@ -31,7 +31,7 @@ public interface IPageWithTable<T extends ITable> extends IPage<T> {
   /**
    * Computes the list of linked child pages for the given table rows and updates their summary cell.
    */
-  List<IPage> getUpdatedChildPagesFor(List<? extends ITableRow> tableRows);
+  List<IPage<?>> getUpdatedChildPagesFor(List<? extends ITableRow> tableRows);
 
   /**
    * @return search form that is used to filter table rows<br>

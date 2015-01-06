@@ -65,7 +65,7 @@ public class VirtualPage extends VirtualTreeNode implements IPage, IVirtualTreeN
   }
 
   @Override
-  public List<IPage> getChildPages() {
+  public List<IPage<?>> getChildPages() {
     return CollectionUtility.emptyArrayList();
   }
 

@@ -64,7 +64,7 @@ public class BookmarkToInvisibleOutlineTest {
     }
 
     @Override
-    protected void execCreateChildPages(List<IPage> pageList) throws ProcessingException {
+    protected void execCreateChildPages(List<IPage<?>> pageList) throws ProcessingException {
       pageList.add(new CockpitMainTablePage());
       pageList.add(new CockpitSecondTablePage());
     }
@@ -77,7 +77,7 @@ public class BookmarkToInvisibleOutlineTest {
     }
 
     @Override
-    protected void execCreateChildPages(List<IPage> pageList) throws ProcessingException {
+    protected void execCreateChildPages(List<IPage<?>> pageList) throws ProcessingException {
       pageList.add(new AdminMainTablePage());
     }
   }

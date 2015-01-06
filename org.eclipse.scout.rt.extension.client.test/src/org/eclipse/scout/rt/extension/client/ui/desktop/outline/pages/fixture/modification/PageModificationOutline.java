@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.extension.client.ui.desktop.outline.AbstractExtensib
 public class PageModificationOutline extends AbstractExtensibleOutline {
 
   @Override
-  protected void execCreateChildPages(List<IPage> pageList) throws ProcessingException {
+  protected void execCreateChildPages(List<IPage<?>> pageList) throws ProcessingException {
     pageList.add(new AModificationPageWithNodes());
     pageList.add(new BModificationPageWithNodes());
     pageList.add(new C1ModificationPageWithNodes());

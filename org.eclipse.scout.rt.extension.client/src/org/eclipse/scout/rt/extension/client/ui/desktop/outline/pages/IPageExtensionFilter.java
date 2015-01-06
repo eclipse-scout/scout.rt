@@ -15,7 +15,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 
 /**
  * A page extension filter is used to control whether a page extension is applied in a particular environment.
- * 
+ *
  * @since 3.9.0
  */
 public interface IPageExtensionFilter {
@@ -25,7 +25,7 @@ public interface IPageExtensionFilter {
    * <code>outline</code> is never <code>null</code>. The parameter <code>parentPage</code> however is <code>null</code>
    * if the filter is invoked in the context of an outline (i.e. whenever an extension is checked to be applied on an
    * outline's root level).
-   * 
+   *
    * @param outline
    *          the current context's outline instance. Never <code>null</code>.
    * @param parentPage
@@ -36,5 +36,5 @@ public interface IPageExtensionFilter {
    * @return Returns <code>true</code> if the extension has to be applied in the given context. Otherwise
    *         <code>false</code>.
    */
-  boolean accept(IOutline outline, IPage parentPage, IPage affectedPage);
+  boolean accept(IOutline outline, IPage<?> parentPage, IPage<?> affectedPage);
 }

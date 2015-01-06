@@ -107,7 +107,7 @@ public class PageWithTableAndPageBeanTest {
     }
 
     @Override
-    protected void execCreateChildPages(List<IPage> pageList) throws ProcessingException {
+    protected void execCreateChildPages(List<IPage<?>> pageList) throws ProcessingException {
       pageList.add(new PageWithTable(m_invokeSuperExecLoadData));
     }
   }

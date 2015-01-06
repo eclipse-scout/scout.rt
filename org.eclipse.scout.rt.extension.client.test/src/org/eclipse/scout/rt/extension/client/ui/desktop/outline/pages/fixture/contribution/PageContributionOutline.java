@@ -23,7 +23,7 @@ import org.eclipse.scout.rt.extension.client.ui.desktop.outline.AbstractExtensib
 public class PageContributionOutline extends AbstractExtensibleOutline {
 
   @Override
-  protected void execCreateChildPages(List<IPage> pageList) throws ProcessingException {
+  protected void execCreateChildPages(List<IPage<?>> pageList) throws ProcessingException {
     pageList.add(new P_NodePage());
     pageList.add(new P_NodePage());
   }

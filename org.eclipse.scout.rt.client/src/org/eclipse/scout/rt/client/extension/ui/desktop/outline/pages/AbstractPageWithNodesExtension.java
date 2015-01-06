@@ -14,7 +14,7 @@ public abstract class AbstractPageWithNodesExtension<OWNER extends AbstractPageW
   }
 
   @Override
-  public void execCreateChildPages(PageWithNodesCreateChildPagesChain chain, List<IPage> pageList) throws ProcessingException {
+  public void execCreateChildPages(PageWithNodesCreateChildPagesChain chain, List<IPage<?>> pageList) throws ProcessingException {
     chain.execCreateChildPages(pageList);
   }
 }

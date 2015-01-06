@@ -106,10 +106,10 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
    */
   @ConfigOperation
   @Order(90)
-  protected void execCreateChildPages(List<IPage> pageList) throws ProcessingException {
+  protected void execCreateChildPages(List<IPage<?>> pageList) throws ProcessingException {
   }
 
-  protected void createChildPagesInternal(List<IPage> pageList) throws ProcessingException {
+  protected void createChildPagesInternal(List<IPage<?>> pageList) throws ProcessingException {
     interceptCreateChildPages(pageList);
   }
 
@@ -184,7 +184,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
    */
   @Override
   public void loadChildren() throws ProcessingException {
-    List<IPage> pageList = new ArrayList<IPage>();
+    List<IPage<?>> pageList = new ArrayList<IPage<?>>();
     createChildPagesInternal(pageList);
     // load tree
     ITree tree = getTree();
@@ -417,7 +417,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
     return (List<? extends IPageWithNodesExtension<? extends AbstractPageWithNodes>>) super.getAllExtensions();
   }
 
-  protected final void interceptCreateChildPages(List<IPage> pageList) throws ProcessingException {
+  protected final void interceptCreateChildPages(List<IPage<?>> pageList) throws ProcessingException {
     List<? extends IPageWithNodesExtension<? extends AbstractPageWithNodes>> extensions = getAllExtensions();
     PageWithNodesCreateChildPagesChain chain = new PageWithNodesCreateChildPagesChain(extensions);
     chain.execCreateChildPages(pageList);
@@ -430,7 +430,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
     }
 
     @Override
-    public void execCreateChildPages(PageWithNodesCreateChildPagesChain chain, List<IPage> pageList) throws ProcessingException {
+    public void execCreateChildPages(PageWithNodesCreateChildPagesChain chain, List<IPage<?>> pageList) throws ProcessingException {
       getOwner().execCreateChildPages(pageList);
     }
   }

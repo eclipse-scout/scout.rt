@@ -9,5 +9,5 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 
 public interface IPageWithNodesExtension<OWNER extends AbstractPageWithNodes> extends IPageExtension<OWNER> {
 
-  void execCreateChildPages(PageWithNodesCreateChildPagesChain chain, List<IPage> pageList) throws ProcessingException;
+  void execCreateChildPages(PageWithNodesCreateChildPagesChain chain, List<IPage<?>> pageList) throws ProcessingException;
 }

@@ -88,7 +88,7 @@ public class OutlineMediator {
       return;
     }
 
-    List<IPage> childNodes = pageWithTable.getUpdatedChildPagesFor(e.getRows());
+    List<IPage<?>> childNodes = pageWithTable.getUpdatedChildPagesFor(e.getRows());
     if (pageWithTable.getTree() != null) {
       pageWithTable.getTree().updateChildNodeOrder(pageWithTable, childNodes);
     }
@@ -99,7 +99,7 @@ public class OutlineMediator {
       return;
     }
 
-    List<IPage> childNodes = pageWithTable.getUpdatedChildPagesFor(e.getRows());
+    List<IPage<?>> childNodes = pageWithTable.getUpdatedChildPagesFor(e.getRows());
     if (pageWithTable.getTree() != null) {
       pageWithTable.getTree().updateChildNodes(pageWithTable, childNodes);
     }
