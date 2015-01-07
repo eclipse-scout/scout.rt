@@ -17,37 +17,37 @@ import org.junit.Test;
 
 /**
  * JUnit test for {@link UserAgent}
- * 
+ *
  * @since 3.8.0
  */
 public class UserAgentTest {
 
   @Test
   public void testEqualsAndHashCode() {
-    UserAgent userAgentRap = UserAgent.create(UiLayer.RAP, UiDeviceType.DESKTOP);
-    UserAgent userAgentRap2 = UserAgent.create(UiLayer.RAP, UiDeviceType.DESKTOP);
-    UserAgent userAgentRapMobile = UserAgent.create(UiLayer.RAP, UiDeviceType.MOBILE);
+    UserAgent userAgentHtml = UserAgent.create(UiLayer.HTML, UiDeviceType.DESKTOP);
+    UserAgent userAgentHtml2 = UserAgent.create(UiLayer.HTML, UiDeviceType.DESKTOP);
+    UserAgent userAgentHtmlMobile = UserAgent.create(UiLayer.HTML, UiDeviceType.MOBILE);
 
-    assertEquals(userAgentRap, userAgentRap2);
-    assertEquals(userAgentRap.hashCode(), userAgentRap2.hashCode());
+    assertEquals(userAgentHtml, userAgentHtml2);
+    assertEquals(userAgentHtml.hashCode(), userAgentHtml2.hashCode());
 
-    assertFalse(userAgentRap.equals(userAgentRapMobile));
-    assertFalse(userAgentRap.hashCode() == userAgentRapMobile.hashCode());
+    assertFalse(userAgentHtml.equals(userAgentHtmlMobile));
+    assertFalse(userAgentHtml.hashCode() == userAgentHtmlMobile.hashCode());
 
     String chromeUserAgentStr = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.19 (KHTML, like Gecko) Chrome/18.0.1025.162 Safari/535.19";
     String firefoxUserAgentStr = "Mozilla/5.0 .. Firefox ..";
-    UserAgent userAgentRapChrome = UserAgent.create(UiLayer.RAP, UiDeviceType.DESKTOP, chromeUserAgentStr);
-    UserAgent userAgentRapChrome2 = UserAgent.create(UiLayer.RAP, UiDeviceType.DESKTOP, chromeUserAgentStr);
-    UserAgent userAgentRapFirefox = UserAgent.create(UiLayer.RAP, UiDeviceType.DESKTOP, firefoxUserAgentStr);
+    UserAgent userAgentHtmlChrome = UserAgent.create(UiLayer.HTML, UiDeviceType.DESKTOP, chromeUserAgentStr);
+    UserAgent userAgentHtmlChrome2 = UserAgent.create(UiLayer.HTML, UiDeviceType.DESKTOP, chromeUserAgentStr);
+    UserAgent userAgentHtmlFirefox = UserAgent.create(UiLayer.HTML, UiDeviceType.DESKTOP, firefoxUserAgentStr);
 
-    assertEquals(userAgentRapChrome, userAgentRapChrome2);
-    assertEquals(userAgentRapChrome.hashCode(), userAgentRapChrome2.hashCode());
+    assertEquals(userAgentHtmlChrome, userAgentHtmlChrome2);
+    assertEquals(userAgentHtmlChrome.hashCode(), userAgentHtmlChrome2.hashCode());
 
-    assertFalse(userAgentRap.equals(userAgentRapChrome));
-    assertFalse(userAgentRap.hashCode() == userAgentRapChrome.hashCode());
+    assertFalse(userAgentHtml.equals(userAgentHtmlChrome));
+    assertFalse(userAgentHtml.hashCode() == userAgentHtmlChrome.hashCode());
 
-    assertFalse(userAgentRapChrome.equals(userAgentRapFirefox));
-    assertFalse(userAgentRapChrome.hashCode() == userAgentRapFirefox.hashCode());
+    assertFalse(userAgentHtmlChrome.equals(userAgentHtmlFirefox));
+    assertFalse(userAgentHtmlChrome.hashCode() == userAgentHtmlFirefox.hashCode());
   }
 
 }

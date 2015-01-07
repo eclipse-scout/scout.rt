@@ -83,9 +83,6 @@ public class ScoutInfoForm extends AbstractForm {
 
     @Override
     protected boolean getConfiguredGridUseUiWidth() {
-      if (UserAgentUtility.isSwingUi()) {
-        return true;
-      }
       return false;
     }
 
@@ -94,9 +91,6 @@ public class ScoutInfoForm extends AbstractForm {
 
       @Override
       protected boolean getConfiguredGridUseUiWidth() {
-        if (UserAgentUtility.isSwingUi()) {
-          return true;
-        }
         return false;
       }
 
@@ -120,40 +114,24 @@ public class ScoutInfoForm extends AbstractForm {
 
         @Override
         protected boolean getConfiguredGridUseUiWidth() {
-          if (UserAgentUtility.isSwingUi()) {
-            return true;
-          }
           return false;
         }
 
         @Override
         protected boolean getConfiguredGridUseUiHeight() {
-          if (UserAgentUtility.isSwingUi()) {
-            return true;
-          }
           return false;
         }
 
         @Override
         protected int getConfiguredGridW() {
-          if (UserAgentUtility.isSwingUi()) {
-            return 1;
-          }
           return 2;
         }
 
         @Override
         protected int getConfiguredGridH() {
-          if (UserAgentUtility.isSwingUi()) {
-            return 1;
-          }
-
           // If the client is a webclient then some of these informations must be omitted (Security) so that the html
           // field is smaller @see https://bugs.eclipse.org/bugs/show_bug.cgi?id=365761
-          else if (UserAgentUtility.isWebClient()) {
-            return 12;
-          }
-          return 20;
+          return UserAgentUtility.isWebClient() ? 12 : 20;
         }
 
         @Override

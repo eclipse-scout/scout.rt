@@ -48,16 +48,8 @@ public final class UserAgentUtility {
     return !isWebClient();
   }
 
-  public static boolean isSwingUi() {
-    return UiLayer.SWING.equals(getCurrentUiLayer());
-  }
-
   public static boolean isSwtUi() {
     return UiLayer.SWT.equals(getCurrentUiLayer());
-  }
-
-  public static boolean isRapUi() {
-    return UiLayer.RAP.equals(getCurrentUiLayer());
   }
 
   public static IUiDeviceType getCurrentUiDeviceType() {
@@ -90,12 +82,9 @@ public final class UserAgentUtility {
     return userAgent;
   }
 
+  // FIXME AWE: (UiLayer) remove this method when wizard refactoring is done
   public static String getFontSizeUnit() {
-    if (isWebClient()) {
-      return "px";
-    }
-
-    return "pt";
+    return isWebClient() ? "px" : "pt";
   }
 
 }
