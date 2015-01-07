@@ -84,7 +84,6 @@ import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.PrintDevice;
-import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
@@ -355,8 +354,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    * Called whenever a new page has been activated (selected) on this desktop.
    * <p>
    * Subclasses can override this method.<br/>
-   * This default implementation {@linkplain #removeForm(IForm) removes} the old form from this desktop and
-   * {@linkplain #addForm(IForm) adds} the new form to this desktop.
+   * This default implementation does nothing.
    *
    * @param oldForm
    *          is the search form of the old (not selected anymore) page or {@code null}
@@ -367,26 +365,13 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   @Order(40)
   @ConfigOperation
   protected void execPageSearchFormChanged(IForm oldForm, IForm newForm) throws ProcessingException {
-    if (oldForm != null) {
-      removeForm(oldForm);
-    }
-    if (newForm != null) {
-      //ticket 89617: make new form height fixed, non-resizable
-      GridData gd = newForm.getRootGroupBox().getGridData();
-      if (gd.weightY <= 0) {
-        gd.weightY = 0;
-        newForm.getRootGroupBox().setGridDataInternal(gd);
-      }
-      addForm(newForm);
-    }
   }
 
   /**
    * Called whenever a new page has been activated (selected) on this desktop.
    * <p>
    * Subclasses can override this method.<br/>
-   * This default implementation {@linkplain #removeForm(IForm) removes} the old form from this desktop and
-   * {@linkplain #addForm(IForm) adds} the new form to this desktop.
+   * This default implementation does nothing.
    *
    * @param oldForm
    *          is the detail form of the old (not selected anymore) page or {@code null}
@@ -397,12 +382,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   @Order(50)
   @ConfigOperation
   protected void execPageDetailFormChanged(IForm oldForm, IForm newForm) throws ProcessingException {
-    if (oldForm != null) {
-      removeForm(oldForm);
-    }
-    if (newForm != null) {
-      addForm(newForm);
-    }
   }
 
   /**

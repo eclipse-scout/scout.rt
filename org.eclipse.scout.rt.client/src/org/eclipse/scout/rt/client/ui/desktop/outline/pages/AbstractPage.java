@@ -623,8 +623,10 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
       return;
     }
     IForm form = createDetailForm();
-    setDetailForm(form);
-    execInitDetailForm();
+    if (form != null) {
+      setDetailForm(form);
+      execInitDetailForm();
+    }
   }
 
   protected void ensureDetailFormStarted() throws ProcessingException {

@@ -89,17 +89,27 @@ public abstract class AbstractFormToolButton<FORM extends IForm> extends Abstrac
         }
       }
     }
-    if (getForm() == null) {
-      FORM form = createForm();
-      if (form != null) {
-        setForm(form);
-        decorateForm();
-        interceptInitForm();
-        if (!form.isFormOpen()) {
-          startForm();
-        }
-      }
+    ensureFormCreated();
+    ensureFormStarted();
+  }
+
+  public void ensureFormCreated() throws ProcessingException {
+    if (getForm() != null) {
+      return;
     }
+    IForm form = createForm();
+    if (form != null) {
+      setForm(form);
+      decorateForm();
+      interceptInitForm();
+    }
+  }
+
+  public void ensureFormStarted() throws ProcessingException {
+    if (getForm() == null || getForm().isFormOpen()) {
+      return;
+    }
+    startForm();
   }
 
   protected FORM createForm() throws ProcessingException {
