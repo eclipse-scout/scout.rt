@@ -19,6 +19,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.servicetunnel.http.internal.ClientNotificationPollingJob;
 
 /**
  * Processes JSON events from the UI in a Scout client job and waits until all sync jobs have been finished.
@@ -81,11 +82,14 @@ public class JsonEventProcessor {
         return;
       }
 
-      int numJobs = jobList.size();
+      int numJobs = getJobListSize(jobList);
       int numSync = 0;
       int numWaitFor = 0;
       for (ClientJob job : jobList) {
-        if (job.isWaitFor()) {
+        if (isPollingJob(job)) {
+          continue;
+        }
+        else if (job.isWaitFor()) {
           numWaitFor++;
         }
         else if (job.isSync()) {
@@ -110,6 +114,21 @@ public class JsonEventProcessor {
         // NOP
       }
     }
+  }
+
+  private boolean isPollingJob(ClientJob job) {
+    return job instanceof ClientNotificationPollingJob;
+  }
+
+  private int getJobListSize(List<ClientJob> jobs) {
+    int size = 0;
+    for (ClientJob job : jobs) {
+      if (isPollingJob(job)) {
+        continue;
+      }
+      size++;
+    }
+    return size;
   }
 
   /**
