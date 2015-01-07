@@ -77,19 +77,15 @@ public class JsonEventProcessor {
   protected void waitUntilJobsHaveFinished() {
     while (true) {
       List<ClientJob> jobList = getJobsForClientSession();
-      if (jobList.isEmpty()) {
+      int numJobs = jobList.size();
+      if (numJobs == 0) {
         LOG.trace("Job list is empty. Finish request");
         return;
       }
-
-      int numJobs = getJobListSize(jobList);
       int numSync = 0;
       int numWaitFor = 0;
       for (ClientJob job : jobList) {
-        if (isPollingJob(job)) {
-          continue;
-        }
-        else if (job.isWaitFor()) {
+        if (job.isWaitFor()) {
           numWaitFor++;
         }
         else if (job.isSync()) {
@@ -116,34 +112,26 @@ public class JsonEventProcessor {
     }
   }
 
-  private boolean isPollingJob(ClientJob job) {
-    return job instanceof ClientNotificationPollingJob;
-  }
-
-  private int getJobListSize(List<ClientJob> jobs) {
-    int size = 0;
-    for (ClientJob job : jobs) {
-      if (isPollingJob(job)) {
-        continue;
-      }
-      size++;
-    }
-    return size;
-  }
-
   /**
    * Returns only jobs which belong to the current client session.
+   * But we must ignore the polling job for client notifications.
    */
   protected List<ClientJob> getJobsForClientSession() {
     List<ClientJob> jobList = new ArrayList<>();
     for (Job job : Job.getJobManager().find(ClientJob.class)) {
-      if (job instanceof ClientJob) {
-        ClientJob clientJob = (ClientJob) job;
-        if (clientJob.getClientSession() == m_jsonSession.getClientSession()) {
-          jobList.add(clientJob);
-        }
-      }
+      conditionalAddJob(jobList, (ClientJob) job);
     }
     return jobList;
   }
+
+  private void conditionalAddJob(List<ClientJob> jobList, ClientJob job) {
+    if (job instanceof ClientNotificationPollingJob) {
+      return;
+    }
+    if (job.getClientSession() != m_jsonSession.getClientSession()) {
+      return;
+    }
+    jobList.add(job);
+  }
+
 }
