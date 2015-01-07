@@ -27,6 +27,7 @@ import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.IUrlTarget;
+import org.eclipse.scout.rt.client.ui.desktop.outline.IFormToolButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTableForm;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTreeForm;
@@ -93,10 +94,14 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
   protected List<IAction> filterModelActions() {
     List<IAction> result = new ArrayList<>();
     for (IAction a : getModel().getActions()) {
-      if (hasClassName(a, "UserProfileMenu")
-          || hasClassName(a, "PhoneFormToolButton")
-          || hasClassName(a, "ProcessAssistantFormToolButton")) {
-        result.add(a);
+      if (a instanceof IFormToolButton) {
+        //FIXME Remove after widget tool buttons may be displayed well
+        if (a.getClass().getName().startsWith("com.bsiag.crm")
+            || hasClassName(a, "UserProfileMenu")
+            || hasClassName(a, "PhoneFormToolButton")
+            || hasClassName(a, "ProcessAssistantFormToolButton")) {
+          result.add(a);
+        }
       }
     }
     // Noch ein Hack: in AbstractDesktop#getActions() ist hart-kodiert, dass menus vor toolButtons

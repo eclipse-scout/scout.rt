@@ -124,15 +124,27 @@ public abstract class AbstractTableControl extends AbstractAction implements ITa
         control.setSelected(false);
       }
     }
+    ensureFormCreated();
+    ensureFormStarted();
+  }
+
+  protected void ensureFormCreated() throws ProcessingException {
+    if (getForm() != null) {
+      return;
+    }
     IForm form = createForm();
     if (form != null) {
       setForm(form);
       decorateForm();
       execInitForm();
-      if (!form.isFormOpen()) {
-        startForm();
-      }
     }
+  }
+
+  protected void ensureFormStarted() throws ProcessingException {
+    if (getForm() == null || getForm().isFormOpen()) {
+      return;
+    }
+    startForm();
   }
 
   protected void decorateForm() {
