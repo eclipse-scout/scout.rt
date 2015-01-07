@@ -1,3 +1,5 @@
+Open source release notes: https://wiki.eclipse.org/Scout/NewAndNoteworthy/6.0
+
 AWE 16.12.2014
 org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop
 API isOutlineChanging hinzugefügt
@@ -5,14 +7,14 @@ API isOutlineChanging hinzugefügt
 org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField
 API set/isStatusVisible hinzugefügt
 
-AWE 17.12.2014
+AWE 17.12.2014 [Bug 456408]
 org.eclipse.scout.rt.client.ui.form.AbstractForm
 API get/setBasicTitle entfernt
 API get/setSubTitle hinzugefügt
 API PROP_SUB_TITLE hinzugefügt
 composeTitle entfernt (GUI-Logik)
 
-AWE 05.01.2015
+AWE 05.01.2015 [Bug 456409]
 org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage
 API merged IPageWithTable and IPageWithNodes and moved duplicated methods to IPage
    IPage now has a T getTable() method, also changed abstract classes implementing
@@ -36,7 +38,7 @@ API IPageWithTable:
   moved to IPage > List<ITableRow> getTableRowsFor(Collection<? extends ITreeNode> childPageNodes);
 
 Migration search/replace:
-  Alle "IPage " suchen und ersetzen mit "IPage<?>"
+  Alle "IPage " suchen und ersetzen mit "IPage<?> "
   Alle "List<IPage>" suchen und ersetzen mit "List<IPage<?>>"
 
 AWE 07.01.2015
