@@ -293,7 +293,7 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
    * <br>
    * ::text(SalutationMr)
    * <p>
-   * 
+   *
    * @return a plain object value or in case of a null value preferrably a {@link IHolder} of the correct value type
    */
   @ConfigOperation
@@ -780,6 +780,10 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
     return createStatementProcessor(s, bindBases, 0).createPlainText();
   }
 
+  /**
+   * @deprecated Will be removed in the Mars-Release.
+   */
+  @Deprecated
   @Override
   public WhereToken resolveSpecialConstraint(Object specialConstraint) throws ProcessingException {
     if (specialConstraint instanceof LegacySearchFilter.StringLikeConstraint) {
@@ -811,7 +815,7 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
   /**
    * When the service completes work with an exception, a xa rollback is done on
    * ALL used service request resources
-   * 
+   *
    * @see commit
    */
   @Override

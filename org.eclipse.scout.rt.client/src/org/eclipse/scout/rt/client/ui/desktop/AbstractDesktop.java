@@ -1347,8 +1347,12 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
   }
 
+  /**
+   * @deprecated use {@link #openUrlInBrowser(String)}. Will be removed in the 5.0 Release.
+   */
   @SuppressWarnings("deprecation")
   @Override
+  @Deprecated
   public void openBrowserWindow(String path) {
     openUrlInBrowser(path, UrlTarget.AUTO);
   }
