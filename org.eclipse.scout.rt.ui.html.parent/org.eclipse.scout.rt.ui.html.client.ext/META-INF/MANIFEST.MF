@@ -19,5 +19,4 @@ Export-Package: org.eclipse.scout.rt.client.ui.basic.table,
  org.eclipse.scout.rt.client.ui.form.fields.smartfield,
  org.eclipse.scout.rt.client.ui.form.fields.tagcloudfield,
  org.eclipse.scout.rt.client.ui.form.menus,
- org.eclipse.scout.rt.shared.ui,
  org.eclipse.scout.rt.shared.ui.menu

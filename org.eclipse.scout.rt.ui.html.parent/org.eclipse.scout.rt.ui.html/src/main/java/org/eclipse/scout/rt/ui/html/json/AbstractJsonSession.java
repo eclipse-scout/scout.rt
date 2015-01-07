@@ -39,7 +39,6 @@ import org.eclipse.scout.rt.shared.ui.IUiDeviceType;
 import org.eclipse.scout.rt.shared.ui.IUiLayer;
 import org.eclipse.scout.rt.shared.ui.UiDeviceType;
 import org.eclipse.scout.rt.shared.ui.UiLayer;
-import org.eclipse.scout.rt.shared.ui.UiLayer2;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -277,12 +276,12 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   }
 
   protected UserAgent createUserAgent(JsonStartupRequest jsonStartupRequest) {
-    IUiLayer uiLayer = UiLayer2.HTML;
+    IUiLayer uiLayer = UiLayer.HTML;
     IUiDeviceType uiDeviceType = UiDeviceType.DESKTOP;
     String browserId = m_currentHttpRequest.getHeader("User-Agent");
     JSONObject userAgent = jsonStartupRequest.getUserAgent();
     if (userAgent != null) {
-      // FIXME CGU it would be great if UserAgent could be changed dynamically, to switch from mobile to tablet mode on the fly, should be done as event in JsonClientSession
+      // FIXME CGU: it would be great if UserAgent could be changed dynamically, to switch from mobile to tablet mode on the fly, should be done as event in JsonClientSession
       String uiDeviceTypeStr = userAgent.optString("deviceType", null);
       if (uiDeviceTypeStr != null) {
         uiDeviceType = UiDeviceType.createByIdentifier(uiDeviceTypeStr);

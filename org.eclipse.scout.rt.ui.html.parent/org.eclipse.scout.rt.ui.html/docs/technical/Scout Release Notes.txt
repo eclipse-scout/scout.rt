@@ -12,7 +12,7 @@ API get/setSubTitle hinzugefügt
 API PROP_SUB_TITLE hinzugefügt
 composeTitle entfernt (GUI-Logik)
 
-AWE 05.01.2014
+AWE 05.01.2015
 org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage
 API merged IPageWithTable and IPageWithNodes and moved duplicated methods to IPage
    IPage now has a T getTable() method, also changed abstract classes implementing
@@ -39,3 +39,10 @@ Migration search/replace:
   Alle "IPage " suchen und ersetzen mit "IPage<?>"
   Alle "List<IPage>" suchen und ersetzen mit "List<IPage<?>>"
 
+AWE 07.01.2015
+org.eclipse.scout.rt.shared.ui.UiLayer
+API removed values JSP, JSF, RAP, SWING
+    added value HTML
+
+org.eclipse.scout.rt.shared.ui.UserAgentUtility
+API removed static boolean isRapUi(), static boolean isSwingUi()

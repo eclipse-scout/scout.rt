@@ -23,7 +23,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.menus.TableOrganizeMenu;
 import org.eclipse.scout.rt.extension.client.ui.basic.table.AbstractExtensibleTable;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
-import org.eclipse.scout.rt.shared.ui.UiLayer2;
 import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
 import org.eclipse.scout.service.SERVICES;
 
@@ -46,12 +45,12 @@ public abstract class AbstractTable5 extends AbstractExtensibleTable implements 
     m_reloadHandler = reloadHandler;
   }
 
-  //FIXME CGU remove PropertyChangeListener in AbstractColumn constructor -> generates a lot of unnecessary events
+  // FIXME CGU: remove PropertyChangeListener in AbstractColumn constructor -> generates a lot of unnecessary events
 
   @Override
   protected void addHeaderMenusInternal(OrderedCollection<IMenu> menuList) {
-    //FIXME how to distinguish between html ui and others? better create service?
-    if (UserAgentUtility.getCurrentUiLayer().equals(UiLayer2.HTML)) {
+    // FIXME CGU: how to distinguish between html ui and others? better create service?
+    if (UserAgentUtility.isWebClient()) {
       menuList.addLast(new TableOrganizeMenu(this));
     }
     else {
