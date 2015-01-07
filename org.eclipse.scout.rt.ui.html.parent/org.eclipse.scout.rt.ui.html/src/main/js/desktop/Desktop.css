@@ -23,7 +23,7 @@
 .desktop-tool-container {
   position: absolute;
   top: @size-desktop-tools;
-  z-index: 10;
+  z-index: 1;
   .menu-context;
   background-color: @body-background-color;
   border-top: 1px solid transparent;

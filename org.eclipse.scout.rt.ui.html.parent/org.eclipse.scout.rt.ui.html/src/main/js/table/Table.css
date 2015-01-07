@@ -71,7 +71,7 @@
     border-right: 1px solid @desktop-border-color;
     background-color: @desktop-background-color;
     color: @active-color;
-    z-index: 2;
+    z-index: 1;
   }
 
 }
@@ -87,7 +87,7 @@
   background-color: @desktop-border-color;
   background-clip: content-box;
   cursor: col-resize;
-  z-index: 4;
+  z-index: 1;
 
   .header-move & {
     background-color: @panel-background-color;
