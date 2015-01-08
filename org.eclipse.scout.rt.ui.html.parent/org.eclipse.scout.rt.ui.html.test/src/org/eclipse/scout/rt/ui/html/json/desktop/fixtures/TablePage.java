@@ -44,7 +44,7 @@ public class TablePage extends AbstractPageWithTable<Table> {
   }
 
   @Override
-  protected IPage execCreateChildPage(ITableRow row) throws ProcessingException {
+  protected IPage<?> execCreateChildPage(ITableRow row) throws ProcessingException {
     if (m_nodePageFactory == null) {
       return null;
     }

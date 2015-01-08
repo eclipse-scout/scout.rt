@@ -41,10 +41,11 @@ public class JsonTableControlTest {
   @Test
   public void testLazyLoadingForm_onModelSelectionChanged() throws ProcessingException, JSONException {
     FormWithOneField form = new FormWithOneField();
-
+    form.setAutoAddRemoveOnDesktop(false);
     TableControl control = new TableControl();
     control.setTable(new Table());
     control.setForm(form);
+    control.decorateForm();
     JsonTableControl<ITableControl> jsonControl = m_jsonSession.newJsonAdapter(control, null, null);
     assertNull(jsonControl.getAdapter(form));
 
@@ -59,10 +60,10 @@ public class JsonTableControlTest {
   @Test
   public void testLazyLoadingForm_onUiSelectionChanged() throws Exception {
     FormWithOneField form = new FormWithOneField();
-
     TableControl control = new TableControl();
     control.setTable(new Table());
     control.setForm(form);
+    control.decorateForm();
     JsonTableControl<ITableControl> jsonControl = m_jsonSession.newJsonAdapter(control, null, null);
 
     assertNull(jsonControl.getAdapter(form));
@@ -93,11 +94,11 @@ public class JsonTableControlTest {
   @Test
   public void testNonLazyLoadingFormWhenSelected() throws ProcessingException, JSONException {
     FormWithOneField form = new FormWithOneField();
-
     TableControl control = new TableControl();
     control.setTable(new Table());
-    control.setSelected(true);
     control.setForm(form);
+    control.decorateForm();
+    control.setSelected(true);
     JsonTableControl<ITableControl> jsonControl = m_jsonSession.newJsonAdapter(control, null, null);
 
     IJsonAdapter<?> formAdapter = jsonControl.getAdapter(form);

@@ -31,6 +31,7 @@ public class FormWithOneField extends AbstractForm {
     }
   }
 
+  @Override
   public void start() throws ProcessingException {
     startInternal(new FormHandler());
   }
