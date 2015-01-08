@@ -18,6 +18,7 @@ scout.Menubar = function($parent, options) {
   }
 };
 
+// FIXME AWE: (Menubar) refactor to MenuBar everywhere
 scout.Menubar.prototype.updateItems = function(menus) {
   var i, left1Menus, left2Menus, hasLeft1Menus, rightMenus, hasMenus;
 

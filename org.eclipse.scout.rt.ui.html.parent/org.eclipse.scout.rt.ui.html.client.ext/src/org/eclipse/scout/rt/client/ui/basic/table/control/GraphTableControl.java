@@ -23,10 +23,8 @@ public class GraphTableControl extends AbstractTableControl implements IGraphTab
   @Override
   protected void initConfig() {
     super.initConfig();
-
     setTooltipText("Netzwerk");
     setIconId("\uE023"); //Icons.Graph
-    setGroup("Anzeige");
   }
 
 }

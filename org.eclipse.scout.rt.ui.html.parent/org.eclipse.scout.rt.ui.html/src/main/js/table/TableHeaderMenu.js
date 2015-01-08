@@ -1,6 +1,7 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 
+// FIXME CRU: implement buttons to show/hide, add/remove columns depending on 'custom' property.
 scout.TableHeaderMenu = function(table, $header, x, y, session) {
   var pos = table.header.getColumnViewIndex($header),
     column = $header.data('column');

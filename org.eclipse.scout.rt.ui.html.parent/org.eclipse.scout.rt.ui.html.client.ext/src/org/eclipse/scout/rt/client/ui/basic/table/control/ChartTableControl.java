@@ -23,10 +23,8 @@ public class ChartTableControl extends AbstractTableControl implements IChartTab
   @Override
   protected void initConfig() {
     super.initConfig();
-
     setTooltipText("Diagramm");
     setIconId("\uE022"); //Icons.Chart
-    setGroup("Anzeige");
   }
 
 }

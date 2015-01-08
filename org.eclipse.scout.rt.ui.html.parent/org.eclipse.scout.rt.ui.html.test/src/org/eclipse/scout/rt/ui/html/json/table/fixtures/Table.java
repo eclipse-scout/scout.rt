@@ -12,10 +12,10 @@ package org.eclipse.scout.rt.ui.html.json.table.fixtures;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable5;
+import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 
-public class Table extends AbstractTable5 {
+public class Table extends AbstractTable {
 
   @Order(10.0)
   public class Col1Column extends AbstractStringColumn {

@@ -16,7 +16,6 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
-import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.action.JsonAction;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonGlobalAdapterProperty;
 
@@ -30,13 +29,6 @@ public class JsonTableControl<T extends ITableControl> extends JsonAction<T> {
   @Override
   protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
-
-    putJsonProperty(new JsonProperty<ITableControl>("group", model) {
-      @Override
-      protected String modelValue() {
-        return getModel().getGroup();
-      }
-    });
     putJsonProperty(new JsonGlobalAdapterProperty<ITableControl>(ITableControl.PROP_FORM, model, getJsonSession()) {
       @Override
       protected IForm modelValue() {

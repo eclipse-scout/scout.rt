@@ -55,7 +55,7 @@ scout.Table.prototype._render = function($parent) {
   this._$scrollable = scout.scrollbars.install(this.$data);
 
   this.menubar = new scout.Menubar(this.$container, {
-    position: this.menubarPosition
+    position: this.menuBarPosition
   });
   this.menubar.menuTypesForLeft1 = ['Table.EmptySpace'];
   this.menubar.menuTypesForLeft2 = ['Table.SingleSelection', 'Table.MultiSelection'];

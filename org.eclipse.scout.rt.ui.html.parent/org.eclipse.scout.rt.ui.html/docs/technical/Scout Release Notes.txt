@@ -77,3 +77,18 @@ CGU 07.01.2015
 API Added IForm#start()
 Mainly useful for forms with just one handler. (detail forms, tool forms etc.). Maybe implemented by the concrete form.
 The default implementation at AbstractForm uses getHandler() to start the form.
+
+AWE 08.01.2015
+org.eclipse.scout.rt.client.ui.basic.table.ITable
+API added / implemented in AbstractTable
+  List<ITableControl> getTableControls();
+  <T extends ITableControl> T getTableControl(Class<T> controlClass);
+  boolean isTableStatusVisible();
+  void setTableStatusVisible(boolean visible);
+  String getMenuBarPosition();
+  void setMenuBarPosition(String position);
+
+ ITableUIFacade
+ API added:
+  void fireTableReloadFromUI();
+  void fireSortColumnRemovedFromUI(IColumn<?> column);

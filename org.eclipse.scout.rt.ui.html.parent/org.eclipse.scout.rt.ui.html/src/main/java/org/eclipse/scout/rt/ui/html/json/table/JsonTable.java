@@ -28,7 +28,6 @@ import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
-import org.eclipse.scout.rt.client.ui.basic.table.ITable5;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.TableListener;
@@ -37,6 +36,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractDateColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IDateColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.customizer.ICustomColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
@@ -159,20 +159,18 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
         return getModel().isScrollToSelection();
       }
     });
-    if (getModel() instanceof ITable5) {
-      putJsonProperty(new JsonProperty<ITable>(ITable5.PROP_TABLE_STATUS_VISIBLE, model) {
-        @Override
-        protected Boolean modelValue() {
-          return ((ITable5) getModel()).isTableStatusVisible();
-        }
-      });
-      putJsonProperty(new JsonProperty<ITable>(ITable5.PROP_MENU_BAR_POSITION, model) {
-        @Override
-        protected String modelValue() {
-          return ((ITable5) getModel()).getMenubarPosition();
-        }
-      });
-    }
+    putJsonProperty(new JsonProperty<ITable>(ITable.PROP_TABLE_STATUS_VISIBLE, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isTableStatusVisible();
+      }
+    });
+    putJsonProperty(new JsonProperty<ITable>(ITable.PROP_MENU_BAR_POSITION, model) {
+      @Override
+      protected String modelValue() {
+        return getModel().getMenuBarPosition();
+      }
+    });
   }
 
   @Override
@@ -184,9 +182,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   protected void attachChildAdapters() {
     super.attachChildAdapters();
     attachAdapter(getModel().getContextMenu());
-    if (getModel() instanceof ITable5) {
-      attachAdapters(((ITable5) getModel()).getControls());
-    }
+    attachAdapters(getModel().getTableControls());
   }
 
   @Override
@@ -223,9 +219,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     if (jsonContextMenu != null) {
       JsonObjectUtility.putProperty(json, PROP_MENUS, JsonObjectUtility.adapterIdsToJson(jsonContextMenu.getJsonChildActions()));
     }
-    if (getModel() instanceof ITable5) {
-      putAdapterIdsProperty(json, "controls", ((ITable5) getModel()).getControls());
-    }
+    putAdapterIdsProperty(json, "controls", getModel().getTableControls()); // FIXME AWE: rename to "tableControls" in JS/Java
     putProperty(json, PROP_SELECTED_ROW_IDS, rowIdsToJson(getModel().getSelectedRows()));
     return json;
   }
@@ -282,9 +276,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   }
 
   protected void handleUiReload(JsonEvent event, JsonResponse res) {
-    if (getModel() instanceof ITable5) {
-      ((ITable5) getModel()).fireTableReloadFromUI();
-    }
+    getModel().getUIFacade().fireTableReloadFromUI();
   }
 
   protected void handleUiResetColumns(JsonEvent event, JsonResponse res) {
@@ -331,9 +323,9 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   }
 
   protected void fireSortRowsFromUi(IColumn<?> column, boolean multiSort, boolean sortingRemoved) {
-    // FIXME CGU add filter for HEADER_UPDATE event with json data of column (execDecorateHeaderCell is called which may change other header properties (text etc)
-    if (sortingRemoved && getModel() instanceof ITable5) {
-      ((ITable5) getModel()).fireSortColumnRemovedFromUI(column);
+    // FIXME CGU: add filter for HEADER_UPDATE event with json data of column (execDecorateHeaderCell is called which may change other header properties (text etc)
+    if (sortingRemoved) {
+      getModel().getUIFacade().fireSortColumnRemovedFromUI(column);
     }
     else {
       getModel().getUIFacade().fireHeaderSortFromUI(column, multiSort);
@@ -446,15 +438,17 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
         json.put("sortAscending", column.isSortAscending());
         json.put("sortIndex", column.getSortIndex());
       }
-
+      if (column instanceof ICustomColumn) {
+        json.put("custom", true);
+      }
       if (column instanceof INumberColumn<?>) {
-        //Use localized pattern which contains the relevant chars for the current locale using DecimalFormatSymbols
+        // Use localized pattern which contains the relevant chars for the current locale using DecimalFormatSymbols
         json.put("format", ((INumberColumn) column).getFormat().toLocalizedPattern());
       }
       else if (column instanceof IDateColumn) {
-        //FIXME CGU update IDateColumnInterface
-        //getDateFormat uses LocaleThreadLocal. IMHO getDateFormat should not perform any logic because it just a getter-> refactor. same on AbstractDateField
-        //Alternative would be to use a clientJob or set localethreadlocal in ui thread as well, as done in rap
+        // FIXME CGU: update IDateColumnInterface
+        // getDateFormat uses LocaleThreadLocal. IMHO getDateFormat should not perform any logic because it just a getter-> refactor. same on AbstractDateField
+        // Alternative would be to use a clientJob or set localethreadlocal in ui thread as well, as done in rap
         LocaleThreadLocal.set(getJsonSession().getClientSession().getLocale());
         try {
           Method method = AbstractDateColumn.class.getDeclaredMethod("getDateFormat");
@@ -466,7 +460,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
           LocaleThreadLocal.set(null);
         }
       }
-      //FIXME complete
+      // FIXME CGU: complete
       return json;
     }
     catch (JSONException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {

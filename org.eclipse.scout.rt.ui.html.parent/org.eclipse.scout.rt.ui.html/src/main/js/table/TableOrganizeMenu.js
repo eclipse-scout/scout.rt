@@ -4,6 +4,7 @@ scout.TableOrganizeMenu = function() {
 
 scout.inherits(scout.TableOrganizeMenu, scout.Menu);
 
+// FIXME CRU: implement table organize menu, copy-columns-width menu (used for Scout SDK)
 scout.TableOrganizeMenu.prototype._onMenuClicked = function(event) {
   var popup = new scout.PopupMenuItem($(event.target));
   popup.render();

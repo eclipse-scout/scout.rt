@@ -10,20 +10,29 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.table;
 
-import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
+import org.eclipse.scout.rt.client.ui.basic.table.menus.TableOrganizeMenu;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonMenu;
+import org.json.JSONObject;
 
-public class JsonTableOrganizeMenu<T extends IMenu> extends JsonMenu<T> {
+public class JsonTableOrganizeMenu extends JsonMenu<TableOrganizeMenu> {
 
-  public JsonTableOrganizeMenu(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
+  public JsonTableOrganizeMenu(TableOrganizeMenu model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
     super(model, jsonSession, id, parent);
   }
 
   @Override
   public String getObjectType() {
     return "TableOrganizeMenu";
+  }
+
+  @Override
+  public JSONObject toJson() {
+    JSONObject json = super.toJson();
+    putProperty(json, "development", getModel().isDevelopment());
+    putProperty(json, "columnsCustomizable", getModel().isColumnsCustomizable());
+    return json;
   }
 
 }
