@@ -5,7 +5,6 @@ import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithTa
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithTableChains.PageWithTableCreateVirtualChildPageChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithTableChains.PageWithTableInitSearchFormChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithTableChains.PageWithTableLoadDataChain;
-import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithTableChains.PageWithTableLoadTableDataChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithTableChains.PageWithTablePopulateTableChain;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -27,17 +26,6 @@ public abstract class AbstractPageWithTableExtension<T extends ITable, OWNER ext
   @Override
   public IPage execCreateChildPage(PageWithTableCreateChildPageChain<? extends ITable> chain, ITableRow row) throws ProcessingException {
     return chain.execCreateChildPage(row);
-  }
-
-  /**
-   * @deprecated will be removed with the N release. see {@link AbstractPageWithTable#execLoadTableData(SearchFilter)}
-   *             for more information.
-   */
-  @Override
-  @Deprecated
-  @SuppressWarnings("deprecation")
-  public Object[][] execLoadTableData(PageWithTableLoadTableDataChain<? extends ITable> chain, SearchFilter filter) throws ProcessingException {
-    return chain.execLoadTableData(filter);
   }
 
   @Override

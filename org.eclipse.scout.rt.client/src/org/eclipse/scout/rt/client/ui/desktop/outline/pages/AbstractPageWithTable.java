@@ -38,7 +38,6 @@ import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithTa
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithTableChains.PageWithTableCreateVirtualChildPageChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithTableChains.PageWithTableInitSearchFormChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithTableChains.PageWithTableLoadDataChain;
-import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithTableChains.PageWithTableLoadTableDataChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithTableChains.PageWithTablePopulateTableChain;
 import org.eclipse.scout.rt.client.services.common.search.ISearchFilterService;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
@@ -262,7 +261,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   @ConfigOperation
   @Order(85)
   protected void execLoadData(SearchFilter filter) throws ProcessingException {
-    importTableData(interceptLoadTableData(filter));
+    importTableData(execLoadTableData(filter));
   }
 
   /**
@@ -285,6 +284,8 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    *   importTableData(service.loadTableData(..));
    * }
    * </pre>
+   *
+   * This method can not be modified by the Scout Extensibility Concept.
    *
    * @deprecated will be removed with the N release. use #execLoadData(SearchFilter) instead.
    */
@@ -1073,17 +1074,6 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     return chain.execCreateChildPage(row);
   }
 
-  /**
-   * @deprecated will be removed with the N release. see #execLoadTableData(SearchFilter) for more information.
-   */
-  @Deprecated
-  @SuppressWarnings("deprecation")
-  protected final Object[][] interceptLoadTableData(SearchFilter filter) throws ProcessingException {
-    List<? extends IPageWithTableExtension<? extends ITable, ? extends AbstractPageWithTable<? extends ITable>>> extensions = getAllExtensions();
-    PageWithTableLoadTableDataChain<T> chain = new PageWithTableLoadTableDataChain<T>(extensions);
-    return chain.execLoadTableData(filter);
-  }
-
   protected final void interceptPopulateTable() throws ProcessingException {
     List<? extends IPageWithTableExtension<? extends ITable, ? extends AbstractPageWithTable<? extends ITable>>> extensions = getAllExtensions();
     PageWithTablePopulateTableChain<T> chain = new PageWithTablePopulateTableChain<T>(extensions);
@@ -1116,17 +1106,6 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     @Override
     public IPage execCreateChildPage(PageWithTableCreateChildPageChain<? extends ITable> chain, ITableRow row) throws ProcessingException {
       return getOwner().execCreateChildPage(row);
-    }
-
-    /**
-     * @deprecated will be removed with the N release. see {@link AbstractPageWithTable#execLoadTableData(SearchFilter)}
-     *             for more information.
-     */
-    @Override
-    @Deprecated
-    @SuppressWarnings("deprecation")
-    public Object[][] execLoadTableData(PageWithTableLoadTableDataChain<? extends ITable> chain, SearchFilter filter) throws ProcessingException {
-      return getOwner().execLoadTableData(filter);
     }
 
     @Override
