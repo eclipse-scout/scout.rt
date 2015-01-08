@@ -50,5 +50,5 @@ Export-Package: org.eclipse.scout.rt.server,
  org.eclipse.scout.rt.server.servlet,
  org.eclipse.scout.rt.server.transaction
 Eclipse-BuddyPolicy: registered
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy

@@ -27,5 +27,5 @@ Export-Package: org.eclipse.scout.jaxws,
  org.eclipse.scout.jaxws.service,
  org.eclipse.scout.jaxws.session,
  org.eclipse.scout.jaxws.tool
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy

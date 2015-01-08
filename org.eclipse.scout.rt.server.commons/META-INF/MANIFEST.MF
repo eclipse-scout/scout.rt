@@ -15,5 +15,5 @@ Export-Package: org.eclipse.scout.rt.server.commons.cache,
  org.eclipse.scout.rt.server.commons.servletfilter,
  org.eclipse.scout.rt.server.commons.servletfilter.helper,
  org.eclipse.scout.rt.server.commons.servletfilter.security
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy

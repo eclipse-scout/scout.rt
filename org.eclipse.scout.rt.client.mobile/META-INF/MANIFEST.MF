@@ -28,5 +28,5 @@ Export-Package: org.eclipse.scout.rt.client.mobile,
  org.eclipse.scout.rt.client.mobile.ui.form.fields.tabbox,
  org.eclipse.scout.rt.client.mobile.ui.form.fields.table,
  org.eclipse.scout.rt.client.mobile.ui.form.outline
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy

@@ -8,4 +8,4 @@ Fragment-Host: org.eclipse.scout.rt.ui.swing;bundle-version="[4.3.0,4.4.0)"
 Require-Bundle: org.eclipse.swt;bundle-version="[3.4.0,4.0.0)"
 Export-Package: org.eclipse.scout.rt.ui.swing.form.fields.browserfield,
  org.eclipse.scout.rt.ui.swing.form.fields.browserfield.internal
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7

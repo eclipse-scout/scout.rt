@@ -93,5 +93,5 @@ Export-Package: org.eclipse.scout.rt.ui.swt,
  org.eclipse.scout.rt.ui.swt.window.filechooser,
  org.eclipse.scout.rt.ui.swt.window.messagebox,
  org.eclipse.scout.rt.ui.swt.window.popup
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy

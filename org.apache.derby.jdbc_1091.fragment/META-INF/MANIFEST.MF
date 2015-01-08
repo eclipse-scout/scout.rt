@@ -117,4 +117,4 @@ Export-Package: org.apache.derby.authentication;version="10.9.1",
  org.apache.derby.vti;version="10.9.1"
 Eclipse-BundleShape: dir
 Fenix-Unpack: true
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
