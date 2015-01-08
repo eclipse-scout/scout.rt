@@ -20,11 +20,4 @@
             createImmediately="false">
       </service>
    </extension>
-   <extension
-         point="org.eclipse.scout.rt.server.commons.filters">
-      <filter
-            aliases="/"
-            class="org.eclipse.scout.rt.ui.html.gzip.GzipServletFilter">
-      </filter>
-   </extension>
 </plugin>
