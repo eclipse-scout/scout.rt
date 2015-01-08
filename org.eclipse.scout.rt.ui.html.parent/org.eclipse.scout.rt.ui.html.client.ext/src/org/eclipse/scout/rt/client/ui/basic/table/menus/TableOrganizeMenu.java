@@ -28,7 +28,7 @@ public class TableOrganizeMenu extends OrganizeColumnsMenu {
 
   @Override
   protected String getConfiguredTooltipText() {
-    return TEXTS.get("TableOrganize");
+    return TEXTS.get("TableOrganize"); // TODO CGU Move this text to scout (is currently in widgets apps)
   }
 
   @Override
