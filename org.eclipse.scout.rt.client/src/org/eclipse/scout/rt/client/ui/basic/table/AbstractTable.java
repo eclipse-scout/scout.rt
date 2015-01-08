@@ -77,13 +77,11 @@ import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.MenuSeparator;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.ITableContextMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.internal.TableContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
-import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ColumnFilterMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.DefaultTableColumnFilterManager;
 import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilter;
 import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilterManager;
@@ -93,14 +91,10 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IContentAssistColumn;
-import org.eclipse.scout.rt.client.ui.basic.table.customizer.AddCustomColumnMenu;
+import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
-import org.eclipse.scout.rt.client.ui.basic.table.customizer.ModifyCustomColumnMenu;
-import org.eclipse.scout.rt.client.ui.basic.table.customizer.RemoveCustomColumnMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.internal.InternalTableRow;
-import org.eclipse.scout.rt.client.ui.basic.table.menus.CopyWidthsOfColumnsMenu;
-import org.eclipse.scout.rt.client.ui.basic.table.menus.OrganizeColumnsMenu;
-import org.eclipse.scout.rt.client.ui.basic.table.menus.ResetColumnsMenu;
+import org.eclipse.scout.rt.client.ui.basic.table.menus.TableOrganizeMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
@@ -173,6 +167,8 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   private final ObjectExtensions<AbstractTable, ITableExtension<? extends AbstractTable>> m_objectExtensions;
   // only do one action at a time
   private boolean m_actionRunning;
+  private List<ITableControl> m_tableControls;
+  private IReloadHandler m_reloadHandler;
 
   public AbstractTable() {
     this(true);
@@ -192,6 +188,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     m_initLock = new OptimisticLock();
     m_actionRunning = false;
     m_objectExtensions = new ObjectExtensions<AbstractTable, ITableExtension<? extends AbstractTable>>(this);
+    m_tableControls = new ArrayList<ITableControl>();
     //add single observer listener
     addTableListener(new P_TableListener());
     if (callInitializer) {
@@ -785,20 +782,15 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    *          the end.
    */
   protected void addHeaderMenusInternal(OrderedCollection<IMenu> menus) {
-    // header menus
-    if (getTableCustomizer() != null) {
-      menus.addLast(new AddCustomColumnMenu(this));
-      menus.addLast(new ModifyCustomColumnMenu(this));
-      menus.addLast(new RemoveCustomColumnMenu(this));
-    }
-    if (menus.size() > 0) {
-      menus.addLast(new MenuSeparator());
-    }
-    menus.addLast(new ResetColumnsMenu(this));
-    menus.addLast(new OrganizeColumnsMenu(this));
-    menus.addLast(new ColumnFilterMenu(this));
-    menus.addLast(new CopyWidthsOfColumnsMenu(this));
-    menus.addLast(new MenuSeparator());
+    menus.addLast(new TableOrganizeMenu(this));
+    // FIXME AWE/CGU: (table) clean-up table organize menus
+    // - remove AddCustomColumnMenu
+    // - remove ModifyCustomColumnMenu
+    // - remove RemoveCustomColumnMenu
+    // - remove ResetColumnsMenu
+    // - remove OrganizeColumnsMenu
+    // - remove ColumnFilterMenu
+    // - remove CopyWidthsOfColumnsMenu
   }
 
   protected List<Class<? extends IMenu>> getDeclaredMenus() {
@@ -848,6 +840,8 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     setDragType(getConfiguredDragType());
     setDropType(getConfiguredDropType());
     setScrollToSelection(getConfiguredScrollToSelection());
+    setTableStatusVisible(getConfiguredTableStatusVisible());
+    setMenuBarPosition(getConfiguredMenuBarPosition());
     if (getTableCustomizer() == null) {
       setTableCustomizer(createTableCustomizer());
     }
@@ -4136,6 +4130,66 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     return new ProcessingException("Unexpected", t);
   }
 
+  protected void setReloadHandler(IReloadHandler reloadHandler) {
+    m_reloadHandler = reloadHandler;
+  }
+
+  @Override
+  public List<ITableControl> getTableControls() {
+    // FIXME AWE: (table) return copy of collection, read configuration in initConfig (inner classes)
+    return m_tableControls;
+  }
+
+  @Override
+  public <T extends ITableControl> T getTableControl(Class<T> controlClass) {
+    for (ITableControl control : m_tableControls) {
+      if (controlClass.isAssignableFrom(control.getClass())) {
+        return controlClass.cast(control);
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Configures the visibility of the table status.
+   * <p>
+   * Subclasses can override this method. Default is {@code false}.
+   *
+   * @return {@code true} if the table status is visible, {@code false} otherwise.
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(200)
+  protected boolean getConfiguredTableStatusVisible() {
+    return false;
+  }
+
+  //FIXME CGU merge with ITableField table status. Probably move status from field to table to make it work without a field (outline mode)
+  @Override
+  public boolean isTableStatusVisible() {
+    return propertySupport.getPropertyBool(PROP_TABLE_STATUS_VISIBLE);
+  }
+
+  @Override
+  public void setTableStatusVisible(boolean visible) {
+    propertySupport.setPropertyBool(PROP_TABLE_STATUS_VISIBLE, visible);
+  }
+
+  @Override
+  public String getMenuBarPosition() {
+    return propertySupport.getPropertyString(PROP_MENU_BAR_POSITION);
+  }
+
+  @Override
+  public void setMenuBarPosition(String position) {
+    propertySupport.setPropertyString(PROP_MENU_BAR_POSITION, position);
+  }
+
+  @ConfigProperty(ConfigProperty.STRING)
+  @Order(210)
+  protected String getConfiguredMenuBarPosition() {
+    return MENU_BAR_POSITION_TOP;
+  }
+
   /*
    * UI Notifications
    */
@@ -4418,6 +4472,26 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       finally {
         popUIProcessor();
       }
+    }
+
+    @Override
+    public void fireTableReloadFromUI() {
+      // FIXME CGU/AWE: push/popUiProcessor?
+      if (m_reloadHandler != null) {
+        try {
+          m_reloadHandler.reload();
+        }
+        catch (ProcessingException e) {
+          SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+        }
+      }
+    }
+
+    @Override
+    public void fireSortColumnRemovedFromUI(IColumn<?> column) {
+      // FIXME CGU/AWE: push/popUiProcessor?
+      getColumnSet().removeSortColumn(column);
+      sort();
     }
 
   }

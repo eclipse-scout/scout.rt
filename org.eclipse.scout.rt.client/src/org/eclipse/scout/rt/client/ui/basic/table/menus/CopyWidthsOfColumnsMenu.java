@@ -31,6 +31,7 @@ public class CopyWidthsOfColumnsMenu extends AbstractMenu {
   public static final String COLUMN_COPY_CLIPBOARD_IDENTIFIER = "dev.table.menu.column.width.copy.ident";
   private final ITable m_table;
 
+  // FIXME AWE: (table) call 'copy column widths' menu from html UI
   public CopyWidthsOfColumnsMenu(ITable table) {
     m_table = table;
   }

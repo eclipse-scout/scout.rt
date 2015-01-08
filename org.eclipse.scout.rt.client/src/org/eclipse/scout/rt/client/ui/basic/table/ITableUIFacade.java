@@ -90,4 +90,9 @@ public interface ITableUIFacade {
   boolean fireKeyTypedFromUI(String keyStrokeText, char keyChar);
 
   void fireHyperlinkActionFromUI(ITableRow row, IColumn<?> column, URL url);
+
+  void fireTableReloadFromUI();
+
+  void fireSortColumnRemovedFromUI(IColumn<?> column);
+
 }

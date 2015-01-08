@@ -27,6 +27,7 @@ import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilterManager;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
@@ -143,6 +144,26 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * {@link ITableCustomizer}
    */
   String PROP_TABLE_CUSTOMIZER = "tableCustomizer";
+
+  /**
+   * Boolean
+   *
+   * @since 5.0.0
+   */
+  String PROP_TABLE_STATUS_VISIBLE = "tableStatusVisible";
+
+  /**
+   * String
+   *
+   * @since 5.0.0
+   */
+  String PROP_MENU_BAR_POSITION = "menuBarPosition";
+
+  /**
+   * @since 5.0.0
+   */
+  String MENU_BAR_POSITION_TOP = "top";
+  String MENU_BAR_POSITION_BOTTOM = "bottom";
 
   void initTable() throws ProcessingException;
 
@@ -926,8 +947,8 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * <p/>
    * Performance note:<br>
    * Since the matrix may contain large amounts of data, the matrix can be passed as an
-   * <code>new AtomicReference&lt;Object&gt;</code>(Object[][]) so that the further processing can set the content of the
-   * holder to null while processing.
+   * <code>new AtomicReference&lt;Object&gt;</code>(Object[][]) so that the further processing can set the content of
+   * the holder to null while processing.
    *
    * @param dataMatrixOrReference
    *          Can be an Object[][] or an <code>AtomicReference&lt;Object&gt;</code>(that holds Object[][])
@@ -943,8 +964,8 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * <p/>
    * Performance note:<br>
    * Since the matrix may contain large amounts of data, the matrix can be passed as an
-   * <code>new AtomicReference&lt;Object&gt;</code>(Object[][]) so that the further processing can set the content of the
-   * holder to null while processing.
+   * <code>new AtomicReference&lt;Object&gt;</code>(Object[][]) so that the further processing can set the content of
+   * the holder to null while processing.
    *
    * @param dataMatrixOrReference
    * @param rowStatus
@@ -998,4 +1019,35 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * @throws ProcessingException
    */
   List<ITableRow> createRowsByArray(Object dataArray, int rowStatus) throws ProcessingException;
+
+  /**
+   * @since 5.1.0
+   */
+  List<ITableControl> getTableControls();
+
+  /**
+   * @since 5.1.0
+   */
+  <T extends ITableControl> T getTableControl(Class<T> controlClass);
+
+  /**
+   * @since 5.1.0
+   */
+  boolean isTableStatusVisible();
+
+  /**
+   * @since 5.1.0
+   */
+  void setTableStatusVisible(boolean visible);
+
+  /**
+   * @since 5.1.0
+   */
+  String getMenuBarPosition();
+
+  /**
+   * @since 5.1.0
+   */
+  void setMenuBarPosition(String position);
+
 }

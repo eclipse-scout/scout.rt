@@ -110,6 +110,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
     this(true);
   }
 
+  // FIXME CGU: (table) remove PropertyChangeListener in AbstractColumn constructor -> generates a lot of unnecessary events
   public AbstractColumn(boolean callInitializer) {
     m_headerCell = new HeaderCell();
     m_objectExtensions = new ObjectExtensions<AbstractColumn<VALUE>, IColumnExtension<VALUE, ? extends AbstractColumn<VALUE>>>(this);
