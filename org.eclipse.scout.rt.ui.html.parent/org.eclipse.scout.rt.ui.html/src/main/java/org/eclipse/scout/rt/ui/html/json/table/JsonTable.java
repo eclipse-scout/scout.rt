@@ -280,7 +280,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   }
 
   protected void handleUiResetColumns(JsonEvent event, JsonResponse res) {
-    //FIXME CGU Code from ResetColumnsMenu, move to ITableUiFacade
+    //FIXME AWE/CGU Code from ResetColumnsMenu, move to ITableUiFacade
     try {
       getModel().setTableChanging(true);
       getModel().resetDisplayableColumns();
