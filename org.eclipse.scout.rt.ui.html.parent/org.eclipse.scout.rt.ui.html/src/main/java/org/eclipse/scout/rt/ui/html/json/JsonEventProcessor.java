@@ -72,7 +72,7 @@ public class JsonEventProcessor {
   }
 
   /**
-   * Wait until all sync jobs have been finished or only waitFor jobs are left.
+   * Wait until all sync jobs have been finished or only waitFor sync jobs are left.
    */
   protected void waitUntilJobsHaveFinished() {
     while (true) {
@@ -88,16 +88,20 @@ public class JsonEventProcessor {
         if (job.isWaitFor()) {
           numWaitFor++;
         }
-        else if (job.isSync()) {
+        if (job.isSync()) {
           numSync++;
         }
       }
       LOG.trace("Jobs: " + numJobs + ", sync (running): " + numSync + ", waitFor (blocking): " + numWaitFor);
       if (numSync > 0) {
         LOG.trace("There are still running sync jobs - must wait until they have finished");
+        if (numSync == numWaitFor) {
+          LOG.trace("Only 'waitFor' sync jobs left in the queue - it's allowed to finish the request");
+          return;
+        }
       }
-      else if (numJobs == numWaitFor) {
-        LOG.trace("Only 'waitFor' jobs left in the queue - it's allowed to finish the request");
+      else {
+        LOG.trace("Every sync job has finished -> finishing request.");
         return;
       }
 
