@@ -64,33 +64,6 @@ public final class PageWithTableChains {
     }
   }
 
-  public static class PageWithTableLoadTableDataChain<T extends ITable> extends AbstractPageWithTableChain<T> {
-
-    public PageWithTableLoadTableDataChain(List<? extends IPageWithTableExtension<? extends ITable, ? extends AbstractPageWithTable<? extends ITable>>> extensions) {
-      super(extensions);
-    }
-
-    /**
-     * @deprecated will be removed with the N release. see {@link AbstractPageWithTable#execLoadTableData(SearchFilter)}
-     *             for more information.
-     */
-    @Deprecated
-    public Object[][] execLoadTableData(final SearchFilter filter) throws ProcessingException {
-      MethodInvocation<Object[][]> methodInvocation = new MethodInvocation<Object[][]>() {
-        @SuppressWarnings("deprecation")
-        @Override
-        protected void callMethod(IPageWithTableExtension<? extends ITable, ? extends AbstractPageWithTable<? extends ITable>> next) throws ProcessingException {
-          setReturnValue(next.execLoadTableData(PageWithTableLoadTableDataChain.this, filter));
-        }
-      };
-      callChain(methodInvocation, filter);
-      if (methodInvocation.getException() instanceof ProcessingException) {
-        throw (ProcessingException) methodInvocation.getException();
-      }
-      return methodInvocation.getReturnValue();
-    }
-  }
-
   public static class PageWithTablePopulateTableChain<T extends ITable> extends AbstractPageWithTableChain<T> {
 
     public PageWithTablePopulateTableChain(List<? extends IPageWithTableExtension<? extends ITable, ? extends AbstractPageWithTable<? extends ITable>>> extensions) {
