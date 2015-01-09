@@ -8,25 +8,13 @@ scout.TableFooter.CONTAINER_SIZE = 340;
 
 scout.TableFooter.prototype._render = function($parent) {
   var that = this,
-    i, control, $group, filter;
+    i, control, filter;
 
   this.$container = $parent.appendDiv('table-footer');
   this._$controlContainer = this.$container.appendDiv('control-container').hide();
   this._addResize(this._$controlContainer);
   this.$controlContent = this._$controlContainer.appendDiv('control-content');
-
-  this._controlGroups = {};
-
-  for (i = 0; i < this._table.controls.length; i++) {
-    control = this._table.controls[i];
-    $group = this._controlGroups[control.group];
-    if (!$group) {
-      $group = this._addGroup(control.group);
-    }
-    control.tableFooter = this;
-    control.table = this._table;
-    control.render($group);
-  }
+  this.$controlGroup = this.$container.appendDiv('control-group');
 
   this._$filterField = scout.fields.new$TextField()
     .addClass('control-filter')
@@ -41,7 +29,6 @@ scout.TableFooter.prototype._render = function($parent) {
   // info section
   this._$controlInfo = this.$container
     .appendDiv('control-info');
-
   this._$infoLoad = this._$controlInfo
     .appendDiv('table-info-load')
     .on('click', '', this._onClickInfoLoad.bind(this));
@@ -116,6 +103,18 @@ scout.TableFooter.prototype.setTableStatusVisible = function(visible) {
   this._updateInfoFilterVisibility();
 };
 
+scout.TableFooter.prototype._updateTableControls = function(tableControls) {
+  if (tableControls) {
+    tableControls.forEach(function(control) {
+      control.tableFooter = this;
+      control.table = this._table;
+      control.render(this.$controlGroup);
+    }.bind(this));
+  } else {
+    this.$controlGroup.empty();
+  }
+};
+
 scout.TableFooter.prototype._updateInfoLoad = function() {
   var numRows = this._table.rows.length;
   var info = this._table.session.text('NumRowsLoaded', this._computeCountInfo(numRows));
@@ -154,12 +153,7 @@ scout.TableFooter.prototype._updateInfoSelection = function(numSelectedRows, all
     all = numRows === numSelectedRows;
   }
 
-  if (all) {
-    selectAllText = this._table.session.text('SelectNone');
-  } else {
-    selectAllText = this._table.session.text('SelectAll');
-  }
-
+  selectAllText = this._table.session.text(all ? 'SelectNone' : 'SelectAll');
   info = this._table.session.text('NumRowsSelected', this._computeCountInfo(numSelectedRows));
   info += '<br><span class="info-button">' + selectAllText + '</span>';
   if (this._$infoSelection.html() === info) {
@@ -213,12 +207,6 @@ scout.TableFooter.prototype._computeCountInfo = function(n) {
   } else {
     return this._table.session.text('TableRowCount', n);
   }
-};
-
-scout.TableFooter.prototype._addGroup = function(title) {
-  var $group = $.makeDiv('control-group').attr('data-title', title).appendTo(this.$container);
-  this._controlGroups[title] = $group;
-  return $group;
 };
 
 /* open, close and resize of the container */
@@ -315,7 +303,7 @@ scout.TableFooter.prototype._addResize = function($parent) {
 };
 
 scout.TableFooter.prototype.onResize = function() {
-  this._table.controls.forEach(function(control) {
+  this._table.tableControls.forEach(function(control) {
     control.onResize();
   });
 };

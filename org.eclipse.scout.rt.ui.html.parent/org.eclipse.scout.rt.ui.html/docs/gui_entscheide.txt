@@ -93,3 +93,36 @@ AWE, CGU 10.11.2014
   Feld im Form fokussiert werden bzw. dort wo der Fokus zuletzt war. Das gleiche gilt auch für
   Dialoge die auf- und wieder zugehen. Nach dem Schliessen muss der Fokus wieder da sein, wo
   er vorher war.
+
+
+Suche / Table-Controls
+AWE, CGU 09.01.2015
+
+- Das Konzept vom UGM Prototyp für Suche, Erweiterte Suche und Kategorien passt nicht gut zu der
+  heutigen Funktionsweise der Suche in CRM.
+  Ist-Zustand: Es gibt _ein_ SearchForm, auf diesem hat es bis zu 4 Tabs:
+    * Einfache Suche
+    * Detaillierte Suche
+    * Erweiterte Suche
+    * Kategorien
+
+  Wenn der Anwender auf einem dieser Tabs etwas eingibt, schränkt dies die Suche weiter ein (Bsp:
+  Anwender wählt eine Kategorie und tippt noch etwas ins Feld der einfachen Suche). Klickt der
+  Anwender auf "Zurücksetzen" wird der Inhalt auf allen Tabs zurückgesetzt. Ist in einem Tab
+  etwas ausgefüllt, wird dies durch den "orangen Punkt" dargestellt.
+
+  Würden wir neu den Inhalt der 4 Tabs auf 3 Forms verteilen, hätten wir folgende Probleme:
+  - Es gibt (model-mässig) kein Verbindung zwischen den Forms, d.h. es wäre schwierig die Suche
+    einzuschränken, wenn die Eingaben über mehrere Forms verteilt sind
+  - Man müsste auf dem Table-Control Widget anzeigen können, dass etwas ausgefüllt ist.
+  - Zurücksetzen wäre ebenfalls schwierig
+  - Auch wenn die technischen Probleme lösbar sind (=Mehraufwand), für den Anwender ist das
+    Konzept trotzdem schwerer verständlich als das heutige.
+
+  Ideen:
+  1. So lassen wie heute: es gibt ein SearchForm mit 4 Tabs. Gibt auch am wenigsten Aufwand
+     bei der Migration
+  2. Tabs auf mehrere Forms aufteilen, Forms müssen miteinander synchronisiert werden,
+     TableControl Widget braucht ein "oranger Punkt" Feature
+  3. Model-mässig ein Form behalten, aber einzelne Tabs als Table-Control rendern
+     TableControl Widget braucht ein "oranger Punkt" Feature

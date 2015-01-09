@@ -36,6 +36,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractDateColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IDateColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ICustomColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
@@ -171,6 +172,12 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
         return getModel().getMenuBarPosition();
       }
     });
+    putJsonProperty(new JsonAdapterProperty<ITable>(ITable.PROP_TABLE_CONTROLS, model, getJsonSession()) {
+      @Override
+      protected List<ITableControl> modelValue() {
+        return getModel().getTableControls();
+      }
+    });
   }
 
   @Override
@@ -182,7 +189,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   protected void attachChildAdapters() {
     super.attachChildAdapters();
     attachAdapter(getModel().getContextMenu());
-    attachAdapters(getModel().getTableControls());
+//    attachAdapters(getModel().getTableControls());
   }
 
   @Override
@@ -219,7 +226,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     if (jsonContextMenu != null) {
       JsonObjectUtility.putProperty(json, PROP_MENUS, JsonObjectUtility.adapterIdsToJson(jsonContextMenu.getJsonChildActions()));
     }
-    putAdapterIdsProperty(json, "controls", getModel().getTableControls()); // FIXME AWE: rename to "tableControls" in JS/Java
+//    putAdapterIdsProperty(json, "controls", getModel().getTableControls()); // FIXME AWE: rename to "tableControls" in JS/Java
     putProperty(json, PROP_SELECTED_ROW_IDS, rowIdsToJson(getModel().getSelectedRows()));
     return json;
   }

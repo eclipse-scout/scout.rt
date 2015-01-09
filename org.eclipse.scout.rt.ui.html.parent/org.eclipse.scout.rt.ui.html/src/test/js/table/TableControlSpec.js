@@ -70,7 +70,7 @@ describe("TableControl", function() {
 
       it("opens and closes the control container", function() {
         var action = createAction(createModel());
-        table.controls = [action];
+        table.tableControls = [action];
         table.render(session.$entryPoint);
         var $controlContainer = table.footer._$controlContainer;
 
@@ -92,7 +92,7 @@ describe("TableControl", function() {
       it("removes the content of the previous selected control without closing the container", function() {
         var action = createAction(createModel());
         var action2 = createAction(createModel());
-        table.controls = [action, action2];
+        table.tableControls = [action, action2];
 
         action.selected = true;
         table.render(session.$entryPoint);
@@ -127,7 +127,7 @@ describe("TableControl", function() {
 
       it("attaches hover listener, but only once", function() {
         var action = createAction(createModel());
-        table.controls = [action];
+        table.tableControls = [action];
         table.render(session.$entryPoint);
 
         spyOn(action.$container, 'hover').and.callThrough();
@@ -147,7 +147,7 @@ describe("TableControl", function() {
 
       it("attaches hover listener, even when re rendering", function() {
         var action = createAction(createModel());
-        table.controls = [action];
+        table.tableControls = [action];
         table.addChild(action);
         table.render(session.$entryPoint);
 
@@ -184,7 +184,7 @@ describe("TableControl", function() {
     it("removes the content of the previous selected control without closing the container", function() {
       var action = createAction(createModel());
       var action2 = createAction(createModel());
-      table.controls = [action, action2];
+      table.tableControls = [action, action2];
 
       action.selected = true;
       table.render(session.$entryPoint);
@@ -206,7 +206,7 @@ describe("TableControl", function() {
     it("sends selected events (for current and previous selection)", function() {
       var action = createAction(createModel());
       var action2 = createAction(createModel());
-      table.controls = [action, action2];
+      table.tableControls = [action, action2];
 
       action.selected = true;
       table.render(session.$entryPoint);

@@ -10,11 +10,11 @@ scout.Table = function() {
   this.selectionHandler;
   this.keystrokeAdapter;
   this.columns = [];
-  this.controls = [];
+  this.tableControls = [];
   this.menus = [];
   this.rows = [];
   this.staticMenus = [];
-  this._addAdapterProperties(['controls', 'menus']);
+  this._addAdapterProperties(['tableControls', 'menus']);
   this.events = new scout.EventSupport();
   this.selectionHandler = new scout.TableSelectionHandler(this);
   this._filterMap = {};
@@ -79,10 +79,20 @@ scout.Table.prototype._render = function($parent) {
 
 scout.Table.prototype._renderProperties = function() {
   this._renderEnabled(this.enabled);
+  this._renderTableControls();
+};
+
+// FIXME AWE: refactor all _render* methods --> remove parameter, always use this.*
+// reason: the property on this is already synced at this point, the argument may contain
+// just a data-model value (and not a adpater).
+scout.Table.prototype._renderTableControls = function(dummy) {
+  if (this.footer) {
+    this.footer._updateTableControls(this.tableControls);
+  }
 };
 
 scout.Table.prototype._isFooterVisible = function() {
-  return this.tableStatusVisible || this.controls.length > 0;
+  return this.tableStatusVisible || this.tableControls.length > 0;
 };
 
 scout.Table.prototype._createHeader = function() {
