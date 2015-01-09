@@ -148,7 +148,7 @@ public abstract class AbstractFormToolButton<FORM extends IForm> extends Abstrac
   }
 
   protected final void interceptInitForm() throws ProcessingException {
-    List<? extends IFormToolButtonExtension<? extends IForm, ? extends AbstractFormToolButton<? extends IForm>>> extensions = getAllExtensions();
+    List<? extends IFormToolButtonExtension<FORM, ? extends AbstractFormToolButton<? extends IForm>>> extensions = getAllExtensions();
     FormToolButtonInitFormChain<FORM> chain = new FormToolButtonInitFormChain<FORM>(extensions);
     chain.execInitForm();
   }

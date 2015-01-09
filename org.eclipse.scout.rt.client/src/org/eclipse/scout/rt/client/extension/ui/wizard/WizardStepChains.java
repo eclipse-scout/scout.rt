@@ -21,7 +21,7 @@ public final class WizardStepChains {
 
   public static class WizardStepDeactivateChain<FORM extends IForm> extends AbstractWizardStepChain<FORM> {
 
-    public WizardStepDeactivateChain(List<? extends IWizardStepExtension<? extends IForm, ? extends AbstractWizardStep<? extends IForm>>> extensions) {
+    public WizardStepDeactivateChain(List<? extends IWizardStepExtension<FORM, ? extends AbstractWizardStep<? extends IForm>>> extensions) {
       super(extensions);
     }
 
@@ -42,7 +42,7 @@ public final class WizardStepChains {
 
   public static class WizardStepDisposeChain<FORM extends IForm> extends AbstractWizardStepChain<FORM> {
 
-    public WizardStepDisposeChain(List<? extends IWizardStepExtension<? extends IForm, ? extends AbstractWizardStep<? extends IForm>>> extensions) {
+    public WizardStepDisposeChain(List<? extends IWizardStepExtension<FORM, ? extends AbstractWizardStep<? extends IForm>>> extensions) {
       super(extensions);
     }
 
@@ -63,7 +63,7 @@ public final class WizardStepChains {
 
   public static class WizardStepFormClosedChain<FORM extends IForm> extends AbstractWizardStepChain<FORM> {
 
-    public WizardStepFormClosedChain(List<? extends IWizardStepExtension<? extends IForm, ? extends AbstractWizardStep<? extends IForm>>> extensions) {
+    public WizardStepFormClosedChain(List<? extends IWizardStepExtension<FORM, ? extends AbstractWizardStep<? extends IForm>>> extensions) {
       super(extensions);
     }
 
@@ -84,7 +84,7 @@ public final class WizardStepChains {
 
   public static class WizardStepActivateChain<FORM extends IForm> extends AbstractWizardStepChain<FORM> {
 
-    public WizardStepActivateChain(List<? extends IWizardStepExtension<? extends IForm, ? extends AbstractWizardStep<? extends IForm>>> extensions) {
+    public WizardStepActivateChain(List<? extends IWizardStepExtension<FORM, ? extends AbstractWizardStep<? extends IForm>>> extensions) {
       super(extensions);
     }
 
@@ -105,7 +105,7 @@ public final class WizardStepChains {
 
   public static class WizardStepFormDiscardedChain<FORM extends IForm> extends AbstractWizardStepChain<FORM> {
 
-    public WizardStepFormDiscardedChain(List<? extends IWizardStepExtension<? extends IForm, ? extends AbstractWizardStep<? extends IForm>>> extensions) {
+    public WizardStepFormDiscardedChain(List<? extends IWizardStepExtension<FORM, ? extends AbstractWizardStep<? extends IForm>>> extensions) {
       super(extensions);
     }
 
@@ -126,7 +126,7 @@ public final class WizardStepChains {
 
   public static class WizardStepFormStoredChain<FORM extends IForm> extends AbstractWizardStepChain<FORM> {
 
-    public WizardStepFormStoredChain(List<? extends IWizardStepExtension<? extends IForm, ? extends AbstractWizardStep<? extends IForm>>> extensions) {
+    public WizardStepFormStoredChain(List<? extends IWizardStepExtension<FORM, ? extends AbstractWizardStep<? extends IForm>>> extensions) {
       super(extensions);
     }
 

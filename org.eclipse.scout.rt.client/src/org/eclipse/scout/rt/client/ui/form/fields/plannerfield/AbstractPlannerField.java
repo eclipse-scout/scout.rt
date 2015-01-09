@@ -453,25 +453,25 @@ public abstract class AbstractPlannerField<T extends ITable, P extends IActivity
   }
 
   protected final void interceptPopulateActivities(List<RI> resourceIds, List<ITableRow> resourceRows) throws ProcessingException {
-    List<? extends IPlannerFieldExtension<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI, ? extends AbstractPlannerField<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI>>> extensions = getAllExtensions();
+    List<? extends IPlannerFieldExtension<T, P, RI, AI, ? extends AbstractPlannerField<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI>>> extensions = getAllExtensions();
     PlannerFieldPopulateActivitiesChain<T, P, RI, AI> chain = new PlannerFieldPopulateActivitiesChain<T, P, RI, AI>(extensions);
     chain.execPopulateActivities(resourceIds, resourceRows);
   }
 
   protected final Object[][] interceptLoadResourceTableData() throws ProcessingException {
-    List<? extends IPlannerFieldExtension<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI, ? extends AbstractPlannerField<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI>>> extensions = getAllExtensions();
+    List<? extends IPlannerFieldExtension<T, P, RI, AI, ? extends AbstractPlannerField<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI>>> extensions = getAllExtensions();
     PlannerFieldLoadResourceTableDataChain<T, P, RI, AI> chain = new PlannerFieldLoadResourceTableDataChain<T, P, RI, AI>(extensions);
     return chain.execLoadResourceTableData();
   }
 
   protected final void interceptPopulateResourceTable() throws ProcessingException {
-    List<? extends IPlannerFieldExtension<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI, ? extends AbstractPlannerField<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI>>> extensions = getAllExtensions();
+    List<? extends IPlannerFieldExtension<T, P, RI, AI, ? extends AbstractPlannerField<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI>>> extensions = getAllExtensions();
     PlannerFieldPopulateResourceTableChain<T, P, RI, AI> chain = new PlannerFieldPopulateResourceTableChain<T, P, RI, AI>(extensions);
     chain.execPopulateResourceTable();
   }
 
   protected final Object[][] interceptLoadActivityMapData(List<? extends RI> resourceIds, List<? extends ITableRow> resourceRows) throws ProcessingException {
-    List<? extends IPlannerFieldExtension<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI, ? extends AbstractPlannerField<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI>>> extensions = getAllExtensions();
+    List<? extends IPlannerFieldExtension<T, P, RI, AI, ? extends AbstractPlannerField<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI>>> extensions = getAllExtensions();
     PlannerFieldLoadActivityMapDataChain<T, P, RI, AI> chain = new PlannerFieldLoadActivityMapDataChain<T, P, RI, AI>(extensions);
     return chain.execLoadActivityMapData(resourceIds, resourceRows);
   }

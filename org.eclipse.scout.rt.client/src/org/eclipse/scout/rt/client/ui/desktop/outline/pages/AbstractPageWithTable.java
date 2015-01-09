@@ -1048,31 +1048,31 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   }
 
   protected final void interceptLoadData(SearchFilter filter) throws ProcessingException {
-    List<? extends IPageWithTableExtension<? extends ITable, ? extends AbstractPageWithTable<? extends ITable>>> extensions = getAllExtensions();
+    List<? extends IPageWithTableExtension<T, ? extends AbstractPageWithTable<? extends ITable>>> extensions = getAllExtensions();
     PageWithTableLoadDataChain<T> chain = new PageWithTableLoadDataChain<T>(extensions);
     chain.execLoadData(filter);
   }
 
   protected final IPage<?> interceptCreateChildPage(ITableRow row) throws ProcessingException {
-    List<? extends IPageWithTableExtension<? extends ITable, ? extends AbstractPageWithTable<? extends ITable>>> extensions = getAllExtensions();
+    List<? extends IPageWithTableExtension<T, ? extends AbstractPageWithTable<? extends ITable>>> extensions = getAllExtensions();
     PageWithTableCreateChildPageChain<T> chain = new PageWithTableCreateChildPageChain<T>(extensions);
     return chain.execCreateChildPage(row);
   }
 
   protected final void interceptPopulateTable() throws ProcessingException {
-    List<? extends IPageWithTableExtension<? extends ITable, ? extends AbstractPageWithTable<? extends ITable>>> extensions = getAllExtensions();
+    List<? extends IPageWithTableExtension<T, ? extends AbstractPageWithTable<? extends ITable>>> extensions = getAllExtensions();
     PageWithTablePopulateTableChain<T> chain = new PageWithTablePopulateTableChain<T>(extensions);
     chain.execPopulateTable();
   }
 
   protected final IPage<?> interceptCreateVirtualChildPage(ITableRow row) throws ProcessingException {
-    List<? extends IPageWithTableExtension<? extends ITable, ? extends AbstractPageWithTable<? extends ITable>>> extensions = getAllExtensions();
+    List<? extends IPageWithTableExtension<T, ? extends AbstractPageWithTable<? extends ITable>>> extensions = getAllExtensions();
     PageWithTableCreateVirtualChildPageChain<T> chain = new PageWithTableCreateVirtualChildPageChain<T>(extensions);
     return chain.execCreateVirtualChildPage(row);
   }
 
   protected final void interceptInitSearchForm() throws ProcessingException {
-    List<? extends IPageWithTableExtension<? extends ITable, ? extends AbstractPageWithTable<? extends ITable>>> extensions = getAllExtensions();
+    List<? extends IPageWithTableExtension<T, ? extends AbstractPageWithTable<? extends ITable>>> extensions = getAllExtensions();
     PageWithTableInitSearchFormChain<T> chain = new PageWithTableInitSearchFormChain<T>(extensions);
     chain.execInitSearchForm();
   }

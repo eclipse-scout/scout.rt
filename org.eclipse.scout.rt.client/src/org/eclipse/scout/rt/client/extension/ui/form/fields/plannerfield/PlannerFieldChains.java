@@ -23,7 +23,7 @@ public final class PlannerFieldChains {
 
   public static class PlannerFieldPopulateActivitiesChain<T extends ITable, P extends IActivityMap<RI, AI>, RI, AI> extends AbstractPlannerFieldChain<T, P, RI, AI> {
 
-    public PlannerFieldPopulateActivitiesChain(List<? extends IPlannerFieldExtension<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI, ? extends AbstractPlannerField<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI>>> extensions) {
+    public PlannerFieldPopulateActivitiesChain(List<? extends IPlannerFieldExtension<T, P, RI, AI, ? extends AbstractPlannerField<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI>>> extensions) {
       super(extensions);
     }
 
@@ -44,7 +44,7 @@ public final class PlannerFieldChains {
 
   public static class PlannerFieldLoadResourceTableDataChain<T extends ITable, P extends IActivityMap<RI, AI>, RI, AI> extends AbstractPlannerFieldChain<T, P, RI, AI> {
 
-    public PlannerFieldLoadResourceTableDataChain(List<? extends IPlannerFieldExtension<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI, ? extends AbstractPlannerField<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI>>> extensions) {
+    public PlannerFieldLoadResourceTableDataChain(List<? extends IPlannerFieldExtension<T, P, RI, AI, ? extends AbstractPlannerField<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI>>> extensions) {
       super(extensions);
     }
 
@@ -65,7 +65,7 @@ public final class PlannerFieldChains {
 
   public static class PlannerFieldPopulateResourceTableChain<T extends ITable, P extends IActivityMap<RI, AI>, RI, AI> extends AbstractPlannerFieldChain<T, P, RI, AI> {
 
-    public PlannerFieldPopulateResourceTableChain(List<? extends IPlannerFieldExtension<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI, ? extends AbstractPlannerField<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI>>> extensions) {
+    public PlannerFieldPopulateResourceTableChain(List<? extends IPlannerFieldExtension<T, P, RI, AI, ? extends AbstractPlannerField<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI>>> extensions) {
       super(extensions);
     }
 
@@ -86,7 +86,7 @@ public final class PlannerFieldChains {
 
   public static class PlannerFieldLoadActivityMapDataChain<T extends ITable, P extends IActivityMap<RI, AI>, RI, AI> extends AbstractPlannerFieldChain<T, P, RI, AI> {
 
-    public PlannerFieldLoadActivityMapDataChain(List<? extends IPlannerFieldExtension<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI, ? extends AbstractPlannerField<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI>>> extensions) {
+    public PlannerFieldLoadActivityMapDataChain(List<? extends IPlannerFieldExtension<T, P, RI, AI, ? extends AbstractPlannerField<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI>>> extensions) {
       super(extensions);
     }
 
