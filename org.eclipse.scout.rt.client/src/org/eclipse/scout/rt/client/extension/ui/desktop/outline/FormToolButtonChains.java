@@ -21,7 +21,7 @@ public final class FormToolButtonChains {
 
   public static class FormToolButtonStartFormChain<FORM extends IForm> extends AbstractFormToolButtonChain<FORM> {
 
-    public FormToolButtonStartFormChain(List<? extends IFormToolButtonExtension<? extends IForm, ? extends AbstractFormToolButton<? extends IForm>>> extensions) {
+    public FormToolButtonStartFormChain(List<? extends IFormToolButtonExtension<FORM, ? extends AbstractFormToolButton<? extends IForm>>> extensions) {
       super(extensions);
     }
 

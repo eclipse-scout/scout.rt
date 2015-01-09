@@ -21,8 +21,6 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.extension.ui.wizard.IWizardStepExtension;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardStepChains.WizardStepActivateChain;
 import org.eclipse.scout.rt.client.extension.ui.wizard.WizardStepChains.WizardStepDeactivateChain;
@@ -41,8 +39,6 @@ import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHa
 import org.eclipse.scout.service.SERVICES;
 
 public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPropertyObserver implements IWizardStep<FORM>, IPropertyObserver, IExtensibleObject {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractWizardStep.class);
-
   private IWizard m_wizard;
   private FORM m_form;
   private FormListener m_formListener;
@@ -494,37 +490,37 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
   }
 
   protected final void interceptDeactivate(int stepKind) throws ProcessingException {
-    List<? extends IWizardStepExtension<? extends IForm, ? extends AbstractWizardStep<? extends IForm>>> extensions = getAllExtensions();
+    List<? extends IWizardStepExtension<FORM, ? extends AbstractWizardStep<? extends IForm>>> extensions = getAllExtensions();
     WizardStepDeactivateChain<FORM> chain = new WizardStepDeactivateChain<FORM>(extensions);
     chain.execDeactivate(stepKind);
   }
 
   protected final void interceptDispose() throws ProcessingException {
-    List<? extends IWizardStepExtension<? extends IForm, ? extends AbstractWizardStep<? extends IForm>>> extensions = getAllExtensions();
+    List<? extends IWizardStepExtension<FORM, ? extends AbstractWizardStep<? extends IForm>>> extensions = getAllExtensions();
     WizardStepDisposeChain<FORM> chain = new WizardStepDisposeChain<FORM>(extensions);
     chain.execDispose();
   }
 
   protected final void interceptFormClosed(boolean activation) throws ProcessingException {
-    List<? extends IWizardStepExtension<? extends IForm, ? extends AbstractWizardStep<? extends IForm>>> extensions = getAllExtensions();
+    List<? extends IWizardStepExtension<FORM, ? extends AbstractWizardStep<? extends IForm>>> extensions = getAllExtensions();
     WizardStepFormClosedChain<FORM> chain = new WizardStepFormClosedChain<FORM>(extensions);
     chain.execFormClosed(activation);
   }
 
   protected final void interceptActivate(int stepKind) throws ProcessingException {
-    List<? extends IWizardStepExtension<? extends IForm, ? extends AbstractWizardStep<? extends IForm>>> extensions = getAllExtensions();
+    List<? extends IWizardStepExtension<FORM, ? extends AbstractWizardStep<? extends IForm>>> extensions = getAllExtensions();
     WizardStepActivateChain<FORM> chain = new WizardStepActivateChain<FORM>(extensions);
     chain.execActivate(stepKind);
   }
 
   protected final void interceptFormDiscarded(boolean activation) throws ProcessingException {
-    List<? extends IWizardStepExtension<? extends IForm, ? extends AbstractWizardStep<? extends IForm>>> extensions = getAllExtensions();
+    List<? extends IWizardStepExtension<FORM, ? extends AbstractWizardStep<? extends IForm>>> extensions = getAllExtensions();
     WizardStepFormDiscardedChain<FORM> chain = new WizardStepFormDiscardedChain<FORM>(extensions);
     chain.execFormDiscarded(activation);
   }
 
   protected final void interceptFormStored(boolean activation) throws ProcessingException {
-    List<? extends IWizardStepExtension<? extends IForm, ? extends AbstractWizardStep<? extends IForm>>> extensions = getAllExtensions();
+    List<? extends IWizardStepExtension<FORM, ? extends AbstractWizardStep<? extends IForm>>> extensions = getAllExtensions();
     WizardStepFormStoredChain<FORM> chain = new WizardStepFormStoredChain<FORM>(extensions);
     chain.execFormStored(activation);
   }

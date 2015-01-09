@@ -776,37 +776,37 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
   }
 
   protected final void interceptReloadTableData() throws ProcessingException {
-    List<? extends ITableFieldExtension<? extends ITable, ? extends AbstractTableField<? extends ITable>>> extensions = getAllExtensions();
+    List<? extends ITableFieldExtension<T, ? extends AbstractTableField<? extends ITable>>> extensions = getAllExtensions();
     TableFieldReloadTableDataChain<T> chain = new TableFieldReloadTableDataChain<T>(extensions);
     chain.execReloadTableData();
   }
 
   protected final void interceptUpdateTableStatus() {
-    List<? extends ITableFieldExtension<? extends ITable, ? extends AbstractTableField<? extends ITable>>> extensions = getAllExtensions();
+    List<? extends ITableFieldExtension<T, ? extends AbstractTableField<? extends ITable>>> extensions = getAllExtensions();
     TableFieldUpdateTableStatusChain<T> chain = new TableFieldUpdateTableStatusChain<T>(extensions);
     chain.execUpdateTableStatus();
   }
 
   protected final void interceptSaveInsertedRow(ITableRow row) throws ProcessingException {
-    List<? extends ITableFieldExtension<? extends ITable, ? extends AbstractTableField<? extends ITable>>> extensions = getAllExtensions();
+    List<? extends ITableFieldExtension<T, ? extends AbstractTableField<? extends ITable>>> extensions = getAllExtensions();
     TableFieldSaveInsertedRowChain<T> chain = new TableFieldSaveInsertedRowChain<T>(extensions);
     chain.execSaveInsertedRow(row);
   }
 
   protected final void interceptSaveUpdatedRow(ITableRow row) throws ProcessingException {
-    List<? extends ITableFieldExtension<? extends ITable, ? extends AbstractTableField<? extends ITable>>> extensions = getAllExtensions();
+    List<? extends ITableFieldExtension<T, ? extends AbstractTableField<? extends ITable>>> extensions = getAllExtensions();
     TableFieldSaveUpdatedRowChain<T> chain = new TableFieldSaveUpdatedRowChain<T>(extensions);
     chain.execSaveUpdatedRow(row);
   }
 
   protected final void interceptSaveDeletedRow(ITableRow row) throws ProcessingException {
-    List<? extends ITableFieldExtension<? extends ITable, ? extends AbstractTableField<? extends ITable>>> extensions = getAllExtensions();
+    List<? extends ITableFieldExtension<T, ? extends AbstractTableField<? extends ITable>>> extensions = getAllExtensions();
     TableFieldSaveDeletedRowChain<T> chain = new TableFieldSaveDeletedRowChain<T>(extensions);
     chain.execSaveDeletedRow(row);
   }
 
   protected final void interceptSave(List<? extends ITableRow> insertedRows, List<? extends ITableRow> updatedRows, List<? extends ITableRow> deletedRows) {
-    List<? extends ITableFieldExtension<? extends ITable, ? extends AbstractTableField<? extends ITable>>> extensions = getAllExtensions();
+    List<? extends ITableFieldExtension<T, ? extends AbstractTableField<? extends ITable>>> extensions = getAllExtensions();
     TableFieldSaveChain<T> chain = new TableFieldSaveChain<T>(extensions);
     chain.execSave(insertedRows, updatedRows, deletedRows);
   }
