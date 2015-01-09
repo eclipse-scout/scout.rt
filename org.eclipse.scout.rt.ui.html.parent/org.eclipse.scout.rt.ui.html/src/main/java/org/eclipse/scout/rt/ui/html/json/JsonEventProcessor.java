@@ -10,16 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.ClientSyncJob;
-import org.eclipse.scout.rt.client.servicetunnel.http.internal.ClientNotificationPollingJob;
 
 /**
  * Processes JSON events from the UI in a Scout client job and waits until all sync jobs have been finished.
@@ -76,36 +72,23 @@ public class JsonEventProcessor {
    */
   protected void waitUntilJobsHaveFinished() {
     while (true) {
-      List<ClientJob> jobList = getJobsForClientSession();
-      int numJobs = jobList.size();
-      if (numJobs == 0) {
-        LOG.trace("Job list is empty. Finish request");
-        return;
-      }
-      int numSync = 0;
       int numWaitFor = 0;
-      for (ClientJob job : jobList) {
-        if (job.isWaitFor()) {
-          numWaitFor++;
-        }
-        if (job.isSync()) {
+      int numSync = 0;
+      for (Job job : Job.getJobManager().find(ClientJob.class)) {
+        ClientJob clientJob = (ClientJob) job;
+        if (isSyncJobFromCurrentSession(clientJob)) {
           numSync++;
+          if (clientJob.isWaitFor()) {
+            numWaitFor++;
+          }
         }
       }
-      LOG.trace("Jobs: " + numJobs + ", sync (running): " + numSync + ", waitFor (blocking): " + numWaitFor);
-      if (numSync > 0) {
-        LOG.trace("There are still running sync jobs - must wait until they have finished");
-        if (numSync == numWaitFor) {
-          LOG.trace("Only 'waitFor' sync jobs left in the queue - it's allowed to finish the request");
-          return;
-        }
-      }
-      else {
-        LOG.trace("Every sync job has finished -> finishing request.");
+      if (numSync == numWaitFor) { // also covers numSync == 0
+        LOG.trace("Job list is empty or only 'waitFor' sync jobs left in the queue - finish the request");
         return;
       }
-
       // TODO AWE: (jobs) prüfen, ob das mit IJobChangeListener schöner geht (sleep/notify)
+      LOG.trace("There are still running sync jobs - must wait until they have finished. Jobs (sync)=" + numSync + " jobs (waitFor)=" + numWaitFor);
       LOG.trace("Going to sleep before checking the job queue again...");
       try {
         Thread.sleep(SLEEP_TIME);
@@ -116,26 +99,9 @@ public class JsonEventProcessor {
     }
   }
 
-  /**
-   * Returns only jobs which belong to the current client session.
-   * But we must ignore the polling job for client notifications.
-   */
-  protected List<ClientJob> getJobsForClientSession() {
-    List<ClientJob> jobList = new ArrayList<>();
-    for (Job job : Job.getJobManager().find(ClientJob.class)) {
-      conditionalAddJob(jobList, (ClientJob) job);
-    }
-    return jobList;
-  }
-
-  private void conditionalAddJob(List<ClientJob> jobList, ClientJob job) {
-    if (job instanceof ClientNotificationPollingJob) {
-      return;
-    }
-    if (job.getClientSession() != m_jsonSession.getClientSession()) {
-      return;
-    }
-    jobList.add(job);
+  private boolean isSyncJobFromCurrentSession(ClientJob job) {
+    return job.isSync() &&
+        job.getClientSession() == m_jsonSession.getClientSession();
   }
 
 }
