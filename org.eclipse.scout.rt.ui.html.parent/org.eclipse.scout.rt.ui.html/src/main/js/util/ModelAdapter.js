@@ -373,6 +373,19 @@ scout.ModelAdapter.prototype._goOnline = function() {
   // NOP may be implemented by subclasses
 };
 
+/**
+ * Creates an id based on a class name. E.g.: smart-field -> SmartField-13
+ */
+scout.ModelAdapter.prototype._generateId = function(cssClass) {
+  var i,
+    idParts = cssClass.split('-');
+
+  for (i = 0; i < idParts.length; i++) {
+    idParts[i] = idParts[i].charAt(0).toUpperCase() + idParts[i].substring(1);
+  }
+  return idParts.join('') + '-' + this.id;
+};
+
 /* --- STATIC HELPERS ------------------------------------------------------------- */
 
 /**

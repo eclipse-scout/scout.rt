@@ -317,16 +317,3 @@ scout.FormField.prototype.addContainer = function($parent, typeName, layout) {
   htmlComp.setLayout(layout || new scout.FormFieldLayout(this));
   return htmlComp;
 };
-
-/**
- * Creates an id based on a class name. E.g.: smart-field -> SmartField-13
- */
-scout.FormField.prototype._generateId = function(cssClass) {
-  var i,
-    idParts = cssClass.split('-');
-
-  for (i = 0; i < idParts.length; i++) {
-    idParts[i] = idParts[i].charAt(0).toUpperCase() + idParts[i].substring(1);
-  }
-  return idParts.join('') + '-' + this.id;
-};

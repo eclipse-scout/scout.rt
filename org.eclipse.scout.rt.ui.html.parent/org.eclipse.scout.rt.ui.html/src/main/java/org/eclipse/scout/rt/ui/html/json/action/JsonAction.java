@@ -19,7 +19,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 
-public class JsonAction<T extends IAction> extends AbstractJsonPropertyObserver<T> {
+public abstract class JsonAction<T extends IAction> extends AbstractJsonPropertyObserver<T> {
   public static final String EVENT_DO_ACTION = "doAction";
 
   public JsonAction(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {

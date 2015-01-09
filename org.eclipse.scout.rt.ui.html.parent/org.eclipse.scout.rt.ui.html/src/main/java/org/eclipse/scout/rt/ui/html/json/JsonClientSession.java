@@ -57,7 +57,7 @@ public class JsonClientSession<T extends IClientSession> extends AbstractJsonAda
     return null;
   }
 
-  void startUp() {
+  protected void startUp() {
     // same as in attachModel. Necessary for locale workaround. Find better solution in scout model
     if (m_localeListener == null) {
       m_localeListener = new P_LocaleListener();
@@ -172,7 +172,7 @@ public class JsonClientSession<T extends IClientSession> extends AbstractJsonAda
     return json;
   }
 
-  private static DecimalFormat getDefaultDecimalFormat(Locale locale) {
+  protected static DecimalFormat getDefaultDecimalFormat(Locale locale) {
     NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);
     if (numberFormat instanceof DecimalFormat) {
       return (DecimalFormat) numberFormat;
@@ -181,7 +181,7 @@ public class JsonClientSession<T extends IClientSession> extends AbstractJsonAda
     return new DecimalFormat();
   }
 
-  private static SimpleDateFormat getDefaultSimpleDateFormat(Locale locale) {
+  protected static SimpleDateFormat getDefaultSimpleDateFormat(Locale locale) {
     DateFormat format = DateFormat.getDateInstance(DateFormat.DEFAULT, locale);
     if (format instanceof SimpleDateFormat) {
       return (SimpleDateFormat) format;

@@ -23,8 +23,6 @@ scout.TableLayout.prototype.layout = function($container) {
   }
   height += $data.cssMarginTop() + $data.cssMarginBottom();
   $data.css('height', 'calc(100% - '+ height + 'px)');
-
-  this.valid2 = true;
 };
 
 scout.TableLayout.prototype.preferredLayoutSize = function($comp) {
