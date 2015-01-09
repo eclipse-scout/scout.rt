@@ -663,7 +663,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   /**
-   * @deprecated use {@link #interceptRowClick(ITableRow, MouseButton)} instead. Will be removed with V5.0.
+   * @deprecated use {@link #execRowClick(ITableRow, MouseButton)} instead. Will be removed with V5.0.
    */
   @Deprecated
   protected void execRowClick(ITableRow row) throws ProcessingException {
