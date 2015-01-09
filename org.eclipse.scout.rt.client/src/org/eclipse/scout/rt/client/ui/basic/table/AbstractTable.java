@@ -766,7 +766,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   /**
-   * @deprecated Will be removed in Scout 6.0. Use {@link #addHeaderMenusInternal(OrderedCollection)} instead.
+   * @deprecated Will be removed in Scout 6.0. Use {@link #addHeaderMenus(OrderedCollection)} instead.
    */
   @Deprecated
   protected void execCreateHeaderMenus(OrderedCollection<IMenu> menuList) {
@@ -781,7 +781,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
    *          a live collection of the menus. Add additional header menus to this list optionally add some separators at
    *          the end.
    */
-  protected void addHeaderMenusInternal(OrderedCollection<IMenu> menus) {
+  protected void addHeaderMenus(OrderedCollection<IMenu> menus) {
     menus.addLast(new TableOrganizeMenu(this));
     // FIXME AWE/CGU: (table) clean-up table organize menus
     // - remove AddCustomColumnMenu
@@ -878,7 +878,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
 
     execCreateHeaderMenus(menus);
-    addHeaderMenusInternal(menus);
+    addHeaderMenus(menus);
     //set container on menus
     for (IMenu menu : menus) {
       menu.setContainerInternal(this);
