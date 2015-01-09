@@ -25,6 +25,14 @@ public class DynamicNls {
 
   private ArrayList<NlsResourceBundleCache> m_resourceBundles;
 
+  /**
+   * Specifies if this class should use {@link ResourceBundle#containsKey(String)} to check if a key is available in a
+   * specific bundle. This operation may be slow some 1.6 IBM JREs.<br>
+   * Setting the system property "scout.resourceBundle.checkContainsKey" to <code>false</code> is recommended for
+   * affected environments.
+   */
+  public static final boolean doContainsCheckInResourceBundle = doContainsCheckInResourceBundle();
+
   public DynamicNls() {
     m_resourceBundles = new ArrayList<NlsResourceBundleCache>();
   }
@@ -75,15 +83,34 @@ public class DynamicNls {
     return NlsUtility.bindText(text, messageArguments);
   }
 
+  private static boolean doContainsCheckInResourceBundle() {
+    boolean checkContainsKey = true;
+    String checkContainsKeyVal = System.getProperty("scout.resourceBundle.checkContainsKey");
+    if (checkContainsKeyVal != null) {
+      checkContainsKeyVal = checkContainsKeyVal.trim().toLowerCase();
+      checkContainsKey = !"false".equals(checkContainsKeyVal);
+    }
+    return checkContainsKey;
+  }
+
   private String getTextInternal(Locale locale, String key) {
     if (locale == null) {
       locale = getDefaultLocale();
     }
+
     for (NlsResourceBundleCache c : m_resourceBundles) {
       try {
         ResourceBundle resourceBundle = c.getResourceBundle(locale);
-        if (resourceBundle != null && resourceBundle.containsKey(key)) {
-          return resourceBundle.getString(key);
+        if (resourceBundle != null) {
+          if (doContainsCheckInResourceBundle) {
+            if (resourceBundle.containsKey(key)) {
+              return resourceBundle.getString(key);
+            }
+          }
+          else {
+            // legacy: do not call containsKey (may be slower on e.g. old IBM JREs)
+            return resourceBundle.getString(key);
+          }
         }
       }
       catch (MissingResourceException e) {
