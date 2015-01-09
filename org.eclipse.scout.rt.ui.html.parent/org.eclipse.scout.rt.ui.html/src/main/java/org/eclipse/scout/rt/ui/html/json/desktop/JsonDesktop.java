@@ -23,11 +23,12 @@ import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigation;
 import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigationService;
 import org.eclipse.scout.rt.client.ui.action.IAction;
+import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
+import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.IUrlTarget;
-import org.eclipse.scout.rt.client.ui.desktop.outline.IFormToolButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTableForm;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTreeForm;
@@ -94,14 +95,9 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
   protected List<IAction> filterModelActions() {
     List<IAction> result = new ArrayList<>();
     for (IAction a : getModel().getActions()) {
-      if (a instanceof IFormToolButton) {
-        //FIXME Remove after widget tool buttons may be displayed well
-        if (a.getClass().getName().startsWith("com.bsiag.crm")
-            || hasClassName(a, "UserProfileMenu")
-            || hasClassName(a, "PhoneFormToolButton")
-            || hasClassName(a, "ProcessAssistantFormToolButton")) {
-          result.add(a);
-        }
+      //FIXME CGU remove demo as soon as demo tool forms are correct
+      if (!(a instanceof IKeyStroke) && !(a instanceof IViewButton) && !a.getClass().getName().startsWith("org.eclipsescout.demo")) {
+        result.add(a);
       }
     }
     // Noch ein Hack: in AbstractDesktop#getActions() ist hart-kodiert, dass menus vor toolButtons
@@ -109,10 +105,6 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
     // auch gelöst sein, wenn alles nur noch IActions sind.
     Collections.reverse(result);
     return result;
-  }
-
-  private boolean hasClassName(IAction a, String className) {
-    return a.getClass().getName().contains(className);
   }
 
   @Override
