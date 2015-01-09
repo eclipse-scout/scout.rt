@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.ui.html.json;
 
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigation;
-import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
@@ -49,7 +48,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.tagcloudfield.ITagCloudField;
 import org.eclipse.scout.rt.client.ui.form.fields.treefield.ITreeField;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.shared.data.model.IDataModel;
-import org.eclipse.scout.rt.ui.html.json.action.JsonAction;
 import org.eclipse.scout.rt.ui.html.json.action.keystroke.JsonKeyStroke;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonBreadCrumbNavigation;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonDesktop;
@@ -207,9 +205,6 @@ public class JsonAdapterFactory implements IJsonAdapterFactory {
     }
     else if (model instanceof ITableControl) {
       return new JsonTableControl((ITableControl) model, session, id, parent);
-    }
-    else if (model instanceof IAction) {
-      return new JsonAction((IAction) model, session, id, parent);
     }
     else if (model instanceof IClientSession) {
       return new JsonClientSession((IClientSession) model, session, id, parent);
