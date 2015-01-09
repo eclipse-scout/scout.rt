@@ -146,21 +146,28 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
   String PROP_TABLE_CUSTOMIZER = "tableCustomizer";
 
   /**
+   * List&lt;ITableControl&gt;
+   *
+   * @since 5.1.0
+   */
+  String PROP_TABLE_CONTROLS = "tableControls";
+
+  /**
    * Boolean
    *
-   * @since 5.0.0
+   * @since 5.1.0
    */
   String PROP_TABLE_STATUS_VISIBLE = "tableStatusVisible";
 
   /**
    * String
    *
-   * @since 5.0.0
+   * @since 5.1.0
    */
   String PROP_MENU_BAR_POSITION = "menuBarPosition";
 
   /**
-   * @since 5.0.0
+   * @since 5.1.0
    */
   String MENU_BAR_POSITION_TOP = "top";
   String MENU_BAR_POSITION_BOTTOM = "bottom";
@@ -1029,6 +1036,21 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * @since 5.1.0
    */
   <T extends ITableControl> T getTableControl(Class<T> controlClass);
+
+  /**
+   * @since 5.1.0
+   */
+  void addTableControl(ITableControl control);
+
+  /**
+   * @since 5.1.0
+   */
+  void addTableControl(int index, ITableControl control);
+
+  /**
+   * @since 5.1.0
+   */
+  void removeTableControl(ITableControl control);
 
   /**
    * @since 5.1.0

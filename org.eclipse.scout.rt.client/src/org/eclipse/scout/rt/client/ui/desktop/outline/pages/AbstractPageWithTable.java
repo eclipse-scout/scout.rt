@@ -43,6 +43,8 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
+import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
+import org.eclipse.scout.rt.client.ui.basic.table.control.SearchFormTableControl;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.IVirtualTreeNode;
@@ -536,6 +538,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
       m_searchForm.setDisplayViewId(IForm.VIEW_ID_PAGE_SEARCH);
     }
     m_searchForm.setAutoAddRemoveOnDesktop(false);
+    attachSearchTableControl();
     // listen for search action
     m_searchFormListener = new FormListener() {
       @Override
@@ -569,6 +572,12 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     }
   }
 
+  private void attachSearchTableControl() {
+    SearchFormTableControl searchControl = new SearchFormTableControl();
+    searchControl.setSearchForm(m_searchForm);
+    getTable().addTableControl(0, searchControl);
+  }
+
   private void detachFromSearchFormInternal() {
     if (m_searchForm == null) {
       return;
@@ -578,6 +587,12 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
       m_searchForm.removeFormListener(m_searchFormListener);
       m_searchFormListener = null;
     }
+    detachSearchTableControl();
+  }
+
+  private void detachSearchTableControl() {
+    ITableControl searchControl = getTable().getTableControl(SearchFormTableControl.class);
+    getTable().removeTableControl(searchControl);
   }
 
   protected void disposeSearchForm() throws ProcessingException {

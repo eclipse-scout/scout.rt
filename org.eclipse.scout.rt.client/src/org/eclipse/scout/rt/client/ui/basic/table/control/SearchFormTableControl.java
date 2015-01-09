@@ -29,16 +29,19 @@ public class SearchFormTableControl extends AbstractTableControl {
 
   public void setSearchForm(ISearchForm searchForm) {
     if (searchForm == null) {
-      return;
+      setEnabled(false);
     }
-    // FIXME AWE: (table) check if this form listener is really needed. delete if not
-    searchForm.addFormListener(new FormListener() {
-      @Override
-      public void formChanged(FormEvent e) throws ProcessingException {
-        if (e.getType() == FormEvent.TYPE_LOAD_COMPLETE) {
-          setForm(e.getForm());
+    else {
+      // FIXME AWE: (table) check if this form listener is really needed. delete if not
+      setEnabled(true);
+      searchForm.addFormListener(new FormListener() {
+        @Override
+        public void formChanged(FormEvent e) throws ProcessingException {
+          if (e.getType() == FormEvent.TYPE_LOAD_COMPLETE) {
+            setForm(e.getForm());
+          }
         }
-      }
-    });
+      });
+    }
   }
 }

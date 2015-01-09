@@ -91,6 +91,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IContentAssistColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.control.AbstractTableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
 import org.eclipse.scout.rt.client.ui.basic.table.internal.InternalTableRow;
@@ -188,7 +189,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     m_initLock = new OptimisticLock();
     m_actionRunning = false;
     m_objectExtensions = new ObjectExtensions<AbstractTable, ITableExtension<? extends AbstractTable>>(this);
-    m_tableControls = new ArrayList<ITableControl>();
     //add single observer listener
     addTableListener(new P_TableListener());
     if (callInitializer) {
@@ -799,6 +799,12 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     return ConfigurationUtility.removeReplacedClasses(filtered);
   }
 
+  protected List<Class<? extends ITableControl>> getConfiguredTableControls() {
+    Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
+    List<Class<ITableControl>> filtered = ConfigurationUtility.filterClasses(dca, ITableControl.class);
+    return ConfigurationUtility.removeReplacedClasses(filtered);
+  }
+
   private List<Class<? extends IColumn>> getConfiguredColumns() {
     Class[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     List<Class<IColumn>> foca = ConfigurationUtility.filterClasses(dca, IColumn.class);
@@ -847,8 +853,9 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
     // columns
     createColumnsInternal();
+    // table controls
+    createTableControlsInternal();
     // menus
-
     List<Class<? extends IMenu>> ma = getDeclaredMenus();
     OrderedCollection<IMenu> menus = new OrderedCollection<IMenu>();
     Map<Class<?>, Class<? extends IMenu>> replacements = ConfigurationUtility.getReplacementMapping(ma);
@@ -978,6 +985,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         }
       }
     });
+    //
   }
 
   private void initColumnsInternal() {
@@ -1001,6 +1009,27 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         LOG.error("column " + c, t);
       }
     }
+  }
+
+  // FIXME AWE/MVI: make TableControls extensible, check copy/paste code in this class
+  private void createTableControlsInternal() {
+    List<Class<? extends ITableControl>> tcs = getConfiguredTableControls();
+    OrderedCollection<ITableControl> tableControls = new OrderedCollection<ITableControl>();
+    for (Class<? extends ITableControl> clazz : tcs) {
+      try {
+        ITableControl tableControl = ConfigurationUtility.newInnerInstance(this, clazz);
+        ((AbstractTableControl) tableControl).setTable(this);
+        tableControls.addOrdered(tableControl);
+      }
+      catch (Exception e) {
+        String className = "null";
+        if (clazz != null) {
+          className = clazz.getName();
+        }
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + className + "'.", e));
+      }
+    }
+    m_tableControls = tableControls.getOrderedList();
   }
 
   private void createColumnsInternal() {
@@ -4136,8 +4165,31 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   @Override
   public List<ITableControl> getTableControls() {
-    // FIXME AWE: (table) return copy of collection, read configuration in initConfig (inner classes)
-    return m_tableControls;
+    return CollectionUtility.arrayList(m_tableControls);
+  }
+
+  @Override
+  public void addTableControl(ITableControl control) {
+    m_tableControls.add(control);
+    addTableControlInternal(control);
+  }
+
+  @Override
+  public void addTableControl(int index, ITableControl control) {
+    m_tableControls.add(index, control);
+    addTableControlInternal(control);
+  }
+
+  private void addTableControlInternal(ITableControl control) {
+    ((AbstractTableControl) control).setTable(this);
+    propertySupport.firePropertyChange(PROP_TABLE_CONTROLS, null, getTableControls());
+  }
+
+  @Override
+  public void removeTableControl(ITableControl control) {
+    m_tableControls.remove(control);
+    ((AbstractTableControl) control).setTable(null);
+    propertySupport.firePropertyChange(PROP_TABLE_CONTROLS, null, getTableControls());
   }
 
   @Override
@@ -4163,7 +4215,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     return false;
   }
 
-  //FIXME CGU merge with ITableField table status. Probably move status from field to table to make it work without a field (outline mode)
+  // FIXME CGU: merge with ITableField table status. Probably move status from field to table to make it work without a field (outline mode)
   @Override
   public boolean isTableStatusVisible() {
     return propertySupport.getPropertyBool(PROP_TABLE_STATUS_VISIBLE);
