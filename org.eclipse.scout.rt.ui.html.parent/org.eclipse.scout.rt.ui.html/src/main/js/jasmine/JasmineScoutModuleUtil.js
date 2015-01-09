@@ -2,7 +2,7 @@
  * Loads a module.js, replace all __include tags, and eval() the dynamic code
  */
 function loadDynamicScript(modulePath) {
-  var moduleText = _loadAndResolveScriptContent(modulePath);
+  var moduleText = loadAndResolveScriptContent(modulePath);
 
   // Add sourceURL marker to make the the dynamic code show up in the browser's dev tools debugger
   var matches = /^(.*)\/(.*?)$/.exec(window.location.href);
@@ -14,7 +14,7 @@ function loadDynamicScript(modulePath) {
   eval(moduleText);
 }
 
-function _loadAndResolveScriptContent(path) {
+function loadAndResolveScriptContent(path) {
   var content = '';
   $.ajax({
     async: false,
@@ -34,7 +34,7 @@ function _loadAndResolveScriptContent(path) {
     function(match, p1, p2, offset, string) {
       var includePrefix = path.replace(/^(.*\/)[^\/]*$/, '$1');
       var includePath = includePrefix + (p1 ? p1 : p2);
-      return _insertLineNumbers(includePath, _loadAndResolveScriptContent(includePath));
+      return insertLineNumbers(includePath, loadAndResolveScriptContent(includePath));
     }
   );
 
@@ -42,7 +42,7 @@ function _loadAndResolveScriptContent(path) {
 }
 
 // Copied from ScriptFileBuilder.java
-function _insertLineNumbers(filename, text) {
+function insertLineNumbers(filename, text) {
   if (typeof text === 'undefined' || text === null) {
     return text;
   }
@@ -68,11 +68,11 @@ function _insertLineNumbers(filename, text) {
     }
     buf += (insideBlockComment ? '//' : '*/') + ' ';
     buf += line + '\n';
-    if (_lineIsBeginOfMultilineBlockComment(line, insideBlockComment)) {
+    if (lineIsBeginOfMultilineBlockComment(line, insideBlockComment)) {
       // also if line is endMLBC AND beginMLBC
       insideBlockComment = true;
     }
-    else if (_lineIsEndOfMultilineBlockComment(line, insideBlockComment)) {
+    else if (lineIsEndOfMultilineBlockComment(line, insideBlockComment)) {
       insideBlockComment = false;
     }
     lineNo++;
@@ -81,23 +81,23 @@ function _insertLineNumbers(filename, text) {
 }
 
 // Copied from ScriptFileBuilder.java
-function _lineIsBeginOfMultilineBlockComment(line, insideBlockComment) {
+function lineIsBeginOfMultilineBlockComment(line, insideBlockComment) {
   if (insideBlockComment) {
     return false;
   }
   var a = line.lastIndexOf("/*");
   var b = line.lastIndexOf("*/");
   var c = line.lastIndexOf("/*/");
-  return (a >= 0 && (b < 0 || b < a || (c == a)));
+  return (a >= 0 && (b < 0 || b < a || (c === a)));
 }
 
 // Copied from ScriptFileBuilder.java
-function _lineIsEndOfMultilineBlockComment(line, insideBlockComment) {
+function lineIsEndOfMultilineBlockComment(line, insideBlockComment) {
   if (!insideBlockComment) {
     return false;
   }
   var a = line.indexOf("/*");
   var b = line.indexOf("*/");
   var c = line.lastIndexOf("/*/");
-  return (b >= 0 && (a < 0 || a < b || (c == a)));
+  return (b >= 0 && (a < 0 || a < b || (c === a)));
 }
