@@ -96,7 +96,7 @@ scout.Desktop.prototype._render = function($parent) {
 
   // Switch off browser's default context menu for the entire scout desktop (except input fields)
   $parent.bind("contextmenu", function(event) {
-    if (event.target.nodeName !== "INPUT" && event.target.nodeName !== "TEXTAREA") {
+    if (event.target.nodeName !== "INPUT" && event.target.nodeName !== "TEXTAREA" && !event.target.isContentEditable) {
       event.preventDefault();
     }
   });

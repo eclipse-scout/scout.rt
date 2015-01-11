@@ -28,29 +28,45 @@
 .rich-text-field {
   position: relative;
   width: 100%;
+  border: 1px solid @border-color;
+  border-radius: @border-radius;
+  overflow: hidden;
+
+
+  & .scrollbar {
+    right: 124px;
+    z-index: 10;
+  }
+
+  &.focused{
+    .focus-border;
+  }
 
   & .field {
     counter-reset: hr;
-    height: 100%;
-    width: 100%;
+    margin-right: 124px;
+    //height: auto !important;
+    height: 100% !important;
     line-height: 20px;
     white-space: pre-wrap;
-    border: 1px solid @border-color;
-    padding: 5px 130px 5px @text-field-padding;
-    border-radius: @border-radius;
+    padding: 5px 5px 5px @text-field-padding;
     color: @text-color;
     background-color: @control-background-color;
+    border: 0 !important;
+    -moz-user-select: text;
+    overflow: hidden;
 
     &:focus {
-      .focus-border;
+      border: 0 !important;
+      outline: 0 !important;
     }
 
     & * {
       line-height: 20px;
+      -moz-user-select: text;
     }
 
-    &::selection, & *::selection
-    {
+    &::selection, & *::selection{
       .selection();
     }
 
@@ -102,7 +118,7 @@
 
   & .rich-text-bar {
     position: absolute;
-    overflow: hidden;
+    top: 0;
     background-color: @panel-background-color;
     border: 1px solid transparent;
     border-left: 1px solid @desktop-border-color;
