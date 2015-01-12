@@ -206,6 +206,15 @@ public final class JsonObjectUtility {
     }
   }
 
+  public static JSONArray newJSONArray(Object array) {
+    try {
+      return new JSONArray(array);
+    }
+    catch (JSONException e) {
+      throw toRuntimeException(e);
+    }
+  }
+
   public static JSONArray adapterIdsToJson(Collection<IJsonAdapter<?>> adapters) {
     JSONArray array = new JSONArray();
     for (IJsonAdapter<?> adapter : adapters) {
@@ -403,7 +412,6 @@ public final class JsonObjectUtility {
   /**
    * @return null, {@link JSONObject}, {@link JSONArray} or a basic type (int, long, boolean, byte[], String) depending
    *         on the value of <code>type</code>
-   * @throws JSONException
    */
   private static Object getTyped(JSONObject jsonObject, String propertyName, Class<?> type) {
     Object jval = jsonObject.opt(propertyName);
@@ -441,7 +449,6 @@ public final class JsonObjectUtility {
   /**
    * @return null, {@link JSONObject}, {@link JSONArray} or a basic type (int, long, boolean, byte[], String) depending
    *         on the value of <code>type</code>
-   * @throws JSONException
    */
   private static Object getTyped(JSONArray jsonArray, int index, Class<?> type) {
     Object jval = jsonArray.opt(index);
@@ -475,5 +482,4 @@ public final class JsonObjectUtility {
     }
     return getJSONObject(jsonArray, index);
   }
-
 }

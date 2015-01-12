@@ -237,8 +237,24 @@ scout.defaultObjectFactories = [{
   create: function() {
     return new scout.TabItem();
   }
-}, {  objectType: 'SequenceBox',
+}, {
+  objectType: 'SequenceBox',
   create: function() {
     return new scout.SequenceBox();
+  }
+}, {
+  objectType: 'Calendar',
+  create: function() {
+    return new scout.Calendar();
+  }
+}, {
+  objectType: 'CalendarField',
+  create: function() {
+    return new scout.CalendarField();
+  }
+}, { //FIXME CGU: only needed temporarily, remove when switched to FormToolButton2
+  objectType: 'Null',
+  create: function() {
+    return new scout.NullAdapter();
   }
 }];

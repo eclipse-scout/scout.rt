@@ -1,5 +1,16 @@
 describe("ObjectFactory", function() {
 
+  beforeEach(function() {
+    // Needed because some model adapters make JSON calls during initialization (e.g. Calendar.js)
+    jasmine.Ajax.install();
+    jasmine.clock().install();
+  });
+
+  afterEach(function() {
+    jasmine.Ajax.uninstall();
+    jasmine.clock().uninstall();
+  });
+
   /**
    * This function is used to create a special-model when a model-adapter requires one.
    * Normally a generic model with id and objectType is sufficient, but some adapters require a more complex
