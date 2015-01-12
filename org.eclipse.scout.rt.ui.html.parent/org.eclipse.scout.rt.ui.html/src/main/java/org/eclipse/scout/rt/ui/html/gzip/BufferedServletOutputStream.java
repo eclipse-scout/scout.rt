@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import javax.servlet.ServletOutputStream;
-import javax.servlet.WriteListener;
 
 public class BufferedServletOutputStream extends ServletOutputStream {
 
@@ -29,13 +28,19 @@ public class BufferedServletOutputStream extends ServletOutputStream {
     return m_buf.toByteArray();
   }
 
+  /**
+   * since servlet api 3.1
+   */
   @Override
   public boolean isReady() {
     return true;
   }
 
+  /**
+   * since servlet api 3.1
+   */
   @Override
-  public void setWriteListener(WriteListener writeListener) {
+  public void setWriteListener(javax.servlet.WriteListener writeListener) {
   }
 
   @Override

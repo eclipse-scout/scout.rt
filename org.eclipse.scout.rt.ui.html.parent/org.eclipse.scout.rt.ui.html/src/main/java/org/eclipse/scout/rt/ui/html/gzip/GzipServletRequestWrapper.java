@@ -64,6 +64,9 @@ public class GzipServletRequestWrapper extends HttpServletRequestWrapper {
     return new BufferedReader(new InputStreamReader(ensureBufferedStream()));
   }
 
+  /**
+   * since servlet api 3.1
+   */
   @Override
   public long getContentLengthLong() {
     return getContentLength();

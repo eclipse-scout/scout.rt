@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.ui.html.gzip;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
 
 public class BufferedServletInputStream extends ServletInputStream {
@@ -35,17 +34,26 @@ public class BufferedServletInputStream extends ServletInputStream {
     return m_buf.read();
   }
 
+  /**
+   * since servlet api 3.1
+   */
   @Override
   public boolean isFinished() {
     return false;
   }
 
+  /**
+   * since servlet api 3.1
+   */
   @Override
   public boolean isReady() {
     return true;
   }
 
+  /**
+   * since servlet api 3.1
+   */
   @Override
-  public void setReadListener(ReadListener readListener) {
+  public void setReadListener(javax.servlet.ReadListener readListener) {
   }
 }
