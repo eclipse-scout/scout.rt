@@ -97,7 +97,6 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   private Set<ITreeNode> m_nodeDecorationBuffer = new HashSet<ITreeNode>();
   private Set<ITreeNode> m_selectedNodes = new HashSet<ITreeNode>();
   private final List<ITreeNodeFilter> m_nodeFilters;
-  private final int m_uiProcessorCount = 0;
   private List<IKeyStroke> m_baseKeyStrokes;
   private IEventHistory<TreeEvent> m_eventHistory;
   // only do one action at a time
@@ -419,7 +418,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   protected void initConfig() {
     m_enabledGranted = true;
     m_eventHistory = createEventHistory();
-    m_uiFacade = new P_UIFacade();
+    m_uiFacade = createUIFacade();
     m_contributionHolder = new ContributionComposite(this);
     setTitle(getConfiguredTitle());
     setIconId(getConfiguredIconId());
@@ -2518,6 +2517,10 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     return null;
   }
 
+  protected ITreeUIFacade createUIFacade() {
+    return new P_UIFacade();
+  }
+
   @Override
   public ITreeUIFacade getUIFacade() {
     return m_uiFacade;
@@ -2560,7 +2563,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   /*
    * UI Notifications
    */
-  private class P_UIFacade implements ITreeUIFacade {
+  protected class P_UIFacade implements ITreeUIFacade {
     private int m_uiProcessorCount = 0;
 
     protected void pushUIProcessor() {
