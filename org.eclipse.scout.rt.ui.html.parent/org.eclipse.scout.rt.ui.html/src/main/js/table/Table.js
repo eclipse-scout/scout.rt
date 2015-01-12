@@ -62,13 +62,6 @@ scout.Table.prototype._render = function($parent) {
   this.menubar.menuTypesForRight = ['Table.Header'];
   this.menubar.staticMenus = this.staticMenus;
 
-  if (this.headerVisible) {
-    this.header = this._createHeader();
-  }
-  if (this._isFooterVisible()) {
-    this.footer = this._createFooter();
-  }
-
   this._totalWidth = 0;
   for (i = 0; i < this.columns.length; i++) {
     this._totalWidth += this.columns[i].width;
@@ -79,16 +72,25 @@ scout.Table.prototype._render = function($parent) {
 
 scout.Table.prototype._renderProperties = function() {
   this._renderEnabled(this.enabled);
-  this._renderTableControls();
+  this._renderTableHeader();
+  this._renderTableFooter();
+};
+
+scout.Table.prototype._remove = function() {
+  scout.Table.parent.prototype._remove.call(this);
+  this.header = null;
+  this.footer = null;
 };
 
 // FIXME AWE: refactor all _render* methods --> remove parameter, always use this.*
 // reason: the property on this is already synced at this point, the argument may contain
 // just a data-model value (and not a adpater).
 scout.Table.prototype._renderTableControls = function(dummy) {
-  if (this.footer) {
-    this.footer._updateTableControls(this.tableControls);
-  }
+ this._renderTableFooter();
+};
+
+scout.Table.prototype._renderTableStatusVisible = function(dummy) {
+ this._renderTableFooter();
 };
 
 scout.Table.prototype._isFooterVisible = function() {
@@ -1188,7 +1190,11 @@ scout.Table.prototype._triggerFilterResetted = function() {
   this.events.trigger(type);
 };
 
-scout.Table.prototype._renderHeaderVisible = function(headerVisible) {
+scout.Table.prototype._renderHeaderVisible = function() {
+  this._renderTableHeader();
+};
+
+scout.Table.prototype._renderTableHeader = function() {
   if (this.headerVisible && !this.header) {
     this.header = this._createHeader();
   } else if (!this.headerVisible && this.header) {
@@ -1200,13 +1206,13 @@ scout.Table.prototype._renderHeaderVisible = function(headerVisible) {
   }
 };
 
-scout.Table.prototype._renderTableStatusVisible = function(tableStatusVisible) {
+scout.Table.prototype._renderTableFooter = function() {
   var footerVisible = this._isFooterVisible();
   if (footerVisible) {
     if (!this.footer) {
       this.footer = this._createFooter();
     } else {
-      this.footer.setTableStatusVisible(tableStatusVisible);
+      this.footer.update();
     }
   } else if (!footerVisible && this.footer) {
     this.footer.remove();
@@ -1284,7 +1290,7 @@ scout.Table.prototype._onColumnOrderChanged = function(columnIds) {
     }
 
     if (currentPosition !== i) {
-      //Update model
+      // Update model
       scout.arrays.remove(this.columns, column);
       scout.arrays.insert(this.columns, column, i);
     }

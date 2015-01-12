@@ -39,6 +39,7 @@ scout.TableFooter.prototype._render = function($parent) {
     .appendDiv('table-info-selection')
     .on('click', '', this._onClickInfoSelection.bind(this));
 
+  this._updateTableControls();
   this._updateInfoLoad();
   this._updateInfoLoadVisibility();
   this._updateInfoFilter();
@@ -97,15 +98,17 @@ scout.TableFooter.prototype._onFilterInput = function(event) {
   event.stopPropagation();
 };
 
-scout.TableFooter.prototype.setTableStatusVisible = function(visible) {
+scout.TableFooter.prototype.update = function() {
+  this._updateTableControls();
   this._updateInfoLoadVisibility();
   this._updateInfoSelectionVisibility();
   this._updateInfoFilterVisibility();
 };
 
-scout.TableFooter.prototype._updateTableControls = function(tableControls) {
-  if (tableControls) {
-    tableControls.forEach(function(control) {
+scout.TableFooter.prototype._updateTableControls = function() {
+  var controls = this._table.tableControls;
+  if (controls) {
+  controls.forEach(function(control) {
       control.tableFooter = this;
       control.table = this._table;
       control.render(this.$controlGroup);
