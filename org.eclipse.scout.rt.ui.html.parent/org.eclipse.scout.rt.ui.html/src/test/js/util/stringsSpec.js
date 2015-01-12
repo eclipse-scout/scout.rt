@@ -63,7 +63,7 @@ describe("scout.strings", function() {
 
   describe("padZeroLeft", function() {
 
-    it("can bad strings with 0", function() {
+    it("can pad strings with 0", function() {
       expect(scout.strings.padZeroLeft()).toBe(undefined);
       expect(scout.strings.padZeroLeft('')).toBe('');
       expect(scout.strings.padZeroLeft('X')).toBe('X');

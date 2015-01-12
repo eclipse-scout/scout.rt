@@ -25,6 +25,9 @@ public class JsonGridData implements IJsonMapper {
   // die != default wert sind?
   @Override
   public JSONObject toJson() {
+    if (m_gridData == null) {
+      return null;
+    }
     JSONObject json = new JSONObject();
     JsonObjectUtility.putProperty(json, "fillHorizontal", m_gridData.fillHorizontal);
     JsonObjectUtility.putProperty(json, "fillVertical", m_gridData.fillVertical);

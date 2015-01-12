@@ -124,11 +124,12 @@ scout.DateField.prototype._onKeyDown = function(event) {
   if (event.which === scout.keys.UP || event.which === scout.keys.DOWN) {
     diff = (event.which === scout.keys.UP ? -1 : 1);
 
-    if (event.ctrlKey) {
+    var modifierCount = (event.ctrlKey ? 1 : 0) + (event.shiftKey ? 1 : 0) + (event.altKey ? 1 : 0) + (event.metaKey ? 1 : 0);
+    if (modifierCount === 1 && event.ctrlKey) {
       years = diff;
-    } else if (event.shiftKey) {
+    } else if (modifierCount === 1 && event.shiftKey) {
       months = diff;
-    } else {
+    } else if (modifierCount === 0) {
       days = diff;
     }
 
@@ -212,6 +213,7 @@ scout.DateField.prototype._acceptPrediction = function() {
 };
 
 scout.DateField.prototype._predict = function(text) {
+  // FIXME BSH Date | Check this code
   var now = new Date();
   var currentYear = String(now.getFullYear());
   var dateInfo = this._dateFormat.analyze(text);
@@ -220,10 +222,10 @@ scout.DateField.prototype._predict = function(text) {
     year = dateInfo.year;
 
   if (!day) {
-    day = now.getDate();
+    day = ('0' + (now.getDate())).slice(-2);
   }
   if (!month) {
-    month = now.getMonth() + 1;
+    month = ('0' + (now.getMonth() + 1)).slice(-2);
   }
 
   if (year) {

@@ -88,7 +88,8 @@ scout.ChartTableControlMatrix.prototype.addAxis = function(axis, axisGroup) {
     if (axisGroup === 0) {
       keyAxis.norm = function(f) {
         if (f) {
-          return new Date(f).getTime();
+          var date = scout.dates.parseJsonDate(f);
+          return date.getTime();
         }
       };
       keyAxis.format = function(n) {
@@ -97,7 +98,8 @@ scout.ChartTableControlMatrix.prototype.addAxis = function(axis, axisGroup) {
     } else if (axisGroup === 1) {
       keyAxis.norm = function(f) {
         if (f) {
-          var b = (new Date(f).getDay() + 7 - locale.dateFormatSymbols.firstDayOfWeek) % 7;
+          var date = scout.dates.parseJsonDate(f);
+          var b = (date.getDay() + 7 - locale.dateFormatSymbols.firstDayOfWeek) % 7;
           return b;
         }
       };
@@ -107,7 +109,8 @@ scout.ChartTableControlMatrix.prototype.addAxis = function(axis, axisGroup) {
     } else if (axisGroup === 2) {
       keyAxis.norm = function(f) {
         if (f) {
-          return new Date(f).getMonth();
+          var date = scout.dates.parseJsonDate(f);
+          return date.getMonth();
         }
       };
       keyAxis.format = function(n) {
@@ -116,7 +119,8 @@ scout.ChartTableControlMatrix.prototype.addAxis = function(axis, axisGroup) {
     } else if (axisGroup === 3) {
       keyAxis.norm = function(f) {
         if (f) {
-          return new Date(f).getFullYear();
+          var date = scout.dates.parseJsonDate(f);
+          return date.getFullYear();
         }
       };
       keyAxis.format = function(n) {
@@ -145,7 +149,6 @@ scout.ChartTableControlMatrix.prototype.addAxis = function(axis, axisGroup) {
     keyAxis.reorder = function() {
       //FIXME implement
     };
-
   }
 
   return keyAxis;

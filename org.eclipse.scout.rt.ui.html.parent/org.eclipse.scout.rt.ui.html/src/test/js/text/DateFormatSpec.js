@@ -19,37 +19,35 @@ describe("DateFormat", function() {
       var pattern = 'dd.MM.yy';
       var dateFormat = new scout.DateFormat(locale, pattern);
 
-      expect(dateFormat.format(new Date("2014-03-21"))).toBe('21.03.14');
+      expect(dateFormat.format(scout.dates.create('2014-03-21'))).toBe('21.03.14');
 
       pattern = 'dd.MM.yyyy';
       dateFormat = new scout.DateFormat(locale, pattern);
-      expect(dateFormat.format(new Date("2014-03-21"))).toBe('21.03.2014');
+      expect(dateFormat.format(scout.dates.create('2014-03-21'))).toBe('21.03.2014');
 
-      //FIXME does not work
-      //      pattern = 'd.M.y';
-      //      dateFormat = new scout.DateFormat(locale, pattern);
-      //      expect(dateFormat.format(new Date("2014-03-21"))).toBe('21.3.2014');
-      //      expect(dateFormat.format(new Date("2004-03-01"))).toBe('1.3.2004');
+      pattern = 'd.M.y';
+      dateFormat = new scout.DateFormat(locale, pattern);
+      expect(dateFormat.format(scout.dates.create('2014-03-21'))).toBe('21.3.14');
+      expect(dateFormat.format(scout.dates.create('2004-03-01'))).toBe('1.3.04');
     });
 
     it("considers E", function() {
       var pattern = 'E, dd.MM.yy';
       var dateFormat = new scout.DateFormat(locale, pattern);
 
-      expect(dateFormat.format(new Date("2014-03-21"))).toBe('Fr, 21.03.14');
+      expect(dateFormat.format(scout.dates.create('2014-03-21'))).toBe('Fr, 21.03.14');
 
-      //FIXME does not work
-      //      pattern = 'EEE, dd.MM.yy';
-      //      dateFormat = new scout.DateFormat(locale, pattern);
-      //      expect(dateFormat.format(new Date("2014-03-21"))).toBe('Fr, 21.03.14');
+      pattern = 'EEE, dd.MM.yy';
+      dateFormat = new scout.DateFormat(locale, pattern);
+      expect(dateFormat.format(scout.dates.create('2014-03-21'))).toBe('Fr, 21.03.14');
 
-      //      pattern = 'EEEE, dd.MM.yy';
-      //      dateFormat = new scout.DateFormat(locale, pattern);
-      //      expect(dateFormat.format(new Date("2014-03-21"))).toBe('Freitag, 21.03.14');
+      pattern = 'EEEE, dd.MM.yy';
+      dateFormat = new scout.DateFormat(locale, pattern);
+      expect(dateFormat.format(scout.dates.create('2014-03-21'))).toBe('Freitag, 21.03.14');
 
-      //      pattern = 'EEEEE, dd.MM.yy';
-      //      dateFormat = new scout.DateFormat(locale, pattern);
-      //      expect(dateFormat.format(new Date("2014-03-21"))).toBe('Freitag, 21.03.14');
+      pattern = 'EEEE, dd.MM.yy';
+      dateFormat = new scout.DateFormat(locale, pattern);
+      expect(dateFormat.format(scout.dates.create('2014-03-21'))).toBe('Freitag, 21.03.14');
     });
 
   });
@@ -86,6 +84,36 @@ describe("DateFormat", function() {
         expect(result.year).toBe('1999');
       });
     });
+  });
+
+
+  describe("weekInYear", function() {
+
+    it("can calculate week in year", function() {
+      var dateFormat = new scout.DateFormat(locale);
+
+      expect(dateFormat.weekInYear()).toBe(undefined);
+      expect(dateFormat.weekInYear(undefined)).toBe(undefined);
+      expect(dateFormat.weekInYear(null)).toBe(undefined);
+
+      expect(dateFormat.weekInYear(scout.dates.create('2014-12-28'))).toBe(52);
+      expect(dateFormat.weekInYear(scout.dates.create('2014-12-29'))).toBe(1);
+      expect(dateFormat.weekInYear(scout.dates.create('2014-12-30'))).toBe(1);
+      expect(dateFormat.weekInYear(scout.dates.create('2014-12-31'))).toBe(1);
+      expect(dateFormat.weekInYear(scout.dates.create('2015-01-01'))).toBe(1);
+      expect(dateFormat.weekInYear(scout.dates.create('2015-01-02'))).toBe(1);
+      expect(dateFormat.weekInYear(scout.dates.create('2015-01-04'))).toBe(1);
+      expect(dateFormat.weekInYear(scout.dates.create('2015-01-05'))).toBe(2);
+      expect(dateFormat.weekInYear(scout.dates.create('2015-01-06'))).toBe(2);
+      expect(dateFormat.weekInYear(scout.dates.create('2015-01-07'))).toBe(2);
+      expect(dateFormat.weekInYear(scout.dates.create('2015-01-08'))).toBe(2);
+      expect(dateFormat.weekInYear(scout.dates.create('2015-01-09'))).toBe(2);
+      expect(dateFormat.weekInYear(scout.dates.create('2015-01-10'))).toBe(2);
+      expect(dateFormat.weekInYear(scout.dates.create('2015-01-11'))).toBe(2);
+      expect(dateFormat.weekInYear(scout.dates.create('2015-01-12'))).toBe(3);
+      expect(dateFormat.weekInYear(scout.dates.create('2015-01-26'))).toBe(5);
+    });
+
   });
 
 });

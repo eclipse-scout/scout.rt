@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.scout.commons.DateUtility;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.MouseButton;
@@ -42,11 +41,13 @@ import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
+import org.eclipse.scout.rt.ui.html.json.JsonDate;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonException;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
+import org.eclipse.scout.rt.ui.html.json.basic.JsonCell;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.json.menu.IContextMenuOwner;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
@@ -55,6 +56,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T> implements IContextMenuOwner {
+
   public static final String EVENT_ROW_CLICKED = "rowClicked";
   public static final String EVENT_ROW_ACTION = "rowAction";
   public static final String EVENT_ROWS_SELECTED = "rowsSelected";
@@ -66,6 +68,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   public static final String EVENT_COLUMN_RESIZED = "columnResized";
   public static final String EVENT_RELOAD = "reload";
   public static final String EVENT_RESET_COLUMNS = "resetColumns";
+
   public static final String PROP_ROW_IDS = "rowIds";
   public static final String PROP_ROW_ID = "rowId";
   public static final String PROP_COLUMN_ID = "columnId";
@@ -75,9 +78,9 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   public static final String PROP_SELECTED_ROW_IDS = "selectedRowIds";
 
   private TableListener m_tableListener;
-  private Map<String, ITableRow> m_tableRows;
-  private Map<ITableRow, String> m_tableRowIds;
-  private TableEventFilter m_tableEventFilter;
+  private final Map<String, ITableRow> m_tableRows;
+  private final Map<ITableRow, String> m_tableRowIds;
+  private final TableEventFilter m_tableEventFilter;
 
   public JsonTable(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
     super(model, jsonSession, id, parent);
@@ -375,48 +378,21 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   }
 
   protected Object cellToJson(ICell cell, IColumn column) {
-    JSONObject jsonCell = new JSONObject();
-    putProperty(jsonCell, "value", getCellValue(cell, column));
-    putProperty(jsonCell, "iconId", cell.getIconId());
-    putProperty(jsonCell, "tooltipText", cell.getTooltipText());
-    putProperty(jsonCell, "horizontalAlignment", (cell.getHorizontalAlignment() == -1 ? null : Integer.valueOf(cell.getHorizontalAlignment())));
-    putProperty(jsonCell, "foregroundColor", cell.getForegroundColor());
-    putProperty(jsonCell, "backgroundColor", cell.getBackgroundColor());
-    putProperty(jsonCell, "font", (cell.getFont() == null ? null : cell.getFont().toPattern()));
-    putProperty(jsonCell, "editable", (!cell.isEditable() ? null : Boolean.valueOf(cell.isEditable())));
-    // TODO BSH Table | Add property "errorStatus"
-    // TODO BSH Table | Handle "default" values
-    // TODO BSH Table | Add generic "cssStyle" property
-    if (jsonCell.length() == 0) {
-      // To reduce the amount of data, don't generate an object if only the text is returned
-      return cell.getText();
-    }
-    putProperty(jsonCell, "text", cell.getText());
-    return jsonCell;
-  }
-
-  protected Object getCellValue(ICell cell, IColumn column) {
-    Object retVal = null;
+    // Prepare cell value
+    Object cellValue = cell.getValue();
     if (column instanceof IDateColumn) {
       Date date = (Date) cell.getValue();
       if (date != null) {
         IDateColumn dateColumn = (IDateColumn) column;
-        if (dateColumn.isHasDate() && !dateColumn.isHasTime()) {
-          retVal = DateUtility.format(date, "yyyy-MM-dd");
-        }
-        else {
-          retVal = date.getTime();
-        }
+        cellValue = new JsonDate(date).asJsonString(false, dateColumn.isHasDate(), dateColumn.isHasTime());
       }
     }
-    else if (column instanceof INumberColumn) {
-      retVal = cell.getValue();
+    if (cellValue != null && String.valueOf(cellValue).equals(cell.getText())) {
+      // don't send value if it is equal to the cell text (not necessary to send duplicate values)
+      cellValue = null;
     }
-    //not necessary to send duplicate values
-    if (retVal != null && !String.valueOf(retVal).equals(cell.getText())) {
-      return retVal;
-    }
-    return null;
+
+    return new JsonCell(cell, cellValue).toJsonOrString();
   }
 
   protected JSONArray columnsToJson(Collection<IColumn<?>> columns) {

@@ -681,14 +681,13 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
 
     //  filter function
     var filterFunc = function($row) {
-      var textX = $row.children().eq(xAxis.column.index).text(),
-        nX = xAxis.norm(textX);
+      var row = that.table.rows[$row.index()];
+      var nX = xAxis.norm(row.cells[xAxis.column.index].value);
 
       if (oneDim) {
         return (filters.indexOf(nX) > -1);
       } else {
-        var textY = $row.children().eq(yAxis.column.index).text(),
-          nY = yAxis.norm(textY);
+        var nY = xAxis.norm(row.cells[yAxis.column.index].value);
         return (filters.indexOf(JSON.stringify([nX, nY])) > -1);
       }
     };

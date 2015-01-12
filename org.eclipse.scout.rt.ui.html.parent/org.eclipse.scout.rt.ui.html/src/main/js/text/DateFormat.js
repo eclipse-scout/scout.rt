@@ -28,196 +28,196 @@ scout.DateFormat = function(locale, pattern) {
   this.formatFunc = [];
   this.pattern = pattern;
 
-  var patternLibrary = {};
-
-  var that = this;
-  patternLibrary['year'] = [{
-    term: 'yyyy',
-    func: function(date) {
-      return String(date.getFullYear());
+  // Local helper (constructor) functions
+  var DateFormatPatternDefinition = function(term, func) {
+    if (Array.isArray(term)) {
+      this.terms = term;
     }
-  }, {
-    term: 'yy',
-    func: function(date) {
-      return String(date.getFullYear()).slice(2);
+    else {
+      this.terms = [term];
     }
-  }];
-
-  patternLibrary['month'] = [{
-    term: 'MMMM',
-    func: function(date) {
-      return that.symbols.months[date.getMonth()];
-    }
-  }, {
-    term: 'MMM',
-    func: function(date) {
-      return that.symbols.monthsShort[date.getMonth()];
-    }
-  }, {
-    term: 'MM',
-    func: function(date) {
-      return padding(date.getMonth() + 1);
-    }
-  }, {
-    term: 'M',
-    func: function(date) {
-      return date.getMonth() + 1;
-    }
-  }];
-
-  patternLibrary['week in year'] = [{
-    term: 'ww',
-    func: function(date) {
-      return padding(weekInYear(date));
-    }
-  }, {
-    term: 'w',
-    func: function(date) {
-      return weekInYear(date);
-    }
-  }];
-
-  patternLibrary['week in month'] = [{
-    term: 'WW',
-    func: function(date) {
-      return padding(weekInMonth(date));
-    }
-  }, {
-    term: 'W',
-    func: function(date) {
-      return weekInMonth(date);
-    }
-  }];
-
-  patternLibrary['day in month'] = [{
-    term: 'dd',
-    func: function(date) {
-      return padding(date.getDate());
-    }
-  }, {
-    term: 'd',
-    func: function(date) {
-      return date.getDate();
-    }
-  }];
-
-  patternLibrary['weekday'] = [{
-    term: 'EEEE',
-    func: function(date) {
-      return that.symbols.weekdays[date.getDay()];
-    }
-  }, {
-    term: 'E',
-    func: function(date) {
-      return that.symbols.weekdaysShort[date.getDay()];
-    }
-  }];
-
-  patternLibrary['hour: 0 - 23'] = [{
-    term: 'HH',
-    func: function(date) {
-      return padding(date.getHours());
-    }
-  }, {
-    term: 'H',
-    func: function(date) {
-      return date.getHours();
-    }
-  }];
-
-  patternLibrary['hour: 1 - 12'] = [{
-    term: 'KK',
-    func: function(date) {
-      return padding((date.getHours() + 11) % 12 + 1);
-    }
-  }, {
-    term: 'K',
-    func: function(date) {
-      return (date.getHours() + 11) % 12 + 1;
-    }
-  }];
-
-  patternLibrary['am/pm marker'] = [{
-    term: 'a',
-    func: function(date) {
-      return (date.getHours() < 12) ? that.symbols.am : that.symbols.pm;
-    }
-  }];
-
-  patternLibrary['minutes'] = [{
-    term: 'mm',
-    func: function(date) {
-      return padding(date.getMinutes());
-    }
-  }, {
-    term: 'm',
-    func: function(date) {
-      return date.getMinutes();
-    }
-  }];
-
-  patternLibrary['seconds'] = [{
-    term: 'ss',
-    func: function(date) {
-      return padding(date.getSeconds());
-    }
-  }, {
-    term: 's',
-    func: function(date) {
-      return date.getSeconds();
-    }
-  }];
-
-  patternLibrary['milliseconds'] = [{
-    term: 'SSS',
-    func: function(date) {
-      return ('000' + date.getMilliseconds()).slice(-3);
-    }
-  }, {
-    term: 'S',
-    func: function(date) {
-      return date.getMilliseconds();
-    }
-  }];
-
-  var createHandler = function(term, func) {
+    this.func = func;
+  };
+  DateFormatPatternDefinition.prototype.createFormatFunc = function() {
+    var that = this;
     return function(string, date) {
-      return string.replace(term, func(date));
+      // Find the first term that matches (we can assume that one does, because
+      // accept() should have been called earlier), then replace the term by
+      // the value provided by the definition's function.
+      for (var i = 0; i < that.terms.length; i++) {
+        if (string.indexOf(that.terms[i]) !== -1) {
+          return string.replace(that.terms[i], that.func(date));
+        }
+      }
+      return string;
     };
   };
+  DateFormatPatternDefinition.prototype.accept = function(pattern) {
+    if (!pattern) {
+      return false;
+    }
+    // Check if one of the terms matches
+    for (var i = 0; i < this.terms.length; i++) {
+      if (pattern.indexOf(this.terms[i]) !== -1) {
+        return true;
+      }
+    }
+    return false;
+  };
+  var that = this;
 
-  for (var l in patternLibrary) {
-    for (var p = 0; p < patternLibrary[l].length; p += 1) {
-      var test = patternLibrary[l][p];
-      if (pattern.indexOf(test.term) > -1) {
-        this.formatFunc.push(createHandler(test.term, test.func));
+  // Build the pattern library in the following order:
+  // - Sort pattern groups by 'time span', from large (year) to small (milliseconds).
+  // - Inside a pattern group, sort the definitions by 'term length', from long (e.g. MMMM)
+  //   to short (e.g. M)
+  // This order ensures, that the algorithm can pick the best matching pattern function for
+  // each term in the pattern.
+  var patternLibrary = [
+    // Year
+    [
+      new DateFormatPatternDefinition('yyyy', function(date) {
+        return String(date.getFullYear());
+      }),
+      new DateFormatPatternDefinition(['yy', 'y'], function(date) {
+        return String(date.getFullYear()).slice(2);
+      })
+    ],
+    // Month
+    [
+      new DateFormatPatternDefinition('MMMM', function(date) {
+        return that.symbols.months[date.getMonth()];
+      }),
+      new DateFormatPatternDefinition('MMM', function(date) {
+        return that.symbols.monthsShort[date.getMonth()];
+      }),
+      new DateFormatPatternDefinition('MM', function(date) {
+        return scout.strings.padZeroLeft(date.getMonth() + 1, 2);
+      }),
+      new DateFormatPatternDefinition('M', function(date) {
+        return date.getMonth() + 1;
+      })
+    ],
+    // Week in year
+    [
+      new DateFormatPatternDefinition('ww', function(date) {
+        return scout.strings.padZeroLeft(scout.dates.weekInYear(date), 2);
+      }),
+      new DateFormatPatternDefinition('w', function(date) {
+        return scout.dates.weekInYear(date);
+      })
+    ],
+    // Day in month
+    [
+      new DateFormatPatternDefinition('dd', function(date) {
+        return scout.strings.padZeroLeft(date.getDate(), 2);
+      }),
+      new DateFormatPatternDefinition('d', function(date) {
+        return date.getDate();
+      })
+    ],
+    // Weekday
+    [
+      new DateFormatPatternDefinition('EEEE', function(date) {
+        return that.symbols.weekdays[date.getDay()];
+      }),
+      new DateFormatPatternDefinition(['EEE', 'EE', 'E'], function(date) {
+        return that.symbols.weekdaysShort[date.getDay()];
+      })
+    ],
+    // Hour (24h)
+    [
+      new DateFormatPatternDefinition('HH', function(date) {
+        return scout.strings.padZeroLeft(date.getHours(), 2);
+      }),
+      new DateFormatPatternDefinition('H', function(date) {
+        return date.getHours();
+      })
+    ],
+    // Hour (12h)
+    [
+      new DateFormatPatternDefinition('KK', function(date) {
+        return scout.strings.padZeroLeft((date.getHours() + 11) % 12 + 1, 2);
+      }),
+      new DateFormatPatternDefinition('K', function(date) {
+        return (date.getHours() + 11) % 12 + 1;
+      })
+    ],
+
+    // AM/PM marker
+    [
+      new DateFormatPatternDefinition('a', function(date) {
+        return (date.getHours() < 12) ? that.symbols.am : that.symbols.pm;
+      })
+    ],
+    // Minute
+    [
+      new DateFormatPatternDefinition('mm', function(date) {
+        return scout.strings.padZeroLeft(date.getMinutes(), 2);
+      }),
+      new DateFormatPatternDefinition('m', function(date) {
+        return date.getMinutes();
+      })
+    ],
+    // Second
+    [
+      new DateFormatPatternDefinition('ss', function(date) {
+        return scout.strings.padZeroLeft(date.getSeconds(), 2);
+      }),
+      new DateFormatPatternDefinition('s', function(date) {
+        return date.getSeconds();
+      })
+    ],
+    // Millisecond
+    [
+      new DateFormatPatternDefinition('SSS', function(date) {
+        return ('000' + date.getMilliseconds()).slice(-3);
+      }),
+      new DateFormatPatternDefinition('S', function(date) {
+        return date.getMilliseconds();
+      })
+    ]
+  ];
+
+  // Now for each pattern group in the library, pick the best matching definition
+  // and retrieve the formatter function from it.
+  for (var i = 0; i < patternLibrary.length; i++) {
+    var patternGroup = patternLibrary[i];
+    for (var j = 0; j < patternGroup.length; j++) {
+      var patternDefinition = patternGroup[j];
+      if (patternDefinition.accept(pattern)) {
+        this.formatFunc.push(patternDefinition.createFormatFunc());
         break;
       }
     }
   }
+};
 
-  function padding(number) {
-    return (number <= 9 ? '0' + number : number);
+scout.DateFormat.prototype.weekInYear = function(date) {
+  if (!date) {
+    return undefined;
   }
 
-  function weekInYear(date) {
-    var onejan = new Date(date.getFullYear(), 0, 1);
-    return Math.ceil((((date - onejan) / 86400000) + onejan.getDay() + 1) / 7);
-  }
+  // If the given date is not a thursday, set it to the thursday of that week
+   var thursday = new Date(date.valueOf());
+   if (thursday.getDay() !== 4) { // 0 = Sun, 1 = Mon, 2 = Thu, 3 = Wed, 4 = Thu, 5 = Fri, 6 = Sat
+     // Calculate week day index if week would start with this.symbols.firstDayOfWeek instead of Sunday
+     var normalizedWeekday = (date.getDay() + 7 - this.symbols.firstDayOfWeek) % 7;
+     thursday.setDate(thursday.getDate() - normalizedWeekday + 3);
+   }
+   // ISO format: week #1 is the week with January 4th
+   var jan4 = new Date(thursday.getFullYear(), 0, 4);
 
-  function weekInMonth(date) {
-    var onemon = new Date(date.getFullYear(), date.getMonth(), 1);
-    return Math.ceil((((date - onemon) / 86400000) + onemon.getDay() + 1) / 7);
-  }
+   var diffInDays = (thursday - jan4) / 86400000;
+   return 1 + Math.ceil(diffInDays / 7);
 };
 
 scout.DateFormat.prototype.format = function(date) {
   var ret = this.pattern;
-
-  for (var f = this.formatFunc.length - 1; f >= 0; f--) {
-    ret = this.formatFunc[f](ret, date);
+  // Apply all formatter functions for this DateFormat to the pattern to replace the
+  // different terms with the corresponding value from the given date.
+  for (var i = 0; i < this.formatFunc.length; i++) {
+    ret = this.formatFunc[i](ret, date);
   }
-
   return ret;
 };
 
@@ -240,27 +240,27 @@ scout.DateFormat.prototype.analyze = function(text, asNumber) {
   return result;
 };
 
-
-scout.DateFormat.prototype.parse = function (text) {
+scout.DateFormat.prototype.parse = function(text) {
   if (!text) {
     return;
   }
 
   var dateInfo = this.analyze(text, true);
-  if (isNaN(dateInfo.year) || isNaN(dateInfo.year) || isNaN(dateInfo.day)) {
+  if (isNaN(dateInfo.year) || isNaN(dateInfo.month) || isNaN(dateInfo.day)) {
     return null;
   }
 
   var year = dateInfo.year;
+  // TODO BSH Date | Try to move this logic to analyze()
   if (year < 100) {
     year += 2000;
   }
 
-  var date = new Date(0);
-  date.setUTCFullYear(year);
-  date.setUTCMonth(dateInfo.month - 1);
-  date.setUTCDate(dateInfo.day);
+  var date = new Date();
+  date.setFullYear(year);
+  date.setMonth(dateInfo.month - 1);
+  date.setDate(dateInfo.day);
+  date.setHours(0, 0, 0, 0);
 
   return date;
 };
-
