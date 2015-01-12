@@ -25,13 +25,17 @@
 @palette-yellow: #FFFF00;
 
 @palette-bsi-orange: #FE9915;
+@palette-bsi-light-orange: #ffcc8a;
+
 
 @palette-green: #00FF00;
+@palette-light-green: #E1FDE3;
 
 @palette-bsi-dark-green: #004A5C;
 @palette-bsi-dark-green-1: #006983;
 @palette-bsi-green: #0082A1;
 @palette-bsi-light-green: #389DB6;
+@palette-bsi-light-green-0: #80c1d0;
 @palette-bsi-light-green-1: #ECF3F7;
 
 /* ------------------------ */

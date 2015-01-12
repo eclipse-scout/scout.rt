@@ -9,19 +9,19 @@
 }
 
 .graph-node {
-  stroke: #fff;
+  stroke: @palette-white;
   stroke-width: 2px;
   cursor: pointer;
 
   &.center { fill: @highlight-color; }
   &.internal { fill: @palette-light-gray-1; }
   &.person { fill: @palette-gray; }
-  &.department { fill: #80c1d0; }
-  &.company { fill: #ffcc8a; }
+  &.department { fill: @palette-bsi-light-green-0; }
+  &.company { fill: @palette-bsi-light-orange; }
 }
 
 .graph-node-text {
-  fill: #fff;
+  fill: @palette-white;
   text-anchor: middle;
   dominant-baseline: central;
 
@@ -31,12 +31,12 @@
 }
 
 .graph-link {
-  stroke: #bfbfbf;
+  stroke: @palette-light-gray-1;
   stroke-width: 2;
 }
 
 .graph-link-text {
-  fill: #9C9C9C;
+  fill: @palette-gray;
   text-anchor: middle;
   dy: 20px;
 }

@@ -11,7 +11,7 @@
   fill: @chart-color-empty;
   cursor: pointer;
   stroke-width: 100;
-  stroke: #fff;
+  stroke: @palette-white;
 
   &.has-data {
     fill: @chart-color-data;

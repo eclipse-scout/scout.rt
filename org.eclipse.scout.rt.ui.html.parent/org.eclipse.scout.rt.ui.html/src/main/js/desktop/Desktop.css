@@ -202,7 +202,7 @@ Middle rows dont have 2px border so no need to do it for those. */
 
 .offline-message {
   border: 1px solid @palette-bsi-green;
-  background-color: #eee;
+  background-color: @palette-light-gray-3;
   padding: 6px 5px;
   margin: 20px auto;
   z-index: 1;
@@ -212,8 +212,8 @@ Middle rows dont have 2px border so no need to do it for those. */
 }
 
 .offline-message.reconnect-successful {
-  border: 1px solid #00A507;
-  background-color: #E1FDE3;
+  border: 1px solid @palette-green;
+  background-color: @palette-light-green;
 }
 
 .reconnect {

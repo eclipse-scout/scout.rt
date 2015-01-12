@@ -77,11 +77,11 @@
   }
 
   &.date-box-weekend {
-    color:#777777;
+    color: @palette-dark-gray-4;
   }
 
   &.date-box-out-weekend {
-    color: #aaa;
+    color: @palette-light-gray-0;
   }
 
   &.date-box-now {

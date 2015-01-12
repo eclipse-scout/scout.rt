@@ -4,10 +4,10 @@
   height: 14px;
   z-index: 100;
   padding-top: 3px;
-  color: #FFF;
+  color: @palette-white;
   line-height: 11px;
-  text-align:center;
-  background-color:@highlight-color;
+  text-align: center;
+  background-color: @highlight-color;
 }
 
 .key-box.large {
