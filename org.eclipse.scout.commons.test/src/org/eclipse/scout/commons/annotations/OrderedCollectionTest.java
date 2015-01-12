@@ -1154,6 +1154,19 @@ public class OrderedCollectionTest {
     assertEquals(Arrays.asList(m_ordered10, m_ordered30), c.getOrderedList());
   }
 
+  @Test
+  public void testDefaultOrderValue() {
+    double d = IOrdered.DEFAULT_ORDER;
+    double prev = d;
+    int count = 0;
+    while (count < 100000) {
+      d = d - IOrdered.DEFAULT_ORDER_STEP;
+      assertFalse(d + " - " + IOrdered.DEFAULT_ORDER_STEP + " results in the same value!", d == prev);
+      prev = d;
+      count++;
+    }
+  }
+
   public static abstract class AbstractOrdered implements IOrdered {
     private double m_order;
 
