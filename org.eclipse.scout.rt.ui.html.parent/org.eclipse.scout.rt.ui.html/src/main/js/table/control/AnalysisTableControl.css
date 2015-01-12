@@ -219,10 +219,10 @@ text.venn-circle-text {
 }
 
 .criteria-attribute:hover {
-  background-color: @palette-light-gray-1;
-  color: @palette-light-gray-1;
+  background-color: @palette-gray-6;
+  color: @palette-gray-6;
 }
 
 .criteria-entity:hover {
-  background-color: @palette-light-gray-1;
+  background-color:@palette-gray-6;
 }

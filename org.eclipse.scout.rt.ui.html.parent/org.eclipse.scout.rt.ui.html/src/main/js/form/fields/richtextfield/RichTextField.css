@@ -173,11 +173,11 @@
   }
 
   & .rich-text-bar-yellow {
-    .rich-text-color(@palette-yellow);
+    .rich-text-color(@palette-orange-normal);
   }
 
   & .rich-text-bar-green {
-    .rich-text-color(@palette-green);
+    .rich-text-color(@palette-green-normal);
   }
 
   & .rich-text-bar-plain {

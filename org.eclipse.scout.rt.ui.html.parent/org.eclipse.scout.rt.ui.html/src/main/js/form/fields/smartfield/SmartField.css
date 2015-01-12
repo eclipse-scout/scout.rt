@@ -36,7 +36,7 @@
 
   &.disabled .multiline-field {
     background-color: @palette-light-gray-5;
-    color: @palette-dark-gray-4;
+    color: @palette-gray-4;
   }
 
    & input.multiline ~ .icon {

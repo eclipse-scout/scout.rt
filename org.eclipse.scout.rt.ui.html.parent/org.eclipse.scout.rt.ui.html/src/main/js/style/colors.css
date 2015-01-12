@@ -1,92 +1,104 @@
-/* ------------------------ */
-/* Color Palette Definition */
-/* ------------------------ */
+/* ---------------------------- */
+/* Old Color Palette Definition */
+/* ---------------------------- */
 
-@palette-white:#fff;
-
-@palette-black: #000;
-
-@palette-dark-gray-1: #333;
-@palette-dark-gray-2: #5D5D5D;
-@palette-dark-gray-3: #666;
-@palette-dark-gray-4: #777;
 @palette-gray: #9a9a9a;
 @palette-light-gray-0: #aaa;
-@palette-light-gray-1: #ccc;
 @palette-light-gray-2: #ddd;
 @palette-light-gray-3: #d3d3d3;
 @palette-light-gray-4: #e3e3e3;
 @palette-light-gray-5: #f6f6f6;
-@palette-light-gray-6: #fefefe;
-
-@palette-red: #FF6060;
-@palette-light-red: #FFE0E0;
-
-@palette-yellow: #FFFF00;
-
-@palette-bsi-orange: #FE9915;
-@palette-bsi-light-orange: #ffcc8a;
 
 
-@palette-green: #00FF00;
-@palette-light-green: #E1FDE3;
+/* ---------------------------- */
+/* New Color Palette Definition */
+/* ---------------------------- */
 
-@palette-bsi-dark-green: #004A5C;
-@palette-bsi-dark-green-1: #006983;
-@palette-bsi-green: #0082A1;
-@palette-bsi-light-green: #389DB6;
-@palette-bsi-light-green-0: #80c1d0;
-@palette-bsi-light-green-1: #ECF3F7;
+@palette-black: #000;
+@palette-white: #fff;
 
-/* ------------------------ */
-/* Global Color Definitions */
-/* ------------------------ */
+@palette-red-background: #FFE0E0;
+@palette-red-disabled: #FC9D98;
+@palette-red-normal: #FF6060;
+@palette-red-active: #DC2938;
 
-@active-color: @palette-bsi-green;
+@palette-green-background: #DDF4EA;
+@palette-green-disabled: #6CCEA0;
+@palette-green-normal: #20AE68;
+@palette-green-active: #247B5E;
 
-@body-background-color: @palette-light-gray-6;
-@border-color: @palette-light-gray-3;
-@button-background-color: @palette-light-gray-5;
+@palette-orange-background: #FCF0E5;
+@palette-orange-disabled: #FFDB9D;
+@palette-orange-normal: #FDAD4F;
+@palette-orange-active: #FE9915;
 
-@chart-color-axis-line: @palette-light-gray-2;
-@chart-color-axis-text: @palette-gray;
-@chart-color-bar: @palette-light-gray-0;
-@chart-color-data: @palette-gray;
-@chart-color-empty: @palette-light-gray-3;
+@palette-cyan-background: #DDFFF9;
+@palette-cyan-disabled: #78E8D3;
+@palette-cyan-normal: #3EE1C3;
+@palette-cyan-active: #248499;
+
+@palette-bsi-background: #ECF3F7;
+@palette-bsi-disabled: #7CC1E3;
+@palette-bsi-normal: #006C86;
+@palette-bsi-active: #005164;
+
+@palette-gray-8: #EFEFEF;
+@palette-gray-6: #CCCCCC;
+@palette-gray-5: #999999;
+@palette-gray-4: #666666;
+@palette-gray-2: #333333;
+
+/* ---------------------------- */
+/* New Global Color Definitions */
+/* ---------------------------- */
+
+
+@active-color: @palette-bsi-normal;
+
+@body-background-color: @palette-white;
+@border-color: @palette-gray-6;
+@button-background-color: @palette-gray-8;
+
+@chart-color-axis-line: @palette-gray-6;
+@chart-color-axis-text: @palette-gray-4;
+@chart-color-bar: @palette-green-normal;
+@chart-color-data: @palette-green-normal;
+@chart-color-empty: @palette-green-background;
 @control-background-color: @palette-white;
-@control-selection-color: @palette-bsi-green;
+@control-selection-color: @palette-bsi-normal;
 
-@default-button-background-color: @palette-bsi-light-green;
+@default-button-background-color: #389DB6;
 @desktop-background-color: @palette-white;
-@desktop-border-color: @palette-light-gray-2;
-@disabled-color: @palette-light-gray-1;
+@desktop-border-color: @palette-gray-6;
+@disabled-color: @palette-gray-6;
 
-@error-color: @palette-red;
-@error-background-color: @palette-light-red;
+@error-color: @palette-red-normal;
+@error-background-color: @palette-red-background;
 
-@focus-color: @palette-bsi-green;
+@focus-color: @palette-bsi-normal;
 @focus-color-glow: fade(@focus-color, 50%);
-@footer-color: @palette-gray;
-@footer-disabled-color: @palette-light-gray-4;
 
-@highlight-color: @palette-bsi-orange;
-@hover-color: @palette-bsi-green;
+@footer-color: @palette-gray-5;
+@footer-disabled-color: @palette-gray-6;
 
-@icon-color: @palette-dark-gray-3;
+@highlight-color: @palette-orange-active;
+@hover-color: @palette-bsi-normal;
 
-@menu-border-color: @palette-light-gray-1;
+@icon-color: @palette-gray-5;
 
-@navigation-background-color: @palette-bsi-dark-green;
-@navigation-background-active-color: @palette-bsi-dark-green-1;
+@menu-border-color: @palette-gray-6;
+
+@navigation-background-color: @palette-bsi-active;
+@navigation-background-active-color: @palette-bsi-normal;
 @navigation-background-selected-color: @palette-white;
 
-@panel-background-color: @palette-light-gray-5;
-@popup-border-color: @palette-bsi-green;
+@panel-background-color: @palette-gray-8;
+@popup-border-color: @palette-bsi-normal;
 
 @selection-text-color: @palette-white;
-@selection-background-color: @palette-bsi-light-green-1;
-@selection-border-color: @palette-bsi-green;
+@selection-background-color: @palette-bsi-background;
+@selection-border-color: @palette-bsi-normal;
 
-@text-color: @palette-dark-gray-1;
-@text-field-icon-color: @palette-gray;
-@title-color: @palette-dark-gray-1;
+@text-color: @palette-gray-2;
+@text-field-icon-color: @palette-gray-5;
+@title-color: @palette-gray-2;

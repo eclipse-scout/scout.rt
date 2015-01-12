@@ -77,7 +77,7 @@
   }
 
   &.date-box-weekend {
-    color: @palette-dark-gray-4;
+    color: @palette-gray-4;
   }
 
   &.date-box-out-weekend {
@@ -89,7 +89,7 @@
   }
 
   &.date-box-select {
-    background-color: @palette-bsi-light-green-1;
+    background-color: @palette-bsi-disabled;
     border: 1px solid @active-color;
   }
 }

@@ -71,7 +71,7 @@
 
   &.default-button {
     .font-text-normal(@bold);
-    background-color: @palette-bsi-green;
+    background-color: @palette-bsi-normal;
     color: @palette-white;
     border-width: 0;
   }

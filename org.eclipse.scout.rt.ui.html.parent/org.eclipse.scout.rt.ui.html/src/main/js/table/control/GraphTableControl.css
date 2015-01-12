@@ -14,10 +14,10 @@
   cursor: pointer;
 
   &.center { fill: @highlight-color; }
-  &.internal { fill: @palette-light-gray-1; }
+  &.internal { fill: @palette-gray-6; }
   &.person { fill: @palette-gray; }
-  &.department { fill: @palette-bsi-light-green-0; }
-  &.company { fill: @palette-bsi-light-orange; }
+  &.department { fill: @palette-bsi-disabled; }
+  &.company { fill: @palette-orange-disabled; }
 }
 
 .graph-node-text {
@@ -31,7 +31,7 @@
 }
 
 .graph-link {
-  stroke: @palette-light-gray-1;
+  stroke: @palette-gray-6;
   stroke-width: 2;
 }
 

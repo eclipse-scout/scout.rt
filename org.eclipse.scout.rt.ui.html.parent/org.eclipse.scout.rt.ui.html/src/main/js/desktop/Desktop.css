@@ -201,7 +201,7 @@ Middle rows dont have 2px border so no need to do it for those. */
 /* base desktop */
 
 .offline-message {
-  border: 1px solid @palette-bsi-green;
+  border: 1px solid @palette-bsi-normal;
   background-color: @palette-light-gray-3;
   padding: 6px 5px;
   margin: 20px auto;
@@ -212,8 +212,8 @@ Middle rows dont have 2px border so no need to do it for those. */
 }
 
 .offline-message.reconnect-successful {
-  border: 1px solid @palette-green;
-  background-color: @palette-light-green;
+  border: 1px solid @palette-green-normal;
+  background-color: @palette-green-background;
 }
 
 .reconnect {
@@ -230,8 +230,8 @@ Middle rows dont have 2px border so no need to do it for those. */
   margin-right: 6px;
   border-radius: 50%;
   border: 1px solid rgba(0, 0, 0, 0);
-  border-top-color: @palette-bsi-green;
-  border-left-color: @palette-bsi-green;
+  border-top-color: @palette-bsi-normal;
+  border-left-color: @palette-bsi-normal;
   width: 14px;
   height: 14px;
 }
