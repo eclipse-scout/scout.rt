@@ -10,12 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.desktop;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.desktop.outline.ISearchOutline;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
-import org.eclipse.scout.rt.ui.html.json.JsonException;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 
@@ -61,12 +59,7 @@ public class JsonSearchOutline<T extends ISearchOutline> extends JsonOutline<T> 
   protected void handleUiSearch(JsonEvent event) {
     String query = event.getData().optString("query");
     addPropertyEventFilterCondition(ISearchOutline.PROP_SEARCH_QUERY, query);
-    try {
-      getModel().search(query);
-    }
-    catch (ProcessingException e) {
-      throw new JsonException(e);
-    }
+    getModel().getUIFacade().search(query);
   }
 
 }

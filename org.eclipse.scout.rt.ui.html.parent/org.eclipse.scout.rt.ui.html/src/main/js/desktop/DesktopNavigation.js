@@ -32,10 +32,13 @@ scout.DesktopNavigation.prototype.render = function($parent) {
     }
   }.bind(this));
 
-  this.searchTab = new scout.DesktopNavigation.TabAndContent(this._createSearchTab());
-  this.searchTab.$tab.on('click', function() {
+  if (this.desktop.searchOutline) {
+    this.searchTab = new scout.DesktopNavigation.TabAndContent(this._createSearchTab());
+    this.searchTab.$tab.on('click', function() {
     this._selectTab(this.searchTab, this.desktop.searchOutline);
-  }.bind(this));
+    }.bind(this));
+    this.$header.addClass('search-available');
+  }
 
   this.$container = this.$navigation.appendDiv('navigation-container');
   this._addSplitter();

@@ -1,4 +1,5 @@
-@search-button-size: @size-desktop-tools;
+@desktop-taskbar-height: 50px;
+@navigation-tab-button-size: @desktop-taskbar-height;
 
 /* main element */
 
@@ -12,21 +13,20 @@
 
 .navigation-header {
   width: 100%;
-  height: @size-desktop-tools;
+  height: @desktop-taskbar-height;
   .font-text-large;
 
   .navigation-breadcrumb & {
-    height: 2 * @size-desktop-tools;
+    height: 2 * @desktop-taskbar-height;
   }
 }
 
 .navigation-container {
   width: 100%;
-  height: calc(~"100%" - @size-desktop-tools);
-  top: @size-desktop-tools;
+  height: calc(~"100%" - @desktop-taskbar-height);
 
   .navigation-breadcrumb & {
-    height: calc(~"100%" - 2 * @size-desktop-tools);
+    height: calc(~"100%" - 2 * @desktop-taskbar-height);
   }
 
   & .search-status {
@@ -62,13 +62,17 @@
   display: inline-block;
 
   &.tab-active {
-    width: calc(~"100%" - @size-desktop-tools);
+    width: 100%;
+  }
+
+  .search-available > &.tab-active {
+    width: calc(~"100%" - @navigation-tab-button-size);
   }
 
   &:not(.tab-active) {
     background-color: @palette-light-gray-2;
     color: @text-color;
-    width:  @size-desktop-tools;
+    width: @navigation-tab-button-size;
   }
 
   .navigation-breadcrumb & {
@@ -82,10 +86,10 @@
 .navigation-tab-search-button {
   padding: 0px 10px 0px 10px;
   text-align: center;
-  height: @search-button-size;
-  width: @search-button-size;
+  height: @navigation-tab-button-size;
+  width: @navigation-tab-button-size;
+  line-height: @navigation-tab-button-size;
   .font-text-large;
-  line-height: @size-desktop-tools;
 
   &:before {
     .font-icon;
@@ -122,7 +126,8 @@
 
 .navigation-tab-outline-title {
   padding: 0px 10px 0px 10px;
-  height: @size-desktop-tools;
+  height: 100%;
+  line-height: @desktop-taskbar-height;
   white-space: nowrap;
   .font-text-large;
   overflow: hidden;
@@ -140,21 +145,13 @@
   }
 }
 
-.navigation-tab-outline-title {
-  line-height: @size-desktop-tools;
-}
-
-.navigation-tab-outline-title {
-  min-width: 190px - 2 * @size-desktop-tools;
-}
-
 .navigation-tab-search-field {
   float: left;
   border: 1px solid @navigation-background-color;
   height: 32px;
   border-radius: 5px;
   margin: 10px 2px 10px 12px;
-  width: calc(~"100%" - (@search-button-size + 2px + 12x));
+  width: calc(~"100%" - (@navigation-tab-button-size + 2px + 12x));
   display: none;
   background-color: #fefefe;
   .tab-active > & {
@@ -169,7 +166,6 @@
   .navigation-breadcrumb & {
     position: absolute;
     margin-right: 12px;
-    top:  @size-desktop-tools;
     left: -100%;
     width: calc(~"200%" - (12px + 12x));
   }
@@ -180,7 +176,7 @@
 
 .navigation-tab-outline-menu {
   position: absolute;
-  top: @size-desktop-tools;
+  top: @desktop-taskbar-height;
   background-color: @desktop-background-color;
   z-index: 10;
   white-space: nowrap;

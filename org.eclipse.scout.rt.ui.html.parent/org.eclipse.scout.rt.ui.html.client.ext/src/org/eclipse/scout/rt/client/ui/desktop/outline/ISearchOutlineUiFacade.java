@@ -10,27 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.desktop.outline;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.ui.basic.tree.ITreeUIFacade;
 
-/**
- * Outline with search capabilities.
- */
-public interface ISearchOutline extends IOutline {
+public interface ISearchOutlineUiFacade extends ITreeUIFacade {
 
-  String PROP_SEARCH_STATUS = "searchStatus";
-
-  String PROP_SEARCH_QUERY = "searchQuery";
-
-  void search() throws ProcessingException;
-
-  String getSearchQuery();
-
-  void setSearchQuery(String searchQuery);
-
-  String getSearchStatus();
-
-  void setSearchStatus(String searchStatus);
-
-  @Override
-  ISearchOutlineUiFacade getUIFacade();
+  void search(String query);
 }

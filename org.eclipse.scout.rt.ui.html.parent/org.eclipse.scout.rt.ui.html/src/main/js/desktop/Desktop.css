@@ -13,7 +13,7 @@
 
 .desktop-bench {
   position: absolute;
-  top: @size-desktop-tools;
+  top: @desktop-taskbar-height;
   left: @size-desktop-navigation;
   right: 0;
   bottom: 0;
@@ -22,7 +22,7 @@
 
 .desktop-tool-container {
   position: absolute;
-  top: @size-desktop-tools;
+  top: @desktop-taskbar-height;
   z-index: 1;
   .menu-context;
   background-color: @body-background-color;
@@ -36,7 +36,7 @@
   top: 0px;
   left: @size-desktop-navigation;
   right: 0px;
-  height: @size-desktop-tools;
+  height: @desktop-taskbar-height;
   border-bottom: 1px solid @desktop-border-color;
 }
 
@@ -54,7 +54,7 @@
 .taskbar-tool-item {
   vertical-align: top;
   display: inline-block;
-  height: @size-desktop-tools;
+  height: @desktop-taskbar-height;
   padding: 6px 20px 0 20px;
 
   cursor: pointer;
