@@ -233,7 +233,9 @@ describe("scout.dates", function() {
     it("can handle missing or invalid inputs", function() {
       expect(scout.dates.toJsonDate()).toBe(undefined);
       expect(scout.dates.parseJsonDate()).toBe(undefined);
-      expect(function() { scout.dates.parseJsonDate('invalid date string'); }).toThrow();
+      expect(function() {
+        scout.dates.parseJsonDate('invalid date string');
+      }).toThrow();
     });
 
     it("can convert JSON and JS dates", function() {
@@ -252,7 +254,9 @@ describe("scout.dates", function() {
       // Time only
       date = scout.dates.parseJsonDate('15:23:00.123Z');
       expect(date.toISOString()).toBe('1970-01-01T15:23:00.123Z');
-      expect(function() { scout.dates.parseJsonDate('15:23:00'); }).toThrow(); // missing millis
+      expect(function() {
+        scout.dates.parseJsonDate('15:23:00');
+      }).toThrow(); // missing millis
 
       // Test 2 - local time zone
       date = scout.dates.parseJsonDate('2014-11-21 00:00:00.000');
@@ -273,7 +277,9 @@ describe("scout.dates", function() {
     it("can create dates", function() {
       expect(scout.dates.create()).toBe(undefined);
       expect(scout.dates.create('')).toBe(undefined);
-      expect(function() { scout.dates.create('invalid date string'); }).toThrow();
+      expect(function() {
+        scout.dates.create('invalid date string');
+      }).toThrow();
 
       expect(scout.dates.create('2014').toISOString()).toBe(scout.dates.create('2014-01-01 00:00:00.000').toISOString());
       expect(scout.dates.create('2014-10').toISOString()).toBe(scout.dates.create('2014-10-01 00:00:00.000').toISOString());

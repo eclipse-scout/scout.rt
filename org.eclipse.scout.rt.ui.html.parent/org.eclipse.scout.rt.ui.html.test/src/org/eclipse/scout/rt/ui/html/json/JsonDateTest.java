@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.ui.html.json;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -51,13 +50,6 @@ public class JsonDateTest {
   public void testJsonStringToJavaDate() {
     assertNull(new JsonDate((String) null).asJavaDate());
     assertNull(new JsonDate("").asJavaDate());
-    try {
-      new JsonDate("Invalid Date String").asJavaDate();
-      fail(); // nok
-    }
-    catch (Exception e) {
-      // ok
-    }
 
     Date date = new JsonDate("2015-09-24 17:38:09.579").asJavaDate();
     assertNotNull(date);
@@ -96,14 +88,16 @@ public class JsonDateTest {
     assertEquals(38, cal.get(Calendar.MINUTE));
     assertEquals(9, cal.get(Calendar.SECOND));
     assertEquals(579, cal.get(Calendar.MILLISECOND));
+  }
 
-    try {
-      new JsonDate("17:38").asJavaDate();
-      fail(); // nok
-    }
-    catch (Exception e) {
-      // ok
-    }
+  @Test(expected = IllegalArgumentException.class)
+  public void testJsonStringToJavaDate_ExceptionInvalidString() {
+    new JsonDate("Invalid Date String").asJavaDate();
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testJsonStringToJavaDate_ExceptionValueTooShort() {
+    new JsonDate("17:38").asJavaDate();
   }
 
   @Test

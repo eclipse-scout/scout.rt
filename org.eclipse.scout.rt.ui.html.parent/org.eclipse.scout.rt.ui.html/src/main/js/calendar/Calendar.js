@@ -25,11 +25,9 @@ scout.Calendar.prototype.init = function(model, session) {
 
 // TODO Calendar | Implement all _render* methods
 scout.Calendar.prototype._render = function($parent) {
-  var i, layout;
-
   this._$parent = $parent;
   this.$container = this._$parent.appendDiv('calendar').attr('id', this._generateId('calendar'));
-  layout = new scout.CalendarLayout(this);
+  var layout = new scout.CalendarLayout(this);
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(layout);
   this.htmlComp.pixelBasedSizing = false;
