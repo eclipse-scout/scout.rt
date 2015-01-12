@@ -1,7 +1,7 @@
 .breadcrumbs {
   white-space: nowrap;
   padding: 10px;
-  color: @palette-gray;
+  color: @palette-gray-5;
 }
 
 .breadcrumbs > .scrollable-x {

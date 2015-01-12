@@ -15,7 +15,7 @@
 
   & .person-address {
     font-size: 13px;
-    color: @palette-light-gray-0;
+    color: @palette-gray-5;
     margin-left: 10px;
   }
 

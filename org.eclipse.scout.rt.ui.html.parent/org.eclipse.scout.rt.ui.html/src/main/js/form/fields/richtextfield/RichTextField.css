@@ -20,7 +20,7 @@
     left: 1px;
     .font-icon;
     font-size: 22px;
-    color: @palette-light-gray-0;
+    color:@palette-gray-5;
     content: @icon;
   }
 }

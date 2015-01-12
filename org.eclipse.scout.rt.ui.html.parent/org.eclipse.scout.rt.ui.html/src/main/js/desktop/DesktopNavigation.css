@@ -70,7 +70,7 @@
   }
 
   &:not(.tab-active) {
-    background-color: @palette-light-gray-2;
+    background-color: @palette-gray-6;
     color: @text-color;
     width: @navigation-tab-button-size;
   }

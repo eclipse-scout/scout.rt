@@ -6,7 +6,7 @@
 
   /* Multiline SmartField */
   & .multiline {
-    border-bottom-color: @palette-light-gray-5;
+    border-bottom-color: @palette-gray-6;
     border-top-left-radius: @border-radius;
     border-top-right-radius: @border-radius;
     border-bottom-right-radius: 0;
@@ -18,7 +18,7 @@
 
   &.disabled .multiline {
     /* color and background-color inherited from input.disabled */
-    border-bottom-color: @palette-light-gray-4;
+    border-bottom-color: @palette-gray-6;
   }
 
   & .multiline-field {
@@ -35,7 +35,11 @@
   }
 
   &.disabled .multiline-field {
+<<<<<<< Upstream, based on branch 'develop' of ssh://cru@git.bsiag.com:29418/tools/eclipse.scout
     background-color: @palette-light-gray-5;
+=======
+    background-color:@palette-gray-8;
+>>>>>>> 4c2a891 html ui: new colors - work in progress (2)
     color: @palette-gray-4;
   }
 

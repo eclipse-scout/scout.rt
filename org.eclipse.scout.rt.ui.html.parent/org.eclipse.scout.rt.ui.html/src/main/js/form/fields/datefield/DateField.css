@@ -73,7 +73,7 @@
   }
 
   &.date-box-out {
-    color: @palette-light-gray-3;
+    color: @palette-gray-6;
   }
 
   &.date-box-weekend {
@@ -81,11 +81,11 @@
   }
 
   &.date-box-out-weekend {
-    color: @palette-light-gray-0;
+    color: @palette-gray-6;
   }
 
   &.date-box-now {
-    background-color: @palette-light-gray-4;
+    background-color: @palette-gray-6;
   }
 
   &.date-box-select {

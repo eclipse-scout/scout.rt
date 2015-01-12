@@ -23,7 +23,7 @@
     }
 
     &.marked:not(.selected) {
-      border-bottom-color: @palette-gray;
+      border-bottom-color: @palette-gray-5;
     }
 
     &:hover {
@@ -49,7 +49,7 @@
     height: 3px;
     margin-top: -3px;
     z-index: 1;
-    background-color: @palette-light-gray-2;
+    background-color: @palette-gray-6;
     content: '';
     display: block;
   }

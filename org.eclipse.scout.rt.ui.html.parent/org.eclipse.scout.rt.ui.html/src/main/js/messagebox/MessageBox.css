@@ -1,4 +1,4 @@
-@color-messagebox-border: @palette-light-gray-2;
+@color-messagebox-border: @palette-gray-6;
 @messagebox-label-padding: 20px;
 
 .messagebox {
@@ -51,7 +51,7 @@
   & button {
     position: relative;
     padding: 12px;
-    background-color: @palette-light-gray-5;
+    background-color: @palette-gray-8;
     border: 1px solid @color-messagebox-border;
     cursor: pointer;
   }

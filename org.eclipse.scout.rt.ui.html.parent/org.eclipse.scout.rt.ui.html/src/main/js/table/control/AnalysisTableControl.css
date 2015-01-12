@@ -200,7 +200,7 @@ text.venn-circle-text {
 
 .criteria-attribute, .criteria-entity {
   position: absolute;
-  background-color: @palette-light-gray-4;
+  background-color: @palette-gray-6;
   border: 1px solid white;
   padding: 2px 4px 2px 4px;
   font-size:12px;
@@ -214,8 +214,8 @@ text.venn-circle-text {
 }
 
 .criteria-attribute {
-  background-color: @palette-light-gray-5;
-  color: @palette-light-gray-5;
+  background-color:  @palette-gray-8;
+  color:  @palette-gray-8;
 }
 
 .criteria-attribute:hover {
