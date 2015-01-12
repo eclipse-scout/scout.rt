@@ -18,4 +18,8 @@
     color: @active-color;
     cursor: default;
   }
+
+  &:last-child {
+    border-bottom: 1px solid transparent;
+  }
 }
