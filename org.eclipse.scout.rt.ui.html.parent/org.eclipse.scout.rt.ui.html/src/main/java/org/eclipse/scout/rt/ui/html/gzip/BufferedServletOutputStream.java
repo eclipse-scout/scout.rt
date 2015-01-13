@@ -31,17 +31,21 @@ public class BufferedServletOutputStream extends ServletOutputStream {
   /**
    * since servlet api 3.1
    */
+  /*TODO [15.0] imo
   @Override
   public boolean isReady() {
     return true;
   }
+   */
 
   /**
    * since servlet api 3.1
    */
+  /*TODO [15.0] imo
   @Override
   public void setWriteListener(javax.servlet.WriteListener writeListener) {
   }
+   */
 
   @Override
   public void write(byte[] b) throws IOException {

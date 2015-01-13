@@ -37,23 +37,29 @@ public class BufferedServletInputStream extends ServletInputStream {
   /**
    * since servlet api 3.1
    */
+  /*TODO [15.0] imo
   @Override
   public boolean isFinished() {
     return false;
   }
+   */
 
   /**
    * since servlet api 3.1
    */
+  /*TODO [15.0] imo
   @Override
   public boolean isReady() {
     return true;
   }
+   */
 
   /**
    * since servlet api 3.1
    */
+  /*TODO [15.0] imo
   @Override
   public void setReadListener(javax.servlet.ReadListener readListener) {
   }
+   */
 }

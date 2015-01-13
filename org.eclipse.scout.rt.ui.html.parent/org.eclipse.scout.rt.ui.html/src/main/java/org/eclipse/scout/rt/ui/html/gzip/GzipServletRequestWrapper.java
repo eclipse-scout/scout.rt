@@ -67,10 +67,12 @@ public class GzipServletRequestWrapper extends HttpServletRequestWrapper {
   /**
    * since servlet api 3.1
    */
+  /*TODO [15.0] imo
   @Override
   public long getContentLengthLong() {
     return getContentLength();
   }
+   */
 
   @Override
   public int getContentLength() {
