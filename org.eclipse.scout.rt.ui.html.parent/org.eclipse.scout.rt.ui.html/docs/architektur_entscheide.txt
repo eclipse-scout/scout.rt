@@ -418,6 +418,7 @@ Das Konzept für die MenuBar muss überarbeitet werden. Wichtige Punkte sind dab
 - TODO cgu: context menü prüfen
 
 - TODO CGU alternative mit Dispose überlegen, wie heute, vielleicht Kombination möglich, nur Property-Change Problem lösen
+<<<<<<< Upstream, based on branch 'develop' of ssh://nbu@git.bsiag.com:29418/tools/eclipse.scout
 
 13.01.2015 UI Team, AHO - Menu
 - Thema: soll die Konfiguration im Bereich Forms (System/Process Buttons) geändert werden
@@ -453,3 +454,5 @@ MVI fragen ob uns die SDK bei der Migration unterstützen kann
 
 
 
+=======
+>>>>>>> 8e30b69 Revert "Gerrit Test"
