@@ -92,3 +92,19 @@ API added / implemented in AbstractTable
  API added:
   void fireTableReloadFromUI();
   void fireSortColumnRemovedFromUI(IColumn<?> column);
+
+CGU 13.01.2015
+The search table control now gets selected if the search is required.
+
+Migration:
+If you had a SearchFormToolButton, remove the code in Desktop#execPageSearchFormChanged.
+
+CGU 13.01.2015
+Added getConfiguredTableStatusVisible on IPageWithTable:
+It is now possible to configure whether the table status should be visible for a table page.
+Until now table status was set visible by the OutlineTableForm.
+
+CGU 13.01.2015
+Added default detail form on outline:
+It is now possible to configure a default detail form for outlines. The default detail form gets shown when no page is selected.
+API added getConfiguredDefaultDetailForm, execInitDefaultDetailForm, createDefaultDetailForm, startDefaultDetailForm

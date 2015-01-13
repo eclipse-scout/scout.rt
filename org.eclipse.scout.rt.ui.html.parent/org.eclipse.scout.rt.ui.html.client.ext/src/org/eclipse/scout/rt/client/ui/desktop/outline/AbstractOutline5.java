@@ -11,13 +11,9 @@
 package org.eclipse.scout.rt.client.ui.desktop.outline;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.AbstractClientSession;
-import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
@@ -25,17 +21,11 @@ import org.eclipse.scout.rt.client.ui.action.menu.MenuSeparator;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
-import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
-import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.extension.client.ui.desktop.outline.AbstractExtensibleOutline;
-import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
-import org.eclipse.scout.service.SERVICES;
 
 public abstract class AbstractOutline5 extends AbstractExtensibleOutline implements IOutline5 {
-
-  private IForm m_defaultDetailForm;
 
   protected AbstractOutline5() {
     super();
@@ -43,62 +33,6 @@ public abstract class AbstractOutline5 extends AbstractExtensibleOutline impleme
 
   protected AbstractOutline5(boolean callInitialzier) {
     super(callInitialzier);
-  }
-
-  @Override
-  protected IPageChangeStrategy createPageChangeStrategy() {
-    return new DefaultPageChangeStrategy5();
-  }
-
-  @Override
-  protected void initConfig() {
-    super.initConfig();
-
-    try {
-      ensureDefaultDetailFormCreated();
-      ensureDefaultDetailFormStarted();
-    }
-    catch (ProcessingException e) {
-      SERVICES.getService(IExceptionHandlerService.class).handleException(e);
-    }
-  }
-
-  @Override
-  public IForm getDefaultDetailForm() {
-    return m_defaultDetailForm;
-  }
-
-  protected boolean getConfiguredSelectFirstPageOnOutlineChange() {
-    return true;
-  }
-
-  @Override
-  public void selectNodes(Collection<? extends ITreeNode> nodes, boolean append) {
-    if (!getConfiguredSelectFirstPageOnOutlineChange() && ClientJob.getCurrentSession(AbstractClientSession.class).getDesktop().isOutlineChanging()) {
-      // Prevent selecting the first node when changing the outline
-      return;
-    }
-    super.selectNodes(nodes, append);
-  }
-
-  public void setDefaultDetailForm(IForm form) {
-    if (form != null) {
-      if (form.getDisplayHint() != IForm.DISPLAY_HINT_VIEW) {
-        form.setDisplayHint(IForm.DISPLAY_HINT_VIEW);
-      }
-      if (form.getDisplayViewId() == null) {
-        form.setDisplayViewId(IForm.VIEW_ID_PAGE_DETAIL);
-      }
-      form.setAutoAddRemoveOnDesktop(false);
-    }
-    m_defaultDetailForm = form;
-  }
-
-  protected IForm execCreateDefaultDetailForm() throws ProcessingException {
-    return null;
-  }
-
-  protected void execStartDefaultDetailForm(IForm form) throws ProcessingException {
   }
 
   @Override
@@ -140,22 +74,6 @@ public abstract class AbstractOutline5 extends AbstractExtensibleOutline impleme
     }
 
     return menus;
-  }
-
-  @Override
-  public void ensureDefaultDetailFormCreated() throws ProcessingException {
-    if (getDefaultDetailForm() != null) {
-      return;
-    }
-    setDefaultDetailForm(execCreateDefaultDetailForm());
-  }
-
-  @Override
-  public void ensureDefaultDetailFormStarted() throws ProcessingException {
-    if (getDefaultDetailForm() == null || getDefaultDetailForm().isFormOpen()) {
-      return;
-    }
-    execStartDefaultDetailForm(getDefaultDetailForm());
   }
 
 }
