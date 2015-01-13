@@ -1,8 +1,9 @@
-scout.MenuNavigateDown = function(outline, node) {
+scout.MenuNavigateDown = function(outline, node, menuTypes) {
   scout.MenuNavigateDown.parent.call(this, outline, node);
   this._text1 = 'Continue';
   this._text2 = 'Show';
   this.defaultMenu = true;
+  this.menuTypes = menuTypes;
 };
 scout.inherits(scout.MenuNavigateDown, scout.AbstractOutlineNavigationMenu);
 

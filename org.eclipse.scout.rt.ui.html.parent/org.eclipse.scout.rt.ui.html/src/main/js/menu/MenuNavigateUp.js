@@ -1,7 +1,8 @@
-scout.MenuNavigateUp = function(outline, node) {
+scout.MenuNavigateUp = function(outline, node, menuTypes) {
   scout.MenuNavigateUp.parent.call(this, outline, node);
   this._text1 = 'Back';
   this._text2 = 'Up';
+  this.menuTypes = menuTypes;
 };
 scout.inherits(scout.MenuNavigateUp, scout.AbstractOutlineNavigationMenu);
 

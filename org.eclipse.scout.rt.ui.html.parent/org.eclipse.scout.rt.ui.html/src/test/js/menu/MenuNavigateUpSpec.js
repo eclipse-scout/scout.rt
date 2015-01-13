@@ -1,11 +1,15 @@
 describe("MenuNavigateUp", function() {
 
-  var session, outline, menu, node = {};
+  var session, outline, menu, node = {}, menuTypes = ['foo'];
 
   beforeEach(function() {
     session = new scout.Session($('#sandbox'), '1.1');
     outline = {session: session};
-    menu = new scout.MenuNavigateUp(outline, node);
+    menu = new scout.MenuNavigateUp(outline, node, menuTypes);
+  });
+
+  it("has menuTypes", function() {
+    expect(menu.menuTypes[0]).toBe('foo');
   });
 
   it("_toggleDetail is always true", function() {
