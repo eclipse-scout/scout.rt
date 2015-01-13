@@ -1,15 +1,6 @@
-/* ---------------------------- */
-/* Old Color Palette Definition */
-/* ---------------------------- */
-
-<<<<<<< Upstream, based on branch 'develop' of ssh://cru@git.bsiag.com:29418/tools/eclipse.scout
-@palette-gray: #9a9a9a;
-@palette-light-gray-0: #aaa;
-@palette-light-gray-2: #ddd;
-@palette-light-gray-3: #d3d3d3;
-@palette-light-gray-4: #e3e3e3;
-@palette-light-gray-5: #f6f6f6;
-=======
+/* ------------------------ */
+/* Color Palette Definition */
+/* ------------------------ */
 @palette-black: #000;
 @palette-white: #fff;
 
@@ -32,58 +23,6 @@
 @palette-cyan-disabled: #78E8D3;
 @palette-cyan-normal: #3EE1C3;
 @palette-cyan-active: #248499;
->>>>>>> 4c2a891 html ui: new colors - work in progress (2)
-
-@palette-bsi-background: #ECF3F7;
-@palette-bsi-disabled: #7CC1E3;
-@palette-bsi-normal: #006C86;
-@palette-bsi-active: #005164;
-
-<<<<<<< Upstream, based on branch 'develop' of ssh://cru@git.bsiag.com:29418/tools/eclipse.scout
-/* ---------------------------- */
-/* New Color Palette Definition */
-/* ---------------------------- */
-
-@palette-black: #000;
-@palette-white: #fff;
-=======
-@palette-gray-8: #EFEFEF;
-@palette-gray-6: #CCCCCC;
-@palette-gray-5: #999999;
-@palette-gray-4: #666666;
-@palette-gray-2: #333333;
->>>>>>> 4c2a891 html ui: new colors - work in progress (2)
-
-@palette-red-background: #FFE0E0;
-@palette-red-disabled: #FC9D98;
-@palette-red-normal: #FF6060;
-@palette-red-active: #DC2938;
-
-<<<<<<< Upstream, based on branch 'develop' of ssh://cru@git.bsiag.com:29418/tools/eclipse.scout
-@palette-green-background: #DDF4EA;
-@palette-green-disabled: #6CCEA0;
-@palette-green-normal: #20AE68;
-@palette-green-active: #247B5E;
-=======
-@active-color: @palette-bsi-normal;
->>>>>>> 4c2a891 html ui: new colors - work in progress (2)
-
-<<<<<<< Upstream, based on branch 'develop' of ssh://cru@git.bsiag.com:29418/tools/eclipse.scout
-@palette-orange-background: #FCF0E5;
-@palette-orange-disabled: #FFDB9D;
-@palette-orange-normal: #FDAD4F;
-@palette-orange-active: #FE9915;
-=======
-@body-background-color: @palette-white;
-@border-color: @palette-gray-6;
-@button-background-color: @palette-gray-8;
->>>>>>> 4c2a891 html ui: new colors - work in progress (2)
-
-<<<<<<< Upstream, based on branch 'develop' of ssh://cru@git.bsiag.com:29418/tools/eclipse.scout
-@palette-cyan-background: #DDFFF9;
-@palette-cyan-disabled: #78E8D3;
-@palette-cyan-normal: #3EE1C3;
-@palette-cyan-active: #248499;
 
 @palette-bsi-background: #ECF3F7;
 @palette-bsi-disabled: #7CC1E3;
@@ -96,10 +35,13 @@
 @palette-gray-4: #666666;
 @palette-gray-2: #333333;
 
-/* ---------------------------- */
-/* New Global Color Definitions */
-/* ---------------------------- */
+/* ------------------------ */
+/* Color Palette Definition */
+/* ------------------------ */
 
+/* ------------------------ */
+/* Global Color Definitions */
+/* ------------------------ */
 
 @active-color: @palette-bsi-normal;
 
@@ -107,8 +49,6 @@
 @border-color: @palette-gray-6;
 @button-background-color: @palette-gray-8;
 
-=======
->>>>>>> 4c2a891 html ui: new colors - work in progress (2)
 @chart-color-axis-line: @palette-gray-6;
 @chart-color-axis-text: @palette-gray-4;
 @chart-color-bar: @palette-green-normal;

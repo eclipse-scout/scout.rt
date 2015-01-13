@@ -15,11 +15,7 @@
 
   &.center { fill: @highlight-color; }
   &.internal { fill: @palette-gray-6; }
-<<<<<<< Upstream, based on branch 'develop' of ssh://cru@git.bsiag.com:29418/tools/eclipse.scout
-  &.person { fill: @palette-gray; }
-=======
   &.person { fill: @palette-gray-5; }
->>>>>>> 4c2a891 html ui: new colors - work in progress (2)
   &.department { fill: @palette-bsi-disabled; }
   &.company { fill: @palette-orange-disabled; }
 }

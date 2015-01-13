@@ -45,11 +45,7 @@ input {
   color: @text-color;
 
   &:disabled {
-<<<<<<< Upstream, based on branch 'develop' of ssh://cru@git.bsiag.com:29418/tools/eclipse.scout
-    background-color: @palette-light-gray-5;
-=======
     background-color:  @palette-gray-8;
->>>>>>> 4c2a891 html ui: new colors - work in progress (2)
     color: @palette-gray-4;
   }
 

@@ -202,11 +202,7 @@ Middle rows dont have 2px border so no need to do it for those. */
 
 .offline-message {
   border: 1px solid @palette-bsi-normal;
-<<<<<<< Upstream, based on branch 'develop' of ssh://cru@git.bsiag.com:29418/tools/eclipse.scout
-  background-color: @palette-light-gray-3;
-=======
   background-color: @palette-gray-8;
->>>>>>> 4c2a891 html ui: new colors - work in progress (2)
   padding: 6px 5px;
   margin: 20px auto;
   z-index: 1;
