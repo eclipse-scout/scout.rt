@@ -21,6 +21,6 @@
     <relativePath>../org.eclipse.scout.rt.parent</relativePath>
   </parent>
 
-  <artifactId>org.eclipse.scout.jaxws216.jre16.fragment</artifactId>
+  <artifactId>org.eclipse.scout.jaxws216.jre17.fragment</artifactId>
   <packaging>eclipse-plugin</packaging>
 </project>

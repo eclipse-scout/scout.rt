@@ -5,7 +5,7 @@
 <project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.3.x,org.eclipse.scout.commons"/>
 <project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.3.x,org.eclipse.scout.commons.test"/>
 <project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.3.x,org.eclipse.scout.jaxws216"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.3.x,org.eclipse.scout.jaxws216.jre16.fragment"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.3.x,org.eclipse.scout.jaxws216.jre17.fragment"/>
 <project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.3.x,org.eclipse.scout.jaxws216.jre18.fragment"/>
 <project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.3.x,org.eclipse.scout.jaxws216.test"/>
 <project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.3.x,org.eclipse.scout.net"/>
@@ -92,7 +92,7 @@
 <item elementID="=org.eclipse.scout.net.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.net" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.jaxws216" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=org.eclipse.scout.jaxws216.jre16.fragment" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
+<item elementID="=org.eclipse.scout.jaxws216.jre17.fragment" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.rt.extension.client.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.apache.derby.jdbc_1091.fragment" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.commons" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
