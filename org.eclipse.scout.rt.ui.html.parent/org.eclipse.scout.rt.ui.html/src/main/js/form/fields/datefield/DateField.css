@@ -77,21 +77,21 @@
   }
 
   &.date-box-weekend {
-    color: @palette-gray-5;
+    color: @palette-orange-active;
   }
 
   &.date-box-out-weekend {
-    color: @palette-gray-7;
+    color: @palette-orange-disabled;
   }
 
   &.date-box-now {
-    background-color: @palette-gray-6;
+    background-color: @palette-orange-background;
+    border: 1px solid @palette-orange-disabled;
   }
 
   &.date-box-selected {
-    background-color: @palette-bsi-disabled;
-    color: @palette-bsi-active;
-    border: 1px solid @active-color;
+    background-color: @palette-bsi-background;
+    border: 1px solid @palette-bsi-disabled;
   }
 }
 

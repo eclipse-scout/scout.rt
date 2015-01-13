@@ -8,21 +8,21 @@
 }
 
 .map-item {
-  fill: @chart-color-empty;
+  fill: @chart-empty-color;
   cursor: pointer;
   stroke-width: 100;
   stroke: @palette-white;
 
   &.has-data {
-    fill: @chart-color-data;
+    fill: @chart-data-color;
   }
 
   &:hover {
-    fill: @active-color;
+    fill: @chart-active-color;
   }
 
   &.selected {
-    fill: @highlight-color;
+    fill: @chart-active-color;
   }
 }
 

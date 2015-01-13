@@ -20,11 +20,11 @@ rect.select-events {
 }
 
 rect.select-fill, circle.select-fill {
-  fill: @chart-color-empty;
+  fill: @chart-unselect-color;
 }
 
 path.select-fill-line, line.select-fill-line {
-  stroke: @chart-color-empty;
+  stroke: @chart-unselect-color;
   fill: @palette-white;
   stroke-width: 3px;
   stroke-linejoin: round;
@@ -33,7 +33,7 @@ path.select-fill-line, line.select-fill-line {
 
 path.select-fill-pie {
   stroke: @palette-white;
-  fill: @chart-color-empty;
+  fill: @chart-unselect-color;
   stroke-width: 1px;
   stroke-linejoin: round;
   stroke-linecap: round;
@@ -41,21 +41,21 @@ path.select-fill-pie {
 
 svg.select-chart:hover {
   & rect.select-fill, & circle.select-fill, & path.select-fill-pie {
-    fill: @active-color;
+    fill: @chart-select-color;
   }
 
   & path.select-fill-line, & line.select-fill-line {
-    stroke: @active-color;
+    stroke: @chart-select-color;
   }
 }
 
 svg.select-chart.selected {
   & rect.select-fill, & circle.select-fill, & path.select-fill-pie {
-    fill: @highlight-color;
+    fill: @chart-select-color;
   }
 
   & path.select-fill-line, & line.select-fill-line {
-    stroke: @highlight-color;
+    stroke: @chart-select-color;
   }
 }
 
@@ -106,11 +106,11 @@ svg.select-chart.selected {
   }
 
   &.selected {
-    background-color: @highlight-color;
+    background-color: @chart-select-color;
     color: @palette-white;
     border-top: 1px solid transparent;
-    border-left: 1px solid @highlight-color;
-    border-right: 1px solid @highlight-color;
+    border-left: 1px solid @chart-select-color;
+    border-right: 1px solid @chart-select-color;
     border-bottom: 1px solid transparent;
   }
 
@@ -191,7 +191,7 @@ svg.select-chart.selected {
 .main-chart {
 
   rect&, circle& {
-    fill: @chart-color-bar;
+    fill: @chart-data-color;
     stroke: @palette-white;
     stroke-width: 0px;
     cursor: pointer;
@@ -202,30 +202,30 @@ svg.select-chart.selected {
   }
 
   path& {
-    fill: @chart-color-bar;
+    fill: @chart-data-color;
     stroke: @palette-white;
     stroke-width: 2px;
     cursor: pointer;
   }
 
   line& {
-    stroke: @chart-color-bar;
+    stroke: @chart-data-color;
     stroke-width: 4px;
     stroke-linejoin: round;
     stroke-linecap: round;
   }
 
   &:hover {
-    fill: @active-color;
+    fill: @chart-active-color;
   }
 
   &.selected {
-    fill: @highlight-color;
+    fill: @chart-active-color;
   }
 }
 
 line.main-axis {
-  stroke: @chart-color-axis-line;
+  stroke: @chart-axis-line-color;
   stroke-width: 1px;
 }
 
@@ -236,14 +236,14 @@ text.main-axis {
 }
 
 text.main-axis-y {
-  fill: @chart-color-axis-text;
+  fill: @chart-axis-text-color;
   text-anchor: end;
   dominant-baseline: central;
   font-size: 10px;
   }
 
 text.main-axis-x, textPath.main-axis-x {
-  fill: @chart-color-axis-text;
+  fill: @chart-axis-text-color;
   text-anchor: middle;
   dominant-baseline: middle;
   font-size: 10px;

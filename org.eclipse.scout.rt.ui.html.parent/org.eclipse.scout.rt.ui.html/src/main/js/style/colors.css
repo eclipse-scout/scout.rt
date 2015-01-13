@@ -10,7 +10,7 @@
 @palette-red-active: #DC2938;
 
 @palette-green-background: #DDF4EA;
-@palette-green-disabled: #6CCEA0;
+@palette-green-disabled: #389DB6;
 @palette-green-normal: #20AE68;
 @palette-green-active: #247B5E;
 
@@ -25,7 +25,7 @@
 @palette-cyan-active: #248499;
 
 @palette-bsi-background: #ECF3F7;
-@palette-bsi-disabled: #7CC1E3;
+@palette-bsi-disabled: #389DB6;    //#7CC1E3
 @palette-bsi-normal: #006C86;
 @palette-bsi-active: #005164;
 
@@ -39,31 +39,29 @@
 @palette-gray-1: #191919;
 
 /* ------------------------ */
-/* Color Palette Definition */
-/* ------------------------ */
-
-/* ------------------------ */
 /* Global Color Definitions */
 /* ------------------------ */
 
-@active-color: @palette-bsi-normal;
-
 @body-background-color: @palette-white;
-@border-color: @palette-gray-6;
-@button-background-color: @palette-gray-8;
-
-@chart-color-axis-line: @palette-gray-6;
-@chart-color-axis-text: @palette-gray-4;
-@chart-color-bar: @palette-green-normal;
-@chart-color-data: @palette-green-normal;
-@chart-color-empty: @palette-green-background;
-@control-background-color: @palette-white;
-@control-selection-color: @palette-bsi-normal;
-
-@default-button-background-color: #389DB6;
 @desktop-background-color: @palette-white;
 @desktop-border-color: @palette-gray-6;
+
+@border-color: @palette-gray-6;
+@button-background-color: @palette-gray-8;
+@default-button-background-color: @palette-bsi-disabled;
 @disabled-color: @palette-gray-6;
+
+@chart-unselect-color: @palette-gray-6;
+@chart-select-color: @palette-bsi-disabled;
+
+@chart-axis-line-color: @palette-gray-6;
+@chart-axis-text-color: @palette-gray-4;
+
+@chart-empty-color: @palette-gray-6;
+@chart-data-color: @palette-green-normal;
+@chart-active-color: @palette-green-active;
+
+@control-background-color: @palette-white;
 
 @error-color: @palette-red-normal;
 @error-background-color: @palette-red-background;
@@ -72,25 +70,34 @@
 @focus-color-glow: fade(@focus-color, 50%);
 
 @footer-color: @palette-gray-5;
-@footer-disabled-color: @palette-gray-6;
 
+@active-color: @palette-bsi-normal;
 @highlight-color: @palette-orange-active;
 @hover-color: @palette-bsi-normal;
 
-@icon-color: @palette-gray-5;
+@icon-color: @palette-gray-4;
+@icon-light-color: @palette-gray-5;
+@icon-disabled-color: @palette-gray-6;
 
 @menu-border-color: @palette-gray-6;
 
 @navigation-background-color: @palette-bsi-active;
+@navigation-light-color: @palette-gray-8;
 @navigation-background-active-color: @palette-bsi-normal;
 @navigation-background-selected-color: @palette-white;
 
 @panel-background-color: @palette-gray-8;
 @popup-border-color: @palette-bsi-normal;
 
+@tooltip-color: @palette-gray-2;
+@tooltip-background-color: @palette-orange-background;
+@tooltip-border-color: @palette-orange-normal;
+
 @selection-text-color: @palette-white;
-@selection-background-color: @palette-bsi-background;
-@selection-border-color: @palette-bsi-normal;
+@selection-background-color: @palette-bsi-normal;
+
+@selection-row-background-color: @palette-bsi-background;
+@selection-row-border-color: @palette-bsi-normal;
 
 @text-color: @palette-gray-2;
 @text-field-icon-color: @palette-gray-5;

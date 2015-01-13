@@ -144,7 +144,7 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
   for (var a = 0; a < xAxis.length; a++) {
     var key = xAxis[a],
       mark = xAxis.format(key),
-      value = cube.getValue([key])[0];
+      value = cube.getValue([key]).length;
 
     var $filter = $headerFilterScroll.appendDiv('header-filter', mark)
       .attr('data-xAxis', key)

@@ -8,7 +8,7 @@
   height: 100%;
   width: @size-desktop-navigation;
   background-color: @navigation-background-color;
-  color: @desktop-background-color;
+  color: @navigation-light-color;
 }
 
 .navigation-header {
@@ -106,7 +106,7 @@
 
   .tab-menu-open & {
     color: @hover-color;
-    background-color: @desktop-background-color;
+    background-color: @navigation-light-color;
   }
 
   &:before {
@@ -141,7 +141,7 @@
   .navigation-breadcrumb & {
     width: 200%;
     text-align: center;
-    border-bottom: 1px solid @desktop-background-color;
+    border-bottom: 1px solid @navigation-light-color;
   }
 }
 
@@ -177,7 +177,7 @@
 .navigation-tab-outline-menu {
   position: absolute;
   top: @desktop-taskbar-height;
-  background-color: @desktop-background-color;
+  background-color: @navigation-light-color;
   z-index: 10;
   white-space: nowrap;
   .menu-context;

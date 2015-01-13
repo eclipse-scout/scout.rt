@@ -11,7 +11,7 @@
   &[data-icon]:before {
     .font-icon;
     font-size: 22px;
-    color: @footer-color;
+    color: @icon-light-color;
     content: attr(data-icon);
   }
 
@@ -30,7 +30,7 @@
 
   &.disabled:hover, &.disabled:before {
     cursor: default;
-    color: @footer-disabled-color;
+    color: @icon-disabled-color;
   }
 
   &.selected:before {

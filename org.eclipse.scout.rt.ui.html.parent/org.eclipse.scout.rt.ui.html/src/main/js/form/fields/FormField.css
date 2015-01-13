@@ -62,6 +62,10 @@
 
     &:before  {
       content: @icon-info;
+      color: @icon-light-color;
+    }
+
+    &:hover:before {
       color: @icon-color;
     }
   }

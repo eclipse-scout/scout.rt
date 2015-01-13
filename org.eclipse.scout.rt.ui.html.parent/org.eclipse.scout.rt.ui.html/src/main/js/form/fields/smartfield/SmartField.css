@@ -21,6 +21,7 @@
     border-bottom-color: @palette-gray-6;
   }
 
+
   & .multiline-field {
     background-color: @control-background-color;
     border:solid 1px @border-color;
@@ -54,6 +55,7 @@
   margin-top: 5px;
   background-color: white;
   .drop-shadow();
+  .focus-border;
 
   & > .options {
     position: absolute;
@@ -67,8 +69,8 @@
       cursor: pointer;
 
       &.selected {
-        background-color: @selection-background-color;
-        border-bottom-color: @selection-border-color;
+        background-color: @selection-row-background-color;
+        border-bottom-color: @selection-row-border-color;
 
         &:before {
           width: 100%;
@@ -76,7 +78,7 @@
           display: block;
           content: '';
           position: absolute;
-          border-top: solid 1px @selection-border-color;
+          border-top: solid 1px @selection-row-border-color;
           top: -1px;
           left: 0;
         }

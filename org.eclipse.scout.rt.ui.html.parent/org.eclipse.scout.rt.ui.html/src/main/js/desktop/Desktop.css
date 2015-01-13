@@ -102,7 +102,7 @@
 .taskbar-tool-item {
   position: relative;
   .font-text-plus;
-  background-color: @desktop-background-color;
+  background-color: @palette-white;
   border-left: 1px solid transparent;
   border-right: 1px solid transparent;
   padding-top:16px;
@@ -186,16 +186,16 @@ Middle rows dont have 2px border so no need to do it for those. */
 }
 
 .desktop-bench > .table .table-row.select-top:before {
-   border-top: 1px solid @selection-border-color;
+   border-top: 1px solid @selection-row-border-color;
 }
 
 .desktop-bench > .table .table-row.select-bottom:before {
-   border-bottom: 1px solid @selection-border-color;
+   border-bottom: 1px solid @selection-row-border-color;
 }
 
 .desktop-bench > .table .table-row.select-single:before {
-   border-top: 1px solid @selection-border-color;
-   border-bottom: 1px solid @selection-border-color;
+   border-top: 1px solid @selection-row-border-color;
+   border-bottom: 1px solid @selection-row-border-color;
 }
 
 /* base desktop */

@@ -7,7 +7,7 @@
   }
 
   &.selected {
-    background-color: @selection-background-color;
-    border: 1px solid @selection-border-color;
+    background-color: @selection-row-background-color;
+    border: 1px solid @selection-row-border-color;
   }
 }

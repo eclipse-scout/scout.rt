@@ -24,7 +24,7 @@
     top: 0;
     left: 0;
     .font-icon;
-    color: @chart-color-empty;
+    color: @chart-unselect-color;
     font-size: 34px;
     width: 90px;
     text-align: center;
@@ -47,12 +47,12 @@
   }
 
   & .command:hover:before {
-    color: @active-color;
+    color: @chart-select-color;
   }
 
   & .simulator {
     padding: 10px 5px 0px 5px;
-    color: @chart-color-empty;
+    color: @chart-unselect-color;
   }
 }
 
@@ -66,18 +66,18 @@
 
 rect.venn-all {
   fill: @palette-white;
-  stroke: @chart-color-axis-line;
+  stroke: @chart-axis-line-color;
   stroke-width: 2;
 }
 
 text.venn-all-text {
-  fill: @chart-color-axis-text;
+  fill: @chart-axis-text-color;
   font-size: 10px;
   text-anchor: end;
 }
 
 text.venn-button {
-  fill: @chart-color-axis-text;
+  fill: @chart-axis-text-color;
   font-size: 10px;
   cursor: pointer;
   text-anchor: end;
@@ -90,7 +90,7 @@ text.venn-button {
 
 circle.venn-circle {
   fill: none;
-  stroke: @chart-color-empty;
+  stroke: @chart-empty-color;
   stroke-width: 2;
   cursor: pointer;
   stroke-opacity: 1;
@@ -110,7 +110,7 @@ circle.venn-circle {
 }
 
 text.venn-circle-text {
-  fill: @chart-color-axis-text;
+  fill: @chart-axis-text-color;
   font-size: 10px;
   text-anchor: middle;
   alignment-baseline: middle;
@@ -132,7 +132,7 @@ text.venn-circle-text {
     position: relative;
     top: -4px;
     .font-icon;
-    color: @chart-color-axis-text;
+    color: @chart-axis-text-color;
     font-size: 24px;
     content: @icon-long-arrow-left;
   }
@@ -154,7 +154,7 @@ text.venn-circle-text {
   float: left;
   padding-right: 20px;
   text-decoration: underline;
-  color: @chart-color-axis-text;
+  color: @chart-axis-text-color;
   cursor: pointer;
 
   &:hover {
