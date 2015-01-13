@@ -42,6 +42,12 @@ public class JsonStringField<T extends IStringField> extends JsonValueField<T> {
         return getModel().isValidateOnAnyKey();
       }
     });
+    putJsonProperty(new JsonProperty<IStringField>(IStringField.PROP_INPUT_MASKED, model) {
+      @Override
+      protected Object modelValue() {
+        return getModel().isInputMasked();
+      }
+    });
   }
 
   @Override

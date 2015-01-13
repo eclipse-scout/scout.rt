@@ -52,4 +52,27 @@ describe("StringField", function() {
 
   });
 
+
+  describe("Check if field is switched to password field if inputMasked is true", function() {
+    var field;
+
+    beforeEach(function() {
+      field = createField(createModel());
+    });
+
+      it("set input masked", function() {
+        field.inputMasked = true;
+        field.render(session.$entryPoint);
+        expect(field.$field.attr('type')).toBe('password');
+      });
+
+      it("set input not masked", function() {
+        field.inputMasked = false;
+        field.render(session.$entryPoint);
+        expect(field.$field.attr('type')).toBe('text');
+      });
+
+
+  });
+
 });
