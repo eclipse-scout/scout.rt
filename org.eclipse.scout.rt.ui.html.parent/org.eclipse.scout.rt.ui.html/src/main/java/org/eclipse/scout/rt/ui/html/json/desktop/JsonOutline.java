@@ -20,7 +20,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
-import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline5;
 import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineEvent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -54,9 +53,7 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
   @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
-    if (getModel() instanceof IOutline5) {
-      putAdapterIdProperty(json, "defaultDetailForm", ((IOutline5) getModel()).getDefaultDetailForm());
-    }
+    putAdapterIdProperty(json, "defaultDetailForm", getModel().getDefaultDetailForm());
     return json;
   }
 
@@ -79,9 +76,7 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
   @Override
   protected void attachChildAdapters() {
     super.attachChildAdapters();
-    if (getModel() instanceof IOutline5) {
-      attachAdapter(((IOutline5) getModel()).getDefaultDetailForm());
-    }
+    attachAdapter(getModel().getDefaultDetailForm());
     if (getModel().isRootNodeVisible()) {
       attachPage(getModel().getRootPage());
     }
