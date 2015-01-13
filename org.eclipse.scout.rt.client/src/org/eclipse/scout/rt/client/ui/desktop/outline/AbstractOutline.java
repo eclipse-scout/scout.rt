@@ -64,6 +64,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   private IPageChangeStrategy m_pageChangeStrategy;
   private OptimisticLock m_contextPageOptimisticLock;
   private OutlineMediator m_outlineMediator;
+  private IForm m_defaultDetailForm;
 
   // internal usage of menus temporarily added to the tree.
   private List<IMenu> m_inheritedMenusOfPage;
@@ -137,6 +138,20 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
   }
 
   /**
+   * Configures the default detail form to be used with this page. The form is shown when no page is selected.
+   * <p>
+   * Subclasses can override this method. Default is {@code null}.
+   *
+   * @return a form type token
+   * @see {@link #startDefaultDetailForm(IForm)} for details how the form gets started
+   */
+  @ConfigProperty(ConfigProperty.FORM)
+  @Order(130)
+  protected Class<? extends IForm> getConfiguredDefaultDetailForm() {
+    return null;
+  }
+
+  /**
    * Called during initialization of this outline. Allows to add child pages to the outline tree. All added pages are
    * roots of the visible tree.
    * <p>
@@ -169,6 +184,21 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     }
   }
 
+  /**
+   * Initializes the default detail form associated with this page. This method is called before the
+   * default detail form is used for the first time.
+   * <p>
+   * Subclasses can override this method. The default does nothing.
+   *
+   * @throws ProcessingException
+   * @see #ensureDefaultDetailFormCreated()
+   * @see #ensureDefaultDetailFormStarted()
+   */
+  @ConfigOperation
+  @Order(120)
+  protected void execInitDefaultDetailForm() throws ProcessingException {
+  }
+
   @Override
   protected void initConfig() {
     m_visibleGranted = true;
@@ -184,6 +214,13 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     setEnabled(getConfiguredEnabled());
     setVisible(getConfiguredVisible());
     setOrder(calculateViewOrder());
+    try {
+      ensureDefaultDetailFormCreated();
+      ensureDefaultDetailFormStarted();
+    }
+    catch (ProcessingException e) {
+      SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+    }
   }
 
   /*
@@ -366,6 +403,11 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
 
   private void calculateVisible() {
     propertySupport.setPropertyBool(PROP_VISIBLE, m_visibleGranted && m_visibleProperty);
+  }
+
+  @Override
+  public IForm getDefaultDetailForm() {
+    return m_defaultDetailForm;
   }
 
   @Override
@@ -566,6 +608,67 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     finally {
       m_contextPageOptimisticLock.release();
     }
+  }
+
+  public void setDefaultDetailForm(IForm form) {
+    if (form != null) {
+      if (form.getDisplayHint() != IForm.DISPLAY_HINT_VIEW) {
+        form.setDisplayHint(IForm.DISPLAY_HINT_VIEW);
+      }
+      if (form.getDisplayViewId() == null) {
+        form.setDisplayViewId(IForm.VIEW_ID_PAGE_DETAIL);
+      }
+      form.setAutoAddRemoveOnDesktop(false);
+    }
+    m_defaultDetailForm = form;
+  }
+
+  /**
+   * Starts the default detail form.
+   * <p>
+   * The default uses {@link IForm#start()} and therefore expects a form handler to be previously set. Override to call
+   * a custom start method or implement a {@link IForm#start()} on the default detail form.
+   */
+  protected void startDefaultDetailForm() throws ProcessingException {
+    getDefaultDetailForm().start();
+  }
+
+  public void ensureDefaultDetailFormCreated() throws ProcessingException {
+    if (getDefaultDetailForm() != null) {
+      return;
+    }
+    IForm form = createDefaultDetailForm();
+    if (form != null) {
+      setDefaultDetailForm(form);
+      execInitDefaultDetailForm();
+    }
+  }
+
+  public void ensureDefaultDetailFormStarted() throws ProcessingException {
+    if (getDefaultDetailForm() == null || getDefaultDetailForm().isFormOpen()) {
+      return;
+    }
+    startDefaultDetailForm();
+  }
+
+  protected void disposeDefaultDetailForm() throws ProcessingException {
+    if (getDefaultDetailForm() != null) {
+      getDefaultDetailForm().doClose();
+      setDefaultDetailForm(null);
+    }
+  }
+
+  protected IForm createDefaultDetailForm() throws ProcessingException {
+    if (getConfiguredDefaultDetailForm() == null) {
+      return null;
+    }
+    try {
+      return getConfiguredDefaultDetailForm().newInstance();
+    }
+    catch (Exception e) {
+      SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + getConfiguredDefaultDetailForm().getName() + "'.", e));
+    }
+    return null;
   }
 
   @Override

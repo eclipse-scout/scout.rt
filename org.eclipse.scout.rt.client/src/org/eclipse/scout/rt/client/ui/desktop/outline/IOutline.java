@@ -106,6 +106,11 @@ public interface IOutline extends ITree, ITypeWithClassId, IOrdered {
   void setVisiblePermission(Permission p);
 
   /**
+   * @return the default detail form if no page is active (selected)
+   */
+  IForm getDefaultDetailForm();
+
+  /**
    * @return the detail form of the active (selected) page {@link IPage#getDetailForm()}
    */
   IForm getDetailForm();

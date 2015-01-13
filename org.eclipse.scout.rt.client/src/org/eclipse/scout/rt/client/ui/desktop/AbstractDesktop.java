@@ -1000,22 +1000,9 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
           setPageSearchForm(m_outline.getSearchForm(), true);
           m_outline.makeActivePageToContextPage();
           IPage<?> newActivePage = m_outline.getActivePage();
-          if (newActivePage == null) {
-            // if there is no active page, set it now
-            if (m_outline.isRootNodeVisible()) {
-              m_outline.selectNode(m_outline.getRootNode(), false);
-            }
-            else {
-              List<ITreeNode> children = m_outline.getRootNode().getChildNodes();
-              if (CollectionUtility.hasElements(children)) {
-                for (ITreeNode node : children) {
-                  if (node.isVisible() && node.isEnabled()) {
-                    m_outline.selectNode(node, false);
-                    break;
-                  }
-                }
-              }
-            }
+          if (newActivePage == null && m_outline.getDefaultDetailForm() == null) {
+            // if there is no active page and no default detail form, select the first page
+            activateFirstPage();
             newActivePage = m_outline.getActivePage();
           }
           if (newActivePage != null) {
@@ -1025,6 +1012,26 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
       }
       finally {
         m_outlineChanging = false;
+      }
+    }
+  }
+
+  /**
+   * Activates the first visible and enabled page of the current outline.
+   */
+  protected void activateFirstPage() {
+    if (m_outline.isRootNodeVisible()) {
+      m_outline.selectNode(m_outline.getRootNode(), false);
+    }
+    else {
+      List<ITreeNode> children = m_outline.getRootNode().getChildNodes();
+      if (CollectionUtility.hasElements(children)) {
+        for (ITreeNode node : children) {
+          if (node.isVisible() && node.isEnabled()) {
+            m_outline.selectNode(node, false);
+            break;
+          }
+        }
       }
     }
   }
