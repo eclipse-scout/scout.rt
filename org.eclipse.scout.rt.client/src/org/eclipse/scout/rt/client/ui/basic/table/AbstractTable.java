@@ -4528,24 +4528,33 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
     @Override
     public void fireTableReloadFromUI() {
-      // FIXME CGU/AWE: push/popUiProcessor?
       if (m_reloadHandler != null) {
         try {
+          pushUIProcessor();
+          //
           m_reloadHandler.reload();
         }
         catch (ProcessingException e) {
           SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+        }
+        finally {
+          popUIProcessor();
         }
       }
     }
 
     @Override
     public void fireSortColumnRemovedFromUI(IColumn<?> column) {
-      // FIXME CGU/AWE: push/popUiProcessor?
-      getColumnSet().removeSortColumn(column);
-      sort();
+      try {
+        pushUIProcessor();
+        //
+        getColumnSet().removeSortColumn(column);
+        sort();
+      }
+      finally {
+        popUIProcessor();
+      }
     }
-
   }
 
   private static class P_CellLookup {
