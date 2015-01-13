@@ -108,3 +108,9 @@ CGU 13.01.2015
 Added default detail form on outline:
 It is now possible to configure a default detail form for outlines. The default detail form gets shown when no page is selected.
 API added getConfiguredDefaultDetailForm, execInitDefaultDetailForm, createDefaultDetailForm, startDefaultDetailForm
+
+CGU 13.01.2015
+Added ISearchOutline:
+The intention of the search outline is to provide a search over several table pages.
+The AbstractSearchOutline provides a frame, the search itself has to be implemented by the project.
+In order to use it add the SearchOutline to the desktop using getConfiguredOutlines (don't create an outlineViewButton).
