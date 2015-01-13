@@ -522,9 +522,19 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
       try {
         m_searchForm.startSearch();
         notifyMemoryPolicyOfSearchFormStart();
+        ensureSearchControlSelected();
       }
       catch (Exception e) {
         LOG.warn(null, e);
+      }
+    }
+  }
+
+  protected void ensureSearchControlSelected() {
+    if (isSearchRequired() && !getSearchFilter().isCompleted()) {
+      SearchFormTableControl control = getTable().getTableControl(SearchFormTableControl.class);
+      if (control != null) {
+        control.setSelected(true);
       }
     }
   }
