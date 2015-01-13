@@ -137,13 +137,12 @@ scout.DateField.prototype._onKeyDown = function(event) {
     return false;
   }
 
-  //Use set timeout because field value is not set when keydown is fried. Keydown is used because keyup feels laggy.
+  // Use set timeout because field value is not set when keyDown is fired (keyDown is used because keyUp feels laggy).
   setTimeout(function(e) {
     if (!this._$predict) {
-      //Return if $predict was already removed (e.g. by focus lost)
+      // Return if $predict was already removed (e.g. by focus lost)
       return;
     }
-
     displayText = this.$field.val();
     var predictedDateText = '';
     var valid = this.validateDisplayText(displayText);
@@ -193,7 +192,7 @@ scout.DateField.prototype._validateDisplayText = function(text) {
   }
 };
 
-/*
+/**
  * @return true if valid, false if not
  */
 scout.DateField.prototype.validateDisplayText = function(text) {
@@ -212,11 +211,11 @@ scout.DateField.prototype._acceptPrediction = function() {
   this._updateSelection(prediction);
 };
 
-scout.DateField.prototype._predict = function(text) {
-  // FIXME BSH Date | Check this code
+scout.DateField.prototype._predict = function(validatedText) {
+  // TODO BSH Date | Check this code
   var now = new Date();
   var currentYear = String(now.getFullYear());
-  var dateInfo = this._dateFormat.analyze(text);
+  var dateInfo = this._dateFormat.analyze(validatedText);
   var day = dateInfo.day,
     month = dateInfo.month,
     year = dateInfo.year;

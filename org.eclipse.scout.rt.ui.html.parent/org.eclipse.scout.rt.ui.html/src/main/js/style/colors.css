@@ -30,10 +30,13 @@
 @palette-bsi-active: #005164;
 
 @palette-gray-8: #EFEFEF;
+@palette-gray-7: #DDDDDD;
 @palette-gray-6: #CCCCCC;
 @palette-gray-5: #999999;
 @palette-gray-4: #666666;
+@palette-gray-3: #4C4C4C;
 @palette-gray-2: #333333;
+@palette-gray-1: #191919;
 
 /* ------------------------ */
 /* Color Palette Definition */

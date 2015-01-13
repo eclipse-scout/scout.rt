@@ -44,6 +44,7 @@
   display: inline-block;
 }
 
+/* weekday header */
 .date-box-weekday {
   width: 34px;
   height: 30px;
@@ -51,7 +52,6 @@
   float: left;
   text-align: center;
 }
-
 
 .date-box-day {
   width: 26px;
@@ -69,7 +69,7 @@
   }
 
   &:hover {
-    color: @active-color;
+    background-color: @palette-gray-8;
   }
 
   &.date-box-out {
@@ -77,19 +77,20 @@
   }
 
   &.date-box-weekend {
-    color: @palette-gray-4;
+    color: @palette-gray-5;
   }
 
   &.date-box-out-weekend {
-    color: @palette-gray-6;
+    color: @palette-gray-7;
   }
 
   &.date-box-now {
     background-color: @palette-gray-6;
   }
 
-  &.date-box-select {
+  &.date-box-selected {
     background-color: @palette-bsi-disabled;
+    color: @palette-bsi-active;
     border: 1px solid @active-color;
   }
 }

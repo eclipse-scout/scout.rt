@@ -205,7 +205,7 @@ scout.DatePicker.prototype._createDateBox = function () {
     }
 
     if (this.selectedDate && scout.dates.isSameDay(start, this.selectedDate)){
-      cl += ' date-box-select';
+      cl += ' date-box-selected';
     }
 
     if (dayInMonth > 9 && dayInMonth < 20) {

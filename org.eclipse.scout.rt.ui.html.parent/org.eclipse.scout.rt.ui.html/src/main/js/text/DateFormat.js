@@ -223,31 +223,32 @@ scout.DateFormat.prototype.format = function(date) {
 
 scout.DateFormat.prototype.analyze = function(text, asNumber) {
   var result = {};
-  var sep = this.pattern.replace('dd', '').replace('MM', '').replace('yyyy', '')[0];
-  var pattern = this.pattern.split(sep);
-  text = text.split(sep);
+  if (text) {
+    var sep = this.pattern.replace('dd', '').replace('MM', '').replace('yyyy', '')[0];
+    var pattern = this.pattern.split(sep);
+    text = text.split(sep);
 
-  result.day = text[pattern.indexOf('dd')];
-  result.month = text[pattern.indexOf('MM')];
-  result.year = text[pattern.indexOf('yyyy')];
+    result.day = text[pattern.indexOf('dd')];
+    result.month = text[pattern.indexOf('MM')];
+    result.year = text[pattern.indexOf('yyyy')];
 
-  if (asNumber) {
-    result.day = parseInt(result.day, 10);
-    result.month = parseInt(result.month, 10);
-    result.year = parseInt(result.year, 10);
+    if (asNumber) {
+      result.day = parseInt(result.day, 10);
+      result.month = parseInt(result.month, 10);
+      result.year = parseInt(result.year, 10);
+    }
   }
-
   return result;
 };
 
 scout.DateFormat.prototype.parse = function(text) {
   if (!text) {
-    return;
+    return undefined;
   }
 
   var dateInfo = this.analyze(text, true);
   if (isNaN(dateInfo.year) || isNaN(dateInfo.month) || isNaN(dateInfo.day)) {
-    return null;
+    return undefined;
   }
 
   var year = dateInfo.year;
