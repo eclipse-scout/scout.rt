@@ -223,6 +223,20 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   }
 
   /**
+   * Configures whether the table status should be visible.
+   * <p>
+   * Subclasses can override this method. Default is {@code true}.
+   *
+   * @since 5.1.0
+   * @see ITable#setTableStatusVisible(boolean)
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(130)
+  protected boolean getConfiguredTableStatusVisible() {
+    return true;
+  }
+
+  /**
    * Fetches data and loads them into the page's table.
    * <p/>
    * Typically subclasses override this method if this table page is using a bean-based table page data (i.e. an
@@ -461,6 +475,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
         table.setEnabled(isEnabled());
         table.setAutoDiscardOnDelete(true);
         table.setUserPreferenceContext(getUserPreferenceContext());
+        table.setTableStatusVisible(getConfiguredTableStatusVisible());
         table.initTable();
       }
     }
