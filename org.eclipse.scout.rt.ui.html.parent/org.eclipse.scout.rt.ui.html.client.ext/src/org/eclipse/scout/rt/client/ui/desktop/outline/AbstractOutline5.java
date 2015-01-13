@@ -25,7 +25,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable;
 import org.eclipse.scout.rt.extension.client.ui.desktop.outline.AbstractExtensibleOutline;
 
-public abstract class AbstractOutline5 extends AbstractExtensibleOutline implements IOutline5 {
+public abstract class AbstractOutline5 extends AbstractExtensibleOutline {
 
   protected AbstractOutline5() {
     super();
