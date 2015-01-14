@@ -88,6 +88,8 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdere
   String PROP_LABEL_VISIBLE = "labelVisible";
   String PROP_KEY_STROKES = "keyStrokes";
   String PROP_STATUS_VISIBLE = "statusVisible";
+  String PROP_GRID_DATA = "gridData";
+
   /**
    * @deprecated since 3.8, sent via {@link org.eclipse.scout.rt.client.ui.form.FormEvent#TYPE_REQUEST_FOCUS
    *             FormEvent#TYPE_REQUEST_FOCUS}. Will be removed in the 5.0 Release.
@@ -626,8 +628,9 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdere
 
   /**
    * Sets whether or not the status icon is visible.
-   * 
-   * @param statusVisible {@code true} if status icon should be visible, {@code false} otherwise
+   *
+   * @param statusVisible
+   *          {@code true} if status icon should be visible, {@code false} otherwise
    */
   void setStatusVisible(boolean statusVisible);
 

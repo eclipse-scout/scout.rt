@@ -100,7 +100,6 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   private IValueField<?> m_masterField;
   private boolean m_masterRequired;
   // auto layout
-  private GridData m_gridData;
   private GridData m_gridDataHints;
   // label visibility
   private boolean m_labelVisible;
@@ -793,7 +792,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   protected void initConfig() {
-    m_gridData = new GridData(-1, -1, 1, 1, -1, -1);
+    setGridDataInternal(new GridData(-1, -1, 1, 1, -1, -1));
     m_gridDataHints = new GridData(-1, -1, 1, 1, -1, -1);
     propertySupport.setPropertyBool(PROP_EMPTY, true);
     m_contributionHolder = new ContributionComposite(this);
@@ -1760,12 +1759,12 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
 
   @Override
   public GridData getGridData() {
-    return new GridData(m_gridData);
+    return (GridData) propertySupport.getProperty(PROP_GRID_DATA);
   }
 
   @Override
   public void setGridDataInternal(GridData data) {
-    m_gridData = new GridData(data);
+    propertySupport.setProperty(PROP_GRID_DATA, data);
   }
 
   @Override

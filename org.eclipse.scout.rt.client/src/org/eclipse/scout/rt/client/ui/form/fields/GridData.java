@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -65,6 +65,87 @@ public final class GridData {
     this.fillVertical = fillVertical;
     this.widthInPixel = widthInPixel;
     this.heightInPixel = heightInPixel;
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + (fillHorizontal ? 1231 : 1237);
+    result = prime * result + (fillVertical ? 1231 : 1237);
+    result = prime * result + h;
+    result = prime * result + heightInPixel;
+    result = prime * result + horizontalAlignment;
+    result = prime * result + (useUiHeight ? 1231 : 1237);
+    result = prime * result + (useUiWidth ? 1231 : 1237);
+    result = prime * result + verticalAlignment;
+    result = prime * result + w;
+    long temp;
+    temp = Double.doubleToLongBits(weightX);
+    result = prime * result + (int) (temp ^ (temp >>> 32));
+    temp = Double.doubleToLongBits(weightY);
+    result = prime * result + (int) (temp ^ (temp >>> 32));
+    result = prime * result + widthInPixel;
+    result = prime * result + x;
+    result = prime * result + y;
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    GridData other = (GridData) obj;
+    if (fillHorizontal != other.fillHorizontal) {
+      return false;
+    }
+    if (fillVertical != other.fillVertical) {
+      return false;
+    }
+    if (h != other.h) {
+      return false;
+    }
+    if (heightInPixel != other.heightInPixel) {
+      return false;
+    }
+    if (horizontalAlignment != other.horizontalAlignment) {
+      return false;
+    }
+    if (useUiHeight != other.useUiHeight) {
+      return false;
+    }
+    if (useUiWidth != other.useUiWidth) {
+      return false;
+    }
+    if (verticalAlignment != other.verticalAlignment) {
+      return false;
+    }
+    if (w != other.w) {
+      return false;
+    }
+    if (Double.doubleToLongBits(weightX) != Double.doubleToLongBits(other.weightX)) {
+      return false;
+    }
+    if (Double.doubleToLongBits(weightY) != Double.doubleToLongBits(other.weightY)) {
+      return false;
+    }
+    if (widthInPixel != other.widthInPixel) {
+      return false;
+    }
+    if (x != other.x) {
+      return false;
+    }
+    if (y != other.y) {
+      return false;
+    }
+    return true;
   }
 
   @Override
