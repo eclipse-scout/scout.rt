@@ -37,7 +37,7 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
 
   private static final String EVENT_PAGE_CHANGED = "pageChanged";
   private static final String PROP_DETAIL_FORM = IOutline.PROP_DETAIL_FORM;
-  private static final String PROP_DETAIL_TABLE = "detailTable";
+  private static final String PROP_DETAIL_TABLE = IOutline.PROP_DETAIL_TABLE;
   private static final String PROP_DETAIL_FORM_VISIBLE = "detailFormVisible";
   private Set<IJsonAdapter<?>> m_jsonDetailTables = new HashSet<IJsonAdapter<?>>();
 
@@ -169,6 +169,10 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
     addActionEvent("detailFormChanged", jsonEvent);
   }
 
+  // FIXME AWE: (outline) discucss with C.GU: das hier ist der event-handler der outline, nicht der page/node
+  // das event, dass wir dann aber ans UI feuern betrifft die page/node und nicht die Outline!
+  // Wir gehen einfach davon aus, dass dieses event IMMER die gerade selektierte node betrifft
+  // was nicht zwangsläufig richtig sein muss.
   protected void handleModelDetailTableChanged(ITable detailTable) {
     JSONObject jsonEvent = new JSONObject();
     ITreeNode selectedNode = getModel().getSelectedNode();

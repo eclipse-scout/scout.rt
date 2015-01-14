@@ -418,3 +418,38 @@ Das Konzept für die MenuBar muss überarbeitet werden. Wichtige Punkte sind dab
 - TODO cgu: context menü prüfen
 
 - TODO CGU alternative mit Dispose überlegen, wie heute, vielleicht Kombination möglich, nur Property-Change Problem lösen
+
+13.01.2015 UI Team, AHO - Menu
+- Thema: soll die Konfiguration im Bereich Forms (System/Process Buttons) geändert werden
+  damit das Model besser zum neuen UI passt? Sollen Buttons durch Actions ersetzt werden?
+  Fazit: der Aufwand dafür wäre zu gross (hoher Migrationsaufwand), der Gewinn wäre relativ
+  klein (bessere Verständlichkeit, mehr Bezug zum UI).
+- Wir werden die aktuelle Konfiguration interpretieren und in der MenuBar vom Html UI darstellen
+
+  System-Buttons interpretieren horizontalAlignment
+    links = -1
+    rechts =  1
+  Process Buttons interpretieren horizontalAlignment
+    links = -1
+    rechts =  1
+
+  Buttons mit gleichem hAlign werden nach ihrer Order sortiert
+
+  Menus im Form
+    links = implements IMenu (gibt es heute nicht)
+    rechts = implements IToolMenu (z.B. Detach Button)
+  Menus in Table
+    ganz links = fix die navi buttons
+    links 1 = empty space
+    links 2 = single/multi selection
+    rechts = IToolMenu
+
+  Menus können nicht mit Buttons durchmischt werden
+
+  Bei den detailForms in der Outline sind IMMER die beiden navi buttons ganz links
+
+Order von Buttons muss in CRM geändert werden (Migration durch Script)
+MVI fragen ob uns die SDK bei der Migration unterstützen kann
+
+
+

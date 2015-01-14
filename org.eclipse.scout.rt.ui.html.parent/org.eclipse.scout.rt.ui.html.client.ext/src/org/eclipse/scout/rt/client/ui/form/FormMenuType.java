@@ -12,6 +12,9 @@ package org.eclipse.scout.rt.client.ui.form;
 
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
 
+// FIXME AWE: delete this enum
+// --> new IToolButton
+
 public enum FormMenuType implements IMenuType {
   Regular,
   System, //Not sure if necessary. We have a system_type on IMenu5. Maybe we should better configure the buttons in the right order and use separators

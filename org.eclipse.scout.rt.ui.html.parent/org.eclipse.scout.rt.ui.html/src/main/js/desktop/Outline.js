@@ -176,6 +176,15 @@ scout.Outline.prototype.onFormChanged = function(nodeId, detailForm) {
 };
 
 // FIXME AWE/CGU: discuss - looks like copy/paste with small differences
+
+// FIXME AWE: (outline) discucss with C.GU:: das hier bilden wir etwas anders ab, als das scout model ist
+// wir ignorieren eigentlich, dass die outline selber ein detailForm hat
+// im java-code reagieren wie auf das event wenn die OUTLINE das detail-form
+// ändert. Im JsonLayer/JS-code kopieren wir dann dieses detailForm auf die gerade
+// aktuelle node.
+//
+// node.table
+// outline.detailTable
 scout.Outline.prototype.onTableChanged = function(nodeId, detailTable) {
   var node;
   if (nodeId >= 0) {
