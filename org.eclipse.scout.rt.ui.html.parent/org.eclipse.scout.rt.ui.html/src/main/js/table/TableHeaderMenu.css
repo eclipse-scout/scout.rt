@@ -42,13 +42,14 @@
   .font-icon;
   font-size: 17px;
   line-height: 29px;
-  color: @text-color;
+  color: @icon-color;
   border: 1px solid @desktop-border-color;
   cursor: pointer;
   text-align: center;
 
   &:hover {
-    color: @hover-color;
+    color: @palette-bsi-normal;
+    border: 1px solid @palette-bsi-normal;
   }
 
   &:after {
