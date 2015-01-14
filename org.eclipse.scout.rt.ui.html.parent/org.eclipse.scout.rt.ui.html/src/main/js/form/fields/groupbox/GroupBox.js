@@ -6,6 +6,7 @@ scout.GroupBox = function() {
   this.formFields = [];
   this._addAdapterProperties('formFields');
   this._$body;
+  this._$bodyContainer; // $scrollable if groupbox is scrollable, otherwise same as _$body;
   this._$groupBoxTitle;
 
   this.controls = [];
@@ -22,7 +23,10 @@ scout.GroupBox.prototype._renderProperties = function() {
 };
 
 scout.GroupBox.prototype._render = function($parent) {
-  var htmlComp = this.addContainer($parent, this.mainBox ? 'root-group-box' : 'group-box', new scout.GroupBoxLayout());
+  var env = scout.HtmlEnvironment,
+    htmlComp = this.addContainer($parent, this.mainBox ? 'root-group-box' : 'group-box', new scout.GroupBoxLayout(this)),
+    htmlBodyContainer;
+
   if (this.mainBox) {
     htmlComp.layoutData = null;
   }
@@ -33,13 +37,18 @@ scout.GroupBox.prototype._render = function($parent) {
     append(this.$label);
 
   this._$body = this.$container.appendDiv('group-box-body');
-  var env = scout.HtmlEnvironment;
-  var htmlBody = new scout.HtmlComponent(this._$body, this.session);
-  htmlBody.setLayout(new scout.LogicalGridLayout(env.formColumnGap, env.formRowGap));
+  this._$bodyContainer = this._$body;
+
+  htmlBodyContainer = new scout.HtmlComponent(this._$bodyContainer, this.session);
+  if (this.scrollable) {
+    this._$bodyContainer = scout.scrollbars.install(this._$body);
+    htmlBodyContainer = scout.HtmlComponent.get(this._$bodyContainer);
+  }
+  htmlBodyContainer.setLayout(new scout.LogicalGridLayout(env.formColumnGap, env.formRowGap));
 
   this._createFieldArraysByType();
   for (var i=0; i<this.controls.length; i++) {
-    this.controls[i].render(this._$body);
+    this.controls[i].render(this._$bodyContainer);
   }
 
   if (this.processButtons.length > 0) {

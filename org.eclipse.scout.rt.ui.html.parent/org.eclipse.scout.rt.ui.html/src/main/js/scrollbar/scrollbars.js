@@ -26,6 +26,14 @@ scout.scrollbars = {
         scrollbar = new scout.Scrollbar($scrollable, options);
       scrollbar.updateThumb();
       $scrollable.data('scrollbar', scrollbar);
+
+      // Create a htmlComponent if the parent has one.
+      // This is necessary in order to properly propagate the size changes to the children, so they get layouted.
+      var htmlContainer = scout.HtmlComponent.optGet($container);
+      if (htmlContainer) {
+        var htmlScrollable = new scout.HtmlComponent($scrollable, htmlContainer.session);
+        htmlContainer.setLayout(new scout.SingleLayout(htmlScrollable));
+      }
       return $scrollable;
     }
   },

@@ -1,13 +1,18 @@
 /**
- * Single Layout. Expects the container to have exactly one child. Resizes the child so it has the same size as the container.
+ * Resizes the child so it has the same size as the container.<br>
+ * If no child is provided, the first child in the container is used.
  */
-scout.SingleLayout = function() {
+scout.SingleLayout = function(htmlChild) {
   scout.SingleLayout.parent.call(this);
+  this._htmlChild = htmlChild;
 };
 scout.inherits(scout.SingleLayout, scout.AbstractLayout);
 
 scout.SingleLayout.prototype.preferredLayoutSize = function($container) {
-  return this._getHtmlSingleChild($container).getPreferredSize();
+  if (!this._htmlChild) {
+    this._htmlChild = this._getHtmlSingleChild($container);
+  }
+  return this._htmlChild.getPreferredSize();
 };
 
 scout.SingleLayout.prototype.layout = function($container) {
@@ -15,7 +20,10 @@ scout.SingleLayout.prototype.layout = function($container) {
   var childSize = htmlContainer.getSize()
     .subtract(htmlContainer.getInsets());
 
-  this._getHtmlSingleChild($container).setSize(childSize);
+  if (!this._htmlChild) {
+    this._htmlChild = this._getHtmlSingleChild($container);
+  }
+  this._htmlChild.setSize(childSize);
 };
 
 scout.SingleLayout.prototype._getHtmlSingleChild = function($container) {

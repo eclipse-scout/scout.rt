@@ -23,6 +23,7 @@ import org.json.JSONObject;
 public class JsonGroupBox<T extends IGroupBox> extends JsonFormField<T> {
 
   public static final String PROP_MAIN_BOX = "mainBox";
+  public static final String PROP_SCROLLABLE = "scrollable";
 
   public JsonGroupBox(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
     super(model, jsonSession, id, parent);
@@ -53,6 +54,12 @@ public class JsonGroupBox<T extends IGroupBox> extends JsonFormField<T> {
       @Override
       protected Boolean modelValue() {
         return getModel().isMainBox();
+      }
+    });
+    putJsonProperty(new JsonProperty<IGroupBox>(PROP_SCROLLABLE, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isScrollable();
       }
     });
   }
