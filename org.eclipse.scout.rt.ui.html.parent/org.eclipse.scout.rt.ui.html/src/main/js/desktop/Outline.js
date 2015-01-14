@@ -212,7 +212,10 @@ scout.Outline.prototype.setDetailFormVisible = function(nodeId, visible) {
     node = this._nodeMap[nodeId];
     if (node.detailFormVisible !== visible) {
       node.detailFormVisible = visible;
-      node.session.send('pageChanged', this.id, {nodeId: nodeId, detailFormVisible: visible});
+      node.session.send(this.id, 'pageChanged', {
+        nodeId: nodeId,
+        detailFormVisible: visible
+      });
     }
   }
 };

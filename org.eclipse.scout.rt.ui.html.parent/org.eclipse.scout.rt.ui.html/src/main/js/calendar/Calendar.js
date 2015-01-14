@@ -14,7 +14,7 @@ scout.Calendar.prototype.init = function(model, session) {
   scout.Calendar.parent.prototype.init.call(this, model, session);
 
   // Trigger async loading of data TODO BSH Calendar | Check if there is a better solution
-  this.session.send('setVisibleRange', this.id, {
+  this.session.send(this.id, 'setVisibleRange', {
     dateRange: {
       // TODO Calendar | Get initial dates from date selector
       from: scout.dates.toJsonDate(new Date()),

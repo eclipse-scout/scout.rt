@@ -75,7 +75,7 @@ describe("Tree", function() {
 
   function createNodeExpandedEvent(model, nodeId, expanded) {
     return {
-      id: model.id,
+      target: model.id,
       nodeId: nodeId,
       expanded: expanded,
       type: 'nodeExpanded'
@@ -84,7 +84,7 @@ describe("Tree", function() {
 
   function createNodesSelectedEvent(model, nodeIds) {
     return {
-      id: model.id,
+      target: model.id,
       nodeIds: nodeIds,
       type: 'nodesSelected'
     };
@@ -92,7 +92,7 @@ describe("Tree", function() {
 
   function createNodesInsertedEvent(model, nodes, commonParentNodeId) {
     return {
-      id: model.id,
+      target: model.id,
       commonParentNodeId: commonParentNodeId,
       nodes: nodes,
       type: 'nodesInserted'
@@ -101,7 +101,7 @@ describe("Tree", function() {
 
   function createNodesDeletedEvent(model, nodeIds, commonParentNodeId) {
     return {
-      id: model.id,
+      target: model.id,
       commonParentNodeId: commonParentNodeId,
       nodeIds: nodeIds,
       type: 'nodesDeleted'
@@ -110,7 +110,7 @@ describe("Tree", function() {
 
   function createAllNodesDeletedEvent(model, commonParentNodeId) {
     return {
-      id: model.id,
+      target: model.id,
       commonParentNodeId: commonParentNodeId,
       type: 'allNodesDeleted'
     };
@@ -118,7 +118,7 @@ describe("Tree", function() {
 
   function createNodeChangedEvent(model, nodeId) {
     return {
-      id: model.id,
+      target: model.id,
       nodeId: nodeId,
       type: 'nodeChanged'
     };
@@ -696,12 +696,12 @@ describe("Tree", function() {
 
         sendQueuedAjaxCalls();
 
-        var event0 = new scout.Event('nodeExpanded', tree.id, {
-          "nodeId": node0.id,
+        var event0 = new scout.Event(tree.id, 'nodeExpanded', {
+          nodeId: node0.id,
           expanded: true
         });
-        var event1 = new scout.Event('nodeExpanded', tree.id, {
-          "nodeId": child0.id,
+        var event1 = new scout.Event(tree.id, 'nodeExpanded', {
+          nodeId: child0.id,
           expanded: true
         });
         expect(mostRecentJsonRequest()).toContainEvents([event0, event1]);

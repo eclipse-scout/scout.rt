@@ -59,7 +59,7 @@ describe("ModelAdapter", function() {
     session.registerModelAdapter(modelAdapter);
 
     // Send a dummy event to this object which contains both a new object and a id-only ref to that new object
-    event = new scout.Event('property', '2', {
+    event = new scout.Event('2', 'property', {
       'properties': {
         'x1': 'val1',
         'x2': 'val2',
@@ -83,7 +83,7 @@ describe("ModelAdapter", function() {
     expect(modelAdapter.o2.id).toBe('3');
 
     // Now send a second event, but now send the id-only ref first (in o1).
-    event = new scout.Event('property', '2', {
+    event = new scout.Event('2', 'property', {
       'properties': {
         'x2': 'val20',
         'x1': 'val10',

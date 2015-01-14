@@ -55,5 +55,5 @@ scout.ValueField.prototype._updateDisplayText = function(displayText, whileTypin
   }
 
   this.displayText = displayText;
-  this.session.send('displayTextChanged', this.id, data);
+  this.session.send(this.id, 'displayTextChanged', data);
 };

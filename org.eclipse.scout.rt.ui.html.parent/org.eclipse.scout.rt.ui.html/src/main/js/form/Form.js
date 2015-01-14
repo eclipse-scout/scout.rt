@@ -68,7 +68,7 @@ scout.Form.prototype._render = function($parent) {
     var $closeButton = $('<button>').text('X');
     this.menubar.$container.append($closeButton);
     $closeButton.on('click', function() {
-      this.session.send('formClosing', this.id);
+      this.session.send(this.id, 'formClosing');
     }.bind(this));
   }
 

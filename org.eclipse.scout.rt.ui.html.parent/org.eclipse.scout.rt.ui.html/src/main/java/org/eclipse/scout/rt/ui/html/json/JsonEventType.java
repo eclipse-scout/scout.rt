@@ -47,5 +47,4 @@ public enum JsonEventType {
     }
     throw new IllegalArgumentException("Value with eventType=" + eventType + " does not exist");
   }
-
 }

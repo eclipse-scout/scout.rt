@@ -17,37 +17,40 @@ import org.json.JSONObject;
  */
 public class JsonEvent implements IJsonMapper {
 
-  public static final String ID = "id";
+  public static final String TARGET = "target";
   public static final String TYPE = "type";
 
-  private final String m_id;
+  private final String m_target;
   private final String m_type;
   private final JSONObject m_data;
 
   /**
+   * @param target
+   *          Event target (usually, an adapter ID)
    * @param type
    *          See {@link JsonEventType} enum for a list of often used event types.
-   * @param id
-   *          Adapater ID
    * @param data
-   *          Nullable data
+   *          Event data (or <code>null</code>). <b><font color=red>Please note:</font></b> Do not use the reserved
+   *          property names <code>'target'</code> and <code>'type'</code> in this object, as they will be overridden by
+   *          the corresponding first two arguments.
    */
-  public JsonEvent(String id, String type, JSONObject data) {
-    if (id == null || type == null) {
-      throw new IllegalArgumentException("id and type cannot be null");
+  public JsonEvent(String target, String type, JSONObject data) {
+    if (target == null) {
+      throw new IllegalArgumentException("Argument 'target' cannot be null");
     }
-    m_id = id;
-    m_type = type;
+    if (type == null) {
+      throw new IllegalArgumentException("Argument 'type' cannot be null");
+    }
     if (data == null) {
-      m_data = new JSONObject();
+      data = new JSONObject();
     }
-    else {
-      m_data = data;
-    }
+    m_target = target;
+    m_type = type;
+    m_data = data;
   }
 
-  public String getId() {
-    return m_id;
+  public String getTarget() {
+    return m_target;
   }
 
   public String getType() {
@@ -59,27 +62,28 @@ public class JsonEvent implements IJsonMapper {
   }
 
   public static JsonEvent fromJson(JSONObject json) {
-    String id = JsonObjectUtility.getString(json, ID);
+    if (json == null) {
+      throw new IllegalArgumentException("Argument 'json' cannot be null");
+    }
+    String target = JsonObjectUtility.getString(json, TARGET);
     String type = JsonObjectUtility.getString(json, TYPE);
-    return new JsonEvent(id, type, json);
+    // data is a copy of the JSON object but without target and type properties
+    JSONObject data = JsonObjectUtility.newJSONObject(json.toString());
+    data.remove(TARGET);
+    data.remove(TYPE);
+    return new JsonEvent(target, type, data);
   }
 
   @Override
   public JSONObject toJson() {
-    JSONObject json;
-    if (m_data == null) {
-      json = new JSONObject();
-    }
-    else {
-      json = JsonObjectUtility.newJSONObject(m_data.toString());
-    }
-    JsonObjectUtility.putProperty(json, ID, m_id);
+    JSONObject json = JsonObjectUtility.newJSONObject(m_data.toString());
+    JsonObjectUtility.putProperty(json, TARGET, m_target);
     JsonObjectUtility.putProperty(json, TYPE, m_type);
     return json;
   }
 
   @Override
   public String toString() {
-    return "ID: " + m_id + ". Type: " + m_type + ". Data: " + m_data;
+    return "Target: " + m_target + ". Type: " + m_type + ". Data: " + m_data;
   }
 }

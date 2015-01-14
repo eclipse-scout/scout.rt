@@ -46,7 +46,9 @@ scout.DesktopNavigation.prototype.render = function($parent) {
 
 scout.DesktopNavigation.prototype._selectTab = function(tab, outline) {
    this.desktop.changeOutline(outline);
-   this.session.send('outlineChanged', this.desktop.id, {'outlineId' : outline.id });
+   this.session.send(this.desktop.id, 'outlineChanged', {
+     outlineId: outline.id
+   });
    this._setActiveTab(tab);
 };
 

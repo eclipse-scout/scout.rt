@@ -41,7 +41,7 @@ describe("Form", function() {
 
       function createFormClosedEvent(model) {
         return {
-          id: model.id,
+          target: model.id,
           type: 'formClosed'
         };
       }

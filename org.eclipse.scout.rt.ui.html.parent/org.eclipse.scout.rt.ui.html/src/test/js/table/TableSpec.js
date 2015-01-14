@@ -114,8 +114,8 @@ describe("Table", function() {
 
       expect(jasmine.Ajax.requests.count()).toBe(1);
 
-      var event = new scout.Event('rowsSelected', table.id, {
-        "rowIds": rowIds
+      var event = new scout.Event(table.id, 'rowsSelected', {
+        rowIds: rowIds
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
@@ -187,9 +187,9 @@ describe("Table", function() {
       expect(table.columns[0].width).toBe(100);
 
       sendQueuedAjaxCalls();
-      var event = new scout.Event('columnResized', table.id, {
-        "columnId": table.columns[0].id,
-        "width": 100
+      var event = new scout.Event(table.id, 'columnResized', {
+        columnId: table.columns[0].id,
+        width: 100
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
@@ -227,9 +227,9 @@ describe("Table", function() {
       expect(jasmine.Ajax.requests.count()).toBe(1);
       expect(mostRecentJsonRequest().events.length).toBe(1);
 
-      var event = new scout.Event('columnResized', table.id, {
-        "columnId": table.columns[0].id,
-        "width": 150
+      var event = new scout.Event(table.id, 'columnResized', {
+        columnId: table.columns[0].id,
+        width: 150
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
@@ -351,8 +351,8 @@ describe("Table", function() {
       table.sort($header0, 'desc');
       sendQueuedAjaxCalls();
 
-      var event = new scout.Event('rowsSorted', table.id, {
-        "columnId": table.columns[0].id
+      var event = new scout.Event(table.id, 'rowsSorted', {
+        columnId: table.columns[0].id
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
@@ -365,8 +365,8 @@ describe("Table", function() {
       table.sort($header0, 'desc');
       sendQueuedAjaxCalls();
 
-      var event = new scout.Event('sortRows', table.id, {
-        "columnId": table.columns[0].id
+      var event = new scout.Event(table.id, 'sortRows', {
+        columnId: table.columns[0].id
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
@@ -556,7 +556,7 @@ describe("Table", function() {
       sendQueuedAjaxCalls();
 
       var requestData = mostRecentJsonRequest();
-      var event = new scout.Event('aboutToShow', menuModel.id);
+      var event = new scout.Event(menuModel.id, 'aboutToShow');
       expect(requestData).toContainEvents(event);
     });
 
@@ -612,8 +612,8 @@ describe("Table", function() {
       var requestData = mostRecentJsonRequest();
       expect(requestData).toContainEventTypesExactly('rowsSelected');
 
-      var event = new scout.Event('rowsSelected', table.id, {
-        "rowIds": ['0', '1', '2']
+      var event = new scout.Event(table.id, 'rowsSelected', {
+        rowIds: ['0', '1', '2']
       });
       expect(requestData).toContainEvents(event);
     });
@@ -654,8 +654,8 @@ describe("Table", function() {
       sendQueuedAjaxCalls();
 
       var requestData = mostRecentJsonRequest();
-      var event = new scout.Event('rowsSelected', table.id, {
-        "rowIds": ['0']
+      var event = new scout.Event(table.id, 'rowsSelected', {
+        rowIds: ['0']
       });
       expect(requestData).toContainEvents(event);
     }
@@ -697,7 +697,7 @@ describe("Table", function() {
 
     function createRowsInsertedEvent(model, rows) {
       return {
-        id: model.id,
+        target: model.id,
         rows: rows,
         type: 'rowsInserted'
       };
@@ -711,8 +711,8 @@ describe("Table", function() {
       spyOn(table, '_onRowsSelected');
 
       var rowIds = ['0', '4'];
-      var event = new scout.Event('rowsSelected', table.id, {
-        "rowIds": rowIds
+      var event = new scout.Event(table.id, 'rowsSelected', {
+        rowIds: rowIds
       });
       table.onModelAction(event);
 
@@ -724,7 +724,7 @@ describe("Table", function() {
 
       function createRowsDeletedEvent(model, rowIds) {
         return {
-          id: model.id,
+          target: model.id,
           rowIds: rowIds,
           type: 'rowsDeleted'
         };
@@ -788,7 +788,7 @@ describe("Table", function() {
 
       function createAllRowsDeletedEvent(model, rowIds) {
         return {
-          id: model.id,
+          target: model.id,
           type: 'allRowsDeleted'
         };
       }
@@ -869,7 +869,7 @@ describe("Table", function() {
 
       function createRowOrderChangedEvent(model, rowIds) {
         return {
-          id: model.id,
+          target: model.id,
           rowIds: rowIds,
           type: 'rowOrderChanged'
         };
@@ -951,7 +951,7 @@ describe("Table", function() {
 
       function createColumnStructureChangedEvent(model, columns) {
         return {
-          id: model.id,
+          target: model.id,
           columns: columns,
           type: 'columnStructureChanged'
         };
@@ -1046,7 +1046,7 @@ describe("Table", function() {
 
       function createColumnOrderChangedEvent(model, columnIds) {
         return {
-          id: model.id,
+          target: model.id,
           columnIds: columnIds,
           type: 'columnOrderChanged'
         };
@@ -1144,7 +1144,7 @@ describe("Table", function() {
 
       function createColumnHeadersUpdatedEvent(model, columns) {
         return {
-          id: model.id,
+          target: model.id,
           columns: columns,
           type: 'columnHeadersUpdated'
         };

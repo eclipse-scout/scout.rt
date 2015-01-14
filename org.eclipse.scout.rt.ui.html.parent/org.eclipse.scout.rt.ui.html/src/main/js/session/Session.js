@@ -147,8 +147,8 @@ scout.Session.prototype.getOrCreateModelAdapters = function(ids, parent) {
  * during the same user interaction, the events are collected and sent in one
  * request at the end of the user interaction
  */
-scout.Session.prototype.send = function(type, id, data) {
-  this._asyncEvents.push(new scout.Event(type, id, data));
+scout.Session.prototype.send = function(target, type, data) {
+  this._asyncEvents.push(new scout.Event(target, type, data));
   if (!this._asyncRequestQueued) {
     var that = this;
     setTimeout(function() {
@@ -365,12 +365,12 @@ scout.Session.prototype._processEvents = function(events) {
   var i, event, adapter;
   for (i = 0; i < events.length; i++) {
     event = events[i];
-    $.log.debug("Processing event '" + event.type + "' for adapter with ID " + event.id);
-    adapter = this.getOrCreateModelAdapter(event.id, scout.rootAdapter);
+    $.log.debug("Processing event '" + event.type + "' for adapter with ID " + event.target);
+    adapter = this.getOrCreateModelAdapter(event.target, scout.rootAdapter);
     if (!adapter) {
-      throw new Error('No adapter registered for ID ' + event.id);
+      throw new Error('No adapter registered for ID ' + event.target);
     }
-    if ('property' === event.type) { // Special handling for 'property' type
+    if (event.type === 'property') { // Special handling for 'property' type
       adapter.onModelPropertyChange(event);
     } else {
       adapter.onModelAction(event);

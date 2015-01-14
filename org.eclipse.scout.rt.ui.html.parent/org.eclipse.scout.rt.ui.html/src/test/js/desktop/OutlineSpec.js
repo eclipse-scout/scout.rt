@@ -71,7 +71,7 @@ describe("Outline", function() {
 
   function createNodesDeletedEvent(model, nodeIds, commonParentNodeId) {
     return {
-      id: model.id,
+      target: model.id,
       commonParentNodeId: commonParentNodeId,
       nodeIds: nodeIds,
       type: 'nodesDeleted'

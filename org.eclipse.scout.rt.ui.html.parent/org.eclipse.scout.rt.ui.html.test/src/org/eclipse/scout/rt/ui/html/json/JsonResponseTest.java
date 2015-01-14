@@ -46,7 +46,7 @@ public class JsonResponseTest {
     assertEquals(1, events.length());
 
     JSONObject event = events.getJSONObject(0);
-    assertEquals(testId, event.get("id"));
+    assertEquals(testId, event.get("target"));
     assertEquals("property", event.get("type"));
     JSONObject props = event.getJSONObject("properties");
     assertNotNull(props);

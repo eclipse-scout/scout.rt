@@ -309,13 +309,13 @@ scout.Table.prototype.sort = function($header, dir, additional, remove) {
   // sort model
   var sorted = this._sort();
   if (sorted) {
-    this.session.send('rowsSorted', this.id, data);
+    this.session.send(this.id, 'rowsSorted', data);
 
     this.clearSelection();
     this._renderRowOrderChanges();
   } else {
     //Delegate sorting to server when it is not possible on client side
-    this.session.send('sortRows', this.id, data);
+    this.session.send(this.id, 'sortRows', data);
   }
 };
 
@@ -455,8 +455,8 @@ scout.Table.prototype._drawData = function(startRow) {
 
     var $row = $(event.delegateTarget);
     //Send click only if mouseDown and mouseUp happened on the same row
-    that.session.send('rowClicked', that.id, {
-      'rowId': $row.attr('id')
+    that.session.send(that.id, 'rowClicked', {
+      rowId: $row.attr('id')
     });
   }
 
@@ -501,8 +501,8 @@ scout.Table.prototype.onRowsSelected = function($selectedRows) {
   if (!scout.arrays.equalsIgnoreOrder(rowIds, this.selectedRowIds)) {
     this.selectedRowIds = rowIds;
     if (!this.session.processingEvents) {
-      this.session.send('rowsSelected', this.id, {
-        'rowIds': rowIds
+      this.session.send(this.id, 'rowsSelected', {
+        rowIds: rowIds
       });
     }
   }
@@ -515,13 +515,13 @@ scout.Table.prototype.onResize = function() {
 };
 
 scout.Table.prototype.sendRowAction = function($row) {
-  this.session.send('rowAction', this.id, {
-    'rowId': $row.attr('id')
+  this.session.send(this.id, 'rowAction', {
+    rowId: $row.attr('id')
   });
 };
 
 scout.Table.prototype.sendReload = function() {
-  this.session.send('reload', this.id);
+  this.session.send(this.id, 'reload');
 };
 
 scout.Table.prototype.getCellValue = function(column, row) {
@@ -821,8 +821,8 @@ scout.Table.prototype.selectRowsByIds = function(rowIds) {
   if (!scout.arrays.equalsIgnoreOrder(rowIds, this.selectedRowIds)) {
     this.selectedRowIds = rowIds;
 
-    this.session.send('rowsSelected', this.id, {
-      'rowIds': rowIds
+    this.session.send(this.id, 'rowsSelected', {
+      rowIds: rowIds
     });
   }
 
@@ -1094,7 +1094,7 @@ scout.Table.prototype.resizingColumnFinished = function($header, width) {
     columnId: column.id,
     width: width
   };
-  this.session.send('columnResized', this.id, data);
+  this.session.send(this.id, 'columnResized', data);
 };
 
 scout.Table.prototype.moveColumn = function($header, oldPos, newPos, dragged) {
@@ -1107,7 +1107,7 @@ scout.Table.prototype.moveColumn = function($header, oldPos, newPos, dragged) {
     columnId: column.id,
     index: newPos
   };
-  this.session.send('columnMoved', this.id, data);
+  this.session.send(this.id, 'columnMoved', data);
 
   this.header.onColumnMoved($header, oldPos, newPos, dragged);
 

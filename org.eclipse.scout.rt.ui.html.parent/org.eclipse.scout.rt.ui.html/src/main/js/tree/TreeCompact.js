@@ -176,7 +176,9 @@ scout.TreeCompact.prototype._onNodeClick = function(event) {
 
 scout.TreeCompact.prototype._selectNode = function(node) {
   $.log.debug('_selectNode id=' + node.id + ' text=' + node.text);
-  this.session.send('nodeAction', this.id, {'nodeId': node.id});
+  this.session.send(this.id, 'nodeAction', {
+    nodeId: node.id
+  });
 };
 
 

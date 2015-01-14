@@ -100,11 +100,11 @@ scout.Action.prototype._goOnline = function() {
 };
 
 scout.Action.prototype.sendDoAction = function() {
-  this.session.send('doAction', this.id);
+  this.session.send(this.id, 'doAction');
 };
 
 scout.Action.prototype.sendSelected = function(selected) {
-  this.session.send('selected', this.id, {
+  this.session.send(this.id, 'selected', {
     selected: selected
   });
 };

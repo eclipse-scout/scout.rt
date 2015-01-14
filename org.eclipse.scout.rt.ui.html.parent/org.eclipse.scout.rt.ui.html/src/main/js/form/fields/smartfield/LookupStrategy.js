@@ -88,7 +88,9 @@ scout.RemoteLookupStrategy.prototype = {
   _loadOptions: function(query) {
     var sf = this._smartField;
     $.log.debug('load options from server. query=' + query);
-    sf.session.send('loadOptions', sf.id, {'query': query});
+    sf.session.send(sf.id, 'loadOptions', {
+      query: query
+    });
   }
 
 };

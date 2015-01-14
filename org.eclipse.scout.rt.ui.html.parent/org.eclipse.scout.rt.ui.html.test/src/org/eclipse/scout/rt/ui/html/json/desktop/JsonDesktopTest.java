@@ -89,7 +89,7 @@ public class JsonDesktopTest {
     String formId = event.getData().getString("form");
 
     // Add event must contain reference (by ID) to form.
-    assertEquals(m_jsonDesktop.getId(), event.getId());
+    assertEquals(m_jsonDesktop.getId(), event.getTarget());
     assertEquals(formAdapter.getId(), formId);
 
     // adapter-data for form must exist in 'adapterData' property of response
@@ -112,7 +112,7 @@ public class JsonDesktopTest {
     formId = event.getData().getString("form");
 
     // Remove event must only contain the id, no other properties
-    assertEquals(m_jsonDesktop.getId(), event.getId());
+    assertEquals(m_jsonDesktop.getId(), event.getTarget());
     assertEquals(formAdapter.getId(), formId);
   }
 

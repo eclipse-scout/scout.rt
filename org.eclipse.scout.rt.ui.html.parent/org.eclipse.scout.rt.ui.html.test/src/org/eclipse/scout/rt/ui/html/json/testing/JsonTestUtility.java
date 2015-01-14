@@ -82,7 +82,7 @@ public final class JsonTestUtility {
     List<JsonEvent> list = new ArrayList<>();
     for (JsonEvent event : response.getEventList()) {
       if (event.getType().equals(eventType)
-          && (adapterId == null || adapterId.equals(event.getId()))) {
+          && (adapterId == null || adapterId.equals(event.getTarget()))) {
         list.add(event);
       }
     }

@@ -19,7 +19,7 @@ scout.TableOrganizeMenu.prototype._createBody = function(popup) {
     click(function() {
       var table = this.parent;
       popup.remove();
-      this.session.send('resetColumns', table.id);
+      this.session.send(table.id, 'resetColumns');
     }.bind(this)).
     one(scout.menus.CLOSING_EVENTS, $.suppressEvent);
 };

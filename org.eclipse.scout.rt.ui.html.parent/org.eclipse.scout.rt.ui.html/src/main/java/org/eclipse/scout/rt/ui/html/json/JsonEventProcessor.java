@@ -49,20 +49,19 @@ public class JsonEventProcessor {
   }
 
   protected void processEvent(JsonEvent event, JsonResponse response) {
-    final String id = event.getId();
-    final IJsonAdapter jsonAdapter = m_jsonSession.getJsonAdapter(id);
+    final IJsonAdapter jsonAdapter = m_jsonSession.getJsonAdapter(event.getTarget());
     if (jsonAdapter == null) {
-      throw new JsonException("No adapter found for id " + id);
+      throw new JsonException("No adapter found for ID " + event.getTarget());
     }
     try {
       if (LOG.isDebugEnabled()) {
-        LOG.debug("Handling event: ID=" + event.getId() + ", Type=" + event.getType());
+        LOG.debug("Handling event '" + event.getType() + "' for adapter with ID " + event.getTarget());
       }
       jsonAdapter.handleUiEvent(event, response);
       jsonAdapter.cleanUpEventFilters();
     }
     catch (Exception t) {
-      LOG.error("Error while handling event [ID=" + id + ", Type=" + event.getType() + "]", t);
+      LOG.error("Error while handling event '" + event.getType() + "' for adapter with ID " + event.getTarget());
       throw new JsonException(t);
     }
   }

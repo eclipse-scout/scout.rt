@@ -20,13 +20,13 @@ describe("Session", function() {
     it("sends multiple async events in one call", function() {
       var session = createSession();
 
-      session.send('nodeClicked', 1);
+      session.send(1, 'nodeClicked');
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      session.send('nodeSelected', 1);
+      session.send(1, 'nodeSelected');
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      session.send('nodeExpanded', 1);
+      session.send(1, 'nodeExpanded');
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
       sendQueuedAjaxCalls();
@@ -53,7 +53,7 @@ describe("Session", function() {
       expect(requestData.startup).toBe(true);
 
       //don't send it on subsequent requests
-      session.send('nodeClicked', 1);
+      session.send(1, 'nodeClicked');
       sendQueuedAjaxCalls();
 
       requestData = mostRecentJsonRequest();
@@ -70,7 +70,7 @@ describe("Session", function() {
       expect(requestData.userAgent.deviceType).toBe('MOBILE');
 
       //don't send it on subsequent requests
-      session.send('nodeClicked', 1);
+      session.send(1, 'nodeClicked');
       sendQueuedAjaxCalls();
 
       requestData = mostRecentJsonRequest();

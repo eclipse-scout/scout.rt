@@ -18,8 +18,8 @@ function createSimpleModel(objectType, id) {
   }
 
   return {
-    'id': id,
-    'objectType': objectType
+    id: id,
+    objectType: objectType
   };
 }
 
@@ -45,7 +45,7 @@ function sendQueuedAjaxCalls(response) {
 
 function createPropertyChangeEvent(model, properties) {
   return {
-    id: model.id,
+    target: model.id,
     properties: properties,
     type: 'property'
   };

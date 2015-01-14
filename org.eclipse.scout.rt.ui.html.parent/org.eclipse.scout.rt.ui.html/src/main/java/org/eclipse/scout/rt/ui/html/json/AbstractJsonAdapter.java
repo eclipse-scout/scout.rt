@@ -233,8 +233,8 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     return JsonObjectUtility.putProperty(json, key, value);
   }
 
-  protected final void addActionEvent(String eventName, JSONObject json) {
-    getJsonSession().currentJsonResponse().addActionEvent(getId(), eventName, json);
+  protected final void addActionEvent(String eventName, JSONObject eventData) {
+    getJsonSession().currentJsonResponse().addActionEvent(getId(), eventName, eventData);
   }
 
   protected void addPropertyChangeEvent(String propertyName, Object newValue) {

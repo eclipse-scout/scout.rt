@@ -66,10 +66,9 @@ scout.Tree.prototype.setBreadcrumb = function(bread) {
         node = this._nodeMap[nodeId];
 
       if (!expanded) {
-        this.session.send('nodeAction', this.id, {
-          'nodeId': nodeId
+        this.session.send(this.id, 'nodeAction', {
+          nodeId: nodeId
         });
-
         this.setNodeExpanded(node, $selected, true);
       }
     }
@@ -97,9 +96,9 @@ scout.Tree.prototype.setNodeExpanded = function(node, $node, expanded) {
   if (node.expanded !== expanded) {
     node.expanded = expanded;
 
-    this.session.send('nodeExpanded', this.id, {
-      'nodeId': node.id,
-      'expanded': expanded
+    this.session.send(this.id, 'nodeExpanded', {
+      nodeId: node.id,
+      expanded: expanded
     });
   }
 
@@ -176,8 +175,8 @@ scout.Tree.prototype.setNodesSelected = function(nodes, $nodes) {
   }
   if (!scout.arrays.equalsIgnoreOrder(nodeIds, this.selectedNodeIds)) {
     this.selectedNodeIds = nodeIds;
-    this.session.send('nodesSelected', this.id, {
-      'nodeIds': nodeIds
+    this.session.send(this.id, 'nodesSelected', {
+      nodeIds: nodeIds
     });
   }
   // FIXME BSH Keystroke | "scroll into view"
@@ -498,8 +497,8 @@ scout.Tree.prototype._onNodeClick = function(event) {
     nodeId = $node.attr('id'),
     node = this._nodeMap[nodeId];
 
-  this.session.send('nodeClicked', this.id, {
-    'nodeId': nodeId
+  this.session.send(this.id, 'nodeClicked', {
+    nodeId: nodeId
   });
 
   this.setNodesSelected([node], [$node]);
@@ -515,8 +514,8 @@ scout.Tree.prototype._onNodeDoubleClick = function(event) {
     return;
   }
 
-  this.session.send('nodeAction', this.id, {
-    'nodeId': nodeId
+  this.session.send(this.id, 'nodeAction', {
+    nodeId: nodeId
   });
 
   this.setNodeExpanded(node, $node, expanded);

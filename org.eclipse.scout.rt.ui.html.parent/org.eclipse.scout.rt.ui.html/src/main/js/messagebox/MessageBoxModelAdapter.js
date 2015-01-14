@@ -14,7 +14,9 @@ scout.MessageBoxModelAdapter.prototype.render = function($parent) {
 
 scout.MessageBoxModelAdapter.prototype.onButtonClicked = function($button, event) {
   var option = $button.data('option');
-  this.session.send('action', this.id, {option: option});
+  this.session.send(this.id, 'action', {
+    option: option
+  });
 };
 
 scout.MessageBoxModelAdapter.prototype.onModelAction = function(event) {

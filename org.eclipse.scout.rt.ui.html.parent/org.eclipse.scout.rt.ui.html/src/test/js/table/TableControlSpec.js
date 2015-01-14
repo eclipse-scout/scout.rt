@@ -215,11 +215,11 @@ describe("TableControl", function() {
 
       sendQueuedAjaxCalls();
       var events = [
-        new scout.Event('selected', action.id, {
-          "selected": false
+        new scout.Event(action.id, 'selected', {
+          selected: false
         }),
-        new scout.Event('selected', action2.id, {
-          "selected": true
+        new scout.Event(action2.id, 'selected', {
+          selected: true
         })
       ];
       expect(mostRecentJsonRequest()).toContainEvents(events);

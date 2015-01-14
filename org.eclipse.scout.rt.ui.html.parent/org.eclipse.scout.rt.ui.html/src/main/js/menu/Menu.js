@@ -6,7 +6,7 @@ scout.Menu = function() {
 scout.inherits(scout.Menu, scout.Action);
 
 scout.Menu.prototype.sendAboutToShow = function(event) {
-  this.session.send('aboutToShow', this.id);
+  this.session.send(this.id, 'aboutToShow');
 };
 
 scout.Menu.prototype._render = function($parent) {

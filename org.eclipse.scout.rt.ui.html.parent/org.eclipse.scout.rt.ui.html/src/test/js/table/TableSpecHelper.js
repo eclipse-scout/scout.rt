@@ -201,8 +201,8 @@ TableSpecHelper.prototype.assertDatesInCells = function(rows, colIndex, dates) {
 };
 
 TableSpecHelper.prototype.assertSelectionEvent = function(id, rowIds) {
-  var event = new scout.Event('rowsSelected', id, {
-    "rowIds": rowIds
+  var event = new scout.Event(id, 'rowsSelected', {
+    rowIds: rowIds
   });
   expect(mostRecentJsonRequest()).toContainEvents(event);
 };

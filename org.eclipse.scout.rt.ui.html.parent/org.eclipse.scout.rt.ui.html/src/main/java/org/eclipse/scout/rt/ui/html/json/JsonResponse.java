@@ -95,16 +95,9 @@ public class JsonResponse {
 
   /**
    * Note: ignores events on adapters that are also part of this response, see also {@link #doAddEvent(JsonEvent)}
-   *
-   * @param id
-   *          Adapter ID
-   * @param eventType
-   *          Event type
-   * @param eventData
-   *          event data (JSON object)
    */
-  public void addActionEvent(String id, String eventType, JSONObject eventData) {
-    m_eventList.add(new JsonEvent(id, eventType, eventData));
+  public void addActionEvent(String eventTarget, String eventType, JSONObject eventData) {
+    m_eventList.add(new JsonEvent(eventTarget, eventType, eventData));
   }
 
   // FIXME CGU potential threading issue: toJson is called by servlet thread. Property-Change-Events may alter the eventList from client job thread
@@ -175,7 +168,7 @@ public class JsonResponse {
    * Example: NodesInserted event on tree must not be sent since the same nodes are already sent by Tree.toJson.
    */
   private boolean doAddEvent(JsonEvent event) {
-    if (m_adapterMap.containsKey(event.getId())) {
+    if (m_adapterMap.containsKey(event.getTarget())) {
       return false;
     }
     return true;

@@ -22,7 +22,7 @@ public class JsonEventTest {
   @Test
   public void testCtor_NullData() {
     JsonEvent event = new JsonEvent("foo", "bar", null);
-    assertEquals("foo", event.getId());
+    assertEquals("foo", event.getTarget());
     assertEquals("bar", event.getType());
     assertNotNull(event.getData());
   }
@@ -41,7 +41,7 @@ public class JsonEventTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void testCtor_MandatoryParamType() {
-    new JsonEvent("id", null, null);
+    new JsonEvent("target", null, null);
   }
 
   @Test
@@ -49,7 +49,7 @@ public class JsonEventTest {
     JSONObject data = JsonObjectUtility.putProperty(new JSONObject(), "myProp", "myValue");
     JsonEvent event = new JsonEvent("foo", "bar", data);
     JSONObject json = event.toJson();
-    assertEquals("foo", json.optString("id"));
+    assertEquals("foo", json.optString("target"));
     assertEquals("bar", json.optString("type"));
     assertEquals("myValue", json.optString("myProp"));
   }
@@ -57,11 +57,11 @@ public class JsonEventTest {
   @Test
   public void testFromJson() throws Exception {
     JSONObject json = new JSONObject();
-    JsonObjectUtility.putProperty(json, "id", "foo");
+    JsonObjectUtility.putProperty(json, "target", "foo");
     JsonObjectUtility.putProperty(json, "type", "bar");
     JsonObjectUtility.putProperty(json, "myProp", "myValue");
     JsonEvent event = JsonEvent.fromJson(json);
-    assertEquals("foo", event.getId());
+    assertEquals("foo", event.getTarget());
     assertEquals("bar", event.getType());
     assertEquals("myValue", event.getData().optString("myProp"));
   }

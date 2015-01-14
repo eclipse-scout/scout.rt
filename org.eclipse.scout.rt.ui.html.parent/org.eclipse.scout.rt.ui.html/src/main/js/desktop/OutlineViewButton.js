@@ -20,7 +20,7 @@ scout.OutlineViewButton.prototype._render = function($parent) {
     if (this.outline) {
       this.desktop.changeOutline(that.outline);
     }
-    this.session.send('clicked', that.id);
+    this.session.send(that.id, 'clicked');
   }.bind(this));
 };
 

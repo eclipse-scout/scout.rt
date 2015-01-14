@@ -58,8 +58,8 @@ scout.BreadCrumbNavigation.prototype._addBreadCrumbForm = function(form) {
 
   function onClick() {
     var formId = $(this).data('formId');
-    that.session.send('activate', that.id, {
-      'formId': formId
+    that.session.send(that.id, 'activate', {
+      formId: formId
     });
   }
 };
