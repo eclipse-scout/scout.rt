@@ -20,9 +20,6 @@ import javax.swing.event.EventListenerList;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
 
-/**
- *
- */
 public abstract class AbstractDecorationItem extends AbstractDecoration implements IDecorationItem {
 
   private State m_state = State.Normal;
@@ -38,13 +35,6 @@ public abstract class AbstractDecorationItem extends AbstractDecoration implemen
     m_defaultCursor = owner.getCursor();
   }
 
-  @Override
-  protected void init() {
-  }
-
-  /**
-   *
-   */
   private boolean updateState(boolean mouseOver) {
     State newState = State.Normal;
     if (!m_visible) {

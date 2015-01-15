@@ -61,6 +61,13 @@ public class ContextMenuDecorationItem extends AbstractDecorationItem implements
     updateContextMenuVisibility();
   }
 
+  public void destroy() {
+    if (m_scoutPropertyChangeListener != null) {
+      getScoutContextMenu().removePropertyChangeListener(m_scoutPropertyChangeListener);
+      m_scoutPropertyChangeListener = null;
+    }
+  }
+
   private void updateContextMenuVisibility() {
     setMarkerVisible(getScoutContextMenu().isVisible());
   }

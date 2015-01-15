@@ -74,6 +74,7 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<IContentAssi
 
   private SwtContextMenuMarkerComposite m_menuMarkerComposite;
   private SwtScoutContextMenu m_contextMenu;
+  private PropertyChangeListener m_contextMenuVisibilityListener;
 
   public SwtScoutSmartField() {
     m_pendingProposalJobLock = new Object();
@@ -128,14 +129,11 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<IContentAssi
     m_browseButton.setLayoutData(LogicalGridDataBuilder.createButton1());
   }
 
-  @Override
   protected void installContextMenu() {
     m_menuMarkerComposite.setMarkerVisible(getScoutObject().getContextMenu().isVisible());
-    getScoutObject().getContextMenu().addPropertyChangeListener(new PropertyChangeListener() {
-
+    m_contextMenuVisibilityListener = new PropertyChangeListener() {
       @Override
       public void propertyChange(PropertyChangeEvent evt) {
-
         if (IMenu.PROP_VISIBLE.equals(evt.getPropertyName())) {
           final boolean markerVisible = getScoutObject().getContextMenu().isVisible();
           getEnvironment().invokeSwtLater(new Runnable() {
@@ -146,7 +144,8 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<IContentAssi
           });
         }
       }
-    });
+    };
+    getScoutObject().getContextMenu().addPropertyChangeListener(m_contextMenuVisibilityListener);
 
     m_contextMenu = new SwtScoutContextMenu(getSwtField().getShell(), getScoutObject().getContextMenu(), getEnvironment());
     getSwtBrowseButton().setMenu(m_contextMenu.getSwtMenu());
@@ -157,6 +156,13 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<IContentAssi
 
     // correction of menu position
     getSwtField().addListener(SWT.MenuDetect, new MenuPositionCorrectionListener(getSwtField()));
+  }
+
+  protected void uninstallContextMenu() {
+    if (m_contextMenuVisibilityListener != null) {
+      getScoutObject().getContextMenu().removePropertyChangeListener(m_contextMenuVisibilityListener);
+      m_contextMenuVisibilityListener = null;
+    }
   }
 
   @Override
@@ -174,13 +180,14 @@ public class SwtScoutSmartField extends SwtScoutValueFieldComposite<IContentAssi
     super.attachScout();
     setIconIdFromScout(getScoutObject().getIconId());
     setProposalFormFromScout(getScoutObject().getProposalForm());
-
+    installContextMenu();
   }
 
   @Override
   protected void detachScout() {
     // workaround since disposeFieldInternal in AbstractSmartField is never called.
     hideProposalPopup();
+    uninstallContextMenu();
     super.detachScout();
   }
 
