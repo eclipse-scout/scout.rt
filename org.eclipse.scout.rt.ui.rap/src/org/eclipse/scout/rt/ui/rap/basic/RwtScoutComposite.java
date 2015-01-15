@@ -154,7 +154,6 @@ public abstract class RwtScoutComposite<T extends IPropertyObserver> implements 
         getUpdateUiFromScoutLock().acquire();
         //
         attachScout();
-        installContextMenu();
       }
       finally {
         getUpdateUiFromScoutLock().release();
@@ -171,10 +170,6 @@ public abstract class RwtScoutComposite<T extends IPropertyObserver> implements 
     finally {
       m_created = true;
     }
-  }
-
-  protected void installContextMenu() {
-
   }
 
   private void setCustomWidgetIds(Widget widget) {
@@ -254,7 +249,7 @@ public abstract class RwtScoutComposite<T extends IPropertyObserver> implements 
    * layout data is set and the scout object is a {@link IFormField}.
    * <p>
    * Default is true.
-   * 
+   *
    * @return
    */
   protected boolean isAutoSetLayoutData() {
@@ -421,7 +416,7 @@ public abstract class RwtScoutComposite<T extends IPropertyObserver> implements 
         case SWT.FocusOut:
           // filter all temporary focus events
           if (getUiField() != null && getUiField().getDisplay().getActiveShell() != null
-              && getUiField().getShell() != getUiField().getDisplay().getActiveShell()) {
+          && getUiField().getShell() != getUiField().getDisplay().getActiveShell()) {
             return;
           }
           else {

@@ -29,7 +29,7 @@ import org.eclipse.swt.widgets.Widget;
 
 /**
  * <h3>SwtScoutComposite</h3> ...
- * 
+ *
  * @since 1.0.0 28.03.2008
  * @author Andreas Hoegger
  */
@@ -107,21 +107,12 @@ public abstract class SwtScoutComposite<T extends IPropertyObserver> extends Abs
           }
         }
         connectToScout();
-        installContextMenu();
       }
       catch (Exception e) {
         m_initialized = false;
         LOG.error("could not initialize component '" + getScoutObject().getClass().getName() + "' to '" + this.getClass().getName() + "'.", e);
       }
     }
-  }
-
-  protected void installContextMenu() {
-
-  }
-
-  protected void uninstallContextMenu() {
-
   }
 
   public boolean isInitialized() {
@@ -215,7 +206,6 @@ public abstract class SwtScoutComposite<T extends IPropertyObserver> extends Abs
     if (getSwtContainer() != null) {
       getSwtContainer().dispose();
     }
-    uninstallContextMenu();
     disconnectFromScout();
   }
 
@@ -239,7 +229,7 @@ public abstract class SwtScoutComposite<T extends IPropertyObserver> extends Abs
 
   /**
    * Runs the SwtInputVerifier.
-   * 
+   *
    * @since 3.10.0-M5
    */
   public boolean runSwtInputVerifier() {

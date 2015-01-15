@@ -94,6 +94,7 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<IContent
   private ContextMenuDecorationItem m_contextMenuMarker;
   private SwingScoutContextMenu m_contextMenu;
   private DropDownDecorationItem m_dropdownIcon;
+  private PropertyChangeListener m_contextMenuVisibilityListener;
 
   @Override
   @SuppressWarnings("serial")
@@ -194,20 +195,25 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<IContent
 
   }
 
-  @Override
   protected void installContextMenu() {
-    getScoutObject().getContextMenu().addPropertyChangeListener(new PropertyChangeListener() {
-
+    m_contextMenuVisibilityListener = new PropertyChangeListener() {
       @Override
       public void propertyChange(PropertyChangeEvent evt) {
-
         if (IMenu.PROP_VISIBLE.equals(evt.getPropertyName())) {
           m_contextMenuMarker.setMarkerVisible(getScoutObject().getContextMenu().isVisible());
         }
       }
-    });
+    };
+    getScoutObject().getContextMenu().addPropertyChangeListener(m_contextMenuVisibilityListener);
     m_contextMenuMarker.setMarkerVisible(getScoutObject().getContextMenu().isVisible());
     m_contextMenu = SwingScoutContextMenu.installContextMenuWithSystemMenus(getSwingTextField(), getScoutObject().getContextMenu(), getSwingEnvironment());
+  }
+
+  protected void uninstallContextMenu() {
+    if (m_contextMenuVisibilityListener != null) {
+      getScoutObject().getContextMenu().removePropertyChangeListener(m_contextMenuVisibilityListener);
+      m_contextMenuVisibilityListener = null;
+    }
   }
 
   @Override
@@ -221,11 +227,16 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<IContent
     IContentAssistField f = getScoutObject();
     setIconIdFromScout(f.getIconId());
     setProposalFormFromScout(f.getProposalForm());
+    installContextMenu();
   }
 
   @Override
   protected void detachScout() {
     hideProposalPopup();
+    if (m_contextMenuMarker != null) {
+      m_contextMenuMarker.destroy();
+    }
+    uninstallContextMenu();
     super.detachScout();
   }
 
