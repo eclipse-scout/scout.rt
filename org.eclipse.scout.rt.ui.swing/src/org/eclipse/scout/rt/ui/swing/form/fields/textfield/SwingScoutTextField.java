@@ -36,6 +36,7 @@ public class SwingScoutTextField extends SwingScoutTextFieldComposite<IStringFie
 
   private ContextMenuDecorationItem m_contextMenuMarker;
   private SwingScoutContextMenu m_contextMenu;
+  private PropertyChangeListener m_contextMenuVisibilityListener;
 
   @Override
   protected void initializeSwing() {
@@ -62,18 +63,25 @@ public class SwingScoutTextField extends SwingScoutTextFieldComposite<IStringFie
     getSwingContainer().setLayout(new LogicalGridLayout(getSwingEnvironment(), 1, 0));
   }
 
-  @Override
   protected void installContextMenu() {
-    getScoutObject().getContextMenu().addPropertyChangeListener(new PropertyChangeListener() {
+    m_contextMenuVisibilityListener = new PropertyChangeListener() {
       @Override
       public void propertyChange(PropertyChangeEvent evt) {
         if (IMenu.PROP_VISIBLE.equals(evt.getPropertyName())) {
           m_contextMenuMarker.setMarkerVisible(getScoutObject().getContextMenu().isVisible());
         }
       }
-    });
+    };
+    getScoutObject().getContextMenu().addPropertyChangeListener(m_contextMenuVisibilityListener);
     m_contextMenuMarker.setMarkerVisible(getScoutObject().getContextMenu().isVisible());
     m_contextMenu = SwingScoutContextMenu.installContextMenuWithSystemMenus(getSwingTextField(), getScoutObject().getContextMenu(), getSwingEnvironment());
+  }
+
+  protected void uninstallContextMenu() {
+    if (m_contextMenuVisibilityListener != null) {
+      getScoutObject().getContextMenu().removePropertyChangeListener(m_contextMenuVisibilityListener);
+      m_contextMenuVisibilityListener = null;
+    }
   }
 
   @Override
@@ -95,6 +103,7 @@ public class SwingScoutTextField extends SwingScoutTextFieldComposite<IStringFie
     if (spellCheckerService != null && spellCheckerService.isInstalled()) {
       m_spellingMonitor = spellCheckerService.createSpellingMonitor(new SwingFieldHolder(this, this.getSwingTextField()));
     }
+    installContextMenu();
     updateContextMenuFromScout();
   }
 
@@ -105,6 +114,10 @@ public class SwingScoutTextField extends SwingScoutTextFieldComposite<IStringFie
       m_spellingMonitor.dispose();
       m_spellingMonitor = null;
     }
+    if (m_contextMenuMarker != null) {
+      m_contextMenuMarker.destroy();
+    }
+    uninstallContextMenu();
     super.detachScout();
   }
 

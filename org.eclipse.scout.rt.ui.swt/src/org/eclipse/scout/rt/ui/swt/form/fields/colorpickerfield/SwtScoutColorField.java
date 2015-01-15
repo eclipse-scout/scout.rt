@@ -48,6 +48,7 @@ public class SwtScoutColorField extends SwtScoutBasicFieldComposite<IColorField>
   private Button m_colorPickButton;
   private SwtContextMenuMarkerComposite m_menuMarkerComposite;
   private SwtScoutContextMenu m_contextMenu;
+  private PropertyChangeListener m_contextMenuVisibilityListener;
 
   @Override
   protected void initializeSwt(Composite parent) {
@@ -112,10 +113,9 @@ public class SwtScoutColorField extends SwtScoutBasicFieldComposite<IColorField>
     m_colorPickButton.setLayoutData(data);
   }
 
-  @Override
   protected void installContextMenu() {
     m_menuMarkerComposite.setMarkerVisible(getScoutObject().getContextMenu().isVisible());
-    getScoutObject().getContextMenu().addPropertyChangeListener(new PropertyChangeListener() {
+    m_contextMenuVisibilityListener = new PropertyChangeListener() {
       @Override
       public void propertyChange(PropertyChangeEvent evt) {
         if (IMenu.PROP_VISIBLE.equals(evt.getPropertyName())) {
@@ -128,7 +128,8 @@ public class SwtScoutColorField extends SwtScoutBasicFieldComposite<IColorField>
           });
         }
       }
-    });
+    };
+    getScoutObject().getContextMenu().addPropertyChangeListener(m_contextMenuVisibilityListener);
 
     m_contextMenu = new SwtScoutContextMenu(getSwtField().getShell(), getScoutObject().getContextMenu(), getEnvironment());
     getColorPickButton().setMenu(m_contextMenu.getSwtMenu());
@@ -140,10 +141,24 @@ public class SwtScoutColorField extends SwtScoutBasicFieldComposite<IColorField>
     getSwtField().addListener(SWT.MenuDetect, new MenuPositionCorrectionListener(getSwtField()));
   }
 
+  protected void uninstallContextMenu() {
+    if (m_contextMenuVisibilityListener != null) {
+      getScoutObject().getContextMenu().removePropertyChangeListener(m_contextMenuVisibilityListener);
+      m_contextMenuVisibilityListener = null;
+    }
+  }
+
   @Override
   protected void attachScout() {
     super.attachScout();
     updateIconIdFromScout();
+    installContextMenu();
+  }
+
+  @Override
+  protected void detachScout() {
+    uninstallContextMenu();
+    super.detachScout();
   }
 
   @Override
