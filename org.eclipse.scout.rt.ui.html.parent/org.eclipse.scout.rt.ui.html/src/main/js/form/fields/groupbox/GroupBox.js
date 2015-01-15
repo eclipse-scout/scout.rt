@@ -32,22 +32,24 @@ scout.GroupBox.prototype._render = function($parent) {
   }
 
   this.$label = $('<span>').html(this.label);
-  this._$groupBoxTitle = this.$container.
-    appendDiv('group-box-title').
-    append(this.$label);
+  this._$groupBoxTitle = this.$container
+    .appendDiv('group-box-title')
+    .append(this.$label);
 
   this._$body = this.$container.appendDiv('group-box-body');
   this._$bodyContainer = this._$body;
 
   htmlBodyContainer = new scout.HtmlComponent(this._$bodyContainer, this.session);
   if (this.scrollable) {
-    this._$bodyContainer = scout.scrollbars.install(this._$body);
+    this._$bodyContainer = scout.scrollbars.install(this._$body, {
+      createHtmlComponent: true
+    });
     htmlBodyContainer = scout.HtmlComponent.get(this._$bodyContainer);
   }
   htmlBodyContainer.setLayout(new scout.LogicalGridLayout(env.formColumnGap, env.formRowGap));
 
   this._createFieldArraysByType();
-  for (var i=0; i<this.controls.length; i++) {
+  for (var i = 0; i < this.controls.length; i++) {
     this.controls[i].render(this._$bodyContainer);
   }
 
@@ -71,16 +73,13 @@ scout.GroupBox.prototype._createFieldArraysByType = function() {
         this.processButtons.push(field);
         if (field.systemType !== scout.Button.SYSTEM_TYPE.NONE) {
           this.systemButtons.push(field);
-        }
-        else {
+        } else {
           this.customButtons.push(field);
         }
-      }
-      else {
+      } else {
         this.controls.push(field);
       }
-    }
-    else {
+    } else {
       this.controls.push(field);
     }
   }
@@ -116,9 +115,7 @@ scout.GroupBox.prototype._computeBorderVisible = function() {
   var fields = this.getFields();
   if (this.mainBox) {
     return false;
-  } else if (fields.length === 1 &&
-      fields[0].objectType === 'TableField' &&
-      !fields[0].labelVisible) {
+  } else if (fields.length === 1 && fields[0].objectType === 'TableField' && !fields[0].labelVisible) {
     fields[0].$container.addClass('single');
     return false;
   }
@@ -133,4 +130,3 @@ scout.GroupBox.prototype._renderLabelVisible = function(visible) {
   // --> kein hack für main-box, wenn die auf dem model ein label hat, hat es im UI auch eins
   this._$groupBoxTitle.setVisible(visible && this.label && !this.mainBox);
 };
-

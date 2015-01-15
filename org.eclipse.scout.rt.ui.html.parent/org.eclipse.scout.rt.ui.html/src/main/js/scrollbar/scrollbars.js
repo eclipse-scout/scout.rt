@@ -13,6 +13,7 @@ scout.scrollbars = {
    */
   install: function($container, options) {
     var nativeScrollbars = false;
+    options = options || {};
     if (nativeScrollbars) {
       $.log.debug('use native scrollbars for container ' + scout.graphics.debugOutput($container));
       $container.
@@ -27,10 +28,11 @@ scout.scrollbars = {
       scrollbar.updateThumb();
       $scrollable.data('scrollbar', scrollbar);
 
-      // Create a htmlComponent if the parent has one.
+      // Create a htmlComponent.
       // This is necessary in order to properly propagate the size changes to the children, so they get layouted.
+      // It is only necessary if the children use the html component pattern.
       var htmlContainer = scout.HtmlComponent.optGet($container);
-      if (htmlContainer) {
+      if (htmlContainer && options.createHtmlComponent) {
         var htmlScrollable = new scout.HtmlComponent($scrollable, htmlContainer.session);
         htmlContainer.setLayout(new scout.SingleLayout(htmlScrollable));
       }

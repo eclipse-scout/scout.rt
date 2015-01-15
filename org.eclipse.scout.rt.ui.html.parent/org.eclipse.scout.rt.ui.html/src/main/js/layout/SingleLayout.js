@@ -9,21 +9,23 @@ scout.SingleLayout = function(htmlChild) {
 scout.inherits(scout.SingleLayout, scout.AbstractLayout);
 
 scout.SingleLayout.prototype.preferredLayoutSize = function($container) {
-  if (!this._htmlChild) {
-    this._htmlChild = this._getHtmlSingleChild($container);
+  var htmlChild = this._htmlChild;
+  if (!htmlChild) {
+    htmlChild = this._getHtmlSingleChild($container);
   }
-  return this._htmlChild.getPreferredSize();
+  return htmlChild.getPreferredSize();
 };
 
 scout.SingleLayout.prototype.layout = function($container) {
   var htmlContainer = scout.HtmlComponent.get($container);
   var childSize = htmlContainer.getSize()
-    .subtract(htmlContainer.getInsets());
+    .subtract(htmlContainer.getInsets()),
+    htmlChild = this._htmlChild;
 
-  if (!this._htmlChild) {
-    this._htmlChild = this._getHtmlSingleChild($container);
+  if (!htmlChild) {
+    htmlChild = this._getHtmlSingleChild($container);
   }
-  this._htmlChild.setSize(childSize);
+  htmlChild.setSize(childSize);
 };
 
 scout.SingleLayout.prototype._getHtmlSingleChild = function($container) {
