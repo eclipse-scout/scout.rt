@@ -1,16 +1,16 @@
 package org.eclipse.scout.rt.ui.rap.basic.table;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.rap.rwt.RWT;
-import org.eclipse.scout.commons.BooleanUtility;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.HTMLUtility;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.holders.BooleanHolder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
@@ -41,7 +41,7 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
   private final Image m_imgCheckboxFalse;
   private final Image m_imgCheckboxTrue;
   private final Color m_disabledForegroundColor;
-  private Map<ITableRow, Map<IColumn<?>, ICell>> m_cachedCells;
+  private Map<ITableRow, Map<IColumn<?>, P_CachedCell>> m_cachedCells;
 
   public RwtScoutColumnModel(ITable scoutTable, RwtScoutTable uiTable, TableColumnManager columnManager) {
     m_scoutTable = scoutTable;
@@ -252,6 +252,14 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
   }
 
   protected ICell getCell(Object row, int colIndex) {
+    P_CachedCell cellInfo = getCellInfo(row, colIndex);
+    if (cellInfo == null) {
+      return null;
+    }
+    return cellInfo.m_cell;
+  }
+
+  protected P_CachedCell getCellInfo(Object row, int colIndex) {
     IColumn<?> column = m_columnManager.getColumnByModelIndex(colIndex - 1);
     if (column != null) {
       if (m_cachedCells == null || m_cachedCells.get(row) == null) {
@@ -275,12 +283,14 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
    */
   protected String createTableRowVariant(ITableRow row) {
     StringBuilder builder = new StringBuilder();
+
     for (int column = 0; column < row.getCellCount(); column++) {
       if (column > 0) {
         builder.append("_");
       }
 
-      if (isEditableIconNeeded(row, m_columnManager.getColumnByModelIndex(column))) {
+      P_CachedCell cellInfo = getCellInfo(row, column + 1 /* getCellInfo is 1-based*/);
+      if (cellInfo.m_isEditable) {
         builder.append("EDITABLE");
       }
     }
@@ -289,9 +299,7 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
     if (variant.contains("EDITABLE")) {
       return "EDITABLE_CELL_VARIANT_" + variant;
     }
-    else {
-      return null;
-    }
+    return null;
   }
 
   /**
@@ -299,7 +307,7 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
    *
    * @return <code>true</code> if the cell is editable and not of the type {@link Boolean}.
    */
-  protected boolean isEditableIconNeeded(final ITableRow row, final IColumn<?> column) {
+  protected boolean isEditableIconNeededInScoutThread(final ITableRow row, final IColumn<?> column) {
     if (column == null || row == null) {
       return false;
     }
@@ -308,14 +316,36 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
       return false;
     }
 
-    final BooleanHolder result = new BooleanHolder(Boolean.FALSE);
+    ITable scoutTable = getScoutTable();
+    if (scoutTable == null) {
+      return false;
+    }
+    return scoutTable.isCellEditable(row, column);
+  }
+
+  private void rebuildCache() {
+    if (getScoutTable() == null) {
+      m_cachedCells = CollectionUtility.emptyHashMap();
+      return;
+    }
+
     Runnable r = new Runnable() {
       @Override
       public void run() {
-        ITable scoutTable = getScoutTable();
-        if (scoutTable != null) {
-          result.setValue(scoutTable.isCellEditable(row, column));
+        List<ITableRow> rows = getScoutTable().getRows();
+        Map<ITableRow, Map<IColumn<?>, P_CachedCell>> tmp = new HashMap<ITableRow, Map<IColumn<?>, P_CachedCell>>(rows.size());
+        for (ITableRow scoutRow : rows) {
+          List<IColumn<?>> visibleColumns = getScoutTable().getColumnSet().getVisibleColumns();
+          Map<IColumn<?>, P_CachedCell> cells = new HashMap<IColumn<?>, P_CachedCell>(visibleColumns.size());
+          for (IColumn<?> col : visibleColumns) {
+            ICell cell = getScoutTable().getCell(scoutRow, col);
+            boolean isCellEditable = isEditableIconNeededInScoutThread(scoutRow, col);
+            cells.put(col, new P_CachedCell(cell, isCellEditable));
+          }
+          tmp.put(scoutRow, cells);
         }
+
+        m_cachedCells = tmp;
       }
     };
 
@@ -323,21 +353,17 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
       getUiTable().getUiEnvironment().invokeScoutLater(r, 2345).join(2345);
     }
     catch (InterruptedException e) {
-      LOG.warn("Interrupted while waiting for the model to determine the cell's editability.", e);
+      LOG.warn("Interrupted while waiting for the model.", e);
     }
-    return BooleanUtility.nvl(result.getValue(), false);
   }
 
-  private void rebuildCache() {
-    m_cachedCells = new HashMap<ITableRow, Map<IColumn<?>, ICell>>();
-    if (getScoutTable() != null) {
-      for (ITableRow scoutRow : getScoutTable().getRows()) {
-        Map<IColumn<?>, ICell> cells = new HashMap<IColumn<?>, ICell>();
-        for (IColumn<?> col : getScoutTable().getColumnSet().getVisibleColumns()) {
-          cells.put(col, getScoutTable().getCell(scoutRow, col));
-        }
-        m_cachedCells.put(scoutRow, cells);
-      }
+  private static final class P_CachedCell {
+    private final ICell m_cell;
+    private final boolean m_isEditable;
+
+    private P_CachedCell(ICell cell, boolean isEditable) {
+      m_cell = cell;
+      m_isEditable = isEditable;
     }
   }
 }

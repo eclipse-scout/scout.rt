@@ -25,7 +25,7 @@ public class RwtScoutSynchronizer {
   private final IRwtEnvironment m_uiEnvironment;
   private final Display m_rwtQueue;
   //loop detection from rwt to scout
-  private LoopDetector m_loopDetector;
+  private final LoopDetector m_loopDetector;
 
   public RwtScoutSynchronizer(IRwtEnvironment uiEnvironment) {
     m_uiEnvironment = uiEnvironment;
