@@ -55,6 +55,7 @@ scout.Session = function($entryPoint, jsonSessionId, options) {
 
   // TODO BSH Detach | Check if there is another way
   // If this is a popup window, re-register with parent (in case the user reloaded the popup window)
+  // re-name "detach window", since "detach" is also an often used JQuery operation on the DOM
   if (window.opener && window.opener.scout && window.opener.scout.sessions) {
     // Should never happen, as forms are not detachable when multiple sessions are alive (see Form.js)
     if (window.opener.scout.sessions.length > 1) {

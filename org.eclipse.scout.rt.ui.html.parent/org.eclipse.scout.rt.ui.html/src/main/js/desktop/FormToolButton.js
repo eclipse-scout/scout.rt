@@ -41,7 +41,6 @@ scout.FormToolButton.prototype._openContainer = function() {
     this.desktop.$toolContainer.append(this.$storage);
   } else if (this.form) {
     this.form.menuBarPosition = 'bottom';
-    this.form.detachable = false;
     this.form.render(this.desktop.$toolContainer);
     this.form.htmlComp.pixelBasedSizing = true;
     this.form.htmlComp.pack();

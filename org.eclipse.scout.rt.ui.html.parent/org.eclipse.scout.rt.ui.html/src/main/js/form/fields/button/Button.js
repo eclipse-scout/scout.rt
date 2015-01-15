@@ -19,10 +19,14 @@ scout.Button.SYSTEM_TYPE = {
  */
 scout.Button.prototype._render = function($parent) {
   this.addContainer($parent, 'button', new scout.ButtonLayout());
-  this.addField($('<button>').
+  var $button = $('<button>').
     on('click', function() {
       this.session.send(this.id, 'clicked');
-    }.bind(this)));
+    }.bind(this));
+  this.addField($button);
+  if (this.systemType === scout.Button.SYSTEM_TYPE.OK) {
+    $button.addClass('default-button');
+  }
 };
 
 scout.Button.prototype._renderLabel = function(label) {

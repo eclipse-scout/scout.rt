@@ -17,6 +17,8 @@ scout.helpers = {
    * Please not that you can open new windows only inside a handler of a direct
    * user action. Asynchronous calls to this method are blocked by the browsers.
    */
+  // FIXME AWE/BSH: unsued after detach-window feature has been removed, check at end of release
+  // if it's still unused and delete it in that case-
   openWindow: function(url, windowId, popupWidth, popupHeight) {
     var windowSpec = '';
     if (popupWidth && popupHeight) {

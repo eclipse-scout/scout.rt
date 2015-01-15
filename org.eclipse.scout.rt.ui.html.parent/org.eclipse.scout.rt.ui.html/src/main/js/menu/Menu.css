@@ -54,7 +54,14 @@
   background-color: @border-color;
 }
 
-.menubar .button {
+.menubar > .form-field {
+  position: relative;
+  & > .field {
+    position: relative;
+  }
+}
+
+.menubar button {
   position: relative;
   height: 30px;
   min-width: 110px;

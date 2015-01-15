@@ -11,7 +11,7 @@ scout.Form = function() {
 scout.inherits(scout.Form, scout.ModelAdapter);
 
 scout.Form.prototype._render = function($parent) {
-  var detachable, closeable, i, btn, systemButtons, menuItems = [];
+  var i, btn, systemButtons, menuItems = [], closeable = false;
 
   this._$parent = $parent;
   this.$container = $('<div>')
@@ -25,25 +25,6 @@ scout.Form.prototype._render = function($parent) {
   this.htmlComp.pixelBasedSizing = false;
 
   this.rootGroupBox.render(this.$container);
-
-  closeable = false;
-  if (this.detachable !== undefined) {
-    detachable = this.detachable;
-  } else {
-    detachable = this.displayHint === 'dialog' && !this.modal;
-  }
-  if (scout.sessions.length > 1 || this.session.parentJsonSession) {
-    // Cannot detach if...
-    // 1. there is more than one session inside the window (portlets), because
-    //    we would not know which session to attach to.
-    // 2. the window is already a child window (cannot detach further).
-    detachable = false;
-  }
-
-  if (detachable && !this.detachFormMenu) {
-    this.detachFormMenu = new scout.DetachFormMenu(this, this.session);
-    this.staticMenus.push(this.detachFormMenu);
-  }
 
   menuItems = this.staticMenus.concat(this.menus);
   systemButtons = this.rootGroupBox.systemButtons;
@@ -63,13 +44,16 @@ scout.Form.prototype._render = function($parent) {
   this.menuBar = new scout.MenuBar(this.$container, 'top', scout.FormMenuItemsOrder.order);
   this.menuBar.updateItems(menuItems);
 
-  if (closeable) {
-    var $closeButton = $('<button>').text('X');
-    this.menuBar.$container.append($closeButton);
-    $closeButton.on('click', function() {
-      this.session.send(this.id, 'formClosing');
-    }.bind(this));
-  }
+// FIXME AWE: (menu) un-comment, check if this is the right place. Probably we should only
+// have the close-buttons on real modal dialogs or we should add an X icon to the tabs in
+// in the task-bar (all but the last tab should be closeable).
+//  if (closeable) {
+//    var $closeButton = $('<button>').text('X');
+//    this.menuBar.$container.append($closeButton);
+//    $closeButton.on('click', function() {
+//      this.session.send(this.id, 'formClosing');
+//    }.bind(this));
+//  }
 
   if (this._locked) {
     this.disable();

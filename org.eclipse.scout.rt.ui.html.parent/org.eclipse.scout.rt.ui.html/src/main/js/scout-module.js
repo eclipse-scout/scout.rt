@@ -79,7 +79,6 @@ __include("messagebox/MessageBox.js");
 __include("messagebox/MessageBoxModelAdapter.js");
 __include("form/Form.js");
 __include("form/FormLayout.js");
-__include("form/DetachFormMenu.js");
 __include("form/fields/fields.js");
 __include("form/fields/FormField.js");
 __include("form/fields/FormFieldLayout.js");
