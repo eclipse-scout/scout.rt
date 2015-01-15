@@ -57,6 +57,7 @@ public class SwingScoutColorField extends SwingScoutBasicFieldComposite<IColorFi
   private ContextMenuDecorationItem m_contextMenuMarker;
   private SwingScoutContextMenu m_contextMenu;
   private DropDownDecorationItem m_dropdownIcon;
+  private PropertyChangeListener m_contextMenuVisibilityListener;
 
   @Override
   protected void initializeSwing() {
@@ -157,27 +158,41 @@ public class SwingScoutColorField extends SwingScoutBasicFieldComposite<IColorFi
 
   }
 
-  @Override
   protected void installContextMenu() {
     m_contextMenuMarker.setMarkerVisible(getScoutObject().getContextMenu().isVisible());
-    getScoutObject().getContextMenu().addPropertyChangeListener(new PropertyChangeListener() {
-
+    m_contextMenuVisibilityListener = new PropertyChangeListener() {
       @Override
       public void propertyChange(PropertyChangeEvent evt) {
-
         if (IMenu.PROP_VISIBLE.equals(evt.getPropertyName())) {
           m_contextMenuMarker.setMarkerVisible(getScoutObject().getContextMenu().isVisible());
         }
       }
-    });
+    };
+    getScoutObject().getContextMenu().addPropertyChangeListener(m_contextMenuVisibilityListener);
     m_contextMenu = SwingScoutContextMenu.installContextMenuWithSystemMenus(getSwingField(), getScoutObject().getContextMenu(), getSwingEnvironment());
+  }
+
+  protected void uninstallContextMenu() {
+    if (m_contextMenuVisibilityListener != null) {
+      getScoutObject().getContextMenu().removePropertyChangeListener(m_contextMenuVisibilityListener);
+      m_contextMenuVisibilityListener = null;
+    }
   }
 
   @Override
   protected void attachScout() {
     super.attachScout();
     updateIconIdFromScout();
+    installContextMenu();
+  }
 
+  @Override
+  protected void detachScout() {
+    if (m_contextMenuMarker != null) {
+      m_contextMenuMarker.destroy();
+    }
+    uninstallContextMenu();
+    super.detachScout();
   }
 
   @Override

@@ -51,7 +51,7 @@ import org.eclipse.swt.widgets.Control;
 
 /**
  * <h3>SwtScoutImageBox</h3> ...
- * 
+ *
  * @since 1.0.9 16.07.2008
  */
 public class SwtScoutImageField extends SwtScoutFieldComposite<IImageField> implements ISwtScoutImageBox {
@@ -61,6 +61,7 @@ public class SwtScoutImageField extends SwtScoutFieldComposite<IImageField> impl
   private ScrolledFormEx m_scrolledForm;
   private SwtContextMenuMarkerComposite m_menuMarkerComposite;
   private SwtScoutContextMenu m_contextMenu;
+  private PropertyChangeListener m_contextMenuVisibilityListener;
 
   @Override
   protected void initializeSwt(Composite parent) {
@@ -119,14 +120,11 @@ public class SwtScoutImageField extends SwtScoutFieldComposite<IImageField> impl
     body.setLayout(new FillLayout());
   }
 
-  @Override
   protected void installContextMenu() {
     m_menuMarkerComposite.setMarkerVisible(getScoutObject().getContextMenu().isVisible());
-    getScoutObject().getContextMenu().addPropertyChangeListener(new PropertyChangeListener() {
-
+    m_contextMenuVisibilityListener = new PropertyChangeListener() {
       @Override
       public void propertyChange(PropertyChangeEvent evt) {
-
         if (IMenu.PROP_VISIBLE.equals(evt.getPropertyName())) {
           final boolean markerVisible = getScoutObject().getContextMenu().isVisible();
           getEnvironment().invokeSwtLater(new Runnable() {
@@ -137,10 +135,18 @@ public class SwtScoutImageField extends SwtScoutFieldComposite<IImageField> impl
           });
         }
       }
-    });
+    };
+    getScoutObject().getContextMenu().addPropertyChangeListener(m_contextMenuVisibilityListener);
 
     m_contextMenu = new SwtScoutContextMenu(getImageViewer().getShell(), getScoutObject().getContextMenu(), getEnvironment());
     getImageViewer().setMenu(m_contextMenu.getSwtMenu());
+  }
+
+  protected void uninstallContextMenu() {
+    if (m_contextMenuVisibilityListener != null) {
+      getScoutObject().getContextMenu().removePropertyChangeListener(m_contextMenuVisibilityListener);
+      m_contextMenuVisibilityListener = null;
+    }
   }
 
   public ImageViewer getImageViewer() {
@@ -165,6 +171,13 @@ public class SwtScoutImageField extends SwtScoutFieldComposite<IImageField> impl
     updateAutoFitFromScout();
     updateImageFromScout();
     new P_DndSupport(getScoutObject(), getScoutObject(), getSwtField(), getEnvironment());
+    installContextMenu();
+  }
+
+  @Override
+  protected void detachScout() {
+    uninstallContextMenu();
+    super.detachScout();
   }
 
   protected void updateImageFromScout() {

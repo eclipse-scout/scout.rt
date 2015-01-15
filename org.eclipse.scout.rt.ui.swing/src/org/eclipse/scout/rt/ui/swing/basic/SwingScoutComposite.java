@@ -170,14 +170,7 @@ public abstract class SwingScoutComposite<T extends IPropertyObserver> implement
       }
       cacheSwingClientProperties();
       connectToScout();
-      installContextMenu();
     }
-  }
-
-  /**
-   *
-   */
-  protected void installContextMenu() {
   }
 
   @Override

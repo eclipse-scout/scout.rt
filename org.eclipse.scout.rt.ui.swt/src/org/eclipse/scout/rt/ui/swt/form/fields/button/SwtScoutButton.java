@@ -49,7 +49,7 @@ import org.eclipse.ui.forms.widgets.Hyperlink;
 
 /**
  * <h3>SwtScoutButton</h3> ...
- * 
+ *
  * @since 1.0.0 07.04.2008
  */
 public class SwtScoutButton<T extends IButton> extends SwtScoutFieldComposite<T> implements ISwtScoutButton<T> {
@@ -63,6 +63,7 @@ public class SwtScoutButton<T extends IButton> extends SwtScoutFieldComposite<T>
   private SwtScoutContextMenu m_contextMenu;
 
   private SwtContextMenuMarkerComposite m_menuMarkerComposite;
+  private PropertyChangeListener m_contextMenuVisibilityListener;
 
   public SwtScoutButton() {
     m_selectionLock = new OptimisticLock();
@@ -178,11 +179,9 @@ public class SwtScoutButton<T extends IButton> extends SwtScoutFieldComposite<T>
     return swtButton;
   }
 
-  @Override
   protected void installContextMenu() {
     m_menuMarkerComposite.setMarkerVisible(getScoutObject().getContextMenu().isVisible());
-    getScoutObject().getContextMenu().addPropertyChangeListener(new PropertyChangeListener() {
-
+    m_contextMenuVisibilityListener = new PropertyChangeListener() {
       @Override
       public void propertyChange(PropertyChangeEvent evt) {
         if (IMenu.PROP_VISIBLE.equals(evt.getPropertyName())) {
@@ -195,9 +194,17 @@ public class SwtScoutButton<T extends IButton> extends SwtScoutFieldComposite<T>
           });
         }
       }
-    });
+    };
+    getScoutObject().getContextMenu().addPropertyChangeListener(m_contextMenuVisibilityListener);
     m_contextMenu = new SwtScoutContextMenu(getSwtField().getShell(), getScoutObject().getContextMenu(), getEnvironment());
     getSwtField().setMenu(m_contextMenu.getSwtMenu());
+  }
+
+  protected void uninstallContextMenu() {
+    if (m_contextMenuVisibilityListener != null) {
+      getScoutObject().getContextMenu().removePropertyChangeListener(m_contextMenuVisibilityListener);
+      m_contextMenuVisibilityListener = null;
+    }
   }
 
   @Override
@@ -207,16 +214,17 @@ public class SwtScoutButton<T extends IButton> extends SwtScoutFieldComposite<T>
       m_scoutButtonListener = new P_ScoutButtonListener();
       getScoutObject().addButtonListener(m_scoutButtonListener);
     }
-
+    installContextMenu();
   }
 
   @Override
   protected void detachScout() {
-    super.detachScout();
     if (m_scoutButtonListener != null) {
       getScoutObject().removeButtonListener(m_scoutButtonListener);
       m_scoutButtonListener = null;
     }
+    uninstallContextMenu();
+    super.detachScout();
   }
 
   @Override

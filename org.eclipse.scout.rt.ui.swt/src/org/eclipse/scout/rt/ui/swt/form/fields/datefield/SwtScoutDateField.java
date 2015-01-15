@@ -57,6 +57,7 @@ public class SwtScoutDateField extends SwtScoutBasicFieldComposite<IDateField> i
 
   private SwtContextMenuMarkerComposite m_menuMarkerComposite;
   private SwtScoutContextMenu m_contextMenu;
+  private PropertyChangeListener m_contextMenuVisibilityListener;
 
   @Override
   protected void initializeSwt(Composite parent) {
@@ -107,14 +108,11 @@ public class SwtScoutDateField extends SwtScoutBasicFieldComposite<IDateField> i
     timeChooserButton.setLayoutData(LogicalGridDataBuilder.createButton2());
   }
 
-  @Override
   protected void installContextMenu() {
     m_menuMarkerComposite.setMarkerVisible(getScoutObject().getContextMenu().isVisible());
-    getScoutObject().getContextMenu().addPropertyChangeListener(new PropertyChangeListener() {
-
+    m_contextMenuVisibilityListener = new PropertyChangeListener() {
       @Override
       public void propertyChange(PropertyChangeEvent evt) {
-
         if (IMenu.PROP_VISIBLE.equals(evt.getPropertyName())) {
           final boolean markerVisible = getScoutObject().getContextMenu().isVisible();
           getEnvironment().invokeSwtLater(new Runnable() {
@@ -125,7 +123,8 @@ public class SwtScoutDateField extends SwtScoutBasicFieldComposite<IDateField> i
           });
         }
       }
-    });
+    };
+    getScoutObject().getContextMenu().addPropertyChangeListener(m_contextMenuVisibilityListener);
 
     m_contextMenu = new SwtScoutContextMenu(getSwtField().getShell(), getScoutObject().getContextMenu(), getEnvironment());
     if (getDateChooserButton() != null) {
@@ -138,6 +137,25 @@ public class SwtScoutDateField extends SwtScoutBasicFieldComposite<IDateField> i
     SwtScoutContextMenu fieldMenu = new SwtScoutContextMenu(getSwtField().getShell(), getScoutObject().getContextMenu(), getEnvironment(),
         getScoutObject().isAutoAddDefaultMenus() ? new StyledTextAccess(getSwtField()) : null, getScoutObject().isAutoAddDefaultMenus() ? getSwtField() : null);
     getSwtField().setMenu(fieldMenu.getSwtMenu());
+  }
+
+  protected void uninstallContextMenu() {
+    if (m_contextMenuVisibilityListener != null) {
+      getScoutObject().getContextMenu().removePropertyChangeListener(m_contextMenuVisibilityListener);
+      m_contextMenuVisibilityListener = null;
+    }
+  }
+
+  @Override
+  protected void attachScout() {
+    super.attachScout();
+    installContextMenu();
+  }
+
+  @Override
+  protected void detachScout() {
+    uninstallContextMenu();
+    super.detachScout();
   }
 
   @Override

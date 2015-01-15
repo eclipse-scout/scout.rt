@@ -18,9 +18,6 @@ import javax.swing.JComponent;
 
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
 
-/**
- *
- */
 public abstract class AbstractDecoration implements IDecoration {
   public static final Rectangle NULL_RECTANGLE = new Rectangle(0, 0, 0, 0);
 
@@ -36,9 +33,6 @@ public abstract class AbstractDecoration implements IDecoration {
     }
   }
 
-  /**
-   *
-   */
   protected void init() {
   }
 

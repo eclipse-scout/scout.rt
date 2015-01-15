@@ -73,6 +73,7 @@ public class SwingScoutDateField extends SwingScoutBasicFieldComposite<IDateFiel
   private ContextMenuDecorationItem m_contextMenuMarker;
   private DropDownDecorationItem m_dropdownIcon;
   private SwingScoutContextMenu m_contextMenu;
+  private PropertyChangeListener m_contextMenuVisibilityListener;
 
   public boolean isIgnoreLabel() {
     return m_ignoreLabel;
@@ -202,20 +203,40 @@ public class SwingScoutDateField extends SwingScoutBasicFieldComposite<IDateFiel
     textField.setDecorationIcon(decorationGroup);
   }
 
-  @Override
   protected void installContextMenu() {
-    getScoutObject().getContextMenu().addPropertyChangeListener(new PropertyChangeListener() {
-
+    m_contextMenuVisibilityListener = new PropertyChangeListener() {
       @Override
       public void propertyChange(PropertyChangeEvent evt) {
-
         if (IMenu.PROP_VISIBLE.equals(evt.getPropertyName())) {
           m_contextMenuMarker.setMarkerVisible(getScoutObject().getContextMenu().isVisible());
         }
       }
-    });
+    };
+    getScoutObject().getContextMenu().addPropertyChangeListener(m_contextMenuVisibilityListener);
     m_contextMenuMarker.setMarkerVisible(getScoutObject().getContextMenu().isVisible());
     m_contextMenu = SwingScoutContextMenu.installContextMenuWithSystemMenus(getSwingDateField(), getScoutObject().getContextMenu(), getSwingEnvironment());
+  }
+
+  protected void uninstallContextMenu() {
+    if (m_contextMenuVisibilityListener != null) {
+      getScoutObject().getContextMenu().removePropertyChangeListener(m_contextMenuVisibilityListener);
+      m_contextMenuVisibilityListener = null;
+    }
+  }
+
+  @Override
+  protected void attachScout() {
+    super.attachScout();
+    installContextMenu();
+  }
+
+  @Override
+  protected void detachScout() {
+    if (m_contextMenuMarker != null) {
+      m_contextMenuMarker.destroy();
+    }
+    uninstallContextMenu();
+    super.detachScout();
   }
 
   public JTextFieldWithDecorationIcons getSwingDateField() {

@@ -35,6 +35,7 @@ public class SwtScoutStringPlainTextField extends SwtScoutStringFieldComposite {
 
   private SwtContextMenuMarkerComposite m_menuMarkerComposite;
   private SwtScoutContextMenu m_contextMenu;
+  private PropertyChangeListener m_contextMenuVisibilityListener;
 
   @Override
   protected void initializeSwt(Composite parent) {
@@ -66,14 +67,11 @@ public class SwtScoutStringPlainTextField extends SwtScoutStringFieldComposite {
     m_menuMarkerComposite.setLayoutData(LogicalGridDataBuilder.createField(((IFormField) getScoutObject()).getGridData()));
   }
 
-  @Override
   protected void installContextMenu() {
     m_menuMarkerComposite.setMarkerVisible(getScoutObject().getContextMenu().isVisible());
-    getScoutObject().getContextMenu().addPropertyChangeListener(new PropertyChangeListener() {
-
+    m_contextMenuVisibilityListener = new PropertyChangeListener() {
       @Override
       public void propertyChange(PropertyChangeEvent evt) {
-
         if (IMenu.PROP_VISIBLE.equals(evt.getPropertyName())) {
           final boolean markerVisible = getScoutObject().getContextMenu().isVisible();
           getEnvironment().invokeSwtLater(new Runnable() {
@@ -84,13 +82,21 @@ public class SwtScoutStringPlainTextField extends SwtScoutStringFieldComposite {
           });
         }
       }
-    });
+    };
+    getScoutObject().getContextMenu().addPropertyChangeListener(m_contextMenuVisibilityListener);
 
     m_contextMenu = new SwtScoutContextMenu(getSwtField().getShell(), getScoutObject().getContextMenu(), getEnvironment());
 
     SwtScoutContextMenu fieldMenu = new SwtScoutContextMenu(getSwtField().getShell(), getScoutObject().getContextMenu(), getEnvironment(),
         getScoutObject().isAutoAddDefaultMenus() ? new TextAccess(getSwtField()) : null, null);
     getSwtField().setMenu(fieldMenu.getSwtMenu());
+  }
+
+  protected void uninstallContextMenu() {
+    if (m_contextMenuVisibilityListener != null) {
+      getScoutObject().getContextMenu().removePropertyChangeListener(m_contextMenuVisibilityListener);
+      m_contextMenuVisibilityListener = null;
+    }
   }
 
   @Override
@@ -103,6 +109,14 @@ public class SwtScoutStringPlainTextField extends SwtScoutStringFieldComposite {
 
     // dnd support
     new P_DndSupport(getScoutObject(), getScoutObject(), getSwtField(), getEnvironment());
+
+    installContextMenu();
+  }
+
+  @Override
+  protected void detachScout() {
+    uninstallContextMenu();
+    super.detachScout();
   }
 
   @Override
