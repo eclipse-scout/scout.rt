@@ -41,7 +41,7 @@
     border-left: 1px solid @desktop-border-color;
     border-right: 1px solid @desktop-border-color;
     border-top: 1px solid @palette-white;
-    background-color: @palette-white;
+    background-color: @body-background-color;
   }
 }
 

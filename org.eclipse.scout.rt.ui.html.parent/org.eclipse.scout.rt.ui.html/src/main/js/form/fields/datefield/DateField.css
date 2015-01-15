@@ -69,7 +69,8 @@
   }
 
   &:hover {
-    border: 1px solid @palette-bsi-disabled;
+    color: @hover-color;
+    font-weight: bold;
   }
 
   &.date-box-out {
@@ -77,11 +78,11 @@
   }
 
   &.date-box-weekend {
-    color: @palette-orange-active;
+    color: @palette-bsi-normal;
   }
 
   &.date-box-out-weekend {
-    color: @palette-orange-disabled;
+    color: @palette-bsi-disabled;
   }
 
   &.date-box-now {

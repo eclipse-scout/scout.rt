@@ -22,7 +22,7 @@
 .control-container {
   position: absolute;
   overflow: hidden;
-  background-color: @desktop-background-color;
+  background-color: @body-background-color;
   bottom: @table-footer-height;
   border-top: 3px solid @desktop-border-color;
   width: 100%;

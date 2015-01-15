@@ -106,7 +106,7 @@
 
   .tab-menu-open & {
     color: @hover-color;
-    background-color: @navigation-light-color;
+    background-color: @control-background-color;
   }
 
   &:before {
@@ -178,7 +178,7 @@
 .navigation-tab-outline-menu {
   position: absolute;
   top: @desktop-taskbar-height;
-  background-color: @navigation-light-color;
+  background-color: @control-background-color;
   z-index: 10;
   white-space: nowrap;
   .menu-context;

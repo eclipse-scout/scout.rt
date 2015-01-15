@@ -25,14 +25,14 @@ rect.select-fill, circle.select-fill {
 
 path.select-fill-line, line.select-fill-line {
   stroke: @chart-unselect-color;
-  fill: @palette-white;
+  fill: @body-background-color;
   stroke-width: 3px;
   stroke-linejoin: round;
   stroke-linecap: round;
 }
 
 path.select-fill-pie {
-  stroke: @palette-white;
+  stroke: @body-background-color;
   fill: @chart-unselect-color;
   stroke-width: 1px;
   stroke-linejoin: round;
@@ -83,6 +83,7 @@ svg.select-chart.selected {
 }
 
 .select-axis, .select-data {
+  background-color: @control-background-color;
   position: relative;
   padding-left: 8px;
   padding-right: 20px;
@@ -203,7 +204,7 @@ svg.select-chart.selected {
 
   path& {
     fill: @chart-data-color;
-    stroke: @palette-white;
+    stroke: @body-background-color;
     stroke-width: 2px;
     cursor: pointer;
   }

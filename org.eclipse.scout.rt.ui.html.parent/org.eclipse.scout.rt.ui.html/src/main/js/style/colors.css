@@ -21,14 +21,15 @@
 
 @palette-cyan-background: #DDFFF9;
 @palette-cyan-disabled: #78E8D3;
-@palette-cyan-normal: #3EE1C3;
-@palette-cyan-active: #248499;
+@palette-cyan-normal: #24B499;  //#3EE1C3;
+@palette-cyan-active: #1D917C;    //#24B499;
 
 @palette-bsi-background: #ECF3F7;
 @palette-bsi-disabled: #389DB6;    //#7CC1E3
 @palette-bsi-normal: #006C86;
 @palette-bsi-active: #005164;
 
+@palette-gray-9: #FEFEFE;
 @palette-gray-8: #EFEFEF;
 @palette-gray-7: #DDDDDD;
 @palette-gray-6: #CCCCCC;
@@ -42,7 +43,7 @@
 /* Global Color Definitions */
 /* ------------------------ */
 
-@body-background-color: @palette-white;
+@body-background-color: @palette-gray-9;
 @desktop-background-color: @palette-white;
 @desktop-border-color: @palette-gray-6;
 
@@ -58,8 +59,8 @@
 @chart-axis-text-color: @palette-gray-4;
 
 @chart-empty-color: @palette-gray-6;
-@chart-data-color: @palette-green-normal;
-@chart-active-color: @palette-green-active;
+@chart-data-color: @palette-cyan-normal;
+@chart-active-color: @palette-cyan-active;
 
 @control-background-color: @palette-white;
 
