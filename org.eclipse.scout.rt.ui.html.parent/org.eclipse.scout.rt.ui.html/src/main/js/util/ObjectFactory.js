@@ -165,7 +165,17 @@ scout.defaultObjectFactories = [{
   create: function() {
     return new scout.CheckBoxField();
   }
-}, {
+},{
+  objectType: 'RadioButtonGroup',
+  create: function() {
+    return new scout.RadioButtonGroup();
+  }
+},{
+  objectType: 'RadioButton',
+  create: function() {
+    return new scout.RadioButton();
+  }
+},{
   objectType: 'LabelField',
   create: function() {
     return new scout.LabelField();

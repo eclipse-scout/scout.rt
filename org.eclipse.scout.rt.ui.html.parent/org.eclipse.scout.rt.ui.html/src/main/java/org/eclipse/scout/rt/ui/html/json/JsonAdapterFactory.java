@@ -33,6 +33,7 @@ import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
+import org.eclipse.scout.rt.client.ui.form.fields.button.IRadioButton;
 import org.eclipse.scout.rt.client.ui.form.fields.calendarfield.ICalendarField;
 import org.eclipse.scout.rt.client.ui.form.fields.checkbox.ICheckBox;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField;
@@ -40,6 +41,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.imagebox.IImageField;
 import org.eclipse.scout.rt.client.ui.form.fields.labelfield.ILabelField;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.INumberField;
+import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.IRadioButtonGroup;
 import org.eclipse.scout.rt.client.ui.form.fields.richtextfield.IRichTextField;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
@@ -68,6 +70,8 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.groupbox.JsonGroupBox;
 import org.eclipse.scout.rt.ui.html.json.form.fields.imagefield.JsonImageField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.labelfield.JsonLabelField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.numberfield.JsonNumberField;
+import org.eclipse.scout.rt.ui.html.json.form.fields.radiobutton.JsonRadioButton;
+import org.eclipse.scout.rt.ui.html.json.form.fields.radiobutton.JsonRadioButtonGroup;
 import org.eclipse.scout.rt.ui.html.json.form.fields.richtextfield.JsonRichTextField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.sequencebox.JsonSequenceBox;
 import org.eclipse.scout.rt.ui.html.json.form.fields.smartfield.JsonSmartField;
@@ -130,6 +134,12 @@ public class JsonAdapterFactory implements IJsonAdapterFactory {
     }
     else if (model instanceof ITreeField) {
       return new JsonTreeField((ITreeField) model, session, id, parent);
+    }
+    else if (model instanceof IRadioButton) {
+      return new JsonRadioButton((IRadioButton) model, session, id, parent);
+    }
+    else if (model instanceof IRadioButtonGroup) {
+      return new JsonRadioButtonGroup((IRadioButtonGroup) model, session, id, parent);
     }
     else if (model instanceof IButton) {
       return new JsonButton((IButton) model, session, id, parent);

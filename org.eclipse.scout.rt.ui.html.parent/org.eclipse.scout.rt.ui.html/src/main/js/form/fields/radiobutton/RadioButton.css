@@ -1,0 +1,48 @@
+.radio-button>span{
+  &  label{
+      display: inline-block;
+      position: relative;
+      padding-left: 25px;
+      margin-right: 15px;
+      font-size: 13px;
+  }
+  &  label:before {
+      content: "";
+      display: inline-block;
+      width: 19px;
+      height: 19px;
+      margin-right: 10px;
+      margin-top: -2px;
+      position: absolute;
+      left: 0;
+      top: 0;
+  }
+
+  &  input[type=radio] {
+      display: none;
+  }
+
+  &  input[type=radio]:checked + label:before {
+      content: "\2022";
+      color: @palette-black;
+      font-size: 30px;
+      text-align: center;
+      line-height: 16px;
+  }
+  &  label:before {
+      border: 2px solid @border-color;
+      border-radius: 10px;
+  }
+
+  &  input[type=radio]:disabled + label:before {
+     background-color:@disabled-color;
+  }
+}
+
+
+
+
+
+
+
+
