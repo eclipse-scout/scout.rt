@@ -75,7 +75,7 @@
     width: @navigation-tab-button-size;
   }
 
-  .navigation-breadcrumb & {
+  .navigation-breadcrumb > .navigation-header > & {
     width: 50%;
   }
 }
@@ -166,6 +166,7 @@
   .navigation-breadcrumb & {
     position: absolute;
     margin-right: 12px;
+    top:  @desktop-taskbar-height;
     left: -100%;
     width: calc(~"200%" - (12px + 12x));
   }
