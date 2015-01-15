@@ -36,10 +36,10 @@ public class JsonEvent implements IJsonMapper {
    */
   public JsonEvent(String target, String type, JSONObject data) {
     if (target == null) {
-      throw new IllegalArgumentException("Argument 'target' cannot be null");
+      throw new IllegalArgumentException("Argument 'target' must be null");
     }
     if (type == null) {
-      throw new IllegalArgumentException("Argument 'type' cannot be null");
+      throw new IllegalArgumentException("Argument 'type' must be null");
     }
     if (data == null) {
       data = new JSONObject();
@@ -63,7 +63,7 @@ public class JsonEvent implements IJsonMapper {
 
   public static JsonEvent fromJson(JSONObject json) {
     if (json == null) {
-      throw new IllegalArgumentException("Argument 'json' cannot be null");
+      throw new IllegalArgumentException("Argument 'json' must not be null");
     }
     String target = JsonObjectUtility.getString(json, TARGET);
     String type = JsonObjectUtility.getString(json, TYPE);
