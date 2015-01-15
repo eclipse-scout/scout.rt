@@ -8,7 +8,7 @@ scout.FormLayout.prototype.layout = function($container) {
     htmlRootGb = this._getHtmlRootGroupBox($container),
     rootGbSize;
 
-  rootGbSize = htmlContainer.getSize()
+  rootGbSize = htmlContainer.getAvailableSize()
     .subtract(htmlContainer.getInsets())
     .subtract(htmlRootGb.getMargins());
   rootGbSize.height -= this._getMenuBarHeight($container);

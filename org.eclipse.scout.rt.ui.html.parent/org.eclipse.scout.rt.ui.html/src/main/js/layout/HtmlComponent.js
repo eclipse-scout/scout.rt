@@ -33,6 +33,21 @@ scout.HtmlComponent.prototype.getParent = function() {
 };
 
 /**
+ * Computes the preferred height if the component is scrollable. Otherwise the actual size is returned.
+ */
+scout.HtmlComponent.prototype.getAvailableSize = function() {
+  var size = this.getSize(),
+    prefSize;
+
+  if (this.scrollable) {
+    prefSize = this.getPreferredSize();
+    size.height = prefSize.height;
+  }
+
+  return size;
+};
+
+/**
  * Calls the layout manager of the component to layout its children.
  * @exception when component has no layout manager
  */

@@ -20,7 +20,7 @@ scout.FormFieldLayout.prototype.layout = function($container) {
     leftWidth = 0,
     rightWidth = 0;
 
-  containerSize = htmlContainer.getSize().
+  containerSize = htmlContainer.getAvailableSize().
     subtract(htmlContainer.getInsets());
 
   if (f.$label && f.labelVisible) {

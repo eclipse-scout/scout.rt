@@ -43,7 +43,7 @@ scout.LogicalGridLayout.prototype.validateLayout = function($parent) {
 scout.LogicalGridLayout.prototype.layout = function($parent) {
   this._verifyLayout($parent);
   var htmlParent = scout.HtmlComponent.get($parent),
-    parentSize = htmlParent.getSize(),
+    parentSize = htmlParent.getAvailableSize(),
     parentInsets = htmlParent.getInsets();
   $.log.trace('(LogicalGridLayout#layout) parent ' + htmlParent.debug() + ' size=' + parentSize + ' insets=' + parentInsets);
   var cellBounds = this.m_info.layoutCellBounds(parentSize, parentInsets);

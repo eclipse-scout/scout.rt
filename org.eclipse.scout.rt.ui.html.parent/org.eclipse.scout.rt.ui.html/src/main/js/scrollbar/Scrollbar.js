@@ -81,11 +81,10 @@ scout.Scrollbar.prototype.updateThumb = function() {
   if (this._updateThumbPending) {
     return;
   }
-  var that = this;
   setTimeout(function() {
-    that._updateThumbImpl();
-    that._updateThumbPending = false;
-  }, 0);
+    this._updateThumbImpl();
+    this._updateThumbPending = false;
+  }.bind(this), 0);
   this._updateThumbPending = true;
 };
 

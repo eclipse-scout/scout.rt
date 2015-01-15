@@ -13,6 +13,7 @@ scout.scrollbars = {
    */
   install: function($container, options) {
     var nativeScrollbars = false;
+    var htmlContainer = scout.HtmlComponent.optGet($container);
     options = options || {};
     if (nativeScrollbars) {
       $.log.debug('use native scrollbars for container ' + scout.graphics.debugOutput($container));
@@ -20,6 +21,10 @@ scout.scrollbars = {
         css('overflow-x', 'hidden').
         css('overflow-y', 'auto').
         css('-webkit-overflow-scrolling', 'touch');
+
+      if (htmlContainer) {
+        htmlContainer.scrollable = true;
+      }
       return $container;
     } else {
       $.log.debug('install JS-scrollbars for container ' + scout.graphics.debugOutput($container) +  ' and add scrollable DIV');
@@ -28,12 +33,14 @@ scout.scrollbars = {
       scrollbar.updateThumb();
       $scrollable.data('scrollbar', scrollbar);
 
-      // Create a htmlComponent.
-      // This is necessary in order to properly propagate the size changes to the children, so they get layouted.
+      // Create a htmlComponent with a layout.
+      // This is necessary in order to properly propagate the layout call to its children.
       // It is only necessary if the children use the html component pattern.
-      var htmlContainer = scout.HtmlComponent.optGet($container);
       if (htmlContainer && options.createHtmlComponent) {
         var htmlScrollable = new scout.HtmlComponent($scrollable, htmlContainer.session);
+        htmlScrollable.scrollable = true;
+        // Disable pixel based sizing to avoid having the size set. Otherwise no scrollbars would appear since it actually is the viewport size.
+        htmlScrollable.pixelBasedSizing = false;
         htmlContainer.setLayout(new scout.SingleLayout(htmlScrollable));
       }
       return $scrollable;

@@ -11,7 +11,7 @@ scout.TabBoxLayout.prototype.layout = function($container) {
     tabAreaHeight = 0,
     containerSize, tabContentSize;
 
-  containerSize = htmlContainer.getSize()
+  containerSize = htmlContainer.getAvailableSize()
     .subtract(htmlContainer.getInsets());
 
   if ($tabArea.isVisible()) {

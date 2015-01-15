@@ -18,7 +18,7 @@ scout.SingleLayout.prototype.preferredLayoutSize = function($container) {
 
 scout.SingleLayout.prototype.layout = function($container) {
   var htmlContainer = scout.HtmlComponent.get($container);
-  var childSize = htmlContainer.getSize()
+  var childSize = htmlContainer.getAvailableSize()
     .subtract(htmlContainer.getInsets()),
     htmlChild = this._htmlChild;
 

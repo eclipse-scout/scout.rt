@@ -9,7 +9,7 @@ scout.GroupBoxLayout.prototype.layout = function($container) {
     htmlGbBody = this._htmlGbBody(),
     gbBodySize;
 
-  gbBodySize = htmlContainer.getSize()
+  gbBodySize = htmlContainer.getAvailableSize()
     .subtract(htmlContainer.getInsets())
     .subtract(htmlGbBody.getMargins());
   gbBodySize.height -= this._titleHeight($container);
