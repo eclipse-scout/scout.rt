@@ -11,29 +11,8 @@
 package org.eclipse.scout.rt.shared.ui.menu;
 
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 
 public interface IMenu5 extends IMenu {
-
-  //FIXME maybe better move to IAction. And button references an action in these cases
-  /*
-   * System Types
-   */
-  int SYSTEM_TYPE_NONE = IButton.SYSTEM_TYPE_NONE;
-  int SYSTEM_TYPE_CANCEL = IButton.SYSTEM_TYPE_CANCEL;
-  int SYSTEM_TYPE_CLOSE = IButton.SYSTEM_TYPE_CLOSE;
-  int SYSTEM_TYPE_OK = IButton.SYSTEM_TYPE_OK;
-  int SYSTEM_TYPE_RESET = IButton.SYSTEM_TYPE_RESET;
-  int SYSTEM_TYPE_SAVE = IButton.SYSTEM_TYPE_SAVE;
-  int SYSTEM_TYPE_SAVE_WITHOUT_MARKER_CHANGE = IButton.SYSTEM_TYPE_SAVE_WITHOUT_MARKER_CHANGE;
-
-  int getSystemType();
-
-  void setSystemType(int systemType);
-
-  boolean isDefault();
-
-  void setDefault(boolean isDefault);
 
   void addActionListener(ActionListener listener);
 

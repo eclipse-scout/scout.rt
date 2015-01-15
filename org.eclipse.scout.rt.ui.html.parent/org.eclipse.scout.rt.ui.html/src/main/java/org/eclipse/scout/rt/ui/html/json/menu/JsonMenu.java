@@ -15,7 +15,6 @@ import java.util.Set;
 
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
-import org.eclipse.scout.rt.shared.ui.menu.IMenu5;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
@@ -61,22 +60,6 @@ public class JsonMenu<T extends IMenu> extends JsonAction<T> {
         return menuTypes;
       }
     });
-    if (getModel() instanceof IMenu5) {
-      putJsonProperty(new JsonProperty<IMenu>(PROP_SYSTEM_TYPE, model) {
-        @Override
-        protected Integer modelValue() {
-          return ((IMenu5) getModel()).getSystemType();
-        }
-      });
-    }
-    if (getModel() instanceof IMenu5) {
-      putJsonProperty(new JsonProperty<IMenu>("defaultMenu", model) {
-        @Override
-        protected Boolean modelValue() {
-          return ((IMenu5) getModel()).isDefault();
-        }
-      });
-    }
   }
 
   @Override

@@ -44,10 +44,6 @@ scout.AbstractOutlineNavigationMenu.prototype._setDetailVisible = function() {
   this.outline._updateOutlineTab(this.node);
 };
 
-scout.AbstractOutlineNavigationMenu.prototype.hasButtonStyle = function() {
-  return true;
-};
-
 scout.AbstractOutlineNavigationMenu.prototype.remove = function() {
   this.$container.remove();
 };

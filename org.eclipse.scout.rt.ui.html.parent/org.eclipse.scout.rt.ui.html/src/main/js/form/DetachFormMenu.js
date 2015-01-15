@@ -1,11 +1,13 @@
 /**
- * Uses the same model as a real menu (childNodes, menuTypes etc.) and the same signature as well (render, remove) to make it compatible with the menubar.
+ * Uses the same model
+ *  as a real menu (childNodes, menuTypes etc.) and the same signature as well (render, remove) to make it compatible with the menubar.
+ * @implements {scout.Menu}
  */
 scout.DetachFormMenu = function(form, session) {
   this.form = form;
   this.session = session;
   this.childMenus = [];
-  this.menuTypes = ['Form.Tool'];
+  this.menuTypes = [];
   this.visible = true;
 };
 

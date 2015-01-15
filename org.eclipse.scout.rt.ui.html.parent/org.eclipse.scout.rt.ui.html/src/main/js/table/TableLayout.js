@@ -6,14 +6,14 @@ scout.TableLayout = function(table) {
 scout.inherits(scout.TableLayout, scout.AbstractLayout);
 
 scout.TableLayout.prototype.layout = function($container) {
-  var menubar = this.table.menubar,
+  var menuBar = this.table.menuBar,
     footer = this.table.footer,
     header = this.table.header,
     $data = this.table.$data,
     height = 0;
 
-  if (menubar.$container.isVisible()){
-    height += scout.graphics.getSize(menubar.$container).height;
+  if (menuBar.$container.isVisible()){
+    height += scout.graphics.getSize(menuBar.$container).height;
   }
   if (footer) {
     height += scout.graphics.getSize(footer.$container).height;

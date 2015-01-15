@@ -54,7 +54,7 @@
   background-color: @border-color;
 }
 
-.menu-button {
+.menubar .button {
   position: relative;
   height: 30px;
   min-width: 110px;

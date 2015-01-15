@@ -249,7 +249,7 @@ scout.TableFooter.prototype._resizeData = function(sizeContainer) {
     that = this;
 
   // new size of container and table data
-  sizeMenubar = parseFloat(that._table.menubar.$container.css('height'));
+  sizeMenubar = parseFloat(that._table.menuBar.$container.css('height'));
   sizeFooter = parseFloat(that.$container.css('height'));
   if (that._table.header) {
     sizeHeader = parseFloat(that._table.header.$container.css('height'));

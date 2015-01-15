@@ -52,11 +52,6 @@ scout.GroupBox.prototype._render = function($parent) {
   for (var i = 0; i < this.controls.length; i++) {
     this.controls[i].render(this._$bodyContainer);
   }
-
-  if (this.processButtons.length > 0) {
-    var buttonBar = new scout.GroupBoxButtonBar(this.processButtons);
-    buttonBar.render(this.$container);
-  }
 };
 
 scout.GroupBox.prototype._createFieldArraysByType = function() {
@@ -73,7 +68,8 @@ scout.GroupBox.prototype._createFieldArraysByType = function() {
         this.processButtons.push(field);
         if (field.systemType !== scout.Button.SYSTEM_TYPE.NONE) {
           this.systemButtons.push(field);
-        } else {
+        }
+        else {
           this.customButtons.push(field);
         }
       } else {

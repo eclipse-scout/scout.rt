@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.client.ui.desktop.outline.pages;
 
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -19,11 +18,9 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
-import org.eclipse.scout.rt.client.ui.form.FormMenuType;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IForm5;
 import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.AbstractExtensiblePageWithNodes;
-import org.eclipse.scout.rt.shared.ui.menu.IMenu5;
 import org.eclipse.scout.rt.shared.ui.menu.MenuWrapper;
 
 public abstract class AbstractPageWithNodes5 extends AbstractExtensiblePageWithNodes {
@@ -72,25 +69,14 @@ public abstract class AbstractPageWithNodes5 extends AbstractExtensiblePageWithN
   }
 
   protected void adaptDetailFormMenus(List<IMenu> menus) throws ProcessingException {
-    List<IMenu> copy = new LinkedList<IMenu>(menus);
-    // Remove system menus (ok cancel)
-    for (IMenu menu : copy) {
-      if (menu instanceof IMenu5 && ((IMenu5) menu).getSystemType() != IMenu5.SYSTEM_TYPE_NONE) {
-        menus.remove(menu);
-      }
-    }
-
     // Add page menus to the form
     for (IMenu menu : getOutline().getContextMenu().getChildActions()) {
       // FIXME CGU improve this
+      // FIXME AWE: (menu) mit alter version vergleich und prüfen ob etwas fehlt
       Set<IMenuType> types = new HashSet<IMenuType>();
       for (IMenuType type : menu.getMenuTypes()) {
-        if (type instanceof FormMenuType) {
-          types.add(type);
-        }
-      }
-      if (types.isEmpty()) {
-        types.add(FormMenuType.Regular);
+        // früher: if (instanceof FormMenuType)
+        types.add(type);
       }
       menus.add(new MenuWrapper(menu, types));
     }

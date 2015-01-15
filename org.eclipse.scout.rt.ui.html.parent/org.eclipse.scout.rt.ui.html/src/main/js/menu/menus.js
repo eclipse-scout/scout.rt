@@ -102,6 +102,14 @@ scout.menus = {
         popup.appendToBody(
           $.makeDiv('menu-item').text(menu.text).data('menu', menu).on('click', '', onMenuItemClicked).one(scout.menus.CLOSING_EVENTS, $.suppressEvent));
       }
+    },
+
+    isButton: function(obj) {
+      return obj instanceof scout.Button;
+    },
+
+    isMenu: function(obj) {
+      return obj instanceof scout.Menu;
     }
 
 };

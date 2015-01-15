@@ -20,6 +20,7 @@ scout.Table = function() {
   this._filterMap = {};
   this.selectedRowIds = [];
   this.animationRowLimit = 25;
+  this.menuBar;
 };
 scout.inherits(scout.Table, scout.ModelAdapter);
 
@@ -54,13 +55,7 @@ scout.Table.prototype._render = function($parent) {
   this.$data = this.$container.appendDiv('table-data');
   this._$scrollable = scout.scrollbars.install(this.$data);
 
-  this.menubar = new scout.Menubar(this.$container, {
-    position: this.menuBarPosition
-  });
-  this.menubar.menuTypesForLeft1 = ['Table.EmptySpace'];
-  this.menubar.menuTypesForLeft2 = ['Table.SingleSelection', 'Table.MultiSelection'];
-  this.menubar.menuTypesForRight = ['Table.Header'];
-  this.menubar.staticMenus = this.staticMenus;
+  this.menuBar = new scout.MenuBar(this.$container, this.menuBarPosition, scout.TableMenuItemsOrder.order);
 
   this._totalWidth = 0;
   for (i = 0; i < this.columns.length; i++) {
@@ -483,7 +478,8 @@ scout.Table.prototype._renderMenus = function(menus) {
 
 scout.Table.prototype._renderRowMenus = function($selectedRows) {
   var menuItems = this._filterMenus($selectedRows, ['Table.EmptySpace', 'Table.Header']);
-  this.menubar.updateItems(menuItems);
+  menuItems = this.staticMenus.concat(menuItems);
+  this.menuBar.updateItems(menuItems);
 };
 
 scout.Table.prototype.onRowsSelected = function($selectedRows) {

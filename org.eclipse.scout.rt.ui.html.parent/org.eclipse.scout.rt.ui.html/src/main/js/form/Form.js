@@ -11,7 +11,7 @@ scout.Form = function() {
 scout.inherits(scout.Form, scout.ModelAdapter);
 
 scout.Form.prototype._render = function($parent) {
-  var detachable, closeable, i, btn, systemButtons;
+  var detachable, closeable, i, btn, systemButtons, menuItems = [];
 
   this._$parent = $parent;
   this.$container = $('<div>')
@@ -40,33 +40,32 @@ scout.Form.prototype._render = function($parent) {
     detachable = false;
   }
 
-  systemButtons = this.rootGroupBox.systemButtons;
-  for (i = 0; i < systemButtons.length; i++) {
-    btn = systemButtons[i];
-    if (btn.visible &&
-      (btn.systemType === scout.Button.SYSTEM_TYPE.CANCEL ||
-        btn.systemType === scout.Button.SYSTEM_TYPE.CLOSE)) {
-      closeable = true;
-    }
-  }
-
   if (detachable && !this.detachFormMenu) {
     this.detachFormMenu = new scout.DetachFormMenu(this, this.session);
     this.staticMenus.push(this.detachFormMenu);
   }
 
-  this.menubar = new scout.Menubar(this.$container, {
-    position: this.menuBarPosition
-  });
-  this.menubar.menuTypesForLeft1 = ['Form.System'];
-  this.menubar.menuTypesForLeft2 = ['Form.Regular'];
-  this.menubar.menuTypesForRight = ['Form.Tool'];
-  this.menubar.staticMenus = this.staticMenus;
-  this.menubar.updateItems(this.menus);
+  menuItems = this.staticMenus.concat(this.menus);
+  systemButtons = this.rootGroupBox.systemButtons;
+  for (i = 0; i < systemButtons.length; i++) {
+    btn = systemButtons[i];
+    if (btn.visible &&
+        btn.systemType === scout.Button.SYSTEM_TYPE.CANCEL ||
+        btn.systemType === scout.Button.SYSTEM_TYPE.CLOSE) {
+      closeable = true;
+    }
+  }
+  // FIXME AWE: (menu) prettify this
+  menuItems = menuItems.concat(this.rootGroupBox.processButtons);
+
+  // FIXME AWE: (menu) braucht es this.menuBar als instanz variable?
+  // FIXME AWE: (menu) check menuBarPosition within forms (PhoneForm) --> move to groupbox
+  this.menuBar = new scout.MenuBar(this.$container, 'top', scout.FormMenuItemsOrder.order);
+  this.menuBar.updateItems(menuItems);
 
   if (closeable) {
     var $closeButton = $('<button>').text('X');
-    this.menubar.$container.append($closeButton);
+    this.menuBar.$container.append($closeButton);
     $closeButton.on('click', function() {
       this.session.send(this.id, 'formClosing');
     }.bind(this));
