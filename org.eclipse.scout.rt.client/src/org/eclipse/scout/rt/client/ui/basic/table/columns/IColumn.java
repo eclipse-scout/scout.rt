@@ -207,13 +207,13 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
   void setInitialVisible(boolean b);
 
   /**
-   * @deprecated Will be removed in the 6.0 Release. Use {@link IColumn#getOrder()} instead.
+   * @deprecated Will be removed in the N-Release. Use {@link IColumn#getOrder()} instead.
    */
   @Deprecated
   double getViewOrder();
 
   /**
-   * @deprecated Will be removed in the 6.0 Release. Use {@link IColumn#setOrder(double)} instead.
+   * @deprecated Will be removed in the N-Release. Use {@link IColumn#setOrder(double)} instead.
    */
   @Deprecated
   void setViewOrder(double order);

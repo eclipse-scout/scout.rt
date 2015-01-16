@@ -39,7 +39,6 @@ public class CodeTypeChangedNotification extends AbstractClientNotification {
     m_codeTypes = CollectionUtility.arrayList(types);
   }
 
-  @SuppressWarnings("deprecation")
   @Override
   public boolean coalesce(IClientNotification existingNotification) {
     CodeTypeChangedNotification n = (CodeTypeChangedNotification) existingNotification;
@@ -47,8 +46,8 @@ public class CodeTypeChangedNotification extends AbstractClientNotification {
     set.addAll(this.m_codeTypes);
     set.addAll(n.m_codeTypes);
     m_codeTypes = new ArrayList<Class<? extends ICodeType<?, ?>>>(set);
-    if (this.getOriginNode() != existingNotification.getOriginNode()) {
-      this.setOriginNode(0);
+    if (!this.getOriginalServerNode().equals(existingNotification.getOriginalServerNode())) {
+      this.setOriginalServerNode("");
     }
     return true;
   }

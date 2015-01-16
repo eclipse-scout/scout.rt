@@ -74,7 +74,6 @@ import org.eclipse.scout.rt.shared.ui.UiDeviceType;
 import org.eclipse.scout.rt.shared.ui.UiLayer;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.rt.ui.rap.basic.IRwtScoutComposite;
-import org.eclipse.scout.rt.ui.rap.basic.WidgetPrinter;
 import org.eclipse.scout.rt.ui.rap.busy.RwtBusyHandler;
 import org.eclipse.scout.rt.ui.rap.concurrency.RwtScoutSynchronizer;
 import org.eclipse.scout.rt.ui.rap.extension.UiDecorationExtensionPoint;
@@ -128,7 +127,7 @@ import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.osgi.framework.Bundle;
 
-@SuppressWarnings({"restriction", "deprecation"})
+@SuppressWarnings("restriction")
 public abstract class AbstractRwtEnvironment extends AbstractEntryPoint implements IRwtEnvironment {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractRwtEnvironment.class);
 
@@ -515,12 +514,12 @@ public abstract class AbstractRwtEnvironment extends AbstractEntryPoint implemen
           @Override
           public void handleException(Throwable e) {
             String msg = new StringBuffer()
-                .append(" [thread=").append(Thread.currentThread())
-                .append(", httpSession=").append(event.getSession().getId())
-                .append(", clientSession=").append(clientSession)
-                .append(", environment=").append(AbstractRwtEnvironment.this)
-                .append(", userAgent=").append(clientSession.getUserAgent())
-                .append("]").toString();
+            .append(" [thread=").append(Thread.currentThread())
+            .append(", httpSession=").append(event.getSession().getId())
+            .append(", clientSession=").append(clientSession)
+            .append(", environment=").append(AbstractRwtEnvironment.this)
+            .append(", userAgent=").append(clientSession.getUserAgent())
+            .append("]").toString();
 
             if (Platform.isRunning()) {
               LOG.error("Failed to stop application." + msg, e);
@@ -1451,13 +1450,7 @@ public abstract class AbstractRwtEnvironment extends AbstractEntryPoint implemen
   }
 
   protected void handleScoutPrintInRwt(DesktopEvent e) {
-    WidgetPrinter wp = new WidgetPrinter(getParentShellIgnoringPopups(SWT.SYSTEM_MODAL | SWT.APPLICATION_MODAL | SWT.MODELESS));
-    try {
-      wp.print(e.getPrintDevice(), e.getPrintParameters());
-    }
-    catch (Throwable ex) {
-      LOG.error(null, ex);
-    }
+    LOG.error("Printing in RAP not supported");
   }
 
   protected String getDesktopOpenedTaskText() {

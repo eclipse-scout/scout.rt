@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.ui.rap.form.fields;
 
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
-import org.eclipse.scout.rt.ui.rap.basic.RwtScoutComposite;
 
 /**
  * @since 3.8.0
@@ -43,33 +42,4 @@ public abstract class RwtScoutValueFieldComposite<T extends IValueField<?>> exte
     }
   }
 
-//  @Override
-//  protected void setUiField(Control swtField) {
-//    super.setUiField(swtField);
-//    installMenuSupport();
-//  }
-
-//  protected void installMenuSupport() {
-//    RwtScoutMenuSupport.install(getUiField(), getUiField().getParent(), new IMenuProvider() {
-//      @Override
-//      public List<IMenu> getValidMenus(MenuContext menuContext) {
-//        return getScoutObject().getUIFacade().fireMenuFromUI(menuContext);
-//      }
-//
-//      @Override
-//      public List<IMenu> getAllMenus() {
-//        return getScoutObject().getMenus();
-//      }
-//    }, getScoutObject(), getUiEnvironment(), null);
-//  }
-
-  /**
-   * Forces UI Input to be verified.
-   * 
-   * @deprecated Use {@link RwtScoutComposite#runUiInputVerifier()} instead. Will be removed in the 5.0 Release.
-   */
-  @Deprecated
-  public void verifyUiInput() {
-    handleUiInputVerifier(true);
-  }
 }

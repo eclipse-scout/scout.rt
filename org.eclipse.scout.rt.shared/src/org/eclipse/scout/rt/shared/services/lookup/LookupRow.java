@@ -78,30 +78,13 @@ public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookup
     setActive(active);
   }
 
-  /**
-   * @deprecated Will be removed in Scout 5.0. Use {@link LookupRow(Object[] cells, Class keyClass)} instead.
-   */
-  @Deprecated
-  public LookupRow(Object[] cells) {
-    this(cells, (cells == null ? 0 : cells.length));
-  }
-
-  /**
-   * @deprecated Will be removed in Scout 5.0. Use {@link LookupRow(Object[] cells, int maxColumnIndex, Class keyClass)}
-   *             instead.
-   */
-  @Deprecated
-  public LookupRow(Object[] cells, int maxColumnIndex) {
-    this(cells, maxColumnIndex, Object.class);
-  }
-
   public LookupRow(Object[] cells, Class<?> keyClass) {
     this(cells, (cells == null ? 0 : cells.length), keyClass);
   }
 
   /**
    * Creates a new lookup row with the given cells as data.
-   * 
+   *
    * @param cells
    *          array containing the following values:<br>
    *          Object key (use keyClass to specify the type of the key) <br>
@@ -330,25 +313,6 @@ public class LookupRow<ID_TYPE> extends MemoryOptimizedObject implements ILookup
   @Override
   public void setAdditionalTableRowData(AbstractTableRowData bean) {
     setValueInternal(ADDITIONAL_TABLE_ROW_DATA, bean);
-  }
-
-  /**
-   * Convenience helper for transforming Object[][] data into CodeRow[] <br>
-   * 
-   * @deprecated Will be removed in Scout 5.0. Use {@link LookupRow(Object[] cells, Class<?> keyClass)} instead.
-   */
-  @Deprecated
-  public static ILookupRow<?>[] createLookupRowArray(Object[][] data) {
-    if (data == null || data.length == 0) {
-      return LookupRow.EMPTY_ARRAY;
-    }
-    else {
-      LookupRow<?>[] a = new LookupRow<?>[data.length];
-      for (int i = 0; i < data.length; i++) {
-        a[i] = new LookupRow<Object>(data[i]);
-      }
-      return a;
-    }
   }
 
   @Override

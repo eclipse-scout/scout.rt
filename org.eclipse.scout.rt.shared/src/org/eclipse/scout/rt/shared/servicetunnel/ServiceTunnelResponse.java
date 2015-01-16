@@ -26,7 +26,6 @@ public class ServiceTunnelResponse implements IServiceTunnelResponse {
   private Object[] m_outVars;
   private Throwable m_exception;
   private Set<IClientNotification> m_clientNotifications;
-  private Object m_metaData;
   // added in 3.1.17
   private Long m_processingDuration;
 
@@ -83,19 +82,6 @@ public class ServiceTunnelResponse implements IServiceTunnelResponse {
 
   public void setClientNotifications(Collection<? extends IClientNotification> clientNotifications) {
     m_clientNotifications = CollectionUtility.hashSet(clientNotifications);
-  }
-
-  /**
-   * @return
-   * @deprecated extend the {@link ServiceTunnelResponse} and add your own attrubutes will be removed with V5.0
-   */
-  @Deprecated
-  public Object getMetaData() {
-    return m_metaData;
-  }
-
-  public void setMetaData(Object o) {
-    m_metaData = o;
   }
 
   @Override

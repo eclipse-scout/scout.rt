@@ -16,7 +16,7 @@ import org.eclipse.scout.commons.StringUtility;
 
 /**
  * @since 11.06.2008
- * @deprecated Will be removed with Bug 426088.
+ * @deprecated Will be removed with the N-Release.
  *             This untyped Map should not be used.
  *             If used in a Page, consider using getter and setter directly instead.
  *             If used somewhere else, you should use your own {@link java.util.Map<K, V>}

@@ -37,25 +37,6 @@ public abstract class AbstractIntegerField extends AbstractNumberField<Integer> 
   /*
    * Configuration
    */
-  /**
-   * @deprecated Will be removed with scout 5.0, use {@link #getConfiguredMinValue()}.<br>
-   *             As long as this deprecated version is overridden in subclasses. This setting wins over
-   *             {@link #getConfiguredMinValue()} in {@link #initConfig()}.
-   */
-  @Deprecated
-  protected Integer getConfiguredMinimumValue() {
-    return getConfiguredMinValue();
-  }
-
-  /**
-   * @deprecated Will be removed with scout 5.0, use {@link #getConfiguredMaxValue()}.<br>
-   *             As long as this deprecated version is overridden in subclasses. This setting wins over
-   *             {@link #getConfiguredMaxValue()} in {@link #initConfig()}.
-   */
-  @Deprecated
-  protected Integer getConfiguredMaximumValue() {
-    return getConfiguredMaxValue();
-  }
 
   @Override
   @ConfigProperty(ConfigProperty.INTEGER)
@@ -88,13 +69,6 @@ public abstract class AbstractIntegerField extends AbstractNumberField<Integer> 
   @Override
   protected Integer getMaxPossibleValue() {
     return Integer.MAX_VALUE;
-  }
-
-  @Override
-  protected void initConfig() {
-    super.initConfig();
-    setMinValue(getConfiguredMinimumValue());
-    setMaxValue(getConfiguredMaximumValue());
   }
 
   /**

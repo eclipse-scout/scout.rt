@@ -78,7 +78,6 @@ import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.basic.BoundsSpec;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
-import org.eclipse.scout.rt.ui.swing.basic.ColorUtility;
 import org.eclipse.scout.rt.ui.swing.dnd.AwtImageTransferable;
 import org.eclipse.scout.rt.ui.swing.dnd.FileListTransferable;
 import org.eclipse.scout.rt.ui.swing.dnd.JVMLocalObjectTransferable;
@@ -342,14 +341,6 @@ public final class SwingUtility {
     else {
       return new Rectangle(r.x, r.y, r.width, r.height);
     }
-  }
-
-  /**
-   * @deprecated Use {@link ColorUtility#createColor(String)} instead. Will be removed in the 5.0 Release.
-   */
-  @Deprecated
-  public static Color createColor(String c) {
-    return ColorUtility.createColor(c);
   }
 
   public static Font createFont(FontSpec scoutFont) {
@@ -904,7 +895,7 @@ public final class SwingUtility {
    * will be returned. In Windows environments these circumstances (task bar on a none primary screen) will be very rare
    * and therefore ignored until the bug will be fixed in a future Java version.
    * </p>
-   * 
+   *
    * @param screenDevice
    *          a screen thats {@link GraphicsConfiguration} will be used to determine the insets
    * @return the insets of this toolkit's screen, in pixels, if the given screen device is the primary screen, otherwise
@@ -1086,7 +1077,7 @@ public final class SwingUtility {
 
   /**
    * Adjusts the window such that it fits on the screen, if necessary.
-   * 
+   *
    * @param window
    */
   public static void adjustBoundsToScreen(Window window) {
@@ -1195,7 +1186,7 @@ public final class SwingUtility {
    * lies within the specified frame.
    * <p>
    * Intended be used in custom implementations of {@link JComponent#getToolTipLocation(MouseEvent)}.
-   * 
+   *
    * @param e
    *          the event that caused the display of the tool tip
    * @param c
@@ -1270,7 +1261,7 @@ public final class SwingUtility {
   /**
    * This method is used to get a top margin for {@link SwingScoutLabelField} and {@link SwingScoutHtmlField} in order
    * to have correct alignment for customized look and feel (e.g. Rayo)
-   * 
+   *
    * @since 3.10.0-M2
    */
   public static int getTopMarginForField() {

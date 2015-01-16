@@ -10,14 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.spec.client.gen.extract;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ITypeWithClassId;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.shared.TEXTS;
 
 /**
@@ -35,9 +32,6 @@ public class DescriptionExtractor<T extends ITypeWithClassId> extends AbstractNa
   @Override
   public String getText(T o) {
     String doc = getDocAssociatedWithClassId(o);
-    if (StringUtility.isNullOrEmpty(doc)) {
-      doc = tryReadingGetConfiguredDoc(o);
-    }
     if (doc != null) {
       doc = doc.replaceAll("</html>", "");
       doc = doc.replaceAll("<html>", "");
@@ -61,35 +55,4 @@ public class DescriptionExtractor<T extends ITypeWithClassId> extends AbstractNa
     return text != null ? text : "";
   }
 
-  /**
-   * @param o
-   * @return
-   * @deprecated Will be removed in the 5.0 Release. (together with the getConfiguredDoc() methods)
-   */
-  @Deprecated
-  private String tryReadingGetConfiguredDoc(ITypeWithClassId o) {
-    Method configuredDocMethod;
-    Class<?> clazz = o.getClass();
-    while (clazz != null) {
-      try {
-        configuredDocMethod = clazz.getDeclaredMethod("getConfiguredDoc");
-        configuredDocMethod.setAccessible(true);
-        Object res = configuredDocMethod.invoke(o);
-        if (res instanceof String) {
-          return (String) res;
-        }
-      }
-      catch (NoSuchMethodException e) {
-        // ignore
-      }
-      catch (IllegalAccessException e) {
-        // ignore
-      }
-      catch (InvocationTargetException e) {
-        // ignore
-      }
-      clazz = clazz.getSuperclass();
-    }
-    return "";
-  }
 }

@@ -18,21 +18,46 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TextsThreadLocal;
+import org.eclipse.scout.rt.shared.services.common.text.ITextProviderService;
 import org.eclipse.scout.rt.spec.client.config.entity.IDocEntityTableConfig;
 import org.eclipse.scout.rt.spec.client.gen.extract.DescriptionExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.IDocTextExtractor;
 import org.eclipse.scout.rt.spec.client.gen.extract.SimpleTypeTextExtractor;
 import org.eclipse.scout.rt.spec.client.out.IDocSection;
+import org.eclipse.scout.rt.spec.client.text.SpecTestDocsTextProviderService;
+import org.eclipse.scout.rt.testing.shared.TestingUtility;
+import org.eclipse.scout.service.SERVICES;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
+import org.osgi.framework.ServiceRegistration;
 
 /**
  * Tests for {@link DocGenUtility}
  */
 public class DocGenUtilityTest {
 
-  private static final String TEST_DOC = "testDoc";
+  private static final String TEST_DOC = "docOne";
+
+  private List<ServiceRegistration> m_testTextService;
+
+  @Before
+  public void before() throws InterruptedException {
+    m_testTextService = TestingUtility.registerServices(Platform.getBundle("org.eclipse.scout.rt.spec.client"), 1000, new SpecTestDocsTextProviderService());
+    TextsThreadLocal.set(new ScoutTexts(SERVICES.getServices(ITextProviderService.class)));
+  }
+
+  @After
+  public void after() {
+    TestingUtility.unregisterServices(m_testTextService);
+    TextsThreadLocal.set(null);
+  }
 
   /**
    * Test for {@link DocGenUtility#getHeaders(List)}
@@ -106,19 +131,8 @@ public class DocGenUtilityTest {
     assertEquals(TEST_DOC, cellText);
   }
 
-  /**
-   * A {@link AbstractFormField} for testing
-   **/
+  @ClassId("doc1")
   class TestFormField extends AbstractFormField {
-
-    /**
-     * test documentation
-     */
-    @SuppressWarnings("deprecation")
-    @Override
-    protected String getConfiguredDoc() {
-      return TEST_DOC;
-    }
   }
 
   private List<IDocTextExtractor<IFormField>> getTestProperties() {

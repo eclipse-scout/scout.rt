@@ -443,12 +443,6 @@ public interface IDesktop extends IPropertyObserver {
   void openUrlInBrowser(String url, IUrlTarget target);
 
   /**
-   * @deprecated use {@link #openUrlInBrowser(String)}. Will be removed in the 5.0 Release.
-   */
-  @Deprecated
-  void openBrowserWindow(String path);
-
-  /**
    * Prints the desktop
    * <p>
    * The method returns immediately, the print is done int the background.
@@ -468,9 +462,9 @@ public interface IDesktop extends IPropertyObserver {
    *
    * @param forceReload
    *          parameter without any function
-   * @deprecated see https://bugs.eclipse.org/bugs/show_bug.cgi?id=439867, parameter forceReload is without any
-   *             function, therefore a method without this parameter has been created, this method might be removed in
-   *             the future.
+   * @deprecated use {@link #activateBookmark(Bookmark)} instead, see
+   *             https://bugs.eclipse.org/bugs/show_bug.cgi?id=439867, parameter forceReload is without any
+   *             function. Will be removed in the N-Release.
    */
   @Deprecated
   void activateBookmark(Bookmark bm, boolean forceReload) throws ProcessingException;

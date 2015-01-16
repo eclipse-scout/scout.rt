@@ -81,10 +81,4 @@ public interface IFormFieldExtension {
    */
   String getContributorBundleId();
 
-  /**
-   * @deprecated use {@link #getContributorBundleId()} instead. Will be removed in the 5.0 Release.
-   */
-  @Deprecated
-  String getContibuterBundleId();
-
 }

@@ -54,7 +54,7 @@ public abstract class AbstractDecimalColumn<NUMBER extends Number> extends Abstr
    * This property only has an effect if no format is specified by {@link #getConfiguredFormat()}.
    * <p>
    * Subclasses can override this method. Default is {@code 2}.
-   * 
+   *
    * @return Minimum number of fraction digits of this column.
    */
   @ConfigProperty(ConfigProperty.INTEGER)
@@ -70,7 +70,7 @@ public abstract class AbstractDecimalColumn<NUMBER extends Number> extends Abstr
    * This property only has an effect if no format is specified by {@link #getConfiguredFormat()}.
    * <p>
    * Subclasses can override this method. Default is {@code 2}.
-   * 
+   *
    * @return maximum number of fraction digits of this column.
    */
   @ConfigProperty(ConfigProperty.INTEGER)
@@ -85,7 +85,7 @@ public abstract class AbstractDecimalColumn<NUMBER extends Number> extends Abstr
    * display a value of 0.12 as 12 %).
    * <p>
    * Subclasses can override this method. Default is {@code false}.
-   * 
+   *
    * @return {@code true} if the column represents a percentage value, {@code false} otherwise.
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -99,7 +99,7 @@ public abstract class AbstractDecimalColumn<NUMBER extends Number> extends Abstr
    * information about multipliers.
    * <p>
    * Subclasses can override this method. Default is {@code 1}.
-   * 
+   *
    * @return The multiplier used to display the value.
    */
   @ConfigProperty(ConfigProperty.INTEGER)
@@ -114,7 +114,6 @@ public abstract class AbstractDecimalColumn<NUMBER extends Number> extends Abstr
     return 2;
   }
 
-  @SuppressWarnings("deprecation")
   @Override
   protected void initConfig() {
     super.initConfig();
@@ -123,9 +122,6 @@ public abstract class AbstractDecimalColumn<NUMBER extends Number> extends Abstr
     setPercent(getConfiguredPercent());
     setFractionDigits(getConfiguredFractionDigits());
     setMultiplier(getConfiguredMultiplier());
-    if (getConfiguredFormat() != null) {
-      getFormatInternal().applyPattern(getConfiguredFormat());
-    }
   }
 
   /*

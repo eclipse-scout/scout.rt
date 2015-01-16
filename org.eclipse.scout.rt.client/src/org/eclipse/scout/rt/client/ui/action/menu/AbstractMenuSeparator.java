@@ -45,9 +45,4 @@ public abstract class AbstractMenuSeparator extends AbstractMenu {
     // void
   }
 
-  @SuppressWarnings("deprecation")
-  @Override
-  protected final void execToggleAction(boolean selected) throws ProcessingException {
-    // void
-  }
 }

@@ -1338,12 +1338,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
   }
 
-  @SuppressWarnings("deprecation")
-  @Override
-  public void openBrowserWindow(String path) {
-    openUrlInBrowser(path, UrlTarget.AUTO);
-  }
-
   @Override
   public boolean isAutoPrefixWildcardForTextSearch() {
     return m_autoPrefixWildcardForTextSearch;
@@ -1661,6 +1655,9 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
   }
 
+  /**
+   * @deprecated use {@link #activateBookmark(Bookmark)} instead. Will be removed in the N-Release.
+   */
   @SuppressWarnings("deprecation")
   @Override
   @Deprecated

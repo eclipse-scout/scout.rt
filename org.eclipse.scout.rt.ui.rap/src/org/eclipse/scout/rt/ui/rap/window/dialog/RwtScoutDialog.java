@@ -349,6 +349,7 @@ public class RwtScoutDialog extends AbstractRwtScoutPart {
   protected void setTitleFromScout() {
     IForm f = getScoutObject();
     //
+    @SuppressWarnings("deprecation")
     String s = f.getBasicTitle();
     m_uiDialog.getShell().setText(StringUtility.removeNewLines(s != null ? s : ""));
     //

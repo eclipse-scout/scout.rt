@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
-import java.text.NumberFormat;
-
 import org.eclipse.scout.rt.client.ui.valuecontainer.INumberValueContainer;
 
 public interface INumberColumn<NUMBER extends Number> extends IColumn<NUMBER>, INumberValueContainer<NUMBER> {
@@ -19,11 +17,5 @@ public interface INumberColumn<NUMBER extends Number> extends IColumn<NUMBER>, I
   void setValidateOnAnyKey(boolean b);
 
   boolean isValidateOnAnyKey();
-
-  /**
-   * @deprecated Will be removed in the 5.0 Release. Use {@link #getFormat()}.
-   */
-  @Deprecated
-  NumberFormat getNumberFormat();
 
 }

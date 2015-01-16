@@ -2723,12 +2723,6 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       }
     }
 
-    @SuppressWarnings("deprecation")
-    @Override
-    public boolean getNodesDragEnabledFromUI() {
-      return isDragEnabled();
-    }
-
     @Override
     public TransferObject fireNodesDragRequestFromUI() {
       try {

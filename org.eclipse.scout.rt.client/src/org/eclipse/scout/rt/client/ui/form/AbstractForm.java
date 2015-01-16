@@ -267,15 +267,6 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     return 0;
   }
 
-  /**
-   * @deprecated: Use a {@link ClassId} annotation as key for Doc-Text. Will be removed in the 5.0 Release.
-   */
-  @Deprecated
-  @Order(60)
-  protected String getConfiguredDoc() {
-    return null;
-  }
-
   @ConfigProperty(ConfigProperty.TEXT)
   @Order(90)
   protected String getConfiguredCancelVerificationText() {

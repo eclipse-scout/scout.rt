@@ -22,9 +22,7 @@ import java.util.Map;
 
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
-import org.eclipse.scout.commons.MatrixUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
-import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
@@ -128,15 +126,6 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
   @ConfigProperty(ConfigProperty.ICON_ID)
   @Order(10)
   protected String getConfiguredIconId() {
-    return null;
-  }
-
-  /**
-   * @deprecated: Use a {@link ClassId} annotation as key for Doc-Text. Will be removed in the 5.0 Release.
-   */
-  @Deprecated
-  @Order(110)
-  protected String getConfiguredDoc() {
     return null;
   }
 
@@ -353,65 +342,6 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
     List<? extends ICodeTypeExtension<CODE_TYPE_ID, CODE_ID, ? extends AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE>>> extensions = getAllExtensions();
     CodeTypeWithGenericOverwriteCodeChain<CODE_TYPE_ID, CODE_ID, CODE> chain = new CodeTypeWithGenericOverwriteCodeChain<CODE_TYPE_ID, CODE_ID, CODE>(extensions);
     chain.execOverwriteCode(oldCode, newCode);
-  }
-
-  /**
-   * Convenience function to sort data for later call to {@link #createCodeRowArray(Object[][])} <br>
-   * The sort indices are 0-based.
-   *
-   * @deprecated use {@link MatrixUtility} directly. Will be removed with M-Release.
-   */
-  @Deprecated
-  public static void sortData(Object[][] data, int... sortColumns) {
-    MatrixUtility.sort(data, sortColumns);
-  }
-
-  /**
-   * see {@link #createCodeRowArray(Object[][], int)}
-   *
-   * @deprecated use {@link CodeRow#CodeRow(Object[], int)} instead. Will be removed with the M-Release.
-   */
-  @Deprecated
-  public static CodeRow[] createCodeRowArray(Object[][] data) {
-    return createCodeRowArray(data, data != null && data.length > 0 ? data[0].length : 0);
-  }
-
-  /**
-   * Convenience function to transform Object[][] data into CodeRow[]
-   *
-   * @param data
-   *          The Object[][] must contain rows with the elements in the
-   *          following order: <br>
-   *          Object key <br>
-   *          String text <br>
-   *          String iconId <br>
-   *          String tooltipText <br>
-   *          String backgroundColor <br>
-   *          String foregroundColor <br>
-   *          String font <br>
-   *          Long active (0 or 1) <br>
-   *          Object parentKey <br>
-   *          String extKey <br>
-   *          Double calcValue <br>
-   *          Long enabled (0 or 1) <br>
-   *          Long partitionId
-   * @param maxColumnIndex
-   *          the maximum column index to be used to create the code rows, all
-   *          column indexes >= columnCount are ignored
-   * @deprecated use {@link CodeRow#CodeRow(Object[], int)} instead. Will be removed with the M-Release.
-   */
-  @Deprecated
-  public static CodeRow[] createCodeRowArray(Object[][] data, int maxColumnIndex) {
-    if (data == null || data.length == 0) {
-      return new CodeRow[0];
-    }
-    else {
-      CodeRow[] a = new CodeRow[data.length];
-      for (int i = 0; i < data.length; i++) {
-        a[i] = new CodeRow(data[i], maxColumnIndex);
-      }
-      return a;
-    }
   }
 
   /**

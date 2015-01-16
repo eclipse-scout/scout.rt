@@ -41,7 +41,6 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.treebox.TreeBoxChain
 import org.eclipse.scout.rt.client.extension.ui.form.fields.treebox.TreeBoxChains.TreeBoxPrepareLookupChain;
 import org.eclipse.scout.rt.client.services.lookup.FormFieldProvisioningContext;
 import org.eclipse.scout.rt.client.services.lookup.ILookupCallProvisioningService;
-import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTreeNodeBuilder;
@@ -734,42 +733,6 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
   @Override
   public Set<T> getCheckedKeys() {
     return getValue();
-  }
-
-  /**
-   * @return
-   * @deprecated Will be removed in the 5.0 Release. Use {@link #getCheckedKey()} instead
-   */
-  @SuppressWarnings("deprecation")
-  @Deprecated
-  @Override
-  public ILookupRow getCheckedLookupRow() {
-    return CollectionUtility.firstElement(getCheckedLookupRows());
-  }
-
-  /**
-   * @return
-   * @deprecated Will be removed in the 5.0 Release.. Use {@link #getCheckedKeys()} instead
-   */
-  @SuppressWarnings({"deprecation", "unchecked"})
-  @Deprecated
-  @Override
-  public Set<ILookupRow> getCheckedLookupRows() {
-    Collection<ITreeNode> treeNodes = getTree().getCheckedNodes();
-    if (treeNodes == null || treeNodes.isEmpty()) {
-      return CollectionUtility.hashSet();
-    }
-    Set<ILookupRow> lookupRows = new HashSet<ILookupRow>(treeNodes.size());
-    Iterator<ITreeNode> it = treeNodes.iterator();
-    while (it.hasNext()) {
-      ITreeNode node = it.next();
-      if (node != null) {
-        ICell cell = node.getCell();
-        ITreeNode parentNode = node.getParentNode();
-        lookupRows.add(new LookupRow(node.getPrimaryKey(), cell.getText(), cell.getIconId(), cell.getTooltipText(), cell.getBackgroundColor(), cell.getForegroundColor(), cell.getFont(), cell.isEnabled(), parentNode != null ? parentNode.getPrimaryKey() : null, isNodeActive(node)));
-      }
-    }
-    return lookupRows;
   }
 
   @Override

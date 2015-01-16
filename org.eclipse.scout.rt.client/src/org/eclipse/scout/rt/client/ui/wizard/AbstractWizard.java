@@ -23,7 +23,6 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.OptimisticLock;
-import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
@@ -162,15 +161,6 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   @ConfigProperty(ConfigProperty.TEXT)
   @Order(30)
   protected String getConfiguredTooltipText() {
-    return null;
-  }
-
-  /**
-   * @deprecated: Use a {@link ClassId} annotation as key for Doc-Text. Will be removed in the 5.0 Release.
-   */
-  @Deprecated
-  @Order(40)
-  protected String getConfiguredDoc() {
     return null;
   }
 

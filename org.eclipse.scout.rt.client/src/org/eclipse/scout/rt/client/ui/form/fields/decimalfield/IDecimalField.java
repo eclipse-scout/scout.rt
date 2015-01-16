@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.decimalfield;
 
-import org.eclipse.scout.rt.client.ui.form.fields.IBasicField;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.INumberField;
 import org.eclipse.scout.rt.client.ui.valuecontainer.IDecimalValueContainer;
 
@@ -18,15 +17,6 @@ import org.eclipse.scout.rt.client.ui.valuecontainer.IDecimalValueContainer;
  * Field type representing a fractional, decimal number such as Float, Double,
  * BigDecimal
  */
-@SuppressWarnings("deprecation")
 public interface IDecimalField<T extends Number> extends INumberField<T>, IDecimalValueContainer<T> {
-
-  /**
-   * @deprecated use the facade defined by {@link IBasicField#getUIFacade()}.
-   *             Will be removed in the 5.0 Release.
-   */
-  @Override
-  @Deprecated
-  IDecimalFieldUIFacade getUIFacade();
 
 }

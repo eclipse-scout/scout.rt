@@ -19,27 +19,17 @@ public class FormFieldExtension implements IFormFieldExtension {
   private int m_scope = SCOPE_DEFAULT;
   private String /* fully qualified name of a Class<? extends IFormField> */m_modelClassName;
   private String /*
-                 * fully qualified name of a Class<? extends
-                 * ISwtScoutFormField>
-                 */m_uiClassName;
+   * fully qualified name of a Class<? extends
+   * ISwtScoutFormField>
+   */m_uiClassName;
   private String /*
-                 * fully qualified name of a Class<? extends
-                 * IFormFieldFactory>
-                 */m_factoryClassName;
+   * fully qualified name of a Class<? extends
+   * IFormFieldFactory>
+   */m_factoryClassName;
   private String m_contributorBundleId;
 
   public FormFieldExtension(String name) {
     m_name = name;
-  }
-
-  /**
-   * @deprecated use {@link #getContributorBundleId()} instead. Will be removed in the 5.0 Release.
-   */
-  @SuppressWarnings("deprecation")
-  @Deprecated
-  @Override
-  public String getContibuterBundleId() {
-    return m_contributorBundleId;
   }
 
   @Override

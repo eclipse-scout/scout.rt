@@ -62,7 +62,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
   }
 
   /**
-   * @deprecated Will be removed in the 6.0 Release.
+   * @deprecated Will be removed with the N-Release.
    *             Use {@link #AbstractPageWithNodes()} in combination with getter and setter on the page
    *             instead.
    */
@@ -81,7 +81,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
   }
 
   /**
-   * @deprecated Will be removed in the 6.0 Release.
+   * @deprecated Will be removed with the N-Release.
    *             Use {@link #AbstractPageWithNodes(boolean, String)} in combination with getter and setter on the page
    *             instead.
    */

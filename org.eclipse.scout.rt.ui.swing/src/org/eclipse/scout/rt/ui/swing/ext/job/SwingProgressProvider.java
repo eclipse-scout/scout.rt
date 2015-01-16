@@ -35,12 +35,6 @@ public class SwingProgressProvider extends ProgressProvider implements IProperty
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingProgressProvider.class);
 
   /**
-   * @deprecated replaced by {@link #PROP_MONITOR_PROPERTIES}. Will be removed in the 5.0 Release.
-   */
-  @Deprecated
-  public static final String PROP_ACTIVE_MONITOR = "activeMonitor";
-
-  /**
    * Key for property to indicate that {@link MonitorProperties} have changed.
    */
   public static final String PROP_MONITOR_PROPERTIES = "monitorProps";
@@ -140,18 +134,11 @@ public class SwingProgressProvider extends ProgressProvider implements IProperty
 
   /**
    * This method fires when one of the properties of the active monitor have changed (worked, task-name, sub-task-name).
-   * 
+   *
    * @param newMonitor
    */
   final synchronized void setActiveMonitor(SwingProgressMonitor newMonitor) {
-    fireActiveMonitor(newMonitor);
     fireMonitorProps(newMonitor);
-  }
-
-  private void fireActiveMonitor(SwingProgressMonitor newMonitor) {
-    SwingProgressMonitor oldMonitor = m_activeMonitor;
-    m_activeMonitor = newMonitor;
-    m_propertySupport.firePropertyChange(PROP_ACTIVE_MONITOR, oldMonitor, newMonitor);
   }
 
   private void fireMonitorProps(SwingProgressMonitor newMonitor) {

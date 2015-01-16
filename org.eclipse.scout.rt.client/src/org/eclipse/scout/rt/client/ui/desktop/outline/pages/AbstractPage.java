@@ -164,7 +164,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   }
 
   /**
-   * @deprecated Will be removed in the 6.0 Release.
+   * @deprecated Will be removed with the N-Release.
    *             Use {@link #AbstractPage()} in combination with getter and setter (page variable) instead.
    */
   @Deprecated
@@ -188,7 +188,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   }
 
   /**
-   * @deprecated Will be removed with Bug 426088.
+   * @deprecated Will be removed with the N-Release.
    *             Use {@link #AbstractPage(boolean, String)} in combination with getter and setter (page variable)
    *             instead.
    */
@@ -251,24 +251,6 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   protected String getConfiguredIconId() {
     return null;
   }
-
-  /**
-   * Provides a documentation text or description of this page. The text is intended to be included in external
-   * documentation. This method is typically processed by a documentation generation tool or similar.
-   * <p>
-   * Subclasses can override this method. Default is {@code null}.
-   *
-   * @deprecated: Use a {@link ClassId} annotation as key for Doc-Text. Will be removed in the 5.0 Release.
-   * @return a documentation text, suitable to be included in external documents
-   */
-  /**
-   */
-  @Deprecated
-  @Order(60)
-  protected String getConfiguredDoc() {
-    return null;
-  }
-
   /**
    * Configures the detail form to be used with this page. The form is lazily {@linkplain #ensureDetailFormCreated()
    * created} and {@linkplain #ensureDetailFormStarted() started}.
@@ -432,7 +414,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   protected abstract T initTable();
 
   /**
-   * @deprecated Will be removed with Bug 426088.
+   * @deprecated Will be removed with the N-Release.
    *             getter and setter (page variable) instead.
    */
   @Deprecated
