@@ -1,12 +1,12 @@
 .check-box-field>span{
-  &  label{
+  & label{
       display: inline-block;
       position: relative;
       padding-left: 25px;
       margin-right: 15px;
       font-size: 13px;
   }
-  &  label:before {
+  & label:before {
       content: "";
       display: inline-block;
       width: 18px;
@@ -18,11 +18,11 @@
       top: 0;
   }
 
-  &  input[type=checkbox] {
+  & input[type=checkbox] {
       display: none;
   }
 
-  &  input[type=checkbox]:checked + label:before {
+  & input[type=checkbox]:checked + label:before {
       .font-icon;
       content: @icon-checked;
       color: @palette-black;
@@ -30,12 +30,12 @@
       text-align: center;
       line-height: 16px;
   }
-  &  label:before {
+  & label:before {
       border: 2px solid @border-color;
       border-radius: 3px;
   }
 
-  &  input[type=checkbox]:disabled + label:before {
-     background-color:@disabled-color;
+  & input[type=checkbox]:disabled + label:before {
+     background-color: @disabled-color;
   }
 }

@@ -16,15 +16,15 @@ scout.CheckBoxField.prototype._render = function($parent) {
   this.addField($('<span>'));
 
   var forRefId = 'RefId-' + this.id;
-  this._$checkBox = $('<input>').
-    attr('id', forRefId).
-    attr('type', 'checkbox').
-    appendTo(this.$field);
+  this._$checkBox = $('<input>')
+    .attr('id', forRefId)
+    .attr('type', 'checkbox')
+    .appendTo(this.$field);
 
-  this._$checkBoxLabel = $('<label>').
-    attr('for', forRefId).
-    attr('title', this.label).
-    appendTo(this.$field);
+  this._$checkBoxLabel = $('<label>')
+    .attr('for', forRefId)
+    .attr('title', this.label)
+    .appendTo(this.$field);
 
   this._$checkBox.on('click', this._onClick.bind(this));
   this.addStatus();
