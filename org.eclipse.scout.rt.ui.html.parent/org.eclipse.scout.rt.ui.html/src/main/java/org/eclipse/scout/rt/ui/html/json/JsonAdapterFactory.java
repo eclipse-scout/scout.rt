@@ -15,6 +15,7 @@ import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigation;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
+import org.eclipse.scout.rt.client.ui.basic.activitymap.IActivityMap;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.control.IAnalysisTableControl;
@@ -41,6 +42,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.imagebox.IImageField;
 import org.eclipse.scout.rt.client.ui.form.fields.labelfield.ILabelField;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.INumberField;
+import org.eclipse.scout.rt.client.ui.form.fields.plannerfield.IPlannerField;
 import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.IRadioButtonGroup;
 import org.eclipse.scout.rt.client.ui.form.fields.richtextfield.IRichTextField;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
@@ -53,6 +55,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.treefield.ITreeField;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.shared.data.model.IDataModel;
 import org.eclipse.scout.rt.ui.html.json.action.keystroke.JsonKeyStroke;
+import org.eclipse.scout.rt.ui.html.json.basic.activitymap.JsonActivityMap;
 import org.eclipse.scout.rt.ui.html.json.calendar.JsonCalendar;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonBreadCrumbNavigation;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonDesktop;
@@ -70,6 +73,7 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.groupbox.JsonGroupBox;
 import org.eclipse.scout.rt.ui.html.json.form.fields.imagefield.JsonImageField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.labelfield.JsonLabelField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.numberfield.JsonNumberField;
+import org.eclipse.scout.rt.ui.html.json.form.fields.plannerfield.JsonPlannerField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.radiobutton.JsonRadioButton;
 import org.eclipse.scout.rt.ui.html.json.form.fields.radiobutton.JsonRadioButtonGroup;
 import org.eclipse.scout.rt.ui.html.json.form.fields.richtextfield.JsonRichTextField;
@@ -165,6 +169,9 @@ public class JsonAdapterFactory implements IJsonAdapterFactory {
     else if (model instanceof ICalendarField) {
       return new JsonCalendarField((ICalendarField) model, session, id, parent);
     }
+    else if (model instanceof IPlannerField) {
+      return new JsonPlannerField((IPlannerField) model, session, id, parent);
+    }
     else if (model instanceof IFormField) {
       return new JsonFormField((IFormField) model, session, id, parent);
     }
@@ -234,6 +241,9 @@ public class JsonAdapterFactory implements IJsonAdapterFactory {
     }
     else if (model instanceof ICalendar) {
       return new JsonCalendar((ICalendar) model, session, id, parent);
+    }
+    else if (model instanceof IActivityMap) {
+      return new JsonActivityMap((IActivityMap) model, session, id, parent);
     }
     throw new IllegalArgumentException("Cannot create JSON-adapter for model-object " + model);
   }

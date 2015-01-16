@@ -14,8 +14,8 @@ import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
 import org.eclipse.scout.rt.client.ui.form.fields.calendarfield.ICalendarField;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
-import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
+import org.json.JSONObject;
 
 public class JsonCalendarField<T extends ICalendarField<? extends ICalendar>> extends JsonFormField<T> {
 
@@ -24,18 +24,14 @@ public class JsonCalendarField<T extends ICalendarField<? extends ICalendar>> ex
   }
 
   @Override
-  protected void initJsonProperties(T model) {
-    super.initJsonProperties(model);
-    putJsonProperty(new JsonAdapterProperty<ICalendarField<? extends ICalendar>>("calendar", model, getJsonSession()) {
-      @Override
-      protected ICalendar modelValue() {
-        return getModel().getCalendar();
-      }
-    });
+  public String getObjectType() {
+    return "CalendarField";
   }
 
   @Override
-  public String getObjectType() {
-    return "CalendarField";
+  public JSONObject toJson() {
+    JSONObject json = super.toJson();
+    putAdapterIdProperty(json, "calendar", getModel().getCalendar());
+    return json;
   }
 }

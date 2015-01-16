@@ -262,6 +262,16 @@ scout.defaultObjectFactories = [{
   create: function() {
     return new scout.CalendarField();
   }
+}, {
+  objectType: 'ActivityMap',
+  create: function() {
+    return new scout.ActivityMap();
+  }
+}, {
+  objectType: 'PlannerField',
+  create: function() {
+    return new scout.PlannerField();
+  }
 }, { //FIXME CGU: only needed temporarily, remove when switched to FormToolButton2
   objectType: 'Null',
   create: function() {

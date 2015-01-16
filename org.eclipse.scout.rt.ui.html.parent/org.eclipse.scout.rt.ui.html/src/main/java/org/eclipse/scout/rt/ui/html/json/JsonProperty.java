@@ -72,6 +72,7 @@ public abstract class JsonProperty<T> {
   protected abstract Object modelValue();
 
   public Object prepareValueForToJson(Object value) {
+    // TODO BSH JSON | Check if we can / should add convenience here (e.g. for Date, lists etc.)
     return value;
   }
 
@@ -84,7 +85,6 @@ public abstract class JsonProperty<T> {
   }
 
   public void attachChildAdapters() {
-
   }
 
   @Override

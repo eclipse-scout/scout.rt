@@ -4,7 +4,7 @@ import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarComponent;
 import org.eclipse.scout.rt.ui.html.json.IJsonMapper;
 import org.eclipse.scout.rt.ui.html.json.JsonDate;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
-import org.eclipse.scout.rt.ui.html.json.basic.JsonCell;
+import org.eclipse.scout.rt.ui.html.json.basic.cell.JsonCell;
 import org.json.JSONObject;
 
 public class JsonCalendarComponent implements IJsonMapper {
