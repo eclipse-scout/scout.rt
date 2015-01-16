@@ -30,12 +30,14 @@ import org.junit.runners.model.TestClass;
 public class ParameterizedTestRunnerExtensionTest {
 
   private TestClass m_testClass;
-  private FrameworkMethod m_testMethod;
+  private FrameworkMethod m_parameterizedTestMethod;
+  private FrameworkMethod m_nonParameterizedTestMethod;
 
   @Before
   public void before() throws NoSuchMethodException, SecurityException {
     m_testClass = new TestClass(SampleParameterizedTestClass.class);
-    m_testMethod = new FrameworkMethod(SampleParameterizedTestClass.class.getMethod("testSomething"));
+    m_parameterizedTestMethod = new FrameworkMethod(SampleParameterizedTestClass.class.getMethod("testSomething"));
+    m_nonParameterizedTestMethod = new FrameworkMethod(SampleParameterizedTestClass.class.getMethod("testSomethingNonParameterized"));
   }
 
   @Test
@@ -59,11 +61,21 @@ public class ParameterizedTestRunnerExtensionTest {
   @Test
   public void testCreateParameterizedTestMethods() {
     List<FrameworkMethod> testMethodLists = new LinkedList<FrameworkMethod>();
-    testMethodLists.add(m_testMethod);
+    testMethodLists.add(m_parameterizedTestMethod);
 
-    List<FrameworkMethod> createdParameterizedTestMethods = ParameterizedTestRunnerExtension.createParameterizedTestMethods(testMethodLists, 2);
-    assertNotNull(createdParameterizedTestMethods);
-    assertEquals(2, createdParameterizedTestMethods.size());
+    List<FrameworkMethod> createdTestMethods = ParameterizedTestRunnerExtension.createTestMethods(testMethodLists, 2);
+    assertNotNull(createdTestMethods);
+    assertEquals(2, createdTestMethods.size());
+  }
+
+  @Test
+  public void testCreateNonParameterizedTestMethod() {
+    List<FrameworkMethod> testMethodLists = new LinkedList<FrameworkMethod>();
+    testMethodLists.add(m_nonParameterizedTestMethod);
+
+    List<FrameworkMethod> createdTestMethods = ParameterizedTestRunnerExtension.createTestMethods(testMethodLists, 2);
+    assertNotNull(createdTestMethods);
+    assertEquals(1, createdTestMethods.size());
   }
 
   @Test
@@ -91,9 +103,9 @@ public class ParameterizedTestRunnerExtensionTest {
   public void testDescribeChild() {
     final String testName = SampleParameterizedTestClass.class.getSimpleName();
     final List<IScoutTestParameter> parameterList = SampleParameterizedTestClass.getParameters();
-    ParameterizedFrameworkMethod parameterizedTestMethod = new ParameterizedFrameworkMethod(m_testMethod, 0);
+    ParameterizedFrameworkMethod parameterizedTestMethod = new ParameterizedFrameworkMethod(m_parameterizedTestMethod, 0);
 
-    Description testDescription = ParameterizedTestRunnerExtension.describeChild(m_testClass, parameterizedTestMethod, testName, parameterList);
+    Description testDescription = ParameterizedTestRunnerExtension.describeParameterizedChild(m_testClass, parameterizedTestMethod, testName, parameterList);
     String expectedTestDescription = testName + " [" + SampleParameterizedTestClass.TEST_PARAMETER_NAME_1 + "]";
     assertTrue(testDescription.getDisplayName().startsWith(expectedTestDescription));
   }

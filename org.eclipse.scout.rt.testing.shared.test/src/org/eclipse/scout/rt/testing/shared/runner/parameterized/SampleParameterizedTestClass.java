@@ -42,4 +42,10 @@ public class SampleParameterizedTestClass {
   @Test
   public void testSomething() {
   }
+
+  @Test
+  @NonParameterized
+  public void testSomethingNonParameterized() {
+
+  }
 }

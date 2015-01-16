@@ -34,7 +34,8 @@ public class ParameterizedTestRunnerExtension {
       return testClass.getOnlyConstructor().newInstance(testParameter);
     }
     catch (Exception ex) {
-      throw new Exception("Constructor can not be invoked with the parameters " + testParameter.getName() + ")", ex);
+      String parameterName = (testParameter != null ? testParameter.getName() : null);
+      throw new Exception("Constructor can not be invoked with the parameter '" + parameterName + "')", ex);
     }
   }
 
@@ -49,14 +50,38 @@ public class ParameterizedTestRunnerExtension {
     }
   }
 
-  public static List<FrameworkMethod> createParameterizedTestMethods(List<FrameworkMethod> originalTestMethods, int numberOfParameterEntries) {
+  /**
+   * Creates parameterized and non parameterized test methods.
+   */
+  public static List<FrameworkMethod> createTestMethods(List<FrameworkMethod> originalTestMethods, int numberOfParameterEntries) {
+    List<FrameworkMethod> nonParameterizedTestMethods = new LinkedList<FrameworkMethod>();
+    List<FrameworkMethod> originalTestMethodsToBeParameterized = new LinkedList<FrameworkMethod>();
+
+    for (FrameworkMethod test : originalTestMethods) {
+      if (test.getAnnotation(NonParameterized.class) != null) {
+        //test case annotated with @NonParameterized
+        nonParameterizedTestMethods.add(test);
+      }
+      else {
+        originalTestMethodsToBeParameterized.add(test);
+      }
+    }
+
     List<FrameworkMethod> result = new LinkedList<FrameworkMethod>();
-    List<FrameworkMethod> testMethods = originalTestMethods;
+    result.addAll(nonParameterizedTestMethods);
+    result.addAll(createParameterizedTestMethods(originalTestMethodsToBeParameterized, numberOfParameterEntries));
+    return result;
+  }
+
+  protected static List<FrameworkMethod> createParameterizedTestMethods(List<FrameworkMethod> originalTestMethods, int numberOfParameterEntries) {
+    List<FrameworkMethod> result = new LinkedList<FrameworkMethod>();
 
     for (int paramsIndex = 0; paramsIndex < numberOfParameterEntries; paramsIndex++) {
-      for (FrameworkMethod test : testMethods) {
-        ParameterizedFrameworkMethod parameterizedTest = new ParameterizedFrameworkMethod(test, paramsIndex);
-        result.add(parameterizedTest);
+      for (FrameworkMethod test : originalTestMethods) {
+        if (test.getAnnotation(NonParameterized.class) == null) {
+          ParameterizedFrameworkMethod parameterizedTest = new ParameterizedFrameworkMethod(test, paramsIndex);
+          result.add(parameterizedTest);
+        }
       }
     }
 
@@ -88,7 +113,7 @@ public class ParameterizedTestRunnerExtension {
     }
   }
 
-  public static Description describeChild(TestClass testClass, ParameterizedFrameworkMethod parameterizedMethod, String testName, List<IScoutTestParameter> parameterList) {
+  public static Description describeParameterizedChild(TestClass testClass, ParameterizedFrameworkMethod parameterizedMethod, String testName, List<IScoutTestParameter> parameterList) {
     return Description.createTestDescription(testClass.getJavaClass(), String.format("%s [%s]", testName, parameterList.get(parameterizedMethod.getParamIndex()).getName()), parameterizedMethod.getAnnotations());
   }
 }
