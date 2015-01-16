@@ -7,6 +7,7 @@ scout.inherits(scout.GroupBoxLayout, scout.AbstractLayout);
 scout.GroupBoxLayout.prototype.layout = function($container) {
   var htmlContainer = scout.HtmlComponent.get($container),
     htmlGbBody = this._htmlGbBody(),
+    htmlGbBodyContainer = this._htmlGbBodyContainer(),
     gbBodySize;
 
   gbBodySize = htmlContainer.getAvailableSize()
@@ -16,6 +17,10 @@ scout.GroupBoxLayout.prototype.layout = function($container) {
 
   $.log.trace('(GroupBoxLayout#layout) gbBodySize=' + gbBodySize);
   htmlGbBody.setSize(gbBodySize);
+
+  if (htmlGbBodyContainer.scrollable) {
+    scout.scrollbars.update(htmlGbBodyContainer.$comp);
+  }
 };
 
 scout.GroupBoxLayout.prototype.preferredLayoutSize = function($container) {
@@ -36,5 +41,9 @@ scout.GroupBoxLayout.prototype._titleHeight = function($container) {
 };
 
 scout.GroupBoxLayout.prototype._htmlGbBody = function() {
-  return scout.HtmlComponent.get(this.groupBox._$body);
+  return scout.HtmlComponent.get(this.groupBox.$body);
+};
+
+scout.GroupBoxLayout.prototype._htmlGbBodyContainer = function() {
+  return scout.HtmlComponent.get(this.groupBox.$bodyContainer);
 };

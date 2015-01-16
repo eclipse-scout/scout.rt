@@ -5,8 +5,8 @@ scout.GroupBox = function() {
   scout.GroupBox.parent.call(this);
   this.formFields = [];
   this._addAdapterProperties('formFields');
-  this._$body;
-  this._$bodyContainer; // $scrollable if groupbox is scrollable, otherwise same as _$body;
+  this.$body;
+  this.$bodyContainer; // $scrollable if groupbox is scrollable, otherwise same as _$body;
   this._$groupBoxTitle;
 
   this.controls = [];
@@ -36,21 +36,21 @@ scout.GroupBox.prototype._render = function($parent) {
     .appendDiv('group-box-title')
     .append(this.$label);
 
-  this._$body = this.$container.appendDiv('group-box-body');
-  this._$bodyContainer = this._$body;
+  this.$body = this.$container.appendDiv('group-box-body');
+  this.$bodyContainer = this.$body;
 
-  htmlBodyContainer = new scout.HtmlComponent(this._$bodyContainer, this.session);
+  htmlBodyContainer = new scout.HtmlComponent(this.$bodyContainer, this.session);
   if (this.scrollable) {
-    this._$bodyContainer = scout.scrollbars.install(this._$body, {
+    this.$bodyContainer = scout.scrollbars.install(this.$body, {
       createHtmlComponent: true
     });
-    htmlBodyContainer = scout.HtmlComponent.get(this._$bodyContainer);
+    htmlBodyContainer = scout.HtmlComponent.get(this.$bodyContainer);
   }
   htmlBodyContainer.setLayout(new scout.LogicalGridLayout(env.formColumnGap, env.formRowGap));
 
   this._createFieldArraysByType();
   for (var i = 0; i < this.controls.length; i++) {
-    this.controls[i].render(this._$bodyContainer);
+    this.controls[i].render(this.$bodyContainer);
   }
 };
 
@@ -94,7 +94,7 @@ scout.GroupBox.prototype._renderBorderVisible = function(borderVisible) {
   }
 
   if (!borderVisible) {
-    this._$body.addClass('margin-invisible');
+    this.$body.addClass('margin-invisible');
   }
 };
 
