@@ -30,7 +30,7 @@ import org.junit.runners.model.Statement;
  * <pre>
  * &#064;RunWith(ParameterizedScoutServerTestRunner.class)
  * public class SampleParameterizedServerTest {
- * 
+ *
  *   &#064;Parameters
  *   public static List&lt;IScoutTestParameter&gt; getParameters() {
  *     List&lt;IScoutTestParameter&gt; parametersList = new LinkedList&lt;IScoutTestParameter&gt;();
@@ -38,26 +38,32 @@ import org.junit.runners.model.Statement;
  *     parametersList.add(new MathTestParameter(&quot;Scenario 2&quot;, 5));
  *     return parametersList;
  *   }
- * 
+ *
  *   private final MathTestParameter m_testParameter;
- * 
+ *
  *   public SampleParameterizedServerTest(MathTestParameter testParameter) {
  *     m_testParameter = testParameter;
  *   }
- * 
+ *
  *   &#064;Test
  *   public void testIsGreaterZero() {
  *     assertTrue(m_testParameter.getX() &gt; 0);
  *   }
- * 
+ *
+ *   &#064;Test
+ *   &#064;NonParameterized
+ *   public void testGeneral() {
+ *     assertFalse(0 &gt; 0);
+ *   }
+ *
  *   static class MathTestParameter extends AbstractScoutTestParameter {
  *     private int m_x;
- * 
+ *
  *     public MathTestParameter(String name, int x) {
  *       super(name);
  *       m_x = x;
  *     }
- * 
+ *
  *     public int getX() {
  *       return m_x;
  *     }
@@ -83,7 +89,7 @@ public class ParameterizedScoutServerTestRunner extends ScoutServerTestRunner {
   @Override
   protected List<FrameworkMethod> getChildren() {
     m_parameterList = ParameterizedTestRunnerExtension.loadParameterList(getTestClass());
-    return ParameterizedTestRunnerExtension.createParameterizedTestMethods(super.getChildren(), m_parameterList.size());
+    return ParameterizedTestRunnerExtension.createTestMethods(super.getChildren(), m_parameterList.size());
   }
 
   @Override
@@ -97,8 +103,13 @@ public class ParameterizedScoutServerTestRunner extends ScoutServerTestRunner {
 
   @Override
   protected Statement methodBlock(FrameworkMethod method) {
-    int paramsIndex = ((ParameterizedFrameworkMethod) method).getParamIndex();
-    m_currentTestParameter = m_parameterList.get(paramsIndex);
+    if (method instanceof ParameterizedFrameworkMethod) {
+      int paramsIndex = ((ParameterizedFrameworkMethod) method).getParamIndex();
+      m_currentTestParameter = m_parameterList.get(paramsIndex);
+    }
+    else {
+      m_currentTestParameter = null;
+    }
 
     return super.methodBlock(method);
   }
@@ -121,6 +132,11 @@ public class ParameterizedScoutServerTestRunner extends ScoutServerTestRunner {
 
   @Override
   protected Description describeChild(FrameworkMethod method) {
-    return ParameterizedTestRunnerExtension.describeChild(getTestClass(), (ParameterizedFrameworkMethod) method, testName(method), m_parameterList);
+    if (method instanceof ParameterizedFrameworkMethod) {
+      return ParameterizedTestRunnerExtension.describeParameterizedChild(getTestClass(), (ParameterizedFrameworkMethod) method, testName(method), m_parameterList);
+    }
+    else {
+      return super.describeChild(method);
+    }
   }
 }
