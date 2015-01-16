@@ -55,7 +55,7 @@ scout.Table.prototype._render = function($parent) {
   this.$data = this.$container.appendDiv('table-data');
   this._$scrollable = scout.scrollbars.install(this.$data);
 
-  this.menuBar = new scout.MenuBar(this.$container, this.menuBarPosition, scout.TableMenuItemsOrder.order);
+  this.menuBar = new scout.MenuBar(this.$container, 'top', scout.TableMenuItemsOrder.order);
 
   this._totalWidth = 0;
   for (i = 0; i < this.columns.length; i++) {
@@ -98,6 +98,11 @@ scout.Table.prototype._createHeader = function() {
 
 scout.Table.prototype._createFooter = function() {
   return new scout.TableFooter(this);
+};
+
+scout.Table.prototype.remove = function() {
+  scout.Table.parent.prototype.remove.call(this);
+  this.menuBar.remove();
 };
 
 scout.Table.prototype.dispose = function() {

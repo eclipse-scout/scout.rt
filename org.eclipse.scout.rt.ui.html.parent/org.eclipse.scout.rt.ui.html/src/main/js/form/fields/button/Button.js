@@ -19,21 +19,23 @@ scout.Button.SYSTEM_TYPE = {
  */
 scout.Button.prototype._render = function($parent) {
   this.addContainer($parent, 'button', new scout.ButtonLayout());
-  var $button = $('<button>').
-    on('click', function() {
-      this.session.send(this.id, 'clicked');
-    }.bind(this));
+  var $button = $('<button>')
+     .on('click', this._onClick.bind(this));
   this.addField($button);
   if (this.systemType === scout.Button.SYSTEM_TYPE.OK) {
     $button.addClass('default-button');
   }
 };
 
+scout.Button.prototype._onClick = function() {
+  this.session.send(this.id, 'clicked');
+};
+
 scout.Button.prototype._renderLabel = function(label) {
-  if (!label) {
-    label = '';
-  } else {
+  if (label) {
     label = scout.strings.removeAmpersand(label);
+  } else {
+    label = '';
   }
   this.$field.text(label);
 };

@@ -1,26 +1,26 @@
-scout.MenuNavigateDown = function(outline, node, menuTypes) {
-  scout.MenuNavigateDown.parent.call(this, outline, node);
+scout.NavigateDownButton = function(outline, node) {
+  scout.NavigateDownButton.parent.call(this, outline, node);
   this._text1 = 'Continue';
   this._text2 = 'Show';
-  this.defaultMenu = true;
-  this.menuTypes = menuTypes;
+  this.systemType = scout.Button.SYSTEM_TYPE.OK;
+  this.id = 'NavigateDownButton';
 };
-scout.inherits(scout.MenuNavigateDown, scout.AbstractOutlineNavigationMenu);
+scout.inherits(scout.NavigateDownButton, scout.AbstractNavigationButton);
 
 
-scout.MenuNavigateDown.prototype._isDetail = function() {
+scout.NavigateDownButton.prototype._isDetail = function() {
   return this.node.detailFormVisible;
 };
 
-scout.MenuNavigateDown.prototype._toggleDetail = function() {
+scout.NavigateDownButton.prototype._toggleDetail = function() {
   return false;
 };
 
-scout.MenuNavigateDown.prototype._menuEnabled = function() {
+scout.NavigateDownButton.prototype._menuEnabled = function() {
   return !this.node.leaf;
 };
 
-scout.MenuNavigateDown.prototype._drill = function() {
+scout.NavigateDownButton.prototype._drill = function() {
   var drillNode, row, rowIds = this.node.detailTable.selectedRowIds;
   if (rowIds && rowIds.length > 0) {
     row = this.node.detailTable.rowById(rowIds[0]);

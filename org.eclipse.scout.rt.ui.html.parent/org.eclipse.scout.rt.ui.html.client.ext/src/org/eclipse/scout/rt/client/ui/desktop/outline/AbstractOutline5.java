@@ -17,7 +17,6 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
-import org.eclipse.scout.rt.client.ui.action.menu.MenuSeparator;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -46,7 +45,7 @@ public abstract class AbstractOutline5 extends AbstractExtensibleOutline {
         List<IMenu> emptySpaceMenus = ActionUtility.getActions(table.getMenus(),
             ActionUtility.createMenuFilterMenuTypes(CollectionUtility.<IMenuType> hashSet(TableMenuType.EmptySpace), false));
         if (emptySpaceMenus.size() > 0) {
-          menus.add(new MenuSeparator());
+//          menus.add(new MenuSeparator());
           for (IMenu menu : emptySpaceMenus) {
             menus.add(menu);
           }
@@ -65,7 +64,7 @@ public abstract class AbstractOutline5 extends AbstractExtensibleOutline {
         List<IMenu> parentTableMenus = ActionUtility.getActions(table.getContextMenu().getChildActions(),
             ActionUtility.createMenuFilterMenuTypes(CollectionUtility.<IMenuType> hashSet(TableMenuType.SingleSelection), false));
         if (parentTableMenus.size() > 0) {
-          menus.add(new MenuSeparator());
+//          menus.add(new MenuSeparator());
           for (IMenu menu : parentTableMenus) {
             menus.add(menu);
           }

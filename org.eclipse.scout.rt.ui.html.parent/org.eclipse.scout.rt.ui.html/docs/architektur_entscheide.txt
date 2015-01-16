@@ -438,7 +438,7 @@ Das Konzept für die MenuBar muss überarbeitet werden. Wichtige Punkte sind dab
 
   Menus im Form
     links = implements IMenu (gibt es heute nicht)
-    rechts = implements IToolMenu (z.B. Detach Button)
+    rechts = implements IToolMenu (z.B. ShareMenu)
   Menus in Table
     ganz links = fix die navi buttons
     links 1 = empty space
@@ -451,8 +451,3 @@ Das Konzept für die MenuBar muss überarbeitet werden. Wichtige Punkte sind dab
 
 Order von Buttons muss in CRM geändert werden (Migration durch Script)
 MVI fragen ob uns die SDK bei der Migration unterstützen kann
-
-
-
-=======
->>>>>>> 8e30b69 Revert "Gerrit Test"

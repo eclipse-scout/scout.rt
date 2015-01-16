@@ -1,15 +1,11 @@
-describe("MenuNavigateDown", function() {
+describe("NavigateDownButton", function() {
 
-  var session, outline, menu, node = {}, menuTypes = ['bar'];
+  var session, outline, menu, node = {};
 
   beforeEach(function() {
     session = new scout.Session($('#sandbox'), '1.1');
     outline = {session: session};
-    menu = new scout.MenuNavigateDown(outline, node, menuTypes);
-  });
-
-  it("has menuTypes", function() {
-    expect(menu.menuTypes[0]).toBe('bar');
+    menu = new scout.NavigateDownButton(outline, node);
   });
 
   it("_toggleDetail is always false", function() {

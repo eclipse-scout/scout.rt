@@ -12,6 +12,12 @@ scout.MenuBar = function($parent, position, orderFunc) {
   }
 };
 
+scout.MenuBar.prototype.remove = function() {
+  this.menuItems.forEach(function(item) {
+    item.remove();
+  });
+};
+
 scout.MenuBar.prototype.updateItems = function(menuItems) {
   var i, orderedMenuItems;
 

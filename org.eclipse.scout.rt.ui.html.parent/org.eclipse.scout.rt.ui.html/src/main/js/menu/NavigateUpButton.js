@@ -1,16 +1,16 @@
-scout.MenuNavigateUp = function(outline, node, menuTypes) {
-  scout.MenuNavigateUp.parent.call(this, outline, node);
+scout.NavigateUpButton = function(outline, node) {
+  scout.NavigateUpButton.parent.call(this, outline, node);
   this._text1 = 'Back';
   this._text2 = 'Up';
-  this.menuTypes = menuTypes;
+  this.id = 'NavigateUpButton';
 };
-scout.inherits(scout.MenuNavigateUp, scout.AbstractOutlineNavigationMenu);
+scout.inherits(scout.NavigateUpButton, scout.AbstractNavigationButton);
 
-scout.MenuNavigateUp.prototype._isDetail = function() {
+scout.NavigateUpButton.prototype._isDetail = function() {
   return !this.node.detailFormVisible;
 };
 
-scout.MenuNavigateUp.prototype._toggleDetail = function() {
+scout.NavigateUpButton.prototype._toggleDetail = function() {
   return true;
 };
 
@@ -18,12 +18,12 @@ scout.MenuNavigateUp.prototype._toggleDetail = function() {
  * Returns true when current node has either a parentNode or if current node is a
  * top-level node without a parent and the outline has a default detail-form.
  */
-scout.MenuNavigateUp.prototype._menuEnabled = function() {
+scout.NavigateUpButton.prototype._menuEnabled = function() {
   var parentNode = this.node.parentNode;
   return !!parentNode || !!this.outline.defaultDetailForm;
 };
 
-scout.MenuNavigateUp.prototype._drill = function() {
+scout.NavigateUpButton.prototype._drill = function() {
   var parentNode = this.node.parentNode;
   if (parentNode) {
     $.log.debug('drill up to node ' + parentNode);

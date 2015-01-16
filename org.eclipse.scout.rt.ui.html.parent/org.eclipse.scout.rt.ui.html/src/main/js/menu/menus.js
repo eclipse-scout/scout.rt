@@ -106,10 +106,6 @@ scout.menus = {
 
     isButton: function(obj) {
       return obj instanceof scout.Button;
-    },
-
-    isMenu: function(obj) {
-      return obj instanceof scout.Menu;
     }
 
 };

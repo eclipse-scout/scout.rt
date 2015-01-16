@@ -7,11 +7,12 @@ scout.Form = function() {
   this.staticMenus = [];
   this._addAdapterProperties(['rootGroupBox', 'menus']);
   this._locked;
+  this.menuBarPosition = 'top';
 };
 scout.inherits(scout.Form, scout.ModelAdapter);
 
 scout.Form.prototype._render = function($parent) {
-  var i, btn, systemButtons, menuItems = [], closeable = false;
+  var menuItems = [];
 
   this._$parent = $parent;
   this.$container = $('<div>')
@@ -23,25 +24,12 @@ scout.Form.prototype._render = function($parent) {
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(new scout.FormLayout());
   this.htmlComp.pixelBasedSizing = false;
-
   this.rootGroupBox.render(this.$container);
 
-  menuItems = this.staticMenus.concat(this.menus);
-  systemButtons = this.rootGroupBox.systemButtons;
-  for (i = 0; i < systemButtons.length; i++) {
-    btn = systemButtons[i];
-    if (btn.visible &&
-        btn.systemType === scout.Button.SYSTEM_TYPE.CANCEL ||
-        btn.systemType === scout.Button.SYSTEM_TYPE.CLOSE) {
-      closeable = true;
-    }
-  }
-  // FIXME AWE: (menu) prettify this
-  menuItems = menuItems.concat(this.rootGroupBox.processButtons);
-
-  // FIXME AWE: (menu) braucht es this.menuBar als instanz variable?
-  // FIXME AWE: (menu) check menuBarPosition within forms (PhoneForm) --> move to groupbox
-  this.menuBar = new scout.MenuBar(this.$container, 'top', scout.FormMenuItemsOrder.order);
+  menuItems = this.staticMenus
+    .concat(this.menus)
+    .concat(this.rootGroupBox.processButtons);
+  this.menuBar = new scout.MenuBar(this.$container, this.menuBarPosition, scout.FormMenuItemsOrder.order);
   this.menuBar.updateItems(menuItems);
 
 // FIXME AWE: (menu) un-comment, check if this is the right place. Probably we should only
@@ -60,6 +48,20 @@ scout.Form.prototype._render = function($parent) {
   }
 };
 
+scout.Form.prototype._isClosable = function() {
+  var i, btn,
+    systemButtons = this.rootGroupBox.systemButtons;
+  for (i = 0; i < systemButtons.length; i++) {
+    btn = systemButtons[i];
+    if (btn.visible &&
+        btn.systemType === scout.Button.SYSTEM_TYPE.CANCEL ||
+        btn.systemType === scout.Button.SYSTEM_TYPE.CLOSE) {
+      return true;
+    }
+  }
+  return false;
+};
+
 scout.Form.prototype.onResize = function() {
   $.log.trace('(Form#onResize) window was resized -> layout Form container');
   var htmlCont = scout.HtmlComponent.get(this.$container);
@@ -72,14 +74,14 @@ scout.Form.prototype.appendTo = function($parent) {
   this.$container.appendTo($parent);
 };
 
-/**
- * @override
- */
-scout.Form.prototype.dispose = function() {
-  scout.Form.parent.prototype.dispose.call(this);
-};
-
 scout.Form.prototype.onModelCreate = function() {};
+
+scout.Form.prototype.remove = function() {
+  scout.Form.parent.prototype.remove.call(this);
+  if (this.menuBar) {
+    this.menuBar.remove();
+  }
+};
 
 scout.Form.prototype.onModelAction = function(event) {
   if (event.type === 'formClosed') {

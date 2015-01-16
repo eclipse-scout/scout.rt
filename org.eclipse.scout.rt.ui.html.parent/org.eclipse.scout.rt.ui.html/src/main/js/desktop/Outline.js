@@ -23,37 +23,29 @@ scout.Outline.prototype._initTreeNode = function(parentNode, node) {
   // FIXME AWE: (outline) bezeichner detailTable ist nicht konsistent zu java code, dort ist es nur "table"
   if (node.detailTable) {
     node.detailTable = this.session.getOrCreateModelAdapter(node.detailTable, this);
-    this._addOutlineNavigationMenusToTable(node.detailTable, node);
+    this._addOutlineNavigationButtons(node.detailTable, node);
   }
   if (node.detailForm) {
     node.detailForm = this.session.getOrCreateModelAdapter(node.detailForm, this);
-    this._addOutlineNavigationMenusToForm(node.detailForm, node);
+    this._addOutlineNavigationButtons(node.detailForm, node);
   }
 };
 
-scout.Outline.prototype._addOutlineNavigationMenusToTable = function(table, node) {
-  this._addOutlineNavigationMenus(table, node, 'Table.EmptySpace');
-};
-
-scout.Outline.prototype._addOutlineNavigationMenusToForm = function(form, node) {
-  this._addOutlineNavigationMenus(form, node, 'Form.System');
-};
-
-scout.Outline.prototype._addOutlineNavigationMenus = function(formOrTable, node, menuType) {
+scout.Outline.prototype._addOutlineNavigationButtons = function(formOrTable, node) {
   // FIXME AWE: soll node (=page) eine outline property bekommen? Dann müssten wir nicht node + outline übergeben
   var menus = scout.arrays.ensure(formOrTable.staticMenus);
-  if (!this._hasMenu(menus, scout.MenuNavigateUp)) {
-    menus.push(new scout.MenuNavigateUp(this, node, [menuType]));
+  if (!this._hasButton(menus, scout.NavigateUpButton)) {
+    menus.push(new scout.NavigateUpButton(this, node));
   }
-  if (!this._hasMenu(menus, scout.MenuNavigateDown)) {
-    menus.push(new scout.MenuNavigateDown(this, node, [menuType]));
+  if (!this._hasButton(menus, scout.NavigateDownButton)) {
+    menus.push(new scout.NavigateDownButton(this, node));
   }
   formOrTable.staticMenus = menus;
 };
 
-scout.Outline.prototype._hasMenu = function(menus, menuClass) {
-  for (var i=0; i<menus.length; i++) {
-    if (menus[i] instanceof menuClass) {
+scout.Outline.prototype._hasButton = function(menus, buttonClass) {
+  for (var i = 0; i < menus.length; i++) {
+    if (menus[i] instanceof buttonClass) {
       return true;
     }
   }
@@ -161,7 +153,7 @@ scout.Outline.prototype.onFormChanged = function(nodeId, detailForm) {
     node = this._nodeMap[nodeId];
     node.detailForm = this.session.getOrCreateModelAdapter(detailForm, this);
     if (node.detailForm) {
-      this._addOutlineNavigationMenusToForm(node.detailForm, node);
+      this._addOutlineNavigationButtons(node.detailForm, node);
     }
     // If the following condition is false, the selection state is not synchronized yet which
     // means there is a selection event in the queue which will be processed right afterwards.
@@ -191,7 +183,7 @@ scout.Outline.prototype.onTableChanged = function(nodeId, detailTable) {
     node = this._nodeMap[nodeId];
     node.detailTable = this.session.getOrCreateModelAdapter(detailTable, this);
     if (node.detailTable) {
-      this._addOutlineNavigationMenusToTable(node.detailTable, node);
+      this._addOutlineNavigationButtons(node.detailTable, node);
     }
     // If the following condition is false, the selection state is not synchronized yet which means
     // there is a selection event in the queue which will be processed right afterwards.

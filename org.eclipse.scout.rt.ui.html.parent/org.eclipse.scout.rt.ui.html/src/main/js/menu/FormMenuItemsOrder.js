@@ -21,7 +21,7 @@ scout.FormMenuItemsOrder = {
       else {
         // FIXME AWE: (menu) check if it is a tool-menu to right align menus!
         // ... oder einfach im Form Table.Header menus rechts oben rendern
-        left2Items.push(item);
+        left1Items.push(item);
       }
     }
     return {

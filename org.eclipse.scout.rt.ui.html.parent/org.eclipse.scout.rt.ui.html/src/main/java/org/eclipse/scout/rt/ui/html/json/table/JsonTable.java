@@ -169,12 +169,6 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
         return getModel().isTableStatusVisible();
       }
     });
-    putJsonProperty(new JsonProperty<ITable>(ITable.PROP_MENU_BAR_POSITION, model) {
-      @Override
-      protected String modelValue() {
-        return getModel().getMenuBarPosition();
-      }
-    });
     putJsonProperty(new JsonAdapterProperty<ITable>(ITable.PROP_TABLE_CONTROLS, model, getJsonSession()) {
       @Override
       protected List<ITableControl> modelValue() {
