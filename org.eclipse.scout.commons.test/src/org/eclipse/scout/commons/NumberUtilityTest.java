@@ -81,4 +81,13 @@ public class NumberUtilityTest {
     d = NumberUtility.median(10.0, 20.0, 30.0, 40.0);
     assertEquals(30.0, d, EPSILON);
   }
+  
+  
+  @Test
+  public void testParseEmptyString() {
+    assertEquals(0d, NumberUtility.parseDouble(""), 0.00001d);
+    assertEquals(0l, NumberUtility.parseLong(""));
+    assertEquals(0, NumberUtility.parseInt(""));
+
+  }
 }

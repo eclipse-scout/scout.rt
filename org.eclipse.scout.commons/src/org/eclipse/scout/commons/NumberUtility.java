@@ -405,7 +405,7 @@ public final class NumberUtility {
   /**
    * Converts a String to an int
    *
-   * @return the converted int. Returns 0 if the parameter is <code>null</code>.
+   * @return the converted int. Returns 0 if the parameter is <code>null</code> or empty.
    */
   public static int parseInt(String s) {
     if (StringUtility.isNullOrEmpty(s)) {
@@ -418,7 +418,7 @@ public final class NumberUtility {
   /**
    * Converts a String to a long
    *
-   * @return The converted long. Returns 0 if the parameter is <code>null</code>.
+   * @return The converted long. Returns 0 if the parameter is <code>null</code> or empty.
    */
   public static long parseLong(String s) {
     if (StringUtility.isNullOrEmpty(s)) {
@@ -431,7 +431,7 @@ public final class NumberUtility {
   /**
    * Converts a String to a double
    *
-   * @return The converted double. Returns 0 if the parameter is <code>null</code>.
+   * @return The converted double. Returns 0 if the parameter is <code>null</code> or empty.
    */
   public static double parseDouble(String s) {
     if (StringUtility.isNullOrEmpty(s)) {
