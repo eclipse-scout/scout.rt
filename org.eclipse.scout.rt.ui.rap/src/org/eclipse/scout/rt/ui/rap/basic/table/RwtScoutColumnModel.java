@@ -252,24 +252,17 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
   }
 
   protected ICell getCell(Object row, int colIndex) {
-    P_CachedCell cellInfo = getCellInfo(row, colIndex);
-    if (cellInfo == null) {
-      return null;
-    }
-    return cellInfo.m_cell;
-  }
-
-  protected P_CachedCell getCellInfo(Object row, int colIndex) {
     IColumn<?> column = m_columnManager.getColumnByModelIndex(colIndex - 1);
     if (column != null) {
       if (m_cachedCells == null || m_cachedCells.get(row) == null) {
         rebuildCache();
       }
-      return m_cachedCells.get(row).get(column);
+      P_CachedCell cachedCell = m_cachedCells.get(row).get(column);
+      if (cachedCell != null) {
+        return cachedCell.m_cell;
+      }
     }
-    else {
-      return null;
-    }
+    return null;
   }
 
   /**
@@ -284,14 +277,18 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
   protected String createTableRowVariant(ITableRow row) {
     StringBuilder builder = new StringBuilder();
 
+    Map<IColumn<?>, P_CachedCell> cachedRow = m_cachedCells.get(row);
     for (int column = 0; column < row.getCellCount(); column++) {
       if (column > 0) {
         builder.append("_");
       }
 
-      P_CachedCell cellInfo = getCellInfo(row, column + 1 /* getCellInfo is 1-based*/);
-      if (cellInfo.m_isEditable) {
-        builder.append("EDITABLE");
+      IColumn<?> col = getScoutTable().getColumnSet().getColumn(column);
+      if (col.isVisible()) {
+        P_CachedCell cachedCell = cachedRow.get(col);
+        if (cachedCell != null && cachedCell.m_isEditable) {
+          builder.append("EDITABLE");
+        }
       }
     }
 
