@@ -28,8 +28,13 @@ scout.MenuBar.prototype.updateItems = function(menuItems) {
     }
   }
 
-  this.menuItems = menuItems;
-  orderedMenuItems = this.orderFunc(this.menuItems);
+  /* The orderFunc may add separators to the list of items, that's why we
+   * store the return value of orderFunc in this.menuItems and not the
+   * menuItems passed to the updateItems method. We must do this because
+   * otherwise we could not remove the added separator later.
+   */
+  orderedMenuItems = this.orderFunc(menuItems);
+  this.menuItems = orderedMenuItems.left.concat(orderedMenuItems.right);
   this._renderMenuItems(orderedMenuItems.left , false);
   this._renderMenuItems(orderedMenuItems.right, true);
 
@@ -61,23 +66,13 @@ scout.MenuBar.prototype._updateVisibility = function() {
 };
 
 scout.MenuBar.prototype._renderMenuItems = function(menuItems, right) {
-  for (var i = 0; i < menuItems.length; i++) {
-    if (menuItems[i].separator) {
-      this._renderMenuSeparator();
-    } else {
-      this._renderMenuItem(menuItems[i], right);
+  menuItems.forEach(function(item) {
+    // FIXME AWE: mit team besprechen -> das hier sollte doch nicht fix sein, oder? der tooltip (und die menu-popups)
+    // sollen doch einfach dort gerendert werden wo's platz hat auf dem screen.
+    item.tooltipPosition = this.position === 'top' ? 'bottom' : 'top';
+    item.render(this.$container);
+    if (right) {
+      item.$container.addClass('menu-right');
     }
-  }
-};
-
-scout.MenuBar.prototype._renderMenuItem = function(menuItem, right) {
-  menuItem.tooltipPosition = this.position === 'top' ? 'bottom' : 'top';
-  menuItem.render(this.$container);
-  if (right) {
-    menuItem.$container.addClass('menu-right');
-  }
-};
-
-scout.MenuBar.prototype._renderMenuSeparator = function () {
-  this.$container.appendDiv('menu-separator');
+  }.bind(this));
 };

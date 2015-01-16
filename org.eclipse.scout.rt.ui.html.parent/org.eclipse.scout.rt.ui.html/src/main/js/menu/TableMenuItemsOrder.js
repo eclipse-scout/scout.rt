@@ -28,15 +28,27 @@ scout.TableMenuItemsOrder = {
 
     // add fixed separator between emptySpace and selection
     if (emptySpaceItems.length > 0 && selectionItems.length > 0) {
-      var separator = new scout.Menu();
-      separator.separator = true;
-      emptySpaceItems.push(separator);
+      emptySpaceItems.push(scout.TableMenuItemsOrder.createSeparator());
     }
 
     return {
       left: buttons.concat(emptySpaceItems, selectionItems),
       right: rightItems
     };
+  },
+
+  /**
+   * The separator here does not exist in the model delivered by Scout.
+   * That's why we must set some of the default model values here.
+   */
+  createSeparator: function() {
+    var s = new scout.Menu();
+    s.session = {};
+    s.separator = true;
+    s.enabled = true;
+    s.visible = true;
+    s.selected = false;
+    return s;
   }
 };
 

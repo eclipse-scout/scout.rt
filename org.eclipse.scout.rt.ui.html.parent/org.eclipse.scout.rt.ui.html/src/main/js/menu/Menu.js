@@ -10,19 +10,21 @@ scout.Menu.prototype.sendAboutToShow = function(event) {
 };
 
 scout.Menu.prototype._render = function($parent) {
-  if (this.hasButtonStyle()) {
-    this.$container = $('<button>')
-      .appendTo($parent)
-      .addClass('menu-button')
-      .on('click', '', onClicked.bind(this));
-    if (this.defaultMenu) {
-      this.$container.addClass('default-button');
-    }
+  if (this.separator) {
+    this._renderSeparator($parent);
   } else {
-    this.$container = $parent
-      .appendDiv('menu-item')
-      .on('click', '', onClicked.bind(this));
+    this._renderItem($parent);
   }
+};
+
+scout.Menu.prototype._renderSeparator = function($parent) {
+  this.$container = $parent.appendDiv('menu-separator');
+};
+
+scout.Menu.prototype._renderItem = function($parent) {
+  this.$container = $parent
+  .appendDiv('menu-item')
+  .on('click', '', onClicked.bind(this));
 
   if ('taskbar' === this.menuStyle) {
     this.$container.addClass('taskbar');
@@ -37,10 +39,6 @@ scout.Menu.prototype._render = function($parent) {
     }
     this._onMenuClicked(event);
   }
-};
-
-scout.Menu.prototype.hasButtonStyle = function() {
-  return scout.menus.checkType(this, ['Form.System']);
 };
 
 scout.Menu.prototype._onMenuClicked = function(event) {
