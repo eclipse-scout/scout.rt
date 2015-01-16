@@ -32,7 +32,6 @@ import org.eclipse.scout.rt.client.extension.ui.desktop.outline.IOutlineExtensio
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.OutlineChains.OutlineCreateChildPagesChain;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.MenuSeparator;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.action.menu.TreeMenuType;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -535,7 +534,6 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
         List<IMenu> emptySpaceMenus = ActionUtility.getActions(table.getMenus(),
             ActionUtility.createMenuFilterMenuTypes(CollectionUtility.hashSet(TableMenuType.EmptySpace), false));
         if (emptySpaceMenus.size() > 0) {
-          menus.add(new MenuSeparator());
           for (IMenu menu : emptySpaceMenus) {
             menus.add(menu);
           }
@@ -553,7 +551,6 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
         table.getUIFacade().setSelectedRowsFromUI(CollectionUtility.arrayList(row));
         List<IMenu> parentTableMenus = ActionUtility.getActions(table.getContextMenu().getChildActions(), ActionUtility.createMenuFilterMenuTypes(CollectionUtility.hashSet(TableMenuType.SingleSelection), false));
         if (parentTableMenus.size() > 0) {
-          menus.add(new MenuSeparator());
           for (IMenu menu : parentTableMenus) {
             menus.add(menu);
           }

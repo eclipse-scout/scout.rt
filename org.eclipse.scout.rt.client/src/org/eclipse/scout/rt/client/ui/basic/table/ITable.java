@@ -159,19 +159,6 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    */
   String PROP_TABLE_STATUS_VISIBLE = "tableStatusVisible";
 
-  /**
-   * String
-   *
-   * @since 5.1.0
-   */
-  String PROP_MENU_BAR_POSITION = "menuBarPosition";
-
-  /**
-   * @since 5.1.0
-   */
-  String MENU_BAR_POSITION_TOP = "top";
-  String MENU_BAR_POSITION_BOTTOM = "bottom";
-
   void initTable() throws ProcessingException;
 
   void disposeTable();
@@ -1061,15 +1048,5 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    * @since 5.1.0
    */
   void setTableStatusVisible(boolean visible);
-
-  /**
-   * @since 5.1.0
-   */
-  String getMenuBarPosition();
-
-  /**
-   * @since 5.1.0
-   */
-  void setMenuBarPosition(String position);
 
 }

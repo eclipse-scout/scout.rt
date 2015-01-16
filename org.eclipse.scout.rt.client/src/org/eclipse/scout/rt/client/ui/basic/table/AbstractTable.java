@@ -847,7 +847,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     setDropType(getConfiguredDropType());
     setScrollToSelection(getConfiguredScrollToSelection());
     setTableStatusVisible(getConfiguredTableStatusVisible());
-    setMenuBarPosition(getConfiguredMenuBarPosition());
     if (getTableCustomizer() == null) {
       setTableCustomizer(createTableCustomizer());
     }
@@ -4224,22 +4223,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   @Override
   public void setTableStatusVisible(boolean visible) {
     propertySupport.setPropertyBool(PROP_TABLE_STATUS_VISIBLE, visible);
-  }
-
-  @Override
-  public String getMenuBarPosition() {
-    return propertySupport.getPropertyString(PROP_MENU_BAR_POSITION);
-  }
-
-  @Override
-  public void setMenuBarPosition(String position) {
-    propertySupport.setPropertyString(PROP_MENU_BAR_POSITION, position);
-  }
-
-  @ConfigProperty(ConfigProperty.STRING)
-  @Order(210)
-  protected String getConfiguredMenuBarPosition() {
-    return MENU_BAR_POSITION_TOP;
   }
 
   /*
