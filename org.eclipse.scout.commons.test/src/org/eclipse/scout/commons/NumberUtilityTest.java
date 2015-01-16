@@ -55,4 +55,12 @@ public class NumberUtilityTest {
             Double.POSITIVE_INFINITY,
             Integer.valueOf(45)));
   }
+
+  @Test
+  public void testParseEmptyString() {
+    assertEquals(0d, NumberUtility.parseDouble(""), 0.00001d);
+    assertEquals(0l, NumberUtility.parseLong(""));
+    assertEquals(0, NumberUtility.parseInt(""));
+
+  }
 }
