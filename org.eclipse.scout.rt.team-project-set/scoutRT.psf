@@ -35,8 +35,6 @@
 <project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.3.x,org.eclipse.scout.rt.server.commons"/>
 <project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.3.x,org.eclipse.scout.rt.server.commons.test"/>
 <project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.3.x,org.eclipse.scout.rt.server.jms"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.3.x,org.eclipse.scout.rt.server.servlet25"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.3.x,org.eclipse.scout.rt.server.servlet31"/>
 <project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.3.x,org.eclipse.scout.rt.server.test"/>
 <project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.3.x,org.eclipse.scout.rt.server.testenvironment"/>
 <project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.rt.git,releases/4.3.x,org.eclipse.scout.rt.servicetunnel"/>
@@ -111,7 +109,6 @@
 <item elementID="=org.eclipse.scout.service.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.rt.server.commons" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.org.w3c.dom.svg.fragment" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item elementID="=org.eclipse.scout.rt.server.servlet25" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.rt.server.commons.test" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.rt.server.jms" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.rt.server.servlet31" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
