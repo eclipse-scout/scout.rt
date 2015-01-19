@@ -18,5 +18,5 @@ Export-Package: org.eclipse.scout.svg.ui.rap,
  org.eclipse.scout.svg.ui.rap.calendarfield,
  org.eclipse.scout.svg.ui.rap.internal,
  org.eclipse.scout.svg.ui.rap.svgfield
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy

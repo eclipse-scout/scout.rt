@@ -49,5 +49,5 @@ Export-Package: org.eclipse.scout.rt.shared,
  org.eclipse.scout.rt.shared.validate,
  org.eclipse.scout.rt.shared.validate.annotations,
  org.eclipse.scout.rt.shared.validate.checks
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy

@@ -109,7 +109,7 @@
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.scout.jaxws216.jre16.fragment"
+         id="org.eclipse.scout.jaxws216.jre17.fragment"
          download-size="0"
          install-size="0"
          version="0.0.0"

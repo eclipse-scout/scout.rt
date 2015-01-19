@@ -19,5 +19,5 @@ Import-Package: com.google.common.base;version="[15.0.0,16.0.0)",
  org.openqa.selenium.remote;version="[2.25.0,3.0.0)",
  org.openqa.selenium.remote.service;version="[2.25.0,3.0.0)"
 Export-Package: org.eclipse.scout.rt.testing.ui.rap
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy

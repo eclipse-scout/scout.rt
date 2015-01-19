@@ -17,5 +17,5 @@ Export-Package: org.eclipse.scout.rt.ui.svg.calendar,
  org.eclipse.scout.rt.ui.svg.calendar.builder,
  org.eclipse.scout.rt.ui.svg.calendar.builder.listener,
  org.eclipse.scout.rt.ui.svg.calendar.comp
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy

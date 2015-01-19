@@ -31,5 +31,5 @@ Export-Package: org.eclipse.scout.rt.ui.rap.mobile,
  org.eclipse.scout.rt.ui.rap.mobile.window,
  org.eclipse.scout.rt.ui.rap.mobile.window.desktop,
  org.eclipse.scout.rt.ui.rap.mobile.window.dialog
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy

@@ -25,5 +25,5 @@ Export-Package: org.eclipse.scout.rt.extension.client,
  org.eclipse.scout.rt.extension.client.ui.form.fields.filechooserfield,
  org.eclipse.scout.rt.extension.client.ui.form.fields.imagebox,
  org.eclipse.scout.rt.extension.client.ui.form.fields.smartfield
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy

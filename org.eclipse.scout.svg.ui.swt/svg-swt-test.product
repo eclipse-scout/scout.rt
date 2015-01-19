@@ -36,7 +36,7 @@
       <plugin id="com.ibm.icu.base"/>
       <plugin id="javax.annotation"/>
       <plugin id="javax.inject"/>
-      <plugin id="jre16.fragment" fragment="true"/>
+      <plugin id="jre17.fragment" fragment="true"/>
       <plugin id="org.apache.batik.bridge"/>
       <plugin id="org.apache.batik.css"/>
       <plugin id="org.apache.batik.dom"/>

@@ -93,5 +93,5 @@ Export-Package: org.eclipse.scout.rt.ui.rap,
  org.eclipse.scout.rt.ui.rap.window.filedownloader,
  org.eclipse.scout.rt.ui.rap.window.messagebox,
  org.eclipse.scout.rt.ui.rap.window.popup
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy

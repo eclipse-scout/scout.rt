@@ -199,5 +199,5 @@ Export-Package: org.eclipse.scout.rt.client,
  org.eclipse.scout.rt.client.ui.profiler,
  org.eclipse.scout.rt.client.ui.valuecontainer,
  org.eclipse.scout.rt.client.ui.wizard
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy

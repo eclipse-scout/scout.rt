@@ -92,5 +92,5 @@ Export-Package: org.eclipse.scout.rt.ui.swing,
  org.eclipse.scout.rt.ui.swing.window.internalframe,
  org.eclipse.scout.rt.ui.swing.window.messagebox,
  org.eclipse.scout.rt.ui.swing.window.popup
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
