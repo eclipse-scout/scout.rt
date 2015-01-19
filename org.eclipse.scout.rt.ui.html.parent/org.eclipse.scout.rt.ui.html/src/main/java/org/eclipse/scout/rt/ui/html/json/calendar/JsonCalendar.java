@@ -215,7 +215,7 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
     id = getJsonSession().createUniqueIdFor(null);
     m_calendarComponents.put(component, id);
     m_calendarComponentsById.put(id, component);
-    JSONObject json = new JsonCalendarComponent(component).toJson();
+    JSONObject json = new JsonCalendarComponent(getJsonSession(), component).toJson();
     JsonObjectUtility.putProperty(json, "id", id);
     return json;
   }

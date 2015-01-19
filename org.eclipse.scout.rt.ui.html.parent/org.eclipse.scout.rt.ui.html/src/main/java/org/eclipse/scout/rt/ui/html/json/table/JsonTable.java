@@ -12,6 +12,8 @@ package org.eclipse.scout.rt.ui.html.json.table;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -59,6 +61,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
 
   public static final String EVENT_ROW_CLICKED = "rowClicked";
   public static final String EVENT_ROW_ACTION = "rowAction";
+  public static final String EVENT_HYPERLINK_ACTION = "hyperlinkAction";
   public static final String EVENT_ROWS_SELECTED = "rowsSelected";
   public static final String EVENT_ROWS_DELETED = "rowsDeleted";
   public static final String EVENT_ALL_ROWS_DELETED = "allRowsDeleted";
@@ -257,6 +260,9 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     else if (EVENT_COLUMN_RESIZED.equals(event.getType())) {
       handleUiColumnResized(event, res);
     }
+    else if (EVENT_HYPERLINK_ACTION.equals(event.getType())) {
+      handleUiHyperlinkAction(event, res);
+    }
     else {
       super.handleUiEvent(event, res);
     }
@@ -264,6 +270,8 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
 
   protected void handleUiRowClicked(JsonEvent event, JsonResponse res) {
     ITableRow tableRow = extractTableRow(event.getData());
+    IColumn column = extractColumn(event.getData());
+    getModel().getUIFacade().setContextColumnFromUI(column);
     getModel().getUIFacade().fireRowClickFromUI(tableRow, MouseButton.Left);
   }
 
@@ -356,14 +364,32 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   }
 
   protected void handleUiRowAction(JsonEvent event, JsonResponse res) {
-    final ITableRow tableRow = extractTableRow(event.getData());
+    ITableRow tableRow = extractTableRow(event.getData());
+    IColumn column = extractColumn(event.getData());
+    getModel().getUIFacade().setContextColumnFromUI(column);
     getModel().getUIFacade().fireRowActionFromUI(tableRow);
+  }
+
+  protected void handleUiHyperlinkAction(JsonEvent event, JsonResponse res) {
+    ITableRow row = extractTableRow(event.getData());
+    IColumn column = extractColumn(event.getData());
+    URL url = null;
+    try {
+      url = new URL("http://local/" + JsonObjectUtility.getString(event.getData(), "hyperlink"));
+    }
+    catch (MalformedURLException e) {
+      //TODO [15.0] imo change in scout and only send the path, not the complete url, also ignore the column! hyperlinks are per row only and use a path only [a href='path']text[/a]
+      e.printStackTrace();
+    }
+    if (row != null && column != null && url != null) {
+      getModel().getUIFacade().fireHyperlinkActionFromUI(row, column, url);
+    }
   }
 
   protected JSONObject tableRowToJson(ITableRow row) {
     JSONArray jsonCells = new JSONArray();
     for (IColumn<?> column : getColumns()) {
-      jsonCells.put(cellToJson(row.getCell(column), column));
+      jsonCells.put(cellToJson(row.getCell(column), row, column));
     }
     JSONObject jsonRow = new JSONObject();
     putProperty(jsonRow, "id", getOrCreatedRowId(row));
@@ -371,7 +397,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     return jsonRow;
   }
 
-  protected Object cellToJson(ICell cell, IColumn column) {
+  protected Object cellToJson(ICell cell, ITableRow row, IColumn column) {
     // Prepare cell value
     Object cellValue = cell.getValue();
     if (column instanceof IDateColumn) {
@@ -381,12 +407,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
         cellValue = new JsonDate(date).asJsonString(false, dateColumn.isHasDate(), dateColumn.isHasTime());
       }
     }
-    if (cellValue != null && String.valueOf(cellValue).equals(cell.getText())) {
-      // don't send value if it is equal to the cell text (not necessary to send duplicate values)
-      cellValue = null;
-    }
-
-    return new JsonCell(cell, cellValue).toJsonOrString();
+    return new JsonCell(getJsonSession(), cell, cellValue).toJsonOrString();
   }
 
   protected JSONArray columnsToJson(Collection<IColumn<?>> columns) {
@@ -405,7 +426,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     try {
       JSONObject json = new JSONObject();
       json.put("id", column.getColumnId());
-      json.put("text", column.getHeaderCell().getText());
+      json.put("text", getJsonSession().getCustomHtmlRenderer().convert(column.getHeaderCell().getText(), true));
       json.put("type", computeColumnType(column));
       json.put(IColumn.PROP_WIDTH, column.getWidth());
       json.put("summary", column.isSummary());

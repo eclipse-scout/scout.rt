@@ -12,20 +12,34 @@ package org.eclipse.scout.rt.ui.html.json.basic.cell;
 
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.ui.html.json.IJsonMapper;
+import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.json.JSONObject;
 
 public class JsonCell implements IJsonMapper {
-
   private final ICell m_cell;
+  private final String m_cellText;
   private final Object m_cellValue;
 
-  public JsonCell(ICell cell) {
-    this(cell, (cell == null ? null : cell.getValue()));
+  public JsonCell(IJsonSession session, ICell cell) {
+    this(session, cell, cell.getValue());
   }
 
-  public JsonCell(ICell cell, Object cellValue) {
+  public JsonCell(IJsonSession session, ICell cell, Object cellValue) {
     m_cell = cell;
+    String cellText = cell.getText();
+    if (cellValue != null && cellValue.equals(cellText)) {
+      // don't send value if it is equal to the cell text (not necessary to send duplicate values)
+      cellValue = null;
+    }
+
+    if (cellText instanceof String) {
+      cellText = session.getCustomHtmlRenderer().convert((String) cellText, true);
+    }
+    if (cellValue instanceof String) {
+      cellValue = session.getCustomHtmlRenderer().convert((String) cellValue, true);
+    }
+    m_cellText = cellText;
     m_cellValue = cellValue;
   }
 
@@ -37,6 +51,10 @@ public class JsonCell implements IJsonMapper {
     return m_cellValue;
   }
 
+  public final String getCellText() {
+    return m_cellText;
+  }
+
   @Override
   public JSONObject toJson() {
     if (m_cell == null) {
@@ -44,7 +62,7 @@ public class JsonCell implements IJsonMapper {
     }
     JSONObject json = new JSONObject();
     JsonObjectUtility.putProperty(json, "value", m_cellValue);
-    JsonObjectUtility.putProperty(json, "text", m_cell.getText());
+    JsonObjectUtility.putProperty(json, "text", m_cellText);
     JsonObjectUtility.putProperty(json, "iconId", m_cell.getIconId());
     JsonObjectUtility.putProperty(json, "tooltipText", m_cell.getTooltipText());
     JsonObjectUtility.putProperty(json, "horizontalAlignment", (m_cell.getHorizontalAlignment() == -1 ? null : Integer.valueOf(m_cell.getHorizontalAlignment())));

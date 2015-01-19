@@ -341,7 +341,7 @@ scout.Table.prototype._buildRowDiv = function(row) {
     tooltipText = this.getCellTooltipText(column, row);
     tooltip = (!scout.strings.hasText(tooltipText) ? '' : ' title="' + tooltipText + '"');
 
-    rowDiv += '<div class="table-cell" style="' + style + '"' + tooltip + scout.device.unselectableAttribute + '>' + value + '</div>';
+    rowDiv += '<div class="table-cell" data-column-index="' + c + '" style="' + style + '"' + tooltip + scout.device.unselectableAttribute + '>' + value + '</div>';
   }
   rowDiv += '</div>';
 
@@ -454,17 +454,58 @@ scout.Table.prototype._drawData = function(startRow) {
     }
 
     var $row = $(event.delegateTarget);
-    //Send click only if mouseDown and mouseUp happened on the same row
-    that.session.send(that.id, 'rowClicked', {
-      rowId: $row.attr('id')
-    });
+    var colId = that._findColumnId(event);
+    var hyperLink = that._findHyperLink(event);
+    if(hyperLink){
+      that.sendHyperlinkAction($row,colId, hyperLink);
+    }
+    else{
+      that.sendRowClicked($row,colId);
+    }
   }
 
   function onDoubleClick(event) {
     var $row = $(event.delegateTarget);
-    that.sendRowAction($row);
+    var colId = that._findColumnId(event);
+    that.sendRowAction($row, colId);
   }
 
+};
+
+scout.Table.prototype._findColumnId = function(event) {
+  //bubble up from target to delegateTarget
+  var $elem=$(event.target);
+  var $stop=$(event.delegateTarget);
+  var colIndex='';
+  while($elem.length>0){
+    colIndex=$elem.data('column-index');
+    if(colIndex>=0){
+      return this.columns[colIndex].id;
+    }
+    if($elem[0]===$stop[0]){
+      return null;
+    }
+    $elem=$elem.parent();
+  }
+  return null;
+};
+
+scout.Table.prototype._findHyperLink = function(event) {
+  //bubble up from target to delegateTarget
+  var $elem=$(event.target);
+  var $stop=$(event.delegateTarget);
+  var hyperLink;
+  while($elem.length>0){
+    hyperLink=$elem.data('hyperlink');
+    if(hyperLink){
+      return hyperLink;
+    }
+    if($elem[0]===$stop[0]){
+      return null;
+    }
+    $elem=$elem.parent();
+  }
+  return null;
 };
 
 scout.Table.prototype._filterMenus = function($selectedRows, allowedTypes) {
@@ -515,9 +556,25 @@ scout.Table.prototype.onResize = function() {
   }
 };
 
-scout.Table.prototype.sendRowAction = function($row) {
+scout.Table.prototype.sendRowClicked = function($row, columnIdParam) {
+  this.session.send(this.id, 'rowClicked', {
+    rowId: $row.attr('id'),
+    columnId: columnIdParam
+  });
+};
+
+scout.Table.prototype.sendRowAction = function($row, columnIdParam) {
   this.session.send(this.id, 'rowAction', {
-    rowId: $row.attr('id')
+    rowId: $row.attr('id'),
+    columnId: columnIdParam
+  });
+};
+
+scout.Table.prototype.sendHyperlinkAction = function($row, columnIdParam, hyperlinkParam) {
+  this.session.send(this.id, 'hyperlinkAction', {
+    rowId: $row.attr('id'),
+    columnId: columnIdParam,
+    hyperlink: hyperlinkParam
   });
 };
 

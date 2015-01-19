@@ -49,6 +49,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
   private final JsonAdapterFactory m_jsonAdapterFactory;
   private final JsonAdapterRegistry m_jsonAdapterRegistry;
+  private ICustomHtmlRenderer m_customHtmlRenderer;
   private P_RootAdapter m_rootJsonAdapter;
   private JsonClientSession<? extends IClientSession> m_jsonClientSession;
   private String m_jsonSessionId;
@@ -72,6 +73,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     m_jsonAdapterFactory = createJsonAdapterFactory();
     m_jsonAdapterRegistry = createJsonAdapterRegistry();
     m_rootJsonAdapter = new P_RootAdapter(this);
+    m_customHtmlRenderer = createCustomHtmlRenderer();
   }
 
   protected JsonResponse createJsonResponse() {
@@ -84,6 +86,10 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
   protected JsonAdapterRegistry createJsonAdapterRegistry() {
     return new JsonAdapterRegistry();
+  }
+
+  protected ICustomHtmlRenderer createCustomHtmlRenderer() {
+    return new CustomHtmlRenderer();
   }
 
   /**
@@ -326,6 +332,11 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
   public long getJsonAdapterSeq() {
     return m_jsonAdapterSeq;
+  }
+
+  @Override
+  public ICustomHtmlRenderer getCustomHtmlRenderer() {
+    return m_customHtmlRenderer;
   }
 
   @Override

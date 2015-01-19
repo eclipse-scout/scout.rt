@@ -2,17 +2,23 @@ package org.eclipse.scout.rt.ui.html.json.calendar;
 
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarComponent;
 import org.eclipse.scout.rt.ui.html.json.IJsonMapper;
+import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonDate;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.basic.cell.JsonCell;
 import org.json.JSONObject;
 
 public class JsonCalendarComponent implements IJsonMapper {
-
+  private final IJsonSession m_session;
   private final CalendarComponent m_component;
 
-  public JsonCalendarComponent(CalendarComponent component) {
+  public JsonCalendarComponent(IJsonSession session, CalendarComponent component) {
+    m_session = session;
     m_component = component;
+  }
+
+  public IJsonSession getJsonSession() {
+    return m_session;
   }
 
   public final CalendarComponent getComponent() {
@@ -26,7 +32,7 @@ public class JsonCalendarComponent implements IJsonMapper {
     }
     JSONObject json = new JSONObject();
     JsonObjectUtility.putProperty(json, "item", new JsonCalendarItem(m_component.getItem()).toJson());
-    JsonObjectUtility.putProperty(json, "cell", new JsonCell(m_component.getCell()).toJson());
+    JsonObjectUtility.putProperty(json, "cell", new JsonCell(getJsonSession(), m_component.getCell()).toJson());
     JsonObjectUtility.putProperty(json, "fromDate", new JsonDate(m_component.getFromDate()).asJsonString());
     JsonObjectUtility.putProperty(json, "toDate", new JsonDate(m_component.getToDate()).asJsonString());
     JsonObjectUtility.putProperty(json, "coveredDays", JsonObjectUtility.newJSONArray(m_component.getCoveredDays()));
