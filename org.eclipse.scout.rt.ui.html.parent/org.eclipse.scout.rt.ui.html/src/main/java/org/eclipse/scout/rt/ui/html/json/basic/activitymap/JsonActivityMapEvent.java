@@ -28,6 +28,8 @@ public class JsonActivityMapEvent implements IJsonMapper {
 
   @Override
   public JSONObject toJson() {
-    return new JSONObject();
+    JSONObject json = new JSONObject();
+    // TODO ActivityMap | Fill data
+    return json;
   }
 }

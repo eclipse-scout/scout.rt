@@ -29,6 +29,12 @@ public class JsonCalendarField<T extends ICalendarField<? extends ICalendar>> ex
   }
 
   @Override
+  protected void attachChildAdapters() {
+    super.attachChildAdapters();
+    attachAdapter(getModel().getCalendar());
+  }
+
+  @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
     putAdapterIdProperty(json, "calendar", getModel().getCalendar());

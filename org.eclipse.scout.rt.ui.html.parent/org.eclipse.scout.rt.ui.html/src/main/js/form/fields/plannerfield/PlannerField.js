@@ -21,3 +21,9 @@ scout.PlannerField.prototype._render = function($parent) {
     this.addField(this.activityMap.$container);
   }
 };
+
+scout.PlannerField.prototype._renderMiniCalendarCount = function() {
+};
+
+scout.PlannerField.prototype._renderSplitterPosition = function() {
+};

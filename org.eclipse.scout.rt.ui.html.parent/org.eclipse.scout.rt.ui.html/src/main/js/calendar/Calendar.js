@@ -27,6 +27,7 @@ scout.Calendar.prototype.init = function(model, session) {
 scout.Calendar.prototype._render = function($parent) {
   this._$parent = $parent;
   this.$container = this._$parent.appendDiv('calendar').attr('id', this._generateId('calendar'));
+  this.$container.addClass('not-implemented'); // TODO Remove once implemented
   var layout = new scout.CalendarLayout(this);
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(layout);
@@ -39,8 +40,7 @@ scout.Calendar.prototype._render = function($parent) {
 };
 
 scout.Calendar.prototype.drawData = function() {
-  this.$data.text('CALENDAR [selectedDate: ' + this.selectedDate + ']').
-    addClass('not-implemented').css('background-color', '#FFFFCC');
+  this.$data.text('CALENDAR [selectedDate: ' + this.selectedDate + ']');
 };
 
 scout.Calendar.prototype._renderComponents = function() {
