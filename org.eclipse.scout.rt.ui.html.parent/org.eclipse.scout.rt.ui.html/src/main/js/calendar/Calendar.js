@@ -18,8 +18,12 @@ scout.Calendar.prototype.init = function(model, session) {
     dateRange: {
       // TODO Calendar | Get initial dates from date selector
       from: scout.dates.toJsonDate(new Date()),
-      to: scout.dates.toJsonDate(new Date())
+      to: scout.dates.toJsonDate(scout.dates.shift(new Date(), 0, 0, 5))
     }
+  });
+  // TODO Calendar | Remove this test code
+  this.session.send(this.id, 'setDisplayMode', {
+    displayMode: 1
   });
 };
 

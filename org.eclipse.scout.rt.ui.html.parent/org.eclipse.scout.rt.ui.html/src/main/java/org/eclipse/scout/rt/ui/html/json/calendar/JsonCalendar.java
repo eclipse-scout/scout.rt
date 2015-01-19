@@ -16,7 +16,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.commons.Range;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ClientJob;
+import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarAdapter;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarComponent;
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarEvent;
@@ -34,6 +41,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObserver<T> {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonCalendar.class);
 
   // from model
   public static final String EVENT_CALENDAR_CHANGED = "calendarChanged";
@@ -45,6 +53,7 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
   private static final String EVENT_RELOAD = "reload";
   private static final String EVENT_SET_VISIBLE_RANGE = "setVisibleRange";
   private static final String EVENT_SET_SELECTION = "setSelection";
+  private static final String EVENT_SET_DISPLAY_MODE = "setDisplayMode";
 
   private CalendarListener m_calendarListener;
 
@@ -244,6 +253,9 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
     else if (EVENT_SET_SELECTION.equals(event.getType())) {
       handleUiSetSelection(event, res);
     }
+    else if (EVENT_SET_DISPLAY_MODE.equals(event.getType())) {
+      handleUiSetDisplayMode(event, res);
+    }
     else {
       super.handleUiEvent(event, res);
     }
@@ -258,16 +270,19 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
 
   protected void handleUiComponentAction(JsonEvent event, JsonResponse res) {
     getModel().getUIFacade().fireComponentActionFromUI();
+    P_WaitForAllClientJobsJob.waitForAllOtherJobs(); // TEMPORARY WORKARROUND!
   }
 
   protected void handleUiComponentMoved(JsonEvent event, JsonResponse res) {
     CalendarComponent comp = resolveCalendarComponent(event.getData().optString("component"));
     Date newDate = new JsonDate(event.getData().optString("newDate")).asJavaDate();
     getModel().getUIFacade().fireComponentMovedFromUI(comp, newDate);
+    P_WaitForAllClientJobsJob.waitForAllOtherJobs(); // TEMPORARY WORKARROUND!
   }
 
   protected void handleUiReload(JsonEvent event, JsonResponse res) {
     getModel().getUIFacade().fireReloadFromUI();
+    P_WaitForAllClientJobsJob.waitForAllOtherJobs(); // TEMPORARY WORKARROUND!
   }
 
   protected void handleUiSetVisibleRange(JsonEvent event, JsonResponse res) {
@@ -275,12 +290,21 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
     Date fromDate = new JsonDate(dateRange.optString("from")).asJavaDate();
     Date toDate = new JsonDate(dateRange.optString("to")).asJavaDate();
     getModel().getUIFacade().setVisibleRangeFromUI(fromDate, toDate);
+    P_WaitForAllClientJobsJob.waitForAllOtherJobs(); // TEMPORARY WORKARROUND!
   }
 
   protected void handleUiSetSelection(JsonEvent event, JsonResponse res) {
     Date date = new JsonDate(event.getData().optString("date")).asJavaDate();
     CalendarComponent comp = resolveCalendarComponent(event.getData().optString("component"));
     getModel().getUIFacade().setSelectionFromUI(date, comp);
+    P_WaitForAllClientJobsJob.waitForAllOtherJobs(); // TEMPORARY WORKARROUND!
+  }
+
+  protected void handleUiSetDisplayMode(JsonEvent event, JsonResponse res) {
+    int displayMode = event.getData().optInt("displayMode");
+    // TODO BSH Calendar | Check if we should add this method to the UI facade
+    getModel().setDisplayMode(displayMode);
+    P_WaitForAllClientJobsJob.waitForAllOtherJobs(); // TEMPORARY WORKARROUND!
   }
 
   protected class P_CalendarListener extends CalendarAdapter {
@@ -299,6 +323,40 @@ public class JsonCalendar<T extends ICalendar> extends AbstractJsonPropertyObser
       JSONObject json = new JSONObject();
       JsonObjectUtility.putProperty(json, "batch", jsonArray); // TODO BSH Calendar | Check if this works
       addActionEvent(EVENT_CALENDAR_CHANGED_BATCH, json);
+    }
+  }
+
+  // FIXME BSH Server Push | Remove this code when server push is implemented!
+  protected static class P_WaitForAllClientJobsJob extends ClientSyncJob {
+
+    public static final int SLEEP_TIME_MILLIS = 100;
+
+    public P_WaitForAllClientJobsJob(IClientSession session) {
+      super("Wait for all client jobs [session: " + session.getVirtualSessionId() + " / " + session.getUserId() + " / " + System.nanoTime() + "]", session);
+    }
+
+    @Override
+    protected void runVoid(IProgressMonitor monitor) throws Throwable {
+      for (Job job : Job.getJobManager().find(ClientJob.class)) {
+        ClientJob clientJob = (ClientJob) job;
+        // Any job (sync or async) from the current session, except this job itself, or "waitFor" job
+        if (clientJob.getClientSession() != getClientSession()) {
+          continue;
+        }
+        if (clientJob instanceof JsonCalendar.P_WaitForAllClientJobsJob) {
+          continue;
+        }
+        if (clientJob.isWaitFor()) {
+          continue;
+        }
+        LOG.info("Waiting for running job: " + clientJob + " (" + clientJob.getClass().getName() + ")");
+        // Re-schedule
+        this.schedule(SLEEP_TIME_MILLIS);
+      }
+    }
+
+    public static void waitForAllOtherJobs() {
+      new P_WaitForAllClientJobsJob(ClientSyncJob.getCurrentSession()).schedule(SLEEP_TIME_MILLIS);
     }
   }
 }
