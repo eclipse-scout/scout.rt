@@ -29,7 +29,6 @@ import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
-import org.eclipse.scout.rt.client.ui.action.menu.MenuSeparator;
 import org.eclipse.scout.rt.client.ui.action.menu.TableMenuType;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -95,15 +94,6 @@ public class OutlineTreeContextMenuNestedPageWithTablesTest {
     assertTrue(containsAllMenus(menus, requiredMenus));
 
     assertEquals(sizeMenuListWithoutSeparators(menus), requiredMenus.size()); // + 1 stands for menu separator
-
-    boolean hasMenuSeparator = false;
-    for (IMenu menu : menus) {
-      if (menu instanceof MenuSeparator) {
-        hasMenuSeparator = true;
-      }
-    }
-
-    assertTrue(hasMenuSeparator);
   }
 
   public static boolean containsAllMenus(Collection<IMenu> reference, Collection<IMenu> menus) {
