@@ -18,9 +18,33 @@
       top: 0;
   }
 
-  & input[type=checkbox] {
-      display: none;
+  & label:hover:before {
+    border: 2px solid @hover-color;
   }
+
+  & input[type=checkbox] {
+    /* no visiblity and display change to be focusable */
+    position:absolute;
+    width:22px;
+    height:22px;
+    overflow:hidden;
+    margin:0;
+    padding:0;
+    border:0;
+    outline:0;
+    opacity:0;
+  }
+
+  & input[type=checkbox]:disabled + label:hover:before {
+    border: 2px solid @border-color;
+  }
+
+  & input[type=checkbox]:focus + label:before {
+    .focus-border(2px);
+    background-color:@focus-color-glow;
+    outline: none;
+  }
+
 
   & input[type=checkbox]:checked + label:before {
       .font-icon;

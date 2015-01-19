@@ -18,17 +18,42 @@
       top: 0;
   }
 
+  & label:hover:before {
+    border: 2px solid @hover-color;
+  }
+
   & input[type=radio] {
-      display: none;
+    /* no visiblity and display change to be focusable */
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    opacity: 0;
+  }
+
+  & input[type=radio]:disabled + label:hover:before {
+      border: 2px solid @border-color;
   }
 
   & input[type=radio]:checked + label:before {
-      content: "\2022";
+      .font-icon;
+      content: @icon-circle;
       color: @palette-black;
-      font-size: 30px;
+      font-size: 8px;
       text-align: center;
       line-height: 16px;
   }
+
+  & input[type=radio]:focus + label:before {
+    .focus-border(2px);
+    background-color:@focus-color-glow;
+    outline: none;
+  }
+
   & label:before {
       border: 2px solid @border-color;
       border-radius: 10px;
@@ -38,11 +63,3 @@
      background-color: @disabled-color;
   }
 }
-
-
-
-
-
-
-
-

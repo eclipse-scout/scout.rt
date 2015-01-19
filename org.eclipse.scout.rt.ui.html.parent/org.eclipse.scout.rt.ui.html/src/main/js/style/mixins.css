@@ -8,9 +8,9 @@
   box-shadow: @x @y @blur @spread rgba(0, 0, 0, @alpha);
 }
 
-.focus-border() {
+.focus-border(@bordersize: 1px) {
   outline: none;
-  border: 1px solid @focus-color;
+  border: @bordersize solid @focus-color;
   .glow(@focus-color-glow);
 }
 

@@ -32,7 +32,7 @@ scout.RadioButton.prototype._render = function($parent) {
 
 scout.RadioButton.prototype._onClick = function() {
   var uiChecked = this._$radioButton[0].checked;
-  this.session.send('selected', this.id, {
+  this.session.send(this.id, 'selected', {
     checked: uiChecked
   });
 };
