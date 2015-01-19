@@ -176,7 +176,7 @@ public class PageTest {
     }
   }
 
-  static class P_Outline extends AbstractOutline {
+  public static class P_Outline extends AbstractOutline {
 
     public P_Outline() {
       super();
