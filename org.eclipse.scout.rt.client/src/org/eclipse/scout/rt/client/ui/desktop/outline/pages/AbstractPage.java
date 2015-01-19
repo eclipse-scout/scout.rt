@@ -757,8 +757,8 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
    * Note: set*Visible methods are called by initConfig(), at this point getTree() is still null.
    * Tree can also be null during shutdown.
    */
-  private void firePageChanged() {
-    if (getOutline() != null) {
+  protected void firePageChanged() {
+    if (m_pageInitialized && getOutline() != null) {
       getOutline().firePageChanged(this);
     }
   }
