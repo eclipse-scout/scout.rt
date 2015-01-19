@@ -3,7 +3,7 @@
 
   & .group {
     padding: 10px 0px 10px 10px;
-    width: 260px;
+    width: 364px;
     overflow: hidden;
   }
 
@@ -14,13 +14,14 @@
 
   & .slot, & .minus, & .plus {
     float: left;
-    width: 50px;
-    margin: 5px 10px 4px 2px;
-    height: 29px;
-    line-height: 29px;
+    width: 80px;
+    margin: 5px 5px 0px 2px;
+    height: 24px;
+    line-height: 24px;
     border: 1px solid @desktop-border-color;
     text-align: center;
     overflow: hidden;
+    white-space: nowrap;
     cursor: pointer;
 
     &:hover {
@@ -35,8 +36,23 @@
     }
 
     &.rename-active {
-      .focus-border();
+      border-radius: @border-radius;
       cursor: text;
+      color: @text-color;
+      border: 1px solid @palette-gray-6;
+      .glow(@palette-gray-6);
+    }
+
+    &:focus {
+      .focus-border();
+    }
+
+    &::selection {
+      .selection();
+    }
+
+    &::-moz-selection {
+      .selection();
     }
   }
 
@@ -44,8 +60,8 @@
     .font-text-small();
     float: left;
     width: 50px;
-    margin: 8px 10px 4px 2px;
-    height: 29px;
+    margin: 6px 10px 0px 6px;
+    height: 24px;
     line-height: 11px;
     cursor: pointer;
 
@@ -58,12 +74,18 @@
   & .fixed{
     float: left;
     width: 50px;
-    margin: 5px 10px 4px 2px;
+    margin: 5px 0px 4px 2px;
     height: 29px;
-    line-height: 29px;
+    line-height: 25px;
     .font-text-normal();
     text-align: center;
   }
+
+
+  & .minus, & .plus {
+    width: 50px;
+  }
+
 
   & .minus:before, & .plus:before{
     color: @icon-color;
@@ -76,7 +98,7 @@
    }
 
   & .minus:before {
-    content: "-";
+    content: @icon-minus;
   }
 
   & .plus:before{
