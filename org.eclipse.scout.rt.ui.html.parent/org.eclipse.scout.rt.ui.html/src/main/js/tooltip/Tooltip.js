@@ -34,7 +34,8 @@ scout.Tooltip.prototype.render = function($parent) {
   this.$container.show();
 
   if (this.autoRemove) {
-    //every user action will close menu
+    // Every user action will remove the tooltip
+    //FIXME CGU Use menus.closing_event resp. make menus.closing_event not dependent from menus
     $(document).on('mousedown.tooltip', this._onTooltipClicked.bind(this));
     $(document).on('keydown.tooltip', this.remove.bind(this));
   }

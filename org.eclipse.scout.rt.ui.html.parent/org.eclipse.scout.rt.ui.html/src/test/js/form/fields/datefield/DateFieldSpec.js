@@ -17,6 +17,7 @@ describe("DateField", function() {
     jasmine.Ajax.uninstall();
     jasmine.clock().uninstall();
     $('.tooltip').remove();
+    $('.date-box').remove();
   });
 
   function createField(model) {

@@ -186,7 +186,7 @@ scout.AbstractSmartField.prototype._showPopup = function(numOptions, vararg) {
     .on('mousedown', this._onPopupMousedown.bind(this))
     .append($.makeDiv('options'))
     .append($.makeDiv('status'))
-    .appendTo(this.$container);
+    .appendTo($('body'));
   scout.graphics.setBounds(this._$popup, popupBounds);
   // layout options and status-div
   var $optionsDiv = this._get$OptionsDiv();
@@ -207,7 +207,7 @@ scout.AbstractSmartField.prototype._onPopupMousedown = function(event) {
  * text-field is not === this.$field.
  */
 scout.AbstractSmartField.prototype._getInputBounds = function() {
-  return scout.graphics.getBounds(this.$field);
+  return scout.graphics.offsetBounds(this.$field);
 };
 
 /**

@@ -13,7 +13,7 @@
 }
 
 /* date box */
-.field.has-error ~ .date-box {
+.date-box.has-error {
   border-color: @error-color;
 }
 

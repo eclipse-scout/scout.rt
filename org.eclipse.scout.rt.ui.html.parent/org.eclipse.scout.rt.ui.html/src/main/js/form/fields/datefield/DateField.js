@@ -67,19 +67,22 @@ scout.DateField.prototype.onDateSelected = function(date) {
 scout.DateField.prototype._renderDisplayText = function(text) {
   this.$field.val(text);
 
-  //Make sure there is no invisible and wrong prediction
+  // Make sure there is no invisible and wrong prediction
   if (this._$predict) {
     this._$predict.val('');
   }
 };
 
 /**
- * @Override
+ * @override
  */
 scout.DateField.prototype._renderErrorStatus = function(errorStatus) {
   scout.DateField.parent.prototype._renderErrorStatus.call(this, errorStatus);
   if (this._$predict) {
-    this._$predict.toggleClass('has-error', !! errorStatus);
+    this._$predict.toggleClass('has-error', !!errorStatus);
+  }
+  if (this._picker.$popup) {
+    this._picker.$popup.toggleClass('has-error', !!errorStatus);
   }
 };
 

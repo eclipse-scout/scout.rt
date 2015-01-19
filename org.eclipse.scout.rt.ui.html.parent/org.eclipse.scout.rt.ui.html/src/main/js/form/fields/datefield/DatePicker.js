@@ -15,12 +15,13 @@ scout.DatePicker.prototype.selectDate = function(date, animated) {
 
 scout.DatePicker.prototype.show = function(viewDate, selectedDate, animated) {
   var viewDateDiff = 0;
+  var origin = scout.graphics.offsetBounds(this._dateField.$field);
   if (!this.$popup) {
     this.$popup = $.makeDiv('date-box')
-      .cssLeft(this._dateField.$field.position().left)
-      .cssTop(this._dateField.$field.innerBottom())
+      .cssLeft(origin.x)
+      .cssTop(origin.y + origin.height)
       .mousedown(this._onMouseDown.bind(this));
-    this._dateField.$field.after(this.$popup);
+    $('body').append(this.$popup);
 
     this._$header = this._createHeader().appendTo(this.$popup);
     this._$header.find('.date-box-left-y, .date-box-left-m, .date-box-right-m, .date-box-right-y').mousedown(this._onNavigationMouseDown.bind(this));
@@ -29,7 +30,7 @@ scout.DatePicker.prototype.show = function(viewDate, selectedDate, animated) {
     this.$scrollable = this.$popup.appendDiv('date-box-scrollable');
     this._scrollableTop = this.$scrollable.position().top;
     this._scrollableLeft = this.$scrollable.position().left;
-    //Fix the position of the scrollable in order to to proper scrollable shifting (see _appendAnimated)
+    // Fix the position of the scrollable in order to do proper scrollable shifting (see _appendAnimated)
     this.$scrollable.css({'position': 'absolute', left: this._scrollableLeft, top: this._scrollableTop});
   }
 
@@ -57,13 +58,13 @@ scout.DatePicker.prototype.show = function(viewDate, selectedDate, animated) {
   if (animated && this.$currentBox && viewDateDiff) {
     this._appendAnimated(viewDateDiff, $box);
   } else {
-    //Just replace the current month box (new day in the same month has been chosen)
+    // Just replace the current month box (new day in the same month has been chosen)
     if (this.$currentBox) {
       this.$currentBox.remove();
     }
     $box.appendTo(this.$scrollable);
 
-    //Measure box size for the animation
+    // Measure box size for the animation
     if (!this._boxWidth) {
       this._boxWidth = $box.width();
     }
@@ -80,7 +81,7 @@ scout.DatePicker.prototype._appendAnimated = function(viewDateDiff, $box) {
   var monthBoxCount = this.$scrollable.find('.date-box-month').length + 1;
   var scrollableWidth = monthBoxCount * this._boxWidth;
 
-  //Fix the size of the boxes
+  // Fix the size of the boxes
   $currentBox
     .width(this._boxWidth)
     .height(this._boxHeight);
@@ -88,29 +89,32 @@ scout.DatePicker.prototype._appendAnimated = function(viewDateDiff, $box) {
     .width(this._boxWidth)
     .height(this._boxHeight);
 
+  this.$scrollable.width(scrollableWidth);
   if (viewDateDiff > 0) {
-    //New view date is larger -> shift left
+    // New view date is larger -> shift left
     $box.appendTo(this.$scrollable);
     newLeft = this._scrollableLeft - (scrollableWidth - this._boxWidth);
   } else {
-    //New view date is smaller -> shift right
+    // New view date is smaller -> shift right
     this.$scrollable.cssLeft(this._scrollableLeft - this._boxWidth);
     $box.prependTo(this.$scrollable);
     newLeft = this._scrollableLeft;
   }
 
-  //Animate
-  //At first: stop existing animation when shifting multiple dates in a row (e.g. with mouse wheel)
+  // Animate
+  // At first: stop existing animation when shifting multiple dates in a row (e.g. with mouse wheel)
   this.$scrollable.
     stop(true).
     animate({ left: newLeft }, 300, function() {
-      //Remove every month box beside the new one
-      //Its important to use that.$currentBox because $box may already be removed
-      //if a new day in the current month has been chosen while the animation is in progress (e.g. by holding down key)
+      // Remove every month box beside the new one
+      // Its important to use that.$currentBox because $box may already be removed
+      // if a new day in the current month has been chosen while the animation is in progress (e.g. by holding down key)
       that.$currentBox.siblings('.date-box-month').remove();
 
-      //Reset scrollable settings
-      that.$scrollable.cssLeft(that._scrollableLeft);
+      // Reset scrollable settings
+      that.$scrollable
+        .cssLeft(that._scrollableLeft)
+        .width(that._boxWidth);
     });
 };
 
@@ -137,7 +141,7 @@ scout.DatePicker.prototype._onMouseWheel = function(event) {
 };
 
 scout.DatePicker.prototype._onMouseDown = function(event) {
-  //Make sure field blur won't be triggered -> popup must not be closed on mouse down
+  // Make sure field blur won't be triggered -> popup must not be closed on mouse down
   event.preventDefault();
 };
 
