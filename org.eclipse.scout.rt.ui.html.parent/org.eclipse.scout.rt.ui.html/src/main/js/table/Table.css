@@ -14,6 +14,10 @@
   & .scrollbar {
     right: 3px;
   }
+
+  &:focus {
+    outline: none;
+  }
 }
 
 /* main table header */

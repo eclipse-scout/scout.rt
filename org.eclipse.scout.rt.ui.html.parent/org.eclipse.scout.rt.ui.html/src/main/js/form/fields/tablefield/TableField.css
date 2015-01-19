@@ -13,10 +13,6 @@
   background-color: transparent;
 }
 
-.table-field > .table:focus {
-  outline: none;
-}
-
 .table-field > .table > .table-header,
 .table-field > .table > .table-header > .header-resize  {
   height: @logical-grid-height;
