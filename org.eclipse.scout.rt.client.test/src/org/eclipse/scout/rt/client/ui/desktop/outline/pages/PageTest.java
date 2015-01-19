@@ -23,7 +23,7 @@ import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.Activator;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
-import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
+import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
@@ -116,8 +116,8 @@ public class PageTest {
   public void testIsSetDetailFormVisible() throws Exception {
     AbstractPage<?> p = new P_Page();
     assertTrue(p.isDetailFormVisible());
-    IOutline outline = Mockito.mock(IOutline.class);
-    p.setTreeInternal(outline, false);
+    P_Outline outline = P_Outline.createMock();
+    outline.addChildNode(outline.getRootNode(), p);
     p.setDetailFormVisible(false);
     assertFalse(p.isDetailFormVisible());
     Mockito.verify(outline).firePageChanged(Mockito.eq(p));
@@ -127,8 +127,8 @@ public class PageTest {
   public void testIsSetTableVisible() throws Exception {
     AbstractPage<?> p = new P_Page();
     assertTrue(p.isTableVisible());
-    IOutline outline = Mockito.mock(IOutline.class);
-    p.setTreeInternal(outline, false);
+    P_Outline outline = P_Outline.createMock();
+    outline.addChildNode(outline.getRootNode(), p);
     p.setTableVisible(false);
     assertFalse(p.isTableVisible());
     Mockito.verify(outline).firePageChanged(Mockito.eq(p));
@@ -176,4 +176,20 @@ public class PageTest {
     }
   }
 
+  static class P_Outline extends AbstractOutline {
+
+    public P_Outline() {
+      super();
+    }
+
+    public P_Outline(boolean callInitialzier) {
+      super(callInitialzier);
+    }
+
+    public static P_Outline createMock() {
+      P_Outline mock = Mockito.spy(new P_Outline(false));
+      mock.callInitializer();
+      return mock;
+    }
+  }
 }
