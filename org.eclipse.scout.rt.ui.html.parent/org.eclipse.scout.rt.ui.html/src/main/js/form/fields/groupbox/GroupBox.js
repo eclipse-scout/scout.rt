@@ -94,7 +94,7 @@ scout.GroupBox.prototype._renderBorderVisible = function(borderVisible) {
   }
 
   if (!borderVisible) {
-    this.$body.addClass('margin-invisible');
+    this.$body.addClass('y-padding-invisible');
   }
 };
 

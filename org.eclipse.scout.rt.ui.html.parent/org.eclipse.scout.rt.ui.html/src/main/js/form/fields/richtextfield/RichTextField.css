@@ -26,12 +26,10 @@
 }
 
 .rich-text-field {
-  position: relative;
   width: 100%;
   border: 1px solid @border-color;
   border-radius: @border-radius;
   overflow: hidden;
-
 
   & .scrollbar {
     right: 124px;
