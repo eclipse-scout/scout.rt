@@ -24,7 +24,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
  * <p>
  * The {@link #run(IProgressMonitor)} first calls {@link #runBusy(IProgressMonitor)} and then calls
  * {@link #runBlocking(IProgressMonitor)}
- * 
+ *
  * @author imo
  * @since 3.8
  */
@@ -52,7 +52,15 @@ public class BusyJob extends Job {
     if (!getBusyHandler().isBusy() || !getBusyHandler().isEnabled()) {
       return Status.OK_STATUS;
     }
-    runBlocking(monitor);
+
+    m_handler.onBlockingBegin();
+    try {
+      runBlocking(monitor);
+    }
+    finally {
+      m_handler.onBlockingEnd();
+    }
+
     return Status.OK_STATUS;
   }
 
