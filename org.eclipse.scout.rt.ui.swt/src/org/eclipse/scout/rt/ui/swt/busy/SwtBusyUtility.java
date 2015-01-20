@@ -15,24 +15,31 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.operation.ModalContext;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.busy.IBusyHandler;
+import org.eclipse.scout.rt.client.busy.IBusyManagerService;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.window.ISwtScoutPart;
 import org.eclipse.scout.rt.ui.swt.window.desktop.editor.AbstractScoutEditorPart;
 import org.eclipse.scout.rt.ui.swt.window.desktop.view.AbstractScoutView;
 import org.eclipse.scout.rt.ui.swt.window.dialog.SwtScoutDialog;
+import org.eclipse.scout.service.SERVICES;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
 /**
  * Utilities to handle busy and blocking
- * 
+ *
  * @author imo
  * @since 3.8
  */
@@ -58,16 +65,16 @@ public final class SwtBusyUtility {
     }
 
     final Object lock = new Object();
-    synchronized (lock) {
 
-      final Display display = busyHandler.getDisplay();
-      display.asyncExec(new Runnable() {
-        @Override
-        public void run() {
-          if (!busyHandler.isEnabled()) {
-            return;
-          }
+    final Display display = busyHandler.getDisplay();
+    display.asyncExec(new Runnable() {
+      @Override
+      public void run() {
+        if (!busyHandler.isEnabled()) {
+          return;
+        }
 
+        try {
           BusyIndicator.showWhile(display, new Runnable() {
             @Override
             public void run() {
@@ -76,14 +83,7 @@ public final class SwtBusyUtility {
                 ModalContext.run(new IRunnableWithProgress() {
                   @Override
                   public void run(IProgressMonitor monitor2) throws InvocationTargetException, InterruptedException {
-                    try {
-                      runnable.run(monitor2);
-                    }
-                    finally {
-                      synchronized (lock) {
-                        lock.notifyAll();
-                      }
-                    }
+                    runnable.run(monitor2);
                   }
                 }, true, new NullProgressMonitor(), display);
               }
@@ -92,15 +92,21 @@ public final class SwtBusyUtility {
               }
             }
           });
-
         }
-      });
+        finally {
+          synchronized (lock) {
+            lock.notifyAll();
+          }
+        }
+      }
+    });
 
+    synchronized (lock) {
       try {
         lock.wait();
       }
       catch (InterruptedException e) {
-        //nop
+        LOG.warn("Interrupted while waiting for the runnable providing busy feedback to complete.", e);
       }
     }
   }
@@ -118,52 +124,49 @@ public final class SwtBusyUtility {
     }
 
     final Object lock = new Object();
-    synchronized (lock) {
 
-      final Display display = busyHandler.getDisplay();
-      display.asyncExec(new Runnable() {
-        @Override
-        public void run() {
-          if (!busyHandler.isEnabled()) {
-            return;
-          }
+    final Display display = busyHandler.getDisplay();
+    display.asyncExec(new Runnable() {
+      @Override
+      public void run() {
+        if (!busyHandler.isEnabled()) {
+          return;
+        }
 
-          IWorkbenchWindow activeWorkbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-          if (activeWorkbenchWindow == null) {
-            return;
-          }
+        IWorkbenchWindow activeWorkbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+        if (activeWorkbenchWindow == null) {
+          return;
+        }
 
-          try {
-            activeWorkbenchWindow.run(true, true, new IRunnableWithProgress() {
-              @Override
-              public void run(IProgressMonitor workbenchJobMonitor) throws InvocationTargetException, InterruptedException {
-                try {
-                  runnable.run(workbenchJobMonitor);
-                }
-                finally {
-                  synchronized (lock) {
-                    lock.notifyAll();
-                  }
-                }
-              }
-            });
-          }
-          catch (InvocationTargetException e) {
-            LOG.warn("Exception while showing workbench busy indicator.", e);
-          }
-          catch (InterruptedException e) {
-            LOG.warn("Exception while showing workbench busy indicator.", e);
+        try {
+          activeWorkbenchWindow.run(true, true, new IRunnableWithProgress() {
+            @Override
+            public void run(IProgressMonitor workbenchJobMonitor) throws InvocationTargetException, InterruptedException {
+              runnable.run(workbenchJobMonitor);
+            }
+          });
+        }
+        catch (InvocationTargetException e) {
+          LOG.warn("Exception while showing workbench busy indicator.", e);
+        }
+        catch (InterruptedException e) {
+          LOG.warn("Exception while showing workbench busy indicator.", e);
+        }
+        finally {
+          synchronized (lock) {
+            lock.notifyAll();
           }
         }
-      });
+      }
+    });
 
+    synchronized (lock) {
       try {
         lock.wait();
       }
       catch (InterruptedException e) {
-        //nop
+        LOG.warn("Interrupted while waiting for the runnable blocking the workbench to complete.", e);
       }
-
     }
   }
 
@@ -216,4 +219,41 @@ public final class SwtBusyUtility {
     return affectedParts;
   }
 
+  /**
+   * Runs the given {@link Runnable} once the {@link IWorkbench} is not blocked. If not being blocked at the time of the
+   * method call, the {@link Runnable} is run immediately. Otherwise, it is run asynchronously in the UI-Thread once the
+   * workbench is not blocked anymore.
+   *
+   * @param env
+   *          {@link ISwtEnvironment}
+   * @param runnable
+   *          {@link Runnable} to be run.
+   */
+  public static void asyncIdleExec(final ISwtEnvironment env, final Runnable runnable) {
+    final IBusyHandler busyHandler = SERVICES.getService(IBusyManagerService.class).getHandler(env.getClientSession());
+
+    if (!busyHandler.isBlocking()) {
+      runnable.run();
+    }
+    else {
+      Job job = new Job("Wait for blocked workbench to be finish") {
+
+        @Override
+        protected IStatus run(IProgressMonitor monitor) {
+          // Wait for the workbench to exit the blocking mode.
+          busyHandler.waitForBlockingToEnd();
+
+          // Execute the runnable in the UI-thread.
+          if (!env.getDisplay().isDisposed()) {
+            env.getDisplay().syncExec(runnable);
+          }
+
+          return Status.OK_STATUS;
+        }
+      };
+      job.setSystem(true);
+      job.setUser(false);
+      job.schedule();
+    }
+  }
 }
