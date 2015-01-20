@@ -27,6 +27,7 @@ import org.eclipse.scout.rt.ui.swt.LogicalGridLayout;
 import org.eclipse.scout.rt.ui.swt.basic.ISwtScoutComposite;
 import org.eclipse.scout.rt.ui.swt.basic.SwtScoutComposite;
 import org.eclipse.scout.rt.ui.swt.basic.WidgetPrinter;
+import org.eclipse.scout.rt.ui.swt.busy.SwtBusyUtility;
 import org.eclipse.scout.rt.ui.swt.form.fields.ISwtScoutFormField;
 import org.eclipse.scout.rt.ui.swt.form.fields.SwtScoutFieldComposite;
 import org.eclipse.scout.rt.ui.swt.form.fields.SwtScoutFormFieldGridData;
@@ -208,25 +209,58 @@ public class SwtScoutForm extends SwtScoutComposite<IForm> implements ISwtScoutF
     }
   }
 
-  protected void handleRequestFocusFromScout(IFormField modelField, boolean force) {
-    if (modelField == null) {
+  protected void handleRequestFocusFromScout(final IFormField modelField, final boolean force) {
+    final Control focusControl = findFocusControl(modelField);
+    if (focusControl == null) {
       return;
     }
-    Control comp = findUiField(modelField);
-    if (comp != null && comp.getVisible()) {
-      Control[] tabList = (comp instanceof Composite ? ((Composite) comp).getTabList() : null);
-      if (tabList != null && tabList.length > 0) {
-        comp = tabList[0];
-      }
-      if (comp != null && comp.getVisible()) {
+
+    // Wait to request the focus until the workbench is not in blocking mode because the event is being ignored otherwise.
+    // For more information see Bugzilla 457859.
+    SwtBusyUtility.asyncIdleExec(getEnvironment(), new Runnable() {
+
+      @Override
+      public void run() {
+        if (focusControl.isDisposed() || !focusControl.isVisible()) {
+          return;
+        }
+
         if (force) {
-          comp.forceFocus();
+          focusControl.forceFocus();
         }
         else {
-          comp.setFocus();
+          focusControl.setFocus();
         }
       }
+    });
+  }
+
+  protected Control findFocusControl(final IFormField modelField) {
+    if (modelField == null) {
+      return null;
     }
+
+    final Control comp = findUiField(modelField);
+    if (comp == null || !comp.getVisible()) {
+      return null;
+    }
+
+    if (!(comp instanceof Composite)) {
+      return comp;
+    }
+
+    // Get the first focusable control of the composite.
+    final Control[] tabList = ((Composite) comp).getTabList();
+    if (tabList.length == 0) {
+      return comp;
+    }
+
+    final Control tabControl = tabList[0];
+    if (tabControl != null && tabControl.getVisible()) {
+      return tabControl;
+    }
+
+    return null;
   }
 
   private class P_ScoutFormListener implements FormListener {

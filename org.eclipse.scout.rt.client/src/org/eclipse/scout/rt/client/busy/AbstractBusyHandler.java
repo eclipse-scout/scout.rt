@@ -42,7 +42,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ContentAssistTreeFo
  * Implementations are ui specific an can be found in the swing, swt, rwt implementation sof scout.
  * <p>
  * This abstract implementation is Thread-safe.
- * 
+ *
  * @author imo
  * @since 3.8
  */
@@ -57,6 +57,9 @@ public abstract class AbstractBusyHandler implements IBusyHandler {
   private long m_shortOperationMillis = 200L;
   private long m_longOperationMillis = 3000L;
   private boolean m_enabled = true;
+
+  private int m_blockingCount;
+  private final Object m_blockingCountLock = new Object();
 
   public AbstractBusyHandler(IClientSession session) {
     m_session = session;
@@ -84,6 +87,50 @@ public abstract class AbstractBusyHandler implements IBusyHandler {
     //avoid unnecessary locks
     if (isBusyOperationNoLock(job)) {
       removeBusyOperation(job);
+    }
+  }
+
+  @Override
+  public void onBlockingBegin() {
+    synchronized (m_blockingCountLock) {
+      m_blockingCount++;
+    }
+  }
+
+  @Override
+  public void onBlockingEnd() {
+    synchronized (m_blockingCountLock) {
+      if (m_blockingCount == 0) {
+        return;
+      }
+
+      m_blockingCount--;
+
+      if (m_blockingCount == 0) {
+        m_blockingCountLock.notifyAll();
+      }
+    }
+  }
+
+  @Override
+  public boolean isBlocking() {
+    synchronized (m_blockingCountLock) {
+      return m_blockingCount > 0;
+    }
+  }
+
+  @Override
+  public void waitForBlockingToEnd() {
+    synchronized (m_blockingCountLock) {
+      while (isBlocking()) {
+        LOG.debug("Waiting for the application to exit blocking mode");
+        try {
+          m_blockingCountLock.wait();
+        }
+        catch (InterruptedException e) {
+          LOG.warn("Interrupted while waiting for the application to exit blocking mode.");
+        }
+      }
     }
   }
 
