@@ -27,6 +27,7 @@ import org.eclipse.scout.commons.holders.IntegerHolder;
 import org.eclipse.scout.rt.client.ui.action.fixture.TestFormWithTemplateSmartfield;
 import org.eclipse.scout.rt.client.ui.action.fixture.TestFormWithTemplateSmartfield.MainBox.SmartField1;
 import org.eclipse.scout.rt.client.ui.action.fixture.TestFormWithTemplateSmartfield.MainBox.SmartField2;
+import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -94,6 +95,17 @@ public class ActionTest {
   @Test
   public void testActionClassIds() throws ProcessingException {
     assertEquals(TEST_ACTION_CLASS_ID, new AnnotatedAction().classId());
+  }
+
+  /**
+   * test for {@link AbstractAction#combineKeyStrokes(String...)}
+   */
+  @Test
+  public void testCombineKeyStrokes() throws Exception {
+    final BaseAction testAction = new BaseAction();
+    assertEquals("", testAction.combineKeyStrokes());
+    assertEquals(IKeyStroke.F1, testAction.combineKeyStrokes(IKeyStroke.F1));
+    assertEquals(IKeyStroke.CONTROL + IKeyStroke.KEY_STROKE_SEPARATOR + IKeyStroke.F1, testAction.combineKeyStrokes(IKeyStroke.CONTROL, IKeyStroke.F1));
   }
 
   /**
