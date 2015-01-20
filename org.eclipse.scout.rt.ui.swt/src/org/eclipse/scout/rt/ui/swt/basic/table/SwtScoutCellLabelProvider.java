@@ -64,10 +64,8 @@ public class SwtScoutCellLabelProvider extends CellLabelProvider {
 
   @Override
   public void update(ViewerCell cell) {
-    // In 'SwtScoutTable' an invisible 'TableColumn' is installed as the very first column to address SWT bug 43910.
-    // That is why the SWT column index must be decremented prior accessing the Scout column model.
     final int currentColumnIndex = cell.getColumnIndex();
-    final int firstColumnIndex = m_swtTable.getColumnOrder()[1];
+    final int firstColumnIndex = m_swtTable.getColumnOrder()[1]; // In 'SwtScoutTable' an invisible 'TableColumn' is installed as the very first column to address SWT bug 43910. So the first real column is at position 1 instead of 0.
     final boolean firstColumn = (currentColumnIndex == firstColumnIndex);
 
     final ITableRow scoutRow = (ITableRow) cell.getElement();
