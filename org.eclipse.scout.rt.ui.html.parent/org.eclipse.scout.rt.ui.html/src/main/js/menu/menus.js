@@ -3,7 +3,7 @@ scout.menus = {
     /**
      * @memberOf scout.menus
      */
-    CLOSING_EVENTS: 'mousedown.contextMenu keydown.contextMenu mousewheel.contextMenu',
+    CLOSING_EVENTS: 'mousedown.contextMenu keydown.contextMenu',
 
     filter: function(menus, types) {
       if (!menus) {

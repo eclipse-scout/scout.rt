@@ -1,6 +1,8 @@
 // SCOUT GUI
 // (c) Copyright 2013-2014, BSI Business Systems Integration AG
 scout.Scrollbar = function($parent, options) {
+  var begin = 0,
+    that = this;
 
   this.defaultOptions = {
     axis: 'y',
@@ -12,8 +14,8 @@ scout.Scrollbar = function($parent, options) {
   this._$parent = $parent;
   this._beginDefault = 0;
   this._thumbRange;
-  this._scroll;
-  this._offset;
+  this._scrollSize;
+  this._offsetSize;
   this._updateThumbPending = false;
 
   // create scrollbar
@@ -28,9 +30,7 @@ scout.Scrollbar = function($parent, options) {
 
   this._dim = this.options.axis === 'x' ? 'Width' : 'Height';
   this._dir = this.options.axis === 'x' ? 'left' : 'top';
-
-  var begin = 0,
-    that = this;
+  this._scrollDir = this.options.axis === 'x' ? 'scrollLeft' : 'scrollTop';
 
   // event handling
   $parent.parent().on('DOMMouseScroll mousewheel', '', scrollWheel);
@@ -39,12 +39,13 @@ scout.Scrollbar = function($parent, options) {
   $(window).on('load resize', this.updateThumb.bind(this));
 
   function scrollWheel(event) {
+    var w, d;
     if (event.ctrlKey) {
       return true; // allow ctrl+mousewheel to zoom the page
     }
     event = event.originalEvent || window.event.originalEvent;
-    var w = event.wheelDelta ? -event.wheelDelta / 2 : event.detail * 60,
-      d = that._scroll / that._offset;
+    w = event.wheelDelta ? -event.wheelDelta / 2 : event.detail * 60;
+    d = that._scrollSize / that._offsetSize;
     that._setThumb(w / d);
     return false;
   }
@@ -93,51 +94,55 @@ scout.Scrollbar.prototype.updateThumb = function() {
  * do not use this internal method
  */
 scout.Scrollbar.prototype._updateThumbImpl = function() {
-  this._offset = this._$parent[0]['offset' + this._dim];
-  this._scroll = this._$parent[0]['scroll' + this._dim];
+  this._offsetSize = this._$parent[0]['offset' + this._dim];
+  this._scrollSize = this._$parent[0]['scroll' + this._dim];
 
   var margin = parseFloat(this._$scrollbar.css('margin-top')),
-    topContainer = parseFloat(this._$parent.css(this._dir));
+    scrollPos = this._$parent.parent()[this._scrollDir]();
 
   // when needed: move container to right position
-  if (this._offset - topContainer >= this._scroll) {
-    topContainer = Math.min(0, -this._scroll + this._offset);
-    this._$parent.stop().animateAVCSD(this._dir, topContainer);
+  if (this._offsetSize + scrollPos >= this._scrollSize) {
+    scrollPos = Math.max(0, this._scrollSize - this._offsetSize);
+    this._$parent.parent()[this._scrollDir](scrollPos);
   }
 
   // calc size and range of thumb
-  var thumbSize = Math.max(this._offset * this._offset / this._scroll - margin * 2, 30);
-  this._thumbRange = this._offset - thumbSize - margin * 2;
+  var thumbSize = Math.max(this._offsetSize * this._offsetSize / this._scrollSize - margin * 2, 30);
+  this._thumbRange = this._offsetSize - thumbSize - margin * 2;
 
   // set size of thumb
   this._$thumb.css(this._dim.toLowerCase(), thumbSize);
   this._beginDefault = thumbSize / 2;
 
   // set location of thumb
-  this._$thumb.css(this._dir, topContainer / (this._offset - this._scroll) * this._thumbRange);
+  var posNew = -scrollPos / (this._offsetSize - this._scrollSize) * this._thumbRange;
+  this._$thumb.css(this._dir, posNew);
 
   // show scrollbar
-  if (this._offset >= this._scroll) {
+  if (this._offsetSize >= this._scrollSize) {
     this._$scrollbar.css('visibility', 'hidden');
   } else {
     this._$scrollbar.css('visibility', 'visible');
   }
+  this._$scrollbar.css(this._dir, scrollPos);
 };
 
-scout.Scrollbar.prototype.scrollTop = function(top) {
-  if (top === undefined) {
-    return -parseFloat(this._$parent.css(this._dir));
+scout.Scrollbar.prototype.scrollTop = function(scrollTop) {
+  if (scrollTop === undefined) {
+    return this._$parent.parent().scrollTop();
   }
-
-  this._$parent.css(this._dir, -top);
-  this._$thumb.css(this._dir, -top / (this._offset - this._scroll) * this._thumbRange);
+  var posNew = -scrollTop / (this._offsetSize - this._scrollSize) * this._thumbRange;
+  this._$parent.parent().scrollTop(scrollTop);
+  this._$scrollbar.css(this._dir, scrollTop);
+  this._$thumb.css(this._dir, posNew);
 };
-
 
 scout.Scrollbar.prototype._setThumb = function(posDiff) {
   var posOld = this._$thumb.offset()[this._dir] - this._$scrollbar.offset()[this._dir],
-    posNew = Math.min(this._thumbRange, Math.max(0, posOld + posDiff));
+    posNew = Math.min(this._thumbRange, Math.max(0, posOld + posDiff)),
+    scrollPos = -(this._offsetSize - this._scrollSize) / this._thumbRange * posNew;
 
-  this._$parent.css(this._dir, (this._offset - this._scroll) / this._thumbRange * posNew);
+  this._$parent.parent()[this._scrollDir](scrollPos);
+  this._$scrollbar.css(this._dir, scrollPos);
   this._$thumb.css(this._dir, posNew);
 };

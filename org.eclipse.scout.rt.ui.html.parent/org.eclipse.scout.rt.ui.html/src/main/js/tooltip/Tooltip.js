@@ -40,6 +40,10 @@ scout.Tooltip.prototype.render = function($parent) {
     $(document).on('keydown.tooltip', this.remove.bind(this));
   }
   this.rendered = true;
+
+  if (this.$origin) {
+    scout.scrollbars.attachScrollHandlers(this.$origin, this.remove.bind(this));
+  }
 };
 
 scout.Tooltip.prototype.position = function() {
@@ -93,9 +97,12 @@ scout.Tooltip.prototype.position = function() {
 };
 
 scout.Tooltip.prototype.remove = function() {
-  this.rendered = false;
   $(document).off('mousedown.tooltip keydown.tooltip');
+  if (this.$origin) {
+    scout.scrollbars.detachScrollHandlers(this.$origin);
+  }
   this.$container.remove();
+  this.rendered = false;
 };
 
 scout.Tooltip.prototype._onTooltipClicked = function(event) {

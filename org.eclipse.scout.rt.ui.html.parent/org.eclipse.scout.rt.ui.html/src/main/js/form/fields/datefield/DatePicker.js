@@ -23,6 +23,8 @@ scout.DatePicker.prototype.show = function(viewDate, selectedDate, animated) {
       .mousedown(this._onMouseDown.bind(this));
     $('body').append(this.$popup);
 
+    scout.scrollbars.attachScrollHandlers(this._dateField.$field, this.close.bind(this));
+
     this._$header = this._createHeader().appendTo(this.$popup);
     this._$header.find('.date-box-left-y, .date-box-left-m, .date-box-right-m, .date-box-right-y').mousedown(this._onNavigationMouseDown.bind(this));
 
@@ -150,6 +152,14 @@ scout.DatePicker.prototype.close = function() {
     this.$popup.remove();
     this.$popup = null;
   }
+  scout.scrollbars.detachScrollHandlers(this._dateField.$field);
+};
+
+scout.DatePicker.prototype._onCloseEvent = function() {
+  if ($.contains(this.$popup[0], event.target)) {
+    return;
+  }
+  this.close();
 };
 
 scout.DatePicker.prototype.shiftViewDate = function(years, months, days) {

@@ -23,6 +23,9 @@ scout.Popup.prototype.render = function() {
  */
 scout.Popup.prototype._attachCloseHandler = function() {
   $(document).one(scout.menus.CLOSING_EVENTS, this.remove.bind(this));
+  if (this.$origin) {
+    scout.scrollbars.attachScrollHandlers(this.$origin, this.remove.bind(this));
+  }
 };
 
 scout.Popup.prototype.appendToBody = function($element) {
@@ -37,6 +40,9 @@ scout.Popup.prototype.remove = function() {
   this.$container.remove();
   // remove all clean-up handlers
   $(document).off('.contextMenu');
+  if (this.$origin) {
+    scout.scrollbars.detachScrollHandlers(this.$origin);
+  }
 };
 
 scout.Popup.prototype.setLocation = function(location) {

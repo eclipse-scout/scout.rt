@@ -195,6 +195,7 @@ scout.AbstractSmartField.prototype._showPopup = function(numOptions, vararg) {
   });
   scout.graphics.setSize($optionsDiv, fieldBounds.width, popupHeight - optionHeight);
   this._setStatusText(vararg);
+  scout.scrollbars.attachScrollHandlers(this.$field, this._closePopup.bind(this));
 };
 
 scout.AbstractSmartField.prototype._onPopupMousedown = function(event) {
@@ -259,6 +260,7 @@ scout.AbstractSmartField.prototype._closePopup = function() {
     this._$popup.remove();
     this._$popup = null;
   }
+  scout.scrollbars.detachScrollHandlers(this.$field);
 };
 
 /**

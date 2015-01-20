@@ -12,8 +12,10 @@ scout.scrollbars = {
    * add elements.
    */
   install: function($container, options) {
-    var nativeScrollbars = false;
-    var htmlContainer = scout.HtmlComponent.optGet($container);
+    var nativeScrollbars = false,
+      htmlContainer = scout.HtmlComponent.optGet($container),
+      htmlScrollable, $scrollable, scrollbar;
+
     options = options || {};
     if (nativeScrollbars) {
       $.log.debug('use native scrollbars for container ' + scout.graphics.debugOutput($container));
@@ -21,15 +23,12 @@ scout.scrollbars = {
         css('overflow-x', 'hidden').
         css('overflow-y', 'auto').
         css('-webkit-overflow-scrolling', 'touch');
-
-      if (htmlContainer) {
-        htmlContainer.scrollable = true;
-      }
-      return $container;
+      htmlScrollable = htmlContainer;
+      $scrollable = $container;
     } else {
       $.log.debug('install JS-scrollbars for container ' + scout.graphics.debugOutput($container) +  ' and add scrollable DIV');
-      var $scrollable = $container.appendDiv('scrollable'),
-        scrollbar = new scout.Scrollbar($scrollable, options);
+      $scrollable = $container.appendDiv('scrollable');
+      scrollbar = new scout.Scrollbar($scrollable, options);
       scrollbar.updateThumb();
       $scrollable.data('scrollbar', scrollbar);
 
@@ -37,14 +36,17 @@ scout.scrollbars = {
       // This is necessary in order to properly propagate the layout call to its children.
       // It is only necessary if the children use the html component pattern.
       if (htmlContainer && options.createHtmlComponent) {
-        var htmlScrollable = new scout.HtmlComponent($scrollable, htmlContainer.session);
-        htmlScrollable.scrollable = true;
+        htmlScrollable = new scout.HtmlComponent($scrollable, htmlContainer.session);
         // Disable pixel based sizing to avoid having the size set. Otherwise no scrollbars would appear since it actually is the viewport size.
         htmlScrollable.pixelBasedSizing = false;
         htmlContainer.setLayout(new scout.SingleLayout(htmlScrollable));
       }
-      return $scrollable;
     }
+    if (htmlScrollable) {
+      htmlScrollable.scrollable = true;
+    }
+    $container.data('scrollable', true);
+    return $scrollable;
   },
 
   update: function($scrollable) {
@@ -79,6 +81,39 @@ scout.scrollbars = {
     } else if (optionY + optionH > scrollableH) {
       scrollTopFunc(scrollTopFunc() + optionY + optionH - scrollableH);
     }
+  },
+
+  /**
+   * Attaches the given handler to each scrollable parent, including $origin if it is scrollable as well.<p>
+   * Make sure you remove the handlers when not needed anymore using detachScrollHandlers.
+   */
+  attachScrollHandlers: function($origin, handler) {
+    var $scrollParents = [],
+      $elem = $origin;
+
+    while ($elem.length > 0) {
+      if ($elem.data('scrollable')) {
+        $elem.scroll(handler);
+        $elem.data('scrollHandler', handler);
+        $scrollParents.push($elem);
+      }
+      $elem = $elem.parent();
+    }
+    $origin.data('scrollParents', $scrollParents);
+  },
+
+  detachScrollHandlers: function($origin) {
+    var $scrollParents = $origin.data('scrollParents');
+    if (!$scrollParents) {
+      return;
+    }
+    for (var i=0; i < $scrollParents.length; i++) {
+      var $elem = $scrollParents[i];
+      var handler = $elem.data('scrollHandler');
+      $elem.off('scroll', handler);
+      $elem.removeData('scrollHandler');
+    }
+    $origin.removeData('scrollParents');
   }
 
 };

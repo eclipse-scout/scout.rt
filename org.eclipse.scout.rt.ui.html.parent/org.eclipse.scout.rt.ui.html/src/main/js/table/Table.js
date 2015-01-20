@@ -402,7 +402,7 @@ scout.Table.prototype._drawData = function(startRow) {
       y = event.pageY;
 
     if ($selectedRows.length > 0) {
-      waitForServer(that.session, showMenuPopup);
+      waitForServer(that.session, showMenuPopup.bind(that));
     }
 
     /* TODO AWE/CGU: (scout, menu) try to get rid of aboutToShow, than delete this method
@@ -431,6 +431,7 @@ scout.Table.prototype._drawData = function(startRow) {
       var menuItems = that._filterMenus($selectedRows);
       if (menuItems.length > 0) {
         var popup = new scout.Popup();
+        popup.$origin = this._$scrollable;
         popup.render();
         scout.menus.appendMenuItems(popup, menuItems);
         popup.setLocation(new scout.Point(x, y));
