@@ -1,3 +1,7 @@
+.check-box-field>.field{
+  padding: 7px 0px 7px 0px;
+}
+
 .check-box-field>span{
   & label{
       display: inline-block;
@@ -40,11 +44,10 @@
   }
 
   & input[type=checkbox]:focus + label:before {
-    .focus-border(2px);
+    border-color: @focus-color;
     background-color:@focus-color-glow;
     outline: none;
   }
-
 
   & input[type=checkbox]:checked + label:before {
       .font-icon;
@@ -52,7 +55,7 @@
       color: @palette-black;
       font-size: 11px;
       text-align: center;
-      line-height: 16px;
+      line-height: 15px;
   }
   & label:before {
       border: 2px solid @border-color;
