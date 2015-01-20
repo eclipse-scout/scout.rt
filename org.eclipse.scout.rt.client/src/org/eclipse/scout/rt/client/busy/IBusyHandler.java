@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.client.IClientSession;
  * <p>
  * The decision whether or not the progress should be visible is made in the acceptor
  * {@link IBusyHandler#acceptJob(Job)}
- * 
+ *
  * @author imo
  * @since 3.8
  */
@@ -40,6 +40,27 @@ public interface IBusyHandler {
    * callback when a job is done
    */
   void onJobEnd(Job job);
+
+  /**
+   * callback when a {@link IBusyHandler} starts blocking the application.
+   */
+  void onBlockingBegin();
+
+  /**
+   * callback when a {@link IBusyHandler} ends blocking the application.
+   */
+  void onBlockingEnd();
+
+  /**
+   * Blocks the caller until the application is not blocked anymore. Has no effect if the application is not blocked at
+   * the time of this method call.
+   */
+  void waitForBlockingToEnd();
+
+  /**
+   * @return <code>true</code> if the application is in blocking mode, e.g. by a long-running operation.
+   */
+  boolean isBlocking();
 
   boolean isBusy();
 
