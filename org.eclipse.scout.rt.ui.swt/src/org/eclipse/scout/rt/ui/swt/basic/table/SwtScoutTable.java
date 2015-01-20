@@ -563,7 +563,6 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
     //
     if (swtTableEvent != null) {
       getSwtTableViewer().setInput(getScoutObject().getFilteredRows());
-      getSwtTableViewer().refresh();
     }
     // refresh selection, indexes might have changed
     switch (e.getType()) {
@@ -943,7 +942,14 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
     }
     // if column with icon has changed position
     if (uiColumnOrder[1] != m_uiColumnOrder[1] && getScoutObject().getRowCount() > 0 && StringUtility.hasText(getScoutObject().getRow(0).getIconId())) {
-      getSwtTableViewer().refresh();
+      getSwtField().setRedraw(false);
+      try {
+        // Disable redraw during the time of refresh to omit flickering and boost performance.
+        getSwtTableViewer().refresh();
+      }
+      finally {
+        getSwtField().setRedraw(true);
+      }
     }
     int[] truncatedColOrder = new int[uiColumnOrder.length - 1];
     for (int i = 0; i < truncatedColOrder.length; i++) {
