@@ -397,8 +397,10 @@ public class RwtScoutTableCellEditor {
 
       m_editScoutRow = null;
       m_editScoutCol = null;
-      for (Control c : m_container.getChildren()) {
-        c.dispose();
+      if (!m_container.isDisposed()) {
+        for (Control c : m_container.getChildren()) {
+          c.dispose();
+        }
       }
       super.deactivate(e);
       if (e.eventType == ColumnViewerEditorDeactivationEvent.EDITOR_CANCELED) {
