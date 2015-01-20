@@ -32,6 +32,9 @@ import org.eclipse.swt.widgets.TableItem;
 
 public class RwtScoutColumnModel extends ColumnLabelProvider {
 
+  public static final String EDITABLE_VARIANT_PREFIX = "EDITABLE_CELL_VARIANT_";
+  public static final String EDITABLE_VARIANT_CELL_MARKER = "EDITABLE";
+
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(RwtScoutColumnModel.class);
   private static final long serialVersionUID = 1L;
 
@@ -278,24 +281,28 @@ public class RwtScoutColumnModel extends ColumnLabelProvider {
     StringBuilder builder = new StringBuilder();
 
     Map<IColumn<?>, P_CachedCell> cachedRow = m_cachedCells.get(row);
-    for (int column = 0; column < row.getCellCount(); column++) {
-      if (column > 0) {
-        builder.append("_");
+    int[] visibleColumnIndexes = getScoutTable().getColumnSet().getVisibleColumnIndexes();
+    boolean isEditable = false;
+    for (int i = 0; i < visibleColumnIndexes.length; i++) {
+      if (i > 0) {
+        builder.append('_');
       }
 
-      IColumn<?> col = getScoutTable().getColumnSet().getColumn(column);
-      if (col.isVisible()) {
+      IColumn<?> col = getScoutTable().getColumnSet().getColumn(visibleColumnIndexes[i]);
+      if (col != null && cachedRow != null) {
         P_CachedCell cachedCell = cachedRow.get(col);
         if (cachedCell != null && cachedCell.m_isEditable) {
-          builder.append("EDITABLE");
+          builder.append(EDITABLE_VARIANT_CELL_MARKER);
+          isEditable = true;
         }
       }
     }
 
-    String variant = builder.toString();
-    if (variant.contains("EDITABLE")) {
-      return "EDITABLE_CELL_VARIANT_" + variant;
+    if (isEditable) {
+      builder.insert(0, EDITABLE_VARIANT_PREFIX);
+      return builder.toString();
     }
+
     return null;
   }
 
