@@ -406,11 +406,11 @@ public final class SwingUtility {
     String key = "";
     boolean hasMeta = false;
     for (String s : a) {
-      if ("shift".equalsIgnoreCase(s)) {
+      if (IKeyStroke.SHIFT.equalsIgnoreCase(s)) {
         shift = "shift ";
         hasMeta = true;
       }
-      else if ("control".equalsIgnoreCase(s)) {
+      else if (IKeyStroke.CONTROL.equalsIgnoreCase(s)) {
         ctrl = "control ";
         hasMeta = true;
       }
@@ -422,12 +422,12 @@ public final class SwingUtility {
         alt = "alt ";
         hasMeta = true;
       }
-      else if ("alt".equalsIgnoreCase(s)) {
+      else if (IKeyStroke.ALT.equalsIgnoreCase(s)) {
         alt = "alt ";
         hasMeta = true;
       }
       else {
-        if ("TAB".equalsIgnoreCase(s)) {
+        if (IKeyStroke.TAB.equalsIgnoreCase(s)) {
           kind = "pressed ";
           key = s;
         }

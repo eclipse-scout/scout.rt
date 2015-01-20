@@ -14,7 +14,6 @@ import java.security.Permission;
 import java.util.List;
 
 import org.eclipse.scout.commons.ConfigurationUtility;
-import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
@@ -32,6 +31,7 @@ import org.eclipse.scout.rt.client.extension.ui.action.ActionChains.ActionInitAc
 import org.eclipse.scout.rt.client.extension.ui.action.ActionChains.ActionSelectionChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.action.IActionExtension;
 import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
+import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.keystroke.KeyStrokeNormalizer;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
@@ -47,7 +47,6 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractAction.class);
 
   private boolean m_initialized;
-  private final EventListenerList m_listenerList = new EventListenerList();
   private final IActionUIFacade m_uiFacade;
   private boolean m_inheritAccessibility;
   // enabled is defined as: enabledGranted && enabledProperty && enabledProcessing && enabledInheritAccessibility
@@ -129,10 +128,10 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
    * The keystroke has to follow a certain pattern: The modifiers (alt, shift, control) are separated from the key by a
    * '-'. Examples:
    * <ul>
-   * <li>control-alt-1
-   * <li>control-shift-alt-1
-   * <li>f11
-   * <li>alt-f11
+   * <li>control-alt-1 (combineKeyStrokes(IKeyStroke.CONTROL,IKeyStroke.ALT,"1"))
+   * <li>control-shift-alt-1 (combineKeyStrokes(IKeyStroke.CONTROL,IKeyStroke.SHIFT,IKeyStroke.ALT,"1"))
+   * <li>f11 (IKeyStroke.F11)
+   * <li>alt-f11 (combineKeyStrokes(IKeyStroke.ALT,IKeyStroke.F11))
    * </ul>
    *
    * @return
@@ -665,6 +664,22 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   public char getMnemonic() {
     Character c = (Character) propertySupport.getProperty(PROP_MNEMONIC);
     return c != null ? c.charValue() : 0x00;
+  }
+
+  /**
+   * Combine a key stroke consisting of multiple keys.
+   */
+  public String combineKeyStrokes(String... keys) {
+    StringBuilder builder = new StringBuilder();
+
+    for (String key : keys) {
+      if (builder.length() > 0) {
+        builder.append(IKeyStroke.KEY_STROKE_SEPARATOR);
+      }
+      builder.append(key);
+    }
+
+    return builder.toString();
   }
 
   @SuppressWarnings("deprecation")
