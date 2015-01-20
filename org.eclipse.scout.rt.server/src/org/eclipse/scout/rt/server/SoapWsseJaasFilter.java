@@ -44,8 +44,6 @@ import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.server.commons.servletfilter.FilterConfigInjection;
 import org.eclipse.scout.rt.server.commons.servletfilter.security.SecureHttpServletRequestWrapper;
 import org.eclipse.scout.rt.server.internal.Activator;
-import org.eclipse.scout.rt.server.servlet.IServletHelperService;
-import org.eclipse.scout.service.SERVICES;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -133,27 +131,57 @@ public class SoapWsseJaasFilter implements Filter {
     }
     final InputStream cacheIn = new ByteArrayInputStream(cacheOut.toByteArray());
     cacheOut = null;
-
-    final IServletHelperService svc = SERVICES.getService(IServletHelperService.class);
-    if (svc == null) {
-      LOG.error("Service IServletHelperService not available."
-          + "Depending on the servlet version add org.eclipse.scout.rt.server.servlet31 or "
-          + "org.eclipse.scout.rt.server.servlet25 to your product");
-      ((HttpServletResponse) response).sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-      return;
-    }
     //
-    continueChainWithPrincipal(subject, createReplayRequest(request, cacheIn, svc), (HttpServletResponse) response, chain);
+    continueChainWithPrincipal(subject, createReplayRequest(request, cacheIn), (HttpServletResponse) response, chain);
   }
 
   /**
    * @return request with new {@link ServletInputStream} that can be read again with original data
    */
-  private HttpServletRequestWrapper createReplayRequest(ServletRequest request, final InputStream cacheIn, final IServletHelperService svc) {
+  private HttpServletRequestWrapper createReplayRequest(ServletRequest request, final InputStream cacheIn) {
     return new HttpServletRequestWrapper((HttpServletRequest) request) {
       @Override
       public ServletInputStream getInputStream() throws IOException {
-        return svc.createInputStream(cacheIn);
+        return new ServletInputStream() {
+          private javax.servlet.ReadListener m_readListener;
+          private boolean m_finished = false;
+
+          @Override
+          public int read() throws IOException {
+            final int next = cacheIn.read();
+            if (next == -1) {
+              m_finished = true;
+              if (m_readListener != null) {
+                m_readListener.onAllDataRead();
+              }
+            }
+            return next;
+          }
+
+          @Override
+          public boolean isFinished() {
+            return m_finished;
+          }
+
+          @Override
+          public boolean isReady() {
+            return true;
+          }
+
+          @Override
+          public void setReadListener(javax.servlet.ReadListener readListener) {
+            m_readListener = readListener;
+            if (m_readListener != null) {
+              try {
+                m_readListener.onDataAvailable();
+              }
+              catch (IOException e) {
+                LOG.error("Error reading stream", e);
+                m_readListener.onError(e);
+              }
+            }
+          }
+        };
       }
     };
   }

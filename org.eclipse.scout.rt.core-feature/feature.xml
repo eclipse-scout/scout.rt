@@ -150,18 +150,4 @@
          version="2.7.1.v201005080400"
          unpack="false"/>
 
-   <plugin
-         id="org.eclipse.scout.rt.server.servlet25"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.scout.rt.server.servlet31"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
 </feature>
