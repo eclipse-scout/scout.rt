@@ -1049,4 +1049,13 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
    */
   void setTableStatusVisible(boolean visible);
 
+  /**
+   * @since 5.1.0
+   */
+  IReloadHandler getReloadHandler();
+
+  /**
+   * @since 5.1.0
+   */
+  void setReloadHandler(IReloadHandler reloadHandler);
 }

@@ -708,7 +708,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         SERVICES.getService(IExceptionHandlerService.class).handleException(ex);
       }
       catch (Throwable t) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(createNewUnexpectedProcessingException(t));
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
       }
     }
     else {
@@ -3769,7 +3769,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       SERVICES.getService(IExceptionHandlerService.class).handleException(e);
     }
     catch (Throwable t) {
-      SERVICES.getService(IExceptionHandlerService.class).handleException(createNewUnexpectedProcessingException(t));
+      SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
     }
   }
 
@@ -3806,7 +3806,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       SERVICES.getService(IExceptionHandlerService.class).handleException(e);
     }
     catch (Throwable t) {
-      SERVICES.getService(IExceptionHandlerService.class).handleException(createNewUnexpectedProcessingException(t));
+      SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
     }
   }
 
@@ -3912,7 +3912,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
         SERVICES.getService(IExceptionHandlerService.class).handleException(ex);
       }
       catch (Throwable t) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(createNewUnexpectedProcessingException(t));
+        SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
       }
     }
   }
@@ -3962,7 +3962,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
             SERVICES.getService(IExceptionHandlerService.class).handleException(ex);
           }
           catch (Throwable t) {
-            SERVICES.getService(IExceptionHandlerService.class).handleException(createNewUnexpectedProcessingException(t));
+            SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("Unexpected", t));
           }
         }
       }
@@ -4154,12 +4154,14 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     return m_uiFacade;
   }
 
-  private ProcessingException createNewUnexpectedProcessingException(Throwable t) {
-    return new ProcessingException("Unexpected", t);
+  @Override
+  public void setReloadHandler(IReloadHandler reloadHandler) {
+    m_reloadHandler = reloadHandler;
   }
 
-  protected void setReloadHandler(IReloadHandler reloadHandler) {
-    m_reloadHandler = reloadHandler;
+  @Override
+  public IReloadHandler getReloadHandler() {
+    return m_reloadHandler;
   }
 
   @Override
