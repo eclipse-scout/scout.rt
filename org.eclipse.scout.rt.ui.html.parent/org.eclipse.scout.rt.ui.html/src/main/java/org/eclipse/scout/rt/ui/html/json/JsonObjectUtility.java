@@ -325,6 +325,9 @@ public final class JsonObjectUtility {
    *          to false ignores this event.
    */
   public static <T> T jsonArrayElementToJava(JSONArray jsonArray, int index, Class<T> type, boolean throwForMissingProperty) {
+    if (type == Void.class) {
+      return null;
+    }
     Object jval = getTyped(jsonArray, index, type);
     return jsonValueToJava(jval, type, throwForMissingProperty);
   }
