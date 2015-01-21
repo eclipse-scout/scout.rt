@@ -126,3 +126,13 @@ AWE, CGU 09.01.2015
      TableControl Widget braucht ein "oranger Punkt" Feature
   3. Model-mässig ein Form behalten, aber einzelne Tabs als Table-Control rendern
      TableControl Widget braucht ein "oranger Punkt" Feature
+
+Reload
+BSH 2015-01-21
+
+- Browser-Relead-Button bzw. Ctrl+R lädt die ganze HTML-Seite neu. Applikation reagiert darauf nicht,
+  sondern rendert einfach das GUI neu. Im Model keine Events.
+- Vorschlag: F5-Hotkey verwenden, um Daten im Model neu zu laden.
+- Neuladen muss auf TablePage und NodePages möglich sein. NodePages brauchen darum auch den TableStatus.
+- Vorschlag CGU: Auch Detail-Forms / 360°-Sichten können neu geladen werden. Hier wäre der Button
+  allerdings oben. Ist das schlimm?
