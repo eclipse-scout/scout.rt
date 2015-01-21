@@ -39,8 +39,13 @@ scout.Calendar.prototype._render = function($parent) {
 
   this.$data = this.$container.appendDiv('calendar-data');
   this._$scrollable = scout.scrollbars.install(this.$data);
+  this.session.detachHelper.pushScrollable(this._$scrollable);
 
   this.drawData();
+};
+
+scout.Calendar.prototype._remove = function() {
+  this.session.detachHelper.removeScrollable(this._$scrollable);
 };
 
 scout.Calendar.prototype.drawData = function() {

@@ -52,6 +52,7 @@ scout.Session = function($entryPoint, jsonSessionId, options) {
   this._customParams;
   this._requestsPendingCounter = 0; // TODO CGU do we really want to have multiple requests pending?
   this.layoutValidator = new scout.LayoutValidator();
+  this.detachHelper = new scout.DetachHelper();
 
   // TODO BSH Detach | Check if there is another way
   // If this is a popup window, re-register with parent (in case the user reloaded the popup window)

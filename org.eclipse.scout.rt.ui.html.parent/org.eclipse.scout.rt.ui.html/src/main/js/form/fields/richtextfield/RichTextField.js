@@ -12,6 +12,7 @@ scout.RichTextField.prototype._render = function($parent) {
 
   // scrollbar
   this._$scrollable = scout.scrollbars.install(this.$container);
+  this.session.detachHelper.pushScrollable(this._$scrollable);
 
   // create editable div
   this.addField(
@@ -63,6 +64,10 @@ scout.RichTextField.prototype._render = function($parent) {
   //FIXME CGU anders lösen, denn: feld soll über die ganze breite gehen
   //this.addMandatoryIndicator();
   this.addStatus();
+};
+
+scout.RichTextField.prototype._remove = function() {
+  this.session.detachHelper.pushScrollable(this._$scrollable);
 };
 
 scout.RichTextField.prototype._onFocus = function(event) {

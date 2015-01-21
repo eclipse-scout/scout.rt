@@ -105,5 +105,27 @@ scout.arrays = {
         func(elementAtI, i);
       }
     }
+  },
+
+  //
+  // Use these methods if you have an array of jquery objects.
+  // Reason $elem1 === $elem2 does often not work because new jquery objects are created for the same html node.
+  // -> Html nodes need to be compared.
+  //
+
+  $indexOf: function(arr, $element) {
+    for (var i = 0; i < arr.length; i++) {
+      if (arr[i][0] === $element[0]) {
+        return i;
+      }
+    }
+  },
+
+
+  $remove: function(arr, $element) {
+    var index = scout.arrays.$indexOf(arr, $element);
+    if (index >= 0) {
+      arr.splice(index, 1);
+    }
   }
 };

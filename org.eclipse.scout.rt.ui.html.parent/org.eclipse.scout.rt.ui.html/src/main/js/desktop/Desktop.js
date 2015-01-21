@@ -188,6 +188,7 @@ scout.Desktop.prototype._selectTab = function(tab) {
   this._selectedTab = tab;
   if (tab.$storage && tab.$storage.length > 0) {
     this.$bench.append(tab.$storage);
+    this.session.detachHelper.afterAttach(tab.$storage);
 
     //If the parent has been resized while the content was not visible, the content has the wrong size -> update
     var htmlComp = scout.HtmlComponent.get(tab.$storage);
@@ -198,9 +199,11 @@ scout.Desktop.prototype._selectTab = function(tab) {
 
 scout.Desktop.prototype._unselectTab = function(tab) {
   tab.$storage = this.$bench.children();
-  var $children = this.$bench.children();
-  scout.Tooltip.removeTooltips($children);
-  $children.detach();
+  if (tab.$storage.length > 0) {
+    scout.Tooltip.removeTooltips(tab.$storage);
+    this.session.detachHelper.beforeDetach(tab.$storage);
+    tab.$storage.detach();
+  }
   tab.$container.select(false);
 };
 

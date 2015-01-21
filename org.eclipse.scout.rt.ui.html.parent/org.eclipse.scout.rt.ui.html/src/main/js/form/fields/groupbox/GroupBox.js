@@ -45,12 +45,19 @@ scout.GroupBox.prototype._render = function($parent) {
       createHtmlComponent: true
     });
     htmlBodyContainer = scout.HtmlComponent.get(this.$bodyContainer);
+    this.session.detachHelper.pushScrollable(this.$bodyContainer);
   }
   htmlBodyContainer.setLayout(new scout.LogicalGridLayout(env.formColumnGap, env.formRowGap));
 
   this._createFieldArraysByType();
   for (var i = 0; i < this.controls.length; i++) {
     this.controls[i].render(this.$bodyContainer);
+  }
+};
+
+scout.GroupBox.prototype._remove = function() {
+  if (this.scrollable) {
+    this.session.detachHelper.removeScrollable(this.$bodyContainer);
   }
 };
 

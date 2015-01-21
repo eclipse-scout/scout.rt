@@ -23,8 +23,13 @@ scout.TreeCompact.prototype._render = function($parent) {
 
   var $nodesWrapperDiv = $.makeDiv('nodes-wrapper').appendTo(this.$container);
   this._$scrollable = scout.scrollbars.install($nodesWrapperDiv, {invertColors:true, borderless:true});
+  this.session.detachHelper.pushScrollable(this._$scrollable);
   this._$nodesDiv = $.makeDiv('nodes').appendTo(this._$scrollable);
   this._renderNodes();
+};
+
+scout.TreeCompact.prototype._remove = function() {
+  this.session.detachHelper.removeScrollable(this._$scrollable);
 };
 
 scout.TreeCompact.prototype._renderNodes = function(filter) {

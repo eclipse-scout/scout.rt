@@ -14,6 +14,7 @@ scout.ImageField.prototype._render = function($parent) {
     this._$scrollable = scout.scrollbars.install($fieldContainer, {
       invertColors: true
     });
+    this.session.detachHelper.pushScrollable(this._$scrollable);
   } else {
     this._$scrollable = $fieldContainer;
   }
@@ -30,6 +31,12 @@ scout.ImageField.prototype._renderProperties = function() {
   scout.ImageField.parent.prototype._renderProperties.call(this);
 
   this._renderImageId(this.imageId);
+};
+
+scout.ImageField.prototype._remove = function() {
+  if (this.scrollBarEnabled) {
+    this.session.detachHelper.removeScrollable(this._$scrollable);
+  }
 };
 
 scout.ImageField.prototype._renderImageId = function(imageId) {

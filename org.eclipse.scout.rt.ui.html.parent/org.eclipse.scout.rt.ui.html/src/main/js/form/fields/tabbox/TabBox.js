@@ -90,7 +90,9 @@ scout.TabBox.prototype._onKeydown = function(e) {
 
 scout.TabBox.prototype._renderSelectedTab = function(selectedTab) {
   $.log.debug('(TabBox#_setSelectedTab) selectedTab='+selectedTab);
-  var i, $tabButton, $oldTabButton, $selectedTabButton, $tabs = this._$tabArea.children('button');
+  var i, $tabButton, $oldTabButton, $selectedTabButton, $tabContent, $oldTab, oldTabIndex, $cachedTabContent,
+    $tabs = this._$tabArea.children('button');
+
   for (i=0; i<$tabs.length; i++) {
     $tabButton = $($tabs[i]);
     if ($tabButton.hasClass('selected')) {
@@ -112,15 +114,20 @@ scout.TabBox.prototype._renderSelectedTab = function(selectedTab) {
   }
 
   // replace tab-content
-  var $oldTab = this._$tabContent.children().first().detach();
-  if ($oldTab.data('tabIndex') !== undefined) {
-    var oldTabIndex = $oldTab.data('tabIndex');
-    this._$tabContentCache[oldTabIndex] = $oldTab;
+  $tabContent = this._$tabContent.children().first();
+  if ($tabContent.length > 0) {
+    this.session.detachHelper.beforeDetach($tabContent);
+    $oldTab = $tabContent.detach();
+    if ($oldTab.data('tabIndex') !== undefined) {
+      oldTabIndex = $oldTab.data('tabIndex');
+      this._$tabContentCache[oldTabIndex] = $oldTab;
+    }
   }
 
-  var $cachedTabContent = this._$tabContentCache[this.selectedTab];
+  $cachedTabContent = this._$tabContentCache[this.selectedTab];
   if ($cachedTabContent) {
     $cachedTabContent.appendTo(this._$tabContent);
+    this.session.detachHelper.afterAttach($cachedTabContent);
   } else {
     this.tabItems[this.selectedTab].render(this._$tabContent);
     this._$tabContent.children().first().data('tabIndex', this.selectedTab);

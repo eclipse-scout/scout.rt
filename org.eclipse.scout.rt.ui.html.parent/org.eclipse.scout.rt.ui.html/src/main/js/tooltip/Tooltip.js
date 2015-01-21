@@ -35,15 +35,13 @@ scout.Tooltip.prototype.render = function($parent) {
 
   if (this.autoRemove) {
     // Every user action will remove the tooltip
-    //FIXME CGU Use menus.closing_event resp. make menus.closing_event not dependent from menus
     $(document).on('mousedown.tooltip', this._onTooltipClicked.bind(this));
     $(document).on('keydown.tooltip', this.remove.bind(this));
+    if (this.$origin) {
+      scout.scrollbars.attachScrollHandlers(this.$origin, this.remove.bind(this));
+    }
   }
   this.rendered = true;
-
-  if (this.$origin) {
-    scout.scrollbars.attachScrollHandlers(this.$origin, this.remove.bind(this));
-  }
 };
 
 scout.Tooltip.prototype.position = function() {

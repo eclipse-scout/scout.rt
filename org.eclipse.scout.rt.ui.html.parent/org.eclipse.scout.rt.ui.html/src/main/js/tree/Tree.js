@@ -48,10 +48,16 @@ scout.Tree.prototype._render = function($parent) {
   this.$parent = $parent;
   this.$container = $parent.appendDiv('tree');
   this._$scrollable = scout.scrollbars.install(this.$container);
+  this.session.detachHelper.pushScrollable(this._$scrollable);
   this._addNodes(this.nodes);
   if (this.selectedNodeIds.length > 0) {
     this._renderSelection();
   }
+};
+
+scout.Tree.prototype._remove = function() {
+  scout.Tree.parent.prototype._remove.call(this);
+  this.session.detachHelper.removeScrollable(this._$scrollable);
 };
 
 scout.Tree.prototype.setBreadcrumb = function(bread) {
