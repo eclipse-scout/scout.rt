@@ -236,6 +236,27 @@ public final class TableChains {
     }
   }
 
+  public static class TableRowsCheckedChain extends AbstractTableChain {
+
+    public TableRowsCheckedChain(List<? extends ITableExtension<? extends AbstractTable>> extensions) {
+      super(extensions);
+    }
+
+    public void execRowsChecked(final List<? extends ITableRow> rows) throws ProcessingException {
+      MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
+        @Override
+        protected void callMethod(ITableExtension<? extends AbstractTable> next) throws ProcessingException {
+          next.execRowsChecked(TableRowsCheckedChain.this, rows);
+        }
+      };
+      callChain(methodInvocation, rows);
+      if (methodInvocation.getException() instanceof ProcessingException) {
+        throw (ProcessingException) methodInvocation.getException();
+      }
+
+    }
+  }
+
   public static class TableDecorateRowChain extends AbstractTableChain {
 
     public TableDecorateRowChain(List<? extends ITableExtension<? extends AbstractTable>> extensions) {

@@ -28,6 +28,7 @@ import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableIni
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableResetColumnsChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableRowActionChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableRowClickChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableRowsCheckedChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableRowsSelectedChain;
 import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
@@ -107,6 +108,11 @@ public abstract class AbstractTableExtension<TABLE extends AbstractTable> extend
   @Override
   public void execRowsSelected(TableRowsSelectedChain chain, List<? extends ITableRow> rows) throws ProcessingException {
     chain.execRowsSelected(rows);
+  }
+
+  @Override
+  public void execRowsChecked(TableRowsCheckedChain chain, List<? extends ITableRow> rows) throws ProcessingException {
+    chain.execRowsChecked(rows);
   }
 
   @Override

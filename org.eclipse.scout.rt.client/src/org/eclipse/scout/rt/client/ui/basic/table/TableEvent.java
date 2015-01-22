@@ -126,6 +126,12 @@ public class TableEvent extends java.util.EventObject {
   public static final int TYPE_ROW_CLICK = 810;
 
   public static final int TYPE_TABLE_POPULATED = 820;
+
+  /**
+   * A rows has been checked or unchecked
+   */
+  public static final int TYPE_ROWS_CHECKED = 850;
+
   /**
    * Advise to scroll to selection
    */

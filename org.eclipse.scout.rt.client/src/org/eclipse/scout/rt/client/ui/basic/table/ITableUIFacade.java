@@ -33,6 +33,11 @@ public interface ITableUIFacade {
   void fireRowClickFromUI(ITableRow row, MouseButton mouseButton);
 
   /**
+   * A rows checked or unchecked
+   */
+  void setCheckedRowsFromUI(List<? extends ITableRow> rows, boolean checked);
+
+  /**
    * A mouse double click on a row triggers this action
    */
   void fireRowActionFromUI(ITableRow row);

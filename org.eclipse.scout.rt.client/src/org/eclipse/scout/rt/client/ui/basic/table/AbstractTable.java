@@ -65,6 +65,7 @@ import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableIni
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableResetColumnsChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableRowActionChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableRowClickChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableRowsCheckedChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableRowsSelectedChain;
 import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
@@ -766,6 +767,20 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   /**
+   * Called when the user checks or unchecks a row in this table.
+   * <p>
+   * Subclasses can override this method.
+   *
+   * @param Row
+   *          that was checked or unchecked (never null).
+   * @throws ProcessingException
+   */
+  @ConfigOperation
+  @Order(130)
+  protected void execRowsChecked(Collection<? extends ITableRow> row) throws ProcessingException {
+  }
+
+  /**
    * @deprecated Will be removed in Scout 6.0. Use {@link #addHeaderMenus(OrderedCollection)} instead.
    */
   @Deprecated
@@ -981,6 +996,14 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
             }
             break;
           }
+          case TableEvent.TYPE_ROWS_CHECKED:
+            try {
+              interceptRowsChecked(e.getRows());
+            }
+            catch (ProcessingException ex) {
+              SERVICES.getService(IExceptionHandlerService.class).handleException(ex);
+            }
+            break;
         }
       }
     });
@@ -2353,29 +2376,43 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   @Override
   public void checkRow(ITableRow row, boolean value) throws ProcessingException {
-    if (!row.isEnabled()) {
-      return;
-    }
-    if (!isMultiCheck() && value && getCheckedRows().size() > 0) {
-      uncheckAllRows();
-    }
-    row.setChecked(value);
-    if (getCheckableColumn() != null) {
-      getCheckableColumn().setValue(row, value);
-    }
+    checkRows(CollectionUtility.arrayList(row), value);
   }
 
   @Override
   public void checkRows(Collection<? extends ITableRow> rows, boolean value) throws ProcessingException {
     rows = resolveRows(rows);
     // check checked count with multicheck
-    if (rows.size() > 1 && !isMultiCheck()) {
-      ITableRow first = CollectionUtility.firstElement(rows);
-      first.setChecked(value);
+    if (rows.size() > 1 && !isMultiCheck() && value) {
+      ITableRow rowToCheck = null;
+      for (ITableRow row : rows) {
+        if (row.isEnabled()) {
+          rowToCheck = row;
+          break;
+        }
+      }
+      if (rowToCheck != null) {
+        uncheckAllRows();
+        rowToCheck.setChecked(value);
+        if (getCheckableColumn() != null) {
+          getCheckableColumn().setValue(rowToCheck, value);
+        }
+        fireRowsChecked(CollectionUtility.arrayList(rowToCheck));
+      }
     }
     else {
+      ArrayList<ITableRow> rowsChecked = new ArrayList<ITableRow>();
       for (ITableRow row : rows) {
-        checkRow(row, value);
+        if (row.isEnabled()) {
+          row.setChecked(value);
+          if (getCheckableColumn() != null) {
+            getCheckableColumn().setValue(row, value);
+          }
+          rowsChecked.add(row);
+        }
+      }
+      if (rows.size() > 0) {
+        fireRowsChecked(CollectionUtility.arrayList(rowsChecked));
       }
     }
   }
@@ -3902,6 +3939,10 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     fireTableEventInternal(new TableEvent(this, TableEvent.TYPE_ROWS_SELECTED, rows));
   }
 
+  private void fireRowsChecked(List<? extends ITableRow> row) {
+    fireTableEventInternal(new TableEvent(this, TableEvent.TYPE_ROWS_CHECKED, CollectionUtility.arrayList(row)));
+  }
+
   private void fireRowClick(ITableRow row, MouseButton mouseButton) {
     if (row != null) {
       try {
@@ -3943,10 +3984,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       else {
         //other editable columns have no effect HERE, the ui will open an editor
       }
-    }
-    else if (isCheckable()) {
-      //row-level checkbox
-      row.setChecked(!row.isChecked());
     }
   }
 
@@ -4353,6 +4390,20 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
 
     @Override
+    public void setCheckedRowsFromUI(List<? extends ITableRow> rows, boolean checked) {
+      try {
+        pushUIProcessor();
+        checkRows(rows, checked);
+      }
+      catch (ProcessingException e) {
+        SERVICES.getService(IExceptionHandlerService.class).handleException(e);
+      }
+      finally {
+        popUIProcessor();
+      }
+    }
+
+    @Override
     public void setSelectedRowsFromUI(List<? extends ITableRow> rows) {
       try {
         pushUIProcessor();
@@ -4689,6 +4740,11 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     public TransferObject execDrag(TableDragChain chain, List<ITableRow> rows) throws ProcessingException {
       return getOwner().execDrag(rows);
     }
+
+    @Override
+    public void execRowsChecked(TableRowsCheckedChain chain, List<? extends ITableRow> row) throws ProcessingException {
+      getOwner().execRowsChecked(row);
+    }
   }
 
   protected final void interceptHyperlinkAction(URL url, String path, boolean local) throws ProcessingException {
@@ -4767,6 +4823,12 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     List<? extends ITableExtension<? extends AbstractTable>> extensions = getAllExtensions();
     TableRowsSelectedChain chain = new TableRowsSelectedChain(extensions);
     chain.execRowsSelected(rows);
+  }
+
+  protected final void interceptRowsChecked(List<? extends ITableRow> rows) throws ProcessingException {
+    List<? extends ITableExtension<? extends AbstractTable>> extensions = getAllExtensions();
+    TableRowsCheckedChain chain = new TableRowsCheckedChain(extensions);
+    chain.execRowsChecked(rows);
   }
 
   protected final TransferObject interceptDrag(List<ITableRow> rows) throws ProcessingException {

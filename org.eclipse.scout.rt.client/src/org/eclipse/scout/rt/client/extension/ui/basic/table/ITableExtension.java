@@ -28,6 +28,7 @@ import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableIni
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableResetColumnsChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableRowActionChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableRowClickChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableRowsCheckedChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.TableChains.TableRowsSelectedChain;
 import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
@@ -59,6 +60,8 @@ public interface ITableExtension<TABLE extends AbstractTable> extends IExtension
   void execDisposeTable(TableDisposeTableChain chain) throws ProcessingException;
 
   void execRowClick(TableRowClickChain chain, ITableRow row, MouseButton mouseButton) throws ProcessingException;
+
+  void execRowsChecked(TableRowsCheckedChain chain, List<? extends ITableRow> rows) throws ProcessingException;
 
   void execDecorateRow(TableDecorateRowChain chain, ITableRow row) throws ProcessingException;
 
