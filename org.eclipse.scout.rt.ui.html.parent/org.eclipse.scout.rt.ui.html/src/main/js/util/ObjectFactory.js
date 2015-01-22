@@ -208,14 +208,12 @@ scout.defaultObjectFactories = [{
 }, {
   objectType: 'SmartField',
   create: function(model) {
-    return new scout.SmartField('remote' === model.lookupStrategy ?
-        new scout.RemoteLookupStrategy() : new scout.CachedLookupStrategy());
+    return new scout.SmartField();
   }
 }, {
   objectType: 'SmartFieldMultiline',
   create: function(model) {
-    return new scout.SmartFieldMultiline('remote' === model.lookupStrategy ?
-        new scout.RemoteLookupStrategy() : new scout.CachedLookupStrategy());
+    return new scout.SmartFieldMultiline();
   }
 }, {
   objectType: 'DateField',

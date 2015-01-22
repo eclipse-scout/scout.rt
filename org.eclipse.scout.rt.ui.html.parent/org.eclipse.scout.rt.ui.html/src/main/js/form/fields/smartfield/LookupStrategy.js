@@ -2,8 +2,8 @@
  * Cached lookup strategy.
  * Options are loaded once from the server and are filtered client-side only.
  */
-scout.CachedLookupStrategy = function() {
-  this._smartField;
+scout.CachedLookupStrategy = function(smartField) {
+  this._smartField = smartField;
 };
 
 scout.CachedLookupStrategy.prototype = {
@@ -41,6 +41,7 @@ scout.CachedLookupStrategy.prototype = {
     sf._showPopup(Math.min(10, numOptions), numOptions);
     sf._renderOptions(sf.options);
   }
+
 };
 
 
@@ -48,8 +49,8 @@ scout.CachedLookupStrategy.prototype = {
  * Remote lookup strategy.
  * Options are loaded and filtered on the server.
  */
-scout.RemoteLookupStrategy = function() {
-  this._smartField;
+scout.RemoteLookupStrategy = function(smartField) {
+  this._smartField = smartField;
   this._delayed;
 };
 

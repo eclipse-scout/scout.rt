@@ -1,15 +1,22 @@
-scout.AbstractSmartField = function(lookupStrategy) {
+scout.AbstractSmartField = function() {
   scout.AbstractSmartField.parent.call(this);
   this._$popup;
   this._$scrollable;
   this.options;
   this._selectedOption = -1;
   this._oldVal;
-  this._lookupStrategy = lookupStrategy;
-
-  lookupStrategy._smartField = this;
+  this._lookupStrategy;
 };
 scout.inherits(scout.AbstractSmartField, scout.ValueField);
+
+scout.AbstractSmartField.prototype.init = function(model, session) {
+  scout.AbstractSmartField.parent.prototype.init.call(this, model, session);
+
+  // Install lookup strategy
+  this._lookupStrategy = (this.lookupStrategy === 'remote' ?
+    new scout.RemoteLookupStrategy(this) :
+    new scout.CachedLookupStrategy(this));
+};
 
 scout.AbstractSmartField.prototype._render = function($parent) {
   this.addContainer($parent, 'smart-field');
