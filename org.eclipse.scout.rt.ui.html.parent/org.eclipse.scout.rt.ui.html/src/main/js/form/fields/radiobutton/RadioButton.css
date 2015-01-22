@@ -1,23 +1,25 @@
-.radio-button>label{
+.radio-button>label {
   padding: 0px 0px 0px 25px;
 }
-.radio-button{
 
-  & label{
-      display: inline-block;
-      position: relative;
-      margin-right: 15px;
-      font-size: 13px;
+.radio-button {
+  & label {
+    cursor: pointer;
+    display: inline-block;
+    position: relative;
+    margin-right: 15px;
+    font-size: 13px;
   }
+
   & label:before {
-      content: "";
-      display: inline-block;
-      width: 19px;
-      height: 19px;
-      margin-right: 10px;
-      position: absolute;
-      left: 0;
-      top: 5px;
+    content: "";
+    display: inline-block;
+    width: 19px;
+    height: 19px;
+    margin-right: 10px;
+    position: absolute;
+    left: 0;
+    top: 5px;
   }
 
   & label:hover:before {
@@ -38,30 +40,34 @@
   }
 
   & input[type=radio]:disabled + label:hover:before {
-      border: 2px solid @border-color;
+    border: 2px solid @border-color;
   }
 
   & input[type=radio]:checked + label:before {
-      .font-icon;
-      content: @icon-circle;
-      color: @palette-black;
-      font-size: 8px;
-      text-align: center;
-      line-height: 15px;
+    .font-icon;
+    content: @icon-circle;
+    color: @palette-black;
+    font-size: 8px;
+    text-align: center;
+    line-height: 15px;
   }
 
   & input[type=radio]:focus + label:before {
     border-color: @focus-color;
-    background-color:@focus-color-glow;
+    background-color: @focus-color-glow;
     outline: none;
   }
 
   & label:before {
-      border: 2px solid @border-color;
-      border-radius: 10px;
+    border: 2px solid @border-color;
+    border-radius: 10px;
   }
 
   & input[type=radio]:disabled + label:before {
-     background-color: @disabled-color;
+    background-color: @disabled-color;
+  }
+
+  & input[type=radio]:disabled + label {
+    cursor: default;
   }
 }
