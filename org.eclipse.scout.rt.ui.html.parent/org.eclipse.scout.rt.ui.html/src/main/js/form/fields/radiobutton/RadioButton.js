@@ -4,11 +4,10 @@ scout.RadioButton = function() {
 scout.inherits(scout.RadioButton, scout.Button);
 
 scout.RadioButton.prototype._render = function($parent) {
-
-  var htmlContainer = this.addContainer($parent, 'radio-button',new scout.RadioButtonLayout(this));
+  var htmlContainer = this.addContainer($parent, 'radio-button', new scout.RadioButtonLayout(this));
 
   var forRefId = 'RefId-' + this.id;
-  this.addField( $('<input>')
+  this.addField($('<input>')
     .attr('id', forRefId)
     .attr('type', 'radio')
     .attr('value', this.radioValue).on('click', this._onClick.bind(this)));
@@ -21,16 +20,14 @@ scout.RadioButton.prototype._render = function($parent) {
 
 scout.RadioButton.prototype._onClick = function() {
   var uiChecked = this.$field[0].checked;
-  this.session.send(this.id, 'selected', {
-    checked: uiChecked
-  });
+  this.session.send(this.id, 'selected');
 };
-
 /**
  * @override
  */
-scout.RadioButton.prototype._renderEnabled = function(enabled) {
-  this.$field.setEnabled(enabled);
+scout.RadioButton.prototype._renderProperties = function() {
+  scout.RadioButton.parent.prototype._renderProperties.call(this);
+  this._renderSelected(this.selected);
 };
 
 /**
@@ -44,4 +41,10 @@ scout.RadioButton.prototype._renderLabel = function(label) {
 
 scout.RadioButton.prototype._renderRadioValue = function(radioValue) {
   this.$field.attr('value', radioValue);
+};
+
+scout.RadioButton.prototype._renderSelected = function(selected) {
+  if (selected) {
+    this.$field.attr('checked', 'checked');
+  }
 };

@@ -43,6 +43,12 @@ public class JsonButton<T extends IButton> extends JsonFormField<T> {
         return getModel().isProcessButton();
       }
     });
+    putJsonProperty(new JsonProperty<IButton>(IButton.PROP_SELECTED, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isSelected();
+      }
+    });
   }
 
   @Override

@@ -9,12 +9,12 @@ scout.inherits(scout.RadioButtonLayout, scout.FormFieldLayout);
 
 scout.RadioButtonLayout.prototype.layout = function($container) {
   var htmlContainer = scout.HtmlComponent.get($container),
-  f = this.formField,
-  b;
-  scout.RadioButtonLayout.parent.prototype.layout.call(this,$container);
+    field = this.formField,
+    bounds;
+  scout.RadioButtonLayout.parent.prototype.layout.call(this, $container);
 
   //move radio button behind radiobutton icon in label:before
-  b=scout.graphics.getBounds(f.$fieldContainer);
-  b.x=0;
-  scout.graphics.setBounds(f.$fieldContainer, b);
+  bounds = scout.graphics.getBounds(field.$fieldContainer);
+  bounds.x = 0;
+  scout.graphics.setBounds(field.$fieldContainer, bounds);
 };

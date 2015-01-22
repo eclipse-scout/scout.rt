@@ -10,10 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form.fields.radiobutton;
 
+import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.IRadioButtonGroup;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
-import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 import org.json.JSONObject;
 
@@ -42,13 +42,7 @@ public class JsonRadioButtonGroup<T extends IRadioButtonGroup> extends JsonValue
   @Override
   protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
-    putJsonProperty(new JsonProperty<IRadioButtonGroup>(IRadioButtonGroup.PROP_VALUE, model) {
-      @Override
-      protected Object modelValue() {
-        return getModel().getValue();
-      }
-    });
-
+    removeJsonProperty(IValueField.PROP_DISPLAY_TEXT);
   }
 
   @Override

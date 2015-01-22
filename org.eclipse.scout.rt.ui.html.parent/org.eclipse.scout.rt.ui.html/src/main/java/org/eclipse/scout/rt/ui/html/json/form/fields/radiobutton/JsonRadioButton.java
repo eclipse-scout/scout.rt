@@ -14,7 +14,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.IRadioButton;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
-import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.form.fields.button.JsonButton;
@@ -24,7 +23,6 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.button.JsonButton;
  */
 public class JsonRadioButton<T extends IRadioButton> extends JsonButton<T> {
 
-  private static final String CHECKED_VAL = "checked";
   private static final String SELECTED = "selected";
 
   /**
@@ -56,8 +54,9 @@ public class JsonRadioButton<T extends IRadioButton> extends JsonButton<T> {
   @Override
   public void handleUiEvent(JsonEvent event, JsonResponse res) {
     if (SELECTED.equals(event.getType())) {
+      addPropertyEventFilterCondition(IRadioButton.PROP_SELECTED, true);
       getModel().getUIFacade().fireButtonClickedFromUI();
-      getModel().getUIFacade().setSelectedFromUI(JsonObjectUtility.getBoolean(event.getData(), CHECKED_VAL));
+      getModel().getUIFacade().setSelectedFromUI(true);
     }
     else {
       super.handleUiEvent(event, res);

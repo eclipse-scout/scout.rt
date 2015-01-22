@@ -63,6 +63,13 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
     m_jsonProperties.put(jsonProperty.getPropertyName(), jsonProperty);
   }
 
+  protected void removeJsonProperty(String jsonPropertyName) {
+    if (!m_initializingProperties) {
+      throw new IllegalStateException("Putting properties is only allowed in initJsonProperties.");
+    }
+    m_jsonProperties.remove(jsonPropertyName);
+  }
+
   protected JsonProperty<?> getJsonProperty(String name) {
     return m_jsonProperties.get(name);
   }
