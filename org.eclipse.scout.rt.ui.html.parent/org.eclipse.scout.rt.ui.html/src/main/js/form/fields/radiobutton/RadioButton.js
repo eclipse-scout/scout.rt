@@ -19,7 +19,6 @@ scout.RadioButton.prototype._render = function($parent) {
 };
 
 scout.RadioButton.prototype._onClick = function() {
-  var uiChecked = this.$field[0].checked;
   this.session.send(this.id, 'selected');
 };
 /**

@@ -8,8 +8,7 @@ scout.RadioButtonLayout = function(formField) {
 scout.inherits(scout.RadioButtonLayout, scout.FormFieldLayout);
 
 scout.RadioButtonLayout.prototype.layout = function($container) {
-  var htmlContainer = scout.HtmlComponent.get($container),
-    field = this.formField,
+  var field = this.formField,
     bounds;
   scout.RadioButtonLayout.parent.prototype.layout.call(this, $container);
 
