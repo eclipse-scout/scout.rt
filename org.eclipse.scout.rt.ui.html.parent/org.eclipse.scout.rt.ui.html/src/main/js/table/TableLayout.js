@@ -16,6 +16,7 @@ scout.TableLayout.prototype.layout = function($container) {
   }
   if (footer) {
     height += scout.graphics.getSize(footer.$container).height;
+    height += scout.graphics.getSize(footer.$controlContainer).height;
   }
   if (header) {
     height += scout.graphics.getSize(header.$container).height;

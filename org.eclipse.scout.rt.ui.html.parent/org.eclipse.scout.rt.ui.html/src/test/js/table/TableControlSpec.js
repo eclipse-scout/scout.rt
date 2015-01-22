@@ -72,7 +72,7 @@ describe("TableControl", function() {
         var action = createAction(createModel());
         table.tableControls = [action];
         table.render(session.$entryPoint);
-        var $controlContainer = table.footer._$controlContainer;
+        var $controlContainer = table.footer.$controlContainer;
 
         expect($controlContainer).toBeHidden();
 
@@ -96,7 +96,7 @@ describe("TableControl", function() {
 
         action.selected = true;
         table.render(session.$entryPoint);
-        var $controlContainer = table.footer._$controlContainer;
+        var $controlContainer = table.footer.$controlContainer;
 
         expect($controlContainer).toBeVisible();
         expect(action.contentRendered).toBe(true);
@@ -188,7 +188,7 @@ describe("TableControl", function() {
 
       action.selected = true;
       table.render(session.$entryPoint);
-      var $controlContainer = table.footer._$controlContainer;
+      var $controlContainer = table.footer.$controlContainer;
 
       expect($controlContainer).toBeVisible();
       expect(action.contentRendered).toBe(true);

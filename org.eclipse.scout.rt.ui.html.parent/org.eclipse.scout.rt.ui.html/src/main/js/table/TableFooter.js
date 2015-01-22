@@ -11,9 +11,9 @@ scout.TableFooter.prototype._render = function($parent) {
     i, control, filter;
 
   this.$container = $parent.appendDiv('table-footer');
-  this._$controlContainer = this.$container.appendDiv('control-container').hide();
-  this._addResize(this._$controlContainer);
-  this.$controlContent = this._$controlContainer.appendDiv('control-content');
+  this.$controlContainer = this.$container.appendDiv('control-container').hide();
+  this._addResize(this.$controlContainer);
+  this.$controlContent = this.$controlContainer.appendDiv('control-content');
   this.$controlGroup = this.$container.appendDiv('control-group');
 
   this._$filterField = scout.fields.new$TextField()
@@ -214,68 +214,51 @@ scout.TableFooter.prototype._computeCountInfo = function(n) {
 
 /* open, close and resize of the container */
 
-scout.TableFooter.prototype.openControlContainer = function() {
-  var insets = scout.graphics.getInsets(this._$controlContainer);
-  var contentHeight = scout.TableFooter.CONTAINER_SIZE - insets.top - insets.bottom;
+scout.TableFooter.prototype._validateTableLayout = function() {
+  this._table.htmlComp.revalidate();
+  this._table.session.layoutValidator.validate();
+};
 
-  // adjust table
-  this._resizeData(scout.TableFooter.CONTAINER_SIZE);
+scout.TableFooter.prototype.openControlContainer = function() {
+  var insets = scout.graphics.getInsets(this.$controlContainer),
+    contentHeight = scout.TableFooter.CONTAINER_SIZE - insets.top - insets.bottom,
+    that = this;
 
   // adjust content
   this.$controlContent.outerHeight(contentHeight);
 
   // open container, stop existing (close) animations before
-  this._$controlContainer.stop(true).show().animateAVCSD('height', scout.TableFooter.CONTAINER_SIZE, null, null, 500);
+  this.$controlContainer.stop(true).show().animate({
+    height: scout.TableFooter.CONTAINER_SIZE}, {
+      duration: 500,
+      progress: that._validateTableLayout.bind(that)
+    });
 
   this.open = true;
 };
 
 scout.TableFooter.prototype.closeControlContainer = function(control) {
-  // adjust table and container
-  this._resizeData(0);
+  var that = this;
 
-  // adjust container
-  this._$controlContainer.animateAVCSD('height', 0, null, null, 500);
-  this._$controlContainer.promise().done(function() {
-    this._$controlContainer.hide();
+  this.$controlContainer.stop(true).show().animate({
+    height: 0}, {
+      duration: 500,
+      progress: that._validateTableLayout.bind(that)
+    });
+
+  this.$controlContainer.promise().done(function() {
+    this.$controlContainer.hide();
     control.onControlContainerClosed();
   }.bind(this));
 
   this.open = false;
 };
 
-scout.TableFooter.prototype._resizeData = function(sizeContainer) {
-  var sizeMenubar, sizeFooter, sizeHeader, newOffset,
-    that = this;
-
-  // new size of container and table data
-  sizeMenubar = parseFloat(that._table.menuBar.$container.css('height'));
-  sizeFooter = parseFloat(that.$container.css('height'));
-  if (that._table.header) {
-    sizeHeader = parseFloat(that._table.header.$container.css('height'));
-  }
-  newOffset = sizeMenubar + sizeHeader + sizeFooter + sizeContainer;
-  newOffset += this._table.$data.cssMarginTop() + this._table.$data.cssMarginBottom();
-
-  var oldH = this._table.$data.height(),
-    newH = this._table.$data.css('height', 'calc(100% - ' + newOffset + 'px)').height();
-
-  // TODO CRU When dragging the table control downwards, the drawing of $data is extremely slow
-  // TODO CRU Enforce min/max height to avoid drawing errors
-  //adjust table
-  this._table.$data.css('height', oldH)
-    .animateAVCSD('height', newH,
-      function() {
-        that._table.$data.css('height', 'calc(100% - ' + newOffset + 'px)');
-      },
-      this._table.updateScrollbar.bind(this._table),
-      500);
-};
-
 scout.TableFooter.prototype._addResize = function($parent) {
+  var that = this;
+
   this._$controlResize = $parent.appendDiv('control-resize')
     .on('mousedown', '', resize);
-  var that = this;
 
   function resize(event) {
     $('body').addClass('row-resize')
@@ -283,17 +266,15 @@ scout.TableFooter.prototype._addResize = function($parent) {
       .one('mouseup', '', resizeEnd);
 
     function resizeMove(event) {
-      var h = that._table.$container.height() - event.pageY;
-      that._resizeData(h);
-      that._$controlContainer.height(h);
-      that.$controlContent.outerHeight(h);
-
-      that._table.updateScrollbar();
+      var newHeight = that._table.$container.height() - event.pageY;
+      that.$controlContainer.height(newHeight);
+      that.$controlContent.outerHeight(newHeight);
+      that._validateTableLayout();
       that.onResize();
     }
 
     function resizeEnd() {
-      if (that._$controlContainer.height() < 100) {
+      if (that.$controlContainer.height() < 100) {
         that.selectedControl.setSelected(false);
       }
 

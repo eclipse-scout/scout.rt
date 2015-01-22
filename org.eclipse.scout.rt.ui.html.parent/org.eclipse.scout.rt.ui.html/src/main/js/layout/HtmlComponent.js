@@ -155,7 +155,7 @@ scout.HtmlComponent.prototype.getBounds = function() {
 
 scout.HtmlComponent.prototype.setBounds = function(bounds) {
   var oldBounds = this.getBounds();
-  if (!oldBounds.equals(bounds) && this.layoutManager.invalidateOnResize) {
+  if (!oldBounds.equals(bounds)) {
     this.invalidate();
   }
   scout.graphics.setBounds(this.$comp, bounds);

@@ -106,17 +106,8 @@ scout.Desktop.prototype._render = function($parent) {
 };
 
 scout.Desktop.prototype.onResize = function() {
-  if (this.forms.length > 0) {
-    var i, form;
-    for (i = 0; i < this.forms.length; i++) {
-      form = this.forms[i];
-      if (form.rendered) {
-        form.onResize();
-      }
-    }
-  }
-  if (this._outlineTab.content) {
-    this._outlineTab.content.onResize();
+  if (this._selectedTab.content) {
+    this._selectedTab.content.onResize();
   }
   if (this.outline) {
     this.outline.onResize();
