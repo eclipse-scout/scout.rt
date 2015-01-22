@@ -26,8 +26,11 @@ scout.inherits(scout.Table, scout.ModelAdapter);
 
 scout.Table.GUI_EVENT_ROWS_DRAWN = 'rowsDrawn';
 scout.Table.GUI_EVENT_ROWS_SELECTED = 'rowsSelected';
+scout.Table.GUI_EVENT_ROWS_UPDATED = 'rowsUpdated';
 scout.Table.GUI_EVENT_ROWS_FILTERED = 'rowsFiltered';
 scout.Table.GUI_EVENT_FILTER_RESETTED = 'filterResetted';
+
+scout.Table.CHECKABLE_COLUMN_SIZE = 40;
 
 scout.Table.prototype.init = function(model, session) {
   scout.Table.parent.prototype.init.call(this, model, session);
@@ -59,6 +62,11 @@ scout.Table.prototype._render = function($parent) {
   this.menuBar = new scout.MenuBar(this.$container, 'top', scout.TableMenuItemsOrder.order);
 
   this._totalWidth = 0;
+  if (this.checkable) {
+    //TODO NBU if customised checkable colum is implemented use size of customised checkable colum
+    //use size for a checkable column
+    this._totalWidth += scout.Table.CHECKABLE_COLUMN_SIZE;
+  }
   for (i = 0; i < this.columns.length; i++) {
     this._totalWidth += this.columns[i].width;
   }
@@ -84,11 +92,11 @@ scout.Table.prototype._remove = function() {
 // reason: the property on this is already synced at this point, the argument may contain
 // just a data-model value (and not a adpater).
 scout.Table.prototype._renderTableControls = function(dummy) {
- this._renderTableFooter();
+  this._renderTableFooter();
 };
 
 scout.Table.prototype._renderTableStatusVisible = function(dummy) {
- this._renderTableFooter();
+  this._renderTableFooter();
 };
 
 scout.Table.prototype._isFooterVisible = function() {
@@ -330,8 +338,16 @@ scout.Table.prototype._buildRowDiv = function(row) {
   if (this.selectedRowIds && this.selectedRowIds.indexOf(row.id) > -1) {
     rowClass += 'selected ';
   }
-
   var rowDiv = '<div id="' + row.id + '" class="' + rowClass + '" style="width: ' + rowWidth + 'px"' + scout.device.unselectableAttribute + '>';
+  if (this.checkable) {
+    rowDiv += '<div class="table-cell"  style="min-width:' + scout.Table.CHECKABLE_COLUMN_SIZE +
+      'px; max-width:' + scout.Table.CHECKABLE_COLUMN_SIZE + 'px;"' + scout.device.unselectableAttribute +
+      '><input type="checkbox" id="' + row.id + '-checkable" ';
+    if (row.checked) {
+      rowDiv += ' checked="checked" ';
+    }
+    rowDiv += '/><label for="' + row.id + '-checkable">&nbsp;</label></div>';
+  }
   for (var c = 0; c < this.columns.length; c++) {
     column = this.columns[c];
     style = this.getCellStyle(column, row);
@@ -455,11 +471,13 @@ scout.Table.prototype._drawData = function(startRow) {
     var $row = $(event.delegateTarget);
     var colId = that._findColumnId(event);
     var hyperLink = that._findHyperLink(event);
-    if(hyperLink){
-      that.sendHyperlinkAction($row,colId, hyperLink);
-    }
-    else{
-      that.sendRowClicked($row,colId);
+    if (hyperLink) {
+      that.sendHyperlinkAction($row, colId, hyperLink);
+    } else {
+      var row = that.rowById($row.attr('id'));
+      row.checked = !row.checked;
+      that._checkRow(row);
+      that.sendRowClicked($row, colId);
     }
   }
 
@@ -473,36 +491,36 @@ scout.Table.prototype._drawData = function(startRow) {
 
 scout.Table.prototype._findColumnId = function(event) {
   //bubble up from target to delegateTarget
-  var $elem=$(event.target);
-  var $stop=$(event.delegateTarget);
-  var colIndex='';
-  while($elem.length>0){
-    colIndex=$elem.data('column-index');
-    if(colIndex>=0){
+  var $elem = $(event.target);
+  var $stop = $(event.delegateTarget);
+  var colIndex = '';
+  while ($elem.length > 0) {
+    colIndex = $elem.data('column-index');
+    if (colIndex >= 0) {
       return this.columns[colIndex].id;
     }
-    if($elem[0]===$stop[0]){
+    if ($elem[0] === $stop[0]) {
       return null;
     }
-    $elem=$elem.parent();
+    $elem = $elem.parent();
   }
   return null;
 };
 
 scout.Table.prototype._findHyperLink = function(event) {
   //bubble up from target to delegateTarget
-  var $elem=$(event.target);
-  var $stop=$(event.delegateTarget);
+  var $elem = $(event.target);
+  var $stop = $(event.delegateTarget);
   var hyperLink;
-  while($elem.length>0){
-    hyperLink=$elem.data('hyperlink');
-    if(hyperLink){
+  while ($elem.length > 0) {
+    hyperLink = $elem.data('hyperlink');
+    if (hyperLink) {
       return hyperLink;
     }
-    if($elem[0]===$stop[0]){
+    if ($elem[0] === $stop[0]) {
       return null;
     }
-    $elem=$elem.parent();
+    $elem = $elem.parent();
   }
   return null;
 };
@@ -823,6 +841,17 @@ scout.Table.prototype._onRowsSelected = function(rowIds) {
   }
 };
 
+scout.Table.prototype._onRowsUpdated = function(rows) {
+  for (var i = 0; i < rows.length; i++) {
+    this._checkRow(rows[i].id, rows[i].checked);
+  }
+};
+
+scout.Table.prototype._checkRow = function(row) {
+  var $checkbox = $('#' + row.id + '-checkable', this.$data);
+  $checkbox.prop('checked', row.checked);
+};
+
 scout.Table.prototype._onRowsInserted = function(rows) {
   //always insert new rows at the end, if the order is wrong a rowOrderChange event will follow
   scout.arrays.pushAll(this.rows, rows);
@@ -1092,8 +1121,7 @@ scout.Table.prototype.showRow = function($row, useAnimation) {
         that.updateScrollbar();
       }
     });
-  }
-  else {
+  } else {
     $row.show();
     $row.removeClass('invisible');
     that.updateScrollbar();
@@ -1114,8 +1142,7 @@ scout.Table.prototype.hideRow = function($row, useAnimation) {
         that.updateScrollbar();
       }
     });
-  }
-  else {
+  } else {
     $row.hide();
     $row.addClass('invisible');
     that.updateScrollbar();
@@ -1391,6 +1418,8 @@ scout.Table.prototype.onModelAction = function(event) {
     this._onRowsSelected(event.rowIds);
   } else if (event.type === 'rowOrderChanged') {
     this._onRowOrderChanged(event.rowIds);
+  } else if (event.type === 'rowsUpdated') {
+    this._onRowsUpdated(event.rows);
   } else if (event.type === 'columnStructureChanged') {
     this._onColumnStructureChanged(event.columns);
   } else if (event.type === 'columnOrderChanged') {

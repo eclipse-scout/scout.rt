@@ -59,10 +59,12 @@ import org.json.JSONObject;
 
 public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T> implements IContextMenuOwner {
 
+  private static final String ROWS = "rows";
   public static final String EVENT_ROW_CLICKED = "rowClicked";
   public static final String EVENT_ROW_ACTION = "rowAction";
   public static final String EVENT_HYPERLINK_ACTION = "hyperlinkAction";
   public static final String EVENT_ROWS_SELECTED = "rowsSelected";
+  public static final String EVENT_ROWS_UPDATED = "rowsUpdated";
   public static final String EVENT_ROWS_DELETED = "rowsDeleted";
   public static final String EVENT_ALL_ROWS_DELETED = "allRowsDeleted";
   public static final String EVENT_ROWS_SORTED = "rowsSorted";
@@ -221,7 +223,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
       JSONObject jsonRow = tableRowToJson(row);
       jsonRows.put(jsonRow);
     }
-    putProperty(json, "rows", jsonRows);
+    putProperty(json, ROWS, jsonRows);
     JsonContextMenu<IContextMenu> jsonContextMenu = getAdapter(getModel().getContextMenu());
     if (jsonContextMenu != null) {
       JsonObjectUtility.putProperty(json, PROP_MENUS, JsonObjectUtility.adapterIdsToJson(jsonContextMenu.getJsonChildActions()));
@@ -271,6 +273,9 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   protected void handleUiRowClicked(JsonEvent event, JsonResponse res) {
     ITableRow tableRow = extractTableRow(event.getData());
     IColumn column = extractColumn(event.getData());
+    ArrayList<ITableRow> rows = new ArrayList<ITableRow>();
+    rows.add(tableRow);
+    addTableEventFilterCondition(TableEvent.TYPE_ROWS_UPDATED).setRows(rows);
     getModel().getUIFacade().setContextColumnFromUI(column);
     getModel().getUIFacade().fireRowClickFromUI(tableRow, MouseButton.Left);
   }
@@ -394,6 +399,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     JSONObject jsonRow = new JSONObject();
     putProperty(jsonRow, "id", getOrCreatedRowId(row));
     putProperty(jsonRow, "cells", jsonCells);
+    putProperty(jsonRow, "checked", row.isChecked());
     return jsonRow;
   }
 
@@ -561,6 +567,9 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
       case TableEvent.TYPE_ROWS_INSERTED:
         handleModelRowsInserted(event);
         break;
+      case TableEvent.TYPE_ROWS_UPDATED:
+        handleModelRowsUpdated(event.getRows());
+        break;
       case TableEvent.TYPE_ROWS_DELETED:
         handleModelRowsDeleted(event.getRows());
         break;
@@ -594,7 +603,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
       JSONObject jsonRow = tableRowToJson(row);
       jsonRows.put(jsonRow);
     }
-    putProperty(jsonEvent, "rows", jsonRows);
+    putProperty(jsonEvent, ROWS, jsonRows);
     addActionEvent("rowsInserted", jsonEvent);
   }
 
@@ -619,6 +628,17 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     JSONObject jsonEvent = new JSONObject();
     putProperty(jsonEvent, PROP_ROW_IDS, rowIdsToJson(modelRows));
     addActionEvent(EVENT_ROWS_SELECTED, jsonEvent);
+  }
+
+  protected void handleModelRowsUpdated(Collection<ITableRow> modelRows) {
+    JSONObject jsonEvent = new JSONObject();
+    JSONArray jsonRows = new JSONArray();
+    for (ITableRow row : modelRows) {
+      JSONObject jsonRow = tableRowToJson(row);
+      jsonRows.put(jsonRow);
+    }
+    putProperty(jsonEvent, ROWS, jsonRows);
+    addActionEvent(EVENT_ROWS_UPDATED, jsonEvent);
   }
 
   protected void handleModelRowOrderChanged(Collection<ITableRow> modelRows) {

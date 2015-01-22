@@ -4,12 +4,19 @@
 scout.TableHeader = function(table, session) {
   var that = this,
     columns = table.columns,
-    column, $header, alignment;
+    column, $header, alignment, $defaultCheckedColumHeader;
 
   this.dragDone = false;
   this.$container = table.$data.beforeDiv('table-header');
   this.table = table;
   this.columns = table.columns;
+  if (table.checkable) {
+    $defaultCheckedColumHeader = this.$container.appendDiv('header-item')
+      .css('min-width', scout.Table.CHECKABLE_COLUMN_SIZE + 'px') // 17 is width of header-resize handle, see table.css (.header-resize)
+    .css('max-width', scout.Table.CHECKABLE_COLUMN_SIZE + 'px')
+      .on('click', '', onHeaderClick);
+    this.$container.appendDiv('header-resize', '');
+  }
 
   for (var i = 0; i < columns.length; i++) {
     column = columns[i];

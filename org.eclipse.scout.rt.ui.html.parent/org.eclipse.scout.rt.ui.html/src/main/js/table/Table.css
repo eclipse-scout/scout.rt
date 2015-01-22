@@ -169,6 +169,53 @@
   margin-top: -1px;
 }
 
+.table-cell {
+  & label:before {
+    content: "";
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    margin-left: -18px;
+    position: absolute;
+  }
+
+  & label:hover:before {
+    border: 2px solid @hover-color;
+  }
+
+  & input[type=checkbox] {
+    visibility:hidden;
+  }
+
+  & input[type=checkbox]:disabled + label:hover:before {
+    border: 2px solid @border-color;
+  }
+
+  & input[type=checkbox]:focus + label:before {
+    border-color: @focus-color;
+    background-color:@focus-color-glow;
+    outline: none;
+  }
+
+  & input[type=checkbox]:checked + label:before {
+    .font-icon;
+    content: @icon-checked;
+    color: @palette-black;
+    font-size: 11px;
+    text-align: center;
+    line-height: 15px;
+  }
+
+  & label:before {
+    border: 2px solid @border-color;
+    border-radius: 3px;
+  }
+
+  & input[type=checkbox]:disabled + label:before {
+    background-color: @disabled-color;
+  }
+}
+
 /* key box */
 
 .table .key-box {
@@ -183,3 +230,4 @@
 .table .key-box.bottom2 { bottom: 32px;}
 .table .key-box.bottom3 { bottom: 10px;}
 .table .key-box.char { bottom: 8px; }
+
