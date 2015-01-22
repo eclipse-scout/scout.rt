@@ -111,6 +111,7 @@ public final class FileUtility {
     EXT_TO_MIME_TYPE_MAP.put("jpeg", "image/jpeg");
     EXT_TO_MIME_TYPE_MAP.put("jpg", "image/jpeg");
     EXT_TO_MIME_TYPE_MAP.put("js", "application/javascript");
+    EXT_TO_MIME_TYPE_MAP.put("json", "application/json");
     EXT_TO_MIME_TYPE_MAP.put("kar", "audio/midi");
     EXT_TO_MIME_TYPE_MAP.put("latex", "application/x-latex");
     EXT_TO_MIME_TYPE_MAP.put("lha", "application/octet-stream");
