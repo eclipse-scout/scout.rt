@@ -1,25 +1,27 @@
-.check-box-field>.field{
+.check-box-field>.field {
   padding: 7px 0px 7px 0px;
 }
 
-.check-box-field>span{
+.check-box-field>span {
   & label{
-      display: inline-block;
-      position: relative;
-      padding-left: 25px;
-      margin-right: 15px;
-      font-size: 13px;
+    cursor: pointer;
+    display: inline-block;
+    position: relative;
+    padding-left: 25px;
+    margin-right: 15px;
+    font-size: 13px;
   }
+
   & label:before {
-      content: "";
-      display: inline-block;
-      width: 18px;
-      height: 18px;
-      margin-right: 10px;
-      margin-top: -2px;
-      position: absolute;
-      left: 0;
-      top: 0;
+    content: "";
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    margin-right: 10px;
+    margin-top: -2px;
+    position: absolute;
+    left: 0;
+    top: 0;
   }
 
   & label:hover:before {
@@ -50,19 +52,24 @@
   }
 
   & input[type=checkbox]:checked + label:before {
-      .font-icon;
-      content: @icon-checked;
-      color: @palette-black;
-      font-size: 11px;
-      text-align: center;
-      line-height: 15px;
+    .font-icon;
+    content: @icon-checked;
+    color: @palette-black;
+    font-size: 11px;
+    text-align: center;
+    line-height: 15px;
   }
+
   & label:before {
-      border: 2px solid @border-color;
-      border-radius: 3px;
+    border: 2px solid @border-color;
+    border-radius: 3px;
   }
 
   & input[type=checkbox]:disabled + label:before {
-     background-color: @disabled-color;
+    background-color: @disabled-color;
+  }
+
+  & input[type=checkbox]:disabled + label {
+    cursor: default;
   }
 }
