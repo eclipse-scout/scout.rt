@@ -167,5 +167,4 @@ public abstract class AbstractJsonPropertyObserver<T extends IPropertyObserver> 
   public void cleanUpEventFilters() {
     m_propertyEventFilter.removeAllConditions();
   }
-
 }

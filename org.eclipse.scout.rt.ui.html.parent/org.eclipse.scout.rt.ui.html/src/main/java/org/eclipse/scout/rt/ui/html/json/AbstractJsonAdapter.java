@@ -133,7 +133,7 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     return json;
   }
 
-  private String getObjectTypeVariant() {
+  protected String getObjectTypeVariant() {
     String objectType = getObjectType();
     if (getModel().getClass().isAnnotationPresent(ModelVariant.class)) {
       ModelVariant modelVariant = getModel().getClass().getAnnotation(ModelVariant.class);
@@ -247,5 +247,4 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
   @Override
   public void cleanUpEventFilters() {
   }
-
 }

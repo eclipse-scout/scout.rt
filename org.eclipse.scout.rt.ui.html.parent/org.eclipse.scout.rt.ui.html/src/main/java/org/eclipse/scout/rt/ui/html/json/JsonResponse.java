@@ -167,7 +167,7 @@ public class JsonResponse {
    * For other event types it may be crucial that the events are not sent.<br>
    * Example: NodesInserted event on tree must not be sent since the same nodes are already sent by Tree.toJson.
    */
-  private boolean doAddEvent(JsonEvent event) {
+  protected boolean doAddEvent(JsonEvent event) {
     if (m_adapterMap.containsKey(event.getTarget())) {
       return false;
     }
@@ -185,5 +185,4 @@ public class JsonResponse {
   public void setErrorMessage(String errorMessage) {
     m_errorMessage = errorMessage;
   }
-
 }
