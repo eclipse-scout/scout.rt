@@ -92,6 +92,8 @@ scout.Calendar.prototype._renderViewRange = function() {
 };
 
 scout.Calendar.prototype._setDisplayMode = function(mode, showDate) {
+  showDate = showDate || new Date();
+
   var year = showDate.getFullYear(),
     month = showDate.getMonth(),
     date = showDate.getDate(),
