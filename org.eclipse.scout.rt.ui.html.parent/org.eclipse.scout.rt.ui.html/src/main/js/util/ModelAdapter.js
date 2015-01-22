@@ -20,9 +20,11 @@ scout.ModelAdapter.prototype.init = function(model, session) {
     if (isAdapterProp && value) {
       value = this._createAdapters(propertyName, value);
     }
-
     this[propertyName] = value;
   }.bind(this));
+
+  // Fill in the missing default values
+  scout.defaultValues.applyTo(this);
 };
 
 scout.ModelAdapter.prototype.render = function($parent) {

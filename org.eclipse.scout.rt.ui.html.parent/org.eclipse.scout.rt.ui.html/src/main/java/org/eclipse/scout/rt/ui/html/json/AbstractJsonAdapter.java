@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.html.json;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -122,7 +123,7 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
 
   @Override
   public JSONObject toJson() {
-    JSONObject json = new JSONObject();
+    JSONObject json = new JSONObject(new LinkedHashMap<>());
     putProperty(json, "id", getId());
     putProperty(json, "objectType", getObjectTypeVariant());
 

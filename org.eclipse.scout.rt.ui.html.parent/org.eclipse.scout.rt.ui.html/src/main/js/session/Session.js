@@ -259,6 +259,7 @@ scout.Session.prototype._processSuccessResponse = function(message) {
 scout.Session.prototype._copyAdapterData = function(adapterData) {
   var count = 0;
   var prop;
+
   for (prop in adapterData) {
     this._adapterDataCache[prop] = adapterData[prop];
     count++;
@@ -312,10 +313,7 @@ scout.Session.prototype._processErrorResponse = function(request, jqXHR, textSta
     return;
   }
 
-  if (errorThrown) {
-    throw errorThrown;
-  }
-  throw new Error('Error while processing request. ' + textStatus);
+  throw new Error('Error while processing request: ' + errorThrown);
 };
 
 scout.Session.prototype.goOffline = function() {
@@ -367,6 +365,9 @@ scout.Session.prototype._processEvents = function(events) {
   var i, event, adapter;
   for (i = 0; i < events.length; i++) {
     event = events[i];
+
+//    scout.defaultValues.unfilter(event);
+
     $.log.debug("Processing event '" + event.type + "' for adapter with ID " + event.target);
     adapter = this.getOrCreateModelAdapter(event.target, scout.rootAdapter);
     if (!adapter) {
@@ -425,6 +426,11 @@ scout.Session.prototype.onModelAction = function(event) {
 scout.Session.prototype._getAdapterData = function(id) {
   var adapterData = this._adapterDataCache[id];
   delete this._adapterDataCache[id];
+
+  // Before returning the new adapter data, re-add missing default values based on defaultValues.json
+  // (This is the reverse operation of DefaultValueFilter.java)
+//  scout.defaultValues.unfilter(adapterData);
+
   return adapterData;
 };
 

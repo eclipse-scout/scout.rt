@@ -16,6 +16,7 @@ __include("util/NullAdapter.js");
 __include("util/numbers.js");
 __include("util/ObjectFactory.js");
 __include("util/dates.js");
+__include("util/defaultValues.js");
 __include("util/Device.js");
 __include("util/helpers.js");
 __include("util/objects.js");

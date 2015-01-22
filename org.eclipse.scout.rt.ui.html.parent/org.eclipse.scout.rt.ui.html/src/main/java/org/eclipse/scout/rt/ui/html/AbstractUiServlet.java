@@ -46,13 +46,12 @@ public abstract class AbstractUiServlet extends HttpServletEx {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractUiServlet.class);
 
-  private final IWebContentResourceLocator m_resourceLocator;
   private final IHttpCacheControl m_httpCacheControl;
   private final P_AbstractRequestHandler m_requestHandlerGet;
   private final P_AbstractRequestHandler m_requestHandlerPost;
 
   protected AbstractUiServlet() {
-    m_resourceLocator = createResourceLocator();
+    Activator.getDefault().setWebContentResourceLocator(createResourceLocator());
     m_httpCacheControl = createHttpCacheControl();
     m_requestHandlerGet = createRequestHandlerGet();
     m_requestHandlerPost = createRequestHandlerPost();
@@ -61,10 +60,6 @@ public abstract class AbstractUiServlet extends HttpServletEx {
   protected IWebContentResourceLocator createResourceLocator() {
     //TODO imo change once we switch from OSGI to JEE; move WebContent to src/main/resources/META-INF/resources/WebContent, move src/main/js to src/main/resources/META-INF/resources/js
     return new OsgiWebContentResourceLocator();
-  }
-
-  public IWebContentResourceLocator getResourceLocator() {
-    return m_resourceLocator;
   }
 
   protected IHttpCacheControl createHttpCacheControl() {

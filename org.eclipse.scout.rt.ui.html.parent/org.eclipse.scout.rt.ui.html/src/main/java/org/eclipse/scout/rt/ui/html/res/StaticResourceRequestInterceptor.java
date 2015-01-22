@@ -27,11 +27,14 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
 import org.eclipse.scout.rt.client.ui.IIconLocator;
 import org.eclipse.scout.rt.ui.html.AbstractUiServlet;
+import org.eclipse.scout.rt.ui.html.Activator;
 import org.eclipse.scout.rt.ui.html.IServletRequestInterceptor;
 import org.eclipse.scout.rt.ui.html.StreamUtility;
 import org.eclipse.scout.rt.ui.html.UiHints;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
+import org.eclipse.scout.rt.ui.html.cache.IHttpCacheControl;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonSession;
+import org.eclipse.scout.rt.ui.html.json.JsonUtility;
 import org.eclipse.scout.rt.ui.html.script.ScriptFileBuilder;
 import org.eclipse.scout.rt.ui.html.script.ScriptOutput;
 import org.eclipse.scout.rt.ui.html.scriptprocessor.ScriptProcessor;
@@ -40,7 +43,7 @@ import org.eclipse.scout.service.AbstractService;
 /**
  * This interceptor contributes to the {@link AbstractUiServlet} as the default GET handler for
  * <p>
- * js, css, html, png, gif, jpg, woff
+ * js, css, html, png, gif, jpg, woff, json
  */
 @Priority(-10)
 public class StaticResourceRequestInterceptor extends AbstractService implements IServletRequestInterceptor {
@@ -51,18 +54,21 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
 
   private static final String UTF_8 = "UTF-8";
 
+  private ScriptProcessor m_scriptProcessor;
+
   @Override
   public boolean interceptGet(AbstractUiServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     String pathInfo = resolvePathInfo(req);
     LOG.debug("processing static resource: " + pathInfo);
 
     // lookup cache or load
-    HttpCacheObject cacheObj = servlet.getHttpCacheControl().getCacheObject(req, pathInfo);
+    IHttpCacheControl httpCacheControl = servlet.getHttpCacheControl();
+    HttpCacheObject cacheObj = httpCacheControl.getCacheObject(req, pathInfo);
     if (cacheObj == null) {
       cacheObj = loadResource(servlet, req, pathInfo);
       // store in cache
       if (cacheObj != null) {
-        servlet.getHttpCacheControl().putCacheObject(req, cacheObj);
+        httpCacheControl.putCacheObject(req, cacheObj);
       }
     }
 
@@ -74,7 +80,7 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
     }
 
     // cached in browser?
-    if (servlet.getHttpCacheControl().checkAndUpdateCacheHeaders(req, resp, cacheObj.toCacheInfo())) {
+    if (httpCacheControl.checkAndUpdateCacheHeaders(req, resp, cacheObj.toCacheInfo())) {
       return true;
     }
 
@@ -95,8 +101,6 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
   public boolean interceptPost(AbstractUiServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     return false;
   }
-
-  private ScriptProcessor m_scriptProcessor;
 
   protected synchronized ScriptProcessor getSharedScriptProcessor() {
     if (m_scriptProcessor == null) {
@@ -138,23 +142,26 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
   }
 
   /**
-   * create new resource
+   * Loads a resource with an appropriate method, based on the URL
    */
   protected HttpCacheObject loadResource(AbstractUiServlet servlet, HttpServletRequest req, String pathInfo) throws ServletException, IOException {
+    if (pathInfo.matches("^/static/.*")) {
+      return loadStaticResource(req, pathInfo);
+    }
     if ((pathInfo.endsWith(".js") || pathInfo.endsWith(".css"))) {
       return loadScriptFile(servlet, req, pathInfo);
     }
     if (pathInfo.endsWith(".html")) {
       return loadHtmlFile(servlet, req, pathInfo);
     }
-    if (pathInfo.matches("^/?static/.*")) {
-      return loadStaticResource(req, pathInfo);
+    if (pathInfo.endsWith(".json")) {
+      return loadJsonFile(servlet, req, pathInfo);
     }
     return loadBinaryFile(servlet, req, pathInfo);
   }
 
   // FIXME AWE: (resource loading) discuss with C.GU - only for images/icons with IDs or other resources too?
-  private HttpCacheObject loadStaticResource(HttpServletRequest req, String pathInfo) {
+  protected HttpCacheObject loadStaticResource(HttpServletRequest req, String pathInfo) {
     HttpSession httpSession = req.getSession();
     String jsonSessionId = req.getParameter("sessionId");
     String jsonSessionAttributeName = "scout.htmlui.session.json." + jsonSessionId;
@@ -174,7 +181,7 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
    * js, css
    */
   protected HttpCacheObject loadScriptFile(AbstractUiServlet servlet, HttpServletRequest req, String pathInfo) throws ServletException, IOException {
-    ScriptFileBuilder builder = new ScriptFileBuilder(servlet.getResourceLocator(), getSharedScriptProcessor());
+    ScriptFileBuilder builder = new ScriptFileBuilder(Activator.getDefault().getWebContentResourceLocator(), getSharedScriptProcessor());
     builder.setMinifyEnabled(UiHints.isMinifyHint(req));
     ScriptOutput out = builder.buildScript(pathInfo);
     if (out != null) {
@@ -187,7 +194,7 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
    * html
    */
   protected HttpCacheObject loadHtmlFile(AbstractUiServlet servlet, HttpServletRequest req, String pathInfo) throws ServletException, IOException {
-    URL url = servlet.getResourceLocator().getWebContentResource(pathInfo);
+    URL url = Activator.getDefault().getWebContentResourceLocator().getWebContentResource(pathInfo);
     if (url == null) {
       //not handled here
       return null;
@@ -198,10 +205,25 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
   }
 
   /**
+   * json
+   */
+  protected HttpCacheObject loadJsonFile(AbstractUiServlet servlet, HttpServletRequest req, String pathInfo) throws ServletException, IOException {
+    URL url = Activator.getDefault().getWebContentResourceLocator().getWebContentResource(pathInfo);
+    if (url == null) {
+      //not handled here
+      return null;
+    }
+    // TODO BSH Maybe optimize memory consumption (unnecessary conversion of byte[] to String)
+    String json = new String(StreamUtility.readResource(url), UTF_8);
+    json = JsonUtility.stripCommentsFromJson(json);
+    return new HttpCacheObject(pathInfo, json.getBytes(UTF_8), System.currentTimeMillis());
+  }
+
+  /**
    * png, jpg, woff, pdf, docx
    */
   protected HttpCacheObject loadBinaryFile(AbstractUiServlet servlet, HttpServletRequest req, String pathInfo) throws ServletException, IOException {
-    URL url = servlet.getResourceLocator().getWebContentResource(pathInfo);
+    URL url = Activator.getDefault().getWebContentResourceLocator().getWebContentResource(pathInfo);
     if (url == null) {
       //not handled here
       return null;

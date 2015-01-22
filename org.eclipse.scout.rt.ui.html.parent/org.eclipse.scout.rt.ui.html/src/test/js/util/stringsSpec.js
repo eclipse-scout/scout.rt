@@ -93,4 +93,39 @@ describe("scout.strings", function() {
 
   });
 
+  describe("startsWith", function() {
+
+    it("can check if a string starts with another", function() {
+      expect(scout.strings.startsWith('abc', 'a')).toBe(true);
+      expect(scout.strings.startsWith('abc', 'b')).toBe(false);
+      expect(scout.strings.startsWith('äabc', 'ä')).toBe(true);
+      expect(scout.strings.startsWith('äabc', 'Ä')).toBe(false);
+      expect(scout.strings.startsWith('abc', '')).toBe(true);
+      expect(scout.strings.startsWith('', '')).toBe(true);
+      expect(scout.strings.startsWith()).toBe(false);
+      expect(scout.strings.startsWith(undefined, 'hello')).toBe(false);
+      expect(scout.strings.startsWith('Der Himmel ist blau!', 'Der')).toBe(true);
+      expect(scout.strings.startsWith('¿Vive usted en España?', 'Vive')).toBe(false);
+      expect(scout.strings.startsWith('¿Vive usted en España?', '¿Vive')).toBe(true);
+    });
+
+  });
+
+  describe("endsWith", function() {
+
+    it("can check if a string ends with another", function() {
+      expect(scout.strings.endsWith('abc', 'c')).toBe(true);
+      expect(scout.strings.endsWith('abc', 'b')).toBe(false);
+      expect(scout.strings.endsWith('abcä', 'ä')).toBe(true);
+      expect(scout.strings.endsWith('abcä', 'Ä')).toBe(false);
+      expect(scout.strings.endsWith('abc', '')).toBe(true);
+      expect(scout.strings.endsWith('', '')).toBe(true);
+      expect(scout.strings.endsWith()).toBe(false);
+      expect(scout.strings.endsWith(undefined, 'hello')).toBe(false);
+      expect(scout.strings.endsWith('Der Himmel ist blau!', 'blau')).toBe(false);
+      expect(scout.strings.endsWith('Der Himmel ist blau!', 'blau!')).toBe(true);
+    });
+
+  });
+
 });

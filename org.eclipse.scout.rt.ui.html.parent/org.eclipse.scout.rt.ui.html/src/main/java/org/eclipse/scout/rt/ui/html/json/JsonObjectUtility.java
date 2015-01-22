@@ -22,6 +22,7 @@ import java.util.NoSuchElementException;
 import org.eclipse.scout.commons.Base64Utility;
 import org.eclipse.scout.commons.beans.FastBeanInfo;
 import org.eclipse.scout.commons.beans.FastPropertyDescriptor;
+import org.eclipse.scout.service.SERVICES;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -484,5 +485,25 @@ public final class JsonObjectUtility {
       throw new IllegalArgumentException("Cannot convert " + type + " from json to java object");
     }
     return getJSONObject(jsonArray, index);
+  }
+
+  public static void filterDefaultValues(JSONObject json) {
+    if (json == null) {
+      return;
+    }
+    IDefaultValuesFilterService filterSvc = SERVICES.getService(IDefaultValuesFilterService.class);
+    if (filterSvc != null) {
+      filterSvc.filter(json);
+    }
+  }
+
+  public static void filterDefaultValues(JSONObject json, String objectType) {
+    if (json == null) {
+      return;
+    }
+    IDefaultValuesFilterService filterSvc = SERVICES.getService(IDefaultValuesFilterService.class);
+    if (filterSvc != null) {
+      filterSvc.filter(json, objectType);
+    }
   }
 }

@@ -1,0 +1,31 @@
+{
+  "defaults": {
+    "FormField": {
+      // hello
+      "enabled": true
+    }/*,
+    "GroupBox": {
+      "borderDecoration": "auto"
+    },
+    "SmartField": {
+      "multiline": false,
+      "options": [],
+      "lookupStrategy": "remote"
+    },
+    /* test
+    "Table": {
+      "enabled": true,
+      "rowHeightHint": -1,
+      "rows": []
+    },
+    // nothing
+    "Table/rows/cells": {
+      "horizontalAlignment": -1,
+      "editable": false
+    },
+    "FormField/gridData": {
+      "x": -1,
+      "y": -1
+    }*/
+  }
+}

@@ -36,8 +36,16 @@ scout.Table.CHECKABLE_COLUMN_SIZE = 40;
 scout.Table.prototype.init = function(model, session) {
   scout.Table.parent.prototype.init.call(this, model, session);
   this.keystrokeAdapter = new scout.TableKeystrokeAdapter(this);
-  for (var i = 0; i < this.columns.length; i++) {
+
+  var i;
+  for (i = 0; i < this.columns.length; i++) {
+    scout.defaultValues.applyTo(this.columns[i], 'TableColumn');
     this.columns[i].index = i;
+  }
+  for (i = 0; i < this.rows.length; i++) {
+    var row = this.rows[i];
+    this._unwrapCells(row.cells);
+    scout.defaultValues.applyTo(row.cells, 'Cell');
   }
 };
 
@@ -98,6 +106,27 @@ scout.Table.prototype._renderTableControls = function(dummy) {
 
 scout.Table.prototype._renderTableStatusVisible = function(dummy) {
   this._renderTableFooter();
+};
+
+/**
+ * Converts each element of the given cell array that is of type string to an object with
+ * a property 'text' with the original value.
+ *
+ * Example:
+ * 'My Company' --> { text: 'MyCompany'; }
+ *
+ * @see JsonCell.java
+ */
+scout.Table.prototype._unwrapCells = function(cells) {
+  for (var i = 0; i < cells.length; i++) {
+    var cell = cells[i];
+    if (typeof cell === 'string') {
+      cell = {
+          text: cell
+      };
+      cells[i] = cell;
+    }
+  }
 };
 
 scout.Table.prototype._isFooterVisible = function() {
@@ -912,6 +941,12 @@ scout.Table.prototype.checkRow = function(row, checked, render) {
 };
 
 scout.Table.prototype._onRowsInserted = function(rows) {
+  for (var i = 0; i < rows.length; i++) {
+    var row = rows[i];
+    this._unwrapCells(row.cells);
+    scout.defaultValues.applyTo(row.cells, 'Cell');
+  }
+
   //always insert new rows at the end, if the order is wrong a rowOrderChange event will follow
   scout.arrays.pushAll(this.rows, rows);
 

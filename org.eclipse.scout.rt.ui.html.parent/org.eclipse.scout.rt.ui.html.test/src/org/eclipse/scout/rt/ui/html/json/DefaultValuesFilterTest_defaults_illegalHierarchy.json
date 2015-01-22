@@ -1,0 +1,13 @@
+{
+  "defaults": {
+  },
+  "objectTypeHierarchy": {
+    "FormField": {
+      "TableField": null,
+      "ValueField": {
+        "SmartField": null
+      },
+      "SmartField": null
+    }
+  }
+}

@@ -24,5 +24,9 @@
                factory="org.eclipse.scout.rt.client.services.ClientServiceFactory"
                ranking="-1000">
       </service>
+      <service
+            class="org.eclipse.scout.rt.ui.html.json.DefaultValuesFilterService"
+            createImmediately="false">
+      </service>
    </extension>
 </plugin>

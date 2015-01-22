@@ -39,6 +39,7 @@ public class JsonDataModel<T extends IDataModel> extends AbstractJsonAdapter<T> 
     }
     try {
       // FIXME read from model
+      // TODO BSH Maybe load this as cacheable file
       String jsonData = new String(IOUtility.getContent(url.openStream()), "utf-8");
       JSONObject json = new JSONObject(jsonData);
       putProperty(json, "objectType", getObjectType());

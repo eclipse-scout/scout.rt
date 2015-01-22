@@ -1,0 +1,192 @@
+/**
+ * Note: This file is not a well-formed JSON file according to RFC 4627 because of the comments.
+ * You can remove the comments (and thus create a compliant JSON file again) with
+ * JsonUtility.stripJsonComments(). If the file is served by StaticResourceRequestInterceptor,
+ * this is done automatically.
+ */
+{
+  /* *** Default value definitions *** */
+  "defaults": {
+
+    // Model adapters
+    "FormField": {
+      "enabled": true,
+      "visible": true,
+      "labelVisible": true,
+      "labelPosition": 0,
+      "mandatory": false,
+      "statusVisible": true,
+      "errorStatus": "",
+      "gridData": { // works because of special handling in DefaultValuesFilter.filterDefaultObject() and defaultValues._extendWithDefaults()
+        "x": -1,
+        "y": -1,
+        "w": 1,
+        "h": 1,
+        "weightX": -1,
+        "weightY": -1,
+        "useUiWidth": false,
+        "useUiHeight": false,
+        "horizontalAlignment": -1,
+        "verticalAlignment": -1,
+        "fillHorizontal": true,
+        "fillVertical": true,
+        "widthInPixel": 0,
+        "heightInPixel": 0
+      }
+    },
+    "Action": {
+      "enabled": true,
+      "visible": true,
+      "selected": false,
+      "horizontalAlignment": -1,
+      "iconId": "",
+      "tooltipText": "",
+      "text": ""
+    },
+    "Menu": {
+      "defaultMenu": false,
+      "systemType": 0,
+      "separator": false,
+      "childMenus": [],
+      "menuTypes": ["Table.EmptySpace"]
+    },
+    "TableOrganizeMenu": {
+      "menuTypes": [ "Table.Header" ]
+    },
+    "Button": {
+      "systemType": 0,
+      "processButton": true,
+      "selected": false,
+      "displayStyle": 0
+    },
+    "GroupBox": {
+      "borderDecoration": "auto",
+      "borderVisible": true,
+      "mainBox": false,
+      "scrollable": false
+    },
+    "SmartField": {
+      "multiline": false,
+      "validateOnAnyKey": false,
+      "options": [],
+      "lookupStrategy": "remote"
+    },
+    "SmartFieldMultiline": {
+      "multilineText": false,
+      "validateOnAnyKey": false,
+      "options": [],
+      "lookupStrategy": "remote"
+    },
+    "StringField": {
+      "inputMasked": false,
+      "multilineText": false,
+      "validateOnAnyKey": false
+    },
+    "Table": {
+      "autoResizeColumns": false,
+      "checkable": false,
+      "enabled": true,
+      "headerVisible": true,
+      "keyStroks": [],
+      "keyboardNavigation": true,
+      "multiCheck": true,
+      "multiSelect": true,
+      "multilineText": false,
+      "rowHeightHint": -1,
+      "rows": [],
+      "scrollToSelection": false,
+      "selectedRowIds": [],
+      "tableStatusVisible": true
+    },
+    "Desktop": {
+      "forms": [],
+      "messageBoxes": []
+    },
+    "Form": {
+      "displayHint": "dialog",
+      "maximizeEnabled": true,
+      "maximized": false,
+      "minimizeEnabled": true,
+      "minimized": false,
+      "modal": false
+    },
+    "Tree": {
+      "selectedNodeIds": [],
+      "filterEnabled": false
+    },
+
+    // Other objects
+    "Cell": {
+      "horizontalAlignment": -1,
+      "editable": false
+    },
+    "TableColumn": {
+      "horizontalAlignment": -1,
+      "sortActive": false,
+      "sortAscending": true,
+      "sortIndex": 0,
+      "summary": false,
+      "type": "text",
+      "width": 60
+    },
+    "TreeNode": {
+      "expanded": false,
+      "leaf": false,
+      "childNodes": []
+    },
+    "ImageField": {
+      "scrollBarEnabled": false
+    }
+  },
+
+  /* *** Object type hierarchy *** */
+  "objectTypeHierarchy": {
+    "FormField": {
+      "Button": {
+        "RadioButton": null
+      },
+      "GroupBox": {
+        "TabItem": null
+      },
+      "ImageField": null,
+      "OfficeOnlineField": null,
+      "SequenceBox": null,
+      "TabBox": null,
+      "TableField": null,
+      "TagCloudField": null,
+      "TreeField": null,
+      "TreeBox": null,
+      "ValueField": {
+        "CheckBoxField": null,
+        "DateField": null,
+        "LabelField": null,
+        "NumberField": null,
+        "RichTextField": null,
+        "SmartField": {
+          "SmartFieldMultiline": null
+        },
+        "StringField": null,
+        "RadioButtonGroup": null
+      }
+    },
+    "Action": {
+      "ToolButton": null,
+      "KeyStroke": null,
+      "Menu": {
+        "TableOrganizeMenu": null
+      },
+      "OutlineViewButton": null,
+      "TableControl": {
+        "AnalysisTableControl": null,
+        "ChartTableControl": null,
+        "GraphTableControl": null,
+        "MapTableControl": null
+      }
+    },
+    "Tree": {
+      "Outline": {
+        "SearchOutline": null
+      }
+    }
+  }
+}

@@ -65,11 +65,11 @@ public class JsonCell implements IJsonMapper {
     JsonObjectUtility.putProperty(json, "text", m_cellText);
     JsonObjectUtility.putProperty(json, "iconId", m_cell.getIconId());
     JsonObjectUtility.putProperty(json, "tooltipText", m_cell.getTooltipText());
-    JsonObjectUtility.putProperty(json, "horizontalAlignment", (m_cell.getHorizontalAlignment() == -1 ? null : Integer.valueOf(m_cell.getHorizontalAlignment())));
+    JsonObjectUtility.putProperty(json, "horizontalAlignment", m_cell.getHorizontalAlignment());
     JsonObjectUtility.putProperty(json, "foregroundColor", m_cell.getForegroundColor());
     JsonObjectUtility.putProperty(json, "backgroundColor", m_cell.getBackgroundColor());
     JsonObjectUtility.putProperty(json, "font", (m_cell.getFont() == null ? null : m_cell.getFont().toPattern()));
-    JsonObjectUtility.putProperty(json, "editable", (!m_cell.isEditable() ? null : Boolean.valueOf(m_cell.isEditable())));
+    JsonObjectUtility.putProperty(json, "editable", m_cell.isEditable());// (!m_cell.isEditable() ? null : Boolean.valueOf(m_cell.isEditable())));
     // TODO BSH Table | Add property "errorStatus"
     // TODO BSH Table | Handle "default" values
     // TODO BSH Table | Add generic "cssStyle" property
@@ -82,6 +82,7 @@ public class JsonCell implements IJsonMapper {
    */
   public Object toJsonOrString() {
     JSONObject json = toJson();
+    JsonObjectUtility.filterDefaultValues(json, "Cell");
     if (json.length() == 1 && json.has("text")) {
       return json.opt("text");
     }

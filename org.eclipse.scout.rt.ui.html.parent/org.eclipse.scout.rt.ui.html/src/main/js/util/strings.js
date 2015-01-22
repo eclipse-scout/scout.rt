@@ -57,8 +57,24 @@ scout.strings = {
     return s;
   },
 
-  startsWith: function(haystack, needle) {
-    return haystack.substr(0, needle.length) === needle;
+  startsWith: function(fullString, startString) {
+    if (fullString === undefined || fullString === null || startString === undefined || startString === null) {
+      return false;
+    }
+    if (startString.length === 0) {
+      return true;
+    }
+    return (fullString.substr(0, startString.length) === startString);
+  },
+
+  endsWith: function(fullString, endString) {
+    if (fullString === undefined || fullString === null || endString === undefined || endString === null) {
+      return false;
+    }
+    if (endString.length === 0) {
+      return true;
+    }
+    return (fullString.substr(-endString.length) === endString);
   }
 
 };

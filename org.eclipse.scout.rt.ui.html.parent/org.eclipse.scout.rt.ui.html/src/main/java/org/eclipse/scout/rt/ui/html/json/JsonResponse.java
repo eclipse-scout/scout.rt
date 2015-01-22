@@ -53,6 +53,7 @@ public class JsonResponse {
    *          property name
    * @param newValue
    */
+  // XXX BSH Methode überladen mit: (Adapter, propertyName, newValue)
   public void addPropertyChangeEvent(String id, String propertyName, Object newValue) {
     // coalesce
     JsonEvent event = m_idToPropertyChangeEventMap.get(id);
@@ -130,13 +131,16 @@ public class JsonResponse {
       // To debug which adapter caused the error, add a syso for entry.getValue() in the following loop.
       List<String> adapterIds = null;
       for (Entry<String, IJsonAdapter<?>> entry : m_adapterMap.entrySet()) {
-        JsonObjectUtility.putProperty(adapterData, entry.getKey(), entry.getValue().toJson());
-
-        if (LOG.isDebugEnabled()) {
-          if (adapterIds == null) {
-            adapterIds = new LinkedList<String>();
+        JSONObject adapterJson = entry.getValue().toJson();
+        if (adapterJson != null) {
+          JsonObjectUtility.filterDefaultValues(adapterJson);
+          JsonObjectUtility.putProperty(adapterData, entry.getKey(), adapterJson);
+          if (LOG.isDebugEnabled()) {
+            if (adapterIds == null) {
+              adapterIds = new LinkedList<String>();
+            }
+            adapterIds.add(entry.getValue().getId());
           }
-          adapterIds.add(entry.getValue().getId());
         }
       }
       LOG.debug("Adapter data created for these adapters: " + adapterIds);

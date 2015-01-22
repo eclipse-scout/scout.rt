@@ -25,6 +25,7 @@ scout.Tree.prototype._initTreeNode = function(parentNode, node) {
   if (parentNode) {
     node.parentNode = parentNode;
   }
+  scout.defaultValues.applyTo(node, 'TreeNode');
   if (node.childNodes === undefined) {
     node.childNodes = [];
   }

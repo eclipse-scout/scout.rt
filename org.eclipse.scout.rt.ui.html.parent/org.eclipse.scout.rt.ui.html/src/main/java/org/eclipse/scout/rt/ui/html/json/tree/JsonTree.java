@@ -326,6 +326,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
       }
     }
     putProperty(json, "childNodes", jsonChildNodes);
+    JsonObjectUtility.filterDefaultValues(json, "TreeNode");
     return json;
   }
 

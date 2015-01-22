@@ -482,6 +482,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
         }
       }
       // FIXME CGU: complete
+      JsonObjectUtility.filterDefaultValues(json, "TableColumn");
       return json;
     }
     catch (JSONException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
