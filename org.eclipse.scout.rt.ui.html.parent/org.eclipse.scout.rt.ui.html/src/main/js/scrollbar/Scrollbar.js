@@ -10,7 +10,7 @@ scout.Scrollbar = function($parent, options) {
     borderless: false
   };
 
-  this.options = $.extend({}, this.defaultSettings, options);
+  this.options = $.extend({}, this.defaultOptions, options);
   this._$parent = $parent;
   this._beginDefault = 0;
   this._thumbRange;
@@ -36,7 +36,6 @@ scout.Scrollbar = function($parent, options) {
   $parent.parent().on('DOMMouseScroll mousewheel', '', scrollWheel);
   this._$scrollbar.on('mousedown', scrollEnd);
   this._$thumb.on('mousedown', '', scrollStart);
-  $(window).on('load resize', this.updateThumb.bind(this));
 
   function scrollWheel(event) {
     var w, d;

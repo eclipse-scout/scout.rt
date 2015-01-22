@@ -569,8 +569,11 @@ scout.Table.prototype.onRowsSelected = function($selectedRows) {
 
 scout.Table.prototype.onResize = function() {
   if (this.footer) {
+    // Delegate window resize events to footer (actually only width changes are relevant)
     this.footer.onResize();
   }
+  // Only necessary for outline table. If the table is on a form, the update is triggered by the table layout
+  scout.scrollbars.update(this._$scrollable);
 };
 
 scout.Table.prototype.sendRowClicked = function($row, columnIdParam) {

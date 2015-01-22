@@ -1,7 +1,6 @@
 scout.TableLayout = function(table) {
   scout.TableLayout.parent.call(this);
   this.table = table;
-  this.invalidateOnResize = false;
 };
 scout.inherits(scout.TableLayout, scout.AbstractLayout);
 
@@ -23,6 +22,8 @@ scout.TableLayout.prototype.layout = function($container) {
   }
   height += $data.cssMarginTop() + $data.cssMarginBottom();
   $data.css('height', 'calc(100% - '+ height + 'px)');
+
+  scout.scrollbars.update(this.table._$scrollable);
 };
 
 scout.TableLayout.prototype.preferredLayoutSize = function($comp) {

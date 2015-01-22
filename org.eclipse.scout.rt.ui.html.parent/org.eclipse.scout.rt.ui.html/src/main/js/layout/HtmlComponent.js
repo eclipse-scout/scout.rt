@@ -33,7 +33,9 @@ scout.HtmlComponent.prototype.getParent = function() {
 };
 
 /**
- * Computes the preferred height if the component is scrollable. Otherwise the actual size is returned.
+ * Computes the preferred height if the component is scrollable and returns it if it is greater than the actual size.
+ * If it is not scrollable, the actual height is returned.<p>
+ * The returned width is always the actual width because there are no horizontal scrollbars.
  */
 scout.HtmlComponent.prototype.getAvailableSize = function() {
   var size = this.getSize(),
@@ -41,7 +43,9 @@ scout.HtmlComponent.prototype.getAvailableSize = function() {
 
   if (this.scrollable) {
     prefSize = this.getPreferredSize();
-    size.height = prefSize.height;
+    if (prefSize.height > size.height) {
+      size.height = prefSize.height;
+    }
   }
 
   return size;
@@ -136,7 +140,7 @@ scout.HtmlComponent.prototype.getSize = function(includeMargins) {
  */
 scout.HtmlComponent.prototype.setSize = function(size) {
   var oldSize = this.size;
-  if (!size.equals(oldSize) && this.layoutManager.invalidateOnResize) {
+  if (!size.equals(oldSize)) {
     this.invalidate();
   }
   if (this.pixelBasedSizing) {

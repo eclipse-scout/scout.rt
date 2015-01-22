@@ -115,9 +115,11 @@ scout.Desktop.prototype.onResize = function() {
       }
     }
   }
-
   if (this._outlineTab.content) {
     this._outlineTab.content.onResize();
+  }
+  if (this.outline) {
+    this.outline.onResize();
   }
 };
 

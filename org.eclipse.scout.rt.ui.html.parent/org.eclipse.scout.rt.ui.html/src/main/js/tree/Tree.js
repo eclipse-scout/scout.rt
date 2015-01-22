@@ -60,6 +60,10 @@ scout.Tree.prototype._remove = function() {
   this.session.detachHelper.removeScrollable(this._$scrollable);
 };
 
+scout.Tree.prototype.onResize = function() {
+  scout.scrollbars.update(this._$scrollable);
+};
+
 scout.Tree.prototype.setBreadcrumb = function(bread) {
   if (bread) {
     this._breadcrumb = true;

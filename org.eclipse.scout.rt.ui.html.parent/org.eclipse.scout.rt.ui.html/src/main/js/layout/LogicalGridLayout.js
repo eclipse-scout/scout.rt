@@ -12,6 +12,7 @@ scout.inherits(scout.LogicalGridLayout, scout.AbstractLayout);
 scout.AbstractLayout.prototype._verifyLayout = function($parent) {
   var htmlParent = scout.HtmlComponent.get($parent),
     parentSize = htmlParent.getSize();
+
   if (!this.valid || !this.validityBasedOnParentSize.equals(parentSize)) {
     this.validityBasedOnParentSize = parentSize;
     this.validateLayout($parent);
@@ -26,6 +27,7 @@ scout.AbstractLayout.prototype.invalidate = function() {
 scout.LogicalGridLayout.prototype.validateLayout = function($parent) {
   var visibleComps = [], visibleCons = [], i, cons,
     children = $parent.children('.form-field');
+
   for (i = 0; i < children.length; i++) {
     var $comp = $(children[i]);
     var htmlComp = scout.HtmlComponent.get($comp);

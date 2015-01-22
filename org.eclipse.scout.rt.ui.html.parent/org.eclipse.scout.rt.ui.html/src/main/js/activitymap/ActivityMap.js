@@ -32,11 +32,12 @@ scout.ActivityMap.prototype._render = function($parent) {
 };
 
 scout.ActivityMap.prototype._remove = function() {
+  scout.ActivityMap.parent.prototype._remove.call(this);
   this.session.detachHelper.removeScrollable(this._$scrollable);
 };
 
 scout.ActivityMap.prototype.drawData = function() {
-  this.$data.text('ACTIVITY MAP');
+  this._$scrollable.text('ACTIVITY MAP');
 };
 
 scout.ActivityMap.prototype._renderDays = function() {
