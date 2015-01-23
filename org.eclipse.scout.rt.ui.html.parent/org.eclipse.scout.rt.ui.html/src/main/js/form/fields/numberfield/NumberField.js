@@ -15,22 +15,23 @@ scout.NumberField.prototype._render = function($parent) {
 };
 
 scout.NumberField.prototype._parse = function () {
-  var value = this.$field.val();
+  var input = this.$field.val();
+  if (input) {
+    // find simple format for value function
+    var decimalFormat = this.session.locale.decimalFormat;
+    input = input.replace(decimalFormat.groupChar, '').replace(decimalFormat.pointChar, '.').replace(/\s/g, '');
 
-  // find simple format for value function
-  value = value.split(this.parent.session.locale.decimalFormat.groupChar).join('');
-  value = value.split(this.parent.session.locale.decimalFormat.pointChar).join('.');
-
-  // in case of non math symbols return false
-  if (value.match(/[^\s\d\(\)\+\-\*\/\.]/g, '')) {
-    return false;
-  }
-
-  // evaluate, in case of math errors return false
-  try {
-    value = String(eval(value));
-    this.$field.val(value);
-  } catch (err) {
-    return false;
+    // if only math symbols are in the input string...
+    if (input.match(/^[\d\(\)\+\-\*\/\.]+$/)) {
+      // ...evaluate, reformat the result and set is to the field. If the display text
+      // changed, ValueField.js will make sure, the new value is sent to the model.
+      try {
+        input = eval(input);
+        input = decimalFormat.format(input);
+        this.$field.val(input);
+      } catch (err) {
+        // ignore errors, let the input handle by scout model
+      }
+    }
   }
 };
