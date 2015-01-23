@@ -19,18 +19,12 @@ import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.decimalfield.IDecimalFieldExtension;
-import org.eclipse.scout.rt.client.ui.form.fields.IBasicFieldUIFacade;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.AbstractNumberField;
 import org.eclipse.scout.rt.client.ui.valuecontainer.IDecimalValueContainer;
 
 @ClassId("f4ec575e-f572-418d-a49c-3d0811ea7540")
 public abstract class AbstractDecimalField<T extends Number> extends AbstractNumberField<T> implements IDecimalField<T> {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractDecimalField.class);
-
-  private IBasicFieldUIFacade m_uiFacade;
 
   public AbstractDecimalField() {
     this(true);
@@ -124,7 +118,6 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractNum
 
   @Override
   protected void initConfig() {
-    m_uiFacade = new P_UIFacade();
     super.initConfig();
     setMinFractionDigits(getConfiguredMinFractionDigits());
     setMaxFractionDigits(getConfiguredMaxFractionDigits());
@@ -255,11 +248,6 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractNum
     return getFormatInternal().getMultiplier();
   }
 
-  @Override
-  public IBasicFieldUIFacade getUIFacade() {
-    return m_uiFacade;
-  }
-
   /**
    * Rounds the parsed value according {@link #getRoundingMode()} and {@link #getParsingFractionDigits()}. (The maximum
    * fraction digits used for parsing is adapted to {@link #getMultiplier()} if needed.)
@@ -273,19 +261,6 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractNum
     int additionalFractionDigits = ("" + Math.abs(getMultiplier())).length() - 1;
     int precision = valBeforeRounding.toBigInteger().toString().length() + getFractionDigits() + additionalFractionDigits;
     return valBeforeRounding.round(new MathContext(precision, getRoundingMode()));
-  }
-
-  private class P_UIFacade implements IBasicFieldUIFacade {
-    @Override
-    public boolean setTextFromUI(String newText, boolean whileTyping) {
-      if (newText != null && newText.length() == 0) {
-        newText = null;
-      }
-      // parse always, validity might change even if text is same
-      setWhileTyping(whileTyping);
-      return parseValue(newText);
-    }
-
   }
 
   protected static class LocalDecimalFieldExtension<T extends Number, OWNER extends AbstractDecimalField<T>> extends LocalNumberFieldExtension<T, OWNER> implements IDecimalFieldExtension<T, OWNER> {
