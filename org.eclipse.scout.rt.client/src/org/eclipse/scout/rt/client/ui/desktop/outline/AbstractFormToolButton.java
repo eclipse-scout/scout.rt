@@ -38,12 +38,12 @@ public abstract class AbstractFormToolButton<FORM extends IForm> extends Abstrac
 
   @SuppressWarnings("unchecked")
   @Override
-  public final FORM getForm() {
+  public FORM getForm() {
     return (FORM) propertySupport.getProperty(PROP_FORM);
   }
 
   @Override
-  public final void setForm(IForm f) {
+  public void setForm(FORM f) {
     propertySupport.setProperty(PROP_FORM, f);
   }
 
@@ -97,7 +97,7 @@ public abstract class AbstractFormToolButton<FORM extends IForm> extends Abstrac
     if (getForm() != null) {
       return;
     }
-    IForm form = createForm();
+    FORM form = createForm();
     if (form != null) {
       setForm(form);
       decorateForm();
