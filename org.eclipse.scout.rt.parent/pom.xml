@@ -53,8 +53,6 @@
     <module>../org.eclipse.scout.svg.ui.swt</module>
     <module>../org.eclipse.scout.rt.swt-feature</module>
 
-    <module>../org.eclipse.scout.rt.ui.svg.calendar</module>
-
     <module>../org.eclipse.scout.rt.feature.about</module>
     <module>../org.eclipse.scout.rt.core-feature</module>
     <module>../org.eclipse.scout.rt-feature</module>
