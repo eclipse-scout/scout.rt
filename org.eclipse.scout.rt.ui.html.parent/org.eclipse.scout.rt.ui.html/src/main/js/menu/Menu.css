@@ -61,6 +61,17 @@
   }
 }
 
+// FIXME AWE: (menu) make mixin, reduce copy/paste, split menu.css into button, menu-item, menu-bar.css
+.menubar .link-button button {
+  height: 39px;
+  line-height: 39px;
+  white-space: nowrap;
+  cursor: pointer;
+  padding-top: 1px;
+  display: inline-block;
+  border: none;
+}
+
 .menubar button {
   position: relative;
   height: 30px;

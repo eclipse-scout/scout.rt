@@ -73,8 +73,6 @@ scout.MenuBar.prototype._updateVisibility = function() {
 
 scout.MenuBar.prototype._renderMenuItems = function(menuItems, right) {
   menuItems.forEach(function(item) {
-    // FIXME AWE: mit team besprechen -> das hier sollte doch nicht fix sein, oder? der tooltip (und die menu-popups)
-    // sollen doch einfach dort gerendert werden wo's platz hat auf dem screen.
     item.tooltipPosition = this.position === 'top' ? 'bottom' : 'top';
     item.render(this.$container);
     if (right) {

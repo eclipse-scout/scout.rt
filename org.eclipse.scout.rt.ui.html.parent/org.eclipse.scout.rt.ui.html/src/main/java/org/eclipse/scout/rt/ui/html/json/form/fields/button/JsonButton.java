@@ -23,6 +23,7 @@ public class JsonButton<T extends IButton> extends JsonFormField<T> {
 
   public static final String PROP_SYSTEM_TYPE = "systemType";
   public static final String PROP_PROCESS_BUTTON = "processButton";
+  public static final String PROP_DISPLAY_STYLE = "displayStyle";
 
   public JsonButton(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
     super(model, jsonSession, id, parent);
@@ -41,6 +42,12 @@ public class JsonButton<T extends IButton> extends JsonFormField<T> {
       @Override
       protected Boolean modelValue() {
         return getModel().isProcessButton();
+      }
+    });
+    putJsonProperty(new JsonProperty<IButton>(PROP_DISPLAY_STYLE, model) {
+      @Override
+      protected Integer modelValue() {
+        return getModel().getDisplayStyle();
       }
     });
     putJsonProperty(new JsonProperty<IButton>(IButton.PROP_SELECTED, model) {
