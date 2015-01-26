@@ -332,6 +332,10 @@
     return this.css('height', height + 'px');
   };
 
+  $.fn.cssLineHeight = function(height) {
+    return this.css('line-height', height + 'px');
+  };
+
   $.fn.cssValue = function(margin, value) {
     margin = margin || 'margin';
     if (value === undefined) {
