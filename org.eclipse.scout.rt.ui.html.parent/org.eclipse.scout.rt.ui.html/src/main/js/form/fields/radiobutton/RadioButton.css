@@ -1,5 +1,5 @@
-.radio-button>label {
-  padding: 0px 0px 0px 25px;
+.radio-button > label {
+  padding: @borderless-field-padding-y 0px @borderless-field-padding-y 25px;
 }
 
 .radio-button {

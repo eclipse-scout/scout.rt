@@ -1,9 +1,9 @@
-.check-box-field>.field {
-  padding: 7px 0px 7px 0px;
+.check-box-field > .field {
+  padding: @borderless-field-padding-y 0px @borderless-field-padding-y 0px;
 }
 
-.check-box-field>span {
-  & label{
+.check-box-field > span {
+  & label {
     cursor: pointer;
     display: inline-block;
     position: relative;

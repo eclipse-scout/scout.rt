@@ -12,7 +12,7 @@ scout.LabelField.prototype._render = function($parent) {
 };
 
 /**
- * @Override
+ * @override
  */
 scout.LabelField.prototype._renderDisplayText = function(displayText) {
   this.$field.html(displayText);
