@@ -27,6 +27,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.CompositeLong;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.ConfigurationUtility;
@@ -1113,6 +1114,22 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
       //
       propertySupport.setProperty(PROP_SELECTED_BEGIN_TIME, beginTime);
       propertySupport.setProperty(PROP_SELECTED_END_TIME, endTime);
+
+      // update selected activity cell based on selected time range.
+      // this is a work around for enforcing an owner value change event on context menus. Actually the empty selection event
+      // should be handled correctly in the GUI.
+      List<RI> selectedResourceIds = getSelectedResourceIds();
+      if (selectedResourceIds.size() == 1) {
+        RI resourceId = CollectionUtility.firstElement(selectedResourceIds);
+        List<ActivityCell<RI, AI>> activityCells = getActivityCells(resourceId);
+        for (ActivityCell<RI, AI> cell : activityCells) {
+          if (CompareUtility.equals(cell.getBeginTime(), beginTime) && CompareUtility.equals(cell.getEndTime(), endTime)) {
+            setSelectedActivityCell(cell);
+            return;
+          }
+        }
+      }
+      setSelectedActivityCell(null);
     }
     finally {
       setActivityMapChanging(false);
