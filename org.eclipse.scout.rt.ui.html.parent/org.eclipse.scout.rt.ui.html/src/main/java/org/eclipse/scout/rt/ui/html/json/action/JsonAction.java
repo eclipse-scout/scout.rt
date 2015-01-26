@@ -82,6 +82,13 @@ public abstract class JsonAction<T extends IAction> extends AbstractJsonProperty
         return getModel().getKeyStroke();
       }
     });
+
+    putJsonProperty(new JsonProperty<T>(IAction.PROP_HORIZONTAL_ALIGNMENT, model) {
+      @Override
+      protected Integer modelValue() {
+        return getModel().getHorizontalAlignment();
+      }
+    });
   }
 
   @Override
