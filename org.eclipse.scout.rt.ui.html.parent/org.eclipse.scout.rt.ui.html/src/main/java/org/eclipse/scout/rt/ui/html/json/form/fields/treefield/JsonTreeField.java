@@ -39,5 +39,4 @@ public class JsonTreeField<T extends ITreeField> extends JsonFormField<T> {
   public String getObjectType() {
     return "TreeField";
   }
-
 }

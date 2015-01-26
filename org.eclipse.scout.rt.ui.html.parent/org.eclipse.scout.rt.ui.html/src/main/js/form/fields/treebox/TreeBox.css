@@ -1,0 +1,6 @@
+.tree-box > .tree {
+  border: 1px solid @border-color;
+  border-radius: @border-radius;
+  background-color: @control-background-color;
+  padding: 3px;
+}

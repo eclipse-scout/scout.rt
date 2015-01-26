@@ -231,6 +231,11 @@ scout.defaultObjectFactories = [{
     return new scout.TreeField();
   }
 }, {
+  objectType: 'TreeBox',
+  create: function() {
+    return new scout.TreeBox();
+  }
+}, {
   objectType: 'GroupBox',
   create: function() {
     return new scout.GroupBox();

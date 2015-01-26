@@ -51,6 +51,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
 import org.eclipse.scout.rt.client.ui.form.fields.tagcloudfield.ITagCloudField;
+import org.eclipse.scout.rt.client.ui.form.fields.treebox.ITreeBox;
 import org.eclipse.scout.rt.client.ui.form.fields.treefield.ITreeField;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.shared.data.model.IDataModel;
@@ -84,6 +85,7 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.tabbox.JsonTabBox;
 import org.eclipse.scout.rt.ui.html.json.form.fields.tabbox.JsonTabItem;
 import org.eclipse.scout.rt.ui.html.json.form.fields.tablefield.JsonTableField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.tagcloudfield.JsonTagCloudField;
+import org.eclipse.scout.rt.ui.html.json.form.fields.treebox.JsonTreeBox;
 import org.eclipse.scout.rt.ui.html.json.form.fields.treefield.JsonTreeField;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonMenu;
@@ -138,6 +140,9 @@ public class JsonAdapterFactory implements IJsonAdapterFactory {
     }
     else if (model instanceof ITreeField) {
       return new JsonTreeField((ITreeField) model, session, id, parent);
+    }
+    else if (model instanceof ITreeBox) {
+      return new JsonTreeBox((ITreeBox) model, session, id, parent);
     }
     else if (model instanceof IRadioButton) {
       return new JsonRadioButton((IRadioButton) model, session, id, parent);
