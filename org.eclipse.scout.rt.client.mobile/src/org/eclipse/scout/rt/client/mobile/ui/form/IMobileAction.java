@@ -17,16 +17,4 @@ import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
  */
 public interface IMobileAction extends IMenu {
 
-  String PROP_HORIZONTAL_ALIGNMENT = "horizontalAlignment";
-
-  int HORIZONTAL_ALIGNMENT_LEFT = -1;
-  int HORIZONTAL_ALIGNMENT_RIGHT = 1;
-
-  int getHorizontalAlignment();
-
-  /**
-   * @param alignment
-   *          negative for left and positive for right alignment
-   */
-  void setHorizontalAlignment(int alignment);
 }

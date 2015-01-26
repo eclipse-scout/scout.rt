@@ -39,7 +39,10 @@ public interface IAction extends IPropertyObserver, ITypeWithClassId, IOrdered {
   String PROP_VISIBLE = "visible";
   String PROP_MNEMONIC = "mnemonic";
   String PROP_KEYSTROKE = "keystroke";
-  String PROP_VIEW_ORDER = "viewOrder";
+  String PROP_VIEW_ORDER = "viewOrder"; // FIXME AWE: evtl. nur order renamen (gab früher probleme in CRM) --> MVI fragen
+  String PROP_HORIZONTAL_ALIGNMENT = "horizontalAlignment";
+  int HORIZONTAL_ALIGNMENT_LEFT = -1;
+  int HORIZONTAL_ALIGNMENT_RIGHT = 1;
 
   /**
    * @throws ProcessingException
@@ -226,5 +229,13 @@ public interface IAction extends IPropertyObserver, ITypeWithClassId, IOrdered {
    * {@link org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField ISmartField}
    **/
   void setContainerInternal(ITypeWithClassId container);
+
+  /**
+   * @param horizontalAlignment
+   *          negative for left and positive for right alignment
+   */
+  void setHorizontalAlignment(int horizontalAlignment);
+
+  int getHorizontalAlignment();
 
 }

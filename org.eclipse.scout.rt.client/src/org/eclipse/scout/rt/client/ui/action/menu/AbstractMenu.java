@@ -40,10 +40,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements IMenu {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractMenu.class);
 
-  private boolean m_singleSelectionAction;
-  private boolean m_multiSelectionAction;
-  private boolean m_emptySpaceAction;
-  private boolean m_visibleProperty;
   private Object m_ownerValue;
 
   public AbstractMenu() {

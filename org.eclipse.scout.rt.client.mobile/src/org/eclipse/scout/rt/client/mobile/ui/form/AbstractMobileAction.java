@@ -52,8 +52,9 @@ public abstract class AbstractMobileAction extends AbstractMenu implements IMobi
     action.setProperty(PROP_HORIZONTAL_ALIGNMENT, alignment);
   }
 
+  @Override
   protected int getConfiguredHorizontalAlignment() {
-    return 1;
+    return HORIZONTAL_ALIGNMENT_RIGHT;
   }
 
 }

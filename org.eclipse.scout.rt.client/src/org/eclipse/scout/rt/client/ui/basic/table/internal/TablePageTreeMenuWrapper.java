@@ -424,6 +424,16 @@ public class TablePageTreeMenuWrapper implements IMenu {
   }
 
   @Override
+  public int getHorizontalAlignment() {
+    return m_wrappedMenu.getHorizontalAlignment();
+  }
+
+  @Override
+  public void setHorizontalAlignment(int horizontalAlignment) {
+    m_wrappedMenu.setHorizontalAlignment(horizontalAlignment);
+  }
+
+  @Override
   public String toString() {
     return super.toString() + " wrapping '" + m_wrappedMenu.toString() + "'";
   }

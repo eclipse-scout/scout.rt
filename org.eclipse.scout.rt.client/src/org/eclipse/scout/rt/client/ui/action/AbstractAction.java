@@ -56,8 +56,9 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   private boolean m_visibleProperty;
   private boolean m_visibleGranted;
   private boolean m_toggleAction;
-
   private boolean m_separator;
+  private int m_horizontalAlignment;
+
   private final ObjectExtensions<AbstractAction, IActionExtension<? extends AbstractAction>> m_objectExtensions;
 
   public AbstractAction() {
@@ -208,6 +209,20 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   }
 
   /**
+   * Configures the horizontal alignment of this action in the user interface. The horizontal alignment is only required
+   * when the action is displayed in a menu-bar. Negative return value for left and positive for right alignment.
+   * <p>
+   * Subclasses can override this method. The default is {@link IAction#HORIZONTAL_ALIGNMENT_LEFT}.
+   *
+   * @return Horizontal alignment of this action.
+   */
+  @ConfigProperty(ConfigProperty.INTEGER)
+  @Order(130)
+  protected int getConfiguredHorizontalAlignment() {
+    return HORIZONTAL_ALIGNMENT_LEFT;
+  }
+
+  /**
    * called by {@link #initAction()}<br>
    * this way a menu can for example add/remove custom child menus
    */
@@ -267,6 +282,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
     setToggleAction(getConfiguredToggleAction());
     setSeparator(getConfiguredSeparator());
     setOrder(calculateViewOrder());
+    setHorizontalAlignment(getConfiguredHorizontalAlignment());
   }
 
   protected IActionUIFacade createUIFacade() {
@@ -700,6 +716,16 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   @Override
   public void setContainerInternal(ITypeWithClassId container) {
     propertySupport.setProperty(PROP_CONTAINER, container);
+  }
+
+  @Override
+  public int getHorizontalAlignment() {
+    return m_horizontalAlignment;
+  }
+
+  @Override
+  public void setHorizontalAlignment(int horizontalAlignment) {
+    m_horizontalAlignment = horizontalAlignment;
   }
 
   protected class P_UIFacade implements IActionUIFacade {
