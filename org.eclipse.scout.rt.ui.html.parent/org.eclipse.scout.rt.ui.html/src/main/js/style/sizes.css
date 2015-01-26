@@ -4,3 +4,6 @@
 
 @border-radius: 3px;
 @logical-grid-height: 30px;
+
+@tree-item-control-size: 15px;
+@outline-item-control-size: 20px;

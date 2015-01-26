@@ -1,0 +1,121 @@
+.outline {
+
+  /* we have to combine this with .outline, otherwise the definition would not be specific enough */
+  &.tree {
+    & .scrollbar-thumb {
+      background-color: rgba(205, 205, 205, 0.3);
+    }
+
+    & .scrollbar-thumb-move,
+    & .scrollbar-thumb:hover {
+      background-color: rgba(205, 205, 205, 0.6);
+    }
+  }
+
+  .tree-item  {
+    .font-text-plus;
+    cursor: pointer;
+    border: 0;
+
+    /* leave some space for the scrollbar */
+    padding-right: 8px;
+    /* set top/bottom padding for item */
+    padding-top: 8px;
+    padding-bottom: 8px;
+    min-height: @outline-item-control-size;
+
+    &.parent {
+      .font-text-plus(@bold);
+    }
+
+    &.group {
+      background-color: @navigation-background-active-color;
+    }
+
+    &.selected {
+      background-color: @body-background-color;
+      border: 0;
+    }
+  }
+
+  .tree-item-control {
+    /* adjust control position */
+    margin-left: -@tree-item-control-size - 5px;
+    margin-top: -3px;
+
+    width: @outline-item-control-size;
+    height: @outline-item-control-size;
+    line-height: @outline-item-control-size;
+
+    &:before {
+      font-size: @outline-item-control-size;
+      /* always use same color as the tree-item label */
+      color: inherit;
+    }
+  }
+
+  /* bread crumb mode */
+
+  .navigation-breadcrumb & .tree-item {
+    overflow: visible;
+    white-space: initial;
+    text-align: center;
+
+    display: none;
+    max-height: 80px;
+    line-height: 21px;
+    border-bottom: 1px solid @navigation-background-selected-color;
+
+    /* !important is necessary here to override the element specific left-padding (calculated by Tree.js for level indentation). */
+    padding: 12px 2px 12px 2px !important;
+
+    &.parent, &.children, &.selected {
+      .font-text-plus;
+      display: block;
+      background-color: @navigation-background-active-color;
+    }
+
+    &.selected {
+      background-color: @navigation-background-selected-color;
+      color: @text-color;
+    }
+  }
+
+  .navigation-breadcrumb & .parent:before,
+  .navigation-breadcrumb & .parent:after,
+  .navigation-breadcrumb & .selected:before {
+    position: absolute;
+    left: 50%;
+    margin-left: -13px;
+    border: solid transparent;
+    content: '';
+    height: 0;
+    width: 0;
+    z-index: 3;
+  }
+  .navigation-breadcrumb & .parent:before {
+    border-color: @navigation-background-selected-color transparent transparent transparent;
+    border-width: 8px 13px 0 13px;
+    bottom: -9px;
+  }
+  .navigation-breadcrumb & .parent:after {
+    border-color: @navigation-background-active-color transparent transparent transparent;
+    border-width: 8px 13px 0 13px;
+    bottom: -8px;
+  }
+  .navigation-breadcrumb & .selected:before {
+    border-color: @navigation-background-selected-color transparent transparent transparent;
+    border-width: 8px 13px 0 13px;
+    bottom: -8px;
+  }
+
+  .navigation-breadcrumb & .parent.leaf:before,
+  .navigation-breadcrumb & .parent.leaf:after,
+  .navigation-breadcrumb & .selected.leaf:before {
+    display: none;
+  }
+
+  .navigation-breadcrumb & .tree-item-control {
+    display: none;
+  }
+}

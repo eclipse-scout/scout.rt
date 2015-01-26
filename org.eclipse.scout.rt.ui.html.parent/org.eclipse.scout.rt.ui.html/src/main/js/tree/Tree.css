@@ -3,146 +3,77 @@
   height: 100%;
   width: 100%;
   overflow: hidden;
-
-  & .scrollbar-thumb {
-    background-color: rgba(205, 205, 205, 0.3);
-  }
-
-  & .scrollbar-thumb-move,
-  & .scrollbar-thumb:hover {
-    background-color: rgba(205, 205, 205, 0.6);
-  }
 }
 
 .tree-item {
+  display: block;
   position: relative;
-  width: 100%;
-  max-height: 37px;
-  line-height: 37px;
-  .font-text-plus;
-  white-space: nowrap;
   overflow: hidden;
+  white-space: nowrap;
   text-overflow: ellipsis;
-  cursor: pointer;
-  padding-right: 8px;
+  border: 1px solid transparent;
+
+  /* leave some space for the scrollbar */
+  padding-right: 6px;
+  /* set top/bottom padding for item */
+  padding-top: 6px;
+  padding-bottom: 6px;
+  min-height: @tree-item-control-size;
 
   &.parent {
-    .font-text-plus(@bold);
   }
 
   &.children {
   }
 
   &.group {
-    background-color: @navigation-background-active-color;
   }
 
   &.selected {
-    background-color: @body-background-color;
-    color: @text-color;
-  }
-
-}
-
-.navigation-breadcrumb .tree-item {
-  overflow: visible;
-  white-space: initial !important;
-  text-align: center  !important;
-  display: none;
-  max-height: 80px;
-  line-height: 21px;
-  padding: 12px 2px 12px 2px !important;
-  border-bottom: 1px solid @navigation-background-selected-color;
-
-  &.parent, &.children, &.selected {
-    .font-text-plus;
-    display: block;
-    background-color: @navigation-background-active-color;
-  }
-
-  &.selected {
-    background-color: @navigation-background-selected-color;
+    background-color: @selection-row-background-color;
+    border: 1px solid @selection-row-border-color;
     color: @text-color;
   }
 }
 
 .tree-item-control {
-  position: relative;
-  display: inline-block;
-  top: 0px;
-  left: -12px;
-  line-height: 37px;
-  min-width: 38px;
-  padding-right: 13px;
-  padding-left: 16px;
-  margin-left: -18px;
-  margin-right: -15px;
+  display: block;
+  position: absolute;
+  top: auto;
+  left: auto;
   transition: transform 0.3s;
+  cursor: pointer;
+
+  /* adjust control position */
+  margin-left: -@tree-item-control-size - 1px;
+  margin-top: -1px;
+
+  /* for good animation, ensure that the control is a square and the icon is centered */
+  width: @tree-item-control-size;
+  height: @tree-item-control-size;
+  line-height: @tree-item-control-size;
+  text-align: center;
 
   &:before {
     .font-icon;
-    font-size: 20px;
-    vertical-align: -2px;
+    font-size: @tree-item-control-size;
     content: @icon-angle-right;
-  }
+    color: @border-color;
 
-  .tree-item.leaf > &:before {
-    content: '';
-  }
+    .tree-item.leaf > & {
+      content: '';
+    }
 
-  .tree-item:selected > &:before {
-    color: @text-color;
-  }
-
-  &.tree-item-control:hover {
-    color: @highlight-color;
+    .tree-item-control:hover& {
+      color: @highlight-color;
+    }
   }
 
   .tree-item.expanded > & {
-    /* Adding 0.001 is necessary for firefox, otherwise it shifts the icon left a little when the animation finishes. */
+    /* The "imprecise" angle is a workround for firefox to prevent shifting the animation a little when the animation finishes. */
     /* See https://bugzilla.mozilla.org/show_bug.cgi?id=739176 */
-    .transform(rotate(90.001deg));
+    .transform(rotate(89.99deg));
   }
-
-  .navigation-breadcrumb & {
-    display: none;
-  }
-}
-
-/* bread crumb arrows */
-
-.navigation-breadcrumb .parent:before,
-.navigation-breadcrumb .parent:after,
-.navigation-breadcrumb .selected:before {
-  position: absolute;
-  left: 50%;
-  margin-left: -13px;
-  border: solid transparent;
-  content: '';
-  height: 0;
-  width: 0;
-  z-index: 3;
-}
-.navigation-breadcrumb .parent:before {
-  border-color: @navigation-background-selected-color transparent transparent transparent;
-  border-width: 8px 13px 0 13px;
-  bottom: -9px;
-}
-.navigation-breadcrumb .parent:after {
-  border-color: @navigation-background-active-color transparent transparent transparent;
-  border-width: 8px 13px 0 13px;
-  bottom: -8px;
-}
-.navigation-breadcrumb .selected:before {
-  border-color: @navigation-background-selected-color transparent transparent transparent;
-  border-width: 8px 13px 0 13px;
-  bottom: -9px;
-}
-
-.navigation-breadcrumb .parent.leaf:before,
-.navigation-breadcrumb .parent.leaf:after,
-.navigation-breadcrumb .selected.leaf:before {
-  display: none;
 }
 
 /* key handling */

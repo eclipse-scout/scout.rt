@@ -2,6 +2,9 @@ scout.Outline = function() {
   scout.Outline.parent.call(this);
   this._addAdapterProperties('defaultDetailForm');
   this._navigateUp = false;
+
+  this._treeItemPaddingLeft = 37;
+  this._treeItemPaddingLevel = 20;
 };
 scout.inherits(scout.Outline, scout.Tree);
 
@@ -10,6 +13,7 @@ scout.inherits(scout.Outline, scout.Tree);
  */
 scout.Outline.prototype._render = function($parent) {
   scout.Outline.parent.prototype._render.call(this, $parent);
+  this.$container.addClass('outline');
   if (this.selectedNodeIds.length === 0) {
     this._showDefaultDetailForm();
   }

@@ -1,13 +1,6 @@
-.tree-field .tree-item {
-  /* Compensate missing border with transparent border due to border-box model. */
-  border: 1px solid transparent;
-
-  &.group {
-    background-color: transparent;
-  }
-
-  &.selected {
-    background-color: @selection-row-background-color;
-    border: 1px solid @selection-row-border-color;
-  }
+.tree-field > .tree {
+  border: 1px solid @border-color;
+  border-radius: @border-radius;
+  background-color: @control-background-color;
+  padding: 3px;
 }
