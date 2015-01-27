@@ -25,25 +25,25 @@ import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFiel
 public interface ITableRow {
   /**
    * same number as
-   * 
+   *
    * @see AbstractTableFieldData
    */
   int STATUS_NON_CHANGED = 0;
   /**
    * same number as
-   * 
+   *
    * @see AbstractTableFieldData
    */
   int STATUS_INSERTED = 1;
   /**
    * same number as
-   * 
+   *
    * @see AbstractTableFieldData
    */
   int STATUS_UPDATED = 2;
   /**
    * same number as
-   * 
+   *
    * @see AbstractTableFieldData
    */
   int STATUS_DELETED = 3;
@@ -60,7 +60,7 @@ public interface ITableRow {
 
   boolean isChecked();
 
-  void setChecked(boolean b);
+  void setChecked(boolean b) throws ProcessingException;
 
   boolean isFilterAccepted();
 
@@ -83,7 +83,7 @@ public interface ITableRow {
   /**
    * Warning: this method is not validating the new value against the
    * corresponding table column use {@link IColumn#setValue(ITableRow, Object)} instead
-   * 
+   *
    * @return true if value was in fact changed
    */
   boolean setCellValue(int columnIndex, Object value) throws ProcessingException;
@@ -91,7 +91,7 @@ public interface ITableRow {
   /**
    * Warning: this method is not validating the new value against the
    * corresponding table column use {@link IColumn#setValue(ITableRow, Object)} instead
-   * 
+   *
    * @return true if value was in fact changed
    */
   boolean setCellValues(List<? extends Object> values) throws ProcessingException;

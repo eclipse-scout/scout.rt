@@ -827,6 +827,9 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
         getTable().selectRows(checkedRows, false);
       }
     }
+    catch (ProcessingException ex) {
+      SERVICES.getService(IExceptionHandlerService.class).handleException(ex);
+    }
     finally {
       getTable().setTableChanging(false);
       m_valueTableSyncActive = false;
@@ -856,6 +859,9 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
         }
       }
     }
+    catch (ProcessingException ex) {
+      SERVICES.getService(IExceptionHandlerService.class).handleException(ex);
+    }
     finally {
       getTable().setTableChanging(false);
       m_valueTableSyncActive = false;
@@ -867,9 +873,9 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
     updateCheckedRowsFilter();
   }
 
-  /*
-   * Implementation of ICompositeField
-   */
+/*
+ * Implementation of ICompositeField
+ */
 
   @Override
   public <F extends IFormField> F getFieldByClass(Class<F> c) {

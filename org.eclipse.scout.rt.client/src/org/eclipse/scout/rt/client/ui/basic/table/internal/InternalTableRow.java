@@ -16,8 +16,6 @@ import java.util.List;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.VerboseUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICellObserver;
@@ -28,12 +26,10 @@ import org.eclipse.scout.rt.client.ui.profiler.DesktopProfiler;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 
 public class InternalTableRow implements ITableRow, ICellObserver {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(InternalTableRow.class);
 
   private ITable m_table;
   private int m_rowIndex;
   private boolean m_enabled;
-  private boolean m_checked;
   private String m_iconId;
   private int m_status = STATUS_NON_CHANGED;
   private List<Cell> m_cells;
@@ -63,7 +59,6 @@ public class InternalTableRow implements ITableRow, ICellObserver {
     this();
     m_rowIndex = row.getRowIndex();
     m_enabled = row.isEnabled();
-    m_checked = row.isChecked();
     m_status = row.getStatus();
     m_cells = new ArrayList<Cell>(table.getColumnCount());
     for (int i = 0; i < table.getColumnCount(); i++) {
@@ -181,42 +176,18 @@ public class InternalTableRow implements ITableRow, ICellObserver {
 
   @Override
   public boolean isChecked() {
-    return m_checked;
+    if (getTable() == null) {
+      return false;
+    }
+    return getTable().getCheckedRows().contains(this);
   }
 
   @Override
-  public void setChecked(boolean b) {
-    if (m_checked != b) {
-      try {
-        setRowChanging(true);
-        //
-        m_checked = b;
-        m_rowPropertiesChanged = true;
-        //
-        //uncheck others in single-check mode
-        ITable table = getTable();
-        if (table != null) {
-          if (table.getCheckableColumn() != null) {
-            try {
-              table.getCheckableColumn().setValue(this, b);
-            }
-            catch (ProcessingException e) {
-              LOG.warn("Value could not be set on CheckableColumn", e);
-            }
-          }
-          if (b && !table.isMultiCheck()) {
-            for (ITableRow cr : table.getCheckedRows()) {
-              if (cr != this) {
-                cr.setChecked(false);
-              }
-            }
-          }
-        }
-      }
-      finally {
-        setRowChanging(false);
-      }
+  public void setChecked(boolean b) throws ProcessingException {
+    if (getTable() == null) {
+      throw new ProcessingException("To set a row checked there must be an table. ");
     }
+    getTable().checkRow(this, b);
   }
 
   @Override
@@ -476,9 +447,9 @@ public class InternalTableRow implements ITableRow, ICellObserver {
     }
   }
 
-  /*
-   * Implementation of ICellObserver
-   */
+/*
+ * Implementation of ICellObserver
+ */
   @Override
   public Object validateValue(ICell cell, Object value) throws ProcessingException {
     Object oldValue = cell.getValue();

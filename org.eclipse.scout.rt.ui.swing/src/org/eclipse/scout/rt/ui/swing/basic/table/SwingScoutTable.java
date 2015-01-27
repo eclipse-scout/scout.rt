@@ -71,8 +71,6 @@ import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.holders.Holder;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.action.IAction;
@@ -114,7 +112,6 @@ import org.eclipse.scout.rt.ui.swing.icons.CompositeIcon;
  * Base table class without selection handling.
  */
 public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwingScoutTable {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingScoutTable.class);
 
   /**
    * The distance from the top of a label to the approximate top position of an uppercase character. As this distance
@@ -692,7 +689,8 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
         break;
       }
       case TableEvent.TYPE_ROWS_UPDATED:
-      case TableEvent.TYPE_ROW_ORDER_CHANGED: {
+      case TableEvent.TYPE_ROW_ORDER_CHANGED:
+      case TableEvent.TYPE_ROWS_CHECKED: {
         swingTableModel.updateModelState(newRowCount);
         break;
       }
@@ -862,6 +860,9 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
           @Override
           public void run() {
             getScoutObject().getUIFacade().fireRowClickFromUI(scoutRow, SwingUtility.swingToScoutMouseButton(swingButton));
+            if (getScoutObject().isCheckable()) {
+              getScoutObject().getUIFacade().setCheckedRowsFromUI(CollectionUtility.arrayList(scoutRow), !scoutRow.isChecked());
+            }
           }
         };
 
@@ -1661,7 +1662,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
 
   /**
    * Implementation of DropSource's DragGestureListener support for drag/drop
-   * 
+   *
    * @since Build 202
    */
   private class P_SwingRowTransferHandler extends TransferHandlerEx {
