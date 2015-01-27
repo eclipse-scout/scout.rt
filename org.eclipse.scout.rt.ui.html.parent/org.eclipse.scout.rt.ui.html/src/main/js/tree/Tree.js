@@ -308,7 +308,7 @@ scout.Tree.prototype._onNodesDeleted = function(nodeIds, parentNodeId) {
   //update model and nodemap
   updateNodeMap = function(parentNode, node) {
     delete this._nodeMap[node.id];
-    if (this._onNodeDeleted) {
+    if (this._onNodeDeleted) { // Necessary for subclasses
       this._onNodeDeleted(node);
     }
   }.bind(this);
@@ -403,6 +403,10 @@ scout.Tree.prototype._onNodeChanged = function(nodeId, cell) {
     //text() removes complete content -> add tree item control again
     this._renderTreeItemControl($node);
   }
+};
+
+scout.Tree.prototype._onNodeFilterChanged = function(rootNode) {
+  // TODO BSH Tree | Replace nodes, restore selection and expansion
 };
 
 /**
@@ -653,7 +657,9 @@ scout.Tree.prototype.onModelAction = function(event) {
   } else if (event.type === 'nodeExpanded') {
     this._onNodeExpanded(event.nodeId, event.expanded);
   } else if (event.type === 'nodeChanged') {
-      this._onNodeChanged(event.nodeId, event);
+    this._onNodeChanged(event.nodeId, event);
+  } else if (event.type === 'nodeFilterChanged') {
+    this._onNodeFilterChanged(event.rootNode);
   } else {
     $.log.warn('Model event not handled. Widget: Tree. Event: ' + event.type + '.');
   }

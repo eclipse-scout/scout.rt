@@ -34,10 +34,12 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   public static final String EVENT_NODE_ACTION = "nodeAction";
   public static final String EVENT_NODE_EXPANDED = "nodeExpanded";
   public static final String EVENT_NODE_CHANGED = "nodeChanged";
+  public static final String EVENT_NODE_FILTER_CHANGED = "nodeFilterChanged";
   public static final String EVENT_NODES_SELECTED = "nodesSelected";
   public static final String EVENT_NODES_DELETED = "nodesDeleted";
   public static final String EVENT_NODES_INSERTED = "nodesInserted";
   public static final String EVENT_ALL_NODES_DELETED = "allNodesDeleted";
+
   public static final String PROP_NODE_ID = "nodeId";
   public static final String PROP_NODE_IDS = "nodeIds";
   public static final String PROP_COMMON_PARENT_NODE_ID = "commonParentNodeId";
@@ -174,10 +176,27 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
       case TreeEvent.TYPE_NODE_CHANGED:
         handleModelNodeChanged(event.getNode());
         break;
+      case TreeEvent.TYPE_NODE_FILTER_CHANGED:
+        handleModelNodeFilterChanged();
+        break;
       default:
         handleOtherTreeEvent(event);
         break;
     }
+    // TODO Tree | Events not yet implemented:
+    // - TYPE_NODES_UPDATED
+    // - TYPE_BEFORE_NODES_SELECTED
+    // - TYPE_CHILD_NODE_ORDER_CHANGED
+    // - TYPE_NODE_ACTION
+    // - TYPE_NODES_DRAG_REQUEST
+    // - TYPE_DRAG_FINISHED
+    // - TYPE_NODE_DROP_ACTION
+    // - TYPE_NODE_REQUEST_FOCUS
+    // - TYPE_NODE_ENSURE_VISIBLE
+    // - TYPE_REQUEST_FOCUS
+    // - TYPE_NODE_CLICK
+    // - TYPE_SCROLL_TO_SELECTION
+    // - TYPE_NODE_DROP_TARGET_CHANGED
   }
 
   /**
@@ -237,6 +256,12 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     addActionEvent(EVENT_NODE_CHANGED, jsonEvent);
   }
 
+  protected void handleModelNodeFilterChanged() {
+    JSONObject jsonEvent = new JSONObject();
+    JsonObjectUtility.putProperty(jsonEvent, "rootNode", treeNodeToJson(getModel().getRootNode()));
+    addActionEvent(EVENT_NODE_FILTER_CHANGED, jsonEvent);
+  }
+
   protected JSONArray nodeIdsToJson(Collection<ITreeNode> modelNodes) {
     JSONArray jsonNodeIds = new JSONArray();
     for (ITreeNode node : modelNodes) {
@@ -249,6 +274,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     return jsonNodeIds;
   }
 
+  // TODO BSH Tree | Coalesce events
   protected void handleModelTreeEventBatch(List<? extends TreeEvent> events) {
     for (TreeEvent event : events) {
       handleModelTreeEvent(event);

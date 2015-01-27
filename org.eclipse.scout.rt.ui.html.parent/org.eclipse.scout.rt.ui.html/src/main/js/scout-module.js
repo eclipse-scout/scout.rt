@@ -110,6 +110,7 @@ __include("form/fields/groupbox/GroupBoxLayout.js");
 __include("form/fields/sequencebox/SequenceBox.js");
 __include("form/fields/tablefield/TableField.js");
 __include("form/fields/treebox/TreeBox.js");
+__include("form/fields/treebox/TreeBoxLayout.js");
 __include("form/fields/treefield/TreeField.js");
 __include("form/fields/tabbox/TabBox.js");
 __include("form/fields/tabbox/TabBoxLayout.js");

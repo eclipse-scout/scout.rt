@@ -3,31 +3,36 @@
 
 scout.TreeBox = function() {
   scout.TreeBox.parent.call(this);
-  this._addAdapterProperties(['tree']);
+  this._addAdapterProperties(['tree', 'filterBox']);
 };
 scout.inherits(scout.TreeBox, scout.ValueField);
 
 scout.TreeBox.prototype._render = function($parent) {
   this.addContainer($parent, 'tree-box');
+
   this.addLabel();
-  this.addStatus();
+  this.addMandatoryIndicator();
+
+  var $fieldContainer = $('<div>');
+  var htmlComp = new scout.HtmlComponent($fieldContainer, this.session);
+  htmlComp.setLayout(new scout.TreeBoxLayout(this.tree, this.filterBox));
+
   if (this.tree) {
-    this._renderTree();
+    this._renderTree($fieldContainer);
+  }
+  if (this.filterBox) {
+    // TODO BSH Tree | Only render when filter active
+    this._renderFilterBox($fieldContainer);
   }
 
-  // TODO BSH Add "filter" boxes
-  // TODO BSH Check if this files can be merge with TreeField.js
+  this.addStatus();
 };
 
-/**
- * Will also be called by model adapter on property change event
- */
-scout.TreeBox.prototype._renderTree = function() {
-  this.tree.render(this.$container);
-  this.addField(this.tree.$container);
+scout.TreeBox.prototype._renderTree = function($fieldContainer) {
+  this.tree.render($fieldContainer);
+  this.addField(this.tree.$container, $fieldContainer);
 };
 
-scout.TreeBox.prototype._removeTree = function(oldTree) {
-  oldTree.remove();
-  this.removeField();
+scout.TreeBox.prototype._renderFilterBox = function($fieldContainer) {
+  this.filterBox.render($fieldContainer);
 };
