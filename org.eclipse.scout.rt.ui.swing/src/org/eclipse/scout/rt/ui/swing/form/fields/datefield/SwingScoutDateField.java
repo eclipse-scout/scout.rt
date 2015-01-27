@@ -453,6 +453,10 @@ public class SwingScoutDateField extends SwingScoutBasicFieldComposite<IDateFiel
         Runnable t = new Runnable() {
           @Override
           public void run() {
+            String newDisplayText = getSwingDateField().getText();
+            if (!CompareUtility.equals(newDisplayText, getScoutObject().getDisplayText())) {
+              getScoutObject().getUIFacade().setDateTextFromUI(newDisplayText);
+            }
             getScoutObject().getUIFacade().fireDateShiftActionFromUI(m_level, m_value);
           }
         };

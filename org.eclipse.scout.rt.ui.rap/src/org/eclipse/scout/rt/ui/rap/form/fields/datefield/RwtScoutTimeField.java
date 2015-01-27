@@ -488,8 +488,8 @@ public class RwtScoutTimeField extends RwtScoutBasicFieldComposite<IDateField> i
 
     @Override
     public void widgetSelected(SelectionEvent e) {
-          getUiField().forceFocus();
-          handleUiTimeChooserAction();
+      getUiField().forceFocus();
+      handleUiTimeChooserAction();
     }
   } // end class P_RwtBrowseButtonListener
 
@@ -502,9 +502,13 @@ public class RwtScoutTimeField extends RwtScoutBasicFieldComposite<IDateField> i
         && getUiField().isVisible()) {
       if (level >= 0) {
         // notify Scout
+        final String newDisplayText = getUiField().getText();
         Runnable t = new Runnable() {
           @Override
           public void run() {
+            if (!CompareUtility.equals(newDisplayText, getScoutObject().getDisplayText())) {
+              getScoutObject().getUIFacade().setTimeTextFromUI(newDisplayText);
+            }
             getScoutObject().getUIFacade().fireTimeShiftActionFromUI(level, value);
           }
         };
