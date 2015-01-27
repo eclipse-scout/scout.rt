@@ -18,16 +18,20 @@ import java.util.regex.Matcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.eclipse.scout.commons.FileUtility;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
+import org.eclipse.scout.rt.client.ui.IIconLocator;
 import org.eclipse.scout.rt.ui.html.AbstractUiServlet;
 import org.eclipse.scout.rt.ui.html.IServletRequestInterceptor;
 import org.eclipse.scout.rt.ui.html.StreamUtility;
 import org.eclipse.scout.rt.ui.html.UiHints;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
+import org.eclipse.scout.rt.ui.html.json.AbstractJsonSession;
 import org.eclipse.scout.rt.ui.html.script.ScriptFileBuilder;
 import org.eclipse.scout.rt.ui.html.script.ScriptOutput;
 import org.eclipse.scout.rt.ui.html.scriptprocessor.ScriptProcessor;
@@ -52,29 +56,29 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
     String pathInfo = resolvePathInfo(req);
     LOG.debug("processing static resource: " + pathInfo);
 
-    //lookup cache or load
+    // lookup cache or load
     HttpCacheObject cacheObj = servlet.getHttpCacheControl().getCacheObject(req, pathInfo);
     if (cacheObj == null) {
       cacheObj = loadResource(servlet, req, pathInfo);
-      //store in cache
+      // store in cache
       if (cacheObj != null) {
         servlet.getHttpCacheControl().putCacheObject(req, cacheObj);
       }
     }
 
-    //check object existence
+    // check object existence
     if (cacheObj == null) {
       LOG.info("404_NOT_FOUND_GET: " + pathInfo);
       resp.sendError(HttpServletResponse.SC_NOT_FOUND);
       return true;
     }
 
-    //cached in browser?
+    // cached in browser?
     if (servlet.getHttpCacheControl().checkAndUpdateCacheHeaders(req, resp, cacheObj.toCacheInfo())) {
       return true;
     }
 
-    //return content
+    // return content
     String contentType = detectContentType(servlet, pathInfo);
     if (contentType != null) {
       resp.setContentType(contentType);
@@ -143,7 +147,27 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
     if (pathInfo.endsWith(".html")) {
       return loadHtmlFile(servlet, req, pathInfo);
     }
+    if (pathInfo.matches("^/?static/.*")) {
+      return loadStaticResource(req, pathInfo);
+    }
     return loadBinaryFile(servlet, req, pathInfo);
+  }
+
+  // FIXME AWE: (resource loading) discuss with C.GU - only for images/icons with IDs or other resources too?
+  private HttpCacheObject loadStaticResource(HttpServletRequest req, String pathInfo) {
+    HttpSession httpSession = req.getSession();
+    String jsonSessionId = req.getParameter("sessionId");
+    String jsonSessionAttributeName = "scout.htmlui.session.json." + jsonSessionId;
+    AbstractJsonSession jsonSession = (AbstractJsonSession) httpSession.getAttribute(jsonSessionAttributeName);
+    IIconLocator iconLocator = jsonSession.getClientSession().getIconLocator();
+
+    String imageId = pathInfo.substring(pathInfo.lastIndexOf('/') + 1);
+    IconSpec iconSpec = iconLocator.getIconSpec(imageId);
+    if (iconSpec != null) {
+      // FIXME AWE: (resource loading) when should image icons expire?
+      return new HttpCacheObject(pathInfo, iconSpec.getContent(), System.currentTimeMillis());
+    }
+    return null;
   }
 
   /**

@@ -29,7 +29,6 @@ scout.ImageField.prototype._render = function($parent) {
 
 scout.ImageField.prototype._renderProperties = function() {
   scout.ImageField.parent.prototype._renderProperties.call(this);
-
   this._renderImageId(this.imageId);
 };
 
@@ -39,7 +38,25 @@ scout.ImageField.prototype._remove = function() {
   }
 };
 
+// FIXME AWE: (resource loading) wir müssen unterscheiden zwischen statischen images (icons, ressourcen) 
+// und dynamischen bildern erstere haben eine imageId, letztere nicht
+
 scout.ImageField.prototype._renderImageId = function(imageId) {
-  this.$field.attr('src', imageId);
-  this.$field.on('load', scout.scrollbars.update.bind(this, this._$scrollable));
+  this._renderImageOrId();
+//  this.$field.attr('src', imageId);
+//  this.$field.on('load', scout.scrollbars.update.bind(this, this._$scrollable));
+};
+
+scout.ImageField.prototype._renderImageOrId = function() {
+  if (this.imageId) {
+    if (scout.strings.startsWith(this.imageId, "font:")) {
+      var icon = this.imageId.substr(5, 1);
+      // FIXME AWE: (font-icon) --> IMG entfernen, mit DIV ersetzen
+    } else {
+      this.$field.attr('src', '/static/' + this.imageId + '?sessionId=' + this.session.jsonSessionId);
+    }
+  } else if (this.image) {
+
+  }
+  // FIXME AWE: (image) IMG/DIV entfernen, wenn kein bild mehr da
 };

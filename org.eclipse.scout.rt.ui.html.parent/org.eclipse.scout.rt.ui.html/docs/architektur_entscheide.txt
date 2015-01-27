@@ -451,3 +451,56 @@ Das Konzept für die MenuBar muss überarbeitet werden. Wichtige Punkte sind dab
 
 Order von Buttons muss in CRM geändert werden (Migration durch Script)
 MVI fragen ob uns die SDK bei der Migration unterstützen kann
+
+
+
+27.01.2015 AWE, CGU - Laden von Ressourcen, z.B. Bitmap-Grafiken, Font-Icons
+
+Die Logik für Fields mit einem Image oder einem Font-Icon ist wie folgt:
+
+ imageId vorhanden?
+ Ja  :
+   beginnt imageId mit "font:"?
+   Ja  :
+     Font-Icon. <div> Tag erzeugen mit class Attribut "font-icon". Das was
+     nach 'font:' kommt, als Content verwenden, Bsp: <div class="font-icon" data-icon="X" />
+     Evtl. müssen wir stattdessen den Content vom DIV setzen -> ausprobieren
+   Nein:
+     Statische Bitmap-Grafik. <img> Tag mit src Attribut "icons/[imageId]" erzeugen
+     Auf dem UI-Server alle Requests auf /icons/ behandeln, imageId parsen
+     und Icon als byte[] zurückgeben.
+ Nein:
+   image vorhanden?
+   Ja  :
+     Dynamische Bitmap-Grafik. <img> Tag mit src Attribut "images/[adapterId] erzeugen
+     Auf dem UI-Server alle Requests auf /images/ behandeln, adapterId parsen, Referenz
+     zu Adapter auflösen, getModel().getImage() aufrufen und Bitmap-Grafik als byte[]
+     zurückgeben.
+   Nein:
+     Kein Bild anzeigen
+
+
+Erweiterbarkeit von Font-Icons:
+
+Das Projekt soll eine eigene Image-Font erstellen können: myProject.ttf
+Will man ein font-icon der Basis font "überschreiben" muss man irgendwo definieren
+welche Icons überschrieben werden. Am besten macht das eine Klasse FontIconLocator.
+
+String fontName = fontIconLocator.getFontIcon("X")
+
+Per Default kommt hier scoutIcons.ttf zurück (=default).
+Der FontIconLocator kann im Projekt überschrieben/ausgetauscht werden, hat man z.B.
+das Icon 'X' ersetzt, gibt man neu in getFontIcon() "myProject.ttf" zurück.
+
+Der HTML Client lädt sich zu Beginn eine Font-Icon Map herunter
+Dort steht für jedes registrierte Font-Icon drin in welcher font-Datei das Icon zu
+finden ist. Wenn der Client eine imageId mit "font:" antrifft, macht er einen Lookup
+auf die Map. Ist die font = default ist das class Attribut einfach "font-icon",
+ist die font != default ist das class Attribut "font-icon myProject". Das Projekt muss
+dann eine zusätzliche CSS Definition definieren (Voraussetzung: CSS Erweiterbarkeit)
+In dieser kann für myProject eine andere font-family mit myProject.ttf referenziert
+werden.
+
+Alternative Idee: wir bauen ein Tool, das im Build Prozess eine grosse scoutIcons.ttf
+welche alle Icons von original scoutIcons.ttf + crmIcons.ttf + myProject.ttf drin hat.
+Es braucht ein Tool, welches im Build die Fonts mergen und analysieren kann.

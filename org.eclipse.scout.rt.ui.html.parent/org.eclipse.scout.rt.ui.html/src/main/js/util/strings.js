@@ -55,6 +55,10 @@ scout.strings = {
       return defaultValue;
     }
     return s;
+  },
+
+  startsWith: function(haystack, needle) {
+    return haystack.substr(0, needle.length) === needle;
   }
 
 };

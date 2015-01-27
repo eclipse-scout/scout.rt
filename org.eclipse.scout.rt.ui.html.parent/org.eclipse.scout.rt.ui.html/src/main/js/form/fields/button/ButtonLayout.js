@@ -8,6 +8,8 @@ scout.inherits(scout.ButtonLayout, scout.AbstractLayout);
 
 scout.ButtonLayout.prototype.layout = function($container) {
   // button has no children - nothing to do here
+  var $button = $container.children('button');
+  $button.css('width', '100%');
 };
 
 scout.ButtonLayout.prototype.preferredLayoutSize = function($container) {
