@@ -135,7 +135,6 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  color: @text-color;
 }
 
 .table-row-sum .table-cell {
@@ -148,6 +147,11 @@
 .table-row.selected {
   background-color: @selection-row-background-color;
   border-color: @selection-row-border-color;
+
+  .disabled & {
+    background-color: @selection-row-background-disabled-color;
+    border-color: @selection-row-border-disabled-color;
+  }
 
   &.select-top,
   &.select-middle {

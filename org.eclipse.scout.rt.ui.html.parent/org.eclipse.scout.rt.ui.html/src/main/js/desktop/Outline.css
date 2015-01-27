@@ -33,6 +33,7 @@
     }
 
     &.selected {
+      color: @text-color;
       background-color: @body-background-color;
       border: 0;
     }

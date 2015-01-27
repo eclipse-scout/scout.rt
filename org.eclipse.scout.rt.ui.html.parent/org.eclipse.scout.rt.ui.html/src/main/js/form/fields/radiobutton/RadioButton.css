@@ -64,7 +64,8 @@
   }
 
   & input[type=radio]:disabled + label:before {
-    background-color: @disabled-color;
+    color: @palette-gray-5;
+    background-color: @control-background-disabled-color;
   }
 
   & input[type=radio]:disabled + label {

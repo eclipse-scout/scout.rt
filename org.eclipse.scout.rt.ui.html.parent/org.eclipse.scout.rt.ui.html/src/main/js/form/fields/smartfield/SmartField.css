@@ -6,7 +6,7 @@
 
   /* Multiline SmartField */
   & .multiline {
-    border-bottom-color: @palette-gray-6;
+    border-bottom-color: @border-color;
     border-top-left-radius: @border-radius;
     border-top-right-radius: @border-radius;
     border-bottom-right-radius: 0;
@@ -16,12 +16,7 @@
     height: 28px;
   }
 
-  &.disabled .multiline {
-    /* color and background-color inherited from input.disabled */
-    border-bottom-color: @palette-gray-6;
-  }
-
-
+  /* DIV below the smart field containing the additional lines */
   & .multiline-field {
     background-color: @control-background-color;
     border:solid 1px @border-color;
@@ -33,11 +28,11 @@
     padding: 3px 10px;
     overflow: hidden;
     text-overflow: ellipsis;
-  }
+    .user-select(text);
 
-  &.disabled .multiline-field {
-    background-color:@palette-gray-8;
-    color: @palette-gray-4;
+    .disabled & {
+      background-color: @control-background-disabled-color;
+    }
   }
 
    & input.multiline ~ .icon {

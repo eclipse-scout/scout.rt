@@ -32,7 +32,11 @@
   &.selected {
     background-color: @selection-row-background-color;
     border: 1px solid @selection-row-border-color;
-    color: @text-color;
+
+    .disabled & {
+      background-color: @selection-row-background-disabled-color;
+      border-color: @selection-row-border-disabled-color;
+    }
   }
 }
 
@@ -66,6 +70,13 @@
 
     .tree-item-control:hover& {
       color: @highlight-color;
+    }
+
+    .disabled & {
+      color: @palette-gray-5;
+    }
+    .disabled .tree-item-control:hover& {
+      color: @palette-gray-3;
     }
   }
 

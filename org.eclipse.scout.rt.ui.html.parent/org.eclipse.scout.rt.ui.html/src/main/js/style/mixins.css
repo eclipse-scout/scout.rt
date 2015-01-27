@@ -24,6 +24,10 @@
   background: @selection-background-color;
   color: @selection-text-color;
 }
+.selectionDisabled() {
+  background: @selection-background-disabled-color;
+  color: @selection-text-disabled-color;
+}
 
 .overlay(@left: 0px, @top: 0px, @diffW: 0px, @diffH: 0px) {
   position: absolute;
@@ -70,4 +74,11 @@
   &.disabled ~ .icon {
     display: none;
   }
+}
+
+.user-select(@mode) {
+  -webkit-user-select: @mode;
+  -moz-user-select: @mode;
+  -ms-user-select: @mode;
+  user-select: @mode;
 }

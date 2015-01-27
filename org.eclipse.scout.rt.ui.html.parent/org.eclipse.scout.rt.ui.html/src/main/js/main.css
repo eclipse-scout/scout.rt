@@ -17,12 +17,29 @@ body {
   margin: 0px;
   overflow: hidden;
   -webkit-touch-callout: none;
-  -webkit-user-select: none;
+  .user-select(none);
   -moz-user-select: -moz-none;
-  -ms-user-select: none;
-  user-select: none;
   cursor: default;
   color: @text-color;
+}
+
+/* -moz variant is required, see https://bugzilla.mozilla.org/show_bug.cgi?id=509958 */
+::-moz-selection {
+  .selection();
+}
+::selection {
+  .selection();
+}
+
+.disabled {
+  color: @text-disabled-color;
+
+  & ::-moz-selection {
+    .selectionDisabled();
+  }
+  & ::selection {
+    .selectionDisabled();
+  }
 }
 
 *, *:before, *:after {
@@ -37,16 +54,19 @@ div {
   -moz-user-select: -moz-none;
 }
 
-input {
+input, textarea, button {
+  .font-text-normal;
+}
+
+input, textarea {
   background-color: @control-background-color;
-  padding: 0 @text-field-padding;
+  color: @control-text-color;
   border: 1px solid @border-color;
   border-radius: @border-radius;
-  color: @text-color;
 
-  &:disabled {
-    background-color:  @palette-gray-8;
-    color: @palette-gray-4;
+  .disabled & {
+    background-color: @control-background-disabled-color;
+    color: @control-text-disabled-color;
   }
 
   &:focus {
@@ -61,30 +81,18 @@ input {
   &.has-error:focus {
     .glow(@error-color);
   }
+}
 
-  &::selection {
-    .selection();
-  }
-
-  &::-moz-selection {
-    .selection();
-  }
+input {
+  padding: 0 @text-field-padding;
 }
 
 textarea {
-   /* these two properties are required for FF, otherwise the editable textarea is 2px too large,
-    * and the DOM inspector does not include these 2 pixels.
-    */
+  /* these two properties are required for FF, otherwise the editable textarea is 2px too large, */
+  /* and the DOM inspector does not include these 2 pixels. */
   margin: 0 auto;
   padding: 5px @text-field-padding;
-  background-color: @control-background-color;
-  border: 1px solid @border-color;
-  border-radius: @border-radius;
-  color: @text-color;
-
-  &:focus {
-    .focus-border;
-  }
+  resize: none;
 }
 
 /* cursor handling */
@@ -95,10 +103,6 @@ body.col-resize *, body.col-resize {
 
 body.row-resize *, body.row-resize {
   cursor: row-resize !important;
-}
-
-input, textarea, button {
-  .font-text-normal;
 }
 
 /* remove the dotted border in firefox */
