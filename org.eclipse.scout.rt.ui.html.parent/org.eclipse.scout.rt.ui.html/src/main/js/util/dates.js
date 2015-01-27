@@ -73,6 +73,25 @@ scout.dates = {
     return weekdaysOrdered;
   },
 
+  weekInYear: function(date) {
+    if (!date) {
+      return undefined;
+    }
+
+    // If the given date is not a thursday, set it to the thursday of that week
+     var thursday = new Date(date.valueOf());
+     if (thursday.getDay() !== 4) { // 0 = Sun, 1 = Mon, 2 = Thu, 3 = Wed, 4 = Thu, 5 = Fri, 6 = Sat
+       thursday.setDate(thursday.getDate() - date.getDay() + 3);
+     }
+     // ISO format: week #1 is the week with January 4th
+     var jan4 = new Date(thursday.getFullYear(), 0, 4);
+
+     var diffInDays = (thursday - jan4) / 86400000;
+
+     return 1 + Math.ceil(diffInDays / 7);
+  },
+
+
   /**
    * Parses a string that corresponds to one of the canonical JSON transfer formats
    * and returns it as a JavaScript 'Date' object.

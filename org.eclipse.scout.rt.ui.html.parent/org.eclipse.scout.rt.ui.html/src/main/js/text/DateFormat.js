@@ -192,25 +192,6 @@ scout.DateFormat = function(locale, pattern) {
   }
 };
 
-scout.DateFormat.prototype.weekInYear = function(date) {
-  if (!date) {
-    return undefined;
-  }
-
-  // If the given date is not a thursday, set it to the thursday of that week
-   var thursday = new Date(date.valueOf());
-   if (thursday.getDay() !== 4) { // 0 = Sun, 1 = Mon, 2 = Thu, 3 = Wed, 4 = Thu, 5 = Fri, 6 = Sat
-     // Calculate week day index if week would start with this.symbols.firstDayOfWeek instead of Sunday
-     var normalizedWeekday = (date.getDay() + 7 - this.symbols.firstDayOfWeek) % 7;
-     thursday.setDate(thursday.getDate() - normalizedWeekday + 3);
-   }
-   // ISO format: week #1 is the week with January 4th
-   var jan4 = new Date(thursday.getFullYear(), 0, 4);
-
-   var diffInDays = (thursday - jan4) / 86400000;
-   return 1 + Math.ceil(diffInDays / 7);
-};
-
 scout.DateFormat.prototype.format = function(date) {
   var ret = this.pattern;
   // Apply all formatter functions for this DateFormat to the pattern to replace the
