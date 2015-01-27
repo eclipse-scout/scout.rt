@@ -1680,7 +1680,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
       return;
     }
     if (!(row instanceof InternalTableRow)) {
-      LOG.info("validateColumnValue called with row not of type " + InternalTableRow.class);
+      LOG.debug("validateColumnValue called with row not of type " + InternalTableRow.class);
       return;
     }
     if (m_isValidating) {
