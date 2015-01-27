@@ -12,16 +12,14 @@ scout.TableKeystrokeAdapter = function(table) {
       inputFocused;
 
     if (elementType === 'input' ||
-        elementType === 'textarea') {
+      elementType === 'textarea') {
       inputFocused = true;
     }
 
     // Don't accept if focus is already in a input field or table is detached or when tool-form is opened.
     // FIXME CGU/AWE: (key-handling) better remove adapter on detach and reinstall on attach to increase performance?
     // also refactor selectedTool-if below when activeForm is implemented on desktop (see Desktop.js)
-    return inputFocused ||
-      !that._table.rendered ||
-      !that._table.$container.isAttached() ||
+    return inputFocused || !that._table.rendered || !that._table.$container.isAttached() ||
       table.session.desktop.selectedTool;
   }
 
@@ -54,9 +52,7 @@ scout.TableKeystrokeAdapter = function(table) {
       if (ignoreEvent()) {
         return false;
       }
-      if (event && $.inArray(event.which,
-          [scout.keys.UP, scout.keys.DOWN, scout.keys.HOME, scout.keys.END, scout.keys.PAGE_UP,scout.keys.PAGE_DOWN]) >= 0 &&
-        !event.ctrlKey && !event.altKey && !event.metaKey) {
+      if (event && $.inArray(event.which, [scout.keys.UP, scout.keys.DOWN, scout.keys.HOME, scout.keys.END, scout.keys.PAGE_UP, scout.keys.PAGE_DOWN, scout.keys.SPACE]) >= 0 && !event.ctrlKey && !event.altKey && !event.metaKey) {
         return true;
       }
       return false;
@@ -66,6 +62,17 @@ scout.TableKeystrokeAdapter = function(table) {
       var keycode = event.which;
       var $rowsAll = that._table.$rows();
       var $rowsSelected = that._table.$selectedRows();
+
+      if (keycode === scout.keys.SPACE) {
+        $newRowSelection = $rowsSelected;
+        if ($rowsSelected.length > 0) {
+          var check = !$($rowsSelected[0]).data('row').checked;
+          for (var j = 0; j < $rowsSelected.length; j++) {
+            var row = $($rowsSelected[j]).data('row');
+            that._table.checkRow(row, check);
+          }
+        }
+      }
 
       // up: move up
       if (keycode === scout.keys.UP) {

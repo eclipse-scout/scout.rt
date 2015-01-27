@@ -234,7 +234,7 @@ scout.Table.prototype._renderRowOrderChanges = function() {
   }
 
   for (i = 0; i < this.rows.length; i++) {
-    $row = this.$rowById(this.rows[i].id);
+    $row = this.rows[i].$row;
     $sortedRows.push($row[0]);
   }
 
@@ -340,7 +340,7 @@ scout.Table.prototype._buildRowDiv = function(row) {
   }
   var rowDiv = '<div id="' + row.id + '" class="' + rowClass + '" style="width: ' + rowWidth + 'px"' + scout.device.unselectableAttribute + '>';
   if (this.checkable) {
-    rowDiv += '<div class="table-cell"  style="min-width:' + scout.Table.CHECKABLE_COLUMN_SIZE +
+    rowDiv += '<div class="table-cell checkable-col"  style="min-width:' + scout.Table.CHECKABLE_COLUMN_SIZE +
       'px; max-width:' + scout.Table.CHECKABLE_COLUMN_SIZE + 'px;"' + scout.device.unselectableAttribute +
       '><input type="checkbox" id="' + row.id + '-checkable" ';
     if (row.checked) {
@@ -395,6 +395,14 @@ scout.Table.prototype._drawData = function(startRow) {
       .on('mouseup', '', onMouseUp)
       .on('dblclick', '', onDoubleClick)
       .on('contextmenu', onContextMenu); //mouseup is used instead of click to make sure the event is fired before mouseup in table selection handler
+
+    $rows.each(function(index, rowObject) {
+      var $row = $(rowObject);
+      $row.data('row', that.rows[index]);
+      that.rows[index].$row = $row;
+      $('.checkable-col label', $row).on('mouseup', that.rows[index], onRowChecked);
+    });
+
   }
 
   // update info and scrollbar
@@ -406,6 +414,12 @@ scout.Table.prototype._drawData = function(startRow) {
     setTimeout(function() {
       that._drawData(startRow + 100);
     }, 0);
+  }
+
+  function onRowChecked(event) {
+    var row = event.data;
+    row.checked = !row.checked;
+    that.sendRowChecked(row.$row, row.checked);
   }
 
   function onContextMenu(event) {
@@ -474,9 +488,6 @@ scout.Table.prototype._drawData = function(startRow) {
     if (hyperLink) {
       that.sendHyperlinkAction($row, colId, hyperLink);
     } else {
-      var row = that.rowById($row.attr('id'));
-      row.checked = !row.checked;
-      that._checkRow(row);
       that.sendRowClicked($row, colId);
     }
   }
@@ -580,6 +591,13 @@ scout.Table.prototype.sendRowClicked = function($row, columnIdParam) {
   this.session.send(this.id, 'rowClicked', {
     rowId: $row.attr('id'),
     columnId: columnIdParam
+  });
+};
+
+scout.Table.prototype.sendRowChecked = function($row, isChecked) {
+  this.session.send(this.id, 'rowsChecked', {
+    rowId: $row.attr('id'),
+    checked: isChecked
   });
 };
 
@@ -701,10 +719,7 @@ scout.Table.prototype._group = function() {
     sum = [];
 
   for (var r = 0; r < $rows.length; r++) {
-    var rowId = $rows.eq(r).attr('id');
-    // FIXME CGU is it possible to link row to $row? because table.rowById does a lookup
-    var row = this.rowById(rowId);
-
+    var row = $rows.data('row');
     // calculate sum per column
     for (var c = 0; c < this.columns.length; c++) {
       column = this.columns[c];
@@ -716,8 +731,7 @@ scout.Table.prototype._group = function() {
     }
 
     // test if sum should be shown, if yes: reset sum-array
-    var nextRowId = $rows.eq(r + 1).attr('id');
-    var nextRow = this.rowById(nextRowId);
+    var nextRow = $rows.data('row');
 
     if ((r === $rows.length - 1) || (!all && this.getCellText(groupColumn, row) !== this.getCellText(groupColumn, nextRow)) && sum.length > 0) {
       for (c = 0; c < this.columns.length; c++) {
@@ -828,8 +842,7 @@ scout.Table.prototype.colorData = function(mode, colorColumn) {
   });
 
   for (var s = 0; s < $rows.length; s++) {
-    rowId = $rows.eq(s).attr('id');
-    row = this.rowById(rowId);
+    row = $rows.data('row');
     value = this.getCellValue(colorColumn, row);
 
     colorFunc($rows.eq(s).children().eq(c), value);
@@ -844,13 +857,24 @@ scout.Table.prototype._onRowsSelected = function(rowIds) {
   }
 };
 
-scout.Table.prototype._onRowsUpdated = function(rows) {
+scout.Table.prototype._onRowsChecked = function(rows) {
   for (var i = 0; i < rows.length; i++) {
-    this._checkRow(rows[i].id, rows[i].checked);
+    this._checkRow(rows[i]);
   }
 };
 
+scout.Table.prototype._onRowsUpdated = function(rows) {
+  //TODO update table
+};
+
 scout.Table.prototype._checkRow = function(row) {
+  var $checkbox = $('#' + row.id + '-checkable', this.$data);
+  $checkbox.prop('checked', row.checked);
+};
+
+scout.Table.prototype.checkRow = function(row, checked) {
+  row.checked = checked;
+  this.sendRowChecked(row.$row, row.checked);
   var $checkbox = $('#' + row.id + '-checkable', this.$data);
   $checkbox.prop('checked', row.checked);
 };
@@ -874,24 +898,20 @@ scout.Table.prototype._onRowsInserted = function(rows) {
   }
 };
 
-scout.Table.prototype._onRowsDeleted = function(rowIds) {
-  var rows, $row, i, row;
+scout.Table.prototype._onRowsDeleted = function(rows) {
+  var i, row;
 
   //update model
-  rows = this.rowsByIds(rowIds);
   for (i = 0; i < rows.length; i++) {
-    row = rows[i];
-    scout.arrays.remove(this.rows, row);
-  }
-
-  //update html doc
-  if (this.rendered) {
-    for (i = 0; i < rowIds.length; i++) {
-      $row = this.$rowById(rowIds[i]);
-      $row.remove();
+    scout.arrays.remove(this.rows, rows[i]);
+    if (this.rendered) {
+      rows[i].$row.remove();
     }
+  }
+  if (this.rendered) {
     this.updateScrollbar();
   }
+  //update html doc
 };
 
 scout.Table.prototype._onAllRowsDeleted = function() {
@@ -943,20 +963,6 @@ scout.Table.prototype.$cellsForColIndex = function(colIndex, includeSumRows) {
     selector += ', .table-row-sum > div:nth-of-type(' + colIndex + ' )';
   }
   return this._$scrollable.find(selector);
-};
-
-scout.Table.prototype.$rowById = function(rowId) {
-  return this._$scrollable.find('#' + rowId);
-};
-
-scout.Table.prototype.rowById = function(rowId) {
-  var row, i;
-  for (i = 0; i < this.rows.length; i++) {
-    row = this.rows[i];
-    if (row.id === rowId) {
-      return row;
-    }
-  }
 };
 
 scout.Table.prototype.rowsByIds = function(rowIds) {
@@ -1185,10 +1191,15 @@ scout.Table.prototype.resizingColumnFinished = function($header, width) {
 };
 
 scout.Table.prototype.moveColumn = function($header, oldPos, newPos, dragged) {
-  var column = $header.data('column');
+  var column = $header.data('column'),
+    uiOnlyColumnOffset = 0;
+
+  if (this.checkable && newPos === 0) {
+    uiOnlyColumnOffset = 1;
+  }
 
   scout.arrays.remove(this.columns, column);
-  scout.arrays.insert(this.columns, column, newPos);
+  scout.arrays.insert(this.columns, column, newPos + uiOnlyColumnOffset);
 
   var data = {
     columnId: column.id,
@@ -1196,15 +1207,15 @@ scout.Table.prototype.moveColumn = function($header, oldPos, newPos, dragged) {
   };
   this.session.send(this.id, 'columnMoved', data);
 
-  this.header.onColumnMoved($header, oldPos, newPos, dragged);
+  this.header.onColumnMoved($header, oldPos, newPos + uiOnlyColumnOffset, dragged);
 
   // move cells
   this.$rows(true).each(function() {
     var $cells = $(this).children();
-    if (newPos < oldPos) {
-      $cells.eq(newPos).before($cells.eq(oldPos));
+    if (newPos + uiOnlyColumnOffset < oldPos) {
+      $cells.eq(newPos + uiOnlyColumnOffset).before($cells.eq(oldPos));
     } else {
-      $cells.eq(newPos).after($cells.eq(oldPos));
+      $cells.eq(newPos + uiOnlyColumnOffset).after($cells.eq(oldPos));
     }
   });
 };
@@ -1414,7 +1425,7 @@ scout.Table.prototype.onModelAction = function(event) {
   if (event.type === 'rowsInserted') {
     this._onRowsInserted(event.rows);
   } else if (event.type === 'rowsDeleted') {
-    this._onRowsDeleted(event.rowIds);
+    this._onRowsDeleted(event.rows);
   } else if (event.type === 'allRowsDeleted') {
     this._onAllRowsDeleted();
   } else if (event.type === 'rowsSelected') {
@@ -1423,6 +1434,8 @@ scout.Table.prototype.onModelAction = function(event) {
     this._onRowOrderChanged(event.rowIds);
   } else if (event.type === 'rowsUpdated') {
     this._onRowsUpdated(event.rows);
+  } else if (event.type === 'rowsChecked') {
+    this._onRowsChecked(event.rows);
   } else if (event.type === 'columnStructureChanged') {
     this._onColumnStructureChanged(event.columns);
   } else if (event.type === 'columnOrderChanged') {

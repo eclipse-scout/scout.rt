@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.MouseButton;
@@ -73,6 +74,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   public static final String EVENT_COLUMN_RESIZED = "columnResized";
   public static final String EVENT_RELOAD = "reload";
   public static final String EVENT_RESET_COLUMNS = "resetColumns";
+  public static final String EVENT_ROWS_CHECKED = "rowsChecked";
 
   public static final String PROP_ROW_IDS = "rowIds";
   public static final String PROP_ROW_ID = "rowId";
@@ -265,6 +267,9 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     else if (EVENT_HYPERLINK_ACTION.equals(event.getType())) {
       handleUiHyperlinkAction(event, res);
     }
+    else if (EVENT_ROWS_CHECKED.equals(event.getType())) {
+      handleUiRowChecked(event, res);
+    }
     else {
       super.handleUiEvent(event, res);
     }
@@ -278,6 +283,14 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     addTableEventFilterCondition(TableEvent.TYPE_ROWS_UPDATED).setRows(rows);
     getModel().getUIFacade().setContextColumnFromUI(column);
     getModel().getUIFacade().fireRowClickFromUI(tableRow, MouseButton.Left);
+  }
+
+  protected void handleUiRowChecked(JsonEvent event, JsonResponse res) {
+    ITableRow tableRow = extractTableRow(event.getData());
+    ArrayList<ITableRow> rows = CollectionUtility.arrayList(tableRow);
+    addTableEventFilterCondition(TableEvent.TYPE_ROWS_CHECKED).setRows(rows);
+    addTableEventFilterCondition(TableEvent.TYPE_ROWS_UPDATED).setRows(rows);
+    getModel().getUIFacade().setCheckedRowsFromUI(rows, event.getData().optBoolean("checked"));
   }
 
   private TableEventFilterCondition addTableEventFilterCondition(int tableEventType) {
@@ -591,6 +604,9 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
       case TableEvent.TYPE_COLUMN_HEADERS_UPDATED:
         handleModelColumnHeadersUpdated(event.getColumns());
         break;
+      case TableEvent.TYPE_ROWS_CHECKED:
+        handleModelRowsChecked(event.getRows());
+        break;
       default:
         // NOP
     }
@@ -639,6 +655,17 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     }
     putProperty(jsonEvent, ROWS, jsonRows);
     addActionEvent(EVENT_ROWS_UPDATED, jsonEvent);
+  }
+
+  protected void handleModelRowsChecked(Collection<ITableRow> modelRows) {
+    JSONObject jsonEvent = new JSONObject();
+    JSONArray jsonRows = new JSONArray();
+    for (ITableRow row : modelRows) {
+      JSONObject jsonRow = tableRowToJson(row);
+      jsonRows.put(jsonRow);
+    }
+    putProperty(jsonEvent, ROWS, jsonRows);
+    addActionEvent(EVENT_ROWS_CHECKED, jsonEvent);
   }
 
   protected void handleModelRowOrderChanged(Collection<ITableRow> modelRows) {
