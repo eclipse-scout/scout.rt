@@ -456,6 +456,10 @@ public class SwingScoutTimeField extends SwingScoutBasicFieldComposite<IDateFiel
         Runnable t = new Runnable() {
           @Override
           public void run() {
+            String newDisplayText = getSwingTimeField().getText();
+            if (!CompareUtility.equals(newDisplayText, getScoutObject().getDisplayText())) {
+              getScoutObject().getUIFacade().setDateTextFromUI(newDisplayText);
+            }
             getScoutObject().getUIFacade().fireTimeShiftActionFromUI(m_level, m_value);
           }
         };
