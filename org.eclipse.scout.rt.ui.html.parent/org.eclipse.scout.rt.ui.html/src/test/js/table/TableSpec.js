@@ -769,9 +769,9 @@ describe("Table", function() {
         session._processSuccessResponse(message);
 
         expect(table.$rows().length).toBe(2);
-        expect(table.$rowById(row0.id).length).toBe(0);
-        expect(table.$rowById(row1.id).length).toBe(1);
-        expect(table.$rowById(row2.id).length).toBe(1);
+        expect(table._$scrollable.find('#'+row0.id).length).toBe(0);
+        expect(table._$scrollable.find('#'+row1.id).length).toBe(1);
+        expect(table._$scrollable.find('#'+row2.id).length).toBe(1);
 
         message = {
           events: [createRowsDeletedEvent(model, [row1.id, row2.id])]

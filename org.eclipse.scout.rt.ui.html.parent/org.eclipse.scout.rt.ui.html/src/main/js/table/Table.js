@@ -12,6 +12,7 @@ scout.Table = function() {
   this.columns = [];
   this.tableControls = [];
   this.menus = [];
+  this.rowsMap = {};
   this.rows = [];
   this.staticMenus = [];
   this._addAdapterProperties(['tableControls', 'menus']);
@@ -398,9 +399,11 @@ scout.Table.prototype._drawData = function(startRow) {
 
     $rows.each(function(index, rowObject) {
       var $row = $(rowObject);
-      $row.data('row', that.rows[index]);
-      that.rows[index].$row = $row;
-      $('.checkable-col label', $row).on('mouseup', that.rows[index], onRowChecked);
+      var row = that.rows[index];
+      $row.data('row', row);
+      row.$row = $row;
+      that.rowsMap[row.id] = row;
+      $('.checkable-col label', $row).on('mouseup', row, onRowChecked);
     });
 
   }
@@ -898,14 +901,15 @@ scout.Table.prototype._onRowsInserted = function(rows) {
   }
 };
 
-scout.Table.prototype._onRowsDeleted = function(rows) {
+scout.Table.prototype._onRowsDeleted = function(rowIds) {
   var i;
-
   //update model
-  for (i = 0; i < rows.length; i++) {
-    scout.arrays.remove(this.rows, rows[i]);
+  for (i = 0; i < rowIds.length; i++) {
+    var row = this.rowsMap[rowIds[i]];
+    scout.arrays.remove(this.rows, row);
+    delete this.rowsMap[rowIds[i]];
     if (this.rendered) {
-      rows[i].$row.remove();
+      row.$row.remove();
     }
   }
   if (this.rendered) {
@@ -963,21 +967,6 @@ scout.Table.prototype.$cellsForColIndex = function(colIndex, includeSumRows) {
     selector += ', .table-row-sum > div:nth-of-type(' + colIndex + ' )';
   }
   return this._$scrollable.find(selector);
-};
-
-scout.Table.prototype.rowsByIds = function(rowIds) {
-  var i, row, rows = [];
-
-  for (i = 0; i < this.rows.length; i++) {
-    row = this.rows[i];
-    if (rowIds.indexOf(row.id) > -1) {
-      rows.push(this.rows[i]);
-      if (rows.length === rowIds.length) {
-        return rows;
-      }
-    }
-  }
-  return rows;
 };
 
 scout.Table.prototype.columnById = function(columnId) {
@@ -1425,7 +1414,7 @@ scout.Table.prototype.onModelAction = function(event) {
   if (event.type === 'rowsInserted') {
     this._onRowsInserted(event.rows);
   } else if (event.type === 'rowsDeleted') {
-    this._onRowsDeleted(event.rows);
+    this._onRowsDeleted(event.rowIds);
   } else if (event.type === 'allRowsDeleted') {
     this._onAllRowsDeleted();
   } else if (event.type === 'rowsSelected') {

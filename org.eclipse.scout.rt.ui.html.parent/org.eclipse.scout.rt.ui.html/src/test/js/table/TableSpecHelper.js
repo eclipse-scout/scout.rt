@@ -142,7 +142,9 @@ TableSpecHelper.prototype.createModelFixture = function(colCount, rowCount) {
 
 TableSpecHelper.prototype.createTable = function(model) {
   var table = new scout.Table();
+  var $div = $('<div>');
   table.init(model, this.session);
+  table._render($div);
   return table;
 };
 
