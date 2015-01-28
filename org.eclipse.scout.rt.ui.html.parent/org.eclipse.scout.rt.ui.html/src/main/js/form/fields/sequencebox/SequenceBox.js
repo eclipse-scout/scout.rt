@@ -11,7 +11,7 @@ scout.SequenceBox.prototype._render = function($parent) {
   this.addLabel();
   this.addField($('<div>'));
   var htmlComp = new scout.HtmlComponent(this.$field, this.session);
-  htmlComp.setLayout(new scout.LogicalGridLayout(0, 0));
+  htmlComp.setLayout(new scout.LogicalGridLayout(8, 0));
   for (i = 0; i < this.fields.length; i++) {
     field = this.fields[i];
     field.render(this.$field);

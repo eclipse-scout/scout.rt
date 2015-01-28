@@ -75,6 +75,7 @@ scout.MenuBar.prototype._renderMenuItems = function(menuItems, right) {
   menuItems.forEach(function(item) {
     item.tooltipPosition = this.position === 'top' ? 'bottom' : 'top';
     item.render(this.$container);
+    item.$container.removeClass('form-field');
     if (right) {
       item.$container.addClass('menu-right');
     }

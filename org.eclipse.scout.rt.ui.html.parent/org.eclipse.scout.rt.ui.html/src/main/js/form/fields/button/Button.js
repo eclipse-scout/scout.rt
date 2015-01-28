@@ -1,5 +1,6 @@
 scout.Button = function() {
   scout.Button.parent.call(this);
+  this._$icon;
 };
 scout.inherits(scout.Button, scout.FormField);
 
@@ -41,7 +42,7 @@ scout.Button.prototype._render = function($parent) {
     cssClass = 'button';
   }
 
-  this.addContainer($parent, cssClass, new scout.ButtonLayout());
+  this.addContainer($parent, cssClass, new scout.ButtonLayout(this));
   this.addField($button);
   $button.on('click', this._onClick.bind(this));
   if (this.systemType === scout.Button.SYSTEM_TYPE.OK) {
@@ -53,11 +54,29 @@ scout.Button.prototype._onClick = function() {
   this.session.send(this.id, 'clicked');
 };
 
-scout.Button.prototype._renderLabel = function(label) {
-  if (label) {
-    label = scout.strings.removeAmpersand(label);
+/**
+ * @override
+ */
+scout.Button.prototype._renderProperties = function() {
+  scout.Button.parent.prototype._renderProperties.call(this);
+  this._renderLabel();
+  this._renderIconId();
+};
+
+scout.Button.prototype._renderLabel = function() {
+  this.$field.text(this.label ? scout.strings.removeAmpersand(this.label) : '');
+};
+
+scout.Button.prototype._renderIconId = function() {
+  if (this.iconId) {
+    var $img = this.$field.find('img');
+    if ($img.length === 0) {
+      $img = $('<img>');
+      this.$field.prepend($img);
+    }
+    $img.attr('src', '/static/' + this.iconId + '?sessionId=' + this.session.jsonSessionId);
+    $img.toggleClass('with-label', !!this.label);
   } else {
-    label = '';
+    this.$field.find('img').remove();
   }
-  this.$field.text(label);
 };

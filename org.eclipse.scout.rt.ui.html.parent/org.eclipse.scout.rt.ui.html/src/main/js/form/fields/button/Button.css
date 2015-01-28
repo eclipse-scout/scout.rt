@@ -1,0 +1,63 @@
+.menubar button, .form-field button {
+  position: relative;
+  height: 30px;
+  color: @text-color;
+  background-color: @button-background-color;
+  border: 1px solid @border-color;
+  border-radius: @border-radius;
+  cursor: pointer;
+
+  &:not(.last) {
+    margin-right: @menu-item-margin-right;
+  }
+
+  &.default-button {
+    .font-text-normal(@bold);
+    background-color: @palette-bsi-normal;
+    color: @palette-white;
+    border-width: 0;
+  }
+
+  &:hover {
+    color: @hover-color;
+  }
+
+  &.default-button:not(:disabled):hover {
+    color: @palette-white;
+    background-color: @default-button-background-color;
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  &:focus:before {
+    .overlay(-3px, -3px, 6px, 6px);
+    .focus-border;
+    border-radius: @border-radius;
+  }
+
+  &:disabled {
+    background-color: @palette-white;
+    color: @disabled-color;
+  }
+
+  &.default-button:disabled {
+    border-width: 1px;
+  }
+
+}
+
+button img {
+  vertical-align: middle;
+  margin-bottom: 1px;
+
+  &.with-label {
+    margin-right: 8px;
+  }
+}
+
+/* Link buttons in a form must have an underline, but link buttons in the menubar shouldn't */
+.form-field.link-button > div {
+  text-decoration: underline;
+}

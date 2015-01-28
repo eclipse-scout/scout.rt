@@ -44,6 +44,11 @@
     vertical-align: middle;
   }
 
+  & button {
+    min-width: 110px;
+    margin: 6px 0 3px 0;
+  }
+
 }
 
 .menu-separator {
@@ -70,58 +75,6 @@
   padding-top: 1px;
   display: inline-block;
   border: none;
-}
-
-.menubar button {
-  position: relative;
-  height: 30px;
-  min-width: 110px;
-  margin: 6px 0 3px 0;
-  color: @text-color;
-  background-color: @button-background-color;
-  border: 1px solid @border-color;
-  border-radius: @border-radius;
-  cursor: pointer;
-
-  &:not(.last) {
-    margin-right: @menu-item-margin-right;
-  }
-
-  &.default-button {
-    .font-text-normal(@bold);
-    background-color: @palette-bsi-normal;
-    color: @palette-white;
-    border-width: 0;
-  }
-
-  &:hover {
-    color: @hover-color;
-  }
-
-  &.default-button:not(:disabled):hover {
-    color: @palette-white;
-    background-color: @default-button-background-color;
-  }
-
-  &:focus {
-    outline: none;
-  }
-
-  &:focus:before {
-    .overlay(-3px, -3px, 6px, 6px);
-    .focus-border;
-    border-radius: @border-radius;
-  }
-
-  &:disabled {
-    background-color: @palette-white;
-    color: @disabled-color;
-  }
-
-  &.default-button:disabled {
-    border-width: 1px;
-  }
-
 }
 
 .menu-item {

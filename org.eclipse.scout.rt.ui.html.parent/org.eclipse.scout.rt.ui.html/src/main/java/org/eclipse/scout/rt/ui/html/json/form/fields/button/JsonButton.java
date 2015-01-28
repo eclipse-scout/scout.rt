@@ -56,6 +56,12 @@ public class JsonButton<T extends IButton> extends JsonFormField<T> {
         return getModel().isSelected();
       }
     });
+    putJsonProperty(new JsonProperty<IButton>(IButton.PROP_ICON_ID, model) {
+      @Override
+      protected String modelValue() {
+        return getModel().getIconId();
+      }
+    });
   }
 
   @Override

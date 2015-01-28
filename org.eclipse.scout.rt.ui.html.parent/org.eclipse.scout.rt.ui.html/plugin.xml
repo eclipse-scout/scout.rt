@@ -19,5 +19,10 @@
             class="org.eclipse.scout.rt.ui.html.HtmlTextProviderService"
             createImmediately="false">
       </service>
+      <service class="org.eclipse.scout.rt.ui.html.services.common.icon.HtmlBundleIconProviderService"
+               createImmediately="false"
+               factory="org.eclipse.scout.rt.client.services.ClientServiceFactory"
+               ranking="-1000">
+      </service>
    </extension>
 </plugin>
