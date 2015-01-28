@@ -41,7 +41,7 @@
 
   .tree-item-control {
     /* adjust control position */
-    margin-left: -@tree-item-control-size - 5px;
+    margin-left: -@outline-item-control-size - 5px;
     margin-top: -3px;
 
     width: @outline-item-control-size;
