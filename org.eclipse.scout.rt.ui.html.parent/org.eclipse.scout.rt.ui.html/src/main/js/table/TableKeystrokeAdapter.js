@@ -69,7 +69,7 @@ scout.TableKeystrokeAdapter = function(table) {
           var check = !$($rowsSelected[0]).data('row').checked;
           for (var j = 0; j < $rowsSelected.length; j++) {
             var row = $($rowsSelected[j]).data('row');
-            that._table.checkRow(row, check);
+            that._table.checkRowAndRender(row, check);
           }
         }
       }

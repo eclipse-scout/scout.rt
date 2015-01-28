@@ -421,8 +421,7 @@ scout.Table.prototype._drawData = function(startRow) {
 
   function onRowChecked(event) {
     var row = event.data;
-    row.checked = !row.checked;
-    that.sendRowChecked(row.$row, row.checked);
+    that.checkRow(row, !row.checked);
   }
 
   function onContextMenu(event) {
@@ -597,11 +596,19 @@ scout.Table.prototype.sendRowClicked = function($row, columnIdParam) {
   });
 };
 
-scout.Table.prototype.sendRowChecked = function($row, isChecked) {
-  this.session.send(this.id, 'rowsChecked', {
-    rowId: $row.attr('id'),
-    checked: isChecked
-  });
+scout.Table.prototype.sendRowsChecked = function(rows) {
+  var data = {
+    rows: []
+  };
+
+  for (var i = 0; i < rows.length; i++) {
+    data.rows.push({
+      rowId: rows[i].id,
+      checked: rows[i].checked
+    });
+  }
+
+  this.session.send(this.id, 'rowsChecked', data);
 };
 
 scout.Table.prototype.sendRowAction = function($row, columnIdParam) {
@@ -862,7 +869,10 @@ scout.Table.prototype._onRowsSelected = function(rowIds) {
 
 scout.Table.prototype._onRowsChecked = function(rows) {
   for (var i = 0; i < rows.length; i++) {
-    this._checkRow(rows[i]);
+    this.rowsMap[rows[i].id].checked = rows[i].checked;
+    if (this.rendered) {
+      this._renderRowChecked(rows[i]);
+    }
   }
 };
 
@@ -870,16 +880,35 @@ scout.Table.prototype._onRowsUpdated = function(rows) {
   //TODO update table
 };
 
-scout.Table.prototype._checkRow = function(row) {
+scout.Table.prototype._renderRowChecked = function(row) {
   var $checkbox = $('#' + row.id + '-checkable', this.$data);
   $checkbox.prop('checked', row.checked);
 };
 
-scout.Table.prototype.checkRow = function(row, checked) {
+scout.Table.prototype.checkRowAndRender = function(row, checked) {
+  this.checkRow(row, checked, true);
+};
+
+scout.Table.prototype.checkRow = function(row, checked, render) {
+  if (row.checked === checked) {
+    return;
+  }
+  var updatedRows = [];
+  if (!this.multiCheck && checked) {
+    for (var i = 0; i < this.rows.length; i++) {
+      if (this.rows[i].checked) {
+        this.rows[i].checked = false;
+        updatedRows.push(this.rows[i]);
+        this._renderRowChecked(this.rows[i]);
+      }
+    }
+  }
   row.checked = checked;
-  this.sendRowChecked(row.$row, row.checked);
-  var $checkbox = $('#' + row.id + '-checkable', this.$data);
-  $checkbox.prop('checked', row.checked);
+  updatedRows.push(row);
+  this.sendRowsChecked(updatedRows);
+  if (render) {
+    this._renderRowChecked(row);
+  }
 };
 
 scout.Table.prototype._onRowsInserted = function(rows) {

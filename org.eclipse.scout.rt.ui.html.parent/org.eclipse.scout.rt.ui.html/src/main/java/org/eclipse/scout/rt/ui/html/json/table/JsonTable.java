@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.MouseButton;
@@ -286,11 +285,16 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   }
 
   protected void handleUiRowChecked(JsonEvent event, JsonResponse res) {
-    ITableRow tableRow = extractTableRow(event.getData());
-    ArrayList<ITableRow> rows = CollectionUtility.arrayList(tableRow);
-    addTableEventFilterCondition(TableEvent.TYPE_ROWS_CHECKED).setRows(rows);
-    addTableEventFilterCondition(TableEvent.TYPE_ROWS_UPDATED).setRows(rows);
-    getModel().getUIFacade().setCheckedRowsFromUI(rows, event.getData().optBoolean("checked"));
+    CheckedInfo tableRowsChecked = jsonToCheckeInfo(event.getData());
+    addTableEventFilterCondition(TableEvent.TYPE_ROWS_CHECKED).setRows(tableRowsChecked.allRows);
+    addTableEventFilterCondition(TableEvent.TYPE_ROWS_UPDATED).setRows(tableRowsChecked.allRows);
+
+    if (tableRowsChecked.checkedRows.size() > 0) {
+      getModel().getUIFacade().setCheckedRowsFromUI(tableRowsChecked.checkedRows, true);
+    }
+    if (tableRowsChecked.uncheckedRows.size() > 0) {
+      getModel().getUIFacade().setCheckedRowsFromUI(tableRowsChecked.uncheckedRows, false);
+    }
   }
 
   private TableEventFilterCondition addTableEventFilterCondition(int tableEventType) {
@@ -546,6 +550,24 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     return rows;
   }
 
+  protected CheckedInfo jsonToCheckeInfo(JSONObject data) {
+    JSONArray jsonRows = data.optJSONArray("rows");
+    CheckedInfo checkInfo = new CheckedInfo();
+    for (int i = 0; i < jsonRows.length(); i++) {
+      JSONObject jsonObject = jsonRows.optJSONObject(i);
+      ITableRow row = m_tableRows.get(jsonObject.optString("rowId"));
+      checkInfo.allRows.add(row);
+      if (jsonObject.optBoolean("checked")) {
+        checkInfo.checkedRows.add(row);
+      }
+      else {
+        checkInfo.uncheckedRows.add(row);
+      }
+    }
+    return checkInfo;
+
+  }
+
   protected ITableRow getTableRowForRowId(String rowId) {
     ITableRow row = m_tableRows.get(rowId);
     if (row == null) {
@@ -712,6 +734,12 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     public void tableChangedBatch(List<? extends TableEvent> events) {
       handleModelTableEventBatch(events);
     }
+  }
+
+  private class CheckedInfo {
+    private ArrayList<ITableRow> allRows = new ArrayList<ITableRow>();
+    private ArrayList<ITableRow> checkedRows = new ArrayList<ITableRow>();
+    private ArrayList<ITableRow> uncheckedRows = new ArrayList<ITableRow>();
   }
 
   @Override
