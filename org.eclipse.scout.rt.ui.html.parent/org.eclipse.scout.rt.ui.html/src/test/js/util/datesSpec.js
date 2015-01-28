@@ -293,4 +293,54 @@ describe("scout.dates", function() {
 
   });
 
+  describe("weekInYear", function() {
+
+    it("can calculate week in year", function() {
+      expect(scout.dates.weekInYear()).toBe(undefined);
+      expect(scout.dates.weekInYear(undefined)).toBe(undefined);
+      expect(scout.dates.weekInYear(null)).toBe(undefined);
+
+      // Check week with firstDayOfWeek = monday (1)
+      expect(scout.dates.weekInYear(scout.dates.create('2014-12-27'), 1)).toBe(52);
+      expect(scout.dates.weekInYear(scout.dates.create('2014-12-28'), 1)).toBe(52);
+      expect(scout.dates.weekInYear(scout.dates.create('2014-12-29'), 1)).toBe(1);
+      expect(scout.dates.weekInYear(scout.dates.create('2014-12-30'), 1)).toBe(1);
+      expect(scout.dates.weekInYear(scout.dates.create('2014-12-31'), 1)).toBe(1);
+      expect(scout.dates.weekInYear(scout.dates.create('2015-01-01'), 1)).toBe(1);
+      expect(scout.dates.weekInYear(scout.dates.create('2015-01-02'), 1)).toBe(1);
+      expect(scout.dates.weekInYear(scout.dates.create('2015-01-03'), 1)).toBe(1);
+      expect(scout.dates.weekInYear(scout.dates.create('2015-01-04'), 1)).toBe(1);
+      expect(scout.dates.weekInYear(scout.dates.create('2015-01-05'), 1)).toBe(2);
+      expect(scout.dates.weekInYear(scout.dates.create('2015-01-06'), 1)).toBe(2);
+      expect(scout.dates.weekInYear(scout.dates.create('2015-01-07'), 1)).toBe(2);
+      expect(scout.dates.weekInYear(scout.dates.create('2015-01-08'), 1)).toBe(2);
+      expect(scout.dates.weekInYear(scout.dates.create('2015-01-09'), 1)).toBe(2);
+      expect(scout.dates.weekInYear(scout.dates.create('2015-01-10'), 1)).toBe(2);
+      expect(scout.dates.weekInYear(scout.dates.create('2015-01-11'), 1)).toBe(2);
+      expect(scout.dates.weekInYear(scout.dates.create('2015-01-12'), 1)).toBe(3);
+      expect(scout.dates.weekInYear(scout.dates.create('2015-01-26'), 1)).toBe(5);
+
+      // Check week with firstDayOfWeek = sunday (0)
+      expect(scout.dates.weekInYear(scout.dates.create('2014-12-27'), 0)).toBe(52);
+      expect(scout.dates.weekInYear(scout.dates.create('2014-12-28'), 0)).toBe(53);
+      expect(scout.dates.weekInYear(scout.dates.create('2014-12-29'), 0)).toBe(53);
+      expect(scout.dates.weekInYear(scout.dates.create('2014-12-30'), 0)).toBe(53);
+      expect(scout.dates.weekInYear(scout.dates.create('2014-12-31'), 0)).toBe(53);
+      expect(scout.dates.weekInYear(scout.dates.create('2015-01-01'), 0)).toBe(53);
+      expect(scout.dates.weekInYear(scout.dates.create('2015-01-02'), 0)).toBe(53);
+      expect(scout.dates.weekInYear(scout.dates.create('2015-01-03'), 0)).toBe(53);
+      expect(scout.dates.weekInYear(scout.dates.create('2015-01-04'), 0)).toBe(1);
+      expect(scout.dates.weekInYear(scout.dates.create('2015-01-05'), 0)).toBe(1);
+      expect(scout.dates.weekInYear(scout.dates.create('2015-01-06'), 0)).toBe(1);
+      expect(scout.dates.weekInYear(scout.dates.create('2015-01-07'), 0)).toBe(1);
+      expect(scout.dates.weekInYear(scout.dates.create('2015-01-08'), 0)).toBe(1);
+      expect(scout.dates.weekInYear(scout.dates.create('2015-01-09'), 0)).toBe(1);
+      expect(scout.dates.weekInYear(scout.dates.create('2015-01-10'), 0)).toBe(1);
+      expect(scout.dates.weekInYear(scout.dates.create('2015-01-11'), 0)).toBe(2);
+      expect(scout.dates.weekInYear(scout.dates.create('2015-01-12'), 0)).toBe(2);
+      expect(scout.dates.weekInYear(scout.dates.create('2015-01-26'), 0)).toBe(4);
+    });
+
+  });
+
 });

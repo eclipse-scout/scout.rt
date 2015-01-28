@@ -73,24 +73,81 @@ scout.dates = {
     return weekdaysOrdered;
   },
 
-  weekInYear: function(date) {
+  /**
+   * Returns the week number according to ISO 8601 definition:
+   * - All years have 52 or 53 weeks.
+   * - The first week is the week with January 4th in it.
+   * - The first day of a week is Monday, the last day is Sunday
+   *
+   * This is the default behavior. By setting the optional second argument 'option',
+   * the first day in a week can be changed (e.g. 0 = Sunday). The returned numbers weeks are
+   * not ISO 8601 compliant anymore, but can be more appropriate for display in a calendar. The
+   * argument can be a number, a 'scout.Locale' or a 'scout.DateFormat' object.
+   */
+  weekInYear: function(date, option) {
     if (!date) {
       return undefined;
     }
+    var firstDayOfWeek = 1;
+    if (typeof option === 'object') {
+      // scout.DateFormat
+      if (typeof option.symbols !== 'undefined' && option.symbols.firstDayOfWeek !== 'undefined') {
+        firstDayOfWeek = option.symbols.firstDayOfWeek;
+      }
+      // scout.Locale
+      else if (typeof option.decimalFormatSymbols !== 'undefined' && option.decimalFormatSymbols.firstDayOfWeek !== 'undefined') {
+        firstDayOfWeek = option.decimalFormatSymbols.firstDayOfWeek;
+      }
+    }
+    else if (typeof option === 'number') {
+      firstDayOfWeek = option;
+    }
 
-    // If the given date is not a thursday, set it to the thursday of that week
-     var thursday = new Date(date.valueOf());
-     if (thursday.getDay() !== 4) { // 0 = Sun, 1 = Mon, 2 = Thu, 3 = Wed, 4 = Thu, 5 = Fri, 6 = Sat
-       thursday.setDate(thursday.getDate() - date.getDay() + 3);
-     }
-     // ISO format: week #1 is the week with January 4th
+     // Thursday of current week decides the year
+     var thursday = this._thursdayOfWeek(date, firstDayOfWeek);
+
+     // In ISO format, the week with January 4th is the first week
      var jan4 = new Date(thursday.getFullYear(), 0, 4);
 
-     var diffInDays = (thursday - jan4) / 86400000;
+     // If the date is before the beginning of the year, it belongs to the year before
+     var startJan4 = this._firstDayOfWeek(jan4, firstDayOfWeek);
+     if (date.getTime() < startJan4.getTime()) {
+       jan4 = new Date(thursday.getFullYear() - 1, 0, 4);
+     }
 
-     return 1 + Math.ceil(diffInDays / 7);
+     // Get the Thursday of the first week, to be able to compare it to 'thursday'
+     var thursdayFirstWeek = this._thursdayOfWeek(jan4, firstDayOfWeek);
+
+     var diffInDays = (thursday.getTime() - thursdayFirstWeek.getTime()) / 86400000;
+     return 1 + (diffInDays / 7);
   },
 
+  _thursdayOfWeek: function(date, firstDayOfWeek) {
+    if (!date || typeof firstDayOfWeek !== 'number') {
+      return undefined;
+    }
+
+    var thursday = new Date(date.valueOf());
+    if (thursday.getDay() !== 4) { // 0 = Sun, 1 = Mon, 2 = Thu, 3 = Wed, 4 = Thu, 5 = Fri, 6 = Sat
+      if (thursday.getDay() < firstDayOfWeek) {
+        // go 1 week backward
+        thursday.setDate(thursday.getDate() - 7);
+      }
+      thursday.setDate(thursday.getDate() - thursday.getDay() + 4); // go to start of week, then add 4 to go to Thursday
+    }
+    return thursday;
+  },
+
+  _firstDayOfWeek: function(date, firstDayOfWeek) {
+    if (!date || typeof firstDayOfWeek !== 'number') {
+      return undefined;
+    }
+    var firstDay = new Date(date.valueOf());
+    if (firstDay.getDay() !== firstDayOfWeek) {
+      firstDay.setDate(firstDay.getDate() - ((firstDay.getDay() + 7 - firstDayOfWeek) % 7));
+    }
+    return firstDay;
+  },
 
   /**
    * Parses a string that corresponds to one of the canonical JSON transfer formats

@@ -86,34 +86,4 @@ describe("DateFormat", function() {
     });
   });
 
-
-  describe("weekInYear", function() {
-
-    it("can calculate week in year", function() {
-      var dateFormat = new scout.DateFormat(locale);
-
-      expect(dateFormat.weekInYear()).toBe(undefined);
-      expect(dateFormat.weekInYear(undefined)).toBe(undefined);
-      expect(dateFormat.weekInYear(null)).toBe(undefined);
-
-      expect(dateFormat.weekInYear(scout.dates.create('2014-12-28'))).toBe(52);
-      expect(dateFormat.weekInYear(scout.dates.create('2014-12-29'))).toBe(1);
-      expect(dateFormat.weekInYear(scout.dates.create('2014-12-30'))).toBe(1);
-      expect(dateFormat.weekInYear(scout.dates.create('2014-12-31'))).toBe(1);
-      expect(dateFormat.weekInYear(scout.dates.create('2015-01-01'))).toBe(1);
-      expect(dateFormat.weekInYear(scout.dates.create('2015-01-02'))).toBe(1);
-      expect(dateFormat.weekInYear(scout.dates.create('2015-01-04'))).toBe(1);
-      expect(dateFormat.weekInYear(scout.dates.create('2015-01-05'))).toBe(2);
-      expect(dateFormat.weekInYear(scout.dates.create('2015-01-06'))).toBe(2);
-      expect(dateFormat.weekInYear(scout.dates.create('2015-01-07'))).toBe(2);
-      expect(dateFormat.weekInYear(scout.dates.create('2015-01-08'))).toBe(2);
-      expect(dateFormat.weekInYear(scout.dates.create('2015-01-09'))).toBe(2);
-      expect(dateFormat.weekInYear(scout.dates.create('2015-01-10'))).toBe(2);
-      expect(dateFormat.weekInYear(scout.dates.create('2015-01-11'))).toBe(2);
-      expect(dateFormat.weekInYear(scout.dates.create('2015-01-12'))).toBe(3);
-      expect(dateFormat.weekInYear(scout.dates.create('2015-01-26'))).toBe(5);
-    });
-
-  });
-
 });
