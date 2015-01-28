@@ -47,8 +47,6 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
   private int m_systemType;
   private int m_displayStyle;
   private boolean m_processButton;
-  private Object m_radioValue;
-  private List<IMenu> m_menus;
   private final IButtonUIFacade m_uiFacade;
   private final OptimisticLock m_uiFacadeSetSelectedLock;
 
