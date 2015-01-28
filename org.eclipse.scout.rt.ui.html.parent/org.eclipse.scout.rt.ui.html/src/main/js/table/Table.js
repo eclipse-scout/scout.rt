@@ -781,7 +781,7 @@ scout.Table.prototype.group = function($header, draw, all) {
 };
 
 scout.Table.prototype.colorData = function(mode, colorColumn) {
-  var minValue, maxValue, colorFunc, row, rowId, value, v, c, $rows;
+  var minValue, maxValue, colorFunc, row, value, v, c, $rows;
 
   for (var r = 0; r < this.rows.length; r++) {
     row = this.rows[r];
@@ -899,7 +899,7 @@ scout.Table.prototype._onRowsInserted = function(rows) {
 };
 
 scout.Table.prototype._onRowsDeleted = function(rows) {
-  var i, row;
+  var i;
 
   //update model
   for (i = 0; i < rows.length; i++) {
