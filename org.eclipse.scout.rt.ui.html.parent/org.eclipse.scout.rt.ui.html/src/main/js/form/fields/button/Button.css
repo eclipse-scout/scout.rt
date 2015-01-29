@@ -1,4 +1,4 @@
-.menubar button, .form-field button {
+.button button {
   position: relative;
   height: 30px;
   color: @text-color;
