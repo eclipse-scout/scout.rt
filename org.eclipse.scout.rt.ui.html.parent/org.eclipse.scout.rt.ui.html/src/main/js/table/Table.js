@@ -959,6 +959,10 @@ scout.Table.prototype.scrollTo = function($selection) {
   scout.scrollbars.scrollTo(this._$scrollable, $selection);
 };
 
+scout.Table.prototype.rowById = function(id) {
+  return this.rowsMap[id];
+};
+
 scout.Table.prototype.selectRowsByIds = function(rowIds) {
   if (!scout.arrays.equalsIgnoreOrder(rowIds, this.selectedRowIds)) {
     this.selectedRowIds = rowIds;
