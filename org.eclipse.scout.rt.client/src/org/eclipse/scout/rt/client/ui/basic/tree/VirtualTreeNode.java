@@ -176,10 +176,6 @@ public class VirtualTreeNode implements IVirtualTreeNode, ICellObserver {
   }
 
   @Override
-  public void setCheckedInternal(boolean b) {
-  }
-
-  @Override
   public void setChecked(boolean b) {
   }
 

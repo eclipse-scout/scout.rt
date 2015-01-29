@@ -333,7 +333,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
                     }
                     break;
                   }
-                  case TreeEvent.TYPE_NODES_UPDATED: {
+                  case TreeEvent.TYPE_NODES_CHECKED: {
                     if (getTree().isCheckable()) {
                       if (isAutoCheckChildNodes() && e.getNodes() != null) {
                         for (ITreeNode node : e.getNodes()) {

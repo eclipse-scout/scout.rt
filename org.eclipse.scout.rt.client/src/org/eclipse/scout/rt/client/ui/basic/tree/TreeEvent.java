@@ -106,19 +106,24 @@ public class TreeEvent extends EventObject {
   /**
    * Node has changed in a way that may affect its presentation (e.g. text, font, color...) but no structural changes
    * occurred
-   * 
+   *
    * @since 3.10.0-M5
    */
   public static final int TYPE_NODE_CHANGED = 850;
 
   /**
    * A node has changed during a drag and drop operation
-   * 
+   *
    * @since 4.0-M7
    */
   public static final int TYPE_NODE_DROP_TARGET_CHANGED = 860;
 
-  // next 870
+  /**
+   * @since 5.1
+   */
+  public static final int TYPE_NODES_CHECKED = 870;
+
+  // next 880
 
   private final int m_type;
   private ITreeNode m_commonParentNode;

@@ -47,6 +47,7 @@ import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeHyperl
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeInitTreeChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeNodeActionChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeNodeClickChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeNodesCheckedChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeNodesSelectedChain;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
@@ -88,6 +89,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   private boolean m_enabledGranted;
   private boolean m_enabledProperty;
 
+  private Set<ITreeNode> m_checkedNodes = new HashSet<ITreeNode>();
   private ITreeNode m_rootNode;
   private int m_treeChanging;
   private boolean m_autoDiscardOnDelete;
@@ -406,6 +408,11 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     fireTreeEventInternal(e);
   }
 
+  @ConfigOperation
+  @Order(90)
+  protected void execNodesChecked(List<ITreeNode> nodes) throws ProcessingException {
+  }
+
   protected final void interceptInitConfig() {
     m_objectExtensions.initConfig(createLocalExtension(), new Runnable() {
       @Override
@@ -479,6 +486,15 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
           }
           case TreeEvent.TYPE_NODES_SELECTED: {
             rebuildKeyStrokesInternal();
+            break;
+          }
+          case TreeEvent.TYPE_NODES_CHECKED: {
+            try {
+              interceptNodesChecked(CollectionUtility.arrayList(e.getNodes()));
+            }
+            catch (ProcessingException ex) {
+              SERVICES.getService(IExceptionHandlerService.class).handleException(ex);
+            }
             break;
           }
           case TreeEvent.TYPE_NODE_DROP_TARGET_CHANGED: {
@@ -1201,7 +1217,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   @Override
   public boolean isNodeChecked(ITreeNode node) {
     if (node != null) {
-      return node.isChecked();
+      return getCheckedNodes().contains(node);
     }
     else {
       return false;
@@ -1210,26 +1226,43 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   @Override
   public void setNodeChecked(ITreeNode node, boolean b) {
-    node = resolveNode(node);
-    if (node != null) {
-      if (node.isChecked() != b) {
-        List<ITreeNode> changedNodes = new ArrayList<ITreeNode>();
-        node.setCheckedInternal(b);
-        changedNodes.add(node);
+    setNodesChecked(CollectionUtility.arrayList(node), b);
+  }
 
-        ITreeNode commonParent = node.getParentNode();
-        //uncheck others in single-check mode
-        if (b && !isMultiCheck()) {
-          for (ITreeNode cn : getCheckedNodes()) {
-            if (cn != node) {
-              cn.setCheckedInternal(false);
-              changedNodes.add(cn);
-            }
+  @Override
+  public void setNodesChecked(List<ITreeNode> nodes, boolean b) {
+    if (!isCheckable()) {
+      return;
+    }
+    List<ITreeNode> changedNodes = new ArrayList<ITreeNode>();
+    for (ITreeNode node : nodes) {
+      node = resolveNode(node);
+      if (node != null) {
+        if (node.isChecked() != b) {
+          if (b) {
+            m_checkedNodes.add(node);
           }
-          commonParent = TreeUtility.findLowestCommonAncestorNode(changedNodes);
+          else {
+            m_checkedNodes.remove(node);
+          }
+          changedNodes.add(node);
+
+          //uncheck others in single-check mode
+          if (b && !isMultiCheck()) {
+            List<ITreeNode> uncheckedNodes = new ArrayList<ITreeNode>();
+            for (ITreeNode cn : getCheckedNodes()) {
+              if (cn != node) {
+                m_checkedNodes.remove(cn);
+                uncheckedNodes.add(cn);
+              }
+            }
+            break;
+          }
         }
-        fireNodesUpdated(commonParent, changedNodes);
       }
+    }
+    if (changedNodes.size() > 0) {
+      fireNodesChecked(changedNodes);
     }
   }
 
@@ -1973,17 +2006,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   @Override
   public Set<ITreeNode> getCheckedNodes() {
-    final List<ITreeNode> list = new ArrayList<ITreeNode>();
-    visitTree(new ITreeVisitor() {
-      @Override
-      public boolean visit(ITreeNode node) {
-        if (node.isChecked()) {
-          list.add(node);
-        }
-        return true;
-      }
-    });
-    return CollectionUtility.hashSet(list);
+    return CollectionUtility.hashSet(m_checkedNodes);
   }
 
   @Override
@@ -2072,6 +2095,12 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   private void fireNodesUpdated(ITreeNode parent, Collection<ITreeNode> children) {
     if (CollectionUtility.hasElements(children)) {
       fireTreeEventInternal(new TreeEvent(this, TreeEvent.TYPE_NODES_UPDATED, parent, children));
+    }
+  }
+
+  private void fireNodesChecked(List<? extends ITreeNode> children) {
+    if (CollectionUtility.hasElements(children)) {
+      fireTreeEventInternal(new TreeEvent(this, TreeEvent.TYPE_NODES_CHECKED, CollectionUtility.hashSet(children)));
     }
   }
 
@@ -2168,7 +2197,6 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   private void fireNodeClick(ITreeNode node, MouseButton mouseButton) {
     if (node != null) {
       try {
-        interceptNodeClickSingleObserver(node);
         interceptNodeClick(node, mouseButton);
       }
       catch (ProcessingException ex) {
@@ -2180,10 +2208,10 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
   }
 
-  protected void interceptNodeClickSingleObserver(ITreeNode node) {
-    if (isCheckable() && node.isEnabled() && isEnabled()) {
-      node.setChecked(!node.isChecked());
-    }
+  protected void interceptNodesChecked(List<ITreeNode> nodes) throws ProcessingException {
+    List<? extends ITreeExtension<? extends AbstractTree>> extensions = getAllExtensions();
+    TreeNodesCheckedChain chain = new TreeNodesCheckedChain(extensions);
+    chain.execNodesChecked(nodes);
   }
 
   private void fireNodeAction(ITreeNode node) {
@@ -2250,11 +2278,6 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
    */
   public void fireDragFinished() {
     TreeEvent e = new TreeEvent(this, TreeEvent.TYPE_DRAG_FINISHED);
-    fireTreeEventInternal(e);
-  }
-
-  private void fireNodeRequestFocus(ITreeNode node) {
-    TreeEvent e = new TreeEvent(this, TreeEvent.TYPE_NODE_REQUEST_FOCUS, node);
     fireTreeEventInternal(e);
   }
 
@@ -2580,6 +2603,38 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
 
     @Override
+    public void setNodesCheckedFromUI(List<ITreeNode> nodes, boolean checked) {
+      try {
+        pushUIProcessor();
+        try {
+          setTreeChanging(true);
+          //
+          nodes = resolveNodes(nodes);
+          nodes = CollectionUtility.arrayList(resolveVirtualNodes(nodes));
+          if (nodes.size() > 0) {
+            setNodesChecked(nodes, checked);
+          }
+        }
+        finally {
+          setTreeChanging(false);
+        }
+      }
+      catch (ProcessingException se) {
+        StringBuilder msg = new StringBuilder();
+        for (ITreeNode node : nodes) {
+          msg.append("[");
+          msg.append(node.getCell().getText());
+          msg.append("]");
+        }
+        se.addContextMessage(msg.toString());
+        SERVICES.getService(IExceptionHandlerService.class).handleException(se);
+      }
+      finally {
+        popUIProcessor();
+      }
+    }
+
+    @Override
     public void setNodeExpandedFromUI(ITreeNode node, boolean on) {
       try {
         pushUIProcessor();
@@ -2873,6 +2928,11 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     @Override
     public TransferObject execDrag(TreeDragNodeChain chain, ITreeNode node) throws ProcessingException {
       return getOwner().execDrag(node);
+    }
+
+    @Override
+    public void execNodesChecked(TreeNodesCheckedChain chain, Collection<ITreeNode> nodes) throws ProcessingException {
+      getOwner().execNodesChecked(CollectionUtility.arrayList(nodes));
     }
 
   }

@@ -224,7 +224,7 @@ public class MobileSmartTreeForm<LOOKUP_TYPE> extends ContentAssistTreeForm<LOOK
     @Override
     public void treeChanged(TreeEvent e) {
       switch (e.getType()) {
-        case TreeEvent.TYPE_NODES_UPDATED: {
+        case TreeEvent.TYPE_NODES_CHECKED: {
           handleTreeNodesUpdated(e.getNodes());
           break;
         }

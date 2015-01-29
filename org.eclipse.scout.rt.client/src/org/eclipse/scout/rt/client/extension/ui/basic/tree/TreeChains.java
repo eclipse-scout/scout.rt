@@ -151,6 +151,27 @@ public final class TreeChains {
     }
   }
 
+  public static class TreeNodesCheckedChain extends AbstractTreeChain {
+
+    public TreeNodesCheckedChain(List<? extends ITreeExtension<? extends AbstractTree>> extensions) {
+      super(extensions);
+    }
+
+    public void execNodesChecked(final List<ITreeNode> nodes) throws ProcessingException {
+      MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
+        @Override
+        protected void callMethod(ITreeExtension<? extends AbstractTree> next) throws ProcessingException {
+          next.execNodesChecked(TreeNodesCheckedChain.this, nodes);
+        }
+      };
+      callChain(methodInvocation, nodes);
+      if (methodInvocation.getException() instanceof ProcessingException) {
+        throw (ProcessingException) methodInvocation.getException();
+      }
+
+    }
+  }
+
   public static class TreeHyperlinkActionChain extends AbstractTreeChain {
 
     public TreeHyperlinkActionChain(List<? extends ITreeExtension<? extends AbstractTree>> extensions) {

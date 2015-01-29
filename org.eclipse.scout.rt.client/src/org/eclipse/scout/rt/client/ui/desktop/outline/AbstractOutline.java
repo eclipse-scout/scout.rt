@@ -705,7 +705,8 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
         case TreeEvent.TYPE_CHILD_NODE_ORDER_CHANGED:
         case TreeEvent.TYPE_NODES_DELETED:
         case TreeEvent.TYPE_NODES_INSERTED:
-        case TreeEvent.TYPE_NODES_UPDATED: {
+        case TreeEvent.TYPE_NODES_UPDATED:
+        case TreeEvent.TYPE_NODES_CHECKED: {
           outlineMediator.mediateTreeNodesChanged(pageWithNodes);
           break;
         }

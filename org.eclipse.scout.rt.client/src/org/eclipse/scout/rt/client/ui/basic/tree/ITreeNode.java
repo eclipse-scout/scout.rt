@@ -131,11 +131,6 @@ public interface ITreeNode {
   void setLeafInternal(boolean b);
 
   /**
-   * do not use this method directly use {@link ITree#setNodeChecked(ITreeNode, boolean)}
-   */
-  void setCheckedInternal(boolean b);
-
-  /**
    * Note: this method is a Convenience for {@link ITree#setNodeLeaf(this, boolean)}
    */
   void setLeaf(boolean b);

@@ -26,6 +26,7 @@ import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeHyperl
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeInitTreeChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeNodeActionChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeNodeClickChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeNodesCheckedChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeNodesSelectedChain;
 import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
@@ -50,6 +51,8 @@ public interface ITreeExtension<OWNER extends AbstractTree> extends IExtension<O
   void execNodeAction(TreeNodeActionChain chain, ITreeNode node) throws ProcessingException;
 
   void execNodeClick(TreeNodeClickChain chain, ITreeNode node, MouseButton mouseButton) throws ProcessingException;
+
+  void execNodesChecked(TreeNodesCheckedChain chain, Collection<ITreeNode> nodes) throws ProcessingException;
 
   void execHyperlinkAction(TreeHyperlinkActionChain chain, URL url, String path, boolean local) throws ProcessingException;
 

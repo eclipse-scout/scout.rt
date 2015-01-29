@@ -390,6 +390,8 @@ public interface ITree extends IPropertyObserver, IDNDSupport {
 
   void setNodeChecked(ITreeNode node, boolean b);
 
+  void setNodesChecked(List<ITreeNode> nodes, boolean b);
+
   boolean isNodeChecked(ITreeNode node);
 
   int getNodeStatus(ITreeNode node);

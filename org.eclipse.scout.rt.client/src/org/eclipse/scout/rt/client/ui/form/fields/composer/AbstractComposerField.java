@@ -337,7 +337,8 @@ public abstract class AbstractComposerField extends AbstractFormField implements
                 switch (e.getType()) {
                   case TreeEvent.TYPE_NODES_DELETED:
                   case TreeEvent.TYPE_NODES_INSERTED:
-                  case TreeEvent.TYPE_NODES_UPDATED: {
+                  case TreeEvent.TYPE_NODES_UPDATED:
+                  case TreeEvent.TYPE_NODES_CHECKED: {
                     checkSaveNeeded();
                     checkEmpty();
                     break;

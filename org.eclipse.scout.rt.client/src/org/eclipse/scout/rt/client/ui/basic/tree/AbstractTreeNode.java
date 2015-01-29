@@ -65,7 +65,6 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   private boolean m_childrenLoaded;
   private final OptimisticLock m_childrenLoadedLock = new OptimisticLock();
   private boolean m_leaf;
-  private boolean m_checked;
   private boolean m_defaultExpanded;
   private boolean m_expanded;
   private boolean m_childrenVolatile;
@@ -450,25 +449,12 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
 
   @Override
   public boolean isChecked() {
-    return m_checked;
-  }
-
-  /**
-   * do not use this method directly use ITree.setNodeLeaf(node,b)
-   */
-  @Override
-  public void setCheckedInternal(boolean b) {
-    m_checked = b;
+    return getTree().isNodeChecked(this);
   }
 
   @Override
   public void setChecked(boolean b) {
-    if (getTree() != null) {
-      getTree().setNodeChecked(this, b);
-    }
-    else {
-      setCheckedInternal(b);
-    }
+    getTree().setNodeChecked(this, b);
   }
 
   @Override

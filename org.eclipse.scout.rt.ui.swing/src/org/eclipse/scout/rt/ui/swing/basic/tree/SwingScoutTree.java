@@ -602,6 +602,7 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
         case TreeEvent.TYPE_NODE_COLLAPSED:
         case TreeEvent.TYPE_NODES_INSERTED:
         case TreeEvent.TYPE_NODES_UPDATED:
+        case TreeEvent.TYPE_NODES_CHECKED:
         case TreeEvent.TYPE_NODE_CHANGED:
         case TreeEvent.TYPE_NODES_DELETED:
         case TreeEvent.TYPE_NODE_FILTER_CHANGED:
@@ -622,7 +623,8 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
         setExpansionFromScout(e.getCommonParentNode());
         break;
       }
-      case TreeEvent.TYPE_NODES_UPDATED: {
+      case TreeEvent.TYPE_NODES_UPDATED:
+      case TreeEvent.TYPE_NODES_CHECKED: {
         updateTreeStructureAndKeepSelectionFromScout(e.getCommonParentNode());
         setExpansionFromScout(e.getCommonParentNode());
         break;
@@ -678,6 +680,7 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
         case TreeEvent.TYPE_NODES_INSERTED:
         case TreeEvent.TYPE_NODES_UPDATED:
         case TreeEvent.TYPE_NODES_DELETED:
+        case TreeEvent.TYPE_NODES_CHECKED:
         case TreeEvent.TYPE_CHILD_NODE_ORDER_CHANGED: {
           parentNode = e.getCommonParentNode();
           break;
@@ -725,7 +728,7 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
 
   /**
    * update the given node
-   * 
+   *
    * @since 3.10.0-M5
    */
   protected void updateTreeNode(ITreeNode node) {
@@ -878,6 +881,9 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
           @Override
           public void run() {
             getScoutObject().getUIFacade().fireNodeClickFromUI(scoutNode, SwingUtility.swingToScoutMouseButton(swingMouseButton));
+            if (getScoutObject().isCheckable()) {
+              getScoutObject().getUIFacade().setNodesCheckedFromUI(CollectionUtility.arrayList(scoutNode), !scoutNode.isChecked());
+            }
           }
         };
 
@@ -900,7 +906,7 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
   /**
    * Returns the path to the node thats path bounds ({@link javax.swing.JTree#getPathBounds(TreePath)}) contains the
    * given x,y coordinates. Thereby the empty space on the left and right side of nodes will be considered too.
-   * 
+   *
    * @see javax.swing.JTree#getClosestPathForLocation(int, int)
    */
   private TreePath getPathForLocation(int x, int y) {
@@ -1104,7 +1110,7 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
 
   /**
    * Implementation of DropSource's DragGestureListener support for drag/drop
-   * 
+   *
    * @since Build 202
    */
   private class P_SwingDragAndDropTransferHandler extends TransferHandlerEx {

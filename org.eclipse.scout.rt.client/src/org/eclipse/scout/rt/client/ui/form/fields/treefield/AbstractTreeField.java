@@ -430,7 +430,8 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
       switch (e.getType()) {
         case TreeEvent.TYPE_NODES_DELETED:
         case TreeEvent.TYPE_NODES_INSERTED:
-        case TreeEvent.TYPE_NODES_UPDATED: {
+        case TreeEvent.TYPE_NODES_UPDATED:
+        case TreeEvent.TYPE_NODES_CHECKED: {
           checkSaveNeeded();
           checkEmpty();
           break;

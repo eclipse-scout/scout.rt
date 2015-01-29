@@ -20,6 +20,8 @@ public interface ITreeUIFacade {
 
   boolean isUIProcessing();
 
+  void setNodesCheckedFromUI(List<ITreeNode> nodes, boolean on);
+
   void setNodeExpandedFromUI(ITreeNode node, boolean on);
 
   void setNodeSelectedAndExpandedFromUI(ITreeNode node);
