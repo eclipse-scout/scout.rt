@@ -82,3 +82,54 @@
   -ms-user-select: @mode;
   user-select: @mode;
 }
+
+/*Checkbox mixins*/
+.checkboxLabelBeforBorderHover {
+  border: 2px solid @hover-color;
+}
+
+.checkboxLabelBeforeFocus {
+  border-color: @focus-color;
+  background-color:@focus-color-glow;
+  outline: none;
+
+}
+.checkboxLabelBeforeChecked {
+  .font-icon;
+  content: @icon-checked;
+  color: @palette-black;
+  font-size: 11px;
+  text-align: center;
+  line-height: 15px;
+}
+
+.checkboxLabelBeforeBorder {
+  border: 2px solid @border-color;
+  border-radius: 3px;
+}
+
+.checkboxLabelBeforeDisabledBorder {
+  border: 2px solid @border-color;
+}
+
+.checkboxLabelBeforeDisabled {
+  color: @palette-gray-5;
+  background-color: @control-background-disabled-color;
+}
+
+.checkboxLabelDisabled {
+  cursor: default;
+}
+
+.checkboxLabelBefore(@left: 0px, @top: 0px, @marginLeft: 0px, @marginRight: 0px,@marginTop: 0px, @marginBottom: 0px) {
+  content: "";
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  position: absolute;
+  margin: @marginTop @marginRight @marginBottom @marginLeft;
+  left: @left;
+  top: @top;
+}
+
+

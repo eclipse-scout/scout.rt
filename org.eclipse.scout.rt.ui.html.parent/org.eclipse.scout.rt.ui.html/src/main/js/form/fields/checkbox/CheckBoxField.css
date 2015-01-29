@@ -13,19 +13,11 @@
   }
 
   & label:before {
-    content: "";
-    display: inline-block;
-    width: 18px;
-    height: 18px;
-    margin-right: 10px;
-    margin-top: -2px;
-    position: absolute;
-    left: 0;
-    top: 0;
+    .checkboxLabelBefore(0px, 0px, 0px, 10px, -2px);
   }
 
   & label:hover:before {
-    border: 2px solid @hover-color;
+    .checkboxLabelBeforBorderHover;
   }
 
   & input[type=checkbox] {
@@ -42,35 +34,26 @@
   }
 
   & input[type=checkbox]:disabled + label:hover:before {
-    border: 2px solid @border-color;
+    .checkboxLabelBeforeDisabledBorder;
   }
 
   & input[type=checkbox]:focus + label:before {
-    border-color: @focus-color;
-    background-color: @focus-color-glow;
-    outline: none;
+    .checkboxLabelBeforeFocus;
   }
 
   & input[type=checkbox]:checked + label:before {
-    .font-icon;
-    content: @icon-checked;
-    color: @palette-black;
-    font-size: 11px;
-    text-align: center;
-    line-height: 15px;
+    .checkboxLabelBeforeChecked;
   }
 
   & label:before {
-    border: 2px solid @border-color;
-    border-radius: 3px;
+    .checkboxLabelBeforeBorder;
   }
 
   & input[type=checkbox]:disabled + label:before {
-    color: @palette-gray-5;
-    background-color: @control-background-disabled-color;
+    .checkboxLabelBeforeDisabled;
   }
 
   & input[type=checkbox]:disabled + label {
-    cursor: default;
+    .checkboxLabelDisabled;
   }
 }
