@@ -36,7 +36,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IRadioButton;
 import org.eclipse.scout.rt.client.ui.form.fields.calendarfield.ICalendarField;
-import org.eclipse.scout.rt.client.ui.form.fields.checkbox.ICheckBox;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.imagebox.IImageField;
@@ -126,7 +125,7 @@ public class JsonAdapterFactory implements IJsonAdapterFactory {
     else if (model instanceof ITabBox) {
       return new JsonTabBox((ITabBox) model, session, id, parent);
     }
-    else if (model instanceof ICheckBox) {
+    else if (model instanceof IBooleanField) {
       return new JsonCheckBoxField((IBooleanField) model, session, id, parent);
     }
     else if (model instanceof ILabelField) {
