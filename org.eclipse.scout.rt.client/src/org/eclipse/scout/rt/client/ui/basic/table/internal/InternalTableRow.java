@@ -176,17 +176,11 @@ public class InternalTableRow implements ITableRow, ICellObserver {
 
   @Override
   public boolean isChecked() {
-    if (getTable() == null) {
-      return false;
-    }
     return getTable().getCheckedRows().contains(this);
   }
 
   @Override
-  public void setChecked(boolean b) throws ProcessingException {
-    if (getTable() == null) {
-      throw new ProcessingException("To set a row checked there must be an table. ");
-    }
+  public void setChecked(boolean b) {
     getTable().checkRow(this, b);
   }
 

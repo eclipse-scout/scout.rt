@@ -827,9 +827,6 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
         getTable().selectRows(checkedRows, false);
       }
     }
-    catch (ProcessingException ex) {
-      SERVICES.getService(IExceptionHandlerService.class).handleException(ex);
-    }
     finally {
       getTable().setTableChanging(false);
       m_valueTableSyncActive = false;
@@ -858,9 +855,6 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
           row.setChecked(row.isSelected());
         }
       }
-    }
-    catch (ProcessingException ex) {
-      SERVICES.getService(IExceptionHandlerService.class).handleException(ex);
     }
     finally {
       getTable().setTableChanging(false);

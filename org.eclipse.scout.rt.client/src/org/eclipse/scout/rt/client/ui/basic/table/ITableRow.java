@@ -60,7 +60,7 @@ public interface ITableRow {
 
   boolean isChecked();
 
-  void setChecked(boolean b) throws ProcessingException;
+  void setChecked(boolean b);
 
   boolean isFilterAccepted();
 

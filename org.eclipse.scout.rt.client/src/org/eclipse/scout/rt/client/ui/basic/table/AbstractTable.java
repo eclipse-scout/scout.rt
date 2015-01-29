@@ -149,7 +149,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   private List<ITableRow> m_cachedRows;
   private final Map<CompositeObject, ITableRow> m_deletedRows;
   private List<ITableRow/* ordered by rowIndex */> m_selectedRows = new ArrayList<ITableRow>();
-  private Set<ITableRow/* ordered by rowIndex */> m_checkedRows = new HashSet<ITableRow>();
+  private Set<ITableRow> m_checkedRows = new HashSet<ITableRow>();
   private Map<Class<?>, Class<? extends IMenu>> m_menuReplacementMapping;
   private ITableUIFacade m_uiFacade;
   private final List<ITableRowFilter> m_rowFilters;
@@ -2386,60 +2386,65 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   @Override
-  public void checkRow(int row, boolean value) throws ProcessingException {
+  public void checkRow(int row, boolean value) {
     checkRow(getRow(row), value);
   }
 
   @Override
-  public void checkRow(ITableRow row, boolean value) throws ProcessingException {
+  public void checkRow(ITableRow row, boolean value) {
     checkRows(CollectionUtility.arrayList(row), value);
   }
 
   @Override
-  public void checkRows(Collection<? extends ITableRow> rows, boolean value) throws ProcessingException {
-    rows = resolveRows(rows);
-    // check checked count with multicheck
-    if (!isMultiCheck() && value) {
-      ITableRow rowToCheck = null;
-      for (ITableRow row : rows) {
-        if (row.isEnabled() && row.isChecked() != value) {
-          rowToCheck = row;
-          break;
+  public void checkRows(Collection<? extends ITableRow> rows, boolean value) {
+    try {
+      rows = resolveRows(rows);
+      // check checked count with multicheck
+      if (!isMultiCheck() && value) {
+        ITableRow rowToCheck = null;
+        for (ITableRow row : rows) {
+          if (row.isEnabled() && row.isChecked() != value) {
+            rowToCheck = row;
+            break;
+          }
         }
-      }
-      if (rowToCheck != null) {
-        uncheckAllRows();
-        if (value) {
-          m_checkedRows.add(rowToCheck);
-        }
-        else {
-          m_checkedRows.remove(rowToCheck);
-        }
-        if (getCheckableColumn() != null) {
-          getCheckableColumn().setValue(rowToCheck, value);
-        }
-        fireRowsChecked(CollectionUtility.arrayList(rowToCheck));
-      }
-    }
-    else {
-      ArrayList<ITableRow> rowsChecked = new ArrayList<ITableRow>();
-      for (ITableRow row : rows) {
-        if (row.isEnabled() && row.isChecked() != value) {
+        if (rowToCheck != null) {
+          uncheckAllRows();
           if (value) {
-            m_checkedRows.add(row);
+            m_checkedRows.add(rowToCheck);
           }
           else {
-            m_checkedRows.remove(row);
+            m_checkedRows.remove(rowToCheck);
           }
           if (getCheckableColumn() != null) {
-            getCheckableColumn().setValue(row, value);
+            getCheckableColumn().setValue(rowToCheck, value);
           }
-          rowsChecked.add(row);
+          fireRowsChecked(CollectionUtility.arrayList(rowToCheck));
         }
       }
-      if (rows.size() > 0) {
-        fireRowsChecked(CollectionUtility.arrayList(rowsChecked));
+      else {
+        ArrayList<ITableRow> rowsChecked = new ArrayList<ITableRow>();
+        for (ITableRow row : rows) {
+          if (row.isEnabled() && row.isChecked() != value) {
+            if (value) {
+              m_checkedRows.add(row);
+            }
+            else {
+              m_checkedRows.remove(row);
+            }
+            if (getCheckableColumn() != null) {
+              getCheckableColumn().setValue(row, value);
+            }
+            rowsChecked.add(row);
+          }
+        }
+        if (rows.size() > 0) {
+          fireRowsChecked(CollectionUtility.arrayList(rowsChecked));
+        }
       }
+    }
+    catch (ProcessingException e) {
+      SERVICES.getService(IExceptionHandlerService.class).handleException(e);
     }
   }
 
@@ -4416,9 +4421,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       try {
         pushUIProcessor();
         checkRows(rows, checked);
-      }
-      catch (ProcessingException e) {
-        SERVICES.getService(IExceptionHandlerService.class).handleException(e);
       }
       finally {
         popUIProcessor();

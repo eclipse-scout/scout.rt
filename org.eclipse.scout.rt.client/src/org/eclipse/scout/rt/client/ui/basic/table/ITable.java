@@ -667,9 +667,9 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
 
   Collection<ITableRow> getCheckedRows();
 
-  void checkRow(int rowIndex, boolean value) throws ProcessingException;
+  void checkRow(int rowIndex, boolean value);
 
-  void checkRow(ITableRow row, boolean value) throws ProcessingException;
+  void checkRow(ITableRow row, boolean value);
 
   void checkRows(Collection<? extends ITableRow> rows, boolean value) throws ProcessingException;
 
