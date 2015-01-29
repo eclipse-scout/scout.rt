@@ -46,6 +46,12 @@
     border-width: 1px;
   }
 
+  &.selected {
+    border-style: inset;
+    border-right-color: @border-color;
+    border-bottom-color: @border-color;
+  }
+
 }
 
 button img {

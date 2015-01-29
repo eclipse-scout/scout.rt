@@ -74,6 +74,10 @@ public class JsonButton<T extends IButton> extends JsonFormField<T> {
     if (JsonEventType.CLICKED.matches(event)) {
       getModel().getUIFacade().fireButtonClickedFromUI();
     }
+    else if (JsonEventType.SELECTED.matches(event)) {
+      Boolean selected = event.getData().optBoolean("selected");
+      getModel().getUIFacade().setSelectedFromUI(selected);
+    }
     else {
       super.handleUiEvent(event, res);
     }

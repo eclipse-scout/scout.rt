@@ -51,7 +51,13 @@ scout.Button.prototype._render = function($parent) {
 };
 
 scout.Button.prototype._onClick = function() {
-  this.session.send(this.id, 'clicked');
+  if (this.displayStyle === scout.Button.DISPLAY_STYLE.TOGGLE) {
+    this.selected = !this.selected;
+    this._renderSelected();
+    this.session.send(this.id, 'selected', {selected: this.selected});
+  } else {
+    this.session.send(this.id, 'clicked');
+  }
 };
 
 /**
@@ -61,6 +67,13 @@ scout.Button.prototype._renderProperties = function() {
   scout.Button.parent.prototype._renderProperties.call(this);
   this._renderLabel();
   this._renderIconId();
+  this._renderSelected();
+};
+
+scout.Button.prototype._renderSelected = function() {
+  if (this.displayStyle === scout.Button.DISPLAY_STYLE.TOGGLE) {
+    this.$field.toggleClass('selected', !!this.selected);
+  }
 };
 
 scout.Button.prototype._renderLabel = function() {
