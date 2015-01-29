@@ -63,6 +63,11 @@ button img {
   }
 }
 
+.form-field.button,
+.form-field.link-button {
+  margin-left: @mandatory-indicator-width;
+}
+
 /* Link buttons in a form must have an underline, but link buttons in the menubar shouldn't */
 .form-field.link-button > div {
   text-decoration: underline;

@@ -4,18 +4,20 @@ scout.TabBoxLayout = function() {
 scout.inherits(scout.TabBoxLayout, scout.AbstractLayout);
 
 scout.TabBoxLayout.prototype.layout = function($container) {
-  var htmlContainer = scout.HtmlComponent.get($container),
+  var containerSize, tabContentSize, htmlTabArea, tabAreaSize,
+    htmlContainer = scout.HtmlComponent.get($container),
     $tabContent = $container.children('.tab-content'),
     htmlTabContent = scout.HtmlComponent.get($tabContent),
     $tabArea =  $container.children('.tab-area'),
-    tabAreaHeight = 0,
-    containerSize, tabContentSize;
+    tabAreaHeight = 0;
 
   containerSize = htmlContainer.getAvailableSize()
     .subtract(htmlContainer.getInsets());
 
   if ($tabArea.isVisible()) {
-    $tabArea.cssWidth(containerSize.width);
+    htmlTabArea = scout.HtmlComponent.get($tabArea),
+    tabAreaSize = containerSize.subtract(htmlTabArea.getMargins());
+    $tabArea.cssWidth(tabAreaSize.width);
     tabAreaHeight = $tabArea.outerHeight(true);
   }
 

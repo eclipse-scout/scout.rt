@@ -3,6 +3,7 @@
 
 .tab-area {
   margin-top: @group-margin-top;
+  margin-left: @mandatory-indicator-width;
 
   & > button {
     position: relative;

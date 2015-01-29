@@ -9,6 +9,8 @@ scout.RichTextField.prototype._renderProperties = function() {
 
 scout.RichTextField.prototype._render = function($parent) {
   this.addContainer($parent, 'rich-text-field');
+  this.addLabel();
+  this.addMandatoryIndicator();
 
   // scrollbar
   this._$scrollable = scout.scrollbars.install(this.$container);
@@ -60,9 +62,6 @@ scout.RichTextField.prototype._render = function($parent) {
     .click((this._onCommandClick.bind(this)))
     .mousedown(function(event) { event.preventDefault(); });
 
-  this.addLabel();
-  //FIXME CGU anders lösen, denn: feld soll über die ganze breite gehen
-  //this.addMandatoryIndicator();
   this.addStatus();
 };
 

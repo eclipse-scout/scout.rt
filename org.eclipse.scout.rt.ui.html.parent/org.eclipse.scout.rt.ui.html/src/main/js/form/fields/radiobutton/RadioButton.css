@@ -1,5 +1,7 @@
 .radio-button > label {
-  padding: @borderless-field-padding-y 0px @borderless-field-padding-y 25px;
+  padding: @borderless-field-padding-y 0 @borderless-field-padding-y 25px;
+  /* reset mandatory indicator margin set in FormField.css */
+  margin-left: 0;
 }
 
 .radio-button {

@@ -1,6 +1,5 @@
 @borderless-field-padding-y: 7px;
 
-/** currently also defined in scout.HtmlEnvironment (graphics.js) */
 .form-field {
   box-sizing: border-box;
   white-space: nowrap;
@@ -11,9 +10,9 @@
     position: absolute;
     text-overflow: ellipsis;
     overflow: hidden;
-    max-width: 130px;
     padding-top: @borderless-field-padding-y;
     padding-bottom: @borderless-field-padding-y;
+    margin-left: @mandatory-indicator-width;
   }
 
   & > .field {

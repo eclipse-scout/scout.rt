@@ -10,7 +10,7 @@
 .root-group-box > .group-box-title {
   /* group-box-body may be scrollable.
   that's why the body has a padding instead of the root-group-box (to place the scrollbars inside the body) */
-  padding-left: @bench-margin-x;
+  padding-left: @bench-margin-x - @mandatory-indicator-width;
   padding-right: @bench-margin-x;
 }
 
@@ -20,8 +20,9 @@
 }
 
 .group-box-title {
-  width: 100%;
+  width: calc(~"100%" - @mandatory-indicator-width);
   margin-top: @group-margin-top;
+  margin-left: @mandatory-indicator-width;
   border-bottom: 3px solid @desktop-border-color;
   padding-bottom: 6px;
 

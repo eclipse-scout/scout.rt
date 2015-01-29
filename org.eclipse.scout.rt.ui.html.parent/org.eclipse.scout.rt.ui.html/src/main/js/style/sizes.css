@@ -3,7 +3,9 @@
 @bench-margin-x: 20px;
 
 @border-radius: 3px;
+/* also defined in scout.HtmlEnvironment (graphics.js) */
 @logical-grid-height: 30px;
+@mandatory-indicator-width: 8px;
 
 @tree-item-control-size: 15px;
 @outline-item-control-size: 20px;
