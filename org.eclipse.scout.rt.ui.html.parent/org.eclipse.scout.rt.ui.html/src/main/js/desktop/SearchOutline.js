@@ -10,9 +10,8 @@ scout.SearchOutline.prototype._render = function($parent) {
 };
 
 scout.SearchOutline.prototype._remove = function() {
-  scout.SearchOutline.parent.prototype._remove.call(this);
-
   this.$searchStatus.remove();
+  scout.SearchOutline.parent.prototype._remove.call(this);
 };
 
 scout.SearchOutline.prototype._renderProperties = function() {

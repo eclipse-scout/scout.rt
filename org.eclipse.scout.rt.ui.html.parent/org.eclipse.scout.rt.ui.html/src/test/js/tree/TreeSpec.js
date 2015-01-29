@@ -70,7 +70,7 @@ describe("Tree", function() {
   }
 
   function findAllNodes(tree) {
-    return tree._$scrollable.find('.tree-item');
+    return tree.$container.find('.tree-item');
   }
 
   function createNodeExpandedEvent(model, nodeId, expanded) {
@@ -152,7 +152,7 @@ describe("Tree", function() {
       spyOn(tree, '_onNodeClick');
       tree.render(session.$entryPoint);
 
-      var $node = tree._$scrollable.find('.tree-item:first');
+      var $node = tree.$container.find('.tree-item:first');
       $node.click();
 
       expect(tree._onNodeClick).toHaveBeenCalled();
@@ -163,7 +163,7 @@ describe("Tree", function() {
       var tree = createTree(model);
       tree.render(session.$entryPoint);
 
-      var $node = tree._$scrollable.find('.tree-item:first');
+      var $node = tree.$container.find('.tree-item:first');
       $node.triggerClick();
 
       sendQueuedAjaxCalls();
@@ -180,7 +180,7 @@ describe("Tree", function() {
 
       expect(tree.selectedNodeIds.length).toBe(0);
 
-      var $node = tree._$scrollable.find('.tree-item:first');
+      var $node = tree.$container.find('.tree-item:first');
       $node.triggerClick();
 
       expect(tree.selectedNodeIds.length).toBe(1);
@@ -205,7 +205,7 @@ describe("Tree", function() {
       var tree = createTree(model);
       tree.render(session.$entryPoint);
 
-      var $node = tree._$scrollable.find('.tree-item:first');
+      var $node = tree.$container.find('.tree-item:first');
       expect($node).not.toHaveClass('expanded');
 
       $node.triggerDoubleClick();
@@ -220,7 +220,7 @@ describe("Tree", function() {
       var tree = createTree(model);
       tree.render(session.$entryPoint);
 
-      var $node = tree._$scrollable.find('.tree-item:first');
+      var $node = tree.$container.find('.tree-item:first');
       $node.triggerDoubleClick();
 
       sendQueuedAjaxCalls();
@@ -246,7 +246,7 @@ describe("Tree", function() {
       var tree = createTree(model);
       tree.render(session.$entryPoint);
 
-      var $nodeControl = tree._$scrollable.find('.tree-item-control:first');
+      var $nodeControl = tree.$container.find('.tree-item-control:first');
       var $node = $nodeControl.parent();
       expect($node).not.toHaveClass('expanded');
 
@@ -262,7 +262,7 @@ describe("Tree", function() {
       var tree = createTree(model);
       tree.render(session.$entryPoint);
 
-      var $node = tree._$scrollable.find('.tree-item:first');
+      var $node = tree.$container.find('.tree-item:first');
       $node.triggerDoubleClick();
 
       sendQueuedAjaxCalls();

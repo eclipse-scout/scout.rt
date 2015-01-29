@@ -5,7 +5,6 @@ scout.Table = function() {
   scout.Table.parent.call(this);
   this.$container;
   this.$data;
-  this._$scrollable;
   this.header;
   this.selectionHandler;
   this.keystrokeAdapter;
@@ -68,8 +67,8 @@ scout.Table.prototype._render = function($parent) {
   }
 
   this.$data = this.$container.appendDiv('table-data');
-  this._$scrollable = scout.scrollbars.install(this.$data);
-  this.session.detachHelper.pushScrollable(this._$scrollable);
+  scout.scrollbars.install(this.$data);
+  this.session.detachHelper.pushScrollable(this.$data);
 
   this.menuBar = new scout.MenuBar(this.$container, 'top', scout.TableMenuItemsOrder.order);
 
@@ -93,11 +92,11 @@ scout.Table.prototype._renderProperties = function() {
 };
 
 scout.Table.prototype._remove = function() {
-  scout.Table.parent.prototype._remove.call(this);
-  this.session.detachHelper.removeScrollable(this._$scrollable);
+  this.session.detachHelper.removeScrollable(this.$data);
   this.menuBar.remove();
   this.header = null;
   this.footer = null;
+  scout.Table.parent.prototype._remove.call(this);
 };
 
 // FIXME AWE: refactor all _render* methods --> remove parameter, always use this.*
@@ -157,7 +156,7 @@ scout.Table.prototype.toggleSelection = function() {
 };
 
 scout.Table.prototype.updateScrollbar = function() {
-  scout.scrollbars.update(this._$scrollable);
+  scout.scrollbars.update(this.$data);
 };
 
 scout.Table.prototype._sort = function() {
@@ -272,7 +271,7 @@ scout.Table.prototype._renderRowOrderChanges = function() {
   }
 
   // change order in dom
-  this._$scrollable.prepend($sortedRows);
+  this.$data.prepend($sortedRows);
 
   // for less than animationRowLimit rows: move to old position and then animate
   if (animate) {
@@ -400,7 +399,7 @@ scout.Table.prototype._tableRowBorderWidth = function() {
     return this._tablRowBorderWidth;
   }
 
-  var $tableRowDummy = this._$scrollable.appendDiv('table-row');
+  var $tableRowDummy = this.$data.appendDiv('table-row');
   this._tablRowBorderWidth = $tableRowDummy.cssBorderLeftWidth() + $tableRowDummy.cssBorderRightWidth();
   $tableRowDummy.remove();
   return this._tablRowBorderWidth;
@@ -423,7 +422,7 @@ scout.Table.prototype._drawData = function(startRow) {
 
     // append block of rows
     $rows = $(rowString);
-    $rows.appendTo(this._$scrollable)
+    $rows.appendTo(this.$data)
       .on('mousedown', '', onMouseDown)
       .on('mouseup', '', onMouseUp)
       .on('dblclick', '', onDoubleClick)
@@ -492,7 +491,7 @@ scout.Table.prototype._drawData = function(startRow) {
       var menuItems = that._filterMenus($selectedRows);
       if (menuItems.length > 0) {
         var popup = new scout.Popup();
-        popup.$origin = this._$scrollable;
+        popup.$origin = this.$data;
         popup.render();
         scout.menus.appendMenuItems(popup, menuItems);
         popup.setLocation(new scout.Point(x, y));
@@ -617,7 +616,7 @@ scout.Table.prototype.onResize = function() {
     this.footer.onResize();
   }
   // Only necessary for outline table. If the table is on a form, the update is triggered by the table layout
-  scout.scrollbars.update(this._$scrollable);
+  scout.scrollbars.update(this.$data);
 };
 
 scout.Table.prototype.sendRowClicked = function($row, columnIdParam) {
@@ -755,7 +754,7 @@ scout.Table.prototype._group = function() {
   }
 
   // prepare data
-  var $rows = $('.table-row:visible', this._$scrollable),
+  var $rows = $('.table-row:visible', this.$data),
     $sumRow = $.makeDiv('table-row-sum'),
     sum = [];
 
@@ -874,7 +873,7 @@ scout.Table.prototype.colorData = function(mode, colorColumn) {
     };
   }
 
-  $rows = $('.table-row:visible', this._$scrollable);
+  $rows = $('.table-row:visible', this.$data);
 
   $('.header-item', this.$container).each(function(i) {
     if ($(this).data('column') === colorColumn) {
@@ -1017,7 +1016,7 @@ scout.Table.prototype._onAllRowsDeleted = function() {
 };
 
 scout.Table.prototype.scrollTo = function($selection) {
-  scout.scrollbars.scrollTo(this._$scrollable, $selection);
+  scout.scrollbars.scrollTo(this.$data, $selection);
 };
 
 scout.Table.prototype.rowById = function(id) {
@@ -1037,10 +1036,10 @@ scout.Table.prototype.selectRowsByIds = function(rowIds) {
 };
 
 scout.Table.prototype.$selectedRows = function() {
-  if (!this._$scrollable) {
+  if (!this.$data) {
     return $();
   }
-  return this._$scrollable.find('.selected');
+  return this.$data.find('.selected');
 };
 
 scout.Table.prototype.$rows = function(includeSumRows) {
@@ -1048,11 +1047,11 @@ scout.Table.prototype.$rows = function(includeSumRows) {
   if (includeSumRows) {
     selector += ', .table-row-sum';
   }
-  return this._$scrollable.find(selector);
+  return this.$data.find(selector);
 };
 
 scout.Table.prototype.$sumRows = function() {
-  return this._$scrollable.find('.table-row-sum');
+  return this.$data.find('.table-row-sum');
 };
 
 scout.Table.prototype.$cellsForColIndex = function(colIndex, includeSumRows) {
@@ -1060,7 +1059,7 @@ scout.Table.prototype.$cellsForColIndex = function(colIndex, includeSumRows) {
   if (includeSumRows) {
     selector += ', .table-row-sum > div:nth-of-type(' + colIndex + ' )';
   }
-  return this._$scrollable.find(selector);
+  return this.$data.find(selector);
 };
 
 scout.Table.prototype.columnById = function(columnId) {
@@ -1406,7 +1405,7 @@ scout.Table.prototype._renderTableFooter = function() {
 
 scout.Table.prototype._renderEnabled = function(enabled) {
   // FIXME CGU remove/add events. Maybe extend jquery to not fire on disabled events?
-  this._$scrollable.setEnabled(enabled);
+  this.$data.setEnabled(enabled);
 };
 
 scout.Table.prototype._renderMultiSelect = function(multiSelect) {

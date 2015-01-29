@@ -6,7 +6,7 @@ scout.ActivityMap = function() {
 
   this.$container;
   this.$data;
-  this._$scrollable;
+  this.$data;
 };
 scout.inherits(scout.ActivityMap, scout.ModelAdapter);
 
@@ -25,19 +25,19 @@ scout.ActivityMap.prototype._render = function($parent) {
   this.htmlComp.pixelBasedSizing = false;
 
   this.$data = this.$container.appendDiv('activity-map-data');
-  this._$scrollable = scout.scrollbars.install(this.$data);
-  this.session.detachHelper.pushScrollable(this._$scrollable);
+  scout.scrollbars.install(this.$data);
+  this.session.detachHelper.pushScrollable(this.$data);
 
   this.drawData();
 };
 
 scout.ActivityMap.prototype._remove = function() {
+  this.session.detachHelper.removeScrollable(this.$data);
   scout.ActivityMap.parent.prototype._remove.call(this);
-  this.session.detachHelper.removeScrollable(this._$scrollable);
 };
 
 scout.ActivityMap.prototype.drawData = function() {
-  this._$scrollable.text('ACTIVITY MAP');
+  this.$data.text('ACTIVITY MAP');
 };
 
 scout.ActivityMap.prototype._renderDays = function() {

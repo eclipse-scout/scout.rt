@@ -24,7 +24,7 @@ scout.TableLayout.prototype.layout = function($container) {
   height += $data.cssMarginTop() + $data.cssMarginBottom();
   $data.css('height', 'calc(100% - '+ height + 'px)');
 
-  scout.scrollbars.update(this.table._$scrollable);
+  scout.scrollbars.update(this.table.$data);
 };
 
 scout.TableLayout.prototype.preferredLayoutSize = function($comp) {

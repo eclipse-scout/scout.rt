@@ -36,8 +36,7 @@
   }
 }
 
-.rich-text-editor-content.editable,
-.rich-text-editor-content > .scrollable.editable {
+.rich-text-editor-content {
     counter-reset: hr;
     line-height: 20px;
     white-space: pre-wrap;

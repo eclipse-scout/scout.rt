@@ -45,5 +45,5 @@ scout.GroupBoxLayout.prototype._htmlGbBody = function() {
 };
 
 scout.GroupBoxLayout.prototype._htmlGbBodyContainer = function() {
-  return scout.HtmlComponent.get(this.groupBox.$bodyContainer);
+  return scout.HtmlComponent.get(this.groupBox.$body);
 };

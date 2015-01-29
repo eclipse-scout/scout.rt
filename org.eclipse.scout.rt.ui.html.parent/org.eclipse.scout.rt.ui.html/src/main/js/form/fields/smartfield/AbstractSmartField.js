@@ -1,7 +1,7 @@
 scout.AbstractSmartField = function() {
   scout.AbstractSmartField.parent.call(this);
   this._$popup;
-  this._$scrollable;
+  this._$optionsDiv;
   this.options;
   this._selectedOption = -1;
   this._oldVal;
@@ -36,7 +36,7 @@ scout.AbstractSmartField.prototype._render = function($parent) {
  */
 scout.AbstractSmartField.prototype._get$Options = function(visible) {
   var filter = visible ? ':visible' : undefined;
-  return this._$scrollable.children(filter);
+  return this._$optionsDiv.children(filter);
 };
 
 scout.AbstractSmartField.prototype._get$OptionsDiv = function() {
@@ -44,7 +44,7 @@ scout.AbstractSmartField.prototype._get$OptionsDiv = function() {
 };
 
 scout.AbstractSmartField.prototype._updateScrollbar = function() {
-  scout.scrollbars.update(this._$scrollable);
+  scout.scrollbars.update(this._$optionsDiv);
 };
 
 scout.AbstractSmartField.prototype._isNavigationKey = function(e) {
@@ -119,7 +119,7 @@ scout.AbstractSmartField.prototype._selectOption = function($options, pos) {
   var $selectedOption = $($options[pos]);
   $selectedOption.addClass('selected');
   this._selectedOption = pos;
-  scout.scrollbars.scrollTo(this._$scrollable, $selectedOption);
+  scout.scrollbars.scrollTo(this._$optionsDiv, $selectedOption);
 };
 
 scout.AbstractSmartField.prototype._onKeyup = function(e) {
@@ -196,11 +196,11 @@ scout.AbstractSmartField.prototype._showPopup = function(numOptions, vararg) {
     .appendTo($('body'));
   scout.graphics.setBounds(this._$popup, popupBounds);
   // layout options and status-div
-  var $optionsDiv = this._get$OptionsDiv();
-  this._$scrollable = scout.scrollbars.install($optionsDiv, {
+this._$optionsDiv = this._get$OptionsDiv();
+  scout.scrollbars.install(this._$optionsDiv, {
     invertColors: true
   });
-  scout.graphics.setSize($optionsDiv, fieldBounds.width, popupHeight - optionHeight);
+  scout.graphics.setSize(this._$optionsDiv, fieldBounds.width, popupHeight - optionHeight);
   this._setStatusText(vararg);
   scout.scrollbars.attachScrollHandlers(this.$field, this._closePopup.bind(this));
 };
@@ -230,7 +230,7 @@ scout.AbstractSmartField.prototype._renderOptions = function(options) {
     htmlOption = scout.strings.nl2br(option);
     $('<p>')
       .on('click', this._onOptionClick.bind(this))
-      .appendTo(this._$scrollable)
+      .appendTo(this._$optionsDiv)
       .data('option', option) // stores the original text as received from the server
     .html(htmlOption);
     if (option === val) {
@@ -244,7 +244,7 @@ scout.AbstractSmartField.prototype._renderOptions = function(options) {
 };
 
 scout.AbstractSmartField.prototype._emptyOptions = function(options) {
-  this._$scrollable.empty();
+  this._$optionsDiv.empty();
   this._updateScrollbar();
 };
 

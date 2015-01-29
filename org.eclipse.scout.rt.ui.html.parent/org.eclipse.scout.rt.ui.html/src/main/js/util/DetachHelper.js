@@ -51,25 +51,22 @@ scout.DetachHelper.prototype._restoreScrollPositions = function($container) {
         this._$scrollables[i].scrollLeft(scrollLeft);
         this._$scrollables[i].removeData('scrollLeft');
       }
+      // Also make sure that scroll bar is up to date
+      // Introduced for use case: Open large table page, edit entry, press f5
+      // -> outline tab gets rendered, scrollbar gets updated with set timeout, outline tab gets detached -> update event never had any effect because it executed after detaching (due to set timeout)
+      scout.scrollbars.update(this._$scrollables[i]);
       $.log.debug('Restored scroll position for ' + this._$scrollables[i].attr('class') + '. Top: ' + scrollTop +'. Left: ' + scrollLeft);
     }
   }
 };
 
 scout.DetachHelper.prototype.pushScrollable = function($container) {
-  if ($container.hasClass('scrollable')) {
-    // In case of non native scrollbars (-> Scrollbar.js), use the parent container since this is the one with the scrolling properties
-    $container = $container.parent();
-  }
   this._$scrollables.push($container);
   $.log.debug('Scrollable added: ' + $container.attr('class') + '. New length: ' + this._$scrollables.length);
 };
 
 scout.DetachHelper.prototype.removeScrollable = function($container) {
   var initLength = this._$scrollables.length;
-  if ($container.hasClass('scrollable')) {
-    $container = $container.parent();
-  }
   scout.arrays.$remove(this._$scrollables, $container);
   $.log.debug('Scrollable removed: ' + $container.attr('class') + '. New length: ' + this._$scrollables.length);
 

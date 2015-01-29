@@ -15,16 +15,15 @@ scout.RichTextField.prototype._render = function($parent) {
   var $editorContainer = this.$container.appendDiv('rich-text-editor');
   var $editorContent = $editorContainer.appendDiv('rich-text-editor-content');
 
-  this._$scrollable = scout.scrollbars.install($editorContent);
-  this.session.detachHelper.pushScrollable(this._$scrollable);
+  scout.scrollbars.install($editorContent);
+  this.session.detachHelper.pushScrollable($editorContent);
 
   // create editable div
-  this._$scrollable.attr('contentEditable', 'true')
-    .addClass('editable')
+  $editorContent.attr('contentEditable', 'true')
     .on('keydown keyup paste', this._onChange.bind(this))
     .on('focus', this._onFocus.bind(this))
     .on('blur', this._onBlur.bind(this));
-  this.addField(this._$scrollable, $editorContainer);
+  this.addField($editorContent, $editorContainer);
 
   // demo data
   this.$field.appendDiv("", "Beispielstext");
@@ -64,7 +63,7 @@ scout.RichTextField.prototype._render = function($parent) {
 };
 
 scout.RichTextField.prototype._remove = function() {
-  this.session.detachHelper.pushScrollable(this._$scrollable);
+  this.session.detachHelper.pushScrollable(this.$field);
 };
 
 scout.RichTextField.prototype._onFocus = function(event) {
@@ -100,7 +99,7 @@ scout.RichTextField.prototype._onCommandClick = function(event) {
 
 scout.RichTextField.prototype._onChange = function(event) {
   // update scrollbar
-  scout.scrollbars.update(this._$scrollable);
+  scout.scrollbars.update(this.$field);
 
   return;
 
@@ -121,7 +120,7 @@ scout.RichTextField.prototype._onChange = function(event) {
 
   //cleanHTML(this.$field[0]);
 
-  //scout.scrollbars.scrollTo(this._$scrollable, $(markerStart));
+  //scout.scrollbars.scrollTo(this.$field, $(markerStart));
 
   // restore selection
   selection.removeAllRanges();

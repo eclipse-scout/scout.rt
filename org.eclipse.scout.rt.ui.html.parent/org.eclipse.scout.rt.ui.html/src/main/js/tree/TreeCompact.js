@@ -5,7 +5,7 @@ scout.TreeCompact = function() {
   scout.TreeCompact.parent.call(this);
   this._$filter;
   this._$nodesDiv;
-  this._$scrollable;
+  this._$nodesWrapperDiv;
   this._domMap = {};
   this._selectedNode = -1;
 };
@@ -21,15 +21,15 @@ scout.TreeCompact.prototype._render = function($parent) {
     on('input', this._onInput.bind(this)).
     keydown(this._onKeydown.bind(this));
 
-  var $nodesWrapperDiv = $.makeDiv('nodes-wrapper').appendTo(this.$container);
-  this._$scrollable = scout.scrollbars.install($nodesWrapperDiv, {invertColors:true, borderless:true});
-  this.session.detachHelper.pushScrollable(this._$scrollable);
-  this._$nodesDiv = $.makeDiv('nodes').appendTo(this._$scrollable);
+  this._$nodesWrapperDiv = $.makeDiv('nodes-wrapper').appendTo(this.$container);
+  scout.scrollbars.install(this._$nodesWrapperDiv, {invertColors:true, borderless:true});
+  this.session.detachHelper.pushScrollable(this._$nodesWrapperDiv);
+  this._$nodesDiv = $.makeDiv('nodes').appendTo(this._$nodesWrapperDiv);
   this._renderNodes();
 };
 
 scout.TreeCompact.prototype._remove = function() {
-  this.session.detachHelper.removeScrollable(this._$scrollable);
+  this.session.detachHelper.removeScrollable(this._$nodesWrapperDiv);
 };
 
 scout.TreeCompact.prototype._renderNodes = function(filter) {
@@ -66,7 +66,7 @@ scout.TreeCompact.prototype._updateNodes = function() {
       }
     }
   }
-  scout.scrollbars.update(this._$scrollable);
+  scout.scrollbars.update(this._$nodesWrapperDiv);
 };
 
 scout.TreeCompact.prototype._onInput = function(event) {

@@ -138,15 +138,15 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
     xAxis = matrix.addAxis(column, group),
     cube = matrix.calculateCube();
 
-  var $headerFilterContainer = $headerFilter.appendDiv('header-filter-container'),
-    $headerFilterScroll = scout.scrollbars.install($headerFilterContainer);
+  var $headerFilterContainer = $headerFilter.appendDiv('header-filter-container');
+  scout.scrollbars.install($headerFilterContainer);
 
   for (var a = 0; a < xAxis.length; a++) {
     var key = xAxis[a],
       mark = xAxis.format(key),
       value = cube.getValue([key]).length;
 
-    var $filter = $headerFilterScroll.appendDiv('header-filter', mark)
+    var $filter = $headerFilterContainer.appendDiv('header-filter', mark)
       .attr('data-xAxis', key)
       .click(filterClick)
       .attr('data-value', value);
@@ -157,11 +157,11 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
   }
 
   var containerHeight = $headerFilterContainer.get(0).offsetHeight,
-    scrollHeight = $headerFilterScroll.get(0).scrollHeight;
+    scrollHeight = $headerFilterContainer.get(0).scrollHeight;
 
   if (containerHeight >= scrollHeight) {
-    $headerFilterScroll.css('height', 'auto');
-    scrollHeight = $headerFilterScroll.get(0).offsetHeight;
+    $headerFilterContainer.css('height', 'auto');
+    scrollHeight = $headerFilterContainer.get(0).offsetHeight;
     $headerFilterContainer.css('height', scrollHeight);
   }
 

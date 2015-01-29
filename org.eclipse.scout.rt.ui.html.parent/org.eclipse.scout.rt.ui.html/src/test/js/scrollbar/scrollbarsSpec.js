@@ -1,5 +1,4 @@
 describe("scrollbars", function() {
-  var $scrollableDiv;
   var $container;
 
   beforeEach(function() {
@@ -13,13 +12,6 @@ describe("scrollbars", function() {
       .css('width', '200px')
       .css('position', 'absolute')
       .appendTo($('#sandbox'));
-
-    $scrollableDiv = $('<div>')
-      .css('overflow', 'hidden')
-      .css('position', 'absolute')
-      .css('height', '100%')
-      .css('width', '100%')
-      .appendTo($container);
   }
 
   function createContent($parent) {
@@ -36,11 +28,11 @@ describe("scrollbars", function() {
       var handler = function() {
         exec = true;
       };
-      var $content = scout.scrollbars.install($scrollableDiv);
+      var $content = scout.scrollbars.install($container);
       var $element = createContent($content);
 
       scout.scrollbars.attachScrollHandlers($element, handler);
-      $scrollableDiv.scroll();
+      $container.scroll();
       expect(exec).toBe(true);
     });
 
@@ -53,16 +45,16 @@ describe("scrollbars", function() {
       var handler = function() {
         exec = true;
       };
-      var $content = scout.scrollbars.install($scrollableDiv);
+      var $content = scout.scrollbars.install($container);
       var $element = createContent($content);
 
       scout.scrollbars.attachScrollHandlers($element, handler);
-      $scrollableDiv.scroll();
+      $container.scroll();
       expect(exec).toBe(true);
 
       exec = false;
       scout.scrollbars.detachScrollHandlers($element, handler);
-      $scrollableDiv.scroll();
+      $container.scroll();
       expect(exec).toBe(false);
     });
 

@@ -17,8 +17,8 @@ scout.Action.prototype._renderProperties = function() {
 };
 
 scout.Action.prototype._remove = function() {
-  scout.Action.parent.prototype._remove.call(this);
   this._hoverBound = false;
+  scout.Action.parent.prototype._remove.call(this);
 };
 
 scout.Action.prototype._renderText = function(text) {

@@ -110,12 +110,9 @@
 
   /* Draw the .table-data DIV one pixel higher, over the header (for selection border). */
   /* - To make height calculation correct, this margin has to be subtracted again */
-  /*   from .table-data's height. See TableLayout.layout() and TableFooter._resizeData(). */
-  /* - To make scrolling correct, we have to add 1px padding to the top of the scrollable. */
+  /*   from .table-data's height. See TableLayout.layout(). */
   margin-top: -1px;
-  & > .scrollable {
-    padding-top: 1px;
-  }
+  padding-top: 1px;
 }
 
 /* table rows */

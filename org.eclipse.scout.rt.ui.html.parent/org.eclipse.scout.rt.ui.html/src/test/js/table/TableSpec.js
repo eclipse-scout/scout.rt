@@ -462,7 +462,7 @@ describe("Table", function() {
       var $selectedRows = table.$selectedRows();
       expect($selectedRows.length).toBe(0);
 
-      var $rows = table._$scrollable.children();
+      var $rows = table.$data.children('.table-row');
       clickRowAndAssertSelection(table, $rows.eq(1));
       clickRowAndAssertSelection(table, $rows.eq(2));
 
@@ -475,7 +475,7 @@ describe("Table", function() {
       var table = helper.createTable(model);
       table.render(session.$entryPoint);
 
-      var $row = table._$scrollable.children().first();
+      var $row = table.$data.children('.table-row').first();
       $row.triggerClick();
 
       sendQueuedAjaxCalls();
@@ -488,7 +488,7 @@ describe("Table", function() {
       var table = helper.createTable(model);
       table.render(session.$entryPoint);
 
-      var $row = table._$scrollable.children().first();
+      var $row = table.$data.children('.table-row').first();
       clickRowAndAssertSelection(table, $row);
       sendQueuedAjaxCalls();
 
@@ -509,7 +509,7 @@ describe("Table", function() {
       var table = helper.createTable(model);
       table.render(session.$entryPoint);
 
-      var $row = table._$scrollable.children().first();
+      var $row = table.$data.children('.table-row').first();
       $row.triggerDoubleClick();
 
       sendQueuedAjaxCalls();
@@ -529,7 +529,7 @@ describe("Table", function() {
       //register adapter
       helper.menuHelper.createMenu(menuModel);
       table.menus = [session.getModelAdapter(menuModel.id)];
-      var $row0 = table._$scrollable.children().eq(0);
+      var $row0 = table.$data.children('.table-row').eq(0);
       $row0.triggerContextMenu();
 
       sendQueuedAjaxCalls();
@@ -547,7 +547,7 @@ describe("Table", function() {
       //register adapter
       helper.menuHelper.createMenu(menuModel);
       table.menus = [session.getModelAdapter(menuModel.id)];
-      var $row0 = table._$scrollable.children().eq(0);
+      var $row0 = table.$data.children('.table-row').eq(0);
       $row0.triggerContextMenu();
 
       sendQueuedAjaxCalls();
@@ -569,7 +569,7 @@ describe("Table", function() {
       var table = helper.createTable(model);
       table.render(session.$entryPoint);
 
-      var $rows = table._$scrollable.children();
+      var $rows = table.$data.children('.table-row');
       var $row0 = $rows.eq(0);
       var $row1 = $rows.eq(1);
       var $row2 = $rows.eq(2);
@@ -595,7 +595,7 @@ describe("Table", function() {
       var table = helper.createTable(model);
       table.render(session.$entryPoint);
 
-      var $rows = table._$scrollable.children();
+      var $rows = table.$data.children('.table-row');
       var $row0 = $rows.eq(0);
       var $row1 = $rows.eq(1);
       var $row2 = $rows.eq(2);
@@ -633,7 +633,7 @@ describe("Table", function() {
     function verifyMouseMoveSelectionIsDisabled(model, table) {
       table.render(session.$entryPoint);
 
-      var $rows = table._$scrollable.children();
+      var $rows = table.$data.children('.table-row');
       var $row0 = $rows.eq(0);
       var $row1 = $rows.eq(1);
       var $row2 = $rows.eq(2);
@@ -769,9 +769,9 @@ describe("Table", function() {
         session._processSuccessResponse(message);
 
         expect(table.$rows().length).toBe(2);
-        expect(table._$scrollable.find('#'+row0.id).length).toBe(0);
-        expect(table._$scrollable.find('#'+row1.id).length).toBe(1);
-        expect(table._$scrollable.find('#'+row2.id).length).toBe(1);
+        expect(table.$data.find('#'+row0.id).length).toBe(0);
+        expect(table.$data.find('#'+row1.id).length).toBe(1);
+        expect(table.$data.find('#'+row2.id).length).toBe(1);
 
         message = {
           events: [createRowsDeletedEvent(model, [row1.id, row2.id])]

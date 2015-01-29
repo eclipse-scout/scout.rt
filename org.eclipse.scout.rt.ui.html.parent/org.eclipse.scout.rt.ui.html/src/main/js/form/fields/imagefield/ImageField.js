@@ -1,29 +1,27 @@
 scout.ImageField = function() {
   scout.ImageField.parent.call(this);
-  this._$scrollable;
+  this.$fieldContainer;
 };
 scout.inherits(scout.ImageField, scout.FormField);
 
 scout.ImageField.prototype._render = function($parent) {
-  var $fieldContainer, $field;
+  var $field;
 
   // Create div to avoid resizing of the <img>
-  $fieldContainer = $('<div>').css('overflow', 'hidden');
+  this.$fieldContainer = $('<div>').css('overflow', 'hidden');
 
   if (this.scrollBarEnabled) {
-    this._$scrollable = scout.scrollbars.install($fieldContainer, {
+    scout.scrollbars.install(this.$fieldContainer, {
       invertColors: true
     });
-    this.session.detachHelper.pushScrollable(this._$scrollable);
-  } else {
-    this._$scrollable = $fieldContainer;
+    this.session.detachHelper.pushScrollable(this.$fieldContainer);
   }
 
-  $field = $('<img>').appendTo(this._$scrollable);
+  $field = $('<img>').appendTo(this.$fieldContainer);
 
   this.addContainer($parent, 'image-field');
   this.addLabel();
-  this.addField($field, $fieldContainer);
+  this.addField($field, this.$fieldContainer);
   this.addStatus();
 };
 
@@ -34,7 +32,7 @@ scout.ImageField.prototype._renderProperties = function() {
 
 scout.ImageField.prototype._remove = function() {
   if (this.scrollBarEnabled) {
-    this.session.detachHelper.removeScrollable(this._$scrollable);
+    this.session.detachHelper.removeScrollable(this.$fieldContainer);
   }
 };
 
@@ -57,6 +55,6 @@ scout.ImageField.prototype._renderImageOrId = function() {
   } else if (this.image) {
     this.$field.attr('src', scout.fields.imageUrl(this, this.image));
   }
-  this.$field.on('load', scout.scrollbars.update.bind(this, this._$scrollable));
+  this.$field.on('load', scout.scrollbars.update.bind(this, this.$fieldContainer));
   // FIXME AWE: (image) IMG/DIV entfernen, wenn kein bild mehr da
 };
