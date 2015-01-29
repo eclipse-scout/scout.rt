@@ -95,7 +95,7 @@ TableSpecHelper.prototype.createModelColumns = function(count, columnType) {
 
   var columns = [];
   for (var i = 0; i < count; i++) {
-    columns[i] = this.createModelColumn(i+'', 'col' + i, columnType);
+    columns[i] = this.createModelColumn(createUniqueAdapterId(), 'col' + i, columnType);
   }
   return columns;
 };
@@ -115,7 +115,7 @@ TableSpecHelper.prototype.createModelRows = function(colCount, rowCount) {
 
   var rows = [];
   for (var i = 0; i < rowCount; i++) {
-    rows[i] = this.createModelRow(i + '', this.createModelCells(colCount));
+    rows[i] = this.createModelRow(createUniqueAdapterId(), this.createModelCells(colCount));
   }
   return rows;
 };
@@ -123,7 +123,7 @@ TableSpecHelper.prototype.createModelRows = function(colCount, rowCount) {
 TableSpecHelper.prototype.createModelSingleColumnByTexts = function(texts) {
   var rows = [];
   for (var i=0; i < texts.length; i++) {
-    rows.push(this.createModelRowByTexts(i, texts[i]));
+    rows.push(this.createModelRowByTexts(createUniqueAdapterId(), texts[i]));
   }
   return this.createModel(this.createModelColumns(1), rows);
 };
@@ -131,7 +131,7 @@ TableSpecHelper.prototype.createModelSingleColumnByTexts = function(texts) {
 TableSpecHelper.prototype.createModelSingleColumnByValues = function(values, columnType) {
   var rows = [];
   for (var i=0; i < values.length; i++) {
-    rows.push(this.createModelRowByValues(i, values[i]));
+    rows.push(this.createModelRowByValues(createUniqueAdapterId(), values[i]));
   }
   return this.createModel(this.createModelColumns(1, columnType), rows);
 };

@@ -98,8 +98,8 @@ describe("Table", function() {
       var $selectedRows = table.$selectedRows();
       expect($selectedRows.length).toBe(0);
 
-      helper.selectRowsAndAssert(table, ['0', '4']);
-      helper.selectRowsAndAssert(table, ['2']);
+      helper.selectRowsAndAssert(table, [model.rows[0].id, model.rows[4].id]);
+      helper.selectRowsAndAssert(table, [model.rows[2].id]);
     });
 
     it("sends selection event containing rowIds", function() {
@@ -125,7 +125,7 @@ describe("Table", function() {
       var table = helper.createTable(model);
       table.render(session.$entryPoint);
 
-      var rowIds = ['0', '4'];
+      var rowIds = [model.rows[0].id, model.rows[4].id];
       table.selectRowsByIds(rowIds);
 
       expect(table.selectedRowIds).toEqual(rowIds);
@@ -466,7 +466,7 @@ describe("Table", function() {
       clickRowAndAssertSelection(table, $rows.eq(1));
       clickRowAndAssertSelection(table, $rows.eq(2));
 
-      helper.selectRowsAndAssert(table, ['0', '4']);
+      helper.selectRowsAndAssert(table, [model.rows[0].id, model.rows[4].id]);
       clickRowAndAssertSelection(table, $rows.eq(4));
     });
 
@@ -613,7 +613,7 @@ describe("Table", function() {
       expect(requestData).toContainEventTypesExactly('rowsSelected');
 
       var event = new scout.Event(table.id, 'rowsSelected', {
-        rowIds: ['0', '1', '2']
+        rowIds: [model.rows[0].id, model.rows[1].id, model.rows[2].id]
       });
       expect(requestData).toContainEvents(event);
     });
@@ -622,15 +622,15 @@ describe("Table", function() {
       var model = helper.createModelFixture(2, 4);
       var table = helper.createTable(model);
       table.selectionHandler.mouseMoveSelectionEnabled = false;
-      verifyMouseMoveSelectionIsDisabled(table);
+      verifyMouseMoveSelectionIsDisabled(model, table);
 
       model = helper.createModelFixture(2, 4);
       table = helper.createTable(model);
       table.multiSelect = false;
-      verifyMouseMoveSelectionIsDisabled(table);
+      verifyMouseMoveSelectionIsDisabled(model, table);
     });
 
-    function verifyMouseMoveSelectionIsDisabled(table) {
+    function verifyMouseMoveSelectionIsDisabled(model, table) {
       table.render(session.$entryPoint);
 
       var $rows = table._$scrollable.children();
@@ -655,7 +655,7 @@ describe("Table", function() {
 
       var requestData = mostRecentJsonRequest();
       var event = new scout.Event(table.id, 'rowsSelected', {
-        rowIds: ['0']
+        rowIds: [model.rows[0].id]
       });
       expect(requestData).toContainEvents(event);
     }
@@ -845,6 +845,7 @@ describe("Table", function() {
         session._processSuccessResponse(message);
 
         expect(table.rows.length).toBe(5);
+        expect(Object.keys(table.rowsMap).length).toBe(5);
 
         rows = helper.createModelRows(2, 3);
         message = {
@@ -853,6 +854,7 @@ describe("Table", function() {
         session._processSuccessResponse(message);
 
         expect(table.rows.length).toBe(5 + 3);
+        expect(Object.keys(table.rowsMap).length).toBe(5 + 3);
       });
     });
 
@@ -896,9 +898,9 @@ describe("Table", function() {
         session._processSuccessResponse(message);
 
         var $rows = table.$rows();
-        expect($rows.eq(0).attr('id')).toBe('2');
-        expect($rows.eq(1).attr('id')).toBe('1');
-        expect($rows.eq(2).attr('id')).toBe('0');
+        expect($rows.eq(0).attr('id')).toBe(model.rows[2].id);
+        expect($rows.eq(1).attr('id')).toBe(model.rows[1].id);
+        expect($rows.eq(2).attr('id')).toBe(model.rows[0].id);
       });
 
       it("does not animate ordering for newly inserted rows", function() {

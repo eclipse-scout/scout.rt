@@ -39,13 +39,16 @@ scout.Table.prototype.init = function(model, session) {
 
   var i;
   for (i = 0; i < this.columns.length; i++) {
+    // Unwrap data
     scout.defaultValues.applyTo(this.columns[i], 'TableColumn');
     this.columns[i].index = i;
   }
   for (i = 0; i < this.rows.length; i++) {
     var row = this.rows[i];
+    // Unwrap data
     this._unwrapCells(row.cells);
     scout.defaultValues.applyTo(row.cells, 'Cell');
+    this.rowsMap[row.id] = row;
   }
 };
 
@@ -428,10 +431,9 @@ scout.Table.prototype._drawData = function(startRow) {
 
     $rows.each(function(index, rowObject) {
       var $row = $(rowObject);
-      var row = that.rows[index];
+      var row = that.rows[startRow + index];
       $row.data('row', row);
       row.$row = $row;
-      that.rowsMap[row.id] = row;
       $('.checkable-col label', $row).on('mouseup', row, onRowChecked);
     });
 
@@ -906,7 +908,24 @@ scout.Table.prototype._onRowsChecked = function(rows) {
 };
 
 scout.Table.prototype._onRowsUpdated = function(rows) {
-  //TODO update table
+  // Update model
+  for (var i = 0; i < rows.length; i++) {
+    var updatedRow = rows[i];
+    // Unwrap data
+    this._unwrapCells(updatedRow.cells);
+    scout.defaultValues.applyTo(updatedRow.cells, 'Cell');
+
+    var oldRow = this.rowsMap[updatedRow.id];
+    scout.arrays.replace(this.rows, oldRow, updatedRow);
+    this.rowsMap[updatedRow.id] = updatedRow;
+
+    // Update HTML
+    if (this.rendered) {
+      updatedRow.$row = $(this._buildRowDiv(updatedRow));
+      oldRow.$row.replaceWith(updatedRow.$row);
+      delete oldRow.$row; // unlink
+    }
+  }
 };
 
 scout.Table.prototype._renderRowChecked = function(row) {
@@ -941,15 +960,18 @@ scout.Table.prototype.checkRow = function(row, checked, render) {
 };
 
 scout.Table.prototype._onRowsInserted = function(rows) {
+  // Update model
   for (var i = 0; i < rows.length; i++) {
     var row = rows[i];
+    // Unwrap data
     this._unwrapCells(row.cells);
     scout.defaultValues.applyTo(row.cells, 'Cell');
+    // Always insert new rows at the end, if the order is wrong a rowOrderChange event will follow
+    this.rows.push(row);
+    this.rowsMap[row.id] = row;
   }
 
-  //always insert new rows at the end, if the order is wrong a rowOrderChange event will follow
-  scout.arrays.pushAll(this.rows, rows);
-
+  // Update HTML
   if (this.rendered) {
     // Remember inserted rows for future events like rowOrderChanged
     if (!this._insertedRows) {
@@ -966,25 +988,29 @@ scout.Table.prototype._onRowsInserted = function(rows) {
 };
 
 scout.Table.prototype._onRowsDeleted = function(rowIds) {
-  var i;
-  //update model
-  for (i = 0; i < rowIds.length; i++) {
+  // Update model
+  for (var i = 0; i < rowIds.length; i++) {
     var row = this.rowsMap[rowIds[i]];
     scout.arrays.remove(this.rows, row);
     delete this.rowsMap[rowIds[i]];
+    // Update HTML
     if (this.rendered) {
       row.$row.remove();
+      delete row.$row; // unlink
     }
   }
+  // Update HTML
   if (this.rendered) {
     this.updateScrollbar();
   }
-  //update html doc
 };
 
 scout.Table.prototype._onAllRowsDeleted = function() {
+  // Update model
   this.rows = [];
+  this.rowsMap = {};
 
+  // Update HTML
   if (this.rendered) {
     this.drawData();
   }

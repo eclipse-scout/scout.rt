@@ -12,6 +12,19 @@ describe("scout.arrays", function() {
 
   });
 
+  describe("replace", function() {
+
+    it("replaces elements", function() {
+      var arr = [ 'a', 'b', 'c', 'd' ];
+
+      scout.arrays.replace(arr, 'c', 'x');
+      expect(arr).toEqual(['a', 'b', 'x', 'd']);
+      scout.arrays.replace(arr, 'e', 'y');
+      expect(arr).toEqual(['a', 'b', 'x', 'd']);
+    });
+
+  });
+
   describe("equals", function() {
 
     it("checks whether two arrays contain the same elements in the same order", function() {
