@@ -61,21 +61,17 @@ scout.graphics = {
       insets = [0, 0, 0, 0],
       includeMargin = options.includeMargin !== undefined ? options.includeMargin : false,
       includePadding = options.includePadding !== undefined ? options.includePadding : true,
-      includeBorder = options.includeBorder !== undefined ? options.includeBorder : true,
-      cssToInt = function(cssProp) {
-        return parseInt($comp.css(cssProp), 10);
-      };
+      includeBorder = options.includeBorder !== undefined ? options.includeBorder : true;
 
     for (i = 0; i < directions.length; i++) {
-      // parseInt will ignore 'px' in string returned from css() method
       if (includeMargin) {
-        insets[i] += cssToInt('margin-' + directions[i]);
+        insets[i] += $comp.cssPxValue('margin-' + directions[i]);
       }
       if (includePadding) {
-        insets[i] += cssToInt('padding-' + directions[i]);
+        insets[i] += $comp.cssPxValue('padding-' + directions[i]);
       }
       if (includeBorder) {
-        insets[i] += cssToInt('border-' + directions[i] + '-width');
+        insets[i] += $comp.cssPxValue('border-' + directions[i] + '-width');
       }
     }
     return new scout.Insets(insets[0], insets[1], insets[2], insets[3]);

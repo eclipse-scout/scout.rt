@@ -111,9 +111,8 @@
   };
 
   $.pxToNumber = function(pixel) {
-    var value = pixel.replace('px', '');
-    // TODO CGU Use parseFloat instead?
-    return parseInt(value, 10);
+    // parseInt ignores 'px' and just extracts the number
+    return parseInt(pixel, 10);
   };
 
   // attr and class handling for svg
@@ -336,44 +335,43 @@
     return this.css('line-height', height + 'px');
   };
 
-  $.fn.cssValue = function(margin, value) {
-    margin = margin || 'margin';
+  $.fn.cssPxValue = function(prop, value) {
     if (value === undefined) {
-      return $.pxToNumber(this.css(margin));
+      return $.pxToNumber(this.css(prop));
     }
-    return this.css(margin, value + 'px');
+    return this.css(prop, value + 'px');
   };
 
   $.fn.cssMarginLeft = function(value) {
-    return this.cssValue('margin-left', value);
+    return this.cssPxValue('margin-left', value);
   };
 
   $.fn.cssMarginBottom = function(value) {
-    return this.cssValue('margin-bottom', value);
+    return this.cssPxValue('margin-bottom', value);
   };
 
   $.fn.cssMarginRight = function(value) {
-    return this.cssValue('margin-right', value);
+    return this.cssPxValue('margin-right', value);
   };
 
   $.fn.cssMarginTop = function(value) {
-    return this.cssValue('margin-top', value);
+    return this.cssPxValue('margin-top', value);
   };
 
   $.fn.cssBorderBottomWidth = function(value) {
-    return this.cssValue('border-bottom-width', value);
+    return this.cssPxValue('border-bottom-width', value);
   };
 
   $.fn.cssBorderLeftWidth = function(value) {
-    return this.cssValue('border-left-width', value);
+    return this.cssPxValue('border-left-width', value);
   };
 
   $.fn.cssBorderRightWidth = function(value) {
-    return this.cssValue('border-right-width', value);
+    return this.cssPxValue('border-right-width', value);
   };
 
   $.fn.cssBorderTopWidth = function(value) {
-    return this.cssValue('border-top-width', value);
+    return this.cssPxValue('border-top-width', value);
   };
 
   /**
