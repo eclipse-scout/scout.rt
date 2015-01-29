@@ -53,7 +53,6 @@ public class JsonResponse {
    *          property name
    * @param newValue
    */
-  // XXX BSH Methode überladen mit: (Adapter, propertyName, newValue)
   public void addPropertyChangeEvent(String id, String propertyName, Object newValue) {
     // coalesce
     JsonEvent event = m_idToPropertyChangeEventMap.get(id);

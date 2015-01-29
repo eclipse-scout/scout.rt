@@ -366,8 +366,6 @@ scout.Session.prototype._processEvents = function(events) {
   for (i = 0; i < events.length; i++) {
     event = events[i];
 
-//    scout.defaultValues.unfilter(event);
-
     $.log.debug("Processing event '" + event.type + "' for adapter with ID " + event.target);
     adapter = this.getOrCreateModelAdapter(event.target, scout.rootAdapter);
     if (!adapter) {
@@ -426,11 +424,6 @@ scout.Session.prototype.onModelAction = function(event) {
 scout.Session.prototype._getAdapterData = function(id) {
   var adapterData = this._adapterDataCache[id];
   delete this._adapterDataCache[id];
-
-  // Before returning the new adapter data, re-add missing default values based on defaultValues.json
-  // (This is the reverse operation of DefaultValueFilter.java)
-//  scout.defaultValues.unfilter(adapterData);
-
   return adapterData;
 };
 

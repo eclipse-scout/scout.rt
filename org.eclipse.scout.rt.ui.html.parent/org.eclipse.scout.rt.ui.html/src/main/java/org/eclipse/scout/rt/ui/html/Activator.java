@@ -1,13 +1,11 @@
 package org.eclipse.scout.rt.ui.html;
 
 import org.eclipse.core.runtime.Plugin;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.html.res.IWebContentResourceLocator;
+import org.eclipse.scout.rt.ui.html.res.OsgiWebContentResourceLocator;
 import org.osgi.framework.BundleContext;
 
 public class Activator extends Plugin {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(Activator.class);
 
   // The plug-in ID
   public static final String PLUGIN_ID = "org.eclipse.scout.rt.ui.html";
@@ -24,10 +22,13 @@ public class Activator extends Plugin {
   public void start(BundleContext context) throws Exception {
     super.start(context);
     plugin = this;
+    // Install default webcontent resource locator
+    setWebContentResourceLocator(new OsgiWebContentResourceLocator());
   }
 
   @Override
   public void stop(BundleContext context) throws Exception {
+    setWebContentResourceLocator(null);
     plugin = null;
     super.stop(context);
   }
@@ -46,9 +47,6 @@ public class Activator extends Plugin {
   }
 
   public void setWebContentResourceLocator(IWebContentResourceLocator webContentResourceLocator) {
-    if (m_webContentResourceLocator != null) {
-      LOG.warn("Overriding existing webContentResourceLocator: " + m_webContentResourceLocator);
-    }
     m_webContentResourceLocator = webContentResourceLocator;
   }
 }

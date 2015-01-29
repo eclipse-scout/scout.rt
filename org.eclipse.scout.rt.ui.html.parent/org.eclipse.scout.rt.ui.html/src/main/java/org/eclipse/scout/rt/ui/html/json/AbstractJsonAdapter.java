@@ -123,7 +123,7 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
 
   @Override
   public JSONObject toJson() {
-    JSONObject json = new JSONObject(new LinkedHashMap<>());
+    JSONObject json = new JSONObject(new LinkedHashMap<>()); // TODO BSH Remove when JSONObject uses LinkedHashMap by default
     putProperty(json, "id", getId());
     putProperty(json, "objectType", getObjectTypeVariant());
 

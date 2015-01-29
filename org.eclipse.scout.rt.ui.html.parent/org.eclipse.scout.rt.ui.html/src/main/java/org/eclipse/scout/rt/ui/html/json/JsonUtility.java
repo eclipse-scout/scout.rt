@@ -13,7 +13,11 @@ package org.eclipse.scout.rt.ui.html.json;
 /**
  * Utility methods for working with JSON data.
  */
-public class JsonUtility {
+public final class JsonUtility {
+
+  private JsonUtility() {
+    // static access only
+  }
 
   /**
    * Strips any comments from the given JSON string. Additionally, line-endings are normalized to <code>'\n'</code>,
