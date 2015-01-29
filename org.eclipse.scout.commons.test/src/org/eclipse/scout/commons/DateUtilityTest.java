@@ -33,6 +33,7 @@ import org.junit.Test;
  * </p>
  */
 public class DateUtilityTest {
+  private static final String DATE_FORMAT_COMPLETE = "yyyy-MM-dd HH:mm:ss.SSS";
   private static final String EXPEC_DATE_1970_01_01_000000 = "1970-01-01_00:00:00.000";
   private static final String EXPEC_DATE_1970_01_01_003000 = "1970-01-01_00:30:00.000";
   private static final String EXPEC_DATE_1970_01_01_010000 = "1970-01-01_01:00:00.000";
@@ -718,5 +719,167 @@ public class DateUtilityTest {
     assertFalse(DateUtility.isWeekend(mondayCalendar.getTime(), Locale.UK));
 
     assertEquals(DateUtility.isWeekend(todayCalendar.getTime()), DateUtility.isWeekend(todayCalendar.getTime(), Locale.getDefault()));
+  }
+
+  @Test
+  public void testTruncDateToHalfYear() {
+    assertNull(DateUtility.truncDateToHalfYear(null));
+
+    // 1. half year
+    assertDateEquals("2015-01-01 00:00:00.000", DateUtility.truncDateToHalfYear(dateOf("2015-01-01 00:00:00.000")));
+    assertDateEquals("2015-01-01 00:00:00.000", DateUtility.truncDateToHalfYear(dateOf("2015-06-30 23:59:59.999")));
+
+    // 2. half year
+    assertDateEquals("2015-07-01 00:00:00.000", DateUtility.truncDateToHalfYear(dateOf("2015-07-01 00:00:00.000")));
+    assertDateEquals("2015-07-01 00:00:00.000", DateUtility.truncDateToHalfYear(dateOf("2015-12-31 23:59:59.999")));
+
+    // leap year
+    assertDateEquals("2012-01-01 00:00:00.000", DateUtility.truncDateToHalfYear(dateOf("2012-02-29 15:30:53.458")));
+  }
+
+  @Test
+  public void testTruncCalendarToHalfYear() {
+    DateUtility.truncCalendarToHalfYear(null);
+
+    Calendar cal = calendarOf("2015-01-01 00:00:00.000");
+    DateUtility.truncCalendarToHalfYear(cal);
+    assertCalendarEquals("2015-01-01 00:00:00.000", cal);
+
+    cal = calendarOf("2015-06-30 23:59:59.999");
+    DateUtility.truncCalendarToHalfYear(cal);
+    assertCalendarEquals("2015-01-01 00:00:00.000", cal);
+
+    cal = calendarOf("2015-07-01 00:00:00.000");
+    DateUtility.truncCalendarToHalfYear(cal);
+    assertCalendarEquals("2015-07-01 00:00:00.000", cal);
+
+    cal = calendarOf("2015-12-31 23:59:59.999");
+    DateUtility.truncCalendarToHalfYear(cal);
+    assertCalendarEquals("2015-07-01 00:00:00.000", cal);
+  }
+
+  @Test
+  public void testTruncDateToQuarter() {
+    assertNull(DateUtility.truncDateToQuarter(null));
+
+    // 1. quarter
+    assertDateEquals("2015-01-01 00:00:00.000", DateUtility.truncDateToQuarter(dateOf("2015-01-01 00:00:00.000")));
+    assertDateEquals("2015-01-01 00:00:00.000", DateUtility.truncDateToQuarter(dateOf("2015-03-31 23:59:59.999")));
+
+    // 2. quarter
+    assertDateEquals("2015-04-01 00:00:00.000", DateUtility.truncDateToQuarter(dateOf("2015-04-01 00:00:00.000")));
+    assertDateEquals("2015-04-01 00:00:00.000", DateUtility.truncDateToQuarter(dateOf("2015-06-30 23:59:59.999")));
+
+    // 3. quarter
+    assertDateEquals("2015-07-01 00:00:00.000", DateUtility.truncDateToQuarter(dateOf("2015-07-01 00:00:00.000")));
+    assertDateEquals("2015-07-01 00:00:00.000", DateUtility.truncDateToQuarter(dateOf("2015-09-30 23:59:59.999")));
+
+    // 4. quarter
+    assertDateEquals("2015-10-01 00:00:00.000", DateUtility.truncDateToQuarter(dateOf("2015-10-01 00:00:00.000")));
+    assertDateEquals("2015-10-01 00:00:00.000", DateUtility.truncDateToQuarter(dateOf("2015-12-31 23:59:59.999")));
+
+    // leap year
+    assertDateEquals("2012-01-01 00:00:00.000", DateUtility.truncDateToQuarter(dateOf("2012-02-29 15:30:53.458")));
+  }
+
+  @Test
+  public void testTruncCalendarToQuarter() {
+    DateUtility.truncCalendarToQuarter(null);
+
+    // 1. quarter
+    Calendar cal = calendarOf("2015-01-01 00:00:00.000");
+    DateUtility.truncCalendarToQuarter(cal);
+    assertCalendarEquals("2015-01-01 00:00:00.000", cal);
+
+    cal = calendarOf("2015-03-30 23:59:59.999");
+    DateUtility.truncCalendarToQuarter(cal);
+    assertCalendarEquals("2015-01-01 00:00:00.000", cal);
+
+    // 2. quarter
+    cal = calendarOf("2015-04-01 00:00:00.000");
+    DateUtility.truncCalendarToQuarter(cal);
+    assertCalendarEquals("2015-04-01 00:00:00.000", cal);
+
+    cal = calendarOf("2015-06-30 23:59:59.999");
+    DateUtility.truncCalendarToQuarter(cal);
+    assertCalendarEquals("2015-04-01 00:00:00.000", cal);
+
+    // 3. quarter
+    cal = calendarOf("2015-07-01 00:00:00.000");
+    DateUtility.truncCalendarToQuarter(cal);
+    assertCalendarEquals("2015-07-01 00:00:00.000", cal);
+
+    cal = calendarOf("2015-09-30 23:59:59.999");
+    DateUtility.truncCalendarToQuarter(cal);
+    assertCalendarEquals("2015-07-01 00:00:00.000", cal);
+
+    // 4. quarter
+    cal = calendarOf("2015-10-01 00:00:00.000");
+    DateUtility.truncCalendarToQuarter(cal);
+    assertCalendarEquals("2015-10-01 00:00:00.000", cal);
+
+    cal = calendarOf("2015-12-31 23:59:59.999");
+    DateUtility.truncCalendarToQuarter(cal);
+    assertCalendarEquals("2015-10-01 00:00:00.000", cal);
+  }
+
+  @Test
+  public void testTruncDateToHour() {
+    assertNull(DateUtility.truncDateToHour(null));
+    assertDateEquals("2015-01-01 00:00:00.000", DateUtility.truncDateToHour(dateOf("2015-01-01 00:00:00.000")));
+    assertDateEquals("2015-01-01 18:00:00.000", DateUtility.truncDateToHour(dateOf("2015-01-01 18:17:25.831")));
+    assertDateEquals("2015-01-01 23:00:00.000", DateUtility.truncDateToHour(dateOf("2015-01-01 23:59:59.999")));
+  }
+
+  @Test
+  public void testTruncCalendarToHour() {
+    DateUtility.truncCalendarToHour(null);
+
+    Calendar cal = calendarOf("2015-01-01 00:00:00.000");
+    DateUtility.truncCalendarToHour(cal);
+    assertCalendarEquals("2015-01-01 00:00:00.000", cal);
+
+    cal = calendarOf("2015-01-01 18:17:25.831");
+    DateUtility.truncCalendarToHour(cal);
+    assertCalendarEquals("2015-01-01 18:00:00.000", cal);
+
+    cal = calendarOf("2015-01-01 23:59:59.999");
+    DateUtility.truncCalendarToHour(cal);
+    assertCalendarEquals("2015-01-01 23:00:00.000", cal);
+  }
+
+  public static void assertDateEquals(String expectedDate, Date date) {
+    assertEquals(expectedDate, stringOf(date));
+  }
+
+  public static void assertCalendarEquals(String expectedDate, Calendar cal) {
+    assertDateEquals(expectedDate, DateUtility.convertCalendar(cal));
+  }
+
+  /**
+   * Parses the given string into a {@link Calendar}.
+   *
+   * @param dateString
+   *          staring representation using format yyyy-MM-dd HH:mm:ss.SSS
+   */
+  public static Calendar calendarOf(String dateString) {
+    return DateUtility.convertDate(dateOf(dateString));
+  }
+
+  /**
+   * Parses the given string into a {@link Date}.
+   *
+   * @param dateString
+   *          staring representation using format yyyy-MM-dd HH:mm:ss.SSS
+   */
+  public static Date dateOf(String dateString) {
+    return DateUtility.parse(dateString, DATE_FORMAT_COMPLETE);
+  }
+
+  /**
+   * Formats the given date using format yyyy-MM-dd HH:mm:ss.SSS
+   */
+  public static String stringOf(Date date) {
+    return DateUtility.format(date, DATE_FORMAT_COMPLETE);
   }
 }
