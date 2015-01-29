@@ -7,7 +7,7 @@ scout.inherits(scout.ImageField, scout.FormField);
 scout.ImageField.prototype._render = function($parent) {
   var $fieldContainer, $field;
 
-  //Create div to avoid resizing of the <img>
+  // Create div to avoid resizing of the <img>
   $fieldContainer = $('<div>').css('overflow', 'hidden');
 
   if (this.scrollBarEnabled) {
@@ -29,7 +29,7 @@ scout.ImageField.prototype._render = function($parent) {
 
 scout.ImageField.prototype._renderProperties = function() {
   scout.ImageField.parent.prototype._renderProperties.call(this);
-  this._renderImageId(this.imageId);
+  this._renderImageOrId();
 };
 
 scout.ImageField.prototype._remove = function() {
@@ -38,13 +38,12 @@ scout.ImageField.prototype._remove = function() {
   }
 };
 
-// FIXME AWE: (resource loading) wir müssen unterscheiden zwischen statischen images (icons, ressourcen) 
-// und dynamischen bildern erstere haben eine imageId, letztere nicht
-
-scout.ImageField.prototype._renderImageId = function(imageId) {
+scout.ImageField.prototype._renderImageId = function() {
   this._renderImageOrId();
-//  this.$field.attr('src', imageId);
-//  this.$field.on('load', scout.scrollbars.update.bind(this, this._$scrollable));
+};
+
+scout.ImageField.prototype._renderImage = function() {
+  this._renderImageOrId();
 };
 
 scout.ImageField.prototype._renderImageOrId = function() {
@@ -53,10 +52,11 @@ scout.ImageField.prototype._renderImageOrId = function() {
       var icon = this.imageId.substr(5, 1);
       // FIXME AWE: (font-icon) --> IMG entfernen, mit DIV ersetzen
     } else {
-      this.$field.attr('src', '/static/' + this.imageId + '?sessionId=' + this.session.jsonSessionId);
+      this.$field.attr('src', scout.fields.imageUrl(this, this.imageId));
     }
   } else if (this.image) {
-
+    this.$field.attr('src', scout.fields.imageUrl(this, this.image));
   }
+  this.$field.on('load', scout.scrollbars.update.bind(this, this._$scrollable));
   // FIXME AWE: (image) IMG/DIV entfernen, wenn kein bild mehr da
 };

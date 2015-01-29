@@ -87,7 +87,7 @@ scout.Button.prototype._renderIconId = function() {
       $img = $('<img>');
       this.$field.prepend($img);
     }
-    $img.attr('src', '/static/' + this.iconId + '?sessionId=' + this.session.jsonSessionId);
+    $img.attr('src', scout.fields.imageUrl(this, this.iconId));
     $img.toggleClass('with-label', !!this.label);
   } else {
     this.$field.find('img').remove();

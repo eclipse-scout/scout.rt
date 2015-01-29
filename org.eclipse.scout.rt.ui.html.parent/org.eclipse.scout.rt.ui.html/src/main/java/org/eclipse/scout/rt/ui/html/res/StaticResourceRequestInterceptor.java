@@ -26,6 +26,8 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
 import org.eclipse.scout.rt.client.ui.IIconLocator;
+import org.eclipse.scout.rt.client.ui.form.fields.imagebox.BinaryContent;
+import org.eclipse.scout.rt.client.ui.form.fields.imagebox.IBinaryContentProvider;
 import org.eclipse.scout.rt.ui.html.AbstractUiServlet;
 import org.eclipse.scout.rt.ui.html.Activator;
 import org.eclipse.scout.rt.ui.html.IServletRequestInterceptor;
@@ -35,6 +37,7 @@ import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
 import org.eclipse.scout.rt.ui.html.cache.IHttpCacheControl;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonUtility;
+import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.script.ScriptFileBuilder;
 import org.eclipse.scout.rt.ui.html.script.ScriptOutput;
 import org.eclipse.scout.rt.ui.html.scriptprocessor.ScriptProcessor;
@@ -84,7 +87,11 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
       return true;
     }
 
-    // return content
+    // return content. Note that this method only works because the file-type information
+    // is contained in the pathInfo (=request from the client), this means we cannot load
+    // a resource from an URL like http://foo.com/myfile, since the file-type is missing.
+    // It would be better if we could determine the mime-type without being dependent on
+    // the request URL.
     String contentType = detectContentType(servlet, pathInfo);
     if (contentType != null) {
       resp.setContentType(contentType);
@@ -145,8 +152,11 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
    * Loads a resource with an appropriate method, based on the URL
    */
   protected HttpCacheObject loadResource(AbstractUiServlet servlet, HttpServletRequest req, String pathInfo) throws ServletException, IOException {
-    if (pathInfo.matches("^/static/.*")) {
-      return loadStaticResource(req, pathInfo);
+    if (pathInfo.matches("^/?icon/.*")) {
+      return loadIcon(req, pathInfo);
+	}
+	if (pathInfo.matches("^/?image/.*")) {
+	  return loadImage(req, pathInfo);
     }
     if ((pathInfo.endsWith(".js") || pathInfo.endsWith(".css"))) {
       return loadScriptFile(servlet, req, pathInfo);
@@ -160,14 +170,11 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
     return loadBinaryFile(servlet, req, pathInfo);
   }
 
-  // FIXME AWE: (resource loading) discuss with C.GU - only for images/icons with IDs or other resources too?
-  protected HttpCacheObject loadStaticResource(HttpServletRequest req, String pathInfo) {
-    HttpSession httpSession = req.getSession();
-    String jsonSessionId = req.getParameter("sessionId");
-    String jsonSessionAttributeName = "scout.htmlui.session.json." + jsonSessionId;
-    AbstractJsonSession jsonSession = (AbstractJsonSession) httpSession.getAttribute(jsonSessionAttributeName);
-    IIconLocator iconLocator = jsonSession.getClientSession().getIconLocator();
-
+  /**
+   * This method loads only image icons from the /resource/icons folder.
+   */
+  private HttpCacheObject loadIcon(HttpServletRequest req, String pathInfo) {
+    IIconLocator iconLocator = getJsonSession(req).getClientSession().getIconLocator();
     String imageId = pathInfo.substring(pathInfo.lastIndexOf('/') + 1);
     IconSpec iconSpec = iconLocator.getIconSpec(imageId);
     if (iconSpec != null) {
@@ -175,6 +182,30 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
       return new HttpCacheObject(pathInfo, iconSpec.getContent(), System.currentTimeMillis());
     }
     return null;
+  }
+
+  /**
+   * This method loads images which belong to a adapter/form-field.
+   */
+  private HttpCacheObject loadImage(HttpServletRequest req, String pathInfo) {
+    String contentId = pathInfo.substring(pathInfo.lastIndexOf('/') + 1);
+    String[] tmp = contentId.split("\\.");
+    String adapterId = tmp[0];
+
+    IJsonAdapter<?> jsonAdapter = getJsonSession(req).getJsonAdapter(adapterId);
+    if (jsonAdapter instanceof IBinaryContentProvider) {
+      IBinaryContentProvider provider = (IBinaryContentProvider) jsonAdapter;
+      BinaryContent binaryContent = provider.getBinaryContent(contentId);
+      return new HttpCacheObject(pathInfo, binaryContent.getContent(), System.currentTimeMillis());
+    }
+    return null;
+  }
+
+  private AbstractJsonSession getJsonSession(HttpServletRequest req) {
+    HttpSession httpSession = req.getSession();
+    String jsonSessionId = req.getParameter("sessionId");
+    String jsonSessionAttributeName = "scout.htmlui.session.json." + jsonSessionId;
+    return (AbstractJsonSession) httpSession.getAttribute(jsonSessionAttributeName);
   }
 
   /**
