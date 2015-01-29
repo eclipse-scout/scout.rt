@@ -12,29 +12,27 @@ scout.RichTextField.prototype._render = function($parent) {
   this.addLabel();
   this.addMandatoryIndicator();
 
-  // scrollbar
-  this._$scrollable = scout.scrollbars.install(this.$container);
+  var $editorContainer = this.$container.appendDiv('rich-text-editor');
+  var $editorContent = $editorContainer.appendDiv('rich-text-editor-content');
+
+  this._$scrollable = scout.scrollbars.install($editorContent);
   this.session.detachHelper.pushScrollable(this._$scrollable);
 
   // create editable div
-  this.addField(
-      this._$scrollable
-      .attr('contentEditable', 'true')
-      .on('keydown keyup paste', this._onChange.bind(this))
-      .on('focus', this._onFocus.bind(this))
-      .on('blur', this._onBlur.bind(this))
-      );
+  this._$scrollable.attr('contentEditable', 'true')
+    .addClass('editable')
+    .on('keydown keyup paste', this._onChange.bind(this))
+    .on('focus', this._onFocus.bind(this))
+    .on('blur', this._onBlur.bind(this));
+  this.addField(this._$scrollable, $editorContainer);
 
   // demo data
   this.$field.appendDiv("", "Beispielstext");
 
-  this.$container.scroll(this._onScroll);
-
   // command bar
-  this.$commandBar = this.$container.appendDiv('rich-text-bar');
+  this.$commandBar = $editorContainer.appendDiv('rich-text-bar');
 
   this.$commandFormat = this.$commandBar.appendDiv('rich-text-bar-group');
-
   this.$commandFormat.appendDiv('rich-text-command rich-text-bar-bold', 'a')
     .data('command', 'bold');
   this.$commandFormat.appendDiv('rich-text-command rich-text-bar-strike', 'a')
@@ -70,17 +68,11 @@ scout.RichTextField.prototype._remove = function() {
 };
 
 scout.RichTextField.prototype._onFocus = function(event) {
-  this.$container.addClass('focused');
+  this.$field.addClass('focused');
 };
 
 scout.RichTextField.prototype._onBlur = function(event) {
-  this.$container.removeClass('focused');
-};
-
-scout.RichTextField.prototype._onScroll = function(event) {
-  $.l(event);
-
-  return false;
+  this.$field.removeClass('focused');
 };
 
 scout.RichTextField.prototype._onCommandClick = function(event) {

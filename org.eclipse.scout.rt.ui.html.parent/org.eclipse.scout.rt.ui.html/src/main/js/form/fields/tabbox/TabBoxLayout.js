@@ -8,14 +8,14 @@ scout.TabBoxLayout.prototype.layout = function($container) {
     htmlContainer = scout.HtmlComponent.get($container),
     $tabContent = $container.children('.tab-content'),
     htmlTabContent = scout.HtmlComponent.get($tabContent),
-    $tabArea =  $container.children('.tab-area'),
+    $tabArea = $container.children('.tab-area'),
     tabAreaHeight = 0;
 
   containerSize = htmlContainer.getAvailableSize()
     .subtract(htmlContainer.getInsets());
 
   if ($tabArea.isVisible()) {
-    htmlTabArea = scout.HtmlComponent.get($tabArea),
+    htmlTabArea = scout.HtmlComponent.get($tabArea);
     tabAreaSize = containerSize.subtract(htmlTabArea.getMargins());
     $tabArea.cssWidth(tabAreaSize.width);
     tabAreaHeight = $tabArea.outerHeight(true);
