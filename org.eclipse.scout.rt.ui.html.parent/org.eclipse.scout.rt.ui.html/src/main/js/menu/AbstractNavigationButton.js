@@ -21,7 +21,7 @@ scout.AbstractNavigationButton.prototype._onClick = function() {
   this._onClickFunc();
 };
 
-//@override
+// @override
 scout.AbstractNavigationButton.prototype._render = function($parent) {
   if (this.node.detailForm && this._isDetail()) {
     this._onClickFunc = this._setDetailVisible.bind(this);
@@ -30,6 +30,7 @@ scout.AbstractNavigationButton.prototype._render = function($parent) {
     this._onClickFunc = this._drill.bind(this);
     this.label = this.session.text(this._text2);
   }
+  this.enabled = this._buttonEnabled();
   scout.AbstractNavigationButton.parent.prototype._render.call(this, $parent);
 };
 

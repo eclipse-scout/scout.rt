@@ -16,7 +16,7 @@ scout.NavigateDownButton.prototype._toggleDetail = function() {
   return false;
 };
 
-scout.NavigateDownButton.prototype._menuEnabled = function() {
+scout.NavigateDownButton.prototype._buttonEnabled = function() {
   return !this.node.leaf;
 };
 

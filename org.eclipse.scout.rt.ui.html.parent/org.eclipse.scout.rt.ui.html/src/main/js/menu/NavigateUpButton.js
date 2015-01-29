@@ -18,7 +18,7 @@ scout.NavigateUpButton.prototype._toggleDetail = function() {
  * Returns true when current node has either a parentNode or if current node is a
  * top-level node without a parent and the outline has a default detail-form.
  */
-scout.NavigateUpButton.prototype._menuEnabled = function() {
+scout.NavigateUpButton.prototype._buttonEnabled = function() {
   var parentNode = this.node.parentNode;
   return !!parentNode || !!this.outline.defaultDetailForm;
 };

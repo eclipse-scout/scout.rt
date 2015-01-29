@@ -19,11 +19,11 @@ describe("NavigateDownButton", function() {
     expect(menu._isDetail()).toBe(false);
   });
 
-  it("_menuEnabled is true when node is not a leaf", function() {
+  it("_buttonEnabled is true when node is not a leaf", function() {
     node.leaf = true;
-    expect(menu._menuEnabled()).toBe(false);
+    expect(menu._buttonEnabled()).toBe(false);
     node.leaf = false;
-    expect(menu._menuEnabled()).toBe(true);
+    expect(menu._buttonEnabled()).toBe(true);
   });
 
   it("_drill drills down to first selected row in the detail table", function() {

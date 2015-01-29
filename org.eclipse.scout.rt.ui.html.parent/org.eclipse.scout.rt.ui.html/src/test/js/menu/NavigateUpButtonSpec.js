@@ -19,24 +19,24 @@ describe("NavigateUpButton", function() {
     expect(menu._isDetail()).toBe(true);
   });
 
-  describe("_menuEnabled", function() {
+  describe("_buttonEnabled", function() {
 
     it("is true when current node has a parent or...", function() {
       node.parentNode = {};
       outline.defaultDetailForm = undefined;
-      expect(menu._menuEnabled()).toBe(true);
+      expect(menu._buttonEnabled()).toBe(true);
     });
 
     it("is true when current node is a top-level node and outline a default detail-form or...", function() {
       node.parentNode = undefined;
       outline.defaultDetailForm = {};
-      expect(menu._menuEnabled()).toBe(true);
+      expect(menu._buttonEnabled()).toBe(true);
     });
 
     it("is false otherwise", function() {
       node.parentNode = undefined;
       outline.defaultDetailForm = undefined;
-      expect(menu._menuEnabled()).toBe(false);
+      expect(menu._buttonEnabled()).toBe(false);
     });
 
   });
