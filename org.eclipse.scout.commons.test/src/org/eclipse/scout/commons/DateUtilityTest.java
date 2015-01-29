@@ -16,7 +16,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
@@ -33,58 +32,58 @@ import org.junit.Test;
  * </p>
  */
 public class DateUtilityTest {
-  private static final String EXPEC_DATE_1970_01_01_000000 = "1970-01-01_00:00:00.000";
-  private static final String EXPEC_DATE_1970_01_01_003000 = "1970-01-01_00:30:00.000";
-  private static final String EXPEC_DATE_1970_01_01_010000 = "1970-01-01_01:00:00.000";
-  private static final String EXPEC_DATE_1970_01_01_013000 = "1970-01-01_01:30:00.000";
-  private static final String EXPEC_DATE_1970_01_01_020000 = "1970-01-01_02:00:00.000";
-  private static final String EXPEC_DATE_1970_01_01_023000 = "1970-01-01_02:30:00.000";
-  private static final String EXPEC_DATE_1970_01_01_030000 = "1970-01-01_03:00:00.000";
-  private static final String EXPEC_DATE_1970_01_01_033000 = "1970-01-01_03:30:00.000";
-  private static final String EXPEC_DATE_1970_01_01_040000 = "1970-01-01_04:00:00.000";
-  private static final String EXPEC_DATE_1970_01_01_043000 = "1970-01-01_04:30:00.000";
-  private static final String EXPEC_DATE_1970_01_01_050000 = "1970-01-01_05:00:00.000";
-  private static final String EXPEC_DATE_1970_01_01_053000 = "1970-01-01_05:30:00.000";
-  private static final String EXPEC_DATE_1970_01_01_060000 = "1970-01-01_06:00:00.000";
-  private static final String EXPEC_DATE_1970_01_01_063000 = "1970-01-01_06:30:00.000";
-  private static final String EXPEC_DATE_1970_01_01_070000 = "1970-01-01_07:00:00.000";
-  private static final String EXPEC_DATE_1970_01_01_073000 = "1970-01-01_07:30:00.000";
-  private static final String EXPEC_DATE_1970_01_01_080000 = "1970-01-01_08:00:00.000";
-  private static final String EXPEC_DATE_1970_01_01_083000 = "1970-01-01_08:30:00.000";
-  private static final String EXPEC_DATE_1970_01_01_090000 = "1970-01-01_09:00:00.000";
-  private static final String EXPEC_DATE_1970_01_01_093000 = "1970-01-01_09:30:00.000";
-  private static final String EXPEC_DATE_1970_01_01_100000 = "1970-01-01_10:00:00.000";
-  private static final String EXPEC_DATE_1970_01_01_103000 = "1970-01-01_10:30:00.000";
-  private static final String EXPEC_DATE_1970_01_01_110000 = "1970-01-01_11:00:00.000";
-  private static final String EXPEC_DATE_1970_01_01_113000 = "1970-01-01_11:30:00.000";
-  private static final String EXPEC_DATE_1970_01_01_120000 = "1970-01-01_12:00:00.000";
-  private static final String EXPEC_DATE_1970_01_01_123000 = "1970-01-01_12:30:00.000";
-  private static final String EXPEC_DATE_1970_01_01_130000 = "1970-01-01_13:00:00.000";
-  private static final String EXPEC_DATE_1970_01_01_133000 = "1970-01-01_13:30:00.000";
-  private static final String EXPEC_DATE_1970_01_01_140000 = "1970-01-01_14:00:00.000";
-  private static final String EXPEC_DATE_1970_01_01_143000 = "1970-01-01_14:30:00.000";
-  private static final String EXPEC_DATE_1970_01_01_150000 = "1970-01-01_15:00:00.000";
-  private static final String EXPEC_DATE_1970_01_01_153000 = "1970-01-01_15:30:00.000";
-  private static final String EXPEC_DATE_1970_01_01_160000 = "1970-01-01_16:00:00.000";
-  private static final String EXPEC_DATE_1970_01_01_163000 = "1970-01-01_16:30:00.000";
-  private static final String EXPEC_DATE_1970_01_01_170000 = "1970-01-01_17:00:00.000";
-  private static final String EXPEC_DATE_1970_01_01_173000 = "1970-01-01_17:30:00.000";
-  private static final String EXPEC_DATE_1970_01_01_180000 = "1970-01-01_18:00:00.000";
-  private static final String EXPEC_DATE_1970_01_01_183000 = "1970-01-01_18:30:00.000";
-  private static final String EXPEC_DATE_1970_01_01_190000 = "1970-01-01_19:00:00.000";
-  private static final String EXPEC_DATE_1970_01_01_193000 = "1970-01-01_19:30:00.000";
-  private static final String EXPEC_DATE_1970_01_01_200000 = "1970-01-01_20:00:00.000";
-  private static final String EXPEC_DATE_1970_01_01_203000 = "1970-01-01_20:30:00.000";
-  private static final String EXPEC_DATE_1970_01_01_210000 = "1970-01-01_21:00:00.000";
-  private static final String EXPEC_DATE_1970_01_01_213000 = "1970-01-01_21:30:00.000";
-  private static final String EXPEC_DATE_1970_01_01_220000 = "1970-01-01_22:00:00.000";
-  private static final String EXPEC_DATE_1970_01_01_223000 = "1970-01-01_22:30:00.000";
-  private static final String EXPEC_DATE_1970_01_01_230000 = "1970-01-01_23:00:00.000";
-  private static final String EXPEC_DATE_1970_01_01_233000 = "1970-01-01_23:30:00.000";
-  private static final String EXPEC_DATE_1970_01_01_235959 = "1970-01-01_23:59:59.000";
+  private static final String EXPEC_DATE_1970_01_01_000000 = "1970-01-01 00:00:00.000";
+  private static final String EXPEC_DATE_1970_01_01_003000 = "1970-01-01 00:30:00.000";
+  private static final String EXPEC_DATE_1970_01_01_010000 = "1970-01-01 01:00:00.000";
+  private static final String EXPEC_DATE_1970_01_01_013000 = "1970-01-01 01:30:00.000";
+  private static final String EXPEC_DATE_1970_01_01_020000 = "1970-01-01 02:00:00.000";
+  private static final String EXPEC_DATE_1970_01_01_023000 = "1970-01-01 02:30:00.000";
+  private static final String EXPEC_DATE_1970_01_01_030000 = "1970-01-01 03:00:00.000";
+  private static final String EXPEC_DATE_1970_01_01_033000 = "1970-01-01 03:30:00.000";
+  private static final String EXPEC_DATE_1970_01_01_040000 = "1970-01-01 04:00:00.000";
+  private static final String EXPEC_DATE_1970_01_01_043000 = "1970-01-01 04:30:00.000";
+  private static final String EXPEC_DATE_1970_01_01_050000 = "1970-01-01 05:00:00.000";
+  private static final String EXPEC_DATE_1970_01_01_053000 = "1970-01-01 05:30:00.000";
+  private static final String EXPEC_DATE_1970_01_01_060000 = "1970-01-01 06:00:00.000";
+  private static final String EXPEC_DATE_1970_01_01_063000 = "1970-01-01 06:30:00.000";
+  private static final String EXPEC_DATE_1970_01_01_070000 = "1970-01-01 07:00:00.000";
+  private static final String EXPEC_DATE_1970_01_01_073000 = "1970-01-01 07:30:00.000";
+  private static final String EXPEC_DATE_1970_01_01_080000 = "1970-01-01 08:00:00.000";
+  private static final String EXPEC_DATE_1970_01_01_083000 = "1970-01-01 08:30:00.000";
+  private static final String EXPEC_DATE_1970_01_01_090000 = "1970-01-01 09:00:00.000";
+  private static final String EXPEC_DATE_1970_01_01_093000 = "1970-01-01 09:30:00.000";
+  private static final String EXPEC_DATE_1970_01_01_100000 = "1970-01-01 10:00:00.000";
+  private static final String EXPEC_DATE_1970_01_01_103000 = "1970-01-01 10:30:00.000";
+  private static final String EXPEC_DATE_1970_01_01_110000 = "1970-01-01 11:00:00.000";
+  private static final String EXPEC_DATE_1970_01_01_113000 = "1970-01-01 11:30:00.000";
+  private static final String EXPEC_DATE_1970_01_01_120000 = "1970-01-01 12:00:00.000";
+  private static final String EXPEC_DATE_1970_01_01_123000 = "1970-01-01 12:30:00.000";
+  private static final String EXPEC_DATE_1970_01_01_130000 = "1970-01-01 13:00:00.000";
+  private static final String EXPEC_DATE_1970_01_01_133000 = "1970-01-01 13:30:00.000";
+  private static final String EXPEC_DATE_1970_01_01_140000 = "1970-01-01 14:00:00.000";
+  private static final String EXPEC_DATE_1970_01_01_143000 = "1970-01-01 14:30:00.000";
+  private static final String EXPEC_DATE_1970_01_01_150000 = "1970-01-01 15:00:00.000";
+  private static final String EXPEC_DATE_1970_01_01_153000 = "1970-01-01 15:30:00.000";
+  private static final String EXPEC_DATE_1970_01_01_160000 = "1970-01-01 16:00:00.000";
+  private static final String EXPEC_DATE_1970_01_01_163000 = "1970-01-01 16:30:00.000";
+  private static final String EXPEC_DATE_1970_01_01_170000 = "1970-01-01 17:00:00.000";
+  private static final String EXPEC_DATE_1970_01_01_173000 = "1970-01-01 17:30:00.000";
+  private static final String EXPEC_DATE_1970_01_01_180000 = "1970-01-01 18:00:00.000";
+  private static final String EXPEC_DATE_1970_01_01_183000 = "1970-01-01 18:30:00.000";
+  private static final String EXPEC_DATE_1970_01_01_190000 = "1970-01-01 19:00:00.000";
+  private static final String EXPEC_DATE_1970_01_01_193000 = "1970-01-01 19:30:00.000";
+  private static final String EXPEC_DATE_1970_01_01_200000 = "1970-01-01 20:00:00.000";
+  private static final String EXPEC_DATE_1970_01_01_203000 = "1970-01-01 20:30:00.000";
+  private static final String EXPEC_DATE_1970_01_01_210000 = "1970-01-01 21:00:00.000";
+  private static final String EXPEC_DATE_1970_01_01_213000 = "1970-01-01 21:30:00.000";
+  private static final String EXPEC_DATE_1970_01_01_220000 = "1970-01-01 22:00:00.000";
+  private static final String EXPEC_DATE_1970_01_01_223000 = "1970-01-01 22:30:00.000";
+  private static final String EXPEC_DATE_1970_01_01_230000 = "1970-01-01 23:00:00.000";
+  private static final String EXPEC_DATE_1970_01_01_233000 = "1970-01-01 23:30:00.000";
+  private static final String EXPEC_DATE_1970_01_01_235959 = "1970-01-01 23:59:59.000";
 
   private static final String DATE_TIME_PATTERN = "dd-MM-yyyy HH:mm";
-  private static final String YEAR_DATE_TIME_PATTERN = "yyyy-MM-dd_HH:mm:ss.SSS";
+  private static final String YEAR_DATE_TIME_PATTERN = "yyyy-MM-dd HH:mm:ss.SSS";
   private static final int HOURS_IN_DAY = 24;
 
   private static final double MINUTES_IN_HOURS = 60;
@@ -116,11 +115,10 @@ public class DateUtilityTest {
    */
   @Test
   public void testAddDaysFull() throws ParseException {
-    SimpleDateFormat sdf = new SimpleDateFormat(YEAR_DATE_TIME_PATTERN);
-    Date date1 = sdf.parse("2013-09-30_10:10:10.111");
-    Date date2 = sdf.parse("2013-10-01_10:10:10.111");
-    assertEquals(date2.getTime(), DateUtility.addDays(date1, 1).getTime());
-    assertEquals(date1.getTime(), DateUtility.addDays(date2, -1).getTime());
+    String date1 = "2013-09-30 10:10:10.111";
+    String date2 = "2013-10-01 10:10:10.111";
+    assertDateEquals(date2, DateUtility.addDays(dateOf(date1), 1));
+    assertDateEquals(date1, DateUtility.addDays(dateOf(date2), -1));
   }
 
   /**
@@ -130,11 +128,7 @@ public class DateUtilityTest {
    */
   @Test
   public void testAddDaysLarge() throws ParseException {
-    SimpleDateFormat sdf = new SimpleDateFormat(YEAR_DATE_TIME_PATTERN);
-    Date testDate = sdf.parse("1990-01-01_0:0:0.000");
-    Date expectedDate = sdf.parse("2030-12-31_0:0:0.000");
-    Date res = DateUtility.addDays(testDate, 14974);
-    assertEquals(expectedDate.getTime(), res.getTime());
+    assertDateEquals("2030-12-31 00:00:00.000", DateUtility.addDays(dateOf("1990-01-01 00:00:00.000"), 14974));
   }
 
   /**
@@ -160,12 +154,11 @@ public class DateUtilityTest {
       double d = sec / SECONDS_IN_DAY;
       Calendar cal = getCalendar(1, 0);
 
-      SimpleDateFormat sdf = new SimpleDateFormat(YEAR_DATE_TIME_PATTERN);
-      String result = sdf.format(DateUtility.addDays(cal.getTime(), d));
+      String result = stringOf(DateUtility.addDays(cal.getTime(), d));
 
       cal.set(Calendar.SECOND, sec);
 
-      String expected = sdf.format(cal.getTime());
+      String expected = stringOf(cal.getTime());
       assertEquals(expected, result);
     }
   }
@@ -183,12 +176,11 @@ public class DateUtilityTest {
       double d = -sec / SECONDS_IN_DAY;
       Calendar cal = getCalendar(1, 0);
 
-      SimpleDateFormat sdf = new SimpleDateFormat(YEAR_DATE_TIME_PATTERN);
-      String result = sdf.format(DateUtility.addDays(cal.getTime(), d));
+      String result = stringOf(DateUtility.addDays(cal.getTime(), d));
 
       cal.set(Calendar.SECOND, -sec);
 
-      String expected = sdf.format(cal.getTime());
+      String expected = stringOf(cal.getTime());
       assertEquals(expected, result);
     }
   }
@@ -247,10 +239,9 @@ public class DateUtilityTest {
       cal.set(Calendar.MINUTE, 0);
       cal.set(Calendar.SECOND, 0);
       cal.set(Calendar.MILLISECOND, 0);
-      SimpleDateFormat sdf = new SimpleDateFormat(YEAR_DATE_TIME_PATTERN);
-      String result = sdf.format(DateUtility.addMilliseconds(cal.getTime(), i));
+      String result = stringOf(DateUtility.addMilliseconds(cal.getTime(), i));
       cal.set(Calendar.MILLISECOND, i);
-      String expected = sdf.format(cal.getTime());
+      String expected = stringOf(cal.getTime());
       assertEquals(expected, result);
     }
   }
@@ -272,10 +263,9 @@ public class DateUtilityTest {
       cal.set(Calendar.HOUR_OF_DAY, 0);
       cal.set(Calendar.MINUTE, 0);
       cal.set(Calendar.SECOND, 0);
-      SimpleDateFormat sdf = new SimpleDateFormat(YEAR_DATE_TIME_PATTERN);
-      String result = sdf.format(DateUtility.addSeconds(cal.getTime(), i));
+      String result = stringOf(DateUtility.addSeconds(cal.getTime(), i));
       cal.set(Calendar.SECOND, i);
-      String expected = sdf.format(cal.getTime());
+      String expected = stringOf(cal.getTime());
       assertEquals(expected, result);
     }
   }
@@ -293,7 +283,6 @@ public class DateUtilityTest {
     //test adding minutes for 10 days
     int testDays = 10;
     double minutes = testDays * MINUTES_IN_HOURS * HOURS_IN_DAY;
-    SimpleDateFormat sdf = new SimpleDateFormat(YEAR_DATE_TIME_PATTERN);
     Calendar cal = Calendar.getInstance();
 
     for (int i = 0; i < minutes; i++) {
@@ -302,10 +291,10 @@ public class DateUtilityTest {
       cal.set(Calendar.SECOND, 0);
       cal.set(Calendar.MINUTE, 0);
 
-      String originalTime = sdf.format(cal.getTime());
-      String resultTime = sdf.format(DateUtility.addMinutes(cal.getTime(), i));
+      String originalTime = stringOf(cal.getTime());
+      String resultTime = stringOf(DateUtility.addMinutes(cal.getTime(), i));
       cal.set(Calendar.MINUTE, i);
-      String expectedTime = sdf.format(cal.getTime());
+      String expectedTime = stringOf(cal.getTime());
       assertEquals("Add " + i + "minutes to " + originalTime, expectedTime, resultTime);
     }
   }
@@ -327,11 +316,10 @@ public class DateUtilityTest {
    */
   @Test
   public void testAddMonthsFull() throws ParseException {
-    SimpleDateFormat sdf = new SimpleDateFormat(YEAR_DATE_TIME_PATTERN);
-    Date date1 = sdf.parse("2013-12-10_10:10:10.111");
-    Date date2 = sdf.parse("2014-01-10_10:10:10.111");
-    assertEquals(date2.getTime(), DateUtility.addMonths(date1, 1).getTime());
-    assertEquals(date1.getTime(), DateUtility.addMonths(date2, -1).getTime());
+    String date1 = "2013-12-10 10:10:10.111";
+    String date2 = "2014-01-10 10:10:10.111";
+    assertDateEquals(date2, DateUtility.addMonths(dateOf(date1), 1));
+    assertDateEquals(date1, DateUtility.addMonths(dateOf(date2), -1));
   }
 
   @Test
@@ -421,14 +409,12 @@ public class DateUtilityTest {
    * @param input
    *          Double to be converted
    * @param expectedDate
-   *          with the Pattern 'yyyy-MM-dd_HH:mm:ss.SSS'
+   *          with the Pattern 'yyyy-MM-dd HH:mm:ss.SSS'
    */
   private void testConvertDoubleTimeToDate(Double input, String expectedDate) {
-    Date expected = DateUtility.parse(expectedDate, YEAR_DATE_TIME_PATTERN);
     Date value = DateUtility.convertDoubleTimeToDate(input);
-
     String message = "Conversion DoubleTime <" + input + "> to Date";
-    assertDateEquals(message, expected, value);
+    assertDateEquals(message, expectedDate, value);
   }
 
   @Test
@@ -487,17 +473,17 @@ public class DateUtilityTest {
     testConvertDateToDoubleTime(EXPEC_DATE_1970_01_01_235959, 0.999988425925926);
 
     //Out of definition Range:
-    testConvertDateToDoubleTime("1970-01-02_00:00:00.000", 0.0);
-    testConvertDateToDoubleTime("1970-01-02_06:00:00.000", 0.25);
+    testConvertDateToDoubleTime("1970-01-02 00:00:00.000", 0.0);
+    testConvertDateToDoubleTime("1970-01-02 06:00:00.000", 0.25);
 
-    testConvertDateToDoubleTime("1970-01-15_00:00:00.000", 0.0);
-    testConvertDateToDoubleTime("1970-01-15_06:00:00.000", 0.25);
+    testConvertDateToDoubleTime("1970-01-15 00:00:00.000", 0.0);
+    testConvertDateToDoubleTime("1970-01-15 06:00:00.000", 0.25);
 
-    testConvertDateToDoubleTime("1969-12-31_00:00:00.000", 0.0);
-    testConvertDateToDoubleTime("1969-12-31_18:00:00.000", 0.75);
+    testConvertDateToDoubleTime("1969-12-31 00:00:00.000", 0.0);
+    testConvertDateToDoubleTime("1969-12-31 18:00:00.000", 0.75);
 
-    testConvertDateToDoubleTime("1969-12-05_00:00:00.000", 0.0);
-    testConvertDateToDoubleTime("1969-12-05_18:00:00.000", 0.75);
+    testConvertDateToDoubleTime("1969-12-05 00:00:00.000", 0.0);
+    testConvertDateToDoubleTime("1969-12-05 18:00:00.000", 0.75);
 
   }
 
@@ -640,58 +626,6 @@ public class DateUtilityTest {
   }
 
   @Test
-  public void testTruncDateToHour() {
-    assertNull("Trunc <null> to hour", DateUtility.truncDateToHour(null));
-    testTruncDateToHour("01-01-1970 00:01", "01-01-1970 00:00");
-    testTruncDateToHour("01-01-1970 00:59", "01-01-1970 00:00");
-    testTruncDateToHour("01-01-1970 10:43", "01-01-1970 10:00");
-    testTruncDateToHour("01-01-1970 13:43", "01-01-1970 13:00");
-    testTruncDateToHour("01-01-1970 23:00", "01-01-1970 23:00");
-    testTruncDateToHour("01-01-1970 23:59", "01-01-1970 23:00");
-  }
-
-  /**
-   * @param input
-   *          date to be truncated to hour. Format is "dd-MM-yyyy HH:mm"
-   * @param expected
-   *          date to be expected. Format is "dd-MM-yyyy HH:mm"
-   */
-  private void testTruncDateToHour(String input, String expected) {
-    Date inputDate = DateUtility.parse(input, DATE_TIME_PATTERN);
-    Date expectedDate = DateUtility.parse(expected, DATE_TIME_PATTERN);
-    Date value = DateUtility.truncDateToHour(inputDate);
-
-    String message = "Trunc <" + input + "> to hour";
-    assertDateEquals(message, expectedDate, value);
-  }
-
-  /**
-   * @param message
-   * @param expected
-   * @param value
-   */
-  public static void assertDateEquals(String message, Date expected, Date value) {
-    Calendar v = Calendar.getInstance();
-    v.clear();
-    v.setTime(value);
-
-    Calendar e = Calendar.getInstance();
-    e.clear();
-    e.setTime(expected);
-
-    assertEquals(message + "[MILLIS]", e.get(Calendar.MILLISECOND), v.get(Calendar.MILLISECOND));
-    assertEquals(message + "[SEC]", e.get(Calendar.SECOND), v.get(Calendar.SECOND));
-    assertEquals(message + "[MIN]", e.get(Calendar.MINUTE), v.get(Calendar.MINUTE));
-    assertEquals(message + "[HOURS]", e.get(Calendar.HOUR_OF_DAY), v.get(Calendar.HOUR_OF_DAY));
-
-    assertEquals(message + "[DAY]", e.get(Calendar.DAY_OF_MONTH), v.get(Calendar.DAY_OF_MONTH));
-    assertEquals(message + "[MONTH]", e.get(Calendar.MONTH), v.get(Calendar.MONTH));
-    assertEquals(message + "[YEAR]", e.get(Calendar.YEAR), v.get(Calendar.YEAR));
-
-    assertEquals(message + "(DATE)", expected, value);
-  }
-
-  @Test
   public void testDaysBetween() {
     Calendar cal = Calendar.getInstance();
     Date d1, d2;
@@ -783,5 +717,177 @@ public class DateUtilityTest {
     assertEquals("-0.000001", DateUtility.formatNanos(-1L));
     assertEquals("9223372036854.775807", DateUtility.formatNanos(Long.MAX_VALUE));
     assertEquals("-9223372036854.775808", DateUtility.formatNanos(Long.MIN_VALUE));
+  }
+
+  @Test
+  public void testTruncDateToHalfYear() {
+    assertNull(DateUtility.truncDateToHalfYear(null));
+
+    // 1. half year
+    assertDateEquals("2015-01-01 00:00:00.000", DateUtility.truncDateToHalfYear(dateOf("2015-01-01 00:00:00.000")));
+    assertDateEquals("2015-01-01 00:00:00.000", DateUtility.truncDateToHalfYear(dateOf("2015-06-30 23:59:59.999")));
+
+    // 2. half year
+    assertDateEquals("2015-07-01 00:00:00.000", DateUtility.truncDateToHalfYear(dateOf("2015-07-01 00:00:00.000")));
+    assertDateEquals("2015-07-01 00:00:00.000", DateUtility.truncDateToHalfYear(dateOf("2015-12-31 23:59:59.999")));
+
+    // leap year
+    assertDateEquals("2012-01-01 00:00:00.000", DateUtility.truncDateToHalfYear(dateOf("2012-02-29 15:30:53.458")));
+  }
+
+  @Test
+  public void testTruncCalendarToHalfYear() {
+    DateUtility.truncCalendarToHalfYear(null);
+
+    Calendar cal = calendarOf("2015-01-01 00:00:00.000");
+    DateUtility.truncCalendarToHalfYear(cal);
+    assertCalendarEquals("2015-01-01 00:00:00.000", cal);
+
+    cal = calendarOf("2015-06-30 23:59:59.999");
+    DateUtility.truncCalendarToHalfYear(cal);
+    assertCalendarEquals("2015-01-01 00:00:00.000", cal);
+
+    cal = calendarOf("2015-07-01 00:00:00.000");
+    DateUtility.truncCalendarToHalfYear(cal);
+    assertCalendarEquals("2015-07-01 00:00:00.000", cal);
+
+    cal = calendarOf("2015-12-31 23:59:59.999");
+    DateUtility.truncCalendarToHalfYear(cal);
+    assertCalendarEquals("2015-07-01 00:00:00.000", cal);
+  }
+
+  @Test
+  public void testTruncDateToQuarter() {
+    assertNull(DateUtility.truncDateToQuarter(null));
+
+    // 1. quarter
+    assertDateEquals("2015-01-01 00:00:00.000", DateUtility.truncDateToQuarter(dateOf("2015-01-01 00:00:00.000")));
+    assertDateEquals("2015-01-01 00:00:00.000", DateUtility.truncDateToQuarter(dateOf("2015-03-31 23:59:59.999")));
+
+    // 2. quarter
+    assertDateEquals("2015-04-01 00:00:00.000", DateUtility.truncDateToQuarter(dateOf("2015-04-01 00:00:00.000")));
+    assertDateEquals("2015-04-01 00:00:00.000", DateUtility.truncDateToQuarter(dateOf("2015-06-30 23:59:59.999")));
+
+    // 3. quarter
+    assertDateEquals("2015-07-01 00:00:00.000", DateUtility.truncDateToQuarter(dateOf("2015-07-01 00:00:00.000")));
+    assertDateEquals("2015-07-01 00:00:00.000", DateUtility.truncDateToQuarter(dateOf("2015-09-30 23:59:59.999")));
+
+    // 4. quarter
+    assertDateEquals("2015-10-01 00:00:00.000", DateUtility.truncDateToQuarter(dateOf("2015-10-01 00:00:00.000")));
+    assertDateEquals("2015-10-01 00:00:00.000", DateUtility.truncDateToQuarter(dateOf("2015-12-31 23:59:59.999")));
+
+    // leap year
+    assertDateEquals("2012-01-01 00:00:00.000", DateUtility.truncDateToQuarter(dateOf("2012-02-29 15:30:53.458")));
+  }
+
+  @Test
+  public void testTruncCalendarToQuarter() {
+    DateUtility.truncCalendarToQuarter(null);
+
+    // 1. quarter
+    Calendar cal = calendarOf("2015-01-01 00:00:00.000");
+    DateUtility.truncCalendarToQuarter(cal);
+    assertCalendarEquals("2015-01-01 00:00:00.000", cal);
+
+    cal = calendarOf("2015-03-30 23:59:59.999");
+    DateUtility.truncCalendarToQuarter(cal);
+    assertCalendarEquals("2015-01-01 00:00:00.000", cal);
+
+    // 2. quarter
+    cal = calendarOf("2015-04-01 00:00:00.000");
+    DateUtility.truncCalendarToQuarter(cal);
+    assertCalendarEquals("2015-04-01 00:00:00.000", cal);
+
+    cal = calendarOf("2015-06-30 23:59:59.999");
+    DateUtility.truncCalendarToQuarter(cal);
+    assertCalendarEquals("2015-04-01 00:00:00.000", cal);
+
+    // 3. quarter
+    cal = calendarOf("2015-07-01 00:00:00.000");
+    DateUtility.truncCalendarToQuarter(cal);
+    assertCalendarEquals("2015-07-01 00:00:00.000", cal);
+
+    cal = calendarOf("2015-09-30 23:59:59.999");
+    DateUtility.truncCalendarToQuarter(cal);
+    assertCalendarEquals("2015-07-01 00:00:00.000", cal);
+
+    // 4. quarter
+    cal = calendarOf("2015-10-01 00:00:00.000");
+    DateUtility.truncCalendarToQuarter(cal);
+    assertCalendarEquals("2015-10-01 00:00:00.000", cal);
+
+    cal = calendarOf("2015-12-31 23:59:59.999");
+    DateUtility.truncCalendarToQuarter(cal);
+    assertCalendarEquals("2015-10-01 00:00:00.000", cal);
+  }
+
+  @Test
+  public void testTruncDateToHour() {
+    assertNull("Trunc <null> to hour", DateUtility.truncDateToHour(null));
+    assertDateEquals("1970-01-01 00:00:00.000", DateUtility.truncDateToHour(dateOf("1970-01-01 00:01:00.000")));
+    assertDateEquals("1970-01-01 00:00:00.000", DateUtility.truncDateToHour(dateOf("1970-01-01 00:59:00.000")));
+    assertDateEquals("1970-01-01 10:00:00.000", DateUtility.truncDateToHour(dateOf("1970-01-01 10:43:00.000")));
+    assertDateEquals("1970-01-01 13:00:00.000", DateUtility.truncDateToHour(dateOf("1970-01-01 13:43:00.000")));
+    assertDateEquals("1970-01-01 23:00:00.000", DateUtility.truncDateToHour(dateOf("1970-01-01 23:00:00.000")));
+    assertDateEquals("1970-01-01 23:00:00.000", DateUtility.truncDateToHour(dateOf("1970-01-01 23:59:00.000")));
+    assertDateEquals("2015-01-01 00:00:00.000", DateUtility.truncDateToHour(dateOf("2015-01-01 00:00:00.000")));
+    assertDateEquals("2015-01-01 18:00:00.000", DateUtility.truncDateToHour(dateOf("2015-01-01 18:17:25.831")));
+    assertDateEquals("2015-01-01 23:00:00.000", DateUtility.truncDateToHour(dateOf("2015-01-01 23:59:59.999")));
+  }
+
+  @Test
+  public void testTruncCalendarToHour() {
+    DateUtility.truncCalendarToHour(null);
+
+    Calendar cal = calendarOf("2015-01-01 00:00:00.000");
+    DateUtility.truncCalendarToHour(cal);
+    assertCalendarEquals("2015-01-01 00:00:00.000", cal);
+
+    cal = calendarOf("2015-01-01 18:17:25.831");
+    DateUtility.truncCalendarToHour(cal);
+    assertCalendarEquals("2015-01-01 18:00:00.000", cal);
+
+    cal = calendarOf("2015-01-01 23:59:59.999");
+    DateUtility.truncCalendarToHour(cal);
+    assertCalendarEquals("2015-01-01 23:00:00.000", cal);
+  }
+
+  public static void assertDateEquals(String expectedDate, Date date) {
+    assertDateEquals(null, expectedDate, date);
+  }
+
+  public static void assertDateEquals(String message, String expectedDate, Date date) {
+    assertEquals(message, expectedDate, stringOf(date));
+  }
+
+  public static void assertCalendarEquals(String expectedDate, Calendar cal) {
+    assertDateEquals(expectedDate, DateUtility.convertCalendar(cal));
+  }
+
+  /**
+   * Parses the given string into a {@link Calendar}.
+   *
+   * @param dateString
+   *          staring representation using format yyyy-MM-dd HH:mm:ss.SSS
+   */
+  public static Calendar calendarOf(String dateString) {
+    return DateUtility.convertDate(dateOf(dateString));
+  }
+
+  /**
+   * Parses the given string into a {@link Date}.
+   *
+   * @param dateString
+   *          staring representation using format yyyy-MM-dd HH:mm:ss.SSS
+   */
+  public static Date dateOf(String dateString) {
+    return DateUtility.parse(dateString, YEAR_DATE_TIME_PATTERN);
+  }
+
+  /**
+   * Formats the given date using format yyyy-MM-dd_HH:mm:ss.SSS
+   */
+  public static String stringOf(Date date) {
+    return DateUtility.format(date, YEAR_DATE_TIME_PATTERN);
   }
 }

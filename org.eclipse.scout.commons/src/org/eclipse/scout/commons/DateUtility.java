@@ -190,19 +190,22 @@ public final class DateUtility {
     Calendar c = Calendar.getInstance();
     c.setTime(d);
     truncCalendar(c);
-    return new Date(c.getTime().getTime());
+    return c.getTime();
   }
 
+  /**
+   * truncate the date to hour
+   *
+   * @since 4.2
+   */
   public static Date truncDateToHour(Date d) {
     if (d == null) {
       return null;
     }
     Calendar c = Calendar.getInstance();
     c.setTime(d);
-    c.set(Calendar.MINUTE, 0);
-    c.set(Calendar.SECOND, 0);
-    c.set(Calendar.MILLISECOND, 0);
-    return new Date(c.getTime().getTime());
+    truncCalendarToHour(c);
+    return c.getTime();
   }
 
   public static Date truncDateToMinute(Date d) {
@@ -213,7 +216,7 @@ public final class DateUtility {
     c.setTime(d);
     c.set(Calendar.SECOND, 0);
     c.set(Calendar.MILLISECOND, 0);
-    return new Date(c.getTime().getTime());
+    return c.getTime();
   }
 
   public static Date truncDateToSecond(Date d) {
@@ -223,7 +226,7 @@ public final class DateUtility {
     Calendar c = Calendar.getInstance();
     c.setTime(d);
     c.set(Calendar.MILLISECOND, 0);
-    return new Date(c.getTime().getTime());
+    return c.getTime();
   }
 
   /**
@@ -236,7 +239,7 @@ public final class DateUtility {
     Calendar c = Calendar.getInstance();
     c.setTime(d);
     truncCalendarToWeek(c, -1);
-    return new Date(c.getTime().getTime());
+    return c.getTime();
   }
 
   /**
@@ -249,7 +252,7 @@ public final class DateUtility {
     Calendar c = Calendar.getInstance();
     c.setTime(d);
     truncCalendarToMonth(c);
-    return new Date(c.getTime().getTime());
+    return c.getTime();
   }
 
   /**
@@ -262,13 +265,46 @@ public final class DateUtility {
     Calendar c = Calendar.getInstance();
     c.setTime(d);
     truncCalendarToYear(c);
-    return new Date(c.getTime().getTime());
+    return c.getTime();
+  }
+
+  /**
+   * truncate the date to half year (i.e. jan 1 or jul 1 of the given year)
+   *
+   * @since 4.2
+   */
+  public static Date truncDateToHalfYear(Date d) {
+    if (d == null) {
+      return null;
+    }
+    Calendar c = Calendar.getInstance();
+    c.setTime(d);
+    truncCalendarToHalfYear(c);
+    return c.getTime();
+  }
+
+  /**
+   * truncate the date to quarter year (i.e. jan 1, apr 1, jul 1 or oct 1 of the given year)
+   *
+   * @since 4.2
+   */
+  public static Date truncDateToQuarter(Date d) {
+    if (d == null) {
+      return null;
+    }
+    Calendar c = Calendar.getInstance();
+    c.setTime(d);
+    truncCalendarToQuarter(c);
+    return c.getTime();
   }
 
   /**
    * truncate the calendar to a day with time 00:00:00.000
    */
   public static void truncCalendar(Calendar c) {
+    if (c == null) {
+      return;
+    }
     c.set(Calendar.HOUR_OF_DAY, 0);
     c.set(Calendar.MINUTE, 0);
     c.set(Calendar.SECOND, 0);
@@ -282,6 +318,9 @@ public final class DateUtility {
    *          +1 or -1
    */
   public static void truncCalendarToWeek(Calendar c, int adjustIncrement) {
+    if (c == null) {
+      return;
+    }
     if (adjustIncrement < -1) {
       adjustIncrement = -1;
     }
@@ -305,6 +344,9 @@ public final class DateUtility {
    * truncate the calendar to month
    */
   public static void truncCalendarToMonth(Calendar c) {
+    if (c == null) {
+      return;
+    }
     c.set(Calendar.DATE, 1);
     c.set(Calendar.HOUR_OF_DAY, 0);
     c.set(Calendar.MINUTE, 0);
@@ -316,9 +358,76 @@ public final class DateUtility {
    * truncate the calendar to year
    */
   public static void truncCalendarToYear(Calendar c) {
+    if (c == null) {
+      return;
+    }
     c.set(Calendar.MONTH, Calendar.JANUARY);
     c.set(Calendar.DATE, 1);
     c.set(Calendar.HOUR_OF_DAY, 0);
+    c.set(Calendar.MINUTE, 0);
+    c.set(Calendar.SECOND, 0);
+    c.set(Calendar.MILLISECOND, 0);
+  }
+
+  /**
+   * truncate the calendar to half year (i.e. jan 1 or jul 1 of the given year)
+   *
+   * @since 4.2
+   */
+  public static void truncCalendarToHalfYear(Calendar c) {
+    if (c == null) {
+      return;
+    }
+    int month = c.get(Calendar.MONTH);
+    truncCalendarToYear(c);
+    if (month >= Calendar.JULY) {
+      c.set(Calendar.MONTH, Calendar.JULY);
+    }
+  }
+
+  /**
+   * truncate the calendar to half year (i.e. jan 1, apr 1, jul 1 or oct 1 of the given year)
+   *
+   * @since 4.2
+   */
+  public static void truncCalendarToQuarter(Calendar c) {
+    if (c == null) {
+      return;
+    }
+    final int month = c.get(Calendar.MONTH);
+    truncCalendarToYear(c);
+    int quarterMonth = Calendar.JANUARY;
+    switch (month) {
+      case Calendar.APRIL:
+      case Calendar.MAY:
+      case Calendar.JUNE:
+        quarterMonth = Calendar.APRIL;
+        break;
+      case Calendar.JULY:
+      case Calendar.AUGUST:
+      case Calendar.SEPTEMBER:
+        quarterMonth = Calendar.JULY;
+        break;
+      case Calendar.OCTOBER:
+      case Calendar.NOVEMBER:
+      case Calendar.DECEMBER:
+        quarterMonth = Calendar.OCTOBER;
+        break;
+    }
+    if (quarterMonth != Calendar.JANUARY) {
+      c.set(Calendar.MONTH, quarterMonth);
+    }
+  }
+
+  /**
+   * truncate the calendar to hour
+   *
+   * @since 4.2
+   */
+  public static void truncCalendarToHour(Calendar c) {
+    if (c == null) {
+      return;
+    }
     c.set(Calendar.MINUTE, 0);
     c.set(Calendar.SECOND, 0);
     c.set(Calendar.MILLISECOND, 0);
@@ -372,7 +481,7 @@ public final class DateUtility {
     Calendar c = Calendar.getInstance();
     c.setTime(d);
     c.add(Calendar.DATE, 1);
-    Date dNew = new Date(c.getTime().getTime());
+    Date dNew = c.getTime();
     return dNew;
   }
 
