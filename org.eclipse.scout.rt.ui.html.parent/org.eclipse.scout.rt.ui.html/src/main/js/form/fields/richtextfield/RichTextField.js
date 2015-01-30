@@ -15,7 +15,9 @@ scout.RichTextField.prototype._render = function($parent) {
   var $editorContainer = this.$container.appendDiv('rich-text-editor');
   var $editorContent = $editorContainer.appendDiv('rich-text-editor-content');
 
-  scout.scrollbars.install($editorContent);
+  scout.scrollbars.install($editorContent, {
+    updateScrollbarPos: false
+  });
   this.session.detachHelper.pushScrollable($editorContent);
 
   // create editable div
@@ -57,7 +59,9 @@ scout.RichTextField.prototype._render = function($parent) {
 
   $('.rich-text-command', this.$commandBar)
     .click((this._onCommandClick.bind(this)))
-    .mousedown(function(event) { event.preventDefault(); });
+    .mousedown(function(event) {
+      event.preventDefault();
+    });
 
   this.addStatus();
 };
@@ -100,6 +104,8 @@ scout.RichTextField.prototype._onCommandClick = function(event) {
 scout.RichTextField.prototype._onChange = function(event) {
   // update scrollbar
   scout.scrollbars.update(this.$field);
+  // maybe necessary scroll to selection
+  //  scout.scrollbars.scrollTo(this.$field, $divAtCursor);
 
   return;
 
@@ -137,9 +143,9 @@ scout.RichTextField.prototype._onChange = function(event) {
 
   // recursive function
 
-  function cleanHTML (element) {
+  function cleanHTML(element) {
     var content = element.childNodes,
-    i, c, t;
+      i, c, t;
 
     for (i = 0; i < content.length; i++) {
       c = content[i];

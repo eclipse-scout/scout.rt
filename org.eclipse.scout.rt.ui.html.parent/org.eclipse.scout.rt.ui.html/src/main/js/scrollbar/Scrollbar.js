@@ -7,7 +7,8 @@ scout.Scrollbar = function($parent, options) {
   this.defaultOptions = {
     axis: 'y',
     invertColors: false,
-    borderless: false
+    borderless: false,
+    updateScrollbarPos: true
   };
 
   this.options = $.extend({}, this.defaultOptions, options);
@@ -52,9 +53,9 @@ scout.Scrollbar = function($parent, options) {
   function scrollStart(event) {
     begin = (that.options.axis === 'x' ? event.pageX : event.pageY) - that._$thumb.offset()[that._dir];
     that._$thumb.addClass('scrollbar-thumb-move');
-    $(document).
-      on('mousemove', scrollEnd).
-      one('mouseup', scrollExit);
+    $(document)
+      .on('mousemove', scrollEnd)
+      .one('mouseup', scrollExit);
     return false;
   }
 
@@ -73,8 +74,13 @@ scout.Scrollbar = function($parent, options) {
 
 /**
  * Use this function (from outside) if size of tree content changes
+ * @force set to true to immediately update the scrollbar, If set to false, it will be queued in order to prevent unnecessary updates.
  */
-scout.Scrollbar.prototype.updateThumb = function() {
+scout.Scrollbar.prototype.updateThumb = function(force) {
+  if (force) {
+    this._updateThumbImpl();
+    return;
+  }
   // Thumb is (re)initialized, but only after the current thread has finished.
   // Additionally, the call is scheduled at most once. This prevents unnecessary
   // executions of the same code while the UI is updated.
@@ -88,7 +94,6 @@ scout.Scrollbar.prototype.updateThumb = function() {
   this._updateThumbPending = true;
 };
 
-
 /**
  * do not use this internal method
  */
@@ -98,7 +103,9 @@ scout.Scrollbar.prototype._updateThumbImpl = function() {
 
   // Reset thumb size and scrollbar position to make sure it does not extend the scrollSize
   this._$thumb.css(this._dim.toLowerCase(), 0);
-  this._$scrollbar.css(this._dir, 0);
+  if (this.options.updateScrollbarPos) {
+    this._$scrollbar.css(this._dir, 0);
+  }
 
   this._offsetSize = this._$parent[0]['offset' + this._dim];
   this._scrollSize = this._$parent[0]['scroll' + this._dim];
@@ -112,7 +119,6 @@ scout.Scrollbar.prototype._updateThumbImpl = function() {
   this._beginDefault = thumbSize / 2;
 
   // set location of thumb
-//  var posNew = (scrollPos / this._scrollSize) * this._offsetSize;
   var posNew = scrollPos / (this._scrollSize - this._offsetSize) * this._thumbRange;
   this._$thumb.css(this._dir, posNew);
 
@@ -122,7 +128,7 @@ scout.Scrollbar.prototype._updateThumbImpl = function() {
   } else {
     this._$scrollbar.css('visibility', 'visible');
   }
-  if (scrollPos > 0) {
+  if (this.options.updateScrollbarPos && scrollPos > 0) {
     this._$scrollbar.css(this._dir, scrollPos);
   }
 };
@@ -133,8 +139,10 @@ scout.Scrollbar.prototype.scrollTop = function(scrollTop) {
   }
   var posNew = scrollTop / (this._scrollSize - this._offsetSize) * this._thumbRange;
   this._$parent.scrollTop(scrollTop);
-  this._$scrollbar.css(this._dir, scrollTop);
   this._$thumb.css(this._dir, posNew);
+  if (this.options.updateScrollbarPos) {
+    this._$scrollbar.css(this._dir, scrollTop);
+  }
 };
 
 scout.Scrollbar.prototype._setThumb = function(posDiff) {
@@ -143,6 +151,8 @@ scout.Scrollbar.prototype._setThumb = function(posDiff) {
     scrollPos = (this._scrollSize - this._offsetSize) / this._thumbRange * posNew;
 
   this._$parent[this._scrollDir](scrollPos);
-  this._$scrollbar.css(this._dir, scrollPos);
   this._$thumb.css(this._dir, posNew);
+  if (this.options.updateScrollbarPos) {
+    this._$scrollbar.css(this._dir, scrollPos);
+  }
 };
