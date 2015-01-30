@@ -11,6 +11,7 @@ scout.Tree = function() {
   this._addAdapterProperties('menus');
 
   this._treeItemPaddingLeft = 20;
+  this._treeItemCheckBoxPaddingLeft = 20;
   this._treeItemPaddingLevel = 15;
 };
 scout.inherits(scout.Tree, scout.ModelAdapter);
@@ -55,6 +56,7 @@ scout.Tree.prototype._render = function($parent) {
   if (this.selectedNodeIds.length > 0) {
     this._renderSelection();
   }
+
 };
 
 scout.Tree.prototype._remove = function() {
@@ -197,7 +199,9 @@ scout.Tree.prototype.setNodesSelected = function(nodes, $nodes) {
 };
 
 scout.Tree.prototype._triggerNodesSelected = function(nodeIds) {
-  this.events.trigger('nodesSelected', {nodeIds: nodeIds});
+  this.events.trigger('nodesSelected', {
+    nodeIds: nodeIds
+  });
 };
 
 /**
@@ -243,6 +247,9 @@ scout.Tree.prototype._renderSelection = function($nodes) {
 };
 
 scout.Tree.prototype._computeTreeItemPaddingLeft = function(level, selected) {
+  if (this.checkable) {
+    return level * this._treeItemPaddingLevel + this._treeItemPaddingLeft + this._treeItemCheckBoxPaddingLeft;
+  }
   return level * this._treeItemPaddingLevel + this._treeItemPaddingLeft;
 };
 
@@ -476,6 +483,10 @@ scout.Tree.prototype._addNodes = function(nodes, $parent) {
 
     this._renderTreeItemControl($node);
 
+    if (this.checkable) {
+      this._renderTreeItemCheckbox($node, node);
+    }
+
     // append first node and successors
     if ($predecessor) {
       $node.insertAfter($predecessor);
@@ -497,10 +508,80 @@ scout.Tree.prototype._addNodes = function(nodes, $parent) {
   return $predecessor;
 };
 
+scout.Tree.prototype._renderNodeChecked = function(node) {
+  var $checkbox = $('#' + node.id + '-tree-checkable', this.$data);
+  $checkbox.prop('checked', node.checked);
+};
+
+scout.Tree.prototype.checkNodeAndRender = function(node, checked) {
+  this.checkNode(node, checked, true);
+};
+
+scout.Tree.prototype.checkNode = function(node, checked, render) {
+  if (node.checked === checked) {
+    return;
+  }
+  var updatedNodes = [];
+  if (!this.multiCheck && checked) {
+    for (var i = 0; i < this.nodes.length; i++) {
+      if (this.nodes[i].checked) {
+        this.nodes[i].checked = false;
+        updatedNodes.push(this.nodes[i]);
+        this._renderNodeChecked(this.nodes[i]);
+      }
+    }
+  }
+  node.checked = checked;
+  updatedNodes.push(node);
+  this.sendNodesChecked(updatedNodes);
+  if (render) {
+    this._renderNodeChecked(node);
+  }
+};
+
+scout.Tree.prototype.sendNodesChecked = function(nodes) {
+  var data = {
+    nodes: []
+  };
+
+  for (var i = 0; i < nodes.length; i++) {
+    data.nodes.push({
+      nodeId: nodes[i].id,
+      checked: nodes[i].checked
+    });
+  }
+
+  this.session.send(this.id, 'nodesChecked', data);
+};
+
 scout.Tree.prototype._renderTreeItemControl = function($node) {
-  $node.prependDiv('tree-item-control')
+  var $control = $node.prependDiv('tree-item-control')
     .on('click', '', this._onNodeControlClick.bind(this))
     .on('dblclick', '', this._onNodeControlClick.bind(this)); //_onNodeControlClick immediately returns with false to prevent bubbling
+
+  if (this.checkable) {
+    $control.addClass('checkable');
+  }
+};
+
+scout.Tree.prototype._renderTreeItemCheckbox = function($node, node) {
+  var that = this,
+    $controlItem = $node.prependDiv('tree-item-checkbox'),
+    forRefId = node.id + '-tree-checkable';
+  var $checkbox = $('<input>')
+    .attr('id', forRefId)
+    .attr('type', 'checkbox')
+    .appendTo($controlItem)
+    .prop('checked', node.checked);
+  $('<label>')
+    .attr('for', forRefId)
+    .appendTo($controlItem).
+  on('mouseup', node, onNodeChecked);
+
+  function onNodeChecked(event) {
+    var node = event.data;
+    that.checkNode(node, !node.checked);
+  }
 };
 
 scout.Tree.prototype._onNodeClick = function(event) {
@@ -659,10 +740,21 @@ scout.Tree.prototype.onModelAction = function(event) {
     this._onNodeExpanded(event.nodeId, event.expanded);
   } else if (event.type === 'nodeChanged') {
     this._onNodeChanged(event.nodeId, event);
+  } else if (event.type === 'nodesChecked') {
+    this._onNodesChecked(event.nodes);
   } else if (event.type === 'nodeFilterChanged') {
     this._onNodeFilterChanged(event.rootNode);
   } else {
     $.log.warn('Model event not handled. Widget: Tree. Event: ' + event.type + '.');
+  }
+};
+
+scout.Tree.prototype._onNodesChecked = function(nodes) {
+  for (var i = 0; i < nodes.length; i++) {
+    this._nodeMap[nodes[i].id].checked = nodes[i].checked;
+    if (this.rendered) {
+      this._renderNodeChecked(nodes[i]);
+    }
   }
 };
 

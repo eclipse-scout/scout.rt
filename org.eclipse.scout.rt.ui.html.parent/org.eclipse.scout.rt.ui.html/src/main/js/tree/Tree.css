@@ -40,6 +40,69 @@
   }
 }
 
+.tree-item-checkbox {
+  display: block;
+  position: absolute;
+  top: auto;
+  left: auto;
+  margin-top: -2px;
+  margin-left: -@tree-item-checkbox-size - 1px;
+  width: @tree-item-checkbox-size;
+  height: @tree-item-checkbox-size;
+
+  & label {
+    cursor: pointer;
+    display: inline-block;
+    position: relative;
+    font-size: 13px;
+  }
+
+  & label:before {
+    .checkboxLabelBefore(0px, 0px, 0px, 0px, -11px);
+  }
+
+  & label:hover:before {
+    .checkboxLabelBeforBorderHover;
+  }
+
+  & input[type=checkbox] {
+    /* no visiblity and display change to be focusable */
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    opacity: 0;
+  }
+
+  & input[type=checkbox]:disabled + label:hover:before {
+    .checkboxLabelBeforeDisabledBorder;
+  }
+
+  & input[type=checkbox]:focus + label:before {
+    .checkboxLabelBeforeFocus;
+  }
+
+  & input[type=checkbox]:checked + label:before {
+    .checkboxLabelBeforeChecked;
+  }
+
+  & label:before {
+    .checkboxLabelBeforeBorder;
+  }
+
+  & input[type=checkbox]:disabled + label:before {
+    .checkboxLabelBeforeDisabled;
+  }
+
+  & input[type=checkbox]:disabled + label {
+    .checkboxLabelDisabled;
+  }
+}
+
 .tree-item-control {
   display: block;
   position: absolute;
@@ -84,6 +147,10 @@
     /* The "imprecise" angle is a workround for firefox to prevent shifting the animation a little when the animation finishes. */
     /* See https://bugzilla.mozilla.org/show_bug.cgi?id=739176 */
     .transform(rotate(89.99deg));
+  }
+
+  &.checkable {
+    margin-left: -@tree-item-control-checkbox-size - 1px;
   }
 }
 

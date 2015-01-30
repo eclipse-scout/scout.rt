@@ -39,6 +39,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   public static final String EVENT_NODES_DELETED = "nodesDeleted";
   public static final String EVENT_NODES_INSERTED = "nodesInserted";
   public static final String EVENT_ALL_NODES_DELETED = "allNodesDeleted";
+  public static final String EVENT_NODES_CHECKED = "nodesChecked";
 
   public static final String PROP_NODE_ID = "nodeId";
   public static final String PROP_NODE_IDS = "nodeIds";
@@ -78,6 +79,18 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
         else {
           return false;
         }
+      }
+    });
+    putJsonProperty(new JsonProperty<T>(ITree.PROP_CHECKABLE, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isCheckable();
+      }
+    });
+    putJsonProperty(new JsonProperty<T>(ITree.PROP_MULTI_CHECK, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isMultiCheck();
       }
     });
   }
@@ -173,6 +186,9 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
       case TreeEvent.TYPE_NODES_SELECTED:
         handleModelNodesSelected(event.getNodes());
         break;
+      case TreeEvent.TYPE_NODES_CHECKED:
+        handleModelNodesChecked(event.getNodes());
+        break;
       case TreeEvent.TYPE_NODE_CHANGED:
         handleModelNodeChanged(event.getNode());
         break;
@@ -249,6 +265,21 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     addActionEvent(EVENT_NODES_SELECTED, jsonEvent);
   }
 
+  protected void handleModelNodesChecked(Collection<ITreeNode> modelNodes) {
+    JSONObject jsonEvent = new JSONObject();
+    JSONArray jsonNodes = new JSONArray();
+    for (ITreeNode node : modelNodes) {
+      String id = getOrCreateNodeId(node);
+      JSONObject json = new JSONObject();
+      putProperty(json, "id", id);
+      putProperty(json, "checked", node.isChecked());
+      JsonObjectUtility.filterDefaultValues(json, "TreeNode");
+      jsonNodes.put(json);
+    }
+    putProperty(jsonEvent, PROP_NODES, (jsonNodes));
+    addActionEvent(EVENT_NODES_CHECKED, jsonEvent);
+  }
+
   protected void handleModelNodeChanged(ITreeNode modelNode) {
     JSONObject jsonEvent = new JSONObject();
     putProperty(jsonEvent, PROP_NODE_ID, getOrCreateNodeId(modelNode));
@@ -318,6 +349,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     putProperty(json, "id", id);
     putProperty(json, PROP_EXPANDED, node.isExpanded());
     putProperty(json, "leaf", node.isLeaf());
+    putProperty(json, "checked", node.isChecked());
     putCellProperties(json, node.getCell());
     JSONArray jsonChildNodes = new JSONArray();
     if (node.getChildNodeCount() > 0) {
@@ -364,8 +396,22 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     else if (EVENT_NODE_EXPANDED.equals(event.getType())) {
       handleUiNodeExpanded(event, res);
     }
+    else if (EVENT_NODES_CHECKED.equals(event.getType())) {
+      handleUiNodesChecked(event, res);
+    }
     else {
       super.handleUiEvent(event, res);
+    }
+  }
+
+  protected void handleUiNodesChecked(JsonEvent event, JsonResponse res) {
+    CheckedInfo treeNodesChecked = jsonToCheckedInfo(event.getData());
+    addTreeEventFilterCondition(TreeEvent.TYPE_NODES_CHECKED, treeNodesChecked.allNodes);
+    if (treeNodesChecked.checkedNodes.size() > 0) {
+      getModel().getUIFacade().setNodesCheckedFromUI(treeNodesChecked.checkedNodes, true);
+    }
+    if (treeNodesChecked.uncheckedNodes.size() > 0) {
+      getModel().getUIFacade().setNodesCheckedFromUI(treeNodesChecked.uncheckedNodes, false);
     }
   }
 
@@ -413,5 +459,28 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   public void cleanUpEventFilters() {
     super.cleanUpEventFilters();
     m_treeEventFilter.removeAllConditions();
+  }
+
+  protected CheckedInfo jsonToCheckedInfo(JSONObject data) {
+    JSONArray jsonNodes = data.optJSONArray("nodes");
+    CheckedInfo checkInfo = new CheckedInfo();
+    for (int i = 0; i < jsonNodes.length(); i++) {
+      JSONObject jsonObject = jsonNodes.optJSONObject(i);
+      ITreeNode row = m_treeNodes.get(jsonObject.optString("nodeId"));
+      checkInfo.allNodes.add(row);
+      if (jsonObject.optBoolean("checked")) {
+        checkInfo.checkedNodes.add(row);
+      }
+      else {
+        checkInfo.uncheckedNodes.add(row);
+      }
+    }
+    return checkInfo;
+  }
+
+  private class CheckedInfo {
+    private ArrayList<ITreeNode> allNodes = new ArrayList<ITreeNode>();
+    private ArrayList<ITreeNode> checkedNodes = new ArrayList<ITreeNode>();
+    private ArrayList<ITreeNode> uncheckedNodes = new ArrayList<ITreeNode>();
   }
 }

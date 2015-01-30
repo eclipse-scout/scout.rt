@@ -9,3 +9,6 @@
 
 @tree-item-control-size: 15px;
 @outline-item-control-size: 20px;
+@tree-item-control-checkbox-size: 20px+@tree-item-control-size;
+@tree-item-checkbox-size: 20px;
+
