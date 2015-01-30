@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -74,6 +75,8 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   public static final String EVENT_RELOAD = "reload";
   public static final String EVENT_RESET_COLUMNS = "resetColumns";
   public static final String EVENT_ROWS_CHECKED = "rowsChecked";
+  public static final String EVENT_COLUMN_ORDER_CHANGED = "columnOrderChanged";
+  public static final String EVENT_COLUMN_HEADERS_UPDATED = "columnHeadersUpdated";
 
   public static final String PROP_ROW_IDS = "rowIds";
   public static final String PROP_ROW_ID = "rowId";
@@ -713,13 +716,26 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   protected void handleModelColumnOrderChanged() {
     JSONObject jsonEvent = new JSONObject();
     putProperty(jsonEvent, PROP_COLUMN_IDS, columnIdsToJson(getColumns()));
-    addActionEvent("columnOrderChanged", jsonEvent);
+    addActionEvent(EVENT_COLUMN_ORDER_CHANGED, jsonEvent);
   }
 
   protected void handleModelColumnHeadersUpdated(Collection<IColumn<?>> columns) {
     JSONObject jsonEvent = new JSONObject();
-    putProperty(jsonEvent, PROP_COLUMNS, columnsToJson(columns));
-    addActionEvent("columnHeadersUpdated", jsonEvent);
+    Collection<IColumn<?>> visibleColumns = filterVisibleColumns(columns);
+    if (visibleColumns.size() > 0) {
+      putProperty(jsonEvent, PROP_COLUMNS, columnsToJson(visibleColumns));
+      addActionEvent(EVENT_COLUMN_HEADERS_UPDATED, jsonEvent);
+    }
+  }
+
+  protected static Collection<IColumn<?>> filterVisibleColumns(Collection<IColumn<?>> columns) {
+    List<IColumn<?>> visibleColumns = new LinkedList<IColumn<?>>();
+    for (IColumn<?> column : columns) {
+      if (column.isVisible()) {
+        visibleColumns.add(column);
+      }
+    }
+    return visibleColumns;
   }
 
   @Override

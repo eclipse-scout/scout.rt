@@ -23,6 +23,7 @@ import java.util.Locale;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.ui.basic.table.HeaderCell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
@@ -227,6 +228,36 @@ public class JsonTableTest {
     List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(
         m_jsonSession.currentJsonResponse(), "columnOrderChanged");
     assertTrue(responseEvents.size() == 0);
+  }
+
+  /**
+   * Sends header update event if header cell has changed, but only for visible columns.
+   */
+  @Test
+  public void testColumnHeadersUpdatedEvent() throws ProcessingException, JSONException {
+    TableWith3Cols table = new TableWith3Cols();
+    table.fill(2);
+    table.initTable();
+    table.resetDisplayableColumns();
+    table.getColumnSet().getColumn(0).setDisplayable(false);
+
+    IColumn<?> column0 = table.getColumns().get(0);
+    IColumn<?> column1 = table.getColumns().get(1);
+    m_jsonSession.newJsonAdapter(table, null, null);
+
+    ((HeaderCell) column0.getHeaderCell()).setText("newHeaderText");
+    table.getColumnSet().updateColumn(column0);
+
+    List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(
+        m_jsonSession.currentJsonResponse(), JsonTable.EVENT_COLUMN_HEADERS_UPDATED);
+    assertTrue(responseEvents.size() == 0);
+
+    ((HeaderCell) column1.getHeaderCell()).setText("newHeaderText2");
+    table.getColumnSet().updateColumn(column1);
+
+    responseEvents = JsonTestUtility.extractEventsFromResponse(
+        m_jsonSession.currentJsonResponse(), JsonTable.EVENT_COLUMN_HEADERS_UPDATED);
+    assertTrue(responseEvents.size() == 1);
   }
 
   /**
