@@ -82,10 +82,19 @@ scout.FormFieldLayout.prototype.preferredLayoutSize = function($container) {
       .add(htmlContainer.getInsets())
       .add(htmlField.getMargins());
   } else {
-    prefSize = new scout.Dimension(formField.$fieldContainer.width(), formField.$fieldContainer.height());
+    prefSize = this.naturalSize(formField);
   }
   width += prefSize.width;
   height = Math.max(height, prefSize.height);
 
   return new scout.Dimension(width, height);
+};
+
+/**
+ * Returns the 'natural' size of the field - which means the current size of the field in the browser.
+ * By default we return the size of the $fieldContainer. Override this method when you must return
+ * another size (which is required when the field-content is scrollable).
+ */
+scout.FormFieldLayout.prototype.naturalSize = function(formField) {
+  return new scout.Dimension(formField.$fieldContainer.width(), formField.$fieldContainer.height());
 };

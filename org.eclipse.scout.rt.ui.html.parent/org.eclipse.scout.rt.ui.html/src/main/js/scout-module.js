@@ -94,6 +94,7 @@ __include("form/fields/radiobutton/RadioButton.js");
 __include("form/fields/radiobutton/RadioButtonGroup.js");
 __include("form/fields/labelfield/LabelField.js");
 __include("form/fields/imagefield/ImageField.js");
+__include("form/fields/imagefield/ImageFieldLayout.js");
 __include("form/fields/numberfield/NumberField.js");
 __include("form/fields/plannerfield/PlannerField.js");
 __include("form/fields/richtextfield/RichTextField.js");

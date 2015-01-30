@@ -124,5 +124,5 @@ scout.LogicalGridData.prototype._inheritWeightYRec = function(f) {
 };
 
 scout.LogicalGridData.prototype.isValidateRoot = function() {
-  return !this.useUiHeight && !this.useUiWidth;
+  return !this.useUiHeight && !this.useUiWidth && this.weighty === -1 && this.weightx === -1;
 };

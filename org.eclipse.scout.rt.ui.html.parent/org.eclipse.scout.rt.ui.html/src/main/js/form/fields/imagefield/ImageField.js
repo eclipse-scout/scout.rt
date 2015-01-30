@@ -17,12 +17,20 @@ scout.ImageField.prototype._render = function($parent) {
     this.session.detachHelper.pushScrollable(this.$fieldContainer);
   }
 
-  $field = $('<img>').appendTo(this.$fieldContainer);
+  $field = $('<img>')
+    .appendTo(this.$fieldContainer)
+    .on('load', this._onImageLoad.bind(this));
 
-  this.addContainer($parent, 'image-field');
+  this.addContainer($parent, 'image-field', new scout.ImageFieldLayout(this));
   this.addLabel();
   this.addField($field, this.$fieldContainer);
   this.addStatus();
+};
+
+scout.ImageField.prototype._onImageLoad = function(event) {
+  scout.scrollbars.update(this.$fieldContainer);
+  scout.HtmlComponent.get(this.$container).revalidate();
+  this.session.layoutValidator.validate();
 };
 
 scout.ImageField.prototype._renderProperties = function() {
@@ -50,6 +58,4 @@ scout.ImageField.prototype._renderImageOrId = function() {
   } else if (this.image) {
     this.$field.attr('src', scout.fields.imageUrl(this, this.image));
   }
-  this.$field.on('load', scout.scrollbars.update.bind(this, this.$fieldContainer));
-  // FIXME AWE: (image) IMG/DIV entfernen, wenn kein bild mehr da
 };
