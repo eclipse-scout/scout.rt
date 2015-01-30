@@ -46,12 +46,7 @@ scout.ImageField.prototype._renderImage = function() {
 
 scout.ImageField.prototype._renderImageOrId = function() {
   if (this.imageId) {
-    if (scout.strings.startsWith(this.imageId, "font:")) {
-      var icon = this.imageId.substr(5, 1);
-      // FIXME AWE: (font-icon) --> IMG entfernen, mit DIV ersetzen
-    } else {
-      this.$field.attr('src', scout.fields.imageUrl(this, this.imageId));
-    }
+    this.$field.attr('src', scout.fields.imageUrl(this, this.imageId));
   } else if (this.image) {
     this.$field.attr('src', scout.fields.imageUrl(this, this.image));
   }

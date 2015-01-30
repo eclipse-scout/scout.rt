@@ -18,13 +18,20 @@ import org.eclipse.scout.rt.ui.html.json.AbstractJsonAdapter;
 public class ImageUrlUtility {
 
   /**
-   * Returns a file-name for a configured logical icon-name. For instance input: 'bookmark', output: 'bookmark.png'.
+   * Returns a file-name for a configured logical icon-name or a font-based icon. For instance:
+   * <ul>
+   * <li>input 'bookmark' - output: '/icon/bookmark.png'</li>
+   * <li>input 'font:X' - output: 'font:X'</li>
+   * </ul>
    * This is required for the web client, since we need the file-type in order to determine the mime-type.
    * Use this method for image-files located in the /resource/icons directory.
    */
   public static String createIconUrl(AbstractJsonAdapter<?> jsonAdapter, String iconName) {
     if (iconName == null) {
       return null;
+    }
+    if (iconName.startsWith("font:")) {
+      return iconName;
     }
     IIconLocator iconLocator = jsonAdapter.getJsonSession().getClientSession().getIconLocator();
     IconSpec iconSpec = iconLocator.getIconSpec(iconName);
