@@ -8,7 +8,8 @@ scout.FormFieldLayout = function(formField) {
   scout.FormFieldLayout.parent.call(this);
   this.formField = formField;
   this.labelWidth = scout.HtmlEnvironment.fieldLabelWidth;
-  this.mandatoryIndicatorWidth = scout.HtmlEnvironment.mandatoryIndicatorWidth;
+  this.mandatoryIndicatorWidth = scout.HtmlEnvironment.fieldMandatoryIndicatorWidth;
+  this.statusWidth = scout.HtmlEnvironment.fieldStatusWidth;
   this.rowHeight = scout.HtmlEnvironment.formRowHeight;
 };
 scout.inherits(scout.FormFieldLayout, scout.AbstractLayout);
@@ -35,7 +36,8 @@ scout.FormFieldLayout.prototype.layout = function($container) {
   if (formField.$status && formField.statusVisible) {
     // can not check for $status.isVisible() since we want to reserve
     // space used for status even when $status is invisible.
-    formField.$status.cssHeight(this.rowHeight).cssLineHeight(this.rowHeight);
+    scout.graphics.setSize(formField.$status, this.statusWidth, this.rowHeight);
+    formField.$status.cssLineHeight(this.rowHeight);
     rightWidth += formField.$status.outerWidth(true);
   }
 
