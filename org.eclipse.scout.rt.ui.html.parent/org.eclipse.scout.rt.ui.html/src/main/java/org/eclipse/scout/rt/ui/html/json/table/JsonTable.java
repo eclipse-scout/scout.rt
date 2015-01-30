@@ -684,7 +684,9 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     JSONObject jsonEvent = new JSONObject();
     JSONArray jsonRows = new JSONArray();
     for (ITableRow row : modelRows) {
-      JSONObject jsonRow = tableRowToJson(row);
+      JSONObject jsonRow = new JSONObject();
+      putProperty(jsonRow, "id", getOrCreatedRowId(row));
+      putProperty(jsonRow, "checked", row.isChecked());
       jsonRows.put(jsonRow);
     }
     putProperty(jsonEvent, ROWS, jsonRows);
