@@ -171,17 +171,19 @@ public class InternalTableRow implements ITableRow, ICellObserver {
 
   @Override
   public boolean isSelected() {
-    return getTable().isSelectedRow(this);
+    return (getTable() == null ? false : getTable().isSelectedRow(this));
   }
 
   @Override
   public boolean isChecked() {
-    return getTable().getCheckedRows().contains(this);
+    return (getTable() == null ? false : getTable().getCheckedRows().contains(this));
   }
 
   @Override
   public void setChecked(boolean b) {
-    getTable().checkRow(this, b);
+    if (getTable() != null) {
+      getTable().checkRow(this, b);
+    }
   }
 
   @Override
@@ -251,13 +253,15 @@ public class InternalTableRow implements ITableRow, ICellObserver {
 
   @Override
   public List<Object> getKeyValues() {
-    int[] keyColumns = getTable().getColumnSet().getKeyColumnIndexes();
-    if (keyColumns.length == 0) {
-      keyColumns = getTable().getColumnSet().getAllColumnIndexes();
-    }
     List<Object> pk = new ArrayList<Object>();
-    for (int keyIndex : keyColumns) {
-      pk.add(getCell(keyIndex).getValue());
+    if (getTable() != null) {
+      int[] keyColumns = getTable().getColumnSet().getKeyColumnIndexes();
+      if (keyColumns.length == 0) {
+        keyColumns = getTable().getColumnSet().getAllColumnIndexes();
+      }
+      for (int keyIndex : keyColumns) {
+        pk.add(getCell(keyIndex).getValue());
+      }
     }
     return pk;
   }
