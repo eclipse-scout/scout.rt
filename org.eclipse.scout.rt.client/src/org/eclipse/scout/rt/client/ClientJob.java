@@ -322,6 +322,14 @@ public class ClientJob extends JobEx implements IClientSessionProvider {
     public IStatus getResult() {
       return null;
     }
+
+    /**
+     * implements org.eclipse.core.runtime.jobs.IJobChangeEvent.getJobGroupResult() which was introduced with eclipse
+     * mars. (@Override-Annotation is missing for backward-compatibility.)
+     */
+    public IStatus getJobGroupResult() {
+      return null;
+    }
   }
 
   /**
