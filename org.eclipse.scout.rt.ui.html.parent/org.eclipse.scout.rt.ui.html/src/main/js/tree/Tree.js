@@ -413,7 +413,7 @@ scout.Tree.prototype._onNodeChanged = function(nodeId, cell) {
   }
 };
 
-scout.Tree.prototype._onNodeFilterChanged = function(rootNode) {
+scout.Tree.prototype._onNodeFilterChanged = function() {
   // TODO BSH Tree | Replace nodes, restore selection and expansion
 };
 
@@ -743,7 +743,7 @@ scout.Tree.prototype.onModelAction = function(event) {
   } else if (event.type === 'nodesChecked') {
     this._onNodesChecked(event.nodes);
   } else if (event.type === 'nodeFilterChanged') {
-    this._onNodeFilterChanged(event.rootNode);
+    this._onNodeFilterChanged();
   } else {
     $.log.warn('Model event not handled. Widget: Tree. Event: ' + event.type + '.');
   }

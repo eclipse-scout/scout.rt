@@ -289,7 +289,6 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
 
   protected void handleModelNodeFilterChanged() {
     JSONObject jsonEvent = new JSONObject();
-    JsonObjectUtility.putProperty(jsonEvent, "rootNode", treeNodeToJson(getModel().getRootNode()));
     addActionEvent(EVENT_NODE_FILTER_CHANGED, jsonEvent);
   }
 
