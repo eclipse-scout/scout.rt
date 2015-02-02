@@ -568,7 +568,7 @@ scout.Tree.prototype._renderTreeItemCheckbox = function($node, node) {
   var that = this,
     $controlItem = $node.prependDiv('tree-item-checkbox'),
     forRefId = node.id + '-tree-checkable';
-  var $checkbox = $('<input>')
+  $('<input>')
     .attr('id', forRefId)
     .attr('type', 'checkbox')
     .appendTo($controlItem)

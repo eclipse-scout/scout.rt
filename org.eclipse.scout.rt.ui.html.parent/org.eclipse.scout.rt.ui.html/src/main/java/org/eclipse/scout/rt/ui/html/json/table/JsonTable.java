@@ -289,14 +289,14 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
 
   protected void handleUiRowChecked(JsonEvent event, JsonResponse res) {
     CheckedInfo tableRowsChecked = jsonToCheckeInfo(event.getData());
-    addTableEventFilterCondition(TableEvent.TYPE_ROWS_CHECKED).setRows(tableRowsChecked.allRows);
-    addTableEventFilterCondition(TableEvent.TYPE_ROWS_UPDATED).setRows(tableRowsChecked.allRows);
+    addTableEventFilterCondition(TableEvent.TYPE_ROWS_CHECKED).setRows(tableRowsChecked.m_allRows);
+    addTableEventFilterCondition(TableEvent.TYPE_ROWS_UPDATED).setRows(tableRowsChecked.m_allRows);
 
-    if (tableRowsChecked.checkedRows.size() > 0) {
-      getModel().getUIFacade().setCheckedRowsFromUI(tableRowsChecked.checkedRows, true);
+    if (tableRowsChecked.m_checkedRows.size() > 0) {
+      getModel().getUIFacade().setCheckedRowsFromUI(tableRowsChecked.m_checkedRows, true);
     }
-    if (tableRowsChecked.uncheckedRows.size() > 0) {
-      getModel().getUIFacade().setCheckedRowsFromUI(tableRowsChecked.uncheckedRows, false);
+    if (tableRowsChecked.m_uncheckedRows.size() > 0) {
+      getModel().getUIFacade().setCheckedRowsFromUI(tableRowsChecked.m_uncheckedRows, false);
     }
   }
 
@@ -560,12 +560,12 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     for (int i = 0; i < jsonRows.length(); i++) {
       JSONObject jsonObject = jsonRows.optJSONObject(i);
       ITableRow row = m_tableRows.get(jsonObject.optString("rowId"));
-      checkInfo.allRows.add(row);
+      checkInfo.m_allRows.add(row);
       if (jsonObject.optBoolean("checked")) {
-        checkInfo.checkedRows.add(row);
+        checkInfo.m_checkedRows.add(row);
       }
       else {
-        checkInfo.uncheckedRows.add(row);
+        checkInfo.m_uncheckedRows.add(row);
       }
     }
     return checkInfo;
@@ -756,9 +756,9 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   }
 
   private class CheckedInfo {
-    private ArrayList<ITableRow> allRows = new ArrayList<ITableRow>();
-    private ArrayList<ITableRow> checkedRows = new ArrayList<ITableRow>();
-    private ArrayList<ITableRow> uncheckedRows = new ArrayList<ITableRow>();
+    private ArrayList<ITableRow> m_allRows = new ArrayList<ITableRow>();
+    private ArrayList<ITableRow> m_checkedRows = new ArrayList<ITableRow>();
+    private ArrayList<ITableRow> m_uncheckedRows = new ArrayList<ITableRow>();
   }
 
   @Override

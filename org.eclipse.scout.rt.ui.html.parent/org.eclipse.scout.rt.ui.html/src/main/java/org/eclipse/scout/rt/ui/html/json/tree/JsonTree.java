@@ -406,12 +406,12 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
 
   protected void handleUiNodesChecked(JsonEvent event, JsonResponse res) {
     CheckedInfo treeNodesChecked = jsonToCheckedInfo(event.getData());
-    addTreeEventFilterCondition(TreeEvent.TYPE_NODES_CHECKED, treeNodesChecked.allNodes);
-    if (treeNodesChecked.checkedNodes.size() > 0) {
-      getModel().getUIFacade().setNodesCheckedFromUI(treeNodesChecked.checkedNodes, true);
+    addTreeEventFilterCondition(TreeEvent.TYPE_NODES_CHECKED, treeNodesChecked.m_allNodes);
+    if (treeNodesChecked.m_checkedNodes.size() > 0) {
+      getModel().getUIFacade().setNodesCheckedFromUI(treeNodesChecked.m_checkedNodes, true);
     }
-    if (treeNodesChecked.uncheckedNodes.size() > 0) {
-      getModel().getUIFacade().setNodesCheckedFromUI(treeNodesChecked.uncheckedNodes, false);
+    if (treeNodesChecked.m_uncheckedNodes.size() > 0) {
+      getModel().getUIFacade().setNodesCheckedFromUI(treeNodesChecked.m_uncheckedNodes, false);
     }
   }
 
@@ -467,20 +467,20 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     for (int i = 0; i < jsonNodes.length(); i++) {
       JSONObject jsonObject = jsonNodes.optJSONObject(i);
       ITreeNode row = m_treeNodes.get(jsonObject.optString("nodeId"));
-      checkInfo.allNodes.add(row);
+      checkInfo.m_allNodes.add(row);
       if (jsonObject.optBoolean("checked")) {
-        checkInfo.checkedNodes.add(row);
+        checkInfo.m_checkedNodes.add(row);
       }
       else {
-        checkInfo.uncheckedNodes.add(row);
+        checkInfo.m_uncheckedNodes.add(row);
       }
     }
     return checkInfo;
   }
 
   private class CheckedInfo {
-    private ArrayList<ITreeNode> allNodes = new ArrayList<ITreeNode>();
-    private ArrayList<ITreeNode> checkedNodes = new ArrayList<ITreeNode>();
-    private ArrayList<ITreeNode> uncheckedNodes = new ArrayList<ITreeNode>();
+    private ArrayList<ITreeNode> m_allNodes = new ArrayList<ITreeNode>();
+    private ArrayList<ITreeNode> m_checkedNodes = new ArrayList<ITreeNode>();
+    private ArrayList<ITreeNode> m_uncheckedNodes = new ArrayList<ITreeNode>();
   }
 }
