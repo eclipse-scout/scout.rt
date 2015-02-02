@@ -37,6 +37,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeExtension;
+import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeAutoCheckChildsNodesChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeDecorateCellChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeDisposeTreeChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeDragNodeChain;
@@ -108,6 +109,8 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   private IContributionOwner m_contributionHolder;
   private final ObjectExtensions<AbstractTree, ITreeExtension<? extends AbstractTree>> m_objectExtensions;
   private List<IMenu> m_currentNodeMenus;
+
+  private boolean m_autoCheckChildNodes;
 
   public AbstractTree() {
     this(true);
@@ -284,6 +287,26 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     return false;
   }
 
+  /**
+   * Moved from AbstractTreeBox to AbstractTree
+   * Checks / unchecks all visible child nodes if the parent node gets checked / unchecked.
+   * <p>
+   * Makes only sense if
+   *
+   * <pre>
+   * {@link #getConfiguredCheckable()}
+   * </pre>
+   *
+   * is set to true.
+   *
+   * @since 5.1
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(100)
+  protected boolean getConfiguredAutoCheckChildNodes() {
+    return false;
+  }
+
   private List<Class<? extends IKeyStroke>> getConfiguredKeyStrokes() {
     Class<?>[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     List<Class<IKeyStroke>> fca = ConfigurationUtility.filterClasses(dca, IKeyStroke.class);
@@ -294,6 +317,16 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     Class<?>[] dca = ConfigurationUtility.getDeclaredPublicClasses(getClass());
     List<Class<IMenu>> filtered = ConfigurationUtility.filterClasses(dca, IMenu.class);
     return ConfigurationUtility.removeReplacedClasses(filtered);
+  }
+
+  @Override
+  public boolean isAutoCheckChildNodes() {
+    return m_autoCheckChildNodes;
+  }
+
+  @Override
+  public void setAutoCheckChildNodes(boolean b) {
+    m_autoCheckChildNodes = b;
   }
 
   @ConfigOperation
@@ -413,6 +446,18 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   protected void execNodesChecked(List<ITreeNode> nodes) throws ProcessingException {
   }
 
+  @ConfigOperation
+  protected void execAutoCheckChildNodes(List<ITreeNode> nodes) throws ProcessingException {
+    for (ITreeNode node : nodes) {
+      for (ITreeNode childNode : node.getFilteredChildNodes()) {
+        if (childNode.isEnabled() && childNode.isVisible()) {
+          childNode.setChecked(node.isChecked());
+        }
+        interceptAutoCheckChildNodes(CollectionUtility.arrayList(childNode));
+      }
+    }
+  }
+
   protected final void interceptInitConfig() {
     m_objectExtensions.initConfig(createLocalExtension(), new Runnable() {
       @Override
@@ -442,6 +487,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     setRootHandlesVisible(getConfiguredRootHandlesVisible());
     setScrollToSelection(getConfiguredScrollToSelection());
     setSaveAndRestoreScrollbars(getConfiguredSaveAndRestoreScrollbars());
+    setAutoCheckChildNodes(getConfiguredAutoCheckChildNodes());
     setRootNode(new AbstractTreeNode() {
     });
     // add Convenience observer for drag & drop callbacks and event history
@@ -1262,6 +1308,14 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       }
     }
     if (changedNodes.size() > 0) {
+      if (isAutoCheckChildNodes()) {
+        try {
+          interceptAutoCheckChildNodes(nodes);
+        }
+        catch (ProcessingException ex) {
+          SERVICES.getService(IExceptionHandlerService.class).handleException(ex);
+        }
+      }
       fireNodesChecked(changedNodes);
     }
   }
@@ -2098,9 +2152,9 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
   }
 
-  private void fireNodesChecked(List<? extends ITreeNode> children) {
-    if (CollectionUtility.hasElements(children)) {
-      fireTreeEventInternal(new TreeEvent(this, TreeEvent.TYPE_NODES_CHECKED, CollectionUtility.hashSet(children)));
+  private void fireNodesChecked(List<? extends ITreeNode> nodes) {
+    if (CollectionUtility.hasElements(nodes)) {
+      fireTreeEventInternal(new TreeEvent(this, TreeEvent.TYPE_NODES_CHECKED, nodes));
     }
   }
 
@@ -2212,6 +2266,12 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     List<? extends ITreeExtension<? extends AbstractTree>> extensions = getAllExtensions();
     TreeNodesCheckedChain chain = new TreeNodesCheckedChain(extensions);
     chain.execNodesChecked(nodes);
+  }
+
+  protected void interceptAutoCheckChildNodes(List<? extends ITreeNode> nodes) throws ProcessingException {
+    List<? extends ITreeExtension<? extends AbstractTree>> extensions = getAllExtensions();
+    TreeAutoCheckChildsNodesChain chain = new TreeAutoCheckChildsNodesChain(extensions);
+    chain.execAutoCheckChildNodes(nodes);
   }
 
   private void fireNodeAction(ITreeNode node) {
@@ -2935,6 +2995,10 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       getOwner().execNodesChecked(CollectionUtility.arrayList(nodes));
     }
 
+    @Override
+    public void execAutoCheckChildNodes(TreeAutoCheckChildsNodesChain chain, Collection<? extends ITreeNode> nodes) throws ProcessingException {
+      getOwner().execAutoCheckChildNodes(CollectionUtility.arrayList(nodes));
+    }
   }
 
   protected final void interceptDrop(ITreeNode node, TransferObject t) throws ProcessingException {

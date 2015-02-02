@@ -5,7 +5,6 @@ import java.util.Set;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.AbstractValueFieldExtension;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.treebox.TreeBoxChains.TreeBoxAutoCheckChildNodesChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.treebox.TreeBoxChains.TreeBoxFilterLookupResultChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.treebox.TreeBoxChains.TreeBoxFilterNewNodeChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.treebox.TreeBoxChains.TreeBoxLoadChildNodesChain;
@@ -39,10 +38,5 @@ public abstract class AbstractTreeBoxExtension<T, OWNER extends AbstractTreeBox<
   @Override
   public void execFilterLookupResult(TreeBoxFilterLookupResultChain<T> chain, ILookupCall<T> call, List<ILookupRow<T>> result) throws ProcessingException {
     chain.execFilterLookupResult(call, result);
-  }
-
-  @Override
-  public void execAutoCheckChildNodes(TreeBoxAutoCheckChildNodesChain<T> chain, ITreeNode node, boolean value) {
-    chain.execAutoCheckChildNodes(node, value);
   }
 }

@@ -312,7 +312,7 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
                 }
                 break;
               }
-              case TableEvent.TYPE_ROWS_UPDATED: {
+              case TableEvent.TYPE_ROWS_CHECKED: {
                 if (getTable().isCheckable()) {
                   syncTableToValue();
                 }

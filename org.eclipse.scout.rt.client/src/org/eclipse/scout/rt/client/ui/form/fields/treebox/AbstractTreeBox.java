@@ -34,7 +34,6 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.treebox.ITreeBoxExtension;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.treebox.TreeBoxChains.TreeBoxAutoCheckChildNodesChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.treebox.TreeBoxChains.TreeBoxFilterLookupResultChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.treebox.TreeBoxChains.TreeBoxFilterNewNodeChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.treebox.TreeBoxChains.TreeBoxLoadChildNodesChain;
@@ -75,7 +74,6 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
   private Class<? extends ICodeType<?, T>> m_codeTypeClass;
   private boolean m_valueTreeSyncActive;
   private boolean m_autoExpandAll;
-  private boolean m_autoCheckChildNodes;
   private boolean m_loadIncremental;
   private ITreeNodeFilter m_activeNodesFilter;
   private ITreeNodeFilter m_checkedNodesFilter;
@@ -303,7 +301,6 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
     setFilterCheckedNodes(getConfiguredFilterCheckedNodes());
     setFilterCheckedNodesValue(getConfiguredFilterCheckedNodes());
     setAutoExpandAll(getConfiguredAutoExpandAll());
-    setAutoCheckChildNodes(getConfiguredAutoCheckChildNodes());
     setLoadIncremental(getConfiguredLoadIncremental());
     try {
       List<ITree> contributedFields = m_contributionHolder.getContributionsByClass(ITree.class);
@@ -335,11 +332,6 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
                   }
                   case TreeEvent.TYPE_NODES_CHECKED: {
                     if (getTree().isCheckable()) {
-                      if (isAutoCheckChildNodes() && e.getNodes() != null) {
-                        for (ITreeNode node : e.getNodes()) {
-                          interceptAutoCheckChildNodes(node, node.isChecked());
-                        }
-                      }
                       syncTreeToValue();
                     }
                     break;
@@ -361,6 +353,7 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
     catch (Exception e) {
       SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException("error creating instance of class '" + getConfiguredTree().getName() + "'.", e));
     }
+    getTree().setAutoCheckChildNodes(getConfiguredAutoCheckChildNodes());
     if (getConfiguredLookupCall() != null) {
       try {
         ILookupCall<T> call = getConfiguredLookupCall().newInstance();
@@ -820,12 +813,12 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
 
   @Override
   public boolean isAutoCheckChildNodes() {
-    return m_autoCheckChildNodes;
+    return getTree().isAutoCheckChildNodes();
   }
 
   @Override
   public void setAutoCheckChildNodes(boolean b) {
-    m_autoCheckChildNodes = b;
+    getTree().setAutoCheckChildNodes(b);
   }
 
   @SuppressWarnings("unchecked")
@@ -943,16 +936,6 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
     finally {
       getTree().setTreeChanging(false);
       m_valueTreeSyncActive = false;
-    }
-  }
-
-  @ConfigOperation
-  protected void execAutoCheckChildNodes(ITreeNode node, boolean value) {
-    for (ITreeNode childNode : node.getFilteredChildNodes()) {
-      if (childNode.isEnabled() && childNode.isVisible()) {
-        childNode.setChecked(value);
-      }
-      interceptAutoCheckChildNodes(childNode, value);
     }
   }
 
@@ -1171,12 +1154,6 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
     chain.execFilterLookupResult(call, result);
   }
 
-  protected final void interceptAutoCheckChildNodes(ITreeNode node, boolean value) {
-    List<? extends ITreeBoxExtension<T, ? extends AbstractTreeBox<T>>> extensions = getAllExtensions();
-    TreeBoxAutoCheckChildNodesChain<T> chain = new TreeBoxAutoCheckChildNodesChain<T>(extensions);
-    chain.execAutoCheckChildNodes(node, value);
-  }
-
   protected static class LocalTreeBoxExtension<T, OWNER extends AbstractTreeBox<T>> extends LocalValueFieldExtension<Set<T>, OWNER> implements ITreeBoxExtension<T, OWNER> {
 
     public LocalTreeBoxExtension(OWNER owner) {
@@ -1201,11 +1178,6 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
     @Override
     public void execFilterLookupResult(TreeBoxFilterLookupResultChain<T> chain, ILookupCall<T> call, List<ILookupRow<T>> result) throws ProcessingException {
       getOwner().execFilterLookupResult(call, result);
-    }
-
-    @Override
-    public void execAutoCheckChildNodes(TreeBoxAutoCheckChildNodesChain<T> chain, ITreeNode node, boolean value) {
-      getOwner().execAutoCheckChildNodes(node, value);
     }
   }
 

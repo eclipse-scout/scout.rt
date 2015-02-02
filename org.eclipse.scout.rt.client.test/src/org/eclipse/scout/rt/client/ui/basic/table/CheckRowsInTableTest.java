@@ -44,31 +44,6 @@ public class CheckRowsInTableTest {
   }
 
   @Test
-  public void testSetCheckedOnDisabledRow() throws Exception {
-    P_Table table = createTable(true);
-    ITableRow row = table.getRow(0);
-    row.setEnabled(false);
-    table.checkRow(row, true);
-    assertTrue(!row.isChecked());
-  }
-
-  @Test
-  public void testCheckAllWithDisabledRow() throws Exception {
-    P_Table table = createTable(true);
-    ITableRow disabledRow = table.getRow(0);
-    disabledRow.setEnabled(false);
-    table.checkAllRows();
-    for (ITableRow row : table.getRows()) {
-      if (row.equals(disabledRow)) {
-        assertTrue(!row.isChecked());
-      }
-      else {
-        assertTrue(row.isChecked());
-      }
-    }
-  }
-
-  @Test
   public void testCheckAllWithDisabledRowSingleSelect() throws Exception {
     P_Table table = createTable(false);
     ITableRow disabledRow = table.getRow(0);

@@ -105,20 +105,4 @@ public final class TreeBoxChains {
     }
   }
 
-  public static class TreeBoxAutoCheckChildNodesChain<T> extends AbstractTreeBoxChain<T> {
-
-    public TreeBoxAutoCheckChildNodesChain(List<? extends ITreeBoxExtension<T, ? extends AbstractTreeBox<T>>> extensions) {
-      super(extensions);
-    }
-
-    public void execAutoCheckChildNodes(final ITreeNode node, final boolean value) {
-      MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
-        @Override
-        protected void callMethod(ITreeBoxExtension<T, ? extends AbstractTreeBox<T>> next) {
-          next.execAutoCheckChildNodes(TreeBoxAutoCheckChildNodesChain.this, node, value);
-        }
-      };
-      callChain(methodInvocation, node, value);
-    }
-  }
 }

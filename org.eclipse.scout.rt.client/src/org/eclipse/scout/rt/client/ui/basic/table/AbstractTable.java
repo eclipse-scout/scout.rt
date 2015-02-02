@@ -2403,7 +2403,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       if (!isMultiCheck() && value) {
         ITableRow rowToCheck = null;
         for (ITableRow row : rows) {
-          if (row.isEnabled() && row.isChecked() != value) {
+          if (row.isChecked() != value) {
             rowToCheck = row;
             break;
           }
@@ -2425,7 +2425,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       else {
         ArrayList<ITableRow> rowsChecked = new ArrayList<ITableRow>();
         for (ITableRow row : rows) {
-          if (row.isEnabled() && row.isChecked() != value) {
+          if (row.isChecked() != value) {
             if (value) {
               m_checkedRows.add(row);
             }
@@ -3579,6 +3579,10 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
               sortedCoalescedMap.put(40, coalesceTableEvents(subList, true, false));// merge
               break;
             }
+            case TableEvent.TYPE_ROWS_CHECKED: {
+              sortedCoalescedMap.put(45, coalesceTableEvents(subList, true, false));// merge
+              break;
+            }
             case TableEvent.TYPE_COLUMN_HEADERS_UPDATED: {
               sortedCoalescedMap.put(60, coalesceTableEvents(subList, false, false));// merge
               break;
@@ -3966,8 +3970,8 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     fireTableEventInternal(new TableEvent(this, TableEvent.TYPE_ROWS_SELECTED, rows));
   }
 
-  private void fireRowsChecked(List<? extends ITableRow> row) {
-    fireTableEventInternal(new TableEvent(this, TableEvent.TYPE_ROWS_CHECKED, CollectionUtility.arrayList(row)));
+  private void fireRowsChecked(List<? extends ITableRow> rows) {
+    fireTableEventInternal(new TableEvent(this, TableEvent.TYPE_ROWS_CHECKED, rows));
   }
 
   private void fireRowClick(ITableRow row, MouseButton mouseButton) {

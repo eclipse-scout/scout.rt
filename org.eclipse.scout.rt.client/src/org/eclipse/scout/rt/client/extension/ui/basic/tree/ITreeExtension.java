@@ -16,6 +16,7 @@ import java.util.Collection;
 
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeAutoCheckChildsNodesChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeDecorateCellChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeDisposeTreeChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeDragNodeChain;
@@ -63,5 +64,7 @@ public interface ITreeExtension<OWNER extends AbstractTree> extends IExtension<O
   void execDecorateCell(TreeDecorateCellChain chain, ITreeNode node, Cell cell) throws ProcessingException;
 
   TransferObject execDrag(TreeDragNodeChain chain, ITreeNode node) throws ProcessingException;
+
+  void execAutoCheckChildNodes(TreeAutoCheckChildsNodesChain chain, Collection<? extends ITreeNode> nodes) throws ProcessingException;
 
 }

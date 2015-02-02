@@ -229,6 +229,10 @@ public interface ITree extends IPropertyObserver, IDNDSupport {
 
   Set<ITreeNode> getSelectedNodes();
 
+  boolean isAutoCheckChildNodes();
+
+  void setAutoCheckChildNodes(boolean b);
+
   boolean isSelectedNode(ITreeNode node);
 
   void selectNode(ITreeNode node);
