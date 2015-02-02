@@ -114,3 +114,14 @@ Added ISearchOutline:
 The intention of the search outline is to provide a search over several table pages.
 The AbstractSearchOutline provides a frame, the search itself has to be implemented by the project.
 In order to use it add the SearchOutline to the desktop using getConfiguredOutlines (don't create an outlineViewButton).
+
+
+NBU 02.02.2015
+InternalTableRow / AbstractTable: checked state of a row is moved to the table. The TYPE_ROWS_UPDATED is no longer used to notifiy
+about rows checked. Instead there is a event TYPE_ROWS_CHECKED which is fired when rows are checked or unchecked. Also there is a
+new Method on the model which is executed when rows are checked-> execRowsChecked. This method is also available in extensions.
+AbstractTreeNode / AbstractTree / AbstractTreeBox: checked state of a row is moved to the tree. The TYPE_NODE_UPDATED is no longer used to notifiy
+about node checked. Instead there is a event TYPE_NODES_CHECKED which is fired when nodes are checked or unchecked. Also there is a
+new Method on the model which is executed when nodes are checked-> execNodessChecked. This method is also available in extensions.
+Also the implementation to check child nodes of a tree when a parent is checked is moved from the AbstractTreeBox to the tree. But the configuration
+can be done on the AbstractTreeBox.
