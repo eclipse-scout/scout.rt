@@ -1127,7 +1127,7 @@ scout.Table.prototype.filter = function() {
 
   this._triggerRowsFiltered(rowCount, this.filteredBy());
 
-  $(':animated', that._$scrollable).promise().done(function() {
+  $(':animated', that.$data).promise().done(function() {
     that._group();
   });
 };
