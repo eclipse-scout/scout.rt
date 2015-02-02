@@ -58,10 +58,20 @@ describe("Table", function() {
 
     });
 
+    /**
+     * Test assumes that default values for horiz. alignment are set on cell object.
+     */
     it("considers horizontal alignment", function() {
       var model = helper.createModelFixture(3, 2);
       model.columns[1].horizontalAlignment = 0;
       model.columns[2].horizontalAlignment = 1;
+
+      model.rows[0].cells[1].horizontalAlignment = 0;
+      model.rows[0].cells[2].horizontalAlignment = 1;
+
+      model.rows[1].cells[1].horizontalAlignment = 0;
+      model.rows[1].cells[2].horizontalAlignment = 1;
+
       var table = helper.createTable(model);
       table.render(session.$entryPoint);
 
@@ -81,6 +91,7 @@ describe("Table", function() {
       expect($headerItem1.css('text-align')).toBe('center');
       expect($cells0.eq(1).css('text-align')).toBe('center');
       expect($cells1.eq(1).css('text-align')).toBe('center');
+
       expect($headerItem2.css('text-align')).toBe('right');
       expect($cells0.eq(2).css('text-align')).toBe('right');
       expect($cells1.eq(2).css('text-align')).toBe('right');
@@ -282,17 +293,19 @@ describe("Table", function() {
         prepareTable();
         render(table);
 
+        // reset logic is only applied on columns used as sort-column, that's why
+        // we must set the sortActive flag here.
+        table.columns[1].sortActive = true;
+
         table.sort($header0, 'desc');
         expect(table.columns[0].sortActive).toBe(true);
         expect(table.columns[0].sortAscending).toBe(false);
         expect(table.columns[0].sortIndex).toBe(0);
-        expect(table.columns[1].sortActive).toBeFalsy();
-        expect(table.columns[1].sortAscending).toBeFalsy();
+        expect(table.columns[1].sortActive).toBe(false);
         expect(table.columns[1].sortIndex).toBeUndefined();
 
         table.sort($header1, 'desc');
-        expect(table.columns[0].sortActive).toBeFalsy();
-        expect(table.columns[0].sortAscending).toBeFalsy();
+        expect(table.columns[0].sortActive).toBe(false);
         expect(table.columns[0].sortIndex).toBeUndefined();
         expect(table.columns[1].sortActive).toBe(true);
         expect(table.columns[1].sortAscending).toBe(false);
@@ -302,6 +315,10 @@ describe("Table", function() {
       it("sets sortIndex", function() {
         prepareTable();
         render(table);
+
+        // reset logic is only applied on columns used as sort-column, that's why
+        // we must set the sortActive flag here.
+        table.columns[1].sortActive = true;
 
         table.sort($header0, 'desc');
         expect(table.columns[0].sortIndex).toBe(0);
@@ -320,6 +337,10 @@ describe("Table", function() {
         prepareTable();
         render(table);
 
+        // reset logic is only applied on columns used as sort-column, that's why
+        // we must set the sortActive flag here.
+        table.columns[1].sortActive = true;
+
         table.sort($header0, 'desc');
         expect(table.columns[0].sortIndex).toBe(0);
         expect(table.columns[1].sortIndex).toBeUndefined();
@@ -333,7 +354,7 @@ describe("Table", function() {
         expect(table.columns[1].sortIndex).toBe(1);
         expect(table.columns[2].sortIndex).toBe(2);
 
-        //Remove second column -> sortIndex of 3rd column gets adjusted
+        // Remove second column -> sortIndex of 3rd column gets adjusted
         table.sort($header1, 'desc', false, true);
         expect(table.columns[0].sortIndex).toBe(0);
         expect(table.columns[1].sortIndex).toBeUndefined();
@@ -345,7 +366,7 @@ describe("Table", function() {
       prepareTable();
       render(table);
       spyOn(scout.device, "supportsInternationalization").and.returnValue(true);
-      //Make sure sorting is not executed because it does not work with phantomJS
+      // Make sure sorting is not executed because it does not work with phantomJS
       spyOn(table, "_sort").and.returnValue(true);
 
       table.sort($header0, 'desc');

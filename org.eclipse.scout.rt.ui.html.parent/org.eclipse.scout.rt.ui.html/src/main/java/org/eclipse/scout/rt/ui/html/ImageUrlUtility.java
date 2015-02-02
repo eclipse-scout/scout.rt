@@ -35,7 +35,10 @@ public class ImageUrlUtility {
     }
     IIconLocator iconLocator = jsonAdapter.getJsonSession().getClientSession().getIconLocator();
     IconSpec iconSpec = iconLocator.getIconSpec(iconName);
-    return "/icon/" + iconSpec.getName();
+    if (iconSpec != null) {
+      return "/icon/" + iconSpec.getName();
+    }
+    return null; // may happen, when no icon is available for the requested iconName
   }
 
   /**

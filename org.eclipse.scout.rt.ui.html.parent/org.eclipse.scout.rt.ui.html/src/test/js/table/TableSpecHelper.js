@@ -63,15 +63,18 @@ TableSpecHelper.prototype.createModelRowByValues = function(id, values) {
 };
 
 TableSpecHelper.prototype.createModelColumn = function(id, text, type) {
-  return {
+  var column = {
     "id": id,
     "text": text,
     "type": type
   };
+  scout.defaultValues.applyTo(column, 'TableColumn');
+  return column;
 };
 
 TableSpecHelper.prototype.createModelCell = function(text, value) {
   var cell = {};
+  scout.defaultValues.applyTo(cell, 'Cell');
   if (text) {
     cell.text = text;
   }

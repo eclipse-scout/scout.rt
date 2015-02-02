@@ -42,15 +42,12 @@ scout.TableMenuItemsOrder = {
    * That's why we must set some of the default model values here.
    */
   createSeparator: function() {
-    // FIXME AWE/BSH: (default-values) an dieser stelle laden
     // FIXME AWE: sequence nr. für client seitige adapter
-    var s = new scout.Menu();
-    s.session = {};
-    s.separator = true;
-    s.enabled = true;
-    s.visible = true;
-    s.selected = false;
-    return s;
+    var separator = new scout.Menu();
+    scout.defaultValues.applyTo(separator, 'Menu');
+    separator.session = {};
+    separator.separator = true;
+    return separator;
   }
 };
 

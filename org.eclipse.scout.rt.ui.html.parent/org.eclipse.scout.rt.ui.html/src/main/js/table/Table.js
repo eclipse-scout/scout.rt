@@ -688,19 +688,17 @@ scout.Table.prototype.getCellText = function(column, row) {
 };
 
 scout.Table.prototype.getCellStyle = function(column, row) {
-  var cell = row.cells[column.index];
+  var style, hAlign,
+    cell = row.cells[column.index],
+    width = column.width;
 
-  var width = column.width;
   if (width === 0) {
     return 'display: none;';
   }
-  var style = 'min-width: ' + width + 'px; max-width: ' + width + 'px; ';
 
-  var hAlign = scout.Table.parseHorizontalAlignment(column.horizontalAlignment);
+  hAlign = scout.Table.parseHorizontalAlignment(cell.horizontalAlignment);
+  style = 'min-width: ' + width + 'px; max-width: ' + width + 'px; ';
   if (typeof cell === 'object' && cell !== null) {
-    if (cell.horizontalAlignment) {
-      hAlign = scout.Table.parseHorizontalAlignment(cell.horizontalAlignment);
-    }
     if (cell.foregroundColor) {
       style += 'color: #' + cell.foregroundColor + '; ';
     }
@@ -724,8 +722,7 @@ scout.Table.prototype.getCellStyle = function(column, row) {
     }
     // TODO BSH Table | iconId, editable, errorStatus
   }
-  style += (hAlign === 'left' ? '' : 'text-align: ' + hAlign + '; ');
-  return style;
+  return style + (hAlign === 'left' ? '' : 'text-align: ' + hAlign + '; ');
 };
 
 scout.Table.prototype.getCellTooltipText = function(column, row) {

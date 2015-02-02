@@ -53,6 +53,22 @@
   <script type="text/javascript">
     <!-- This is usually done in index.html, but here, we have to do it manually -->
     scout.logging.init();
+
+    jQuery.ajax({
+      async: false,
+      type: 'GET',
+      dataType: 'text',
+      contentType: 'text/plain; charset=UTF-8',
+      cache: false,
+      url: 'WebContent/res/defaultValues.json',
+      data: ''
+    }).done(function(data) {
+      var dataWithoutComments = removeCommentsFromJson(data),
+        dataObj = JSON.parse(dataWithoutComments);
+      scout.defaultValues._loadDefaultsConfiguration(dataObj);
+    }).fail(function(jqXHR, textStatus, errorThrown) {
+      throw new Error('Error while loading default values: ' + errorThrown);
+    });
   </script>
 
   $specScriptTags$

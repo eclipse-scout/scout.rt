@@ -33,6 +33,7 @@ scout.defaultValues = {
 
   _loadDefaultsConfiguration: function(data) {
     // Store defaults
+    this._objectTypeHierarchyFlat = {};
     this._defaults = data.defaults || {};
 
     // Generate object type hierarchy
