@@ -6,6 +6,19 @@ scout.BaseDesktop = function() {
 };
 scout.inherits(scout.BaseDesktop, scout.ModelAdapter);
 
+scout.BaseDesktop.prototype._renderProperties = function() {
+  scout.BaseDesktop.parent.prototype._renderProperties.call(this);
+
+  this._renderTitle(this.title);
+};
+
+scout.BaseDesktop.prototype._renderTitle = function(title) {
+  var $scoutDivs = $('div.scout');
+  if ($scoutDivs.length <= 1) { // only set document title in non-portlet case
+    document.title = title;
+  }
+};
+
 scout.BaseDesktop.prototype.showFatalMessage = function(title, text, buttonName, buttonAction) {
   var that = this;
   var $glasspane = this.$parent.appendDiv('glasspane');

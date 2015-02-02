@@ -41,6 +41,7 @@ import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonException;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
+import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.service.SERVICES;
 import org.json.JSONObject;
@@ -125,6 +126,17 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
     }
     getModel().removeDesktopListener(m_desktopListener);
     m_desktopListener = null;
+  }
+
+  @Override
+  protected void initJsonProperties(T model) {
+    super.initJsonProperties(model);
+    putJsonProperty(new JsonProperty<T>(IDesktop.PROP_TITLE, model) {
+      @Override
+      protected String modelValue() {
+        return getModel().getTitle();
+      }
+    });
   }
 
   @Override
