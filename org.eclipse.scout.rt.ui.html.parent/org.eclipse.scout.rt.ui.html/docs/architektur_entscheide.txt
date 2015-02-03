@@ -504,3 +504,6 @@ werden.
 Alternative Idee: wir bauen ein Tool, das im Build Prozess eine grosse scoutIcons.ttf
 welche alle Icons von original scoutIcons.ttf + crmIcons.ttf + myProject.ttf drin hat.
 Es braucht ein Tool, welches im Build die Fonts mergen und analysieren kann.
+
+Security:
+Man kann heute Felder auf enabled / visible setzen per Javascript-Console. wie wollen wir damit umgehen? Erneute Prüfung auf enabled/visible im JSON-Layer einbauen?
