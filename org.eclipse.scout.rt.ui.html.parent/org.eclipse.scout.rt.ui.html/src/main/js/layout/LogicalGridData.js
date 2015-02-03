@@ -68,10 +68,6 @@ scout.LogicalGridData.prototype.validate = function() {
   this.fillVertical = data.fillVertical;
   this.widthHint = data.widthInPixel;
   this.heightHint = data.heightInPixel;
-  if (this.weighty === 0 || (this.weighty < 0 && this.gridh <= 1)) {
-    this.fillVertical = false;
-  }
-
 };
 
 scout.LogicalGridData.prototype._inheritWeightY = function() {
@@ -124,6 +120,5 @@ scout.LogicalGridData.prototype._inheritWeightYRec = function(f) {
 };
 
 scout.LogicalGridData.prototype.isValidateRoot = function() {
-  //FIXME CGU nearly always results false because fillVertical is set to false if weightY is 0, see this.validate. Why is this necessary?
   return !this.useUiHeight && !this.useUiWidth && this.fillVertical && this.fillHorizontal;
 };
