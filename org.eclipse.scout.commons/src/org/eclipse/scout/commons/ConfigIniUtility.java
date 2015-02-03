@@ -39,7 +39,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
  * <li>com.myapp.MyService/query#realm=QueryRealm</li>
  * <p>
  * Supports for config.ini files in an external area
- * 
+ *
  * <pre>
  * <code>
  * external.configuration.area=[url | file | ${variable}]
@@ -49,7 +49,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
  * ...
  * </code>
  * </pre>
- * 
+ *
  * where ${variable} is a system property or an environment variable containing an url or a file path to the FOLDER
  * containing the config.ini
  */
@@ -132,9 +132,7 @@ public final class ConfigIniUtility {
       }
     }
     catch (Throwable t) {
-      if (in != null) {
-        LOG.error("parsing " + file, t);
-      }
+      LOG.error("parsing " + file, t);
     }
     finally {
       if (in != null) {
@@ -198,9 +196,7 @@ public final class ConfigIniUtility {
         }
       }
       catch (Throwable t) {
-        if (in != null) {
-          LOG.error("parsing external file " + path + " (" + resolvedPath + ")", t);
-        }
+        LOG.error("parsing external file " + path + " (" + resolvedPath + ")", t);
       }
       finally {
         if (in != null) {
