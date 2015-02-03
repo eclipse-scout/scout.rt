@@ -94,6 +94,10 @@
     .checkboxLabelBeforeBorder;
   }
 
+  & label.childsChecked:before {
+    .checkboxLabelBeforeChildChecked;
+  }
+
   & input[type=checkbox]:disabled + label:before {
     .checkboxLabelBeforeDisabled;
   }

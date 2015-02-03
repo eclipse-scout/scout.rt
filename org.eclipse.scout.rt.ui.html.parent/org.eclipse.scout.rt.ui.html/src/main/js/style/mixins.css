@@ -90,14 +90,22 @@
 
 .checkboxLabelBeforeFocus {
   border-color: @focus-color;
-  background-color:@focus-color-glow;
   outline: none;
-
 }
+
 .checkboxLabelBeforeChecked {
   .font-icon;
   content: @icon-checked;
-  color: @palette-black;
+  color: @palette-bsi-normal;
+  font-size: 11px;
+  text-align: center;
+  line-height: 15px;
+}
+
+.checkboxLabelBeforeChildChecked {
+  .font-icon;
+  content: @icon-square;
+  color: @palette-bsi-normal;
   font-size: 11px;
   text-align: center;
   line-height: 15px;

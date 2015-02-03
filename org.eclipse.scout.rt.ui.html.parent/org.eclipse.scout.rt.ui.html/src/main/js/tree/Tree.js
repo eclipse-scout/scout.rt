@@ -30,6 +30,7 @@ scout.Tree.prototype._initTreeNode = function(parentNode, node) {
   if (node.childNodes === undefined) {
     node.childNodes = [];
   }
+  this._updateMarkChildsChecked(node, true, node.checked);
 };
 
 scout.Tree.prototype._visitNodes = function(nodes, func, parentNode) {
@@ -47,6 +48,71 @@ scout.Tree.prototype._visitNodes = function(nodes, func, parentNode) {
   }
 };
 
+scout.Tree.prototype._updateMarkChildsChecked = function(node, init, checked, checkChildsChecked) {
+  if (!this.checkable) {
+    return;
+  }
+
+  if (checkChildsChecked) {
+    var childsFound = false;
+    for (var j = 0; j < node.childNodes.length > 0; j++) {
+      var childNode = node.childNodes[j];
+      if (childNode.checked || childNode.childsChecked) {
+        node.childsChecked = true;
+        checked = true;
+        childsFound = true;
+        if (this.rendered) {
+          this.$nodeById(node.id).find('label').addClass('childsChecked');
+        }
+        break;
+      }
+    }
+    if (!childsFound) {
+      node.childsChecked = false;
+      if (this.rendered) {
+        this.$nodeById(node.id).find('label').removeClass('childsChecked');
+      }
+    }
+  }
+
+  if (!node.parentNode || node.parentNode.checked) {
+    return;
+  }
+
+  var stateChanged = false;
+  if (!checked && !init) {
+    //node was unchecked check siblings
+    var hasCheckedSiblings = false;
+    for (var i = 0; i < node.parentNode.childNodes.length > 0; i++) {
+      var siblingNode = node.parentNode.childNodes[i];
+      if (siblingNode.checked || siblingNode.childsChecked) {
+        hasCheckedSiblings = true;
+        break;
+      }
+    }
+    if (hasCheckedSiblings !== node.parentNode.childsChecked) {
+      //parentNode.checked should be false
+      node.parentNode.childsChecked = hasCheckedSiblings;
+      stateChanged = true;
+    }
+  }
+  if ((checked && !node.parentNode.childsChecked)) {
+    node.parentNode.childsChecked = true;
+    stateChanged = true;
+  }
+  if (stateChanged) {
+    this._updateMarkChildsChecked(node.parentNode, init, checked);
+    if (this.rendered) {
+      if (checked) {
+        this.$nodeById(node.parentNode.id).find('label').addClass('childsChecked');
+      } else {
+        this.$nodeById(node.parentNode.id).find('label').removeClass('childsChecked');
+      }
+    }
+  }
+
+};
+
 scout.Tree.prototype._render = function($parent) {
   this.$parent = $parent;
   this.$container = $parent.appendDiv('tree');
@@ -56,7 +122,6 @@ scout.Tree.prototype._render = function($parent) {
   if (this.selectedNodeIds.length > 0) {
     this._renderSelection();
   }
-
 };
 
 scout.Tree.prototype._remove = function() {
@@ -331,6 +396,7 @@ scout.Tree.prototype._onNodesDeleted = function(nodeIds, parentNodeId) {
   for (i = 0; i < nodeIds.length; i++) {
     nodeId = nodeIds[i];
     node = this._nodeMap[nodeId];
+    this._updateMarkChildsChecked(node, false, false);
     if (parentNode) {
       if (node.parentNode !== parentNode) {
         throw new Error('Unexpected parent. Node.parent: ' + node.parentNode + ', parentNode: ' + parentNode);
@@ -360,6 +426,7 @@ scout.Tree.prototype._onAllNodesDeleted = function(parentNodeId) {
 
   //Update model and nodemap
   updateNodeMap = function(parentNode, node) {
+    this._updateMarkChildsChecked(node, false, false);
     delete this._nodeMap[node.id];
   }.bind(this);
 
@@ -518,7 +585,7 @@ scout.Tree.prototype.checkNodeAndRender = function(node, checked) {
 };
 
 scout.Tree.prototype.checkNode = function(node, checked, render) {
-  if (node.checked === checked) {
+  if (!this.enabled || !node.enabled || node.checked === checked) {
     return;
   }
   var updatedNodes = [];
@@ -526,12 +593,14 @@ scout.Tree.prototype.checkNode = function(node, checked, render) {
     for (var i = 0; i < this.nodes.length; i++) {
       if (this.nodes[i].checked) {
         this.nodes[i].checked = false;
+        this._updateMarkChildsChecked(this.nodes[i], false, false, true);
         updatedNodes.push(this.nodes[i]);
         this._renderNodeChecked(this.nodes[i]);
       }
     }
   }
   node.checked = checked;
+  this._updateMarkChildsChecked(node, false, checked, true);
   updatedNodes.push(node);
   this.sendNodesChecked(updatedNodes);
   if (render) {
@@ -568,15 +637,25 @@ scout.Tree.prototype._renderTreeItemCheckbox = function($node, node) {
   var that = this,
     $controlItem = $node.prependDiv('tree-item-checkbox'),
     forRefId = node.id + '-tree-checkable';
-  $('<input>')
+  var $checkbox = $('<input>')
     .attr('id', forRefId)
     .attr('type', 'checkbox')
     .appendTo($controlItem)
     .prop('checked', node.checked);
-  $('<label>')
+  var $label = $('<label>')
     .attr('for', forRefId)
     .appendTo($controlItem).
   on('mouseup', node, onNodeChecked);
+
+  if (!this.enabled || !node.enabled) {
+    $checkbox.prop('disabled', 'disabled');
+  }
+
+  if (node.childsChecked) {
+    $label.addClass('childsChecked');
+  } else {
+    $label.removeClass('childsChecked');
+  }
 
   function onNodeChecked(event) {
     var node = event.data;
@@ -752,6 +831,7 @@ scout.Tree.prototype.onModelAction = function(event) {
 scout.Tree.prototype._onNodesChecked = function(nodes) {
   for (var i = 0; i < nodes.length; i++) {
     this._nodeMap[nodes[i].id].checked = nodes[i].checked;
+    this._updateMarkChildsChecked(this._nodeMap[nodes[i].id], false, nodes[i].checked, true);
     if (this.rendered) {
       this._renderNodeChecked(nodes[i]);
     }

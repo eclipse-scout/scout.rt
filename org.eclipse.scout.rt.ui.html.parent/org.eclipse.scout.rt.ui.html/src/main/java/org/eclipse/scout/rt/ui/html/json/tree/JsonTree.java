@@ -93,6 +93,12 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
         return getModel().isMultiCheck();
       }
     });
+    putJsonProperty(new JsonProperty<T>(ITree.PROP_ENABLED, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isEnabled();
+      }
+    });
   }
 
   @Override
@@ -349,6 +355,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     putProperty(json, PROP_EXPANDED, node.isExpanded());
     putProperty(json, "leaf", node.isLeaf());
     putProperty(json, "checked", node.isChecked());
+    putProperty(json, "enabled", node.isEnabled());
     putCellProperties(json, node.getCell());
     JSONArray jsonChildNodes = new JSONArray();
     if (node.getChildNodeCount() > 0) {
