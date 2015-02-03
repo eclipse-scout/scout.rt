@@ -24,7 +24,7 @@ scout.Desktop = function() {
    */
   this.selectedTool;
 
-  this._addAdapterProperties(['viewButtons', 'actions', 'forms', 'outline', 'searchOutline', 'messageBoxes', 'addOns']);
+  this._addAdapterProperties(['viewButtons', 'actions', 'views', 'dialogs', 'outline', 'searchOutline', 'messageBoxes', 'addOns']);
 };
 scout.inherits(scout.Desktop, scout.BaseDesktop);
 
@@ -38,7 +38,7 @@ scout.Desktop.prototype.onChildAdapterCreated = function(propertyName, adapter) 
 };
 
 scout.Desktop.prototype._render = function($parent) {
-  var i, form, messageBox, action;
+  var i, action;
 
   this.$parent = $parent;
 
@@ -82,15 +82,9 @@ scout.Desktop.prototype._render = function($parent) {
 
   this.navigation.onOutlineChanged(this.outline);
 
-  for (i = 0; i < this.forms.length; i++) {
-    form = this.forms[i];
-    this._addForm(form);
-  }
-
-  for (i = 0; i < this.messageBoxes.length; i++) {
-    messageBox = this.messageBoxes[i];
-    this.addMessageBox(messageBox);
-  }
+  this.views.forEach(this._addView.bind(this));
+  this.dialogs.forEach(this._addDialog.bind(this));
+  this.messageBoxes.forEach(this.addMessageBox.bind(this));
 
   $(window).on('resize', this.onResize.bind(this));
 
@@ -202,24 +196,59 @@ scout.Desktop.prototype._unselectTab = function(tab) {
 
 /* handling of forms */
 
-scout.Desktop.prototype._addForm = function(form) {
-  var tab = new scout.Desktop.TabAndContent(form, form.title, form.subTitle);
+scout.Desktop.prototype._ensureGlasspane = function() {
+  if (!this.$glasspane) {
+    this.$glasspane = this.$parent.appendDiv('glasspane');
+  }
+  return this.$glasspane;
+};
+
+scout.Desktop.prototype._addDialog = function(dialog) {
+  dialog.render(this._ensureGlasspane());
+  dialog.htmlComp.pixelBasedSizing = true;
+  dialog.htmlComp.pack();
+
+  var $handle,
+    prefSize = dialog.htmlComp.getPreferredSize(),
+    documentSize = new scout.Dimension($(document).width(), $(document).height()),
+    marginLeft = (documentSize.width - prefSize.width) / 2,
+    marginTop = (documentSize.height - prefSize.height) / 2 - 10; // -10 for optical vertical middle
+  dialog.$container
+    .css('margin-left', marginLeft)
+    .css('margin-top', marginTop);
+
+  // FIXME AWE: (modal dialog) make drag work --> see messagebox
+  $handle = dialog.$container.prependDiv('drag-handle');
+  dialog.$container.makeDraggable($handle);
+};
+
+scout.Desktop.prototype._addView = function(view) {
+  var tab = new scout.Desktop.TabAndContent(view, view.title, view.subTitle);
   this._addTab(tab);
-  form.render(this.$bench);
+  view.render(this.$bench);
 
   // FIXME CGU: maybe include in render?
-  form.htmlComp.layout();
-  form.htmlComp.validateRoot = true;
-  form.tab = tab;
+  view.htmlComp.layout();
+  view.htmlComp.validateRoot = true;
+  view.tab = tab;
 };
 
 scout.Desktop.prototype._removeForm = function(form) {
-  this._removeTab(form.tab);
+  if (form.displayHint === 'view') {
+    this._removeTab(form.tab);
+  }
   form.remove();
+  if (this._isDialog(form)) {
+    this._removeGlasspane();
+  }
 };
 
 scout.Desktop.prototype._showForm = function(form) {
-  this._selectTab(form.tab);
+  if (this._isDialog(form)) {
+    // FIXME AWE: (modal dialog) - show dialogs
+  } else {
+    this._selectTab(form.tab);
+  }
 };
 
 scout.Desktop.prototype._openUrlInBrowser = function(event) {
@@ -272,15 +301,16 @@ scout.Desktop.prototype.changeOutline = function(outline) {
 /* message boxes */
 
 scout.Desktop.prototype.addMessageBox = function(messageBox) {
-  if (!this.$glasspane) {
-    this.$glasspane = this.$parent.appendDiv('glasspane');
-  }
-  messageBox.render(this.$glasspane);
+  messageBox.render(this._ensureGlasspane());
 };
 
 scout.Desktop.prototype.onMessageBoxClosed = function(messageBox) {
   scout.arrays.remove(this.messageBoxes, messageBox);
-  if (this.messageBoxes.length === 0) {
+  this._removeGlasspane();
+};
+
+scout.Desktop.prototype._removeGlasspane = function() {
+  if (this.messageBoxes.length === 0 && this.dialogs.length === 0) {
     this.$glasspane.remove();
     this.$glasspane = null;
   }
@@ -288,16 +318,38 @@ scout.Desktop.prototype.onMessageBoxClosed = function(messageBox) {
 
 /* event handling */
 
+scout.Desktop.prototype._onModelFormAdded = function(event) {
+  var form = this.session.getOrCreateModelAdapter(event.form, this);
+  if (this._isDialog(form)) {
+    this.dialogs.push(form);
+    this._addDialog(form);
+  } else {
+    this.views.push(form);
+    this._addView(form);
+  }
+};
+
+scout.Desktop.prototype._onModelFormRemoved = function(event) {
+  var form = this.session.getOrCreateModelAdapter(event.form, this);
+  if (this._isDialog(form)) {
+    scout.arrays.remove(this.dialogs, form);
+  } else {
+    scout.arrays.remove(this.views, form);
+  }
+  this._removeForm(form);
+};
+
+scout.Desktop.prototype._isDialog = function(form) {
+  return form.displayHint === 'dialog';
+};
+
+
 scout.Desktop.prototype.onModelAction = function(event) {
   var form;
   if (event.type === 'formAdded') {
-    form = this.session.getOrCreateModelAdapter(event.form, this);
-    this.forms.push(form);
-    this._addForm(form);
+    this._onModelFormAdded(event);
   } else if (event.type === 'formRemoved') {
-    form = this.session.getOrCreateModelAdapter(event.form, this);
-    scout.arrays.remove(this.forms, form);
-    this._removeForm(form);
+    this._onModelFormRemoved(event);
   } else if (event.type === 'formEnsureVisible') {
     form = this.session.getOrCreateModelAdapter(event.form, this);
     this._showForm(form);

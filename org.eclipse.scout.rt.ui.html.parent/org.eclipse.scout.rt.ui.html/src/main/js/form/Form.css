@@ -26,3 +26,12 @@
      color:@hover-color;
   }
 }
+
+.dialog {
+  background-color: @body-background-color;
+  border: solid 1px @desktop-border-color;
+  border-top: 5px solid @active-color;
+  border-top-left-radius: @border-radius;
+  border-top-right-radius: @border-radius;
+  .drop-shadow;
+}

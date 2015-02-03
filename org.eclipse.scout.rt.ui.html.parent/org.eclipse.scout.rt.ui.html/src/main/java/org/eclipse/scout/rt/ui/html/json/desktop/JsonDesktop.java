@@ -66,7 +66,8 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
   @Override
   protected void attachChildAdapters() {
     super.attachChildAdapters();
-    attachGlobalAdapters(getForms());
+    attachGlobalAdapters(getViews());
+    attachGlobalAdapters(getDialogs());
     attachGlobalAdapters(getModel().getMessageBoxStack());
     attachAdapters(filterModelActions());
     attachAdapters(getModel().getAddOns());
@@ -142,7 +143,8 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
   @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
-    putAdapterIdsProperty(json, "forms", getForms());
+    putAdapterIdsProperty(json, "views", getViews());
+    putAdapterIdsProperty(json, "dialogs", getDialogs());
     putAdapterIdsProperty(json, "messageBoxes", getModel().getMessageBoxStack());
     putAdapterIdsProperty(json, "actions", filterModelActions());
     putAdapterIdsProperty(json, "addOns", getModel().getAddOns());
@@ -182,20 +184,24 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
     return getJsonSession().getClientSession().getUserAgent().getUiDeviceType().isTouchDevice();
   }
 
-  protected List<IForm> getForms() {
-    List<IForm> forms = new ArrayList<>();
+  protected List<IForm> getViews() {
+    List<IForm> views = new ArrayList<>();
     for (IForm form : getModel().getViewStack()) {
       if (!isFormBlocked(form)) {
-        forms.add(form);
+        views.add(form);
       }
     }
+    return views;
+  }
+
+  protected List<IForm> getDialogs() {
+    List<IForm> dialogs = new ArrayList<>();
     for (IForm form : getModel().getDialogStack()) {
       if (!isFormBlocked(form)) {
-        forms.add(form);
+        dialogs.add(form);
       }
     }
-
-    return forms;
+    return dialogs;
   }
 
   protected boolean isFormBlocked(IForm form) {

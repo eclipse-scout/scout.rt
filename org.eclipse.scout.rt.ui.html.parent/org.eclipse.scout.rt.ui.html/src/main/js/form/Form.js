@@ -18,7 +18,8 @@ scout.Form.prototype._render = function($parent) {
   this.$container = $('<div>')
     .appendTo($parent)
     .attr('id', 'Form-' + this.id)
-    .addClass('form')
+    .addClass(this.displayHint === 'dialog' ? 'dialog' : 'form') // FIXME AWE: (modal dialog) rename class 'form' to view
+    // so we can use the displayHint as class-name
     .data('model', this);
 
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
