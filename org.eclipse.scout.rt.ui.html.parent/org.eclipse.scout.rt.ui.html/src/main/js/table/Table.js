@@ -124,7 +124,7 @@ scout.Table.prototype._unwrapCells = function(cells) {
     var cell = cells[i];
     if (typeof cell === 'string') {
       cell = {
-          text: cell
+        text: cell
       };
       cells[i] = cell;
     }
@@ -377,6 +377,9 @@ scout.Table.prototype._buildRowDiv = function(row) {
       '><input type="checkbox" id="' + row.id + '-checkable" ';
     if (row.checked) {
       rowDiv += ' checked="checked" ';
+    }
+    if (!row.enabled) {
+      rowDiv += ' disabled="disabled" ';
     }
     rowDiv += '/><label for="' + row.id + '-checkable">&nbsp;</label></div>';
   }
@@ -934,7 +937,7 @@ scout.Table.prototype.checkRowAndRender = function(row, checked) {
 };
 
 scout.Table.prototype.checkRow = function(row, checked, render) {
-  if (row.checked === checked) {
+  if (!row.enabled || row.checked === checked) {
     return;
   }
   var updatedRows = [];
