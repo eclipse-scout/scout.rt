@@ -937,7 +937,7 @@ scout.Table.prototype.checkRowAndRender = function(row, checked) {
 };
 
 scout.Table.prototype.checkRow = function(row, checked, render) {
-  if (!row.enabled || row.checked === checked) {
+  if (!this.checkable || !this.enabled || !row.enabled || row.checked === checked ) {
     return;
   }
   var updatedRows = [];
