@@ -14,13 +14,13 @@ import java.awt.Rectangle;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
-import org.eclipse.scout.rt.client.ClientAsyncJob;
+import org.eclipse.scout.rt.client.Activator;
 import org.eclipse.scout.rt.client.ClientSessionThreadLocal;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -28,40 +28,31 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.splitbox.ISplitBox;
 import org.eclipse.scout.rt.shared.data.basic.BoundsSpec;
-import org.eclipse.scout.rt.shared.services.common.prefs.IUserPreferencesStorageService;
+import org.eclipse.scout.rt.shared.services.common.prefs.IPreferences;
+import org.eclipse.scout.rt.shared.services.common.prefs.Preferences;
 import org.eclipse.scout.rt.shared.ui.UiDeviceType;
 import org.eclipse.scout.rt.shared.ui.UiLayer;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
-import org.eclipse.scout.service.SERVICES;
-import org.osgi.service.prefs.Preferences;
 
 /**
- * UI model customization wrapping a {@link org.eclipse.core.runtime.Preferences} object with its location Stored
- * in user area.
- * <p>
- * Warning: Only use this class within a ClientJob with an {@link IClientSession}.
- * <p>
- * Calling from outside a {@link IClientSession} {@link org.eclipse.scout.rt.client.ClientJob ClientJob} will produce a
- * warning. In release 3.9 (TODO) will produce an error.
+ * UI model customization wrapping a {@link IPreferences} object.
  */
 public class ClientUIPreferences {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ClientUIPreferences.class);
 
   /**
-   * @return a new instance of the {@link ClientUIPreferences} based on the {@link IUserPreferencesStorageService}
-   *         <p>
-   *         Warning: Only use this class within a ClientJob with an {@link IClientSession}.
-   *         <p>
-   *         Calling from outside a {@link IClientSession} {@link org.eclipse.scout.rt.client.ClientJob ClientJob} will
-   *         produce a warning. Starting with release 3.9 it will fail with an error.
+   * @return a new instance of the {@link ClientUIPreferences}
+   * @throws IllegalArgumentException
+   *           When no {@link IClientSession} is available in the current thread context
+   *           ({@link ClientSessionThreadLocal}).
    */
   public static ClientUIPreferences getInstance() {
     return new ClientUIPreferences(ClientSessionThreadLocal.get());
   }
 
   /**
-   * @return a new instance of the {@link ClientUIPreferences} based on the {@link IUserPreferencesStorageService}
+   * @return a new instance of the {@link ClientUIPreferences}
    */
   public static ClientUIPreferences getInstance(IClientSession session) {
     return new ClientUIPreferences(session);
@@ -82,13 +73,13 @@ public class ClientUIPreferences {
   private static final String FORM_BOUNDS = "form.bounds.";
 
   private final IClientSession m_session;
-  private Preferences m_env;
+  private IPreferences m_env;
 
   private ClientUIPreferences(IClientSession session) {
-    m_session = session;
-    if (m_session == null) {
-      LOG.error("No scout client session context", new Exception("Calling client preferences from outside a scout client session job"));
+    if (session == null) {
+      throw new IllegalArgumentException("No scout client session context. Calling client preferences from outside a scout client session job.");
     }
+    m_session = session;
     load();
   }
 
@@ -99,7 +90,7 @@ public class ClientUIPreferences {
    */
   public Rectangle getFormBounds(IForm form) {
     String key = form.computeCacheBoundsKey();
-    if (key == null) {
+    if (key == null || m_env == null) {
       return null;
     }
 
@@ -135,7 +126,7 @@ public class ClientUIPreferences {
    */
   public void setFormBounds(IForm form, Rectangle bounds) {
     String key = form.computeCacheBoundsKey();
-    if (key == null) {
+    if (key == null || m_env == null) {
       return;
     }
 
@@ -240,6 +231,9 @@ public class ClientUIPreferences {
   }
 
   public Object getTableCustomizerData(String customizerKey) {
+    if (m_env == null) {
+      return null;
+    }
     String key = TABLE_CUSTOMIZER_DATA + customizerKey;
     byte[] serialData = m_env.getByteArray(key, null);
     if (serialData != null) {
@@ -262,6 +256,10 @@ public class ClientUIPreferences {
    * store customizer data to persistent store
    */
   public void setTableCustomizerData(String customizerKey, Object customizerData) {
+    if (m_env == null) {
+      return;
+    }
+
     String key = TABLE_CUSTOMIZER_DATA + customizerKey;
     if (customizerData != null) {
       try {
@@ -296,6 +294,9 @@ public class ClientUIPreferences {
   }
 
   public void setTableColumnPreferences(IColumn col, boolean flush) {
+    if (m_env == null) {
+      return;
+    }
     String keySuffix = getColumnKey(col);
     String key = TABLE_COLUMN_UIINDEX + keySuffix;
     int viewIndex = col.getVisibleColumnIndexHint();
@@ -361,6 +362,9 @@ public class ClientUIPreferences {
     if (columnList.size() != visibleColumnIndexHints.length) {
       throw new IllegalArgumentException("columnList.size=" + columnList.size() + " hints.length=" + visibleColumnIndexHints.length);
     }
+    if (m_env == null) {
+      return;
+    }
     for (int i = 0; i < visibleColumnIndexHints.length; i++) {
       IColumn<?> c = columnList.get(i);
       int viewIndex = visibleColumnIndexHints[i];
@@ -386,7 +390,7 @@ public class ClientUIPreferences {
   }
 
   private void removeTableColumnPreferences(IColumn col, boolean visibility, boolean order, boolean sorting, boolean widths, boolean flush) {
-    if (col != null) {
+    if (col != null && m_env != null) {
       String keySuffix = getColumnKey(col);
       if (visibility) {
         m_env.remove(TABLE_COLUMN_VISIBLE + keySuffix);
@@ -439,7 +443,7 @@ public class ClientUIPreferences {
    * @return true if there are any user preferences for this tables columns
    */
   public boolean hasTableColumnPreferences(ITable table) {
-    if (table != null) {
+    if (table != null && m_env != null) {
       for (IColumn col : table.getColumns()) {
         String keySuffix = getColumnKey(col);
         if (m_env.get(TABLE_COLUMN_VISIBLE + keySuffix, null) != null) {
@@ -471,6 +475,10 @@ public class ClientUIPreferences {
    * IUiDeviceType}.
    */
   public int getTableColumnWidth(IColumn col, int defaultWidth) {
+    if (m_env == null) {
+      return defaultWidth;
+    }
+
     String keySuffix = getColumnKey(col);
     String baseKey = TABLE_COLUMN_WIDTH + keySuffix;
     String key = getUserAgentPrefix() + baseKey;
@@ -492,6 +500,9 @@ public class ClientUIPreferences {
   }
 
   public boolean getTableColumnVisible(IColumn col, boolean defaultValue) {
+    if (m_env == null) {
+      return defaultValue;
+    }
     String keySuffix = getColumnKey(col);
     String key = TABLE_COLUMN_VISIBLE + keySuffix;
     String value = m_env.get(key, null);
@@ -503,6 +514,10 @@ public class ClientUIPreferences {
   }
 
   public int getTableColumnViewIndex(IColumn col, int defaultIndex) {
+    if (m_env == null) {
+      return defaultIndex;
+    }
+
     String keySuffix = getColumnKey(col);
     String key = TABLE_COLUMN_UIINDEX + keySuffix;
     String value = m_env.get(key, null);
@@ -518,6 +533,10 @@ public class ClientUIPreferences {
   }
 
   public int getTableColumnSortIndex(IColumn col, int defaultValue) {
+    if (m_env == null) {
+      return defaultValue;
+    }
+
     String keySuffix = getColumnKey(col);
     String key = TABLE_COLUMN_SORT_INDEX + keySuffix;
     String value = m_env.get(key, null);
@@ -529,6 +548,10 @@ public class ClientUIPreferences {
   }
 
   public boolean getTableColumnSortAscending(IColumn col, boolean defaultValue) {
+    if (m_env == null) {
+      return defaultValue;
+    }
+
     String keySuffix = getColumnKey(col);
     String key = TABLE_COLUMN_SORT_ASC + keySuffix;
     String value = m_env.get(key, null);
@@ -540,6 +563,10 @@ public class ClientUIPreferences {
   }
 
   public Boolean getTableColumnSortExplicit(IColumn col) {
+    if (m_env == null) {
+      return null;
+    }
+
     String keySuffix = getColumnKey(col);
     String key = TABLE_COLUMN_SORT_EXPLICIT + keySuffix;
     String value = m_env.get(key, null);
@@ -550,6 +577,10 @@ public class ClientUIPreferences {
   }
 
   public void setApplicationWindowPreferences(BoundsSpec r, boolean maximized) {
+    if (m_env == null) {
+      return;
+    }
+
     if (r != null) {
       String value = "" + r.x + "," + r.y + "," + r.width + "," + r.height;
       m_env.put(APPLICATION_WINDOW_BOUNDS, value);
@@ -568,12 +599,20 @@ public class ClientUIPreferences {
   }
 
   public boolean getApplicationWindowMaximized() {
+    if (m_env == null) {
+      return false;
+    }
+
     String key = APPLICATION_WINDOW_MAXIMIZED;
     String value = m_env.get(key, null);
     return "yes".equalsIgnoreCase(value);
   }
 
   public BoundsSpec getApplicationWindowBounds() {
+    if (m_env == null) {
+      return null;
+    }
+
     String key = APPLICATION_WINDOW_BOUNDS;
     String value = m_env.get(key, null);
     if (value != null) {
@@ -595,12 +634,20 @@ public class ClientUIPreferences {
   }
 
   public void setCalendarPreferences(int displayMode, boolean displayCondensed) {
+    if (m_env == null) {
+      return;
+    }
+
     m_env.put(CALENDAR_DISPLAY_MODE, "" + displayMode);
     m_env.put(CALENDAR_DISPLAY_CONDENSED, "" + displayCondensed);
     flush();
   }
 
   public int getCalendarDisplayMode(int defaultValue) {
+    if (m_env == null) {
+      return defaultValue;
+    }
+
     String key = CALENDAR_DISPLAY_MODE;
     String value = m_env.get(key, null);
     if (value != null) {
@@ -615,6 +662,10 @@ public class ClientUIPreferences {
   }
 
   public boolean getCalendarDisplayCondensed(boolean defaultValue) {
+    if (m_env == null) {
+      return defaultValue;
+    }
+
     String key = CALENDAR_DISPLAY_CONDENSED;
     String value = m_env.get(key, null);
     if (value != null) {
@@ -629,6 +680,10 @@ public class ClientUIPreferences {
   }
 
   public int getPropertyInteger(String propName, int defaultValue, boolean setDefaultAsProperty) {
+    if (m_env == null) {
+      return defaultValue;
+    }
+
     String value = m_env.get(propName, null);
     if (value != null) {
       try {
@@ -650,11 +705,19 @@ public class ClientUIPreferences {
   }
 
   public void setPropertyInteger(String propName, int value) {
+    if (m_env == null) {
+      return;
+    }
+
     m_env.put(propName, "" + value);
     flush();
   }
 
   public int[] getPropertyIntArray(String propName) {
+    if (m_env == null) {
+      return null;
+    }
+
     String strVal = m_env.get(propName, null);
     if (!StringUtility.hasText(strVal)) {
       return null;
@@ -669,6 +732,10 @@ public class ClientUIPreferences {
   }
 
   public void setPropertyIntArray(String propName, int[] value) {
+    if (m_env == null) {
+      return;
+    }
+
     StringBuilder builder = new StringBuilder();
     if (value != null) {
       for (int i = 0; i < value.length; i++) {
@@ -683,6 +750,10 @@ public class ClientUIPreferences {
   }
 
   public Double getPropertyDouble(String propName) {
+    if (m_env == null) {
+      return null;
+    }
+
     String value = m_env.get(propName, null);
     if (value != null) {
       try {
@@ -696,6 +767,10 @@ public class ClientUIPreferences {
   }
 
   public void setPropertyDouble(String propName, Double value) {
+    if (m_env == null) {
+      return;
+    }
+
     m_env.put(propName, "" + value);
     flush();
   }
@@ -734,36 +809,30 @@ public class ClientUIPreferences {
     }
   }
 
+  public static IPreferences getClientPreferences(IClientSession session) {
+    try {
+      return Preferences.get(session, Activator.PLUGIN_ID);
+    }
+    catch (ProcessingException t) {
+      LOG.error("Unable to load preferences.", t);
+    }
+    return null;
+  }
+
   protected void load() {
-    if (m_session == null || ClientSessionThreadLocal.get() == m_session) {
-      m_env = SERVICES.getService(IUserPreferencesStorageService.class).loadPreferences();
-    }
-    else {
-      ClientAsyncJob job = new ClientAsyncJob("Load user preferences", m_session) {
-        @Override
-        protected void runVoid(IProgressMonitor monitor) throws Throwable {
-          m_env = SERVICES.getService(IUserPreferencesStorageService.class).loadPreferences();
-        }
-      };
-      job.schedule();
-      try {
-        job.join();
-      }
-      catch (InterruptedException e) {
-        //nop
-      }
-    }
-    if (m_env == null) {
-      throw new IllegalStateException("Could not load preferences in client job");
-    }
+    m_env = getClientPreferences(m_session);
   }
 
   protected void flush() {
+    if (m_env == null) {
+      return;
+    }
+
     try {
       m_env.flush();
     }
-    catch (Throwable t) {
-      t.printStackTrace();
+    catch (ProcessingException t) {
+      LOG.error("Unable to flush preferences.", t);
     }
   }
 }

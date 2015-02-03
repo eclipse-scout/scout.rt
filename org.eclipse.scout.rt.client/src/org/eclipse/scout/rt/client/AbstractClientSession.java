@@ -45,6 +45,7 @@ import org.eclipse.scout.rt.client.services.common.clientnotification.ClientNoti
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerListener;
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerService;
 import org.eclipse.scout.rt.client.servicetunnel.http.IClientServiceTunnel;
+import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.IIconLocator;
 import org.eclipse.scout.rt.client.ui.IconLocator;
@@ -60,13 +61,11 @@ import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
 import org.eclipse.scout.rt.shared.services.common.context.SharedContextChangedNotification;
 import org.eclipse.scout.rt.shared.services.common.context.SharedVariableMap;
-import org.eclipse.scout.rt.shared.services.common.prefs.IUserPreferencesStorageService;
+import org.eclipse.scout.rt.shared.services.common.prefs.IPreferences;
 import org.eclipse.scout.rt.shared.services.common.security.ILogoutService;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.service.SERVICES;
 import org.osgi.framework.Bundle;
-import org.osgi.service.prefs.BackingStoreException;
-import org.osgi.service.prefs.Preferences;
 
 public abstract class AbstractClientSession implements IClientSession, IExtensibleObject {
 
@@ -554,21 +553,24 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
 
   @Override
   public void goOffline() throws ProcessingException {
-    Preferences pref = SERVICES.getService(IUserPreferencesStorageService.class).loadPreferences();
-    if (getUserId() != null) {
-      if (OfflineState.isOnlineDefault()) {
-        try {
-          pref.put("offline.user", getUserId());
-          pref.flush();
-          pref.sync();
-        }
-        catch (BackingStoreException e) {
-          LOG.error("Could not write userId to preferences!");
-        }
+    final String keyName = "offline.user";
+    IPreferences pref = ClientUIPreferences.getClientPreferences(this);
+    if (getUserId() != null && OfflineState.isOnlineDefault() && pref != null) {
+      pref.put(keyName, getUserId());
+    }
+
+    // create new backend subject
+    String offlineUser = null;
+    if (pref != null) {
+      offlineUser = pref.get(keyName, null);
+    }
+    if (offlineUser == null) {
+      offlineUser = getUserId();
+      if (offlineUser == null) {
+        offlineUser = "anonymous";
       }
     }
-    // create new backend subject
-    String offlineUser = pref.get("offline.user", "anonymous");
+
     m_offlineSubject = new Subject();
     m_offlineSubject.getPrincipals().add(new SimplePrincipal(offlineUser));
     OfflineState.setOfflineDefault(true);

@@ -29,7 +29,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
-import org.eclipse.scout.commons.prefs.UserScope;
 
 /**
  * Runner for JUnit Plug-in tests.
@@ -105,7 +104,7 @@ public class ScoutJUnitPluginTestExecutor {
   /**
    * Returns the configuration value for the given parameter that is either configured as
    * command line argument or as system property.
-   * 
+   *
    * @param parameterName
    * @return
    */
@@ -126,7 +125,7 @@ public class ScoutJUnitPluginTestExecutor {
    * <code>-reportsDir=C:\temp\junitreports</code>)</li>
    * <li>System property with name <code>reportsDir</code> (e.g. <code>-DjunitReportsDir=C:\temp\junitreports</code>)</li>
    * </ol>
-   * 
+   *
    * @param context
    * @return
    */
@@ -232,15 +231,6 @@ public class ScoutJUnitPluginTestExecutor {
 
   public int runTest(Class<?> testClass) throws FileNotFoundException {
     int result = EXIT_CODE_OK;
-
-    //clear preference cache of client
-    try {
-      new UserScope().getNode("org.eclipse.scout.rt.client").clear();
-    }
-    catch (Throwable t) {
-      t.printStackTrace();
-    }
-
     PrintStream sysOut = null;
     PrintStream sysErr = null;
     PrintStream oldSysOut = System.out;
@@ -314,7 +304,7 @@ public class ScoutJUnitPluginTestExecutor {
 
   /**
    * Creates a new Ant {@link JUnitTest} used to execute the test and for reporting its outcome.
-   * 
+   *
    * @param testName
    * @return
    */
@@ -328,7 +318,7 @@ public class ScoutJUnitPluginTestExecutor {
 
   /**
    * Creates a {@link XMLJUnitResultFormatter} that writes its output to a file in the reports directory.
-   * 
+   *
    * @param testName
    * @return
    * @throws FileNotFoundException

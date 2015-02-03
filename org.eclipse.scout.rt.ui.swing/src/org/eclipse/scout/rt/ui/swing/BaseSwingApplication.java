@@ -31,7 +31,6 @@ import org.eclipse.scout.commons.LocaleUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.commons.prefs.UserScope;
 import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.services.common.exceptionhandler.ErrorHandler;
@@ -46,7 +45,7 @@ import org.osgi.framework.ServiceRegistration;
 
 /**
  * This abstract class is the base class for all Scout Swing (Eclipse) applications.
- * 
+ *
  * @author awe
  */
 abstract class BaseSwingApplication implements IApplication {
@@ -108,7 +107,7 @@ abstract class BaseSwingApplication implements IApplication {
 
   /**
    * Returns the Swing environment used to display the splash screen.
-   * 
+   *
    * @return
    */
   abstract ISwingEnvironment getSwingEnvironment();
@@ -127,11 +126,10 @@ abstract class BaseSwingApplication implements IApplication {
 
   /**
    * This abstract template application creates a JAAS subject based on the system property "user.name"
-   * and supports for initializing the {@link Locale} in {@link #execInitLocale()}
    * <p>
    * The start is then delegated to {@link #startInSubject(IApplicationContext)}
    * <p>
-   * Normally {@link #startInSubject(IApplicationContext)} is overriden
+   * Normally {@link #startInSubject(IApplicationContext)} is overridden
    */
   @Override
   public Object start(final IApplicationContext context) throws Exception {
@@ -154,7 +152,7 @@ abstract class BaseSwingApplication implements IApplication {
   abstract Object startInSubject(IApplicationContext context) throws Exception;
 
   /**
-   * Exit delegate to handle os-specific exit behaviour.
+   * Exit delegate to handle os-specific exit behavior.
    * <p>
    * Mac OS X normally only closes the window, but we want to close the app (with Quit).
    */
@@ -166,7 +164,13 @@ abstract class BaseSwingApplication implements IApplication {
   }
 
   protected void execInitLocale() {
-    Locale locale = LocaleUtility.parse(new UserScope().getNode(org.eclipse.scout.rt.client.Activator.PLUGIN_ID).get("locale", null));
+    String[] localeParams = new String[]{"locale", "nl", "osgi.nl.user", "osgi.nl"};
+    String localeProp = null;
+    for (int i = 0; i < localeParams.length && localeProp == null; i++) {
+      localeProp = System.getProperty(localeParams[i], null);
+    }
+
+    Locale locale = LocaleUtility.parse(localeProp);
     if (locale != null) {
       Locale.setDefault(locale);
     }

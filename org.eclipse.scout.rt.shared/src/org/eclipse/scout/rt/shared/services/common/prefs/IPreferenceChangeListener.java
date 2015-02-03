@@ -10,25 +10,22 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.services.common.prefs;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.shared.ISession;
+import java.util.EventListener;
 
 /**
- * User preference service that is capable to persist preferences to a preference store.
- *
+ * Listener to be notified about changes in a preference node.
+ * 
  * @since 5.1
- * @see Preferences#get(ISession, String)
+ * @see IPreferences#addPreferenceChangeListener(IPreferenceChangeListener)
  */
-public interface IUserPreferencesStorageService extends IUserPreferencesService {
+public interface IPreferenceChangeListener extends EventListener {
 
   /**
-   * Flushes the given {@link IPreferences} to the persistent store.
+   * Callback when the preferences of the observed preference node has been changed.
    *
-   * @param prefs
-   *          The preferences to store.
-   * @throws ProcessingException
-   *           On an error while storing the given preferences.
+   * @param event
+   *          Event object containing the details about the change.
    */
-  void flush(IPreferences prefs) throws ProcessingException;
+  void preferenceChange(PreferenceChangeEvent event);
 
 }

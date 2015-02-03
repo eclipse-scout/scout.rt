@@ -13,21 +13,22 @@ package org.eclipse.scout.rt.client.ui.basic.filechooser;
 import java.io.File;
 import java.util.List;
 
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.commons.prefs.UserScope;
 import org.eclipse.scout.rt.client.BlockingCondition;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.shared.ScoutTexts;
-import org.osgi.service.prefs.BackingStoreException;
+import org.eclipse.scout.rt.shared.services.common.prefs.IPreferences;
 
 public class FileChooser implements IFileChooser {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(FileChooser.class);
+
+  private static final String LAST_DIR_PREF_KEY = "current-dir";
 
   private File m_directory;
   private String m_fileName;
@@ -107,9 +108,13 @@ public class FileChooser implements IFileChooser {
     if (session == null) {
       return null;
     }
-    String id = session.getBundle().getSymbolicName() + "-" + session.getUserId();
-    IEclipsePreferences props = new UserScope().getNode(id);
-    return props.get("current-dir", null);
+
+    IPreferences clientPreferences = ClientUIPreferences.getClientPreferences(session);
+    if (clientPreferences == null) {
+      return null;
+    }
+
+    return clientPreferences.get(LAST_DIR_PREF_KEY, null);
   }
 
   public static void setCurrentDirectory(String dir) {
@@ -117,14 +122,18 @@ public class FileChooser implements IFileChooser {
     if (session == null) {
       return;
     }
-    String id = session.getBundle().getSymbolicName() + "-" + session.getUserId();
-    IEclipsePreferences props = new UserScope().getNode(id);
-    props.put("current-dir", dir);
-    try {
-      props.flush();
+
+    IPreferences clientPreferences = ClientUIPreferences.getClientPreferences(session);
+    if (clientPreferences == null) {
+      return;
     }
-    catch (BackingStoreException e) {
-      //nop
+
+    clientPreferences.put(LAST_DIR_PREF_KEY, dir);
+    try {
+      clientPreferences.flush();
+    }
+    catch (ProcessingException t) {
+      LOG.error("Unable to flush preferences.", t);
     }
   }
 

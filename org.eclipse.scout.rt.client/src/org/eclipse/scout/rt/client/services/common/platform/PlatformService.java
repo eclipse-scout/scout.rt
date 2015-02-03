@@ -16,50 +16,14 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.annotations.Priority;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.commons.prefs.UserScope;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.FileChooser;
 import org.eclipse.scout.service.AbstractService;
-import org.osgi.service.prefs.BackingStoreException;
 
 @Priority(-1)
 public class PlatformService extends AbstractService implements IPlatformService {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(PlatformService.class);
-
-  @Override
-  public boolean setProperty(String key, String value) {
-    IClientSession session = ClientSyncJob.getCurrentSession();
-    String id = session.getBundle().getSymbolicName() + "-" + session.getUserId();
-    IEclipsePreferences prefs = new UserScope().getNode(id);
-    String oldValue = prefs.get(key, null);
-    if (value == null) {
-      prefs.remove(key);
-    }
-    else {
-      prefs.put(key, value);
-      try {
-        prefs.flush();
-      }
-      catch (BackingStoreException e) {
-        LOG.warn("storing property: " + key + "=" + value, e);
-      }
-    }
-    return !CompareUtility.equals(oldValue, value);
-  }
-
-  @Override
-  public String getProperty(String key, String def) {
-    IClientSession session = ClientSyncJob.getCurrentSession();
-    String id = session.getBundle().getSymbolicName() + "-" + session.getUserId();
-    IEclipsePreferences prefs = new UserScope().getNode(id);
-    return prefs.get(key, def);
-  }
 
   @Override
   public String getFile() {
@@ -86,9 +50,6 @@ public class PlatformService extends AbstractService implements IPlatformService
           curPath = Platform.getStateLocation(session.getBundle()).toFile().getCanonicalPath();
         }
         catch (IOException io) {
-          // throw new
-          // ProcessingException("PlatformService.getFile(): unable to get current-dir",
-          // io);
           curPath = null;
         }
       }
