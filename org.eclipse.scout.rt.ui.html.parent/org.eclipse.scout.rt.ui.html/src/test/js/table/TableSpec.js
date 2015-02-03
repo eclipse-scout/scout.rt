@@ -99,6 +99,165 @@ describe("Table", function() {
 
   });
 
+  describe("Check Rows", function() {
+    it("check two rows in multicheckable table", function() {
+      var model = helper.createModelFixture(2, 5);
+      var table = helper.createTable(model);
+      table.multiCheck = true;
+      table.checkable = true;
+      table.render(session.$entryPoint);
+
+      var rows = table.rows;
+      var checkedRows = [];
+      for(var i = 0; i<rows.length; i++){
+        if(rows[i].checked){
+          checkedRows.push(rows[i]);
+        }
+      }
+      expect(checkedRows.length).toBe(0);
+
+      table.checkRow(rows[0], true, true);
+      table.checkRow(rows[4], true, true);
+
+      checkedRows = [];
+      for(var j = 0; j<rows.length; j++){
+        if(rows[j].checked){
+          checkedRows.push(rows[j]);
+        }
+      }
+      expect(checkedRows.length).toBe(2);
+
+      table.checkRow(rows[4], false, true);
+
+      checkedRows = [];
+      for(var z = 0; z<rows.length; z++){
+        if(rows[z].checked){
+          checkedRows.push(rows[z]);
+        }
+      }
+      expect(checkedRows.length).toBe(1);
+    });
+
+
+    it("check two rows in multicheckable table, only one should be checked", function() {
+      var model = helper.createModelFixture(2, 5);
+      var table = helper.createTable(model);
+      table.multiCheck = false;
+      table.checkable = true;
+      table.render(session.$entryPoint);
+
+      var rows = table.rows;
+      var checkedRows = [];
+      for(var i = 0; i<rows.length; i++){
+        if(rows[i].checked){
+          checkedRows.push(rows[i]);
+        }
+      }
+      expect(checkedRows.length).toBe(0);
+
+      table.checkRow(rows[0], true, true);
+      table.checkRow(rows[4], true, true);
+
+      checkedRows = [];
+      for(var j = 0; j<rows.length; j++){
+        if(rows[j].checked){
+          checkedRows.push(rows[j]);
+        }
+      }
+      expect(checkedRows.length).toBe(1);
+
+      table.checkRow(rows[4], false, true);
+
+      checkedRows = [];
+      for(var z = 0; z<rows.length; z++){
+        if(rows[z].checked){
+          checkedRows.push(rows[z]);
+        }
+      }
+      expect(checkedRows.length).toBe(0);
+    });
+
+    it("try to check a row in uncheckable table", function() {
+      var model = helper.createModelFixture(2, 5);
+      var table = helper.createTable(model);
+      table.multiCheck = false;
+      table.checkable = false;
+      table.render(session.$entryPoint);
+
+      var rows = table.rows;
+      var checkedRows = [];
+      for(var i = 0; i<rows.length; i++){
+        if(rows[i].checked){
+          checkedRows.push(rows[i]);
+        }
+      }
+      expect(checkedRows.length).toBe(0);
+
+      table.checkRow(rows[0], true, true);
+      checkedRows = [];
+      for(var j = 0; j<rows.length; j++){
+        if(rows[j].checked){
+          checkedRows.push(rows[j]);
+        }
+      }
+      expect(checkedRows.length).toBe(0);
+    });
+
+    it("try to check a disabled row ", function() {
+      var model = helper.createModelFixture(2, 5);
+      var table = helper.createTable(model);
+      table.multiCheck = false;
+      table.checkable = false;
+      table.render(session.$entryPoint);
+
+      var rows = table.rows;
+      var checkedRows = [];
+      for(var i = 0; i<rows.length; i++){
+        if(rows[i].checked){
+          checkedRows.push(rows[i]);
+        }
+      }
+      expect(checkedRows.length).toBe(0);
+      rows[0].enabled = false;
+      table.checkRow(rows[0], true, true);
+      checkedRows = [];
+      for(var j = 0; j<rows.length; j++){
+        if(rows[j].checked){
+          checkedRows.push(rows[j]);
+        }
+      }
+      expect(checkedRows.length).toBe(0);
+    });
+
+    it("try to check a row in disabled table", function() {
+      var model = helper.createModelFixture(2, 5);
+      var table = helper.createTable(model);
+      table.multiCheck = true;
+      table.checkable = true;
+      table.enabled = false;
+      table.render(session.$entryPoint);
+
+      var rows = table.rows;
+      var checkedRows = [];
+      for(var i = 0; i<rows.length; i++){
+        if(rows[i].checked){
+          checkedRows.push(rows[i]);
+        }
+      }
+      expect(checkedRows.length).toBe(0);
+
+      table.checkRow(rows[0], true, true);
+      checkedRows = [];
+      for(var j = 0; j<rows.length; j++){
+        if(rows[j].checked){
+          checkedRows.push(rows[j]);
+        }
+      }
+      expect(checkedRows.length).toBe(0);
+    });
+
+  });
+
   describe("selectRowsByIds", function() {
 
     it("selects rows and unselects others", function() {
