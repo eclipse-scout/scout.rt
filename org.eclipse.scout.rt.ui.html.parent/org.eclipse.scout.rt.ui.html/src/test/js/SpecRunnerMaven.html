@@ -63,7 +63,7 @@
       url: 'WebContent/res/defaultValues.json',
       data: ''
     }).done(function(data) {
-      var dataWithoutComments = removeCommentsFromJson(data),
+      var dataWithoutComments = stripCommentsFromJson(data),
         dataObj = JSON.parse(dataWithoutComments);
       scout.defaultValues._loadDefaultsConfiguration(dataObj);
     }).fail(function(jqXHR, textStatus, errorThrown) {

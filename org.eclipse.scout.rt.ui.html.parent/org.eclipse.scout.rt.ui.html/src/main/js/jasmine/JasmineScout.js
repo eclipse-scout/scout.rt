@@ -74,7 +74,7 @@ function createAdapter(model, session, adapterDataArray) {
   return adapter;
 }
 
-function removeCommentsFromJson(input) {
+function stripCommentsFromJson(input) {
   if (!input || typeof input !== 'string') {
     return input;
   }
