@@ -99,6 +99,12 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
         return getModel().isEnabled();
       }
     });
+    putJsonProperty(new JsonProperty<T>(ITree.PROP_AUTO_CHECK_CHILDS, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isEnabled();
+      }
+    });
   }
 
   @Override
@@ -420,7 +426,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
       getModel().getUIFacade().setNodesCheckedFromUI(treeNodesChecked.m_uncheckedNodes, false);
     }
   }
-  
+
   protected void handleUiNodeClicked(JsonEvent event, JsonResponse res) {
     final ITreeNode node = getTreeNodeForNodeId(JsonObjectUtility.getString(event.getData(), PROP_NODE_ID));
     getModel().getUIFacade().fireNodeClickFromUI(node, MouseButton.Left);
