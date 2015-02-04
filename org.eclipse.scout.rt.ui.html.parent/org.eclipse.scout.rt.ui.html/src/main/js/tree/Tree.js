@@ -585,7 +585,7 @@ scout.Tree.prototype.checkNodeAndRender = function(node, checked) {
 };
 
 scout.Tree.prototype.checkNode = function(node, checked, render) {
-  if (!this.enabled || !node.enabled || node.checked === checked) {
+  if (!this.enabled || !this.checkable || !node.enabled || node.checked === checked) {
     return;
   }
   var updatedNodes = [];
