@@ -67,16 +67,15 @@ scout.Outline.prototype._onNodeDeleted = function(node) {
 scout.Outline.prototype._renderSelection = function($nodes) {
   scout.Outline.parent.prototype._renderSelection.call(this, $nodes);
 
+  var node;
   if (!$nodes) {
     // Outline does not support multi selection -> [0]
-    $nodes = [this.$nodeById(this.selectedNodeIds[0])];
+    node = this.nodesMap[this.selectedNodeIds[0]];
+  }
+  else if ($nodes.length !== 0) {
+    node = $nodes[0].data('node');
   }
 
-  if ($nodes.length === 0) {
-    return;
-  }
-
-  var node = $nodes[0].data('node');
   if (node) {
     this._updateOutlineTab(node);
   }
@@ -154,7 +153,7 @@ scout.Outline.prototype._updateOutlineTab = function(node) {
 scout.Outline.prototype.onFormChanged = function(nodeId, detailForm) {
   var node;
   if (nodeId >= 0) {
-    node = this._nodeMap[nodeId];
+    node = this.nodesMap[nodeId];
     node.detailForm = this.session.getOrCreateModelAdapter(detailForm, this);
     if (node.detailForm) {
       this._addOutlineNavigationButtons(node.detailForm, node);
@@ -184,7 +183,7 @@ scout.Outline.prototype.onFormChanged = function(nodeId, detailForm) {
 scout.Outline.prototype.onTableChanged = function(nodeId, detailTable) {
   var node;
   if (nodeId >= 0) {
-    node = this._nodeMap[nodeId];
+    node = this.nodesMap[nodeId];
     node.detailTable = this.session.getOrCreateModelAdapter(detailTable, this);
     if (node.detailTable) {
       this._addOutlineNavigationButtons(node.detailTable, node);
@@ -203,7 +202,7 @@ scout.Outline.prototype.onTableChanged = function(nodeId, detailTable) {
 scout.Outline.prototype.onPageChanged = function(nodeId, detailFormVisible) {
   var node;
   if (nodeId >= 0) {
-    node = this._nodeMap[nodeId];
+    node = this.nodesMap[nodeId];
     if (node.detailFormVisible !== detailFormVisible) {
       node.detailFormVisible = detailFormVisible;
       this._updateOutlineTab(node);
@@ -214,7 +213,7 @@ scout.Outline.prototype.onPageChanged = function(nodeId, detailFormVisible) {
 scout.Outline.prototype.setDetailFormVisible = function(nodeId, visible) {
   var node;
   if (nodeId >= 0) {
-    node = this._nodeMap[nodeId];
+    node = this.nodesMap[nodeId];
     if (node.detailFormVisible !== visible) {
       node.detailFormVisible = visible;
       node.session.send(this.id, 'pageChanged', {

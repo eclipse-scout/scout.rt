@@ -30,15 +30,16 @@ import org.json.JSONObject;
 
 public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> implements IContextMenuOwner {
 
+  public static final String EVENT_NODES_INSERTED = "nodesInserted";
+  public static final String EVENT_NODES_UPDATED = "nodesUpdated";
+  public static final String EVENT_NODES_DELETED = "nodesDeleted";
+  public static final String EVENT_ALL_NODES_DELETED = "allNodesDeleted";
+  public static final String EVENT_NODES_SELECTED = "nodesSelected";
   public static final String EVENT_NODE_CLICKED = "nodeClicked";
   public static final String EVENT_NODE_ACTION = "nodeAction";
   public static final String EVENT_NODE_EXPANDED = "nodeExpanded";
   public static final String EVENT_NODE_CHANGED = "nodeChanged";
   public static final String EVENT_NODE_FILTER_CHANGED = "nodeFilterChanged";
-  public static final String EVENT_NODES_SELECTED = "nodesSelected";
-  public static final String EVENT_NODES_DELETED = "nodesDeleted";
-  public static final String EVENT_NODES_INSERTED = "nodesInserted";
-  public static final String EVENT_ALL_NODES_DELETED = "allNodesDeleted";
   public static final String EVENT_NODES_CHECKED = "nodesChecked";
 
   public static final String PROP_NODE_ID = "nodeId";
@@ -184,16 +185,17 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
       case TreeEvent.TYPE_NODES_INSERTED:
         handleModelNodesInserted(event);
         break;
+      case TreeEvent.TYPE_NODES_UPDATED:
+        handleModelNodesUpdated(event);
+        break;
       case TreeEvent.TYPE_NODES_DELETED:
         handleModelNodesDeleted(event);
         break;
       case TreeEvent.TYPE_NODE_EXPANDED:
       case TreeEvent.TYPE_NODE_COLLAPSED:
-        if (isInvisibleRootNode(event.getNode())) {
-          //Not necessary to send events for invisible root node
-          return;
+        if (!isInvisibleRootNode(event.getNode())) { // Not necessary to send events for invisible root node
+          handleModelNodeExpanded(event.getNode());
         }
-        handleModelNodeExpanded(event.getNode());
         break;
       case TreeEvent.TYPE_NODES_SELECTED:
         handleModelNodesSelected(event.getNodes());
@@ -212,18 +214,18 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
         break;
     }
     // TODO Tree | Events not yet implemented:
-    // - TYPE_NODES_UPDATED
     // - TYPE_BEFORE_NODES_SELECTED
     // - TYPE_CHILD_NODE_ORDER_CHANGED
+    // - TYPE_NODE_REQUEST_FOCUS
+    // - TYPE_NODE_ENSURE_VISIBLE
+    // - TYPE_REQUEST_FOCUS
+    // - TYPE_SCROLL_TO_SELECTION
+    // Probabely not needed:
     // - TYPE_NODE_ACTION
     // - TYPE_NODES_DRAG_REQUEST
     // - TYPE_DRAG_FINISHED
     // - TYPE_NODE_DROP_ACTION
-    // - TYPE_NODE_REQUEST_FOCUS
-    // - TYPE_NODE_ENSURE_VISIBLE
-    // - TYPE_REQUEST_FOCUS
     // - TYPE_NODE_CLICK
-    // - TYPE_SCROLL_TO_SELECTION
     // - TYPE_NODE_DROP_TARGET_CHANGED
   }
 
@@ -251,6 +253,20 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     addActionEvent(EVENT_NODES_INSERTED, jsonEvent);
   }
 
+  protected void handleModelNodesUpdated(TreeEvent event) {
+    JSONObject jsonEvent = new JSONObject();
+    for (ITreeNode node : event.getNodes()) {
+      // Only send _some_ of the properties. Everything else will be handled with separate events.
+      // --> See also: Tree.js/_onNodesUpdated()
+      JSONObject jsonNode = new JSONObject();
+      putProperty(jsonNode, "id", getOrCreateNodeId(node));
+      putProperty(jsonNode, "leaf", node.isLeaf());
+      JsonObjectUtility.append(jsonEvent, PROP_NODES, jsonNode);
+    }
+    putProperty(jsonEvent, PROP_COMMON_PARENT_NODE_ID, getOrCreateNodeId(event.getCommonParentNode()));
+    addActionEvent(EVENT_NODES_UPDATED, jsonEvent);
+  }
+
   protected void handleModelNodesDeleted(TreeEvent event) {
     Collection<ITreeNode> nodes = event.getNodes();
     JSONObject jsonEvent = new JSONObject();
@@ -260,7 +276,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
       addActionEvent(EVENT_ALL_NODES_DELETED, jsonEvent);
     }
     else {
-      putProperty(jsonEvent, PROP_NODE_IDS, nodeIdsToJson(event.getNodes()));
+      putProperty(jsonEvent, PROP_NODE_IDS, nodeIdsToJson(nodes));
       addActionEvent(EVENT_NODES_DELETED, jsonEvent);
     }
 
@@ -351,14 +367,20 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   }
 
   protected void putCellProperties(JSONObject json, ICell cell) {
-    putProperty(json, "text", cell.getText());
+    // We deliberately don't use JsonCell here, because most properties are not supported in a tree anyway
+    JsonObjectUtility.putProperty(json, "text", cell.getText());
+    JsonObjectUtility.putProperty(json, "iconId", cell.getIconId());
+    JsonObjectUtility.putProperty(json, "tooltipText", cell.getTooltipText());
+    JsonObjectUtility.putProperty(json, "foregroundColor", cell.getForegroundColor());
+    JsonObjectUtility.putProperty(json, "backgroundColor", cell.getBackgroundColor());
+    JsonObjectUtility.putProperty(json, "font", (cell.getFont() == null ? null : cell.getFont().toPattern()));
+    // TODO BSH Tree | Maybe add "cssStyle"?
   }
 
   protected JSONObject treeNodeToJson(ITreeNode node) {
-    String id = getOrCreateNodeId(node);
     JSONObject json = new JSONObject();
-    putProperty(json, "id", id);
-    putProperty(json, PROP_EXPANDED, node.isExpanded());
+    putProperty(json, "id", getOrCreateNodeId(node));
+    putProperty(json, "expanded", node.isExpanded());
     putProperty(json, "leaf", node.isLeaf());
     putProperty(json, "checked", node.isChecked());
     putProperty(json, "enabled", node.isEnabled());

@@ -36,7 +36,7 @@ describe("NavigateDownButton", function() {
         };
       }
     };
-    outline._nodeMap = {'123': drillNode};
+    outline.nodesMap = {'123': drillNode};
     outline.setNodesSelected = function(node) {};
     outline.setNodeExpanded = function(node, $node, expanded) {};
 

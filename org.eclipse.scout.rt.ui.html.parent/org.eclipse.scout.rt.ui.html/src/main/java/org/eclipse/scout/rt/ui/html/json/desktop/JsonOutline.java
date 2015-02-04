@@ -110,6 +110,16 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
     }
   }
 
+  protected void attachPagesForNodes(Collection<ITreeNode> nodes) {
+    for (ITreeNode node : nodes) {
+      if (!(node instanceof IPage)) {
+        throw new IllegalArgumentException("Expected page.");
+      }
+      IPage page = (IPage) node;
+      attachPage(page);
+    }
+  }
+
   @Override
   protected JSONObject treeNodeToJson(ITreeNode node) {
     if (!(node instanceof IPage)) {
@@ -127,13 +137,7 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
 
   @Override
   protected void handleModelNodesInserted(TreeEvent event) {
-    for (ITreeNode node : event.getNodes()) {
-      if (!(node instanceof IPage)) {
-        throw new IllegalArgumentException("Expected page.");
-      }
-      IPage page = (IPage) node;
-      attachPage(page);
-    }
+    attachPagesForNodes(event.getNodes());
     super.handleModelNodesInserted(event);
   }
 

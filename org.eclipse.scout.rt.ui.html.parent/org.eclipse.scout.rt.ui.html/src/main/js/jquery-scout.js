@@ -270,42 +270,44 @@
 
   // over engineered animate
   $.fn.widthToContent = function(duration) {
-    duration = duration || 300;
+    if (typeof duration === 'undefined') {
+      duration = 300;
+    }
 
     var oldW = this.outerWidth(),
       newW = this.css('width', 'auto').outerWidth(),
       finalWidth = this.data('finalWidth');
-
     if (newW !== oldW) {
       this.css('width', oldW);
     }
 
     if (newW !== finalWidth) {
       this.data('finalWidth', newW);
-      this.stop().animateAVCSD('width', newW, null, function() {
+      this.stop().animateAVCSD('width', newW, function() {
         $(this).data('finalWidth', null);
-      }, duration);
+      }, null, duration);
     }
 
     return this;
   };
 
   $.fn.heightToContent = function(duration) {
-    duration = duration || 300;
+    if (typeof duration === 'undefined') {
+      duration = 300;
+    }
 
     var oldH = this.outerHeight(),
       newH = this.css('height', 'auto').outerHeight(),
       finalHeight = this.data('finalHeight');
-
     if (newH !== oldH) {
       this.css('height', oldH);
     }
 
     if (newH !== finalHeight) {
       this.data('finalHeight', newH);
-      this.stop().animateAVCSD('height', newH, null, function() {
+      this.stop().animateAVCSD('height', newH, function() {
         $(this).data('finalHeight', null);
-      }, duration);
+      }, null, duration);
     }
 
     return newH;

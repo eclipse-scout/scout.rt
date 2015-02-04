@@ -11,8 +11,8 @@ scout.Table = function() {
   this.columns = [];
   this.tableControls = [];
   this.menus = [];
-  this.rowsMap = {};
   this.rows = [];
+  this.rowsMap = {}; // rows by id
   this.staticMenus = [];
   this._addAdapterProperties(['tableControls', 'menus']);
   this.events = new scout.EventSupport();
@@ -21,6 +21,7 @@ scout.Table = function() {
   this.selectedRowIds = [];
   this.animationRowLimit = 25;
   this.menuBar;
+  this._drawDataInProgress = false;
 };
 scout.inherits(scout.Table, scout.ModelAdapter);
 
@@ -398,14 +399,13 @@ scout.Table.prototype._buildRowDiv = function(row) {
 };
 
 scout.Table.prototype._tableRowBorderWidth = function() {
-  if (this._tablRowBorderWidth !== undefined) {
-    return this._tablRowBorderWidth;
+  if (typeof this._tableRowBorderWidth !== 'undefined') {
+    return this._tableRowBorderWidth;
   }
-
   var $tableRowDummy = this.$data.appendDiv('table-row');
-  this._tablRowBorderWidth = $tableRowDummy.cssBorderLeftWidth() + $tableRowDummy.cssBorderRightWidth();
+  this._tableRowBorderWidth = $tableRowDummy.cssBorderLeftWidth() + $tableRowDummy.cssBorderRightWidth();
   $tableRowDummy.remove();
-  return this._tablRowBorderWidth;
+  return this._tableRowBorderWidth;
 };
 
 scout.Table.prototype._drawData = function(startRow) {
@@ -413,48 +413,96 @@ scout.Table.prototype._drawData = function(startRow) {
   var rowString = '',
     that = this,
     numRowsLoaded = startRow,
-    $rows,
-    $mouseDownRow;
+    $rows;
 
   if (this.rows.length > 0) {
+    // Build $rows (as string instead of jQuery objects for efficiency reasons)
     for (var r = startRow; r < Math.min(this.rows.length, startRow + 100); r++) {
       var row = this.rows[r];
       rowString += this._buildRowDiv(row, r);
     }
     numRowsLoaded = r;
-
-    // append block of rows
     $rows = $(rowString);
-    $rows.appendTo(this.$data)
-      .on('mousedown', '', onMouseDown)
-      .on('mouseup', '', onMouseUp)
-      .on('dblclick', '', onDoubleClick)
-      .on('contextmenu', onContextMenu); //mouseup is used instead of click to make sure the event is fired before mouseup in table selection handler
 
+    // Link model and jQuery objects
     $rows.each(function(index, rowObject) {
       var $row = $(rowObject);
       var row = that.rows[startRow + index];
-      $row.data('row', row);
-      row.$row = $row;
-      $('.checkable-col label', $row).on('mouseup', row, onRowChecked);
+      scout.Table.linkRowToDiv(row, $row);
     });
 
+    // append block of rows
+    $rows.appendTo(this.$data);
+
+    // Add row listeners, inform subscribers and update scrollbar
+    this._installRows($rows);
   }
 
-  // update info and scrollbar
-  this._triggerRowsDrawn($rows, numRowsLoaded);
-  this.updateScrollbar();
-
   // repaint and append next block
+  this._drawDataInProgress = false;
   if (this.rows.length > numRowsLoaded) {
+    this._drawDataInProgress = true;
     setTimeout(function() {
       that._drawData(startRow + 100);
     }, 0);
   }
+};
 
-  function onRowChecked(event) {
-    var row = event.data;
-    that.checkRow(row, !row.checked);
+/**
+ * Adds row listeners, triggers "rows drawn" event and updates the scrollbar.
+ * This method should be used after the $rows are added to the DOM. The '$rows'
+ * are expected to be linked with the corresponding 'rows' (row.$row and $row.data('row')).
+ */
+scout.Table.prototype._installRows = function($rows) {
+  var that = this;
+
+  // Attach listeners
+  $rows.each(function() {
+    var $row = $(this);
+    $row.on('mousedown', '', onMouseDown)
+      .on('mouseup', '', onMouseUp)
+      .on('dblclick', '', onDoubleClick)
+      .on('contextmenu', onContextMenu); // mouseup is used instead of click to make sure the event is fired before mouseup in table selection handler
+    $('.checkable-col label', $row).on('mouseup', $row, onRowChecked);
+  });
+
+  // update info and scrollbar
+  this._triggerRowsDrawn($rows);
+  this.updateScrollbar();
+
+  // ----- inline methods: --------
+
+  var $mouseDownRow;
+
+  function onMouseDown(event) {
+    $mouseDownRow = $(event.delegateTarget);
+  }
+
+  function onMouseUp(event) {
+    if (event.originalEvent.detail > 1) {
+      //don't execute on double click events
+      return;
+    }
+
+    var $mouseUpRow = $(event.delegateTarget);
+    if ($mouseDownRow && $mouseDownRow[0] !== $mouseUpRow[0]) {
+      return;
+    }
+
+    var $row = $(event.delegateTarget);
+    var colId = that._findColumnId(event);
+    var hyperLink = that._findHyperLink(event);
+    if (hyperLink) {
+      that.sendHyperlinkAction($row, colId, hyperLink);
+    } else {
+      that.sendRowClicked($row, colId);
+    }
+  }
+
+  function onDoubleClick(event) {
+    var $row = $(event.delegateTarget);
+    var colId = that._findColumnId(event);
+    that.sendRowAction($row, colId);
   }
 
   function onContextMenu(event) {
@@ -502,37 +550,11 @@ scout.Table.prototype._drawData = function(startRow) {
     }
   }
 
-  function onMouseDown(event) {
-    $mouseDownRow = $(event.delegateTarget);
+  function onRowChecked(event) {
+    var $row = event.data;
+    var row = $row.data('row');
+    that.checkRow(row, !row.checked);
   }
-
-  function onMouseUp(event) {
-    if (event.originalEvent.detail > 1) {
-      //don't execute on double click events
-      return;
-    }
-
-    var $mouseUpRow = $(event.delegateTarget);
-    if ($mouseDownRow && $mouseDownRow[0] !== $mouseUpRow[0]) {
-      return;
-    }
-
-    var $row = $(event.delegateTarget);
-    var colId = that._findColumnId(event);
-    var hyperLink = that._findHyperLink(event);
-    if (hyperLink) {
-      that.sendHyperlinkAction($row, colId, hyperLink);
-    } else {
-      that.sendRowClicked($row, colId);
-    }
-  }
-
-  function onDoubleClick(event) {
-    var $row = $(event.delegateTarget);
-    var colId = that._findColumnId(event);
-    that.sendRowAction($row, colId);
-  }
-
 };
 
 scout.Table.prototype._findColumnId = function(event) {
@@ -702,27 +724,7 @@ scout.Table.prototype.getCellStyle = function(column, row) {
   hAlign = scout.Table.parseHorizontalAlignment(cell.horizontalAlignment);
   style = 'min-width: ' + width + 'px; max-width: ' + width + 'px; ';
   if (typeof cell === 'object' && cell !== null) {
-    if (cell.foregroundColor) {
-      style += 'color: #' + cell.foregroundColor + '; ';
-    }
-    if (cell.backgroundColor) {
-      style += 'background-color: #' + cell.backgroundColor + '; ';
-    }
-    if (cell.font) {
-      var fontSpec = scout.helpers.parseFontSpec(cell.font);
-      if (fontSpec.bold) {
-        style += 'font-weight: bold; ';
-      }
-      if (fontSpec.italic) {
-        style += 'font-style: italic; ';
-      }
-      if (fontSpec.size) {
-        style += 'font-size: ' + fontSpec.size + 'pt; ';
-      }
-      if (fontSpec.name) {
-        style += 'font-family: ' + fontSpec.name + '; ';
-      }
-    }
+    style += scout.helpers.legacyCellStyle(cell);
     // TODO BSH Table | iconId, editable, errorStatus
   }
   return style + (hAlign === 'left' ? '' : 'text-align: ' + hAlign + '; ');
@@ -907,6 +909,8 @@ scout.Table.prototype._onRowsChecked = function(rows) {
 };
 
 scout.Table.prototype._onRowsUpdated = function(rows) {
+  var $updatedRows = $();
+
   // Update model
   for (var i = 0; i < rows.length; i++) {
     var updatedRow = rows[i];
@@ -914,16 +918,24 @@ scout.Table.prototype._onRowsUpdated = function(rows) {
     this._unwrapCells(updatedRow.cells);
     scout.defaultValues.applyTo(updatedRow.cells, 'Cell');
 
+    // Replace old row
     var oldRow = this.rowsMap[updatedRow.id];
     scout.arrays.replace(this.rows, oldRow, updatedRow);
     this.rowsMap[updatedRow.id] = updatedRow;
 
-    // Update HTML
-    if (this.rendered) {
-      updatedRow.$row = $(this._buildRowDiv(updatedRow));
-      oldRow.$row.replaceWith(updatedRow.$row);
-      delete oldRow.$row; // unlink
+    // Replace old $row
+    if (this.rendered && oldRow.$row) {
+      var $updatedRow = $(this._buildRowDiv(updatedRow));
+      scout.Table.linkRowToDiv(updatedRow, $updatedRow);
+      // replace div in DOM
+      oldRow.$row.replaceWith($updatedRow);
+      $updatedRows = $updatedRows.add($updatedRow);
     }
+  }
+
+  // Re-attach listeners and inform subscribers
+  if ($updatedRows.length > 0) {
+    this._installRows($updatedRows);
   }
 };
 
@@ -995,7 +1007,7 @@ scout.Table.prototype._onRowsDeleted = function(rowIds) {
     // Update HTML
     if (this.rendered) {
       row.$row.remove();
-      delete row.$row; // unlink
+      delete row.$row;
     }
   }
   // Update HTML
@@ -1178,7 +1190,6 @@ scout.Table.prototype.registerFilter = function(key, filter) {
   if (!key) {
     throw new Error('key has to be defined');
   }
-
   this._filterMap[key] = filter;
 };
 
@@ -1186,7 +1197,6 @@ scout.Table.prototype.getFilter = function(key, filter) {
   if (!key) {
     throw new Error('key has to be defined');
   }
-
   return this._filterMap[key];
 };
 
@@ -1194,7 +1204,6 @@ scout.Table.prototype.unregisterFilter = function(key) {
   if (!key) {
     throw new Error('key has to be defined');
   }
-
   delete this._filterMap[key];
 };
 
@@ -1331,11 +1340,10 @@ scout.Table.prototype._renderColumnOrderChanges = function(oldColumnOrder) {
   });
 };
 
-scout.Table.prototype._triggerRowsDrawn = function($rows, numRows) {
+scout.Table.prototype._triggerRowsDrawn = function($rows) {
   var type = scout.Table.GUI_EVENT_ROWS_DRAWN;
   var event = {
-    $rows: $rows,
-    numRows: numRows
+    $rows: $rows
   };
   this.events.trigger(type, event);
 };
@@ -1435,6 +1443,9 @@ scout.Table.prototype._onRowOrderChanged = function(rowIds) {
 scout.Table.prototype._onColumnStructureChanged = function(columns) {
   //Index is not sent -> update received columns with the current indices
   for (var i = 0; i < columns.length; i++) {
+    // Unwrap data
+    scout.defaultValues.applyTo(columns[i], 'TableColumn');
+
     for (var j = 0; j < this.columns.length; j++) {
       if (columns[i].id === this.columns[j].id) {
         columns[i].index = this.columns[j].index;
@@ -1504,6 +1515,16 @@ scout.Table.prototype._onColumnHeadersUpdated = function(columns) {
 };
 
 scout.Table.prototype.onModelAction = function(event) {
+  // _drawData() might not have drawn all rows yet, therefore postpone the
+  // execution of this method to prevent conflicts on the row objects.
+  if (this._drawDataInProgress) {
+    var that = this;
+    setTimeout(function() {
+      that.onModelAction(event);
+    }, 0);
+    return;
+  }
+
   if (event.type === 'rowsInserted') {
     this._onRowsInserted(event.rows);
   } else if (event.type === 'rowsDeleted') {
@@ -1542,4 +1563,13 @@ scout.Table.parseHorizontalAlignment = function(alignment) {
     return 'center';
   }
   return 'left';
+};
+
+scout.Table.linkRowToDiv = function(row, $row) {
+  if (row) {
+    row.$row = $row;
+  }
+  if ($row) {
+    $row.data('row', row);
+  }
 };

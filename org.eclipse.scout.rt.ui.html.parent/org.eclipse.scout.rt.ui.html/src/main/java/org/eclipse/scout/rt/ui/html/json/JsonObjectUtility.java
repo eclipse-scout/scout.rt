@@ -216,6 +216,15 @@ public final class JsonObjectUtility {
     }
   }
 
+  public static JSONObject append(JSONObject json, String key, Object value) {
+    try {
+      return json.append(key, value);
+    }
+    catch (JSONException e) {
+      throw toRuntimeException(e);
+    }
+  }
+
   public static JSONArray adapterIdsToJson(Collection<IJsonAdapter<?>> adapters) {
     JSONArray array = new JSONArray();
     for (IJsonAdapter<?> adapter : adapters) {

@@ -555,7 +555,7 @@ describe("Tree", function() {
         it("updates model", function() {
           var newNode0Child3 = createModelNode('0_3', 'newNode0Child3');
           expect(tree.nodes.length).toBe(3);
-          expect(Object.keys(tree._nodeMap).length).toBe(12);
+          expect(Object.keys(tree.nodesMap).length).toBe(12);
 
           var message = {
             events: [createNodesInsertedEvent(model, [newNode0Child3], node0.id)]
@@ -564,7 +564,7 @@ describe("Tree", function() {
 
           expect(node0.childNodes.length).toBe(4);
           expect(node0.childNodes[3].text).toBe(newNode0Child3.text);
-          expect(Object.keys(tree._nodeMap).length).toBe(13);
+          expect(Object.keys(tree.nodesMap).length).toBe(13);
         });
 
         it("updates html document if parent is expanded", function() {
@@ -579,7 +579,7 @@ describe("Tree", function() {
           session._processSuccessResponse(message);
 
           expect(findAllNodes(tree).length).toBe(13);
-          expect(tree.$nodeById(node0.childNodes[3].id).text()).toBe(newNode0Child3.text);
+          expect(node0.childNodes[3].$node.text()).toBe(newNode0Child3.text);
         });
 
       });
@@ -599,11 +599,11 @@ describe("Tree", function() {
         //Check that the model was updated correctly
         expect(node0.childNodes.length).toBe(4);
         expect(node0.childNodes[3].text).toBe(newNode0Child3.text);
-        expect(Object.keys(tree._nodeMap).length).toBe(13);
+        expect(Object.keys(tree.nodesMap).length).toBe(13);
 
         //Check that no dom manipulation happened
         expect(findAllNodes(tree).length).toBe(9);
-        expect(tree.$nodeById(node0.childNodes[3].id).length).toBe(0);
+        expect(node0.childNodes[3].$node).toBeUndefined();
       });
 
       it("expands the parent if parent.expanded = true and the new inserted nodes are the first child nodes", function() {
@@ -615,7 +615,9 @@ describe("Tree", function() {
         tree.render(session.$entryPoint);
 
         var newNode0Child3 = createModelNode('0_3', 'newNode0Child3');
-        var $node0 = tree.$nodeById(node0.id);
+        var $node0 = node0.$node;
+        // Even tough the nodes were created with expanded=true, the $node should not have
+        // been rendered as expanded (because it has no children)
         expect($node0).not.toHaveClass('expanded');
         expect(findAllNodes(tree).length).toBe(3);
 
@@ -625,7 +627,7 @@ describe("Tree", function() {
         session._processSuccessResponse(message);
 
         expect(findAllNodes(tree).length).toBe(4);
-        expect(tree.$nodeById(node0.childNodes[0].id).text()).toBe(newNode0Child3.text);
+        expect(node0.childNodes[0].$node.text()).toBe(newNode0Child3.text);
         expect($node0).toHaveClass('expanded');
       });
 
@@ -654,7 +656,7 @@ describe("Tree", function() {
           var node2Child1 = node2.childNodes[1];
           expect(tree.nodes.length).toBe(3);
           expect(tree.nodes[0]).toBe(node0);
-          expect(Object.keys(tree._nodeMap).length).toBe(39);
+          expect(Object.keys(tree.nodesMap).length).toBe(39);
 
           var message = {
             events: [createNodesDeletedEvent(model, [node2Child0.id], node2.id)]
@@ -663,7 +665,7 @@ describe("Tree", function() {
 
           expect(tree.nodes[2].childNodes.length).toBe(2);
           expect(tree.nodes[2].childNodes[0]).toBe(node2Child1);
-          expect(Object.keys(tree._nodeMap).length).toBe(35);
+          expect(Object.keys(tree.nodesMap).length).toBe(35);
         });
 
         it("updates html document", function() {
@@ -672,7 +674,7 @@ describe("Tree", function() {
           var node2Child0 = node2.childNodes[0];
 
           expect(findAllNodes(tree).length).toBe(39);
-          expect(tree.$nodeById(node2Child0.id).length).toBe(1);
+          expect(node2Child0.$node).toBeDefined();
 
           //Delete a child node
           var message = {
@@ -681,12 +683,12 @@ describe("Tree", function() {
           session._processSuccessResponse(message);
 
           expect(findAllNodes(tree).length).toBe(35);
-          expect(tree.$nodeById(node2Child0.id).length).toBe(0);
+          expect(node2Child0.$node).toBeUndefined();
 
-          expect(tree.$nodeById(node0.id).length).toBe(1);
-          expect(tree.$nodeById(node0.childNodes[0].id).length).toBe(1);
-          expect(tree.$nodeById(node0.childNodes[1].id).length).toBe(1);
-          expect(tree.$nodeById(node0.childNodes[2].id).length).toBe(1);
+          expect(node0.$node).toBeDefined();
+          expect(node0.childNodes[0].$node).toBeDefined();
+          expect(node0.childNodes[1].$node).toBeDefined();
+          expect(node0.childNodes[2].$node).toBeDefined();
         });
 
       });
@@ -700,7 +702,7 @@ describe("Tree", function() {
 
           expect(tree.nodes.length).toBe(2);
           expect(tree.nodes[0]).toBe(node1);
-          expect(Object.keys(tree._nodeMap).length).toBe(26);
+          expect(Object.keys(tree.nodesMap).length).toBe(26);
         });
 
         it("updates html document", function() {
@@ -712,10 +714,10 @@ describe("Tree", function() {
           session._processSuccessResponse(message);
 
           expect(findAllNodes(tree).length).toBe(26);
-          expect(tree.$nodeById(node0.id).length).toBe(0);
-          expect(tree.$nodeById(node0.childNodes[0].id).length).toBe(0);
-          expect(tree.$nodeById(node0.childNodes[1].id).length).toBe(0);
-          expect(tree.$nodeById(node0.childNodes[2].id).length).toBe(0);
+          expect(node0.$node).toBeUndefined();
+          expect(node0.childNodes[0].$node).toBeUndefined();
+          expect(node0.childNodes[1].$node).toBeUndefined();
+          expect(node0.childNodes[2].$node).toBeUndefined();
         });
 
         describe("deleting a collapsed root node", function() {
@@ -728,7 +730,7 @@ describe("Tree", function() {
 
             expect(tree.nodes.length).toBe(2);
             expect(tree.nodes[0]).toBe(node1);
-            expect(Object.keys(tree._nodeMap).length).toBe(26);
+            expect(Object.keys(tree.nodesMap).length).toBe(26);
           });
 
           it("updates html document", function() {
@@ -741,10 +743,10 @@ describe("Tree", function() {
             session._processSuccessResponse(message);
 
             expect(findAllNodes(tree).length).toBe(26);
-            expect(tree.$nodeById(node0.id).length).toBe(0);
-            expect(tree.$nodeById(node0.childNodes[0].id).length).toBe(0);
-            expect(tree.$nodeById(node0.childNodes[1].id).length).toBe(0);
-            expect(tree.$nodeById(node0.childNodes[2].id).length).toBe(0);
+            expect(node0.$node).toBeUndefined();
+            expect(node0.childNodes[0].$node).toBeUndefined();
+            expect(node0.childNodes[1].$node).toBeUndefined();
+            expect(node0.childNodes[2].$node).toBeUndefined();
           });
         });
       });
@@ -757,7 +759,7 @@ describe("Tree", function() {
           session._processSuccessResponse(message);
 
           expect(tree.nodes.length).toBe(0);
-          expect(Object.keys(tree._nodeMap).length).toBe(0);
+          expect(Object.keys(tree.nodesMap).length).toBe(0);
         });
 
         it("updates html document", function() {
@@ -797,7 +799,7 @@ describe("Tree", function() {
 
       it("deletes all nodes from model", function() {
         expect(tree.nodes.length).toBe(3);
-        expect(Object.keys(tree._nodeMap).length).toBe(12);
+        expect(Object.keys(tree.nodesMap).length).toBe(12);
 
         var message = {
           events: [createAllNodesDeletedEvent(model)]
@@ -805,7 +807,7 @@ describe("Tree", function() {
         session._processSuccessResponse(message);
 
         expect(tree.nodes.length).toBe(0);
-        expect(Object.keys(tree._nodeMap).length).toBe(0);
+        expect(Object.keys(tree.nodesMap).length).toBe(0);
       });
 
       it("deletes all nodes from html document", function() {
@@ -823,7 +825,7 @@ describe("Tree", function() {
 
       it("deletes all nodes from model for a given parent", function() {
         expect(tree.nodes.length).toBe(3);
-        expect(Object.keys(tree._nodeMap).length).toBe(12);
+        expect(Object.keys(tree.nodesMap).length).toBe(12);
 
         var message = {
           events: [createAllNodesDeletedEvent(model, node1.id)]
@@ -831,7 +833,7 @@ describe("Tree", function() {
         session._processSuccessResponse(message);
 
         expect(node1.childNodes.length).toBe(0);
-        expect(Object.keys(tree._nodeMap).length).toBe(9);
+        expect(Object.keys(tree.nodesMap).length).toBe(9);
       });
 
       it("deletes all nodes from html document for a given parent", function() {
@@ -847,10 +849,10 @@ describe("Tree", function() {
         expect(findAllNodes(tree).length).toBe(9);
 
         //Check that children are removed, parent must still exist
-        expect(tree.$nodeById(node1.id).length).toBe(1);
-        expect(tree.$nodeById(node1Child0.id).length).toBe(0);
-        expect(tree.$nodeById(node1Child1.id).length).toBe(0);
-        expect(tree.$nodeById(node1Child2.id).length).toBe(0);
+        expect(node1.$node).toBeDefined();
+        expect(node1Child0.$node).toBeUndefined();
+        expect(node1Child1.$node).toBeUndefined();
+        expect(node1Child2.$node).toBeUndefined();
       });
 
     });
@@ -873,7 +875,7 @@ describe("Tree", function() {
       it("selects a node", function() {
         tree.render(session.$entryPoint);
         expect(tree.$selectedNodes().length).toBe(0);
-        expect(tree.$nodeById(node0.id).isSelected()).toBe(false);
+        expect(node0.$node.isSelected()).toBe(false);
 
         var message = {
           events: [createNodesSelectedEvent(model, [node0.id])]
@@ -886,7 +888,7 @@ describe("Tree", function() {
 
         //Check gui
         expect(tree.$selectedNodes().length).toBe(1);
-        expect(tree.$nodeById(node0.id).isSelected()).toBe(true);
+        expect(node0.$node.isSelected()).toBe(true);
       });
 
       it("expands the parents if a hidden node should be selected whose parents are collapsed (revealing the selection)", function() {
@@ -894,7 +896,7 @@ describe("Tree", function() {
 
         expect(node0.expanded).toBe(false);
         expect(child0.expanded).toBe(false);
-        expect(tree.$nodeById(child0.id).length).toBe(0);
+        expect(child0.$node).toBeUndefined();
 
         var message = {
           events: [createNodesSelectedEvent(model, [grandchild0.id])]
@@ -904,7 +906,7 @@ describe("Tree", function() {
         expect(node0.expanded).toBe(true);
         expect(child0.expanded).toBe(true);
         expect(tree.$selectedNodes().length).toBe(1);
-        expect(tree.$nodeById(grandchild0.id).isSelected()).toBe(true);
+        expect(grandchild0.$node.isSelected()).toBe(true);
 
         sendQueuedAjaxCalls();
 
@@ -967,7 +969,7 @@ describe("Tree", function() {
         session._processSuccessResponse(message);
 
         //Check gui
-        var $node0 = tree.$nodeById(node0.id);
+        var $node0 = node0.$node;
         expect($node0.text()).toBe(event.text);
 
         //Check whether tree-control is still there
@@ -1004,7 +1006,7 @@ describe("Tree", function() {
         expect(findAllNodes(tree).length).toBe(9);
 
         //Collapse node0
-        var $node0 = tree.$nodeById(node0.id);
+        var $node0 = node0.$node;
         message = {
           events: [createNodeExpandedEvent(model, node0.id, false)]
         };
@@ -1022,7 +1024,7 @@ describe("Tree", function() {
         //Model should be updated, html nodes not added because node still is collapsed
         expect(node0.childNodes.length).toBe(1);
         expect(node0.childNodes[0].text).toBe(newNode0Child3.text);
-        expect(Object.keys(tree._nodeMap).length).toBe(10);
+        expect(Object.keys(tree.nodesMap).length).toBe(10);
         expect(findAllNodes(tree).length).toBe(9); //Still 9 nodes
 
         //Expand again
@@ -1036,7 +1038,7 @@ describe("Tree", function() {
 
         //Html nodes should now be added
         expect(findAllNodes(tree).length).toBe(10);
-        expect(tree.$nodeById(node0.childNodes[0].id).length).toBe(1);
+        expect(node0.childNodes[0].$node).toBeDefined();
       });
     });
   });

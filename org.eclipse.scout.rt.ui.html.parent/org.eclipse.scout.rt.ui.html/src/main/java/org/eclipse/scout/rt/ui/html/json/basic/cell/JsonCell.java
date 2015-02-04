@@ -71,7 +71,6 @@ public class JsonCell implements IJsonMapper {
     JsonObjectUtility.putProperty(json, "font", (m_cell.getFont() == null ? null : m_cell.getFont().toPattern()));
     JsonObjectUtility.putProperty(json, "editable", m_cell.isEditable());
     // TODO BSH Table | Add property "errorStatus"
-    // TODO BSH Table | Handle "default" values
     // TODO BSH Table | Add generic "cssStyle" property
     return json;
   }

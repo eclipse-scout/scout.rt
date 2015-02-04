@@ -16,6 +16,8 @@ scout.helpers = {
    * <p>
    * Please not that you can open new windows only inside a handler of a direct
    * user action. Asynchronous calls to this method are blocked by the browsers.
+   *
+   * @memberOf scout.helpers
    */
   // FIXME AWE/BSH: unsued after detach-window feature has been removed, check at end of release
   // if it's still unused and delete it in that case-
@@ -85,6 +87,89 @@ scout.helpers = {
       }
     }
     return fontSpec;
+  },
+
+  /**
+   * Returns a string with CSS definitions for use in an element's "style" attribute. All CSS relevant
+   * properties of the given cell are converted to CSS definitions, namely foreground color, background
+   * color and font.
+   *
+   * If an $element is provided, the CSS definitions are directly applied to the element. This can be
+   * useful if the "style" attribute is shared and cannot be replaced in it's entirety.
+   */
+  legacyCellStyle: function(cell, $element) {
+    var cssColor = '',
+      cssBackgroundColor = '',
+      cssFontWeight = '',
+      cssFontStyle = '',
+      cssFontSize = '',
+      cssFontFamily = '';
+
+    if (typeof cell === 'object' && cell !== null) {
+      if (/^[A-Fa-f0-9]{3}([A-Fa-f0-9]{3})?$/.test(cell.foregroundColor)) { // hex color
+        cssColor = '#' + cell.foregroundColor;
+      }
+      else if (/^[A-Za-z0-9().,%-]+$/.test(cell.foregroundColor)) { // named colors or color functions
+        cssColor = cell.foregroundColor;
+      }
+
+      if (/^[A-Fa-f0-9]{3}([A-Fa-f0-9]{3})?$/.test(cell.backgroundColor)) { // hex color
+        cssBackgroundColor = '#' + cell.backgroundColor;
+      }
+      else if (/^[A-Za-z0-9().,%-]+$/.test(cell.backgroundColor)) { // named colors or color functions
+        cssBackgroundColor = cell.backgroundColor;
+      }
+
+      if (cell.font) {
+        var fontSpec = this.parseFontSpec(cell.font);
+        if (fontSpec.bold) {
+          cssFontWeight = 'bold';
+        }
+        if (fontSpec.italic) {
+          cssFontStyle = 'italic';
+        }
+        if (fontSpec.size) {
+          cssFontSize = fontSpec.size + 'pt';
+        }
+        if (fontSpec.name) {
+          cssFontFamily = fontSpec.name;
+        }
+      }
+    }
+
+    // Apply CSS properties
+    if ($element) {
+      $element
+        .css('color', cssColor)
+        .css('background-color', cssBackgroundColor)
+        .css('font-weight', cssFontWeight)
+        .css('font-style', cssFontStyle)
+        .css('font-size', cssFontSize)
+        .css('font-family', cssFontFamily);
+    }
+
+    // Build style string
+    var style = '';
+    if (cssColor) {
+      style += 'color: ' + cssColor + '; ';
+    }
+    if (cssBackgroundColor) {
+      style += 'background-color: ' + cell.backgroundColor + '; ';
+    }
+    if (cssFontWeight) {
+      style += 'font-weight: '+ cssFontWeight +'; ';
+    }
+    if (cssFontStyle) {
+      style += 'font-style: '+ cssFontStyle +'; ';
+    }
+    if (cssFontSize) {
+      style += 'font-size: '+ cssFontSize +'; ';
+    }
+    if (cssFontFamily) {
+      style += 'font-family: '+ cssFontFamily +'; ';
+    }
+
+    return style;
   }
 
 };

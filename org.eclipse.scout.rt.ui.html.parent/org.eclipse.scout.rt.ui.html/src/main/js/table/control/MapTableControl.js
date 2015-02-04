@@ -147,7 +147,9 @@ scout.MapTableControl.prototype._removeContent = function() {
 };
 
 scout.MapTableControl.prototype.dispose = function() {
-  this.table.events.removeListener(this._filterResetListener);
+  if (this.table) { // FIXME CGU TableControl.dispose() | Fix this
+    this.table.events.removeListener(this._filterResetListener);
+  }
 };
 
 scout.MapTableControl.prototype._removeMap = function() {

@@ -705,7 +705,9 @@ scout.ChartTableControl.prototype._removeContent = function() {
 };
 
 scout.ChartTableControl.prototype.dispose = function() {
-  this.table.events.removeListener(this._filterResetListener);
+  if (this.table) { // FIXME CGU TableControl.dispose() | Fix this
+    this.table.events.removeListener(this._filterResetListener);
+  }
 };
 
 scout.ChartTableControl.prototype.isContentAvailable = function() {

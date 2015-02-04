@@ -24,7 +24,7 @@ scout.NavigateDownButton.prototype._drill = function() {
   var drillNode, row, rowIds = this.node.detailTable.selectedRowIds;
   if (rowIds && rowIds.length > 0) {
     row = this.node.detailTable.rowById(rowIds[0]);
-    drillNode = this.outline._nodeMap[row.nodeId];
+    drillNode = this.outline.nodesMap[row.nodeId];
     $.log.debug('drill down to node ' + drillNode);
     this.outline.setNodesSelected(drillNode);
     this.outline.setNodeExpanded(drillNode, undefined, false);
