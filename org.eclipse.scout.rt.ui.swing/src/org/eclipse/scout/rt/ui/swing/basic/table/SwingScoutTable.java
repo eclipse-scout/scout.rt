@@ -636,6 +636,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
         case TableEvent.TYPE_ROWS_INSERTED:
         case TableEvent.TYPE_ROWS_UPDATED:
         case TableEvent.TYPE_ROWS_DELETED:
+        case TableEvent.TYPE_ROWS_CHECKED:
         case TableEvent.TYPE_ALL_ROWS_DELETED:
         case TableEvent.TYPE_ROW_ORDER_CHANGED:
         case TableEvent.TYPE_ROW_FILTER_CHANGED:
@@ -859,10 +860,10 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
         Runnable t = new Runnable() {
           @Override
           public void run() {
-            getScoutObject().getUIFacade().fireRowClickFromUI(scoutRow, SwingUtility.swingToScoutMouseButton(swingButton));
             if (getScoutObject().isCheckable()) {
               getScoutObject().getUIFacade().setCheckedRowsFromUI(CollectionUtility.arrayList(scoutRow), !scoutRow.isChecked());
             }
+            getScoutObject().getUIFacade().fireRowClickFromUI(scoutRow, SwingUtility.swingToScoutMouseButton(swingButton));
           }
         };
 
