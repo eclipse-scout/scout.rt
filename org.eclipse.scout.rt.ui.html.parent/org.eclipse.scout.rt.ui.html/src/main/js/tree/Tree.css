@@ -94,7 +94,7 @@
     .checkboxLabelBeforeBorder;
   }
 
-  & label.childsChecked:before {
+  & label.childrenChecked:before {
     .checkboxLabelBeforeChildChecked;
   }
 

@@ -30,7 +30,7 @@ scout.Tree.prototype._initTreeNode = function(parentNode, node) {
   if (node.childNodes === undefined) {
     node.childNodes = [];
   }
-  this._updateMarkChildsChecked(node, true, node.checked);
+  this._updateMarkChildrenChecked(node, true, node.checked);
 };
 
 scout.Tree.prototype._visitNodes = function(nodes, func, parentNode) {
@@ -48,29 +48,29 @@ scout.Tree.prototype._visitNodes = function(nodes, func, parentNode) {
   }
 };
 
-scout.Tree.prototype._updateMarkChildsChecked = function(node, init, checked, checkChildsChecked) {
+scout.Tree.prototype._updateMarkChildrenChecked = function(node, init, checked, checkChildrenChecked) {
   if (!this.checkable) {
     return;
   }
 
-  if (checkChildsChecked) {
-    var childsFound = false;
+  if (checkChildrenChecked) {
+    var childrenFound = false;
     for (var j = 0; j < node.childNodes.length > 0; j++) {
       var childNode = node.childNodes[j];
-      if (childNode.checked || childNode.childsChecked) {
-        node.childsChecked = true;
+      if (childNode.checked || childNode.childrenChecked) {
+        node.childrenChecked = true;
         checked = true;
-        childsFound = true;
+        childrenFound = true;
         if (this.rendered) {
-          this.$nodeById(node.id).find('label').addClass('childsChecked');
+          this.$nodeById(node.id).find('label').addClass('childrenChecked');
         }
         break;
       }
     }
-    if (!childsFound) {
-      node.childsChecked = false;
+    if (!childrenFound) {
+      node.childrenChecked = false;
       if (this.rendered) {
-        this.$nodeById(node.id).find('label').removeClass('childsChecked');
+        this.$nodeById(node.id).find('label').removeClass('childrenChecked');
       }
     }
   }
@@ -85,28 +85,28 @@ scout.Tree.prototype._updateMarkChildsChecked = function(node, init, checked, ch
     var hasCheckedSiblings = false;
     for (var i = 0; i < node.parentNode.childNodes.length > 0; i++) {
       var siblingNode = node.parentNode.childNodes[i];
-      if (siblingNode.checked || siblingNode.childsChecked) {
+      if (siblingNode.checked || siblingNode.childrenChecked) {
         hasCheckedSiblings = true;
         break;
       }
     }
-    if (hasCheckedSiblings !== node.parentNode.childsChecked) {
+    if (hasCheckedSiblings !== node.parentNode.childrenChecked) {
       //parentNode.checked should be false
-      node.parentNode.childsChecked = hasCheckedSiblings;
+      node.parentNode.childrenChecked = hasCheckedSiblings;
       stateChanged = true;
     }
   }
-  if ((checked && !node.parentNode.childsChecked)) {
-    node.parentNode.childsChecked = true;
+  if ((checked && !node.parentNode.childrenChecked)) {
+    node.parentNode.childrenChecked = true;
     stateChanged = true;
   }
   if (stateChanged) {
-    this._updateMarkChildsChecked(node.parentNode, init, checked);
+    this._updateMarkChildrenChecked(node.parentNode, init, checked);
     if (this.rendered) {
       if (checked) {
-        this.$nodeById(node.parentNode.id).find('label').addClass('childsChecked');
+        this.$nodeById(node.parentNode.id).find('label').addClass('childrenChecked');
       } else {
-        this.$nodeById(node.parentNode.id).find('label').removeClass('childsChecked');
+        this.$nodeById(node.parentNode.id).find('label').removeClass('childrenChecked');
       }
     }
   }
@@ -396,7 +396,7 @@ scout.Tree.prototype._onNodesDeleted = function(nodeIds, parentNodeId) {
   for (i = 0; i < nodeIds.length; i++) {
     nodeId = nodeIds[i];
     node = this._nodeMap[nodeId];
-    this._updateMarkChildsChecked(node, false, false);
+    this._updateMarkChildrenChecked(node, false, false);
     if (parentNode) {
       if (node.parentNode !== parentNode) {
         throw new Error('Unexpected parent. Node.parent: ' + node.parentNode + ', parentNode: ' + parentNode);
@@ -426,7 +426,7 @@ scout.Tree.prototype._onAllNodesDeleted = function(parentNodeId) {
 
   //Update model and nodemap
   updateNodeMap = function(parentNode, node) {
-    this._updateMarkChildsChecked(node, false, false);
+    this._updateMarkChildrenChecked(node, false, false);
     delete this._nodeMap[node.id];
   }.bind(this);
 
@@ -593,7 +593,7 @@ scout.Tree.prototype.checkNode = function(node, checked, render, suppressSend) {
     for (var i = 0; i < this.nodes.length; i++) {
       if (this.nodes[i].checked) {
         this.nodes[i].checked = false;
-        this._updateMarkChildsChecked(this.nodes[i], false, false, true);
+        this._updateMarkChildrenChecked(this.nodes[i], false, false, true);
         updatedNodes.push(this.nodes[i]);
         if (this.rendered) {
           this._renderNodeChecked(this.nodes[i]);
@@ -603,7 +603,7 @@ scout.Tree.prototype.checkNode = function(node, checked, render, suppressSend) {
   }
   node.checked = checked;
   updatedNodes.push(node);
-  this._updateMarkChildsChecked(node, false, checked, true);
+  this._updateMarkChildrenChecked(node, false, checked, true);
   updatedNodes = updatedNodes.concat(this.checkChilds(node));
   if (!suppressSend) {
     this.sendNodesChecked(updatedNodes);
@@ -667,10 +667,10 @@ scout.Tree.prototype._renderTreeItemCheckbox = function($node, node) {
     $checkbox.prop('disabled', 'disabled');
   }
 
-  if (node.childsChecked) {
-    $label.addClass('childsChecked');
+  if (node.childrenChecked) {
+    $label.addClass('childrenChecked');
   } else {
-    $label.removeClass('childsChecked');
+    $label.removeClass('childrenChecked');
   }
 
   function onNodeChecked(event) {
@@ -847,7 +847,7 @@ scout.Tree.prototype.onModelAction = function(event) {
 scout.Tree.prototype._onNodesChecked = function(nodes) {
   for (var i = 0; i < nodes.length; i++) {
     this._nodeMap[nodes[i].id].checked = nodes[i].checked;
-    this._updateMarkChildsChecked(this._nodeMap[nodes[i].id], false, nodes[i].checked, true);
+    this._updateMarkChildrenChecked(this._nodeMap[nodes[i].id], false, nodes[i].checked, true);
     if (this.rendered) {
       this._renderNodeChecked(nodes[i]);
     }
