@@ -32,8 +32,8 @@ describe("Tree", function() {
     return {
       "id": id,
       "text": text,
-      "enabled":true,
-      "checked":false
+      "enabled": true,
+      "checked": false
     };
   }
 
@@ -200,18 +200,18 @@ describe("Tree", function() {
 
       var node;
       //find node with more then one child level
-      for(var i = 0 ; i< tree.nodes.length; i++){
-        if(tree.nodes[i].childNodes && tree.nodes[i].childNodes.length>0 && tree.nodes[i].childNodes[0].childNodes && tree.nodes[i].childNodes[0].childNodes.length>0 ){
+      for (var i = 0; i < tree.nodes.length; i++) {
+        if (tree.nodes[i].childNodes && tree.nodes[i].childNodes.length > 0 && tree.nodes[i].childNodes[0].childNodes && tree.nodes[i].childNodes[0].childNodes.length > 0) {
           node = tree.nodes[i].childNodes[0].childNodes[0];
           break;
         }
       }
 
-      if (node){
+      if (node) {
         tree.checkNode(node, true, true);
       }
 
-      while(node.parentNode){
+      while (node.parentNode) {
         node = node.parentNode;
         expect(node.childsChecked).toEqual(true);
       }
@@ -225,21 +225,21 @@ describe("Tree", function() {
       tree.checkable = true;
       var node, nodeToCheck;
       //find node with more then one child level
-      for(var i = 0 ; i< tree.nodes.length; i++){
-        if(tree.nodes[i].childNodes && tree.nodes[i].childNodes.length>0 && tree.nodes[i].childNodes[0].childNodes && tree.nodes[i].childNodes[0].childNodes.length>0 ){
+      for (var i = 0; i < tree.nodes.length; i++) {
+        if (tree.nodes[i].childNodes && tree.nodes[i].childNodes.length > 0 && tree.nodes[i].childNodes[0].childNodes && tree.nodes[i].childNodes[0].childNodes.length > 0) {
           node = tree.nodes[i].childNodes[0].childNodes[0];
           nodeToCheck = tree.nodes[i].childNodes[0];
           break;
         }
       }
 
-      if (node){
+      if (node) {
         tree.checkNode(node, true, true);
       }
       tree.checkNode(nodeToCheck, true, true);
-      var tmpNode =  nodeToCheck;
+      var tmpNode = nodeToCheck;
       //upper nodes should be marked
-      while(tmpNode.parentNode){
+      while (tmpNode.parentNode) {
         tmpNode = tmpNode.parentNode;
         expect(tmpNode.childsChecked).toEqual(true);
       }
@@ -249,9 +249,9 @@ describe("Tree", function() {
       tree.checkNode(nodeToCheck, false, true);
       expect(nodeToCheck.checked).toEqual(false);
       expect(nodeToCheck.childsChecked).toEqual(true);
-      tmpNode =  nodeToCheck;
+      tmpNode = nodeToCheck;
       //upper nodes should be marked
-      while(tmpNode.parentNode){
+      while (tmpNode.parentNode) {
         tmpNode = tmpNode.parentNode;
         expect(tmpNode.childsChecked).toEqual(true);
       }
@@ -263,20 +263,20 @@ describe("Tree", function() {
       tree.checkable = true;
       var nodeOne, nodeTwo;
       //find node with more then one child level
-      for(var i = 0 ; i< tree.nodes.length; i++){
-        if(tree.nodes[i].childNodes && tree.nodes[i].childNodes.length>0 && tree.nodes[i].childNodes[0].childNodes && tree.nodes[i].childNodes[0].childNodes.length>1 ){
+      for (var i = 0; i < tree.nodes.length; i++) {
+        if (tree.nodes[i].childNodes && tree.nodes[i].childNodes.length > 0 && tree.nodes[i].childNodes[0].childNodes && tree.nodes[i].childNodes[0].childNodes.length > 1) {
           nodeOne = tree.nodes[i].childNodes[0].childNodes[0];
           nodeTwo = tree.nodes[i].childNodes[0].childNodes[1];
           break;
         }
       }
-      if (nodeOne && nodeTwo){
+      if (nodeOne && nodeTwo) {
         tree.checkNode(nodeOne, true, true);
         tree.checkNode(nodeTwo, true, true);
       }
       //check if all upper nodes are marked
       var tmpNode = nodeOne;
-      while(tmpNode.parentNode){
+      while (tmpNode.parentNode) {
         tmpNode = tmpNode.parentNode;
         expect(tmpNode.childsChecked).toEqual(true);
       }
@@ -285,7 +285,7 @@ describe("Tree", function() {
       tree.checkNode(nodeTwo, false, true);
       //marks on upper should exist
       tmpNode = nodeOne;
-      while(tmpNode.parentNode){
+      while (tmpNode.parentNode) {
         tmpNode = tmpNode.parentNode;
         expect(tmpNode.childsChecked).toEqual(true);
       }
@@ -294,7 +294,7 @@ describe("Tree", function() {
       tree.checkNode(nodeOne, false, true);
       //marks on upper should be removed
       tmpNode = nodeOne;
-      while(tmpNode.parentNode){
+      while (tmpNode.parentNode) {
         tmpNode = tmpNode.parentNode;
         expect(tmpNode.childsChecked).toEqual(false);
       }
@@ -307,7 +307,7 @@ describe("Tree", function() {
       tree.checkable = true;
       var node = tree.nodes[0];
 
-      if (node){
+      if (node) {
         node.enabled = false;
         tree.checkNode(node, true, true);
       }
@@ -321,10 +321,9 @@ describe("Tree", function() {
       tree.enabled = false;
       tree.render(session.$entryPoint);
 
-
       var node = tree.nodes[0];
 
-      if (node){
+      if (node) {
         tree.checkNode(node, true, true);
       }
       expect(node.checked).toEqual(false);
@@ -338,26 +337,46 @@ describe("Tree", function() {
       tree.checkable = true;
       tree.render(session.$entryPoint);
 
-
       var node = tree.nodes[0],
-      nodeTwo =  tree.nodes[1];
+        nodeTwo = tree.nodes[1];
 
-      if (node && nodeTwo){
+      if (node && nodeTwo) {
         tree.checkNode(node, true, true);
         tree.checkNode(nodeTwo, true, true);
-
       }
 
       var checkedNodes = [];
-      for(var j = 0; j<tree.nodes.length; j++){
-        if(tree.nodes[j].checked){
+      for (var j = 0; j < tree.nodes.length; j++) {
+        if (tree.nodes[j].checked) {
           checkedNodes.push(tree.nodes[j]);
         }
       }
       expect(checkedNodes.length).toBe(1);
     });
 
-it("try to check nodes in uncheckable tree ", function() {
+    it("check a parent in autoCheckChilds tree ", function() {
+      var model = createModelFixture(4, 4);
+      var tree = createTree(model);
+      tree.multiCheck = true;
+      tree.checkable = true;
+      tree.autoCheckChilds = true;
+      tree.render(session.$entryPoint);
+
+      var node = tree.nodes[0];
+
+      if (node) {
+        tree.checkNode(node, true, true);
+      }
+
+      var nodesToCheck = node.childNodes.slice();
+      for (var j = 0; j < nodesToCheck.length; j++) {
+        var tmpNode = nodesToCheck[j];
+        expect(tmpNode.checked).toEqual(true);
+        tmpNode = nodesToCheck.concat(tmpNode.childNodes.splice());
+      }
+    });
+
+    it("try to check nodes in uncheckable tree ", function() {
       var model = createModelFixture(4, 4);
       var tree = createTree(model);
       tree.multiCheck = false;
@@ -366,13 +385,13 @@ it("try to check nodes in uncheckable tree ", function() {
 
       var node = tree.nodes[0];
 
-      if (node){
+      if (node) {
         tree.checkNode(node, true, true);
       }
 
       var checkedNodes = [];
-      for(var j = 0; j<tree.nodes.length; j++){
-        if(tree.nodes[j].checked){
+      for (var j = 0; j < tree.nodes.length; j++) {
+        if (tree.nodes[j].checked) {
           checkedNodes.push(tree.nodes[j]);
         }
       }
@@ -380,9 +399,6 @@ it("try to check nodes in uncheckable tree ", function() {
     });
 
   });
-
-
-
 
   describe("node double click", function() {
 
