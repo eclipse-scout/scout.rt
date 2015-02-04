@@ -13,6 +13,8 @@ package org.eclipse.scout.rt.shared.extension.dto;
 import java.math.BigDecimal;
 
 import org.eclipse.scout.extension.AbstractLocalExtensionTestCase;
+import org.eclipse.scout.rt.client.ClientSessionThreadLocal;
+import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.MultiColumnExtension;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.MultiColumnExtensionData;
@@ -21,26 +23,51 @@ import org.eclipse.scout.rt.shared.extension.dto.fixture.OrigPageWithTableData;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.OrigPageWithTableData.OrigPageWithTableRowData;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.ThirdIntegerColumn;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.ThirdIntegerColumnData;
+import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.service.SERVICES;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 /**
  *
  */
 public class PageDataExtensionTest extends AbstractLocalExtensionTestCase {
+
   @Test
   public void testPageDataSingleExtensionExplicit() throws Exception {
-    SERVICES.getService(IExtensionRegistry.class).register(ThirdIntegerColumn.class, OrigPageWithTable.Table.class);
-    SERVICES.getService(IExtensionRegistry.class).register(ThirdIntegerColumnData.class, OrigPageWithTableRowData.class);
-    doTestSingle();
+    setupSession();
+    try {
+      SERVICES.getService(IExtensionRegistry.class).register(ThirdIntegerColumn.class, OrigPageWithTable.Table.class);
+      SERVICES.getService(IExtensionRegistry.class).register(ThirdIntegerColumnData.class, OrigPageWithTableRowData.class);
+      doTestSingle();
+    }
+    finally {
+      ClientSessionThreadLocal.set(null);
+      System.clearProperty("user.area");
+    }
   }
 
   @Test
   public void testPageDataMultipleExtensionAnnotation() throws Exception {
-    SERVICES.getService(IExtensionRegistry.class).register(MultiColumnExtension.class);
-    SERVICES.getService(IExtensionRegistry.class).register(MultiColumnExtensionData.class);
-    doTestMulti();
+    setupSession();
+    try {
+      SERVICES.getService(IExtensionRegistry.class).register(MultiColumnExtension.class);
+      SERVICES.getService(IExtensionRegistry.class).register(MultiColumnExtensionData.class);
+      doTestMulti();
+    }
+    finally {
+      ClientSessionThreadLocal.set(null);
+      System.clearProperty("user.area");
+    }
+  }
+
+  private void setupSession() {
+    final IClientSession session = Mockito.mock(IClientSession.class);
+    System.setProperty("user.area", "@user.home/test");
+    Mockito.when(session.getUserId()).thenReturn("userid");
+    Mockito.when(session.getUserAgent()).thenReturn(UserAgent.createDefault());
+    ClientSessionThreadLocal.set(session);
   }
 
   private void doTestMulti() throws Exception {

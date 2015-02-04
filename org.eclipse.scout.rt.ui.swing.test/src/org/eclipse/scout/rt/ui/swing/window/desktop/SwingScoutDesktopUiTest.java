@@ -24,17 +24,21 @@ import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 
+import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
 import org.eclipse.scout.rt.client.ui.form.IForm;
+import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.rt.ui.swing.AbstractSwingEnvironment;
 import org.eclipse.scout.rt.ui.swing.SingleLayout;
 import org.eclipse.scout.rt.ui.swing.ext.JInternalFrameEx;
 import org.eclipse.scout.rt.ui.swing.window.desktop.layout.DefaultColumnSplitStrategy;
 import org.eclipse.scout.rt.ui.swing.window.desktop.layout.IMultiSplitStrategy;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 
 /**
  * Tests for {@link SwingScoutDesktop}
@@ -46,7 +50,20 @@ public class SwingScoutDesktopUiTest {
 
   @Before
   public void setup() throws Exception {
+    System.setProperty("user.area", "@user.home/test");
     m_desktop = setupDesktop();
+  }
+
+  @After
+  public void cleanup() throws Exception {
+    System.clearProperty("user.area");
+  }
+
+  private IClientSession getSession() {
+    IClientSession session = Mockito.mock(IClientSession.class);
+    Mockito.when(session.getUserId()).thenReturn("userid");
+    Mockito.when(session.getUserAgent()).thenReturn(UserAgent.createDefault());
+    return session;
   }
 
   /**
@@ -76,9 +93,9 @@ public class SwingScoutDesktopUiTest {
     JInternalFrameEx v10 = createView("10");
     JInternalFrameEx v11 = createView("11");
     JInternalFrameEx v21 = createView("21");
-    m_desktop.addView(v10, createEnvironment().getViewLayoutConstraintsFor(IForm.VIEW_ID_W));
-    m_desktop.addView(v11, createEnvironment().getViewLayoutConstraintsFor(IForm.VIEW_ID_CENTER));
-    m_desktop.addView(v21, createEnvironment().getViewLayoutConstraintsFor(IForm.VIEW_ID_S));
+    m_desktop.addView(v10, createEnvironment(getSession()).getViewLayoutConstraintsFor(IForm.VIEW_ID_W));
+    m_desktop.addView(v11, createEnvironment(getSession()).getViewLayoutConstraintsFor(IForm.VIEW_ID_CENTER));
+    m_desktop.addView(v21, createEnvironment(getSession()).getViewLayoutConstraintsFor(IForm.VIEW_ID_S));
 
     assertEquals(new Dimension(250, 600), v10.getSize());
     assertEquals(new Dimension(550, 500), v11.getSize());
@@ -113,10 +130,10 @@ public class SwingScoutDesktopUiTest {
     JInternalFrameEx v11 = createView("11");
     JInternalFrameEx v12 = createView("12");
     JInternalFrameEx v21 = createView("21");
-    m_desktop.addView(v10, createEnvironment().getViewLayoutConstraintsFor(IForm.VIEW_ID_W));
-    m_desktop.addView(v11, createEnvironment().getViewLayoutConstraintsFor(IForm.VIEW_ID_CENTER));
-    m_desktop.addView(v12, createEnvironment().getViewLayoutConstraintsFor(IForm.VIEW_ID_E));
-    m_desktop.addView(v21, createEnvironment().getViewLayoutConstraintsFor(IForm.VIEW_ID_S));
+    m_desktop.addView(v10, createEnvironment(getSession()).getViewLayoutConstraintsFor(IForm.VIEW_ID_W));
+    m_desktop.addView(v11, createEnvironment(getSession()).getViewLayoutConstraintsFor(IForm.VIEW_ID_CENTER));
+    m_desktop.addView(v12, createEnvironment(getSession()).getViewLayoutConstraintsFor(IForm.VIEW_ID_E));
+    m_desktop.addView(v21, createEnvironment(getSession()).getViewLayoutConstraintsFor(IForm.VIEW_ID_S));
     m_desktop.removeView(v12);
 
     assertEquals(new Dimension(250, 600), v10.getSize());
@@ -127,7 +144,7 @@ public class SwingScoutDesktopUiTest {
   private SwingScoutDesktop setupDesktop() throws Exception {
     SwingScoutDesktop d = new SwingScoutDesktop();
     d.createField(new AbstractDesktop() {
-    }, createEnvironment());
+    }, createEnvironment(getSession()));
     showInWindow(d);
     return d;
   }
@@ -153,12 +170,16 @@ public class SwingScoutDesktopUiTest {
     return view;
   }
 
-  private AbstractSwingEnvironment createEnvironment() throws InterruptedException, InvocationTargetException, ExecutionException {
+  private AbstractSwingEnvironment createEnvironment(final IClientSession session) throws InterruptedException, InvocationTargetException, ExecutionException {
     Callable<AbstractSwingEnvironment> c = new Callable<AbstractSwingEnvironment>() {
 
       @Override
       public AbstractSwingEnvironment call() throws Exception {
         return new AbstractSwingEnvironment() {
+          @Override
+          public IClientSession getScoutSession() {
+            return session;
+          }
         };
       }
     };

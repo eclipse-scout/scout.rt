@@ -26,7 +26,7 @@ import org.eclipse.scout.service.SERVICES;
 
 /**
  * Default implementation for the preferences using a simple hash map and {@link String} key-value pairs.
- * 
+ *
  * @since 5.1
  */
 public class Preferences implements IPreferences {
@@ -325,6 +325,10 @@ public class Preferences implements IPreferences {
 
   protected boolean isDirty() {
     return m_dirty;
+  }
+
+  protected void setDirty(boolean dirty) {
+    m_dirty = dirty;
   }
 
   @Override
