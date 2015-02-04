@@ -304,18 +304,6 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     addActionEvent(EVENT_NODE_FILTER_CHANGED, jsonEvent);
   }
 
-  protected JSONArray nodeIdsToJson(Collection<ITreeNode> modelNodes) {
-    JSONArray jsonNodeIds = new JSONArray();
-    for (ITreeNode node : modelNodes) {
-      String nodeId = getOrCreateNodeId(node);
-      //May be null if its the invisible root node
-      if (nodeId != null) {
-        jsonNodeIds.put(nodeId);
-      }
-    }
-    return jsonNodeIds;
-  }
-
   // TODO BSH Tree | Coalesce events
   protected void handleModelTreeEventBatch(List<? extends TreeEvent> events) {
     for (TreeEvent event : events) {
@@ -326,6 +314,18 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   @Override
   public void handleModelContextMenuChanged(List<IJsonAdapter<?>> menuAdapters) {
     addPropertyChangeEvent(PROP_MENUS, JsonObjectUtility.adapterIdsToJson(menuAdapters));
+  }
+
+  protected JSONArray nodeIdsToJson(Collection<ITreeNode> modelNodes) {
+    JSONArray jsonNodeIds = new JSONArray();
+    for (ITreeNode node : modelNodes) {
+      String nodeId = getOrCreateNodeId(node);
+      //May be null if its the invisible root node
+      if (nodeId != null) {
+        jsonNodeIds.put(nodeId);
+      }
+    }
+    return jsonNodeIds;
   }
 
   protected String getOrCreateNodeId(ITreeNode node) {
@@ -418,12 +418,12 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
 
   protected void handleUiNodesChecked(JsonEvent event, JsonResponse res) {
     CheckedInfo treeNodesChecked = jsonToCheckedInfo(event.getData());
-    addTreeEventFilterCondition(TreeEvent.TYPE_NODES_CHECKED, treeNodesChecked.m_allNodes);
-    if (treeNodesChecked.m_checkedNodes.size() > 0) {
-      getModel().getUIFacade().setNodesCheckedFromUI(treeNodesChecked.m_checkedNodes, true);
+    addTreeEventFilterCondition(TreeEvent.TYPE_NODES_CHECKED, treeNodesChecked.getAllNodes());
+    if (treeNodesChecked.getCheckedNodes().size() > 0) {
+      getModel().getUIFacade().setNodesCheckedFromUI(treeNodesChecked.getCheckedNodes(), true);
     }
-    if (treeNodesChecked.m_uncheckedNodes.size() > 0) {
-      getModel().getUIFacade().setNodesCheckedFromUI(treeNodesChecked.m_uncheckedNodes, false);
+    if (treeNodesChecked.getUncheckedNodes().size() > 0) {
+      getModel().getUIFacade().setNodesCheckedFromUI(treeNodesChecked.getUncheckedNodes(), false);
     }
   }
 
@@ -435,10 +435,6 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   protected void handleUiNodeAction(JsonEvent event, JsonResponse res) {
     final ITreeNode node = getTreeNodeForNodeId(JsonObjectUtility.getString(event.getData(), PROP_NODE_ID));
     getModel().getUIFacade().fireNodeActionFromUI(node);
-  }
-
-  private void addTreeEventFilterCondition(int type, List<ITreeNode> nodes) {
-    m_treeEventFilter.addCondition(new TreeEventFilterCondition(type, nodes));
   }
 
   protected void handleUiNodesSelected(JsonEvent event, JsonResponse res) {
@@ -455,16 +451,12 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     getModel().getUIFacade().setNodeExpandedFromUI(node, expanded);
   }
 
-  private class P_TreeListener implements TreeListener {
-    @Override
-    public void treeChanged(final TreeEvent e) {
-      handleModelTreeEvent(e);
-    }
+  protected TreeEventFilter getTreeEventFilter() {
+    return m_treeEventFilter;
+  }
 
-    @Override
-    public void treeChangedBatch(List<? extends TreeEvent> events) {
-      handleModelTreeEventBatch(events);
-    }
+  protected void addTreeEventFilterCondition(int type, List<ITreeNode> nodes) {
+    m_treeEventFilter.addCondition(new TreeEventFilterCondition(type, nodes));
   }
 
   @Override
@@ -479,20 +471,47 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     for (int i = 0; i < jsonNodes.length(); i++) {
       JSONObject jsonObject = jsonNodes.optJSONObject(i);
       ITreeNode row = m_treeNodes.get(jsonObject.optString("nodeId"));
-      checkInfo.m_allNodes.add(row);
+      checkInfo.getAllNodes().add(row);
       if (jsonObject.optBoolean("checked")) {
-        checkInfo.m_checkedNodes.add(row);
+        checkInfo.getCheckedNodes().add(row);
       }
       else {
-        checkInfo.m_uncheckedNodes.add(row);
+        checkInfo.getUncheckedNodes().add(row);
       }
     }
     return checkInfo;
   }
 
-  private class CheckedInfo {
-    private ArrayList<ITreeNode> m_allNodes = new ArrayList<ITreeNode>();
-    private ArrayList<ITreeNode> m_checkedNodes = new ArrayList<ITreeNode>();
-    private ArrayList<ITreeNode> m_uncheckedNodes = new ArrayList<ITreeNode>();
+  protected static class CheckedInfo {
+    private final List<ITreeNode> m_allNodes = new ArrayList<ITreeNode>();
+    private final List<ITreeNode> m_checkedNodes = new ArrayList<ITreeNode>();
+    private final List<ITreeNode> m_uncheckedNodes = new ArrayList<ITreeNode>();
+
+    public CheckedInfo() {
+    }
+
+    public List<ITreeNode> getAllNodes() {
+      return m_allNodes;
+    }
+
+    public List<ITreeNode> getCheckedNodes() {
+      return m_checkedNodes;
+    }
+
+    public List<ITreeNode> getUncheckedNodes() {
+      return m_uncheckedNodes;
+    }
+  }
+
+  private class P_TreeListener implements TreeListener {
+    @Override
+    public void treeChanged(final TreeEvent e) {
+      handleModelTreeEvent(e);
+    }
+
+    @Override
+    public void treeChangedBatch(List<? extends TreeEvent> events) {
+      handleModelTreeEventBatch(events);
+    }
   }
 }

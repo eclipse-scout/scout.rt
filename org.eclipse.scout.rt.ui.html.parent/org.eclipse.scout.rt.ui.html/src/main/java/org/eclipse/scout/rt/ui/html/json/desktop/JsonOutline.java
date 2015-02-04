@@ -205,7 +205,7 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
     }
   }
 
-  private void handleModelPageChanged(TreeEvent event) {
+  protected void handleModelPageChanged(TreeEvent event) {
     IPage page = (IPage) event.getNode();
     if (page.isDetailFormVisible()) {
       attachGlobalAdapter(page.getDetailForm());
@@ -232,7 +232,7 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
     }
   }
 
-  private void handleUiPageChanged(JsonEvent event) {
+  protected void handleUiPageChanged(JsonEvent event) {
     JSONObject data = event.getData();
     IPage page = (IPage) getTreeNodeForNodeId(JsonObjectUtility.getString(data, PROP_NODE_ID));
     boolean detailFormVisible = JsonObjectUtility.getBoolean(data, PROP_DETAIL_FORM_VISIBLE);
@@ -250,7 +250,6 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
   }
 
   private class P_JsonOutlineAdapter implements IJsonOutlineAdapter {
-
     private final IPage m_page;
 
     private P_JsonOutlineAdapter(IPage page) {
@@ -262,11 +261,9 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
       ITreeNode treeNode = m_page.getTreeNodeFor(tableRow);
       return JsonOutline.this.getOrCreateNodeId(treeNode);
     }
-
   }
 
   private class P_JsonOutlineTableFactory implements IJsonAdapterFactory {
-
     private final IPage m_page;
 
     private P_JsonOutlineTableFactory(IPage page) {
@@ -278,7 +275,5 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
     public IJsonAdapter<?> createJsonAdapter(Object model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
       return new JsonOutlineTable((ITable) model, jsonSession, id, new P_JsonOutlineAdapter(m_page), parent);
     }
-
   }
-
 }
