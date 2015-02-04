@@ -37,7 +37,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeExtension;
-import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeAutoCheckChildsNodesChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeAutoCheckChildNodesChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeDecorateCellChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeDisposeTreeChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.TreeChains.TreeDragNodeChain;
@@ -109,8 +109,6 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   private IContributionOwner m_contributionHolder;
   private final ObjectExtensions<AbstractTree, ITreeExtension<? extends AbstractTree>> m_objectExtensions;
   private List<IMenu> m_currentNodeMenus;
-
-  private boolean m_autoCheckChildNodes;
 
   public AbstractTree() {
     this(true);
@@ -321,12 +319,12 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   @Override
   public boolean isAutoCheckChildNodes() {
-    return m_autoCheckChildNodes;
+    return propertySupport.getPropertyBool(PROP_AUTO_CHECK_CHILDREN);
   }
 
   @Override
   public void setAutoCheckChildNodes(boolean b) {
-    m_autoCheckChildNodes = b;
+    propertySupport.setPropertyBool(PROP_AUTO_CHECK_CHILDREN, b);
   }
 
   @ConfigOperation
@@ -2270,7 +2268,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   protected void interceptAutoCheckChildNodes(List<? extends ITreeNode> nodes) throws ProcessingException {
     List<? extends ITreeExtension<? extends AbstractTree>> extensions = getAllExtensions();
-    TreeAutoCheckChildsNodesChain chain = new TreeAutoCheckChildsNodesChain(extensions);
+    TreeAutoCheckChildNodesChain chain = new TreeAutoCheckChildNodesChain(extensions);
     chain.execAutoCheckChildNodes(nodes);
   }
 
@@ -2996,7 +2994,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     }
 
     @Override
-    public void execAutoCheckChildNodes(TreeAutoCheckChildsNodesChain chain, Collection<? extends ITreeNode> nodes) throws ProcessingException {
+    public void execAutoCheckChildNodes(TreeAutoCheckChildNodesChain chain, Collection<? extends ITreeNode> nodes) throws ProcessingException {
       getOwner().execAutoCheckChildNodes(CollectionUtility.arrayList(nodes));
     }
   }

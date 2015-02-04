@@ -172,9 +172,9 @@ public final class TreeChains {
     }
   }
 
-  public static class TreeAutoCheckChildsNodesChain extends AbstractTreeChain {
+  public static class TreeAutoCheckChildNodesChain extends AbstractTreeChain {
 
-    public TreeAutoCheckChildsNodesChain(List<? extends ITreeExtension<? extends AbstractTree>> extensions) {
+    public TreeAutoCheckChildNodesChain(List<? extends ITreeExtension<? extends AbstractTree>> extensions) {
       super(extensions);
     }
 
@@ -182,7 +182,7 @@ public final class TreeChains {
       MethodInvocation<Object> methodInvocation = new MethodInvocation<Object>() {
         @Override
         protected void callMethod(ITreeExtension<? extends AbstractTree> next) throws ProcessingException {
-          next.execAutoCheckChildNodes(TreeAutoCheckChildsNodesChain.this, nodes);
+          next.execAutoCheckChildNodes(TreeAutoCheckChildNodesChain.this, nodes);
         }
       };
       callChain(methodInvocation, nodes);

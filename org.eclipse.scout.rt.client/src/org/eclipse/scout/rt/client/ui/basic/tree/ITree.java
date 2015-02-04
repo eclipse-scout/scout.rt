@@ -40,6 +40,7 @@ public interface ITree extends IPropertyObserver, IDNDSupport {
   String PROP_MULTI_SELECT = "multiSelect";
   String PROP_MULTI_CHECK = "multiCheck";
   String PROP_CHECKABLE = "checkable";
+  String PROP_AUTO_CHECK_CHILDREN = "autoCheckChildren";
   /**
    * Integer default -1
    */
