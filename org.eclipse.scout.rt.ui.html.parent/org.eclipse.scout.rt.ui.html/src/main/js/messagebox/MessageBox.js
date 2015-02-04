@@ -12,13 +12,17 @@ scout.MessageBox = function(modelAdapter) {
   this.$cancelButton;
   this.previouslyFocusedElement;
   this.focusListener;
+  this._$glassPane;
 };
 
 scout.MessageBox.prototype.render = function($parent) {
   if (!$parent) {
     throw new Error('Missing argument $parent');
   }
-  this.$container = $.makeDiv('messagebox').hide().appendTo($parent);
+
+  this._$glassPane = $parent.appendDiv('glasspane');
+  this.$container = this._$glassPane.appendDiv('messagebox').hide();
+
   var $handle = this.$container.appendDiv('drag-handle');
   this.$container.makeDraggable($handle);
 
@@ -84,7 +88,7 @@ scout.MessageBox.prototype.render = function($parent) {
 
 scout.MessageBox.prototype.remove = function() {
   if (this.$container) {
-    this.$container.remove();
+    this._$glassPane.remove();
     this.$container = null;
   }
 
@@ -120,7 +124,7 @@ scout.MessageBox.prototype._renderTitle = function(title) {
 };
 
 scout.MessageBox.prototype._renderIconId = function(iconId) {
-  //FIXME implement
+  // FIXME implement
 };
 
 scout.MessageBox.prototype._renderSeverity = function(severity) {

@@ -1,20 +1,24 @@
 scout.Form = function() {
   scout.Form.parent.call(this);
   this._$title;
-  this._$parent;
   this.rootGroupBox;
   this.menus = [];
   this.staticMenus = [];
   this._addAdapterProperties(['rootGroupBox', 'menus']);
   this._locked;
   this.menuBarPosition = 'top';
+  this._$glassPane;
 };
 scout.inherits(scout.Form, scout.ModelAdapter);
 
 scout.Form.prototype._render = function($parent) {
   var menuItems = [];
 
-  this._$parent = $parent;
+  if (this.displayHint === 'dialog') {
+    this._$glassPane = $parent.appendDiv('glasspane');
+    $parent = this._$glassPane;
+  }
+
   this.$container = $('<div>')
     .appendTo($parent)
     .attr('id', 'Form-' + this.id)
@@ -77,10 +81,13 @@ scout.Form.prototype.appendTo = function($parent) {
 
 scout.Form.prototype.onModelCreate = function() {};
 
-scout.Form.prototype.remove = function() {
-  scout.Form.parent.prototype.remove.call(this);
+scout.Form.prototype._remove = function() {
+  scout.Form.parent.prototype._remove.call(this);
   if (this.menuBar) {
     this.menuBar.remove();
+  }
+  if (this._$glassPane) {
+    this._$glassPane.remove();
   }
 };
 

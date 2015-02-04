@@ -1,7 +1,3 @@
-/* TODO cru
- *  enable / disable and modal handling? auch beim tab löschen
- */
-
 scout.Desktop = function() {
   scout.Desktop.parent.call(this);
 
@@ -11,7 +7,6 @@ scout.Desktop = function() {
   this.$toolbar;
   this.$bench;
   this.$toolContainer;
-  this.$glasspane;
 
   this._allTabs = [];
   this._selectedTab;
@@ -82,9 +77,9 @@ scout.Desktop.prototype._render = function($parent) {
 
   this.navigation.onOutlineChanged(this.outline);
 
-  this.views.forEach(this._addView.bind(this));
-  this.dialogs.forEach(this._addDialog.bind(this));
-  this.messageBoxes.forEach(this.addMessageBox.bind(this));
+  this.views.forEach(this._renderView.bind(this));
+  this.dialogs.forEach(this._renderDialog.bind(this));
+  this.messageBoxes.forEach(this._renderMessageBox.bind(this));
 
   $(window).on('resize', this.onResize.bind(this));
 
@@ -196,15 +191,8 @@ scout.Desktop.prototype._unselectTab = function(tab) {
 
 /* handling of forms */
 
-scout.Desktop.prototype._ensureGlasspane = function() {
-  if (!this.$glasspane) {
-    this.$glasspane = this.$parent.appendDiv('glasspane');
-  }
-  return this.$glasspane;
-};
-
-scout.Desktop.prototype._addDialog = function(dialog) {
-  dialog.render(this._ensureGlasspane());
+scout.Desktop.prototype._renderDialog = function(dialog) {
+  dialog.render(this.$parent);
   dialog.htmlComp.pixelBasedSizing = true;
   dialog.htmlComp.pack();
 
@@ -213,6 +201,7 @@ scout.Desktop.prototype._addDialog = function(dialog) {
     documentSize = new scout.Dimension($(document).width(), $(document).height()),
     marginLeft = (documentSize.width - prefSize.width) / 2,
     marginTop = (documentSize.height - prefSize.height) / 2 - 10; // -10 for optical vertical middle
+
   dialog.$container
     .css('margin-left', marginLeft)
     .css('margin-top', marginTop);
@@ -222,7 +211,7 @@ scout.Desktop.prototype._addDialog = function(dialog) {
   dialog.$container.makeDraggable($handle);
 };
 
-scout.Desktop.prototype._addView = function(view) {
+scout.Desktop.prototype.renderView = function(view) {
   var tab = new scout.Desktop.TabAndContent(view, view.title, view.subTitle);
   this._addTab(tab);
   view.render(this.$bench);
@@ -238,9 +227,6 @@ scout.Desktop.prototype._removeForm = function(form) {
     this._removeTab(form.tab);
   }
   form.remove();
-  if (this._isDialog(form)) {
-    this._removeGlasspane();
-  }
 };
 
 scout.Desktop.prototype._showForm = function(form) {
@@ -300,20 +286,12 @@ scout.Desktop.prototype.changeOutline = function(outline) {
 
 /* message boxes */
 
-scout.Desktop.prototype.addMessageBox = function(messageBox) {
-  messageBox.render(this._ensureGlasspane());
+scout.Desktop.prototype._renderMessageBox = function(messageBox) {
+  messageBox.render(this.$parent);
 };
 
 scout.Desktop.prototype.onMessageBoxClosed = function(messageBox) {
   scout.arrays.remove(this.messageBoxes, messageBox);
-  this._removeGlasspane();
-};
-
-scout.Desktop.prototype._removeGlasspane = function() {
-  if (this.messageBoxes.length === 0 && this.dialogs.length === 0) {
-    this.$glasspane.remove();
-    this.$glasspane = null;
-  }
 };
 
 /* event handling */
@@ -322,10 +300,10 @@ scout.Desktop.prototype._onModelFormAdded = function(event) {
   var form = this.session.getOrCreateModelAdapter(event.form, this);
   if (this._isDialog(form)) {
     this.dialogs.push(form);
-    this._addDialog(form);
+    this._renderDialog(form);
   } else {
     this.views.push(form);
-    this._addView(form);
+    this._renderView(form);
   }
 };
 
@@ -358,7 +336,7 @@ scout.Desktop.prototype.onModelAction = function(event) {
   } else if (event.type === 'searchPerformed') {
     this.navigation.onSearchPerformed(event);
   } else if (event.type === 'messageBoxAdded') {
-    this.addMessageBox(this.session.getOrCreateModelAdapter(event.messageBox, this));
+    this._renderMessageBox(this.session.getOrCreateModelAdapter(event.messageBox, this));
   } else if (event.type === 'openUrlInBrowser') {
     this._openUrlInBrowser(event);
   } else {
