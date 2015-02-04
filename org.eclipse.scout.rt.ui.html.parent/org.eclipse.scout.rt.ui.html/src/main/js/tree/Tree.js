@@ -651,10 +651,10 @@ scout.Tree.prototype.checkNodeAndRender = function(node, checked) {
 };
 
 scout.Tree.prototype.checkNode = function(node, checked, render, suppressSend) {
-  if (!this.enabled || !this.checkable || !node.enabled || node.checked === checked) {
-    return;
-  }
   var updatedNodes = [];
+  if (!this.enabled || !this.checkable || !node.enabled || node.checked === checked) {
+    return updatedNodes;
+  }
   if (!this.multiCheck && checked) {
     for (var i = 0; i < this.nodes.length; i++) {
       if (this.nodes[i].checked) {
