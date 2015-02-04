@@ -213,12 +213,12 @@ describe("Tree", function() {
 
       while (node.parentNode) {
         node = node.parentNode;
-        expect(node.childsChecked).toEqual(true);
+        expect(node.childrenChecked).toEqual(true);
       }
 
     });
 
-    it("checks a node->mark upper nodes ->uncheck node and test if node keeps marked because childs are checked", function() {
+    it("checks a node->mark upper nodes ->uncheck node and test if node keeps marked because children are checked", function() {
       var model = createModelFixture(4, 4);
       var tree = createTree(model);
       tree.render(session.$entryPoint);
@@ -241,19 +241,19 @@ describe("Tree", function() {
       //upper nodes should be marked
       while (tmpNode.parentNode) {
         tmpNode = tmpNode.parentNode;
-        expect(tmpNode.childsChecked).toEqual(true);
+        expect(tmpNode.childrenChecked).toEqual(true);
       }
       expect(nodeToCheck.childNodes[0].checked).toEqual(true);
 
-      //remove check state on second level node-> second level node should be marked because childs of it are checked
+      //remove check state on second level node-> second level node should be marked because children of it are checked
       tree.checkNode(nodeToCheck, false, true);
       expect(nodeToCheck.checked).toEqual(false);
-      expect(nodeToCheck.childsChecked).toEqual(true);
+      expect(nodeToCheck.childrenChecked).toEqual(true);
       tmpNode = nodeToCheck;
       //upper nodes should be marked
       while (tmpNode.parentNode) {
         tmpNode = tmpNode.parentNode;
-        expect(tmpNode.childsChecked).toEqual(true);
+        expect(tmpNode.childrenChecked).toEqual(true);
       }
     });
     it("checks a subnode and its sibling->mark upper nodes -> uncheck one of the siblings", function() {
@@ -278,7 +278,7 @@ describe("Tree", function() {
       var tmpNode = nodeOne;
       while (tmpNode.parentNode) {
         tmpNode = tmpNode.parentNode;
-        expect(tmpNode.childsChecked).toEqual(true);
+        expect(tmpNode.childrenChecked).toEqual(true);
       }
 
       //uncheck one of the two siblings
@@ -287,7 +287,7 @@ describe("Tree", function() {
       tmpNode = nodeOne;
       while (tmpNode.parentNode) {
         tmpNode = tmpNode.parentNode;
-        expect(tmpNode.childsChecked).toEqual(true);
+        expect(tmpNode.childrenChecked).toEqual(true);
       }
 
       //uncheck second siblings
@@ -296,7 +296,7 @@ describe("Tree", function() {
       tmpNode = nodeOne;
       while (tmpNode.parentNode) {
         tmpNode = tmpNode.parentNode;
-        expect(tmpNode.childsChecked).toEqual(false);
+        expect(tmpNode.childrenChecked).toEqual(false);
       }
     });
 
@@ -354,12 +354,12 @@ describe("Tree", function() {
       expect(checkedNodes.length).toBe(1);
     });
 
-    it("check a parent in autoCheckChilds tree ", function() {
+    it("check a parent in autoCheckChildren tree ", function() {
       var model = createModelFixture(4, 4);
       var tree = createTree(model);
       tree.multiCheck = true;
       tree.checkable = true;
-      tree.autoCheckChilds = true;
+      tree.autoCheckChildren = true;
       tree.render(session.$entryPoint);
 
       var node = tree.nodes[0];

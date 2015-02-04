@@ -670,7 +670,7 @@ scout.Tree.prototype.checkNode = function(node, checked, render, suppressSend) {
   node.checked = checked;
   updatedNodes.push(node);
   this._updateMarkChildrenChecked(node, false, checked, true);
-  updatedNodes = updatedNodes.concat(this.checkChilds(node));
+  updatedNodes = updatedNodes.concat(this.checkChildren(node));
   if (!suppressSend) {
     this.sendNodesChecked(updatedNodes);
   }
@@ -680,9 +680,9 @@ scout.Tree.prototype.checkNode = function(node, checked, render, suppressSend) {
   return updatedNodes;
 };
 
-scout.Tree.prototype.checkChilds = function(node) {
+scout.Tree.prototype.checkChildren = function(node) {
   var updatedNodes = [];
-  if (this.autoCheckChilds && node && node.checked) {
+  if (this.autoCheckChildren && node && node.checked) {
     for (var i = 0; i < node.childNodes.length; i++) {
       updatedNodes = updatedNodes.concat(this.checkNode(node.childNodes[i], true, node.checked, true));
     }
@@ -912,6 +912,6 @@ scout.Tree.prototype._renderTitle = function() {
   // NOP
 };
 
-scout.Tree.prototype._renderAutoCheckChilds = function() {
+scout.Tree.prototype._renderAutoCheckChildren = function() {
   // NOP
 };
