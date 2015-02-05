@@ -140,4 +140,12 @@
   top: @top;
 }
 
+.overflow-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
+.overflow-ellipsis-nowrap {
+  .overflow-ellipsis;
+  white-space: nowrap;
+}

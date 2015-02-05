@@ -91,12 +91,10 @@ svg.select-chart.selected {
   line-height: 30px;
   width: 100%;
   cursor: pointer;
-  overflow: hidden;
+  .overflow-ellipsis;
   border-top: 1px solid @desktop-border-color;
   border-left: 1px solid @desktop-border-color;
   border-right: 1px solid @desktop-border-color;
-
-  text-overflow: ellipsis;
 
   &:hover {
     color: @active-color;

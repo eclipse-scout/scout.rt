@@ -212,9 +212,7 @@
   line-height: 30px;
   cursor: pointer;
   padding: 0px 20px 0px 8px;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  .overflow-ellipsis-nowrap;
   border-top: 1px solid @desktop-border-color;
 
   &:last-child {

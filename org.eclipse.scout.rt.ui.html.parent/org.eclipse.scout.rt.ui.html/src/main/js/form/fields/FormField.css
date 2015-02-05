@@ -8,8 +8,7 @@
 
   & > label {
     position: absolute;
-    text-overflow: ellipsis;
-    overflow: hidden;
+    .overflow-ellipsis;
     padding-top: @borderless-field-padding-y;
     padding-bottom: @borderless-field-padding-y;
     margin-left: @mandatory-indicator-width;
@@ -24,8 +23,7 @@
     border-radius: @border-radius;
     padding: 6px @text-field-padding;
     color: @disabled-color;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    .overflow-ellipsis;
   }
 
   & > .mandatory-indicator {

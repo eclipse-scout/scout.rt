@@ -33,9 +33,7 @@
     padding: 10px;
     padding-left: 15px;
     text-align: right;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
+    .overflow-ellipsis-nowrap;
   }
 
   .navigation-breadcrumb & .search-status {
@@ -128,10 +126,8 @@
   padding: 0px 10px 0px 10px;
   height: 100%;
   line-height: @desktop-taskbar-height;
-  white-space: nowrap;
   .font-text-large;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  .overflow-ellipsis-nowrap;
   display: none;
 
   .tab-active > & {

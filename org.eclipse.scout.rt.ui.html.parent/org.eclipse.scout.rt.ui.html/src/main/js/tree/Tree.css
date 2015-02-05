@@ -8,9 +8,7 @@
 .tree-item {
   display: block;
   position: relative;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  .overflow-ellipsis-nowrap;
   border: 1px solid transparent;
 
   /* leave some space for the scrollbar */
@@ -148,7 +146,7 @@
   }
 
   .tree-item.expanded > & {
-    /* The "imprecise" angle is a workround for firefox to prevent shifting the animation a little when the animation finishes. */
+    /* This "imprecise" angle is a workround for firefox to prevent shifting the div a little when the animation finishes. */
     /* See https://bugzilla.mozilla.org/show_bug.cgi?id=739176 */
     .transform(rotate(89.99deg));
   }

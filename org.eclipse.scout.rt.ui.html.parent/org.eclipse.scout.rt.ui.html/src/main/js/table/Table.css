@@ -47,8 +47,7 @@
   display: inline-block;
   .font-text-normal(@bold);
   padding: 0px 6px 0px @table-row-padding-left;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  .overflow-ellipsis-nowrap;
   line-height: @table-header-height;
   cursor:pointer;
   border-left: 1px solid transparent;
@@ -129,9 +128,7 @@
 .table-row-sum .table-cell {
   display: table-cell;
   padding: @table-row-padding-y 4px @table-row-padding-y @table-row-padding-left;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  .overflow-ellipsis-nowrap;
 }
 
 .table-row-sum .table-cell {
