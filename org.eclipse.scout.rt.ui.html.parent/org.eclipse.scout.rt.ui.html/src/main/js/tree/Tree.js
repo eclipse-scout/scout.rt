@@ -509,8 +509,8 @@ scout.Tree.prototype._onNodeChanged = function(nodeId, cell) {
 
 scout.Tree.prototype._onNodesChecked = function(nodes) {
   for (var i = 0; i < nodes.length; i++) {
-    this._nodeMap[nodes[i].id].checked = nodes[i].checked;
-    this._updateMarkChildrenChecked(this._nodeMap[nodes[i].id], false, nodes[i].checked, true);
+    this.nodesMap[nodes[i].id].checked = nodes[i].checked;
+    this._updateMarkChildrenChecked(this.nodesMap[nodes[i].id], false, nodes[i].checked, true);
     if (this.rendered) {
       this._renderNodeChecked(nodes[i]);
     }

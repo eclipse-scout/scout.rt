@@ -376,6 +376,28 @@ describe("Tree", function() {
       }
     });
 
+    it("check a parent in autoCheckChildren = false tree ", function() {
+      var model = createModelFixture(4, 4);
+      var tree = createTree(model);
+      tree.multiCheck = true;
+      tree.checkable = true;
+      tree.autoCheckChildren = false;
+      tree.render(session.$entryPoint);
+
+      var node = tree.nodes[0];
+
+      if (node) {
+        tree.checkNode(node, true, true);
+      }
+
+      var nodesToCheck = node.childNodes.slice();
+      for (var j = 0; j < nodesToCheck.length; j++) {
+        var tmpNode = nodesToCheck[j];
+        expect(tmpNode.checked).toEqual(false);
+        tmpNode = nodesToCheck.concat(tmpNode.childNodes.splice());
+      }
+    });
+
     it("try to check nodes in uncheckable tree ", function() {
       var model = createModelFixture(4, 4);
       var tree = createTree(model);

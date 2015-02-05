@@ -103,7 +103,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     putJsonProperty(new JsonProperty<T>(ITree.PROP_AUTO_CHECK_CHILDREN, model) {
       @Override
       protected Boolean modelValue() {
-        return getModel().isEnabled();
+        return getModel().isAutoCheckChildNodes();
       }
     });
   }
