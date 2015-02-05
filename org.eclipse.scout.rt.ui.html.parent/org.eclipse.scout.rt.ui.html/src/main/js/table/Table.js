@@ -366,7 +366,7 @@ scout.Table.prototype.drawData = function() {
 
 scout.Table.prototype._buildRowDiv = function(row) {
   var column, style, value, tooltipText, tooltip;
-  var rowWidth = this._totalWidth + this._tableRowBorderWidth();
+  var rowWidth = this._totalWidth + this._getTableRowBorderWidth();
   var rowClass = 'table-row ';
   if (this.selectedRowIds && this.selectedRowIds.indexOf(row.id) > -1) {
     rowClass += 'selected ';
@@ -398,8 +398,8 @@ scout.Table.prototype._buildRowDiv = function(row) {
   return rowDiv;
 };
 
-scout.Table.prototype._tableRowBorderWidth = function() {
-  if (typeof this._tableRowBorderWidth !== 'undefined') {
+scout.Table.prototype._getTableRowBorderWidth = function() {
+  if (this._tableRowBorderWidth !== undefined) {
     return this._tableRowBorderWidth;
   }
   var $tableRowDummy = this.$data.appendDiv('table-row');
@@ -595,6 +595,10 @@ scout.Table.prototype._findHyperLink = function(event) {
 
 scout.Table.prototype._filterMenus = function($selectedRows, allowedTypes) {
   allowedTypes = allowedTypes || [];
+  if(!this.headerVisible){
+    //if no header is visible header menues should not be displayed
+    delete allowedTypes[allowedTypes.indexOf('Table.Header')];
+  }
   if ($selectedRows && $selectedRows.length === 1) {
     allowedTypes.push('Table.SingleSelection');
   } else if ($selectedRows && $selectedRows.length > 1) {
@@ -798,7 +802,7 @@ scout.Table.prototype._group = function() {
 
       // TODO BSH Table Sum | There is something wrong here...
       $sumRow.insertAfter($rows.eq(r))
-        .width(this._totalWidth + this._tableRowBorderWidth())
+        .width(this._totalWidth + this._getTableRowBorderWidth())
         .hide()
         .slideDown();
 
@@ -1379,6 +1383,7 @@ scout.Table.prototype._triggerFilterResetted = function() {
 };
 
 scout.Table.prototype._renderHeaderVisible = function() {
+  //TODO nbu paint header Menues
   this._renderTableHeader();
 };
 

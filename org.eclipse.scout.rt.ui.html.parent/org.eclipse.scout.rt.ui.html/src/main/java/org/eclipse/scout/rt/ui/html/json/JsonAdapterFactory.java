@@ -40,6 +40,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.imagebox.IImageField;
 import org.eclipse.scout.rt.client.ui.form.fields.labelfield.ILabelField;
+import org.eclipse.scout.rt.client.ui.form.fields.listbox.IListBox;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.INumberField;
 import org.eclipse.scout.rt.client.ui.form.fields.plannerfield.IPlannerField;
 import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.IRadioButtonGroup;
@@ -72,6 +73,7 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.checkbox.JsonCheckBoxField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.groupbox.JsonGroupBox;
 import org.eclipse.scout.rt.ui.html.json.form.fields.imagefield.JsonImageField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.labelfield.JsonLabelField;
+import org.eclipse.scout.rt.ui.html.json.form.fields.listbox.JsonListBox;
 import org.eclipse.scout.rt.ui.html.json.form.fields.numberfield.JsonNumberField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.plannerfield.JsonPlannerField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.radiobutton.JsonRadioButton;
@@ -136,6 +138,9 @@ public class JsonAdapterFactory implements IJsonAdapterFactory {
     }
     else if (model instanceof ITableField<?>) {
       return new JsonTableField((ITableField) model, session, id, parent);
+    }
+    else if (model instanceof IListBox) {
+      return new JsonListBox((IListBox) model, session, id, parent);
     }
     else if (model instanceof ITreeField) {
       return new JsonTreeField((ITreeField) model, session, id, parent);

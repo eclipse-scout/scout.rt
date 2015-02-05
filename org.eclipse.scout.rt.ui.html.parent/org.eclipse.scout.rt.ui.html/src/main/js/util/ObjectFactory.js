@@ -225,7 +225,12 @@ scout.defaultObjectFactories = [{
   create: function() {
     return new scout.TableField();
   }
-},  {
+}, {
+  objectType: 'ListBox',
+  create: function() {
+    return new scout.ListBox();
+  }
+}, {
   objectType: 'TreeField',
   create: function() {
     return new scout.TreeField();
