@@ -21,6 +21,8 @@ public class HttpCacheObject {
   private final long m_lastModified;
   private final long m_fingerprint;
 
+  // FIXME AWE: add m_fileExtension
+
   public HttpCacheObject(String pathInfo, byte[] content, long lastModified) {
     m_pathInfo = pathInfo;
     m_content = content;

@@ -203,15 +203,14 @@ scout.Desktop.prototype._renderDialog = function(dialog) {
     marginTop = (documentSize.height - prefSize.height) / 2 - 10; // -10 for optical vertical middle
 
   dialog.$container
-    .css('margin-left', marginLeft)
-    .css('margin-top', marginTop);
+    .cssMarginLeft(marginLeft)
+    .cssMarginTop(marginTop);
 
-  // FIXME AWE: (modal dialog) make drag work --> see messagebox
   $handle = dialog.$container.prependDiv('drag-handle');
   dialog.$container.makeDraggable($handle);
 };
 
-scout.Desktop.prototype.renderView = function(view) {
+scout.Desktop.prototype._renderView = function(view) {
   var tab = new scout.Desktop.TabAndContent(view, view.title, view.subTitle);
   this._addTab(tab);
   view.render(this.$bench);

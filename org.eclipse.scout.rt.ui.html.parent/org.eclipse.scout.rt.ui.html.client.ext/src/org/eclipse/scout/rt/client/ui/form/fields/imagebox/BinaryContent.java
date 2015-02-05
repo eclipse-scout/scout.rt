@@ -23,7 +23,7 @@ public class BinaryContent implements Serializable {
 
   public BinaryContent(byte[] content, String contentType) {
     m_content = content;
-    m_contentType = contentType;
+    m_contentType = contentType; // FIXME AWE: rename to m_fileExtension
   }
 
   public byte[] getContent() {

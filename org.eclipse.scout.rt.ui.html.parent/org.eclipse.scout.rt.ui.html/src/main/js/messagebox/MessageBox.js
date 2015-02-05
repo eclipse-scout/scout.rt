@@ -57,7 +57,7 @@ scout.MessageBox.prototype.render = function($parent) {
   setTimeout(function() {
     // Class 'shown' is used for css animation
     this.$container.addClass('shown').show();
-    // Prevent resizing when messagebox is dragged off the viewport
+    // Prevent resizing when message-box is dragged off the viewport
     this.$container.css('min-width', this.$container.width());
     // Focus the default button
     if (this.$defaultButton) {
@@ -65,7 +65,7 @@ scout.MessageBox.prototype.render = function($parent) {
     }
   }.bind(this));
 
-  //FIXME CGU this solution does not allow for backwards tabbing (shift+tab) on the first button. Better do it like jquery ui (listen for keydown events)?
+  // FIXME CGU this solution does not allow for backwards tabbing (shift+tab) on the first button. Better do it like jquery ui (listen for keydown events)?
   // Also make more generic to make it reusable by other elements (regular dialog, form)
   this.focusListener = function(event) {
     if (!this.$container[0].contains(event.target)) {
@@ -73,7 +73,7 @@ scout.MessageBox.prototype.render = function($parent) {
       this.$container.find('button').eq(0).focus();
     }
   }.bind(this);
-  document.addEventListener("focus", this.focusListener, true);
+  document.addEventListener('focus', this.focusListener, true);
 
   // Render properties
   this._renderTitle(this.modelAdapter.title);
@@ -92,9 +92,9 @@ scout.MessageBox.prototype.remove = function() {
     this.$container = null;
   }
 
-  document.removeEventListener("focus", this.focusListener, true);
+  document.removeEventListener('focus', this.focusListener, true);
 
-  //FIXME CGU does not work, because button gets disabled when clicked (why??).
+  // FIXME CGU does not work, because button gets disabled when clicked (why??).
   this.previouslyFocusedElement.focus();
 };
 

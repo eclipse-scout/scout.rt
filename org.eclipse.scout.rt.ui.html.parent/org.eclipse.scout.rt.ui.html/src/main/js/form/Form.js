@@ -14,7 +14,9 @@ scout.inherits(scout.Form, scout.ModelAdapter);
 scout.Form.prototype._render = function($parent) {
   var menuItems = [];
 
-  if (this.displayHint === 'dialog') {
+  if (this.isDialog()) {
+    // FIXME AWE: (modal dialog) model seitig oder UI only?
+    this.menuBarPosition = 'bottom';
     this._$glassPane = $parent.appendDiv('glasspane');
     $parent = this._$glassPane;
   }
@@ -25,6 +27,13 @@ scout.Form.prototype._render = function($parent) {
     .addClass(this.displayHint === 'dialog' ? 'dialog' : 'form') // FIXME AWE: (modal dialog) rename class 'form' to view
     // so we can use the displayHint as class-name
     .data('model', this);
+
+  if (this.isDialog()) {
+    this.$container.hide();
+    setTimeout(function() {
+      this.$container.addClass('shown').show();
+    }.bind(this));
+  }
 
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
   this.htmlComp.setLayout(new scout.FormLayout());
@@ -51,6 +60,10 @@ scout.Form.prototype._render = function($parent) {
   if (this._locked) {
     this.disable();
   }
+};
+
+scout.Form.prototype.isDialog = function() {
+  return this.displayHint === 'dialog';
 };
 
 scout.Form.prototype._isClosable = function() {

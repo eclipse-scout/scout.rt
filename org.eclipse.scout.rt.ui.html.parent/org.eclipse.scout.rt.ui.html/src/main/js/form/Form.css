@@ -5,7 +5,7 @@
   background-color: @body-background-color;
 }
 
-.form > .menubar {
+.form > .menubar, .dialog > .menubar  {
   border-bottom: 3px solid @desktop-border-color;
 
   &.bottom {
@@ -28,10 +28,19 @@
 }
 
 .dialog {
+
+  position: absolute;
   background-color: @body-background-color;
   border: solid 1px @desktop-border-color;
   border-top: 5px solid @active-color;
   border-top-left-radius: @border-radius;
   border-top-right-radius: @border-radius;
   .drop-shadow;
+
+  &.shown {
+     opacity:0; /* make things invisible upon start */
+     .animation (fadeIn ease-in 1);
+     .animation-duration (0.15s);
+     .animation-fill-mode (forwards);
+  }
 }
