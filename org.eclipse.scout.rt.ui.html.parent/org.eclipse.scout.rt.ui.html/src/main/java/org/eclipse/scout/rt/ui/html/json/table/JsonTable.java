@@ -21,6 +21,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.eclipse.scout.commons.LocaleThreadLocal;
@@ -474,15 +475,16 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
         // FIXME CGU: update IDateColumnInterface
         // getDateFormat uses LocaleThreadLocal. IMHO getDateFormat should not perform any logic because it just a getter-> refactor. same on AbstractDateField
         // Alternative would be to use a clientJob or set localethreadlocal in ui thread as well, as done in rap
-        LocaleThreadLocal.set(getJsonSession().getClientSession().getLocale());
+        Locale oldLocale = LocaleThreadLocal.get(false);
         try {
+          LocaleThreadLocal.set(getJsonSession().getClientSession().getLocale());
           Method method = AbstractDateColumn.class.getDeclaredMethod("getDateFormat");
           method.setAccessible(true);
           SimpleDateFormat dateFormat = (SimpleDateFormat) method.invoke(column);
           json.put("format", dateFormat.toPattern()); //Don't use toLocalizedPattern, it translates the chars ('d' to 't' for german).
         }
         finally {
-          LocaleThreadLocal.set(null);
+          LocaleThreadLocal.set(oldLocale);
         }
       }
       // FIXME CGU: complete

@@ -197,6 +197,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
         LOG.info("Creating new client session [clientSessionId=" + clientSessionId + "]");
         //FIXME CGU session must be started later, see JsonClientSession
         //return SERVICES.getService(IClientSessionRegistryService.class).newClientSession(clientSessionClass(), subject, UUID.randomUUID().toString(), userAgent);
+        Locale oldLocale = LocaleThreadLocal.get(false);
         try {
           LocaleThreadLocal.set(request.getLocale());
           //
@@ -204,7 +205,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
           initClientSession(clientSession, jsonStartupRequest);
         }
         finally {
-          LocaleThreadLocal.set(null);
+          LocaleThreadLocal.set(oldLocale);
         }
         httpSession.setAttribute(clientSessionAttributeName, clientSession);
         httpSession.setAttribute(clientSessionAttributeName + ".cleanup", new P_ClientSessionCleanupHandler(clientSessionId, clientSession));
