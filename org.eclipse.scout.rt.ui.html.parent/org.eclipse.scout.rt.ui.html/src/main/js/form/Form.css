@@ -43,4 +43,20 @@
      .animation-duration (0.15s);
      .animation-fill-mode (forwards);
   }
+
+  & .title-box {
+    margin-top: 10px;
+    margin-left: 20px;
+  }
+
+  & .title {
+    .font-text-large;
+    color: @active-color;
+  }
+
+  & .sub-title {
+    .font-text-normal;
+    color: @active-color;
+  }
+
 }

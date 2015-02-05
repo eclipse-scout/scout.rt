@@ -1,6 +1,5 @@
 scout.Form = function() {
   scout.Form.parent.call(this);
-  this._$title;
   this.rootGroupBox;
   this.menus = [];
   this.staticMenus = [];
@@ -29,6 +28,12 @@ scout.Form.prototype._render = function($parent) {
     .data('model', this);
 
   if (this.isDialog()) {
+    this._setDialogTitle();
+
+    if (this.closable) {
+      // FIXME AWE: (modal dialog) show close icon
+    }
+
     this.$container.hide();
     setTimeout(function() {
       this.$container.addClass('shown').show();
@@ -36,7 +41,7 @@ scout.Form.prototype._render = function($parent) {
   }
 
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
-  this.htmlComp.setLayout(new scout.FormLayout());
+  this.htmlComp.setLayout(new scout.FormLayout(this));
   this.htmlComp.pixelBasedSizing = false;
   this.rootGroupBox.render(this.$container);
 
@@ -59,6 +64,18 @@ scout.Form.prototype._render = function($parent) {
 
   if (this._locked) {
     this.disable();
+  }
+};
+
+scout.Form.prototype._setDialogTitle = function() {
+  if (this.title || this.subTitle) {
+    var $titles = this.$container.prependDiv('title-box');
+    if (this.title) {
+      $titles.appendDiv('title').text(this.title);
+    }
+    if (this.subTitle) {
+      $titles.appendDiv('sub-title').text(this.subTitle);
+    }
   }
 };
 

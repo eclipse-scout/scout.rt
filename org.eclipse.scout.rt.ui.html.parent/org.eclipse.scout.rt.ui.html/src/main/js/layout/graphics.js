@@ -3,11 +3,21 @@
  */
 scout.graphics = {
 
-  measureString: function(text) {
+  /**
+   * @param text
+   * @param className (optional) className to apply on measurement DIV
+   * @returns {scout.Dimension}
+   */
+  measureString: function(text, className) {
     text = text || '';
     var $div = $('#StringMeasurement');
     if ($div.length === 0) { // create dynamically
       $div = $('body').appendDiv('', '', 'StringMeasurement');
+    }
+    if (className) {
+      $div.addClass(className);
+    } else {
+      $div.removeAttr('class');
     }
     $div.html(text.replace(/\s/g, "&nbsp;"));
     var dimension = new scout.Dimension($div.width(), $div.height());
