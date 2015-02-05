@@ -52,6 +52,9 @@ public final class FormFieldInjectionThreadLocal {
    */
   public static void pop(IFormFieldInjection injection) {
     THREAD_LOCAL.get().popInternal(injection);
+    if (THREAD_LOCAL.get().isEmpty()) {
+      THREAD_LOCAL.remove();
+    }
   }
 
   /**
@@ -85,6 +88,9 @@ public final class FormFieldInjectionThreadLocal {
    */
   public static void popContainerField(ICompositeField container) {
     THREAD_LOCAL.get().popContainerFieldInternal(container);
+    if (THREAD_LOCAL.get().isEmpty()) {
+      THREAD_LOCAL.remove();
+    }
   }
 
   /**
@@ -186,5 +192,12 @@ public final class FormFieldInjectionThreadLocal {
 
   private List<ICompositeField> getContainerFieldsInternal() {
     return Collections.unmodifiableList(m_containerFields);
+  }
+
+  /**
+   * @return if both stack and container field list are empty
+   */
+  private boolean isEmpty() {
+    return (m_stack.isEmpty() && m_containerFields.isEmpty());
   }
 }

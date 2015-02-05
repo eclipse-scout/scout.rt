@@ -327,7 +327,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
     try {
       lazyInit(req, res);
       Map<Class, Object> backup = ThreadContext.backup();
-      Locale oldLocale = LocaleThreadLocal.get();
+      Locale oldLocale = LocaleThreadLocal.get(false);
       try {
         ThreadContext.putHttpServletRequest(req);
         ThreadContext.putHttpServletResponse(res);

@@ -69,7 +69,7 @@ public class DataModelAttributeTest {
 
   @Before
   public void before() {
-    m_oldLocale = LocaleThreadLocal.get();
+    m_oldLocale = LocaleThreadLocal.get(false);
   }
 
   @After

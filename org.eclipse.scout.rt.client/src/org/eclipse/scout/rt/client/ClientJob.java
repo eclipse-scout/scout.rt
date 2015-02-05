@@ -160,9 +160,9 @@ public class ClientJob extends JobEx implements IClientSessionProvider {
   }
 
   private IStatus runTransactionWrapper(IProgressMonitor monitor) {
-    Locale oldLocale = LocaleThreadLocal.get();
-    ScoutTexts oldTexts = TextsThreadLocal.get();
     IClientSession oldSession = ClientSessionThreadLocal.get();
+    Locale oldLocale = LocaleThreadLocal.get(false);
+    ScoutTexts oldTexts = TextsThreadLocal.get();
     ClientJobContext oldContext = ClientJobContextThreadLocal.get();
     try {
       ClientSessionThreadLocal.set(getClientSession());
