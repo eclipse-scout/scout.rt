@@ -14,7 +14,6 @@ scout.Form.prototype._render = function($parent) {
   var menuItems = [];
 
   if (this.isDialog()) {
-    // FIXME AWE: (modal dialog) model seitig oder UI only?
     this.menuBarPosition = 'bottom';
     this._$glassPane = $parent.appendDiv('glasspane');
     $parent = this._$glassPane;
@@ -23,16 +22,22 @@ scout.Form.prototype._render = function($parent) {
   this.$container = $('<div>')
     .appendTo($parent)
     .attr('id', 'Form-' + this.id)
-    .addClass(this.displayHint === 'dialog' ? 'dialog' : 'form') // FIXME AWE: (modal dialog) rename class 'form' to view
-    // so we can use the displayHint as class-name
+    // FIXME AWE: (modal dialog) rename class 'form' to view so we can use the displayHint as class-name
+    .addClass(this.displayHint === 'dialog' ? 'dialog' : 'form')
     .data('model', this);
 
   if (this.isDialog()) {
-    this._setDialogTitle();
+    var $handle = this.$container.appendDiv('drag-handle');
+    this.$container.makeDraggable($handle);
 
     if (this.closable) {
-      // FIXME AWE: (modal dialog) show close icon
+      this.$container.appendDiv('closable')
+        .on('click', function() {
+          this.session.send(this.id, 'formClosing');
+        }.bind(this));
     }
+//    this.$container.resizable();
+    this._setDialogTitle();
 
     this.$container.hide();
     setTimeout(function() {
@@ -51,17 +56,6 @@ scout.Form.prototype._render = function($parent) {
   this.menuBar = new scout.MenuBar(this.$container, this.menuBarPosition, scout.FormMenuItemsOrder.order);
   this.menuBar.updateItems(menuItems);
 
-// FIXME AWE: (menu) un-comment, check if this is the right place. Probably we should only
-// have the close-buttons on real modal dialogs or we should add an X icon to the tabs in
-// in the task-bar (all but the last tab should be closeable).
-//  if (closeable) {
-//    var $closeButton = $('<button>').text('X');
-//    this.menuBar.$container.append($closeButton);
-//    $closeButton.on('click', function() {
-//      this.session.send(this.id, 'formClosing');
-//    }.bind(this));
-//  }
-
   if (this._locked) {
     this.disable();
   }
@@ -69,7 +63,7 @@ scout.Form.prototype._render = function($parent) {
 
 scout.Form.prototype._setDialogTitle = function() {
   if (this.title || this.subTitle) {
-    var $titles = this.$container.prependDiv('title-box');
+    var $titles = this.$container.appendDiv('title-box');
     if (this.title) {
       $titles.appendDiv('title').text(this.title);
     }

@@ -21,6 +21,8 @@ import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IForm5;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
@@ -50,6 +52,7 @@ public class JsonForm<T extends IForm> extends AbstractJsonPropertyObserver<T> i
   public static final String PROP_MODAL = "modal";
   public static final String PROP_DISPLAY_HINT = "displayHint";
   public static final String PROP_DISPLAY_VIEW_ID = "displayViewId";
+  public static final String PROP_CLOSABLE = "closable";
 
   private FormListener m_formListener;
 
@@ -101,6 +104,7 @@ public class JsonForm<T extends IForm> extends AbstractJsonPropertyObserver<T> i
     putProperty(json, PROP_MODAL, model.isModal());
     putProperty(json, PROP_DISPLAY_HINT, displayHintToJson(model.getDisplayHint()));
     putProperty(json, PROP_DISPLAY_VIEW_ID, model.getDisplayViewId());
+    putProperty(json, PROP_CLOSABLE, isClosable());
     putAdapterIdProperty(json, "rootGroupBox", model.getRootGroupBox());
     if (getModel() instanceof IForm5) {
       JsonContextMenu<IContextMenu> jsonContextMenu = getAdapter(((IForm5) getModel()).getContextMenu());
@@ -109,6 +113,20 @@ public class JsonForm<T extends IForm> extends AbstractJsonPropertyObserver<T> i
       }
     }
     return json;
+  }
+
+  private boolean isClosable() {
+    for (IFormField f : getModel().getAllFields()) {
+      if (f.isEnabled() && f.isVisible() && (f instanceof IButton)) {
+        switch (((IButton) f).getSystemType()) {
+          case IButton.SYSTEM_TYPE_CLOSE:
+          case IButton.SYSTEM_TYPE_CANCEL: {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
   }
 
   protected String displayHintToJson(int displayHint) {
@@ -137,10 +155,10 @@ public class JsonForm<T extends IForm> extends AbstractJsonPropertyObserver<T> i
   }
 
   protected void handleModelFormClosed(IForm form) {
-    //FIXME what happens if isAutoAddRemoveOnDesktop = false and form removed comes after closing? maybe remove form first?
+    // FIXME CGU: what happens if isAutoAddRemoveOnDesktop = false and form removed comes after closing? maybe remove form first?
     if (ClientSyncJob.getCurrentSession().getDesktop().isShowing(form)) {
       LOG.error("Form closed but is still showing on desktop.");
-//      handleModelFormRemoved(form);
+      // handleModelFormRemoved(form);
     }
     dispose();
     addActionEvent("formClosed", new JSONObject());

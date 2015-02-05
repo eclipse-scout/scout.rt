@@ -205,9 +205,6 @@ scout.Desktop.prototype._renderDialog = function(dialog) {
   dialog.$container
     .cssMarginLeft(marginLeft)
     .cssMarginTop(marginTop);
-
-  $handle = dialog.$container.prependDiv('drag-handle');
-  dialog.$container.makeDraggable($handle);
 };
 
 scout.Desktop.prototype._renderView = function(view) {
