@@ -203,7 +203,7 @@ public class DateAndTimeFieldParseTest {
 
   @Before
   public void setUp() throws Throwable {
-    m_oldLocale = LocaleThreadLocal.get();
+    m_oldLocale = LocaleThreadLocal.get(false);
     m_form = new TestForm();
     m_form.startForm();
   }

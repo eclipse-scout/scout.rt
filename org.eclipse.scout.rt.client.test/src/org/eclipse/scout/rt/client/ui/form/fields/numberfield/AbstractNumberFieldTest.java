@@ -40,7 +40,7 @@ public class AbstractNumberFieldTest extends AbstractNumberField<BigDecimal> {
 
   @BeforeClass
   public static void setupBeforeClass() {
-    ORIGINAL_LOCALE = LocaleThreadLocal.get();
+    ORIGINAL_LOCALE = LocaleThreadLocal.get(false);
     LocaleThreadLocal.set(new Locale("de", "CH"));
   }
 

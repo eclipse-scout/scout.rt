@@ -14,17 +14,16 @@ package org.eclipse.scout.rt.shared;
  * This class represents the nls texts set for the current thread
  */
 public class TextsThreadLocal {
-  private static ThreadLocal<ScoutTexts> textsThreadLocal = new ThreadLocal<ScoutTexts>();
+  private static final ThreadLocal<ScoutTexts> THREAD_LOCAL = new ThreadLocal<ScoutTexts>();
 
   private TextsThreadLocal() {
   }
 
   public static ScoutTexts get() {
-    return textsThreadLocal.get();
+    return THREAD_LOCAL.get();
   }
 
   public static void set(ScoutTexts t) {
-    textsThreadLocal.set(t);
+    THREAD_LOCAL.set(t);
   }
-
 }

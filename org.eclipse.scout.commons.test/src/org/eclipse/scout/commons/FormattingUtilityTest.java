@@ -194,7 +194,7 @@ public class FormattingUtilityTest {
   }
 
   private static void assertFormat(Locale locale, String expected, Object o) {
-    Locale oldLocale = LocaleThreadLocal.get();
+    Locale oldLocale = LocaleThreadLocal.get(false);
     try {
       if (locale == null) {
         fail("locale must not be null");

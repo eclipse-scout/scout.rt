@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.client;
 
 /**
  * This class represents the client job context for the current thread.
- * 
+ *
  * @since 3.8.2
  */
 public final class ClientJobContextThreadLocal {
@@ -26,9 +26,6 @@ public final class ClientJobContextThreadLocal {
   }
 
   public static void set(ClientJobContext properties) {
-    if (properties == null) {
-      return;
-    }
     THREAD_LOCAL.set(properties);
   }
 }

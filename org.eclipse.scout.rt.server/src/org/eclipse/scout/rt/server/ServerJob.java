@@ -207,7 +207,7 @@ public abstract class ServerJob extends JobEx implements IServerSessionProvider 
   protected final IStatus runTransactionWrapper(IProgressMonitor monitor) throws Exception {
     ITransaction transaction = createNewTransaction();
     Map<Class, Object> backup = ThreadContext.backup();
-    Locale oldLocale = LocaleThreadLocal.get();
+    Locale oldLocale = LocaleThreadLocal.get(false);
     ScoutTexts oldTexts = TextsThreadLocal.get();
     ClassLoader oldContextClassLoader = Thread.currentThread().getContextClassLoader();
     try {
