@@ -19,20 +19,37 @@ scout.BaseDesktop.prototype._renderTitle = function(title) {
   }
 };
 
-scout.BaseDesktop.prototype.showFatalMessage = function(title, text, buttonName, buttonAction) {
+scout.BaseDesktop.prototype.showFatalMessage = function(options) {
+  options = options || {};
   var that = this;
   var $glasspane = this.$parent.appendDiv('glasspane');
-  var ui = new scout.MessageBox({
-    title: title,
-    iconId: undefined,
-    severity: 4,
-    introText: text,
-    actionText: undefined,
-    yesButtonText: buttonName,
+  var model = {
+    title: options.title,
+    iconId: options.iconId,
+    severity: options.severity || 4,
+    introText: options.text || options.introText,
+    actionText: options.actionText,
+    yesButtonText: options.yesButtonText,
+    noButtonText: options.noButtonText,
+    cancelButtonText: options.cancelButtonText,
     onButtonClicked: function($button, event) {
-      buttonAction.apply(that);
+      var option = $button.data('option');
+
+      // Close message box
+      ui.remove();
+      $glasspane.remove();
+
+      // Custom actions
+      if (option === 'yes' && options.yesButtonAction) {
+        options.yesButtonAction.apply(that);
+      } else if (option === 'no' && options.noButtonAction) {
+        options.noButtonAction.apply(that);
+      } else if (option === 'cancel' && options.cancelButtonAction) {
+        options.cancelButtonAction.apply(that);
+      }
     }
-  });
+  };
+  var ui = new scout.MessageBox(model);
   ui.render($glasspane);
 };
 

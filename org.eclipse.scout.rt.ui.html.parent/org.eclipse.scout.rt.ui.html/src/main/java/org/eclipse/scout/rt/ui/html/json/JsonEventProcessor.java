@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.html.json;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientJob;
@@ -32,20 +33,23 @@ public class JsonEventProcessor {
     m_jsonSession = jsonSession;
   }
 
-  public void processEvents(JsonRequest request, final JsonResponse response) {
-    for (final JsonEvent event : request.getEvents()) {
-      // TODO AWE: (jobs) prüfen ob das hier probleme macht: dadurch läuft processEvent immer im richtigen
-      // context. JsonAdapter instanzen müssen somit nicht immer einen ClientSyncJob starten wenn sie z.B.
-      // einen Scout-service aufrufen wollen. Es wurde bewusst für jedes processEvent ein eigener Job gestartet
-      // und nicht für den ganzen Loop.
-      new ClientSyncJob("processEvent", m_jsonSession.getClientSession()) {
-        @Override
-        protected void runVoid(IProgressMonitor monitor) throws Throwable {
+  public void processEvents(final JsonRequest request, final JsonResponse response) {
+    ClientSyncJob job = new ClientSyncJob("processEvents", m_jsonSession.getClientSession()) {
+      @Override
+      protected void runVoid(IProgressMonitor monitor) throws Throwable {
+        for (final JsonEvent event : request.getEvents()) {
           processEvent(event, response);
         }
-      }.schedule();
-    }
+      }
+    };
+    job.schedule();
     waitUntilJobsHaveFinished();
+    try {
+      job.throwOnError();
+    }
+    catch (ProcessingException e) {
+      throw new JsonException(e); // TODO BSH Exception | Try to eliminate this pattern (5 others in html bundle)
+    }
   }
 
   protected void processEvent(JsonEvent event, JsonResponse response) {
@@ -98,9 +102,7 @@ public class JsonEventProcessor {
     }
   }
 
-  private boolean isSyncJobFromCurrentSession(ClientJob job) {
-    return job.isSync() &&
-        job.getClientSession() == m_jsonSession.getClientSession();
+  protected boolean isSyncJobFromCurrentSession(ClientJob job) {
+    return (job.isSync() && job.getClientSession() == m_jsonSession.getClientSession());
   }
-
 }

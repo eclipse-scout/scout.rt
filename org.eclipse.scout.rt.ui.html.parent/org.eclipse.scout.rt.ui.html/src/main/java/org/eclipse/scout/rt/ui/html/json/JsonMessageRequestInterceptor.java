@@ -50,25 +50,30 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
       resp.sendError(HttpServletResponse.SC_NOT_FOUND);
       return true;
     }
+    try {
+      //disable cache
+      servlet.getHttpCacheControl().disableCacheHeaders(req, resp);
 
-    //disable cache
-    servlet.getHttpCacheControl().disableCacheHeaders(req, resp);
+      JsonRequest jsonReq = new JsonRequest(decodeJSONRequest(req));
+      if (jsonReq.isPingRequest()) {
+        writeResponse(resp, createPingJsonResponse().toJson());
+        return true;
+      }
 
-    JsonRequest jsonReq = new JsonRequest(decodeJSONRequest(req));
-    if (jsonReq.isPingRequest()) {
-      writeResponse(resp, createPingJsonResponse().toJson());
-      return true;
+      IJsonSession jsonSession = getOrCreateJsonSession(servlet, req, resp, jsonReq);
+      if (jsonSession == null) {
+        return true;
+      }
+
+      // GUI requests for the same session must be processed consecutively
+      synchronized (jsonSession) {
+        JSONObject json = jsonSession.processRequest(req, jsonReq);
+        writeResponse(resp, json);
+      }
     }
-
-    IJsonSession jsonSession = getOrCreateJsonSession(servlet, req, resp, jsonReq);
-    if (jsonSession == null) {
-      return true;
-    }
-
-    // GUI requests for the same session must be processed consecutively
-    synchronized (jsonSession) {
-      JSONObject json = jsonSession.processRequest(req, jsonReq);
-      writeResponse(resp, json);
+    catch (Exception e) {
+      LOG.error("Unexpected error while processing JSON request", e);
+      writeErrorResponse(resp, createUnrecoverableFailureJsonResponse());
     }
     return true;
   }
@@ -111,7 +116,14 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
   protected JsonResponse createSessionTimeoutJsonResponse() {
     JsonResponse jsonResp = new JsonResponse();
     jsonResp.setErrorCode(JsonResponse.ERR_SESSION_TIMEOUT);
-    jsonResp.setErrorMessage("The session has expired, please reload the page."); // will be translated in client, see Session.js
+    jsonResp.setErrorMessage("The session has expired, please reload the page."); // will be translated in client, see Session.js/_processErrorResponse()
+    return jsonResp;
+  }
+
+  protected JsonResponse createUnrecoverableFailureJsonResponse() {
+    JsonResponse jsonResp = new JsonResponse();
+    jsonResp.setErrorCode(JsonResponse.ERR_UI_PROCESSING);
+    jsonResp.setErrorMessage("UI processing error"); // will be translated in client, see Session.js/_processErrorResponse()
     return jsonResp;
   }
 
@@ -148,5 +160,4 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
       throw new JsonException(e.getMessage(), e);
     }
   }
-
 }

@@ -43,6 +43,7 @@
     background-color: @palette-gray-8;
     border: 1px solid @color-messagebox-border;
     cursor: pointer;
+    .overflow-ellipsis-nowrap;
   }
 
   & > button:first-child {

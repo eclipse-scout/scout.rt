@@ -157,7 +157,12 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
         "Show",
         "Up",
         "Back",
-        "Continue");
+        "Continue",
+        "Ignore",
+        "UiProcessingErrorTitle",
+        "UiProcessingErrorText",
+        "UiProcessingErrorAction"
+        );
   }
 
   private JSONObject getTextMap(Locale locale) {

@@ -27,6 +27,7 @@ public class JsonResponse {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonResponse.class);
 
   public static final int ERR_SESSION_TIMEOUT = 10;
+  public static final int ERR_UI_PROCESSING = 20;
 
   public static final String PROP_EVENTS = "events";
   public static final String PROP_ADAPTER_DATA = "adapterData";
