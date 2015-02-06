@@ -2,6 +2,19 @@
   position: relative;
   height: 100%;
   width: 100%;
+
+  & .menubar {
+    height: 39px;
+    border-bottom: 1px solid @desktop-border-color;
+    margin-left: -3px;
+    margin-right: -3px;
+    padding: 0 8px;
+  }
+}
+
+.tree-data {
+  /* necessary for scrollbars */
+  position: relative;
   overflow: hidden;
 }
 

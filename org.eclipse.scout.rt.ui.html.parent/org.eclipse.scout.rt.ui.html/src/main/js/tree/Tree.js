@@ -3,6 +3,7 @@
 
 scout.Tree = function() {
   scout.Tree.parent.call(this);
+  this.$data;
   this.selectedNodeIds = [];
   this.nodes = []; // top-level nodes
   this.nodesMap = {}; // all nodes by id
@@ -13,6 +14,9 @@ scout.Tree = function() {
   this._treeItemPaddingLeft = 20;
   this._treeItemCheckBoxPaddingLeft = 20;
   this._treeItemPaddingLevel = 15;
+
+  this.menuBar;
+  this.staticMenus = [];
 };
 scout.inherits(scout.Tree, scout.ModelAdapter);
 
@@ -116,8 +120,17 @@ scout.Tree.prototype._updateMarkChildrenChecked = function(node, init, checked, 
 scout.Tree.prototype._render = function($parent) {
   this.$parent = $parent;
   this.$container = $parent.appendDiv('tree');
-  scout.scrollbars.install(this.$container);
-  this.session.detachHelper.pushScrollable(this.$container);
+
+  var layout = new scout.TreeLayout(this);
+  this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
+  this.htmlComp.setLayout(layout);
+  this.htmlComp.pixelBasedSizing = false;
+
+  this.$data = this.$container.appendDiv('tree-data');
+
+  scout.scrollbars.install(this.$data);
+  this.session.detachHelper.pushScrollable(this.$data);
+  this.menuBar = new scout.MenuBar(this.$container, 'top', scout.TreeMenuItemsOrder.order);
   this._addNodes(this.nodes);
   if (this.selectedNodeIds.length > 0) {
     this._renderSelection();
@@ -125,7 +138,7 @@ scout.Tree.prototype._render = function($parent) {
 };
 
 scout.Tree.prototype._remove = function() {
-  this.session.detachHelper.removeScrollable(this.$container);
+  this.session.detachHelper.removeScrollable(this.$data);
   scout.Tree.parent.prototype._remove.call(this);
 };
 
@@ -134,7 +147,7 @@ scout.Tree.prototype.onResize = function() {
 };
 
 scout.Tree.prototype.updateScrollbar = function() {
-  scout.scrollbars.update(this.$container);
+  scout.scrollbars.update(this.$data);
 };
 
 scout.Tree.prototype.setBreadcrumb = function(bread) {
@@ -164,7 +177,7 @@ scout.Tree.prototype.collapseAll = function() {
   var that = this;
 
   //Collapse root nodes
-  this.$container.find('[data-level="0"]').each(function() {
+  this.$data.find('[data-level="0"]').each(function() {
     var $node = $(this);
     that.setNodeExpanded($node.data('node'), $node, false);
   });
@@ -264,6 +277,7 @@ scout.Tree.prototype.setNodesSelected = function(nodes, $nodes) {
     // FIXME BSH Keystroke | "scroll into view"
     this._renderSelection($nodes);
     this._triggerNodesSelected(nodeIds);
+    this._renderNodeMenus(this.selectedNodeIds);
   }
 };
 
@@ -299,7 +313,7 @@ scout.Tree.prototype._renderSelection = function($nodes) {
     }
   }
 
-  this.$container.children().select(false);
+  this.$data.children().select(false);
 
   // render selection
   for (i = 0; i < $nodes.length; i++) {
@@ -476,6 +490,7 @@ scout.Tree.prototype._onAllNodesDeleted = function(parentNodeId) {
 
 scout.Tree.prototype._onNodesSelected = function(nodeIds) {
   this.selectedNodeIds = nodeIds;
+  this._renderNodeMenus(this.selectedNodeIds);
   if (this.rendered) {
     this._renderSelection();
   }
@@ -559,6 +574,7 @@ scout.Tree.prototype._removeNodes = function(nodes, parentNodeId, $parentNode) {
 
 scout.Tree.prototype._addNodes = function(nodes, $parent) {
   if (!nodes || nodes.length === 0) {
+    this._renderNodeMenus(this.selectedNodeIds);
     return;
   }
 
@@ -571,7 +587,7 @@ scout.Tree.prototype._addNodes = function(nodes, $parent) {
     if ($predecessor) {
       $node.insertAfter($predecessor);
     } else {
-      $node.appendTo(this.$container);
+      $node.appendTo(this.$data);
     }
 
     // if model demands children, create them
@@ -581,7 +597,7 @@ scout.Tree.prototype._addNodes = function(nodes, $parent) {
       $predecessor = $node;
     }
   }
-
+  this._renderNodeMenus(this.selectedNodeIds);
   this.updateScrollbar();
 
   //return the last created node
@@ -616,8 +632,8 @@ scout.Tree.prototype._decorateNode = function(node) {
     return;
   }
 
-  $node.toggleClass('leaf', !!node.leaf);
-  $node.toggleClass('expanded', (!!node.expanded && node.childNodes.length > 0));
+  $node.toggleClass('leaf', !! node.leaf);
+  $node.toggleClass('expanded', ( !! node.expanded && node.childNodes.length > 0));
 
   // Replace only the text node in the DOM, but leave inner DIVs untouched (e.g. tree item control)
   var textDomNodes = $node.contents().filter(function() {
@@ -625,8 +641,7 @@ scout.Tree.prototype._decorateNode = function(node) {
   });
   if (textDomNodes.length > 0) {
     textDomNodes[0].textContent = node.text;
-  }
-  else {
+  } else {
     $node.append(node.text);
   }
 
@@ -800,7 +815,7 @@ scout.Tree.prototype._onNodeControlClick = function(event) {
 
 scout.Tree.prototype._updateItemPath = function() {
   var $selected = this.$selectedNodes(),
-    $allNodes = this.$container.children(),
+    $allNodes = this.$data.children(),
     level = parseFloat($selected.attr('data-level'));
 
   // first remove and select selected
@@ -865,11 +880,11 @@ scout.Tree.prototype._updateItemPath = function() {
 };
 
 scout.Tree.prototype.$selectedNodes = function() {
-  return this.$container.find('.selected');
+  return this.$data.find('.selected');
 };
 
 scout.Tree.prototype.$nodes = function() {
-  return this.$container.find('.tree-item');
+  return this.$data.find('.tree-item');
 };
 
 scout.Tree.prototype.selectedNodes = function() {
@@ -904,8 +919,26 @@ scout.Tree.prototype.onModelAction = function(event) {
   }
 };
 
-scout.Tree.prototype._renderMenus = function() {
-  // NOP
+scout.Tree.prototype._renderMenus = function(menus) {
+  this._renderNodeMenus(this.selectedNodeIds);
+};
+
+scout.Tree.prototype._renderNodeMenus = function(selectedNodeIds) {
+  var menuItems = this._filterMenus(selectedNodeIds, ['Tree.EmptySpace', 'Tree.Header']);
+  if (menuItems) {
+    menuItems = this.staticMenus.concat(menuItems);
+  }
+  this.menuBar.updateItems(menuItems);
+};
+
+scout.Tree.prototype._filterMenus = function(selectedNodeIds, allowedTypes) {
+  allowedTypes = allowedTypes || [];
+  if (selectedNodeIds && selectedNodeIds.length === 1) {
+    allowedTypes.push('Tree.SingleSelection');
+  } else if (selectedNodeIds && selectedNodeIds.length > 1) {
+    allowedTypes.push('Tree.MultiSelection');
+  }
+  return scout.menus.filter(this.menus, allowedTypes);
 };
 
 scout.Tree.prototype._renderTitle = function() {

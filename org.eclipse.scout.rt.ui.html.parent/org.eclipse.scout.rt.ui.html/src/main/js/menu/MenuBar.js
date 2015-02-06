@@ -2,7 +2,7 @@ scout.MenuBar = function($parent, position, orderFunc) {
   this.position = position;
   this.orderFunc = orderFunc;
   this.menuItems = [];
-
+  this.$parent = $parent;
   this.$container = $.makeDiv('menubar');
   if (this.position === 'top') {
     $parent.prepend(this.$container);
@@ -41,24 +41,24 @@ scout.MenuBar.prototype.updateItems = function(menuItems) {
    */
   orderedMenuItems = this.orderFunc(menuItems);
   this.menuItems = orderedMenuItems.left.concat(orderedMenuItems.right);
-  this._renderMenuItems(orderedMenuItems.left , false);
+  this._renderMenuItems(orderedMenuItems.left, false);
   this._renderMenuItems(orderedMenuItems.right, true);
 
   // Fix for Firefox issue with float:right. In Firefox elements with float:right must
   // come first in the HTML order of elements. Otherwise a strange layout bug occurs.
   this.$container.children('.menu-right').
-    detach().
-    prependTo(this.$container);
+  detach().
+  prependTo(this.$container);
 
   // The _first_ menu-right must have the 'last' class (reverse order because of float:right)
   this.$container.children('.menu-right').
-    first().
-    addClass('last');
+  first().
+  addClass('last');
 
-// FIXME AWE: (menu) check if this code is still needed
-// if (this.lastItem && !this.lastItem.$container.hasClass('menu-right')) {
-//    this.lastItem.$container.addClass('last');
-//  }
+  // FIXME AWE: (menu) check if this code is still needed
+  // if (this.lastItem && !this.lastItem.$container.hasClass('menu-right')) {
+  //    this.lastItem.$container.addClass('last');
+  //  }
 
   this._updateVisibility();
 };
@@ -68,6 +68,10 @@ scout.MenuBar.prototype._updateVisibility = function() {
     this.$container.hide();
   } else {
     this.$container.show();
+  }
+  var htmlComp = scout.HtmlComponent.optGet(this.$parent);
+  if (htmlComp) {
+    htmlComp.revalidate();
   }
 };
 
