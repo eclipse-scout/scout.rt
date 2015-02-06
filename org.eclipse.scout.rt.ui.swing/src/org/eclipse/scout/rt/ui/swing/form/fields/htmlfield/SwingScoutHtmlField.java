@@ -31,7 +31,6 @@ import javax.swing.event.HyperlinkListener;
 import javax.swing.text.DefaultCaret;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
-import javax.swing.text.html.StyleSheet;
 
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
@@ -59,7 +58,6 @@ public class SwingScoutHtmlField extends SwingScoutValueFieldComposite<IHtmlFiel
 
   private HTMLEditorKit m_htmlKit;
   private HTMLDocument m_htmlDoc;
-  private StyleSheet m_styleSheet;
   private JTextPane m_htmlView;
   private JScrollPane m_scrollPane;
   private JPanelEx m_htmlViewPanel;
@@ -79,7 +77,6 @@ public class SwingScoutHtmlField extends SwingScoutValueFieldComposite<IHtmlFiel
     // viewer
     m_htmlKit = new HTMLEditorKit();
     m_htmlDoc = (HTMLDocument) (m_htmlKit.createDefaultDocument());
-    m_styleSheet = m_htmlDoc.getStyleSheet();
     //
     m_htmlView = new JTextPaneEx();
     m_htmlView.setName(getScoutObject().getClass().getSimpleName() + ".htmlView");
@@ -129,7 +126,7 @@ public class SwingScoutHtmlField extends SwingScoutValueFieldComposite<IHtmlFiel
 
   /**
    * Creates a border to have correct alignment for customized look and feel (e.g. Rayo)
-   * 
+   *
    * @since 3.10.0-M2
    */
   protected void setTopMarginForField() {
@@ -226,7 +223,6 @@ public class SwingScoutHtmlField extends SwingScoutValueFieldComposite<IHtmlFiel
         LOG.warn("Setting document base", e);
       }
     }
-    m_styleSheet = m_htmlDoc.getStyleSheet();
     m_htmlView.setDocument(m_htmlDoc);
     m_htmlView.setText(m_originalText);
     int newPos = Math.max(0, Math.min(oldPos, swingField.getDocument().getLength()));
@@ -240,7 +236,7 @@ public class SwingScoutHtmlField extends SwingScoutValueFieldComposite<IHtmlFiel
    * Unset preferred height to fit the content into the field
    * </p>
    * <small>Bugzilla #364473</small>
-   * 
+   *
    * @param textPane
    */
   private void ensureContentHeight(JTextPane textPane) {
