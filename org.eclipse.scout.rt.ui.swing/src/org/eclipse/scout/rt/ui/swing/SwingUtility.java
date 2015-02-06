@@ -64,8 +64,8 @@ import javax.swing.UIManager;
 import javax.swing.plaf.basic.BasicHTML;
 
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.scout.commons.BundleContextUtility;
 import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.dnd.FileListTransferObject;
 import org.eclipse.scout.commons.dnd.ImageTransferObject;
@@ -95,8 +95,8 @@ public final class SwingUtility {
 
   public static final boolean IS_JAVA_7_OR_GREATER = CompareUtility.compareTo(System.getProperty("java.version"), "1.7") >= 0;
   public static final boolean IS_JAVA_7_OR_LESS = CompareUtility.compareTo(System.getProperty("java.version"), "1.7") <= 0;
-  public static final boolean DO_RESET_COMPONENT_BOUNDS = BundleContextUtility.parseBooleanProperty("scout.ui.layout.resetBoundsOnInvalidate", true);
-  public static final boolean VERIFY_INPUT_ON_WINDOW_CLOSED = BundleContextUtility.parseBooleanProperty("scout.ui.verifyInputOnWindowClosed", false);
+  public static final boolean DO_RESET_COMPONENT_BOUNDS = ConfigIniUtility.getBooleanProperty("scout.ui.layout.resetBoundsOnInvalidate", true);
+  public static final boolean VERIFY_INPUT_ON_WINDOW_CLOSED = ConfigIniUtility.getBooleanProperty("scout.ui.verifyInputOnWindowClosed", false);
 
   private static Integer topMarginForField = null;
 

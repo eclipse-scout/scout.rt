@@ -14,10 +14,8 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.runtime.IProduct;
-import org.eclipse.core.runtime.Platform;
+import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.internal.Activator;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.osgi.BundleListClassLoader;
@@ -63,36 +61,29 @@ public final class SerializationUtility {
 
   private static IObjectSerializerFactory createObjectSerializerFactory() {
     IObjectSerializerFactory factory = null;
-    if (Activator.getDefault() != null) {
-      // check whether there is a custom object serializer factory available
-      try {
-        Class<?> customSerializerFactory = Activator.getDefault().getBundle().loadClass("org.eclipse.scout.commons.serialization.CustomObjectSerializerFactory");
-        LOG.info("loaded custom object serializer factory: [" + customSerializerFactory + "]");
-        if (!IObjectSerializerFactory.class.isAssignableFrom(customSerializerFactory)) {
-          LOG.warn("custom object serializer factory is not implementing [" + IObjectSerializerFactory.class + "]");
-        }
-        else if (Modifier.isAbstract(customSerializerFactory.getModifiers())) {
-          LOG.warn("custom object serializer factory is an abstract class [" + customSerializerFactory + "]");
-        }
-        else {
-          factory = (IObjectSerializerFactory) customSerializerFactory.newInstance();
-        }
+    // check whether there is a custom object serializer factory available
+    try {
+      Class<?> customSerializerFactory = Class.forName("org.eclipse.scout.commons.serialization.CustomObjectSerializerFactory");
+      LOG.info("loaded custom object serializer factory: [" + customSerializerFactory + "]");
+      if (!IObjectSerializerFactory.class.isAssignableFrom(customSerializerFactory)) {
+        LOG.warn("custom object serializer factory is not implementing [" + IObjectSerializerFactory.class + "]");
       }
-      catch (ClassNotFoundException e) {
-        // no custom object serializer factory installed
+      else if (Modifier.isAbstract(customSerializerFactory.getModifiers())) {
+        LOG.warn("custom object serializer factory is an abstract class [" + customSerializerFactory + "]");
       }
-      catch (Exception e) {
-        LOG.warn("Unexpected problem while creating a new instance of custom object serializer factory", e);
-      }
-
-      // no custom object serializer factory. Use bundle based serializer factory
-      if (factory == null) {
-        factory = new BundleObjectSerializerFactory();
+      else {
+        factory = (IObjectSerializerFactory) customSerializerFactory.newInstance();
       }
     }
-    else {
-      // running outside eclipse. Use basic strategy.
-      factory = new BasicObjectSerializerFactory();
+    catch (ClassNotFoundException e) {
+      // no custom object serializer factory installed
+    }
+    catch (Exception e) {
+      LOG.warn("Unexpected problem while creating a new instance of custom object serializer factory", e);
+    }
+
+    if (factory == null) {
+      factory = new BundleObjectSerializerFactory();
     }
 
     return factory;
@@ -108,29 +99,17 @@ public final class SerializationUtility {
    * value is computed and returned.
    */
   public static String[] getBundleOrderPrefixes() {
-    String rawBundlePrefixes = null;
-    if (Activator.getDefault() != null) {
-      rawBundlePrefixes = Activator.getDefault().getBundle().getBundleContext().getProperty(BUNDLE_ORDER_PREFIX_PROPERTY_NAME);
-    }
-    if (!StringUtility.hasText(rawBundlePrefixes)) {
-      rawBundlePrefixes = System.getProperty(BUNDLE_ORDER_PREFIX_PROPERTY_NAME, null);
-    }
+    String rawBundlePrefixes = ConfigIniUtility.getProperty(BUNDLE_ORDER_PREFIX_PROPERTY_NAME);
     if (!StringUtility.hasText(rawBundlePrefixes)) {
       rawBundlePrefixes = "org.eclipse.scout";
-      if (Activator.getDefault() != null) {
-        IProduct product = Platform.getProduct();
-        if (product != null && product.getDefiningBundle() != null && product.getDefiningBundle().getSymbolicName() != null) {
-          String prefix = product.getDefiningBundle().getSymbolicName().replaceAll("^(.*\\.)(client|shared|server|ui)(\\.core)?.*$", "$1");
-          rawBundlePrefixes = StringUtility.join(",", prefix, rawBundlePrefixes);
-        }
-      }
-      LOG.warn("bundle order prefixes are neither defined in config.ini nor as a system property. Using default value: " + BUNDLE_ORDER_PREFIX_PROPERTY_NAME + "=" + rawBundlePrefixes + "");
+      LOG.warn("bundle order prefixes are neither defined in config.ini nor as a system property. Using default value: " + BUNDLE_ORDER_PREFIX_PROPERTY_NAME + "=" + rawBundlePrefixes);
     }
-    List<String> bundlePrefixes = new ArrayList<String>();
-    for (String s : StringUtility.split(rawBundlePrefixes, ",")) {
-      s = StringUtility.trim(s);
+
+    String[] split = StringUtility.split(rawBundlePrefixes, ",");
+    List<String> bundlePrefixes = new ArrayList<String>(split.length);
+    for (String s : split) {
       if (StringUtility.hasText(s)) {
-        bundlePrefixes.add(s);
+        bundlePrefixes.add(s.trim());
       }
     }
     return bundlePrefixes.toArray(new String[bundlePrefixes.size()]);
@@ -147,13 +126,7 @@ public final class SerializationUtility {
    * <p/>
    */
   public static boolean isResourceUrlCachingInBundleListClassLoaderEnabled() {
-    String cacheEnabled = null;
-    if (Activator.getDefault() != null) {
-      cacheEnabled = Activator.getDefault().getBundle().getBundleContext().getProperty(ENABLE_RESOURCE_URL_CACHING_PROPERTY_NAME);
-    }
-    if (!StringUtility.hasText(cacheEnabled)) {
-      cacheEnabled = System.getProperty(ENABLE_RESOURCE_URL_CACHING_PROPERTY_NAME, null);
-    }
+    String cacheEnabled = ConfigIniUtility.getProperty(ENABLE_RESOURCE_URL_CACHING_PROPERTY_NAME);
     return StringUtility.parseBoolean(cacheEnabled, false);
   }
 
@@ -173,13 +146,7 @@ public final class SerializationUtility {
    * <p/>
    */
   public static boolean isUseBundleOrderPrefixListAsResourceFilterEnabled() {
-    String cacheEnabled = null;
-    if (Activator.getDefault() != null) {
-      cacheEnabled = Activator.getDefault().getBundle().getBundleContext().getProperty(ENABLE_USAGE_OF_BUNDLE_ORDER_PREFIX_LIST_AS_RESOURCE_FILTER_PROPERTY_NAME);
-    }
-    if (!StringUtility.hasText(cacheEnabled)) {
-      cacheEnabled = System.getProperty(ENABLE_USAGE_OF_BUNDLE_ORDER_PREFIX_LIST_AS_RESOURCE_FILTER_PROPERTY_NAME, null);
-    }
+    String cacheEnabled = ConfigIniUtility.getProperty(ENABLE_USAGE_OF_BUNDLE_ORDER_PREFIX_LIST_AS_RESOURCE_FILTER_PROPERTY_NAME);
     return StringUtility.parseBoolean(cacheEnabled, false);
   }
 

@@ -22,8 +22,6 @@ import java.util.List;
 import java.util.ListIterator;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 
 /**
  * Instances of this class hold references on {@link IOrdered} objects. It provides a subset of methods available on the
@@ -35,8 +33,6 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 public class OrderedCollection<ORDERED extends IOrdered> implements Iterable<ORDERED> {
 
   public static final double DEFAULT_EMPTY_ORDER = 0;
-
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(OrderedCollection.class);
 
   private final LinkedList<ORDERED> m_orderedObjects;
   private final Comparator<? super ORDERED> m_comparator;

@@ -15,8 +15,6 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectStreamClass;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.serialization.IObjectReplacer;
 import org.osgi.framework.Bundle;
 
@@ -26,7 +24,7 @@ import org.osgi.framework.Bundle;
  * see also {@link BundleObjectOutputStream}
  */
 public class BundleObjectInputStream extends ObjectInputStream {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(BundleObjectInputStream.class);
+
   private final ClassLoader m_classLoader;
   private final IObjectReplacer m_objectReplacer;
 

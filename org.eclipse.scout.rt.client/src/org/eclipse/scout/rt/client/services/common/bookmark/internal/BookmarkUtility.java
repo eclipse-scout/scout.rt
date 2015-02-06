@@ -648,7 +648,7 @@ public final class BookmarkUtility {
         String oldSearchFilterState = "" + createSearchFilterCRC(searchForm.getSearchFilter());
         if (CompareUtility.equals(oldSearchFilterState, newSearchFilterState)) {
           String newSearchFormState = tablePageState.getSearchFormState();
-          String oldSearchFormState = searchForm.getXML("UTF-8");
+          String oldSearchFormState = searchForm.getXML();
           if (CompareUtility.equals(oldSearchFormState, newSearchFormState)) {
             doSearch = false;
           }
@@ -782,7 +782,7 @@ public final class BookmarkUtility {
     state.setExpanded(page.isExpanded());
     IForm searchForm = page.getSearchFormInternal();
     if (searchForm != null) {
-      state.setSearchFormState(searchForm.getXML("UTF-8"));
+      state.setSearchFormState(searchForm.getXML());
       state.setSearchFilterState(searchForm.getSearchFilter().isCompleted(), "" + createSearchFilterCRC(searchForm.getSearchFilter()));
     }
     if (page.getTable().getTableCustomizer() != null) {

@@ -21,7 +21,7 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.scout.commons.BundleContextUtility;
+import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.NumberUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
@@ -528,7 +528,7 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
    * Supports ${...} variables resolved by {@link BundleContextUtility#resolve(String)}
    */
   public void setJdbcMappingName(String s) {
-    m_jdbcMappingName = BundleContextUtility.resolve(s);
+    m_jdbcMappingName = ConfigIniUtility.resolve(s);
   }
 
   public void setJdbcDriverName(String s) {

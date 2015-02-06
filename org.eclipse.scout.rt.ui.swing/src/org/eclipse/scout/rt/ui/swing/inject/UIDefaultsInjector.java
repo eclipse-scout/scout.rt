@@ -32,7 +32,7 @@ import javax.swing.plaf.InsetsUIResource;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.scout.commons.BundleContextUtility;
+import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -177,7 +177,7 @@ public class UIDefaultsInjector {
 
   protected IconUIResource getSplashUIResource() {
     IconUIResource iconresource = null;
-    String splashPathProp = BundleContextUtility.getProperty("osgi.splashPath");
+    String splashPathProp = ConfigIniUtility.getProperty("osgi.splashPath");
     try {
       if (!StringUtility.isNullOrEmpty(splashPathProp)) {
         Path p = new Path(splashPathProp);

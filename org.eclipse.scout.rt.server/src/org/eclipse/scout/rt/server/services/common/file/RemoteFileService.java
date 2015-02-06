@@ -21,8 +21,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 
-import org.eclipse.scout.commons.BundleContextUtility;
 import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Priority;
@@ -61,7 +61,7 @@ public class RemoteFileService extends AbstractService implements IRemoteFileSer
       m_rootPath = null;
     }
     else {
-      String tmp = BundleContextUtility.resolve(rootPath);
+      String tmp = ConfigIniUtility.resolve(rootPath);
       tmp = tmp.replaceAll("\\\\", "/");
       tmp = tmp.replaceAll("//", "/");
       File f = new File(tmp);

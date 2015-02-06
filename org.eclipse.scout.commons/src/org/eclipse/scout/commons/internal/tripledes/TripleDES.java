@@ -4,13 +4,21 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.commons.internal.tripledes;
 
-//3 x 64 =192 bit key DES
+import org.eclipse.scout.commons.EncryptionUtility2;
+
+/**
+ * Uses 3 x 64 = 192 bit key DES
+ *
+ * @deprecated This class in insecure and should no longer be used. Will be removed in Scout 6.0. Use
+ *             {@link EncryptionUtility2} instead.
+ */
+@Deprecated
 public final class TripleDES {
   private DESKey k1;
   private DESKey k2;
@@ -101,14 +109,6 @@ public final class TripleDES {
     return 8;
   }
 
-  private byte[] getKey() {
-    byte[] k = new byte[24];
-    System.arraycopy(k1.getKey(), 0, k, 0, 8);
-    System.arraycopy(k2.getKey(), 0, k, 8, 8);
-    System.arraycopy(k3.getKey(), 0, k, 16, 8);
-    return k;
-  }
-
   private static long pickBits(long a, byte[] bits) {
     long r = 0;
     int l = bits.length;
@@ -161,11 +161,6 @@ public final class TripleDES {
     private long key;
     private long[] subKeys;
 
-    protected DESKey(byte[] key) {
-      this.key = makeLong(key, 0, 8);
-      buildSubKeys();
-    }
-
     protected DESKey(long key) {
       this.key = key;
       buildSubKeys();
@@ -181,12 +176,6 @@ public final class TripleDES {
       subKeys = null;
     }
 
-    protected byte[] getKey() {
-      byte[] a = new byte[8];
-      writeBytes(key, a, 0, 8);
-      return a;
-    }
-
     protected long subCrypt(long block) {
       int i = (int) (block >>> 32);
       int r = (int) block;
@@ -198,14 +187,6 @@ public final class TripleDES {
       return ((long) r << 32) | (i & 0xffffffffL);
     }
 
-    protected void encrypt(byte[] source, int i, byte[] dest, int j) {
-      long block = makeLong(source, i, 8);
-      block = pickBits(block, IP);
-      block = subCrypt(block);
-      block = pickBits(block, FP);
-      writeBytes(block, dest, j, 8);
-    }
-
     protected long subDecrypt(long block) {
       int i = (int) (block >>> 32);
       int r = (int) block;
@@ -215,14 +196,6 @@ public final class TripleDES {
         r = t ^ f(r, subKeys[k]);
       }
       return ((long) r << 32) | (i & 0xffffffffL);
-    }
-
-    protected void decrypt(byte[] source, int i, byte[] dest, int j) {
-      long block = makeLong(source, i, 8);
-      block = pickBits(block, IP);
-      block = subDecrypt(block);
-      block = pickBits(block, FP);
-      writeBytes(block, dest, j, 8);
     }
 
     private void buildSubKeys() {
@@ -269,6 +242,5 @@ public final class TripleDES {
     private static int f(int r, long k) {
       return S1[(int) ((((r << 5) & 0x20) | ((r >>> 27) & 0x1f)) ^ ((k >>> 42) & 0x3f))] | S2[(int) (((r >>> 23) & 0x3f) ^ ((k >>> 36) & 0x3f))] | S3[(int) (((r >>> 19) & 0x3f) ^ ((k >>> 30) & 0x3f))] | S4[(int) (((r >>> 15) & 0x3f) ^ ((k >>> 24) & 0x3f))] | S5[(int) (((r >>> 11) & 0x3f) ^ ((k >>> 18) & 0x3f))] | S6[(int) (((r >>> 7) & 0x3f) ^ ((k >>> 12) & 0x3f))] | S7[(int) (((r >>> 3) & 0x3f) ^ ((k >>> 6) & 0x3f))] | S8[(int) ((((r >>> 31) & 0x01) | ((r << 1) & 0x3e)) ^ (k & 0x3f))];
     }
-
   }
 }

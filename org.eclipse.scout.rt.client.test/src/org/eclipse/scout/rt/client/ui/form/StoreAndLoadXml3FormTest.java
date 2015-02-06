@@ -12,12 +12,12 @@ package org.eclipse.scout.rt.client.ui.form;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.XmlUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.xmlparser.SimpleXmlElement;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fixture.AbstractTestGroupBox.InnerTestGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fixture.TestForm;
@@ -26,6 +26,8 @@ import org.eclipse.scout.rt.client.ui.form.fixture.TestForm.MainBox.G2Box;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 @RunWith(ScoutClientTestRunner.class)
 public class StoreAndLoadXml3FormTest {
@@ -71,9 +73,9 @@ public class StoreAndLoadXml3FormTest {
   @Test
   public void testFormId() throws Exception {
     TestForm f = new TestForm();
-    SimpleXmlElement xml = f.storeXML();
-    assertEquals("TestForm", xml.getAttribute("formId"));
-    assertEquals(TestForm.class.getName(), xml.getAttribute("formQname"));
+    Document xml = f.storeXML();
+    assertEquals("TestForm", xml.getDocumentElement().getAttribute("formId"));
+    assertEquals(TestForm.class.getName(), xml.getDocumentElement().getAttribute("formQname"));
   }
 
   @Test
@@ -90,7 +92,7 @@ public class StoreAndLoadXml3FormTest {
     f.getG3G4Text2Field().setValue("g3g2");
     f.getG1Box().getTestListBox().setValue(CollectionUtility.hashSet("g1L"));
     f.getG2Box().getTestListBox().setValue(CollectionUtility.hashSet("g2L"));
-    String xml = f.getXML(null);
+    String xml = f.getXML();
 
     f = new TestForm();
     f.setXML(xml);
@@ -119,15 +121,17 @@ public class StoreAndLoadXml3FormTest {
     f.getG3G4Text2Field().setValue("g3g2");
 
     // remove enclosing field path information and fieldQname
-    SimpleXmlElement xml = f.storeXML();
-    for (SimpleXmlElement e : xml.getChild("fields").getChildren()) {
-      e.removeChildren("enclosingField");
+    Document xml = f.storeXML();
+    for (Element e : XmlUtility.getChildElements(XmlUtility.getFirstChildElement(xml.getDocumentElement(), "fields"))) {
+      for (Element toRemove : XmlUtility.getChildElements(e, "enclosingField")) {
+        e.removeChild(toRemove);
+      }
       e.removeAttribute("fieldQname");
     }
 
     // value should be imported to first field found
     f = new TestForm();
-    f.loadXML(xml);
+    f.loadXML(xml.getDocumentElement());
 
     assertEquals("t3", f.getText3Field().getValue());
 
@@ -143,17 +147,18 @@ public class StoreAndLoadXml3FormTest {
   }
 
   private void checkFieldXml(IFormField field, String expectedFieldId, EnclosingField... expectedEnclosingFieldPath) throws ProcessingException {
-    SimpleXmlElement xml = new SimpleXmlElement("field");
+    Document document = XmlUtility.createNewXmlDocument("field");
+    Element xml = document.getDocumentElement();
     field.storeXML(xml);
     assertXmlIds(expectedFieldId, field.getClass().getName(), xml);
-    ArrayList<SimpleXmlElement> enclosingFieldPath = xml.getChildren("enclosingField");
+    List<Element> enclosingFieldPath = XmlUtility.getChildElements(xml, "enclosingField");
     assertEquals(expectedEnclosingFieldPath.length, enclosingFieldPath.size());
     for (int i = 0; i < expectedEnclosingFieldPath.length; i++) {
       assertXmlIds(expectedEnclosingFieldPath[i].getXmlFieldId(), expectedEnclosingFieldPath[i].getXmlFieldQname(), enclosingFieldPath.get(i));
     }
   }
 
-  private static void assertXmlIds(String expectedXmlFieldId, String expectedFqcn, SimpleXmlElement xml) {
+  private static void assertXmlIds(String expectedXmlFieldId, String expectedFqcn, Element xml) {
     assertEquals(expectedXmlFieldId, xml.getAttribute("fieldId"));
     assertEquals(expectedFqcn, xml.getAttribute("fieldQname"));
   }

@@ -17,13 +17,14 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import org.eclipse.scout.commons.xmlparser.ScoutXmlParser;
+import org.eclipse.scout.commons.XmlUtility;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.jaxws.Activator;
 import org.osgi.framework.Bundle;
 
 import com.sun.xml.internal.ws.transport.http.ResourceLoader;
 
-@SuppressWarnings({"restriction", "deprecation"})
+@SuppressWarnings("restriction")
 public class BundleProxyResourceLoader implements ResourceLoader {
 
   private static final Logger LOG = Logger.getLogger("com.sun.xml.ws.server.http");
@@ -106,12 +107,10 @@ public class BundleProxyResourceLoader implements ResourceLoader {
 
     private boolean isValidXml(URL url) {
       try {
-        // skip files which are not valid XML as JAX-WS fails to start properly otherwise.
-        ScoutXmlParser parser = new ScoutXmlParser();
-        parser.parse(url);
+        XmlUtility.getXmlDocument(url);
         return true;
       }
-      catch (Exception e) {
+      catch (ProcessingException e1) {
         return false;
       }
     }

@@ -12,7 +12,6 @@ package org.eclipse.scout.rt.client.ui.form.fields;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.StringWriter;
 import java.security.Permission;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,6 +21,7 @@ import java.util.Map;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
+import org.eclipse.scout.commons.XmlUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
@@ -37,7 +37,6 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.ProcessingStatus;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.commons.xmlparser.SimpleXmlElement;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains.FormFieldAddSearchTermsChain;
@@ -75,6 +74,8 @@ import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHa
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.eclipse.scout.service.SERVICES;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 @ClassId("cb3204c4-71bf-4dc6-88a4-3a8f81a7ca10")
 @FormData(value = AbstractFormFieldData.class, sdkCommand = SdkCommand.USE)
@@ -1185,13 +1186,13 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    * XML i/o
    */
   @Override
-  public void storeXML(SimpleXmlElement x) throws ProcessingException {
+  public void storeXML(Element x) throws ProcessingException {
     List<ICompositeField> enclosingFieldList = getEnclosingFieldList();
     for (ICompositeField field : enclosingFieldList) {
-      SimpleXmlElement enclosingField = new SimpleXmlElement("enclosingField");
+      Element enclosingField = x.getOwnerDocument().createElement("enclosingField");
       setXmlFormFieldId(enclosingField, field);
       // Enclosing fields are traversed from outside to inside. Hence add XML child at the end.
-      x.addChild(enclosingField);
+      x.appendChild(enclosingField);
     }
     // set field ids
     setXmlFormFieldId(x, this);
@@ -1211,13 +1212,13 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
     return enclosingFieldList;
   }
 
-  protected final void setXmlFormFieldId(SimpleXmlElement x, IFormField f) {
+  protected final void setXmlFormFieldId(Element x, IFormField f) {
     x.setAttribute("fieldId", f.getFieldId());
     x.setAttribute("fieldQname", f.getClass().getName());
   }
 
   @Override
-  public void loadXML(SimpleXmlElement x) throws ProcessingException {
+  public void loadXML(Element x) throws ProcessingException {
   }
 
   @Override
@@ -1226,8 +1227,8 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
       return;
     }
     try {
-      SimpleXmlElement root = new SimpleXmlElement();
-      root.parseString(xml);
+      Document doc = XmlUtility.getXmlDocument(xml);
+      Element root = doc.getDocumentElement();
       loadXML(root);
     }
     catch (Exception e) {
@@ -1237,15 +1238,9 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
 
   @Override
   public final String getXML() throws ProcessingException {
-    SimpleXmlElement x = new SimpleXmlElement("field");
-    storeXML(x);
-    StringWriter sw = new StringWriter();
-    try {
-      x.writeDocument(sw, null, "UTF-8");
-    }
-    catch (java.io.IOException ioe) {/* never */
-    }
-    return sw.toString();
+    Document x = XmlUtility.createNewXmlDocument("field");
+    storeXML(x.getDocumentElement());
+    return XmlUtility.wellformDocument(x);
   }
 
   @Override

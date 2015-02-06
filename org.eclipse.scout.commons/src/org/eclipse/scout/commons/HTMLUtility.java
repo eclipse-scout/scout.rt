@@ -106,11 +106,6 @@ public final class HTMLUtility {
     // fix incorrect single tag endings ( <br/ > <br /> )
     htmlText = htmlText.replaceAll("/\\s+>", "/>");
     htmlText = htmlText.replaceAll("([^\\s])\\s+/>", "$1/>");
-    // before jre 1.6 eliminate single tags and </br> tags
-    if (System.getProperty("java.version", "1.5").substring(0, 3).compareTo("1.6") < 0) {
-      htmlText = htmlText.replaceAll("/>", ">");
-      htmlText = htmlText.replaceAll("</\\s*br\\s*>", "");
-    }
     StyleSheet styleSheet = new StyleSheet();
     MutableHTMLDocument doc = new MutableHTMLDocument(styleSheet);
     try {
@@ -958,16 +953,8 @@ public final class HTMLUtility {
   private static class MutableHTMLDocument extends HTMLDocument {
     private static final long serialVersionUID = 1L;
 
-    public MutableHTMLDocument() {
-      super();
-    }
-
     public MutableHTMLDocument(StyleSheet styles) {
       super(styles);
-    }
-
-    public MutableHTMLDocument(Content c, StyleSheet styles) {
-      super(c, styles);
     }
 
     public void writeLockEx() {

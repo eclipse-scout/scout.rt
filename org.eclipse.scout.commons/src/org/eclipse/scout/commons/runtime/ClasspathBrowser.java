@@ -21,6 +21,8 @@ import java.util.TreeSet;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import org.eclipse.scout.commons.ConfigIniUtility;
+
 /**
  * Browser known classes on the class path Note: this visitor only detects
  * classes on the "visitable" classpath. This is mainly the area of
@@ -39,8 +41,8 @@ public class ClasspathBrowser {
   }
 
   public void addDefaultClasspaths() {
-    addClasspath(System.getProperty("sun.boot.class.path"));
-    addClasspath(System.getProperty("java.class.path"));
+    addClasspath(ConfigIniUtility.getProperty("sun.boot.class.path"));
+    addClasspath(ConfigIniUtility.getProperty("java.class.path"));
   }
 
   public void addClasspath(String cp) {

@@ -21,6 +21,7 @@ import java.util.List;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.XmlUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.FormData;
@@ -30,7 +31,6 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.commons.xmlparser.SimpleXmlElement;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.composer.ComposerFieldChains.ComposerFieldCreateAdditionalOrNodeChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.composer.ComposerFieldChains.ComposerFieldCreateAttributeNodeChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.composer.ComposerFieldChains.ComposerFieldCreateDataModelChain;
@@ -73,6 +73,8 @@ import org.eclipse.scout.rt.shared.data.model.IDataModelAttributeOp;
 import org.eclipse.scout.rt.shared.data.model.IDataModelEntity;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.service.SERVICES;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 @ClassId("8e7f7eb8-be18-48e5-9efe-8a5b3459e247")
 @FormData(value = AbstractComposerData.class, sdkCommand = SdkCommand.USE, defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.CREATE)
@@ -81,7 +83,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
 
   private IComposerFieldUIFacade m_uiFacade;
   private ITree m_tree;
-  private SimpleXmlElement m_initValue;
+  private Element m_initValue;
   private IDataModel m_dataModel;
 
   public AbstractComposerField() {
@@ -143,8 +145,8 @@ public abstract class AbstractComposerField extends AbstractFormField implements
 
   /**
    * For {@link #exportFormFieldData(AbstractFormFieldData)}, {@link AbstractTree#exportTreeData(AbstractTreeFieldData)}
-   * and {@link #storeXML(SimpleXmlElement)} it is necessary to export {@link IDataModelEntity} and
-   * {@link IDataModelAttribute} as external strings. see {@link EntityPath}
+   * and {@link #storeXML(Element)} it is necessary to export {@link IDataModelEntity} and {@link IDataModelAttribute}
+   * as external strings. see {@link EntityPath}
    * <p>
    * This callback completes an entity path to its root. The parameter path contains the entity path represented in the
    * composer tree of {@link EntityNode}s, the last element is the deepest tree node.
@@ -427,7 +429,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
   }
 
   @Override
-  public void loadXML(SimpleXmlElement x) throws ProcessingException {
+  public void loadXML(Element x) throws ProcessingException {
     super.loadXML(x);
     ITree tree = getTree();
     try {
@@ -441,16 +443,25 @@ public abstract class AbstractComposerField extends AbstractFormField implements
     }
   }
 
-  private void loadXMLRec(SimpleXmlElement x, ITreeNode parent) {
+  private void loadXMLRec(Element x, ITreeNode parent) {
     // build tree
-    for (SimpleXmlElement xmlElem : x.getChildren()) {
-      if ("attribute".equals(xmlElem.getName())) {
-        String id = xmlElem.getStringAttribute("id");
+    for (Element xmlElem : XmlUtility.getChildElements(x)) {
+      if ("attribute".equals(xmlElem.getTagName())) {
+        String id = xmlElem.getAttribute("id");
         IDataModelAttributeOp op;
-        Integer aggregationType;
+        Integer aggregationType = 0;
         try {
-          op = DataModelAttributeOp.create(xmlElem.getIntAttribute("op", DataModelConstants.OPERATOR_EQ));
-          aggregationType = xmlElem.getIntAttribute("aggregationType", 0);
+          int operator = DataModelConstants.OPERATOR_EQ;
+          String opAttribName = "op";
+          if (xmlElem.hasAttribute(opAttribName)) {
+            operator = Integer.parseInt(xmlElem.getAttribute(opAttribName));
+          }
+          op = DataModelAttributeOp.create(operator);
+
+          String aggregTypeName = "aggregationType";
+          if (xmlElem.hasAttribute(aggregTypeName)) {
+            aggregationType = Integer.parseInt(xmlElem.getAttribute(aggregTypeName));
+          }
           if (aggregationType == 0) {
             aggregationType = null;
           }
@@ -464,7 +475,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
           for (int i = 1; i <= 5; i++) {
             String valueName = (i == 1 ? "value" : "value" + i);
             if (xmlElem.hasAttribute(valueName)) {
-              valueList.add(xmlElem.getObjectAttribute(valueName, null));
+              valueList.add(XmlUtility.getObjectAttribute(xmlElem, valueName));
             }
           }
         }
@@ -476,7 +487,11 @@ public abstract class AbstractComposerField extends AbstractFormField implements
         for (int i = 1; i <= 5; i++) {
           String displayValueName = (i == 1 ? "displayValue" : "displayValue" + i);
           if (xmlElem.hasAttribute(displayValueName)) {
-            displayValueList.add(xmlElem.getStringAttribute(displayValueName, null));
+            String val = null;
+            if (xmlElem.hasAttribute(displayValueName)) {
+              val = xmlElem.getAttribute(displayValueName);
+            }
+            displayValueList.add(val);
           }
         }
         // find definition
@@ -492,10 +507,10 @@ public abstract class AbstractComposerField extends AbstractFormField implements
           loadXMLRec(xmlElem, node);
         }
       }
-      else if ("entity".equals(xmlElem.getName())) {
-        String id = xmlElem.getStringAttribute("id");
-        boolean negated = xmlElem.getStringAttribute("negated", "false").equalsIgnoreCase("true");
-        String text = xmlElem.getStringAttribute("displayValues", null);
+      else if ("entity".equals(xmlElem.getTagName())) {
+        String id = xmlElem.getAttribute("id");
+        boolean negated = Boolean.parseBoolean(xmlElem.getAttribute("negated"));
+        String text = xmlElem.getAttribute("displayValues");
         // find definition
         EntityPath entityPath = DataModelUtility.externalIdToEntityPath(getDataModel(), id);
         IDataModelEntity foundEntity = (entityPath != null ? entityPath.lastElement() : null);
@@ -509,9 +524,9 @@ public abstract class AbstractComposerField extends AbstractFormField implements
           loadXMLRec(xmlElem, node);
         }
       }
-      else if ("or".equals(xmlElem.getName())) {
-        boolean beginning = xmlElem.getStringAttribute("begin", "false").equalsIgnoreCase("true");
-        boolean negated = xmlElem.getStringAttribute("negated", "false").equalsIgnoreCase("true");
+      else if ("or".equals(xmlElem.getTagName())) {
+        boolean beginning = Boolean.parseBoolean(xmlElem.getAttribute("begin"));
+        boolean negated = Boolean.parseBoolean(xmlElem.getAttribute("negated"));
         ITreeNode node = null;
         if (beginning) {
           node = addEitherNode(parent, negated);
@@ -538,36 +553,33 @@ public abstract class AbstractComposerField extends AbstractFormField implements
   }
 
   @Override
-  public void storeXML(SimpleXmlElement x) throws ProcessingException {
+  public void storeXML(Element x) throws ProcessingException {
     super.storeXML(x);
     storeXMLRec(x, getTree().getRootNode());
   }
 
-  private void createDataModelEntityPathRec(EntityNode node, List<IDataModelEntity> list) {
-  }
-
-  private void storeXMLRec(SimpleXmlElement x, ITreeNode parent) {
+  private void storeXMLRec(Element x, ITreeNode parent) {
     for (ITreeNode node : parent.getChildNodes()) {
       if (node instanceof EntityNode) {
         EntityNode entityNode = (EntityNode) node;
-        SimpleXmlElement xEntity = new SimpleXmlElement("entity");
+        Element xEntity = x.getOwnerDocument().createElement("entity");
         xEntity.setAttribute("id", DataModelUtility.entityPathToExternalId(getDataModel(), interceptResolveEntityPath(entityNode)));
         xEntity.setAttribute("negated", (entityNode.isNegative() ? "true" : "false"));
         List<String> texts = entityNode.getTexts();
         xEntity.setAttribute("displayValues", CollectionUtility.hasElements(texts) ? StringUtility.emptyIfNull(CollectionUtility.firstElement(texts)) : null);
-        x.addChild(xEntity);
+        x.appendChild(xEntity);
         // recursion
         storeXMLRec(xEntity, node);
       }
       else if (node instanceof AttributeNode) {
         AttributeNode attNode = (AttributeNode) node;
-        SimpleXmlElement xAtt = new SimpleXmlElement("attribute");
+        Element xAtt = x.getOwnerDocument().createElement("attribute");
         xAtt.setAttribute("id", DataModelUtility.attributePathToExternalId(getDataModel(), interceptResolveAttributePath(attNode)));
         IDataModelAttributeOp op = attNode.getOp();
         try {
-          xAtt.setAttribute("op", op.getOperator());
+          xAtt.setAttribute("op", op.getOperator() + "");
           if (attNode.getAggregationType() != null) {
-            xAtt.setIntAttribute("aggregationType", attNode.getAggregationType());
+            xAtt.setAttribute("aggregationType", attNode.getAggregationType() + "");
           }
         }
         catch (Exception e) {
@@ -589,7 +601,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
           for (Object value : values) {
             String valueName = (i == 0 ? "value" : "value" + (i + 1));
             try {
-              xAtt.setObjectAttribute(valueName, value);
+              XmlUtility.setObjectAttribute(xAtt, valueName, value);
             }
             catch (Exception e) {
               LOG.warn("write value[" + i + "] for attribute " + attNode.getAttribute() + ": " + value, e);
@@ -597,14 +609,14 @@ public abstract class AbstractComposerField extends AbstractFormField implements
             i++;
           }
         }
-        x.addChild(xAtt);
+        x.appendChild(xAtt);
       }
       else if (node instanceof EitherOrNode) {
         EitherOrNode orNode = (EitherOrNode) node;
-        SimpleXmlElement xOr = new SimpleXmlElement("or");
+        Element xOr = x.getOwnerDocument().createElement("or");
         xOr.setAttribute("begin", "" + orNode.isBeginOfEitherOr());
         xOr.setAttribute("negated", (orNode.isNegative() ? "true" : "false"));
-        x.addChild(xOr);
+        x.appendChild(xOr);
         // recursion
         storeXMLRec(xOr, node);
       }
@@ -672,7 +684,8 @@ public abstract class AbstractComposerField extends AbstractFormField implements
   public void updateInitialValue() {
     try {
       // clone composer field by storing as XML
-      SimpleXmlElement element = new SimpleXmlElement();
+      Document x = XmlUtility.createNewXmlDocument("field");
+      Element element = x.getDocumentElement();
       storeXML(element);
       m_initValue = element;
     }

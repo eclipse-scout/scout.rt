@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.serialization;
 
-import org.eclipse.scout.commons.internal.Activator;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.osgi.BundleInspector;
@@ -22,7 +21,7 @@ import org.osgi.framework.ServiceReference;
 /**
  * Factory for creating {@link BundleObjectSerializer} instances. All of them are sharing the very same
  * {@link BundleListClassLoader}.
- * 
+ *
  * @since 3.8.2
  */
 public class BundleObjectSerializerFactory implements IObjectSerializerFactory {
@@ -58,7 +57,7 @@ public class BundleObjectSerializerFactory implements IObjectSerializerFactory {
     // find OSGi parent classloader by service
     ClassLoader osgiContextClassLoader = null;
     try {
-      BundleContext context = Activator.getDefault().getBundle().getBundleContext();
+      BundleContext context = BundleInspector.getBundleContext();
       for (ServiceReference ref : context.getServiceReferences(ClassLoader.class.getName(), null)) {
         if ("contextClassLoader".equals(ref.getProperty("equinox.classloader.type"))) {
           try {

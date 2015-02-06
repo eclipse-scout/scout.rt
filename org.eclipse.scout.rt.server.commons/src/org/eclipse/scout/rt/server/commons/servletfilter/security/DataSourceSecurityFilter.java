@@ -65,7 +65,7 @@ import org.eclipse.scout.service.SERVICES;
  * </ul>
  * <p>
  * , Michael Rudolf
- * 
+ *
  * @since 1.0.3 06.02.2009
  */
 public class DataSourceSecurityFilter extends AbstractChainableSecurityFilter {

@@ -18,6 +18,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Default implementation of a time to live cache mechanism using a HashMap. This implementation is thread-safe.
@@ -30,9 +31,13 @@ public class TTLCache<K, V> {
   private final Object m_itemMapLock = new Object();
 
   public TTLCache() {
-    this(60000);// 60 sec. default
+    this(TimeUnit.SECONDS.toMillis(60));// 60 sec. default
   }
 
+  /**
+   * @param timeToLive
+   *          in milliseconds
+   */
   public TTLCache(long timeToLive) {
     m_ttl = timeToLive;
     m_itemMap = new HashMap<K, CacheEntryTTL>();

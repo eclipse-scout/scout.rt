@@ -17,9 +17,6 @@ import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.commons.xmlparser.SimpleXmlElement;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.wrappedform.IWrappedFormFieldExtension;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -28,10 +25,10 @@ import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.service.SERVICES;
+import org.w3c.dom.Element;
 
 @ClassId("535cfd11-39cf-4804-beef-2bc1bc3d34cc")
 public abstract class AbstractWrappedFormField<T extends IForm> extends AbstractFormField implements IWrappedFormField<T> {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractWrappedFormField.class);
 
   private T m_innerForm;
   private P_InnerFormPropertyChangeListener m_innerFormPropertyListener;
@@ -167,7 +164,7 @@ public abstract class AbstractWrappedFormField<T extends IForm> extends Abstract
   }
 
   @Override
-  public void loadXML(SimpleXmlElement x) throws ProcessingException {
+  public void loadXML(Element x) throws ProcessingException {
     super.loadXML(x);
     if (getInnerForm() != null) {
       getInnerForm().loadXML(x);
@@ -175,7 +172,7 @@ public abstract class AbstractWrappedFormField<T extends IForm> extends Abstract
   }
 
   @Override
-  public void storeXML(SimpleXmlElement x) throws ProcessingException {
+  public void storeXML(Element x) throws ProcessingException {
     super.storeXML(x);
     if (getInnerForm() != null) {
       getInnerForm().storeXML(x);

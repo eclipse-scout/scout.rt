@@ -18,7 +18,7 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import org.eclipse.scout.commons.BundleContextUtility;
+import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
@@ -194,14 +194,14 @@ public abstract class AbstractSMTPService extends AbstractService implements ISM
    * debug email address.<br>
    * To override the debug email in the config.ini file use the property
    * <code>org.eclipse.scout.rt.server.services.common.smtp.AbstractSMTPService#debugReceiverEmail</code>
-   * 
+   *
    * @param emailAddress
    *          a valid email address
    *          <p>
    *          Supports ${...} variables resolved by {@link BundleContextUtility#resolve(String)}
    */
   public void setDebugReceiverEmail(String emailAddress) {
-    m_debugReceiverEmail = BundleContextUtility.resolve(emailAddress);
+    m_debugReceiverEmail = ConfigIniUtility.resolve(emailAddress);
   }
 
   protected String getProtocol() {

@@ -15,8 +15,6 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilter;
 import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilterManager;
@@ -30,7 +28,6 @@ import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
  * limits after page reload.
  */
 public class LargeMemoryPolicy extends AbstractMemoryPolicy {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(LargeMemoryPolicy.class);
 
   //cache all search form contents
   private final Map<String/*pageFormIdentifier*/, SearchFormState> m_searchFormCache;
@@ -62,7 +59,7 @@ public class LargeMemoryPolicy extends AbstractMemoryPolicy {
       m_searchFormCache.remove(pageFormIdentifier);
     }
     else {
-      String xml = f.getXML("UTF-8");
+      String xml = f.getXML();
       SearchFilter filter = f.getSearchFilter();
       m_searchFormCache.put(pageFormIdentifier, new SearchFormState(xml, filter));
     }

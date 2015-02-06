@@ -71,7 +71,7 @@ public class MediumMemoryPolicy extends AbstractMemoryPolicy {
       m_searchFormCache.remove(pageFormIdentifier);
     }
     else {
-      String xml = f.getXML("UTF-8");
+      String xml = f.getXML();
       SearchFilter filter = f.getSearchFilter();
       m_searchFormCache.put(pageFormIdentifier, new SearchFormState(xml, filter));
     }

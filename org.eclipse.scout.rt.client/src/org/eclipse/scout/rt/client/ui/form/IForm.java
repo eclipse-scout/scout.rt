@@ -18,7 +18,6 @@ import org.eclipse.scout.commons.ITypeWithSettableClassId;
 import org.eclipse.scout.commons.beans.IPropertyFilter;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.xmlparser.SimpleXmlElement;
 import org.eclipse.scout.rt.client.ui.IEventHistory;
 import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
@@ -34,6 +33,8 @@ import org.eclipse.scout.rt.client.ui.wizard.IWizard;
 import org.eclipse.scout.rt.client.ui.wizard.IWizardStep;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * A form is the model used for anything containing fields: a dialog, a step
@@ -570,13 +571,13 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId {
    */
   void setXML(String xml) throws ProcessingException;
 
-  String getXML(String encoding) throws ProcessingException;
+  String getXML() throws ProcessingException;
 
-  SimpleXmlElement storeXML() throws ProcessingException;
+  Document storeXML() throws ProcessingException;
 
-  void storeXML(SimpleXmlElement root) throws ProcessingException;
+  void storeXML(Element root) throws ProcessingException;
 
-  void loadXML(SimpleXmlElement root) throws ProcessingException;
+  void loadXML(Element root) throws ProcessingException;
 
   /**
    * Wait until form is closed<br>

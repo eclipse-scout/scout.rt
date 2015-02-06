@@ -12,13 +12,13 @@ package org.eclipse.scout.rt.client.ui.form;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
-import java.nio.charset.Charset;
+import java.io.Writer;
 import java.security.Permission;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,6 +29,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -37,6 +38,7 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.StoppableThread;
+import org.eclipse.scout.commons.XmlUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
@@ -54,7 +56,6 @@ import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.commons.xmlparser.SimpleXmlElement;
 import org.eclipse.scout.rt.client.BlockingCondition;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
@@ -125,6 +126,8 @@ import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHa
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.eclipse.scout.service.SERVICES;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 @FormData(value = AbstractFormData.class, sdkCommand = SdkCommand.USE)
 public abstract class AbstractForm extends AbstractPropertyObserver implements IForm, IExtensibleObject, IContributionOwner {
@@ -2144,51 +2147,40 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     if (xml == null) {
       return;
     }
-    SimpleXmlElement root = new SimpleXmlElement();
-    try {
-      root.parseString(xml);
-    }
-    catch (Throwable t) {
-      throw new ProcessingException("Loading xml", t);
-    }
-    loadXML(root);
+    Document xmlDocument = XmlUtility.getXmlDocument(xml);
+    loadXML(xmlDocument.getDocumentElement());
   }
 
   @Override
-  public String getXML(String encoding) throws ProcessingException {
-    if (encoding == null) {
-      encoding = "UTF-8";
-    }
+  public String getXML() throws ProcessingException {
     try {
-      SimpleXmlElement e = storeXML();
-      ByteArrayOutputStream bo = new ByteArrayOutputStream();
-      e.writeDocument(bo, null, encoding);
-      return new String(bo.toByteArray(), Charset.forName(encoding));
+      Document e = storeXML();
+      return XmlUtility.wellformDocument(e);
     }
-    catch (Throwable e) {
+    catch (Exception e) {
       if (e instanceof ProcessingException) {
         throw (ProcessingException) e;
       }
       else {
-        throw new ProcessingException("form : " + getTitle() + ", encoding: " + encoding, e);
+        throw new ProcessingException("form : " + getTitle(), e);
       }
     }
   }
 
   @Override
-  public SimpleXmlElement storeXML() throws ProcessingException {
-    SimpleXmlElement root = new SimpleXmlElement("form-state");
-    storeXML(root);
-    return root;
+  public Document storeXML() throws ProcessingException {
+    Document doc = XmlUtility.createNewXmlDocument("form-state");
+    storeXML(doc.getDocumentElement());
+    return doc;
   }
 
   @Override
-  public void storeXML(SimpleXmlElement root) throws ProcessingException {
+  public void storeXML(Element root) throws ProcessingException {
     root.setAttribute("formId", getFormId());
     root.setAttribute("formQname", getClass().getName());
     // add custom properties
-    SimpleXmlElement xProps = new SimpleXmlElement("properties");
-    root.addChild(xProps);
+    Element xProps = root.getOwnerDocument().createElement("properties");
+    root.appendChild(xProps);
     IPropertyFilter filter = new IPropertyFilter() {
       @Override
       public boolean accept(FastPropertyDescriptor descriptor) {
@@ -2204,30 +2196,29 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
         return true;
       }
     };
-    Map props = BeanUtility.getProperties(this, AbstractForm.class, filter);
-    for (Iterator it = props.entrySet().iterator(); it.hasNext();) {
-      Map.Entry entry = (Map.Entry) it.next();
+    Map<String, Object> props = BeanUtility.getProperties(this, AbstractForm.class, filter);
+    for (Entry<String, Object> entry : props.entrySet()) {
       try {
-        SimpleXmlElement xProp = new SimpleXmlElement("property");
-        xProps.addChild(xProp);
+        Element xProp = root.getOwnerDocument().createElement("property");
+        xProps.appendChild(xProp);
         xProp.setAttribute("name", entry.getKey());
-        xProp.setObjectAttribute("value", entry.getValue());
+        XmlUtility.setObjectAttribute(xProp, "value", entry.getValue());
       }
       catch (Exception e) {
         throw new ProcessingException("property " + entry.getKey() + " with value " + entry.getValue(), e);
       }
     }
     // add fields
-    final SimpleXmlElement xFields = new SimpleXmlElement("fields");
-    root.addChild(xFields);
+    final Element xFields = root.getOwnerDocument().createElement("fields");
+    root.appendChild(xFields);
     final Holder<ProcessingException> exceptionHolder = new Holder<ProcessingException>(ProcessingException.class);
     P_AbstractCollectingFieldVisitor v = new P_AbstractCollectingFieldVisitor() {
       @Override
       public boolean visitField(IFormField field, int level, int fieldIndex) {
-        SimpleXmlElement xField = new SimpleXmlElement("field");
+        Element xField = xFields.getOwnerDocument().createElement("field");
         try {
           field.storeXML(xField);
-          xFields.addChild(xField);
+          xFields.appendChild(xField);
         }
         catch (ProcessingException e) {
           exceptionHolder.setValue(e);
@@ -2243,39 +2234,40 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   @Override
-  public void loadXML(SimpleXmlElement root) throws ProcessingException {
+  public void loadXML(Element root) throws ProcessingException {
     String formId = getFormId();
-    String xmlId = root.getStringAttribute("formId", "");
+    String xmlId = root.getAttribute("formId");
     if (!formId.equals(xmlId)) {
       throw new ProcessingException("xml id=" + xmlId + " does not match form id=" + formId);
     }
+
     // load properties
-    HashMap<String, Object> props = new HashMap<String, Object>();
-    SimpleXmlElement xProps = root.getChild("properties");
+    Map<String, Object> props = new HashMap<String, Object>();
+    Element xProps = XmlUtility.getFirstChildElement(root, "properties");
     if (xProps != null) {
-      for (Iterator it = xProps.getChildren("property").iterator(); it.hasNext();) {
-        SimpleXmlElement xProp = (SimpleXmlElement) it.next();
-        String name = xProp.getStringAttribute("name");
+      for (Element xProp : XmlUtility.getChildElements(xProps, "property")) {
+        String name = xProp.getAttribute("name");
         try {
-          Object value = xProp.getObjectAttribute("value", null);
-          props.put(name, value);
+          Object o = XmlUtility.getObjectAttribute(xProp, "value");
+          props.put(name, o);
         }
         catch (Exception e) {
           LOG.warn("property " + name, e);
         }
       }
     }
+
     BeanUtility.setProperties(this, props, true, null);
     // load fields
-    SimpleXmlElement xFields = root.getChild("fields");
+    Element xFields = XmlUtility.getFirstChildElement(root, "fields");
     if (xFields != null) {
-      for (SimpleXmlElement xField : xFields.getChildren("field")) {
+      for (Element xField : XmlUtility.getChildElements(xFields, "field")) {
         List<String> xmlFieldIds = new LinkedList<String>();
         // add enclosing field path to xml field IDs
-        for (SimpleXmlElement element : xField.getChildren("enclosingField")) {
-          xmlFieldIds.add(element.getStringAttribute("fieldId"));
+        for (Element element : XmlUtility.getChildElements(xField, "enclosingField")) {
+          xmlFieldIds.add(element.getAttribute("fieldId"));
         }
-        xmlFieldIds.add(xField.getStringAttribute("fieldId"));
+        xmlFieldIds.add(xField.getAttribute("fieldId"));
         FindFieldByXmlIdsVisitor v = new FindFieldByXmlIdsVisitor(xmlFieldIds.toArray(new String[xmlFieldIds.size()]));
         visitFields(v);
         IFormField f = v.getField();
@@ -2323,15 +2315,16 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
           path = a.get(0);
         }
       }
+
       // export search parameters
-      try {
-        storeXML().writeDocument(new OutputStreamWriter(new FileOutputStream(path), "UTF-8"), null, "UTF-8");
+      try (Writer w = new OutputStreamWriter(new FileOutputStream(path), "UTF-8")) {
+        XmlUtility.wellformDocument(storeXML(), w);
         if (path != null) {
           m_lastXmlFileForStorage = path;
         }
         break;
       }
-      catch (Throwable t) {
+      catch (Exception t) {
         SERVICES.getService(IExceptionHandlerService.class).handleException(new ProcessingException(ScoutTexts.get("FormExportXml") + " " + getTitle(), t));
         saveAs = true;
       }
@@ -2347,16 +2340,14 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
     List<File> a = new FileChooser(dir, Collections.singletonList("xml"), true).startChooser();
     if (a.size() == 1) {
       File newPath = a.get(0);
-      String text = null;
-      try {
-        SimpleXmlElement e = new SimpleXmlElement();
-        e.parseStream(new FileInputStream(newPath));
+      try (InputStream in = new FileInputStream(newPath)) {
+        Document doc = XmlUtility.getXmlDocument(in);
         // load xml to search
         m_lastXmlFileForStorage = newPath;
-        loadXML(e);
+        loadXML(doc.getDocumentElement());
       }
       catch (Exception e) {
-        LOG.warn("loading: " + newPath + " text: " + text + " Exception: " + e);
+        LOG.warn("loading: " + newPath + " Exception: " + e);
         new MessageBox(
             null,
             TEXTS.get("LoadFormXmlFailedText"),

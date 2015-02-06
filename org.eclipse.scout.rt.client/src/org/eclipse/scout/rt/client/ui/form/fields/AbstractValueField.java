@@ -20,6 +20,7 @@ import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.VerboseUtility;
+import org.eclipse.scout.commons.XmlUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
@@ -35,7 +36,6 @@ import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.commons.xmlparser.SimpleXmlElement;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.AbstractValueFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IValueFieldExtension;
@@ -55,6 +55,7 @@ import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.service.SERVICES;
+import org.w3c.dom.Element;
 
 @ScoutSdkIgnore
 @ClassId("dfc4615d-a38d-450a-8592-e4d2c536d7cb")
@@ -234,11 +235,11 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
    * XML i/o
    */
   @Override
-  public void storeXML(SimpleXmlElement x) throws ProcessingException {
+  public void storeXML(Element x) throws ProcessingException {
     super.storeXML(x);
     VALUE value = getValue();
     try {
-      x.setObjectAttribute("value", value);
+      XmlUtility.setObjectAttribute(x, "value", value);
     }
     catch (IOException e) {
       if (LOG.isInfoEnabled()) {
@@ -248,10 +249,10 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
   }
 
   @Override
-  public void loadXML(SimpleXmlElement x) throws ProcessingException {
+  public void loadXML(Element x) throws ProcessingException {
     super.loadXML(x);
     try {
-      VALUE value = TypeCastUtility.castValue(x.getObjectAttribute("value", null), getHolderType());
+      VALUE value = TypeCastUtility.castValue(XmlUtility.getObjectAttribute(x, "value"), getHolderType());
       setValue(value);
     }
     catch (Exception e) {

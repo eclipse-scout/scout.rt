@@ -48,7 +48,7 @@ public class StoreAndLoadXml1FormTest {
       f.setText(EXPECTED_TEXT);
 
       // export to xml and check result
-      String xml = f.getXML(null);
+      String xml = f.getXML();
       assertNotNull(xml);
       assertTrue(xml.contains("primitiveInteger"));
       assertTrue(xml.contains("primitiveBoolean"));

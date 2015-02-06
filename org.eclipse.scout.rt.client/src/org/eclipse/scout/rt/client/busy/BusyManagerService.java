@@ -12,13 +12,9 @@ package org.eclipse.scout.rt.client.busy;
 
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.IJobChangeListener;
-import org.eclipse.core.runtime.jobs.IJobManager;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.scout.commons.annotations.Priority;
-import org.eclipse.scout.commons.internal.runtime.CompatibilityUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.IClientSessionProvider;
@@ -26,25 +22,21 @@ import org.eclipse.scout.rt.client.IJobChangeListenerEx;
 import org.eclipse.scout.rt.client.JobChangeAdapterEx;
 import org.eclipse.scout.service.AbstractService;
 import org.osgi.framework.ServiceRegistration;
-import org.osgi.framework.Version;
 
 /**
  * The busy manager is the primary place to register/unregister {@link IBusyHandler} per {@link IClientSession}
  * <p>
  * This service is registered by default with priority -1000
- * 
+ *
  * @author imo
  * @since 3.8
  */
-@SuppressWarnings("restriction")
 @Priority(-1000)
 public class BusyManagerService extends AbstractService implements IBusyManagerService {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(BusyManagerService.class);
   private static final String HANDLER_CLIENT_SESSION_KEY = IBusyHandler.class.getName();
 
   private final IJobChangeListener m_jobChangeListener;
   private final IJobChangeListenerEx m_jobChangeListenerEx;
-  private JobManagerResumeThread m_jobManagerResumeThread;
 
   public BusyManagerService() {
     m_jobChangeListener = new P_JobChangeListener();
@@ -55,23 +47,11 @@ public class BusyManagerService extends AbstractService implements IBusyManagerS
   public void initializeService(ServiceRegistration registration) {
     super.initializeService(registration);
     Job.getJobManager().addJobChangeListener(m_jobChangeListener);
-
-    if (CompatibilityUtility.isEclipseVersionLessThan(new Version("3.7.2"))) {
-      //Bug in eclipse job manager: sometimes a delayed scheduled job is not run after the delay but remains sleeping forever.
-      //To work around this issue, a call to IJobManager.resume() wakes up these jobs.
-      //See https://bugs.eclipse.org/bugs/show_bug.cgi?id=366170. Bug has been fixed for indigo sr2.
-      m_jobManagerResumeThread = new JobManagerResumeThread();
-      m_jobManagerResumeThread.start();
-    }
   }
 
   @Override
   public void disposeServices() {
     try {
-      if (m_jobManagerResumeThread != null) {
-        m_jobManagerResumeThread.cancel();
-      }
-      m_jobManagerResumeThread = null;
       Job.getJobManager().removeJobChangeListener(m_jobChangeListener);
     }
     finally {
@@ -171,41 +151,4 @@ public class BusyManagerService extends AbstractService implements IBusyManagerS
       handler.onJobBegin(job);
     }
   }
-
-  private static class JobManagerResumeThread extends Thread {
-
-    private boolean m_running = true;
-
-    public JobManagerResumeThread() {
-      super("JobManager-Resume");
-      setDaemon(true);
-    }
-
-    public void cancel() {
-      m_running = false;
-    }
-
-    @Override
-    public void run() {
-      while (true) {
-        if (!m_running) {
-          return;
-        }
-        try {
-          Thread.sleep(2000);
-          if (!m_running) {
-            return;
-          }
-          IJobManager m = Job.getJobManager();
-          if (m != null && !m.isSuspended()) {
-            m.resume();
-          }
-        }
-        catch (Throwable t) {
-          //nop
-        }
-      }
-    }
-  }
-
 }

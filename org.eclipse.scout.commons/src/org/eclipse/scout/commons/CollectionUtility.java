@@ -195,6 +195,7 @@ public final class CollectionUtility {
    * @param values
    * @return <code>true</code> if the collection contains one of the values.
    */
+  @SafeVarargs
   public static <T> boolean containsAny(Collection<T> c, T... values) {
     if (values == null || c == null) {
       return false;
@@ -225,15 +226,16 @@ public final class CollectionUtility {
   /**
    * List factory
    */
+  @SafeVarargs
   public static <T> ArrayList<T> arrayList(T... values) {
-    if (values != null) {
-      ArrayList<T> list = new ArrayList<T>(values.length);
-      for (T v : values) {
-        list.add(v);
-      }
-      return list;
+    if (values == null) {
+      return emptyArrayList();
     }
-    return emptyArrayList();
+    ArrayList<T> list = new ArrayList<T>(values.length);
+    for (T v : values) {
+      list.add(v);
+    }
+    return list;
   }
 
   /**
@@ -652,15 +654,16 @@ public final class CollectionUtility {
   /**
    * Set factory
    */
+  @SafeVarargs
   public static <T> HashSet<T> hashSet(T... values) {
-    if (values != null) {
-      HashSet<T> set = new HashSet<T>(values.length);
-      for (T v : values) {
-        set.add(v);
-      }
-      return set;
+    if (values == null) {
+      return emptyHashSet();
     }
-    return new HashSet<T>(0);
+    HashSet<T> set = new HashSet<T>(values.length);
+    for (T v : values) {
+      set.add(v);
+    }
+    return set;
   }
 
   public static <T> HashSet<T> hashSet(T value) {

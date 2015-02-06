@@ -65,10 +65,6 @@ public class DynamicNlsTest {
       return instance;
     }
 
-    public static String get(String key, String... messageArguments) {
-      return getInstance().getText(key, messageArguments);
-    }
-
     protected TestResourceBundleTexts() {
       registerResourceBundle(RESOURCE_BUNDLE_NAME, TestResourceBundleTexts.class);
     }

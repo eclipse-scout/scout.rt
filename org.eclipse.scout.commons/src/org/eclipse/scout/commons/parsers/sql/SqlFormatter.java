@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.parsers.sql;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.parsers.sql.SqlParserToken.AndExpr;
 import org.eclipse.scout.commons.parsers.sql.SqlParserToken.AndOp;
 import org.eclipse.scout.commons.parsers.sql.SqlParserToken.Atom;
@@ -40,7 +38,7 @@ import org.eclipse.scout.commons.parsers.sql.SqlParserToken.Unparsed;
 
 /**
  * see {@link SqlParser}
- * 
+ *
  * <pre>
  * <code>
  * Statement = SingleStatement (UnionToken SingleStatement)* (Unparsed)?
@@ -60,7 +58,6 @@ import org.eclipse.scout.commons.parsers.sql.SqlParserToken.Unparsed;
  * </pre>
  */
 public class SqlFormatter {
-  private static IScoutLogger logger = ScoutLogManager.getLogger(SqlFormatter.class);
 
   private static class FormatContext {
     private int m_tabSize;

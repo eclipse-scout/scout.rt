@@ -22,11 +22,11 @@ import java.util.Set;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.osgi.util.ManifestElement;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.internal.Activator;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.runtime.BundleBrowser;
 import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 import org.osgi.framework.Constants;
 
@@ -70,6 +70,11 @@ public final class BundleInspector {
       parents = nextParents;
     }
     return list.toArray(new Bundle[0]);
+  }
+
+  @SuppressWarnings("restriction")
+  public static BundleContext getBundleContext() {
+    return org.eclipse.core.internal.runtime.InternalPlatform.getDefault().getBundleContext();
   }
 
   /**
@@ -147,13 +152,7 @@ public final class BundleInspector {
    *         added at the end.
    */
   public static Bundle[] getOrderedBundleList(final String... prefixList) {
-    Bundle[] allBundles;
-    if (Activator.getDefault() != null) {
-      allBundles = Activator.getDefault().getBundle().getBundleContext().getBundles();
-    }
-    else {
-      allBundles = new Bundle[0];
-    }
+    Bundle[] allBundles = getBundleContext().getBundles();
     if (allBundles == null || allBundles.length == 0) {
       return new Bundle[0];
     }
@@ -390,7 +389,7 @@ public final class BundleInspector {
    */
   public static Set<Class<?>> getAllClasses(IClassFilter filter) throws ProcessingException {
     HashSet<Class<?>> discoveredClasses = new HashSet<Class<?>>();
-    for (Bundle bundle : Activator.getDefault().getBundle().getBundleContext().getBundles()) {
+    for (Bundle bundle : getBundleContext().getBundles()) {
       // Skip fragments, because classes from fragments are read when browsing the host bundle
       if (Platform.isFragment(bundle)) {
         continue;

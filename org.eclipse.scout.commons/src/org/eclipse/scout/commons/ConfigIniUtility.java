@@ -13,17 +13,18 @@ package org.eclipse.scout.commons;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Properties;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 
 /**
  * Utility to extract config.ini entries of the formats
@@ -50,29 +51,27 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
  * </code>
  * </pre>
  *
- * where ${variable} is a system property or an environment variable containing an url or a file path to the FOLDER
+ * where ${variable} is a system property or an environment variable containing an URL or a file path to the FOLDER
  * containing the config.ini
  */
 public final class ConfigIniUtility {
-  private static final Pattern CONFIG_LINE_PATTERN = Pattern.compile("([^#/]+)(/[^#]+)?\\#([^=]+)=(.*)");
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ConfigIniUtility.class);
-  private static ConfigIniProperty[] configProperties;
+  public static final String CONFIG_INI = "config.ini";
+  public static final char FILTER_DELIM = '/';
+
+  private static final Pattern CONFIG_LINE_PATTERN = Pattern.compile("([^#" + FILTER_DELIM + "]+)(" + FILTER_DELIM + "[^#]*)?\\#([^=]+)");
+  private static final Pattern VARIABLE_PATTERN = Pattern.compile("\\$\\{([^\\}]+)\\}");
+  private static final Map<String, String> configProperties;
 
   private ConfigIniUtility() {
   }
 
   static {
-    ArrayList<ConfigIniProperty> parsingList = new ArrayList<ConfigIniProperty>();
-    ArrayList<String> externalConfigPaths = new ArrayList<String>();
-    parseLocalConfigIniFile(parsingList, externalConfigPaths);
-    parseExternalConfigIniFiles(parsingList, externalConfigPaths);
-    configProperties = parsingList.toArray(new ConfigIniProperty[parsingList.size()]);
-    if (LOG.isInfoEnabled()) {
-      LOG.info("Config Bean Properties");
-      for (ConfigIniProperty p : configProperties) {
-        LOG.info(" " + p.getBeanName() + "#" + p.getPropertyName() + (p.getFilter() != null ? "/" + p.getFilter() : "") + "=" + p.getValue());
-      }
-    }
+    configProperties = new HashMap<>();
+
+    Set<String> externalConfigPaths = new LinkedHashSet<>();
+    parseLocalConfigIniFile(externalConfigPaths);
+    parseExternalConfigIniFiles(externalConfigPaths);
+    resolveAll();
   }
 
   public static Map<String, String> getProperties(Class beanType) {
@@ -80,172 +79,214 @@ public final class ConfigIniUtility {
   }
 
   public static Map<String, String> getProperties(Class beanType, String filter) {
-    Map<String, String> props = new HashMap<String, String>();
-    for (ConfigIniProperty p : configProperties) {
-      if (matchesBeanClass(p, beanType, filter)) {
-        String v = p.getValue();
-        if (v != null && v.length() == 0) {
-          v = null;
+    Map<String, String> props = new HashMap<>();
+    for (Entry<String, String> entry : configProperties.entrySet()) {
+      String key = entry.getKey();
+      String value = entry.getValue();
+      if (value != null && value.length() > 0) {
+        String classProperty = getClassProperty(key, beanType, filter);
+        if (classProperty != null && classProperty.length() > 0) {
+          // filter accepted
+          String propName = key.substring(key.length() - classProperty.length());
+          props.put(propName, value);
         }
-        props.put(p.getPropertyName(), v);
-      }
-    }
-    if (LOG.isInfoEnabled()) {
-      LOG.info("Properties for " + beanType.getName());
-      for (Map.Entry<String, String> e : props.entrySet()) {
-        LOG.info(" " + e.getKey() + "=" + e.getValue());
       }
     }
     return props;
   }
 
-  private static void parseLocalConfigIniFile(List<ConfigIniProperty> parsingList, List<String> externalConfigPaths) {
-    String file = "config.ini";
-    BufferedReader in = null;
-    try {
-      URL url = null;
-      if (Platform.inDevelopmentMode()) {
-        url = new URL(Platform.getConfigurationLocation().getURL(), file);
-      }
-      else {
-        URL installLocationUrl = Platform.getInstallLocation().getURL();
-        url = new URL(installLocationUrl, "configuration/" + file);
-      }
-      in = new BufferedReader(new InputStreamReader(url.openStream(), "UTF-8"));
-      String line;
-      while ((line = in.readLine()) != null) {
-        ConfigIniProperty p = parseConfigIniLine(line);
-        if (p != null) {
-          parsingList.add(p);
-        }
-        if (line.matches("external.configuration.area(\\.[0-9]+)?=.*")) {
-          externalConfigPaths.add(line.split("=", 2)[1]);
-        }
-        if (line.matches("osgi.sharedConfiguration.area=.*")) {
-          externalConfigPaths.add(line.split("=", 2)[1]);
-        }
-      }
-
-      String furtherExternalConfigFile = System.getProperty("external.configuration.file");
-      if (furtherExternalConfigFile != null) {
-        externalConfigPaths.add(furtherExternalConfigFile);
-      }
+  public static boolean getBooleanProperty(String key, boolean def) {
+    String val = getProperty(key);
+    if (val == null) {
+      return def;
     }
-    catch (Throwable t) {
-      LOG.error("parsing " + file, t);
-    }
-    finally {
-      if (in != null) {
-        try {
-          in.close();
-        }
-        catch (Throwable fatal) {
-        }
-      }
-    }
+    return Boolean.parseBoolean(val);
   }
 
-  @SuppressWarnings("null")
-  private static void parseExternalConfigIniFiles(List<ConfigIniProperty> parsingList, List<String> externalConfigPaths) {
-    for (String path : externalConfigPaths) {
-      BufferedReader in = null;
-      String resolvedPath = null;
+  public static String getProperty(String key) {
+    if (key == null) {
+      return null;
+    }
+
+    // 1. App config (config.ini)
+    String value = configProperties.get(key);
+    if (value != null) {
+      return value;
+    }
+
+    // 2. system config
+    value = System.getProperty(key);
+    if (value != null) {
+      return value;
+    }
+
+    // 3. environment config
+    return System.getenv(key);
+  }
+
+  public static String resolve(String s) {
+    if (s == null || s.length() == 0) {
+      return s;
+    }
+    String t = s;
+    Matcher m = VARIABLE_PATTERN.matcher(t);
+    while (m.find()) {
+      String key = m.group(1);
+
+      String value = getProperty(key);
       try {
-        URL url = null;
-        resolvedPath = path.replaceAll("\\\\(.)", "$1");
-        if (resolvedPath.matches("\\$\\{.*\\}.*")) {
-          String tail = resolvedPath.replaceAll("\\$\\{.*\\}", "");
-          String variable = resolvedPath.replaceAll(tail, "");
-          variable = variable.substring(2, variable.length() - 1);
-          resolvedPath = System.getProperty(variable, null);
-          if (resolvedPath == null) {
-            resolvedPath = System.getenv(variable);
-          }
-          if (resolvedPath == null) {
-            continue;
-          }
-          resolvedPath += tail;
-        }
-        resolvedPath = resolvedPath.replace("@user.home", System.getProperty("user.home"));
-        resolvedPath = resolvedPath.replace("@user.dir", System.getProperty("user.dir"));
-        File f1 = new File(resolvedPath);
+        // in case it is an URL: make absolute file path
+        value = new File(new URL(value).getFile()).getAbsolutePath();
+      }
+      catch (Exception e) {
+      }
 
-        if (f1.exists()) {
-          if (f1.isFile()) {
-            url = f1.toURI().toURL();
-          }
-          else {
-            url = new File(resolvedPath, "config.ini").toURI().toURL();
-          }
-        }
-        else {
-          if (resolvedPath.toLowerCase().endsWith(".ini") || resolvedPath.toLowerCase().endsWith(".properties")) {
-            url = new URL(resolvedPath);
-          }
-          else {
-            url = new URL(new URL(resolvedPath), "config.ini");
-          }
-        }
-        in = new BufferedReader(new InputStreamReader(url.openStream(), "UTF-8"));
-        String line;
-        while ((line = in.readLine()) != null) {
-          ConfigIniProperty p = parseConfigIniLine(line);
-          if (p != null) {
-            parsingList.add(p);
-          }
-        }
+      if (value == null) {
+        throw new IllegalArgumentException("resolving expression \"" + s + "\": variable ${" + key + "} is not defined in the context");
       }
-      catch (Throwable t) {
-        LOG.error("parsing external file " + path + " (" + resolvedPath + ")", t);
-      }
-      finally {
-        if (in != null) {
-          try {
-            in.close();
-          }
-          catch (Throwable fatal) {
-          }
-        }
-      }
+      t = t.substring(0, m.start()) + value + t.substring(m.end());
+      // next
+      m = VARIABLE_PATTERN.matcher(t);
     }
+
+    t = t.replace("@user.home", getProperty("user.home"));
+    t = t.replace("@user.dir", getProperty("user.dir"));
+    return t;
   }
 
-  private static ConfigIniProperty parseConfigIniLine(String configLine) {
-    if (configLine != null) {
-      configLine = configLine.replaceAll("\\\\(.)", "$1");
-      Matcher m = CONFIG_LINE_PATTERN.matcher(configLine);
-      if (m.matches()) {
-        String filter = m.group(2);
-        if (filter != null && filter.startsWith("/")) {
-          // ok
+  protected static String getClassProperty(String key, Class beanType, String filter) {
+    Matcher m = CONFIG_LINE_PATTERN.matcher(key);
+    if (m.matches()) {
+      String clazz = m.group(1);
+      String f = m.group(2);
+      String prop = m.group(3);
+
+      if (f != null && (f.length() < 1 || f.charAt(0) != FILTER_DELIM)) {
+        f = null;
+      }
+
+      try {
+        if (filter == null || f == null || filter.equals(f)) {
+          Class<?> myType = Class.forName(clazz, false, beanType.getClassLoader());
+          if (myType.isAssignableFrom(beanType)) {
+            return prop;
+          }
         }
-        else {
-          filter = null;
-        }
-        ConfigIniProperty p = new ConfigIniProperty(m.group(1), filter, m.group(3), BundleContextUtility.resolve(m.group(4)));
-        return p;
+      }
+      catch (Exception e) {
+        //nop
       }
     }
     return null;
   }
 
-  /**
-   * returns true if this property bean type is equal or a supertype of the
-   * parameter type
-   */
-  @SuppressWarnings("unchecked")
-  private static boolean matchesBeanClass(ConfigIniProperty p, Class parameterType, String filter) {
+  protected static void parseLocalConfigIniFile(Set<String> externalConfigPaths) {
+    URL url = null;
     try {
-      Class myType = Class.forName(p.getBeanName(), false, parameterType.getClassLoader());
-      if (myType.isAssignableFrom(parameterType)) {
-        if (filter == null || p.getFilter() == null || filter.equals(p.getFilter())) {
-          return true;
+      if (Platform.isRunning()) {
+        if (Platform.inDevelopmentMode()) {
+          url = new URL(Platform.getConfigurationLocation().getURL(), CONFIG_INI);
+        }
+        else {
+          URL installLocationUrl = Platform.getInstallLocation().getURL();
+          url = new URL(installLocationUrl, "configuration/" + CONFIG_INI);
         }
       }
     }
-    catch (Throwable t) {
+    catch (MalformedURLException e) {
+      // Do not use logger here. Because the logger uses this class, it is not yet initialized
+      e.printStackTrace();
     }
-    return false;
+
+    if (url != null) {
+      parseConfigIni(url, externalConfigPaths);
+    }
   }
 
+  protected static void parseExternalConfigIniFiles(Set<String> externalConfigPaths) {
+    for (String path : externalConfigPaths) {
+      URL url = getExternalConfigIniUrl(path);
+      if (url != null) {
+        parseConfigIni(url, null /* no second level of external files*/);
+      }
+    }
+  }
+
+  protected static void resolveAll() {
+    for (Entry<String, String> entry : configProperties.entrySet()) {
+      entry.setValue(resolve(entry.getValue()));
+    }
+  }
+
+  protected static void parseConfigIni(URL configIniUrl, Set<String> externalConfigPaths) {
+    Properties props = new Properties();
+    try (BufferedReader in = new BufferedReader(new InputStreamReader(configIniUrl.openStream(), "UTF-8"))) {
+      props.load(in);
+    }
+    catch (Exception t) {
+      // Do not use logger here. Because the logger uses this class, it is not yet initialized
+      t.printStackTrace();
+      return;
+    }
+
+    if (externalConfigPaths != null) {
+      Object sharedConfigArea = props.remove("osgi.sharedConfiguration.area"); // legacy
+      if (sharedConfigArea != null) {
+        externalConfigPaths.add(sharedConfigArea.toString());
+      }
+    }
+
+    Pattern externalConfigFilePattern = Pattern.compile("external\\.configuration\\.area(\\.[0-9]+)?");
+    for (Entry<Object, Object> entry : props.entrySet()) {
+      String key = (String) entry.getKey();
+      String value = (String) entry.getValue();
+      if (key != null && value != null) {
+        if (externalConfigFilePattern.matcher(key).matches()) {
+          if (externalConfigPaths != null) {
+            externalConfigPaths.add(value);
+          }
+        }
+        else {
+          configProperties.put(key, value);
+        }
+      }
+    }
+
+    if (externalConfigPaths != null) {
+      String furtherExternalConfigFile = System.getProperty("external.configuration.file");
+      if (furtherExternalConfigFile != null) {
+        externalConfigPaths.add(furtherExternalConfigFile);
+      }
+    }
+  }
+
+  protected static URL getExternalConfigIniUrl(String externalPath) {
+    URL url = null;
+    String resolvedPath = resolve(externalPath.replaceAll("\\\\(.)", "$1"));
+    File f = new File(resolvedPath);
+
+    try {
+      if (f.exists()) {
+        if (f.isFile()) {
+          url = f.toURI().toURL();
+        }
+        else {
+          url = new File(resolvedPath, CONFIG_INI).toURI().toURL();
+        }
+      }
+      else {
+        if (resolvedPath.toLowerCase().endsWith(".ini") || resolvedPath.toLowerCase().endsWith(".properties")) {
+          url = new URL(resolvedPath);
+        }
+        else {
+          url = new URL(new URL(resolvedPath), CONFIG_INI);
+        }
+      }
+    }
+    catch (Exception e) {
+      // Do not use logger here. Because the logger uses this class, it is not yet initialized
+      e.printStackTrace();
+    }
+    return url;
+  }
 }

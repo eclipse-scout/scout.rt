@@ -215,10 +215,4 @@ public final class CSSPatch {
       return null;
     }
   }
-
-  private static Object createCssValue() throws Exception {
-    Constructor<?> c = Class.forName(CSS.class.getName() + "$CssValue", true, CSS.class.getClassLoader()).getDeclaredConstructor();
-    c.setAccessible(true);
-    return c.newInstance();
-  }
 }

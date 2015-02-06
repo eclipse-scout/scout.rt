@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -16,6 +16,12 @@ import java.util.Random;
 
 import org.eclipse.scout.commons.internal.tripledes.TripleDES;
 
+/**
+ * @deprecated This class in insecure and should no longer be used. Will be removed in Scout 6.0. Use
+ *             {@link EncryptionUtility2} instead.
+ */
+@Deprecated
+@SuppressWarnings("deprecation")
 public final class EncryptionUtility {
   public static final byte[] DEFAULT_KEY = Base64Utility.decode("GQgTSBkIE0gZCBNIGQgTSBkIE0gZCBNI");// 24
 

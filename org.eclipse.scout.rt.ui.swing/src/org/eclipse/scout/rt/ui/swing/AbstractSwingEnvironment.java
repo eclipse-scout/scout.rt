@@ -48,8 +48,8 @@ import javax.swing.plaf.ColorUIResource;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.scout.commons.BundleContextUtility;
 import org.eclipse.scout.commons.CSSPatch;
+import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.HTMLUtility;
 import org.eclipse.scout.commons.HTMLUtility.DefaultFont;
 import org.eclipse.scout.commons.ITypeWithClassId;
@@ -631,7 +631,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
    * </pre>
    */
   protected void decorateAppZone(RootPaneContainer root) {
-    String zone = BundleContextUtility.getProperty("app.zone");
+    String zone = ConfigIniUtility.getProperty("app.zone");
     if (zone == null) {
       //production
     }

@@ -13,7 +13,6 @@ package org.eclipse.scout.commons.parsers;
 import java.text.ParsePosition;
 import java.util.ArrayList;
 
-import org.eclipse.scout.commons.internal.Activator;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.parsers.token.DatabaseSpecificToken;
@@ -67,24 +66,11 @@ import org.eclipse.scout.commons.parsers.token.ValueOutputToken;
 public class BindParser {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(BindParser.class);
 
-  private static final String PLAIN_SQL_BIND_PROPERTY_NAME = "org.eclipse.scout.commons.sqlplainbind";
-  private static final Boolean PLAIN_SQL_BIND_ENABLED;
-
   private static final String S_MAP;
   private static final String NAME_MAP;
   static {
     S_MAP = " \n\t\r";
     NAME_MAP = "_.0123456789{}[]ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-    String s = Activator.getDefault() != null ? Activator.getDefault().getBundle().getBundleContext().getProperty(PLAIN_SQL_BIND_PROPERTY_NAME) : System.getProperty(PLAIN_SQL_BIND_PROPERTY_NAME);
-    if ("true".equalsIgnoreCase(s)) {
-      PLAIN_SQL_BIND_ENABLED = Boolean.TRUE;
-    }
-    else if ("false".equalsIgnoreCase(s)) {
-      PLAIN_SQL_BIND_ENABLED = Boolean.FALSE;
-    }
-    else {
-      PLAIN_SQL_BIND_ENABLED = null;
-    }
   }
 
   private String m_str;

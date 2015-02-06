@@ -21,7 +21,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 
-import org.eclipse.scout.commons.BundleContextUtility;
 import org.eclipse.scout.commons.ConfigIniUtility;
 
 /**
@@ -170,7 +169,7 @@ public class FilterConfigInjection {
       }
       else {
         String s = m_config.getInitParameter(name);
-        return BundleContextUtility.resolve(s);
+        return ConfigIniUtility.resolve(s);
       }
     }
 

@@ -22,6 +22,7 @@ import org.eclipse.scout.commons.BooleanUtility;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.NumberUtility;
+import org.eclipse.scout.commons.XmlUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
@@ -34,7 +35,6 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.ProcessingStatus;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.commons.xmlparser.SimpleXmlElement;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.tablefield.ITableFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.tablefield.TableFieldChains.TableFieldReloadTableDataChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.tablefield.TableFieldChains.TableFieldSaveChain;
@@ -61,6 +61,7 @@ import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFiel
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldData;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.service.SERVICES;
+import org.w3c.dom.Element;
 
 @ClassId("76887bde-6815-4f7d-9cbd-60409b49488d")
 @FormData(value = AbstractTableFieldBeanData.class, sdkCommand = SdkCommand.USE, defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.CREATE)
@@ -413,19 +414,19 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
   }
 
   @Override
-  public void loadXML(SimpleXmlElement x) throws ProcessingException {
+  public void loadXML(Element x) throws ProcessingException {
     super.loadXML(x);
     if (m_table != null) {
       int[] selectedRowIndices = null;
       try {
-        selectedRowIndices = (int[]) x.getObjectAttribute("selectedRowIndices", null);
+        selectedRowIndices = (int[]) XmlUtility.getObjectAttribute(x, "selectedRowIndices");
       }
       catch (Exception e) {
         LOG.warn("reading attribute 'selectedRowIndices'", e);
       }
       Object[][] dataMatrix = null;
       try {
-        dataMatrix = (Object[][]) x.getObjectAttribute("rows", null);
+        dataMatrix = (Object[][]) XmlUtility.getObjectAttribute(x, "rows");
       }
       catch (Exception e) {
         LOG.warn("reading attribute 'rows'", e);
@@ -441,7 +442,7 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
   }
 
   @Override
-  public void storeXML(SimpleXmlElement x) throws ProcessingException {
+  public void storeXML(Element x) throws ProcessingException {
     super.storeXML(x);
     if (m_table != null) {
       List<ITableRow> selectedRows = m_table.getSelectedRows();
@@ -452,7 +453,7 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
         i++;
       }
       try {
-        x.setObjectAttribute("selectedRowIndices", selectedRowIndices);
+        XmlUtility.setObjectAttribute(x, "selectedRowIndices", selectedRowIndices);
       }
       catch (Exception e) {
         LOG.warn("writing attribute 'selectedRowIndices'", e);
@@ -468,7 +469,7 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
         }
       }
       try {
-        x.setObjectAttribute("rows", dataMatrix);
+        XmlUtility.setObjectAttribute(x, "rows", dataMatrix);
       }
       catch (Exception e) {
         LOG.warn("writing attribute 'rows'", e);

@@ -4,8 +4,6 @@ import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Array;
 import java.net.URL;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -14,15 +12,14 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.Vector;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.regex.Pattern;
 
+import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.internal.Activator;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -38,7 +35,7 @@ public class BundleListClassLoader extends ClassLoader {
   /** table mapping primitive type names to corresponding class objects */
   private static final HashMap<String, Class> PRIMITIVE_TYPES;
   static {
-    PRIMITIVE_TYPES = new HashMap<String, Class>(8, 1f);
+    PRIMITIVE_TYPES = new HashMap<String, Class>(18);
     PRIMITIVE_TYPES.put("boolean", boolean.class);
     PRIMITIVE_TYPES.put("byte", byte.class);
     PRIMITIVE_TYPES.put("char", char.class);
@@ -60,32 +57,9 @@ public class BundleListClassLoader extends ClassLoader {
     PRIMITIVE_TYPES.put("V", void.class);
   }
   private static final ThreadLocal<Set<String>> LOOP_DETECTOR = new ThreadLocal<Set<String>>();
-  private static final Enumeration<URL> EMPTY_URL_ENUMERATION = new Enumeration<URL>() {
-
-    @Override
-    public boolean hasMoreElements() {
-      return false;
-    }
-
-    @Override
-    public URL nextElement() {
-      throw new NoSuchElementException();
-    }
-  };
   private static final String BUNDLE_INCLUDE_FILTER_PROPERTY = "org.eclipse.scout.commons.osgi.BundleListClassLoader#includeBundles";
   private static final String BUNDLE_EXCLUDE_FILTER_PROPERTY = "org.eclipse.scout.commons.osgi.BundleListClassLoader#excludeBundles";
   private static final String REGEX_MARKER = "regex:";
-
-  private static ClassLoader s_myClassLoader;
-  static {
-    AccessController.doPrivileged(new PrivilegedAction<Object>() {
-      @Override
-      public Object run() {
-        s_myClassLoader = BundleListClassLoader.class.getClassLoader();
-        return null;
-      }
-    });
-  }
 
   private final Bundle[] m_bundles;
   private final Bundle[] m_bundlesSortedByBundleSymbolicNameLenght;
@@ -106,8 +80,8 @@ public class BundleListClassLoader extends ClassLoader {
       throw new IllegalArgumentException("bundle list must not be null or empty");
     }
     // filter given list of bundles.
-    String bundleIncludeFilter = Activator.getDefault().getBundle().getBundleContext().getProperty(BUNDLE_INCLUDE_FILTER_PROPERTY);
-    String bundleExcludeFilter = Activator.getDefault().getBundle().getBundleContext().getProperty(BUNDLE_EXCLUDE_FILTER_PROPERTY);
+    String bundleIncludeFilter = ConfigIniUtility.getProperty(BUNDLE_INCLUDE_FILTER_PROPERTY);
+    String bundleExcludeFilter = ConfigIniUtility.getProperty(BUNDLE_EXCLUDE_FILTER_PROPERTY);
     Pattern[] bundleIncludePatterns = parseFilterPatterns(bundleIncludeFilter);
     Pattern[] bundleExcludePatterns = parseFilterPatterns(bundleExcludeFilter);
     List<Bundle> filteredBundleList = new ArrayList<Bundle>();
@@ -154,13 +128,6 @@ public class BundleListClassLoader extends ClassLoader {
       m_cacheLock.writeLock().unlock();
     }
     return c;
-  }
-
-  private URL putInCache(String name, URL resources) {
-    Vector<URL> urlList = new Vector<URL>();
-    urlList.add(resources);
-    urlList = putInCache(name, urlList);
-    return urlList.firstElement();
   }
 
   private Vector<URL> putInCache(String name, Vector<URL> resources) {

@@ -20,7 +20,6 @@ import org.eclipse.scout.commons.annotations.IOrdered;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.xmlparser.SimpleXmlElement;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.PrintDevice;
@@ -28,6 +27,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
+import org.w3c.dom.Element;
 
 /**
  * The {@link IForm} and <code>IFormField</code> classes are the prominent classes
@@ -89,7 +89,6 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdere
   String PROP_KEY_STROKES = "keyStrokes";
   String PROP_STATUS_VISIBLE = "statusVisible";
   String PROP_GRID_DATA = "gridData";
-
 
   /**
    * if the field is focusable or not, value is of type {@link Boolean}
@@ -228,9 +227,9 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdere
 
   void setXML(String xml) throws ProcessingException;
 
-  void storeXML(SimpleXmlElement x) throws ProcessingException;
+  void storeXML(Element x) throws ProcessingException;
 
-  void loadXML(SimpleXmlElement x) throws ProcessingException;
+  void loadXML(Element x) throws ProcessingException;
 
   /**
    * add verbose information to the search filter

@@ -129,7 +129,6 @@ public class StringUtilityTest {
     assertEquals("1, 2", StringUtility.join(", ", new Long[]{Long.valueOf(1), null, Long.valueOf(2)}));
   }
 
-  @SuppressWarnings("unchecked")
   @Test
   public void testJoinCollection() {
     assertEquals("", StringUtility.join(null, (Collection<?>) null));

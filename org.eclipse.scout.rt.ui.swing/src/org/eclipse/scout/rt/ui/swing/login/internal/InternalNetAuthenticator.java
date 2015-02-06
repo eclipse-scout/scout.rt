@@ -18,15 +18,14 @@ import java.util.HashSet;
 
 import javax.swing.SwingUtilities;
 
-import org.eclipse.scout.commons.BundleContextUtility;
-import org.eclipse.scout.commons.SecurePreferencesUtility;
+import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 
 public class InternalNetAuthenticator extends Authenticator {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(InternalNetAuthenticator.class);
 
-  public static final boolean NET_AUTHENTICATION_CACHE_ENABLED = BundleContextUtility.parseBooleanProperty("java.net.authenticate.cache.enabled", false);
+  public static final boolean NET_AUTHENTICATION_CACHE_ENABLED = ConfigIniUtility.getBooleanProperty("java.net.authenticate.cache.enabled", false);
 
   private HashSet<String> m_visitedKeys;
 
@@ -42,23 +41,23 @@ public class InternalNetAuthenticator extends Authenticator {
     String path = getRequestingURL().getHost() + getRequestingURL().getPath();
     String visitedKey = null;
     // check auto-login with user-saved credentials
-    if (NET_AUTHENTICATION_CACHE_ENABLED) {
-      try {
-        String[] a = SecurePreferencesUtility.loadCredentials(path);
-        if (a != null) {
-          status.setUsername(a[0]);
-          status.setPassword(a[1]);
-          visitedKey = status.getUsername() + "@" + path;
-          if (!m_visitedKeys.contains(visitedKey)) {
-            m_visitedKeys.add(visitedKey);
-            return new PasswordAuthentication(status.getUsername(), status.getPassword().toCharArray());
-          }
-        }
-      }
-      catch (Throwable t) {
-        LOG.error(getRequestingURL().toExternalForm(), t);
-      }
-    }
+//    if (NET_AUTHENTICATION_CACHE_ENABLED) {
+//      try {
+//        String[] a = SecurePreferencesUtility.loadCredentials(path);
+//        if (a != null) {
+//          status.setUsername(a[0]);
+//          status.setPassword(a[1]);
+//          visitedKey = status.getUsername() + "@" + path;
+//          if (!m_visitedKeys.contains(visitedKey)) {
+//            m_visitedKeys.add(visitedKey);
+//            return new PasswordAuthentication(status.getUsername(), status.getPassword().toCharArray());
+//          }
+//        }
+//      }
+//      catch (Throwable t) {
+//        LOG.error(getRequestingURL().toExternalForm(), t);
+//      }
+//    }
     //
     try {
       showModalDialog(status);
@@ -71,14 +70,14 @@ public class InternalNetAuthenticator extends Authenticator {
       if (status.isSavePassword()) {
         visitedKey = status.getUsername() + "@" + path;
         m_visitedKeys.add(visitedKey);
-        if (status.isSavePassword()) {
-          try {
-            SecurePreferencesUtility.storeCredentials(path, status.getUsername(), status.getPassword());
-          }
-          catch (Throwable t) {
-            LOG.error(getRequestingURL().toExternalForm(), t);
-          }
-        }
+//        if (status.isSavePassword()) {
+//          try {
+//            SecurePreferencesUtility.storeCredentials(path, status.getUsername(), status.getPassword());
+//          }
+//          catch (Throwable t) {
+//            LOG.error(getRequestingURL().toExternalForm(), t);
+//          }
+//        }
       }
       return new PasswordAuthentication(status.getUsername(), status.getPassword().toCharArray());
     }

@@ -22,6 +22,7 @@ import java.util.logging.SimpleFormatter;
 import org.eclipse.core.runtime.ILogListener;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.EclipseLogUtility;
@@ -74,7 +75,7 @@ public class JavaScoutLogManager implements IScoutLogManager {
 
     Logger root = Logger.getLogger("");
     if (root.getLevel() == Level.INFO) {
-      if (System.getProperty("java.util.logging.config.class") == null && System.getProperty("java.util.logging.config.file") == null) {
+      if (ConfigIniUtility.getProperty("java.util.logging.config.class") == null && ConfigIniUtility.getProperty("java.util.logging.config.file") == null) {
         root.setLevel(Level.WARNING);
       }
     }
@@ -179,7 +180,7 @@ public class JavaScoutLogManager implements IScoutLogManager {
 
   /**
    * To create a handler to record the log messages
-   * 
+   *
    * @return
    * @throws ProcessingException
    */

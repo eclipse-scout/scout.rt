@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -108,18 +108,6 @@ public class CellRange implements Serializable {
   @Override
   public String toString() {
     return format();
-  }
-
-  private String toString(int val) {
-    if (val <= 0) {
-      return " *";
-    }
-    else if (val <= 9) {
-      return "0" + val;
-    }
-    else {
-      return "" + val;
-    }
   }
 
   public String format() {

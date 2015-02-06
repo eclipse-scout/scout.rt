@@ -24,11 +24,12 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.scout.commons.XmlUtility;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.commons.xmlparser.SimpleXmlElement;
+import org.w3c.dom.Element;
 
 /**
  * Default implementation of a calendar service delivering holiday items <br>
@@ -55,7 +56,7 @@ import org.eclipse.scout.commons.xmlparser.SimpleXmlElement;
 @Priority(-1)
 public class HolidayCalendarItemParser {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(HolidayCalendarItemParser.class);
-  private static final String HOLIDAYS = "holidays";
+
   private static final String HOLIDAY = "holiday";
   private static final String DATE = "date";
   private static final String WEEKDAY = "weekday";
@@ -67,29 +68,18 @@ public class HolidayCalendarItemParser {
   private static final String RELATIVE_TO = "relativeTo";
 
   private SimpleDateFormat m_dateFormat = new SimpleDateFormat("dd.MM.yyyy");
-  private SimpleXmlElement m_xml;
+  private final Element m_xml;
 
   public HolidayCalendarItemParser(URL xmlResource) throws ProcessingException {
-    m_xml = new SimpleXmlElement();
-    if (xmlResource != null) {
-      try {
-        m_xml.parseStream(xmlResource.openStream());
-      }
-      catch (Throwable t) {
-        throw new ProcessingException("loading " + xmlResource, t);
-      }
-    }
+    m_xml = XmlUtility.getXmlDocument(xmlResource).getDocumentElement();
   }
 
   public HolidayCalendarItemParser(InputStream xmlResource, String displayFileName) throws ProcessingException {
-    m_xml = new SimpleXmlElement();
-    if (xmlResource != null) {
-      try {
-        m_xml.parseStream(xmlResource);
-      }
-      catch (Throwable t) {
-        throw new ProcessingException("loading " + displayFileName, t);
-      }
+    try {
+      m_xml = XmlUtility.getXmlDocument(xmlResource).getDocumentElement();
+    }
+    catch (Exception t) {
+      throw new ProcessingException("loading " + displayFileName, t);
     }
   }
 
@@ -125,16 +115,18 @@ public class HolidayCalendarItemParser {
         loc.getLanguage(),
     };
     long index = 1;
-    for (Iterator holidayIt = m_xml.getChildren(HOLIDAY).iterator(); holidayIt.hasNext();) {
-      SimpleXmlElement holidayElem = (SimpleXmlElement) holidayIt.next();
+
+    for (Element holidayElem : XmlUtility.getChildElements(m_xml, HOLIDAY)) {
       try {
         Date d = evaluateHolidayDate(holidayElem, holidayMap, year);
         if (d != null) {
           // find correct text
           String text = getAttributeByLocale(holidayElem, locPatterns, TEXT);
           String tooltip = getAttributeByLocale(holidayElem, locPatterns, TOOLTIP);
-          //
-          String itemId = holidayElem.getStringAttribute(ID, null);
+          String itemId = null;
+          if (holidayElem.hasAttribute(ID)) {
+            itemId = holidayElem.getAttribute(ID);
+          }
           if (itemId == null) {
             itemId = "" + index;
           }
@@ -142,7 +134,9 @@ public class HolidayCalendarItemParser {
           item.setStart(d);
           item.setSubject(text);
           item.setBody(tooltip);
-          item.setColor(holidayElem.getStringAttribute(COLOR));
+          if (holidayElem.hasAttribute(COLOR)) {
+            item.setColor(holidayElem.getAttribute(COLOR));
+          }
           index++;
           holidayMap.put(itemId, item);
         }
@@ -154,11 +148,25 @@ public class HolidayCalendarItemParser {
     newList.addAll(holidayMap.values());
   }
 
-  private Date evaluateHolidayDate(SimpleXmlElement holidayElem, Map<String, HolidayItem> holidayMap, int year) throws ParseException {
-    String datePattern = holidayElem.getStringAttribute(DATE);
-    String weekdayPattern = holidayElem.getStringAttribute(WEEKDAY);
-    String instancePattern = holidayElem.getStringAttribute(INSTANCE);
-    String relativeToId = holidayElem.getStringAttribute(RELATIVE_TO, null);
+  private Date evaluateHolidayDate(Element holidayElem, Map<String, HolidayItem> holidayMap, int year) throws ParseException {
+    String datePattern = null;
+    if (holidayElem.hasAttribute(DATE)) {
+      datePattern = holidayElem.getAttribute(DATE);
+    }
+
+    String weekdayPattern = null;
+    if (holidayElem.hasAttribute(WEEKDAY)) {
+      weekdayPattern = holidayElem.getAttribute(WEEKDAY);
+    }
+
+    String instancePattern = null;
+    if (holidayElem.hasAttribute(INSTANCE)) {
+      instancePattern = holidayElem.getAttribute(INSTANCE);
+    }
+    String relativeToId = null;
+    if (holidayElem.hasAttribute(RELATIVE_TO)) {
+      relativeToId = holidayElem.getAttribute(RELATIVE_TO);
+    }
     //
     int weekday = -1;
     if (weekdayPattern != null) {
@@ -256,15 +264,17 @@ public class HolidayCalendarItemParser {
     return startDate;
   }
 
-  private String getAttributeByLocale(SimpleXmlElement e, String[] locPatterns, String attributeNamePrefix) {
-    String s = null;
+  private String getAttributeByLocale(Element e, String[] locPatterns, String attributeNamePrefix) {
     for (int i = 0; i < locPatterns.length; i++) {
-      s = e.getStringAttribute(attributeNamePrefix + "_" + locPatterns[i], null);
-      if (s != null) {
-        break;
+      String attribName = attributeNamePrefix + "_" + locPatterns[i];
+      if (e.hasAttribute(attribName)) {
+        String s = e.getAttribute(attribName);
+        if (s != null) {
+          return s;
+        }
       }
     }
-    return s;
+    return null;
   }
 
 }

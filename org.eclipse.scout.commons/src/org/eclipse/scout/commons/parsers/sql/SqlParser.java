@@ -21,8 +21,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.parsers.BindModel;
 import org.eclipse.scout.commons.parsers.BindParser;
 import org.eclipse.scout.commons.parsers.sql.SqlParserToken.AndExpr;
@@ -58,7 +56,7 @@ import org.eclipse.scout.commons.parsers.token.TextToken;
 /**
  * Parser for sql SELECT statements
  * Syntax (EBNF):
- * 
+ *
  * <pre>
  * <code>
  * Statement = SingleStatement (UnionToken SingleStatement)* (Unparsed)?
@@ -81,7 +79,6 @@ import org.eclipse.scout.commons.parsers.token.TextToken;
  * </pre>
  */
 public class SqlParser {
-  private static IScoutLogger logger = ScoutLogManager.getLogger(SqlParser.class);
 
   private static final String nameChars = "a-zA-Z0-9_$.@:?";
   private static final Pattern COMMENT_PAT = Pattern.compile("(\\{[^\\}]*\\})");
@@ -675,7 +672,7 @@ public class SqlParser {
   /**
    * Tokenize a string into Whitespace (containing Comment and HintComment), Text and Token items.
    * There are no Raw objects left.
-   * 
+   *
    * @throws ParseException
    */
   private List<IToken> tokenize(String s, ParseContext ctx) {

@@ -18,6 +18,8 @@ import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
+import org.eclipse.scout.commons.ConfigIniUtility;
+
 /**
  * Warning: Avoid osgi imports in this class, so it can be used in J2EE
  */
@@ -85,7 +87,7 @@ public class DynamicNls {
 
   private static boolean doContainsCheckInResourceBundle() {
     boolean checkContainsKey = true;
-    String checkContainsKeyVal = System.getProperty("scout.resourceBundle.checkContainsKey");
+    String checkContainsKeyVal = ConfigIniUtility.getProperty("scout.resourceBundle.checkContainsKey");
     if (checkContainsKeyVal != null) {
       checkContainsKeyVal = checkContainsKeyVal.trim().toLowerCase();
       checkContainsKey = !"false".equals(checkContainsKeyVal);

@@ -80,6 +80,7 @@ public final class MatrixUtility {
   /**
    * union all lists into a matrix every list is interpreted as a matrix row
    */
+  @SafeVarargs
   public static Object[][] union(Collection<Object>... collections) {
     int rowCount = 0;
     int colCount = 0;
@@ -161,6 +162,7 @@ public final class MatrixUtility {
     return union((Object[]) matrices);
   }
 
+  @SafeVarargs
   public static Object[][] toMatrix(Collection<Object>... rows) {
     return union(rows);
   }
@@ -215,7 +217,7 @@ public final class MatrixUtility {
 
   /**
    * Sorting a 2d Object array providing {@link ArrayComparator.ColumnComparator ArrayComparator.ColumnComparators}
-   * 
+   *
    * @param data
    * @param columnComparators
    */
@@ -229,7 +231,7 @@ public final class MatrixUtility {
    * Delegates to {@link #sort(Locale, Object[][], int...)} using {@link NlsUtility#getDefaultLocale()}
    * <p>
    * <b>It is recommended to use {@link #sort(Locale, Object[][], int...)} with the specific {@link Locale}</b>
-   * 
+   *
    * @param data
    * @param sortColumns
    */
@@ -239,7 +241,7 @@ public final class MatrixUtility {
 
   /**
    * Sorting a 2d Object array using {@link ArrayComparator}
-   * 
+   *
    * @param locale
    * @param data
    * @param sortColumns

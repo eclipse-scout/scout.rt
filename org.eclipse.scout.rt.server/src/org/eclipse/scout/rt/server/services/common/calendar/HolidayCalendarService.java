@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.server.services.common.calendar;
 
 import java.util.Date;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.LocaleThreadLocal;
@@ -35,9 +36,7 @@ import org.eclipse.scout.service.SERVICES;
 public class HolidayCalendarService extends AbstractService implements IHolidayCalendarService {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(HolidayCalendarService.class);
 
-  private TTLCache<String/* resourceFileName */, HolidayCalendarItemParser> m_holidayXmlCache = new TTLCache<String, HolidayCalendarItemParser>(5 * 60000L);// 5
-
-  // minutes
+  private TTLCache<String/* resourceFileName */, HolidayCalendarItemParser> m_holidayXmlCache = new TTLCache<String, HolidayCalendarItemParser>(TimeUnit.MINUTES.toMillis(5));// 5 minutes
 
   @Override
   public Set<? extends ICalendarItem> getItems(RemoteFile spec, Date minDate, Date maxDate) throws ProcessingException {

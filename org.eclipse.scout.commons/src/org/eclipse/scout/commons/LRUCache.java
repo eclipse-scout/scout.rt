@@ -227,7 +227,7 @@ public class LRUCache<K, V> {
   /**
    * Cache Entry Value Object
    */
-  private class CacheEntry {
+  private final class CacheEntry {
     private final K m_key;
     private V m_value;
     private long m_timestamp;
@@ -245,10 +245,6 @@ public class LRUCache<K, V> {
 
     public V getValue() {
       return m_value;
-    }
-
-    public long getTimestamp() {
-      return m_timestamp;
     }
 
     public boolean isTimeout() {

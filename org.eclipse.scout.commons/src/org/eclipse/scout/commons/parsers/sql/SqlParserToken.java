@@ -14,11 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 
 final class SqlParserToken {
-  private static IScoutLogger logger = ScoutLogManager.getLogger(SqlParserToken.class);
 
   public interface IToken {
     String getText();

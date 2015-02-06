@@ -21,7 +21,7 @@ import org.junit.Test;
 
 /**
  * JUnit tests for {@link FastBeanUtility}
- * 
+ *
  * @since 3.9.0
  */
 public class FastBeanUtilityTest {
@@ -31,6 +31,7 @@ public class FastBeanUtilityTest {
       return null;
     }
 
+    @SuppressWarnings("unused")
     private void myMethod() {
     }
 

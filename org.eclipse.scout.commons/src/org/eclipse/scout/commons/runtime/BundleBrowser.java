@@ -99,7 +99,7 @@ public class BundleBrowser {
   /**
    * To recursively get all resources placed at the given location. Thereby, attaching fragments are also looked for
    * resources.
-   * 
+   *
    * @param bundle
    * @param path
    * @return
@@ -118,19 +118,6 @@ public class BundleBrowser {
     }
 
     return Collections.enumeration(resources);
-  }
-
-  private Enumeration convertToStringPaths(Enumeration entries) {
-    Set<String> paths = new HashSet<String>();
-
-    if (entries != null) {
-      while (entries.hasMoreElements()) {
-        URL url = (URL) entries.nextElement();
-        paths.add(url.getPath());
-      }
-    }
-
-    return Collections.enumeration(paths);
   }
 
   @SuppressWarnings("unchecked")

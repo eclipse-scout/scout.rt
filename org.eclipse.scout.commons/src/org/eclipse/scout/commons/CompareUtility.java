@@ -15,14 +15,10 @@ import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
-
 /**
  * Utility class for comparing objects considering <code>null</code> values and other commonly used special cases.
  */
 public final class CompareUtility {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(CompareUtility.class);
 
   private CompareUtility() {
   }
@@ -57,7 +53,7 @@ public final class CompareUtility {
    * This method returns <code>true</code>, if and only if both arguments of Type <code>java.util.Date</code> or
    * <code>java.sql.Timestamp</code> represent the same point in time.
    * </p>
-   * 
+   *
    * @param a
    *          the first Object to be compared.
    * @param b
@@ -102,7 +98,7 @@ public final class CompareUtility {
   /**
    * Indicates whether some Object a is not "equal to" another Object b. See {@link #equals} for more
    * detail.
-   * 
+   *
    * @param a
    *          the second Object to be compared.
    * @param b
