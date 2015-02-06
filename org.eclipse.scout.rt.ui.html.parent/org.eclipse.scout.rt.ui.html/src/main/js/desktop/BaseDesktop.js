@@ -31,25 +31,25 @@ scout.BaseDesktop.prototype.showFatalMessage = function(options) {
     actionText: options.actionText,
     yesButtonText: options.yesButtonText,
     noButtonText: options.noButtonText,
-    cancelButtonText: options.cancelButtonText,
-    onButtonClicked: function($button, event) {
-      var option = $button.data('option');
-
-      // Close message box
-      ui.remove();
-      $glasspane.remove();
-
-      // Custom actions
-      if (option === 'yes' && options.yesButtonAction) {
-        options.yesButtonAction.apply(that);
-      } else if (option === 'no' && options.noButtonAction) {
-        options.noButtonAction.apply(that);
-      } else if (option === 'cancel' && options.cancelButtonAction) {
-        options.cancelButtonAction.apply(that);
-      }
-    }
+    cancelButtonText: options.cancelButtonText
   };
   var ui = new scout.MessageBox(model);
+
+  model.onButtonClicked = function($button, event) {
+    var option = $button.data('option');
+    // Close message box
+    ui.remove();
+    $glasspane.remove();
+    // Custom actions
+    if (option === 'yes' && options.yesButtonAction) {
+      options.yesButtonAction.apply(that);
+    } else if (option === 'no' && options.noButtonAction) {
+      options.noButtonAction.apply(that);
+    } else if (option === 'cancel' && options.cancelButtonAction) {
+      options.cancelButtonAction.apply(that);
+    }
+  };
+
   ui.render($glasspane);
 };
 
