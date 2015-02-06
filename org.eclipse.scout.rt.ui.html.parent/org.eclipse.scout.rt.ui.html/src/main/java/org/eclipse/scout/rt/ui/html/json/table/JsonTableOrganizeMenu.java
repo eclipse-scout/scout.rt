@@ -13,6 +13,9 @@ package org.eclipse.scout.rt.ui.html.json.table;
 import org.eclipse.scout.rt.client.ui.basic.table.menus.TableOrganizeMenu;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
+import org.eclipse.scout.rt.ui.html.json.JsonEvent;
+import org.eclipse.scout.rt.ui.html.json.JsonEventType;
+import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonMenu;
 import org.json.JSONObject;
 
@@ -33,6 +36,16 @@ public class JsonTableOrganizeMenu extends JsonMenu<TableOrganizeMenu> {
     putProperty(json, "development", getModel().isDevelopment());
     putProperty(json, "columnsCustomizable", getModel().isColumnsCustomizable());
     return json;
+  }
+
+  @Override
+  public void handleUiEvent(JsonEvent event, JsonResponse res) {
+    if (JsonEventType.CLICKED.matches(event)) {
+      getModel().getUIFacade().fireActionFromUI();
+    }
+    else {
+      super.handleUiEvent(event, res);
+    }
   }
 
 }

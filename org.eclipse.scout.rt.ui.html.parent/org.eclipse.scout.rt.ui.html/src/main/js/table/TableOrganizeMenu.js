@@ -87,9 +87,9 @@ scout.TableOrganizeMenu.prototype._createSlotLoad = function(popup) {
   //event handling for slots
   $('.slot', $group)
     .click(function() {
-        popup.remove();
-        this.session.send('loadColumns', this.parent.id, $(event.target).data('id'));
-      }.bind(this))
+      popup.remove();
+      this.session.send('loadColumns', this.parent.id, $(event.target).data('id'));
+    }.bind(this))
     .one(scout.menus.CLOSING_EVENTS, $.suppressEvent);
 
   return $group;
@@ -106,13 +106,20 @@ scout.TableOrganizeMenu.prototype._createFixedColumn = function() {
   $group.appendDiv('minus')
     .click(function() {
       this._setFixedColumn(null, -1);
-      }.bind(this))
+    }.bind(this))
     .on(scout.menus.CLOSING_EVENTS, $.suppressEvent);
 
   $group.appendDiv('plus')
     .click(function() {
       this._setFixedColumn(null, 1);
-      }.bind(this))
+     }.bind(this))
+    .on(scout.menus.CLOSING_EVENTS, $.suppressEvent);
+
+  // temp. solution to show the old column organize dialog
+  $group.appendDiv('slot', 'Organize')
+    .click(function() {
+      this.session.send(this.id, 'clicked');
+    }.bind(this))
     .on(scout.menus.CLOSING_EVENTS, $.suppressEvent);
 
   return $group;
