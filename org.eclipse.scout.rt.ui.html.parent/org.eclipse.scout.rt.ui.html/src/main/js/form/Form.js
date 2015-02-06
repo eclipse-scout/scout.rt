@@ -36,7 +36,10 @@ scout.Form.prototype._render = function($parent) {
           this.session.send(this.id, 'formClosing');
         }.bind(this));
     }
-//    this.$container.resizable();
+    this.$container.resizable({resize: function(event, ui) {
+      this.htmlComp.invalidate();
+      this.htmlComp.layout();
+    }.bind(this)});
     this._setDialogTitle();
 
     this.$container.hide();
