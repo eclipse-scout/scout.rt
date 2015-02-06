@@ -1101,7 +1101,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
       cleanHtml = HTMLUtility.cleanupHtml(cleanHtml, false, true, createDefaultFontSettings(uiComposite.getSwingField()));
     }
 
-    return cleanHtml;
+    return SwingUtility.replace3DigitColors(cleanHtml);
   }
 
   /**
