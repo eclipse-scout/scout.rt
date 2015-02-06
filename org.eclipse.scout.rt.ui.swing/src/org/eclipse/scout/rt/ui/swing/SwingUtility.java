@@ -42,6 +42,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -1304,6 +1306,41 @@ public final class SwingUtility {
     for (Component c : components) {
       c.setBounds(0, 0, 0, 0);
     }
+  }
+
+  /**
+   * Replaces 3 digit CSS colors with 6 digit colors: (e.g. #fff with #ffffff)
+   *
+   * @param rawHtml
+   *          may be <code>null</code>
+   */
+  public static String replace3DigitColors(String rawHtml) {
+    if (StringUtility.isNullOrEmpty(rawHtml)) {
+      return rawHtml;
+    }
+
+    String styleRegex = "style[\\s]*=[\\s]*[\"\'][^\"^\']+?color:[\\s]*?#([a-fA-F0-9])([a-fA-F0-9])([a-fA-F0-9])[\"\']";
+    Pattern pattern = Pattern.compile(styleRegex, Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+    Matcher matcher = pattern.matcher(rawHtml);
+
+    StringBuffer sb = new StringBuffer();
+    int matchEndIndex = 0;
+    while (matcher.find()) {
+      //append pre match
+      sb.append(rawHtml.substring(matchEndIndex, matcher.start(1)));
+
+      //replace digits
+      String c1 = matcher.group(1);
+      String c2 = matcher.group(2);
+      String c3 = matcher.group(3);
+      sb.append(c1 + c1 + c2 + c2 + c3 + c3);
+
+      //mark end of replaced color
+      matchEndIndex = matcher.end(3);
+    }
+    //append post match
+    sb.append(rawHtml.substring(matchEndIndex, rawHtml.length()));
+    return sb.toString();
   }
 
 }
