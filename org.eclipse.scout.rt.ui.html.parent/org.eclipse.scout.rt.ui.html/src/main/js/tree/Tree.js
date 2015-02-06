@@ -251,6 +251,10 @@ scout.Tree.prototype._renderExpansion = function(node, $node, expanded) {
     // animated closing
     $wrapper = $node.nextUntil(function() {
       return $(this).attr('data-level') <= level;
+    }).each(function() {
+      // unlink '$nodes' from 'nodes' before deleting them
+      var node = $(this).data('node');
+      delete node.$node;
     }).wrapAll('<div class="animationWrapper">)').parent();
 
     $wrapper.animateAVCSD('height', 0, $.removeThis, this.updateScrollbar.bind(this), 200);
@@ -395,6 +399,7 @@ scout.Tree.prototype._onNodesInserted = function(nodes, parentNodeId) {
 
 scout.Tree.prototype._onNodesUpdated = function(nodes, parentNodeId) {
   // Update model
+  var propertiesChanged = false;
   for (var i = 0; i < nodes.length; i++) {
     var updatedNode = nodes[i];
     var oldNode = this.nodesMap[updatedNode.id];
@@ -402,14 +407,19 @@ scout.Tree.prototype._onNodesUpdated = function(nodes, parentNodeId) {
     // Only update _some_ of the properties. Everything else will be handled with separate events.
     // --> See also: JsonTree.java/handleModelNodesUpdated()
     scout.defaultValues.applyTo(updatedNode, 'TreeNode');
-    oldNode.leaf = updatedNode.leaf;
+    if (oldNode.leaf !== updatedNode.leaf) {
+      oldNode.leaf = updatedNode.leaf;
+      propertiesChanged = true;
+    }
 
-    if (this.rendered) {
+    if (this.rendered && propertiesChanged) {
       this._decorateNode(oldNode);
     }
   }
 
-  this._updateItemPath();
+  if (this.rendered && propertiesChanged) {
+    this._updateItemPath();
+  }
 };
 
 scout.Tree.prototype._onNodesDeleted = function(nodeIds, parentNodeId) {
@@ -815,26 +825,32 @@ scout.Tree.prototype._onNodeControlClick = function(event) {
 
 scout.Tree.prototype._updateItemPath = function() {
   var $selected = this.$selectedNodes(),
-    $allNodes = this.$data.children(),
     level = parseFloat($selected.attr('data-level'));
 
   // first remove and select selected
-  $allNodes.removeClass('parent children group');
+  this.$data.find('.tree-item').removeClass('parent children group');
 
   // if no selection: mark all top elements as children
   if ($selected.length === 0) {
-    $allNodes.addClass('children');
+    this.$data.children().addClass('children');
     return;
   }
 
   // find direct children
   var $node = $selected.next();
   while ($node.length > 0) {
+    if ($node.hasClass('animationWrapper')) {
+      $node = $node.children().first();
+    }
     var l = parseFloat($node.attr('data-level'));
     if (l === level + 1) {
       $node.addClass('children');
     } else if (l === level) {
       break;
+    }
+    if ($node.next().length === 0 && $node.parent().hasClass('animationWrapper')) {
+      // If there is no next node but we are inside an animationWrapper, step out the wrapper
+      $node = $node.parent();
     }
     $node = $node.next();
   }
@@ -864,7 +880,8 @@ scout.Tree.prototype._updateItemPath = function() {
   $node = $ultimate;
   while ($node.length > 0) {
     $node.addClass('group');
-    if ($node.parent().hasClass('animationWrapper')) {
+    if ($node.next().length === 0 && $node.parent().hasClass('animationWrapper')) {
+      // If there is no next node but we are inside an animationWrapper, step out the wrapper
       $node = $node.parent();
     }
     $node = $node.next();
