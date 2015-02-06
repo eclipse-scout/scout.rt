@@ -14,24 +14,22 @@ import java.io.Serializable;
 import java.util.Arrays;
 
 public class BinaryContent implements Serializable {
-
   private static final long serialVersionUID = 1L;
 
   private byte[] m_content;
+  private String m_fileExtension;
 
-  private String m_contentType;
-
-  public BinaryContent(byte[] content, String contentType) {
+  public BinaryContent(byte[] content, String fileExtension) {
     m_content = content;
-    m_contentType = contentType; // FIXME AWE: rename to m_fileExtension
+    m_fileExtension = fileExtension;
   }
 
   public byte[] getContent() {
     return m_content;
   }
 
-  public String getContentType() {
-    return m_contentType;
+  public String getFileExtension() {
+    return m_fileExtension;
   }
 
   @Override
@@ -39,7 +37,7 @@ public class BinaryContent implements Serializable {
     final int prime = 31;
     int result = 1;
     result = prime * result + Arrays.hashCode(m_content);
-    result = prime * result + ((m_contentType == null) ? 0 : m_contentType.hashCode());
+    result = prime * result + ((m_fileExtension == null) ? 0 : m_fileExtension.hashCode());
     return result;
   }
 
@@ -58,15 +56,14 @@ public class BinaryContent implements Serializable {
     if (!Arrays.equals(m_content, other.m_content)) {
       return false;
     }
-    if (m_contentType == null) {
-      if (other.m_contentType != null) {
+    if (m_fileExtension == null) {
+      if (other.m_fileExtension != null) {
         return false;
       }
     }
-    else if (!m_contentType.equals(other.m_contentType)) {
+    else if (!m_fileExtension.equals(other.m_fileExtension)) {
       return false;
     }
     return true;
   }
-
 }

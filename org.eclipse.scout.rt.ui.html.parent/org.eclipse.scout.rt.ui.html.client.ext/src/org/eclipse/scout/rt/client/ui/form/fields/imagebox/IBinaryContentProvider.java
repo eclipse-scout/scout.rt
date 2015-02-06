@@ -10,13 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.imagebox;
 
-import org.eclipse.scout.rt.client.ui.form.fields.imagebox.BinaryContent;
 
-/**
- *
- */
 public interface IBinaryContentProvider {
 
   BinaryContent getBinaryContent(String contentId);
-
 }

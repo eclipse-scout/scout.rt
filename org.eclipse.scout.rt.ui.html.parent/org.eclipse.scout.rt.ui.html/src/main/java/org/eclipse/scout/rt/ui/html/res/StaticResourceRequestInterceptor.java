@@ -36,8 +36,8 @@ import org.eclipse.scout.rt.ui.html.UiHints;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
 import org.eclipse.scout.rt.ui.html.cache.IHttpCacheControl;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonSession;
-import org.eclipse.scout.rt.ui.html.json.JsonUtility;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
+import org.eclipse.scout.rt.ui.html.json.JsonUtility;
 import org.eclipse.scout.rt.ui.html.script.ScriptFileBuilder;
 import org.eclipse.scout.rt.ui.html.script.ScriptOutput;
 import org.eclipse.scout.rt.ui.html.scriptprocessor.ScriptProcessor;
@@ -154,9 +154,9 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
   protected HttpCacheObject loadResource(AbstractUiServlet servlet, HttpServletRequest req, String pathInfo) throws ServletException, IOException {
     if (pathInfo.matches("^/?icon/.*")) {
       return loadIcon(req, pathInfo);
-	}
-	if (pathInfo.matches("^/?image/.*")) {
-	  return loadImage(req, pathInfo);
+    }
+    if (pathInfo.matches("^/?image/.*")) {
+      return loadImage(req, pathInfo);
     }
     if ((pathInfo.endsWith(".js") || pathInfo.endsWith(".css"))) {
       return loadScriptFile(servlet, req, pathInfo);
@@ -173,7 +173,7 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
   /**
    * This method loads only image icons from the /resource/icons folder.
    */
-  private HttpCacheObject loadIcon(HttpServletRequest req, String pathInfo) {
+  protected HttpCacheObject loadIcon(HttpServletRequest req, String pathInfo) {
     IIconLocator iconLocator = getJsonSession(req).getClientSession().getIconLocator();
     String imageId = pathInfo.substring(pathInfo.lastIndexOf('/') + 1);
     IconSpec iconSpec = iconLocator.getIconSpec(imageId);
@@ -187,7 +187,7 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
   /**
    * This method loads images which belong to a adapter/form-field.
    */
-  private HttpCacheObject loadImage(HttpServletRequest req, String pathInfo) {
+  protected HttpCacheObject loadImage(HttpServletRequest req, String pathInfo) {
     String contentId = pathInfo.substring(pathInfo.lastIndexOf('/') + 1);
     String[] tmp = contentId.split("\\.");
     String adapterId = tmp[0];
@@ -201,9 +201,13 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
     return null;
   }
 
-  private AbstractJsonSession getJsonSession(HttpServletRequest req) {
+  /**
+   * Returns the JSON session associated with the current HTTP session and with the ID
+   * of the servlet parameter <code>jsonSessionId</code>.
+   */
+  protected AbstractJsonSession getJsonSession(HttpServletRequest req) {
     HttpSession httpSession = req.getSession();
-    String jsonSessionId = req.getParameter("sessionId");
+    String jsonSessionId = req.getParameter("jsonSessionId");
     String jsonSessionAttributeName = "scout.htmlui.session.json." + jsonSessionId;
     return (AbstractJsonSession) httpSession.getAttribute(jsonSessionAttributeName);
   }

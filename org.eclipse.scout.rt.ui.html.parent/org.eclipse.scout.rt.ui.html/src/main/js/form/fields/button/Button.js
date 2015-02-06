@@ -95,7 +95,7 @@ scout.Button.prototype._renderIconId = function() {
         .text(iconChar);
     } else {
       $icon = $('<img>')
-        .attr('src', scout.fields.imageUrl(this, this.iconId));
+        .attr('src', scout.helpers.imageUrl(this, this.iconId));
     }
     $icon.toggleClass('with-label', !!this.label);
     this.$field.prepend($icon);

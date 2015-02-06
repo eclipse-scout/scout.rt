@@ -18,12 +18,14 @@ import org.eclipse.scout.rt.ui.html.json.AbstractJsonAdapter;
 public class ImageUrlUtility {
 
   /**
-   * Returns a file-name for a configured logical icon-name or a font-based icon. For instance:
+   * Returns a relative URL for a configured logical icon-name or a font-based icon. For instance:
    * <ul>
-   * <li>input 'bookmark' - output: '/icon/bookmark.png'</li>
-   * <li>input 'font:X' - output: 'font:X'</li>
+   * <li>input: <code>"bookmark"</code>, output: <code>"icon/bookmark.png"</code> (the file extension is included to
+   * support auto-detection of the MIME type without looking at the file contents)</li>
+   * <li>input: <code>"font:X"</code>, output: <code>"font:X"</code></li>
    * </ul>
-   * This is required for the web client, since we need the file-type in order to determine the mime-type.
+   * The file extension is included to be able to auto-detect the MIME type based on it.
+   * <p>
    * Use this method for image-files located in the /resource/icons directory.
    */
   public static String createIconUrl(AbstractJsonAdapter<?> jsonAdapter, String iconName) {
@@ -36,18 +38,19 @@ public class ImageUrlUtility {
     IIconLocator iconLocator = jsonAdapter.getJsonSession().getClientSession().getIconLocator();
     IconSpec iconSpec = iconLocator.getIconSpec(iconName);
     if (iconSpec != null) {
-      return "/icon/" + iconSpec.getName();
+      return "icon/" + iconSpec.getName(); // includes file extension
     }
     return null; // may happen, when no icon is available for the requested iconName
   }
 
   /**
-   * Returns a file-name for an image which belongs to an adapter.
+   * Returns a relative URL for an image which belongs to an adapter. The file extension is appended from the given
+   * 'image' argument to support auto-detection of the MIME type without looking at the file contents.
    */
   public static String createImageUrl(AbstractJsonAdapter<?> jsonAdapter, BinaryContent image) {
     if (image == null) {
       return null;
     }
-    return "/image/" + jsonAdapter.getId() + "." + image.getContentType();
+    return "image/" + jsonAdapter.getId() + "." + image.getFileExtension();
   }
 }

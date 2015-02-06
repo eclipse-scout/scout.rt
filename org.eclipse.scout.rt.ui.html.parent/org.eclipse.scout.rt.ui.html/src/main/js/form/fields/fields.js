@@ -4,10 +4,6 @@ scout.fields = {
     return $('<input>').
       attr('type', 'text').
       disableSpellcheck();
-  },
-
-  imageUrl: function(adapter, url) {
-    return url + '?sessionId=' + adapter.session.jsonSessionId;
   }
 
 };
