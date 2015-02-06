@@ -287,6 +287,7 @@ scout.Session.prototype._processErrorResponse = function(request, jqXHR, textSta
   }
 
   var jsonResponse = jqXHR.responseJSON;
+  //FIXME CGU refactor, errorcode is sufficient if translations are on client
   if (jsonResponse && jsonResponse.errorMessage) {
     if (this.desktop) {
       // Default values for fatal message boxes

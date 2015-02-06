@@ -149,3 +149,9 @@
   .overflow-ellipsis;
   white-space: nowrap;
 }
+
+.button-focus {
+  .overlay(-3px, -3px, 6px, 6px);
+  .focus-border;
+  border-radius: @border-radius;
+}

@@ -82,9 +82,13 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
       return true;
     }
 
-    // cached in browser?
-    if (httpCacheControl.checkAndUpdateCacheHeaders(req, resp, cacheObj.toCacheInfo())) {
-      return true;
+    // cached in browser? -> returns 304 if the resource has not been modified
+    // Important: Check is only done if the request still processes the requested resource and hasn't been forwarded to another one (using req.getRequestDispatcher().forward)
+    String originalPathInfo = (String) req.getAttribute("javax.servlet.forward.path_info");
+    if (originalPathInfo == null || pathInfo.equals(originalPathInfo)) {
+      if (httpCacheControl.checkAndUpdateCacheHeaders(req, resp, cacheObj.toCacheInfo())) {
+        return true;
+      }
     }
 
     // return content. Note that this method only works because the file-type information

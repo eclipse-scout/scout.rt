@@ -32,9 +32,7 @@
   }
 
   &:focus:before {
-    .overlay(-3px, -3px, 6px, 6px);
-    .focus-border;
-    border-radius: @border-radius;
+    .button-focus;
   }
 
   &:disabled {
