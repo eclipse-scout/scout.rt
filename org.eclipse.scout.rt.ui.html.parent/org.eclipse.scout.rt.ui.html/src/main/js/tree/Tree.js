@@ -205,7 +205,8 @@ scout.Tree.prototype.setNodeExpanded = function(node, $node, expanded) {
 };
 
 scout.Tree.prototype._renderExpansion = function(node, $node, expanded) {
-  var $wrapper, level;
+  var $wrapper,
+    that = this;
   if (expanded === $node.hasClass('expanded')) {
     return;
   }
@@ -214,8 +215,6 @@ scout.Tree.prototype._renderExpansion = function(node, $node, expanded) {
   if (node.childNodes.length === 0) {
     return true;
   }
-
-  level = $node.attr('data-level');
 
   if (expanded) {
     this._addNodes(node.childNodes, $node);
@@ -228,11 +227,7 @@ scout.Tree.prototype._renderExpansion = function(node, $node, expanded) {
 
     // animated opening
     if (!$node.hasClass('leaf') && !$node.hasClass('expanded')) { // can expand
-      var $newNodes = $node.nextUntil(
-        function() {
-          return $(this).attr('data-level') <= level;
-        }
-      );
+      var $newNodes = scout.Tree.collectSubtree($node, false);
       if ($newNodes.length) {
         $wrapper = $newNodes.wrapAll('<div class="animationWrapper">').parent();
         var h = $newNodes.height() * $newNodes.length;
@@ -249,12 +244,12 @@ scout.Tree.prototype._renderExpansion = function(node, $node, expanded) {
     $node.removeClass('expanded');
 
     // animated closing
-    $wrapper = $node.nextUntil(function() {
-      return $(this).attr('data-level') <= level;
-    }).each(function() {
+    $wrapper = scout.Tree.collectSubtree($node, false).each(function() {
       // unlink '$nodes' from 'nodes' before deleting them
       var node = $(this).data('node');
-      delete node.$node;
+      if (node) { // FIXME BSH Tree | This if should not be necessary! 'node' should not be undefined, but is sometimes... Check why!
+        delete node.$node;
+      }
     }).wrapAll('<div class="animationWrapper">)').parent();
 
     $wrapper.animateAVCSD('height', 0, $.removeThis, this.updateScrollbar.bind(this), 200);
@@ -546,6 +541,48 @@ scout.Tree.prototype._onNodeFilterChanged = function() {
   // TODO BSH Tree | Replace nodes, restore selection and expansion
 };
 
+scout.Tree.prototype._onChildNodeOrderChanged = function(parentNodeId, childNodeIds) {
+  var i,
+    parentNode = this.nodesMap[parentNodeId],
+    $lastChildNode = parentNode.childNodes[parentNode.childNodes.length - 1].$node;
+
+  // Sort model nodes
+  var newPositionsMap = {};
+  for (i = 0; i < childNodeIds.length; i++) {
+    newPositionsMap[childNodeIds[i]] = i;
+  }
+  parentNode.childNodes.sort(compare.bind(this));
+
+  // Render sorted nodes
+  if (this.rendered && $lastChildNode) {
+    // Find the last affected node DIV
+    $lastChildNode = scout.Tree.collectSubtree($lastChildNode).last();
+
+    // Insert a marker DIV
+    var $marker = $lastChildNode.afterDiv();
+    for (i = 0; i < parentNode.childNodes.length; i++) {
+      var node = parentNode.childNodes[i];
+      var $node = node.$node;
+      if ($node) {
+        scout.Tree.collectSubtree($node).remove().insertBefore($marker);
+      }
+    }
+    $marker.remove();
+  }
+
+  function compare(node1, node2) {
+    var pos1 = newPositionsMap[node1.id];
+    var pos2 = newPositionsMap[node2.id];
+    if (pos1 < pos2) {
+      return -1;
+    }
+    if (pos1 > pos2) {
+      return 1;
+    }
+    return 0;
+  }
+};
+
 /**
  *
  * @param $parentNode optional. If not provided, parentNodeId will be used to find $parentNode.
@@ -615,7 +652,7 @@ scout.Tree.prototype._addNodes = function(nodes, $parent) {
 };
 
 scout.Tree.prototype._$buildNode = function(node, $parent) {
-  var level = $parent ? $parent.data('level') + 1 : 0;
+  var level = $parent ? parseFloat($parent.attr('data-level')) + 1 : 0;
 
   var $node = $.makeDiv('tree-item', undefined, node.id)
     .on('click', '', this._onNodeClick.bind(this))
@@ -931,6 +968,8 @@ scout.Tree.prototype.onModelAction = function(event) {
     this._onNodesChecked(event.nodes);
   } else if (event.type === 'nodeFilterChanged') {
     this._onNodeFilterChanged();
+  } else if (event.type === 'childNodeOrderChanged') {
+    this._onChildNodeOrderChanged(event.parentNodeId, event.childNodeIds);
   } else {
     $.log.warn('Model event not handled. Widget: Tree. Event: ' + event.type + '.');
   }
@@ -964,4 +1003,33 @@ scout.Tree.prototype._renderTitle = function() {
 
 scout.Tree.prototype._renderAutoCheckChildren = function() {
   // NOP
+};
+
+/* --- STATIC HELPERS ------------------------------------------------------------- */
+
+/**
+ * @memberOf scout.Tree
+ */
+scout.Tree.collectSubtree = function($rootNode, includeRootNodeInResult) {
+  var $result = $();
+  if (!$rootNode) {
+    return $result;
+  }
+  var rootLevel = parseFloat($rootNode.attr('data-level'));
+  if (includeRootNodeInResult !== false) {
+    $result = $result.add($rootNode);
+  }
+
+  var $nextNode = $rootNode.next();
+  while ($nextNode) {
+    var level = parseFloat($nextNode.attr('data-level'));
+    if (level > rootLevel) {
+      $result = $result.add($nextNode);
+    }
+    else {
+      break;
+    }
+    $nextNode = $nextNode.next();
+  }
+  return $result;
 };

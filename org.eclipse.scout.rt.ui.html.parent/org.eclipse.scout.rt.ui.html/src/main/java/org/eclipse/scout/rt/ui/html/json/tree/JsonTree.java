@@ -40,6 +40,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   public static final String EVENT_NODE_EXPANDED = "nodeExpanded";
   public static final String EVENT_NODE_CHANGED = "nodeChanged";
   public static final String EVENT_NODE_FILTER_CHANGED = "nodeFilterChanged";
+  public static final String EVENT_CHILD_NODE_ORDER_CHANGED = "childNodeOrderChanged";
   public static final String EVENT_NODES_CHECKED = "nodesChecked";
 
   public static final String PROP_NODE_ID = "nodeId";
@@ -209,13 +210,15 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
       case TreeEvent.TYPE_NODE_FILTER_CHANGED:
         handleModelNodeFilterChanged();
         break;
+      case TreeEvent.TYPE_CHILD_NODE_ORDER_CHANGED:
+        handleModelChildNodeOrderChanged(event);
+        break;
       default:
         handleOtherTreeEvent(event);
         break;
     }
     // TODO Tree | Events not yet implemented:
     // - TYPE_BEFORE_NODES_SELECTED
-    // - TYPE_CHILD_NODE_ORDER_CHANGED
     // - TYPE_NODE_REQUEST_FOCUS
     // - TYPE_NODE_ENSURE_VISIBLE
     // - TYPE_REQUEST_FOCUS
@@ -318,6 +321,15 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   protected void handleModelNodeFilterChanged() {
     JSONObject jsonEvent = new JSONObject();
     addActionEvent(EVENT_NODE_FILTER_CHANGED, jsonEvent);
+  }
+
+  protected void handleModelChildNodeOrderChanged(TreeEvent event) {
+    JSONObject jsonEvent = new JSONObject();
+    JsonObjectUtility.putProperty(jsonEvent, "parentNodeId", getOrCreateNodeId(event.getCommonParentNode()));
+    for (ITreeNode childNode : event.getChildNodes()) {
+      JsonObjectUtility.append(jsonEvent, "childNodeIds", getOrCreateNodeId(childNode));
+    }
+    addActionEvent(EVENT_CHILD_NODE_ORDER_CHANGED, jsonEvent);
   }
 
   // TODO BSH Tree | Coalesce events
