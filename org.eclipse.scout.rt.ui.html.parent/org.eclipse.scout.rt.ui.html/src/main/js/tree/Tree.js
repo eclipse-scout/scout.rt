@@ -564,7 +564,10 @@ scout.Tree.prototype._onChildNodeOrderChanged = function(parentNodeId, childNode
       var node = parentNode.childNodes[i];
       var $node = node.$node;
       if ($node) {
-        scout.Tree.collectSubtree($node).remove().insertBefore($marker);
+        // Move the element in DOM tree. Note: Inserting the element at the new position is sufficient
+        // in jQuery. There is no need to remove() it at the old position. Also, removing would break
+        // the application, because remove() detaches all listeners!
+        scout.Tree.collectSubtree($node).insertBefore($marker);
       }
     }
     $marker.remove();
