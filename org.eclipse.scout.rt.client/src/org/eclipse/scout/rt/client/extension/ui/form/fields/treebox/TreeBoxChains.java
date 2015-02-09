@@ -3,7 +3,9 @@ package org.eclipse.scout.rt.client.extension.ui.form.fields.treebox;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
+import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.treebox.AbstractTreeBox;
 import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
@@ -16,14 +18,14 @@ public final class TreeBoxChains {
 
   protected abstract static class AbstractTreeBoxChain<T> extends AbstractExtensionChain<ITreeBoxExtension<T, ? extends AbstractTreeBox<T>>> {
 
-    public AbstractTreeBoxChain(List<? extends ITreeBoxExtension<T, ? extends AbstractTreeBox<T>>> extensions) {
-      super(extensions);
+    public AbstractTreeBoxChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
+      super(extensions, ITreeBoxExtension.class);
     }
   }
 
   public static class TreeBoxFilterNewNodeChain<T> extends AbstractTreeBoxChain<T> {
 
-    public TreeBoxFilterNewNodeChain(List<? extends ITreeBoxExtension<T, ? extends AbstractTreeBox<T>>> extensions) {
+    public TreeBoxFilterNewNodeChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
@@ -44,7 +46,7 @@ public final class TreeBoxChains {
 
   public static class TreeBoxLoadChildNodesChain<T> extends AbstractTreeBoxChain<T> {
 
-    public TreeBoxLoadChildNodesChain(List<? extends ITreeBoxExtension<T, ? extends AbstractTreeBox<T>>> extensions) {
+    public TreeBoxLoadChildNodesChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
@@ -65,7 +67,7 @@ public final class TreeBoxChains {
 
   public static class TreeBoxPrepareLookupChain<T> extends AbstractTreeBoxChain<T> {
 
-    public TreeBoxPrepareLookupChain(List<? extends ITreeBoxExtension<T, ? extends AbstractTreeBox<T>>> extensions) {
+    public TreeBoxPrepareLookupChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
@@ -86,7 +88,7 @@ public final class TreeBoxChains {
 
   public static class TreeBoxFilterLookupResultChain<T> extends AbstractTreeBoxChain<T> {
 
-    public TreeBoxFilterLookupResultChain(List<? extends ITreeBoxExtension<T, ? extends AbstractTreeBox<T>>> extensions) {
+    public TreeBoxFilterLookupResultChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
@@ -104,5 +106,4 @@ public final class TreeBoxChains {
 
     }
   }
-
 }

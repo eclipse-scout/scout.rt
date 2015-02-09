@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import org.eclipse.scout.commons.CollectionUtility;
 
@@ -22,32 +23,93 @@ import org.eclipse.scout.commons.CollectionUtility;
  */
 public abstract class AbstractExtensionChain<EXTENSION> {
 
-  private final ListIterator<? extends EXTENSION> m_iterator;
+  private final ListIterator<? extends IExtension<?>> m_iterator;
 
   /**
    * the execution state of every executer.
    */
   private final Map<EXTENSION, MethodState> m_executionStates = new HashMap<EXTENSION, MethodState>();
 
-  public AbstractExtensionChain(List<? extends EXTENSION> executers) {
-    m_iterator = executers.listIterator();
+  private final Class<?> m_filterClass;
 
+  private boolean m_hasExtension;
+  private EXTENSION m_currentExtension;
+
+  public AbstractExtensionChain(List<? extends IExtension<?>> extensions, Class<? extends IExtension> filterClass) {
+    m_filterClass = filterClass;
+    m_iterator = extensions.listIterator();
   }
 
   protected boolean hasNext() {
-    return m_iterator.hasNext();
+    computeNext(true);
+    return m_hasExtension;
   }
 
   protected EXTENSION next() {
-    return m_iterator.next();
+    computeNext(false);
+    if (!m_hasExtension) {
+      throw new NoSuchElementException();
+    }
+    return m_currentExtension;
+  }
+
+  private void computeNext(boolean forceRewind) {
+    m_hasExtension = false;
+    int nextCount = 0;
+    while (m_iterator.hasNext()) {
+      IExtension<?> next = m_iterator.next();
+      nextCount++;
+      if (m_filterClass.isInstance(next)) {
+        m_hasExtension = true;
+        @SuppressWarnings("unchecked")
+        EXTENSION extension = (EXTENSION) next;
+        m_currentExtension = extension;
+        break;
+      }
+    }
+
+    // rewind
+    if (!m_hasExtension || forceRewind) {
+      for (int i = nextCount; i > 0; i--) {
+        m_iterator.previous();
+      }
+    }
   }
 
   protected boolean hasPrevious() {
-    return m_iterator.hasPrevious();
+    computePrevious(true);
+    return m_hasExtension;
   }
 
   protected EXTENSION previous() {
-    return m_iterator.previous();
+    computePrevious(false);
+    if (!m_hasExtension) {
+      throw new NoSuchElementException();
+    }
+    return m_currentExtension;
+  }
+
+  private void computePrevious(boolean forceRewind) {
+    m_hasExtension = false;
+    int previousCount = 0;
+    while (m_iterator.hasPrevious()) {
+      IExtension<?> previous = m_iterator.previous();
+      previousCount++;
+      if (m_filterClass.isInstance(previous)) {
+        m_hasExtension = true;
+        @SuppressWarnings("unchecked")
+        EXTENSION extension = (EXTENSION) previous;
+        m_currentExtension = extension;
+        break;
+      }
+    }
+
+    // rewind
+    if (!m_hasExtension || forceRewind) {
+      for (int i = previousCount; i > 0; i--) {
+        m_iterator.next();
+      }
+    }
   }
 
   protected void callChain(MethodInvocation<?> methodInvocation, Object... arguments) {
@@ -97,6 +159,5 @@ public abstract class AbstractExtensionChain<EXTENSION> {
     public RETURN_VALUE getReturnValue() {
       return m_returnValue;
     }
-
   }
 }

@@ -19,6 +19,7 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ContentAssistColumnChains.ContentAssistColumnConvertValueToKeyChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ContentAssistColumnChains.ContentAssistColumnPrepareLookupChain;
+import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.IColumnExtension;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.IContentAssistColumnExtension;
 import org.eclipse.scout.rt.client.services.lookup.ILookupCallProvisioningService;
 import org.eclipse.scout.rt.client.services.lookup.TableProvisioningContext;
@@ -226,20 +227,14 @@ public abstract class AbstractContentAssistColumn<VALUE, LOOKUP_TYPE> extends Ab
     return validValue;
   }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<? extends IContentAssistColumnExtension<VALUE, LOOKUP_TYPE, ? extends AbstractContentAssistColumn<VALUE, LOOKUP_TYPE>>> getAllExtensions() {
-    return (List<? extends IContentAssistColumnExtension<VALUE, LOOKUP_TYPE, ? extends AbstractContentAssistColumn<VALUE, LOOKUP_TYPE>>>) super.getAllExtensions();
-  }
-
   protected final LOOKUP_TYPE interceptConvertValueToKey(VALUE value) {
-    List<? extends IContentAssistColumnExtension<VALUE, LOOKUP_TYPE, ? extends AbstractContentAssistColumn<VALUE, LOOKUP_TYPE>>> extensions = getAllExtensions();
+    List<? extends IColumnExtension<VALUE, ? extends AbstractColumn<VALUE>>> extensions = getAllExtensions();
     ContentAssistColumnConvertValueToKeyChain<VALUE, LOOKUP_TYPE> chain = new ContentAssistColumnConvertValueToKeyChain<VALUE, LOOKUP_TYPE>(extensions);
     return chain.execConvertValueToKey(value);
   }
 
   protected final void interceptPrepareLookup(ILookupCall<LOOKUP_TYPE> call, ITableRow row) {
-    List<? extends IContentAssistColumnExtension<VALUE, LOOKUP_TYPE, ? extends AbstractContentAssistColumn<VALUE, LOOKUP_TYPE>>> extensions = getAllExtensions();
+    List<? extends IColumnExtension<VALUE, ? extends AbstractColumn<VALUE>>> extensions = getAllExtensions();
     ContentAssistColumnPrepareLookupChain<VALUE, LOOKUP_TYPE> chain = new ContentAssistColumnPrepareLookupChain<VALUE, LOOKUP_TYPE>(extensions);
     chain.execPrepareLookup(call, row);
   }

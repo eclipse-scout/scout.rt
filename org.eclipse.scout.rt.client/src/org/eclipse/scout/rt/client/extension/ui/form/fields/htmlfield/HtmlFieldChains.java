@@ -4,6 +4,8 @@ import java.net.URL;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
+import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.AbstractHtmlField;
 import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
 
@@ -14,14 +16,14 @@ public final class HtmlFieldChains {
 
   protected abstract static class AbstractHtmlFieldChain extends AbstractExtensionChain<IHtmlFieldExtension<? extends AbstractHtmlField>> {
 
-    public AbstractHtmlFieldChain(List<? extends IHtmlFieldExtension<? extends AbstractHtmlField>> extensions) {
-      super(extensions);
+    public AbstractHtmlFieldChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
+      super(extensions, IHtmlFieldExtension.class);
     }
   }
 
   public static class HtmlFieldHyperlinkActionChain extends AbstractHtmlFieldChain {
 
-    public HtmlFieldHyperlinkActionChain(List<? extends IHtmlFieldExtension<? extends AbstractHtmlField>> extensions) {
+    public HtmlFieldHyperlinkActionChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 

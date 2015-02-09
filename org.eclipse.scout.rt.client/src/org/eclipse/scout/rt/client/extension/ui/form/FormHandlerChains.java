@@ -14,7 +14,7 @@ public final class FormHandlerChains {
   protected abstract static class AbstractFormHandlerChain extends AbstractExtensionChain<IFormHandlerExtension<? extends AbstractFormHandler>> {
 
     public AbstractFormHandlerChain(List<? extends IFormHandlerExtension<? extends AbstractFormHandler>> extensions) {
-      super(extensions);
+      super(extensions, IFormHandlerExtension.class);
     }
   }
 

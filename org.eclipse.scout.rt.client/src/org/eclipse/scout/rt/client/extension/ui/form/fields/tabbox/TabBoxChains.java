@@ -3,6 +3,8 @@ package org.eclipse.scout.rt.client.extension.ui.form.fields.tabbox;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
+import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.AbstractTabBox;
 import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
@@ -14,14 +16,14 @@ public final class TabBoxChains {
 
   protected abstract static class AbstractTabBoxChain extends AbstractExtensionChain<ITabBoxExtension<? extends AbstractTabBox>> {
 
-    public AbstractTabBoxChain(List<? extends ITabBoxExtension<? extends AbstractTabBox>> extensions) {
-      super(extensions);
+    public AbstractTabBoxChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
+      super(extensions, ITabBoxExtension.class);
     }
   }
 
   public static class TabBoxTabSelectedChain extends AbstractTabBoxChain {
 
-    public TabBoxTabSelectedChain(List<? extends ITabBoxExtension<? extends AbstractTabBox>> extensions) {
+    public TabBoxTabSelectedChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 

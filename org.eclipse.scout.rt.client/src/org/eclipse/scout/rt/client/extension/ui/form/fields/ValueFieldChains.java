@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.client.extension.ui.form.fields;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
 
@@ -22,6 +23,13 @@ import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
 public final class ValueFieldChains {
 
   private ValueFieldChains() {
+  }
+
+  public static abstract class AbstractValueFieldChain<VALUE> extends AbstractExtensionChain<IValueFieldExtension<VALUE, ? extends AbstractValueField<VALUE>>> {
+
+    public AbstractValueFieldChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
+      super(extensions, IValueFieldExtension.class);
+    }
 
   }
 
@@ -31,7 +39,7 @@ public final class ValueFieldChains {
      * @param extensions
      *          the list of all extension sorted reverse considering the execution order. The list must be immutable.
      */
-    public ValueFieldExecValidateChain(List<? extends IValueFieldExtension<VALUE, ? extends AbstractValueField<VALUE>>> extensions) {
+    public ValueFieldExecValidateChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
@@ -50,20 +58,9 @@ public final class ValueFieldChains {
     }
   }
 
-  public static abstract class AbstractValueFieldChain<VALUE> extends AbstractExtensionChain<IValueFieldExtension<VALUE, ? extends AbstractValueField<VALUE>>> {
-
-    /**
-     * @param executers
-     */
-    public AbstractValueFieldChain(List<? extends IValueFieldExtension<VALUE, ? extends AbstractValueField<VALUE>>> executers) {
-      super(executers);
-    }
-
-  }
-
   public static class ValueFieldFormatValueChain<VALUE> extends AbstractValueFieldChain<VALUE> {
 
-    public ValueFieldFormatValueChain(List<? extends IValueFieldExtension<VALUE, ? extends AbstractValueField<VALUE>>> extensions) {
+    public ValueFieldFormatValueChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
@@ -81,7 +78,7 @@ public final class ValueFieldChains {
 
   public static class ValueFieldValidateValueChain<VALUE> extends AbstractValueFieldChain<VALUE> {
 
-    public ValueFieldValidateValueChain(List<? extends IValueFieldExtension<VALUE, ? extends AbstractValueField<VALUE>>> extensions) {
+    public ValueFieldValidateValueChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
@@ -102,7 +99,7 @@ public final class ValueFieldChains {
 
   public static class ValueFieldChangedValueChain<VALUE> extends AbstractValueFieldChain<VALUE> {
 
-    public ValueFieldChangedValueChain(List<? extends IValueFieldExtension<VALUE, ? extends AbstractValueField<VALUE>>> extensions) {
+    public ValueFieldChangedValueChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
@@ -123,7 +120,7 @@ public final class ValueFieldChains {
 
   public static class ValueFieldParseValueChain<VALUE> extends AbstractValueFieldChain<VALUE> {
 
-    public ValueFieldParseValueChain(List<? extends IValueFieldExtension<VALUE, ? extends AbstractValueField<VALUE>>> extensions) {
+    public ValueFieldParseValueChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 

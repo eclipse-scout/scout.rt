@@ -22,6 +22,7 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.service.SERVICES;
@@ -206,20 +207,14 @@ public abstract class AbstractSvgField extends AbstractFormField implements ISvg
     }
   }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<? extends ISvgFieldExtension<? extends AbstractSvgField>> getAllExtensions() {
-    return (List<? extends ISvgFieldExtension<? extends AbstractSvgField>>) super.getAllExtensions();
-  }
-
   protected final void interceptClicked(SvgFieldEvent e) throws ProcessingException {
-    List<? extends ISvgFieldExtension<? extends AbstractSvgField>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     SvgFieldClickedChain chain = new SvgFieldClickedChain(extensions);
     chain.execClicked(e);
   }
 
   protected final void interceptHyperlink(SvgFieldEvent e) throws ProcessingException {
-    List<? extends ISvgFieldExtension<? extends AbstractSvgField>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     SvgFieldHyperlinkChain chain = new SvgFieldHyperlinkChain(extensions);
     chain.execHyperlink(e);
   }

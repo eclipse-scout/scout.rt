@@ -18,7 +18,7 @@ public final class ActivityMapChains {
   protected abstract static class AbstractActivityMapChain<RI, AI> extends AbstractExtensionChain<IActivityMapExtension<RI, AI, ? extends AbstractActivityMap<RI, AI>>> {
 
     public AbstractActivityMapChain(List<? extends IActivityMapExtension<RI, AI, ? extends AbstractActivityMap<RI, AI>>> extensions) {
-      super(extensions);
+      super(extensions, IActivityMapExtension.class);
     }
   }
 

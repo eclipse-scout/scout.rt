@@ -3,9 +3,11 @@ package org.eclipse.scout.rt.client.extension.ui.form.fields.plannerfield;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.ui.basic.activitymap.IActivityMap;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.plannerfield.AbstractPlannerField;
 import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
 
@@ -16,14 +18,14 @@ public final class PlannerFieldChains {
 
   protected abstract static class AbstractPlannerFieldChain<T extends ITable, P extends IActivityMap<RI, AI>, RI, AI> extends AbstractExtensionChain<IPlannerFieldExtension<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI, ? extends AbstractPlannerField<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI>>> {
 
-    public AbstractPlannerFieldChain(List<? extends IPlannerFieldExtension<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI, ? extends AbstractPlannerField<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI>>> extensions) {
-      super(extensions);
+    public AbstractPlannerFieldChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
+      super(extensions, IPlannerFieldExtension.class);
     }
   }
 
   public static class PlannerFieldPopulateActivitiesChain<T extends ITable, P extends IActivityMap<RI, AI>, RI, AI> extends AbstractPlannerFieldChain<T, P, RI, AI> {
 
-    public PlannerFieldPopulateActivitiesChain(List<? extends IPlannerFieldExtension<T, P, RI, AI, ? extends AbstractPlannerField<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI>>> extensions) {
+    public PlannerFieldPopulateActivitiesChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
@@ -44,7 +46,7 @@ public final class PlannerFieldChains {
 
   public static class PlannerFieldLoadResourceTableDataChain<T extends ITable, P extends IActivityMap<RI, AI>, RI, AI> extends AbstractPlannerFieldChain<T, P, RI, AI> {
 
-    public PlannerFieldLoadResourceTableDataChain(List<? extends IPlannerFieldExtension<T, P, RI, AI, ? extends AbstractPlannerField<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI>>> extensions) {
+    public PlannerFieldLoadResourceTableDataChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
@@ -65,7 +67,7 @@ public final class PlannerFieldChains {
 
   public static class PlannerFieldPopulateResourceTableChain<T extends ITable, P extends IActivityMap<RI, AI>, RI, AI> extends AbstractPlannerFieldChain<T, P, RI, AI> {
 
-    public PlannerFieldPopulateResourceTableChain(List<? extends IPlannerFieldExtension<T, P, RI, AI, ? extends AbstractPlannerField<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI>>> extensions) {
+    public PlannerFieldPopulateResourceTableChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
@@ -86,7 +88,7 @@ public final class PlannerFieldChains {
 
   public static class PlannerFieldLoadActivityMapDataChain<T extends ITable, P extends IActivityMap<RI, AI>, RI, AI> extends AbstractPlannerFieldChain<T, P, RI, AI> {
 
-    public PlannerFieldLoadActivityMapDataChain(List<? extends IPlannerFieldExtension<T, P, RI, AI, ? extends AbstractPlannerField<? extends ITable, ? extends IActivityMap<RI, AI>, RI, AI>>> extensions) {
+    public PlannerFieldLoadActivityMapDataChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 

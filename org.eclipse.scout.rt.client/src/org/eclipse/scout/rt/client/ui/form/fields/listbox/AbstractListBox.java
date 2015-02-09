@@ -34,6 +34,7 @@ import org.eclipse.scout.commons.annotations.OrderedComparator;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.listbox.IListBoxExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.listbox.ListBoxChains.ListBoxFilterLookupResultChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.listbox.ListBoxChains.ListBoxLoadTableDataChain;
@@ -57,6 +58,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
+import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.CompositeFieldUtility;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
@@ -1050,32 +1052,26 @@ public abstract class AbstractListBox<KEY> extends AbstractValueField<Set<KEY>> 
     }
   }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<? extends IListBoxExtension<KEY, ? extends AbstractListBox<KEY>>> getAllExtensions() {
-    return (List<? extends IListBoxExtension<KEY, ? extends AbstractListBox<KEY>>>) super.getAllExtensions();
-  }
-
   protected final void interceptPopulateTable() throws ProcessingException {
-    List<? extends IListBoxExtension<KEY, ? extends AbstractListBox<KEY>>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     ListBoxPopulateTableChain<KEY> chain = new ListBoxPopulateTableChain<KEY>(extensions);
     chain.execPopulateTable();
   }
 
   protected final List<? extends ILookupRow<KEY>> interceptLoadTableData() throws ProcessingException {
-    List<? extends IListBoxExtension<KEY, ? extends AbstractListBox<KEY>>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     ListBoxLoadTableDataChain<KEY> chain = new ListBoxLoadTableDataChain<KEY>(extensions);
     return chain.execLoadTableData();
   }
 
   protected final void interceptFilterLookupResult(ILookupCall<KEY> call, List<ILookupRow<KEY>> result) throws ProcessingException {
-    List<? extends IListBoxExtension<KEY, ? extends AbstractListBox<KEY>>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     ListBoxFilterLookupResultChain<KEY> chain = new ListBoxFilterLookupResultChain<KEY>(extensions);
     chain.execFilterLookupResult(call, result);
   }
 
   protected final void interceptPrepareLookup(ILookupCall<KEY> call) throws ProcessingException {
-    List<? extends IListBoxExtension<KEY, ? extends AbstractListBox<KEY>>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     ListBoxPrepareLookupChain<KEY> chain = new ListBoxPrepareLookupChain<KEY>(extensions);
     chain.execPrepareLookup(call);
   }

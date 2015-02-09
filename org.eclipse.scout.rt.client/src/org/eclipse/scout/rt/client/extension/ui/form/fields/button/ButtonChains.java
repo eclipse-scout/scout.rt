@@ -3,6 +3,8 @@ package org.eclipse.scout.rt.client.extension.ui.form.fields.button;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
+import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractButton;
 import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
 
@@ -13,14 +15,14 @@ public final class ButtonChains {
 
   protected abstract static class AbstractButtonChain extends AbstractExtensionChain<IButtonExtension<? extends AbstractButton>> {
 
-    public AbstractButtonChain(List<? extends IButtonExtension<? extends AbstractButton>> extensions) {
-      super(extensions);
+    public AbstractButtonChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
+      super(extensions, IButtonExtension.class);
     }
   }
 
   public static class ButtonSelectionChangedChain extends AbstractButtonChain {
 
-    public ButtonSelectionChangedChain(List<? extends IButtonExtension<? extends AbstractButton>> extensions) {
+    public ButtonSelectionChangedChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
@@ -41,7 +43,7 @@ public final class ButtonChains {
 
   public static class ButtonClickActionChain extends AbstractButtonChain {
 
-    public ButtonClickActionChain(List<? extends IButtonExtension<? extends AbstractButton>> extensions) {
+    public ButtonClickActionChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 

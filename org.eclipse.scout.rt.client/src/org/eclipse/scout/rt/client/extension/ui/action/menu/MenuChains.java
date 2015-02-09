@@ -3,6 +3,8 @@ package org.eclipse.scout.rt.client.extension.ui.action.menu;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.extension.ui.action.IActionExtension;
+import org.eclipse.scout.rt.client.ui.action.AbstractAction;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
 
@@ -13,14 +15,14 @@ public final class MenuChains {
 
   protected abstract static class AbstractMenuChain extends AbstractExtensionChain<IMenuExtension<? extends AbstractMenu>> {
 
-    public AbstractMenuChain(List<? extends IMenuExtension<? extends AbstractMenu>> extensions) {
-      super(extensions);
+    public AbstractMenuChain(List<? extends IActionExtension<? extends AbstractAction>> extensions) {
+      super(extensions, IMenuExtension.class);
     }
   }
 
   public static class MenuAboutToShowChain extends AbstractMenuChain {
 
-    public MenuAboutToShowChain(List<? extends IMenuExtension<? extends AbstractMenu>> extensions) {
+    public MenuAboutToShowChain(List<? extends IActionExtension<? extends AbstractAction>> extensions) {
       super(extensions);
     }
 
@@ -41,7 +43,7 @@ public final class MenuChains {
 
   public static class MenuOwnerValueChangedChain extends AbstractMenuChain {
 
-    public MenuOwnerValueChangedChain(List<? extends IMenuExtension<? extends AbstractMenu>> extensions) {
+    public MenuOwnerValueChangedChain(List<? extends IActionExtension<? extends AbstractAction>> extensions) {
       super(extensions);
     }
 

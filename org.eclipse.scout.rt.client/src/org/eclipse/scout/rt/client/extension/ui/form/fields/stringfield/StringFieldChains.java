@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
+import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
 
@@ -15,14 +17,14 @@ public final class StringFieldChains {
 
   protected abstract static class AbstractStringFieldChain extends AbstractExtensionChain<IStringFieldExtension<? extends AbstractStringField>> {
 
-    public AbstractStringFieldChain(List<? extends IStringFieldExtension<? extends AbstractStringField>> extensions) {
-      super(extensions);
+    public AbstractStringFieldChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
+      super(extensions, IStringFieldExtension.class);
     }
   }
 
   public static class StringFieldDropRequestChain extends AbstractStringFieldChain {
 
-    public StringFieldDropRequestChain(List<? extends IStringFieldExtension<? extends AbstractStringField>> extensions) {
+    public StringFieldDropRequestChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
@@ -39,7 +41,7 @@ public final class StringFieldChains {
 
   public static class StringFieldLinkActionChain extends AbstractStringFieldChain {
 
-    public StringFieldLinkActionChain(List<? extends IStringFieldExtension<? extends AbstractStringField>> extensions) {
+    public StringFieldLinkActionChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
@@ -60,7 +62,7 @@ public final class StringFieldChains {
 
   public static class StringFieldDragRequestChain extends AbstractStringFieldChain {
 
-    public StringFieldDragRequestChain(List<? extends IStringFieldExtension<? extends AbstractStringField>> extensions) {
+    public StringFieldDragRequestChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 

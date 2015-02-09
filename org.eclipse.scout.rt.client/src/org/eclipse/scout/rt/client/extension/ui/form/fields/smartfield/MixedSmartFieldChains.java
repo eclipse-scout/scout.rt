@@ -2,6 +2,8 @@ package org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield;
 
 import java.util.List;
 
+import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
+import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractMixedSmartField;
 import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
 
@@ -12,14 +14,14 @@ public final class MixedSmartFieldChains {
 
   protected abstract static class AbstractMixedSmartFieldChain<VALUE, LOOKUP_KEY> extends AbstractExtensionChain<IMixedSmartFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractMixedSmartField<VALUE, LOOKUP_KEY>>> {
 
-    public AbstractMixedSmartFieldChain(List<? extends IMixedSmartFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractMixedSmartField<VALUE, LOOKUP_KEY>>> extensions) {
-      super(extensions);
+    public AbstractMixedSmartFieldChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
+      super(extensions, IMixedSmartFieldExtension.class);
     }
   }
 
   public static class MixedSmartFieldConvertValueToKeyChain<VALUE, LOOKUP_KEY> extends AbstractMixedSmartFieldChain<VALUE, LOOKUP_KEY> {
 
-    public MixedSmartFieldConvertValueToKeyChain(List<? extends IMixedSmartFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractMixedSmartField<VALUE, LOOKUP_KEY>>> extensions) {
+    public MixedSmartFieldConvertValueToKeyChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
@@ -37,7 +39,7 @@ public final class MixedSmartFieldChains {
 
   public static class MixedSmartFieldConvertKeyToValueChain<VALUE, LOOKUP_KEY> extends AbstractMixedSmartFieldChain<VALUE, LOOKUP_KEY> {
 
-    public MixedSmartFieldConvertKeyToValueChain(List<? extends IMixedSmartFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractMixedSmartField<VALUE, LOOKUP_KEY>>> extensions) {
+    public MixedSmartFieldConvertKeyToValueChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 

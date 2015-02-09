@@ -26,9 +26,11 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.htmlfield.HtmlFieldChains.HtmlFieldHyperlinkActionChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.htmlfield.IHtmlFieldExtension;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
+import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.browserfield.AbstractBrowserField;
 import org.eclipse.scout.rt.client.ui.form.fields.documentfield.AbstractDocumentField;
@@ -292,14 +294,8 @@ public abstract class AbstractHtmlField extends AbstractValueField<String> imple
     m_monitorSpelling = Boolean.valueOf(monitorSpelling);
   }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<? extends IHtmlFieldExtension<? extends AbstractHtmlField>> getAllExtensions() {
-    return (List<? extends IHtmlFieldExtension<? extends AbstractHtmlField>>) super.getAllExtensions();
-  }
-
   protected final void interceptHyperlinkAction(URL url, String path, boolean local) throws ProcessingException {
-    List<? extends IHtmlFieldExtension<? extends AbstractHtmlField>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     HtmlFieldHyperlinkActionChain chain = new HtmlFieldHyperlinkActionChain(extensions);
     chain.execHyperlinkAction(url, path, local);
   }

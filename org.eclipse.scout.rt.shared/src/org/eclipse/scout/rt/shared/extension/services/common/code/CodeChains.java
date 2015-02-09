@@ -14,7 +14,7 @@ public final class CodeChains {
   protected abstract static class AbstractCodeChain<T> extends AbstractExtensionChain<ICodeExtension<T, ? extends AbstractCode<T>>> {
 
     public AbstractCodeChain(List<? extends ICodeExtension<T, ? extends AbstractCode<T>>> extensions) {
-      super(extensions);
+      super(extensions, ICodeExtension.class);
     }
   }
 

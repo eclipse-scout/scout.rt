@@ -14,7 +14,7 @@ public final class ClientSessionChains {
   protected abstract static class AbstractClientSessionChain extends AbstractExtensionChain<IClientSessionExtension<? extends AbstractClientSession>> {
 
     public AbstractClientSessionChain(List<? extends IClientSessionExtension<? extends AbstractClientSession>> extensions) {
-      super(extensions);
+      super(extensions, IClientSessionExtension.class);
     }
   }
 

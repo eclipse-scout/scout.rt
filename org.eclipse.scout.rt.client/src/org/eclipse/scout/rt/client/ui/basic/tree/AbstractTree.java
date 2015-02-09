@@ -630,7 +630,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   @Override
-  public List<? extends ITreeExtension<? extends AbstractTree>> getAllExtensions() {
+  public final List<? extends ITreeExtension<? extends AbstractTree>> getAllExtensions() {
     return m_objectExtensions.getAllExtensions();
   }
 

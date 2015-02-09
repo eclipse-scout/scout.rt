@@ -20,8 +20,10 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.IOutlineTableFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.OutlineTableFieldChains.OutlineTableFieldTableTitleChangedChain;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
+import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 
 /**
@@ -94,14 +96,8 @@ public abstract class AbstractOutlineTableField extends AbstractTableField<ITabl
     interceptTableTitleChanged();
   }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<? extends IOutlineTableFieldExtension<? extends AbstractOutlineTableField>> getAllExtensions() {
-    return (List<? extends IOutlineTableFieldExtension<? extends AbstractOutlineTableField>>) super.getAllExtensions();
-  }
-
   protected final void interceptTableTitleChanged() {
-    List<? extends IOutlineTableFieldExtension<? extends AbstractOutlineTableField>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     OutlineTableFieldTableTitleChangedChain chain = new OutlineTableFieldTableTitleChangedChain(extensions);
     chain.execTableTitleChanged();
   }

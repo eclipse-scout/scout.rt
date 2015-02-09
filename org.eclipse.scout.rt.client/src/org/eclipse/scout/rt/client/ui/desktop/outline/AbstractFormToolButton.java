@@ -18,7 +18,9 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.FormToolButtonChains.FormToolButtonInitFormChain;
+import org.eclipse.scout.rt.client.extension.ui.action.IActionExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.IFormToolButtonExtension;
+import org.eclipse.scout.rt.client.ui.action.AbstractAction;
 import org.eclipse.scout.rt.client.ui.action.tool.AbstractToolButton;
 import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -141,14 +143,8 @@ public abstract class AbstractFormToolButton<FORM extends IForm> extends Abstrac
     getForm().setDisplayViewId(IForm.VIEW_ID_E);
   }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<? extends IFormToolButtonExtension<FORM, ? extends AbstractFormToolButton<? extends IForm>>> getAllExtensions() {
-    return (List<? extends IFormToolButtonExtension<FORM, ? extends AbstractFormToolButton<? extends IForm>>>) super.getAllExtensions();
-  }
-
   protected final void interceptInitForm() throws ProcessingException {
-    List<? extends IFormToolButtonExtension<FORM, ? extends AbstractFormToolButton<? extends IForm>>> extensions = getAllExtensions();
+    List<? extends IActionExtension<? extends AbstractAction>> extensions = getAllExtensions();
     FormToolButtonInitFormChain<FORM> chain = new FormToolButtonInitFormChain<FORM>(extensions);
     chain.execInitForm();
   }

@@ -165,7 +165,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   @Override
-  public List<? extends IFormFieldExtension<? extends AbstractFormField>> getAllExtensions() {
+  public final List<? extends IFormFieldExtension<? extends AbstractFormField>> getAllExtensions() {
     return m_objectExtensions.getAllExtensions();
   }
 

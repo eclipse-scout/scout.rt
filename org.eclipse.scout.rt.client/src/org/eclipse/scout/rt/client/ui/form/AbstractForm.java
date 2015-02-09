@@ -201,7 +201,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   @Override
-  public List<? extends IFormExtension<? extends AbstractForm>> getAllExtensions() {
+  public final List<? extends IFormExtension<? extends AbstractForm>> getAllExtensions() {
     return m_objectExtensions.getAllExtensions();
   }
 

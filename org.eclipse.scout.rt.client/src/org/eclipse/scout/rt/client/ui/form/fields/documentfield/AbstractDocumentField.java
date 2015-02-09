@@ -11,8 +11,10 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.documentfield.DocumentFieldChains.DocumentFieldComReadyStatusChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.documentfield.IDocumentFieldExtension;
+import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.documentfield.eventdata.SaveAsData;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
@@ -218,14 +220,8 @@ public abstract class AbstractDocumentField extends AbstractValueField<RemoteFil
     }
   }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<? extends IDocumentFieldExtension<? extends AbstractDocumentField>> getAllExtensions() {
-    return (List<? extends IDocumentFieldExtension<? extends AbstractDocumentField>>) super.getAllExtensions();
-  }
-
   protected final void interceptComReadyStatusChanged(boolean ready) throws ProcessingException {
-    List<? extends IDocumentFieldExtension<? extends AbstractDocumentField>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     DocumentFieldComReadyStatusChangedChain chain = new DocumentFieldComReadyStatusChangedChain(extensions);
     chain.execComReadyStatusChanged(ready);
   }

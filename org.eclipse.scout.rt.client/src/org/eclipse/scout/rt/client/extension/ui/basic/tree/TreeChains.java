@@ -21,7 +21,7 @@ public final class TreeChains {
   protected abstract static class AbstractTreeChain extends AbstractExtensionChain<ITreeExtension<? extends AbstractTree>> {
 
     public AbstractTreeChain(List<? extends ITreeExtension<? extends AbstractTree>> extensions) {
-      super(extensions);
+      super(extensions, ITreeExtension.class);
     }
   }
 

@@ -214,7 +214,7 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
   }
 
   @Override
-  public List<? extends IServerSessionExtension<? extends AbstractServerSession>> getAllExtensions() {
+  public final List<? extends IServerSessionExtension<? extends AbstractServerSession>> getAllExtensions() {
     return m_objectExtensions.getAllExtensions();
   }
 

@@ -235,7 +235,7 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable, IContri
   }
 
   @Override
-  public List<? extends ICodeExtension<T, ? extends AbstractCode<T>>> getAllExtensions() {
+  public final List<? extends ICodeExtension<T, ? extends AbstractCode<T>>> getAllExtensions() {
     return m_objectExtensions.getAllExtensions();
   }
 

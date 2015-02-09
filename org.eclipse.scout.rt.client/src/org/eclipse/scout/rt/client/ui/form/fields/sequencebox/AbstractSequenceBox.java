@@ -26,11 +26,13 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.holders.IHolder;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.sequencebox.ISequenceBoxExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.sequencebox.SequenceBoxChains.SequenceBoxCheckFromToChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.sequencebox.SequenceBoxChains.SequenceBoxCreateLabelSuffixChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.sequencebox.SequenceBoxChains.SequenceBoxIsLabelSuffixCandidateChain;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractCompositeField;
+import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
@@ -415,26 +417,20 @@ public abstract class AbstractSequenceBox extends AbstractCompositeField impleme
     return b.toString();
   }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<? extends ISequenceBoxExtension<? extends AbstractSequenceBox>> getAllExtensions() {
-    return (List<? extends ISequenceBoxExtension<? extends AbstractSequenceBox>>) super.getAllExtensions();
-  }
-
   protected final boolean interceptIsLabelSuffixCandidate(IFormField formField) {
-    List<? extends ISequenceBoxExtension<? extends AbstractSequenceBox>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     SequenceBoxIsLabelSuffixCandidateChain chain = new SequenceBoxIsLabelSuffixCandidateChain(extensions);
     return chain.execIsLabelSuffixCandidate(formField);
   }
 
   protected final <T extends Comparable<T>> void interceptCheckFromTo(IValueField<T>[] valueFields, int changedIndex) throws ProcessingException {
-    List<? extends ISequenceBoxExtension<? extends AbstractSequenceBox>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     SequenceBoxCheckFromToChain chain = new SequenceBoxCheckFromToChain(extensions);
     chain.execCheckFromTo(valueFields, changedIndex);
   }
 
   protected final String interceptCreateLabelSuffix() {
-    List<? extends ISequenceBoxExtension<? extends AbstractSequenceBox>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     SequenceBoxCreateLabelSuffixChain chain = new SequenceBoxCreateLabelSuffixChain(extensions);
     return chain.execCreateLabelSuffix();
   }

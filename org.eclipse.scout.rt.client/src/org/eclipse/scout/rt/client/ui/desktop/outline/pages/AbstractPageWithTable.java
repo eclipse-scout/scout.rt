@@ -30,6 +30,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IMemoryPolicy;
+import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeNodeExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.IPageWithTableExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithTableChains.PageWithTableCreateChildPageChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithTableChains.PageWithTableCreateVirtualChildPageChain;
@@ -45,6 +46,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.TableAdapter;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.control.SearchFormTableControl;
+import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.IVirtualTreeNode;
@@ -1009,38 +1011,32 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
 
   }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<? extends IPageWithTableExtension<T, ? extends AbstractPageWithTable<? extends ITable>>> getAllExtensions() {
-    return (List<? extends IPageWithTableExtension<T, ? extends AbstractPageWithTable<? extends ITable>>>) super.getAllExtensions();
-  }
-
   protected final void interceptLoadData(SearchFilter filter) throws ProcessingException {
-    List<? extends IPageWithTableExtension<T, ? extends AbstractPageWithTable<? extends ITable>>> extensions = getAllExtensions();
+    List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
     PageWithTableLoadDataChain<T> chain = new PageWithTableLoadDataChain<T>(extensions);
     chain.execLoadData(filter);
   }
 
   protected final IPage<?> interceptCreateChildPage(ITableRow row) throws ProcessingException {
-    List<? extends IPageWithTableExtension<T, ? extends AbstractPageWithTable<? extends ITable>>> extensions = getAllExtensions();
+    List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
     PageWithTableCreateChildPageChain<T> chain = new PageWithTableCreateChildPageChain<T>(extensions);
     return chain.execCreateChildPage(row);
   }
 
   protected final void interceptPopulateTable() throws ProcessingException {
-    List<? extends IPageWithTableExtension<T, ? extends AbstractPageWithTable<? extends ITable>>> extensions = getAllExtensions();
+    List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
     PageWithTablePopulateTableChain<T> chain = new PageWithTablePopulateTableChain<T>(extensions);
     chain.execPopulateTable();
   }
 
   protected final IPage<?> interceptCreateVirtualChildPage(ITableRow row) throws ProcessingException {
-    List<? extends IPageWithTableExtension<T, ? extends AbstractPageWithTable<? extends ITable>>> extensions = getAllExtensions();
+    List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
     PageWithTableCreateVirtualChildPageChain<T> chain = new PageWithTableCreateVirtualChildPageChain<T>(extensions);
     return chain.execCreateVirtualChildPage(row);
   }
 
   protected final void interceptInitSearchForm() throws ProcessingException {
-    List<? extends IPageWithTableExtension<T, ? extends AbstractPageWithTable<? extends ITable>>> extensions = getAllExtensions();
+    List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
     PageWithTableInitSearchFormChain<T> chain = new PageWithTableInitSearchFormChain<T>(extensions);
     chain.execInitSearchForm();
   }

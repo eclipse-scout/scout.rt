@@ -19,7 +19,7 @@ public final class CalendarItemProviderChains {
   protected abstract static class AbstractCalendarItemProviderChain extends AbstractExtensionChain<ICalendarItemProviderExtension<? extends AbstractCalendarItemProvider>> {
 
     public AbstractCalendarItemProviderChain(List<? extends ICalendarItemProviderExtension<? extends AbstractCalendarItemProvider>> extensions) {
-      super(extensions);
+      super(extensions, ICalendarItemProviderExtension.class);
     }
   }
 

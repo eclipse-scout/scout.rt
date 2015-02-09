@@ -33,6 +33,7 @@ import org.eclipse.scout.commons.annotations.OrderedComparator;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.treebox.ITreeBoxExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.treebox.TreeBoxChains.TreeBoxFilterLookupResultChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.treebox.TreeBoxChains.TreeBoxFilterNewNodeChain;
@@ -50,6 +51,7 @@ import org.eclipse.scout.rt.client.ui.basic.tree.ITreeVisitor;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.form.IFormFieldVisitor;
+import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.CompositeFieldUtility;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
@@ -1124,32 +1126,26 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
     }
   }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<? extends ITreeBoxExtension<T, ? extends AbstractTreeBox<T>>> getAllExtensions() {
-    return (List<? extends ITreeBoxExtension<T, ? extends AbstractTreeBox<T>>>) super.getAllExtensions();
-  }
-
   protected final void interceptFilterNewNode(ITreeNode newNode, int treeLevel) throws ProcessingException {
-    List<? extends ITreeBoxExtension<T, ? extends AbstractTreeBox<T>>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     TreeBoxFilterNewNodeChain<T> chain = new TreeBoxFilterNewNodeChain<T>(extensions);
     chain.execFilterNewNode(newNode, treeLevel);
   }
 
   protected final void interceptLoadChildNodes(ITreeNode parentNode) throws ProcessingException {
-    List<? extends ITreeBoxExtension<T, ? extends AbstractTreeBox<T>>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     TreeBoxLoadChildNodesChain<T> chain = new TreeBoxLoadChildNodesChain<T>(extensions);
     chain.execLoadChildNodes(parentNode);
   }
 
   protected final void interceptPrepareLookup(ILookupCall<T> call, ITreeNode parent) throws ProcessingException {
-    List<? extends ITreeBoxExtension<T, ? extends AbstractTreeBox<T>>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     TreeBoxPrepareLookupChain<T> chain = new TreeBoxPrepareLookupChain<T>(extensions);
     chain.execPrepareLookup(call, parent);
   }
 
   protected final void interceptFilterLookupResult(ILookupCall<T> call, List<ILookupRow<T>> result) throws ProcessingException {
-    List<? extends ITreeBoxExtension<T, ? extends AbstractTreeBox<T>>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     TreeBoxFilterLookupResultChain<T> chain = new TreeBoxFilterLookupResultChain<T>(extensions);
     chain.execFilterLookupResult(call, result);
   }

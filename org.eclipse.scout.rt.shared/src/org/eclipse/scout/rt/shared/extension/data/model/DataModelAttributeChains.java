@@ -15,7 +15,7 @@ public final class DataModelAttributeChains {
   protected abstract static class AbstractDataModelAttributeChain extends AbstractExtensionChain<IDataModelAttributeExtension<? extends AbstractDataModelAttribute>> {
 
     public AbstractDataModelAttributeChain(List<? extends IDataModelAttributeExtension<? extends AbstractDataModelAttribute>> extensions) {
-      super(extensions);
+      super(extensions, IDataModelAttributeExtension.class);
     }
   }
 

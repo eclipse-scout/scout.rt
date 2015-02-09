@@ -122,7 +122,7 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
   }
 
   @Override
-  public List<? extends IClientSessionExtension<? extends AbstractClientSession>> getAllExtensions() {
+  public final List<? extends IClientSessionExtension<? extends AbstractClientSession>> getAllExtensions() {
     return m_objectExtensions.getAllExtensions();
   }
 

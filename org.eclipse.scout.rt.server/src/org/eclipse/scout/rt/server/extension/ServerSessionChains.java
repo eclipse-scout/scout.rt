@@ -2,9 +2,9 @@ package org.eclipse.scout.rt.server.extension;
 
 import java.util.List;
 
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.server.AbstractServerSession;
 import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
-import org.eclipse.scout.commons.exception.ProcessingException;
 
 public final class ServerSessionChains {
 
@@ -14,7 +14,7 @@ public final class ServerSessionChains {
   protected abstract static class AbstractServerSessionChain extends AbstractExtensionChain<IServerSessionExtension<? extends AbstractServerSession>> {
 
     public AbstractServerSessionChain(List<? extends IServerSessionExtension<? extends AbstractServerSession>> extensions) {
-      super(extensions);
+      super(extensions, IServerSessionExtension.class);
     }
   }
 

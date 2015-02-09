@@ -21,6 +21,7 @@ import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeNodeExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.IPageWithNodesExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageWithNodesChains.PageWithNodesCreateChildPagesChain;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
@@ -37,6 +38,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.TableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.internal.TablePageTreeMenuWrapper;
+import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTreeNode;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineMediator;
@@ -395,14 +397,8 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
     }
   }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<? extends IPageWithNodesExtension<? extends AbstractPageWithNodes>> getAllExtensions() {
-    return (List<? extends IPageWithNodesExtension<? extends AbstractPageWithNodes>>) super.getAllExtensions();
-  }
-
   protected final void interceptCreateChildPages(List<IPage<?>> pageList) throws ProcessingException {
-    List<? extends IPageWithNodesExtension<? extends AbstractPageWithNodes>> extensions = getAllExtensions();
+    List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
     PageWithNodesCreateChildPagesChain chain = new PageWithNodesCreateChildPagesChain(extensions);
     chain.execCreateChildPages(pageList);
   }

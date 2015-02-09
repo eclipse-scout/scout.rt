@@ -18,7 +18,7 @@ public final class ColumnChains {
   protected abstract static class AbstractColumnChain<VALUE> extends AbstractExtensionChain<IColumnExtension<VALUE, ? extends AbstractColumn<VALUE>>> {
 
     public AbstractColumnChain(List<? extends IColumnExtension<VALUE, ? extends AbstractColumn<VALUE>>> extensions) {
-      super(extensions);
+      super(extensions, IColumnExtension.class);
     }
   }
 

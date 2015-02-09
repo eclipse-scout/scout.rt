@@ -426,7 +426,7 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
   }
 
   @Override
-  public List<? extends IWizardExtension<? extends AbstractWizard>> getAllExtensions() {
+  public final List<? extends IWizardExtension<? extends AbstractWizard>> getAllExtensions() {
     return m_objectExtensions.getAllExtensions();
   }
 

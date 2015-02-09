@@ -25,6 +25,7 @@ import org.eclipse.scout.commons.annotations.FormData.DefaultSubtypeSdkCommand;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.treefield.ITreeFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.treefield.TreeFieldChains.TreeFieldLoadChildNodesChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.treefield.TreeFieldChains.TreeFieldSaveChain;
@@ -473,38 +474,32 @@ public abstract class AbstractTreeField extends AbstractFormField implements ITr
     return new LocalTreeFieldExtension<AbstractTreeField>(this);
   }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<? extends ITreeFieldExtension<? extends AbstractTreeField>> getAllExtensions() {
-    return (List<? extends ITreeFieldExtension<? extends AbstractTreeField>>) super.getAllExtensions();
-  }
-
   protected final void interceptSave(Collection<? extends ITreeNode> insertedNodes, Collection<? extends ITreeNode> updatedNodes, Collection<? extends ITreeNode> deletedNodes) {
-    List<? extends ITreeFieldExtension<? extends AbstractTreeField>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     TreeFieldSaveChain chain = new TreeFieldSaveChain(extensions);
     chain.execSave(insertedNodes, updatedNodes, deletedNodes);
   }
 
   protected final void interceptSaveDeletedNode(ITreeNode row) throws ProcessingException {
-    List<? extends ITreeFieldExtension<? extends AbstractTreeField>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     TreeFieldSaveDeletedNodeChain chain = new TreeFieldSaveDeletedNodeChain(extensions);
     chain.execSaveDeletedNode(row);
   }
 
   protected final void interceptSaveUpdatedNode(ITreeNode row) throws ProcessingException {
-    List<? extends ITreeFieldExtension<? extends AbstractTreeField>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     TreeFieldSaveUpdatedNodeChain chain = new TreeFieldSaveUpdatedNodeChain(extensions);
     chain.execSaveUpdatedNode(row);
   }
 
   protected final void interceptLoadChildNodes(ITreeNode parentNode) throws ProcessingException {
-    List<? extends ITreeFieldExtension<? extends AbstractTreeField>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     TreeFieldLoadChildNodesChain chain = new TreeFieldLoadChildNodesChain(extensions);
     chain.execLoadChildNodes(parentNode);
   }
 
   protected final void interceptSaveInsertedNode(ITreeNode row) throws ProcessingException {
-    List<? extends ITreeFieldExtension<? extends AbstractTreeField>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     TreeFieldSaveInsertedNodeChain chain = new TreeFieldSaveInsertedNodeChain(extensions);
     chain.execSaveInsertedNode(row);
   }

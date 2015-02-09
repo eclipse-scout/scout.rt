@@ -247,7 +247,7 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
   }
 
   @Override
-  public List<? extends IDataModelAttributeExtension<? extends AbstractDataModelAttribute>> getAllExtensions() {
+  public final List<? extends IDataModelAttributeExtension<? extends AbstractDataModelAttribute>> getAllExtensions() {
     return m_objectExtensions.getAllExtensions();
   }
 
