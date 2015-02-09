@@ -60,7 +60,6 @@ import org.json.JSONObject;
 
 public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T> implements IContextMenuOwner {
 
-  private static final String ROWS = "rows";
   public static final String EVENT_ROW_CLICKED = "rowClicked";
   public static final String EVENT_ROW_ACTION = "rowAction";
   public static final String EVENT_HYPERLINK_ACTION = "hyperlinkAction";
@@ -78,6 +77,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   public static final String EVENT_COLUMN_ORDER_CHANGED = "columnOrderChanged";
   public static final String EVENT_COLUMN_HEADERS_UPDATED = "columnHeadersUpdated";
 
+  public static final String PROP_ROWS = "rows";
   public static final String PROP_ROW_IDS = "rowIds";
   public static final String PROP_ROW_ID = "rowId";
   public static final String PROP_COLUMN_ID = "columnId";
@@ -224,10 +224,13 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     putProperty(json, PROP_COLUMNS, columnsToJson(getColumns()));
     JSONArray jsonRows = new JSONArray();
     for (ITableRow row : getModel().getRows()) {
+      if (row.isStatusDeleted()) { // Ignore deleted rows, because for the UI, they don't exist
+        continue;
+      }
       JSONObject jsonRow = tableRowToJson(row);
       jsonRows.put(jsonRow);
     }
-    putProperty(json, ROWS, jsonRows);
+    putProperty(json, PROP_ROWS, jsonRows);
     JsonContextMenu<IContextMenu> jsonContextMenu = getAdapter(getModel().getContextMenu());
     if (jsonContextMenu != null) {
       JsonObjectUtility.putProperty(json, PROP_MENUS, JsonObjectUtility.adapterIdsToJson(jsonContextMenu.getJsonChildActions()));
@@ -288,22 +291,16 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   }
 
   protected void handleUiRowChecked(JsonEvent event, JsonResponse res) {
-    CheckedInfo tableRowsChecked = jsonToCheckeInfo(event.getData());
-    addTableEventFilterCondition(TableEvent.TYPE_ROWS_CHECKED).setRows(tableRowsChecked.m_allRows);
-    addTableEventFilterCondition(TableEvent.TYPE_ROWS_UPDATED).setRows(tableRowsChecked.m_allRows);
+    CheckedInfo tableRowsChecked = jsonToCheckedInfo(event.getData());
+    addTableEventFilterCondition(TableEvent.TYPE_ROWS_CHECKED).setRows(tableRowsChecked.getAllRows());
+    addTableEventFilterCondition(TableEvent.TYPE_ROWS_UPDATED).setRows(tableRowsChecked.getAllRows());
 
-    if (tableRowsChecked.m_checkedRows.size() > 0) {
-      getModel().getUIFacade().setCheckedRowsFromUI(tableRowsChecked.m_checkedRows, true);
+    if (tableRowsChecked.getCheckedRows().size() > 0) {
+      getModel().getUIFacade().setCheckedRowsFromUI(tableRowsChecked.getCheckedRows(), true);
     }
-    if (tableRowsChecked.m_uncheckedRows.size() > 0) {
-      getModel().getUIFacade().setCheckedRowsFromUI(tableRowsChecked.m_uncheckedRows, false);
+    if (tableRowsChecked.getUncheckedRows().size() > 0) {
+      getModel().getUIFacade().setCheckedRowsFromUI(tableRowsChecked.getUncheckedRows(), false);
     }
-  }
-
-  private TableEventFilterCondition addTableEventFilterCondition(int tableEventType) {
-    TableEventFilterCondition conditon = new TableEventFilterCondition(tableEventType);
-    m_tableEventFilter.addCondition(conditon);
-    return conditon;
   }
 
   protected void handleUiRowsSelected(JsonEvent event, JsonResponse res) {
@@ -438,7 +435,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     return jsonColumns;
   }
 
-  public List<IColumn<?>> getColumns() {
+  protected List<IColumn<?>> getColumns() {
     return getModel().getColumnSet().getVisibleColumns();
   }
 
@@ -515,20 +512,23 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   protected JSONArray rowIdsToJson(Collection<ITableRow> modelRows) {
     JSONArray jsonRowIds = new JSONArray();
     for (ITableRow row : modelRows) {
+      if (row.isStatusDeleted()) { // Ignore deleted rows, because for the UI, they don't exist
+        continue;
+      }
       jsonRowIds.put(getOrCreatedRowId(row));
     }
     return jsonRowIds;
   }
 
-  public List<ITableRow> extractTableRows(JSONObject json) {
+  protected List<ITableRow> extractTableRows(JSONObject json) {
     return jsonToTableRows(JsonObjectUtility.getJSONArray(json, PROP_ROW_IDS));
   }
 
-  public ITableRow extractTableRow(JSONObject json) {
+  protected ITableRow extractTableRow(JSONObject json) {
     return getTableRowForRowId(JsonObjectUtility.getString(json, PROP_ROW_ID));
   }
 
-  public IColumn extractColumn(JSONObject json) {
+  protected IColumn extractColumn(JSONObject json) {
     String columnId = JsonObjectUtility.getString(json, PROP_COLUMN_ID);
     return getModel().getColumnSet().getColumnById(columnId);
   }
@@ -547,24 +547,6 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
       rows.add(m_tableRows.get(JsonObjectUtility.get(rowIds, i)));
     }
     return rows;
-  }
-
-  protected CheckedInfo jsonToCheckeInfo(JSONObject data) {
-    JSONArray jsonRows = data.optJSONArray("rows");
-    CheckedInfo checkInfo = new CheckedInfo();
-    for (int i = 0; i < jsonRows.length(); i++) {
-      JSONObject jsonObject = jsonRows.optJSONObject(i);
-      ITableRow row = m_tableRows.get(jsonObject.optString("rowId"));
-      checkInfo.m_allRows.add(row);
-      if (jsonObject.optBoolean("checked")) {
-        checkInfo.m_checkedRows.add(row);
-      }
-      else {
-        checkInfo.m_uncheckedRows.add(row);
-      }
-    }
-    return checkInfo;
-
   }
 
   protected ITableRow getTableRowForRowId(String rowId) {
@@ -599,7 +581,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     }
     switch (event.getType()) {
       case TableEvent.TYPE_ROWS_INSERTED:
-        handleModelRowsInserted(event);
+        handleModelRowsInserted(event.getRows());
         break;
       case TableEvent.TYPE_ROWS_UPDATED:
         handleModelRowsUpdated(event.getRows());
@@ -633,24 +615,48 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     }
   }
 
-  protected void handleModelRowsInserted(TableEvent event) {
-    JSONObject jsonEvent = new JSONObject();
+  protected void handleModelRowsInserted(Collection<ITableRow> modelRows) {
     JSONArray jsonRows = new JSONArray();
-    for (ITableRow row : event.getRows()) {
+    for (ITableRow row : modelRows) {
+      if (row.isStatusDeleted()) { // Ignore deleted rows, because for the UI, they don't exist
+        continue;
+      }
       JSONObject jsonRow = tableRowToJson(row);
       jsonRows.put(jsonRow);
     }
-    putProperty(jsonEvent, ROWS, jsonRows);
+    if (jsonRows.length() == 0) {
+      return;
+    }
+    JSONObject jsonEvent = new JSONObject();
+    putProperty(jsonEvent, PROP_ROWS, jsonRows);
     addActionEvent("rowsInserted", jsonEvent);
   }
 
-  protected void handleModelRowsDeleted(Collection<ITableRow> modelRows) {
+  protected void handleModelRowsUpdated(Collection<ITableRow> modelRows) {
+    JSONArray jsonRows = new JSONArray();
+    for (ITableRow row : modelRows) {
+      if (row.isStatusDeleted()) { // Ignore deleted rows, because for the UI, they don't exist
+        continue;
+      }
+      JSONObject jsonRow = tableRowToJson(row);
+      jsonRows.put(jsonRow);
+    }
+    if (jsonRows.length() == 0) {
+      return;
+    }
     JSONObject jsonEvent = new JSONObject();
-    putProperty(jsonEvent, PROP_ROW_IDS, rowIdsToJson(modelRows));
-    JSONArray jsonRowIds = new JSONArray();
+    putProperty(jsonEvent, PROP_ROWS, jsonRows);
+    addActionEvent(EVENT_ROWS_UPDATED, jsonEvent);
+  }
+
+  protected void handleModelRowsDeleted(Collection<ITableRow> modelRows) {
+    if (modelRows.isEmpty()) {
+      return;
+    }
+    JSONObject jsonEvent = new JSONObject();
     for (ITableRow row : modelRows) {
       String rowId = m_tableRowIds.get(row);
-      jsonRowIds.put(rowId);
+      JsonObjectUtility.append(jsonEvent, PROP_ROW_IDS, rowId);
       m_tableRowIds.remove(row);
       m_tableRows.remove(rowId);
     }
@@ -658,36 +664,39 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   }
 
   protected void handleModelAllRowsDeleted(Collection<ITableRow> modelRows) {
+    if (modelRows.isEmpty()) {
+      return;
+    }
+    m_tableRows.clear();
+    m_tableRowIds.clear();
     addActionEvent(EVENT_ALL_ROWS_DELETED, new JSONObject());
   }
 
   protected void handleModelRowsSelected(Collection<ITableRow> modelRows) {
+    if (modelRows.isEmpty()) {
+      return;
+    }
     JSONObject jsonEvent = new JSONObject();
     putProperty(jsonEvent, PROP_ROW_IDS, rowIdsToJson(modelRows));
     addActionEvent(EVENT_ROWS_SELECTED, jsonEvent);
   }
 
-  protected void handleModelRowsUpdated(Collection<ITableRow> modelRows) {
-    JSONObject jsonEvent = new JSONObject();
-    JSONArray jsonRows = new JSONArray();
-    for (ITableRow row : modelRows) {
-      JSONObject jsonRow = tableRowToJson(row);
-      jsonRows.put(jsonRow);
-    }
-    putProperty(jsonEvent, ROWS, jsonRows);
-    addActionEvent(EVENT_ROWS_UPDATED, jsonEvent);
-  }
-
   protected void handleModelRowsChecked(Collection<ITableRow> modelRows) {
-    JSONObject jsonEvent = new JSONObject();
     JSONArray jsonRows = new JSONArray();
     for (ITableRow row : modelRows) {
+      if (row.isStatusDeleted()) { // Ignore deleted rows, because for the UI, they don't exist
+        continue;
+      }
       JSONObject jsonRow = new JSONObject();
       putProperty(jsonRow, "id", getOrCreatedRowId(row));
       putProperty(jsonRow, "checked", row.isChecked());
       jsonRows.put(jsonRow);
     }
-    putProperty(jsonEvent, ROWS, jsonRows);
+    if (jsonRows.length() == 0) {
+      return;
+    }
+    JSONObject jsonEvent = new JSONObject();
+    putProperty(jsonEvent, PROP_ROWS, jsonRows);
     addActionEvent(EVENT_ROWS_CHECKED, jsonEvent);
   }
 
@@ -696,8 +705,14 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     putProperty(jsonEvent, PROP_ROW_IDS, rowIdsToJson(modelRows));
     JSONArray jsonRowIds = new JSONArray();
     for (ITableRow row : modelRows) {
+      if (row.isStatusDeleted()) { // Ignore deleted rows, because for the UI, they don't exist
+        continue;
+      }
       String rowId = m_tableRowIds.get(row);
       jsonRowIds.put(rowId);
+    }
+    if (jsonRowIds.length() == 0) {
+      return;
     }
     addActionEvent("rowOrderChanged", jsonEvent);
   }
@@ -723,7 +738,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     }
   }
 
-  protected static Collection<IColumn<?>> filterVisibleColumns(Collection<IColumn<?>> columns) {
+  protected Collection<IColumn<?>> filterVisibleColumns(Collection<IColumn<?>> columns) {
     List<IColumn<?>> visibleColumns = new LinkedList<IColumn<?>>();
     for (IColumn<?> column : columns) {
       if (column.isVisible()) {
@@ -738,6 +753,57 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     addPropertyChangeEvent(PROP_MENUS, JsonObjectUtility.adapterIdsToJson(menuAdapters));
   }
 
+  protected final TableEventFilter getTableEventFilter() {
+    return m_tableEventFilter;
+  }
+
+  protected TableEventFilterCondition addTableEventFilterCondition(int tableEventType) {
+    TableEventFilterCondition conditon = new TableEventFilterCondition(tableEventType);
+    m_tableEventFilter.addCondition(conditon);
+    return conditon;
+  }
+
+  @Override
+  public void cleanUpEventFilters() {
+    super.cleanUpEventFilters();
+    m_tableEventFilter.removeAllConditions();
+  }
+
+  protected CheckedInfo jsonToCheckedInfo(JSONObject data) {
+    JSONArray jsonRows = data.optJSONArray("rows");
+    CheckedInfo checkInfo = new CheckedInfo();
+    for (int i = 0; i < jsonRows.length(); i++) {
+      JSONObject jsonObject = jsonRows.optJSONObject(i);
+      ITableRow row = m_tableRows.get(jsonObject.optString("rowId"));
+      checkInfo.getAllRows().add(row);
+      if (jsonObject.optBoolean("checked")) {
+        checkInfo.getCheckedRows().add(row);
+      }
+      else {
+        checkInfo.getUncheckedRows().add(row);
+      }
+    }
+    return checkInfo;
+  }
+
+  protected static class CheckedInfo {
+    private final List<ITableRow> m_allRows = new ArrayList<ITableRow>();
+    private final List<ITableRow> m_checkedRows = new ArrayList<ITableRow>();
+    private final List<ITableRow> m_uncheckedRows = new ArrayList<ITableRow>();
+
+    public List<ITableRow> getAllRows() {
+      return m_allRows;
+    }
+
+    public List<ITableRow> getCheckedRows() {
+      return m_checkedRows;
+    }
+
+    public List<ITableRow> getUncheckedRows() {
+      return m_uncheckedRows;
+    }
+  }
+
   private class P_TableListener implements TableListener {
     @Override
     public void tableChanged(final TableEvent e) {
@@ -748,18 +814,6 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     public void tableChangedBatch(List<? extends TableEvent> events) {
       handleModelTableEventBatch(events);
     }
-  }
-
-  private class CheckedInfo {
-    private ArrayList<ITableRow> m_allRows = new ArrayList<ITableRow>();
-    private ArrayList<ITableRow> m_checkedRows = new ArrayList<ITableRow>();
-    private ArrayList<ITableRow> m_uncheckedRows = new ArrayList<ITableRow>();
-  }
-
-  @Override
-  public void cleanUpEventFilters() {
-    super.cleanUpEventFilters();
-    m_tableEventFilter.removeAllConditions();
   }
 
 }

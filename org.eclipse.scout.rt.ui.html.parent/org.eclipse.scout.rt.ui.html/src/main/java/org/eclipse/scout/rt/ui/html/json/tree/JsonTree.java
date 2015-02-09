@@ -485,7 +485,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     getModel().getUIFacade().setNodeExpandedFromUI(node, expanded);
   }
 
-  protected TreeEventFilter getTreeEventFilter() {
+  protected final TreeEventFilter getTreeEventFilter() {
     return m_treeEventFilter;
   }
 
