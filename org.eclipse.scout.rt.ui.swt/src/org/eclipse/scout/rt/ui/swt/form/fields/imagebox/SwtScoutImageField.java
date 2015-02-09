@@ -141,8 +141,34 @@ public class SwtScoutImageField extends SwtScoutFieldComposite<IImageField> impl
 
     m_contextMenu = new SwtScoutContextMenu(getImageViewer().getShell(), getScoutObject().getContextMenu(), getEnvironment());
     getImageViewer().setMenu(m_contextMenu.getSwtMenu());
+
     // correction of menu position
-    getImageViewer().addListener(SWT.MenuDetect, new MenuPositionCorrectionListener(getImageViewer(), MenuPositionCorrectionListener.HORIZONTAL_CENTER | MenuPositionCorrectionListener.VERTICAL_CENTER));
+    int hAlign;
+    switch (getImageViewer().getAlignmentX()) {
+      case SWT.LEFT:
+        hAlign = MenuPositionCorrectionListener.HORIZONTAL_LEFT;
+        break;
+      case SWT.RIGHT:
+        hAlign = MenuPositionCorrectionListener.HORIZONTAL_RIGHT;
+        break;
+      default:
+        hAlign = MenuPositionCorrectionListener.HORIZONTAL_CENTER;
+        break;
+    }
+
+    int vAlign;
+    switch (getImageViewer().getAlignmentY()) {
+      case SWT.TOP:
+        vAlign = MenuPositionCorrectionListener.VERTICAL_TOP;
+        break;
+      case SWT.BOTTOM:
+        vAlign = MenuPositionCorrectionListener.VERTICAL_BOTTOM;
+        break;
+      default:
+        vAlign = MenuPositionCorrectionListener.VERTICAL_CENTER;
+        break;
+    }
+    getImageViewer().addListener(SWT.MenuDetect, new MenuPositionCorrectionListener(getImageViewer(), hAlign | vAlign));
   }
 
   protected void uninstallContextMenu() {
