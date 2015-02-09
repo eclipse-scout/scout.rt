@@ -7,8 +7,9 @@ scout.KeystrokeManager = function() {
   // FIXME BSH Keystroke | Alt-Key is a bad choice on IE, see http://superuser.com/questions/470064/is-it-possible-to-disable-the-alt-key-as-it-is-used-for-default-windows-things
   $(document).keydown(function(event) {
     if (event.which === scout.keys.ALT) {
-      removeKeyBox();
-      drawKeyBox();
+    // FIXME BSH Keystrokes | Re-enable later
+//      removeKeyBox();
+//      drawKeyBox();
     }
   });
 
