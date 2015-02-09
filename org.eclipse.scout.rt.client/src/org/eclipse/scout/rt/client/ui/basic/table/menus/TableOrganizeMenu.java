@@ -39,11 +39,6 @@ public class TableOrganizeMenu extends OrganizeColumnsMenu {
     return null;
   }
 
-  @Override
-  protected final void execAction() {
-    // since this is a UI-only widget the server does nothing here
-  }
-
   /**
    * Whether or not development menus must be displayed (copy columns width).
    *
