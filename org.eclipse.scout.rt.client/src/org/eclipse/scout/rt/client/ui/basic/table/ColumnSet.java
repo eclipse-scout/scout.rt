@@ -840,7 +840,12 @@ public class ColumnSet {
 
   public void removeSortColumn(IColumn<?> col) {
     col = resolveColumn(col);
-    if (col != null) {
+    if (col == null) {
+      return;
+    }
+
+    m_table.setTableChanging(true);
+    try {
       m_userSortColumns.remove(col);
       if (!isSortColumn(col)) {
         HeaderCell cell = (HeaderCell) col.getHeaderCell();
@@ -849,6 +854,9 @@ public class ColumnSet {
         rebuildHeaderCell(col);
         fireColumnHeadersUpdated(CollectionUtility.hashSet(col));
       }
+    }
+    finally {
+      m_table.setTableChanging(false);
     }
   }
 
