@@ -3,6 +3,8 @@ package org.eclipse.scout.rt.client.extension.ui.form.fields.listbox;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
+import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.listbox.AbstractListBox;
 import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
@@ -15,14 +17,14 @@ public final class ListBoxChains {
 
   protected abstract static class AbstractListBoxChain<KEY> extends AbstractExtensionChain<IListBoxExtension<KEY, ? extends AbstractListBox<KEY>>> {
 
-    public AbstractListBoxChain(List<? extends IListBoxExtension<KEY, ? extends AbstractListBox<KEY>>> extensions) {
-      super(extensions);
+    public AbstractListBoxChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
+      super(extensions, IListBoxExtension.class);
     }
   }
 
   public static class ListBoxPopulateTableChain<KEY> extends AbstractListBoxChain<KEY> {
 
-    public ListBoxPopulateTableChain(List<? extends IListBoxExtension<KEY, ? extends AbstractListBox<KEY>>> extensions) {
+    public ListBoxPopulateTableChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
@@ -43,7 +45,7 @@ public final class ListBoxChains {
 
   public static class ListBoxLoadTableDataChain<KEY> extends AbstractListBoxChain<KEY> {
 
-    public ListBoxLoadTableDataChain(List<? extends IListBoxExtension<KEY, ? extends AbstractListBox<KEY>>> extensions) {
+    public ListBoxLoadTableDataChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
@@ -64,7 +66,7 @@ public final class ListBoxChains {
 
   public static class ListBoxFilterLookupResultChain<KEY> extends AbstractListBoxChain<KEY> {
 
-    public ListBoxFilterLookupResultChain(List<? extends IListBoxExtension<KEY, ? extends AbstractListBox<KEY>>> extensions) {
+    public ListBoxFilterLookupResultChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
@@ -85,7 +87,7 @@ public final class ListBoxChains {
 
   public static class ListBoxPrepareLookupChain<KEY> extends AbstractListBoxChain<KEY> {
 
-    public ListBoxPrepareLookupChain(List<? extends IListBoxExtension<KEY, ? extends AbstractListBox<KEY>>> extensions) {
+    public ListBoxPrepareLookupChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 

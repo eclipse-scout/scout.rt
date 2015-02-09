@@ -3,6 +3,8 @@ package org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeNodeExtension;
+import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPage;
 import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
 
@@ -13,14 +15,14 @@ public final class PageChains {
 
   protected abstract static class AbstractPageChain extends AbstractExtensionChain<IPageExtension<? extends AbstractPage>> {
 
-    public AbstractPageChain(List<? extends IPageExtension<? extends AbstractPage>> extensions) {
-      super(extensions);
+    public AbstractPageChain(List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions) {
+      super(extensions, IPageExtension.class);
     }
   }
 
   public static class PagePageDataLoadedChain extends AbstractPageChain {
 
-    public PagePageDataLoadedChain(List<? extends IPageExtension<? extends AbstractPage>> extensions) {
+    public PagePageDataLoadedChain(List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions) {
       super(extensions);
     }
 
@@ -41,7 +43,7 @@ public final class PageChains {
 
   public static class PagePageActivatedChain extends AbstractPageChain {
 
-    public PagePageActivatedChain(List<? extends IPageExtension<? extends AbstractPage>> extensions) {
+    public PagePageActivatedChain(List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions) {
       super(extensions);
     }
 
@@ -62,7 +64,7 @@ public final class PageChains {
 
   public static class PageDataChangedChain extends AbstractPageChain {
 
-    public PageDataChangedChain(List<? extends IPageExtension<? extends AbstractPage>> extensions) {
+    public PageDataChangedChain(List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions) {
       super(extensions);
     }
 
@@ -83,7 +85,7 @@ public final class PageChains {
 
   public static class PageInitPageChain extends AbstractPageChain {
 
-    public PageInitPageChain(List<? extends IPageExtension<? extends AbstractPage>> extensions) {
+    public PageInitPageChain(List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions) {
       super(extensions);
     }
 
@@ -104,7 +106,7 @@ public final class PageChains {
 
   public static class PagePageDeactivatedChain extends AbstractPageChain {
 
-    public PagePageDeactivatedChain(List<? extends IPageExtension<? extends AbstractPage>> extensions) {
+    public PagePageDeactivatedChain(List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions) {
       super(extensions);
     }
 
@@ -125,7 +127,7 @@ public final class PageChains {
 
   public static class PageDisposePageChain extends AbstractPageChain {
 
-    public PageDisposePageChain(List<? extends IPageExtension<? extends AbstractPage>> extensions) {
+    public PageDisposePageChain(List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions) {
       super(extensions);
     }
 

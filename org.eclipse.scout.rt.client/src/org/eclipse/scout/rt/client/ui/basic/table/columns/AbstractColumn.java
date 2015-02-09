@@ -697,7 +697,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
   }
 
   @Override
-  public List<? extends IColumnExtension<VALUE, ? extends AbstractColumn<VALUE>>> getAllExtensions() {
+  public final List<? extends IColumnExtension<VALUE, ? extends AbstractColumn<VALUE>>> getAllExtensions() {
     return m_objectExtensions.getAllExtensions();
   }
 

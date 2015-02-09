@@ -25,6 +25,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.button.ButtonChains.ButtonClickActionChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.button.ButtonChains.ButtonSelectionChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.button.IButtonExtension;
@@ -461,20 +462,14 @@ public abstract class AbstractButton extends AbstractFormField implements IButto
     }
   }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<? extends IButtonExtension<? extends AbstractButton>> getAllExtensions() {
-    return (List<? extends IButtonExtension<? extends AbstractButton>>) super.getAllExtensions();
-  }
-
   protected final void interceptSelectionChanged(boolean selection) throws ProcessingException {
-    List<? extends IButtonExtension<? extends AbstractButton>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     ButtonSelectionChangedChain chain = new ButtonSelectionChangedChain(extensions);
     chain.execSelectionChanged(selection);
   }
 
   protected final void interceptClickAction() throws ProcessingException {
-    List<? extends IButtonExtension<? extends AbstractButton>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     ButtonClickActionChain chain = new ButtonClickActionChain(extensions);
     chain.execClickAction();
   }

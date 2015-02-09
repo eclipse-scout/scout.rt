@@ -32,7 +32,7 @@ public final class DesktopChains {
   protected abstract static class AbstractDesktopChain extends AbstractExtensionChain<org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> {
 
     public AbstractDesktopChain(List<? extends org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension<? extends AbstractDesktop>> extensions) {
-      super(extensions);
+      super(extensions, IDesktopExtension.class);
     }
   }
 

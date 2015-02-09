@@ -21,9 +21,11 @@ import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.mailfield.IMailFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.mailfield.MailFieldChains.MailFieldAttachementActionChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.mailfield.MailFieldChains.MailFieldHyperlinkActionChain;
+import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
@@ -243,20 +245,14 @@ public abstract class AbstractMailField extends AbstractValueField<MimeMessage> 
 
   }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<? extends IMailFieldExtension<? extends AbstractMailField>> getAllExtensions() {
-    return (List<? extends IMailFieldExtension<? extends AbstractMailField>>) super.getAllExtensions();
-  }
-
   protected final void interceptHyperlinkAction(URL url, String path, boolean local) throws ProcessingException {
-    List<? extends IMailFieldExtension<? extends AbstractMailField>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     MailFieldHyperlinkActionChain chain = new MailFieldHyperlinkActionChain(extensions);
     chain.execHyperlinkAction(url, path, local);
   }
 
   protected final void interceptAttachementAction(File file) throws ProcessingException {
-    List<? extends IMailFieldExtension<? extends AbstractMailField>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     MailFieldAttachementActionChain chain = new MailFieldAttachementActionChain(extensions);
     chain.execAttachementAction(file);
   }

@@ -3,8 +3,10 @@ package org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeNodeExtension;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithTable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
@@ -17,14 +19,14 @@ public final class PageWithTableChains {
 
   protected abstract static class AbstractPageWithTableChain<T extends ITable> extends AbstractExtensionChain<IPageWithTableExtension<? extends ITable, ? extends AbstractPageWithTable<? extends ITable>>> {
 
-    public AbstractPageWithTableChain(List<? extends IPageWithTableExtension<T, ? extends AbstractPageWithTable<? extends ITable>>> extensions) {
-      super(extensions);
+    public AbstractPageWithTableChain(List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions) {
+      super(extensions, IPageWithTableExtension.class);
     }
   }
 
   public static class PageWithTableLoadDataChain<T extends ITable> extends AbstractPageWithTableChain<T> {
 
-    public PageWithTableLoadDataChain(List<? extends IPageWithTableExtension<T, ? extends AbstractPageWithTable<? extends ITable>>> extensions) {
+    public PageWithTableLoadDataChain(List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions) {
       super(extensions);
     }
 
@@ -45,7 +47,7 @@ public final class PageWithTableChains {
 
   public static class PageWithTableCreateChildPageChain<T extends ITable> extends AbstractPageWithTableChain<T> {
 
-    public PageWithTableCreateChildPageChain(List<? extends IPageWithTableExtension<T, ? extends AbstractPageWithTable<? extends ITable>>> extensions) {
+    public PageWithTableCreateChildPageChain(List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions) {
       super(extensions);
     }
 
@@ -66,7 +68,7 @@ public final class PageWithTableChains {
 
   public static class PageWithTablePopulateTableChain<T extends ITable> extends AbstractPageWithTableChain<T> {
 
-    public PageWithTablePopulateTableChain(List<? extends IPageWithTableExtension<T, ? extends AbstractPageWithTable<? extends ITable>>> extensions) {
+    public PageWithTablePopulateTableChain(List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions) {
       super(extensions);
     }
 
@@ -87,7 +89,7 @@ public final class PageWithTableChains {
 
   public static class PageWithTableCreateVirtualChildPageChain<T extends ITable> extends AbstractPageWithTableChain<T> {
 
-    public PageWithTableCreateVirtualChildPageChain(List<? extends IPageWithTableExtension<T, ? extends AbstractPageWithTable<? extends ITable>>> extensions) {
+    public PageWithTableCreateVirtualChildPageChain(List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions) {
       super(extensions);
     }
 
@@ -108,7 +110,7 @@ public final class PageWithTableChains {
 
   public static class PageWithTableInitSearchFormChain<T extends ITable> extends AbstractPageWithTableChain<T> {
 
-    public PageWithTableInitSearchFormChain(List<? extends IPageWithTableExtension<T, ? extends AbstractPageWithTable<? extends ITable>>> extensions) {
+    public PageWithTableInitSearchFormChain(List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions) {
       super(extensions);
     }
 

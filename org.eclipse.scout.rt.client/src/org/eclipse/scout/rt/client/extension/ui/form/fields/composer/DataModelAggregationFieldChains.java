@@ -3,6 +3,8 @@ package org.eclipse.scout.rt.client.extension.ui.form.fields.composer;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
+import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.AbstractDataModelAggregationField;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
 import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
@@ -14,14 +16,14 @@ public final class DataModelAggregationFieldChains {
 
   protected abstract static class AbstractDataModelAggregationFieldChain extends AbstractExtensionChain<IDataModelAggregationFieldExtension<? extends AbstractDataModelAggregationField>> {
 
-    public AbstractDataModelAggregationFieldChain(List<? extends IDataModelAggregationFieldExtension<? extends AbstractDataModelAggregationField>> extensions) {
-      super(extensions);
+    public AbstractDataModelAggregationFieldChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
+      super(extensions, IDataModelAggregationFieldExtension.class);
     }
   }
 
   public static class DataModelAggregationFieldAttributeChangedChain extends AbstractDataModelAggregationFieldChain {
 
-    public DataModelAggregationFieldAttributeChangedChain(List<? extends IDataModelAggregationFieldExtension<? extends AbstractDataModelAggregationField>> extensions) {
+    public DataModelAggregationFieldAttributeChangedChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 

@@ -17,8 +17,10 @@ import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.composer.DataModelAggregationFieldChains.DataModelAggregationFieldAttributeChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.composer.IDataModelAggregationFieldExtension;
+import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.data.model.DataModelConstants;
@@ -116,14 +118,8 @@ public abstract class AbstractDataModelAggregationField extends AbstractSmartFie
     setValue(newAg);
   }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<? extends IDataModelAggregationFieldExtension<? extends AbstractDataModelAggregationField>> getAllExtensions() {
-    return (List<? extends IDataModelAggregationFieldExtension<? extends AbstractDataModelAggregationField>>) super.getAllExtensions();
-  }
-
   protected final void interceptAttributeChanged(IDataModelAttribute attribute) throws ProcessingException {
-    List<? extends IDataModelAggregationFieldExtension<? extends AbstractDataModelAggregationField>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     DataModelAggregationFieldAttributeChangedChain chain = new DataModelAggregationFieldAttributeChangedChain(extensions);
     chain.execAttributeChanged(attribute);
   }

@@ -17,7 +17,7 @@ public final class WizardChains {
   protected abstract static class AbstractWizardChain extends AbstractExtensionChain<IWizardExtension<? extends AbstractWizard>> {
 
     public AbstractWizardChain(List<? extends IWizardExtension<? extends AbstractWizard>> extensions) {
-      super(extensions);
+      super(extensions, IWizardExtension.class);
     }
   }
 

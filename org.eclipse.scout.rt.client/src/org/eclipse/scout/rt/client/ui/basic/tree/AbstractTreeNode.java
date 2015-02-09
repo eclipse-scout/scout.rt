@@ -220,7 +220,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   }
 
   @Override
-  public List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> getAllExtensions() {
+  public final List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> getAllExtensions() {
     return m_objectExtensions.getAllExtensions();
   }
 

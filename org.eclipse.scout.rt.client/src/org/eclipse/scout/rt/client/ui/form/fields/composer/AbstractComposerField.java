@@ -31,6 +31,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.xmlparser.SimpleXmlElement;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.composer.ComposerFieldChains.ComposerFieldCreateAdditionalOrNodeChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.composer.ComposerFieldChains.ComposerFieldCreateAttributeNodeChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.composer.ComposerFieldChains.ComposerFieldCreateDataModelChain;
@@ -872,68 +873,62 @@ public abstract class AbstractComposerField extends AbstractFormField implements
     }
   }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<? extends IComposerFieldExtension<? extends AbstractComposerField>> getAllExtensions() {
-    return (List<? extends IComposerFieldExtension<? extends AbstractComposerField>>) super.getAllExtensions();
-  }
-
   protected final EntityPath interceptResolveEntityPath(EntityNode node) {
-    List<? extends IComposerFieldExtension<? extends AbstractComposerField>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     ComposerFieldResolveEntityPathChain chain = new ComposerFieldResolveEntityPathChain(extensions);
     return chain.execResolveEntityPath(node);
   }
 
   protected final void interceptResolveRootPathForTopLevelEntity(IDataModelEntity e, List<IDataModelEntity> lifeList) {
-    List<? extends IComposerFieldExtension<? extends AbstractComposerField>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     ComposerFieldResolveRootPathForTopLevelEntityChain chain = new ComposerFieldResolveRootPathForTopLevelEntityChain(extensions);
     chain.execResolveRootPathForTopLevelEntity(e, lifeList);
   }
 
   protected final RootNode interceptCreateRootNode() {
-    List<? extends IComposerFieldExtension<? extends AbstractComposerField>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     ComposerFieldCreateRootNodeChain chain = new ComposerFieldCreateRootNodeChain(extensions);
     return chain.execCreateRootNode();
   }
 
   protected final AttributePath interceptResolveAttributePath(AttributeNode node) {
-    List<? extends IComposerFieldExtension<? extends AbstractComposerField>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     ComposerFieldResolveAttributePathChain chain = new ComposerFieldResolveAttributePathChain(extensions);
     return chain.execResolveAttributePath(node);
   }
 
   protected final AttributeNode interceptCreateAttributeNode(ITreeNode parentNode, IDataModelAttribute a, Integer aggregationType, IDataModelAttributeOp op, List<? extends Object> values, List<String> texts) {
-    List<? extends IComposerFieldExtension<? extends AbstractComposerField>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     ComposerFieldCreateAttributeNodeChain chain = new ComposerFieldCreateAttributeNodeChain(extensions);
     return chain.execCreateAttributeNode(parentNode, a, aggregationType, op, values, texts);
   }
 
   protected final IDataModel interceptCreateDataModel() {
-    List<? extends IComposerFieldExtension<? extends AbstractComposerField>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     ComposerFieldCreateDataModelChain chain = new ComposerFieldCreateDataModelChain(extensions);
     return chain.execCreateDataModel();
   }
 
   protected final EitherOrNode interceptCreateEitherNode(ITreeNode parentNode, boolean negated) {
-    List<? extends IComposerFieldExtension<? extends AbstractComposerField>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     ComposerFieldCreateEitherNodeChain chain = new ComposerFieldCreateEitherNodeChain(extensions);
     return chain.execCreateEitherNode(parentNode, negated);
   }
 
   protected final void interceptResolveRootPathForTopLevelAttribute(IDataModelAttribute a, List<IDataModelEntity> lifeList) {
-    List<? extends IComposerFieldExtension<? extends AbstractComposerField>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     ComposerFieldResolveRootPathForTopLevelAttributeChain chain = new ComposerFieldResolveRootPathForTopLevelAttributeChain(extensions);
     chain.execResolveRootPathForTopLevelAttribute(a, lifeList);
   }
 
   protected final EitherOrNode interceptCreateAdditionalOrNode(ITreeNode eitherOrNode, boolean negated) {
-    List<? extends IComposerFieldExtension<? extends AbstractComposerField>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     ComposerFieldCreateAdditionalOrNodeChain chain = new ComposerFieldCreateAdditionalOrNodeChain(extensions);
     return chain.execCreateAdditionalOrNode(eitherOrNode, negated);
   }
 
   protected final EntityNode interceptCreateEntityNode(ITreeNode parentNode, IDataModelEntity e, boolean negated, List<? extends Object> values, List<String> texts) {
-    List<? extends IComposerFieldExtension<? extends AbstractComposerField>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     ComposerFieldCreateEntityNodeChain chain = new ComposerFieldCreateEntityNodeChain(extensions);
     return chain.execCreateEntityNode(parentNode, e, negated, values, texts);
   }

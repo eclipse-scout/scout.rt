@@ -14,7 +14,7 @@ public final class ActionChains {
   protected abstract static class AbstractActionChain extends AbstractExtensionChain<IActionExtension<? extends AbstractAction>> {
 
     public AbstractActionChain(List<? extends IActionExtension<? extends AbstractAction>> extensions) {
-      super(extensions);
+      super(extensions, IActionExtension.class);
     }
   }
 

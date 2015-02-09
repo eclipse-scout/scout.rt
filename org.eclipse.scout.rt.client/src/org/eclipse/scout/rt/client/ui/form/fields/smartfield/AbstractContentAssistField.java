@@ -35,6 +35,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.ContentAssistFieldChains.ContentAssistFieldBrowseNewChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.ContentAssistFieldChains.ContentAssistFieldFilterBrowseLookupResultChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.ContentAssistFieldChains.ContentAssistFieldFilterKeyLookupResultChain;
@@ -52,6 +53,7 @@ import org.eclipse.scout.rt.client.services.lookup.ILookupCallProvisioningServic
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.FormEvent;
 import org.eclipse.scout.rt.client.ui.form.FormListener;
+import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.ScoutTexts;
@@ -1335,76 +1337,69 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
     return new LocalContentAssistFieldExtension<VALUE, LOOKUP_KEY, AbstractContentAssistField<VALUE, LOOKUP_KEY>>(this);
   }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<? extends IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>>> getAllExtensions() {
-    return (List<? extends IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>>>) super.getAllExtensions();
-  }
-
   protected final void interceptFilterBrowseLookupResult(ILookupCall<LOOKUP_KEY> call, List<ILookupRow<LOOKUP_KEY>> result) throws ProcessingException {
-    List<? extends IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     ContentAssistFieldFilterBrowseLookupResultChain<VALUE, LOOKUP_KEY> chain = new ContentAssistFieldFilterBrowseLookupResultChain<VALUE, LOOKUP_KEY>(extensions);
     chain.execFilterBrowseLookupResult(call, result);
   }
 
   protected final ILookupRow<LOOKUP_KEY> interceptBrowseNew(String searchText) throws ProcessingException {
-    List<? extends IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     ContentAssistFieldBrowseNewChain<VALUE, LOOKUP_KEY> chain = new ContentAssistFieldBrowseNewChain<VALUE, LOOKUP_KEY>(extensions);
     return chain.execBrowseNew(searchText);
   }
 
   protected final void interceptFilterKeyLookupResult(ILookupCall<LOOKUP_KEY> call, List<ILookupRow<LOOKUP_KEY>> result) throws ProcessingException {
-    List<? extends IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     ContentAssistFieldFilterKeyLookupResultChain<VALUE, LOOKUP_KEY> chain = new ContentAssistFieldFilterKeyLookupResultChain<VALUE, LOOKUP_KEY>(extensions);
     chain.execFilterKeyLookupResult(call, result);
   }
 
   protected final void interceptPrepareLookup(ILookupCall<LOOKUP_KEY> call) throws ProcessingException {
-    List<? extends IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     ContentAssistFieldPrepareLookupChain<VALUE, LOOKUP_KEY> chain = new ContentAssistFieldPrepareLookupChain<VALUE, LOOKUP_KEY>(extensions);
     chain.execPrepareLookup(call);
   }
 
   protected final void interceptPrepareTextLookup(ILookupCall<LOOKUP_KEY> call, String text) throws ProcessingException {
-    List<? extends IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     ContentAssistFieldPrepareTextLookupChain<VALUE, LOOKUP_KEY> chain = new ContentAssistFieldPrepareTextLookupChain<VALUE, LOOKUP_KEY>(extensions);
     chain.execPrepareTextLookup(call, text);
   }
 
   protected final void interceptPrepareBrowseLookup(ILookupCall<LOOKUP_KEY> call, String browseHint) throws ProcessingException {
-    List<? extends IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     ContentAssistFieldPrepareBrowseLookupChain<VALUE, LOOKUP_KEY> chain = new ContentAssistFieldPrepareBrowseLookupChain<VALUE, LOOKUP_KEY>(extensions);
     chain.execPrepareBrowseLookup(call, browseHint);
   }
 
   protected final void interceptFilterTextLookupResult(ILookupCall<LOOKUP_KEY> call, List<ILookupRow<LOOKUP_KEY>> result) throws ProcessingException {
-    List<? extends IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     ContentAssistFieldFilterTextLookupResultChain<VALUE, LOOKUP_KEY> chain = new ContentAssistFieldFilterTextLookupResultChain<VALUE, LOOKUP_KEY>(extensions);
     chain.execFilterTextLookupResult(call, result);
   }
 
   protected final void interceptPrepareRecLookup(ILookupCall<LOOKUP_KEY> call, LOOKUP_KEY parentKey) throws ProcessingException {
-    List<? extends IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     ContentAssistFieldPrepareRecLookupChain<VALUE, LOOKUP_KEY> chain = new ContentAssistFieldPrepareRecLookupChain<VALUE, LOOKUP_KEY>(extensions);
     chain.execPrepareRecLookup(call, parentKey);
   }
 
   protected final void interceptFilterLookupResult(ILookupCall<LOOKUP_KEY> call, List<ILookupRow<LOOKUP_KEY>> result) throws ProcessingException {
-    List<? extends IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     ContentAssistFieldFilterLookupResultChain<VALUE, LOOKUP_KEY> chain = new ContentAssistFieldFilterLookupResultChain<VALUE, LOOKUP_KEY>(extensions);
     chain.execFilterLookupResult(call, result);
   }
 
   protected final void interceptFilterRecLookupResult(ILookupCall<LOOKUP_KEY> call, List<ILookupRow<LOOKUP_KEY>> result) throws ProcessingException {
-    List<? extends IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     ContentAssistFieldFilterRecLookupResultChain<VALUE, LOOKUP_KEY> chain = new ContentAssistFieldFilterRecLookupResultChain<VALUE, LOOKUP_KEY>(extensions);
     chain.execFilterRecLookupResult(call, result);
   }
 
   protected final void interceptPrepareKeyLookup(ILookupCall<LOOKUP_KEY> call, LOOKUP_KEY key) throws ProcessingException {
-    List<? extends IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     ContentAssistFieldPrepareKeyLookupChain<VALUE, LOOKUP_KEY> chain = new ContentAssistFieldPrepareKeyLookupChain<VALUE, LOOKUP_KEY>(extensions);
     chain.execPrepareKeyLookup(call, key);
   }
-
 }

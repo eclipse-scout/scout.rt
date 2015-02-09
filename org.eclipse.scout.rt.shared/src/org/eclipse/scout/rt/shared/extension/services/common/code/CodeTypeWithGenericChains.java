@@ -27,16 +27,16 @@ public final class CodeTypeWithGenericChains {
   }
 
   protected abstract static class AbstractCodeTypeWithGenericChain<CODE_TYPE_ID, CODE_ID, CODE extends ICode<CODE_ID>>
-  extends AbstractExtensionChain<ICodeTypeExtension<CODE_TYPE_ID, CODE_ID, ? extends AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, ? extends ICode<CODE_ID>>>> {
+      extends AbstractExtensionChain<ICodeTypeExtension<CODE_TYPE_ID, CODE_ID, ? extends AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, ? extends ICode<CODE_ID>>>> {
 
     public AbstractCodeTypeWithGenericChain(List<? extends ICodeTypeExtension<CODE_TYPE_ID, CODE_ID, ? extends AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, ? extends ICode<CODE_ID>>>> extensions) {
-      super(extensions);
+      super(extensions, ICodeTypeExtension.class);
     }
   }
 
   /**
    * chain for extending {@link AbstractCodeTypeWithGeneric#execCreateCodes}
-   * 
+   *
    * @param <CODE_TYPE_ID>
    * @param <CODE_ID>
    * @param <CODE>
@@ -94,7 +94,7 @@ public final class CodeTypeWithGenericChains {
 
   /**
    * chain for extending {@link AbstractCodeTypeWithGeneric#execLoadCodes()}
-   * 
+   *
    * @param <CODE_TYPE_ID>
    * @param <CODE_ID>
    * @param <CODE>
@@ -122,7 +122,7 @@ public final class CodeTypeWithGenericChains {
 
   /**
    * chain for extending {@link AbstractCodeTypeWithGeneric#execOverwriteCode()}
-   * 
+   *
    * @param <CODE_TYPE_ID>
    * @param <CODE_ID>
    * @param <CODE>

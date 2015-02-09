@@ -35,6 +35,7 @@ import org.eclipse.scout.commons.exception.ProcessingStatus;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.xmlparser.SimpleXmlElement;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.tablefield.ITableFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.tablefield.TableFieldChains.TableFieldReloadTableDataChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.tablefield.TableFieldChains.TableFieldSaveChain;
@@ -769,44 +770,38 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
     return new LocalTableFieldExtension<T, AbstractTableField<T>>(this);
   }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<? extends ITableFieldExtension<T, ? extends AbstractTableField<? extends ITable>>> getAllExtensions() {
-    return (List<? extends ITableFieldExtension<T, ? extends AbstractTableField<? extends ITable>>>) super.getAllExtensions();
-  }
-
   protected final void interceptReloadTableData() throws ProcessingException {
-    List<? extends ITableFieldExtension<T, ? extends AbstractTableField<? extends ITable>>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     TableFieldReloadTableDataChain<T> chain = new TableFieldReloadTableDataChain<T>(extensions);
     chain.execReloadTableData();
   }
 
   protected final void interceptUpdateTableStatus() {
-    List<? extends ITableFieldExtension<T, ? extends AbstractTableField<? extends ITable>>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     TableFieldUpdateTableStatusChain<T> chain = new TableFieldUpdateTableStatusChain<T>(extensions);
     chain.execUpdateTableStatus();
   }
 
   protected final void interceptSaveInsertedRow(ITableRow row) throws ProcessingException {
-    List<? extends ITableFieldExtension<T, ? extends AbstractTableField<? extends ITable>>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     TableFieldSaveInsertedRowChain<T> chain = new TableFieldSaveInsertedRowChain<T>(extensions);
     chain.execSaveInsertedRow(row);
   }
 
   protected final void interceptSaveUpdatedRow(ITableRow row) throws ProcessingException {
-    List<? extends ITableFieldExtension<T, ? extends AbstractTableField<? extends ITable>>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     TableFieldSaveUpdatedRowChain<T> chain = new TableFieldSaveUpdatedRowChain<T>(extensions);
     chain.execSaveUpdatedRow(row);
   }
 
   protected final void interceptSaveDeletedRow(ITableRow row) throws ProcessingException {
-    List<? extends ITableFieldExtension<T, ? extends AbstractTableField<? extends ITable>>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     TableFieldSaveDeletedRowChain<T> chain = new TableFieldSaveDeletedRowChain<T>(extensions);
     chain.execSaveDeletedRow(row);
   }
 
   protected final void interceptSave(List<? extends ITableRow> insertedRows, List<? extends ITableRow> updatedRows, List<? extends ITableRow> deletedRows) {
-    List<? extends ITableFieldExtension<T, ? extends AbstractTableField<? extends ITable>>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     TableFieldSaveChain<T> chain = new TableFieldSaveChain<T>(extensions);
     chain.execSave(insertedRows, updatedRows, deletedRows);
   }

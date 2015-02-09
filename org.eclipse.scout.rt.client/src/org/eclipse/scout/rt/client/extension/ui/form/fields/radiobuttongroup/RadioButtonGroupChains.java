@@ -3,6 +3,8 @@ package org.eclipse.scout.rt.client.extension.ui.form.fields.radiobuttongroup;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
+import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.AbstractRadioButtonGroup;
 import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
@@ -15,14 +17,14 @@ public final class RadioButtonGroupChains {
 
   protected abstract static class AbstractRadioButtonGroupChain<T> extends AbstractExtensionChain<IRadioButtonGroupExtension<T, ? extends AbstractRadioButtonGroup<T>>> {
 
-    public AbstractRadioButtonGroupChain(List<? extends IRadioButtonGroupExtension<T, ? extends AbstractRadioButtonGroup<T>>> extensions) {
-      super(extensions);
+    public AbstractRadioButtonGroupChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
+      super(extensions, IRadioButtonGroupExtension.class);
     }
   }
 
   public static class RadioButtonGroupPrepareLookupChain<T> extends AbstractRadioButtonGroupChain<T> {
 
-    public RadioButtonGroupPrepareLookupChain(List<? extends IRadioButtonGroupExtension<T, ? extends AbstractRadioButtonGroup<T>>> extensions) {
+    public RadioButtonGroupPrepareLookupChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
@@ -39,7 +41,7 @@ public final class RadioButtonGroupChains {
 
   public static class RadioButtonGroupFilterLookupResultChain<T> extends AbstractRadioButtonGroupChain<T> {
 
-    public RadioButtonGroupFilterLookupResultChain(List<? extends IRadioButtonGroupExtension<T, ? extends AbstractRadioButtonGroup<T>>> extensions) {
+    public RadioButtonGroupFilterLookupResultChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 

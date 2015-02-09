@@ -24,9 +24,11 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.extension.ui.action.IActionExtension;
 import org.eclipse.scout.rt.client.extension.ui.action.menu.IMenuExtension;
 import org.eclipse.scout.rt.client.extension.ui.action.menu.MenuChains.MenuAboutToShowChain;
 import org.eclipse.scout.rt.client.extension.ui.action.menu.MenuChains.MenuOwnerValueChangedChain;
+import org.eclipse.scout.rt.client.ui.action.AbstractAction;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.tree.AbstractActionNode;
@@ -261,20 +263,14 @@ public abstract class AbstractMenu extends AbstractActionNode<IMenu> implements 
     propertySupport.setProperty(PROP_MENU_TYPES, CollectionUtility.<IMenuType> hashSet(menuTypes));
   }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<? extends IMenuExtension<? extends AbstractMenu>> getAllExtensions() {
-    return (List<? extends IMenuExtension<? extends AbstractMenu>>) super.getAllExtensions();
-  }
-
   protected final void interceptAboutToShow() throws ProcessingException {
-    List<? extends IMenuExtension<? extends AbstractMenu>> extensions = getAllExtensions();
+    List<? extends IActionExtension<? extends AbstractAction>> extensions = getAllExtensions();
     MenuAboutToShowChain chain = new MenuAboutToShowChain(extensions);
     chain.execAboutToShow();
   }
 
   protected final void interceptOwnerValueChanged(Object newOwnerValue) throws ProcessingException {
-    List<? extends IMenuExtension<? extends AbstractMenu>> extensions = getAllExtensions();
+    List<? extends IActionExtension<? extends AbstractAction>> extensions = getAllExtensions();
     MenuOwnerValueChangedChain chain = new MenuOwnerValueChangedChain(extensions);
     chain.execOwnerValueChanged(newOwnerValue);
   }

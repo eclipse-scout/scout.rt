@@ -243,7 +243,7 @@ public abstract class AbstractWizardStep<FORM extends IForm> extends AbstractPro
   }
 
   @Override
-  public List<? extends IWizardStepExtension<FORM, ? extends AbstractWizardStep<FORM>>> getAllExtensions() {
+  public final List<? extends IWizardStepExtension<FORM, ? extends AbstractWizardStep<FORM>>> getAllExtensions() {
     return m_objectExtensions.getAllExtensions();
   }
 

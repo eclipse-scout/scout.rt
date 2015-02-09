@@ -3,6 +3,8 @@ package org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeNodeExtension;
+import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithNodes;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
@@ -14,14 +16,14 @@ public final class PageWithNodesChains {
 
   protected abstract static class AbstractPageWithNodesChain extends AbstractExtensionChain<IPageWithNodesExtension<? extends AbstractPageWithNodes>> {
 
-    public AbstractPageWithNodesChain(List<? extends IPageWithNodesExtension<? extends AbstractPageWithNodes>> extensions) {
-      super(extensions);
+    public AbstractPageWithNodesChain(List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions) {
+      super(extensions, IPageWithNodesExtension.class);
     }
   }
 
   public static class PageWithNodesCreateChildPagesChain extends AbstractPageWithNodesChain {
 
-    public PageWithNodesCreateChildPagesChain(List<? extends IPageWithNodesExtension<? extends AbstractPageWithNodes>> extensions) {
+    public PageWithNodesCreateChildPagesChain(List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions) {
       super(extensions);
     }
 

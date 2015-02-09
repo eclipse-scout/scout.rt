@@ -23,6 +23,7 @@ import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.stringfield.IStringFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.stringfield.StringFieldChains.StringFieldDragRequestChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.stringfield.StringFieldChains.StringFieldDropRequestChain;
@@ -30,6 +31,7 @@ import org.eclipse.scout.rt.client.extension.ui.form.fields.stringfield.StringFi
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractBasicField;
+import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 
 @ClassId("d8b1f73a-4415-4477-8408-e6ada9e69551")
@@ -543,26 +545,20 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
 
   }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<? extends IStringFieldExtension<? extends AbstractStringField>> getAllExtensions() {
-    return (List<? extends IStringFieldExtension<? extends AbstractStringField>>) super.getAllExtensions();
-  }
-
   protected final void interceptDropRequest(TransferObject transferObject) {
-    List<? extends IStringFieldExtension<? extends AbstractStringField>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     StringFieldDropRequestChain chain = new StringFieldDropRequestChain(extensions);
     chain.execDropRequest(transferObject);
   }
 
   protected final void interceptLinkAction(URL url) throws ProcessingException {
-    List<? extends IStringFieldExtension<? extends AbstractStringField>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     StringFieldLinkActionChain chain = new StringFieldLinkActionChain(extensions);
     chain.execLinkAction(url);
   }
 
   protected final TransferObject interceptDragRequest() {
-    List<? extends IStringFieldExtension<? extends AbstractStringField>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     StringFieldDragRequestChain chain = new StringFieldDragRequestChain(extensions);
     return chain.execDragRequest();
   }

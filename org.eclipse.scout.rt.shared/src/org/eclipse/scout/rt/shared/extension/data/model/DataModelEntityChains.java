@@ -2,9 +2,9 @@ package org.eclipse.scout.rt.shared.extension.data.model;
 
 import java.util.List;
 
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.data.model.AbstractDataModelEntity;
 import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
-import org.eclipse.scout.commons.exception.ProcessingException;
 
 public final class DataModelEntityChains {
 
@@ -14,7 +14,7 @@ public final class DataModelEntityChains {
   protected abstract static class AbstractDataModelEntityChain extends AbstractExtensionChain<IDataModelEntityExtension<? extends AbstractDataModelEntity>> {
 
     public AbstractDataModelEntityChain(List<? extends IDataModelEntityExtension<? extends AbstractDataModelEntity>> extensions) {
-      super(extensions);
+      super(extensions, IDataModelEntityExtension.class);
     }
   }
 
