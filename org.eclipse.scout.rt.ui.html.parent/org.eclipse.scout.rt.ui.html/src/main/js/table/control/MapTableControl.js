@@ -133,7 +133,7 @@ scout.MapTableControl.prototype._renderContent = function($parent) {
     // callback to table
     // set filter function
     var filter = that.table.getFilter(scout.MapTableControl.FILTER_KEY) || {};
-    filter.label = that.label;
+    filter.label = that.tooltipText;
     filter.accept = filterFunc;
     that.table.registerFilter(scout.MapTableControl.FILTER_KEY, filter);
     that.table.filter();
@@ -141,15 +141,8 @@ scout.MapTableControl.prototype._renderContent = function($parent) {
 };
 
 scout.MapTableControl.prototype._removeContent = function() {
-  if (this.$contentContainer) {
-    this.$contentContainer.remove();
-  }
-};
-
-scout.MapTableControl.prototype.dispose = function() {
-  if (this.table) { // FIXME CGU TableControl.dispose() | Fix this
-    this.table.events.removeListener(this._filterResetListener);
-  }
+  this.$contentContainer.remove();
+  this.table.events.removeListener(this._filterResetListener);
 };
 
 scout.MapTableControl.prototype._removeMap = function() {

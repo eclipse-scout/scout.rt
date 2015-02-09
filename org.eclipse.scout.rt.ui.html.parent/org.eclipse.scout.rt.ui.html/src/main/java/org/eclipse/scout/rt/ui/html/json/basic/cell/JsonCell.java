@@ -19,28 +19,18 @@ import org.json.JSONObject;
 public class JsonCell implements IJsonMapper {
   private final ICell m_cell;
   private final String m_cellText;
-  private final Object m_cellValue;
+  private Object m_cellValue;
 
   public JsonCell(IJsonSession session, ICell cell) {
-    this(session, cell, cell.getValue());
+    this(session, cell, null);
   }
 
-  public JsonCell(IJsonSession session, ICell cell, Object cellValue) {
+  public JsonCell(IJsonSession session, ICell cell, ICellValueReader cellValueReader) {
     m_cell = cell;
-    String cellText = cell.getText();
-    if (cellValue != null && cellValue.equals(cellText)) {
-      // don't send value if it is equal to the cell text (not necessary to send duplicate values)
-      cellValue = null;
+    m_cellText = session.getCustomHtmlRenderer().convert(cell.getText(), true);
+    if (cellValueReader != null) {
+      m_cellValue = cellValueReader.read();
     }
-
-    if (cellText instanceof String) {
-      cellText = session.getCustomHtmlRenderer().convert((String) cellText, true);
-    }
-    if (cellValue instanceof String) {
-      cellValue = session.getCustomHtmlRenderer().convert((String) cellValue, true);
-    }
-    m_cellText = cellText;
-    m_cellValue = cellValue;
   }
 
   public final ICell getCell() {

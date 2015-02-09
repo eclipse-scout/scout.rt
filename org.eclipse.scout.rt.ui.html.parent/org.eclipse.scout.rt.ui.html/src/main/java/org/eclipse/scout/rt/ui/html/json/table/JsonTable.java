@@ -17,7 +17,6 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -45,12 +44,12 @@ import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
-import org.eclipse.scout.rt.ui.html.json.JsonDate;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonException;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
+import org.eclipse.scout.rt.ui.html.json.basic.cell.ICellValueReader;
 import org.eclipse.scout.rt.ui.html.json.basic.cell.JsonCell;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.json.menu.IContextMenuOwner;
@@ -415,7 +414,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   protected JSONObject tableRowToJson(ITableRow row) {
     JSONArray jsonCells = new JSONArray();
     for (IColumn<?> column : getColumns()) {
-      jsonCells.put(cellToJson(row.getCell(column), row, column));
+      jsonCells.put(cellToJson(row, column));
     }
     JSONObject jsonRow = new JSONObject();
     putProperty(jsonRow, "id", getOrCreatedRowId(row));
@@ -425,17 +424,10 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     return jsonRow;
   }
 
-  protected Object cellToJson(ICell cell, ITableRow row, IColumn column) {
-    // Prepare cell value
-    Object cellValue = cell.getValue();
-    if (column instanceof IDateColumn) {
-      Date date = (Date) cell.getValue();
-      if (date != null) {
-        IDateColumn dateColumn = (IDateColumn) column;
-        cellValue = new JsonDate(date).asJsonString(false, dateColumn.isHasDate(), dateColumn.isHasTime());
-      }
-    }
-    return new JsonCell(getJsonSession(), cell, cellValue).toJsonOrString();
+  protected Object cellToJson(final ITableRow row, final IColumn column) {
+    final ICell cell = row.getCell(column);
+    ICellValueReader reader = new TableCellValueReader(column, cell);
+    return new JsonCell(getJsonSession(), cell, reader).toJsonOrString();
   }
 
   protected JSONArray columnsToJson(Collection<IColumn<?>> columns) {
@@ -769,4 +761,5 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     super.cleanUpEventFilters();
     m_tableEventFilter.removeAllConditions();
   }
+
 }

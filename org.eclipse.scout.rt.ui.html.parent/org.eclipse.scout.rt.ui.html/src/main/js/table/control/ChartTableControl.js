@@ -668,7 +668,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
       oneDim = $('.selected', $chartSelect).attr('id') !== 'ChartScatter';
 
     //  find all filter
-    $('.main-chart.selected').each(function() {
+    that.$contentContainer.find('.main-chart.selected').each(function() {
       var dX = parseFloat($(this).attr('data-xAxis'));
 
       if (oneDim) {
@@ -681,19 +681,19 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
 
     //  filter function
     var filterFunc = function($row) {
-      var row = that.table.rows[$row.index()];
-      var nX = xAxis.norm(row.cells[xAxis.column.index].value);
+      var row = that.table.rows[$row.index() - 1];
+      var nX = xAxis.norm(that.table.cellValue(xAxis.column, row));
 
       if (oneDim) {
         return (filters.indexOf(nX) > -1);
       } else {
-        var nY = xAxis.norm(row.cells[yAxis.column.index].value);
+        var nY = yAxis.norm(that.table.cellValue(yAxis.column, row));
         return (filters.indexOf(JSON.stringify([nX, nY])) > -1);
       }
     };
 
     var filter = that.table.getFilter(scout.ChartTableControl.FILTER_KEY) || {};
-    filter.label = that.label;
+    filter.label = that.tooltipText;
     filter.accept = filterFunc;
     that.table.registerFilter(scout.ChartTableControl.FILTER_KEY, filter);
     that.table.filter();
@@ -702,12 +702,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
 
 scout.ChartTableControl.prototype._removeContent = function() {
   this.$contentContainer.remove();
-};
-
-scout.ChartTableControl.prototype.dispose = function() {
-  if (this.table) { // FIXME CGU TableControl.dispose() | Fix this
-    this.table.events.removeListener(this._filterResetListener);
-  }
+  this.table.events.removeListener(this._filterResetListener);
 };
 
 scout.ChartTableControl.prototype.isContentAvailable = function() {

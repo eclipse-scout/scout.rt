@@ -52,6 +52,11 @@ scout.Table.prototype.init = function(model, session) {
   }
 };
 
+
+scout.Table.prototype.dispose = function() {
+  scout.keystrokeManager.uninstallAdapter(this.keystrokeAdapter);
+};
+
 scout.Table.prototype._render = function($parent) {
   var i, layout;
 
@@ -144,10 +149,6 @@ scout.Table.prototype._createFooter = function() {
   return new scout.TableFooter(this);
 };
 
-scout.Table.prototype.dispose = function() {
-  scout.keystrokeManager.uninstallAdapter(this.keystrokeAdapter);
-};
-
 scout.Table.prototype.clearSelection = function() {
   this.selectionHandler.clearSelection();
 };
@@ -183,8 +184,8 @@ scout.Table.prototype._sort = function() {
   function compare(row1, row2) {
     for (var s = 0; s < sortColumns.length; s++) {
       column = sortColumns[s];
-      var valueA = this.getCellValue(column, row1);
-      var valueB = this.getCellValue(column, row2);
+      var valueA = this.cellValue(column, row1);
+      var valueB = this.cellValue(column, row2);
       var direction = column.sortActive && column.sortAscending ? -1 : 1;
 
       var result = column.compare(valueA, valueB);
@@ -386,9 +387,9 @@ scout.Table.prototype._buildRowDiv = function(row) {
   }
   for (var c = 0; c < this.columns.length; c++) {
     column = this.columns[c];
-    style = this.getCellStyle(column, row);
-    value = this.getCellText(column, row);
-    tooltipText = this.getCellTooltipText(column, row);
+    style = this.cellStyle(column, row);
+    value = this.cellText(column, row);
+    tooltipText = this.cellTooltipText(column, row);
     tooltip = (!scout.strings.hasText(tooltipText) ? '' : ' title="' + tooltipText + '"');
 
     rowDiv += '<div class="table-cell" data-column-index="' + c + '" style="' + style + '"' + tooltip + scout.device.unselectableAttribute + '>' + value + '</div>';
@@ -689,7 +690,7 @@ scout.Table.prototype.sendReload = function() {
   this.session.send(this.id, 'reload');
 };
 
-scout.Table.prototype.getCellValue = function(column, row) {
+scout.Table.prototype.cellValue = function(column, row) {
   var cell = row.cells[column.index];
 
   if (cell === null) { //cell may be a number so don't use !cell
@@ -704,7 +705,7 @@ scout.Table.prototype.getCellValue = function(column, row) {
   return cell.text || '';
 };
 
-scout.Table.prototype.getCellText = function(column, row) {
+scout.Table.prototype.cellText = function(column, row) {
   var cell = row.cells[column.index];
 
   if (!cell) {
@@ -716,7 +717,7 @@ scout.Table.prototype.getCellText = function(column, row) {
   return cell.text || '';
 };
 
-scout.Table.prototype.getCellStyle = function(column, row) {
+scout.Table.prototype.cellStyle = function(column, row) {
   var style, hAlign,
     cell = row.cells[column.index],
     width = column.width;
@@ -734,7 +735,7 @@ scout.Table.prototype.getCellStyle = function(column, row) {
   return style + (hAlign === 'left' ? '' : 'text-align: ' + hAlign + '; ');
 };
 
-scout.Table.prototype.getCellTooltipText = function(column, row) {
+scout.Table.prototype.cellTooltipText = function(column, row) {
   var cell = row.cells[column.index];
   if (typeof cell === 'object' && cell !== null && scout.strings.hasText(cell.tooltipText)) {
     return cell.tooltipText;
@@ -769,7 +770,7 @@ scout.Table.prototype._group = function() {
     // calculate sum per column
     for (var c = 0; c < this.columns.length; c++) {
       column = this.columns[c];
-      var value = this.getCellValue(column, row);
+      var value = this.cellValue(column, row);
 
       if (column.type === 'number') {
         sum[c] = (sum[c] || 0) + value;
@@ -779,7 +780,7 @@ scout.Table.prototype._group = function() {
     // test if sum should be shown, if yes: reset sum-array
     var nextRow = $rows.data('row');
 
-    if ((r === $rows.length - 1) || (!all && this.getCellText(groupColumn, row) !== this.getCellText(groupColumn, nextRow)) && sum.length > 0) {
+    if ((r === $rows.length - 1) || (!all && this.cellText(groupColumn, row) !== this.cellText(groupColumn, nextRow)) && sum.length > 0) {
       for (c = 0; c < this.columns.length; c++) {
         var $cell;
 
@@ -789,7 +790,7 @@ scout.Table.prototype._group = function() {
           $cell = $.makeDiv('table-cell', sum[c])
             .css('text-align', alignment);
         } else if (!all && column === groupColumn) {
-          $cell = $.makeDiv('table-cell', this.getCellText(groupColumn, row))
+          $cell = $.makeDiv('table-cell', this.cellText(groupColumn, row))
             .css('text-align', alignment);
         } else {
           $cell = $.makeDiv('table-cell', '&nbsp');
@@ -831,7 +832,7 @@ scout.Table.prototype.colorData = function(mode, colorColumn) {
 
   for (var r = 0; r < this.rows.length; r++) {
     row = this.rows[r];
-    v = this.getCellValue(colorColumn, row);
+    v = this.cellValue(colorColumn, row);
 
     if (v < minValue || minValue === undefined) {
       minValue = v;
@@ -889,7 +890,7 @@ scout.Table.prototype.colorData = function(mode, colorColumn) {
 
   for (var s = 0; s < $rows.length; s++) {
     row = $rows.data('row');
-    value = this.getCellValue(colorColumn, row);
+    value = this.cellValue(colorColumn, row);
 
     colorFunc($rows.eq(s).children().eq(c), value);
   }
