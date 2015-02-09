@@ -24,6 +24,7 @@ __include("util/strings.js");
 __include("util/DetachHelper.js");
 __include("util/URL.js");
 __include("session/Session.js");
+__include("session/Texts.js");
 __include("session/Event.js");
 __include("session/Locale.js");
 __include("session/UserAgent.js");

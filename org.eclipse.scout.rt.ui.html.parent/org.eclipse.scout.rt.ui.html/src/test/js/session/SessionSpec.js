@@ -88,17 +88,17 @@ describe("Session", function() {
 
   });
 
+  // Tests whether delegation to scout.Texts works as expected
   describe("texts", function() {
 
     var session = createSession();
-    // In production mode these texts are sent by the server in the initialize event
-    session._textMap = {
+    session._texts = new scout.Texts({
       NoOptions: 'Keine Übereinstimmung',
       NumOptions: '{0} Optionen',
       Greeting: 'Hello {0}, my name is {2}, {1}.',
       Empty: '',
       Null: null
-    };
+    });
 
     it("check if correct text is returned", function() {
       expect(session.text('NoOptions')).toBe('Keine Übereinstimmung');
