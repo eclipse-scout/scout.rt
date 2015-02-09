@@ -205,8 +205,8 @@ scout.Tree.prototype.setNodeExpanded = function(node, $node, expanded) {
 };
 
 scout.Tree.prototype._renderExpansion = function(node, $node, expanded) {
-  var $wrapper,
-    that = this;
+  var $wrapper;
+
   if (expanded === $node.hasClass('expanded')) {
     return;
   }
@@ -1016,7 +1016,7 @@ scout.Tree.collectSubtree = function($rootNode, includeRootNodeInResult) {
     return $result;
   }
   var rootLevel = parseFloat($rootNode.attr('data-level'));
-  if (includeRootNodeInResult !== false) {
+  if (includeRootNodeInResult === undefined || includeRootNodeInResult) {
     $result = $result.add($rootNode);
   }
 
