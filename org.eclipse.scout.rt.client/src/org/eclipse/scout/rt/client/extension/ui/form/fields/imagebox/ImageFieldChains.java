@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
+import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.imagebox.AbstractImageField;
 import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
 
@@ -14,14 +16,14 @@ public final class ImageFieldChains {
 
   protected abstract static class AbstractImageFieldChain extends AbstractExtensionChain<IImageFieldExtension<? extends AbstractImageField>> {
 
-    public AbstractImageFieldChain(List<? extends IImageFieldExtension<? extends AbstractImageField>> extensions) {
-      super(extensions);
+    public AbstractImageFieldChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
+      super(extensions, IImageFieldExtension.class);
     }
   }
 
   public static class ImageFieldDragRequestChain extends AbstractImageFieldChain {
 
-    public ImageFieldDragRequestChain(List<? extends IImageFieldExtension<? extends AbstractImageField>> extensions) {
+    public ImageFieldDragRequestChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
@@ -42,7 +44,7 @@ public final class ImageFieldChains {
 
   public static class ImageFieldDropRequestChain extends AbstractImageFieldChain {
 
-    public ImageFieldDropRequestChain(List<? extends IImageFieldExtension<? extends AbstractImageField>> extensions) {
+    public ImageFieldDropRequestChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 

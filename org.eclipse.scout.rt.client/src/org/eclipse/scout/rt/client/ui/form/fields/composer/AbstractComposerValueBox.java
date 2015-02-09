@@ -31,9 +31,11 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.composer.ComposerValueBoxChains.ComposerValueBoxChangedValueChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.composer.IComposerValueBoxExtension;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
+import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractDateField;
@@ -1305,14 +1307,8 @@ public abstract class AbstractComposerValueBox extends AbstractGroupBox implemen
     }
   }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<? extends IComposerValueBoxExtension<? extends AbstractComposerValueBox>> getAllExtensions() {
-    return (List<? extends IComposerValueBoxExtension<? extends AbstractComposerValueBox>>) super.getAllExtensions();
-  }
-
   protected final void interceptChangedValue() throws ProcessingException {
-    List<? extends IComposerValueBoxExtension<? extends AbstractComposerValueBox>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     ComposerValueBoxChangedValueChain chain = new ComposerValueBoxChangedValueChain(extensions);
     chain.execChangedValue();
   }

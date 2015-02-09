@@ -28,6 +28,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.IOutlineExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.OutlineChains.OutlineCreateChildPagesChain;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
@@ -690,14 +691,8 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
     }
   }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<? extends IOutlineExtension<? extends AbstractOutline>> getAllExtensions() {
-    return (List<? extends IOutlineExtension<? extends AbstractOutline>>) super.getAllExtensions();
-  }
-
   protected final void interceptCreateChildPages(List<IPage> pageList) throws ProcessingException {
-    List<? extends IOutlineExtension<? extends AbstractOutline>> extensions = getAllExtensions();
+    List<? extends ITreeExtension<? extends AbstractTree>> extensions = getAllExtensions();
     OutlineCreateChildPagesChain chain = new OutlineCreateChildPagesChain(extensions);
     chain.execCreateChildPages(pageList);
   }

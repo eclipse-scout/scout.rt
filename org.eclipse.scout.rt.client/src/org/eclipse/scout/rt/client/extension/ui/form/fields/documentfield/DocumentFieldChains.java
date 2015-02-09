@@ -3,6 +3,8 @@ package org.eclipse.scout.rt.client.extension.ui.form.fields.documentfield;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
+import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.documentfield.AbstractDocumentField;
 import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
 
@@ -13,14 +15,14 @@ public final class DocumentFieldChains {
 
   protected abstract static class AbstractDocumentFieldChain extends AbstractExtensionChain<IDocumentFieldExtension<? extends AbstractDocumentField>> {
 
-    public AbstractDocumentFieldChain(List<? extends IDocumentFieldExtension<? extends AbstractDocumentField>> extensions) {
-      super(extensions);
+    public AbstractDocumentFieldChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
+      super(extensions, IDocumentFieldExtension.class);
     }
   }
 
   public static class DocumentFieldComReadyStatusChangedChain extends AbstractDocumentFieldChain {
 
-    public DocumentFieldComReadyStatusChangedChain(List<? extends IDocumentFieldExtension<? extends AbstractDocumentField>> extensions) {
+    public DocumentFieldComReadyStatusChangedChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 

@@ -291,7 +291,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
   }
 
   @Override
-  public List<? extends IActionExtension<? extends AbstractAction>> getAllExtensions() {
+  public final List<? extends IActionExtension<? extends AbstractAction>> getAllExtensions() {
     return m_objectExtensions.getAllExtensions();
   }
 

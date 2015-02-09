@@ -38,7 +38,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.xmlparser.SimpleXmlElement;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
-import org.eclipse.scout.rt.client.extension.ui.form.fields.AbstractValueFieldExtension;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IValueFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.ValueFieldChains.ValueFieldChangedValueChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.ValueFieldChains.ValueFieldExecValidateChain;
@@ -80,12 +80,6 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
   @Override
   protected IValueFieldExtension<VALUE, ? extends AbstractValueField<VALUE>> createLocalExtension() {
     return new LocalValueFieldExtension<VALUE, AbstractValueField<VALUE>>(this);
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<? extends IValueFieldExtension<VALUE, ? extends AbstractValueField<VALUE>>> getAllExtensions() {
-    return (List<? extends AbstractValueFieldExtension<VALUE, ? extends IValueField<VALUE>>>) super.getAllExtensions();
   }
 
   /*
@@ -505,12 +499,6 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
     }
   }
 
-  protected final VALUE interceptValidateValue(VALUE rawValue) throws ProcessingException {
-    List<? extends IValueFieldExtension<VALUE, ? extends AbstractValueField<VALUE>>> formFieldExtensions = getAllExtensions();
-    ValueFieldExecValidateChain<VALUE> chain = new ValueFieldExecValidateChain<VALUE>(formFieldExtensions);
-    return chain.execValidateValue(rawValue);
-  }
-
   private VALUE validateValue(VALUE rawValue) throws ProcessingException {
     try {
       setValueValidating(true);
@@ -749,22 +737,27 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
     }
   }
 
+  protected final VALUE interceptValidateValue(VALUE rawValue) throws ProcessingException {
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
+    ValueFieldExecValidateChain<VALUE> chain = new ValueFieldExecValidateChain<VALUE>(extensions);
+    return chain.execValidateValue(rawValue);
+  }
+
   protected final String interceptFormatValue(VALUE validValue) {
-    List<? extends IValueFieldExtension<VALUE, ? extends AbstractValueField<VALUE>>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     ValueFieldFormatValueChain<VALUE> chain = new ValueFieldFormatValueChain<VALUE>(extensions);
     return chain.execFormatValue(validValue);
   }
 
   protected final void interceptChangedValue() throws ProcessingException {
-    List<? extends IValueFieldExtension<VALUE, ? extends AbstractValueField<VALUE>>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     ValueFieldChangedValueChain<VALUE> chain = new ValueFieldChangedValueChain<VALUE>(extensions);
     chain.execChangedValue();
   }
 
   protected final VALUE interceptParseValue(String text) throws ProcessingException {
-    List<? extends IValueFieldExtension<VALUE, ? extends AbstractValueField<VALUE>>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     ValueFieldParseValueChain<VALUE> chain = new ValueFieldParseValueChain<VALUE>(extensions);
     return chain.execParseValue(text);
   }
-
 }

@@ -25,6 +25,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IMemoryPolicy;
+import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeNodeExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.IPageExtension;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageDataChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.PageChains.PageDisposePageChain;
@@ -601,44 +602,38 @@ public abstract class AbstractPage extends AbstractTreeNode implements IPage {
     return null;
   }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<? extends IPageExtension<? extends AbstractPage>> getAllExtensions() {
-    return (List<? extends IPageExtension<? extends AbstractPage>>) super.getAllExtensions();
-  }
-
   protected final void interceptPageDataLoaded() throws ProcessingException {
-    List<? extends IPageExtension<? extends AbstractPage>> extensions = getAllExtensions();
+    List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
     PagePageDataLoadedChain chain = new PagePageDataLoadedChain(extensions);
     chain.execPageDataLoaded();
   }
 
   protected final void interceptPageActivated() throws ProcessingException {
-    List<? extends IPageExtension<? extends AbstractPage>> extensions = getAllExtensions();
+    List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
     PagePageActivatedChain chain = new PagePageActivatedChain(extensions);
     chain.execPageActivated();
   }
 
   protected final void interceptDataChanged(Object... dataTypes) throws ProcessingException {
-    List<? extends IPageExtension<? extends AbstractPage>> extensions = getAllExtensions();
+    List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
     PageDataChangedChain chain = new PageDataChangedChain(extensions);
     chain.execDataChanged(dataTypes);
   }
 
   protected final void interceptInitPage() throws ProcessingException {
-    List<? extends IPageExtension<? extends AbstractPage>> extensions = getAllExtensions();
+    List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
     PageInitPageChain chain = new PageInitPageChain(extensions);
     chain.execInitPage();
   }
 
   protected final void interceptPageDeactivated() throws ProcessingException {
-    List<? extends IPageExtension<? extends AbstractPage>> extensions = getAllExtensions();
+    List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
     PagePageDeactivatedChain chain = new PagePageDeactivatedChain(extensions);
     chain.execPageDeactivated();
   }
 
   protected final void interceptDisposePage() throws ProcessingException {
-    List<? extends IPageExtension<? extends AbstractPage>> extensions = getAllExtensions();
+    List<? extends ITreeNodeExtension<? extends AbstractTreeNode>> extensions = getAllExtensions();
     PageDisposePageChain chain = new PageDisposePageChain(extensions);
     chain.execDisposePage();
   }

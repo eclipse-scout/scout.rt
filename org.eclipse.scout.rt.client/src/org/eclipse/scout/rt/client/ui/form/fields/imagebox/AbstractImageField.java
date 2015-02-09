@@ -25,6 +25,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.imagebox.IImageFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.imagebox.ImageFieldChains.ImageFieldDragRequestChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.imagebox.ImageFieldChains.ImageFieldDropRequestChain;
@@ -518,20 +519,14 @@ public abstract class AbstractImageField extends AbstractFormField implements II
 
   }// end private class
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<? extends IImageFieldExtension<? extends AbstractImageField>> getAllExtensions() {
-    return (List<? extends IImageFieldExtension<? extends AbstractImageField>>) super.getAllExtensions();
-  }
-
   protected final TransferObject interceptDragRequest() throws ProcessingException {
-    List<? extends IImageFieldExtension<? extends AbstractImageField>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     ImageFieldDragRequestChain chain = new ImageFieldDragRequestChain(extensions);
     return chain.execDragRequest();
   }
 
   protected final void interceptDropRequest(TransferObject transferObject) throws ProcessingException {
-    List<? extends IImageFieldExtension<? extends AbstractImageField>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     ImageFieldDropRequestChain chain = new ImageFieldDropRequestChain(extensions);
     chain.execDropRequest(transferObject);
   }

@@ -30,10 +30,12 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.BooleanHolder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.datefield.DateFieldChains.DateFieldShiftDateChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.datefield.DateFieldChains.DateFieldShiftTimeChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.datefield.IDateFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractBasicField;
+import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.service.SERVICES;
@@ -1153,20 +1155,14 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
     }
   }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<? extends IDateFieldExtension<? extends AbstractDateField>> getAllExtensions() {
-    return (List<? extends IDateFieldExtension<? extends AbstractDateField>>) super.getAllExtensions();
-  }
-
   protected final void interceptShiftTime(int level, int value) throws ProcessingException {
-    List<? extends IDateFieldExtension<? extends AbstractDateField>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     DateFieldShiftTimeChain chain = new DateFieldShiftTimeChain(extensions);
     chain.execShiftTime(level, value);
   }
 
   protected final void interceptShiftDate(int level, int value) throws ProcessingException {
-    List<? extends IDateFieldExtension<? extends AbstractDateField>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     DateFieldShiftDateChain chain = new DateFieldShiftDateChain(extensions);
     chain.execShiftDate(level, value);
   }

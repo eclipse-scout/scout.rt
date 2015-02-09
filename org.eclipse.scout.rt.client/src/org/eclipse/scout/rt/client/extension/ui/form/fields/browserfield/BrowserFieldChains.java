@@ -3,6 +3,8 @@ package org.eclipse.scout.rt.client.extension.ui.form.fields.browserfield;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
+import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.browserfield.AbstractBrowserField;
 import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
 
@@ -13,14 +15,14 @@ public final class BrowserFieldChains {
 
   protected abstract static class AbstractBrowserFieldChain extends AbstractExtensionChain<IBrowserFieldExtension<? extends AbstractBrowserField>> {
 
-    public AbstractBrowserFieldChain(List<? extends IBrowserFieldExtension<? extends AbstractBrowserField>> extensions) {
-      super(extensions);
+    public AbstractBrowserFieldChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
+      super(extensions, IBrowserFieldExtension.class);
     }
   }
 
   public static class BrowserFieldLocationChangedChain extends AbstractBrowserFieldChain {
 
-    public BrowserFieldLocationChangedChain(List<? extends IBrowserFieldExtension<? extends AbstractBrowserField>> extensions) {
+    public BrowserFieldLocationChangedChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
@@ -41,7 +43,7 @@ public final class BrowserFieldChains {
 
   public static class BrowserFieldAcceptLocationChangeChain extends AbstractBrowserFieldChain {
 
-    public BrowserFieldAcceptLocationChangeChain(List<? extends IBrowserFieldExtension<? extends AbstractBrowserField>> extensions) {
+    public BrowserFieldAcceptLocationChangeChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 

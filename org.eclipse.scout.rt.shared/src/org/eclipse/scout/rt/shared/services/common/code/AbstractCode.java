@@ -214,16 +214,16 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable, IContri
           getConfiguredText(),
           getConfiguredIconId(),
           getConfiguredTooltipText() != null ? getConfiguredTooltipText() : null,
-              (getConfiguredBackgroundColor()),
-              (getConfiguredForegroundColor()),
-              FontSpec.parse(getConfiguredFont()),
-              getConfiguredEnabled(),
-              null,
-              getConfiguredActive(),
-              getConfiguredExtKey(),
-              getConfiguredValue(),
-              0,
-              calculateViewOrder()
+          (getConfiguredBackgroundColor()),
+          (getConfiguredForegroundColor()),
+          FontSpec.parse(getConfiguredFont()),
+          getConfiguredEnabled(),
+          null,
+          getConfiguredActive(),
+          getConfiguredExtKey(),
+          getConfiguredValue(),
+          0,
+          calculateViewOrder()
           ));
     }
     m_contributionHolder = new ContributionComposite(this);
@@ -238,7 +238,7 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable, IContri
   }
 
   @Override
-  public List<? extends ICodeExtension<T, ? extends AbstractCode<T>>> getAllExtensions() {
+  public final List<? extends ICodeExtension<T, ? extends AbstractCode<T>>> getAllExtensions() {
     return m_objectExtensions.getAllExtensions();
   }
 

@@ -5,6 +5,8 @@ import java.net.URL;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
+import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.mailfield.AbstractMailField;
 import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
 
@@ -15,14 +17,14 @@ public final class MailFieldChains {
 
   protected abstract static class AbstractMailFieldChain extends AbstractExtensionChain<IMailFieldExtension<? extends AbstractMailField>> {
 
-    public AbstractMailFieldChain(List<? extends IMailFieldExtension<? extends AbstractMailField>> extensions) {
-      super(extensions);
+    public AbstractMailFieldChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
+      super(extensions, IMailFieldExtension.class);
     }
   }
 
   public static class MailFieldHyperlinkActionChain extends AbstractMailFieldChain {
 
-    public MailFieldHyperlinkActionChain(List<? extends IMailFieldExtension<? extends AbstractMailField>> extensions) {
+    public MailFieldHyperlinkActionChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
@@ -43,7 +45,7 @@ public final class MailFieldChains {
 
   public static class MailFieldAttachementActionChain extends AbstractMailFieldChain {
 
-    public MailFieldAttachementActionChain(List<? extends IMailFieldExtension<? extends AbstractMailField>> extensions) {
+    public MailFieldAttachementActionChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 

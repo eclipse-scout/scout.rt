@@ -3,6 +3,8 @@ package org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
+import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractContentAssistField;
 import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
@@ -15,14 +17,14 @@ public final class ContentAssistFieldChains {
 
   protected abstract static class AbstractContentAssistFieldChain<VALUE, LOOKUP_KEY> extends AbstractExtensionChain<IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>>> {
 
-    public AbstractContentAssistFieldChain(List<? extends IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>>> extensions) {
-      super(extensions);
+    public AbstractContentAssistFieldChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
+      super(extensions, IContentAssistFieldExtension.class);
     }
   }
 
   public static class ContentAssistFieldFilterBrowseLookupResultChain<VALUE, LOOKUP_KEY> extends AbstractContentAssistFieldChain<VALUE, LOOKUP_KEY> {
 
-    public ContentAssistFieldFilterBrowseLookupResultChain(List<? extends IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>>> extensions) {
+    public ContentAssistFieldFilterBrowseLookupResultChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
@@ -43,7 +45,7 @@ public final class ContentAssistFieldChains {
 
   public static class ContentAssistFieldBrowseNewChain<VALUE, LOOKUP_KEY> extends AbstractContentAssistFieldChain<VALUE, LOOKUP_KEY> {
 
-    public ContentAssistFieldBrowseNewChain(List<? extends IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>>> extensions) {
+    public ContentAssistFieldBrowseNewChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
@@ -64,7 +66,7 @@ public final class ContentAssistFieldChains {
 
   public static class ContentAssistFieldFilterKeyLookupResultChain<VALUE, LOOKUP_KEY> extends AbstractContentAssistFieldChain<VALUE, LOOKUP_KEY> {
 
-    public ContentAssistFieldFilterKeyLookupResultChain(List<? extends IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>>> extensions) {
+    public ContentAssistFieldFilterKeyLookupResultChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
@@ -85,7 +87,7 @@ public final class ContentAssistFieldChains {
 
   public static class ContentAssistFieldPrepareLookupChain<VALUE, LOOKUP_KEY> extends AbstractContentAssistFieldChain<VALUE, LOOKUP_KEY> {
 
-    public ContentAssistFieldPrepareLookupChain(List<? extends IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>>> extensions) {
+    public ContentAssistFieldPrepareLookupChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
@@ -106,7 +108,7 @@ public final class ContentAssistFieldChains {
 
   public static class ContentAssistFieldPrepareTextLookupChain<VALUE, LOOKUP_KEY> extends AbstractContentAssistFieldChain<VALUE, LOOKUP_KEY> {
 
-    public ContentAssistFieldPrepareTextLookupChain(List<? extends IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>>> extensions) {
+    public ContentAssistFieldPrepareTextLookupChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
@@ -127,7 +129,7 @@ public final class ContentAssistFieldChains {
 
   public static class ContentAssistFieldPrepareBrowseLookupChain<VALUE, LOOKUP_KEY> extends AbstractContentAssistFieldChain<VALUE, LOOKUP_KEY> {
 
-    public ContentAssistFieldPrepareBrowseLookupChain(List<? extends IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>>> extensions) {
+    public ContentAssistFieldPrepareBrowseLookupChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
@@ -148,7 +150,7 @@ public final class ContentAssistFieldChains {
 
   public static class ContentAssistFieldFilterTextLookupResultChain<VALUE, LOOKUP_KEY> extends AbstractContentAssistFieldChain<VALUE, LOOKUP_KEY> {
 
-    public ContentAssistFieldFilterTextLookupResultChain(List<? extends IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>>> extensions) {
+    public ContentAssistFieldFilterTextLookupResultChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
@@ -169,7 +171,7 @@ public final class ContentAssistFieldChains {
 
   public static class ContentAssistFieldPrepareRecLookupChain<VALUE, LOOKUP_KEY> extends AbstractContentAssistFieldChain<VALUE, LOOKUP_KEY> {
 
-    public ContentAssistFieldPrepareRecLookupChain(List<? extends IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>>> extensions) {
+    public ContentAssistFieldPrepareRecLookupChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
@@ -190,7 +192,7 @@ public final class ContentAssistFieldChains {
 
   public static class ContentAssistFieldFilterLookupResultChain<VALUE, LOOKUP_KEY> extends AbstractContentAssistFieldChain<VALUE, LOOKUP_KEY> {
 
-    public ContentAssistFieldFilterLookupResultChain(List<? extends IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>>> extensions) {
+    public ContentAssistFieldFilterLookupResultChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
@@ -211,7 +213,7 @@ public final class ContentAssistFieldChains {
 
   public static class ContentAssistFieldFilterRecLookupResultChain<VALUE, LOOKUP_KEY> extends AbstractContentAssistFieldChain<VALUE, LOOKUP_KEY> {
 
-    public ContentAssistFieldFilterRecLookupResultChain(List<? extends IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>>> extensions) {
+    public ContentAssistFieldFilterRecLookupResultChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
@@ -232,7 +234,7 @@ public final class ContentAssistFieldChains {
 
   public static class ContentAssistFieldPrepareKeyLookupChain<VALUE, LOOKUP_KEY> extends AbstractContentAssistFieldChain<VALUE, LOOKUP_KEY> {
 
-    public ContentAssistFieldPrepareKeyLookupChain(List<? extends IContentAssistFieldExtension<VALUE, LOOKUP_KEY, ? extends AbstractContentAssistField<VALUE, LOOKUP_KEY>>> extensions) {
+    public ContentAssistFieldPrepareKeyLookupChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 

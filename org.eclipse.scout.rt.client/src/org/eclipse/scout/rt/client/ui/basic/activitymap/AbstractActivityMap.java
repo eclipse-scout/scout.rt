@@ -377,7 +377,7 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
   }
 
   @Override
-  public List<? extends IActivityMapExtension<RI, AI, ? extends AbstractActivityMap<RI, AI>>> getAllExtensions() {
+  public final List<? extends IActivityMapExtension<RI, AI, ? extends AbstractActivityMap<RI, AI>>> getAllExtensions() {
     return m_objectExtensions.getAllExtensions();
   }
 

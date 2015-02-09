@@ -2,7 +2,9 @@ package org.eclipse.scout.rt.client.extension.ui.form.fields.composer;
 
 import java.util.List;
 
+import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
+import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.AbstractComposerField;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.node.AttributeNode;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.node.EitherOrNode;
@@ -23,14 +25,14 @@ public final class ComposerFieldChains {
 
   protected abstract static class AbstractComposerFieldChain extends AbstractExtensionChain<IComposerFieldExtension<? extends AbstractComposerField>> {
 
-    public AbstractComposerFieldChain(List<? extends IComposerFieldExtension<? extends AbstractComposerField>> extensions) {
-      super(extensions);
+    public AbstractComposerFieldChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
+      super(extensions, IComposerFieldExtension.class);
     }
   }
 
   public static class ComposerFieldResolveEntityPathChain extends AbstractComposerFieldChain {
 
-    public ComposerFieldResolveEntityPathChain(List<? extends IComposerFieldExtension<? extends AbstractComposerField>> extensions) {
+    public ComposerFieldResolveEntityPathChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
@@ -48,7 +50,7 @@ public final class ComposerFieldChains {
 
   public static class ComposerFieldResolveRootPathForTopLevelEntityChain extends AbstractComposerFieldChain {
 
-    public ComposerFieldResolveRootPathForTopLevelEntityChain(List<? extends IComposerFieldExtension<? extends AbstractComposerField>> extensions) {
+    public ComposerFieldResolveRootPathForTopLevelEntityChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
@@ -65,7 +67,7 @@ public final class ComposerFieldChains {
 
   public static class ComposerFieldCreateRootNodeChain extends AbstractComposerFieldChain {
 
-    public ComposerFieldCreateRootNodeChain(List<? extends IComposerFieldExtension<? extends AbstractComposerField>> extensions) {
+    public ComposerFieldCreateRootNodeChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
@@ -83,7 +85,7 @@ public final class ComposerFieldChains {
 
   public static class ComposerFieldResolveAttributePathChain extends AbstractComposerFieldChain {
 
-    public ComposerFieldResolveAttributePathChain(List<? extends IComposerFieldExtension<? extends AbstractComposerField>> extensions) {
+    public ComposerFieldResolveAttributePathChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
@@ -101,7 +103,7 @@ public final class ComposerFieldChains {
 
   public static class ComposerFieldCreateAttributeNodeChain extends AbstractComposerFieldChain {
 
-    public ComposerFieldCreateAttributeNodeChain(List<? extends IComposerFieldExtension<? extends AbstractComposerField>> extensions) {
+    public ComposerFieldCreateAttributeNodeChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
@@ -119,7 +121,7 @@ public final class ComposerFieldChains {
 
   public static class ComposerFieldCreateDataModelChain extends AbstractComposerFieldChain {
 
-    public ComposerFieldCreateDataModelChain(List<? extends IComposerFieldExtension<? extends AbstractComposerField>> extensions) {
+    public ComposerFieldCreateDataModelChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
@@ -137,7 +139,7 @@ public final class ComposerFieldChains {
 
   public static class ComposerFieldCreateEitherNodeChain extends AbstractComposerFieldChain {
 
-    public ComposerFieldCreateEitherNodeChain(List<? extends IComposerFieldExtension<? extends AbstractComposerField>> extensions) {
+    public ComposerFieldCreateEitherNodeChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
@@ -155,7 +157,7 @@ public final class ComposerFieldChains {
 
   public static class ComposerFieldResolveRootPathForTopLevelAttributeChain extends AbstractComposerFieldChain {
 
-    public ComposerFieldResolveRootPathForTopLevelAttributeChain(List<? extends IComposerFieldExtension<? extends AbstractComposerField>> extensions) {
+    public ComposerFieldResolveRootPathForTopLevelAttributeChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
@@ -172,7 +174,7 @@ public final class ComposerFieldChains {
 
   public static class ComposerFieldCreateAdditionalOrNodeChain extends AbstractComposerFieldChain {
 
-    public ComposerFieldCreateAdditionalOrNodeChain(List<? extends IComposerFieldExtension<? extends AbstractComposerField>> extensions) {
+    public ComposerFieldCreateAdditionalOrNodeChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
@@ -190,7 +192,7 @@ public final class ComposerFieldChains {
 
   public static class ComposerFieldCreateEntityNodeChain extends AbstractComposerFieldChain {
 
-    public ComposerFieldCreateEntityNodeChain(List<? extends IComposerFieldExtension<? extends AbstractComposerField>> extensions) {
+    public ComposerFieldCreateEntityNodeChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 

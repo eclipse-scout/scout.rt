@@ -297,7 +297,7 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
   }
 
   @Override
-  public List<? extends ICodeTypeExtension<CODE_TYPE_ID, CODE_ID, ? extends AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE>>> getAllExtensions() {
+  public final List<? extends ICodeTypeExtension<CODE_TYPE_ID, CODE_ID, ? extends AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE>>> getAllExtensions() {
     return m_objectExtensions.getAllExtensions();
   }
 
@@ -305,12 +305,6 @@ public abstract class AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE ex
   public <E extends IExtension<?>> E getExtension(Class<E> c) {
     return m_objectExtensions.getExtension(c);
   }
-
-//  @Override
-//  @SuppressWarnings("unchecked")
-//  public List<? extends ICodeTypeExtension<CODE_TYPE_ID, CODE_ID, ? extends AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE>>> getAllExtensions() {
-//    return (List<? extends ICodeTypeExtension<CODE_TYPE_ID, CODE_ID, ? extends AbstractCodeTypeWithGeneric<CODE_TYPE_ID, CODE_ID, CODE>>>) super.getAllExtensions();
-//  }
 
   /**
    * The extension support for {@link AbstractCodeTypeWithGeneric#execCreateCodes()} method.

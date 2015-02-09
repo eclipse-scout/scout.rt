@@ -15,7 +15,7 @@ public final class WizardStepChains {
   protected abstract static class AbstractWizardStepChain<FORM extends IForm> extends AbstractExtensionChain<IWizardStepExtension<? extends IForm, ? extends AbstractWizardStep<? extends IForm>>> {
 
     public AbstractWizardStepChain(List<? extends IWizardStepExtension<? extends IForm, ? extends AbstractWizardStep<? extends IForm>>> extensions) {
-      super(extensions);
+      super(extensions, IWizardStepExtension.class);
     }
   }
 

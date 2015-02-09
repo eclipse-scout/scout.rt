@@ -22,9 +22,11 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.tabbox.ITabBoxExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.tabbox.TabBoxChains.TabBoxTabSelectedChain;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractCompositeField;
+import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.internal.TabBoxGrid;
@@ -206,14 +208,8 @@ public abstract class AbstractTabBox extends AbstractCompositeField implements I
     }
   }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<? extends ITabBoxExtension<? extends AbstractTabBox>> getAllExtensions() {
-    return (List<? extends ITabBoxExtension<? extends AbstractTabBox>>) super.getAllExtensions();
-  }
-
   protected final void interceptTabSelected(IGroupBox selectedBox) throws ProcessingException {
-    List<? extends ITabBoxExtension<? extends AbstractTabBox>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     TabBoxTabSelectedChain chain = new TabBoxTabSelectedChain(extensions);
     chain.execTabSelected(selectedBox);
   }

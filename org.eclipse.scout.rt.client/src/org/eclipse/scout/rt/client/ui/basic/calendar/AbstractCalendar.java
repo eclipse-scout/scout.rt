@@ -293,7 +293,7 @@ public abstract class AbstractCalendar extends AbstractPropertyObserver implemen
   }
 
   @Override
-  public List<? extends ICalendarExtension<? extends AbstractCalendar>> getAllExtensions() {
+  public final List<? extends ICalendarExtension<? extends AbstractCalendar>> getAllExtensions() {
     return m_objectExtensions.getAllExtensions();
   }
 

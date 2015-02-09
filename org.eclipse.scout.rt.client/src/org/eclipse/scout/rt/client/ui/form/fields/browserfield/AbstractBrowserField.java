@@ -21,9 +21,11 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.browserfield.BrowserFieldChains.BrowserFieldAcceptLocationChangeChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.browserfield.BrowserFieldChains.BrowserFieldLocationChangedChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.browserfield.IBrowserFieldExtension;
+import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
@@ -171,20 +173,14 @@ public abstract class AbstractBrowserField extends AbstractValueField<RemoteFile
     }
   }
 
-  @Override
-  @SuppressWarnings("unchecked")
-  public List<? extends IBrowserFieldExtension<? extends AbstractBrowserField>> getAllExtensions() {
-    return (List<? extends IBrowserFieldExtension<? extends AbstractBrowserField>>) super.getAllExtensions();
-  }
-
   protected final void interceptLocationChanged(String location, String path, boolean local) throws ProcessingException {
-    List<? extends IBrowserFieldExtension<? extends AbstractBrowserField>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     BrowserFieldLocationChangedChain chain = new BrowserFieldLocationChangedChain(extensions);
     chain.execLocationChanged(location, path, local);
   }
 
   protected final boolean interceptAcceptLocationChange(String location, String path, boolean local) throws ProcessingException {
-    List<? extends IBrowserFieldExtension<? extends AbstractBrowserField>> extensions = getAllExtensions();
+    List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions = getAllExtensions();
     BrowserFieldAcceptLocationChangeChain chain = new BrowserFieldAcceptLocationChangeChain(extensions);
     return chain.execAcceptLocationChange(location, path, local);
   }

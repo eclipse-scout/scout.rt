@@ -201,7 +201,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   @Override
-  public List<? extends ITableExtension<? extends AbstractTable>> getAllExtensions() {
+  public final List<? extends ITableExtension<? extends AbstractTable>> getAllExtensions() {
     return m_objectExtensions.getAllExtensions();
   }
 

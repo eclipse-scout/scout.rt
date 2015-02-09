@@ -166,7 +166,7 @@ public abstract class AbstractFormHandler implements IFormHandler, IExtensibleOb
   }
 
   @Override
-  public List<? extends IFormHandlerExtension<? extends AbstractFormHandler>> getAllExtensions() {
+  public final List<? extends IFormHandlerExtension<? extends AbstractFormHandler>> getAllExtensions() {
     return m_objectExtensions.getAllExtensions();
   }
 

@@ -24,8 +24,8 @@ public class FormFieldChains {
 
   public static abstract class AbstractFormFieldChain extends AbstractExtensionChain<IFormFieldExtension<? extends AbstractFormField>> {
 
-    public AbstractFormFieldChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> executers) {
-      super(executers);
+    public AbstractFormFieldChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
+      super(extensions, IFormFieldExtension.class);
     }
 
   }

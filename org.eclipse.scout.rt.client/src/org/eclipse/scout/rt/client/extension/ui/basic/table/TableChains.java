@@ -23,7 +23,7 @@ public final class TableChains {
   protected abstract static class AbstractTableChain extends AbstractExtensionChain<ITableExtension<? extends AbstractTable>> {
 
     public AbstractTableChain(List<? extends ITableExtension<? extends AbstractTable>> extensions) {
-      super(extensions);
+      super(extensions, ITableExtension.class);
     }
   }
 

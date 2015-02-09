@@ -2,7 +2,9 @@ package org.eclipse.scout.rt.client.extension.ui.desktop.outline;
 
 import java.util.List;
 
+import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutlineTableField;
+import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
 
 public final class OutlineTableFieldChains {
@@ -12,14 +14,14 @@ public final class OutlineTableFieldChains {
 
   protected abstract static class AbstractOutlineTableFieldChain extends AbstractExtensionChain<IOutlineTableFieldExtension<? extends AbstractOutlineTableField>> {
 
-    public AbstractOutlineTableFieldChain(List<? extends IOutlineTableFieldExtension<? extends AbstractOutlineTableField>> extensions) {
-      super(extensions);
+    public AbstractOutlineTableFieldChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
+      super(extensions, IOutlineTableFieldExtension.class);
     }
   }
 
   public static class OutlineTableFieldTableTitleChangedChain extends AbstractOutlineTableFieldChain {
 
-    public OutlineTableFieldTableTitleChangedChain(List<? extends IOutlineTableFieldExtension<? extends AbstractOutlineTableField>> extensions) {
+    public OutlineTableFieldTableTitleChangedChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 

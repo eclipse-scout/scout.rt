@@ -3,6 +3,8 @@ package org.eclipse.scout.rt.client.extension.ui.form.fields.datefield;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
+import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractDateField;
 import org.eclipse.scout.rt.shared.extension.AbstractExtensionChain;
 
@@ -13,14 +15,14 @@ public final class DateFieldChains {
 
   protected abstract static class AbstractDateFieldChain extends AbstractExtensionChain<IDateFieldExtension<? extends AbstractDateField>> {
 
-    public AbstractDateFieldChain(List<? extends IDateFieldExtension<? extends AbstractDateField>> extensions) {
-      super(extensions);
+    public AbstractDateFieldChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
+      super(extensions, IDateFieldExtension.class);
     }
   }
 
   public static class DateFieldShiftTimeChain extends AbstractDateFieldChain {
 
-    public DateFieldShiftTimeChain(List<? extends IDateFieldExtension<? extends AbstractDateField>> extensions) {
+    public DateFieldShiftTimeChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
@@ -41,7 +43,7 @@ public final class DateFieldChains {
 
   public static class DateFieldShiftDateChain extends AbstractDateFieldChain {
 
-    public DateFieldShiftDateChain(List<? extends IDateFieldExtension<? extends AbstractDateField>> extensions) {
+    public DateFieldShiftDateChain(List<? extends IFormFieldExtension<? extends AbstractFormField>> extensions) {
       super(extensions);
     }
 
