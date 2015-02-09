@@ -23,7 +23,7 @@ import org.eclipse.swt.widgets.Listener;
  * This listener is to ensure the context menu gets always located on/over the owner control. If the mouse is over the
  * control the menu will be shown at the mouse position.
  * <p>
- * 
+ *
  * @see(<a href="https://bugs.eclipse.org/bugs/show_bug.cgi?id=431030">BUG 431030</a>)
  */
 public class MenuPositionCorrectionListener implements Listener {
@@ -55,7 +55,7 @@ public class MenuPositionCorrectionListener implements Listener {
   @Override
   public void handleEvent(Event event) {
     Rectangle ownerBounds = getOwner().getBounds();
-    if (!ownerBounds.contains(getOwner().toControl(event.x, event.y))) {
+    if (!ownerBounds.contains(getOwner().getParent().toControl(event.x, event.y))) {
       // horizontal
       Point newLocation = new Point(0, 0);
       if ((getPosition() & HORIZONTAL_RIGHT) != 0) {
@@ -75,7 +75,7 @@ public class MenuPositionCorrectionListener implements Listener {
         newLocation.y = ownerBounds.y + (ownerBounds.height / 2);
       }
       else {
-        newLocation.y = ownerBounds.y = ownerBounds.height;
+        newLocation.y = ownerBounds.y + ownerBounds.height;
       }
       newLocation = getOwner().toDisplay(newLocation);
       event.x = newLocation.x;
