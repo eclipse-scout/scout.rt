@@ -18,6 +18,10 @@
   overflow: hidden;
 }
 
+.navigation-breadcrumb .tree-data {
+  float: left;
+}
+
 .tree-item {
   display: block;
   position: relative;
