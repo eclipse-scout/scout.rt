@@ -124,7 +124,7 @@
       "horizontalAlignment": -1,
       "sortActive": false,
       "sortAscending": true,
-      "sortIndex": 0,
+      "sortIndex": -1,
       "summary": false,
       "type": "text",
       "width": 60
