@@ -31,7 +31,7 @@ scout.TreeBoxLayout.prototype.preferredLayoutSize = function($container) {
     height = scout.HtmlEnvironment.formRowHeight,
     treeBox = this.treeBox;
   if (treeBox.$label && treeBox.labelVisible) {
-    width += this.labelWidth;
+    width += scout.HtmlEnvironment.fieldLabelWidth;
   }
   if (treeBox.$mandatory) {
     width += treeBox.$mandatory.outerWidth(true);
@@ -64,4 +64,9 @@ scout.TreeBoxLayout.prototype.preferredLayoutSize = function($container) {
 
   return new scout.Dimension(width, height);
 
+};
+
+
+scout.TreeBoxLayout.prototype.naturalSize = function(formField) {
+  return new scout.Dimension(formField.$fieldContainer.width(), formField.$fieldContainer.height());
 };
