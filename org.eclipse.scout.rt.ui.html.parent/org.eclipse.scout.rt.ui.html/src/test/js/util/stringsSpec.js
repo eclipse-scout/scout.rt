@@ -128,4 +128,23 @@ describe("scout.strings", function() {
 
   });
 
+  describe("count", function() {
+
+    it("can count occurrences", function() {
+      expect(scout.strings.count()).toBe(0);
+      expect(scout.strings.count('hello')).toBe(0);
+      expect(scout.strings.count('hello', 'xxx')).toBe(0);
+      expect(scout.strings.count('hello', 'l')).toBe(2);
+      expect(scout.strings.count('hello', 'll')).toBe(1);
+      expect(scout.strings.count('hello', 'H')).toBe(0);
+      expect(scout.strings.count('hello', 'h')).toBe(1);
+      expect(scout.strings.count('hello! this a test. :-)', '  ')).toBe(0);
+      expect(scout.strings.count('hello! this a test. :-)', ' ')).toBe(4);
+      expect(scout.strings.count('{"validJson": true, "example": "ümlauts"}', 'ü')).toBe(1);
+      expect(scout.strings.count('{"validJson": true, "example": "ümlauts"}', '"')).toBe(6);
+      expect(scout.strings.count('the bird is the word', 'rd')).toBe(2);
+    });
+
+  });
+
 });

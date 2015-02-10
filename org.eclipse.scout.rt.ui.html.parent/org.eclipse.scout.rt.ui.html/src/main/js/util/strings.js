@@ -75,6 +75,16 @@ scout.strings = {
       return true;
     }
     return (fullString.substr(-endString.length) === endString);
+  },
+
+  /**
+   * Returns the number of occurrences of 'separator' in 'string'
+   */
+  count: function(string, separator) {
+    if (!string || !separator) {
+      return 0;
+    }
+    return string.split(separator).length - 1;
   }
 
 };

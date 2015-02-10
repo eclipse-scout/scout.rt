@@ -140,12 +140,9 @@ public class JsonClientSession<T extends IClientSession> extends AbstractJsonAda
 
   protected JSONObject decimalFormatSymbolsToJson(DecimalFormatSymbols symbols) {
     JSONObject json = new JSONObject();
-    putProperty(json, "digit", String.valueOf(symbols.getDigit()));
-    putProperty(json, "zeroDigit", String.valueOf(symbols.getZeroDigit()));
     putProperty(json, "decimalSeparator", String.valueOf(symbols.getDecimalSeparator()));
     putProperty(json, "groupingSeparator", String.valueOf(symbols.getGroupingSeparator()));
     putProperty(json, "minusSign", String.valueOf(symbols.getMinusSign()));
-    putProperty(json, "patternSeparator", String.valueOf(symbols.getPatternSeparator()));
     return json;
   }
 
@@ -165,7 +162,7 @@ public class JsonClientSession<T extends IClientSession> extends AbstractJsonAda
     DecimalFormat defaultDecimalFormat = getDefaultDecimalFormat(locale);
     SimpleDateFormat defaultDateFormat = getDefaultSimpleDateFormat(locale);
     putProperty(json, "languageTag", locale.toLanguageTag());
-    putProperty(json, "decimalFormatPatternDefault", defaultDecimalFormat.toLocalizedPattern());
+    putProperty(json, "decimalFormatPatternDefault", defaultDecimalFormat.toPattern());
     putProperty(json, "dateFormatPatternDefault", defaultDateFormat.toPattern());
     putProperty(json, "decimalFormatSymbols", decimalFormatSymbolsToJson(defaultDecimalFormat.getDecimalFormatSymbols()));
     putProperty(json, "dateFormatSymbols", dateFormatSymbolsToJson(defaultDateFormat.getDateFormatSymbols()));
