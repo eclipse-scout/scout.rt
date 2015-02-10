@@ -6,7 +6,7 @@ scout.TableHeader = function(table, session) {
     columns = table.columns,
     column, $header, alignment, $defaultCheckedColumHeader;
 
-  this.dragDone = false;
+  this.dragging = false;
   this.$container = table.$data.beforeDiv('table-header');
   this.table = table;
   this.columns = table.columns;
@@ -45,8 +45,8 @@ scout.TableHeader = function(table, session) {
   function onHeaderClick(event) {
     var $header = $(this);
 
-    if (that.dragDone) {
-      that.dragDone = false;
+    if (that.dragging) {
+      that.dragging = false;
     } else if (event.shiftKey || event.ctrlKey) {
       table.sort($header, $header.hasClass('sort-asc') ? 'desc' : 'asc', event.shiftKey);
     } else if (that._tableHeaderMenu && that._tableHeaderMenu.isOpenFor($(event.target))) {
@@ -99,7 +99,7 @@ scout.TableHeader = function(table, session) {
       move = $header.outerWidth(),
       $otherHeaders = $header.siblings('.header-item');
 
-    that.dragDone = false;
+    that.dragging = false;
 
     // start drag & drop events
     $('body').on('mousemove', '', dragMove)
@@ -107,6 +107,11 @@ scout.TableHeader = function(table, session) {
 
     function dragMove(event) {
       diff = event.pageX - startX;
+      if (diff === 0) {
+        return;
+      }
+
+      that.dragging = true;
 
       // change css of dragged header
       $header.css('z-index', 50)
@@ -131,13 +136,10 @@ scout.TableHeader = function(table, session) {
         }
       });
 
-      if (diff !== 0) {
-        that.dragDone = true;
 
-        if (that._tableHeaderMenu && that._tableHeaderMenu.isOpen()) {
-          that._tableHeaderMenu.remove();
-          that._tableHeaderMenu = null;
-        }
+      if (that._tableHeaderMenu && that._tableHeaderMenu.isOpen()) {
+        that._tableHeaderMenu.remove();
+        that._tableHeaderMenu = null;
       }
     }
 
@@ -158,12 +160,15 @@ scout.TableHeader = function(table, session) {
     }
 
     function dragEnd(event) {
-      // remove events
       $('body').off('mousemove');
+
+      // in case of no movement: return
+      if (!that.dragging) {
+        return true;
+      }
 
       // find new position of dragged header
       var h = (diff < 0) ? $otherHeaders : $($otherHeaders.get().reverse());
-
       h.each(function(i) {
         if ($(this).css('left') !== '0px') {
           newPos = that.getColumnViewIndex($(this));
@@ -171,18 +176,13 @@ scout.TableHeader = function(table, session) {
         }
       });
 
-      // in case of no movement: return
-      if (!that.dragDone) {
-        return true;
-      }
-
       // move column
       if (oldPos !== newPos) {
         table.moveColumn($header, oldPos, newPos, true);
-        that.dragDone = false;
+        that.dragging = false;
       } else {
         $header.animateAVCSD('left', '', function() {
-          that.dragDone = false;
+          that.dragging = false;
         });
       }
 
