@@ -1275,6 +1275,10 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   @Override
   public void setNodesChecked(List<ITreeNode> nodes, boolean b) {
+    setNodesChecked(nodes, b, false);
+  }
+
+  public void setNodesChecked(List<ITreeNode> nodes, boolean b, boolean onlyCheckEnabledNodes) {
     if (!isCheckable()) {
       return;
     }
@@ -1282,7 +1286,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     for (ITreeNode node : nodes) {
       node = resolveNode(node);
       if (node != null) {
-        if (node.isChecked() != b) {
+        if (node.isChecked() != b && (!onlyCheckEnabledNodes || node.isEnabled())) {
           if (b) {
             m_checkedNodes.add(node);
           }
@@ -1306,7 +1310,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
       }
     }
     if (changedNodes.size() > 0) {
-      if (isAutoCheckChildNodes()) {
+      if (isAutoCheckChildNodes() && isMultiCheck()) {
         try {
           interceptAutoCheckChildNodes(nodes);
         }
@@ -2670,7 +2674,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
           nodes = resolveNodes(nodes);
           nodes = CollectionUtility.arrayList(resolveVirtualNodes(nodes));
           if (nodes.size() > 0) {
-            setNodesChecked(nodes, checked);
+            setNodesChecked(nodes, checked, true);
           }
         }
         finally {

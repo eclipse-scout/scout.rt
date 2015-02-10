@@ -2397,19 +2397,28 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   @Override
   public void checkRows(Collection<? extends ITableRow> rows, boolean value) {
+    checkRows(rows, value, false);
+  }
+
+  public void checkRows(Collection<? extends ITableRow> rows, boolean value, boolean enabledRowsOnly) {
     try {
       rows = resolveRows(rows);
       // check checked count with multicheck
       if (!isMultiCheck() && value) {
         ITableRow rowToCheck = null;
         for (ITableRow row : rows) {
-          if (row.isChecked() != value) {
+          if (row.isChecked() != value && (!enabledRowsOnly || row.isEnabled())) {
             rowToCheck = row;
             break;
           }
         }
         if (rowToCheck != null) {
-          uncheckAllRows();
+          if (!enabledRowsOnly) {
+            uncheckAllRows();
+          }
+          else {
+            uncheckAllEnabledRows();
+          }
           if (value) {
             m_checkedRows.add(rowToCheck);
           }
@@ -2425,7 +2434,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       else {
         ArrayList<ITableRow> rowsChecked = new ArrayList<ITableRow>();
         for (ITableRow row : rows) {
-          if (row.isChecked() != value) {
+          if (row.isChecked() != value && (!enabledRowsOnly || row.isEnabled())) {
             if (value) {
               m_checkedRows.add(row);
             }
@@ -2438,7 +2447,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
             rowsChecked.add(row);
           }
         }
-        if (rows.size() > 0) {
+        if (rowsChecked.size() > 0) {
           fireRowsChecked(CollectionUtility.arrayList(rowsChecked));
         }
       }
@@ -2453,6 +2462,26 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     try {
       setTableChanging(true);
       checkRows(getRows(), true);
+    }
+    finally {
+      setTableChanging(false);
+    }
+  }
+
+  public void checkAllEnabledRows() {
+    try {
+      setTableChanging(true);
+      checkRows(getRows(), true, true);
+    }
+    finally {
+      setTableChanging(false);
+    }
+  }
+
+  public void uncheckAllEnabledRows() {
+    try {
+      setTableChanging(true);
+      checkRows(getRows(), false, true);
     }
     finally {
       setTableChanging(false);
@@ -4424,7 +4453,7 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     public void setCheckedRowsFromUI(List<? extends ITableRow> rows, boolean checked) {
       try {
         pushUIProcessor();
-        checkRows(rows, checked);
+        checkRows(rows, checked, true);
       }
       finally {
         popUIProcessor();
