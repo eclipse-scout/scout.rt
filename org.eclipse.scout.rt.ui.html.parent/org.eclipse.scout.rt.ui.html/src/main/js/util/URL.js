@@ -3,7 +3,7 @@
  * If no URL is passed, 'window.location.href' is used as input.
  */
 scout.URL = function(url) {
-  if (typeof url === 'undefined') {
+  if (url === undefined) {
     url = window.location.href;
   }
   var urlParts = /^([^?#]*)(?:\?([^#]*))?(?:#(.*))?$/.exec(url || '');
@@ -102,7 +102,7 @@ scout.URL._sorter = function(a, b) {
 //
 scout.URL._formatQueryParam = function(key, value) {
   var s = encodeURIComponent(key);
-  if (typeof value !== 'undefined' && value !== null) {
+  if (value !== undefined && value !== null) {
     s += '=' + encodeURIComponent(value);
   }
   return s;
@@ -115,10 +115,10 @@ scout.URL._formatQueryParam = function(key, value) {
  * @memberOf scout.URL
  */
 scout.URL._addToMap = function(map, key, value) {
-  if (typeof map === 'undefined') {
+  if (map === undefined) {
     throw new Error("Argument 'map' must not be null");
   }
-  if (typeof key === 'undefined') {
+  if (key === undefined) {
     throw new Error("Argument 'key' must not be null");
   }
   if (key in map) {

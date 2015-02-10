@@ -10,60 +10,104 @@ http://contribute.jquery.org/style-guide/js/
 
 ### Variablen
 
-- Variablen wenn moeglich immer am Anfang der Funktion deklarieren. Variablen am
-  Anfang zu Deklarieren ist good practice, denn die JS-Engine macht das bei der
-  Ausfuehrung sowieso(variable hoisting).
-- Pro 'var' Anweisung dürfen mehrere Variablen deklariert und auch initialisiert
-  werden. Komplexe Initialisierung soll aber auf einer separaten Zeile notiert
-  werden.
-- Grundsätzlich ist eine kompakte Darstellung erwünscht, die Lesbarkeit soll
-  aber nicht darunter leiden.
+Variablen gelten in JS (zumindest in ECMA 5) immer für die ganze Funktion und nicht für
+innere Blöcke wie if, while etc. Egal wo in der Funktion man die Variable mit 'var'
+definiert, zur Laufzeit existiert die Variable immer schon am Anfang der Funktion (mit
+Wert undefined). Das nennt sich "Variable Hoisting".
 
+Es ist zu einem gewissen Grad Geschmacksache, ob man alle verwendeten Variablen selber
+schon ganz am Anfang der Funktion deklariert. Vorteilhaft dabei ist, dass es die
+tatsächliche Situation zur Laufzeit abbildet, allerdings kann die Lesbarkeit darunter
+leiden. Darum sollte man mit Augenmass vorgehen:
+
+  - Variablen innerhalb ihres "logischen" Kontexts deklarieren, so dass ein Leser der
+    Funktion möglichst nicht verwirrt ist durch Sachen, die erst später relevant werden.
+
+    Wenn eine Variable von Anfang bis Ende der Funktion immer wieder benutzt wird, sollte
+    sie schon am Anfang deklariert werden. Wenn sie nur in einem einzigen if() Statement
+    vorkommt, dann eher erst dort. Auch Zählvariablen in for()-Loops können in der for-
+    Anweisung deklariert werden. Wenn die gleiche aber in mehreren Loops verwendet wird,
+    kann es Sinn machen, sie weiter oben zu deklarieren, damit die beiden for-Anweisungen
+    "ähnlich" aussehen.
+
+  - Pro 'var' Anweisung dürfen mehrere Variablen deklariert und auch initialisiert
+    werden. Komplexe Initialisierung soll aber auf einer separaten Zeile notiert werden.
+    Grundsätzlich ist eine kompakte Darstellung erwünscht, die Lesbarkeit soll
+    aber nicht darunter leiden.
 
 Beispiele:
 
-NOK:                           OK:
--------------------------------------------------------------------------
-var x = (y > 0 ? 1 : 2), y = $('h1').children('.myClass').first().text();
+NOK:
 
-                               var x, y = 3;
+  var x = (y > 0 ? 1 : 2), y = $('h1').children('.myClass').first().text();
 
-                               var x = 4,
-                                 y = 3,
-                                 value = $('h1').text();
+OK:
+
+  var x, y = 3;
+
+  var x = 4,
+    y = x + 1,
+    value = $('h1').text();
+
+  for (var i = 0; i < array.length; i++) {
+    var temp = array[i];
+    temp.run();
+  }
 
 Links:
 - http://benalman.com/news/2012/05/multiple-var-statements-javascript/
 
 
 ### Visibility
-Wir verwenden _ als Prefix für private Members einer Klasse. Solche Members dürfen von aussen nicht zugegriffen werden (Ausnahme: in Tests/Specs)
+
+Wir verwenden _ als Prefix für private Members einer Klasse. Solche Members dürfen von aussen
+nicht zugegriffen werden (Ausnahme: in Tests/Specs)
 
 
 ### Pruefen, ob eine Variable oder ein Property existiert
 
-        +-------------------------------------+----------------------------------+
-        | FUER PROPERTIES:                    | FUER VARIABLEN:                  |
- +------+-------------------------------------+----------------------------------+
- | #1   | if (obj.x === undefined)            | if (y === undefined)             |
- |      |                                     |                                  |
- | #2   | if (typeof obj.x === 'undefined')   | if (typeof y === 'undefined')    |
- |      |                                     |                                  |
- | #3   | if (obj.hasOwnProperty('x'))        | -                                |
- +------+-------------------------------------+----------------------------------+
+Am einfachsten ist es, zu schauen, ob die Variable "truthy" ist:
 
-Bewertung:
-- #1 funktioniert bei Properties, aber nicht bei Variablen. Wenn die Variable nicht
-  definiert ist, gibt es eine Exception. Weiteres (theoretisches) Problem: Jemand
-  koennte die Variable 'undefined' umdefinieren. (wir stellen jedoch im scout-module.js
-  sicher, dass dies nicht geschehen kann).
-- #2 funktioniert immer. Bei Properties werden auch diejenigen der Protoypen
-  beruecksichtigt.
-- #3 kann sinnvoll sein, denn es schaut _nicht_ beim Prototyp nach. Allerdings scheint
-  es extrem langsam zu sein, darum besser nicht verwenden.
+  if (value)
+  if (obj.prop)
 
---> Wir verwenden grundsätzlich Variante #1. Exceptions die durch nicht deklarierte
-    Variablen verursacht werden sind Programmierfehler.
+Es gibt aber Fälle, wo das nicht geht:
+
+  1) Die Variable ist zwar vorhanden, hat aber einen "falsy" Wert (z.B. 0).
+
+     Das ist der häufigsten Fall. Man prüft hier einfach auf undefined (mit ===):
+
+       if (value === undefined)
+       if (obj.prop === undefined)
+
+     Teilweise wird von dieser Variante abgeraten, da das globale Objekt 'undefined'
+     überschrieben worden sein könnte. Das wird in Scout aber durch eine IIFE verhindert.
+     Bei dieser Variante wird 'null' nicht geprüft, d.h. es braucht ggf. eine zweite
+     Bedingung. Und bei der Property-Variante ist natürlich wichtig, dass 'obj' ein
+     Objekt ist, sonst kommt es beim Zugriff auf obj.prop zu einer Exception.
+
+  2) Die Variable ist nicht deklariert (gibt Exception bei der Prüfung)
+
+     Dieser Fall kommt eher selten vor. Ein Beispiel ist die Prüfung, ob das globale
+     Objekt log4javascript vorhanden ist, d.h. schon log4javascript installiert ist.
+     Lösen kann man das über den typeof-Trick:
+
+       if (typeof neverdeclared === 'undefined')
+
+     Auch 1) könnte man damit erledigen, aber es gibt eher keinen Vorteil. Bei 1) hat
+     man den Vorteil, dass das Wort 'undefined' in Eclipse fett geschrieben wird. Manche
+     sagen, dass der String-Vergleich von 2) langsam ist, während andere sagen, dass
+     das nicht stimmt, da die Browser extra darauf optimieren.
+
+  3) Es ist wirklich relevant, ob x auf obj vorhanden ist (und nicht etwa auf einem
+     seiner Prototypen).
+
+     Da 'obj.prop' auch etwas zurückgibt, wenn prop auf einem der Prototypen des Objekts
+     definiert ist, kann manchmal auch folgende Notation nötig sein:
+
+       if (obj.hasOwnProperty('prop'))
+
+     Das scheint allerdings relativ langsam sein, darum nur verwenden, wenn wirklich nötig.
 
 Links:
 - http://stackoverflow.com/questions/4725603
@@ -236,3 +280,14 @@ Begruendung:
   Da wir viele jQuery-Funktionen verwenden, halten wir uns an den jQuery-Styleguide.
 - Der JS-Formatter in Eclipse beherrscht aktuell nur die Punkte vorne. Deshalb verwenden wir
   diesen Stil, obwohl er anders ist als im Java-Code.
+
+
+### Cast to boolean
+
+Um einen Wert in einen Boolean zu casten, folgende Kurznotation verwenden:
+
+  !!value
+
+Mit dem einen Ausrufezeichen wird geschaut, ob der Value "truthy" ist. Das ist dann
+immer garantiert true oder false, dummerweise noch verkehrt (true wenn 'value' falsy ist,
+false, wenn er truthy ist). Mit dem zweiten Ausrufezeichen wird das korrigiert.

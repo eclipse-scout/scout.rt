@@ -66,7 +66,7 @@ scout.TableSelectionHandler.prototype._onRowsDrawn = function($rows) {
     // action for all affected rows
     function selectData(event) {
       // affected rows between $row and Target
-      var firstIndex = (typeof first !== 'undefined' ? first : $allRows.index($row));
+      var firstIndex = (first !== undefined ? first : $allRows.index($row));
       var lastIndex = $allRows.index($(event.delegateTarget));
 
       var startIndex = Math.min(firstIndex, lastIndex);

@@ -24,10 +24,10 @@ scout.helpers = {
   openWindow: function(url, windowId, popupWidth, popupHeight) {
     var windowSpec = '';
     if (popupWidth && popupHeight) {
-      var parentLeft = (typeof window.screenX !== 'undefined') ? window.screenX : window.screenLeft;
-      var parentTop = (typeof window.screenY !== 'undefined') ? window.screenY : window.screenTop;
-      var parentWidth = (typeof window.outerWidth !== 'undefined') ? window.outerWidth : screen.width;
-      var parentHeight = (typeof window.outerHeight !== 'undefined') ? window.outerHeight : screen.height;
+      var parentLeft = (window.screenX !== undefined) ? window.screenX : window.screenLeft;
+      var parentTop = (window.screenY !== undefined) ? window.screenY : window.screenTop;
+      var parentWidth = (window.outerWidth !== undefined) ? window.outerWidth : screen.width;
+      var parentHeight = (window.outerHeight !== undefined) ? window.outerHeight : screen.height;
       var popupLeft = ((parentWidth / 2) - (popupWidth / 2)) + parentLeft;
       var popupTop = ((parentHeight / 2) - (popupHeight / 2)) + parentTop;
       windowSpec = [

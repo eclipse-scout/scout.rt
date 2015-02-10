@@ -43,7 +43,7 @@ function loadAndResolveScriptContent(path) {
 
 // Copied from ScriptFileBuilder.java
 function insertLineNumbers(filename, text) {
-  if (typeof text === 'undefined' || text === null) {
+  if (text === undefined || text === null) {
     return text;
   }
   var index = filename.lastIndexOf('/');

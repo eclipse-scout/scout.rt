@@ -60,7 +60,7 @@
    */
   $.debounce = function(fx, delay) {
     var delayer = null;
-    delay = (typeof delay !== 'undefined') ? delay : 250;
+    delay = (delay !== undefined) ? delay : 250;
     return function() {
       var that = this,
         args = arguments;
@@ -275,9 +275,7 @@
 
   // over engineered animate
   $.fn.widthToContent = function(duration) {
-    if (typeof duration === 'undefined') {
-      duration = 300;
-    }
+    duration = (duration !== undefined) ? duration : 300;
 
     var oldW = this.outerWidth(),
       newW = this.css('width', 'auto').outerWidth(),
@@ -297,9 +295,7 @@
   };
 
   $.fn.heightToContent = function(duration) {
-    if (typeof duration === 'undefined') {
-      duration = 300;
-    }
+    duration = (duration !== undefined) ? duration : 300;
 
     var oldH = this.outerHeight(),
       newH = this.css('height', 'auto').outerHeight(),

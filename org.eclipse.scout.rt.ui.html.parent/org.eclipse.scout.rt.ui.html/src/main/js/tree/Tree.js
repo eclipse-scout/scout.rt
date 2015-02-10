@@ -677,7 +677,7 @@ scout.Tree.prototype._$buildNode = function(node, $parent) {
 
 scout.Tree.prototype._decorateNode = function(node) {
   var $node = node.$node;
-  if (typeof $node === 'undefined') {
+  if (!$node) {
     // This node is not yet rendered, nothing to do
     return;
   }

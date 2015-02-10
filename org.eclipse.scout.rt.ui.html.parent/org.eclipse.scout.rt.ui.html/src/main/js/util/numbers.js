@@ -5,7 +5,7 @@ scout.numbers =  {
      * represented by [a-zA-Z0-9] instead of only [0-9].
      */
     toBase62: function(number) {
-      if (typeof number === 'undefined') {
+      if (number === undefined) {
         return undefined;
       }
       var symbols = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('');
@@ -25,9 +25,7 @@ scout.numbers =  {
      * given length. The default length is 8.
      */
     randomId: function(length) {
-      if (typeof length === 'undefined') {
-        length = 8;
-      }
+      length = (length !== undefined) ? length : 8;
       var charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
       var s = '';
       for (var i = 0; i < length; i++) {

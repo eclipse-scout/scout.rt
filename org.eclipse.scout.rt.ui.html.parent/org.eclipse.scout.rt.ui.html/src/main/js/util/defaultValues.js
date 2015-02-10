@@ -107,12 +107,12 @@ scout.defaultValues = {
   },
 
   _extendWithDefaults: function(object, defaults) {
-    if (typeof object === 'undefined' || typeof defaults === 'undefined') {
+    if (object === undefined || defaults === undefined) {
       return;
     }
     for (var prop in defaults) {
       // If property does not exist, set the default value.
-      if (typeof object[prop] === 'undefined') {
+      if (object[prop] === undefined) {
         object[prop] = scout.objects.valueCopy(defaults[prop]);
       }
       // Special case: "default objects". If the property value is an object and default

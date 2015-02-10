@@ -91,11 +91,11 @@ scout.dates = {
     var firstDayOfWeek = 1;
     if (typeof option === 'object') {
       // scout.DateFormat
-      if (typeof option.symbols !== 'undefined' && option.symbols.firstDayOfWeek !== 'undefined') {
+      if (option.symbols !== undefined && option.symbols.firstDayOfWeek !== undefined) {
         firstDayOfWeek = option.symbols.firstDayOfWeek;
       }
       // scout.Locale
-      else if (typeof option.decimalFormatSymbols !== 'undefined' && option.decimalFormatSymbols.firstDayOfWeek !== 'undefined') {
+      else if (option.decimalFormatSymbols !== undefined && option.decimalFormatSymbols.firstDayOfWeek !== undefined) {
         firstDayOfWeek = option.decimalFormatSymbols.firstDayOfWeek;
       }
     }
