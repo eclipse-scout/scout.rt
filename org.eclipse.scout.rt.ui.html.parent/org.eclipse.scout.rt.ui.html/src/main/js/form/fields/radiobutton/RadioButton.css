@@ -56,7 +56,6 @@
 
   & input[type=radio]:focus + label:before {
     border-color: @focus-color;
-    background-color: @focus-color-glow;
     outline: none;
   }
 
