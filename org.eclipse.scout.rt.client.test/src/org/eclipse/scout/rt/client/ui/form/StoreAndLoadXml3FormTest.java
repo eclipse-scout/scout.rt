@@ -73,7 +73,7 @@ public class StoreAndLoadXml3FormTest {
   @Test
   public void testFormId() throws Exception {
     TestForm f = new TestForm();
-    Document xml = f.storeXML();
+    Document xml = f.storeToXml();
     assertEquals("TestForm", xml.getDocumentElement().getAttribute("formId"));
     assertEquals(TestForm.class.getName(), xml.getDocumentElement().getAttribute("formQname"));
   }
@@ -92,10 +92,10 @@ public class StoreAndLoadXml3FormTest {
     f.getG3G4Text2Field().setValue("g3g2");
     f.getG1Box().getTestListBox().setValue(CollectionUtility.hashSet("g1L"));
     f.getG2Box().getTestListBox().setValue(CollectionUtility.hashSet("g2L"));
-    String xml = f.getXML();
+    String xml = f.storeToXmlString();
 
     f = new TestForm();
-    f.setXML(xml);
+    f.loadFromXmlString(xml);
 
     //new form should contain the stored values
     assertEquals("t1", f.getText1Field().getValue());
@@ -121,7 +121,7 @@ public class StoreAndLoadXml3FormTest {
     f.getG3G4Text2Field().setValue("g3g2");
 
     // remove enclosing field path information and fieldQname
-    Document xml = f.storeXML();
+    Document xml = f.storeToXml();
     for (Element e : XmlUtility.getChildElements(XmlUtility.getFirstChildElement(xml.getDocumentElement(), "fields"))) {
       for (Element toRemove : XmlUtility.getChildElements(e, "enclosingField")) {
         e.removeChild(toRemove);
@@ -131,7 +131,7 @@ public class StoreAndLoadXml3FormTest {
 
     // value should be imported to first field found
     f = new TestForm();
-    f.loadXML(xml.getDocumentElement());
+    f.loadFromXml(xml.getDocumentElement());
 
     assertEquals("t3", f.getText3Field().getValue());
 

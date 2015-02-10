@@ -2143,18 +2143,18 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   @Override
-  public void setXML(String xml) throws ProcessingException {
+  public void loadFromXmlString(String xml) throws ProcessingException {
     if (xml == null) {
       return;
     }
     Document xmlDocument = XmlUtility.getXmlDocument(xml);
-    loadXML(xmlDocument.getDocumentElement());
+    loadFromXml(xmlDocument.getDocumentElement());
   }
 
   @Override
-  public String getXML() throws ProcessingException {
+  public String storeToXmlString() throws ProcessingException {
     try {
-      Document e = storeXML();
+      Document e = storeToXml();
       return XmlUtility.wellformDocument(e);
     }
     catch (Exception e) {
@@ -2168,14 +2168,14 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   @Override
-  public Document storeXML() throws ProcessingException {
+  public Document storeToXml() throws ProcessingException {
     Document doc = XmlUtility.createNewXmlDocument("form-state");
-    storeXML(doc.getDocumentElement());
+    storeToXml(doc.getDocumentElement());
     return doc;
   }
 
   @Override
-  public void storeXML(Element root) throws ProcessingException {
+  public void storeToXml(Element root) throws ProcessingException {
     root.setAttribute("formId", getFormId());
     root.setAttribute("formQname", getClass().getName());
     // add custom properties
@@ -2234,7 +2234,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   @Override
-  public void loadXML(Element root) throws ProcessingException {
+  public void loadFromXml(Element root) throws ProcessingException {
     String formId = getFormId();
     String xmlId = root.getAttribute("formId");
     if (!formId.equals(xmlId)) {
@@ -2318,7 +2318,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
 
       // export search parameters
       try (Writer w = new OutputStreamWriter(new FileOutputStream(path), "UTF-8")) {
-        XmlUtility.wellformDocument(storeXML(), w);
+        XmlUtility.wellformDocument(storeToXml(), w);
         if (path != null) {
           m_lastXmlFileForStorage = path;
         }
@@ -2344,7 +2344,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
         Document doc = XmlUtility.getXmlDocument(in);
         // load xml to search
         m_lastXmlFileForStorage = newPath;
-        loadXML(doc.getDocumentElement());
+        loadFromXml(doc.getDocumentElement());
       }
       catch (Exception e) {
         LOG.warn("loading: " + newPath + " Exception: " + e);

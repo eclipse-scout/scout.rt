@@ -56,7 +56,7 @@ public class MediumMemoryPolicy extends AbstractMemoryPolicy {
     SearchFormState state = m_searchFormCache.get(pageFormIdentifier);
     if (state != null) {
       if (state.formContentXml != null) {
-        f.setXML(state.formContentXml);
+        f.loadFromXmlString(state.formContentXml);
       }
       if (state.searchFilter != null) {
         f.setSearchFilter(state.searchFilter);
@@ -71,7 +71,7 @@ public class MediumMemoryPolicy extends AbstractMemoryPolicy {
       m_searchFormCache.remove(pageFormIdentifier);
     }
     else {
-      String xml = f.getXML();
+      String xml = f.storeToXmlString();
       SearchFilter filter = f.getSearchFilter();
       m_searchFormCache.put(pageFormIdentifier, new SearchFormState(xml, filter));
     }

@@ -569,15 +569,15 @@ public interface IForm extends IPropertyObserver, ITypeWithSettableClassId {
   /**
    * XML export/import of form state
    */
-  void setXML(String xml) throws ProcessingException;
+  void loadFromXmlString(String xml) throws ProcessingException;
 
-  String getXML() throws ProcessingException;
+  String storeToXmlString() throws ProcessingException;
 
-  Document storeXML() throws ProcessingException;
+  Document storeToXml() throws ProcessingException;
 
-  void storeXML(Element root) throws ProcessingException;
+  void storeToXml(Element root) throws ProcessingException;
 
-  void loadXML(Element root) throws ProcessingException;
+  void loadFromXml(Element root) throws ProcessingException;
 
   /**
    * Wait until form is closed<br>

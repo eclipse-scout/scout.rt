@@ -167,7 +167,7 @@ public abstract class AbstractWrappedFormField<T extends IForm> extends Abstract
   public void loadXML(Element x) throws ProcessingException {
     super.loadXML(x);
     if (getInnerForm() != null) {
-      getInnerForm().loadXML(x);
+      getInnerForm().loadFromXml(x);
     }
   }
 
@@ -175,7 +175,7 @@ public abstract class AbstractWrappedFormField<T extends IForm> extends Abstract
   public void storeXML(Element x) throws ProcessingException {
     super.storeXML(x);
     if (getInnerForm() != null) {
-      getInnerForm().storeXML(x);
+      getInnerForm().storeToXml(x);
     }
   }
 

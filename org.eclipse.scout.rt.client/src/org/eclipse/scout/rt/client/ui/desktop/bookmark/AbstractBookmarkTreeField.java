@@ -940,7 +940,7 @@ public abstract class AbstractBookmarkTreeField extends AbstractTreeField {
               if (state instanceof TablePageState) {
                 TablePageState tablePageState = (TablePageState) state;
                 try {
-                  searchForm.setXML(tablePageState.getSearchFormState());
+                  searchForm.loadFromXmlString(tablePageState.getSearchFormState());
                   searchForm.doSaveWithoutMarkerChange();
                   success = true;
                   break;

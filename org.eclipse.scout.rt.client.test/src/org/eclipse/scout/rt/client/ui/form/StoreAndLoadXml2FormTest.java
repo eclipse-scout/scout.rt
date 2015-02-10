@@ -213,11 +213,11 @@ public class StoreAndLoadXml2FormTest {
       f.startModify();
       assertArrayEquals(TABLE_DATA, f.getTableField().getTable().getTableData());
       //store xml and clear
-      String xml = f.getXML();
+      String xml = f.storeToXmlString();
       f.getTableField().getTable().discardAllRows();
       assertArrayEquals(new Object[0][0], f.getTableField().getTable().getTableData());
       //load xml
-      f.setXML(xml);
+      f.loadFromXmlString(xml);
       assertArrayEquals(TABLE_DATA, f.getTableField().getTable().getTableData());
     }
     finally {

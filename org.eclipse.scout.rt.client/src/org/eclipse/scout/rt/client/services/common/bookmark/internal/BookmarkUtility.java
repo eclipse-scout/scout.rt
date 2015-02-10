@@ -648,7 +648,7 @@ public final class BookmarkUtility {
         String oldSearchFilterState = "" + createSearchFilterCRC(searchForm.getSearchFilter());
         if (CompareUtility.equals(oldSearchFilterState, newSearchFilterState)) {
           String newSearchFormState = tablePageState.getSearchFormState();
-          String oldSearchFormState = searchForm.getXML();
+          String oldSearchFormState = searchForm.storeToXmlString();
           if (CompareUtility.equals(oldSearchFormState, newSearchFormState)) {
             doSearch = false;
           }
@@ -658,7 +658,7 @@ public final class BookmarkUtility {
           doSearch = true;
         }
         if (doSearch) {
-          searchForm.setXML(tablePageState.getSearchFormState());
+          searchForm.loadFromXmlString(tablePageState.getSearchFormState());
           if (tablePageState.isSearchFilterComplete()) {
             searchForm.doSaveWithoutMarkerChange();
           }
@@ -782,7 +782,7 @@ public final class BookmarkUtility {
     state.setExpanded(page.isExpanded());
     IForm searchForm = page.getSearchFormInternal();
     if (searchForm != null) {
-      state.setSearchFormState(searchForm.getXML());
+      state.setSearchFormState(searchForm.storeToXmlString());
       state.setSearchFilterState(searchForm.getSearchFilter().isCompleted(), "" + createSearchFilterCRC(searchForm.getSearchFilter()));
     }
     if (page.getTable().getTableCustomizer() != null) {
