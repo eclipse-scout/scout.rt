@@ -17,11 +17,13 @@ import static org.junit.Assert.assertTrue;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
+import org.eclipse.scout.rt.client.ui.basic.tree.ITreeVisitor;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
@@ -30,6 +32,7 @@ import org.eclipse.scout.rt.ui.html.json.menu.fixtures.Menu;
 import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
 import org.eclipse.scout.rt.ui.html.json.tree.fixtures.Tree;
 import org.eclipse.scout.rt.ui.html.json.tree.fixtures.TreeNode;
+import org.eclipse.scout.rt.ui.html.json.tree.fixtures.TreeWith3Levels;
 import org.eclipse.scout.rt.ui.html.json.tree.fixtures.TreeWithOneNode;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
 import org.json.JSONArray;
@@ -154,7 +157,8 @@ public class JsonTreeTest {
 
   @Test
   public void testDispose() throws ProcessingException {
-    ITree tree = createTreeWithOneNode();
+    ITree tree = new TreeWith3Levels();
+    tree.initTree();
     JsonTree<ITree> object = m_jsonSession.newJsonAdapter(tree, null, null);
     WeakReference<JsonTree> ref = new WeakReference<JsonTree>(object);
 
@@ -236,6 +240,59 @@ public class JsonTreeTest {
   }
 
   /**
+   * Tests whether the node gets removed from the maps after deletion (m_treeNodes, m_treeNodeIds)
+   */
+  @Test
+  public void testNodeDisposal() throws ProcessingException, JSONException {
+    List<ITreeNode> nodes = new ArrayList<ITreeNode>();
+    nodes.add(new TreeNode());
+    nodes.add(new TreeNode());
+    nodes.add(new TreeNode());
+    ITree tree = createTree(nodes);
+    JsonTree<ITree> jsonTree = m_jsonSession.createJsonAdapter(tree, null);
+
+    String node0Id = jsonTree.getOrCreateNodeId(nodes.get(0));
+    assertNotNull(node0Id);
+    assertNotNull(jsonTree.getNode(node0Id));
+
+    tree.removeNode(nodes.get(0));
+
+    assertNull(jsonTree.getNodeId(nodes.get(0)));
+    assertNull(jsonTree.getNode(node0Id));
+  }
+
+  /**
+   * Tests whether the child nodes gets removed from the maps after deletion (m_treeNodes, m_treeNodeIds)
+   */
+  @Test
+  public void testNodeDisposalRec() throws ProcessingException, JSONException {
+    ITree tree = new TreeWith3Levels();
+    tree.initTree();
+
+    List<ITreeNode> allNodes = getAllTreeNodes(tree);
+    List<String> allNodeIds = new LinkedList<String>();
+
+    JsonTree<ITree> jsonTree = m_jsonSession.createJsonAdapter(tree, null);
+
+    for (ITreeNode node : allNodes) {
+      String nodeId = jsonTree.getOrCreateNodeId(node);
+      allNodeIds.add(nodeId);
+
+      assertNotNull(nodeId);
+      assertNotNull(jsonTree.getNode(nodeId));
+    }
+
+    tree.removeNode(allNodes.get(0));
+
+    for (ITreeNode node : allNodes) {
+      assertNull(jsonTree.getNodeId(node));
+    }
+    for (String nodeId : allNodeIds) {
+      assertNull(jsonTree.getNode(nodeId));
+    }
+  }
+
+  /**
    * Tests whether an all nodes deleted event gets sent whenever all children of a node get deleted.
    */
   @Test
@@ -292,5 +349,33 @@ public class JsonTreeTest {
     Tree tree = new Tree(nodes);
     tree.initTree();
     return tree;
+  }
+
+  public static String getOrCreateNodeId(JsonTree tree, ITreeNode node) {
+    return tree.getOrCreateNodeId(node);
+  }
+
+  public static String getNodeId(JsonTree tree, ITreeNode node) {
+    return tree.getNodeId(node);
+  }
+
+  public static ITreeNode getNode(JsonTree tree, String nodeId) {
+    return tree.getNode(nodeId);
+  }
+
+  public static List<ITreeNode> getAllTreeNodes(final ITree tree) {
+    final List<ITreeNode> nodes = new LinkedList<ITreeNode>();
+    tree.visitTree(new ITreeVisitor() {
+
+      @Override
+      public boolean visit(ITreeNode node) {
+        if (!tree.isRootNodeVisible() && tree.getRootNode() == node) {
+          return true;
+        }
+        nodes.add(node);
+        return true;
+      }
+    });
+    return nodes;
   }
 }

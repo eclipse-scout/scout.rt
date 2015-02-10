@@ -283,11 +283,22 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
       addActionEvent(EVENT_NODES_DELETED, jsonEvent);
     }
 
+    disposeNodes(nodes);
+  }
+
+  protected void disposeNodes(Collection<ITreeNode> nodes) {
     for (ITreeNode node : nodes) {
-      String nodeId = m_treeNodeIds.get(node);
-      m_treeNodeIds.remove(node);
-      m_treeNodes.remove(nodeId);
+      if (node.getChildNodeCount() > 0) {
+        disposeNodes(node.getChildNodes());
+      }
+      disposeNode(node);
     }
+  }
+
+  protected void disposeNode(ITreeNode node) {
+    String nodeId = m_treeNodeIds.get(node);
+    m_treeNodeIds.remove(node);
+    m_treeNodes.remove(nodeId);
   }
 
   protected void handleModelNodesSelected(Collection<ITreeNode> modelNodes) {
@@ -363,8 +374,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     if (isInvisibleRootNode(node)) {
       return null;
     }
-
-    String id = m_treeNodeIds.get(node);
+    String id = getNodeId(node);
     if (id != null) {
       return id;
     }
@@ -372,6 +382,14 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     m_treeNodes.put(id, node);
     m_treeNodeIds.put(node, id);
     return id;
+  }
+
+  protected String getNodeId(ITreeNode node) {
+    return m_treeNodeIds.get(node);
+  }
+
+  protected ITreeNode getNode(String nodeId) {
+    return m_treeNodes.get(nodeId);
   }
 
   protected boolean isInvisibleRootNode(ITreeNode node) {
@@ -423,7 +441,10 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   public List<ITreeNode> jsonToTreeNodes(JSONArray nodeIds) {
     List<ITreeNode> nodes = new ArrayList<>(nodeIds.length());
     for (int i = 0; i < nodeIds.length(); i++) {
-      nodes.add(m_treeNodes.get(JsonObjectUtility.get(nodeIds, i)));
+      ITreeNode node = getNode(JsonObjectUtility.getString(nodeIds, i));
+      if (node != null) {
+        nodes.add(node);
+      }
     }
     return nodes;
   }

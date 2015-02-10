@@ -10,14 +10,20 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.desktop;
 
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
+import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
+import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.NodePage;
 import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.NodePageWithForm;
 import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.Outline;
 import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.OutlineWithOneNode;
@@ -25,6 +31,7 @@ import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.TablePage;
 import org.eclipse.scout.rt.ui.html.json.fixtures.JsonSessionMock;
 import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
 import org.eclipse.scout.rt.ui.html.json.tree.JsonTree;
+import org.eclipse.scout.rt.ui.html.json.tree.JsonTreeTest;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -67,6 +74,46 @@ public class JsonOutlineTest {
 
     Assert.assertNotNull(jsonOutline.getAdapter(nodePage.getDetailForm()));
     Assert.assertNotNull(jsonOutline.getAdapter(rowPage.getDetailForm()));
+  }
+
+  @Test
+  public void testPageDisposal() throws ProcessingException {
+    TablePage tablePage = new TablePage(1, new TablePage.NodePageWithFormFactory());
+    NodePage nodePage = new NodePage();
+
+    List<IPage<?>> pages = new ArrayList<IPage<?>>();
+    pages.add(nodePage);
+    IOutline outline = new Outline(pages);
+
+    outline.addChildNode(nodePage, tablePage);
+    outline.selectNode(tablePage);
+
+    JsonOutline<IOutline> jsonOutline = m_jsonSession.newJsonAdapter(outline, null, null);
+
+    List<ITreeNode> allNodes = JsonTreeTest.getAllTreeNodes(outline);
+    List<String> allNodeIds = new LinkedList<String>();
+
+    for (ITreeNode node : allNodes) {
+      String nodeId = JsonTreeTest.getOrCreateNodeId(jsonOutline, node);
+      allNodeIds.add(nodeId);
+
+      assertNotNull(nodeId);
+      assertNotNull(JsonTreeTest.getNode(jsonOutline, nodeId));
+    }
+
+    outline.removeNode(nodePage);
+
+    // Verify nodes get unregistered
+    for (ITreeNode node : allNodes) {
+      assertNull(JsonTreeTest.getNodeId(jsonOutline, node));
+    }
+    for (String nodeId : allNodeIds) {
+      assertNull(JsonTreeTest.getNode(jsonOutline, nodeId));
+    }
+
+    // Verify table adapter gets unregistered
+    m_jsonSession.flush();
+    assertNull(m_jsonSession.getJsonAdapter(tablePage.getTable(), m_jsonSession.getRootJsonAdapter()));
   }
 
   /**

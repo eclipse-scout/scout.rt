@@ -95,6 +95,7 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
     for (IJsonAdapter<?> childAdapter : m_jsonDetailTables) {
       childAdapter.dispose();
     }
+    m_jsonDetailTables.clear();
   }
 
   protected void attachPage(IPage<?> page) {
@@ -142,19 +143,16 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
   }
 
   @Override
-  protected void handleModelNodesDeleted(TreeEvent event) {
-    super.handleModelNodesDeleted(event);
+  protected void disposeNode(ITreeNode node) {
+    super.disposeNode(node);
 
-    Collection<ITreeNode> nodes = event.getNodes();
-    for (ITreeNode node : nodes) {
-      IPage page = (IPage) node;
-      ITable table = page.getTable();
-      if (table != null) {
-        IJsonAdapter<?> jsonAdapter = getGlobalAdapter(table);
-        if (jsonAdapter != null) {
-          m_jsonDetailTables.remove(jsonAdapter);
-          jsonAdapter.dispose();
-        }
+    IPage page = (IPage) node;
+    ITable table = page.getTable();
+    if (table != null) {
+      IJsonAdapter<?> jsonAdapter = getGlobalAdapter(table);
+      if (jsonAdapter != null) {
+        m_jsonDetailTables.remove(jsonAdapter);
+        jsonAdapter.dispose();
       }
     }
   }
