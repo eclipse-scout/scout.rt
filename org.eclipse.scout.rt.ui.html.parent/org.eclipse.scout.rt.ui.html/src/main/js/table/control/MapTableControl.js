@@ -3,38 +3,30 @@
 scout.MapTableControl = function() {
   scout.MapTableControl.parent.call(this);
   this.cssClass = 'map';
+  this.countryColumns;
 };
 scout.inherits(scout.MapTableControl, scout.TableControl);
 
 scout.MapTableControl.FILTER_KEY = 'MAP';
 
 scout.MapTableControl.prototype._renderContent = function($parent) {
+  var that = this,
+    countries = this.map.objects.countries.geometries,
+    tableCountries;
+
   this.$contentContainer = $parent
     .appendSVG('svg', '', 'map-container')
     .attrSVG('viewBox', '5000 -100000 200000 83000')
     .attrSVG('preserveAspectRatio', 'xMidYMid');
 
-  var that = this,
-    countries = this.map.objects.countries.geometries;
+  if (!this.countryColumns) {
+    this.countryColumns = this._resolveColumnIds();
+  }
+  tableCountries = this._findCountries();
 
   this._filterResetListener = this.table.events.on(scout.Table.GUI_EVENT_FILTER_RESETTED, function(event) {
     that.$contentContainer.find('.map-item.selected').removeClassSVG('selected');
   });
-
-  // find all countries in table
-  var tableCountries = [];
-  for (var i = 0; i < this.table.columns.length; i++) {
-    for (var j = 0; j < this.columnIds.length; j++) {
-      if (this.table.columns[i].id === this.columnIds[j]) {
-        for (var r = 0; r < this.table.rows.length; r++) {
-          var value = this.table.rows[r].cells[i];
-          if (tableCountries.indexOf(value) === -1) {
-            tableCountries.push(value);
-          }
-        }
-      }
-    }
-  }
 
   // loop all countries and draw path
   for (var c = 0; c < countries.length; c++) {
@@ -92,14 +84,14 @@ scout.MapTableControl.prototype._renderContent = function($parent) {
     // finally: append country as svg path
     var $country = this.$contentContainer.appendSVG('path', countries[c].id, 'map-item')
       .attr('d', pathString)
-      .click(clickMap);
+      .click(onMapClick);
 
     if (tableCountries.indexOf(countries[c].id) > -1) {
       $country.addClassSVG('has-data');
     }
   }
 
-  function clickMap(event) {
+  function onMapClick(event) {
     var $clicked = $(this);
 
     if (event.ctrlKey) {
@@ -115,15 +107,16 @@ scout.MapTableControl.prototype._renderContent = function($parent) {
 
     // find filter values
     var countries = [];
-    $('.map-item.selected').each(function() {
+    that.$contentContainer.find('.map-item.selected').each(function() {
       countries.push($(this).attr('id'));
     });
 
-    //  filter function
     var filterFunc = function($row) {
-      for (var c = 0; c < that.table.columns.length; c++) {
-        var text = $row.children().eq(c).text();
-        if (countries.indexOf(text) > -1) {
+      for (var c = 0; c < that.countryColumns.length; c++) {
+        var column = that.countryColumns[c];
+        var row = $row.data('row');
+        var cellText = that.table.cellText(column, row);
+        if (countries.indexOf(cellText) > -1) {
           return true;
         }
       }
@@ -155,4 +148,38 @@ scout.MapTableControl.prototype._renderMap = function(map) {
 
 scout.MapTableControl.prototype.isContentAvailable = function() {
   return this.map;
+};
+
+scout.MapTableControl.prototype._resolveColumnIds = function() {
+  var i, j, column, countryColumns = [];
+  for (i = 0; i < this.table.columns.length; i++) {
+    for (j = 0; j < this.columnIds.length; j++) {
+      column = this.table.columns[i];
+      if (column.id === this.columnIds[j]) {
+        countryColumns.push(column);
+      }
+    }
+  }
+  return countryColumns;
+};
+
+/**
+ * @return all countries in the table
+ */
+scout.MapTableControl.prototype._findCountries = function() {
+  var column, row, i, j, countryName,
+    tableCountries = [], countryColumns = [];
+
+  for (i = 0; i < this.countryColumns.length; i++) {
+    column = this.countryColumns[i];
+    for (j = 0; j < this.table.rows.length; j++) {
+      row = this.table.rows[j];
+      countryName = this.table.cellText(column, row);
+      if (tableCountries.indexOf(countryName) === -1) {
+        tableCountries.push(countryName);
+      }
+    }
+  }
+
+  return tableCountries;
 };

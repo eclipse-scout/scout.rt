@@ -681,7 +681,7 @@ scout.ChartTableControl.prototype._renderContent = function($parent) {
 
     //  filter function
     var filterFunc = function($row) {
-      var row = that.table.rows[$row.index() - 1];
+      var row = $row.data('row');
       var nX = xAxis.norm(that.table.cellValue(xAxis.column, row));
 
       if (oneDim) {
