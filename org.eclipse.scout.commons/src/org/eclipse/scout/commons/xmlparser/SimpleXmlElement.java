@@ -30,12 +30,17 @@ import java.util.TreeMap;
 
 import org.eclipse.scout.commons.Base64Utility;
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.XmlUtility;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
+import org.w3c.dom.Element;
 
 /**
  * Simple xml parser/writer. Very efficient and performant when handling xml
  * content without care of namespaces.
+ *
+ * @deprecated Will be removed in Scout 6.0. Use {@link Element} and {@link XmlUtility} instead.
  */
+@Deprecated
 public class SimpleXmlElement {
   private static final HashMap<String, String> ENTITIES;
   private static final HashMap<String, String> INVERSE_ENTITIES;
@@ -358,7 +363,7 @@ public class SimpleXmlElement {
 
   /**
    * Returns the given attribute's object value.
-   * 
+   *
    * @param name
    *          attribute name
    * @param defaultValue

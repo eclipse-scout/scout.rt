@@ -16,7 +16,7 @@ package org.eclipse.scout.commons.xmlparser;
  * Zürich, Stefan Vogt Company : BSI AG www.bsiag.com
  *
  * @version 1.0
- * @deprecated Will be removed when there is an appropriate replacement.
+ * @deprecated Will be removed in Scout 6.0.
  */
 @Deprecated
 public class ScoutXmlQName implements Comparable {

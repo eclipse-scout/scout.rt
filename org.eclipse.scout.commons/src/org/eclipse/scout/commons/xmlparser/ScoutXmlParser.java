@@ -42,7 +42,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
  * ETH Zürich, Stefan Vogt Company : BSI AG www.bsiag.com
  *
  * @version 1.0
- * @deprecated Will be removed when there is an appropriate replacement.
+ * @deprecated Will be removed in Scout 6.0.
  */
 @Deprecated
 @SuppressWarnings("deprecation")

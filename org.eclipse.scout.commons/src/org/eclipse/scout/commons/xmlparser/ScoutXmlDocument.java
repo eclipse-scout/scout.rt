@@ -31,15 +31,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import org.eclipse.scout.commons.XmlUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.xml.sax.Attributes;
 
 /**
  * Title : Scout XML Document
  *
  * @version 2.0
- * @deprecated Will be removed when there is an appropriate replacement.
+ * @deprecated Will be removed in Scout 6.0. Use {@link Document} and {@link XmlUtility} instead.
  */
 @SuppressWarnings("deprecation")
 @Deprecated
@@ -957,6 +960,10 @@ public class ScoutXmlDocument implements Serializable {
     }
   }
 
+  /**
+   * @deprecated Will be removed in Scout 6.0. Use {@link Element} and {@link XmlUtility} instead.
+   */
+  @Deprecated
   public class ScoutXmlElement extends P_AbstractNode implements Serializable {
 
     private static final long serialVersionUID = 1L;
