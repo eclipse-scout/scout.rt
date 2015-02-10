@@ -293,7 +293,7 @@ scout.Tree.prototype._renderSelection = function($nodes) {
   var i, node, $node;
 
   // If $nodes are not given collect the nodes based on this.selectedNodeIds
-  if (!$nodes) {
+  if (!$nodes || $nodes.length === 0) {
     $nodes = [];
     for (i = 0; i < this.selectedNodeIds.length; i++) {
       node = this.nodesMap[this.selectedNodeIds[i]];

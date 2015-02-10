@@ -21,13 +21,18 @@ scout.NavigateDownButton.prototype._buttonEnabled = function() {
 };
 
 scout.NavigateDownButton.prototype._drill = function() {
-  var drillNode, row, rowIds = this.node.detailTable.selectedRowIds;
+  var rowIds = this.node.detailTable.selectedRowIds;
   if (rowIds && rowIds.length > 0) {
-    row = this.node.detailTable.rowById(rowIds[0]);
-    drillNode = this.outline.nodesMap[row.nodeId];
+    var row = this.node.detailTable.rowById(rowIds[0]);
+    // TODO BSH Tree | Ask AW.E: Why not like this? Offline? What about row action?
+//    this.node.detailTable.sendRowAction(row.$row, null);
+    var drillNode = this.outline.nodesMap[row.nodeId];
     $.log.debug('drill down to node ' + drillNode);
+    if (!drillNode.$node && drillNode.parentNode) {
+      this.outline.setNodeExpanded(drillNode.parentNode, drillNode.parentNode.$node, true);
+    }
     this.outline.setNodesSelected(drillNode);
-    this.outline.setNodeExpanded(drillNode, undefined, false);
+    this.outline.setNodeExpanded(drillNode, drillNode.$node, false); // TODO BSH Tree | Ask AW.E why not true?
   }
 };
 
