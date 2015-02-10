@@ -11,8 +11,7 @@ scout.ListBoxLayout.prototype.layout = function($container) {
     size = htmlContainer.getSize(),
     height = size.height,
     minHeight = 0,
-    heightCalculated,
-    htmlContainerFilterBox;
+    heightCalculated;
 
   this.pixelBasedSizing = true;
 
