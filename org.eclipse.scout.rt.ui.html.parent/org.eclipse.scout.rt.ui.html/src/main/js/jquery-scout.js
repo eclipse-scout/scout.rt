@@ -165,18 +165,23 @@
   };
 
   $.fn.setEnabled = function(enabled) {
+    this.data('enabled', !!enabled);
     if (enabled) {
-      this.removeAttr('disabled');
       this.removeClass('disabled');
+      if (this.is('input')) {
+        this.removeAttr('disabled');
+      }
     } else {
-      this.attr('disabled', 'disabled');
       this.addClass('disabled');
+      if (this.is('input')) {
+        this.attr('disabled', 'disabled');
+      }
     }
     return this;
   };
 
   $.fn.isEnabled = function() {
-    return this.attr('disabled') === undefined;
+    return this.data('enabled') !== false;
   };
 
   $.fn.setVisible = function(visible) {
