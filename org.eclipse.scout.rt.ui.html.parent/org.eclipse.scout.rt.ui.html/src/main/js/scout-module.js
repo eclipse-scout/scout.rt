@@ -121,6 +121,7 @@ __include("form/fields/tabbox/TabBox.js");
 __include("form/fields/tabbox/TabBoxLayout.js");
 __include("form/fields/tabbox/TabItem.js");
 __include("form/fields/listbox/ListBox.js");
+__include("form/fields/listbox/ListBoxLayout.js");
 __include("menu/AbstractNavigationButton.js");
 __include("menu/NavigateDownButton.js");
 __include("menu/NavigateUpButton.js");
