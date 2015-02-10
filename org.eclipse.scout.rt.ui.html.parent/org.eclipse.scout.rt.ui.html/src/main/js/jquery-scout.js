@@ -165,15 +165,15 @@
   };
 
   $.fn.setEnabled = function(enabled) {
-    this.data('enabled', !!enabled);
-    if (enabled) {
-      this.removeClass('disabled');
-      if (this.is('input')) {
+    enabled = !!enabled;
+    this.data('enabled', enabled);
+    this.toggleClass('disabled', !enabled);
+    // Toggle disabled attribute for elements that support it (see http://www.w3.org/TR/html5/disabled-elements.html)
+    if (this.is('button, input, select, textarea, optgroup, option, fieldset')) {
+      if (enabled) {
         this.removeAttr('disabled');
       }
-    } else {
-      this.addClass('disabled');
-      if (this.is('input')) {
+      else {
         this.attr('disabled', 'disabled');
       }
     }
