@@ -160,7 +160,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
       jsonNodes.put(treeNodeToJson(rootNode));
     }
     else {
-      for (ITreeNode childNode : getModel().getRootNode().getChildNodes()) {
+      for (ITreeNode childNode : getModel().getRootNode().getFilteredChildNodes()) {
         jsonNodes.put(treeNodeToJson(childNode));
       }
     }
@@ -275,7 +275,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     JSONObject jsonEvent = new JSONObject();
     putProperty(jsonEvent, PROP_COMMON_PARENT_NODE_ID, getOrCreateNodeId(event.getCommonParentNode()));
 
-    if (event.getCommonParentNode().getChildNodes().size() == 0) {
+    if (event.getCommonParentNode().getFilteredChildNodes().size() == 0) {
       addActionEvent(EVENT_ALL_NODES_DELETED, jsonEvent);
     }
     else {
@@ -289,7 +289,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   protected void disposeNodes(Collection<ITreeNode> nodes) {
     for (ITreeNode node : nodes) {
       if (node.getChildNodeCount() > 0) {
-        disposeNodes(node.getChildNodes());
+        disposeNodes(node.getFilteredChildNodes());
       }
       disposeNode(node);
     }
@@ -331,6 +331,19 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
 
   protected void handleModelNodeFilterChanged() {
     JSONObject jsonEvent = new JSONObject();
+    JSONArray jsonNodes = new JSONArray();
+    if (getModel().isRootNodeVisible()) {
+      ITreeNode rootNode = getModel().getRootNode();
+      jsonNodes.put(treeNodeToJson(rootNode));
+    }
+    else {
+      for (ITreeNode childNode : getModel().getRootNode().getFilteredChildNodes()) {
+        jsonNodes.put(treeNodeToJson(childNode));
+      }
+    }
+    putProperty(jsonEvent, PROP_NODES, jsonNodes);
+    putProperty(jsonEvent, PROP_SELECTED_NODE_IDS, nodeIdsToJson(getModel().getSelectedNodes()));
+
     addActionEvent(EVENT_NODE_FILTER_CHANGED, jsonEvent);
   }
 
@@ -417,7 +430,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     putCellProperties(json, node.getCell());
     JSONArray jsonChildNodes = new JSONArray();
     if (node.getChildNodeCount() > 0) {
-      for (ITreeNode childNode : node.getChildNodes()) {
+      for (ITreeNode childNode : node.getFilteredChildNodes()) {
         jsonChildNodes.put(treeNodeToJson(childNode));
       }
     }
