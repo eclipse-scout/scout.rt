@@ -54,13 +54,13 @@ public interface ITableUIFacade {
   /**
    * @param column
    * @param multiSort
-   *          true = multiple sort columns are supported, every event toggles
-   *          the current column between the states ON-ASCENDING (add to tail of
-   *          sort columns), ON-DESCENDING. False = the selected column is set
-   *          as the (new) primary sort column, if already set it is toggled
-   *          between ascending and descending
+   *          True: Multiple sort columns are supported, which means the given column is added to the list of sort
+   *          columns, if not added yet.<br>
+   *          False: The selected column is set as the (new) primary sort column.<br>
+   * @param ascending
+   *          Specifies the new sort direction
    */
-  void fireHeaderSortFromUI(IColumn<?> column, boolean multiSort);
+  void fireHeaderSortFromUI(IColumn<?> column, boolean multiSort, boolean ascending);
 
   void setSelectedRowsFromUI(List<? extends ITableRow> rows);
 

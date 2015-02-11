@@ -4431,14 +4431,14 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
     }
 
     @Override
-    public void fireHeaderSortFromUI(IColumn<?> c, boolean multiSort) {
+    public void fireHeaderSortFromUI(IColumn<?> c, boolean multiSort, boolean ascending) {
       try {
         pushUIProcessor();
         //
         if (isSortEnabled()) {
           c = getColumnSet().resolveColumn(c);
           if (c != null) {
-            getColumnSet().handleSortEvent(c, multiSort);
+            getColumnSet().handleSortEvent(c, multiSort, ascending);
             ClientUIPreferences.getInstance().setAllTableColumnPreferences(AbstractTable.this);
             sort();
           }

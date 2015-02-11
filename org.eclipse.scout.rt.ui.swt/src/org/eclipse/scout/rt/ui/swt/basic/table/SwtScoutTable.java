@@ -687,17 +687,6 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
     }
   }
 
-  private int getVisualCellIndex(TableItem tableItem, int columnIndex) {
-    int visualCellIndex = columnIndex;
-    final int[] columnOrder = tableItem.getParent().getColumnOrder();
-    for (int element : columnOrder) {
-      if (element == columnIndex) {
-        visualCellIndex = columnIndex;
-      }
-    }
-    return visualCellIndex;
-  }
-
   /**
    * @param p
    *          is the location of the Table control (i.e. not scrollbar adjusted)
@@ -1204,7 +1193,7 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
           public void run() {
             // use always memory sort since SWT does not provide a keymask on
             // selection events
-            getScoutObject().getUIFacade().fireHeaderSortFromUI(newColumn, false);
+            getScoutObject().getUIFacade().fireHeaderSortFromUI(newColumn, false, !newColumn.isSortAscending());
           }
         };
         getEnvironment().invokeScoutLater(job, 0);

@@ -931,7 +931,7 @@ public class SwingScoutTable extends SwingScoutComposite<ITable> implements ISwi
           public void run() {
             IColumn<?> scoutCol = getScoutObject().getColumnSet().getVisibleColumn(sortIndex);
             getScoutObject().getUIFacade().setContextColumnFromUI(scoutCol);
-            getScoutObject().getUIFacade().fireHeaderSortFromUI(scoutCol, controlDown);
+            getScoutObject().getUIFacade().fireHeaderSortFromUI(scoutCol, controlDown, !scoutCol.isSortAscending());
           }
         };
         getSwingEnvironment().invokeScoutLater(t, 200);

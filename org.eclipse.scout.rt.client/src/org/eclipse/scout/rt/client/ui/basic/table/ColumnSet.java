@@ -511,22 +511,6 @@ public class ColumnSet {
     }
   }
 
-  private int visibleToModelIndex(int visibleIndex) {
-    if (visibleIndex < 0 || visibleIndex >= m_visibleIndexes.length) {
-      LOG.warn("viewIndex " + visibleIndex + " out of range [" + 0 + "," + (m_visibleIndexes.length - 1) + "]");
-      return -1;
-    }
-    return m_visibleIndexes[visibleIndex];
-  }
-
-  private int keyToModelIndex(int keyIndex) {
-    if (keyIndex < 0 || keyIndex >= m_keyIndexes.length) {
-      LOG.warn("keyIndex " + keyIndex + " out of range [" + 0 + "," + (m_keyIndexes.length - 1) + "]");
-      return -1;
-    }
-    return m_keyIndexes[keyIndex];
-  }
-
   private int modelToVisibleIndex(int index) {
     for (int i = 0; i < m_visibleIndexes.length; i++) {
       if (m_visibleIndexes[i] == index) {
@@ -566,13 +550,13 @@ public class ColumnSet {
   /**
    * @param column
    * @param multiSort
-   *          true = multiple sort columns are supported, every event toggles
-   *          the current column between the states ON-ASCENDING (add to tail of
-   *          sort columns), ON-DESCENDING. False = the selected column is set
-   *          as the (new) primary sort column, if already set it is toggled
-   *          between ascending and descending
+   *          True: Multiple sort columns are supported, which means the given column is added to the list of sort
+   *          columns, if not added yet.<br>
+   *          False: The selected column is set as the (new) primary sort column.<br>
+   * @param ascending
+   *          Specifies the new sort direction
    */
-  public void handleSortEvent(IColumn col, boolean multiSort) {
+  public void handleSortEvent(IColumn col, boolean multiSort, boolean ascending) {
     col = resolveColumn(col);
     if (col == null) {
       return;
@@ -583,10 +567,10 @@ public class ColumnSet {
       //
       if (multiSort) {
         if (isSortColumn(col) && col.isSortExplicit()) {
-          toggleSortColumn(col);
+          updateSortColumn(col, ascending);
         }
         else {
-          addSortColumn(col, true);
+          addSortColumn(col, ascending);
         }
       }
       else {
@@ -597,10 +581,10 @@ public class ColumnSet {
           }
         }
         if (isSortColumn(col) && col.isSortExplicit() && explicitCount == 1) {
-          toggleSortColumn(col);
+          updateSortColumn(col, ascending);
         }
         else {
-          setSortColumn(col, true, 5);
+          setSortColumn(col, ascending, 5);
         }
       }
     }
@@ -809,14 +793,16 @@ public class ColumnSet {
     }
   }
 
-  public void toggleSortColumn(IColumn<?> col) {
+  public void updateSortColumn(IColumn<?> col, boolean ascending) {
     col = resolveColumn(col);
-    if (col != null && isSortColumn(col) && !col.isSortPermanent()) {
-      HeaderCell cell = (HeaderCell) col.getHeaderCell();
-      cell.setSortAscending(!cell.isSortAscending());
-      rebuildHeaderCell(col);
-      fireColumnHeadersUpdated(CollectionUtility.hashSet(col));
+    if (col == null || !isSortColumn(col) || col.isSortPermanent() || col.isSortAscending() == ascending) {
+      return;
     }
+
+    HeaderCell cell = (HeaderCell) col.getHeaderCell();
+    cell.setSortAscending(ascending);
+    rebuildHeaderCell(col);
+    fireColumnHeadersUpdated(CollectionUtility.hashSet(col));
   }
 
   private void updateColumnStructure(IColumn column) {

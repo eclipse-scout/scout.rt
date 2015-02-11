@@ -1126,7 +1126,7 @@ public class OrganizeColumnsForm extends AbstractForm {
       }
       else {
         if (m_table.getColumnSet().isSortColumn(selectedCol)) {
-          m_table.getColumnSet().handleSortEvent(selectedCol, true);
+          m_table.getColumnSet().handleSortEvent(selectedCol, true, !selectedCol.isSortAscending());
         }
         else {
           m_table.getColumnSet().addSortColumn(selectedCol, ascending);
