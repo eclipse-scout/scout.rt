@@ -192,6 +192,8 @@ scout.DesktopNavigation.prototype.onOutlineChanged = function(outline) {
 
   this.outline = outline;
   this.outline.render(this.$container);
+  this.outline.htmlComp.layout();
+  this.outline.pixelBasedSizing = true;
   this.$outlineTitle.html(this.outline.title);
   this.$header.removeClass('tab-menu-open');
 
