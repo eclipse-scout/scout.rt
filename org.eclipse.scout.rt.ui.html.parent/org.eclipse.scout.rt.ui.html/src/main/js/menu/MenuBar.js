@@ -73,11 +73,9 @@ scout.MenuBar.prototype._updateVisibility = function() {
 
 scout.MenuBar.prototype._renderMenuItems = function(menuItems, right) {
   var tooltipPosition = (this.position === 'top' ? 'bottom' : 'top');
-
   menuItems.forEach(function(item) {
     item.tooltipPosition = tooltipPosition;
     item.render(this.$container);
-    // TODO BSH Menu | Ask AW.E why this is needed:
     item.$container.removeClass('form-field');
     if (right) {
       item.$container.addClass('menu-right');

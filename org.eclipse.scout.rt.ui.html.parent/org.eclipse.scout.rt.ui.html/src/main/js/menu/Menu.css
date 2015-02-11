@@ -59,13 +59,6 @@
   background-color: @border-color;
 }
 
-.menubar > .form-field {
-  position: relative;
-  & > .field {
-    position: relative;
-  }
-}
-
 .menu-item {
   /* vertical-align:middle only works with line-height */
   height: 39px;

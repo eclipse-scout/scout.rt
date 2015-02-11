@@ -19,11 +19,11 @@ scout.TableControl.prototype._render = function($parent) {
 
 scout.TableControl.prototype.remove = function() {
   this.removeContent();
-
   scout.TableControl.parent.prototype.remove.call(this);
 };
 
 scout.TableControl.prototype._renderContent = function($parent) {
+  this.form.menuBarPosition = 'bottom';
   this.form.render($parent);
   this.form.$container.height($parent.height());
   this.form.$container.width($parent.width());
