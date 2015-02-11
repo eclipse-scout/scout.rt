@@ -164,16 +164,16 @@ public abstract class AbstractWrappedFormField<T extends IForm> extends Abstract
   }
 
   @Override
-  public void loadXML(Element x) throws ProcessingException {
-    super.loadXML(x);
+  public void loadFromXml(Element x) throws ProcessingException {
+    super.loadFromXml(x);
     if (getInnerForm() != null) {
       getInnerForm().loadFromXml(x);
     }
   }
 
   @Override
-  public void storeXML(Element x) throws ProcessingException {
-    super.storeXML(x);
+  public void storeToXml(Element x) throws ProcessingException {
+    super.storeToXml(x);
     if (getInnerForm() != null) {
       getInnerForm().storeToXml(x);
     }

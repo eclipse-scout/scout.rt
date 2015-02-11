@@ -235,8 +235,8 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
    * XML i/o
    */
   @Override
-  public void storeXML(Element x) throws ProcessingException {
-    super.storeXML(x);
+  public void storeToXml(Element x) throws ProcessingException {
+    super.storeToXml(x);
     VALUE value = getValue();
     try {
       XmlUtility.setObjectAttribute(x, "value", value);
@@ -249,8 +249,8 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
   }
 
   @Override
-  public void loadXML(Element x) throws ProcessingException {
-    super.loadXML(x);
+  public void loadFromXml(Element x) throws ProcessingException {
+    super.loadFromXml(x);
     try {
       VALUE value = TypeCastUtility.castValue(XmlUtility.getObjectAttribute(x, "value"), getHolderType());
       setValue(value);

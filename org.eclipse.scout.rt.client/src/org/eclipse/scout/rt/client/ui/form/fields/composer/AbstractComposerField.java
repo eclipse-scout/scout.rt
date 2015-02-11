@@ -145,7 +145,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
 
   /**
    * For {@link #exportFormFieldData(AbstractFormFieldData)}, {@link AbstractTree#exportTreeData(AbstractTreeFieldData)}
-   * and {@link #storeXML(Element)} it is necessary to export {@link IDataModelEntity} and {@link IDataModelAttribute}
+   * and {@link #storeToXml(Element)} it is necessary to export {@link IDataModelEntity} and {@link IDataModelAttribute}
    * as external strings. see {@link EntityPath}
    * <p>
    * This callback completes an entity path to its root. The parameter path contains the entity path represented in the
@@ -429,8 +429,8 @@ public abstract class AbstractComposerField extends AbstractFormField implements
   }
 
   @Override
-  public void loadXML(Element x) throws ProcessingException {
-    super.loadXML(x);
+  public void loadFromXml(Element x) throws ProcessingException {
+    super.loadFromXml(x);
     ITree tree = getTree();
     try {
       tree.setTreeChanging(true);
@@ -553,8 +553,8 @@ public abstract class AbstractComposerField extends AbstractFormField implements
   }
 
   @Override
-  public void storeXML(Element x) throws ProcessingException {
-    super.storeXML(x);
+  public void storeToXml(Element x) throws ProcessingException {
+    super.storeToXml(x);
     storeXMLRec(x, getTree().getRootNode());
   }
 
@@ -630,7 +630,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
     }
     else {
       try {
-        loadXML(m_initValue);
+        loadFromXml(m_initValue);
       }
       catch (ProcessingException e) {
         LOG.error("unexpected error occured while restoring initial value", e);
@@ -686,7 +686,7 @@ public abstract class AbstractComposerField extends AbstractFormField implements
       // clone composer field by storing as XML
       Document x = XmlUtility.createNewXmlDocument("field");
       Element element = x.getDocumentElement();
-      storeXML(element);
+      storeToXml(element);
       m_initValue = element;
     }
     catch (ProcessingException e) {

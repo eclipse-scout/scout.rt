@@ -149,7 +149,7 @@ public class StoreAndLoadXml3FormTest {
   private void checkFieldXml(IFormField field, String expectedFieldId, EnclosingField... expectedEnclosingFieldPath) throws ProcessingException {
     Document document = XmlUtility.createNewXmlDocument("field");
     Element xml = document.getDocumentElement();
-    field.storeXML(xml);
+    field.storeToXml(xml);
     assertXmlIds(expectedFieldId, field.getClass().getName(), xml);
     List<Element> enclosingFieldPath = XmlUtility.getChildElements(xml, "enclosingField");
     assertEquals(expectedEnclosingFieldPath.length, enclosingFieldPath.size());

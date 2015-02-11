@@ -1186,7 +1186,7 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
    * XML i/o
    */
   @Override
-  public void storeXML(Element x) throws ProcessingException {
+  public void storeToXml(Element x) throws ProcessingException {
     List<ICompositeField> enclosingFieldList = getEnclosingFieldList();
     for (ICompositeField field : enclosingFieldList) {
       Element enclosingField = x.getOwnerDocument().createElement("enclosingField");
@@ -1218,18 +1218,18 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   @Override
-  public void loadXML(Element x) throws ProcessingException {
+  public void loadFromXml(Element x) throws ProcessingException {
   }
 
   @Override
-  public final void setXML(String xml) throws ProcessingException {
+  public final void loadFromXmlString(String xml) throws ProcessingException {
     if (xml == null) {
       return;
     }
     try {
       Document doc = XmlUtility.getXmlDocument(xml);
       Element root = doc.getDocumentElement();
-      loadXML(root);
+      loadFromXml(root);
     }
     catch (Exception e) {
       throw new ProcessingException("Error in AbstractFormField.setXML: ", e);
@@ -1237,9 +1237,9 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   @Override
-  public final String getXML() throws ProcessingException {
+  public final String storeToXmlString() throws ProcessingException {
     Document x = XmlUtility.createNewXmlDocument("field");
-    storeXML(x.getDocumentElement());
+    storeToXml(x.getDocumentElement());
     return XmlUtility.wellformDocument(x);
   }
 

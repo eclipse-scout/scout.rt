@@ -414,8 +414,8 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
   }
 
   @Override
-  public void loadXML(Element x) throws ProcessingException {
-    super.loadXML(x);
+  public void loadFromXml(Element x) throws ProcessingException {
+    super.loadFromXml(x);
     if (m_table != null) {
       int[] selectedRowIndices = null;
       try {
@@ -442,8 +442,8 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
   }
 
   @Override
-  public void storeXML(Element x) throws ProcessingException {
-    super.storeXML(x);
+  public void storeToXml(Element x) throws ProcessingException {
+    super.storeToXml(x);
     if (m_table != null) {
       List<ITableRow> selectedRows = m_table.getSelectedRows();
       int[] selectedRowIndices = new int[selectedRows.size()];

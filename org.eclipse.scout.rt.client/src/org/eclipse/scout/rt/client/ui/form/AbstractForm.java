@@ -2217,7 +2217,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
       public boolean visitField(IFormField field, int level, int fieldIndex) {
         Element xField = xFields.getOwnerDocument().createElement("field");
         try {
-          field.storeXML(xField);
+          field.storeToXml(xField);
           xFields.appendChild(xField);
         }
         catch (ProcessingException e) {
@@ -2272,7 +2272,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
         visitFields(v);
         IFormField f = v.getField();
         if (f != null) {
-          f.loadXML(xField);
+          f.loadFromXml(xField);
         }
       }
     }

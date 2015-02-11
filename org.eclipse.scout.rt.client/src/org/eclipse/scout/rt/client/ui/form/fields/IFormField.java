@@ -220,16 +220,13 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdere
    */
   void importFormFieldData(AbstractFormFieldData source, boolean valueChangeTriggersEnabled) throws ProcessingException;
 
-  /*
-   * XML i/o
-   */
-  String getXML() throws ProcessingException;
+  String storeToXmlString() throws ProcessingException;
 
-  void setXML(String xml) throws ProcessingException;
+  void loadFromXmlString(String xml) throws ProcessingException;
 
-  void storeXML(Element x) throws ProcessingException;
+  void storeToXml(Element x) throws ProcessingException;
 
-  void loadXML(Element x) throws ProcessingException;
+  void loadFromXml(Element x) throws ProcessingException;
 
   /**
    * add verbose information to the search filter
