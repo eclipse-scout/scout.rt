@@ -7,7 +7,10 @@ scout.NavigateUpButton = function(outline, node) {
 scout.inherits(scout.NavigateUpButton, scout.AbstractNavigationButton);
 
 scout.NavigateUpButton.prototype._isDetail = function() {
-  return !this.node.detailFormVisible;
+  // Button is in "detail mode" if there are both detail form and detail table visible and detail form _is_ hidden.
+  return !!(this.node.detailFormVisible && this.node.detailForm &&
+    this.node.detailTableVisible && this.node.detailTable &&
+    this.node.detailFormHiddenByUi);
 };
 
 scout.NavigateUpButton.prototype._toggleDetail = function() {
@@ -27,7 +30,7 @@ scout.NavigateUpButton.prototype._drill = function() {
   var parentNode = this.node.parentNode;
   if (parentNode) {
     $.log.debug('drill up to node ' + parentNode);
-    this.outline._navigateUp = true;
+    this.outline.navigateUpInProgress = true;
     this.outline.setNodesSelected(parentNode);
     this.outline.setNodeExpanded(parentNode, undefined, false);
   } else {

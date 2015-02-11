@@ -22,23 +22,20 @@ import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.OutlineEvent;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
-import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapterFactory;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
-import org.eclipse.scout.rt.ui.html.json.JsonEvent;
-import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
-import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.table.JsonOutlineTable;
 import org.eclipse.scout.rt.ui.html.json.tree.JsonTree;
 import org.json.JSONObject;
 
 public class JsonOutline<T extends IOutline> extends JsonTree<T> {
 
-  private static final String EVENT_PAGE_CHANGED = "pageChanged";
   private static final String PROP_DETAIL_FORM = IOutline.PROP_DETAIL_FORM;
   private static final String PROP_DETAIL_TABLE = IOutline.PROP_DETAIL_TABLE;
   private static final String PROP_DETAIL_FORM_VISIBLE = "detailFormVisible";
+  private static final String PROP_DETAIL_TABLE_VISIBLE = "detailTableVisible";
+
   private Set<IJsonAdapter<?>> m_jsonDetailTables = new HashSet<IJsonAdapter<?>>();
 
   public JsonOutline(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
@@ -78,11 +75,11 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
     super.attachChildAdapters();
     attachAdapter(getModel().getDefaultDetailForm());
     if (getModel().isRootNodeVisible()) {
-      attachPage(getModel().getRootPage());
+      attachPageAndChildPages(getModel().getRootPage());
     }
     else {
       for (IPage<?> page : getModel().getRootPage().getChildPages()) {
-        attachPage(page);
+        attachPageAndChildPages(page);
       }
     }
   }
@@ -99,16 +96,17 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
   }
 
   protected void attachPage(IPage<?> page) {
-    for (IPage<?> childPage : page.getChildPages()) {
-      attachPage(childPage);
-    }
     if (page.isDetailFormVisible()) {
       attachGlobalAdapter(page.getDetailForm());
     }
     if (page.isTableVisible()) {
-      // Create 'outline' variant for table
       attachDetailTable(page);
     }
+  }
+
+  protected void attachPageAndChildPages(IPage<?> page) {
+    attachPage(page);
+    attachPagesForNodes(page.getChildNodes());
   }
 
   protected void attachPagesForNodes(Collection<ITreeNode> nodes) {
@@ -117,7 +115,7 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
         throw new IllegalArgumentException("Expected page.");
       }
       IPage page = (IPage) node;
-      attachPage(page);
+      attachPageAndChildPages(page);
     }
   }
 
@@ -128,12 +126,19 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
     }
     IPage page = (IPage) node;
     JSONObject json = super.treeNodeToJson(node);
-    putAdapterIdProperty(json, PROP_DETAIL_FORM, page.getDetailForm());
+    putDetailFormAndTable(json, page);
+    return json;
+  }
+
+  protected void putDetailFormAndTable(JSONObject json, IPage page) {
     putProperty(json, PROP_DETAIL_FORM_VISIBLE, page.isDetailFormVisible());
+    if (page.isDetailFormVisible()) {
+      putAdapterIdProperty(json, PROP_DETAIL_FORM, page.getDetailForm());
+    }
+    putProperty(json, PROP_DETAIL_TABLE_VISIBLE, page.isTableVisible());
     if (page.isTableVisible()) {
       putAdapterIdProperty(json, PROP_DETAIL_TABLE, page.getTable());
     }
-    return json;
   }
 
   @Override
@@ -155,39 +160,8 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
         jsonAdapter.dispose();
       }
     }
-  }
 
-  protected void handleModelDetailFormChanged(IForm detailForm) {
-    JSONObject jsonEvent = new JSONObject();
-    ITreeNode selectedNode = getModel().getSelectedNode();
-    putProperty(jsonEvent, PROP_NODE_ID, getOrCreateNodeId(selectedNode));
-    if (detailForm == null) {
-      putProperty(jsonEvent, PROP_DETAIL_FORM, null);
-    }
-    else {
-      IJsonAdapter<?> detailFormAdapter = attachGlobalAdapter(detailForm);
-      putProperty(jsonEvent, PROP_DETAIL_FORM, detailFormAdapter.getId());
-    }
-    addActionEvent("detailFormChanged", jsonEvent);
-  }
-
-  // FIXME AWE: (outline) discucss with C.GU: das hier ist der event-handler der outline, nicht der page/node
-  // das event, dass wir dann aber ans UI feuern betrifft die page/node und nicht die Outline!
-  // Wir gehen einfach davon aus, dass dieses event IMMER die gerade selektierte node betrifft
-  // was nicht zwangsläufig richtig sein muss.
-  protected void handleModelDetailTableChanged(ITable detailTable) {
-    JSONObject jsonEvent = new JSONObject();
-    ITreeNode selectedNode = getModel().getSelectedNode();
-    IPage page = (IPage) selectedNode;
-    putProperty(jsonEvent, PROP_NODE_ID, getOrCreateNodeId(selectedNode));
-    if (detailTable == null) {
-      putProperty(jsonEvent, PROP_DETAIL_TABLE, null);
-    }
-    else {
-      IJsonAdapter<?> detailTableAdapter = attachDetailTable(page);
-      putProperty(jsonEvent, PROP_DETAIL_TABLE, detailTableAdapter.getId());
-    }
-    addActionEvent("detailTableChanged", jsonEvent);
+    // No need to dispose detail form (it will be disposed automatically when it is closed)
   }
 
   protected IJsonAdapter<?> attachDetailTable(IPage page) {
@@ -200,61 +174,26 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
   protected void handleOtherTreeEvent(TreeEvent event) {
     switch (event.getType()) {
       case OutlineEvent.TYPE_PAGE_CHANGED:
-        handleModelPageChanged(event);
+        handleModelPageChanged((OutlineEvent) event);
         break;
       default:
         //NOP
     }
   }
 
-  protected void handleModelPageChanged(TreeEvent event) {
+  protected void handleModelPageChanged(OutlineEvent event) {
     IPage page = (IPage) event.getNode();
-    if (page.isDetailFormVisible()) {
-      attachGlobalAdapter(page.getDetailForm());
-    }
-    if (page.isTableVisible()) {
-      attachDetailTable(page);
-    }
+    attachPage(page);
     JSONObject jsonEvent = new JSONObject();
     putProperty(jsonEvent, PROP_NODE_ID, getOrCreateNodeId(page));
-    putProperty(jsonEvent, PROP_DETAIL_FORM_VISIBLE, page.isDetailFormVisible());
-    addActionEvent("pageChanged", jsonEvent);
-  }
-
-  @Override
-  protected void handleModelPropertyChange(String propertyName, Object oldValue, Object newValue) {
-    if (PROP_DETAIL_FORM.equals(propertyName)) {
-      handleModelDetailFormChanged((IForm) newValue);
-    }
-    else if (PROP_DETAIL_TABLE.equals(propertyName)) {
-      handleModelDetailTableChanged((ITable) newValue);
-    }
-    else {
-      super.handleModelPropertyChange(propertyName, oldValue, newValue);
-    }
-  }
-
-  protected void handleUiPageChanged(JsonEvent event) {
-    JSONObject data = event.getData();
-    IPage page = (IPage) getTreeNodeForNodeId(JsonObjectUtility.getString(data, PROP_NODE_ID));
-    boolean detailFormVisible = JsonObjectUtility.getBoolean(data, PROP_DETAIL_FORM_VISIBLE);
-    page.setDetailFormVisible(detailFormVisible);
-  }
-
-  @Override
-  public void handleUiEvent(JsonEvent event, JsonResponse res) {
-    if (EVENT_PAGE_CHANGED.equals(event.getType())) {
-      handleUiPageChanged(event);
-    }
-    else {
-      super.handleUiEvent(event, res);
-    }
+    putDetailFormAndTable(jsonEvent, page);
+    replaceActionEvent("pageChanged", jsonEvent);
   }
 
   private class P_JsonOutlineAdapter implements IJsonOutlineAdapter {
     private final IPage m_page;
 
-    private P_JsonOutlineAdapter(IPage page) {
+    public P_JsonOutlineAdapter(IPage page) {
       m_page = page;
     }
 
@@ -268,7 +207,7 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
   private class P_JsonOutlineTableFactory implements IJsonAdapterFactory {
     private final IPage m_page;
 
-    private P_JsonOutlineTableFactory(IPage page) {
+    public P_JsonOutlineTableFactory(IPage page) {
       m_page = page;
     }
 

@@ -12,12 +12,14 @@ package org.eclipse.scout.rt.ui.html.json;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.json.JSONArray;
@@ -95,10 +97,25 @@ public class JsonResponse {
   }
 
   /**
-   * Note: ignores events on adapters that are also part of this response, see also {@link #doAddEvent(JsonEvent)}
+   * Note: when converting the response to JSON, events on adapters that are also part of this response are ignored, see
+   * also {@link #doAddEvent(JsonEvent)}
    */
   public void addActionEvent(String eventTarget, String eventType, JSONObject eventData) {
     m_eventList.add(new JsonEvent(eventTarget, eventType, eventData));
+  }
+
+  /**
+   * Note: when converting the response to JSON, events on adapters that are also part of this response are ignored, see
+   * also {@link #doAddEvent(JsonEvent)}
+   */
+  public void replaceActionEvent(String id, String eventName, JSONObject eventData) {
+    for (Iterator<JsonEvent> it = m_eventList.iterator(); it.hasNext();) {
+      JsonEvent event = it.next();
+      if (CompareUtility.equals(event.getType(), id)) {
+        it.remove();
+      }
+    }
+    addActionEvent(id, eventName, eventData);
   }
 
   // FIXME CGU potential threading issue: toJson is called by servlet thread. Property-Change-Events may alter the eventList from client job thread

@@ -238,6 +238,14 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     getJsonSession().currentJsonResponse().addActionEvent(getId(), eventName, eventData);
   }
 
+  /**
+   * Like {@link #addActionEvent(String, JSONObject)} but if there are already action events for the same
+   * event in the current response, all existing events are removed before adding the new event.
+   */
+  protected final void replaceActionEvent(String eventName, JSONObject eventData) {
+    getJsonSession().currentJsonResponse().replaceActionEvent(getId(), eventName, eventData);
+  }
+
   protected void addPropertyChangeEvent(String propertyName, Object newValue) {
     if (newValue instanceof IJsonAdapter<?>) {
       throw new IllegalArgumentException("Cannot pass an adapter instance to a JSON response");

@@ -13,6 +13,7 @@ import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree5;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
+import org.eclipse.scout.rt.client.ui.basic.tree.TreeAdapter;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeEvent;
 import org.eclipse.scout.rt.client.ui.basic.tree.TreeListener;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
@@ -287,14 +288,13 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
 
   protected void disposeNodes(Collection<ITreeNode> nodes) {
     for (ITreeNode node : nodes) {
-      if (node.getChildNodeCount() > 0) {
-        disposeNodes(node.getFilteredChildNodes());
-      }
       disposeNode(node);
     }
   }
 
   protected void disposeNode(ITreeNode node) {
+    disposeNodes(node.getChildNodes());
+
     String nodeId = m_treeNodeIds.get(node);
     m_treeNodeIds.remove(node);
     m_treeNodes.remove(nodeId);
@@ -355,13 +355,6 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
       JsonObjectUtility.append(jsonEvent, "childNodeIds", getOrCreateNodeId(childNode));
     }
     addActionEvent(EVENT_CHILD_NODE_ORDER_CHANGED, jsonEvent);
-  }
-
-  // TODO BSH Tree | Coalesce events
-  protected void handleModelTreeEventBatch(List<? extends TreeEvent> events) {
-    for (TreeEvent event : events) {
-      handleModelTreeEvent(event);
-    }
   }
 
   @Override
@@ -572,15 +565,11 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     }
   }
 
-  private class P_TreeListener implements TreeListener {
+  private class P_TreeListener extends TreeAdapter {
+
     @Override
     public void treeChanged(final TreeEvent e) {
       handleModelTreeEvent(e);
-    }
-
-    @Override
-    public void treeChangedBatch(List<? extends TreeEvent> events) {
-      handleModelTreeEventBatch(events);
     }
   }
 }

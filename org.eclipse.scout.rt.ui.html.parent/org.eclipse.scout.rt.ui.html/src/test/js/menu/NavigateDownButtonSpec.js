@@ -12,10 +12,34 @@ describe("NavigateDownButton", function() {
     expect(menu._toggleDetail()).toBe(false);
   });
 
-  it("_isDetail is true when detail-form is visible", function() {
+  it("_isDetail returns true or false depending on the state of the detail-form and detail-table", function() {
+    // true when both detailForm and detailTable are visible
+    node.detailForm = {};
     node.detailFormVisible = true;
+    node.detailTable = {};
+    node.detailTableVisible = true;
     expect(menu._isDetail()).toBe(true);
+
+    // false when detailForm is absent, even when if detailFormVisible=true
+    delete node.detailForm;
+    expect(menu._isDetail()).toBe(false);
+    node.detailForm = {};
+
+    // false when detailTable is absent, even when if detailTableVisible=true
+    delete node.detailTable;
+    expect(menu._isDetail()).toBe(false);
+    node.detailTable = {};
+
+    // false when hidden by UI
+    node.detailFormHiddenByUi = true;
+    expect(menu._isDetail()).toBe(false);
+    node.detailFormHiddenByUi = false;
+
+    // false when property says to
     node.detailFormVisible = false;
+    expect(menu._isDetail()).toBe(false);
+    node.detailFormVisible = true;
+    node.detailTableVisible = false;
     expect(menu._isDetail()).toBe(false);
   });
 

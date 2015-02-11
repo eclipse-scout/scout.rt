@@ -23,7 +23,7 @@ scout.AbstractNavigationButton.prototype._onClick = function() {
 
 // @override
 scout.AbstractNavigationButton.prototype._render = function($parent) {
-  if (this.node.detailForm && this._isDetail()) {
+  if (this._isDetail()) {
     this._onClickFunc = this._setDetailVisible.bind(this);
     this.label = this.session.text(this._text1);
   } else {
@@ -37,7 +37,6 @@ scout.AbstractNavigationButton.prototype._render = function($parent) {
 scout.AbstractNavigationButton.prototype._setDetailVisible = function() {
   var detailVisible = this._toggleDetail();
   $.log.debug('show detail-' + detailVisible ? 'form' : 'table');
-  this.node.detailFormVisible = detailVisible;
+  this.node.detailFormHiddenByUi = !detailVisible;
   this.outline._updateOutlineTab(this.node);
 };
-
