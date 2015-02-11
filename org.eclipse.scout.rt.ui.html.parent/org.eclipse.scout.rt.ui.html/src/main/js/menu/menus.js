@@ -5,18 +5,23 @@ scout.menus = {
      */
     CLOSING_EVENTS: 'mousedown.contextMenu keydown.contextMenu',
 
+    /**
+     * Filters menus that don't match the given types, or in other words: only menus with the given types are returned
+     * from this method. The visible state is not checked by this filter-function, invisible items are added to the
+     * menu-bar DOM (invisible, however). They may change their visible state later.
+     */
     filter: function(menus, types) {
       if (!menus) {
         return;
       }
       types = scout.arrays.ensure(types);
 
-      var filteredMenus = [];
-      var separatorCount = 0;
-      for (var i = 0; i < menus.length; i++) {
-        var menu = menus[i];
-
-        var childMenus = menu.childMenus;
+      var i, menu, childMenus,
+       filteredMenus = [],
+       separatorCount = 0;
+      for (i = 0; i < menus.length; i++) {
+        menu = menus[i];
+        childMenus = menu.childMenus;
         if (childMenus.length > 0) {
           childMenus = scout.menus.filter(menu.childMenus, types);
           if (childMenus.length === 0) {
@@ -24,10 +29,6 @@ scout.menus = {
           }
         } //don't check the menu type for a group
         else if (!scout.menus._checkType(menu, types)) {
-          continue;
-        }
-
-        if (!menu.visible) {
           continue;
         }
 

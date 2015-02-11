@@ -15,7 +15,7 @@ describe("menus", function() {
       expect(menus).toBeUndefined();
     });
 
-    it("only returns visible menus", function() {
+    it("returns menus (even when menu is not visible)", function() {
       var menus, menu1, menu2, menu3;
       menu1 = helper.createMenu(helper.createModel(1));
       menu2 = helper.createMenu(helper.createModel(2));
@@ -23,25 +23,10 @@ describe("menus", function() {
       menu3.visible = false;
 
       menus = scout.menus.filter([menu1, menu2, menu3]);
-
-      expect(menus).toEqual([menu1, menu2]);
+      expect(menus).toEqual([menu1, menu2, menu3]);
     });
 
-    it("only returns menus with given type", function() {
-      var menus, menu1, menu2, menu3;
-      menu1 = helper.createMenu(helper.createModel(1));
-      menu1.menuTypes = ['MultiSelection', 'SingleSelection'];
-      menu2 = helper.createMenu(helper.createModel(2));
-      menu2.menuTypes = ['MultiSelection'];
-      menu3 = helper.createMenu(helper.createModel(3));
-      menu3.menuTypes = ['SingleSelection'];
-
-      menus = scout.menus.filter([menu1, menu2, menu3], 'SingleSelection');
-
-      expect(menus).toEqual([menu1, menu3]);
-    });
-
-    it("only returns menus with given type which are visible", function() {
+    it("only returns menus with given type (even when menu is not visible)", function() {
       var menus, menu1, menu2, menu3;
       menu1 = helper.createMenu(helper.createModel(1));
       menu1.menuTypes = ['MultiSelection', 'SingleSelection'];
@@ -53,7 +38,7 @@ describe("menus", function() {
 
       menus = scout.menus.filter([menu1, menu2, menu3], 'SingleSelection');
 
-      expect(menus).toEqual([menu3]);
+      expect(menus).toEqual([menu1, menu3]);
     });
 
     it("only returns parent menus if child menus should be displayed", function() {
