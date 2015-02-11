@@ -1,7 +1,6 @@
 var LocaleSpecHelper = function() {
   this._initDecimalFormatSymbols();
   this._initDateFormatSymbols();
-  this._initDecimalFormatDefaultPatterns();
   this._initDateFormatDefaultPatterns();
 };
 
@@ -14,23 +13,16 @@ LocaleSpecHelper.prototype.createModel = function(languageTag) {
 LocaleSpecHelper.prototype.createLocale = function(languageTag) {
   var model = this.createModel(languageTag);
   model.decimalFormatSymbols = this.decimalFormatSymbolsByLocale[languageTag];
-  model.decimalFormatPatternDefault = this.decimalFormatPatternByLocale[languageTag];
+  model.decimalFormatPatternDefault = "#,##0.###";
   model.dateFormatSymbols = this.dateFormatSymbolsByLocale[languageTag];
   model.dateFormatPatternDefault = this.dateFormatPatternByLocale[languageTag];
   return new scout.Locale(model);
 };
 
-
 LocaleSpecHelper.prototype._initDecimalFormatSymbols = function () {
   this.decimalFormatSymbolsByLocale = {};
-  this.decimalFormatSymbolsByLocale.de_CH = this.createDecimalFormatSymbolsForDeCH();
-  this.decimalFormatSymbolsByLocale.de_DE = this.createDecimalFormatSymbolsForDeDE();
-};
-
-LocaleSpecHelper.prototype._initDecimalFormatDefaultPatterns = function() {
-  this.decimalFormatPatternByLocale = {};
-  this.decimalFormatPatternByLocale.de_CH = "#'##0.###";
-  this.decimalFormatPatternByLocale.de_DE = "#.##0,###";
+  this.decimalFormatSymbolsByLocale['de-CH'] = this.createDecimalFormatSymbolsForDeCH();
+  this.decimalFormatSymbolsByLocale['de-DE'] = this.createDecimalFormatSymbolsForDeDE();
 };
 
 LocaleSpecHelper.prototype.createDecimalFormatSymbolsForDeCH = function() {

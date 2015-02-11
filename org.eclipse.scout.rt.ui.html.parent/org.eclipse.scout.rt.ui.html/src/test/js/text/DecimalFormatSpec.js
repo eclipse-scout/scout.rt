@@ -6,7 +6,7 @@ describe("DecimalFormat", function() {
   beforeEach(function() {
     setFixtures(sandbox());
     helper = new LocaleSpecHelper();
-    locale = helper.createLocale('de_CH');
+    locale = helper.createLocale('de-CH');
   });
 
   afterEach(function() {
@@ -34,7 +34,7 @@ describe("DecimalFormat", function() {
       expect(decimalFormat.format(1000.1234)).toBe('1000.12');
       expect(decimalFormat.format(12345.6789)).toBe('12345.68'); // rounding
 
-      locale = helper.createLocale('de_DE');
+      locale = helper.createLocale('de-DE');
       pattern = '###0.00';
       decimalFormat = new scout.DecimalFormat(locale, pattern);
 
@@ -54,7 +54,7 @@ describe("DecimalFormat", function() {
       expect(decimalFormat.format(50121000.1234)).toBe('50\'121\'000.12');
       expect(decimalFormat.format(100005121000.1234)).toBe('100\'005\'121\'000.12');
 
-      locale = helper.createLocale('de_DE');
+      locale = helper.createLocale('de-DE');
       decimalFormat = new scout.DecimalFormat(locale, pattern);
 
       expect(decimalFormat.format(0)).toBe('0,00');

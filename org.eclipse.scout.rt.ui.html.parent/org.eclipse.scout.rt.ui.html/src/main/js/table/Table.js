@@ -741,10 +741,9 @@ scout.Table.prototype.cellTooltipText = function(column, row) {
   }
   return '';
 };
-
 scout.Table.prototype._group = function() {
-  var that = this,
-    all, groupColumn, column, alignment,
+  var all, groupColumn, column, alignment,
+    that = this,
     $group = $('.group-sort', this.$container);
 
   // remove all sum rows
@@ -760,12 +759,12 @@ scout.Table.prototype._group = function() {
   }
 
   // prepare data
-  var $rows = $('.table-row:visible', this.$data),
-    $sumRow = $.makeDiv('table-row-sum'),
+  var rows = this.filteredRows(),
     sum = [];
 
-  for (var r = 0; r < $rows.length; r++) {
-    var row = $rows.data('row');
+  for (var r = 0; r < rows.length; r++) {
+    var row = rows[r];
+
     // calculate sum per column
     for (var c = 0; c < this.columns.length; c++) {
       column = this.columns[c];
@@ -777,39 +776,48 @@ scout.Table.prototype._group = function() {
     }
 
     // test if sum should be shown, if yes: reset sum-array
-    var nextRow = $rows.data('row');
-
-    if ((r === $rows.length - 1) || (!all && this.cellText(groupColumn, row) !== this.cellText(groupColumn, nextRow)) && sum.length > 0) {
-      for (c = 0; c < this.columns.length; c++) {
-        var $cell;
-
-        column = this.columns[c];
-        alignment = scout.Table.parseHorizontalAlignment(column.horizontalAlignment);
-        if (typeof sum[c] === 'number') {
-          $cell = $.makeDiv('table-cell', sum[c])
-            .css('text-align', alignment);
-        } else if (!all && column === groupColumn) {
-          $cell = $.makeDiv('table-cell', this.cellText(groupColumn, row))
-            .css('text-align', alignment);
-        } else {
-          $cell = $.makeDiv('table-cell', '&nbsp');
-        }
-
-        $cell.appendTo($sumRow)
-          .css('min-width', column.width)
-          .css('max-width', column.width);
-      }
-
-      // TODO BSH Table Sum | There is something wrong here...
-      $sumRow.insertAfter($rows.eq(r))
-        .width(this._totalWidth + this._getTableRowBorderWidth())
-        .hide()
-        .slideDown();
-
-      $sumRow = $.makeDiv('table-row-sum');
+    var nextRow = rows[r + 1];
+    if ((r === rows.length - 1) || (!all && this.cellText(groupColumn, row) !== this.cellText(groupColumn, nextRow)) && sum.length > 0) {
+      this._appendSumRow(sum, groupColumn, row, all);
       sum = [];
     }
   }
+};
+
+/**
+ * Appends a new sum row after row.$row
+ */
+scout.Table.prototype._appendSumRow = function(sum, groupColumn, row, all) {
+  var c, column, alignment, $cell,
+    $sumRow = $.makeDiv('table-row-sum');
+
+  for (c = 0; c < this.columns.length; c++) {
+    column = this.columns[c];
+    alignment = scout.Table.parseHorizontalAlignment(column.horizontalAlignment);
+    if (typeof sum[c] === 'number') {
+      var sumValue = sum[c];
+      if (column.format) {
+        var decimalFormat = new scout.DecimalFormat(this.session.locale, column.format);
+        sumValue = decimalFormat.format(sumValue);
+      }
+      $cell = $.makeDiv('table-cell', sumValue)
+        .css('text-align', alignment);
+    } else if (!all && column === groupColumn) {
+      $cell = $.makeDiv('table-cell', this.cellText(groupColumn, row))
+        .css('text-align', alignment);
+    } else {
+      $cell = $.makeDiv('table-cell', '&nbsp');
+    }
+
+    $cell.appendTo($sumRow)
+      .css('min-width', column.width)
+      .css('max-width', column.width);
+  }
+
+  $sumRow.insertAfter(row.$row)
+    .width(this._totalWidth + this._getTableRowBorderWidth())
+    .hide()
+    .slideDown();
 };
 
 scout.Table.prototype.group = function(column, draw, all) {
@@ -1076,6 +1084,17 @@ scout.Table.prototype.$selectedRows = function() {
     return $();
   }
   return this.$data.find('.selected');
+};
+
+scout.Table.prototype.filteredRows = function(includeSumRows) {
+  var filteredRows = [];
+  for (var i = 0; i < this.rows.length; i++) {
+    var row = this.rows[i];
+    if (row.$row.isVisible()){
+      filteredRows.push(row);
+    }
+  }
+  return filteredRows;
 };
 
 scout.Table.prototype.$rows = function(includeSumRows) {

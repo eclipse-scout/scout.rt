@@ -6,7 +6,7 @@ describe("Table", function() {
   beforeEach(function() {
     setFixtures(sandbox());
     session = new scout.Session($('#sandbox'), '1.1');
-    session.locale = new LocaleSpecHelper().createLocale('de');
+    session.locale = new LocaleSpecHelper().createLocale('de-CH');
     helper = new TableSpecHelper(session);
     jasmine.Ajax.install();
     jasmine.clock().install();
@@ -617,6 +617,86 @@ describe("Table", function() {
       });
 
 
+    });
+
+  });
+
+  describe("group", function() {
+    var model, table, column0, column1, rows, columns;
+    var $colHeaders, $header0, $header1;
+
+    function prepareTable() {
+      columns = [helper.createModelColumn(createUniqueAdapterId(), 'col1'),
+                 helper.createModelColumn(createUniqueAdapterId(), 'col2', 'number')];
+      rows = helper.createModelRows(2, 3);
+      model = helper.createModel(columns, rows);
+      table = helper.createTable(model);
+      column0 = model.columns[0];
+      column1 = model.columns[1];
+    }
+
+    function render(table) {
+      table.render(session.$entryPoint);
+      $colHeaders = table.header.$container.find('.header-item');
+      $header0 = $colHeaders.eq(0);
+      $header1 = $colHeaders.eq(1);
+    }
+
+    it("creates a sum row", function() {
+      prepareTable();
+      render(table);
+
+      expect(table.$sumRows().length).toBe(0);
+      table.group(column0, true);
+      expect(table.$sumRows().length).toBe(1);
+    });
+
+    it("creates a sum row, even if there are filtered rows", function() {
+      prepareTable();
+      render(table);
+
+      expect(table.$sumRows().length).toBe(0);
+      table.hideRow(table.$rows().eq(2));
+      table.group(column0, true);
+      expect(table.$sumRows().length).toBe(1);
+    });
+
+    it("sums up numbers in a number column", function() {
+      prepareTable();
+      rows[0].cells[1].value = 1;
+      rows[1].cells[1].value = 2;
+      rows[2].cells[1].value = 3;
+      render(table);
+
+      table.group(column0, true);
+      var $sumCell = table.$sumRows().eq(0).children().eq(1);
+      expect($sumCell.text()).toBe('6');
+    });
+
+    it("sums up numbers in a number column but only on filtered rows", function() {
+      prepareTable();
+      rows[0].cells[1].value = 1;
+      rows[1].cells[1].value = 2;
+      rows[2].cells[1].value = 3;
+      render(table);
+
+      table.hideRow(table.$rows().eq(2));
+      table.group(column0, true);
+      var $sumCell = table.$sumRows().eq(0).children().eq(1);
+      expect($sumCell.text()).toBe('3');
+    });
+
+    it("sums up numbers in a number column and considers format pattern", function() {
+      prepareTable();
+      rows[0].cells[1].value = 1000;
+      rows[1].cells[1].value = 1000;
+      rows[2].cells[1].value = 2000;
+      render(table);
+      column1.format = '#.00';
+
+      table.group(column0, true);
+      var $sumCell = table.$sumRows().eq(0).children().eq(1);
+      expect($sumCell.text()).toBe('4000.00');
     });
 
   });

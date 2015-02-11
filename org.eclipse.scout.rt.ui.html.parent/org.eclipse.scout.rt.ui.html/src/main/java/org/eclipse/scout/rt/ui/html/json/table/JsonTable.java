@@ -460,8 +460,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
         json.put("custom", true);
       }
       if (column instanceof INumberColumn<?>) {
-        // Use localized pattern which contains the relevant chars for the current locale using DecimalFormatSymbols
-        json.put("format", ((INumberColumn) column).getFormat().toLocalizedPattern());
+        json.put("format", ((INumberColumn) column).getFormat().toPattern());
       }
       else if (column instanceof IDateColumn) {
         // FIXME CGU: update IDateColumnInterface

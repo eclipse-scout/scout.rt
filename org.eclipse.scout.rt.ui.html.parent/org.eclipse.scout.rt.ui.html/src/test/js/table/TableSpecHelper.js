@@ -26,7 +26,7 @@ TableSpecHelper.prototype.createModelRow = function(id, cells) {
   return {
     "id": id,
     "cells": cells,
-    "enabled": true,
+    "enabled": true
   };
 };
 
