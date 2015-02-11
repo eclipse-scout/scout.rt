@@ -1020,25 +1020,24 @@ scout.Tree.prototype._renderAutoCheckChildren = function() {
  * @memberOf scout.Tree
  */
 scout.Tree.collectSubtree = function($rootNode, includeRootNodeInResult) {
-  var $result = $();
   if (!$rootNode) {
-    return $result;
+    return $();
   }
   var rootLevel = parseFloat($rootNode.attr('data-level'));
-  if (includeRootNodeInResult === undefined || includeRootNodeInResult) {
-    $result = $result.add($rootNode);
-  }
-
+  // Find first node after the root element that has the same or a lower level
   var $nextNode = $rootNode.next();
-  while ($nextNode) {
+  while ($nextNode.length > 0) {
     var level = parseFloat($nextNode.attr('data-level'));
-    if (level > rootLevel) {
-      $result = $result.add($nextNode);
-    }
-    else {
+    if (isNaN(level) || level <= rootLevel) {
       break;
     }
     $nextNode = $nextNode.next();
+  }
+
+  // The result set consists of all nodes between the root node and the found node
+  var $result = $rootNode.nextUntil($nextNode);
+  if (includeRootNodeInResult === undefined || includeRootNodeInResult) {
+    $result = $result.add($rootNode);
   }
   return $result;
 };
