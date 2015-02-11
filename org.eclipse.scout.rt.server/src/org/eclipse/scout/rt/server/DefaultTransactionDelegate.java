@@ -40,6 +40,7 @@ import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.servicetunnel.VersionMismatchException;
 import org.eclipse.scout.rt.shared.validate.DefaultValidator;
 import org.eclipse.scout.rt.shared.validate.IValidationStrategy;
+import org.eclipse.scout.rt.shared.validate.IValidator;
 import org.eclipse.scout.rt.shared.validate.InputValidation;
 import org.eclipse.scout.rt.shared.validate.OutputValidation;
 import org.eclipse.scout.service.IService;
@@ -130,6 +131,10 @@ public class DefaultTransactionDelegate {
       ((ServiceTunnelResponse) response).setProcessingDuration((m_requestEnd - m_requestStart) / 1000000L);
     }
     return response;
+  }
+
+  protected IValidator createValidator(IValidationStrategy validationStrategy) {
+    return new DefaultValidator(validationStrategy);
   }
 
   /**
@@ -346,7 +351,7 @@ public class DefaultTransactionDelegate {
    * For default handling use
    *
    * <pre>
-   * new {@link DefaultValidator#DefaultValidator(IValidationStrategy)}.validate()
+   * the validation methods of {@link #createValidator(IValidationStrategy)}
    * </pre>
    * <p>
    * Override this method to do central input validation inside the transaction context.
@@ -361,7 +366,7 @@ public class DefaultTransactionDelegate {
   }
 
   protected void defaultValidateInput(IValidationStrategy validationStrategy, Object service, Method op, Object[] args) throws Exception {
-    new DefaultValidator(validationStrategy).validateMethodCall(op, args);
+    createValidator(validationStrategy).validateMethodCall(op, args);
   }
 
   /**
@@ -376,7 +381,7 @@ public class DefaultTransactionDelegate {
 
   protected void defaultValidateOutput(IValidationStrategy validationStrategy, Object service, Method op, Object returnValue, Object[] outArgs) throws Exception {
     if ((outArgs != null && outArgs.length > 0) || returnValue != null) {
-      DefaultValidator v = new DefaultValidator(validationStrategy);
+      IValidator v = createValidator(validationStrategy);
       if (outArgs != null && outArgs.length > 0) {
         for (Object arg : outArgs) {
           v.validateParameter(arg, null);
