@@ -443,7 +443,7 @@ public class MailUtility {
         MimeBodyPart bodyPart = new MimeBodyPart();
         DataSource source = new FileDataSource(attachment);
         bodyPart.setDataHandler(new DataHandler(source));
-        bodyPart.setFileName(MimeUtility.encodeText(attachment.getName()));
+        bodyPart.setFileName(MimeUtility.encodeText(attachment.getName(), "UTF-8", null));
         multiPart.addBodyPart(bodyPart);
       }
       msg.saveChanges();

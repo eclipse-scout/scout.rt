@@ -273,7 +273,7 @@ final class WordMailUtility {
           FileDataSource fds = new FileDataSource(attachment);
           DataHandler handler = new DataHandler(fds);
           part.setDataHandler(handler);
-          part.setFileName(MimeUtility.encodeText(attachment.getName()));
+          part.setFileName(MimeUtility.encodeText(attachment.getName(), "UTF-8", null));
           multiPart.addBodyPart(part);
         }
       }
