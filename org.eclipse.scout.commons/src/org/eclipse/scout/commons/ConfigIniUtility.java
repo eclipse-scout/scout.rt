@@ -25,6 +25,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 
 /**
  * Utility to extract config.ini entries of the formats
@@ -55,6 +56,9 @@ import org.eclipse.core.runtime.Platform;
  * containing the config.ini
  */
 public final class ConfigIniUtility {
+
+  // Do not declare static Logger because 'ScoutLogManager' uses this class during its initialization; use ConfigIniUtility.logWarn() instead.
+
   public static final String CONFIG_INI = "config.ini";
   public static final char FILTER_DELIM = '/';
 
@@ -95,33 +99,152 @@ public final class ConfigIniUtility {
     return props;
   }
 
-  public static boolean getBooleanProperty(String key, boolean def) {
-    String val = getProperty(key);
-    if (val == null) {
-      return def;
-    }
-    return Boolean.parseBoolean(val);
+  public static String getProperty(String key) {
+    return getProperty(key, null);
   }
 
-  public static String getProperty(String key) {
+  public static String getProperty(String key, String defaultValue) {
     if (key == null) {
       return null;
     }
 
     // 1. App config (config.ini)
     String value = configProperties.get(key);
-    if (value != null) {
+    if (StringUtility.hasText(value)) {
       return value;
     }
 
     // 2. system config
     value = System.getProperty(key);
-    if (value != null) {
+    if (StringUtility.hasText(value)) {
       return value;
     }
 
     // 3. environment config
-    return System.getenv(key);
+    value = System.getenv(key);
+    if (StringUtility.hasText(value)) {
+      return value;
+    }
+
+    return defaultValue;
+  }
+
+  /**
+   * TODO [dwi]: remove me
+   */
+  @Deprecated
+  public static boolean getBooleanProperty(String key, boolean defaultValue) {
+    return getPropertyBoolean(key, defaultValue);
+  }
+
+  public static boolean getPropertyBoolean(String key, boolean defaultValue) {
+    String rawValue = getProperty(key);
+    if (rawValue == null) {
+      return defaultValue;
+    }
+
+    if (Boolean.TRUE.toString().equalsIgnoreCase(rawValue) || Boolean.FALSE.toString().equalsIgnoreCase(rawValue)) {
+      return Boolean.parseBoolean(rawValue);
+    }
+    else {
+      logWarn("Invalid boolean-value for property '{}' configured: {}", key, rawValue);
+      return defaultValue;
+    }
+  }
+
+  /**
+   * Returns safely an <code>int</code> property from the <code>config.ini</code>.
+   *
+   * @param key
+   *          name of the property.
+   * @return value of the given property or the 'default-value' if the property is not defined or invalid.
+   * @since 5.0
+   */
+  public static int getPropertyInt(String key, int defaultValue) {
+    String valueRaw = getProperty(key, null);
+    if (valueRaw == null) {
+      return defaultValue;
+    }
+
+    try {
+      return Integer.valueOf(valueRaw);
+    }
+    catch (final NumberFormatException e) {
+      logWarn("Invalid int-value for property '{}' configured: {}", key, valueRaw);
+      return defaultValue;
+    }
+  }
+
+  /**
+   * Returns safely a <code>long</code> property from the <code>config.ini</code>.
+   *
+   * @param key
+   *          name of the property.
+   * @return value of the given property or the 'default-value' if the property is not defined or invalid.
+   *         environment is available.
+   * @since 5.0
+   */
+  public static long getPropertyLong(String key, long defaultValue) {
+    String valueRaw = getProperty(key, null);
+    if (valueRaw == null) {
+      return defaultValue;
+    }
+
+    try {
+      return Long.valueOf(valueRaw);
+    }
+    catch (final NumberFormatException e) {
+      logWarn("Invalid long-value for property '{}' configured: {}", key, valueRaw);
+      return defaultValue;
+    }
+  }
+
+  /**
+   * Returns safely a <code>float</code> property from the <code>config.ini</code>.
+   *
+   * @param key
+   *          name of the property.
+   * @return value of the given property or the 'default-value' if the property is not defined or invalid.
+   *         environment is available.
+   * @since 5.0
+   */
+  public static float getPropertyFloat(String key, float defaultValue) {
+    String valueRaw = getProperty(key, null);
+    if (valueRaw == null) {
+      return defaultValue;
+    }
+
+    try {
+      return Float.valueOf(valueRaw);
+    }
+    catch (final NumberFormatException e) {
+      logWarn("Invalid float-value for property '{}' configured: {}", key, valueRaw);
+      return defaultValue;
+    }
+  }
+
+  /**
+   * Returns safely a <code>double</code> property from the <code>config.ini</code>.
+   *
+   * @param key
+   *          name of the property.
+   * @return value of the given property or the 'default-value' if the property is not defined or invalid.
+   *         environment is available.
+   * @since 5.0
+   */
+  public static double getPropertyDouble(String key, double defaultValue) {
+    String valueRaw = getProperty(key, null);
+    if (valueRaw == null) {
+      return defaultValue;
+    }
+
+    try {
+      return Double.valueOf(valueRaw);
+    }
+    catch (final NumberFormatException e) {
+      logWarn("Invalid double-value for property '{}' configured: {}", key, valueRaw);
+      return defaultValue;
+    }
   }
 
   public static String resolve(String s) {
@@ -288,5 +411,12 @@ public final class ConfigIniUtility {
       e.printStackTrace();
     }
     return url;
+  }
+
+  /**
+   * Logs the given message to the logger.
+   */
+  private static void logWarn(String msg, Object... msgArgs) {
+    ScoutLogManager.getLogger(ConfigIniUtility.class).warn(msg, msgArgs);
   }
 }
