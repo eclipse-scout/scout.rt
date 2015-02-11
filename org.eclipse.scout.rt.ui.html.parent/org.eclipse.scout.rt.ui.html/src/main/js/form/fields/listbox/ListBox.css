@@ -1,25 +1,26 @@
 @tablefield-selection-border-width: 1px;
 
-.list-box > .table {
+.list-box > .field > .table {
   margin-left: @mandatory-indicator-width;
   border: 1px solid @border-color;
   border-radius: @border-radius;
   background-color: @control-background-color;
+  padding: 2px 0px;
 
   &.disabled {
     background-color: @control-background-disabled-color;
   }
 }
 
-.list-box.single > .table {
+.list-box.single > .field > .table {
   border: 0;
   border-bottom: 0;
   border-radius: 0;
   background-color: transparent;
 }
 
-.list-box > .table > .table-header,
-.list-box > .table > .table-header > .header-resize  {
+.list-box > .field >  .table > .table-header,
+.list-box > .field > .table > .table-header > .header-resize  {
   height: @logical-grid-height;
 }
 
@@ -48,7 +49,7 @@
   }
 }
 
-.list-box > .table > .table-data .table-row > .table-cell {
+.list-box > .field > .table > .table-data .table-row > .table-cell {
   padding-top: @table-row-padding-y - 6;
   padding-bottom: @table-row-padding-y - 6;
 }
