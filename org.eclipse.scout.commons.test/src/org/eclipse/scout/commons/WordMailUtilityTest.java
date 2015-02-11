@@ -93,7 +93,7 @@ public class WordMailUtilityTest {
     // create mime message from word archive and verify message
     MimeMessage message = WordMailUtility.createMimeMessageFromWordArchive(archiveFile, attachments.toArray(new File[attachments.size()]));
     verifyPlainTextAndHtml(message, plainText, htmlText);
-    verifyAttachments(message, "sample1.dat", "sample2.dat", MimeUtility.encodeText("sample3_öüä.dat"));
+    verifyAttachments(message, "sample1.dat", "sample2.dat", MimeUtility.encodeText("sample3_öüä.dat", "UTF-8", null));
   }
 
   private void verifyPlainTextAndHtml(MimeMessage message, String plainText, String htmlText) throws ProcessingException, IOException, MessagingException {

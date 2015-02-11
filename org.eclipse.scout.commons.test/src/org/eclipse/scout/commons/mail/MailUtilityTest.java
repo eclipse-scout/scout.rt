@@ -232,7 +232,7 @@ public class MailUtilityTest {
     MailUtility.addAttachmentsToMimeMessage(message, attachments);
 
     // verify added attachments in java instance
-    verifyMimeMessage(message, plainText, html, "sample1.dat", "sample2.dat", MimeUtility.encodeText("sample3_öüä.dat"));
+    verifyMimeMessage(message, plainText, html, "sample1.dat", "sample2.dat", MimeUtility.encodeText("sample3_öüä.dat", "UTF-8", null));
 
     // store and recreate mime message (byte[])
     ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -240,7 +240,7 @@ public class MailUtilityTest {
     message = MailUtility.createMessageFromBytes(bos.toByteArray());
 
     // verify new instance
-    verifyMimeMessage(message, plainText, html, "sample1.dat", "sample2.dat", MimeUtility.encodeText("sample3_öüä.dat"));
+    verifyMimeMessage(message, plainText, html, "sample1.dat", "sample2.dat", MimeUtility.encodeText("sample3_öüä.dat", "UTF-8", null));
   }
 
   @Test
