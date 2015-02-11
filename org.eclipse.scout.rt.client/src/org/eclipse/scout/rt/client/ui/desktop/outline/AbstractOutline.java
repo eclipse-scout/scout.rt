@@ -603,6 +603,7 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
       form.setAutoAddRemoveOnDesktop(false);
     }
     m_defaultDetailForm = form;
+    firePageChanged(null);
   }
 
   /**

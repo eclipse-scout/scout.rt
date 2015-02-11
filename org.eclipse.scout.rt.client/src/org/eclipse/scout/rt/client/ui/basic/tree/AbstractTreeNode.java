@@ -390,7 +390,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
               }
               else {
                 replaceChildNodeInternal(node.getChildNodeIndex(), resolvedNode);
-                m_tree.updateNode(resolvedNode);
+                onVirtualChildNodeResolved(resolvedNode);
               }
               return resolvedNode;
             }
@@ -402,6 +402,10 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
       }
     }
     return node;
+  }
+
+  protected void onVirtualChildNodeResolved(ITreeNode resolvedNode) {
+    m_tree.updateNode(resolvedNode);
   }
 
   @Override

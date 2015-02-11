@@ -60,6 +60,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   @SuppressWarnings("deprecation")
   private final org.eclipse.scout.rt.shared.ContextMap m_contextMap;
   private boolean m_tableVisible;
+  private boolean m_detailFormVisible;
   private DataChangeListener m_internalDataChangeListener;
   private final String m_userPreferenceContext;
   private IProcessingStatus m_pagePopulateStatus;
@@ -70,8 +71,6 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
    * This flag is used to suppress change events while the page is initializing, see {@link #initPage()}.
    */
   private boolean m_pageInitialized;
-
-  private boolean m_detailFormVisible;
 
   @Override
   public T getTable() {
@@ -196,7 +195,6 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   @SuppressWarnings("deprecation")
   public AbstractPage(boolean callInitializer, org.eclipse.scout.rt.shared.ContextMap contextMap, String userPreferenceContext) {
     super(false);
-    m_detailFormVisible = true;
     m_contextMap = contextMap;
     m_userPreferenceContext = userPreferenceContext;
     if (callInitializer) {
@@ -220,6 +218,20 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(35)
   protected boolean getConfiguredTableVisible() {
+    return true;
+  }
+
+  /**
+   * Configures if a configured detail form should be visible by default.
+   * <p>
+   * Subclasses can override this method. Default is {@code true}.
+   *
+   * @see #getConfiguredDetailForm() on how to configure a detail form.
+   * @see #setDetailFormVisible(boolean) on how to change the visibility of a detail form
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(91)
+  protected boolean getConfiguredDetailFormVisible() {
     return true;
   }
 
@@ -251,6 +263,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   protected String getConfiguredIconId() {
     return null;
   }
+
   /**
    * Configures the detail form to be used with this page. The form is lazily {@linkplain #ensureDetailFormCreated()
    * created} and {@linkplain #ensureDetailFormStarted() started}.
@@ -428,6 +441,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     super.initConfig();
     m_table = initTable();
     setTableVisible(getConfiguredTableVisible());
+    setDetailFormVisible(getConfiguredDetailFormVisible());
   }
 
   /*
@@ -644,6 +658,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
     m_detailForm = form;
     if (isSelectedNode()) {
       getOutline().setDetailForm(m_detailForm);
+      firePageChanged(this);
     }
   }
 
@@ -728,6 +743,12 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   }
 
   @Override
+  protected void onVirtualChildNodeResolved(ITreeNode resolvedNode) {
+    super.onVirtualChildNodeResolved(resolvedNode);
+    firePageChanged((IPage) resolvedNode);
+  }
+
+  @Override
   public boolean isTableVisible() {
     return m_tableVisible;
   }
@@ -736,7 +757,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   public void setTableVisible(boolean tableVisible) {
     if (m_tableVisible != tableVisible) {
       m_tableVisible = tableVisible;
-      firePageChanged();
+      firePageChanged(this);
     }
   }
 
@@ -749,7 +770,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   public void setDetailFormVisible(boolean detailFormVisible) {
     if (m_detailFormVisible != detailFormVisible) {
       m_detailFormVisible = detailFormVisible;
-      firePageChanged();
+      firePageChanged(this);
     }
   }
 
@@ -757,9 +778,9 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
    * Note: set*Visible methods are called by initConfig(), at this point getTree() is still null.
    * Tree can also be null during shutdown.
    */
-  protected void firePageChanged() {
+  protected void firePageChanged(IPage page) {
     if (m_pageInitialized && getOutline() != null) {
-      getOutline().firePageChanged(this);
+      getOutline().firePageChanged(page);
     }
   }
 
