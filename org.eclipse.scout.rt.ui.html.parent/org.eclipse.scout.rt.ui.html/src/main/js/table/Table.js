@@ -289,74 +289,75 @@ scout.Table.prototype._renderRowOrderChanges = function() {
 };
 
 /**
- * @param additional true to add the column to list of sorted columns. False to use this column exclusively as sort column (reset other columns)
+ * @param multiSort true to add the column to list of sorted columns. False to use this column exclusively as sort column (reset other columns)
+ * @param remove true to remove the column from the sort columns
  */
-scout.Table.prototype.sort = function($header, dir, additional, remove) {
-  var sortIndex, siblingsResetted,
-    maxIndex = -1,
-    column = $header.data('column'),
-    data = {
-      columnId: column.id
-    };
+scout.Table.prototype.sort = function(column, direction, multiSort, remove) {
+  var data, sorted;
 
-  // Update model
-  if (remove) {
-    data.sortingRemoved = true;
-    column.sortActive = false;
-
-    //Adjust sibling columns with higher index
-    scout.arrays.eachSibling(this.columns, column, function(siblingColumn) {
-      if (siblingColumn.sortIndex > column.sortIndex) {
-        siblingColumn.sortIndex = siblingColumn.sortIndex - 1;
-      }
-    });
-    column.sortIndex = undefined;
-  } else {
-    if (additional) {
-      data.multiSort = true;
-
-      // If not already sorted set the appropriate sort index
-      if (!column.sortActive) {
-        for (var i = 0; i < this.columns.length; i++) {
-          sortIndex = this.columns[i].sortIndex;
-          if (sortIndex >= 0) {
-            maxIndex = Math.max(sortIndex, maxIndex);
-          }
-        }
-        column.sortIndex = maxIndex + 1;
-      }
-    } else {
-      scout.arrays.eachSibling(this.columns, column, function(siblingColumn) {
-        if (siblingColumn.sortActive) {
-          siblingColumn.sortIndex = undefined;
-          siblingColumn.sortActive = false;
-          siblingsResetted = true;
-        }
-      });
-      column.sortIndex = 0;
-    }
-    if (column.sortActive && siblingsResetted) {
-      //FIXME CGU this is necessary because the server logic does it (handleSortEvent). In my opinion we have to send sorting details (active, index, asc) instead of just column sorted.
-      column.sortAscending = true;
-    } else {
-      column.sortAscending = dir === 'asc' ? true : false;
-    }
-    column.sortActive = true;
+  this._updateSortColumns(column, direction, multiSort, remove);
+  if (this.header) {
+    this.header.onSortingChanged();
   }
+  sorted = this._sort();
 
-  this.header.onSortingChanged();
-
-  // sort model
-  var sorted = this._sort();
+  data = {
+    columnId: column.id,
+    sortingRemoved: remove,
+    multiSort: multiSort,
+    sortAscending: column.sortAscending
+  };
   if (sorted) {
     this.session.send(this.id, 'rowsSorted', data);
 
     this.clearSelection();
     this._renderRowOrderChanges();
   } else {
-    //Delegate sorting to server when it is not possible on client side
+    // Delegate sorting to server when it is not possible on client side
     this.session.send(this.id, 'sortRows', data);
   }
+};
+
+scout.Table.prototype._updateSortColumns = function(column, direction, multiSort, remove) {
+  var sortIndex, siblingsResetted,
+    maxIndex = -1;
+
+  if (remove) {
+    column.sortActive = false;
+
+    // Adjust sibling columns with higher index
+    scout.arrays.eachSibling(this.columns, column, function(siblingColumn) {
+      if (siblingColumn.sortIndex > column.sortIndex) {
+        siblingColumn.sortIndex = siblingColumn.sortIndex - 1;
+      }
+    });
+    column.sortIndex = -1;
+    return;
+  }
+
+  if (multiSort) {
+    // If not already sorted set the appropriate sort index
+    if (!column.sortActive) {
+      for (var i = 0; i < this.columns.length; i++) {
+        sortIndex = this.columns[i].sortIndex;
+        if (sortIndex >= 0) {
+          maxIndex = Math.max(sortIndex, maxIndex);
+        }
+      }
+      column.sortIndex = maxIndex + 1;
+    }
+  } else {
+    scout.arrays.eachSibling(this.columns, column, function(siblingColumn) {
+      if (siblingColumn.sortActive) {
+        siblingColumn.sortIndex = -1;
+        siblingColumn.sortActive = false;
+      }
+    });
+    column.sortIndex = 0;
+  }
+
+  column.sortAscending = direction === 'asc' ? true : false;
+  column.sortActive = true;
 };
 
 scout.Table.prototype.drawData = function() {
@@ -813,15 +814,17 @@ scout.Table.prototype._group = function() {
   }
 };
 
-scout.Table.prototype.group = function($header, draw, all) {
+scout.Table.prototype.group = function(column, draw, all) {
   $('.group-sort', this.$container).removeClass('group-sort');
   $('.group-all', this.$container).removeClass('group-all');
 
   if (draw) {
     if (!all) {
-      this.sort($header, 'asc', false);
+      this.sort(column, 'asc', false);
     }
-    this.header.onGroupingChanged($header, all);
+    if (this.header) {
+      this.header.onGroupingChanged(column, all);
+    }
   }
 
   this._group();
@@ -1175,7 +1178,7 @@ scout.Table.prototype.filteredBy = function() {
   var filteredBy = [];
   for (var i = 0; i < this.columns.length; i++) {
     if (this.columns[i].filterFunc) {
-      filteredBy.push(this.columns[i].$div.text());
+      filteredBy.push(this.columns[i].$header.text());
     }
   }
   for (var key in this._filterMap) {

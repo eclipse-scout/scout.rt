@@ -429,7 +429,7 @@ describe("Table", function() {
     it("updates column model", function() {
       prepareTable();
       render(table);
-      table.sort($header0, 'desc');
+      table.sort(column0, 'desc');
 
       expect(table.columns[0].sortActive).toBe(true);
       expect(table.columns[0].sortAscending).toBe(false);
@@ -441,10 +441,10 @@ describe("Table", function() {
         prepareTable();
         render(table);
 
-        table.sort($header0, 'desc');
+        table.sort(column0, 'desc');
         expect(table.columns[0].sortAscending).toBe(false);
 
-        table.sort($header0, 'asc');
+        table.sort(column0, 'asc');
         expect(table.columns[0].sortAscending).toBe(true);
       });
 
@@ -456,16 +456,16 @@ describe("Table", function() {
         // we must set the sortActive flag here.
         table.columns[1].sortActive = true;
 
-        table.sort($header0, 'desc');
+        table.sort(column0, 'desc');
         expect(table.columns[0].sortActive).toBe(true);
         expect(table.columns[0].sortAscending).toBe(false);
         expect(table.columns[0].sortIndex).toBe(0);
         expect(table.columns[1].sortActive).toBe(false);
-        expect(table.columns[1].sortIndex).toBeUndefined();
+        expect(table.columns[1].sortIndex).toBe(-1);
 
-        table.sort($header1, 'desc');
+        table.sort(column1, 'desc');
         expect(table.columns[0].sortActive).toBe(false);
-        expect(table.columns[0].sortIndex).toBeUndefined();
+        expect(table.columns[0].sortIndex).toBe(-1);
         expect(table.columns[1].sortActive).toBe(true);
         expect(table.columns[1].sortAscending).toBe(false);
         expect(table.columns[1].sortIndex).toBe(0);
@@ -479,16 +479,16 @@ describe("Table", function() {
         // we must set the sortActive flag here.
         table.columns[1].sortActive = true;
 
-        table.sort($header0, 'desc');
+        table.sort(column0, 'desc');
         expect(table.columns[0].sortIndex).toBe(0);
-        expect(table.columns[1].sortIndex).toBeUndefined();
+        expect(table.columns[1].sortIndex).toBe(-1);
 
-        table.sort($header1, 'desc', true);
+        table.sort(column1, 'desc', true);
         expect(table.columns[0].sortIndex).toBe(0);
         expect(table.columns[1].sortIndex).toBe(1);
 
-        table.sort($header1, 'desc');
-        expect(table.columns[0].sortIndex).toBeUndefined();
+        table.sort(column1, 'desc');
+        expect(table.columns[0].sortIndex).toBe(-1);
         expect(table.columns[1].sortIndex).toBe(0);
       });
 
@@ -500,23 +500,23 @@ describe("Table", function() {
         // we must set the sortActive flag here.
         table.columns[1].sortActive = true;
 
-        table.sort($header0, 'desc');
+        table.sort(column0, 'desc');
         expect(table.columns[0].sortIndex).toBe(0);
-        expect(table.columns[1].sortIndex).toBeUndefined();
+        expect(table.columns[1].sortIndex).toBe(-1);
 
-        table.sort($header1, 'desc', true);
+        table.sort(column1, 'desc', true);
         expect(table.columns[0].sortIndex).toBe(0);
         expect(table.columns[1].sortIndex).toBe(1);
 
-        table.sort($header2, 'desc', true);
+        table.sort(column2, 'desc', true);
         expect(table.columns[0].sortIndex).toBe(0);
         expect(table.columns[1].sortIndex).toBe(1);
         expect(table.columns[2].sortIndex).toBe(2);
 
         // Remove second column -> sortIndex of 3rd column gets adjusted
-        table.sort($header1, 'desc', false, true);
+        table.sort(column1, 'desc', false, true);
         expect(table.columns[0].sortIndex).toBe(0);
-        expect(table.columns[1].sortIndex).toBeUndefined();
+        expect(table.columns[1].sortIndex).toBe(-1);
         expect(table.columns[2].sortIndex).toBe(1);
       });
     });
@@ -528,11 +528,12 @@ describe("Table", function() {
       // Make sure sorting is not executed because it does not work with phantomJS
       spyOn(table, "_sort").and.returnValue(true);
 
-      table.sort($header0, 'desc');
+      table.sort(column0, 'desc');
       sendQueuedAjaxCalls();
 
       var event = new scout.Event(table.id, 'rowsSorted', {
-        columnId: table.columns[0].id
+        columnId: table.columns[0].id,
+        sortAscending: false
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
@@ -542,11 +543,12 @@ describe("Table", function() {
       render(table);
       spyOn(scout.device, "supportsInternationalization").and.returnValue(false);
 
-      table.sort($header0, 'desc');
+      table.sort(column0, 'desc');
       sendQueuedAjaxCalls();
 
       var event = new scout.Event(table.id, 'sortRows', {
-        columnId: table.columns[0].id
+        columnId: table.columns[0].id,
+        sortAscending: false
       });
       expect(mostRecentJsonRequest()).toContainEvents(event);
     });
@@ -556,7 +558,7 @@ describe("Table", function() {
       render(table);
       spyOn(table, '_sort');
 
-      table.sort($header0, 'desc');
+      table.sort(column0, 'desc');
 
       expect(table._sort).toHaveBeenCalled();
     });
@@ -570,50 +572,47 @@ describe("Table", function() {
 
         var model = helper.createModelSingleColumnByTexts(1, ['Österreich', 'Italien', 'Zypern']);
         var table = helper.createTable(model);
+        column0 = model.columns[0];
         table.render(session.$entryPoint);
-        $colHeaders = table.header.$container.find('.header-item');
-        $header0 = $colHeaders.eq(0);
 
-        table.sort($header0, 'desc');
+        table.sort(column0, 'desc');
         helper.assertTextsInCells(table.rows, 0, ['Zypern', 'Österreich', 'Italien']);
 
-        table.sort($header0, 'asc');
+        table.sort(column0, 'asc');
         helper.assertTextsInCells(table.rows, 0, ['Italien', 'Österreich', 'Zypern']);
 
         session.locale = new LocaleSpecHelper().createLocale('sv');
 
-        table.sort($header0, 'desc');
+        table.sort(column0, 'desc');
         helper.assertTextsInCells(table.rows, 0, ['Österreich', 'Zypern', 'Italien']);
 
-        table.sort($header0, 'asc');
+        table.sort(column0, 'asc');
         helper.assertTextsInCells(table.rows, 0, ['Italien', 'Zypern', 'Österreich']);
       });
 
       it("sorts number columns", function() {
         var model = helper.createModelSingleColumnByValues([11, 1, 8], 'number');
         var table = helper.createTable(model);
+        column0 = model.columns[0];
         table.render(session.$entryPoint);
-        $colHeaders = table.header.$container.find('.header-item');
-        $header0 = $colHeaders.eq(0);
 
-        table.sort($header0, 'desc');
+        table.sort(column0, 'desc');
         helper.assertValuesInCells(table.rows, 0, [11, 8, 1]);
 
-        table.sort($header0, 'asc');
+        table.sort(column0, 'asc');
         helper.assertValuesInCells(table.rows, 0, [1, 8, 11]);
       });
 
       it("sorts date columns", function() {
         var model = helper.createModelSingleColumnByValues([new Date('2012-08-10'), new Date('2014-03-01'), new Date('1999-01-10')], 'date');
         var table = helper.createTable(model);
+        column0 = model.columns[0];
         table.render(session.$entryPoint);
-        $colHeaders = table.header.$container.find('.header-item');
-        $header0 = $colHeaders.eq(0);
 
-        table.sort($header0, 'desc');
+        table.sort(column0, 'desc');
         helper.assertDatesInCells(table.rows, 0, [new Date('2014-03-01'), new Date('2012-08-10'), new Date('1999-01-10')]);
 
-        table.sort($header0, 'asc');
+        table.sort(column0, 'asc');
         helper.assertDatesInCells(table.rows, 0, [new Date('1999-01-10'), new Date('2012-08-10'), new Date('2014-03-01')]);
       });
 

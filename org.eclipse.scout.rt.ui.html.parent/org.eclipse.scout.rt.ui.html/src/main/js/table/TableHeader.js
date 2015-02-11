@@ -38,7 +38,7 @@ scout.TableHeader = function(table, session) {
     this.$container.appendDiv('header-resize', '')
       .on('mousedown', '', resizeHeader);
 
-    column.$div = $header;
+    column.$header = $header;
     column.filter = [];
   }
 
@@ -48,7 +48,7 @@ scout.TableHeader = function(table, session) {
     if (that.dragging) {
       that.dragging = false;
     } else if (event.shiftKey || event.ctrlKey) {
-      table.sort($header, $header.hasClass('sort-asc') ? 'desc' : 'asc', event.shiftKey);
+      table.sort($header.data('column'), $header.hasClass('sort-asc') ? 'desc' : 'asc', event.shiftKey);
     } else if (that._tableHeaderMenu && that._tableHeaderMenu.isOpenFor($(event.target))) {
       that._tableHeaderMenu.remove();
       that._tableHeaderMenu = null;
@@ -212,11 +212,12 @@ scout.TableHeader.prototype.onColumnResized = function($header, width) {
 scout.TableHeader.prototype.onSortingChanged = function() {
   for (var i = 0; i < this.table.columns.length; i++) {
     var column = this.table.columns[i];
-    this._applyColumnSorting(column.$div, column);
+    this._applyColumnSorting(column.$header, column);
   }
 };
 
-scout.TableHeader.prototype.onGroupingChanged = function($header, all) {
+scout.TableHeader.prototype.onGroupingChanged = function(column, all) {
+  var $header = column.$header;
   if (all) {
     $header.parent().addClass('group-all');
   } else {
@@ -274,7 +275,7 @@ scout.TableHeader.prototype.onOrderChanged = function(oldColumnOrder) {
   // change order in dom of header
   for (i = 0; i < this.table.columns.length; i++) {
     column = this.table.columns[i];
-    $header = column.$div;
+    $header = column.$header;
     $headerResize = $header.next('.header-resize');
 
     this.$container.append($header);
@@ -309,7 +310,7 @@ scout.TableHeader.prototype.findHeaderItems = function() {
 scout.TableHeader.prototype.updateHeaders = function(columns) {
   for (var i = 0; i < columns.length; i++) {
     var column = columns[i];
-    var $header = columns[i].$div;
+    var $header = columns[i].$header;
     this._applyColumnText($header, column);
     this._applyColumnSorting($header, column);
   }

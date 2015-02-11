@@ -343,27 +343,26 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
    * happened on client as well.
    */
   protected void handleUiRowsSorted(JsonEvent event, JsonResponse res) {
-    IColumn column = extractColumn(event.getData());
-    boolean multiSort = event.getData().optBoolean("multiSort");
-    boolean sortingRemoved = event.getData().optBoolean("sortingRemoved");
     addTableEventFilterCondition(TableEvent.TYPE_ROW_ORDER_CHANGED);
-    fireSortRowsFromUi(column, multiSort, sortingRemoved);
+    fireSortRowsFromUi(event.getData());
   }
 
   protected void handleUiSortRows(JsonEvent event, JsonResponse res) {
-    IColumn column = extractColumn(event.getData());
-    boolean multiSort = event.getData().optBoolean("multiSort");
-    boolean sortingRemoved = event.getData().optBoolean("sortingRemoved");
-    fireSortRowsFromUi(column, multiSort, sortingRemoved);
+    fireSortRowsFromUi(event.getData());
   }
 
-  protected void fireSortRowsFromUi(IColumn<?> column, boolean multiSort, boolean sortingRemoved) {
+  protected void fireSortRowsFromUi(JSONObject data) {
+    IColumn column = extractColumn(data);
+    boolean sortingRemoved = data.optBoolean("sortingRemoved");
+
     // FIXME CGU: add filter for HEADER_UPDATE event with json data of column (execDecorateHeaderCell is called which may change other header properties (text etc)
     if (sortingRemoved) {
       getModel().getUIFacade().fireSortColumnRemovedFromUI(column);
     }
     else {
-      getModel().getUIFacade().fireHeaderSortFromUI(column, multiSort);
+      boolean multiSort = data.optBoolean("multiSort");
+      boolean sortAscending = JsonObjectUtility.getBoolean(data, "sortAscending");
+      getModel().getUIFacade().fireHeaderSortFromUI(column, multiSort, sortAscending);
     }
   }
 

@@ -59,13 +59,13 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
     });
 
   var $sortAscAdd = $commandSort.appendDiv('header-command sort-asc-add')
-    .data('label', session.text('ascendingAdditionally'))
+    .data('label', session.text('ascendingmultiSortly'))
     .click(this.remove.bind(this))
     .click(function() {
       sort('asc', true, $(this).hasClass('selected'));
     });
   var $sortDescAdd = $commandSort.appendDiv('header-command sort-desc-add')
-    .data('label', session.text('descendingAdditionally'))
+    .data('label', session.text('descendingmultiSortly'))
     .click(this.remove.bind(this))
     .click(function() {
       sort('desc', true, $(this).hasClass('selected'));
@@ -238,9 +238,10 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
     pos = table.header.getColumnViewIndex($header);
   }
 
-  function sort(dir, additional, remove) {
-    table.group($header, false, false);
-    table.sort($header, dir, additional, remove);
+  function sort(direction, multiSort, remove) {
+    var column = $header.data('column');
+    table.group(column, false, false);
+    table.sort(column, direction, multiSort, remove);
 
     sortSelect();
     groupSelect();
@@ -295,14 +296,14 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
   }
 
   function groupAll() {
-    table.group($header, !$(this).hasClass('selected'), true);
+    table.group($header.data('column'), !$(this).hasClass('selected'), true);
 
     sortSelect();
     groupSelect();
   }
 
   function groupSort() {
-    table.group($header, !$(this).hasClass('selected'), false);
+    table.group($header.data('column'), !$(this).hasClass('selected'), false);
 
     sortSelect();
     groupSelect();
