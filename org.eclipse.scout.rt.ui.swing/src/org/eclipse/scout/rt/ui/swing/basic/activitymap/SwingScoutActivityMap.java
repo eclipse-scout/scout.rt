@@ -26,7 +26,6 @@ import javax.swing.SwingUtilities;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.ActivityMapMenuType;
-import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.activitymap.ActivityCell;
 import org.eclipse.scout.rt.client.ui.basic.activitymap.ActivityMapEvent;
@@ -435,22 +434,24 @@ public class SwingScoutActivityMap extends SwingScoutComposite<IActivityMap<?, ?
   }
 
   private void handleSwingEditActivityPopup(final MouseEvent e) {
-    if (getUpdateSwingFromScoutLock().isAcquired()) {
-      return;
-    }
-    //
-    // notify Scout
-    Runnable t = new Runnable() {
-      @Override
-      public void run() {
-        IContextMenu contextMenu = getScoutObject().getContextMenu();
-        // call swing menu
-        SwingPopupWorker popupWorker = new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), e.getPoint(), contextMenu, MenuUtility.getMenuTypesForActivityMapSelection(getScoutActivityMap().getSelectedActivityCell()));
-        popupWorker.setLightWeightPopup(false);
-        popupWorker.enqueue();
-      }
-    };
-    getSwingEnvironment().invokeScoutLater(t, 5678);
-    // end notify
+    // disabled because it does not work since menu refactoring
+    // the context menu presented to the user are belonging to the selected range, not to the activity cell the context menu action takes place
+//    if (getUpdateSwingFromScoutLock().isAcquired()) {
+//      return;
+//    }
+//    //
+//    // notify Scout
+//    Runnable t = new Runnable() {
+//      @Override
+//      public void run() {
+//        IContextMenu contextMenu = getScoutObject().getContextMenu();
+//        // call swing menu
+//        SwingPopupWorker popupWorker = new SwingPopupWorker(getSwingEnvironment(), e.getComponent(), e.getPoint(), contextMenu, MenuUtility.getMenuTypesForActivityMapSelection(getScoutActivityMap().getSelectedActivityCell()));
+//        popupWorker.setLightWeightPopup(false);
+//        popupWorker.enqueue();
+//      }
+//    };
+//    getSwingEnvironment().invokeScoutLater(t, 5678);
+//    // end notify
   }
 }
