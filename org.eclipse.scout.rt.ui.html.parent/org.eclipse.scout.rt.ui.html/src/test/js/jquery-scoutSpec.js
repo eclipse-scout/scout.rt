@@ -8,11 +8,11 @@ describe("scout-jquery", function() {
 
   describe("isEnabled", function() {
 
-    it("is only false when data enabled is === false", function() {
+    it("is only false when class disabled is set", function() {
       expect($e.isEnabled()).toBe(true);
-      $e.data('enabled', false);
+      $e.addClass('disabled');
       expect($e.isEnabled()).toBe(false);
-      $e.removeData('enabled');
+      $e.removeClass('disabled');
       expect($e.isEnabled()).toBe(true);
     });
 

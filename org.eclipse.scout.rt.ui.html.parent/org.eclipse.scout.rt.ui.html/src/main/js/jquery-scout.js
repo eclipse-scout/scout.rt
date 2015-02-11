@@ -166,7 +166,6 @@
 
   $.fn.setEnabled = function(enabled) {
     enabled = !!enabled;
-    this.data('enabled', enabled);
     this.toggleClass('disabled', !enabled);
     // Toggle disabled attribute for elements that support it (see http://www.w3.org/TR/html5/disabled-elements.html)
     if (this.is('button, input, select, textarea, optgroup, option, fieldset')) {
@@ -181,7 +180,7 @@
   };
 
   $.fn.isEnabled = function() {
-    return !!this.data('enabled');
+    return !this.hasClass('disabled');
   };
 
   $.fn.setVisible = function(visible) {
