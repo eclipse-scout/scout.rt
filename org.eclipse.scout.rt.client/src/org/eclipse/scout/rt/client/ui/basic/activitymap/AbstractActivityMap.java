@@ -630,6 +630,25 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
     m_selectedResourceIds.clear();
     m_selectedResourceIds.addAll(internalResourceIds);
     propertySupport.setProperty(PROP_SELECTED_RESOURCE_IDS, internalResourceIds);
+
+    // check whether current selected activity cell needs to be updated
+    if (CollectionUtility.size(internalResourceIds) != 1) {
+      // at most one activity cell might be selected
+      setSelectedActivityCell(null);
+      return;
+    }
+
+    ActivityCell<RI, AI> selectedCell = getSelectedActivityCell();
+    if (selectedCell == null) {
+      // nothing selected
+      return;
+    }
+
+    RI resourceId = CollectionUtility.firstElement(resourceIds);
+    if (CompareUtility.notEquals(resourceId, selectedCell.getResourceId())) {
+      // selected cell does not belong to selected resources
+      setSelectedActivityCell(null);
+    }
   }
 
   @SuppressWarnings("unchecked")
@@ -1103,7 +1122,14 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
         RI resourceId = CollectionUtility.firstElement(selectedResourceIds);
         List<ActivityCell<RI, AI>> activityCells = getActivityCells(resourceId);
         for (ActivityCell<RI, AI> cell : activityCells) {
-          if (CompareUtility.equals(cell.getBeginTime(), beginTime) && CompareUtility.equals(cell.getEndTime(), endTime)) {
+
+          if (CompareUtility.equals(cell.getBeginTime(), beginTime) &&
+              (CompareUtility.equals(cell.getEndTime(), endTime)
+              // see TimeScaleBuilder, end time is sometimes actual end time minus 1ms
+              || (cell != null
+                  && cell.getEndTime() != null
+                  && endTime != null
+                  && cell.getEndTime().getTime() == endTime.getTime() + 1))) {
             setSelectedActivityCell(cell);
             return;
           }
