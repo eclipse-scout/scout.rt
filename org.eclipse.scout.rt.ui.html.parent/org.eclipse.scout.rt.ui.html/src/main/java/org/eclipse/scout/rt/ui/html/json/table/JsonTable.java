@@ -25,6 +25,8 @@ import java.util.Map;
 
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.MouseButton;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
@@ -59,6 +61,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T> implements IContextMenuOwner {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonTable.class);
 
   public static final String EVENT_ROW_CLICKED = "rowClicked";
   public static final String EVENT_ROW_ACTION = "rowAction";
@@ -401,7 +404,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     }
     catch (MalformedURLException e) {
       //TODO [15.0] imo change in scout and only send the path, not the complete url, also ignore the column! hyperlinks are per row only and use a path only [a href='path']text[/a]
-      e.printStackTrace();
+      LOG.error("", e);
     }
     if (row != null && column != null && url != null) {
       getModel().getUIFacade().fireHyperlinkActionFromUI(row, column, url);

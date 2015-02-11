@@ -12,8 +12,7 @@ scout.RadioButtonGroup = function() {
 scout.inherits(scout.RadioButtonGroup, scout.ValueField);
 
 scout.RadioButtonGroup.prototype._render = function($parent) {
-  var htmlComp,
-    env = scout.HtmlEnvironment,
+  var env = scout.HtmlEnvironment,
     htmlBodyContainer;
 
   this.addContainer($parent, 'radiobutton-group');

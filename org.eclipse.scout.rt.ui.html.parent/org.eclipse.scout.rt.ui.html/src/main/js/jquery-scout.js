@@ -181,7 +181,7 @@
   };
 
   $.fn.isEnabled = function() {
-    return this.data('enabled') !== false;
+    return !!this.data('enabled');
   };
 
   $.fn.setVisible = function(visible) {

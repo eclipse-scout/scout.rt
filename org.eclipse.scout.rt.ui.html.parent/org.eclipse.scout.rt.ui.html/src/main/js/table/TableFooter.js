@@ -7,8 +7,7 @@ scout.TableFooter.FILTER_KEY = 'TEXTFIELD';
 scout.TableFooter.CONTAINER_SIZE = 350;
 
 scout.TableFooter.prototype._render = function($parent) {
-  var that = this,
-    i, control, filter;
+  var filter, that = this;
 
   this.$container = $parent.appendDiv('table-footer');
   this.$controlContainer = this.$container.appendDiv('control-container').hide();
@@ -108,7 +107,7 @@ scout.TableFooter.prototype.update = function() {
 scout.TableFooter.prototype._updateTableControls = function() {
   var controls = this._table.tableControls;
   if (controls) {
-  controls.forEach(function(control) {
+    controls.forEach(function(control) {
       control.tableFooter = this;
       control.table = this._table;
       control.render(this.$controlGroup);
@@ -229,10 +228,11 @@ scout.TableFooter.prototype.openControlContainer = function() {
 
   // open container, stop existing (close) animations before
   this.$controlContainer.stop(true).show().animate({
-    height: scout.TableFooter.CONTAINER_SIZE}, {
-      duration: 500,
-      progress: that._validateTableLayout.bind(that)
-    });
+    height: scout.TableFooter.CONTAINER_SIZE
+  }, {
+    duration: 500,
+    progress: that._validateTableLayout.bind(that)
+  });
 
   this.open = true;
 };
@@ -241,10 +241,11 @@ scout.TableFooter.prototype.closeControlContainer = function(control) {
   var that = this;
 
   this.$controlContainer.stop(true).show().animate({
-    height: 0}, {
-      duration: 500,
-      progress: that._validateTableLayout.bind(that)
-    });
+    height: 0
+  }, {
+    duration: 500,
+    progress: that._validateTableLayout.bind(that)
+  });
 
   this.$controlContainer.promise().done(function() {
     this.$controlContainer.hide();

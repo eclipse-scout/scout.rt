@@ -18,7 +18,6 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenuType;
-import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.IForm5;
 import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.AbstractExtensiblePageWithNodes;
 import org.eclipse.scout.rt.shared.ui.menu.MenuWrapper;
@@ -58,7 +57,7 @@ public abstract class AbstractPageWithNodes5 extends AbstractExtensiblePageWithN
       return;
     }
     super.ensureDetailFormCreated();
-    if (getDetailForm() instanceof IForm) {
+    if (getDetailForm() instanceof IForm5) {
       IForm5 form = (IForm5) getDetailForm();
       List<IMenu> menus = form.getContextMenu().getChildActions();
       adaptDetailFormMenus(menus);

@@ -111,7 +111,7 @@ scout.RichTextField.prototype._onChange = function(event) {
 
   // store selection
   var selection = window.getSelection(),
-    range, markerStart, markerEnd, backwards;
+    range, markerStart, markerEnd;
 
   if (selection.getRangeAt && selection.rangeCount) {
     range = selection.getRangeAt(0);

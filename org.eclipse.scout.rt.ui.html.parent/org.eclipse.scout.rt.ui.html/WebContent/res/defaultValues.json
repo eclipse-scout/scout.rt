@@ -99,7 +99,8 @@
       "tableStatusVisible": true
     },
     "Desktop": {
-      "forms": [],
+      "dialogs": [],
+      "views": [],
       "messageBoxes": []
     },
     "Form": {

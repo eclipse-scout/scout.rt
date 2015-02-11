@@ -18,7 +18,6 @@ scout.Desktop = function() {
    * Auch im zusammenhang mit focus-handling nochmals überdenken.
    */
   this.selectedTool;
-
   this._addAdapterProperties(['viewButtons', 'actions', 'views', 'dialogs', 'outline', 'searchOutline', 'messageBoxes', 'addOns']);
 };
 scout.inherits(scout.Desktop, scout.BaseDesktop);
@@ -95,7 +94,7 @@ scout.Desktop.prototype._render = function($parent) {
 };
 
 scout.Desktop.prototype.onResize = function() {
-  if (this._selectedTab.content) {
+  if (this._selectedTab && this._selectedTab.content) {
     this._selectedTab.content.onResize();
   }
   if (this.outline) {
@@ -196,8 +195,7 @@ scout.Desktop.prototype._renderDialog = function(dialog) {
   dialog.htmlComp.pixelBasedSizing = true;
   dialog.htmlComp.pack();
 
-  var $handle,
-    prefSize = dialog.htmlComp.getPreferredSize(),
+  var prefSize = dialog.htmlComp.getPreferredSize(),
     documentSize = new scout.Dimension($(document).width(), $(document).height()),
     marginLeft = (documentSize.width - prefSize.width) / 2,
     marginTop = (documentSize.height - prefSize.height) / 2 - 10; // -10 for optical vertical middle

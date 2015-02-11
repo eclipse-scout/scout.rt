@@ -168,7 +168,7 @@ scout.MapTableControl.prototype._resolveColumnIds = function() {
  */
 scout.MapTableControl.prototype._findCountries = function() {
   var column, row, i, j, countryName,
-    tableCountries = [], countryColumns = [];
+    tableCountries = [];
 
   for (i = 0; i < this.countryColumns.length; i++) {
     column = this.countryColumns[i];

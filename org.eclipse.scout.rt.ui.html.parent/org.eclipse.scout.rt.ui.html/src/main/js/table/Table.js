@@ -52,7 +52,6 @@ scout.Table.prototype.init = function(model, session) {
   }
 };
 
-
 scout.Table.prototype.dispose = function() {
   scout.keystrokeManager.uninstallAdapter(this.keystrokeAdapter);
 };
@@ -319,8 +318,7 @@ scout.Table.prototype.sort = function(column, direction, multiSort, remove) {
 };
 
 scout.Table.prototype._updateSortColumns = function(column, direction, multiSort, remove) {
-  var sortIndex, siblingsResetted,
-    maxIndex = -1;
+  var sortIndex, maxIndex = -1;
 
   if (remove) {
     column.sortActive = false;
@@ -597,7 +595,7 @@ scout.Table.prototype._findHyperLink = function(event) {
 
 scout.Table.prototype._filterMenus = function($selectedRows, allowedTypes) {
   allowedTypes = allowedTypes || [];
-  if(!this.headerVisible){
+  if (!this.headerVisible) {
     //if no header is visible header menues should not be displayed
     delete allowedTypes[allowedTypes.indexOf('Table.Header')];
   }
@@ -975,7 +973,7 @@ scout.Table.prototype.checkRowAndRender = function(row, checked) {
 };
 
 scout.Table.prototype.checkRow = function(row, checked, render) {
-  if (!this.checkable || !this.enabled || !row.enabled || row.checked === checked ) {
+  if (!this.checkable || !this.enabled || !row.enabled || row.checked === checked) {
     return;
   }
   var updatedRows = [];
@@ -1567,7 +1565,7 @@ scout.Table.prototype.onModelAction = function(event) {
     this._onRowsUpdated(event.rows);
   } else if (event.type === 'rowFilterChanged') {
     this._onRowFilterChanged(event.rows);
-  }else if (event.type === 'rowsChecked') {
+  } else if (event.type === 'rowsChecked') {
     this._onRowsChecked(event.rows);
   } else if (event.type === 'columnStructureChanged') {
     this._onColumnStructureChanged(event.columns);

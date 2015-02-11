@@ -279,6 +279,7 @@ scout.Calendar.prototype.layoutLabel = function() {
 
   // set dayname
   // todo: weekdaysShortOrdered based on shown day
+  //FIXME CRU always search inside a container, $grid?
   var $days = $('.calendar-day-name'),
     weekdays;
 
@@ -296,8 +297,7 @@ scout.Calendar.prototype.layoutLabel = function() {
   // set day date and mark selected one
   var $days = $('.calendar-day');
 
-  var firstDate = new Date(this.start.valueOf()),
-    diff;
+  var firstDate = new Date(this.start.valueOf());
 
   for (var offset = 0; offset < 42; offset++){
     firstDate.setDate(firstDate.getDate() - 1);

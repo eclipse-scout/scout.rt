@@ -148,8 +148,8 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
     }
     else if (LOG.isDebugEnabled()) {
       // Truncate log output to not spam the log (and in case of eclipse to not make it freeze: https://bugs.eclipse.org/bugs/show_bug.cgi?id=175888)
-      if (jsonText.length() > 5000) {
-        jsonText = jsonText.substring(0, 5000) + "...";
+      if (jsonText.length() > 10000) {
+        jsonText = jsonText.substring(0, 10000) + "...";
       }
       LOG.debug("Returned: " + jsonText);
     }
