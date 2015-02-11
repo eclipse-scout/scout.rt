@@ -34,6 +34,7 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
  *
  * @see {@link ClientJob}
  */
+// TODO [dwi]: Job API v5 (remove me)
 public class BlockingCondition {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(BlockingCondition.class);

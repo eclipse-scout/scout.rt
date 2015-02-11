@@ -110,19 +110,19 @@ public final class ConfigIniUtility {
 
     // 1. App config (config.ini)
     String value = configProperties.get(key);
-    if (StringUtility.hasText(value)) {
+    if (value != null) {
       return value;
     }
 
     // 2. system config
     value = System.getProperty(key);
-    if (StringUtility.hasText(value)) {
+    if (value != null) {
       return value;
     }
 
     // 3. environment config
     value = System.getenv(key);
-    if (StringUtility.hasText(value)) {
+    if (value != null) {
       return value;
     }
 

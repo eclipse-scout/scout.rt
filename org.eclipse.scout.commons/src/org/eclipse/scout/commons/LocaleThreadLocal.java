@@ -17,7 +17,11 @@ import java.util.Locale;
  * Locale.getLocale() by default.
  */
 public final class LocaleThreadLocal {
-  private static final ThreadLocal<Locale> THREAD_LOCAL = new ThreadLocal<Locale>();
+  
+  /**
+   * The {@link Locale} which is currently associated with the current thread.
+   */  
+  public static final ThreadLocal<Locale> CURRENT = new ThreadLocal<>();
 
   private LocaleThreadLocal() {
   }
@@ -40,14 +44,14 @@ public final class LocaleThreadLocal {
    *          {@link Locale#getDefault()} is returned. Otherwise, <code>null</code> is returned.
    */
   public static Locale get(boolean useDefaultLocale) {
-    Locale l = THREAD_LOCAL.get();
+    Locale l = CURRENT.get();
     if (l == null && useDefaultLocale) {
       l = Locale.getDefault();
     }
     return l;
   }
 
-  public static void set(Locale l) {
-    THREAD_LOCAL.set(l);
+  public static void set(Locale locale) {
+    CURRENT.set(locale);
   }
 }

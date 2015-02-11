@@ -10,20 +10,22 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client;
 
+import org.eclipse.scout.rt.shared.ISession;
+
 /**
  * This class represents the client session for the current thread.
+ * TODO [dwi/imo]: Remove on behalf of nOSGi.
  */
 public final class ClientSessionThreadLocal {
-  private static final ThreadLocal<IClientSession> THREAD_LOCAL = new ThreadLocal<IClientSession>();
-
   private ClientSessionThreadLocal() {
   }
 
   public static IClientSession get() {
-    return THREAD_LOCAL.get();
+    ISession session = ISession.CURRENT.get();
+    return (IClientSession) (session instanceof IClientSession ? session : null);
   }
 
-  public static void set(IClientSession l) {
-    THREAD_LOCAL.set(l);
+  public static void set(IClientSession session) {
+    ISession.CURRENT.set(session);
   }
 }

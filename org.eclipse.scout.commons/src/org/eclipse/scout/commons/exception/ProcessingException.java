@@ -22,7 +22,7 @@ import org.eclipse.core.runtime.IStatus;
  * class is a conceptual copy of {@link org.eclipse.core.runtime.Status} that
  * also can run in J2EE.
  */
-public class ProcessingException extends Exception implements Serializable {
+public class ProcessingException extends RuntimeException implements Serializable {
   private static final long serialVersionUID = 1L;
 
   private IProcessingStatus m_status;
@@ -85,7 +85,9 @@ public class ProcessingException extends Exception implements Serializable {
   }
 
   public void addContextMessage(String s) {
-    m_status.addContextMessage(s);
+    if (m_status != null) {
+      m_status.addContextMessage(s);
+    }
   }
 
   public boolean isConsumed() {
@@ -96,15 +98,24 @@ public class ProcessingException extends Exception implements Serializable {
     m_consumed = true;
   }
 
+  /**
+   * @return <code>true</code> to indicate that a blocking thread was interrupted while waiting for a condition to
+   *         become <code>true</code>.
+   */
   public boolean isInterruption() {
     return m_status != null && (m_status.getCause() instanceof InterruptedException);
   }
 
   @Override
   public String toString() {
+    if (m_status == null) {
+      return "";
+    }
+
     if (m_status.getCause() == this) {
       return "";
     }
+
     return getClass().getSimpleName() + "[" + m_status.toString() + "]";
   }
 

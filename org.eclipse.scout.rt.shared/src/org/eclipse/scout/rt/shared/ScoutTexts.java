@@ -21,7 +21,7 @@ import org.eclipse.scout.service.SERVICES;
 /**
  * This is the base class for translations access in scout applications.<br>
  * It provides prioritized access to all text services available to the scope.
- * 
+ *
  * @see IClientSession#getNlsTexts()
  * @see IServerSession#getNlsTexts()
  * @see ClientJob
@@ -31,8 +31,14 @@ import org.eclipse.scout.service.SERVICES;
 public class ScoutTexts {
 
   /**
-   * Jop property name tha can be used when Texts should be used in associated contexts such as swt display, rwt display
-   * etc.
+   * The {@link ScoutTexts} which are currently associated with the current thread.
+   */
+  public static final ThreadLocal<ScoutTexts> CURRENT = new ThreadLocal<>();
+
+  /**
+   * TODO [dwi]: remove SWT/RWT
+   * Job property name that can be used when Texts should be used in associated contexts such as swt display, rwt
+   * display etc.
    */
   public static final QualifiedName JOB_PROPERTY_NAME = new QualifiedName(ScoutTexts.class.getName(), "ref");
 
@@ -60,7 +66,7 @@ public class ScoutTexts {
    * Queries {@link TextsThreadLocal#get()}. If this one is null, then the default
    * instance is used as global default. That way applications can override scout texts in their
    * application sessions, without interfering with other scout applications in the same osgi/eclipse runtime.
-   * 
+   *
    * @return the <code>ScoutTexts</code> instance to use in current scope.
    */
   public static ScoutTexts getInstance() {

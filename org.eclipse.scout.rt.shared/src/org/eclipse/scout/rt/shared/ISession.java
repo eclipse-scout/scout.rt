@@ -24,6 +24,11 @@ import org.osgi.framework.Bundle;
  */
 public interface ISession {
 
+  /**
+   * The {@link ISession} which is currently associated with the current thread.
+   */
+  ThreadLocal<ISession> CURRENT = new ThreadLocal<>();
+
   Bundle getBundle();
 
   /**
@@ -77,7 +82,7 @@ public interface ISession {
    * /process recognizes this and is not associating the scout server session with the HttpSession but with a custom
    * cache associated with this ajax (remote) session id.
    * <p>
-   * 
+   *
    * @return rap/rwt/ajax session id (this is a uuid) or null if app is not running as web app
    */
   String getVirtualSessionId();

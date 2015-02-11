@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * Copyright (c) 2015 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,22 +8,19 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.shared;
+package org.eclipse.scout.commons.job;
 
 /**
- * This class represents the nls texts set for the current thread
- * TODO [dwi/imo]: Remove on behalf of nOSGi.
+ * Visitor for visiting jobs.
+ *
+ * @since 5.0
  */
-public class TextsThreadLocal {
+public interface IJobVisitor {
 
-  private TextsThreadLocal() {
-  }
-
-  public static ScoutTexts get() {
-    return ScoutTexts.CURRENT.get();
-  }
-
-  public static void set(ScoutTexts texts) {
-    ScoutTexts.CURRENT.set(texts);
-  }
+  /**
+   * Is called upon visiting a job.
+   *
+   * @return <code>true</code>=continue visiting, <code>false</code>=end visiting
+   */
+  boolean visit(IJob<?> job);
 }

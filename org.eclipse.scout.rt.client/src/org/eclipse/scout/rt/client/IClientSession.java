@@ -15,6 +15,7 @@ import java.util.Map;
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.job.ModelJobManager;
 import org.eclipse.scout.rt.client.servicetunnel.http.IClientServiceTunnel;
 import org.eclipse.scout.rt.client.ui.IIconLocator;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -22,6 +23,12 @@ import org.eclipse.scout.rt.shared.ISession;
 import org.osgi.framework.Bundle;
 
 public interface IClientSession extends ISession {
+
+  /**
+   * @return dedicated job manager to schedule model jobs on behalf of this {@link IClientServiceTunnel} in serial
+   *         execution order.
+   */
+  ModelJobManager getModelJobManager();
 
   /**
    * Monitor can be used to wait for changes of the states 'active' and 'loaded'
@@ -38,7 +45,7 @@ public interface IClientSession extends ISession {
   /**
    * Called before {@link #startSession(Bundle)} in order to prepare the state used to start the session with some
    * custom and runtime options
-   * 
+   *
    * @since 4.2
    */
   void initCustomParams(Map<String, String> customParams);
