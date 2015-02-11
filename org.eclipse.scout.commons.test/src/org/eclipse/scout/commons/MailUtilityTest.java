@@ -192,7 +192,7 @@ public class MailUtilityTest {
     MailUtility.addAttachmentsToMimeMessage(message, attachments);
 
     // verify added attachments in java instance
-    verifyAttachments(message, "sample1.dat", "sample2.dat", MimeUtility.encodeText("sample3_öüä.dat"));
+    verifyAttachments(message, "sample1.dat", "sample2.dat", MimeUtility.encodeText("sample3_öüä.dat", "UTF-8", null));
 
     // store and recreate mime message (byte[])
     ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -200,7 +200,7 @@ public class MailUtilityTest {
     message = new MimeMessage(null, new ByteArrayInputStream(bos.toByteArray()));
 
     // verify new instance
-    verifyAttachments(message, "sample1.dat", "sample2.dat", MimeUtility.encodeText("sample3_öüä.dat"));
+    verifyAttachments(message, "sample1.dat", "sample2.dat", MimeUtility.encodeText("sample3_öüä.dat", "UTF-8", null));
   }
 
   @Test
@@ -234,7 +234,7 @@ public class MailUtilityTest {
     // create mime message from word archive and verify message
     MimeMessage message = MailUtility.createMimeMessageFromWordArchive(archiveFile, attachments.toArray(new File[attachments.size()]));
     verifyPlainTextAndHtml(message, plainText, htmlText);
-    verifyAttachments(message, "sample1.dat", "sample2.dat", MimeUtility.encodeText("sample3_öüä.dat"));
+    verifyAttachments(message, "sample1.dat", "sample2.dat", MimeUtility.encodeText("sample3_öüä.dat", "UTF-8", null));
   }
 
   /**
