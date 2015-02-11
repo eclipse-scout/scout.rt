@@ -76,6 +76,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   public static final String EVENT_ROWS_CHECKED = "rowsChecked";
   public static final String EVENT_COLUMN_ORDER_CHANGED = "columnOrderChanged";
   public static final String EVENT_COLUMN_HEADERS_UPDATED = "columnHeadersUpdated";
+  public static final String EVENT_ROW_FILTER_CHANGED = "rowFilterChanged";
 
   public static final String PROP_ROWS = "rows";
   public static final String PROP_ROW_IDS = "rowIds";
@@ -223,7 +224,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     JSONObject json = super.toJson();
     putProperty(json, PROP_COLUMNS, columnsToJson(getColumns()));
     JSONArray jsonRows = new JSONArray();
-    for (ITableRow row : getModel().getRows()) {
+    for (ITableRow row : getModel().getFilteredRows()) {
       if (row.isStatusDeleted()) { // Ignore deleted rows, because for the UI, they don't exist
         continue;
       }
@@ -610,6 +611,9 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
       case TableEvent.TYPE_ROWS_CHECKED:
         handleModelRowsChecked(event.getRows());
         break;
+      case TableEvent.TYPE_ROW_FILTER_CHANGED:
+        handleModelRowFilterChanged(event.getTable());
+        break;
       default:
         // NOP
     }
@@ -630,6 +634,23 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     JSONObject jsonEvent = new JSONObject();
     putProperty(jsonEvent, PROP_ROWS, jsonRows);
     addActionEvent("rowsInserted", jsonEvent);
+  }
+
+  protected void handleModelRowFilterChanged(ITable table) {
+    JSONArray jsonRows = new JSONArray();
+    for (ITableRow row : table.getFilteredRows()) {
+      if (row.isStatusDeleted()) { // Ignore deleted rows, because for the UI, they don't exist
+        continue;
+      }
+      JSONObject jsonRow = tableRowToJson(row);
+      jsonRows.put(jsonRow);
+    }
+    if (jsonRows.length() == 0) {
+      return;
+    }
+    JSONObject jsonEvent = new JSONObject();
+    putProperty(jsonEvent, PROP_ROWS, jsonRows);
+    addActionEvent(EVENT_ROW_FILTER_CHANGED, jsonEvent);
   }
 
   protected void handleModelRowsUpdated(Collection<ITableRow> modelRows) {

@@ -913,6 +913,24 @@ scout.Table.prototype._onRowsChecked = function(rows) {
   }
 };
 
+scout.Table.prototype._onRowFilterChanged = function(rows) {
+  //reset all rows
+  this.rows = rows;
+  this.rowsMap = {};
+
+  for (var i = 0; i < this.rows.length; i++) {
+    var row = this.rows[i];
+    // Unwrap data
+    this._unwrapCells(row.cells);
+    scout.defaultValues.applyTo(row.cells, 'Cell');
+    this.rowsMap[row.id] = row;
+  }
+
+  if (this.rendered) {
+    this.drawData();
+  }
+};
+
 scout.Table.prototype._onRowsUpdated = function(rows) {
   var $updatedRows = $();
 
@@ -1544,7 +1562,9 @@ scout.Table.prototype.onModelAction = function(event) {
     this._onRowOrderChanged(event.rowIds);
   } else if (event.type === 'rowsUpdated') {
     this._onRowsUpdated(event.rows);
-  } else if (event.type === 'rowsChecked') {
+  } else if (event.type === 'rowFilterChanged') {
+    this._onRowFilterChanged(event.rows);
+  }else if (event.type === 'rowsChecked') {
     this._onRowsChecked(event.rows);
   } else if (event.type === 'columnStructureChanged') {
     this._onColumnStructureChanged(event.columns);
