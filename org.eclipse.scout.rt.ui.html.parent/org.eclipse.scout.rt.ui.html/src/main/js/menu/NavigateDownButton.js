@@ -24,15 +24,9 @@ scout.NavigateDownButton.prototype._drill = function() {
   var rowIds = this.node.detailTable.selectedRowIds;
   if (rowIds && rowIds.length > 0) {
     var row = this.node.detailTable.rowById(rowIds[0]);
-    // TODO BSH Tree | Ask AW.E: Why not like this? Offline? What about row action?
-//    this.node.detailTable.sendRowAction(row.$row, null);
     var drillNode = this.outline.nodesMap[row.nodeId];
     $.log.debug('drill down to node ' + drillNode);
-    if (!drillNode.$node && drillNode.parentNode) {
-      this.outline.setNodeExpanded(drillNode.parentNode, drillNode.parentNode.$node, true);
-    }
-    this.outline.setNodesSelected(drillNode);
-    this.outline.setNodeExpanded(drillNode, drillNode.$node, false); // TODO BSH Tree | Ask AW.E why not true?
+    this.outline.setNodesSelected(drillNode); // this also expands the parent node, if required
+    this.outline.setNodeExpanded(drillNode, undefined, false);
   }
 };
-
