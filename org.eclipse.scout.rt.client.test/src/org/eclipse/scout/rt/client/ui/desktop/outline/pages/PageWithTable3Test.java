@@ -50,7 +50,7 @@ public class PageWithTable3Test {
     //load table with configured sort columns
     assertTrue(CollectionUtility.equalsCollection(CollectionUtility.arrayList(7, 6, 5, 4, 3, 2, 1, 0), table.getValueColumn().getValues()));
     //user sorts value column asc (all other columns lost their sort index resp. their sort is now explicit=false)
-    table.getUIFacade().fireHeaderSortFromUI(table.getValueColumn(), false, !table.getValueColumn().isSortAscending());
+    table.getUIFacade().fireHeaderSortFromUI(table.getValueColumn(), false, true);
     assertSortState(table, CollectionUtility.arrayList(0, 1, 2, 3, 4, 5, 6, 7), CollectionUtility.arrayList(0));
     //
     //reset desktop and re-create new outline
