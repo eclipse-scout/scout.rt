@@ -916,24 +916,6 @@ scout.Table.prototype._onRowsChecked = function(rows) {
   }
 };
 
-scout.Table.prototype._onRowFilterChanged = function(rows) {
-  //reset all rows
-  this.rows = rows;
-  this.rowsMap = {};
-
-  for (var i = 0; i < this.rows.length; i++) {
-    var row = this.rows[i];
-    // Unwrap data
-    this._unwrapCells(row.cells);
-    scout.defaultValues.applyTo(row.cells, 'Cell');
-    this.rowsMap[row.id] = row;
-  }
-
-  if (this.rendered) {
-    this.drawData();
-  }
-};
-
 scout.Table.prototype._onRowsUpdated = function(rows) {
   var $updatedRows = $();
 
@@ -1421,7 +1403,6 @@ scout.Table.prototype._triggerFilterResetted = function() {
 };
 
 scout.Table.prototype._renderHeaderVisible = function() {
-  //TODO nbu paint header Menues
   this._renderTableHeader();
 };
 

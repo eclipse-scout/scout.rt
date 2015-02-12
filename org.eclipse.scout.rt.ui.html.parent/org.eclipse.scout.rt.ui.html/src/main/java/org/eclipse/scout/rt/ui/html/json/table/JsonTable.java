@@ -61,6 +61,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T> implements IContextMenuOwner {
+  private static final String EVENT_ROWS_INSERTED = "rowsInserted";
+
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonTable.class);
 
   public static final String EVENT_ROW_CLICKED = "rowClicked";
@@ -79,7 +81,6 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   public static final String EVENT_ROWS_CHECKED = "rowsChecked";
   public static final String EVENT_COLUMN_ORDER_CHANGED = "columnOrderChanged";
   public static final String EVENT_COLUMN_HEADERS_UPDATED = "columnHeadersUpdated";
-  public static final String EVENT_ROW_FILTER_CHANGED = "rowFilterChanged";
 
   public static final String PROP_ROWS = "rows";
   public static final String PROP_ROW_IDS = "rowIds";
@@ -634,21 +635,13 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     }
     JSONObject jsonEvent = new JSONObject();
     putProperty(jsonEvent, PROP_ROWS, jsonRows);
-    addActionEvent("rowsInserted", jsonEvent);
+    addActionEvent(EVENT_ROWS_INSERTED, jsonEvent);
   }
 
   protected void handleModelRowFilterChanged(ITable table) {
-    JSONArray jsonRows = new JSONArray();
-    for (ITableRow row : table.getFilteredRows()) {
-      if (row.isStatusDeleted()) { // Ignore deleted rows, because for the UI, they don't exist
-        continue;
-      }
-      JSONObject jsonRow = tableRowToJson(row);
-      jsonRows.put(jsonRow);
-    }
-    JSONObject jsonEvent = new JSONObject();
-    putProperty(jsonEvent, PROP_ROWS, jsonRows);
-    addActionEvent(EVENT_ROW_FILTER_CHANGED, jsonEvent);
+    disposeRows(getModel().getRows());
+    addActionEvent(EVENT_ALL_ROWS_DELETED, new JSONObject());
+    handleModelRowsInserted(table.getFilteredRows());
   }
 
   protected void handleModelRowsUpdated(Collection<ITableRow> modelRows) {
@@ -676,10 +669,21 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     for (ITableRow row : modelRows) {
       String rowId = m_tableRowIds.get(row);
       JsonObjectUtility.append(jsonEvent, PROP_ROW_IDS, rowId);
-      m_tableRowIds.remove(row);
-      m_tableRows.remove(rowId);
+      disposeRow(row);
     }
     addActionEvent(EVENT_ROWS_DELETED, jsonEvent);
+  }
+
+  private void disposeRows(Collection<ITableRow> modelRows) {
+    for (ITableRow row : modelRows) {
+      disposeRow(row);
+    }
+  }
+
+  private void disposeRow(ITableRow row) {
+    String rowId = m_tableRowIds.get(row);
+    m_tableRowIds.remove(row);
+    m_tableRows.remove(rowId);
   }
 
   protected void handleModelAllRowsDeleted(Collection<ITableRow> modelRows) {
