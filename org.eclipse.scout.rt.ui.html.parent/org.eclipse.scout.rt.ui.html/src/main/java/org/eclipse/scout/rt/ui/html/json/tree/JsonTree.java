@@ -118,13 +118,20 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   protected void attachChildAdapters() {
     super.attachChildAdapters();
     attachContextMenu();
-    attachNodes(getTopLevelNodes(), true);
+    attachNodes(getTopLevelNodes(true), true);
   }
 
   @Override
   protected void disposeChildAdapters() {
     super.disposeChildAdapters();
-    disposeNodes(getTopLevelNodes(), true);
+    disposeNodes(getTopLevelNodes(true), true);
+
+    // "Leak detection". Assert that after disposing the child adapters,
+    // all nodes have been disposed (they will remove themselves in their
+    // dispose() method).
+    if (!m_treeNodeIds.isEmpty() || !m_treeNodes.isEmpty()) {
+      throw new IllegalStateException("Not all nodes have been disposed! TreeNodeIds: " + m_treeNodeIds + " TreeNodes: " + m_treeNodes);
+    }
   }
 
   protected void attachContextMenu() {
@@ -179,7 +186,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   public JSONObject toJson() {
     JSONObject json = super.toJson();
     JSONArray jsonNodes = new JSONArray();
-    for (ITreeNode childNode : getTopLevelNodes()) {
+    for (ITreeNode childNode : getTopLevelNodes(true)) {
       jsonNodes.put(treeNodeToJson(childNode));
     }
     putProperty(json, PROP_NODES, jsonNodes);
@@ -297,7 +304,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     Collection<ITreeNode> nodes = event.getNodes();
     JSONObject jsonEvent = new JSONObject();
     putProperty(jsonEvent, PROP_COMMON_PARENT_NODE_ID, getOrCreateNodeId(event.getCommonParentNode()));
-
+    // If no nodes remain, just send "all" instead of every single nodeId. However, the nodes must be disposed individually.
     if (event.getCommonParentNode().getFilteredChildNodes().size() == 0) {
       addActionEvent(EVENT_ALL_NODES_DELETED, jsonEvent);
     }
@@ -305,7 +312,6 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
       putProperty(jsonEvent, PROP_NODE_IDS, nodeIdsToJson(nodes));
       addActionEvent(EVENT_NODES_DELETED, jsonEvent);
     }
-
     disposeNodes(nodes, true);
   }
 
@@ -338,14 +344,12 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   }
 
   protected void handleModelNodeFilterChanged() {
-    //FIXME BSH/CGU Fix AbstractJsonSession.m_unregisterAdapterSet first
-//    disposeNodes(getTopLevelNodes(), true);
-//    addActionEvent(EVENT_ALL_NODES_DELETED, new JSONObject());
-//
-//    addNodesInsertedEvent(null, getTopLevelNodes());
-//    putProperty(jsonEvent, PROP_SELECTED_NODE_IDS, nodeIdsToJson(getModel().getSelectedNodes()));
+    // Delete all nodes
+    disposeNodes(getTopLevelNodes(false), true);
+    addActionEvent(EVENT_ALL_NODES_DELETED, new JSONObject());
 
-    // TODO BSH Selection
+    // Insert the remaining nodes again (re-attaching them automatically)
+    addNodesInsertedEvent(null, getTopLevelNodes(true));
   }
 
   protected void handleModelChildNodeOrderChanged(TreeEvent event) {
@@ -403,11 +407,12 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     return !getModel().isRootNodeVisible() && getModel().getRootNode() == node;
   }
 
-  protected List<ITreeNode> getTopLevelNodes() {
+  protected List<ITreeNode> getTopLevelNodes(boolean filteredOnly) {
+    ITreeNode rootNode = getModel().getRootNode();
     if (getModel().isRootNodeVisible()) {
-      return CollectionUtility.arrayList(getModel().getRootNode());
+      return CollectionUtility.arrayList(rootNode);
     }
-    return getModel().getRootNode().getFilteredChildNodes();
+    return (filteredOnly ? rootNode.getFilteredChildNodes() : rootNode.getChildNodes());
   }
 
   protected void putCellProperties(JSONObject json, ICell cell) {

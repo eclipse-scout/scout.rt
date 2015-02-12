@@ -7,13 +7,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
 import java.lang.ref.WeakReference;
-import java.lang.reflect.Field;
-import java.util.Collection;
 
 import javax.servlet.http.HttpSessionBindingEvent;
 
 import org.eclipse.scout.rt.client.AbstractClientSession;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonSession.P_ClientSessionCleanupHandler;
 import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
@@ -60,25 +59,23 @@ public class AbstractJsonSessionTest {
   @Test
   public void testCreateDisposeInSameRequest() throws Exception {
     AbstractJsonSession session = new TestEnvironmentJsonSession();
-    IStringField model = Mockito.mock(IStringField.class);
+    IStringField model = new AbstractStringField() {
+    };
     IJsonAdapter<?> adapter = session.getOrCreateJsonAdapter(model, null);
-    assertEquals(0, getAdapterCount(session));
+
+    // Note: Additionally, registry contains the "root adapter"
+    assertEquals(2, session.jsonAdapterRegistry().getJsonAdapterCount());
+    assertEquals(1, session.currentJsonResponse().adapterMap().size());
+    assertEquals(0, session.currentJsonResponse().eventList().size());
+
+    model.setDisplayText("Test");
+    assertEquals(2, session.jsonAdapterRegistry().getJsonAdapterCount());
+    assertEquals(1, session.currentJsonResponse().adapterMap().size());
+    assertEquals(1, session.currentJsonResponse().eventList().size());
+
     adapter.dispose();
-    assertEquals(1, getAdapterCount(session));
-    session.flush(); // this method is called when the request ends
-    assertEquals(0, getAdapterCount(session));
+    assertEquals(1, session.jsonAdapterRegistry().getJsonAdapterCount());
+    assertEquals(0, session.currentJsonResponse().adapterMap().size());
+    assertEquals(0, session.currentJsonResponse().eventList().size());
   }
-
-  private int getAdapterCount(AbstractJsonSession session) {
-    try {
-      Field field = AbstractJsonSession.class.getDeclaredField("m_unregisterAdapterSet");
-      field.setAccessible(true);
-      Collection<?> set = (Collection<?>) field.get(session);
-      return set.size();
-    }
-    catch (ReflectiveOperationException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
 }

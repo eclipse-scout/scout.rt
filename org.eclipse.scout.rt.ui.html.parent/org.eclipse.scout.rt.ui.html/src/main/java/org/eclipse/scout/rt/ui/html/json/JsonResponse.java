@@ -195,8 +195,33 @@ public class JsonResponse {
     return true;
   }
 
+  /**
+   * If the adapter with the given ID is contained in the response's adpaterMap, it is removed. Additionally,
+   * every event whose target is this particular adapter is removed from the response.
+   * <p>
+   * This is useful when an adapter that was created in the current request is disposed again. In this case, we don't
+   * have to send anything to the client at all (as if the adapter was never created in the first place).
+   */
+  public void removeJsonAdapter(String id) {
+    m_adapterMap.remove(id);
+    for (Iterator<JsonEvent> it = m_eventList.iterator(); it.hasNext();) {
+      JsonEvent event = it.next();
+      if (CompareUtility.equals(event.getTarget(), id)) {
+        it.remove();
+      }
+    }
+  }
+
   public List<JsonEvent> getEventList() {
     return CollectionUtility.arrayList(m_eventList);
+  }
+
+  protected List<JsonEvent> eventList() {
+    return m_eventList;
+  }
+
+  protected Map<String, IJsonAdapter<?>> adapterMap() {
+    return m_adapterMap;
   }
 
   public void setErrorCode(Integer errorCode) {

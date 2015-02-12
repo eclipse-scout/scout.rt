@@ -117,7 +117,7 @@ public class JsonDesktopTest {
   }
 
   @Test
-  public void testFormClosedBeforeRemoved() throws ProcessingException, JSONException {
+  public void testFormClosedBeforeRemovedInDifferentRequests() throws Exception {
     FormWithOneField form = new FormWithOneField();
     form.setAutoAddRemoveOnDesktop(false);
 
@@ -130,21 +130,50 @@ public class JsonDesktopTest {
     assertNotNull(jsonForm);
 
     List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(m_session.currentJsonResponse(), "formAdded");
-    assertTrue(responseEvents.size() == 1);
+    assertEquals(1, responseEvents.size());
+
+    form.start();
+
+    JsonTestUtility.endRequest(m_session);
+    // -------------------------------
+    // New request:
+
+    form.doClose();
+    responseEvents = JsonTestUtility.extractEventsFromResponse(m_session.currentJsonResponse(), "formClosed");
+    assertEquals(1, responseEvents.size());
+
+    m_desktop.removeForm(form);
+    responseEvents = JsonTestUtility.extractEventsFromResponse(m_session.currentJsonResponse(), "formRemoved");
+    assertEquals(1, responseEvents.size());
+  }
+
+  @Test
+  public void testFormClosedBeforeRemovedInSameRequest() throws ProcessingException, JSONException {
+    FormWithOneField form = new FormWithOneField();
+    form.setAutoAddRemoveOnDesktop(false);
+
+    JsonForm jsonForm = (JsonForm) m_jsonDesktop.getAdapter(form);
+    assertNull(jsonForm);
+
+    m_desktop.addForm(form);
+
+    jsonForm = (JsonForm) m_jsonDesktop.getAdapter(form);
+    assertNotNull(jsonForm);
+
+    List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(m_session.currentJsonResponse(), "formAdded");
+    assertEquals(1, responseEvents.size());
 
     form.start();
     form.doClose();
     responseEvents = JsonTestUtility.extractEventsFromResponse(m_session.currentJsonResponse(), "formClosed");
-    assertTrue(responseEvents.size() == 1);
+    assertEquals(1, responseEvents.size());
 
     m_desktop.removeForm(form);
     responseEvents = JsonTestUtility.extractEventsFromResponse(m_session.currentJsonResponse(), "formRemoved");
-    assertTrue(responseEvents.size() == 1);
+    assertEquals(0, responseEvents.size());
   }
 
   @Test
   public void testHandleFormRemoved() throws Exception {
-
   }
-
 }

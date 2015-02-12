@@ -58,14 +58,6 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   private JsonRequest m_currentJsonRequest;
   private HttpServletRequest m_currentHttpRequest;
   private JsonEventProcessor m_jsonEventProcessor;
-
-  /**
-   * Contains IDs to adapters which must be removed <i>after</i> a request has been processed.
-   * This concept was introduced, because an adapter can be created, attached and disposed in
-   * a single request. When we'd remove the adapters immediately we sometimes have the situation
-   * where an event in the response, references an adapter that has already been disposed. With
-   * this solution this situation is avoided.
-   */
   private final Set<String> m_unregisterAdapterSet = new HashSet<String>();
 
   public AbstractJsonSession() {
@@ -165,7 +157,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
         );
   }
 
-  private JSONObject getTextMap(Locale locale) {
+  protected JSONObject getTextMap(Locale locale) {
     JSONObject map = new JSONObject();
     for (String textKey : getTextKeys()) {
       JsonObjectUtility.putProperty(map, textKey, TEXTS.get(locale, textKey));
@@ -316,6 +308,14 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     m_currentJsonResponse = null;
   }
 
+  protected JsonAdapterFactory jsonAdapterFactory() {
+    return m_jsonAdapterFactory;
+  }
+
+  protected JsonAdapterRegistry jsonAdapterRegistry() {
+    return m_jsonAdapterRegistry;
+  }
+
   @Override
   public IJsonAdapter<?> getRootJsonAdapter() {
     return m_rootJsonAdapter;
@@ -425,11 +425,32 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
   @Override
   public void unregisterJsonAdapter(String id) {
-    m_unregisterAdapterSet.add(id);
+    boolean createdInCurrentRequest = m_currentJsonResponse.adapterMap().containsKey(id);
+    if (createdInCurrentRequest) {
+      // If adapter was not yet sent to the client, we can safely remove it from the registry
+      // (as if it was never registered) and remove it completely from the response (including
+      // events targeting the adapter).
+      m_jsonAdapterRegistry.removeJsonAdapter(id);
+      m_currentJsonResponse.removeJsonAdapter(id);
+    }
+    else {
+      // Because the client might be interested in events for the disposed adapter, we cannot
+      // remove it yet from the registry. Therefore, we add it to a temporary list which will
+      // be processed after the response has been sent (see flush()).
+      // Example case where this is relevant:
+      //   0) Form was previously sent to the client
+      //   1) Form is closed and disposed
+      //   2) Desktop sends a "formRemoved" event
+      // If the form adapter was removed in step 2), the JsonDesktop could not resolve the
+      // adapter ID anymore in step 3).
+      m_unregisterAdapterSet.add(id);
+    }
   }
 
   @Override
   public void flush() {
+    // Response has been sent, it is now safe to remove all adapters from the registry
+    // that were previously only remembered in m_unregisterAdapterSet.
     LOG.debug("Flush. Remove these adapter IDs from registry: " + m_unregisterAdapterSet);
     for (String id : m_unregisterAdapterSet) {
       m_jsonAdapterRegistry.removeJsonAdapter(id);

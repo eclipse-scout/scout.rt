@@ -583,6 +583,10 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
      * - event rowsInserted again (the same 3 rows)
      *
      * Only one rowsInserted event should be sent. Must analyze what happens in the model.
+     *
+     * FIXME BSH Table | AbstractTable's coalesce seems to be broken!
+     * Example: "UpdateRow", "DeleteAllRows" --> Gets reordered to "DeleteAllRows", "UpdateRow",
+     * which is wrong, because the UpdateRow event refers a row that does not exist anymore!
      */
     event = m_tableEventFilter.filter(event);
     if (event == null) {
