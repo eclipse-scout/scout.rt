@@ -61,14 +61,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T> implements IContextMenuOwner {
-  private static final String EVENT_ROWS_INSERTED = "rowsInserted";
-
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonTable.class);
 
   public static final String EVENT_ROW_CLICKED = "rowClicked";
   public static final String EVENT_ROW_ACTION = "rowAction";
   public static final String EVENT_HYPERLINK_ACTION = "hyperlinkAction";
   public static final String EVENT_ROWS_SELECTED = "rowsSelected";
+  public static final String EVENT_ROWS_INSERTED = "rowsInserted";
   public static final String EVENT_ROWS_UPDATED = "rowsUpdated";
   public static final String EVENT_ROWS_DELETED = "rowsDeleted";
   public static final String EVENT_ALL_ROWS_DELETED = "allRowsDeleted";
@@ -201,6 +200,13 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     super.attachChildAdapters();
     attachAdapter(getModel().getContextMenu());
 //    attachAdapters(getModel().getTableControls());
+  }
+
+  @Override
+  protected void disposeChildAdapters() {
+    super.disposeChildAdapters();
+    m_tableRows.clear();
+    m_tableRowIds.clear();
   }
 
   @Override
@@ -641,7 +647,10 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   protected void handleModelRowFilterChanged(ITable table) {
     disposeRows(getModel().getRows());
     addActionEvent(EVENT_ALL_ROWS_DELETED, new JSONObject());
+
     handleModelRowsInserted(table.getFilteredRows());
+
+    // TODO BSH Selection
   }
 
   protected void handleModelRowsUpdated(Collection<ITableRow> modelRows) {

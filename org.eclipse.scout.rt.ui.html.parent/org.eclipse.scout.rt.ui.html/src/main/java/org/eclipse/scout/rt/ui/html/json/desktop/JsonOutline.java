@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.desktop;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -74,48 +73,22 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
   protected void attachChildAdapters() {
     super.attachChildAdapters();
     attachAdapter(getModel().getDefaultDetailForm());
-    if (getModel().isRootNodeVisible()) {
-      attachPageAndChildPages(getModel().getRootPage());
-    }
-    else {
-      for (IPage<?> page : getModel().getRootPage().getChildPages()) {
-        attachPageAndChildPages(page);
-      }
-    }
   }
 
   @Override
-  protected void disposeChildAdapters() {
-    super.disposeChildAdapters();
-    // Detail tables are global to make them reusable by other components (e.g. table field)
-    // Therefore we have to dispose them by our own (although this is not very likely because outlines don't die before a session disposal)
-    for (IJsonAdapter<?> childAdapter : m_jsonDetailTables) {
-      childAdapter.dispose();
+  protected void attachNode(ITreeNode node, boolean attachChildren) {
+    if (attachChildren) {
+      attachNodes(node.getChildNodes(), attachChildren);
     }
-    m_jsonDetailTables.clear();
-  }
-
-  protected void attachPage(IPage<?> page) {
+    if (!(node instanceof IPage)) {
+      throw new IllegalArgumentException("Expected page.");
+    }
+    IPage<?> page = (IPage) node;
     if (page.isDetailFormVisible()) {
       attachGlobalAdapter(page.getDetailForm());
     }
     if (page.isTableVisible()) {
       attachDetailTable(page);
-    }
-  }
-
-  protected void attachPageAndChildPages(IPage<?> page) {
-    attachPage(page);
-    attachPagesForNodes(page.getChildNodes());
-  }
-
-  protected void attachPagesForNodes(Collection<ITreeNode> nodes) {
-    for (ITreeNode node : nodes) {
-      if (!(node instanceof IPage)) {
-        throw new IllegalArgumentException("Expected page.");
-      }
-      IPage page = (IPage) node;
-      attachPageAndChildPages(page);
     }
   }
 
@@ -142,20 +115,16 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
   }
 
   @Override
-  protected void handleModelNodesInserted(TreeEvent event) {
-    attachPagesForNodes(event.getNodes());
-    super.handleModelNodesInserted(event);
-  }
-
-  @Override
-  protected void disposeNode(ITreeNode node) {
-    super.disposeNode(node);
+  protected void disposeNode(ITreeNode node, boolean disposeChildren) {
+    super.disposeNode(node, disposeChildren);
 
     IPage page = (IPage) node;
     ITable table = page.getTable();
     if (table != null) {
       IJsonAdapter<?> jsonAdapter = getGlobalAdapter(table);
       if (jsonAdapter != null) {
+        // Detail tables are global to make them reusable by other components (e.g. table field)
+        // Therefore we have to dispose them by our own
         m_jsonDetailTables.remove(jsonAdapter);
         jsonAdapter.dispose();
       }
@@ -183,7 +152,7 @@ public class JsonOutline<T extends IOutline> extends JsonTree<T> {
 
   protected void handleModelPageChanged(OutlineEvent event) {
     IPage page = (IPage) event.getNode();
-    attachPage(page);
+    attachNode(page, false);
     JSONObject jsonEvent = new JSONObject();
     putProperty(jsonEvent, PROP_NODE_ID, getOrCreateNodeId(page));
     putDetailFormAndTable(jsonEvent, page);

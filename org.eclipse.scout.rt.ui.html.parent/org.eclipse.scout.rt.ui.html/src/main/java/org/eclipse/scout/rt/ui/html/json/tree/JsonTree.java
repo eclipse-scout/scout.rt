@@ -118,6 +118,13 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   protected void attachChildAdapters() {
     super.attachChildAdapters();
     attachContextMenu();
+    attachNodes(getTopLevelNodes(), true);
+  }
+
+  @Override
+  protected void disposeChildAdapters() {
+    super.disposeChildAdapters();
+    disposeNodes(getTopLevelNodes(), true);
   }
 
   protected void attachContextMenu() {
@@ -144,25 +151,36 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     m_treeListener = null;
   }
 
-  @Override
-  public void dispose() {
-    super.dispose();
-    m_treeNodeIds.clear();
-    m_treeNodes.clear();
+  protected void attachNode(ITreeNode node, boolean attachChildren) {
+  }
+
+  protected void attachNodes(Collection<ITreeNode> nodes, boolean attachChildren) {
+    for (ITreeNode node : nodes) {
+      attachNode(node, attachChildren);
+    }
+  }
+
+  protected void disposeNode(ITreeNode node, boolean disposeChildren) {
+    if (disposeChildren) {
+      disposeNodes(node.getChildNodes(), disposeChildren);
+    }
+    String nodeId = m_treeNodeIds.get(node);
+    m_treeNodeIds.remove(node);
+    m_treeNodes.remove(nodeId);
+  }
+
+  protected void disposeNodes(Collection<ITreeNode> nodes, boolean disposeChildren) {
+    for (ITreeNode node : nodes) {
+      disposeNode(node, disposeChildren);
+    }
   }
 
   @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
     JSONArray jsonNodes = new JSONArray();
-    if (getModel().isRootNodeVisible()) {
-      ITreeNode rootNode = getModel().getRootNode();
-      jsonNodes.put(treeNodeToJson(rootNode));
-    }
-    else {
-      for (ITreeNode childNode : getModel().getRootNode().getFilteredChildNodes()) {
-        jsonNodes.put(treeNodeToJson(childNode));
-      }
+    for (ITreeNode childNode : getTopLevelNodes()) {
+      jsonNodes.put(treeNodeToJson(childNode));
     }
     putProperty(json, PROP_NODES, jsonNodes);
     putProperty(json, PROP_SELECTED_NODE_IDS, nodeIdsToJson(getModel().getSelectedNodes()));
@@ -246,13 +264,18 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   }
 
   protected void handleModelNodesInserted(TreeEvent event) {
+    addNodesInsertedEvent(event.getCommonParentNode(), event.getNodes());
+  }
+
+  protected void addNodesInsertedEvent(ITreeNode commonParentNode, Collection<ITreeNode> nodes) {
     JSONObject jsonEvent = new JSONObject();
     JSONArray jsonNodes = new JSONArray();
-    for (ITreeNode node : event.getNodes()) {
+    attachNodes(nodes, true);
+    for (ITreeNode node : nodes) {
       jsonNodes.put(treeNodeToJson(node));
     }
     putProperty(jsonEvent, PROP_NODES, jsonNodes);
-    putProperty(jsonEvent, PROP_COMMON_PARENT_NODE_ID, getOrCreateNodeId(event.getCommonParentNode()));
+    putProperty(jsonEvent, PROP_COMMON_PARENT_NODE_ID, getOrCreateNodeId(commonParentNode));
     addActionEvent(EVENT_NODES_INSERTED, jsonEvent);
   }
 
@@ -283,21 +306,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
       addActionEvent(EVENT_NODES_DELETED, jsonEvent);
     }
 
-    disposeNodes(nodes);
-  }
-
-  protected void disposeNodes(Collection<ITreeNode> nodes) {
-    for (ITreeNode node : nodes) {
-      disposeNode(node);
-    }
-  }
-
-  protected void disposeNode(ITreeNode node) {
-    disposeNodes(node.getChildNodes());
-
-    String nodeId = m_treeNodeIds.get(node);
-    m_treeNodeIds.remove(node);
-    m_treeNodes.remove(nodeId);
+    disposeNodes(nodes, true);
   }
 
   protected void handleModelNodesSelected(Collection<ITreeNode> modelNodes) {
@@ -329,23 +338,14 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   }
 
   protected void handleModelNodeFilterChanged() {
-    disposeNodes(getModel().isRootNodeVisible() ? CollectionUtility.arrayList(getModel().getRootNode()) : getModel().getRootNode().getChildNodes());
-    addActionEvent(EVENT_ALL_NODES_DELETED, new JSONObject());
-    JSONObject jsonEvent = new JSONObject();
-    JSONArray jsonNodes = new JSONArray();
-    if (getModel().isRootNodeVisible()) {
-      ITreeNode rootNode = getModel().getRootNode();
-      jsonNodes.put(treeNodeToJson(rootNode));
-    }
-    else {
-      for (ITreeNode childNode : getModel().getRootNode().getFilteredChildNodes()) {
-        jsonNodes.put(treeNodeToJson(childNode));
-      }
-    }
-    putProperty(jsonEvent, PROP_NODES, jsonNodes);
-    putProperty(jsonEvent, PROP_SELECTED_NODE_IDS, nodeIdsToJson(getModel().getSelectedNodes()));
+    //FIXME BSH/CGU Fix AbstractJsonSession.m_unregisterAdapterSet first
+//    disposeNodes(getTopLevelNodes(), true);
+//    addActionEvent(EVENT_ALL_NODES_DELETED, new JSONObject());
+//
+//    addNodesInsertedEvent(null, getTopLevelNodes());
+//    putProperty(jsonEvent, PROP_SELECTED_NODE_IDS, nodeIdsToJson(getModel().getSelectedNodes()));
 
-    addActionEvent(EVENT_NODES_INSERTED, jsonEvent);
+    // TODO BSH Selection
   }
 
   protected void handleModelChildNodeOrderChanged(TreeEvent event) {
@@ -401,6 +401,13 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
 
   protected boolean isInvisibleRootNode(ITreeNode node) {
     return !getModel().isRootNodeVisible() && getModel().getRootNode() == node;
+  }
+
+  protected List<ITreeNode> getTopLevelNodes() {
+    if (getModel().isRootNodeVisible()) {
+      return CollectionUtility.arrayList(getModel().getRootNode());
+    }
+    return getModel().getRootNode().getFilteredChildNodes();
   }
 
   protected void putCellProperties(JSONObject json, ICell cell) {

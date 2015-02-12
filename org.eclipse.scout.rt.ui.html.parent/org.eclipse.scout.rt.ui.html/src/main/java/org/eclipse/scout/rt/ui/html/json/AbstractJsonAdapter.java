@@ -46,7 +46,6 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
   @Override
   public void init() {
     attach();
-    attachChildAdapters();
   }
 
   @Override
@@ -92,6 +91,7 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
       throw new IllegalStateException("Adapter already attached");
     }
     attachModel();
+    attachChildAdapters();
     m_attached = true;
   }
 
@@ -104,12 +104,12 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
   }
 
   @Override
-  public void dispose() {
+  public final void dispose() {
     if (m_attached) {
       detachModel();
+      disposeChildAdapters();
       m_attached = false;
     }
-    disposeChildAdapters();
     m_jsonSession.unregisterJsonAdapter(m_id);
   }
 

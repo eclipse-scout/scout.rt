@@ -93,15 +93,6 @@ public class JsonClientSession<T extends IClientSession> extends AbstractJsonAda
   }
 
   @Override
-  public void dispose() {
-    super.dispose();
-    if (m_localeListener != null) {
-      getModel().removeLocaleListener(m_localeListener);
-      m_localeListener = null;
-    }
-  }
-
-  @Override
   protected void detachModel() {
     if (m_localeListener != null) {
       getModel().removeLocaleListener(m_localeListener);
