@@ -3,7 +3,7 @@
 
 // FIXME CRU: implement buttons to show/hide, add/remove columns depending on 'custom' property.
 scout.TableHeaderMenu = function(table, $header, x, y, session) {
-  var pos = table.header.getColumnViewIndex($header),
+  var pos = table.header.columnIndex($header),
     column = $header.data('column');
 
   // label title
@@ -220,22 +220,22 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
 
   function moveTop() {
     table.moveColumn($header, pos, 0);
-    pos = table.header.getColumnViewIndex($header);
+    pos = table.header.columnIndex($header);
   }
 
   function moveUp() {
     table.moveColumn($header, pos, Math.max(pos - 1, 0));
-    pos = table.header.getColumnViewIndex($header);
+    pos = table.header.columnIndex($header);
   }
 
   function moveDown() {
     table.moveColumn($header, pos, Math.min(pos + 1, table.header.findHeaderItems().length - 1));
-    pos = table.header.getColumnViewIndex($header);
+    pos = table.header.columnIndex($header);
   }
 
   function moveBottom() {
     table.moveColumn($header, pos, table.header.findHeaderItems().length - 1);
-    pos = table.header.getColumnViewIndex($header);
+    pos = table.header.columnIndex($header);
   }
 
   function sort(direction, multiSort, remove) {
@@ -322,19 +322,19 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
   }
 
   function colorRed() {
-    table.colorData('red', column);
+    table.colorData(column, 'red');
   }
 
   function colorGreen() {
-    table.colorData('green', column);
+    table.colorData(column, 'green');
   }
 
   function colorBar() {
-    table.colorData('bar', column);
+    table.colorData(column, 'bar');
   }
 
   function colorRemove() {
-    table.colorData('remove', column);
+    table.colorData(column, 'remove');
   }
 
   function columnAdd() {}

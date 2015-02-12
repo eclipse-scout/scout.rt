@@ -347,13 +347,8 @@ describe("Table", function() {
       var table = helper.createTable(model);
       table.render(session.$entryPoint);
 
-      var $colHeaders = table.header.$container.find('.header-item');
-      var $header0 = $colHeaders.eq(0);
-
       expect(table.columns[0].width).not.toBe(100);
-
-      table.resizeColumn($header0, 100, 150);
-
+      table.resizeColumn(table.columns[0], 100, 150);
       expect(table.columns[0].width).toBe(100);
 
       sendQueuedAjaxCalls();
@@ -369,11 +364,8 @@ describe("Table", function() {
       var table = helper.createTable(model);
       table.render(session.$entryPoint);
 
-      var $colHeaders = table.header.$container.find('.header-item');
-      var $header0 = $colHeaders.eq(0);
-
-      table.resizeColumn($header0, 50, 100, true);
-      table.resizeColumn($header0, 100, 150, true);
+      table.resizeColumn(table.columns[0], 50, 100, true);
+      table.resizeColumn(table.columns[0], 100, 150, true);
 
       sendQueuedAjaxCalls();
 
@@ -385,12 +377,9 @@ describe("Table", function() {
       var table = helper.createTable(model);
       table.render(session.$entryPoint);
 
-      var $colHeaders = table.header.$container.find('.header-item');
-      var $header0 = $colHeaders.eq(0);
-
-      table.resizeColumn($header0, 50, 100, true);
-      table.resizeColumn($header0, 100, 150, true);
-      table.resizeColumn($header0, 150, 200);
+      table.resizeColumn(table.columns[0], 50, 100, true);
+      table.resizeColumn(table.columns[0], 100, 150, true);
+      table.resizeColumn(table.columns[0], 150, 200);
 
       sendQueuedAjaxCalls();
 
@@ -933,21 +922,21 @@ describe("Table", function() {
       var $header1 = $colHeaders.eq(1);
       var $header2 = $colHeaders.eq(2);
 
-      expect(table.header.getColumnViewIndex($header0)).toBe(0);
-      expect(table.header.getColumnViewIndex($header1)).toBe(1);
-      expect(table.header.getColumnViewIndex($header2)).toBe(2);
+      expect(table.header.columnIndex($header0)).toBe(0);
+      expect(table.header.columnIndex($header1)).toBe(1);
+      expect(table.header.columnIndex($header2)).toBe(2);
 
       table.moveColumn($header0, 0, 2);
 
-      expect(table.header.getColumnViewIndex($header1)).toBe(0);
-      expect(table.header.getColumnViewIndex($header2)).toBe(1);
-      expect(table.header.getColumnViewIndex($header0)).toBe(2);
+      expect(table.header.columnIndex($header1)).toBe(0);
+      expect(table.header.columnIndex($header2)).toBe(1);
+      expect(table.header.columnIndex($header0)).toBe(2);
 
       table.moveColumn($header2, 1, 0);
 
-      expect(table.header.getColumnViewIndex($header2)).toBe(0);
-      expect(table.header.getColumnViewIndex($header1)).toBe(1);
-      expect(table.header.getColumnViewIndex($header0)).toBe(2);
+      expect(table.header.columnIndex($header2)).toBe(0);
+      expect(table.header.columnIndex($header1)).toBe(1);
+      expect(table.header.columnIndex($header0)).toBe(2);
     });
 
   });

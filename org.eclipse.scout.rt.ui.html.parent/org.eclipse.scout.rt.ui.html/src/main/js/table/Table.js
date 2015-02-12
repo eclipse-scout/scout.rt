@@ -836,12 +836,13 @@ scout.Table.prototype.group = function(column, draw, all) {
   this._group();
 };
 
-scout.Table.prototype.colorData = function(mode, colorColumn) {
-  var minValue, maxValue, colorFunc, row, value, v, c, $rows;
+scout.Table.prototype.colorData = function(column, mode) {
+  var minValue, maxValue, colorFunc, row, value, v, c, $rows, i, $cell, columnIndex,
+    filteredRows = this.filteredRows();
 
-  for (var r = 0; r < this.rows.length; r++) {
-    row = this.rows[r];
-    v = this.cellValue(colorColumn, row);
+  for (i = 0; i < this.rows.length; i++) {
+    row = this.rows[i];
+    v = this.cellValue(column, row);
 
     if (v < minValue || minValue === undefined) {
       minValue = v;
@@ -854,54 +855,47 @@ scout.Table.prototype.colorData = function(mode, colorColumn) {
   // TODO CRU Don't use hardcoded colors (or make them customizable)
   // TODO CRU Handle case where model already has set specific cell background colors
   if (mode === 'red') {
-    colorFunc = function(cell, value) {
+    colorFunc = function($cell, value) {
       var level = (value - minValue) / (maxValue - minValue);
 
       var r = Math.ceil(255 - level * (255 - 171)),
         g = Math.ceil(175 - level * (175 - 214)),
         b = Math.ceil(175 - level * (175 - 147));
 
-      cell.css('background-color', 'rgb(' + r + ',' + g + ', ' + b + ')');
-      cell.css('background-image', '');
+      $cell.css('background-color', 'rgb(' + r + ',' + g + ', ' + b + ')');
+      $cell.css('background-image', '');
     };
   } else if (mode === 'green') {
-    colorFunc = function(cell, value) {
+    colorFunc = function($cell, value) {
       var level = (value - minValue) / (maxValue - minValue);
 
       var r = Math.ceil(171 - level * (171 - 255)),
         g = Math.ceil(214 - level * (214 - 175)),
         b = Math.ceil(147 - level * (147 - 175));
 
-      cell.css('background-color', 'rgb(' + r + ',' + g + ', ' + b + ')');
-      cell.css('background-image', '');
+      $cell.css('background-color', 'rgb(' + r + ',' + g + ', ' + b + ')');
+      $cell.css('background-image', '');
     };
   } else if (mode === 'bar') {
-    colorFunc = function(cell, value) {
+    colorFunc = function($cell, value) {
       var level = Math.ceil((value - minValue) / (maxValue - minValue) * 100) + '';
 
-      cell.css('background-color', 'transparent');
-      cell.css('background-image', 'linear-gradient(to left, #80c1d0 0%, #80c1d0 ' + level + '%, transparent ' + level + '%, transparent 100% )');
+      $cell.css('background-color', 'transparent');
+      $cell.css('background-image', 'linear-gradient(to left, #80c1d0 0%, #80c1d0 ' + level + '%, transparent ' + level + '%, transparent 100% )');
     };
   } else if (mode === 'remove') {
-    colorFunc = function(cell, value) {
-      cell.css('background-image', '');
-      cell.css('background-color', 'transparent');
+    colorFunc = function($cell, value) {
+      $cell.css('background-image', '');
+      $cell.css('background-color', 'transparent');
     };
   }
 
-  $rows = $('.table-row:visible', this.$data);
-
-  $('.header-item', this.$container).each(function(i) {
-    if ($(this).data('column') === colorColumn) {
-      c = i;
-    }
-  });
-
-  for (var s = 0; s < $rows.length; s++) {
-    row = $rows.data('row');
-    value = this.cellValue(colorColumn, row);
-
-    colorFunc($rows.eq(s).children().eq(c), value);
+  columnIndex = this.columns.indexOf(column);
+  for (i = 0; i < filteredRows.length; i++) {
+    row = filteredRows[i];
+    value = this.cellValue(column, row);
+    $cell = this.$cell(columnIndex, row.$row);
+    colorFunc($cell, value);
   }
 };
 
@@ -1117,6 +1111,10 @@ scout.Table.prototype.$cellsForColIndex = function(colIndex, includeSumRows) {
   return this.$data.find(selector);
 };
 
+scout.Table.prototype.$cell = function(columnIndex, $row) {
+  return $row.children().eq(columnIndex);
+};
+
 scout.Table.prototype.columnById = function(columnId) {
   var column, i;
   for (i = 0; i < this.columns.length; i++) {
@@ -1195,7 +1193,7 @@ scout.Table.prototype.filteredBy = function() {
   var filteredBy = [];
   for (var i = 0; i < this.columns.length; i++) {
     if (this.columns[i].filterFunc) {
-      filteredBy.push(this.columns[i].$header.text());
+      filteredBy.push(this.columns[i].text || '');
     }
   }
   for (var key in this._filterMap) {
@@ -1295,9 +1293,8 @@ scout.Table.prototype.hideRow = function($row, useAnimation) {
 /**
  * @param resizingInProgress set this to true when calling this function several times in a row. If resizing is finished you have to call resizingColumnFinished.
  */
-scout.Table.prototype.resizeColumn = function($header, width, totalWidth, resizingInProgress) {
-  var colNum = this.header.getColumnViewIndex($header) + 1;
-  var column = $header.data('column');
+scout.Table.prototype.resizeColumn = function(column, width, totalWidth, resizingInProgress) {
+  var colNum = this.columns.indexOf(column) + 1;
 
   column.width = width;
   this._totalWidth = totalWidth;
@@ -1308,15 +1305,16 @@ scout.Table.prototype.resizeColumn = function($header, width, totalWidth, resizi
   this.$rows(true)
     .css('width', totalWidth);
 
-  this.header.onColumnResized($header, width);
+  if (this.header) {
+    this.header.onColumnResized(column, width);
+  }
 
   if (!resizingInProgress) {
-    this.resizingColumnFinished($header, width);
+    this.resizingColumnFinished(column, width);
   }
 };
 
-scout.Table.prototype.resizingColumnFinished = function($header, width) {
-  var column = $header.data('column');
+scout.Table.prototype.resizingColumnFinished = function(column, width) {
   var data = {
     columnId: column.id,
     width: width
@@ -1324,9 +1322,8 @@ scout.Table.prototype.resizingColumnFinished = function($header, width) {
   this.session.send(this.id, 'columnResized', data);
 };
 
-scout.Table.prototype.moveColumn = function($header, oldPos, newPos, dragged) {
-  var column = $header.data('column'),
-    uiOnlyColumnOffset = 0;
+scout.Table.prototype.moveColumn = function(column, oldPos, newPos, dragged) {
+  var uiOnlyColumnOffset = 0;
 
   if (this.checkable && newPos === 0) {
     uiOnlyColumnOffset = 1;
@@ -1341,7 +1338,9 @@ scout.Table.prototype.moveColumn = function($header, oldPos, newPos, dragged) {
   };
   this.session.send(this.id, 'columnMoved', data);
 
-  this.header.onColumnMoved($header, oldPos, newPos + uiOnlyColumnOffset, dragged);
+  if (this.header) {
+    this.header.onColumnMoved(column, oldPos, newPos + uiOnlyColumnOffset, dragged);
+  }
 
   // move cells
   this.$rows(true).each(function() {

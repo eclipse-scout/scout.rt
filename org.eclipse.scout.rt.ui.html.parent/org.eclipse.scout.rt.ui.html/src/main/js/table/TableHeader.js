@@ -77,7 +77,7 @@ scout.TableHeader = function(table, session) {
         wSummary = totalWidth + diff;
 
       if (wHeader > 80 || diff > 0) {
-        that.table.resizeColumn($header, wHeader, wSummary, true);
+        that.table.resizeColumn($header.data('column'), wHeader, wSummary, true);
       }
     }
 
@@ -86,7 +86,7 @@ scout.TableHeader = function(table, session) {
         .removeClass('col-resize');
 
       var width = parseFloat($header.css('min-width'));
-      that.table.resizingColumnFinished($header, width);
+      that.table.resizingColumnFinished($header.column, width);
     }
   }
 
@@ -94,7 +94,7 @@ scout.TableHeader = function(table, session) {
     var diff = 0,
       startX = event.pageX,
       $header = $(this),
-      oldPos = that.getColumnViewIndex($header),
+      oldPos = that.columnIndex($header),
       newPos = oldPos,
       move = $header.outerWidth(),
       $otherHeaders = $header.siblings('.header-item');
@@ -171,14 +171,14 @@ scout.TableHeader = function(table, session) {
       var h = (diff < 0) ? $otherHeaders : $($otherHeaders.get().reverse());
       h.each(function(i) {
         if ($(this).css('left') !== '0px') {
-          newPos = that.getColumnViewIndex($(this));
+          newPos = that.columnIndex($(this));
           return false;
         }
       });
 
       // move column
       if (oldPos !== newPos) {
-        table.moveColumn($header, oldPos, newPos, true);
+        table.moveColumn($header.column, oldPos, newPos, true);
         that.dragging = false;
       } else {
         $header.animateAVCSD('left', '', function() {
@@ -203,7 +203,8 @@ scout.TableHeader.prototype.remove = function() {
   this.$container.remove();
 };
 
-scout.TableHeader.prototype.onColumnResized = function($header, width) {
+scout.TableHeader.prototype.onColumnResized = function(column, width) {
+  var $header = column.$header;
   $header
     .css('min-width', width)
     .css('max-width', width);
@@ -225,8 +226,9 @@ scout.TableHeader.prototype.onGroupingChanged = function(column, all) {
   }
 };
 
-scout.TableHeader.prototype.onColumnMoved = function($header, oldPos, newPos, dragged) {
-  var $headers = this.findHeaderItems(),
+scout.TableHeader.prototype.onColumnMoved = function(column, oldPos, newPos, dragged) {
+  var $header = column.$header,
+    $headers = this.findHeaderItems(),
     $moveHeader = $headers.eq(oldPos),
     $moveResize = $moveHeader.next();
 
@@ -296,7 +298,7 @@ scout.TableHeader.prototype.onOrderChanged = function(oldColumnOrder) {
   });
 };
 
-scout.TableHeader.prototype.getColumnViewIndex = function($header) {
+scout.TableHeader.prototype.columnIndex = function($header) {
   return $header.index() / 2;
 };
 
