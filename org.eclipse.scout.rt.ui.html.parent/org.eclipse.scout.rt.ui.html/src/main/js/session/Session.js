@@ -290,6 +290,7 @@ scout.Session.prototype._processErrorResponse = function(request, jqXHR, textSta
   //FIXME CGU refactor, errorcode is sufficient if translations are on client
   if (jsonResponse && jsonResponse.errorMessage) {
     if (this.desktop) {
+      var that = this;
       // Default values for fatal message boxes
       var boxOptions = {
         title: this.text('ServerError'),
@@ -297,7 +298,7 @@ scout.Session.prototype._processErrorResponse = function(request, jqXHR, textSta
         yesButtonText: this.text('Reload'),
         yesButtonAction: function() {
           // Hide everything
-          this.session.$entryPoint.html('');
+          that.$entryPoint.html('');
           // Reload window (using setTimeout, to overcome drawing issues in IE)
           setTimeout(function() {
             window.location.reload();
@@ -318,8 +319,9 @@ scout.Session.prototype._processErrorResponse = function(request, jqXHR, textSta
       }
       this.desktop.showFatalMessage(boxOptions);
     } else {
-      this.$entryPoint.html('');
-      this.$entryPoint.text(jsonResponse.errorMessage);
+      // Fallback if message box cannot be shown
+      var $error = $.makeDiv('fatal-error').text(jsonResponse.errorMessage);
+      this.$entryPoint.replaceWith($error);
     }
     return;
   }

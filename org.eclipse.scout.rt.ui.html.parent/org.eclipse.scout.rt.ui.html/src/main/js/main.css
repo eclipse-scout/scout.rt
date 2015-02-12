@@ -128,3 +128,9 @@ button::-moz-focus-inner {
   margin-top: -5px;
   cursor: move;
 }
+
+/* Used to display errors from server when desktop is not available */
+.fatal-error {
+  margin: 10px;
+  .user-select(text)
+}
