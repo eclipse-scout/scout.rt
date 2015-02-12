@@ -30,12 +30,10 @@ import java.util.zip.DeflaterOutputStream;
 import java.util.zip.Inflater;
 import java.util.zip.InflaterInputStream;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.nls.NlsUtility;
 
 public final class StringUtility {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(StringUtility.class);
+
   public static final Pattern PATTERN_TRIM_NEWLINES = Pattern.compile("^[\r\n]*(.*?)[\r\n]*$", Pattern.DOTALL);
 
   private static final String[] EMPTY_ARRAY = new String[0];
@@ -553,10 +551,10 @@ public final class StringUtility {
     while (startPos < text.length() && (a = getStartTag(text, tagName, startPos)).begin >= 0 && (b = text.indexOf("</" + tagName + ">", a.end)) > 0) {
       text =
           text.substring(0, a.begin) +
-          start +
-          text.substring(a.end, b) +
-          end +
-          text.substring(b + tagName.length() + 3);
+              start +
+              text.substring(a.end, b) +
+              end +
+              text.substring(b + tagName.length() + 3);
       //next
       startPos = a.begin + start.length();
     }
@@ -1191,7 +1189,7 @@ public final class StringUtility {
             "(?<=[^A-Z])(?=[A-Z])",
             "(?<=[A-Za-z])(?=[^A-Za-z])"
             ),
-            " "
+        " "
         );
   }
 
@@ -1529,7 +1527,7 @@ public final class StringUtility {
       }
     }
     catch (IOException e) {
-      LOG.warn(null, e);
+      // NOOP
     }
     finally {
       try {
@@ -1582,7 +1580,7 @@ public final class StringUtility {
       }
     }
     catch (IOException e) {
-      LOG.warn(null, e);
+      // NOOP
     }
     finally {
       try {

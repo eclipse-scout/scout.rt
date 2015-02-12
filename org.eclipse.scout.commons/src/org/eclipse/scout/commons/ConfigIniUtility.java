@@ -25,6 +25,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 
 /**
@@ -57,7 +58,8 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
  */
 public final class ConfigIniUtility {
 
-  // Do not declare static Logger because 'ScoutLogManager' uses this class during its initialization; use ConfigIniUtility.logWarn() instead.
+  // Do not statically initialize a 'ScoutLogManager' because this class is used during the manager's static initialization; use 'getLogger()' instead.
+  private static volatile IScoutLogger logger;
 
   public static final String CONFIG_INI = "config.ini";
   public static final char FILTER_DELIM = '/';
@@ -110,19 +112,19 @@ public final class ConfigIniUtility {
 
     // 1. App config (config.ini)
     String value = configProperties.get(key);
-    if (value != null) {
+    if (StringUtility.hasText(value)) {
       return value;
     }
 
     // 2. system config
     value = System.getProperty(key);
-    if (value != null) {
+    if (StringUtility.hasText(value)) {
       return value;
     }
 
     // 3. environment config
     value = System.getenv(key);
-    if (value != null) {
+    if (StringUtility.hasText(value)) {
       return value;
     }
 
@@ -130,7 +132,7 @@ public final class ConfigIniUtility {
   }
 
   /**
-   * TODO [dwi]: remove me
+   * TODO [dwi]: Remove me after migrated the products.
    */
   @Deprecated
   public static boolean getBooleanProperty(String key, boolean defaultValue) {
@@ -147,7 +149,7 @@ public final class ConfigIniUtility {
       return Boolean.parseBoolean(rawValue);
     }
     else {
-      logWarn("Invalid boolean-value for property '{}' configured: {}", key, rawValue);
+      getLogger().warn("Invalid boolean-value for property '{}' configured: {}", key, rawValue);
       return defaultValue;
     }
   }
@@ -170,7 +172,7 @@ public final class ConfigIniUtility {
       return Integer.valueOf(valueRaw);
     }
     catch (final NumberFormatException e) {
-      logWarn("Invalid int-value for property '{}' configured: {}", key, valueRaw);
+      getLogger().warn("Invalid int-value for property '{}' configured: {}", key, valueRaw);
       return defaultValue;
     }
   }
@@ -194,7 +196,7 @@ public final class ConfigIniUtility {
       return Long.valueOf(valueRaw);
     }
     catch (final NumberFormatException e) {
-      logWarn("Invalid long-value for property '{}' configured: {}", key, valueRaw);
+      getLogger().warn("Invalid long-value for property '{}' configured: {}", key, valueRaw);
       return defaultValue;
     }
   }
@@ -218,7 +220,7 @@ public final class ConfigIniUtility {
       return Float.valueOf(valueRaw);
     }
     catch (final NumberFormatException e) {
-      logWarn("Invalid float-value for property '{}' configured: {}", key, valueRaw);
+      getLogger().warn("Invalid float-value for property '{}' configured: {}", key, valueRaw);
       return defaultValue;
     }
   }
@@ -242,7 +244,7 @@ public final class ConfigIniUtility {
       return Double.valueOf(valueRaw);
     }
     catch (final NumberFormatException e) {
-      logWarn("Invalid double-value for property '{}' configured: {}", key, valueRaw);
+      getLogger().warn("Invalid double-value for property '{}' configured: {}", key, valueRaw);
       return defaultValue;
     }
   }
@@ -414,9 +416,19 @@ public final class ConfigIniUtility {
   }
 
   /**
-   * Logs the given message to the logger.
+   * @return creates a {@link IScoutLogger} on first use; is necessary because {@link ScoutLogManager} uses this class
+   *         during its initialization.
    */
-  private static void logWarn(String msg, Object... msgArgs) {
-    ScoutLogManager.getLogger(ConfigIniUtility.class).warn(msg, msgArgs);
+  private static IScoutLogger getLogger() {
+    if (logger != null) {
+      return logger;
+    }
+
+    synchronized (ConfigIniUtility.class) {
+      if (logger == null) {
+        logger = ScoutLogManager.getLogger(ConfigIniUtility.class);
+      }
+      return logger;
+    }
   }
 }
