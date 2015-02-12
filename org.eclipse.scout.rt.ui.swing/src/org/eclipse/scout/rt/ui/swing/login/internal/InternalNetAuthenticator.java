@@ -15,19 +15,19 @@ import java.lang.reflect.UndeclaredThrowableException;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 import java.util.HashSet;
+import java.util.Set;
 
 import javax.swing.SwingUtilities;
 
-import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 
 public class InternalNetAuthenticator extends Authenticator {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(InternalNetAuthenticator.class);
 
-  public static final boolean NET_AUTHENTICATION_CACHE_ENABLED = ConfigIniUtility.getBooleanProperty("java.net.authenticate.cache.enabled", false);
+//  public static final boolean NET_AUTHENTICATION_CACHE_ENABLED = ConfigIniUtility.getPropertyBoolean("java.net.authenticate.cache.enabled", false);
 
-  private HashSet<String> m_visitedKeys;
+  private Set<String> m_visitedKeys;
 
   public InternalNetAuthenticator() {
     m_visitedKeys = new HashSet<String>();

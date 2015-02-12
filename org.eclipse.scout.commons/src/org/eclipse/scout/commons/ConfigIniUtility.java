@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * Copyright (c) 2015 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -29,39 +29,53 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 
 /**
- * Utility to extract config.ini entries of the formats
- * <p>
+ * Utility to extract properties stored in the <code>config.ini</code> file of scout applications.<br>
+ * Properties can be simple key-value-pairs or can use the class#property format: <code>
+ * <ul>
+ * <li>myKey=value</li>
+ * <li>my.qualified.key=value</li>
  * <li>classOrInterfaceName#propertyName=value</li>
  * <li>classOrInterfaceName/filter#propertyName=value</li>
+ * </ul>
+ * </code> Other properties, system properties or environment variables may be accessed using
+ * <code>${variableName}</code>. These variables are then resolved once when the properties are initialized.<br>
+ * Furthermore it supports storing the configs in several external config files. In that case the property
+ * <code>external.configuration.area</code> must be specified:
  * <p>
- * Example entries
- * <li>com.myapp.MyService#realm=MyRealm</li>
- * <li>realm=MyRealm2</li>
- * <li>com.myapp.MyService#realm=${realm}</li>
- * <li>com.myapp.MyService/process#realm=ExecRealm</li>
- * <li>com.myapp.MyService/query#realm=QueryRealm</li>
- * <p>
- * Supports for config.ini files in an external area
- *
- * <pre>
  * <code>
- * external.configuration.area=[url | file | ${variable}]
- * external.configuration.area.0=[url | file | ${variable}]
- * external.configuration.area.1=[url | file | ${variable}]
- * external.configuration.area.2=[url | file | ${variable}]
- * ...
+ * <ul>
+ * <li>external.configuration.area=[url | file | ${variable}]</li>
+ * <li>external.configuration.area.0=[url | file | ${variable}]</li>
+ * <li>external.configuration.area.1=[url | file | ${variable}]</li>
+ * <li>external.configuration.area.2=[url | file | ${variable}]</li>
+ * </ul>
  * </code>
- * </pre>
- *
- * where ${variable} is a system property or an environment variable containing an URL or a file path to the FOLDER
- * containing the config.ini
+ * </p>
+ * Examples: <code>
+ * <ul>
+ * <li>customProperty=customValue</li>
+ * <li>user.area=/usr/exampleUser/</li>
+ * <li>com.myapp.MyService#realm=MyRealm</li>
+ * <li>com.myapp.MyService#realm=${customProperty}</li>
+ * <li>com.myapp.MyService/process#realm=ProcessRealm</li>
+ * <li>com.myapp.MyService/query#realm=QueryRealm</li>
+ * <li>com.myapp.MyService#path=${user.home}/subfolder</li>
+ * </ul>
+ * </code>
  */
 public final class ConfigIniUtility {
 
-  // Do not statically initialize a 'ScoutLogManager' because this class is used during the manager's static initialization; use 'getLogger()' instead.
+  // Do not statically initialize this variable using the 'ScoutLogManager' because ConfigIniUtility is used during the ScoutLogManager's static initialization; use 'getLogger()' instead.
   private static volatile IScoutLogger logger;
 
+  /**
+   * Name of the default configuration file
+   */
   public static final String CONFIG_INI = "config.ini";
+
+  /**
+   * char used as delimiter for the filter in the class#property format.
+   */
   public static final char FILTER_DELIM = '/';
 
   private static final Pattern CONFIG_LINE_PATTERN = Pattern.compile("([^#" + FILTER_DELIM + "]+)(" + FILTER_DELIM + "[^#]*)?\\#([^=]+)");
@@ -73,17 +87,37 @@ public final class ConfigIniUtility {
 
   static {
     configProperties = new HashMap<>();
-
     Set<String> externalConfigPaths = new LinkedHashSet<>();
+
     parseLocalConfigIniFile(externalConfigPaths);
     parseExternalConfigIniFiles(externalConfigPaths);
+
     resolveAll();
   }
 
+  /**
+   * Gets all properties that are defined for the given class. Only properties in the class#property format are used
+   * that matches the given fully qualified class name. Properties with a filter defined are part of the result as well.
+   *
+   * @param beanType
+   *          The class for which the properties should be returned. May not be <code>null</code>.
+   * @return A {@link Map} holding all properties for the given class.
+   */
   public static Map<String, String> getProperties(Class beanType) {
     return getProperties(beanType, null);
   }
 
+  /**
+   * Gets all properties that are defined for the given class and filter. Properties that matches the given class and
+   * filter and properties matching the given class without filter are returned.
+   *
+   * @param beanType
+   *          The class for which the properties should be returned. May not be <code>null</code>.
+   * @param filter
+   *          The filter the properties must fullfil. may be <code>null</code>. Then all properties for the given class
+   *          are returned.
+   * @return A {@link Map} holding all properties for the given class and filter.
+   */
   public static Map<String, String> getProperties(Class beanType, String filter) {
     Map<String, String> props = new HashMap<>();
     for (Entry<String, String> entry : configProperties.entrySet()) {
@@ -101,10 +135,37 @@ public final class ConfigIniUtility {
     return props;
   }
 
+  /**
+   * Gets the property with given key. If there is no property with given key, <code>null</code> is returned.<br>
+   * The given key is searched in the following order:
+   * <ol>
+   * <li>in properties defined in a <code>config.ini</code> or an external <code>config.ini</code>.</li>
+   * <li>in the system properties ({@link System#getProperty(String)})</li>
+   * <li>in the environment variables ({@link System#getenv(String)})</li>
+   * </ol>
+   *
+   * @param key
+   *          The key of the property.
+   * @return The value of the given property or <code>null</code>.
+   */
   public static String getProperty(String key) {
     return getProperty(key, null);
   }
 
+  /**
+   * Gets the property with given key. If there is no property with given key, the given default value is returned.<br>
+   * The given key is searched in the following order:
+   * <ol>
+   * <li>in properties defined in a <code>config.ini</code> or an external <code>config.ini</code>.</li>
+   * <li>in the system properties ({@link System#getProperty(String)})</li>
+   * <li>in the environment variables ({@link System#getenv(String)})</li>
+   * </ol>
+   *
+   * @param key
+   *          The key of the property.
+   * @return The value of the given property, the given default value if the property could not be found or
+   *         <code>null</code> if the key is <code>null</code>.
+   */
   public static String getProperty(String key, String defaultValue) {
     if (key == null) {
       return null;
@@ -132,13 +193,17 @@ public final class ConfigIniUtility {
   }
 
   /**
-   * TODO [dwi]: Remove me after migrated the products.
+   * Gets the property with given key as boolean. If a property with given key does not exist or is no valid boolean
+   * value, the given default value is returned.
+   *
+   * @param key
+   *          The key of the property.
+   * @param defaultValue
+   *          The default value to use if the given key does not exist or as no valid boolean associated with it.
+   * @return The boolean value of the given key or the given default value otherwise.
+   * @since 5.1
+   * @see #getProperty(String)
    */
-  @Deprecated
-  public static boolean getBooleanProperty(String key, boolean defaultValue) {
-    return getPropertyBoolean(key, defaultValue);
-  }
-
   public static boolean getPropertyBoolean(String key, boolean defaultValue) {
     String rawValue = getProperty(key);
     if (rawValue == null) {
@@ -155,12 +220,16 @@ public final class ConfigIniUtility {
   }
 
   /**
-   * Returns safely an <code>int</code> property from the <code>config.ini</code>.
+   * Gets the property with given key as int. If a property with given key does not exist or is no valid int
+   * value, the given default value is returned.
    *
    * @param key
-   *          name of the property.
-   * @return value of the given property or the 'default-value' if the property is not defined or invalid.
-   * @since 5.0
+   *          The key of the property.
+   * @param defaultValue
+   *          The default value to use if the given key does not exist or as no valid int associated with it.
+   * @return The int value of the given key or the given default value otherwise.
+   * @since 5.1
+   * @see #getProperty(String)
    */
   public static int getPropertyInt(String key, int defaultValue) {
     String valueRaw = getProperty(key, null);
@@ -178,13 +247,16 @@ public final class ConfigIniUtility {
   }
 
   /**
-   * Returns safely a <code>long</code> property from the <code>config.ini</code>.
+   * Gets the property with given key as long. If a property with given key does not exist or is no valid long
+   * value, the given default value is returned.
    *
    * @param key
-   *          name of the property.
-   * @return value of the given property or the 'default-value' if the property is not defined or invalid.
-   *         environment is available.
-   * @since 5.0
+   *          The key of the property.
+   * @param defaultValue
+   *          The default value to use if the given key does not exist or as no valid long associated with it.
+   * @return The long value of the given key or the given default value otherwise.
+   * @since 5.1
+   * @see #getProperty(String)
    */
   public static long getPropertyLong(String key, long defaultValue) {
     String valueRaw = getProperty(key, null);
@@ -202,13 +274,16 @@ public final class ConfigIniUtility {
   }
 
   /**
-   * Returns safely a <code>float</code> property from the <code>config.ini</code>.
+   * Gets the property with given key as float. If a property with given key does not exist or is no valid float
+   * value, the given default value is returned.
    *
    * @param key
-   *          name of the property.
-   * @return value of the given property or the 'default-value' if the property is not defined or invalid.
-   *         environment is available.
-   * @since 5.0
+   *          The key of the property.
+   * @param defaultValue
+   *          The default value to use if the given key does not exist or as no valid float associated with it.
+   * @return The float value of the given key or the given default value otherwise.
+   * @since 5.1
+   * @see #getProperty(String)
    */
   public static float getPropertyFloat(String key, float defaultValue) {
     String valueRaw = getProperty(key, null);
@@ -226,13 +301,16 @@ public final class ConfigIniUtility {
   }
 
   /**
-   * Returns safely a <code>double</code> property from the <code>config.ini</code>.
+   * Gets the property with given key as double. If a property with given key does not exist or is no valid double
+   * value, the given default value is returned.
    *
    * @param key
-   *          name of the property.
-   * @return value of the given property or the 'default-value' if the property is not defined or invalid.
-   *         environment is available.
-   * @since 5.0
+   *          The key of the property.
+   * @param defaultValue
+   *          The default value to use if the given key does not exist or as no valid double associated with it.
+   * @return The double value of the given key or the given default value otherwise.
+   * @since 5.1
+   * @see #getProperty(String)
    */
   public static double getPropertyDouble(String key, double defaultValue) {
     String valueRaw = getProperty(key, null);
@@ -249,6 +327,16 @@ public final class ConfigIniUtility {
     }
   }
 
+  /**
+   * Resolves all variables of format <code>${variableName}</code> in the given expression according to the current
+   * application context.
+   *
+   * @param s
+   *          The expression to resolve.
+   * @return A {@link String} where all variables have been replaced with their values.
+   * @throws IllegalArgumentException
+   *           if a variable could not be resolved in the current context.
+   */
   public static String resolve(String s) {
     if (s == null || s.length() == 0) {
       return s;
@@ -259,6 +347,10 @@ public final class ConfigIniUtility {
       String key = m.group(1);
 
       String value = getProperty(key);
+      if (!StringUtility.hasText(value)) {
+        throw new IllegalArgumentException("resolving expression '" + s + "': variable ${" + key + "} is not defined in the context.");
+      }
+
       try {
         // in case it is an URL: make absolute file path
         value = new File(new URL(value).getFile()).getAbsolutePath();
@@ -266,14 +358,12 @@ public final class ConfigIniUtility {
       catch (Exception e) {
       }
 
-      if (value == null) {
-        throw new IllegalArgumentException("resolving expression \"" + s + "\": variable ${" + key + "} is not defined in the context");
-      }
       t = t.substring(0, m.start()) + value + t.substring(m.end());
       // next
       m = VARIABLE_PATTERN.matcher(t);
     }
 
+    // legacy formats:
     t = t.replace("@user.home", getProperty("user.home"));
     t = t.replace("@user.dir", getProperty("user.dir"));
     return t;

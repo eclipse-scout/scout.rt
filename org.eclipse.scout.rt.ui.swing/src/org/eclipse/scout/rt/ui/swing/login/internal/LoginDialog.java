@@ -146,14 +146,14 @@ public class LoginDialog extends JDialogEx {
       }
     });
 
-    if (InternalNetAuthenticator.NET_AUTHENTICATION_CACHE_ENABLED) {
-      /*
-       * ticket 80881: default false
-       */
-      m_saveCheckBox = new JCheckBox(UIManager.getString("LoginDialog.savePassword"), false);
-      m_saveCheckBox.setOpaque(false);
-      contentPane.add(m_saveCheckBox, new GridBagConstraints(1, 3, 1, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, insets, 0, 0));
-    }
+//    if (InternalNetAuthenticator.NET_AUTHENTICATION_CACHE_ENABLED) {
+//      /*
+//       * ticket 80881: default false
+//       */
+//      m_saveCheckBox = new JCheckBox(UIManager.getString("LoginDialog.savePassword"), false);
+//      m_saveCheckBox.setOpaque(false);
+//      contentPane.add(m_saveCheckBox, new GridBagConstraints(1, 3, 1, 1, 1, 0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, insets, 0, 0));
+//    }
 
     contentPane.add(new JPanelEx(), new GridBagConstraints(0, 10, 2, 1, 1, 1, GridBagConstraints.EAST, GridBagConstraints.BOTH, insets, 0, 0));
 

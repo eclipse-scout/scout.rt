@@ -95,8 +95,8 @@ public final class SwingUtility {
 
   public static final boolean IS_JAVA_7_OR_GREATER = CompareUtility.compareTo(System.getProperty("java.version"), "1.7") >= 0;
   public static final boolean IS_JAVA_7_OR_LESS = CompareUtility.compareTo(System.getProperty("java.version"), "1.7") <= 0;
-  public static final boolean DO_RESET_COMPONENT_BOUNDS = ConfigIniUtility.getBooleanProperty("scout.ui.layout.resetBoundsOnInvalidate", true);
-  public static final boolean VERIFY_INPUT_ON_WINDOW_CLOSED = ConfigIniUtility.getBooleanProperty("scout.ui.verifyInputOnWindowClosed", false);
+  public static final boolean DO_RESET_COMPONENT_BOUNDS = ConfigIniUtility.getPropertyBoolean("scout.ui.layout.resetBoundsOnInvalidate", true);
+  public static final boolean VERIFY_INPUT_ON_WINDOW_CLOSED = ConfigIniUtility.getPropertyBoolean("scout.ui.verifyInputOnWindowClosed", false);
 
   private static Integer topMarginForField = null;
 
