@@ -86,7 +86,7 @@ scout.TableHeader = function(table, session) {
         .removeClass('col-resize');
 
       var width = parseFloat($header.css('min-width'));
-      that.table.resizingColumnFinished($header.column, width);
+      that.table.resizingColumnFinished($header.data('column'), width);
     }
   }
 
@@ -178,7 +178,7 @@ scout.TableHeader = function(table, session) {
 
       // move column
       if (oldPos !== newPos) {
-        table.moveColumn($header.column, oldPos, newPos, true);
+        table.moveColumn($header.data('column'), oldPos, newPos, true);
         that.dragging = false;
       } else {
         $header.animateAVCSD('left', '', function() {
@@ -214,15 +214,6 @@ scout.TableHeader.prototype.onSortingChanged = function() {
   for (var i = 0; i < this.table.columns.length; i++) {
     var column = this.table.columns[i];
     this._applyColumnSorting(column.$header, column);
-  }
-};
-
-scout.TableHeader.prototype.onGroupingChanged = function(column, all) {
-  var $header = column.$header;
-  if (all) {
-    $header.parent().addClass('group-all');
-  } else {
-    $header.addClass('group-sort');
   }
 };
 

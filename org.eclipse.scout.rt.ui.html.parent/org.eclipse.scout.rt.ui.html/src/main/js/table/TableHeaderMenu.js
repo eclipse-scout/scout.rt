@@ -74,23 +74,22 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
   sortSelect();
 
   // create buttons in command for grouping
-  if (column.type === 'text' || column.type === 'date') {
-    var $commandGroup = $menuHeader.appendDiv('header-group');
-    $commandGroup.appendDiv('header-text')
-      .data('label', session.text('Sum'));
+  var $commandGroup = $menuHeader.appendDiv('header-group');
+  $commandGroup.appendDiv('header-text')
+    .data('label', session.text('Sum'));
 
-    var $groupAll = $commandGroup.appendDiv('header-command group-all')
-      .data('label', session.text('overEverything'))
-      .click(this.remove.bind(this))
-      .click(groupAll);
+  var $groupAll = $commandGroup.appendDiv('header-command group-all')
+    .data('label', session.text('overEverything'))
+    .click(this.remove.bind(this))
+    .click(groupAll);
 
+  if (column.type !== 'number') {
     var $groupSort = $commandGroup.appendDiv('header-command group-sort')
       .data('label', session.text('grouped'))
       .click(this.remove.bind(this))
       .click(groupSort);
-
-    groupSelect();
   }
+  groupSelect();
 
   // create buttons in command for coloring
   if (column.type === 'number') {
@@ -240,11 +239,9 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
 
   function sort(direction, multiSort, remove) {
     var column = $header.data('column');
-    table.group(column, false, false);
     table.sort(column, direction, multiSort, remove);
 
     sortSelect();
-    groupSelect();
   }
 
   function sortSelect() {
@@ -296,14 +293,19 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
   }
 
   function groupAll() {
-    table.group($header.data('column'), !$(this).hasClass('selected'), true);
-
-    sortSelect();
-    groupSelect();
+    doGroup($(this), true);
   }
 
   function groupSort() {
-    table.group($header.data('column'), !$(this).hasClass('selected'), false);
+    doGroup($(this), false);
+  }
+
+  function doGroup($command, all) {
+    if ($command.isSelected()) {
+      table.removeGrouping();
+    } else {
+      table.group($header.data('column'), all);
+    }
 
     sortSelect();
     groupSelect();
@@ -311,12 +313,14 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
 
   function groupSelect() {
     $groupAll.removeClass('selected');
-    $groupSort.removeClass('selected');
+    if ($groupSort) {
+      $groupSort.removeClass('selected');
+    }
 
-    if ($header.parent().hasClass('group-all')) {
+    if (table.grouped) {
       $groupAll.addClass('selected');
     }
-    if ($header.hasClass('group-sort')) {
+    if ($header.data('column').grouped) {
       $groupSort.addClass('selected');
     }
   }
@@ -365,7 +369,7 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
     // filter function
     if (column.filter.length) {
       column.filterFunc = function($row) {
-        var row = table.rowById($row.attr('id')),
+        var row = $row.data('row'),
           textX = table.cellValue(xAxis.column, row),
           nX = xAxis.norm(textX);
         return (column.filter.indexOf(nX) > -1);

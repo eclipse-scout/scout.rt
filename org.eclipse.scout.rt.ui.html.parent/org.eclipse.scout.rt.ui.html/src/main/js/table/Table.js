@@ -285,6 +285,11 @@ scout.Table.prototype._renderRowOrderChanges = function() {
       }
     });
   }
+
+  // update grouping if group by column is active
+  if (this._groupColumn()) {
+    this._group();
+  }
 };
 
 /**
@@ -469,6 +474,9 @@ scout.Table.prototype._installRows = function($rows) {
   // update info and scrollbar
   this._triggerRowsDrawn($rows);
   this.updateScrollbar();
+
+  // update grouping if data was grouped
+  this._group();
 
   // ----- inline methods: --------
 
@@ -741,34 +749,30 @@ scout.Table.prototype.cellTooltipText = function(column, row) {
   }
   return '';
 };
+
 scout.Table.prototype._group = function() {
-  var all, groupColumn, column, alignment,
+  var column, alignment, rows, sum, row, value, nextRow,
     that = this,
-    $group = $('.group-sort', this.$container);
+    groupColumn = this._groupColumn();
 
   // remove all sum rows
   this.$sumRows().animateAVCSD('height', 0, $.removeThis, that.updateScrollbar.bind(that));
 
-  // find group type
-  if ($('.group-all', this.$container).length) {
-    all = true;
-  } else if ($group.length) {
-    groupColumn = $group.data('column');
-  } else {
+  if (!this.grouped && !groupColumn) {
     return;
   }
 
   // prepare data
-  var rows = this.filteredRows(),
-    sum = [];
+  rows = this.filteredRows();
+  sum = [];
 
   for (var r = 0; r < rows.length; r++) {
-    var row = rows[r];
+    row = rows[r];
 
     // calculate sum per column
     for (var c = 0; c < this.columns.length; c++) {
       column = this.columns[c];
-      var value = this.cellValue(column, row);
+      value = this.cellValue(column, row);
 
       if (column.type === 'number') {
         sum[c] = (sum[c] || 0) + value;
@@ -776,10 +780,20 @@ scout.Table.prototype._group = function() {
     }
 
     // test if sum should be shown, if yes: reset sum-array
-    var nextRow = rows[r + 1];
-    if ((r === rows.length - 1) || (!all && this.cellText(groupColumn, row) !== this.cellText(groupColumn, nextRow)) && sum.length > 0) {
-      this._appendSumRow(sum, groupColumn, row, all);
+    nextRow = rows[r + 1];
+    if ((r === rows.length - 1) || (!this.grouped && this.cellText(groupColumn, row) !== this.cellText(groupColumn, nextRow)) && sum.length > 0) {
+      this._appendSumRow(sum, groupColumn, row, this.grouped);
       sum = [];
+    }
+  }
+};
+
+scout.Table.prototype._groupColumn = function() {
+  var i, column;
+  for (i = 0; i < this.columns.length; i++) {
+    column = this.columns[i];
+    if (column.grouped) {
+      return column;
     }
   }
 };
@@ -820,24 +834,34 @@ scout.Table.prototype._appendSumRow = function(sum, groupColumn, row, all) {
     .slideDown();
 };
 
-scout.Table.prototype.group = function(column, draw, all) {
-  $('.group-sort', this.$container).removeClass('group-sort');
-  $('.group-all', this.$container).removeClass('group-all');
+scout.Table.prototype.removeGrouping = function() {
+  this.group('', '', true);
+};
 
-  if (draw) {
-    if (!all) {
-      this.sort(column, 'asc', false);
-    }
-    if (this.header) {
-      this.header.onGroupingChanged(column, all);
-    }
+scout.Table.prototype.group = function(column, all, remove) {
+  this.grouped = false;
+  for (var i = 0; i < this.columns.length; i++) {
+    this.columns[i].grouped = false;
   }
 
-  this._group();
+  if (remove) {
+    this._group();
+    return;
+  }
+
+  if (all) {
+    this.grouped = true;
+    this._group();
+  } else {
+    column.grouped = true;
+
+    // sort also takes care about the grouping
+    this.sort(column, 'asc', false);
+  }
 };
 
 scout.Table.prototype.colorData = function(column, mode) {
-  var minValue, maxValue, colorFunc, row, value, v, c, $rows, i, $cell, columnIndex,
+  var minValue, maxValue, colorFunc, row, value, v, i, $cell, columnIndex,
     filteredRows = this.filteredRows();
 
   for (i = 0; i < this.rows.length; i++) {

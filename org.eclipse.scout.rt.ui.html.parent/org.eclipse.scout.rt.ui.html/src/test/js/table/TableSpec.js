@@ -552,6 +552,17 @@ describe("Table", function() {
       expect(table._sort).toHaveBeenCalled();
     });
 
+    it("regroups the data if group by column is active", function() {
+      prepareTable();
+      render(table);
+      spyOn(table, '_group');
+
+      column0.grouped = true;
+      table.sort(column0, 'desc');
+
+      expect(table._group).toHaveBeenCalled();
+    });
+
     describe("sorting", function() {
 
       it("sorts text columns considering locale (if browser supports it)", function() {
@@ -636,7 +647,7 @@ describe("Table", function() {
       render(table);
 
       expect(table.$sumRows().length).toBe(0);
-      table.group(column0, true);
+      table.group(column0);
       expect(table.$sumRows().length).toBe(1);
     });
 
@@ -657,7 +668,7 @@ describe("Table", function() {
       rows[2].cells[1].value = 3;
       render(table);
 
-      table.group(column0, true);
+      table.group(column0);
       var $sumCell = table.$sumRows().eq(0).children().eq(1);
       expect($sumCell.text()).toBe('6');
     });
@@ -670,7 +681,7 @@ describe("Table", function() {
       render(table);
 
       table.hideRow(table.$rows().eq(2));
-      table.group(column0, true);
+      table.group(column0);
       var $sumCell = table.$sumRows().eq(0).children().eq(1);
       expect($sumCell.text()).toBe('3');
     });
@@ -683,7 +694,7 @@ describe("Table", function() {
       render(table);
       column1.format = '#.00';
 
-      table.group(column0, true);
+      table.group(column0);
       var $sumCell = table.$sumRows().eq(0).children().eq(1);
       expect($sumCell.text()).toBe('4000.00');
     });
