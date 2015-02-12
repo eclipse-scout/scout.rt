@@ -1265,14 +1265,22 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
 
   @Override
   public void applyRowFilters() {
-    applyRowFiltersInternal();
-    fireRowFilterChanged();
+    boolean filterChanged = applyRowFiltersInternal();
+    if (filterChanged) {
+      fireRowFilterChanged();
+    }
   }
 
-  private void applyRowFiltersInternal() {
+  private boolean applyRowFiltersInternal() {
+    boolean filterChanged = false;
     for (ITableRow row : m_rows) {
+      boolean wasFilterAccepted = row.isFilterAccepted();
       applyRowFiltersInternal((InternalTableRow) row);
+      if (row.isFilterAccepted() != wasFilterAccepted) {
+        filterChanged = true;
+      }
     }
+    return filterChanged;
   }
 
   private void applyRowFiltersInternal(InternalTableRow row) {
