@@ -275,6 +275,8 @@ public class ModelJobScheduleTest {
 
     final CountDownLatch latch = new CountDownLatch(2);
 
+    ModelJob.CURRENT.set(null);
+
     new ModelJob<Void>("job-1", m_clientSession) {
 
       @Override

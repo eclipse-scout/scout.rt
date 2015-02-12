@@ -16,7 +16,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
-import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -365,7 +364,7 @@ public class ModelJobManager {
   protected void handleJobRejected(final FutureTaskEx<?> futureTask) {
     futureTask.reject();
 
-    // Do not throw an exception because the invoker will not be the job's submitter if this task was queued.
+    // Do not throw a 'RejectedExecutionException' because the invoker will not be the job's submitter if this task was queued.
     if (m_executor.isShutdown()) {
       LOG.debug("Job rejected because the job manager is shutdown.");
     }
@@ -481,7 +480,7 @@ public class ModelJobManager {
       // Check if the model-mutex could be acquired successfully.
       if (rejectedByExecutor.get()) {
         getFuture(currentJob).cancel(true); // to interrupt the submitter if waiting for the job to complete.
-        throw new JobExecutionException(String.format("Failed to re-acquire the model-mutex because being rejected by the executor. Maybe there are no more threads or queue slots available, or the executor was shutdown. [bc=%s, job=%s, shutdown=%s]", m_name, currentJob.getName(), m_executor.isShutdown()), new RejectedExecutionException());
+        throw JobExecutionException.newRejectedJobExecutionException("Failed to re-acquire the model-mutex because being rejected by the executor. Maybe there are no more threads or queue slots available, or the executor was shutdown. [bc=%s, job=%s, shutdown=%s]", m_name, currentJob.getName(), m_executor.isShutdown());
       }
       else {
         // [mutex] The following code is synchronized with the model-mutex anew.

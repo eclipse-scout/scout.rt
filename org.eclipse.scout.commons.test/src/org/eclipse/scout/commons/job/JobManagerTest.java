@@ -150,10 +150,10 @@ public class JobManagerTest {
     job2.schedule();
     job3.schedule();
 
-    latchBefore.await(10, TimeUnit.SECONDS); // Wait for all jobs to be ready
-    _sleep(100);
+    latchBefore.await(30, TimeUnit.SECONDS); // Wait for all jobs to be ready
+    _sleep(2000);
     m_jobManager.shutdown();
-    latchAfter.await(10, TimeUnit.SECONDS); // Wait for all jobs to be interrupted
+    latchAfter.await(60, TimeUnit.SECONDS); // Wait for all jobs to be interrupted
     assertEquals(CollectionUtility.hashSet(job1, job2, job3), actualInterruptedProtocol);
   }
 

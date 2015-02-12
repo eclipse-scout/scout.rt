@@ -249,6 +249,8 @@ public class JobScheduleTest {
     final Holder<IJob<?>> actualJob1 = new Holder<>();
     final Holder<IJob<?>> actualJob2 = new Holder<>();
 
+    IJob.CURRENT.set(null);
+
     new Job_<Void>("job-1") {
 
       @Override

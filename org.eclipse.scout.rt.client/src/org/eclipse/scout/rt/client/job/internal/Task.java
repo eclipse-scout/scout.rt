@@ -15,7 +15,6 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
 
 import org.eclipse.scout.commons.ToStringBuilder;
-import org.eclipse.scout.commons.job.JobExecutionException;
 
 /**
  * {@link Callable} to be scheduled once the model-mutex is acquired.
@@ -44,10 +43,13 @@ public abstract class Task<R> implements Callable<R> {
   /**
    * Schedules this task to be executed at the next reasonable opportunity. The invoker must ensure that this task is
    * the mutex-owner.
+   * 
+   * @throws IllegalStateException
+   *           if this task is not the mutex-owner.
    */
   public final void schedule() {
     if (m_mutexSemaphore.getMutexOwner() != this) {
-      throw new JobExecutionException(String.format("Task rejected because not being the mutex-owner. [job=%s, mutexSemaphore=%s]", m_jobName, m_mutexSemaphore));
+      throw new IllegalStateException(String.format("Task rejected because not being the mutex-owner. [job=%s, mutexSemaphore=%s]", m_jobName, m_mutexSemaphore));
     }
 
     m_executor.execute(m_futureTask);

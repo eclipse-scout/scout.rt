@@ -377,10 +377,10 @@ public class JobManager {
     future.cancel(true); // to indicate the submitter that the job was not executed.
 
     if (m_executor.isShutdown()) {
-      throw new JobExecutionException("Job rejected because the job manager is shutdown.", new RejectedExecutionException());
+      throw new RejectedExecutionException("Job rejected because the job manager is shutdown.");
     }
     else {
-      throw new JobExecutionException("Job rejected because no more threads or queue slots available.", new RejectedExecutionException());
+      throw new RejectedExecutionException("Job rejected because no more threads or queue slots available.");
     }
   }
 

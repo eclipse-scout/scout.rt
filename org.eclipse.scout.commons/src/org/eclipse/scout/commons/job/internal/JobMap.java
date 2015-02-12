@@ -17,6 +17,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
@@ -52,17 +53,23 @@ public class JobMap {
    *          callback invoked if the job was not contained in the map.
    * @return {@link Future} returned by {@link IPutCallback#onAbsent()}
    * @throws JobExecutionException
-   *           if the given job is already contained in the map.
+   *           if the given job is already contained in the map or depending on the installed
+   *           {@link RejectedExecutionHandler} cannot be scheduled for execution.
    */
   public <R, F extends Future<R>> F putIfAbsentElseReject(final IJob<R> job, final IPutCallback<R, F> callback) throws JobExecutionException {
     writeLock.lock();
     try {
       if (m_jobMap.containsKey(job)) {
-        throw new JobExecutionException(String.format("Job rejected because already running [job=%s]", job.getName()), new RejectedExecutionException());
+        throw JobExecutionException.newRejectedJobExecutionException("Job rejected because already running [job=%s]", job.getName());
       }
 
-      final F future = callback.onAbsent();
-      Assertions.assertNotNull(future);
+      final F future;
+      try {
+        future = Assertions.assertNotNull(callback.onAbsent());
+      }
+      catch (final RejectedExecutionException e) {
+        throw JobExecutionException.newRejectedJobExecutionException(e.getMessage());
+      }
 
       // Register the future only if being accepted by the executor; otherwise it would never be removed.
       if (!future.isCancelled() && !future.isDone()) {
@@ -229,6 +236,9 @@ public class JobMap {
      *
      * @return {@link Future} that is associated with the job; must not be <code>null</code>; if being 'cancelled' or
      *         'done', the job is not put into the map.
+     * @throws RejectedExecutionException
+     *           depending on the installed {@link RejectedExecutionHandler}, this exception is thrown if the task
+     *           cannot be scheduled for execution.
      */
     F onAbsent();
   }

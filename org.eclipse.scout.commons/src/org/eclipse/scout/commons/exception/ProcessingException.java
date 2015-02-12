@@ -22,7 +22,7 @@ import org.eclipse.core.runtime.IStatus;
  * class is a conceptual copy of {@link org.eclipse.core.runtime.Status} that
  * also can run in J2EE.
  */
-public class ProcessingException extends RuntimeException implements Serializable {
+public class ProcessingException extends Exception implements Serializable {
   private static final long serialVersionUID = 1L;
 
   private IProcessingStatus m_status;

@@ -271,7 +271,7 @@ public class JobCancelTest {
   }
 
   @Test
-  public void testCancelPeriodicAction() {
+  public void testCancelPeriodicAction() throws ProcessingException {
     final List<Future<?>> actualProtocol = new ArrayList<>();
     final Job<String> job = new Job_<String>("job") {
 

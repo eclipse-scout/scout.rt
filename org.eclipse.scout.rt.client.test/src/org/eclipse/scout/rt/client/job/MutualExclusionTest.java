@@ -353,7 +353,7 @@ public class MutualExclusionTest {
    * job-map and is not marked as blocked anymore.
    */
   @Test
-  public void testBlockingCondition_InterruptedWhileBeingBlocked1() {
+  public void testBlockingCondition_InterruptedWhileBeingBlocked1() throws JobExecutionException {
     final List<String> protocol = new ArrayList<>();
     final IBlockingCondition BC = m_jobManager.createBlockingCondition("bc");
 
@@ -397,7 +397,7 @@ public class MutualExclusionTest {
    * is interrupted, job3 must not be scheduled because the mutex-owner is still job2.
    */
   @Test
-  public void testBlockingCondition_InterruptedWhileBeingBlocked2() {
+  public void testBlockingCondition_InterruptedWhileBeingBlocked2() throws JobExecutionException {
     final List<String> protocol = new ArrayList<>();
     final IBlockingCondition BC = m_jobManager.createBlockingCondition("bc");
 
@@ -474,7 +474,7 @@ public class MutualExclusionTest {
    * is interrupted.
    */
   @Test
-  public void testBlockingCondition_InterruptedWhileReAcquiringTheMutex() {
+  public void testBlockingCondition_InterruptedWhileReAcquiringTheMutex() throws ProcessingException {
     final List<String> protocol = new ArrayList<>();
     final IBlockingCondition BC = m_jobManager.createBlockingCondition("bc");
 
@@ -613,7 +613,7 @@ public class MutualExclusionTest {
    * job2 gets scheduled, it is rejected by the executor. The test verifies, that job3 still gets scheduled.
    */
   @Test
-  public void testRejection() throws InterruptedException {
+  public void testRejection() throws InterruptedException, JobExecutionException {
     final List<String> protocol = new ArrayList<>();
 
     final ThreadPoolExecutor executorMock = mock(ThreadPoolExecutor.class);
@@ -702,7 +702,7 @@ public class MutualExclusionTest {
    * running and waits until being cancelled. That allows job4 to run.
    */
   @Test
-  public void testBlockedJobRejection1() throws InterruptedException {
+  public void testBlockedJobRejection1() throws InterruptedException, ProcessingException {
     final List<String> protocol = new ArrayList<>();
 
     final ThreadPoolExecutor executorMock = mock(ThreadPoolExecutor.class);
@@ -974,7 +974,7 @@ public class MutualExclusionTest {
     expected1.add("job-4-running");
   }
 
-  private void runTestBlockingCondition2(final IBlockingCondition BC) throws InterruptedException {
+  private void runTestBlockingCondition2(final IBlockingCondition BC) throws InterruptedException, JobExecutionException {
     final List<String> protocol = new ArrayList<>();
 
     new ModelJob<Void>("job-1", m_clientSession) {

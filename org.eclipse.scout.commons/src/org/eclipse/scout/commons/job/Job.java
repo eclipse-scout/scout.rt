@@ -232,7 +232,7 @@ public class Job<R> implements IJob<R> {
 
     final Callable<R> p5 = targetInvoker;
     final Callable<R> p4 = new AsyncFutureNotifier<R>(p5, asyncFuture);
-    final Callable<R> p3 = new ThreadLocalInitializer<>(p4, JobContext.CURRENT, (JobContext.CURRENT.get() == null ? new JobContext() : JobContext.copy(JobContext.CURRENT.get())));
+    final Callable<R> p3 = new ThreadLocalInitializer<>(p4, JobContext.CURRENT, JobContext.copy(JobContext.CURRENT.get()));
     final Callable<R> p2 = new ThreadLocalInitializer<>(p3, IJob.CURRENT, this);
     final Callable<R> head = new ThreadNameDecorator<R>(p2, m_name);
 

@@ -76,7 +76,7 @@ public class AsyncFutureNotifierTest {
   }
 
   @Test
-  public void testErrorRuntimeException1() throws Exception {
+  public void testErrorRuntimeExceptionWithAsyncFuture() throws Exception {
     RuntimeException exception = new RuntimeException();
     when(m_next.call()).thenThrow(exception);
 
@@ -102,7 +102,7 @@ public class AsyncFutureNotifierTest {
   }
 
   @Test
-  public void testErrorRuntimeException2() throws Exception {
+  public void testErrorRuntimeException() throws Exception {
     RuntimeException exception = new RuntimeException();
     when(m_next.call()).thenThrow(exception);
 
@@ -114,38 +114,12 @@ public class AsyncFutureNotifierTest {
     }
     catch (Exception e) {
       assertSame(exception, e);
-    }
-  }
-
-  @Test
-  public void testErrorProcessingException1() throws Exception {
-    RuntimeException exception = new ProcessingException("error");
-    when(m_next.call()).thenThrow(exception);
-
-    AsyncFutureNotifier<String> notifier = new AsyncFutureNotifier<>(m_next, m_asyncFuture);
-
-    try {
-      notifier.call();
-      fail();
-    }
-    catch (ProcessingException e) {
-      verify(m_asyncFuture, never()).onSuccess(anyString());
-      verify(m_asyncFuture, times(1)).onError(any(ProcessingException.class));
-      verify(m_asyncFuture, times(1)).onDone(isNull(String.class), any(ProcessingException.class));
-
-      ProcessingException pe = m_errorExceptionCaptor.getValue();
-      assertSame(exception, pe);
-      assertSame(pe, e);
-
-      pe = m_doneExceptionCaptor.getValue();
-      assertSame(exception, pe);
-      assertSame(pe, e);
     }
   }
 
   @Test
   public void testErrorProcessingException2() throws Exception {
-    RuntimeException exception = new ProcessingException("error");
+    ProcessingException exception = new ProcessingException("error");
     when(m_next.call()).thenThrow(exception);
 
     AsyncFutureNotifier<String> notifier = new AsyncFutureNotifier<>(m_next, null);
@@ -156,6 +130,32 @@ public class AsyncFutureNotifierTest {
     }
     catch (Exception e) {
       assertSame(exception, e);
+    }
+  }
+
+  @Test
+  public void testErrorProcessingExceptionWithAsyncFuture() throws Exception {
+    ProcessingException exception = new ProcessingException("error");
+    when(m_next.call()).thenThrow(exception);
+
+    AsyncFutureNotifier<String> notifier = new AsyncFutureNotifier<>(m_next, m_asyncFuture);
+
+    try {
+      notifier.call();
+      fail();
+    }
+    catch (ProcessingException e) {
+      verify(m_asyncFuture, never()).onSuccess(anyString());
+      verify(m_asyncFuture, times(1)).onError(any(ProcessingException.class));
+      verify(m_asyncFuture, times(1)).onDone(isNull(String.class), any(ProcessingException.class));
+
+      ProcessingException pe = m_errorExceptionCaptor.getValue();
+      assertSame(exception, pe);
+      assertSame(pe, e);
+
+      pe = m_doneExceptionCaptor.getValue();
+      assertSame(exception, pe);
+      assertSame(pe, e);
     }
   }
 }
