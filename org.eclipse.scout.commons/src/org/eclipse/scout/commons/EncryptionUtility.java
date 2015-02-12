@@ -17,7 +17,7 @@ import java.util.Random;
 import org.eclipse.scout.commons.internal.tripledes.TripleDES;
 
 /**
- * @deprecated This class in insecure and should no longer be used. Will be removed in Scout 6.0. Use
+ * @deprecated This class in insecure and should no longer be used. Will be removed in Scout 7.0. Use
  *             {@link EncryptionUtility2} instead.
  */
 @Deprecated

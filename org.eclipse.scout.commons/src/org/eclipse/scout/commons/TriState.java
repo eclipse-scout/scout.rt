@@ -120,19 +120,4 @@ public enum TriState {
       return UNDEFINED;
     }
   }
-
-  /**
-   * Boolean: true -&gt; true false -&gt; false null -&gt; null
-   * <p>
-   * Number: 1 -&gt; true 0 -&gt; false null -&gt; null other-&gt; null
-   * <p>
-   * String: "true" -&gt; true "false" -&gt; false "1" -&gt; true "0" -&gt; false null -&gt; null other -&gt; null
-   *
-   * @deprecated use {@link #parse(Object)}.
-   */
-  @Deprecated
-  public static TriState parseTriState(Object value) {
-    return parse(value);
-  }
-
 }

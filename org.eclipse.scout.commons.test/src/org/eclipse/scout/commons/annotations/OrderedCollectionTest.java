@@ -236,152 +236,6 @@ public class OrderedCollectionTest {
     assertEquals(20d + 2d * (10d / 3d), o2.getOrder(), MAX_ACCEPTABLE_DELTA);
   }
 
-  @SuppressWarnings("deprecation")
-  @Test(expected = IllegalArgumentException.class)
-  public void testAddLegacyNegativeIndex() {
-    c.add(-1, new Ordered());
-  }
-
-  @SuppressWarnings("deprecation")
-  @Test(expected = IllegalArgumentException.class)
-  public void testAddLegacyIndexOutOfBoundsEmptyCollection() {
-    c.add(1, new Ordered());
-  }
-
-  @SuppressWarnings("deprecation")
-  @Test(expected = IllegalArgumentException.class)
-  public void testAddLegacyIndexOutOfBounds() {
-    try {
-      c.addOrdered(m_ordered10);
-    }
-    catch (Throwable t) {
-      fail("expected to work");
-    }
-    c.add(2, new Ordered());
-  }
-
-  @Test
-  @SuppressWarnings("deprecation")
-  public void testAddLegacyNull() {
-    assertFalse(c.add(0, null));
-  }
-
-  @Test
-  @SuppressWarnings("deprecation")
-  public void testAddLegacyFirst() {
-    c.addOrdered(m_ordered10);
-    Ordered o = new Ordered();
-    assertTrue(c.add(0, o));
-    assertEquals(-990, o.getOrder(), MAX_ACCEPTABLE_DELTA);
-  }
-
-  @Test
-  @SuppressWarnings("deprecation")
-  public void testAddLegacyLast() {
-    c.addOrdered(m_ordered10);
-    Ordered o = new Ordered();
-    assertTrue(c.add(1, o));
-    assertEquals(1010, o.getOrder(), MAX_ACCEPTABLE_DELTA);
-  }
-
-  @Test
-  @SuppressWarnings("deprecation")
-  public void testAddLegacyBetweenWithTwoElements() {
-    c.addOrdered(m_ordered10);
-    c.addOrdered(m_ordered20);
-    Ordered o = new Ordered();
-    assertTrue(c.add(1, o));
-    assertEquals(15, o.getOrder(), MAX_ACCEPTABLE_DELTA);
-  }
-
-  @Test
-  @SuppressWarnings("deprecation")
-  public void testAddLegacyBetweenWithTrheeElements() {
-    c.addOrdered(m_ordered10);
-    c.addOrdered(m_ordered20);
-    c.addOrdered(m_ordered30);
-    Ordered o = new Ordered();
-    assertTrue(c.add(2, o));
-    assertEquals(25, o.getOrder(), MAX_ACCEPTABLE_DELTA);
-  }
-
-  @SuppressWarnings("deprecation")
-  @Test(expected = IllegalArgumentException.class)
-  public void testAddAllIndexLegacyNegativeIndex() {
-    c.addAll(-1, Collections.singleton(new Ordered()));
-  }
-
-  @SuppressWarnings("deprecation")
-  @Test(expected = IllegalArgumentException.class)
-  public void testAddAllIndexLegacyIndexOutOfBoundsEmptyCollection() {
-    c.addAll(1, Collections.singleton(new Ordered()));
-  }
-
-  @SuppressWarnings("deprecation")
-  @Test(expected = IllegalArgumentException.class)
-  public void testAddAllIndexLegacyIndexOutOfBounds() {
-    try {
-      c.addOrdered(m_ordered10);
-    }
-    catch (Throwable t) {
-      fail("expected to work");
-    }
-    c.addAll(2, Collections.singleton(new Ordered()));
-  }
-
-  @Test
-  @SuppressWarnings("deprecation")
-  public void testAddAllIndexLegacyNull() {
-    assertFalse(c.addAll(0, null));
-  }
-
-  @Test
-  @SuppressWarnings("deprecation")
-  public void testAddAllIndexLegacyFirst() {
-    c.addOrdered(m_ordered10);
-    Ordered o1 = new Ordered();
-    Ordered o2 = new Ordered();
-    assertTrue(c.addAll(0, Arrays.asList(o1, o2)));
-    assertEquals(-1990, o1.getOrder(), MAX_ACCEPTABLE_DELTA);
-    assertEquals(-990, o2.getOrder(), MAX_ACCEPTABLE_DELTA);
-  }
-
-  @Test
-  @SuppressWarnings("deprecation")
-  public void testAddAllIndexLegacyLast() {
-    c.addOrdered(m_ordered10);
-    Ordered o1 = new Ordered();
-    Ordered o2 = new Ordered();
-    assertTrue(c.addAll(1, Arrays.asList(o1, o2)));
-    assertEquals(1010, o1.getOrder(), MAX_ACCEPTABLE_DELTA);
-    assertEquals(2010, o2.getOrder(), MAX_ACCEPTABLE_DELTA);
-  }
-
-  @Test
-  @SuppressWarnings("deprecation")
-  public void testAddAllIndexLegacyBetweenWithTwoElements() {
-    c.addOrdered(m_ordered10);
-    c.addOrdered(m_ordered20);
-    Ordered o1 = new Ordered();
-    Ordered o2 = new Ordered();
-    assertTrue(c.addAll(1, Arrays.asList(o1, o2)));
-    assertEquals(10d + 1d * (10d / 3d), o1.getOrder(), MAX_ACCEPTABLE_DELTA);
-    assertEquals(10d + 2d * (10d / 3d), o2.getOrder(), MAX_ACCEPTABLE_DELTA);
-  }
-
-  @Test
-  @SuppressWarnings("deprecation")
-  public void testAddAllIndexLegacyBetweenWithTrheeElements() {
-    c.addOrdered(m_ordered10);
-    c.addOrdered(m_ordered20);
-    c.addOrdered(m_ordered30);
-    Ordered o1 = new Ordered();
-    Ordered o2 = new Ordered();
-    assertTrue(c.addAll(2, Arrays.asList(o1, o2)));
-    assertEquals(20d + 1d * (10d / 3d), o1.getOrder(), MAX_ACCEPTABLE_DELTA);
-    assertEquals(20d + 2d * (10d / 3d), o2.getOrder(), MAX_ACCEPTABLE_DELTA);
-  }
-
   @Test
   public void testAddAllOrdered() {
     assertFalse(c.addAllOrdered(null));
@@ -541,26 +395,6 @@ public class OrderedCollectionTest {
   public void testAddLastInEmptyCollection() {
     Ordered o = new Ordered();
     assertTrue(c.addLast(o));
-    assertEquals(OrderedCollection.DEFAULT_EMPTY_ORDER, o.getOrder(), MAX_ACCEPTABLE_DELTA);
-  }
-
-  @Test
-  @SuppressWarnings("deprecation")
-  public void testAddLegacy() {
-    assertFalse(c.add(null));
-    assertTrue(c.addOrdered(m_ordered10));
-    Ordered o = new Ordered();
-    assertTrue(c.add(o));
-    assertEquals(1010, o.getOrder(), MAX_ACCEPTABLE_DELTA);
-    assertTrue(c.add(m_ordered20));
-    assertEquals(2010, m_ordered20.getOrder(), MAX_ACCEPTABLE_DELTA);
-  }
-
-  @Test
-  @SuppressWarnings("deprecation")
-  public void testAddLegacyInEmptyCollection() {
-    Ordered o = new Ordered();
-    assertTrue(c.add(o));
     assertEquals(OrderedCollection.DEFAULT_EMPTY_ORDER, o.getOrder(), MAX_ACCEPTABLE_DELTA);
   }
 
@@ -761,38 +595,6 @@ public class OrderedCollectionTest {
     Ordered o1 = new Ordered();
     Ordered o2 = new Ordered();
     assertTrue(c.addAllLast(Arrays.asList(o1, o2)));
-    assertEquals(OrderedCollection.DEFAULT_EMPTY_ORDER, o1.getOrder(), MAX_ACCEPTABLE_DELTA);
-    assertEquals(OrderedCollection.DEFAULT_EMPTY_ORDER + IOrdered.DEFAULT_ORDER_STEP, o2.getOrder(), MAX_ACCEPTABLE_DELTA);
-  }
-
-  @Test
-  @SuppressWarnings("deprecation")
-  public void testAddAllLegacyNullOrEmptyOrNullElements() {
-    assertFalse(c.addAll(null));
-    assertFalse(c.addAll(Collections.<IOrdered> emptyList()));
-    assertFalse(c.addAll(Collections.<IOrdered> singleton(null)));
-    assertFalse(c.addAll(Arrays.<IOrdered> asList(null, null)));
-  }
-
-  @Test
-  @SuppressWarnings("deprecation")
-  public void testAddAllLegacyFirst() {
-    assertTrue(c.addOrdered(m_ordered10));
-    Ordered o1 = new Ordered();
-    Ordered o2 = new Ordered();
-    assertTrue(c.addAll(Arrays.asList(o1, o2)));
-    assertEquals(1010, o1.getOrder(), MAX_ACCEPTABLE_DELTA);
-    assertEquals(2010, o2.getOrder(), MAX_ACCEPTABLE_DELTA);
-    assertTrue(c.addAll(Collections.singleton(m_ordered20)));
-    assertEquals(3010, m_ordered20.getOrder(), MAX_ACCEPTABLE_DELTA);
-  }
-
-  @Test
-  @SuppressWarnings("deprecation")
-  public void testAddAllLegacyInEmptyCollection() {
-    Ordered o1 = new Ordered();
-    Ordered o2 = new Ordered();
-    assertTrue(c.addAll(Arrays.asList(o1, o2)));
     assertEquals(OrderedCollection.DEFAULT_EMPTY_ORDER, o1.getOrder(), MAX_ACCEPTABLE_DELTA);
     assertEquals(OrderedCollection.DEFAULT_EMPTY_ORDER + IOrdered.DEFAULT_ORDER_STEP, o2.getOrder(), MAX_ACCEPTABLE_DELTA);
   }
@@ -1105,52 +907,6 @@ public class OrderedCollectionTest {
     assertTrue(c.addOrdered(m_ordered20));
     assertTrue(c.addOrdered(m_ordered30));
     c.removeAt(1);
-    assertEquals(Arrays.asList(m_ordered10, m_ordered30), c.getOrderedList());
-  }
-
-  @SuppressWarnings("deprecation")
-  @Test(expected = IllegalArgumentException.class)
-  public void testRemoveLegacyNegativeIndex() {
-    c.remove(-1);
-  }
-
-  @SuppressWarnings("deprecation")
-  @Test(expected = IllegalArgumentException.class)
-  public void testRemoveLegacyIndexOutOfBounds() {
-    try {
-      assertTrue(c.addOrdered(m_ordered10));
-    }
-    catch (Exception e) {
-      fail("expected to work");
-    }
-    c.remove(1);
-  }
-
-  @Test
-  @SuppressWarnings("deprecation")
-  public void testRemoveLegacyFirst() {
-    assertTrue(c.addOrdered(m_ordered10));
-    assertTrue(c.addOrdered(m_ordered20));
-    c.remove(0);
-    assertEquals(Collections.singletonList(m_ordered20), c.getOrderedList());
-  }
-
-  @Test
-  @SuppressWarnings("deprecation")
-  public void testRemoveLegacyLast() {
-    assertTrue(c.addOrdered(m_ordered10));
-    assertTrue(c.addOrdered(m_ordered20));
-    c.remove(1);
-    assertEquals(Collections.singletonList(m_ordered10), c.getOrderedList());
-  }
-
-  @Test
-  @SuppressWarnings("deprecation")
-  public void testRemoveLegacyInBetween() {
-    assertTrue(c.addOrdered(m_ordered10));
-    assertTrue(c.addOrdered(m_ordered20));
-    assertTrue(c.addOrdered(m_ordered30));
-    c.remove(1);
     assertEquals(Arrays.asList(m_ordered10, m_ordered30), c.getOrderedList());
   }
 

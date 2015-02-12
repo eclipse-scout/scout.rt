@@ -15,7 +15,7 @@ import org.eclipse.scout.commons.EncryptionUtility2;
 /**
  * Uses 3 x 64 = 192 bit key DES
  *
- * @deprecated This class in insecure and should no longer be used. Will be removed in Scout 6.0. Use
+ * @deprecated This class in insecure and should no longer be used. Will be removed in Scout 7.0. Use
  *             {@link EncryptionUtility2} instead.
  */
 @Deprecated

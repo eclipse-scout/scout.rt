@@ -14,7 +14,6 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
@@ -29,8 +28,6 @@ import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.IOrdered;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.Replace;
-import org.eclipse.scout.commons.fixture.A;
-import org.eclipse.scout.commons.fixture.AbstractC;
 import org.junit.Test;
 
 /**
@@ -40,38 +37,6 @@ import org.junit.Test;
  */
 public class ConfigurationUtilityTest {
   private static final String TEST_CLASS_ID = "TEST_CLASS_ID";
-
-  @Test
-  @SuppressWarnings("deprecation")
-  public void getEnclosingContainerType() {
-    // null
-    assertNull(ConfigurationUtility.getEnclosingContainerType(null));
-    // objects
-    assertSame(A.class, ConfigurationUtility.getEnclosingContainerType(new A()));
-    assertSame(A.class, ConfigurationUtility.getEnclosingContainerType(new A().b));
-    assertSame(A.class, ConfigurationUtility.getEnclosingContainerType(new A().b.c1));
-    assertSame(AbstractC.class, ConfigurationUtility.getEnclosingContainerType(new A().b.c1.d));
-    assertSame(AbstractC.class, ConfigurationUtility.getEnclosingContainerType(new A().b.c1.d.e));
-    assertSame(A.class, ConfigurationUtility.getEnclosingContainerType(new A().b.c2));
-    assertSame(AbstractC.class, ConfigurationUtility.getEnclosingContainerType(new A().b.c2.d));
-    assertSame(AbstractC.class, ConfigurationUtility.getEnclosingContainerType(new A().b.c2.d.e));
-    // primitive values
-    assertSame(Integer.class, ConfigurationUtility.getEnclosingContainerType(42));
-    assertSame(Double.class, ConfigurationUtility.getEnclosingContainerType(42d));
-  }
-
-  @Test
-  @SuppressWarnings("deprecation")
-  public void getEnclosingContainerTypeAbstractInnerClasses() {
-    assertSame(ConfigurationUtilityTest.class, ConfigurationUtility.getEnclosingContainerType(new InnerA()));
-    assertSame(ConfigurationUtilityTest.class, ConfigurationUtility.getEnclosingContainerType(new InnerA().b));
-    assertSame(ConfigurationUtilityTest.class, ConfigurationUtility.getEnclosingContainerType(new InnerA().b.c1));
-    assertSame(AbstractInnerC.class, ConfigurationUtility.getEnclosingContainerType(new InnerA().b.c1.d));
-    assertSame(AbstractInnerC.class, ConfigurationUtility.getEnclosingContainerType(new InnerA().b.c1.d.e));
-    assertSame(ConfigurationUtilityTest.class, ConfigurationUtility.getEnclosingContainerType(new InnerA().b.c2));
-    assertSame(AbstractInnerC.class, ConfigurationUtility.getEnclosingContainerType(new InnerA().b.c2.d));
-    assertSame(AbstractInnerC.class, ConfigurationUtility.getEnclosingContainerType(new InnerA().b.c2.d.e));
-  }
 
   @Test(expected = NullPointerException.class)
   public void removeReplacedClassesNull() {

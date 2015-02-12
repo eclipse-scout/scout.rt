@@ -17,7 +17,6 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.text.Collator;
-import java.text.DecimalFormat;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Locale;
@@ -551,10 +550,10 @@ public final class StringUtility {
     while (startPos < text.length() && (a = getStartTag(text, tagName, startPos)).begin >= 0 && (b = text.indexOf("</" + tagName + ">", a.end)) > 0) {
       text =
           text.substring(0, a.begin) +
-              start +
-              text.substring(a.end, b) +
-              end +
-              text.substring(b + tagName.length() + 3);
+          start +
+          text.substring(a.end, b) +
+          end +
+          text.substring(b + tagName.length() + 3);
       //next
       startPos = a.begin + start.length();
     }
@@ -958,15 +957,6 @@ public final class StringUtility {
   }
 
   /**
-   * @deprecated Use {@link #notEqualsIgnoreCase(String, String)} instead. Will be removed in the
-   *             N-Release.
-   */
-  @Deprecated
-  public static boolean notEequalsIgnoreCase(String a, String b) {
-    return notEqualsIgnoreCase(a, b);
-  }
-
-  /**
    * Compares two Strings, ignoring case considerations.
    * Uses the method <code>java.lang.String.equalsIgnoreCase()</code>.
    * Null strings are converted to zero length strings before comparison.
@@ -1189,7 +1179,7 @@ public final class StringUtility {
             "(?<=[^A-Z])(?=[A-Z])",
             "(?<=[A-Za-z])(?=[^A-Za-z])"
             ),
-        " "
+            " "
         );
   }
 
@@ -1779,65 +1769,5 @@ public final class StringUtility {
   public static String substituteWhenEmpty(Object value, String valueWhenEmpty) {
     String stringValue = nvl(value, null);
     return hasText(stringValue) ? stringValue : valueWhenEmpty;
-  }
-
-  /**
-   * Checks whether the given string modification still fulfills the given {@link DecimalFormat} max length constraints.
-   *
-   * @param format
-   *          The {@link DecimalFormat} holding the constraints: {@link DecimalFormat#getMaximumIntegerDigits()},
-   *          {@link DecimalFormat#getMaximumFractionDigits()}.
-   * @param curText
-   *          The current text (before the modification).
-   * @param offset
-   *          The offset of the modification relative to the curText parameter.
-   * @param replaceLen
-   *          How many characters that will be replaced starting at the given offset.
-   * @param insertText
-   *          The new text that should be inserted at the given replace range.
-   * @return <code>true</code> if the given {@link DecimalFormat} length constraints are still fulfilled after the
-   *         string modification has been applied or if the resulting string is no valid number. <code>false</code>
-   *         otherwise.
-   * @deprecated use {@link AbstractNumberField#isWithinNumberFormatLimits(DecimalFormat, String, int, int, String)}
-   *             instead.
-   *             Will be removed in the N-Release
-   */
-  @Deprecated
-  public static boolean isWithinNumberFormatLimits(DecimalFormat format, String curText, int offset, int replaceLen, String insertText) {
-    // !! IMPORTANT NOTE: There is also a JavaScript implementation of this method: org/eclipse/scout/rt/ui/rap/form/fields/numberfield/RwtScoutNumberField.js
-    // When changing this implementation also consider updating the js version!
-    if (insertText == null || insertText.length() < 1) {
-      return true;
-    }
-
-    String futureText = null;
-    if (curText == null) {
-      futureText = insertText;
-    }
-    else {
-      StringBuilder docTxt = new StringBuilder(curText.length() + insertText.length());
-      docTxt.append(curText);
-      docTxt.replace(offset, offset + replaceLen, insertText);
-      futureText = docTxt.toString();
-    }
-
-    Pattern pat = Pattern.compile("[^1-9" + format.getDecimalFormatSymbols().getZeroDigit() + "]");
-    String decimalSeparator = String.valueOf(format.getDecimalFormatSymbols().getDecimalSeparator());
-    String[] parts = futureText.split(Pattern.quote(decimalSeparator));
-    if (parts.length >= 1) {
-      String intPartDigits = pat.matcher(parts[0]).replaceAll("");
-      boolean intPartValid = StringUtility.length(intPartDigits) <= format.getMaximumIntegerDigits();
-      if (!intPartValid) {
-        return false;
-      }
-    }
-    if (parts.length == 2) {
-      String fracPartDigits = pat.matcher(parts[1]).replaceAll("");
-      boolean fracPartValid = StringUtility.length(fracPartDigits) <= format.getMaximumFractionDigits();
-      if (!fracPartValid) {
-        return false;
-      }
-    }
-    return true;
   }
 }

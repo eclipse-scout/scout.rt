@@ -299,8 +299,6 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdere
    * @return Returns the list of fields that are enclosing this field, starting with the furthermost (from outside to
    *         inside). An enclosing field is part of the enclosing classes path that is abstract or the outermost
    *         enclosing class. The latter is the primary type.
-   * @see org.eclipse.scout.commons.ConfigurationUtility#getEnclosingContainerType(Object)
-   *      ConfigurationUtility#getEnclosingContainerType(Object)
    * @since 3.8.1
    */
   List<ICompositeField> getEnclosingFieldList();

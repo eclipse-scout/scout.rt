@@ -361,14 +361,6 @@ public final class CollectionUtility {
     return set;
   }
 
-  /**
-   * @deprecated Will be removed in Scout 5.0. Use {@link #arrayList(Collection)} instead.
-   */
-  @Deprecated
-  public static <T> List<T> copyList(Collection<T> c) {
-    return arrayList(c);
-  }
-
   @SuppressWarnings("unchecked")
   public static <T> T[] toArray(Collection<T> c, Class<T> clazz) {
     if (c == null || c.size() == 0) {
@@ -378,22 +370,6 @@ public final class CollectionUtility {
     else {
       T[] a = (T[]) java.lang.reflect.Array.newInstance(clazz, c.size());
       return c.toArray(a);
-    }
-  }
-
-  /**
-   * @deprecated Will be removed in Scout 5.0. Use {@link CollectionUtility#arrayList(Collection)} instead.
-   */
-  @Deprecated
-  public static <T> List<T> toList(Collection<T> c) {
-    if (c == null) {
-      return null;
-    }
-    else if (c instanceof List) {
-      return (List<T>) c;
-    }
-    else {
-      return new ArrayList<T>(c);
     }
   }
 
@@ -547,15 +523,6 @@ public final class CollectionUtility {
     return targetMap;
   }
 
-  /**
-   * @deprecated Will be removed in Scout 5.0. Use {@link #emptyHashMap()} to obtain an empty map, or
-   *             {@link #copyMap(Map)} to create a copy of an existing map.
-   */
-  @Deprecated
-  public static <T, U> Map<T, U> getEmptyMap(Map<T, U> m) {
-    return new HashMap<T, U>();
-  }
-
   /*
    * Sort Map handling
    */
@@ -616,14 +583,6 @@ public final class CollectionUtility {
     }
     targetMap.putAll(sourceMap);
     return targetMap;
-  }
-
-  /**
-   * @deprecated Will be removed in Scout 5.0. Use {@link #copySortedMap(SortedMap)} if required.
-   */
-  @Deprecated
-  public static <T, U> SortedMap<T, U> getEmptySortedMap(SortedMap<T, U> m) {
-    return new TreeMap<T, U>();
   }
 
   /**

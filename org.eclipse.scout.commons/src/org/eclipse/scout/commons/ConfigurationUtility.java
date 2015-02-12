@@ -228,23 +228,6 @@ public final class ConfigurationUtility {
   }
 
   /**
-   * @return Returns the given objects enclosing container type, i.e the first class on the enclosing classes path that
-   *         is abstract or the outermost enclosing class. The latter is the primary type.
-   * @deprecated method will be removed in N-Release
-   */
-  @Deprecated
-  public static Class<?> getEnclosingContainerType(Object o) {
-    if (o == null) {
-      return null;
-    }
-    Class<?> c = o.getClass();
-    while (!Modifier.isAbstract(c.getModifiers()) && c.getEnclosingClass() != null) {
-      c = c.getEnclosingClass();
-    }
-    return c;
-  }
-
-  /**
    * Returns a new array without those classes, that are replaced by another class. The returned array is a new
    * instance, except there are no replacing classes. Replacing classes are annotated with {@link Replace}. Replacing
    * classes are reordered according to their nearest {@link Order} annotation that is found up the type hierarchy.

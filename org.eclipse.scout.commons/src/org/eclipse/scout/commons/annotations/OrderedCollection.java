@@ -25,8 +25,7 @@ import org.eclipse.scout.commons.CollectionUtility;
 
 /**
  * Instances of this class hold references on {@link IOrdered} objects. It provides a subset of methods available on the
- * {@link List} interface. However they are all marked deprecated and should be replaced by a semantic clearer version.
- * See java doc of deprecated methods for details.
+ * {@link List} interface.
  *
  * @since 4.2
  */
@@ -123,46 +122,6 @@ public class OrderedCollection<ORDERED extends IOrdered> implements Iterable<ORD
 
   public void clear() {
     m_orderedObjects.clear();
-  }
-
-  /**
-   * @deprecated use {@link #addLast(IOrdered)} instead. Will be removed in N release.
-   */
-  @Deprecated
-  public boolean add(ORDERED e) {
-    return addLast(e);
-  }
-
-  /**
-   * @deprecated use {@link #addAllLast(Collection)} instead. Will be removed in N release.
-   */
-  @Deprecated
-  public boolean addAll(Collection<? extends ORDERED> c) {
-    return addAllLast(c);
-  }
-
-  /**
-   * @deprecated use {@link #addAt(IOrdered, int)} instead. Will be removed in N release.
-   */
-  @Deprecated
-  public boolean add(int index, ORDERED o) {
-    return addAt(o, index);
-  }
-
-  /**
-   * @deprecated use {@link #addAllAt(Collection, int)} instead. Will be removed in N release.
-   */
-  @Deprecated
-  public boolean addAll(int index, Collection<? extends ORDERED> c) {
-    return addAllAt(c, index);
-  }
-
-  /**
-   * @deprecated use {@link #removeAt(int)} instead. Will be removed in N release.
-   */
-  @Deprecated
-  public ORDERED remove(int index) {
-    return removeAt(index);
   }
 
   public ORDERED get(int index) {
