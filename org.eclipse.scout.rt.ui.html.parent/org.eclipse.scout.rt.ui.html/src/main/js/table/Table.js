@@ -835,10 +835,10 @@ scout.Table.prototype._appendSumRow = function(sum, groupColumn, row, all) {
 };
 
 scout.Table.prototype.removeGrouping = function() {
-  this.group('', '', true);
+  this.group('', true);
 };
 
-scout.Table.prototype.group = function(column, all, remove) {
+scout.Table.prototype.group = function(column, remove) {
   this.grouped = false;
   for (var i = 0; i < this.columns.length; i++) {
     this.columns[i].grouped = false;
@@ -849,7 +849,7 @@ scout.Table.prototype.group = function(column, all, remove) {
     return;
   }
 
-  if (all) {
+  if (!column) {
     this.grouped = true;
     this._group();
   } else {
@@ -1138,7 +1138,6 @@ scout.Table.prototype.filter = function() {
 
   // TODO BSH Table Selection | Selection should be preserved if possible
   that.clearSelection();
-  // TODO BSH Table Sum | See also _group(), this does not seem to be too good
   this.$sumRows().hide();
 
   // Filter rows

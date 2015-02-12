@@ -513,8 +513,8 @@ describe("Table", function() {
     it("sends rowsSorted event when client side sorting is possible", function() {
       prepareTable();
       render(table);
-      spyOn(scout.device, "supportsInternationalization").and.returnValue(true);
       // Make sure sorting is not executed because it does not work with phantomJS
+      spyOn(scout.device, "supportsInternationalization").and.returnValue(true);
       spyOn(table, "_sort").and.returnValue(true);
 
       table.sort(column0, 'desc');
@@ -555,6 +555,11 @@ describe("Table", function() {
     it("regroups the data if group by column is active", function() {
       prepareTable();
       render(table);
+
+      // Make sure sorting is not executed because it does not work with phantomJS
+      spyOn(scout.device, "supportsInternationalization").and.returnValue(true);
+      spyOn(table, "_sort").and.returnValue(true);
+
       spyOn(table, '_group');
 
       column0.grouped = true;
@@ -647,7 +652,7 @@ describe("Table", function() {
       render(table);
 
       expect(table.$sumRows().length).toBe(0);
-      table.group(column0);
+      table.group();
       expect(table.$sumRows().length).toBe(1);
     });
 
@@ -657,7 +662,7 @@ describe("Table", function() {
 
       expect(table.$sumRows().length).toBe(0);
       table.hideRow(table.$rows().eq(2));
-      table.group(column0, true);
+      table.group();
       expect(table.$sumRows().length).toBe(1);
     });
 
@@ -668,7 +673,7 @@ describe("Table", function() {
       rows[2].cells[1].value = 3;
       render(table);
 
-      table.group(column0);
+      table.group();
       var $sumCell = table.$sumRows().eq(0).children().eq(1);
       expect($sumCell.text()).toBe('6');
     });
@@ -681,7 +686,7 @@ describe("Table", function() {
       render(table);
 
       table.hideRow(table.$rows().eq(2));
-      table.group(column0);
+      table.group();
       var $sumCell = table.$sumRows().eq(0).children().eq(1);
       expect($sumCell.text()).toBe('3');
     });
@@ -694,7 +699,7 @@ describe("Table", function() {
       render(table);
       column1.format = '#.00';
 
-      table.group(column0);
+      table.group();
       var $sumCell = table.$sumRows().eq(0).children().eq(1);
       expect($sumCell.text()).toBe('4000.00');
     });

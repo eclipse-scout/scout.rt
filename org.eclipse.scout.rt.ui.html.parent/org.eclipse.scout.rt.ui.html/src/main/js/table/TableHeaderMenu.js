@@ -293,18 +293,18 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
   }
 
   function groupAll() {
-    doGroup($(this), true);
+    doGroup($(this));
   }
 
   function groupSort() {
-    doGroup($(this), false);
+    doGroup($(this), $header.data('column'));
   }
 
-  function doGroup($command, all) {
+  function doGroup($command, column) {
     if ($command.isSelected()) {
       table.removeGrouping();
     } else {
-      table.group($header.data('column'), all);
+      table.group(column);
     }
 
     sortSelect();
