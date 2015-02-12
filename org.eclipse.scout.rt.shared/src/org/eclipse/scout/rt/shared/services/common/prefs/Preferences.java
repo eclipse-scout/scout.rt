@@ -167,7 +167,7 @@ public class Preferences implements IPreferences {
         result = Integer.parseInt(value);
       }
       catch (NumberFormatException e) {
-        // Ignoring exception causes specified default to be returned
+        LOG.warn("Invalid int-value for property '{}' configured: {}", key, value);
       }
     }
     return result;
@@ -187,7 +187,7 @@ public class Preferences implements IPreferences {
         result = Long.parseLong(value);
       }
       catch (NumberFormatException e) {
-        // Ignoring exception causes specified default to be returned
+        LOG.warn("Invalid long-value for property '{}' configured: {}", key, value);
       }
     }
     return result;
@@ -227,7 +227,7 @@ public class Preferences implements IPreferences {
         result = Float.parseFloat(value);
       }
       catch (NumberFormatException e) {
-        // Ignoring exception causes specified default to be returned
+        LOG.warn("Invalid float-value for property '{}' configured: {}", key, value);
       }
     }
     return result;
@@ -247,7 +247,7 @@ public class Preferences implements IPreferences {
         result = Double.parseDouble(value);
       }
       catch (NumberFormatException e) {
-        // Ignoring exception causes specified default to be returned
+        LOG.warn("Invalid double-value for property '{}' configured: {}", key, value);
       }
     }
     return result;
