@@ -13,7 +13,6 @@ package org.eclipse.scout.commons.logger;
 import java.io.File;
 import java.util.logging.Logger;
 
-import org.eclipse.core.runtime.ILog;
 import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.internal.java.JavaScoutLogManager;
@@ -21,9 +20,9 @@ import org.eclipse.scout.commons.logger.internal.java.JavaScoutLogManager;
 /**
  * The default factory to create {@link IScoutLogger} objects.
  * <p>
- * This factory creates transparent wrappers of JUL logger {@link Logger} and Eclipse logger {@link ILog}, see
- * {@link IScoutLogger} for more details.</br> Set the system (or config.ini) property
- * <code>org.eclipse.scout.log</code> to define a logging strategy. Valid values are:
+ * This factory creates transparent wrappers of JUL logger {@link Logger} see {@link IScoutLogger} for more
+ * details.</br> Set the system (or config.ini) property <code>org.eclipse.scout.log</code> to define a logging
+ * strategy. Valid values are:
  * <table border="1">
  * <tr>
  * <td><strong>System (or config.ini) property</strong></td>

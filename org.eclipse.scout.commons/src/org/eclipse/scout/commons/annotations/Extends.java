@@ -15,17 +15,15 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.eclipse.core.runtime.IExtension;
-import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.scout.commons.ClassIdentifier;
 
 /**
- * Annotation to declare the owner of an {@link IExtension} or contribution.<br>
- * This annotation is used by the {@link IExtensionRegistry} service to automatically calculate the owner of
- * {@link IExtension}s or contributions.
- * Furthermore it is used by the Scout SDK to automatically create DTOs for contributions.
+ * Annotation to declare the owner of an <code>org.eclipse.scout.rt.shared.extension.IExtension<OWNER></code> or
+ * contribution.<br>
+ * This annotation is used by the <code>org.eclipse.scout.rt.shared.extension.IExtensionRegistry</code> service to
+ * automatically calculate the owner of extensions or contributions. Furthermore it is used by the Scout SDK to
+ * automatically create DTOs for contributions.
  *
- * @see IExtensionRegistry
  * @since 4.2
  */
 @Retention(RetentionPolicy.RUNTIME)
@@ -34,7 +32,7 @@ public @interface Extends {
 
   /**
    * Describes the object that is extended. In other words: the owner of the extension or contribution.
-   * 
+   *
    * @return The owner class.
    */
   Class<?> value();
