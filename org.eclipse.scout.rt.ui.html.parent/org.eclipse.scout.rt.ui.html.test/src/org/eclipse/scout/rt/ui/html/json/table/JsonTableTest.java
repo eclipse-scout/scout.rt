@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.ui.html.json.table;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -26,9 +27,11 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.HeaderCell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
+import org.eclipse.scout.rt.client.ui.basic.table.ITableRowFilter;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
+import org.eclipse.scout.rt.ui.html.json.JsonException;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.fixtures.JsonSessionMock;
 import org.eclipse.scout.rt.ui.html.json.table.fixtures.Table;
@@ -313,6 +316,31 @@ public class JsonTableTest {
     m_jsonSession = null;
     object = null;
     JsonTestUtility.assertGC(ref);
+  }
+
+  @Test(expected = JsonException.class)
+  public void testRowFilter() throws ProcessingException, JSONException {
+    TableWith3Cols table = new TableWith3Cols();
+
+    table.fill(2);
+    table.initTable();
+
+    JsonTable<ITable> jsonTable = m_jsonSession.createJsonAdapter(table, null);
+    ITableRow row = table.getRow(0);
+
+    String row0Id = jsonTable.getOrCreatedRowId(row);
+    assertNotNull(row0Id);
+    assertNotNull(jsonTable.getTableRowForRowId(row0Id));
+
+    table.addRowFilter(new ITableRowFilter() {
+
+      @Override
+      public boolean accept(ITableRow r) {
+        return r.getRowIndex() == 0;
+      }
+    });
+
+    assertNull(jsonTable.getTableRowForRowId(row0Id));
   }
 
   public static Table createTableFixture(int numRows) throws ProcessingException {

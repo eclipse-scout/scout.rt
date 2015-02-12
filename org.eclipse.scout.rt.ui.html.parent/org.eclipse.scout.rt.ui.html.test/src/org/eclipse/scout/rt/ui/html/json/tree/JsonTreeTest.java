@@ -23,6 +23,7 @@ import java.util.List;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
+import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNodeFilter;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeVisitor;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
@@ -256,6 +257,34 @@ public class JsonTreeTest {
     assertNotNull(jsonTree.getNode(node0Id));
 
     tree.removeNode(nodes.get(0));
+
+    assertNull(jsonTree.getNodeId(nodes.get(0)));
+    assertNull(jsonTree.getNode(node0Id));
+  }
+
+  @Test
+  public void testNodeFilter() throws ProcessingException, JSONException {
+    TreeNode nodeToFilter = new TreeNode();
+    nodeToFilter.setEnabled(false);
+    List<ITreeNode> nodes = new ArrayList<ITreeNode>();
+    nodes.add(nodeToFilter);
+    nodes.add(new TreeNode());
+    nodes.add(new TreeNode());
+    nodes.add(new TreeNode());
+    ITree tree = createTree(nodes);
+    JsonTree<ITree> jsonTree = m_jsonSession.createJsonAdapter(tree, null);
+
+    String node0Id = jsonTree.getOrCreateNodeId(nodes.get(0));
+    assertNotNull(node0Id);
+    assertNotNull(jsonTree.getNode(node0Id));
+
+    tree.addNodeFilter(new ITreeNodeFilter() {
+
+      @Override
+      public boolean accept(ITreeNode node, int level) {
+        return node.isEnabled();
+      }
+    });
 
     assertNull(jsonTree.getNodeId(nodes.get(0)));
     assertNull(jsonTree.getNode(node0Id));
