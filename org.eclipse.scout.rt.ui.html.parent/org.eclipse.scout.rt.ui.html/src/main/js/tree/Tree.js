@@ -537,16 +537,6 @@ scout.Tree.prototype._onNodesChecked = function(nodes) {
   }
 };
 
-scout.Tree.prototype._onNodeFilterChanged = function(nodes) {
-  this.nodes = nodes;
-  $('.tree-item', this.$data).remove();
-  this._visitNodes(this.nodes, this._initTreeNode.bind(this));
-  this._addNodes(this.nodes);
-  if (this.selectedNodeIds.length > 0) {
-    this._renderSelection();
-  }
-};
-
 scout.Tree.prototype._onChildNodeOrderChanged = function(parentNodeId, childNodeIds) {
   var i,
     parentNode = this.nodesMap[parentNodeId],
@@ -975,8 +965,6 @@ scout.Tree.prototype.onModelAction = function(event) {
     this._onNodeChanged(event.nodeId, event);
   } else if (event.type === 'nodesChecked') {
     this._onNodesChecked(event.nodes);
-  } else if (event.type === 'nodeFilterChanged') {
-    this._onNodeFilterChanged(event.nodes, event.selectedNodeIds);
   } else if (event.type === 'childNodeOrderChanged') {
     this._onChildNodeOrderChanged(event.parentNodeId, event.childNodeIds);
   } else {

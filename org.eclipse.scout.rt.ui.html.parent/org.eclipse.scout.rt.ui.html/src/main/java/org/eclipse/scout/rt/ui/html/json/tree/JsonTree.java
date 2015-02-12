@@ -39,7 +39,6 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   public static final String EVENT_NODE_ACTION = "nodeAction";
   public static final String EVENT_NODE_EXPANDED = "nodeExpanded";
   public static final String EVENT_NODE_CHANGED = "nodeChanged";
-  public static final String EVENT_NODE_FILTER_CHANGED = "nodeFilterChanged";
   public static final String EVENT_CHILD_NODE_ORDER_CHANGED = "childNodeOrderChanged";
   public static final String EVENT_NODES_CHECKED = "nodesChecked";
 
@@ -330,6 +329,8 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   }
 
   protected void handleModelNodeFilterChanged() {
+    disposeNodes(getModel().isRootNodeVisible() ? CollectionUtility.arrayList(getModel().getRootNode()) : getModel().getRootNode().getChildNodes());
+    addActionEvent(EVENT_ALL_NODES_DELETED, new JSONObject());
     JSONObject jsonEvent = new JSONObject();
     JSONArray jsonNodes = new JSONArray();
     if (getModel().isRootNodeVisible()) {
@@ -344,7 +345,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     putProperty(jsonEvent, PROP_NODES, jsonNodes);
     putProperty(jsonEvent, PROP_SELECTED_NODE_IDS, nodeIdsToJson(getModel().getSelectedNodes()));
 
-    addActionEvent(EVENT_NODE_FILTER_CHANGED, jsonEvent);
+    addActionEvent(EVENT_NODES_INSERTED, jsonEvent);
   }
 
   protected void handleModelChildNodeOrderChanged(TreeEvent event) {
