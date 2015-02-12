@@ -646,9 +646,6 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
       JSONObject jsonRow = tableRowToJson(row);
       jsonRows.put(jsonRow);
     }
-    if (jsonRows.length() == 0) {
-      return;
-    }
     JSONObject jsonEvent = new JSONObject();
     putProperty(jsonEvent, PROP_ROWS, jsonRows);
     addActionEvent(EVENT_ROW_FILTER_CHANGED, jsonEvent);

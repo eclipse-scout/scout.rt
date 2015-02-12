@@ -27,39 +27,6 @@ scout.ListBox.prototype._render = function($parent) {
   this.addStatus();
 };
 
-scout.ListBox.prototype._renderFilterCheckedRowsValue = function(){
-  //TODO nbu add listener to table for rows checked
-  var rows = this.table.rows,
-  i = 0;
-  for(i = 0; i < rows.length; i++){
-    if(!rows[i].checked && this.filterCheckedRowsValue){
-      rows[i].$row.hide();
-    }
-    else{
-      rows[i].$row.show();
-    }
-  }
-  this.table.updateScrollbar();
-};
-
-scout.ListBox.prototype._renderFilterActiveRowsValue = function(){
-  //TODO nbu add listener to table for rows enabled
-  var rows = this.table.rows,
-  i = 0;
-  for(i = 0; i < rows.length; i++){
-    if(!rows[i].enabled && this.filterActiveRowsValue){
-      rows[i].$row.hide();
-    }
-    else if(rows[i].enabled && !this.filterActiveRowsValue){
-      rows[i].$row.hide();
-    }
-    else{
-      rows[i].$row.show();
-    }
-  }
-  this.table.updateScrollbar();
-};
-
 scout.ListBox.prototype._renderTable = function($fieldContainer) {
   this.table.render($fieldContainer);
   this.addField(this.table.$container, $fieldContainer);

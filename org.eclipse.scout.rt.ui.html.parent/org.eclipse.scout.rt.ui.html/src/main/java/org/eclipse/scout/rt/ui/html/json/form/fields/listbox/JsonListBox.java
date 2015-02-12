@@ -10,14 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form.fields.listbox;
 
-import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.form.fields.listbox.AbstractListBox;
 import org.eclipse.scout.rt.client.ui.form.fields.listbox.AbstractListBoxFilterBox;
 import org.eclipse.scout.rt.client.ui.form.fields.listbox.IListBox;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
-import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
 
@@ -30,7 +28,6 @@ public class JsonListBox<V, T extends IListBox<V>> extends JsonFormField<T> {
   @Override
   protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
-    //TODO nbu check update of table
     putJsonProperty(new JsonAdapterProperty<IListBox<V>>("table", model, getJsonSession()) {
       @Override
       protected ITable modelValue() {
@@ -46,20 +43,6 @@ public class JsonListBox<V, T extends IListBox<V>> extends JsonFormField<T> {
         }
       });
     }
-    //TODO NBU implement client side processing
-    putJsonProperty(new JsonProperty<IListBox<V>>(IListBox.PROP_FILTER_ACTIVE_ROWS_VALUE, model) {
-      @Override
-      protected TriState modelValue() {
-        return getModel().getFilterActiveRowsValue();
-      }
-    });
-    //TODO NBU implement client side processing
-    putJsonProperty(new JsonProperty<IListBox<V>>(IListBox.PROP_FILTER_CHECKED_ROWS_VALUE, model) {
-      @Override
-      protected Boolean modelValue() {
-        return getModel().getFilterCheckedRowsValue();
-      }
-    });
   }
 
   @Override
