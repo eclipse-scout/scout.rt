@@ -13,8 +13,6 @@ package org.eclipse.scout.rt.client.ui.form.fields.sequencebox.internal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
@@ -25,10 +23,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
  * Grid (model) layout of sequence box only visible process-buttons are used
  */
 public class SequenceBoxGrid {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SequenceBoxGrid.class);
-
   private ISequenceBox m_rangeBox = null;
-  private List<IFormField> m_fields;
   private int m_gridColumns;
   private int m_gridRows;
 

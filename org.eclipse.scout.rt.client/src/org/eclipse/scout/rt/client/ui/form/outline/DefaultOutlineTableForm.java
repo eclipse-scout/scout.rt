@@ -14,8 +14,6 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.ProcessingStatus;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
@@ -34,8 +32,6 @@ import org.eclipse.scout.rt.client.ui.form.outline.DefaultOutlineTableForm.MainB
  * Default form displaying the current page's table
  */
 public class DefaultOutlineTableForm extends AbstractForm implements IOutlineTableForm {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(DefaultOutlineTableForm.class);
-
   public DefaultOutlineTableForm() throws ProcessingException {
     super();
   }

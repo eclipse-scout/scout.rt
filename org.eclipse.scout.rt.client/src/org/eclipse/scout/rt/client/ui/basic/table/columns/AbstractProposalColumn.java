@@ -12,8 +12,6 @@ package org.eclipse.scout.rt.client.ui.basic.table.columns;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.IProposalColumnExtension;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -24,7 +22,6 @@ import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 
 public abstract class AbstractProposalColumn<LOOKUP_TYPE> extends AbstractContentAssistColumn<String, LOOKUP_TYPE> implements IProposalColumn<LOOKUP_TYPE> {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractProposalColumn.class);
 
   public AbstractProposalColumn() {
     super();

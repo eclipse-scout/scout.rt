@@ -15,16 +15,12 @@ import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICellObserver;
 
 public class VirtualTreeNode implements IVirtualTreeNode, ICellObserver {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(VirtualTreeNode.class);
-
   private ITree m_tree;
   private ITreeNode m_parentNode;
   private ITreeNode m_resolvedNode;

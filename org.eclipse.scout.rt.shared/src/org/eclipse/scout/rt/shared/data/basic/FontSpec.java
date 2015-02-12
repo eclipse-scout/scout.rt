@@ -12,12 +12,8 @@ package org.eclipse.scout.rt.shared.data.basic;
 
 import java.util.StringTokenizer;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
-
 public class FontSpec implements java.io.Serializable {
   private static final long serialVersionUID = 1L;
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(FontSpec.class);
   public static final int STYLE_PLAIN = 0x00;
   public static final int STYLE_BOLD = 0x01;
   public static final int STYLE_ITALIC = 0x02;

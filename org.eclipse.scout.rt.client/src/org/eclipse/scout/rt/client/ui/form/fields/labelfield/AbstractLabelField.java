@@ -14,15 +14,11 @@ import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.labelfield.ILabelFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
 
 @ClassId("7e531d93-ad27-4316-9529-7766059b3886")
 public abstract class AbstractLabelField extends AbstractValueField<String> implements ILabelField {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractLabelField.class);
-
   public AbstractLabelField() {
     this(true);
   }

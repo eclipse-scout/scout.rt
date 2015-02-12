@@ -23,7 +23,6 @@ public class ComposerEntityNodeData extends TreeNodeData {
 
   private String m_entityExternalId;
   private boolean m_negated = false;
-  private String m_alias;
 
   public ComposerEntityNodeData() {
   }

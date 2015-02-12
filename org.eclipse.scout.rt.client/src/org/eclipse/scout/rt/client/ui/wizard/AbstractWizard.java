@@ -1218,12 +1218,6 @@ public abstract class AbstractWizard extends AbstractPropertyObserver implements
     }
   }
 
-  private void assertOpen() throws ProcessingException {
-    if (isClosed()) {
-      throw new ProcessingException("wizard is closed");
-    }
-  }
-
   private void assertClosed() throws ProcessingException {
     if (!isClosed()) {
       throw new ProcessingException("wizard is already started");

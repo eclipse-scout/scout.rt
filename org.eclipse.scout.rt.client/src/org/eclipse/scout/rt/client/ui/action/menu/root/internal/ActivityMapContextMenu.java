@@ -14,8 +14,6 @@ import java.beans.PropertyChangeEvent;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -31,8 +29,6 @@ import org.eclipse.scout.service.SERVICES;
  * The invisible root menu node of any activity map. (internal usage only)
  */
 public class ActivityMapContextMenu extends AbstractPropertyObserverContextMenu<IActivityMap<?, ?>> implements IActivityMapContextMenu {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ActivityMapContextMenu.class);
-
   /**
    * @param owner
    */

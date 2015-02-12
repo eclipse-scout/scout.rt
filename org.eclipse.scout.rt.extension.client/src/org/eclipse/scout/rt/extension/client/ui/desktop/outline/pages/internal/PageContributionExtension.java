@@ -12,8 +12,6 @@ package org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.internal;
 
 import org.eclipse.scout.commons.BeanUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithNodes;
@@ -22,13 +20,10 @@ import org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.IPageExten
 /**
  * This class references a page and describes the places in the existing outline structure, where the referenced page is
  * added.
- * 
+ *
  * @since 3.9.0
  */
 public class PageContributionExtension extends AbstractPageExtension {
-
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(PageContributionExtension.class);
-
   private final Class<? extends IPage> m_pageClass;
   private final double m_order;
 
@@ -53,7 +48,7 @@ public class PageContributionExtension extends AbstractPageExtension {
   /**
    * Creates and returns a new page instance described by this page contribution. The contributed page must either
    * implement a constructor with the parent page or outline
-   * 
+   *
    * @param outline
    * @param parentPage
    * @return

@@ -26,8 +26,6 @@ import org.eclipse.scout.commons.annotations.IOrdered;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.OrderedComparator;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.extension.AbstractSerializableExtension;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
@@ -41,7 +39,6 @@ import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHa
 import org.eclipse.scout.service.SERVICES;
 
 public abstract class AbstractCode<T> implements ICode<T>, Serializable, IContributionOwner, IExtensibleObject {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractCode.class);
   private static final long serialVersionUID = 1L;
 
   private transient ICodeType<?, T> m_codeType;
@@ -214,16 +211,16 @@ public abstract class AbstractCode<T> implements ICode<T>, Serializable, IContri
           getConfiguredText(),
           getConfiguredIconId(),
           getConfiguredTooltipText() != null ? getConfiguredTooltipText() : null,
-              (getConfiguredBackgroundColor()),
-              (getConfiguredForegroundColor()),
-              FontSpec.parse(getConfiguredFont()),
-              getConfiguredEnabled(),
-              null,
-              getConfiguredActive(),
-              getConfiguredExtKey(),
-              getConfiguredValue(),
-              0,
-              calculateViewOrder()
+          (getConfiguredBackgroundColor()),
+          (getConfiguredForegroundColor()),
+          FontSpec.parse(getConfiguredFont()),
+          getConfiguredEnabled(),
+          null,
+          getConfiguredActive(),
+          getConfiguredExtKey(),
+          getConfiguredValue(),
+          0,
+          calculateViewOrder()
           ));
     }
     m_contributionHolder = new ContributionComposite(this);

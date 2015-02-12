@@ -12,8 +12,6 @@ package org.eclipse.scout.rt.client.ui.form.fields.groupbox.internal;
 
 import java.io.PrintStream;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
@@ -23,8 +21,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.internal.GridDataBuilder;
  * Grid Cell as container helper for dynamic layouting in scout
  */
 public class GridCell {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(GridCell.class);
-
   private IFormField m_field;
   private int m_gridColumnCount;
   private GridCell m_up, m_down, m_right;

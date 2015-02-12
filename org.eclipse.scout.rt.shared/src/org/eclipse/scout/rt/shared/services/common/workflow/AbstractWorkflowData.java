@@ -19,8 +19,6 @@ import java.util.List;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
 import org.eclipse.scout.rt.shared.extension.IContributionOwner;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
@@ -32,7 +30,6 @@ import org.eclipse.scout.service.SERVICES;
  * class are added as the initial set of workflow state datas.
  */
 public abstract class AbstractWorkflowData implements Serializable, IContributionOwner {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractWorkflowData.class);
   private static final long serialVersionUID = 1L;
 
   /*

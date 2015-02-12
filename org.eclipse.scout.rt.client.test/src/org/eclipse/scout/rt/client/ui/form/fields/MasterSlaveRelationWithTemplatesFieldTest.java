@@ -111,6 +111,7 @@ public class MasterSlaveRelationWithTemplatesFieldTest {
       }
     }
 
+    @Override
     public void start() throws ProcessingException {
       startInternal(new FormHandler());
     }
@@ -203,6 +204,7 @@ public class MasterSlaveRelationWithTemplatesFieldTest {
       }
     }
 
+    @Override
     public void start() throws ProcessingException {
       startInternal(new FormHandler());
     }

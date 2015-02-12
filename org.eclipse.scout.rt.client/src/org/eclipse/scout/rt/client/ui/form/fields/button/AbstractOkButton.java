@@ -46,4 +46,5 @@ public abstract class AbstractOkButton extends AbstractButton {
   protected int getConfiguredHorizontalAlignment() {
     return 1;
   }
+
 }

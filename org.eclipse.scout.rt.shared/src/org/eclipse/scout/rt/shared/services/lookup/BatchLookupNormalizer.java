@@ -16,8 +16,6 @@ import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 
 /**
  * Normalize batch lookup calls.
@@ -26,7 +24,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
  * Instances of this type are intended to be used on one-time per-call basis.
  * <p>
  * Typical code is
- * 
+ *
  * <pre>
  * LookupCall[] callArray=...;
  * BatchLookupNormalizer normalizer=new BatchLookupNormalizer();
@@ -36,8 +34,6 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
  * </pre>
  */
 public class BatchLookupNormalizer {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(BatchLookupNormalizer.class);
-
   private int m_originalLength;
   private int[] m_forwardMapping;
   private List<ILookupCall<?>> m_normalizedCalls;
@@ -48,7 +44,7 @@ public class BatchLookupNormalizer {
   /**
    * When two {@link LookupCall}s are {@link Object#equals(Object)} then the first one iq used, subsequent ones
    * reference the first ones directly.
-   * 
+   *
    * @return the reduced array only containing distinct calls with respect to {@link LookupCall#equals(Object)}
    */
   public List<ILookupCall<?>> normalizeCalls(List<ILookupCall<?>> calls) throws ProcessingException {

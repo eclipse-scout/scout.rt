@@ -9,9 +9,6 @@ import java.security.Permissions;
 import java.util.ArrayList;
 import java.util.Enumeration;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
-
 /**
  * Wrapper for {@link Permissions} that is serialize safe.
  * This is useful to transfer permission collections that may contain permissions not known by the consumer.
@@ -19,7 +16,6 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
  */
 public class LenientPermissionsWrapper implements Serializable {
   private static final long serialVersionUID = 1L;
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(LenientPermissionsWrapper.class);
 
   /*
    * do NOT change this field name, it is used as text in readObject and writeObject

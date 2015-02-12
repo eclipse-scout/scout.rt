@@ -19,8 +19,6 @@ import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.filechooserfield.IFileChooserFieldExtension;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.FileChooser;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
@@ -31,8 +29,6 @@ import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
 
 @ClassId("8d2818c2-5659-4c03-87ef-09441302fbdd")
 public abstract class AbstractFileChooserField extends AbstractValueField<String> implements IFileChooserField {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractFileChooserField.class);
-
   private File m_directory;
   private List<String> m_fileExtensions;
   private boolean m_typeLoad;

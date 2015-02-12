@@ -57,6 +57,7 @@ public class ExtendAbstractStringFieldTest extends AbstractLocalExtensionTestCas
       super();
     }
 
+    @Override
     public void start() throws ProcessingException {
       startInternal(new StartHandler());
     }

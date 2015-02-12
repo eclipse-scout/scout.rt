@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -17,8 +17,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.holders.Holder;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.services.common.progress.ISimpleProgress;
 import org.eclipse.scout.rt.client.services.common.progress.ISimpleProgressService;
 import org.eclipse.scout.service.AbstractService;
@@ -28,7 +26,6 @@ import org.eclipse.scout.service.AbstractService;
  */
 @Priority(-1)
 public class SimpleProgressService extends AbstractService implements ISimpleProgressService {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SimpleProgressService.class);
 
   public SimpleProgressService() {
   }

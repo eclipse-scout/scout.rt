@@ -17,8 +17,6 @@ import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ContentAssistColumnChains.ContentAssistColumnConvertValueToKeyChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ContentAssistColumnChains.ContentAssistColumnPrepareLookupChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.IContentAssistColumnExtension;
@@ -32,7 +30,6 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.service.SERVICES;
 
 public abstract class AbstractContentAssistColumn<VALUE, LOOKUP_TYPE> extends AbstractColumn<VALUE> implements IContentAssistColumn<VALUE, LOOKUP_TYPE> {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractContentAssistColumn.class);
 
   // DO NOT init members, this has the same effect as if they were set AFTER
   // initConfig()

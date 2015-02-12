@@ -15,16 +15,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 
 /**
  * Use the {@link TokenBasedSearchFilterService} on the client side to use this class
  */
 public class TokenBasedSearchFilter extends SearchFilter implements Cloneable {
   private static final long serialVersionUID = 0L;
-
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(TokenBasedSearchFilter.class);
 
   private ArrayList<ValueToken> m_valueTokens;
   private ArrayList<WildcardStringToken> m_wildcardStringTokens;

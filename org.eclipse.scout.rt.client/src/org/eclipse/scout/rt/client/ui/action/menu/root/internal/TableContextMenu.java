@@ -16,8 +16,6 @@ import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -35,8 +33,6 @@ import org.eclipse.scout.service.SERVICES;
  * The invisible root menu node of any table. (internal usage only)
  */
 public class TableContextMenu extends AbstractPropertyObserverContextMenu<ITable> implements ITableContextMenu {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(TableContextMenu.class);
-
   private List<? extends ITableRow> m_currentSelection;
 
   /**

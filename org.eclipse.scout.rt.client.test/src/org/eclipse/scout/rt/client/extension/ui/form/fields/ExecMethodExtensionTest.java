@@ -59,6 +59,7 @@ public class ExecMethodExtensionTest extends AbstractLocalExtensionTestCase {
       super();
     }
 
+    @Override
     public void start() throws ProcessingException {
       startInternal(new StartHandler());
     }

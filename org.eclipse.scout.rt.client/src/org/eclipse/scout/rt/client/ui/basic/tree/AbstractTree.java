@@ -83,7 +83,6 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   private final EventListenerList m_listenerList = new EventListenerList();
   private ITreeUIFacade m_uiFacade;
-  private List<IMenu> m_menus;
   private boolean m_initialized;
 
   // enabled is defined as: enabledGranted && enabledProperty && enabledSlave

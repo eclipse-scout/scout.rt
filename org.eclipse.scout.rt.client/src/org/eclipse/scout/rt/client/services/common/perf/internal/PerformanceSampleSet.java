@@ -4,18 +4,14 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.client.services.common.perf.internal;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 
 public class PerformanceSampleSet {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(PerformanceSampleSet.class);
-
   private Object m_samplesLock = new Object();
   private long[] m_samples;
   private int m_samplesLastIndex;

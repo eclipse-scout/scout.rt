@@ -20,8 +20,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.commons.job.JobEx;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientAsyncJob;
 import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.ClientSyncJob;
@@ -42,19 +40,13 @@ import org.eclipse.scout.service.SERVICES;
 
 /**
  * Non-public implementation of a client-side tunnel used to invoke a service through HTTP.
- * 
+ *
  * @author awe
  */
 public class InternalClientHttpServiceTunnel extends AbstractInternalHttpServiceTunnel<IClientSession> implements IClientServiceTunnel {
-
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(InternalClientHttpServiceTunnel.class);
-
   private ClientNotificationPollingJob m_pollingJob;
-
   private final Object m_pollingJobLock = new Object();
-
   private long m_pollInterval = -1L;
-
   private boolean m_analyzeNetworkLatency = true;
 
   public InternalClientHttpServiceTunnel(IClientSession session, URL url) {

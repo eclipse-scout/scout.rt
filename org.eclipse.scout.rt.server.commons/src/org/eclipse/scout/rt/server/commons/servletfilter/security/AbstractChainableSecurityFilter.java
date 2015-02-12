@@ -27,8 +27,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
 import org.eclipse.scout.rt.server.commons.servletfilter.FilterConfigInjection;
@@ -49,15 +47,14 @@ import org.eclipse.scout.service.SERVICES;
  * failover flag on the last security filter to false!</b>
  * <p>
  * Make sure to dectivate session persistence. In tomcat: in server.xml inside <Context> tag add
- * 
+ *
  * <pre>
  * &lt;Manager className="org.apache.catalina.session.StandardManager" pathname=""&gt; &lt;/Manager&gt;
  * </pre>
- * 
+ *
  * @since 1.0.3 06.02.2009
  */
 public abstract class AbstractChainableSecurityFilter implements Filter {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractChainableSecurityFilter.class);
   public static final String PROP_SUBJECT = Subject.class.getName();
 
   public static final int STATUS_CONTINUE_CHAIN = 1;
@@ -73,7 +70,7 @@ public abstract class AbstractChainableSecurityFilter implements Filter {
 
   /**
    * identifier for this filter.
-   * 
+   *
    * @rn aho, 4.6.09
    */
   protected String getFilterId() {
@@ -226,7 +223,7 @@ public abstract class AbstractChainableSecurityFilter implements Filter {
 
   /**
    * set the 'WWW-Authenticate' value on the response to enforce the client to provide login data.
-   * 
+   *
    * @param req
    * @param resp
    * @return

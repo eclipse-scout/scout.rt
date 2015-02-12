@@ -46,6 +46,7 @@ public class AddRemoveFieldsForm extends AbstractForm {
     return (MainBox) getRootGroupBox();
   }
 
+  @Override
   public void start() throws ProcessingException {
     startInternal(new AddRemoveFormHandler());
   }

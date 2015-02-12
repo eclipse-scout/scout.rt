@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
-import java.util.EventListener;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -31,8 +30,6 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.ProcessingStatus;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.job.JobEx;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.ContentAssistFieldChains.ContentAssistFieldBrowseNewChain;
@@ -73,8 +70,6 @@ import org.eclipse.scout.service.SERVICES;
  */
 @ScoutSdkIgnore
 public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends AbstractValueField<VALUE> implements IContentAssistField<VALUE, LOOKUP_KEY> {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractContentAssistField.class);
-
   public final ILookupRow<LOOKUP_KEY> EMPTY_LOOKUP_ROW = new LookupRow<LOOKUP_KEY>(null, "", null, null, null, null, null, true);
 
   private final EventListenerList m_listenerList = new EventListenerList();
@@ -85,7 +80,6 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
   // cached lookup row
   private P_ProposalFormListener m_proposalFormListener;
   private IContentAssistFieldProposalFormProvider<LOOKUP_KEY> m_proposalFormProvider;
-  private P_LookupRowFetcherPropertyListener m_lookupRowFetcherPropertyListener;
   private IContentAssistFieldLookupRowFetcher<LOOKUP_KEY> m_lookupRowFetcher;
   private int m_maxRowCount;
   private String m_browseNewText;
@@ -453,16 +447,6 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
   @Override
   public void removeSmartFieldListener(ContentAssistFieldListener listener) {
     m_listenerList.remove(ContentAssistFieldListener.class, listener);
-  }
-
-  // main handler
-  private void fireSmartFieldEvent(ContentAssistFieldEvent e) {
-    EventListener[] listeners = m_listenerList.getListeners(ContentAssistFieldListener.class);
-    if (listeners != null && listeners.length > 0) {
-      for (int i = 0; i < listeners.length; i++) {
-        ((ContentAssistFieldListener) listeners[i]).fieldChanged(e);
-      }
-    }
   }
 
   @Override

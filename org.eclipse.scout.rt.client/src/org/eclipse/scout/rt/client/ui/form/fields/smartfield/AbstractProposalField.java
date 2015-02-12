@@ -17,8 +17,6 @@ import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.smartfield.IProposalFieldExtension;
 import org.eclipse.scout.rt.client.ui.form.fields.ParsingFailedStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
@@ -33,7 +31,6 @@ import org.eclipse.scout.service.SERVICES;
  * {@link String}. The proposals are delivered as lookup rows of any type.
  */
 public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentAssistField<String, LOOKUP_KEY> implements IProposalField<LOOKUP_KEY> {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractProposalField.class);
   private P_UIFacade m_uiFacade;
 
   public AbstractProposalField() {

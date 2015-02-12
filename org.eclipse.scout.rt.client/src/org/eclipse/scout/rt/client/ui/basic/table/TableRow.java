@@ -15,8 +15,6 @@ import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
@@ -24,7 +22,6 @@ import org.eclipse.scout.rt.client.ui.profiler.DesktopProfiler;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 
 public class TableRow implements ITableRow {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(TableRow.class);
 
   private final ColumnSet m_columnSet;
   private int m_status = STATUS_NON_CHANGED;

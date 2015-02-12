@@ -15,16 +15,11 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 
 /**
  * @since 3.9.0
  */
 public final class ExtensionUtility {
-
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ExtensionUtility.class);
-
   private ExtensionUtility() {
   }
 
@@ -32,7 +27,7 @@ public final class ExtensionUtility {
    * Removes all objects from the given list that are exact instance of the java types provided. An object <em>o</em> is
    * an exact instance of a class <em>C</em>, iff <code>o.getClass() == C</code>. i.e. instances of sub classes of
    * <em>C</em> are not exact instances of <em>C</em>.
-   * 
+   *
    * @param objectList
    *          the list of classes to remove types from. The list is modified in general.
    * @param types
@@ -54,7 +49,7 @@ public final class ExtensionUtility {
   /**
    * Computes the enclosing object for the given object. The enclosing object is the corresponding to
    * {@link Class#getEnclosingClass()}, but for instances.
-   * 
+   *
    * @param o
    *          the object to get the enclosing object for
    * @return the enclosing object or <code>null</code> if the given object is <code>null</code>, if it is a primary
@@ -82,7 +77,7 @@ public final class ExtensionUtility {
 
   /**
    * Computes the first enclosing object on the given object's enclosing object path that implements the given type.
-   * 
+   *
    * @param o
    *          the object to get the enclosing object for
    * @param type

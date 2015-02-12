@@ -16,8 +16,6 @@ import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.TTLCache;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.shared.services.common.security.IAccessControlService;
 import org.eclipse.scout.service.SERVICES;
 
@@ -36,8 +34,6 @@ import org.eclipse.scout.service.SERVICES;
  * @since 4.3.0 (Mars-M5)
  */
 public class AccessControlStore {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AccessControlStore.class);
-
   /**
    * the internal store, the {@link String} used as key is always lower case
    */

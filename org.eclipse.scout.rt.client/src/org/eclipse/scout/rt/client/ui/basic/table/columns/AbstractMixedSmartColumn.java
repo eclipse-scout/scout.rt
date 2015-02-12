@@ -20,8 +20,6 @@ import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.IMixedSmartColumnExtension;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.MixedSmartColumnChains.MixedSmartColumnConvertKeyToValueChain;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -38,9 +36,6 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.service.SERVICES;
 
 public abstract class AbstractMixedSmartColumn<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE> extends AbstractContentAssistColumn<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE> implements IMixedSmartColumn<VALUE_TYPE, LOOKUP_CALL_KEY_TYPE>, IContributionOwner {
-
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractMixedSmartColumn.class);
-
   private boolean m_sortCodesByDisplayText;
   private IContributionOwner m_contributionHolder;
 

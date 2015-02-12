@@ -107,7 +107,6 @@ public class ProposalFieldParseValueTest {
       return null;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public List<? extends ILookupRow<Long>> getDataByText(ILookupCall<Long> call) throws ProcessingException {
       if ("a*".equals(call.getText())) {

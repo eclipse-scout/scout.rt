@@ -21,8 +21,6 @@ import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.holders.IHolder;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -36,8 +34,6 @@ import org.eclipse.scout.service.SERVICES;
  * base implementation of {@link IDesktopExtension}
  */
 public abstract class AbstractDesktopExtension implements IDesktopExtension {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractDesktopExtension.class);
-
   private IDesktop m_coreDesktop;
 
   public AbstractDesktopExtension() {

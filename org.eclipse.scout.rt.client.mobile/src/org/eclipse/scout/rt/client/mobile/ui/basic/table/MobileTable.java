@@ -22,8 +22,6 @@ import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.columns.AbstractRowSummaryColumn;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.columns.IRowSummaryColumn;
 import org.eclipse.scout.rt.client.ui.MouseButton;
@@ -43,11 +41,10 @@ import org.eclipse.scout.service.SERVICES;
  * A table optimized for mobile devices which wraps another table.
  * <p>
  * It consists of a content column which displays the relevant information of the original table.
- * 
+ *
  * @since 3.9.0
  */
 public class MobileTable extends AbstractMobileTable implements IMobileTable {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(MobileTable.class);
   private static final int ROW_HEIGHT = 18;
   private int m_maxCellDetailColumns;
   private OptimisticLock m_selectionLock;

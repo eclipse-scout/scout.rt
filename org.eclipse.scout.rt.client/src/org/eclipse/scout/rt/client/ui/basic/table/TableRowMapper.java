@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -14,15 +14,11 @@ import java.util.ArrayList;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.IHolder;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.internal.HolderToRowMapper;
 import org.eclipse.scout.rt.client.ui.basic.table.internal.RowToHolderMapper;
 
 public class TableRowMapper {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(TableRowMapper.class);
-
   private ITableRow m_row;
   private ArrayList<RowToHolderMapper> m_exportMappings;
   private ArrayList<HolderToRowMapper> m_importMappings;
@@ -45,7 +41,7 @@ public class TableRowMapper {
   /**
    * Convenience for mapping the values of this row to holders such as form
    * fields and value containers
-   * 
+   *
    * @see #exportRowData() and @see {@link #importRowData()}
    * @param enableExport
    *          if true then the corresponding row value is included in {@link #exportRowData()}

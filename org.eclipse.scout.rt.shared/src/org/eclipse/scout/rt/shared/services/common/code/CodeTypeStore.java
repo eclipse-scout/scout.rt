@@ -16,18 +16,14 @@ import java.util.List;
 import java.util.Locale;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 
 /**
  * CodeType store
  * Maintains a map of partition- and language-dependent code type caches
- * 
+ *
  * @since 4.3.0 (mars-M5)
  */
 public class CodeTypeStore {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(CodeTypeStore.class);
-
   private Object m_storeLock;
   private HashMap<PartitionLanguageComposite, CodeTypeCache> m_store;
 

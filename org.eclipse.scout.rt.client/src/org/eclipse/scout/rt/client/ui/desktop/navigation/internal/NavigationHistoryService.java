@@ -14,8 +14,6 @@ import java.util.List;
 
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -27,7 +25,6 @@ import org.eclipse.scout.service.AbstractService;
 
 @Priority(-1)
 public class NavigationHistoryService extends AbstractService implements INavigationHistoryService {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(NavigationHistoryService.class);
 
   @Override
   public Bookmark addStep(int level, String name, String iconId) {

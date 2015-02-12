@@ -24,8 +24,6 @@ import java.util.regex.Pattern;
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.annotations.Priority;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.shared.security.BasicHierarchyPermission;
 import org.eclipse.scout.rt.shared.services.common.security.internal.AccessControlStore;
 import org.eclipse.scout.service.AbstractService;
@@ -39,8 +37,6 @@ import org.osgi.framework.ServiceRegistration;
  */
 @Priority(-1)
 public abstract class AbstractSharedAccessControlService extends AbstractService implements IAccessControlService {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSharedAccessControlService.class);
-
   private AccessControlStore m_accessControlStore;
   private Pattern[] m_userIdSearchPatterns;
 

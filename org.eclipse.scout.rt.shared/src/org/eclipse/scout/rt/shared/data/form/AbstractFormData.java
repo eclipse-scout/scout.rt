@@ -24,8 +24,6 @@ import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.IHolder;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
 import org.eclipse.scout.rt.shared.extension.AbstractContributionComposite;
@@ -34,10 +32,7 @@ import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHa
 import org.eclipse.scout.service.SERVICES;
 
 public abstract class AbstractFormData extends AbstractContributionComposite implements Serializable, Cloneable, IPropertyHolder {
-
   public static final char FIELD_PATH_DELIM = '/';
-
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractFormData.class);
   private static final long serialVersionUID = 1L;
 
   private Map<Class<?>, Class<? extends AbstractFormFieldData>> m_fieldDataReplacements;

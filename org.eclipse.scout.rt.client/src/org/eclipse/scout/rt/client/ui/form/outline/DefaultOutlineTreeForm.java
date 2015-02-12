@@ -12,8 +12,6 @@ package org.eclipse.scout.rt.client.ui.form.outline;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
@@ -27,7 +25,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.treefield.AbstractTreeField;
 import org.eclipse.scout.rt.client.ui.form.outline.DefaultOutlineTreeForm.MainBox.OutlineTreeField;
 
 public class DefaultOutlineTreeForm extends AbstractForm implements IOutlineTreeForm {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(DefaultOutlineTreeForm.class);
   private DesktopListener m_desktopListener;
 
   public DefaultOutlineTreeForm() throws ProcessingException {

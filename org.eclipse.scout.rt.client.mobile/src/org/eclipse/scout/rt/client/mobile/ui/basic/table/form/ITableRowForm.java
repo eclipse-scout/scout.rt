@@ -10,12 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.mobile.ui.basic.table.form;
 
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.mobile.ui.form.IMobileForm;
 
 /**
  * @since 3.10.0 M3
  */
 public interface ITableRowForm extends IMobileForm {
-  void start() throws ProcessingException;
 }

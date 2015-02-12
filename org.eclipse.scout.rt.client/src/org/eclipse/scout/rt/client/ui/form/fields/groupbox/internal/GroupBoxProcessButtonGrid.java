@@ -14,8 +14,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
@@ -25,8 +23,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.internal.GridDataBuilder;
  * Grid (model) layout of process buttons only visible process-buttons are used
  */
 public class GroupBoxProcessButtonGrid {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(GroupBoxProcessButtonGrid.class);
-
   private IGroupBox m_groupBox = null;
   private boolean m_includeSystemButtons;
   private boolean m_includeCustomButtons;

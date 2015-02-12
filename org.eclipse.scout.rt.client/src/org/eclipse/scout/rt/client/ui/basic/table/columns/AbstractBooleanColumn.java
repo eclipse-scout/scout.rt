@@ -14,8 +14,6 @@ import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.IBooleanColumnExtension;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -26,8 +24,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.AbstractBooleanFi
  */
 @ClassId("62fcae6b-6b75-4e8c-bb3f-ea3b400e7e30")
 public abstract class AbstractBooleanColumn extends AbstractColumn<Boolean> implements IBooleanColumn {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractBooleanColumn.class);
-
   // DO NOT init members, this has the same effect as if they were set AFTER
   // initConfig()
 
@@ -81,7 +77,7 @@ public abstract class AbstractBooleanColumn extends AbstractColumn<Boolean> impl
    * Configures the horizontal alignment of text inside this column (including header text).
    * <p>
    * Subclasses can override this method. For boolean columns, the default is {@code 0} (center alignment).
-   * 
+   *
    * @return {@code -1} for left, {@code 0} for center and {@code 1} for right alignment.
    */
   @Override
@@ -93,7 +89,7 @@ public abstract class AbstractBooleanColumn extends AbstractColumn<Boolean> impl
    * Configures the vertical alignment of text inside this column (including header text).
    * <p>
    * Subclasses can override this method. Default is {@code -1} (top alignment).
-   * 
+   *
    * @return {@code -1} for top, {@code 0} for center and {@code 1} for bottom alignment.
    */
   @ConfigProperty(ConfigProperty.INTEGER)

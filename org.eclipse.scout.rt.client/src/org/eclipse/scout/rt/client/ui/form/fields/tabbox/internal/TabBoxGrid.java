@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -12,8 +12,6 @@ package org.eclipse.scout.rt.client.ui.form.fields.tabbox.internal;
 
 import java.util.ArrayList;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.internal.GridDataBuilder;
@@ -23,8 +21,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
  * Grid (model) layout of tab box only visible process-buttons are used
  */
 public class TabBoxGrid {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(TabBoxGrid.class);
-
   private ITabBox m_tabBox = null;
   private IFormField[] m_fields;
   private int m_gridColumns;

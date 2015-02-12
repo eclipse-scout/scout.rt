@@ -18,8 +18,6 @@ import java.util.Map;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.shared.data.form.FormDataUtility;
 import org.eclipse.scout.rt.shared.data.form.IPropertyHolder;
 import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
@@ -28,7 +26,6 @@ import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHa
 import org.eclipse.scout.service.SERVICES;
 
 public abstract class AbstractFormFieldData extends AbstractContributionComposite implements IPropertyHolder, Serializable {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractFormFieldData.class);
   private static final long serialVersionUID = 1L;
 
   private Map<Class<?>, Class<? extends AbstractFormFieldData>> m_fieldDataReplacements;

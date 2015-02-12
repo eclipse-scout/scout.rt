@@ -50,7 +50,6 @@ public abstract class AbstractDataModelAttribute extends AbstractPropertyObserve
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractDataModelAttribute.class);
   private static final long serialVersionUID = 1L;
 
-  private String m_id;
   private String m_text;
   private int m_type;
   private double m_order;

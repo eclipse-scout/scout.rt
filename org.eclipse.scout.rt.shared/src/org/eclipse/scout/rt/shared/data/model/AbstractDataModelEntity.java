@@ -46,7 +46,6 @@ public abstract class AbstractDataModelEntity extends AbstractPropertyObserver i
   private static final long serialVersionUID = 1L;
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractDataModelEntity.class);
 
-  private String m_id;
   private double m_order;
   private Permission m_visiblePermission;
   private boolean m_visibleGranted;

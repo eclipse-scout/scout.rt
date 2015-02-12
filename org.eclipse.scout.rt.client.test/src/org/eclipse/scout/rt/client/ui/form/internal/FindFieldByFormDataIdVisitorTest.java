@@ -223,6 +223,7 @@ public class FindFieldByFormDataIdVisitorTest {
       return getFieldByClass(MainForm.MainBox.FirstField.class);
     }
 
+    @Override
     public void start() throws ProcessingException {
       startInternal(new MainFormHandler());
     }
@@ -272,6 +273,7 @@ public class FindFieldByFormDataIdVisitorTest {
       return getFieldByClass(InnerForm.MainBox.SecondField.class);
     }
 
+    @Override
     public void start() throws ProcessingException {
       startInternal(new InnerFormHandler());
     }
@@ -324,6 +326,7 @@ public class FindFieldByFormDataIdVisitorTest {
       return getFieldByClass(InnerInnerForm.MainBox.ThirdField.class);
     }
 
+    @Override
     public void start() throws ProcessingException {
       startInternal(new InnerInnerFormHandler());
     }

@@ -17,12 +17,9 @@ import java.awt.Insets;
 import java.awt.Point;
 import java.awt.Rectangle;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.swing.form.fields.AbstractLayoutManager2;
 
 public class SingleLayout extends AbstractLayoutManager2 {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SingleLayout.class);
   private Dimension[] m_sizes;
 
   @Override

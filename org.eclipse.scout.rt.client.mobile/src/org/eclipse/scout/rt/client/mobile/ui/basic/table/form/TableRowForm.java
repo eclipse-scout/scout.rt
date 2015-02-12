@@ -19,8 +19,6 @@ import java.util.Map;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.mobile.ui.basic.table.form.fields.ColumnFieldBuilder;
 import org.eclipse.scout.rt.client.mobile.ui.form.AbstractMobileForm;
 import org.eclipse.scout.rt.client.mobile.ui.form.IActionFetcher;
@@ -44,8 +42,6 @@ import org.eclipse.scout.service.SERVICES;
  * @since 3.9.0
  */
 public class TableRowForm extends AbstractMobileForm implements ITableRowForm {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(TableRowForm.class);
-
   private ITable m_table;
   private ITableRow m_row;
   private IFormField m_rowField;

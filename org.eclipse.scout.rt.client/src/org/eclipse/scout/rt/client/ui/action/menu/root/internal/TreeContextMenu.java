@@ -17,8 +17,6 @@ import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.IActionVisitor;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -37,8 +35,6 @@ import org.eclipse.scout.service.SERVICES;
  *
  */
 public class TreeContextMenu extends AbstractPropertyObserverContextMenu<ITree> implements ITreeContextMenu {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(TreeContextMenu.class);
-
   private Set<? extends ITreeNode> m_currentSelection;
 
   /**

@@ -16,8 +16,6 @@ import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.service.SERVICES;
 
@@ -28,8 +26,6 @@ import org.eclipse.scout.service.SERVICES;
  * @since 4.3.0 (mars-M5)
  */
 public class CodeTypeCache {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(CodeTypeCache.class);
-
   private Object m_cacheLock = new Object();
   private HashMap<Class<? extends ICodeType>, ICodeType> m_cache = new HashMap<Class<? extends ICodeType>, ICodeType>();
 

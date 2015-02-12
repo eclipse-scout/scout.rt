@@ -14,8 +14,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 
 /**
  * This is the default busy job that runs the process of showing busy marker, blocking and canceling.
@@ -29,8 +27,6 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
  * @since 3.8
  */
 public class BusyJob extends Job {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(BusyJob.class);
-
   private final IBusyHandler m_handler;
   private boolean m_cancelApplied;
 

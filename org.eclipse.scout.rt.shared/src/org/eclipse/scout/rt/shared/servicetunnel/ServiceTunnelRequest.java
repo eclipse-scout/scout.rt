@@ -48,6 +48,7 @@ public class ServiceTunnelRequest implements IServiceTunnelRequest {
   private transient Subject m_clientSubject;
 
   // for serialization
+  @SuppressWarnings("unused")
   private ServiceTunnelRequest() {
   }
 

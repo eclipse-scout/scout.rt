@@ -31,12 +31,7 @@ import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.text.View;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
-
 public final class SwingLayoutUtility {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingLayoutUtility.class);
-
   public static final int MIN = 0;
   public static final int PREF = 1;
   public static final int MAX = 2;

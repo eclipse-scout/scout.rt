@@ -18,8 +18,6 @@ import java.util.Set;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktopExtension;
 import org.eclipse.scout.rt.extension.client.internal.AbstractExtensionManager;
 import org.eclipse.scout.rt.extension.client.internal.IExtensionProcessor;
@@ -31,9 +29,6 @@ import org.osgi.framework.Bundle;
  * @since 3.9.0
  */
 public class DesktopExtensionManager extends AbstractExtensionManager {
-
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(DesktopExtensionManager.class);
-
   public static final String EXTENSION_POINT_ID = org.eclipse.scout.rt.extension.client.Activator.PLUGIN_ID + ".desktopExtensions";
   public static final String DESKTOP_EXTENSION_ELEMENT = "desktopExtension";
 
@@ -65,13 +60,13 @@ public class DesktopExtensionManager extends AbstractExtensionManager {
   private void initExtensionProcessors() {
     addExtensionProcessor(DESKTOP_EXTENSION_ELEMENT,
         new IExtensionProcessor<Class<? extends IDesktopExtension>>() {
-          @Override
-          public Class<? extends IDesktopExtension> processConfigurationElement(Bundle contributor, IConfigurationElement element) throws Exception {
-            Class<? extends IDesktopExtension> desktopExtension = loadClass(contributor, IDesktopExtension.class, element.getAttribute("class"));
-            m_desktopExtensionTypes.add(desktopExtension);
-            return desktopExtension;
-          }
-        });
+      @Override
+      public Class<? extends IDesktopExtension> processConfigurationElement(Bundle contributor, IConfigurationElement element) throws Exception {
+        Class<? extends IDesktopExtension> desktopExtension = loadClass(contributor, IDesktopExtension.class, element.getAttribute("class"));
+        m_desktopExtensionTypes.add(desktopExtension);
+        return desktopExtension;
+      }
+    });
   }
 
   @Override
