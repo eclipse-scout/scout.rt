@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -20,10 +20,6 @@ public class ColumnDesc implements java.io.Serializable {
   private long m_decimalDigits;
   private boolean m_nullable;
   private String m_defaultValue;
-
-  // for IScoutSerializable
-  private ColumnDesc() {
-  }
 
   public ColumnDesc(String name, String typeName, long size, long precision, long decimalDigits, boolean isNullable) {
     this(name, typeName, size, precision, decimalDigits, isNullable, null);

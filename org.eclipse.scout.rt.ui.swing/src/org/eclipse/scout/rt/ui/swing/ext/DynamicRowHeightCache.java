@@ -26,8 +26,6 @@ import org.eclipse.scout.rt.ui.swing.SwingLayoutUtility;
  * Support for table with dynamic vairable row heights
  */
 public class DynamicRowHeightCache {
-  private static final long serialVersionUID = 1L;
-
   private final JTable m_table;
   private final SizeSequence m_sizes;
   private boolean m_sizesValid;

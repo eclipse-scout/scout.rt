@@ -33,7 +33,6 @@ import org.eclipse.swt.widgets.Listener;
 public class SwtScoutCheckbox extends SwtScoutValueFieldComposite<IBooleanField> implements ISwtScoutCheckbox {
 
   private P_SwtButtonListener m_swtButtonListener;
-  private boolean m_mandatoryCached;
   private StatusLabelEx m_labelPlaceholder;
 
   @Override

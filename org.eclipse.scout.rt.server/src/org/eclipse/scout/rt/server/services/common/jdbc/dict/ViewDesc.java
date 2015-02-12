@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -19,10 +19,6 @@ public class ViewDesc implements java.io.Serializable {
   private String m_name, m_owner;
   private String m_statement;
   private Collection<TableGrantDesc> m_grants;
-
-  // for IScoutSerializable
-  private ViewDesc() {
-  }
 
   public ViewDesc(String name, String owner, String statement) {
     m_name = name;

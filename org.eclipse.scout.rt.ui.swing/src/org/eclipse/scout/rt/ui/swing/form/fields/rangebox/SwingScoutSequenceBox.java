@@ -17,8 +17,6 @@ import java.util.List;
 import javax.swing.JPanel;
 
 import org.eclipse.scout.commons.exception.IProcessingStatus;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
@@ -37,7 +35,6 @@ import org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutFormFieldGridData;
  * processButtonPart systemProcessButtonPart customProcessButtonPart
  */
 public class SwingScoutSequenceBox extends SwingScoutFieldComposite<ISequenceBox> implements ISwingScoutSequenceBox {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingScoutSequenceBox.class);
 
   private PropertyChangeListener m_scoutMandatoryChangeListener;
   private PropertyChangeListener m_scoutErrorStatusChangeListener;

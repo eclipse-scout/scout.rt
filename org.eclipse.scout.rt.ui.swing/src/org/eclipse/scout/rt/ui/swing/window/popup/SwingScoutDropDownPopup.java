@@ -30,8 +30,6 @@ import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.SwingUtilities;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
 import org.eclipse.scout.rt.ui.swing.window.SwingScoutViewEvent;
 
@@ -41,7 +39,6 @@ import org.eclipse.scout.rt.ui.swing.window.SwingScoutViewEvent;
  * The popup is not activated when opened and is closed when mouse clicks anyhwhere outside of window.
  */
 public class SwingScoutDropDownPopup extends SwingScoutPopup {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingScoutDropDownPopup.class);
 
   private ComponentListener m_ownerComponentListener;
   private Component m_focusComponent;

@@ -580,7 +580,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
   }
 
   protected SwtBusyHandler createBusyHandler() {
-    return new SwtBusyHandler(getClientSession(), this);
+    return new SwtBusyHandler(this);
   }
 
   protected void showClientSessionLoadError(Throwable error) {

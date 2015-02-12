@@ -12,15 +12,12 @@ package org.eclipse.scout.rt.ui.swt.util;
 
 import java.util.HashMap;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.swt.basic.ColorUtility;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 
 public class ColorFactory {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ColorFactory.class);
   private final Display m_display;
   private HashMap<String, Color> m_colorCache = new HashMap<String, Color>();
 

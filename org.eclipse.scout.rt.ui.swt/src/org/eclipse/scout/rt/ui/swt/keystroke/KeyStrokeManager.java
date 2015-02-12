@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -14,8 +14,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Control;
@@ -26,11 +24,10 @@ import org.eclipse.ui.PlatformUI;
 
 /**
  * <h3>KeyStrokeManager</h3> ...
- * 
+ *
  * @since 1.0.0 30.04.2008
  */
 public class KeyStrokeManager implements IKeyStrokeManager {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(KeyStrokeManager.class);
 
   private Listener m_keyListener;
   private ArrayList<ISwtKeyStroke> m_globalKeyStrokes;

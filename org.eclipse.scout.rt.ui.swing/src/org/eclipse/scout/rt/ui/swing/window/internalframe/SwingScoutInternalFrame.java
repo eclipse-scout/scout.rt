@@ -27,8 +27,6 @@ import javax.swing.event.InternalFrameEvent;
 import javax.swing.event.InternalFrameListener;
 
 import org.eclipse.scout.commons.EventListenerList;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.ext.BorderLayoutEx;
@@ -41,16 +39,12 @@ import org.eclipse.scout.rt.ui.swing.window.SwingScoutViewEvent;
 import org.eclipse.scout.rt.ui.swing.window.SwingScoutViewListener;
 
 public class SwingScoutInternalFrame implements ISwingScoutView {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingScoutInternalFrame.class);
 
   private final ISwingEnvironment m_env;
   private boolean m_addedToDesktop;
   private final EventListenerList m_listenerList;
   private final JInternalFrameEx m_swingView;
   private final Object m_viewConstraints;
-  // cache
-  private boolean m_maximized;
-
   private ISwingScoutBoundsProvider m_boundsProvider;
 
   public SwingScoutInternalFrame(ISwingEnvironment env, Object viewConstraints) {
@@ -225,7 +219,6 @@ public class SwingScoutInternalFrame implements ISwingScoutView {
 
   @Override
   public void setMaximized(boolean on) {
-    m_maximized = on;
     try {
       m_swingView.setMaximum(on);
     }

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -17,10 +17,6 @@ public class PrimaryKeyDesc implements java.io.Serializable {
   private static final long serialVersionUID = 9164041758420662753L;
   private String m_name;
   private ArrayList<String> m_columnNames;
-
-  // for IScoutSerializable
-  private PrimaryKeyDesc() {
-  }
 
   public PrimaryKeyDesc(String name) {
     m_name = name;

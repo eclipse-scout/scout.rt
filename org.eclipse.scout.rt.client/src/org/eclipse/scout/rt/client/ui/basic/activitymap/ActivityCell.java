@@ -96,9 +96,6 @@ public class ActivityCell<RI, AI> extends MemoryOptimizedObject {
    */
   public static final int CUSTOM_DATA = 15;
 
-  private ActivityCell() {
-  }
-
   public ActivityCell(RI resourceId, AI activityId) {
     setValueInternal(RESOURCE_ID_BIT, resourceId);
     setValueInternal(ACTIVITY_ID_BIT, activityId);

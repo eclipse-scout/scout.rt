@@ -20,6 +20,7 @@ import org.junit.Test;
 /**
  * @since 3.8.3
  */
+@SuppressWarnings("unused")
 public class TableFieldBeanDataTest {
 
   private TestingTableData m_table;

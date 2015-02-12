@@ -17,8 +17,6 @@ import java.util.Collection;
 import java.util.Properties;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.spec.client.out.ILinkTarget;
 import org.eclipse.scout.rt.spec.client.utility.SpecIOUtility;
 
@@ -26,7 +24,6 @@ import org.eclipse.scout.rt.spec.client.utility.SpecIOUtility;
  * Responsible for persisting links to a property file
  */
 public class MediawikiLinkTargetManager {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(MediawikiLinkTargetManager.class);
 
   private final File m_propertyFile;
 

@@ -30,8 +30,6 @@ import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.extension.IServerSessionExtension;
 import org.eclipse.scout.rt.server.extension.ServerSessionChains.ServerSessionLoadSessionChain;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;
@@ -53,7 +51,6 @@ import org.eclipse.scout.service.SERVICES;
 import org.osgi.framework.Bundle;
 
 public abstract class AbstractServerSession implements IServerSession, Serializable, IExtensibleObject {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractServerSession.class);
 
   private static final long serialVersionUID = 1L;
 

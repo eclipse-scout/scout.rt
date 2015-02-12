@@ -13,8 +13,6 @@ import org.eclipse.swt.widgets.Listener;
  * @since 3.10.0-M4
  */
 public class MultilineCheckbox extends MultilineButton {
-  private static final long serialVersionUID = 1L;
-
   public MultilineCheckbox(Composite parent, int style) {
     super(parent, style | SWT.CHECK);
 

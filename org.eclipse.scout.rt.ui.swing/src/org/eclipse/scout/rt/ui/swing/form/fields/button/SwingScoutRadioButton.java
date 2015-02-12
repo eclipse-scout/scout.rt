@@ -1,12 +1,9 @@
 package org.eclipse.scout.rt.ui.swing.form.fields.button;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IRadioButton;
 import org.eclipse.scout.rt.ui.swing.LogicalGridData;
 
 public class SwingScoutRadioButton extends SwingScoutButton<IRadioButton> implements ISwingScoutRadioButton {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingScoutRadioButton.class);
 
   public SwingScoutRadioButton() {
     super();

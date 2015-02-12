@@ -14,20 +14,17 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.busy.BusyJob;
 import org.eclipse.scout.rt.ui.swt.busy.SwtBusyHandler;
 import org.eclipse.scout.rt.ui.swt.busy.SwtBusyUtility;
 
 /**
  * Shows the workbench progress indicator while blocking.
- * 
+ *
  * @author imo
  * @since 3.8
  */
 public class BlockWorkbenchJob extends BusyJob {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(BlockWorkbenchJob.class);
 
   public BlockWorkbenchJob(String name, SwtBusyHandler handler) {
     super(name, handler);

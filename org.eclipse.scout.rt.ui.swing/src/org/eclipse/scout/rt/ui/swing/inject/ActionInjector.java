@@ -12,8 +12,6 @@ package org.eclipse.scout.rt.ui.swing.inject;
 
 import javax.swing.JComponent;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.IActionFilter;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -33,7 +31,6 @@ import org.eclipse.scout.rt.ui.swing.action.SwingScoutViewTab;
  * Factory to create a SwingScout representation of a Scout model action.
  */
 public class ActionInjector {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ActionInjector.class);
 
   public ActionInjector() {
   }

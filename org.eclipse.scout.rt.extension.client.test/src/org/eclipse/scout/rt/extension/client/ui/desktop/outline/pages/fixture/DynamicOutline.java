@@ -19,10 +19,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
  * @since 3.9.0
  */
 public class DynamicOutline extends AbstractOutline {
-  private final IPage[] m_pages;
-
   public DynamicOutline(IPage... pages) throws ProcessingException {
-    m_pages = pages;
     if (pages == null || pages.length == 0) {
       return;
     }

@@ -76,7 +76,6 @@ public class OutlineTreeContextMenuTest {
     ITreeNode selectedNode = outline.getSelectedNode();
     List<IMenu> menus = selectedNode.getTree().getMenus();
 
-    @SuppressWarnings("unchecked")
     List<IMenu> requiredMenus = resolveMenusOfActiveTablePage(outline, PageWithTableEmptySpaceMenu.class, PageWithTableEmptySpace2Menu.class);
 
     assertTrue(OutlineTreeContextMenuNestedPageWithTablesTest.containsAllMenus(menus, requiredMenus));
@@ -86,7 +85,6 @@ public class OutlineTreeContextMenuTest {
   private static void assertRowMenusExistOnTablePageNode(IOutline outline) throws Exception {
     outline.selectFirstNode();
 
-    @SuppressWarnings("unchecked")
     List<IMenu> requiredMenus = resolveMenusOfActiveTablePage(outline, PageWithTableRowMenu.class);
 
     outline.selectNextChildNode();
@@ -98,6 +96,7 @@ public class OutlineTreeContextMenuTest {
     assertEquals(OutlineTreeContextMenuNestedPageWithTablesTest.sizeMenuListWithoutSeparators(menus), requiredMenus.size());
   }
 
+  @SafeVarargs
   private static List<IMenu> resolveMenusOfActiveTablePage(IOutline outline, Class<? extends IMenu>... menuClasses) throws Exception {
     List<IMenu> resolvedMenus = new LinkedList<IMenu>();
     IPageWithTable<?> activePage = (IPageWithTable<?>) outline.getActivePage();

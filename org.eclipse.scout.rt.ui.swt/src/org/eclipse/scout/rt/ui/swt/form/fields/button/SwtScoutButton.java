@@ -16,8 +16,6 @@ import java.beans.PropertyChangeListener;
 import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.WeakEventListener;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.ButtonEvent;
@@ -54,7 +52,6 @@ import org.eclipse.ui.forms.widgets.Hyperlink;
  * @since 1.0.0 07.04.2008
  */
 public class SwtScoutButton<T extends IButton> extends SwtScoutFieldComposite<T> implements ISwtScoutButton<T> {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwtScoutButton.class);
 
   private ButtonListener m_scoutButtonListener;
   private OptimisticLock m_selectionLock;

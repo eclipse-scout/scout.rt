@@ -296,6 +296,7 @@ public class SwtScoutFormFieldPopup extends SwtScoutComposite<IFormField> {
       startInternal(new FormHandler());
     }
 
+    @SuppressWarnings("unused")
     public MainBox getMainBox() {
       return (MainBox) getRootGroupBox();
     }

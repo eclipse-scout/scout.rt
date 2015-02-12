@@ -35,8 +35,6 @@ import javax.swing.text.JTextComponent;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.job.JobEx;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField;
 import org.eclipse.scout.rt.shared.AbstractIcons;
@@ -61,8 +59,6 @@ import org.eclipse.scout.rt.ui.swing.window.SwingScoutViewListener;
 import org.eclipse.scout.rt.ui.swing.window.popup.SwingScoutDropDownPopup;
 
 public class SwingScoutDateField extends SwingScoutBasicFieldComposite<IDateField> implements ISwingScoutDateField {
-  private static final long serialVersionUID = 1L;
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingScoutDateField.class);
 
   private boolean m_ignoreLabel;
   private boolean m_dateTimeCompositeMember;

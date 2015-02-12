@@ -29,8 +29,6 @@ public class TableRow implements ITableRow {
   private boolean m_checked;
   private final List<Cell> m_cells;
   private boolean m_rowPropertiesChanged;
-  private int m_rowChanging = 0;
-
   /**
    * @param columnSet
    *          may be null
@@ -228,10 +226,8 @@ public class TableRow implements ITableRow {
   @Override
   public void setRowChanging(boolean b) {
     if (b) {
-      m_rowChanging++;
     }
     else {
-      m_rowChanging--;
     }
   }
 

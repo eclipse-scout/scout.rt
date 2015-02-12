@@ -11,9 +11,6 @@
 package org.eclipse.scout.rt.ui.swing.ext.busy;
 
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.busy.AbstractBusyHandler;
 import org.eclipse.scout.rt.client.busy.IBusyHandler;
 import org.eclipse.scout.rt.shared.TEXTS;
@@ -24,15 +21,14 @@ import org.eclipse.scout.rt.shared.TEXTS;
  * Show wait cursor as long as busy.
  * <p>
  * Block application after {@link IBusyHandler#getLongOperationMillis()}
- * 
+ *
  * @author imo
  * @since 3.8
  */
 public class SwingBusyHandler extends AbstractBusyHandler {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingBusyHandler.class);
 
-  public SwingBusyHandler(IClientSession session) {
-    super(session);
+  public SwingBusyHandler() {
+    super();
   }
 
   @Override

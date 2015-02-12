@@ -26,8 +26,6 @@ import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
@@ -48,7 +46,6 @@ import org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutFormFieldGridData;
  * processButtonPart systemProcessButtonPart customProcessButtonPart
  */
 public class SwingScoutGroupBox extends SwingScoutFieldComposite<IGroupBox> implements ISwingScoutGroupBox {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingScoutGroupBox.class);
 
   private JPanel m_swingBodyPart;
   private JPanel m_swingButtonBarPart;

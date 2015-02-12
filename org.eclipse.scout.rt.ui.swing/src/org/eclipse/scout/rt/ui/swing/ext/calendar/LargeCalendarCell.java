@@ -40,8 +40,6 @@ import java.util.Iterator;
 import java.util.TreeSet;
 
 import javax.swing.ToolTipManager;
-import javax.swing.border.Border;
-import javax.swing.border.EmptyBorder;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -56,7 +54,6 @@ public class LargeCalendarCell extends AbstractCalendarCell {
   private static final int SWITCH_COMPRESSED_HEIGHT = 4;
   private static final long HOUR_MILLIS = 3600 * 1000;
 
-  private static final Border EMPTY_BORDER = new EmptyBorder(1, 1, 1, 1);
   private static final Dimension MIN_SIZE = new Dimension(10, 10);
   private static final Dimension PREF_SIZE = new Dimension(80, 60);
   private static final Dimension MAX_SIZE = new Dimension(1000, 1000);
@@ -641,9 +638,9 @@ public class LargeCalendarCell extends AbstractCalendarCell {
       g.fillRect(r.x, r.y, r.width, r.height);
       // label
       cc.setLabeled(true);/*
-                           * r.height>=fm.getAscent() &&
-                           * r.width>=SWITCH_ITEM_WIDTH
-                           */
+                          * r.height>=fm.getAscent() &&
+                          * r.width>=SWITCH_ITEM_WIDTH
+                          */
       if (cc.isLabeled()) {
         g.setColor(getForeground());
         String s = m_dateChooser.getModel().getLabel(cc.getItem(), getRepresentedDate());
@@ -662,7 +659,6 @@ public class LargeCalendarCell extends AbstractCalendarCell {
     private long m_fromRelative, m_toRelative;// truncated to actual DAY
     private Rectangle m_bounds;
     private boolean m_fullDay;
-    private Date m_dragSourceDate;
     private float m_x0, m_x1;
 
     public ItemWrapper(Object item) {
@@ -735,10 +731,6 @@ public class LargeCalendarCell extends AbstractCalendarCell {
       m_labeled = on;
     }
 
-    public void setDragSourceDate(Date date) {
-      m_dragSourceDate = date;
-    }
-
     public boolean isLabeled() {
       return m_labeled;
     }
@@ -768,10 +760,6 @@ public class LargeCalendarCell extends AbstractCalendarCell {
 
     public long getToRelative() {
       return m_toRelative;
-    }
-
-    public Date getDragSourceDate() {
-      return m_dragSourceDate;
     }
 
     // wrappers
@@ -892,7 +880,6 @@ public class LargeCalendarCell extends AbstractCalendarCell {
       }
       if (m_dateChooser.getModel().isDraggable(item)) {
         ItemWrapper cic = new ItemWrapper(item);
-        cic.setDragSourceDate(getRepresentedDate());
         CalendarItemTransferable cit = new CalendarItemTransferable(cic);
         e.startDrag(null, cit);
       }

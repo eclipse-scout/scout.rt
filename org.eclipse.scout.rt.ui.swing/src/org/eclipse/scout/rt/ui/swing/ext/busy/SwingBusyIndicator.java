@@ -22,7 +22,6 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -31,8 +30,6 @@ import javax.swing.RootPaneContainer;
 import javax.swing.SwingUtilities;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 
 /**
@@ -42,8 +39,6 @@ import org.eclipse.scout.rt.ui.swing.SwingUtility;
  * {@link JRootPane#putClientProperty(Object, Object)} of {@value #BUSY_SUPPORTED_CLIENT_PROPERTY} set to true
  */
 public class SwingBusyIndicator {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingBusyIndicator.class);
-  private static final AtomicLong BUSY_SEQ = new AtomicLong();
   private static final String BUSY_SET_CLIENT_PROPERTY = "SwingBusyIndicator.busySet";
   private static SwingBusyIndicator instance = new SwingBusyIndicator();
 
@@ -132,42 +127,42 @@ public class SwingBusyIndicator {
    */
   private void setBusy(final Collection<RootPaneContainer> lazyHolder) {
     SwingUtilities.invokeLater(
-          new Runnable() {
-            @Override
-            public void run() {
-              //windows
-              Window[] windows = Window.getWindows();
-              if (windows != null) {
-                for (Window w : windows) {
-                  RootPaneContainer r = accept(w);
-                  if (r != null) {
-                    if (setBusy0(r)) {
-                      lazyHolder.add(r);
-                    }
+        new Runnable() {
+          @Override
+          public void run() {
+            //windows
+            Window[] windows = Window.getWindows();
+            if (windows != null) {
+              for (Window w : windows) {
+                RootPaneContainer r = accept(w);
+                if (r != null) {
+                  if (setBusy0(r)) {
+                    lazyHolder.add(r);
                   }
                 }
               }
             }
-          });
+          }
+        });
   }
 
   private void setBlocking(final IProgressMonitor monitor) {
     SwingUtilities.invokeLater(
-          new Runnable() {
-            @Override
-            public void run() {
-              //windows
-              Window[] windows = Window.getWindows();
-              if (windows != null) {
-                for (Window w : windows) {
-                  RootPaneContainer r = accept(w);
-                  if (r != null) {
-                    setBlocking0(r, monitor);
-                  }
+        new Runnable() {
+          @Override
+          public void run() {
+            //windows
+            Window[] windows = Window.getWindows();
+            if (windows != null) {
+              for (Window w : windows) {
+                RootPaneContainer r = accept(w);
+                if (r != null) {
+                  setBlocking0(r, monitor);
                 }
               }
             }
-          });
+          }
+        });
   }
 
   /**
@@ -177,17 +172,17 @@ public class SwingBusyIndicator {
    */
   private void clearBusy(final Collection<RootPaneContainer> lazyHolder) {
     SwingUtilities.invokeLater(
-          new Runnable() {
-            @Override
-            public void run() {
-              if (lazyHolder.size() == 0) {
-                return;
-              }
-              for (RootPaneContainer r : lazyHolder) {
-                clearBusy0(r);
-              }
+        new Runnable() {
+          @Override
+          public void run() {
+            if (lazyHolder.size() == 0) {
+              return;
             }
-          });
+            for (RootPaneContainer r : lazyHolder) {
+              clearBusy0(r);
+            }
+          }
+        });
   }
 
   /**

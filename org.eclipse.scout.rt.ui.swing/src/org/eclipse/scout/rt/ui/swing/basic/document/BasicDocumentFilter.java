@@ -19,7 +19,6 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 
 public class BasicDocumentFilter extends DocumentFilter {
-  private static final long serialVersionUID = 1L;
 
   private int m_maxLen;
 

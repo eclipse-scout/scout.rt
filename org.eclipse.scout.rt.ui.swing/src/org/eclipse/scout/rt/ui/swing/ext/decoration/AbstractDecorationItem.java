@@ -28,11 +28,9 @@ public abstract class AbstractDecorationItem extends AbstractDecoration implemen
   private boolean m_visible = true;
   private EventListenerList m_eventListeners = new EventListenerList();
   private Cursor m_mouseOverCursor;
-  private Cursor m_defaultCursor;
 
   public AbstractDecorationItem(JComponent owner, ISwingEnvironment environment, boolean callInitializer) {
     super(owner, environment, callInitializer);
-    m_defaultCursor = owner.getCursor();
   }
 
   private boolean updateState(boolean mouseOver) {

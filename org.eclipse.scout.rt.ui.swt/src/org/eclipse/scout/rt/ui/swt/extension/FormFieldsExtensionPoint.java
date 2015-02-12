@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -18,18 +18,15 @@ import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.swt.Activator;
 import org.eclipse.scout.rt.ui.swt.extension.internal.FormFieldExtension;
 
 /**
  * <h3>FormFieldsExtensionPoint</h3> To access all form field extension beans.
- * 
+ *
  * @since 1.0.8 17.04.2009
  */
 public final class FormFieldsExtensionPoint {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(FormFieldsExtensionPoint.class);
 
   private FormFieldsExtensionPoint() {
   }

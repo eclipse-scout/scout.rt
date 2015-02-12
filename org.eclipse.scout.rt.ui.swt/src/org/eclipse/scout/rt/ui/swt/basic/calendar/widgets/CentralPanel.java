@@ -34,7 +34,7 @@ import org.eclipse.swt.widgets.Listener;
 
 /**
  * Central panel component of a calendar (i.e. holding calendar cells).
- * 
+ *
  * @author Michael Rudolf, Andreas Hoegger
  */
 public class CentralPanel extends Composite {
@@ -62,12 +62,6 @@ public class CentralPanel extends Composite {
 
   /** composite for holding the cell widgets */
   private Composite m_cells;
-
-  /** panel width */
-  private int m_panelWidth = 0;
-
-  /** panel height */
-  private int m_panelHeight = 0;
 
   /** max number of timeless items within any cell */
   private int m_timelessMaxCount;

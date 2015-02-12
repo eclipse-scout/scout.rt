@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -15,8 +15,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.scout.commons.TTLCache;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.internal.Activator;
 
@@ -24,7 +22,6 @@ import org.eclipse.scout.rt.server.internal.Activator;
  * process monitor of servlet context
  */
 public class ProcessInspector {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ProcessInspector.class);
 
   public static synchronized ProcessInspector getDefault() {
     return Activator.getDefault().getProcessInspector();

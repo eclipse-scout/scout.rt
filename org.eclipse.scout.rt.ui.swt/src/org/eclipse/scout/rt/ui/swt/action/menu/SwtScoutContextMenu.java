@@ -48,8 +48,6 @@ public class SwtScoutContextMenu implements ISwtScoutMenu {
 
   private IContextMenu m_scoutContextMenu;
   private Listener m_uiMenuListener;
-  private Boolean m_childrenCreated = Boolean.FALSE;
-
   private final ITextAccess m_systemMenuOwner;
   private final StyledText m_undoRedoMenuOwner;
 

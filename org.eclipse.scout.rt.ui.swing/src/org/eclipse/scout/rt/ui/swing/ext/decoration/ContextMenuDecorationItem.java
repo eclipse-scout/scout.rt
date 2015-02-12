@@ -36,7 +36,6 @@ public class ContextMenuDecorationItem extends AbstractDecorationItem implements
 
   private PropertyChangeListener m_scoutPropertyChangeListener;
 
-  private Rectangle m_bounds;
   private IContextMenu m_scoutContextMenu;
   private IconGroup m_iconGroup = MenuArrowDownIcon.createMenuArrowDownIconGroup(new Insets(2, 1, 15, 1));
 
@@ -81,10 +80,6 @@ public class ContextMenuDecorationItem extends AbstractDecorationItem implements
     icon.paintIcon(c, g, x, y);
 
     return new Rectangle(x, y, icon.getIconWidth(), icon.getIconHeight());
-  }
-
-  private int calcArrowWidth(int line) {
-    return 5 - (line * 2);
   }
 
   @Override

@@ -23,7 +23,6 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.ClientSyncJob;
-import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ContentAssistTreeForm;
 
 /**
@@ -51,7 +50,6 @@ public abstract class AbstractBusyHandler implements IBusyHandler {
   private static final QualifiedName TIMER_PROPERTY = new QualifiedName(AbstractBusyHandler.class.getName(), "timer");
   private static final QualifiedName BUSY_OPERATION_PROPERTY = new QualifiedName(AbstractBusyHandler.class.getName(), "busy");
 
-  private final IClientSession m_session;
   private final Object m_stateLock = new Object();
   private final Set<Job> m_list = Collections.synchronizedSet(new HashSet<Job>());
   private long m_shortOperationMillis = 200L;
@@ -61,8 +59,7 @@ public abstract class AbstractBusyHandler implements IBusyHandler {
   private int m_blockingCount;
   private final Object m_blockingCountLock = new Object();
 
-  public AbstractBusyHandler(IClientSession session) {
-    m_session = session;
+  public AbstractBusyHandler() {
   }
 
   @Override

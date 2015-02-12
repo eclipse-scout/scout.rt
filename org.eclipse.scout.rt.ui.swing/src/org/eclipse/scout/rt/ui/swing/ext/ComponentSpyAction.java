@@ -191,8 +191,6 @@ public class ComponentSpyAction extends AbstractAction {
   }
 
   static class TextNode implements TreeNode {
-    private static final long serialVersionUID = 1L;
-
     private Object m_userObject;
     private TreeNode m_parent;
     private Vector<TreeNode> m_children;
@@ -257,8 +255,6 @@ public class ComponentSpyAction extends AbstractAction {
   }
 
   static class ScoutNode implements TreeNode {
-    private static final long serialVersionUID = 1L;
-
     private Object m_userObject;
     private boolean m_showContext;
     private ScoutNode m_markedChild;
@@ -419,8 +415,6 @@ public class ComponentSpyAction extends AbstractAction {
   }
 
   static class SwingNode implements TreeNode {
-    private static final long serialVersionUID = 1L;
-
     private Object m_userObject;
     private boolean m_showContext;
     private SwingNode m_markedChild;

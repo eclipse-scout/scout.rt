@@ -13,15 +13,10 @@ package org.eclipse.scout.rt.servicetunnel;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
-
 /**
  * Creates a service proxy through a tunnel.
  */
 public final class ServiceTunnelUtility {
-
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ServiceTunnelUtility.class);
 
   private ServiceTunnelUtility() {
   }

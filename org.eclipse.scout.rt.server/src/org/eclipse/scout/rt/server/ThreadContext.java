@@ -17,8 +17,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 
 /**
@@ -28,7 +26,6 @@ import org.eclipse.scout.rt.server.transaction.ITransaction;
  * threads to run job queues, handle Thread-based session values etc.
  */
 public final class ThreadContext {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ThreadContext.class);
   private static final ThreadLocal<HttpServletRequest> HTTP_SERVLET_REQUEST = new ThreadLocal<HttpServletRequest>();
   private static final ThreadLocal<HttpServletResponse> HTTP_SERVLET_RESPONSE = new ThreadLocal<HttpServletResponse>();
   private static final ThreadLocal<IServerSession> SERVER_SESSION = new ThreadLocal<IServerSession>();

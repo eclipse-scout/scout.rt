@@ -38,7 +38,6 @@ public class SnapButtonMaximized extends Canvas {
   private EventListenerList m_eventListener = new EventListenerList();
   // internal
   private boolean m_mouseHover;
-  private boolean m_focussed;
   private Listener m_controlListener = new P_ControlListener();
   // spacing
   private int m_gap = 5;
@@ -158,10 +157,8 @@ public class SnapButtonMaximized extends Canvas {
     public void handleEvent(Event event) {
       switch (event.type) {
         case SWT.FocusIn:
-          m_focussed = true;
           break;
         case SWT.FocusOut:
-          m_focussed = false;
           break;
         case SWT.MouseEnter:
           m_mouseHover = true;

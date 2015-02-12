@@ -41,8 +41,6 @@ import org.eclipse.scout.rt.ui.swing.form.fields.AbstractLayoutManager2;
  */
 public class JSection extends JPanel {
   private static final long serialVersionUID = 1L;
-  private static final int VERTICAL_GAP = 2;
-
   private final JButton m_button;
   private final JPanel m_head;
   private final JPanel m_body;
@@ -235,8 +233,6 @@ public class JSection extends JPanel {
   }
 
   private class ExpandedIcon implements Icon {
-    private static final long serialVersionUID = 1L;
-
     private Color m_color;
 
     public ExpandedIcon(Color col) {

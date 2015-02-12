@@ -4,16 +4,13 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.server.scheduler;
 
 import java.util.Collection;
-
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 
 /**
  * This accessor can be used to give individual sessions limited access to a
@@ -22,7 +19,6 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
  * restrictions
  */
 public class SchedulerAccessor implements IScheduler {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SchedulerAccessor.class);
 
   private IScheduler m_scheduler;
 

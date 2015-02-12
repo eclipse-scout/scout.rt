@@ -29,6 +29,7 @@ import org.junit.Test;
 /**
  * JUnit tests for {@link AbstractTableField}
  */
+@SuppressWarnings("unused")
 public class TableFieldTest {
 
   /**

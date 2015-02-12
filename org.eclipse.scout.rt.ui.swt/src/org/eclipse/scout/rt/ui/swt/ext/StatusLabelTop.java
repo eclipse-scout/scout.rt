@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt.ext;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.basic.comp.CLabelEx;
 import org.eclipse.swt.SWT;
@@ -31,7 +29,6 @@ import org.eclipse.swt.widgets.Label;
  * </p>
  */
 public class StatusLabelTop extends StatusLabelEx {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(StatusLabelTop.class);
 
   public StatusLabelTop(Composite parent, int style, ISwtEnvironment environment) {
     super(parent, style, environment);

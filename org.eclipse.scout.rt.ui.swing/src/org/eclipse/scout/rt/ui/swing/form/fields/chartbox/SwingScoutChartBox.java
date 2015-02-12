@@ -27,7 +27,6 @@ import org.eclipse.scout.rt.ui.swing.ext.JStatusLabelEx;
 import org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutFieldComposite;
 
 public class SwingScoutChartBox extends SwingScoutFieldComposite<IChartBox> implements ISwingScoutChartBox {
-  private static final long serialVersionUID = 1L;
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingScoutChartBox.class);
 
   private P_ScoutChartBoxListener m_scoutChartBoxListener;

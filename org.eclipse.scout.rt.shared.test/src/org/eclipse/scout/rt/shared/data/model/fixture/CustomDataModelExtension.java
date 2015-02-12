@@ -14,8 +14,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.scout.commons.annotations.OrderedCollection;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.shared.data.model.AbstractDataModelAttribute;
 import org.eclipse.scout.rt.shared.data.model.AbstractDataModelEntity;
 import org.eclipse.scout.rt.shared.data.model.DataModelConstants;
@@ -23,7 +21,6 @@ import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
 import org.eclipse.scout.rt.shared.data.model.IDataModelEntity;
 
 public final class CustomDataModelExtension {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(CustomDataModelExtension.class);
 
   public static boolean ENABLED = true;
 

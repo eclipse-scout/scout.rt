@@ -13,7 +13,6 @@ package org.eclipse.scout.rt.ui.swt.basic.calendar.widgets;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Map;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -46,17 +45,13 @@ import org.eclipse.swt.widgets.Menu;
  * <li>If the display mode is changed, the view date start/end is recalculated</li>
  * <li>If the current view date is changed, the view date start/end are also recalculated</li>
  * </ul>
- * 
+ *
  * @author Michael Rudolf, Andreas Hoegger
  */
 public class SwtCalendar extends Composite implements PaintListener {
   protected static final IScoutLogger LOG = ScoutLogManager.getLogger(SwtCalendar.class);
 
   private ArrayList<ICalendarViewListener> calendarViewListeners;
-
-  private int m_workDayCount = 5;
-
-  private Map m_itemMap;
 
   /** selected date */
   private Calendar m_selectedDate;
@@ -70,8 +65,6 @@ public class SwtCalendar extends Composite implements PaintListener {
 
   private CalendarModel m_model;
   private Object m_selectedItem;
-  private boolean m_calendarUpdating;
-
   /** date browser bar to set the date backward/forward */
   private DateBrowserBar m_browserBar;
 
@@ -416,7 +409,6 @@ public class SwtCalendar extends Composite implements PaintListener {
    */
   public void showContextMenu(Menu manager) {
   }
-
 
   @Override
   public void paintControl(PaintEvent e) {

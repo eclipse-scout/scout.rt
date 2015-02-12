@@ -32,7 +32,6 @@ public class AliasMapper {
    * append a space to the string before applying the pattern.
    */
   private static final Pattern ENTITY_DEFINITION = Pattern.compile("[@]([a-zA-Z0-9_]+)[@]([^.])");
-  private static final Pattern ENTITY_REFERENCE = Pattern.compile("[@](parent\\.)?([a-zA-Z0-9_]+)[@][.]");
 
   private AtomicInteger m_sequenceProvider;
   private final Map<String, String> m_rootAliases;

@@ -15,8 +15,6 @@ import java.util.Set;
 
 import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.osgi.BundleInspector;
 import org.eclipse.scout.rt.spec.client.config.entity.IDocEntityTableConfig;
 import org.eclipse.scout.rt.spec.client.filter.FilterUtility;
@@ -37,7 +35,6 @@ import org.eclipse.scout.rt.spec.client.utility.SpecUtility;
  * <li>Description: filled with doc text with the key "[types classid]_description"
  */
 public abstract class AbstractTypeSpecTest extends AbstractSpecGenTest {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractTypeSpecTest.class);
   protected Class<?> m_supertype;
   protected String m_id;
   protected String m_title;

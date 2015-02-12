@@ -495,7 +495,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
   }
 
   protected SwingBusyHandler createBusyHandler() {
-    return new SwingBusyHandler(getScoutSession());
+    return new SwingBusyHandler();
   }
 
   @Override

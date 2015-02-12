@@ -21,8 +21,6 @@ import javax.swing.JLabel;
 import javax.swing.JTree;
 import javax.swing.tree.TreeCellRenderer;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
@@ -33,9 +31,6 @@ import org.eclipse.scout.rt.ui.swing.icons.CheckboxIcon;
 import org.eclipse.scout.rt.ui.swing.icons.CompositeIcon;
 
 public class SwingTreeCellRenderer implements TreeCellRenderer {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingTreeCellRenderer.class);
-  private static final long serialVersionUID = 1L;
-
   private final ISwingEnvironment m_env;
   private TreeCellRenderer m_internalRenderer;
   private SwingScoutTree m_swingScoutTree;

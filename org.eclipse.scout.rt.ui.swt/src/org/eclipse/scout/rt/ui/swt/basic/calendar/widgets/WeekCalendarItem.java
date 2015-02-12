@@ -27,12 +27,6 @@ import org.eclipse.swt.graphics.Rectangle;
  */
 public class WeekCalendarItem extends AbstractCalendarItem {
 
-  /**
-   * if this item is timeless, this field contains it index
-   * within the other timeless items of the same cell
-   */
-  private int m_timelessIndex = -1;
-
   public WeekCalendarItem(AbstractCell parent, int style, CalendarItemContainer item) {
     super(parent, style, item);
   }

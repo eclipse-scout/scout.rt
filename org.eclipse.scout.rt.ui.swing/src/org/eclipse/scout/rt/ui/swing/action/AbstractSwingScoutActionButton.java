@@ -20,8 +20,6 @@ import javax.swing.Action;
 import javax.swing.SwingConstants;
 
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
@@ -34,7 +32,6 @@ import org.eclipse.scout.rt.ui.swing.basic.SwingScoutComposite;
  * JButton/JToggleButton/JRadioButton
  */
 public abstract class AbstractSwingScoutActionButton<T extends IAction> extends SwingScoutComposite<T> implements ISwingScoutAction<T> {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSwingScoutActionButton.class);
 
   //ticket 86811: avoid double-action in queue
   private boolean m_handleActionPending;

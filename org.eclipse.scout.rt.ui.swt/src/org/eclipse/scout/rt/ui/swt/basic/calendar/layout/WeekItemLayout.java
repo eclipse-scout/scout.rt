@@ -28,8 +28,6 @@ public class WeekItemLayout extends Layout {
   private static final int MIN_HEIGHT = 4;
   private int m_startHour = CalendarConstants.DAY_TIMELINE_START_TIME;
   private int m_endHour = CalendarConstants.DAY_TIMELINE_END_TIME;
-  private boolean m_useOverflowCells = true;
-
   @Override
   protected Point computeSize(Composite composite, int wHint, int hHint, boolean flushCache) {
     // return a dummy size
@@ -120,7 +118,6 @@ public class WeekItemLayout extends Layout {
   public void setWorkingHours(int startHour, int endHour, boolean useOverflowCells) {
     m_startHour = startHour;
     m_endHour = endHour;
-    m_useOverflowCells = useOverflowCells;
   }
 
 }

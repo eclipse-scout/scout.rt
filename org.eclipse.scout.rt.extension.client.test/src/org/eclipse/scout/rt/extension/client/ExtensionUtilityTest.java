@@ -167,9 +167,11 @@ public class ExtensionUtilityTest {
   private abstract static class AbstractE {
   }
 
+  @SuppressWarnings("unused")
   private static class P_E1 extends AbstractE {
   }
 
+  @SuppressWarnings("unused")
   private static class P_E2 extends AbstractE {
   }
 }

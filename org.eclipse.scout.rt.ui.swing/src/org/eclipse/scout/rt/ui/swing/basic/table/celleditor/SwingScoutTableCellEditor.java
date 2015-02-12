@@ -459,10 +459,6 @@ public class SwingScoutTableCellEditor {
       return policy;
     }
 
-    public void setClickCountToStart(int count) {
-      m_clickCountToStart = count;
-    }
-
     public int getClickCountToStart() {
       return m_clickCountToStart;
     }

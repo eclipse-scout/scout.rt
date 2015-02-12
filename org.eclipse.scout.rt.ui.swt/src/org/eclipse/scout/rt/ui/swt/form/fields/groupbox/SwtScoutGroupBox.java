@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt.form.fields.groupbox;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
@@ -40,7 +38,6 @@ import org.eclipse.ui.forms.widgets.Section;
  * <h3>SwtScoutGroupBox</h3>
  */
 public class SwtScoutGroupBox extends SwtScoutFieldComposite<IGroupBox> implements ISwtScoutGroupBox {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwtScoutGroupBox.class);
 
   /**
    * is null if the group box is not a scrolled group box
@@ -53,7 +50,6 @@ public class SwtScoutGroupBox extends SwtScoutFieldComposite<IGroupBox> implemen
   // cache
   private boolean m_containerBorderEnabled;
   private String m_containerBorderDecorationResolved;
-  private String m_containerLabel;
   private String m_containerImage;
 
   @Override

@@ -77,12 +77,6 @@ import org.junit.runners.model.Statement;
  */
 public class ParameterizedScoutClientTestRunner extends ScoutClientTestRunner {
 
-  /**
-   * Access this field using {@link #ParameterizedTestRunnerExtension} because the <code>validate</code> methods are
-   * already
-   * being invoked by the super constructor.
-   */
-  private ParameterizedTestRunnerExtension m_testRunnerExtension;
   /** Parameters returned by the <code>@</code>{@link Parameters} annotated method in the test class. */
   private List<IScoutTestParameter> m_parameterList;
   /** Parameter for the current test method being executed. */

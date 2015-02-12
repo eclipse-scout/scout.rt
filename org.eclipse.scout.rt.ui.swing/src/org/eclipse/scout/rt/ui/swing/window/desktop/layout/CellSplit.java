@@ -11,11 +11,8 @@
 package org.eclipse.scout.rt.ui.swing.window.desktop.layout;
 
 import org.eclipse.scout.commons.VerboseUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 
 class CellSplit {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(CellSplit.class);
 
   private boolean m_rowSplit;
   private int m_row;

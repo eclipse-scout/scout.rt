@@ -36,8 +36,6 @@ public abstract class AbstractSwtScoutAction extends Action {
   private boolean m_updateUi = true;
   private boolean m_handleSelectionPending;
 
-  private P_ScoutPropertyChangeListener m_scoutPropertyListener;
-
   public AbstractSwtScoutAction(IAction scoutAction, ISwtEnvironment environment) {
     this(scoutAction, environment, true);
   }

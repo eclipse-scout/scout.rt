@@ -18,13 +18,10 @@ import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.swing.Activator;
 import org.eclipse.scout.rt.ui.swing.extension.internal.FormFieldExtension;
 
 public final class FormFieldsExtensionPoint {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(FormFieldsExtensionPoint.class);
 
   private FormFieldsExtensionPoint() {
   }

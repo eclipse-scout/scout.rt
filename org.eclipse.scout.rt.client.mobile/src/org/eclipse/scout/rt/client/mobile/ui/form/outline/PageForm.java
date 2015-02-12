@@ -87,7 +87,7 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
     v.handleResult();
 
     // custom
-    execInitForm();
+    interceptInitForm();
   }
 
   @Override
@@ -706,6 +706,7 @@ public class PageForm extends AbstractMobileForm implements IPageForm {
       return false;
     }
 
+    @SuppressWarnings("unused")
     public LabelColumn getLabelColumn() {
       return getColumnSet().getColumnByClass(LabelColumn.class);
     }

@@ -23,27 +23,21 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Stroke;
 import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
 import java.awt.event.FocusAdapter;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.util.EventListener;
 
-import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.event.EventListenerList;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.swing.ext.MouseClickedBugFix;
 
 public class SwingImageViewer extends JComponent {
   public static final float EPS = 1E-6f;
   private static final long serialVersionUID = 1L;
-
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingImageViewer.class);
 
   protected static final int FOCUS_BORDER_OFFSET_PX = 2;
 
@@ -424,20 +418,6 @@ public class SwingImageViewer extends JComponent {
     }
     return location;
   }
-
-  /**
-   * private classes for key actions
-   */
-
-  private class P_SwingFit extends AbstractAction {
-
-    private static final long serialVersionUID = 1L;
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-      doFitImage();
-    }
-  }// end private class
 
   /**
    * Image Transformation Observer

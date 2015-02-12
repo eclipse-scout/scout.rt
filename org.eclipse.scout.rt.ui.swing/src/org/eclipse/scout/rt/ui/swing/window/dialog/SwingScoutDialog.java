@@ -32,8 +32,6 @@ import javax.swing.WindowConstants;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.EventListenerList;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.ext.BorderLayoutEx;
@@ -49,9 +47,7 @@ import org.eclipse.scout.rt.ui.swing.window.SwingScoutViewEvent;
 import org.eclipse.scout.rt.ui.swing.window.SwingScoutViewListener;
 
 public class SwingScoutDialog implements ISwingScoutView {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingScoutDialog.class);
 
-  private final ISwingEnvironment m_env;
   private final EventListenerList m_listenerList;
   private final Window m_swingParent;
   private final JDialogEx m_swingDialog;
@@ -71,7 +67,6 @@ public class SwingScoutDialog implements ISwingScoutView {
   }
 
   public SwingScoutDialog(ISwingEnvironment env, Window swingParent, ISwingScoutBoundsProvider provider, boolean modal) {
-    m_env = env;
     m_boundsProvider = provider;
     while (swingParent != null && !(swingParent instanceof Dialog || swingParent instanceof Frame)) {
       swingParent = SwingUtilities.getWindowAncestor(swingParent);

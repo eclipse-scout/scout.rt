@@ -37,8 +37,6 @@ import org.eclipse.scout.rt.ui.swing.text.HTMLStyledTextCreator;
 import org.eclipse.scout.rt.ui.swing.text.IStyledTextCreator;
 
 public class SwingScoutLabelField extends SwingScoutValueFieldComposite<ILabelField> implements ISwingScoutLabelField {
-  private static final long serialVersionUID = 1L;
-
   private JPanelEx m_fieldPanel;
   private int m_horizontalAlignment;
   private int m_verticalAlignment;

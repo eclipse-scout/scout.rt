@@ -19,8 +19,6 @@ import java.util.Set;
 import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.osgi.BundleInspector;
 import org.eclipse.scout.commons.osgi.BundleInspector.IClassFilter;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -33,16 +31,16 @@ import org.eclipse.scout.rt.spec.client.gen.extract.SpecialDescriptionExtractor;
  * General utilities for the spec plugin
  */
 public final class SpecUtility {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SpecUtility.class);
   private static Set<Class<?>> s_allClasses;
   public static final String DOC_ID_TRUE = "org.eclipse.scout.rt.spec.true";
   public static final String DOC_ID_FALSE = "org.eclipse.scout.rt.spec.false";
+
   private SpecUtility() {
   }
 
   /**
    * creates a base spec file name (without file extension) for a object
-   * 
+   *
    * @param object
    * @return
    */
@@ -50,10 +48,9 @@ public final class SpecUtility {
     return object.getClass().getSimpleName() + "_" + object.classId();
   }
 
-
   /**
    * wrapper around {@link BundleInspector#getAllClasses(IClassFilter)} which caches all classes on first invocation
-   * 
+   *
    * @param filter
    * @return
    * @throws ProcessingException
@@ -78,7 +75,7 @@ public final class SpecUtility {
 
   /**
    * Create an anchorId using the object's classId with {@link #createAnchorId(String)}
-   * 
+   *
    * @param object
    * @return
    */
@@ -90,7 +87,7 @@ public final class SpecUtility {
   /**
    * Prepends the classId with "c_" to make sure the anchor does not start with a digit, which is forbidden for IDs in
    * HTML.
-   * 
+   *
    * @param classId
    * @return
    */
@@ -100,7 +97,7 @@ public final class SpecUtility {
 
   /**
    * Creates a flat array with all menus by traversing the menu hierarchy by depth-first search.
-   * 
+   *
    * @param menus
    *          the list of top level menus
    * @return
@@ -140,7 +137,7 @@ public final class SpecUtility {
    * <li>Instances of the type can be assigned to the <code>supertype</code>.
    * <li>Either the type is annotated with a {@link ClassId} annotation for which a doc-text with key
    * <code>[classid]_name</code> is available or <code>listTypesWithoutDoc</code> is set to true.
-   * 
+   *
    * @param type
    * @param supertype
    * @param listTypesWithoutDoc
@@ -159,7 +156,7 @@ public final class SpecUtility {
 
   /**
    * Returns the language specific text for a boolean value
-   * 
+   *
    * @param b
    * @return text
    */

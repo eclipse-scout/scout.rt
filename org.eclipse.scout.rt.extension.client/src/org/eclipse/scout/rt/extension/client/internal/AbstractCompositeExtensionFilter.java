@@ -23,6 +23,7 @@ public abstract class AbstractCompositeExtensionFilter<T> {
 
   private final List<T> m_filters;
 
+  @SafeVarargs
   public AbstractCompositeExtensionFilter(T... filters) {
     m_filters = new LinkedList<T>();
     if (filters != null) {

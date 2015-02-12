@@ -31,8 +31,6 @@ import org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutValueFieldComposite;
 import org.eclipse.scout.rt.ui.swing.icons.CheckboxIcon;
 
 public class SwingScoutCheckBox extends SwingScoutValueFieldComposite<IBooleanField> implements ISwingScoutCheckBox {
-  private static final long serialVersionUID = 1L;
-
   private boolean m_mandatoryCached;
 
   /**

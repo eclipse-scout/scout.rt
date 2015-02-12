@@ -29,7 +29,7 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 
 /**
  * This is an old version of the {@code CodeLookupCall} class required only for unit tests.
- * 
+ *
  * @see CodeLookupCallTest
  */
 public class LegacyCodeLookupCall<CODE_ID_TYPE> extends LocalLookupCall<CODE_ID_TYPE> implements Serializable {
@@ -226,15 +226,6 @@ public class LegacyCodeLookupCall<CODE_ID_TYPE> extends LocalLookupCall<CODE_ID_
 
     public void add(ICode<CODE_ID_TYPE> code) {
       m_list.add(code);
-    }
-
-    public ICode<CODE_ID_TYPE> getFirstCode() {
-      if (m_list.size() > 0) {
-        return m_list.get(0);
-      }
-      else {
-        return null;
-      }
     }
 
     public List<ICode<CODE_ID_TYPE>> getCodes() {

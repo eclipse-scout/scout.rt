@@ -15,8 +15,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.AbstractTableModel;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
@@ -24,7 +22,6 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
 
 public class SwingTableModel extends AbstractTableModel {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingTableModel.class);
   private static final long serialVersionUID = 1L;
 
   private ISwingEnvironment m_env;

@@ -10,14 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt.extension.internal;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.ui.swt.extension.IUiDecoration;
 import org.eclipse.swt.SWT;
 
 public class UiDecoration implements IUiDecoration {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(UiDecoration.class);
 
   private String m_mandatoryFieldBackgroundColor;
   private int m_mandatoryStarMarkerPosition;

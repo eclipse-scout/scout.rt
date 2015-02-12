@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui.wizard;
 
 import static org.junit.Assert.assertEquals;
 
+import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.junit.Test;
 
 /**
@@ -55,7 +56,7 @@ public class AbstractWizardTest {
 
   }
 
-  private class P_WizardStepWithEqualsImplemented extends AbstractWizardStep {
+  private class P_WizardStepWithEqualsImplemented extends AbstractWizardStep<IForm> {
     private int m_uid;
 
     public P_WizardStepWithEqualsImplemented(int uniqueId) {

@@ -41,8 +41,6 @@ import org.eclipse.scout.rt.ui.swing.ext.decoration.JTextFieldWithDecorationIcon
 import org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutBasicFieldComposite;
 
 public class SwingScoutNumberField extends SwingScoutBasicFieldComposite<INumberField<?>> implements ISwingScoutNumberField {
-  private static final long serialVersionUID = 1L;
-
   private ContextMenuDecorationItem m_contextMenuMarker;
   private SwingScoutContextMenu m_contextMenu;
   private PropertyChangeListener m_contextMenuVisibilityListener;

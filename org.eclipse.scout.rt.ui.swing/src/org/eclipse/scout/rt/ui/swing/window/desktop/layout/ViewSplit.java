@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -14,12 +14,9 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.util.Set;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.swing.SwingLayoutUtility;
 
 class ViewSplit {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ViewSplit.class);
 
   private Set<CellSplit> m_cellSplits;
   private Set<ViewElement> m_leftViews;
@@ -66,7 +63,7 @@ class ViewSplit {
 
   /**
    * left=top, right=bottom
-   * 
+   *
    * @return amount that was effectively moved
    */
   public int move(int delta, boolean force) {

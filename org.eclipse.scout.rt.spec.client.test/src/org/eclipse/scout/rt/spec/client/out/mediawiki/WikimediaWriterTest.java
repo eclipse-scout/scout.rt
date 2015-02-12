@@ -25,7 +25,7 @@ public class WikimediaWriterTest {
 
   /**
    * Test for {@link WikimediaTableWriter#appendTable(IDocTable)}
-   * 
+   *
    * @throws IOException
    */
   @Test
@@ -37,7 +37,7 @@ public class WikimediaWriterTest {
 
   /**
    * Verifies that a test table is written as expected with {@link MediaWikiTableWriter#appendTable(IDocTable)}
-   * 
+   *
    * @param testTable
    *          test {@link IDocTable}
    * @param expectedTable
@@ -53,7 +53,7 @@ public class WikimediaWriterTest {
 
   /**
    * Test for {@link MediaWikiTableWriter#appendTableTransposed(IDocTable)}
-   * 
+   *
    * @throws IOException
    */
   @Test
@@ -67,7 +67,7 @@ public class WikimediaWriterTest {
   /**
    * Verifies that a test table is written as expected with
    * {@link MediaWikiTableWriter#appendTableTransposed(IDocTable)}
-   * 
+   *
    * @param testTable
    *          test {@link IDocTable}
    * @param expectedTable
@@ -87,11 +87,6 @@ public class WikimediaWriterTest {
     if (headers) {
       return new DocTable(header, cells, false);
     }
-    return new DocTable(null, cells, false);
-  }
-
-  private IDocTable getTestTableNoHeaders() {
-    String[][] cells = new String[][]{{"a1", "a2"}, {"b1", "b2"}, {"c1", "c2"}};
     return new DocTable(null, cells, false);
   }
 
@@ -129,16 +124,16 @@ public class WikimediaWriterTest {
           + "|}" + MediawikiTableWriter.NEWLINE;
     }
     return ""
-        + "{|" + MediawikiTableWriter.NEWLINE
-        + "|-" + MediawikiTableWriter.NEWLINE
-        + "| a1" + MediawikiTableWriter.NEWLINE
-        + "| b1" + MediawikiTableWriter.NEWLINE
-        + "| c1" + MediawikiTableWriter.NEWLINE
-        + "|-" + MediawikiTableWriter.NEWLINE
-        + "| a2" + MediawikiTableWriter.NEWLINE
-        + "| b2" + MediawikiTableWriter.NEWLINE
-        + "| c2" + MediawikiTableWriter.NEWLINE
-        + "|}" + MediawikiTableWriter.NEWLINE;
+    + "{|" + MediawikiTableWriter.NEWLINE
+    + "|-" + MediawikiTableWriter.NEWLINE
+    + "| a1" + MediawikiTableWriter.NEWLINE
+    + "| b1" + MediawikiTableWriter.NEWLINE
+    + "| c1" + MediawikiTableWriter.NEWLINE
+    + "|-" + MediawikiTableWriter.NEWLINE
+    + "| a2" + MediawikiTableWriter.NEWLINE
+    + "| b2" + MediawikiTableWriter.NEWLINE
+    + "| c2" + MediawikiTableWriter.NEWLINE
+    + "|}" + MediawikiTableWriter.NEWLINE;
   }
 
 }

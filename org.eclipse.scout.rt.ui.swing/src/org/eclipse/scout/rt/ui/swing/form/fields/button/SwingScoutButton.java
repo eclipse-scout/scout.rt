@@ -27,8 +27,6 @@ import javax.swing.SwingConstants;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.WeakEventListener;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.button.ButtonEvent;
 import org.eclipse.scout.rt.client.ui.form.fields.button.ButtonListener;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
@@ -52,7 +50,6 @@ import org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutFieldComposite;
  * JButton/JToggleButton/JRadioButton
  */
 public class SwingScoutButton<T extends IButton> extends SwingScoutFieldComposite<T> implements ISwingScoutButton<T> {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingScoutButton.class);
 
   private ButtonListener m_scoutButtonListener;
   //ticket 86811: avoid double-action in queue
@@ -132,7 +129,7 @@ public class SwingScoutButton<T extends IButton> extends SwingScoutFieldComposit
 
   /**
    * Create the gridData for the Button
-   * 
+   *
    * @since 4.0.0-M7
    */
   protected void adaptButtonLayoutData(LogicalGridData gd) {

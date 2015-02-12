@@ -14,7 +14,6 @@ import java.util.UUID;
 
 public abstract class AbstractClientNotification implements IClientNotification {
   private static final long serialVersionUID = 1L;
-  private int m_node;
   private final String m_notificationId = UUID.randomUUID().toString();
   private final long m_timeout;
   private String m_originServerNode;

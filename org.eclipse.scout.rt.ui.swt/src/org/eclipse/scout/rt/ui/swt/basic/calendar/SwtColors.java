@@ -20,7 +20,7 @@ import org.eclipse.swt.widgets.Display;
 
 /**
  * SWT Color Management
- * 
+ *
  * @author Michael Rudolf, Andreas Hoegger
  */
 public final class SwtColors {
@@ -32,7 +32,6 @@ public final class SwtColors {
   private final Color darkgray;
   private final Color red;
   private final Color black;
-  private final Color widget_background;
 
   private HashMap<String, Color> m_registry = new HashMap<String, Color>();
   private HashMap<Integer, Color> m_scoutColorRegistry = new HashMap<Integer, Color>();
@@ -56,7 +55,6 @@ public final class SwtColors {
     darkgray = display.getSystemColor(SWT.COLOR_DARK_GRAY);
     red = display.getSystemColor(SWT.COLOR_RED);
     black = display.getSystemColor(SWT.COLOR_BLACK);
-    widget_background = display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
   }
 
   public static SwtColors getInstance() {

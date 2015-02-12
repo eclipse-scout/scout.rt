@@ -218,7 +218,4 @@ public class JClock extends JComponent {
     }
   }
 
-  private static final int SOFT_REPAINT_ALPHA_DELTA = 8;
-  private static final int SOFT_REPAINT_INTERVAL = 24;
-
 }

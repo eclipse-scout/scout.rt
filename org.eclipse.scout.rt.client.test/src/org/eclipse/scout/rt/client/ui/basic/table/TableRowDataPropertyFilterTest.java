@@ -25,6 +25,7 @@ import org.junit.Test;
 /**
  * @since 3.10.0-M4
  */
+@SuppressWarnings("unused")
 public class TableRowDataPropertyFilterTest {
 
   @Test

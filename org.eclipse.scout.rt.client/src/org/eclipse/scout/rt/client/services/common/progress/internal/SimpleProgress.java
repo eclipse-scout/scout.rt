@@ -16,13 +16,11 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.rt.client.services.common.progress.ISimpleProgress;
 
 public class SimpleProgress extends ProgressMonitorWrapper implements ISimpleProgress {
-  private Job m_job;
   private String m_name;
   private int m_worked = -1;
 
   protected SimpleProgress(Job job, IProgressMonitor monitor) {
     super(monitor);
-    m_job = job;
   }
 
   @Override

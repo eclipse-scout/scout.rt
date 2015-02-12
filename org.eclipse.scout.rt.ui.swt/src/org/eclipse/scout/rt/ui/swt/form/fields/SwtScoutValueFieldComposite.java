@@ -10,19 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt.form.fields;
 
-import java.beans.PropertyChangeListener;
-
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 
 /**
  * <h3>SwtScoutValueFieldComposite</h3> ...
- * 
+ *
  * @since 1.0.0 01.04.2008
  * @param <T>
  */
 public abstract class SwtScoutValueFieldComposite<T extends IValueField<?>> extends SwtScoutFieldComposite<T> {
-
-  private PropertyChangeListener m_contextMenuPropertyListener;
 
   @Override
   protected void attachScout() {

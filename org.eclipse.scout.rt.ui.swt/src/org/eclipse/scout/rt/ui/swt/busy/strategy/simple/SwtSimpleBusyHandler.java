@@ -10,26 +10,25 @@
 package org.eclipse.scout.rt.ui.swt.busy.strategy.simple;
 
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.busy.SwtBusyHandler;
 
 /**
  * Busy handler which only shows the busy indicator.
- * 
+ *
  * @author imo
  * @since 3.8
  */
 public class SwtSimpleBusyHandler extends SwtBusyHandler {
   private boolean m_abortable = false;
 
-  public SwtSimpleBusyHandler(IClientSession session, ISwtEnvironment env) {
-    this(session, env, true);
+  public SwtSimpleBusyHandler(ISwtEnvironment env) {
+    this(env, true);
   }
 
-  public SwtSimpleBusyHandler(IClientSession session, ISwtEnvironment env, boolean abortable) {
-    super(session, env);
+  public SwtSimpleBusyHandler(ISwtEnvironment env, boolean abortable) {
+    super(env);
     m_abortable = abortable;
   }
 

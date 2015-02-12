@@ -15,8 +15,6 @@ import javax.jms.JMSException;
 import javax.jms.Session;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.ThreadContext;
 import org.eclipse.scout.rt.server.jms.AbstractJmsService;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
@@ -30,7 +28,6 @@ import org.eclipse.scout.rt.server.transaction.ITransaction;
  * Before you can use any of the send or receive methods you must call {@link #setupConnection()}.
  */
 public abstract class AbstractTransactionalJmsService<T> extends AbstractJmsService<T> {
-  private static IScoutLogger LOG = ScoutLogManager.getLogger(AbstractTransactionalJmsService.class);
 
   private final String m_transactionId;
 

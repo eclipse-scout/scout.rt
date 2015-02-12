@@ -4,13 +4,12 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt.form.fields.snapbox.button;
 
-import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.ui.swt.ext.SnapButtonMaximized;
@@ -22,10 +21,7 @@ import org.eclipse.swt.widgets.Composite;
 
 public class SwtScoutSnapBoxMaximizedButton extends SwtScoutFieldComposite<IButton> implements ISwtScoutSnapBoxMaximizedButton {
 
-  private OptimisticLock m_selectionLock;
-
   public SwtScoutSnapBoxMaximizedButton() {
-    m_selectionLock = new OptimisticLock();
   }
 
   @Override

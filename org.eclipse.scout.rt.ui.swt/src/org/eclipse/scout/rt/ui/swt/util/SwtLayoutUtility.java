@@ -15,8 +15,6 @@ import java.io.StringWriter;
 import java.lang.reflect.Method;
 
 import org.eclipse.core.runtime.Status;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.swt.Activator;
 import org.eclipse.scout.rt.ui.swt.LayoutValidateManager;
 import org.eclipse.scout.rt.ui.swt.LogicalGridLayout;
@@ -30,7 +28,6 @@ import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Scrollable;
 
 public final class SwtLayoutUtility {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwtLayoutUtility.class);
 
   private SwtLayoutUtility() {
   }

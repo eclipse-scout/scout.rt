@@ -23,8 +23,6 @@ import javax.swing.text.Caret;
 import javax.swing.text.JTextComponent;
 
 public class NullCaret implements Caret, FocusListener, MouseListener {
-  private static final long serialVersionUID = 1L;
-
   private JTextComponent component;
   private boolean visible;
 

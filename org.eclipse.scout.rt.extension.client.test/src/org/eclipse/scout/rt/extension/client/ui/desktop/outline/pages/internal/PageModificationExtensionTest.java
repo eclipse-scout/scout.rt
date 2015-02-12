@@ -33,14 +33,12 @@ import org.junit.runner.RunWith;
 public class PageModificationExtensionTest {
 
   private P_Outline m_outline;
-  private P_OtherOutline m_otherOutline;
   private P_Page m_page;
   private P_OtherPage m_otherPage;
 
   @Before
   public void setup() throws Exception {
     m_outline = new P_Outline();
-    m_otherOutline = new P_OtherOutline();
     m_page = new P_Page();
     m_otherPage = new P_OtherPage();
   }
@@ -94,15 +92,8 @@ public class PageModificationExtensionTest {
 
   public static class P_PageModifier implements IPageModifier<P_Page> {
 
-    private IOutline m_outline;
-    private IPage m_parentPage;
-    private IPage m_page;
-
     @Override
     public void modify(IOutline outline, IPage parentPage, P_Page page) throws ProcessingException {
-      m_outline = outline;
-      m_parentPage = parentPage;
-      m_page = page;
     }
   }
 
@@ -127,9 +118,6 @@ public class PageModificationExtensionTest {
   }
 
   private static class P_Outline extends AbstractOutline {
-  }
-
-  private static class P_OtherOutline extends AbstractOutline {
   }
 
   private static class P_Page extends AbstractPageWithNodes {

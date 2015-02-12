@@ -33,7 +33,6 @@ import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.Base64Utility;
 import org.eclipse.scout.commons.EncryptionUtility;
-import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.SoapHandlingUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -140,11 +139,9 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
   private String m_originAddress;
   private Boolean m_sendCompressed;
   private Boolean m_receivedCompressed;
-  private final EventListenerList m_listeners;
   private IObjectSerializer m_objectSerializer;
 
   public DefaultServiceTunnelContentHandler() {
-    m_listeners = new EventListenerList();
   }
 
   /**

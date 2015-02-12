@@ -76,10 +76,6 @@ public class DropDownButtonIcon implements Icon {
       m_enabled = b;
     }
 
-    public boolean isMouseOver() {
-      return m_mouseOver;
-    }
-
     public void setMouseOver(boolean b) {
       m_mouseOver = b;
     }

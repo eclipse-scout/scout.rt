@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -15,8 +15,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.eclipse.scout.commons.VerboseUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 
 /**
  * Only works together with the PerspectiveDesktopManager to support
@@ -24,7 +22,6 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
  * 3x3 priority matrix for every 3x3 cell
  */
 class Cell {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(Cell.class);
 
   private int m_row;
   private int m_col;

@@ -13,8 +13,6 @@ package org.eclipse.scout.rt.ui.swing.form.fields.composer;
 import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.IComposerField;
 import org.eclipse.scout.rt.ui.swing.LogicalGridData;
 import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
@@ -26,7 +24,6 @@ import org.eclipse.scout.rt.ui.swing.form.fields.LogicalGridDataBuilder;
 import org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutFieldComposite;
 
 public class SwingScoutComposerField extends SwingScoutFieldComposite<IComposerField> implements ISwingScoutComposerField {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingScoutComposerField.class);
 
   private SwingScoutTree m_treeComposite;
 

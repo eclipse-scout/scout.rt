@@ -15,8 +15,6 @@ import java.util.Map;
 
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.ServerJob;
 import org.eclipse.scout.rt.server.services.common.clientnotification.AllUserFilter;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;
@@ -32,12 +30,8 @@ import org.eclipse.scout.rt.shared.services.common.code.SharedCodeService;
 import org.eclipse.scout.service.IService;
 import org.eclipse.scout.service.SERVICES;
 
-/**
- * delegates to {@link CodeTypeStore}
- */
 @Priority(-1)
 public class CodeService extends SharedCodeService implements IClusterNotificationListenerService {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(CodeService.class);
 
   @Override
   protected Long provideCurrentPartitionId() {

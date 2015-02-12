@@ -134,20 +134,4 @@ public class ServerSessionClassFinder {
     }
     return null;
   }
-
-  @SuppressWarnings("unchecked")
-  private Class<? extends IServerSession> loadServerSessionSafe(Bundle bundle, String serverSessionFqn) {
-    try {
-      Class clazz = bundle.loadClass(serverSessionFqn);
-      if (IServerSession.class.isAssignableFrom(clazz)) {
-        return clazz;
-      }
-      LOG.error("Server session class '" + serverSessionFqn + "' could not be loaded as not of the type '" + IServerSession.class.getName() + "'");
-    }
-    catch (ClassNotFoundException e) {
-      LOG.error("Server session class '" + serverSessionFqn + "' could not be found");
-    }
-    return null;
-  }
-
 }

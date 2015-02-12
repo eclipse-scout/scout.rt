@@ -65,8 +65,6 @@ public class SwingScoutPopup implements ISwingScoutView {
   private final JWindowEx m_swingWindow;
   private boolean m_resizable;
   private final P_ResizeListener m_resizeListener;
-  // cache
-  private boolean m_maximized;
   private boolean m_positionBelowReferenceField;// ticket 76521
   private Rectangle m_boundsBeforeMaximize;
   private boolean m_opened;
@@ -339,7 +337,6 @@ public class SwingScoutPopup implements ISwingScoutView {
 
   @Override
   public void setMaximized(boolean on) {
-    m_maximized = on;
     if (on) {
       if (m_boundsBeforeMaximize == null) {
         m_boundsBeforeMaximize = m_swingWindow.getBounds();

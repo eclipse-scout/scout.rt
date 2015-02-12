@@ -62,14 +62,17 @@ public class ExtendAbstractStringFieldTest extends AbstractLocalExtensionTestCas
       startInternal(new StartHandler());
     }
 
+    @SuppressWarnings("unused")
     public MainBox getMainBox() {
       return getFieldByClass(MainBox.class);
     }
 
+    @SuppressWarnings("unused")
     public NameField getNameField() {
       return getFieldByClass(NameField.class);
     }
 
+    @SuppressWarnings("unused")
     public PrenameField getPrenameField() {
       return getFieldByClass(PrenameField.class);
     }

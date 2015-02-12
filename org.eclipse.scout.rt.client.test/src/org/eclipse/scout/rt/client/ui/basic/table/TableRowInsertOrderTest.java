@@ -110,6 +110,7 @@ public class TableRowInsertOrderTest {
       return getColumnSet().getColumnByClass(FirstColumn.class);
     }
 
+    @SuppressWarnings("unused")
     public SecondColumn getSecondColumn() {
       return getColumnSet().getColumnByClass(SecondColumn.class);
     }

@@ -187,6 +187,7 @@ public class BookmarkUtilityTest {
   private static class SerializablePrimaryKey implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    @SuppressWarnings("unused")
     private final long m_id;
 
     public SerializablePrimaryKey(long id) {
@@ -196,6 +197,7 @@ public class BookmarkUtilityTest {
 
   private static class UnSerializablePrimaryKey {
 
+    @SuppressWarnings("unused")
     private final long m_id;
 
     public UnSerializablePrimaryKey(long id) {

@@ -15,8 +15,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.service.internal.Activator;
 import org.eclipse.scout.service.internal.ServicesExtensionManager;
 import org.osgi.framework.BundleContext;
@@ -37,7 +35,6 @@ import org.osgi.framework.ServiceReference;
  * runtime.
  */
 public final class SERVICES {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SERVICES.class);
 
   private SERVICES() {
   }
@@ -161,7 +158,7 @@ public final class SERVICES {
    * Clear the services cache that speeds up service lookup.
    * <p>
    * This does not affect the registered services it is only clears the lookup cache.
-   * 
+   *
    * @since 4.0
    */
   public static void clearCache() {

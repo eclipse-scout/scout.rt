@@ -423,8 +423,6 @@ public class SwtScoutMessageBoxDialog extends Dialog {
 
   private class P_DisposeListener implements DisposeListener {
 
-    private static final long serialVersionUID = 1L;
-
     @Override
     public void widgetDisposed(DisposeEvent event) {
       dettachScout();

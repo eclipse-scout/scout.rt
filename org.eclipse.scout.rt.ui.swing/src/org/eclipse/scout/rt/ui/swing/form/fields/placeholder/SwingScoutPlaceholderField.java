@@ -15,8 +15,6 @@ import org.eclipse.scout.rt.ui.swing.ext.JPanelEx;
 import org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutFieldComposite;
 
 public class SwingScoutPlaceholderField extends SwingScoutFieldComposite<IPlaceholderField> implements ISwingScoutPlaceholderField {
-  private static final long serialVersionUID = 1L;
-
   @Override
   protected void initializeSwing() {
     JPanelEx container = new JPanelEx();

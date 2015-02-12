@@ -23,12 +23,9 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreePath;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 
 public class SwingTreeModel implements TreeModel {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingTreeModel.class);
 
   private EventListenerList m_listenerList = new EventListenerList();
   private SwingScoutTree m_swingScoutTree;
@@ -193,7 +190,7 @@ public class SwingTreeModel implements TreeModel {
 
   /**
    * Updates the given node.
-   * 
+   *
    * @since 3.10.0-M5
    */
   public void updateNode(ITreeNode node) {

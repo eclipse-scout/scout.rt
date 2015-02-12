@@ -33,7 +33,6 @@ import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.DateUtility;
 import org.eclipse.scout.commons.EventListenerList;
-import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
@@ -82,9 +81,6 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
   private IContributionOwner m_contributionHolder;
   private final ObjectExtensions<AbstractActivityMap<RI, AI>, IActivityMapExtension<RI, AI, ? extends AbstractActivityMap<RI, AI>>> m_objectExtensions;
 
-  private Class<RI> m_resourceIdClass;
-  private Class<AI> m_activityIdClass;
-
   public AbstractActivityMap() {
     this(true);
   }
@@ -116,22 +112,6 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
       interceptInitConfig();
       m_initialized = true;
     }
-  }
-
-  @SuppressWarnings("unchecked")
-  private Class<RI> getResourceIdClass() {
-    if (m_resourceIdClass == null) {
-      m_resourceIdClass = TypeCastUtility.getGenericsParameterClass(getClass(), IActivityMap.class, 0);
-    }
-    return m_resourceIdClass;
-  }
-
-  @SuppressWarnings("unchecked")
-  private Class<AI> getActivityIdClass() {
-    if (m_activityIdClass == null) {
-      m_activityIdClass = TypeCastUtility.getGenericsParameterClass(getClass(), IActivityMap.class, 1);
-    }
-    return m_activityIdClass;
   }
 
   /*
@@ -1344,10 +1324,6 @@ public abstract class AbstractActivityMap<RI, AI> extends AbstractPropertyObserv
    * Specialized ui facade
    */
   private class P_ActivityMapUIFacade implements IActivityMapUIFacade<RI, AI> {
-
-    public void setSelectedDayListFromUI(Date[] days) {
-      setDays(days);
-    }
 
     @Override
     public void setSelectionFromUI(List<? extends RI> resourceIds, double[] normalizedRange) {

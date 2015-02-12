@@ -284,11 +284,4 @@ public class SwtScoutFileChooserField extends SwtScoutValueFieldComposite<IFileC
       setFileIconIdFromScout((String) newValue);
     }
   }
-
-  private class P_SwtFileChooserButtonListener extends SelectionAdapter {
-    @Override
-    public void widgetSelected(SelectionEvent e) {
-      handleSwtFileChooserAction();
-    }
-  }
 }

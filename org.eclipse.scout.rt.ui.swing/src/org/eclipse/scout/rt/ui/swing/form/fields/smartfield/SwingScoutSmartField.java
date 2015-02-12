@@ -84,8 +84,6 @@ import org.eclipse.scout.rt.ui.swing.window.popup.SwingScoutPopup;
  * in the proposal popup
  */
 public class SwingScoutSmartField extends SwingScoutValueFieldComposite<IContentAssistField<?, ?>> implements ISwingScoutSmartField {
-  private static final long serialVersionUID = 1L;
-
   // proposal support
   private SwingScoutDropDownPopup m_proposalPopup;
   private P_PendingProposalJob m_pendingProposalJob;
@@ -700,18 +698,6 @@ public class SwingScoutSmartField extends SwingScoutValueFieldComposite<IContent
       m_text = text;
       m_selectCurrentValue = selectCurrentValue;
     }
-  }
-
-  private String getLinesOfStackTrace(StackTraceElement[] elements, int lines) {
-    StringBuilder b = new StringBuilder();
-    int lineCount = Math.min(lines, elements.length);
-    for (int i = 0; i < lineCount; i++) {
-      b.append("  " + elements[i].toString());
-      if (i < lineCount - 1) {
-        b.append("\n");
-      }
-    }
-    return b.toString();
   }
 
   private static final class P_SwingDocumentFilter extends BasicDocumentFilter {

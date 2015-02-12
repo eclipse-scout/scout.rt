@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -17,8 +17,6 @@ import javax.swing.JLabel;
 import javax.swing.text.JTextComponent;
 
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.ui.swing.LogicalGridData;
 import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
@@ -33,7 +31,6 @@ import org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutFieldComposite;
  * JButton/JToggleButton/JRadioButton
  */
 public class SwingScoutLink extends SwingScoutFieldComposite<IButton> implements ISwingScoutLink {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingScoutLink.class);
 
   //ticket 86811: avoid double-action in queue
   private boolean m_handleActionPending;

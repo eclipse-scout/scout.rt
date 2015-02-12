@@ -33,11 +33,9 @@ import org.eclipse.scout.rt.ui.swing.form.fields.AbstractLayoutManager2;
 import org.osgi.framework.Version;
 
 public class EmbeddedSplashWindow implements ISplashWindow {
-  private static final long serialVersionUID = 1L;
   private RootPaneContainer m_owner;
   //
   private JLabel m_splash;
-  private String m_title;
   private String m_statusText = "...";
   private String m_versionText;
   private float m_animationPhase = -1;
@@ -46,7 +44,6 @@ public class EmbeddedSplashWindow implements ISplashWindow {
     m_owner = owner;
     Version v = Version.emptyVersion;
     if (Platform.getProduct() != null) {
-      m_title = Platform.getProduct().getName();
       v = Version.parseVersion("" + Platform.getProduct().getDefiningBundle().getHeaders().get("Bundle-Version"));
     }
     m_versionText = v.getMajor() + "." + v.getMinor() + "." + v.getMicro();

@@ -10,12 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.spec.client.link;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.spec.client.out.IDocLink;
 
 public class DocLink implements IDocLink {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(DocLink.class);
 
   private final String m_targetId;
   private final String m_displayName;

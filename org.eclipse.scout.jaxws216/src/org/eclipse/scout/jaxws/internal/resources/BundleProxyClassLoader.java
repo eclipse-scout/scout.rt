@@ -16,14 +16,11 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.logging.Logger;
 
 import org.eclipse.scout.jaxws.Activator;
 import org.osgi.framework.Bundle;
 
 public class BundleProxyClassLoader extends ClassLoader {
-
-  private static final Logger LOG = Logger.getLogger("com.sun.xml.ws.server.http");
 
   private Bundle m_bundle;
 

@@ -29,8 +29,6 @@ public class StyledTextFieldUndoRedoSupport {
   private Stack<P_TextChange> m_undoStack;
   private Stack<P_TextChange> m_redoStack;
 
-  private boolean disposed = true;
-
   public StyledTextFieldUndoRedoSupport(StyledText styledText) {
     m_styledText = styledText;
     init();

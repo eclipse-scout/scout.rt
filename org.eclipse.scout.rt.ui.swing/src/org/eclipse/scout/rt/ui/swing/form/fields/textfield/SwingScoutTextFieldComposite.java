@@ -50,7 +50,6 @@ import org.eclipse.scout.rt.ui.swing.ext.MouseClickedBugFix;
 import org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutBasicFieldComposite;
 
 public abstract class SwingScoutTextFieldComposite<T extends IStringField> extends SwingScoutBasicFieldComposite<T> {
-  private static final long serialVersionUID = 1L;
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingScoutTextFieldComposite.class);
 
   public static final String CLIENT_PROP_INITIAL_DISABLED_TEXT_COLOR = "scoutInitialDisabledForeground";

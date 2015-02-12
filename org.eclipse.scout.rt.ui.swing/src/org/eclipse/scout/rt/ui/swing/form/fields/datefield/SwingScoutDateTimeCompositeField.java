@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swing.form.fields.datefield;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField;
 import org.eclipse.scout.rt.ui.swing.LogicalGridData;
 import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
@@ -22,8 +20,6 @@ import org.eclipse.scout.rt.ui.swing.form.fields.LogicalGridDataBuilder;
 import org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutFieldComposite;
 
 public class SwingScoutDateTimeCompositeField extends SwingScoutFieldComposite<IDateField> implements ISwingScoutFormField<IDateField> {
-  private static final long serialVersionUID = 1L;
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingScoutDateTimeCompositeField.class);
 
   private SwingScoutDateField m_dateField;
   private SwingScoutTimeField m_timeField;

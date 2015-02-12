@@ -34,9 +34,6 @@ public enum PrintDevice {
      */
     File(2);
 
-  private int value;
-
   PrintDevice(int value) {
-    this.value = value;
   }
 }

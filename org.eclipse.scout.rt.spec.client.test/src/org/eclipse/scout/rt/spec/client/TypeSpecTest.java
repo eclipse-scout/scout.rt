@@ -17,7 +17,7 @@ import java.util.ArrayList;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBooleanColumn;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractDateField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.junit.Before;
@@ -68,7 +68,7 @@ public class TypeSpecTest {
   private class TestStringField extends AbstractStringField {
   }
 
-  private class TestStringColumn extends AbstractColumn {
+  private class TestStringColumn extends AbstractStringColumn {
   }
 
 }

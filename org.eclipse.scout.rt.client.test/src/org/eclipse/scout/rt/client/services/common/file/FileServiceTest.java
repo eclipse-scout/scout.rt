@@ -45,8 +45,6 @@ public class FileServiceTest {
   private static final String TEST_PATH_1 = TEST_DIR_IN + "/" + "file1.txt";
   private static final String TEST_PATH_2 = TEST_DIR_IN + "/sub/" + "file2.txt";
 
-  private static final String TEST_FILENAME2 = "file2.txt";
-
   @Before
   public void createTestFiles() {
     deleteTestFolders();

@@ -71,7 +71,6 @@ public class OutlineTreeContextMenuNestedPageWithTablesTest {
     assertRowMenusExistOnTablePageNode(outline);
   }
 
-  @SuppressWarnings("unchecked")
   private static void assertRowMenusExistOnTablePageNode(IOutline outline) throws Exception {
     outline.selectFirstNode();
 
@@ -129,6 +128,7 @@ public class OutlineTreeContextMenuNestedPageWithTablesTest {
     return i;
   }
 
+  @SafeVarargs
   private static List<IMenu> resolveMenusOfPageWithTable(IPageWithTable<?> page, Class<? extends IMenu>... menuClasses) throws Exception {
     List<IMenu> resolvedMenus = new LinkedList<IMenu>();
 

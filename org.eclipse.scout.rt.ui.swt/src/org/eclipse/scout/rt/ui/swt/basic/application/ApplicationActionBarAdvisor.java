@@ -7,8 +7,6 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.ToolBarContributionItem;
 import org.eclipse.jface.action.ToolBarManager;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
 import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -25,8 +23,6 @@ import org.eclipse.ui.application.IActionBarConfigurer;
  * <h3>ApplicationActionBarAdvisor</h3> Used for menu contributions.
  */
 public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
-
-  private static IScoutLogger logger = ScoutLogManager.getLogger(ApplicationActionBarAdvisor.class);
 
   private IActionBarConfigurer m_configurer;
   private ToolBarManager m_toolbar;

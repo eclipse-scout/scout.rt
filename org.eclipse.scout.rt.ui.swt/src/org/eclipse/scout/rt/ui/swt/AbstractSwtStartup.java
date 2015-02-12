@@ -13,8 +13,6 @@ package org.eclipse.scout.rt.ui.swt;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.swt.util.SwtUtility;
 import org.eclipse.scout.rt.ui.swt.util.listener.WindowListener;
 import org.eclipse.swt.widgets.Display;
@@ -28,7 +26,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.UIJob;
 
 public abstract class AbstractSwtStartup implements IStartup {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSwtStartup.class);
 
   protected abstract ISwtEnvironment getSwtEnvironment();
 

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -26,10 +26,6 @@ public class TableDesc implements java.io.Serializable {
   private Collection<TableGrantDesc> m_grants;
   private Collection<IndexDesc> m_indices;
   private PrimaryKeyDesc m_pk;
-
-  // for IScoutSerializable
-  private TableDesc() {
-  }
 
   public TableDesc(String name, String owner) {
     m_name = name;

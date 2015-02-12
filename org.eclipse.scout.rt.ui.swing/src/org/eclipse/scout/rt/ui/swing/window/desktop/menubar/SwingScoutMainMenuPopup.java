@@ -26,7 +26,6 @@ import org.eclipse.scout.rt.ui.swing.basic.SwingScoutComposite;
  */
 public class SwingScoutMainMenuPopup extends SwingScoutComposite<IDesktop> {
 
-  private static final long serialVersionUID = 1L;
   private IActionFilter m_filter;
 
   public SwingScoutMainMenuPopup(IActionFilter filter) {

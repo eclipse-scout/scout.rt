@@ -19,7 +19,6 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.Spring;
 import javax.swing.SpringLayout;
 import javax.swing.UIManager;
@@ -51,11 +50,8 @@ import org.eclipse.scout.service.SERVICES;
 public class SwingScoutHeaderPanel extends SwingScoutComposite<IDesktop> {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingScoutHeaderPanel.class);
-  private static final long serialVersionUID = 1L;
   private static final int DISTANCE_NAVIGATION_TABS = 2;
   protected AbstractJNavigationPanel m_navigationPanel;
-  private JLabel m_windowIcons;
-
   private int m_topLevelMenuCount;
   protected AbstractJViewTabsBar m_viewTabsPanel;
   protected AbstractJToolTabsBar m_toolTabsPanel;
@@ -347,7 +343,7 @@ public class SwingScoutHeaderPanel extends SwingScoutComposite<IDesktop> {
 
   /**
    * Update layout of {@link RayoToolTabsBar} tool button bar to have the very same size as the tool bar itself
-   * 
+   *
    * @param width
    *          the new width to be set. Thereby, the with is only set if is different to the old width.
    * @param force
@@ -399,7 +395,7 @@ public class SwingScoutHeaderPanel extends SwingScoutComposite<IDesktop> {
    * To be overwritten to install a custom navigation panel.
    * </p>
    * This panel holds navigation buttons like 'back', 'forward', 'stop' and 'refresh'.
-   * 
+   *
    * @return
    */
   protected AbstractJNavigationPanel createNavigationPanel() {
@@ -411,7 +407,7 @@ public class SwingScoutHeaderPanel extends SwingScoutComposite<IDesktop> {
    * To be overwritten to install a custom tool tab bar.
    * </p>
    * This bar holds the {@link IToolButton} configured on desktop.
-   * 
+   *
    * @param swingScoutToolBar
    * @return
    */
@@ -424,7 +420,7 @@ public class SwingScoutHeaderPanel extends SwingScoutComposite<IDesktop> {
    * To be overwritten to install a custom view tab bar.
    * </p>
    * This bar holds the {@link IViewButton} configured on desktop.
-   * 
+   *
    * @return
    */
   protected AbstractJViewTabsBar createViewTabsBar() {

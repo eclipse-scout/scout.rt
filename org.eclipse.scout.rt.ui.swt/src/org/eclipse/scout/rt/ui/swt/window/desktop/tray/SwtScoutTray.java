@@ -13,8 +13,6 @@ package org.eclipse.scout.rt.ui.swt.window.desktop.tray;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -33,7 +31,6 @@ import org.eclipse.swt.widgets.Tray;
 import org.eclipse.swt.widgets.TrayItem;
 
 public class SwtScoutTray extends SwtScoutComposite<IDesktop> implements ISwtScoutTray {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwtScoutTray.class);
 
   private TrayItem m_trayItem;
   private Menu m_popupMenu;

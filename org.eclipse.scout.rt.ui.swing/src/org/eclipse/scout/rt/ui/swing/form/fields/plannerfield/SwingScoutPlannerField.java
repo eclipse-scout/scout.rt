@@ -30,7 +30,6 @@ import javax.swing.table.JTableHeader;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.OptimisticLock;
-import org.eclipse.scout.rt.client.ui.basic.activitymap.IActivityMap;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.form.fields.plannerfield.IPlannerField;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
@@ -104,19 +103,19 @@ public class SwingScoutPlannerField extends SwingScoutFieldComposite<IPlannerFie
     container.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(SwingUtility.createKeystroke("F5"), "refresh");
     container.getActionMap().put("refresh",
         new AbstractAction() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        // notify Scout
+        Runnable t = new Runnable() {
           @Override
-          public void actionPerformed(ActionEvent e) {
-            // notify Scout
-            Runnable t = new Runnable() {
-              @Override
-              public void run() {
-                getScoutObject().getUIFacade().refreshFromUI();
-              }
-            };
-            getSwingEnvironment().invokeScoutLater(t, 0);
-            // end notify
+          public void run() {
+            getScoutObject().getUIFacade().refreshFromUI();
           }
-        }
+        };
+        getSwingEnvironment().invokeScoutLater(t, 0);
+        // end notify
+      }
+    }
         );
     //
     setSwingContainer(container);
@@ -266,25 +265,6 @@ public class SwingScoutPlannerField extends SwingScoutFieldComposite<IPlannerFie
           getSwingEnvironment().invokeScoutLater(t, 0);
           break;
         }
-      }
-    }
-  }// end private class
-
-  /*
-   * in addition to planner property changes, also listen on activity map
-   * property changes
-   */
-  private class P_ScoutActivityMapPropertyChangeListener implements PropertyChangeListener {
-    @Override
-    public void propertyChange(final PropertyChangeEvent e) {
-      if (e.getPropertyName().equals(IActivityMap.PROP_WORK_DAY_COUNT)) {
-        Runnable t = new Runnable() {
-          @Override
-          public void run() {
-            setWorkDayCountFromScout((Integer) e.getNewValue());
-          }
-        };
-        getSwingEnvironment().invokeSwingLater(t);
       }
     }
   }// end private class

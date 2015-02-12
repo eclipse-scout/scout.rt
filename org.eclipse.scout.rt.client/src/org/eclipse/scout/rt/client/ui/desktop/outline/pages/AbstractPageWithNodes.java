@@ -343,6 +343,7 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
       return false;
     }
 
+    @SuppressWarnings("unused")
     public LabelColumn getLabelColumn() {
       return getColumnSet().getColumnByClass(LabelColumn.class);
     }

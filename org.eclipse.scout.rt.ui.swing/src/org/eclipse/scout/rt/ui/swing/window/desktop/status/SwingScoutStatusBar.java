@@ -34,8 +34,6 @@ import javax.swing.border.EmptyBorder;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.services.common.perf.IPerformanceAnalyzerService;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.shared.AbstractIcons;
@@ -51,7 +49,6 @@ import org.eclipse.scout.rt.ui.swing.ext.job.SwingProgressHandler;
 import org.eclipse.scout.service.SERVICES;
 
 public class SwingScoutStatusBar extends SwingScoutComposite<IDesktop> {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingScoutStatusBar.class);
 
   public static final int VISIBLE_ALWAYS = 0;
   public static final int VISIBLE_WHEN_BUSY = 1;

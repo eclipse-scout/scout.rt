@@ -18,7 +18,7 @@ import org.eclipse.swt.widgets.Display;
 
 /**
  * Default SWT busy handler for a {@link IClientSession}
- * 
+ *
  * @author imo
  * @since 3.8
  */
@@ -26,8 +26,8 @@ public class SwtBusyHandler extends AbstractBusyHandler {
   private final ISwtEnvironment m_env;
   private final Display m_display;
 
-  public SwtBusyHandler(IClientSession session, ISwtEnvironment env) {
-    super(session);
+  public SwtBusyHandler(ISwtEnvironment env) {
+    super();
     m_env = env;
     m_display = env.getDisplay();
   }

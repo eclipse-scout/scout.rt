@@ -16,11 +16,7 @@ import java.awt.Dimension;
 import java.awt.LayoutManager2;
 import java.lang.reflect.Array;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
-
 public abstract class AbstractLayoutManager2 implements LayoutManager2 {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractLayoutManager2.class);
 
   /*
    * do not change these indexes @see getValidatedSize

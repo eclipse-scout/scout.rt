@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -18,10 +18,6 @@ public class IndexDesc implements java.io.Serializable {
   private String m_indexName;
   private boolean m_uniqueness;
   private ArrayList<String> m_columnNames;
-
-  // for IScoutSerializable
-  private IndexDesc() {
-  }
 
   public IndexDesc(String indexName, boolean uniqueness) {
     m_indexName = indexName;

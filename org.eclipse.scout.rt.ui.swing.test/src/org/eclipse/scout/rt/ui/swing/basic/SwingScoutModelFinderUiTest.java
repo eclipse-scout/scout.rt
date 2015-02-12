@@ -349,7 +349,7 @@ public class SwingScoutModelFinderUiTest {
     }
 
     @Override
-    protected IPage execCreateChildPage(ITableRow row) throws ProcessingException {
+    protected IPage<?> execCreateChildPage(ITableRow row) throws ProcessingException {
       return new PageWithNode();
     }
 

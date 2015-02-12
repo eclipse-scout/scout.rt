@@ -22,8 +22,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.eclipse.scout.commons.OptimisticLock;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 import org.eclipse.scout.rt.ui.swing.ext.JTabbedPaneEx;
@@ -31,7 +29,6 @@ import org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutFieldComposite;
 import org.eclipse.scout.rt.ui.swing.form.fields.tabbox.SwingScoutTabItem.SwingTabIcon;
 
 public class SwingScoutTabBox extends SwingScoutFieldComposite<ITabBox> implements ISwingScoutTabBox {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingScoutTabBox.class);
 
   private HashMap<IGroupBox, Integer> m_scoutGroupToIndex;
   private HashMap<Component, IGroupBox> m_swingGroupToScoutGroup;

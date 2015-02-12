@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.server.services.common.jdbc.internal.exec;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.scout.commons.holders.HolderUtility;
 import org.eclipse.scout.commons.holders.IHolder;
@@ -21,7 +22,7 @@ import org.eclipse.scout.rt.server.services.common.jdbc.style.ISqlStyle;
 class ArrayHolderOutput implements IBindOutput {
   private IHolder<?> m_holder;
   private ValueOutputToken m_source;
-  private ArrayList<Object> m_accumulator = new ArrayList<Object>();
+  private final List<Object> m_accumulator = new ArrayList<Object>();
   private int m_batchIndex = -1;
   private int m_jdbcBindIndex = -1;
 
@@ -68,6 +69,10 @@ class ArrayHolderOutput implements IBindOutput {
   @Override
   public void setNextBatchIndex(int i) {
     m_batchIndex = i;
+  }
+
+  public int getBatchIndex() {
+    return m_batchIndex;
   }
 
   @Override

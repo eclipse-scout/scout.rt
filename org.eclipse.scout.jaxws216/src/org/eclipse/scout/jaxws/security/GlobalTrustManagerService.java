@@ -11,14 +11,12 @@
 package org.eclipse.scout.jaxws.security;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringWriter;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.SecureRandom;
@@ -58,7 +56,7 @@ public class GlobalTrustManagerService extends AbstractService {
   /**
    * Installs the global trustmanager for 'TLS' server socket protocol and the default trustmanager algorithm as
    * specified in the java security properties, or an implementation-specific default if no such property exists.
-   * 
+   *
    * @throws ProcessingException
    */
   public void installGlobalTrustManager() throws ProcessingException {
@@ -67,7 +65,7 @@ public class GlobalTrustManagerService extends AbstractService {
 
   /**
    * Installs the global trustmanager for the given server socket protocol and trustmanager algorithm.
-   * 
+   *
    * @param protocol
    *          the server socket protocol (e.g. TLS or SSL) used to identify the protocol implementing {@link SSLContext}
    *          . This context is injected with a custom {@link TrustManager} to further check server identity with
@@ -251,23 +249,6 @@ public class GlobalTrustManagerService extends AbstractService {
       }
 
       return trustedCertsAll.toArray(new X509Certificate[trustedCertsAll.size()]);
-    }
-
-    private String printCertificates(X509Certificate[] certificates) {
-      StringWriter stringWriter = new StringWriter();
-      BufferedWriter writer = new BufferedWriter(stringWriter);
-
-      for (X509Certificate certificate : certificates) {
-        try {
-          writer.write(certificate.toString());
-          writer.newLine();
-        }
-        catch (IOException e) {
-          LOG.warn("Error while printing certificates.", e);
-        }
-      }
-
-      return stringWriter.getBuffer().toString();
     }
   }
 }

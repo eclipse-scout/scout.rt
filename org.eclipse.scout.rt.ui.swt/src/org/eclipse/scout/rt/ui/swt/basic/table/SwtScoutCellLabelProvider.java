@@ -15,7 +15,6 @@ import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerColumn;
 import org.eclipse.scout.commons.BooleanUtility;
@@ -32,7 +31,6 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
 
 /**
  * {@link LabelProvider} for {@link IColumn}s.
@@ -44,7 +42,6 @@ public class SwtScoutCellLabelProvider extends CellLabelProvider {
   private final boolean m_useNativeToolTips;
 
   private Table m_swtTable;
-  private TableColumn m_swtColumn;
   private IColumn<?> m_scoutColumn;
 
   public SwtScoutCellLabelProvider(IColumn<?> scoutColumn, ISwtEnvironment environment) {
@@ -58,7 +55,6 @@ public class SwtScoutCellLabelProvider extends CellLabelProvider {
   @Override
   protected void initialize(ColumnViewer viewer, ViewerColumn column) {
     m_swtTable = ((TableViewer) viewer).getTable();
-    m_swtColumn = ((TableViewerColumn) column).getColumn();
     super.initialize(viewer, column);
   }
 

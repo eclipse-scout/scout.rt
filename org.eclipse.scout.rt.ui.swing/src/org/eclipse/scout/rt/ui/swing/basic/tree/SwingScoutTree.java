@@ -1086,8 +1086,6 @@ public class SwingScoutTree extends SwingScoutComposite<ITree> implements ISwing
    * @since 4.0-M7
    */
   private class P_DropTargetListener extends DropTargetAdapter {
-    private static final long serialVersionUID = 1L;
-
     @Override
     public void dragOver(DropTargetDragEvent dtde) {
       DataFlavor[] currentFlavors = dtde.getCurrentDataFlavors();

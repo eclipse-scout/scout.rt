@@ -53,7 +53,6 @@ public class SwtScoutDateField extends SwtScoutBasicFieldComposite<IDateField> i
 
   private Button m_dateChooserButton;
   private Button m_timeChooserButton;
-  private boolean m_hasTime;
   private TextFieldEditableSupport m_editableSupport;
 
   private SwtContextMenuMarkerComposite m_menuMarkerComposite;

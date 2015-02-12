@@ -37,7 +37,6 @@ import org.junit.Test;
  * Test for {@link ClientNotificationQueue}
  */
 public class ClientNotificationQueueTest {
-  private static final String TEST_ID = "TEST_ID";
   private IClientNotification m_testNotification;
   private ClientNotificationQueue m_clientNotificationQueue;
 

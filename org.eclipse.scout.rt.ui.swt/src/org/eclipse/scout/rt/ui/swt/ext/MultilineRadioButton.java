@@ -22,8 +22,6 @@ import org.eclipse.swt.widgets.Event;
  * @since 3.10.0-M4
  */
 public class MultilineRadioButton extends MultilineButton {
-  private static final long serialVersionUID = 1L;
-
   public MultilineRadioButton(Composite parent, int style) {
     super(parent, style | SWT.RADIO);
 

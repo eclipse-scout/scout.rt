@@ -36,22 +36,15 @@ import org.eclipse.ui.PlatformUI;
  */
 public class JUnitSWTJob extends Job {
   private final ISwtEnvironment m_environment;
-  private final long m_waitTimeout;
 
   /**
    * @param environment
-   * @param waitTimeout
    *          timeout until the application is showing
    */
-  public JUnitSWTJob(ISwtEnvironment environment, long waitTimeout) {
+  public JUnitSWTJob(ISwtEnvironment environment) {
     super("JUnit SWT Runner");
     setSystem(true);
     m_environment = environment;
-    m_waitTimeout = waitTimeout;
-  }
-
-  public JUnitSWTJob(ISwtEnvironment environment) {
-    this(environment, IGuiMock.WAIT_TIMEOUT);
   }
 
   @Override

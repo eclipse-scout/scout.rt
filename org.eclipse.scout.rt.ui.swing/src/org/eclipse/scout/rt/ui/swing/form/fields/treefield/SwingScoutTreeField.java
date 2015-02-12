@@ -14,8 +14,6 @@ import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.treefield.ITreeField;
@@ -30,7 +28,6 @@ import org.eclipse.scout.rt.ui.swing.form.fields.LogicalGridDataBuilder;
 import org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutFieldComposite;
 
 public class SwingScoutTreeField extends SwingScoutFieldComposite<ITreeField> implements ISwingScoutTreeField {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingScoutTreeField.class);
 
   private ISwingScoutTree m_treeComposite;
 

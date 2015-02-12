@@ -14,7 +14,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
@@ -61,7 +60,6 @@ import org.eclipse.scout.rt.shared.validate.checks.RegexMatchCheck;
  */
 public class DefaultValidator extends ValidationUtility.ValidateTreeVisitor implements IValidator {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(DefaultValidator.class);
-  private static final Map<String, Object> NO_RULE_MAP = new HashMap<String, Object>();
 
   private IValidationStrategy m_validationStrategy;
   private ValidateCheckSet m_defaultCheckSet;

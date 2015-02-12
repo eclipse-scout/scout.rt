@@ -51,7 +51,6 @@ import javax.swing.event.HyperlinkEvent.EventType;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
-import javax.swing.text.html.StyleSheet;
 
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.HTMLUtility;
@@ -86,13 +85,10 @@ public class SwingScoutMailField extends SwingScoutValueFieldComposite<IMailFiel
   private static final String KEY_FROM = "From";
   private static final String KEY_TO = "To";
   private static final String KEY_CC = "Cc";
-  private static final String KEY_BCC = "bcc";
-
   private Map<String, P_AddressComponent> m_addressComponents;
 
   private HTMLEditorKit m_htmlKit;
   private HTMLDocument m_htmlDoc;
-  private StyleSheet m_styleSheet;
   private JTextPane m_htmlView;
   private JPanelEx m_htmlViewPanel;
   private JScrollPane m_scrollPane;
@@ -161,7 +157,6 @@ public class SwingScoutMailField extends SwingScoutValueFieldComposite<IMailFiel
     // viewer
     m_htmlKit = new HTMLEditorKit();
     m_htmlDoc = (HTMLDocument) (m_htmlKit.createDefaultDocument());
-    m_styleSheet = m_htmlDoc.getStyleSheet();
     //
     m_htmlView = new JTextPaneEx();
     m_htmlView.setEditorKit(m_htmlKit);
@@ -415,7 +410,6 @@ public class SwingScoutMailField extends SwingScoutValueFieldComposite<IMailFiel
 
     // set content
     m_htmlDoc = (HTMLDocument) (m_htmlKit.createDefaultDocument());
-    m_styleSheet = m_htmlDoc.getStyleSheet();
     m_htmlView.setDocument(m_htmlDoc);
     m_htmlView.setText(styledHtml);
     m_htmlView.setCaretPosition(0);

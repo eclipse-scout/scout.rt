@@ -64,17 +64,17 @@ public class DropDownButton extends Canvas {
       @Override
       public void handleEvent(Event e) {
         switch (e.detail) {
-          /* Do tab group traversal */
+        /* Do tab group traversal */
           case SWT.TRAVERSE_ESCAPE:
-                  case SWT.TRAVERSE_RETURN:
-                  case SWT.TRAVERSE_TAB_NEXT:
-                  case SWT.TRAVERSE_TAB_PREVIOUS:
-                  case SWT.TRAVERSE_PAGE_NEXT:
-                  case SWT.TRAVERSE_PAGE_PREVIOUS:
-                    e.doit = true;
-                    break;
-                }
-              }
+          case SWT.TRAVERSE_RETURN:
+          case SWT.TRAVERSE_TAB_NEXT:
+          case SWT.TRAVERSE_TAB_PREVIOUS:
+          case SWT.TRAVERSE_PAGE_NEXT:
+          case SWT.TRAVERSE_PAGE_PREVIOUS:
+            e.doit = true;
+            break;
+        }
+      }
     });
     addListener(SWT.KeyDown, new Listener() {
       @Override
@@ -253,8 +253,6 @@ public class DropDownButton extends Canvas {
   private Color m_mouseOverHighlightColor;
   private Color m_borderColor;
   private Color m_borderColorDisabled;
-  private Color m_textColor;
-  private Color m_textColorDisabled;
   private Color m_backgroundGradient1;
   private Color m_backgroundGradient2;
   private Color m_backgroundGradient1MouseDown;
@@ -264,8 +262,6 @@ public class DropDownButton extends Canvas {
   private void initResources() {
     m_borderColor = getDisplay().getSystemColor(SWT.COLOR_WIDGET_DARK_SHADOW);
     m_borderColorDisabled = getDisplay().getSystemColor(SWT.COLOR_WIDGET_NORMAL_SHADOW);
-    m_textColor = getDisplay().getSystemColor(SWT.COLOR_WIDGET_FOREGROUND);
-    m_textColorDisabled = getDisplay().getSystemColor(SWT.COLOR_WIDGET_DARK_SHADOW);
     m_focusedHighlightBorderColor = new Color(getDisplay(), 118, 183, 232);
     m_mouseOverHighlightColor = new Color(getDisplay(), 180, 200, 220);
     m_dropDownIcon = Activator.getIcon(SwtIcons.DropDownFieldArrowDown);

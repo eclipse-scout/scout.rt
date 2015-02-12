@@ -137,14 +137,6 @@ public class MediawikiPostProcessor implements ISpecProcessor {
     }
 
     /**
-     * @param group
-     * @return
-     */
-    private String searchFormClassId(String group) {
-      return null;
-    }
-
-    /**
      * @param anchorId
      * @return
      */

@@ -95,7 +95,6 @@ public class DateChooser {
   private int m_startHour = 6;
   private int m_endHour = 19;
   private boolean m_useOverflowCells = true;
-  private DateFormat m_formatHHMM;
   private boolean m_markOutOfMonthDays;
   private boolean m_markNoonHour = true;
 
@@ -124,12 +123,11 @@ public class DateChooser {
     m_listenerList = new EventListenerList();
     preConstructorInitialization(params);
     initializationByConstructor(largeVersion, displayMode, displayCondensed);
-    m_formatHHMM = new DateTimeFormatFactory().getHourMinute();
   }
 
   /**
    * is overridden by subclasses for pre-constructor initialization.
-   * 
+   *
    * @param params
    *          may be null!
    * @since 07.02.2006 - tha@bsiag.com
@@ -189,7 +187,7 @@ public class DateChooser {
 
   /**
    * Returns the layout provided by the L/F or the default layout of JCalendar.
-   * 
+   *
    * @param largeVersion
    * @param displayMode
    * @return
@@ -751,7 +749,7 @@ public class DateChooser {
 
   /**
    * overridden in subclass to notify subscribers.
-   * 
+   *
    * @param type
    * @param amount
    * @since 07.02.2006 - tha@bsiag.com
@@ -983,17 +981,6 @@ public class DateChooser {
         rowPanel.add(m_cell[y][x]);
       }
     }
-  }
-
-  private String formatHour(int h) {
-    Calendar cal = Calendar.getInstance();
-    cal.clear();
-    cal.set(2000, 01, 01, h, 0, 0);
-    String s = m_formatHHMM.format(cal.getTime());
-    if (s.charAt(1) == ':') {
-      s = "0" + s;
-    }
-    return s;
   }
 
   private void updateSelections() {

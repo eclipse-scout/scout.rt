@@ -26,11 +26,10 @@ import org.eclipse.scout.rt.shared.services.common.bookmark.IBookmarkStorageServ
  */
 public abstract class AbstractSqlBookmarkStorageService extends AbstractBookmarkStorageService implements IBookmarkStorageService {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSqlBookmarkStorageService.class);
-  private static final int KIND_MODEL = 99;
 
   /**
    * @return sql data with the following columns
-   * 
+   *
    *         <pre>
    * ID    NUMBER required
    * DATA  BINARY BookmarkFolder object required
@@ -44,7 +43,7 @@ public abstract class AbstractSqlBookmarkStorageService extends AbstractBookmark
 
   /**
    * @return sql data with the following columns
-   * 
+   *
    *         <pre>
    * ID    NUMBER required
    * DATA  BINARY BookmarkFolder object required
@@ -59,7 +58,7 @@ public abstract class AbstractSqlBookmarkStorageService extends AbstractBookmark
   /**
    * <p>
    * The sql statement is created based on the 'folderData' and 'id' property of the model<br>
-   * 
+   *
    * <pre>
    * if (folderData != null) {
    *   if (id == 0) {
@@ -73,9 +72,9 @@ public abstract class AbstractSqlBookmarkStorageService extends AbstractBookmark
    *   //DELETE
    * }
    * </pre>
-   * 
+   *
    * SQL Examples:
-   * 
+   *
    * <pre>
    * SQL.insert(
    *     &quot;INSERT INTO BOOKMARKS(ID,BINARY) VALUES( SEQ.NEXTVAL, :kind, :folderData )&quot;,
@@ -102,7 +101,7 @@ public abstract class AbstractSqlBookmarkStorageService extends AbstractBookmark
   /**
    * <p>
    * The sql statement is created based on the 'folderData' and 'id' property of the model<br>
-   * 
+   *
    * <pre>
    * if (folderData != null) {
    *   if (id == 0) {
@@ -116,9 +115,9 @@ public abstract class AbstractSqlBookmarkStorageService extends AbstractBookmark
    *   //DELETE
    * }
    * </pre>
-   * 
+   *
    * SQL Examples:
-   * 
+   *
    * <pre>
    * SQL.insert(
    *     &quot;INSERT INTO BOOKMARKS(ID,BINARY) VALUES( SEQ.NEXTVAL, :kind, :folderData )&quot;,

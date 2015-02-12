@@ -56,10 +56,6 @@ public class RemoteFile implements Serializable {
   private byte[] m_compressedData;
   private String m_charsetName = DEFAULT_CHARSETNAME;
 
-  // for ISerializable
-  private RemoteFile() {
-  }
-
   public RemoteFile(URL url, boolean ignoreFolders) {
     this(url, ignoreFolders, DEFAULT_CHARSETNAME);
   }
@@ -435,7 +431,7 @@ public class RemoteFile implements Serializable {
 
   /**
    * Static extension to mimetype mapper
-   * 
+   *
    * @since 2.7
    */
   private static final Map<String, String> FILE_EXTENSION_TO_MIME_TYPE_MAP;

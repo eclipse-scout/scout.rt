@@ -15,8 +15,6 @@ import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.busy.BusyJob;
 import org.eclipse.scout.rt.client.ui.form.IForm;
@@ -29,12 +27,11 @@ import org.eclipse.scout.rt.ui.swt.window.ISwtScoutPart;
  * Default SWT busy handler for a {@link IClientSession}
  * <p>
  * Show busy, schedule a block job when necessary
- * 
+ *
  * @author imo
  * @since 3.8
  */
 public class WaitForBlockingJob extends BusyJob {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(WaitForBlockingJob.class);
 
   private final boolean m_allowBlockWorkbench;
   private List<ISwtScoutPart> m_parts;

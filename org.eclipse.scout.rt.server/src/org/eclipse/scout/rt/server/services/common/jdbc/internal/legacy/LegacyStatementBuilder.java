@@ -14,13 +14,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.scout.commons.holders.NVPair;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.services.common.jdbc.style.ISqlStyle;
 import org.eclipse.scout.rt.shared.data.model.DataModelConstants;
 
 public class LegacyStatementBuilder {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(LegacyStatementBuilder.class);
 
   private ISqlStyle m_sqlStyle;
   private Map<String, Object> m_bindMap;
@@ -137,7 +134,7 @@ public class LegacyStatementBuilder {
    * @return sql text with operation and bind names
    *         <p>
    *         Simple example for EQ operation
-   * 
+   *
    *         <pre>
    * return something in the form of: attribute + &quot;=&quot; + &quot;:&quot; + bindName;
    * </pre>

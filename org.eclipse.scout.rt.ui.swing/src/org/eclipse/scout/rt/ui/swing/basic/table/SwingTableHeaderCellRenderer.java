@@ -33,12 +33,8 @@ import org.eclipse.scout.rt.ui.swing.basic.ColorUtility;
 import org.eclipse.scout.rt.ui.swing.icons.CompositeIcon;
 
 public class SwingTableHeaderCellRenderer implements TableCellRenderer {
-  private static final long serialVersionUID = 1L;
-
   private TableCellRenderer m_internalRenderer;
   private SwingScoutTable m_swingScoutTable;
-  private Icon m_sortUpIcon;
-  private Icon m_sortDownIcon;
   private Icon m_filterActiveIcon;
   private Icon m_customColumnIcon;
 
@@ -46,8 +42,6 @@ public class SwingTableHeaderCellRenderer implements TableCellRenderer {
     super();
     m_internalRenderer = internalRenderer;
     m_swingScoutTable = t;
-    m_sortUpIcon = Activator.getIcon(SwingIcons.TableSortAsc);
-    m_sortDownIcon = Activator.getIcon(SwingIcons.TableSortDesc);
     m_filterActiveIcon = Activator.getIcon(SwingIcons.TableColumnFilterActive);
     m_customColumnIcon = Activator.getIcon(SwingIcons.TableCustomColumn);
   }

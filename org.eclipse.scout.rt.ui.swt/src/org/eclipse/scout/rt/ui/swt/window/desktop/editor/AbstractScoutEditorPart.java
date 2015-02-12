@@ -19,8 +19,6 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.action.ActionUtility;
 import org.eclipse.scout.rt.client.ui.action.tool.IToolButton;
@@ -54,7 +52,6 @@ import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.part.EditorPart;
 
 public abstract class AbstractScoutEditorPart extends EditorPart implements ISwtScoutPart, ISaveablePart2 {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractScoutEditorPart.class);
   public static final String EDITOR_ID = AbstractScoutEditorPart.class.getName();
 
   private Form m_rootForm;

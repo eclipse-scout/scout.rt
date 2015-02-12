@@ -15,20 +15,17 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.busy.BusyJob;
 import org.eclipse.scout.rt.ui.swt.busy.SwtBusyHandler;
 import org.eclipse.scout.rt.ui.swt.busy.SwtBusyUtility;
 
 /**
  * Only show busy
- * 
+ *
  * @author imo
  * @since 3.8
  */
 public class ShowBusyJob extends BusyJob {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ShowBusyJob.class);
 
   public ShowBusyJob(String name, SwtBusyHandler handler) {
     super(name, handler);

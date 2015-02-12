@@ -34,8 +34,6 @@ public class MediawikiLinkTargetManagerTest {
   private File m_testFile;
   private File m_specDir;
   private MediawikiLinkTargetManager m_writer;
-  private static final String TEST_FILENAME = "test.mediawiki";
-
   @Before
   public void setUp() throws ProcessingException {
     SpecFileConfig c = new SpecFileConfig("org.eclipse.scout.rt.spec.client.test");

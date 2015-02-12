@@ -25,7 +25,7 @@ import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 public class PageModificationTablePage extends AbstractExtensiblePageWithTable<PageModificationTablePage.Table> {
 
   @Override
-  protected IPage execCreateChildPage(ITableRow row) throws ProcessingException {
+  protected IPage<?> execCreateChildPage(ITableRow row) throws ProcessingException {
     return new BModificationPageWithNodes();
   }
 

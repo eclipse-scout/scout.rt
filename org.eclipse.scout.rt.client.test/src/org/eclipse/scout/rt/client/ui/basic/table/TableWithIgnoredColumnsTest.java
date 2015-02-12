@@ -22,6 +22,7 @@ import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
 import org.junit.Test;
 
+@SuppressWarnings("unused")
 public class TableWithIgnoredColumnsTest {
 
   private static final int ROW_COUNT = 3;

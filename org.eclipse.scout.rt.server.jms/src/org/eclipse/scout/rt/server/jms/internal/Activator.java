@@ -1,12 +1,9 @@
 package org.eclipse.scout.rt.server.jms.internal;
 
 import org.eclipse.core.runtime.Plugin;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.osgi.framework.BundleContext;
 
 public class Activator extends Plugin {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(Activator.class);
 
   public static final String PLUGIN_ID = "org.eclipse.scout.rt.server.jms";
   private static Activator plugin;

@@ -16,7 +16,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.Collections;
 import java.util.List;
 
-import org.easymock.EasyMock;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
@@ -25,7 +24,7 @@ import org.junit.Test;
 
 /**
  * Tests for {@link ActionUtility}
- * 
+ *
  * @since 4.0.0-M6
  */
 public class ActionUtilityTest {
@@ -91,11 +90,6 @@ public class ActionUtilityTest {
 
   private IMenu createMenu(String label, boolean separator, boolean visible) {
     return new Menu(label, separator, visible);
-  }
-
-  private void setChildMenus(IMenu parentMenu, List<IMenu> childMenus) {
-    EasyMock.expect(parentMenu.getChildActions()).andReturn(childMenus);
-    EasyMock.expect(parentMenu.getChildActionCount()).andReturn(childMenus.size());
   }
 
   private static class Menu extends AbstractMenu {

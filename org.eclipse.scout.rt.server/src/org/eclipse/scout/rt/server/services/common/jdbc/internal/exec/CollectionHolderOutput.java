@@ -76,6 +76,10 @@ class CollectionHolderOutput implements IBindOutput {
     m_batchIndex = i;
   }
 
+  public int getBatchIndex() {
+    return m_batchIndex;
+  }
+
   @SuppressWarnings("unchecked")
   private static <T> void setValueToHolder(IHolder<T> holder, List<Object> list) {
     Class<T> toType = holder.getHolderType();

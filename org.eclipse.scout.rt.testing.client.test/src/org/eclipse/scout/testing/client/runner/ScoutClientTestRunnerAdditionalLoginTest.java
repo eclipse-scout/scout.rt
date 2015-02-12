@@ -33,8 +33,6 @@ public class ScoutClientTestRunnerAdditionalLoginTest {
 
   private static IClientSession s_beforeClassClientSession;
   private static TestEnvironmentClientSession s_beforeClientSession;
-  private static TestEnvironmentClientSession s_afterClientSession;
-
   @BeforeClass
   public static void beforeClass1() throws Exception {
     checkBeforeClass();
@@ -140,7 +138,6 @@ public class ScoutClientTestRunnerAdditionalLoginTest {
       assertEquals(s_beforeClientSession, TestEnvironmentClientSession.get());
     }
     finally {
-      s_afterClientSession = s_beforeClientSession;
       s_beforeClientSession = null;
     }
   }

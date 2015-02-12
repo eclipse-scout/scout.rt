@@ -202,28 +202,6 @@ public class ServicesView extends DefaultView {
      */
   }
 
-  private void renderServiceRow(HtmlComponent p, final ServiceInspector service) {
-    boolean selected = m_selectedService != null && (m_selectedService.getService() == service.getService());
-    p.startTableRow();
-    p.startTableCell();
-    String serviceId = service.getService().getClass().getSimpleName();
-    if (selected) {
-      p.bold(serviceId);
-    }
-    else {
-      p.linkAction(serviceId, new AbstractHtmlAction("selectService." + service.getService().getClass().getName()) {
-        private static final long serialVersionUID = 950604742249675832L;
-
-        @Override
-        public void run() {
-          m_selectedService = service;
-        }
-      });
-    }
-    p.endTableCell();
-    p.endTableRow();
-  }
-
   private void renderServiceDetail(HtmlComponent p, ServiceInspector service) {
     p.bold(service.getService().getClass().getSimpleName());
     p.p();

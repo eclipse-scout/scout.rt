@@ -67,7 +67,6 @@ import org.eclipse.scout.rt.server.transaction.ITransactionMember;
 
 public class StatementProcessor implements IStatementProcessor {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(StatementProcessor.class);
-  private static final Object NULL = new Object();
 
   static {
     if (LOG.isDebugEnabled()) {

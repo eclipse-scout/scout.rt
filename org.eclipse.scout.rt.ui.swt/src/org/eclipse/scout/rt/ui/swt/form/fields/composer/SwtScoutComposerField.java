@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt.form.fields.composer;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.IComposerField;
 import org.eclipse.scout.rt.ui.swt.LogicalGridData;
 import org.eclipse.scout.rt.ui.swt.LogicalGridLayout;
@@ -23,7 +21,6 @@ import org.eclipse.scout.rt.ui.swt.form.fields.SwtScoutFieldComposite;
 import org.eclipse.swt.widgets.Composite;
 
 public class SwtScoutComposerField extends SwtScoutFieldComposite<IComposerField> implements ISwtScoutComposerField {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwtScoutComposerField.class);
 
   private ISwtScoutTree m_treeComposite;
 

@@ -21,8 +21,6 @@ import java.awt.event.MouseListener;
 
 import javax.swing.JInternalFrame;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.swing.form.fields.AbstractLayoutManager2;
 
 /**
@@ -31,10 +29,7 @@ import org.eclipse.scout.rt.ui.swing.form.fields.AbstractLayoutManager2;
  * cell layout with variable splitters between every cell
  */
 public class MultiSplitLayout extends AbstractLayoutManager2 {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(MultiSplitLayout.class);
   private static final String CONSTRAINT_PROPERTY_NAME = "MultiSplitLayoutConstraints";
-  private static final int UNLIMITED = 10240;
-
   private final Cell[][] m_cells = new Cell[3][3];
   /*
    * top and bottom splits are fixed

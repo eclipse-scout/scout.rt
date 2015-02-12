@@ -14,8 +14,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.swt.DefaultValidateRoot;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.IValidateRoot;
@@ -35,8 +33,6 @@ import org.eclipse.swt.widgets.Shell;
  * being scrolled, resized or moved.
  */
 public class SwtScoutDropDownPopup extends SwtScoutPopup {
-
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwtScoutDropDownPopup.class);
 
   private final Listener m_viewPortChangedListener = new P_ViewPortChangedListener();
   private Set<ScrollBar> scrollBars;

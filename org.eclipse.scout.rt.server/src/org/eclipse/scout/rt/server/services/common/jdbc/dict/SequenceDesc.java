@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -18,10 +18,6 @@ public class SequenceDesc implements java.io.Serializable {
   private long m_min;
   private long m_max;
   private long m_increment;
-
-  // for IScoutSerializable
-  private SequenceDesc() {
-  }
 
   public SequenceDesc(String name, BigDecimal min, BigDecimal max, BigDecimal increment) {
     m_name = name;

@@ -19,9 +19,6 @@ import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.TransferHandler;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
-
 /**
  * Simplified and generalized version of Swings TransferHandler
  * <p>
@@ -34,7 +31,6 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
  */
 public class TransferHandlerEx extends TransferHandler {
   private static final long serialVersionUID = 1L;
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(TransferHandlerEx.class);
 
   /**
    * Drag

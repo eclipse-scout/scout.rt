@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -15,10 +15,6 @@ public class TableGrantDesc implements java.io.Serializable {
   private String m_grantee;
   private String m_type;
   private boolean m_grantOption;
-
-  // for IScoutSerializable
-  private TableGrantDesc() {
-  }
 
   public TableGrantDesc(String grantee, String type, boolean grantOption) {
     m_grantee = grantee;
@@ -47,5 +43,4 @@ public class TableGrantDesc implements java.io.Serializable {
     buf.append("/>\n");
     return buf.toString();
   }
-
 }

@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swing.icons;
 
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.services.common.icon.IconProviderService;
 import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
 import org.eclipse.scout.rt.client.ui.IIconLocator;
@@ -19,7 +17,6 @@ import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.ui.swing.services.common.icon.SwingBundleIconProviderService;
 
 public class SwingBundleIconLocator implements IIconLocator {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingBundleIconLocator.class);
 
   private final IconProviderService m_swingIconProviderService;
 

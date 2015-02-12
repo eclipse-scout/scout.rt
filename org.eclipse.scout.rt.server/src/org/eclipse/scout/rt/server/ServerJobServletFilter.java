@@ -40,7 +40,6 @@ import org.eclipse.scout.service.SERVICES;
  * Expected init-param example: session=com.bsiag.myapp.server.ServerSession
  */
 public class ServerJobServletFilter implements Filter {
-  private static final long serialVersionUID = 1L;
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ServerJobServletFilter.class);
 
   private FilterConfigInjection m_injection;

@@ -203,12 +203,11 @@ public class OracleSqlStyle extends AbstractSqlStyle {
 
   /**
    * Scout transaction member that frees all LOBs which were created during the current transaction.
-   * 
+   *
    * @since 3.8.3
    */
   private static class OracleLobTransactionMember implements ITransactionMember {
 
-    private static final IScoutLogger LOG = ScoutLogManager.getLogger(OracleLobTransactionMember.class);
     public static final String TRANSACTION_MEMBER_ID = OracleLobTransactionMember.class.getName();
 
     private Set<Blob> m_temporaryBlobs;

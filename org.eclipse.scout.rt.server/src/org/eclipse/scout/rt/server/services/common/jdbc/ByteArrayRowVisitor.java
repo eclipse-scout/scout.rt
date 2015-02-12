@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -23,7 +23,6 @@ import org.eclipse.scout.commons.exception.ProcessingException;
  * byte-array.
  */
 public class ByteArrayRowVisitor implements ISelectStreamHandler {
-  private static final long serialVersionUID = 1L;
   private static final int INITIAL_BUFFER_SIZE = 1024 * 1024; // 1MB
   private static final int DEFLATER_BUFFER_SIZE = 1024 * 10; // 10KB
 

@@ -33,7 +33,6 @@ import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.action.menu.MenuUtility;
 import org.eclipse.scout.rt.client.ui.basic.filechooser.IFileChooser;
 import org.eclipse.scout.rt.client.ui.form.fields.filechooserfield.IFileChooserField;
 import org.eclipse.scout.rt.ui.swing.LogicalGridLayout;
@@ -50,7 +49,6 @@ import org.eclipse.scout.rt.ui.swing.ext.decoration.JTextFieldWithDecorationIcon
 import org.eclipse.scout.rt.ui.swing.form.fields.SwingScoutValueFieldComposite;
 
 public class SwingScoutFileChooserField extends SwingScoutValueFieldComposite<IFileChooserField> implements ISwingScoutFileChooserField {
-  private static final long serialVersionUID = 1L;
   private ContextMenuDecorationItem m_contextMenuMarker;
   private SwingScoutContextMenu m_contextMenu;
   private DropDownDecorationItem m_dropdownIcon;
@@ -197,24 +195,6 @@ public class SwingScoutFileChooserField extends SwingScoutValueFieldComposite<IF
     swingField.setText(s);
   }
 
-  private boolean calculateDropDownButtonEnabled() {
-    final Holder<List<IMenu>> menuHolder = new Holder<List<IMenu>>();
-    Runnable t = new Runnable() {
-      @Override
-      public void run() {
-        menuHolder.setValue(getScoutObject().getContextMenu().getChildActions());
-      }
-    };
-    JobEx job = getSwingEnvironment().invokeScoutLater(t, 1200);
-    try {
-      job.join(1200);
-    }
-    catch (InterruptedException ex) {
-      //nop
-    }
-    return MenuUtility.consolidateMenus(menuHolder.getValue()).size() > 0;
-  }
-
   @Override
   protected void setHorizontalAlignmentFromScout(int scoutAlign) {
     if (getSwingTextField() instanceof JTextField) {
@@ -227,9 +207,6 @@ public class SwingScoutFileChooserField extends SwingScoutValueFieldComposite<IF
   protected void setEnabledFromScout(boolean b) {
     super.setEnabledFromScout(b);
     m_dropdownIcon.setEnabled(b);
-//    if (getSwingField() instanceof JTextFieldWithDropDownButton) {
-//      ((JTextFieldWithDropDownButton) getSwingTextField()).setDropDownButtonEnabled(b);
-//    }
   }
 
   protected void setFileIconIdFromScout(String s) {
