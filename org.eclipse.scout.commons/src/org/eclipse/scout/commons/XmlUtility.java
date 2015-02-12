@@ -155,6 +155,12 @@ public final class XmlUtility {
    */
   public static void wellformDocument(Document document, OutputStream out) throws ProcessingException {
     wellformDocument(document, new StreamResult(out));
+    try {
+      out.flush();
+    }
+    catch (IOException e) {
+      throw new ProcessingException("unable to flush xml document to output.", e);
+    }
   }
 
   /**
@@ -195,6 +201,12 @@ public final class XmlUtility {
    */
   public static void wellformDocument(Document document, Writer writer) throws ProcessingException {
     wellformDocument(document, new StreamResult(writer));
+    try {
+      writer.flush();
+    }
+    catch (IOException e) {
+      throw new ProcessingException("unable to flush xml document to writer.", e);
+    }
   }
 
   private static void wellformDocument(Document document, Result result) throws ProcessingException {
