@@ -272,25 +272,6 @@ public final class BookmarkUtility {
    * <p />
    * Finally the path will be expanded. Possible exceptions might occur if no outline is set in the {@link Bookmark} or
    * the outline is not available.
-   *
-   * @param forceReload
-   *          parameter without any function
-   * @deprecated use {@link #activateBookmark(IDesktop, Bookmark)}, parameter forceReload is without any
-   *             function. Will be removed in the N-Release
-   */
-  @Deprecated
-  public static void activateBookmark(IDesktop desktop, Bookmark bm, boolean forceReload) throws ProcessingException {
-    activateBookmark(desktop, bm);
-  }
-
-  /**
-   * Load a {@link Bookmark} on the specified {@link IDesktop} model.
-   * <p />
-   * First the specific {@link Bookmark#getOutlineClassName()} is evaluated and selected, afterwards every page from the
-   * {@link Bookmark#getPath()} will be selected (respecting the {@link AbstractPageState}).
-   * <p />
-   * Finally the path will be expanded. Possible exceptions might occur if no outline is set in the {@link Bookmark} or
-   * the outline is not available.
    */
   public static void activateBookmark(IDesktop desktop, Bookmark bm) throws ProcessingException {
     if (bm.getOutlineClassName() == null) {

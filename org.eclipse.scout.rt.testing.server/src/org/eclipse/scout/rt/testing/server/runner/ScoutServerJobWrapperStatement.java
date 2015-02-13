@@ -12,18 +12,14 @@ package org.eclipse.scout.rt.testing.server.runner;
 
 import java.util.List;
 
-import javax.security.auth.Subject;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.server.IServerJobFactory;
-import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.ITransactionRunnable;
 import org.eclipse.scout.rt.server.ServerJob;
-import org.eclipse.scout.rt.server.ServerJobFactory;
 import org.eclipse.scout.rt.testing.commons.ScoutAssert;
 import org.eclipse.scout.rt.testing.shared.Activator;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
@@ -42,18 +38,6 @@ public class ScoutServerJobWrapperStatement extends Statement {
   public ScoutServerJobWrapperStatement(IServerJobFactory factory, Statement statement) {
     m_statement = statement;
     m_factory = factory;
-  }
-
-  /**
-   * @deprecated use {@link ScoutServerJobWrapperStatement(IServerJobFactory,Statement} instead. Will be removed in
-   *             N-release.
-   * @param serverSession
-   * @param subject
-   * @param statement
-   */
-  @Deprecated
-  public ScoutServerJobWrapperStatement(IServerSession serverSession, Subject subject, Statement statement) {
-    this(new ServerJobFactory(serverSession, subject), statement);
   }
 
   @Override

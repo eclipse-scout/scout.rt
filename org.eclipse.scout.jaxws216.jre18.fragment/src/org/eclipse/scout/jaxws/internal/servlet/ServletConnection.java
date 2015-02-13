@@ -134,6 +134,7 @@ public class ServletConnection extends WSHTTPConnection {
   }
 
   @Override
+  @Deprecated
   @SuppressWarnings("deprecation")
   @Property({MessageContext.HTTP_REQUEST_HEADERS, Packet.INBOUND_TRANSPORT_HEADERS})
   public Map<String, List<String>> getRequestHeaders() {
@@ -214,8 +215,8 @@ public class ServletConnection extends WSHTTPConnection {
   }
 
   @Override
-  @SuppressWarnings("deprecation")
   @Deprecated
+  @SuppressWarnings("deprecation")
   public Set<String> getRequestHeaderNames() {
     Set<String> headerNameSet = new HashSet<String>();
     for (Enumeration<String> headerNames = m_request.getHeaderNames(); headerNames.hasMoreElements();) {

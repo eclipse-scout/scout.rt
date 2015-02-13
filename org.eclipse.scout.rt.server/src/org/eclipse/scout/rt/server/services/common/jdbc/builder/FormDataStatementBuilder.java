@@ -113,9 +113,8 @@ import org.eclipse.scout.rt.shared.data.model.IDataModelEntity;
  * <p>
  * That way non-existent matches are added to the result, which matches the expected behaviour.
  *
- * @author imo
+ * @author Ivan Motsch
  */
-@SuppressWarnings("deprecation")
 public class FormDataStatementBuilder implements DataModelConstants {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(FormDataStatementBuilder.class);
   private static final Pattern PLAIN_ATTRIBUTE_PATTERN = Pattern.compile("(<attribute>)([a-zA-Z_][a-zA-Z0-9_]*)(</attribute>)");
@@ -377,62 +376,6 @@ public class FormDataStatementBuilder implements DataModelConstants {
    * see {@link #setBasicDefinition(Class, String, int)}
    */
   public void setBasicDefinition(BasicPartDefinition def) {
-    m_basicDefs.add(def);
-  }
-
-  /**
-   * @deprecated use setBasicDefinition instead. Will be removed in the 5.0 Release.
-   */
-  @Deprecated
-  public void setValueDefinition(Class<?> fieldType, String sqlAttribute, int operator) {
-    setValueDefinition(new ValuePartDefinition(fieldType, sqlAttribute, operator));
-  }
-
-  /**
-   * @deprecated use setBasicDefinition instead. Will be removed in the 5.0 Release.
-   */
-  @Deprecated
-  public void setValueDefinition(ClassIdentifier fieldTypeIdentifier, String sqlAttribute, int operator) {
-    setValueDefinition(new ValuePartDefinition(fieldTypeIdentifier, sqlAttribute, operator));
-  }
-
-  /**
-   * @deprecated use setBasicDefinition instead. Will be removed in the 5.0 Release.
-   */
-  @Deprecated
-  public void setValueDefinition(Class<?> fieldType, String sqlAttribute, int operator, boolean plainBind) {
-    setValueDefinition(new ValuePartDefinition(fieldType, sqlAttribute, operator, plainBind));
-  }
-
-  /**
-   * @deprecated use setBasicDefinition instead. Will be removed in the 5.0 Release.
-   */
-  @Deprecated
-  public void setValueDefinition(ClassIdentifier fieldTypeIdentifier, String sqlAttribute, int operator, boolean plainBind) {
-    setValueDefinition(new ValuePartDefinition(fieldTypeIdentifier, sqlAttribute, operator, plainBind));
-  }
-
-  /**
-   * @deprecated use setBasicDefinition instead. Will be removed in the 5.0 Release.
-   */
-  @Deprecated
-  public void setValueDefinition(Class<?>[] fieldTypes, String sqlAttribute, int operator) {
-    setValueDefinition(new ValuePartDefinition(fieldTypes, sqlAttribute, operator, false));
-  }
-
-  /**
-   * @deprecated use setBasicDefinition instead. Will be removed in the 5.0 Release.
-   */
-  @Deprecated
-  public void setValueDefinition(ClassIdentifier[] fieldTypeIdentifiers, String sqlAttribute, int operator) {
-    setValueDefinition(new ValuePartDefinition(fieldTypeIdentifiers, sqlAttribute, operator, false));
-  }
-
-  /**
-   * @deprecated use setBasicDefinition instead. Will be removed in the 5.0 Release.
-   */
-  @Deprecated
-  public void setValueDefinition(ValuePartDefinition def) {
     m_basicDefs.add(def);
   }
 
@@ -712,14 +655,6 @@ public class FormDataStatementBuilder implements DataModelConstants {
     }
   }
 
-  /**
-   * @deprecated use {@link #getBasicPartDefinitions()} instead. Will be removed in the 5.0 Release.
-   */
-  @Deprecated
-  public List<BasicPartDefinition> getValuePartDefinitions() {
-    return getBasicPartDefinitions();
-  }
-
   public List<BasicPartDefinition> getBasicPartDefinitions() {
     return CollectionUtility.arrayList(m_basicDefs);
   }
@@ -903,30 +838,6 @@ public class FormDataStatementBuilder implements DataModelConstants {
       }
     }
     return contrib;
-  }
-
-  /**
-   * @deprecated use {@link #buildComposerEntityNodeContribution(ComposerEntityNodeData, EntityStrategy)} instead. Will
-   *             be removed in the 5.0 Release.
-   */
-  @Deprecated
-  public String buildComposerEntityNode(ComposerEntityNodeData node, EntityStrategy entityStrategy) throws ProcessingException {
-    EntityContribution contrib = buildComposerEntityNodeContribution(node, entityStrategy);
-    switch (entityStrategy) {
-      case BuildConstraints: {
-        if (contrib.getWhereParts().size() > 0) {
-          return contrib.getWhereParts().get(0);
-        }
-        break;
-      }
-      case BuildQuery: {
-        if (contrib.getSelectParts().size() > 0) {
-          return contrib.getSelectParts().get(0);
-        }
-        break;
-      }
-    }
-    return null;
   }
 
   public EntityContribution buildComposerEntityNodeContribution(ComposerEntityNodeData node, EntityStrategy entityStrategy) throws ProcessingException {
@@ -1288,17 +1199,6 @@ public class FormDataStatementBuilder implements DataModelConstants {
     // negation
     if (negative) {
       s = " NOT (" + s + ") ";
-    }
-    return s;
-  }
-
-  /**
-   * @deprecated moved to {@link EntityContributionUtility}. Will be removed in the 5.0 Release.
-   */
-  @Deprecated
-  protected String autoBracketSelectPart(String s) {
-    if (s != null && !s.startsWith("(") && s.toLowerCase().contains("select")) {
-      return "(" + s + ")";
     }
     return s;
   }

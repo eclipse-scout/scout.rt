@@ -16,11 +16,8 @@ import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
-import org.eclipse.scout.rt.server.internal.ServerSessionClassFinder;
 import org.eclipse.scout.rt.server.services.common.session.IServerSessionRegistryService;
 import org.eclipse.scout.service.AbstractService;
 import org.eclipse.scout.service.SERVICES;
@@ -31,9 +28,7 @@ import org.eclipse.scout.service.SERVICES;
  * <p>
  * Default implementation is searching server session class
  */
-@SuppressWarnings("deprecation")
 public class ServerJobService extends AbstractService implements IServerJobService {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ServerJobService.class);
 
   private static final String SERVER_PRINCIPAL = "anonymous";
   private final Subject m_serverSubject = createSubject(SERVER_PRINCIPAL);
@@ -66,13 +61,7 @@ public class ServerJobService extends AbstractService implements IServerJobServi
     if (!StringUtility.isNullOrEmpty(sessionName)) {
       return loadSessionClass(sessionName);
     }
-    LOG.error("No server session class defined: Set org.eclipse.scout.rt.server.ServerJobService#serverSessionClassName in your config.ini.");
-    //legacy support
-    final String classNameByConvention = new ServerSessionClassFinder().findClassNameByConvention();
-    if (classNameByConvention != null) {
-      return loadSessionClass(classNameByConvention);
-    }
-    throw new ProcessingException("No found");
+    throw new ProcessingException("No server session class defined! Set org.eclipse.scout.rt.server.ServerJobService#serverSessionClassName in your config.ini.");
   }
 
   @SuppressWarnings("unchecked")

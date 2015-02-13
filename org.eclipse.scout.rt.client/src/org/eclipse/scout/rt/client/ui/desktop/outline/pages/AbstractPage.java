@@ -57,8 +57,6 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
 
   private T m_table;
   private IForm m_detailForm;
-  @SuppressWarnings("deprecation")
-  private final org.eclipse.scout.rt.shared.ContextMap m_contextMap;
   private boolean m_tableVisible;
   private boolean m_detailFormVisible;
   private DataChangeListener m_internalDataChangeListener;
@@ -155,47 +153,15 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   }
 
   public AbstractPage(String userPreferenceContext) {
-    this(true, null, userPreferenceContext);
+    this(true, userPreferenceContext);
   }
 
   public AbstractPage(boolean callInitializer) {
-    this(callInitializer, null, null);
-  }
-
-  /**
-   * @deprecated Will be removed with the N-Release.
-   *             Use {@link #AbstractPage()} in combination with getter and setter (page variable) instead.
-   */
-  @Deprecated
-  @SuppressWarnings("deprecation")
-  public AbstractPage(org.eclipse.scout.rt.shared.ContextMap contextMap) {
-    this(true, contextMap, null);
+    this(callInitializer, null);
   }
 
   public AbstractPage(boolean callInitializer, String userPreferenceContext) {
-    this(callInitializer, null, userPreferenceContext);
-  }
-
-  /**
-   * @deprecated Will be removed in the 6.0 Release.
-   *             Use {@link #AbstractPage(boolean)} in combination with getter and setter (page variable) instead.
-   */
-  @Deprecated
-  @SuppressWarnings("deprecation")
-  public AbstractPage(boolean callInitializer, org.eclipse.scout.rt.shared.ContextMap contextMap) {
-    this(callInitializer, contextMap, null);
-  }
-
-  /**
-   * @deprecated Will be removed with the N-Release.
-   *             Use {@link #AbstractPage(boolean, String)} in combination with getter and setter (page variable)
-   *             instead.
-   */
-  @Deprecated
-  @SuppressWarnings("deprecation")
-  public AbstractPage(boolean callInitializer, org.eclipse.scout.rt.shared.ContextMap contextMap, String userPreferenceContext) {
     super(false);
-    m_contextMap = contextMap;
     m_userPreferenceContext = userPreferenceContext;
     if (callInitializer) {
       callInitializer();
@@ -425,16 +391,6 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   }
 
   protected abstract T initTable();
-
-  /**
-   * @deprecated Will be removed with the N-Release.
-   *             getter and setter (page variable) instead.
-   */
-  @Deprecated
-  @SuppressWarnings("deprecation")
-  protected org.eclipse.scout.rt.shared.ContextMap getContextMap() {
-    return m_contextMap;
-  }
 
   @Override
   protected void initConfig() {

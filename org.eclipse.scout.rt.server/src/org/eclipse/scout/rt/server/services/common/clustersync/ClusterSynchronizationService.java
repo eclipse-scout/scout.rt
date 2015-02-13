@@ -21,8 +21,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.security.auth.Subject;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -126,14 +124,6 @@ public class ClusterSynchronizationService extends AbstractService implements IC
       LOG.error("Error creating backend session for cluster synchronization.", e);
     }
     return serverSession;
-  }
-
-  /**
-   * @deprecated use {@link IBackendSessionFactoryService} to create backend subject. Will be removed in N-Release.
-   */
-  @Deprecated
-  protected Subject createBackendSubject() {
-    return SERVICES.getService(IServerJobService.class).getServerSubject();
   }
 
   protected EventListenerList getListenerList() {

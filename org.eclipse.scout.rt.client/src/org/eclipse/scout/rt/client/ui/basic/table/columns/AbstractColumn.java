@@ -1427,26 +1427,6 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
     m_initialWidth = w;
   }
 
-  /**
-   * @deprecated Will be removed in the 6.0 Release. Use {@link IColumn#getOrder()} instead.
-   */
-  @Override
-  @Deprecated
-  @SuppressWarnings("deprecation")
-  public double getViewOrder() {
-    return getOrder();
-  }
-
-  /**
-   * @deprecated Will be removed in the 6.0 Release. Use {@link IColumn#setOrder(double)} instead.
-   */
-  @Override
-  @Deprecated
-  @SuppressWarnings("deprecation")
-  public void setViewOrder(double order) {
-    setOrder(order);
-  }
-
   @Override
   public double getOrder() {
     return propertySupport.getPropertyDouble(PROP_VIEW_ORDER);

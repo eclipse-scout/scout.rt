@@ -13,9 +13,6 @@ package org.eclipse.scout.rt.shared.servicetunnel;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.eclipse.scout.commons.osgi.BundleInspector;
-import org.osgi.framework.Bundle;
-
 /**
  * This is the content handler that defines the format in which data is
  * exchanged through a service tunnel.
@@ -23,14 +20,6 @@ import org.osgi.framework.Bundle;
  * Most implementations also implement {@link IServiceTunnelContentObserver}
  */
 public interface IServiceTunnelContentHandler {
-
-  /**
-   * @param classresolveBundles
-   *          is often created using {@link BundleInspector#getOrderedBundleList(String...)}
-   * @deprecated use {@link #initialize()} instead. Will be removed in the N release.
-   */
-  @Deprecated
-  void initialize(Bundle[] classResolveBundles, ClassLoader rawClassLoader);
 
   void initialize();
 

@@ -39,35 +39,12 @@ public abstract class AbstractExtensiblePageWithNodes extends AbstractPageWithNo
     super(callInitializer);
   }
 
-  /**
-   * @deprecated Will be removed in the 6.0 Release.
-   *             Use {@link #AbstractExtensiblePageWithNodes()} in combination with getter and setter (page variable)
-   *             instead.
-   */
-  @Deprecated
-  @SuppressWarnings("deprecation")
-  public AbstractExtensiblePageWithNodes(org.eclipse.scout.rt.shared.ContextMap contextMap) {
-    super(contextMap);
-  }
-
   public AbstractExtensiblePageWithNodes(String userPreferenceContext) {
     super(userPreferenceContext);
   }
 
   public AbstractExtensiblePageWithNodes(boolean callInitializer, String userPreferenceContext) {
     super(callInitializer, userPreferenceContext);
-  }
-
-  /**
-   * @deprecated Will be removed in the 6.0 Release.
-   *             Use {@link #AbstractExtensiblePageWithNodes(boolean, String)} in combination with getter and setter
-   *             (page
-   *             variable) instead.
-   */
-  @Deprecated
-  @SuppressWarnings("deprecation")
-  public AbstractExtensiblePageWithNodes(boolean callInitializer, org.eclipse.scout.rt.shared.ContextMap contextMap, String userPreferenceContext) {
-    super(callInitializer, contextMap, userPreferenceContext);
   }
 
   @Override

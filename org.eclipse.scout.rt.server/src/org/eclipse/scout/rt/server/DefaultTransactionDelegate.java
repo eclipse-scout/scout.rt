@@ -46,7 +46,6 @@ import org.eclipse.scout.rt.shared.validate.OutputValidation;
 import org.eclipse.scout.service.IService;
 import org.eclipse.scout.service.SERVICES;
 import org.eclipse.scout.service.ServiceUtility;
-import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
 
 /**
@@ -76,14 +75,6 @@ public class DefaultTransactionDelegate {
   private final boolean m_debug;
   private long m_requestStart;
   private long m_requestEnd;
-
-  /**
-   * @deprecated use {@link #DefaultTransactionDelegate(Version, boolean)} instead. Will be removed in the 6.0 Release.
-   */
-  @Deprecated
-  public DefaultTransactionDelegate(Bundle[] loaderBundles, Version requestMinVersion, boolean debug) {
-    this(requestMinVersion, debug);
-  }
 
   public DefaultTransactionDelegate(Version requestMinVersion, boolean debug) {
     m_requestMinVersion = requestMinVersion;

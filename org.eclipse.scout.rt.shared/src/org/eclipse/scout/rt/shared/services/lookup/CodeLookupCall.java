@@ -115,18 +115,6 @@ public class CodeLookupCall<CODE_ID> extends LocalLookupCall<CODE_ID> implements
   }
 
   /**
-   * Deprecated: Use {@link #createCodeLookupRowList(List)}. Will be removed in N release.
-   */
-  @Deprecated
-  public static <T> List<ILookupRow<T>> createLookupRowArray(List<? extends ICode<T>> codes) {
-    List<ILookupRow<T>> rows = new ArrayList<ILookupRow<T>>(codes.size());
-    for (ICode<T> code : codes) {
-      rows.add(createLookupRow(code));
-    }
-    return rows;
-  }
-
-  /**
    * Default implementation to create lookup rows from codes.
    * <p>
    * Called by {@link #execCreateLookupRowsFromCodes(List)}.
@@ -140,18 +128,6 @@ public class CodeLookupCall<CODE_ID> extends LocalLookupCall<CODE_ID> implements
   }
 
   /**
-   * Deprecated: Use {@link #createCodeLookupRow(ICode)}. Will be removed in N release.
-   */
-  @Deprecated
-  public static <T> ILookupRow<T> createLookupRow(ICode<T> c) {
-    T parentId = null;
-    if (c.getParentCode() != null) {
-      parentId = c.getParentCode().getId();
-    }
-    return new LookupRow<T>(c.getId(), c.getText(), c.getIconId(), c.getTooltipText(), c.getBackgroundColor(), c.getForegroundColor(), c.getFont(), c.isEnabled(), parentId, c.isActive());
-  }
-
-  /**
    * Default implementation to create a lookup row from a code.
    * <p>
    * Called by {@link #createCodeLookupRowList(List)}.
@@ -162,21 +138,6 @@ public class CodeLookupCall<CODE_ID> extends LocalLookupCall<CODE_ID> implements
       parentId = c.getParentCode().getId();
     }
     return new LookupRow<T>(c.getId(), c.getText(), c.getIconId(), c.getTooltipText(), c.getBackgroundColor(), c.getForegroundColor(), c.getFont(), c.isEnabled(), parentId, c.isActive());
-  }
-
-  /**
-   * Deprecated: Use {@link #createSearchPattern(String)} instead. Will be removed in N release.
-   */
-  @Deprecated
-  public static Pattern getSearchPattern(String s) {
-    if (s == null) {
-      s = "";
-    }
-    s = s.toLowerCase();
-    if (!s.endsWith("*")) {
-      s = s + "*";
-    }
-    return Pattern.compile(StringUtility.toRegExPattern(s), Pattern.DOTALL);
   }
 
   @Override

@@ -35,15 +35,12 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.commons.osgi.BundleInspector;
-import org.eclipse.scout.commons.serialization.SerializationUtility;
 import org.eclipse.scout.rt.server.admin.html.AdminSession;
 import org.eclipse.scout.rt.server.commons.cache.IClientIdentificationService;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
 import org.eclipse.scout.rt.server.commons.servletfilter.HttpServletEx;
 import org.eclipse.scout.rt.server.commons.servletfilter.helper.HttpAuthJaasFilter;
 import org.eclipse.scout.rt.server.internal.Activator;
-import org.eclipse.scout.rt.server.internal.ServerSessionClassFinder;
 import org.eclipse.scout.rt.server.services.common.session.IServerSessionRegistryService;
 import org.eclipse.scout.rt.shared.servicetunnel.DefaultServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
@@ -51,7 +48,6 @@ import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.service.SERVICES;
-import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
 
 /**
@@ -70,7 +66,6 @@ import org.osgi.framework.Version;
  * When using RAP (rich ajax platform) as the ui web app then there must be a {@link WebSessionIdPrincipal} in the
  * subject, in order to map those requests to virtual sessions instead of (the unique) http session.
  */
-@SuppressWarnings("deprecation")
 public class ServiceTunnelServlet extends HttpServletEx {
   public static final String HTTP_DEBUG_PARAM = "org.eclipse.scout.rt.server.http.debug";
 
@@ -83,8 +78,6 @@ public class ServiceTunnelServlet extends HttpServletEx {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(ServiceTunnelServlet.class);
 
   private transient IServiceTunnelContentHandler m_contentHandler;
-  private transient Bundle[] m_orderedBundleList;
-  private final Object m_orderedBundleListLock = new Object();
   private final Object m_msgEncoderLock = new Object();
   private Class<? extends IServerSession> m_serverSessionClass;
   private Version m_requestMinVersion;
@@ -116,10 +109,6 @@ public class ServiceTunnelServlet extends HttpServletEx {
     }
     if (m_serverSessionClass == null) {
       m_serverSessionClass = loadSessionClassByParam();
-    }
-    if (m_serverSessionClass == null) {
-      //legacy support
-      m_serverSessionClass = new ServerSessionClassFinder().findClassByConvention(req.getServletPath());
     }
     if (m_serverSessionClass == null) {
       throw new ServletException("Expected init-param \"session\"");
@@ -207,21 +196,6 @@ public class ServiceTunnelServlet extends HttpServletEx {
       }
     }
     return m_contentHandler;
-  }
-
-  /**
-   * @deprecated use {@link SerializationUtility} instead. Will be removed in the N release.
-   * @return
-   */
-  @Deprecated
-  protected Bundle[] getOrderedBundleList() {
-    synchronized (m_orderedBundleListLock) {
-      if (m_orderedBundleList == null) {
-        String[] bundleOrderPrefixes = SerializationUtility.getBundleOrderPrefixes();
-        m_orderedBundleList = BundleInspector.getOrderedBundleList(bundleOrderPrefixes);
-      }
-    }
-    return m_orderedBundleList;
   }
 
   protected IServerSession lookupServerSession(HttpServletRequest req, HttpServletResponse res, Subject subject, IServiceTunnelRequest serviceRequest) throws ProcessingException, ServletException {
@@ -402,15 +376,6 @@ public class ServiceTunnelServlet extends HttpServletEx {
    */
   protected IServiceTunnelResponse runServerJobTransaction(IServiceTunnelRequest req) throws Exception {
     return runServerJobTransactionWithDelegate(req, m_requestMinVersion, m_debug);
-  }
-
-  /**
-   * @deprecated use {@link #runServerJobTransactionWithDelegate(IServiceTunnelRequest, Version, boolean)} instead. Will
-   *             be removed with the N-Release.
-   */
-  @Deprecated
-  protected IServiceTunnelResponse runServerJobTransactionWithDelegate(IServiceTunnelRequest req, Bundle[] loaderBundles, Version requestMinVersion, boolean debug) throws Exception {
-    return runServerJobTransactionWithDelegate(req, requestMinVersion, debug);
   }
 
   protected IServiceTunnelResponse runServerJobTransactionWithDelegate(IServiceTunnelRequest req, Version requestMinVersion, boolean debug) throws Exception {

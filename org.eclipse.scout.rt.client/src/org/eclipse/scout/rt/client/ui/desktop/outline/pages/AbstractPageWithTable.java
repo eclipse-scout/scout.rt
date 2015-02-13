@@ -79,7 +79,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   private boolean m_showTableRowMenus;
 
   public AbstractPageWithTable() {
-    this(true, null, null);
+    this(true, null);
   }
 
   /**
@@ -91,47 +91,15 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * @param callInitializer
    */
   public AbstractPageWithTable(boolean callInitializer) {
-    this(callInitializer, null, null);
-  }
-
-  /**
-   * @deprecated Will be removed in the 6.0 Release.
-   *             Use {@link #AbstractPageWithTable()} in combination with getter and setter (page variable) instead.
-   */
-  @Deprecated
-  @SuppressWarnings("deprecation")
-  public AbstractPageWithTable(org.eclipse.scout.rt.shared.ContextMap contextMap) {
-    this(true, contextMap, null);
+    this(callInitializer, null);
   }
 
   public AbstractPageWithTable(String userPreferenceContext) {
-    this(true, null, userPreferenceContext);
-  }
-
-  /**
-   * @deprecated Will be removed in the 6.0 Release.
-   *             Use {@link #AbstractPageWithTable(boolean)} in combination with getter and setter (page variable)
-   *             instead.
-   */
-  @Deprecated
-  @SuppressWarnings("deprecation")
-  public AbstractPageWithTable(boolean callInitializer, org.eclipse.scout.rt.shared.ContextMap contextMap) {
-    this(callInitializer, contextMap, null);
+    this(true, userPreferenceContext);
   }
 
   public AbstractPageWithTable(boolean callInitializer, String userPreferenceContext) {
-    this(callInitializer, null, userPreferenceContext);
-  }
-
-  /**
-   * @deprecated Will be removed in the 6.0 Release.
-   *             Use {@link #AbstractPageWithTable(boolean, String)} in combination with getter and setter (page
-   *             variable) instead.
-   */
-  @Deprecated
-  @SuppressWarnings("deprecation")
-  public AbstractPageWithTable(boolean callInitializer, org.eclipse.scout.rt.shared.ContextMap contextMap, String userPreferenceContext) {
-    super(callInitializer, contextMap, userPreferenceContext);
+    super(callInitializer, userPreferenceContext);
     if (!callInitializer) {
       callMinimalInitializer();
     }
@@ -271,39 +239,6 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   @ConfigOperation
   @Order(85)
   protected void execLoadData(SearchFilter filter) throws ProcessingException {
-    importTableData(execLoadTableData(filter));
-  }
-
-  /**
-   * Deprecated: use #execLoadData(SearchFilter) instead.
-   * <p/>
-   * If you had something like this:
-   *
-   * <pre>
-   * protected Object[][] execLoadTableData(SearchFilter filter) throws ProcessingException {
-   *   //logic to initialize the service, to handle the search filter...
-   *   return service.loadTableData(..);
-   * }
-   * </pre>
-   * <p/>
-   * You should convert it to:
-   *
-   * <pre>
-   * protected void execLoadData(SearchFilter filter) throws ProcessingException {
-   *   //logic to initialize the service, to handle the search filter...
-   *   importTableData(service.loadTableData(..));
-   * }
-   * </pre>
-   *
-   * This method can not be modified by the Scout Extensibility Concept.
-   *
-   * @deprecated will be removed with the N release. use #execLoadData(SearchFilter) instead.
-   */
-  @ConfigOperation
-  @Order(90)
-  @Deprecated
-  protected Object[][] execLoadTableData(SearchFilter filter) throws ProcessingException {
-    return null;
   }
 
   /**
@@ -493,20 +428,12 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   protected void ensureSearchFormCreated() {
     if (m_searchForm == null) {
       try {
-        setSearchForm(execCreateSearchForm());
+        setSearchForm(createSearchForm());
       }
       catch (Exception e) {
         LOG.warn("unable to create SearchForm for '" + getClass().getName() + "'.", e);
       }
     }
-  }
-
-  /**
-   * @deprecated Will be removed with the N-Release. Use {@link #createSearchForm()} instead.
-   */
-  @Deprecated
-  protected ISearchForm execCreateSearchForm() throws ProcessingException {
-    return createSearchForm();
   }
 
   /**
@@ -805,7 +732,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
    * @since 4.2.0 (Mars-M4)
    */
   protected void importTableData(Object[][] data) throws ProcessingException {
-    //do NOT reference the result data object and warp it into a ref, so the processor is allowed to delete the contents to free up memory sooner
+    //do NOT reference the result data object and wrap it into a ref, so the processor is allowed to delete the contents to free up memory sooner
     getTable().replaceRowsByMatrix(new AtomicReference<Object>(data));
   }
 

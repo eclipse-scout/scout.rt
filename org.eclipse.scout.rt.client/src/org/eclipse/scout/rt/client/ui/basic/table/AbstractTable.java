@@ -671,14 +671,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   /**
-   * @deprecated use {@link #execRowClick(ITableRow, MouseButton)} instead. Will be removed with V5.0.
-   */
-  @Deprecated
-  protected void execRowClick(ITableRow row) throws ProcessingException {
-
-  }
-
-  /**
    * Called when the user clicks on a row in this table.
    * <p>
    * Subclasses can override this method. The default fires a {@link TableEvent#TYPE_ROW_CLICK} event.
@@ -694,7 +686,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   protected void execRowClick(ITableRow row, MouseButton mouseButton) throws ProcessingException {
     TableEvent e = new TableEvent(this, TableEvent.TYPE_ROW_CLICK, CollectionUtility.arrayList(row));
     fireTableEventInternal(e);
-    execRowClick(row);
   }
 
   /**
@@ -788,13 +779,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   @ConfigOperation
   @Order(130)
   protected void execRowsChecked(Collection<? extends ITableRow> row) throws ProcessingException {
-  }
-
-  /**
-   * @deprecated Will be removed in Scout 6.0. Use {@link #addHeaderMenus(OrderedCollection)} instead.
-   */
-  @Deprecated
-  protected void execCreateHeaderMenus(OrderedCollection<IMenu> menuList) {
   }
 
   /**
@@ -920,7 +904,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
       LOG.error("error occured while dynamically contributing menus.", e);
     }
 
-    execCreateHeaderMenus(menus);
     addHeaderMenus(menus);
     //set container on menus
     for (IMenu menu : menus) {

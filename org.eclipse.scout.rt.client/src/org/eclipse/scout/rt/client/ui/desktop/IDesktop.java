@@ -459,24 +459,6 @@ public interface IDesktop extends IPropertyObserver {
    * <p />
    * Finally the path will be expanded. Possible exceptions might occur if no outline is set in the {@link Bookmark} or
    * the outline is not available.
-   *
-   * @param forceReload
-   *          parameter without any function
-   * @deprecated use {@link #activateBookmark(Bookmark)} instead, see
-   *             https://bugs.eclipse.org/bugs/show_bug.cgi?id=439867, parameter forceReload is without any
-   *             function. Will be removed in the N-Release.
-   */
-  @Deprecated
-  void activateBookmark(Bookmark bm, boolean forceReload) throws ProcessingException;
-
-  /**
-   * Activates a {@link Bookmark} on this desktop.
-   * <p />
-   * First the specific {@link Bookmark#getOutlineClassName()} is evaluated and selected, afterwards every page from the
-   * {@link Bookmark#getPath()} will be selected (respecting the {@link AbstractPageState}).
-   * <p />
-   * Finally the path will be expanded. Possible exceptions might occur if no outline is set in the {@link Bookmark} or
-   * the outline is not available.
    */
   void activateBookmark(Bookmark bm) throws ProcessingException;
 

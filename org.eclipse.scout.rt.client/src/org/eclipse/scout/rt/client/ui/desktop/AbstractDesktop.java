@@ -1655,16 +1655,6 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
     }
   }
 
-  /**
-   * @deprecated use {@link #activateBookmark(Bookmark)} instead. Will be removed in the N-Release.
-   */
-  @SuppressWarnings("deprecation")
-  @Override
-  @Deprecated
-  public void activateBookmark(Bookmark bm, boolean forceReload) throws ProcessingException {
-    BookmarkUtility.activateBookmark(this, bm);
-  }
-
   @Override
   public void activateBookmark(Bookmark bm) throws ProcessingException {
     BookmarkUtility.activateBookmark(this, bm);

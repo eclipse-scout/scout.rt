@@ -2,11 +2,7 @@ package org.eclipse.scout.rt.testing.server.runner;
 
 import java.util.List;
 
-import javax.security.auth.Subject;
-
 import org.eclipse.scout.rt.server.IServerJobFactory;
-import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.server.ServerJobFactory;
 import org.eclipse.scout.rt.testing.shared.runner.AbstractRunAftersInSeparateScoutSession;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
@@ -26,16 +22,6 @@ public class RunAftersInSeparateScoutServerSession extends AbstractRunAftersInSe
         evaluateAfters();
       }
     });
-  }
-
-  /**
-   * @deprecated use RunAftersInSeparateScoutServerSession(IServerJobFactory, Statement, List<FrameworkMethod>, Object).
-   *             Will be removed in
-   *             N-release.
-   */
-  @Deprecated
-  public RunAftersInSeparateScoutServerSession(IServerSession serverSession, Subject subject, Statement statement, List<FrameworkMethod> afters, Object target) {
-    this(new ServerJobFactory(serverSession, subject), statement, afters, target);
   }
 
   @Override

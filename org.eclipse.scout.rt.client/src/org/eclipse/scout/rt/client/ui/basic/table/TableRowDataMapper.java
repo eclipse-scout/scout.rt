@@ -31,6 +31,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.form.FormDataUtility;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
+import org.eclipse.scout.rt.shared.data.form.fields.tablefield.TableRowDataPropertyFilter;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.IInternalExtensionRegistry;
 import org.eclipse.scout.service.SERVICES;
@@ -215,13 +216,5 @@ public class TableRowDataMapper implements ITableRowDataMapper {
   @Override
   public boolean acceptImport(AbstractTableRowData rowData) throws ProcessingException {
     return true;
-  }
-
-  /**
-   * @deprecated use {@link org.eclipse.scout.rt.shared.data.form.fields.tablefield.TableRowDataPropertyFilter} instead.
-   *             This class will be removed in the N release.
-   */
-  @Deprecated
-  public static class TableRowDataPropertyFilter extends org.eclipse.scout.rt.shared.data.form.fields.tablefield.TableRowDataPropertyFilter {
   }
 }

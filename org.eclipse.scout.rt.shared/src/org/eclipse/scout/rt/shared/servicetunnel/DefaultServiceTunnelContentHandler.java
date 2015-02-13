@@ -40,7 +40,6 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.serialization.IObjectSerializer;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
 import org.eclipse.scout.rt.shared.Activator;
-import org.osgi.framework.Bundle;
 
 /**
  * Creates SOAP envelopes for {@link IServiceTunnelRequest} and {@link IServiceTunnelResponse} objects.<br>
@@ -142,16 +141,6 @@ public class DefaultServiceTunnelContentHandler implements IServiceTunnelContent
   private IObjectSerializer m_objectSerializer;
 
   public DefaultServiceTunnelContentHandler() {
-  }
-
-  /**
-   * @deprecated use {@link #initialize()} instead. Will be removed in the N release.
-   */
-  @SuppressWarnings("deprecation")
-  @Deprecated
-  @Override
-  public void initialize(Bundle[] classResolveBundles, ClassLoader rawClassLoader) {
-    initialize();
   }
 
   @Override

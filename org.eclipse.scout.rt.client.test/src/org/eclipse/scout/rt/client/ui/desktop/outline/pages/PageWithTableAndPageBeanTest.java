@@ -31,7 +31,6 @@ import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.page.AbstractTablePageData;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -44,25 +43,9 @@ public class PageWithTableAndPageBeanTest {
   private static final String FIRST_COL_CONTENT = "first col";
   private static final String SECOND_COL_CONTENT = "second col";
 
-  private static final String FIRST_COL_CONTENT2 = "first col 2";
-  private static final String SECOND_COL_CONTENT2 = "second col 2";
-
-  private static final String FIRST_COL_CONTENT3 = "first col 3";
-  private static final String SECOND_COL_CONTENT3 = "second col 3";
-
-  @Test
-  public void testExecLoadDataInvokesExecLoadTableData() throws Exception {
-    PageWithTable p = prepareTest(true);
-    assertEquals(2, p.getTable().getRowCount());
-    assertEquals(FIRST_COL_CONTENT2, p.getTable().getFirstColumn().getValue(0));
-    assertEquals(SECOND_COL_CONTENT2, p.getTable().getSecondColumn().getValue(0));
-    assertEquals(FIRST_COL_CONTENT3, p.getTable().getFirstColumn().getValue(1));
-    assertEquals(SECOND_COL_CONTENT3, p.getTable().getSecondColumn().getValue(1));
-  }
-
   @Test
   public void testExecLoadData() throws Exception {
-    PageWithTable p = prepareTest(false);
+    PageWithTable p = prepareTest();
     assertEquals(1, p.getTable().getRowCount());
     assertEquals(FIRST_COL_CONTENT, p.getTable().getFirstColumn().getValue(0));
     assertEquals(SECOND_COL_CONTENT, p.getTable().getSecondColumn().getValue(0));
@@ -78,11 +61,11 @@ public class PageWithTableAndPageBeanTest {
     assertEquals(SECOND_COL_CONTENT, p.getTable().getSecondColumn().getValue(0));
   }
 
-  private PageWithTable prepareTest(boolean invokeSuperExecLoadData) {
+  private PageWithTable prepareTest() {
     IDesktop desktop = TestEnvironmentClientSession.get().getDesktop();
     assertNotNull(desktop);
 
-    desktop.setAvailableOutlines(Collections.singletonList(new PageWithTableOutline(invokeSuperExecLoadData)));
+    desktop.setAvailableOutlines(Collections.singletonList(new PageWithTableOutline()));
     desktop.setOutline(PageWithTableOutline.class);
 
     IOutline outline = desktop.getOutline();
@@ -98,53 +81,31 @@ public class PageWithTableAndPageBeanTest {
 
   public static class PageWithTableOutline extends AbstractOutline {
 
-    private final boolean m_invokeSuperExecLoadData;
-
-    public PageWithTableOutline(boolean invokeSuperExecLoadData) {
+    public PageWithTableOutline() {
       super(false);
-      m_invokeSuperExecLoadData = invokeSuperExecLoadData;
       callInitializer();
     }
 
     @Override
     protected void execCreateChildPages(List<IPage<?>> pageList) throws ProcessingException {
-      pageList.add(new PageWithTable(m_invokeSuperExecLoadData));
+      pageList.add(new PageWithTable());
     }
   }
 
   public static class PageWithTable extends AbstractPageWithTable<PageWithTable.Table> {
-    private final boolean m_invokeSuperExecLoadData;
 
-    public PageWithTable(boolean invokeSuperExecLoadData) {
+    public PageWithTable() {
       super(false);
-      m_invokeSuperExecLoadData = invokeSuperExecLoadData;
       callInitializer();
     }
 
     @Override
     protected void execLoadData(SearchFilter filter) throws ProcessingException {
-      if (m_invokeSuperExecLoadData) {
-        super.execLoadData(filter);
-      }
-      else {
-        PageWithTableData pageData = new PageWithTableData();
-        PageWithTableRowData row = pageData.addRow();
-        row.setFirst(FIRST_COL_CONTENT);
-        row.setSecond(SECOND_COL_CONTENT);
-        getTable().importFromTableBeanData(pageData);
-      }
-    }
-
-    @Override
-    @SuppressWarnings("deprecation")
-    protected Object[][] execLoadTableData(SearchFilter filter) throws ProcessingException {
-      if (!m_invokeSuperExecLoadData) {
-        Assert.fail("execLoadTableData must not be called!");
-      }
-      return new Object[][]{
-          new Object[]{FIRST_COL_CONTENT2, SECOND_COL_CONTENT2},
-          new Object[]{FIRST_COL_CONTENT3, SECOND_COL_CONTENT3}
-      };
+      PageWithTableData pageData = new PageWithTableData();
+      PageWithTableRowData row = pageData.addRow();
+      row.setFirst(FIRST_COL_CONTENT);
+      row.setSecond(SECOND_COL_CONTENT);
+      getTable().importFromTableBeanData(pageData);
     }
 
     @Override

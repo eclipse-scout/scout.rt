@@ -40,7 +40,6 @@ public class SwingScoutRadioButtonTest {
   private AbstractButton m_swingField;
 
   private BooleanHolder m_execSelectionChangedHolder;
-  private BooleanHolder m_execToggleActionHolder;
   private AtomicInteger m_execClickActionCount;
 
   @Before
@@ -49,7 +48,6 @@ public class SwingScoutRadioButtonTest {
 
     // create the members to verify the calls to 'execAction' and 'execSelectionChanged'.
     m_execSelectionChangedHolder = new BooleanHolder(null);
-    m_execToggleActionHolder = new BooleanHolder(null);
     m_execClickActionCount = new AtomicInteger();
 
     // make dispatching into Scout model thread synchronously.
@@ -76,13 +74,11 @@ public class SwingScoutRadioButtonTest {
   public void testClickEvent() throws InterruptedException {
     // Verify initial status.
     assertNull(m_execSelectionChangedHolder.getValue());
-    assertNull(m_execToggleActionHolder.getValue());
     assertEquals(0, m_execClickActionCount.get());
 
     // Test 1: Check the radio button.
     m_swingField.doClick();
     assertTrue(m_execSelectionChangedHolder.getValue().booleanValue());
-    assertTrue(m_execToggleActionHolder.getValue().booleanValue());
     assertEquals(1, m_execClickActionCount.get());
 
     resetBooleanHolders();
@@ -90,13 +86,11 @@ public class SwingScoutRadioButtonTest {
     // Test 2: Check the radio button again.
     m_swingField.doClick();
     assertNull(m_execSelectionChangedHolder.getValue()); // change action is not called again.
-    assertNull(m_execToggleActionHolder.getValue()); // change action is not called again.
     assertEquals(2, m_execClickActionCount.get()); // action count is incremented
   }
 
   private void resetBooleanHolders() {
     m_execSelectionChangedHolder.setValue(null);
-    m_execToggleActionHolder.setValue(null);
   }
 
   private class P_TestRadioButton extends AbstractRadioButton<Long> {
@@ -109,12 +103,6 @@ public class SwingScoutRadioButtonTest {
     @Override
     protected void execClickAction() throws ProcessingException {
       m_execClickActionCount.incrementAndGet();
-    }
-
-    @SuppressWarnings("deprecation")
-    @Override
-    protected void execToggleAction(boolean selected) throws ProcessingException {
-      m_execToggleActionHolder.setValue(selected);
     }
   }
 }

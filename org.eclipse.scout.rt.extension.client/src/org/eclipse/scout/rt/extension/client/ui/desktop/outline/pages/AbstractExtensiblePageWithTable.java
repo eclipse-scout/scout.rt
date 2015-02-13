@@ -35,46 +35,12 @@ public abstract class AbstractExtensiblePageWithTable<T extends ITable> extends 
     super(callInitializer);
   }
 
-  /**
-   * @deprecated Will be removed in the 6.0 Release.
-   *             Use {@link #AbstractExtensiblePageWithTable()} in combination with getter and setter (page variable)
-   *             instead.
-   */
-  @Deprecated
-  @SuppressWarnings("deprecation")
-  public AbstractExtensiblePageWithTable(org.eclipse.scout.rt.shared.ContextMap contextMap) {
-    super(contextMap);
-  }
-
   public AbstractExtensiblePageWithTable(String userPreferenceContext) {
     super(userPreferenceContext);
   }
 
-  /**
-   * @deprecated Will be removed in the 6.0 Release.
-   *             Use {@link #AbstractExtensiblePageWithTable(boolean)} in combination with getter and setter (page
-   *             variable) instead.
-   */
-  @Deprecated
-  @SuppressWarnings("deprecation")
-  public AbstractExtensiblePageWithTable(boolean callInitializer, org.eclipse.scout.rt.shared.ContextMap contextMap) {
-    super(callInitializer, contextMap);
-  }
-
   public AbstractExtensiblePageWithTable(boolean callInitializer, String userPreferenceContext) {
     super(callInitializer, userPreferenceContext);
-  }
-
-  /**
-   * @deprecated Will be removed in the 6.0 Release.
-   *             Use {@link #AbstractExtensiblePageWithTable(boolean, String)} in combination with getter and setter
-   *             (page
-   *             variable) instead.
-   */
-  @Deprecated
-  @SuppressWarnings("deprecation")
-  public AbstractExtensiblePageWithTable(boolean callInitializer, org.eclipse.scout.rt.shared.ContextMap contextMap, String userPreferenceContext) {
-    super(callInitializer, contextMap, userPreferenceContext);
   }
 
   @Override

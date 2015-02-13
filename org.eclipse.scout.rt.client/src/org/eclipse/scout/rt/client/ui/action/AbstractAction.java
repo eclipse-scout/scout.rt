@@ -684,9 +684,9 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
     return builder.toString();
   }
 
-  @SuppressWarnings("deprecation")
-  @Deprecated
   @Override
+  @Deprecated
+  @SuppressWarnings("deprecation")
   public final void prepareAction() {
     try {
       prepareActionInternal();

@@ -54,41 +54,19 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractPageWithNodes.class);
 
   public AbstractPageWithNodes() {
-    this(true, null, null);
+    this(true, null);
   }
 
   public AbstractPageWithNodes(boolean callInitializer) {
-    this(callInitializer, null, null);
-  }
-
-  /**
-   * @deprecated Will be removed with the N-Release.
-   *             Use {@link #AbstractPageWithNodes()} in combination with getter and setter on the page
-   *             instead.
-   */
-  @Deprecated
-  @SuppressWarnings("deprecation")
-  public AbstractPageWithNodes(org.eclipse.scout.rt.shared.ContextMap contextMap) {
-    this(true, contextMap, null);
+    this(callInitializer, null);
   }
 
   public AbstractPageWithNodes(String userPreferenceContext) {
-    this(true, null, userPreferenceContext);
+    this(true, userPreferenceContext);
   }
 
   public AbstractPageWithNodes(boolean callInitializer, String userPreferenceContext) {
-    this(callInitializer, null, userPreferenceContext);
-  }
-
-  /**
-   * @deprecated Will be removed with the N-Release.
-   *             Use {@link #AbstractPageWithNodes(boolean, String)} in combination with getter and setter on the page
-   *             instead.
-   */
-  @Deprecated
-  @SuppressWarnings("deprecation")
-  public AbstractPageWithNodes(boolean callInitializer, org.eclipse.scout.rt.shared.ContextMap contextMap, String userPreferenceContext) {
-    super(callInitializer, contextMap, userPreferenceContext);
+    super(callInitializer, userPreferenceContext);
   }
 
   /*

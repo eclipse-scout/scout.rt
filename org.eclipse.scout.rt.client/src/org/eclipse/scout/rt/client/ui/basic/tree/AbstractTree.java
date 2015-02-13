@@ -414,21 +414,11 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   protected void execNodesSelected(TreeEvent e) throws ProcessingException {
   }
 
-  /**
-   * @deprecated use {@link #interceptNodeClick(ITreeNode, MouseButton)} instead. This method will be removed with V5.0
-   */
-  @Deprecated
-  protected void execNodeClick(ITreeNode node) throws ProcessingException {
-    TreeEvent e = new TreeEvent(this, TreeEvent.TYPE_NODE_CLICK, node);
-    fireTreeEventInternal(e);
-  }
-
   @ConfigOperation
   @Order(70)
   protected void execNodeClick(ITreeNode node, MouseButton mouseButton) throws ProcessingException {
     TreeEvent e = new TreeEvent(this, TreeEvent.TYPE_NODE_CLICK, node);
     fireTreeEventInternal(e);
-    execNodeClick(node);
   }
 
   @ConfigOperation
