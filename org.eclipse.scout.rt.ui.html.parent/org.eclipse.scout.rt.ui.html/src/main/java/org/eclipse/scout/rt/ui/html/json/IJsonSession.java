@@ -23,6 +23,8 @@ public interface IJsonSession {
 
   void dispose();
 
+  void logout();
+
   /**
    * @return the current ui response that is collecting changes for the next
    *         {@link #processRequest(HttpServletRequest, JsonRequest)} cycle

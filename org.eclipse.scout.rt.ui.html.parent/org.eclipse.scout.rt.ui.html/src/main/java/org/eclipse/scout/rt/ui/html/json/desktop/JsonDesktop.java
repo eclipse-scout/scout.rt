@@ -288,7 +288,7 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
   }
 
   protected void handleModelDesktopClosed() {
-    dispose();
+    getJsonSession().logout();
   }
 
   protected ISearchOutline getSearchOutline() {

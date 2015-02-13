@@ -48,6 +48,7 @@ public final class JsonTestUtility {
     Mockito.when(request.getLocale()).thenReturn(new Locale("de_CH"));
     Mockito.when(request.getHeader("User-Agent")).thenReturn("dummy");
     Mockito.when(request.getSession()).thenReturn(httpSession);
+    Mockito.when(request.getSession(false)).thenReturn(httpSession);
     Mockito.when(httpSession.getAttribute("scout.htmlui.session.client." + clientSessionId)).thenReturn(null);
     JSONObject jsonReqObj = new JSONObject();
     try {
@@ -70,6 +71,10 @@ public final class JsonTestUtility {
     Field field = AbstractJsonSession.class.getDeclaredField("m_currentJsonResponse");
     field.setAccessible(true);
     field.set(jsonSession, new JsonResponse());
+
+    field = AbstractJsonSession.class.getDeclaredField("m_currentHttpRequest");
+    field.setAccessible(true);
+    field.set(jsonSession, null);
 
     jsonSession.flush();
   }

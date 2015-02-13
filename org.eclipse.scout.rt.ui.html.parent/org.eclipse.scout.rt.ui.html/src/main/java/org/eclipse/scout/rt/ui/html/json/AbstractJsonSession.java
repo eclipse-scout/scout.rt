@@ -60,6 +60,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   private JsonRequest m_currentJsonRequest;
   private HttpServletRequest m_currentHttpRequest;
   private JsonEventProcessor m_jsonEventProcessor;
+  private boolean m_disposing;
 
   public AbstractJsonSession() {
     m_currentJsonResponse = createJsonResponse();
@@ -305,6 +306,13 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
   @Override
   public void dispose() {
+    if (m_currentHttpRequest != null) {
+      // If there is a request in progress just mark the session as being disposed.
+      // The actual disposing happens before returning to the client, see processRequest.
+      m_disposing = true;
+      return;
+    }
+
     m_jsonAdapterRegistry.disposeAllJsonAdapters();
     m_currentJsonResponse = null;
     flush();
@@ -504,13 +512,26 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     finally {
       // FIXME CGU really finally? what if exception occurs and some events are already delegated to the model?
       // reset event map (aka jsonResponse) when response has been sent to client
-      m_currentJsonResponse = createJsonResponse();
       flush();
+      m_currentJsonResponse = createJsonResponse();
+      m_currentHttpRequest = null;
+
+      if (m_disposing) {
+        dispose();
+      }
 
       if (LOG.isDebugEnabled()) {
         LOG.debug("Adapter count after request: " + m_jsonAdapterRegistry.getJsonAdapterCount());
       }
     }
+  }
+
+  @Override
+  public void logout() {
+    LOG.info("Logging out...");
+    currentHttpRequest().getSession(false).invalidate();
+    currentJsonResponse().addActionEvent(getJsonSessionId(), "logout", new JSONObject());
+    LOG.info("Logged out");
   }
 
   @Override

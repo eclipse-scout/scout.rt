@@ -5,8 +5,10 @@ package org.eclipse.scout.rt.ui.html.json;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.lang.ref.WeakReference;
+import java.util.List;
 
 import javax.servlet.http.HttpSessionBindingEvent;
 
@@ -26,13 +28,24 @@ import org.mockito.Mockito;
 public class AbstractJsonSessionTest {
 
   @Test
-  public void testDispose() {
+  public void testDispose() throws Exception {
     AbstractJsonSession object = (AbstractJsonSession) JsonTestUtility.createAndInitializeJsonSession();
     WeakReference<IJsonSession> ref = new WeakReference<IJsonSession>(object);
 
+    JsonTestUtility.endRequest(object);
     object.dispose();
     object = null;
     JsonTestUtility.assertGC(ref);
+  }
+
+  @Test
+  public void testLogout() throws Exception {
+    IJsonSession jsonSession = JsonTestUtility.createAndInitializeJsonSession();
+    jsonSession.logout();
+
+    Mockito.verify(jsonSession.currentHttpRequest().getSession()).invalidate();
+    List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(jsonSession.currentJsonResponse(), "logout");
+    assertTrue(responseEvents.size() == 1);
   }
 
   @Test

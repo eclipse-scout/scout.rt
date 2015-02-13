@@ -404,28 +404,52 @@ scout.Session.prototype.init = function() {
   }.bind(this));
 
   // Destroy json session on server when page is closed or reloaded
-  $(window).on('unload', function() {
-    // Destroy JSON session on server
-    this._unload = true;
-    this._sendNow();
-    // If child windows are open, they have to be closed as well
-    this._childWindows.forEach(function(childWindow) {
-      childWindow.close();
-    });
-  }.bind(this));
+  $(window).on('unload.' + this.id, this._onWindowUnload.bind(this));
 };
 
 scout.Session.prototype.onModelAction = function(event) {
   if (event.type === 'localeChanged') {
-    this.locale = new scout.Locale(event);
-    // FIXME inform components to reformat display text?
+    this._onLocaleChanged(event);
   } else if (event.type === 'initialized') {
-    this._texts = new scout.Texts(event.textMap);
-    var clientSessionData = this._getAdapterData(event.clientSession);
-    this.locale = new scout.Locale(clientSessionData.locale);
-    this.desktop = this.getOrCreateModelAdapter(clientSessionData.desktop, this.rootAdapter);
-    this.desktop.render(this.$entryPoint);
+    this._onInitialized(event);
+  } else if (event.type === 'logout') {
+    this._onLogout(event);
   }
+};
+
+scout.Session.prototype._onLocaleChanged = function(event) {
+  this.locale = new scout.Locale(event);
+// FIXME inform components to reformat display text?
+};
+
+scout.Session.prototype._onInitialized = function(event) {
+  this._texts = new scout.Texts(event.textMap);
+  var clientSessionData = this._getAdapterData(event.clientSession);
+  this.locale = new scout.Locale(clientSessionData.locale);
+  this.desktop = this.getOrCreateModelAdapter(clientSessionData.desktop, this.rootAdapter);
+  this.desktop.render(this.$entryPoint);
+};
+
+scout.Session.prototype._onLogout = function(event) {
+  // Make sure the unload handler does not get triggered since the server initiated the logout and already disposed the session
+  $(window).off('unload.' + this.id);
+
+  if (event.redirectUrl) {
+    window.location.href = event.redirectUrl;
+  } else {
+    window.location.reload();
+  }
+};
+
+scout.Session.prototype._onWindowUnload = function() {
+  // Destroy JSON session on server
+  this._unload = true;
+  this._sendNow();
+
+  // If child windows are open, they have to be closed as well
+  this._childWindows.forEach(function(childWindow) {
+    childWindow.close();
+  });
 };
 
 /**
