@@ -152,6 +152,23 @@ describe("scout.arrays", function() {
     });
 
   });
+  describe("find", function() {
+
+  it("returns the element for which the given predicate returns true", function() {
+    var arr = ['a', 'b', 'c', 'd'];
+
+    var element = scout.arrays.find(arr, function(element) {
+      return element === 'c';
+    });
+    expect(element).toBe('c');
+
+    element = scout.arrays.find(arr, function(element) {
+      return element === 'z';
+    });
+    expect(element).toBeFalsy();
+  });
+
+});
 
 
 });

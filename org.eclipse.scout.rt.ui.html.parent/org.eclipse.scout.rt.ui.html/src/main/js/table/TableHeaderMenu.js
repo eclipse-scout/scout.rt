@@ -73,23 +73,29 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
 
   sortSelect();
 
-  // create buttons in command for grouping
-  var $commandGroup = $menuHeader.appendDiv('header-group');
-  $commandGroup.appendDiv('header-text')
-    .data('label', session.text('Sum'));
+  // create buttons in command for grouping, if there is at least one number column
+  var containsNumberColumn = scout.arrays.find(table.columns, function(column) {
+    return column.type === 'number';
+  });
 
-  var $groupAll = $commandGroup.appendDiv('header-command group-all')
-    .data('label', session.text('overEverything'))
-    .click(this.remove.bind(this))
-    .click(groupAll);
+  if (containsNumberColumn) {
+    var $commandGroup = $menuHeader.appendDiv('header-group');
+    $commandGroup.appendDiv('header-text')
+      .data('label', session.text('Sum'));
 
-  if (column.type !== 'number') {
-    var $groupSort = $commandGroup.appendDiv('header-command group-sort')
-      .data('label', session.text('grouped'))
+    var $groupAll = $commandGroup.appendDiv('header-command group-all')
+      .data('label', session.text('overEverything'))
       .click(this.remove.bind(this))
-      .click(groupSort);
+      .click(groupAll);
+
+    if (column.type !== 'number') {
+      var $groupSort = $commandGroup.appendDiv('header-command group-sort')
+        .data('label', session.text('grouped'))
+        .click(this.remove.bind(this))
+        .click(groupSort);
+    }
+    groupSelect();
   }
-  groupSelect();
 
   // create buttons in command for coloring
   if (column.type === 'number') {

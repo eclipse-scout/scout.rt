@@ -86,7 +86,7 @@ scout.arrays = {
     }
 
     for (var i = 0; i < arr.length; i++) {
-      if(arr[i] !== arr2[i]) {
+      if (arr[i] !== arr2[i]) {
         return false;
       }
     }
@@ -106,10 +106,19 @@ scout.arrays = {
   },
 
   eachSibling: function(arr, element, func) {
-    for (var i=0; i< arr.length; i++) {
+    for (var i = 0; i < arr.length; i++) {
       var elementAtI = arr[i];
       if (elementAtI !== element) {
         func(elementAtI, i);
+      }
+    }
+  },
+
+  find: function(arr, predicate) {
+    for (var i = 0; i < arr.length; i++) {
+      var element = arr[i];
+      if (predicate(element)) {
+        return element;
       }
     }
   },
@@ -127,7 +136,6 @@ scout.arrays = {
       }
     }
   },
-
 
   $remove: function(arr, $element) {
     var index = scout.arrays.$indexOf(arr, $element);

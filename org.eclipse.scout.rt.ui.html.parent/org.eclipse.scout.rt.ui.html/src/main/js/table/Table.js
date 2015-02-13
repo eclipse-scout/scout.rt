@@ -789,13 +789,9 @@ scout.Table.prototype._group = function() {
 };
 
 scout.Table.prototype._groupColumn = function() {
-  var i, column;
-  for (i = 0; i < this.columns.length; i++) {
-    column = this.columns[i];
-    if (column.grouped) {
-      return column;
-    }
-  }
+  return scout.arrays.find(this.columns, function(column) {
+    return column.grouped;
+  });
 };
 
 /**
