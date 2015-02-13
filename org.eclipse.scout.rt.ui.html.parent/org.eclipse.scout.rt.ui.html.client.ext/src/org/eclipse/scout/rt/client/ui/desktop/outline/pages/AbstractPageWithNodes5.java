@@ -32,17 +32,6 @@ public abstract class AbstractPageWithNodes5 extends AbstractExtensiblePageWithN
     super(callInitializer);
   }
 
-  /**
-   * @deprecated Will be removed in the 6.0 Release.
-   *             Use {@link #AbstractExtensiblePageWithNodes()} in combination with getter and setter (page variable)
-   *             instead.
-   */
-  @Deprecated
-  @SuppressWarnings("deprecation")
-  public AbstractPageWithNodes5(org.eclipse.scout.rt.shared.ContextMap contextMap) {
-    super(contextMap);
-  }
-
   public AbstractPageWithNodes5(String userPreferenceContext) {
     super(userPreferenceContext);
   }
