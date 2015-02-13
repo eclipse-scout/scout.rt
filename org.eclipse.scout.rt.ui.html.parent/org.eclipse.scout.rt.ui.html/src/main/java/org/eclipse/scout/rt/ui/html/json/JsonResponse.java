@@ -36,11 +36,11 @@ public class JsonResponse {
   public static final String PROP_ERROR_CODE = "errorCode";
   public static final String PROP_ERROR_MESSAGE = "errorMessage";
 
-  private Integer m_errorCode;
-  private String m_errorMessage;
   private final List<JsonEvent> m_eventList;
   private final Map<String/*id*/, JsonEvent> m_idToPropertyChangeEventMap;
-  private Map<String, IJsonAdapter<?>> m_adapterMap;
+  private final Map<String, IJsonAdapter<?>> m_adapterMap;
+  private Integer m_errorCode;
+  private String m_errorMessage;
   private boolean m_toJsonInProgress;
 
   public JsonResponse() {

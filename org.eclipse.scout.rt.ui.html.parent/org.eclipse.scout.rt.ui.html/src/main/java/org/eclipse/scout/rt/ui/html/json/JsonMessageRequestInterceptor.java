@@ -89,7 +89,7 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
       if (jsonReq.isUnloadRequest()) {
         LOG.info("Unloading JSON session with ID " + jsonReq.getJsonSessionId() + " (requested by UI)");
         if (jsonSession != null) {
-          jsonSession.dispose();
+          // Unbinding the jsonSession will cause it to be disposed automatically, see AbstractJsonSession.valueUnbound()
           httpSession.removeAttribute(jsonSessionAttributeName);
         }
         return null;

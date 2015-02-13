@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.html.json;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -37,11 +38,11 @@ public class JsonAdapterRegistry {
     m_parentAdapterMap = new HashMap<>();
   }
 
-  protected Map<String, P_RegistryValue> getIdAdapterMap() {
+  protected Map<String, P_RegistryValue> idAdapterMap() {
     return m_idAdapterMap;
   }
 
-  protected Map<IJsonAdapter<?>, Map<Object, P_RegistryValue>> getParentAdapterMap() {
+  protected Map<IJsonAdapter<?>, Map<Object, P_RegistryValue>> parentAdapterMap() {
     return m_parentAdapterMap;
   }
 
@@ -61,8 +62,13 @@ public class JsonAdapterRegistry {
 
   public void removeJsonAdapter(String id) {
     P_RegistryValue value = m_idAdapterMap.remove(id);
-    for (Map<Object, P_RegistryValue> modelAdapterMap : m_parentAdapterMap.values()) {
+    for (Iterator<Map<Object, P_RegistryValue>> it = m_parentAdapterMap.values().iterator(); it.hasNext();) {
+      Map<Object, P_RegistryValue> modelAdapterMap = it.next();
       modelAdapterMap.remove(value.getModel());
+      // Cleanup parentAdapterMap
+      if (modelAdapterMap.isEmpty()) {
+        it.remove();
+      }
     }
   }
 
@@ -104,7 +110,7 @@ public class JsonAdapterRegistry {
     return size;
   }
 
-  public void dispose() {
+  public void disposeAllJsonAdapters() {
     for (String key : CollectionUtility.arrayList(m_idAdapterMap.keySet())) {
       P_RegistryValue value = m_idAdapterMap.get(key);
       if (value != null) { // Check if still in registry (it might already have been removed by a parent adapter)
@@ -112,8 +118,10 @@ public class JsonAdapterRegistry {
         jsonAdapter.dispose();
       }
     }
-    assert m_idAdapterMap.isEmpty();
-    assert m_parentAdapterMap.isEmpty();
+  }
+
+  public boolean isEmpty() {
+    return (m_idAdapterMap.isEmpty() && m_parentAdapterMap.isEmpty());
   }
 
   protected static class P_RegistryValue {

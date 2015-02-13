@@ -49,8 +49,10 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
   private final JsonAdapterFactory m_jsonAdapterFactory;
   private final JsonAdapterRegistry m_jsonAdapterRegistry;
-  private ICustomHtmlRenderer m_customHtmlRenderer;
-  private P_RootAdapter m_rootJsonAdapter;
+  private final Set<String> m_unregisterAdapterSet = new HashSet<String>();
+  private final ICustomHtmlRenderer m_customHtmlRenderer;
+  private final P_RootAdapter m_rootJsonAdapter;
+
   private JsonClientSession<? extends IClientSession> m_jsonClientSession;
   private String m_jsonSessionId;
   private long m_jsonAdapterSeq = ROOT_ID;
@@ -58,7 +60,6 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   private JsonRequest m_currentJsonRequest;
   private HttpServletRequest m_currentHttpRequest;
   private JsonEventProcessor m_jsonEventProcessor;
-  private final Set<String> m_unregisterAdapterSet = new HashSet<String>();
 
   public AbstractJsonSession() {
     m_currentJsonResponse = createJsonResponse();
@@ -304,8 +305,13 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
   @Override
   public void dispose() {
-    m_jsonAdapterRegistry.dispose();
+    m_jsonAdapterRegistry.disposeAllJsonAdapters();
     m_currentJsonResponse = null;
+    flush();
+    // "Leak detection". After disposing all adapters and flushing the session, no adapters should be remaining.
+    if (!m_jsonAdapterRegistry.isEmpty() && !m_unregisterAdapterSet.isEmpty()) {
+      throw new IllegalStateException("JsonAdapterRegistry should be empty, but is not!");
+    }
   }
 
   protected JsonAdapterFactory jsonAdapterFactory() {
@@ -451,7 +457,9 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   public void flush() {
     // Response has been sent, it is now safe to remove all adapters from the registry
     // that were previously only remembered in m_unregisterAdapterSet.
-    LOG.debug("Flush. Remove these adapter IDs from registry: " + m_unregisterAdapterSet);
+    if (LOG.isDebugEnabled()) {
+      LOG.debug("Flush. Remove these adapter IDs from registry: " + m_unregisterAdapterSet);
+    }
     for (String id : m_unregisterAdapterSet) {
       m_jsonAdapterRegistry.removeJsonAdapter(id);
     }
