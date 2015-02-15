@@ -19,6 +19,7 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.IAsyncFuture;
@@ -55,9 +56,9 @@ public class ModelJobAlreadyRunningTest {
     ModelJob<Void> job1 = new ModelJob<Void>("job-1", m_clientSession) {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws ProcessingException {
+      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
         protocol.add("running-1");
-        _sleep(Long.MAX_VALUE);
+        Thread.sleep(TimeUnit.SECONDS.toMillis(30));
       }
     };
     job1.schedule();
@@ -97,15 +98,6 @@ public class ModelJobAlreadyRunningTest {
       assertFalse(e.isCancellation());
       assertFalse(e.isInterruption());
       assertFalse(e.isTimeout());
-    }
-  }
-
-  private static void _sleep(long millis) {
-    try {
-      Thread.sleep(millis);
-    }
-    catch (InterruptedException e) {
-      // NOOP
     }
   }
 }

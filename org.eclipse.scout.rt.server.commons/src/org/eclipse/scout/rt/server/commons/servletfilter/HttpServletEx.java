@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -27,7 +27,7 @@ import javax.servlet.http.HttpServlet;
  * This is a temporary solution until bug <a href="https://bugs.eclipse.org/bugs/show_bug.cgi?id=128068"
  * >https://bugs.eclipse.org/bugs/show_bug.cgi?id=128068</a> is closed.
  */
-public class HttpServletEx extends HttpServlet {
+public class HttpServletEx extends HttpServlet implements IServlet {
   private static final long serialVersionUID = 1L;
 
   @Override

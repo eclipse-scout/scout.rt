@@ -21,12 +21,12 @@ import org.eclipse.scout.commons.exception.ProcessingException;
  * Represents a {@link java.util.concurrent.Future} and translates exceptions that might occur while waiting for a job
  * to complete into {@link JobExecutionException}s.
  *
- * @since 5.0
  * @see java.util.concurrent.Future
  * @see CancellationException
  * @see InterruptedException
  * @see TimeoutException
  * @see ExecutionException
+ * @since 5.1
  */
 public interface IFuture<R> {
 

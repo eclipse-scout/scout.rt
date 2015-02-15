@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.job.internal;
 
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -18,12 +19,13 @@ import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.IFuture;
 import org.eclipse.scout.commons.job.JobExecutionException;
+import org.eclipse.scout.commons.job.interceptor.ExceptionTranslator;
 
 /**
  * Default implementation of {@link IFuture}.
  *
  * @see java.util.concurrent.Future
- * @since 5.0
+ * @since 5.1
  */
 public class Future<R> implements IFuture<R> {
 
@@ -55,8 +57,17 @@ public class Future<R> implements IFuture<R> {
     try {
       return m_delegate.get();
     }
-    catch (ExecutionException | InterruptedException | RuntimeException e) {
-      throw JobExceptionTranslator.translate(e, m_jobName);
+    catch (final ExecutionException e) {
+      throw ExceptionTranslator.translate(e.getCause());
+    }
+    catch (final CancellationException e) {
+      throw ExceptionTranslator.translateCancellationException(e, m_jobName);
+    }
+    catch (final InterruptedException e) {
+      throw ExceptionTranslator.translateInterruptedException(e, m_jobName);
+    }
+    catch (final RuntimeException e) {
+      throw ExceptionTranslator.translate(e);
     }
   }
 
@@ -65,11 +76,20 @@ public class Future<R> implements IFuture<R> {
     try {
       return m_delegate.get(timeout, unit);
     }
-    catch (final TimeoutException e) {
-      throw JobExceptionTranslator.translate(e, timeout, unit, m_jobName);
+    catch (final ExecutionException e) {
+      throw ExceptionTranslator.translate(e.getCause());
     }
-    catch (ExecutionException | InterruptedException | RuntimeException e) {
-      throw JobExceptionTranslator.translate(e, m_jobName);
+    catch (final CancellationException e) {
+      throw ExceptionTranslator.translateCancellationException(e, m_jobName);
+    }
+    catch (final InterruptedException e) {
+      throw ExceptionTranslator.translateInterruptedException(e, m_jobName);
+    }
+    catch (final TimeoutException e) {
+      throw ExceptionTranslator.translateTimeoutException(e, timeout, unit, m_jobName);
+    }
+    catch (final RuntimeException e) {
+      throw ExceptionTranslator.translate(e);
     }
   }
 

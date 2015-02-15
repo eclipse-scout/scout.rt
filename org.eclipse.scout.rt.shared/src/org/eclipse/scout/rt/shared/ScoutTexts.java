@@ -42,7 +42,7 @@ public class ScoutTexts {
    */
   public static final QualifiedName JOB_PROPERTY_NAME = new QualifiedName(ScoutTexts.class.getName(), "ref");
 
-  private static final ScoutTexts defaultInstance = new ScoutTexts();
+  private static final ScoutTexts DEFAULT = new ScoutTexts();
 
   private final ITextProviderService[] m_textProviders;
 
@@ -63,18 +63,16 @@ public class ScoutTexts {
   }
 
   /**
-   * Queries {@link TextsThreadLocal#get()}. If this one is null, then the default
-   * instance is used as global default. That way applications can override scout texts in their
-   * application sessions, without interfering with other scout applications in the same osgi/eclipse runtime.
-   *
-   * @return the <code>ScoutTexts</code> instance to use in current scope.
+   * @return {@link ScoutTexts} associated with the current thread or the JVM-wide instance if not set.
    */
   public static ScoutTexts getInstance() {
-    ScoutTexts t = TextsThreadLocal.get();
-    if (t == null) {
-      t = defaultInstance;
+    ScoutTexts texts = ScoutTexts.CURRENT.get();
+    if (texts != null) {
+      return texts;
     }
-    return t;
+    else {
+      return DEFAULT;
+    }
   }
 
   public final String getText(String key, String... messageArguments) {

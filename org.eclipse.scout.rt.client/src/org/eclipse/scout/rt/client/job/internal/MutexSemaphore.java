@@ -29,7 +29,7 @@ import org.eclipse.scout.commons.ToStringBuilder;
  *
  * @param <T>
  *          the type of elements competing for the mutex.
- * @since 5.0
+ * @since 5.1
  */
 public class MutexSemaphore<T> {
 

@@ -24,19 +24,18 @@ import javax.security.auth.Subject;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.server.extension.IServerSessionExtension;
 import org.eclipse.scout.rt.server.extension.ServerSessionChains.ServerSessionLoadSessionChain;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;
 import org.eclipse.scout.rt.server.services.common.clientnotification.SessionFilter;
 import org.eclipse.scout.rt.shared.OfflineState;
 import org.eclipse.scout.rt.shared.ScoutTexts;
-import org.eclipse.scout.rt.shared.TextsThreadLocal;
 import org.eclipse.scout.rt.shared.extension.AbstractSerializableExtension;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
@@ -71,7 +70,7 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
   private final ObjectExtensions<AbstractServerSession, IServerSessionExtension<? extends AbstractServerSession>> m_objectExtensions;
 
   public AbstractServerSession(boolean autoInitConfig) {
-    m_locale = LocaleThreadLocal.get();
+    m_locale = NlsLocale.get();
     m_attributesLock = new Object();
     m_attributes = new HashMap<String, Object>();
     m_sharedVariableMap = new SharedVariableMap();
@@ -81,6 +80,9 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
     }
   }
 
+  /**
+   * This method is used for deserialization.
+   */
   private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
     ois.defaultReadObject();
     if (m_bundle == null && m_symbolicBundleName != null) {
@@ -89,7 +91,7 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
 
     if (m_scoutTexts == null) {
       m_scoutTexts = new ScoutTexts();
-      TextsThreadLocal.set(m_scoutTexts);
+      ScoutTexts.CURRENT.set(m_scoutTexts);
     }
 
     if (m_attributesLock == null) {
@@ -152,10 +154,8 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
   }
 
   @Override
-  public void setLocale(Locale l) {
-    if (l != null) {
-      m_locale = l;
-    }
+  public void setLocale(Locale locale) {
+    m_locale = locale;
   }
 
   /**
@@ -245,7 +245,7 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
     m_active = true;
     m_scoutTexts = new ScoutTexts();
     // explicitly set the just created instance to the ThreadLocal because it was not available yet, when the job was started.
-    TextsThreadLocal.set(m_scoutTexts);
+    ScoutTexts.CURRENT.set(m_scoutTexts); // TODO [dwi][nosgi]: to be set in ClientSessionRegistryService before startup
     assignUserId();
     interceptLoadSession();
   }

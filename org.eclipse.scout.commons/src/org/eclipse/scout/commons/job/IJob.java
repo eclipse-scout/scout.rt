@@ -22,7 +22,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
  * @param <R>
  *          the result type of the job's computation; use {@link Void} if this job does not return a result.
  * @see JobManager
- * @since 5.0
+ * @since 5.1
  */
 public interface IJob<R> {
 

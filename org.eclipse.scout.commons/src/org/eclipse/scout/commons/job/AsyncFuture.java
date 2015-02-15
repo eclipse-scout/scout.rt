@@ -17,8 +17,8 @@ import org.eclipse.scout.commons.exception.ProcessingException;
  * <p/>
  * Classes that wish to deal with {@link IAsyncFuture} can extend this class and override only the methods which they
  * are interested in.
- * 
- * @since 5.0
+ *
+ * @since 5.1
  */
 public class AsyncFuture<R> implements IAsyncFuture<R> {
 

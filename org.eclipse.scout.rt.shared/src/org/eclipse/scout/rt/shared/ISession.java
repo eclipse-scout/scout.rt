@@ -56,6 +56,7 @@ public interface ISession {
 
   /**
    * Sets the session's locale used for formatting values and for translating texts.
+   * TODO [dwi][nosgi]: why does this method exist?
    */
   void setLocale(Locale l);
 

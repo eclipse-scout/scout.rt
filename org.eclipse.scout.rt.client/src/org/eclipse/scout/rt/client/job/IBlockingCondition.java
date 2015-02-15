@@ -9,7 +9,7 @@ import org.eclipse.scout.commons.job.JobExecutionException;
  * This condition can be used across multiple model-threads to wait for the same condition; this condition is reusable
  * upon signaling.
  *
- * @since 5.0
+ * @since 5.1
  */
 public interface IBlockingCondition {
 

@@ -39,7 +39,6 @@ import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.holders.IntegerHolder;
@@ -47,10 +46,10 @@ import org.eclipse.scout.commons.job.IAsyncFuture;
 import org.eclipse.scout.commons.job.IFuture;
 import org.eclipse.scout.commons.job.IProgressMonitor;
 import org.eclipse.scout.commons.job.JobContext;
+import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ScoutTexts;
-import org.eclipse.scout.rt.shared.TextsThreadLocal;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -81,7 +80,7 @@ public class ModelJobScheduleTest {
   public void testResult() throws ProcessingException {
     ModelJob<String> job = new ModelJob<String>("job", m_clientSession) {
       @Override
-      protected String onRun(IProgressMonitor monitor) throws ProcessingException {
+      protected String onRun(IProgressMonitor monitor) throws Exception {
         return "RUNNING_WITH_RESULT";
       }
     };
@@ -104,8 +103,8 @@ public class ModelJobScheduleTest {
     ModelJob<Void> job = new ModelJob<Void>("job", m_clientSession) {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws ProcessingException {
-        _sleep(500);
+      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+        Thread.sleep(500);
         holder.setValue("RUNNING_VOID");
       }
     };
@@ -132,8 +131,8 @@ public class ModelJobScheduleTest {
 
     ModelJob<String> job = new ModelJob<String>("job", m_clientSession) {
       @Override
-      protected String onRun(IProgressMonitor monitor) throws ProcessingException {
-        _sleep(500);
+      protected String onRun(IProgressMonitor monitor) throws Exception {
+        Thread.sleep(500);
         throw expectedException;
       }
     };
@@ -167,8 +166,8 @@ public class ModelJobScheduleTest {
 
     ModelJob<String> job = new ModelJob<String>("job", m_clientSession) {
       @Override
-      protected String onRun(IProgressMonitor monitor) throws ProcessingException {
-        _sleep(500);
+      protected String onRun(IProgressMonitor monitor) throws Exception {
+        Thread.sleep(500);
         throw expectedException;
       }
     };
@@ -210,14 +209,14 @@ public class ModelJobScheduleTest {
     new ModelJob<Void>("job-1", m_clientSession) {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor1) throws ProcessingException {
+      protected void onRunVoid(IProgressMonitor monitor1) throws Exception {
         workerThreads.add(Thread.currentThread());
         latch.countDown();
 
         new ModelJob<Void>("job-2", m_clientSession) {
 
           @Override
-          protected void onRunVoid(IProgressMonitor monitor2) throws ProcessingException {
+          protected void onRunVoid(IProgressMonitor monitor2) throws Exception {
             workerThreads.add(Thread.currentThread());
             latch.countDown();
           }
@@ -243,14 +242,14 @@ public class ModelJobScheduleTest {
     new ModelJob<Void>("ABC", m_clientSession) {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor1) throws ProcessingException {
+      protected void onRunVoid(IProgressMonitor monitor1) throws Exception {
         actualThreadName1.setValue(Thread.currentThread().getName());
         latch.countDown();
 
         new ModelJob<Void>("XYZ", m_clientSession) {
 
           @Override
-          protected void onRunVoid(IProgressMonitor monitor2) throws ProcessingException {
+          protected void onRunVoid(IProgressMonitor monitor2) throws Exception {
             actualThreadName2.setValue(Thread.currentThread().getName());
             latch.countDown();
           }
@@ -280,7 +279,7 @@ public class ModelJobScheduleTest {
     new ModelJob<Void>("job-1", m_clientSession) {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor1) throws ProcessingException {
+      protected void onRunVoid(IProgressMonitor monitor1) throws Exception {
         job1.setValue(this);
         actualJob1.setValue(ModelJob.get());
         latch.countDown();
@@ -288,7 +287,7 @@ public class ModelJobScheduleTest {
         new ModelJob<Void>("job-2", m_clientSession) {
 
           @Override
-          protected void onRunVoid(IProgressMonitor monitor2) throws ProcessingException {
+          protected void onRunVoid(IProgressMonitor monitor2) throws Exception {
             job2.setValue(this);
             actualJob2.setValue(ModelJob.get());
             latch.countDown();
@@ -314,8 +313,8 @@ public class ModelJobScheduleTest {
     new ModelJob<Void>("job", m_clientSession) {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws ProcessingException {
-        _sleep(100);
+      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+        Thread.sleep(100);
         actualProtocol.add(1);
       }
     }.schedule().get();
@@ -329,7 +328,7 @@ public class ModelJobScheduleTest {
     final IntegerHolder holder = new IntegerHolder();
     ModelJob<String> job = new ModelJob<String>("job", m_clientSession) {
       @Override
-      protected String onRun(IProgressMonitor monitor) throws ProcessingException {
+      protected String onRun(IProgressMonitor monitor) throws Exception {
         return "RUN_" + holder.getValue();
       }
     };
@@ -341,7 +340,7 @@ public class ModelJobScheduleTest {
   }
 
   @Test
-  public void testClientContext() throws ProcessingException, InterruptedException {
+  public void testJobContext() throws ProcessingException, InterruptedException {
     Thread.currentThread().setName("main");
 
     final Holder<ISession> actualClientSession1 = new Holder<>();
@@ -359,10 +358,10 @@ public class ModelJobScheduleTest {
     new ModelJob<Void>("job-1", m_clientSession) {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor1) throws ProcessingException {
+      protected void onRunVoid(IProgressMonitor monitor1) throws Exception {
         actualClientSession1.setValue(IClientSession.CURRENT.get());
-        actualLocale1.setValue(LocaleThreadLocal.get());
-        actualTexts1.setValue(TextsThreadLocal.get());
+        actualLocale1.setValue(NlsLocale.CURRENT.get());
+        actualTexts1.setValue(ScoutTexts.CURRENT.get());
 
         JobContext ctx1 = JobContext.CURRENT.get();
         ctx1.set("PROP_JOB1", "J1");
@@ -372,10 +371,10 @@ public class ModelJobScheduleTest {
         new ModelJob<Void>("job-2", m_clientSession) {
 
           @Override
-          protected void onRunVoid(IProgressMonitor monitor2) throws ProcessingException {
+          protected void onRunVoid(IProgressMonitor monitor2) throws Exception {
             actualClientSession2.setValue(IClientSession.CURRENT.get());
-            actualLocale2.setValue(LocaleThreadLocal.get());
-            actualTexts2.setValue(TextsThreadLocal.get());
+            actualLocale2.setValue(NlsLocale.CURRENT.get());
+            actualTexts2.setValue(ScoutTexts.CURRENT.get());
 
             JobContext ctx2 = JobContext.CURRENT.get();
             ctx2.set("PROP_JOB2", "J2");
@@ -394,15 +393,15 @@ public class ModelJobScheduleTest {
 
     assertSame(m_clientSession.getLocale(), actualLocale1.getValue());
     assertSame(m_clientSession.getLocale(), actualLocale2.getValue());
-    assertSame(Locale.getDefault(), LocaleThreadLocal.get());
+    assertNull(NlsLocale.CURRENT.get());
 
     assertSame(m_clientSession.getTexts(), actualTexts1.getValue());
     assertSame(m_clientSession.getTexts(), actualTexts2.getValue());
-    assertNull(TextsThreadLocal.get());
+    assertNull(ScoutTexts.CURRENT.get());
 
     assertNotNull(actualJobContext1.getValue());
     assertNotNull(actualJobContext2.getValue());
-    assertNotSame("ClientJobContex should be a copy", actualJobContext1.getValue(), actualJobContext2.getValue());
+    assertNotSame("JobContext should be a copy", actualJobContext1.getValue(), actualJobContext2.getValue());
 
     assertEquals("J1", actualJobContext1.getValue().get("PROP_JOB1"));
     assertEquals("SHARED-1", actualJobContext1.getValue().get("PROP_JOB1+JOB2"));
@@ -414,14 +413,5 @@ public class ModelJobScheduleTest {
     assertNull(actualJobContext1.getValue().get("JOB2"));
 
     assertNull(JobContext.CURRENT.get());
-  }
-
-  private static void _sleep(long millis) {
-    try {
-      Thread.sleep(millis);
-    }
-    catch (InterruptedException e) {
-      // NOOP
-    }
   }
 }

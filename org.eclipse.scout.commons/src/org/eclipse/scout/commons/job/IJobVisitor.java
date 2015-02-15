@@ -13,7 +13,7 @@ package org.eclipse.scout.commons.job;
 /**
  * Visitor for visiting jobs.
  *
- * @since 5.0
+ * @since 5.1
  */
 public interface IJobVisitor {
 

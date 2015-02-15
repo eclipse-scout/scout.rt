@@ -31,7 +31,7 @@ import org.eclipse.scout.commons.job.IJobVisitor;
 import org.eclipse.scout.commons.job.IProgressMonitor;
 import org.eclipse.scout.commons.job.JobExecutionException;
 import org.eclipse.scout.commons.job.NamedThreadFactory;
-import org.eclipse.scout.commons.job.internal.JobExceptionTranslator;
+import org.eclipse.scout.commons.job.interceptor.ExceptionTranslator;
 import org.eclipse.scout.commons.job.internal.JobMap;
 import org.eclipse.scout.commons.job.internal.JobMap.IPutCallback;
 import org.eclipse.scout.commons.job.internal.RunNowFuture;
@@ -54,7 +54,7 @@ import org.eclipse.scout.rt.client.job.internal.Task;
  * @see {@link IClientSession#getModelJobManager()}
  * @see ModelJob
  * @see IBlockingCondition
- * @since 5.0
+ * @since 5.1
  */
 public class ModelJobManager {
 
@@ -117,7 +117,7 @@ public class ModelJobManager {
       return interceptCallable(callable).call();
     }
     catch (final Exception e) {
-      throw JobExceptionTranslator.translate(e, job.getName());
+      throw ExceptionTranslator.translate(e);
     }
     finally {
       m_jobMap.remove(future);

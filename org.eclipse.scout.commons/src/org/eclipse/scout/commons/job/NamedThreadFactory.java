@@ -21,7 +21,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 /**
  * Thread factory for named threads and to handle uncaught exceptions.
  *
- * @since 5.0
+ * @since 5.1
  */
 public class NamedThreadFactory implements ThreadFactory {
 

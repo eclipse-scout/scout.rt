@@ -182,30 +182,30 @@ public class MutexSemaphoreTest {
     protocolCount.decrementAndGet();
     assertSame(m_obj5, mutexSemaphore.pollElseRelease());
     // state: [(obj5), obj2, obj3, obj4]
-    _sleep(100);
+    Thread.sleep(100);
 
     protocolCount.decrementAndGet();
     assertSame(m_obj2, mutexSemaphore.pollElseRelease());
     // state: [(obj2), obj3, obj4]
-    _sleep(100);
+    Thread.sleep(100);
 
     simulateWaitForIdleSpuriousWakeup(mutexSemaphore);
 
     protocolCount.decrementAndGet();
     assertSame(m_obj3, mutexSemaphore.pollElseRelease());
     // state: [(obj3), obj4]
-    _sleep(100);
+    Thread.sleep(100);
 
     protocolCount.decrementAndGet();
     assertSame(m_obj4, mutexSemaphore.pollElseRelease());
     // state: [(obj4)]
-    _sleep(100);
+    Thread.sleep(100);
 
     protocolCount.decrementAndGet();
     assertNull(mutexSemaphore.pollElseRelease());
     // state: []
 
-    _sleep(TimeUnit.SECONDS.toMillis(1));
+    Thread.sleep(TimeUnit.SECONDS.toMillis(1));
     assertTrue(waitForIdleResult.getValue());
     assertTrue(mutexSemaphore.isIdle());
   }
@@ -242,15 +242,6 @@ public class MutexSemaphoreTest {
   private void assertIdle(MutexSemaphore<Object> mutexSemaphore) throws InterruptedException {
     assertTrue(mutexSemaphore.isIdle());
     assertTrue(mutexSemaphore.waitForIdle(100, TimeUnit.MILLISECONDS));
-  }
-
-  private static void _sleep(long millis) {
-    try {
-      Thread.sleep(millis);
-    }
-    catch (InterruptedException e) {
-      // NOOP
-    }
   }
 
   private static void simulateWaitForIdleSpuriousWakeup(final MutexSemaphore<Object> mutexSemaphore) {

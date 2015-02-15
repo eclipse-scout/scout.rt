@@ -20,7 +20,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.exception.ProcessingException;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -59,22 +58,22 @@ public class JobManagerTest {
     IJob<Void> job1 = new Job_<Void>("job-1") {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws ProcessingException {
-        _sleep(1000);
+      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+        Thread.sleep(TimeUnit.SECONDS.toMillis(1));
       }
     };
     IJob<Void> job2 = new Job_<Void>("job-2") {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws ProcessingException {
-        _sleep(1000);
+      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+        Thread.sleep(TimeUnit.SECONDS.toMillis(1));
       }
     };
     IJob<Void> job3 = new Job_<Void>("job-3") {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws ProcessingException {
-        _sleep(1000);
+      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+        Thread.sleep(TimeUnit.SECONDS.toMillis(1));
       }
     };
 
@@ -82,7 +81,7 @@ public class JobManagerTest {
     job2.schedule();
     job3.schedule();
 
-    _sleep(500);
+    Thread.sleep(500);
 
     final Set<IJob<?>> actualVisitedJobs = new HashSet<>();
     m_jobManager.visit(new IJobVisitor() {
@@ -106,10 +105,10 @@ public class JobManagerTest {
     final IJob<Void> job1 = new Job_<Void>("job-1") {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws ProcessingException {
+      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
         latchBefore.countDown();
         try {
-          Thread.sleep(Long.MAX_VALUE);
+          Thread.sleep(TimeUnit.SECONDS.toMillis(30));
         }
         catch (InterruptedException e) {
           actualInterruptedProtocol.add(this);
@@ -120,10 +119,10 @@ public class JobManagerTest {
     final IJob<Void> job2 = new Job_<Void>("job-2") {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws ProcessingException {
+      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
         latchBefore.countDown();
         try {
-          Thread.sleep(Long.MAX_VALUE);
+          Thread.sleep(TimeUnit.SECONDS.toMillis(30));
         }
         catch (InterruptedException e) {
           actualInterruptedProtocol.add(this);
@@ -134,10 +133,10 @@ public class JobManagerTest {
     final IJob<Void> job3 = new Job_<Void>("job-3") {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws ProcessingException {
+      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
         latchBefore.countDown();
         try {
-          Thread.sleep(Long.MAX_VALUE);
+          Thread.sleep(TimeUnit.SECONDS.toMillis(30));
         }
         catch (InterruptedException e) {
           actualInterruptedProtocol.add(this);
@@ -151,20 +150,10 @@ public class JobManagerTest {
     job3.schedule();
 
     latchBefore.await(30, TimeUnit.SECONDS); // Wait for all jobs to be ready
-    _sleep(2000);
+    Thread.sleep(TimeUnit.SECONDS.toMillis(2));
     m_jobManager.shutdown();
     latchAfter.await(60, TimeUnit.SECONDS); // Wait for all jobs to be interrupted
     assertEquals(CollectionUtility.hashSet(job1, job2, job3), actualInterruptedProtocol);
-  }
-
-  private static boolean _sleep(long millis) {
-    try {
-      Thread.sleep(millis);
-      return true;
-    }
-    catch (InterruptedException e) {
-      return false;
-    }
   }
 
   /**

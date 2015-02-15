@@ -45,7 +45,7 @@ public class ActiveTransactionRegistry {
   }
 
   public static void register(ITransaction tx) {
-    if (tx == null || tx.getTransactionSequence() == 0L) {
+    if (tx == null || tx.getId() == ITransaction.TX_ZERO_ID) {
       return;
     }
     SessionState state = getSessionState(true);
@@ -54,12 +54,12 @@ public class ActiveTransactionRegistry {
       return;
     }
     synchronized (state.m_txMapLock) {
-      state.m_txMap.put(tx.getTransactionSequence(), new WeakReference<ITransaction>(tx));
+      state.m_txMap.put(tx.getId(), new WeakReference<ITransaction>(tx));
     }
   }
 
   public static void unregister(ITransaction tx) {
-    if (tx == null || tx.getTransactionSequence() == 0L) {
+    if (tx == null || tx.getId() == ITransaction.TX_ZERO_ID) {
       return;
     }
     SessionState state = getSessionState(false);
@@ -67,7 +67,7 @@ public class ActiveTransactionRegistry {
       return;
     }
     synchronized (state.m_txMapLock) {
-      state.m_txMap.remove(tx.getTransactionSequence());
+      state.m_txMap.remove(tx.getId());
     }
   }
 
@@ -75,7 +75,7 @@ public class ActiveTransactionRegistry {
    * @return true if cancel was successful and transaction was in fact cancelled, false otherwise
    */
   public static boolean cancel(long transactionSequence) {
-    if (transactionSequence == 0L) {
+    if (transactionSequence == ITransaction.TX_ZERO_ID) {
       return false;
     }
     SessionState state = getSessionState(false);

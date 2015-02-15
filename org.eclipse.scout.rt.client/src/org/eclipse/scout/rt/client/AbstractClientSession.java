@@ -29,7 +29,6 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.EventListenerList;
-import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
@@ -37,6 +36,7 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionLoadSessionChain;
 import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionStoreSessionChain;
@@ -55,7 +55,6 @@ import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.internal.VirtualDesktop;
 import org.eclipse.scout.rt.shared.OfflineState;
 import org.eclipse.scout.rt.shared.ScoutTexts;
-import org.eclipse.scout.rt.shared.TextsThreadLocal;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
@@ -103,13 +102,13 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
 
   public AbstractClientSession(boolean autoInitConfig) {
     // Instantiate a dedicated ModelJobManager for this ClientSession so that model-jobs scheduled on behalf of this session are executed in serial execution order.
-    m_jobManager = new ModelJobManager(); // TODO [dwi]: Job API v5: Obtain ModelJobManager by OBJ.NEW
+    m_jobManager = new ModelJobManager(); // TODO [dwi][nosgi]: Job API v5: Obtain ModelJobManager by OBJ.NEW
 
     m_clientSessionData = new HashMap<String, Object>();
     m_stateLock = new Object();
     m_isStopping = false;
     m_sharedVariableMap = new SharedVariableMap();
-    m_locale = LocaleThreadLocal.get();
+    m_locale = NlsLocale.get();
     m_objectExtensions = new ObjectExtensions<AbstractClientSession, IClientSessionExtension<? extends AbstractClientSession>>(this);
     if (autoInitConfig) {
       interceptInitConfig();
@@ -178,15 +177,12 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
 
   @Override
   public final void setLocale(Locale locale) {
-    if (locale != null) {
-      Locale oldLocale = m_locale;
-      m_locale = locale;
-      if (!locale.equals(LocaleThreadLocal.get())) {
-        LocaleThreadLocal.set(locale);
-      }
-      if (!locale.equals(oldLocale)) {
-        notifyLocaleListeners(locale);
-      }
+    NlsLocale.set(locale);
+
+    Locale oldLocale = m_locale;
+    m_locale = locale;
+    if (!locale.equals(oldLocale)) {
+      notifyLocaleChangedListeners(locale);
     }
   }
 
@@ -310,7 +306,7 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
       m_iconLocator = createIconLocator();
       m_scoutTexts = new ScoutTexts();
       // explicitly set the just created instance to the ThreadLocal because it was not available yet, when the job was started.
-      TextsThreadLocal.set(m_scoutTexts);
+      ScoutTexts.CURRENT.set(m_scoutTexts); // TODO [dwi][nosgi]: to be set in ClientSessionRegistryService before startup
       interceptLoadSession();
       setActive(true);
     }
@@ -666,7 +662,7 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
     m_localeListener.remove(listener);
   }
 
-  protected void notifyLocaleListeners(Locale locale) {
+  protected void notifyLocaleChangedListeners(Locale locale) {
     LocaleChangeEvent event = new LocaleChangeEvent(this, locale);
     Iterator it = ((Vector) m_localeListener.clone()).iterator();
     while (it.hasNext()) {

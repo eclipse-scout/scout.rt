@@ -13,6 +13,7 @@ package org.eclipse.scout.commons.job;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
@@ -39,8 +40,6 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.holders.IntegerHolder;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -50,8 +49,6 @@ import org.mockito.ArgumentCaptor;
  * JUnit-test to test {@link Job#schedule()}
  */
 public class JobScheduleTest {
-
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JobScheduleTest.class);
 
   private JobManager m_jobManager;
 
@@ -69,7 +66,7 @@ public class JobScheduleTest {
   public void testResult() throws ProcessingException {
     IJob<String> job = new Job_<String>("job") {
       @Override
-      protected String onRun(IProgressMonitor monitor) throws ProcessingException {
+      protected String onRun(IProgressMonitor monitor) throws Exception {
         return "RUNNING_WITH_RESULT";
       }
     };
@@ -92,8 +89,8 @@ public class JobScheduleTest {
     IJob<Void> job = new Job_<Void>("job") {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws ProcessingException {
-        _sleep(500);
+      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+        Thread.sleep(500);
         holder.setValue("RUNNING_VOID");
       }
     };
@@ -120,8 +117,8 @@ public class JobScheduleTest {
 
     IJob<String> job = new Job_<String>("job") {
       @Override
-      protected String onRun(IProgressMonitor monitor) throws ProcessingException {
-        _sleep(500);
+      protected String onRun(IProgressMonitor monitor) throws Exception {
+        Thread.sleep(500);
         throw expectedException;
       }
     };
@@ -155,8 +152,8 @@ public class JobScheduleTest {
 
     IJob<String> job = new Job_<String>("job") {
       @Override
-      protected String onRun(IProgressMonitor monitor) throws ProcessingException {
-        _sleep(500);
+      protected String onRun(IProgressMonitor monitor) throws Exception {
+        Thread.sleep(500);
         throw expectedException;
       }
     };
@@ -196,13 +193,13 @@ public class JobScheduleTest {
     new Job_<Void>("job-1") {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor1) throws ProcessingException {
+      protected void onRunVoid(IProgressMonitor monitor1) throws Exception {
         workerThreads.add(Thread.currentThread());
 
         new Job_<Void>("job-2") {
 
           @Override
-          protected void onRunVoid(IProgressMonitor monitor2) throws ProcessingException {
+          protected void onRunVoid(IProgressMonitor monitor2) throws Exception {
             workerThreads.add(Thread.currentThread());
           }
         }.schedule().get();
@@ -223,13 +220,13 @@ public class JobScheduleTest {
     new Job_<Void>("ABC") {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor1) throws ProcessingException {
+      protected void onRunVoid(IProgressMonitor monitor1) throws Exception {
         actualThreadName1.setValue(Thread.currentThread().getName());
 
         new Job_<Void>("XYZ") {
 
           @Override
-          protected void onRunVoid(IProgressMonitor monitor2) throws ProcessingException {
+          protected void onRunVoid(IProgressMonitor monitor2) throws Exception {
             actualThreadName2.setValue(Thread.currentThread().getName());
           }
         }.schedule().get();
@@ -254,14 +251,14 @@ public class JobScheduleTest {
     new Job_<Void>("job-1") {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor1) throws ProcessingException {
+      protected void onRunVoid(IProgressMonitor monitor1) throws Exception {
         job1.setValue(this);
         actualJob1.setValue(Job.get());
 
         new Job_<Void>("job-2") {
 
           @Override
-          protected void onRunVoid(IProgressMonitor monitor2) throws ProcessingException {
+          protected void onRunVoid(IProgressMonitor monitor2) throws Exception {
             job2.setValue(this);
             actualJob2.setValue(Job.get());
           }
@@ -284,8 +281,8 @@ public class JobScheduleTest {
     new Job_<Void>("job") {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws ProcessingException {
-        _sleep(100);
+      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+        Thread.sleep(100);
         actualProtocol.add(1);
       }
     }.schedule().get();
@@ -302,43 +299,28 @@ public class JobScheduleTest {
     new Job_<Void>("job-1") {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws ProcessingException {
-        _sleep(100);
+      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+        Thread.sleep(100);
         testLatch.countDown();
-        try {
-          parallelRunningLatch.await();
-        }
-        catch (InterruptedException e) {
-          // NOOP
-        }
+        parallelRunningLatch.await();
       }
     }.schedule();
     new Job_<Void>("job-2") {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws ProcessingException {
-        _sleep(100);
+      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+        Thread.sleep(100);
         testLatch.countDown();
-        try {
-          parallelRunningLatch.await();
-        }
-        catch (InterruptedException e) {
-          // NOOP
-        }
+        parallelRunningLatch.await();
       }
     }.schedule();
     new Job_<Void>("job-3") {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws ProcessingException {
-        _sleep(100);
+      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+        Thread.sleep(100);
         testLatch.countDown();
-        try {
-          parallelRunningLatch.await();
-        }
-        catch (InterruptedException e) {
-          // NOOP
-        }
+        parallelRunningLatch.await();
       }
     }.schedule();
 
@@ -360,7 +342,7 @@ public class JobScheduleTest {
     final IntegerHolder holder = new IntegerHolder();
     IJob<String> job = new Job_<String>("job") {
       @Override
-      protected String onRun(IProgressMonitor monitor) throws ProcessingException {
+      protected String onRun(IProgressMonitor monitor) throws Exception {
         return "RUN_" + holder.getValue();
       }
     };
@@ -371,13 +353,49 @@ public class JobScheduleTest {
     assertEquals("RUN_2", job.schedule().get());
   }
 
-  private static void _sleep(long millis) {
-    try {
-      Thread.sleep(millis);
-    }
-    catch (InterruptedException e) {
-      LOG.warn("Interrupted while sleeping", e);
-    }
+  @Test
+  public void testJobContext() throws ProcessingException {
+    Thread.currentThread().setName("main");
+
+    final Holder<JobContext> actualJobContext1 = new Holder<>();
+    final Holder<JobContext> actualJobContext2 = new Holder<>();
+
+    new Job_<Void>("job-1") {
+
+      @Override
+      protected void onRunVoid(IProgressMonitor monitor1) throws Exception {
+        JobContext ctx1 = JobContext.CURRENT.get();
+        ctx1.set("PROP_JOB1", "J1");
+        ctx1.set("PROP_JOB1+JOB2", "SHARED-1");
+        actualJobContext1.setValue(ctx1);
+
+        new Job_<Void>("job-2") {
+
+          @Override
+          protected void onRunVoid(IProgressMonitor monitor2) throws Exception {
+            JobContext ctx2 = JobContext.CURRENT.get();
+            ctx2.set("PROP_JOB2", "J2");
+            ctx2.set("PROP_JOB1+JOB2", "SHARED-2");
+            actualJobContext2.setValue(ctx2);
+          }
+        }.schedule().get();
+      }
+    }.schedule().get();
+
+    assertNotNull(actualJobContext1.getValue());
+    assertNotNull(actualJobContext2.getValue());
+    assertNotSame("JobContext should be a copy", actualJobContext1.getValue(), actualJobContext2.getValue());
+
+    assertEquals("J1", actualJobContext1.getValue().get("PROP_JOB1"));
+    assertEquals("SHARED-1", actualJobContext1.getValue().get("PROP_JOB1+JOB2"));
+    assertNull(actualJobContext1.getValue().get("PROP_JOB2"));
+
+    assertEquals("J1", actualJobContext2.getValue().get("PROP_JOB1"));
+    assertEquals("J2", actualJobContext2.getValue().get("PROP_JOB2"));
+    assertEquals("SHARED-2", actualJobContext2.getValue().get("PROP_JOB1+JOB2"));
+    assertNull(actualJobContext1.getValue().get("JOB2"));
+
+    assertNull(JobContext.CURRENT.get());
   }
 
   /**

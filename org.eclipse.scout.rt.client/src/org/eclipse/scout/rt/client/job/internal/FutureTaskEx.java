@@ -23,7 +23,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
  * invoked for sure to properly acquire/release the mutex.
  *
  * @See {@link FutureTaskEx#run()}
- * @since 5.0
+ * @since 5.1
  */
 public final class FutureTaskEx<R> extends FutureTask<R> {
 

@@ -13,7 +13,7 @@ package org.eclipse.scout.commons.job;
 /**
  * Monitor to track the progress of an activity.
  *
- * @since 5.0
+ * @since 5.1
  */
 public interface IProgressMonitor {
 

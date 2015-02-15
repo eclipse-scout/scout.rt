@@ -61,9 +61,9 @@ public class JobAlreadyRunningTest {
     Job<Void> job1 = new Job_<Void>("job-1") {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws ProcessingException {
+      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
         protocol.add("running-1");
-        _sleep(Long.MAX_VALUE);
+        Thread.sleep(TimeUnit.SECONDS.toMillis(30));
       }
     };
     job1.schedule();
@@ -150,15 +150,6 @@ public class JobAlreadyRunningTest {
       assertFalse(e.isCancellation());
       assertFalse(e.isInterruption());
       assertFalse(e.isTimeout());
-    }
-  }
-
-  private static void _sleep(long millis) {
-    try {
-      Thread.sleep(millis);
-    }
-    catch (InterruptedException e) {
-      throw new RuntimeException(e);
     }
   }
 

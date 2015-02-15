@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.job.internal.JobExceptionTranslator;
+import org.eclipse.scout.commons.job.interceptor.ExceptionTranslator;
 import org.eclipse.scout.commons.job.internal.JobMap;
 import org.eclipse.scout.commons.job.internal.JobMap.IPutCallback;
 import org.eclipse.scout.commons.job.internal.RunNowFuture;
@@ -38,8 +38,8 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
  * installed on the JVM. This job manager is based on an unbounded {@link ScheduledThreadPoolExecutor} with a
  * <code>core-pool-size</code> set to reuse worker-threads among different jobs.
  *
- * @since 5.0
  * @see Job
+ * @since 5.1
  */
 public class JobManager {
 
@@ -90,7 +90,7 @@ public class JobManager {
       return interceptCallable(callable).call();
     }
     catch (final Exception e) {
-      throw JobExceptionTranslator.translate(e, job.getName());
+      throw ExceptionTranslator.translate(e);
     }
     finally {
       m_jobMap.remove(future);

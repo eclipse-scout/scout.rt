@@ -122,14 +122,14 @@ public abstract class ServerJob extends JobEx implements IServerSessionProvider 
   }
 
   /**
-   * see {@link ITransaction#getTransactionSequence()}
+   * see {@link ITransaction#getId()}
    */
   public long getTransactionSequence() {
     return m_transactionSequence;
   }
 
   /**
-   * see {@link ITransaction#getTransactionSequence()}
+   * see {@link ITransaction#getId()}
    */
   public void setTransactionSequence(long seq) {
     if (getState() != NONE) {

@@ -15,18 +15,17 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.job.IJob;
 
 /**
- * Processor to decorate the thread-name of the worker-thread during the time of executing an {@link IJob}.
+ * Processor to decorate the thread-name of the worker-thread during the time of execution with the job name.
  * <p/>
  * This {@link Callable} is a processing object in the language of the design pattern 'chain-of-responsibility'.
  *
  * @param <R>
  *          the result type of the job's computation.
- * @since 5.0
+ * @since 5.1
  */
-public class ThreadNameDecorator<R> implements Callable<R> {
+public class ThreadNameDecorator<R> implements Callable<R>, Chainable {
 
   protected static final Pattern PATTERN_THREAD_NAME = Pattern.compile("thread\\:(.+?)\\;job\\:.+");
 
@@ -34,10 +33,12 @@ public class ThreadNameDecorator<R> implements Callable<R> {
   protected final String m_jobName;
 
   /**
+   * Creates a processor to decorate the thread-name of the worker-thread with the job name.
+   *
    * @param next
-   *          the next processor in the chain.
+   *          next processor in the chain; must not be <code>null</code>.
    * @param jobName
-   *          the name of the job to decorate the thread's name.
+   *          job name to decorate the thread name with; must not be <code>null</code>.
    */
   public ThreadNameDecorator(final Callable<R> next, final String jobName) {
     m_next = Assertions.assertNotNull(next);
@@ -71,5 +72,10 @@ public class ThreadNameDecorator<R> implements Callable<R> {
     else {
       return threadName;
     }
+  }
+
+  @Override
+  public Callable<R> getNext() {
+    return m_next;
   }
 }

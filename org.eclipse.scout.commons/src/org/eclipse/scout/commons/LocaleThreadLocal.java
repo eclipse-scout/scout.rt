@@ -12,46 +12,38 @@ package org.eclipse.scout.commons;
 
 import java.util.Locale;
 
+import org.eclipse.scout.commons.nls.NlsLocale;
+
 /**
- * This class represents the nls locale for the current thread and
- * Locale.getLocale() by default.
+ * @deprecated use {@link NlsLocale} instead; will be removed in 5.2.0;
  */
+@Deprecated
 public final class LocaleThreadLocal {
-  
-  /**
-   * The {@link Locale} which is currently associated with the current thread.
-   */  
-  public static final ThreadLocal<Locale> CURRENT = new ThreadLocal<>();
 
   private LocaleThreadLocal() {
   }
 
   /**
-   * Same as {@link #get(boolean)} with the argument <code>true</code>.
-   * <p>
-   * Note: If you want to backup the current value before calling {@link #set(Locale)}, you should <b>not</b> use this
-   * method, but use {@link #get(boolean)} with the argument <code>false</code> instead.
+   * @deprecated use {@link NlsLocale} instead; will be removed in 5.2.0;
    */
+  @Deprecated
   public static Locale get() {
-    return get(true);
+    return NlsLocale.get();
   }
 
   /**
-   * Returns the {@link Locale} that was previously stored for the current thread using {@link #set(Locale)}.
-   *
-   * @param useDefaultLocale
-   *          If this argument is <code>true</code> and no value was found in the ThreadLocal, the result of
-   *          {@link Locale#getDefault()} is returned. Otherwise, <code>null</code> is returned.
+   * @deprecated use {@link NlsLocale} instead; will be removed in 5.2.0;
    */
+  @Deprecated
   public static Locale get(boolean useDefaultLocale) {
-    Locale l = CURRENT.get();
-    if (l == null && useDefaultLocale) {
-      l = Locale.getDefault();
-    }
-    return l;
+    return NlsLocale.get(useDefaultLocale);
   }
 
+  /**
+   * @deprecated use {@link NlsLocale} instead; will be removed in 5.2.0;
+   */
+  @Deprecated
   public static void set(Locale locale) {
-    CURRENT.set(locale);
+    NlsLocale.CURRENT.set(locale);
   }
 }

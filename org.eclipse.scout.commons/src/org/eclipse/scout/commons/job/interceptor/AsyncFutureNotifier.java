@@ -12,10 +12,9 @@ package org.eclipse.scout.commons.job.interceptor;
 
 import java.util.concurrent.Callable;
 
+import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.IAsyncFuture;
-import org.eclipse.scout.commons.job.IJob;
-import org.eclipse.scout.commons.job.internal.JobExceptionTranslator;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 
@@ -26,17 +25,25 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
  *
  * @param <R>
  *          the result type of the job's computation.
- * @since 5.0
+ * @since 5.1
  */
-public class AsyncFutureNotifier<R> implements Callable<R> {
+public class AsyncFutureNotifier<R> implements Callable<R>, Chainable {
 
   protected static final IScoutLogger LOG = ScoutLogManager.getLogger(AsyncFutureNotifier.class);
 
   protected final Callable<R> m_next;
   protected final IAsyncFuture<R> m_asyncFuture;
 
+  /**
+   * Creates a processor to notify the given {@link IAsyncFuture} about the computation result upon completion.
+   *
+   * @param next
+   *          next processor in the chain; must not be <code>null</code>.
+   * @param asyncFuture
+   *          {@link IAsyncFuture} to be notified or <code>null</code> if not used.
+   */
   public AsyncFutureNotifier(final Callable<R> next, final IAsyncFuture<R> asyncFuture) {
-    m_next = next;
+    m_next = Assertions.assertNotNull(next);
     m_asyncFuture = asyncFuture;
   }
 
@@ -54,7 +61,7 @@ public class AsyncFutureNotifier<R> implements Callable<R> {
         return result;
       }
       catch (final Exception e) {
-        error = JobExceptionTranslator.translate(e, IJob.CURRENT.get().getName());
+        error = ExceptionTranslator.translate(e);
         handleErrorSafe(error);
         throw error;
       }
@@ -98,5 +105,10 @@ public class AsyncFutureNotifier<R> implements Callable<R> {
     catch (final RuntimeException unexpected) {
       LOG.error("Unhandled exception while handling a job's 'DONE' state.", unexpected);
     }
+  }
+
+  @Override
+  public Callable<R> getNext() {
+    return m_next;
   }
 }

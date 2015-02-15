@@ -10,11 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.job;
 
-import java.util.Locale;
 import java.util.concurrent.Callable;
 
 import org.eclipse.scout.commons.Assertions;
-import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.IAsyncFuture;
@@ -23,52 +21,56 @@ import org.eclipse.scout.commons.job.IJob;
 import org.eclipse.scout.commons.job.IProgressMonitor;
 import org.eclipse.scout.commons.job.JobContext;
 import org.eclipse.scout.commons.job.JobExecutionException;
+import org.eclipse.scout.commons.job.JobManager;
 import org.eclipse.scout.commons.job.interceptor.AsyncFutureNotifier;
+import org.eclipse.scout.commons.job.interceptor.ExceptionTranslator;
 import org.eclipse.scout.commons.job.interceptor.ThreadLocalInitializer;
 import org.eclipse.scout.commons.job.interceptor.ThreadNameDecorator;
 import org.eclipse.scout.commons.job.internal.Future;
+import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.IClientSessionProvider;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 
 /**
- * Job that operates on a {@link IClientSession} and provides your executing code with a client-context.
+ * Job to interact with the client model that operates on a {@link IClientSession} and provides your executing code with
+ * the client-context.
  * Jobs of this type run on behalf of a session-dedicated {@link ModelJobManager}, meaning that each
  * {@link IClientSession} has its own {@link ModelJobManager}.
+ * <p/>
+ * While running, jobs of this type have the following characteristics:
+ * <ul>
+ * <li>run in sequence among other {@link ModelJob}s (mutual exclusion);</li>
+ * <li>operate on named worker threads;</li>
+ * <li>have a {@link JobContext} installed to propagate properties among nested jobs;</li>
+ * <li>exceptions are translated into {@link ProcessingException}s;</li>
+ * <li>have job relevant data bound to ThreadLocals: {@link IJob#CURRENT}, {@link JobContext#CURRENT},
+ * {@link ISession#CURRENT}, {@link NlsLocale#CURRENT}, {@link ScoutTexts#CURRENT};</li>
+ * </ul>
  * <p/>
  * Within the same {@link ModelJobManager}, jobs are executed in sequence so that no more than one job will be active at
  * any given time. If a {@link ModelJob} gets blocked by entering a {@link IBlockingCondition}, the model-mutex will be
  * released which allows another model-job to run. When being unblocked, the job must compete for the model-mutex anew
- * in order to continue its execution.<br/>
- * <p/>
- * While running, a {@link ModelJob} has the following {@link ThreadLocal}s set:
- * <ul>
- * <li>{@link IJob#CURRENT}: to access this job</li>
- * <li>{@link JobContext#CURRENT}: to propagate properties to nested jobs</li>
- * <li>{@link ISession#CURRENT}: to access the session associated with this job</li>
- * <li>{@link LocaleThreadLocal#CURRENT}: to access the session's {@link Locale}</li>
- * <li>{@link ScoutTexts#CURRENT}: to access the session's {@link ScoutTexts}</li>
- * </ul>
+ * in order to continue its execution.
  *
  * @param <R>
  *          the result type of the job's computation; use {@link Void} in combination with {@link #onRunVoid()} if this
  *          job does not return a result.
- * @since 5.0
- * @see ModelJobManager
+ * @see IJob
+ * @see ModelJob
+ * @since 5.1
  */
 public class ModelJob<R> implements IJob<R>, IClientSessionProvider {
 
   protected final ModelJobManager m_jobManager;
   protected final String m_name;
-  protected final Callable<R> m_targetInvoker;
   protected final IClientSession m_clientSession;
 
   public ModelJob(final String name, final IClientSession clientSession) {
     m_name = Assertions.assertNotNullOrEmpty(name);
     m_clientSession = Assertions.assertNotNull(clientSession);
     m_jobManager = Assertions.assertNotNull(createJobManager(clientSession));
-    m_targetInvoker = Assertions.assertNotNull(createTargetInvoker());
   }
 
   @Override
@@ -104,7 +106,7 @@ public class ModelJob<R> implements IJob<R>, IClientSessionProvider {
    */
   @Override
   public final R runNow() throws ProcessingException, JobExecutionException {
-    return m_jobManager.runNow(this, interceptCallable(m_targetInvoker, null));
+    return m_jobManager.runNow(this, createCallable(null));
   }
 
   /**
@@ -123,7 +125,7 @@ public class ModelJob<R> implements IJob<R>, IClientSessionProvider {
    */
   @Override
   public final IFuture<R> schedule() throws JobExecutionException {
-    final Callable<R> callable = interceptCallable(m_targetInvoker, null);
+    final Callable<R> callable = createCallable(null);
     return interceptFuture(m_jobManager.schedule(this, callable));
   }
 
@@ -146,7 +148,7 @@ public class ModelJob<R> implements IJob<R>, IClientSessionProvider {
    */
   @Override
   public final IFuture<R> schedule(final IAsyncFuture<R> asyncFuture) throws JobExecutionException {
-    final Callable<R> callable = interceptCallable(m_targetInvoker, asyncFuture);
+    final Callable<R> callable = createCallable(asyncFuture);
     return interceptFuture(m_jobManager.schedule(this, callable));
   }
 
@@ -164,12 +166,11 @@ public class ModelJob<R> implements IJob<R>, IClientSessionProvider {
    * @param monitor
    *          {@link IProgressMonitor} to track the progress of this job.
    * @return the result of the job's computation.
-   * @throws ProcessingException
-   *           throw a {@link ProcessingException} if you encounter a problem that should be propagated to the caller.
-   * @throws RuntimeException
-   *           {@link RuntimeException}s are wrapped into a {@link ProcessingException} and propagated to the caller.
+   * @throws Exception
+   *           if you encounter a problem that should be propagated to the caller; exceptions other than
+   *           {@link ProcessingException} are wrapped into a {@link ProcessingException}.
    */
-  protected R onRun(final IProgressMonitor monitor) throws ProcessingException {
+  protected R onRun(final IProgressMonitor monitor) throws Exception {
     onRunVoid(monitor);
     return null;
   }
@@ -181,46 +182,79 @@ public class ModelJob<R> implements IJob<R>, IClientSessionProvider {
    *
    * @param monitor
    *          {@link IProgressMonitor} to track the progress of this job.
-   * @throws ProcessingException
-   *           throw a {@link ProcessingException} if you encounter a problem that should be propagated to the caller.
-   * @throws RuntimeException
-   *           {@link RuntimeException}s are wrapped into a {@link ProcessingException} and propagated to the caller.
+   * @throws Exception
+   *           if you encounter a problem that should be propagated to the caller; exceptions other than
+   *           {@link ProcessingException} are wrapped into a {@link ProcessingException}.
    */
-  protected void onRunVoid(final IProgressMonitor monitor) throws ProcessingException {
+  protected void onRunVoid(final IProgressMonitor monitor) throws Exception {
   }
 
   /**
-   * This method can be used to intercept the concrete {@link Callable} given to the {@link ModelJobManager} for
-   * execution.<br/>
-   * The default implementation adds {@link IAsyncFuture}-support and sets the following {@link ThreadLocal}s:
-   * While running, jobs of this type have the following {@link ThreadLocal}s set:
-   * <ul>
-   * <li>{@link IJob#CURRENT}: to access this job</li>
-   * <li>{@link JobContext#CURRENT}: to propagate properties to nested jobs</li>
-   * <li>{@link ISession#CURRENT}: to access the session associated with this job</li>
-   * <li>{@link LocaleThreadLocal#CURRENT}: to access the session's {@link Locale}</li>
-   * <li>{@link ScoutTexts#CURRENT}: to access the session's {@link ScoutTexts}</li>
-   * </ul>
+   * Creates the {@link Callable} to be given to the {@link ModelJobManager} for execution.
+   * <p/>
+   * The default implementation invokes {@link #interceptCallable(Callable)} and installs the following functionality on
+   * top of the contributions:
+   * <ol>
+   * <li>Notifies the {@link IAsyncFuture} about the computations result;</li>
+   * <li>Translates computing exception into {@link ProcessingException};</li>
+   * <li>Invokes the job's {@link #onRun(IProgressMonitor)}-method;</li>
+   * </ol>
    *
-   * @param targetInvoker
-   *          {@link Callable} which calls the job's {@link #onRun(IProgressMonitor)}-method.
    * @param asyncFuture
-   *          {@link IAsyncFuture} to be notified about the job's completion or failure.
-   * @return {@link Callable} to be given to the {@link ModelJobManager}.
+   *          {@link IAsyncFuture} to be notified once the job completes.
+   * @return {@link Callable} to be given to the {@link JobManager} (head of the chain).
    */
-  protected Callable<R> interceptCallable(final Callable<R> targetInvocationCallable, final IAsyncFuture<R> asyncFuture) {
-    // Plugged according to design pattern: 'chain-of-responsibility'.
+  protected Callable<R> createCallable(final IAsyncFuture<R> asyncFuture) {
+    final Callable<R> tail = createTargetInvoker();
+    final Callable<R> p3 = new ExceptionTranslator<>(tail);
+    final Callable<R> p2 = new AsyncFutureNotifier<R>(p3, asyncFuture);
+    final Callable<R> p1 = interceptCallable(p2);
 
-    final Callable<R> p8 = targetInvocationCallable;
-    final Callable<R> p7 = new AsyncFutureNotifier<R>(p8, asyncFuture);
-    final Callable<R> p6 = new ThreadLocalInitializer<>(p7, ScoutTexts.CURRENT, m_clientSession.getTexts());
-    final Callable<R> p5 = new ThreadLocalInitializer<>(p6, LocaleThreadLocal.CURRENT, m_clientSession.getLocale());
+    return p1;
+  }
+
+  /**
+   * Overwrite this method to contribute some behavior to the {@link Callable} given to the {@link ModelJobManager} for
+   * execution.
+   * <p/>
+   * Contributions are plugged according to the design pattern: 'chain-of-responsibility' - it is easiest to read the
+   * chain from 'bottom-to-top'.
+   * <p/>
+   * To contribute on top of the chain (meaning that you are invoked <strong>after</strong> the contributions of super
+   * classes and therefore can base on their contributed functionality), you can use constructions of the following
+   * form:
+   * <p/>
+   * <code>
+   *   Callable p2 = new YourInterceptor2(<strong>next</strong>); // executed 3th<br/>
+   *   Callable p1 = new YourInterceptor1(p2); // executed 2nd<br/>
+   *   Callable head = <i>super.interceptCallable(p1)</i>; // executed 1st<br/>
+   *   return head;
+   * </code>
+   * </p>
+   * To be invoked <strong>before</strong> the super classes contributions, you can use constructions of the following
+   * form:
+   * <p/>
+   * <code>
+   *   Callable p2 = <i>super.interceptCallable(<strong>next</strong>)</i>; // executed 3th<br/>
+   *   Callable p1 = new YourInterceptor2(p2); // executed 2nd<br/>
+   *   Callable head = new YourInterceptor1(p1); // executed 1st<br/>
+   *   return head;
+   * </code>
+   *
+   * @param next
+   *          subsequent chain-element; typically notifies the {@link IAsyncFuture}-callback and invokes the job's
+   *          {@link #onRun(IProgressMonitor)}-method.
+   * @return the head of the chain to be invoked first.
+   */
+  protected Callable<R> interceptCallable(final Callable<R> next) {
+    final Callable<R> p6 = new ThreadLocalInitializer<>(next, ScoutTexts.CURRENT, m_clientSession.getTexts());
+    final Callable<R> p5 = new ThreadLocalInitializer<>(p6, NlsLocale.CURRENT, m_clientSession.getLocale());
     final Callable<R> p4 = new ThreadLocalInitializer<>(p5, ISession.CURRENT, m_clientSession);
     final Callable<R> p3 = new ThreadLocalInitializer<>(p4, JobContext.CURRENT, JobContext.copy(JobContext.CURRENT.get()));
     final Callable<R> p2 = new ThreadLocalInitializer<>(p3, IJob.CURRENT, this);
-    final Callable<R> head = new ThreadNameDecorator<R>(p2, m_name);
+    final Callable<R> p1 = new ThreadNameDecorator<R>(p2, m_name);
 
-    return head;
+    return p1;
   }
 
   /**

@@ -32,7 +32,7 @@ import org.eclipse.scout.commons.job.JobExecutionException;
  * <p/>
  * This class is thread-safe.
  *
- * @since 5.0
+ * @since 5.1
  */
 public class JobMap {
 
@@ -77,6 +77,19 @@ public class JobMap {
         m_futureMap.put(future, job);
       }
       return future;
+    }
+    finally {
+      writeLock.unlock();
+    }
+  }
+
+  /**
+   * @return <code>true</code> if the given job is contained in the map.
+   */
+  public boolean contains(final IJob job) {
+    readLock.lock();
+    try {
+      return m_jobMap.containsKey(job);
     }
     finally {
       writeLock.unlock();
@@ -132,8 +145,9 @@ public class JobMap {
     for (final Entry<IJob<?>, Future<?>> entry : map.entrySet()) {
       final IJob<?> job = entry.getKey();
       final Future<?> future = entry.getValue();
+
       if (future.isDone()) {
-        continue;
+        continue; // in case the job completed in the meantime.
       }
       if (!visitor.visit(job)) {
         return;
@@ -185,7 +199,13 @@ public class JobMap {
    * @return the {@link Future} for the given job or <code>null</code> if not contained.
    */
   public Future<?> getFuture(final IJob<?> job) {
-    return m_jobMap.get(job);
+    readLock.lock();
+    try {
+      return m_jobMap.get(job);
+    }
+    finally {
+      readLock.unlock();
+    }
   }
 
   /**

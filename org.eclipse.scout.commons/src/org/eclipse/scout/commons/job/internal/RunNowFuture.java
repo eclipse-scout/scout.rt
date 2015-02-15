@@ -20,7 +20,7 @@ import org.eclipse.scout.commons.job.IJob;
 /**
  * {@link Future} used for {@link IJob#runNow()} invocations.
  *
- * @since 5.0
+ * @since 5.1
  */
 public class RunNowFuture<R> implements Future<R> {
 

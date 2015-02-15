@@ -19,15 +19,15 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 /**
  * This exception describes a problem while executing an {@link IJob} and is thrown in one of the following cases:
  * <ul>
- * <li>when a {@link IJob} cannot be accepted for execution. This may occur when no more threads or queue slots are
- * available, or upon shutdown of the job manager;</li>
- * <li>when a {@link IJob} cannot be accepted for execution because already running;</li>
+ * <li>when a job cannot be accepted for execution. This may occur when no more threads or queue slots are available, or
+ * upon shutdown of the job manager;</li>
+ * <li>when a job cannot be accepted for execution because already running;</li>
  * <li>when waiting for a cancelled job to complete;</li>
  * <li>when waiting for the job to complete longer than the specified timeout;</li>
  * <li>when waiting for the job to complete and the current thread was interrupted;</li>
  * </ul>
  *
- * @since 5.0
+ * @since 5.1
  */
 public class JobExecutionException extends ProcessingException {
 

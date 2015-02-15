@@ -17,7 +17,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
  *
  * @param <R>
  *          type of the computation result.
- * @since 5.0
+ * @since 5.1
  */
 public interface IAsyncFuture<R> {
 

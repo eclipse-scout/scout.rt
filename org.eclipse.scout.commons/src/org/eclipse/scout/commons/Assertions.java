@@ -13,7 +13,7 @@ package org.eclipse.scout.commons;
 /**
  * Helper class to ensure the application's assumptions about expected values.
  *
- * @since 5.0
+ * @since 5.1
  */
 public final class Assertions {
 

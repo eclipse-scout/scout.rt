@@ -19,7 +19,7 @@ import org.eclipse.scout.commons.ToStringBuilder;
 /**
  * {@link Callable} to be scheduled once the model-mutex is acquired.
  *
- * @since 5.0
+ * @since 5.1
  */
 public abstract class Task<R> implements Callable<R> {
 
@@ -43,7 +43,7 @@ public abstract class Task<R> implements Callable<R> {
   /**
    * Schedules this task to be executed at the next reasonable opportunity. The invoker must ensure that this task is
    * the mutex-owner.
-   * 
+   *
    * @throws IllegalStateException
    *           if this task is not the mutex-owner.
    */
