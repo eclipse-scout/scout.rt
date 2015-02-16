@@ -58,18 +58,20 @@ public class HttpAuthJaasFilter implements Filter {
 
   @Override
   public void doFilter(ServletRequest in, ServletResponse out, final FilterChain chain) throws IOException, ServletException {
-    if (isSubjectSet()) {
+    HttpServletRequest req = (HttpServletRequest) in;
+    HttpServletResponse res = (HttpServletResponse) out;
+
+    String username = req.getRemoteUser();
+    if (isSubjectSetWithCorrectPrincipal(username)) {
       chain.doFilter(in, out);
       return;
     }
+
     FilterConfigInjection.FilterConfig config = m_injection.getConfig(in);
     if (!config.isActive()) {
       chain.doFilter(in, out);
       return;
     }
-
-    HttpServletRequest req = (HttpServletRequest) in;
-    HttpServletResponse res = (HttpServletResponse) out;
 
     // check if subject that has one principal at minimum is available
     // create subject if necessary
@@ -99,7 +101,10 @@ public class HttpAuthJaasFilter implements Filter {
     continueChainWithPrincipal(subject, req, res, chain);
   }
 
-  private boolean isSubjectSet() {
+  /**
+   * @return true, if a {@link Subject} is already set with a principal corresponding to the given username.
+   */
+  private boolean isSubjectSetWithCorrectPrincipal(String username) {
     Subject subject = Subject.getSubject(AccessController.getContext());
     if (subject == null) {
       return false;
@@ -108,7 +113,7 @@ public class HttpAuthJaasFilter implements Filter {
       return false;
     }
     String name = subject.getPrincipals().iterator().next().getName();
-    if (!StringUtility.hasText(name)) {
+    if (!StringUtility.hasText(name) || !StringUtility.contains(name, username)) {
       return false;
     }
     return true;
@@ -142,5 +147,4 @@ public class HttpAuthJaasFilter implements Filter {
       }
     }
   }
-
 }
