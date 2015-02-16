@@ -37,12 +37,23 @@ scout.FormField.prototype.init = function(model, session) {
 
 scout.FormField.prototype.render = function($parent) {
   scout.FormField.parent.prototype.render.call(this, $parent);
-  this.installKeystrokeAdapter();
+  this._installKeystrokeAdapter();
 };
 
-scout.FormField.prototype.installKeystrokeAdapter = function() {
+scout.FormField.prototype.dispose = function() {
+  scout.FormField.parent.prototype.dispose.call(this);
+  this._uninstallKeystrokeAdapter();
+};
+
+scout.FormField.prototype._installKeystrokeAdapter = function() {
   if (this.keystrokeAdapter && !scout.keystrokeManager.isAdapterInstalled(this.keystrokeAdapter)) {
     scout.keystrokeManager.installAdapter(this.$container, this.keystrokeAdapter);
+  }
+};
+
+scout.FormField.prototype._uninstallKeystrokeAdapter = function() {
+  if (this.keystrokeAdapter && scout.keystrokeManager.isAdapterInstalled(this.keystrokeAdapter)) {
+    scout.keystrokeManager.uninstallAdapter(this.keystrokeAdapter);
   }
 };
 
@@ -338,6 +349,3 @@ scout.FormField.prototype.addContainer = function($parent, typeName, layout) {
   return htmlComp;
 };
 
-scout.FormField.prototype.dispose = function() {
-  scout.keystrokeManager.uninstallAdapter(this.keystrokeAdapter);
-};
