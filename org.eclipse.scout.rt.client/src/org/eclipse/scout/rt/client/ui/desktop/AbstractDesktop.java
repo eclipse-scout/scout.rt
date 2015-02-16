@@ -1339,6 +1339,13 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
+  public void openDownloadInBrowser(IDownloadHandler handler) {
+    if (UserAgentUtility.isWebClient()) {
+      fireOpenDownloadInBrowser(handler);
+    }
+  }
+
+  @Override
   public boolean isAutoPrefixWildcardForTextSearch() {
     return m_autoPrefixWildcardForTextSearch;
   }
@@ -1593,6 +1600,11 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
 
   private void fireOpenUrlInBrowser(String path, IUrlTarget target) {
     DesktopEvent e = new DesktopEvent(this, DesktopEvent.TYPE_OPEN_URL_IN_BROWSER, path, target);
+    fireDesktopEvent(e);
+  }
+
+  private void fireOpenDownloadInBrowser(IDownloadHandler handler) {
+    DesktopEvent e = new DesktopEvent(this, DesktopEvent.TYPE_OPEN_DOWNLOAD_IN_BROWSER, handler);
     fireDesktopEvent(e);
   }
 

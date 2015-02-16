@@ -33,6 +33,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktopUIFacade;
+import org.eclipse.scout.rt.client.ui.desktop.IDownloadHandler;
 import org.eclipse.scout.rt.client.ui.desktop.IUrlTarget;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTableForm;
@@ -233,6 +234,10 @@ public class VirtualDesktop implements IDesktop {
   @Override
   public void openUrlInBrowser(String url, IUrlTarget target) {
     throw createUnsupportedOperationException();
+  }
+
+  @Override
+  public void openDownloadInBrowser(IDownloadHandler handler) {
   }
 
   @Override

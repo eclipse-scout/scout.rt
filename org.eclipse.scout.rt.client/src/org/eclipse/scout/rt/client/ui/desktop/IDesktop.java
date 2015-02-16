@@ -443,6 +443,14 @@ public interface IDesktop extends IPropertyObserver {
   void openUrlInBrowser(String url, IUrlTarget target);
 
   /**
+   * Opens the download in the browser.
+   *
+   * @param target
+   *          used to specify where the url should be opened. Only considered by the web ui.
+   */
+  void openDownloadInBrowser(IDownloadHandler handler);
+
+  /**
    * Prints the desktop
    * <p>
    * The method returns immediately, the print is done int the background.

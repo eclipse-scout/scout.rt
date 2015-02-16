@@ -56,10 +56,16 @@ public class DesktopEvent extends EventObject {
   public static final int TYPE_PRINTED = 901;
   public static final int TYPE_FILE_CHOOSER_ADDED = 910;
   /**
-   * Creates and opens a browser window to download a file or open an url via user interface (only supported in web ui),
+   * Creates and opens a browser window to download a static resource or opens an url via user interface (only supported
+   * in web ui),
    * see {@link IDesktop#openUrlInBrowser(String)}
    */
   public static final int TYPE_OPEN_URL_IN_BROWSER = 920;
+  /**
+   * Creates and opens a browser window to download a resource (only supported in web ui),
+   * see {@link IDesktop#openDownloadInBrowser(IDownloadHandler)}
+   */
+  public static final int TYPE_OPEN_DOWNLOAD_IN_BROWSER = 921;
   /**
    * Send a broadcast event to find the {@link IFormField} that owns the focus
    * The listener can store the result using {@link #setFocusedField()} The event waits some time to give asynchronous
@@ -74,21 +80,21 @@ public class DesktopEvent extends EventObject {
 
   /**
    * Event type that indicates that the desktop should traverse the focus to the next possible location.
-   * 
+   *
    * @see IDesktop#traverseFocusNext()
    */
   public static final int TYPE_TRAVERSE_FOCUS_NEXT = 1020;
 
   /**
    * Event type that indicates that the desktop should traverse the focus to the previous location.
-   * 
+   *
    * @see IDesktop#traverseFocusPrevious()
    */
   public static final int TYPE_TRAVERSE_FOCUS_PREVIOUS = 1030;
 
   /**
    * Event type that indicates that the currently active (focused) {@link IForm} should be calculated.
-   * 
+   *
    * @see IDesktop#traverseFocusPrevious()
    */
   public static final int TYPE_FIND_ACTIVE_FORM = 1040;
@@ -106,6 +112,7 @@ public class DesktopEvent extends EventObject {
   private List<IMenu> m_popupMenus;
   private File m_printedFile;
   private IUrlTarget m_urlTarget;
+  private IDownloadHandler m_downloadHandler;
 
   public DesktopEvent(IDesktop source, int type) {
     super(source);
@@ -150,6 +157,12 @@ public class DesktopEvent extends EventObject {
     m_printParameters = printParameters;
   }
 
+  public DesktopEvent(IDesktop source, int type, IDownloadHandler handler) {
+    super(source);
+    m_type = type;
+    m_downloadHandler = handler;
+  }
+
   public IDesktop getDesktop() {
     return (IDesktop) getSource();
   }
@@ -180,6 +193,10 @@ public class DesktopEvent extends EventObject {
 
   public IUrlTarget getUrlTarget() {
     return m_urlTarget;
+  }
+
+  public IDownloadHandler getDownloadHandler() {
+    return m_downloadHandler;
   }
 
   public IMessageBox getMessageBox() {
