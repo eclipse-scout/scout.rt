@@ -40,7 +40,6 @@ import org.w3c.dom.Element;
  *
  * @deprecated Will be removed in Scout 6.0. Use {@link Element} and {@link XmlUtility} instead.
  */
-@Deprecated
 public class SimpleXmlElement {
   private static final HashMap<String, String> ENTITIES;
   private static final HashMap<String, String> INVERSE_ENTITIES;
