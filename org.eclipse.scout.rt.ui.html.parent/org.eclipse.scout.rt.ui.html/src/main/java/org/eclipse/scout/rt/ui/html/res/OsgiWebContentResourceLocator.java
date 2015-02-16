@@ -33,17 +33,14 @@ public class OsgiWebContentResourceLocator implements IWebContentResourceLocator
     if (path.startsWith("/")) {
       path = path.substring(1);
     }
-
-    //XXX rmeove
-    if (path.startsWith("src")) {
-      return getResourceImpl("/" + path);
-    }
-
-    //FIXME imo handle '../..' hacks
     return getResourceImpl("WebContent/" + path);
   }
 
   protected URL getResourceImpl(String resourcePath) {
+    //disable hacker attacks using '..'
+    if (resourcePath.contains("..")) {
+      throw new IllegalArgumentException("path must not contain any '..'");
+    }
     for (OsgiWebContentService s : SERVICES.getServices(OsgiWebContentService.class)) {
       URL url = s.getBundle().getEntry(resourcePath);
       if (url != null) {

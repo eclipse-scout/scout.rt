@@ -38,6 +38,10 @@ public class JEEWebContentResourceLocator implements IWebContentResourceLocator 
   }
 
   protected URL getResourceImpl(String resourcePath) {
+    //disable hacker attacks using '..'
+    if (resourcePath.contains("..")) {
+      throw new IllegalArgumentException("path must not contain any '..'");
+    }
     try {
       URL url = m_servletContext.getResource(resourcePath);
       if (url != null && LOG.isTraceEnabled()) {
