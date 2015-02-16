@@ -507,3 +507,10 @@ Es braucht ein Tool, welches im Build die Fonts mergen und analysieren kann.
 
 Security:
 Man kann heute Felder auf enabled / visible setzen per Javascript-Console. wie wollen wir damit umgehen? Erneute Prüfung auf enabled/visible im JSON-Layer einbauen?
+
+Erweiterbarkeit:
+Probleme mit aktuellem Ansatz:
+1. Man möchte colors und mixins verwenden -> benötigt weitere css files. Diese Files werden dann z.B. in bsiwidgets.css inkludiert, obwohl sie in scout.css schon dabei sind.
+   Vielleicht eine Anweisung im Include, dass man sie nur zur Compile-Zeit benötigt? Mit Kommentar start und Ende eines inkludierten Files markieren, dann kann man es einfacher rauslöschen.
+2. Es ist zur Zeit nötig, eine Versions-Nummer zu verwenden beim import von js oder css Dateien, die aber gar nichts bewirkt -> optional machen.
+3. Wir sollten überlegen, ob es Namespaces für Includes braucht. Oder genügt es über den Filenamen? z.B. colors.css, bsiwidgets-colors.css vs. scout/colors.css, bsiwidgets/colors.css

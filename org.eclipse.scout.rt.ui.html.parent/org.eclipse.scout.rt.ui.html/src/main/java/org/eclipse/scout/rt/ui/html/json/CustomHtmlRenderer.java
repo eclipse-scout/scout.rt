@@ -86,6 +86,10 @@ public class CustomHtmlRenderer implements ICustomHtmlRenderer {
         }
         continue;
       }
+      if ("div".equals(tag.getName())) {
+        tag.filterAttributes("class");
+        continue;
+      }
       if ("b".equals(tag.getName())) {
         tag.filterAttributes("class");
         continue;
