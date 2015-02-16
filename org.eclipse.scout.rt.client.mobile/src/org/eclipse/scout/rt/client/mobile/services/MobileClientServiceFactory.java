@@ -21,7 +21,7 @@ import org.osgi.framework.ServiceRegistration;
 
 /**
  * Accepts the service only if the current device is a mobile or tablet.
- * 
+ *
  * @since 3.9.0
  * @see {@link UserAgent}
  */
@@ -33,6 +33,9 @@ public class MobileClientServiceFactory extends ClientServiceFactory {
 
   @Override
   public Object getService(Bundle bundle, ServiceRegistration registration) {
+    if (ClientJob.getCurrentSession() == null) {
+      return ServiceUtility.NULL_SERVICE;
+    }
     IUiDeviceType uiDeviceType = ClientJob.getCurrentSession().getUserAgent().getUiDeviceType();
     if (!UiDeviceType.MOBILE.equals(uiDeviceType) && !UiDeviceType.TABLET.equals(uiDeviceType)) {
       return ServiceUtility.NULL_SERVICE;
