@@ -10,52 +10,47 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.cache;
 
-import java.util.zip.Adler32;
+import org.eclipse.scout.rt.shared.data.basic.BinaryResource;
 
 /**
  * Used in {@link IHttpCacheControl}
  */
 public class HttpCacheObject {
-  private final String m_pathInfo;
-  private final byte[] m_content;
-  private final long m_lastModified;
-  private final long m_fingerprint;
+  private final String m_cacheId;
+  private final boolean m_cachingAllowed;
+  private final int m_cacheMaxAge;
+  private final BinaryResource m_resource;
 
-  // FIXME AWE: add m_fileExtension
-
-  public HttpCacheObject(String pathInfo, byte[] content, long lastModified) {
-    m_pathInfo = pathInfo;
-    m_content = content;
-    m_lastModified = lastModified;
-    Adler32 a = new Adler32();
-    a.update(content);
-    m_fingerprint = a.getValue();
+  public HttpCacheObject(String cacheId, boolean cachingAllowed, int cacheMaxAge, BinaryResource resource) {
+    m_cacheId = cacheId;
+    m_cachingAllowed = cachingAllowed;
+    m_cacheMaxAge = cacheMaxAge;
+    m_resource = resource;
   }
 
-  public String getPathInfo() {
-    return m_pathInfo;
+  public String getCacheId() {
+    return m_cacheId;
   }
 
-  public byte[] getContent() {
-    return m_content;
+  public boolean isCachingAllowed() {
+    return m_cachingAllowed;
   }
 
-  public long getLastModified() {
-    return m_lastModified;
+  public int getCacheMaxAge() {
+    return m_cacheMaxAge;
   }
 
-  public long getFingerprint() {
-    return m_fingerprint;
+  public BinaryResource getResource() {
+    return m_resource;
   }
 
   /**
-   * Convenience for creating a {@link HttpCacheInfo} out of this object
+   * @return an ETAG if {@link #getContentLength()} and {@link #getFingerprint()} are both not -1
    */
-  public HttpCacheInfo toCacheInfo() {
-    HttpCacheInfo info = new HttpCacheInfo();
-    info.setContentLength(m_content.length);
-    info.setFingerprint(m_fingerprint);
-    info.setLastModified(m_lastModified);
-    return info;
+  public String createETag() {
+    if (m_resource.getFingerprint() != -1L && m_resource.getContentLength() != -1L) {
+      return "W/\"" + m_resource.getContentLength() + "-" + m_resource.getFingerprint() + "\"";
+    }
+    return null;
   }
 }

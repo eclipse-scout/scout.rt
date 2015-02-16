@@ -79,7 +79,7 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
   }
 
   protected IJsonSession getOrCreateJsonSession(AbstractUiServlet servlet, HttpServletRequest req, HttpServletResponse resp, JsonRequest jsonReq) throws ServletException, IOException {
-    String jsonSessionAttributeName = "scout.htmlui.session.json." + jsonReq.getJsonSessionId();
+    String jsonSessionAttributeName = IJsonSession.HTTP_SESSION_ATTRIBUTE_PREFIX + jsonReq.getJsonSessionId();
     HttpSession httpSession = req.getSession();
 
     //FIXME cgu really synchronize on this? blocks every call, maybe introduce a lock object saved on httpSession or even better use java.util.concurrent.locks.ReadWriteLock

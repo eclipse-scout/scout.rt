@@ -53,6 +53,7 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     return m_id;
   }
 
+  @Override
   public IJsonSession getJsonSession() {
     return m_jsonSession;
   }

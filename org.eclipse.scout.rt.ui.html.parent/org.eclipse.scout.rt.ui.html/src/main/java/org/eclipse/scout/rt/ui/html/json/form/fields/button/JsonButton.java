@@ -11,7 +11,6 @@
 package org.eclipse.scout.rt.ui.html.json.form.fields.button;
 
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
-import org.eclipse.scout.rt.ui.html.ImageUrlUtility;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
@@ -19,6 +18,7 @@ import org.eclipse.scout.rt.ui.html.json.JsonEventType;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
+import org.eclipse.scout.rt.ui.html.res.DynamicResourceUrlUtility;
 
 public class JsonButton<T extends IButton> extends JsonFormField<T> {
 
@@ -60,7 +60,7 @@ public class JsonButton<T extends IButton> extends JsonFormField<T> {
     putJsonProperty(new JsonProperty<IButton>(IButton.PROP_ICON_ID, model) {
       @Override
       protected String modelValue() {
-        return ImageUrlUtility.createIconUrl(JsonButton.this, getModel().getIconId());
+        return DynamicResourceUrlUtility.createIconUrl(JsonButton.this, getModel().getIconId());
       }
     });
   }

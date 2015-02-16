@@ -40,12 +40,12 @@ public interface IHttpCacheControl {
 
   void putCacheObject(HttpServletRequest req, HttpCacheObject o);
 
-  HttpCacheObject getCacheObject(HttpServletRequest req, String pathInfo);
+  HttpCacheObject getCacheObject(HttpServletRequest req, String cacheId);
 
   /**
    * @return the removed object or null if it was not cached
    */
-  HttpCacheObject removeCacheObject(HttpServletRequest req, String pathInfo);
+  HttpCacheObject removeCacheObject(HttpServletRequest req, String cacheId);
 
   /**
    * Checks whether the file needs to be returned or not, depending on the request headers and file modification state.
@@ -59,7 +59,7 @@ public interface IHttpCacheControl {
    *         false if the content of the file needs to be returned, Etag, IfModifiedSince and MaxAge headers were set if
    *         appropriate.
    */
-  boolean checkAndUpdateCacheHeaders(HttpServletRequest req, HttpServletResponse resp, HttpCacheInfo info);
+  boolean checkAndUpdateCacheHeaders(HttpServletRequest req, HttpServletResponse resp, HttpCacheObject obj);
 
   /**
    * Disable cache for this resource

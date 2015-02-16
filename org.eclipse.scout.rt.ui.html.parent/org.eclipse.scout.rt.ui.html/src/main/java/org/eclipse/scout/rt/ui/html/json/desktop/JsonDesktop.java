@@ -12,6 +12,8 @@ package org.eclipse.scout.rt.ui.html.json.desktop;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -28,13 +30,16 @@ import org.eclipse.scout.rt.client.ui.action.view.IViewButton;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopEvent;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
+import org.eclipse.scout.rt.client.ui.desktop.IDownloadHandler;
 import org.eclipse.scout.rt.client.ui.desktop.IUrlTarget;
+import org.eclipse.scout.rt.client.ui.desktop.UrlTarget;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTableForm;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineTreeForm;
 import org.eclipse.scout.rt.client.ui.desktop.outline.ISearchOutline;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
+import org.eclipse.scout.rt.shared.data.basic.BinaryResource;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
@@ -43,15 +48,18 @@ import org.eclipse.scout.rt.ui.html.json.JsonException;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
+import org.eclipse.scout.rt.ui.html.res.DynamicResourceUrlUtility;
+import org.eclipse.scout.rt.ui.html.res.IDynamicResourceProvider;
 import org.eclipse.scout.service.SERVICES;
 import org.json.JSONObject;
 
-public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserver<T> {
+public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserver<T> implements IDynamicResourceProvider {
 
   public static final String PROP_OUTLINE = "outline";
   public static final String PROP_FORM = "form";
   public static final String PROP_MESSAGE_BOX = "messageBox";
 
+  private HashMap<String, IDownloadHandler> m_downloadHandlers = new HashMap<String, IDownloadHandler>();
   private DesktopListener m_desktopListener;
 
   public JsonDesktop(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
@@ -226,6 +234,9 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
       case DesktopEvent.TYPE_OPEN_URL_IN_BROWSER:
         handleModelOpenUrlInBrowser(event.getPath(), event.getUrlTarget());
         break;
+      case DesktopEvent.TYPE_OPEN_DOWNLOAD_IN_BROWSER:
+        handleModelOpenDownloadInBrowser(event.getDownloadHandler());
+        break;
       case DesktopEvent.TYPE_MESSAGE_BOX_ADDED:
         handleModelMessageBoxAdded(event.getMessageBox());
         break;
@@ -242,6 +253,41 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
     putProperty(json, "path", path);
     putProperty(json, "urlTarget", urlTarget.toString());
     addActionEvent("openUrlInBrowser", json);
+  }
+
+  protected void handleModelOpenDownloadInBrowser(IDownloadHandler handler) {
+    if (handler == null) {
+      return;
+    }
+    manageDownloadHandlers();
+    m_downloadHandlers.put(handler.getResource().getFilename(), handler);
+    String path = DynamicResourceUrlUtility.createCallbackUrl(this, handler.getResource().getFilename());
+    JSONObject json = new JSONObject();
+    putProperty(json, "path", path);
+    putProperty(json, "urlTarget", UrlTarget.BLANK);
+    addActionEvent("openUrlInBrowser", json);
+  }
+
+  @Override
+  public BinaryResource loadDynamicResource(String filename) {
+    manageDownloadHandlers();
+    IDownloadHandler handler = m_downloadHandlers.get(filename);
+    if (handler != null) {
+      BinaryResource res = handler.getResource();
+      if (res != null) {
+        return res;
+      }
+    }
+    return null;
+  }
+
+  protected void manageDownloadHandlers() {
+    for (Iterator<IDownloadHandler> it = m_downloadHandlers.values().iterator(); it.hasNext();) {
+      IDownloadHandler handler = it.next();
+      if (!handler.isActive()) {
+        it.remove();
+      }
+    }
   }
 
   protected void handleModelOutlineChanged(IOutline outline) {

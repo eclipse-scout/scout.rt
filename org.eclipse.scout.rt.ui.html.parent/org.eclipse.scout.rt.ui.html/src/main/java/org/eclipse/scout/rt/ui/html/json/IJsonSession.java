@@ -19,6 +19,8 @@ import org.json.JSONObject;
 
 public interface IJsonSession {
 
+  String HTTP_SESSION_ATTRIBUTE_PREFIX = "scout.htmlui.session.json."/*+JsonRequest.PROP_JSON_SESSION_ID*/;
+
   void init(HttpServletRequest request, JsonStartupRequest jsonStartupRequest);
 
   void dispose();

@@ -26,8 +26,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
 import org.eclipse.scout.rt.client.ui.IIconLocator;
-import org.eclipse.scout.rt.client.ui.form.fields.imagebox.BinaryContent;
-import org.eclipse.scout.rt.client.ui.form.fields.imagebox.IBinaryContentProvider;
+import org.eclipse.scout.rt.shared.data.basic.BinaryResource;
 import org.eclipse.scout.rt.ui.html.AbstractUiServlet;
 import org.eclipse.scout.rt.ui.html.Activator;
 import org.eclipse.scout.rt.ui.html.IServletRequestInterceptor;
@@ -35,8 +34,9 @@ import org.eclipse.scout.rt.ui.html.StreamUtility;
 import org.eclipse.scout.rt.ui.html.UiHints;
 import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
 import org.eclipse.scout.rt.ui.html.cache.IHttpCacheControl;
-import org.eclipse.scout.rt.ui.html.json.AbstractJsonSession;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
+import org.eclipse.scout.rt.ui.html.json.IJsonSession;
+import org.eclipse.scout.rt.ui.html.json.JsonRequest;
 import org.eclipse.scout.rt.ui.html.json.JsonUtility;
 import org.eclipse.scout.rt.ui.html.script.ScriptFileBuilder;
 import org.eclipse.scout.rt.ui.html.script.ScriptOutput;
@@ -86,25 +86,20 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
     // Important: Check is only done if the request still processes the requested resource and hasn't been forwarded to another one (using req.getRequestDispatcher().forward)
     String originalPathInfo = (String) req.getAttribute("javax.servlet.forward.path_info");
     if (originalPathInfo == null || pathInfo.equals(originalPathInfo)) {
-      if (httpCacheControl.checkAndUpdateCacheHeaders(req, resp, cacheObj.toCacheInfo())) {
+      if (httpCacheControl.checkAndUpdateCacheHeaders(req, resp, cacheObj)) {
         return true;
       }
     }
 
-    // return content. Note that this method only works because the file-type information
-    // is contained in the pathInfo (=request from the client), this means we cannot load
-    // a resource from an URL like http://foo.com/myfile, since the file-type is missing.
-    // It would be better if we could determine the mime-type without being dependent on
-    // the request URL.
-    String contentType = detectContentType(servlet, pathInfo);
+    String contentType = cacheObj.getResource().getContentType();
     if (contentType != null) {
       resp.setContentType(contentType);
     }
     else {
       LOG.warn("Could not determine content type of: " + pathInfo);
     }
-    resp.setContentLength(cacheObj.getContent().length);
-    resp.getOutputStream().write(cacheObj.getContent());
+    resp.setContentLength(cacheObj.getResource().getContentLength());
+    resp.getOutputStream().write(cacheObj.getResource().getContent());
     return true;
   }
 
@@ -139,28 +134,12 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
     return INDEX_HTML;
   }
 
-  protected String detectContentType(AbstractUiServlet servlet, String path) {
-    int lastSlash = path.lastIndexOf('/');
-    String fileName = lastSlash >= 0 ? path.substring(lastSlash + 1) : path;
-    //Prefer mime type mapping from container
-    String contentType = servlet.getServletContext().getMimeType(fileName);
-    if (contentType != null) {
-      return contentType;
-    }
-    int lastDot = path.lastIndexOf('.');
-    String fileExtension = lastDot >= 0 ? path.substring(lastDot + 1) : path;
-    return FileUtility.getContentTypeForExtension(fileExtension);
-  }
-
   /**
    * Loads a resource with an appropriate method, based on the URL
    */
   protected HttpCacheObject loadResource(AbstractUiServlet servlet, HttpServletRequest req, String pathInfo) throws ServletException, IOException {
     if (pathInfo.matches("^/?icon/.*")) {
-      return loadIcon(req, pathInfo);
-    }
-    if (pathInfo.matches("^/?image/.*")) {
-      return loadImage(req, pathInfo);
+      return loadIcon(servlet, req, pathInfo);
     }
     if ((pathInfo.endsWith(".js") || pathInfo.endsWith(".css"))) {
       return loadScriptFile(servlet, req, pathInfo);
@@ -171,49 +150,33 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
     if (pathInfo.endsWith(".json")) {
       return loadJsonFile(servlet, req, pathInfo);
     }
+    if (pathInfo.matches("^/?tmp/.*")) {
+      return loadDynamicAdapterResource(servlet, req, pathInfo);
+    }
     return loadBinaryFile(servlet, req, pathInfo);
   }
 
   /**
-   * This method loads only image icons from the /resource/icons folder.
+   * /**
+   * This method loads static icon images from the /resource/icons folders of all jars on the classpath
+   * <p>
+   * The {@link HttpServletRequest} must contain the parameter <code>jsonSessionId</code>
    */
-  protected HttpCacheObject loadIcon(HttpServletRequest req, String pathInfo) {
-    IIconLocator iconLocator = getJsonSession(req).getClientSession().getIconLocator();
+  protected HttpCacheObject loadIcon(AbstractUiServlet servlet, HttpServletRequest req, String pathInfo) {
+    HttpSession httpSession = req.getSession();
+    IJsonSession jsonSession = (IJsonSession) httpSession.getAttribute(IJsonSession.HTTP_SESSION_ATTRIBUTE_PREFIX + req.getParameter(JsonRequest.PROP_JSON_SESSION_ID));
+    if (jsonSession == null) {
+      return null;
+    }
+    IIconLocator iconLocator = jsonSession.getClientSession().getIconLocator();
     String imageId = pathInfo.substring(pathInfo.lastIndexOf('/') + 1);
     IconSpec iconSpec = iconLocator.getIconSpec(imageId);
     if (iconSpec != null) {
-      // FIXME AWE: (resource loading) when should image icons expire?
-      return new HttpCacheObject(pathInfo, iconSpec.getContent(), System.currentTimeMillis());
+      // cache: use max-age caching for at most 4 hours
+      BinaryResource content = new BinaryResource(iconSpec.getName(), detectContentType(servlet, pathInfo), iconSpec.getContent(), System.currentTimeMillis());
+      return new HttpCacheObject(pathInfo, true, IHttpCacheControl.MAX_AGE_4_HOURS, content);
     }
     return null;
-  }
-
-  /**
-   * This method loads images which belong to a adapter/form-field.
-   */
-  protected HttpCacheObject loadImage(HttpServletRequest req, String pathInfo) {
-    String contentId = pathInfo.substring(pathInfo.lastIndexOf('/') + 1);
-    String[] tmp = contentId.split("\\.");
-    String adapterId = tmp[0];
-
-    IJsonAdapter<?> jsonAdapter = getJsonSession(req).getJsonAdapter(adapterId);
-    if (jsonAdapter instanceof IBinaryContentProvider) {
-      IBinaryContentProvider provider = (IBinaryContentProvider) jsonAdapter;
-      BinaryContent binaryContent = provider.getBinaryContent(contentId);
-      return new HttpCacheObject(pathInfo, binaryContent.getContent(), System.currentTimeMillis());
-    }
-    return null;
-  }
-
-  /**
-   * Returns the JSON session associated with the current HTTP session and with the ID
-   * of the servlet parameter <code>jsonSessionId</code>.
-   */
-  protected AbstractJsonSession getJsonSession(HttpServletRequest req) {
-    HttpSession httpSession = req.getSession();
-    String jsonSessionId = req.getParameter("jsonSessionId");
-    String jsonSessionAttributeName = "scout.htmlui.session.json." + jsonSessionId;
-    return (AbstractJsonSession) httpSession.getAttribute(jsonSessionAttributeName);
   }
 
   /**
@@ -224,7 +187,8 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
     builder.setMinifyEnabled(UiHints.isMinifyHint(req));
     ScriptOutput out = builder.buildScript(pathInfo);
     if (out != null) {
-      return new HttpCacheObject(out.getPathInfo(), out.getContent(), out.getLastModified());
+      BinaryResource content = new BinaryResource(out.getPathInfo(), detectContentType(servlet, pathInfo), out.getContent(), out.getLastModified());
+      return new HttpCacheObject(pathInfo, true, -1, content);
     }
     return null;
   }
@@ -238,9 +202,10 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
       //not handled here
       return null;
     }
-    byte[] content = StreamUtility.readResource(url);
-    content = replaceHtmlScriptTags(servlet, req, content);
-    return new HttpCacheObject(pathInfo, content, System.currentTimeMillis());
+    byte[] bytes = StreamUtility.readResource(url);
+    bytes = replaceHtmlScriptTags(servlet, req, bytes);
+    BinaryResource content = new BinaryResource(pathInfo, detectContentType(servlet, pathInfo), bytes, System.currentTimeMillis());
+    return new HttpCacheObject(pathInfo, true, -1, content);
   }
 
   /**
@@ -255,11 +220,46 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
     // TODO BSH Maybe optimize memory consumption (unnecessary conversion of byte[] to String)
     String json = new String(StreamUtility.readResource(url), UTF_8);
     json = JsonUtility.stripCommentsFromJson(json);
-    return new HttpCacheObject(pathInfo, json.getBytes(UTF_8), System.currentTimeMillis());
+    BinaryResource content = new BinaryResource(pathInfo, detectContentType(servlet, pathInfo), json.getBytes(UTF_8), System.currentTimeMillis());
+    return new HttpCacheObject(pathInfo, true, -1, content);
   }
 
   /**
-   * png, jpg, woff, pdf, docx
+   * This method loads resources that are temporary or dynamically registered on the {@link IJsonSession}. This includes
+   * adapter/form-fields such as the image field, WordAddIn docx documents, temporary and time-limited landing page
+   * files etc.
+   * <p>
+   * The {@link HttpServletRequest} must contain the parameters <code>jsonSessionId</code> and <code>adapterId</code>
+   */
+  protected HttpCacheObject loadDynamicAdapterResource(AbstractUiServlet servlet, HttpServletRequest req, String pathInfo) {
+    HttpSession httpSession = req.getSession();
+    IJsonSession jsonSession = (IJsonSession) httpSession.getAttribute(IJsonSession.HTTP_SESSION_ATTRIBUTE_PREFIX + req.getParameter(JsonRequest.PROP_JSON_SESSION_ID));
+    if (jsonSession == null) {
+      return null;
+    }
+    IJsonAdapter<?> jsonAdapter = jsonSession.getJsonAdapter(req.getParameter("adapterId"));
+    if (jsonAdapter == null) {
+      return null;
+    }
+    if (!(jsonAdapter instanceof IDynamicResourceProvider)) {
+      return null;
+    }
+    IDynamicResourceProvider provider = (IDynamicResourceProvider) jsonAdapter;
+    String filename = pathInfo.substring(pathInfo.lastIndexOf('/') + 1);
+    BinaryResource content0 = provider.loadDynamicResource(filename);
+    if (content0 == null) {
+      return null;
+    }
+    String contentType = content0.getContentType();
+    if (contentType == null) {
+      contentType = detectContentType(servlet, pathInfo);
+    }
+    BinaryResource content = new BinaryResource(pathInfo, contentType, content0.getContent(), content0.getLastModified());
+    return new HttpCacheObject(pathInfo, false, -1, content);
+  }
+
+  /**
+   * Static binary file png, jpg, woff, pdf, docx
    */
   protected HttpCacheObject loadBinaryFile(AbstractUiServlet servlet, HttpServletRequest req, String pathInfo) throws ServletException, IOException {
     URL url = Activator.getDefault().getWebContentResourceLocator().getWebContentResource(pathInfo);
@@ -267,9 +267,23 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
       //not handled here
       return null;
     }
-    byte[] content = StreamUtility.readResource(url);
+    byte[] bytes = StreamUtility.readResource(url);
     URLConnection uc = url.openConnection();
-    return new HttpCacheObject(pathInfo, content, uc.getLastModified());
+    BinaryResource content = new BinaryResource(pathInfo, detectContentType(servlet, pathInfo), bytes, uc.getLastModified());
+    return new HttpCacheObject(pathInfo, true, -1, content);
+  }
+
+  protected String detectContentType(AbstractUiServlet servlet, String path) {
+    int lastSlash = path.lastIndexOf('/');
+    String fileName = lastSlash >= 0 ? path.substring(lastSlash + 1) : path;
+    //Prefer mime type mapping from container
+    String contentType = servlet.getServletContext().getMimeType(fileName);
+    if (contentType != null) {
+      return contentType;
+    }
+    int lastDot = path.lastIndexOf('.');
+    String fileExtension = lastDot >= 0 ? path.substring(lastDot + 1) : path;
+    return FileUtility.getContentTypeForExtension(fileExtension);
   }
 
   /**
@@ -292,7 +306,7 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
           if (obj == null) {
             LOG.warn("Failed to locate resource referenced in html file '" + req.getPathInfo() + "': " + m.group());
           }
-          fingerprint = (obj != null ? Long.toHexString(obj.getFingerprint()) : m.group(4));
+          fingerprint = (obj != null ? Long.toHexString(obj.getResource().getFingerprint()) : m.group(4));
         }
         buf.append(m.group(1));
         buf.append(m.group(2));

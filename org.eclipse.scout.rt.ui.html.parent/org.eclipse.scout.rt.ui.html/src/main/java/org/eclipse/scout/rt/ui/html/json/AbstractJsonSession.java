@@ -212,7 +212,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
       // Handle detach
       String parentJsonSessionId = jsonStartupRequest.getParentJsonSessionId();
       if (parentJsonSessionId != null) {
-        IJsonSession parentJsonSession = (IJsonSession) httpSession.getAttribute("scout.htmlui.session.json." + parentJsonSessionId);
+        IJsonSession parentJsonSession = (IJsonSession) httpSession.getAttribute(HTTP_SESSION_ATTRIBUTE_PREFIX + parentJsonSessionId);
         if (parentJsonSession != null) {
           LOG.info("Attaching jsonSession '" + m_jsonSessionId + "' to parentJsonSession '" + parentJsonSessionId + "'");
           // TODO BSH Detach | Actually do something
@@ -529,8 +529,11 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   @Override
   public void logout() {
     LOG.info("Logging out...");
-    currentHttpRequest().getSession(false).invalidate();
-    currentJsonResponse().addActionEvent(getJsonSessionId(), "logout", new JSONObject());
+    //when timeout occurs, logout is called without a http context
+    if (currentHttpRequest() != null) {
+      currentHttpRequest().getSession(false).invalidate();
+      currentJsonResponse().addActionEvent(getJsonSessionId(), "logout", new JSONObject());
+    }
     LOG.info("Logged out");
   }
 

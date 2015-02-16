@@ -10,6 +10,8 @@ import java.util.Collection;
  */
 public interface IJsonAdapter<T extends Object> extends IJsonMapper {
 
+  IJsonSession getJsonSession();
+
   String getId();
 
   /**

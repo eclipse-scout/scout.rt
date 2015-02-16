@@ -172,8 +172,8 @@ scout.helpers = {
     return style;
   },
 
-  imageUrl: function(adapter, url) {
-    return url + '?jsonSessionId=' + adapter.session.jsonSessionId;
+  dynamicResourceUrl: function(adapter, url) {
+    return url;
   }
 
 };

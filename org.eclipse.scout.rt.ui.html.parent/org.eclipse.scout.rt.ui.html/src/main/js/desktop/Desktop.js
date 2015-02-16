@@ -234,7 +234,9 @@ scout.Desktop.prototype._showForm = function(form) {
 scout.Desktop.prototype._openUrlInBrowser = function(event) {
   $.log.debug('(Desktop#_openUrlInBrowser) path=' + event.path + ' targetUrl=' + event.targetUrl);
   if (event.path) {
-    window.open(event.path);
+    //FIXME imo: window.open clears the screen
+    //window.open(event.path);
+    window.location.href=event.path;
   }
 };
 

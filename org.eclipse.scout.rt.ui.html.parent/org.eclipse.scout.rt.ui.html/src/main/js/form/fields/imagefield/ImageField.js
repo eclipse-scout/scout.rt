@@ -54,8 +54,8 @@ scout.ImageField.prototype._renderImage = function() {
 
 scout.ImageField.prototype._renderImageOrId = function() {
   if (this.imageId) {
-    this.$field.attr('src', scout.helpers.imageUrl(this, this.imageId));
+    this.$field.attr('src', scout.helpers.dynamicResourceUrl(this, this.imageId));
   } else if (this.image) {
-    this.$field.attr('src', scout.helpers.imageUrl(this, this.image));
+    this.$field.attr('src', scout.helpers.dynamicResourceUrl(this, this.image));
   }
 };

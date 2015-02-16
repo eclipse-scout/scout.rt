@@ -33,36 +33,42 @@ public class DefaultHttpCacheControl implements IHttpCacheControl {
   }
 
   @Override
-  public void putCacheObject(HttpServletRequest req, HttpCacheObject o) {
+  public void putCacheObject(HttpServletRequest req, HttpCacheObject obj) {
     if (!UiHints.isCacheHint(req)) {
       return;
     }
-    m_cache.put(o.getPathInfo(), o);
+    if (!obj.isCachingAllowed()) {
+      return;
+    }
+    m_cache.put(obj.getCacheId(), obj);
   }
 
   @Override
-  public HttpCacheObject getCacheObject(HttpServletRequest req, String pathInfo) {
+  public HttpCacheObject getCacheObject(HttpServletRequest req, String cacheId) {
     if (!UiHints.isCacheHint(req)) {
       return null;
     }
-    return m_cache.get(pathInfo);
+    return m_cache.get(cacheId);
   }
 
   @Override
-  public HttpCacheObject removeCacheObject(HttpServletRequest req, String pathInfo) {
+  public HttpCacheObject removeCacheObject(HttpServletRequest req, String cacheId) {
     if (!UiHints.isCacheHint(req)) {
       return null;
     }
-    return m_cache.remove(pathInfo);
+    return m_cache.remove(cacheId);
   }
 
   @Override
-  public boolean checkAndUpdateCacheHeaders(HttpServletRequest req, HttpServletResponse resp, HttpCacheInfo info) {
+  public boolean checkAndUpdateCacheHeaders(HttpServletRequest req, HttpServletResponse resp, HttpCacheObject obj) {
     if (!UiHints.isCacheHint(req)) {
       disableCacheHeaders(req, resp);
       return false;
     }
-    int maxAge = getMaxAgeFor(req, resp, info);
+    if (!obj.isCachingAllowed()) {
+      return false;
+    }
+    int maxAge = getMaxAgeFor(req, resp, obj);
     if (maxAge > 0) {
       resp.setHeader("cache-control", "public, max-age=" + maxAge + ", s-maxage=" + maxAge);
     }
@@ -70,7 +76,7 @@ public class DefaultHttpCacheControl implements IHttpCacheControl {
       resp.setHeader("cache-control", "private, max-age=0, must-revalidate");
     }
 
-    String etag = info.createETag();
+    String etag = obj.createETag();
     String ifNoneMatch = req.getHeader(IF_NONE_MATCH);
     if (notModified(ifNoneMatch, etag)) {
       LOG.info("use http cached object (etag): " + req.getPathInfo());
@@ -80,15 +86,15 @@ public class DefaultHttpCacheControl implements IHttpCacheControl {
     else {
       long ifModifiedSince = req.getDateHeader(IF_MODIFIED_SINCE);
       // for purposes of comparison we add 999 to ifModifiedSince since the fidelity of the IMS header generally doesn't include milli-seconds
-      if (notModifiedSince(ifModifiedSince, info.getLastModified())) {
+      if (notModifiedSince(ifModifiedSince, obj.getResource().getLastModified())) {
         LOG.info("use http cached object (ifModifiedSince): " + req.getPathInfo());
         resp.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
         return true;
       }
     }
 
-    if (info.getLastModified() > 0) {
-      resp.setDateHeader(LAST_MODIFIED, info.getLastModified());
+    if (obj.getResource().getLastModified() > 0) {
+      resp.setDateHeader(LAST_MODIFIED, obj.getResource().getLastModified());
     }
     if (etag != null) {
       resp.setHeader(ETAG, etag);
@@ -100,15 +106,15 @@ public class DefaultHttpCacheControl implements IHttpCacheControl {
   /**
    * @return the preferred max age or 0/negative in oder to omit a max-age header
    */
-  protected int getMaxAgeFor(HttpServletRequest req, HttpServletResponse resp, HttpCacheInfo info) {
-    if (info.getPreferredCacheMaxAge() > 0) {
-      return info.getPreferredCacheMaxAge();
+  protected int getMaxAgeFor(HttpServletRequest req, HttpServletResponse resp, HttpCacheObject obj) {
+    if (obj.getCacheMaxAge() > 0) {
+      return obj.getCacheMaxAge();
     }
     String pathInfo = req.getPathInfo();
     if (pathInfo == null) {
       return MAX_AGE_4_HOURS;
     }
-    if (pathInfo.endsWith("js") || pathInfo.endsWith("css")) {
+    if (pathInfo.endsWith(".js") || pathInfo.endsWith(".css")) {
       return MAX_AGE_ONE_YEAR;
     }
     return MAX_AGE_4_HOURS;

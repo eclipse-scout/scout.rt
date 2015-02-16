@@ -1,15 +1,15 @@
 package org.eclipse.scout.rt.ui.html.json.form.fields.imagefield;
 
-import org.eclipse.scout.rt.client.ui.form.fields.imagebox.BinaryContent;
-import org.eclipse.scout.rt.client.ui.form.fields.imagebox.IBinaryContentProvider;
 import org.eclipse.scout.rt.client.ui.form.fields.imagebox.IImageField;
-import org.eclipse.scout.rt.ui.html.ImageUrlUtility;
+import org.eclipse.scout.rt.shared.data.basic.BinaryResource;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
+import org.eclipse.scout.rt.ui.html.res.DynamicResourceUrlUtility;
+import org.eclipse.scout.rt.ui.html.res.IDynamicResourceProvider;
 
-public class JsonImageField<T extends IImageField> extends JsonFormField<T> implements IBinaryContentProvider {
+public class JsonImageField<T extends IImageField> extends JsonFormField<T> implements IDynamicResourceProvider {
 
   public JsonImageField(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
     super(model, jsonSession, id, parent);
@@ -26,7 +26,7 @@ public class JsonImageField<T extends IImageField> extends JsonFormField<T> impl
     putJsonProperty(new JsonProperty<T>(IImageField.PROP_IMAGE_ID, model) {
       @Override
       protected String modelValue() {
-        return ImageUrlUtility.createIconUrl(JsonImageField.this, getModel().getImageId());
+        return DynamicResourceUrlUtility.createIconUrl(JsonImageField.this, getModel().getImageId());
       }
     });
     // We don't send the image via JSON to the client, we only set a flag that this adapter has an image
@@ -34,8 +34,8 @@ public class JsonImageField<T extends IImageField> extends JsonFormField<T> impl
     putJsonProperty(new JsonProperty<T>(IImageField.PROP_IMAGE, model) {
       @Override
       protected String modelValue() {
-        BinaryContent image = (BinaryContent) getModel().getImage();
-        return ImageUrlUtility.createImageUrl(JsonImageField.this, image);
+        BinaryResource image = extractBinaryResource();
+        return image != null ? DynamicResourceUrlUtility.createCallbackUrl(JsonImageField.this, image.getFilename()) : null;
       }
     });
     putJsonProperty(new JsonProperty<T>(IImageField.PROP_SCROLL_BAR_ENABLED, model) {
@@ -44,16 +44,27 @@ public class JsonImageField<T extends IImageField> extends JsonFormField<T> impl
         return getModel().isScrollBarEnabled();
       }
     });
+  }
 
+  protected BinaryResource extractBinaryResource() {
+    Object raw = getModel().getImage();
+    if (raw instanceof BinaryResource) {
+      return (BinaryResource) raw;
+    }
+    if (raw instanceof byte[]) {
+      return new BinaryResource("image.jpg", null, (byte[]) raw, -1);
+    }
+    return null;
   }
 
   // When an adapter has multiple images, it must deal itself with that case. For instance it could
   // add a sequence-number to the contentId to distinct between different images.
   @Override
-  public BinaryContent getBinaryContent(String contentId) {
-    if (!contentId.startsWith(getId())) {
-      throw new IllegalArgumentException("content ID does not match adapater ID");
+  public BinaryResource loadDynamicResource(String filename) {
+    BinaryResource content = extractBinaryResource();
+    if (content != null && filename.equals(content.getFilename())) {
+      return content;
     }
-    return (BinaryContent) getModel().getImage();
+    return null;
   }
 }
