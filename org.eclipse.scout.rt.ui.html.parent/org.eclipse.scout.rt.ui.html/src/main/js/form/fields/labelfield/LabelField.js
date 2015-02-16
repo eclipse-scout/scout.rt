@@ -6,8 +6,7 @@ scout.inherits(scout.LabelField, scout.ValueField);
 scout.LabelField.prototype._render = function($parent) {
   this.addContainer($parent, 'label-field');
   this.addLabel();
-  this.addField($('<div>').
-    blur(this._onFieldBlur.bind(this)));
+  this.addField($('<div>'));
   this.addStatus();
 };
 

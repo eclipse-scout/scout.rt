@@ -6,6 +6,7 @@
 /* also defined in scout.HtmlEnvironment (graphics.js) */
 @logical-grid-height: 30px;
 @mandatory-indicator-width: 8px;
+@borderless-field-padding-y: 7px;
 
 @tree-item-control-size: 15px;
 @outline-item-control-size: 20px;

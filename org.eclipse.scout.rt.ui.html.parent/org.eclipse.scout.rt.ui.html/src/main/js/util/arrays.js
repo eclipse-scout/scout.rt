@@ -123,6 +123,22 @@ scout.arrays = {
     }
   },
 
+  format: function(arr, delimiter) {
+    if (!arr || arr.length === 0) {
+      return '';
+    }
+
+    var output = '';
+    for (var i = 0; i < arr.length; i++) {
+      var element = arr[i];
+      if (delimiter && i > 0 && i < arr.length) {
+        output += delimiter;
+      }
+      output += element;
+    }
+    return output;
+  },
+
   //
   // Use these methods if you have an array of jquery objects.
   // Reason $elem1 === $elem2 does often not work because new jquery objects are created for the same html node.

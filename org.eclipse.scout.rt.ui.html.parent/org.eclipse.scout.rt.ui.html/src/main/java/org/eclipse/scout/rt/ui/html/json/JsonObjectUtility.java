@@ -238,7 +238,7 @@ public final class JsonObjectUtility {
    * <p>
    * The java class may have public fields or getter/setter methods.
    * <p>
-   * Valid data types are: boolean, int, long, String, byte[], array of before mentioned types.
+   * Valid data types are: boolean, int, long, String, byte[], array or {@link Collection} of before mentioned types.
    *
    * @param o
    *          the java bean
@@ -263,12 +263,20 @@ public final class JsonObjectUtility {
     }
     //array
     if (type.isArray()) {
-      JSONArray jarray = new JSONArray();
+      JSONArray jsonArray = new JSONArray();
       int n = Array.getLength(o);
       for (int i = 0; i < n; i++) {
-        jarray.put(javaToJson(Array.get(o, i)));
+        jsonArray.put(javaToJson(Array.get(o, i)));
       }
-      return jarray;
+      return jsonArray;
+    }
+    if (Collection.class.isAssignableFrom(type)) {
+      JSONArray jsonArray = new JSONArray();
+      Collection collection = (Collection) o;
+      for (Object object : collection) {
+        jsonArray.put(javaToJson(object));
+      }
+      return jsonArray;
     }
     //bean
     if (type.getName().startsWith("java.")) {

@@ -154,21 +154,44 @@ describe("scout.arrays", function() {
   });
   describe("find", function() {
 
-  it("returns the element for which the given predicate returns true", function() {
-    var arr = ['a', 'b', 'c', 'd'];
+    it("returns the element for which the given predicate returns true", function() {
+      var arr = ['a', 'b', 'c', 'd'];
 
-    var element = scout.arrays.find(arr, function(element) {
-      return element === 'c';
-    });
-    expect(element).toBe('c');
+      var element = scout.arrays.find(arr, function(element) {
+        return element === 'c';
+      });
+      expect(element).toBe('c');
 
-    element = scout.arrays.find(arr, function(element) {
-      return element === 'z';
+      element = scout.arrays.find(arr, function(element) {
+        return element === 'z';
+      });
+      expect(element).toBeFalsy();
     });
-    expect(element).toBeFalsy();
+
   });
 
-});
+  describe("format", function() {
 
+    it("formats an array by concatenating each entry", function() {
+      var arr = ['a', 'b', 'c', 'd'];
+      expect(scout.arrays.format(arr)).toBe('abcd');
+      expect(scout.arrays.format(arr, '_')).toBe('a_b_c_d');
+
+      arr = ['abc', 'def'];
+      expect(scout.arrays.format(arr)).toBe('abcdef');
+      expect(scout.arrays.format(arr, '_')).toBe('abc_def');
+
+      arr = ['abc'];
+      expect(scout.arrays.format(arr)).toBe('abc');
+      expect(scout.arrays.format(arr, '_')).toBe('abc');
+    });
+
+    it("returns '' for empty array or if no array was provided", function() {
+      var arr = [];
+      expect(scout.arrays.format(arr)).toBe('');
+      expect(scout.arrays.format()).toBe('');
+    });
+
+  });
 
 });

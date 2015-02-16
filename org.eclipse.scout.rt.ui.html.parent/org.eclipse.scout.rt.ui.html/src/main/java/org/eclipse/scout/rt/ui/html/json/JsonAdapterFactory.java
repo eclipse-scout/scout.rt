@@ -32,6 +32,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.IOutlineViewButton;
 import org.eclipse.scout.rt.client.ui.desktop.outline.ISearchOutline;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
+import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.IRadioButton;
@@ -67,6 +68,7 @@ import org.eclipse.scout.rt.ui.html.json.desktop.JsonSearchOutline;
 import org.eclipse.scout.rt.ui.html.json.form.JsonForm;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonDateField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
+import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.button.JsonButton;
 import org.eclipse.scout.rt.ui.html.json.form.fields.calendar.JsonCalendarField;
 import org.eclipse.scout.rt.ui.html.json.form.fields.checkbox.JsonCheckBoxField;
@@ -183,6 +185,9 @@ public class JsonAdapterFactory implements IJsonAdapterFactory {
     }
     else if (model instanceof IFormField) {
       return new JsonFormField((IFormField) model, session, id, parent);
+    }
+    else if (model instanceof IValueField) {
+      return new JsonValueField((IValueField) model, session, id, parent);
     }
     // other model objects
     else if (model instanceof IDesktop) {

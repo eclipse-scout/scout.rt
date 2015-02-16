@@ -25,6 +25,21 @@
     );
   };
 
+  $.makeSpan = function(cssClass, text) {
+    return $.make('<span>', cssClass, text);
+  };
+
+  $.make = function(element, cssClass, text) {
+    var $elem = $(element);
+    if (cssClass) {
+      $elem.addClass(cssClass);
+    }
+    if (text) {
+      $elem.text(text);
+    }
+    return $elem;
+  };
+
   $.makeSVG = function(type, id, cssClass, htmlContent) {
     var $svgElement = $(document.createElementNS('http://www.w3.org/2000/svg', type));
     if (id) {
@@ -103,6 +118,10 @@
   // insert before - and return new div for chaining
   $.fn.beforeDiv = function(cssClass, htmlContent, id) {
     return $.makeDiv(cssClass, htmlContent, id).insertBefore(this);
+  };
+
+  $.fn.appendSpan = function(cssClass, text) {
+    return $.makeSpan(cssClass, text).appendTo(this);
   };
 
   // append svg
