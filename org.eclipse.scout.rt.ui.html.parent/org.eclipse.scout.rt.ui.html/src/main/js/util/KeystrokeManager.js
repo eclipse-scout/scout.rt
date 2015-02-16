@@ -7,9 +7,9 @@ scout.KeystrokeManager = function() {
   // FIXME BSH Keystroke | Alt-Key is a bad choice on IE, see http://superuser.com/questions/470064/is-it-possible-to-disable-the-alt-key-as-it-is-used-for-default-windows-things
   $(document).keydown(function(event) {
     if (event.which === scout.keys.ALT) {
-    // FIXME BSH Keystrokes | Re-enable later
-//      removeKeyBox();
-//      drawKeyBox();
+      // FIXME BSH Keystrokes | Re-enable later
+      //      removeKeyBox();
+      //      drawKeyBox();
     }
   });
 
@@ -62,18 +62,17 @@ scout.KeystrokeManager.prototype.installAdapter = function($element, adapter) {
   }
 
   var controller = function(event) {
-    var i, handler, accepted;
+    var i, keystroke;
     var bubbleUp = true;
 
-    if (!adapter.handlers) {
+    if (!adapter.keystrokes) {
       return;
     }
-    for (i = 0; i < adapter.handlers.length; i++) {
-      handler = adapter.handlers[i];
-      accepted = false;
-      if (handler.accept && handler.accept(event)) {
-        bubbleUp = bubbleUp && handler.handle(event);
-        if (handler.removeKeyBox) {
+    for (i = 0; i < adapter.keystrokes.length; i++) {
+      keystroke = adapter.keystrokes[i];
+      if (keystroke.accept && keystroke.accept(event)) {
+        bubbleUp = bubbleUp && keystroke.handle(event);
+        if (keystroke.removeKeyBox) {
           adapter.removeKeyBox();
         }
       }

@@ -3,7 +3,7 @@ scout.TableKeystrokeAdapter = function(table) {
 
   this.$target = undefined; // set by KeystrokeManager
   this.controller = undefined; // set by KeystrokeManager
-  this.handlers = [];
+  this.keystrokes = [];
   this._table = table;
 
   function ignoreEvent() {
@@ -24,7 +24,7 @@ scout.TableKeystrokeAdapter = function(table) {
   }
 
   //table filter
-  this.handlers.push({
+  this.keystrokes.push({
     accept: function(event) {
       if (ignoreEvent()) {
         return false;
@@ -47,7 +47,7 @@ scout.TableKeystrokeAdapter = function(table) {
     }
   });
 
-  this.handlers.push({
+  this.keystrokes.push({
     accept: function(event) {
       if (ignoreEvent()) {
         return false;

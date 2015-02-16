@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonGridData;
 import org.eclipse.scout.rt.ui.html.json.JsonProcessingStatus;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
+import org.json.JSONObject;
 
 // TODO AWE: [P2] make JsonFormField abstract (later), direktes instanzieren soll nicht mehr möglich sein
 public class JsonFormField<T extends IFormField> extends AbstractJsonPropertyObserver<T> {
@@ -78,6 +79,7 @@ public class JsonFormField<T extends IFormField> extends AbstractJsonPropertyObs
         return getModel().isStatusVisible();
       }
     });
+
     putJsonProperty(new JsonProperty<T>(IFormField.PROP_ERROR_STATUS, model) {
       @Override
       protected IProcessingStatus modelValue() {
@@ -111,4 +113,16 @@ public class JsonFormField<T extends IFormField> extends AbstractJsonPropertyObs
   public String getObjectType() {
     return "FormField";
   }
+
+  @Override
+  protected void attachChildAdapters() {
+    super.attachChildAdapters();
+    attachAdapters(getModel().getKeyStrokes());
+  }
+
+  @Override
+  public JSONObject toJson() {
+    return putAdapterIdsProperty(super.toJson(), "keyStrokes", getModel().getKeyStrokes());
+  }
+
 }

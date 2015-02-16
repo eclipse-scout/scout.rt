@@ -18,6 +18,9 @@ scout.FormField = function() {
    * The status label is used for error-status and tooltip-icon.
    */
   this.$status;
+  this.keyStrokes = [];
+  this._addAdapterProperties('keyStrokes');
+  this.keystrokeAdapter;
 };
 scout.inherits(scout.FormField, scout.ModelAdapter);
 
@@ -26,6 +29,22 @@ scout.FormField.LABEL_POSITION_LEFT = 1;
 scout.FormField.LABEL_POSITION_ON_FIELD = 2;
 scout.FormField.LABEL_POSITION_RIGHT = 3;
 scout.FormField.LABEL_POSITION_TOP = 4;
+
+scout.FormField.prototype.init = function(model, session) {
+  scout.FormField.parent.prototype.init.call(this, model, session);
+  this.keystrokeAdapter = new scout.FormFieldKeystrokeAdapter(this);
+};
+
+scout.FormField.prototype.render = function($parent) {
+  scout.FormField.parent.prototype.render.call(this, $parent);
+  this.installKeystrokeAdapter();
+};
+
+scout.FormField.prototype.installKeystrokeAdapter = function() {
+  if (this.keystrokeAdapter && !scout.keystrokeManager.isAdapterInstalled(this.keystrokeAdapter)) {
+    scout.keystrokeManager.installAdapter(this.$container, this.keystrokeAdapter);
+  }
+};
 
 scout.FormField.prototype._render = function($parent) {
   // TODO AWE: [P2] remove this code when FormField is "abstract". There should be no reason to instantiate a
@@ -37,6 +56,7 @@ scout.FormField.prototype._render = function($parent) {
     .addClass('not-implemented'));
   this.addMandatoryIndicator(); // TODO BSH Layout | Need global solution for field alignment... maybe getConfiguredMandatoryIndicatorVisible?
   this.addStatus();
+
 };
 
 scout.FormField.prototype._renderProperties = function() {
@@ -316,4 +336,8 @@ scout.FormField.prototype.addContainer = function($parent, typeName, layout) {
   htmlComp.layoutData = new scout.LogicalGridData(this);
   htmlComp.setLayout(layout || new scout.FormFieldLayout(this));
   return htmlComp;
+};
+
+scout.FormField.prototype.dispose = function() {
+  scout.keystrokeManager.uninstallAdapter(this.keystrokeAdapter);
 };

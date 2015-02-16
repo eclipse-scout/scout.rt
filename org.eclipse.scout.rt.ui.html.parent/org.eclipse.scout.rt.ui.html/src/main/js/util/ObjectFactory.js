@@ -86,7 +86,7 @@ scout.defaultObjectFactories = [{
   create: function() {
     return new scout.DataModel();
   }
-},{
+}, {
   objectType: 'ChartTableControl',
   create: function() {
     return new scout.ChartTableControl();
@@ -151,7 +151,8 @@ scout.defaultObjectFactories = [{
   create: function() {
     return new scout.Menu();
   }
-}, {  objectType: 'FormField',
+}, {
+  objectType: 'FormField',
   create: function() {
     return new scout.FormField();
   }
@@ -165,17 +166,17 @@ scout.defaultObjectFactories = [{
   create: function() {
     return new scout.CheckBoxField();
   }
-},{
+}, {
   objectType: 'RadioButtonGroup',
   create: function() {
     return new scout.RadioButtonGroup();
   }
-},{
+}, {
   objectType: 'RadioButton',
   create: function() {
     return new scout.RadioButton();
   }
-},{
+}, {
   objectType: 'LabelField',
   create: function() {
     return new scout.LabelField();
@@ -279,6 +280,11 @@ scout.defaultObjectFactories = [{
   objectType: 'PlannerField',
   create: function() {
     return new scout.PlannerField();
+  }
+}, {
+  objectType: 'Keystroke',
+  create: function() {
+    return new scout.Keystroke();
   }
 }, { //FIXME CGU: only needed temporarily, remove when switched to FormToolButton2
   objectType: 'Null',
