@@ -164,6 +164,10 @@ scout.TableSelectionHandler.prototype._clearSelectionBorder = function($selected
 };
 
 scout.TableSelectionHandler.prototype.selectAll = function() {
+  if (!this.table.multiSelect) {
+    return; // not possible
+  }
+
   this.clearSelection(true);
 
   var $rows = this.table.$rows();
@@ -174,8 +178,7 @@ scout.TableSelectionHandler.prototype.selectAll = function() {
 };
 
 scout.TableSelectionHandler.prototype.toggleSelection = function() {
-  if (this.table.selectedRowIds &&
-    this.table.selectedRowIds.length === this.table.rows.length) {
+  if (this.table.selectedRowIds && this.table.selectedRowIds.length === this.table.rows.length) {
     this.clearSelection();
   } else {
     this.selectAll();

@@ -23,22 +23,24 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
   $('body').on('keydown.remove', removeMenu);
 
   // create buttons in command for order
-  var $commandMove = $menuHeader.appendDiv('header-group');
-  $commandMove.appendDiv('header-text')
-    .data('label', session.text('Move'));
+  if (table.header.columns.length > 1) {
+    var $commandMove = $menuHeader.appendDiv('header-group');
+    $commandMove.appendDiv('header-text')
+      .data('label', session.text('Move'));
 
-  $commandMove.appendDiv('header-command move-top')
-    .data('label', session.text('toBegin'))
-    .click(moveTop);
-  $commandMove.appendDiv('header-command move-up')
-    .data('label', session.text('forward'))
-    .click(moveUp);
-  $commandMove.appendDiv('header-command move-down')
-    .data('label', session.text('backward'))
-    .click(moveDown);
-  $commandMove.appendDiv('header-command move-bottom')
-    .data('label', session.text('toEnd'))
-    .click(moveBottom);
+    $commandMove.appendDiv('header-command move-top')
+      .data('label', session.text('toBegin'))
+      .click(moveTop);
+    $commandMove.appendDiv('header-command move-up')
+      .data('label', session.text('forward'))
+      .click(moveUp);
+    $commandMove.appendDiv('header-command move-down')
+      .data('label', session.text('backward'))
+      .click(moveDown);
+    $commandMove.appendDiv('header-command move-bottom')
+      .data('label', session.text('toEnd'))
+      .click(moveBottom);
+  }
 
   // create buttons in command for sorting
   var $commandSort = $menuHeader.appendDiv('header-group');
@@ -59,13 +61,13 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
     });
 
   var $sortAscAdd = $commandSort.appendDiv('header-command sort-asc-add')
-    .data('label', session.text('ascendingmultiSortly'))
+    .data('label', session.text('ascendingAdditionally'))
     .click(this.remove.bind(this))
     .click(function() {
       sort('asc', true, $(this).hasClass('selected'));
     });
   var $sortDescAdd = $commandSort.appendDiv('header-command sort-desc-add')
-    .data('label', session.text('descendingmultiSortly'))
+    .data('label', session.text('descendingAdditionally'))
     .click(this.remove.bind(this))
     .click(function() {
       sort('desc', true, $(this).hasClass('selected'));
@@ -224,27 +226,26 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
   }
 
   function moveTop() {
-    table.moveColumn($header, pos, 0);
+    table.moveColumn(column, pos, 0);
     pos = table.header.columnIndex($header);
   }
 
   function moveUp() {
-    table.moveColumn($header, pos, Math.max(pos - 1, 0));
+    table.moveColumn(column, pos, Math.max(pos - 1, 0));
     pos = table.header.columnIndex($header);
   }
 
   function moveDown() {
-    table.moveColumn($header, pos, Math.min(pos + 1, table.header.findHeaderItems().length - 1));
+    table.moveColumn(column, pos, Math.min(pos + 1, table.header.findHeaderItems().length - 1));
     pos = table.header.columnIndex($header);
   }
 
   function moveBottom() {
-    table.moveColumn($header, pos, table.header.findHeaderItems().length - 1);
+    table.moveColumn(column, pos, table.header.findHeaderItems().length - 1);
     pos = table.header.columnIndex($header);
   }
 
   function sort(direction, multiSort, remove) {
-    var column = $header.data('column');
     table.sort(column, direction, multiSort, remove);
 
     sortSelect();
@@ -252,8 +253,7 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
 
   function sortSelect() {
     var addIcon = '\uF067',
-      sortCount = getSortColumnCount(),
-      column = $header.data('column');
+      sortCount = getSortColumnCount();
 
     $('.header-command', $commandSort).removeClass('selected');
 
@@ -303,7 +303,7 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
   }
 
   function groupSort() {
-    doGroup($(this), $header.data('column'));
+    doGroup($(this), column);
   }
 
   function doGroup($command, column) {
@@ -326,7 +326,7 @@ scout.TableHeaderMenu = function(table, $header, x, y, session) {
     if (table.grouped) {
       $groupAll.addClass('selected');
     }
-    if ($header.data('column').grouped) {
+    if (column.grouped) {
       $groupSort.addClass('selected');
     }
   }

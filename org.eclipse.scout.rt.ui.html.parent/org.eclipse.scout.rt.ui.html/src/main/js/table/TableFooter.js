@@ -72,11 +72,11 @@ scout.TableFooter.prototype.remove = function() {
 };
 
 scout.TableFooter.prototype._onFilterInput = function(event) {
-  var $input = $(event.currentTarget);
-  $input.val($input.val().toLowerCase());
+  var $input = $(event.currentTarget),
+    filterText = $input.val();
 
   var filter = this._table.getFilter(scout.TableFooter.FILTER_KEY);
-  if (!filter && $input.val()) {
+  if (!filter && filterText) {
     filter = {
       accept: function($row) {
         var rowText = $row.text().toLowerCase();
@@ -84,13 +84,13 @@ scout.TableFooter.prototype._onFilterInput = function(event) {
       }
     };
     this._table.registerFilter(scout.TableFooter.FILTER_KEY, filter);
-  } else if (!$input.val()) {
+  } else if (filter && !filterText) {
     this._table.unregisterFilter(scout.TableFooter.FILTER_KEY);
   }
 
   if (filter) {
-    filter.text = $input.val();
-    filter.label = filter.text;
+    filter.text = filterText.toLowerCase();
+    filter.label = filterText;
   }
 
   this._table.filter();
@@ -141,6 +141,7 @@ scout.TableFooter.prototype._updateInfoFilter = function() {
   if (this._$infoFilter.html() === info) {
     return;
   }
+  // FIXME BSH Table | Code injection! Don't use html() here, build content using jQuery objects instead. Fix this in the other methods as well.
   this._$infoFilter.html(info);
 };
 
@@ -166,16 +167,18 @@ scout.TableFooter.prototype._updateInfoSelection = function(numSelectedRows, all
 };
 
 scout.TableFooter.prototype._updateInfoLoadVisibility = function() {
-  this._setInfoVisible(this._$infoLoad, this._table.tableStatusVisible);
+  var visible = (this._table.tableStatusVisible);
+  this._setInfoVisible(this._$infoLoad, visible);
 };
 
 scout.TableFooter.prototype._updateInfoFilterVisibility = function() {
-  var visible = this._table.tableStatusVisible && this._table.filteredBy().length > 0;
+  var visible = (this._table.tableStatusVisible && this._table.filteredBy().length > 0);
   this._setInfoVisible(this._$infoFilter, visible);
 };
 
 scout.TableFooter.prototype._updateInfoSelectionVisibility = function() {
-  this._setInfoVisible(this._$infoSelection, this._table.tableStatusVisible);
+  var tableStatusVisible = (this._table.tableStatusVisible && this._table.multiSelect);
+  this._setInfoVisible(this._$infoSelection, tableStatusVisible);
 };
 
 scout.TableFooter.prototype._setInfoVisible = function($info, visible) {

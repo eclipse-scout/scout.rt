@@ -290,6 +290,7 @@ scout.TableHeader.prototype.onOrderChanged = function(oldColumnOrder) {
 };
 
 scout.TableHeader.prototype.columnIndex = function($header) {
+  // divide index by 2, because after each column $header, there is an additional header-resize div
   return $header.index() / 2;
 };
 
