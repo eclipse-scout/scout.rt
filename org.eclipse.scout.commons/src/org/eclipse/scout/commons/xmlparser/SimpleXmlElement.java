@@ -37,8 +37,9 @@ import org.w3c.dom.Element;
 /**
  * Simple xml parser/writer. Very efficient and performant when handling xml
  * content without care of namespaces.
- *
- * @deprecated Will be removed in Scout 6.0. Use {@link Element} and {@link XmlUtility} instead.
+ * <p/>
+ * <b>Important</b>: This class is deprecated and will be removed in Scout 6.0. Use {@link Element} and
+ * {@link XmlUtility} instead.
  */
 public class SimpleXmlElement {
   private static final HashMap<String, String> ENTITIES;
