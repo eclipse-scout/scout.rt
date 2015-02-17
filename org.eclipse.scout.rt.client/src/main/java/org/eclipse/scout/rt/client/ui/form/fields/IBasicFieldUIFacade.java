@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.client.ui.form.fields;
 
 /**
  * UI facade for {@link IBasicField}
- * 
+ *
  * @since 3.10.0 M3
  */
 public interface IBasicFieldUIFacade {
@@ -26,5 +26,12 @@ public interface IBasicFieldUIFacade {
    * @return
    */
   boolean setTextFromUI(String newText, boolean whileTyping);
+
+  /**
+   * TODO ASA javadoc
+   *
+   * @param text
+   */
+  void setDisplayTextFromUI(String text);
 
 }

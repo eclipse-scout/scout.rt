@@ -24,12 +24,13 @@ import org.eclipse.scout.rt.client.ui.form.fields.IBasicField;
 
 /**
  * Common code for Swing fields corresponding to {@link IBasicField}.
- * 
+ *
  * @since 3.10.0-M3
  */
 public abstract class SwingScoutBasicFieldComposite<T extends IBasicField<?>> extends SwingScoutValueFieldComposite<T> {
 
   private boolean m_validateOnAnyKey;
+  private boolean m_udateDisplayTextOnModify;
 
   /**
    * attach Scout Model: set scout properties
@@ -38,6 +39,7 @@ public abstract class SwingScoutBasicFieldComposite<T extends IBasicField<?>> ex
   protected void attachScout() {
     IBasicField f = getScoutObject();
     setValidateOnAnyKeyFromScout(f.isValidateOnAnyKey());
+    setUpdateDisplayTextOnModifyFromScout(f.isUpdateDisplayTextOnModify());
 
     //super call must come after reading model properties:
     super.attachScout();
@@ -55,6 +57,10 @@ public abstract class SwingScoutBasicFieldComposite<T extends IBasicField<?>> ex
 
   protected void setValidateOnAnyKeyFromScout(boolean b) {
     m_validateOnAnyKey = b;
+  }
+
+  protected void setUpdateDisplayTextOnModifyFromScout(boolean b) {
+    m_udateDisplayTextOnModify = b;
   }
 
   @Override
@@ -162,6 +168,9 @@ public abstract class SwingScoutBasicFieldComposite<T extends IBasicField<?>> ex
     if (name.equals(IBasicField.PROP_VALIDATE_ON_ANY_KEY)) {
       setValidateOnAnyKeyFromScout(((Boolean) newValue).booleanValue());
     }
+    if (name.equals(IBasicField.PROP_UPDATE_DISPLAY_TEXT_ON_MODIFY)) {
+      setUpdateDisplayTextOnModifyFromScout(((Boolean) newValue).booleanValue());
+    }
   }
 
   private class P_SwingCaretListener implements CaretListener {
@@ -178,6 +187,7 @@ public abstract class SwingScoutBasicFieldComposite<T extends IBasicField<?>> ex
     @Override
     public void changedUpdate(DocumentEvent e) {
       setInputDirty(true);
+      setDisplayTextInScout();
       if (m_validateOnAnyKey) {
         if (getUpdateSwingFromScoutLock().isReleased()) {
           sendVerifyToScoutAndIgnoreResponses();
@@ -188,6 +198,7 @@ public abstract class SwingScoutBasicFieldComposite<T extends IBasicField<?>> ex
     @Override
     public void insertUpdate(DocumentEvent e) {
       setInputDirty(true);
+      setDisplayTextInScout();
       if (m_validateOnAnyKey) {
         if (getUpdateSwingFromScoutLock().isReleased()) {
           sendVerifyToScoutAndIgnoreResponses();
@@ -198,10 +209,25 @@ public abstract class SwingScoutBasicFieldComposite<T extends IBasicField<?>> ex
     @Override
     public void removeUpdate(DocumentEvent e) {
       setInputDirty(true);
+      setDisplayTextInScout();
       if (m_validateOnAnyKey) {
         if (getUpdateSwingFromScoutLock().isReleased()) {
           sendVerifyToScoutAndIgnoreResponses();
         }
+      }
+    }
+
+    private void setDisplayTextInScout() {
+      if (m_udateDisplayTextOnModify && getUpdateSwingFromScoutLock().isReleased()) {
+        final String text = getSwingField().getText();
+        // notify Scout
+        Runnable t = new Runnable() {
+          @Override
+          public void run() {
+            getScoutObject().getUIFacade().setDisplayTextFromUI(text);
+          }
+        };
+        getSwingEnvironment().invokeScoutLater(t, 0);
       }
     }
 
