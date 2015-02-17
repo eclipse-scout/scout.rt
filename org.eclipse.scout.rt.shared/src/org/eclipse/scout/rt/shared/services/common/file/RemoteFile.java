@@ -14,6 +14,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -33,6 +34,7 @@ import java.util.Map;
 import org.eclipse.scout.commons.FileUtility;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.rt.shared.data.basic.BinaryResource;
 
 /**
  * file path with / as delimiter
@@ -143,6 +145,28 @@ public class RemoteFile implements Serializable {
       m_name = path;
     }
     m_lastModified = lastModified;
+  }
+
+  public RemoteFile(BinaryResource res) {
+    this(null, res.getFilename(), res.getLastModified());
+    setContentType(res.getContentType());
+    if (res.getContent() != null) {
+      try {
+        readData(new ByteArrayInputStream(res.getContent()));
+      }
+      catch (IOException e) {
+        throw new IllegalArgumentException("Cannot read binary data");
+      }
+    }
+  }
+
+  public BinaryResource toBinaryResource() {
+    try {
+      return new BinaryResource(getName(), getContentType(), extractData(), getLastModified());
+    }
+    catch (IOException e) {
+      throw new IllegalArgumentException("Cannot write binary data");
+    }
   }
 
   /**
