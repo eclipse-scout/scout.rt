@@ -53,6 +53,15 @@ public class VirtualTreeNode implements IVirtualTreeNode, ICellObserver {
   }
 
   @Override
+  public boolean isInitializing() {
+    return false;
+  }
+
+  @Override
+  public void setInitializing(boolean b) {
+  }
+
+  @Override
   public ITreeNode getResolvedNode() {
     return m_resolvedNode;
   }

@@ -808,7 +808,9 @@ public abstract class AbstractOutline extends AbstractTree implements IOutline {
 
   @Override
   public void firePageChanged(IPage<?> page) {
+    if (page != null && page.isInitializing()) {
+      return;
+    }
     fireTreeEventInternal(new OutlineEvent(this, OutlineEvent.TYPE_PAGE_CHANGED, page));
   }
-
 }

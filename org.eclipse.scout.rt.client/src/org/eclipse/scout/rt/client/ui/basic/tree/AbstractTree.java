@@ -2131,19 +2131,40 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     return m_eventHistory;
   }
 
+  protected void filterInitializingTreeNodes(Collection<? extends ITreeNode> nodes) {
+    if (nodes == null) {
+      return;
+    }
+    for (Iterator<? extends ITreeNode> it = nodes.iterator(); it.hasNext();) {
+      ITreeNode node = it.next();
+      if (node != null && node.isInitializing()) {
+        it.remove();
+      }
+    }
+  }
+
   private void fireNodesInserted(ITreeNode parent, List<ITreeNode> children) {
+    if (parent != null && parent.isInitializing()) {
+      return;
+    }
+    filterInitializingTreeNodes(children);
     if (CollectionUtility.hasElements(children)) {
       fireTreeEventInternal(new TreeEvent(this, TreeEvent.TYPE_NODES_INSERTED, parent, children));
     }
   }
 
   private void fireNodesUpdated(ITreeNode parent, Collection<ITreeNode> children) {
+    if (parent != null && parent.isInitializing()) {
+      return;
+    }
+    filterInitializingTreeNodes(children);
     if (CollectionUtility.hasElements(children)) {
       fireTreeEventInternal(new TreeEvent(this, TreeEvent.TYPE_NODES_UPDATED, parent, children));
     }
   }
 
-  private void fireNodesChecked(List<? extends ITreeNode> nodes) {
+  private void fireNodesChecked(List<ITreeNode> nodes) {
+    filterInitializingTreeNodes(nodes);
     if (CollectionUtility.hasElements(nodes)) {
       fireTreeEventInternal(new TreeEvent(this, TreeEvent.TYPE_NODES_CHECKED, nodes));
     }
@@ -2151,20 +2172,34 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
 
   @Override
   public void fireNodeChanged(ITreeNode node) {
+    if (node != null && node.isInitializing()) {
+      return;
+    }
     fireTreeEventInternal(new TreeEvent(this, TreeEvent.TYPE_NODE_CHANGED, node));
   }
 
   private void fireNodeFilterChanged() {
+    if (getRootNode() != null && getRootNode().isInitializing()) {
+      return;
+    }
     fireTreeEventInternal(new TreeEvent(this, TreeEvent.TYPE_NODE_FILTER_CHANGED, getRootNode()));
   }
 
   private void fireNodesDeleted(ITreeNode parent, Collection<? extends ITreeNode> children) {
+    if (parent != null && parent.isInitializing()) {
+      return;
+    }
+    filterInitializingTreeNodes(children);
     if (CollectionUtility.hasElements(children)) {
       fireTreeEventInternal(new TreeEvent(this, TreeEvent.TYPE_NODES_DELETED, parent, children));
     }
   }
 
   private void fireChildNodeOrderChanged(ITreeNode parent, List<? extends ITreeNode> children) {
+    if (parent != null && parent.isInitializing()) {
+      return;
+    }
+    filterInitializingTreeNodes(children);
     if (CollectionUtility.hasElements(children)) {
       fireTreeEventInternal(new TreeEvent(this, TreeEvent.TYPE_CHILD_NODE_ORDER_CHANGED, parent, children));
     }
@@ -2177,6 +2212,13 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     e.setDeselectedNodes(deselectedNodes);
     Set<ITreeNode> newSelectedNodes = new HashSet<ITreeNode>(newSelection);
     newSelectedNodes.removeAll(oldSelection);
+
+    boolean emptySelection = newSelectedNodes.isEmpty();
+    filterInitializingTreeNodes(newSelectedNodes);
+    if (!emptySelection && newSelectedNodes.isEmpty()) {
+      return;
+    }
+
     e.setNewSelectedNodes(newSelectedNodes);
     fireTreeEventInternal(e);
   }
@@ -2193,6 +2235,13 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     e.setDeselectedNodes(deselectedNodes);
     Set<ITreeNode> newSelectedNodes = new HashSet<ITreeNode>(newSelection);
     newSelectedNodes.removeAll(oldSelection);
+
+    boolean emptySelection = newSelectedNodes.isEmpty();
+    filterInitializingTreeNodes(newSelectedNodes);
+    if (!emptySelection && newSelectedNodes.isEmpty()) {
+      return;
+    }
+
     e.setNewSelectedNodes(newSelectedNodes);
     // update node menus
     updateNodeMenus(newSelection);
@@ -2229,7 +2278,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   private void fireNodeExpanded(ITreeNode node, boolean b) {
-    if (node != null) {
+    if (node != null && !node.isInitializing()) {
       if (b) {
         fireTreeEventInternal(new TreeEvent(this, TreeEvent.TYPE_NODE_EXPANDED, node));
       }
@@ -2240,7 +2289,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   private void fireNodeClick(ITreeNode node, MouseButton mouseButton) {
-    if (node != null) {
+    if (node != null && !node.isInitializing()) {
       try {
         interceptNodeClick(node, mouseButton);
       }
@@ -2269,7 +2318,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
     if (!m_actionRunning) {
       try {
         m_actionRunning = true;
-        if (node != null) {
+        if (node != null && !node.isInitializing()) {
           if (node.isLeaf()) {
             try {
               interceptNodeAction(node);
@@ -2295,6 +2344,7 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   private TransferObject fireNodesDragRequest(Collection<ITreeNode> nodes) {
+    filterInitializingTreeNodes(nodes);
     if (CollectionUtility.hasElements(nodes)) {
       TreeEvent e = new TreeEvent(this, TreeEvent.TYPE_NODES_DRAG_REQUEST, nodes);
       fireTreeEventInternal(e);
@@ -2306,6 +2356,9 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   private void fireNodeDropAction(ITreeNode node, TransferObject dropData) {
+    if (node != null && node.isInitializing()) {
+      return;
+    }
     TreeEvent e = new TreeEvent(this, TreeEvent.TYPE_NODE_DROP_ACTION, node);
     e.setDropObject(dropData);
     fireTreeEventInternal(e);
@@ -2318,6 +2371,9 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
    * @since 4.0-M7
    */
   public void fireNodeDropTargetChanged(ITreeNode node) {
+    if (node != null && node.isInitializing()) {
+      return;
+    }
     TreeEvent e = new TreeEvent(this, TreeEvent.TYPE_NODE_DROP_TARGET_CHANGED, node);
     fireTreeEventInternal(e);
   }
@@ -2333,6 +2389,9 @@ public abstract class AbstractTree extends AbstractPropertyObserver implements I
   }
 
   private void fireNodeEnsureVisible(ITreeNode node) {
+    if (node != null && node.isInitializing()) {
+      return;
+    }
     TreeEvent e = new TreeEvent(this, TreeEvent.TYPE_NODE_ENSURE_VISIBLE, node);
     fireTreeEventInternal(e);
   }

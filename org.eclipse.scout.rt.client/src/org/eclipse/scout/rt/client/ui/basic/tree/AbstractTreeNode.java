@@ -52,6 +52,7 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractTreeNode.class);
 
   private boolean m_initialized;
+  private int m_initializing = 0; // >0 is true
   private ITree m_tree;
   private ITreeNode m_parentNode;
   private final Object m_childNodeListLock;
@@ -278,14 +279,35 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
    */
   @Override
   public void initTreeNode() {
-    // init menus
+    setInitializing(true);
     try {
-      ActionUtility.initActions(getMenus());
+      // init menus
+      try {
+        ActionUtility.initActions(getMenus());
+      }
+      catch (ProcessingException e) {
+        LOG.error("could not initialize actions.", e);
+      }
+      interceptInitTreeNode();
     }
-    catch (ProcessingException e) {
-      LOG.error("could not initialize actions.", e);
+    finally {
+      setInitializing(false);
     }
-    interceptInitTreeNode();
+  }
+
+  @Override
+  public boolean isInitializing() {
+    return m_initializing > 0;
+  }
+
+  @Override
+  public void setInitializing(boolean b) {
+    if (b) {
+      m_initializing++;
+    }
+    else {
+      m_initializing--;
+    }
   }
 
   @Override
@@ -453,12 +475,17 @@ public abstract class AbstractTreeNode implements ITreeNode, ICellObserver, ICon
 
   @Override
   public boolean isChecked() {
-    return getTree().isNodeChecked(this);
+    if (getTree() != null) {
+      return getTree().isNodeChecked(this);
+    }
+    return false;
   }
 
   @Override
   public void setChecked(boolean b) {
-    getTree().setNodeChecked(this, b);
+    if (getTree() != null) {
+      getTree().setNodeChecked(this, b);
+    }
   }
 
   @Override

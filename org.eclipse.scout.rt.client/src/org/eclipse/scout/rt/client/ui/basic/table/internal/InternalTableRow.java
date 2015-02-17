@@ -171,12 +171,18 @@ public class InternalTableRow implements ITableRow, ICellObserver {
 
   @Override
   public boolean isSelected() {
-    return (getTable() == null ? false : getTable().isSelectedRow(this));
+    if (getTable() != null) {
+      return getTable().isSelectedRow(this);
+    }
+    return false;
   }
 
   @Override
   public boolean isChecked() {
-    return (getTable() == null ? false : getTable().getCheckedRows().contains(this));
+    if (getTable() != null) {
+      return getTable().isCheckedRow(this);
+    }
+    return false;
   }
 
   @Override

@@ -2237,6 +2237,17 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
   }
 
   @Override
+  public boolean isCheckedRow(ITableRow row) {
+    row = resolveRow(row);
+    if (row == null) {
+      return false;
+    }
+    else {
+      return m_checkedRows.contains(row);
+    }
+  }
+
+  @Override
   public void selectRow(int rowIndex) {
     selectRow(getRow(rowIndex));
   }

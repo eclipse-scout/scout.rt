@@ -39,7 +39,6 @@ import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.WeakDataChangeListener;
 import org.eclipse.scout.rt.client.ui.basic.cell.Cell;
-import org.eclipse.scout.rt.client.ui.basic.cell.ICell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.tree.AbstractTreeNode;
@@ -64,11 +63,6 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   private IProcessingStatus m_pagePopulateStatus;
   private final Map<ITableRow, IPage> m_tableRowToPageMap = new HashMap<ITableRow, IPage>();
   private final Map<IPage, ITableRow> m_pageToTableRowMap = new HashMap<IPage, ITableRow>();
-
-  /**
-   * This flag is used to suppress change events while the page is initializing, see {@link #initPage()}.
-   */
-  private boolean m_pageInitialized;
 
   @Override
   public T getTable() {
@@ -405,22 +399,19 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
    */
   @Override
   public void initPage() throws ProcessingException {
-    m_pageInitialized = false;
-    Cell cell = getCellForUpdate();
-    if (cell.getText() == null && getConfiguredTitle() != null) {
-      cell.setText(getConfiguredTitle());
+    setInitializing(true);
+    try {
+      Cell cell = getCellForUpdate();
+      if (cell.getText() == null && getConfiguredTitle() != null) {
+        cell.setText(getConfiguredTitle());
+      }
+      if (cell.getIconId() == null && getConfiguredIconId() != null) {
+        cell.setIconId(getConfiguredIconId());
+      }
+      interceptInitPage();
     }
-    if (cell.getIconId() == null && getConfiguredIconId() != null) {
-      cell.setIconId(getConfiguredIconId());
-    }
-    interceptInitPage();
-    m_pageInitialized = true;
-  }
-
-  @Override
-  public void cellChanged(ICell cell, int changedBit) {
-    if (m_pageInitialized) {
-      super.cellChanged(cell, changedBit);
+    finally {
+      setInitializing(false);
     }
   }
 
@@ -735,7 +726,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
    * Tree can also be null during shutdown.
    */
   protected void firePageChanged(IPage page) {
-    if (m_pageInitialized && getOutline() != null) {
+    if (getOutline() != null) {
       getOutline().firePageChanged(page);
     }
   }

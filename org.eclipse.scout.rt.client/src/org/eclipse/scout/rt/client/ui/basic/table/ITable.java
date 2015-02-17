@@ -631,6 +631,8 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
 
   boolean isSelectedRow(ITableRow row);
 
+  boolean isCheckedRow(ITableRow row);
+
   void selectRow(int rowIndex);
 
   void selectRow(ITableRow row);

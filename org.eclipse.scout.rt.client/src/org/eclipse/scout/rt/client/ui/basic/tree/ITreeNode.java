@@ -33,6 +33,10 @@ public interface ITreeNode {
 
   void initTreeNode() throws ProcessingException;
 
+  boolean isInitializing();
+
+  void setInitializing(boolean b);
+
   String getNodeId();
 
   /**
