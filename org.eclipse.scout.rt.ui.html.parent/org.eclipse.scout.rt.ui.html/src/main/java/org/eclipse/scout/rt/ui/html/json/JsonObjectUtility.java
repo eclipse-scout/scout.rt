@@ -250,11 +250,8 @@ public final class JsonObjectUtility {
     }
     Class<?> type = o.getClass();
     //basic types
-    if (type == String.class) {
+    if (type.isPrimitive() || type == String.class || type == Integer.class || type == Long.class || type == Boolean.class) {
       return o;
-    }
-    if (type.isPrimitive() || type == Integer.class || type == Long.class || type == Boolean.class) {
-      return o.toString();
     }
     if (type == byte[].class) {
       JSONObject b64 = new JSONObject();

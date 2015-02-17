@@ -1,10 +1,10 @@
 package org.eclipse.scout.rt.ui.html.json.basic.activitymap;
 
 import org.eclipse.scout.rt.client.ui.basic.activitymap.TimeScale;
-import org.eclipse.scout.rt.ui.html.json.IJsonMapper;
+import org.eclipse.scout.rt.ui.html.json.IJsonObject;
 import org.json.JSONObject;
 
-public class JsonTimeScale implements IJsonMapper {
+public class JsonTimeScale implements IJsonObject {
 
   private final TimeScale m_timeScale;
 

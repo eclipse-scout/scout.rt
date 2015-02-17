@@ -8,7 +8,7 @@ import java.util.Collection;
  * @param <T>
  *          Type of Scout model
  */
-public interface IJsonAdapter<T extends Object> extends IJsonMapper {
+public interface IJsonAdapter<T extends Object> extends IJsonObject {
 
   IJsonSession getJsonSession();
 

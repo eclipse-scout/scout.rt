@@ -1,12 +1,12 @@
 package org.eclipse.scout.rt.ui.html.json.basic.activitymap;
 
 import org.eclipse.scout.rt.client.ui.basic.activitymap.ActivityCell;
-import org.eclipse.scout.rt.ui.html.json.IJsonMapper;
+import org.eclipse.scout.rt.ui.html.json.IJsonObject;
 import org.eclipse.scout.rt.ui.html.json.JsonDate;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.json.JSONObject;
 
-public class JsonActivityCell<RI, AI> implements IJsonMapper {
+public class JsonActivityCell<RI, AI> implements IJsonObject {
 
   private final ActivityCell<RI, AI> m_activityCell;
 

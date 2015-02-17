@@ -18,6 +18,9 @@ import org.eclipse.scout.rt.client.ui.action.menu.root.IContextMenu;
 import org.eclipse.scout.rt.client.ui.basic.activitymap.IActivityMap;
 import org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.IDateColumn;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.control.IAnalysisTableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.control.IChartTableControl;
 import org.eclipse.scout.rt.client.ui.basic.table.control.IGraphTableControl;
@@ -93,6 +96,9 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.treefield.JsonTreeField;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonMenu;
 import org.eclipse.scout.rt.ui.html.json.messagebox.JsonMessageBox;
+import org.eclipse.scout.rt.ui.html.json.table.JsonColumn;
+import org.eclipse.scout.rt.ui.html.json.table.JsonDateColumn;
+import org.eclipse.scout.rt.ui.html.json.table.JsonNumberColumn;
 import org.eclipse.scout.rt.ui.html.json.table.JsonTable;
 import org.eclipse.scout.rt.ui.html.json.table.JsonTableOrganizeMenu;
 import org.eclipse.scout.rt.ui.html.json.table.control.JsonAnalysisTableControl;
@@ -106,11 +112,11 @@ import org.eclipse.scout.rt.ui.html.json.tree.JsonTree;
  * This factory creates IJsonAdapter instances for a given model object. You must call the <code>init()</code> method
  * on the return value from <code>createJsonAdapter()</code>.
  */
-public class JsonAdapterFactory implements IJsonAdapterFactory {
+public class JsonObjectFactory implements IJsonObjectFactory {
 
   @Override
   @SuppressWarnings("unchecked")
-  public IJsonAdapter<?> createJsonAdapter(Object model, IJsonSession session, String id, IJsonAdapter<?> parent) {
+  public IJsonObject createJsonObject(Object model, IJsonSession session, String id, IJsonAdapter<?> parent) {
     // form fields
     if (model instanceof IGroupBox) {
       // we must distinct between normal group-boxes and group-boxes in tab-boxes
@@ -228,6 +234,15 @@ public class JsonAdapterFactory implements IJsonAdapterFactory {
     }
     else if (model instanceof ITable) {
       return new JsonTable((ITable) model, session, id, parent);
+    }
+    else if (model instanceof INumberColumn<?>) {
+      return new JsonNumberColumn((INumberColumn<?>) model, session);
+    }
+    else if (model instanceof IDateColumn) {
+      return new JsonDateColumn((IDateColumn) model, session);
+    }
+    else if (model instanceof IColumn) {
+      return new JsonColumn((IColumn) model, session);
     }
     else if (model instanceof IChartTableControl) {//Needs to be before ITableControl
       return new JsonChartTableControl((IChartTableControl) model, session, id, parent);

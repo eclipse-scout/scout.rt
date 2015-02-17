@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.ui.html.json;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.json.JSONObject;
 
-public class JsonGridData implements IJsonMapper {
+public class JsonGridData implements IJsonObject {
 
   private GridData m_gridData;
 

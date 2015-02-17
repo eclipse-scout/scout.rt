@@ -1,14 +1,14 @@
 package org.eclipse.scout.rt.ui.html.json.calendar;
 
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarComponent;
-import org.eclipse.scout.rt.ui.html.json.IJsonMapper;
+import org.eclipse.scout.rt.ui.html.json.IJsonObject;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonDate;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.basic.cell.JsonCell;
 import org.json.JSONObject;
 
-public class JsonCalendarComponent implements IJsonMapper {
+public class JsonCalendarComponent implements IJsonObject {
   private final IJsonSession m_session;
   private final CalendarComponent m_component;
 

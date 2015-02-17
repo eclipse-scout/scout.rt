@@ -1,11 +1,11 @@
 package org.eclipse.scout.rt.ui.html.json.calendar;
 
 import org.eclipse.scout.rt.shared.services.common.calendar.ICalendarItem;
-import org.eclipse.scout.rt.ui.html.json.IJsonMapper;
+import org.eclipse.scout.rt.ui.html.json.IJsonObject;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.json.JSONObject;
 
-public class JsonCalendarItem implements IJsonMapper {
+public class JsonCalendarItem implements IJsonObject {
 
   private final ICalendarItem m_item;
 

@@ -77,17 +77,17 @@ public class AbstractJsonSessionTest {
     IJsonAdapter<?> adapter = session.getOrCreateJsonAdapter(model, null);
 
     // Note: Additionally, registry contains the "root adapter"
-    assertEquals(2, session.jsonAdapterRegistry().getJsonAdapterCount());
+    assertEquals(2, session.getJsonAdapterRegistry().getJsonAdapterCount());
     assertEquals(1, session.currentJsonResponse().adapterMap().size());
     assertEquals(0, session.currentJsonResponse().eventList().size());
 
     model.setDisplayText("Test");
-    assertEquals(2, session.jsonAdapterRegistry().getJsonAdapterCount());
+    assertEquals(2, session.getJsonAdapterRegistry().getJsonAdapterCount());
     assertEquals(1, session.currentJsonResponse().adapterMap().size());
     assertEquals(1, session.currentJsonResponse().eventList().size());
 
     adapter.dispose();
-    assertEquals(1, session.jsonAdapterRegistry().getJsonAdapterCount());
+    assertEquals(1, session.getJsonAdapterRegistry().getJsonAdapterCount());
     assertEquals(0, session.currentJsonResponse().adapterMap().size());
     assertEquals(0, session.currentJsonResponse().eventList().size());
   }

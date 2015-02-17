@@ -1,12 +1,12 @@
 package org.eclipse.scout.rt.ui.html.json.calendar;
 
 import org.eclipse.scout.rt.shared.services.common.calendar.RecurrencePattern;
-import org.eclipse.scout.rt.ui.html.json.IJsonMapper;
+import org.eclipse.scout.rt.ui.html.json.IJsonObject;
 import org.eclipse.scout.rt.ui.html.json.JsonDate;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.json.JSONObject;
 
-public class JsonRecurrencePattern implements IJsonMapper {
+public class JsonRecurrencePattern implements IJsonObject {
 
   private final RecurrencePattern m_recurrencePattern;
 

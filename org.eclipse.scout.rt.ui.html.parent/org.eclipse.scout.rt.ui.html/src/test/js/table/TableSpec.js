@@ -1230,8 +1230,8 @@ describe("Table", function() {
         session._processSuccessResponse(message);
 
         expect(table.columns.length).toBe(2);
-        expect(table.columns[0]).toBe(column2);
-        expect(table.columns[1]).toBe(column1);
+        expect(table.columns[0].id).toBe(column2.id);
+        expect(table.columns[1].id).toBe(column1.id);
       });
 
       it("redraws the header to reflect header cell changes (text)", function() {
@@ -1262,9 +1262,9 @@ describe("Table", function() {
 
         var $colHeaders = table.header.findHeaderItems();
         expect($colHeaders.length).toBe(3);
-        expect($colHeaders.eq(0).data('column')).toBe(column0);
-        expect($colHeaders.eq(1).data('column')).toBe(column1);
-        expect($colHeaders.eq(2).data('column')).toBe(column2);
+        expect($colHeaders.eq(0).data('column').id).toBe(column0.id);
+        expect($colHeaders.eq(1).data('column').id).toBe(column1.id);
+        expect($colHeaders.eq(2).data('column').id).toBe(column2.id);
 
         var $rows = table.$rows();
         var $cells0 = $rows.eq(0).find('.table-cell');
@@ -1285,8 +1285,8 @@ describe("Table", function() {
         //Check column header order
         $colHeaders = table.header.findHeaderItems();
         expect($colHeaders.length).toBe(2);
-        expect($colHeaders.eq(0).data('column')).toBe(column2);
-        expect($colHeaders.eq(1).data('column')).toBe(column1);
+        expect($colHeaders.eq(0).data('column').id).toBe(column2.id);
+        expect($colHeaders.eq(1).data('column').id).toBe(column1.id);
 
         //Check cells order
         $rows = table.$rows();

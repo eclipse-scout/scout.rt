@@ -31,24 +31,31 @@ scout.Table.GUI_EVENT_ROWS_UPDATED = 'rowsUpdated';
 scout.Table.GUI_EVENT_ROWS_FILTERED = 'rowsFiltered';
 scout.Table.GUI_EVENT_FILTER_RESETTED = 'filterResetted';
 
-scout.Table.CHECKABLE_COLUMN_SIZE = 40;
-
 scout.Table.prototype.init = function(model, session) {
   scout.Table.parent.prototype.init.call(this, model, session);
   this.keystrokeAdapter = new scout.TableKeystrokeAdapter(this);
 
-  var i;
-  for (i = 0; i < this.columns.length; i++) {
-    // Unwrap data
-    scout.defaultValues.applyTo(this.columns[i], 'TableColumn');
-    this.columns[i].index = i;
-  }
-  for (i = 0; i < this.rows.length; i++) {
+  this._initColumns();
+  for (var i = 0; i < this.rows.length; i++) {
     var row = this.rows[i];
     // Unwrap data
     this._unwrapCells(row.cells);
     scout.defaultValues.applyTo(row.cells, 'Cell');
     this.rowsMap[row.id] = row;
+  }
+};
+
+scout.Table.prototype._initColumns = function() {
+  for (var i = 0; i < this.columns.length; i++) {
+    // Unwrap data
+    scout.defaultValues.applyTo(this.columns[i], 'TableColumn');
+
+    var column = this.session.objectFactory.create(this.columns[i]);
+    column.table = this;
+    if (column.index === undefined) {
+      column.index = i;
+    }
+    this.columns[i] = column;
   }
 };
 
@@ -370,7 +377,6 @@ scout.Table.prototype.drawData = function() {
 };
 
 scout.Table.prototype._buildRowDiv = function(row) {
-  var column, style, value, tooltipText, tooltip;
   var rowWidth = this._totalWidth + this._getTableRowBorderWidth();
   var rowClass = 'table-row ';
   if (this.selectedRowIds && this.selectedRowIds.indexOf(row.id) > -1) {
@@ -378,25 +384,11 @@ scout.Table.prototype._buildRowDiv = function(row) {
   }
   var rowDiv = '<div id="' + row.id + '" class="' + rowClass + '" style="width: ' + rowWidth + 'px"' + scout.device.unselectableAttribute + '>';
   if (this.checkable) {
-    rowDiv += '<div class="table-cell checkable-col"  style="min-width:' + scout.Table.CHECKABLE_COLUMN_SIZE +
-      'px; max-width:' + scout.Table.CHECKABLE_COLUMN_SIZE + 'px;"' + scout.device.unselectableAttribute +
-      '><input type="checkbox" id="' + row.id + '-checkable" ';
-    if (row.checked) {
-      rowDiv += ' checked="checked" ';
-    }
-    if (!row.enabled) {
-      rowDiv += ' disabled="disabled" ';
-    }
-    rowDiv += '/><label for="' + row.id + '-checkable">&nbsp;</label></div>';
+    // FIXME NBU/CGU maybe better to have a checkbox column added in this.columns instead of treating this case here? would allow for real checkbox columns
+    rowDiv += new scout.CheckBoxColumn().buildCell(row);
   }
   for (var c = 0; c < this.columns.length; c++) {
-    column = this.columns[c];
-    style = this.cellStyle(column, row);
-    value = this.cellText(column, row);
-    tooltipText = this.cellTooltipText(column, row);
-    tooltip = (!scout.strings.hasText(tooltipText) ? '' : ' title="' + tooltipText + '"');
-
-    rowDiv += '<div class="table-cell" data-column-index="' + c + '" style="' + style + '"' + tooltip + scout.device.unselectableAttribute + '>' + value + '</div>';
+    rowDiv += this.columns[c].buildCell(row);
   }
   rowDiv += '</div>';
 
@@ -1118,13 +1110,9 @@ scout.Table.prototype.$cell = function(columnIndex, $row) {
 };
 
 scout.Table.prototype.columnById = function(columnId) {
-  var column, i;
-  for (i = 0; i < this.columns.length; i++) {
-    column = this.columns[i];
-    if (column.id === columnId) {
-      return column;
-    }
-  }
+  return scout.arrays.find(this.columns, function(column) {
+    return column.id === columnId;
+  });
 };
 
 scout.Table.prototype.filter = function() {
@@ -1484,19 +1472,13 @@ scout.Table.prototype._onRowOrderChanged = function(rowIds) {
 };
 
 scout.Table.prototype._onColumnStructureChanged = function(columns) {
-  //Index is not sent -> update received columns with the current indices
   for (var i = 0; i < columns.length; i++) {
-    // Unwrap data
-    scout.defaultValues.applyTo(columns[i], 'TableColumn');
-
-    for (var j = 0; j < this.columns.length; j++) {
-      if (columns[i].id === this.columns[j].id) {
-        columns[i].index = this.columns[j].index;
-        break;
-      }
-    }
+    // Index is not sent -> update received columns with the current indices
+    var column = this.columnById(columns[i].id);
+    columns[i].index = column.index;
   }
   this.columns = columns;
+  this._initColumns();
 
   if (this.rendered) {
     if (this.header) {

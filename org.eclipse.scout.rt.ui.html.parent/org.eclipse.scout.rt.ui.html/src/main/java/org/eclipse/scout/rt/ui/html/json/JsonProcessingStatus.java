@@ -17,7 +17,7 @@ import org.json.JSONObject;
 /**
  * @author awe
  */
-public class JsonProcessingStatus implements IJsonMapper {
+public class JsonProcessingStatus implements IJsonObject {
 
   private final IProcessingStatus m_processingStatus;
 

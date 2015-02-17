@@ -90,7 +90,7 @@
     cursor: pointer;
   }
   & label:before {
-  .checkboxLabelBefore(inherit, inherit, -18px);
+    .checkboxLabelBefore(inherit, inherit, -18px);
   }
 
   & label:hover:before {
@@ -98,7 +98,7 @@
   }
 
   & input[type=checkbox] {
-    visibility:hidden;
+    visibility: hidden;
   }
 
   & input[type=checkbox]:disabled + label:hover:before {

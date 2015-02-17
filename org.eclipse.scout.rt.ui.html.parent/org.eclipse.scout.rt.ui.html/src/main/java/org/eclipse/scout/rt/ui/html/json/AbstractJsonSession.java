@@ -47,7 +47,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractJsonSession.class);
   private static final long ROOT_ID = 1;
 
-  private final JsonAdapterFactory m_jsonAdapterFactory;
+  private final JsonObjectFactory m_jsonObjectFactory;
   private final JsonAdapterRegistry m_jsonAdapterRegistry;
   private final Set<String> m_unregisterAdapterSet = new HashSet<String>();
   private final ICustomHtmlRenderer m_customHtmlRenderer;
@@ -64,7 +64,7 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
 
   public AbstractJsonSession() {
     m_currentJsonResponse = createJsonResponse();
-    m_jsonAdapterFactory = createJsonAdapterFactory();
+    m_jsonObjectFactory = createJsonObjectFactory();
     m_jsonAdapterRegistry = createJsonAdapterRegistry();
     m_rootJsonAdapter = new P_RootAdapter(this);
     m_customHtmlRenderer = createCustomHtmlRenderer();
@@ -74,8 +74,8 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     return new JsonResponse();
   }
 
-  protected JsonAdapterFactory createJsonAdapterFactory() {
-    return new JsonAdapterFactory();
+  protected JsonObjectFactory createJsonObjectFactory() {
+    return new JsonObjectFactory();
   }
 
   protected JsonAdapterRegistry createJsonAdapterRegistry() {
@@ -322,11 +322,12 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     }
   }
 
-  protected JsonAdapterFactory jsonAdapterFactory() {
-    return m_jsonAdapterFactory;
+  @Override
+  public JsonObjectFactory getJsonObjectFactory() {
+    return m_jsonObjectFactory;
   }
 
-  protected JsonAdapterRegistry jsonAdapterRegistry() {
+  protected JsonAdapterRegistry getJsonAdapterRegistry() {
     return m_jsonAdapterRegistry;
   }
 
@@ -395,12 +396,12 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   }
 
   @Override
-  public <M, A extends IJsonAdapter<? super M>> A getOrCreateJsonAdapter(M model, IJsonAdapter<?> parent, IJsonAdapterFactory adapterFactory) {
+  public <M, A extends IJsonAdapter<? super M>> A getOrCreateJsonAdapter(M model, IJsonAdapter<?> parent, IJsonObjectFactory objectFactory) {
     A jsonAdapter = getJsonAdapter(model, parent);
     if (jsonAdapter != null) {
       return jsonAdapter;
     }
-    return createJsonAdapter(model, parent, adapterFactory);
+    return createJsonAdapter(model, parent, objectFactory);
   }
 
   @Override
@@ -409,8 +410,8 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
   }
 
   @Override
-  public <M, A extends IJsonAdapter<? super M>> A createJsonAdapter(M model, IJsonAdapter<?> parent, IJsonAdapterFactory adapterFactory) {
-    A jsonAdapter = newJsonAdapter(model, parent, adapterFactory);
+  public <M, A extends IJsonAdapter<? super M>> A createJsonAdapter(M model, IJsonAdapter<?> parent, IJsonObjectFactory objectFactory) {
+    A jsonAdapter = newJsonAdapter(model, parent, objectFactory);
 
     // because it's a new adapter we must add it to the response
     m_currentJsonResponse.addAdapter(jsonAdapter);
@@ -422,12 +423,12 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
    * on the created instance.
    */
   @SuppressWarnings("unchecked")
-  public <M, A extends IJsonAdapter<? super M>> A newJsonAdapter(M model, IJsonAdapter<?> parent, IJsonAdapterFactory adapterFactory) {
-    if (adapterFactory == null) {
-      adapterFactory = m_jsonAdapterFactory;
+  public <M, A extends IJsonAdapter<? super M>> A newJsonAdapter(M model, IJsonAdapter<?> parent, IJsonObjectFactory objectFactory) {
+    if (objectFactory == null) {
+      objectFactory = m_jsonObjectFactory;
     }
     String id = createUniqueIdFor(null); // FIXME CGU
-    A adapter = (A) adapterFactory.createJsonAdapter(model, this, id, parent);
+    A adapter = (A) objectFactory.createJsonObject(model, this, id, parent);
     adapter.init();
     return adapter;
   }

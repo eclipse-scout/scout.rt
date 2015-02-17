@@ -10,20 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.table;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
-import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -36,12 +31,8 @@ import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
 import org.eclipse.scout.rt.client.ui.basic.table.TableListener;
 import org.eclipse.scout.rt.client.ui.basic.table.columnfilter.ITableColumnFilterManager;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractDateColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.IDateColumn;
-import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.control.ITableControl;
-import org.eclipse.scout.rt.client.ui.basic.table.customizer.ICustomColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ITableCustomizer;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
@@ -57,7 +48,6 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.JsonAdapterProperty;
 import org.eclipse.scout.rt.ui.html.json.menu.IContextMenuOwner;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonContextMenu;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T> implements IContextMenuOwner {
@@ -94,12 +84,14 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   private final Map<String, ITableRow> m_tableRows;
   private final Map<ITableRow, String> m_tableRowIds;
   private final TableEventFilter m_tableEventFilter;
+  private final Map<IColumn, JsonColumn> m_jsonColumns;
 
   public JsonTable(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
     super(model, jsonSession, id, parent);
     m_tableRows = new HashMap<>();
     m_tableRowIds = new HashMap<>();
     m_tableEventFilter = new TableEventFilter(this);
+    m_jsonColumns = new HashMap<IColumn, JsonColumn>();
   }
 
   @Override
@@ -199,12 +191,24 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   protected void attachChildAdapters() {
     super.attachChildAdapters();
     attachAdapter(getModel().getContextMenu());
-//    attachAdapters(getModel().getTableControls());
+    attachColumns();
+  }
+
+  protected void attachColumns() {
+    for (IColumn<?> column : getColumns()) {
+      JsonColumn jsonColumn = (JsonColumn) getJsonSession().getJsonObjectFactory().createJsonObject(column, getJsonSession(), null, null);
+      m_jsonColumns.put(column, jsonColumn);
+    }
+  }
+
+  protected void disposeColumns() {
+    m_jsonColumns.clear();
   }
 
   @Override
   protected void disposeChildAdapters() {
     super.disposeChildAdapters();
+    disposeColumns();
     m_tableRows.clear();
     m_tableRowIds.clear();
   }
@@ -432,76 +436,25 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   }
 
   protected Object cellToJson(final ITableRow row, final IColumn column) {
-    final ICell cell = row.getCell(column);
-    ICellValueReader reader = new TableCellValueReader(column, cell);
+    ICell cell = row.getCell(column);
+    JsonColumn<?> jsonColumn = m_jsonColumns.get(column);
+    ICellValueReader reader = new TableCellValueReader(jsonColumn, cell);
     return new JsonCell(getJsonSession(), cell, reader).toJsonOrString();
   }
 
   protected JSONArray columnsToJson(Collection<IColumn<?>> columns) {
     JSONArray jsonColumns = new JSONArray();
     for (IColumn<?> column : columns) {
-      jsonColumns.put(columnToJson(column));
+      JsonColumn jsonColumn = m_jsonColumns.get(column);
+      JSONObject json = jsonColumn.toJson();
+      JsonObjectUtility.filterDefaultValues(json, jsonColumn.getObjectType());
+      jsonColumns.put(json);
     }
     return jsonColumns;
   }
 
   protected List<IColumn<?>> getColumns() {
     return getModel().getColumnSet().getVisibleColumns();
-  }
-
-  protected JSONObject columnToJson(IColumn column) {
-    try {
-      JSONObject json = new JSONObject();
-      json.put("id", column.getColumnId());
-      json.put("text", getJsonSession().getCustomHtmlRenderer().convert(column.getHeaderCell().getText(), true));
-      json.put("type", computeColumnType(column));
-      json.put(IColumn.PROP_WIDTH, column.getWidth());
-      json.put("summary", column.isSummary());
-      json.put(IColumn.PROP_HORIZONTAL_ALIGNMENT, column.getHorizontalAlignment());
-      if (column.isSortActive() && column.isSortExplicit()) {
-        json.put("sortActive", true);
-        json.put("sortAscending", column.isSortAscending());
-        json.put("sortIndex", column.getSortIndex());
-      }
-      if (column instanceof ICustomColumn) {
-        json.put("custom", true);
-      }
-      if (column instanceof INumberColumn<?>) {
-        json.put("format", ((INumberColumn) column).getFormat().toPattern());
-      }
-      else if (column instanceof IDateColumn) {
-        // FIXME CGU: update IDateColumnInterface
-        // getDateFormat uses LocaleThreadLocal. IMHO getDateFormat should not perform any logic because it just a getter-> refactor. same on AbstractDateField
-        // Alternative would be to use a clientJob or set localethreadlocal in ui thread as well, as done in rap
-        Locale oldLocale = LocaleThreadLocal.get(false);
-        try {
-          LocaleThreadLocal.set(getJsonSession().getClientSession().getLocale());
-          Method method = AbstractDateColumn.class.getDeclaredMethod("getDateFormat");
-          method.setAccessible(true);
-          SimpleDateFormat dateFormat = (SimpleDateFormat) method.invoke(column);
-          json.put("format", dateFormat.toPattern()); //Don't use toLocalizedPattern, it translates the chars ('d' to 't' for german).
-        }
-        finally {
-          LocaleThreadLocal.set(oldLocale);
-        }
-      }
-      // FIXME CGU: complete
-      JsonObjectUtility.filterDefaultValues(json, "TableColumn");
-      return json;
-    }
-    catch (JSONException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-      throw new JsonException(e.getMessage(), e);
-    }
-  }
-
-  protected String computeColumnType(IColumn column) {
-    if (column instanceof INumberColumn) {
-      return "number";
-    }
-    if (column instanceof IDateColumn) {
-      return "date";
-    }
-    return "text";
   }
 
   protected String getOrCreatedRowId(ITableRow row) {
@@ -755,6 +708,8 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
 
   protected void handleModelColumnStructureChanged() {
     JSONObject jsonEvent = new JSONObject();
+    disposeColumns();
+    attachColumns();
     putProperty(jsonEvent, PROP_COLUMNS, columnsToJson(getColumns()));
     addActionEvent("columnStructureChanged", jsonEvent);
   }

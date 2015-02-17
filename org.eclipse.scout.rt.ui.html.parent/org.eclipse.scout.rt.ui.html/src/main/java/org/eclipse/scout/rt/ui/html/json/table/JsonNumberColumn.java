@@ -8,28 +8,28 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.html.json.basic.activitymap;
+package org.eclipse.scout.rt.ui.html.json.table;
 
-import org.eclipse.scout.rt.client.ui.basic.activitymap.ActivityMapEvent;
-import org.eclipse.scout.rt.ui.html.json.IJsonObject;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.INumberColumn;
+import org.eclipse.scout.rt.ui.html.json.IJsonSession;
+import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.json.JSONObject;
 
-public class JsonActivityMapEvent implements IJsonObject {
+public class JsonNumberColumn<T extends INumberColumn<?>> extends JsonColumn<T> {
 
-  private final ActivityMapEvent m_event;
-
-  public JsonActivityMapEvent(ActivityMapEvent event) {
-    m_event = event;
-  }
-
-  public final ActivityMapEvent getEvent() {
-    return m_event;
+  public JsonNumberColumn(T model, IJsonSession jsonSession) {
+    super(model, jsonSession);
   }
 
   @Override
   public JSONObject toJson() {
-    JSONObject json = new JSONObject();
-    // TODO ActivityMap | Fill data
+    JSONObject json = super.toJson();
+    JsonObjectUtility.putProperty(json, "format", ((INumberColumn) getColumn()).getFormat().toPattern());
     return json;
+  }
+
+  @Override
+  public Object cellValueToJson(Object value) {
+    return value;
   }
 }

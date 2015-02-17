@@ -159,8 +159,8 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     return attachAdapter(model, null);
   }
 
-  protected final <A extends IJsonAdapter<?>> A attachAdapter(Object model, IJsonAdapterFactory adapterFactory) {
-    return m_jsonSession.getOrCreateJsonAdapter(model, this, adapterFactory);
+  protected final <A extends IJsonAdapter<?>> A attachAdapter(Object model, IJsonObjectFactory objectFactory) {
+    return m_jsonSession.getOrCreateJsonAdapter(model, this, objectFactory);
   }
 
   protected final List<IJsonAdapter<?>> attachAdapters(Collection<?> models) {
@@ -169,6 +169,17 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
       adapters.add(attachAdapter(model));
     }
     return adapters;
+  }
+
+  /**
+   * Disposes adapters for the existing models but only if they are not part of the newModels.
+   */
+  protected void disposeAdapters(List<?> existingModels, List<?> newModels) {
+    existingModels.removeAll(newModels);
+    for (Object model : existingModels) {
+      IJsonAdapter<Object> jsonAdapter = getJsonSession().getJsonAdapter(model, this, false);
+      jsonAdapter.dispose();
+    }
   }
 
   /**
@@ -213,11 +224,11 @@ public abstract class AbstractJsonAdapter<T> implements IJsonAdapter<T> {
     return attachGlobalAdapter(model, null);
   }
 
-  protected final IJsonAdapter<?> attachGlobalAdapter(Object model, IJsonAdapterFactory adapterFactory) {
+  protected final IJsonAdapter<?> attachGlobalAdapter(Object model, IJsonObjectFactory objectFactory) {
     if (model == null) {
       return null;
     }
-    return m_jsonSession.getOrCreateJsonAdapter(model, getJsonSession().getRootJsonAdapter(), adapterFactory);
+    return m_jsonSession.getOrCreateJsonAdapter(model, getJsonSession().getRootJsonAdapter(), objectFactory);
   }
 
   protected final JSONObject putAdapterIdProperty(JSONObject json, String key, Object model) {

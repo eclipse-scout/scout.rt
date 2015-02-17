@@ -50,6 +50,8 @@ public interface IJsonSession {
 
   JsonClientSession<? extends IClientSession> getJsonClientSession();
 
+  IJsonObjectFactory getJsonObjectFactory();
+
   IJsonAdapter<?> getRootJsonAdapter();
 
   /**
@@ -72,9 +74,9 @@ public interface IJsonSession {
    */
   <M, A extends IJsonAdapter<? super M>> A getOrCreateJsonAdapter(M model, IJsonAdapter<?> parent);
 
-  <M, A extends IJsonAdapter<? super M>> A getOrCreateJsonAdapter(M model, IJsonAdapter<?> parent, IJsonAdapterFactory adapterFactory);
+  <M, A extends IJsonAdapter<? super M>> A getOrCreateJsonAdapter(M model, IJsonAdapter<?> parent, IJsonObjectFactory objectFactory);
 
-  <M, A extends IJsonAdapter<? super M>> A createJsonAdapter(M model, IJsonAdapter<?> parent, IJsonAdapterFactory adapterFactory);
+  <M, A extends IJsonAdapter<? super M>> A createJsonAdapter(M model, IJsonAdapter<?> parent, IJsonObjectFactory objectFactory);
 
   <M, A extends IJsonAdapter<? super M>> A createJsonAdapter(M model, IJsonAdapter<?> parent);
 

@@ -48,6 +48,8 @@ __include("layout/LogicalGridLayoutInfo.js");
 __include("layout/LogicalGridLayout.js");
 __include("layout/NullLayout.js");
 __include("layout/SingleLayout.js");
+__include("table/Column.js");
+__include("table/CheckBoxColumn.js");
 __include("table/Table.js");
 __include("table/TableLayout.js");
 __include("table/TableHeader.js");

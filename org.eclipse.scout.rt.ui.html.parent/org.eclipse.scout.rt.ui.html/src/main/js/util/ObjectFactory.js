@@ -112,6 +112,11 @@ scout.defaultObjectFactories = [{
     return new scout.Table();
   }
 }, {
+  objectType: 'TableColumn',
+  create: function() {
+    return new scout.Column();
+  }
+}, {
   objectType: 'TableControl',
   create: function() {
     return new scout.TableControl();

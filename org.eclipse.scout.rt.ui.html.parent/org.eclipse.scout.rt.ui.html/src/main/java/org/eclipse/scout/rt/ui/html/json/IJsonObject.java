@@ -10,8 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json;
 
-public interface IJsonAdapterFactory {
+import org.json.JSONObject;
 
-  IJsonAdapter<?> createJsonAdapter(Object model, IJsonSession session, String id, IJsonAdapter<?> parent);
+/**
+ * Implementations of this interface transform a model object into a JSONObject.
+ */
+public interface IJsonObject {
+
+  JSONObject toJson();
 
 }

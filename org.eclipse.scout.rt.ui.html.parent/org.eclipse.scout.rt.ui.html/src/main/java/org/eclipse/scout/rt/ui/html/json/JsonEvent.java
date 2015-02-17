@@ -15,7 +15,7 @@ import org.json.JSONObject;
 /**
  * This class is a Java wrapper around a <code>JSONObject</code> with properties 'type' and 'id'.
  */
-public class JsonEvent implements IJsonMapper {
+public class JsonEvent implements IJsonObject {
 
   public static final String TARGET = "target";
   public static final String TYPE = "type";

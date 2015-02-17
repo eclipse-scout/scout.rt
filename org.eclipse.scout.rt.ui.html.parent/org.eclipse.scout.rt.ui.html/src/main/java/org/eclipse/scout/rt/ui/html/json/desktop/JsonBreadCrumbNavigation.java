@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigation;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
-import org.eclipse.scout.rt.ui.html.json.IJsonMapper;
+import org.eclipse.scout.rt.ui.html.json.IJsonObject;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonException;
@@ -126,7 +126,7 @@ public class JsonBreadCrumbNavigation<T extends IBreadCrumbsNavigation> extends 
   }
 
   // FIXME CGU: verify with A.WE - really necessary to hold a state? Not extendable
-  private class JsonBreadCrumb implements IJsonMapper {
+  private class JsonBreadCrumb implements IJsonObject {
     private IBreadCrumb m_breadCrumb;
 
     public JsonBreadCrumb(IBreadCrumb breadCrumb) {
