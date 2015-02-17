@@ -99,7 +99,9 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
       LOG.warn("Could not determine content type of: " + pathInfo);
     }
     resp.setContentLength(cacheObj.getResource().getContentLength());
-    resp.getOutputStream().write(cacheObj.getResource().getContent());
+    if (!"HEAD".equals(req.getMethod())) {
+      resp.getOutputStream().write(cacheObj.getResource().getContent());
+    }
     return true;
   }
 
