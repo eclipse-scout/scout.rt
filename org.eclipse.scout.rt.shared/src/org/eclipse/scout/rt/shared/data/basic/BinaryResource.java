@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.zip.Adler32;
 
 import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.commons.FileUtility;
 
 /**
  * Wrapper for binary content (<code>byte[]</code>) with some meta data.
@@ -39,6 +40,8 @@ public final class BinaryResource implements Serializable {
    *          MIME type of the resource. Example: <code>"image/jpeg"</code>. If this value is omitted, it is recommended
    *          to ensure that the argument <i>filename</i> has a valid file extension, which can then be used to
    *          determine the MIME type.
+   *          <p>
+   *          null contentType is replaced by {@link FileUtility#getContentTypeForExtension(String)}
    * @param content
    *          The resource's content as byte array. The fingerprint for the given content is calculated automatically.
    * @param lastModified
@@ -46,7 +49,18 @@ public final class BinaryResource implements Serializable {
    */
   public BinaryResource(String filename, String contentType, byte[] content, long lastModified) {
     m_filename = filename;
-    m_contentType = contentType;
+    if (contentType != null) {
+      m_contentType = contentType;
+    }
+    else {
+      int i = filename.lastIndexOf('.');
+      if (i >= 0) {
+        m_contentType = FileUtility.getContentTypeForExtension(filename.substring(i + 1));
+      }
+      else {
+        m_contentType = null;
+      }
+    }
     m_content = content;
     m_lastModified = lastModified;
     if (content != null) {
@@ -61,6 +75,8 @@ public final class BinaryResource implements Serializable {
 
   /**
    * Convenience constructor which assumes <code>contentType = null</code> and <code>lastModified = -1</code>
+   * <p>
+   * null contentType is replaced by {@link FileUtility#getContentTypeForExtension(String)}
    *
    * @see #BinaryResource(String, String, byte[], long)
    */
