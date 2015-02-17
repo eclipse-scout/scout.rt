@@ -257,7 +257,7 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
       contentType = detectContentType(servlet, pathInfo);
     }
     BinaryResource content = new BinaryResource(pathInfo, contentType, content0.getContent(), content0.getLastModified());
-    return new HttpCacheObject(pathInfo, false, -1, content);
+    return new HttpCacheObject(pathInfo, content.getLastModified() > 0, -1, content);
   }
 
   /**

@@ -73,7 +73,8 @@ public class JsonAdapterRegistry {
   }
 
   public IJsonAdapter<?> getJsonAdapter(String id) {
-    return m_idAdapterMap.get(id).getJsonAdapter();
+    P_RegistryValue entry = m_idAdapterMap.get(id);
+    return entry != null ? entry.getJsonAdapter() : null;
   }
 
   public <M, A extends IJsonAdapter<? super M>> A getJsonAdapter(M model, IJsonAdapter<?> parent) {

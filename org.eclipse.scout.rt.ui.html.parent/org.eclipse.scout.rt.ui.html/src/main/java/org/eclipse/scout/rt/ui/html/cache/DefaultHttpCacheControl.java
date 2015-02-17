@@ -70,7 +70,7 @@ public class DefaultHttpCacheControl implements IHttpCacheControl {
     }
     int maxAge = getMaxAgeFor(req, resp, obj);
     if (maxAge > 0) {
-      resp.setHeader("cache-control", "public, max-age=" + maxAge + ", s-maxage=" + maxAge);
+      resp.setHeader("cache-control", "private, max-age=" + maxAge + ", s-maxage=" + maxAge);
     }
     else {
       resp.setHeader("cache-control", "private, max-age=0, must-revalidate");

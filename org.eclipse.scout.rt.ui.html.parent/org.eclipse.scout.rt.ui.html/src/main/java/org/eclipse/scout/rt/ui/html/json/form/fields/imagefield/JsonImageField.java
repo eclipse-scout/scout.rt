@@ -1,5 +1,7 @@
 package org.eclipse.scout.rt.ui.html.json.form.fields.imagefield;
 
+import java.util.zip.Adler32;
+
 import org.eclipse.scout.rt.client.ui.form.fields.imagebox.IImageField;
 import org.eclipse.scout.rt.shared.data.basic.BinaryResource;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
@@ -52,7 +54,9 @@ public class JsonImageField<T extends IImageField> extends JsonFormField<T> impl
       return (BinaryResource) raw;
     }
     if (raw instanceof byte[]) {
-      return new BinaryResource("image.jpg", null, (byte[]) raw, -1);
+      Adler32 crc = new Adler32();
+      crc.update((byte[]) raw);
+      return new BinaryResource("image-" + (crc.getValue()) + "-" + (((byte[]) raw).length) + ".jpg", null, (byte[]) raw, 1L);
     }
     return null;
   }
@@ -61,9 +65,9 @@ public class JsonImageField<T extends IImageField> extends JsonFormField<T> impl
   // add a sequence-number to the contentId to distinct between different images.
   @Override
   public BinaryResource loadDynamicResource(String filename) {
-    BinaryResource content = extractBinaryResource();
-    if (content != null && filename.equals(content.getFilename())) {
-      return content;
+    BinaryResource res = extractBinaryResource();
+    if (res != null && filename.equals(res.getFilename())) {
+      return res;
     }
     return null;
   }
