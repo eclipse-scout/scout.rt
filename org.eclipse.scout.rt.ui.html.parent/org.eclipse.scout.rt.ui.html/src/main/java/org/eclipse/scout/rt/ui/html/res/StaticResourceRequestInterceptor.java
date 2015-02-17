@@ -13,6 +13,8 @@ package org.eclipse.scout.rt.ui.html.res;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.regex.Matcher;
 
 import javax.servlet.ServletException;
@@ -82,6 +84,15 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
       return true;
     }
 
+    String contentType = cacheObj.getResource().getContentType();
+    if (contentType != null) {
+      resp.setContentType(contentType);
+    }
+    else {
+      LOG.warn("Could not determine content type of: " + pathInfo);
+    }
+    resp.setContentLength(cacheObj.getResource().getContentLength());
+
     // cached in browser? -> returns 304 if the resource has not been modified
     // Important: Check is only done if the request still processes the requested resource and hasn't been forwarded to another one (using req.getRequestDispatcher().forward)
     String originalPathInfo = (String) req.getAttribute("javax.servlet.forward.path_info");
@@ -91,14 +102,10 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
       }
     }
 
-    String contentType = cacheObj.getResource().getContentType();
-    if (contentType != null) {
-      resp.setContentType(contentType);
+    if (isDownload(cacheObj.getResource())) {
+      resp.setHeader("Content-Disposition", "attachment");
     }
-    else {
-      LOG.warn("Could not determine content type of: " + pathInfo);
-    }
-    resp.setContentLength(cacheObj.getResource().getContentLength());
+
     if (!"HEAD".equals(req.getMethod())) {
       resp.getOutputStream().write(cacheObj.getResource().getContent());
     }
@@ -279,6 +286,36 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
     BinaryResource content = new BinaryResource(pathInfo, detectContentType(servlet, pathInfo), bytes, uc.getLastModified());
     // TODO BSH Check with IMO: Why not explicitly pass MAX_AGE_4_HOURS instead of -1? Would make logic in DefaultHttpCacheControl.getMaxAgeFor() obsolete
     return new HttpCacheObject(pathInfo, true, -1, content);
+  }
+
+  private static final HashSet<String> DOWNLOAD_CONTENT_TYPES = new HashSet<String>(Arrays.asList(new String[]{
+      "application/octet-stream",
+      "application/octet-stream",
+      "application/pdf",
+      "application/mspowerpoint",
+      "application/mspowerpoint",
+      "application/mspowerpoint",
+      "application/mspowerpoint",
+      "application/vnd.ms-excel",
+      "application/vnd.ms-excel",
+      "application/vnd.ms-excel",
+      "application/vnd.ms-excel",
+      "application/vnd.ms-excel",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.template",
+      "application/vnd.openxmlformats-officedocument.presentationml.template",
+      "application/vnd.openxmlformats-officedocument.presentationml.slideshow",
+      "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "application/vnd.openxmlformats-officedocument.presentationml.slide",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.template",
+      "application/zip",
+  }));
+
+  protected boolean isDownload(BinaryResource res) {
+    return DOWNLOAD_CONTENT_TYPES.contains(res.getContentType());
   }
 
   protected String detectContentType(AbstractUiServlet servlet, String path) {
