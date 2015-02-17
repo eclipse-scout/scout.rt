@@ -33,6 +33,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.event.EventListenerList;
 
+import org.eclipse.scout.rt.shared.data.basic.BinaryResource;
 import org.eclipse.scout.rt.ui.swing.ext.MouseClickedBugFix;
 
 public class SwingImageViewer extends JComponent {
@@ -165,8 +166,12 @@ public class SwingImageViewer extends JComponent {
     }
     else if (imgData instanceof byte[]) {
       byte[] b = (byte[]) imgData;
-      if (b != null) {
-        img = Toolkit.getDefaultToolkit().createImage(b);
+      img = Toolkit.getDefaultToolkit().createImage(b);
+    }
+    else if (imgData instanceof BinaryResource) {
+      BinaryResource b = (BinaryResource) imgData;
+      if (b.getContent() != null) {
+        img = Toolkit.getDefaultToolkit().createImage(b.getContent());
       }
     }
     if (img != null) {

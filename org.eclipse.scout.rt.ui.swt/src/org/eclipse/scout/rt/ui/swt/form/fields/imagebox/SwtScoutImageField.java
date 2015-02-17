@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.imagebox.IImageField;
+import org.eclipse.scout.rt.shared.data.basic.BinaryResource;
 import org.eclipse.scout.rt.ui.swt.DefaultValidateRoot;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.IValidateRoot;
@@ -214,6 +215,10 @@ public class SwtScoutImageField extends SwtScoutFieldComposite<IImageField> impl
     freeResources();
     if (getScoutObject().getImage() instanceof byte[]) {
       m_image = new Image(getSwtField().getDisplay(), new ByteArrayInputStream((byte[]) getScoutObject().getImage()));
+      getImageViewer().setImage(m_image);
+    }
+    else if (getScoutObject().getImage() instanceof BinaryResource) {
+      m_image = new Image(getSwtField().getDisplay(), new ByteArrayInputStream(((BinaryResource) getScoutObject().getImage()).getContent()));
       getImageViewer().setImage(m_image);
     }
     else if (getScoutObject().getImage() instanceof ImageData) {
