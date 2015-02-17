@@ -17,6 +17,8 @@ import java.util.zip.Adler32;
 import org.eclipse.scout.commons.CompareUtility;
 
 /**
+ * Wrapper for binary content (<code>byte[]</code>) with some meta data.
+ *
  * @since 5.0
  */
 public final class BinaryResource implements Serializable {
@@ -25,14 +27,22 @@ public final class BinaryResource implements Serializable {
   private final String m_filename;
   private final String m_contentType;
   private final byte[] m_content;
-  private final long m_fingerprint;
   private final long m_lastModified;
+
+  private final long m_fingerprint;
 
   /**
    * @param filename
+   *          A valid file name (with or without path information), preferably with file extension to allow automatic
+   *          detection of MIME type. Examples: <code>"image.jpg"</code>, <code>"icons/eye.png"</code>
+   * @param contentType
+   *          MIME type of the resource. Example: <code>"image/jpeg"</code>. If this value is omitted, it is recommended
+   *          to ensure that the argument <i>filename</i> has a valid file extension, which can then be used to
+   *          determine the MIME type.
    * @param content
+   *          The resource's content as byte array. The fingerprint for the given content is calculated automatically.
    * @param lastModified
-   *          [milliseconds]
+   *          "Last modified" timestamp of the resource (in milliseconds a.k.a. UNIX time). <code>-1</code> if unknown.
    */
   public BinaryResource(String filename, String contentType, byte[] content, long lastModified) {
     m_filename = filename;
@@ -49,28 +59,59 @@ public final class BinaryResource implements Serializable {
     }
   }
 
+  /**
+   * Convenience constructor which assumes <code>contentType = null</code> and <code>lastModified = -1</code>
+   *
+   * @see #BinaryResource(String, String, byte[], long)
+   */
+  public BinaryResource(String filename, byte[] content) {
+    this(filename, null, content, -1);
+  }
+
+  /**
+   * @return the filename, as passed to the constructor. Should not be <code>null</code> (but could).
+   */
   public String getFilename() {
     return m_filename;
   }
 
+  /**
+   * @return the content type (MIME type), as passed to the constructor. May be <code>null</code>. In this case,
+   *         the filename extension might give a hint to determine the content type.
+   */
   public String getContentType() {
     return m_contentType;
   }
 
+  /**
+   * @return the raw binary content, as passed to the constructor
+   */
   public byte[] getContent() {
     return m_content;
   }
 
+  /**
+   * Convenience method to get the length of the byte array returend by {@link #getContent()}. If the content
+   * is <code>null</code>, this method returns <code>-1</code>.
+   */
   public int getContentLength() {
     return m_content != null ? m_content.length : -1;
   }
 
-  public long getFingerprint() {
-    return m_fingerprint;
-  }
-
+  /**
+   * @return the "last modified" timestamp in milliseconds (or <code>-1</code> if last modified time is unknown).
+   */
   public long getLastModified() {
     return m_lastModified;
+  }
+
+  /**
+   * @return a checksum-style fingerprint of the binary content. This fingerprint was calculated during the
+   *         constructor by applying the Adler32 algorithm to the content. If the content is <code>null</code>, this
+   *         method returns <code>-1</code>.
+   */
+  public long getFingerprint() {
+    return m_fingerprint;
   }
 
   @Override
