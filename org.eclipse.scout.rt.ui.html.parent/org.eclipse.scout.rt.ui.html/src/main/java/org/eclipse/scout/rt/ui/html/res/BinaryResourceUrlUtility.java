@@ -17,8 +17,8 @@ import org.eclipse.scout.rt.client.ui.IIconLocator;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonRequest;
 
-public class DynamicResourceUrlUtility {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(DynamicResourceUrlUtility.class);
+public class BinaryResourceUrlUtility {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(BinaryResourceUrlUtility.class);
 
   /**
    * @return a relative URL for a configured logical icon-name or a font-based icon. For instance:
@@ -53,14 +53,14 @@ public class DynamicResourceUrlUtility {
    * @return a relative URL for a resource handled by an adapter, see
    *         {@link StaticResourceRequestInterceptor#loadDynamicAdapterResource(javax.servlet.http.HttpServletRequest, String)}
    *         <p>
-   *         The calling adapter must implement {@link IDynamicResourceProvider}
+   *         The calling adapter must implement {@link IBinaryResourceProvider}
    */
   public static String createCallbackUrl(IJsonAdapter<?> jsonAdapter, String filename) {
     if (jsonAdapter == null) {
       return null;
     }
-    if (!(jsonAdapter instanceof IDynamicResourceProvider)) {
-      LOG.warn("adapter " + jsonAdapter + " is not implementing " + IDynamicResourceProvider.class);
+    if (!(jsonAdapter instanceof IBinaryResourceProvider)) {
+      LOG.warn("adapter " + jsonAdapter + " is not implementing " + IBinaryResourceProvider.class);
       return null;
     }
     if (filename == null) {

@@ -243,10 +243,10 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
     if (jsonAdapter == null) {
       return null;
     }
-    if (!(jsonAdapter instanceof IDynamicResourceProvider)) {
+    if (!(jsonAdapter instanceof IBinaryResourceProvider)) {
       return null;
     }
-    IDynamicResourceProvider provider = (IDynamicResourceProvider) jsonAdapter;
+    IBinaryResourceProvider provider = (IBinaryResourceProvider) jsonAdapter;
     String filename = pathInfo.substring(pathInfo.lastIndexOf('/') + 1);
     BinaryResource content0 = provider.loadDynamicResource(filename);
     if (content0 == null) {

@@ -6,10 +6,10 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.form.fields.JsonFormField;
-import org.eclipse.scout.rt.ui.html.res.DynamicResourceUrlUtility;
-import org.eclipse.scout.rt.ui.html.res.IDynamicResourceProvider;
+import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
+import org.eclipse.scout.rt.ui.html.res.IBinaryResourceProvider;
 
-public class JsonImageField<T extends IImageField> extends JsonFormField<T> implements IDynamicResourceProvider {
+public class JsonImageField<T extends IImageField> extends JsonFormField<T> implements IBinaryResourceProvider {
 
   public JsonImageField(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
     super(model, jsonSession, id, parent);
@@ -26,7 +26,7 @@ public class JsonImageField<T extends IImageField> extends JsonFormField<T> impl
     putJsonProperty(new JsonProperty<T>(IImageField.PROP_IMAGE_ID, model) {
       @Override
       protected String modelValue() {
-        return DynamicResourceUrlUtility.createIconUrl(JsonImageField.this, getModel().getImageId());
+        return BinaryResourceUrlUtility.createIconUrl(JsonImageField.this, getModel().getImageId());
       }
     });
     // We don't send the image via JSON to the client, we only set a flag that this adapter has an image
@@ -35,7 +35,7 @@ public class JsonImageField<T extends IImageField> extends JsonFormField<T> impl
       @Override
       protected String modelValue() {
         BinaryResource image = extractBinaryResource();
-        return image != null ? DynamicResourceUrlUtility.createCallbackUrl(JsonImageField.this, image.getFilename()) : null;
+        return image != null ? BinaryResourceUrlUtility.createCallbackUrl(JsonImageField.this, image.getFilename()) : null;
       }
     });
     putJsonProperty(new JsonProperty<T>(IImageField.PROP_SCROLL_BAR_ENABLED, model) {

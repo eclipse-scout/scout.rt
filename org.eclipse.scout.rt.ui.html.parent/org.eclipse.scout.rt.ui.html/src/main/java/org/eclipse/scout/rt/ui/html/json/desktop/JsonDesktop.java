@@ -48,12 +48,12 @@ import org.eclipse.scout.rt.ui.html.json.JsonException;
 import org.eclipse.scout.rt.ui.html.json.JsonObjectUtility;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
-import org.eclipse.scout.rt.ui.html.res.DynamicResourceUrlUtility;
-import org.eclipse.scout.rt.ui.html.res.IDynamicResourceProvider;
+import org.eclipse.scout.rt.ui.html.res.BinaryResourceUrlUtility;
+import org.eclipse.scout.rt.ui.html.res.IBinaryResourceProvider;
 import org.eclipse.scout.service.SERVICES;
 import org.json.JSONObject;
 
-public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserver<T> implements IDynamicResourceProvider {
+public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserver<T> implements IBinaryResourceProvider {
 
   public static final String PROP_OUTLINE = "outline";
   public static final String PROP_FORM = "form";
@@ -261,7 +261,7 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
     }
     manageDownloadHandlers();
     m_downloadHandlers.put(handler.getResource().getFilename(), handler);
-    String path = DynamicResourceUrlUtility.createCallbackUrl(this, handler.getResource().getFilename());
+    String path = BinaryResourceUrlUtility.createCallbackUrl(this, handler.getResource().getFilename());
     JSONObject json = new JSONObject();
     putProperty(json, "path", path);
     putProperty(json, "urlTarget", UrlTarget.BLANK);

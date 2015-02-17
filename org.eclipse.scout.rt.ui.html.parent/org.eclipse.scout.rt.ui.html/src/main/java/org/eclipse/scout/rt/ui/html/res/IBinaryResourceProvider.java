@@ -6,13 +6,13 @@ import org.eclipse.scout.rt.shared.data.basic.BinaryResource;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 
 /**
- * {@link IJsonAdapter}s can implements {@link IDynamicResourceProvider} in order to provide public {@link URL} calling
+ * {@link IJsonAdapter}s can implements {@link IBinaryResourceProvider} in order to provide public {@link URL} calling
  * back to them.
  * <p>
  * URLs that call back to this method are defined using
- * {@link DynamicResourceUrlUtility#createCallbackUrl(IJsonAdapter, String)}
+ * {@link BinaryResourceUrlUtility#createCallbackUrl(IJsonAdapter, String)}
  */
-public interface IDynamicResourceProvider {
+public interface IBinaryResourceProvider {
 
   BinaryResource loadDynamicResource(String filename);
 
