@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.desktop;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
@@ -19,10 +20,14 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITree;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
 import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithNodes;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
+import org.eclipse.scout.rt.ui.html.json.JsonEvent;
+import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.NodePage;
 import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.NodePageWithForm;
 import org.eclipse.scout.rt.ui.html.json.desktop.fixtures.Outline;
@@ -33,6 +38,7 @@ import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
 import org.eclipse.scout.rt.ui.html.json.tree.JsonTree;
 import org.eclipse.scout.rt.ui.html.json.tree.JsonTreeTest;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Assert;
@@ -150,4 +156,62 @@ public class JsonOutlineTest {
     JsonTestUtility.assertGC(ref);
   }
 
+  /**
+   * Tests that no events are fired during page initialization
+   */
+  @Test
+  public void testNoEventsFiredOnChildPageCreation() throws ProcessingException, JSONException {
+    final Holder<Integer> initPageCounter = new Holder<>(Integer.class);
+    initPageCounter.setValue(0);
+
+    // Build an outline with two nodes, where the second node has a child node
+    IPage page1 = new AbstractPageWithNodes() {
+    };
+    IPage page2 = new AbstractPageWithNodes() {
+      @Override
+      protected void execCreateChildPages(List<IPage<?>> pageList) throws ProcessingException {
+        pageList.add(new AbstractPageWithNodes() {
+          @Override
+          protected void execInitPage() throws ProcessingException {
+            // Change some properties (this would normally fire events, but we are inside execInitPage())
+            setLeaf(!isLeaf());
+            getCellForUpdate().setText("Test");
+            initPageCounter.setValue(initPageCounter.getValue() + 1);
+          }
+        });
+        super.execCreateChildPages(pageList);
+      }
+    };
+    List<IPage<?>> pages = new ArrayList<IPage<?>>();
+    pages.add(page2);
+    IOutline outline = new Outline(pages);
+    outline.selectNode(page1);
+
+    // Outline to JsonOutline
+    JsonOutline<IOutline> jsonOutline = m_jsonSession.newJsonAdapter(outline, null, null);
+    jsonOutline.toJson(); // simulate "send to client"
+
+    Assert.assertEquals(0, initPageCounter.getValue().intValue());
+
+    // Simulate "select page2" event
+    JsonEvent event = createNodeSelectionEvent(jsonOutline, page2);
+    jsonOutline.handleUiEvent(event, new JsonResponse());
+
+    assertEquals(1, initPageCounter.getValue().intValue());
+
+    // Get all events for the outline (ignore table events)
+    List<JsonEvent> responseEvents = JsonTestUtility.extractEventsFromResponse(m_jsonSession.currentJsonResponse(), null, jsonOutline.getId());
+    // Check that we got only one event (node insertion)
+    assertEquals(1, responseEvents.size());
+    assertEquals(JsonTree.EVENT_NODES_INSERTED, responseEvents.get(0).getType());
+  }
+
+  protected JsonEvent createNodeSelectionEvent(JsonOutline<IOutline> jsonOutline, IPage page) throws JSONException {
+    JSONObject eventData = new JSONObject();
+    JSONArray nodeIds = new JSONArray();
+    nodeIds.put(JsonTreeTest.getNodeId(jsonOutline, page));
+    eventData.put("nodeIds", nodeIds);
+    JsonEvent event = new JsonEvent(jsonOutline.getId(), JsonTree.EVENT_NODES_SELECTED, eventData);
+    return event;
+  }
 }

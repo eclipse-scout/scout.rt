@@ -385,7 +385,7 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
     if (isInvisibleRootNode(node)) {
       return null;
     }
-    String id = getNodeId(node);
+    String id = m_treeNodeIds.get(node);
     if (id != null) {
       return id;
     }
@@ -396,15 +396,27 @@ public class JsonTree<T extends ITree> extends AbstractJsonPropertyObserver<T> i
   }
 
   protected String getNodeId(ITreeNode node) {
+    if (node == null) {
+      return null;
+    }
+    if (isInvisibleRootNode(node)) {
+      return null;
+    }
     return m_treeNodeIds.get(node);
   }
 
   protected ITreeNode getNode(String nodeId) {
+    if (nodeId == null) {
+      return null;
+    }
     return m_treeNodes.get(nodeId);
   }
 
   protected boolean isInvisibleRootNode(ITreeNode node) {
-    return !getModel().isRootNodeVisible() && getModel().getRootNode() == node;
+    if (!getModel().isRootNodeVisible()) {
+      return (node == getModel().getRootNode());
+    }
+    return false;
   }
 
   protected List<ITreeNode> getTopLevelNodes(boolean filteredOnly) {

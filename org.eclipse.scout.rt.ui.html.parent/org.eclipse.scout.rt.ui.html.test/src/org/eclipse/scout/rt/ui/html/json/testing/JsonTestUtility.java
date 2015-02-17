@@ -80,13 +80,15 @@ public final class JsonTestUtility {
   }
 
   /**
+   * @param eventType
+   *          Optional. If set only events with the given type will be returned.
    * @param adapterId
    *          Optional. If set only events for the given id will be returned.
    */
   public static List<JsonEvent> extractEventsFromResponse(JsonResponse response, String eventType, String adapterId) throws JSONException {
     List<JsonEvent> list = new ArrayList<>();
     for (JsonEvent event : response.getEventList()) {
-      if (event.getType().equals(eventType)
+      if ((eventType == null || event.getType().equals(eventType))
           && (adapterId == null || adapterId.equals(event.getTarget()))) {
         list.add(event);
       }
