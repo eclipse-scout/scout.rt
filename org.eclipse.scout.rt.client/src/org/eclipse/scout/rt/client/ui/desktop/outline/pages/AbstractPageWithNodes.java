@@ -321,6 +321,11 @@ public abstract class AbstractPageWithNodes extends AbstractPage<ITable> impleme
       return false;
     }
 
+    @Override
+    protected boolean getConfiguredTableStatusVisible() {
+      return true;
+    }
+
     @SuppressWarnings("unused")
     public LabelColumn getLabelColumn() {
       return getColumnSet().getColumnByClass(LabelColumn.class);
