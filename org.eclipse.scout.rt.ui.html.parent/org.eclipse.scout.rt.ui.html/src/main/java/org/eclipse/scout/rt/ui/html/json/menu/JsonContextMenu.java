@@ -78,16 +78,11 @@ public class JsonContextMenu<T extends IContextMenu> extends AbstractJsonPropert
   }
 
   public void handleModelContextMenuStructureChanged(ContextMenuEvent event) {
-    //Dispose the removed menus
-    m_menus.removeAll(getModel().getChildActions());
-    for (Object model : m_menus) {
-      IJsonAdapter<Object> jsonAdapter = getJsonSession().getJsonAdapter(model, this, false);
-      jsonAdapter.dispose();
-    }
+    disposeAdapters(m_menus, getModel().getChildActions());
     m_menus = getModel().getChildActions();
+    List<IJsonAdapter<?>> menuAdapters = attachAdapters(m_menus);
 
     IJsonAdapter<?> owner = getAdapter(event.getSource().getOwner());
-    List<IJsonAdapter<?>> menuAdapters = attachAdapters(m_menus);
     if (owner instanceof IContextMenuOwner) {
       ((IContextMenuOwner) owner).handleModelContextMenuChanged(menuAdapters);
     }
