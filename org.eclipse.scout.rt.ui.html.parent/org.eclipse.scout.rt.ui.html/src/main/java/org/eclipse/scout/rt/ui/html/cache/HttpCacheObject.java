@@ -16,6 +16,7 @@ import org.eclipse.scout.rt.shared.data.basic.BinaryResource;
  * Used in {@link IHttpCacheControl}
  */
 public class HttpCacheObject {
+
   private final String m_cacheId;
   private final boolean m_cachingAllowed;
   private final int m_cacheMaxAge;
@@ -45,7 +46,7 @@ public class HttpCacheObject {
   }
 
   /**
-   * @return an ETAG if {@link #getContentLength()} and {@link #getFingerprint()} are both not -1
+   * @return an ETAG if the resource's {@link #getContentLength()} and {@link #getFingerprint()} are both not -1
    */
   public String createETag() {
     if (m_resource.getFingerprint() != -1L && m_resource.getContentLength() != -1L) {

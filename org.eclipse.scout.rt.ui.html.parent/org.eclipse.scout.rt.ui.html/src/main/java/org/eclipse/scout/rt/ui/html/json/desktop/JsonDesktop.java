@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -59,7 +60,7 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
   public static final String PROP_FORM = "form";
   public static final String PROP_MESSAGE_BOX = "messageBox";
 
-  private HashMap<String, IDownloadHandler> m_downloadHandlers = new HashMap<String, IDownloadHandler>();
+  private Map<String, IDownloadHandler> m_downloadHandlers = new HashMap<String, IDownloadHandler>();
   private DesktopListener m_desktopListener;
 
   public JsonDesktop(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {

@@ -28,12 +28,12 @@ public interface IHttpCacheControl {
   String ETAG = "ETag"; //$NON-NLS-1$
 
   /**
-   * default value used for js and css in
+   * default value (in seconds) used for js and css in
    * {@link DefaultHttpCacheControl#getMaxAgeFor(HttpServletRequest, HttpServletResponse, HttpCacheInfo)}
    */
   int MAX_AGE_ONE_YEAR = 365 * 24 * 3600;
   /**
-   * default value used for html, jpg, gif etc. in
+   * default value (in seconds) used for html, jpg, gif etc. in
    * {@link DefaultHttpCacheControl#getMaxAgeFor(HttpServletRequest, HttpServletResponse, HttpCacheInfo)}
    */
   int MAX_AGE_4_HOURS = 4 * 3600;
@@ -65,5 +65,4 @@ public interface IHttpCacheControl {
    * Disable cache for this resource
    */
   void disableCacheHeaders(HttpServletRequest req, HttpServletResponse resp);
-
 }

@@ -172,6 +172,7 @@ scout.helpers = {
     return style;
   },
 
+  // TODO IMO Is this still needed???
   dynamicResourceUrl: function(adapter, url) {
     return url;
   }

@@ -56,7 +56,7 @@ public class JsonImageField<T extends IImageField> extends JsonFormField<T> impl
     if (raw instanceof byte[]) {
       Adler32 crc = new Adler32();
       crc.update((byte[]) raw);
-      return new BinaryResource("image-" + (crc.getValue()) + "-" + (((byte[]) raw).length) + ".jpg", null, (byte[]) raw, 1L);
+      return new BinaryResource("image-" + (crc.getValue()) + "-" + (((byte[]) raw).length) + ".jpg", (byte[]) raw);
     }
     return null;
   }

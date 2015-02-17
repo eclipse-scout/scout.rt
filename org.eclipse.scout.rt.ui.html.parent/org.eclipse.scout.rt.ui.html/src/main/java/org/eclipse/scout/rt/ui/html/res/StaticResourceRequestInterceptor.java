@@ -152,6 +152,7 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
     if (pathInfo.endsWith(".json")) {
       return loadJsonFile(servlet, req, pathInfo);
     }
+    // TODO BSH Use a better name than "tmp" (resources are more dynamic than temporary)
     if (pathInfo.matches("^/?tmp/.*")) {
       return loadDynamicAdapterResource(servlet, req, pathInfo);
     }
@@ -190,6 +191,7 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
     ScriptOutput out = builder.buildScript(pathInfo);
     if (out != null) {
       BinaryResource content = new BinaryResource(out.getPathInfo(), detectContentType(servlet, pathInfo), out.getContent(), out.getLastModified());
+      // TODO BSH Check with IMO: Why not pass MAX_AGE_ONE_YEAR instead of -1? Would make logic in DefaultHttpCacheControl.getMaxAgeFor() obsolete
       return new HttpCacheObject(pathInfo, true, -1, content);
     }
     return null;
@@ -207,6 +209,7 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
     byte[] bytes = StreamUtility.readResource(url);
     bytes = replaceHtmlScriptTags(servlet, req, bytes);
     BinaryResource content = new BinaryResource(pathInfo, detectContentType(servlet, pathInfo), bytes, System.currentTimeMillis());
+    // TODO BSH Check with IMO: Why not explicitly pass MAX_AGE_4_HOURS instead of -1? Would make logic in DefaultHttpCacheControl.getMaxAgeFor() obsolete
     return new HttpCacheObject(pathInfo, true, -1, content);
   }
 
@@ -223,6 +226,7 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
     String json = new String(StreamUtility.readResource(url), UTF_8);
     json = JsonUtility.stripCommentsFromJson(json);
     BinaryResource content = new BinaryResource(pathInfo, detectContentType(servlet, pathInfo), json.getBytes(UTF_8), System.currentTimeMillis());
+    // TODO BSH Check with IMO: Why not explicitly pass MAX_AGE_4_HOURS instead of -1? Would make logic in DefaultHttpCacheControl.getMaxAgeFor() obsolete
     return new HttpCacheObject(pathInfo, true, -1, content);
   }
 
@@ -257,6 +261,7 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
       contentType = detectContentType(servlet, pathInfo);
     }
     BinaryResource content = new BinaryResource(pathInfo, contentType, content0.getContent(), content0.getLastModified());
+    // TODO BSH Check with IMO: Why not explicitly pass MAX_AGE_4_HOURS instead of -1? Would make logic in DefaultHttpCacheControl.getMaxAgeFor() obsolete
     return new HttpCacheObject(pathInfo, content.getLastModified() > 0, -1, content);
   }
 
@@ -272,6 +277,7 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
     byte[] bytes = StreamUtility.readResource(url);
     URLConnection uc = url.openConnection();
     BinaryResource content = new BinaryResource(pathInfo, detectContentType(servlet, pathInfo), bytes, uc.getLastModified());
+    // TODO BSH Check with IMO: Why not explicitly pass MAX_AGE_4_HOURS instead of -1? Would make logic in DefaultHttpCacheControl.getMaxAgeFor() obsolete
     return new HttpCacheObject(pathInfo, true, -1, content);
   }
 

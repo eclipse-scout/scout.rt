@@ -132,5 +132,4 @@ public class DefaultHttpCacheControl implements IHttpCacheControl {
   protected boolean notModifiedSince(long ifModifiedSince, long lastModified) {
     return (ifModifiedSince > -1 && lastModified > 0 && lastModified <= (ifModifiedSince + IF_MODIFIED_SINCE_FIDELITY));
   }
-
 }
