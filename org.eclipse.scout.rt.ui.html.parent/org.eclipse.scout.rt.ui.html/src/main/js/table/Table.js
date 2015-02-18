@@ -88,7 +88,7 @@ scout.Table.prototype._render = function($parent) {
   if (this.checkable) {
     //TODO NBU if customised checkable colum is implemented use size of customised checkable colum
     //use size for a checkable column
-    this._totalWidth += scout.Table.CHECKABLE_COLUMN_SIZE;
+    this._totalWidth += scout.CheckBoxColumn.CHECKABLE_COLUMN_SIZE;
   }
   for (i = 0; i < this.columns.length; i++) {
     this._totalWidth += this.columns[i].width;
@@ -373,7 +373,6 @@ scout.Table.prototype._updateSortColumns = function(column, direction, multiSort
 scout.Table.prototype.drawData = function() {
   this.$rows().remove();
   this._drawData(0);
-  this.selectionHandler.dataDrawn();
 };
 
 scout.Table.prototype._buildRowDiv = function(row) {
@@ -465,6 +464,7 @@ scout.Table.prototype._installRows = function($rows) {
 
   // update info and scrollbar
   this._triggerRowsDrawn($rows);
+  this.selectionHandler.dataDrawn();
   this.updateScrollbar();
 
   // update grouping if data was grouped

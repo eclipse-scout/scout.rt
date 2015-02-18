@@ -12,8 +12,8 @@ scout.TableHeader = function(table, session) {
   this.columns = table.columns;
   if (table.checkable) {
     $defaultCheckedColumHeader = this.$container.appendDiv('header-item')
-      .css('min-width', scout.Table.CHECKABLE_COLUMN_SIZE + 'px') // 17 is width of header-resize handle, see table.css (.header-resize)
-    .css('max-width', scout.Table.CHECKABLE_COLUMN_SIZE + 'px')
+      .css('min-width', scout.CheckBoxColumn.CHECKABLE_COLUMN_SIZE + 'px')
+      .css('max-width', scout.CheckBoxColumn.CHECKABLE_COLUMN_SIZE + 'px')
       .on('click', '', onHeaderClick);
     this.$container.appendDiv('header-resize', '');
   }
@@ -22,8 +22,8 @@ scout.TableHeader = function(table, session) {
     column = columns[i];
     $header = this.$container.appendDiv('header-item')
       .data('column', column)
-      .css('min-width', column.width + 'px') // 17 is width of header-resize handle, see table.css (.header-resize)
-    .css('max-width', column.width + 'px')
+      .css('min-width', column.width + 'px')
+      .css('max-width', column.width + 'px')
       .on('click', '', onHeaderClick)
       .on('mousedown', '', dragHeader);
 
