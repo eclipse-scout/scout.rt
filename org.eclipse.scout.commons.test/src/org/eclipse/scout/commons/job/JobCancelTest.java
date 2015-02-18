@@ -48,7 +48,7 @@ import org.mockito.Mockito;
 
 public class JobCancelTest {
 
-  private JobManager m_jobManager;
+  private IJobManager m_jobManager;
   private static ScheduledExecutorService s_executor;
 
   @BeforeClass
@@ -73,21 +73,22 @@ public class JobCancelTest {
 
   @Test
   public void testRunNowCancelSoft() throws ProcessingException {
-    final List<Boolean> actualProtocol = new ArrayList<>();
-
+    final List<Boolean> actualProtocol = Collections.synchronizedList(new ArrayList<Boolean>()); // synchronized because modified/read by different threads.
     final BooleanHolder actualInterrupted = new BooleanHolder(false);
-    final Job<Void> job = new Job_<Void>("job") {
+    final Job<Void> job = new _Job<Void>("job") {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
-        actualProtocol.add(monitor.isCancelled());
+      protected Void call() throws Exception {
+        actualProtocol.add(IProgressMonitor.CURRENT.get().isCancelled());
         try {
           Thread.sleep(TimeUnit.SECONDS.toMillis(5));
         }
         catch (InterruptedException e) {
           actualInterrupted.setValue(true);
         }
-        actualProtocol.add(monitor.isCancelled());
+        actualProtocol.add(IProgressMonitor.CURRENT.get().isCancelled());
+
+        return null;
       }
     };
 
@@ -108,21 +109,23 @@ public class JobCancelTest {
 
   @Test
   public void testRunNowCancelForce() throws ProcessingException {
-    final List<Boolean> actualProtocol = new ArrayList<>();
+    final List<Boolean> actualProtocol = Collections.synchronizedList(new ArrayList<Boolean>()); // synchronized because modified/read by different threads.
 
     final BooleanHolder actualInterrupted = new BooleanHolder(false);
-    final Job<Void> job = new Job_<Void>("job") {
+    final IJob<Void> job = new _Job<Void>("job") {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
-        actualProtocol.add(monitor.isCancelled());
+      protected Void call() throws Exception {
+        actualProtocol.add(IProgressMonitor.CURRENT.get().isCancelled());
         try {
           Thread.sleep(TimeUnit.SECONDS.toMillis(20));
         }
         catch (InterruptedException e) {
           actualInterrupted.setValue(true);
         }
-        actualProtocol.add(monitor.isCancelled());
+        actualProtocol.add(IProgressMonitor.CURRENT.get().isCancelled());
+
+        return null;
       }
     };
 
@@ -143,21 +146,22 @@ public class JobCancelTest {
 
   @Test
   public void testScheduleCancelSoft() throws ProcessingException, InterruptedException {
-    final List<Boolean> actualProtocol = new ArrayList<>();
+    final List<Boolean> actualProtocol = Collections.synchronizedList(new ArrayList<Boolean>()); // synchronized because modified/read by different threads.
 
     final BooleanHolder actualInterrupted = new BooleanHolder(false);
-    final Job<String> job = new Job_<String>("job") {
+    final Job<String> job = new _Job<String>("job") {
 
       @Override
-      protected String onRun(IProgressMonitor monitor) throws Exception {
-        actualProtocol.add(monitor.isCancelled());
+      protected String call() throws Exception {
+        actualProtocol.add(IProgressMonitor.CURRENT.get().isCancelled());
         try {
           Thread.sleep(TimeUnit.SECONDS.toMillis(2));
         }
         catch (InterruptedException e) {
           actualInterrupted.setValue(true);
         }
-        actualProtocol.add(monitor.isCancelled());
+
+        actualProtocol.add(IProgressMonitor.CURRENT.get().isCancelled());
 
         return "result";
       }
@@ -194,21 +198,21 @@ public class JobCancelTest {
 
   @Test
   public void testScheduleCancelForce() throws ProcessingException, InterruptedException {
-    final List<Boolean> actualProtocol = new ArrayList<>();
+    final List<Boolean> actualProtocol = Collections.synchronizedList(new ArrayList<Boolean>()); // synchronized because modified/read by different threads.
 
     final BooleanHolder actualInterrupted = new BooleanHolder(false);
-    final Job<String> job = new Job_<String>("job") {
+    final Job<String> job = new _Job<String>("job") {
 
       @Override
-      protected String onRun(IProgressMonitor monitor) throws Exception {
-        actualProtocol.add(monitor.isCancelled());
+      protected String call() throws Exception {
+        actualProtocol.add(IProgressMonitor.CURRENT.get().isCancelled());
         try {
           Thread.sleep(TimeUnit.SECONDS.toMillis(20));
         }
         catch (InterruptedException e) {
           actualInterrupted.setValue(true);
         }
-        actualProtocol.add(monitor.isCancelled());
+        actualProtocol.add(IProgressMonitor.CURRENT.get().isCancelled());
 
         return "result";
       }
@@ -245,12 +249,12 @@ public class JobCancelTest {
 
   @Test
   public void testScheduleCancelBeforeRunning() throws JobExecutionException, InterruptedException {
-    final List<Boolean> actualProtocol = new ArrayList<>();
-    final Job<String> job = new Job_<String>("job") {
+    final List<Boolean> actualProtocol = Collections.synchronizedList(new ArrayList<Boolean>()); // synchronized because modified/read by different threads.
+    final Job<String> job = new _Job<String>("job") {
 
       @Override
-      protected String onRun(IProgressMonitor monitor) throws Exception {
-        actualProtocol.add(monitor.isCancelled());
+      protected String call() throws Exception {
+        actualProtocol.add(IProgressMonitor.CURRENT.get().isCancelled());
         return "result";
       }
     };
@@ -272,11 +276,11 @@ public class JobCancelTest {
 
   @Test
   public void testCancelPeriodicAction() throws ProcessingException {
-    final List<Future<?>> actualProtocol = new ArrayList<>();
-    final Job<String> job = new Job_<String>("job") {
+    final List<Future<?>> actualProtocol = Collections.synchronizedList(new ArrayList<Future<?>>()); // synchronized because modified/read by different threads.
+    final Job<String> job = new _Job<String>("job") {
 
       @Override
-      protected String onRun(IProgressMonitor monitor) throws Exception {
+      protected String call() throws Exception {
         actualProtocol.add(m_jobManager.getFuture(this));
 
         if (actualProtocol.size() == 3) {
@@ -305,30 +309,36 @@ public class JobCancelTest {
   @SuppressWarnings("unchecked")
   @Test
   public void testShutdownJobManagerAndSchedule() throws InterruptedException, ProcessingException {
-    final List<String> protocol = new ArrayList<>();
+    final List<String> actualProtocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
 
-    IJob<Void> job1 = new Job_<Void>("job-1") {
+    IJob<Void> job1 = new _Job<Void>("job-1") {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
-        protocol.add("running-1");
+      protected Void call() throws Exception {
+        actualProtocol.add("running-1");
         Thread.sleep(TimeUnit.MINUTES.toMillis(1));
+
+        return null;
       }
     };
-    IJob<Void> job2 = new Job_<Void>("job-2") {
+    IJob<Void> job2 = new _Job<Void>("job-2") {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
-        protocol.add("running-2");
+      protected Void call() throws Exception {
+        actualProtocol.add("running-2");
         Thread.sleep(TimeUnit.MINUTES.toMillis(1));
+
+        return null;
       }
     };
-    IJob<Void> job3 = new Job_<Void>("job-3") {
+    IJob<Void> job3 = new _Job<Void>("job-3") {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
-        protocol.add("running-3");
+      protected Void call() throws Exception {
+        actualProtocol.add("running-3");
         Thread.sleep(TimeUnit.MINUTES.toMillis(1));
+
+        return null;
       }
     };
 
@@ -373,7 +383,7 @@ public class JobCancelTest {
 
     Thread.sleep(TimeUnit.SECONDS.toMillis(1));
 
-    assertEquals(Arrays.asList("running-1", "running-2"), protocol);
+    assertEquals(Arrays.asList("running-1", "running-2"), actualProtocol);
     assertNull(m_jobManager.getFuture(job1));
     assertNull(m_jobManager.getFuture(job2));
     assertNull(m_jobManager.getFuture(job3));
@@ -416,11 +426,12 @@ public class JobCancelTest {
     final BooleanHolder executed = new BooleanHolder(false);
 
     m_jobManager.shutdown();
-    Job_<Void> job = new Job_<Void>("job") {
+    IJob<Void> job = new _Job<Void>("job") {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+      protected Void call() throws Exception {
         executed.setValue(true);
+        return null;
       }
     };
 
@@ -433,14 +444,14 @@ public class JobCancelTest {
   /**
    * Job with a dedicated {@link JobManager} per test-case.
    */
-  public class Job_<R> extends Job<R> {
+  public abstract class _Job<R> extends Job<R> {
 
-    public Job_(String name) {
+    public _Job(String name) {
       super(name);
     }
 
     @Override
-    protected JobManager createJobManager() {
+    protected IJobManager createJobManager() {
       return JobCancelTest.this.m_jobManager;
     }
   }

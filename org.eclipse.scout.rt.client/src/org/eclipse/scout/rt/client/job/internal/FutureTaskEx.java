@@ -14,6 +14,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 
+import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 
@@ -25,13 +26,14 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
  * @See {@link FutureTaskEx#run()}
  * @since 5.1
  */
-public final class FutureTaskEx<R> extends FutureTask<R> {
+@Internal
+public final class FutureTaskEx<RESULT> extends FutureTask<RESULT> {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(FutureTaskEx.class);
 
-  private final Task<R> m_callable;
+  private final Task<RESULT> m_callable;
 
-  public FutureTaskEx(final Task<R> callable) {
+  public FutureTaskEx(final Task<RESULT> callable) {
     super(callable);
     m_callable = callable;
   }

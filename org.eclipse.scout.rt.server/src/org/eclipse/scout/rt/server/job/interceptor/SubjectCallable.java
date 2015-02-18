@@ -24,13 +24,13 @@ import org.eclipse.scout.commons.job.interceptor.Chainable;
  * <p/>
  * This {@link Callable} is a processing object in the language of the design pattern 'chain-of-responsibility'.
  *
- * @param <R>
+ * @param <RESULT>
  *          the result type of the job's computation.
  * @since 5.1
  */
-public class PrivilegedActionRunner<R> implements Callable<R>, Chainable {
+public class SubjectCallable<RESULT> implements Callable<RESULT>, Chainable {
 
-  protected final Callable<R> m_next;
+  protected final Callable<RESULT> m_next;
   protected final Subject m_subject;
 
   /**
@@ -42,22 +42,22 @@ public class PrivilegedActionRunner<R> implements Callable<R>, Chainable {
    *          {@link Subject} on behalf of which to run the following processors; use <code>null</code> if not to be run
    *          in privileged mode.
    */
-  public PrivilegedActionRunner(final Callable<R> next, final Subject subject) {
+  public SubjectCallable(final Callable<RESULT> next, final Subject subject) {
     m_next = Assertions.assertNotNull(next);
     m_subject = subject;
   }
 
   @Override
-  public R call() throws Exception {
+  public RESULT call() throws Exception {
     if (m_subject == null) {
       return m_next.call();
     }
     else {
       try {
-        return Subject.doAs(m_subject, new PrivilegedExceptionAction<R>() {
+        return Subject.doAs(m_subject, new PrivilegedExceptionAction<RESULT>() {
 
           @Override
-          public R run() throws Exception {
+          public RESULT run() throws Exception {
             return m_next.call();
           }
         });

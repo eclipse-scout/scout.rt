@@ -28,7 +28,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
  * @see ExecutionException
  * @since 5.1
  */
-public interface IFuture<R> {
+public interface IFuture<RESULT> {
 
   /**
    * Attempts to cancel the execution of the associated job. This attempt will be ignored if the job has already
@@ -69,7 +69,7 @@ public interface IFuture<R> {
    *           see {@link JobExecutionException#isInterruption()};</li>
    *           </ul>
    */
-  R get() throws ProcessingException, JobExecutionException;
+  RESULT get() throws ProcessingException, JobExecutionException;
 
   /**
    * Blocks the calling thread until the job completed to return its execution result. This call returns immediately if
@@ -93,5 +93,5 @@ public interface IFuture<R> {
    *           see {@link JobExecutionException#isTimeout()};</li>
    *           </ul>
    */
-  R get(long timeout, TimeUnit unit) throws ProcessingException, JobExecutionException;
+  RESULT get(long timeout, TimeUnit unit) throws ProcessingException, JobExecutionException;
 }

@@ -27,7 +27,7 @@ import javax.servlet.http.HttpServlet;
  * This is a temporary solution until bug <a href="https://bugs.eclipse.org/bugs/show_bug.cgi?id=128068"
  * >https://bugs.eclipse.org/bugs/show_bug.cgi?id=128068</a> is closed.
  */
-public class HttpServletEx extends HttpServlet implements IServlet {
+public class HttpServletEx extends HttpServlet {
   private static final long serialVersionUID = 1L;
 
   @Override

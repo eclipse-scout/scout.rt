@@ -63,10 +63,34 @@ public class JobMapTest {
   public void before() {
     MockitoAnnotations.initMocks(this);
 
-    m_job1 = new Job<>("job-1");
-    m_job2 = new Job<>("job-2");
-    m_job3 = new Job<>("job-3");
-    m_job4 = new Job<>("job-4");
+    m_job1 = new Job<Void>("job-1") {
+
+      @Override
+      protected Void call() throws Exception {
+        return null;
+      }
+    };
+    m_job2 = new Job<Void>("job-2") {
+
+      @Override
+      protected Void call() throws Exception {
+        return null;
+      }
+    };
+    m_job3 = new Job<Void>("job-3") {
+
+      @Override
+      protected Void call() throws Exception {
+        return null;
+      }
+    };
+    m_job4 = new Job<Void>("job-4") {
+
+      @Override
+      protected Void call() throws Exception {
+        return null;
+      }
+    };
 
     when(m_putCallbackMock1.onAbsent()).thenAnswer(new Answer<Future<Void>>() {
 

@@ -41,6 +41,7 @@ import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionLoadSessionChain;
 import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionStoreSessionChain;
 import org.eclipse.scout.rt.client.extension.IClientSessionExtension;
+import org.eclipse.scout.rt.client.job.IModelJobManager;
 import org.eclipse.scout.rt.client.job.ModelJobManager;
 import org.eclipse.scout.rt.client.services.common.clientnotification.ClientNotificationConsumerEvent;
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerListener;
@@ -98,7 +99,7 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
   private long m_maxShutdownWaitTime = 4567;
   private final ObjectExtensions<AbstractClientSession, IClientSessionExtension<? extends AbstractClientSession>> m_objectExtensions;
 
-  private final ModelJobManager m_jobManager;
+  private final IModelJobManager m_jobManager;
 
   public AbstractClientSession(boolean autoInitConfig) {
     // Instantiate a dedicated ModelJobManager for this ClientSession so that model-jobs scheduled on behalf of this session are executed in serial execution order.
@@ -116,7 +117,7 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
   }
 
   @Override
-  public ModelJobManager getModelJobManager() {
+  public IModelJobManager getModelJobManager() {
     return m_jobManager;
   }
 

@@ -20,19 +20,19 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
 import org.eclipse.scout.commons.job.IJob;
+import org.eclipse.scout.commons.job.IJobManager;
 import org.eclipse.scout.commons.job.IProgressMonitor;
 import org.eclipse.scout.commons.job.JobContext;
-import org.eclipse.scout.commons.job.JobManager;
-import org.eclipse.scout.commons.job.interceptor.AsyncFutureNotifier;
+import org.eclipse.scout.commons.job.interceptor.AsyncFutureCallable;
 import org.eclipse.scout.commons.job.interceptor.Chainable;
 import org.eclipse.scout.commons.job.interceptor.ExceptionTranslator;
-import org.eclipse.scout.commons.job.interceptor.ThreadLocalInitializer;
+import org.eclipse.scout.commons.job.interceptor.InitThreadLocalCallable;
 import org.eclipse.scout.commons.job.interceptor.ThreadNameDecorator;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.server.commons.servletfilter.IServlet;
-import org.eclipse.scout.rt.server.job.interceptor.PrivilegedActionRunner;
-import org.eclipse.scout.rt.server.job.interceptor.TransactionDemarcator;
+import org.eclipse.scout.rt.server.commons.servletfilter.HttpServletRoundtrip;
+import org.eclipse.scout.rt.server.job.interceptor.SubjectCallable;
+import org.eclipse.scout.rt.server.job.interceptor.TwoPhaseTransactionBoundaryCallable;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ScoutTexts;
@@ -43,32 +43,32 @@ import org.mockito.ArgumentCaptor;
 public class ServerJobCallableChainTest {
 
   /**
-   * Tests the correct order of interceptors in {@link ServerJob}.
+   * Tests the correct order of interceptors in {@link ServerJobWithResult}.
    */
   @Test
   public void testCallableChain() throws Exception {
-    final JobManager jobManager = mock(JobManager.class);
+    final IJobManager jobManager = mock(IJobManager.class);
 
     // verify Callable-Chain
     ArgumentCaptor<Callable> callableCaptor = ArgumentCaptor.forClass(Callable.class);
     doReturn(mock(Future.class)).when(jobManager).schedule(any(IJob.class), callableCaptor.capture());
 
-    final Callable<Void> targetInvoker = mock(Callable.class);
-    ServerJob<Void> job = new ServerJob<Void>("job-1", mock(IServerSession.class)) {
+    final Callable<Void> callInvoker = mock(Callable.class);
+    ServerJob job = new ServerJob("job-1", mock(IServerSession.class)) {
 
       @Override
-      protected JobManager createJobManager() {
+      protected IJobManager createJobManager() {
         return jobManager;
       }
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+      protected void run() throws Exception {
         throw new RuntimeException();
       }
 
       @Override
-      protected Callable<Void> createTargetInvoker() {
-        return targetInvoker;
+      protected Callable<Void> createCallInvoker() {
+        return callInvoker;
       }
     };
 
@@ -77,55 +77,59 @@ public class ServerJobCallableChainTest {
 
     // verify Callable-Chain
 
-    // 1. ThreadNameDecorator
-    ThreadNameDecorator c1 = getFirstAndAssert(callableCaptor, ThreadNameDecorator.class);
+    // 1. InitThreadLocalCallable for IJob.CURRENT
+    InitThreadLocalCallable c1 = getFirstAndAssert(callableCaptor, InitThreadLocalCallable.class);
+    assertSame(IJob.CURRENT, ((InitThreadLocalCallable) c1).getThreadLocal());
 
-    // 2. ThreadLocalInitializer for IJob.CURRENT
-    ThreadLocalInitializer c2 = getNextAndAssert(c1, ThreadLocalInitializer.class);
-    assertSame(IJob.CURRENT, ((ThreadLocalInitializer) c2).getThreadLocal());
+    // 2. InitThreadLocalCallable for IProgressMonitor.CURRENT
+    InitThreadLocalCallable c2 = getNextAndAssert(c1, InitThreadLocalCallable.class);
+    assertSame(IProgressMonitor.CURRENT, ((InitThreadLocalCallable) c2).getThreadLocal());
 
-    // 3. ThreadLocalInitializer for JobContext.CURRENT
-    ThreadLocalInitializer c3 = getNextAndAssert(c2, ThreadLocalInitializer.class);
-    assertSame(JobContext.CURRENT, ((ThreadLocalInitializer) c3).getThreadLocal());
+    // 3. ThreadNameDecorator
+    ThreadNameDecorator c3 = getNextAndAssert(c2, ThreadNameDecorator.class);
 
-    // 4. ThreadLocalInitializer for ServiceTunnelServlet.CURRENT_REQUEST
-    ThreadLocalInitializer c4 = getNextAndAssert(c3, ThreadLocalInitializer.class);
-    assertSame(IServlet.CURRENT_HTTP_SERVLET_REQUEST, ((ThreadLocalInitializer) c4).getThreadLocal());
+    // 4. InitThreadLocalCallable for JobContext.CURRENT
+    InitThreadLocalCallable c4 = getNextAndAssert(c3, InitThreadLocalCallable.class);
+    assertSame(JobContext.CURRENT, ((InitThreadLocalCallable) c4).getThreadLocal());
 
-    // 5. ThreadLocalInitializer for ServiceTunnelServlet.CURRENT_RESPONSE
-    ThreadLocalInitializer c5 = getNextAndAssert(c4, ThreadLocalInitializer.class);
-    assertSame(IServlet.CURRENT_HTTP_SERVLET_RESPONSE, ((ThreadLocalInitializer) c5).getThreadLocal());
+    // 5. InitThreadLocalCallable for ServiceTunnelServlet.CURRENT_REQUEST
+    InitThreadLocalCallable c5 = getNextAndAssert(c4, InitThreadLocalCallable.class);
+    assertSame(HttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, ((InitThreadLocalCallable) c5).getThreadLocal());
 
-    // 6. ThreadLocalInitializer for ISession.CURRENT
-    ThreadLocalInitializer c6 = getNextAndAssert(c5, ThreadLocalInitializer.class);
-    assertSame(ISession.CURRENT, ((ThreadLocalInitializer) c6).getThreadLocal());
+    // 6. InitThreadLocalCallable for ServiceTunnelServlet.CURRENT_RESPONSE
+    InitThreadLocalCallable c6 = getNextAndAssert(c5, InitThreadLocalCallable.class);
+    assertSame(HttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, ((InitThreadLocalCallable) c6).getThreadLocal());
 
-    // 7. ThreadLocalInitializer for ScoutLocale.CURRENT
-    ThreadLocalInitializer c7 = getNextAndAssert(c6, ThreadLocalInitializer.class);
-    assertSame(NlsLocale.CURRENT, ((ThreadLocalInitializer) c7).getThreadLocal());
+    // 7. InitThreadLocalCallable for ISession.CURRENT
+    InitThreadLocalCallable c7 = getNextAndAssert(c6, InitThreadLocalCallable.class);
+    assertSame(ISession.CURRENT, ((InitThreadLocalCallable) c7).getThreadLocal());
 
-    // 8. ThreadLocalInitializer for ScoutTexts.CURRENT
-    ThreadLocalInitializer c8 = getNextAndAssert(c7, ThreadLocalInitializer.class);
-    assertSame(ScoutTexts.CURRENT, ((ThreadLocalInitializer) c8).getThreadLocal());
+    // 8. InitThreadLocalCallable for ScoutLocale.CURRENT
+    InitThreadLocalCallable c8 = getNextAndAssert(c7, InitThreadLocalCallable.class);
+    assertSame(NlsLocale.CURRENT, ((InitThreadLocalCallable) c8).getThreadLocal());
 
-    // 9. ThreadLocalInitializer for ITransaction.CURRENT
-    ThreadLocalInitializer c9 = getNextAndAssert(c8, ThreadLocalInitializer.class);
-    assertSame(ITransaction.CURRENT, ((ThreadLocalInitializer) c9).getThreadLocal());
+    // 9. InitThreadLocalCallable for ScoutTexts.CURRENT
+    InitThreadLocalCallable c9 = getNextAndAssert(c8, InitThreadLocalCallable.class);
+    assertSame(ScoutTexts.CURRENT, ((InitThreadLocalCallable) c9).getThreadLocal());
 
-    // 10. PrivilegedActionRunner
-    PrivilegedActionRunner c10 = getNextAndAssert(c9, PrivilegedActionRunner.class);
+    // 10. InitThreadLocalCallable for ITransaction.CURRENT
+    InitThreadLocalCallable c10 = getNextAndAssert(c9, InitThreadLocalCallable.class);
+    assertSame(ITransaction.CURRENT, ((InitThreadLocalCallable) c10).getThreadLocal());
 
-    // 11. TransactionDemarcator
-    TransactionDemarcator c11 = getNextAndAssert(c10, TransactionDemarcator.class);
+    // 11. SubjectCallable
+    SubjectCallable c11 = getNextAndAssert(c10, SubjectCallable.class);
 
-    // 12. AsyncFutureNotifier
-    AsyncFutureNotifier c12 = getNextAndAssert(c11, AsyncFutureNotifier.class);
+    // 12. TwoPhaseTransactionBoundaryCallable
+    TwoPhaseTransactionBoundaryCallable c12 = getNextAndAssert(c11, TwoPhaseTransactionBoundaryCallable.class);
 
-    // 13. ExceptionTranslator
-    ExceptionTranslator c13 = getNextAndAssert(c12, ExceptionTranslator.class);
+    // 13. AsyncFutureCallable
+    AsyncFutureCallable c13 = getNextAndAssert(c12, AsyncFutureCallable.class);
 
-    // 14. TargetInvoker
-    assertSame(targetInvoker, c13.getNext());
+    // 14. ExceptionTranslator
+    ExceptionTranslator c14 = getNextAndAssert(c13, ExceptionTranslator.class);
+
+    // 15. TargetInvoker
+    assertSame(callInvoker, c14.getNext());
   }
 
   /**
@@ -133,14 +137,14 @@ public class ServerJobCallableChainTest {
    */
   @Test
   public void testCallableChainWithContributionsAfter() throws Exception {
-    final JobManager jobManager = mock(JobManager.class);
+    final IJobManager jobManager = mock(IJobManager.class);
 
     // verify Callable-Chain
     ArgumentCaptor<Callable> callableCaptor = ArgumentCaptor.forClass(Callable.class);
     doReturn(mock(Future.class)).when(jobManager).schedule(any(IJob.class), callableCaptor.capture());
 
-    final Callable<Void> targetInvoker = mock(Callable.class);
-    ServerJob<Void> job = new ServerJob<Void>("job-1", mock(IServerSession.class)) {
+    final Callable<Void> callInvoker = mock(Callable.class);
+    ServerJob job = new ServerJob("job-1", mock(IServerSession.class)) {
 
       @Override
       protected Callable<Void> interceptCallable(Callable<Void> next) {
@@ -151,18 +155,18 @@ public class ServerJobCallableChainTest {
       }
 
       @Override
-      protected JobManager createJobManager() {
+      protected IJobManager createJobManager() {
         return jobManager;
       }
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+      protected void run() throws Exception {
         throw new RuntimeException();
       }
 
       @Override
-      protected Callable<Void> createTargetInvoker() {
-        return targetInvoker;
+      protected Callable<Void> createCallInvoker() {
+        return callInvoker;
       }
     };
 
@@ -171,61 +175,65 @@ public class ServerJobCallableChainTest {
 
     // verify Callable-Cahin
 
-    // 1. ThreadNameDecorator
-    ThreadNameDecorator c1 = getFirstAndAssert(callableCaptor, ThreadNameDecorator.class);
+    // 1. InitThreadLocalCallable for IJob.CURRENT
+    InitThreadLocalCallable c1 = getFirstAndAssert(callableCaptor, InitThreadLocalCallable.class);
+    assertSame(IJob.CURRENT, ((InitThreadLocalCallable) c1).getThreadLocal());
 
-    // 2. ThreadLocalInitializer for IJob.CURRENT
-    ThreadLocalInitializer c2 = getNextAndAssert(c1, ThreadLocalInitializer.class);
-    assertSame(IJob.CURRENT, ((ThreadLocalInitializer) c2).getThreadLocal());
+    // 2. InitThreadLocalCallable for IProgressMonitor.CURRENT
+    InitThreadLocalCallable c2 = getNextAndAssert(c1, InitThreadLocalCallable.class);
+    assertSame(IProgressMonitor.CURRENT, ((InitThreadLocalCallable) c2).getThreadLocal());
 
-    // 3. ThreadLocalInitializer for JobContext.CURRENT
-    ThreadLocalInitializer c3 = getNextAndAssert(c2, ThreadLocalInitializer.class);
-    assertSame(JobContext.CURRENT, ((ThreadLocalInitializer) c3).getThreadLocal());
+    // 3. ThreadNameDecorator
+    ThreadNameDecorator c3 = getNextAndAssert(c2, ThreadNameDecorator.class);
 
-    // 4. ThreadLocalInitializer for ServiceTunnelServlet.CURRENT_REQUEST
-    ThreadLocalInitializer c4 = getNextAndAssert(c3, ThreadLocalInitializer.class);
-    assertSame(IServlet.CURRENT_HTTP_SERVLET_REQUEST, ((ThreadLocalInitializer) c4).getThreadLocal());
+    // 4. InitThreadLocalCallable for JobContext.CURRENT
+    InitThreadLocalCallable c4 = getNextAndAssert(c3, InitThreadLocalCallable.class);
+    assertSame(JobContext.CURRENT, ((InitThreadLocalCallable) c4).getThreadLocal());
 
-    // 5. ThreadLocalInitializer for ServiceTunnelServlet.CURRENT_RESPONSE
-    ThreadLocalInitializer c5 = getNextAndAssert(c4, ThreadLocalInitializer.class);
-    assertSame(IServlet.CURRENT_HTTP_SERVLET_RESPONSE, ((ThreadLocalInitializer) c5).getThreadLocal());
+    // 5. InitThreadLocalCallable for ServiceTunnelServlet.CURRENT_REQUEST
+    InitThreadLocalCallable c5 = getNextAndAssert(c4, InitThreadLocalCallable.class);
+    assertSame(HttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, ((InitThreadLocalCallable) c5).getThreadLocal());
 
-    // 6. ThreadLocalInitializer for ISession.CURRENT
-    ThreadLocalInitializer c6 = getNextAndAssert(c5, ThreadLocalInitializer.class);
-    assertSame(ISession.CURRENT, ((ThreadLocalInitializer) c6).getThreadLocal());
+    // 6. InitThreadLocalCallable for ServiceTunnelServlet.CURRENT_RESPONSE
+    InitThreadLocalCallable c6 = getNextAndAssert(c5, InitThreadLocalCallable.class);
+    assertSame(HttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, ((InitThreadLocalCallable) c6).getThreadLocal());
 
-    // 7. ThreadLocalInitializer for ScoutLocale.CURRENT
-    ThreadLocalInitializer c7 = getNextAndAssert(c6, ThreadLocalInitializer.class);
-    assertSame(NlsLocale.CURRENT, ((ThreadLocalInitializer) c7).getThreadLocal());
+    // 7. InitThreadLocalCallable for ISession.CURRENT
+    InitThreadLocalCallable c7 = getNextAndAssert(c6, InitThreadLocalCallable.class);
+    assertSame(ISession.CURRENT, ((InitThreadLocalCallable) c7).getThreadLocal());
 
-    // 8. ThreadLocalInitializer for ScoutTexts.CURRENT
-    ThreadLocalInitializer c8 = getNextAndAssert(c7, ThreadLocalInitializer.class);
-    assertSame(ScoutTexts.CURRENT, ((ThreadLocalInitializer) c8).getThreadLocal());
+    // 8. InitThreadLocalCallable for ScoutLocale.CURRENT
+    InitThreadLocalCallable c8 = getNextAndAssert(c7, InitThreadLocalCallable.class);
+    assertSame(NlsLocale.CURRENT, ((InitThreadLocalCallable) c8).getThreadLocal());
 
-    // 9. ThreadLocalInitializer for ITransaction.CURRENT
-    ThreadLocalInitializer c9 = getNextAndAssert(c8, ThreadLocalInitializer.class);
-    assertSame(ITransaction.CURRENT, ((ThreadLocalInitializer) c9).getThreadLocal());
+    // 9. InitThreadLocalCallable for ScoutTexts.CURRENT
+    InitThreadLocalCallable c9 = getNextAndAssert(c8, InitThreadLocalCallable.class);
+    assertSame(ScoutTexts.CURRENT, ((InitThreadLocalCallable) c9).getThreadLocal());
 
-    // 10. PrivilegedActionRunner
-    PrivilegedActionRunner c10 = getNextAndAssert(c9, PrivilegedActionRunner.class);
+    // 10. InitThreadLocalCallable for ITransaction.CURRENT
+    InitThreadLocalCallable c10 = getNextAndAssert(c9, InitThreadLocalCallable.class);
+    assertSame(ITransaction.CURRENT, ((InitThreadLocalCallable) c10).getThreadLocal());
 
-    // 11. TransactionDemarcator
-    TransactionDemarcator c11 = getNextAndAssert(c10, TransactionDemarcator.class);
+    // 11. SubjectCallable
+    SubjectCallable c11 = getNextAndAssert(c10, SubjectCallable.class);
 
-    // 12. Contribution1
-    Contribution1 c12 = getNextAndAssert(c11, Contribution1.class);
+    // 12. TwoPhaseTransactionBoundaryCallable
+    TwoPhaseTransactionBoundaryCallable c12 = getNextAndAssert(c11, TwoPhaseTransactionBoundaryCallable.class);
 
-    // 13. Contribution2
-    Contribution2 c13 = getNextAndAssert(c12, Contribution2.class);
+    // 13. Contribution1
+    Contribution1 c13 = getNextAndAssert(c12, Contribution1.class);
 
-    // 14. AsyncFutureNotifier
-    AsyncFutureNotifier c14 = getNextAndAssert(c13, AsyncFutureNotifier.class);
+    // 14. Contribution2
+    Contribution2 c14 = getNextAndAssert(c13, Contribution2.class);
 
-    // 15. ExceptionTranslator
-    ExceptionTranslator c15 = getNextAndAssert(c14, ExceptionTranslator.class);
+    // 15. AsyncFutureCallable
+    AsyncFutureCallable c15 = getNextAndAssert(c14, AsyncFutureCallable.class);
 
-    // 16. TargetInvoker
-    assertSame(targetInvoker, c15.getNext());
+    // 16. ExceptionTranslator
+    ExceptionTranslator c16 = getNextAndAssert(c15, ExceptionTranslator.class);
+
+    // 17. TargetInvoker
+    assertSame(callInvoker, c16.getNext());
   }
 
   /**
@@ -233,14 +241,14 @@ public class ServerJobCallableChainTest {
    */
   @Test
   public void testCallableChainWithContributionsBefore() throws Exception {
-    final JobManager jobManager = mock(JobManager.class);
+    final IJobManager jobManager = mock(IJobManager.class);
 
     // verify Callable-Chain
     ArgumentCaptor<Callable> callableCaptor = ArgumentCaptor.forClass(Callable.class);
     doReturn(mock(Future.class)).when(jobManager).schedule(any(IJob.class), callableCaptor.capture());
 
-    final Callable<Void> targetInvoker = mock(Callable.class);
-    ServerJob<Void> job = new ServerJob<Void>("job-1", mock(IServerSession.class)) {
+    final Callable<Void> callInvoker = mock(Callable.class);
+    ServerJob job = new ServerJob("job-1", mock(IServerSession.class)) {
 
       @Override
       protected Callable<Void> interceptCallable(Callable<Void> next) {
@@ -251,18 +259,18 @@ public class ServerJobCallableChainTest {
       }
 
       @Override
-      protected JobManager createJobManager() {
+      protected IJobManager createJobManager() {
         return jobManager;
       }
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+      protected void run() throws Exception {
         throw new RuntimeException();
       }
 
       @Override
-      protected Callable<Void> createTargetInvoker() {
-        return targetInvoker;
+      protected Callable<Void> createCallInvoker() {
+        return callInvoker;
       }
     };
 
@@ -271,61 +279,65 @@ public class ServerJobCallableChainTest {
 
     // verify Callable-Cahin
 
-    // 1. Contribution1
-    Contribution1 c1 = getFirstAndAssert(callableCaptor, Contribution1.class);
+    // 1. InitThreadLocalCallable for IJob.CURRENT
+    InitThreadLocalCallable c1 = getFirstAndAssert(callableCaptor, InitThreadLocalCallable.class);
+    assertSame(IJob.CURRENT, ((InitThreadLocalCallable) c1).getThreadLocal());
 
-    // 2. Contribution2
-    Contribution2 c2 = getNextAndAssert(c1, Contribution2.class);
+    // 2. InitThreadLocalCallable for IProgressMonitor.CURRENT
+    InitThreadLocalCallable c2 = getNextAndAssert(c1, InitThreadLocalCallable.class);
+    assertSame(IProgressMonitor.CURRENT, ((InitThreadLocalCallable) c2).getThreadLocal());
 
-    // 3. ThreadNameDecorator
-    ThreadNameDecorator c3 = getNextAndAssert(c2, ThreadNameDecorator.class);
+    // 3. Contribution1
+    Contribution1 c3 = getNextAndAssert(c2, Contribution1.class);
 
-    // 4. ThreadLocalInitializer for IJob.CURRENT
-    ThreadLocalInitializer c4 = getNextAndAssert(c3, ThreadLocalInitializer.class);
-    assertSame(IJob.CURRENT, ((ThreadLocalInitializer) c4).getThreadLocal());
+    // 4. Contribution2
+    Contribution2 c4 = getNextAndAssert(c3, Contribution2.class);
 
-    // 5. ThreadLocalInitializer for JobContext.CURRENT
-    ThreadLocalInitializer c5 = getNextAndAssert(c4, ThreadLocalInitializer.class);
-    assertSame(JobContext.CURRENT, ((ThreadLocalInitializer) c5).getThreadLocal());
+    // 5. ThreadNameDecorator
+    ThreadNameDecorator c5 = getNextAndAssert(c4, ThreadNameDecorator.class);
 
-    // 6. ThreadLocalInitializer for ServiceTunnelServlet.CURRENT_REQUEST
-    ThreadLocalInitializer c6 = getNextAndAssert(c5, ThreadLocalInitializer.class);
-    assertSame(IServlet.CURRENT_HTTP_SERVLET_REQUEST, ((ThreadLocalInitializer) c6).getThreadLocal());
+    // 6. InitThreadLocalCallable for JobContext.CURRENT
+    InitThreadLocalCallable c6 = getNextAndAssert(c5, InitThreadLocalCallable.class);
+    assertSame(JobContext.CURRENT, ((InitThreadLocalCallable) c6).getThreadLocal());
 
-    // 7. ThreadLocalInitializer for ServiceTunnelServlet.CURRENT_RESPONSE
-    ThreadLocalInitializer c7 = getNextAndAssert(c6, ThreadLocalInitializer.class);
-    assertSame(IServlet.CURRENT_HTTP_SERVLET_RESPONSE, ((ThreadLocalInitializer) c7).getThreadLocal());
+    // 7. InitThreadLocalCallable for ServiceTunnelServlet.CURRENT_REQUEST
+    InitThreadLocalCallable c7 = getNextAndAssert(c6, InitThreadLocalCallable.class);
+    assertSame(HttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, ((InitThreadLocalCallable) c7).getThreadLocal());
 
-    // 8. ThreadLocalInitializer for ISession.CURRENT
-    ThreadLocalInitializer c8 = getNextAndAssert(c7, ThreadLocalInitializer.class);
-    assertSame(ISession.CURRENT, ((ThreadLocalInitializer) c8).getThreadLocal());
+    // 8. InitThreadLocalCallable for ServiceTunnelServlet.CURRENT_RESPONSE
+    InitThreadLocalCallable c8 = getNextAndAssert(c7, InitThreadLocalCallable.class);
+    assertSame(HttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, ((InitThreadLocalCallable) c8).getThreadLocal());
 
-    // 9. ThreadLocalInitializer for ScoutLocale.CURRENT
-    ThreadLocalInitializer c9 = getNextAndAssert(c8, ThreadLocalInitializer.class);
-    assertSame(NlsLocale.CURRENT, ((ThreadLocalInitializer) c9).getThreadLocal());
+    // 9. InitThreadLocalCallable for ISession.CURRENT
+    InitThreadLocalCallable c9 = getNextAndAssert(c8, InitThreadLocalCallable.class);
+    assertSame(ISession.CURRENT, ((InitThreadLocalCallable) c9).getThreadLocal());
 
-    // 10. ThreadLocalInitializer for ScoutTexts.CURRENT
-    ThreadLocalInitializer c10 = getNextAndAssert(c9, ThreadLocalInitializer.class);
-    assertSame(ScoutTexts.CURRENT, ((ThreadLocalInitializer) c10).getThreadLocal());
+    // 10. InitThreadLocalCallable for ScoutLocale.CURRENT
+    InitThreadLocalCallable c10 = getNextAndAssert(c9, InitThreadLocalCallable.class);
+    assertSame(NlsLocale.CURRENT, ((InitThreadLocalCallable) c10).getThreadLocal());
 
-    // 11. ThreadLocalInitializer for ITransaction.CURRENT
-    ThreadLocalInitializer c11 = getNextAndAssert(c10, ThreadLocalInitializer.class);
-    assertSame(ITransaction.CURRENT, ((ThreadLocalInitializer) c11).getThreadLocal());
+    // 11. InitThreadLocalCallable for ScoutTexts.CURRENT
+    InitThreadLocalCallable c11 = getNextAndAssert(c10, InitThreadLocalCallable.class);
+    assertSame(ScoutTexts.CURRENT, ((InitThreadLocalCallable) c11).getThreadLocal());
 
-    // 12. PrivilegedActionRunner
-    PrivilegedActionRunner c12 = getNextAndAssert(c11, PrivilegedActionRunner.class);
+    // 12. InitThreadLocalCallable for ITransaction.CURRENT
+    InitThreadLocalCallable c12 = getNextAndAssert(c11, InitThreadLocalCallable.class);
+    assertSame(ITransaction.CURRENT, ((InitThreadLocalCallable) c12).getThreadLocal());
 
-    // 13. TransactionDemarcator
-    TransactionDemarcator c13 = getNextAndAssert(c12, TransactionDemarcator.class);
+    // 13. SubjectCallable
+    SubjectCallable c13 = getNextAndAssert(c12, SubjectCallable.class);
 
-    // 14. AsyncFutureNotifier
-    AsyncFutureNotifier c14 = getNextAndAssert(c13, AsyncFutureNotifier.class);
+    // 14. TwoPhaseTransactionBoundaryCallable
+    TwoPhaseTransactionBoundaryCallable c14 = getNextAndAssert(c13, TwoPhaseTransactionBoundaryCallable.class);
 
-    // 15. ExceptionTranslator
-    ExceptionTranslator c15 = getNextAndAssert(c14, ExceptionTranslator.class);
+    // 15. AsyncFutureCallable
+    AsyncFutureCallable c15 = getNextAndAssert(c14, AsyncFutureCallable.class);
 
-    // 16. TargetInvoker
-    assertSame(targetInvoker, c15.getNext());
+    // 16. ExceptionTranslator
+    ExceptionTranslator c16 = getNextAndAssert(c15, ExceptionTranslator.class);
+
+    // 17. TargetInvoker
+    assertSame(callInvoker, c16.getNext());
   }
 
   private static <T> T getFirstAndAssert(ArgumentCaptor<Callable> captor, Class<T> expectedType) {

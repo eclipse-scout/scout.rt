@@ -15,7 +15,7 @@ import java.util.Map;
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.job.ModelJobManager;
+import org.eclipse.scout.rt.client.job.IModelJobManager;
 import org.eclipse.scout.rt.client.servicetunnel.http.IClientServiceTunnel;
 import org.eclipse.scout.rt.client.ui.IIconLocator;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -28,7 +28,7 @@ public interface IClientSession extends ISession {
    * @return dedicated job manager to schedule model jobs on behalf of this {@link IClientServiceTunnel} in serial
    *         execution order.
    */
-  ModelJobManager getModelJobManager();
+  IModelJobManager getModelJobManager();
 
   /**
    * Monitor can be used to wait for changes of the states 'active' and 'loaded'

@@ -17,13 +17,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.IAsyncFuture;
-import org.eclipse.scout.commons.job.IProgressMonitor;
 import org.eclipse.scout.commons.job.JobExecutionException;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.shared.ScoutTexts;
@@ -51,12 +51,12 @@ public class ModelJobAlreadyRunningTest {
   @SuppressWarnings("unchecked")
   @Test
   public void testAlreadyRunning() throws ProcessingException {
-    final List<String> protocol = new ArrayList<>();
+    final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
     // This job runs forever.
-    ModelJob<Void> job1 = new ModelJob<Void>("job-1", m_clientSession) {
+    ModelJob job1 = new ModelJob("job-1", m_clientSession) {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+      protected void run() throws Exception {
         protocol.add("running-1");
         Thread.sleep(TimeUnit.SECONDS.toMillis(30));
       }
@@ -88,7 +88,7 @@ public class ModelJobAlreadyRunningTest {
     }
 
     // Try to run job again (with AsyncFuture)
-    m_clientSession.getModelJobManager().m_mutexSemaphore.registerAsModelThread();
+    ((ModelJobManager) m_clientSession.getModelJobManager()).m_mutexSemaphore.registerAsModelThread();
     try {
       job1.runNow();
       fail();

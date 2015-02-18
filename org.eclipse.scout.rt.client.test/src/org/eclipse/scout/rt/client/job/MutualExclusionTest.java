@@ -23,6 +23,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -39,7 +40,6 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.BooleanHolder;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.job.IFuture;
-import org.eclipse.scout.commons.job.IProgressMonitor;
 import org.eclipse.scout.commons.job.JobExecutionException;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.job.internal.FutureTaskEx;
@@ -76,7 +76,7 @@ public class MutualExclusionTest {
     when(m_clientSession.getTexts()).thenReturn(new ScoutTexts());
     when(m_clientSession.getModelJobManager()).thenReturn(new ModelJobManager());
 
-    m_jobManager = m_clientSession.getModelJobManager();
+    m_jobManager = (ModelJobManager) m_clientSession.getModelJobManager();
   }
 
   @After
@@ -94,26 +94,26 @@ public class MutualExclusionTest {
    */
   @Test
   public void testModelJobs() throws ProcessingException, InterruptedException {
-    final Set<Integer> protocol = new HashSet<>();
+    final Set<Integer> protocol = Collections.synchronizedSet(new HashSet<Integer>()); // synchronized because modified/read by different threads.
 
-    new ModelJob<Void>("job-1", m_clientSession) {
+    new ModelJob("job-1", m_clientSession) {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+      protected void run() throws Exception {
         protocol.add(1);
       }
     }.schedule();
-    new ModelJob<Void>("job-2", m_clientSession) {
+    new ModelJob("job-2", m_clientSession) {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+      protected void run() throws Exception {
         protocol.add(2);
       }
     }.schedule();
-    new ModelJob<Void>("job-3", m_clientSession) {
+    new ModelJob("job-3", m_clientSession) {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+      protected void run() throws Exception {
         protocol.add(3);
       }
     }.schedule();
@@ -128,21 +128,21 @@ public class MutualExclusionTest {
    */
   @Test
   public void testNestedModelJobs() throws ProcessingException, InterruptedException {
-    final List<Integer> protocol = new ArrayList<>();
+    final List<Integer> protocol = Collections.synchronizedList(new ArrayList<Integer>()); // synchronized because modified/read by different threads.
 
     final CountDownLatch latch = new CountDownLatch(1);
 
-    new ModelJob<Void>("job-1", m_clientSession) {
+    new ModelJob("job-1", m_clientSession) {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor1) throws Exception {
+      protected void run() throws Exception {
         protocol.add(1);
 
         // RUN-NOW
-        new ModelJob<Void>("job-2", m_clientSession) {
+        new ModelJob("job-2", m_clientSession) {
 
           @Override
-          protected void onRunVoid(IProgressMonitor monitor2) throws Exception {
+          protected void run() throws Exception {
             protocol.add(2);
           }
         }.runNow();
@@ -150,17 +150,17 @@ public class MutualExclusionTest {
         protocol.add(3);
 
         // SCHEDULE
-        new ModelJob<Void>("job-3", m_clientSession) {
+        new ModelJob("job-3", m_clientSession) {
 
           @Override
-          protected void onRunVoid(IProgressMonitor monitor3) throws Exception {
+          protected void run() throws Exception {
             protocol.add(7);
 
             // SCHEDULE
-            ModelJob<Void> job4 = new ModelJob<Void>("job-4", m_clientSession) {
+            ModelJob job4 = new ModelJob("job-4", m_clientSession) {
 
               @Override
-              protected void onRunVoid(IProgressMonitor monitor4) throws Exception {
+              protected void run() throws Exception {
                 protocol.add(14);
               }
             };
@@ -177,10 +177,10 @@ public class MutualExclusionTest {
             protocol.add(9);
 
             // RUN-NOW
-            new ModelJob<Void>("job-2", m_clientSession) {
+            new ModelJob("job-2", m_clientSession) {
 
               @Override
-              protected void onRunVoid(IProgressMonitor monitor2) throws Exception {
+              protected void run() throws Exception {
                 protocol.add(10);
               }
             }.runNow();
@@ -192,16 +192,16 @@ public class MutualExclusionTest {
         protocol.add(4);
 
         // SCHEDULE
-        new ModelJob<Void>("job-5", m_clientSession) {
+        new ModelJob("job-5", m_clientSession) {
 
           @Override
-          protected void onRunVoid(IProgressMonitor monitor5) throws Exception {
+          protected void run() throws Exception {
             protocol.add(12);
 
-            new ModelJob<Void>("job-6", m_clientSession) {
+            new ModelJob("job-6", m_clientSession) {
 
               @Override
-              protected void onRunVoid(IProgressMonitor monitor6) throws Exception {
+              protected void run() throws Exception {
                 protocol.add(15);
                 latch.countDown();
               }
@@ -230,17 +230,17 @@ public class MutualExclusionTest {
   @Test
   public void testMutexDeadlock() throws ProcessingException, InterruptedException {
     final Holder<JobExecutionException> jeeHolder = new Holder<>();
-    final BooleanHolder onRunVoidJob2 = new BooleanHolder(false);
+    final BooleanHolder actualRunJob2 = new BooleanHolder(false);
 
-    new ModelJob<Void>("job-1", m_clientSession) {
+    new ModelJob("job-1", m_clientSession) {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
-        ModelJob<Void> job2 = new ModelJob<Void>("job-2", m_clientSession) {
+      protected void run() throws Exception {
+        ModelJob job2 = new ModelJob("job-2", m_clientSession) {
 
           @Override
-          protected void onRunVoid(IProgressMonitor monitor2) throws Exception {
-            onRunVoidJob2.setValue(true);
+          protected void run() throws Exception {
+            actualRunJob2.setValue(true);
           }
         };
 
@@ -255,7 +255,7 @@ public class MutualExclusionTest {
 
     }.schedule().get();
 
-    assertFalse(onRunVoidJob2.getValue());
+    assertFalse(actualRunJob2.getValue());
     JobExecutionException e = jeeHolder.getValue();
     assertNotNull(e);
     assertTrue(e.isTimeout());
@@ -266,14 +266,14 @@ public class MutualExclusionTest {
    */
   @Test
   public void testBlockingConditionSingle() throws ProcessingException, InterruptedException {
-    final List<String> protocol = new ArrayList<>();
+    final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
 
     final IBlockingCondition BC = m_clientSession.getModelJobManager().createBlockingCondition("bc");
 
-    ModelJob<Void> job1 = new ModelJob<Void>("job-1", m_clientSession) {
+    ModelJob job1 = new ModelJob("job-1", m_clientSession) {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+      protected void run() throws Exception {
         protocol.add("running");
 
         if (m_jobManager.isIdle()) {
@@ -354,13 +354,13 @@ public class MutualExclusionTest {
    */
   @Test
   public void testBlockingCondition_InterruptedWhileBeingBlocked1() throws JobExecutionException, InterruptedException {
-    final List<String> protocol = new ArrayList<>();
+    final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
     final IBlockingCondition BC = m_jobManager.createBlockingCondition("bc");
 
-    final ModelJob<Void> job = new ModelJob<Void>("job", m_clientSession) {
+    final ModelJob job = new ModelJob("job", m_clientSession) {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+      protected void run() throws Exception {
         protocol.add("running");
 
         try {
@@ -398,13 +398,13 @@ public class MutualExclusionTest {
    */
   @Test
   public void testBlockingCondition_InterruptedWhileBeingBlocked2() throws JobExecutionException, InterruptedException {
-    final List<String> protocol = new ArrayList<>();
+    final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
     final IBlockingCondition BC = m_jobManager.createBlockingCondition("bc");
 
-    final ModelJob<Void> job1 = new ModelJob<Void>("job-1", m_clientSession) {
+    final ModelJob job1 = new ModelJob("job-1", m_clientSession) {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+      protected void run() throws Exception {
         protocol.add("running-1");
 
         try {
@@ -422,18 +422,18 @@ public class MutualExclusionTest {
       }
     };
 
-    final ModelJob<Void> job2 = new ModelJob<Void>("job-2", m_clientSession) {
+    final ModelJob job2 = new ModelJob("job-2", m_clientSession) {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+      protected void run() throws Exception {
         protocol.add("running-2");
         Thread.sleep(TimeUnit.SECONDS.toMillis(30));
       }
     };
-    final ModelJob<Void> job3 = new ModelJob<Void>("job-3", m_clientSession) {
+    final ModelJob job3 = new ModelJob("job-3", m_clientSession) {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+      protected void run() throws Exception {
         protocol.add("running-3");
         Thread.sleep(TimeUnit.SECONDS.toMillis(30));
       }
@@ -475,15 +475,15 @@ public class MutualExclusionTest {
    */
   @Test
   public void testBlockingCondition_InterruptedWhileReAcquiringTheMutex() throws ProcessingException, InterruptedException {
-    final List<String> protocol = new ArrayList<>();
+    final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
     final IBlockingCondition BC = m_jobManager.createBlockingCondition("bc");
 
     final CountDownLatch latchJob2 = new CountDownLatch(1);
 
-    final ModelJob<Void> job1 = new ModelJob<Void>("job-1", m_clientSession) {
+    final ModelJob job1 = new ModelJob("job-1", m_clientSession) {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+      protected void run() throws Exception {
         protocol.add("running-1 (a)");
 
         try {
@@ -498,10 +498,10 @@ public class MutualExclusionTest {
       }
     };
 
-    final ModelJob<Void> job2 = new ModelJob<Void>("job-2", m_clientSession) {
+    final ModelJob job2 = new ModelJob("job-2", m_clientSession) {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+      protected void run() throws Exception {
         protocol.add("running-2");
         Thread.sleep(TimeUnit.SECONDS.toMillis(1));
         BC.signalAll();
@@ -510,10 +510,10 @@ public class MutualExclusionTest {
         latchJob2.await();
       }
     };
-    final ModelJob<Void> job3 = new ModelJob<Void>("job-3", m_clientSession) {
+    final ModelJob job3 = new ModelJob("job-3", m_clientSession) {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+      protected void run() throws Exception {
         protocol.add("running-3");
         Thread.sleep(TimeUnit.SECONDS.toMillis(30));
       }
@@ -608,7 +608,7 @@ public class MutualExclusionTest {
    */
   @Test
   public void testRejection() throws InterruptedException, JobExecutionException {
-    final List<String> protocol = new ArrayList<>();
+    final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
 
     final ThreadPoolExecutor executorMock = mock(ThreadPoolExecutor.class);
     final ModelJobManager jobManager = new ModelJobManager() {
@@ -659,24 +659,24 @@ public class MutualExclusionTest {
     }).when(executorMock).execute(any(Runnable.class));
     when(m_clientSession.getModelJobManager()).thenReturn(jobManager);
 
-    ModelJob<Void> job1 = new ModelJob<Void>("job-1", m_clientSession) {
+    ModelJob job1 = new ModelJob("job-1", m_clientSession) {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+      protected void run() throws Exception {
         protocol.add("running-job-1");
       }
     };
-    ModelJob<Void> job2 = new ModelJob<Void>("job-2", m_clientSession) {
+    ModelJob job2 = new ModelJob("job-2", m_clientSession) {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+      protected void run() throws Exception {
         protocol.add("running-job-2");
       }
     };
-    ModelJob<Void> job3 = new ModelJob<Void>("job-3", m_clientSession) {
+    ModelJob job3 = new ModelJob("job-3", m_clientSession) {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+      protected void run() throws Exception {
         protocol.add("running-job-3");
       }
     };
@@ -702,7 +702,7 @@ public class MutualExclusionTest {
    */
   @Test
   public void testBlockedJobRejection1() throws InterruptedException, ProcessingException {
-    final List<String> protocol = new ArrayList<>();
+    final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
 
     final ThreadPoolExecutor executorMock = mock(ThreadPoolExecutor.class);
     final ModelJobManager jobManager = new ModelJobManager() {
@@ -773,10 +773,10 @@ public class MutualExclusionTest {
 
     final IBlockingCondition BC = jobManager.createBlockingCondition("bc");
 
-    ModelJob<Void> job1 = new ModelJob<Void>("job-1", m_clientSession) {
+    ModelJob job1 = new ModelJob("job-1", m_clientSession) {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+      protected void run() throws Exception {
         try {
           protocol.add("running-job-1 (a)");
           BC.releaseMutexAndAwait();
@@ -796,10 +796,10 @@ public class MutualExclusionTest {
         }
       }
     };
-    ModelJob<Void> job2 = new ModelJob<Void>("job-2", m_clientSession) {
+    ModelJob job2 = new ModelJob("job-2", m_clientSession) {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+      protected void run() throws Exception {
         protocol.add("running-job-2 (a)");
         BC.signalAll();
         Thread.sleep(TimeUnit.SECONDS.toMillis(1)); // wait that jbo1 can acquire mutex after being unblocked.
@@ -807,19 +807,19 @@ public class MutualExclusionTest {
       }
     };
 
-    ModelJob<Void> job3 = new ModelJob<Void>("job-3", m_clientSession) {
+    ModelJob job3 = new ModelJob("job-3", m_clientSession) {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+      protected void run() throws Exception {
         protocol.add("running-job-3");
         Thread.sleep(TimeUnit.SECONDS.toMillis(30));
       }
     };
 
-    ModelJob<Void> job4 = new ModelJob<Void>("job-4", m_clientSession) {
+    ModelJob job4 = new ModelJob("job-4", m_clientSession) {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+      protected void run() throws Exception {
         protocol.add("running-job-4");
       }
     };
@@ -870,12 +870,12 @@ public class MutualExclusionTest {
   }
 
   private void runTestBlockingConditionMultipleFlat(final IBlockingCondition BC) throws ProcessingException, InterruptedException {
-    final List<String> protocol = new ArrayList<>();
+    final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
 
-    final ModelJob<Void> job1 = new ModelJob<Void>("job-1", m_clientSession) {
+    final ModelJob job1 = new ModelJob("job-1", m_clientSession) {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+      protected void run() throws Exception {
         protocol.add("job-1-beforeAwait");
         BC.releaseMutexAndAwait();
         protocol.add("job-X-afterAwait");
@@ -883,37 +883,37 @@ public class MutualExclusionTest {
       }
     };
     job1.schedule();
-    final ModelJob<Void> job2 = new ModelJob<Void>("job-2", m_clientSession) {
+    final ModelJob job2 = new ModelJob("job-2", m_clientSession) {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+      protected void run() throws Exception {
         protocol.add("job-2-beforeAwait");
         BC.releaseMutexAndAwait();
         protocol.add("job-X-afterAwait");
       }
     };
     job2.schedule();
-    final ModelJob<Void> job3 = new ModelJob<Void>("job-3", m_clientSession) {
+    final ModelJob job3 = new ModelJob("job-3", m_clientSession) {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+      protected void run() throws Exception {
         protocol.add("job-3-beforeAwait");
         BC.releaseMutexAndAwait();
         protocol.add("job-X-afterAwait");
       }
     };
     job3.schedule();
-    new ModelJob<Void>("job-4", m_clientSession) {
+    new ModelJob("job-4", m_clientSession) {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+      protected void run() throws Exception {
         protocol.add("job-4-running");
       }
     }.schedule();
-    new ModelJob<Void>("job-5", m_clientSession) {
+    new ModelJob("job-5", m_clientSession) {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+      protected void run() throws Exception {
         protocol.add("job-5-running");
         if (job1.isBlocked()) {
           protocol.add("job-1-blocked");
@@ -979,21 +979,21 @@ public class MutualExclusionTest {
   }
 
   private void runTestBlockingCondition2(final IBlockingCondition BC) throws InterruptedException, JobExecutionException {
-    final List<String> protocol = new ArrayList<>();
+    final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
 
-    new ModelJob<Void>("job-1", m_clientSession) {
+    new ModelJob("job-1", m_clientSession) {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor1) throws Exception {
-        final ModelJob<Void> job1 = this;
+      protected void run() throws Exception {
+        final ModelJob job1 = this;
 
         protocol.add("job-1-running");
 
-        new ModelJob<Void>("job-2", m_clientSession) {
+        new ModelJob("job-2", m_clientSession) {
 
           @Override
-          protected void onRunVoid(IProgressMonitor monitor2) throws Exception {
-            final ModelJob<Void> job2 = this;
+          protected void run() throws Exception {
+            final ModelJob job2 = this;
 
             protocol.add("job-2-running");
 
@@ -1001,10 +1001,10 @@ public class MutualExclusionTest {
               protocol.add("job-1-blocked");
             }
 
-            new ModelJob<Void>("job-3", m_clientSession) {
+            new ModelJob("job-3", m_clientSession) {
 
               @Override
-              protected void onRunVoid(IProgressMonitor monitor3) throws Exception {
+              protected void run() throws Exception {
                 protocol.add("job-3-running");
 
                 if (m_jobManager.isBlocked(job1)) {
@@ -1014,10 +1014,10 @@ public class MutualExclusionTest {
                   protocol.add("job-2-blocked");
                 }
 
-                new ModelJob<Void>("job-4", m_clientSession) {
+                new ModelJob("job-4", m_clientSession) {
 
                   @Override
-                  protected void onRunVoid(IProgressMonitor monitor4) throws Exception {
+                  protected void run() throws Exception {
                     protocol.add("job-4-running");
                   }
                 }.schedule();
@@ -1031,10 +1031,10 @@ public class MutualExclusionTest {
                 Thread.sleep(500); // just that the signaled jobs could run (should not be happen)
                 protocol.add("job-3-after-signaling");
 
-                new ModelJob<Void>("job-5", m_clientSession) {
+                new ModelJob("job-5", m_clientSession) {
 
                   @Override
-                  protected void onRunVoid(IProgressMonitor monitor4) throws Exception {
+                  protected void run() throws Exception {
                     protocol.add("job-5-running");
                   }
                 }.schedule();

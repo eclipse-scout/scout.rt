@@ -15,28 +15,30 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
 
 import org.eclipse.scout.commons.ToStringBuilder;
+import org.eclipse.scout.commons.annotations.Internal;
 
 /**
  * {@link Callable} to be scheduled once the model-mutex is acquired.
  *
  * @since 5.1
  */
-public abstract class Task<R> implements Callable<R> {
+@Internal
+public abstract class Task<RESULT> implements Callable<RESULT> {
 
   private final String m_jobName;
   private final Executor m_executor;
   private final MutexSemaphore<Task<?>> m_mutexSemaphore;
-  private final FutureTaskEx<R> m_futureTask;
+  private final FutureTaskEx<RESULT> m_futureTask;
 
   public Task(final String jobName, final Executor executor, final MutexSemaphore<Task<?>> mutexSemaphore) {
     m_jobName = jobName;
     m_executor = executor;
     m_mutexSemaphore = mutexSemaphore;
-    m_futureTask = new FutureTaskEx<R>(this);
+    m_futureTask = new FutureTaskEx<RESULT>(this);
   }
 
   @Override
-  public final R call() throws Exception {
+  public final RESULT call() throws Exception {
     return onCall();
   }
 
@@ -58,7 +60,7 @@ public abstract class Task<R> implements Callable<R> {
   /**
    * @return the {@link Future} representing this task.
    */
-  public final Future<R> getFuture() {
+  public final Future<RESULT> getFuture() {
     return m_futureTask;
   }
 
@@ -97,7 +99,7 @@ public abstract class Task<R> implements Callable<R> {
    * @throws Exception
    *           if unable to compute a result.
    */
-  protected abstract R onCall() throws Exception;
+  protected abstract RESULT onCall() throws Exception;
 
   @Override
   public String toString() {

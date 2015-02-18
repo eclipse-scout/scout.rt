@@ -23,27 +23,29 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.scout.commons.ToStringBuilder;
+import org.eclipse.scout.commons.annotations.Internal;
 
 /**
  * Provides a thread-safe implementation of a non-blocking 1-permit {@link Semaphore} backed with a fair {@link Queue}.
  *
- * @param <T>
+ * @param <ELEMENT>
  *          the type of elements competing for the mutex.
  * @since 5.1
  */
-public class MutexSemaphore<T> {
+@Internal
+public class MutexSemaphore<ELEMENT> {
 
   private static final boolean POSITION_TAIL = true;
   private static final boolean POSITION_HEAD = false;
 
   private final AtomicInteger m_permits = new AtomicInteger(0);
-  private final Deque<T> m_pendingQueue = new ArrayDeque<T>();
+  private final Deque<ELEMENT> m_pendingQueue = new ArrayDeque<ELEMENT>();
 
   final Lock m_idleLock = new ReentrantLock();
   final Condition m_idleCondition = m_idleLock.newCondition();
 
   private Thread m_modelThread; // The one thread currently representing the model-thread.
-  private T m_mutexOwner; // The element currently owning the mutex.
+  private ELEMENT m_mutexOwner; // The element currently owning the mutex.
 
   /**
    * Registers the current thread as model-thread.
@@ -64,7 +66,7 @@ public class MutexSemaphore<T> {
   /**
    * @return the element currently owning the mutex.
    */
-  public T getMutexOwner() {
+  public ELEMENT getMutexOwner() {
     return m_mutexOwner;
   }
 
@@ -77,7 +79,7 @@ public class MutexSemaphore<T> {
    * @return <code>true</code> if the mutex was acquired, <code>false</code> if being queued.
    * @see #pollElseRelease()
    */
-  public boolean tryAcquireElseOfferTail(final T element) {
+  public boolean tryAcquireElseOfferTail(final ELEMENT element) {
     return tryAcquireElseOffer(element, POSITION_TAIL);
   }
 
@@ -90,11 +92,11 @@ public class MutexSemaphore<T> {
    * @return <code>true</code> if the mutex was acquired, <code>false</code> if being queued.
    * @see #pollElseRelease()
    */
-  public boolean tryAcquireElseOfferHead(final T element) {
+  public boolean tryAcquireElseOfferHead(final ELEMENT element) {
     return tryAcquireElseOffer(element, POSITION_HEAD);
   }
 
-  protected boolean tryAcquireElseOffer(final T element, final boolean position) {
+  protected boolean tryAcquireElseOffer(final ELEMENT element, final boolean position) {
     synchronized (m_pendingQueue) {
       if (m_permits.getAndIncrement() == 0) {
         m_mutexOwner = element;
@@ -120,7 +122,7 @@ public class MutexSemaphore<T> {
    *         available and therefore the mutex was released.
    * @see #tryAcquireElseOffer(Object)
    */
-  public T pollElseRelease() {
+  public ELEMENT pollElseRelease() {
     synchronized (m_pendingQueue) {
       m_modelThread = null;
       m_mutexOwner = null;

@@ -19,10 +19,10 @@ import static org.mockito.Mockito.mock;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
-import org.eclipse.scout.commons.job.interceptor.AsyncFutureNotifier;
+import org.eclipse.scout.commons.job.interceptor.AsyncFutureCallable;
 import org.eclipse.scout.commons.job.interceptor.Chainable;
 import org.eclipse.scout.commons.job.interceptor.ExceptionTranslator;
-import org.eclipse.scout.commons.job.interceptor.ThreadLocalInitializer;
+import org.eclipse.scout.commons.job.interceptor.InitThreadLocalCallable;
 import org.eclipse.scout.commons.job.interceptor.ThreadNameDecorator;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -35,7 +35,7 @@ public class JobCallableChainTest {
    */
   @Test
   public void testCallableChain() throws Exception {
-    final JobManager jobManager = mock(JobManager.class);
+    final IJobManager jobManager = mock(IJobManager.class);
 
     // install captor to intercept Callable.
     ArgumentCaptor<Callable> callableCaptor = ArgumentCaptor.forClass(Callable.class);
@@ -45,17 +45,17 @@ public class JobCallableChainTest {
     Job<Void> job = new Job<Void>("job-1") {
 
       @Override
-      protected JobManager createJobManager() {
+      protected IJobManager createJobManager() {
         return jobManager;
       }
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+      protected Void call() throws Exception {
         throw new RuntimeException();
       }
 
       @Override
-      protected Callable<Void> createTargetInvoker() {
+      protected Callable<Void> createCallInvoker() {
         return targetInvoker;
       }
     };
@@ -65,25 +65,29 @@ public class JobCallableChainTest {
 
     // verify Callable-Cahin
 
-    // 1. ThreadNameDecorator
-    ThreadNameDecorator c1 = getFirstAndAssert(callableCaptor, ThreadNameDecorator.class);
+    // 1. InitThreadLocalCallable for IJob.CURRENT
+    InitThreadLocalCallable c1 = getFirstAndAssert(callableCaptor, InitThreadLocalCallable.class);
+    assertSame(IJob.CURRENT, ((InitThreadLocalCallable) c1).getThreadLocal());
 
-    // 2. ThreadLocalInitializer for IJob.CURRENT
-    ThreadLocalInitializer c2 = getNextAndAssert(c1, ThreadLocalInitializer.class);
-    assertSame(IJob.CURRENT, ((ThreadLocalInitializer) c2).getThreadLocal());
+    // 2. InitThreadLocalCallable for IProgressMonitor.CURRENT
+    InitThreadLocalCallable c2 = getNextAndAssert(c1, InitThreadLocalCallable.class);
+    assertSame(IProgressMonitor.CURRENT, ((InitThreadLocalCallable) c2).getThreadLocal());
 
-    // 3. ThreadLocalInitializer for JobContext.CURRENT
-    ThreadLocalInitializer c3 = getNextAndAssert(c2, ThreadLocalInitializer.class);
-    assertSame(JobContext.CURRENT, ((ThreadLocalInitializer) c3).getThreadLocal());
+    // 3. ThreadNameDecorator
+    ThreadNameDecorator c3 = getNextAndAssert(c2, ThreadNameDecorator.class);
 
-    // 4. AsyncFutureNotifier
-    AsyncFutureNotifier c4 = getNextAndAssert(c3, AsyncFutureNotifier.class);
+    // 4. InitThreadLocalCallable for JobContext.CURRENT
+    InitThreadLocalCallable c4 = getNextAndAssert(c3, InitThreadLocalCallable.class);
+    assertSame(JobContext.CURRENT, ((InitThreadLocalCallable) c4).getThreadLocal());
 
-    // 5. ExceptionTranslator
-    ExceptionTranslator c5 = getNextAndAssert(c4, ExceptionTranslator.class);
+    // 5. AsyncFutureCallable
+    AsyncFutureCallable c5 = getNextAndAssert(c4, AsyncFutureCallable.class);
 
-    // 6. TargetInvoker
-    assertSame(targetInvoker, c5.getNext());
+    // 6. ExceptionTranslator
+    ExceptionTranslator c6 = getNextAndAssert(c5, ExceptionTranslator.class);
+
+    // 7. TargetInvoker
+    assertSame(targetInvoker, c6.getNext());
   }
 
   /**
@@ -91,7 +95,7 @@ public class JobCallableChainTest {
    */
   @Test
   public void testCallableChainWithContributionsAfter() throws Exception {
-    final JobManager jobManager = mock(JobManager.class);
+    final IJobManager jobManager = mock(IJobManager.class);
 
     // install captor to intercept Callable.
     ArgumentCaptor<Callable> callableCaptor = ArgumentCaptor.forClass(Callable.class);
@@ -109,17 +113,17 @@ public class JobCallableChainTest {
       }
 
       @Override
-      protected JobManager createJobManager() {
+      protected IJobManager createJobManager() {
         return jobManager;
       }
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+      protected Void call() throws Exception {
         throw new RuntimeException();
       }
 
       @Override
-      protected Callable<Void> createTargetInvoker() {
+      protected Callable<Void> createCallInvoker() {
         return targetInvoker;
       }
     };
@@ -129,31 +133,35 @@ public class JobCallableChainTest {
 
     // verify Callable-Cahin
 
-    // 1. ThreadNameDecorator
-    ThreadNameDecorator c1 = getFirstAndAssert(callableCaptor, ThreadNameDecorator.class);
+    // 1. InitThreadLocalCallable for IJob.CURRENT
+    InitThreadLocalCallable c1 = getFirstAndAssert(callableCaptor, InitThreadLocalCallable.class);
+    assertSame(IJob.CURRENT, ((InitThreadLocalCallable) c1).getThreadLocal());
 
-    // 2. ThreadLocalInitializer for IJob.CURRENT
-    ThreadLocalInitializer c2 = getNextAndAssert(c1, ThreadLocalInitializer.class);
-    assertSame(IJob.CURRENT, ((ThreadLocalInitializer) c2).getThreadLocal());
+    // 2. InitThreadLocalCallable for IProgressMonitor.CURRENT
+    InitThreadLocalCallable c2 = getNextAndAssert(c1, InitThreadLocalCallable.class);
+    assertSame(IProgressMonitor.CURRENT, ((InitThreadLocalCallable) c2).getThreadLocal());
 
-    // 3. ThreadLocalInitializer for JobContext.CURRENT
-    ThreadLocalInitializer c3 = getNextAndAssert(c2, ThreadLocalInitializer.class);
-    assertSame(JobContext.CURRENT, ((ThreadLocalInitializer) c3).getThreadLocal());
+    // 3. ThreadNameDecorator
+    ThreadNameDecorator c3 = getNextAndAssert(c2, ThreadNameDecorator.class);
 
-    // 4. Contribution1
-    Contribution1 c4 = getNextAndAssert(c3, Contribution1.class);
+    // 4. InitThreadLocalCallable for JobContext.CURRENT
+    InitThreadLocalCallable c4 = getNextAndAssert(c3, InitThreadLocalCallable.class);
+    assertSame(JobContext.CURRENT, ((InitThreadLocalCallable) c4).getThreadLocal());
 
-    // 5. Contribution2
-    Contribution2 c5 = getNextAndAssert(c4, Contribution2.class);
+    // 5. Contribution1
+    Contribution1 c5 = getNextAndAssert(c4, Contribution1.class);
 
-    // 6. AsyncFutureNotifier
-    AsyncFutureNotifier c6 = getNextAndAssert(c5, AsyncFutureNotifier.class);
+    // 6. Contribution2
+    Contribution2 c6 = getNextAndAssert(c5, Contribution2.class);
 
-    // 7. ExceptionTranslator
-    ExceptionTranslator c7 = getNextAndAssert(c6, ExceptionTranslator.class);
+    // 7. AsyncFutureCallable
+    AsyncFutureCallable c7 = getNextAndAssert(c6, AsyncFutureCallable.class);
 
-    // 8. TargetInvoker
-    assertSame(targetInvoker, c7.getNext());
+    // 8. ExceptionTranslator
+    ExceptionTranslator c8 = getNextAndAssert(c7, ExceptionTranslator.class);
+
+    // 9. TargetInvoker
+    assertSame(targetInvoker, c8.getNext());
   }
 
   /**
@@ -161,7 +169,7 @@ public class JobCallableChainTest {
    */
   @Test
   public void testCallableChainWithContributionsBefore() throws Exception {
-    final JobManager jobManager = mock(JobManager.class);
+    final IJobManager jobManager = mock(IJobManager.class);
 
     // install captor to intercept Callable.
     ArgumentCaptor<Callable> callableCaptor = ArgumentCaptor.forClass(Callable.class);
@@ -179,17 +187,17 @@ public class JobCallableChainTest {
       }
 
       @Override
-      protected JobManager createJobManager() {
+      protected IJobManager createJobManager() {
         return jobManager;
       }
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+      protected Void call() throws Exception {
         throw new RuntimeException();
       }
 
       @Override
-      protected Callable<Void> createTargetInvoker() {
+      protected Callable<Void> createCallInvoker() {
         return targetInvoker;
       }
     };
@@ -199,31 +207,35 @@ public class JobCallableChainTest {
 
     // verify Callable-Cahin
 
-    // 1. Contribution1
-    Contribution1 c1 = getFirstAndAssert(callableCaptor, Contribution1.class);
+    // 1. InitThreadLocalCallable for IJob.CURRENT
+    InitThreadLocalCallable c1 = getFirstAndAssert(callableCaptor, InitThreadLocalCallable.class);
+    assertSame(IJob.CURRENT, ((InitThreadLocalCallable) c1).getThreadLocal());
 
-    // 2. Contribution2
-    Contribution2 c2 = getNextAndAssert(c1, Contribution2.class);
+    // 2. InitThreadLocalCallable for IProgressMonitor.CURRENT
+    InitThreadLocalCallable c2 = getNextAndAssert(c1, InitThreadLocalCallable.class);
+    assertSame(IProgressMonitor.CURRENT, ((InitThreadLocalCallable) c2).getThreadLocal());
 
-    // 3. ThreadNameDecorator
-    ThreadNameDecorator c3 = getNextAndAssert(c2, ThreadNameDecorator.class);
+    // 3. Contribution1
+    Contribution1 c3 = getNextAndAssert(c2, Contribution1.class);
 
-    // 4. ThreadLocalInitializer for IJob.CURRENT
-    ThreadLocalInitializer c4 = getNextAndAssert(c3, ThreadLocalInitializer.class);
-    assertSame(IJob.CURRENT, ((ThreadLocalInitializer) c4).getThreadLocal());
+    // 4. Contribution2
+    Contribution2 c4 = getNextAndAssert(c3, Contribution2.class);
 
-    // 5. ThreadLocalInitializer for JobContext.CURRENT
-    ThreadLocalInitializer c5 = getNextAndAssert(c4, ThreadLocalInitializer.class);
-    assertSame(JobContext.CURRENT, ((ThreadLocalInitializer) c5).getThreadLocal());
+    // 5. ThreadNameDecorator
+    ThreadNameDecorator c5 = getNextAndAssert(c4, ThreadNameDecorator.class);
 
-    // 6. AsyncFutureNotifier
-    AsyncFutureNotifier c6 = getNextAndAssert(c5, AsyncFutureNotifier.class);
+    // 6. InitThreadLocalCallable for JobContext.CURRENT
+    InitThreadLocalCallable c6 = getNextAndAssert(c5, InitThreadLocalCallable.class);
+    assertSame(JobContext.CURRENT, ((InitThreadLocalCallable) c6).getThreadLocal());
 
-    // 7. ExceptionTranslator
-    ExceptionTranslator c7 = getNextAndAssert(c6, ExceptionTranslator.class);
+    // 7. AsyncFutureCallable
+    AsyncFutureCallable c7 = getNextAndAssert(c6, AsyncFutureCallable.class);
 
-    // 8. TargetInvoker
-    assertSame(targetInvoker, c7.getNext());
+    // 8. ExceptionTranslator
+    ExceptionTranslator c8 = getNextAndAssert(c7, ExceptionTranslator.class);
+
+    // 9. TargetInvoker
+    assertSame(targetInvoker, c8.getNext());
   }
 
   private static <T> T getFirstAndAssert(ArgumentCaptor<Callable> captor, Class<T> expectedType) {

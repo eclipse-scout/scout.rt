@@ -8,22 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.commons.job;
+package org.eclipse.scout.commons.annotations;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Monitor to track the progress of an activity.
+ * Indicates that an element type is not part of the public API and therefore not to be used by clients other than Scout
+ * itself. There is no guarantee of binary compatibility in future releases.
  *
  * @since 5.1
  */
-public interface IProgressMonitor {
-
-  /**
-   * The {@link IProgressMonitor} which is currently associated with the current thread.
-   */
-  ThreadLocal<IProgressMonitor> CURRENT = new ThreadLocal<>();
-
-  /**
-   * @return <code>true</code> if this job was cancelled and the job should terminate its work.
-   */
-  boolean isCancelled();
+@Target({ElementType.TYPE, ElementType.FIELD, ElementType.METHOD})
+@Retention(RetentionPolicy.SOURCE)
+public @interface Internal {
 }

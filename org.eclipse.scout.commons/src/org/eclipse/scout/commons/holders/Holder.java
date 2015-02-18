@@ -20,7 +20,7 @@ import org.eclipse.scout.commons.TypeCastUtility;
 
 public class Holder<T> implements IHolder<T>, Serializable {
   private static final long serialVersionUID = 1L;
-  private T m_value;
+  private volatile T m_value; // volatile because modified/read by different threads.
   private final Class<T> m_clazz;
 
   public Holder() {

@@ -13,6 +13,7 @@ package org.eclipse.scout.commons.job.interceptor;
 import java.util.concurrent.Callable;
 
 import org.eclipse.scout.commons.Assertions;
+import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.IAsyncFuture;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -23,16 +24,18 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
  * <p/>
  * This {@link Callable} is a processing object in the language of the design pattern 'chain-of-responsibility'.
  *
- * @param <R>
+ * @param <RESULT>
  *          the result type of the job's computation.
  * @since 5.1
  */
-public class AsyncFutureNotifier<R> implements Callable<R>, Chainable {
+public class AsyncFutureCallable<RESULT> implements Callable<RESULT>, Chainable {
 
-  protected static final IScoutLogger LOG = ScoutLogManager.getLogger(AsyncFutureNotifier.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(AsyncFutureCallable.class);
 
-  protected final Callable<R> m_next;
-  protected final IAsyncFuture<R> m_asyncFuture;
+  @Internal
+  protected final Callable<RESULT> m_next;
+  @Internal
+  protected final IAsyncFuture<RESULT> m_asyncFuture;
 
   /**
    * Creates a processor to notify the given {@link IAsyncFuture} about the computation result upon completion.
@@ -42,18 +45,18 @@ public class AsyncFutureNotifier<R> implements Callable<R>, Chainable {
    * @param asyncFuture
    *          {@link IAsyncFuture} to be notified or <code>null</code> if not used.
    */
-  public AsyncFutureNotifier(final Callable<R> next, final IAsyncFuture<R> asyncFuture) {
+  public AsyncFutureCallable(final Callable<RESULT> next, final IAsyncFuture<RESULT> asyncFuture) {
     m_next = Assertions.assertNotNull(next);
     m_asyncFuture = asyncFuture;
   }
 
   @Override
-  public R call() throws Exception {
+  public RESULT call() throws Exception {
     if (m_asyncFuture == null) {
       return m_next.call();
     }
     else {
-      R result = null;
+      RESULT result = null;
       ProcessingException error = null;
       try {
         result = m_next.call();
@@ -74,7 +77,8 @@ public class AsyncFutureNotifier<R> implements Callable<R>, Chainable {
   /**
    * Is called to notify the {@link IAsyncFuture} about successful execution; must never throw an exception.
    */
-  protected void handleSuccessSafe(final R result) {
+  @Internal
+  protected void handleSuccessSafe(final RESULT result) {
     try {
       m_asyncFuture.onSuccess(result);
     }
@@ -86,6 +90,7 @@ public class AsyncFutureNotifier<R> implements Callable<R>, Chainable {
   /**
    * Is called to notify the {@link IAsyncFuture} about failed execution; must never throw an exception.
    */
+  @Internal
   protected void handleErrorSafe(final ProcessingException e) {
     try {
       m_asyncFuture.onError(e);
@@ -98,7 +103,8 @@ public class AsyncFutureNotifier<R> implements Callable<R>, Chainable {
   /**
    * Is called to notify the {@link IAsyncFuture} in case of success or error; must never throw an exception.
    */
-  protected void handleDoneSafe(final R result, final ProcessingException e) {
+  @Internal
+  protected void handleDoneSafe(final RESULT result, final ProcessingException e) {
     try {
       m_asyncFuture.onDone(result, e);
     }
@@ -108,7 +114,7 @@ public class AsyncFutureNotifier<R> implements Callable<R>, Chainable {
   }
 
   @Override
-  public Callable<R> getNext() {
+  public Callable<RESULT> getNext() {
     return m_next;
   }
 }

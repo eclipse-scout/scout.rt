@@ -16,6 +16,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import org.eclipse.scout.commons.Assertions;
+import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.IFuture;
 import org.eclipse.scout.commons.job.JobExecutionException;
@@ -27,12 +28,13 @@ import org.eclipse.scout.commons.job.interceptor.ExceptionTranslator;
  * @see java.util.concurrent.Future
  * @since 5.1
  */
-public class Future<R> implements IFuture<R> {
+@Internal
+public class Future<RESULT> implements IFuture<RESULT> {
 
-  private final java.util.concurrent.Future<R> m_delegate;
+  private final java.util.concurrent.Future<RESULT> m_delegate;
   private final String m_jobName;
 
-  public Future(final java.util.concurrent.Future<R> delegate, final String jobName) {
+  public Future(final java.util.concurrent.Future<RESULT> delegate, final String jobName) {
     m_delegate = Assertions.assertNotNull(delegate);
     m_jobName = Assertions.assertNotNull(jobName);
   }
@@ -53,7 +55,7 @@ public class Future<R> implements IFuture<R> {
   }
 
   @Override
-  public R get() throws ProcessingException, JobExecutionException {
+  public RESULT get() throws ProcessingException, JobExecutionException {
     try {
       return m_delegate.get();
     }
@@ -72,7 +74,7 @@ public class Future<R> implements IFuture<R> {
   }
 
   @Override
-  public R get(final long timeout, final TimeUnit unit) throws ProcessingException, JobExecutionException {
+  public RESULT get(final long timeout, final TimeUnit unit) throws ProcessingException, JobExecutionException {
     try {
       return m_delegate.get(timeout, unit);
     }

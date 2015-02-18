@@ -15,8 +15,6 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -30,7 +28,7 @@ import org.junit.Test;
 
 public class JobAlreadyRunningTest {
 
-  private JobManager m_jobManager;
+  private IJobManager m_jobManager;
   private static ExecutorService s_executor;
 
   @BeforeClass
@@ -56,14 +54,13 @@ public class JobAlreadyRunningTest {
   @SuppressWarnings("unchecked")
   @Test
   public void testAlreadyRunning() throws ProcessingException {
-    final List<String> protocol = new ArrayList<>();
     // This job runs forever.
-    Job<Void> job1 = new Job_<Void>("job-1") {
+    Job<Void> job1 = new _Job<Void>("job-1") {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
-        protocol.add("running-1");
+      protected Void call() throws Exception {
         Thread.sleep(TimeUnit.SECONDS.toMillis(30));
+        return null;
       }
     };
     job1.schedule();
@@ -156,14 +153,14 @@ public class JobAlreadyRunningTest {
   /**
    * Job with a dedicated {@link JobManager} per test-case.
    */
-  public class Job_<R> extends Job<R> {
+  public abstract class _Job<R> extends Job<R> {
 
-    public Job_(String name) {
+    public _Job(String name) {
       super(name);
     }
 
     @Override
-    protected JobManager createJobManager() {
+    protected IJobManager createJobManager() {
       return JobAlreadyRunningTest.this.m_jobManager;
     }
   }

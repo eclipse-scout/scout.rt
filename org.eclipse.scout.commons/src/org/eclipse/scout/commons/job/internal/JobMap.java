@@ -23,6 +23,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 import org.eclipse.scout.commons.Assertions;
+import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.job.IJob;
 import org.eclipse.scout.commons.job.IJobVisitor;
 import org.eclipse.scout.commons.job.JobExecutionException;
@@ -34,6 +35,7 @@ import org.eclipse.scout.commons.job.JobExecutionException;
  *
  * @since 5.1
  */
+@Internal
 public class JobMap {
 
   private final Map<IJob<?>, Future<?>> m_jobMap = new HashMap<>();
@@ -56,14 +58,14 @@ public class JobMap {
    *           if the given job is already contained in the map or depending on the installed
    *           {@link RejectedExecutionHandler} cannot be scheduled for execution.
    */
-  public <R, F extends Future<R>> F putIfAbsentElseReject(final IJob<R> job, final IPutCallback<R, F> callback) throws JobExecutionException {
+  public <RESULT, FUTURE extends Future<RESULT>> FUTURE putIfAbsentElseReject(final IJob<RESULT> job, final IPutCallback<RESULT, FUTURE> callback) throws JobExecutionException {
     writeLock.lock();
     try {
       if (m_jobMap.containsKey(job)) {
         throw JobExecutionException.newRejectedJobExecutionException("Job rejected because already running [job=%s]", job.getName());
       }
 
-      final F future;
+      final FUTURE future;
       try {
         future = Assertions.assertNotNull(callback.onAbsent());
       }
@@ -250,7 +252,7 @@ public class JobMap {
   /**
    * Callback which is invoked if a job is not contained in the map yet.
    */
-  public interface IPutCallback<R, F extends Future<R>> {
+  public interface IPutCallback<RESULT, F extends Future<RESULT>> {
     /**
      * Method is invoked if the job is not contained in the map yet.
      *

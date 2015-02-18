@@ -19,12 +19,12 @@ import org.eclipse.scout.commons.exception.ProcessingException;
  * number of concurrent running jobs, support for mutual exclusion within the jobs and so on.<br/>
  * Jobs are reusable meaning that once a job has completed, it can be scheduled to run again.
  *
- * @param <R>
+ * @param <RESULT>
  *          the result type of the job's computation; use {@link Void} if this job does not return a result.
  * @see JobManager
  * @since 5.1
  */
-public interface IJob<R> {
+public interface IJob<RESULT> {
 
   /**
    * The {@link IJob} which is currently associated with the current thread.
@@ -44,8 +44,8 @@ public interface IJob<R> {
    *
    * @param interruptIfRunning
    *          <code>true</code> to interrupt the executing thread if the {@link IJob} is already running.
-   * @return <code>false</code> if the {@link IJob} could not be cancelled,
-   *         typically because it has already completed normally.
+   * @return <code>false</code> if the {@link IJob} could not be cancelled, typically because it has already completed
+   *         normally.
    */
   boolean cancel(boolean interruptIfRunning);
 
@@ -53,15 +53,13 @@ public interface IJob<R> {
    * Runs this job synchronously on behalf of the current thread. This call blocks the calling thread as long as this
    * job is running.
    *
-   * @param job
-   *          the {@link IJob} to be run.
    * @return the computed result.
    * @throws ProcessingException
    *           if the job throws an exception during execution.
    * @throws JobExecutionException
    *           if the job is already running.
    */
-  R runNow() throws ProcessingException, JobExecutionException;
+  RESULT runNow() throws ProcessingException, JobExecutionException;
 
   /**
    * Runs this job asynchronously on behalf of a worker thread at the next reasonable opportunity. The caller of this
@@ -77,7 +75,7 @@ public interface IJob<R> {
    *           are available, or upon shutdown of the job manager.
    * @see #schedule(IAsyncFuture)
    */
-  IFuture<R> schedule() throws JobExecutionException;
+  IFuture<RESULT> schedule() throws JobExecutionException;
 
   /**
    * Runs this job asynchronously on behalf of a worker thread at the next reasonable opportunity. The caller of this
@@ -87,12 +85,12 @@ public interface IJob<R> {
    * {@link IFuture} returned allows to cancel the execution of this job or to also wait for the job to complete.
    *
    * @param asyncFuture
-   *          {@link IAsyncFuture} to be notified about the job's completion or failure; is notified from from within
-   *          the worker-thread that executed the job; is not called if the job never started running.
+   *          {@link IAsyncFuture} to be notified about the job's completion or failure; is notified from within the
+   *          worker-thread that executed the job; is not called if the job never started running.
    * @throws JobExecutionException
    *           if the job is already running or was rejected by the job manager because no more threads or queue slots
    *           are available, or upon shutdown of the job manager.
    * @see #schedule()
    */
-  IFuture<R> schedule(IAsyncFuture<R> asyncFuture) throws JobExecutionException;
+  IFuture<RESULT> schedule(IAsyncFuture<RESULT> asyncFuture) throws JobExecutionException;
 }

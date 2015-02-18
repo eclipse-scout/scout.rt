@@ -15,6 +15,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.job.IJob;
 
 /**
@@ -22,7 +23,8 @@ import org.eclipse.scout.commons.job.IJob;
  *
  * @since 5.1
  */
-public class RunNowFuture<R> implements Future<R> {
+@Internal
+public class RunNowFuture<RESULT> implements Future<RESULT> {
 
   private final Thread m_workerThread;
   private boolean m_cancelled;
@@ -55,12 +57,12 @@ public class RunNowFuture<R> implements Future<R> {
   }
 
   @Override
-  public R get() throws InterruptedException, ExecutionException {
+  public RESULT get() throws InterruptedException, ExecutionException {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public R get(final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+  public RESULT get(final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
     throw new UnsupportedOperationException();
   }
 }

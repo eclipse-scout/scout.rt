@@ -34,7 +34,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
-public class AsyncFutureNotifierTest {
+public class AsyncFutureCallableTest {
 
   private IAsyncFuture<String> m_asyncFuture;
   private Callable<String> m_next;
@@ -64,7 +64,7 @@ public class AsyncFutureNotifierTest {
   public void testSuccess1() throws Exception {
     when(m_next.call()).thenReturn("ABC");
 
-    AsyncFutureNotifier<String> notifier = new AsyncFutureNotifier<>(m_next, m_asyncFuture);
+    AsyncFutureCallable<String> notifier = new AsyncFutureCallable<>(m_next, m_asyncFuture);
 
     assertEquals("ABC", notifier.call());
     verify(m_asyncFuture, times(1)).onSuccess(eq("ABC"));
@@ -76,7 +76,7 @@ public class AsyncFutureNotifierTest {
   public void testSuccess2() throws Exception {
     when(m_next.call()).thenReturn("ABC");
 
-    AsyncFutureNotifier<String> notifier = new AsyncFutureNotifier<>(m_next, null);
+    AsyncFutureCallable<String> notifier = new AsyncFutureCallable<>(m_next, null);
 
     assertEquals("ABC", notifier.call());
   }
@@ -86,7 +86,7 @@ public class AsyncFutureNotifierTest {
     RuntimeException exception = new RuntimeException();
     when(m_next.call()).thenThrow(exception);
 
-    AsyncFutureNotifier<String> notifier = new AsyncFutureNotifier<>(m_next, m_asyncFuture);
+    AsyncFutureCallable<String> notifier = new AsyncFutureCallable<>(m_next, m_asyncFuture);
 
     try {
       notifier.call();
@@ -112,7 +112,7 @@ public class AsyncFutureNotifierTest {
     RuntimeException exception = new RuntimeException();
     when(m_next.call()).thenThrow(exception);
 
-    AsyncFutureNotifier<String> notifier = new AsyncFutureNotifier<>(m_next, null);
+    AsyncFutureCallable<String> notifier = new AsyncFutureCallable<>(m_next, null);
 
     try {
       notifier.call();
@@ -128,7 +128,7 @@ public class AsyncFutureNotifierTest {
     ProcessingException exception = new ProcessingException("error");
     when(m_next.call()).thenThrow(exception);
 
-    AsyncFutureNotifier<String> notifier = new AsyncFutureNotifier<>(m_next, null);
+    AsyncFutureCallable<String> notifier = new AsyncFutureCallable<>(m_next, null);
 
     try {
       notifier.call();
@@ -144,7 +144,7 @@ public class AsyncFutureNotifierTest {
     ProcessingException exception = new ProcessingException("error");
     when(m_next.call()).thenThrow(exception);
 
-    AsyncFutureNotifier<String> notifier = new AsyncFutureNotifier<>(m_next, m_asyncFuture);
+    AsyncFutureCallable<String> notifier = new AsyncFutureCallable<>(m_next, m_asyncFuture);
 
     try {
       notifier.call();

@@ -25,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.ConfigIniUtility;
+import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.interceptor.ExceptionTranslator;
 import org.eclipse.scout.commons.job.internal.JobMap;
@@ -34,23 +35,24 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 
 /**
- * Job manager to run jobs in parallel on so called worker threads. By default, there is a single {@link JobManager}
- * installed on the JVM. This job manager is based on an unbounded {@link ScheduledThreadPoolExecutor} with a
- * <code>core-pool-size</code> set to reuse worker-threads among different jobs.
+ * Default implementation of {@link IJobManager}.
  *
- * @see Job
  * @since 5.1
  */
-public class JobManager {
+public class JobManager implements IJobManager {
 
   public static final JobManager INSTANCE = new JobManager(); // TODO [dwi]: Job API v5: Obtain JobManager by OBJ.GET
 
-  protected static final IScoutLogger LOG = ScoutLogManager.getLogger(JobManager.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(JobManager.class);
 
+  @Internal
   protected static final String PROP_CORE_POOL_SIZE = "org.eclipse.scout.job.corePoolSize";
+  @Internal
   protected static final int DEFAULT_CORE_POOL_SIZE = 5; // The number of threads to keep in the pool, even if they are idle.
 
+  @Internal
   protected final ScheduledExecutorService m_executor;
+  @Internal
   protected final JobMap m_jobMap;
 
   public JobManager() {
@@ -58,30 +60,16 @@ public class JobManager {
     m_executor = Assertions.assertNotNull(createExecutor());
   }
 
-  /**
-   * Runs the given job synchronously on behalf of the current thread. This call blocks the calling thread as long as
-   * this job is running.
-   * <p/>
-   * Do not use this method directly. Use {@link Job#runNow()} instead.
-   *
-   * @param job
-   *          the {@link IJob} to be run.
-   * @param callable
-   *          the {@link Callable} to be executed.
-   * @throws ProcessingException
-   *           if the job throws an exception during execution.
-   * @throws JobExecutionException
-   *           if the job is already running.
-   */
-  public <R> R runNow(final IJob<R> job, final Callable<R> callable) throws ProcessingException, JobExecutionException {
+  @Override
+  public final <RESULT> RESULT runNow(final IJob<RESULT> job, final Callable<RESULT> callable) throws ProcessingException, JobExecutionException {
     Assertions.assertNotNull(callable);
 
     // Create a 'RunNow'-Future if not running yet.
-    final RunNowFuture<R> future = m_jobMap.putIfAbsentElseReject(job, new IPutCallback<R, RunNowFuture<R>>() {
+    final RunNowFuture<RESULT> future = m_jobMap.putIfAbsentElseReject(job, new IPutCallback<RESULT, RunNowFuture<RESULT>>() {
 
       @Override
-      public RunNowFuture<R> onAbsent() {
-        return new RunNowFuture<R>(Thread.currentThread());
+      public RunNowFuture<RESULT> onAbsent() {
+        return new RunNowFuture<RESULT>(Thread.currentThread());
       }
     });
 
@@ -97,155 +85,76 @@ public class JobManager {
     }
   }
 
-  /**
-   * Runs the given job asynchronously on behalf of a worker thread at the next reasonable opportunity. The caller of
-   * this method continues to run in parallel.
-   * <p/>
-   * Do not use this method directly. Use {@link Job#schedule()} instead.
-   *
-   * @param job
-   *          the {@link IJob} to be scheduled.
-   * @param callable
-   *          the {@link Callable} to be executed.
-   * @return {@link Future} to wait for the job's completion or to cancel the job execution.
-   * @throws JobExecutionException
-   *           if the job is already running or was rejected by the job manager because no more threads or queue slots
-   *           are available, or upon shutdown of the job manager.
-   * @see ExecutorService#submit(Callable)
-   */
-  public <R> Future<R> schedule(final IJob<R> job, final Callable<R> callable) throws JobExecutionException {
+  @Override
+  public final <RESULT> Future<RESULT> schedule(final IJob<RESULT> job, final Callable<RESULT> callable) throws JobExecutionException {
     Assertions.assertNotNull(job);
     Assertions.assertNotNull(callable);
 
     // Schedule the job if not running yet.
-    return m_jobMap.putIfAbsentElseReject(job, new IPutCallback<R, Future<R>>() {
+    return m_jobMap.putIfAbsentElseReject(job, new IPutCallback<RESULT, Future<RESULT>>() {
 
       @Override
-      public Future<R> onAbsent() {
+      public Future<RESULT> onAbsent() {
         return m_executor.submit(interceptCallable(callable));
       }
     });
   }
 
-  /**
-   * Runs the given job asynchronously on behalf of a worker thread after the specified delay has elapsed. The caller of
-   * this method continues to run in parallel.
-   * <p/>
-   * Do not use this method directly. Use {@link Job#schedule(long, TimeUnit)} instead.
-   *
-   * @param job
-   *          the {@link IJob} to be scheduled.
-   * @param callable
-   *          the {@link Callable} to be executed.
-   * @param delay
-   *          the delay after which this job is to be run.
-   * @param delayUnit
-   *          the time unit of the <code>delay</code> argument.
-   * @return {@link ScheduledFuture} to wait for the job's completion or to cancel the job execution.
-   * @throws JobExecutionException
-   *           if the job is already running or was rejected by the job manager because no more threads or queue slots
-   *           are available, or upon shutdown of the job manager.
-   * @see ScheduledExecutorService#schedule(Callable, long, TimeUnit)
-   */
-  public <R> ScheduledFuture<R> schedule(final IJob<R> job, final Callable<R> callable, final long delay, final TimeUnit delayUnit) throws JobExecutionException {
+  @Override
+  public final <RESULT> ScheduledFuture<RESULT> schedule(final IJob<RESULT> job, final Callable<RESULT> callable, final long delay, final TimeUnit delayUnit) throws JobExecutionException {
     Assertions.assertNotNull(job);
     Assertions.assertNotNull(callable);
 
     // Schedule the job if not running yet.
-    return m_jobMap.putIfAbsentElseReject(job, new IPutCallback<R, ScheduledFuture<R>>() {
+    return m_jobMap.putIfAbsentElseReject(job, new IPutCallback<RESULT, ScheduledFuture<RESULT>>() {
 
       @Override
-      public ScheduledFuture<R> onAbsent() {
+      public ScheduledFuture<RESULT> onAbsent() {
         return m_executor.schedule(interceptCallable(callable), delay, delayUnit);
       }
     });
   }
 
-  /**
-   * Periodically runs the given job on behalf of a worker thread at a fixed rate. The caller of this method continues
-   * to run in parallel.
-   * <p/>
-   * Do not use this method directly. Use {@link Job#schedule(long, TimeUnit)} instead.
-   *
-   * @param job
-   *          the {@link IJob} to be scheduled.
-   * @param callable
-   *          the {@link Callable} to be periodically executed.
-   * @param initialDelay
-   *          the time to delay first run.
-   * @param period
-   *          the period between successive runs.
-   * @param unit
-   *          the time unit of the <code>initialDelay</code> and <code>period</code> arguments.
-   * @return {@link ScheduledFuture} to cancel this periodic action.
-   * @throws JobExecutionException
-   *           if the job is already running or was rejected by the job manager because no more threads or queue slots
-   *           are available, or upon shutdown of the job manager.
-   * @see ScheduledExecutorService#scheduleAtFixedRate(Runnable, long, long, TimeUnit)
-   */
-  public <R> ScheduledFuture<R> scheduleAtFixedRate(final IJob<R> job, final Callable<R> callable, final long initialDelay, final long period, final TimeUnit unit) throws JobExecutionException {
+  @Override
+  public final <RESULT> ScheduledFuture<RESULT> scheduleAtFixedRate(final IJob<RESULT> job, final Callable<RESULT> callable, final long initialDelay, final long period, final TimeUnit unit) throws JobExecutionException {
     Assertions.assertNotNull(job);
     Assertions.assertNotNull(callable);
 
     // Schedule the job if not running yet.
-    return m_jobMap.putIfAbsentElseReject(job, new IPutCallback<R, ScheduledFuture<R>>() {
+    return m_jobMap.putIfAbsentElseReject(job, new IPutCallback<RESULT, ScheduledFuture<RESULT>>() {
 
       @Override
-      public ScheduledFuture<R> onAbsent() {
+      public ScheduledFuture<RESULT> onAbsent() {
         final Runnable runnable = adaptRunnable(interceptCallable(callable));
 
         @SuppressWarnings("unchecked")
-        final ScheduledFuture<R> future = (ScheduledFuture<R>) m_executor.scheduleAtFixedRate(runnable, initialDelay, period, unit);
+        final ScheduledFuture<RESULT> future = (ScheduledFuture<RESULT>) m_executor.scheduleAtFixedRate(runnable, initialDelay, period, unit);
         return future;
       }
     });
   }
 
-  /**
-   * Periodically runs the given job on behalf of a worker thread with a fixed delay. The caller of this method
-   * continues to run in parallel.
-   * <p/>
-   * Do not use this method directly. Use {@link Job#schedule(long, TimeUnit)} instead.
-   *
-   * @param job
-   *          the {@link IJob} to be scheduled.
-   * @param callable
-   *          the {@link Callable} to be periodically executed.
-   * @param initialDelay
-   *          the time to delay first run.
-   * @param delay
-   *          the fixed delay between successive runs.
-   * @param unit
-   *          the time unit of the <code>initialDelay</code> and <code>period</code> arguments.
-   * @return {@link ScheduledFuture} to cancel this periodic action.
-   * @throws JobExecutionException
-   *           if the job is already running or was rejected by the job manager because no more threads or queue slots
-   *           are available, or upon shutdown of the job manager.
-   * @see ScheduledExecutorService#scheduleWithFixedDelay(Runnable, long, long, TimeUnit)
-   */
-  public <R> ScheduledFuture<R> scheduleWithFixedDelay(final IJob<R> job, final Callable<R> callable, final long initialDelay, final long delay, final TimeUnit unit) throws JobExecutionException {
+  @Override
+  public final <RESULT> ScheduledFuture<RESULT> scheduleWithFixedDelay(final IJob<RESULT> job, final Callable<RESULT> callable, final long initialDelay, final long delay, final TimeUnit unit) throws JobExecutionException {
     Assertions.assertNotNull(job);
     Assertions.assertNotNull(callable);
 
     // Schedule the job if not running yet.
-    return m_jobMap.putIfAbsentElseReject(job, new IPutCallback<R, ScheduledFuture<R>>() {
+    return m_jobMap.putIfAbsentElseReject(job, new IPutCallback<RESULT, ScheduledFuture<RESULT>>() {
 
       @Override
-      public ScheduledFuture<R> onAbsent() {
+      public ScheduledFuture<RESULT> onAbsent() {
         final Runnable runnable = adaptRunnable(interceptCallable(callable));
 
         @SuppressWarnings("unchecked")
-        final ScheduledFuture<R> future = (ScheduledFuture<R>) m_executor.scheduleWithFixedDelay(runnable, initialDelay, delay, unit);
+        final ScheduledFuture<RESULT> future = (ScheduledFuture<RESULT>) m_executor.scheduleWithFixedDelay(runnable, initialDelay, delay, unit);
         return future;
       }
     });
   }
 
-  /**
-   * Interrupts all running jobs and prevents scheduled jobs from running. After having shutdown, this
-   * {@link JobManager} cannot be used anymore.
-   */
-  public void shutdown() {
+  @Override
+  public final void shutdown() {
     m_executor.shutdownNow();
 
     final Set<Future<?>> futures = m_jobMap.clear();
@@ -254,44 +163,35 @@ public class JobManager {
     }
   }
 
-  /**
-   * Attempts to cancel execution of the given job.
-   *
-   * @param job
-   *          the job to be canceled.
-   * @param interruptIfRunning
-   *          <code>true</code> if the thread executing this job should be interrupted; otherwise, in-progress jobs
-   *          are allowed to complete.
-   * @return <code>false</code> if the job could not be cancelled, typically because it has already completed normally;
-   *         <code>true</code> otherwise.
-   * @see Future#cancel(boolean)
-   */
-  public boolean cancel(final IJob<?> job, final boolean interruptIfRunning) {
+  @Override
+  public final boolean cancel(final IJob<?> job, final boolean interruptIfRunning) {
     return m_jobMap.cancel(job, interruptIfRunning);
   }
 
-  /**
-   * @return <code>true</code> if the given job was cancelled before it completed normally.
-   */
-  public boolean isCanceled(final IJob<?> job) {
+  @Override
+  public final boolean isCanceled(final IJob<?> job) {
     return m_jobMap.isCancelled(job);
   }
 
-  /**
-   * @return {@link Future} associated with the given job; is <code>null</code> if not scheduled or already completed.
-   */
-  public Future<?> getFuture(final IJob<?> job) {
+  @Override
+  public final Future<?> getFuture(final IJob<?> job) {
     return m_jobMap.getFuture(job);
   }
 
-  /**
-   * To visit all running jobs.
-   *
-   * @param visitor
-   *          {@link IJobVisitor} called for each {@link IJob}.
-   */
-  public void visit(final IJobVisitor visitor) {
+  @Override
+  public final void visit(final IJobVisitor visitor) {
     m_jobMap.visit(visitor);
+  }
+
+  @Override
+  public <RESULT> IProgressMonitor createProgressMonitor(final IJob<RESULT> job) {
+    return new IProgressMonitor() {
+
+      @Override
+      public boolean isCancelled() {
+        return isCanceled(job);
+      }
+    };
   }
 
   /**
@@ -302,7 +202,7 @@ public class JobManager {
    *          {@link Callable} to decorate.
    * @return decorated {@link Callable} to be passed to an {@link ExecutorService}; must not be <code>null</code>.
    */
-  protected <R> Callable<R> interceptCallable(final Callable<R> callable) {
+  protected <RESULT> Callable<RESULT> interceptCallable(final Callable<RESULT> callable) {
     return callable;
   }
 
@@ -310,7 +210,7 @@ public class JobManager {
    * Is invoked for periodic actions to adapt the {@link Callable} into a {@link Runnable} to be passed to the
    * {@link ScheduledExecutorService}.
    */
-  protected <R> Runnable adaptRunnable(final Callable<R> callable) {
+  protected <RESULT> Runnable adaptRunnable(final Callable<RESULT> callable) {
     return new Runnable() {
 
       @Override
@@ -326,21 +226,9 @@ public class JobManager {
   }
 
   /**
-   * Creates a {@link IProgressMonitor} for the given {@link IJob}.
-   */
-  public <R> IProgressMonitor createProgressMonitor(final IJob<R> job) {
-    return new IProgressMonitor() {
-
-      @Override
-      public boolean isCancelled() {
-        return isCanceled(job);
-      }
-    };
-  }
-
-  /**
    * Creates the {@link ScheduledExecutorService} to run jobs in parallel.
    */
+  @Internal
   protected ScheduledExecutorService createExecutor() {
     final int corePoolSize = ConfigIniUtility.getPropertyInt(PROP_CORE_POOL_SIZE, DEFAULT_CORE_POOL_SIZE);
 
@@ -373,6 +261,7 @@ public class JobManager {
    * @param future
    *          rejected {@link Future}.
    */
+  @Internal
   protected void handleJobRejected(final Future<?> future) {
     future.cancel(true); // to indicate the submitter that the job was not executed.
 
@@ -390,6 +279,7 @@ public class JobManager {
    * @param future
    *          associated {@link Future}.
    */
+  @Internal
   protected void handleJobCompleted(final Future<?> future) {
     m_jobMap.remove(future); // Remove the job from the map to allow the job to run again.
   }

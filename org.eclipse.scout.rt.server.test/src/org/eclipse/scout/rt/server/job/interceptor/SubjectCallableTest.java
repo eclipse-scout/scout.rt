@@ -32,7 +32,7 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-public class PrivilegedActionRunnerTest {
+public class SubjectCallableTest {
 
   @Mock
   private Callable<String> m_next;
@@ -62,7 +62,7 @@ public class PrivilegedActionRunnerTest {
       }
     }).when(m_next).call();
 
-    PrivilegedActionRunner<String> runner = new PrivilegedActionRunner<String>(m_next, m_subject);
+    SubjectCallable<String> runner = new SubjectCallable<String>(m_next, m_subject);
 
     assertEquals("success", runner.call());
     assertSame(m_subject, actualSubject.getValue());
@@ -80,7 +80,7 @@ public class PrivilegedActionRunnerTest {
       }
     }).when(m_next).call();
 
-    PrivilegedActionRunner<String> runner = new PrivilegedActionRunner<String>(m_next, null);
+    SubjectCallable<String> runner = new SubjectCallable<String>(m_next, null);
 
     assertEquals("success", runner.call());
     assertNull(actualSubject.getValue());
@@ -100,7 +100,7 @@ public class PrivilegedActionRunnerTest {
       }
     }).when(m_next).call();
 
-    PrivilegedActionRunner<String> runner = new PrivilegedActionRunner<String>(m_next, m_subject);
+    SubjectCallable<String> runner = new SubjectCallable<String>(m_next, m_subject);
 
     try {
       runner.call();
@@ -126,7 +126,7 @@ public class PrivilegedActionRunnerTest {
       }
     }).when(m_next).call();
 
-    PrivilegedActionRunner<String> runner = new PrivilegedActionRunner<String>(m_next, m_subject);
+    SubjectCallable<String> runner = new SubjectCallable<String>(m_next, m_subject);
 
     try {
       runner.call();

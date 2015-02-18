@@ -12,6 +12,7 @@ package org.eclipse.scout.commons.job;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
@@ -30,7 +31,7 @@ public class JobManagerTest {
 
   private static ExecutorService s_executor;
 
-  private JobManager m_jobManager;
+  private IJobManager m_jobManager;
 
   @Before
   public void before() {
@@ -55,25 +56,28 @@ public class JobManagerTest {
 
   @Test
   public void testVisit() throws Exception {
-    IJob<Void> job1 = new Job_<Void>("job-1") {
+    IJob<Void> job1 = new _Job<Void>("job-1") {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+      protected Void call() throws Exception {
         Thread.sleep(TimeUnit.SECONDS.toMillis(1));
+        return null;
       }
     };
-    IJob<Void> job2 = new Job_<Void>("job-2") {
+    IJob<Void> job2 = new _Job<Void>("job-2") {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+      protected Void call() throws Exception {
         Thread.sleep(TimeUnit.SECONDS.toMillis(1));
+        return null;
       }
     };
-    IJob<Void> job3 = new Job_<Void>("job-3") {
+    IJob<Void> job3 = new _Job<Void>("job-3") {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+      protected Void call() throws Exception {
         Thread.sleep(TimeUnit.SECONDS.toMillis(1));
+        return null;
       }
     };
 
@@ -97,51 +101,53 @@ public class JobManagerTest {
 
   @Test
   public void testShutdown() throws Exception {
-    final Set<IJob<?>> actualInterruptedProtocol = new HashSet<>();
+    final Set<IJob<?>> actualInterruptedProtocol = Collections.synchronizedSet(new HashSet<IJob<?>>()); // synchronized because modified/read by different threads.
 
     final CountDownLatch latchBefore = new CountDownLatch(3);
-    final CountDownLatch latchAfter = new CountDownLatch(3);
 
-    final IJob<Void> job1 = new Job_<Void>("job-1") {
+    final IJob<Void> job1 = new _Job<Void>("job-1") {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+      protected Void call() throws Exception {
         latchBefore.countDown();
         try {
-          Thread.sleep(TimeUnit.SECONDS.toMillis(3));
+          Thread.sleep(TimeUnit.SECONDS.toMillis(30));
         }
         catch (InterruptedException e) {
           actualInterruptedProtocol.add(this);
         }
-        latchAfter.countDown();
+
+        return null;
       }
     };
-    final IJob<Void> job2 = new Job_<Void>("job-2") {
+    final IJob<Void> job2 = new _Job<Void>("job-2") {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+      protected Void call() throws Exception {
         latchBefore.countDown();
         try {
-          Thread.sleep(TimeUnit.SECONDS.toMillis(3));
+          Thread.sleep(TimeUnit.SECONDS.toMillis(30));
         }
         catch (InterruptedException e) {
           actualInterruptedProtocol.add(this);
         }
-        latchAfter.countDown();
+
+        return null;
       }
     };
-    final IJob<Void> job3 = new Job_<Void>("job-3") {
+    final IJob<Void> job3 = new _Job<Void>("job-3") {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+      protected Void call() throws Exception {
         latchBefore.countDown();
         try {
-          Thread.sleep(TimeUnit.SECONDS.toMillis(3));
+          Thread.sleep(TimeUnit.SECONDS.toMillis(30));
         }
         catch (InterruptedException e) {
           actualInterruptedProtocol.add(this);
         }
-        latchAfter.countDown();
+
+        return null;
       }
     };
 
@@ -150,23 +156,23 @@ public class JobManagerTest {
     job3.schedule();
 
     latchBefore.await(10, TimeUnit.SECONDS); // Wait for all jobs to be ready
-    Thread.sleep(TimeUnit.SECONDS.toMillis(2));
     m_jobManager.shutdown();
-    latchAfter.await(20, TimeUnit.SECONDS); // Wait for all jobs to be interrupted
+
+    Thread.sleep(TimeUnit.SECONDS.toMillis(5)); // Wait some time until all jobs were interrupted.
     assertEquals(CollectionUtility.hashSet(job1, job2, job3), actualInterruptedProtocol);
   }
 
   /**
    * Job with a dedicated {@link JobManager} per test-case.
    */
-  public class Job_<R> extends Job<R> {
+  public abstract class _Job<R> extends Job<R> {
 
-    public Job_(String name) {
+    public _Job(String name) {
       super(name);
     }
 
     @Override
-    protected JobManager createJobManager() {
+    protected IJobManager createJobManager() {
       return JobManagerTest.this.m_jobManager;
     }
   }

@@ -22,6 +22,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -29,7 +30,7 @@ import java.util.Set;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
-import org.eclipse.scout.commons.job.IProgressMonitor;
+import org.eclipse.scout.commons.job.IJob;
 import org.eclipse.scout.commons.job.JobContext;
 import org.eclipse.scout.commons.job.JobExecutionException;
 import org.eclipse.scout.commons.nls.NlsLocale;
@@ -46,32 +47,43 @@ import org.junit.Test;
 public class ModelJobRunNowTest {
 
   private IClientSession m_clientSession;
+  private ModelJobManager m_jobManager;
 
   @Before
   public void before() {
+    m_jobManager = new ModelJobManager();
     m_clientSession = mock(IClientSession.class);
     when(m_clientSession.getLocale()).thenReturn(new Locale("de", "DE"));
     when(m_clientSession.getTexts()).thenReturn(new ScoutTexts());
     when(m_clientSession.getModelJobManager()).thenReturn(new ModelJobManager());
+    when(m_clientSession.getModelJobManager()).thenReturn(m_jobManager);
+
   }
 
   @After
   public void after() {
-    m_clientSession.getModelJobManager().shutdown();
+    m_jobManager.shutdown();
   }
 
   @Test(expected = JobExecutionException.class)
   public void testRunNowNotModelThread() throws ProcessingException {
-    new ModelJob<Void>("job", m_clientSession).runNow();
+    new ModelJob("job", m_clientSession) {
+
+      @Override
+      protected void run() throws Exception {
+        // NOOP
+      }
+    }.runNow();
   }
 
   @Test
   public void testResult() throws ProcessingException {
     simulateToRunInModelThread();
 
-    ModelJob<String> job = new ModelJob<String>("job", m_clientSession) {
+    IModelJob<String> job = new ModelJobWithResult<String>("job", m_clientSession) {
+
       @Override
-      protected String onRun(IProgressMonitor monitor) throws Exception {
+      protected String call() throws Exception {
         return "RUNNING_WITH_RESULT";
       }
     };
@@ -86,10 +98,10 @@ public class ModelJobRunNowTest {
 
     final Holder<String> holder = new Holder<>();
 
-    ModelJob<Void> job = new ModelJob<Void>("job", m_clientSession) {
+    ModelJob job = new ModelJob("job", m_clientSession) {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+      protected void run() throws Exception {
         holder.setValue("RUNNING_VOID");
       }
     };
@@ -105,9 +117,9 @@ public class ModelJobRunNowTest {
 
     final ProcessingException expectedException = new ProcessingException();
 
-    ModelJob<String> job = new ModelJob<String>("job", m_clientSession) {
+    ModelJob job = new ModelJob("job", m_clientSession) {
       @Override
-      protected String onRun(IProgressMonitor monitor) throws Exception {
+      protected void run() throws Exception {
         throw expectedException;
       }
     };
@@ -127,9 +139,9 @@ public class ModelJobRunNowTest {
 
     final RuntimeException expectedException = new RuntimeException();
 
-    ModelJob<String> job = new ModelJob<String>("job", m_clientSession) {
+    ModelJob job = new ModelJob("job", m_clientSession) {
       @Override
-      protected String onRun(IProgressMonitor monitor) throws Exception {
+      protected void run() throws Exception {
         throw expectedException;
       }
     };
@@ -148,18 +160,18 @@ public class ModelJobRunNowTest {
   public void testSameThread() throws ProcessingException {
     simulateToRunInModelThread();
 
-    final Set<Thread> threads = new HashSet<Thread>();
+    final Set<Thread> threads = Collections.synchronizedSet(new HashSet<Thread>()); // synchronized because modified/read by different threads.
 
-    new ModelJob<Void>("job-1", m_clientSession) {
+    new ModelJob("job-1", m_clientSession) {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor1) throws Exception {
+      protected void run() throws Exception {
         threads.add(Thread.currentThread());
 
-        new ModelJob<Void>("job-2", m_clientSession) {
+        new ModelJob("job-2", m_clientSession) {
 
           @Override
-          protected void onRunVoid(IProgressMonitor monitor2) throws Exception {
+          protected void run() throws Exception {
             threads.add(Thread.currentThread());
           }
         }.runNow();
@@ -178,16 +190,16 @@ public class ModelJobRunNowTest {
     final Holder<String> actualThreadName1 = new Holder<>();
     final Holder<String> actualThreadName2 = new Holder<>();
 
-    new ModelJob<Void>("ABC", m_clientSession) {
+    new ModelJob("ABC", m_clientSession) {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor1) throws Exception {
+      protected void run() throws Exception {
         actualThreadName1.setValue(Thread.currentThread().getName());
 
-        new ModelJob<Void>("XYZ", m_clientSession) {
+        new ModelJob("XYZ", m_clientSession) {
 
           @Override
-          protected void onRunVoid(IProgressMonitor monitor2) throws Exception {
+          protected void run() throws Exception {
             actualThreadName2.setValue(Thread.currentThread().getName());
           }
         }.runNow();
@@ -202,26 +214,27 @@ public class ModelJobRunNowTest {
   @Test
   public void testCurrentJob() throws ProcessingException {
     simulateToRunInModelThread();
+    final Holder<IJob<?>> job1 = new Holder<>();
+    final Holder<IJob<?>> job2 = new Holder<>();
 
-    final Holder<ModelJob<?>> job1 = new Holder<>();
-    final Holder<ModelJob<?>> job2 = new Holder<>();
+    final Holder<IJob<?>> actualJob1 = new Holder<>();
+    final Holder<IJob<?>> actualJob2 = new Holder<>();
 
-    final Holder<ModelJob<?>> actualJob1 = new Holder<>();
-    final Holder<ModelJob<?>> actualJob2 = new Holder<>();
+    IJob.CURRENT.set(null);
 
-    new ModelJob<Void>("job-1", m_clientSession) {
+    new ModelJob("job-1", m_clientSession) {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor1) throws Exception {
+      protected void run() throws Exception {
         job1.setValue(this);
-        actualJob1.setValue(ModelJob.get());
+        actualJob1.setValue(IJob.CURRENT.get());
 
-        new ModelJob<Void>("job-2", m_clientSession) {
+        new ModelJob("job-2", m_clientSession) {
 
           @Override
-          protected void onRunVoid(IProgressMonitor monitor2) throws Exception {
+          protected void run() throws Exception {
             job2.setValue(this);
-            actualJob2.setValue(ModelJob.get());
+            actualJob2.setValue(IJob.CURRENT.get());
           }
         }.runNow();
       }
@@ -240,12 +253,12 @@ public class ModelJobRunNowTest {
   public void testBlocking() throws ProcessingException {
     simulateToRunInModelThread();
 
-    final List<Integer> actualProtocol = new ArrayList<>();
+    final List<Integer> actualProtocol = Collections.synchronizedList(new ArrayList<Integer>()); // synchronized because modified/read by different threads.
 
-    new ModelJob<Void>("job", m_clientSession) {
+    new ModelJob("job", m_clientSession) {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+      protected void run() throws Exception {
         actualProtocol.add(1);
       }
     }.runNow();
@@ -272,10 +285,10 @@ public class ModelJobRunNowTest {
 
     simulateToRunInModelThread();
 
-    new ModelJob<Void>("job-1", m_clientSession) {
+    new ModelJob("job-1", m_clientSession) {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor1) throws ProcessingException {
+      protected void run() throws Exception {
         actualClientSession1.setValue(IClientSession.CURRENT.get());
         actualLocale1.setValue(NlsLocale.CURRENT.get());
         actualTexts1.setValue(ScoutTexts.CURRENT.get());
@@ -285,10 +298,10 @@ public class ModelJobRunNowTest {
         ctx1.set("PROP_JOB1+JOB2", "SHARED-1");
         actualJobContext1.setValue(ctx1);
 
-        new ModelJob<Void>("job-2", m_clientSession) {
+        new ModelJob("job-2", m_clientSession) {
 
           @Override
-          protected void onRunVoid(IProgressMonitor monitor2) throws ProcessingException {
+          protected void run() throws Exception {
             actualClientSession2.setValue(IClientSession.CURRENT.get());
             actualLocale2.setValue(NlsLocale.CURRENT.get());
             actualTexts2.setValue(ScoutTexts.CURRENT.get());
@@ -331,6 +344,6 @@ public class ModelJobRunNowTest {
   }
 
   private void simulateToRunInModelThread() {
-    m_clientSession.getModelJobManager().m_mutexSemaphore.registerAsModelThread();
+    m_jobManager.m_mutexSemaphore.registerAsModelThread();
   }
 }

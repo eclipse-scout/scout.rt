@@ -20,10 +20,10 @@ import org.eclipse.scout.commons.exception.ProcessingException;
  *
  * @since 5.1
  */
-public class AsyncFuture<R> implements IAsyncFuture<R> {
+public class AsyncFuture<RESULT> implements IAsyncFuture<RESULT> {
 
   @Override
-  public void onSuccess(final R result) {
+  public void onSuccess(final RESULT result) {
     // NOOP by default.
   }
 
@@ -33,7 +33,7 @@ public class AsyncFuture<R> implements IAsyncFuture<R> {
   }
 
   @Override
-  public void onDone(final R result, final ProcessingException e) {
+  public void onDone(final RESULT result, final ProcessingException e) {
     // NOOP by default.
   }
 }

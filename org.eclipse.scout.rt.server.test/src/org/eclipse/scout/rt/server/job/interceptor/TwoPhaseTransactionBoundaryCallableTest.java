@@ -33,7 +33,7 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-public class TransactionDemarcatorTest {
+public class TwoPhaseTransactionBoundaryCallableTest {
 
   @Mock
   private ITransaction m_transaction;
@@ -57,7 +57,7 @@ public class TransactionDemarcatorTest {
     when(m_next.call()).thenReturn("success");
     when(m_transaction.commitPhase1()).thenReturn(true);
 
-    TransactionDemarcator<String> coordinator = new TransactionDemarcator<>(m_next, m_transaction);
+    TwoPhaseTransactionBoundaryCallable<String> coordinator = new TwoPhaseTransactionBoundaryCallable<>(m_next, m_transaction);
     assertEquals("success", coordinator.call());
 
     InOrder inOrder = inOrder(m_transaction);
@@ -75,7 +75,7 @@ public class TransactionDemarcatorTest {
     when(m_transaction.getFailures()).thenReturn(new Throwable[]{re});
     when(m_transaction.hasFailures()).thenReturn(true);
 
-    TransactionDemarcator<String> coordinator = new TransactionDemarcator<>(m_next, m_transaction);
+    TwoPhaseTransactionBoundaryCallable<String> coordinator = new TwoPhaseTransactionBoundaryCallable<>(m_next, m_transaction);
     try {
       coordinator.call();
       fail();
@@ -101,7 +101,7 @@ public class TransactionDemarcatorTest {
     when(m_transaction.getFailures()).thenReturn(new Throwable[]{cause});
     when(m_transaction.hasFailures()).thenReturn(true);
 
-    TransactionDemarcator<String> coordinator = new TransactionDemarcator<>(m_next, m_transaction);
+    TwoPhaseTransactionBoundaryCallable<String> coordinator = new TwoPhaseTransactionBoundaryCallable<>(m_next, m_transaction);
     try {
       coordinator.call();
       fail();
@@ -126,7 +126,7 @@ public class TransactionDemarcatorTest {
     when(m_transaction.getFailures()).thenReturn(new Throwable[]{pe});
     when(m_transaction.hasFailures()).thenReturn(true);
 
-    TransactionDemarcator<String> coordinator = new TransactionDemarcator<>(m_next, m_transaction);
+    TwoPhaseTransactionBoundaryCallable<String> coordinator = new TwoPhaseTransactionBoundaryCallable<>(m_next, m_transaction);
     try {
       coordinator.call();
       fail();
@@ -152,7 +152,7 @@ public class TransactionDemarcatorTest {
     when(m_transaction.hasFailures()).thenReturn(true);
     doThrow(new RuntimeException()).when(m_transaction).rollback();
 
-    TransactionDemarcator<String> coordinator = new TransactionDemarcator<>(m_next, m_transaction);
+    TwoPhaseTransactionBoundaryCallable<String> coordinator = new TwoPhaseTransactionBoundaryCallable<>(m_next, m_transaction);
     try {
       coordinator.call();
       fail();
@@ -175,7 +175,7 @@ public class TransactionDemarcatorTest {
     when(m_next.call()).thenReturn("success");
     when(m_transaction.commitPhase1()).thenReturn(false);
 
-    TransactionDemarcator<String> coordinator = new TransactionDemarcator<>(m_next, m_transaction);
+    TwoPhaseTransactionBoundaryCallable<String> coordinator = new TwoPhaseTransactionBoundaryCallable<>(m_next, m_transaction);
     assertEquals("success", coordinator.call());
 
     InOrder inOrder = inOrder(m_transaction);
@@ -191,7 +191,7 @@ public class TransactionDemarcatorTest {
     when(m_next.call()).thenReturn("success");
     when(m_transaction.commitPhase1()).thenThrow(new RuntimeException());
 
-    TransactionDemarcator<String> coordinator = new TransactionDemarcator<>(m_next, m_transaction);
+    TwoPhaseTransactionBoundaryCallable<String> coordinator = new TwoPhaseTransactionBoundaryCallable<>(m_next, m_transaction);
     assertEquals("success", coordinator.call());
 
     InOrder inOrder = inOrder(m_transaction);
@@ -208,7 +208,7 @@ public class TransactionDemarcatorTest {
     when(m_transaction.commitPhase1()).thenReturn(true);
     doThrow(new RuntimeException()).when(m_transaction).commitPhase2();
 
-    TransactionDemarcator<String> coordinator = new TransactionDemarcator<>(m_next, m_transaction);
+    TwoPhaseTransactionBoundaryCallable<String> coordinator = new TwoPhaseTransactionBoundaryCallable<>(m_next, m_transaction);
     assertEquals("success", coordinator.call());
 
     InOrder inOrder = inOrder(m_transaction);
@@ -225,7 +225,7 @@ public class TransactionDemarcatorTest {
     when(m_transaction.commitPhase1()).thenReturn(true);
     doThrow(new RuntimeException()).when(m_transaction).release();
 
-    TransactionDemarcator<String> coordinator = new TransactionDemarcator<>(m_next, m_transaction);
+    TwoPhaseTransactionBoundaryCallable<String> coordinator = new TwoPhaseTransactionBoundaryCallable<>(m_next, m_transaction);
     assertEquals("success", coordinator.call());
 
     InOrder inOrder = inOrder(m_transaction);

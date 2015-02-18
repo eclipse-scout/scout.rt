@@ -20,6 +20,7 @@ import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -35,7 +36,7 @@ import org.junit.Test;
  */
 public class JobRunNowTest {
 
-  private JobManager m_jobManager;
+  private IJobManager m_jobManager;
 
   @Before
   public void before() {
@@ -49,9 +50,9 @@ public class JobRunNowTest {
 
   @Test
   public void testResult() throws ProcessingException {
-    IJob<String> job = new Job_<String>("job") {
+    IJob<String> job = new _Job<String>("job") {
       @Override
-      protected String onRun(IProgressMonitor monitor) throws ProcessingException {
+      protected String call() throws ProcessingException {
         return "RUNNING_WITH_RESULT";
       }
     };
@@ -64,11 +65,12 @@ public class JobRunNowTest {
   public void testVoidResult() throws ProcessingException {
     final Holder<String> holder = new Holder<>();
 
-    IJob<Void> job = new Job_<Void>("job") {
+    IJob<Void> job = new _Job<Void>("job") {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+      protected Void call() throws Exception {
         holder.setValue("RUNNING_VOID");
+        return null;
       }
     };
     Void actualResult = job.runNow();
@@ -81,9 +83,9 @@ public class JobRunNowTest {
   public void testProcessingException() throws ProcessingException {
     final ProcessingException expectedException = new ProcessingException();
 
-    IJob<String> job = new Job_<String>("job") {
+    IJob<String> job = new _Job<String>("job") {
       @Override
-      protected String onRun(IProgressMonitor monitor) throws Exception {
+      protected String call() throws Exception {
         throw expectedException;
       }
     };
@@ -101,9 +103,9 @@ public class JobRunNowTest {
   public void testRuntimeException() throws ProcessingException {
     final RuntimeException expectedException = new RuntimeException();
 
-    IJob<String> job = new Job_<String>("job") {
+    IJob<String> job = new _Job<String>("job") {
       @Override
-      protected String onRun(IProgressMonitor monitor) throws Exception {
+      protected String call() throws Exception {
         throw expectedException;
       }
     };
@@ -120,21 +122,23 @@ public class JobRunNowTest {
 
   @Test
   public void testSameThread() throws ProcessingException {
-    final Set<Thread> threads = new HashSet<Thread>();
+    final Set<Thread> threads = Collections.synchronizedSet(new HashSet<Thread>()); // synchronized because modified/read by different threads.
 
-    new Job_<Void>("job-1") {
+    new _Job<Void>("job-1") {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor1) throws Exception {
+      protected Void call() throws Exception {
         threads.add(Thread.currentThread());
 
-        new Job_<Void>("job-2") {
+        new _Job<Void>("job-2") {
 
           @Override
-          protected void onRunVoid(IProgressMonitor monitor2) throws Exception {
+          protected Void call() throws Exception {
             threads.add(Thread.currentThread());
+            return null;
           }
         }.runNow();
+        return null;
       }
     }.runNow();
 
@@ -149,19 +153,21 @@ public class JobRunNowTest {
     final Holder<String> actualThreadName1 = new Holder<>();
     final Holder<String> actualThreadName2 = new Holder<>();
 
-    new Job_<Void>("ABC") {
+    new _Job<Void>("ABC") {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor1) throws Exception {
+      protected Void call() throws Exception {
         actualThreadName1.setValue(Thread.currentThread().getName());
 
-        new Job_<Void>("XYZ") {
+        new _Job<Void>("XYZ") {
 
           @Override
-          protected void onRunVoid(IProgressMonitor monitor2) throws Exception {
+          protected Void call() throws Exception {
             actualThreadName2.setValue(Thread.currentThread().getName());
+            return null;
           }
         }.runNow();
+        return null;
       }
     }.runNow();
 
@@ -178,21 +184,25 @@ public class JobRunNowTest {
     final Holder<IJob<?>> actualJob1 = new Holder<>();
     final Holder<IJob<?>> actualJob2 = new Holder<>();
 
-    new Job_<Void>("job-1") {
+    IJob.CURRENT.set(null);
+
+    new _Job<Void>("job-1") {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor1) throws Exception {
+      protected Void call() throws Exception {
         job1.setValue(this);
-        actualJob1.setValue(Job.get());
+        actualJob1.setValue(IJob.CURRENT.get());
 
-        new Job_<Void>("job-2") {
+        new _Job<Void>("job-2") {
 
           @Override
-          protected void onRunVoid(IProgressMonitor monitor2) throws Exception {
+          protected Void call() throws Exception {
             job2.setValue(this);
-            actualJob2.setValue(Job.get());
+            actualJob2.setValue(IJob.CURRENT.get());
+            return null;
           }
         }.runNow();
+        return null;
       }
     }.runNow();
 
@@ -207,13 +217,14 @@ public class JobRunNowTest {
 
   @Test
   public void testBlocking() throws ProcessingException {
-    final List<Integer> actualProtocol = new ArrayList<>();
+    final List<Integer> actualProtocol = Collections.synchronizedList(new ArrayList<Integer>()); // synchronized because modified/read by different threads.
 
-    new Job_<Void>("job") {
+    new _Job<Void>("job") {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+      protected Void call() throws Exception {
         actualProtocol.add(1);
+        return null;
       }
     }.runNow();
     actualProtocol.add(2);
@@ -228,25 +239,27 @@ public class JobRunNowTest {
     final Holder<JobContext> actualJobContext1 = new Holder<>();
     final Holder<JobContext> actualJobContext2 = new Holder<>();
 
-    new Job_<Void>("job-1") {
+    new _Job<Void>("job-1") {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor1) throws Exception {
+      protected Void call() throws Exception {
         JobContext ctx1 = JobContext.CURRENT.get();
         ctx1.set("PROP_JOB1", "J1");
         ctx1.set("PROP_JOB1+JOB2", "SHARED-1");
         actualJobContext1.setValue(ctx1);
 
-        new Job_<Void>("job-2") {
+        new _Job<Void>("job-2") {
 
           @Override
-          protected void onRunVoid(IProgressMonitor monitor2) throws Exception {
+          protected Void call() throws Exception {
             JobContext ctx2 = JobContext.CURRENT.get();
             ctx2.set("PROP_JOB2", "J2");
             ctx2.set("PROP_JOB1+JOB2", "SHARED-2");
             actualJobContext2.setValue(ctx2);
+            return null;
           }
         }.runNow();
+        return null;
       }
     }.runNow();
 
@@ -269,14 +282,14 @@ public class JobRunNowTest {
   /**
    * Job with a dedicated {@link JobManager} per test-case.
    */
-  public class Job_<R> extends Job<R> {
+  public abstract class _Job<R> extends Job<R> {
 
-    public Job_(String name) {
+    public _Job(String name) {
       super(name);
     }
 
     @Override
-    protected JobManager createJobManager() {
+    protected IJobManager createJobManager() {
       return JobRunNowTest.this.m_jobManager;
     }
   }

@@ -31,6 +31,7 @@ import static org.mockito.Mockito.verify;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -50,7 +51,7 @@ import org.mockito.ArgumentCaptor;
  */
 public class JobScheduleTest {
 
-  private JobManager m_jobManager;
+  private IJobManager m_jobManager;
 
   @Before
   public void before() {
@@ -64,9 +65,9 @@ public class JobScheduleTest {
 
   @Test
   public void testResult() throws ProcessingException {
-    IJob<String> job = new Job_<String>("job") {
+    IJob<String> job = new _Job<String>("job") {
       @Override
-      protected String onRun(IProgressMonitor monitor) throws Exception {
+      protected String call() throws Exception {
         return "RUNNING_WITH_RESULT";
       }
     };
@@ -86,12 +87,13 @@ public class JobScheduleTest {
   public void testVoidResult() throws ProcessingException {
     final Holder<String> holder = new Holder<>();
 
-    IJob<Void> job = new Job_<Void>("job") {
+    IJob<Void> job = new _Job<Void>("job") {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+      protected Void call() throws Exception {
         Thread.sleep(500);
         holder.setValue("RUNNING_VOID");
+        return null;
       }
     };
 
@@ -115,9 +117,9 @@ public class JobScheduleTest {
   public void testProcessingException() throws ProcessingException {
     final ProcessingException expectedException = new ProcessingException();
 
-    IJob<String> job = new Job_<String>("job") {
+    IJob<String> job = new _Job<String>("job") {
       @Override
-      protected String onRun(IProgressMonitor monitor) throws Exception {
+      protected String call() throws Exception {
         Thread.sleep(500);
         throw expectedException;
       }
@@ -150,9 +152,9 @@ public class JobScheduleTest {
   public void testRuntimeException() throws ProcessingException {
     final RuntimeException expectedException = new RuntimeException();
 
-    IJob<String> job = new Job_<String>("job") {
+    IJob<String> job = new _Job<String>("job") {
       @Override
-      protected String onRun(IProgressMonitor monitor) throws Exception {
+      protected String call() throws Exception {
         Thread.sleep(500);
         throw expectedException;
       }
@@ -188,21 +190,23 @@ public class JobScheduleTest {
 
   @Test
   public void testWorkerThread() throws ProcessingException {
-    final Set<Thread> workerThreads = new HashSet<Thread>();
+    final Set<Thread> workerThreads = Collections.synchronizedSet(new HashSet<Thread>()); // synchronized because modified/read by different threads.
 
-    new Job_<Void>("job-1") {
+    new _Job<Void>("job-1") {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor1) throws Exception {
+      protected Void call() throws Exception {
         workerThreads.add(Thread.currentThread());
 
-        new Job_<Void>("job-2") {
+        new _Job<Void>("job-2") {
 
           @Override
-          protected void onRunVoid(IProgressMonitor monitor2) throws Exception {
+          protected Void call() throws Exception {
             workerThreads.add(Thread.currentThread());
+            return null;
           }
         }.schedule().get();
+        return null;
       }
     }.schedule().get();
 
@@ -217,19 +221,21 @@ public class JobScheduleTest {
     final Holder<String> actualThreadName1 = new Holder<>();
     final Holder<String> actualThreadName2 = new Holder<>();
 
-    new Job_<Void>("ABC") {
+    new _Job<Void>("ABC") {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor1) throws Exception {
+      protected Void call() throws Exception {
         actualThreadName1.setValue(Thread.currentThread().getName());
 
-        new Job_<Void>("XYZ") {
+        new _Job<Void>("XYZ") {
 
           @Override
-          protected void onRunVoid(IProgressMonitor monitor2) throws Exception {
+          protected Void call() throws Exception {
             actualThreadName2.setValue(Thread.currentThread().getName());
+            return null;
           }
         }.schedule().get();
+        return null;
       }
     }.schedule().get();
 
@@ -248,21 +254,23 @@ public class JobScheduleTest {
 
     IJob.CURRENT.set(null);
 
-    new Job_<Void>("job-1") {
+    new _Job<Void>("job-1") {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor1) throws Exception {
+      protected Void call() throws Exception {
         job1.setValue(this);
-        actualJob1.setValue(Job.get());
+        actualJob1.setValue(IJob.CURRENT.get());
 
-        new Job_<Void>("job-2") {
+        new _Job<Void>("job-2") {
 
           @Override
-          protected void onRunVoid(IProgressMonitor monitor2) throws Exception {
+          protected Void call() throws Exception {
             job2.setValue(this);
-            actualJob2.setValue(Job.get());
+            actualJob2.setValue(IJob.CURRENT.get());
+            return null;
           }
         }.schedule().get();
+        return null;
       }
     }.schedule().get();
 
@@ -277,13 +285,14 @@ public class JobScheduleTest {
 
   @Test
   public void testScheduleAndGet() throws ProcessingException {
-    final List<Integer> actualProtocol = new ArrayList<>();
-    new Job_<Void>("job") {
+    final List<Integer> actualProtocol = Collections.synchronizedList(new ArrayList<Integer>()); // synchronized because modified/read by different threads.
+    new _Job<Void>("job") {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+      protected Void call() throws Exception {
         Thread.sleep(100);
         actualProtocol.add(1);
+        return null;
       }
     }.schedule().get();
     actualProtocol.add(2);
@@ -296,31 +305,34 @@ public class JobScheduleTest {
     final CountDownLatch testLatch = new CountDownLatch(3);
     final CountDownLatch parallelRunningLatch = new CountDownLatch(1);
 
-    new Job_<Void>("job-1") {
+    new _Job<Void>("job-1") {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+      protected Void call() throws Exception {
         Thread.sleep(100);
         testLatch.countDown();
         parallelRunningLatch.await();
+        return null;
       }
     }.schedule();
-    new Job_<Void>("job-2") {
+    new _Job<Void>("job-2") {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+      protected Void call() throws Exception {
         Thread.sleep(100);
         testLatch.countDown();
         parallelRunningLatch.await();
+        return null;
       }
     }.schedule();
-    new Job_<Void>("job-3") {
+    new _Job<Void>("job-3") {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+      protected Void call() throws Exception {
         Thread.sleep(100);
         testLatch.countDown();
         parallelRunningLatch.await();
+        return null;
       }
     }.schedule();
 
@@ -340,9 +352,9 @@ public class JobScheduleTest {
   @Test
   public void testReusable() throws ProcessingException {
     final IntegerHolder holder = new IntegerHolder();
-    IJob<String> job = new Job_<String>("job") {
+    IJob<String> job = new _Job<String>("job") {
       @Override
-      protected String onRun(IProgressMonitor monitor) throws Exception {
+      protected String call() throws Exception {
         return "RUN_" + holder.getValue();
       }
     };
@@ -360,25 +372,27 @@ public class JobScheduleTest {
     final Holder<JobContext> actualJobContext1 = new Holder<>();
     final Holder<JobContext> actualJobContext2 = new Holder<>();
 
-    new Job_<Void>("job-1") {
+    new _Job<Void>("job-1") {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor1) throws Exception {
+      protected Void call() throws Exception {
         JobContext ctx1 = JobContext.CURRENT.get();
         ctx1.set("PROP_JOB1", "J1");
         ctx1.set("PROP_JOB1+JOB2", "SHARED-1");
         actualJobContext1.setValue(ctx1);
 
-        new Job_<Void>("job-2") {
+        new _Job<Void>("job-2") {
 
           @Override
-          protected void onRunVoid(IProgressMonitor monitor2) throws Exception {
+          protected Void call() throws Exception {
             JobContext ctx2 = JobContext.CURRENT.get();
             ctx2.set("PROP_JOB2", "J2");
             ctx2.set("PROP_JOB1+JOB2", "SHARED-2");
             actualJobContext2.setValue(ctx2);
+            return null;
           }
         }.schedule().get();
+        return null;
       }
     }.schedule().get();
 
@@ -401,14 +415,14 @@ public class JobScheduleTest {
   /**
    * Job with a dedicated {@link JobManager} per test-case.
    */
-  public class Job_<R> extends Job<R> {
+  public abstract class _Job<R> extends Job<R> {
 
-    public Job_(String name) {
+    public _Job(String name) {
       super(name);
     }
 
     @Override
-    protected JobManager createJobManager() {
+    protected IJobManager createJobManager() {
       return JobScheduleTest.this.m_jobManager;
     }
   }

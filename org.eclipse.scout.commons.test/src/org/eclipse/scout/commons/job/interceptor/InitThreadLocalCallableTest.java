@@ -17,7 +17,7 @@ import java.util.concurrent.Callable;
 import org.eclipse.scout.commons.holders.StringHolder;
 import org.junit.Test;
 
-public class ThreadLocalInitializerTest {
+public class InitThreadLocalCallableTest {
 
   private static final ThreadLocal<String> THREAD_LOCAL = new ThreadLocal<>();
 
@@ -29,15 +29,15 @@ public class ThreadLocalInitializerTest {
 
       @Override
       public Void call() throws Exception {
-        actualValue.setValue("blubber");
+        actualValue.setValue(THREAD_LOCAL.get());
         return null;
       }
     };
 
     THREAD_LOCAL.set("ORIG");
 
-    new ThreadLocalInitializer<Void, String>(next, THREAD_LOCAL, "blubber").call();
-    assertEquals("blubber", actualValue.getValue());
+    new InitThreadLocalCallable<Void, String>(next, THREAD_LOCAL, "ABC").call();
+    assertEquals("ABC", actualValue.getValue());
     assertEquals("ORIG", THREAD_LOCAL.get());
   }
 }

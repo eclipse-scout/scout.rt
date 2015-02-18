@@ -19,7 +19,7 @@ import java.util.Locale;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
-import org.eclipse.scout.commons.job.IProgressMonitor;
+import org.eclipse.scout.commons.job.IJobManager;
 import org.eclipse.scout.commons.job.Job;
 import org.eclipse.scout.commons.job.JobManager;
 import org.eclipse.scout.commons.nls.NlsLocale;
@@ -35,7 +35,7 @@ import org.junit.Test;
  */
 public class ClientJobScheduleTest {
 
-  private JobManager m_jobManager;
+  private IJobManager m_jobManager;
   private IClientSession m_clientSession1;
   private IClientSession m_clientSession2;
 
@@ -69,18 +69,18 @@ public class ClientJobScheduleTest {
     final Holder<ScoutTexts> actualTexts1 = new Holder<>();
     final Holder<ScoutTexts> actualTexts2 = new Holder<>();
 
-    new ClientJob_<Void>("job-1", m_clientSession1) {
+    new _ClientJob("job-1", m_clientSession1) {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor1) throws Exception {
+      protected void run() throws Exception {
         actualClientSession1.setValue(IClientSession.CURRENT.get());
         actualLocale1.setValue(NlsLocale.CURRENT.get());
         actualTexts1.setValue(ScoutTexts.CURRENT.get());
 
-        new ClientJob_<Void>("job-2", m_clientSession2) {
+        new _ClientJob("job-2", m_clientSession2) {
 
           @Override
-          protected void onRunVoid(IProgressMonitor monitor2) throws Exception {
+          protected void run() throws Exception {
             actualClientSession2.setValue(IClientSession.CURRENT.get());
             actualLocale2.setValue(NlsLocale.CURRENT.get());
             actualTexts2.setValue(ScoutTexts.CURRENT.get());
@@ -105,14 +105,14 @@ public class ClientJobScheduleTest {
   /**
    * Job with a dedicated {@link JobManager} per test-case.
    */
-  public class ClientJob_<R> extends ClientJob<R> {
+  public abstract class _ClientJob extends ClientJob {
 
-    public ClientJob_(String name, IClientSession clientSession) {
+    public _ClientJob(String name, IClientSession clientSession) {
       super(name, clientSession);
     }
 
     @Override
-    protected JobManager createJobManager() {
+    protected IJobManager createJobManager() {
       return ClientJobScheduleTest.this.m_jobManager;
     }
   }

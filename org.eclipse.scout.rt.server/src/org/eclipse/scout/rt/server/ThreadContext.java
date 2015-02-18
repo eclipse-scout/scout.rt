@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.rt.server.commons.servletfilter.IServlet;
+import org.eclipse.scout.rt.server.commons.servletfilter.HttpServletRoundtrip;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.shared.ISession;
 
@@ -39,7 +39,7 @@ public final class ThreadContext {
    */
   @Deprecated
   public static HttpServletRequest getHttpServletRequest() {
-    return IServlet.CURRENT_HTTP_SERVLET_REQUEST.get();
+    return HttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get();
   }
 
   /**
@@ -48,7 +48,7 @@ public final class ThreadContext {
    */
   @Deprecated
   public static HttpServletResponse getHttpServletResponse() {
-    return IServlet.CURRENT_HTTP_SERVLET_RESPONSE.get();
+    return HttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get();
   }
 
   /**
@@ -94,7 +94,7 @@ public final class ThreadContext {
    */
   @Deprecated
   public static void putHttpServletRequest(HttpServletRequest value) {
-    IServlet.CURRENT_HTTP_SERVLET_REQUEST.set(value);
+    HttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.set(value);
   }
 
   /**
@@ -103,7 +103,7 @@ public final class ThreadContext {
    */
   @Deprecated
   public static void putHttpServletResponse(HttpServletResponse value) {
-    IServlet.CURRENT_HTTP_SERVLET_RESPONSE.set(value);
+    HttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.set(value);
   }
 
   /**

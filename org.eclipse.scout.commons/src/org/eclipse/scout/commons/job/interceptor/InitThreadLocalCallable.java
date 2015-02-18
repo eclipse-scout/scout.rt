@@ -13,21 +13,27 @@ package org.eclipse.scout.commons.job.interceptor;
 import java.util.concurrent.Callable;
 
 import org.eclipse.scout.commons.Assertions;
+import org.eclipse.scout.commons.annotations.Internal;
 
 /**
  * Processor to bind a value to the thread's {@link ThreadLocal} during the time of executing a job.
  * <p/>
  * This {@link Callable} is a processing object in the language of the design pattern 'chain-of-responsibility'.
  *
- * @param <R>
+ * @param <RESULT>
  *          the result type of the job's computation.
+ * @param <THREAD_LOCAL>
+ *          the type of the {@link ThreadLocal}.
  * @since 5.1
  */
-public class ThreadLocalInitializer<R, T> implements Callable<R>, Chainable {
+public class InitThreadLocalCallable<RESULT, THREAD_LOCAL> implements Callable<RESULT>, Chainable {
 
-  private final Callable<R> m_next;
-  private final ThreadLocal<T> m_threadLocal;
-  private final T m_value;
+  @Internal
+  protected final Callable<RESULT> m_next;
+  @Internal
+  protected final ThreadLocal<THREAD_LOCAL> m_threadLocal;
+  @Internal
+  protected final THREAD_LOCAL m_value;
 
   /**
    * Creates a processor to set the given {@link ThreadLocal} during the time of execution.
@@ -39,15 +45,15 @@ public class ThreadLocalInitializer<R, T> implements Callable<R>, Chainable {
    * @param value
    *          value to be bound.
    */
-  public ThreadLocalInitializer(final Callable<R> next, final ThreadLocal<T> threadLocal, final T value) {
+  public InitThreadLocalCallable(final Callable<RESULT> next, final ThreadLocal<THREAD_LOCAL> threadLocal, final THREAD_LOCAL value) {
     m_next = Assertions.assertNotNull(next);
     m_threadLocal = Assertions.assertNotNull(threadLocal);
     m_value = value;
   }
 
   @Override
-  public R call() throws Exception {
-    final T oldValue = m_threadLocal.get();
+  public RESULT call() throws Exception {
+    final THREAD_LOCAL oldValue = m_threadLocal.get();
 
     m_threadLocal.set(m_value);
     try {
@@ -64,11 +70,11 @@ public class ThreadLocalInitializer<R, T> implements Callable<R>, Chainable {
   }
 
   @Override
-  public Callable<R> getNext() {
+  public Callable<RESULT> getNext() {
     return m_next;
   }
 
-  public ThreadLocal<T> getThreadLocal() {
+  public ThreadLocal<THREAD_LOCAL> getThreadLocal() {
     return m_threadLocal;
   }
 }

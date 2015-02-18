@@ -14,6 +14,7 @@ import java.util.concurrent.Callable;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.IJob;
 import org.eclipse.scout.commons.job.interceptor.Chainable;
@@ -30,16 +31,17 @@ import org.eclipse.scout.rt.server.transaction.internal.ActiveTransactionRegistr
  * <p/>
  * This {@link Callable} is a processing object in the language of the design pattern 'chain-of-responsibility'.
  *
- * @param <R>
+ * @param <RESULT>
  *          the result type of the job's computation.
  * @since 5.1
  */
-public class TransactionDemarcator<R> implements Callable<R>, Chainable {
+public class TwoPhaseTransactionBoundaryCallable<RESULT> implements Callable<RESULT>, Chainable {
 
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(TransactionDemarcator.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(TwoPhaseTransactionBoundaryCallable.class);
 
-  protected final Callable<R> m_next;
-
+  @Internal
+  protected final Callable<RESULT> m_next;
+  @Internal
   protected final ITransaction m_transaction;
 
   /**
@@ -51,13 +53,13 @@ public class TransactionDemarcator<R> implements Callable<R>, Chainable {
    * @param transaction
    *          transaction to set the demarcation boundaries; must not be <code>null</code>.
    */
-  public TransactionDemarcator(final Callable<R> next, final ITransaction transaction) {
+  public TwoPhaseTransactionBoundaryCallable(final Callable<RESULT> next, final ITransaction transaction) {
     m_next = Assertions.assertNotNull(next);
     m_transaction = Assertions.assertNotNull(transaction);
   }
 
   @Override
-  public R call() throws Exception {
+  public RESULT call() throws Exception {
     ActiveTransactionRegistry.register(m_transaction);
     try {
       return runAsTransaction(m_transaction);
@@ -76,10 +78,11 @@ public class TransactionDemarcator<R> implements Callable<R>, Chainable {
    * @throws Exception
    *           if the processing throws an error.
    */
-  protected R runAsTransaction(final ITransaction tx) throws Exception {
+  @Internal
+  protected RESULT runAsTransaction(final ITransaction tx) throws Exception {
     final TransactionSafeDelegator txDelegator = new TransactionSafeDelegator(tx); // ITransaction-delegate that does not propagate errors.
 
-    R result = null;
+    RESULT result = null;
     Exception error = null;
     try {
       result = m_next.call();
@@ -114,6 +117,7 @@ public class TransactionDemarcator<R> implements Callable<R>, Chainable {
     }
   }
 
+  @Internal
   protected void logTxFailures(final ITransaction tx) {
     for (final Throwable txFailure : tx.getFailures()) {
       LOG.error(String.format("The current XA transaction has been rolled back because of a processing error. [reason=%s, job=%s, tx=%s]", StringUtility.nvl(txFailure.getMessage(), "n/a"), IJob.CURRENT.get().getName(), tx), txFailure);

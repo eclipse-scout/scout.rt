@@ -24,12 +24,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
-import org.eclipse.scout.commons.job.IProgressMonitor;
+import org.eclipse.scout.commons.job.IJobManager;
 import org.eclipse.scout.commons.job.Job;
 import org.eclipse.scout.commons.job.JobManager;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.server.commons.servletfilter.IServlet;
+import org.eclipse.scout.rt.server.commons.servletfilter.HttpServletRoundtrip;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ScoutTexts;
@@ -40,11 +40,11 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 /**
- * Tests the additional functionality of {@link ServerJob} compared with {@link Job}.
+ * Tests the additional functionality of {@link ServerJobWithResult} compared with {@link Job}.
  */
 public class ServerJobScheduleTest {
 
-  private JobManager m_jobManager;
+  private IJobManager m_jobManager;
   private IServerSession m_serverSession1;
   private IServerSession m_serverSession2;
   private Subject m_subject1 = new Subject();
@@ -70,8 +70,8 @@ public class ServerJobScheduleTest {
     when(m_serverSession2.getLocale()).thenReturn(new Locale("de", "CH"));
     when(m_serverSession2.getTexts()).thenReturn(new ScoutTexts());
 
-    IServlet.CURRENT_HTTP_SERVLET_REQUEST.set(m_httpServletRequest);
-    IServlet.CURRENT_HTTP_SERVLET_RESPONSE.set(m_httpServletResponse);
+    HttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.set(m_httpServletRequest);
+    HttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.set(m_httpServletResponse);
   }
 
   @After
@@ -104,29 +104,29 @@ public class ServerJobScheduleTest {
     final Holder<HttpServletResponse> actualHttpServletResponse1 = new Holder<>();
     final Holder<HttpServletResponse> actualHttpServletResponse2 = new Holder<>();
 
-    new ServerJob_<Void>("job-1", m_serverSession1, m_subject1, m_transactionId1) {
+    new _ServerJob("job-1", m_serverSession1, m_subject1, m_transactionId1) {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor1) throws Exception {
+      protected void run() throws Exception {
         actualServerSession1.setValue(IServerSession.CURRENT.get());
         actualLocale1.setValue(NlsLocale.CURRENT.get());
         actualTexts1.setValue(ScoutTexts.CURRENT.get());
         actualTransaction1.setValue(ITransaction.CURRENT.get());
         actualSubject1.setValue(Subject.getSubject(AccessController.getContext()));
-        actualHttpServletRequest1.setValue(IServlet.CURRENT_HTTP_SERVLET_REQUEST.get());
-        actualHttpServletResponse1.setValue(IServlet.CURRENT_HTTP_SERVLET_RESPONSE.get());
+        actualHttpServletRequest1.setValue(HttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get());
+        actualHttpServletResponse1.setValue(HttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get());
 
-        new ServerJob_<Void>("job-2", m_serverSession2, m_subject2, m_transactionId2) {
+        new _ServerJob("job-2", m_serverSession2, m_subject2, m_transactionId2) {
 
           @Override
-          protected void onRunVoid(IProgressMonitor monitor2) throws Exception {
+          protected void run() throws Exception {
             actualServerSession2.setValue(IServerSession.CURRENT.get());
             actualLocale2.setValue(NlsLocale.CURRENT.get());
             actualTexts2.setValue(ScoutTexts.CURRENT.get());
             actualTransaction2.setValue(ITransaction.CURRENT.get());
             actualSubject2.setValue(Subject.getSubject(AccessController.getContext()));
-            actualHttpServletRequest2.setValue(IServlet.CURRENT_HTTP_SERVLET_REQUEST.get());
-            actualHttpServletResponse2.setValue(IServlet.CURRENT_HTTP_SERVLET_RESPONSE.get());
+            actualHttpServletRequest2.setValue(HttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get());
+            actualHttpServletResponse2.setValue(HttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get());
           }
         }.schedule().get();
       }
@@ -154,24 +154,24 @@ public class ServerJobScheduleTest {
 
     assertSame(m_httpServletRequest, actualHttpServletRequest1.getValue());
     assertSame(m_httpServletRequest, actualHttpServletRequest2.getValue());
-    assertSame(m_httpServletRequest, IServlet.CURRENT_HTTP_SERVLET_REQUEST.get());
+    assertSame(m_httpServletRequest, HttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.get());
 
     assertSame(m_httpServletResponse, actualHttpServletResponse1.getValue());
     assertSame(m_httpServletResponse, actualHttpServletResponse2.getValue());
-    assertSame(m_httpServletResponse, IServlet.CURRENT_HTTP_SERVLET_RESPONSE.get());
+    assertSame(m_httpServletResponse, HttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.get());
   }
 
   /**
    * Job with a dedicated {@link JobManager} per test-case.
    */
-  public class ServerJob_<R> extends ServerJob<R> {
+  public abstract class _ServerJob extends ServerJob {
 
-    public ServerJob_(String name, IServerSession serverSession, Subject subject, long transactionId) {
+    public _ServerJob(String name, IServerSession serverSession, Subject subject, long transactionId) {
       super(name, serverSession, subject, transactionId);
     }
 
     @Override
-    protected JobManager createJobManager() {
+    protected IJobManager createJobManager() {
       return ServerJobScheduleTest.this.m_jobManager;
     }
   }

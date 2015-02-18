@@ -10,15 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.commons.servletfilter;
 
-import javax.servlet.Servlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * Represents a {@link Servlet} used in Scout application and provides the ongoing {@link HttpServletRequest} and
- * {@link HttpServletResponse} in the form of {@link ThreadLocal}s.
+ * Interface to hold information for an ongoing servlet call.
  */
-public interface IServlet extends Servlet {
+public interface HttpServletRoundtrip {
 
   /**
    * The {@link HttpServletRequest} which is currently associated with the current thread.

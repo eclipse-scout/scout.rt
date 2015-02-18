@@ -19,7 +19,6 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isNull;
 import static org.mockito.Matchers.same;
@@ -32,6 +31,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -44,7 +44,7 @@ import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.holders.IntegerHolder;
 import org.eclipse.scout.commons.job.IAsyncFuture;
 import org.eclipse.scout.commons.job.IFuture;
-import org.eclipse.scout.commons.job.IProgressMonitor;
+import org.eclipse.scout.commons.job.IJob;
 import org.eclipse.scout.commons.job.JobContext;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.IClientSession;
@@ -78,9 +78,9 @@ public class ModelJobScheduleTest {
 
   @Test
   public void testResult() throws ProcessingException {
-    ModelJob<String> job = new ModelJob<String>("job", m_clientSession) {
+    IModelJob<String> job = new ModelJobWithResult<String>("job", m_clientSession) {
       @Override
-      protected String onRun(IProgressMonitor monitor) throws Exception {
+      protected String call() throws Exception {
         return "RUNNING_WITH_RESULT";
       }
     };
@@ -100,10 +100,10 @@ public class ModelJobScheduleTest {
   public void testVoidResult() throws ProcessingException {
     final Holder<String> holder = new Holder<>();
 
-    ModelJob<Void> job = new ModelJob<Void>("job", m_clientSession) {
+    ModelJob job = new ModelJob("job", m_clientSession) {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+      protected void run() throws Exception {
         Thread.sleep(500);
         holder.setValue("RUNNING_VOID");
       }
@@ -129,18 +129,19 @@ public class ModelJobScheduleTest {
   public void testProcessingException() throws ProcessingException {
     final ProcessingException expectedException = new ProcessingException();
 
-    ModelJob<String> job = new ModelJob<String>("job", m_clientSession) {
+    ModelJob job = new ModelJob("job", m_clientSession) {
+
       @Override
-      protected String onRun(IProgressMonitor monitor) throws Exception {
+      protected void run() throws Exception {
         Thread.sleep(500);
         throw expectedException;
       }
     };
 
     @SuppressWarnings("unchecked")
-    IAsyncFuture<String> asyncFutureMock = Mockito.mock(IAsyncFuture.class);
+    IAsyncFuture<Void> asyncFutureMock = Mockito.mock(IAsyncFuture.class);
 
-    IFuture<String> future = job.schedule(asyncFutureMock);
+    IFuture<Void> future = job.schedule(asyncFutureMock);
     try {
       assertFalse(future.isDone());
       future.get();
@@ -155,8 +156,8 @@ public class ModelJobScheduleTest {
 
     assertTrue(future.isDone());
 
-    verify(asyncFutureMock, times(1)).onDone(isNull(String.class), same(expectedException));
-    verify(asyncFutureMock, never()).onSuccess(anyString());
+    verify(asyncFutureMock, times(1)).onDone(isNull(Void.class), same(expectedException));
+    verify(asyncFutureMock, never()).onSuccess(any(Void.class));
     verify(asyncFutureMock, times(1)).onError(same(expectedException));
   }
 
@@ -164,9 +165,9 @@ public class ModelJobScheduleTest {
   public void testRuntimeException() throws ProcessingException {
     final RuntimeException expectedException = new RuntimeException();
 
-    ModelJob<String> job = new ModelJob<String>("job", m_clientSession) {
+    ModelJob job = new ModelJob("job", m_clientSession) {
       @Override
-      protected String onRun(IProgressMonitor monitor) throws Exception {
+      protected void run() throws Exception {
         Thread.sleep(500);
         throw expectedException;
       }
@@ -175,10 +176,10 @@ public class ModelJobScheduleTest {
     // Mock AsyncFuture and prepare to capture the exception
     ArgumentCaptor<ProcessingException> actualExceptionCaptor = ArgumentCaptor.forClass(ProcessingException.class);
     @SuppressWarnings("unchecked")
-    IAsyncFuture<String> asyncFutureMock = Mockito.mock(IAsyncFuture.class);
+    IAsyncFuture<Void> asyncFutureMock = Mockito.mock(IAsyncFuture.class);
     doNothing().when(asyncFutureMock).onError(actualExceptionCaptor.capture());
 
-    IFuture<String> future = job.schedule(asyncFutureMock);
+    IFuture<Void> future = job.schedule(asyncFutureMock);
     try {
       assertFalse(future.isDone());
       future.get();
@@ -194,29 +195,29 @@ public class ModelJobScheduleTest {
 
     assertTrue(future.isDone());
 
-    verify(asyncFutureMock, times(1)).onDone(isNull(String.class), any(ProcessingException.class));
-    verify(asyncFutureMock, never()).onSuccess(anyString());
+    verify(asyncFutureMock, times(1)).onDone(isNull(Void.class), any(ProcessingException.class));
+    verify(asyncFutureMock, never()).onSuccess(any(Void.class));
     verify(asyncFutureMock, times(1)).onError(any(ProcessingException.class));
     assertSame(expectedException, actualExceptionCaptor.getValue().getCause());
   }
 
   @Test
   public void testWorkerThread() throws ProcessingException, InterruptedException {
-    final Set<Thread> workerThreads = new HashSet<Thread>();
+    final Set<Thread> workerThreads = Collections.synchronizedSet(new HashSet<Thread>()); // synchronized because modified/read by different threads.
 
     final CountDownLatch latch = new CountDownLatch(2);
 
-    new ModelJob<Void>("job-1", m_clientSession) {
+    new ModelJob("job-1", m_clientSession) {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor1) throws Exception {
+      protected void run() throws Exception {
         workerThreads.add(Thread.currentThread());
         latch.countDown();
 
-        new ModelJob<Void>("job-2", m_clientSession) {
+        new ModelJob("job-2", m_clientSession) {
 
           @Override
-          protected void onRunVoid(IProgressMonitor monitor2) throws Exception {
+          protected void run() throws Exception {
             workerThreads.add(Thread.currentThread());
             latch.countDown();
           }
@@ -239,17 +240,17 @@ public class ModelJobScheduleTest {
 
     final CountDownLatch latch = new CountDownLatch(2);
 
-    new ModelJob<Void>("ABC", m_clientSession) {
+    new ModelJob("ABC", m_clientSession) {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor1) throws Exception {
+      protected void run() throws Exception {
         actualThreadName1.setValue(Thread.currentThread().getName());
         latch.countDown();
 
-        new ModelJob<Void>("XYZ", m_clientSession) {
+        new ModelJob("XYZ", m_clientSession) {
 
           @Override
-          protected void onRunVoid(IProgressMonitor monitor2) throws Exception {
+          protected void run() throws Exception {
             actualThreadName2.setValue(Thread.currentThread().getName());
             latch.countDown();
           }
@@ -266,30 +267,30 @@ public class ModelJobScheduleTest {
 
   @Test
   public void testCurrentJob() throws ProcessingException, InterruptedException {
-    final Holder<ModelJob<?>> job1 = new Holder<>();
-    final Holder<ModelJob<?>> job2 = new Holder<>();
+    final Holder<IJob<?>> job1 = new Holder<>();
+    final Holder<IJob<?>> job2 = new Holder<>();
 
-    final Holder<ModelJob<?>> actualJob1 = new Holder<>();
-    final Holder<ModelJob<?>> actualJob2 = new Holder<>();
+    final Holder<IJob<?>> actualJob1 = new Holder<>();
+    final Holder<IJob<?>> actualJob2 = new Holder<>();
 
     final CountDownLatch latch = new CountDownLatch(2);
 
     ModelJob.CURRENT.set(null);
 
-    new ModelJob<Void>("job-1", m_clientSession) {
+    new ModelJob("job-1", m_clientSession) {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor1) throws Exception {
+      protected void run() throws Exception {
         job1.setValue(this);
-        actualJob1.setValue(ModelJob.get());
+        actualJob1.setValue(IJob.CURRENT.get());
         latch.countDown();
 
-        new ModelJob<Void>("job-2", m_clientSession) {
+        new ModelJob("job-2", m_clientSession) {
 
           @Override
-          protected void onRunVoid(IProgressMonitor monitor2) throws Exception {
+          protected void run() throws Exception {
             job2.setValue(this);
-            actualJob2.setValue(ModelJob.get());
+            actualJob2.setValue(IJob.CURRENT.get());
             latch.countDown();
           }
         }.schedule();
@@ -309,11 +310,11 @@ public class ModelJobScheduleTest {
 
   @Test
   public void testScheduleAndGet() throws ProcessingException {
-    final List<Integer> actualProtocol = new ArrayList<>();
-    new ModelJob<Void>("job", m_clientSession) {
+    final List<Integer> actualProtocol = Collections.synchronizedList(new ArrayList<Integer>()); // synchronized because modified/read by different threads.
+    new ModelJob("job", m_clientSession) {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+      protected void run() throws Exception {
         Thread.sleep(100);
         actualProtocol.add(1);
       }
@@ -326,9 +327,10 @@ public class ModelJobScheduleTest {
   @Test
   public void testReusable() throws ProcessingException {
     final IntegerHolder holder = new IntegerHolder();
-    ModelJob<String> job = new ModelJob<String>("job", m_clientSession) {
+    IModelJob<String> job = new ModelJobWithResult<String>("job", m_clientSession) {
+
       @Override
-      protected String onRun(IProgressMonitor monitor) throws Exception {
+      protected String call() throws Exception {
         return "RUN_" + holder.getValue();
       }
     };
@@ -355,10 +357,10 @@ public class ModelJobScheduleTest {
     final Holder<JobContext> actualJobContext1 = new Holder<>();
     final Holder<JobContext> actualJobContext2 = new Holder<>();
 
-    new ModelJob<Void>("job-1", m_clientSession) {
+    new ModelJob("job-1", m_clientSession) {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor1) throws Exception {
+      protected void run() throws Exception {
         actualClientSession1.setValue(IClientSession.CURRENT.get());
         actualLocale1.setValue(NlsLocale.CURRENT.get());
         actualTexts1.setValue(ScoutTexts.CURRENT.get());
@@ -368,10 +370,10 @@ public class ModelJobScheduleTest {
         ctx1.set("PROP_JOB1+JOB2", "SHARED-1");
         actualJobContext1.setValue(ctx1);
 
-        new ModelJob<Void>("job-2", m_clientSession) {
+        new ModelJob("job-2", m_clientSession) {
 
           @Override
-          protected void onRunVoid(IProgressMonitor monitor2) throws Exception {
+          protected void run() throws Exception {
             actualClientSession2.setValue(IClientSession.CURRENT.get());
             actualLocale2.setValue(NlsLocale.CURRENT.get());
             actualTexts2.setValue(ScoutTexts.CURRENT.get());

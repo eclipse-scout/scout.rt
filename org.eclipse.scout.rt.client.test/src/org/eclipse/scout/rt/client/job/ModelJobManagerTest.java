@@ -14,6 +14,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -26,9 +27,7 @@ import java.util.concurrent.TimeUnit;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.job.IJob;
 import org.eclipse.scout.commons.job.IJobVisitor;
-import org.eclipse.scout.commons.job.IProgressMonitor;
 import org.eclipse.scout.commons.job.JobExecutionException;
-import org.eclipse.scout.commons.job.JobManager;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -40,11 +39,14 @@ public class ModelJobManagerTest {
 
   private static ExecutorService s_executor;
 
+  private IClientSession m_clientSession;
   private ModelJobManager m_jobManager;
 
   @Before
   public void before() {
     m_jobManager = new ModelJobManager();
+    m_clientSession = mock(IClientSession.class);
+    when(m_clientSession.getModelJobManager()).thenReturn(m_jobManager);
   }
 
   @After
@@ -64,24 +66,24 @@ public class ModelJobManagerTest {
 
   @Test
   public void testVisit() throws JobExecutionException, InterruptedException {
-    IJob<Void> job1 = new Job_<Void>("job-1") {
+    ModelJob job1 = new ModelJob("job-1", m_clientSession) {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+      protected void run() throws Exception {
         Thread.sleep(TimeUnit.SECONDS.toMillis(1));
       }
     };
-    IJob<Void> job2 = new Job_<Void>("job-2") {
+    ModelJob job2 = new ModelJob("job-2", m_clientSession) {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+      protected void run() throws Exception {
         Thread.sleep(TimeUnit.SECONDS.toMillis(1));
       }
     };
-    IJob<Void> job3 = new Job_<Void>("job-3") {
+    ModelJob job3 = new ModelJob("job-3", m_clientSession) {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+      protected void run() throws Exception {
         Thread.sleep(TimeUnit.SECONDS.toMillis(1));
       }
     };
@@ -106,14 +108,13 @@ public class ModelJobManagerTest {
 
   @Test
   public void testShutdown() throws JobExecutionException, InterruptedException {
-    final Set<IJob<?>> actualInterruptedProtocol = new HashSet<>();
-
+    final Set<IJob<?>> actualInterruptedProtocol = Collections.synchronizedSet(new HashSet<IJob<?>>()); // synchronized because modified/read by different threads.
     final CountDownLatch latchBefore = new CountDownLatch(1);
 
-    final IJob<Void> job1 = new Job_<Void>("job-1") {
+    ModelJob job1 = new ModelJob("job-1", m_clientSession) {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+      protected void run() throws Exception {
         latchBefore.countDown();
         try {
           Thread.sleep(TimeUnit.SECONDS.toMillis(30));
@@ -123,10 +124,10 @@ public class ModelJobManagerTest {
         }
       }
     };
-    final IJob<Void> job2 = new Job_<Void>("job-2") {
+    ModelJob job2 = new ModelJob("job-2", m_clientSession) {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+      protected void run() throws Exception {
         latchBefore.countDown();
         try {
           Thread.sleep(TimeUnit.SECONDS.toMillis(30));
@@ -136,10 +137,10 @@ public class ModelJobManagerTest {
         }
       }
     };
-    final IJob<Void> job3 = new Job_<Void>("job-3") {
+    ModelJob job3 = new ModelJob("job-3", m_clientSession) {
 
       @Override
-      protected void onRunVoid(IProgressMonitor monitor) throws Exception {
+      protected void run() throws Exception {
         latchBefore.countDown();
         try {
           Thread.sleep(TimeUnit.SECONDS.toMillis(30));
@@ -155,26 +156,11 @@ public class ModelJobManagerTest {
     job3.schedule();
 
     latchBefore.await(10, TimeUnit.SECONDS); // Wait for all jobs to be ready
-    Thread.sleep(100);
     assertFalse(m_jobManager.isIdle());
     m_jobManager.shutdown();
-    assertTrue("pending queue not cleared", m_jobManager.waitForIdle(10, TimeUnit.SECONDS));
+    assertTrue(m_jobManager.isIdle());
+
+    Thread.sleep(TimeUnit.SECONDS.toMillis(5)); // Wait some time until all jobs were interrupted.
     assertEquals("active mutex-job interrupted", Collections.singleton(job1), actualInterruptedProtocol);
-    assertTrue("pending queue not cleared", m_jobManager.isIdle());
-  }
-
-  /**
-   * Job with a dedicated {@link JobManager} per test-case.
-   */
-  public class Job_<R> extends ModelJob<R> {
-
-    public Job_(String name) {
-      super(name, mock(IClientSession.class));
-    }
-
-    @Override
-    protected ModelJobManager createJobManager(IClientSession clientSession) {
-      return ModelJobManagerTest.this.m_jobManager;
-    }
   }
 }

@@ -24,6 +24,7 @@ import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.IJob;
 import org.eclipse.scout.commons.job.JobExecutionException;
@@ -33,13 +34,14 @@ import org.eclipse.scout.commons.job.JobExecutionException;
  * <p/>
  * This {@link Callable} is a processing object in the language of the design pattern 'chain-of-responsibility'.
  *
- * @param <R>
+ * @param <RESULT>
  *          the result type of the job's computation.
  * @since 5.1
  */
-public class ExceptionTranslator<R> implements Callable<R>, Chainable {
+public class ExceptionTranslator<RESULT> implements Callable<RESULT>, Chainable {
 
-  protected final Callable<R> m_next;
+  @Internal
+  protected final Callable<RESULT> m_next;
 
   /**
    * Creates a processor to translate computing exceptions into {@link ProcessingException}s.
@@ -47,12 +49,12 @@ public class ExceptionTranslator<R> implements Callable<R>, Chainable {
    * @param next
    *          next processor in the chain; must not be <code>null</code>.
    */
-  public ExceptionTranslator(final Callable<R> next) {
+  public ExceptionTranslator(final Callable<RESULT> next) {
     m_next = Assertions.assertNotNull(next);
   }
 
   @Override
-  public R call() throws Exception {
+  public RESULT call() throws Exception {
     try {
       return m_next.call();
     }
@@ -120,6 +122,7 @@ public class ExceptionTranslator<R> implements Callable<R>, Chainable {
   /**
    * @return the current subject's principals.
    */
+  @Internal
   protected static String getIdentity() {
     Subject subject = null;
     try {
@@ -141,7 +144,7 @@ public class ExceptionTranslator<R> implements Callable<R>, Chainable {
   }
 
   @Override
-  public Callable<R> getNext() {
+  public Callable<RESULT> getNext() {
     return m_next;
   }
 }

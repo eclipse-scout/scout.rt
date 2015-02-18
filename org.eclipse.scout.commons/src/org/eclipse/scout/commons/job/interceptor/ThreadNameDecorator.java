@@ -15,21 +15,24 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.Assertions;
+import org.eclipse.scout.commons.annotations.Internal;
 
 /**
  * Processor to decorate the thread-name of the worker-thread during the time of execution with the job name.
  * <p/>
  * This {@link Callable} is a processing object in the language of the design pattern 'chain-of-responsibility'.
  *
- * @param <R>
+ * @param <RESULT>
  *          the result type of the job's computation.
  * @since 5.1
  */
-public class ThreadNameDecorator<R> implements Callable<R>, Chainable {
+public class ThreadNameDecorator<RESULT> implements Callable<RESULT>, Chainable {
 
+  @Internal
   protected static final Pattern PATTERN_THREAD_NAME = Pattern.compile("thread\\:(.+?)\\;job\\:.+");
-
-  protected final Callable<R> m_next;
+  @Internal
+  protected final Callable<RESULT> m_next;
+  @Internal
   protected final String m_jobName;
 
   /**
@@ -40,13 +43,13 @@ public class ThreadNameDecorator<R> implements Callable<R>, Chainable {
    * @param jobName
    *          job name to decorate the thread name with; must not be <code>null</code>.
    */
-  public ThreadNameDecorator(final Callable<R> next, final String jobName) {
+  public ThreadNameDecorator(final Callable<RESULT> next, final String jobName) {
     m_next = Assertions.assertNotNull(next);
     m_jobName = Assertions.assertNotNullOrEmpty(jobName);
   }
 
   @Override
-  public R call() throws Exception {
+  public RESULT call() throws Exception {
     final Thread thread = Thread.currentThread();
 
     final String oldThreadName = thread.getName();
@@ -62,8 +65,9 @@ public class ThreadNameDecorator<R> implements Callable<R>, Chainable {
   }
 
   /**
-   * @return the original thread name as defined by the worker-thread.
+   * @return the original thread name as defined by the worker-thread; removes decoration if running a nested job.
    */
+  @Internal
   protected String getOriginalThreadName(final String threadName) {
     final Matcher matcher = PATTERN_THREAD_NAME.matcher(threadName);
     if (matcher.find()) {
@@ -75,7 +79,7 @@ public class ThreadNameDecorator<R> implements Callable<R>, Chainable {
   }
 
   @Override
-  public Callable<R> getNext() {
+  public Callable<RESULT> getNext() {
     return m_next;
   }
 }

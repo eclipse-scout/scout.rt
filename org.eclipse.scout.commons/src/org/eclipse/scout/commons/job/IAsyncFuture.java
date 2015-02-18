@@ -15,11 +15,11 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 /**
  * Future to be notified upon completion of a computation.
  *
- * @param <R>
+ * @param <RESULT>
  *          type of the computation result.
  * @since 5.1
  */
-public interface IAsyncFuture<R> {
+public interface IAsyncFuture<RESULT> {
 
   /**
    * Is called upon successful computation.
@@ -27,7 +27,7 @@ public interface IAsyncFuture<R> {
    * @param result
    *          the computation result.
    */
-  void onSuccess(R result);
+  void onSuccess(RESULT result);
 
   /**
    * Is called upon failed computation.
@@ -45,5 +45,5 @@ public interface IAsyncFuture<R> {
    * @param e
    *          the computation error; is <code>null</code> in case of success.
    */
-  void onDone(R result, ProcessingException e);
+  void onDone(RESULT result, ProcessingException e);
 }
