@@ -16,6 +16,7 @@
   /* necessary for scrollbars */
   position: relative;
   overflow: hidden;
+  width: 100%; /* expand to outer container, needed for breadcrumb */
 }
 
 .navigation-breadcrumb .tree-data {
