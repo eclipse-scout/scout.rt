@@ -291,3 +291,5 @@ Um einen Wert in einen Boolean zu casten, folgende Kurznotation verwenden:
 Mit dem einen Ausrufezeichen wird geschaut, ob der Value "truthy" ist. Das ist dann
 immer garantiert true oder false, dummerweise noch verkehrt (true wenn 'value' falsy ist,
 false, wenn er truthy ist). Mit dem zweiten Ausrufezeichen wird das korrigiert.
+
+Zwischen !! und dem Wert kein Leerzeichen verwenden (macht man ja bei einem einzelnen ! auch nicht.)

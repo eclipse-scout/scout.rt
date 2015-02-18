@@ -678,8 +678,8 @@ scout.Tree.prototype._decorateNode = function(node) {
     return;
   }
 
-  $node.toggleClass('leaf', !! node.leaf);
-  $node.toggleClass('expanded', ( !! node.expanded && node.childNodes.length > 0));
+  $node.toggleClass('leaf', !!node.leaf);
+  $node.toggleClass('expanded', ( !!node.expanded && node.childNodes.length > 0));
 
   // Replace only the text node in the DOM, but leave inner DIVs untouched (e.g. tree item control)
   var textDomNodes = $node.contents().filter(function() {

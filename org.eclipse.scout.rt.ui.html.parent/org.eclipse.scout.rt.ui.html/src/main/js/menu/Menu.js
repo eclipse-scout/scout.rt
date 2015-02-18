@@ -64,5 +64,5 @@ scout.Menu.prototype._renderIconId = function(iconId) {
 
 scout.Menu.prototype._updateIconAndTextStyle = function() {
   var textAndIcon = (this.text && this.text.length > 0 && this.iconId);
-  this.$container.toggleClass('menu-textandicon', !! textAndIcon);
+  this.$container.toggleClass('menu-textandicon', !!textAndIcon);
 };
