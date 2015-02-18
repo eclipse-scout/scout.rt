@@ -26,7 +26,7 @@ function loadAndResolveScriptContent(path) {
   }).done(function(data) {
     content = data;
   }).fail(function(jqXHR, textStatus, errorThrown) {
-    throw new Error(textStatus);
+    throw new Error('Script ' + path + ' could not be loaded. Status: ' + textStatus + '. Error thrown: ' + errorThrown);
   });
   //replace includes
   content = content.replace(
