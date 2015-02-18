@@ -126,6 +126,16 @@ describe("Tree", function() {
     };
   }
 
+  function createTreeEnabledEvent(model, enabled) {
+    return {
+      target: model.id,
+      type: 'property',
+      properties: {
+        enabled: enabled
+      }
+    };
+  }
+
   describe("creation", function() {
     it("adds nodes", function() {
 
@@ -1064,4 +1074,46 @@ describe("Tree", function() {
       });
     });
   });
+
+  describe("tree enabled/disabled", function() {
+
+    var model;
+    var tree;
+    var node0;
+    var node1;
+    var node2;
+
+    beforeEach(function() {
+      model = createModelFixture(3, 1, true);
+      model.checkable = true;
+      model.nodes[2].enabled = false;
+
+      tree = createTree(model);
+      node0 = model.nodes[0];
+      node1 = model.nodes[1];
+      node2 = model.nodes[2];
+    });
+
+    it("disables checkboxes when tree is disabled", function() {
+      tree.render(session.$entryPoint);
+
+      expect(node0.$node.find('input').eq(0)[0]).not.toHaveAttr('disabled');
+      expect(node2.$node.find('input').eq(0)[0]).toHaveAttr('disabled');
+
+      // Disable tree
+      var message = { events: [ createTreeEnabledEvent(model, false) ] };
+      session._processSuccessResponse(message);
+
+      expect(node0.$node.find('input').eq(0)[0]).toHaveAttr('disabled');
+      expect(node2.$node.find('input').eq(0)[0]).toHaveAttr('disabled');
+
+      // Re-enable tree
+      message = { events: [ createTreeEnabledEvent(model, true) ] };
+      session._processSuccessResponse(message);
+
+      expect(node0.$node.find('input').eq(0)[0]).not.toHaveAttr('disabled');
+      expect(node2.$node.find('input').eq(0)[0]).toHaveAttr('disabled');
+    });
+  });
+
 });

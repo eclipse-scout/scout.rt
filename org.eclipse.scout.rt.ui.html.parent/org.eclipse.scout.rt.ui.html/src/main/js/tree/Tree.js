@@ -787,12 +787,10 @@ scout.Tree.prototype._renderTreeItemCheckbox = function($node, node) {
     .prop('checked', node.checked);
   var $label = $('<label>')
     .attr('for', forRefId)
-    .appendTo($controlItem).
-  on('mouseup', node, onNodeChecked);
+    .appendTo($controlItem)
+    .on('mouseup', node, onNodeChecked);
 
-  if (!this.enabled || !node.enabled) {
-    $checkbox.prop('disabled', 'disabled');
-  }
+  $checkbox.setEnabled(this.enabled && node.enabled);
 
   if (node.childrenChecked) {
     $label.addClass('childrenChecked');
@@ -1001,6 +999,19 @@ scout.Tree.prototype._renderTitle = function() {
 scout.Tree.prototype._renderAutoCheckChildren = function() {
   // NOP
 };
+
+scout.Tree.prototype._renderEnabled = function(enabled) {
+  // FIXME CGU remove/add events. Maybe extend jquery to not fire on disabled events?
+  this.$data.setEnabled(enabled);
+
+  // Enable/disable all checkboxes
+  this.$nodes().each(function() {
+    var $node = $(this),
+      node = $node.data('node');
+    $node.find('input').setEnabled(enabled && node.enabled);
+  });
+};
+
 
 /* --- STATIC HELPERS ------------------------------------------------------------- */
 
