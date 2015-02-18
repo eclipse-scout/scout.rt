@@ -16,19 +16,22 @@ import static org.mockito.Mockito.verify;
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.testing.server.runner.ScoutServerTestRunner;
 import org.eclipse.scout.rt.testing.server.test.TestServerSession;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 
 /**
  * Test for {@link DefaultTestServerSessionProvider}
  */
+@RunWith(ScoutServerTestRunner.class)
 public class DefaultTestServerSessionProviderTest {
 
   /**
    * A new ServerSession should be created and loaded in
    * {@link DefaultTestServerSessionProvider#createServerSession(Class, Subject)}
-   * 
+   *
    * @throws ProcessingException
    */
   @Test
