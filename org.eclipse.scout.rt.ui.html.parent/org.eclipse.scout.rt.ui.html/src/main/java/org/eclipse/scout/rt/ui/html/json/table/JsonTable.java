@@ -492,7 +492,14 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
 
   protected IColumn extractColumn(JSONObject json) {
     String columnId = JsonObjectUtility.getString(json, PROP_COLUMN_ID);
-    return getModel().getColumnSet().getColumnById(columnId);
+    if (columnId == null) {
+      return null;
+    }
+    IColumn column = getModel().getColumnSet().getColumnById(columnId);
+    if (column == null) {
+      throw new JsonException("No column found for id " + columnId);
+    }
+    return column;
   }
 
   protected JSONArray columnIdsToJson(Collection<IColumn<?>> columns) {

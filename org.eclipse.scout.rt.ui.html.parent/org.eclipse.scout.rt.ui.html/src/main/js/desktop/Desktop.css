@@ -176,11 +176,10 @@ Middle rows dont have 2px border so no need to do it for those. */
 .desktop-bench > .table .table-row.select-single:before,
 .desktop-bench > .table .table-row.select-top:before,
 .desktop-bench > .table .table-row.select-bottom:before {
-   position: absolute;
-   display: block;
-   content: '';
-   height: 100%;
-   width: 100%;
+   .overlay;
+   /* Make sure overlay does not get target of mouse events, necessary for links inside table-cell.
+   FIXME CGU verify if this really works with IE 9 */
+   pointer-events: none;
 }
 
 .desktop-bench > .table .table-row.select-top:before {

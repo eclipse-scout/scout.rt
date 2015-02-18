@@ -490,19 +490,19 @@ scout.Table.prototype._installRows = function($rows) {
     }
 
     var $row = $(event.delegateTarget);
-    var colId = that._findColumnId(event);
+    var column = that._columnAtX(event.pageX);
     var hyperLink = that._findHyperLink(event);
     if (hyperLink) {
-      that.sendHyperlinkAction($row, colId, hyperLink);
+      that.sendHyperlinkAction($row.data('row').id, column.id, hyperLink);
     } else {
-      that.sendRowClicked($row, colId);
+      that.sendRowClicked($row, column.id);
     }
   }
 
   function onDoubleClick(event) {
     var $row = $(event.delegateTarget);
-    var colId = that._findColumnId(event);
-    that.sendRowAction($row, colId);
+    var column = that._columnAtX(event.pageX);
+    that.sendRowAction($row, column.id);
   }
 
   function onContextMenu(event) {
@@ -557,22 +557,21 @@ scout.Table.prototype._installRows = function($rows) {
   }
 };
 
-scout.Table.prototype._findColumnId = function(event) {
-  //bubble up from target to delegateTarget
-  var $elem = $(event.target);
-  var $stop = $(event.delegateTarget);
-  var colIndex = '';
-  while ($elem.length > 0) {
-    colIndex = $elem.data('column-index');
-    if (colIndex >= 0) {
-      return this.columns[colIndex].id;
+/**
+ * @returns the column at position x (e.g. from event.pageX)
+ */
+scout.Table.prototype._columnAtX = function(x) {
+  var column, i,
+    columnOffsetRight = 0,
+    offsetLeft = this.$data.offset().left;
+
+  return scout.arrays.find(this.columns, function(column) {
+    columnOffsetRight = offsetLeft + column.width;
+    if (x >= offsetLeft && x <= columnOffsetRight) {
+      return true;
     }
-    if ($elem[0] === $stop[0]) {
-      return null;
-    }
-    $elem = $elem.parent();
-  }
-  return null;
+    offsetLeft = columnOffsetRight;
+  });
 };
 
 scout.Table.prototype._findHyperLink = function(event) {
@@ -670,18 +669,18 @@ scout.Table.prototype.sendRowsChecked = function(rows) {
   this.session.send(this.id, 'rowsChecked', data);
 };
 
-scout.Table.prototype.sendRowAction = function($row, columnIdParam) {
+scout.Table.prototype.sendRowAction = function($row, columnId) {
   this.session.send(this.id, 'rowAction', {
     rowId: $row.attr('id'),
-    columnId: columnIdParam
+    columnId: columnId
   });
 };
 
-scout.Table.prototype.sendHyperlinkAction = function($row, columnIdParam, hyperlinkParam) {
+scout.Table.prototype.sendHyperlinkAction = function(rowId, columnId, hyperlink) {
   this.session.send(this.id, 'hyperlinkAction', {
-    rowId: $row.attr('id'),
-    columnId: columnIdParam,
-    hyperlink: hyperlinkParam
+    rowId: rowId,
+    columnId: columnId,
+    hyperlink: hyperlink
   });
 };
 

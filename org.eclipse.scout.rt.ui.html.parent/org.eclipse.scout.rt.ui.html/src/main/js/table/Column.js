@@ -18,5 +18,5 @@ scout.Column.prototype.buildCell = function(row) {
   tooltipText = this.table.cellTooltipText(this, row);
   tooltip = (!scout.strings.hasText(tooltipText) ? '' : ' title="' + tooltipText + '"');
 
-  return '<div class="table-cell" data-column-index="' + this.index + '" style="' + style + '"' + tooltip + scout.device.unselectableAttribute + '>' + value + '</div>';
+  return '<div class="table-cell" style="' + style + '"' + tooltip + scout.device.unselectableAttribute + '>' + value + '</div>';
 };
