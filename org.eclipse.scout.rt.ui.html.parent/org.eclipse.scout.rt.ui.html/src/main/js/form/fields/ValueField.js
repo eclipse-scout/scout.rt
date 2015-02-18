@@ -19,6 +19,10 @@ scout.ValueField.prototype._readDisplayText = function() {
   return this.$field.val();
 };
 
+/**
+ * "Validate on any key" does not really belong to ValueField, but is available here
+ * as a convenience for all subclasses that want to support it.
+ */
 scout.ValueField.prototype._renderValidateOnAnyKey = function(validateOnAnyKey) {
   if (validateOnAnyKey) {
     this.$field.on('keyup', this._onFieldKeyUp.bind(this));
