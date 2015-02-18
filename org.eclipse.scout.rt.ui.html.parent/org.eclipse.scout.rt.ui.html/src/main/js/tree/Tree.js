@@ -470,6 +470,9 @@ scout.Tree.prototype._onAllNodesDeleted = function(parentNodeId) {
   updateNodeMap = function(parentNode, node) {
     this._updateMarkChildrenChecked(node, false, false);
     delete this.nodesMap[node.id];
+    if (this._onNodeDeleted) { // Necessary for subclasses
+      this._onNodeDeleted(node);
+    }
   }.bind(this);
 
   if (parentNodeId >= 0) {

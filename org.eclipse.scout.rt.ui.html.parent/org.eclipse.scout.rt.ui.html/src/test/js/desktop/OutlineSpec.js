@@ -78,6 +78,15 @@ describe("Outline", function() {
     };
   }
 
+  function createAllNodesDeletedEvent(model, commonParentNodeId) {
+    return {
+      target: model.id,
+      commonParentNodeId: commonParentNodeId,
+      type: 'allNodesDeleted'
+    };
+  }
+
+
   describe("onModelAction", function() {
 
     describe("nodesDeleted event", function() {
@@ -96,19 +105,45 @@ describe("Outline", function() {
         node2 = model.nodes[2];
       });
 
-      describe("deleting a node", function() {
+      it("calls onNodeDeleted for every node to be able to cleanup", function() {
+        spyOn(tree, '_onNodeDeleted');
 
-        it("calls onNodeDeleted for every node to be able to cleanup", function() {
-          spyOn(tree, '_onNodeDeleted');
+        var message = {
+          events: [createNodesDeletedEvent(model, [node0.id])]
+        };
+        session._processSuccessResponse(message);
 
-          var message = {
-            events: [createNodesDeletedEvent(model, [node0.id])]
-          };
-          session._processSuccessResponse(message);
+        expect(tree._onNodeDeleted.calls.count()).toBe(13);
+      });
 
-          expect(tree._onNodeDeleted.calls.count()).toBe(13);
-        });
+    });
 
+    describe("allNodesDeleted event", function() {
+      var model;
+      var tree;
+      var node0;
+      var node1;
+      var node2;
+
+      beforeEach(function() {
+        // A large tree is used to properly test recursion
+        model = createModelFixture(3, 2, true);
+        tree = createOutline(model);
+        node0 = model.nodes[0];
+        node1 = model.nodes[1];
+        node2 = model.nodes[2];
+      });
+
+      it("calls onNodeDeleted for every node to be able to cleanup", function() {
+        spyOn(tree, '_onNodeDeleted');
+
+        var message = {
+          events: [createAllNodesDeletedEvent(model)]
+        };
+        session._processSuccessResponse(message);
+
+        expect(tree._onNodeDeleted.calls.count()).toBe(39);
+        expect(scout.objects.countProperties(tree.nodesMap)).toBe(0);
       });
 
     });
