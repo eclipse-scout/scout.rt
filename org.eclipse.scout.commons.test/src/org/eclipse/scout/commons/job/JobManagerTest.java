@@ -108,7 +108,7 @@ public class JobManagerTest {
       protected void onRunVoid(IProgressMonitor monitor) throws Exception {
         latchBefore.countDown();
         try {
-          Thread.sleep(TimeUnit.SECONDS.toMillis(30));
+          Thread.sleep(TimeUnit.SECONDS.toMillis(3));
         }
         catch (InterruptedException e) {
           actualInterruptedProtocol.add(this);
@@ -122,7 +122,7 @@ public class JobManagerTest {
       protected void onRunVoid(IProgressMonitor monitor) throws Exception {
         latchBefore.countDown();
         try {
-          Thread.sleep(TimeUnit.SECONDS.toMillis(30));
+          Thread.sleep(TimeUnit.SECONDS.toMillis(3));
         }
         catch (InterruptedException e) {
           actualInterruptedProtocol.add(this);
@@ -136,7 +136,7 @@ public class JobManagerTest {
       protected void onRunVoid(IProgressMonitor monitor) throws Exception {
         latchBefore.countDown();
         try {
-          Thread.sleep(TimeUnit.SECONDS.toMillis(30));
+          Thread.sleep(TimeUnit.SECONDS.toMillis(3));
         }
         catch (InterruptedException e) {
           actualInterruptedProtocol.add(this);
@@ -149,10 +149,10 @@ public class JobManagerTest {
     job2.schedule();
     job3.schedule();
 
-    latchBefore.await(30, TimeUnit.SECONDS); // Wait for all jobs to be ready
+    latchBefore.await(10, TimeUnit.SECONDS); // Wait for all jobs to be ready
     Thread.sleep(TimeUnit.SECONDS.toMillis(2));
     m_jobManager.shutdown();
-    latchAfter.await(60, TimeUnit.SECONDS); // Wait for all jobs to be interrupted
+    latchAfter.await(20, TimeUnit.SECONDS); // Wait for all jobs to be interrupted
     assertEquals(CollectionUtility.hashSet(job1, job2, job3), actualInterruptedProtocol);
   }
 
