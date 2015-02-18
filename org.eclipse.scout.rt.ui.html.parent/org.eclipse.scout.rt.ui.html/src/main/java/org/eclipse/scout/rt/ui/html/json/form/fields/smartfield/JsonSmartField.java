@@ -21,7 +21,6 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.CachingEnabled;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.Multiline;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
@@ -61,7 +60,7 @@ public class JsonSmartField<V, T extends ISmartField<V>> extends JsonValueField<
     putJsonProperty(new JsonProperty<ISmartField<?>>(PROP_MULTI_LINE, model) {
       @Override
       protected Boolean modelValue() {
-        return isMultiline();
+        return getModel().isMultilineText();
       }
     });
     putJsonProperty(new JsonProperty<ISmartField<?>>(PROP_LOOKUP_STRATEGY, model) {
@@ -86,7 +85,7 @@ public class JsonSmartField<V, T extends ISmartField<V>> extends JsonValueField<
 
   @Override
   public String getObjectType() {
-    if (isMultiline()) {
+    if (getModel().isMultilineText()) {
       return "SmartFieldMultiline";
     }
     else {
@@ -122,10 +121,6 @@ public class JsonSmartField<V, T extends ISmartField<V>> extends JsonValueField<
 
   protected String getLookupStrategy() {
     return isCachingEnabled() ? "cached" : "remote";
-  }
-
-  protected boolean isMultiline() {
-    return getModel().getClass().isAnnotationPresent(Multiline.class);
   }
 
   protected List<? extends ILookupRow<V>> loadOptions(final String query) {
