@@ -153,11 +153,13 @@ scout.Desktop.prototype._updateTab = function(tab) {
 scout.Desktop.prototype._removeTab = function(tab) {
   scout.arrays.remove(this._allTabs, tab);
 
-  if (tab.$container.isSelected() && this._allTabs.length > 0) {
-    this._selectTab(this._allTabs[this._allTabs.length - 1]);
+  // If tab was already rendered, unrender it
+  if (tab.$container) {
+    if (tab.$container.isSelected() && this._allTabs.length > 0) {
+      this._selectTab(this._allTabs[this._allTabs.length - 1]);
+    }
+    tab.$container.remove();
   }
-
-  tab.$container.remove();
 };
 
 scout.Desktop.prototype._selectTab = function(tab) {
