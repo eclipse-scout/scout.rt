@@ -44,7 +44,7 @@ public interface IContentAssistField<VALUE, LOOKUP_KEY> extends IValueField<VALU
    * {@link String}
    */
   String PROP_ICON_ID = "iconId";
-
+  String PROP_MULTILINE_TEXT = "multilineText";
   String BROWSE_ALL_TEXT = "*";
 
   void addSmartFieldListener(ContentAssistFieldListener listener);
@@ -93,6 +93,16 @@ public interface IContentAssistField<VALUE, LOOKUP_KEY> extends IValueField<VALU
   String getIconId();
 
   void setIconId(String s);
+
+  /**
+   * @since 5.1
+   */
+  void setMultilineText(boolean b);
+
+  /**
+   * @since 5.1
+   */
+  boolean isMultilineText();
 
   /**
    * For performance optimization, style loading is done lazily.

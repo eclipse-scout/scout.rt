@@ -209,7 +209,7 @@ public abstract class AbstractMixedSmartField<VALUE, LOOKUP_KEY> extends Abstrac
     if (getCurrentLookupRow() != null) {
       installLookupRowContext(getCurrentLookupRow());
       String text = getCurrentLookupRow().getText();
-      if (text != null) {
+      if (!isMultilineText() && text != null) {
         text = text.replaceAll("[\\n\\r]+", " ");
       }
       return text;

@@ -137,7 +137,7 @@ public abstract class AbstractProposalField<LOOKUP_KEY> extends AbstractContentA
     if (getCurrentLookupRow() != null) {
       installLookupRowContext(getCurrentLookupRow());
       String text = getCurrentLookupRow().getText();
-      if (text != null) {
+      if (!isMultilineText() && text != null) {
         text = text.replaceAll("[\\n\\r]+", " ");
       }
       return text;

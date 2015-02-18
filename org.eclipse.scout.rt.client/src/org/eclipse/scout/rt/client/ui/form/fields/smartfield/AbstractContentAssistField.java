@@ -121,6 +121,19 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
   }
 
   /**
+   * Configures whether the field may display multiple lines of text.<br>
+   * <p>
+   * Subclasses can override this method. Default is false.
+   * 
+   * @since 5.1
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(290)
+  protected boolean getConfiguredMultilineText() {
+    return false;
+  }
+
+  /**
    * valid when configuredBrowseHierarchy=true
    */
   @ConfigProperty(ConfigProperty.BOOLEAN)
@@ -399,6 +412,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
     setBrowseIconId(getConfiguredBrowseIconId());
     setBrowseLoadIncremental(getConfiguredBrowseLoadIncremental());
     setIconId(getConfiguredIconId());
+    setMultilineText(getConfiguredMultilineText());
     setBrowseMaxRowCount(getConfiguredBrowseMaxRowCount());
     setBrowseNewText(getConfiguredBrowseNewText());
     setProposalFormProvider(createProposalFormProvider());
@@ -538,6 +552,16 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
   @Override
   public void setIconId(String s) {
     propertySupport.setPropertyString(PROP_ICON_ID, s);
+  }
+
+  @Override
+  public void setMultilineText(boolean b) {
+    propertySupport.setPropertyBool(PROP_MULTILINE_TEXT, b);
+  }
+
+  @Override
+  public boolean isMultilineText() {
+    return propertySupport.getPropertyBool(PROP_MULTILINE_TEXT);
   }
 
   @Override
@@ -786,7 +810,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
     try {
       m_installingRowContext = true;
       String text = row.getText();
-      if (text != null) {
+      if (!isMultilineText() && text != null) {
         text = text.replaceAll("[\\n\\r]+", " ");
       }
       setDisplayText(text);
