@@ -26,7 +26,7 @@ import org.eclipse.scout.rt.shared.Activator;
  * {@link DefaultUserAgentParser}. If you would like to export it in a custom format just create a custom
  * {@link IUserAgentParser} and call {@link #createIdentifier(IUserAgentParser)}.
  * </p>
- * 
+ *
  * @since 3.8.0
  */
 public final class UserAgent implements Serializable {
@@ -103,8 +103,13 @@ public final class UserAgent implements Serializable {
   }
 
   public static UserAgent create(IUiLayer uiLayer, IUiDeviceType uiDeviceType) {
-    String osName = Activator.getDefault().getBundle().getBundleContext().getProperty("org.osgi.framework.os.name");
-
+    String osName;
+    if (Activator.getDefault() != null) {
+      osName = Activator.getDefault().getBundle().getBundleContext().getProperty("org.osgi.framework.os.name");
+    }
+    else {
+      osName = System.getProperty("os.name");
+    }
     return new UserAgent(uiLayer, uiDeviceType, osName);
   }
 

@@ -29,6 +29,7 @@ import java.util.concurrent.Callable;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.IAsyncFuture;
 import org.eclipse.scout.commons.job.IJob;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -52,6 +53,11 @@ public class AsyncFutureNotifierTest {
     doNothing().when(m_asyncFuture).onDone(anyString(), m_doneExceptionCaptor.capture());
 
     IJob.CURRENT.set(mock(IJob.class));
+  }
+
+  @After
+  public void after() {
+    IJob.CURRENT.remove();
   }
 
   @Test

@@ -51,7 +51,7 @@ public class ExceptionTranslatorTest {
   }
 
   @After
-  public void ater() {
+  public void after() {
     IJob.CURRENT.remove();
   }
 

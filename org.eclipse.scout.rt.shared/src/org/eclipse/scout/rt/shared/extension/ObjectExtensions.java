@@ -55,6 +55,9 @@ public class ObjectExtensions<OWNER, EXTENSION extends IExtension<? extends OWNE
       throw new IllegalStateException("The model object is already initialized: " + m_owner + ".");
     }
     IInternalExtensionRegistry extensionRegistry = SERVICES.getService(IInternalExtensionRegistry.class);
+    if (extensionRegistry == null) {
+      return;
+    }
     try {
       extensionRegistry.pushScope(m_owner.getClass());
       m_extensions = loadExtensions(localExtension);
