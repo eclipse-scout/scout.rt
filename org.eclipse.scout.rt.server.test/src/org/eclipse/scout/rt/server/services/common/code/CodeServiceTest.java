@@ -22,6 +22,7 @@ import java.util.Set;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.osgi.BundleClassDescriptor;
+import org.eclipse.scout.rt.platform.cdi.IBean;
 import org.eclipse.scout.rt.server.internal.Activator;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationFilter;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;
@@ -39,7 +40,6 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.osgi.framework.Bundle;
-import org.osgi.framework.ServiceRegistration;
 
 /**
  * Test for {@link ICodeService}
@@ -52,7 +52,7 @@ public class CodeServiceTest {
   /* ---------------------------------------------------------------------------------------------- */
 
   private void testImpl(ICodeService testService, boolean testCodeType1Expected, boolean testCodeType2Expected) {
-    List<ServiceRegistration> reg = TestingUtility.registerServices(Activator.getDefault().getBundle(), 1000, testService);
+    List<IBean<?>> reg = TestingUtility.registerServices(1000, testService);
     try {
       ICodeService service = SERVICES.getService(ICodeService.class);
       assertSame(testService, service);
@@ -113,9 +113,6 @@ public class CodeServiceTest {
       super();
     }
 
-    @Override
-    public void initializeService(ServiceRegistration registration) {
-    }
   }
 
   static class CodeService_Default_Mock extends AbstractCodeServiceMock {
@@ -168,7 +165,7 @@ public class CodeServiceTest {
   @Test
   public void testReloadCodeType() throws Exception {
     IClientNotificationService clientNotificationService = Mockito.mock(IClientNotificationService.class);
-    List<ServiceRegistration> reg = TestingUtility.registerServices(Activator.getDefault().getBundle(), 1000, clientNotificationService);
+    List<IBean<?>> reg = TestingUtility.registerServices(1000, clientNotificationService);
     try {
       CodeService codeService = new CodeService();
 
@@ -189,7 +186,7 @@ public class CodeServiceTest {
   @Test
   public void testReloadCodeTypes() throws Exception {
     IClientNotificationService clientNotificationService = Mockito.mock(IClientNotificationService.class);
-    List<ServiceRegistration> reg = TestingUtility.registerServices(Activator.getDefault().getBundle(), 1000, clientNotificationService);
+    List<IBean<?>> reg = TestingUtility.registerServices(1000, clientNotificationService);
     try {
       CodeService codeService = new CodeService();
 

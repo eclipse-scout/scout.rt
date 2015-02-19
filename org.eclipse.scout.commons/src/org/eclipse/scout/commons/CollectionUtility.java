@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 public final class CollectionUtility {
   private CollectionUtility() {
@@ -642,6 +643,17 @@ public final class CollectionUtility {
    */
   public static <T> HashSet<T> emptyHashSet() {
     return new HashSet<T>(0);
+  }
+
+  /**
+   * Returns a new empty {@link TreeSet}.<br>
+   * This method differs to {@link Collections#emptySet()} in that way that the {@link TreeSet} returned by this
+   * method can be modified hence is no shared instance.
+   *
+   * @return An empty but modifiable {@link TreeSet} with an initial capacity of <code>0</code>.
+   */
+  public static <T> TreeSet<T> emptyTreeSet() {
+    return new TreeSet<T>();
   }
 
   /**

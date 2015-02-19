@@ -30,7 +30,6 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.osgi.framework.ServiceRegistration;
 
 /**
  *
@@ -104,10 +103,6 @@ public class SmartFieldParseValueTest {
   }
 
   public static class P_LookupService implements ILookupService<Long> {
-
-    @Override
-    public void initializeService(ServiceRegistration registration) {
-    }
 
     @Override
     public List<? extends ILookupRow<Long>> getDataByKey(ILookupCall<Long> call) throws ProcessingException {

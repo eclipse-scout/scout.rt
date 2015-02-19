@@ -28,9 +28,11 @@ import org.osgi.framework.Bundle;
 
 public class ServerSessionRegistryService extends AbstractService implements IServerSessionRegistryService {
 
-  private final IServerJobService m_backendService;
+  private IServerJobService m_backendService;
 
-  public ServerSessionRegistryService() {
+  @Override
+  protected void initializeService() {
+    super.initializeService();
     m_backendService = SERVICES.getService(IServerJobService.class);
   }
 

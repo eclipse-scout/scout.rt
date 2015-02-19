@@ -41,6 +41,7 @@ import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelRequest;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.service.AbstractService;
+import org.eclipse.scout.service.IService;
 import org.eclipse.scout.service.SERVICES;
 import org.eclipse.scout.service.ServiceUtility;
 
@@ -203,7 +204,8 @@ public class OfflineDispatcherService extends AbstractService implements IOfflin
   private ServiceTunnelResponse callService(IServiceTunnelRequest serviceReq) throws ProcessingException {
     try {
       IServerSession serverSession = ThreadContext.getServerSession();
-      Class<?> serviceInterfaceClass = serverSession.getBundle().loadClass(serviceReq.getServiceInterfaceClassName());
+      @SuppressWarnings("unchecked")
+      Class<? extends IService> serviceInterfaceClass = serverSession.getBundle().loadClass(serviceReq.getServiceInterfaceClassName());
       Object service = SERVICES.getService(serviceInterfaceClass);
       if (service == null) {
         throw new ProcessingException("service registry does not contain a service of type " + serviceReq.getServiceInterfaceClassName());

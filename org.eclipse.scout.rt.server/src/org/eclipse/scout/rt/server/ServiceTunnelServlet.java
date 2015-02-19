@@ -30,8 +30,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.LocaleThreadLocal;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -40,7 +40,6 @@ import org.eclipse.scout.rt.server.commons.cache.IClientIdentificationService;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
 import org.eclipse.scout.rt.server.commons.servletfilter.HttpServletEx;
 import org.eclipse.scout.rt.server.commons.servletfilter.helper.HttpAuthJaasFilter;
-import org.eclipse.scout.rt.server.internal.Activator;
 import org.eclipse.scout.rt.server.services.common.session.IServerSessionRegistryService;
 import org.eclipse.scout.rt.shared.servicetunnel.DefaultServiceTunnelContentHandler;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelContentHandler;
@@ -93,8 +92,7 @@ public class ServiceTunnelServlet extends HttpServletEx {
   }
 
   public ServiceTunnelServlet() {
-    this(StringUtility.parseBoolean(Activator.getDefault().getBundle().getBundleContext().getProperty(MULTI_CLIENT_SESSION_COOKIESTORE), true),
-        StringUtility.parseBoolean(Activator.getDefault().getBundle().getBundleContext().getProperty(HTTP_DEBUG_PARAM)));
+    this(ConfigIniUtility.getPropertyBoolean(MULTI_CLIENT_SESSION_COOKIESTORE, true), ConfigIniUtility.getPropertyBoolean(HTTP_DEBUG_PARAM, false));
   }
 
   @Override

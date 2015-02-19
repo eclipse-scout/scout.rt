@@ -28,7 +28,6 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.osgi.framework.ServiceRegistration;
 
 /**
  * Tests the behavior of the display text in a {@link AbstractProposalField}.
@@ -91,10 +90,6 @@ public class ProposalFieldDisplayTextTest {
   }
 
   public static class P_LookupService implements ILookupService<String> {
-
-    @Override
-    public void initializeService(ServiceRegistration registration) {
-    }
 
     @Override
     public List<? extends ILookupRow<String>> getDataByKey(ILookupCall<String> call) throws ProcessingException {

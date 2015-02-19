@@ -27,13 +27,13 @@ import org.eclipse.scout.commons.serialization.SerializationUtility;
 import org.eclipse.scout.rt.server.IServerJobFactory;
 import org.eclipse.scout.rt.server.IServerJobService;
 import org.eclipse.scout.rt.server.IServerSession;
+import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
 import org.eclipse.scout.rt.testing.server.DefaultTestServerSessionProvider;
 import org.eclipse.scout.rt.testing.server.ITestServerSessionProvider;
 import org.eclipse.scout.rt.testing.shared.services.common.exceptionhandler.ProcessingRuntimeExceptionUnwrappingStatement;
 import org.eclipse.scout.service.SERVICES;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.Statement;
@@ -80,7 +80,7 @@ import org.junit.runners.model.Statement;
  * </tr>
  * </table>
  */
-public class ScoutServerTestRunner extends BlockJUnit4ClassRunner {
+public class ScoutServerTestRunner extends ScoutPlatformTestRunner {
 
   private static Class<? extends IServerSession> s_defaultServerSessionClass;
   private static String s_defaultPrincipalName;

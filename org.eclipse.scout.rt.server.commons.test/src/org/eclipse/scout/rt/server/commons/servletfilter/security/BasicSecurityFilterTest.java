@@ -30,16 +30,15 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.eclipse.scout.rt.platform.cdi.IBean;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
 import org.eclipse.scout.rt.server.commons.cache.TestHttpSession;
-import org.eclipse.scout.rt.server.commons.internal.Activator;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.service.IService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentMatcher;
-import org.osgi.framework.ServiceRegistration;
 
 /**
  * Test for {@link BasicSecurityFilter}
@@ -49,7 +48,7 @@ public class BasicSecurityFilterTest {
   private HttpServletResponse m_responseMock;
   private PrincipalHolder m_testPrincipalHolder;
   private BasicSecurityFilter m_filter;
-  private List<ServiceRegistration> m_registeredServices = new ArrayList<ServiceRegistration>();
+  private List<IBean<?>> m_registeredServices = new ArrayList<IBean<?>>();
   private FilterConfig m_testFilterConfig;
 
   @Before
@@ -114,7 +113,7 @@ public class BasicSecurityFilterTest {
   }
 
   private void registerTestService(IService service) {
-    m_registeredServices.addAll(TestingUtility.registerServices(Activator.getDefault().getBundle(), 1000, service));
+    m_registeredServices.addAll(TestingUtility.registerServices(1000, service));
   }
 
   private String subjectProperty() {

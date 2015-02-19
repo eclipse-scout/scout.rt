@@ -24,7 +24,6 @@ import org.eclipse.scout.rt.client.services.common.icon.IconProviderService;
 import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
 import org.eclipse.scout.rt.ui.swt.Activator;
 import org.osgi.framework.Bundle;
-import org.osgi.framework.ServiceRegistration;
 
 public class SwtBundleIconProviderService extends IconProviderService {
 
@@ -39,10 +38,11 @@ public class SwtBundleIconProviderService extends IconProviderService {
   }
 
   @Override
-  public void initializeService(ServiceRegistration registration) {
-    super.initializeService(registration);
-    setHostBundle(Activator.getDefault().getBundle());
-    setFolderName(FOLDER_NAME);
+  public void initializeService() {
+    super.initializeService();
+    // TODO NOOSGI
+//    setHostBundle(Activator.getDefault().getBundle());
+//    setFolderName(FOLDER_NAME);
   }
 
   @Override

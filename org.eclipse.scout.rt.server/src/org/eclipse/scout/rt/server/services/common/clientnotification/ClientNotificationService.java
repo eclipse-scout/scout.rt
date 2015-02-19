@@ -16,6 +16,7 @@ import java.util.Set;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.server.ThreadContext;
 import org.eclipse.scout.rt.server.services.common.clientnotification.internal.ClientNotificationQueue;
 import org.eclipse.scout.rt.server.services.common.clientnotification.internal.ClientNotificationQueueElement;
@@ -106,7 +107,7 @@ public class ClientNotificationService extends AbstractService implements IClien
    */
   protected void distributeCluster(IClientNotificationQueueElement element) {
     try {
-      IClusterSynchronizationService s = SERVICES.getService(IClusterSynchronizationService.class);
+      IClusterSynchronizationService s = OBJ.NEW(IClusterSynchronizationService.class, null);
       if (s != null) {
         element.getNotification().setOriginalServerNode(s.getNodeId());
         s.publishNotification(new ClientNotificationClusterNotification(element));
@@ -121,7 +122,7 @@ public class ClientNotificationService extends AbstractService implements IClien
    * Has no effect, if no cluster service is registered
    */
   protected void addClusterInfo(Set<IClientNotification> notifications) {
-    IClusterSynchronizationService s = SERVICES.getService(IClusterSynchronizationService.class);
+    IClusterSynchronizationService s = OBJ.NEW(IClusterSynchronizationService.class, null);
     if (s != null) {
       for (IClientNotification n : notifications) {
         n.setProvidingServerNode(s.getNodeId());

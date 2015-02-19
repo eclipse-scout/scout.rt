@@ -13,15 +13,14 @@ package org.eclipse.scout.rt.server.services.extension;
 import org.eclipse.scout.rt.server.services.common.workflow.AbstractWorkflowService;
 import org.eclipse.scout.rt.server.services.common.workflow.IWorkflowStep;
 import org.eclipse.scout.rt.shared.extension.AbstractContainerValidationService;
-import org.osgi.framework.ServiceRegistration;
 
 /**
  *
  */
 public class ServerContainerValidationService extends AbstractContainerValidationService {
   @Override
-  public void initializeService(ServiceRegistration registration) {
-    super.initializeService(registration);
+  protected void initializeService() {
+    super.initializeService();
     addPossibleContributionForContainer(IWorkflowStep.class, AbstractWorkflowService.class);
   }
 }

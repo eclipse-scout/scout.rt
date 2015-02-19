@@ -48,6 +48,7 @@ import javax.swing.text.JTextComponent;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
+import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
 import org.eclipse.scout.commons.dnd.TextTransferObject;
@@ -104,7 +105,7 @@ public class SwingMock extends AbstractGuiMock {
 
   public int getTreeNodeToExpandIconGap() {
     if (m_treeNodeToExpandIconGap <= 0) {
-      String s = Activator.getDefault().getBundle().getBundleContext().getProperty("IGuiMock.treeNodeToExpandIconGap");
+      String s = ConfigIniUtility.getProperty("IGuiMock.treeNodeToExpandIconGap");
       if (s == null) {
         LOG.warn("Missing config.ini property 'IGuiMock.treeNodeToExpandIconGap'; using default value of 4");
         s = "4";
@@ -949,7 +950,7 @@ public class SwingMock extends AbstractGuiMock {
 
       /**
        * Use {@link Window#getOwnedWindows()} recursively to find the active javax.swing.Popup$HeavyWeightWindow.
-       * 
+       *
        * @param window
        * @return
        */

@@ -1,0 +1,21 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Scout Platform
+Bundle-SymbolicName: org.eclipse.scout.rt.platform
+Bundle-Version: 5.1.0.qualifier
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-Vendor: Eclipse Scout Project
+Require-Bundle: org.eclipse.scout.commons;bundle-version="[5.1.0,5.2.0)",
+ org.eclipse.osgi
+Bundle-Activator: org.eclipse.scout.rt.platform.internal.Activator
+Export-Package: javax.inject,
+ javax.interceptor,
+ org.eclipse.scout.rt.platform,
+ org.eclipse.scout.rt.platform.cdi,
+ org.eclipse.scout.rt.platform.cdi.interceptor,
+ org.eclipse.scout.rt.platform.cdi.interceptor.internal,
+ org.eclipse.scout.rt.platform.cdi.internal,
+ org.eclipse.scout.rt.platform.internal,
+ org.eclipse.scout.rt.platform.pluginxml,
+ org.eclipse.scout.rt.platform.pluginxml.internal
+Bundle-ActivationPolicy: lazy

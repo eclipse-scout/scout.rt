@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -397,5 +398,58 @@ public final class BeanUtility {
       return -1;
     }
     return minSuperClassesDistance + 1;
+  }
+
+  @SuppressWarnings("unchecked")
+  public static Class[] getInterfacesHierarchy(Class type, Class filterClass) {
+    Set<Class> resultSet = new HashSet<Class>();
+    List<Class> workList = new ArrayList<Class>();
+    List<Class> lookAheadList = new ArrayList<Class>();
+    if (type.isInterface()) {
+      lookAheadList.add(type);
+    }
+    else {
+      Class test = type;
+      while (test != null) {
+        lookAheadList.addAll(Arrays.asList(test.getInterfaces()));
+        test = test.getSuperclass();
+      }
+    }
+    while (lookAheadList.size() > 0) {
+      workList = lookAheadList;
+      lookAheadList = new ArrayList<Class>();
+      for (Class c : workList) {
+        if (!resultSet.contains(c)) {
+          resultSet.add(c);
+          // look ahead
+          Class[] ifs = c.getInterfaces();
+          if (ifs.length > 0) {
+            lookAheadList.addAll(Arrays.asList(ifs));
+          }
+        }
+      }
+    }
+    Map<CompositeObject, Class> resultMap = new TreeMap<CompositeObject, Class>();
+    int index = 0;
+    for (Class c : resultSet) {
+      if (filterClass.isAssignableFrom(c)) {
+        int depth = 0;
+        Class test = c;
+        while (test != null) {
+          depth++;
+          Class[] xa = test.getInterfaces();
+          test = null;
+          if (xa != null) {
+            for (Class x : xa) {
+              if (filterClass.isAssignableFrom(x)) {
+                test = x;
+              }
+            }
+          }
+        }
+        resultMap.put(new CompositeObject(depth, index++), c);
+      }
+    }
+    return resultMap.values().toArray(new Class[resultMap.size()]);
   }
 }

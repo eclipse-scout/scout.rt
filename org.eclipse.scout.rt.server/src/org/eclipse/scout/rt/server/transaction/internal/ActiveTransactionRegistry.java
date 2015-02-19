@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.server.transaction.internal;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -98,6 +99,6 @@ public class ActiveTransactionRegistry {
 
   private static class SessionState {
     final Object m_txMapLock = new Object();
-    final HashMap<Long, WeakReference<ITransaction>> m_txMap = new HashMap<Long, WeakReference<ITransaction>>();
+    final Map<Long, WeakReference<ITransaction>> m_txMap = new HashMap<>();
   }
 }

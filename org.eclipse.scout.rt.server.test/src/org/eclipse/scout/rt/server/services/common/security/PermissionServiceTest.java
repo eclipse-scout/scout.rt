@@ -19,6 +19,7 @@ import java.util.List;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.osgi.BundleClassDescriptor;
+import org.eclipse.scout.rt.platform.cdi.IBean;
 import org.eclipse.scout.rt.server.internal.Activator;
 import org.eclipse.scout.rt.server.services.common.security.fixture.TestPermission1;
 import org.eclipse.scout.rt.server.services.common.security.fixture.TestPermission2;
@@ -29,7 +30,6 @@ import org.eclipse.scout.service.SERVICES;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.osgi.framework.Bundle;
-import org.osgi.framework.ServiceRegistration;
 
 /**
  * Test for {@link IPermissionService}
@@ -42,7 +42,7 @@ public class PermissionServiceTest {
   /* ---------------------------------------------------------------------------------------------- */
 
   private void testImpl(IPermissionService testService, boolean testPermission1Expected, boolean testPermission2Expected) {
-    List<ServiceRegistration> reg = TestingUtility.registerServices(Activator.getDefault().getBundle(), 1000, testService);
+    List<IBean<?>> reg = TestingUtility.registerServices(1000, testService);
     try {
       IPermissionService service = SERVICES.getService(IPermissionService.class);
       assertSame(testService, service);
@@ -103,9 +103,6 @@ public class PermissionServiceTest {
       super();
     }
 
-    @Override
-    public void initializeService(ServiceRegistration registration) {
-    }
   }
 
   static class PermissionService_Default_Mock extends AbstractPermissionServiceMock {

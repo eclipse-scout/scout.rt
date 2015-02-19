@@ -20,7 +20,6 @@
          <choice>
             <element ref="service" minOccurs="0" maxOccurs="unbounded"/>
             <element ref="proxy" minOccurs="0" maxOccurs="unbounded"/>
-            <element ref="serviceInitializerFactory" minOccurs="0" maxOccurs="unbounded"/>
          </choice>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -229,26 +228,6 @@ The attribute is provided to the osgi service by the init parameter with the nam
                <documentation>
                   
                </documentation>
-            </annotation>
-         </attribute>
-      </complexType>
-   </element>
-
-   <element name="serviceInitializerFactory">
-      <annotation>
-         <documentation>
-            A factory to create a service initializer which is used in org.eclipse.scout.service.AbstractService.initializeService.
-         </documentation>
-      </annotation>
-      <complexType>
-         <attribute name="class" type="string" use="required">
-            <annotation>
-               <documentation>
-                  The implementation of the service initializer factory, which is used in org.eclipse.scout.service.AbstractService.initializeService.
-               </documentation>
-               <appInfo>
-                  <meta.attribute kind="java" basedOn=":org.eclipse.scout.service.IServiceInitializerFactory"/>
-               </appInfo>
             </annotation>
          </attribute>
       </complexType>

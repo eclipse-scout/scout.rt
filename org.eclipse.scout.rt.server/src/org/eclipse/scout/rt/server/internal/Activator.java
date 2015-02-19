@@ -55,24 +55,22 @@ public class Activator extends Plugin {
     m_processInspector = new ProcessInspector();
     // workaround for bug in serverside equinox implementation with servletbridge
     // wait until done and launch product if one exists
-    if (Platform.getBundle("org.eclipse.scout.sdk") == null) {
-      context.addBundleListener(new SynchronousBundleListener() {
-        @Override
-        public void bundleChanged(BundleEvent event) {
-          if (event.getType() == BundleEvent.STARTED && event.getBundle().equals(getBundle())) {
-            new Job("Product launcher") {
-              @Override
-              protected IStatus run(IProgressMonitor monitor) {
-                if (Platform.getBundle("org.eclipse.equinox.http.servletbridge") != null) {
-                  runProduct();
-                }
-                return Status.OK_STATUS;
+    context.addBundleListener(new SynchronousBundleListener() {
+      @Override
+      public void bundleChanged(BundleEvent event) {
+        if (event.getType() == BundleEvent.STARTED && event.getBundle().equals(getBundle())) {
+          new Job("Product launcher") {
+            @Override
+            protected IStatus run(IProgressMonitor monitor) {
+              if (Platform.getBundle("org.eclipse.equinox.http.servletbridge") != null) {
+                runProduct();
               }
-            }.schedule();
-          }
+              return Status.OK_STATUS;
+            }
+          }.schedule();
         }
-      });
-    }
+      }
+    });
   }
 
   /*

@@ -20,37 +20,36 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.rt.platform.cdi.IBean;
 import org.eclipse.scout.rt.server.AbstractServerSession;
 import org.eclipse.scout.rt.shared.OfflineState;
 import org.eclipse.scout.rt.shared.services.common.clientnotification.IClientNotification;
-import org.eclipse.scout.rt.testing.server.Activator;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.service.AbstractService;
 import org.eclipse.scout.service.SERVICES;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.osgi.framework.ServiceRegistration;
 
 /**
  * This class tests the behavior of sent client notifications when
  * the shared variable map changes on the server side.<br/>
  * {@code SharedContextChangedNotification}s should only be sent if
  * the default offline state matches the offline state of the current thread.
- * 
+ *
  * @see <a href="https://bugs.eclipse.org/bugs/show_bug.cgi?id=379721">Bugzilla 379721</a>
  */
 public class OfflineStateSharedVariableNotificationTest {
 
   private TestServerSession m_serverSession;
-  private List<ServiceRegistration> m_registrationList;
+  private List<IBean<?>> m_registrationList;
 
   @Before
   public void setUp() {
     OfflineState.setOfflineDefault(false);
     OfflineState.setOfflineInCurrentThread(null);
     m_serverSession = new TestServerSession();
-    m_registrationList = TestingUtility.registerServices(Activator.getDefault().getBundle(), 1000, new MockClientNotificationService());
+    m_registrationList = TestingUtility.registerServices(1000, new MockClientNotificationService());
   }
 
   @After

@@ -17,6 +17,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.scout.rt.platform.cdi.IBean;
+import org.eclipse.scout.rt.platform.cdi.internal.BeanInstanceCreator;
 import org.eclipse.scout.rt.server.ThreadContext;
 import org.eclipse.scout.rt.server.services.common.clientnotification.ClientNotificationQueueEvent;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationFilter;
@@ -24,7 +26,6 @@ import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNot
 import org.eclipse.scout.rt.server.services.common.clientnotification.SingleUserFilter;
 import org.eclipse.scout.rt.server.services.common.security.fixture.TestAccessControlService;
 import org.eclipse.scout.rt.server.services.common.security.fixture.TestClientNotificationQueueListener;
-import org.eclipse.scout.rt.server.testenvironment.Activator;
 import org.eclipse.scout.rt.shared.services.common.clientnotification.AbstractClientNotification;
 import org.eclipse.scout.rt.shared.services.common.security.AccessControlChangedNotification;
 import org.eclipse.scout.rt.shared.services.common.security.ResetAccessControlChangedNotification;
@@ -36,7 +37,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.osgi.framework.ServiceRegistration;
 
 /**
  * Test for {@link AbstractAccessControlService}
@@ -45,15 +45,15 @@ import org.osgi.framework.ServiceRegistration;
 public class AbstractAccessControlServiceTest {
   private AbstractAccessControlService m_accessControlService;
   private TestClientNotificationQueueListener m_listener;
-  private List<ServiceRegistration> m_registerServices;
+  private List<IBean<?>> m_registerServices;
 
   @Before
   public void setup() {
-    m_accessControlService = new TestAccessControlService();
-    m_accessControlService.initializeService(null);
+
+    m_accessControlService = BeanInstanceCreator.create(TestAccessControlService.class);
 
     //Register this IAccessControlService with an higher priority than AllAccessControlService registered in CustomServerTestEnvironment
-    m_registerServices = TestingUtility.registerServices(Activator.getDefault().getBundle(), 500, m_accessControlService);
+    m_registerServices = TestingUtility.registerServices(500, m_accessControlService);
 
     m_listener = new TestClientNotificationQueueListener();
     SERVICES.getService(IClientNotificationService.class).addClientNotificationQueueListener(m_listener);

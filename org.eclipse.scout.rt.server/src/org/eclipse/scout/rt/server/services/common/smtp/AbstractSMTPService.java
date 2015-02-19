@@ -42,8 +42,10 @@ public abstract class AbstractSMTPService extends AbstractService implements ISM
   private String m_sslProtocols;
   private boolean m_useSmtps;
 
-  public AbstractSMTPService() {
-    init();
+  @Override
+  protected void initializeService() {
+    super.initializeService();
+    initConfig();
   }
 
   // configuration
@@ -102,7 +104,7 @@ public abstract class AbstractSMTPService extends AbstractService implements ISM
     return null;
   }
 
-  private void init() {
+  protected void initConfig() {
     setHost(getConfiguredHost());
     setPort(getConfiguredPort());
     setUsername(getConfiguredUsername());

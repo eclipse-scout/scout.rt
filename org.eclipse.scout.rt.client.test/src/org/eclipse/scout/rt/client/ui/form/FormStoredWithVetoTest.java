@@ -16,9 +16,9 @@ import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
-import org.eclipse.scout.rt.client.Activator;
 import org.eclipse.scout.rt.client.ui.form.fixture.FormToStore;
 import org.eclipse.scout.rt.client.ui.form.fixture.FormToStore.MethodImplementation;
+import org.eclipse.scout.rt.platform.cdi.IBean;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
@@ -28,7 +28,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import org.osgi.framework.ServiceRegistration;
 
 /**
  * Unit test for {@link AbstractForm} where {@link AbstractFormHandler#execStore()} or {@link AbstractForm#execStored()}
@@ -39,13 +38,13 @@ import org.osgi.framework.ServiceRegistration;
 @RunWith(ScoutClientTestRunner.class)
 public class FormStoredWithVetoTest {
 
-  private List<ServiceRegistration> m_registeredServices;
+  private List<IBean<?>> m_registeredServices;
   private IExceptionHandlerService m_exceptionHandlerService;
 
   @Before
   public void setup() {
     m_exceptionHandlerService = Mockito.mock(IExceptionHandlerService.class);
-    m_registeredServices = TestingUtility.registerServices(Activator.getDefault().getBundle(), 9000, m_exceptionHandlerService);
+    m_registeredServices = TestingUtility.registerServices(9000, m_exceptionHandlerService);
   }
 
   @After

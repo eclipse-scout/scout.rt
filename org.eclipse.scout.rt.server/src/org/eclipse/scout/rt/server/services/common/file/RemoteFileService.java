@@ -26,6 +26,7 @@ import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Priority;
+import org.eclipse.scout.commons.exception.InitializationException;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.services.common.file.IRemoteFileService;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
@@ -36,8 +37,10 @@ import org.eclipse.scout.service.AbstractService;
 public class RemoteFileService extends AbstractService implements IRemoteFileService {
   private String m_rootPath;
 
-  public RemoteFileService() throws ProcessingException {
+  @Override
+  protected void initializeService() {
     initConfig();
+    super.initializeService();
   }
 
   @ConfigProperty(ConfigProperty.STRING)
@@ -45,7 +48,7 @@ public class RemoteFileService extends AbstractService implements IRemoteFileSer
     return null;
   }
 
-  protected void initConfig() throws ProcessingException {
+  protected void initConfig() {
     setRootPath(getConfiguredRootPath());
   }
 
@@ -56,7 +59,7 @@ public class RemoteFileService extends AbstractService implements IRemoteFileSer
   /**
    * Supports ${...} variables resolved by {@link BundleContextUtility#resolve(String)}
    */
-  public void setRootPath(String rootPath) throws ProcessingException {
+  public void setRootPath(String rootPath) {
     if (rootPath == null || rootPath.length() == 0) {
       m_rootPath = null;
     }
@@ -70,7 +73,7 @@ public class RemoteFileService extends AbstractService implements IRemoteFileSer
       }
       catch (IOException e) {
         m_rootPath = null;
-        throw new ProcessingException("invalid path for file service: '" + rootPath + "'", e);
+        throw new InitializationException("invalid path for file service: '" + rootPath + "'", e);
       }
     }
   }

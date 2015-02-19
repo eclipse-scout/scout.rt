@@ -12,13 +12,12 @@ package org.eclipse.scout.extension;
 
 import java.util.List;
 
-import org.eclipse.scout.rt.shared.Activator;
+import org.eclipse.scout.rt.platform.cdi.IBean;
 import org.eclipse.scout.rt.shared.extension.ExtensionRegistry;
 import org.eclipse.scout.rt.shared.extension.IExtensionRegistry;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.After;
 import org.junit.Before;
-import org.osgi.framework.ServiceRegistration;
 
 /**
  * use this superclass for test requiring a local extension registry ({@link IExtensionRegistry}). Extensions can be
@@ -26,12 +25,12 @@ import org.osgi.framework.ServiceRegistration;
  */
 public abstract class AbstractLocalExtensionTestCase {
 
-  private List<ServiceRegistration> m_localServiceRegistrations;
+  private List<IBean<?>> m_localServiceRegistrations;
 
   @Before
   public void registerLocalRegistry() {
     IExtensionRegistry localRegistry = new ExtensionRegistry();
-    m_localServiceRegistrations = TestingUtility.registerServices(Activator.getDefault().getBundle(), 100, localRegistry);
+    m_localServiceRegistrations = TestingUtility.registerServices(100, localRegistry);
   }
 
   @After

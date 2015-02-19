@@ -150,4 +150,11 @@
          version="2.7.1.v201005080400"
          unpack="false"/>
 
+   <plugin
+         id="org.eclipse.scout.rt.platform"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
 </feature>

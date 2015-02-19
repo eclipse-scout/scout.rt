@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.JarOutputStream;
@@ -37,24 +38,17 @@ import org.eclipse.scout.commons.exception.ProcessingException;
  * @since 1.0
  */
 public final class FileUtility {
-  static final int KILO_BYTE = 1024;
+  private static final int KILO_BYTE = 1024;
 
   private FileUtility() {
   }
 
+  /**
+   * Static extension to mimetype mapper
+   */
+  private static final Map<String, String> EXT_TO_MIME_TYPE_MAP;
+
   static {
-    setupExtendedMimeMappings();
-  }
-
-  /**
-   * Static extension to mimetype mapper
-   */
-  private static HashMap<String, String> EXT_TO_MIME_TYPE_MAP;
-
-  /**
-   * Static extension to mimetype mapper
-   */
-  private static void setupExtendedMimeMappings() {
     EXT_TO_MIME_TYPE_MAP = new HashMap<String, String>();
     EXT_TO_MIME_TYPE_MAP.put("ai", "application/postscript");
     EXT_TO_MIME_TYPE_MAP.put("aif", "audio/x-aiff");
@@ -537,7 +531,7 @@ public final class FileUtility {
     if (ext == null) {
       return null;
     }
-    if (ext.startsWith(".")) {
+    if (ext.length() > 0 && ext.charAt(0) == '.') {
       ext = ext.substring(1);
     }
     ext = ext.toLowerCase();

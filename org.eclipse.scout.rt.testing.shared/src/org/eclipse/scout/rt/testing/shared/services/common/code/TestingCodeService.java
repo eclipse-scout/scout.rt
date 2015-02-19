@@ -42,7 +42,7 @@ import org.osgi.framework.FrameworkUtil;
  * <b>Example</b>:
  *
  * <pre>
- * List<ServiceRegistration> reg = TestingUtility.registerServices(Activator.getDefault().getBundle(), 1000, new TestingCodeService(new MyCodeType()));
+ * List<ServiceRegistration> reg = TestingUtility.registerServices( 1000, new TestingCodeService(new MyCodeType()));
  * CODES.getCodeType(MyCodeType.class);
  * [...]
  * SERVICES.getService(TestingCodeService.class).addCodeTypes(new OtherCodeType());

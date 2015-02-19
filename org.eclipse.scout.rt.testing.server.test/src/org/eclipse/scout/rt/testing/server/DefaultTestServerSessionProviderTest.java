@@ -16,14 +16,17 @@ import static org.mockito.Mockito.verify;
 import javax.security.auth.Subject;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
 import org.eclipse.scout.rt.testing.server.test.TestServerSession;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 
 /**
  * Test for {@link DefaultTestServerSessionProvider}
  */
+@RunWith(ScoutPlatformTestRunner.class)
 public class DefaultTestServerSessionProviderTest {
 
   /**

@@ -13,13 +13,12 @@ package org.eclipse.scout.rt.server.admin.inspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
 
-import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.service.IServiceInventory;
 
 public class ServiceInspector {
 
-  private Object m_service;
+  private final Object m_service;
 
   public ServiceInspector(Object service) {
     m_service = service;
@@ -27,12 +26,10 @@ public class ServiceInspector {
 
   public ReflectServiceInventory buildInventory() {
     ReflectServiceInventory inv = new ReflectServiceInventory(m_service);
-    // make service inventory
-    if (m_service instanceof IAdaptable) {
-      IServiceInventory si = (IServiceInventory) ((IAdaptable) m_service).getAdapter(IServiceInventory.class);
-      if (si != null) {
-        inv.addState(si.getInventory());
-      }
+    if (m_service instanceof IServiceInventory) {
+      // make service inventory
+      IServiceInventory si = (IServiceInventory) m_service;
+      inv.addState(si.getInventory());
     }
     return inv;
   }

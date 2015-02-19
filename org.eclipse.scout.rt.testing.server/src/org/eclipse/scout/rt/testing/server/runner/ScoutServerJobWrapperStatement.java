@@ -17,15 +17,14 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.cdi.IBean;
 import org.eclipse.scout.rt.server.IServerJobFactory;
 import org.eclipse.scout.rt.server.ITransactionRunnable;
 import org.eclipse.scout.rt.server.ServerJob;
 import org.eclipse.scout.rt.testing.commons.ScoutAssert;
-import org.eclipse.scout.rt.testing.shared.Activator;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.testing.shared.services.common.exceptionhandler.WrappingProcessingRuntimeExceptionHandlerService;
 import org.junit.runners.model.Statement;
-import org.osgi.framework.ServiceRegistration;
 
 /**
  * JUnit statements that runs the JUnit test within a Scout {@link ServerJob}.
@@ -60,10 +59,10 @@ public class ScoutServerJobWrapperStatement extends Statement {
   }
 
   protected void doEvaluateWrappingExceptions() throws ProcessingException {
-    List<ServiceRegistration> serviceReg = null;
+    List<? extends IBean<?>> serviceReg = null;
     try {
       WrappingProcessingRuntimeExceptionHandlerService handler = new WrappingProcessingRuntimeExceptionHandlerService();
-      serviceReg = TestingUtility.registerServices(Activator.getDefault().getBundle(), EXCEPTIONHANDLER_SERVICE_RANKING, handler);
+      serviceReg = TestingUtility.registerServices(EXCEPTIONHANDLER_SERVICE_RANKING, handler);
       doEvaluate();
     }
     finally {

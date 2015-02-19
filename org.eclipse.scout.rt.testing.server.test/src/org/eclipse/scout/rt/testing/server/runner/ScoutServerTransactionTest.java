@@ -20,18 +20,17 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.platform.cdi.IBean;
 import org.eclipse.scout.rt.server.ServerJob;
 import org.eclipse.scout.rt.server.ThreadContext;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.LogExceptionHandlerService;
 import org.eclipse.scout.rt.testing.server.runner.fixture.TestTransactionMember;
-import org.eclipse.scout.rt.testing.shared.Activator;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.osgi.framework.ServiceRegistration;
 
 /**
  * JUnit test for {@link ScoutServerTestRunner}
@@ -165,10 +164,10 @@ public class ScoutServerTransactionTest {
   public void testTransactionWithException() {
     final TestTransactionMember transactionMember1 = new TestTransactionMember("01");
     final TestTransactionMember transactionMember2 = new TestTransactionMember("02");
-    List<ServiceRegistration> serviceReg = null;
+    List<IBean<?>> serviceReg = null;
     //Use real live IExceptionHandlerService implementation here!
     try {
-      serviceReg = TestingUtility.registerServices(Activator.getDefault().getBundle(), 1100, new LogExceptionHandlerService());
+      serviceReg = TestingUtility.registerServices(1100, new LogExceptionHandlerService());
 
       ServerJob job = new ServerJob("", ServerJob.getCurrentSession()) {
 

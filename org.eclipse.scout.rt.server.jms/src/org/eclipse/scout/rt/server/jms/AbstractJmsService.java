@@ -58,6 +58,13 @@ public abstract class AbstractJmsService<T> extends AbstractJndiService {
 
   private Connection m_connection;
 
+  @Override
+  protected void initConfig() {
+    super.initConfig();
+    setConnectionFactory(getConfiguredConnectionFactory());
+    setDestination(getConfiguredDestination());
+  }
+
   @ConfigProperty(ConfigProperty.STRING)
   @Order(10)
   protected String getConfiguredConnectionFactory() {
@@ -84,13 +91,6 @@ public abstract class AbstractJmsService<T> extends AbstractJndiService {
 
   public void setDestination(String destination) {
     m_destination = destination;
-  }
-
-  @Override
-  protected void initConfig() {
-    super.initConfig();
-    setConnectionFactory(getConfiguredConnectionFactory());
-    setDestination(getConfiguredDestination());
   }
 
   protected ConnectionFactory lookupConnectionFactory() throws ProcessingException {

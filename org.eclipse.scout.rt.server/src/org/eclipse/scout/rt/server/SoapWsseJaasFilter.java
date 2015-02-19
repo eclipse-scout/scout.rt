@@ -35,6 +35,7 @@ import javax.xml.namespace.QName;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.eclipse.scout.commons.Base64Utility;
+import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.EncryptionUtility;
 import org.eclipse.scout.commons.SoapHandlingUtility;
 import org.eclipse.scout.commons.StringUtility;
@@ -43,7 +44,6 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.server.commons.servletfilter.FilterConfigInjection;
 import org.eclipse.scout.rt.server.commons.servletfilter.security.SecureHttpServletRequestWrapper;
-import org.eclipse.scout.rt.server.internal.Activator;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -69,7 +69,7 @@ public class SoapWsseJaasFilter implements Filter {
 
   private static final byte[] tripleDesKey;
   static {
-    String key = Activator.getDefault().getBundle().getBundleContext().getProperty("scout.ajax.token.key");
+    String key = ConfigIniUtility.getProperty("scout.ajax.token.key");
     if (key == null) {
       tripleDesKey = null;
     }

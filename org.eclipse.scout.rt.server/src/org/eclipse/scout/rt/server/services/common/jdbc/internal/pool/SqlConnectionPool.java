@@ -17,11 +17,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlService;
-import org.eclipse.scout.service.IServiceInventory;
 
 /**
  * System-wide connection pool for pooling connections There is one pool for
@@ -35,8 +36,8 @@ public final class SqlConnectionPool {
   /*
    * Pool factory per service type (top-level class)
    */
-  private static Object poolStoreLock = new Object();
-  private static HashMap<Class, SqlConnectionPool> poolStore = new HashMap<Class, SqlConnectionPool>();
+  private static final Object poolStoreLock = new Object();
+  private static final Map<Class, SqlConnectionPool> poolStore = new HashMap<Class, SqlConnectionPool>();
 
   public static SqlConnectionPool getPool(Class serviceType, int poolSize, long connectionLifetime, long connectionBusyTimeout) {
     synchronized (poolStoreLock) {
@@ -52,14 +53,13 @@ public final class SqlConnectionPool {
   /*
    * Instance
    */
-  private Object m_poolLock = new Object();
-  private HashSet<PoolEntry> m_idleEntries = new HashSet<PoolEntry>();
-  private HashSet<PoolEntry> m_busyEntries = new HashSet<PoolEntry>();
-  //
-  private Class m_serviceType;
-  private int m_poolSize;
-  private long m_connectionLifetime;
-  private long m_connectionBusyTimeout;
+  private final Object m_poolLock = new Object();
+  private final Set<PoolEntry> m_idleEntries = new HashSet<PoolEntry>();
+  private final Set<PoolEntry> m_busyEntries = new HashSet<PoolEntry>();
+  private final Class m_serviceType;
+  private final int m_poolSize;
+  private final long m_connectionLifetime;
+  private final long m_connectionBusyTimeout;
 
   private SqlConnectionPool(Class serviceType, int poolSize, long connectionLifetime, long connectionBusyTimeout) {
     m_serviceType = serviceType;
@@ -213,10 +213,10 @@ public final class SqlConnectionPool {
     managePool();
   }
 
-  public IServiceInventory getInventory() {
-    StringBuffer buf = new StringBuffer();
+  public String getInventory() {
+    StringBuilder buf = new StringBuilder();
+    SimpleDateFormat fmt = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss.SSSS");
     synchronized (m_poolLock) {
-      SimpleDateFormat fmt = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss.SSSS");
       buf.append("Total connections: " + (m_busyEntries.size() + m_idleEntries.size()));
       buf.append("\n");
       buf.append("Busy: " + m_busyEntries.size());
@@ -232,13 +232,7 @@ public final class SqlConnectionPool {
         buf.append("\n");
       }
     }
-    final String f = buf.toString();
-    return new IServiceInventory() {
-      @Override
-      public String getInventory() {
-        return new String(f);
-      }
-    };
+    return buf.toString();
   }
 
   /**

@@ -39,8 +39,18 @@ public abstract class AbstractIMAPService extends AbstractService implements IIM
   private Folder m_folder;
   private Store m_store;
 
-  public AbstractIMAPService() {
-    init();
+  @Override
+  protected void initializeService() {
+    super.initializeService();
+    initConfig();
+  }
+
+  private void initConfig() {
+    setHost(getConfiguredHost());
+    setPort(getConfiguredPort());
+    setMailbox(getConfiguredMailbox());
+    setUserName(getConfiguredUserName());
+    setPassword(getConfiguredPassword());
   }
 
   @ConfigProperty(ConfigProperty.STRING)
@@ -232,14 +242,6 @@ public abstract class AbstractIMAPService extends AbstractService implements IIM
     else {
       task.doTask(m_folder);
     }
-  }
-
-  private void init() {
-    setHost(getConfiguredHost());
-    setPort(getConfiguredPort());
-    setMailbox(getConfiguredMailbox());
-    setUserName(getConfiguredUserName());
-    setPassword(getConfiguredPassword());
   }
 
   private abstract class AbstractMailTask {

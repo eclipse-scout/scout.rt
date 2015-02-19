@@ -25,6 +25,7 @@ import org.eclipse.scout.rt.client.fixture.MockServiceTunnel;
 import org.eclipse.scout.rt.client.services.common.session.IClientSessionRegistryService;
 import org.eclipse.scout.rt.client.servicetunnel.http.IClientServiceTunnel;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
+import org.eclipse.scout.rt.platform.cdi.IBean;
 import org.eclipse.scout.rt.servicetunnel.ServiceTunnelUtility;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.ping.IPingService;
@@ -37,7 +38,6 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.osgi.framework.ServiceRegistration;
 
 /**
  * Tests what happens when the user cancels a long running job (system=false) that is caused by a backend service call
@@ -46,7 +46,7 @@ import org.osgi.framework.ServiceRegistration;
 public class ClientJobCancelTest {
   private static long pingServiceDelay;
 
-  private List<ServiceRegistration> m_serviceReg;
+  private List<IBean<?>> m_serviceReg;
   private TestEnvironmentClientSession m_session;
   private static IClientServiceTunnel oldServiceTunnel;
 
@@ -69,7 +69,7 @@ public class ClientJobCancelTest {
     m_session = SERVICES.getService(IClientSessionRegistryService.class).newClientSession(TestEnvironmentClientSession.class, UserAgent.createDefault());
     MockServiceTunnel tunnel = new MockServiceTunnel(m_session);
     m_session.setServiceTunnel(tunnel);
-    m_serviceReg = TestingUtility.registerServices(Activator.getDefault().getBundle(), 0, new MockPingService(), new MockServerProcessingCancelService(tunnel));
+    m_serviceReg = TestingUtility.registerServices(0, new MockPingService(), new MockServerProcessingCancelService(tunnel));
   }
 
   @After

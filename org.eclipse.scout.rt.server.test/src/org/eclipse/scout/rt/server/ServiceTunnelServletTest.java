@@ -40,6 +40,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.JobEx;
+import org.eclipse.scout.rt.platform.cdi.IBean;
 import org.eclipse.scout.rt.server.commons.cache.ICacheEntry;
 import org.eclipse.scout.rt.server.commons.cache.StickySessionCacheService;
 import org.eclipse.scout.rt.server.internal.Activator;
@@ -53,7 +54,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.osgi.framework.ServiceRegistration;
 
 /**
  * Test for {@link ServiceTunnelServlet}
@@ -61,7 +61,7 @@ import org.osgi.framework.ServiceRegistration;
 public class ServiceTunnelServletTest {
 
   private static final int TEST_SERVICE_RANKING = 1000;
-  private List<ServiceRegistration> m_serviceReg;
+  private List<IBean<?>> m_serviceReg;
   private ServiceTunnelServlet m_testServiceTunnelServlet;
   private HttpServletRequest m_requestMock;
   private HttpServletResponse m_responseMock;
@@ -69,7 +69,7 @@ public class ServiceTunnelServletTest {
 
   @Before
   public void setup() throws ServletException {
-    m_serviceReg = TestingUtility.registerServices(Activator.getDefault().getBundle(), TEST_SERVICE_RANKING, new StickySessionCacheService(), new AbstractAccessControlService() {
+    m_serviceReg = TestingUtility.registerServices(TEST_SERVICE_RANKING, new StickySessionCacheService(), new AbstractAccessControlService() {
     });
     m_testServiceTunnelServlet = getServiceTunnelServletWithTestSession();
     m_testServiceTunnelServlet.lazyInit(null, null);
@@ -130,7 +130,7 @@ public class ServiceTunnelServletTest {
     IServerSessionRegistryService serverSessionRegistryServiceMock = mock(IServerSessionRegistryService.class);
     when(serverSessionRegistryServiceMock.newServerSession(eq(TestServerSession.class), any(Subject.class), any(UserAgent.class))).thenAnswer(slowCreateTestsession(testSession));
 
-    List<ServiceRegistration> registerServices = TestingUtility.registerServices(Activator.getDefault().getBundle(), TEST_SERVICE_RANKING, serverSessionRegistryServiceMock);
+    List<IBean<?>> registerServices = TestingUtility.registerServices(TEST_SERVICE_RANKING, serverSessionRegistryServiceMock);
     try {
       List<HttpSessionJob> jobs = new ArrayList<HttpSessionJob>();
       for (int i = 0; i < 4; i++) {
@@ -200,7 +200,7 @@ public class ServiceTunnelServletTest {
     IServerSessionRegistryService serverSessionRegistryServiceMock = mock(IServerSessionRegistryService.class);
     when(serverSessionRegistryServiceMock.newServerSession(eq(TestServerSession.class), any(Subject.class), any(UserAgent.class))).thenReturn(testSession, anotherTestSession, testSession, anotherTestSession);
 
-    List<ServiceRegistration> registerServices = TestingUtility.registerServices(Activator.getDefault().getBundle(), TEST_SERVICE_RANKING, serverSessionRegistryServiceMock);
+    List<IBean<?>> registerServices = TestingUtility.registerServices(TEST_SERVICE_RANKING, serverSessionRegistryServiceMock);
     try {
       IServerSession session = m_testServiceTunnelServlet.lookupServerSession(m_requestMock, m_responseMock, null, serviceTunnelRequestMock);
       assertEquals(testSession, session);
@@ -241,7 +241,7 @@ public class ServiceTunnelServletTest {
     IServerSessionRegistryService serverSessionRegistryServiceMock = mock(IServerSessionRegistryService.class);
     when(serverSessionRegistryServiceMock.newServerSession(eq(TestServerSession.class), any(Subject.class), any(UserAgent.class))).thenAnswer(testOrOtherSession(testSession, anotherTestSession));
 
-    List<ServiceRegistration> registerServices = TestingUtility.registerServices(Activator.getDefault().getBundle(), TEST_SERVICE_RANKING, serverSessionRegistryServiceMock);
+    List<IBean<?>> registerServices = TestingUtility.registerServices(TEST_SERVICE_RANKING, serverSessionRegistryServiceMock);
     try {
       List<VirtualSessionJob> jobs = new ArrayList<VirtualSessionJob>();
       for (int i = 0; i < 4; i++) {

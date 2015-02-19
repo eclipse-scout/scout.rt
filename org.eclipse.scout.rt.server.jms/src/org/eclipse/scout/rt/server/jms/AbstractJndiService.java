@@ -28,7 +28,6 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlService;
 import org.eclipse.scout.service.AbstractService;
-import org.osgi.framework.ServiceRegistration;
 
 /**
  * Base class for a JNDI configured scout service. To configure a JNDI scout service one can put in config.ini for each
@@ -55,9 +54,18 @@ public abstract class AbstractJndiService extends AbstractService {
   private String m_securityCredentials;
 
   @Override
-  public void initializeService(@SuppressWarnings("rawtypes") ServiceRegistration registration) {
+  protected void initializeService() {
+    super.initializeService();
     initConfig();
-    super.initializeService(registration);
+  }
+
+  protected void initConfig() {
+    setJndiInitialContextFactory(getConfiguredJndiInitialContextFactory());
+    setJndiProviderUrl(getConfiguredJndiProviderUrl());
+    setJndiUrlPkgPrefixes(getConfiguredJndiUrlPkgPrefixes());
+    setJndiProperties(getConfiguredJndiProperties());
+    setSecurityPrincipal(getConfiguredSecurityPrincipal());
+    setSecurityCredentials(getConfiguredSecurityCredentials());
   }
 
   @ConfigProperty(ConfigProperty.STRING)
@@ -142,15 +150,6 @@ public abstract class AbstractJndiService extends AbstractService {
 
   public void setSecurityCredentials(String securityCredentials) {
     m_securityCredentials = securityCredentials;
-  }
-
-  protected void initConfig() {
-    setJndiInitialContextFactory(getConfiguredJndiInitialContextFactory());
-    setJndiProviderUrl(getConfiguredJndiProviderUrl());
-    setJndiUrlPkgPrefixes(getConfiguredJndiUrlPkgPrefixes());
-    setJndiProperties(getConfiguredJndiProperties());
-    setSecurityPrincipal(getConfiguredSecurityPrincipal());
-    setSecurityCredentials(getConfiguredSecurityCredentials());
   }
 
   protected <T> T lookup(String name, Class<T> type) throws ProcessingException {

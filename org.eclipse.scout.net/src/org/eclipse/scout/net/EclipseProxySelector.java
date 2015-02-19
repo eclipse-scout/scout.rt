@@ -158,6 +158,7 @@ public final class EclipseProxySelector extends ProxySelector {
   }
 
   private IProxyData[] safeSelectImpl(URI uri) {
+    // TODO remove OSGI Dependency
     BundleContext context = NetActivator.getDefault().getBundle().getBundleContext();
     ServiceReference ref = context.getServiceReference(IProxyService.class.getName());
     if (ref != null) {

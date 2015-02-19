@@ -25,7 +25,7 @@ import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelResponse;
 
 /**
  * Abstract tunnel used to invoke a service through HTTP.
- * 
+ *
  * @author awe (refactoring)
  */
 public abstract class AbstractHttpServiceTunnel<T extends ISession> extends AbstractInternalHttpServiceTunnel<T> {
@@ -68,7 +68,7 @@ public abstract class AbstractHttpServiceTunnel<T extends ISession> extends Abst
 
   /**
    * Signals the server to cancel processing jobs for the current session.
-   * 
+   *
    * @return true if cancel was successful and transaction was in fact cancelled, false otherwise
    */
   @Override
@@ -120,7 +120,7 @@ public abstract class AbstractHttpServiceTunnel<T extends ISession> extends Abst
    * This method is called just after the http response is received but before
    * the http response is processed by scout. This might be used to read and
    * interpret custom http headers.
-   * 
+   *
    * @since 06.07.2009
    */
   @Override

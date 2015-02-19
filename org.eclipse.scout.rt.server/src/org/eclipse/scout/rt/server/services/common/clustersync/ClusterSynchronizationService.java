@@ -24,6 +24,7 @@ import java.util.UUID;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -35,7 +36,6 @@ import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.ITransactionRunnable;
 import org.eclipse.scout.rt.server.ServerJob;
 import org.eclipse.scout.rt.server.ThreadContext;
-import org.eclipse.scout.rt.server.internal.Activator;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationMessage;
 import org.eclipse.scout.rt.server.services.common.clustersync.internal.ClusterNotificationMessageProperties;
 import org.eclipse.scout.rt.server.transaction.AbstractTransactionMember;
@@ -43,7 +43,6 @@ import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.service.AbstractService;
 import org.eclipse.scout.service.IService;
 import org.eclipse.scout.service.SERVICES;
-import org.osgi.framework.ServiceRegistration;
 
 public class ClusterSynchronizationService extends AbstractService implements IClusterSynchronizationService, IPublishSubscribeMessageListener {
   private static final String TRANSACTION_MEMBER_ID = ClusterSynchronizationService.class.getName();
@@ -62,8 +61,8 @@ public class ClusterSynchronizationService extends AbstractService implements IC
   private volatile IPublishSubscribeMessageService m_messageService;
 
   @Override
-  public void initializeService(ServiceRegistration registration) {
-    super.initializeService(registration);
+  public void initializeService() {
+    super.initializeService();
     m_nodeId = createNodeId();
     m_session = createBackendSession();
     m_jobFactory = createJobFactory();
@@ -80,7 +79,7 @@ public class ClusterSynchronizationService extends AbstractService implements IC
 
   protected String createNodeId() {
     // system property defined node id
-    String nodeId = Activator.getDefault().getBundle().getBundleContext().getProperty(CLUSTER_NODE_ID_PARAM);
+    String nodeId = ConfigIniUtility.getProperty(CLUSTER_NODE_ID_PARAM);
 
     // weblogic name as node id
     if (!StringUtility.hasText(nodeId)) {
@@ -109,7 +108,7 @@ public class ClusterSynchronizationService extends AbstractService implements IC
 
       // in development on same machine there might run multiple instances on different ports (usecase when testing cluster sync)
       // therefore we use in this case the port jetty port too
-      String port = System.getProperty("org.eclipse.equinox.http.jetty.http.port");
+      String port = ConfigIniUtility.getProperty("org.eclipse.equinox.http.jetty.http.port");
       nodeId = StringUtility.join(":", hostname, port);
     }
     return nodeId;

@@ -13,7 +13,8 @@ package org.eclipse.scout.commons.nls;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
 import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
@@ -32,18 +33,15 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 public final class NlsResourceBundle extends PropertyResourceBundle {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(NlsResourceBundle.class);
+  public static final String TEXT_RESOURCE_EXTENSION = "properties";
 
   public NlsResourceBundle(InputStream stream) throws IOException {
     super(stream);
   }
 
   public static NlsResourceBundle getBundle(String baseName, Locale locale, ClassLoader cl) {
-    return getBundle(baseName, locale, cl, (Class) null);
-  }
-
-  public static NlsResourceBundle getBundle(String baseName, Locale locale, ClassLoader cl, Class wrapperClass) {
     String ls = locale.toString();
-    ArrayList<String> suffixes = new ArrayList<String>();
+    List<String> suffixes = new LinkedList<>();
     suffixes.add("_" + ls);
     int i = ls.lastIndexOf('_');
     while (i >= 0) {
@@ -53,16 +51,14 @@ public final class NlsResourceBundle extends PropertyResourceBundle {
       i = ls.lastIndexOf('_');
     }
     suffixes.add("");
-    //
+
     NlsResourceBundle root = null;
     NlsResourceBundle child = null;
     for (String suffix : suffixes) {
-      String fileName = baseName.replace('.', '/') + suffix + ".properties";
+      String fileName = baseName.replace('.', '/') + suffix + '.' + TEXT_RESOURCE_EXTENSION;
       URL res = cl.getResource(fileName);
       if (res != null) {
-        InputStream in = null;
-        try {
-          in = res.openStream();
+        try (InputStream in = res.openStream()) {
           NlsResourceBundle parent = new NlsResourceBundle(in);
           if (root == null) {
             root = parent;
@@ -73,16 +69,7 @@ public final class NlsResourceBundle extends PropertyResourceBundle {
           child = parent;
         }
         catch (IOException e) {
-          LOG.warn(null, e);
-        }
-        finally {
-          if (in != null) {
-            try {
-              in.close();
-            }
-            catch (Throwable t) {
-            }
-          }
+          LOG.warn("Error loading nls resource URL '" + res.toExternalForm() + "'.", e);
         }
       }
     }

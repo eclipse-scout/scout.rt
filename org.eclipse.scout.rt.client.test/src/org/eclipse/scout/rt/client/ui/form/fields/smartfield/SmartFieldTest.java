@@ -15,9 +15,10 @@ import static org.junit.Assert.assertEquals;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.Activator;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -25,6 +26,7 @@ import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCloseButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.SmartFieldTest.TestForm.MainBox.StyleField;
+import org.eclipse.scout.rt.platform.cdi.IBean;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
@@ -40,7 +42,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.osgi.framework.ServiceRegistration;
 
 /**
  * Smartfield with rows having tooltip/color/icon. When some rows do not have tooltip/color/icon this info should be
@@ -52,7 +53,7 @@ public class SmartFieldTest {
   public static final String ICON_FILE = "file";
 
   protected TestForm form;
-  private List<ServiceRegistration> reg;
+  private List<IBean<?>> reg;
 
   public static class TestForm extends AbstractForm {
 
@@ -161,8 +162,8 @@ public class SmartFieldTest {
   }
 
   public static class StyleLookupService extends TestingLookupService {
-    @Override
-    public void initializeService(ServiceRegistration registration) {
+    @PostConstruct
+    protected void initializeService() {
       List<ILookupRow<Long>> rows = new ArrayList<ILookupRow<Long>>();
       rows.add(new LookupRow<Long>(10L, "Red", ICON_FILE, "Red tooltip", "ff8888", "880000", FontSpec.parse("italic")));
       rows.add(new LookupRow<Long>(20L, "Yellow", ICON_FILE, "Yellow tooltip", "ffff88", "888800", FontSpec.parse("italic")));
@@ -184,7 +185,7 @@ public class SmartFieldTest {
 
   @Before
   public void setUp() throws Throwable {
-    reg = TestingUtility.registerServices(Activator.getDefault().getBundle(), 0, new StyleLookupService());
+    reg = TestingUtility.registerServices(0, new StyleLookupService());
     form = new TestForm();
     form.startForm();
   }

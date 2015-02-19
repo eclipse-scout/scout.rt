@@ -18,11 +18,11 @@ import javax.security.auth.Subject;
 
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.services.common.session.IClientSessionRegistryService;
+import org.eclipse.scout.rt.platform.cdi.IBean;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.service.AbstractService;
 import org.eclipse.scout.service.SERVICES;
-import org.osgi.framework.ServiceRegistration;
 
 /**
  * The TestingClientSessionRegistryService is intended to be used within the context of automatic GUI tests.
@@ -35,7 +35,7 @@ import org.osgi.framework.ServiceRegistration;
  * SwingApplication or SwtApplication respectively gets started. In case of RAP GUI tests, this service is registered
  * when the JUnitRAPJob is scheduled. The service is unregistered with
  * {@link #unregisterTestingClientSessionRegistryService} when the Application or the JUnitJob terminates
- * 
+ *
  * @since 3.8.1
  */
 public class TestingClientSessionRegistryService extends AbstractService implements IClientSessionRegistryService {
@@ -45,7 +45,7 @@ public class TestingClientSessionRegistryService extends AbstractService impleme
 
   private final IClientSessionRegistryService m_delegate;
 
-  private List<ServiceRegistration> m_serviceRegistrations;
+  private List<IBean<?>> m_serviceRegistrations;
 
   public TestingClientSessionRegistryService(IClientSessionRegistryService delegate) {
     m_delegate = delegate;
@@ -54,7 +54,7 @@ public class TestingClientSessionRegistryService extends AbstractService impleme
   public static TestingClientSessionRegistryService registerTestingClientSessionRegistryService() {
     IClientSessionRegistryService delegateClientSessionRegistryService = SERVICES.getService(IClientSessionRegistryService.class);
     TestingClientSessionRegistryService testingClientSessionRegistryService = new TestingClientSessionRegistryService(delegateClientSessionRegistryService);
-    List<ServiceRegistration> regs = TestingUtility.registerServices(Activator.getDefault().getBundle(), 1000, testingClientSessionRegistryService);
+    List<IBean<?>> regs = TestingUtility.registerServices(1000, testingClientSessionRegistryService);
     testingClientSessionRegistryService.setServiceRegistrations(regs);
     return testingClientSessionRegistryService;
   }
@@ -66,11 +66,11 @@ public class TestingClientSessionRegistryService extends AbstractService impleme
     TestingUtility.unregisterServices(service.getServiceRegistrations());
   }
 
-  public List<ServiceRegistration> getServiceRegistrations() {
+  public List<IBean<?>> getServiceRegistrations() {
     return m_serviceRegistrations;
   }
 
-  public void setServiceRegistrations(List<ServiceRegistration> serviceRegistrations) {
+  public void setServiceRegistrations(List<IBean<?>> serviceRegistrations) {
     m_serviceRegistrations = serviceRegistrations;
   }
 

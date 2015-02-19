@@ -25,7 +25,6 @@ import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.osgi.framework.ServiceRegistration;
 
 @RunWith(ScoutClientTestRunner.class)
 public class SmartFieldMultilineTest {
@@ -58,7 +57,7 @@ public class SmartFieldMultilineTest {
     }
   }
 
-  @ClassId("fa2d4f62-e609-4e62-b8ba-fb76c7368af2")
+  @ClassId("43949094-ddb9-47f2-9bdf-4f208e1ed499")
   public static class P_LookupCall extends LookupCall<Long> {
 
     private static final long serialVersionUID = -7536271824820806283L;
@@ -71,10 +70,6 @@ public class SmartFieldMultilineTest {
   }
 
   public static class P_LookupService implements ILookupService<Long> {
-
-    @Override
-    public void initializeService(ServiceRegistration registration) {
-    }
 
     @Override
     public List<? extends ILookupRow<Long>> getDataByKey(ILookupCall<Long> call) throws ProcessingException {

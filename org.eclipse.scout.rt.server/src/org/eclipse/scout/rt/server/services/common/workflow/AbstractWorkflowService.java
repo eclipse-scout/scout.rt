@@ -36,8 +36,10 @@ public abstract class AbstractWorkflowService<T extends AbstractWorkflowData> ex
   private Map<Class<? extends IWorkflowStep>, IWorkflowStep> m_stepMap;
   private IContributionOwner m_contributionHolder;
 
-  public AbstractWorkflowService() {
+  @Override
+  protected void initializeService() {
     initConfig();
+    super.initializeService();
   }
 
   @Override

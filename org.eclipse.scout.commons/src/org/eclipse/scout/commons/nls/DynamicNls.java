@@ -20,9 +20,6 @@ import java.util.ResourceBundle;
 
 import org.eclipse.scout.commons.ConfigIniUtility;
 
-/**
- * Warning: Avoid osgi imports in this class, so it can be used in J2EE
- */
 public class DynamicNls {
 
   private ArrayList<NlsResourceBundleCache> m_resourceBundles;
@@ -41,7 +38,6 @@ public class DynamicNls {
 
   public void registerResourceBundle(String resourceBundleName, Class<?> wrapperClass) {
     m_resourceBundles.add(0, new NlsResourceBundleCache(resourceBundleName, wrapperClass));
-    //NlsUtility.dynamicBindFields(wrapperClass);
   }
 
   /**

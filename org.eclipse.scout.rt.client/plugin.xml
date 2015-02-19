@@ -11,10 +11,10 @@
     <service class="org.eclipse.scout.rt.client.services.common.clientnotification.internal.ClientNotificationConsumerService"/>
     <service class="org.eclipse.scout.rt.client.services.common.perf.internal.PerformanceAnalyzerService"/>
     <service class="org.eclipse.scout.rt.client.ui.desktop.navigation.internal.NavigationHistoryService" createImmediately="false" factory="org.eclipse.scout.rt.client.services.ClientServiceFactory" ranking="-1"/>
-    <proxy class="org.eclipse.scout.rt.client.services.common.code.CodeServiceClientProxy" createImmediately="true" factory="org.eclipse.scout.rt.client.services.ClientProxyServiceFactory"/>
-    <proxy class="org.eclipse.scout.rt.client.services.common.security.AccessControlServiceClientProxy" createImmediately="true" factory="org.eclipse.scout.rt.client.services.ClientProxyServiceFactory"/>
-    <proxy class="org.eclipse.scout.rt.client.services.lookup.BatchLookupServiceClientProxy" factory="org.eclipse.scout.rt.client.services.ClientProxyServiceFactory"/>
-    <proxy class="org.eclipse.scout.rt.client.services.common.security.PermissionServiceClientProxy" factory="org.eclipse.scout.rt.client.services.ClientProxyServiceFactory"/>
+    <service class="org.eclipse.scout.rt.client.services.common.code.CodeServiceClientProxy" createImmediately="true" factory="org.eclipse.scout.rt.client.services.ClientServiceFactory"/>
+    <service class="org.eclipse.scout.rt.client.services.common.security.AccessControlServiceClientProxy" createImmediately="true" factory="org.eclipse.scout.rt.client.services.ClientServiceFactory"/>
+    <service class="org.eclipse.scout.rt.client.services.lookup.BatchLookupServiceClientProxy" factory="org.eclipse.scout.rt.client.services.ClientServiceFactory"/>
+    <service class="org.eclipse.scout.rt.client.services.common.security.PermissionServiceClientProxy" factory="org.eclipse.scout.rt.client.services.ClientServiceFactory"/>
     <proxy class="org.eclipse.scout.rt.shared.services.common.ping.IPingService" factory="org.eclipse.scout.rt.client.services.ClientProxyServiceFactory"/>
     <proxy class="org.eclipse.scout.rt.shared.services.common.security.ILogoutService" factory="org.eclipse.scout.rt.client.services.ClientProxyServiceFactory"/>
     <proxy class="org.eclipse.scout.rt.shared.services.common.bookmark.IBookmarkStorageService" factory="org.eclipse.scout.rt.client.services.ClientProxyServiceFactory"/>

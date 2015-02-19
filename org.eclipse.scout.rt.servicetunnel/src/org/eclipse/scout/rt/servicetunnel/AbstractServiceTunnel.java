@@ -29,7 +29,7 @@ import org.eclipse.scout.service.ServiceUtility;
 
 /**
  * Service tunnel is Thread-Safe.
- * 
+ *
  * @author awe (refactoring)
  */
 public abstract class AbstractServiceTunnel<T extends ISession> implements IServiceTunnel {
@@ -153,7 +153,7 @@ public abstract class AbstractServiceTunnel<T extends ISession> implements IServ
 
   /**
    * Override this method to do additional things after the the response has been received.
-   * 
+   *
    * @param t0
    *          System time before the request has been started (may be used for performance analyzing).
    * @param response

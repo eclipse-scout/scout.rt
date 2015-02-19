@@ -26,14 +26,13 @@ import java.util.List;
 
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.Activator;
+import org.eclipse.scout.rt.platform.cdi.IBean;
 import org.eclipse.scout.rt.shared.services.common.file.IRemoteFileService;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.osgi.framework.ServiceRegistration;
 
 /**
  * Tests for {@link FileService}
@@ -91,7 +90,7 @@ public class FileServiceTest {
   @Test
   public void syncRemoteFilesToPath() {
     //register services
-    List<ServiceRegistration> reg = TestingUtility.registerServices(Activator.getDefault().getBundle(), 0, new DummyRemoteFileService());
+    List<IBean<?>> reg = TestingUtility.registerServices(0, new DummyRemoteFileService());
 
     //start with clean setup
     File outFolder = new File(TEST_DIR_OUT);
@@ -167,10 +166,6 @@ public class FileServiceTest {
     @Override
     public void streamRemoteFile(RemoteFile spec, OutputStream out) throws ProcessingException {
       throw new ProcessingException("not implemented");
-    }
-
-    @Override
-    public void initializeService(ServiceRegistration registration) {
     }
 
   }

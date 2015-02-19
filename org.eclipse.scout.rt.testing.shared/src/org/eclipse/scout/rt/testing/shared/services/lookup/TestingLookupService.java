@@ -21,22 +21,17 @@ import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupService;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
-import org.osgi.framework.ServiceRegistration;
 
 /**
  * Lookup service for testing purposes (Implementation of {@link ILookupService}).
  * Rows can be set dynamically with {@link #setRows(LookupRow[])}.
- * 
+ *
  * @since 3.9.0
  */
 public class TestingLookupService implements ILookupService<Long> {
   private List<ILookupRow<Long>> m_rows = new ArrayList<ILookupRow<Long>>();
 
   public TestingLookupService() {
-  }
-
-  @Override
-  public void initializeService(ServiceRegistration registration) {
   }
 
   public List<ILookupRow<Long>> getRows() {

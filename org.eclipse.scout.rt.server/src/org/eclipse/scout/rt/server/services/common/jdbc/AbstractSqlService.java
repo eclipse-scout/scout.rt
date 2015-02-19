@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.NumberUtility;
@@ -51,9 +50,8 @@ import org.eclipse.scout.rt.shared.services.common.security.IPermissionService;
 import org.eclipse.scout.service.AbstractService;
 import org.eclipse.scout.service.IServiceInventory;
 import org.eclipse.scout.service.SERVICES;
-import org.osgi.framework.ServiceRegistration;
 
-public abstract class AbstractSqlService extends AbstractService implements ISqlService, IAdaptable {
+public abstract class AbstractSqlService extends AbstractService implements ISqlService, IServiceInventory {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractSqlService.class);
   public static final int DEFAULT_MEMORY_PREFETCH_SIZE = 1048576; // = 1MB default
 
@@ -81,13 +79,10 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
   private HashMap<String, List<BundleClassDescriptor>> m_permissionNameToDescriptor;
   private HashMap<String, List<BundleClassDescriptor>> m_codeNameToDescriptor;
 
-  public AbstractSqlService() {
-    initConfig();
-  }
-
   @Override
-  public void initializeService(ServiceRegistration registration) {
-    super.initializeService(registration);
+  protected void initializeService() {
+    super.initializeService();
+    initConfig();
 
     // load code and permission names
     m_permissionNameToDescriptor = new HashMap<String, List<BundleClassDescriptor>>();
@@ -128,6 +123,7 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
         list.add(d);
       }
     }
+
   }
 
   /*
@@ -564,11 +560,9 @@ public abstract class AbstractSqlService extends AbstractService implements ISql
   }
 
   @Override
-  public Object getAdapter(Class adapter) {
-    if (adapter == IServiceInventory.class) {
-      if (m_pool != null) {
-        return m_pool.getInventory();
-      }
+  public String getInventory() {
+    if (m_pool != null) {
+      return m_pool.getInventory();
     }
     return null;
   }

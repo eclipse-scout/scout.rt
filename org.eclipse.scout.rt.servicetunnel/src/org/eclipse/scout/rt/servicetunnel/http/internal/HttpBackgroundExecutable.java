@@ -18,9 +18,9 @@ import java.net.URLConnection;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.servicetunnel.Activator;
 import org.eclipse.scout.rt.servicetunnel.http.AbstractHttpServiceTunnel;
 import org.eclipse.scout.rt.shared.servicetunnel.HttpException;
 import org.eclipse.scout.rt.shared.servicetunnel.IServiceTunnelRequest;
@@ -29,7 +29,7 @@ import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelResponse;
 
 /**
  * A runnable which is executed by a Job, the run() method performs an HTTP request and returns the response.
- * 
+ *
  * @author awe (refactoring)
  */
 public class HttpBackgroundExecutable {
@@ -51,14 +51,7 @@ public class HttpBackgroundExecutable {
   }
 
   private static boolean isDebug() {
-    String text = null;
-    if (Activator.getDefault() != null) {
-      text = Activator.getDefault().getBundle().getBundleContext().getProperty(AbstractHttpServiceTunnel.HTTP_DEBUG_PARAM);
-    }
-    if (text != null && text.equalsIgnoreCase("true")) {
-      return true;
-    }
-    return false;
+    return ConfigIniUtility.getPropertyBoolean(AbstractHttpServiceTunnel.HTTP_DEBUG_PARAM, false);
   }
 
   public IServiceTunnelResponse getResponse() {

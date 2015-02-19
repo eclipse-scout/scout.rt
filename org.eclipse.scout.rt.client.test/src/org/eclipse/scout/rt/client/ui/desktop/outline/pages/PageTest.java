@@ -21,9 +21,9 @@ import java.util.List;
 
 import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.Activator;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline;
+import org.eclipse.scout.rt.platform.cdi.IBean;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
@@ -31,7 +31,6 @@ import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.osgi.framework.ServiceRegistration;
 
 /**
  * JUnit tests for {@link AbstractPage}
@@ -41,7 +40,7 @@ import org.osgi.framework.ServiceRegistration;
 @RunWith(ScoutClientTestRunner.class)
 public class PageTest {
   private static final String TEST_PAGE_CLASS_ID = "TEST_CLASS_ID";
-  private List<ServiceRegistration> m_serviceRegs;
+  private List<IBean<?>> m_serviceRegs;
   private final int TEST_SERVICE_RANKING = 10000;
 
   @After
@@ -108,7 +107,7 @@ public class PageTest {
 
   private IExceptionHandlerService createMockExceptionHandlerService() {
     IExceptionHandlerService svc = Mockito.mock(IExceptionHandlerService.class);
-    m_serviceRegs = TestingUtility.registerServices(Activator.getDefault().getBundle(), TEST_SERVICE_RANKING, svc);
+    m_serviceRegs = TestingUtility.registerServices(TEST_SERVICE_RANKING, svc);
     return svc;
   }
 

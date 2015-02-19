@@ -35,9 +35,6 @@ public class PermissionService extends AbstractService implements IPermissionSer
   private Object m_permissionClassesLock = new Object();
   private BundleClassDescriptor[] m_permissionClasses;
 
-  public PermissionService() {
-  }
-
   @Override
   public BundleClassDescriptor[] getAllPermissionClasses() {
     checkCache();
@@ -91,7 +88,7 @@ public class PermissionService extends AbstractService implements IPermissionSer
    * Checks whether the given bundle should be scanned for permission classes. The default implementations accepts
    * all bundles that are not fragments (because classes from fragments are automatically read when browsing the host
    * bundle).
-   * 
+   *
    * @return Returns <code>true</code> if the given bundle meets the requirements to be scanned for permission classes.
    *         <code>false</code> otherwise.
    */
@@ -103,7 +100,7 @@ public class PermissionService extends AbstractService implements IPermissionSer
    * Checks whether the given class name is a potential permission class. Class names that do not meet the
    * requirements of this method are not considered further, i.e. the "expensive" class instantiation is skipped.
    * The default implementation checks whether the class name contains <code>"Permission"</code>.
-   * 
+   *
    * @param bundle
    *          The class's hosting bundle
    * @param className
@@ -124,7 +121,7 @@ public class PermissionService extends AbstractService implements IPermissionSer
    * <li>not an <code>interface</code>
    * <li>not <code>abstract</code>
    * </ul>
-   * 
+   *
    * @param bundle
    *          The class's hosting bundle
    * @param c

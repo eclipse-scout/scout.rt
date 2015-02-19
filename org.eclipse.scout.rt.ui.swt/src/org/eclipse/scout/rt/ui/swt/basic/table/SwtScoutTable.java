@@ -212,7 +212,7 @@ public class SwtScoutTable extends SwtScoutComposite<ITable> implements ISwtScou
     });
 
     // Install tooltip support for the table.
-    ColumnViewerToolTipSupport.enableFor(viewer, ToolTip.RECREATE);
+    ColumnViewerToolTipSupport.enableFor(viewer, ToolTip.NO_RECREATE);
   }
 
   @Override
