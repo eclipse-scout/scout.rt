@@ -62,13 +62,10 @@ scout.Table.prototype.dispose = function() {
 };
 
 scout.Table.prototype._render = function($parent) {
-  var i, layout;
-
   this._$parent = $parent;
   this.$container = this._$parent.appendDiv('table');
-  layout = new scout.TableLayout(this);
   this.htmlComp = new scout.HtmlComponent(this.$container, this.session);
-  this.htmlComp.setLayout(layout);
+  this.htmlComp.setLayout(new scout.TableLayout(this));
   this.htmlComp.pixelBasedSizing = false;
 
   if (!scout.keystrokeManager.isAdapterInstalled(this.keystrokeAdapter)) {

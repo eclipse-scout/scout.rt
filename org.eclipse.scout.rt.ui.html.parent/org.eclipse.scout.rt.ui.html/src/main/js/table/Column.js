@@ -12,7 +12,7 @@ scout.Column.prototype.init = function(model, session) {
 };
 
 scout.Column.prototype.buildCell = function(row) {
-  var column, style, value, tooltipText, tooltip;
+  var style, value, tooltipText, tooltip;
   style = this.table.cellStyle(this, row);
   value = this.table.cellText(this, row);
   tooltipText = this.table.cellTooltipText(this, row);

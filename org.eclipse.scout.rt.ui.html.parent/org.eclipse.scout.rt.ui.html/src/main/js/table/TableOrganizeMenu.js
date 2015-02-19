@@ -88,7 +88,7 @@ scout.TableOrganizeMenu.prototype._createSlotLoad = function(popup) {
   $('.slot', $group)
     .click(function() {
       popup.remove();
-      this.session.send('loadColumns', this.parent.id, $(event.target).data('id'));
+      this.session.send(this.parent.id, 'resetColumns');
     }.bind(this))
     .one(scout.menus.CLOSING_EVENTS, $.suppressEvent);
 
