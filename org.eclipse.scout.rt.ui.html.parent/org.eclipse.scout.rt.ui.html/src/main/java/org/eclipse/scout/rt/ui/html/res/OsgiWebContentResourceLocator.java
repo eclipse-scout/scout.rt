@@ -41,8 +41,8 @@ public class OsgiWebContentResourceLocator implements IWebContentResourceLocator
     if (resourcePath.contains("..")) {
       throw new IllegalArgumentException("path must not contain any '..'");
     }
-    for (OsgiWebContentService s : SERVICES.getServices(OsgiWebContentService.class)) {
-      URL url = s.getBundle().getEntry(resourcePath);
+    for (IWebContentService s : SERVICES.getServices(IWebContentService.class)) {
+      URL url = s.getResource(resourcePath);
       if (url != null) {
         if (LOG.isTraceEnabled()) {
           LOG.trace("locate resource '" + resourcePath + "' -> " + url);

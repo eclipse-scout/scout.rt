@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.ui.html;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -110,7 +111,7 @@ public abstract class AbstractUiServlet extends HttpServletEx {
         LOG.debug(m_requestType + " request " + req.getRequestURI() + " started");
       }
       try {
-        IServletRequestInterceptor[] interceptors = SERVICES.getServices(IServletRequestInterceptor.class);
+        List<IServletRequestInterceptor> interceptors = SERVICES.getServices(IServletRequestInterceptor.class);
         for (IServletRequestInterceptor interceptor : interceptors) {
           if (intercept(interceptor, req, resp)) {
             return;

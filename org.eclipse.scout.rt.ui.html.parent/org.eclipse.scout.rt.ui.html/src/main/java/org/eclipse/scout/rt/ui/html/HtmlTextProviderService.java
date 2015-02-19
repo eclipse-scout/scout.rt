@@ -15,6 +15,6 @@ public class HtmlTextProviderService extends AbstractDynamicNlsTextProviderServi
 
   @Override
   protected String getDynamicNlsBaseName() {
-    return "resources.texts.Texts";
+    return "org.eclipse.scout.rt.ui.html.texts.Texts";
   }
 }

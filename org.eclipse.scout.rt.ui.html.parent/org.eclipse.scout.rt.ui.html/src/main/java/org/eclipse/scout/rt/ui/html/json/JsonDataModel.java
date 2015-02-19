@@ -16,7 +16,6 @@ import java.net.URL;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.data.model.IDataModel;
-import org.eclipse.scout.rt.ui.html.Activator;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -33,7 +32,7 @@ public class JsonDataModel<T extends IDataModel> extends AbstractJsonAdapter<T> 
 
   @Override
   public JSONObject toJson() {
-    URL url = Activator.getDefault().getBundle().getResource("resources/dummy_datamodel.json");
+    URL url = getClass().getClassLoader().getResource("org/eclipse/scout/rt/ui/html/dummy_datamodel.json");
     if (url == null) {
       throw new JsonException("Failed to load dummy_datamodel.json");
     }

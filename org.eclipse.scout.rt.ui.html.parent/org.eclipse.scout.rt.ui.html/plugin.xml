@@ -12,7 +12,7 @@
             createImmediately="false">
       </service>
       <service
-            class="org.eclipse.scout.rt.ui.html.res.OsgiWebContentService"
+            class="org.eclipse.scout.rt.ui.html.services.WebContentResourceLocator"
             createImmediately="false">
       </service>
       <service
