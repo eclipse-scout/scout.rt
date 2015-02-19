@@ -14,7 +14,7 @@ import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 
-import org.eclipse.scout.commons.exception.IProcessingStatus;
+import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
@@ -98,8 +98,8 @@ public class SwingScoutTableField extends SwingScoutFieldComposite<ITableField<?
 
   protected void setTableStatusFromScout() {
     if (m_swingTableStatus != null) {
-      IProcessingStatus dataStatus = getScoutObject().getTablePopulateStatus();
-      IProcessingStatus selectionStatus = getScoutObject().getTableSelectionStatus();
+      IStatus dataStatus = getScoutObject().getTablePopulateStatus();
+      IStatus selectionStatus = getScoutObject().getTableSelectionStatus();
       m_swingTableStatus.setStatus(dataStatus, selectionStatus);
     }
   }

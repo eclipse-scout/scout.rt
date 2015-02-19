@@ -11,9 +11,9 @@
 package org.eclipse.scout.rt.client.ui.form.outline;
 
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.exception.ProcessingStatus;
+import org.eclipse.scout.commons.status.IStatus;
+import org.eclipse.scout.commons.status.Status;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
@@ -113,7 +113,7 @@ public class DefaultOutlineTableForm extends AbstractForm implements IOutlineTab
         }
         IOutline outline = getDesktop().getOutline();
         // populate status
-        IProcessingStatus populateStatus = null;
+        IStatus populateStatus = null;
         if (outline != null && outline.getActivePage() != null) {
           IPage<?> activePage = outline.getActivePage();
           populateStatus = activePage.getPagePopulateStatus();
@@ -121,18 +121,18 @@ public class DefaultOutlineTableForm extends AbstractForm implements IOutlineTab
         setTablePopulateStatus(populateStatus);
 
         // selection status for table pages only
-        IProcessingStatus selectionStatus = null;
+        IStatus selectionStatus = null;
         if (outline != null && outline.getActivePage() instanceof IPageWithTable<?>) {
           IPageWithTable<?> tablePage = (IPageWithTable<?>) outline.getActivePage();
           //selection status
           if (tablePage.isSearchActive() && tablePage.getSearchFilter() != null && (!tablePage.getSearchFilter().isCompleted()) && tablePage.isSearchRequired()) {
             // clear status
           }
-          else if (populateStatus != null && populateStatus.getSeverity() == IProcessingStatus.WARNING) {
+          else if (populateStatus != null && populateStatus.getSeverity() == IStatus.WARNING) {
             // clear status
           }
           else {
-            selectionStatus = new ProcessingStatus(createDefaultTableStatus(), IProcessingStatus.INFO);
+            selectionStatus = new Status(createDefaultTableStatus(), IStatus.INFO);
           }
         }
         setTableSelectionStatus(selectionStatus);

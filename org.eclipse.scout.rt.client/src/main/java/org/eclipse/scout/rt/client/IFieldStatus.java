@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * Copyright (c) 2015 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -8,15 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.swing.form.fields.tablefield;
+package org.eclipse.scout.rt.client;
 
 import org.eclipse.scout.commons.status.IStatus;
 
 /**
- * Table Status Composite
+ * Status used in client model
  */
-public interface ISwingTableStatus {
+public interface IFieldStatus extends IStatus {
 
-  void setStatus(IStatus populateStatus, IStatus selectionStatus);
+  String getIconId();
 
 }

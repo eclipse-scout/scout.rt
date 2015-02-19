@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.StringUtility;
@@ -22,12 +21,12 @@ import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.PageData;
-import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.exception.ProcessingStatus;
 import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.status.IStatus;
+import org.eclipse.scout.commons.status.Status;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IMemoryPolicy;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeNodeExtension;
@@ -275,7 +274,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
     }
     //update table data status
     if (isSearchActive() && getSearchFilter() != null && (!getSearchFilter().isCompleted()) && isSearchRequired()) {
-      setPagePopulateStatus(new ProcessingStatus(ScoutTexts.get("TooManyRows"), ProcessingStatus.WARNING));
+      setPagePopulateStatus(new Status(ScoutTexts.get("TooManyRows"), IStatus.WARNING));
     }
     else {
       setPagePopulateStatus(null);
@@ -285,7 +284,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
       if (UserAgentUtility.isTouchDevice()) {
         maxOutlineWarningKey = "MaxOutlineRowWarningMobile";
       }
-      setPagePopulateStatus(new ProcessingStatus(TEXTS.get(maxOutlineWarningKey, "" + getTable().getRowCount()), IStatus.WARNING));
+      setPagePopulateStatus(new Status(TEXTS.get(maxOutlineWarningKey, "" + getTable().getRowCount()), IStatus.WARNING));
     }
   }
 
@@ -710,7 +709,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
   }
 
   @Override
-  public void setPagePopulateStatus(IProcessingStatus status) {
+  public void setPagePopulateStatus(IStatus status) {
     super.setPagePopulateStatus(status);
     getTable().tablePopulated();
   }
@@ -760,7 +759,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
           pe = new ProcessingException(t.getMessage(), t);
         }
         if (pe.isInterruption()) {
-          setPagePopulateStatus(new ProcessingStatus(ScoutTexts.get("SearchWasCanceled"), ProcessingStatus.CANCEL));
+          setPagePopulateStatus(new Status(ScoutTexts.get("SearchWasCanceled"), IStatus.WARNING));
         }
         else {
           String message = null;
@@ -770,7 +769,7 @@ public abstract class AbstractPageWithTable<T extends ITable> extends AbstractPa
           if (StringUtility.isNullOrEmpty(message)) {
             message = ScoutTexts.get("ErrorWhileLoadingData");
           }
-          setPagePopulateStatus(new ProcessingStatus(message, ProcessingStatus.CANCEL));
+          setPagePopulateStatus(new Status(message, IStatus.WARNING));
         }
         throw pe;
       }

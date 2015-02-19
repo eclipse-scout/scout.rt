@@ -10,14 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt.form.fields.tablefield;
 
-import org.eclipse.scout.commons.exception.IProcessingStatus;
+import org.eclipse.scout.commons.status.IStatus;
 
 /**
  * Table Status Composite
  */
 public interface ISwtTableStatus {
 
-  void setStatus(IProcessingStatus populateStatus, IProcessingStatus selectionStatus);
+  void setStatus(IStatus populateStatus, IStatus selectionStatus);
 
   void dispose();
 

@@ -14,13 +14,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.eclipse.core.runtime.IStatus;
-
 /**
- * This class is the core exception in scout do not change interface contract
- * since this class is serializable and used in different build versions This
- * class is a conceptual copy of {@link org.eclipse.core.runtime.Status} that
- * also can run in J2EE.
+ * Core exception in Scout.
+ *
+ * @see org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService
  */
 public class ProcessingException extends Exception implements Serializable {
   private static final long serialVersionUID = 1L;
@@ -33,42 +30,42 @@ public class ProcessingException extends Exception implements Serializable {
    * bean support
    */
   public ProcessingException() {
-    super("undefined", null);
+    this("undefined");
   }
 
   public ProcessingException(String message) {
-    this(new ProcessingStatus(null, message, null, 0, IProcessingStatus.ERROR));
+    this(null, message);
   }
 
   public ProcessingException(String message, Throwable cause) {
-    this(new ProcessingStatus(null, message, cause, 0, IProcessingStatus.ERROR));
+    this(null, message, cause);
   }
 
   public ProcessingException(String message, Throwable cause, int errorCode) {
-    this(new ProcessingStatus(null, message, cause, errorCode, IProcessingStatus.ERROR));
+    this(null, message, cause, errorCode);
   }
 
   public ProcessingException(String message, Throwable cause, int errorCode, int severity) {
-    this(new ProcessingStatus(null, message, cause, errorCode, severity));
+    this(null, message, cause, errorCode, severity);
   }
 
   public ProcessingException(String title, String message) {
-    this(new ProcessingStatus(title, message, null, 0, IProcessingStatus.ERROR));
+    this(title, message, null);
   }
 
   public ProcessingException(String title, String message, Throwable cause) {
-    this(new ProcessingStatus(title, message, cause, 0, IProcessingStatus.ERROR));
+    this(title, message, cause, 0);
   }
 
   public ProcessingException(String title, String message, Throwable cause, int errorCode) {
-    this(new ProcessingStatus(title, message, cause, errorCode, IProcessingStatus.ERROR));
+    this(title, message, cause, errorCode, IProcessingStatus.ERROR);
   }
 
   public ProcessingException(String title, String message, Throwable cause, int errorCode, int severity) {
     this(new ProcessingStatus(title, message, cause, errorCode, severity));
   }
 
-  public ProcessingException(IStatus status) {
+  public ProcessingException(IProcessingStatus status) {
     super(status.getMessage(), status.getException());
     m_status = status instanceof ProcessingStatus ? (ProcessingStatus) status : new ProcessingStatus(status);
     if (m_status.getException() == null) {

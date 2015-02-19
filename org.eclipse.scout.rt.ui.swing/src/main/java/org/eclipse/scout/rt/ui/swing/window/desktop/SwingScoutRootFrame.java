@@ -42,6 +42,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
@@ -241,7 +242,7 @@ public class SwingScoutRootFrame extends SwingScoutComposite<IDesktop> implement
   }
 
   @Override
-  public void setSwingStatus(IProcessingStatus newStatus) {
+  public void setSwingStatus(IStatus newStatus) {
     if (m_statusBarComposite != null) {
       m_statusBarComposite.setSwingStatus(newStatus);
     }
@@ -310,7 +311,7 @@ public class SwingScoutRootFrame extends SwingScoutComposite<IDesktop> implement
 
   protected void setStatusFromScout() {
     if (getScoutObject() != null) {
-      IProcessingStatus newStatus = getScoutObject().getStatus();
+      IStatus newStatus = getScoutObject().getStatus();
       //when a tray item is available, use it, otherwise set status on views/dialogs
       TrayIcon trayItem = null;
       ISwingScoutTray trayComposite = getSwingEnvironment().getTrayComposite();
@@ -318,34 +319,14 @@ public class SwingScoutRootFrame extends SwingScoutComposite<IDesktop> implement
         trayItem = trayComposite.getSwingTrayIcon();
       }
       if (trayItem != null) {
-        String title = newStatus != null ? newStatus.getTitle() : null;
-        String text = newStatus != null ? newStatus.getMessage() : null;
-        if (newStatus != null && text != null) {
-          // icon
-          TrayIcon.MessageType iconId;
-          switch (newStatus.getSeverity()) {
-            case IProcessingStatus.ERROR:
-            case IProcessingStatus.FATAL: {
-              iconId = MessageType.ERROR;
-              break;
-            }
-            case IProcessingStatus.WARNING: {
-              iconId = MessageType.WARNING;
-              break;
-            }
-            case IProcessingStatus.INFO: {
-              iconId = MessageType.INFO;
-              break;
-            }
-            default: {
-              iconId = MessageType.NONE;
-              break;
-            }
+        if (newStatus instanceof IProcessingStatus) {
+          IProcessingStatus ps = ((IProcessingStatus) newStatus);
+          if (ps.getBody() != null) {
+            trayItem.displayMessage(ps.getTitle(), ps.getBody(), getTrayIconId(ps));
           }
-          trayItem.displayMessage(title, text, iconId);
         }
-        else {
-          //nop
+        else if (newStatus.getMessage() != null) {
+          trayItem.displayMessage(null, newStatus.getMessage(), getTrayIconId(newStatus));
         }
       }
       else {
@@ -355,9 +336,24 @@ public class SwingScoutRootFrame extends SwingScoutComposite<IDesktop> implement
     }
   }
 
-  /*
-   * event handlers
-   */
+  private TrayIcon.MessageType getTrayIconId(IStatus status) {
+    if (status.getSeverity() >= IStatus.ERROR) {
+      return MessageType.ERROR;
+    }
+    else if (status.getSeverity() >= IStatus.WARNING) {
+      return MessageType.WARNING;
+    }
+    else if (status.getSeverity() >= IStatus.INFO) {
+      return MessageType.INFO;
+    }
+    else {
+      return MessageType.NONE;
+    }
+  }
+
+/*
+ * event handlers
+ */
   protected void handleSwingWindowOpened(WindowEvent e) {
     // fit initial size of views
     if (getDesktopComposite() != null) {
@@ -450,9 +446,9 @@ public class SwingScoutRootFrame extends SwingScoutComposite<IDesktop> implement
     }
   }
 
-  /*
-   * extended property observer
-   */
+/*
+ * extended property observer
+ */
   @Override
   protected void handleScoutPropertyChange(String name, Object newValue) {
     super.handleScoutPropertyChange(name, newValue);
@@ -476,9 +472,9 @@ public class SwingScoutRootFrame extends SwingScoutComposite<IDesktop> implement
     return new SwingScoutHeaderPanel();
   }
 
-  /*
-   * other observers
-   */
+/*
+ * other observers
+ */
   private class P_ScoutDesktopListener implements DesktopListener {
     @Override
     public void desktopChanged(final DesktopEvent e) {

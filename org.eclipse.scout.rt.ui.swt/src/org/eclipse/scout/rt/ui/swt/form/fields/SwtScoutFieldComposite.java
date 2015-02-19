@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.ui.swt.form.fields;
 
 import java.util.ArrayList;
 
-import org.eclipse.scout.commons.exception.IProcessingStatus;
+import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
@@ -30,7 +30,7 @@ import org.eclipse.swt.widgets.Control;
 
 /**
  * <h3>SwtScoutFieldComposite</h3> ...
- * 
+ *
  * @since 1.0.0 19.05.2008
  */
 public abstract class SwtScoutFieldComposite<T extends IFormField> extends SwtScoutComposite<T> implements ISwtScoutFormField<T> {
@@ -82,7 +82,7 @@ public abstract class SwtScoutFieldComposite<T extends IFormField> extends SwtSc
     return m_mandatoryFieldBackgroundColor;
   }
 
-  protected void setErrorStatusFromScout(IProcessingStatus s) {
+  protected void setErrorStatusFromScout(IStatus s) {
     if (getSwtLabel() != null) {
       getSwtLabel().setStatus(s);
       getSwtContainer().layout(true, true);
@@ -174,7 +174,7 @@ public abstract class SwtScoutFieldComposite<T extends IFormField> extends SwtSc
 
   /**
    * used to change enabled into read only
-   * 
+   *
    * @param swtField
    * @param enabled
    */
@@ -460,7 +460,7 @@ public abstract class SwtScoutFieldComposite<T extends IFormField> extends SwtSc
       setMandatoryFromScout(((Boolean) newValue).booleanValue());
     }
     else if (name.equals(IFormField.PROP_ERROR_STATUS)) {
-      setErrorStatusFromScout((IProcessingStatus) newValue);
+      setErrorStatusFromScout((IStatus) newValue);
     }
     else if (name.equals(IFormField.PROP_FOREGROUND_COLOR)) {
       setForegroundFromScout((String) newValue);

@@ -23,7 +23,7 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.text.JTextComponent;
 
-import org.eclipse.scout.commons.exception.IProcessingStatus;
+import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -204,7 +204,7 @@ public abstract class SwingScoutFieldComposite<T extends IFormField> extends Swi
     }
   }
 
-  protected void setErrorStatusFromScout(IProcessingStatus s) {
+  protected void setErrorStatusFromScout(IStatus s) {
     if (getSwingLabel() != null) {
       getSwingLabel().setStatus(s);
     }
@@ -478,7 +478,7 @@ public abstract class SwingScoutFieldComposite<T extends IFormField> extends Swi
       setMandatoryFromScout(((Boolean) newValue).booleanValue());
     }
     else if (name.equals(IFormField.PROP_ERROR_STATUS)) {
-      setErrorStatusFromScout((IProcessingStatus) newValue);
+      setErrorStatusFromScout((IStatus) newValue);
     }
     else if (name.equals(IFormField.PROP_FOREGROUND_COLOR)) {
       setForegroundFromScout((String) newValue);

@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields;
 
-import org.eclipse.scout.commons.exception.IProcessingStatus;
+import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 
@@ -22,7 +22,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
  */
 public class ValidateFormFieldDescriptor implements IValidateContentDescriptor {
   private final IFormField m_field;
-  private final IProcessingStatus m_errorStatus;
+  private final IStatus m_errorStatus;
 
   public ValidateFormFieldDescriptor(IFormField field) {
     m_field = field;
@@ -35,7 +35,7 @@ public class ValidateFormFieldDescriptor implements IValidateContentDescriptor {
   }
 
   @Override
-  public IProcessingStatus getErrorStatus() {
+  public IStatus getErrorStatus() {
     return m_errorStatus;
   }
 

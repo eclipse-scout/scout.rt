@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.sequencebox;
 
-import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.ScoutFieldStatus;
 
 /**
@@ -20,14 +19,9 @@ import org.eclipse.scout.rt.client.ui.form.fields.ScoutFieldStatus;
  * cleared once the sequence is valid again.
  */
 public class InvalidSequenceStatus extends ScoutFieldStatus {
-  private static final long serialVersionUID = 1L;
 
   public InvalidSequenceStatus(String message) {
     super(message, ERROR);
-  }
-
-  public InvalidSequenceStatus(IProcessingStatus s) {
-    super(s, ERROR);
   }
 
 }

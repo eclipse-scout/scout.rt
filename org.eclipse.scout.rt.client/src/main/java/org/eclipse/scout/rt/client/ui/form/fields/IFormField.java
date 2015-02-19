@@ -18,8 +18,8 @@ import java.util.Map;
 import org.eclipse.scout.commons.ITypeWithClassId;
 import org.eclipse.scout.commons.annotations.IOrdered;
 import org.eclipse.scout.commons.beans.IPropertyObserver;
-import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.PrintDevice;
@@ -455,14 +455,14 @@ public interface IFormField extends IPropertyObserver, ITypeWithClassId, IOrdere
    * @return null iff value is valid, non-null if the currently set value has
    *         semantic errors
    */
-  IProcessingStatus getErrorStatus();
+  IStatus getErrorStatus();
 
   /**
    * @param status
    *          error status of currently set value In order to set a custom icon
    *          as the field status, use {@link ScoutFieldStatus}
    */
-  void setErrorStatus(IProcessingStatus status);
+  void setErrorStatus(IStatus status);
 
   /**
    * @param message

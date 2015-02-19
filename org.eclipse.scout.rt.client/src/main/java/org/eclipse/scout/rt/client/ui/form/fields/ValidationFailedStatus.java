@@ -4,13 +4,11 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields;
-
-import org.eclipse.scout.commons.exception.IProcessingStatus;
 
 /**
  * Marker subclass so we know inside setValue that this was a previous
@@ -18,13 +16,17 @@ import org.eclipse.scout.commons.exception.IProcessingStatus;
  * status of this type can safely be cleared.
  */
 public class ValidationFailedStatus extends ScoutFieldStatus {
-  private static final long serialVersionUID = 1L;
 
   public ValidationFailedStatus(String message) {
-    super(message, WARNING);
+    this(message, WARNING);
   }
 
-  public ValidationFailedStatus(IProcessingStatus s) {
-    super(s, WARNING);
+  public ValidationFailedStatus(String message, int severity) {
+    super(message, severity);
   }
+
+  public ValidationFailedStatus(String message, int severity, int code) {
+    super(message, severity, code);
+  }
+
 }

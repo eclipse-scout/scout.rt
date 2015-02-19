@@ -27,9 +27,10 @@ import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.ScoutSdkIgnore;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.exception.ProcessingStatus;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.job.JobEx;
+import org.eclipse.scout.commons.status.IStatus;
+import org.eclipse.scout.commons.status.Status;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
@@ -888,7 +889,7 @@ public abstract class AbstractContentAssistField<VALUE, LOOKUP_KEY> extends Abst
   public void doSearch(String searchText, boolean selectCurrentValue, boolean synchronous) {
     IContentAssistFieldProposalForm<LOOKUP_KEY> proposalForm = getProposalForm();
     if (proposalForm != null) {
-      proposalForm.setTablePopulateStatus(new ProcessingStatus(ScoutTexts.get("searchingProposals"), ProcessingStatus.WARNING));
+      proposalForm.setTablePopulateStatus(new Status(ScoutTexts.get("searchingProposals"), IStatus.WARNING));
     }
     getLookupRowFetcher().update(searchText, selectCurrentValue, synchronous);
   }

@@ -22,9 +22,9 @@ import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.exception.IProcessingStatus;
+import org.eclipse.scout.commons.status.IStatus;
+import org.eclipse.scout.rt.client.IFieldStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.ScoutFieldStatus;
-import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.ui.swing.Activator;
 import org.eclipse.scout.rt.ui.swing.LogicalGridData;
 import org.eclipse.scout.rt.ui.swing.SwingIcons;
@@ -42,14 +42,13 @@ import org.eclipse.scout.rt.ui.swing.SwingUtility;
  * displayed, this panel is not visible at all.
  * <p>
  * The iconPanel contains to icon labels to indicate the status (error, warning, info) and the mandatory flag.
- * 
+ *
  * @author bsh
  */
 public class JStatusLabelEx extends JComponent {
   private static final long serialVersionUID = 1L;
 
-//  private final ISwingEnvironment m_env;
-  private IProcessingStatus m_status;
+  private IStatus m_status;
   private boolean m_mandatoryLabelVisible; // contains actual state, needed for error status overlay (bsh 2010-10-08)
 
   private JPanelEx m_labelPanel;
@@ -195,7 +194,7 @@ public class JStatusLabelEx extends JComponent {
     m_label.setVisible(StringUtility.hasText(text)); // Hide empty labels (so the spacing is not too big within SequenceBoxes)
   }
 
-  public void setStatus(IProcessingStatus status) {
+  public void setStatus(IStatus status) {
     m_status = status;
     if (m_status == null) {
       m_statusLabel.setVisible(false);
@@ -205,40 +204,24 @@ public class JStatusLabelEx extends JComponent {
     }
     else {
       // icon
-      String iconId = (m_status instanceof ScoutFieldStatus ? ((ScoutFieldStatus) m_status).getIconId() : null);
-      if (iconId == null) {
-        switch (m_status.getSeverity()) {
-          case IProcessingStatus.FATAL:
-          case IProcessingStatus.ERROR:
-            iconId = AbstractIcons.StatusError;
-            break;
-          case IProcessingStatus.WARNING:
-            iconId = AbstractIcons.StatusWarning;
-            break;
-          default:
-            iconId = AbstractIcons.StatusInfo;
-            break;
-        }
-      }
-      m_statusLabel.setIcon(Activator.getIcon(iconId));
+      m_statusLabel.setIcon(Activator.getIcon(getIconId()));
       // tooltip
-      StringBuffer buf = new StringBuffer();
-      if (m_status.getTitle() != null) {
-        buf.append(m_status.getTitle());
-      }
-      if (m_status.getMessage() != null) {
-        if (buf.length() > 0) {
-          buf.append("\n");
-        }
-        buf.append(m_status.getMessage());
-      }
-      m_statusLabel.setToolTipText(buf.toString());
+      m_statusLabel.setToolTipText(m_status.getMessage());
       // visibility
       m_statusLabel.setVisible(true);
 
       if (isStatusHidesMandatoryIconEnabled()) {
         m_mandatoryLabel.setVisible(false);
       }
+    }
+  }
+
+  private String getIconId() {
+    if (m_status instanceof IFieldStatus) {
+      return ((IFieldStatus) m_status).getIconId();
+    }
+    else {
+      return ScoutFieldStatus.getIconIdFromSeverity(m_status.getSeverity());
     }
   }
 

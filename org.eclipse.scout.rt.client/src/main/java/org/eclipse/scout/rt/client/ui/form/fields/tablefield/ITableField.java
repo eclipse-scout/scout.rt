@@ -10,9 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.tablefield;
 
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 
@@ -23,11 +22,11 @@ public interface ITableField<T extends ITable> extends IFormField {
    */
   String PROP_TABLE = "table";
   /**
-   * {@link IProcessingStatus}
+   * {@link IStatus}
    */
   String PROP_TABLE_SELECTION_STATUS = "tableSelectionStatus";
   /**
-   * {@link IProcessingStatus}
+   * {@link IStatus}
    */
   String PROP_TABLE_POPULATE_STATUS = "tablePopulateStatus";
   /**
@@ -57,15 +56,14 @@ public interface ITableField<T extends ITable> extends IFormField {
   String getTableStatus();
 
   /**
-   * Convenience for {@link #setTableSelectionStatus(IProcessingStatus)} with a string. Creates a status with
-   * {@link IStatus#INFO}
+   * Convenience for {@link #setTableSelectionStatus(IStatus)} with a string. Creates a status with {@link IStatus#INFO}
    */
   void setTableStatus(String s);
 
   /**
    * @return the status of the table data row count and selection
    */
-  IProcessingStatus getTableSelectionStatus();
+  IStatus getTableSelectionStatus();
 
   /**
    * set the selection status on the table
@@ -77,15 +75,15 @@ public interface ITableField<T extends ITable> extends IFormField {
    * <p>
    * see also {@link #createDefaultTableStatus()}
    * <p>
-   * see {@link #setTableSelectionStatus(IProcessingStatus)}
+   * see {@link #setTableSelectionStatus(IStatus)}
    */
-  void setTableSelectionStatus(IProcessingStatus status);
+  void setTableSelectionStatus(IStatus status);
 
   /**
    * @return the data fetching>/loading status, warnings and other general messages related with data currently loaded
    *         into this table
    */
-  IProcessingStatus getTablePopulateStatus();
+  IStatus getTablePopulateStatus();
 
   /**
    * set the data loading status on the table
@@ -97,11 +95,11 @@ public interface ITableField<T extends ITable> extends IFormField {
    * <p>
    * see also {@link #createDefaultTableStatus()}
    * <p>
-   * see {@link #setTableSelectionStatus(IProcessingStatus)}
+   * see {@link #setTableSelectionStatus(IStatus)}
    * <p>
-   * see {@link #setTablePopulateStatus(IProcessingStatus)}
+   * see {@link #setTablePopulateStatus(IStatus)}
    */
-  void setTablePopulateStatus(IProcessingStatus status);
+  void setTablePopulateStatus(IStatus status);
 
   /**
    * @return true if the table status is visible, false of not

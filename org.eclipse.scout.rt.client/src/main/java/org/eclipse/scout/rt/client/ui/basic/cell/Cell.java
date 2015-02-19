@@ -15,10 +15,11 @@ import java.util.Map;
 
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.status.IStatus;
+import org.eclipse.scout.commons.status.Status;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
 
@@ -48,7 +49,7 @@ public class Cell implements ICell {
   private String m_text;
   private ICellSpecialization m_cellSpecialization = DEFAULT_CELL_STYLE;
 
-  private IProcessingStatus m_errorStatus = null;
+  private IStatus m_errorStatus = null;
 
   public Cell() {
   }
@@ -290,19 +291,23 @@ public class Cell implements ICell {
   }
 
   @Override
-  public IProcessingStatus getErrorStatus() {
+  public IStatus getErrorStatus() {
     return m_errorStatus;
+  }
+
+  public void setErrorStatus(String message) {
+    setErrorStatus(new Status(message));
   }
 
   /**
    * Set the error status of the cell or <code>null</code> in case of no error.
    **/
-  public void setErrorStatus(IProcessingStatus status) {
+  public void setErrorStatus(IStatus status) {
     m_errorStatus = status;
   }
 
   public void clearErrorStatus() {
-    setErrorStatus(null);
+    setErrorStatus((IStatus) null);
   }
 
   @Override

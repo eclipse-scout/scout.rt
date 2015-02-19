@@ -14,8 +14,8 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
@@ -104,12 +104,12 @@ public class VirtualPage extends VirtualTreeNode implements IPage, IVirtualTreeN
   }
 
   @Override
-  public IProcessingStatus getPagePopulateStatus() {
+  public IStatus getPagePopulateStatus() {
     return null;
   }
 
   @Override
-  public void setPagePopulateStatus(IProcessingStatus status) {
+  public void setPagePopulateStatus(IStatus status) {
   }
 
   /**

@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.ui.swt.window.messagebox;
 
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.scout.commons.exception.IProcessingStatus;
+import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxEvent;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxListener;
@@ -42,7 +42,7 @@ import org.eclipse.swt.widgets.Shell;
 
 /**
  * <h3>MessageBoxDialog</h3> ...
- * 
+ *
  * @since 1.0.0 13.04.2008
  */
 public class SwtScoutMessageBoxDialog extends Dialog {
@@ -113,13 +113,13 @@ public class SwtScoutMessageBoxDialog extends Dialog {
     if (getScoutObject().getIconId() == null) {
       Image icon = null;
       switch (severity) {
-        case IProcessingStatus.ERROR:
+        case IStatus.ERROR:
           icon = getShell().getDisplay().getSystemImage(SWT.ICON_ERROR);
           break;
-        case IProcessingStatus.WARNING:
+        case IStatus.WARNING:
           icon = getShell().getDisplay().getSystemImage(SWT.ICON_WARNING);
           break;
-        case IProcessingStatus.INFO:
+        case IStatus.INFO:
           icon = getShell().getDisplay().getSystemImage(SWT.ICON_INFORMATION);
           break;
         default:

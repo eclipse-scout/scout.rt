@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.tablefield;
 
-import org.eclipse.scout.commons.exception.IProcessingStatus;
+import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
@@ -46,7 +46,7 @@ public class ValidateTableFieldDescriptor implements IValidateContentDescriptor 
   }
 
   @Override
-  public IProcessingStatus getErrorStatus() {
+  public IStatus getErrorStatus() {
     return null;
   }
 

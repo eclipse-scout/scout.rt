@@ -30,12 +30,12 @@ import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.annotations.ScoutSdkIgnore;
-import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IValueFieldExtension;
@@ -359,7 +359,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
 
         //parsing error remains unchanged, regardless of validation error
         if (!(getErrorStatus() instanceof ParsingFailedStatus)) {
-          setErrorStatus(new ValidationFailedStatus(e.getStatus()));
+          setErrorStatus(new ValidationFailedStatus(e.getStatus().getMessage()));
         }
 
         e.consume();
@@ -524,7 +524,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
    * by for example calling {@link IValueField#setValue(Object)} on another
    * field.<br>
    * If this new value seems to be invalid (even though it has been validated
-   * correctly) use {@link #setErrorStatus(IProcessingStatus)} to mark the value
+   * correctly) use {@link #setErrorStatus(IStatus)} to mark the value
    * as incorrect. It will appear red in the gui.<br>
    * In case this method throws exceptions, this will NOT invalidate the value
    * of the field (like {@link #execValidateValue(Object)} does)
@@ -547,7 +547,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
       VALUE parsedValue = interceptParseValue(text);
 
       //
-      IProcessingStatus oldErrorStatus = getErrorStatus();
+      IStatus oldErrorStatus = getErrorStatus();
       String oldDisplayText = getDisplayText();
 
       if (getErrorStatus() instanceof ParsingFailedStatus) {
@@ -563,7 +563,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
       }
       //convert validation error to parsing error
       else if (getErrorStatus() instanceof ValidationFailedStatus) {
-        setErrorStatus(new ParsingFailedStatus(getErrorStatus(), text));
+        setErrorStatus(new ParsingFailedStatus(getErrorStatus().getMessage(), text));
       }
       return true;
     }
@@ -576,7 +576,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
         LOG.warn(null, t);
         e = new ProcessingException(ScoutTexts.get("InvalidValueMessageX", text), t);
       }
-      ParsingFailedStatus internalStatus = new ParsingFailedStatus(e.getStatus(), text);
+      ParsingFailedStatus internalStatus = new ParsingFailedStatus(e.getStatus().getMessage(), text);
       setErrorStatus(internalStatus);
       return false;
     }

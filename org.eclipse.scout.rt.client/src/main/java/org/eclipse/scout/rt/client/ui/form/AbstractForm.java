@@ -49,13 +49,13 @@ import org.eclipse.scout.commons.annotations.OrderedComparator;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.beans.FastPropertyDescriptor;
 import org.eclipse.scout.commons.beans.IPropertyFilter;
-import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.BlockingCondition;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
@@ -1772,7 +1772,7 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
             TEXTS.get("NoButton"),
             TEXTS.get("CancelButton")
             );
-        messageBox.setSeverity(IProcessingStatus.INFO);
+        messageBox.setSeverity(IStatus.INFO);
         int result = messageBox.startMessageBox();
         if (result == IMessageBox.YES_OPTION) {
           doOk();

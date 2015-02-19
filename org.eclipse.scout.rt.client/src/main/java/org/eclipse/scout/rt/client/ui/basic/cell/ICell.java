@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.basic.cell;
 
-import org.eclipse.scout.commons.exception.IProcessingStatus;
+import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
@@ -59,6 +59,6 @@ public interface ICell {
   /**
    * the error status of the cell or <code>null</code> in case of no error.
    */
-  IProcessingStatus getErrorStatus();
+  IStatus getErrorStatus();
 
 }

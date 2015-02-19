@@ -32,11 +32,11 @@ import org.eclipse.scout.commons.annotations.IOrdered;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
-import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.exception.ProcessingStatus;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.status.IStatus;
+import org.eclipse.scout.commons.status.Status;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ColumnChains.ColumnCompleteEditChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ColumnChains.ColumnDecorateCellChain;
 import org.eclipse.scout.rt.client.extension.ui.basic.table.columns.ColumnChains.ColumnDecorateHeaderCellChain;
@@ -1651,7 +1651,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
     if (m_isValidating) {
       LOG.warn("validateColumnValue called during running validation. Value " + String.valueOf(value) + " will not be set.");
       Cell cell = row.getCellForUpdate(this);
-      cell.setErrorStatus(new ProcessingStatus(ScoutTexts.get("RunningColumnValidation"), IProcessingStatus.ERROR));
+      cell.setErrorStatus(ScoutTexts.get("RunningColumnValidation"));
       return;
     }
 
@@ -1670,7 +1670,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
           }
         }
         if (editor != null) {
-          IProcessingStatus errorStatus = editor.getErrorStatus();
+          IStatus errorStatus = editor.getErrorStatus();
           boolean editorValid = editor.isContentValid() && errorStatus == null;
           Cell cell = row.getCellForUpdate(this);
           if (!editorValid) {
@@ -1683,7 +1683,7 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
               cell.setText(((ParsingFailedStatus) errorStatus).getParseInputString());
             }
             else {
-              cell.setErrorStatus(new ProcessingStatus(ScoutTexts.get("FormEmptyMandatoryFieldsMessage"), IProcessingStatus.ERROR));
+              cell.setErrorStatus(new Status(ScoutTexts.get("FormEmptyMandatoryFieldsMessage")));
               cell.setText("");
             }
             return;

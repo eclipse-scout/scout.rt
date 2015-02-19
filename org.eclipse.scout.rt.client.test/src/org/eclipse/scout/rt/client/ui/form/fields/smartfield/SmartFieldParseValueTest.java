@@ -19,7 +19,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
@@ -90,7 +89,6 @@ public class SmartFieldParseValueTest {
     }
   }
 
-  @ClassId("fa2d4f62-e609-4e62-b8ba-fb76c7368af2")
   public static class P_LookupCall extends LookupCall<Long> {
 
     private static final long serialVersionUID = -7536271824820806283L;

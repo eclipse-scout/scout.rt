@@ -19,8 +19,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.scout.commons.EventListenerList;
-import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.action.IAction;
@@ -431,7 +431,7 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
-  public IProcessingStatus getStatus() {
+  public IStatus getStatus() {
     throw createUnsupportedOperationException();
   }
 
@@ -547,7 +547,7 @@ public class VirtualDesktop implements IDesktop {
   }
 
   @Override
-  public void setStatus(IProcessingStatus status) {
+  public void setStatus(IStatus status) {
     throw createUnsupportedOperationException();
   }
 

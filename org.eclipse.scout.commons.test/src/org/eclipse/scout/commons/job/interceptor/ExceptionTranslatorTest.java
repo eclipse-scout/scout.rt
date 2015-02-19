@@ -21,7 +21,6 @@ import static org.mockito.Mockito.when;
 
 import java.lang.reflect.UndeclaredThrowableException;
 import java.security.PrivilegedAction;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -118,7 +117,7 @@ public class ExceptionTranslatorTest {
     catch (Exception e) {
       assertTrue(e instanceof ProcessingException);
       ProcessingException pe = ((ProcessingException) e);
-      Set<String> ctx = new HashSet<>(Arrays.asList(pe.getStatus().getContextMessages()));
+      Set<String> ctx = new HashSet<>(pe.getStatus().getContextMessages());
       assertEquals(ctx, CollectionUtility.hashSet("job=job-1", "identity=anonymous"));
     }
   }
@@ -155,7 +154,7 @@ public class ExceptionTranslatorTest {
     Exception e = errorHolder.getValue();
     assertTrue(e instanceof ProcessingException);
     ProcessingException pe = ((ProcessingException) e);
-    Set<String> ctx = new HashSet<>(Arrays.asList(pe.getStatus().getContextMessages()));
+    Set<String> ctx = new HashSet<>(pe.getStatus().getContextMessages());
     assertEquals(ctx, CollectionUtility.hashSet("job=job-1", "identity=jack, john"));
   }
 
@@ -176,7 +175,7 @@ public class ExceptionTranslatorTest {
       assertSame(r1, e.getCause());
 
       ProcessingException pe = ((ProcessingException) e);
-      Set<String> ctx = new HashSet<>(Arrays.asList(pe.getStatus().getContextMessages()));
+      Set<String> ctx = new HashSet<>(pe.getStatus().getContextMessages());
       assertEquals(ctx, CollectionUtility.hashSet("job=job-1", "identity=anonymous"));
     }
 

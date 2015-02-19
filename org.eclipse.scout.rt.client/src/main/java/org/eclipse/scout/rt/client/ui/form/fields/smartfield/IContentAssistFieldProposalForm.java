@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields.smartfield;
 
-import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
@@ -38,7 +38,7 @@ public interface IContentAssistFieldProposalForm<LOOKUP_KEY> extends IForm {
 
   /**
    * This method may call {@link IContentAssistField#acceptProposal(LookupRow)}
-   * 
+   *
    * @return true if a propsal was accepted (might be a single match or the
    *         selcted one that is enabled)
    */
@@ -55,11 +55,11 @@ public interface IContentAssistFieldProposalForm<LOOKUP_KEY> extends IForm {
   /**
    * @param status
    */
-  void setTablePopulateStatus(IProcessingStatus status);
+  void setTablePopulateStatus(IStatus status);
 
   /**
    * delegate method to search result.
-   * 
+   *
    * @return the search text of the last successful search.
    */
   String getSearchText();

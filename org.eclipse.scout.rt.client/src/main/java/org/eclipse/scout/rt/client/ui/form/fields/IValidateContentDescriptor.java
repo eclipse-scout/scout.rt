@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields;
 
-import org.eclipse.scout.commons.exception.IProcessingStatus;
+import org.eclipse.scout.commons.status.IStatus;
 
 /**
  * This interface is used to check fields for valid content and - in case invalid - activate / select / focus the
@@ -25,7 +25,7 @@ public interface IValidateContentDescriptor {
    */
   String getDisplayText();
 
-  IProcessingStatus getErrorStatus();
+  IStatus getErrorStatus();
 
   /**
    * activate / select / focus the appropriate location

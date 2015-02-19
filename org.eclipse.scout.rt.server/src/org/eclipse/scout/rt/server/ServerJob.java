@@ -27,7 +27,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.exception.ProcessingStatus;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -183,10 +182,11 @@ public abstract class ServerJob extends JobEx implements IServerSessionProvider 
         catch (PrivilegedActionException e) {
           Throwable t = e.getCause();
           if (t instanceof ProcessingException) {
-            return ((ProcessingException) t).getStatus();
+            ProcessingException pe = ((ProcessingException) t);
+            return new Status(IStatus.ERROR, null, pe.getStatus().getCode(), pe.getMessage(), t);
           }
           else {
-            return new ProcessingStatus(t.getMessage(), t, 0, ProcessingStatus.ERROR);
+            return new Status(IStatus.ERROR, null, 0, t.getMessage(), t);
           }
         }
       }
@@ -196,10 +196,11 @@ public abstract class ServerJob extends JobEx implements IServerSessionProvider 
     }
     catch (Throwable t) {
       if (t instanceof ProcessingException) {
-        return ((ProcessingException) t).getStatus();
+        ProcessingException pe = ((ProcessingException) t);
+        return new Status(IStatus.ERROR, "0", pe.getStatus().getCode(), pe.getMessage(), t);
       }
       else {
-        return new ProcessingStatus(t.getMessage(), t, 0, ProcessingStatus.ERROR);
+        return new Status(IStatus.ERROR, "0", 0, t.getMessage(), t);
       }
     }
   }

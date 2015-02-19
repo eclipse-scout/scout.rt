@@ -14,8 +14,8 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.scout.commons.ITypeWithClassId;
-import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode;
@@ -109,17 +109,17 @@ public interface IPage<T extends ITable> extends ITreeNode, ITypeWithClassId {
    *
    * @since 3.8.2
    */
-  IProcessingStatus getPagePopulateStatus();
+  IStatus getPagePopulateStatus();
 
   /**
-   * see {@link ITableField#setTablePopulateStatus(IProcessingStatus)}
+   * see {@link ITableField#setTablePopulateStatus(IStatus)}
    * <p>
    * This method is temporary and will be removed in future releases (long term) when the {@link IPage} is legacy and
    * replaced by a simple page with just N forms.
    *
    * @since 3.8.2
    */
-  void setPagePopulateStatus(IProcessingStatus status);
+  void setPagePopulateStatus(IStatus status);
 
   /**
    * Call this method to refresh all listeners on that dataTypes.<br>

@@ -18,12 +18,12 @@ import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.exception.ProcessingStatus;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.status.IStatus;
+import org.eclipse.scout.commons.status.Status;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.TableEvent;
@@ -101,21 +101,21 @@ public class ContentAssistTableForm<LOOKUP_KEY> extends AbstractContentAssistFie
         table.setTableChanging(false);
       }
       String statusText = null;
-      int severity = ProcessingStatus.INFO;
+      int severity = IStatus.INFO;
       if (failed != null) {
         statusText = failed.getStatus().getMessage();
-        severity = ProcessingStatus.ERROR;
+        severity = IStatus.ERROR;
       }
       else if (rows.size() <= 0) {
         statusText = ScoutTexts.get("SmartFieldCannotComplete", (searchText == null) ? ("") : (searchText));
-        severity = ProcessingStatus.WARNING;
+        severity = IStatus.WARNING;
       }
       else if (rows.size() > getContentAssistField().getBrowseMaxRowCount()) {
         statusText = ScoutTexts.get("SmartFieldMoreThanXRows", "" + getContentAssistField().getBrowseMaxRowCount());
-        severity = ProcessingStatus.INFO;
+        severity = IStatus.INFO;
       }
       if (statusText != null) {
-        getResultTableField().setTablePopulateStatus(new ProcessingStatus(statusText, severity));
+        getResultTableField().setTablePopulateStatus(new Status(statusText, severity));
       }
       else {
         getResultTableField().setTablePopulateStatus(null);
@@ -132,7 +132,7 @@ public class ContentAssistTableForm<LOOKUP_KEY> extends AbstractContentAssistFie
   }
 
   @Override
-  public void setTablePopulateStatus(IProcessingStatus status) {
+  public void setTablePopulateStatus(IStatus status) {
     getResultTableField().setTablePopulateStatus(status);
   }
 

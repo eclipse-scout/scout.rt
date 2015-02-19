@@ -120,7 +120,7 @@ public class ServerJobServletFilter implements Filter {
       IStatus status = job.runNow(new NullProgressMonitor());
       if (!status.isOK()) {
         try {
-          ProcessingException p = new ProcessingException(status);
+          ProcessingException p = new ProcessingException(status.getMessage(), status.getException());
           p.addContextMessage("Client=" + req.getRemoteUser() + "@" + req.getRemoteAddr() + "/" + req.getRemoteHost());
           SERVICES.getService(IExceptionHandlerService.class).handleException(p);
         }

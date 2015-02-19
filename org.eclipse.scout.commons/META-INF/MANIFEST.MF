@@ -30,5 +30,6 @@ Export-Package: org.eclipse.scout.commons,
  org.eclipse.scout.commons.parsers.token,
  org.eclipse.scout.commons.runtime,
  org.eclipse.scout.commons.security,
- org.eclipse.scout.commons.serialization
+ org.eclipse.scout.commons.serialization,
+ org.eclipse.scout.commons.status
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7

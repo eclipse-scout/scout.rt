@@ -11,7 +11,7 @@
 package org.eclipse.scout.rt.ui.swt.form.fields.checkbox;
 
 import org.eclipse.scout.commons.BooleanUtility;
-import org.eclipse.scout.commons.exception.IProcessingStatus;
+import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField;
 import org.eclipse.scout.rt.ui.swt.LogicalGridData;
 import org.eclipse.scout.rt.ui.swt.LogicalGridLayout;
@@ -27,7 +27,7 @@ import org.eclipse.swt.widgets.Listener;
 
 /**
  * <h3>SwtScoutCheckbox</h3> ...
- * 
+ *
  * @since 1.0.0 14.04.2008
  */
 public class SwtScoutCheckbox extends SwtScoutValueFieldComposite<IBooleanField> implements ISwtScoutCheckbox {
@@ -79,7 +79,7 @@ public class SwtScoutCheckbox extends SwtScoutValueFieldComposite<IBooleanField>
    * @see org.eclipse.scout.rt.ui.swt.form.fields.SwtScoutValueFieldComposite#setErrorStatusFromScout(org.eclipse.scout.commons.exception.IProcessingStatus)
    */
   @Override
-  protected void setErrorStatusFromScout(IProcessingStatus s) {
+  protected void setErrorStatusFromScout(IStatus s) {
     // Update the status of the labelPlaceholder and not the dispatcherLabel
     m_labelPlaceholder.setStatus(s);
   }

@@ -24,9 +24,9 @@ import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.OrderedCollection;
-import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.JobEx;
+import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.ClientAsyncJob;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.MouseButton;
@@ -307,7 +307,7 @@ public class ContentAssistTreeForm<LOOKUP_KEY> extends AbstractContentAssistFiel
    */
 
   @Override
-  public void setTablePopulateStatus(IProcessingStatus status) {
+  public void setTablePopulateStatus(IStatus status) {
 //    getStatusField().setErrorStatus(status);
   }
 

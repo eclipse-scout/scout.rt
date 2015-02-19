@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt.form.fields.tablefield;
 
-import org.eclipse.scout.commons.exception.IProcessingStatus;
+import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.LogicalGridData;
@@ -71,7 +71,7 @@ public class SwtTableStatus implements ISwtTableStatus {
   }
 
   @Override
-  public void setStatus(IProcessingStatus populateStatus, IProcessingStatus selectionStatus) {
+  public void setStatus(IStatus populateStatus, IStatus selectionStatus) {
     setStatusImpl(m_populateLabel, populateStatus, true);
     setStatusImpl(m_selectionLabel, selectionStatus, true);
     if (m_layoutNeeded) {
@@ -80,7 +80,7 @@ public class SwtTableStatus implements ISwtTableStatus {
     }
   }
 
-  private void setStatusImpl(Label field, IProcessingStatus status, boolean hideWhenNullStatus) {
+  private void setStatusImpl(Label field, IStatus status, boolean hideWhenNullStatus) {
     if (status == null) {
       field.setText("");
       if (hideWhenNullStatus) {
@@ -104,13 +104,11 @@ public class SwtTableStatus implements ISwtTableStatus {
     field.setText(text != null ? " " + text : "");
     //style
     switch (status.getSeverity()) {
-      case IProcessingStatus.ERROR:
-      case IProcessingStatus.FATAL: {
+      case IStatus.ERROR: {
         field.setForeground(m_env.getColor(new RGB(0xcc, 0, 0)));
         break;
       }
-      case IProcessingStatus.WARNING:
-      case IProcessingStatus.CANCEL: {
+      case IStatus.WARNING: {
         field.setForeground(m_env.getColor(new RGB(0xfe, 0x9a, 0x23)));
         break;
       }

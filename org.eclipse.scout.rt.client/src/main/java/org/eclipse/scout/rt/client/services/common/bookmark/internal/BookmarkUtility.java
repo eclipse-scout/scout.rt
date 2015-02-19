@@ -28,10 +28,11 @@ import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.exception.ProcessingStatus;
 import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.status.IStatus;
+import org.eclipse.scout.commons.status.Status;
 import org.eclipse.scout.rt.client.services.common.bookmark.DefaultBookmarkAdapter;
 import org.eclipse.scout.rt.client.services.common.bookmark.IBookmarkAdapter;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
@@ -707,7 +708,7 @@ public final class BookmarkUtility {
       if (childPage == null
           || (!childPage.isFilterAccepted() && table.getColumnFilterManager() != null && table.getColumnFilterManager().isEnabled())) {
         table.getColumnFilterManager().reset();
-        tablePage.setPagePopulateStatus(new ProcessingStatus(ScoutTexts.get("BookmarkResetColumnFilters"), ProcessingStatus.WARNING));
+        tablePage.setPagePopulateStatus(new Status(ScoutTexts.get("BookmarkResetColumnFilters"), IStatus.WARNING));
       }
     }
 
@@ -716,10 +717,10 @@ public final class BookmarkUtility {
       if (resetViewAndWarnOnFail) {
         // set appropriate warning
         if (tablePage.isSearchActive() && tablePage.getSearchFormInternal() != null) {
-          tablePage.setPagePopulateStatus(new ProcessingStatus(ScoutTexts.get("BookmarkResolutionCanceledCheckSearchCriteria"), ProcessingStatus.WARNING));
+          tablePage.setPagePopulateStatus(new Status(ScoutTexts.get("BookmarkResolutionCanceledCheckSearchCriteria"), IStatus.WARNING));
         }
         else {
-          tablePage.setPagePopulateStatus(new ProcessingStatus(ScoutTexts.get("BookmarkResolutionCanceled"), ProcessingStatus.WARNING));
+          tablePage.setPagePopulateStatus(new Status(ScoutTexts.get("BookmarkResolutionCanceled"), IStatus.WARNING));
         }
       }
       childPage = null;
@@ -747,7 +748,7 @@ public final class BookmarkUtility {
       }
       // set appropriate warning if child page is not available or filtered out
       if (childPage == null && resetViewAndWarnOnFail) {
-        nodePage.setPagePopulateStatus(new ProcessingStatus(ScoutTexts.get("BookmarkResolutionCanceled"), ProcessingStatus.WARNING));
+        nodePage.setPagePopulateStatus(new Status(ScoutTexts.get("BookmarkResolutionCanceled"), IStatus.WARNING));
       }
     }
     return childPage;

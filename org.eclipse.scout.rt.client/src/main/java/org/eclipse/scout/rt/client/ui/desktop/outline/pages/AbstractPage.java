@@ -22,10 +22,10 @@ import org.eclipse.scout.commons.ConfigurationUtility;
 import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IMemoryPolicy;
 import org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeNodeExtension;
@@ -61,7 +61,7 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   private boolean m_detailFormVisible;
   private DataChangeListener m_internalDataChangeListener;
   private final String m_userPreferenceContext;
-  private IProcessingStatus m_pagePopulateStatus;
+  private IStatus m_pagePopulateStatus;
   private final Map<ITableRow, IPage> m_tableRowToPageMap = new HashMap<ITableRow, IPage>();
   private final Map<IPage, ITableRow> m_pageToTableRowMap = new HashMap<IPage, ITableRow>();
 
@@ -417,12 +417,12 @@ public abstract class AbstractPage<T extends ITable> extends AbstractTreeNode im
   }
 
   @Override
-  public IProcessingStatus getPagePopulateStatus() {
+  public IStatus getPagePopulateStatus() {
     return m_pagePopulateStatus;
   }
 
   @Override
-  public void setPagePopulateStatus(IProcessingStatus status) {
+  public void setPagePopulateStatus(IStatus status) {
     m_pagePopulateStatus = status;
   }
 

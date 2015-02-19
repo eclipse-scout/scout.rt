@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -14,9 +14,10 @@ import java.io.Serializable;
 
 /**
  * This class is a special subclass of {@link ProcessingException} to mark a
- * vetoed exception that is specialized from a general {@link ProcessingException} do not change interface contract
- * since this class
- * is serializable and used in different build versions
+ * vetoed exception that is specialized from a general {@link ProcessingException}.
+ * <p>
+ * E.g. for actions that are not allowed or invalid data
+ * </p>
  */
 public class VetoException extends ProcessingException implements Serializable {
   private static final long serialVersionUID = 1L;
@@ -30,43 +31,43 @@ public class VetoException extends ProcessingException implements Serializable {
   }
 
   public VetoException(String message) {
-    super(new ProcessingStatus(null, message, null, 0, IProcessingStatus.ERROR));
+    this(null, message);
   }
 
   public VetoException(String message, Throwable cause) {
-    super(new ProcessingStatus(null, message, cause, 0, IProcessingStatus.ERROR));
+    this(null, message, cause);
   }
 
   public VetoException(String message, Throwable cause, int errorCode) {
-    super(new ProcessingStatus(null, message, cause, errorCode, IProcessingStatus.ERROR));
+    this(null, message, cause, errorCode);
   }
 
   public VetoException(String message, int errorCode, int severity) {
-    super(new ProcessingStatus(null, message, null, errorCode, severity));
+    this(null, message, errorCode, severity);
   }
 
   public VetoException(String message, Throwable cause, int errorCode, int severity) {
-    super(new ProcessingStatus(null, message, cause, errorCode, severity));
+    this(null, message, cause, errorCode, severity);
   }
 
   public VetoException(String title, String message) {
-    super(new ProcessingStatus(title, message, null, 0, IProcessingStatus.ERROR));
+    this(title, message, null);
   }
 
   public VetoException(String title, String message, Throwable cause) {
-    super(new ProcessingStatus(title, message, cause, 0, IProcessingStatus.ERROR));
+    this(title, message, cause, 0);
   }
 
   public VetoException(String title, String message, Throwable cause, int errorCode) {
-    super(new ProcessingStatus(title, message, cause, errorCode, IProcessingStatus.ERROR));
+    this(title, message, cause, errorCode, IProcessingStatus.ERROR);
   }
 
   public VetoException(String title, String message, int errorCode, int severity) {
-    super(new ProcessingStatus(title, message, null, errorCode, severity));
+    this(title, message, null, errorCode, severity);
   }
 
   public VetoException(String title, String message, Throwable cause, int errorCode, int severity) {
-    super(new ProcessingStatus(title, message, cause, errorCode, severity));
+    this(new ProcessingStatus(title, message, cause, errorCode, severity));
   }
 
   public VetoException(IProcessingStatus status) {

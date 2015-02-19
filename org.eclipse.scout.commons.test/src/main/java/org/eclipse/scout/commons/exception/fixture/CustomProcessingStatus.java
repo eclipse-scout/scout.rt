@@ -10,8 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.exception.fixture;
 
-import org.eclipse.core.runtime.IStatus;
+import java.util.List;
+
 import org.eclipse.scout.commons.exception.IProcessingStatus;
+import org.eclipse.scout.commons.status.IStatus;
 
 public class CustomProcessingStatus implements IProcessingStatus {
   private final String m_message;
@@ -28,23 +30,19 @@ public class CustomProcessingStatus implements IProcessingStatus {
     // nop
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public Throwable getCause() {
     return m_cause;
   }
 
   @Override
-  public String[] getContextMessages() {
+  public List<String> getContextMessages() {
     return null;
   }
 
   @Override
   public String getTitle() {
-    return null;
-  }
-
-  @Override
-  public IStatus[] getChildren() {
     return null;
   }
 
@@ -64,13 +62,8 @@ public class CustomProcessingStatus implements IProcessingStatus {
   }
 
   @Override
-  public String getPlugin() {
-    return null;
-  }
-
-  @Override
   public int getSeverity() {
-    return 0;
+    return IStatus.ERROR;
   }
 
   @Override
@@ -86,5 +79,15 @@ public class CustomProcessingStatus implements IProcessingStatus {
   @Override
   public boolean matches(int severityMask) {
     return false;
+  }
+
+  @Override
+  public int compareTo(IStatus o) {
+    return 0;
+  }
+
+  @Override
+  public String getBody() {
+    return null;
   }
 }

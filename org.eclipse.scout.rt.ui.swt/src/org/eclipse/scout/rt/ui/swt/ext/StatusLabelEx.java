@@ -11,7 +11,8 @@
 package org.eclipse.scout.rt.ui.swt.ext;
 
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.exception.IProcessingStatus;
+import org.eclipse.scout.commons.status.IStatus;
+import org.eclipse.scout.rt.client.IFieldStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.ScoutFieldStatus;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.data.basic.FontSpec;
@@ -36,7 +37,7 @@ import org.eclipse.swt.widgets.Listener;
 
 public class StatusLabelEx extends Composite implements ILabelComposite {
   private final ISwtEnvironment m_environment;
-  private IProcessingStatus m_status;
+  private IStatus m_status;
   private boolean m_mandatory;
   private boolean m_enabled;
   private Control m_label;
@@ -284,7 +285,7 @@ public class StatusLabelEx extends Composite implements ILabelComposite {
   }
 
   @Override
-  public void setStatus(IProcessingStatus status) {
+  public void setStatus(IStatus status) {
     m_status = status;
     if (m_status == null) {
       getStatusLabel().setToolTipText("");
@@ -295,42 +296,24 @@ public class StatusLabelEx extends Composite implements ILabelComposite {
       }
     }
     else {
-      String iconId = m_status instanceof ScoutFieldStatus ? ((ScoutFieldStatus) m_status).getIconId() : null;
-      if (iconId != null) {
-        getStatusLabel().setImage(getEnvironment().getIcon(iconId));
-      }
-      else {
-        switch (m_status.getSeverity()) {
-          case IProcessingStatus.FATAL:
-          case IProcessingStatus.ERROR:
-            getStatusLabel().setImage(m_errorImg);
-            break;
-          case IProcessingStatus.WARNING:
-            getStatusLabel().setImage(m_warningImg);
-            break;
-          default:
-            getStatusLabel().setImage(m_infoImg);
-            break;
-        }
-      }
+      getStatusLabel().setImage(getEnvironment().getIcon(getIconId()));
       // tooltip
-      StringBuffer buf = new StringBuffer();
-      if (m_status.getTitle() != null) {
-        buf.append(m_status.getTitle());
-      }
-      if (m_status.getMessage() != null) {
-        if (buf.length() > 0) {
-          buf.append("\n");
-        }
-        buf.append(m_status.getMessage());
-      }
-      getStatusLabel().setToolTipText(buf.toString());
+      getStatusLabel().setToolTipText(m_status.getMessage());
       getStatusLabel().setVisible(true);
       if (getStatusLabel().getLayoutData() instanceof GridData) {
         ((GridData) getStatusLabel().getLayoutData()).exclude = false;
       }
     }
     layout(true, true);
+  }
+
+  private String getIconId() {
+    if (m_status instanceof IFieldStatus) {
+      return ((IFieldStatus) m_status).getIconId();
+    }
+    else {
+      return ScoutFieldStatus.getIconIdFromSeverity(m_status.getSeverity());
+    }
   }
 
 // delegate methods

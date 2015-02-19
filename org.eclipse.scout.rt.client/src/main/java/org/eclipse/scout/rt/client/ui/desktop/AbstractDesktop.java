@@ -35,14 +35,14 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.OrderedCollection;
 import org.eclipse.scout.commons.annotations.OrderedComparator;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
-import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.exception.ProcessingStatus;
 import org.eclipse.scout.commons.exception.VetoException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.status.IStatus;
+import org.eclipse.scout.commons.status.Status;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.extension.ui.action.tree.MoveActionNodesHandler;
 import org.eclipse.scout.rt.client.extension.ui.desktop.DesktopChains.DesktopAddTrayMenusChain;
@@ -1286,19 +1286,19 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
   }
 
   @Override
-  public IProcessingStatus getStatus() {
-    return (IProcessingStatus) propertySupport.getProperty(PROP_STATUS);
+  public IStatus getStatus() {
+    return (IStatus) propertySupport.getProperty(PROP_STATUS);
   }
 
   @Override
-  public void setStatus(IProcessingStatus status) {
+  public void setStatus(IStatus status) {
     propertySupport.setProperty(PROP_STATUS, status);
   }
 
   @Override
   public void setStatusText(String s) {
     if (s != null) {
-      setStatus(new ProcessingStatus(s, null, 0, IProcessingStatus.INFO));
+      setStatus(new Status(s, IStatus.INFO));
     }
     else {
       setStatus(null);

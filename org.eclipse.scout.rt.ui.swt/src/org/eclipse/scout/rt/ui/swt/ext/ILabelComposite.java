@@ -10,14 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt.ext;
 
-import org.eclipse.scout.commons.exception.IProcessingStatus;
+import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Control;
 
 /**
  * <h3>ILabelComposite</h3> ...
- * 
+ *
  * @since 1.0.0 15.12.2009
  */
 public interface ILabelComposite {
@@ -37,7 +37,7 @@ public interface ILabelComposite {
 
   boolean setMandadatory(boolean b);
 
-  void setStatus(IProcessingStatus status);
+  void setStatus(IStatus status);
 
   String getText();
 

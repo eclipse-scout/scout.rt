@@ -16,7 +16,7 @@ import java.util.List;
 
 import javax.swing.JPanel;
 
-import org.eclipse.scout.commons.exception.IProcessingStatus;
+import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
@@ -150,7 +150,7 @@ public class SwingScoutSequenceBox extends SwingScoutFieldComposite<ISequenceBox
   }
 
   protected void setChildErrorStatusFromScout() {
-    IProcessingStatus inheritedErrorStatus = null;
+    IStatus inheritedErrorStatus = null;
     IValueField<?> firstVisibleValueField = findFirstVisibleValueField(getScoutObject());
     if (firstVisibleValueField != null) {
       // bsh 2010-10-01: don't inherit error status from other fields than the first visible field

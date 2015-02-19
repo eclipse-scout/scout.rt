@@ -17,7 +17,7 @@ import javax.swing.JLabel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.plaf.BorderUIResource;
 
-import org.eclipse.scout.commons.exception.IProcessingStatus;
+import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
@@ -85,12 +85,12 @@ public class SwingTableStatus implements ISwingTableStatus {
   }
 
   @Override
-  public void setStatus(IProcessingStatus populateStatus, IProcessingStatus selectionStatus) {
+  public void setStatus(IStatus populateStatus, IStatus selectionStatus) {
     setStatusImpl(m_populateLabel, populateStatus, true);
     setStatusImpl(m_selectionLabel, selectionStatus, true);
   }
 
-  private void setStatusImpl(JLabel field, IProcessingStatus status, boolean hideWhenNullStatus) {
+  private void setStatusImpl(JLabel field, IStatus status, boolean hideWhenNullStatus) {
     if (status == null) {
       field.setText(null);
       if (hideWhenNullStatus) {
@@ -107,13 +107,11 @@ public class SwingTableStatus implements ISwingTableStatus {
     field.setText(text);
     //style
     switch (status.getSeverity()) {
-      case IProcessingStatus.ERROR:
-      case IProcessingStatus.FATAL: {
+      case IStatus.ERROR: {
         field.setForeground(new Color(0xcc0000));
         break;
       }
-      case IProcessingStatus.WARNING:
-      case IProcessingStatus.CANCEL: {
+      case IStatus.WARNING: {
         field.setForeground(new Color(0xfe9a23));
         break;
       }

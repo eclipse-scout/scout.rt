@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -12,39 +12,31 @@ package org.eclipse.scout.commons.exception;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
-import org.eclipse.core.runtime.IStatus;
+import org.eclipse.scout.commons.Assertions;
+import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.status.IStatus;
+import org.eclipse.scout.commons.status.Status;
 
 /**
- * A concrete status implementation, suitable either for instantiating or
- * subclassing.
- * <p>
- * This class can be used without OSGi running.
- * </p>
+ * A Status for processing results.
  */
-public class ProcessingStatus implements IProcessingStatus, Serializable {
+@SuppressWarnings("deprecation")
+public class ProcessingStatus extends Status implements IProcessingStatus, Serializable {
   private static final long serialVersionUID = 1L;
-
-  private int m_severity;
-
-  /**
-   * Custom status code.
-   */
-  private int m_code;
-
-  private String m_plugin = "";
 
   /**
    * Title, localized to the current locale.
    */
-  private String m_title;
+  private String m_messageTitle;
 
   /**
    * Message, localized to the current locale.
    */
-  private String m_message = "";
+  private String m_messageBody = "";
 
-  private ArrayList<String> m_contextMessages;
+  private List<String> m_contextMessages;
 
   /**
    * Wrapped exception, or <code>null</code> if none.
@@ -52,106 +44,90 @@ public class ProcessingStatus implements IProcessingStatus, Serializable {
   private Throwable m_cause = null;
 
   /**
-   * Creates a new status object. The created status has no children.
-   * 
-   * @param message
-   *          a human-readable message, localized to the current locale, is
-   *          never null
-   * @param severity
-   *          the severity; one of <code>FATAL</code>, <code>ERROR</code>, <code>INFO</code>, <code>WARNING</code>
+   * Creates a new status with severity {@link IStatus#ERROR}.
+   *
+   * @param messageBody
+   *          a human-readable message, localized to the current locale, is never <code>null</null>
    */
-  public ProcessingStatus(String message, int severity) {
-    setMessage(message);
-    setSeverity(severity);
+  public ProcessingStatus(String messageBody) {
+    this(messageBody, IStatus.ERROR);
   }
 
   /**
-   * Creates a new status object. The created status has no children.
-   * 
-   * @param title
-   *          a human-readable title, localized to the current locale, can be
-   *          null
-   * @param message
-   *          a human-readable message, localized to the current locale, is
-   *          never null
+   * Creates a new status without child-statuses.
+   *
+   * @param messageBody
+   *          a human-readable message, localized to the current locale, is never <code>null</null>
    * @param severity
-   *          the severity; one of <code>FATAL</code>, <code>ERROR</code>, <code>INFO</code>, <code>WARNING</code>
+   *          the severity; exactly one of {@link #FATAL}, {@link #ERROR}, {@link #WARNING}, {@link #INFO}, {@link #OK}
    */
-  public ProcessingStatus(String title, String message, int severity) {
-    setTitle(title);
-    setMessage(message);
-    setSeverity(severity);
+  public ProcessingStatus(String messageBody, int severity) {
+    this(null, messageBody, severity);
   }
 
   /**
-   * Creates a new status object. The created status has no children.
-   * 
-   * @param message
-   *          a human-readable message, localized to the current locale, is
-   *          never null
+   * Creates a new status without child-statuses.
+   *
+   * @param messageTitle
+   *          a human-readable title, localized to the current locale, can be <code>null</null>
+   * @param messageBody
+   *          a human-readable message, localized to the current locale, is never <code>null</null>
+   * @param severity
+   *          the severity; exactly one of {@link #FATAL}, {@link #ERROR}, {@link #WARNING}, {@link #INFO}, {@link #OK}
+   */
+  public ProcessingStatus(String messageTitle, String messageBody, int severity) {
+    this(messageTitle, messageBody, null, 0, severity);
+  }
+
+  /**
+   * Creates a new status without child-statuses.
+   *
+   * @param messageBody
+   *          a human-readable message, localized to the current locale, is never <code>null</null>
    * @param cause
    *          a low-level exception, or <code>null</code> if not applicable
    * @param code
    *          the custom status code
    * @param severity
-   *          the severity; one of <code>FATAL</code>, <code>ERROR</code>, <code>INFO</code>, <code>WARNING</code>
+   *          the severity; exactly one of {@link #FATAL}, {@link #ERROR}, {@link #WARNING}, {@link #INFO}, {@link #OK}
    */
-  public ProcessingStatus(String message, Throwable cause, int code, int severity) {
-    setMessage(message);
-    setException(cause);
-    setCode(code);
-    setSeverity(severity);
+  public ProcessingStatus(String messageBody, Throwable cause, int code, int severity) {
+    this(null, messageBody, cause, code, severity);
   }
 
   /**
-   * Creates a new status object. The created status has no children.
-   * 
-   * @param title
-   *          a human-readable title, localized to the current locale, can be
-   *          null
-   * @param message
-   *          a human-readable message, localized to the current locale, is
-   *          never null
+   * Creates a new status without child-statuses.
+   *
+   * @param messageTitle
+   *          a human-readable title, localized to the current locale, can be <code>null</null>
+   * @param messageBody
+   *          a human-readable message, localized to the current locale, is never <code>null</null>
    * @param cause
    *          a low-level exception, or <code>null</code> if not applicable
    * @param code
    *          the custom status code
    * @param severity
-   *          the severity; one of <code>FATAL</code>, <code>ERROR</code>, <code>INFO</code>, <code>WARNING</code>
+   *          the severity; exactly one of {@link #FATAL}, {@link #ERROR}, {@link #WARNING}, {@link #INFO}, {@link #OK}
    */
-  public ProcessingStatus(String title, String message, Throwable cause, int code, int severity) {
-    setTitle(title);
-    setMessage(message);
+  public ProcessingStatus(String messageTitle, String messageBody, Throwable cause, int code, int severity) {
+    super(null, checkSeverity(severity), code);
+    setTitle(messageTitle);
+    setBody(messageBody);
     setException(cause);
-    setCode(code);
-    setSeverity(severity);
   }
 
   public ProcessingStatus(IStatus s) {
-    if (s != null) {
-      setMessage(s.getMessage());
-      setException(s.getException());
-      setCode(s.getCode());
-      setSeverity(s.getSeverity());
-      if (s instanceof IProcessingStatus) {
-        setTitle(((IProcessingStatus) s).getTitle());
-      }
+    super(Assertions.assertNotNull(s).getMessage(), checkSeverity(s.getSeverity()), s.getCode());
+    setBody(s.getMessage());
+    if (s instanceof IProcessingStatus) {
+      setTitle(((IProcessingStatus) s).getTitle());
+      setException(((IProcessingStatus) s).getException());
     }
-  }
-
-  @Override
-  public IProcessingStatus[] getChildren() {
-    return new IProcessingStatus[0];
   }
 
   @Override
   public boolean isMultiStatus() {
     return false;
-  }
-
-  @Override
-  public int getCode() {
-    return m_code;
   }
 
   @Override
@@ -164,33 +140,32 @@ public class ProcessingStatus implements IProcessingStatus, Serializable {
     return m_cause;
   }
 
-  @Override
-  public String getPlugin() {
-    return m_plugin;
-  }
-
-  public void setPlugin(String plugin) {
-    m_plugin = plugin;
-  }
-
+  /**
+   * Status message with {@link #getBody() body} and {@link #getTitle() title}.
+   */
   @Override
   public String getMessage() {
-    return m_message;
+    StringBuilder buf = new StringBuilder();
+    if (getTitle() != null) {
+      buf.append(getTitle());
+    }
+    if (getBody() != null) {
+      if (buf.length() > 0) {
+        buf.append("\n");
+      }
+      buf.append(getBody());
+    }
+    return buf.toString();
+  }
+
+  @Override
+  public String getBody() {
+    return m_messageBody;
   }
 
   @Override
   public String getTitle() {
-    return m_title;
-  }
-
-  @Override
-  public int getSeverity() {
-    return m_severity;
-  }
-
-  @Override
-  public boolean isOK() {
-    return m_severity == OK;
+    return m_messageTitle;
   }
 
   @Override
@@ -199,18 +174,8 @@ public class ProcessingStatus implements IProcessingStatus, Serializable {
   }
 
   /**
-   * Sets the status code.
-   * 
-   * @param code
-   *          the custom status code
-   */
-  public void setCode(int code) {
-    m_code = code;
-  }
-
-  /**
    * Sets the exception.
-   * 
+   *
    * @param exception
    *          a low-level exception, or <code>null</code> if not applicable
    */
@@ -220,22 +185,22 @@ public class ProcessingStatus implements IProcessingStatus, Serializable {
 
   /**
    * Sets the message.
-   * 
+   *
    * @param title
    *          a human-readable message, localized to the current locale
    */
   public void setTitle(String title) {
-    m_title = title;
+    m_messageTitle = title;
   }
 
   /**
    * Sets the message.
-   * 
-   * @param message
+   *
+   * @param messageBody
    *          a human-readable message, localized to the current locale
    */
-  public void setMessage(String message) {
-    m_message = message;
+  public void setBody(String messageBody) {
+    m_messageBody = messageBody;
   }
 
   @Override
@@ -249,18 +214,16 @@ public class ProcessingStatus implements IProcessingStatus, Serializable {
   }
 
   @Override
-  public String[] getContextMessages() {
-    return m_contextMessages != null ? m_contextMessages.toArray(new String[0]) : new String[0];
+  public List<String> getContextMessages() {
+    return CollectionUtility.arrayList(m_contextMessages);
   }
 
   /**
-   * Sets the severity.
-   * 
    * @param severity
    *          the severity; one of <code>OK</code>, <code>ERROR</code>, <code>INFO</code>, <code>WARNING</code>, or
    *          <code>CANCEL</code>
    */
-  public void setSeverity(int severity) {
+  private static int checkSeverity(int severity) {
     switch (severity) {
       case INFO:
       case WARNING:
@@ -268,13 +231,12 @@ public class ProcessingStatus implements IProcessingStatus, Serializable {
       case FATAL:
       case OK:
       case CANCEL: {
-        break;
+        return severity;
       }
       default: {
         throw new IllegalArgumentException("illegal severity: " + severity);
       }
     }
-    m_severity = severity;
   }
 
   /**
@@ -285,36 +247,10 @@ public class ProcessingStatus implements IProcessingStatus, Serializable {
   public String toString() {
     StringBuffer buf = new StringBuffer();
     buf.append(getClass().getSimpleName() + "["); //$NON-NLS-1$
-    switch (getSeverity()) {
-      case INFO: {
-        buf.append("INFO"); //$NON-NLS-1$
-        break;
-      }
-      case WARNING: {
-        buf.append("WARNING"); //$NON-NLS-1$
-        break;
-      }
-      case ERROR: {
-        buf.append("ERROR"); //$NON-NLS-1$
-        break;
-      }
-      case FATAL: {
-        buf.append("FATAL"); //$NON-NLS-1$
-        break;
-      }
-      case OK: {
-        buf.append("OK"); //$NON-NLS-1$
-        break;
-      }
-      case CANCEL: {
-        buf.append("CANCEL"); //$NON-NLS-1$
-        break;
-      }
-      default: {
-        buf.append("severity=" + getSeverity());
-      }
-    }
-    buf.append(" code=" + m_code); //$NON-NLS-1$
+
+    final String severityName = getSeverityName();
+    buf.append(severityName != null ? severityName : "severity=" + getSeverity());
+    buf.append(" code=" + getCode()); //$NON-NLS-1$
     if (m_contextMessages != null) {
       for (String s : m_contextMessages) {
         buf.append(" ");
@@ -323,13 +259,93 @@ public class ProcessingStatus implements IProcessingStatus, Serializable {
       }
     }
     buf.append(" ");
-    buf.append(m_message);
+    buf.append(m_messageBody);
     if (m_cause != null) {
       buf.append(" ");
       buf.append(m_cause);
     }
     buf.append("]"); //$NON-NLS-1$
     return buf.toString();
+  }
+
+  /**
+   * severity name ($NON-NLS-1$)
+   */
+  @Override
+  protected String getSeverityName() {
+    final String sn = super.getSeverityName();
+    if (sn != null) {
+      return sn;
+    }
+    switch (getSeverity()) {
+      case FATAL: {
+        return "FATAL";
+      }
+
+      case CANCEL: {
+        return "CANCEL";
+      }
+      default:
+        return null;
+    }
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + ((m_cause == null) ? 0 : m_cause.hashCode());
+    result = prime * result + ((m_contextMessages == null) ? 0 : m_contextMessages.hashCode());
+    result = prime * result + ((m_messageBody == null) ? 0 : m_messageBody.hashCode());
+    result = prime * result + ((m_messageTitle == null) ? 0 : m_messageTitle.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!super.equals(obj)) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    ProcessingStatus other = (ProcessingStatus) obj;
+    if (m_cause == null) {
+      if (other.m_cause != null) {
+        return false;
+      }
+    }
+    else if (!m_cause.equals(other.m_cause)) {
+      return false;
+    }
+    if (m_contextMessages == null) {
+      if (other.m_contextMessages != null) {
+        return false;
+      }
+    }
+    else if (!m_contextMessages.equals(other.m_contextMessages)) {
+      return false;
+    }
+    if (m_messageBody == null) {
+      if (other.m_messageBody != null) {
+        return false;
+      }
+    }
+    else if (!m_messageBody.equals(other.m_messageBody)) {
+      return false;
+    }
+    if (m_messageTitle == null) {
+      if (other.m_messageTitle != null) {
+        return false;
+      }
+    }
+    else if (!m_messageTitle.equals(other.m_messageTitle)) {
+      return false;
+    }
+    return true;
   }
 
 }

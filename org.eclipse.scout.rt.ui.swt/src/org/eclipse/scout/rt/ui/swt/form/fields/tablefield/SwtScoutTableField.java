@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swt.form.fields.tablefield;
 
-import org.eclipse.scout.commons.exception.IProcessingStatus;
+import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
 import org.eclipse.scout.rt.ui.swt.LogicalGridData;
@@ -99,8 +99,8 @@ public class SwtScoutTableField extends SwtScoutFieldComposite<ITableField<? ext
 
   protected void setTableStatusFromScout() {
     if (m_swtTableStatus != null) {
-      IProcessingStatus dataStatus = getScoutObject().getTablePopulateStatus();
-      IProcessingStatus selectionStatus = getScoutObject().getTableSelectionStatus();
+      IStatus dataStatus = getScoutObject().getTablePopulateStatus();
+      IStatus selectionStatus = getScoutObject().getTableSelectionStatus();
       m_swtTableStatus.setStatus(dataStatus, selectionStatus);
     }
   }

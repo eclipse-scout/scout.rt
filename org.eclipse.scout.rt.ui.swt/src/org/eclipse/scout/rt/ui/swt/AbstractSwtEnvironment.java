@@ -1176,7 +1176,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
 
   protected void updateStatusFromScout() {
     if (getScoutDesktop() != null) {
-      IProcessingStatus newValue = getScoutDesktop().getStatus();
+      org.eclipse.scout.commons.status.IStatus newValue = getScoutDesktop().getStatus();
       //when a tray item is available, use it, otherwise set status on views/dialogs
       TrayItem trayItem = null;
       if (getTrayComposite() != null) {
@@ -1185,26 +1185,7 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
       if (trayItem != null) {
         String s = newValue != null ? newValue.getMessage() : null;
         if (newValue != null && s != null) {
-          int iconId;
-          switch (newValue.getSeverity()) {
-            case IProcessingStatus.WARNING: {
-              iconId = SWT.ICON_WARNING;
-              break;
-            }
-            case IProcessingStatus.FATAL:
-            case IProcessingStatus.ERROR: {
-              iconId = SWT.ICON_ERROR;
-              break;
-            }
-            case IProcessingStatus.CANCEL: {
-              iconId = 1 << 8;//SWT.ICON_CANCEL
-              break;
-            }
-            default: {
-              iconId = SWT.ICON_INFORMATION;
-              break;
-            }
-          }
+          int iconId = getIconId(newValue);
           ToolTip tip = new ToolTip(getParentShellIgnoringPopups(SWT.MODELESS), SWT.BALLOON | iconId);
           tip.setMessage(s);
           trayItem.setToolTip(tip);
@@ -1222,6 +1203,24 @@ public abstract class AbstractSwtEnvironment extends AbstractPropertyObserver im
           message = newValue.getMessage();
         }
         setStatusLineMessage(null, message);
+      }
+    }
+  }
+
+  private int getIconId(org.eclipse.scout.commons.status.IStatus s) {
+    switch (s.getSeverity()) {
+      case IProcessingStatus.WARNING: {
+        return SWT.ICON_WARNING;
+      }
+      case IProcessingStatus.FATAL:
+      case IProcessingStatus.ERROR: {
+        return SWT.ICON_ERROR;
+      }
+      case IProcessingStatus.CANCEL: {
+        return 1 << 8;//SWT.ICON_CANCEL
+      }
+      default: {
+        return SWT.ICON_INFORMATION;
       }
     }
   }

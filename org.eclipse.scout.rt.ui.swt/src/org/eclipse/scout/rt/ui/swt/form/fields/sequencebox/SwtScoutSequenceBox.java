@@ -15,7 +15,7 @@ import java.beans.PropertyChangeListener;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.scout.commons.exception.IProcessingStatus;
+import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.ICompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
@@ -33,7 +33,7 @@ import org.eclipse.swt.widgets.Composite;
 
 /**
  * <h3>SwtScoutRangeBox</h3> ...
- * 
+ *
  * @since 1.0.0 15.04.2008
  */
 public class SwtScoutSequenceBox extends SwtScoutFieldComposite<ISequenceBox> implements ISwtScoutSequenceBox {
@@ -156,7 +156,7 @@ public class SwtScoutSequenceBox extends SwtScoutFieldComposite<ISequenceBox> im
   }
 
   protected void setChildErrorStatusFromScout() {
-    IProcessingStatus inheritedErrorStatus = null;
+    IStatus inheritedErrorStatus = null;
     List<IValueField<?>> visibleFields = findVisibleValueFields(getScoutObject());
     if (visibleFields.size() > 0) {
       // bsh 2010-10-01: don't inherit error status from other fields than the first visible field

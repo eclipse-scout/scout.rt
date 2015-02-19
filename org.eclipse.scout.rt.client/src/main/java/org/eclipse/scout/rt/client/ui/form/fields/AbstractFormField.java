@@ -32,11 +32,11 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.beans.AbstractPropertyObserver;
 import org.eclipse.scout.commons.beans.BasicPropertySupport;
-import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.exception.ProcessingStatus;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.status.IStatus;
+import org.eclipse.scout.commons.status.Status;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.FormFieldChains.FormFieldAddSearchTermsChain;
@@ -1615,17 +1615,17 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
   }
 
   @Override
-  public IProcessingStatus getErrorStatus() {
-    return (IProcessingStatus) propertySupport.getProperty(PROP_ERROR_STATUS);
+  public IStatus getErrorStatus() {
+    return (IStatus) propertySupport.getProperty(PROP_ERROR_STATUS);
   }
 
   @Override
   public void setErrorStatus(String message) {
-    setErrorStatus(new ProcessingStatus(message, null, 0, IProcessingStatus.ERROR));
+    setErrorStatus(new Status(message));
   }
 
   @Override
-  public void setErrorStatus(IProcessingStatus status) {
+  public void setErrorStatus(IStatus status) {
     propertySupport.setProperty(PROP_ERROR_STATUS, status);
   }
 
@@ -1644,16 +1644,15 @@ public abstract class AbstractFormField extends AbstractPropertyObserver impleme
 
   @Override
   public boolean isContentValid() {
-    IProcessingStatus errorStatus = getErrorStatus();
-    if (errorStatus != null && (errorStatus.getSeverity() == IProcessingStatus.ERROR || errorStatus.getSeverity() == IProcessingStatus.FATAL)) {
-      return false;
-    }
-    /*
-    if (isMandatory()) {
-      //nop
-    }
-     */
-    return true;
+    return !hasError();
+  }
+
+  /**
+   * @return true, if it contains an error status with severity >= IStatus.ERROR
+   */
+  protected boolean hasError() {
+    IStatus errorStatus = getErrorStatus();
+    return errorStatus != null && (errorStatus.getSeverity() >= IStatus.ERROR);
   }
 
   @Override

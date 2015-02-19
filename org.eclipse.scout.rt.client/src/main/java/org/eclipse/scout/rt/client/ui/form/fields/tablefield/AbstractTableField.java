@@ -30,11 +30,11 @@ import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.commons.annotations.FormData.DefaultSubtypeSdkCommand;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.exception.ProcessingStatus;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.status.IStatus;
+import org.eclipse.scout.commons.status.Status;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.tablefield.ITableFieldExtension;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.tablefield.TableFieldChains.TableFieldReloadTableDataChain;
@@ -582,32 +582,32 @@ public abstract class AbstractTableField<T extends ITable> extends AbstractFormF
 
   @Override
   public String getTableStatus() {
-    IProcessingStatus status = getTableSelectionStatus();
+    IStatus status = getTableSelectionStatus();
     return status != null ? status.getMessage() : null;
   }
 
   @Override
   public void setTableStatus(String status) {
-    setTableSelectionStatus(status != null ? new ProcessingStatus(status, ProcessingStatus.INFO) : null);
+    setTableSelectionStatus(status != null ? new Status(status, IStatus.INFO) : null);
   }
 
   @Override
-  public IProcessingStatus getTableSelectionStatus() {
-    return (IProcessingStatus) propertySupport.getProperty(PROP_TABLE_SELECTION_STATUS);
+  public IStatus getTableSelectionStatus() {
+    return (IStatus) propertySupport.getProperty(PROP_TABLE_SELECTION_STATUS);
   }
 
   @Override
-  public void setTableSelectionStatus(IProcessingStatus status) {
+  public void setTableSelectionStatus(IStatus status) {
     propertySupport.setProperty(PROP_TABLE_SELECTION_STATUS, status);
   }
 
   @Override
-  public IProcessingStatus getTablePopulateStatus() {
-    return (IProcessingStatus) propertySupport.getProperty(PROP_TABLE_POPULATE_STATUS);
+  public IStatus getTablePopulateStatus() {
+    return (IStatus) propertySupport.getProperty(PROP_TABLE_POPULATE_STATUS);
   }
 
   @Override
-  public void setTablePopulateStatus(IProcessingStatus status) {
+  public void setTablePopulateStatus(IStatus status) {
     propertySupport.setProperty(PROP_TABLE_POPULATE_STATUS, status);
   }
 

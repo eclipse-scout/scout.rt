@@ -17,8 +17,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.scout.commons.beans.IPropertyObserver;
-import org.eclipse.scout.commons.exception.IProcessingStatus;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
 import org.eclipse.scout.rt.client.ui.action.ActionFinder;
 import org.eclipse.scout.rt.client.ui.action.IAction;
@@ -63,7 +63,7 @@ public interface IDesktop extends IPropertyObserver {
    */
   String PROP_TITLE = "title";
   /**
-   * {@link IProcessingStatus}
+   * {@link IStatus}
    */
   String PROP_STATUS = "status";
   /**
@@ -402,18 +402,18 @@ public interface IDesktop extends IPropertyObserver {
   /**
    * get the status of the desktop
    * <p>
-   * see also {@link IForm#getFormStatus(IProcessingStatus)}
+   * see also {@link IForm#getFormStatus(IStatus)}
    */
-  IProcessingStatus getStatus();
+  IStatus getStatus();
 
   /**
    * set a status on the desktop
    * <p>
    * this is normally displayed in as a tray message box
    * <p>
-   * see also {@link IForm#setFormStatus(IProcessingStatus)}
+   * see also {@link IForm#setFormStatus(IStatus)}
    */
-  void setStatus(IProcessingStatus status);
+  void setStatus(IStatus status);
 
   /**
    * set a status on the desktop

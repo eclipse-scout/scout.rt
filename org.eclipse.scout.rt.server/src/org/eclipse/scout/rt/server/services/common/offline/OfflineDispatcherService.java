@@ -192,7 +192,7 @@ public class OfflineDispatcherService extends AbstractService implements IOfflin
       });
       IStatus status = job.runNow(new NullProgressMonitor());
       if (!status.isOK()) {
-        return new ServiceTunnelResponse(null, null, new ProcessingException(status));
+        return new ServiceTunnelResponse(null, null, new ProcessingException(status.getMessage(), status.getException()));
       }
       return responseHolder.getValue();
     }
