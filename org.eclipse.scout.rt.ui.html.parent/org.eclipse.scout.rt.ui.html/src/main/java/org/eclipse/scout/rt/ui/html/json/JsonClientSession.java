@@ -68,6 +68,10 @@ public class JsonClientSession<T extends IClientSession> extends AbstractJsonAda
       getModel().startSession(Activator.getDefault().getBundle());
     }
 
+    if (getModel().getLoadError() != null) {
+      throw new JsonException(getModel().getLoadError());
+    }
+
     // attach child adapters - we cannot do this in attachModel() as normal
     // since the desktop is not yet created when attachModel runs.
     // see AbstractJsonSession#init()

@@ -19,40 +19,6 @@ scout.BaseDesktop.prototype._renderTitle = function(title) {
   }
 };
 
-scout.BaseDesktop.prototype.showFatalMessage = function(options) {
-  options = options || {};
-  var that = this;
-  var $glasspane = this.$parent.appendDiv('glasspane');
-  var model = {
-    title: options.title,
-    iconId: options.iconId,
-    severity: options.severity || 4,
-    introText: options.text || options.introText,
-    actionText: options.actionText,
-    yesButtonText: options.yesButtonText,
-    noButtonText: options.noButtonText,
-    cancelButtonText: options.cancelButtonText
-  };
-  var ui = new scout.MessageBox(model);
-
-  model.onButtonClicked = function($button, event) {
-    var option = $button.data('option');
-    // Close message box
-    ui.remove();
-    $glasspane.remove();
-    // Custom actions
-    if (option === 'yes' && options.yesButtonAction) {
-      options.yesButtonAction.apply(that);
-    } else if (option === 'no' && options.noButtonAction) {
-      options.noButtonAction.apply(that);
-    } else if (option === 'cancel' && options.cancelButtonAction) {
-      options.cancelButtonAction.apply(that);
-    }
-  };
-
-  ui.render($glasspane);
-};
-
 scout.BaseDesktop.prototype._goOffline = function() {
   var message = this.session.text('ConnectionInterrupted'),
     $reconnect;

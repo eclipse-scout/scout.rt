@@ -28,6 +28,7 @@ import org.json.JSONObject;
 public class JsonResponse {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonResponse.class);
 
+  public static final int ERR_STARTUP_FAILED = 5;
   public static final int ERR_SESSION_TIMEOUT = 10;
   public static final int ERR_UI_PROCESSING = 20;
 

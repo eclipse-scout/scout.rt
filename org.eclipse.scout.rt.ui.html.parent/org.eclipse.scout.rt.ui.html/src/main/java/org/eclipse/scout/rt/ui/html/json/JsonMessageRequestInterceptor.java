@@ -45,6 +45,7 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
   public boolean interceptPost(AbstractUiServlet servlet, HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     //serve only /json
     String pathInfo = req.getPathInfo();
+    IJsonSession jsonSession = null;
     if (CompareUtility.notEquals(pathInfo, "/json")) {
       LOG.info("404_NOT_FOUND_POST: " + pathInfo);
       resp.sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -60,7 +61,7 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
         return true;
       }
 
-      IJsonSession jsonSession = getOrCreateJsonSession(servlet, req, resp, jsonReq);
+      jsonSession = getOrCreateJsonSession(servlet, req, resp, jsonReq);
       if (jsonSession == null) {
         return true;
       }
@@ -72,8 +73,14 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
       }
     }
     catch (Exception e) {
-      LOG.error("Unexpected error while processing JSON request", e);
-      writeErrorResponse(resp, createUnrecoverableFailureJsonResponse());
+      if (jsonSession == null) {
+        LOG.error("Error while initializing json session", e);
+        writeErrorResponse(resp, createStartupFailedJsonResponse());
+      }
+      else {
+        LOG.error("Unexpected error while processing JSON request", e);
+        writeErrorResponse(resp, createUnrecoverableFailureJsonResponse());
+      }
     }
     return true;
   }
@@ -125,6 +132,13 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
     JsonResponse jsonResp = new JsonResponse();
     jsonResp.setErrorCode(JsonResponse.ERR_UI_PROCESSING);
     jsonResp.setErrorMessage("UI processing error"); // will be translated in client, see Session.js/_processErrorResponse()
+    return jsonResp;
+  }
+
+  protected JsonResponse createStartupFailedJsonResponse() {
+    JsonResponse jsonResp = new JsonResponse();
+    jsonResp.setErrorCode(JsonResponse.ERR_STARTUP_FAILED);
+    jsonResp.setErrorMessage("Initialization failed");
     return jsonResp;
   }
 

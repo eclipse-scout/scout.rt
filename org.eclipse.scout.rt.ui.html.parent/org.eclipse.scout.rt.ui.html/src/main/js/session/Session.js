@@ -295,46 +295,82 @@ scout.Session.prototype._processErrorResponse = function(request, jqXHR, textSta
   }
 
   var jsonResponse = jqXHR.responseJSON;
-  //FIXME CGU refactor, errorcode is sufficient if translations are on client
-  if (jsonResponse && jsonResponse.errorMessage) {
-    if (this.desktop) {
-      var that = this;
-      // Default values for fatal message boxes
-      var boxOptions = {
-        title: this.text('ServerError'),
-        text: jsonResponse.errorMessage,
-        yesButtonText: this.text('Reload'),
-        yesButtonAction: function() {
-          // Hide everything
-          that.$entryPoint.html('');
-          // Reload window (using setTimeout, to overcome drawing issues in IE)
-          setTimeout(function() {
-            window.location.reload();
-          });
-        }
-      };
-
-      // Customize for specific error codes
-      if (jsonResponse.errorCode === 10) { // JsonResponse.ERR_SESSION_TIMEOUT
-        boxOptions.title = this.optText('SessionTimeout', boxOptions.title);
-        boxOptions.text = this.optText('SessionExpiredMsg', boxOptions.text);
-      }
-      else if (jsonResponse.errorCode === 20) { // JsonResponse.ERR_UI_PROCESSING
-        boxOptions.title = this.optText('UiProcessingErrorTitle', boxOptions.title);
-        boxOptions.text = this.optText('UiProcessingErrorText', boxOptions.text);
-        boxOptions.actionText = this.optText('UiProcessingErrorAction', boxOptions.actionText);
-        boxOptions.noButtonText = this.text('Ignore');
-      }
-      this.desktop.showFatalMessage(boxOptions);
-    } else {
-      // Fallback if message box cannot be shown
-      var $error = $.makeDiv('fatal-error').text(jsonResponse.errorMessage);
-      this.$entryPoint.replaceWith($error);
-    }
+  if (jsonResponse && jsonResponse.errorCode) {
+    this._processErrorJsonResponse(jsonResponse);
     return;
   }
 
   throw new Error('Error while processing request: ' + errorThrown);
+};
+
+scout.Session.prototype._processErrorJsonResponse = function(jsonResponse) {
+  // Default values for fatal message boxes
+  var boxOptions = {
+    title: this.text('ServerError'),
+    text: jsonResponse.errorMessage,
+    yesButtonText: this.text('Reload'),
+    yesButtonAction: function() {
+      // Hide everything
+      this.$entryPoint.html('');
+      // Reload window (using setTimeout, to overcome drawing issues in IE)
+      setTimeout(function() {
+        window.location.reload();
+      });
+    }.bind(this)
+  };
+
+  // Customize for specific error codes
+  if (jsonResponse.errorCode === 5) { // JsonResponse.ERR_STARTUP_FAILED
+    // there are no texts yet if session startup failed
+    boxOptions.title = '';
+    boxOptions.text = jsonResponse.errorMessage;
+    boxOptions.yesButtonText = "Retry";
+  }
+  else if (jsonResponse.errorCode === 10) { // JsonResponse.ERR_SESSION_TIMEOUT
+    boxOptions.title = this.optText('SessionTimeout', boxOptions.title);
+    boxOptions.text = this.optText('SessionExpiredMsg', boxOptions.text);
+  }
+  else if (jsonResponse.errorCode === 20) { // JsonResponse.ERR_UI_PROCESSING
+    boxOptions.title = this.optText('UiProcessingErrorTitle', boxOptions.title);
+    boxOptions.text = this.optText('UiProcessingErrorText', boxOptions.text);
+    boxOptions.actionText = this.optText('UiProcessingErrorAction', boxOptions.actionText);
+    boxOptions.noButtonText = this.text('Ignore');
+  }
+  this.showFatalMessage(boxOptions);
+};
+
+scout.Session.prototype.showFatalMessage = function(options) {
+  options = options || {};
+  var that = this;
+  var $glasspane = this.$entryPoint.appendDiv('glasspane');
+  var model = {
+    title: options.title,
+    iconId: options.iconId,
+    severity: options.severity || 4,
+    introText: options.text || options.introText,
+    actionText: options.actionText,
+    yesButtonText: options.yesButtonText,
+    noButtonText: options.noButtonText,
+    cancelButtonText: options.cancelButtonText
+  };
+  var ui = new scout.MessageBox(model);
+
+  model.onButtonClicked = function($button, event) {
+    var option = $button.data('option');
+    // Close message box
+    ui.remove();
+    $glasspane.remove();
+    // Custom actions
+    if (option === 'yes' && options.yesButtonAction) {
+      options.yesButtonAction.apply(that);
+    } else if (option === 'no' && options.noButtonAction) {
+      options.noButtonAction.apply(that);
+    } else if (option === 'cancel' && options.cancelButtonAction) {
+      options.cancelButtonAction.apply(that);
+    }
+  };
+
+  ui.render($glasspane);
 };
 
 scout.Session.prototype.goOffline = function() {

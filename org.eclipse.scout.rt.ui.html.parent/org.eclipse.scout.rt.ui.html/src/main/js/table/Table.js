@@ -560,8 +560,7 @@ scout.Table.prototype._installRows = function($rows) {
  * @returns the column at position x (e.g. from event.pageX)
  */
 scout.Table.prototype._columnAtX = function(x) {
-  var column, i,
-    columnOffsetRight = 0,
+  var columnOffsetRight = 0,
     offsetLeft = this.$data.offset().left;
 
   return scout.arrays.find(this.columns, function(column) {
