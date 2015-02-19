@@ -23,6 +23,7 @@ public class JsonColumn<T extends IColumn<?>> implements IJsonObject {
 
   private IJsonSession m_jsonSession;
   private T m_column;
+  private int m_indexOffset;
 
   public JsonColumn(T model, IJsonSession jsonSession) {
     m_column = model;
@@ -33,11 +34,16 @@ public class JsonColumn<T extends IColumn<?>> implements IJsonObject {
     return "TableColumn";
   }
 
+  public void setColumnIndexOffset(int indexOffset) {
+    m_indexOffset = indexOffset;
+  }
+
   @Override
   public JSONObject toJson() {
     JSONObject json = new JSONObject();
     JsonObjectUtility.putProperty(json, "id", getColumn().getColumnId());
     JsonObjectUtility.putProperty(json, "objectType", getObjectType());
+    JsonObjectUtility.putProperty(json, "index", getColumn().getColumnIndex() - m_indexOffset);
     JsonObjectUtility.putProperty(json, "text", getJsonSession().getCustomHtmlRenderer().convert(getColumn().getHeaderCell().getText(), true));
     JsonObjectUtility.putProperty(json, "type", computeColumnType(getColumn()));
     JsonObjectUtility.putProperty(json, IColumn.PROP_WIDTH, getColumn().getWidth());

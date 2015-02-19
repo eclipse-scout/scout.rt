@@ -211,6 +211,31 @@ public class JsonTableTest {
     assertEquals(table.getColumnSet().getVisibleColumn(0), column1);
   }
 
+  @Test
+  public void testColumnOrderChangedEvent_assertCellOrder() throws ProcessingException, JSONException {
+    TableWith3Cols table = new TableWith3Cols();
+    table.fill(2);
+    table.initTable();
+    table.resetDisplayableColumns();
+
+    IColumn<?> column0 = table.getColumns().get(0);
+    JsonTable<ITable> jsonTable = m_jsonSession.newJsonAdapter(table, null, null);
+
+    JSONObject jsonRow = jsonTable.tableRowToJson(table.getRow(0));
+    JSONArray jsonCells = (JSONArray) jsonRow.get("cells");
+
+    JsonEvent event = createJsonColumnMovedEvent(column0.getColumnId(), 2);
+    jsonTable.handleUiEvent(event, new JsonResponse());
+
+    JSONObject jsonRowAfterMoving = jsonTable.tableRowToJson(table.getRow(0));
+    JSONArray jsonCellsAfterMoving = (JSONArray) jsonRowAfterMoving.get("cells");
+
+    // Expect same cell order, even if the columns are moved
+    for (int i = 0; i < jsonCellsAfterMoving.length(); i++) {
+      assertEquals(jsonCells.get(i), jsonCellsAfterMoving.get(i));
+    }
+  }
+
   /**
    * Response must not contain the column order changed event if the event was triggered by the request and the order
    * hasn't changed

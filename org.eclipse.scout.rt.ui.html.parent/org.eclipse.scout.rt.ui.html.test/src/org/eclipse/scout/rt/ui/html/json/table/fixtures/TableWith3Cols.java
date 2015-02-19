@@ -50,10 +50,10 @@ public class TableWith3Cols extends AbstractTable {
   public void fill(int rowCount) throws ProcessingException {
     Object[][] rows = new Object[rowCount][3];
     for (int i = 0; i < rowCount; i++) {
-      rows[i][0] = new Object[]{"cell" + i + "_0"};
-      rows[i][1] = new Object[]{"cell" + i + "_1"};
-      rows[i][2] = new Object[]{"cell" + i + "_2"};
+      rows[i][0] = "cell" + i + "_0";
+      rows[i][1] = "cell" + i + "_1";
+      rows[i][2] = "cell" + i + "_2";
     }
-    replaceRowsByArray(rows);
+    replaceRowsByMatrix(rows);
   }
 }

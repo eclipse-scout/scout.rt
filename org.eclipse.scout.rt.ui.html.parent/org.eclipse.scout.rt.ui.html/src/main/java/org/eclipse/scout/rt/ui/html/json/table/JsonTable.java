@@ -195,8 +195,16 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   }
 
   protected void attachColumns() {
-    for (IColumn<?> column : getColumns()) {
+    int offset = 0;
+    for (IColumn<?> column : getModel().getColumns()) {
+      if (!column.isVisible()) {
+        // since we don't send row data for invisible columns, we have to adjust the column index
+        offset += 1;
+        continue;
+      }
+
       JsonColumn jsonColumn = (JsonColumn) getJsonSession().getJsonObjectFactory().createJsonObject(column, getJsonSession(), null, null);
+      jsonColumn.setColumnIndexOffset(offset);
       m_jsonColumns.put(column, jsonColumn);
     }
   }
@@ -236,7 +244,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
   @Override
   public JSONObject toJson() {
     JSONObject json = super.toJson();
-    putProperty(json, PROP_COLUMNS, columnsToJson(getColumns()));
+    putProperty(json, PROP_COLUMNS, columnsToJson(getColumnsInViewOrder()));
     JSONArray jsonRows = new JSONArray();
     for (ITableRow row : getModel().getFilteredRows()) {
       if (row.isStatusDeleted()) { // Ignore deleted rows, because for the UI, they don't exist
@@ -385,7 +393,7 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     int viewIndex = JsonObjectUtility.getInt(event.getData(), "index");
 
     // Create column list with expected order
-    List<IColumn<?>> columns = getColumns();
+    List<IColumn<?>> columns = getColumnsInViewOrder();
     columns.remove(column);
     columns.add(viewIndex, column);
     addTableEventFilterCondition(TableEvent.TYPE_COLUMN_ORDER_CHANGED).setColumns(columns);
@@ -424,8 +432,11 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
 
   protected JSONObject tableRowToJson(ITableRow row) {
     JSONArray jsonCells = new JSONArray();
-    for (IColumn<?> column : getColumns()) {
-      jsonCells.put(cellToJson(row, column));
+    for (IColumn<?> column : getModel().getColumnSet().getColumns()) {
+      // Don't use getColumnsInViewOrder because the cells of the rows have to be returned in the model order. The ui does a lookup using column.index.
+      if (column.isVisible()) {
+        jsonCells.put(cellToJson(row, column));
+      }
     }
     JSONObject jsonRow = new JSONObject();
     putProperty(jsonRow, "id", getOrCreatedRowId(row));
@@ -453,7 +464,10 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     return jsonColumns;
   }
 
-  protected List<IColumn<?>> getColumns() {
+  /**
+   * @return columns in the right order to be presented to the user
+   */
+  protected List<IColumn<?>> getColumnsInViewOrder() {
     return getModel().getColumnSet().getVisibleColumns();
   }
 
@@ -717,13 +731,13 @@ public class JsonTable<T extends ITable> extends AbstractJsonPropertyObserver<T>
     JSONObject jsonEvent = new JSONObject();
     disposeColumns();
     attachColumns();
-    putProperty(jsonEvent, PROP_COLUMNS, columnsToJson(getColumns()));
+    putProperty(jsonEvent, PROP_COLUMNS, columnsToJson(getColumnsInViewOrder()));
     addActionEvent("columnStructureChanged", jsonEvent);
   }
 
   protected void handleModelColumnOrderChanged() {
     JSONObject jsonEvent = new JSONObject();
-    putProperty(jsonEvent, PROP_COLUMN_IDS, columnIdsToJson(getColumns()));
+    putProperty(jsonEvent, PROP_COLUMN_IDS, columnIdsToJson(getColumnsInViewOrder()));
     addActionEvent(EVENT_COLUMN_ORDER_CHANGED, jsonEvent);
   }
 

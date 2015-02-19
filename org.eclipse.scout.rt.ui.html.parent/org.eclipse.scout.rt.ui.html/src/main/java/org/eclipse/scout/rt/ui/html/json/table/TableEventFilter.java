@@ -44,7 +44,7 @@ public class TableEventFilter extends AbstractEventFilter<TableEvent, TableEvent
         }
         else if (condition.checkColumns()) {
           //Columns are not delivered by the event itself (at least not with COLUMN_ORDER_CHANGED) -> grab from table
-          if (CollectionUtility.equalsCollection(m_jsonTable.getColumns(), condition.getColumns())) {
+          if (CollectionUtility.equalsCollection(m_jsonTable.getColumnsInViewOrder(), condition.getColumns())) {
             return null;
           }
           //Don't ignore if columns are different

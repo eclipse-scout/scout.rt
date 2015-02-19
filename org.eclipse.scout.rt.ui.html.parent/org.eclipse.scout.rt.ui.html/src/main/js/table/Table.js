@@ -52,9 +52,6 @@ scout.Table.prototype._initColumns = function() {
 
     var column = this.session.objectFactory.create(this.columns[i]);
     column.table = this;
-    if (column.index === undefined) {
-      column.index = i;
-    }
     this.columns[i] = column;
   }
 };
@@ -1471,11 +1468,6 @@ scout.Table.prototype._onRowOrderChanged = function(rowIds) {
 };
 
 scout.Table.prototype._onColumnStructureChanged = function(columns) {
-  for (var i = 0; i < columns.length; i++) {
-    // Index is not sent -> update received columns with the current indices
-    var column = this.columnById(columns[i].id);
-    columns[i].index = column.index;
-  }
   this.columns = columns;
   this._initColumns();
 
