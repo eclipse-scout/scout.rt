@@ -160,7 +160,9 @@ public class JsonResponse {
           }
         }
       }
-      LOG.debug("Adapter data created for these adapters: " + adapterIds);
+      if (adapterIds != null && LOG.isDebugEnabled()) {
+        LOG.debug("Adapter data created for these adapters: " + adapterIds);
+      }
 
       JSONArray eventArray = new JSONArray();
       for (JsonEvent event : m_eventList) {

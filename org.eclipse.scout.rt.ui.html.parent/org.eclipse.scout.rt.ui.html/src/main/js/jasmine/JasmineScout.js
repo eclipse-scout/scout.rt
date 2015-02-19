@@ -43,6 +43,15 @@ function sendQueuedAjaxCalls(response) {
   }
 }
 
+/**
+ * Uninstalls 'beforeunload' and 'unload' events from window that were previously installed by session.init()
+ */
+function uninstallUnloadHandlers(session) {
+  $(window)
+    .off('beforeunload')
+    .off('unload.' + session.id);
+}
+
 function createPropertyChangeEvent(model, properties) {
   return {
     target: model.id,

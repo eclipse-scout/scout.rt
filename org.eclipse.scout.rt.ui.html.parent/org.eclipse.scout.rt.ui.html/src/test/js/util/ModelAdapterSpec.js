@@ -10,6 +10,7 @@ describe("ModelAdapter", function() {
 
     session = new scout.Session($('#sandbox'), '1.1');
     session.init();
+    uninstallUnloadHandlers(session);
 
     var genericFactories = [{
       objectType: 'Generic',

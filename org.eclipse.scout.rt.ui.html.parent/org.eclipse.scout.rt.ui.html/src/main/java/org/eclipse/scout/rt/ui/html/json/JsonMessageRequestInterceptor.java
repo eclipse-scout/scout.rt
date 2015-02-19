@@ -92,6 +92,7 @@ public class JsonMessageRequestInterceptor extends AbstractService implements IS
           // Unbinding the jsonSession will cause it to be disposed automatically, see AbstractJsonSession.valueUnbound()
           httpSession.removeAttribute(jsonSessionAttributeName);
         }
+        writeResponse(resp, new JSONObject()); // send empty response to satisfy clients expecting a valid response
         return null;
       }
 

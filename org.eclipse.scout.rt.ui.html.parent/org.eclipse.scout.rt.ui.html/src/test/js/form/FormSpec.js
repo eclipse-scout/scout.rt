@@ -9,6 +9,7 @@ describe("Form", function() {
     helper = new FormSpecHelper(session);
     session = new scout.Session($('#sandbox'), '1.1');
     session.init();
+    uninstallUnloadHandlers(session);
   });
 
   afterEach(function() {

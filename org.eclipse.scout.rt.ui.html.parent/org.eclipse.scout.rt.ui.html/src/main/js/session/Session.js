@@ -203,7 +203,7 @@ scout.Session.prototype._sendRequest = function(request) {
 
   var that = this;
   $.ajax({
-    async: true,
+    async: !request.unload,
     type: 'POST',
     dataType: 'json',
     contentType: 'application/json; charset=UTF-8',

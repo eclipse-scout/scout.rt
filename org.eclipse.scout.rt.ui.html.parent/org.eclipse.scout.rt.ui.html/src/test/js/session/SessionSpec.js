@@ -47,6 +47,7 @@ describe("Session", function() {
       var session = createSession();
 
       session.init();
+      uninstallUnloadHandlers(session);
       sendQueuedAjaxCalls();
 
       var requestData = mostRecentJsonRequest();
@@ -64,6 +65,7 @@ describe("Session", function() {
       var session = createSession(new scout.UserAgent(scout.UserAgent.DEVICE_TYPE_MOBILE));
 
       session.init();
+      uninstallUnloadHandlers(session);
       sendQueuedAjaxCalls();
 
       var requestData = mostRecentJsonRequest();
@@ -80,6 +82,7 @@ describe("Session", function() {
       session = createSession(new scout.UserAgent(scout.UserAgent.DEVICE_TYPE_DESKTOP));
 
       session.init();
+      uninstallUnloadHandlers(session);
       sendQueuedAjaxCalls();
 
       requestData = mostRecentJsonRequest();
