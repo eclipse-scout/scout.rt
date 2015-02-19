@@ -3602,6 +3602,10 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
               sortedCoalescedMap.put(20, coalesceTableEvents(subList, false, true));// merge
               break;
             }
+            case TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED: {
+              sortedCoalescedMap.put(25, subList.get(lastIndex));// use last
+              break;
+            }
             case TableEvent.TYPE_ROWS_INSERTED: {
               sortedCoalescedMap.put(30, coalesceTableEvents(subList, true, false));// merge
               break;
@@ -3620,10 +3624,6 @@ public abstract class AbstractTable extends AbstractPropertyObserver implements 
             }
             case TableEvent.TYPE_COLUMN_ORDER_CHANGED: {
               sortedCoalescedMap.put(70, coalesceTableEvents(subList, false, false));// merge
-              break;
-            }
-            case TableEvent.TYPE_COLUMN_STRUCTURE_CHANGED: {
-              sortedCoalescedMap.put(80, subList.get(lastIndex));// use last
               break;
             }
             case TableEvent.TYPE_ROW_ORDER_CHANGED: {
