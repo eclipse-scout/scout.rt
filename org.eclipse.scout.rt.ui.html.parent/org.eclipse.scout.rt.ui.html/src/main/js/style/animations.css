@@ -1,3 +1,4 @@
+/* args = keyframeName, timingFunction, iterationCount */
 .animation(@args) {
   -webkit-animation: @args;
   -moz-animation: @args;
@@ -5,6 +6,7 @@
   -o-animation: @args;
   animation: @args;
 }
+
 .animation-duration(@duration) {
   -webkit-animation-duration: @duration;
   -moz-animation-duration: @duration;
@@ -12,6 +14,7 @@
   -o-animation-duration: @duration;
   animation-duration: @duration;
 }
+
 .animation-name(@name) {
   -webkit-animation-name: @name;
   -moz-animation-name: @name;
@@ -28,7 +31,24 @@
   animation-fill-mode: @fillMode;
 }
 
+.animation-timing-function(@timingFunction) {
+  -webkit-animation-timing-function: @timingFunction;
+  -moz-animation-timing-function: @timingFunction;
+  -ms-animation-timing-function: @timingFunction;
+  -o-animation-timing-function: @timingFunction;
+  animation-timing-function: @timingFunction;
+}
+
+.animation-iteration-count(@iterationCount) {
+  -webkit-animation-iteration-count: @iterationCount;
+  -moz-animation-iteration-count: @iterationCount;
+  -ms-animation-iteration-count: @iterationCount;
+  -o-animation-iteration-count: @iterationCount;
+  animation-iteration-count: @iterationCount;
+}
+
 /*** Fade In ***/
+
 .keyframes-fade-in() {
   from {
     opacity:0;
@@ -91,3 +111,33 @@
 
 @-webkit-keyframes rotation { .keyframes-rotation; }
 @keyframes rotation { .keyframes-rotation; }
+
+/*** Pulse Opacity ***/
+
+.keyframes-pulse-opacity () {
+  0%   { opacity: 1.0; }
+  50%  { opacity: 0.05; }
+  100% { opacity: 1.0; }
+}
+
+@-webkit-keyframes pulse-opacity { .keyframes-pulse-opacity; }
+@keyframes pulse-opacity { .keyframes-pulse-opacity; }
+
+/*** Pulsate ***/
+
+.keyframes-pulsate () {
+  0% {
+    transform:scale(.1);
+    opacity: 0.0;
+  }
+  50% {
+    opacity:1;
+  }
+  100% {
+    transform:scale(1.2);
+    opacity:0;
+  }
+}
+
+@-webkit-keyframes pulsate { .keyframes-pulsate; }
+@keyframes pulsate { .keyframes-pulsate; }

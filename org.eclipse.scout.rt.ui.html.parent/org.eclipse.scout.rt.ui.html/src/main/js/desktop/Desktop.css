@@ -155,6 +155,13 @@
   background: url('logo.png');
   background-size: contain;
   background-repeat: no-repeat;
+
+  &.animated {
+    .animation-name(pulse-opacity);
+    .animation-duration(1.5s);
+    .animation-timing-function(ease-in-out);
+    .animation-iteration-count(infinite);
+  }
 }
 
 /* table / form */
@@ -241,4 +248,9 @@ Middle rows dont have 2px border so no need to do it for those. */
   right: 0;
   background-color: rgba(0, 0, 0, 0.2);
   z-index: 9;
+
+  &.busy {
+    background-color: rgba(0, 0, 0, 0.1);
+    cursor: wait;
+  }
 }

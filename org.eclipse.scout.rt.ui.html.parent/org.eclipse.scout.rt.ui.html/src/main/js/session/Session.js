@@ -51,6 +51,7 @@ scout.Session = function($entryPoint, jsonSessionId, options) {
   this._texts = new scout.Texts();
   this._customParams;
   this._requestsPendingCounter = 0; // TODO CGU do we really want to have multiple requests pending?
+  this._busyCounter = 0; //  >0 = busy
   this.layoutValidator = new scout.LayoutValidator();
   this.detachHelper = new scout.DetachHelper();
 
@@ -195,8 +196,12 @@ scout.Session.prototype._sendRequest = function(request) {
     return;
   }
 
-  var that = this;
+  if (!this.areRequestsPending() && !request.unload) {
+    this.setBusy(true);
+  }
   this._requestsPendingCounter++;
+
+  var that = this;
   $.ajax({
     async: true,
     type: 'POST',
@@ -211,6 +216,11 @@ scout.Session.prototype._sendRequest = function(request) {
   }).fail(function(jqXHR, textStatus, errorThrown) {
     var request = this;
     that._processErrorResponse(request, jqXHR, textStatus, errorThrown);
+  }).always(function() {
+    that._requestsPendingCounter--;
+    if (!that.areRequestsPending() && !request.unload) {
+      that.setBusy(false);
+    }
   });
 };
 
@@ -225,7 +235,6 @@ scout.Session.prototype._processSuccessResponse = function(message) {
   }
 
   this._queuedRequest = null;
-  this._requestsPendingCounter--;
 
   this._copyAdapterData(message.adapterData);
   this.processingEvents = true;
@@ -274,7 +283,6 @@ scout.Session.prototype._copyAdapterData = function(adapterData) {
  */
 scout.Session.prototype._processErrorResponse = function(request, jqXHR, textStatus, errorThrown) {
   $.log.error('errorResponse: status=' + jqXHR.status + ', textStatus=' + textStatus + ', errorThrown=' + errorThrown);
-  this._requestsPendingCounter--;
 
   //Status code = 0 -> no connection
   //Status code >= 12000 come from windows, see http://msdn.microsoft.com/en-us/library/aa383770%28VS.85%29.aspx. Not sure if it is necessary for IE >= 9.
@@ -372,6 +380,33 @@ scout.Session.prototype.areEventsQueued = function() {
 
 scout.Session.prototype.areRequestsPending = function() {
   return this._requestsPendingCounter > 0;
+};
+
+scout.Session.prototype.setBusy = function(busy) {
+  var that = this;
+  if (busy) {
+    if (this._busyCounter === 0) {
+      // Don't show the busy glasspane immediately. Set a short timer instead (which may be
+      // cancelled again if the busy state returns to false in the meantime).
+      this._busyTimer = setTimeout(function() {
+        that._$busyGlasspane = that.$entryPoint.appendDiv('glasspane busy');
+        $('.taskbar-logo').addClass('animated');
+      }, 1000);
+    }
+    this._busyCounter++;
+  }
+  else {
+    this._busyCounter--;
+    if (this._busyCounter === 0) {
+      // Clear any pending timers
+      clearTimeout(that._busyTimer);
+      // If the timer action was executed and the glasspane is showing, we have to remove it
+      if (that._$busyGlasspane) {
+        that._$busyGlasspane.remove();
+        $('.taskbar-logo').removeClass('animated');
+      }
+    }
+  }
 };
 
 scout.Session.prototype._processEvents = function(events) {
