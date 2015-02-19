@@ -26,11 +26,10 @@ import javax.servlet.http.HttpSessionBindingEvent;
 import javax.servlet.http.HttpSessionBindingListener;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
@@ -40,6 +39,7 @@ import org.eclipse.scout.rt.shared.ui.IUiLayer;
 import org.eclipse.scout.rt.shared.ui.UiDeviceType;
 import org.eclipse.scout.rt.shared.ui.UiLayer;
 import org.eclipse.scout.rt.shared.ui.UserAgent;
+import org.eclipse.scout.rt.ui.html.ClientJobUtility;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -196,15 +196,15 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
         LOG.info("Creating new client session [clientSessionId=" + clientSessionId + "]");
         //FIXME CGU session must be started later, see JsonClientSession
         //return SERVICES.getService(IClientSessionRegistryService.class).newClientSession(clientSessionClass(), subject, UUID.randomUUID().toString(), userAgent);
-        Locale oldLocale = LocaleThreadLocal.get(false);
+        Locale oldLocale = NlsLocale.get(false);
         try {
-          LocaleThreadLocal.set(request.getLocale());
+          NlsLocale.set(request.getLocale());
           //
           clientSession = createClientSession();
           initClientSession(clientSession, jsonStartupRequest);
         }
         finally {
-          LocaleThreadLocal.set(oldLocale);
+          NlsLocale.set(oldLocale);
         }
         httpSession.setAttribute(clientSessionAttributeName, clientSession);
         httpSession.setAttribute(clientSessionAttributeName + ".cleanup", new P_ClientSessionCleanupHandler(clientSessionId, clientSession));
@@ -269,7 +269,8 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
         m_jsonClientSession.startUp();
       }
     };
-    job.runNow(new NullProgressMonitor());
+    job.schedule();
+    ClientJobUtility.waitForSyncJob(job);
     try {
       job.throwOnError();
     }
@@ -579,7 +580,8 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
             m_clientSession.getDesktop().getUIFacade().fireDesktopClosingFromUI(true);
           }
         };
-        job.runNow(new NullProgressMonitor());
+        job.schedule();
+        ClientJobUtility.waitForSyncJob(job);
         try {
           job.throwOnError();
         }

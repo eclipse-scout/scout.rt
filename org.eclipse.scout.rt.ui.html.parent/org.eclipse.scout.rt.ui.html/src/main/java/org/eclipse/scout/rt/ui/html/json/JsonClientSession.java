@@ -21,7 +21,6 @@ import java.util.Calendar;
 import java.util.Locale;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -33,6 +32,7 @@ import org.eclipse.scout.rt.client.ILocaleListener;
 import org.eclipse.scout.rt.client.LocaleChangeEvent;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.ui.html.Activator;
+import org.eclipse.scout.rt.ui.html.ClientJobUtility;
 import org.eclipse.scout.rt.ui.html.json.desktop.JsonDesktop;
 import org.json.JSONObject;
 
@@ -120,7 +120,8 @@ public class JsonClientSession<T extends IClientSession> extends AbstractJsonAda
         }
       }
     };
-    job.runNow(new NullProgressMonitor());
+    job.schedule();
+    ClientJobUtility.waitForSyncJob(job);
     try {
       job.throwOnError();
     }

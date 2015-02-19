@@ -22,7 +22,8 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.holders.IHolder;
-import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.ClientAsyncJob;
+import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigation;
 import org.eclipse.scout.rt.client.mobile.navigation.IBreadCrumbsNavigationService;
 import org.eclipse.scout.rt.client.ui.action.IAction;
@@ -168,24 +169,30 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
   }
 
   protected IBreadCrumbsNavigation getBreadcrumbNavigation() {
-    final IHolder<IBreadCrumbsNavigation> breadCrumbsNavigation = new Holder<>();
-    ClientSyncJob job = new ClientSyncJob("AbstractJsonSession#init", getJsonSession().getClientSession()) {
-      @Override
-      protected void runVoid(IProgressMonitor monitor) throws Throwable {
-        IBreadCrumbsNavigationService service = SERVICES.getService(IBreadCrumbsNavigationService.class);
-        if (service != null) {
-          breadCrumbsNavigation.setValue(service.getBreadCrumbsNavigation());
+    // Ensure call is in client session context (service will not be available otherwise)
+    if (ClientJob.getCurrentSession() == null) {
+      final IHolder<IBreadCrumbsNavigation> breadCrumbsNavigation = new Holder<>();
+      ClientJob job = new ClientAsyncJob("getBreadcrumbNavigation", getJsonSession().getClientSession()) {
+        @Override
+        protected void runVoid(IProgressMonitor monitor) throws Throwable {
+          breadCrumbsNavigation.setValue(getBreadcrumbNavigation());
         }
+      };
+      job.runNow(new NullProgressMonitor());
+      try {
+        job.throwOnError();
       }
-    };
-    job.runNow(new NullProgressMonitor());
-    try {
-      job.throwOnError();
+      catch (ProcessingException e) {
+        throw new JsonException(e);
+      }
+      return breadCrumbsNavigation.getValue();
     }
-    catch (ProcessingException e) {
-      throw new JsonException(e);
+
+    IBreadCrumbsNavigationService service = SERVICES.getService(IBreadCrumbsNavigationService.class);
+    if (service != null) {
+      return service.getBreadCrumbsNavigation();
     }
-    return breadCrumbsNavigation.getValue();
+    return null;
   }
 
   protected boolean isFormBased() {
