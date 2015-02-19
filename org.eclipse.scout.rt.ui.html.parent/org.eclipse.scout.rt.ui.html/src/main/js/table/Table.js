@@ -13,6 +13,7 @@ scout.Table = function() {
   this.menus = [];
   this.rows = [];
   this.rowsMap = {}; // rows by id
+  this._rowWidth = 0;
   this.staticMenus = [];
   this._addAdapterProperties(['tableControls', 'menus']);
   this.events = new scout.EventSupport();
@@ -81,16 +82,7 @@ scout.Table.prototype._render = function($parent) {
 
   this.menuBar = new scout.MenuBar(this.$container, 'top', scout.TableMenuItemsOrder.order);
 
-  this._totalWidth = 0;
-  if (this.checkable) {
-    //TODO NBU if customised checkable colum is implemented use size of customised checkable colum
-    //use size for a checkable column
-    this._totalWidth += scout.CheckBoxColumn.CHECKABLE_COLUMN_SIZE;
-  }
-  for (i = 0; i < this.columns.length; i++) {
-    this._totalWidth += this.columns[i].width;
-  }
-
+  this._updateRowWidth();
   this.drawData();
 };
 
@@ -373,7 +365,7 @@ scout.Table.prototype.drawData = function() {
 };
 
 scout.Table.prototype._buildRowDiv = function(row) {
-  var rowWidth = this._totalWidth + this._getTableRowBorderWidth();
+  var rowWidth = this._rowWidth;
   var rowClass = 'table-row ';
   if (this.selectedRowIds && this.selectedRowIds.indexOf(row.id) > -1) {
     rowClass += 'selected ';
@@ -399,6 +391,19 @@ scout.Table.prototype._getTableRowBorderWidth = function() {
   this._tableRowBorderWidth = $tableRowDummy.cssBorderLeftWidth() + $tableRowDummy.cssBorderRightWidth();
   $tableRowDummy.remove();
   return this._tableRowBorderWidth;
+};
+
+scout.Table.prototype._updateRowWidth = function() {
+  this._rowWidth = 0;
+  if (this.checkable) {
+    //TODO NBU if customised checkable colum is implemented use size of customised checkable colum
+    //use size for a checkable column
+    this._rowWidth += scout.CheckBoxColumn.CHECKABLE_COLUMN_SIZE;
+  }
+  for (var i = 0; i < this.columns.length; i++) {
+    this._rowWidth += this.columns[i].width;
+  }
+  this._rowWidth += this._getTableRowBorderWidth();
 };
 
 scout.Table.prototype._drawData = function(startRow) {
@@ -813,7 +818,7 @@ scout.Table.prototype._appendSumRow = function(sum, groupColumn, row, all) {
   }
 
   $sumRow.insertAfter(row.$row)
-    .width(this._totalWidth + this._getTableRowBorderWidth())
+    .width(this._rowWidth)
     .hide()
     .slideDown();
 };
@@ -1278,17 +1283,17 @@ scout.Table.prototype.hideRow = function($row, useAnimation) {
 /**
  * @param resizingInProgress set this to true when calling this function several times in a row. If resizing is finished you have to call resizingColumnFinished.
  */
-scout.Table.prototype.resizeColumn = function(column, width, totalWidth, resizingInProgress) {
+scout.Table.prototype.resizeColumn = function(column, width, resizingInProgress) {
   var colNum = this.columns.indexOf(column) + 1;
 
   column.width = width;
-  this._totalWidth = totalWidth;
+  this._updateRowWidth();
 
   this.$cellsForColIndex(colNum, true)
     .css('min-width', width)
     .css('max-width', width);
   this.$rows(true)
-    .css('width', totalWidth);
+    .css('width', this._rowWidth);
 
   if (this.header) {
     this.header.onColumnResized(column, width);
@@ -1476,6 +1481,7 @@ scout.Table.prototype._onColumnStructureChanged = function(columns) {
       this.header.remove();
       this.header = this._createHeader();
     }
+    this._updateRowWidth();
     this.drawData();
   }
 };

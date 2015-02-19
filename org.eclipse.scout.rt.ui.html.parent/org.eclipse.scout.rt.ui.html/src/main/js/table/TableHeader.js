@@ -64,8 +64,7 @@ scout.TableHeader = function(table, session) {
   function resizeHeader(event) {
     var startX = event.pageX,
       $header = $(this).prev(),
-      headerWidth = parseFloat($header.css('min-width')),
-      totalWidth = parseFloat(that.table.$rows().eq(0).css('width'));
+      headerWidth = parseFloat($header.css('min-width'));
 
     $('body').addClass('col-resize')
       .on('mousemove', '', resizeMove)
@@ -73,11 +72,10 @@ scout.TableHeader = function(table, session) {
 
     function resizeMove(event) {
       var diff = event.pageX - startX,
-        wHeader = headerWidth + diff,
-        wSummary = totalWidth + diff;
+        wHeader = headerWidth + diff;
 
       if (wHeader > 80 || diff > 0) {
-        that.table.resizeColumn($header.data('column'), wHeader, wSummary, true);
+        that.table.resizeColumn($header.data('column'), wHeader, true);
       }
     }
 

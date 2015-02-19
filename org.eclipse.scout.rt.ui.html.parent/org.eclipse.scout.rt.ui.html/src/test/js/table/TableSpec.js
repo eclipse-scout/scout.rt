@@ -348,7 +348,7 @@ describe("Table", function() {
       table.render(session.$entryPoint);
 
       expect(table.columns[0].width).not.toBe(100);
-      table.resizeColumn(table.columns[0], 100, 150);
+      table.resizeColumn(table.columns[0], 100);
       expect(table.columns[0].width).toBe(100);
 
       sendQueuedAjaxCalls();
@@ -364,8 +364,8 @@ describe("Table", function() {
       var table = helper.createTable(model);
       table.render(session.$entryPoint);
 
-      table.resizeColumn(table.columns[0], 50, 100, true);
-      table.resizeColumn(table.columns[0], 100, 150, true);
+      table.resizeColumn(table.columns[0], 50, true);
+      table.resizeColumn(table.columns[0], 100, true);
 
       sendQueuedAjaxCalls();
 
@@ -377,9 +377,9 @@ describe("Table", function() {
       var table = helper.createTable(model);
       table.render(session.$entryPoint);
 
-      table.resizeColumn(table.columns[0], 50, 100, true);
-      table.resizeColumn(table.columns[0], 100, 150, true);
-      table.resizeColumn(table.columns[0], 150, 200);
+      table.resizeColumn(table.columns[0], 50, true);
+      table.resizeColumn(table.columns[0], 100, true);
+      table.resizeColumn(table.columns[0], 150);
 
       sendQueuedAjaxCalls();
 
