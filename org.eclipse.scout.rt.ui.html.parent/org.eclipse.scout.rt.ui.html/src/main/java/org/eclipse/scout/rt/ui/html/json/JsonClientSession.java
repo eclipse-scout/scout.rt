@@ -115,9 +115,14 @@ public class JsonClientSession<T extends IClientSession> extends AbstractJsonAda
     ClientJob job = new ClientSyncJob("Desktop opened", getJsonSession().getClientSession()) {
       @Override
       protected void runVoid(IProgressMonitor monitor) throws Throwable {
-        if (!getModel().getLocale().equals(locale)) {
-          getModel().setLocale(locale);
-        }
+        ClientJobUtility.runAsSubject(new Runnable() {
+          @Override
+          public void run() {
+            if (!getModel().getLocale().equals(locale)) {
+              getModel().setLocale(locale);
+            }
+          }
+        });
       }
     };
     job.schedule();

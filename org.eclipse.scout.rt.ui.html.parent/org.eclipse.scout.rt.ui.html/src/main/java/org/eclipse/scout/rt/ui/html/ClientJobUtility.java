@@ -1,5 +1,10 @@
 package org.eclipse.scout.rt.ui.html;
 
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
+
+import javax.security.auth.Subject;
+
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -82,6 +87,35 @@ public final class ClientJobUtility {
       catch (InterruptedException e) {
         // NOP
       }
+    }
+  }
+
+  public static void runAsSubject(final Runnable runnable) throws Throwable {
+    runAsSubject(runnable, null);
+  }
+
+  public static void runAsSubject(final Runnable runnable, Subject subject) throws Throwable {
+    if (subject == null) {
+      IClientSession session = ClientJob.getCurrentSession();
+      subject = (session == null ? null : session.getSubject());
+    }
+    if (subject == null) {
+      throw new IllegalStateException("Subject is null");
+    }
+    try {
+      Subject.doAs(
+          subject,
+          new PrivilegedExceptionAction<Void>() {
+            @Override
+            public Void run() throws Exception {
+              runnable.run();
+              return null;
+            }
+          });
+    }
+    catch (PrivilegedActionException e) {
+      Throwable t = e.getCause();
+      throw t;
     }
   }
 }

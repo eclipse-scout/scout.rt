@@ -266,7 +266,12 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
     ClientSyncJob job = new ClientSyncJob("AbstractJsonSession#startClientSession", clientSession) {
       @Override
       protected void runVoid(IProgressMonitor monitor) throws Throwable {
-        m_jsonClientSession.startUp();
+        ClientJobUtility.runAsSubject(new Runnable() {
+          @Override
+          public void run() {
+            m_jsonClientSession.startUp();
+          }
+        });
       }
     };
     job.schedule();
@@ -577,7 +582,12 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
         ClientJob job = new ClientSyncJob("Disposing client session", m_clientSession) {
           @Override
           protected void runVoid(IProgressMonitor monitor) throws Throwable {
-            m_clientSession.getDesktop().getUIFacade().fireDesktopClosingFromUI(true);
+            ClientJobUtility.runAsSubject(new Runnable() {
+              @Override
+              public void run() {
+                m_clientSession.getDesktop().getUIFacade().fireDesktopClosingFromUI(true);
+              }
+            });
           }
         };
         job.schedule();
