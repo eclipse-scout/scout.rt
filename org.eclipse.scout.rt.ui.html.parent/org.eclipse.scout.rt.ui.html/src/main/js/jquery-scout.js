@@ -8,7 +8,11 @@
   // === $ extensions ===
 
   // chris' shortcut
-  $.l = console.log.bind(console);
+  if (console && console.log.bind) {
+    $.l = console.log.bind(console);
+  } else {
+    $.l = function() {};
+  }
 
   $.makeDiv = function(cssClass, htmlContent, id) {
     if (id === 0) {
