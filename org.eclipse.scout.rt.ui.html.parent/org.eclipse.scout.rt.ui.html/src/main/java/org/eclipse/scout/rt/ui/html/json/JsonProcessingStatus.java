@@ -10,8 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json;
 
-import org.eclipse.scout.commons.exception.IProcessingStatus;
-import org.eclipse.scout.rt.shared.AbstractIcons;
+import org.eclipse.scout.commons.status.IStatus;
+import org.eclipse.scout.rt.client.IFieldStatus;
+import org.eclipse.scout.rt.client.ui.form.fields.ScoutFieldStatus;
 import org.json.JSONObject;
 
 /**
@@ -19,14 +20,14 @@ import org.json.JSONObject;
  */
 public class JsonProcessingStatus implements IJsonObject {
 
-  private final IProcessingStatus m_processingStatus;
+  private final IStatus m_status;
 
-  public JsonProcessingStatus(IProcessingStatus processingStatus) {
-    this.m_processingStatus = processingStatus;
+  public JsonProcessingStatus(IStatus processingStatus) {
+    this.m_status = processingStatus;
   }
 
-  public IProcessingStatus getProcessingStatus() {
-    return m_processingStatus;
+  public IStatus getProcessingStatus() {
+    return m_status;
   }
 
   @Override
@@ -38,29 +39,16 @@ public class JsonProcessingStatus implements IJsonObject {
   }
 
   private String getIconUrl() {
-    switch (m_processingStatus.getSeverity()) {
-      case IProcessingStatus.FATAL:
-      case IProcessingStatus.ERROR:
-        return AbstractIcons.StatusError;
-      case IProcessingStatus.WARNING:
-        return AbstractIcons.StatusWarning;
-      default:
-        return AbstractIcons.StatusInfo;
+    if (m_status instanceof IFieldStatus) {
+      return ((IFieldStatus) m_status).getIconId();
+    }
+    else {
+      return ScoutFieldStatus.getIconIdFromSeverity(m_status.getSeverity());
     }
   }
 
   private String getMessage() {
-    StringBuilder sb = new StringBuilder();
-    if (m_processingStatus.getTitle() != null) {
-      sb.append(m_processingStatus.getTitle());
-    }
-    if (m_processingStatus.getMessage() != null) {
-      if (sb.length() > 0) {
-        sb.append("\n");
-      }
-      sb.append(m_processingStatus.getMessage());
-    }
-    return sb.toString();
+    return m_status.getMessage();
   }
 
 }

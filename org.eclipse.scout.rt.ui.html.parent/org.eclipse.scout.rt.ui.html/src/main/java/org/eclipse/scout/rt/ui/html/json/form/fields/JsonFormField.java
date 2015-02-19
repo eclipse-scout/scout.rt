@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.json.form.fields;
 
-import org.eclipse.scout.commons.exception.IProcessingStatus;
+import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
 import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonPropertyObserver;
@@ -82,7 +82,7 @@ public class JsonFormField<T extends IFormField> extends AbstractJsonPropertyObs
 
     putJsonProperty(new JsonProperty<T>(IFormField.PROP_ERROR_STATUS, model) {
       @Override
-      protected IProcessingStatus modelValue() {
+      protected IStatus modelValue() {
         return getModel().getErrorStatus();
       }
 
@@ -92,7 +92,7 @@ public class JsonFormField<T extends IFormField> extends AbstractJsonPropertyObs
           return "";
         }
         else {
-          return new JsonProcessingStatus((IProcessingStatus) value).toJson();
+          return new JsonProcessingStatus((IStatus) value).toJson();
         }
       }
     });
