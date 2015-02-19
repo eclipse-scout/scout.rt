@@ -101,6 +101,7 @@ TableSpecHelper.prototype.createModelColumns = function(count, columnType) {
   var columns = [];
   for (var i = 0; i < count; i++) {
     columns[i] = this.createModelColumn(createUniqueAdapterId(), 'col' + i, columnType);
+    columns[i].index = i;
   }
   return columns;
 };

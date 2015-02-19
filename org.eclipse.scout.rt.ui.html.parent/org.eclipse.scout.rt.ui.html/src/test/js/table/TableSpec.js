@@ -633,6 +633,8 @@ describe("Table", function() {
     function prepareTable() {
       columns = [helper.createModelColumn(createUniqueAdapterId(), 'col1'),
                  helper.createModelColumn(createUniqueAdapterId(), 'col2', 'number')];
+      columns[0].index = 0;
+      columns[1].index = 1;
       rows = helper.createModelRows(2, 3);
       model = helper.createModel(columns, rows);
       table = helper.createTable(model);
@@ -772,7 +774,10 @@ describe("Table", function() {
       var model = helper.createModelFixture(2, 5);
       var table = helper.createTable(model);
       table.render(session.$entryPoint);
-
+      // mock function because it does not work without css (columns are one below the other instead of side by side).
+      table._columnAtX = function() {
+        return table.columns[0];
+      };
       var $row = table.$data.children('.table-row').first();
       $row.triggerDoubleClick();
 
