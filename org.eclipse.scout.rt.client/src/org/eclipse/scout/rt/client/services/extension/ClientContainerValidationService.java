@@ -33,6 +33,7 @@ import org.eclipse.scout.rt.client.ui.desktop.outline.IOutline;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithTable;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
+import org.eclipse.scout.rt.client.ui.form.IFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractCompositeField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField;
@@ -64,6 +65,7 @@ public class ClientContainerValidationService extends AbstractContainerValidatio
     super.initializeService(registration);
 
     // contributions
+    addPossibleContributionForContainer(IFormHandler.class, AbstractForm.class);
     addPossibleContributionForContainer(IActionNode.class, AbstractActionNode.class);
     addPossibleContributionForContainer(IMenu.class, AbstractActivityMap.class);
     addPossibleContributionForContainer(ICalendarItemProvider.class, AbstractCalendar.class);
