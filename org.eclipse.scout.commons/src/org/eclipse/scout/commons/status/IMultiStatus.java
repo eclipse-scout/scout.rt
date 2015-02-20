@@ -32,6 +32,6 @@ public interface IMultiStatus extends IStatus {
    * @return SortedSet children
    * @see #isMultiStatus()
    */
-  public List<IStatus> getChildren();
+  List<IStatus> getChildren();
 
 }

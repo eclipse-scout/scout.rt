@@ -10,10 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.status;
 
+import java.io.Serializable;
+
 /**
  * Status
  */
-public class Status implements IStatus {
+public class Status implements IStatus, Serializable {
+  private static final long serialVersionUID = 382223180907716448L;
 
   private final int m_severity;
   private final String m_message;
@@ -58,6 +61,13 @@ public class Status implements IStatus {
    */
   public Status(String message) {
     this(message, IStatus.ERROR);
+  }
+
+  /**
+   * for Serialization
+   */
+  public Status() {
+    this("undefined");
   }
 
   @Override

@@ -24,6 +24,7 @@ import org.eclipse.scout.commons.CollectionUtility;
  * </p>
  */
 public class MultiStatus extends Status implements IMultiStatus {
+  private static final long serialVersionUID = -4166865994075130263L;
 
   //children ordered by severity and message
   private final SortedSet<IStatus> m_children = new TreeSet<>();

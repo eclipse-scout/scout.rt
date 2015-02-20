@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.exception.fixture;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.IProcessingStatus;
@@ -38,7 +39,7 @@ public class CustomProcessingStatus implements IProcessingStatus {
 
   @Override
   public List<String> getContextMessages() {
-    return null;
+    return new ArrayList<>();
   }
 
   @Override

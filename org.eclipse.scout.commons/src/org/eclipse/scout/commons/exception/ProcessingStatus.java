@@ -245,27 +245,25 @@ public class ProcessingStatus extends Status implements IProcessingStatus, Seria
    */
   @Override
   public String toString() {
-    StringBuffer buf = new StringBuffer();
-    buf.append(getClass().getSimpleName() + "["); //$NON-NLS-1$
-
-    final String severityName = getSeverityName();
-    buf.append(severityName != null ? severityName : "severity=" + getSeverity());
-    buf.append(" code=" + getCode()); //$NON-NLS-1$
+    StringBuilder sb = new StringBuilder();
+    sb.append(getClass().getSimpleName() + "["); //$NON-NLS-1$
+    sb.append(" severity=" + getSeverityName());
+    sb.append(" code=" + getCode()); //$NON-NLS-1$
     if (m_contextMessages != null) {
       for (String s : m_contextMessages) {
-        buf.append(" ");
-        buf.append(s);
-        buf.append(" /");
+        sb.append(" ");
+        sb.append(s);
+        sb.append(" /");
       }
     }
-    buf.append(" ");
-    buf.append(m_messageBody);
+    sb.append(" ");
+    sb.append(m_messageBody);
     if (m_cause != null) {
-      buf.append(" ");
-      buf.append(m_cause);
+      sb.append(" ");
+      sb.append(m_cause);
     }
-    buf.append("]"); //$NON-NLS-1$
-    return buf.toString();
+    sb.append("]"); //$NON-NLS-1$
+    return sb.toString();
   }
 
   /**
@@ -273,20 +271,15 @@ public class ProcessingStatus extends Status implements IProcessingStatus, Seria
    */
   @Override
   protected String getSeverityName() {
-    final String sn = super.getSeverityName();
-    if (sn != null) {
-      return sn;
-    }
     switch (getSeverity()) {
       case FATAL: {
         return "FATAL";
       }
-
       case CANCEL: {
         return "CANCEL";
       }
       default:
-        return null;
+        return super.getSeverityName();
     }
   }
 
