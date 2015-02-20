@@ -10,13 +10,18 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.server.services.common.clientnotification;
 
+import java.security.AccessController;
 import java.util.LinkedList;
 import java.util.Set;
 
+import javax.security.auth.Subject;
+
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.eclipse.scout.rt.server.IServerJobService;
 import org.eclipse.scout.rt.server.ThreadContext;
 import org.eclipse.scout.rt.server.services.common.clientnotification.internal.ClientNotificationQueue;
 import org.eclipse.scout.rt.server.services.common.clientnotification.internal.ClientNotificationQueueElement;
@@ -54,8 +59,13 @@ public class ClientNotificationService extends AbstractService implements IClien
   @Override
   public void putNotification(IClientNotification notification, IClientNotificationFilter filter) {
     tryPutNotification(new ConsumableClientNotificationQueueElement(notification, filter));
-    // send cluster notification to other nodes right away since cluster notification is also transactional
-    distributeCluster(new ClientNotificationQueueElement(notification, filter));
+
+    Subject serverJobSubject = SERVICES.getService(IServerJobService.class).getServerSubject();
+    Subject contextSubject = Subject.getSubject(AccessController.getContext());
+    if (CompareUtility.notEquals(serverJobSubject, contextSubject)) {
+      // send cluster notification to other nodes right away since cluster notification is also transactional
+      distributeCluster(new ClientNotificationQueueElement(notification, filter));
+    }
   }
 
   @Override

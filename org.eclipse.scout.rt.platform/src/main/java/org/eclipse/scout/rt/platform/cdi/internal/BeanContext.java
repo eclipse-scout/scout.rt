@@ -145,7 +145,7 @@ public class BeanContext implements IBeanContext {
   public <T> T getInstance(Class<T> beanClazz) {
     T bean = getInstance(beanClazz, null);
     if (bean == null) {
-      LOG.warn(String.format("No beans bound to '%s'", beanClazz));
+      LOG.warn(String.format("No beans bound to '%s'", beanClazz), new Exception());
     }
     return bean;
   }

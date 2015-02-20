@@ -55,8 +55,8 @@ public abstract class AbstractJndiService extends AbstractService {
 
   @Override
   protected void initializeService() {
-    super.initializeService();
     initConfig();
+    super.initializeService();
   }
 
   protected void initConfig() {
