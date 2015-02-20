@@ -25,8 +25,6 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import org.apache.derby.iapi.store.access.Qualifier;
-
 /**
  * Identifies injectable constructors, methods, and fields. May apply to static
  * as well as instance members. An injectable member may have any access
@@ -102,6 +100,9 @@ import org.apache.derby.iapi.store.access.Qualifier;
  *   &#064;Inject void install(Windshield windshield, Trunk trunk) { ... }
  * }
  * 
+ *
+ *
+ *
  * </pre>
  * <p>
  * A method annotated with {@code @Inject} that overrides another method annotated with {@code @Inject} will only be
@@ -113,10 +114,9 @@ import org.apache.derby.iapi.store.access.Qualifier;
  * reflection support) might preclude injection of non-public members.
  * <h3>Qualifiers</h3>
  * <p>
- * A {@linkplain Qualifier qualifier} may annotate an injectable field or parameter and, combined with the type,
- * identify the implementation to inject. Qualifiers are optional, and when used with {@code @Inject} in
- * injector-independent classes, no more than one qualifier should annotate a single field or parameter. The qualifiers
- * are bold in the following example:
+ * A Qualifier may annotate an injectable field or parameter and, combined with the type, identify the implementation to
+ * inject. Qualifiers are optional, and when used with {@code @Inject} in injector-independent classes, no more than one
+ * qualifier should annotate a single field or parameter. The qualifiers are bold in the following example:
  *
  * <pre>
  *   public class Car {
@@ -162,14 +162,11 @@ import org.apache.derby.iapi.store.access.Qualifier;
  * second instance of {@code B} to set on the second instance of {@code A}, and so on.
  * <p>
  * A conservative injector might detect the circular dependency at build time and generate an error, at which point the
- * programmer could break the circular dependency by injecting {@link Provider Provider&lt;A>} or {@code Provider<B>}
- * instead of {@code A} or {@code B} respectively. Calling {@link Provider#get() get()} on the provider directly from
- * the constructor or method it was injected into defeats the provider's ability to break up circular dependencies. In
- * the case of method or field injection, scoping one of the dependencies (using {@linkplain Singleton singleton scope},
- * for example) may also enable a valid circular relationship.
- *
- * @see javax.inject.Qualifier @Qualifier
- * @see javax.inject.Provider
+ * programmer could break the circular dependency by injecting Provider or Provider<B> instead of {@code A} or {@code B}
+ * respectively. Calling Provider#get() on the provider directly from the constructor or method it was injected into
+ * defeats the provider's ability to break up circular dependencies. In the case of method or field injection, scoping
+ * one of the dependencies (using {@linkplain Singleton singleton scope}, for example) may also enable a valid circular
+ * relationship.
  */
 @Target({METHOD, CONSTRUCTOR, FIELD})
 @Retention(RUNTIME)
