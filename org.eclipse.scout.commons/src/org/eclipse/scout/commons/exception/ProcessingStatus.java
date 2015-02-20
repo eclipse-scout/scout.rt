@@ -41,7 +41,7 @@ public class ProcessingStatus extends Status implements IProcessingStatus, Seria
   /**
    * Wrapped exception, or <code>null</code> if none.
    */
-  private Throwable m_cause = null;
+  private Throwable m_exception = null;
 
   /**
    * Creates a new status with severity {@link IStatus#ERROR}.
@@ -136,12 +136,12 @@ public class ProcessingStatus extends Status implements IProcessingStatus, Seria
   @Deprecated
   @Override
   public Throwable getCause() {
-    return m_cause;
+    return m_exception;
   }
 
   @Override
   public Throwable getException() {
-    return m_cause;
+    return m_exception;
   }
 
   /**
@@ -184,7 +184,7 @@ public class ProcessingStatus extends Status implements IProcessingStatus, Seria
    *          a low-level exception, or <code>null</code> if not applicable
    */
   public void setException(Throwable exception) {
-    m_cause = exception;
+    m_exception = exception;
   }
 
   /**
@@ -261,10 +261,12 @@ public class ProcessingStatus extends Status implements IProcessingStatus, Seria
       }
     }
     sb.append(" ");
-    sb.append(getMessage());
-    if (m_cause != null) {
+    sb.append(getTitle());
+    sb.append(" ");
+    sb.append(getBody());
+    if (m_exception != null) {
       sb.append(" ");
-      sb.append(m_cause);
+      sb.append(m_exception.toString());
     }
     sb.append("]"); //$NON-NLS-1$
     return sb.toString();
@@ -291,7 +293,7 @@ public class ProcessingStatus extends Status implements IProcessingStatus, Seria
   public int hashCode() {
     final int prime = 31;
     int result = super.hashCode();
-    result = prime * result + ((m_cause == null) ? 0 : m_cause.hashCode());
+    result = prime * result + ((m_exception == null) ? 0 : m_exception.hashCode());
     result = prime * result + ((m_contextMessages == null) ? 0 : m_contextMessages.hashCode());
     result = prime * result + ((m_messageBody == null) ? 0 : m_messageBody.hashCode());
     result = prime * result + ((m_messageTitle == null) ? 0 : m_messageTitle.hashCode());
@@ -310,12 +312,12 @@ public class ProcessingStatus extends Status implements IProcessingStatus, Seria
       return false;
     }
     ProcessingStatus other = (ProcessingStatus) obj;
-    if (m_cause == null) {
-      if (other.m_cause != null) {
+    if (m_exception == null) {
+      if (other.m_exception != null) {
         return false;
       }
     }
-    else if (!m_cause.equals(other.m_cause)) {
+    else if (!m_exception.equals(other.m_exception)) {
       return false;
     }
     if (m_contextMessages == null) {

@@ -14,6 +14,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.eclipse.scout.commons.Assertions;
+
 /**
  * Core exception in Scout.
  *
@@ -22,7 +24,7 @@ import java.util.Arrays;
 public class ProcessingException extends Exception implements Serializable {
   private static final long serialVersionUID = 1L;
 
-  private IProcessingStatus m_status;
+  private ProcessingStatus m_status;
   private transient boolean m_consumed;
 
   /**
@@ -78,7 +80,7 @@ public class ProcessingException extends Exception implements Serializable {
   }
 
   public void setStatus(IProcessingStatus status) {
-    m_status = status;
+    m_status = new ProcessingStatus(status);
   }
 
   public void addContextMessage(String s) {
@@ -105,15 +107,30 @@ public class ProcessingException extends Exception implements Serializable {
 
   @Override
   public String toString() {
-    if (m_status == null) {
-      return "";
-    }
-
+    Assertions.assertNotNull(m_status);
+    StringBuilder sb = new StringBuilder();
+    sb.append("[");
+    sb.append(super.toString());
     if (m_status.getException() == this) {
-      return "";
+      sb.append(" severity=" + m_status.getSeverityName());
+      sb.append(" code=" + m_status.getCode());
+      if (m_status.getContextMessages().size() > 0) {
+        for (String s : m_status.getContextMessages()) {
+          sb.append(" ");
+          sb.append(s);
+          sb.append(" /");
+        }
+        sb.append(" ");
+      }
     }
-
-    return getClass().getSimpleName() + "[" + m_status.toString() + "]";
+    else {
+      sb.append(m_status.toString());
+    }
+    if (isConsumed()) {
+      sb.append(" consumed");
+    }
+    sb.append("]");
+    return sb.toString();
   }
 
   /**

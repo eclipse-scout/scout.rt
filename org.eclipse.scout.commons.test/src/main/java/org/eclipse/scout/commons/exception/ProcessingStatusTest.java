@@ -29,6 +29,9 @@ public class ProcessingStatusTest {
   private IProcessingStatus m_fatalStatus;
   private IProcessingStatus m_okStatus;
 
+  private static final String BODY = "testMessage";
+  private static final String TITLE = "title";
+
   @SuppressWarnings("deprecation")
   @Before
   public void setup() {
@@ -73,6 +76,54 @@ public class ProcessingStatusTest {
     String fullStatus = new ProcessingStatus(title, body, new ProcessingException(exceptionMessage), 0, IProcessingStatus.FATAL).toString();
     assertTrue(fullStatus.contains(title));
     assertTrue(fullStatus.contains(body));
+  }
+
+  @Test
+  public void testToStringWithCause() {
+    final String exceptionName = "NPE";
+    final int code = 22;
+    final ProcessingStatus ps = new ProcessingStatus(TITLE, BODY, new NullPointerException(exceptionName), code, IStatus.INFO);
+    final String psString = ps.toString();
+    assertContainsStatusStrings(code, psString);
+    assertTrue(psString.contains("NullPointerException"));
+    assertTrue(psString.contains(exceptionName));
+  }
+
+  @Test
+  public void testToStringWithProcessingException() {
+    final int code = 22;
+    final String exceptionMessage = "ex";
+    final ProcessingException pe = new ProcessingException(exceptionMessage);
+    final ProcessingStatus ps = new ProcessingStatus(TITLE, BODY, pe, code, IStatus.INFO);
+    final String psString = ps.toString();
+    assertContainsStatusStrings(code, psString);
+    assertContainsExceptionStrings(exceptionMessage, psString);
+  }
+
+  @Test
+  public void testToStringWithProcessingExceptionStatus() {
+    final int code = 22;
+    final String exceptionMessage = "ex";
+    final String innerStatusMessage = "innerStatus";
+    final ProcessingException pe = new ProcessingException("ExTitle", exceptionMessage, new ProcessingException(new ProcessingStatus(innerStatusMessage, IStatus.OK)));
+    final ProcessingStatus ps = new ProcessingStatus(TITLE, BODY, pe, code, IStatus.INFO);
+    final String psString = ps.toString();
+    assertContainsStatusStrings(code, psString);
+    assertContainsExceptionStrings(exceptionMessage, psString);
+    assertTrue(psString.contains(innerStatusMessage));
+    assertTrue(psString.contains("OK"));
+  }
+
+  private void assertContainsStatusStrings(final int code, final String psString) {
+    assertTrue(psString.contains(TITLE));
+    assertTrue(psString.contains(BODY));
+    assertTrue(psString.contains("" + code));
+    assertTrue(psString.contains("INFO"));
+  }
+
+  private void assertContainsExceptionStrings(final String exceptionMessage, final String psString) {
+    assertTrue(psString.contains("ProcessingException"));
+    assertTrue(psString.contains(exceptionMessage));
   }
 
   @SuppressWarnings("deprecation")
