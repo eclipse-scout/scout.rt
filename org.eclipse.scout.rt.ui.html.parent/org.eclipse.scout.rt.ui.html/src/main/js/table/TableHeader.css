@@ -29,6 +29,12 @@
   border-left: 1px solid transparent;
   border-right: 1px solid transparent;
 
+  &.sort-asc,
+  &.sort-desc {
+    /* make room form sort-icon */
+    padding-right: 20px;
+  }
+
   &.sort-desc:after {
     .sort-icon(@icon-arial-long-arrow-down);
   }
