@@ -45,7 +45,7 @@ scout.Form.prototype._render = function($parent) {
     this.$container.hide();
     setTimeout(function() {
       this.$container.addClass('shown').show();
-      this._$glassPane.installFocusContext();
+      this._$glassPane.installFocusContext('auto');
     }.bind(this));
   }
 
@@ -115,7 +115,7 @@ scout.Form.prototype._remove = function() {
     this.menuBar.remove();
   }
   if (this._$glassPane) {
-    this._$glassPane.remove();
+    this._$glassPane.fadeOutAndRemove();
   }
 };
 

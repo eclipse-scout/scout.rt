@@ -16,7 +16,7 @@ scout.init = function(options) {
 
     // Make container focusable and install focus context
     $container.attr('tabindex', portletPartId);
-    $container.installFocusContext(false);
+    $container.installFocusContext();
     if (options.focusFirstPart && !firstPartFocusApplied) {
       firstPartFocusApplied = true;
       $container.focus();

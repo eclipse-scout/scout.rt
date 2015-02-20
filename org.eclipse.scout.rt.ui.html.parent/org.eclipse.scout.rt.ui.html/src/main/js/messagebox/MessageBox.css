@@ -14,17 +14,17 @@
   &.severity-error {
     border-top-color: @error-color;
   }
-}
 
-.messagebox.shown {
-  .animation-name (fade-slidein-top);
-  .animation-duration (0.5s);
+  &.shown {
+    .animation-name(fade-slidein-top);
+    .animation-duration(0.5s);
+  }
 }
 
 .messagebox-content {
   border-left: 1px solid @color-messagebox-border;
   border-right: 1px solid @color-messagebox-border;
-  background-color:white;
+  background-color: @desktop-background-color;
   padding: (26px - @messagebox-label-padding) / 2 26px 26px 26px;
 }
 

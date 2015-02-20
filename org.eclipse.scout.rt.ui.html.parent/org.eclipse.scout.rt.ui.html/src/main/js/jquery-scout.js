@@ -445,6 +445,14 @@
     });
   };
 
+  /**
+   * Installs listeners to the given element to ensure that the focus cannot leave it with the TAB key. Instead,
+   * when the last focusable child element is reached, the focus is set the first focusable element automatically.
+   *
+   * @param $firstFocusElement If the argument is a jQuery object, the current focus is set to this element. If the
+   *   argument is the string 'auto', the current focus is set to the first focusable element inside the parent
+   *   element. All other values don't change the current focus.
+   */
   $.fn.installFocusContext = function($firstFocusElement) {
     var $container = this;
     // Ensure $container is focusable (-1 = only programmatically)
@@ -453,7 +461,7 @@
     }
 
     // Set initial focus
-    if ($firstFocusElement === true || $firstFocusElement === undefined) {
+    if ($firstFocusElement === 'auto') {
       $firstFocusElement = $container.find(':focusable').first();
     }
     if ($firstFocusElement) {
@@ -489,6 +497,15 @@
       }
     });
     return this;
+  };
+
+  /**
+   * Calls jQuery.fadeOut() and then removes the element from the DOM.
+   * Default fade-out duration is 150 ms.
+   */
+  $.fn.fadeOutAndRemove = function(duration) {
+    duration = (duration !== undefined) ? duration : 150;
+    this.stop(true).fadeOut(duration, $.removeThis);
   };
 
 }(jQuery));

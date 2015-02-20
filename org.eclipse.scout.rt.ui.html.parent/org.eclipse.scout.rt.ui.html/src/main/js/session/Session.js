@@ -429,7 +429,7 @@ scout.Session.prototype.setBusy = function(busy) {
       // Don't show the busy glasspane immediately. Set a short timer instead (which may be
       // cancelled again if the busy state returns to false in the meantime).
       this._busyTimer = setTimeout(function() {
-        that._$busyGlasspane = scout.fields.new$Glasspane().hide().appendTo(that.$entryPoint).fadeIn(250);
+        that._$busyGlasspane = scout.fields.new$Glasspane().appendTo(that.$entryPoint);
         // Workround for Chrome: Trigger cursor change (Otherwise, the cursor is not correctly
         // updated without moving the mouse, see https://code.google.com/p/chromium/issues/detail?id=26723)
         that._$busyGlasspane.css('cursor', 'default');
@@ -454,7 +454,7 @@ scout.Session.prototype.setBusy = function(busy) {
         that._$busyGlasspane.css('cursor', 'default');
         setTimeout(function() {
           // (End workaround)
-          that._$busyGlasspane.stop().fadeOut(250, $.removeThis);
+          that._$busyGlasspane.stop().fadeOut(150, $.removeThis);
           $('.taskbar-logo').removeClass('animated');
         }, 0);
       }

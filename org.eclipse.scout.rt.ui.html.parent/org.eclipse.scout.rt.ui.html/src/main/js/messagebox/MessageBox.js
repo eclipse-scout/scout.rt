@@ -57,7 +57,7 @@ scout.MessageBox.prototype.render = function($parent) {
   setTimeout(function() {
     // Class 'shown' is used for css animation
     this.$container.addClass('shown').show();
-    this._$glassPane.installFocusContext();
+    this._$glassPane.installFocusContext('auto');
     // Prevent resizing when message-box is dragged off the viewport
     this.$container.css('min-width', this.$container.width());
   }.bind(this));
@@ -75,11 +75,9 @@ scout.MessageBox.prototype.render = function($parent) {
 
 scout.MessageBox.prototype.remove = function() {
   if (this.$container) {
-    this._$glassPane.remove();
+    this._$glassPane.fadeOutAndRemove();
     this.$container = null;
   }
-
-  document.removeEventListener('focus', this.focusListener, true);
 
   // FIXME CGU does not work, because button gets disabled when clicked (why??).
   this.previouslyFocusedElement.focus();

@@ -28,7 +28,6 @@
 }
 
 .dialog {
-
   position: absolute;
   background-color: @body-background-color;
   border: solid 1px @desktop-border-color;
@@ -38,10 +37,8 @@
   .drop-shadow;
 
   &.shown {
-     opacity:0; /* make things invisible upon start */
-     .animation (fadeIn ease-in 1);
-     .animation-duration (0.15s);
-     .animation-fill-mode (forwards);
+    .animation(fadeIn ease-in 1);
+    .animation-duration(0.15s);
   }
 
   & .title-box {
@@ -76,5 +73,4 @@
       color: @hover-color;
     }
   }
-
 }
