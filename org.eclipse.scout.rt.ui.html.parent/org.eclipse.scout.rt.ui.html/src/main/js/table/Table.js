@@ -538,7 +538,7 @@ scout.Table.prototype._installRows = function($rows) {
     }
 
     function showMenuPopup() {
-      var menuItems = that._filterMenus($selectedRows);
+      var menuItems = that._filterMenus($selectedRows, '', true);
       if (menuItems.length > 0) {
         var popup = new scout.Popup();
         popup.$origin = this.$data;
@@ -590,7 +590,7 @@ scout.Table.prototype._findHyperLink = function(event) {
   return null;
 };
 
-scout.Table.prototype._filterMenus = function($selectedRows, allowedTypes) {
+scout.Table.prototype._filterMenus = function($selectedRows, allowedTypes, onlyVisible) {
   allowedTypes = allowedTypes || [];
   if (!this.headerVisible) {
     //if no header is visible header menues should not be displayed
@@ -601,7 +601,7 @@ scout.Table.prototype._filterMenus = function($selectedRows, allowedTypes) {
   } else if ($selectedRows && $selectedRows.length > 1) {
     allowedTypes.push('Table.MultiSelection');
   }
-  return scout.menus.filter(this.menus, allowedTypes);
+  return scout.menus.filter(this.menus, allowedTypes, onlyVisible);
 };
 
 scout.Table.prototype._renderMenus = function(menus) {

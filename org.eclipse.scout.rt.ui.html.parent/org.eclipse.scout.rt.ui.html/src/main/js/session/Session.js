@@ -202,6 +202,7 @@ scout.Session.prototype._sendRequest = function(request) {
   this._requestsPendingCounter++;
 
   var that = this;
+  var success = false;
   $.ajax({
     async: !request.unload,
     type: 'POST',
@@ -212,14 +213,18 @@ scout.Session.prototype._sendRequest = function(request) {
     data: JSON.stringify(request),
     context: request
   }).done(function(data) {
+    success = true;
     that._processSuccessResponse(data);
   }).fail(function(jqXHR, textStatus, errorThrown) {
     var request = this;
     that._processErrorResponse(request, jqXHR, textStatus, errorThrown);
-  }).always(function() {
+  }).always(function(data, textStatus, errorThrown) {
     that._requestsPendingCounter--;
     if (!that.areRequestsPending() && !request.unload) {
       that.setBusy(false);
+    }
+    if (success) {
+      that._fireRequestFinished(data);
     }
   });
 };
@@ -247,18 +252,6 @@ scout.Session.prototype._processSuccessResponse = function(message) {
     $.log.debug('size of _adapterDataCache after response has been processed: ' + cacheSize);
     cacheSize = scout.objects.countProperties(this.modelAdapterRegistry);
     $.log.debug('size of modelAdapterRegistry after response has been processed: ' + cacheSize);
-  }
-
-  if (this._deferred) {
-    for (var i = 0; i < message.events.length; i++) {
-      this._deferredEventTypes.push(message.events[i].type);
-    }
-
-    if (this._requestsPendingCounter === 0) {
-      this._deferred.resolve(this._deferredEventTypes);
-      this._deferred = null;
-      this._deferredEventTypes = null;
-    }
   }
 };
 
@@ -334,6 +327,22 @@ scout.Session.prototype._processErrorJsonResponse = function(jsonResponse) {
     boxOptions.noButtonText = this.text('Ignore');
   }
   this.showFatalMessage(boxOptions);
+};
+
+scout.Session.prototype._fireRequestFinished = function(message) {
+  if (!this._deferred) {
+    return;
+  }
+
+  for (var i = 0; i < message.events.length; i++) {
+    this._deferredEventTypes.push(message.events[i].type);
+  }
+
+  if (this._requestsPendingCounter === 0) {
+    this._deferred.resolve(this._deferredEventTypes);
+    this._deferred = null;
+    this._deferredEventTypes = null;
+  }
 };
 
 scout.Session.prototype.showFatalMessage = function(options) {

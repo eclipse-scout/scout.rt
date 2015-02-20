@@ -807,6 +807,28 @@ describe("Table", function() {
       expect($menu.length).toBeTruthy();
     });
 
+    it("context menu only shows visible menus", function() {
+      var model = helper.createModelFixture(2, 2);
+      var table = helper.createTable(model);
+      table.render(session.$entryPoint);
+
+      var menuModel = helper.createMenuModel('menu');
+      var menuModel2 = helper.createMenuModel('menu');
+      menuModel2.visible = false;
+
+      // register adapter
+      helper.menuHelper.createMenu(menuModel);
+      helper.menuHelper.createMenu(menuModel2);
+      table.menus = [session.getModelAdapter(menuModel.id, menuModel2.id)];
+      var $row0 = table.$data.children('.table-row').eq(0);
+      $row0.triggerContextMenu();
+
+      sendQueuedAjaxCalls();
+
+      var $menu = helper.getDisplayingContextMenu(table);
+      expect($menu.find('.menu-item').length).toBe(1);
+    });
+
     it("and sends aboutToShow for every menu item", function() {
       var model = helper.createModelFixture(2, 2);
       var table = helper.createTable(model);
