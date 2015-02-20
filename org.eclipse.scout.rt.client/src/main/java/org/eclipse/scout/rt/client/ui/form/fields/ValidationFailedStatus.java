@@ -16,6 +16,7 @@ package org.eclipse.scout.rt.client.ui.form.fields;
  * status of this type can safely be cleared.
  */
 public class ValidationFailedStatus extends ScoutFieldStatus {
+  private static final long serialVersionUID = 1L;
 
   public ValidationFailedStatus(String message) {
     this(message, WARNING);

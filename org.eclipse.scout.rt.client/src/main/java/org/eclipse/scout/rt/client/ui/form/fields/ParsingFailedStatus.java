@@ -10,13 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields;
 
-
 /**
  * Marker subclass so we know inside setValue that a previous parse failure was
  * catched inside the local parse method and can safely be cleared once parsing
  * succeeded.
  */
 public class ParsingFailedStatus extends ScoutFieldStatus {
+  private static final long serialVersionUID = 1L;
   private final String m_parseInputString;
 
   public ParsingFailedStatus(String message, String parseInputString) {

@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.shared.AbstractIcons;
  * Status type for form fields with additional property "iconId"
  */
 public class ScoutFieldStatus extends Status implements IFieldStatus {
+  private static final long serialVersionUID = 1L;
   private final String m_iconId;
 
   public ScoutFieldStatus(String message, int severity) {

@@ -45,7 +45,7 @@ public class JobExecutionException extends ProcessingException {
    * @return <code>true</code> to indicate that the result of a job could not be retrieved because being cancelled.
    */
   public boolean isCancellation() {
-    return getStatus() != null && (getStatus().getCause() instanceof CancellationException);
+    return getStatus() != null && (getStatus().getException() instanceof CancellationException);
   }
 
   /**
@@ -53,7 +53,7 @@ public class JobExecutionException extends ProcessingException {
    *         while waiting for that job to complete.
    */
   public boolean isTimeout() {
-    return getStatus() != null && (getStatus().getCause() instanceof TimeoutException);
+    return getStatus() != null && (getStatus().getException() instanceof TimeoutException);
   }
 
   /**
@@ -61,7 +61,7 @@ public class JobExecutionException extends ProcessingException {
    *         queue slots are available, or upon shutdown of the job manager, or if the job is already running.
    */
   public boolean isRejection() {
-    return getStatus() != null && (getStatus().getCause() instanceof RejectedExecutionException);
+    return getStatus() != null && (getStatus().getException() instanceof RejectedExecutionException);
   }
 
   /**

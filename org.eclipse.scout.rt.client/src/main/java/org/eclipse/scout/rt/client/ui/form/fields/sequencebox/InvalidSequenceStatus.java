@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.ScoutFieldStatus;
  * cleared once the sequence is valid again.
  */
 public class InvalidSequenceStatus extends ScoutFieldStatus {
+  private static final long serialVersionUID = 1L;
 
   public InvalidSequenceStatus(String message) {
     super(message, ERROR);

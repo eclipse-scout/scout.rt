@@ -64,6 +64,17 @@ public class ProcessingStatusTest {
     assertMatchesOnly(m_okStatus, IProcessingStatus.OK, getKnownStatuses());
   }
 
+  @Test
+  public void testToString() {
+    final String title = "title";
+    final String body = "body";
+    final String exceptionMessage = "ex";
+    assertTrue(m_infoStatus.toString().contains("INFO"));
+    String fullStatus = new ProcessingStatus(title, body, new ProcessingException(exceptionMessage), 0, IProcessingStatus.FATAL).toString();
+    assertTrue(fullStatus.contains(title));
+    assertTrue(fullStatus.contains(body));
+  }
+
   @SuppressWarnings("deprecation")
   private int[] getKnownStatuses() {
     return new int[]{IStatus.INFO, IStatus.ERROR, IStatus.WARNING, IProcessingStatus.FATAL, IProcessingStatus.CANCEL, IProcessingStatus.OK};

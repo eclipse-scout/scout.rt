@@ -130,6 +130,10 @@ public class ProcessingStatus extends Status implements IProcessingStatus, Seria
     return false;
   }
 
+  /**
+   * @deprecated use {@link #getException()}
+   */
+  @Deprecated
   @Override
   public Throwable getCause() {
     return m_cause;
@@ -257,7 +261,7 @@ public class ProcessingStatus extends Status implements IProcessingStatus, Seria
       }
     }
     sb.append(" ");
-    sb.append(m_messageBody);
+    sb.append(getMessage());
     if (m_cause != null) {
       sb.append(" ");
       sb.append(m_cause);

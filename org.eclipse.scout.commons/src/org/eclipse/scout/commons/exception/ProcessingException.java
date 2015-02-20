@@ -100,7 +100,7 @@ public class ProcessingException extends Exception implements Serializable {
    *         become <code>true</code>.
    */
   public boolean isInterruption() {
-    return m_status != null && (m_status.getCause() instanceof InterruptedException);
+    return m_status != null && (m_status.getException() instanceof InterruptedException);
   }
 
   @Override
@@ -109,7 +109,7 @@ public class ProcessingException extends Exception implements Serializable {
       return "";
     }
 
-    if (m_status.getCause() == this) {
+    if (m_status.getException() == this) {
       return "";
     }
 
