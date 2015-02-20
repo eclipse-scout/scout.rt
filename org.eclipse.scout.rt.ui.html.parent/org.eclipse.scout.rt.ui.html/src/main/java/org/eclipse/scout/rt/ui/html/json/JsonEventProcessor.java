@@ -34,9 +34,14 @@ public class JsonEventProcessor {
     ClientSyncJob job = new ClientSyncJob("processEvents", m_jsonSession.getClientSession()) {
       @Override
       protected void runVoid(IProgressMonitor monitor) throws Throwable {
-        for (final JsonEvent event : request.getEvents()) {
-          processEvent(event, response);
-        }
+        ClientJobUtility.runAsSubject(new Runnable() {
+          @Override
+          public void run() {
+            for (final JsonEvent event : request.getEvents()) {
+              processEvent(event, response);
+            }
+          }
+        });
       }
     };
     job.schedule();

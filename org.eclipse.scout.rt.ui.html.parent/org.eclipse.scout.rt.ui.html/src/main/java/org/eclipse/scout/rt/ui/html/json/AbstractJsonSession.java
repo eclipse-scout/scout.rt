@@ -27,6 +27,8 @@ import javax.servlet.http.HttpSessionBindingListener;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.holders.Holder;
+import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.nls.NlsLocale;
@@ -511,10 +513,8 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
       if (jsonRequest.isStartupRequest()) {
         getJsonClientSession().processRequestLocale(httpRequest.getLocale());
       }
-      JsonResponse jsonResponse = currentJsonResponse();
-      getJsonEventProcessor().processEvents(m_currentJsonRequest, jsonResponse);
-
-      return jsonResponse.toJson();
+      getJsonEventProcessor().processEvents(m_currentJsonRequest, currentJsonResponse());
+      return jsonResponseToJson();
     }
     finally {
       // FIXME CGU really finally? what if exception occurs and some events are already delegated to the model?
@@ -531,6 +531,31 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
         LOG.debug("Adapter count after request: " + m_jsonAdapterRegistry.getJsonAdapterCount());
       }
     }
+  }
+
+  protected JSONObject jsonResponseToJson() {
+    final IHolder<JSONObject> resultHolder = new Holder<JSONObject>(JSONObject.class);
+    ClientSyncJob job = new ClientSyncJob("processEvents", getClientSession()) {
+      @Override
+      protected void runVoid(IProgressMonitor monitor) throws Throwable {
+        ClientJobUtility.runAsSubject(new Runnable() {
+          @Override
+          public void run() {
+            JSONObject result = currentJsonResponse().toJson();
+            resultHolder.setValue(result);
+          }
+        });
+      }
+    };
+    job.schedule();
+    ClientJobUtility.waitForSyncJob(job);
+    try {
+      job.throwOnError();
+    }
+    catch (ProcessingException e) {
+      throw new JsonException(e); // TODO BSH Exception | Try to eliminate this pattern (5 others in html bundle)
+    }
+    return resultHolder.getValue();
   }
 
   @Override

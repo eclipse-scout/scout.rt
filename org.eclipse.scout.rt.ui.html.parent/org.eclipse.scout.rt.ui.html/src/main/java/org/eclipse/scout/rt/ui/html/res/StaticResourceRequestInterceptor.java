@@ -22,15 +22,21 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.FileUtility;
 import org.eclipse.scout.commons.annotations.Priority;
+import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.holders.Holder;
+import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
 import org.eclipse.scout.rt.client.ui.IIconLocator;
 import org.eclipse.scout.rt.shared.data.basic.BinaryResource;
 import org.eclipse.scout.rt.ui.html.AbstractUiServlet;
 import org.eclipse.scout.rt.ui.html.Activator;
+import org.eclipse.scout.rt.ui.html.ClientJobUtility;
 import org.eclipse.scout.rt.ui.html.IServletRequestInterceptor;
 import org.eclipse.scout.rt.ui.html.StreamUtility;
 import org.eclipse.scout.rt.ui.html.UiHints;
@@ -38,6 +44,7 @@ import org.eclipse.scout.rt.ui.html.cache.HttpCacheObject;
 import org.eclipse.scout.rt.ui.html.cache.IHttpCacheControl;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
+import org.eclipse.scout.rt.ui.html.json.JsonException;
 import org.eclipse.scout.rt.ui.html.json.JsonRequest;
 import org.eclipse.scout.rt.ui.html.json.JsonUtility;
 import org.eclipse.scout.rt.ui.html.script.ScriptFileBuilder;
@@ -178,9 +185,32 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
     if (jsonSession == null) {
       return null;
     }
-    IIconLocator iconLocator = jsonSession.getClientSession().getIconLocator();
-    String imageId = pathInfo.substring(pathInfo.lastIndexOf('/') + 1);
-    IconSpec iconSpec = iconLocator.getIconSpec(imageId);
+    final IIconLocator iconLocator = jsonSession.getClientSession().getIconLocator();
+    final String imageId = pathInfo.substring(pathInfo.lastIndexOf('/') + 1);
+
+    final IHolder<IconSpec> iconSpecHolder = new Holder<IconSpec>(IconSpec.class);
+    ClientSyncJob job = new ClientSyncJob("processEvents", jsonSession.getClientSession()) {
+      @Override
+      protected void runVoid(IProgressMonitor monitor) throws Throwable {
+        ClientJobUtility.runAsSubject(new Runnable() {
+          @Override
+          public void run() {
+            IconSpec iconSpec = iconLocator.getIconSpec(imageId);
+            iconSpecHolder.setValue(iconSpec);
+          }
+        });
+      }
+    };
+    job.schedule();
+    ClientJobUtility.waitForSyncJob(job);
+    try {
+      job.throwOnError();
+    }
+    catch (ProcessingException e) {
+      throw new JsonException(e); // TODO BSH Exception | Try to eliminate this pattern (5 others in html bundle)
+    }
+    IconSpec iconSpec = iconSpecHolder.getValue();
+
     if (iconSpec != null) {
       // cache: use max-age caching for at most 4 hours
       BinaryResource content = new BinaryResource(iconSpec.getName(), detectContentType(servlet, pathInfo), iconSpec.getContent(), System.currentTimeMillis());
