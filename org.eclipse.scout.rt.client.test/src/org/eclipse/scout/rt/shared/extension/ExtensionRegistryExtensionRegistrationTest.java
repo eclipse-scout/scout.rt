@@ -31,9 +31,12 @@ import org.eclipse.scout.rt.shared.extension.fixture.NameFieldExtension;
 import org.eclipse.scout.rt.shared.extension.fixture.NestedBasicFormExtension;
 import org.eclipse.scout.rt.shared.extension.fixture.PojoContainerExtension;
 import org.eclipse.scout.rt.shared.extension.fixture.StaticPojoContainerExtension;
+import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+@RunWith(ScoutPlatformTestRunner.class)
 public class ExtensionRegistryExtensionRegistrationTest {
 
   private ExtensionRegistryTest m_clientExtensionManager;

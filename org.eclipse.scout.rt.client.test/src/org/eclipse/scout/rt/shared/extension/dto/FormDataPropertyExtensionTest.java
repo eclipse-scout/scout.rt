@@ -24,15 +24,12 @@ import org.eclipse.scout.rt.shared.extension.dto.fixture.TreeBoxPropertyExtensio
 import org.eclipse.scout.rt.shared.extension.dto.fixture.TreeBoxToTemplateField;
 import org.eclipse.scout.rt.shared.extension.dto.fixture.TreeBoxToTemplateFieldData;
 import org.eclipse.scout.service.SERVICES;
-import org.eclipse.scout.testing.client.runner.ScoutClientTestRunner;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 /**
  *
  */
-@RunWith(ScoutClientTestRunner.class)
 public class FormDataPropertyExtensionTest extends AbstractLocalExtensionTestCase {
   @Test
   public void testPropertyExtensionFormFieldExplicit() throws Exception {
