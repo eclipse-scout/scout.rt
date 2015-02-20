@@ -58,9 +58,9 @@ scout.TableKeystrokeAdapter = function(table) {
       return false;
     },
     handle: function(event) {
-      var $newRowSelection, $prev, i, rowIds;
+      var $newRowSelection, $prev, $next, i, rowIds;
       var keycode = event.which;
-      var $rowsAll = that._table.$rows();
+      var $rowsAll = that._table.$filteredRows();
       var $rowsSelected = that._table.$selectedRows();
 
       if (keycode === scout.keys.SPACE) {
@@ -77,7 +77,7 @@ scout.TableKeystrokeAdapter = function(table) {
       // up: move up
       if (keycode === scout.keys.UP) {
         if ($rowsSelected.length > 0) {
-          $newRowSelection = $rowsSelected.first().prev('.table-row');
+          $newRowSelection = that._table.$prevFilteredRows($rowsSelected.first()).first();
         } else {
           $newRowSelection = $rowsAll.last();
         }
@@ -86,7 +86,7 @@ scout.TableKeystrokeAdapter = function(table) {
       // down: move down
       if (keycode === scout.keys.DOWN) {
         if ($rowsSelected.length > 0) {
-          $newRowSelection = $rowsSelected.last().next('.table-row');
+          $newRowSelection = that._table.$nextFilteredRows($rowsSelected.last()).first();
         } else {
           $newRowSelection = $rowsAll.first();
         }
@@ -105,7 +105,7 @@ scout.TableKeystrokeAdapter = function(table) {
       // pgup: jump up
       if (keycode === scout.keys.PAGE_UP) {
         if ($rowsSelected.length > 0) {
-          $prev = $rowsSelected.first().prevAll();
+          $prev = that._table.$prevFilteredRows($rowsSelected.first())
           if ($prev.length > 10) {
             $newRowSelection = $prev.eq(10);
           } else {
@@ -119,9 +119,9 @@ scout.TableKeystrokeAdapter = function(table) {
       // pgdn: jump down
       if (keycode === scout.keys.PAGE_DOWN) {
         if ($rowsSelected.length > 0) {
-          $prev = $rowsSelected.last().nextAll();
-          if ($prev.length > 10) {
-            $newRowSelection = $prev.eq(10);
+          $next = that._table.$nextFilteredRows($rowsSelected.last())
+          if ($next.length > 10) {
+            $newRowSelection = $next.eq(10);
           } else {
             $newRowSelection = $rowsAll.last();
           }
@@ -137,7 +137,7 @@ scout.TableKeystrokeAdapter = function(table) {
         if (event.shiftKey) {
           $newRowSelection = $rowsSelected.add($newRowSelection);
         }
-        for (i = 0; typeof($newRowSelection[i]) !== 'undefined'; i++) {
+        for (i = 0; $newRowSelection[i] !== undefined; i++) {
           rowIds.push($newRowSelection[i].getAttribute('id'));
         }
         that._table.selectRowsByIds(rowIds);

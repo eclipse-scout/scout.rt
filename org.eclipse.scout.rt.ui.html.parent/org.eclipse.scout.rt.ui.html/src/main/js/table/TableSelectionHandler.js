@@ -30,7 +30,7 @@ scout.TableSelectionHandler.prototype._onRowsDrawn = function($rows) {
       add = true,
       first,
       $selectedRows = that.table.$selectedRows(),
-      $allRows = that.table.$rows(),
+      $allRows = that.table.$filteredRows(),
       selectionChanged = false;
 
     // click without ctrl always starts new selection, with ctrl toggle
@@ -140,21 +140,23 @@ scout.TableSelectionHandler.prototype.dataDrawn = function() {
  * Adds the css classes for the selection border based on the selected rows.
  */
 scout.TableSelectionHandler.prototype._drawSelectionBorder = function($selectedRows) {
+  var that = this;
   $selectedRows.each(function() {
-    var hasPrev = $(this).prevAll('div:not(.invisible):first').isSelected();
-    var hasNext = $(this).nextAll('div:not(.invisible):first').isSelected();
+    var $row = $(this);
+    var hasPrev = that.table.$prevFilteredRows($row).first().isSelected();
+    var hasNext = that.table.$nextFilteredRows($row).first().isSelected();
 
     if (hasPrev && hasNext) {
-      $(this).addClass('select-middle');
+      $row.addClass('select-middle');
     }
     if (!hasPrev && hasNext) {
-      $(this).addClass('select-top');
+      $row.addClass('select-top');
     }
     if (hasPrev && !hasNext) {
-      $(this).addClass('select-bottom');
+      $row.addClass('select-bottom');
     }
     if (!hasPrev && !hasNext) {
-      $(this).addClass('select-single');
+      $row.addClass('select-single');
     }
   });
 };

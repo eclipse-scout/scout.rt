@@ -1090,6 +1090,22 @@ scout.Table.prototype.$rows = function(includeSumRows) {
   return this.$data.find(selector);
 };
 
+scout.Table.prototype.$filteredRows = function(includeSumRows) {
+  var selector = '.table-row:not(.invisible)';
+  if (includeSumRows) {
+    selector += ', .table-row-sum:not(.invisible)';
+  }
+  return this.$data.find(selector);
+};
+
+scout.Table.prototype.$prevFilteredRows = function($row) {
+  return $row.prevAll('.table-row:not(.invisible)');
+};
+
+scout.Table.prototype.$nextFilteredRows = function($row) {
+  return $row.nextAll('.table-row:not(.invisible)');
+};
+
 scout.Table.prototype.$sumRows = function() {
   return this.$data.find('.table-row-sum');
 };
