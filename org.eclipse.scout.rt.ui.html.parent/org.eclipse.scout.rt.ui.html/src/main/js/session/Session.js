@@ -225,28 +225,25 @@ scout.Session.prototype._sendRequest = function(request) {
 };
 
 scout.Session.prototype._processSuccessResponse = function(message) {
-  var cacheSize;
-  // Normalize
-  if (message.adapterData === undefined) {
-    message.adapterData = {};
-  }
-  if (message.events === undefined) {
-    message.events = {};
-  }
-
   this._queuedRequest = null;
 
-  this._copyAdapterData(message.adapterData);
-  this.processingEvents = true;
-  try {
-    this._processEvents(message.events);
-    this.layoutValidator.validate();
-  } finally {
-    this.processingEvents = false;
+  message.adapterData = message.adapterData || {};
+  message.events = message.events || {};
+  if (!$.isEmptyObject(message.adapterData)) {
+    this._copyAdapterData(message.adapterData);
+  }
+  if (!$.isEmptyObject(message.events)) {
+    this.processingEvents = true;
+    try {
+      this._processEvents(message.events);
+      this.layoutValidator.validate();
+    } finally {
+      this.processingEvents = false;
+    }
   }
 
   if ($.log.isDebugEnabled()) {
-    cacheSize = scout.objects.countProperties(this._adapterDataCache);
+    var cacheSize = scout.objects.countProperties(this._adapterDataCache);
     $.log.debug('size of _adapterDataCache after response has been processed: ' + cacheSize);
     cacheSize = scout.objects.countProperties(this.modelAdapterRegistry);
     $.log.debug('size of modelAdapterRegistry after response has been processed: ' + cacheSize);
@@ -425,7 +422,14 @@ scout.Session.prototype.setBusy = function(busy) {
       // Don't show the busy glasspane immediately. Set a short timer instead (which may be
       // cancelled again if the busy state returns to false in the meantime).
       this._busyTimer = setTimeout(function() {
-        that._$busyGlasspane = that.$entryPoint.appendDiv('glasspane busy');
+        that._$busyGlasspane = that.$entryPoint.appendDiv('glasspane busy').hide().fadeIn(250);
+        // Workround for Chrome: Trigger cursor change (Otherwise, the cursor is not correctly
+        // updated without moving the mouse, see https://code.google.com/p/chromium/issues/detail?id=26723)
+        that._$busyGlasspane.css('cursor', 'default');
+        setTimeout(function() {
+          that._$busyGlasspane.css('cursor', 'wait');
+        }, 0);
+        // (End workaround)
         $('.taskbar-logo').addClass('animated');
       }, 1000);
     }
@@ -438,8 +442,14 @@ scout.Session.prototype.setBusy = function(busy) {
       clearTimeout(that._busyTimer);
       // If the timer action was executed and the glasspane is showing, we have to remove it
       if (that._$busyGlasspane) {
-        that._$busyGlasspane.remove();
-        $('.taskbar-logo').removeClass('animated');
+        // Workround for Chrome: Before removing the glasspane, reset the cursor. Therefore,
+        // the actual remove has to be inside setTimeout()
+        that._$busyGlasspane.css('cursor', 'default');
+        setTimeout(function() {
+          // (End workaround)
+          that._$busyGlasspane.stop().fadeOut(250, $.removeThis);
+          $('.taskbar-logo').removeClass('animated');
+        }, 0);
       }
     }
   }
