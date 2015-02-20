@@ -23,6 +23,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.testing.shared.services.common.exceptionhandler.ProcessingRuntimeExceptionUnwrappingStatement;
 import org.eclipse.scout.testing.client.DefaultTestClientSessionProvider;
 import org.eclipse.scout.testing.client.ITestClientSessionProvider;
@@ -52,6 +53,7 @@ public class ScoutClientTestRunner extends BlockJUnit4ClassRunner {
   private static final IClientTestEnvironment FACTORY;
 
   static {
+    ((Platform) Platform.get()).ensureStarted();
     LOG = ScoutLogManager.getLogger(ScoutClientTestRunner.class);
     FACTORY = createClientTestEnvironmentFactory();
 

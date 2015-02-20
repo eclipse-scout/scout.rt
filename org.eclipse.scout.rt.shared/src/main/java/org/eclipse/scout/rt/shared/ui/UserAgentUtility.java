@@ -61,13 +61,11 @@ public final class UserAgentUtility {
   }
 
   public static UserAgent getCurrentUserAgent() {
-    ISessionService service = SERVICES.getService(ISessionService.class);
-    if (service == null) {
+    if (ISession.CURRENT.get() == null) {
       LOG.warn("No session service found! Returning default user agent object.");
       return UserAgent.createDefault();
     }
-
-    ISession session = service.getCurrentSession();
+    ISession session = SERVICES.getService(ISessionService.class).getCurrentSession();
     if (session == null) {
       LOG.warn("No session found! Returning default user agent object.");
       return UserAgent.createDefault();

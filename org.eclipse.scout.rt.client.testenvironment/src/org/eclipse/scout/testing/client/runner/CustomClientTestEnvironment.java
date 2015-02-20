@@ -14,7 +14,7 @@ import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 
 /**
  * Injection of Test Environment settings
- * 
+ *
  * @author amo
  */
 public class CustomClientTestEnvironment implements IClientTestEnvironment {
