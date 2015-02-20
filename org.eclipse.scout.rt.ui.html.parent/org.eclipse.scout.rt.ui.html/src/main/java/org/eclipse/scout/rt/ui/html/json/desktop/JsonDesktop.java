@@ -272,7 +272,7 @@ public class JsonDesktop<T extends IDesktop> extends AbstractJsonPropertyObserve
     String path = BinaryResourceUrlUtility.createCallbackUrl(this, handler.getResource().getFilename());
     JSONObject json = new JSONObject();
     putProperty(json, "path", path);
-    putProperty(json, "urlTarget", UrlTarget.BLANK);
+    putProperty(json, "urlTarget", UrlTarget.SELF);
     addActionEvent("openUrlInBrowser", json);
   }
 

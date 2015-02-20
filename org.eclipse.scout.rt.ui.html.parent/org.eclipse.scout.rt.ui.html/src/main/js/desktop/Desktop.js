@@ -234,11 +234,14 @@ scout.Desktop.prototype._showForm = function(form) {
 };
 
 scout.Desktop.prototype._openUrlInBrowser = function(event) {
-  $.log.debug('(Desktop#_openUrlInBrowser) path=' + event.path + ' targetUrl=' + event.targetUrl);
-  if (event.path) {
-    //FIXME imo: window.open clears the screen
-    //window.open(event.path);
-    window.location.href=event.path;
+  $.log.debug('(Desktop#_openUrlInBrowser) path=' + event.path + ' urlTarget=' + event.urlTarget);
+  if (!event.path) {
+    return;
+  }
+  if (event.urlTarget === 'SELF') {
+    window.location.href = event.path;
+  } else {
+    window.open(event.path);
   }
 };
 
@@ -318,7 +321,6 @@ scout.Desktop.prototype._onModelFormRemoved = function(event) {
 scout.Desktop.prototype._isDialog = function(form) {
   return form.displayHint === 'dialog';
 };
-
 
 scout.Desktop.prototype.onModelAction = function(event) {
   var form;
