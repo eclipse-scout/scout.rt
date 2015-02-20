@@ -67,12 +67,9 @@ public final class TestingUtility {
     }
     List<IBean<?>> registeredBeans = new ArrayList<>();
     for (Object service : services) {
-      Bean<Object> bean = new Bean<>(service);
-      bean.addAnnotation(DynamicAnnotations.createPriority(priority));
-      bean.addAnnotation(DynamicAnnotations.createCreateImmediately());
+      Bean<Object> bean = new Bean<>(service, CollectionUtility.arrayList(DynamicAnnotations.createApplicationScoped(), DynamicAnnotations.createPriority(priority)));
       OBJ.register(bean);
       registeredBeans.add(bean);
-
     }
     return registeredBeans;
   }

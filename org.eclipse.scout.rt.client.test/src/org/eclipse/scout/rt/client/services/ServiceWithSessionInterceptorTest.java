@@ -58,11 +58,11 @@ public class ServiceWithSessionInterceptorTest {
    *
    */
   protected void runInClientJob() {
-    OBJ.NEW(TestService.class).doit();
+    OBJ.NEW(ITestService.class).doit();
 
   }
 
-  public static interface ITestService extends IService {
+  private static interface ITestService extends IService {
 
     /**
      *
@@ -73,7 +73,7 @@ public class ServiceWithSessionInterceptorTest {
 
   @SessionRequired(IClientSession.class)
   @ApplicationScoped
-  public static class TestService extends AbstractService implements ITestService {
+  private static class TestService extends AbstractService implements ITestService {
     @Override
     public void doit() {
 

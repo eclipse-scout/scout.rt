@@ -13,9 +13,11 @@ package org.eclipse.scout.rt.platform.cdi;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Inherited;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.scout.commons.Assertions;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.cdi.internal.BeanContext;
@@ -25,6 +27,7 @@ import org.eclipse.scout.rt.platform.cdi.internal.BeanInstanceCreator;
  *
  */
 public class Bean<T> implements IBean<T> {
+  @SuppressWarnings("unused")
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(Bean.class);
 
   private final Class<? extends T> m_beanClazz;
@@ -39,10 +42,17 @@ public class Bean<T> implements IBean<T> {
     readStaticAnnoations(clazz, false);
   }
 
-  @SuppressWarnings("unchecked")
   public Bean(T instance) {
+    this(instance, CollectionUtility.<Annotation> emptyArrayList());
+  }
+
+  @SuppressWarnings("unchecked")
+  public Bean(T instance, List<Annotation> beanAnnotations) {
     this((Class<? extends T>) instance.getClass());
-    if (m_beanClazz.getAnnotation(ApplicationScoped.class) == null) {
+    for (Annotation annotation : beanAnnotations) {
+      addAnnotation(annotation);
+    }
+    if (getBeanAnnotation(ApplicationScoped.class) == null) {
       throw new IllegalArgumentException(String.format("Instance constructor only allows application scoped instances. Class '%s' does not have the '%s' annotation.", m_beanClazz.getName(), ApplicationScoped.class.getName()));
     }
     m_instance = instance;

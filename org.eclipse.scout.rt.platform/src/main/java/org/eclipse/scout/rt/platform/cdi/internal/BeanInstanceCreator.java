@@ -51,29 +51,39 @@ public class BeanInstanceCreator<T> {
   }
 
   public T create() {
-    return create(getBean().getBeanClazz());
+    return createAndInitialize(getBean().getBeanClazz());
   }
 
-  public static <T> T create(Class<T> beanClazz) {
+  public static <T> T createAndInitialize(Class<T> beanClazz) {
     T instance = null;
     try {
-      Constructor<? extends T> constructor = findConstructor(beanClazz);
-      if (constructor != null) {
-        Object[] parameters = lookupParameters(constructor.getParameterTypes());
-        constructor.setAccessible(true);
-        instance = constructor.newInstance(parameters);
-        // inject members
-        injectMembers(instance);
-        // post instantiate
-        callPostConstruct(instance);
-      }
-      else {
-        LOG.error(String.format("No constructor found of '%s'. Ensure to have an empty constructor or an @Inject annotated constructor.", beanClazz.getName()));
-      }
+      instance = Assertions.assertNotNull(createInstance(beanClazz));
+      instance = initializeInstance(instance);
     }
     catch (Exception e) {
       LOG.error(String.format("Could not instantiate '%s'.", beanClazz), e);
     }
+    return instance;
+  }
+
+  public static <T> T createInstance(Class<T> clazz) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+    Constructor<? extends T> constructor = findConstructor(clazz);
+    if (constructor != null) {
+      Object[] parameters = lookupParameters(constructor.getParameterTypes());
+      constructor.setAccessible(true);
+      return constructor.newInstance(parameters);
+    }
+    else {
+      LOG.error(String.format("No constructor found of '%s'. Ensure to have an empty constructor or an @Inject annotated constructor.", clazz.getName()));
+      return null;
+    }
+  }
+
+  public static <T> T initializeInstance(T instance) {
+    // inject members
+    injectMembers(instance);
+    // post instantiate
+    callPostConstruct(instance);
     return instance;
   }
 
