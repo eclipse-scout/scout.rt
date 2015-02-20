@@ -1,6 +1,8 @@
 scout.sessions = [];
 
 scout.init = function(options) {
+  this._installGlobalJavascriptErrorHandler();
+
   var tabId = scout.dates.timestamp();
   options = options || {};
 
@@ -60,4 +62,20 @@ scout.inherits = function(childCtor, parentCtor) {
   childCtor.prototype = Object.create(parentCtor.prototype);
   childCtor.prototype.constructor = childCtor;
   childCtor.parent = parentCtor;
+};
+
+scout._installGlobalJavascriptErrorHandler = function() {
+  window.onerror = function(errorMessage, fileName, lineNumber) {
+    // TODO Log error to server?
+    $.log.error(errorMessage + ' at ' + fileName + ':' + lineNumber);
+    // FIXME Improve this!
+    if (scout.sessions.length > 0) {
+      var session = scout.sessions[0];
+      session.showFatalMessage({
+        title: 'Internal UI Error',
+        text: errorMessage,
+        yesButtonText: 'OK'
+      });
+    }
+  };
 };

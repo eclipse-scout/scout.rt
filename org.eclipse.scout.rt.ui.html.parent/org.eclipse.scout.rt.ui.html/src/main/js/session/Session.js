@@ -201,9 +201,7 @@ scout.Session.prototype._sendRequest = function(request) {
   }
   this._requestsPendingCounter++;
 
-  var that = this;
-  var success = false;
-  $.ajax({
+  var ajaxOptions = {
     async: !request.unload,
     type: 'POST',
     dataType: 'json',
@@ -212,13 +210,31 @@ scout.Session.prototype._sendRequest = function(request) {
     url: this.url,
     data: JSON.stringify(request),
     context: request
-  }).done(function(data) {
-    success = true;
-    that._processSuccessResponse(data);
-  }).fail(function(jqXHR, textStatus, errorThrown) {
-    var request = this;
-    that._processErrorResponse(request, jqXHR, textStatus, errorThrown);
-  }).always(function(data, textStatus, errorThrown) {
+  };
+
+  var that = this;
+  var success = false;
+  var jsError;
+
+  function onAjaxDone(data) {
+    try {
+      that._processSuccessResponse(data);
+      success = true;
+    } catch (err) {
+      jsError = jsError || err;
+    }
+  }
+
+  function onAjaxFail(jqXHR, textStatus, errorThrown) {
+    try {
+      var request = this;
+      that._processErrorResponse(request, jqXHR, textStatus, errorThrown);
+    } catch (err) {
+      jsError = jsError || err;
+    }
+  }
+
+  function onAjaxAlways(data, textStatus, errorThrown) {
     that._requestsPendingCounter--;
     if (!that.areRequestsPending() && !request.unload) {
       that.setBusy(false);
@@ -226,7 +242,13 @@ scout.Session.prototype._sendRequest = function(request) {
     if (success) {
       that._fireRequestFinished(data);
     }
-  });
+    // Throw previously catched error
+    if (jsError) {
+      throw jsError;
+    }
+  }
+
+  $.ajax(ajaxOptions).done(onAjaxDone).fail(onAjaxFail).always(onAjaxAlways);
 };
 
 scout.Session.prototype._processSuccessResponse = function(message) {
@@ -314,13 +336,11 @@ scout.Session.prototype._processErrorJsonResponse = function(jsonResponse) {
     // there are no texts yet if session startup failed
     boxOptions.title = '';
     boxOptions.text = jsonResponse.errorMessage;
-    boxOptions.yesButtonText = "Retry";
-  }
-  else if (jsonResponse.errorCode === 10) { // JsonResponse.ERR_SESSION_TIMEOUT
+    boxOptions.yesButtonText = 'Retry';
+  } else if (jsonResponse.errorCode === 10) { // JsonResponse.ERR_SESSION_TIMEOUT
     boxOptions.title = this.optText('SessionTimeout', boxOptions.title);
     boxOptions.text = this.optText('SessionExpiredMsg', boxOptions.text);
-  }
-  else if (jsonResponse.errorCode === 20) { // JsonResponse.ERR_UI_PROCESSING
+  } else if (jsonResponse.errorCode === 20) { // JsonResponse.ERR_UI_PROCESSING
     boxOptions.title = this.optText('UiProcessingErrorTitle', boxOptions.title);
     boxOptions.text = this.optText('UiProcessingErrorText', boxOptions.text);
     boxOptions.actionText = this.optText('UiProcessingErrorAction', boxOptions.actionText);
@@ -441,8 +461,7 @@ scout.Session.prototype.setBusy = function(busy) {
       }, 1000);
     }
     this._busyCounter++;
-  }
-  else {
+  } else {
     this._busyCounter--;
     if (this._busyCounter === 0) {
       // Clear any pending timers
@@ -507,7 +526,7 @@ scout.Session.prototype.onModelAction = function(event) {
 
 scout.Session.prototype._onLocaleChanged = function(event) {
   this.locale = new scout.Locale(event);
-// FIXME inform components to reformat display text?
+  // FIXME inform components to reformat display text?
 };
 
 scout.Session.prototype._onInitialized = function(event) {
