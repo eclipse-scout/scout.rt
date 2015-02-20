@@ -20,7 +20,7 @@ scout.MessageBox.prototype.render = function($parent) {
     throw new Error('Missing argument $parent');
   }
 
-  this._$glassPane = $parent.appendDiv('glasspane');
+  this._$glassPane = scout.fields.new$Glasspane().appendTo($parent);
   this.$container = this._$glassPane.appendDiv('messagebox').hide();
 
   var $handle = this.$container.appendDiv('drag-handle');
@@ -57,23 +57,10 @@ scout.MessageBox.prototype.render = function($parent) {
   setTimeout(function() {
     // Class 'shown' is used for css animation
     this.$container.addClass('shown').show();
+    this._$glassPane.installFocusContext();
     // Prevent resizing when message-box is dragged off the viewport
     this.$container.css('min-width', this.$container.width());
-    // Focus the default button
-    if (this.$defaultButton) {
-      this.$defaultButton.focus();
-    }
   }.bind(this));
-
-  // FIXME CGU this solution does not allow for backwards tabbing (shift+tab) on the first button. Better do it like jquery ui (listen for keydown events)?
-  // Also make more generic to make it reusable by other elements (regular dialog, form)
-  this.focusListener = function(event) {
-    if (!this.$container[0].contains(event.target)) {
-      event.stopPropagation();
-      this.$container.find('button').eq(0).focus();
-    }
-  }.bind(this);
-  document.addEventListener('focus', this.focusListener, true);
 
   // Render properties
   this._renderTitle(this.modelAdapter.title);

@@ -300,8 +300,8 @@ scout.Session.prototype._processErrorJsonResponse = function(jsonResponse) {
     text: jsonResponse.errorMessage,
     yesButtonText: this.text('Reload'),
     yesButtonAction: function() {
-      // Hide everything
-      this.$entryPoint.html('');
+      // Hide everything (on entire page, not only $entryPoint)
+      $('body').html('');
       // Reload window (using setTimeout, to overcome drawing issues in IE)
       setTimeout(function() {
         window.location.reload();
@@ -348,7 +348,6 @@ scout.Session.prototype._fireRequestFinished = function(message) {
 scout.Session.prototype.showFatalMessage = function(options) {
   options = options || {};
   var that = this;
-  var $glasspane = this.$entryPoint.appendDiv('glasspane');
   var model = {
     title: options.title,
     iconId: options.iconId,
@@ -365,7 +364,6 @@ scout.Session.prototype.showFatalMessage = function(options) {
     var option = $button.data('option');
     // Close message box
     ui.remove();
-    $glasspane.remove();
     // Custom actions
     if (option === 'yes' && options.yesButtonAction) {
       options.yesButtonAction.apply(that);
@@ -376,7 +374,7 @@ scout.Session.prototype.showFatalMessage = function(options) {
     }
   };
 
-  ui.render($glasspane);
+  ui.render(this.$entryPoint);
 };
 
 scout.Session.prototype.goOffline = function() {
@@ -431,7 +429,7 @@ scout.Session.prototype.setBusy = function(busy) {
       // Don't show the busy glasspane immediately. Set a short timer instead (which may be
       // cancelled again if the busy state returns to false in the meantime).
       this._busyTimer = setTimeout(function() {
-        that._$busyGlasspane = that.$entryPoint.appendDiv('glasspane busy').hide().fadeIn(250);
+        that._$busyGlasspane = scout.fields.new$Glasspane().hide().appendTo(that.$entryPoint).fadeIn(250);
         // Workround for Chrome: Trigger cursor change (Otherwise, the cursor is not correctly
         // updated without moving the mouse, see https://code.google.com/p/chromium/issues/detail?id=26723)
         that._$busyGlasspane.css('cursor', 'default');

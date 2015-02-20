@@ -15,7 +15,7 @@ scout.Form.prototype._render = function($parent) {
 
   if (this.isDialog()) {
     this.menuBarPosition = 'bottom';
-    this._$glassPane = $parent.appendDiv('glasspane');
+    this._$glassPane = scout.fields.new$Glasspane().appendTo($parent);
     $parent = this._$glassPane;
   }
 
@@ -45,6 +45,7 @@ scout.Form.prototype._render = function($parent) {
     this.$container.hide();
     setTimeout(function() {
       this.$container.addClass('shown').show();
+      this._$glassPane.installFocusContext();
     }.bind(this));
   }
 

@@ -69,7 +69,11 @@
    * 'stopPropagation()' on the event.
    */
   $.suppressEvent = function(event) {
-    event.stopPropagation();
+    if (event) {
+      event.stopPropagation();
+      event.preventDefault();
+      event.stopImmediatePropagation();
+    }
   };
 
   /**
@@ -439,6 +443,52 @@
         });
       event.preventDefault();
     });
+  };
+
+  $.fn.installFocusContext = function($firstFocusElement) {
+    var $container = this;
+    // Ensure $container is focusable (-1 = only programmatically)
+    if ($container.attr('tabindex') === undefined) {
+      $container.attr('tabindex', '-1');
+    }
+
+    // Set initial focus
+    if ($firstFocusElement === true || $firstFocusElement === undefined) {
+      $firstFocusElement = $container.find(':focusable').first();
+    }
+    if ($firstFocusElement) {
+      $firstFocusElement.focus();
+    }
+
+    // Add key listener to TAB key to ensure, the "focus context" is not left. When the last
+    // focusable element is reached, the focus should "wrap around" and focus the first element.
+    this.off('.focusContext');
+    this.on('keydown.focusContext', function (event) {
+      var activeElement = document.activeElement;
+      if (event.which === scout.keys.TAB) {
+        var $focusableElements = $container.find(':focusable');
+        var $firstFocusableElement = $focusableElements.first();
+        var $lastFocusableElement = $focusableElements.last();
+
+        // Forward (TAB)
+        if (!event.shiftKey) {
+          // If the last focusable element is focused, or the focus is on the container, set the focus to the first focusable element
+          if (activeElement === $lastFocusableElement[0] || activeElement === $container[0]) {
+            $.suppressEvent(event);
+            $firstFocusableElement.focus();
+          }
+        }
+        // Backward (Shift+TAB)
+        else {
+          // If the first focusable element is focused, or the focus is on the container, set the focus to the last focusable element
+          if (activeElement === $container[0] || activeElement === $firstFocusableElement[0]) {
+            $.suppressEvent(event);
+            $lastFocusableElement.focus();
+          }
+        }
+      }
+    });
+    return this;
   };
 
 }(jQuery));

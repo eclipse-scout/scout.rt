@@ -106,7 +106,12 @@ scout.menus = {
       }
       menu.sendAboutToShow();
       popup.appendToBody(
-        $.makeDiv('menu-item').text(menu.text).data('menu', menu).on('click', '', onMenuItemClicked).one(scout.menus.CLOSING_EVENTS, $.suppressEvent));
+        $.makeDiv('menu-item')
+        .text(menu.text)
+        .data('menu', menu)
+        .on('click', '', onMenuItemClicked)
+        .one(scout.menus.CLOSING_EVENTS, $.suppressEvent)
+      );
     }
   },
 
