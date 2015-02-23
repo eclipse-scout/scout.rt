@@ -44,11 +44,12 @@
 @icon-minus: '\F068';
 @icon-remove: '\F00D';
 @icon-angle-down: '\F107';
+@icon-angle-up: '\F106';
 @icon-angle-double-left: '\F100';
 @icon-angle-left: '\F104';
 @icon-angle-right: '\F105';
 @icon-angle-double-right: '\F101';
-@icon-chevron-left: '\f053';
-@icon-chevron-right: '\f054';
-@icon-circle: '\f111';
-@icon-square: '\f0c8';
+@icon-chevron-left: '\F053';
+@icon-chevron-right: '\F054';
+@icon-circle: '\F111';
+@icon-square: '\F0C8';

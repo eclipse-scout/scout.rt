@@ -6,3 +6,7 @@ To add custom icons create a svg and upload the icon by using the "Import to Set
 The svg should be the same size as the other svg icons in the font and must not have colors (beside black and white)
 
 When creating the font make sure the unicode matches the one in the icon name (for easier maintanance).
+
+--- Update BSH 2015-02-23 ---
+Try to use the same order as in icons.css
+(TODO Ask CGU: How to set code point?)
