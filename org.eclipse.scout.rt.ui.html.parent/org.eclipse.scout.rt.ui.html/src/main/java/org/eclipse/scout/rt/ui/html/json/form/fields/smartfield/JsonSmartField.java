@@ -20,7 +20,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.CachingEnabled;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistField;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IProposalField;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
@@ -32,44 +32,41 @@ import org.eclipse.scout.rt.ui.html.json.form.fields.JsonValueField;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class JsonSmartField<V, T extends ISmartField<V>> extends JsonValueField<T> {
+public class JsonSmartField<K, V, T extends IContentAssistField<K, V>> extends JsonValueField<T> {
 
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(JsonSmartField.class);
   private static final String PROP_LOOKUP_STRATEGY = "lookupStrategy";
   private static final String PROP_OPTIONS = "options";
   private static final String PROP_MULTI_LINE = "multiline";
   private static final int MAX_OPTIONS = 100;
+  private static final String PROP_PROPOSAL = "proposal";
 
   private List<? extends ILookupRow<V>> m_options = new ArrayList<>();
 
+  // FIXME AWE: (proposal) discuss with C.GU - better have class-hierarchy instead of property?
+  private boolean m_proposal;
+
   public JsonSmartField(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
     super(model, jsonSession, id, parent);
-  }
-
-  protected List<? extends ILookupRow<V>> getOptions() {
-    return m_options;
-  }
-
-  protected void setOptions(List<? extends ILookupRow<V>> options) {
-    m_options = options;
+    m_proposal = model instanceof IProposalField;
   }
 
   @Override
   protected void initJsonProperties(T model) {
     super.initJsonProperties(model);
-    putJsonProperty(new JsonProperty<ISmartField<?>>(PROP_MULTI_LINE, model) {
+    putJsonProperty(new JsonProperty<IContentAssistField<K, V>>(PROP_MULTI_LINE, model) {
       @Override
       protected Boolean modelValue() {
         return getModel().isMultilineText();
       }
     });
-    putJsonProperty(new JsonProperty<ISmartField<?>>(PROP_LOOKUP_STRATEGY, model) {
+    putJsonProperty(new JsonProperty<IContentAssistField<K, V>>(PROP_LOOKUP_STRATEGY, model) {
       @Override
       protected String modelValue() {
         return getLookupStrategy();
       }
     });
-    putJsonProperty(new JsonProperty<ISmartField<?>>(PROP_OPTIONS, model) {
+    putJsonProperty(new JsonProperty<IContentAssistField<K, V>>(PROP_OPTIONS, model) {
       @Override
       protected List<? extends ILookupRow<V>> modelValue() {
         return m_options;
@@ -150,6 +147,7 @@ public class JsonSmartField<V, T extends ISmartField<V>> extends JsonValueField<
     addActionEvent("optionsLoaded", putProperty(new JSONObject(), PROP_OPTIONS, options));
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   protected void handleUiDisplayTextChangedImpl(String displayText, boolean whileTyping) {
     if (StringUtility.isNullOrEmpty(displayText)) {
@@ -159,10 +157,15 @@ public class JsonSmartField<V, T extends ISmartField<V>> extends JsonValueField<
     else {
       for (ILookupRow<V> lr : m_options) {
         if (displayText.equals(lr.getText())) {
-          getModel().setValue(lr.getKey());
+          getModel().setValue((K) lr.getKey()); // FIXME AWE: (proposal) check key/value logic
           break;
         }
       }
     }
+  }
+
+  @Override
+  public JSONObject toJson() {
+    return putProperty(super.toJson(), PROP_PROPOSAL, m_proposal);
   }
 }

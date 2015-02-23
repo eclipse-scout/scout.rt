@@ -19,7 +19,8 @@ scout.AbstractSmartField.prototype.init = function(model, session) {
 };
 
 scout.AbstractSmartField.prototype._render = function($parent) {
-  this.addContainer($parent, 'smart-field');
+  var cssClass = this.proposal ? 'proposal-field' : 'smart-field';
+  this.addContainer($parent, cssClass);
   this.addLabel();
   this.addField(scout.fields.new$TextField()
     .blur(this._onFieldBlur.bind(this))

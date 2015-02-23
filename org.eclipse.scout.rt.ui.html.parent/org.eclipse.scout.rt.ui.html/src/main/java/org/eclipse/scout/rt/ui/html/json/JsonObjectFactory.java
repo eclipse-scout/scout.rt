@@ -50,7 +50,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.plannerfield.IPlannerField;
 import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.IRadioButtonGroup;
 import org.eclipse.scout.rt.client.ui.form.fields.richtextfield.IRichTextField;
 import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox;
-import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField;
+import org.eclipse.scout.rt.client.ui.form.fields.smartfield.IContentAssistField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField;
@@ -177,8 +177,8 @@ public class JsonObjectFactory implements IJsonObjectFactory {
     else if (model instanceof INumberField) {
       return new JsonNumberField((INumberField) model, session, id, parent);
     }
-    else if (model instanceof ISmartField) {
-      return new JsonSmartField((ISmartField) model, session, id, parent);
+    else if (model instanceof IContentAssistField) {
+      return new JsonSmartField((IContentAssistField) model, session, id, parent);
     }
     else if (model instanceof IDateField) {
       return new JsonDateField((IDateField) model, session, id, parent);
