@@ -21,7 +21,7 @@
       </service>
       <service class="org.eclipse.scout.rt.ui.html.services.common.icon.HtmlBundleIconProviderService"
             createImmediately="false"
-            factory="org.eclipse.scout.rt.client.services.ClientServiceFactory"
+            factory="org.eclipse.scout.service.DefaultServiceFactory"
             ranking="-1000">
       </service>
       <service
