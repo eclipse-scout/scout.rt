@@ -8,7 +8,7 @@
   // === $ extensions ===
 
   // chris' shortcut
-  if (console && console.log.bind) {
+  if (typeof console !== 'undefined' && console.log.bind) {
     $.l = console.log.bind(console);
   } else {
     $.l = function() {};
