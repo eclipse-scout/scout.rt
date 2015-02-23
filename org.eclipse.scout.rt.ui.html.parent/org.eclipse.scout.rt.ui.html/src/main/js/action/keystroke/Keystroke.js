@@ -9,16 +9,9 @@ scout.Keystroke = function() {
 };
 scout.inherits(scout.Keystroke, scout.Action);
 
-scout.Keystroke.prototype.init = function(model, session) {
-  scout.FormField.parent.prototype.init.call(this, model, session);
-  this.initKeystrokeParts();
-};
-
 scout.Keystroke.prototype._remove = function() {
   scout.Action.parent.prototype._remove.call(this);
 };
-
-scout.Keystroke.KEY_SEPARATOR = '-';
 
 /**
  * If processing should continue return true otherwise return false.
@@ -43,38 +36,40 @@ scout.Keystroke.prototype.ignore = function() {
   return false;
 };
 
-scout.Keystroke.prototype.keystrokeString = function(keystroke) {
-  if (keystroke) {
-    this.keystroke = keystroke;
-    this.initKeystrokeParts();
-  }
-  return this.keystroke;
-};
-
 scout.Keystroke.drawKeyBox = function() {
   var keyBoxText = scout.codesToKeys[this.keystrokeKeyPart];
   //TODO nbu draw key box
 };
 
-/**
- * @see keys.js -> to determine key mapping
- */
-scout.Keystroke.prototype.initKeystrokeParts = function() {
+scout.Keystroke._syncKeystroke = function(keystroke) {
+  // When model's 'keystroke' property changes, also update keystroke parts
+  this.keystroke = keystroke;
+  this._initKeystrokeParts();
+};
+
+scout.Keystroke.prototype._initKeystrokeParts = function() {
+  this.alt = undefined;
+  this.ctrl = undefined;
+  this.meta = undefined;
+  this.shift = undefined;
+  this.keystrokeKeyPart = undefined;
   if (!this.keystroke) {
-    throw new Error('Can\'t separate keys from keystroke. keystroke is not set.');
+    return;
   }
-  var keystrokeParts = this.keystroke.split(scout.Keystroke.KEY_SEPARATOR);
+  var keystrokeParts = this.keystroke.split('-');
   for (var i = 0; i < keystrokeParts.length; i++) {
-    if (keystrokeParts[i] === 'alternate') {
+    var part = keystrokeParts[i];
+    // see org.eclipse.scout.rt.client.ui.action.keystroke.KeyStrokeNormalizer
+    if (part === 'alternate') {
       this.alt = true;
-    } else if (keystrokeParts[i] === 'control') {
+    } else if (part === 'control') {
       this.ctrl = true;
-    } else if (keystrokeParts[i] === 'meta') {
+    } else if (part === 'meta') {
       this.meta = true;
-    } else if (keystrokeParts[i] === 'shift') {
+    } else if (part === 'shift') {
       this.shift = true;
     } else {
-      this.keystrokeKeyPart = scout.keys[keystrokeParts[i].toUpperCase()];
+      this.keystrokeKeyPart = scout.keys[part.toUpperCase()];
     }
   }
 };
