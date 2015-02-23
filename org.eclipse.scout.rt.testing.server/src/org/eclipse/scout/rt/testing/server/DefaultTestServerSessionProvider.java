@@ -17,6 +17,13 @@ import org.eclipse.scout.rt.shared.ui.UserAgent;
  */
 public class DefaultTestServerSessionProvider extends ServerSessionRegistryService implements ITestServerSessionProvider {
 
+  /**
+   *
+   */
+  protected DefaultTestServerSessionProvider() {
+    super();
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   public <T extends IServerSession> T createServerSession(Class<T> clazz, final Subject subject) throws ProcessingException {

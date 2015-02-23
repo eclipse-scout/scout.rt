@@ -30,6 +30,10 @@ public class ServerSessionRegistryService extends AbstractService implements ISe
 
   private IServerJobService m_backendService;
 
+  protected ServerSessionRegistryService() {
+
+  }
+
   @Override
   protected void initializeService() {
     super.initializeService();

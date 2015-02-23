@@ -17,6 +17,7 @@ import java.util.Date;
 import org.eclipse.scout.commons.holders.IntegerHolder;
 import org.eclipse.scout.commons.holders.LongHolder;
 import org.eclipse.scout.commons.holders.NVPair;
+import org.eclipse.scout.rt.platform.cdi.internal.BeanInstanceCreator;
 import org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlService;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
@@ -36,14 +37,16 @@ public class StatementProcessorTest {
     };
 
     //
+    AbstractSqlService sqlService = new AbstractSqlService() {
+    };
+    BeanInstanceCreator.initializeInstance(sqlService);
     StatementProcessor sp = new StatementProcessor(
-        new AbstractSqlService() {
-        },
+        sqlService,
         "SELECT P.PERSON_NR,P.NAME" +
             " FROM PERSON P " +
             " WHERE P.PERSON_NR=:key " +
             " AND P.NAME like '%'||:text||'%'",
-        new Object[]{call});
+            new Object[]{call});
     sp.simulate();
 
     String sqlPlainTextDump = sp.createSqlDump(false, true);
@@ -52,9 +55,11 @@ public class StatementProcessorTest {
 
   @Test
   public void testSelectLike() throws Exception {
+    AbstractSqlService sqlService = new AbstractSqlService() {
+    };
+    BeanInstanceCreator.initializeInstance(sqlService);
     StatementProcessor sp = new StatementProcessor(
-        new AbstractSqlService() {
-        },
+        sqlService,
         "SELECT BP_NR FROM FLM_BP WHERE BP_NO LIKE :bpNo INTO :bpNr",
         new Object[]{new NVPair("bpNo", "12"), new NVPair("bpNr", new LongHolder())});
     sp.simulate();
@@ -70,16 +75,18 @@ public class StatementProcessorTest {
     formData.getAddressTable().addRow();
     formData.getAddressTable().addRow();
     //
+    AbstractSqlService sqlService = new AbstractSqlService() {
+    };
+    BeanInstanceCreator.initializeInstance(sqlService);
     StatementProcessor sp = new StatementProcessor(
-        new AbstractSqlService() {
-        },
+        sqlService,
         "SELECT COUNT(*) " +
             "FROM PERSON P " +
             "WHERE NVL(:birthdate,TO_DATE('1.1.3000','dd.mm.yyyy')) >= SYSDATE " +
             "AND :name like '%Me%' " +
             "AND :{addressTable.street} like '%Park%' " +
             "INTO :countConcurrent ",
-        new Object[]{formData, new NVPair("countConcurrent", countConcurrent)});
+            new Object[]{formData, new NVPair("countConcurrent", countConcurrent)});
     sp.simulate();
 
     String sqlPlainTextDump = sp.createSqlDump(false, true);

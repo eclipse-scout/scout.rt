@@ -24,15 +24,12 @@ import org.eclipse.scout.service.AbstractService;
 import org.eclipse.scout.service.IService;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**
  *
  */
-@Ignore
-// until server job is updated and has a session
 @RunWith(ScoutPlatformTestRunner.class)
 public class ServiceWithSessionInterceptorTest {
 

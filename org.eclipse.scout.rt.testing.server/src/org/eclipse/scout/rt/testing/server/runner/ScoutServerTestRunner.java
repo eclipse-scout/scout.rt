@@ -24,16 +24,18 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
+import org.eclipse.scout.rt.platform.Platform;
+import org.eclipse.scout.rt.platform.cdi.internal.BeanInstanceCreator;
 import org.eclipse.scout.rt.server.IServerJobFactory;
 import org.eclipse.scout.rt.server.IServerJobService;
 import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
 import org.eclipse.scout.rt.testing.server.DefaultTestServerSessionProvider;
 import org.eclipse.scout.rt.testing.server.ITestServerSessionProvider;
 import org.eclipse.scout.rt.testing.shared.services.common.exceptionhandler.ProcessingRuntimeExceptionUnwrappingStatement;
 import org.eclipse.scout.service.SERVICES;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.runners.BlockJUnit4ClassRunner;
 import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.Statement;
@@ -80,16 +82,18 @@ import org.junit.runners.model.Statement;
  * </tr>
  * </table>
  */
-public class ScoutServerTestRunner extends ScoutPlatformTestRunner {
+public class ScoutServerTestRunner extends BlockJUnit4ClassRunner {
 
   private static Class<? extends IServerSession> s_defaultServerSessionClass;
   private static String s_defaultPrincipalName;
-  private static ITestServerSessionProvider s_defaultServerSessionProvider = new DefaultTestServerSessionProvider();
+  private static ITestServerSessionProvider s_defaultServerSessionProvider;
   private static final IServerJobService BACKEND_JOB_SERVICE;
   private static final IScoutLogger LOG;
   private static final IServerTestEnvironment FACTORY;
 
   static {
+    ((Platform) Platform.get()).ensureStarted();
+    s_defaultServerSessionProvider = BeanInstanceCreator.createAndInitialize(DefaultTestServerSessionProvider.class);
     LOG = ScoutLogManager.getLogger(ScoutServerTestRunner.class);
     FACTORY = createServerTestEnvironmentFactory();
     BACKEND_JOB_SERVICE = SERVICES.getService(IServerJobService.class);
