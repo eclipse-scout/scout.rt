@@ -26,6 +26,7 @@ import javax.servlet.http.HttpSessionBindingEvent;
 import javax.servlet.http.HttpSessionBindingListener;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.holders.IHolder;
@@ -276,8 +277,13 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
         });
       }
     };
-    job.schedule();
-    ClientJobUtility.waitForSyncJob(job);
+    if (ClientJob.isSyncClientJob()) {
+      job.runNow(new NullProgressMonitor());
+    }
+    else {
+      job.schedule();
+      ClientJobUtility.waitForSyncJob(job);
+    }
     try {
       job.throwOnError();
     }
@@ -547,8 +553,13 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
         });
       }
     };
-    job.schedule();
-    ClientJobUtility.waitForSyncJob(job);
+    if (ClientJob.isSyncClientJob()) {
+      job.runNow(new NullProgressMonitor());
+    }
+    else {
+      job.schedule();
+      ClientJobUtility.waitForSyncJob(job);
+    }
     try {
       job.throwOnError();
     }
@@ -615,8 +626,13 @@ public abstract class AbstractJsonSession implements IJsonSession, HttpSessionBi
             });
           }
         };
-        job.schedule();
-        ClientJobUtility.waitForSyncJob(job);
+        if (ClientJob.isSyncClientJob()) {
+          job.runNow(new NullProgressMonitor());
+        }
+        else {
+          job.schedule();
+          ClientJobUtility.waitForSyncJob(job);
+        }
         try {
           job.throwOnError();
         }

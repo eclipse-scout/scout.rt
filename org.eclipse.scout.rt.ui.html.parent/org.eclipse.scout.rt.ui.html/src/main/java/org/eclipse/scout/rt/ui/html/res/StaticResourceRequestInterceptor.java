@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.scout.commons.FileUtility;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -30,6 +31,7 @@ import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.commons.holders.IHolder;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
 import org.eclipse.scout.rt.client.ui.IIconLocator;
@@ -201,8 +203,13 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
         });
       }
     };
-    job.schedule();
-    ClientJobUtility.waitForSyncJob(job);
+    if (ClientJob.isSyncClientJob()) {
+      job.runNow(new NullProgressMonitor());
+    }
+    else {
+      job.schedule();
+      ClientJobUtility.waitForSyncJob(job);
+    }
     try {
       job.throwOnError();
     }

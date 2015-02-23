@@ -21,6 +21,7 @@ import java.util.Calendar;
 import java.util.Locale;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -129,8 +130,13 @@ public class JsonClientSession<T extends IClientSession> extends AbstractJsonAda
         });
       }
     };
-    job.schedule();
-    ClientJobUtility.waitForSyncJob(job);
+    if (ClientJob.isSyncClientJob()) {
+      job.runNow(new NullProgressMonitor());
+    }
+    else {
+      job.schedule();
+      ClientJobUtility.waitForSyncJob(job);
+    }
     try {
       job.throwOnError();
     }
