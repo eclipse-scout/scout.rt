@@ -143,8 +143,8 @@ scout.TableSelectionHandler.prototype._drawSelectionBorder = function($selectedR
   var that = this;
   $selectedRows.each(function() {
     var $row = $(this);
-    var hasPrev = that.table.$prevFilteredRows($row).first().isSelected();
-    var hasNext = that.table.$nextFilteredRows($row).first().isSelected();
+    var hasPrev = that.table.$prevFilteredRows($row, true).first().isSelected();
+    var hasNext = that.table.$nextFilteredRows($row, true).first().isSelected();
 
     if (hasPrev && hasNext) {
       $row.addClass('select-middle');

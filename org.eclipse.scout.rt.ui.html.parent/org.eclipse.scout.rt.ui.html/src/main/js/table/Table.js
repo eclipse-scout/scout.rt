@@ -1098,12 +1098,20 @@ scout.Table.prototype.$filteredRows = function(includeSumRows) {
   return this.$data.find(selector);
 };
 
-scout.Table.prototype.$prevFilteredRows = function($row) {
-  return $row.prevAll('.table-row:not(.invisible)');
+scout.Table.prototype.$prevFilteredRows = function($row, includeSumRows) {
+  var selector = '.table-row:not(.invisible)';
+  if (includeSumRows) {
+    selector += ', .table-row-sum:not(.invisible)';
+  }
+  return $row.prevAll(selector);
 };
 
-scout.Table.prototype.$nextFilteredRows = function($row) {
-  return $row.nextAll('.table-row:not(.invisible)');
+scout.Table.prototype.$nextFilteredRows = function($row, includeSumRows) {
+  var selector = '.table-row:not(.invisible)';
+  if (includeSumRows) {
+    selector += ', .table-row-sum:not(.invisible)';
+  }
+  return $row.nextAll(selector);
 };
 
 scout.Table.prototype.$sumRows = function() {

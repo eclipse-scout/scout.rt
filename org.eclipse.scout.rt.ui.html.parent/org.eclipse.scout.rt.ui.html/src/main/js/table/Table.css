@@ -40,13 +40,12 @@
   border-left: 1px solid transparent;
   border-right: 1px solid transparent;
   border-bottom: 1px solid @desktop-border-color;
-}
 
-.table-row .table-cell,
-.table-row-sum .table-cell {
-  display: table-cell;
-  padding: @table-row-padding-y 4px @table-row-padding-y @table-row-padding-left;
-  .overflow-ellipsis-nowrap;
+  & .table-cell {
+    display: table-cell;
+    padding: @table-row-padding-y 4px @table-row-padding-y @table-row-padding-left;
+    .overflow-ellipsis-nowrap;
+  }
 }
 
 .table-row-sum .table-cell {
@@ -67,6 +66,8 @@
 
   &.select-top,
   &.select-middle {
+    /* Disable bottom-border. Instead, we add the border in the ::after pseudo element, because otherwise */
+    /* it would interfere with the 2px left border (missing control of 'border join behaviour' in CSS) */
     border-bottom: 0;
   }
 
