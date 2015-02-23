@@ -41,87 +41,82 @@
   border-right: 1px solid transparent;
   border-bottom: 1px solid @desktop-border-color;
 
-  & .table-cell {
-    display: table-cell;
-    padding: @table-row-padding-y 4px @table-row-padding-y @table-row-padding-left;
-    .overflow-ellipsis-nowrap;
+  /* Selected rows */
+  /* Hint: The definition of the 2px selection border is written in desktop.css because it is */
+  /* not possible to prevent the creation of the additional selection div in tablefield.css*/
+  &.selected {
+    background-color: @selection-row-background-color;
+    border-color: @selection-row-border-color;
+
+    &::after {
+      background-color: red;
+    }
+
+    .disabled & {
+      background-color: @selection-row-background-disabled-color;
+      border-color: @selection-row-border-disabled-color;
+    }
+
+    &.select-top,
+    &.select-middle {
+      /* Disable bottom-border. Instead, we add the border in the ::after pseudo element, because otherwise */
+      /* it would interfere with the 2px left border (missing control of 'border join behaviour' in CSS) */
+      border-bottom: 0;
+    }
+
+    &.select-top:after,
+    &.select-middle:after {
+      border-bottom: 1px solid @desktop-border-color;
+      content: '';
+      display: block;
+    }
   }
-}
 
-.table-row-sum .table-cell {
-  font-weight: bold;
-}
-
-/* Selected rows */
-/* Hint: The definition of the 2px selection border is written in desktop.css because it is not possible to prevent the creation of the additional selection div in tablefield.css*/
-
-.table-row.selected {
-  background-color: @selection-row-background-color;
-  border-color: @selection-row-border-color;
-
-  .disabled & {
-    background-color: @selection-row-background-disabled-color;
-    border-color: @selection-row-border-disabled-color;
+  &.select-single,
+  &.select-top {
+    border-top: 1px solid @selection-row-border-color;
+    /* Move the row 1px up to cover the bottom border of the previous row. */
+    margin-top: -1px;
   }
-
-  &.select-top,
-  &.select-middle {
-    /* Disable bottom-border. Instead, we add the border in the ::after pseudo element, because otherwise */
-    /* it would interfere with the 2px left border (missing control of 'border join behaviour' in CSS) */
-    border-bottom: 0;
-  }
-
-  &.select-top:after,
-  &.select-middle:after {
-    border-bottom: 1px solid @desktop-border-color;
-    content: '';
-    display: block;
-  }
-}
-
-.table-row.select-single,
-.table-row.select-top {
-  border-top: 1px solid @selection-row-border-color;
-  /* Move the row 1px up to cover the bottom border of the previous row. */
-  margin-top: -1px;
 }
 
 .table-cell {
+  display: table-cell;
+  padding: @table-row-padding-y 4px @table-row-padding-y @table-row-padding-left;
+  .overflow-ellipsis-nowrap;
+  mix-blend-mode: multiply; /* experimental support, currently only in FF */
+
+  .table-row-sum & {
+    font-weight: bold;
+  }
+
   & label {
     cursor: pointer;
   }
   & label:before {
     .checkboxLabelBefore(inherit, inherit, -18px);
   }
-
   & label:hover:before {
     .checkboxLabelBeforBorderHover;
   }
-
   & input[type=checkbox] {
     visibility: hidden;
   }
-
   & input[type=checkbox]:disabled + label:hover:before {
     .checkboxLabelBeforeDisabledBorder;
   }
-
   & input[type=checkbox]:focus + label:before {
     .checkboxLabelBeforeFocus;
   }
-
   & input[type=checkbox]:checked + label:before {
     .checkboxLabelBeforeChecked;
   }
-
   & label:before {
     .checkboxLabelBeforeBorder;
   }
-
   & input[type=checkbox]:disabled + label:before {
     .checkboxLabelBeforeDisabled;
   }
-
   & input[type=checkbox]:disabled + label {
     .checkboxLabelDisabled;
   }

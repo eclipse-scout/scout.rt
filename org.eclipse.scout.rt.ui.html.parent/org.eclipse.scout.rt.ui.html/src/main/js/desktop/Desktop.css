@@ -89,7 +89,6 @@
   &> .sub-title {
     .font-text-normal;
   }
-
 }
 
 .taskbar-tab-item {
@@ -166,40 +165,42 @@
 
 /* table / form */
 
-.desktop-bench > .table > .table-header,
-.desktop-bench > .table > .table-data {
-  margin-left: @bench-margin-x;
-  margin-right: @bench-margin-x;
-}
+.desktop-bench > .table {
+  & > .table-header,
+  & > .table-data {
+    margin-left: @bench-margin-x;
+    margin-right: @bench-margin-x;
+  }
 
-/* Desktop table has a 2px border. For this we create a div which spans the full row and has border-top/bottom set to 1px.
-Middle rows dont have 2px border so no need to do it for those. */
-.desktop-bench > .table .table-row,
-.desktop-bench > .table .table-row-sum {
-  border-left-width: 2px;
-  border-right-width: 2px;
-}
+  /* Desktop table has a 2px border. For this we create a div which spans the full row and has */
+  /* border-top/bottom set to 1px. Middle rows dont have 2px border so no need to do it for those. */
+  & .table-row,
+  & .table-row-sum {
+    border-left-width: 2px;
+    border-right-width: 2px;
 
-.desktop-bench > .table .table-row.select-single:before,
-.desktop-bench > .table .table-row.select-top:before,
-.desktop-bench > .table .table-row.select-bottom:before {
-   .overlay;
-   /* Make sure overlay does not get target of mouse events, necessary for links inside table-cell.
-   FIXME CGU verify if this really works with IE 9 */
-   pointer-events: none;
-}
+    &.select-single:before,
+    &.select-top:before,
+    &.select-bottom:before {
+      .overlay;
+      /* Make sure overlay does not get target of mouse events, necessary for links inside table-cell.
+      FIXME CGU verify if this really works with IE 9 */
+      pointer-events: none;
+    }
 
-.desktop-bench > .table .table-row.select-top:before {
-   border-top: 1px solid @selection-row-border-color;
-}
+    &.select-top:before {
+      border-top: 1px solid @selection-row-border-color;
+    }
 
-.desktop-bench > .table .table-row.select-bottom:before {
-   border-bottom: 1px solid @selection-row-border-color;
-}
+    &.select-bottom:before {
+      border-bottom: 1px solid @selection-row-border-color;
+    }
 
-.desktop-bench > .table .table-row.select-single:before {
-   border-top: 1px solid @selection-row-border-color;
-   border-bottom: 1px solid @selection-row-border-color;
+    &.select-single:before {
+      border-top: 1px solid @selection-row-border-color;
+      border-bottom: 1px solid @selection-row-border-color;
+    }
+  }
 }
 
 /* base desktop */

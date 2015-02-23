@@ -154,7 +154,7 @@ scout.helpers = {
       style += 'color: ' + cssColor + '; ';
     }
     if (cssBackgroundColor) {
-      style += 'background-color: ' + cell.backgroundColor + '; ';
+      style += 'background-color: ' + cssBackgroundColor + '; ';
     }
     if (cssFontWeight) {
       style += 'font-weight: '+ cssFontWeight +'; ';
