@@ -15,15 +15,6 @@ package org.eclipse.scout.rt.platform;
  * To register a module use the <b><code>scout.module</code></b> entry in the maifest file.
  */
 public interface IModule {
-  /**
-   * The Manifest.MF entry to provide a module.</br>
-   *
-   * <pre>
-   * MANIFEST.MF
-   * Scout-Module: fullyQuallifiedModuleName
-   * </pre>
-   */
-  static String MANIFEST_MODULE_ENTRY = "Scout-Module";
 
   /**
    * will be called of the platform launcher {@link Launcher} during startup. This method is used to set up the system,
