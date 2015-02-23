@@ -10,7 +10,7 @@
       <service
             class="org.eclipse.scout.rt.client.services.common.icon.IconProviderService"
             createImmediately="false"
-            factory="org.eclipse.scout.rt.client.services.ClientServiceFactory"
+            factory="org.eclipse.scout.service.DefaultServiceFactory"
             ranking="-90">
       </service>
    </extension>

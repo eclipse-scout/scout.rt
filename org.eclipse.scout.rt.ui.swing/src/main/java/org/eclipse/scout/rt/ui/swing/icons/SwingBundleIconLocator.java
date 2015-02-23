@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swing.icons;
 
-import org.eclipse.scout.rt.client.services.common.icon.IconProviderService;
+import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
 import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
 import org.eclipse.scout.rt.client.ui.IIconLocator;
 import org.eclipse.scout.rt.shared.AbstractIcons;
@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.ui.swing.services.common.icon.SwingBundleIconProvide
 
 public class SwingBundleIconLocator implements IIconLocator {
 
-  private final IconProviderService m_swingIconProviderService;
+  private final IIconProviderService m_swingIconProviderService;
 
   public SwingBundleIconLocator() {
     m_swingIconProviderService = new SwingBundleIconProviderService();

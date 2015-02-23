@@ -32,7 +32,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 
 /**
- * Looks for icons in the resources/icons folder of bundles
+ * Looks for icons and creates SWT-specific resources
  */
 public class SwtIconLocator implements ISwtIconLocator {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwtIconLocator.class);

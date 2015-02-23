@@ -8,15 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui;
+package org.eclipse.scout.rt.ui.swt.services.common.icon;
 
-import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
+import org.eclipse.scout.rt.client.services.common.icon.AbstractIconProviderService;
 
-/**
- * TODO NOOSGI reconsider usage after removing OSGi dependencies. Could be removed completely and replaced by
- * IIconProviderService.
- */
-public interface IIconLocator {
+public class SwtBundleIconProviderService extends AbstractIconProviderService {
+  public static final String FOLDER_NAME = "org.eclipse.scout.rt.ui.swt.icons";
 
-  IconSpec getIconSpec(String name);
+  public SwtBundleIconProviderService() {
+    setFolderName(FOLDER_NAME);
+  }
 }

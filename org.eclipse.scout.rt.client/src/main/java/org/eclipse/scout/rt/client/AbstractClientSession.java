@@ -617,7 +617,7 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
   }
 
   protected IIconLocator createIconLocator() {
-    return new IconLocator(this);
+    return new IconLocator();
   }
 
   @Override

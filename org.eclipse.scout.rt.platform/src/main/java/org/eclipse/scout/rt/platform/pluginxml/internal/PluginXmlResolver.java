@@ -115,9 +115,17 @@ public final class PluginXmlResolver {
         pluginXmls.add(new OsgiPluginXml(bundle, pluginUrl));
       }
       // fragments.xml
-      URL fragmentUrl = bundle.getResource("fragment.xml");
-      if (fragmentUrl != null) {
-        pluginXmls.add(new OsgiPluginXml(bundle, fragmentUrl));
+      try {
+        Enumeration fragmentUrlEnumeration = bundle.getResources("fragment.xml");
+        while (fragmentUrlEnumeration != null && fragmentUrlEnumeration.hasMoreElements()) {
+          URL fragmentUrl = (URL) fragmentUrlEnumeration.nextElement();
+          if (fragmentUrl != null) {
+            pluginXmls.add(new OsgiPluginXml(bundle, fragmentUrl));
+          }
+        }
+      }
+      catch (IOException e) {
+        LOG.warn("exception while resolving fragments", e);
       }
     }
     return pluginXmls;

@@ -14,7 +14,6 @@
 <plugin>
    <extension-point id="org.eclipse.scout.rt.ui.swt.formfields" name="Form Fields" schema="schema/formfields.exsd"/>
    <extension-point id="org.eclipse.scout.rt.ui.swt.lookAndFeel" name="lookAndFeel" schema="schema/lookAndFeel.exsd"/>
-   <extension-point id="org.eclipse.scout.rt.ui.swt.scouticons" name="Scout Icons" schema="schema/scouticons.exsd"/>
    <extension
          point="org.eclipse.ui.themes">
       <theme
@@ -335,7 +334,7 @@
       <service class="org.eclipse.scout.rt.ui.swt.services.common.clipboard.SwtScoutClipboardService" />
       <service class="org.eclipse.scout.rt.ui.swt.services.common.icon.SwtBundleIconProviderService"
                createImmediately="false"
-               factory="org.eclipse.scout.rt.client.services.ClientServiceFactory"
+               factory="org.eclipse.scout.service.DefaultServiceFactory"
                ranking="-1000">
       </service>
    </extension>

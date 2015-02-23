@@ -14,6 +14,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
+import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -100,17 +101,20 @@ public abstract class AbstractIconProviderService extends AbstractService implem
     return null;
   }
 
-  protected abstract URL findResource(String fullPath);
+  protected URL findResource(String fullPath) {
+    return getClass().getClassLoader().getResource(fullPath);
+  }
 
   public void setFolderName(String folderName) {
-    m_folderName = folderName;
+    Assertions.assertNotNullOrEmpty(folderName);
+    m_folderName = folderName.replace('.', '/');
   }
 
   public String getFolderName() {
     return m_folderName;
   }
 
-  public void setIconExtensions(String iconExtensions) {
+  public synchronized void setIconExtensions(String iconExtensions) {
     m_iconExtensions = iconExtensions;
     m_iconExtensionsArray = null;
   }
@@ -121,10 +125,4 @@ public abstract class AbstractIconProviderService extends AbstractService implem
   public String getIconExtensions() {
     return m_iconExtensions;
   }
-
-  @Override
-  public String toString() {
-    return getHostBundle() + ": " + getClass().getName();
-  }
-
 }

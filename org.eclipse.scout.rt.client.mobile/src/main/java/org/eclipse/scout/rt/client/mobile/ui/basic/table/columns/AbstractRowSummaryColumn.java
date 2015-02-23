@@ -68,7 +68,7 @@ public abstract class AbstractRowSummaryColumn extends AbstractStringColumn impl
 
   protected String initHtmlCellTemplate() throws ProcessingException {
     try {
-      return new String(IOUtility.getContent(getClass().getResource("resources/html/MobileTableCellContent.html").openStream()), "iso-8859-1");
+      return new String(IOUtility.getContent(getClass().getResource("org/eclipse/scout/rt/client/mobile/html/MobileTableCellContent.html").openStream()), "iso-8859-1");
     }
     catch (Throwable t) {
       throw new ProcessingException("Exception while loading html cell template for mobile table", t);
@@ -77,7 +77,7 @@ public abstract class AbstractRowSummaryColumn extends AbstractStringColumn impl
 
   protected String initHtmlDrillDown() throws ProcessingException {
     try {
-      return new String(IOUtility.getContent(getClass().getResource("resources/html/MobileTableDrillDown.html").openStream()), "iso-8859-1");
+      return new String(IOUtility.getContent(getClass().getResource("org/eclipse/scout/rt/client/mobile/html/MobileTableDrillDown.html").openStream()), "iso-8859-1");
     }
     catch (Throwable t) {
       throw new ProcessingException("Exception while loading html cell template for mobile table", t);
@@ -86,7 +86,7 @@ public abstract class AbstractRowSummaryColumn extends AbstractStringColumn impl
 
   protected String initHtmlDrillDownButton() throws ProcessingException {
     try {
-      return new String(IOUtility.getContent(getClass().getResource("resources/html/MobileTableDrillDownButton.html").openStream()), "iso-8859-1");
+      return new String(IOUtility.getContent(getClass().getResource("org/eclipse/scout/rt/client/mobile/html/MobileTableDrillDownButton.html").openStream()), "iso-8859-1");
     }
     catch (Throwable t) {
       throw new ProcessingException("Exception while loading html cell template for mobile table", t);

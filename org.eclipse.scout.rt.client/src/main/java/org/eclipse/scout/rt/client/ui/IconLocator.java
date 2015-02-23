@@ -12,36 +12,17 @@ package org.eclipse.scout.rt.client.ui;
 
 import java.util.List;
 
-import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
-import org.eclipse.scout.rt.client.services.common.icon.IconProviderService;
 import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.service.SERVICES;
-import org.osgi.framework.Bundle;
 
-/**
- *
- */
 public class IconLocator implements IIconLocator {
 
   private final List<IIconProviderService> m_iconProviderServices;
 
-  public IconLocator(IClientSession session) {
-    Bundle clientBundle = session.getBundle();
-    List<IIconProviderService> registeredServices = SERVICES.getServices(IIconProviderService.class);
-    boolean containsClientBundle = false;
-    for (IIconProviderService service : registeredServices) {
-      if (CompareUtility.equals(service.getHostBundle(), clientBundle)) {
-        containsClientBundle = true;
-        break;
-      }
-    }
-    if (!containsClientBundle) {
-      registeredServices.add(new P_ClientIconProviderService(clientBundle));
-    }
-    m_iconProviderServices = registeredServices;
+  public IconLocator() {
+    m_iconProviderServices = SERVICES.getServices(IIconProviderService.class);
   }
 
   @Override
@@ -58,13 +39,4 @@ public class IconLocator implements IIconLocator {
     }
     return spec;
   }
-
-  private class P_ClientIconProviderService extends IconProviderService {
-
-    public P_ClientIconProviderService(Bundle clientBundle) {
-      setHostBundle(clientBundle);
-    }
-
-  }
-
 }

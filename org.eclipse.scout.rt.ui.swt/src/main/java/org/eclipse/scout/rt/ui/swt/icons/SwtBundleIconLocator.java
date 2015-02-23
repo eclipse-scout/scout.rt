@@ -8,22 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.ui;
+package org.eclipse.scout.rt.ui.swt.icons;
 
-import org.eclipse.scout.rt.client.services.common.icon.IconProviderService;
+import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
 import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
+import org.eclipse.scout.rt.client.ui.IIconLocator;
 import org.eclipse.scout.rt.shared.AbstractIcons;
-import org.osgi.framework.Bundle;
+import org.eclipse.scout.rt.ui.swt.services.common.icon.SwtBundleIconProviderService;
 
-/**
- *
- */
-public class BundleIconLocator implements IIconLocator {
+public class SwtBundleIconLocator implements IIconLocator {
 
-  private final IconProviderService m_iconLocatorService;
+  private final IIconProviderService m_swtIconProviderService;
 
-  public BundleIconLocator(Bundle bundle) {
-    m_iconLocatorService = new P_BundleIconProviderService(bundle);
+  public SwtBundleIconLocator() {
+    m_swtIconProviderService = new SwtBundleIconProviderService();
   }
 
   @Override
@@ -31,20 +29,6 @@ public class BundleIconLocator implements IIconLocator {
     if (name == null || AbstractIcons.Null.equals(name)) {
       return null;
     }
-    IconSpec spec = m_iconLocatorService.getIconSpec(name);
-    return spec;
+    return m_swtIconProviderService.getIconSpec(name);
   }
-
-  public IconProviderService getIconLocatorService() {
-    return m_iconLocatorService;
-  }
-
-  private class P_BundleIconProviderService extends IconProviderService {
-
-    public P_BundleIconProviderService(Bundle bundle) {
-      setHostBundle(bundle);
-    }
-
-  }
-
 }

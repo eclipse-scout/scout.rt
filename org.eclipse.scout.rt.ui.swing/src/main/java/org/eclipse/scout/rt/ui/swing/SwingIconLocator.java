@@ -32,7 +32,7 @@ import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.ui.swing.basic.IconUtility;
 
 /**
- * Looks for icons in the resources/icons folder of bundles
+ * Looks for icons and creates Swing-specific resources
  */
 public class SwingIconLocator {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingIconLocator.class);

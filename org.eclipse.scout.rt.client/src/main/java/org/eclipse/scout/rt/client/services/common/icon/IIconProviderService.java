@@ -11,11 +11,7 @@
 package org.eclipse.scout.rt.client.services.common.icon;
 
 import org.eclipse.scout.service.IService;
-import org.osgi.framework.Bundle;
 
-/**
- *
- */
 public interface IIconProviderService extends IService {
 
   /**
@@ -26,7 +22,4 @@ public interface IIconProviderService extends IService {
    * @return the icon specification to the icon or null if not found.
    */
   IconSpec getIconSpec(String iconName);
-
-  Bundle getHostBundle();
-
 }
