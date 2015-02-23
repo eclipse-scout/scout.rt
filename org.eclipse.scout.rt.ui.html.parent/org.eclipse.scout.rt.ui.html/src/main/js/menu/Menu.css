@@ -68,11 +68,11 @@
   padding-top: 1px;
   display: inline-block;
 
-  &[data-icon]:before {
+  &[data-icon]::before {
     .menu-icon(attr(data-icon));
   }
 
-  &[data-icon]:hover:before {
+  &[data-icon]:hover::before {
     color: @hover-color;
   }
 
@@ -85,7 +85,7 @@
     cursor: default;
   }
 
-  &[data-icon].disabled:before {
+  &[data-icon].disabled::before {
     color: @disabled-color;
   }
 
@@ -97,7 +97,7 @@
     color: @active-color;
   }
 
-  &.has-submenu:after {
+  &.has-submenu::after {
    .sub-menu-icon;
   }
 
@@ -120,7 +120,7 @@
   }
 }
 
-.menu-textandicon[data-icon]:before {
+.menu-textandicon[data-icon]::before {
   padding-right: 11px;
 }
 
@@ -170,7 +170,7 @@
 .popup-head {
   color: @active-color;
 
-  &.has-submenu:after {
+  &.has-submenu::after {
     .sub-menu-icon;
     .transform(rotate(180deg));
     padding-right: 10px;
@@ -178,7 +178,7 @@
     top: 5px;
   }
 
-  &[data-icon]:before {
+  &[data-icon]::before {
     .menu-icon(attr(data-icon));
     color: @hover-color;
   }

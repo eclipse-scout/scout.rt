@@ -104,7 +104,7 @@
   border-right: 1px solid transparent;
   padding-top:16px;
 
-  &:before {
+  &::before {
     .font-icon;
     color: @icon-color;
     font-size: 17px;
@@ -113,7 +113,7 @@
     content: attr(data-icon);
   }
 
-  &:hover:before {
+  &:hover::before {
     color: @hover-color;
   }
 
@@ -123,12 +123,12 @@
     border-bottom: 1px solid @body-background-color;
     cursor: pointer;
 
-    &:before {
+    &::before {
       color: @active-color;
     }
   }
 
-  &.disabled:before {
+  &.disabled::before {
     color: @disabled-color;
   }
 }
@@ -179,24 +179,24 @@
     border-left-width: 2px;
     border-right-width: 2px;
 
-    &.select-single:before,
-    &.select-top:before,
-    &.select-bottom:before {
+    &.select-single::before,
+    &.select-top::before,
+    &.select-bottom::before {
       .overlay;
       /* Make sure overlay does not get target of mouse events, necessary for links inside table-cell.
       FIXME CGU verify if this really works with IE 9 */
       pointer-events: none;
     }
 
-    &.select-top:before {
+    &.select-top::before {
       border-top: 1px solid @selection-row-border-color;
     }
 
-    &.select-bottom:before {
+    &.select-bottom::before {
       border-bottom: 1px solid @selection-row-border-color;
     }
 
-    &.select-single:before {
+    &.select-single::before {
       border-top: 1px solid @selection-row-border-color;
       border-bottom: 1px solid @selection-row-border-color;
     }
@@ -226,7 +226,7 @@
   float: right;
 }
 
-.reconnect-animated:before {
+.reconnect-animated::before {
   .animation(rotation 0.9s linear infinite);
   content: '';
   display: inline-block;

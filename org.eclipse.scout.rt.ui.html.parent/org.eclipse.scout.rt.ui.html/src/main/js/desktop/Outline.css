@@ -47,7 +47,7 @@
     height: @outline-item-control-size;
     line-height: @outline-item-control-size;
 
-    &:before {
+    &::before {
       font-size: @outline-item-control-size;
       /* always use same color as the tree-item label */
       color: inherit;
@@ -81,9 +81,9 @@
     }
   }
 
-  .navigation-breadcrumb & .parent:before,
-  .navigation-breadcrumb & .parent:after,
-  .navigation-breadcrumb & .selected:before {
+  .navigation-breadcrumb & .parent::before,
+  .navigation-breadcrumb & .parent::after,
+  .navigation-breadcrumb & .selected::before {
     position: absolute;
     left: 50%;
     margin-left: -13px;
@@ -93,25 +93,25 @@
     width: 0;
     z-index: 3;
   }
-  .navigation-breadcrumb & .parent:before {
+  .navigation-breadcrumb & .parent::before {
     border-color: @navigation-background-selected-color transparent transparent transparent;
     border-width: 8px 13px 0 13px;
     bottom: -9px;
   }
-  .navigation-breadcrumb & .parent:after {
+  .navigation-breadcrumb & .parent::after {
     border-color: @navigation-background-active-color transparent transparent transparent;
     border-width: 8px 13px 0 13px;
     bottom: -8px;
   }
-  .navigation-breadcrumb & .selected:before {
+  .navigation-breadcrumb & .selected::before {
     border-color: @navigation-background-selected-color transparent transparent transparent;
     border-width: 8px 13px 0 13px;
     bottom: -8px;
   }
 
-  .navigation-breadcrumb & .parent.leaf:before,
-  .navigation-breadcrumb & .parent.leaf:after,
-  .navigation-breadcrumb & .selected.leaf:before {
+  .navigation-breadcrumb & .parent.leaf::before,
+  .navigation-breadcrumb & .parent.leaf::after,
+  .navigation-breadcrumb & .selected.leaf::before {
     display: none;
   }
 

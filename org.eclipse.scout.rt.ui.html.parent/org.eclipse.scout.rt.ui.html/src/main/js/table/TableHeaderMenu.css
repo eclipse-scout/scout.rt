@@ -52,7 +52,7 @@
     border: 1px solid @palette-bsi-normal;
   }
 
-  &:after {
+  &::after {
     position: relative;
     left: 3px;
     top: -6px;
@@ -65,58 +65,58 @@
     border: 1px solid @palette-bsi-disabled;
   }
 
-  &.selected:before,
-  &.selected:after {
+  &.selected::before,
+  &.selected::after {
     color: @desktop-background-color;
   }
 
-  &.move-top:before,
-  &.move-up:before,
-  &.move-down:before,
-  &.move-bottom:before {
+  &.move-top::before,
+  &.move-up::before,
+  &.move-down::before,
+  &.move-bottom::before {
     font-size: 20px;
     line-height: 20px;
   }
 
-  &.move-top:before {
+  &.move-top::before {
     content: @icon-angle-double-left;
   }
-  &.move-up:before {
+  &.move-up::before {
     content: @icon-angle-left;
   }
-  &.move-down:before {
+  &.move-down::before {
    content: @icon-angle-right;
   }
-  &.move-bottom:before {
+  &.move-bottom::before {
     content: @icon-angle-double-right;
   }
 
-  &.sort-asc:before,
-  &.sort-asc-add:before {
+  &.sort-asc::before,
+  &.sort-asc-add::before {
     content: @icon-long-arrow-up;
   }
 
-  &.sort-desc:before,
-  &.sort-desc-add:before {
+  &.sort-desc::before,
+  &.sort-desc-add::before {
     content: @icon-long-arrow-down;
   }
 
-  &.sort-asc-add:after,
-  &.sort-desc-add:after {
+  &.sort-asc-add::after,
+  &.sort-desc-add::after {
     content: attr(data-icon);
   }
 
-  &.sort-asc:before,
-  &.sort-asc-add:before {
+  &.sort-asc::before,
+  &.sort-asc-add::before {
     content: @icon-long-arrow-up;
   }
 
-  &.sort-asc.selected:hover:before,
-  &.sort-asc-add.selected:hover:before,
-  &.sort-desc.selected:hover:before,
-  &.sort-desc-add.selected:hover:before,
-  &.group-all.selected:hover:before,
-  &.group-sort.selected:hover:before {
+  &.sort-asc.selected:hover::before,
+  &.sort-asc-add.selected:hover::before,
+  &.sort-desc.selected:hover::before,
+  &.sort-desc-add.selected:hover::before,
+  &.group-all.selected:hover::before,
+  &.group-sort.selected:hover::before {
     top: 0px;
     font-size: 17px;
     line-height: 20px;
@@ -124,17 +124,17 @@
     content: @icon-remove;
   }
 
-  &.sort-asc.selected:hover:after,
-  &.sort-asc-add.selected:hover:after,
-  &.sort-desc.selected:hover:after,
-  &.sort-desc-add.selected:hover:after,
-  &.group-all.selected:hover:after,
-  &.group-sort.selected:hover:after {
+  &.sort-asc.selected:hover::after,
+  &.sort-asc-add.selected:hover::after,
+  &.sort-desc.selected:hover::after,
+  &.sort-desc-add.selected:hover::after,
+  &.group-all.selected:hover::after,
+  &.group-sort.selected:hover::after {
     content: '';
   }
 
-  &.group-all:before,
-  &.group-sort:before {
+  &.group-all::before,
+  &.group-sort::before {
     position: relative;
     top: 0px;
     font-family: sans-serif;
@@ -143,25 +143,25 @@
     content: @icon-sum;
   }
 
-  &.group-sort:after {
+  &.group-sort::after {
     content: @icon-th-list;
   }
 
-  &.color-red:after {
+  &.color-red::after {
     content: @icon-nbsp;
   }
   &.color-red {
     background-image: linear-gradient(to right, @palette-red-disabled, @palette-green-disabled);
   }
 
-  &.color-green:after {
+  &.color-green::after {
     content: @icon-nbsp;
   }
   &.color-green {
     background-image: linear-gradient(to right, @palette-green-disabled, @palette-red-disabled);
   }
 
-  &.color-bar:after {
+  &.color-bar::after {
     content: @icon-nbsp;
   }
   &.color-bar {
@@ -171,7 +171,7 @@
     line-height: 29px;
   }
 
-  &.color-remove:after {
+  &.color-remove::after {
     content: @icon-nbsp;
   }
   &.color-remove {
@@ -181,11 +181,11 @@
     line-height: 29px;
   }
 
-  &.column-add:before {
+  &.column-add::before {
     content: @icon-add;
   }
 
-  &.column-remove:before {
+  &.column-remove::before {
     content: @icon-remove;
   }
 }
@@ -223,7 +223,7 @@
     color: @hover-color;
   }
 
-  &:after {
+  &::after {
     position: absolute;
     right: 14px;
     content: attr(data-value);

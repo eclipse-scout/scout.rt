@@ -87,7 +87,7 @@
   font-size: 16px;
   transform: rotate(45deg);
 
-  &:before {
+  &::before {
     content: @icon-caret-right;
   }
 }

@@ -62,21 +62,21 @@
     outline: none;
   }
 
-  & > button:focus:before {
+  & > button:focus::before {
     .focus-border;
     .overlay(2px, 2px, -4px, -4px);
     z-index: 1;
   }
 
-  & > button:first-child:focus:before {
+  & > button:first-child:focus::before {
     border-bottom-left-radius: @border-radius;
   }
 
-  & > button:last-child:focus:before {
+  & > button:last-child:focus::before {
     border-bottom-right-radius: @border-radius;
   }
 
-  .severity-error & > button:focus:before {
+  .severity-error & > button:focus::before {
     border-color: @error-color;
     .glow(@error-color);
   }

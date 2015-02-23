@@ -35,11 +35,11 @@
     padding-right: 20px;
   }
 
-  &.sort-desc:after {
+  &.sort-desc::after {
     .sort-icon(@icon-arial-long-arrow-down);
   }
 
-  &.sort-asc:after {
+  &.sort-asc::after {
     .sort-icon(@icon-arial-long-arrow-up)
   }
 
@@ -47,8 +47,8 @@
     color: @hover-color;
   }
 
-  &.header-move:after,
-  &.menu-open:after {
+  &.header-move::after,
+  &.menu-open::after {
     display: none;
   }
 
@@ -59,7 +59,6 @@
     color: @active-color;
     z-index: 1;
   }
-
 }
 
 .header-resize {

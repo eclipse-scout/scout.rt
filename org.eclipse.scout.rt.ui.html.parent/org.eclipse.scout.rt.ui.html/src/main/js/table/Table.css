@@ -64,8 +64,8 @@
       border-bottom: 0;
     }
 
-    &.select-top:after,
-    &.select-middle:after {
+    &.select-top::after,
+    &.select-middle::after {
       border-bottom: 1px solid @desktop-border-color;
       content: '';
       display: block;
@@ -93,28 +93,28 @@
   & label {
     cursor: pointer;
   }
-  & label:before {
+  & label::before {
     .checkboxLabelBefore(inherit, inherit, -18px);
   }
-  & label:hover:before {
+  & label:hover::before {
     .checkboxLabelBeforBorderHover;
   }
   & input[type=checkbox] {
     visibility: hidden;
   }
-  & input[type=checkbox]:disabled + label:hover:before {
+  & input[type=checkbox]:disabled + label:hover::before {
     .checkboxLabelBeforeDisabledBorder;
   }
-  & input[type=checkbox]:focus + label:before {
+  & input[type=checkbox]:focus + label::before {
     .checkboxLabelBeforeFocus;
   }
-  & input[type=checkbox]:checked + label:before {
+  & input[type=checkbox]:checked + label::before {
     .checkboxLabelBeforeChecked;
   }
-  & label:before {
+  & label::before {
     .checkboxLabelBeforeBorder;
   }
-  & input[type=checkbox]:disabled + label:before {
+  & input[type=checkbox]:disabled + label::before {
     .checkboxLabelBeforeDisabled;
   }
   & input[type=checkbox]:disabled + label {
@@ -136,4 +136,3 @@
 .table .key-box.bottom2 { bottom: 32px;}
 .table .key-box.bottom3 { bottom: 10px;}
 .table .key-box.char { bottom: 8px; }
-

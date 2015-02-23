@@ -12,7 +12,9 @@
     overflow: hidden;
   }
 
-  & .slot, & .minus, & .plus {
+  & .slot,
+  & .minus,
+  & .plus {
     float: left;
     width: 80px;
     margin: 5px 5px 0px 2px;
@@ -70,7 +72,6 @@
     }
   }
 
-
   & .fixed{
     float: left;
     width: 50px;
@@ -81,28 +82,28 @@
     text-align: center;
   }
 
-
-  & .minus, & .plus {
+  & .minus,
+  & .plus {
     width: 50px;
   }
 
-
-  & .minus:before, & .plus:before{
+  & .minus::before,
+  & .plus::before{
     color: @icon-color;
     .font-icon;
     font-size: 17px;
   }
 
-  & .minus:hover:before, & .plus:hover:before {
-     color: @palette-bsi-normal !important;
+  & .minus:hover::before,
+  & .plus:hover::before {
+     color: @palette-bsi-normal;
    }
 
-  & .minus:before {
+  & .minus::before {
     content: @icon-minus;
   }
 
-  & .plus:before{
+  & .plus::before{
     content: @icon-add;
   }
-
 }

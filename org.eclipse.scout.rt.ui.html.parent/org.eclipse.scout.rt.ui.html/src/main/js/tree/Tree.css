@@ -72,11 +72,11 @@
     font-size: 13px;
   }
 
-  & label:before {
+  & label::before {
     .checkboxLabelBefore(0px, 0px, 0px, 0px, -11px);
   }
 
-  & label:hover:before {
+  & label:hover::before {
     .checkboxLabelBeforBorderHover;
   }
 
@@ -93,27 +93,27 @@
     opacity: 0;
   }
 
-  & input[type=checkbox]:disabled + label:hover:before {
+  & input[type=checkbox]:disabled + label:hover::before {
     .checkboxLabelBeforeDisabledBorder;
   }
 
-  & input[type=checkbox]:focus + label:before {
+  & input[type=checkbox]:focus + label::before {
     .checkboxLabelBeforeFocus;
   }
 
-  & input[type=checkbox]:checked + label:before {
+  & input[type=checkbox]:checked + label::before {
     .checkboxLabelBeforeChecked;
   }
 
-  & label:before {
+  & label::before {
     .checkboxLabelBeforeBorder;
   }
 
-  & label.childrenChecked:before {
+  & label.childrenChecked::before {
     .checkboxLabelBeforeChildChecked;
   }
 
-  & input[type=checkbox]:disabled + label:before {
+  & input[type=checkbox]:disabled + label::before {
     .checkboxLabelBeforeDisabled;
   }
 
@@ -140,7 +140,7 @@
   line-height: @tree-item-control-size;
   text-align: center;
 
-  &:before {
+  &::before {
     .font-icon;
     font-size: @tree-item-control-size;
     content: @icon-angle-right;

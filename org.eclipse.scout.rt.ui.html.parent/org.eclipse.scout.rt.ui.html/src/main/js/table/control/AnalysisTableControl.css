@@ -19,7 +19,7 @@
     overflow: visible;
   }
 
-  & .command:before {
+  & .command::before {
     position: absolute;
     top: 0;
     left: 0;
@@ -30,15 +30,15 @@
     text-align: center;
   }
 
-  & .command.new:before {
+  & .command.new::before {
     content: @icon-add;
   }
 
-  & .command.delete:before {
+  & .command.delete::before {
     content: @icon-remove;
   }
 
-  & .command.search:before {
+  & .command.search::before {
     content: @icon-search;
   }
 
@@ -46,7 +46,7 @@
     color: @active-color;
   }
 
-  & .command:hover:before {
+  & .command:hover::before {
     color: @chart-select-color;
   }
 
@@ -128,7 +128,7 @@ text.venn-circle-text {
   width: 30px;
   left: 680px;
 
-  &:before {
+  &::before {
     position: relative;
     top: -4px;
     .font-icon;
@@ -137,7 +137,7 @@ text.venn-circle-text {
     content: @icon-long-arrow-left;
   }
 
-  &:hover:before {
+  &:hover::before {
     color: @active-color;
   }
 }
@@ -166,7 +166,7 @@ text.venn-circle-text {
     cursor: default;
   }
 
-  &:after {
+  &::after {
     .font-icon;
     content:  @icon-angle-right;
     position: relative;
@@ -174,7 +174,7 @@ text.venn-circle-text {
     display: inline-block;
   }
 
- &:last-child:after {
+ &:last-child::after {
     content: "";
     left: 0px;
   }

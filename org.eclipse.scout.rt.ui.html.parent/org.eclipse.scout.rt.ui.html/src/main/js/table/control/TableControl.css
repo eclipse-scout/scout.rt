@@ -8,14 +8,14 @@
   line-height: @table-footer-height;
   border: 1px solid transparent;
 
-  &[data-icon]:before {
+  &[data-icon]::before {
     .font-icon;
     font-size: 22px;
     color: @icon-light-color;
     content: attr(data-icon);
   }
 
-  &:last-child:after {
+  &:last-child::after {
     content: '';
     position: absolute;
     top: @table-control-padding / 2  + 2px;
@@ -24,17 +24,17 @@
     border-right: 1px solid @desktop-border-color;
   }
 
-  &:hover:before {
+  &:hover::before {
     color: @active-color;
   }
 
-  &.disabled:hover, &.disabled:before {
+  &.disabled:hover, &.disabled::before {
     cursor: default;
     color: @icon-disabled-color;
   }
 
-  &.selected:before {
-    color: @active-color !important;
+  &.selected::before {
+    color: @active-color;
   }
 
   &.selected {

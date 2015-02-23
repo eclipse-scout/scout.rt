@@ -40,16 +40,16 @@
       left: 2px;
     }
 
-    & .calendar-minus:hover:before,
-    & .calendar-plus:hover:before {
+    & .calendar-minus:hover::before,
+    & .calendar-plus:hover::before {
       color: @hover-color;
     }
 
-    & .calendar-minus:before {
+    & .calendar-minus::before {
       .calendar-icon(@icon-angle-left, 29px);
     }
 
-    & .calendar-plus:before {
+    & .calendar-plus::before {
       .calendar-icon(@icon-angle-right, 29px);
     }
 
@@ -63,31 +63,31 @@
       cursor: pointer;
     }
 
-    & .calendar-today:before {
+    & .calendar-today::before {
       .calendar-icon(@icon-target, 20px);
     }
 
-    & .calendar-mode-day:before {
+    & .calendar-mode-day::before {
       .calendar-icon("1", 20px);
      }
 
-    & .calendar-mode-work:before {
+    & .calendar-mode-work::before {
       .calendar-icon("5", 20px);
      }
 
-    & .calendar-mode-week:before {
+    & .calendar-mode-week::before {
       .calendar-icon("7", 20px);
      }
 
-    & .calendar-mode-month:before {
+    & .calendar-mode-month::before {
       .calendar-icon("31", 20px);
      }
 
-    & .calendar-toggle-year:before {
+    & .calendar-toggle-year::before {
       .calendar-icon(@icon-clock, 20px);
      }
 
-    & .calendar-toggle-list:before {
+    & .calendar-toggle-list::before {
       .calendar-icon(@icon-menu, 20px);
      }
 
@@ -97,8 +97,8 @@
       height: 25px;
     }
 
-    & *:hover:before, & *:hover,
-    & .selected:before, & .selected {
+    & *:hover::before, & *:hover,
+    & .selected::before, & .selected {
       color: @hover-color;
     }
 
@@ -172,8 +172,8 @@
      vertical-align: middle;
   }
 
-  & .calendar-day:after,
-  & .calendar-day-name:after{
+  & .calendar-day::after,
+  & .calendar-day-name::after{
     position: absolute;
     width: 1px;
     height: 100%;
@@ -183,7 +183,7 @@
     background-color: @palette-gray-6;
   }
 
-  & .calendar-week:after{
+  & .calendar-week::after{
     position: absolute;
     height: 1px;
     width: 100%;
@@ -199,7 +199,7 @@
     color: @palette-gray-4;
   }
 
-  & .calendar-day:before {
+  & .calendar-day::before {
     position: absolute;
     font-size: 17px;
     content: attr(data-day-name);
@@ -208,19 +208,19 @@
     top: 5px;
   }
 
-  & .out:before {
+  & .out::before {
     color: @palette-gray-6;
   }
 
-  & .weekend:before {
+  & .weekend::before {
     color: @palette-bsi-normal;
   }
 
-  & .weekend-out:before {
+  & .weekend-out::before {
     color: @palette-bsi-disabled;
   }
 
-  & .now:before {
+  & .now::before {
     color: @palette-orange-normal;
   }
 
@@ -230,7 +230,7 @@
     width:  calc(~"100%" - 8px);
   }
 
-  & .calendar-week-axis:after {
+  & .calendar-week-axis::after {
     position: absolute;
     height: 1px;
     width: 100%;
@@ -238,7 +238,7 @@
     background-color: @palette-gray-8;
   }
 
-  & .calendar-week-axis:before {
+  & .calendar-week-axis::before {
     position: absolute;
     font-size: 10px;
     top: -5px;
@@ -254,7 +254,7 @@
     width:  calc(~"100%" - 8px);
   }
 
-  & .calendar-week-axis-over:before {
+  & .calendar-week-axis-over::before {
     position: absolute;
     font-size: 10px;
     top: -5px;
@@ -269,7 +269,7 @@
     width:  100%;
   }
 
-  & .calendar-week-task:after {
+  & .calendar-week-task::after {
     position: absolute;
     height: 1px;
     width: 100%;
@@ -277,7 +277,7 @@
     background-color: @palette-gray-6;
   }
 
-  & .calendar-week-task:before {
+  & .calendar-week-task::before {
     position: absolute;
     font-size: 10px;
     top: 5px;

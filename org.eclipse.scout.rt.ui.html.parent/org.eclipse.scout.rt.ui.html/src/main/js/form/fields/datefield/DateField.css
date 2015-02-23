@@ -142,11 +142,11 @@
   float: left;
 }
 
-.date-box-left-y:before {
+.date-box-left-y::before {
   content: @icon-angle-double-left;
 }
 
-.date-box-left-m:before {
+.date-box-left-m::before {
   content: @icon-angle-left;
 }
 
@@ -155,10 +155,10 @@
   float: right;
 }
 
-.date-box-right-y:before {
+.date-box-right-y::before {
   content: @icon-angle-double-right;
 }
 
-.date-box-right-m:before {
+.date-box-right-m::before {
   content: @icon-angle-right;
 }

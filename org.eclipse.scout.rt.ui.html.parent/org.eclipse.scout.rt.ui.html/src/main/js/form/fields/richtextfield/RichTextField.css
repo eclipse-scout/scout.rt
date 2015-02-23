@@ -15,7 +15,7 @@
 }
 
 .rich-text-icon(@icon) {
-  &:before {
+  &::before {
     position: relative;
     left: 1px;
     .font-icon;
@@ -37,34 +37,31 @@
 }
 
 .rich-text-editor-content {
-    counter-reset: hr;
+  counter-reset: hr;
+  line-height: 20px;
+  white-space: pre-wrap;
+  padding: 5px 5px 5px @text-field-padding;
+  color: @text-color;
+  background-color: @control-background-color;
+  -moz-user-select: text;
+  overflow: hidden;
+
+  &:focus {
+    outline: none;
+  }
+
+  & * {
     line-height: 20px;
-    white-space: pre-wrap;
-    padding: 5px 5px 5px @text-field-padding;
-    color: @text-color;
-    background-color: @control-background-color;
-    border: 0 !important;
     -moz-user-select: text;
-    overflow: hidden;
+  }
 
-    &:focus {
-      border: 0 !important;
-      outline: 0 !important;
-    }
+  &::selection, & *::selection{
+    .selection();
+  }
 
-    & * {
-      line-height: 20px;
-      -moz-user-select: text;
-    }
-
-    &::selection, & *::selection{
-      .selection();
-    }
-
-    &::-moz-selection, & *::-moz-selection {
-      .selection();
-    }
-
+  &::-moz-selection, & *::-moz-selection {
+    .selection();
+  }
 }
 
 .rich-text-editor {
@@ -86,7 +83,7 @@
     position: relative;
     list-style: none;
 
-    &:before {
+    &::before {
       content: counter(li) ".";
       counter-increment: li;
       position :absolute;
@@ -103,7 +100,7 @@
     position: relative;
     list-style: none;
 
-    &:before {
+    &::before {
       .font-icon;
       content: @icon-angle-double-right;
       position :absolute;
@@ -147,7 +144,7 @@
       color: @active-color;
     }
 
-    &:hover:before {
+    &:hover::before {
       color: @active-color;
     }
   }

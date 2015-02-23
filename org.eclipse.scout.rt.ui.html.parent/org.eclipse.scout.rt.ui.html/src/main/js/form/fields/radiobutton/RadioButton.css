@@ -13,7 +13,7 @@
     font-size: 13px;
   }
 
-  & label:before {
+  & label::before {
     content: "";
     display: inline-block;
     width: 19px;
@@ -24,7 +24,7 @@
     top: 5px;
   }
 
-  & label:hover:before {
+  & label:hover::before {
     border: 2px solid @hover-color;
   }
 
@@ -41,11 +41,11 @@
     opacity: 0;
   }
 
-  & input[type=radio]:disabled + label:hover:before {
+  & input[type=radio]:disabled + label:hover::before {
     border: 2px solid @border-color;
   }
 
-  & input[type=radio]:checked + label:before {
+  & input[type=radio]:checked + label::before {
     .font-icon;
     content: @icon-circle;
     color: @palette-black;
@@ -54,17 +54,17 @@
     line-height: 15px;
   }
 
-  & input[type=radio]:focus + label:before {
+  & input[type=radio]:focus + label::before {
     border-color: @focus-color;
     outline: none;
   }
 
-  & label:before {
+  & label::before {
     border: 2px solid @border-color;
     border-radius: 10px;
   }
 
-  & input[type=radio]:disabled + label:before {
+  & input[type=radio]:disabled + label::before {
     color: @palette-gray-5;
     background-color: @control-background-disabled-color;
   }

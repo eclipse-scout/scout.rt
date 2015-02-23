@@ -129,8 +129,7 @@ svg.select-chart.selected {
     display: block;
   }
 
-  &:before {
-    color: @palette-white !important;
+  &::before {
     position: absolute;
     font-size: 16px;
     line-height: 16px;
@@ -139,37 +138,37 @@ svg.select-chart.selected {
     .font-icon;
   }
 
-  &.axis-ver.selected:before {
+  &.axis-ver.selected::before {
   content: @icon-long-arrow-down;
   }
 
-  &.axis-hor.selected:before {
+  &.axis-hor.selected::before {
     content: @icon-long-arrow-right;
     right: 5px;
   }
 
-  &.axis-around.selected:before {
+  &.axis-around.selected::before {
     content: @icon-rotate-right;
     right: 6px;
   }
 
-  &.axis-up.selected:before {
+  &.axis-up.selected::before {
     content: @icon-long-arrow-up;
   }
 
-  &.data-count.selected:before {
+  &.data-count.selected::before {
     content: @icon-count;
     top: 3px;
     right: 7px;
   }
 
-  &.data-sum.selected:before {
+  &.data-sum.selected::before {
     content: @icon-sum;
     top: 4px;
     right: 8px;
   }
 
-  &.data-median.selected:before {
+  &.data-median.selected::before {
     content: @icon-median;
     top: 4px;
     right: 8px;

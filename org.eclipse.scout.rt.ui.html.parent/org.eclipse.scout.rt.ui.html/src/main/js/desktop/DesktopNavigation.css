@@ -89,7 +89,7 @@
   line-height: @navigation-tab-button-size;
   .font-text-large;
 
-  &:before {
+  &::before {
     .font-icon;
     font-size: 24px;
   }
@@ -107,7 +107,7 @@
     background-color: @control-background-color;
   }
 
-  &:before {
+  &::before {
     content: @icon-menu;
   }
 }
@@ -115,7 +115,7 @@
 .navigation-tab-search-button {
   float: right;
 
-  &:before {
+  &::before {
     content: @icon-search;
   }
 }

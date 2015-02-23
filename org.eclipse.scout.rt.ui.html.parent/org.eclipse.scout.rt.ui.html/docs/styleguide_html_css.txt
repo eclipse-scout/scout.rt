@@ -6,57 +6,90 @@ Als Basis dient der Google HTML/CSS StyleGuide:
 https://google-styleguide.googlecode.com/svn/trunk/htmlcssguide.xml
 
 ### CSS
-- Leerschlag nach dem Doppelpunkt.
-- Leerschlag vor {
-- Einrückung mit 2 Leerschlägen wie im JS (keine Tabs)
-- Trennung von Wörter mit Bindestrich
-- Abkürzungen verwenden für padding und margin also margin:
-  So:
-  margin: 0 5px
 
-  So nicht:
-  margin: 0 5px 0 5px;
+- Leerschlag nach dem Doppelpunkt.
+
+- Leerschlag vor {
+
+- Einrückung mit 2 Leerschlägen wie im JS (keine Tabs)
+
+- Trennung von Wörter mit Bindestrich
+
+- Abkürzungen verwenden für padding und margin also margin:
+    So:
+      margin: 0 5px
+    So nicht:
+      margin: 0 5px 0 5px;
 
 - Abkürzungen verwenden für Farben:
-  So:
-  color: #ccc;
-
-  So nicht:
-  color: #cccccc
+    So:
+      color: #ccc;
+    So nicht:
+      color: #cccccc
 
 - Unit weglassen bei 0
+
 - Universelle Klassen verwenden sofern sinnvoll
-  z.B. selected anstatt row-selected.
-  Dann kann man die CSS-Klassen kombinieren (z.B. .table-row.selected) und wir haben nicht für dasselbe immer neue Klassen-Namen.
+    z.B. selected anstatt row-selected.
+    Dann kann man die CSS-Klassen kombinieren (z.B. .table-row.selected) und wir haben nicht für dasselbe immer neue Klassen-Namen.
 
 - Sortierung der Properties ist nicht nötig
+
 - Wenn ein Style ergänzt / überschrieben wird, soll man nur die Differenz definieren. Z.B.
+    .ab {
+      border: 1px solid black;
+    }
+    .ab.selected {
+      So:
+      border-color: red;
 
-  .ab {
-    border: 1px solid black;
-  }
-  .ab.selected {
+      So nicht:
+      border: 1px solid red;
+    }
+
+- Pseudoelemente immer mit "::" schreiben, Pseudoselektoren dagegen mit ":"
     So:
-    border-color: red;
-
+      div::before { ... }
+      .class:hover::after { ... }
     So nicht:
-    border: 1px solid red;
-  }
+      div:before { ... }
+      .class:hover:after { ... }
+    Zwar funktioniert der einfache Doppelpunkt auch fuer Pseudoelemente, aber das ist nur ein Legacy-Fallback der Browser.
+    IE kann :: ab Version 8, sollte darum so verwendet werden.
+
+- Auf "!important" verzichten
+    Normalerweise sollte eine Regel immer durch die CSS-Spezifität angewandt werden koennen, d.h. sie wird automatisch
+    verwendet, weil sie spezifischer (normalerweise gleich "laenger") ist als diejenige, die ueberschrieben werden soll.
+    Das Ueberschreiben mit !important ist fast immer falsch, da es ein "Dead-End" ist (geht nur 1x). Die Struktur der
+    Regeln und Elemente sollte normalerweise ausreichen. Es gibt Ausnahmefaelle, wo !important gut und richtig ist, aber
+    diese sind wirklich sehr selten und sollten immer mit einem Kommentar begruendet werden (damit es nicht spaeter wieder
+    jemand wegloescht).
+
+    So:
+      .wrapper { color: blue; }
+      .wrapper .item { color: dark-red; }
+      .wrapper .item:hover { color: red; }
+    So nicht:
+      .wrapper { color: blue; }
+      .item { color: dark-red !important; }
+
 
 ### LESS
-- Mixins einsetzen für häufig genutze Konstrukte
-  z.B. .drop-shadow
-- Mixins einsetzen für Vendor-abhängige Stlyes
-  Also sobald ein Vendor-Prefix verwendet werden muss, dies in ein mixin auslagern.
-  Z.B.:
-  .animation-name(@name) {
-    -webkit-animation-name: @name;
-    -moz-animation-name: @name;
-    -ms-animation-name: @name;
-    -o-animation-name: @name;
-    animation-name: @name;
-  }
-  Vorher bitte prüfen, ob der Prefix wirklich noch nötig ist, am besten über caniuse.com
 
-- Variablen einsetzen wenn Werte abhängig voneinander sind -> hiflt bei Refactoring.
+- Mixins einsetzen für häufig genutze Konstrukte
+    z.B. .drop-shadow
+
+- Mixins einsetzen für Vendor-abhängige Stlyes
+    Also sobald ein Vendor-Prefix verwendet werden muss, dies in ein mixin auslagern. Beispiel:
+      .animation-name(@name) {
+        -webkit-animation-name: @name;
+        -moz-animation-name: @name;
+        -ms-animation-name: @name;
+        -o-animation-name: @name;
+        animation-name: @name;
+      }
+    Vorher bitte prüfen, ob der Prefix wirklich noch nötig ist, am besten über caniuse.com
+
+- Variablen einsetzen wenn Werte abhängig voneinander sind -> hilft bei Refactoring.
+
 - & einsetzen für bessere Gruppierung

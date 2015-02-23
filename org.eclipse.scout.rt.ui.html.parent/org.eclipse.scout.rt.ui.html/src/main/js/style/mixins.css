@@ -48,7 +48,7 @@
     cursor: text;
   }
 
-  & ~ .icon:before {
+  & ~ .icon::before {
     .font-icon;
     font-size: 13px;
     content: @icon;
@@ -59,11 +59,11 @@
     color: @text-field-icon-color;
   }
 
-  &:focus ~ .icon:before {
+  &:focus ~ .icon::before {
     color: @focus-color;
   }
 
-  &.has-error ~ .icon:before {
+  &.has-error ~ .icon::before {
     color: @error-color;
   }
 

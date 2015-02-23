@@ -1,5 +1,5 @@
 /**
- * RadioButtonLayout. Sets the input behind the displayed Radio-Button ui-elemnt in label:before.
+ * RadioButtonLayout. Sets the input behind the displayed Radio-Button ui-elemnt in label::before.
  */
 scout.RadioButtonLayout = function(formField) {
   scout.RadioButtonLayout.parent.call(this);
@@ -12,7 +12,7 @@ scout.RadioButtonLayout.prototype.layout = function($container) {
     bounds;
   scout.RadioButtonLayout.parent.prototype.layout.call(this, $container);
 
-  //move radio button behind radiobutton icon in label:before
+  //move radio button behind radiobutton icon in label::before
   bounds = scout.graphics.getBounds(field.$fieldContainer);
   bounds.x = 0;
   scout.graphics.setBounds(field.$fieldContainer, bounds);

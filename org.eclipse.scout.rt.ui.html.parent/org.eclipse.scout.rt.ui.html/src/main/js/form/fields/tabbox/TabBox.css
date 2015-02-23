@@ -35,7 +35,7 @@
       outline: none;
     }
 
-    &:focus:before {
+    &:focus::before {
       .font-icon;
       content: @icon-angle-right;
       color: @active-color;
@@ -45,7 +45,7 @@
     }
   }
 
-  &:after {
+  &::after {
     width: 100%;
     height: 3px;
     margin-top: -3px;

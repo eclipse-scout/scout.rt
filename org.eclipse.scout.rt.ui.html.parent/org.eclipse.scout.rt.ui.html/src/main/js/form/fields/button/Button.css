@@ -31,7 +31,7 @@
     outline: none;
   }
 
-  &:focus:before {
+  &:focus::before {
     .button-focus;
   }
 

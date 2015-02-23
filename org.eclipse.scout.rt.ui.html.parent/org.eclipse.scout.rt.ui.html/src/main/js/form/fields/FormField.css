@@ -29,7 +29,7 @@
     visibility: hidden;
     margin-right: 2px;
 
-    &:before {
+    &::before {
       content: '*';
       font-size: 15px;
     }
@@ -51,7 +51,7 @@
     visibility: hidden;
     cursor: pointer;
 
-    &:before  {
+    &::before  {
       .font-icon();
       /* set (invisible) info icon to reserve space */
       content: @icon-info;
@@ -62,12 +62,12 @@
   &.has-tooltip > .status {
     visibility: visible;
 
-    &:before  {
+    &::before  {
       content: @icon-info;
       color: @icon-light-color;
     }
 
-    &:hover:before {
+    &:hover::before {
       color: @icon-color;
     }
   }
@@ -75,7 +75,7 @@
   &.has-error > .status {
     visibility: visible;
 
-    &:before  {
+    &::before  {
       content: @icon-error;
       color: @error-color;
     }

@@ -70,7 +70,7 @@
   cursor: pointer;
   line-height: 19px;
 
-  &:before {
+  &::before {
     content: '';
     position: absolute;
     top: @table-control-padding / 2  + 2px;

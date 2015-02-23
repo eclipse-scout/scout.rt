@@ -37,7 +37,7 @@
   & > .menu-item {
     padding-top:0;
 
-    &[data-icon]:before {
+    &[data-icon]::before {
       font-size: 18px;
       line-height: @logical-grid-height;
     }

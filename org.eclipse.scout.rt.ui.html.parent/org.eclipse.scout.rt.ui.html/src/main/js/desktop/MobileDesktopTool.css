@@ -1,44 +1,43 @@
 #DesktopTools {
-position: absolute;
-right: 0px;
-top: 0px;
-z-index: 10;
-height: 60px;
-width: 100%;
-overflow: hidden;
+  position: absolute;
+  right: 0px;
+  top: 0px;
+  z-index: 10;
+  height: 60px;
+  width: 100%;
+  overflow: hidden;
 }
 
 .tool-button {
-position: relative;
-float: right;
-width: 65px;
-padding: 15px 15px;
-text-align: center;
+  position: relative;
+  float: right;
+  width: 65px;
+  padding: 15px 15px;
+  text-align: center;
 }
 
-.tool-button:before {
-.font-icon;
-font-size: 30px;
-color: @palette-bsi-normal;
-content: attr(data-icon) '\A';
+.tool-button::before { .font-icon;
+  font-size: 30px;
+  color: @palette-bsi-normal;
+  content: attr(data-icon) '\A';
 }
 
 .tool-button:active {
-color: @palette-bsi-normal;
+  color: @palette-bsi-normal;
 }
 
-.tool-button.selected, .tool-button.selected:before {
-color: @highlight-color !important;
+.tool-button.selected, .tool-button.selected::before {
+  color: @highlight-color;
 }
 
 .tool-open {
-position: absolute;
-left: 0px;
-top: 65px;
-width: 100%;
-height: 0;
-border-left:1px solid @palette-gray-6;
-background-color: rgba(255, 255, 255, 0.95);
-overflow: hidden;
-z-index: 11;
+  position: absolute;
+  left: 0px;
+  top: 65px;
+  width: 100%;
+  height: 0;
+  border-left: 1px solid@palette-gray-6;
+  background-color: rgba(255, 255, 255, 0.95);
+  overflow: hidden;
+  z-index: 11;
 }

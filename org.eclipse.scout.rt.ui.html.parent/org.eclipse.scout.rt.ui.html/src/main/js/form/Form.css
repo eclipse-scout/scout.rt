@@ -19,10 +19,10 @@
 }
 
 .detach-menu {
-  &:before {
+  &::before {
     .menu-icon(@icon-detach);
   }
-  &:hover:before {
+  &:hover::before {
      color:@hover-color;
   }
 }
@@ -65,7 +65,7 @@
     cursor: pointer;
     color: @icon-light-color;
 
-    &:before {
+    &::before {
       content: @icon-remove;
     }
 
