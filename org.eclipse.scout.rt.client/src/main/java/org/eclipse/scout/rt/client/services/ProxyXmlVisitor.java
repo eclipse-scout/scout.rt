@@ -20,6 +20,7 @@ import javax.xml.xpath.XPathFactory;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.cdi.Bean;
+import org.eclipse.scout.rt.platform.cdi.DynamicAnnotations;
 import org.eclipse.scout.rt.platform.cdi.IBeanContext;
 import org.eclipse.scout.rt.platform.pluginxml.IPluginXmlVisitor;
 import org.eclipse.scout.rt.platform.pluginxml.internal.IPluginXml;
@@ -77,7 +78,14 @@ public class ProxyXmlVisitor implements IPluginXmlVisitor {
         return ServiceTunnelUtility.createProxy(service, new ClientServiceTunnelInvocationHandler(service));
       }
     };
-    ServiceXmlVisitor.fillServiceAnnotations(bean, xmlFile, ref);
+    fillProxyAnnotations(bean, xmlFile, ref);
     m_context.register(bean);
+  }
+
+  public static void fillProxyAnnotations(Bean<?> bean, IPluginXml pluginXml, IServiceReference ref) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, ClassNotFoundException {
+    ServiceXmlVisitor.fillServiceAnnotations(bean, pluginXml, ref);
+
+    // proxies are always application scoped (singletons)
+    bean.addAnnotation(DynamicAnnotations.createApplicationScoped());
   }
 }
