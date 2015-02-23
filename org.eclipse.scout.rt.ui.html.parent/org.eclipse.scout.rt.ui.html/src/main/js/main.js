@@ -5,6 +5,10 @@ scout.init = function(options) {
 
   var tabId = scout.dates.timestamp();
   options = options || {};
+  // Set default poptions
+  if (options.focusFirstPart === undefined) {
+    options.focusFirstPart = true;
+  }
 
   var firstPartFocusApplied = false;
   $('.scout').each(function() {
