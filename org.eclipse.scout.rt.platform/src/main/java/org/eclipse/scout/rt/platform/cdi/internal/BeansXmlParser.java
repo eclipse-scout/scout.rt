@@ -33,6 +33,7 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.internal.Activator;
 import org.osgi.framework.Bundle;
 import org.w3c.dom.Document;
@@ -61,7 +62,7 @@ public final class BeansXmlParser {
   }
 
   protected List<IBeansXml> findAllBeanXml() {
-    if (StringUtility.hasText(System.getProperty("org.osgi.framework.version"))) {
+    if (Platform.isOsgiRunning()) {
       return findAllBeanXmlOsgi();
     }
     else {

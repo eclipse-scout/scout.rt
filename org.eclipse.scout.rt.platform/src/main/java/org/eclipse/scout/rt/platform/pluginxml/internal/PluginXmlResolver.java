@@ -21,9 +21,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.Platform;
 import org.eclipse.scout.rt.platform.internal.Activator;
 import org.osgi.framework.Bundle;
 
@@ -41,11 +41,11 @@ public final class PluginXmlResolver {
    * @return all fragment.xml and plugin.xml files resolved on the classpath.
    */
   public static List<IPluginXml> resolvePluginXml() {
-    if (StringUtility.isNullOrEmpty(System.getProperty("org.osgi.framework.version"))) {
-      return resolvePluginXmlPureJava();
+    if (Platform.isOsgiRunning()) {
+      return resolvePluginXmlOsgi();
     }
     else {
-      return resolvePluginXmlOsgi();
+      return resolvePluginXmlPureJava();
     }
   }
 

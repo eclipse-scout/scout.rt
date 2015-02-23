@@ -18,6 +18,8 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.cdi.CDI;
 import org.eclipse.scout.rt.platform.internal.ApplicationLoader;
 import org.eclipse.scout.rt.platform.internal.ScoutServiceLoader;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 /**
  *
@@ -156,5 +158,11 @@ public final class Platform implements IPlatform {
         LOG.warn("Platform event listener notification.", e);
       }
     }
+  }
+
+  public static boolean isOsgiRunning() {
+//    return StringUtility.hasText(System.getProperty("org.osgi.framework.version"));
+    Bundle bundle = FrameworkUtil.getBundle(Platform.class);
+    return bundle != null;
   }
 }

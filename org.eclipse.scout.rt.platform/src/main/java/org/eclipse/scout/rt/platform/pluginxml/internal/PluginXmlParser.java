@@ -43,6 +43,7 @@ public final class PluginXmlParser implements IPluginXmlParser {
   private Map<IPluginXml, Document> m_documents;
 
   private PluginXmlParser() {
+    LOG.setLevel(LOG.LEVEL_DEBUG);
   }
 
   /**
@@ -61,6 +62,7 @@ public final class PluginXmlParser implements IPluginXmlParser {
 
   private void visitInternal(IPluginXmlVisitor visitor) {
     for (Entry<IPluginXml, Document> entry : ensureDucumentsLoaded().entrySet()) {
+
       visitor.visit(entry.getKey(), entry.getValue());
     }
   }
@@ -70,6 +72,7 @@ public final class PluginXmlParser implements IPluginXmlParser {
       Map<IPluginXml, Document> documents = new HashMap<>();
       List<IPluginXml> xmlFiles = PluginXmlResolver.resolvePluginXml();
       for (IPluginXml xmlFile : xmlFiles) {
+        LOG.debug(String.format("resolved plugin.xml '%s'", xmlFile));
         try {
           documents.put(xmlFile, getDocument(xmlFile));
         }
