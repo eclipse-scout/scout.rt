@@ -363,9 +363,9 @@ scout.Table.prototype.drawData = function() {
 
 scout.Table.prototype._buildRowDiv = function(row) {
   var rowWidth = this._rowWidth;
-  var rowClass = 'table-row ';
+  var rowClass = 'table-row';
   if (this.selectedRowIds && this.selectedRowIds.indexOf(row.id) > -1) {
-    rowClass += 'selected ';
+    rowClass += ' selected';
   }
   var rowDiv = '<div id="' + row.id + '" class="' + rowClass + '" style="width: ' + rowWidth + 'px"' + scout.device.unselectableAttribute + '>';
   if (this.checkable) {
