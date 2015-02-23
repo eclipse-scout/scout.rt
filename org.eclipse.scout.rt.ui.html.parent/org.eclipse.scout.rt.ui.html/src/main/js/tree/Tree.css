@@ -34,7 +34,6 @@
   /* set top/bottom padding for item */
   padding-top: 6px;
   padding-bottom: 6px;
-  min-height: @tree-item-control-size;
 
   &.parent {
   }

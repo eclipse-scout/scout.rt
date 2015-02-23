@@ -22,7 +22,6 @@
     /* set top/bottom padding for item */
     padding-top: 8px;
     padding-bottom: 8px;
-    min-height: @outline-item-control-size;
 
     &.parent {
       .font-text-plus(@bold);
