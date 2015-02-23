@@ -15,8 +15,11 @@ import static org.junit.Assert.assertNull;
 
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
+import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
+@RunWith(ScoutPlatformTestRunner.class)
 public class FormDataTest {
 
   @Test

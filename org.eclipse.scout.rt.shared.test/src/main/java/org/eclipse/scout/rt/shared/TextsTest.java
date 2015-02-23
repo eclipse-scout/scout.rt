@@ -19,24 +19,29 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.eclipse.scout.rt.platform.cdi.IBean;
+import org.eclipse.scout.rt.platform.cdi.internal.BeanInstanceCreator;
 import org.eclipse.scout.rt.shared.services.common.text.ITextProviderService;
 import org.eclipse.scout.rt.shared.text.TestTextProviderService;
+import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.service.SERVICES;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * JUnit tests for {@link ScoutTexts} and {@link TEXTS}
  */
+@RunWith(ScoutPlatformTestRunner.class)
 public class TextsTest {
 
   private List<IBean<?>> m_testTextService;
 
   @Before
   public void before() throws InterruptedException {
-    m_testTextService = TestingUtility.registerServices(5, new TestTextProviderService());
+
+    m_testTextService = TestingUtility.registerServices(5, BeanInstanceCreator.createAndInitialize(TestTextProviderService.class));
     TextsThreadLocal.set(new ScoutTexts(SERVICES.getServices(ITextProviderService.class)));
   }
 

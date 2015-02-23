@@ -38,6 +38,7 @@ import org.eclipse.scout.rt.shared.services.lookup.DefaultCodeLookupCallFactoryS
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
+import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
 import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.testing.shared.services.common.code.TestingCodeService;
 import org.junit.After;
@@ -45,10 +46,12 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * @since 3.8.0
  */
+@RunWith(ScoutPlatformTestRunner.class)
 public class DataModelAttributeTest {
 
   private static List<IBean<?>> s_services;
