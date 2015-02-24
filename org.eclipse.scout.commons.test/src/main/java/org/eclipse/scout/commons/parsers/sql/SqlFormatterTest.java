@@ -61,7 +61,7 @@ public class SqlFormatterTest {
   }
 
   protected void check(String resourceName) throws Exception {
-    String s = new String(IOUtility.getContent(SqlFormatterTest.class.getResourceAsStream(resourceName)), "UTF-8");
+    String s = IOUtility.getContentUtf8(SqlFormatterTest.class.getResourceAsStream(resourceName));
     String w = SqlFormatter.wellform(s);
     int i = w.toLowerCase().indexOf("unparsed");
     if (i != -1) {

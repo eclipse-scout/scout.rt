@@ -657,7 +657,7 @@ public class HTMLUtilityTest {
 
   /**
    * Test cases for {@link HTMLUtility#toPlainTextWithTable(String)}.
-   * 
+   *
    * @see Bug 415316
    */
   @Test
@@ -672,8 +672,8 @@ public class HTMLUtilityTest {
    * @param fileName
    */
   private void testToPlainTextWithTableConversion(String fileName) {
-    String htmlString = readFileFromClasspath(fileName);
-    String plainExpected = readFileFromClasspath("htmlToPlain_expectedResult.txt").trim();
+    String htmlString = readResourceAsText(fileName);
+    String plainExpected = readResourceAsText("htmlToPlain_expectedResult.txt").trim();
     String plaintext = HTMLUtility.toPlainTextWithTable(htmlString).trim();
     assertEquals(fileName + " was not converted to plaintext as expected.", plainExpected, plaintext);
   }
@@ -682,24 +682,20 @@ public class HTMLUtilityTest {
    * @param fileName
    * @return
    */
-  private String readFileFromClasspath(String fileName) {
-    String packageName = getClass().getPackage().getName();
-    packageName = packageName.replaceAll("\\.", "/");
-    fileName = StringUtility.join("/", packageName, "fixture", fileName);
-
-    InputStream in = getClass().getClassLoader().getResourceAsStream(fileName);
+  private String readResourceAsText(String relativeFileName) {
+    InputStream in = ResourceBase.class.getResourceAsStream(relativeFileName);
     try {
       return new String(IOUtility.getContent(in), "UTF-8");
     }
     catch (Exception e) {
-      fail("could not read input file: " + fileName);
+      fail("could not read input file: " + ResourceBase.class.getPackage() + "/" + relativeFileName);
       return null;
     }
   }
 
   /**
    * Test cases for {@link HTMLUtility#toPlainTextWithTable(String)} with comments.
-   * 
+   *
    * @See Bug 415316
    */
   @Test
@@ -741,7 +737,7 @@ public class HTMLUtilityTest {
   /**
    * Test cases for {@link HTMLUtility#toPlainTextWithTable(String)}:
    * ensure that the line breaks in table cell will be ignored.
-   * 
+   *
    * @See Bug 415316
    */
   @Test
@@ -775,7 +771,7 @@ public class HTMLUtilityTest {
 
   /**
    * Test cases for {@link HTMLUtility#toPlainTextWithTable(String)}: test different lines breaks (p, br, table)
-   * 
+   *
    * @See Bug 415316
    */
   @Test
