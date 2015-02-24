@@ -22,14 +22,20 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.service.AbstractService;
 
 /**
- *
+ * Abstract icon provider service. By default {@link #getFolderName()} links to
+ * <code><em>concrete class's package name</em>.icons</code> (e.g. <em>org.eclipse.scout.sample.icons</em> if the icon
+ * provider service is called <code>org.eclipse.scout.sample.SampleIconProviderService</code>).
  */
 public abstract class AbstractIconProviderService extends AbstractService implements IIconProviderService {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractIconProviderService.class);
 
-  private String m_folderName = "resources/icons";
+  private String m_folderName;
   private String m_iconExtensions = "png,gif,jpg";
   private String[] m_iconExtensionsArray;
+
+  public AbstractIconProviderService() {
+    setFolderName(getClass().getPackage().getName() + ".icons");
+  }
 
   protected synchronized String[] getIconExtensionsArray() {
     if (m_iconExtensionsArray == null) {
