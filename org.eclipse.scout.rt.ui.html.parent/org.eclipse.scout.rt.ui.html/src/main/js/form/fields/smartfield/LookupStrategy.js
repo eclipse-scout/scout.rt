@@ -29,7 +29,6 @@ scout.CachedLookupStrategy.prototype = {
         numVisibleOptions = sf.options.length;
       }
 
-      // XXX AWE
       sf._resizePopup(numVisibleOptions);
       if (sf.proposal && numVisibleOptions === 0) {
         sf._setStatusText('Benutzerdefiniert');
