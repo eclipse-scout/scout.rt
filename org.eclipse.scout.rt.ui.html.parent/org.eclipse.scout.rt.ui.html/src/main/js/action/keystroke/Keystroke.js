@@ -36,11 +36,6 @@ scout.Keystroke.prototype.ignore = function() {
   return false;
 };
 
-scout.Keystroke.drawKeyBox = function() {
-  var keyBoxText = scout.codesToKeys[this.keystrokeKeyPart];
-  //TODO nbu draw key box
-};
-
 scout.Keystroke._syncKeystroke = function(keystroke) {
   // When model's 'keystroke' property changes, also update keystroke parts
   this.keystroke = keystroke;

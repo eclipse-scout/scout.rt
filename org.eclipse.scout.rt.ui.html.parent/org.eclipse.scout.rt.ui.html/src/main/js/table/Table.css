@@ -125,14 +125,8 @@
 /* key box */
 
 .table .key-box {
-  right: 24px;
-  width: 32px;
+  top: 2px;
 }
 
-.table .key-box.top3 { top: 10px;}
-.table .key-box.top2 { top: 32px;}
-.table .key-box.top1 { top: 54px;}
-.table .key-box.bottom1 { bottom: 54px;}
-.table .key-box.bottom2 { bottom: 32px;}
-.table .key-box.bottom3 { bottom: 10px;}
-.table .key-box.char { bottom: 8px; }
+.table .key-box.char { bottom: 2px; }
+

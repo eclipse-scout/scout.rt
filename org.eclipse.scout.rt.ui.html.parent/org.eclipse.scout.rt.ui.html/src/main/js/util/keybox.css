@@ -1,15 +1,31 @@
 .key-box {
-  .font-text-small;
   position: absolute;
-  height: 14px;
+  height: 25px;
+  width: 25px;
   z-index: 100;
-  padding-top: 3px;
-  color: @palette-white;
-  line-height: 11px;
+  color: @text-color;
+  line-height: 25px;
   text-align: center;
-  background-color: @highlight-color;
+  background-color: @desktop-background-color;
+  border: 1px solid @border-color;
+  border-radius: 4px;
+  opacity: 0.9;
+  left: 4px;
+  font-weight: bold;
+  .glow(@focus-color-glow);
 }
 
-.key-box.large {
-  font-size: 20px;
+
+.key-box-additional{
+  position: absolute;
+  height: 25px;
+  width: 20px;
+  z-index: 100;
+  color: @text-color;
+  line-height: 25px;
+  text-align: center;
+  background-color: @desktop-background-color;
+  opacity: 0.9;
+  left: 28px;
+  font-weight: bold;
 }

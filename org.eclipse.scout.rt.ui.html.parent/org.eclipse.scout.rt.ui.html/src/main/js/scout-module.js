@@ -107,6 +107,7 @@ __include("form/fields/numberfield/NumberField.js");
 __include("form/fields/plannerfield/PlannerField.js");
 __include("form/fields/richtextfield/RichTextField.js");
 __include("form/fields/stringfield/StringField.js");
+__include("form/fields/stringfield/StringfieldKeystrokeAdapter.js");
 __include("form/fields/smartfield/AbstractSmartField.js");
 __include("form/fields/smartfield/LookupStrategy.js");
 __include("form/fields/smartfield/SmartField.js");

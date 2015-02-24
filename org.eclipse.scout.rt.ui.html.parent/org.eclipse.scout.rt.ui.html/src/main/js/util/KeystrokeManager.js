@@ -9,17 +9,17 @@ scout.KeystrokeManager = function() {
     if (event.which === scout.keys.ALT) {
       // FIXME BSH Keystrokes | Re-enable later
       //      removeKeyBox();
-      //      drawKeyBox();
+            drawKeyBox();
     }
   });
 
-  $(document).keyup(function(event) {
-    if (event.which === scout.keys.ALT) {
-      removeKeyBox();
-      // FIXME BSH Keystroke | This cannot work... See http://stackoverflow.com/questions/6220300/jquery-keyup-how-do-i-prevent-the-default-behavior-of-the-arrow-up-down-an
-      return false;
-    }
-  });
+//  $(document).keyup(function(event) {
+//    if (event.which === scout.keys.ALT) {
+//      removeKeyBox();
+//      // FIXME BSH Keystroke | This cannot work... See http://stackoverflow.com/questions/6220300/jquery-keyup-how-do-i-prevent-the-default-behavior-of-the-arrow-up-down-an
+//      return false;
+//    }
+//  });
 
   $(window).blur(function() {
     removeKeyBox();
@@ -28,8 +28,6 @@ scout.KeystrokeManager = function() {
   var that = this;
 
   function removeKeyBox() {
-    $('.key-box').remove();
-
     var i, adapter;
     for (i = 0; i < that._adapters.length; i++) {
       adapter = that._adapters[i];
@@ -71,14 +69,15 @@ scout.KeystrokeManager.prototype.installAdapter = function($element, adapter) {
     for (i = 0; i < adapter.keystrokes.length; i++) {
       keystroke = adapter.keystrokes[i];
       if (keystroke.accept && keystroke.accept(event)) {
-        bubbleUp = bubbleUp && keystroke.handle(event);
+        keystroke.handle(event);
+        bubbleUp = bubbleUp && keystroke.bubbleUp;
         if (keystroke.removeKeyBox) {
           adapter.removeKeyBox();
         }
       }
     }
     if (!bubbleUp) {
-      $element.find('.key-box').remove();
+      adapter.removeKeyBox();
       event.stopPropagation();
     }
   };

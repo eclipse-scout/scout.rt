@@ -32,7 +32,7 @@ scout.FormField.LABEL_POSITION_TOP = 4;
 
 scout.FormField.prototype.init = function(model, session) {
   scout.FormField.parent.prototype.init.call(this, model, session);
-  this.keystrokeAdapter = new scout.FormFieldKeystrokeAdapter(this);
+  this._registerKeyStrokeAdapter();
 };
 
 scout.FormField.prototype.render = function($parent) {
@@ -43,6 +43,10 @@ scout.FormField.prototype.render = function($parent) {
 scout.FormField.prototype.dispose = function() {
   scout.FormField.parent.prototype.dispose.call(this);
   this._uninstallKeystrokeAdapter();
+};
+
+scout.FormField.prototype._registerKeyStrokeAdapter = function(){
+  this.keystrokeAdapter = new scout.FormFieldKeystrokeAdapter(this);
 };
 
 scout.FormField.prototype._installKeystrokeAdapter = function() {
