@@ -39,10 +39,10 @@ scout.Keystroke.prototype.ignore = function() {
 scout.Keystroke._syncKeystroke = function(keystroke) {
   // When model's 'keystroke' property changes, also update keystroke parts
   this.keystroke = keystroke;
-  this._initKeystrokeParts();
+  this.initKeystrokeParts();
 };
 
-scout.Keystroke.prototype._initKeystrokeParts = function() {
+scout.Keystroke.prototype.initKeystrokeParts = function() {
   this.alt = undefined;
   this.ctrl = undefined;
   this.meta = undefined;
