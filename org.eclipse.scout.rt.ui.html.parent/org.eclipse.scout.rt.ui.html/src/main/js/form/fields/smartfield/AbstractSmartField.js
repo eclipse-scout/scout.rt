@@ -140,10 +140,16 @@ scout.AbstractSmartField.prototype._onKeyup = function(e) {
     return;
   }
 
-  if (e.which === scout.keys.SHIFT ||
+  // Pop-ups shouldn't open when smart-fields are focused by tabbing through them
+  if (e.which === scout.keys.TAB ||
+    e.which === scout.keys.SHIFT ||
     this._isNavigationKey(e)) {
     return;
   }
+
+  // FIXME AWE: (proposal) wenn es ein proposal ist, wollen wir das popup gar nicht aufmachen, wenn keine option matched
+  // --> ausprobieren: popup immer aufmachen und künstlich das eingetippte als 1. option anzeigen, wenn nichts matched
+  // nicht künstlich schliessen (also nicht so wie in swing)
 
   // ensure popup is opened for following operations
   if (this._openPopup()) {
@@ -197,7 +203,7 @@ scout.AbstractSmartField.prototype._showPopup = function(numOptions, vararg) {
     .appendTo($('body'));
   scout.graphics.setBounds(this._$popup, popupBounds);
   // layout options and status-div
-this._$optionsDiv = this._get$OptionsDiv();
+  this._$optionsDiv = this._get$OptionsDiv();
   scout.scrollbars.install(this._$optionsDiv, {
     invertColors: true
   });
@@ -207,7 +213,7 @@ this._$optionsDiv = this._get$OptionsDiv();
 };
 
 scout.AbstractSmartField.prototype._onPopupMousedown = function(event) {
-  //Make sure field blur won't be triggered -> popup must not be closed on mouse down
+  // Make sure field blur won't be triggered -> pop-up must not be closed on mouse down
   event.preventDefault();
 };
 

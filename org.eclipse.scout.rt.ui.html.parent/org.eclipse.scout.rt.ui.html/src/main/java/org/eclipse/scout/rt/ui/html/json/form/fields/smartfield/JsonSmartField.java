@@ -147,18 +147,28 @@ public class JsonSmartField<K, V, T extends IContentAssistField<K, V>> extends J
     addActionEvent("optionsLoaded", putProperty(new JSONObject(), PROP_OPTIONS, options));
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   protected void handleUiDisplayTextChangedImpl(String displayText, boolean whileTyping) {
     if (StringUtility.isNullOrEmpty(displayText)) {
-      T model = getModel();
-      model.setValue(null);
+      getModel().setValue(null);
     }
     else {
-      for (ILookupRow<V> lr : m_options) {
-        if (displayText.equals(lr.getText())) {
-          getModel().setValue((K) lr.getKey()); // FIXME AWE: (proposal) check key/value logic
-          break;
+      updateValue(displayText);
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  private void updateValue(String displayText) {
+    if (m_proposal) {
+      // proposal field: key/value is _always_ string
+      getModel().setValue((K) displayText);
+    }
+    else {
+      // smart-field: lookup key by display-text
+      for (ILookupRow<V> lookupRow : m_options) {
+        if (displayText.equals(lookupRow.getText())) {
+          getModel().setValue((K) lookupRow.getKey());
+          return;
         }
       }
     }
