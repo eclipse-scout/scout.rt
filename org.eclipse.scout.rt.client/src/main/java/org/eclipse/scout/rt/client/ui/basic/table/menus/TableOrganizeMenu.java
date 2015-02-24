@@ -30,7 +30,6 @@ public class TableOrganizeMenu extends OrganizeColumnsMenu {
 
   @Override
   protected String getConfiguredTooltipText() {
-    // TODO CGU: Move this text to scout (is currently in widgets apps)
     return TEXTS.get("TableOrganize");
   }
 
@@ -57,5 +56,4 @@ public class TableOrganizeMenu extends OrganizeColumnsMenu {
   public boolean isColumnsCustomizable() {
     return getTable().getTableCustomizer() != null;
   }
-
 }
