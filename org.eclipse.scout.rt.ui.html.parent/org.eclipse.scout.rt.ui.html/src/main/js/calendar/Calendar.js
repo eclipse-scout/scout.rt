@@ -111,7 +111,8 @@ scout.Calendar.prototype._onClickMinus = function(event) {};
 
 scout.Calendar.prototype._onClickPlus = function(event) {};
 
-scout.Calendar.prototype._onClickToday = function(event) {};
+scout.Calendar.prototype._onClickToday = function(event) {
+};
 
 scout.Calendar.prototype._onClickMode = function(event) {
   this._setDisplayMode($(event.target).data('mode'), scout.dates.parseJsonDate(this.selectedDate));
@@ -375,7 +376,7 @@ scout.Calendar.prototype.layoutComponents = function() {
       $.l(c, c.fromDate, c.toDate, c.fullDay, c.cell.text, c.cell.tooltipText);
 
       fromDate = scout.dates.parseJsonDate(c.fromDate);
-      toDate = scout.dates.parseJsonDate(c.fromDate);
+      toDate = scout.dates.parseJsonDate(c.toDate);
       $day = this._findDay(fromDate);
       $component = $day.appendDiv('calendar-component', c.cell.text)
         .hover(this._onMouseenter.bind(this), this._onMouseleave.bind(this));
@@ -396,7 +397,14 @@ scout.Calendar.prototype.layoutComponents = function() {
           $component.attr('data-from', '08:45');
           $component.attr('data-to', '16:00');
         }
+      } else {
+        var diff = toDate.getDate() - fromDate.getDate();
+        $.l(toDate, fromDate, diff);
+        if (diff > 0) {
+          $component.css('width', '200%');
+        }
       }
+
     }
   }
 };
@@ -430,13 +438,25 @@ scout.Calendar.prototype._findDay = function (date) {
   return $day;
 };
 
-/* -----------  Scout Stuff ---------------------
 
 
+/* -----------  Scout Stuff ---------------------*/
+
+scout.Calendar.prototype._renderComponents = function() {
+  this.layoutComponents();
+};
+
+scout.Calendar.prototype._renderLoadInProgress = function() {
+};
+
+
+
+/*
 scout.Calendar.prototype._renderViewRange = function() {
 };
 
 scout.Calendar.prototype._renderComponents = function() {
+  this.layoutComponents();
 };
 
 scout.Calendar.prototype._renderSelectedComponent = function() {

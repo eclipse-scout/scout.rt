@@ -163,7 +163,7 @@
   }
 
   & .calendar-day {
-    padding: 5px 5px 5px 32px;
+    padding: 6px 0px;
   }
 
   & .calendar-week-name {
@@ -294,7 +294,8 @@
     line-height: 20px;
     padding-left: 4px;
     .overflow-ellipsis;
-    width: 100%;
+    margin-left: 32px;
+    width: calc(~"100%" - 38px);
     background-color: @palette-orange-background;
     margin-bottom: 4px;
     border-left: 4px solid @palette-orange-disabled;
@@ -311,6 +312,7 @@
     padding: 0;
     .overflow-ellipsis;
     padding-left: 4px;
+    margin-left: 0px;
     width: calc(~"100%" - 14px);
     background-color: @palette-orange-background;
     border-left: 4px solid @palette-orange-disabled;
