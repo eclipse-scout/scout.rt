@@ -37,7 +37,7 @@ scout.AbstractSmartField.prototype._render = function($parent) {
  * Note: we cannot simply select all children, because the scrollbar DIV is also a child.
  */
 scout.AbstractSmartField.prototype._get$Options = function(visible) {
-  var filter = visible ? 'p:visible' : undefined;
+  var filter = visible ? 'p:visible' : 'p';
   return this._$optionsDiv.children(filter);
 };
 
@@ -148,11 +148,7 @@ scout.AbstractSmartField.prototype._onKeyup = function(e) {
     return;
   }
 
-  // FIXME AWE: (proposal) wenn es ein proposal ist, wollen wir das popup gar nicht aufmachen, wenn keine option matched
-  // --> ausprobieren: popup immer aufmachen und künstlich das eingetippte als 1. option anzeigen, wenn nichts matched
-  // nicht künstlich schliessen (also nicht so wie in swing)
-
-  // ensure popup is opened for following operations
+  // ensure pop-up is opened for following operations
   if (this._openPopup()) {
     return;
   }
@@ -261,7 +257,7 @@ scout.AbstractSmartField.prototype._renderOptions = function(options) {
 /**
  * Empties the options DIV. Note: since we must not remove the scrollbar DIV, we must explicitly select P elements (=options).
  */
-scout.AbstractSmartField.prototype._emptyOptions = function(options) {
+scout.AbstractSmartField.prototype._emptyOptions = function() {
   this._$optionsDiv.children('p').remove();
   this._updateScrollbar();
 };
