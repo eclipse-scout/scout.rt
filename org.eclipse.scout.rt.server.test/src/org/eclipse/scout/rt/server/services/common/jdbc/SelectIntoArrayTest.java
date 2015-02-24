@@ -35,7 +35,9 @@ import org.eclipse.scout.rt.server.services.common.jdbc.fixture.TableFieldData;
 import org.eclipse.scout.rt.server.services.common.jdbc.style.OracleSqlStyle;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
+import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Test for {@link ISqlService} (using the mock {@link SqlServiceMock}).
@@ -44,18 +46,19 @@ import org.junit.Test;
  * - {@link ISqlService#selectInto(String, Object...)}.
  * With different types of arrays used as output bind.
  */
+@RunWith(ScoutPlatformTestRunner.class)
 public class SelectIntoArrayTest {
 
   private static final Object[][] DATA = new Object[][]{
-      new Object[]{true, 1, "abc"},
-      new Object[]{null, 1, "abc"},
-      new Object[]{true, null, "abc"},
-      new Object[]{true, 1, null},
+    new Object[]{true, 1, "abc"},
+    new Object[]{null, 1, "abc"},
+    new Object[]{true, null, "abc"},
+    new Object[]{true, 1, null},
   };
   private static final Object[][] ROLES_DATA = new Object[][]{
-      new Object[]{3L},
-      new Object[]{5L},
-      new Object[]{7L}
+    new Object[]{3L},
+    new Object[]{5L},
+    new Object[]{7L}
   };
 
   @Test

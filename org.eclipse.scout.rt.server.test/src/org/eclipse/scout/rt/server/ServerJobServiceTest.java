@@ -22,6 +22,7 @@ import org.junit.Test;
 /**
  * Test for {@link m_backendJobService}
  */
+// TODO OSGi dependencies
 public class ServerJobServiceTest {
   private ServerJobService m_serverJobService;
 

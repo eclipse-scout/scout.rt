@@ -42,7 +42,7 @@ import org.junit.runner.RunWith;
  * Test for {@link AbstractAccessControlService}
  */
 @RunWith(ScoutServerTestRunner.class)
-public class AbstractAccessControlServiceTest {
+public class AccessControlServiceTest {
   private AbstractAccessControlService m_accessControlService;
   private TestClientNotificationQueueListener m_listener;
   private List<IBean<?>> m_registerServices;

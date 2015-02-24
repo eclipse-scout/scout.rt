@@ -34,12 +34,15 @@ import org.eclipse.scout.rt.server.services.common.jdbc.fixture.TableFieldBeanDa
 import org.eclipse.scout.rt.server.services.common.jdbc.fixture.TableFieldData;
 import org.eclipse.scout.rt.server.services.common.jdbc.style.OracleSqlStyle;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
+import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Test for {@link ISqlService} (using the mock {@link SqlServiceMock}).
  * Different types of arrays used as input bind.
  */
+@RunWith(ScoutPlatformTestRunner.class)
 public class SelectInputBindTest {
 
   /**

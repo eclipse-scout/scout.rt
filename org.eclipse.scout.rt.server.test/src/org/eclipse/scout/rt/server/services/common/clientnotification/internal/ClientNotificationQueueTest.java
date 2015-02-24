@@ -29,13 +29,16 @@ import org.eclipse.scout.rt.server.services.common.clientnotification.AllUserFil
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationFilter;
 import org.eclipse.scout.rt.shared.services.common.clientnotification.AbstractClientNotification;
 import org.eclipse.scout.rt.shared.services.common.clientnotification.IClientNotification;
+import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Test for {@link ClientNotificationQueue}
  */
+@RunWith(ScoutPlatformTestRunner.class)
 public class ClientNotificationQueueTest {
   private IClientNotification m_testNotification;
   private ClientNotificationQueue m_clientNotificationQueue;

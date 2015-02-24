@@ -36,10 +36,14 @@ import org.eclipse.scout.rt.server.job.interceptor.TwoPhaseTransactionBoundaryCa
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 
+// TODO remove OSGi dependencies
 @SuppressWarnings("unchecked")
+@RunWith(ScoutPlatformTestRunner.class)
 public class ServerJobCallableChainTest {
 
   /**

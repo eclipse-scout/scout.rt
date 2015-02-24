@@ -23,11 +23,14 @@ import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldData;
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
+import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Unit Test for {@link StatementProcessor}
  */
+@RunWith(ScoutPlatformTestRunner.class)
 public class StatementProcessorTest {
 
   @Test
@@ -46,7 +49,7 @@ public class StatementProcessorTest {
             " FROM PERSON P " +
             " WHERE P.PERSON_NR=:key " +
             " AND P.NAME like '%'||:text||'%'",
-            new Object[]{call});
+        new Object[]{call});
     sp.simulate();
 
     String sqlPlainTextDump = sp.createSqlDump(false, true);
@@ -86,7 +89,7 @@ public class StatementProcessorTest {
             "AND :name like '%Me%' " +
             "AND :{addressTable.street} like '%Park%' " +
             "INTO :countConcurrent ",
-            new Object[]{formData, new NVPair("countConcurrent", countConcurrent)});
+        new Object[]{formData, new NVPair("countConcurrent", countConcurrent)});
     sp.simulate();
 
     String sqlPlainTextDump = sp.createSqlDump(false, true);

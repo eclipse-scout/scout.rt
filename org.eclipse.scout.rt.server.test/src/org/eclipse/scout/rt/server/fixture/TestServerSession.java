@@ -1,6 +1,7 @@
-package org.eclipse.scout.rt.server;
+package org.eclipse.scout.rt.server.fixture;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.server.AbstractServerSession;
 
 /**
  * A test server session with shared context variables. <br>

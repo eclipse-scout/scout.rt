@@ -17,7 +17,7 @@ import org.eclipse.scout.rt.platform.cdi.ApplicationScoped;
 import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.ServerJob;
-import org.eclipse.scout.rt.server.TestServerSession;
+import org.eclipse.scout.rt.server.fixture.TestServerSession;
 import org.eclipse.scout.rt.shared.services.cdi.SessionRequired;
 import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
 import org.eclipse.scout.service.AbstractService;

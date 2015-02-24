@@ -34,12 +34,15 @@ import org.eclipse.scout.rt.shared.data.model.DataModelUtility;
 import org.eclipse.scout.rt.shared.data.model.EntityPath;
 import org.eclipse.scout.rt.shared.data.model.IDataModelAttribute;
 import org.eclipse.scout.rt.shared.data.model.IDataModelEntity;
+import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * @since 3.8.1
  */
+@RunWith(ScoutPlatformTestRunner.class)
 public class FormDataStatementBuilderWithComposerTest {
 
   private FormDataStatementBuilder m_builder;
@@ -65,7 +68,7 @@ public class FormDataStatementBuilderWithComposerTest {
         ")",
         "SELECT <selectParts/> " +
             "FROM <fromParts>TABLE @Table@</fromParts> " +
-        "WHERE <whereParts>@Table@.PRIMARY_KEY=@parent.Table@.PRIMARY_KEY</whereParts>");
+            "WHERE <whereParts>@Table@.PRIMARY_KEY=@parent.Table@.PRIMARY_KEY</whereParts>");
     m_builder.setDataModelAttributeDefinition(TestDataModel.Entity.SubEntity.SubAttribute.class, "@Table@.SUB_ATTRIBUTE");
 
   }

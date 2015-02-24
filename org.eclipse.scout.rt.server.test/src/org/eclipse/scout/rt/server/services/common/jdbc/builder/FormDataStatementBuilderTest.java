@@ -23,12 +23,15 @@ import org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
 import org.eclipse.scout.rt.shared.data.model.DataModelConstants;
+import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 /**
  * Tests the {@link FormDataStatementBuilder} with externally defined template data.
  */
+@RunWith(ScoutPlatformTestRunner.class)
 public class FormDataStatementBuilderTest {
 
   private static final String STATEMENT_TEMPLATE = "SELECT <selectParts>P.PERSON_NR</selectParts> FROM <fromParts>ORS_PERSON P</fromParts> WHERE <whereParts>1=1</whereParts>";

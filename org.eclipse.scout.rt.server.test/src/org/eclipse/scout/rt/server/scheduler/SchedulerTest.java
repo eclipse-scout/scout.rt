@@ -27,6 +27,7 @@ import org.junit.runner.RunWith;
 /**
  * Tests for IScheduler
  */
+// TODO remove OSGi dependencies
 @RunWith(ScoutServerTestRunner.class)
 public class SchedulerTest {
 
