@@ -34,9 +34,10 @@ scout.AbstractSmartField.prototype._render = function($parent) {
 
 /**
  * @param visible [optional] when true, returns only visible options from the DOM, otherwise return all options regardless of their visible state.
+ * Note: we cannot simply select all children, because the scrollbar DIV is also a child.
  */
 scout.AbstractSmartField.prototype._get$Options = function(visible) {
-  var filter = visible ? ':visible' : undefined;
+  var filter = visible ? 'p:visible' : undefined;
   return this._$optionsDiv.children(filter);
 };
 
@@ -212,6 +213,13 @@ scout.AbstractSmartField.prototype._showPopup = function(numOptions, vararg) {
   scout.scrollbars.attachScrollHandlers(this.$field, this._closePopup.bind(this));
 };
 
+scout.AbstractSmartField.prototype._resizePopup = function(numOptions) {
+  var optionHeight = scout.HtmlEnvironment.formRowHeight,
+    popupHeight = (numOptions + 1) * optionHeight;
+  this._$popup.cssHeight(popupHeight);
+  this._updateScrollbar();
+};
+
 scout.AbstractSmartField.prototype._onPopupMousedown = function(event) {
   // Make sure field blur won't be triggered -> pop-up must not be closed on mouse down
   event.preventDefault();
@@ -239,7 +247,7 @@ scout.AbstractSmartField.prototype._renderOptions = function(options) {
       .on('click', this._onOptionClick.bind(this))
       .appendTo(this._$optionsDiv)
       .data('option', option) // stores the original text as received from the server
-    .html(htmlOption);
+      .html(htmlOption);
     if (option === val) {
       selectedPos = i;
     }
@@ -250,8 +258,11 @@ scout.AbstractSmartField.prototype._renderOptions = function(options) {
   this._updateScrollbar();
 };
 
+/**
+ * Empties the options DIV. Note: since we must not remove the scrollbar DIV, we must explicitly select P elements (=options).
+ */
 scout.AbstractSmartField.prototype._emptyOptions = function(options) {
-  this._$optionsDiv.empty();
+  this._$optionsDiv.children('p').remove();
   this._updateScrollbar();
 };
 

@@ -28,7 +28,14 @@ scout.CachedLookupStrategy.prototype = {
       if (showAll) {
         numVisibleOptions = sf.options.length;
       }
-      sf._setStatusText(numVisibleOptions);
+
+      // XXX AWE
+      sf._resizePopup(numVisibleOptions);
+      if (sf.proposal && numVisibleOptions === 0) {
+        sf._setStatusText('Benutzerdefiniert');
+      } else {
+        sf._setStatusText(numVisibleOptions);
+      }
     },
 
   onOptionsLoaded: function(options) {
