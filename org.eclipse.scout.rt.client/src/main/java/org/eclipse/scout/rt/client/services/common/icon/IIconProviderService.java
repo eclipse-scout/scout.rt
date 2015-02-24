@@ -10,16 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.services.common.icon;
 
+import org.eclipse.scout.rt.client.ui.IIconLocator;
 import org.eclipse.scout.service.IService;
 
-public interface IIconProviderService extends IService {
+public interface IIconProviderService extends IService, IIconLocator {
 
-  /**
-   * the icon lookup can be called with a full icon name (with extension) e.g. 'myIcon.gif' or with a simple icon name
-   * e.g. 'myIcon'. In case of calling this method without an extension the list of extensions will be looped and added
-   * to the simple icon name. The first found icon is returned.
-   *
-   * @return the icon specification to the icon or null if not found.
-   */
-  IconSpec getIconSpec(String iconName);
 }

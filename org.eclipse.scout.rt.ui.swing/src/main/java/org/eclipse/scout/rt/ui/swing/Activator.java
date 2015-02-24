@@ -16,7 +16,8 @@ import java.util.Hashtable;
 import javax.swing.Icon;
 
 import org.eclipse.core.runtime.Plugin;
-import org.eclipse.scout.rt.ui.swing.icons.SwingBundleIconLocator;
+import org.eclipse.scout.rt.client.ui.IIconLocator;
+import org.eclipse.scout.rt.client.ui.IconLocator;
 import org.eclipse.scout.rt.ui.swing.login.internal.InternalNetAuthenticator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
@@ -40,7 +41,7 @@ public class Activator extends Plugin implements SwingIcons {
   public void start(BundleContext context) throws Exception {
     super.start(context);
     plugin = this;
-    SwingBundleIconLocator iconLocator = new SwingBundleIconLocator();
+    IIconLocator iconLocator = new IconLocator();
     m_iconLocator = new SwingIconLocator(iconLocator);
     // register net authenticator ui
     Hashtable<String, Object> map = new Hashtable<String, Object>();

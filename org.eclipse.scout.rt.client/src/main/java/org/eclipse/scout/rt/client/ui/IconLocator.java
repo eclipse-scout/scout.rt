@@ -19,19 +19,15 @@ import org.eclipse.scout.service.SERVICES;
 
 public class IconLocator implements IIconLocator {
 
-  private final List<IIconProviderService> m_iconProviderServices;
-
-  public IconLocator() {
-    m_iconProviderServices = SERVICES.getServices(IIconProviderService.class);
-  }
-
   @Override
   public IconSpec getIconSpec(String name) {
     if (name == null || AbstractIcons.Null.equals(name)) {
       return null;
     }
+
+    List<IIconProviderService> iconProviderServices = SERVICES.getServices(IIconProviderService.class);
     IconSpec spec = null;
-    for (IIconProviderService service : m_iconProviderServices) {
+    for (IIconProviderService service : iconProviderServices) {
       spec = service.getIconSpec(name);
       if (spec != null) {
         break;

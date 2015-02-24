@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.ui.swt;
 import java.util.Hashtable;
 
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.scout.rt.ui.swt.icons.SwtBundleIconLocator;
+import org.eclipse.scout.rt.client.ui.IconLocator;
 import org.eclipse.scout.rt.ui.swt.login.internal.InternalNetAuthenticator;
 import org.eclipse.scout.rt.ui.swt.util.ISwtIconLocator;
 import org.eclipse.scout.rt.ui.swt.util.SwtIconLocator;
@@ -77,14 +77,14 @@ public class Activator extends AbstractUIPlugin {
 
   private Image getIconImpl(String name) {
     if (m_iconLocator == null) {
-      m_iconLocator = new SwtIconLocator(new SwtBundleIconLocator());
+      m_iconLocator = new SwtIconLocator(new IconLocator());
     }
     return m_iconLocator.getIcon(name, ISwtEnvironment.ICON_DECORATION_NONE);
   }
 
   private ImageDescriptor getImageDescriptorImpl(String name) {
     if (m_iconLocator == null) {
-      m_iconLocator = new SwtIconLocator(new SwtBundleIconLocator());
+      m_iconLocator = new SwtIconLocator(new IconLocator());
     }
     return m_iconLocator.getImageDescriptor(name);
   }
