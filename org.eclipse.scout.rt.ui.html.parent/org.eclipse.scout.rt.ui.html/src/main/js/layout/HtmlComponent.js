@@ -68,7 +68,7 @@ scout.HtmlComponent.prototype.layout = function() {
 };
 
 scout.HtmlComponent.prototype.invalidate = function() {
-  this.valid = false;
+  this.valid = false; // FIXME AWE: check why this flag is required here and on the layoutManager too
   if (this.layoutManager) {
     this.layoutManager.invalidate();
   }

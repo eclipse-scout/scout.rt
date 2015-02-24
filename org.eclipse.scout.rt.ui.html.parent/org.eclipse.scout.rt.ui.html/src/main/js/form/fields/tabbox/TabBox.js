@@ -142,6 +142,9 @@ scout.TabBox.prototype._renderSelectedTab = function(selectedTab) {
     if (this.rendered) {
       var htmlComp = scout.HtmlComponent.get(this._$tabContent);
       htmlComp.revalidate();
+      // FIXME AWE: discuss with C.GU - see ticket #154914. why is it necessary to call validate() now?
+      // Doesn't work anymore without calling validate() what has changed?
+      this.session.layoutValidator.validate();
     }
   }
 };

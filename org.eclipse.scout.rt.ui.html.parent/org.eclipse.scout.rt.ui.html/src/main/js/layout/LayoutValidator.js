@@ -25,7 +25,7 @@ scout.LayoutValidator.prototype.revalidate = function(htmlComp) {
     validateRoot = htmlComp;
   }
 
-  // Add validate root to list of invalid components. These are the starting point for a new
+  // Add validate root to list of invalid components. These are the starting point for a subsequent call to validate().
   if (this._invalidComponents.indexOf(htmlComp) < 0) {
     this._invalidComponents.push(validateRoot);
   }
