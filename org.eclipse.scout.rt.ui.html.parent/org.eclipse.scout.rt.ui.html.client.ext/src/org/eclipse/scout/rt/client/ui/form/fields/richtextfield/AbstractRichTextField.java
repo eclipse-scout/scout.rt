@@ -30,7 +30,7 @@ public abstract class AbstractRichTextField extends AbstractBasicField<String> i
     m_uiFacade = new P_UIFacade();
   }
 
-  private class P_UIFacade implements IBasicFieldUIFacade {
+  private class P_UIFacade extends AbstractBasicField.P_UIFacade implements IBasicFieldUIFacade {
 
     @Override
     public boolean setTextFromUI(String newText, boolean whileTyping) {
@@ -39,6 +39,7 @@ public abstract class AbstractRichTextField extends AbstractBasicField<String> i
       }
       return parseValue(newText);
     }
+
   }
 
   @Override
