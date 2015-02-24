@@ -5,15 +5,14 @@ scout.LayoutValidator = function() {
 // FIXME CGU maybe it is necessary to sort the list so that the top most root is layouted first.
 // Testcase: Field in scrollable groupbox gets invisible and also a field outside the groupbox.
 // If scrollable is layouted first it may be relayouted again when the form gets layouted
-scout.LayoutValidator.prototype.revalidate = function(htmlComp) {
-  var validateRoot;
-  var htmlCompParent = htmlComp;
+scout.LayoutValidator.prototype.invalidateTree = function(htmlComp) {
+  var validateRoot,
+    htmlCompParent = htmlComp;
 
   //Mark every parent as invalid until validate root
   while (htmlCompParent) {
     htmlComp = htmlCompParent;
     htmlComp.invalidate();
-
     if (htmlComp.isValidateRoot()) {
       validateRoot = htmlComp;
       break;

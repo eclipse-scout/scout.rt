@@ -31,9 +31,9 @@ describe("TabBox", function() {
     });
 
     it("does NOT call layout for the selected tab on initialization", function() {
-      spyOn(session.layoutValidator, 'revalidate').and.callThrough();
+      spyOn(session.layoutValidator, 'invalidateTree').and.callThrough();
       field.render(session.$entryPoint);
-      expect(session.layoutValidator.revalidate).not.toHaveBeenCalled();
+      expect(session.layoutValidator.invalidateTree).not.toHaveBeenCalled();
     });
 
   });

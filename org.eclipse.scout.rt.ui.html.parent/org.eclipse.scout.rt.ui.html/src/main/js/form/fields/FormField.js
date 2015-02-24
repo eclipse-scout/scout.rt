@@ -122,7 +122,7 @@ scout.FormField.prototype._renderVisible = function(visible) {
   if (this.rendered) {
     var htmlComp = scout.HtmlComponent.get(this.$container).getParent();
     if (htmlComp) { // may be null if $container is detached
-      htmlComp.revalidate();
+      htmlComp.invalidateTree();
     }
   }
 };
@@ -168,7 +168,7 @@ scout.FormField.prototype._renderChildVisible = function($child, visible) {
   }
   $child.setVisible(visible);
   if (this.rendered) {
-    scout.HtmlComponent.get(this.$container).revalidate();
+    scout.HtmlComponent.get(this.$container).invalidateTree();
   }
 };
 

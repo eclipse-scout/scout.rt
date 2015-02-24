@@ -63,7 +63,7 @@ scout.MenuBar.prototype._updateVisibility = function() {
   this.$container.setVisible(this.menuItems.length > 0);
   var htmlComp = scout.HtmlComponent.optGet(this.$parent);
   if (htmlComp) {
-    htmlComp.revalidate();
+    htmlComp.invalidateTree();
   }
 };
 

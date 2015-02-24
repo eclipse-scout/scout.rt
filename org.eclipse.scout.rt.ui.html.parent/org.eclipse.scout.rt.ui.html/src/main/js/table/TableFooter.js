@@ -216,9 +216,8 @@ scout.TableFooter.prototype._computeCountInfo = function(n) {
 
 /* open, close and resize of the container */
 
-scout.TableFooter.prototype._validateTableLayout = function() {
+scout.TableFooter.prototype._revalidateTableLayout = function() {
   this._table.htmlComp.revalidate();
-  this._table.session.layoutValidator.validate();
 };
 
 scout.TableFooter.prototype.openControlContainer = function() {
@@ -234,7 +233,7 @@ scout.TableFooter.prototype.openControlContainer = function() {
     height: scout.TableFooter.CONTAINER_SIZE
   }, {
     duration: 500,
-    progress: that._validateTableLayout.bind(that)
+    progress: that._revalidateTableLayout.bind(that)
   });
 
   this.open = true;
@@ -247,7 +246,7 @@ scout.TableFooter.prototype.closeControlContainer = function(control) {
     height: 0
   }, {
     duration: 500,
-    progress: that._validateTableLayout.bind(that)
+    progress: that._revalidateTableLayout.bind(that)
   });
 
   this.$controlContainer.promise().done(function() {
@@ -273,7 +272,7 @@ scout.TableFooter.prototype._addResize = function($parent) {
       var newHeight = that._table.$container.height() - event.pageY;
       that.$controlContainer.height(newHeight);
       that.$controlContent.outerHeight(newHeight);
-      that._validateTableLayout();
+      that._revalidateTableLayout();
       that.onResize();
     }
 

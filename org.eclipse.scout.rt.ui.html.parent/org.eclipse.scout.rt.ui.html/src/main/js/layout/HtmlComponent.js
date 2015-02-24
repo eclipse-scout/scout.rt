@@ -67,6 +67,9 @@ scout.HtmlComponent.prototype.layout = function() {
   }
 };
 
+/**
+ * Invalidates the component (sets the valid-flag to false).
+ */
 scout.HtmlComponent.prototype.invalidate = function() {
   this.valid = false; // FIXME AWE: check why this flag is required here and on the layoutManager too
   if (this.layoutManager) {
@@ -74,8 +77,19 @@ scout.HtmlComponent.prototype.invalidate = function() {
   }
 };
 
+/**
+ * Invalidates the component-tree up to the next validate root.
+ */
+scout.HtmlComponent.prototype.invalidateTree = function() {
+  this.session.layoutValidator.invalidateTree(this);
+};
+
+/**
+ * Performs invalidateTree() and validate() subsequently.
+ */
 scout.HtmlComponent.prototype.revalidate = function() {
-  this.session.layoutValidator.revalidate(this);
+  this.invalidateTree();
+  this.session.layoutValidator.validate();
 };
 
 /**

@@ -1442,7 +1442,7 @@ scout.Table.prototype._renderTableHeader = function() {
     this.header = null;
   }
   if (this.rendered) {
-    this.htmlComp.revalidate();
+    this.htmlComp.invalidateTree();
   }
 };
 
@@ -1459,7 +1459,7 @@ scout.Table.prototype._renderTableFooter = function() {
     this.footer = null;
   }
   if (this.rendered) {
-    this.htmlComp.revalidate();
+    this.htmlComp.invalidateTree();
   }
 };
 
