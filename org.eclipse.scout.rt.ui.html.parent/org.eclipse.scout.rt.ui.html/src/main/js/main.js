@@ -70,16 +70,21 @@ scout.inherits = function(childCtor, parentCtor) {
 
 scout._installGlobalJavascriptErrorHandler = function() {
   window.onerror = function(errorMessage, fileName, lineNumber) {
-    // TODO Log error to server?
-    $.log.error(errorMessage + ' at ' + fileName + ':' + lineNumber);
-    // FIXME Improve this!
-    if (scout.sessions.length > 0) {
-      var session = scout.sessions[0];
-      session.showFatalMessage({
-        title: 'Internal UI Error',
-        text: errorMessage,
-        yesButtonText: 'OK'
-      });
+    try {
+      // TODO Log error to server?
+      $.log.error(errorMessage + ' at ' + fileName + ':' + lineNumber);
+      // FIXME Improve this!
+      if (scout.sessions.length > 0) {
+        var session = scout.sessions[0];
+        session.showFatalMessage({
+          title: 'Internal UI Error',
+          text: errorMessage,
+          yesButtonText: 'OK'
+        });
+      }
+    }
+    catch (err) {
+      throw new Error('Error in global JavaScript error handler: ' + errorMessage + ' at ' + fileName + ':' + lineNumber);
     }
   };
 };
