@@ -176,7 +176,5 @@
 /* key handling */
 
 .tree-item .key-box {
-  left: 3px;
-  top: 7px;
-  width: 20px;
+  top: 4px;
 }

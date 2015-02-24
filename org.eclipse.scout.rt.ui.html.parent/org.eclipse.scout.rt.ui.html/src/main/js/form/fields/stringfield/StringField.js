@@ -33,3 +33,8 @@ scout.StringField.prototype._renderInputMasked = function(inputMasked){
   }
   this.$field.attr('type', (inputMasked ? 'password' : 'text'));
 };
+
+
+scout.StringField.prototype._registerKeyStrokeAdapter = function(){
+  this.keystrokeAdapter = new scout.StringfieldKeystrokeAdapter(this);
+};

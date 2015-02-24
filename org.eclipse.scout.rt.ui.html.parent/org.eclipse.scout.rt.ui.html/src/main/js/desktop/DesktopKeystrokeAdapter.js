@@ -1,5 +1,5 @@
-//FIXME read keycodes from model
 scout.DesktopKeystrokeAdapter = function(navigation, taskbar) {
+  scout.DesktopKeystrokeAdapter.parent.call(this, navigation);
   var that = this;
 
   this.$target = undefined; // set by KeystrokeManager
@@ -110,7 +110,13 @@ scout.DesktopKeystrokeAdapter = function(navigation, taskbar) {
   }
 };
 
+scout.inherits(scout.DesktopKeystrokeAdapter, scout.AbstractKeyStrokeAdapter);
+
 scout.DesktopKeystrokeAdapter.prototype.drawKeyBox = function() {
+  if(this.keyBoxDrawn){
+    return;
+  }
+  this.keyBoxDrawn = true;
   if (this._taskbar) {
     $('.taskbar-item', this._taskbar.$container).each(function(i, e) {
       $(e).appendDiv('key-box', $(e).attr('data-shortcut'));
@@ -132,9 +138,9 @@ scout.DesktopKeystrokeAdapter.prototype.drawKeyBox = function() {
 
     if (!$node.hasClass('leaf')) {
       if ($node.hasClass('expanded')) {
-        $node.appendDiv('key-box large', '←');
+        $node.appendDiv('key-box', '←');
       } else {
-        $node.appendDiv('key-box large', '→');
+        $node.appendDiv('key-box', '→');
       }
       $node.children('.tree-item-control').css('display', 'none');
     }
@@ -152,6 +158,7 @@ scout.DesktopKeystrokeAdapter.prototype.drawKeyBox = function() {
 };
 
 scout.DesktopKeystrokeAdapter.prototype.removeKeyBox = function() {
+  scout.DesktopKeystrokeAdapter.parent.prototype.removeKeyBox.call(this);
   $('.tree-item-control').css('display', '');
 };
 
