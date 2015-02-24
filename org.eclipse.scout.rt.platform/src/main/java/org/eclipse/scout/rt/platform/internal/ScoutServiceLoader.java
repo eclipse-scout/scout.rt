@@ -20,9 +20,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ServiceLoader;
 
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.platform.Platform;
 import org.osgi.framework.Bundle;
 
 /**
@@ -37,7 +37,7 @@ public final class ScoutServiceLoader {
 
   public static <T> List<T> loadServices(Class<T> clazz) {
     // OSGi support
-    if (StringUtility.hasText(System.getProperty("org.osgi.framework.version"))) {
+    if (Platform.isOsgiRunning()) {
       return loadServicesOsgi(clazz);
     }
     // pure Java
