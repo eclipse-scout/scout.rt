@@ -18,16 +18,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isNull;
-import static org.mockito.Matchers.same;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,27 +25,30 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.Future;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
-import org.eclipse.scout.commons.holders.IntegerHolder;
+import org.eclipse.scout.commons.job.internal.JobManager;
+import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 
-/**
- * JUnit-test to test {@link Job#schedule()}
- */
 public class JobScheduleTest {
 
-  private IJobManager m_jobManager;
+  private IJobManager<IJobInput> m_jobManager;
 
   @Before
   public void before() {
-    m_jobManager = new JobManager();
+    m_jobManager = new JobManager<IJobInput>("scout") {
+
+      @Override
+      protected IJobInput createDefaultJobInput() {
+        return JobInput.defaults();
+      }
+    };
   }
 
   @After
@@ -64,154 +57,195 @@ public class JobScheduleTest {
   }
 
   @Test
-  public void testResult() throws ProcessingException {
-    IJob<String> job = new _Job<String>("job") {
-      @Override
-      protected String call() throws Exception {
-        return "RUNNING_WITH_RESULT";
-      }
-    };
-
-    @SuppressWarnings("unchecked")
-    IAsyncFuture<String> asyncFutureMock = mock(IAsyncFuture.class);
-
-    String actualResult = job.schedule(asyncFutureMock).get();
-    assertEquals("RUNNING_WITH_RESULT", actualResult);
-
-    verify(asyncFutureMock, times(1)).onDone(eq("RUNNING_WITH_RESULT"), isNull(ProcessingException.class));
-    verify(asyncFutureMock, times(1)).onSuccess(eq("RUNNING_WITH_RESULT"));
-    verify(asyncFutureMock, never()).onError(any(ProcessingException.class));
-  }
-
-  @Test
-  public void testVoidResult() throws ProcessingException {
-    final Holder<String> holder = new Holder<>();
-
-    IJob<Void> job = new _Job<Void>("job") {
+  public void testWithCallable() throws ProcessingException {
+    IFuture<String> future = m_jobManager.schedule(new ICallable<String>() {
 
       @Override
-      protected Void call() throws Exception {
-        Thread.sleep(500);
-        holder.setValue("RUNNING_VOID");
-        return null;
+      public String call() throws Exception {
+        return "running";
       }
-    };
+    });
 
-    @SuppressWarnings("unchecked")
-    IAsyncFuture<Void> asyncFutureMock = mock(IAsyncFuture.class);
-
-    IFuture<Void> future = job.schedule(asyncFutureMock);
-    assertFalse(future.isDone());
-    Void actualResult = future.get();
+    // VERIFY
+    assertEquals("running", future.get());
     assertTrue(future.isDone());
-
-    assertNull(actualResult);
-    assertEquals("RUNNING_VOID", holder.getValue());
-
-    verify(asyncFutureMock, times(1)).onDone(isNull(Void.class), isNull(ProcessingException.class));
-    verify(asyncFutureMock, times(1)).onSuccess(isNull(Void.class));
-    verify(asyncFutureMock, never()).onError(any(ProcessingException.class));
   }
 
   @Test
-  public void testProcessingException() throws ProcessingException {
-    final ProcessingException expectedException = new ProcessingException();
+  public void testWithRunnable() throws ProcessingException {
+    final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
+    IFuture<Void> future = m_jobManager.schedule(new IRunnable() {
 
-    IJob<String> job = new _Job<String>("job") {
       @Override
-      protected String call() throws Exception {
-        Thread.sleep(500);
-        throw expectedException;
+      public void run() throws Exception {
+        protocol.add("running");
       }
-    };
+    });
 
-    @SuppressWarnings("unchecked")
-    IAsyncFuture<String> asyncFutureMock = mock(IAsyncFuture.class);
+    // VERIFY
+    assertNull(future.get());
+    assertEquals(CollectionUtility.hashSet("running"), protocol);
+    assertTrue(future.isDone());
+  }
 
-    IFuture<String> future = job.schedule(asyncFutureMock);
+  @Test
+  public void testProcessingExceptionWithRunnable() throws ProcessingException {
+    final ProcessingException exception = new ProcessingException();
+
+    IFuture<Void> future = m_jobManager.schedule(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        throw exception;
+      }
+    });
+
     try {
-      assertFalse(future.isDone());
       future.get();
       fail("Exception expected");
     }
     catch (Exception e) {
-      assertSame(expectedException, e);
-    }
-    finally {
+      assertSame(exception, e);
       assertTrue(future.isDone());
     }
-
-    assertTrue(future.isDone());
-
-    verify(asyncFutureMock, times(1)).onDone(isNull(String.class), same(expectedException));
-    verify(asyncFutureMock, never()).onSuccess(anyString());
-    verify(asyncFutureMock, times(1)).onError(same(expectedException));
   }
 
   @Test
-  public void testRuntimeException() throws ProcessingException {
-    final RuntimeException expectedException = new RuntimeException();
+  public void testProcessingExceptionWithCallable() throws ProcessingException {
+    final ProcessingException exception = new ProcessingException();
 
-    IJob<String> job = new _Job<String>("job") {
+    IFuture<Void> future = m_jobManager.schedule(new ICallable<Void>() {
+
       @Override
-      protected String call() throws Exception {
-        Thread.sleep(500);
-        throw expectedException;
+      public Void call() throws Exception {
+        throw exception;
       }
-    };
+    });
 
-    // Mock AsyncFuture and prepare to capture the exception
-    ArgumentCaptor<ProcessingException> actualExceptionCaptor = ArgumentCaptor.forClass(ProcessingException.class);
-    @SuppressWarnings("unchecked")
-    IAsyncFuture<String> asyncFutureMock = mock(IAsyncFuture.class);
-    doNothing().when(asyncFutureMock).onError(actualExceptionCaptor.capture());
-
-    IFuture<String> future = job.schedule(asyncFutureMock);
     try {
-      assertFalse(future.isDone());
+      future.get();
+      fail("Exception expected");
+    }
+    catch (Exception e) {
+      assertSame(exception, e);
+      assertTrue(future.isDone());
+    }
+  }
+
+  @Test
+  public void testRuntimeExceptionWithRunnable() throws ProcessingException {
+    final RuntimeException exception = new RuntimeException();
+
+    IFuture<Void> future = m_jobManager.schedule(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        throw exception;
+      }
+    });
+
+    try {
       future.get();
       fail("Exception expected");
     }
     catch (Exception e) {
       assertTrue(e instanceof ProcessingException);
-      assertSame(expectedException, e.getCause());
-    }
-    finally {
+      assertSame(exception, e.getCause());
       assertTrue(future.isDone());
     }
+  }
 
-    assertTrue(future.isDone());
+  @Test
+  public void testRuntimeExceptionWithCallable() throws ProcessingException {
+    final RuntimeException exception = new RuntimeException();
 
-    verify(asyncFutureMock, times(1)).onDone(isNull(String.class), any(ProcessingException.class));
-    verify(asyncFutureMock, never()).onSuccess(anyString());
-    verify(asyncFutureMock, times(1)).onError(any(ProcessingException.class));
-    assertSame(expectedException, actualExceptionCaptor.getValue().getCause());
+    IFuture<Void> future = m_jobManager.schedule(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        throw exception;
+      }
+    });
+
+    try {
+      future.get();
+      fail("Exception expected");
+    }
+    catch (Exception e) {
+      assertTrue(e instanceof ProcessingException);
+      assertSame(exception, e.getCause());
+      assertTrue(future.isDone());
+    }
+  }
+
+  @Test
+  public void testExceptionExceptionWithRunnable() throws ProcessingException {
+    final Exception exception = new Exception();
+
+    IFuture<Void> future = m_jobManager.schedule(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        throw exception;
+      }
+    });
+
+    try {
+      future.get();
+      fail("Exception expected");
+    }
+    catch (Exception e) {
+      assertTrue(e instanceof ProcessingException);
+      assertSame(exception, e.getCause());
+      assertTrue(future.isDone());
+    }
+  }
+
+  @Test
+  public void testExceptionExceptionWithCallable() throws ProcessingException {
+    final Exception exception = new Exception();
+
+    IFuture<Void> future = m_jobManager.schedule(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        throw exception;
+      }
+    });
+
+    try {
+      future.get();
+      fail("Exception expected");
+    }
+    catch (Exception e) {
+      assertTrue(e instanceof ProcessingException);
+      assertSame(exception, e.getCause());
+      assertTrue(future.isDone());
+    }
   }
 
   @Test
   public void testWorkerThread() throws ProcessingException {
-    final Set<Thread> workerThreads = Collections.synchronizedSet(new HashSet<Thread>()); // synchronized because modified/read by different threads.
+    final Set<Thread> protocol = Collections.synchronizedSet(new HashSet<Thread>()); // synchronized because modified/read by different threads.
 
-    new _Job<Void>("job-1") {
+    m_jobManager.schedule(new IRunnable() {
 
       @Override
-      protected Void call() throws Exception {
-        workerThreads.add(Thread.currentThread());
+      public void run() throws Exception {
+        protocol.add(Thread.currentThread());
 
-        new _Job<Void>("job-2") {
+        m_jobManager.schedule(new IRunnable() {
 
           @Override
-          protected Void call() throws Exception {
-            workerThreads.add(Thread.currentThread());
-            return null;
+          public void run() throws Exception {
+            protocol.add(Thread.currentThread());
           }
-        }.schedule().get();
-        return null;
+        }).get();
       }
-    }.schedule().get();
+    }).get();
 
-    assertEquals(2, workerThreads.size());
-    assertFalse(workerThreads.contains(Thread.currentThread()));
+    assertEquals(2, protocol.size());
+    assertFalse(protocol.contains(Thread.currentThread()));
   }
 
   @Test
@@ -221,180 +255,145 @@ public class JobScheduleTest {
     final Holder<String> actualThreadName1 = new Holder<>();
     final Holder<String> actualThreadName2 = new Holder<>();
 
-    new _Job<Void>("ABC") {
+    m_jobManager.schedule(new IRunnable() {
 
       @Override
-      protected Void call() throws Exception {
+      public void run() throws Exception {
         actualThreadName1.setValue(Thread.currentThread().getName());
 
-        new _Job<Void>("XYZ") {
+        m_jobManager.schedule(new IRunnable() {
 
           @Override
-          protected Void call() throws Exception {
+          public void run() throws Exception {
             actualThreadName2.setValue(Thread.currentThread().getName());
-            return null;
           }
-        }.schedule().get();
-        return null;
+        }, JobInput.defaults().name("XYZ")).get();
       }
-    }.schedule().get();
+    }, JobInput.defaults().name("ABC")).get();
 
-    assertTrue(actualThreadName1.getValue().matches("thread:scout-(\\d)+;job:ABC"));
-    assertTrue(actualThreadName2.getValue().matches("thread:scout-(\\d)+;job:XYZ"));
+    assertTrue(actualThreadName1.getValue().matches("scout-(\\d)+;job:ABC"));
+    assertTrue(actualThreadName2.getValue().matches("scout-(\\d)+;job:XYZ"));
     assertEquals("main", Thread.currentThread().getName());
   }
 
   @Test
-  public void testCurrentJob() throws ProcessingException {
-    final Holder<IJob<?>> job1 = new Holder<>();
-    final Holder<IJob<?>> job2 = new Holder<>();
+  public void testCurrentFuture() throws ProcessingException {
+    final Holder<IFuture<?>> expectedFuture1 = new Holder<>();
+    final Holder<IFuture<?>> expectedFuture2 = new Holder<>();
 
-    final Holder<IJob<?>> actualJob1 = new Holder<>();
-    final Holder<IJob<?>> actualJob2 = new Holder<>();
+    final Holder<Future<?>> actualFuture1 = new Holder<>();
+    final Holder<Future<?>> actualFuture2 = new Holder<>();
 
-    IJob.CURRENT.set(null);
+    IFuture.CURRENT.remove();
 
-    new _Job<Void>("job-1") {
+    expectedFuture1.setValue(m_jobManager.schedule(new IRunnable() {
 
       @Override
-      protected Void call() throws Exception {
-        job1.setValue(this);
-        actualJob1.setValue(IJob.CURRENT.get());
+      public void run() throws Exception {
+        actualFuture1.setValue(IFuture.CURRENT.get());
 
-        new _Job<Void>("job-2") {
+        expectedFuture2.setValue(m_jobManager.schedule(new IRunnable() {
 
           @Override
-          protected Void call() throws Exception {
-            job2.setValue(this);
-            actualJob2.setValue(IJob.CURRENT.get());
-            return null;
+          public void run() throws Exception {
+            actualFuture2.setValue(IFuture.CURRENT.get());
           }
-        }.schedule().get();
-        return null;
+        }));
+
+        expectedFuture2.getValue().get(); // wait for the job to complete
       }
-    }.schedule().get();
+    }));
 
-    assertNotNull(job1.getValue());
-    assertNotNull(job2.getValue());
+    expectedFuture1.getValue().get(); // wait for the job to complete
 
-    assertSame(job1.getValue(), actualJob1.getValue());
-    assertSame(job2.getValue(), actualJob2.getValue());
+    assertNotNull(expectedFuture1.getValue());
+    assertNotNull(expectedFuture2.getValue());
 
-    assertNull(IJob.CURRENT.get());
+    assertSame(expectedFuture1.getValue().getDelegate(), actualFuture1.getValue());
+    assertSame(expectedFuture2.getValue().getDelegate(), actualFuture2.getValue());
+
+    assertNull(IFuture.CURRENT.get());
   }
 
   @Test
   public void testScheduleAndGet() throws ProcessingException {
-    final List<Integer> actualProtocol = Collections.synchronizedList(new ArrayList<Integer>()); // synchronized because modified/read by different threads.
-    new _Job<Void>("job") {
+    final List<Integer> protocol = Collections.synchronizedList(new ArrayList<Integer>()); // synchronized because modified/read by different threads.
+
+    IFuture<Void> future = m_jobManager.schedule(new IRunnable() {
 
       @Override
-      protected Void call() throws Exception {
-        Thread.sleep(100);
-        actualProtocol.add(1);
-        return null;
+      public void run() throws Exception {
+        Thread.sleep(500); // Wait some time to test that 'Future.get' blocks.
+        protocol.add(1);
       }
-    }.schedule().get();
-    actualProtocol.add(2);
+    });
+    future.get();
+    protocol.add(2);
 
-    assertEquals(Arrays.asList(1, 2), actualProtocol);
+    assertEquals(Arrays.asList(1, 2), protocol);
   }
 
   @Test
-  public void testParallelExecution() throws ProcessingException, InterruptedException {
-    final CountDownLatch testLatch = new CountDownLatch(3);
-    final CountDownLatch parallelRunningLatch = new CountDownLatch(1);
+  public void testParallelExecution() throws Exception {
+    final BlockingCountDownLatch barrier = new BlockingCountDownLatch(3);
 
-    new _Job<Void>("job-1") {
-
-      @Override
-      protected Void call() throws Exception {
-        Thread.sleep(100);
-        testLatch.countDown();
-        parallelRunningLatch.await();
-        return null;
-      }
-    }.schedule();
-    new _Job<Void>("job-2") {
+    m_jobManager.schedule(new IRunnable() {
 
       @Override
-      protected Void call() throws Exception {
-        Thread.sleep(100);
-        testLatch.countDown();
-        parallelRunningLatch.await();
-        return null;
+      public void run() throws Exception {
+        barrier.countDownAndBlock();
       }
-    }.schedule();
-    new _Job<Void>("job-3") {
+    });
+
+    m_jobManager.schedule(new IRunnable() {
 
       @Override
-      protected Void call() throws Exception {
-        Thread.sleep(100);
-        testLatch.countDown();
-        parallelRunningLatch.await();
-        return null;
+      public void run() throws Exception {
+        barrier.countDownAndBlock();
       }
-    }.schedule();
+    });
 
-    assertEquals(3, testLatch.getCount());
+    m_jobManager.schedule(new IRunnable() {
 
-    // Wait for the jobs to wait in parallel.
-    try {
-      if (!testLatch.await(5, TimeUnit.SECONDS)) {
-        fail("Jobs not running in parallel");
-      }
-    }
-    finally {
-      parallelRunningLatch.countDown();
-    }
-  }
-
-  @Test
-  public void testReusable() throws ProcessingException {
-    final IntegerHolder holder = new IntegerHolder();
-    IJob<String> job = new _Job<String>("job") {
       @Override
-      protected String call() throws Exception {
-        return "RUN_" + holder.getValue();
+      public void run() throws Exception {
+        barrier.countDownAndBlock();
       }
-    };
+    });
 
-    holder.setValue(1);
-    assertEquals("RUN_1", job.schedule().get());
-    holder.setValue(2);
-    assertEquals("RUN_2", job.schedule().get());
+    assertTrue(barrier.await());
+    barrier.unblock();
   }
 
   @Test
   public void testJobContext() throws ProcessingException {
     Thread.currentThread().setName("main");
+    JobContext.CURRENT.remove();
 
     final Holder<JobContext> actualJobContext1 = new Holder<>();
     final Holder<JobContext> actualJobContext2 = new Holder<>();
 
-    new _Job<Void>("job-1") {
+    m_jobManager.schedule(new IRunnable() {
 
       @Override
-      protected Void call() throws Exception {
+      public void run() throws Exception {
         JobContext ctx1 = JobContext.CURRENT.get();
         ctx1.set("PROP_JOB1", "J1");
         ctx1.set("PROP_JOB1+JOB2", "SHARED-1");
         actualJobContext1.setValue(ctx1);
 
-        new _Job<Void>("job-2") {
+        m_jobManager.schedule(new IRunnable() {
 
           @Override
-          protected Void call() throws Exception {
+          public void run() throws Exception {
             JobContext ctx2 = JobContext.CURRENT.get();
             ctx2.set("PROP_JOB2", "J2");
             ctx2.set("PROP_JOB1+JOB2", "SHARED-2");
             actualJobContext2.setValue(ctx2);
-            return null;
           }
-        }.schedule().get();
-        return null;
+        }).get();
       }
-    }.schedule().get();
+    }).get();
 
     assertNotNull(actualJobContext1.getValue());
     assertNotNull(actualJobContext2.getValue());
@@ -410,20 +409,5 @@ public class JobScheduleTest {
     assertNull(actualJobContext1.getValue().get("JOB2"));
 
     assertNull(JobContext.CURRENT.get());
-  }
-
-  /**
-   * Job with a dedicated {@link JobManager} per test-case.
-   */
-  public abstract class _Job<R> extends Job<R> {
-
-    public _Job(String name) {
-      super(name);
-    }
-
-    @Override
-    protected IJobManager createJobManager() {
-      return JobScheduleTest.this.m_jobManager;
-    }
   }
 }

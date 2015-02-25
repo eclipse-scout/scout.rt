@@ -23,7 +23,8 @@ public interface IProgressMonitor {
   ThreadLocal<IProgressMonitor> CURRENT = new ThreadLocal<>();
 
   /**
-   * @return <code>true</code> if this job was cancelled and the job should terminate its work.
+   * @return <code>true</code> if this job was cancelled and the job should terminate its work; must be invoked from
+   *         within the job.
    */
   boolean isCancelled();
 }

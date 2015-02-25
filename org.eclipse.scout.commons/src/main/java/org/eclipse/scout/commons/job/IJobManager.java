@@ -1,7 +1,7 @@
 /*******************************************************************************
  * Copyright (c) 2015 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse  License v1.0
+ * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
  *
@@ -10,171 +10,205 @@
  ******************************************************************************/
 package org.eclipse.scout.commons.job;
 
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.job.Executables.IExecutable;
 
 /**
- * Job manager to run jobs in parallel. By default, there is a single {@link IJobManager} installed on the JVM.
+ * Job manager to execute jobs in parallel.
  *
  * @since 5.1
  */
-public interface IJobManager {
+public interface IJobManager<INPUT extends IJobInput> {
 
   /**
-   * Runs the given job synchronously on behalf of the current thread. This call blocks the calling thread as long as
-   * this job is running.
-   * <p/>
-   * Do not use this method directly. Use {@link Job#runNow()} instead.
+   * Runs the given job immediately on behalf of the current thread. This call blocks the calling thread as long as
+   * the job is running. The job manager will use a default {@link IJobInput} with values from the current calling
+   * context.
    *
-   * @param job
-   *          the {@link IJob} to be run.
-   * @param callable
-   *          the {@link Callable} to be executed.
+   * @param executable
+   *          executable to be executed; must be either a {@link IRunnable} or {@link ICallable} for a value-returning
+   *          job.
+   * @return computation result as returned by the callable; is <code>null</code> if operating on a runnable.
    * @throws ProcessingException
-   *           if the job throws an exception during execution.
-   * @throws JobExecutionException
-   *           if the job is already running.
+   *           if the executable throws an exception during execution.
+   * @see #runNow(IExecutable, IJobInput)
+   * @see JobInput#defaults()
    */
-  <RESULT> RESULT runNow(IJob<RESULT> job, Callable<RESULT> callable) throws ProcessingException, JobExecutionException;
+  <RESULT> RESULT runNow(IExecutable<RESULT> executable) throws ProcessingException;
+
+  /**
+   * Runs the given job immediately on behalf of the current thread. This call blocks the calling thread as long as
+   * the job is running.
+   *
+   * @param executable
+   *          executable to be executed; must be either a {@link IRunnable} or {@link ICallable} for a value-returning
+   *          job.
+   * @param input
+   *          gives the executable a semantic meaning and contains instructions about its execution.
+   * @return computation result as returned by the callable; is <code>null</code> if operating on a runnable.
+   * @throws ProcessingException
+   *           if the executable throws an exception during execution.
+   * @see #runNow(IExecutable)
+   */
+  <RESULT> RESULT runNow(IExecutable<RESULT> executable, INPUT input) throws ProcessingException;
+
+  /**
+   * Runs the given job asynchronously on behalf of a worker thread at the next reasonable opportunity. The caller of
+   * this method continues to run in parallel. The job manager will use a default {@link IJobInput} with values from the
+   * current calling context.
+   * <p/>
+   * The {@link IFuture} returned allows to wait for the job to complete or to cancel the execution of the job. To
+   * immediately block waiting for the job to complete, you can use constructions of the form
+   * <code>result = jobManager.schedule(...).get();</code>.
+   *
+   * @param executable
+   *          executable to be executed; must be either a {@link IRunnable} or {@link ICallable} for a value-returning
+   *          job.
+   * @return {@link IFuture} to wait for the job's completion or to cancel the job execution.
+   * @throws JobExecutionException
+   *           if the job is rejected by the job manager because no more threads or queue slots are available, or upon
+   *           shutdown of the job manager.
+   * @see #schedule(IExecutable, IJobInput)
+   * @see JobInput#defaults()
+   */
+  <RESULT> IFuture<RESULT> schedule(IExecutable<RESULT> executable) throws JobExecutionException;
 
   /**
    * Runs the given job asynchronously on behalf of a worker thread at the next reasonable opportunity. The caller of
    * this method continues to run in parallel.
    * <p/>
-   * Do not use this method directly. Use {@link Job#schedule()} instead.
+   * The {@link IFuture} returned allows to wait for the job to complete or to cancel the execution of the job. To
+   * immediately block waiting for the job to complete, you can use constructions of the form
+   * <code>result = jobManager.schedule(...).get();</code>.
    *
-   * @param job
-   *          the {@link IJob} to be scheduled.
-   * @param callable
-   *          the {@link Callable} to be executed.
-   * @return {@link Future} to wait for the job's completion or to cancel the job execution.
+   * @param executable
+   *          executable to be executed; must be either a {@link IRunnable} or {@link ICallable} for a value-returning
+   *          job.
+   * @param input
+   *          gives the executable a semantic meaning and contains instructions about its execution.
+   * @return {@link IFuture} to wait for the job's completion or to cancel the job execution.
    * @throws JobExecutionException
-   *           if the job is already running or was rejected by the job manager because no more threads or queue slots
-   *           are available, or upon shutdown of the job manager.
-   * @see ExecutorService#submit(Callable)
+   *           if the job is rejected by the job manager because no more threads or queue slots are available, or upon
+   *           shutdown of the job manager.
+   * @see #schedule(IExecutable)
    */
-  <RESULT> Future<RESULT> schedule(IJob<RESULT> job, Callable<RESULT> callable) throws JobExecutionException;
+  <RESULT> IFuture<RESULT> schedule(IExecutable<RESULT> executable, INPUT input) throws JobExecutionException;
+
+  /**
+   * Runs the given job asynchronously on behalf of a worker thread after the specified delay has elapsed. The caller of
+   * this method continues to run in parallel. The job manager will use a default {@link IJobInput} with values from the
+   * current calling context.
+   * <p/>
+   * The {@link IFuture} returned allows to wait for the job to complete or to cancel the execution of the job. To
+   * immediately block waiting for a job to complete, you can use constructions of the form
+   * <code>result = jobManager.schedule(...).get();</code>.
+   *
+   * @param executable
+   *          executable to be executed; must be either a {@link IRunnable} or {@link ICallable} for a value-returning
+   *          job.
+   * @param delay
+   *          the delay after which the job is to be run.
+   * @param delayUnit
+   *          the time unit of the <code>delay</code> argument.
+   * @return {@link IFuture} to wait for the job's completion or to cancel the job execution.
+   * @throws JobExecutionException
+   *           if the job is rejected by the job manager because no more threads or queue slots are available, or upon
+   *           shutdown of the job manager.
+   * @see #schedule(IExecutable, long, TimeUnit, IJobInput)
+   * @see JobInput#defaults()
+   */
+  <RESULT> IFuture<RESULT> schedule(IExecutable<RESULT> executable, long delay, TimeUnit delayUnit) throws JobExecutionException;
 
   /**
    * Runs the given job asynchronously on behalf of a worker thread after the specified delay has elapsed. The caller of
    * this method continues to run in parallel.
    * <p/>
-   * Do not use this method directly. Use {@link Job#schedule(long, TimeUnit)} instead.
+   * The {@link IFuture} returned allows to wait for the job to complete or to cancel the execution of the job. To
+   * immediately block waiting for a job to complete, you can use constructions of the form
+   * <code>result = jobManager.schedule(...).get();</code>.
    *
-   * @param job
-   *          the {@link IJob} to be scheduled.
-   * @param callable
-   *          the {@link Callable} to be executed.
+   * @param executable
+   *          executable to be executed; must be either a {@link IRunnable} or {@link ICallable} for a value-returning
+   *          job.
    * @param delay
-   *          the delay after which this job is to be run.
+   *          the delay after which the job is to be run.
    * @param delayUnit
    *          the time unit of the <code>delay</code> argument.
-   * @return {@link ScheduledFuture} to wait for the job's completion or to cancel the job execution.
+   * @param input
+   *          gives the executable a semantic meaning and contains instructions about its execution.
+   * @return {@link IFuture} to wait for the job's completion or to cancel the job execution.
    * @throws JobExecutionException
-   *           if the job is already running or was rejected by the job manager because no more threads or queue slots
-   *           are available, or upon shutdown of the job manager.
-   * @see ScheduledExecutorService#schedule(Callable, long, TimeUnit)
+   *           if the job is rejected by the job manager because no more threads or queue slots are available, or upon
+   *           shutdown of the job manager.
+   * @see #schedule(IExecutable, long, TimeUnit)
    */
-  <RESULT> ScheduledFuture<RESULT> schedule(IJob<RESULT> job, Callable<RESULT> callable, long delay, TimeUnit delayUnit) throws JobExecutionException;
+  <RESULT> IFuture<RESULT> schedule(IExecutable<RESULT> executable, long delay, TimeUnit delayUnit, INPUT input) throws JobExecutionException;
 
   /**
-   * Periodically runs the given job on behalf of a worker thread at a fixed rate. The caller of this method continues
-   * to run in parallel.
-   * <p/>
-   * Do not use this method directly. Use {@link Job#schedule(long, TimeUnit)} instead.
+   * Periodically runs the given job on behalf of a worker thread.<br/>
+   * The first execution is after the given <code>initialDelay</code>, the second after <code>initialDelay+period</code>
+   * , the third after <code>initialDelay+period+period</code> and so on. If an execution takes longer than the
+   * <code>period</code>, the subsequent execution is delayed and starts only once the current execution completed. So
+   * you have kind of mutual exclusion meaning that at any given time, there is only one job running.<br/>
+   * If any execution throws an exception, subsequent executions are suppressed. Otherwise, the job only terminates via
+   * cancellation or termination of the job manager.
    *
-   * @param job
-   *          the {@link IJob} to be scheduled.
-   * @param callable
-   *          the {@link Callable} to be periodically executed.
+   * @param runnable
+   *          the runnable to be executed periodically.
    * @param initialDelay
    *          the time to delay first run.
    * @param period
    *          the period between successive runs.
    * @param unit
    *          the time unit of the <code>initialDelay</code> and <code>period</code> arguments.
-   * @return {@link ScheduledFuture} to cancel this periodic action.
+   * @param input
+   *          gives the runnable a semantic meaning and contains instructions about its execution.
+   * @return {@link IFuture} to cancel the periodic action.
    * @throws JobExecutionException
-   *           if the job is already running or was rejected by the job manager because no more threads or queue slots
-   *           are available, or upon shutdown of the job manager.
-   * @see ScheduledExecutorService#scheduleAtFixedRate(Runnable, long, long, TimeUnit)
+   *           if the job is rejected by the job manager because no more threads or queue slots are available, or upon
+   *           shutdown of the job manager.
    */
-  <RESULT> ScheduledFuture<RESULT> scheduleAtFixedRate(IJob<RESULT> job, Callable<RESULT> callable, long initialDelay, long period, TimeUnit unit) throws JobExecutionException;
+  IFuture<Void> scheduleAtFixedRate(IRunnable runnable, long initialDelay, long period, TimeUnit unit, INPUT input) throws JobExecutionException;
 
   /**
-   * Periodically runs the given job on behalf of a worker thread with a fixed delay. The caller of this method
-   * continues to run in parallel.
-   * <p/>
-   * Do not use this method directly. Use {@link Job#schedule(long, TimeUnit)} instead.
+   * Periodically runs the given job on behalf of a worker thread.<br/>
+   * The first execution is after the given <code>initialDelay</code>, and subsequently with the given
+   * <code>delay</code> between the termination of one execution and the commencement of the next. So you have kind of
+   * mutual exclusion meaning that at any given time, there is only one job running.<br/>
+   * If any execution throws an exception, subsequent executions are suppressed. Otherwise, the job will only terminate
+   * via cancellation or termination of the the job manager.
    *
-   * @param job
-   *          the {@link IJob} to be scheduled.
-   * @param callable
-   *          the {@link Callable} to be periodically executed.
+   * @param runnable
+   *          the runnable to be executed periodically.
    * @param initialDelay
    *          the time to delay first run.
    * @param delay
    *          the fixed delay between successive runs.
    * @param unit
    *          the time unit of the <code>initialDelay</code> and <code>period</code> arguments.
-   * @return {@link ScheduledFuture} to cancel this periodic action.
+   * @param input
+   *          gives the runnable a semantic meaning and contains instructions about its execution.
+   * @return {@link IFuture} to cancel the periodic action.
    * @throws JobExecutionException
-   *           if the job is already running or was rejected by the job manager because no more threads or queue slots
-   *           are available, or upon shutdown of the job manager.
-   * @see ScheduledExecutorService#scheduleWithFixedDelay(Runnable, long, long, TimeUnit)
+   *           if the job is rejected by the job manager because no more threads or queue slots are available, or upon
+   *           shutdown of the job manager.
    */
-  <RESULT> ScheduledFuture<RESULT> scheduleWithFixedDelay(IJob<RESULT> job, Callable<RESULT> callable, long initialDelay, long delay, TimeUnit unit) throws JobExecutionException;
+  IFuture<Void> scheduleWithFixedDelay(IRunnable runnable, long initialDelay, long delay, TimeUnit unit, INPUT input) throws JobExecutionException;
 
   /**
-   * Interrupts all running jobs and prevents scheduled jobs from running. After having shutdown, this
-   * {@link JobManager} cannot be used anymore.
-   */
-  void shutdown();
-
-  /**
-   * Attempts to cancel execution of the given job.
-   *
-   * @param job
-   *          the job to be canceled.
-   * @param interruptIfRunning
-   *          <code>true</code> if the thread executing this job should be interrupted; otherwise, in-progress jobs
-   *          are allowed to complete.
-   * @return <code>false</code> if the job could not be cancelled, typically because it has already completed normally;
-   *         <code>true</code> otherwise.
-   * @see Future#cancel(boolean)
-   */
-  boolean cancel(IJob<?> job, boolean interruptIfRunning);
-
-  /**
-   * @return <code>true</code> if the given job was cancelled before it completed normally.
-   */
-  boolean isCanceled(IJob<?> job);
-
-  /**
-   * @return {@link Future} associated with the given job; is <code>null</code> if not scheduled or already completed.
-   */
-  Future<?> getFuture(IJob<?> job);
-
-  /**
-   * To visit all running jobs.
+   * To visit all Futures which did not complete yet.
    *
    * @param visitor
-   *          {@link IJobVisitor} called for each {@link IJob}.
+   *          {@link IFutureVisitor} called for each {@link Future}.
    */
-  void visit(IJobVisitor visitor);
+  void visit(IFutureVisitor visitor);
 
   /**
-   * Creates a {@link IProgressMonitor} for the given {@link IModelJob}.
-   *
-   * @param job
-   *          the job to create a {@link IProgressMonitor} for.
-   * @return {@link IProgressMonitor}; is never <code>null</code>.
+   * Interrupts all running jobs and prevents scheduled jobs from running. After having shutdown, this job manager
+   * cannot be used anymore.
    */
-  <RESULT> IProgressMonitor createProgressMonitor(IJob<RESULT> job);
+  void shutdown();
 }

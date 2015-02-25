@@ -32,7 +32,6 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.commons.cache.IHttpSessionCacheService;
 import org.eclipse.scout.rt.server.commons.servletfilter.FilterConfigInjection;
-import org.eclipse.scout.rt.server.commons.servletfilter.HttpServletRoundtrip;
 import org.eclipse.scout.rt.server.services.common.session.IServerSessionRegistryService;
 import org.eclipse.scout.rt.shared.services.common.exceptionhandler.IExceptionHandlerService;
 import org.eclipse.scout.service.SERVICES;
@@ -98,17 +97,6 @@ public class ServerJobServletFilter implements Filter {
           return;
         }
       }
-    }
-    // process service request
-    // TODO DWI:
-    HttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.set(req);
-    HttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.set(res);
-    try {
-
-    }
-    finally {
-      HttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST.remove();
-      HttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE.remove();
     }
 
     Map<Class, Object> backup = ThreadContext.backup();

@@ -17,7 +17,7 @@ import java.util.concurrent.TimeoutException;
 import org.eclipse.scout.commons.exception.ProcessingException;
 
 /**
- * This exception describes a problem while executing an {@link IJob} and is thrown in one of the following cases:
+ * This exception describes a problem while executing a job and is thrown in one of the following cases:
  * <ul>
  * <li>when a job cannot be accepted for execution. This may occur when no more threads or queue slots are available, or
  * upon shutdown of the job manager;</li>
@@ -68,6 +68,6 @@ public class JobExecutionException extends ProcessingException {
    * Creates a {@link JobExecutionException} to represent a job's rejection from being scheduled.
    */
   public static JobExecutionException newRejectedJobExecutionException(String msg, Object... msgArgs) {
-    return new JobExecutionException(String.format(msg, msgArgs), new RejectedExecutionException());
+    return new JobExecutionException(msg == null ? "N/A" : String.format(msg, msgArgs), new RejectedExecutionException());
   }
 }

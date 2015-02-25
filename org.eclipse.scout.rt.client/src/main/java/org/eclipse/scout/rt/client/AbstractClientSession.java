@@ -43,7 +43,7 @@ import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionLo
 import org.eclipse.scout.rt.client.extension.ClientSessionChains.ClientSessionStoreSessionChain;
 import org.eclipse.scout.rt.client.extension.IClientSessionExtension;
 import org.eclipse.scout.rt.client.job.IModelJobManager;
-import org.eclipse.scout.rt.client.job.ModelJobManager;
+import org.eclipse.scout.rt.client.job.internal.ModelJobManager;
 import org.eclipse.scout.rt.client.services.common.clientnotification.ClientNotificationConsumerEvent;
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerListener;
 import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNotificationConsumerService;

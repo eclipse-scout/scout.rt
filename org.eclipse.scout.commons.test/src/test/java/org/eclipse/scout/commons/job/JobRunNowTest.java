@@ -24,23 +24,30 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicReference;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
+import org.eclipse.scout.commons.job.internal.JobManager;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-/**
- * JUnit-test to test {@link Job#runNow()}
- */
 public class JobRunNowTest {
 
-  private IJobManager m_jobManager;
+  private IJobManager<IJobInput> m_jobManager;
 
   @Before
   public void before() {
-    m_jobManager = new JobManager();
+    m_jobManager = new JobManager<IJobInput>("scout") {
+
+      @Override
+      protected IJobInput createDefaultJobInput() {
+        return JobInput.defaults();
+      }
+    };
   }
 
   @After
@@ -49,74 +56,147 @@ public class JobRunNowTest {
   }
 
   @Test
-  public void testResult() throws ProcessingException {
-    IJob<String> job = new _Job<String>("job") {
-      @Override
-      protected String call() throws ProcessingException {
-        return "RUNNING_WITH_RESULT";
-      }
-    };
-    String actualResult = job.runNow();
+  public void testWithCallable() throws ProcessingException {
+    String result = m_jobManager.runNow(new ICallable<String>() {
 
-    assertEquals("RUNNING_WITH_RESULT", actualResult);
+      @Override
+      public String call() throws Exception {
+        return "running";
+      }
+    });
+
+    assertEquals("running", result);
   }
 
   @Test
   public void testVoidResult() throws ProcessingException {
-    final Holder<String> holder = new Holder<>();
-
-    IJob<Void> job = new _Job<Void>("job") {
+    final Set<String> protocol = Collections.synchronizedSet(new HashSet<String>()); // synchronized because modified/read by different threads.
+    m_jobManager.runNow(new IRunnable() {
 
       @Override
-      protected Void call() throws Exception {
-        holder.setValue("RUNNING_VOID");
-        return null;
+      public void run() throws Exception {
+        protocol.add("running");
       }
-    };
-    Void actualResult = job.runNow();
+    });
 
-    assertNull(actualResult);
-    assertEquals("RUNNING_VOID", holder.getValue());
+    assertEquals(CollectionUtility.hashSet("running"), protocol);
   }
 
   @Test
-  public void testProcessingException() throws ProcessingException {
-    final ProcessingException expectedException = new ProcessingException();
-
-    IJob<String> job = new _Job<String>("job") {
-      @Override
-      protected String call() throws Exception {
-        throw expectedException;
-      }
-    };
+  public void testProcessingExceptionWithRunnable() throws ProcessingException {
+    final ProcessingException exception = new ProcessingException();
 
     try {
-      job.runNow();
+      m_jobManager.runNow(new IRunnable() {
+
+        @Override
+        public void run() throws Exception {
+          throw exception;
+        }
+      });
       fail("Exception expected");
     }
     catch (Exception e) {
-      assertSame(expectedException, e);
+      assertSame(exception, e);
     }
   }
 
   @Test
-  public void testRuntimeException() throws ProcessingException {
-    final RuntimeException expectedException = new RuntimeException();
-
-    IJob<String> job = new _Job<String>("job") {
-      @Override
-      protected String call() throws Exception {
-        throw expectedException;
-      }
-    };
+  public void testProcessingExceptionWithCallable() throws ProcessingException {
+    final ProcessingException exception = new ProcessingException();
 
     try {
-      job.runNow();
+      m_jobManager.runNow(new ICallable<Void>() {
+
+        @Override
+        public Void call() throws Exception {
+          throw exception;
+        }
+      });
+      fail("Exception expected");
+    }
+    catch (Exception e) {
+      assertSame(exception, e);
+    }
+  }
+
+  @Test
+  public void testRuntimeExceptionWithRunnable() throws ProcessingException {
+    final RuntimeException exception = new RuntimeException();
+
+    try {
+      m_jobManager.runNow(new IRunnable() {
+
+        @Override
+        public void run() throws Exception {
+          throw exception;
+        }
+      });
       fail("Exception expected");
     }
     catch (Exception e) {
       assertTrue(e instanceof ProcessingException);
-      assertSame(expectedException, e.getCause());
+      assertSame(exception, e.getCause());
+    }
+  }
+
+  @Test
+  public void testRuntimeExceptionWithCallable() throws ProcessingException {
+    final RuntimeException exception = new RuntimeException();
+
+    try {
+      m_jobManager.runNow(new IRunnable() {
+
+        @Override
+        public void run() throws Exception {
+          throw exception;
+        }
+      });
+      fail("Exception expected");
+    }
+    catch (Exception e) {
+      assertTrue(e instanceof ProcessingException);
+      assertSame(exception, e.getCause());
+    }
+  }
+
+  @Test
+  public void testExceptionExceptionWithRunnable() throws ProcessingException {
+    final Exception exception = new Exception();
+
+    try {
+      m_jobManager.runNow(new IRunnable() {
+
+        @Override
+        public void run() throws Exception {
+          throw exception;
+        }
+      });
+      fail("Exception expected");
+    }
+    catch (Exception e) {
+      assertTrue(e instanceof ProcessingException);
+      assertSame(exception, e.getCause());
+    }
+  }
+
+  @Test
+  public void testExceptionExceptionWithCallable() throws ProcessingException {
+    final Exception exception = new Exception();
+
+    try {
+      m_jobManager.runNow(new IRunnable() {
+
+        @Override
+        public void run() throws Exception {
+          throw exception;
+        }
+      });
+      fail("Exception expected");
+    }
+    catch (Exception e) {
+      assertTrue(e instanceof ProcessingException);
+      assertSame(exception, e.getCause());
     }
   }
 
@@ -124,23 +204,21 @@ public class JobRunNowTest {
   public void testSameThread() throws ProcessingException {
     final Set<Thread> threads = Collections.synchronizedSet(new HashSet<Thread>()); // synchronized because modified/read by different threads.
 
-    new _Job<Void>("job-1") {
+    m_jobManager.runNow(new IRunnable() {
 
       @Override
-      protected Void call() throws Exception {
+      public void run() throws Exception {
         threads.add(Thread.currentThread());
 
-        new _Job<Void>("job-2") {
+        m_jobManager.runNow(new IRunnable() {
 
           @Override
-          protected Void call() throws Exception {
+          public void run() throws Exception {
             threads.add(Thread.currentThread());
-            return null;
           }
-        }.runNow();
-        return null;
+        });
       }
-    }.runNow();
+    });
 
     assertEquals(1, threads.size());
     assertTrue(threads.contains(Thread.currentThread()));
@@ -153,115 +231,133 @@ public class JobRunNowTest {
     final Holder<String> actualThreadName1 = new Holder<>();
     final Holder<String> actualThreadName2 = new Holder<>();
 
-    new _Job<Void>("ABC") {
+    m_jobManager.runNow(new IRunnable() {
 
       @Override
-      protected Void call() throws Exception {
+      public void run() throws Exception {
         actualThreadName1.setValue(Thread.currentThread().getName());
 
-        new _Job<Void>("XYZ") {
+        m_jobManager.runNow(new IRunnable() {
 
           @Override
-          protected Void call() throws Exception {
+          public void run() throws Exception {
             actualThreadName2.setValue(Thread.currentThread().getName());
-            return null;
           }
-        }.runNow();
-        return null;
+        }, JobInput.defaults().name("XYZ"));
       }
-    }.runNow();
+    }, JobInput.defaults().name("ABC"));
 
-    assertEquals("thread:main;job:ABC", actualThreadName1.getValue());
-    assertEquals("thread:main;job:XYZ", actualThreadName2.getValue());
+    assertEquals("main;job:ABC", actualThreadName1.getValue());
+    assertEquals("main;job:XYZ", actualThreadName2.getValue());
     assertEquals("main", Thread.currentThread().getName());
   }
 
   @Test
-  public void testCurrentJob() throws ProcessingException {
-    final Holder<IJob<?>> job1 = new Holder<>();
-    final Holder<IJob<?>> job2 = new Holder<>();
+  public void testCurrentFuture1() throws ProcessingException {
+    final AtomicReference<Future<?>> actualFuture1 = new AtomicReference<>();
+    final AtomicReference<Future<?>> actualFuture2 = new AtomicReference<>();
 
-    final Holder<IJob<?>> actualJob1 = new Holder<>();
-    final Holder<IJob<?>> actualJob2 = new Holder<>();
+    IFuture.CURRENT.remove();
 
-    IJob.CURRENT.set(null);
-
-    new _Job<Void>("job-1") {
+    m_jobManager.runNow(new IRunnable() {
 
       @Override
-      protected Void call() throws Exception {
-        job1.setValue(this);
-        actualJob1.setValue(IJob.CURRENT.get());
+      public void run() throws Exception {
+        actualFuture1.set(IFuture.CURRENT.get());
 
-        new _Job<Void>("job-2") {
+        m_jobManager.runNow(new IRunnable() {
 
           @Override
-          protected Void call() throws Exception {
-            job2.setValue(this);
-            actualJob2.setValue(IJob.CURRENT.get());
-            return null;
+          public void run() throws Exception {
+            actualFuture2.set(IFuture.CURRENT.get());
           }
-        }.runNow();
-        return null;
+        });
       }
-    }.runNow();
+    });
 
-    assertNotNull(job1.getValue());
-    assertNotNull(job2.getValue());
+    assertNotNull(actualFuture1.get());
+    assertNotNull(actualFuture2.get());
 
-    assertSame(job1.getValue(), actualJob1.getValue());
-    assertSame(job2.getValue(), actualJob2.getValue());
+    assertEquals("same future expected", 1, CollectionUtility.hashSet(actualFuture1.get(), actualFuture2.get()).size());
 
-    assertNull(IJob.CURRENT.get());
+    assertNull(IFuture.CURRENT.get());
+  }
+
+  @Test
+  public void testCurrentFuture() throws ProcessingException {
+    final AtomicReference<Future<?>> actualFuture1 = new AtomicReference<>();
+    final AtomicReference<Future<?>> actualFuture2 = new AtomicReference<>();
+
+    IFuture.CURRENT.remove();
+
+    // Schedule outermost job.
+    IFuture<Void> future = m_jobManager.schedule(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        actualFuture1.set(IFuture.CURRENT.get());
+
+        m_jobManager.runNow(new IRunnable() {
+
+          @Override
+          public void run() throws Exception {
+            actualFuture2.set(IFuture.CURRENT.get());
+          }
+        });
+      }
+    });
+
+    future.get();
+
+    assertEquals("same future expected", CollectionUtility.hashSet(future.getDelegate()), CollectionUtility.hashSet(actualFuture1.get(), actualFuture2.get()));
+
+    assertNull(IFuture.CURRENT.get());
   }
 
   @Test
   public void testBlocking() throws ProcessingException {
-    final List<Integer> actualProtocol = Collections.synchronizedList(new ArrayList<Integer>()); // synchronized because modified/read by different threads.
+    final List<Integer> protocol = Collections.synchronizedList(new ArrayList<Integer>()); // synchronized because modified/read by different threads.
 
-    new _Job<Void>("job") {
+    m_jobManager.runNow(new IRunnable() {
 
       @Override
-      protected Void call() throws Exception {
-        actualProtocol.add(1);
-        return null;
+      public void run() throws Exception {
+        protocol.add(1);
       }
-    }.runNow();
-    actualProtocol.add(2);
+    });
+    protocol.add(2);
 
-    assertEquals(Arrays.asList(1, 2), actualProtocol);
+    assertEquals(Arrays.asList(1, 2), protocol);
   }
 
   @Test
   public void testJobContext() throws ProcessingException {
-    Thread.currentThread().setName("main");
+    JobContext.CURRENT.remove();
 
     final Holder<JobContext> actualJobContext1 = new Holder<>();
     final Holder<JobContext> actualJobContext2 = new Holder<>();
 
-    new _Job<Void>("job-1") {
+    m_jobManager.runNow(new IRunnable() {
 
       @Override
-      protected Void call() throws Exception {
+      public void run() throws Exception {
         JobContext ctx1 = JobContext.CURRENT.get();
         ctx1.set("PROP_JOB1", "J1");
         ctx1.set("PROP_JOB1+JOB2", "SHARED-1");
         actualJobContext1.setValue(ctx1);
 
-        new _Job<Void>("job-2") {
+        m_jobManager.runNow(new IRunnable() {
 
           @Override
-          protected Void call() throws Exception {
+          public void run() throws Exception {
             JobContext ctx2 = JobContext.CURRENT.get();
             ctx2.set("PROP_JOB2", "J2");
             ctx2.set("PROP_JOB1+JOB2", "SHARED-2");
             actualJobContext2.setValue(ctx2);
-            return null;
           }
-        }.runNow();
-        return null;
+        });
       }
-    }.runNow();
+    });
 
     assertNotNull(actualJobContext1.getValue());
     assertNotNull(actualJobContext2.getValue());
@@ -277,20 +373,5 @@ public class JobRunNowTest {
     assertNull(actualJobContext1.getValue().get("JOB2"));
 
     assertNull(JobContext.CURRENT.get());
-  }
-
-  /**
-   * Job with a dedicated {@link JobManager} per test-case.
-   */
-  public abstract class _Job<R> extends Job<R> {
-
-    public _Job(String name) {
-      super(name);
-    }
-
-    @Override
-    protected IJobManager createJobManager() {
-      return JobRunNowTest.this.m_jobManager;
-    }
   }
 }

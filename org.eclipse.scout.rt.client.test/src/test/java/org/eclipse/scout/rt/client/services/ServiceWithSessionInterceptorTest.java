@@ -10,8 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.services;
 
+import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.job.ClientJob;
+import org.eclipse.scout.rt.client.job.ClientJobInput;
+import org.eclipse.scout.rt.client.job.IClientJobManager;
 import org.eclipse.scout.rt.client.testenvironment.TestEnvironmentClientSession;
 import org.eclipse.scout.rt.platform.cdi.ApplicationScoped;
 import org.eclipse.scout.rt.platform.cdi.OBJ;
@@ -45,13 +47,13 @@ public class ServiceWithSessionInterceptorTest {
 
   @Test
   public void testService() throws Exception {
-    ClientJob job = new ClientJob("testJob", clientSession) {
+    IClientJobManager.DEFAULT.runNow(new IRunnable() {
+
       @Override
-      protected void run() throws Exception {
+      public void run() throws Exception {
         runInClientJob();
       }
-    };
-    job.runNow();
+    }, ClientJobInput.defaults().session(clientSession));
   }
 
   /**

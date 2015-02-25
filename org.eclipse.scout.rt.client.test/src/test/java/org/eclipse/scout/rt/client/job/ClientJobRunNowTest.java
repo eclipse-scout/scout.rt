@@ -12,40 +12,61 @@ package org.eclipse.scout.rt.client.job;
 
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.security.AccessController;
 import java.util.Locale;
 
+import javax.security.auth.Subject;
+
+import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.holders.Holder;
-import org.eclipse.scout.commons.job.IJobManager;
-import org.eclipse.scout.commons.job.Job;
-import org.eclipse.scout.commons.job.JobManager;
+import org.eclipse.scout.commons.job.ICallable;
+import org.eclipse.scout.commons.job.IRunnable;
+import org.eclipse.scout.commons.job.internal.JobManager;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.job.internal.ClientJobManager;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 /**
- * Tests the additional functionality of {@link ClientJob} compared with {@link Job}.
+ * Tests the additional functionality of {@link ClientJobManager} compared with {@link JobManager}.
  */
+@RunWith(ScoutPlatformTestRunner.class)
 public class ClientJobRunNowTest {
 
-  private IJobManager m_jobManager;
+  private IClientJobManager m_jobManager;
+
+  private Subject m_subject1 = new Subject();
+  private Subject m_subject2 = new Subject();
+
+  @Mock
   private IClientSession m_clientSession1;
+  @Mock
   private IClientSession m_clientSession2;
 
   @Before
   public void before() {
-    m_jobManager = new JobManager();
-    m_clientSession1 = mock(IClientSession.class);
+    MockitoAnnotations.initMocks(this);
+
+    m_jobManager = new ClientJobManager();
+
+    // initialize ClientSession1
     when(m_clientSession1.getLocale()).thenReturn(new Locale("de", "DE"));
     when(m_clientSession1.getTexts()).thenReturn(new ScoutTexts());
 
+    // initialize ClientSession2
     m_clientSession2 = mock(IClientSession.class);
     when(m_clientSession2.getLocale()).thenReturn(new Locale("de", "CH"));
     when(m_clientSession2.getTexts()).thenReturn(new ScoutTexts());
@@ -57,8 +78,48 @@ public class ClientJobRunNowTest {
   }
 
   @Test
+  public void testMissingSession() throws ProcessingException {
+    ISession.CURRENT.remove(); // ensure no session installed.
+
+    String result = null;
+    try {
+      result = m_jobManager.runNow(new ICallable<String>() {
+
+        @Override
+        public String call() throws Exception {
+          return "executed";
+        }
+      });
+      fail();
+    }
+    catch (AssertionException e) {
+      assertNull(result);
+    }
+  }
+
+  @Test
+  public void testMissingJobInput() throws ProcessingException {
+    String result = null;
+    try {
+      result = m_jobManager.runNow(new ICallable<String>() {
+
+        @Override
+        public String call() throws Exception {
+          return "executed";
+        }
+      }, null);
+      fail();
+    }
+    catch (AssertionException e) {
+      assertNull(result);
+    }
+  }
+
+  @Test
   public void testClientContext() throws ProcessingException {
-    Thread.currentThread().setName("main");
+    ISession.CURRENT.remove();
+    NlsLocale.CURRENT.remove();
+    ScoutTexts.CURRENT.remove();
 
     final Holder<ISession> actualClientSession1 = new Holder<>();
     final Holder<ISession> actualClientSession2 = new Holder<>();
@@ -69,29 +130,34 @@ public class ClientJobRunNowTest {
     final Holder<ScoutTexts> actualTexts1 = new Holder<>();
     final Holder<ScoutTexts> actualTexts2 = new Holder<>();
 
-    new _ClientJob("job-1", m_clientSession1) {
+    final Holder<Subject> actualSubject1 = new Holder<>();
+    final Holder<Subject> actualSubject2 = new Holder<>();
+
+    m_jobManager.runNow(new IRunnable() {
 
       @Override
-      protected void run() throws Exception {
+      public void run() throws Exception {
         actualClientSession1.setValue(IClientSession.CURRENT.get());
         actualLocale1.setValue(NlsLocale.CURRENT.get());
         actualTexts1.setValue(ScoutTexts.CURRENT.get());
+        actualSubject1.setValue(Subject.getSubject(AccessController.getContext()));
 
-        new _ClientJob("job-2", m_clientSession2) {
+        m_jobManager.runNow(new IRunnable() {
 
           @Override
-          protected void run() throws Exception {
+          public void run() throws Exception {
             actualClientSession2.setValue(IClientSession.CURRENT.get());
             actualLocale2.setValue(NlsLocale.CURRENT.get());
             actualTexts2.setValue(ScoutTexts.CURRENT.get());
+            actualSubject2.setValue(Subject.getSubject(AccessController.getContext()));
           }
-        }.runNow();
+        }, ClientJobInput.defaults().session(m_clientSession2).subject(m_subject2));
       }
-    }.runNow();
+    }, ClientJobInput.defaults().session(m_clientSession1).subject(m_subject1));
 
     assertSame(m_clientSession1, actualClientSession1.getValue());
     assertSame(m_clientSession2, actualClientSession2.getValue());
-    assertNull(IClientSession.CURRENT.get());
+    assertNull(ISession.CURRENT.get());
 
     assertSame(m_clientSession1.getLocale(), actualLocale1.getValue());
     assertSame(m_clientSession2.getLocale(), actualLocale2.getValue());
@@ -100,20 +166,9 @@ public class ClientJobRunNowTest {
     assertSame(m_clientSession1.getTexts(), actualTexts1.getValue());
     assertSame(m_clientSession2.getTexts(), actualTexts2.getValue());
     assertNull(ScoutTexts.CURRENT.get());
-  }
 
-  /**
-   * Job with a dedicated {@link JobManager} per test-case.
-   */
-  public abstract class _ClientJob extends ClientJob {
-
-    public _ClientJob(String name, IClientSession clientSession) {
-      super(name, clientSession);
-    }
-
-    @Override
-    protected IJobManager createJobManager() {
-      return ClientJobRunNowTest.this.m_jobManager;
-    }
+    assertSame(m_subject1, actualSubject1.getValue());
+    assertSame(m_subject2, actualSubject2.getValue());
+    assertNull(Subject.getSubject(AccessController.getContext()));
   }
 }

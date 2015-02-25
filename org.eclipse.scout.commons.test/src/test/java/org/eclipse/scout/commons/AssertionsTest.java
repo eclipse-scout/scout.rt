@@ -12,23 +12,34 @@ package org.eclipse.scout.commons;
 
 import static org.junit.Assert.fail;
 
+import org.eclipse.scout.commons.Assertions.AssertionException;
 import org.junit.Test;
 
 public class AssertionsTest {
 
-  @Test(expected = IllegalArgumentException.class)
-  public void testNotNull() {
+  @Test
+  public void testNotNull_Positive() {
+    Assertions.assertNotNull(new Object());
+  }
+
+  @Test(expected = AssertionException.class)
+  public void testNotNull_Negative() {
     Assertions.assertNotNull(null);
   }
 
   @Test
-  public void testNotNullOrEmpty() {
+  public void testNotNullOrEmpty_Positive() {
+    Assertions.assertNotNullOrEmpty("NOT-NULL");
+  }
+
+  @Test
+  public void testNotNullOrEmpty_Negative1() {
     // Verify 'NULL'
     try {
       Assertions.assertNotNullOrEmpty(null);
       fail();
     }
-    catch (IllegalArgumentException e) {
+    catch (AssertionException e) {
       // NOOP
     }
 
@@ -37,8 +48,49 @@ public class AssertionsTest {
       Assertions.assertNotNullOrEmpty("");
       fail();
     }
-    catch (IllegalArgumentException e) {
+    catch (AssertionException e) {
       // NOOP
     }
+  }
+
+  @Test
+  public void testNotNullOrEmpty_Negative2() {
+    // Verify 'NULL'
+    try {
+      Assertions.assertNotNullOrEmpty(null, "failure");
+      fail();
+    }
+    catch (AssertionException e) {
+      // NOOP
+    }
+
+    // Verify 'empty'
+    try {
+      Assertions.assertNotNullOrEmpty("", "failure");
+      fail();
+    }
+    catch (AssertionException e) {
+      // NOOP
+    }
+  }
+
+  @Test
+  public void testTrue_Positive() {
+    Assertions.assertTrue(true);
+  }
+
+  @Test(expected = AssertionException.class)
+  public void testTrue_Negative() {
+    Assertions.assertTrue(false);
+  }
+
+  @Test
+  public void testFalse_Positive() {
+    Assertions.assertFalse(false);
+  }
+
+  @Test(expected = AssertionException.class)
+  public void testFalse_Negative() {
+    Assertions.assertFalse(true);
   }
 }

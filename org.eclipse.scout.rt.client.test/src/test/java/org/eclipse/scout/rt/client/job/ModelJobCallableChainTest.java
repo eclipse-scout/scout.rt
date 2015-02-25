@@ -12,101 +12,87 @@ package org.eclipse.scout.rt.client.job;
 
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 
 import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
 
-import org.eclipse.scout.commons.job.IJob;
 import org.eclipse.scout.commons.job.IProgressMonitor;
 import org.eclipse.scout.commons.job.JobContext;
-import org.eclipse.scout.commons.job.interceptor.AsyncFutureCallable;
-import org.eclipse.scout.commons.job.interceptor.Chainable;
-import org.eclipse.scout.commons.job.interceptor.ExceptionTranslator;
-import org.eclipse.scout.commons.job.interceptor.InitThreadLocalCallable;
-import org.eclipse.scout.commons.job.interceptor.ThreadNameDecorator;
+import org.eclipse.scout.commons.job.internal.JobManager;
+import org.eclipse.scout.commons.job.internal.callable.Chainable;
+import org.eclipse.scout.commons.job.internal.callable.ExceptionTranslator;
+import org.eclipse.scout.commons.job.internal.callable.InitThreadLocalCallable;
+import org.eclipse.scout.commons.job.internal.callable.SubjectCallable;
+import org.eclipse.scout.commons.job.internal.callable.ThreadNameDecorator;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.job.internal.ModelJobManager;
 import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
-@SuppressWarnings("unchecked")
+@RunWith(ScoutPlatformTestRunner.class)
 public class ModelJobCallableChainTest {
 
+  @Mock
+  private Callable<Void> m_targetCallable;
+
+  @Before
+  public void before() {
+    MockitoAnnotations.initMocks(this);
+    ISession.CURRENT.set(mock(IClientSession.class));
+  }
+
+  @After
+  public void after() {
+    ISession.CURRENT.remove();
+  }
+
   /**
-   * Tests the correct order of interceptors in {@link ClientJob}.
+   * Tests the correct order of interceptors in {@link JobManager}.
    */
   @Test
   public void testCallableChain() throws Exception {
-    final IModelJobManager jobManager = mock(IModelJobManager.class);
+    Callable<Void> actualCallable = new _ModelJobManager().interceptCallable(m_targetCallable, ClientJobInput.defaults());
 
-    // install captor to intercept Callable.
-    ArgumentCaptor<Callable> callableCaptor = ArgumentCaptor.forClass(Callable.class);
-    doReturn(mock(Future.class)).when(jobManager).schedule(any(ModelJob.class), callableCaptor.capture());
+    // 1. ExceptionTranslator
+    ExceptionTranslator c1 = getFirstAndAssert(actualCallable, ExceptionTranslator.class);
 
-    final Callable<Void> callInvoker = mock(Callable.class);
-    ModelJob job = new ModelJob("job-1", mock(IClientSession.class)) {
+    // 2. ThreadNameDecorator
+    getNextAndAssert(c1, ThreadNameDecorator.class);
+    ThreadNameDecorator c2 = getNextAndAssert(c1, ThreadNameDecorator.class);
 
-      @Override
-      protected IModelJobManager createJobManager(IClientSession clientSession) {
-        return jobManager;
-      }
+    // 3. SubjectCallable
+    SubjectCallable c3 = getNextAndAssert(c2, SubjectCallable.class);
 
-      @Override
-      protected void run() throws Exception {
-        throw new RuntimeException();
-      }
-
-      @Override
-      protected Callable<Void> createCallInvoker() {
-        return callInvoker;
-      }
-    };
-
-    // run the test
-    job.schedule();
-
-    // verify Callable-Chain
-
-    // 1. InitThreadLocalCallable for IJob.CURRENT
-    InitThreadLocalCallable c1 = getFirstAndAssert(callableCaptor, InitThreadLocalCallable.class);
-    assertSame(IJob.CURRENT, ((InitThreadLocalCallable) c1).getThreadLocal());
-
-    // 2. InitThreadLocalCallable for IProgressMonitor.CURRENT
-    InitThreadLocalCallable c2 = getNextAndAssert(c1, InitThreadLocalCallable.class);
-    assertSame(IProgressMonitor.CURRENT, ((InitThreadLocalCallable) c2).getThreadLocal());
-
-    // 3. ThreadNameDecorator
-    ThreadNameDecorator c3 = getNextAndAssert(c2, ThreadNameDecorator.class);
-
-    // 4. InitThreadLocalCallable for JobContext.CURRENT
+    // 4. InitThreadLocalCallable for IProgressMonitor.CURRENT
     InitThreadLocalCallable c4 = getNextAndAssert(c3, InitThreadLocalCallable.class);
-    assertSame(JobContext.CURRENT, ((InitThreadLocalCallable) c4).getThreadLocal());
+    assertSame(IProgressMonitor.CURRENT, ((InitThreadLocalCallable) c4).getThreadLocal());
 
-    // 5. InitThreadLocalCallable for ISession.CURRENT
+    // 5. InitThreadLocalCallable for JobContext.CURRENT
     InitThreadLocalCallable c5 = getNextAndAssert(c4, InitThreadLocalCallable.class);
-    assertSame(ISession.CURRENT, ((InitThreadLocalCallable) c5).getThreadLocal());
+    assertSame(JobContext.CURRENT, ((InitThreadLocalCallable) c5).getThreadLocal());
 
-    // 6. InitThreadLocalCallable for LocaleThreadLocal.CURRENT
+    // 6. InitThreadLocalCallable for ISession.CURRENT
     InitThreadLocalCallable c6 = getNextAndAssert(c5, InitThreadLocalCallable.class);
-    assertSame(NlsLocale.CURRENT, ((InitThreadLocalCallable) c6).getThreadLocal());
+    assertSame(ISession.CURRENT, ((InitThreadLocalCallable) c6).getThreadLocal());
 
-    // 7. InitThreadLocalCallable for ScoutTexts.CURRENT
+    // 7. InitThreadLocalCallable for NlsLocale.CURRENT
     InitThreadLocalCallable c7 = getNextAndAssert(c6, InitThreadLocalCallable.class);
-    assertSame(ScoutTexts.CURRENT, ((InitThreadLocalCallable) c7).getThreadLocal());
+    assertSame(NlsLocale.CURRENT, ((InitThreadLocalCallable) c7).getThreadLocal());
 
-    // 8. AsyncFutureCallable
-    AsyncFutureCallable c8 = getNextAndAssert(c7, AsyncFutureCallable.class);
+    // 8. InitThreadLocalCallable for ScoutTexts.CURRENT
+    InitThreadLocalCallable c8 = getNextAndAssert(c7, InitThreadLocalCallable.class);
+    assertSame(ScoutTexts.CURRENT, ((InitThreadLocalCallable) c8).getThreadLocal());
 
-    // 9. ExceptionTranslator
-    ExceptionTranslator c9 = getNextAndAssert(c8, ExceptionTranslator.class);
-
-    // 10. TargetInvoker
-    assertSame(callInvoker, c9.getNext());
+    // 9. Target
+    assertSame(m_targetCallable, c8.getNext());
   }
 
   /**
@@ -114,85 +100,56 @@ public class ModelJobCallableChainTest {
    */
   @Test
   public void testCallableChainWithContributionsAfter() throws Exception {
-    final IModelJobManager jobManager = mock(IModelJobManager.class);
-
-    // install captor to intercept Callable.
-    ArgumentCaptor<Callable> callableCaptor = ArgumentCaptor.forClass(Callable.class);
-    doReturn(mock(Future.class)).when(jobManager).schedule(any(ModelJob.class), callableCaptor.capture());
-
-    final Callable<Void> callInvoker = mock(Callable.class);
-    ModelJob job = new ModelJob("job-1", mock(IClientSession.class)) {
+    _ModelJobManager jobManager = new _ModelJobManager() {
 
       @Override
-      protected Callable<Void> interceptCallable(Callable<Void> next) {
-        Callable<Void> p2 = new Contribution2(next); // executed 3th
-        Callable<Void> p1 = new Contribution1(p2); // executed 2nd
-        Callable<Void> head = super.interceptCallable(p1); // executed 1st
+      public <RESULT> Callable<RESULT> interceptCallable(Callable<RESULT> next, ClientJobInput input) {
+        Callable<RESULT> p2 = new Contribution2<>(next); // executed 3th
+        Callable<RESULT> p1 = new Contribution1<>(p2); // executed 2nd
+        Callable<RESULT> head = super.interceptCallable(p1, input); // executed 1st
         return head;
-      }
-
-      @Override
-      protected IModelJobManager createJobManager(IClientSession clientSession) {
-        return jobManager;
-      }
-
-      @Override
-      protected void run() throws Exception {
-        throw new RuntimeException();
-      }
-
-      @Override
-      protected Callable<Void> createCallInvoker() {
-        return callInvoker;
       }
     };
 
-    // run the test
-    job.schedule();
+    Callable<Void> actualCallable = jobManager.interceptCallable(m_targetCallable, ClientJobInput.defaults());
 
-    // verify Callable-Chain
+    // 1. ExceptionTranslator
+    ExceptionTranslator c1 = getFirstAndAssert(actualCallable, ExceptionTranslator.class);
 
-    // 1. InitThreadLocalCallable for IJob.CURRENT
-    InitThreadLocalCallable c1 = getFirstAndAssert(callableCaptor, InitThreadLocalCallable.class);
-    assertSame(IJob.CURRENT, ((InitThreadLocalCallable) c1).getThreadLocal());
+    // 2. ThreadNameDecorator
+    ThreadNameDecorator c2 = getNextAndAssert(c1, ThreadNameDecorator.class);
 
-    // 2. InitThreadLocalCallable for IProgressMonitor.CURRENT
-    InitThreadLocalCallable c2 = getNextAndAssert(c1, InitThreadLocalCallable.class);
-    assertSame(IProgressMonitor.CURRENT, ((InitThreadLocalCallable) c2).getThreadLocal());
+    // 3. SubjectCallable
+    SubjectCallable c3 = getNextAndAssert(c2, SubjectCallable.class);
 
-    // 3. ThreadNameDecorator
-    ThreadNameDecorator c3 = getNextAndAssert(c2, ThreadNameDecorator.class);
-
-    // 4. InitThreadLocalCallable for JobContext.CURRENT
+    // 4. InitThreadLocalCallable for IProgressMonitor.CURRENT
     InitThreadLocalCallable c4 = getNextAndAssert(c3, InitThreadLocalCallable.class);
-    assertSame(JobContext.CURRENT, ((InitThreadLocalCallable) c4).getThreadLocal());
+    assertSame(IProgressMonitor.CURRENT, ((InitThreadLocalCallable) c4).getThreadLocal());
 
-    // 5. InitThreadLocalCallable for ISession.CURRENT
+    // 5. InitThreadLocalCallable for JobContext.CURRENT
     InitThreadLocalCallable c5 = getNextAndAssert(c4, InitThreadLocalCallable.class);
-    assertSame(ISession.CURRENT, ((InitThreadLocalCallable) c5).getThreadLocal());
+    assertSame(JobContext.CURRENT, ((InitThreadLocalCallable) c5).getThreadLocal());
 
-    // 6. InitThreadLocalCallable for LocaleThreadLocal.CURRENT
+    // 6. InitThreadLocalCallable for ISession.CURRENT
     InitThreadLocalCallable c6 = getNextAndAssert(c5, InitThreadLocalCallable.class);
-    assertSame(NlsLocale.CURRENT, ((InitThreadLocalCallable) c6).getThreadLocal());
+    assertSame(ISession.CURRENT, ((InitThreadLocalCallable) c6).getThreadLocal());
 
-    // 7. InitThreadLocalCallable for ScoutTexts.CURRENT
+    // 7. InitThreadLocalCallable for NlsLocale.CURRENT
     InitThreadLocalCallable c7 = getNextAndAssert(c6, InitThreadLocalCallable.class);
-    assertSame(ScoutTexts.CURRENT, ((InitThreadLocalCallable) c7).getThreadLocal());
+    assertSame(NlsLocale.CURRENT, ((InitThreadLocalCallable) c7).getThreadLocal());
 
-    // 8. Contribution1
-    Contribution1 c8 = getNextAndAssert(c7, Contribution1.class);
+    // 8. InitThreadLocalCallable for ScoutTexts.CURRENT
+    InitThreadLocalCallable c8 = getNextAndAssert(c7, InitThreadLocalCallable.class);
+    assertSame(ScoutTexts.CURRENT, ((InitThreadLocalCallable) c8).getThreadLocal());
 
-    // 9. Contribution2
-    Contribution2 c9 = getNextAndAssert(c8, Contribution2.class);
+    // 9. Contribution1
+    Contribution1 c9 = getNextAndAssert(c8, Contribution1.class);
 
-    // 10. AsyncFutureCallable
-    AsyncFutureCallable c10 = getNextAndAssert(c9, AsyncFutureCallable.class);
+    // 10. Contribution2
+    Contribution2 c10 = getNextAndAssert(c9, Contribution2.class);
 
-    // 11. ExceptionTranslator
-    ExceptionTranslator c11 = getNextAndAssert(c10, ExceptionTranslator.class);
-
-    // 12. TargetInvoker
-    assertSame(callInvoker, c11.getNext());
+    // 11. Target
+    assertSame(m_targetCallable, c10.getNext());
   }
 
   /**
@@ -200,134 +157,114 @@ public class ModelJobCallableChainTest {
    */
   @Test
   public void testCallableChainWithContributionsBefore() throws Exception {
-    final IModelJobManager jobManager = mock(IModelJobManager.class);
-
-    // install captor to intercept Callable.
-    ArgumentCaptor<Callable> callableCaptor = ArgumentCaptor.forClass(Callable.class);
-    doReturn(mock(Future.class)).when(jobManager).schedule(any(ModelJob.class), callableCaptor.capture());
-
-    final Callable<Void> callInvoker = mock(Callable.class);
-    ModelJob job = new ModelJob("job-1", mock(IClientSession.class)) {
+    _ModelJobManager jobManager = new _ModelJobManager() {
 
       @Override
-      protected Callable<Void> interceptCallable(Callable<Void> next) {
-        Callable<Void> p2 = super.interceptCallable(next); // executed 3th
-        Callable<Void> p1 = new Contribution2(p2); // executed 2nd
-        Callable<Void> head = new Contribution1(p1); // executed 1st
+      public <RESULT> Callable<RESULT> interceptCallable(Callable<RESULT> next, ClientJobInput input) {
+        Callable<RESULT> p2 = super.interceptCallable(next, input); // executed 3th
+        Callable<RESULT> p1 = new Contribution2<>(p2); // executed 2nd
+        Callable<RESULT> head = new Contribution1<>(p1); // executed 1st
         return head;
-      }
-
-      @Override
-      protected IModelJobManager createJobManager(IClientSession clientSession) {
-        return jobManager;
-      }
-
-      @Override
-      protected void run() throws Exception {
-        throw new RuntimeException();
-      }
-
-      @Override
-      protected Callable<Void> createCallInvoker() {
-        return callInvoker;
       }
     };
 
-    // run the test
-    job.schedule();
+    Callable<Void> actualCallable = jobManager.interceptCallable(m_targetCallable, ClientJobInput.defaults());
 
-    // verify Callable-Chain
+    // 1. Contribution1
+    Contribution1 c1 = getFirstAndAssert(actualCallable, Contribution1.class);
 
-    // 1. InitThreadLocalCallable for IJob.CURRENT
-    InitThreadLocalCallable c1 = getFirstAndAssert(callableCaptor, InitThreadLocalCallable.class);
-    assertSame(IJob.CURRENT, ((InitThreadLocalCallable) c1).getThreadLocal());
+    // 2. Contribution2
+    Contribution2 c2 = getNextAndAssert(c1, Contribution2.class);
 
-    // 2. InitThreadLocalCallable for IProgressMonitor.CURRENT
-    InitThreadLocalCallable c2 = getNextAndAssert(c1, InitThreadLocalCallable.class);
-    assertSame(IProgressMonitor.CURRENT, ((InitThreadLocalCallable) c2).getThreadLocal());
+    // 3. ExceptionTranslator
+    ExceptionTranslator c3 = getNextAndAssert(c2, ExceptionTranslator.class);
 
-    // 3. Contribution1
-    Contribution1 c3 = getNextAndAssert(c2, Contribution1.class);
+    // 4. ThreadNameDecorator
+    ThreadNameDecorator c4 = getNextAndAssert(c3, ThreadNameDecorator.class);
 
-    // 4. Contribution2
-    Contribution2 c4 = getNextAndAssert(c3, Contribution2.class);
+    // 5. SubjectCallable
+    SubjectCallable c5 = getNextAndAssert(c4, SubjectCallable.class);
 
-    // 5. ThreadNameDecorator
-    ThreadNameDecorator c5 = getNextAndAssert(c4, ThreadNameDecorator.class);
-
-    // 6. InitThreadLocalCallable for JobContext.CURRENT
+    // 6. InitThreadLocalCallable for IProgressMonitor.CURRENT
     InitThreadLocalCallable c6 = getNextAndAssert(c5, InitThreadLocalCallable.class);
-    assertSame(JobContext.CURRENT, ((InitThreadLocalCallable) c6).getThreadLocal());
+    assertSame(IProgressMonitor.CURRENT, ((InitThreadLocalCallable) c6).getThreadLocal());
 
-    // 7. InitThreadLocalCallable for ISession.CURRENT
+    // 7. InitThreadLocalCallable for JobContext.CURRENT
     InitThreadLocalCallable c7 = getNextAndAssert(c6, InitThreadLocalCallable.class);
-    assertSame(ISession.CURRENT, ((InitThreadLocalCallable) c7).getThreadLocal());
+    assertSame(JobContext.CURRENT, ((InitThreadLocalCallable) c7).getThreadLocal());
 
-    // 8. InitThreadLocalCallable for LocaleThreadLocal.CURRENT
+    // 8. InitThreadLocalCallable for ISession.CURRENT
     InitThreadLocalCallable c8 = getNextAndAssert(c7, InitThreadLocalCallable.class);
-    assertSame(NlsLocale.CURRENT, ((InitThreadLocalCallable) c8).getThreadLocal());
+    assertSame(ISession.CURRENT, ((InitThreadLocalCallable) c8).getThreadLocal());
 
-    // 9. InitThreadLocalCallable for ScoutTexts.CURRENT
+    // 9. InitThreadLocalCallable for NlsLocale.CURRENT
     InitThreadLocalCallable c9 = getNextAndAssert(c8, InitThreadLocalCallable.class);
-    assertSame(ScoutTexts.CURRENT, ((InitThreadLocalCallable) c9).getThreadLocal());
+    assertSame(NlsLocale.CURRENT, ((InitThreadLocalCallable) c9).getThreadLocal());
 
-    // 10. AsyncFutureCallable
-    AsyncFutureCallable c10 = getNextAndAssert(c9, AsyncFutureCallable.class);
+    // 10. InitThreadLocalCallable for ScoutTexts.CURRENT
+    InitThreadLocalCallable c10 = getNextAndAssert(c9, InitThreadLocalCallable.class);
+    assertSame(ScoutTexts.CURRENT, ((InitThreadLocalCallable) c10).getThreadLocal());
 
-    // 11. ExceptionTranslator
-    ExceptionTranslator c11 = getNextAndAssert(c10, ExceptionTranslator.class);
-
-    // 12. TargetInvoker
-    assertSame(callInvoker, c11.getNext());
+    // 11. Target
+    assertSame(m_targetCallable, c10.getNext());
   }
 
-  private static <T> T getFirstAndAssert(ArgumentCaptor<Callable> captor, Class<T> expectedType) {
-    Object first = captor.getValue();
+  @SuppressWarnings("unchecked")
+  private static <RESULT, TYPE> TYPE getFirstAndAssert(Callable<RESULT> first, Class<TYPE> expectedType) {
     assertTrue(expectedType.equals(first.getClass()));
-    return (T) first;
+    return (TYPE) first;
   }
 
-  private static <T> T getNextAndAssert(Chainable c, Class<T> expectedType) {
-    Object next = c.getNext();
+  @SuppressWarnings("unchecked")
+  private static <RESULT, TYPE> TYPE getNextAndAssert(Chainable<?> c, Class<TYPE> expectedType) {
+    Callable<?> next = c.getNext();
     assertTrue(expectedType.equals(next.getClass()));
-    return (T) next;
+    return (TYPE) next;
   }
 
-  private static class Contribution1 implements Callable<Void>, Chainable {
+  private static class Contribution1<RESULT> implements Callable<RESULT>, Chainable<RESULT> {
 
-    private final Callable<Void> m_next;
+    private final Callable<RESULT> m_next;
 
-    public Contribution1(Callable<Void> next) {
+    public Contribution1(Callable<RESULT> next) {
       m_next = next;
     }
 
     @Override
-    public Void call() throws Exception {
+    public RESULT call() throws Exception {
       return m_next.call();
     }
 
     @Override
-    public Object getNext() {
+    public Callable<RESULT> getNext() {
       return m_next;
     }
   }
 
-  private static class Contribution2 implements Callable<Void>, Chainable {
+  private static class Contribution2<RESULT> implements Callable<RESULT>, Chainable<RESULT> {
 
-    private final Callable<Void> m_next;
+    private final Callable<RESULT> m_next;
 
-    public Contribution2(Callable<Void> next) {
+    public Contribution2(Callable<RESULT> next) {
       m_next = next;
     }
 
     @Override
-    public Void call() throws Exception {
+    public RESULT call() throws Exception {
       return m_next.call();
     }
 
     @Override
-    public Object getNext() {
+    public Callable<RESULT> getNext() {
       return m_next;
+    }
+  }
+
+  private class _ModelJobManager extends ModelJobManager {
+
+    @Override
+    public <RESULT> Callable<RESULT> interceptCallable(final Callable<RESULT> next, final ClientJobInput input) {
+      return super.interceptCallable(next, input);
     }
   }
 }

@@ -12,19 +12,8 @@ package org.eclipse.scout.rt.client.job;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isNull;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -32,32 +21,41 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.holders.BooleanHolder;
-import org.eclipse.scout.commons.job.IAsyncFuture;
 import org.eclipse.scout.commons.job.IFuture;
 import org.eclipse.scout.commons.job.IProgressMonitor;
+import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.commons.job.JobExecutionException;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.job.internal.ModelJobManager;
+import org.eclipse.scout.rt.shared.ISession;
 import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.testing.commons.BlockingCountDownLatch;
+import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
+@RunWith(ScoutPlatformTestRunner.class)
 public class ModelJobCancelTest {
 
   private static ExecutorService s_executor;
+
+  private IModelJobManager m_jobManager;
+
+  @Mock
   private IClientSession m_clientSession;
-  private ModelJobManager m_jobManager;
 
   @BeforeClass
   public static void beforeClass() {
@@ -71,408 +69,326 @@ public class ModelJobCancelTest {
 
   @Before
   public void before() {
+    MockitoAnnotations.initMocks(this);
+
     m_jobManager = new ModelJobManager();
-    m_clientSession = mock(IClientSession.class);
+
+    // initialize ClientSession
     when(m_clientSession.getLocale()).thenReturn(new Locale("de", "DE"));
     when(m_clientSession.getTexts()).thenReturn(new ScoutTexts());
-    when(m_clientSession.getModelJobManager()).thenReturn(m_jobManager);
+
+    ISession.CURRENT.set(m_clientSession);
   }
 
   @After
   public void after() {
     m_jobManager.shutdown();
+
+    ISession.CURRENT.remove();
   }
 
   @Test
-  public void testRunNowCancelSoft() throws ProcessingException {
-    final List<Boolean> actualProtocol = Collections.synchronizedList(new ArrayList<Boolean>()); // synchronized because modified/read by different threads.
-
-    final BooleanHolder actualInterrupted = new BooleanHolder(false);
-
-    final CountDownLatch latch = new CountDownLatch(1);
-
-    final ModelJob job = new ModelJob("job", m_clientSession) {
-
-      @Override
-      protected void run() throws Exception {
-        actualProtocol.add(IProgressMonitor.CURRENT.get().isCancelled());
-        latch.countDown();
-
-        try {
-          Thread.sleep(1000);
-        }
-        catch (InterruptedException e) {
-          actualInterrupted.setValue(true);
-        }
-        actualProtocol.add(IProgressMonitor.CURRENT.get().isCancelled());
-      }
-    };
-
-    s_executor.execute(new Runnable() {
-
-      @Override
-      public void run() {
-        try {
-          latch.await();
-          Thread.sleep(100);
-          job.cancel(false /* soft */);
-        }
-        catch (InterruptedException e) {
-          // NOOP
-        }
-      }
-    });
-
-    simulateToRunInModelThread();
-    job.runNow();
-
-    assertFalse(actualInterrupted.getValue());
-    assertEquals(Arrays.asList(Boolean.FALSE, Boolean.TRUE), actualProtocol);
-    assertNull(job.m_jobManager.getFuture(job));
-  }
-
-  @Test
-  public void testRunNowCancelForce() throws ProcessingException {
-    final List<Boolean> actualProtocol = Collections.synchronizedList(new ArrayList<Boolean>()); // synchronized because modified/read by different threads.
-
-    final BooleanHolder actualInterrupted = new BooleanHolder(false);
-
-    final CountDownLatch latch = new CountDownLatch(1);
-
-    final ModelJob job = new ModelJob("job", m_clientSession) {
-
-      @Override
-      protected void run() throws Exception {
-        actualProtocol.add(IProgressMonitor.CURRENT.get().isCancelled());
-        latch.countDown();
-
-        try {
-          Thread.sleep(TimeUnit.SECONDS.toMillis(30));
-        }
-        catch (InterruptedException e) {
-          actualInterrupted.setValue(true);
-        }
-        actualProtocol.add(IProgressMonitor.CURRENT.get().isCancelled());
-      }
-    };
-
-    s_executor.execute(new Runnable() {
-
-      @Override
-      public void run() {
-        try {
-          latch.await();
-          Thread.sleep(100);
-          job.cancel(true /* force */);
-        }
-        catch (InterruptedException e) {
-          // NOOP
-        }
-      }
-    });
-
-    simulateToRunInModelThread();
-    job.runNow();
-
-    assertTrue(actualInterrupted.getValue());
-    assertEquals(Arrays.asList(Boolean.FALSE, Boolean.TRUE), actualProtocol);
-    assertNull(job.m_jobManager.getFuture(job));
-  }
-
-  @Test
-  public void testScheduleCancelSoft() throws ProcessingException, InterruptedException {
-    final List<Boolean> actualProtocol = Collections.synchronizedList(new ArrayList<Boolean>()); // synchronized because modified/read by different threads.
-    final BooleanHolder actualInterrupted = new BooleanHolder(false);
-    final CountDownLatch latch = new CountDownLatch(1);
-
-    final IModelJob<String> job = new ModelJobWithResult<String>("job", m_clientSession) {
-
-      @Override
-      protected String call() throws Exception {
-        actualProtocol.add(IProgressMonitor.CURRENT.get().isCancelled());
-
-        latch.countDown();
-
-        try {
-          Thread.sleep(1000);
-        }
-        catch (InterruptedException e) {
-          actualInterrupted.setValue(true);
-        }
-        actualProtocol.add(IProgressMonitor.CURRENT.get().isCancelled());
-
-        return "result";
-      }
-    };
-
-    @SuppressWarnings("unchecked")
-    IAsyncFuture<String> asyncFutureMock = Mockito.mock(IAsyncFuture.class);
-
-    IFuture<String> future = job.schedule(asyncFutureMock);
-    latch.await();
-
-    Thread.sleep(100);
-    future.cancel(false /* soft */);
-    Thread.sleep(100);
-
-    JobExecutionException je = null;
-    try {
-      future.get(5, TimeUnit.SECONDS);
-      fail();
-    }
-    catch (JobExecutionException e) {
-      je = e;
-    }
-
-    assertTrue(m_jobManager.waitForIdle(10, TimeUnit.SECONDS));
-
-    assertFalse(actualInterrupted.getValue());
-    assertEquals(Arrays.asList(Boolean.FALSE, Boolean.TRUE), actualProtocol);
-    assertNull(m_jobManager.getFuture(job)); // Future not available anymore
-    assertFalse(m_jobManager.isCanceled(job)); // cancel=false because Future not available anymore
-
-    assertNotNull(je);
-    assertFalse("Future did not return", je.isTimeout());
-    assertTrue("Future should be canceled", je.isCancellation());
-    assertFalse("Job execution should be interrupted", je.isInterruption());
-
-    verify(asyncFutureMock, times(1)).onDone(eq("result"), isNull(ProcessingException.class));
-    verify(asyncFutureMock, times(1)).onSuccess(eq("result"));
-    verify(asyncFutureMock, never()).onError(any(ProcessingException.class));
-  }
-
-  @Test
-  public void testScheduleCancelForce() throws ProcessingException, InterruptedException {
-    final List<Boolean> actualProtocol = Collections.synchronizedList(new ArrayList<Boolean>()); // synchronized because modified/read by different threads.
-
-    final BooleanHolder actualInterrupted = new BooleanHolder(false);
-
-    final CountDownLatch latch = new CountDownLatch(1);
-
-    final IModelJob<String> job = new ModelJobWithResult<String>("job", m_clientSession) {
-
-      @Override
-      protected String call() throws Exception {
-        actualProtocol.add(IProgressMonitor.CURRENT.get().isCancelled());
-
-        latch.countDown();
-        try {
-          Thread.sleep(TimeUnit.SECONDS.toMillis(30));
-        }
-        catch (InterruptedException e) {
-          actualInterrupted.setValue(true);
-        }
-        actualProtocol.add(IProgressMonitor.CURRENT.get().isCancelled());
-
-        return "result";
-      }
-    };
-
-    @SuppressWarnings("unchecked")
-    IAsyncFuture<String> asyncFutureMock = Mockito.mock(IAsyncFuture.class);
-
-    IFuture<String> future = job.schedule(asyncFutureMock);
-    latch.await();
-
-    future.cancel(true /* soft */);
-    Thread.sleep(100);
-    JobExecutionException je = null;
-    try {
-      future.get(5, TimeUnit.SECONDS);
-      fail();
-    }
-    catch (JobExecutionException e) {
-      je = e;
-    }
-
-    assertTrue(actualInterrupted.getValue());
-    assertEquals(Arrays.asList(Boolean.FALSE, Boolean.TRUE), actualProtocol);
-    assertNull(m_jobManager.getFuture(job)); // Future not available anymore
-    assertFalse(m_jobManager.isCanceled(job)); // cancel=false because Future not available anymore
-
-    assertNotNull(je);
-    assertFalse("Future did not return", je.isTimeout());
-    assertTrue("Future should be canceled", je.isCancellation());
-    assertFalse("Job execution should be interrupted", je.isInterruption());
-
-    verify(asyncFutureMock, times(1)).onDone(eq("result"), isNull(ProcessingException.class));
-    verify(asyncFutureMock, times(1)).onSuccess(eq("result"));
-    verify(asyncFutureMock, never()).onError(any(ProcessingException.class));
-  }
-
-  @Test
-  public void testScheduleAndCancelBeforeRunning() throws ProcessingException, InterruptedException {
-    // Let this job block the mutex.
-    ModelJob job1 = new ModelJob("job-1", m_clientSession) {
-
-      @Override
-      protected void run() throws Exception {
-        Thread.sleep(Long.MAX_VALUE);
-      }
-    };
-    IFuture<Void> future1 = job1.schedule();
-
-    final BooleanHolder actualOnRun = new BooleanHolder(false);
-    final ModelJob job2 = new ModelJob("job", m_clientSession) {
-
-      @Override
-      protected void run() throws Exception {
-        actualOnRun.setValue(true);
-      }
-    };
-
-    @SuppressWarnings("unchecked")
-    IAsyncFuture<Void> asyncFutureMock = Mockito.mock(IAsyncFuture.class);
-
-    IFuture<Void> future2 = job2.schedule(asyncFutureMock); // schedule job2 --> will not start running because the mutex-holder is job1.
-
-    assertEquals(future1, m_jobManager.getFuture(job1)); // registered
-    assertEquals(future2, m_jobManager.getFuture(job2)); // registered
-
-    future2.cancel(true); // cancel the future of job2 before running so that it will not be executed (silent rejection by the FutureTask)
-    Thread.sleep(100);
-    job1.cancel(true); // cancel job1 so that job2 is being scheduled.
-
-    assertTrue(m_jobManager.waitForIdle(10, TimeUnit.SECONDS));
-    assertTrue(m_jobManager.isIdle()); // no pending mutex-jobs anymore
-    assertFalse(actualOnRun.getValue()); // not executed
-    assertNull(m_jobManager.getFuture(job2)); // not registered anymore
-    assertNull(m_jobManager.getFuture(job2)); // not registered anymore
-
-    verifyZeroInteractions(asyncFutureMock);
-  }
-
-  @SuppressWarnings("unchecked")
-  @Test
-  public void testShutdownJobManagerAndSchedule() throws ProcessingException, InterruptedException {
+  public void testCancelSoft() throws ProcessingException, InterruptedException {
     final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
 
-    ModelJobManager jobManager = m_jobManager;
+    final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
 
-    ModelJob job1 = new ModelJob("job-1", m_clientSession) {
-
-      @Override
-      protected void run() throws Exception {
-        protocol.add("running-1");
-        Thread.sleep(TimeUnit.SECONDS.toMillis(30));
-      }
-    };
-    ModelJob job2 = new ModelJob("job-2", m_clientSession) {
+    IFuture<Void> future = m_jobManager.schedule(new IRunnable() {
 
       @Override
-      protected void run() throws Exception {
-        protocol.add("running-2");
-        Thread.sleep(TimeUnit.SECONDS.toMillis(30));
+      public void run() throws Exception {
+        if (IProgressMonitor.CURRENT.get().isCancelled()) {
+          protocol.add("cancelled-before");
+        }
+
+        try {
+          setupLatch.countDownAndBlock(2, TimeUnit.SECONDS);
+        }
+        catch (InterruptedException e) {
+          protocol.add("interrupted");
+        }
+
+        if (IProgressMonitor.CURRENT.get().isCancelled()) {
+          protocol.add("cancelled-after");
+        }
       }
-    };
-    ModelJob job3 = new ModelJob("job-3", m_clientSession) {
+    });
 
-      @Override
-      protected void run() throws Exception {
-        protocol.add("running-3");
-        Thread.sleep(TimeUnit.SECONDS.toMillis(30));
-      }
-    };
+    assertTrue(setupLatch.await());
 
-    IAsyncFuture<Void> asyncFutureMock1 = mock(IAsyncFuture.class);
-    IAsyncFuture<Void> asyncFutureMock2 = mock(IAsyncFuture.class);
-    IAsyncFuture<Void> asyncFutureMock3 = mock(IAsyncFuture.class);
+    // RUN THE TEST
+    assertTrue(future.cancel(false /* soft */));
 
-    ArgumentCaptor<ProcessingException> pe1Captor = ArgumentCaptor.forClass(ProcessingException.class);
-    doNothing().when(asyncFutureMock1).onError(pe1Captor.capture());
-    ArgumentCaptor<ProcessingException> pe2Captor = ArgumentCaptor.forClass(ProcessingException.class);
-    doNothing().when(asyncFutureMock2).onError(pe2Captor.capture());
-    ArgumentCaptor<ProcessingException> pe3Captor = ArgumentCaptor.forClass(ProcessingException.class);
-    doNothing().when(asyncFutureMock3).onError(pe3Captor.capture());
+    assertTrue(m_jobManager.waitForIdle(10, TimeUnit.SECONDS));
 
-    IFuture<Void> future1 = job1.schedule(asyncFutureMock1);
-    IFuture<Void> future2 = job2.schedule(asyncFutureMock2);
-    Thread.sleep(500);
-    jobManager.shutdown();
-    IFuture<Void> future3 = job3.schedule();
+    // VERIFY
+    assertEquals(Arrays.asList("cancelled-after"), protocol);
+    assertTrue(future.isCancelled());
 
-    JobExecutionException je1 = null;
     try {
-      future1.get(5, TimeUnit.SECONDS);
+      future.get(1, TimeUnit.SECONDS);
+      fail();
     }
     catch (JobExecutionException e) {
-      je1 = e;
+      assertFalse(e.isTimeout());
+      assertTrue(e.isCancellation());
+      assertFalse(e.isInterruption());
     }
-    JobExecutionException je2 = null;
-    try {
-      future2.get(5, TimeUnit.SECONDS);
-    }
-    catch (JobExecutionException e) {
-      je2 = e;
-    }
-    JobExecutionException je3 = null;
-    try {
-      future3.get(5, TimeUnit.SECONDS);
-    }
-    catch (JobExecutionException e) {
-      je3 = e;
-    }
-
-    Thread.sleep(TimeUnit.SECONDS.toMillis(1));
-
-    assertEquals(Arrays.asList("running-1"), protocol);
-
-    assertTrue(jobManager.m_mutexSemaphore.isIdle());
-
-    assertNull(jobManager.getFuture(job1));
-    assertNull(jobManager.getFuture(job2));
-    assertNull(jobManager.getFuture(job3));
-
-    assertNotNull(je1);
-    assertNotNull(pe1Captor.getValue());
-    assertFalse(je1.isTimeout());
-    assertFalse(je1.isInterruption());
-    assertTrue(je1.isCancellation());
-    assertTrue(pe1Captor.getValue().isInterruption());
-    verify(asyncFutureMock1, times(1)).onDone(isNull(Void.class), any(ProcessingException.class));
-    verify(asyncFutureMock1, never()).onSuccess(any(Void.class));
-    verify(asyncFutureMock1, times(1)).onError(any(ProcessingException.class));
-
-    assertNotNull(je2);
-    assertTrue(pe2Captor.getAllValues().isEmpty()); // job not run at all
-    assertFalse(je2.isTimeout());
-    assertFalse(je2.isInterruption());
-    assertTrue(je2.isCancellation());
-    verify(asyncFutureMock2, never()).onDone(any(Void.class), any(ProcessingException.class)); // job not run at all
-    verify(asyncFutureMock2, never()).onSuccess(any(Void.class)); // job not run at all
-    verify(asyncFutureMock2, never()).onError(any(ProcessingException.class)); // job not run at all
-
-    // verify job that was scheduled after shutdown.
-    assertNotNull(je3);
-    assertTrue(pe3Captor.getAllValues().isEmpty()); // job not run at all
-    assertFalse(je3.isTimeout());
-    assertFalse(je3.isInterruption());
-    assertTrue(je3.isCancellation());
-    verify(asyncFutureMock3, never()).onDone(any(Void.class), any(ProcessingException.class)); // job not run at all
-    verify(asyncFutureMock3, never()).onSuccess(any(Void.class)); // job not run at all
-    verify(asyncFutureMock3, never()).onError(any(ProcessingException.class)); // job not run at all
   }
 
   @Test
-  public void testShutdownJobManagerAndRunNow() throws ProcessingException {
-    final BooleanHolder executed = new BooleanHolder(false);
+  public void testCancelForce() throws ProcessingException, InterruptedException {
+    final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
 
-    m_jobManager.shutdown();
-    ModelJob job = new ModelJob("job", m_clientSession) {
+    final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
+
+    IFuture<Void> future = m_jobManager.schedule(new IRunnable() {
 
       @Override
-      protected void run() throws Exception {
-        executed.setValue(true);
+      public void run() throws Exception {
+        if (IProgressMonitor.CURRENT.get().isCancelled()) {
+          protocol.add("cancelled-before");
+        }
+
+        try {
+          setupLatch.countDownAndBlock();
+        }
+        catch (InterruptedException e) {
+          protocol.add("interrupted");
+        }
+
+        if (IProgressMonitor.CURRENT.get().isCancelled()) {
+          protocol.add("cancelled-after");
+        }
       }
-    };
+    });
 
-    simulateToRunInModelThread();
-    job.runNow();
+    assertTrue(setupLatch.await());
 
-    assertTrue("Job must not be executed if the job-manager is shutdown", executed.getValue());
+    // RUN THE TEST
+    assertTrue(future.cancel(true /* force */));
+
+    assertTrue(m_jobManager.waitForIdle(10, TimeUnit.SECONDS));
+
+    // VERIFY
+    assertTrue(future.isCancelled());
+    assertEquals(Arrays.asList("interrupted", "cancelled-after"), protocol);
+
+    try {
+      future.get(5, TimeUnit.SECONDS);
+      fail();
+    }
+    catch (JobExecutionException e) {
+      assertFalse(e.isTimeout());
+      assertTrue(e.isCancellation());
+      assertFalse(e.isInterruption());
+    }
   }
 
-  private void simulateToRunInModelThread() {
-    m_jobManager.m_mutexSemaphore.registerAsModelThread();
+  @Test
+  public void testCancelBeforeRunning() throws ProcessingException, InterruptedException {
+    final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
+
+    final BlockingCountDownLatch job1RunningLatch = new BlockingCountDownLatch(1);
+
+    IFuture<Void> future1 = m_jobManager.schedule(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        protocol.add("running-1");
+        job1RunningLatch.countDownAndBlock();
+      }
+    });
+
+    IFuture<Void> future2 = m_jobManager.schedule(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        protocol.add("running-2");
+      }
+    });
+
+    // RUN THE TEST
+    job1RunningLatch.await();
+    future2.cancel(true);
+    job1RunningLatch.unblock();
+
+    assertTrue(m_jobManager.waitForIdle(10, TimeUnit.SECONDS));
+
+    // VERIFY
+    assertEquals(CollectionUtility.arrayList("running-1"), protocol);
+
+    future1.get();
+    assertFalse(future1.isCancelled());
+    assertTrue(future1.isDone());
+
+    try {
+      assertTrue(future2.isCancelled());
+      assertTrue(future2.isDone());
+      future2.get();
+      fail();
+    }
+    catch (JobExecutionException e) {
+      assertTrue(e.isCancellation());
+      assertFalse(e.isRejection());
+      assertFalse(e.isInterruption());
+      assertFalse(e.isTimeout());
+    }
+  }
+
+  @Test
+  public void testShutdownJobManagerAndSchedule() throws Exception {
+    final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
+
+    final BlockingCountDownLatch latch = new BlockingCountDownLatch(1);
+
+    IFuture<Void> future1 = m_jobManager.schedule(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        protocol.add("running-1");
+        try {
+          latch.countDownAndBlock();
+        }
+        catch (InterruptedException e) {
+          protocol.add("interrupted-1");
+        }
+        finally {
+          protocol.add("done-1");
+        }
+      }
+    });
+
+    IFuture<Void> future2 = m_jobManager.schedule(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        protocol.add("running-2");
+      }
+    });
+
+    assertTrue(latch.await());
+
+    // SHUTDOWN
+    m_jobManager.shutdown();
+
+    IFuture<Void> future3 = m_jobManager.schedule(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        protocol.add("running-3");
+      }
+    });
+
+    assertTrue(m_jobManager.waitForIdle(10, TimeUnit.SECONDS)); // Wait until job-1 finished.
+
+    // VERIFY
+    assertEquals(CollectionUtility.arrayList("running-1", "interrupted-1", "done-1"), protocol);
+
+    try {
+      future1.get(1, TimeUnit.SECONDS);
+      fail();
+    }
+    catch (JobExecutionException e) {
+      assertTrue(e.isCancellation());
+      assertFalse(e.isInterruption());
+      assertFalse(e.isRejection());
+      assertFalse(e.isTimeout());
+    }
+
+    try {
+      future2.get(1, TimeUnit.SECONDS);
+      fail();
+    }
+    catch (JobExecutionException e) {
+      assertTrue(e.isCancellation());
+      assertFalse(e.isInterruption());
+      assertFalse(e.isRejection());
+      assertFalse(e.isTimeout());
+    }
+
+    try {
+      future3.get(1, TimeUnit.SECONDS);
+      fail();
+    }
+    catch (JobExecutionException e) {
+      assertTrue(e.isCancellation());
+      assertFalse(e.isInterruption());
+      assertFalse(e.isRejection());
+      assertFalse(e.isTimeout());
+    }
+  }
+
+  @Test
+  public void testShutdownJobManagerAndRunNow() throws Exception {
+    final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
+
+    IFuture<Void> future = m_jobManager.schedule(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        m_jobManager.shutdown();
+
+        m_jobManager.runNow(new IRunnable() {
+
+          @Override
+          public void run() throws Exception {
+            protocol.add("running");
+          }
+        });
+      }
+    });
+
+    assertTrue(m_jobManager.waitForIdle(10, TimeUnit.SECONDS));
+    assertTrue(future.isCancelled());
+    assertEquals(CollectionUtility.arrayList("running"), protocol);
+  }
+
+  @Test
+  public void testRunNowAndShutdownJobManager() throws Exception {
+    final List<String> protocol = Collections.synchronizedList(new ArrayList<String>()); // synchronized because modified/read by different threads.
+
+    final BlockingCountDownLatch setupLatch = new BlockingCountDownLatch(1);
+
+    // This job will cancel the job manager.
+    s_executor.submit(new Callable<Void>() {
+
+      @Override
+      public Void call() throws Exception {
+        setupLatch.await();
+        m_jobManager.shutdown();
+        return null;
+      }
+    });
+
+    m_jobManager.schedule(new IRunnable() {
+
+      @Override
+      public void run() throws Exception {
+        m_jobManager.runNow(new IRunnable() {
+
+          @Override
+          public void run() throws Exception {
+            protocol.add("1: running");
+            try {
+              if (IProgressMonitor.CURRENT.get().isCancelled()) {
+                protocol.add("2: cancelled");
+              }
+              setupLatch.countDownAndBlock();
+            }
+            catch (InterruptedException e) {
+              protocol.add("3: interrupted");
+              if (IProgressMonitor.CURRENT.get().isCancelled()) {
+                protocol.add("4: cancelled");
+              }
+            }
+          }
+        });
+      }
+    });
+
+    // VERIFY
+    assertTrue(m_jobManager.waitForIdle(30, TimeUnit.SECONDS));
+    assertEquals(CollectionUtility.arrayList("1: running", "3: interrupted", "4: cancelled"), protocol);
   }
 }

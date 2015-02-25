@@ -14,8 +14,10 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
 
+import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.annotations.Internal;
+import org.eclipse.scout.rt.client.job.ClientJobInput;
 
 /**
  * {@link Callable} to be scheduled once the model-mutex is acquired.
@@ -25,43 +27,46 @@ import org.eclipse.scout.commons.annotations.Internal;
 @Internal
 public abstract class Task<RESULT> implements Callable<RESULT> {
 
-  private final String m_jobName;
   private final Executor m_executor;
-  private final MutexSemaphore<Task<?>> m_mutexSemaphore;
-  private final FutureTaskEx<RESULT> m_futureTask;
+  private final ClientJobInput m_input;
+  private final ModelJobFuture<RESULT> m_runnableFuture;
 
-  public Task(final String jobName, final Executor executor, final MutexSemaphore<Task<?>> mutexSemaphore) {
-    m_jobName = jobName;
+  public Task(final Executor executor, final ClientJobInput input) {
     m_executor = executor;
-    m_mutexSemaphore = mutexSemaphore;
-    m_futureTask = new FutureTaskEx<RESULT>(this);
+    m_input = input;
+    m_runnableFuture = Assertions.assertNotNull(interceptFuture(new ModelJobFuture<>(this, input)));
   }
 
   @Override
   public final RESULT call() throws Exception {
-    return onCall();
+    return execute(m_runnableFuture);
+  }
+
+  /**
+   * Method invoked to intercept the Future given to the executor for execution.
+   *
+   * @param future
+   *          Future to be adapted.
+   * @return adapted Future.
+   */
+  protected ModelJobFuture<RESULT> interceptFuture(final ModelJobFuture<RESULT> future) {
+    return future;
   }
 
   /**
    * Schedules this task to be executed at the next reasonable opportunity. The invoker must ensure that this task is
    * the mutex-owner.
-   *
-   * @throws IllegalStateException
-   *           if this task is not the mutex-owner.
    */
   public final void schedule() {
-    if (m_mutexSemaphore.getMutexOwner() != this) {
-      throw new IllegalStateException(String.format("Task rejected because not being the mutex-owner. [job=%s, mutexSemaphore=%s]", m_jobName, m_mutexSemaphore));
-    }
-
-    m_executor.execute(m_futureTask);
+    Assertions.assertTrue(isMutexOwner(), "Unexpected inconsistency: Task rejected because not being the mutex-owner. [task=%s]", this);
+    m_executor.execute(m_runnableFuture);
   }
 
   /**
    * @return the {@link Future} representing this task.
    */
-  public final Future<RESULT> getFuture() {
-    return m_futureTask;
+  public ModelJobFuture<RESULT> getFuture() {
+    return m_runnableFuture;
   }
 
   /**
@@ -69,17 +74,32 @@ public abstract class Task<RESULT> implements Callable<RESULT> {
    * also invoked for <code>cancelled</code> tasks. This method is invoked by the thread that will execute this task.
    * When being invoked, this task is the mutex-owner.
    *
-   * @see #onRejected()
+   * @param future
+   *          Future associated with this task.
    */
-  protected void onBefore() {
+  protected void beforeExecute(final ModelJobFuture<RESULT> future) {
   }
 
   /**
-   * Method invoked after executing this task. If the task was <code>cancelled</code> before running, this method is
-   * called immediately after {@link #onBefore()}. This method is invoked by the thread that executed this task. When
-   * being invoked, this task is still the mutex-owner.
+   * Method invoked to execute the task; is not called if the Future was cancelled.
+   *
+   * @param future
+   *          Future associated with this task.
+   * @return return value or <code>null</code>.
+   * @throws Exception
+   *           exception occurred during task execution.
    */
-  protected void onAfter() {
+  protected abstract RESULT execute(ModelJobFuture<RESULT> future) throws Exception;
+
+  /**
+   * Method invoked after executing this task. If the task was <code>cancelled</code> before running, this method is
+   * called immediately after {@link #beforeExecute()}. This method is invoked by the thread that executed this task.
+   * When being invoked, this task is still the mutex-owner.
+   *
+   * @param future
+   *          the Future associated with this task.
+   */
+  protected void afterExecute(final ModelJobFuture<RESULT> future) {
   }
 
   /**
@@ -87,25 +107,22 @@ public abstract class Task<RESULT> implements Callable<RESULT> {
    * queue slots are available because their bounds would be exceeded, or upon shutdown of the executor. This method is
    * invoked from the thread that scheduled this task. When being invoked, this task is the mutex-owner.
    *
-   * @see #onBefore()
+   * @param future
+   *          the Future associated with this task.
    */
-  protected void onRejected() {
+  protected void rejected(final ModelJobFuture<RESULT> future) {
   }
 
   /**
-   * Method invoked to execute this task. This method is not invoked for <code>cancelled</code> tasks.
-   *
-   * @return computed result of this task.
-   * @throws Exception
-   *           if unable to compute a result.
+   * @return <code>true</code> if the current task is the mutex-owner.
    */
-  protected abstract RESULT onCall() throws Exception;
+  protected abstract boolean isMutexOwner();
 
   @Override
   public String toString() {
     final ToStringBuilder builder = new ToStringBuilder(this);
-    builder.attr("job", m_jobName);
-    builder.ref("future", m_futureTask);
+    builder.attr("job", m_input.getIdentifier("n/a"));
+    builder.ref("future", m_runnableFuture);
     return builder.toString();
   }
 }

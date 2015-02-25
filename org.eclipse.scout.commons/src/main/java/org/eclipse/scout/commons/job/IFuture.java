@@ -12,13 +12,14 @@ package org.eclipse.scout.commons.job;
 
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
 
 /**
- * Represents a {@link java.util.concurrent.Future} and translates exceptions that might occur while waiting for a job
+ * Represents a {@link java.util.concurrent.Future} that translates exceptions that might occur while waiting for a job
  * to complete into {@link JobExecutionException}s.
  *
  * @see java.util.concurrent.Future
@@ -29,6 +30,11 @@ import org.eclipse.scout.commons.exception.ProcessingException;
  * @since 5.1
  */
 public interface IFuture<RESULT> {
+
+  /**
+   * The {@link IFuture} which is currently associated with the current thread.
+   */
+  ThreadLocal<Future<?>> CURRENT = new ThreadLocal<>();
 
   /**
    * Attempts to cancel the execution of the associated job. This attempt will be ignored if the job has already
@@ -94,4 +100,9 @@ public interface IFuture<RESULT> {
    *           </ul>
    */
   RESULT get(long timeout, TimeUnit unit) throws ProcessingException, JobExecutionException;
+
+  /**
+   * @return {@link Future} which this {@link IFuture} delegates to.
+   */
+  Future<RESULT> getDelegate();
 }

@@ -27,12 +27,29 @@ public final class Assertions {
    * @param value
    *          the value to be tested.
    * @return the given value if not <code>null</code>.
-   * @throws IllegalArgumentException
+   * @throws AssertionException
    *           if the given value is <code>null</code>.
    */
   public static <T> T assertNotNull(final T value) {
+    return assertNotNull(value, "expected 'non-null' object but was 'null'");
+  }
+
+  /**
+   * Asserts the given value not to be <code>null</code>.
+   *
+   * @param value
+   *          the value to be tested.
+   * @param msg
+   *          message contained in the {@link AssertionException} in case of an assertion error.
+   * @param msgArgs
+   *          arguments to be used in the message.
+   * @return the given value if not <code>null</code>.
+   * @throws AssertionException
+   *           if the given value is <code>null</code>.
+   */
+  public static <T> T assertNotNull(final T value, final String msg, final Object... msgArgs) {
     if (value == null) {
-      fail("expected 'non-null' object but was 'null'");
+      fail(msg, msgArgs);
     }
     return value;
   }
@@ -43,7 +60,7 @@ public final class Assertions {
    * @param value
    *          the value to be tested.
    * @return the given value if not <code>null</code> or <code>empty</code>.
-   * @throws IllegalArgumentException
+   * @throws AssertionException
    *           if the given value is <code>null</code> or <code>empty</code>.
    */
   public static String assertNotNullOrEmpty(final String value) {
@@ -57,6 +74,92 @@ public final class Assertions {
   }
 
   /**
+   * Asserts the given value not to be <code>null</code> or <code>empty</code>.
+   *
+   * @param value
+   *          the value to be tested.
+   * @param msg
+   *          message contained in the {@link AssertionException} in case of an assertion error.
+   * @param msgArgs
+   *          arguments to be used in the message.
+   * @return the given value if not <code>null</code> or <code>empty</code>.
+   * @throws AssertionException
+   *           if the given value is <code>null</code> or <code>empty</code>.
+   */
+  public static String assertNotNullOrEmpty(final String value, final String msg, final Object... msgArgs) {
+    if (value == null || value.isEmpty()) {
+      fail(msg, msgArgs);
+    }
+    return value;
+  }
+
+  /**
+   * Asserts the given value to be <code>true</code>.
+   *
+   * @param value
+   *          the value to be tested.
+   * @return always <code>true</code>.
+   * @throws AssertionException
+   *           if the given value is <code>false</code>.
+   */
+  public static boolean assertTrue(final boolean value) {
+    return assertTrue(value, "expected 'true' but was 'false'.");
+  }
+
+  /**
+   * Asserts the given value to be <code>true</code>.
+   *
+   * @param value
+   *          the value to be tested.
+   * @param msg
+   *          message contained in the {@link AssertionException} in case of an assertion error.
+   * @param msgArgs
+   *          arguments to be used in the message.
+   * @return always <code>true</code>.
+   * @throws AssertionException
+   *           if the given value is <code>false</code>.
+   */
+  public static boolean assertTrue(final boolean value, final String msg, final Object... msgArgs) {
+    if (!value) {
+      fail(msg, msgArgs);
+    }
+    return value;
+  }
+
+  /**
+   * Asserts the given value to be <code>false</code>.
+   *
+   * @param value
+   *          the value to be tested.
+   * @return always <code>false</code>.
+   * @throws AssertionException
+   *           if the given value is <code>true</code>.
+   */
+  public static boolean assertFalse(final boolean value) {
+    return assertFalse(value, "expected 'false' but was 'true'.");
+  }
+
+  /**
+   * Asserts the given value to be <code>false</code>.
+   *
+   * @param value
+   *          the value to be tested.
+   * @param msg
+   *          message contained in the {@link AssertionException} in case of an assertion error.
+   * @param msgArgs
+   *          arguments to be used in the message.
+   * @return always <code>false</code>.
+   * @throws AssertionException
+   *           if the given value is <code>true</code>.
+   */
+  public static boolean assertFalse(final boolean value, final String msg, final Object... msgArgs) {
+    if (value) {
+      fail(msg, msgArgs);
+    }
+    return value;
+  }
+
+  /**
    * To always throw an assertion exception.
    *
    * @param msg
@@ -65,6 +168,18 @@ public final class Assertions {
    *          message arguments to be referenced in the given message by <code>%s</code>.
    */
   public static void fail(final String msg, final Object... msgArgs) {
-    throw new IllegalArgumentException(String.format("Assertion error: %s", String.format(msg, msgArgs)));
+    throw new AssertionException("Assertion error: %s", String.format(msg, msgArgs));
+  }
+
+  /**
+   * Indicates an assertion error about the application's assumptions about expected values.
+   */
+  public static class AssertionException extends RuntimeException {
+
+    private static final long serialVersionUID = 1L;
+
+    public AssertionException(final String msg, final Object... msgArgs) {
+      super(String.format(msg, msgArgs));
+    }
   }
 }

@@ -11,10 +11,12 @@
 package org.eclipse.scout.rt.client.job.internal;
 
 import java.util.ArrayDeque;
-import java.util.Calendar;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Deque;
+import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.Future;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -24,28 +26,31 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.eclipse.scout.commons.ToStringBuilder;
 import org.eclipse.scout.commons.annotations.Internal;
+import org.eclipse.scout.commons.job.IFutureVisitor;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 
 /**
  * Provides a thread-safe implementation of a non-blocking 1-permit {@link Semaphore} backed with a fair {@link Queue}.
  *
- * @param <ELEMENT>
- *          the type of elements competing for the mutex.
  * @since 5.1
  */
 @Internal
-public class MutexSemaphore<ELEMENT> {
+public class MutexSemaphore {
+
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(MutexSemaphore.class);
 
   private static final boolean POSITION_TAIL = true;
   private static final boolean POSITION_HEAD = false;
 
   private final AtomicInteger m_permits = new AtomicInteger(0);
-  private final Deque<ELEMENT> m_pendingQueue = new ArrayDeque<ELEMENT>();
+  private final Deque<Task<?>> m_pendingQueue = new ArrayDeque<>();
 
   final Lock m_idleLock = new ReentrantLock();
   final Condition m_idleCondition = m_idleLock.newCondition();
 
   private Thread m_modelThread; // The one thread currently representing the model-thread.
-  private ELEMENT m_mutexOwner; // The element currently owning the mutex.
+  private Task<?> m_mutexOwner; // The task currently owning the mutex.
 
   /**
    * Registers the current thread as model-thread.
@@ -64,50 +69,50 @@ public class MutexSemaphore<ELEMENT> {
   }
 
   /**
-   * @return the element currently owning the mutex.
+   * @return the task currently owning the mutex.
    */
-  public ELEMENT getMutexOwner() {
+  public Task<?> getMutexOwner() {
     return m_mutexOwner;
   }
 
   /**
-   * Tries to acquire the mutex if available at the time of invocation. Otherwise, the element is put into the queue of
-   * pending elements and will compete for the mutex once all queued elements acquired/released the mutex.
+   * Tries to acquire the mutex if available at the time of invocation. Otherwise, the task is put into the queue of
+   * pending tasks and will compete for the mutex once all queued tasks acquired/released the mutex.
    *
-   * @param element
-   *          the element to acquire the mutex.
+   * @param task
+   *          the model-task to acquire the mutex.
    * @return <code>true</code> if the mutex was acquired, <code>false</code> if being queued.
    * @see #pollElseRelease()
    */
-  public boolean tryAcquireElseOfferTail(final ELEMENT element) {
-    return tryAcquireElseOffer(element, POSITION_TAIL);
+  public boolean tryAcquireElseOfferTail(final Task<?> task) {
+    return tryAcquireElseOffer(task, POSITION_TAIL);
   }
 
   /**
-   * Tries to acquire the mutex if available at the time of invocation. Otherwise, the element is put into the queue of
-   * pending elements and will compete for the mutex as the very next element.
+   * Tries to acquire the mutex if available at the time of invocation. Otherwise, the task is put into the queue of
+   * pending tasks and will compete for the mutex as the very next task.
    *
-   * @param element
-   *          the element to acquire the mutex.
+   * @param task
+   *          the task to acquire the mutex.
    * @return <code>true</code> if the mutex was acquired, <code>false</code> if being queued.
    * @see #pollElseRelease()
    */
-  public boolean tryAcquireElseOfferHead(final ELEMENT element) {
-    return tryAcquireElseOffer(element, POSITION_HEAD);
+  public boolean tryAcquireElseOfferHead(final Task<?> task) {
+    return tryAcquireElseOffer(task, POSITION_HEAD);
   }
 
-  protected boolean tryAcquireElseOffer(final ELEMENT element, final boolean position) {
+  protected boolean tryAcquireElseOffer(final Task<?> task, final boolean position) {
     synchronized (m_pendingQueue) {
       if (m_permits.getAndIncrement() == 0) {
-        m_mutexOwner = element;
+        m_mutexOwner = task;
         return true;
       }
       else {
         if (position == POSITION_TAIL) {
-          m_pendingQueue.offerLast(element);
+          m_pendingQueue.offerLast(task);
         }
         else {
-          m_pendingQueue.offerFirst(element);
+          m_pendingQueue.offerFirst(task);
         }
         return false;
       }
@@ -115,24 +120,32 @@ public class MutexSemaphore<ELEMENT> {
   }
 
   /**
-   * Passes the mutex to the oldest element in the queue. If no such competing element is available, the mutex is
+   * Passes the mutex to the oldest task in the queue. If no such competing task is available, the mutex is
    * released.
    *
-   * @return the oldest element in the queue competing for the mutex or <code>null</code> if no such element is
+   * @return the oldest task in the queue competing for the mutex or <code>null</code> if no such task is
    *         available and therefore the mutex was released.
    * @see #tryAcquireElseOffer(Object)
    */
-  public ELEMENT pollElseRelease() {
+  public Task<?> pollElseRelease() {
     synchronized (m_pendingQueue) {
+      if (m_mutexOwner == null) {
+        LOG.error("Unexpected inconsistency while releasing model mutex: mutex owner must not be null.");
+      }
+
       m_modelThread = null;
       m_mutexOwner = null;
 
-      if (m_permits.get() == 0) { // the count is 0 if the queue was cleared.
-        return null;
+      m_mutexOwner = m_pendingQueue.poll();
+
+      if (m_permits.get() > 0) {
+        m_permits.decrementAndGet();
+      }
+      else {
+        LOG.error("Unexpected inconsistency while releasing model mutex: permit count must not be 0.");
       }
 
-      m_mutexOwner = m_pendingQueue.poll();
-      if (m_permits.decrementAndGet() == 0) {
+      if (m_permits.get() == 0) {
         signalIdle();
       }
       return m_mutexOwner;
@@ -147,8 +160,8 @@ public class MutexSemaphore<ELEMENT> {
   }
 
   /**
-   * @return the number of elements currently competing for the mutex - this is the mutex-owner plus all pending
-   *         elements; if <code>0</code>, the mutex is not acquired.
+   * @return the number of tasks currently competing for the mutex - this is the mutex-owner plus all pending
+   *         tasks; if <code>0</code>, the mutex is not acquired.
    */
   public int getPermitCount() {
     return m_permits.get();
@@ -171,37 +184,61 @@ public class MutexSemaphore<ELEMENT> {
     }
 
     // Determine the absolute deadline.
-    final Calendar calendar = Calendar.getInstance();
-    calendar.setTimeInMillis(System.currentTimeMillis() + unit.toMillis(timeout));
-    final Date deadline = calendar.getTime();
+    final Date deadline = new Date(System.currentTimeMillis() + unit.toMillis(timeout));
 
     // Wait until idle or the deadline is passed.
-    boolean deadlinePassed = false;
     m_idleLock.lockInterruptibly();
     try {
-      while (!isIdle() && !deadlinePassed) { // spurious-wakeup-safe
-        deadlinePassed = !m_idleCondition.awaitUntil(deadline);
+      while (!isIdle()) { // spurious-wakeup-safe
+        if (!m_idleCondition.awaitUntil(deadline)) {
+          return false; // timeout expired
+        }
       }
+      return true;
     }
     finally {
       m_idleLock.unlock();
     }
-
-    return !deadlinePassed;
   }
 
   /**
-   * Releases the mutex and clears all queued elements.
+   * Cancels the current mutex-owner and cancels and clears all queued tasks.
    */
-  public void clear() {
+  public void clearAndCancel() {
     synchronized (m_pendingQueue) {
-      m_permits.set(0);
+      if (m_mutexOwner != null) {
+        m_mutexOwner.getFuture().cancel(true);
+      }
+
+      for (final Task<?> pendingTask : m_pendingQueue) {
+        pendingTask.getFuture().cancel(true);
+      }
+      m_permits.addAndGet(-m_pendingQueue.size()); // do not subtract the mutex-owner.
       m_pendingQueue.clear();
+    }
+  }
 
-      m_mutexOwner = null;
-      m_modelThread = null;
+  /**
+   * To visit all {@link Future}s which did not complete yet.
+   *
+   * @param visitor
+   *          {@link IFutureVisitor} called for each {@link Future}.
+   */
+  public void visit(final IFutureVisitor visitor) {
+    final List<Task<?>> tasks = new ArrayList<>();
 
-      signalIdle();
+    synchronized (m_pendingQueue) {
+      tasks.add(m_mutexOwner);
+      tasks.addAll(m_pendingQueue);
+    }
+
+    for (final Task<?> task : tasks) {
+      if (task == null) {
+        continue;
+      }
+      if (!visitor.visit(task.getFuture())) {
+        return;
+      }
     }
   }
 

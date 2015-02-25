@@ -20,7 +20,7 @@ import org.eclipse.scout.commons.annotations.Internal;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.job.IFuture;
 import org.eclipse.scout.commons.job.JobExecutionException;
-import org.eclipse.scout.commons.job.interceptor.ExceptionTranslator;
+import org.eclipse.scout.commons.job.internal.callable.ExceptionTranslator;
 
 /**
  * Default implementation of {@link IFuture}.
@@ -32,12 +32,14 @@ import org.eclipse.scout.commons.job.interceptor.ExceptionTranslator;
 public class Future<RESULT> implements IFuture<RESULT> {
 
   private final java.util.concurrent.Future<RESULT> m_delegate;
-  private final String m_jobName;
+  private final String m_name;
 
-  public Future(final java.util.concurrent.Future<RESULT> delegate, final String jobName) {
+  public Future(final java.util.concurrent.Future<RESULT> delegate, final String name) {
     m_delegate = Assertions.assertNotNull(delegate);
-    m_jobName = Assertions.assertNotNull(jobName);
+    m_name = Assertions.assertNotNull(name);
   }
+
+  // === Future - delegate methods ===
 
   @Override
   public boolean cancel(final boolean mayInterruptIfRunning) {
@@ -63,10 +65,10 @@ public class Future<RESULT> implements IFuture<RESULT> {
       throw ExceptionTranslator.translate(e.getCause());
     }
     catch (final CancellationException e) {
-      throw ExceptionTranslator.translateCancellationException(e, m_jobName);
+      throw ExceptionTranslator.translateCancellationException(e, m_name);
     }
     catch (final InterruptedException e) {
-      throw ExceptionTranslator.translateInterruptedException(e, m_jobName);
+      throw ExceptionTranslator.translateInterruptedException(e, m_name);
     }
     catch (final RuntimeException e) {
       throw ExceptionTranslator.translate(e);
@@ -82,17 +84,22 @@ public class Future<RESULT> implements IFuture<RESULT> {
       throw ExceptionTranslator.translate(e.getCause());
     }
     catch (final CancellationException e) {
-      throw ExceptionTranslator.translateCancellationException(e, m_jobName);
+      throw ExceptionTranslator.translateCancellationException(e, m_name);
     }
     catch (final InterruptedException e) {
-      throw ExceptionTranslator.translateInterruptedException(e, m_jobName);
+      throw ExceptionTranslator.translateInterruptedException(e, m_name);
     }
     catch (final TimeoutException e) {
-      throw ExceptionTranslator.translateTimeoutException(e, timeout, unit, m_jobName);
+      throw ExceptionTranslator.translateTimeoutException(e, timeout, unit, m_name);
     }
     catch (final RuntimeException e) {
       throw ExceptionTranslator.translate(e);
     }
+  }
+
+  @Override
+  public java.util.concurrent.Future<RESULT> getDelegate() {
+    return m_delegate;
   }
 
   @Override
