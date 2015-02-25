@@ -54,9 +54,12 @@ public final class SandboxClassLoaderBuilder {
   }
 
   public SandboxClassLoaderBuilder addJarContaining(Class<?> clazz) {
+    if (clazz == null) {
+      throw new IllegalStateException("Argument 'clazz' must not be null");
+    }
     URL url = m_jarLocator.getJarContaining(clazz);
     if (url == null) {
-      throw new IllegalStateException("Could not resolve URL for class " + (clazz == null ? "null" : clazz.getName()));
+      throw new IllegalStateException("Could not resolve URL for class " + clazz.getName());
     }
     m_urls.put(url.toExternalForm(), unwrapNestedJar(url));
     return this;
