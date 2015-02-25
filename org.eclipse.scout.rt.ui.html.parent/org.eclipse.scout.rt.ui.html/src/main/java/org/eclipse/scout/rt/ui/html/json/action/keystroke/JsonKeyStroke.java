@@ -23,6 +23,6 @@ public class JsonKeyStroke<T extends IKeyStroke> extends JsonAction<T> {
 
   @Override
   public String getObjectType() {
-    return "Keystroke";
+    return "KeyStroke";
   }
 }

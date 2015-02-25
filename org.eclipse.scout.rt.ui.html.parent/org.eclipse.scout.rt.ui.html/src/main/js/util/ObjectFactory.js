@@ -287,9 +287,9 @@ scout.defaultObjectFactories = [{
     return new scout.PlannerField();
   }
 }, {
-  objectType: 'Keystroke',
+  objectType: 'KeyStroke',
   create: function() {
-    return new scout.Keystroke();
+    return new scout.KeyStroke();
   }
 }, { //FIXME CGU: only needed temporarily, remove when switched to FormToolButton2
   objectType: 'Null',

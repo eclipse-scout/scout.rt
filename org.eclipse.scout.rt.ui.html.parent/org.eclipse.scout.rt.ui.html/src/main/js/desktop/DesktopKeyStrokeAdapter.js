@@ -1,5 +1,5 @@
-scout.DesktopKeystrokeAdapter = function(navigation, taskbar) {
-  scout.DesktopKeystrokeAdapter.parent.call(this, navigation);
+scout.DesktopKeyStrokeAdapter = function(navigation, taskbar) {
+  scout.DesktopKeyStrokeAdapter.parent.call(this, navigation);
   var that = this;
 
   this.$target = undefined; // set by KeystrokeManager
@@ -11,10 +11,10 @@ scout.DesktopKeystrokeAdapter = function(navigation, taskbar) {
 
   if (this._taskbar) {
     $('.taskbar-item', this._taskbar.$container).each(function(i, element) {
-      var keystroke = $(element).attr('data-shortcut');
-      if (keystroke) {
-        keystroke = keystroke.toUpperCase();
-        var shortcut = parseInt(keystroke.replace('F', ''), 10) + 111;
+      var keyStroke = $(element).attr('data-shortcut');
+      if (keyStroke) {
+        keyStroke = keyStroke.toUpperCase();
+        var shortcut = parseInt(keyStroke.replace('F', ''), 10) + 111;
         that.handlers.push({
           $element: $(element),
           accept: function(event) {
@@ -110,9 +110,9 @@ scout.DesktopKeystrokeAdapter = function(navigation, taskbar) {
   }
 };
 
-scout.inherits(scout.DesktopKeystrokeAdapter, scout.AbstractKeyStrokeAdapter);
+scout.inherits(scout.DesktopKeyStrokeAdapter, scout.AbstractKeyStrokeAdapter);
 
-scout.DesktopKeystrokeAdapter.prototype.drawKeyBox = function() {
+scout.DesktopKeyStrokeAdapter.prototype.drawKeyBox = function() {
   if(this.keyBoxDrawn){
     return;
   }
@@ -157,11 +157,11 @@ scout.DesktopKeystrokeAdapter.prototype.drawKeyBox = function() {
   }
 };
 
-scout.DesktopKeystrokeAdapter.prototype.removeKeyBox = function() {
-  scout.DesktopKeystrokeAdapter.parent.prototype.removeKeyBox.call(this);
+scout.DesktopKeyStrokeAdapter.prototype.removeKeyBox = function() {
+  scout.DesktopKeyStrokeAdapter.parent.prototype.removeKeyBox.call(this);
   $('.tree-item-control').css('display', '');
 };
 
-scout.DesktopKeystrokeAdapter.prototype.accept = function(keycode) {
+scout.DesktopKeyStrokeAdapter.prototype.accept = function(keycode) {
 
 };

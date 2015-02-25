@@ -36,5 +36,5 @@ scout.StringField.prototype._renderInputMasked = function(inputMasked){
 
 
 scout.StringField.prototype._registerKeyStrokeAdapter = function(){
-  this.keystrokeAdapter = new scout.StringfieldKeystrokeAdapter(this);
+  this.keyStrokeAdapter = new scout.StringFieldKeyStrokeAdapter(this);
 };

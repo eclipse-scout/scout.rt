@@ -1,7 +1,7 @@
 scout.AbstractKeyStrokeAdapter = function(field) {
   this.$target = undefined; // set by KeystrokeManager
   this.controller = undefined; // set by KeystrokeManager
-  this.keystrokes = [];
+  this.keyStrokes = [];
   this._field = field;
   this.installModelKeystrokes();
   this.keyBoxDrawn = false;
@@ -16,11 +16,11 @@ scout.AbstractKeyStrokeAdapter.prototype.drawKeyBox = function() {
   }
   this.keyBoxDrawn = true;
   var offset = 0;
-  for (var i = 0; i < this.keystrokes.length; i++) {
-    if (!this.keystrokes[i].drawHint) {
+  for (var i = 0; i < this.keyStrokes.length; i++) {
+    if (!this.keyStrokes[i].drawHint) {
       continue;
     }
-    var keyBoxText = scout.codesToKeys[this.keystrokes[i].keystrokeKeyPart];
+    var keyBoxText = scout.codesToKeys[this.keyStrokes[i].keystrokeKeyPart];
 
     var $boxToAlignKeyBox = this._field.$container;
     if (offset > 0) {
@@ -28,12 +28,12 @@ scout.AbstractKeyStrokeAdapter.prototype.drawKeyBox = function() {
       additionalKeyBox.css('left', '' + this._calcKeyboxSeparator(offset) + 'px');
     }
     if ($boxToAlignKeyBox && keyBoxText) {
-      if (this.keystrokes[i].ctrl) {
+      if (this.keyStrokes[i].ctrl) {
         $boxToAlignKeyBox.prependDiv('key-box ', 'ctrl');
         $boxToAlignKeyBox.prependDiv('key-box-additional', '+');
         offset++;
       }
-      if (this.keystrokes[i].alt) {
+      if (this.keyStrokes[i].alt) {
         altKeybox = $boxToAlignKeyBox.prependDiv('key-box ', 'alt');
         additionalKeyBox = $boxToAlignKeyBox.prependDiv('key-box-additional ', '+');
         if (offset > 0) {
@@ -42,7 +42,7 @@ scout.AbstractKeyStrokeAdapter.prototype.drawKeyBox = function() {
         }
         offset++;
       }
-      if (this.keystrokes[i].shift) {
+      if (this.keyStrokes[i].shift) {
         shiftKeyBox = $boxToAlignKeyBox.prependDiv('key-box ', 'shift');
         additionalKeyBox = $boxToAlignKeyBox.prependDiv('key-box-additional ', '+');
         if (offset > 0) {
@@ -51,7 +51,7 @@ scout.AbstractKeyStrokeAdapter.prototype.drawKeyBox = function() {
         }
         offset++;
       }
-      if (this.keystrokes[i].meta) {
+      if (this.keyStrokes[i].meta) {
         metaKeyBox = $boxToAlignKeyBox.prependDiv('key-box ', 'meta');
         additionalKeyBox = $boxToAlignKeyBox.prependDiv('key-box-additional ', '+');
         if (offset > 0) {
@@ -83,9 +83,9 @@ scout.AbstractKeyStrokeAdapter.prototype.removeKeyBox = function() {
 };
 
 scout.AbstractKeyStrokeAdapter.prototype.installModelKeystrokes = function() {
-  if (this.keystrokes.length > 0) {
-    this.keystrokes = this.keystrokes.concat(this._field.keyStrokes);
+  if (this.keyStrokes.length > 0) {
+    this.keyStrokes = this.keyStrokes.concat(this._field.keyStrokes);
   } else if (this._field.keyStrokes) {
-    this.keystrokes = this._field.keyStrokes;
+    this.keyStrokes = this._field.keyStrokes;
   }
 };

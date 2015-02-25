@@ -2,7 +2,7 @@ scout.TableKeystrokeAdapter = function(field) {
   scout.TableKeystrokeAdapter.parent.call(this, field);
   var that = this;
 
-  this.keystrokes.push({
+  this.keyStrokes.push({
     accept: function(event) {
       if (event && event.which >= 65 && event.which <= 90 && // a-z
         !event.ctrlKey && !event.altKey && !event.metaKey) {
@@ -23,7 +23,7 @@ scout.TableKeystrokeAdapter = function(field) {
     bubbleUp: false
   });
 
-  this.keystrokes.push({
+  this.keyStrokes.push({
     accept: function(event) {
       if (event && $.inArray(event.which, [scout.keys.UP, scout.keys.DOWN, scout.keys.HOME, scout.keys.END, scout.keys.PAGE_UP, scout.keys.PAGE_DOWN, scout.keys.SPACE]) >= 0 && !event.ctrlKey && !event.altKey && !event.metaKey) {
         return true;
@@ -50,7 +50,7 @@ scout.TableKeystrokeAdapter = function(field) {
       // up: move up
       if (keycode === scout.keys.UP) {
         if ($rowsSelected.length > 0) {
-          $newRowSelection = that._table.$prevFilteredRows($rowsSelected.first()).first();
+          $newRowSelection = that._field.$prevFilteredRows($rowsSelected.first()).first();
         } else {
           $newRowSelection = $rowsAll.last();
         }
@@ -59,7 +59,7 @@ scout.TableKeystrokeAdapter = function(field) {
       // down: move down
       if (keycode === scout.keys.DOWN) {
         if ($rowsSelected.length > 0) {
-          $newRowSelection = that._table.$nextFilteredRows($rowsSelected.last()).first();
+          $newRowSelection = that._field.$nextFilteredRows($rowsSelected.last()).first();
         } else {
           $newRowSelection = $rowsAll.first();
         }
@@ -78,7 +78,7 @@ scout.TableKeystrokeAdapter = function(field) {
       // pgup: jump up
       if (keycode === scout.keys.PAGE_UP) {
         if ($rowsSelected.length > 0) {
-          $prev = that._table.$prevFilteredRows($rowsSelected.first())
+          $prev = that._field.$prevFilteredRows($rowsSelected.first());
           if ($prev.length > 10) {
             $newRowSelection = $prev.eq(10);
           } else {
@@ -92,7 +92,7 @@ scout.TableKeystrokeAdapter = function(field) {
       // pgdn: jump down
       if (keycode === scout.keys.PAGE_DOWN) {
         if ($rowsSelected.length > 0) {
-          $next = that._table.$nextFilteredRows($rowsSelected.last())
+          $next = that._field.$nextFilteredRows($rowsSelected.last());
           if ($next.length > 10) {
             $newRowSelection = $next.eq(10);
           } else {

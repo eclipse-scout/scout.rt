@@ -10,7 +10,7 @@ scout.Action.prototype._renderProperties = function() {
   this._renderText(this.text);
   this._renderIconId(this.iconId);
   this._renderTooltipText(this.tooltipText);
-  this._renderKeystroke(this.keystroke);
+  this._renderKeyStroke(this.keyStroke);
   this._renderEnabled(this.enabled);
   this._renderSelected(this.selected);
   this._renderVisible(this.visible);
@@ -43,9 +43,9 @@ scout.Action.prototype._renderSelected = function(selected) {
   this.$container.select(selected);
 };
 
-scout.Action.prototype._renderKeystroke = function(keystroke) {
-  keystroke = keystroke || '';
-  this.$container.attr('data-shortcut', keystroke);
+scout.Action.prototype._renderKeyStroke = function(keyStroke) {
+  keyStroke = keyStroke || '';
+  this.$container.attr('data-shortcut', keyStroke);
 };
 
 scout.Action.prototype._renderTooltipText = function(tooltipText) {

@@ -60,18 +60,18 @@ scout.KeystrokeManager.prototype.installAdapter = function($element, adapter) {
   }
 
   var controller = function(event) {
-    var i, keystroke;
+    var i, keyStroke;
     var bubbleUp = true;
 
-    if (!adapter.keystrokes) {
+    if (!adapter.keyStrokes) {
       return;
     }
-    for (i = 0; i < adapter.keystrokes.length; i++) {
-      keystroke = adapter.keystrokes[i];
-      if (keystroke.accept && keystroke.accept(event)) {
-        keystroke.handle(event);
-        bubbleUp = bubbleUp && keystroke.bubbleUp;
-        if (keystroke.removeKeyBox) {
+    for (i = 0; i < adapter.keyStrokes.length; i++) {
+      keyStroke = adapter.keyStrokes[i];
+      if (keyStroke.accept && keyStroke.accept(event)) {
+        keyStroke.handle(event);
+        bubbleUp = bubbleUp && keyStroke.bubbleUp;
+        if (keyStroke.removeKeyBox) {
           adapter.removeKeyBox();
         }
       }
@@ -104,4 +104,4 @@ scout.KeystrokeManager.prototype.uninstallAdapter = function(adapter) {
 };
 
 //Singleton
-scout.keystrokeManager = new scout.KeystrokeManager();
+scout.keyStrokeManager = new scout.KeystrokeManager();

@@ -90,7 +90,7 @@ scout.Desktop.prototype._render = function($parent) {
   });
 
   // TODO CRU: split and move
-  scout.keystrokeManager.installAdapter($parent, new scout.DesktopKeystrokeAdapter(this.navigation, this.taskbar));
+  scout.keyStrokeManager.installAdapter($parent, new scout.DesktopKeyStrokeAdapter(this.navigation, this.taskbar));
 };
 
 scout.Desktop.prototype.onResize = function() {
@@ -271,7 +271,7 @@ scout.Desktop.prototype.updateOutlineTab = function(content, title, subTitle) {
   if (!content.rendered) {
     if (content.objectType === 'Table') {
       // Install adapter on parent (no table focus required)
-      scout.keystrokeManager.installAdapter(this.$parent, content.keystrokeAdapter);
+      scout.keyStrokeManager.installAdapter(this.$parent, content.keystrokeAdapter);
     }
     content.render(this.$bench);
     // FIXME CGU: maybe include in render?

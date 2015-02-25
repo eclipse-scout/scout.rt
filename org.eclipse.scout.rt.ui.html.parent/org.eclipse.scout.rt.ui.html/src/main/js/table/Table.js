@@ -58,7 +58,7 @@ scout.Table.prototype._initColumns = function() {
 };
 
 scout.Table.prototype.dispose = function() {
-  scout.keystrokeManager.uninstallAdapter(this.keystrokeAdapter);
+  scout.keyStrokeManager.uninstallAdapter(this.keystrokeAdapter);
 };
 
 scout.Table.prototype._render = function($parent) {
@@ -68,9 +68,9 @@ scout.Table.prototype._render = function($parent) {
   this.htmlComp.setLayout(new scout.TableLayout(this));
   this.htmlComp.pixelBasedSizing = false;
 
-  if (!scout.keystrokeManager.isAdapterInstalled(this.keystrokeAdapter)) {
+  if (!scout.keyStrokeManager.isAdapterInstalled(this.keystrokeAdapter)) {
     this.$container.attr('tabIndex', 0);
-    scout.keystrokeManager.installAdapter(this.$container, this.keystrokeAdapter);
+    scout.keyStrokeManager.installAdapter(this.$container, this.keystrokeAdapter);
   }
 
   this.$data = this.$container.appendDiv('table-data');
