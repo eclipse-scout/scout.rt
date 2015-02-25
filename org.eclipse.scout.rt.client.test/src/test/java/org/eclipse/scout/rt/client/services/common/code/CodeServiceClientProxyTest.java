@@ -46,6 +46,7 @@ import org.mockito.stubbing.Answer;
 @RunWith(ScoutClientTestRunner.class)
 public class CodeServiceClientProxyTest {
 
+  private static final String CLIENT_CODE_TYPE_PREFIX = "org.eclipse.scout.rt.client";
   private ICodeService m_remoteService;
   private CodeServiceClientProxy m_service;
 
@@ -101,12 +102,12 @@ public class CodeServiceClientProxyTest {
     codeTypes = m_service.getAllCodeTypes("");
     assertEquals("size", 2, codeTypes.size());
 
-    codeTypes = m_service.getAllCodeTypes(org.eclipse.scout.rt.client.Activator.PLUGIN_ID);
+    codeTypes = m_service.getAllCodeTypes(CLIENT_CODE_TYPE_PREFIX);
     assertEquals("size", 2, codeTypes.size());
 
     verify(m_remoteService, times(1)).getAllCodeTypeClasses("");
     verify(m_remoteService, times(1)).getCodeTypes(anyListOfCodeTypes());
-    verify(m_remoteService, times(1)).getAllCodeTypeClasses(org.eclipse.scout.rt.client.Activator.PLUGIN_ID);
+    verify(m_remoteService, times(1)).getAllCodeTypeClasses(CLIENT_CODE_TYPE_PREFIX);
     verifyNoMoreInteractions(m_remoteService);
   }
 
@@ -141,13 +142,13 @@ public class CodeServiceClientProxyTest {
     //getAllCodeTypeClasses:
     when(remoteService.getAllCodeTypeClasses("")).thenReturn(
         CollectionUtility.hashSet(
-            new BundleClassDescriptor(org.eclipse.scout.rt.client.Activator.PLUGIN_ID, CompanyRatingCodeType.class.getName()),
-            new BundleClassDescriptor(org.eclipse.scout.rt.client.Activator.PLUGIN_ID, CompanyTypeCodeType.class.getName())
+            new BundleClassDescriptor("org.eclipse.scout.rt.client", CompanyRatingCodeType.class.getName()),
+            new BundleClassDescriptor("org.eclipse.scout.rt.client", CompanyTypeCodeType.class.getName())
             ));
-    when(remoteService.getAllCodeTypeClasses(org.eclipse.scout.rt.client.Activator.PLUGIN_ID)).thenReturn(
+    when(remoteService.getAllCodeTypeClasses("org.eclipse.scout.rt.client")).thenReturn(
         CollectionUtility.hashSet(
-            new BundleClassDescriptor(org.eclipse.scout.rt.client.Activator.PLUGIN_ID, CompanyRatingCodeType.class.getName()),
-            new BundleClassDescriptor(org.eclipse.scout.rt.client.Activator.PLUGIN_ID, CompanyTypeCodeType.class.getName())
+            new BundleClassDescriptor("org.eclipse.scout.rt.client", CompanyRatingCodeType.class.getName()),
+            new BundleClassDescriptor("org.eclipse.scout.rt.client", CompanyTypeCodeType.class.getName())
             ));
 
     //getCodeType:

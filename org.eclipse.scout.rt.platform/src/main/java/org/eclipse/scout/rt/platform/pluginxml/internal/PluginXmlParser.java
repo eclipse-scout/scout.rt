@@ -43,7 +43,6 @@ public final class PluginXmlParser implements IPluginXmlParser {
   private Map<IPluginXml, Document> m_documents;
 
   private PluginXmlParser() {
-    LOG.setLevel(LOG.LEVEL_DEBUG);
   }
 
   /**

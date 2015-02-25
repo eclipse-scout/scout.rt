@@ -20,7 +20,6 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
-import org.eclipse.scout.rt.client.Activator;
 import org.eclipse.scout.rt.client.ClientSessionThreadLocal;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
@@ -57,6 +56,8 @@ public class ClientUIPreferences {
   public static ClientUIPreferences getInstance(IClientSession session) {
     return new ClientUIPreferences(session);
   }
+
+  private static final String PREFERENCES_NODE_ID = "org.eclipse.scout.rt.client";
 
   private static final String TABLE_CUSTOMIZER_DATA = "table.customizer.data.";
   private static final String TABLE_COLUMN_UIINDEX = "table.column.viewIndex.";
@@ -811,7 +812,7 @@ public class ClientUIPreferences {
 
   public static IPreferences getClientPreferences(IClientSession session) {
     try {
-      return Preferences.get(session, Activator.PLUGIN_ID);
+      return Preferences.get(session, PREFERENCES_NODE_ID);
     }
     catch (ProcessingException t) {
       LOG.error("Unable to load preferences.", t);
