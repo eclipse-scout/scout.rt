@@ -628,7 +628,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
 
   @Override
   public void setDisplayText(String s) {
-    propertySupport.setPropertyStringAlwaysFire(PROP_DISPLAY_TEXT, s);
+    propertySupport.setPropertyString(PROP_DISPLAY_TEXT, s);
   }
 
   @Override
@@ -687,7 +687,7 @@ public abstract class AbstractValueField<VALUE> extends AbstractFormField implem
    * any further chain elements.
    */
   protected static class LocalValueFieldExtension<VALUE, OWNER extends AbstractValueField<VALUE>> extends AbstractFormField.LocalFormFieldExtension<OWNER>
-  implements IValueFieldExtension<VALUE, OWNER> {
+      implements IValueFieldExtension<VALUE, OWNER> {
 
     public LocalValueFieldExtension(OWNER owner) {
       super(owner);

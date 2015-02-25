@@ -103,7 +103,7 @@ public abstract class AbstractColorField extends AbstractBasicField<String> impl
   }
 
   // ---------------------------------------------------------------------------------
-  private class P_UiFacade implements IColorFieldUiFacade {
+  private class P_UiFacade extends AbstractBasicField.P_UIFacade implements IColorFieldUiFacade {
     @Override
     public boolean setTextFromUI(String newText, boolean whileTyping) {
       if (newText != null && newText.length() == 0) {

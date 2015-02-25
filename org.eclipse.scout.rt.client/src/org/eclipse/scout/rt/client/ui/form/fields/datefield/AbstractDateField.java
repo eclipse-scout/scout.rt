@@ -992,7 +992,7 @@ public abstract class AbstractDateField extends AbstractBasicField<Date> impleme
     return d;
   }
 
-  private class P_UIFacade implements IDateFieldUIFacade {
+  private class P_UIFacade extends AbstractBasicField.P_UIFacade implements IDateFieldUIFacade {
 
     @Override
     public boolean setDateTextFromUI(String newDate) {

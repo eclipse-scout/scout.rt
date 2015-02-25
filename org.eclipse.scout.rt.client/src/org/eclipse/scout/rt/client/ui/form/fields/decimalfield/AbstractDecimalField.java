@@ -22,6 +22,7 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.decimalfield.IDecimalFieldExtension;
+import org.eclipse.scout.rt.client.ui.form.fields.AbstractBasicField;
 import org.eclipse.scout.rt.client.ui.form.fields.IBasicFieldUIFacade;
 import org.eclipse.scout.rt.client.ui.form.fields.numberfield.AbstractNumberField;
 import org.eclipse.scout.rt.client.ui.valuecontainer.IDecimalValueContainer;
@@ -275,7 +276,7 @@ public abstract class AbstractDecimalField<T extends Number> extends AbstractNum
     return valBeforeRounding.round(new MathContext(precision, getRoundingMode()));
   }
 
-  private class P_UIFacade implements IBasicFieldUIFacade {
+  private class P_UIFacade extends AbstractBasicField.P_UIFacade implements IBasicFieldUIFacade {
     @Override
     public boolean setTextFromUI(String newText, boolean whileTyping) {
       if (newText != null && newText.length() == 0) {

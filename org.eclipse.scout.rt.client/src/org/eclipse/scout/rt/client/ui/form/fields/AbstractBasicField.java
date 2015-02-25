@@ -10,10 +10,16 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui.form.fields;
 
+import java.util.List;
+
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.annotations.ClassId;
+import org.eclipse.scout.commons.annotations.ConfigOperation;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.ScoutSdkIgnore;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.BasicFieldChains;
+import org.eclipse.scout.rt.client.extension.ui.form.fields.BasicFieldChains.BasicFieldExecChangedDisplayTextChain;
 import org.eclipse.scout.rt.client.extension.ui.form.fields.IBasicFieldExtension;
 
 /**
@@ -27,6 +33,13 @@ public abstract class AbstractBasicField<VALUE> extends AbstractValueField<VALUE
 
   private boolean m_whileTyping;
 
+  protected abstract class P_UIFacade implements IBasicFieldUIFacade {
+    @Override
+    public void setDisplayTextFromUI(String text) {
+      setDisplayText(text);
+    }
+  }
+
   protected AbstractBasicField(boolean callInitializer) {
     super(callInitializer);
   }
@@ -36,20 +49,62 @@ public abstract class AbstractBasicField<VALUE> extends AbstractValueField<VALUE
     return new LocalBasicFieldExtension<VALUE, AbstractBasicField<VALUE>>(this);
   }
 
+  /**
+   * After the property {@link IValueField#PROP_DISPLAY_TEXT} changed.
+   * <p>
+   * Per default this happens when a new valid value is set. If {@link IBasicField#PROP_UPDATE_DISPLAY_TEXT_ON_MODIFY}
+   * is <code>true</code> this method is called after every modification in the UI.
+   */
+  @ConfigOperation
+  @Order(225)
+  protected void execChangedDisplayText() {
+  }
+
   @Override
   protected void initConfig() {
     super.initConfig();
     setValidateOnAnyKey(getConfiguredValidateOnAnyKey());
+    setUpdateDisplayTextOnModify(getConfiguredUpdateDisplayTextOnModify());
+  }
+
+  @Override
+  public void setDisplayText(String s) {
+    String oldDisplayText = getDisplayText();
+    super.setDisplayText(s);
+    if (CompareUtility.notEquals(oldDisplayText, s)) {
+      interceptExecChangedDisplayText();
+    }
   }
 
   /**
    * Causes the ui to send a validate event every time the input field content is changed.
    * <p>
    * Be careful when using this property since this can influence performance and the characteristics of text input.
+   *
+   * @deprecated use {@link AbstractBasicField#getConfiguredUpdateDisplayTextOnModify()} and
+   *             {@link AbstractBasicField#execChangedDisplayText()} instead; will be removed in 5.1.0;
    */
+  @Deprecated
   @ConfigProperty(ConfigProperty.BOOLEAN)
   @Order(310)
   protected boolean getConfiguredValidateOnAnyKey() {
+    return false;
+  }
+
+  /**
+   * Indicates whether the property {@link IValueField#PROP_DISPLAY_TEXT} should be updated when the display text in the
+   * UI changes.
+   * <p>
+   * By default the property {@link IValueField#PROP_DISPLAY_TEXT} is set from within the model and then propagated to
+   * the UI. (e.g. after a value was successfully set) While the user is editing the field, before the new value is
+   * actually validated and set, the model does not get notified about changes of the display text in the UI.
+   * <p>
+   * When set to <code>true</code> the property {@link IValueField#PROP_DISPLAY_TEXT} is kept in sync with the UI while
+   * the user is editing the field.
+   */
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(315)
+  protected boolean getConfiguredUpdateDisplayTextOnModify() {
     return false;
   }
 
@@ -58,14 +113,26 @@ public abstract class AbstractBasicField<VALUE> extends AbstractValueField<VALUE
     return !(isWhileTyping() && !validValueDiffersFromRawValue) && super.shouldUpdateDisplayText(validValueDiffersFromRawValue);
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public boolean isValidateOnAnyKey() {
     return propertySupport.getPropertyBool(PROP_VALIDATE_ON_ANY_KEY);
   }
 
+  @SuppressWarnings("deprecation")
   @Override
   public void setValidateOnAnyKey(boolean b) {
     propertySupport.setPropertyBool(PROP_VALIDATE_ON_ANY_KEY, b);
+  }
+
+  @Override
+  public void setUpdateDisplayTextOnModify(boolean b) {
+    propertySupport.setPropertyBool(PROP_UPDATE_DISPLAY_TEXT_ON_MODIFY, b);
+  }
+
+  @Override
+  public boolean isUpdateDisplayTextOnModify() {
+    return propertySupport.getPropertyBool(PROP_UPDATE_DISPLAY_TEXT_ON_MODIFY);
   }
 
   /**
@@ -84,6 +151,12 @@ public abstract class AbstractBasicField<VALUE> extends AbstractValueField<VALUE
     m_whileTyping = whileTyping;
   }
 
+  protected final void interceptExecChangedDisplayText() {
+    @SuppressWarnings("unchecked")
+    List<? extends IBasicFieldExtension<VALUE, ? extends AbstractBasicField<VALUE>>> extensions = (List<? extends IBasicFieldExtension<VALUE, ? extends AbstractBasicField<VALUE>>>) getAllExtensions();
+    new BasicFieldChains.BasicFieldExecChangedDisplayTextChain<VALUE>(extensions).execChangedDisplayText();
+  }
+
   /**
    * The extension delegating to the local methods. This Extension is always at the end of the chain and will not call
    * any further chain elements.
@@ -95,6 +168,10 @@ public abstract class AbstractBasicField<VALUE> extends AbstractValueField<VALUE
       super(owner);
     }
 
+    @Override
+    public void execChangedDisplayText(BasicFieldExecChangedDisplayTextChain<VALUE_TYPE> chain) {
+      getOwner().execChangedDisplayText();
+    }
   }
 
 }

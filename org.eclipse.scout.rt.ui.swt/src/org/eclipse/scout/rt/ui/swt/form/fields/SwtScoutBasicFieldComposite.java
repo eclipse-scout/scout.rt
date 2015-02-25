@@ -14,7 +14,7 @@ import org.eclipse.swt.widgets.Widget;
 
 /**
  * Common code for SWT fields corresponding to {@link IBasicField}.
- * 
+ *
  * @since 3.10.0-M3
  */
 public abstract class SwtScoutBasicFieldComposite<T extends IBasicField<?>> extends SwtScoutValueFieldComposite<T> {
@@ -22,6 +22,7 @@ public abstract class SwtScoutBasicFieldComposite<T extends IBasicField<?>> exte
   private Point m_backupSelection = null;
   private TextFieldEditableSupport m_editableSupport;
   private boolean m_validateOnAnyKey;
+  private boolean m_updateDisplayTextOnModify;
 
   protected void addModifyListenerForBasicField(Widget inputField) {
     TypedListener typedListener = new TypedListener(new P_SwtTextModifyListener());
@@ -33,6 +34,7 @@ public abstract class SwtScoutBasicFieldComposite<T extends IBasicField<?>> exte
     super.attachScout();
     IBasicField f = getScoutObject();
     setValidateOnAnyKeyFromScout(f.isValidateOnAnyKey());
+    setUpdateDisplayTextOnModifyFromScout(f.isUpdateDisplayTextOnModify());
   }
 
   @Override
@@ -204,10 +206,17 @@ public abstract class SwtScoutBasicFieldComposite<T extends IBasicField<?>> exte
     if (name.equals(IBasicField.PROP_VALIDATE_ON_ANY_KEY)) {
       setValidateOnAnyKeyFromScout(((Boolean) newValue).booleanValue());
     }
+    if (name.equals(IBasicField.PROP_UPDATE_DISPLAY_TEXT_ON_MODIFY)) {
+      setUpdateDisplayTextOnModifyFromScout(((Boolean) newValue).booleanValue());
+    }
   }
 
   private void setValidateOnAnyKeyFromScout(boolean b) {
     m_validateOnAnyKey = b;
+  }
+
+  protected void setUpdateDisplayTextOnModifyFromScout(boolean b) {
+    m_updateDisplayTextOnModify = b;
   }
 
   protected class P_SwtTextModifyListener implements ModifyListener {
@@ -217,10 +226,25 @@ public abstract class SwtScoutBasicFieldComposite<T extends IBasicField<?>> exte
      */
     @Override
     public void modifyText(ModifyEvent e) {
+      setDisplayTextInScout();
       if (m_validateOnAnyKey) {
         if (getUpdateSwtFromScoutLock().isReleased()) {
           sendVerifyToScoutAndIgnoreResponses();
         }
+      }
+    }
+
+    private void setDisplayTextInScout() {
+      if (m_updateDisplayTextOnModify && getUpdateSwtFromScoutLock().isReleased()) {
+        final String text = getText();
+        // notify Scout
+        Runnable t = new Runnable() {
+          @Override
+          public void run() {
+            getScoutObject().getUIFacade().setDisplayTextFromUI(text);
+          }
+        };
+        getEnvironment().invokeScoutLater(t, 0);
       }
     }
 

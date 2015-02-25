@@ -10,11 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.extension.ui.form.fields;
 
+import org.eclipse.scout.rt.client.extension.ui.form.fields.BasicFieldChains.BasicFieldExecChangedDisplayTextChain;
 import org.eclipse.scout.rt.client.ui.form.fields.AbstractBasicField;
 
 /**
  *
  */
 public interface IBasicFieldExtension<VALUE, OWNER extends AbstractBasicField<VALUE>> extends IValueFieldExtension<VALUE, OWNER> {
-
+  void execChangedDisplayText(BasicFieldExecChangedDisplayTextChain<VALUE> chain);
 }

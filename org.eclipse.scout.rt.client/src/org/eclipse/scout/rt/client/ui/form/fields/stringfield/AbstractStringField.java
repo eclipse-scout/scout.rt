@@ -423,7 +423,7 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
     return propertySupport.getPropertyInt(PROP_DROP_TYPE);
   }
 
-  private class P_UIFacade implements IStringFieldUIFacade {
+  private class P_UIFacade extends AbstractBasicField.P_UIFacade implements IStringFieldUIFacade {
 
     @Override
     public boolean setTextFromUI(String newText, boolean whileTyping) {
@@ -522,7 +522,7 @@ public abstract class AbstractStringField extends AbstractBasicField<String> imp
    * any further chain elements.
    */
   protected static class LocalStringFieldExtension<OWNER_FIELD extends AbstractStringField> extends AbstractBasicField.LocalBasicFieldExtension<String, OWNER_FIELD>
-  implements IStringFieldExtension<OWNER_FIELD> {
+      implements IStringFieldExtension<OWNER_FIELD> {
 
     public LocalStringFieldExtension(OWNER_FIELD owner) {
       super(owner);

@@ -336,7 +336,7 @@ public abstract class AbstractNumberField<NUMBER extends Number> extends Abstrac
     return m_uiFacade;
   }
 
-  private class P_UIFacade implements IBasicFieldUIFacade {
+  private class P_UIFacade extends AbstractBasicField.P_UIFacade implements IBasicFieldUIFacade {
     @Override
     public boolean setTextFromUI(String newText, boolean whileTyping) {
       if (newText != null && newText.length() == 0) {
