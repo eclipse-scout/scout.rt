@@ -38,7 +38,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.smartfield.ContentAssistTreeFo
  * The strategy to display busy and blocking progress can be changed by overriding {@link #runBusy(Object)} and
  * {@link #runBusy(IRunnableWithProgress)}.
  * </p>
- * Implementations are ui specific an can be found in the swing, swt, rwt implementation sof scout.
+ * Implementations are ui specific and can be found in the rendering projects.
  * <p>
  * This abstract implementation is Thread-safe.
  *

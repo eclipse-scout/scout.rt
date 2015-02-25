@@ -31,10 +31,10 @@ import org.eclipse.scout.service.SERVICES;
  * are needed for GUI tests to reuse the already initialized client session.
  * <p>
  * To use the TestingClientSessionRegistryService, it has to be registered by calling the method
- * {@link #registerTestingClientSessionRegistryService}. For Swing and SWT GUI tests, this is done when the
- * SwingApplication or SwtApplication respectively gets started. In case of RAP GUI tests, this service is registered
- * when the JUnitRAPJob is scheduled. The service is unregistered with
- * {@link #unregisterTestingClientSessionRegistryService} when the Application or the JUnitJob terminates
+ * {@link #registerTestingClientSessionRegistryService}. For GUI tests, this is done when the SwingApplication
+ * respectively gets started. In case of RAP GUI tests, this service is registered when the JUnitRAPJob is scheduled.
+ * The service is unregistered with {@link #unregisterTestingClientSessionRegistryService} when the Application or the
+ * JUnitJob terminates
  *
  * @since 3.8.1
  */

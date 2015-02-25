@@ -46,8 +46,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 
 /**
- * Utility to manipulate HTML documents regardless of ui (swt / swing). This
- * class is used from swt as well as in swing code
+ * Utility to manipulate HTML documents regardless of ui .
  */
 public final class HTMLUtility {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(HTMLUtility.class);

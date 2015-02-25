@@ -34,8 +34,6 @@ import org.eclipse.scout.rt.ui.swing.form.fields.AbstractLayoutManager2;
 /**
  * A Section component with property "expanded".
  * <p>
- * Similar to the swt Section component.
- * <p>
  * The component consists of a button (line) and a body. The button is transparented out on the bottom when the section
  * is expanded.
  */

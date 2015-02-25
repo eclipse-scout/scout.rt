@@ -25,7 +25,7 @@ import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 
 /**
- * Filter panel normally displayed in the ui (swing, swt) below the listbox
+ * Filter panel normally displayed below the listbox
  * table. Showing 2 radio button groups, one for checked filter, one for active
  * filter.
  * o show checked o show all

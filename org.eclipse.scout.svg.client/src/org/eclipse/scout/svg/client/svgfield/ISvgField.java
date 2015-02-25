@@ -16,8 +16,6 @@ import org.w3c.dom.svg.SVGPoint;
 
 /**
  * The field supports for official SVG standard documents rendering and interaction.
- * <p>
- * Known implementations include Swing, SWT, RAP/RWT.
  */
 public interface ISvgField extends IFormField {
   /**

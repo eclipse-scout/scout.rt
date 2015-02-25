@@ -464,8 +464,6 @@ public abstract class AbstractColumn<VALUE> extends AbstractPropertyObserver imp
    * <p>
    * This may display a horizontal scroll bar on the table.
    * <p>
-   * This feature is not supported in SWT and RWT since SWT does not offer such an API method.
-   * <p>
    * Subclasses can override this method. Default is {@code false}.
    *
    * @return {@code true} if this column width is auto optimized, {@code false} otherwise.

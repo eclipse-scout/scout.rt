@@ -31,8 +31,8 @@ public interface IClientSessionRegistryService extends IService {
    * {@link Subject#doAs(Subject, java.security.PrivilegedAction)} section.
    * </p>
    * <p>
-   * Warning: Only use this method if the client environment is a rich client (swt, swing, ...) and therefore supports
-   * singleton user sessions. Don't use it with web clients. With web clients rather use
+   * Warning: Only use this method if the client environment is a rich client and therefore supports singleton user
+   * sessions. Don't use it with web clients. With web clients rather use
    * {@link #newClientSession(Class, Subject, String, UserAgent)} and provide a virtualSessionId.
    * </p>
    *

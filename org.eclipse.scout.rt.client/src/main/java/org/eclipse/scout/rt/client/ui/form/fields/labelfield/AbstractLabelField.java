@@ -88,8 +88,6 @@ public abstract class AbstractLabelField extends AbstractValueField<String> impl
    * {@link #getConfiguredFillHorizontal()}.
    * <p>
    * Subclasses can override this method. Default alignment is left.
-   * <p>
-   * For SWT rendering this property will only have effect if also the WrapText property is set to <code>true</code>.
    *
    * @return -1 for left, 0 for center and 1 for right alignment
    * @see {@link #getGridData()}, {@link #getGridDataHints()}

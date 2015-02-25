@@ -390,8 +390,6 @@ public interface IColumn<VALUE> extends IPropertyObserver, ITypeWithClassId, IOr
    * cropping.
    * <p>
    * This may display a horizontal scroll bar on the table.
-   * <p>
-   * This feature is not supported in SWT and RWT since SWT does not offer such an api method.
    */
   boolean isAutoOptimizeWidth();
 

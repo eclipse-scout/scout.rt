@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.scout.rt.shared.services.common.text.ITextProviderService;
 import org.eclipse.scout.service.SERVICES;
 
@@ -35,13 +34,6 @@ public class ScoutTexts {
    * The {@link ScoutTexts} which are currently associated with the current thread.
    */
   public static final ThreadLocal<ScoutTexts> CURRENT = new ThreadLocal<>();
-
-  /**
-   * TODO [dwi]: remove SWT/RWT
-   * Job property name that can be used when Texts should be used in associated contexts such as swt display, rwt
-   * display etc.
-   */
-  public static final QualifiedName JOB_PROPERTY_NAME = new QualifiedName(ScoutTexts.class.getName(), "ref");
 
   private static final ScoutTexts DEFAULT = new ScoutTexts();
 

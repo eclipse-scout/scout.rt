@@ -41,7 +41,7 @@ import org.junit.Test;
 
 /**
  * Tests for class {@link AbstractSwingEnvironment}.
- * 
+ *
  * @author awe
  * @since 3.10.0-M3
  */
@@ -63,7 +63,7 @@ public class SwingEnvironmentUiTest {
   }
 
   /**
-   * Test for {@link AbstractSwtEnvironment#assignTestId}
+   * Test for {@link AbstractSwingEnvironment#assignTestId}
    */
   @Test
   public void testClassIdAssignedForm() throws Exception {
@@ -74,8 +74,8 @@ public class SwingEnvironmentUiTest {
   }
 
   /**
-   * Test for {@link AbstractSwtEnvironment#assignTestId}
-   * 
+   * Test for {@link AbstractSwingEnvironment#assignTestId}
+   *
    * @throws ExecutionException
    * @throws InvocationTargetException
    * @throws InterruptedException
@@ -89,7 +89,7 @@ public class SwingEnvironmentUiTest {
   }
 
   /**
-   * Test for {@link AbstractSwtEnvironment#assignTestId}
+   * Test for {@link AbstractSwingEnvironment#assignTestId}
    */
   @Test
   public void testClassIdAssignedGroupBox() throws Exception {
@@ -100,7 +100,7 @@ public class SwingEnvironmentUiTest {
   }
 
   /**
-   * Test for {@link AbstractSwtEnvironment#assignTestId}
+   * Test for {@link AbstractSwingEnvironment#assignTestId}
    */
   @Test
   public void testClassIdNotAssignedDisabled() throws Exception {

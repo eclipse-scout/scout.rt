@@ -456,13 +456,11 @@ public interface ITable extends IPropertyObserver, IDNDSupport, ITypeWithClassId
 
   /**
    * This is a hint for the UI iff it is not capable of
-   * having variable table row height based on cell contents (such as rap/rwt or swt).
+   * having variable table row height based on cell contents.
    * <p>
    * This property is interpreted in different manner for each GUI port:
    * <ul>
    * <li>Swing: The property is ignored.
-   * <li>SWT: Used as the maximal row height.
-   * <li>rap/rwt: Used as the fixed row height in multiline tables.
    * </ul>
    * </p>
    * This hint defines the table row height in pixels being used as the row height for all table rows of this table

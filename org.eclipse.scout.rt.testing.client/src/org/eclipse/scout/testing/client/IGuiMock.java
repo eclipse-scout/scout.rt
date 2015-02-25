@@ -20,9 +20,9 @@ import org.eclipse.scout.testing.client.menu.MenuItem;
 /**
  * This interface is used to support gui testing with an abstraction layer.
  * <p>
- * Therefore swt and swing gui tests can be programmed just once in the client and run with both guis.
+ * Therefore gui tests can be programmed just once in the client and run with both guis.
  * <p>
- * The term "window" is used for frames, dialogs, swt views, swt editors, swing internal frames.
+ * The term "window" is used for frames, dialogs, swing internal frames.
  * <p>
  * The config.ini property "IGuiMock.treeNodeToExpandIconGap" defines the gap between a tree node and its
  * expand/collapse icon and is used in {@link #gotoTreeExpandIcon(int, String)}
@@ -31,7 +31,6 @@ public interface IGuiMock {
   long WAIT_TIMEOUT = 10000L;
 
   enum GuiStrategy {
-    Swt,
     Swing,
     Rap
   }
@@ -273,7 +272,7 @@ public interface IGuiMock {
   /**
    * place the mouse over the center of a field that represents a scout field.
    * This correspond to {@link #gotoScoutField(String, float, float)} with x=0.5 and y=0.5
-   * 
+   *
    * @param name
    *          (class) name of the scout field (scout client model)
    */
@@ -281,7 +280,7 @@ public interface IGuiMock {
 
   /**
    * place the mouse over the field that represents a scout field at the position described by the x and y parameter
-   * 
+   *
    * @param name
    *          (class) name of the scout field (scout client model)
    * @param x
@@ -348,7 +347,7 @@ public interface IGuiMock {
 
   /**
    * Works only if checked Row is visible
-   * 
+   *
    * @return the sorted set of texts of checked cells
    */
   Set<String> getCheckedTableCells(int tableIndex, int columnIndex);
@@ -381,7 +380,7 @@ public interface IGuiMock {
   /**
    * Invokes the given {@link WaitCondition} in the Scout model thread and waits until it is completed. This may freeze
    * the UI while the {@link WaitCondition} is executing.
-   * 
+   *
    * @param r
    *          The {@link WaitCondition} to execute.
    * @param startTimeout

@@ -21,8 +21,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.documentfield.IDocumentField;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 
 /**
- * This model represents a UI specific browser, in swing it is a JEditorPane html viewer/editor, in swt it is the native
- * browser.
+ * This model represents a UI specific browser, in swing it is a JEditorPane html viewer/editor.
  * <p>
  * You can use local urls that call back to the field itself and can be handled by overriding
  * {@link AbstractHtmlField#execHyperlinkAction(URL, String, boolean)} A local URL is one of the form http://local/...

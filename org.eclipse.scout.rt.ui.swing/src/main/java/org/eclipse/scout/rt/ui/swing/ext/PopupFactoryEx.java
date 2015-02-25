@@ -23,7 +23,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.swing.window.internalframe.SwingScoutInternalFrame;
 
 /**
- * Custom popup factory which should currently be used when mixing lightweight (swing) and heavyweight (awt/swt)
+ * Custom popup factory which should currently be used when mixing lightweight (swing) and heavyweight (awt)
  * components.<br>
  * According to <a href="http://www.oracle.com/technetwork/articles/java/mixing-components-433992.html">this article</a>
  * the whole component hierarchy must be valid that lightweight components (popups and tooltips) which overlap
@@ -38,12 +38,12 @@ public final class PopupFactoryEx extends PopupFactory {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(PopupFactoryEx.class);
 
   /**
-   * Instance of the custom popup factory which will be used when awt/swt components are displayed.
+   * Instance of the custom popup factory which will be used when awt components are displayed.
    */
   private static final PopupFactoryEx CUSTOM_POPUP_FACTORY = new PopupFactoryEx();
 
   /**
-   * Instance of the original popup factory which will be used when all awt/swt components are closed.
+   * Instance of the original popup factory which will be used when all awt components are closed.
    */
   private static final PopupFactory ORIGINAL_POPUP_FACTORY = getSharedInstance();
 
@@ -57,7 +57,7 @@ public final class PopupFactoryEx extends PopupFactory {
 
   /**
    * <p>
-   * Call this method to activate the custom popup factory when awt/swt components are desplayed. We don't need to
+   * Call this method to activate the custom popup factory when awt components are desplayed. We don't need to
    * synchronzie here because these methods will be called from the same thread.
    * </p>
    * <p>
@@ -81,7 +81,7 @@ public final class PopupFactoryEx extends PopupFactory {
 
   /**
    * <p>
-   * Call this method to deactivate the custom popup factory when awt/swt components are disposed. We don't need to
+   * Call this method to deactivate the custom popup factory when awt components are disposed. We don't need to
    * synchronzie here because these methods will be called from the same thread.
    * </p>
    * <p>
@@ -99,7 +99,7 @@ public final class PopupFactoryEx extends PopupFactory {
       setSharedInstance(ORIGINAL_POPUP_FACTORY);
     }
     else {
-      LOG.debug("There are still awt/swt components displayed, counter was decremented.");
+      LOG.debug("There are still awt components displayed, counter was decremented.");
     }
   }
 

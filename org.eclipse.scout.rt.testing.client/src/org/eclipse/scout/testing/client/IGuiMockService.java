@@ -17,7 +17,7 @@ import org.eclipse.scout.service.IService;
 /**
  * This interface is used to support gui testing with an abstraction layer.
  * <p>
- * Therefore swt and swing gui tests can be programmed just once in the client and run with both guis.
+ * Therefore gui tests can be programmed just once in the client and run with both guis.
  */
 public interface IGuiMockService extends IService {
 

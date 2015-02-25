@@ -21,10 +21,10 @@ import org.eclipse.scout.service.IService;
  * <p>
  * When scout.osgi.tier is not set, the default value is automatically determined.
  * <ul>
- * <li>exists(org.eclipse.scout.rt.ui.swing) or exists(org.eclipse.scout.rt.ui.swt) -&gt; FrontEnd</li>
+ * <li>exists(org.eclipse.scout.rt.ui.swing) -&gt; FrontEnd</li>
  * <li>exists(org.eclipse.scout.rt.client) and not exists(org.eclipse.scout.rt.server) -&gt; FrontEnd</li>
- * <li>not exists(org.eclipse.scout.rt.ui.swing) and not exists(org.eclipse.scout.rt.ui.swt) and not
- * exists(org.eclipse.scout.rt.client) and exists(org.eclipse.scout.rt.server)-&gt; BackEnd</li>
+ * <li>not exists(org.eclipse.scout.rt.ui.swing) and not exists(org.eclipse.scout.rt.client) and
+ * exists(org.eclipse.scout.rt.server)-&gt; BackEnd</li>
  * <li>all other cases -&gt; Undefined</li>
  * </ul>
  */
@@ -44,14 +44,13 @@ public final class TierState {
       boolean hasClient = Platform.getBundle("org.eclipse.scout.rt.client") != null;
       boolean hasServer = Platform.getBundle("org.eclipse.scout.rt.server") != null;
       boolean hasSwing = Platform.getBundle("org.eclipse.scout.rt.ui.swing") != null;
-      boolean hasSwt = Platform.getBundle("org.eclipse.scout.rt.ui.swt") != null;
-      if (hasSwing || hasSwt) {
+      if (hasSwing) {
         VALUE = Tier.FrontEnd;
       }
       else if (hasClient && !hasServer) {
         VALUE = Tier.FrontEnd;
       }
-      else if (hasServer && !hasClient && !hasSwing && !hasSwt) {
+      else if (hasServer && !hasClient && !hasSwing) {
         VALUE = Tier.BackEnd;
       }
       else {

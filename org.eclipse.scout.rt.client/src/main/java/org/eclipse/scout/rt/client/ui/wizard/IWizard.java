@@ -70,12 +70,11 @@ public interface IWizard extends IPropertyObserver, ITypeWithClassId {
   String PROP_CLOSE_TYPE = "closeType";
 
   /**
-   * Standalone window Swing: modal -> JDialog, nonmodal -> JFrame SWT: modal ->
-   * Dialog, nonmodal -> Dialog, Wizard Dialog
+   * Standalone window Swing: modal -> JDialog, nonmodal -> JFrame
    */
   int DISPLAY_HINT_DIALOG = 0;
   /**
-   * Inline view Swing: JInternalFrame SWT: View, Editor, , Wizard Editor
+   * Inline view Swing: JInternalFrame
    */
   int DISPLAY_HINT_VIEW = 20;
 

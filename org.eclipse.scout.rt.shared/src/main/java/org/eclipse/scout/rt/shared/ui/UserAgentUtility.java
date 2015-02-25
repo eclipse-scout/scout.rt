@@ -48,10 +48,6 @@ public final class UserAgentUtility {
     return !isWebClient();
   }
 
-  public static boolean isSwtUi() {
-    return UiLayer.SWT.equals(getCurrentUiLayer());
-  }
-
   public static IUiDeviceType getCurrentUiDeviceType() {
     return getCurrentUserAgent().getUiDeviceType();
   }

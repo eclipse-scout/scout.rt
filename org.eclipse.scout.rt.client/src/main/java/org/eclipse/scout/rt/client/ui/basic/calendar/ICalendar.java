@@ -240,8 +240,8 @@ public interface ICalendar extends IPropertyObserver {
   void setShowDisplayModeSelection(boolean showDisplayModeSelection);
 
   /**
-   * Defines whether or not the noon hour is painted with a darker color. The type of client (Swing, SWT) defines how
-   * it is actually painted. In RAP this is not supported.
+   * Defines whether or not the noon hour is painted with a darker color. The actually implementation is UI rendering
+   * specific.
    */
   boolean getMarkNoonHour();
 

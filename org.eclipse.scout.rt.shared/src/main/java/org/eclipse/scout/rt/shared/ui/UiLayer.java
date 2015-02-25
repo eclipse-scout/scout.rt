@@ -15,7 +15,6 @@ package org.eclipse.scout.rt.shared.ui;
  */
 public enum UiLayer implements IUiLayer {
 
-  SWT,
   /**
    * FIXME AWE: (UiLayer) remove SWING before new Scout version is released.
    * we keep this value for a while, to compare with the old UI while the

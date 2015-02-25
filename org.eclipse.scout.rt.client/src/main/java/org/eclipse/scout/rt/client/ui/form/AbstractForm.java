@@ -361,9 +361,8 @@ public abstract class AbstractForm extends AbstractPropertyObserver implements I
   }
 
   /**
-   * one of {@link IForm#TOOLBAR_FORM_HEADER} or {@link IForm#TOOLBAR_VIEW_PART}. The {@link IForm#TOOLBAR_VIEW_PART} is
-   * only considered if the form is displayed as a view (display hint {@link IForm#DISPLAY_HINT_VIEW} and SWT
-   * representation. In all other cases the fallback {@link IForm#TOOLBAR_FORM_HEADER} is taken.
+   * {@link IForm#TOOLBAR_VIEW_PART}.
+   * In all other cases the fallback {@link IForm#TOOLBAR_FORM_HEADER} is taken.
    *
    * @return {@link IForm#TOOLBAR_FORM_HEADER} | {@link IForm#TOOLBAR_VIEW_PART}
    */

@@ -40,8 +40,7 @@ import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 import org.eclipse.scout.service.SERVICES;
 
 /**
- * This model represents a UI specific browser, in swing it is a JEditorPane html viewer/editor, in swt it is the native
- * browser.
+ * This model represents a UI specific browser, in swing it is a JEditorPane html viewer/editor.
  * <p>
  * See also {@link AbstractBrowserField} for html viewing and {@link AbstractDocumentField} for html editing (requires a
  * fragment such as microsoft word editor)

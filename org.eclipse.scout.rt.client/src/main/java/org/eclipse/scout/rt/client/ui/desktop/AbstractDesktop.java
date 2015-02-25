@@ -112,9 +112,8 @@ import org.eclipse.scout.service.SERVICES;
  * <li>active table view
  * <li>active detail form
  * <li>active search form
- * <li>form stack (swing: dialogs on desktop as {@code JInternalFrame}s; SWT: editors or views)
- * <li>dialog stack of modal and non-modal dialogs (swing: dialogs as {@code JDialog}, {@code JFrame}; SWT: dialogs in a
- * new Shell)
+ * <li>form stack (swing: dialogs on desktop as {@code JInternalFrame}s)
+ * <li>dialog stack of modal and non-modal dialogs (swing: dialogs as {@code JDialog}, {@code JFrame})
  * <li>active message box stack
  * <li>menubar menus
  * <li>toolbar and viewbar actions
