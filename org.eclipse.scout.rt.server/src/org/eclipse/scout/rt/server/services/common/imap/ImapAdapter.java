@@ -32,9 +32,13 @@ import javax.mail.Store;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 
 @SuppressWarnings("restriction")
 public class ImapAdapter implements IImapAdapter {
+
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ImapAdapter.class);
 
   public static final String TRASH_FOLDER_NAME = "Trash";
   public static final int DEFAULT_IMAP_PORT = 143;
@@ -136,19 +140,48 @@ public class ImapAdapter implements IImapAdapter {
 
   protected void copyMessages(String destFolderName, Message[] messages, boolean deleteSourceMessages) throws ProcessingException {
     connect();
+
     Folder destFolder = null;
     try {
       destFolder = findFolder(destFolderName);
       if (destFolder != null) {
-        destFolder.appendMessages(messages);
-        if (deleteSourceMessages) {
-          deleteMessagesPermanently(messages);
+        Map<Folder, Set<Message>> messagesBySourceFolder = groupMessagesBySourceFolder(messages);
+        for (Folder sourceFolder : messagesBySourceFolder.keySet()) {
+          Set<Message> messageSet = messagesBySourceFolder.get(sourceFolder);
+          Message[] messagesForSourceFolder = messageSet.toArray(new Message[messageSet.size()]);
+          // use copyMessages instead of appendMessages because this can be optimized by the mail-server
+          sourceFolder.copyMessages(messagesForSourceFolder, destFolder);
+          if (deleteSourceMessages) {
+            deleteMessagesPermanently(messagesForSourceFolder);
+          }
         }
       }
     }
     catch (MessagingException e) {
       throw new ProcessingException(e.getMessage(), e);
     }
+  }
+
+  /**
+   * @return the messages grouped by source folder
+   */
+  protected Map<Folder, Set<Message>> groupMessagesBySourceFolder(Message[] messages) {
+    Map<Folder, Set<Message>> messagesByFolder = new HashMap<Folder, Set<Message>>();
+    if (messages == null || messages.length == 0) {
+      return messagesByFolder;
+    }
+
+    for (Message message : messages) {
+      if (message.getFolder() == null) {
+        LOG.warn("Folder is empty for message {}", message);
+        continue;
+      }
+      if (!messagesByFolder.containsKey(message.getFolder())) {
+        messagesByFolder.put(message.getFolder(), new HashSet<Message>());
+      }
+      messagesByFolder.get(message.getFolder()).add(message);
+    }
+    return messagesByFolder;
   }
 
   /**
