@@ -435,7 +435,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
 
   @Override
   public String getKeyStroke() {
-    return propertySupport.getPropertyString(PROP_KEYSTROKE);
+    return propertySupport.getPropertyString(PROP_KEY_STROKE);
   }
 
   @Override
@@ -443,7 +443,7 @@ public abstract class AbstractAction extends AbstractPropertyObserver implements
     KeyStrokeNormalizer scoutKeystroke = new KeyStrokeNormalizer(k);
     scoutKeystroke.normalize();
     if (scoutKeystroke.isValid()) {
-      propertySupport.setPropertyString(PROP_KEYSTROKE, scoutKeystroke.getNormalizedKeystroke());
+      propertySupport.setPropertyString(PROP_KEY_STROKE, scoutKeystroke.getNormalizedKeystroke());
     }
     else {
       LOG.warn("Could not create keystroke '" + k + "' because it is invalid!");

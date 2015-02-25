@@ -178,7 +178,7 @@ public class SwingScoutAction<T extends IAction> extends SwingScoutComposite<T> 
     else if (name.equals(IAction.PROP_MNEMONIC)) {
       setMnemonicFromScout(((Character) newValue).charValue());
     }
-    else if (name.equals(IAction.PROP_KEYSTROKE)) {
+    else if (name.equals(IAction.PROP_KEY_STROKE)) {
       setKeyStrokeFromScout((String) newValue);
     }
     else if (name.equals(IAction.PROP_ICON_ID)) {
