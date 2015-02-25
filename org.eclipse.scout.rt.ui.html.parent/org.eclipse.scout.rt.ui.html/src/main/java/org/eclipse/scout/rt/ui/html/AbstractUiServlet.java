@@ -26,8 +26,6 @@ import org.eclipse.scout.rt.ui.html.cache.DefaultHttpCacheControl;
 import org.eclipse.scout.rt.ui.html.cache.IHttpCacheControl;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
 import org.eclipse.scout.rt.ui.html.json.JsonMessageRequestInterceptor;
-import org.eclipse.scout.rt.ui.html.res.IWebContentResourceLocator;
-import org.eclipse.scout.rt.ui.html.res.OsgiWebContentResourceLocator;
 import org.eclipse.scout.rt.ui.html.res.StaticResourceRequestInterceptor;
 import org.eclipse.scout.service.SERVICES;
 
@@ -52,15 +50,9 @@ public abstract class AbstractUiServlet extends HttpServletEx {
   private final P_AbstractRequestHandler m_requestHandlerPost;
 
   protected AbstractUiServlet() {
-    Activator.getDefault().setWebContentResourceLocator(createResourceLocator());
     m_httpCacheControl = createHttpCacheControl();
     m_requestHandlerGet = createRequestHandlerGet();
     m_requestHandlerPost = createRequestHandlerPost();
-  }
-
-  protected IWebContentResourceLocator createResourceLocator() {
-    //TODO imo change once we switch from OSGI to JEE; move WebContent to src/main/resources/META-INF/resources/WebContent, move src/main/js to src/main/resources/META-INF/resources/js
-    return new OsgiWebContentResourceLocator();
   }
 
   protected IHttpCacheControl createHttpCacheControl() {

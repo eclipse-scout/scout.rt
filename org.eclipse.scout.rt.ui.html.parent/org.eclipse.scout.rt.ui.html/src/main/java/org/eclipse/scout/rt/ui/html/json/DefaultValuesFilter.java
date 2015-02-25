@@ -24,6 +24,7 @@ import org.json.JSONObject;
 
 public class DefaultValuesFilter {
 
+  private final long m_lastModified;
   /**
    * Map holding the defaults object for a given object type from the configuration file.
    * <p>
@@ -40,9 +41,14 @@ public class DefaultValuesFilter {
    */
   private final Map<String, List<String>> m_objectTypeHierarchyFlat = new HashMap<>();
 
-  public DefaultValuesFilter(JSONObject jsonDefaults, JSONObject jsonObjectTypeHierarchy) {
+  public DefaultValuesFilter(long lastModified, JSONObject jsonDefaults, JSONObject jsonObjectTypeHierarchy) {
+    m_lastModified = lastModified;
     loadDefaults(jsonDefaults);
     loadObjectTypeHierarchy(jsonObjectTypeHierarchy);
+  }
+
+  public long lastModified() {
+    return m_lastModified;
   }
 
   protected void loadDefaults(JSONObject jsonDefaults) {

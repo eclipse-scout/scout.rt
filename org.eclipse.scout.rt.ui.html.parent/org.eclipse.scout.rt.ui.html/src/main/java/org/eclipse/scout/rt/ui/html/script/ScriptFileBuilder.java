@@ -21,7 +21,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.ui.html.StreamUtility;
 import org.eclipse.scout.rt.ui.html.UiHints;
-import org.eclipse.scout.rt.ui.html.res.IWebContentResourceLocator;
+import org.eclipse.scout.rt.ui.html.res.IWebContentService;
 import org.eclipse.scout.rt.ui.html.res.StaticResourceRequestInterceptor;
 import org.eclipse.scout.rt.ui.html.script.ScriptSource.NodeType;
 import org.eclipse.scout.rt.ui.html.scriptprocessor.ScriptProcessor;
@@ -58,11 +58,11 @@ public class ScriptFileBuilder {
    */
   public static final Pattern SCRIPT_URL_PATTERN = Pattern.compile("([^\"']*/)([-_\\w]+)-([0-9.]+)(?:\\-([a-f0-9]+|fingerprint))?(?:\\.min)?\\.(js|css)");
 
-  private final IWebContentResourceLocator m_resourceLocator;
+  private final IWebContentService m_resourceLocator;
   private final ScriptProcessor m_scriptProcessor;
   private boolean m_minifyEnabled;
 
-  public ScriptFileBuilder(IWebContentResourceLocator locator, ScriptProcessor scriptProcessor) {
+  public ScriptFileBuilder(IWebContentService locator, ScriptProcessor scriptProcessor) {
     m_resourceLocator = locator;
     m_scriptProcessor = scriptProcessor;
   }

@@ -19,13 +19,15 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 
-import org.eclipse.scout.rt.ui.html.res.IWebContentResourceLocator;
+import org.eclipse.scout.rt.ui.html.res.IWebContentService;
 import org.eclipse.scout.rt.ui.html.scriptprocessor.ScriptProcessor;
 
 /**
  * Generate js and css files used for testing. This java class is run using the maven
  * org.codehaus.mojo/exec-maven-plugin in the phase generate-test-resources
  * see {@link #GenerateTestScripts(File, File)}
+ * <p>
+ * TODO imo not used anymore since we use test-side js includes
  *
  * @since 5.0.0
  */
@@ -64,7 +66,7 @@ public class GenerateTestScripts {
 
   private final File m_inDir;
   private final File m_outDir;
-  private final IWebContentResourceLocator m_loc;
+  private final IWebContentService m_loc;
 
   public GenerateTestScripts(File inDir, File outDir) {
     if (!inDir.exists()) {
@@ -73,7 +75,7 @@ public class GenerateTestScripts {
     m_inDir = inDir;
     m_outDir = outDir;
     m_outDir.mkdirs();
-    m_loc = new IWebContentResourceLocator() {
+    m_loc = new IWebContentService() {
       @Override
       public URL getWebContentResource(String path) {
         return null;

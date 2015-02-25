@@ -18,9 +18,6 @@ import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.ui.html.res.IWebContentResourceLocator;
-import org.eclipse.scout.rt.ui.html.res.OsgiWebContentResourceLocator;
-import org.eclipse.scout.service.SERVICES;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
@@ -36,8 +33,6 @@ public class Activator extends Plugin {
   // The shared instance
   private static Activator plugin;
 
-  private IWebContentResourceLocator m_webContentResourceLocator;
-
   public Activator() {
   }
 
@@ -45,8 +40,6 @@ public class Activator extends Plugin {
   public void start(BundleContext context) throws Exception {
     super.start(context);
     plugin = this;
-    // Install default webcontent resource locator
-    setWebContentResourceLocator(new OsgiWebContentResourceLocator());
     // workaround for bug in serverside equinox implementation with servletbridge
     // wait until done and launch product if one exists
     context.addBundleListener(new SynchronousBundleListener() {
@@ -69,7 +62,6 @@ public class Activator extends Plugin {
 
   @Override
   public void stop(BundleContext context) throws Exception {
-    setWebContentResourceLocator(null);
     plugin = null;
     super.stop(context);
   }
@@ -81,14 +73,6 @@ public class Activator extends Plugin {
    */
   public static Activator getDefault() {
     return plugin;
-  }
-
-  public IWebContentResourceLocator getWebContentResourceLocator() {
-    return m_webContentResourceLocator;
-  }
-
-  public void setWebContentResourceLocator(IWebContentResourceLocator webContentResourceLocator) {
-    m_webContentResourceLocator = webContentResourceLocator;
   }
 
   private void runProduct() {

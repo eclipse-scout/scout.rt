@@ -36,10 +36,10 @@ public class ScriptSource {
     /**
      * A macro consists of multiple libraries and modules and has the file name *-macro.js or *-macro.css
      * <p>
-     * Typically placed inside <code>/META-INF/resources/WebContent/res</code>
+     * Typically placed inside <code>/src/main/resources/WebContent/res</code>
      * <p>
      * Example: the request to <code>/res/crm-14.0.0.min.js</code> is mapped to the file
-     * <code>/META-INF/resources/WebContent/res/crm-macro.js</code> which has include directives
+     * <code>/src/main/resources/WebContent/res/crm-macro.js</code> which has include directives
      * <code>//@include("jquery-4.0.0.min.js")</code> and <code>//@include("scout-5.0.0.min.js")</code>
      */
     MACRO,
@@ -48,11 +48,11 @@ public class ScriptSource {
      * A library or third-party library is available in minimized and/or non-minimized form with the file name pattern
      * *.min.js or *.min.css respectively *.js or *.css
      * <p>
-     * Typically placed inside <code>/META-INF/resources/WebContent/res</code>
+     * Typically placed inside <code>/src/main/resources/WebContent/res</code>
      * <p>
      * Example: the request to <code>/res/jquery-4.0.0.min.js</code> is mapped to the minimized file
-     * <code>/META-INF/resources/WebContent/res/jquery-4.0.0.min.js</code> and the non-minimized file
-     * <code>/META-INF/resources/WebContent/res/jquery-4.0.0.js</code>
+     * <code>/src/main/resources/WebContent/res/jquery-4.0.0.min.js</code> and the non-minimized file
+     * <code>/src/main/resources/WebContent/res/jquery-4.0.0.js</code>
      */
     LIBRARY,
 
@@ -60,10 +60,10 @@ public class ScriptSource {
      * A source module is a project javascript file that is being developed, it may consist of multiple fragments. The
      * file name pattern is *-module.js or *-module.css
      * <p>
-     * Placed inside <code>/META-INF/resources/js</code>
+     * Placed inside <code>/src/main/resources/js</code>
      * <p>
      * Example: the request to <code>/res/scout-5.0.0.min.js</code> is mapped to the file
-     * <code>/META-INF/resources/js/scout-module.js</code> which has include directives
+     * <code>/src/main/resources/js/scout-module.js</code> which has include directives
      * <code>//@include("tree/Tree.js")</code> and <code>//@include("table/Table.js")</code>
      */
     SRC_MODULE,

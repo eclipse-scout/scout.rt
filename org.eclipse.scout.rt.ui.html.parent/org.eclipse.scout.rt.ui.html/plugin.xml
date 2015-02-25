@@ -12,10 +12,6 @@
             createImmediately="false">
       </service>
       <service
-            class="org.eclipse.scout.rt.ui.html.services.WebContentResourceLocator"
-            createImmediately="false">
-      </service>
-      <service
             class="org.eclipse.scout.rt.ui.html.HtmlTextProviderService"
             createImmediately="false">
       </service>
@@ -26,6 +22,10 @@
       </service>
       <service
             class="org.eclipse.scout.rt.ui.html.json.DefaultValuesFilterService"
+            createImmediately="false">
+      </service>
+      <service
+            class="org.eclipse.scout.rt.ui.html.res.WebContentService"
             createImmediately="false">
       </service>
    </extension>

@@ -15,9 +15,22 @@ import java.net.URL;
 import org.eclipse.scout.service.IService;
 
 /**
- *
+ * Locate script and other web resources on the classpath
  */
 public interface IWebContentService extends IService {
 
-  URL getResource(String resourcePath);
+  /**
+   * @return the source (or template file) of a js or css script.
+   *         <p>
+   *         At runtime the prefix / is used, at development time the prefix /src/main/js/ and /src/main/js/ is used.
+   */
+  URL getScriptSource(String path);
+
+  /**
+   * @return a web resource
+   *         <p>
+   *         At runtime the prefix /WebContent/ is used, at development time the prefix /src/main/resources/WebContent/
+   *         and /src/test/resources/WebContent/ is used.
+   */
+  URL getWebContentResource(String path);
 }
