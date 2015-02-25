@@ -16,7 +16,6 @@ scout.Tree = function() {
   this._treeItemPaddingLevel = 15;
 
   this.menuBar;
-  this.staticMenus = [];
 };
 scout.inherits(scout.Tree, scout.ModelAdapter);
 
@@ -276,7 +275,7 @@ scout.Tree.prototype.setNodesSelected = function(nodes, $nodes) {
     // FIXME BSH Keystroke | "scroll into view"
     this._renderSelection($nodes);
     this._triggerNodesSelected(nodeIds);
-    this._renderNodeMenus(this.selectedNodeIds);
+    this._renderMenus();
   }
 };
 
@@ -498,7 +497,7 @@ scout.Tree.prototype._onAllNodesDeleted = function(parentNodeId) {
 
 scout.Tree.prototype._onNodesSelected = function(nodeIds) {
   this.selectedNodeIds = nodeIds;
-  this._renderNodeMenus(this.selectedNodeIds);
+  this._renderMenus();
   if (this.rendered) {
     this._renderSelection();
   }
@@ -623,7 +622,7 @@ scout.Tree.prototype._removeNodes = function(nodes, parentNodeId, $parentNode) {
 
 scout.Tree.prototype._addNodes = function(nodes, $parent) {
   if (!nodes || nodes.length === 0) {
-    this._renderNodeMenus(this.selectedNodeIds);
+    this._renderMenus();
     return;
   }
 
@@ -646,7 +645,7 @@ scout.Tree.prototype._addNodes = function(nodes, $parent) {
       $predecessor = $node;
     }
   }
-  this._renderNodeMenus(this.selectedNodeIds);
+  this._renderMenus();
   this.updateScrollbar();
 
   //return the last created node
@@ -973,15 +972,13 @@ scout.Tree.prototype.onModelAction = function(event) {
   }
 };
 
-scout.Tree.prototype._renderMenus = function(menus) {
-  this._renderNodeMenus(this.selectedNodeIds);
+scout.Tree.prototype._renderProperties = function() {
+  scout.Tree.parent.prototype._renderProperties.call(this);
+  this._renderMenus();
 };
 
-scout.Tree.prototype._renderNodeMenus = function(selectedNodeIds) {
-  var menuItems = this._filterMenus(selectedNodeIds, ['Tree.EmptySpace', 'Tree.Header']);
-  if (menuItems) {
-    menuItems = this.staticMenus.concat(menuItems);
-  }
+scout.Tree.prototype._renderMenus = function() {
+  var menuItems = this._filterMenus(this.selectedNodeIds, ['Tree.EmptySpace', 'Tree.Header']);
   this.menuBar.updateItems(menuItems);
 };
 
@@ -1003,8 +1000,9 @@ scout.Tree.prototype._renderAutoCheckChildren = function() {
   // NOP
 };
 
-scout.Tree.prototype._renderEnabled = function(enabled) {
+scout.Tree.prototype._renderEnabled = function() {
   // FIXME CGU remove/add events. Maybe extend jquery to not fire on disabled events?
+  var enabled = this.enabled;
   this.$data.setEnabled(enabled);
 
   // Enable/disable all checkboxes

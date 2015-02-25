@@ -84,7 +84,8 @@ scout.Table.prototype._render = function($parent) {
 };
 
 scout.Table.prototype._renderProperties = function() {
-  this._renderEnabled(this.enabled);
+  scout.Table.parent.prototype._renderProperties.call(this);
+  this._renderMenus();
   this._renderTableHeader();
   this._renderTableFooter();
 };
@@ -604,7 +605,7 @@ scout.Table.prototype._filterMenus = function($selectedRows, allowedTypes, onlyV
   return scout.menus.filter(this.menus, allowedTypes, onlyVisible);
 };
 
-scout.Table.prototype._renderMenus = function(menus) {
+scout.Table.prototype._renderMenus = function() {
   this._renderRowMenus(this.$selectedRows());
 };
 
@@ -1463,9 +1464,9 @@ scout.Table.prototype._renderTableFooter = function() {
   }
 };
 
-scout.Table.prototype._renderEnabled = function(enabled) {
+scout.Table.prototype._renderEnabled = function() {
   // FIXME CGU remove/add events. Maybe extend jquery to not fire on disabled events?
-  this.$data.setEnabled(enabled);
+  this.$data.setEnabled(this.enabled);
 };
 
 scout.Table.prototype._renderMultiSelect = function(multiSelect) {
