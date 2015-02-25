@@ -20,24 +20,17 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Locale;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.shared.OfflineState;
 import org.eclipse.scout.rt.shared.services.common.file.IRemoteFileService;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 import org.eclipse.scout.service.AbstractService;
 import org.eclipse.scout.service.SERVICES;
-import org.osgi.framework.Bundle;
 
 @Priority(-1)
 public class FileService extends AbstractService implements IFileService {
   private String m_rootPath = null;
-
-  private Bundle getBundle() {
-    return ClientSyncJob.getCurrentSession().getBundle();
-  }
 
   @Override
   public File getLocalFile(String dir, String simpleName) throws ProcessingException {
@@ -249,42 +242,38 @@ public class FileService extends AbstractService implements IFileService {
   }
 
   private File getFileLocation(String dir, String name, boolean local) throws ProcessingException {
-    try {
-      String path = m_rootPath;
-      if (path == null) {
-        path = Platform.getStateLocation(getBundle()).toFile().getCanonicalPath();
-        if (!path.endsWith("/")) {
-          path = path + "/";
-        }
-        if (local) {
-          path = path + "local";
-        }
-        else {
-          path = path + "remote";
-        }
-      }
-      if (dir != null) {
-        dir = dir.replace("\\", "/");
-        if (!dir.startsWith("/")) {
-          path = path + "/";
-        }
-        path = path + dir;
-      }
+    String path = m_rootPath;
+    if (path == null) {
+      path = System.getProperty("java.io.tmpdir");
       if (!path.endsWith("/")) {
         path = path + "/";
       }
-      File file = new File(path);
-      if (!file.exists()) {
-        file.mkdirs();
+      if (local) {
+
+        path = path + "local";
       }
-      if (name != null) {
-        file = new File(path + name);
+      else {
+        path = path + "remote";
       }
-      return file;
     }
-    catch (IOException e) {
-      throw new ProcessingException("io error getting file", e);
+    if (dir != null) {
+      dir = dir.replace("\\", "/");
+      if (!dir.startsWith("/")) {
+        path = path + "/";
+      }
+      path = path + dir;
     }
+    if (!path.endsWith("/")) {
+      path = path + "/";
+    }
+    File file = new File(path);
+    if (!file.exists()) {
+      file.mkdirs();
+    }
+    if (name != null) {
+      file = new File(path + name);
+    }
+    return file;
   }
 
   private void setDirectPath(String rootPath) {
