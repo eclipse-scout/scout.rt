@@ -24,8 +24,8 @@ import java.util.Set;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.Platform;
-import org.eclipse.scout.rt.platform.internal.Activator;
 import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 /**
  * To resolve all plugin.xml and fragment.xml on the classpath. This class is responsible for the switch between pure
@@ -108,7 +108,7 @@ public final class PluginXmlResolver {
    */
   private static List<IPluginXml> resolvePluginXmlOsgi() {
     List<IPluginXml> pluginXmls = new LinkedList<IPluginXml>();
-    for (Bundle bundle : Activator.getBundleContext().getBundles()) {
+    for (Bundle bundle : FrameworkUtil.getBundle(PluginXmlResolver.class).getBundleContext().getBundles()) {
       // plugin.xml
       URL pluginUrl = bundle.getResource("plugin.xml");
       if (pluginUrl != null) {

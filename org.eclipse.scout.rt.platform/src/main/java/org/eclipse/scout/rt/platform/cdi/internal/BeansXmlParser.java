@@ -34,8 +34,8 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.Platform;
-import org.eclipse.scout.rt.platform.internal.Activator;
 import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -88,7 +88,7 @@ public final class BeansXmlParser {
    */
   protected List<IBeansXml> findAllBeanXmlOsgi() {
     List<IBeansXml> beanXmls = new ArrayList<>();
-    for (Bundle bundle : Activator.getBundleContext().getBundles()) {
+    for (Bundle bundle : FrameworkUtil.getBundle(BeansXmlParser.class).getBundleContext().getBundles()) {
       URL resourceUrl = bundle.getResource("META-INF/beans.xml");
       if (resourceUrl != null) {
         beanXmls.add(new OsgiBeanXml(bundle, resourceUrl));

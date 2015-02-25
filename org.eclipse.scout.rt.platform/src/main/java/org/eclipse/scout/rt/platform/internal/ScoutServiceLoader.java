@@ -24,6 +24,7 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.Platform;
 import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 /**
  * The {@link ScoutServiceLoader} has a similar behavior as the {@link ServiceLoader} and is able to load services in a
@@ -54,7 +55,7 @@ public final class ScoutServiceLoader {
    */
   private static <T> List<T> loadServicesOsgi(Class<T> clazz) {
     final List<T> services = new LinkedList<T>();
-    for (Bundle bundle : Activator.getBundleContext().getBundles()) {
+    for (Bundle bundle : FrameworkUtil.getBundle(ScoutServiceLoader.class).getBundleContext().getBundles()) {
       URL servicesUrl = bundle.getResource("META-INF/services/" + clazz.getName());
       if (servicesUrl != null) {
         BufferedReader reader = null;

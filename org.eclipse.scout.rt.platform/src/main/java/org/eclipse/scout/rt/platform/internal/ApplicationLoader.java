@@ -25,6 +25,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.IApplication;
 import org.eclipse.scout.rt.platform.Platform;
 import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 /**
  * The application loader is responsible to find all {@link IApplication} which are started when the {@link Platform}
@@ -56,7 +57,7 @@ public final class ApplicationLoader {
    */
   private static List<IApplication> getApplicationsOsgi() {
     final List<IApplication> applications = new LinkedList<IApplication>();
-    for (Bundle bundle : Activator.getBundleContext().getBundles()) {
+    for (Bundle bundle : FrameworkUtil.getBundle(ApplicationLoader.class).getBundleContext().getBundles()) {
       URL applicationServices = bundle.getResource("META-INF/services/" + IApplication.class.getName());
       if (applicationServices != null) {
         BufferedReader reader = null;
