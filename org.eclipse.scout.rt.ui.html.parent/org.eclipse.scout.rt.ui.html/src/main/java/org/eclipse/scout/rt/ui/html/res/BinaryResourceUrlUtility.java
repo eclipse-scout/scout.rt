@@ -41,8 +41,7 @@ public class BinaryResourceUrlUtility {
     if (iconId.startsWith("font:")) {
       return iconId;
     }
-    IIconLocator iconLocator = jsonAdapter.getJsonSession().getClientSession().getIconLocator();
-    IconSpec iconSpec = iconLocator.getIconSpec(iconId);
+    IconSpec iconSpec = IIconLocator.INSTANCE.getIconSpec(iconId);
     if (iconSpec != null) {
       return "icon/" + iconSpec.getName() + "?" + JsonRequest.PROP_JSON_SESSION_ID + "=" + jsonAdapter.getJsonSession().getJsonSessionId(); // includes file extension
     }
