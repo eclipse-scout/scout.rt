@@ -15,6 +15,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Matcher;
 
 import javax.servlet.ServletException;
@@ -67,6 +68,31 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
   public static final String MOBILE_INDEX_HTML = "/index-mobile.html";
 
   private static final String UTF_8 = "UTF-8";
+  private static final Set<String> DOWNLOAD_CONTENT_TYPES = new HashSet<String>(Arrays.asList(new String[]{
+      "application/octet-stream",
+      "application/octet-stream",
+      "application/pdf",
+      "application/mspowerpoint",
+      "application/mspowerpoint",
+      "application/mspowerpoint",
+      "application/mspowerpoint",
+      "application/vnd.ms-excel",
+      "application/vnd.ms-excel",
+      "application/vnd.ms-excel",
+      "application/vnd.ms-excel",
+      "application/vnd.ms-excel",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.template",
+      "application/vnd.openxmlformats-officedocument.presentationml.template",
+      "application/vnd.openxmlformats-officedocument.presentationml.slideshow",
+      "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "application/vnd.openxmlformats-officedocument.presentationml.slide",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.template",
+      "application/zip",
+  }));
 
   private ScriptProcessor m_scriptProcessor;
 
@@ -324,32 +350,6 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
     // TODO BSH Check with IMO: Why not explicitly pass MAX_AGE_4_HOURS instead of -1? Would make logic in DefaultHttpCacheControl.getMaxAgeFor() obsolete
     return new HttpCacheObject(pathInfo, true, -1, content);
   }
-
-  private static final HashSet<String> DOWNLOAD_CONTENT_TYPES = new HashSet<String>(Arrays.asList(new String[]{
-      "application/octet-stream",
-      "application/octet-stream",
-      "application/pdf",
-      "application/mspowerpoint",
-      "application/mspowerpoint",
-      "application/mspowerpoint",
-      "application/mspowerpoint",
-      "application/vnd.ms-excel",
-      "application/vnd.ms-excel",
-      "application/vnd.ms-excel",
-      "application/vnd.ms-excel",
-      "application/vnd.ms-excel",
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.template",
-      "application/vnd.openxmlformats-officedocument.presentationml.template",
-      "application/vnd.openxmlformats-officedocument.presentationml.slideshow",
-      "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      "application/vnd.openxmlformats-officedocument.presentationml.slide",
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.template",
-      "application/zip",
-  }));
 
   protected boolean isDownload(BinaryResource res) {
     return DOWNLOAD_CONTENT_TYPES.contains(res.getContentType());

@@ -19,34 +19,46 @@ import java.net.URLClassLoader;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 public final class SandboxClassLoaderBuilder {
+
   private static final int ANY_SIZE = 10240;
-  private final LinkedHashMap<String, URL> m_urls = new LinkedHashMap<String, URL>();
-  private final JarLocator m_loc;
+
+  private final Map<String, URL> m_urls = new LinkedHashMap<String, URL>();
+  private final JarLocator m_jarLocator;
 
   public SandboxClassLoaderBuilder() {
     this(null);
   }
 
-  public SandboxClassLoaderBuilder(JarLocator loc) {
-    m_loc = (loc != null ? loc : new JarLocator(SandboxClassLoaderBuilder.class));
+  public SandboxClassLoaderBuilder(JarLocator jarLocator) {
+    m_jarLocator = (jarLocator != null ? jarLocator : new JarLocator(SandboxClassLoaderBuilder.class));
   }
 
   public SandboxClassLoaderBuilder addJar(URL url) {
-    m_urls.put(url.toExternalForm(), unwrapNestedJar(notNull(url)));
+    if (url == null) {
+      throw new IllegalArgumentException("Argument 'url' must not be null");
+    }
+    m_urls.put(url.toExternalForm(), unwrapNestedJar(url));
     return this;
   }
 
   public SandboxClassLoaderBuilder addLocalJar(String path) {
-    URL url = m_loc.getResource(path);
-    m_urls.put(url.toExternalForm(), unwrapNestedJar(notNull(url)));
+    URL url = m_jarLocator.getResource(path);
+    if (url == null) {
+      throw new IllegalStateException("Could not resolve URL for path '" + path + "'");
+    }
+    m_urls.put(url.toExternalForm(), unwrapNestedJar(url));
     return this;
   }
 
   public SandboxClassLoaderBuilder addJarContaining(Class<?> clazz) {
-    URL url = m_loc.getJarContaining(clazz);
-    m_urls.put(url.toExternalForm(), unwrapNestedJar(notNull(url)));
+    URL url = m_jarLocator.getJarContaining(clazz);
+    if (url == null) {
+      throw new IllegalStateException("Could not resolve URL for class " + (clazz == null ? "null" : clazz.getName()));
+    }
+    m_urls.put(url.toExternalForm(), unwrapNestedJar(url));
     return this;
   }
 
@@ -57,13 +69,6 @@ public final class SandboxClassLoaderBuilder {
         return new URLClassLoader(m_urls.values().toArray(new URL[0]), parent);
       }
     });
-  }
-
-  protected static URL notNull(URL url) {
-    if (url == null) {
-      throw new IllegalArgumentException("url is null");
-    }
-    return url;
   }
 
   protected static URL unwrapNestedJar(URL url) {
@@ -77,11 +82,9 @@ public final class SandboxClassLoaderBuilder {
         if (i >= 0) {
           name = name.substring(i + 1);
         }
-        File f = File.createTempFile("html-", name);
+        File f = File.createTempFile("jar-sandbox-", name);
         f.deleteOnExit();
-        try (
-            InputStream in = url.openStream();
-            FileOutputStream out = new FileOutputStream(f);) {
+        try (InputStream in = url.openStream(); FileOutputStream out = new FileOutputStream(f)) {
           byte[] buf = new byte[ANY_SIZE];
           int n;
           while ((n = in.read(buf)) > 0) {
@@ -93,7 +96,7 @@ public final class SandboxClassLoaderBuilder {
       return url;
     }
     catch (IOException e) {
-      throw new IllegalArgumentException("nexted url " + url + " can not be extracted to temp directory", e);
+      throw new IllegalArgumentException("JAR " + url + " could not be extracted to temp directory", e);
     }
   }
 }
