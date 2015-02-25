@@ -96,9 +96,6 @@
   & label::before {
     .checkboxLabelBefore(inherit, inherit, -18px);
   }
-  & label:hover::before {
-    .checkboxLabelBeforBorderHover;
-  }
   & input[type=checkbox] {
     visibility: hidden;
   }

@@ -84,10 +84,6 @@
 }
 
 /*Checkbox mixins*/
-.checkboxLabelBeforBorderHover {
-  border: 2px solid @hover-color;
-}
-
 .checkboxLabelBeforeFocus {
   border-color: @focus-color;
   outline: none;

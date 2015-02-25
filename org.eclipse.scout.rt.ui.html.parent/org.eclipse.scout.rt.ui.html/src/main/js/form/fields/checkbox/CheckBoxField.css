@@ -16,10 +16,6 @@
     .checkboxLabelBefore(0px, 0px, 0px, 10px, -2px);
   }
 
-  & label:hover::before {
-    .checkboxLabelBeforBorderHover;
-  }
-
   & input[type=checkbox] {
     /* no visiblity and display change to be focusable */
     position: absolute;
