@@ -188,6 +188,7 @@ public class MobileSmartTreeForm<LOOKUP_TYPE> extends ContentAssistTreeForm<LOOK
           return false;
         }
 
+        @SuppressWarnings("deprecation")
         @Override
         protected boolean getConfiguredValidateOnAnyKey() {
           return true;

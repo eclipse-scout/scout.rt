@@ -193,6 +193,7 @@ public class MobileSmartTableForm<LOOKUP_TYPE> extends ContentAssistTableForm<LO
           return false;
         }
 
+        @SuppressWarnings("deprecation")
         @Override
         protected boolean getConfiguredValidateOnAnyKey() {
           return true;
