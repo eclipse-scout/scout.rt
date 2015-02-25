@@ -8,34 +8,34 @@ scout.CachedLookupStrategy = function(smartField) {
 
 scout.CachedLookupStrategy.prototype = {
 
-    filterOptions: function(query) {
-      var match, numVisibleOptions = 0,
-        showAll = !query || '*' === query,
-        regexp = new RegExp(query, 'im'),
-        sf = this._smartField;
-      sf._get$Options().each(function() {
-        if (showAll) {
-          $(this).setVisible(true);
-        } else {
-          match = $(this).html().match(regexp);
-          if (match) {
-            numVisibleOptions++;
-          }
-          $.log.debug('regexp=' + regexp + ' html=' + $(this).html());
-          $(this).setVisible(match);
-        }
-      });
+  filterOptions: function(query) {
+    var match, numVisibleOptions = 0,
+      showAll = (!query || '*' === query),
+      regexp = new RegExp(query, 'im'), // i = ignore case, m = multiline
+      sf = this._smartField;
+    sf._get$Options().each(function() {
       if (showAll) {
-        numVisibleOptions = sf.options.length;
-      }
-
-      sf._resizePopup(numVisibleOptions);
-      if (sf.proposal && numVisibleOptions === 0) {
-        sf._setStatusText('Benutzerdefiniert');
+        $(this).setVisible(true);
       } else {
-        sf._setStatusText(numVisibleOptions);
+        match = $(this).html().match(regexp);
+        if (match) {
+          numVisibleOptions++;
+        }
+        $.log.debug('regexp=' + regexp + ' html=' + $(this).html());
+        $(this).setVisible(match);
       }
-    },
+    });
+    if (showAll) {
+      numVisibleOptions = sf.options.length;
+    }
+
+    sf._resizePopup(numVisibleOptions);
+    if (sf.proposal && numVisibleOptions === 0) {
+      sf._setStatusText('Benutzerdefiniert');
+    } else {
+      sf._setStatusText(numVisibleOptions);
+    }
+  },
 
   onOptionsLoaded: function(options) {
     // NOP
@@ -49,7 +49,6 @@ scout.CachedLookupStrategy.prototype = {
   }
 
 };
-
 
 /**
  * Remote lookup strategy.

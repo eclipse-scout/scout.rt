@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -49,6 +50,22 @@ public class JsonSmartField<K, V, T extends IContentAssistField<K, V>> extends J
   public JsonSmartField(T model, IJsonSession jsonSession, String id, IJsonAdapter<?> parent) {
     super(model, jsonSession, id, parent);
     m_proposal = model instanceof IProposalField;
+  }
+
+  protected final List<? extends ILookupRow<V>> getOptions() {
+    return m_options;
+  }
+
+  protected final void setOptions(List<? extends ILookupRow<V>> options) {
+    m_options = options;
+  }
+
+  protected final boolean isProposal() {
+    return m_proposal;
+  }
+
+  protected final void setProposal(boolean proposal) {
+    m_proposal = proposal;
   }
 
   @Override
@@ -122,7 +139,13 @@ public class JsonSmartField<K, V, T extends IContentAssistField<K, V>> extends J
 
   protected List<? extends ILookupRow<V>> loadOptions(final String query) {
     try {
-      m_options = getModel().callBrowseLookup(query, MAX_OPTIONS);
+      // FIXME BSH: This logic is already present in ContentAssistFieldDataFetcher.update() Can we use LookupFetcher? What about async fetching? What about hierarchy?
+      if (CompareUtility.isOneOf(query, IContentAssistField.BROWSE_ALL_TEXT, "")) {
+        m_options = getModel().callBrowseLookup(query, MAX_OPTIONS);
+      }
+      else {
+        m_options = getModel().callTextLookup(query, MAX_OPTIONS);
+      }
       return m_options;
     }
     catch (ProcessingException e) {
@@ -158,7 +181,7 @@ public class JsonSmartField<K, V, T extends IContentAssistField<K, V>> extends J
   }
 
   @SuppressWarnings("unchecked")
-  private void updateValue(String displayText) {
+  protected void updateValue(String displayText) {
     if (m_proposal) {
       // proposal field: key/value is _always_ string
       getModel().setValue((K) displayText);

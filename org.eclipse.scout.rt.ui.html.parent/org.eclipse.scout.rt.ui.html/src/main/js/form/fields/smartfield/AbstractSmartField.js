@@ -25,8 +25,8 @@ scout.AbstractSmartField.prototype._render = function($parent) {
   this.addField(scout.fields.new$TextField()
     .blur(this._onFieldBlur.bind(this))
     .click(this._onClick.bind(this))
-    .keyup(this._onKeyup.bind(this))
-    .keydown(this._onKeydown.bind(this)));
+    .keyup(this._onKeyUp.bind(this))
+    .keydown(this._onKeyDown.bind(this)));
   this.addMandatoryIndicator();
   this.addIcon();
   this.addStatus();
@@ -75,7 +75,7 @@ scout.AbstractSmartField.prototype._selectedOptionData = function() {
 };
 
 // navigate in options
-scout.AbstractSmartField.prototype._onKeydown = function(e) {
+scout.AbstractSmartField.prototype._onKeyDown = function(e) {
   if (e.which === scout.keys.TAB) {
     if (this._selectedOption > -1) {
       var value = this._selectedOptionData();
@@ -124,7 +124,7 @@ scout.AbstractSmartField.prototype._selectOption = function($options, pos) {
   scout.scrollbars.scrollTo(this._$optionsDiv, $selectedOption);
 };
 
-scout.AbstractSmartField.prototype._onKeyup = function(e) {
+scout.AbstractSmartField.prototype._onKeyUp = function(e) {
   // escape
   if (e.which === scout.keys.ESC) {
     this.$field.blur();
