@@ -44,7 +44,7 @@ scout.FormLayout.prototype._getMenuBarHeight = function($container) {
 
 scout.FormLayout.prototype._getTitleHeight = function($container) {
   var height = 0,
-    insets = scout.graphics.getInsets($container.children('.title-box'));
+    insets = scout.graphics.getInsets($container.children('.title-box'), {includeMargin: true});
   if (this._form.title) {
     height += scout.graphics.measureString(this._form.title, 'font-text-large').height;
   }
@@ -54,3 +54,4 @@ scout.FormLayout.prototype._getTitleHeight = function($container) {
   height += insets.top + insets.bottom;
   return height;
 };
+
