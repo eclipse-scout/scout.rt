@@ -14,6 +14,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.ui.html.ResourceBase;
 import org.junit.Test;
 
 public class JsonUtilityTest {
@@ -40,11 +41,11 @@ public class JsonUtilityTest {
     assertEquals("", JsonUtility.stripCommentsFromJson("/*\n{\n\r\n  \"location\": \"Baden // Switzerland\" // Person's location\r}\n"));
 
     // load complex json file without comments -> verify that stripping does not change anything
-    String json = IOUtility.getContentUtf8(JsonUtilityTest.class.getResourceAsStream("DefaultValuesFilterTest_defaults_simple.json"));
+    String json = IOUtility.getContentUtf8(ResourceBase.class.getResourceAsStream("json/DefaultValuesFilterTest_defaults_simple.json"));
     assertEquals(json, JsonUtility.stripCommentsFromJson(json));
 
     // another tes tfile
-    json = IOUtility.getContentUtf8(JsonUtilityTest.class.getResourceAsStream("DefaultValuesFilterTest_defaults_withComments.json"));
+    json = IOUtility.getContentUtf8(ResourceBase.class.getResourceAsStream("json/DefaultValuesFilterTest_defaults_withComments.json"));
     assertEquals("{\n  \"defaults\": {\n    \"FormField\": {\n      \"enabled\": true\n    }\n  }\n}\n", JsonUtility.stripCommentsFromJson(json));
   }
 }

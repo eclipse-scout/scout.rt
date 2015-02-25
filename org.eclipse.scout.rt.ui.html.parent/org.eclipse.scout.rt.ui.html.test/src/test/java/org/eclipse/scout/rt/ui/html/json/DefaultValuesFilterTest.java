@@ -13,6 +13,7 @@ package org.eclipse.scout.rt.ui.html.json;
 import static org.junit.Assert.assertEquals;
 
 import org.eclipse.scout.commons.IOUtility;
+import org.eclipse.scout.rt.ui.html.ResourceBase;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Test;
@@ -28,13 +29,13 @@ public class DefaultValuesFilterTest {
   @Test
   public void testDefaultValueFilter_simple() throws Exception {
     // Load defaults and build filter
-    JSONObject jsonDefaultValueConfiguration = new JSONObject(IOUtility.getContentUtf8(DefaultValuesFilterTest.class.getResourceAsStream("DefaultValuesFilterTest_defaults_simple.json")));
+    JSONObject jsonDefaultValueConfiguration = new JSONObject(IOUtility.getContentUtf8(ResourceBase.class.getResourceAsStream("json/DefaultValuesFilterTest_defaults_simple.json")));
     JSONObject jsonDefaults = new JSONObject(jsonDefaultValueConfiguration.optString("defaults"));
     JSONObject jsonObjectTypeHierarchy = new JSONObject(jsonDefaultValueConfiguration.optString("objectTypeHierarchy"));
     DefaultValuesFilter filter = new DefaultValuesFilter(jsonDefaults, jsonObjectTypeHierarchy);
 
     // Load test data and apply filter
-    JSONObject jsonToFilter = new JSONObject(IOUtility.getContentUtf8(DefaultValuesFilterTest.class.getResourceAsStream("DefaultValuesFilterTest_test_simple.json")));
+    JSONObject jsonToFilter = new JSONObject(IOUtility.getContentUtf8(ResourceBase.class.getResourceAsStream("json/DefaultValuesFilterTest_test_simple.json")));
     JSONArray adapterData = jsonToFilter.getJSONArray("adapterData");
     for (int i = 0; i < adapterData.length(); i++) {
       filter.filter(adapterData.getJSONObject(i));
@@ -78,7 +79,7 @@ public class DefaultValuesFilterTest {
   @Test(expected = IllegalStateException.class)
   public void testDefaultValueFilter_illegalHierarchy() throws Exception {
     // Load defaults and build filter
-    JSONObject jsonDefaultValueConfiguration = new JSONObject(IOUtility.getContentUtf8(DefaultValuesFilterTest.class.getResourceAsStream("DefaultValuesFilterTest_defaults_illegalHierarchy.json")));
+    JSONObject jsonDefaultValueConfiguration = new JSONObject(IOUtility.getContentUtf8(ResourceBase.class.getResourceAsStream("json/DefaultValuesFilterTest_defaults_illegalHierarchy.json")));
     JSONObject jsonDefaults = new JSONObject(jsonDefaultValueConfiguration.optString("defaults"));
     JSONObject jsonObjectTypeHierarchy = new JSONObject(jsonDefaultValueConfiguration.optString("objectTypeHierarchy"));
     new DefaultValuesFilter(jsonDefaults, jsonObjectTypeHierarchy);
@@ -87,7 +88,7 @@ public class DefaultValuesFilterTest {
   @Test(expected = IllegalStateException.class)
   public void testDefaultValueFilter_loopHierarchy() throws Exception {
     // Load defaults and build filter
-    JSONObject jsonDefaultValueConfiguration = new JSONObject(IOUtility.getContentUtf8(DefaultValuesFilterTest.class.getResourceAsStream("DefaultValuesFilterTest_defaults_loopHierarchy.json")));
+    JSONObject jsonDefaultValueConfiguration = new JSONObject(IOUtility.getContentUtf8(ResourceBase.class.getResourceAsStream("json/DefaultValuesFilterTest_defaults_loopHierarchy.json")));
     JSONObject jsonDefaults = new JSONObject(jsonDefaultValueConfiguration.optString("defaults"));
     JSONObject jsonObjectTypeHierarchy = new JSONObject(jsonDefaultValueConfiguration.optString("objectTypeHierarchy"));
     new DefaultValuesFilter(jsonDefaults, jsonObjectTypeHierarchy);
