@@ -10,7 +10,10 @@
 // ******************************************************************************/
 package org.eclipse.scout.rt.server.services;
 
-//TODO: delete this class
+/**
+ * This class exist to have no compile errors/warnings in the plugin.xml files. Legacy support.
+ * TODO can be deleted when service registrations over Plugin.xml is not longer supported.
+ */
 public class ServerServiceFactory {
 
 }
