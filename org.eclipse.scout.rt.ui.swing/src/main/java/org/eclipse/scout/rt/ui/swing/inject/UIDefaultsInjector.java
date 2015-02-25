@@ -38,7 +38,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.shared.AbstractIcons;
-import org.eclipse.scout.rt.ui.swing.Activator;
+import org.eclipse.scout.rt.ui.swing.SwingIconLocator;
 import org.eclipse.scout.rt.ui.swing.SwingIcons;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.splash.SplashWindow;
@@ -99,17 +99,17 @@ public class UIDefaultsInjector {
     putIfUndefined(defaults, "Tree.openIcon", createIconUIResource(AbstractIcons.TreeNodeOpen));
     putIfUndefined(defaults, "Tree.rowHeight", 24);
     putIfUndefined(defaults, "TreeBox.rowHeight", 20);
-    Icon icon = Activator.getIcon(SwingIcons.Window);
+    Icon icon = SwingIconLocator.INSTANCE.getIcon(SwingIcons.Window);
     if (icon != null) { // legacy
       putIfUndefined(defaults, "Window.icon", icon);// must be an ImageIcon, not an IconUIResource
     }
     else {
       // multiple icons for newer versions of Java
       List<Image> icons = new ArrayList<Image>();
-      icons.add(Activator.getImage(SwingIcons.Window16));
-      icons.add(Activator.getImage(SwingIcons.Window32));
-      icons.add(Activator.getImage(SwingIcons.Window48));
-      icons.add(Activator.getImage(SwingIcons.Window256));
+      icons.add(SwingIconLocator.INSTANCE.getImage(SwingIcons.Window16));
+      icons.add(SwingIconLocator.INSTANCE.getImage(SwingIcons.Window32));
+      icons.add(SwingIconLocator.INSTANCE.getImage(SwingIcons.Window48));
+      icons.add(SwingIconLocator.INSTANCE.getImage(SwingIcons.Window256));
       putIfUndefined(defaults, "Window.icons", icons);
     }
 
@@ -164,7 +164,7 @@ public class UIDefaultsInjector {
   }
 
   protected IconUIResource createIconUIResource(String resourceSimpleName) {
-    Icon icon = Activator.getIcon(resourceSimpleName);
+    Icon icon = SwingIconLocator.INSTANCE.getIcon(resourceSimpleName);
     if (icon != null) {
       return new IconUIResource(icon);
     }

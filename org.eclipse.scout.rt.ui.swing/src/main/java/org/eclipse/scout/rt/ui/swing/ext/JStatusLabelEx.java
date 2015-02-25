@@ -25,8 +25,8 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.status.IStatus;
 import org.eclipse.scout.rt.client.IFieldStatus;
 import org.eclipse.scout.rt.client.ui.form.fields.ScoutFieldStatus;
-import org.eclipse.scout.rt.ui.swing.Activator;
 import org.eclipse.scout.rt.ui.swing.LogicalGridData;
+import org.eclipse.scout.rt.ui.swing.SwingIconLocator;
 import org.eclipse.scout.rt.ui.swing.SwingIcons;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 
@@ -64,8 +64,8 @@ public class JStatusLabelEx extends JComponent {
 
   public JStatusLabelEx() {
     setLayout(new BorderLayoutEx(0, 0));
-    m_mandatoryIconEnabled = Activator.getIcon(SwingIcons.Mandantory);
-    m_mandatoryIconDisabled = Activator.getIcon(SwingIcons.MandantoryDisabled);
+    m_mandatoryIconEnabled = SwingIconLocator.INSTANCE.getIcon(SwingIcons.Mandantory);
+    m_mandatoryIconDisabled = SwingIconLocator.INSTANCE.getIcon(SwingIcons.MandantoryDisabled);
 
     createPanels();
 
@@ -204,7 +204,7 @@ public class JStatusLabelEx extends JComponent {
     }
     else {
       // icon
-      m_statusLabel.setIcon(Activator.getIcon(getIconId()));
+      m_statusLabel.setIcon(SwingIconLocator.INSTANCE.getIcon(getIconId()));
       // tooltip
       m_statusLabel.setToolTipText(m_status.getMessage());
       // visibility

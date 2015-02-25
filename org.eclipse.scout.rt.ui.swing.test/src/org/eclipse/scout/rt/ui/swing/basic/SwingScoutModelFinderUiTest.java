@@ -70,6 +70,7 @@ import org.eclipse.scout.rt.ui.swing.basic.SwingScoutModelFinderUiTest.AllFields
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutModelFinderUiTest.AllFieldsTestForm.MainBox.StringField2;
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutModelFinderUiTest.AllFieldsTestForm.MainBox.TreeBoxField;
 import org.eclipse.scout.rt.ui.swing.form.fields.ISwingScoutFormField;
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -82,7 +83,7 @@ public class SwingScoutModelFinderUiTest {
   @Test
   public void test() throws InterruptedException, InvocationTargetException {
     final IClientSession clientSession = EasyMock.createNiceMock(IClientSession.class);
-    clientSession.getIconLocator();
+    Assert.assertNotNull(IIconLocator.INSTANCE);
     EasyMock.expectLastCall().andReturn(NULL_ICON_LOCATOR).anyTimes();
     EasyMock.replay(clientSession);
 

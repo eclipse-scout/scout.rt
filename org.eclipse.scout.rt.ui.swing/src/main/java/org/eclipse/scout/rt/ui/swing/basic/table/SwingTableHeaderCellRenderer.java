@@ -26,7 +26,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.IHeaderCell;
 import org.eclipse.scout.rt.client.ui.basic.table.ITable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.customizer.ICustomColumn;
-import org.eclipse.scout.rt.ui.swing.Activator;
+import org.eclipse.scout.rt.ui.swing.SwingIconLocator;
 import org.eclipse.scout.rt.ui.swing.SwingIcons;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.basic.ColorUtility;
@@ -42,8 +42,8 @@ public class SwingTableHeaderCellRenderer implements TableCellRenderer {
     super();
     m_internalRenderer = internalRenderer;
     m_swingScoutTable = t;
-    m_filterActiveIcon = Activator.getIcon(SwingIcons.TableColumnFilterActive);
-    m_customColumnIcon = Activator.getIcon(SwingIcons.TableCustomColumn);
+    m_filterActiveIcon = SwingIconLocator.INSTANCE.getIcon(SwingIcons.TableColumnFilterActive);
+    m_customColumnIcon = SwingIconLocator.INSTANCE.getIcon(SwingIcons.TableCustomColumn);
   }
 
   @Override

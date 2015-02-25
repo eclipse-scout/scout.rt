@@ -17,15 +17,16 @@ import java.util.Collection;
 
 import org.eclipse.core.runtime.IProduct;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
 import org.eclipse.scout.rt.client.services.common.perf.IPerformanceAnalyzerService;
+import org.eclipse.scout.rt.client.ui.IIconLocator;
 import org.eclipse.scout.rt.client.ui.form.ScoutInfoForm.MainBox.CloseButton;
 import org.eclipse.scout.rt.client.ui.form.ScoutInfoForm.MainBox.GroupBox.HtmlField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCloseButton;
@@ -157,8 +158,7 @@ public class ScoutInfoForm extends AbstractForm {
     if (f != null && !f.hasContent()) {
       // try to load bundle resource
       try {
-        IClientSession clientSession = ClientSyncJob.getCurrentSession();
-        IconSpec iconSpec = clientSession.getIconLocator().getIconSpec(AbstractIcons.ApplicationLogo);
+        IconSpec iconSpec = IIconLocator.INSTANCE.getIconSpec(AbstractIcons.ApplicationLogo);
         ByteArrayInputStream is = new ByteArrayInputStream(iconSpec.getContent());
         f.readData(is);
         is.close();
@@ -217,8 +217,8 @@ public class ScoutInfoForm extends AbstractForm {
     long memMax = Runtime.getRuntime().maxMemory() / 1024 / 1024;
     //
     buf.append("<tr><td>" + ScoutTexts.get("Username") + ":</td><td>&nbsp;</td><td>" + session.getUserId() + "</td></tr>");
-    buf.append("<tr><td>" + ScoutTexts.get("Language") + ":</td><td>&nbsp;</td><td>" + LocaleThreadLocal.get().getDisplayLanguage() + "</td></tr>");
-    buf.append("<tr><td>" + ScoutTexts.get("FormattingLocale") + ":</td><td>&nbsp;</td><td>" + LocaleThreadLocal.get() + "</td></tr>");
+    buf.append("<tr><td>" + ScoutTexts.get("Language") + ":</td><td>&nbsp;</td><td>" + NlsLocale.get().getDisplayLanguage() + "</td></tr>");
+    buf.append("<tr><td>" + ScoutTexts.get("FormattingLocale") + ":</td><td>&nbsp;</td><td>" + NlsLocale.get() + "</td></tr>");
 
     /**
      * These information must only be presented in the case of an richclient. If the client is a webclient (ui.rap) then

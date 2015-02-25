@@ -50,8 +50,6 @@ import org.eclipse.scout.rt.client.services.common.clientnotification.IClientNot
 import org.eclipse.scout.rt.client.servicetunnel.http.IClientServiceTunnel;
 import org.eclipse.scout.rt.client.ui.ClientUIPreferences;
 import org.eclipse.scout.rt.client.ui.DataChangeListener;
-import org.eclipse.scout.rt.client.ui.IIconLocator;
-import org.eclipse.scout.rt.client.ui.IconLocator;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopListener;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.internal.VirtualDesktop;
@@ -91,7 +89,6 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
   private boolean m_singleThreadSession;
   private String m_virtualSessionId;
   private IMemoryPolicy m_memoryPolicy;
-  private IIconLocator m_iconLocator;
   private final Map<String, Object> m_clientSessionData;
   private ScoutTexts m_scoutTexts;
   private Locale m_locale;
@@ -305,7 +302,6 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
       else if ("medium".equals(policy)) {
         setMemoryPolicy(new MediumMemoryPolicy());
       }
-      m_iconLocator = createIconLocator();
       m_scoutTexts = new ScoutTexts();
       // explicitly set the just created instance to the ThreadLocal because it was not available yet, when the job was started.
       ScoutTexts.CURRENT.set(m_scoutTexts); // TODO [dwi][nosgi]: to be set in ClientSessionRegistryService before startup
@@ -614,15 +610,6 @@ public abstract class AbstractClientSession implements IClientSession, IExtensib
   @Override
   public void setSubject(Subject subject) {
     m_subject = subject;
-  }
-
-  protected IIconLocator createIconLocator() {
-    return new IconLocator();
-  }
-
-  @Override
-  public IIconLocator getIconLocator() {
-    return m_iconLocator;
   }
 
   @Override

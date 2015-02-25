@@ -15,8 +15,8 @@ import java.util.Map;
 
 import javax.swing.Icon;
 
-import org.eclipse.scout.rt.ui.swing.Activator;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
+import org.eclipse.scout.rt.ui.swing.SwingIconLocator;
 
 /**
  * Convenience for managing a set of decoration icons using an icon id
@@ -39,20 +39,20 @@ public class IconGroup {
     if (iconId == null) {
       return;
     }
-    Icon normal = Activator.getIcon(iconId);
-    Icon rollover = Activator.getIcon(iconId + "_mouse_over");
+    Icon normal = SwingIconLocator.INSTANCE.getIcon(iconId);
+    Icon rollover = SwingIconLocator.INSTANCE.getIcon(iconId + "_mouse_over");
     if (rollover == null) {
-      rollover = Activator.getIcon(iconId + "_rollover");
+      rollover = SwingIconLocator.INSTANCE.getIcon(iconId + "_rollover");
     }
 
-    Icon selected = Activator.getIcon(iconId + "_active");
+    Icon selected = SwingIconLocator.INSTANCE.getIcon(iconId + "_active");
     if (selected == null) {
-      selected = Activator.getIcon(iconId + "_pressed");
+      selected = SwingIconLocator.INSTANCE.getIcon(iconId + "_pressed");
       if (selected == null) {
-        selected = Activator.getIcon(iconId + "_selected");
+        selected = SwingIconLocator.INSTANCE.getIcon(iconId + "_selected");
       }
     }
-    Icon disabled = Activator.getIcon(iconId + "_disabled");
+    Icon disabled = SwingIconLocator.INSTANCE.getIcon(iconId + "_disabled");
 
     iconMap.put(IconState.NORMAL, normal);
     if (rollover != null) {

@@ -38,7 +38,7 @@ import org.eclipse.scout.rt.client.IFieldStatus;
 import org.eclipse.scout.rt.client.services.common.perf.IPerformanceAnalyzerService;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.form.fields.ScoutFieldStatus;
-import org.eclipse.scout.rt.ui.swing.Activator;
+import org.eclipse.scout.rt.ui.swing.SwingIconLocator;
 import org.eclipse.scout.rt.ui.swing.SwingIcons;
 import org.eclipse.scout.rt.ui.swing.SwingUtility;
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutComposite;
@@ -80,9 +80,9 @@ public class SwingScoutStatusBar extends SwingScoutComposite<IDesktop> {
   @Override
   protected void initializeSwing() {
     super.initializeSwing();
-    m_iconNetworkLatencyGreen = Activator.getIcon(SwingIcons.NetworkLatencyGreen);
-    m_iconNetworkLatencyYellow = Activator.getIcon(SwingIcons.NetworkLatencyYellow);
-    m_iconNetworkLatencyRed = Activator.getIcon(SwingIcons.NetworkLatencyRed);
+    m_iconNetworkLatencyGreen = SwingIconLocator.INSTANCE.getIcon(SwingIcons.NetworkLatencyGreen);
+    m_iconNetworkLatencyYellow = SwingIconLocator.INSTANCE.getIcon(SwingIcons.NetworkLatencyYellow);
+    m_iconNetworkLatencyRed = SwingIconLocator.INSTANCE.getIcon(SwingIcons.NetworkLatencyRed);
     //
     Icon icon = UIManager.getIcon("StatusBar.StopButton.icon");
     // create button and add notifiers for starting progress listeners

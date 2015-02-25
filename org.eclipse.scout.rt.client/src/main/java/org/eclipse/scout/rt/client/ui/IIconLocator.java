@@ -10,7 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.client.ui;
 
+import java.util.List;
+
+import org.eclipse.scout.rt.client.services.common.icon.IIconProviderService;
 import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
+import org.eclipse.scout.rt.shared.AbstractIcons;
+import org.eclipse.scout.service.SERVICES;
 
 public interface IIconLocator {
 
@@ -22,4 +27,28 @@ public interface IIconLocator {
    * @return the icon specification to the icon or null if not found.
    */
   IconSpec getIconSpec(String name);
+
+  /**
+   * This is the main IconLocator that collects all {@link IIconProviderService}
+   */
+  IIconLocator INSTANCE = new IIconLocator() {
+
+    @Override
+    public IconSpec getIconSpec(String name) {
+      if (name == null || AbstractIcons.Null.equals(name)) {
+        return null;
+      }
+
+      List<IIconProviderService> iconProviderServices = SERVICES.getServices(IIconProviderService.class);
+      IconSpec spec = null;
+      for (IIconProviderService service : iconProviderServices) {
+        spec = service.getIconSpec(name);
+        if (spec != null) {
+          break;
+        }
+      }
+      return spec;
+    }
+  };
+
 }

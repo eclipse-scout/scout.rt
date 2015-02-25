@@ -26,7 +26,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
-import org.eclipse.scout.rt.ui.swing.Activator;
+import org.eclipse.scout.rt.ui.swing.SwingIconLocator;
 import org.eclipse.scout.rt.ui.swing.SwingIcons;
 import org.eclipse.scout.rt.ui.swing.action.SwingScoutAction;
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutComposite;
@@ -59,9 +59,9 @@ public class SwingScoutTray extends SwingScoutComposite<IDesktop> implements ISw
   }
 
   protected TrayIcon createTrayIcon() {
-    Image icon = Activator.getImage(SwingIcons.Window); // legacy
+    Image icon = SwingIconLocator.INSTANCE.getImage(SwingIcons.Window); // legacy
     if (icon == null) {
-      icon = Activator.getImage(SwingIcons.Tray); // different from window icon (should be a GIF for Win XP)
+      icon = SwingIconLocator.INSTANCE.getImage(SwingIcons.Tray); // different from window icon (should be a GIF for Win XP)
     }
     if (icon == null) {
       return null;

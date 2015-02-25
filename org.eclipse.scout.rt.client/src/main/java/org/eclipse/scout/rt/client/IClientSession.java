@@ -17,7 +17,6 @@ import javax.security.auth.Subject;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.job.IModelJobManager;
 import org.eclipse.scout.rt.client.servicetunnel.http.IClientServiceTunnel;
-import org.eclipse.scout.rt.client.ui.IIconLocator;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.shared.ISession;
 import org.osgi.framework.Bundle;
@@ -114,11 +113,6 @@ public interface IClientSession extends ISession {
   Subject getOfflineSubject();
 
   void goOffline() throws ProcessingException;
-
-  /**
-   * @return
-   */
-  IIconLocator getIconLocator();
 
   void addLocaleListener(ILocaleListener listener);
 

@@ -15,7 +15,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.rt.client.busy.BusyJob;
 import org.eclipse.scout.rt.client.busy.IBusyHandler;
-import org.eclipse.scout.rt.ui.swing.Activator;
 
 /**
  * Swing default shows the status bar using {@link IWorkbenchWindow#run(boolean, boolean, IRunnableWithProgress)} when
@@ -27,7 +26,7 @@ import org.eclipse.scout.rt.ui.swing.Activator;
  * To enable/disable the manager just call {@link SwingBusyJob#install()}.
  * <p>
  * The handler is by default active on {@link Activator}.
- * 
+ *
  * @author imo
  * @since 3.8
  */

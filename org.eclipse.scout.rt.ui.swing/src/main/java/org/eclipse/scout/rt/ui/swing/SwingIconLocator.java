@@ -39,13 +39,12 @@ public class SwingIconLocator {
 
   public static final Pattern IMAGE_WITH_STATE_PATTERN = Pattern.compile("(.*)(_active|_disabled|_mouse|_mouse_over|_open|_over|_pressed|_rollover|_selected)", Pattern.CASE_INSENSITIVE);
 
+  public static final SwingIconLocator INSTANCE = new SwingIconLocator();
+
   private final Object m_cacheLock = new Object();
   private final HashMap<String, Image> m_imagesByNameCache = new HashMap<String, Image>();
 
-  private final IIconLocator m_iconLocator;
-
-  public SwingIconLocator(IIconLocator iconLocator) {
-    m_iconLocator = iconLocator;
+  private SwingIconLocator() {
   }
 
   /**
@@ -89,7 +88,7 @@ public class SwingIconLocator {
   }
 
   private Image createImageImpl(String name) {
-    IconSpec iconSpec = m_iconLocator.getIconSpec(name);
+    IconSpec iconSpec = IIconLocator.INSTANCE.getIconSpec(name);
     if (iconSpec != null) {
       Image img = Toolkit.getDefaultToolkit().createImage(iconSpec.getContent());
       if (img != null) {

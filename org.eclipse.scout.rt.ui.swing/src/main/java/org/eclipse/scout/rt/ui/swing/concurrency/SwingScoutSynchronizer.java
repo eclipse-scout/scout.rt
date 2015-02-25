@@ -21,7 +21,6 @@ import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
-import org.eclipse.scout.rt.ui.swing.Activator;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
 
 public class SwingScoutSynchronizer {
@@ -95,7 +94,7 @@ public class SwingScoutSynchronizer {
   /**
    * Executes the given {@link Runnable} and waits until it has finished.<br>
    * If the waiting thread is interrupted, this method returns before the {@link Runnable} has finished!
-   * 
+   *
    * @param r
    *          The {@link Runnable} to execute.
    * @param timeout
@@ -112,12 +111,12 @@ public class SwingScoutSynchronizer {
         catch (InterruptedException e) {
           String msg = "Interrupted while waiting for swing runnable.";
           LOG.error(msg, e);
-          return new Status(IStatus.ERROR, Activator.PLUGIN_ID, 0, msg, e);
+          return new Status(IStatus.ERROR, "org.eclipse.scout.rt.ui.swing", 0, msg, e);
         }
         catch (InvocationTargetException e) {
           String msg = "Error executing swing runnable.";
           LOG.error(msg, e);
-          return new Status(IStatus.ERROR, Activator.PLUGIN_ID, 0, msg, e);
+          return new Status(IStatus.ERROR, "org.eclipse.scout.rt.ui.swing", 0, msg, e);
         }
       }
     };

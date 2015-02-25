@@ -18,7 +18,7 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
 import org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn;
-import org.eclipse.scout.rt.ui.swing.Activator;
+import org.eclipse.scout.rt.ui.swing.SwingIconLocator;
 import org.eclipse.scout.rt.ui.swing.SwingIcons;
 
 /**
@@ -27,15 +27,15 @@ import org.eclipse.scout.rt.ui.swing.SwingIcons;
 public class SortIconUtility {
 
   private static final float BRIGHTEN_FACTOR = 1.6f;
-  private static final Icon m_sortUpIcon = Activator.getIcon(SwingIcons.TableSortAsc);
-  private static final Icon m_sortDownIcon = Activator.getIcon(SwingIcons.TableSortDesc);
+  private static final Icon m_sortUpIcon = SwingIconLocator.INSTANCE.getIcon(SwingIcons.TableSortAsc);
+  private static final Icon m_sortDownIcon = SwingIconLocator.INSTANCE.getIcon(SwingIcons.TableSortDesc);
 
   private SortIconUtility() {
   }
 
   /**
    * Brightens icons of type {@link ImageIcon} by a factor
-   * 
+   *
    * @param icon
    *          the ImageIcon to brighten
    * @param factor
@@ -62,7 +62,7 @@ public class SortIconUtility {
 
   /**
    * Create a sort icon with gray scales according sort order
-   * 
+   *
    * @param column
    *          the column the icon is intended for
    * @param sortColumns

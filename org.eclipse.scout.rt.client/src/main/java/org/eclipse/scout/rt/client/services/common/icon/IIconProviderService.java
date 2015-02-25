@@ -13,6 +13,9 @@ package org.eclipse.scout.rt.client.services.common.icon;
 import org.eclipse.scout.rt.client.ui.IIconLocator;
 import org.eclipse.scout.service.IService;
 
+/**
+ * see {@link IIconLocator#INSTANCE}
+ */
 public interface IIconProviderService extends IService, IIconLocator {
 
 }

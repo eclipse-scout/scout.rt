@@ -129,7 +129,6 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
   private boolean m_initialized;
   private IClientSession m_scoutSession;
   private SwingScoutSynchronizer m_synchronizer;
-  private SwingIconLocator m_iconLocator;
   private ISwingScoutTray m_trayComposite;
   private Frame m_rootFrame;
   private FormFieldFactory m_formFieldFactory;
@@ -180,20 +179,20 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
 
   @Override
   public Icon getIcon(String name) {
-    Icon icon = m_iconLocator.getIcon(name);
+    Icon icon = SwingIconLocator.INSTANCE.getIcon(name);
     // No application icon could be found. Look for a respective Scout icon.
     if (icon == null) {
-      icon = Activator.getIcon(name);
+      icon = SwingIconLocator.INSTANCE.getIcon(name);
     }
     return icon;
   }
 
   @Override
   public Image getImage(String name) {
-    Image image = m_iconLocator.getImage(name);
+    Image image = SwingIconLocator.INSTANCE.getImage(name);
     // No application image could be found. Look for a respective Scout image.
     if (image == null) {
-      image = Activator.getImage(name);
+      image = SwingIconLocator.INSTANCE.getImage(name);
     }
     return image;
   }
@@ -221,7 +220,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
    */
   protected void setWindowIcon(Window window) {
     // legacy
-    Image legacyIcon = Activator.getImage(SwingIcons.Window);
+    Image legacyIcon = SwingIconLocator.INSTANCE.getImage(SwingIcons.Window);
     if (legacyIcon != null) {
       window.setIconImage(legacyIcon);
     }
@@ -229,7 +228,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
       ArrayList<Image> icons = new ArrayList<Image>();
       for (String name : new String[]{SwingIcons.Window16, SwingIcons.Window32, SwingIcons.Window48, SwingIcons.Window256}) {
         if (name != null) {
-          Image img = Activator.getImage(name);
+          Image img = SwingIconLocator.INSTANCE.getImage(name);
           if (img != null) {
             icons.add(img);
           }
@@ -328,7 +327,6 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
       m_scoutSession.stopSession();
       return;
     }
-    m_iconLocator = createIconLocator();
     try {
       if (!execBeforeDesktop(session)) {
         System.exit(0);
@@ -553,13 +551,6 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
   @Override
   public void invokeSwingAndWait(Runnable r, long timeout) {
     m_synchronizer.invokeSwingAndWait(r, timeout);
-  }
-
-  /*
-   * Factory
-   */
-  protected SwingIconLocator createIconLocator() {
-    return new SwingIconLocator(getScoutSession().getIconLocator());
   }
 
   @Override
@@ -1126,7 +1117,7 @@ public abstract class AbstractSwingEnvironment implements ISwingEnvironment {
   @Override
   public JComponent createLogo() {
     JLabel logo = new JLabel();
-    logo.setIcon(Activator.getIcon(SwingIcons.Logo));
+    logo.setIcon(SwingIconLocator.INSTANCE.getIcon(SwingIcons.Logo));
     return logo;
   }
 

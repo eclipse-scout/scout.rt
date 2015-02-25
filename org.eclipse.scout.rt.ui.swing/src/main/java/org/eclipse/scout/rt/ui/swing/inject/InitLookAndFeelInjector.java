@@ -20,8 +20,8 @@ import javax.swing.plaf.synth.SynthLookAndFeel;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.ui.swing.Activator;
 import org.eclipse.scout.rt.ui.swing.ILookAndFeelProvider;
+import org.osgi.framework.FrameworkUtil;
 
 /**
  *
@@ -61,7 +61,7 @@ public class InitLookAndFeelInjector {
       Matcher m = Pattern.compile("(.*\\.)?([^.]+\\.xml)").matcher(synthStyleProperty);
       if (m.matches()) {
         resourceName = "/" + m.group(1).replace('.', '/') + m.group(2);
-        url = Activator.getDefault().getBundle().getResource(resourceName);
+        url = FrameworkUtil.getBundle(getClass()).getResource(resourceName);
       }
       if (url == null) {
         throw new IllegalArgumentException("config.ini: javax.swing.plaf.synth.style=" + synthLaf + ": resource " + resourceName + " could not be found");
@@ -80,7 +80,7 @@ public class InitLookAndFeelInjector {
    */
   protected void initScoutLAF(String scoutLaf) {
     try {
-      Class<?> lafClass = Activator.getDefault().getBundle().loadClass(scoutLaf);
+      Class<?> lafClass = FrameworkUtil.getBundle(getClass()).loadClass(scoutLaf);
       Object o = lafClass.newInstance();
       if (!(o instanceof ILookAndFeelProvider)) {
         throw new IllegalArgumentException("class provided for scout.laf=" + scoutLaf + " is not an instance of ILookAndFeelProvider");
