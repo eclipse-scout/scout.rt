@@ -38,6 +38,12 @@ public interface IBeanContext {
    */
   void unregisterBean(IBean<?> bean);
 
+  <T> IBean<T> getBean(Class<T> beanClazz);
+
+  <T> List<IBean<T>> getBeans(Class<T> beanClazz);
+
+  List<IBean<?>> getAllRegisteredBeans();
+
   /**
    * @param beanClazz
    * @return
