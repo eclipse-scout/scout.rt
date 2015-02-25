@@ -36,7 +36,7 @@ describe("AbstractSmartField", function() {
 
   });
 
-  describe("_onKeyup", function() {
+  describe("_onKeyUp", function() {
 
     it("doesn't call _openPopup() when TAB has been pressed", function() {
       smartField._openPopup = function() {};
@@ -44,7 +44,7 @@ describe("AbstractSmartField", function() {
         which: scout.keys.TAB
       };
       spyOn(smartField, '_openPopup');
-      smartField._onKeyup(event);
+      smartField._onKeyUp(event);
       expect(smartField._openPopup).not.toHaveBeenCalled();
     });
 
@@ -54,7 +54,7 @@ describe("AbstractSmartField", function() {
         which: scout.keys.A
       };
       spyOn(smartField, '_openPopup').and.callThrough();
-      smartField._onKeyup(event);
+      smartField._onKeyUp(event);
       expect(smartField._openPopup).toHaveBeenCalled();
     });
 
