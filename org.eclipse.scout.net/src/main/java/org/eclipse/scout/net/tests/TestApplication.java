@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -14,7 +14,7 @@ import java.net.URL;
 
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
-import org.eclipse.scout.net.NetActivator;
+import org.eclipse.scout.net.NetModule;
 
 public class TestApplication implements IApplication {
 
@@ -22,7 +22,7 @@ public class TestApplication implements IApplication {
   public Object start(IApplicationContext context) throws Exception {
     System.out.println("Hello RCP World!");
 
-    NetActivator.install();
+    new NetModule().start();
 
     URL url = new URL("http://www.google.ch");
     for (int i = 0; i < 10; i++) {

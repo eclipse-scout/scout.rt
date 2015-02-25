@@ -15,12 +15,14 @@ import java.lang.reflect.Method;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 
-import org.eclipse.core.runtime.Status;
-import org.eclipse.scout.net.NetActivator;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 
 public class InternalEclipseAuthenticator extends Authenticator {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(InternalEclipseAuthenticator.class);
 
   public InternalEclipseAuthenticator() {
   }
@@ -31,7 +33,7 @@ public class InternalEclipseAuthenticator extends Authenticator {
     Authenticator auth = new EclipseAuthenticatorLocator().locate();
     if (auth == null) {
       // use osgi service
-      BundleContext context = NetActivator.getDefault().getBundle().getBundleContext();
+      BundleContext context = Platform.getBundle("org.eclipse.scout.net").getBundleContext();
       ServiceReference ref = context.getServiceReference(Authenticator.class.getName());
       if (ref != null) {
         auth = (Authenticator) context.getService(ref);
@@ -43,19 +45,19 @@ public class InternalEclipseAuthenticator extends Authenticator {
         result = reflectPasswordAuthentication(auth);
       }
       catch (Throwable ex) {
-        NetActivator.getDefault().getLog().log(new Status(Status.ERROR, NetActivator.PLUGIN_ID, getRequestingURL() + " " + getRequestorType(), ex));
+        LOG.error(getRequestingURL() + " " + getRequestorType(), ex);
         throw new SecurityException(ex);
       }
     }
     if (result != null) {
-      if (NetActivator.DEBUG) {
-        NetActivator.getDefault().getLog().log(new Status(Status.INFO, NetActivator.PLUGIN_ID, "net.auth SUCCESS " + getRequestingURL() + " " + getRequestorType() + " " + result.getUserName()));
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("net.auth SUCCESS " + getRequestingURL() + " " + getRequestorType() + " " + result.getUserName());
       }
       return result;
     }
     else {
-      if (NetActivator.DEBUG) {
-        NetActivator.getDefault().getLog().log(new Status(Status.INFO, NetActivator.PLUGIN_ID, "net.auth NONE " + getRequestingURL() + " " + getRequestorType()));
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("net.auth NONE " + getRequestingURL() + " " + getRequestorType());
       }
       return null;
     }

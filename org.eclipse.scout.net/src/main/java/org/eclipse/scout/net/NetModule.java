@@ -16,8 +16,8 @@ import java.net.CookieManager;
 import java.net.CookiePolicy;
 import java.net.ProxySelector;
 
-import org.eclipse.core.runtime.Plugin;
-import org.osgi.framework.BundleContext;
+import org.eclipse.scout.commons.ConfigIniUtility;
+import org.eclipse.scout.rt.platform.IModule;
 
 /**
  * Extension to the org.eclipse.core.net to support JAAS based net
@@ -38,42 +38,22 @@ import org.osgi.framework.BundleContext;
  * <p/>
  * Use org.eclipse.scout.net.proxy.autodetect=false to disable proxy detection
  */
-public final class NetActivator extends Plugin {
-  public static final String PLUGIN_ID = "org.eclipse.scout.net";
+public final class NetModule implements IModule {
   public static boolean DEBUG;
   public static boolean PROXY_AUTODETECTION;
-
-  private static NetActivator plugin;
-
-  public static NetActivator getDefault() {
-    return plugin;
-  }
-
-  /**
-   * alias for {@link #getDefault()}, simply instantiates the plugin Installs {@link EclipseAuthenticator} inside
-   * {@link Authenticator} and {@link EclipseProxySelector} inside {@link ProxySelector}
-   */
-  public static void install() {
-    getDefault();
-  }
 
   private CookieHandler m_oldCookieHandler;
   private CookieHandler m_newCookieHandler;
   private ProxySelector m_oldProxySelector;
   private ProxySelector m_newProxySelector;
 
-  public NetActivator() {
-  }
-
   @SuppressWarnings("deprecation")
   @Override
-  public void start(BundleContext context) throws Exception {
-    super.start(context);
-    plugin = this;
-    String debugText = context.getProperty(PLUGIN_ID + ".debug");
+  public void start() {
+    String debugText = ConfigIniUtility.getProperty("org.eclipse.scout.net" + ".debug");
     DEBUG = (debugText != null && debugText.equalsIgnoreCase("true"));
 
-    String proxyDetectionText = context.getProperty(PLUGIN_ID + ".proxy.autodetect");
+    String proxyDetectionText = ConfigIniUtility.getProperty("org.eclipse.scout.net" + ".proxy.autodetect");
     PROXY_AUTODETECTION = (proxyDetectionText == null || proxyDetectionText.equalsIgnoreCase("true"));
 
     // setup java.net
@@ -87,8 +67,7 @@ public final class NetActivator extends Plugin {
   }
 
   @Override
-  public void stop(BundleContext context) throws Exception {
-    super.stop(context);
+  public void stop() {
     Authenticator.setDefault(null);
     if (ProxySelector.getDefault() == m_newProxySelector) {
       ProxySelector.setDefault(m_oldProxySelector);
@@ -100,7 +79,6 @@ public final class NetActivator extends Plugin {
     m_newProxySelector = null;
     m_oldCookieHandler = null;
     m_newCookieHandler = null;
-    plugin = null;
   }
 
 }

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -18,13 +18,14 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.scout.net.NetActivator;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 
 /**
  * locate authenticator at extension point "org.eclipse.core.net.authenticator"
  */
 public class EclipseAuthenticatorLocator {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(EclipseAuthenticatorLocator.class);
 
   public Authenticator locate() {
     IExtensionRegistry xreg = Platform.getExtensionRegistry();
@@ -39,7 +40,7 @@ public class EclipseAuthenticatorLocator {
             }
           }
           catch (CoreException e) {
-            NetActivator.getDefault().getLog().log(new Status(Status.ERROR, NetActivator.PLUGIN_ID, "authenticator: " + authenticatorElement.getAttribute("class"), e));
+            LOG.error("authenticator: " + authenticatorElement.getAttribute("class"), e);
           }
         }
       }

@@ -25,7 +25,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.core.net.proxy.IProxyData;
 import org.eclipse.core.net.proxy.IProxyService;
-import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.scout.commons.ConfigIniUtility;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.net.internal.TTLCache;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -49,6 +52,7 @@ import org.osgi.framework.ServiceReference;
  */
 @Deprecated
 public final class EclipseProxySelector extends ProxySelector {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(EclipseProxySelector.class);
 
   private AtomicBoolean m_initialized;
   private AtomicBoolean m_initializeInProgress;
@@ -64,7 +68,7 @@ public final class EclipseProxySelector extends ProxySelector {
     m_cacheLock = new Object();
     m_cache = new TTLCache<URI, List<Proxy>>(300000L);
     try {
-      String ttlText = NetActivator.getDefault().getBundle().getBundleContext().getProperty(NetActivator.PLUGIN_ID + ".cache");
+      String ttlText = ConfigIniUtility.getProperty("org.eclipse.scout.net" + ".cache");
       if (ttlText != null) {
         long ttl = Long.parseLong(ttlText);
         if (ttl > 0) {
@@ -127,7 +131,7 @@ public final class EclipseProxySelector extends ProxySelector {
 
   @Override
   public void connectFailed(URI uri, SocketAddress sa, IOException ioe) {
-    NetActivator.getDefault().getLog().log(new Status(Status.WARNING, NetActivator.PLUGIN_ID, "Failed connecting to proxy server " + sa, ioe));
+    LOG.warn("Failed connecting to proxy server " + sa, ioe);
   }
 
   /**
@@ -159,7 +163,7 @@ public final class EclipseProxySelector extends ProxySelector {
 
   private IProxyData[] safeSelectImpl(URI uri) {
     // TODO remove OSGI Dependency
-    BundleContext context = NetActivator.getDefault().getBundle().getBundleContext();
+    BundleContext context = Platform.getBundle("org.eclipse.scout.net").getBundleContext();
     ServiceReference ref = context.getServiceReference(IProxyService.class.getName());
     if (ref != null) {
       try {
@@ -169,7 +173,7 @@ public final class EclipseProxySelector extends ProxySelector {
           return (IProxyData[]) method.invoke(service, uri);
         }
         catch (Exception e) {
-          NetActivator.getDefault().getLog().log(new Status(Status.WARNING, NetActivator.PLUGIN_ID, "could not access method 'select' on 'IProxyService'.", e));
+          LOG.warn("could not access method 'select' on 'IProxyService'.", e);
         }
       }
       finally {
