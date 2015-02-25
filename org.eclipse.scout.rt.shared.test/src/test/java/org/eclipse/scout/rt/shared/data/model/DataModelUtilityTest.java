@@ -13,7 +13,7 @@ package org.eclipse.scout.rt.shared.data.model;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 
-import java.io.InputStreamReader;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.HashSet;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -22,6 +22,7 @@ import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.shared.data.model.fixture.CustomDataModel;
 import org.eclipse.scout.rt.shared.data.model.fixture.CustomDataModelExtension;
+import org.eclipse.scout.rt.shared.test.ResourceBase;
 import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -60,13 +61,13 @@ public class DataModelUtilityTest {
     String s;
     //
     s = visit(dataModel, v, 2);
-    assertEquals(readFile("fixture/level2-new.txt").trim(), s.trim());
+    assertEquals(readTextFile(ResourceBase.class.getResourceAsStream("data/model/level2-new.txt")), s.trim());
     //
     s = visit(dataModel, v, 3);
-    assertEquals(readFile("fixture/level3-new.txt").trim(), s.trim());
+    assertEquals(readTextFile(ResourceBase.class.getResourceAsStream("data/model/level3-new.txt")), s.trim());
     //
     s = visit(dataModel, v, 4);
-    assertEquals(readFile("fixture/level4-new.txt").trim(), s.trim());
+    assertEquals(readTextFile(ResourceBase.class.getResourceAsStream("data/model/level4-new.txt")), s.trim());
   }
 
   @Test
@@ -112,8 +113,8 @@ public class DataModelUtilityTest {
     assertEquals(3545, externaIdSet.size());
   }
 
-  private String readFile(String name) throws UnsupportedEncodingException, ProcessingException {
-    return IOUtility.getContent(new InputStreamReader(getClass().getResourceAsStream(name), "UTF-8")).replaceAll("[\\n\\r]+", "\n");
+  private String readTextFile(InputStream in) throws UnsupportedEncodingException, ProcessingException {
+    return IOUtility.getContentUtf8(in).replaceAll("[\\n\\r]+", "\n").trim();
   }
 
   private String visit(IDataModel m, IDataModelVisitor v, int maxLevel) {
