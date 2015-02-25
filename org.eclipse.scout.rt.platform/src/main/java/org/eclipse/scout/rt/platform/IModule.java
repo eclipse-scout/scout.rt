@@ -12,7 +12,8 @@ package org.eclipse.scout.rt.platform;
 
 /**
  * A {@link IModule} can be used to take part at the scout platform's lifecycle.
- * To register a module use the <b><code>scout.module</code></b> entry in the maifest file.
+ * To register a module add an entry of the {@link IModule} subclasses qualified class name to the text file
+ * META-INF/services/org.eclipse.scout.rt.platform.IModule in your pom module.
  */
 public interface IModule {
 
