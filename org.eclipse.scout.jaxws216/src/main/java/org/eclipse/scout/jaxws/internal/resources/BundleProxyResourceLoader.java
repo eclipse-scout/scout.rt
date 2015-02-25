@@ -17,9 +17,9 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.XmlUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.jaxws.Activator;
 import org.osgi.framework.Bundle;
 
 import com.sun.xml.internal.ws.transport.http.ResourceLoader;
@@ -30,9 +30,11 @@ public class BundleProxyResourceLoader implements ResourceLoader {
   private static final Logger LOG = Logger.getLogger("com.sun.xml.ws.server.http");
 
   private Bundle m_bundle;
+  private Bundle m_thisBundle;
 
   public BundleProxyResourceLoader(Bundle bundle) {
     m_bundle = bundle;
+    m_thisBundle = Platform.getBundle("org.eclipse.scout.jaxws216");
   }
 
   @Override
@@ -42,12 +44,12 @@ public class BundleProxyResourceLoader implements ResourceLoader {
 
   @Override
   public URL getResource(String path) throws MalformedURLException {
-    return new P_GetResourceResolver(path, Activator.getDefault().getBundle(), m_bundle).resolve();
+    return new P_GetResourceResolver(path, m_thisBundle, m_bundle).resolve();
   }
 
   @Override
   public Set<String> getResourcePaths(String path) {
-    return new P_GetResourcePathsResolver(path, Activator.getDefault().getBundle(), m_bundle).resolve();
+    return new P_GetResourcePathsResolver(path, m_thisBundle, m_bundle).resolve();
   }
 
   private class P_GetResourcePathsResolver extends AbstractResolver<Set<String>> {

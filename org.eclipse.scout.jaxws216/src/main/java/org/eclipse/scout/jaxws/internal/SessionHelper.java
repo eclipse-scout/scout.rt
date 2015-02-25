@@ -19,7 +19,7 @@ import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.jaxws.Activator;
+import org.eclipse.scout.jaxws.JaxWs216Module;
 import org.eclipse.scout.jaxws.session.IServerSessionFactory;
 import org.eclipse.scout.rt.server.IServerJobService;
 import org.eclipse.scout.rt.server.IServerSession;
@@ -57,9 +57,9 @@ public final class SessionHelper {
     // As long as the request is not authenticated the subject is null or empty. If using container authentication, the subject is always available.
     if (subject == null || subject.getPrincipals().size() == 0) {
       // create subject with anonymous principal
-      String principalName = ConfigIniUtility.getProperty(Activator.PROP_DEFAULT_PRINCIPAL);
+      String principalName = ConfigIniUtility.getProperty(JaxWs216Module.PROP_DEFAULT_PRINCIPAL);
       if (!StringUtility.hasText(principalName)) {
-        LOG.warn("No subject found in calling AccessContext. That is why the principal 'anonymous' is registered with the subject. This subject is used to create sessions for transactional handlers as long as the request is not authenticated. The default principal can be changed by configuring the prinicipal in '" + Activator.PROP_DEFAULT_PRINCIPAL + "' in config.ini.");
+        LOG.warn("No subject found in calling AccessContext. That is why the principal 'anonymous' is registered with the subject. This subject is used to create sessions for transactional handlers as long as the request is not authenticated. The default principal can be changed by configuring the prinicipal in '" + JaxWs216Module.PROP_DEFAULT_PRINCIPAL + "' in config.ini.");
         principalName = "anonymous";
       }
       subject = SERVICES.getService(IServerJobService.class).createSubject(principalName);

@@ -10,30 +10,20 @@
  ******************************************************************************/
 package org.eclipse.scout.jaxws;
 
-import org.eclipse.core.runtime.Plugin;
 import org.eclipse.scout.commons.ConfigIniUtility;
-import org.osgi.framework.BundleContext;
+import org.eclipse.scout.rt.platform.IModule;
 
 import com.sun.xml.internal.ws.fault.SOAPFaultBuilder;
 
 @SuppressWarnings("restriction")
-public class Activator extends Plugin {
+public class JaxWs216Module implements IModule {
 
   public static final String PROP_STACKTRACE = "org.eclipse.scout.jaxws.stacktrace";
   public static final String PROP_DEFAULT_PRINCIPAL = "org.eclipse.scout.jaxws.txhandler.sessionfactory.principal";
   public static final String PROP_PUBLISH_STATUS_PAGE = "org.eclipse.scout.jaxws.publish_status_page";
 
-  public static final String PLUGIN_ID = "org.eclipse.scout.jaxws";
-  private static Activator m_plugin;
-
-  public Activator() {
-  }
-
   @Override
-  public void start(BundleContext context) throws Exception {
-    super.start(context);
-    m_plugin = this;
-
+  public void start() {
     // apply properties
     boolean stacktraceEnabled = ConfigIniUtility.getPropertyBoolean(PROP_STACKTRACE, false);
     if (!stacktraceEnabled) {
@@ -42,12 +32,6 @@ public class Activator extends Plugin {
   }
 
   @Override
-  public void stop(BundleContext context) throws Exception {
-    m_plugin = null;
-    super.stop(context);
-  }
-
-  public static Activator getDefault() {
-    return m_plugin;
+  public void stop() {
   }
 }

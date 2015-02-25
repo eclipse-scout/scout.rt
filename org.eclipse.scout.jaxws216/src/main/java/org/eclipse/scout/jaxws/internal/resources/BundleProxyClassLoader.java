@@ -17,45 +17,47 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 
-import org.eclipse.scout.jaxws.Activator;
+import org.eclipse.core.runtime.Platform;
 import org.osgi.framework.Bundle;
 
 public class BundleProxyClassLoader extends ClassLoader {
 
   private Bundle m_bundle;
+  private Bundle m_thisBundle;
 
   public BundleProxyClassLoader(Bundle bundle) {
     m_bundle = bundle;
+    m_thisBundle = Platform.getBundle("org.eclipse.scout.jaxws216");
   }
 
   @Override
   protected Class<?> findClass(String name) throws ClassNotFoundException {
-    return new P_FindClassResolver(name, Activator.getDefault().getBundle(), m_bundle).resolve();
+    return new P_FindClassResolver(name, m_thisBundle, m_bundle).resolve();
   }
 
   @Override
   protected URL findResource(String name) {
-    return new P_FindResourceResolver(name, Activator.getDefault().getBundle(), m_bundle).resolve();
+    return new P_FindResourceResolver(name, m_thisBundle, m_bundle).resolve();
   }
 
   @Override
   protected Enumeration<URL> findResources(String name) throws IOException {
-    return new P_FindResourcesResolver(name, Activator.getDefault().getBundle(), m_bundle).resolve();
+    return new P_FindResourcesResolver(name, m_thisBundle, m_bundle).resolve();
   }
 
   @Override
   public Enumeration<URL> getResources(String name) throws IOException {
-    return new P_GetResourcesResolver(name, Activator.getDefault().getBundle(), m_bundle).resolve();
+    return new P_GetResourcesResolver(name, m_thisBundle, m_bundle).resolve();
   }
 
   @Override
   public URL getResource(String name) {
-    return new P_GetResourceResolver(name, Activator.getDefault().getBundle(), m_bundle).resolve();
+    return new P_GetResourceResolver(name, m_thisBundle, m_bundle).resolve();
   }
 
   @Override
   public InputStream getResourceAsStream(String name) {
-    return new P_GetResourceAsStream(name, Activator.getDefault().getBundle(), m_bundle).resolve();
+    return new P_GetResourceAsStream(name, m_thisBundle, m_bundle).resolve();
   }
 
   private class P_FindClassResolver extends AbstractResolver<Class<?>> {

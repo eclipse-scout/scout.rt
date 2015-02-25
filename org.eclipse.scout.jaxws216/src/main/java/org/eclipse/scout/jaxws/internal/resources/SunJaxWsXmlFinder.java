@@ -15,8 +15,8 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.osgi.BundleInspector;
-import org.eclipse.scout.jaxws.Activator;
 import org.osgi.framework.Bundle;
 
 /**
@@ -29,7 +29,7 @@ public class SunJaxWsXmlFinder {
    */
   public List<SunJaxWsXml> findAll() {
     ArrayList<SunJaxWsXml> list = new ArrayList<SunJaxWsXml>();
-    for (Bundle bundle : Activator.getDefault().getBundle().getBundleContext().getBundles()) {
+    for (Bundle bundle : Platform.getBundle("org.eclipse.scout.jaxws216").getBundleContext().getBundles()) {
       // exclude fragments as their content is searched by their host bundles.
       // Furthermore, fragments do not have a classloader and therefore cannot load classes.
       if (!(BundleInspector.isFragment(bundle))) {
