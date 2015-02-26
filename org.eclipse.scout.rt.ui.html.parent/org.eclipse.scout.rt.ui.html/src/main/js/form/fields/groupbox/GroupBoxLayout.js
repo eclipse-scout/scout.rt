@@ -37,7 +37,15 @@ scout.GroupBoxLayout.prototype.preferredLayoutSize = function($container) {
 };
 
 scout.GroupBoxLayout.prototype._titleHeight = function($container) {
-  return scout.graphics.getVisibleSize($container.children('.group-box-title'), true).height;
+  if (this.groupBox.label) {
+    var height = scout.graphics.measureString(this.groupBox.label).height,
+      insets = scout.graphics.getInsets($container.children('.group-box-title'), {includeMargin: true});
+    height += insets.top + insets.bottom;
+    $.log.info('_titleHeight='+height);
+    return height;
+  } else {
+    return 0;
+  }
 };
 
 scout.GroupBoxLayout.prototype._htmlGbBody = function() {
