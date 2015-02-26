@@ -27,8 +27,8 @@ import org.eclipse.scout.commons.FileUtility;
 import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.services.common.icon.IconLocator;
 import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
-import org.eclipse.scout.rt.client.ui.IIconLocator;
 import org.eclipse.scout.rt.shared.data.basic.BinaryResource;
 import org.eclipse.scout.rt.ui.html.AbstractUiServlet;
 import org.eclipse.scout.rt.ui.html.IServletRequestInterceptor;
@@ -213,7 +213,7 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
         ClientJobUtility.runAsSubject(new Runnable() {
           @Override
           public void run() {
-            IconSpec iconSpec = IIconLocator.INSTANCE.getIconSpec(imageId);
+            IconSpec iconSpec = IconLocator.instance().getIconSpec(imageId);
             iconSpecHolder.setValue(iconSpec);
           }
         });
@@ -235,7 +235,7 @@ public class StaticResourceRequestInterceptor extends AbstractService implements
     IconSpec iconSpec = iconSpecHolder.getValue();
      */
 
-    IconSpec iconSpec = IIconLocator.INSTANCE.getIconSpec(imageId);
+    IconSpec iconSpec = IconLocator.instance().getIconSpec(imageId);
     if (iconSpec != null) {
       // cache: use max-age caching for at most 4 hours
       BinaryResource content = new BinaryResource(iconSpec.getName(), detectContentType(servlet, pathInfo), iconSpec.getContent(), System.currentTimeMillis());

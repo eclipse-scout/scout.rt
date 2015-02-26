@@ -12,8 +12,8 @@ package org.eclipse.scout.rt.ui.html.res;
 
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.services.common.icon.IconLocator;
 import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
-import org.eclipse.scout.rt.client.ui.IIconLocator;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.JsonRequest;
 
@@ -41,7 +41,7 @@ public class BinaryResourceUrlUtility {
     if (iconId.startsWith("font:")) {
       return iconId;
     }
-    IconSpec iconSpec = IIconLocator.INSTANCE.getIconSpec(iconId);
+    IconSpec iconSpec = IconLocator.instance().getIconSpec(iconId);
     if (iconSpec != null) {
       return "icon/" + iconSpec.getName() + "?" + JsonRequest.PROP_JSON_SESSION_ID + "=" + jsonAdapter.getJsonSession().getJsonSessionId(); // includes file extension
     }

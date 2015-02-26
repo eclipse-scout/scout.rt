@@ -10,16 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.html.services.common.icon;
 
+import java.net.URL;
+
 import org.eclipse.scout.rt.client.services.common.icon.AbstractIconProviderService;
 
-// FIXME AWE: (resource loading) discuss with C.GU - wollen wir diesen service wirklich?
-// Wir könnten auch ohne ihn leben prinzipiell - aber dann gibt es keine bitmap grafiken
-// aus dem scout.rt.ui.html Bundle
 public class HtmlBundleIconProviderService extends AbstractIconProviderService {
 
-  public static final String FOLDER_NAME = "org.eclipse.scout.rt.ui.html.icons.internal";
-
-  public HtmlBundleIconProviderService() {
-    setFolderName(FOLDER_NAME);
+  @Override
+  protected URL findResource(String relativePath) {
+    return org.eclipse.scout.rt.ui.html.ResourceBase.class.getResource("icons/internal/" + relativePath);
   }
 }
