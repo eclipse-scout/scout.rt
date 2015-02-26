@@ -76,7 +76,7 @@ class ArrayInput implements IBindInput {
   }
 
   @Override
-  public boolean isJdbcBind() {
+  public boolean isJdbcBind(ISqlStyle sqlStyle) {
     if (isBatch()) {
       if (m_target.isPlainValue()) {
         return false;
@@ -89,7 +89,7 @@ class ArrayInput implements IBindInput {
       }
     }
     else {
-      return false;
+      return m_target.getParsedAttribute() != null && sqlStyle.isCreatingInListGeneratingBind(m_array);
     }
   }
 
@@ -125,23 +125,30 @@ class ArrayInput implements IBindInput {
       }
     }
     else {
-      if (m_target.getParsedAttribute() != null) {
-        String att = m_target.getParsedAttribute();
-        String op = m_target.getParsedOp();
-        m_target.setParsedAttribute(null);
-        m_target.setParsedOp(null);
-        if (op.equalsIgnoreCase("IN") || op.equalsIgnoreCase("=")) {
-          m_target.setReplaceToken(sqlStyle.createInList(att, m_array));
-        }
-        else {
-          m_target.setReplaceToken(sqlStyle.createNotInList(att, m_array));
-        }
+      return applyMultiValued(sqlStyle);
+    }
+  }
+
+  private SqlBind applyMultiValued(ISqlStyle sqlStyle) throws ProcessingException {
+    if (m_target.getParsedAttribute() != null) {
+      String att = m_target.getParsedAttribute();
+      String op = m_target.getParsedOp();
+      m_target.setParsedAttribute(null);
+      m_target.setParsedOp(null);
+      if (op.equalsIgnoreCase("IN") || op.equalsIgnoreCase("=")) {
+        m_target.setReplaceToken(sqlStyle.createInList(att, m_array));
       }
       else {
-        m_target.setReplaceToken(sqlStyle.toPlainText(m_array));
+        m_target.setReplaceToken(sqlStyle.createNotInList(att, m_array));
       }
-      return null;
+      if (sqlStyle.isCreatingInListGeneratingBind(m_array)) {
+        return sqlStyle.buildBindFor(m_array, null);
+      }
     }
+    else {
+      m_target.setReplaceToken(sqlStyle.toPlainText(m_array));
+    }
+    return null;
   }
 
 }

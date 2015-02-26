@@ -22,7 +22,7 @@ interface IBindInput {
   /**
    * @return true if this bind corresponds to a jdbc "?" bind
    */
-  boolean isJdbcBind();
+  boolean isJdbcBind(ISqlStyle sqlStyle);
 
   int getJdbcBindIndex();
 

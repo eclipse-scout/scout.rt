@@ -56,7 +56,7 @@ class FunctionInput implements IBindInput {
   }
 
   @Override
-  public boolean isJdbcBind() {
+  public boolean isJdbcBind(ISqlStyle sqlStyle) {
     if (m_target.isPlainToken()) {
       return false;
     }
