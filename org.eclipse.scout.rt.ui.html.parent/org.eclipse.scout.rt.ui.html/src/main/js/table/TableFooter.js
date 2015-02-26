@@ -19,7 +19,7 @@ scout.TableFooter.prototype._render = function($parent) {
     .addClass('control-filter')
     .appendTo(this.$container)
     .on('input paste', '', $.debounce(this._onFilterInput.bind(this)))
-    .attr('placeholder', this._table.session.text('FilterBy_'));
+    .placeholder(this._table.session.text('FilterBy_'));
   filter = this._table.getFilter(scout.TableFooter.FILTER_KEY);
   if (filter) {
     this._$filterField.val(filter.text);

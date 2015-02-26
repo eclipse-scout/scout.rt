@@ -29,6 +29,13 @@
   color: @selection-text-disabled-color;
 }
 
+.placeholder() {
+  opacity: 0.54; /* see https://developer.mozilla.org/de/docs/Web/CSS/::-moz-placeholder */
+}
+.placeholderDisabled() {
+  opacity: 0.2;
+}
+
 .overlay(@left: 0px, @top: 0px, @diffW: 0px, @diffH: 0px) {
   position: absolute;
   content: '';

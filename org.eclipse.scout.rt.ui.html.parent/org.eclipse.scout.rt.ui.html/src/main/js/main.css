@@ -31,6 +31,19 @@ body {
   .selection();
 }
 
+::-webkit-input-placeholder {
+  .placeholder();
+}
+:-moz-placeholder { /* older versions of firefox */
+  .placeholder();
+}
+::-moz-placeholder {
+  .placeholder();
+}
+:-ms-input-placeholder {
+  .placeholder();
+}
+
 .disabled {
   color: @text-disabled-color;
 
@@ -39,6 +52,19 @@ body {
   }
   & ::selection {
     .selectionDisabled();
+  }
+
+  &::-webkit-input-placeholder {
+    .placeholderDisabled();
+  }
+  &:-moz-placeholder { /* older versions of firefox */
+    .placeholderDisabled();
+  }
+  &::-moz-placeholder {
+    .placeholderDisabled();
+  }
+  &:-ms-input-placeholder {
+    .placeholderDisabled();
   }
 }
 

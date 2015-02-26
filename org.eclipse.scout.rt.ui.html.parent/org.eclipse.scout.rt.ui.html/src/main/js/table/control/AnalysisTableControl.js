@@ -40,7 +40,7 @@ scout.AnalysisTableControl.prototype._renderContent = function($parent) {
   var $criteriaNavigation = this.$contentContainer.appendDiv('', 'criteria-navigation');
   this.$contentContainer.append('<input class="criteria-search"></input>')
     .on('input paste', '', searchMap)
-    .attr('placeholder', this.session.text('FilterBy_'));
+    .placeholder(this.session.text('FilterBy_'));
   var $criteriaContainer = this.$contentContainer.appendDiv('criteria-container');
   var containerWidth = parseFloat($criteriaContainer.css('width')),
     containerHeight = parseFloat($criteriaContainer.css('height'));

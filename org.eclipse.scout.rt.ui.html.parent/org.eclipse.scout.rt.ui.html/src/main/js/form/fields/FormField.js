@@ -144,7 +144,7 @@ scout.FormField.prototype._renderLabel = function(label) {
 
 scout.FormField.prototype._renderPlaceholder = function() {
   if (this.$field) {
-    this.$field.attr('placeholder', this.label);
+    this.$field.placeholder(this.label);
   }
 };
 

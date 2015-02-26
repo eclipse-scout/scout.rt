@@ -12,3 +12,9 @@ to readonly event handling is still enabled. In other words: we'd have to implem
 browser/widget default behavior to work around this problem - additionally the workaround
 should only affect Firefox but none of the other browsers (where this is not an issue at all).
 
+[Table columns]
+IE9 does not support overflow attribute on DIVs with "display-style: table-cell". Therefore,
+the table columns are not correctly aligned.
+
+[Input placeholders]
+On-field labels are not visible in IE9 because it lacks support for the "placeholder" attribute.
