@@ -52,6 +52,16 @@ public class ClientJobManager extends JobManager<ClientJobInput> implements ICli
   }
 
   @Override
+  protected <RESULT> Callable<RESULT> interceptCallable(final Callable<RESULT> next, final ClientJobInput input) {
+    final Callable<RESULT> c4 = new InitThreadLocalCallable<>(next, ScoutTexts.CURRENT, input.getSession().getTexts());
+    final Callable<RESULT> c3 = new InitThreadLocalCallable<>(c4, NlsLocale.CURRENT, input.getSession().getLocale());
+    final Callable<RESULT> c2 = new InitThreadLocalCallable<>(c3, ISession.CURRENT, input.getSession());
+    final Callable<RESULT> c1 = super.interceptCallable(c2, input);
+
+    return c1;
+  }
+
+  @Override
   protected <RESULT> JobFuture<RESULT> interceptFuture(final JobFuture<RESULT> future) {
     return new ClientJobFuture<>(future, (ClientJobInput) future.getInput());
   }
@@ -73,15 +83,5 @@ public class ClientJobManager extends JobManager<ClientJobInput> implements ICli
     });
 
     return Collections.singleton(true).equals(status);
-  }
-
-  @Override
-  protected <RESULT> Callable<RESULT> interceptCallable(final Callable<RESULT> next, final ClientJobInput input) {
-    final Callable<RESULT> c4 = new InitThreadLocalCallable<>(next, ScoutTexts.CURRENT, input.getSession().getTexts());
-    final Callable<RESULT> c3 = new InitThreadLocalCallable<>(c4, NlsLocale.CURRENT, input.getSession().getLocale());
-    final Callable<RESULT> c2 = new InitThreadLocalCallable<>(c3, ISession.CURRENT, input.getSession());
-    final Callable<RESULT> c1 = super.interceptCallable(c2, input);
-
-    return c1;
   }
 }

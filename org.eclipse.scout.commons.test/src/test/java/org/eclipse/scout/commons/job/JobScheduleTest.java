@@ -42,13 +42,7 @@ public class JobScheduleTest {
 
   @Before
   public void before() {
-    m_jobManager = new JobManager<IJobInput>("scout") {
-
-      @Override
-      protected IJobInput createDefaultJobInput() {
-        return JobInput.defaults();
-      }
-    };
+    m_jobManager = new JobManager<IJobInput>("scout");
   }
 
   @After

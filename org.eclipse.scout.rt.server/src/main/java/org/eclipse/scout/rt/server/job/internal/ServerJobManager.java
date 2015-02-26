@@ -56,8 +56,33 @@ public class ServerJobManager extends JobManager<ServerJobInput> implements ISer
   }
 
   @Override
+  protected <RESULT> Callable<RESULT> interceptCallable(final Callable<RESULT> next, final ServerJobInput input) {
+    final ITransaction tx = Assertions.assertNotNull(createTransaction());
+
+    final Callable<RESULT> c8 = new TwoPhaseTransactionBoundaryCallable<>(next, tx, input);
+    final Callable<RESULT> c7 = new InitThreadLocalCallable<>(c8, ITransaction.CURRENT, tx);
+    final Callable<RESULT> c6 = new InitThreadLocalCallable<>(c7, ScoutTexts.CURRENT, input.getSession().getTexts());
+    final Callable<RESULT> c5 = new InitThreadLocalCallable<>(c6, NlsLocale.CURRENT, input.getSession().getLocale());
+    final Callable<RESULT> c4 = new InitThreadLocalCallable<>(c5, ISession.CURRENT, input.getSession());
+    final Callable<RESULT> c3 = new InitThreadLocalCallable<>(c4, IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, input.getServletResponse());
+    final Callable<RESULT> c2 = new InitThreadLocalCallable<>(c3, IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, input.getServletRequest());
+    final Callable<RESULT> c1 = super.interceptCallable(c2, input);
+
+    return c1;
+  }
+
+  @Override
   protected <RESULT> JobFuture<RESULT> interceptFuture(final JobFuture<RESULT> future) {
     return new ServerJobFuture<>(future, (ServerJobInput) future.getInput());
+  }
+
+  /**
+   * Method invoked to create a {@link ITransaction}.
+   *
+   * @return {@link ITransaction}; must not be <code>null</code>.
+   */
+  protected ITransaction createTransaction() {
+    return new BasicTransaction();
   }
 
   @Override
@@ -77,30 +102,5 @@ public class ServerJobManager extends JobManager<ServerJobInput> implements ISer
     });
 
     return Collections.singleton(true).equals(status);
-  }
-
-  @Override
-  protected <RESULT> Callable<RESULT> interceptCallable(final Callable<RESULT> next, final ServerJobInput input) {
-    final ITransaction tx = Assertions.assertNotNull(createTransaction());
-
-    final Callable<RESULT> c8 = new TwoPhaseTransactionBoundaryCallable<>(next, tx, input);
-    final Callable<RESULT> c7 = new InitThreadLocalCallable<>(c8, ITransaction.CURRENT, tx);
-    final Callable<RESULT> c6 = new InitThreadLocalCallable<>(c7, ScoutTexts.CURRENT, input.getSession().getTexts());
-    final Callable<RESULT> c5 = new InitThreadLocalCallable<>(c6, NlsLocale.CURRENT, input.getSession().getLocale());
-    final Callable<RESULT> c4 = new InitThreadLocalCallable<>(c5, ISession.CURRENT, input.getSession());
-    final Callable<RESULT> c3 = new InitThreadLocalCallable<>(c4, IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_RESPONSE, input.getServletResponse());
-    final Callable<RESULT> c2 = new InitThreadLocalCallable<>(c3, IHttpServletRoundtrip.CURRENT_HTTP_SERVLET_REQUEST, input.getServletRequest());
-    final Callable<RESULT> c1 = super.interceptCallable(c2, input);
-
-    return c1;
-  }
-
-  /**
-   * Method invoked to create a {@link ITransaction}.
-   *
-   * @return {@link ITransaction}; must not be <code>null</code>.
-   */
-  protected ITransaction createTransaction() {
-    return new BasicTransaction();
   }
 }

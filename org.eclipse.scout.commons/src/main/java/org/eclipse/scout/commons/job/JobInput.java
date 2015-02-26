@@ -43,25 +43,25 @@ public class JobInput implements IJobInput {
   }
 
   @Override
-  public JobInput id(final long id) {
+  public IJobInput id(final long id) {
     m_id = id;
     return this;
   }
 
   @Override
-  public JobInput name(final String name) {
+  public IJobInput name(final String name) {
     m_name = name;
     return this;
   }
 
   @Override
-  public JobInput subject(final Subject subject) {
+  public IJobInput subject(final Subject subject) {
     m_subject = subject;
     return this;
   }
 
   @Override
-  public JobInput context(final JobContext context) {
+  public IJobInput context(final JobContext context) {
     m_context = context;
     return this;
   }
@@ -106,7 +106,7 @@ public class JobInput implements IJobInput {
    * Creates a {@link IJobInput} that is only filled with the {@link JobContext} of the current thread, or if not
    * available, an empty one.
    */
-  public static JobInput empty() {
+  public static IJobInput empty() {
     return new JobInput().context(JobContext.copy(JobContext.CURRENT.get()));
   }
 
@@ -118,7 +118,7 @@ public class JobInput implements IJobInput {
    * available, an empty {@link JobContext};
    * </ul>
    */
-  public static JobInput defaults() {
+  public static IJobInput defaults() {
     return JobInput.empty().subject(Subject.getSubject(AccessController.getContext()));
   }
 }

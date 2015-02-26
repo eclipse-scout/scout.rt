@@ -37,6 +37,7 @@ import org.eclipse.scout.commons.job.IProgressMonitor;
 import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.commons.job.JobContext;
 import org.eclipse.scout.commons.job.JobExecutionException;
+import org.eclipse.scout.commons.job.JobInput;
 import org.eclipse.scout.commons.job.internal.FutureSet.FutureSupplier;
 import org.eclipse.scout.commons.job.internal.callable.ExceptionTranslator;
 import org.eclipse.scout.commons.job.internal.callable.InitThreadLocalCallable;
@@ -48,7 +49,7 @@ import org.eclipse.scout.commons.job.internal.callable.ThreadNameDecorator;
  *
  * @since 5.1
  */
-public abstract class JobManager<INPUT extends IJobInput> implements IJobManager<INPUT> {
+public class JobManager<INPUT extends IJobInput> implements IJobManager<INPUT> {
 
   protected static final String PROP_CORE_POOL_SIZE = "org.eclipse.scout.job.corePoolSize";
   protected static final int DEFAULT_CORE_POOL_SIZE = 5; // The number of threads to keep in the pool, even if they are idle.
@@ -347,5 +348,9 @@ public abstract class JobManager<INPUT extends IJobInput> implements IJobManager
   /**
    * Method invoked to create a {@link IJobInput} filled with default values.
    */
-  protected abstract INPUT createDefaultJobInput();
+  protected INPUT createDefaultJobInput() {
+    @SuppressWarnings("unchecked")
+    final INPUT input = (INPUT) JobInput.defaults();
+    return input;
+  }
 }

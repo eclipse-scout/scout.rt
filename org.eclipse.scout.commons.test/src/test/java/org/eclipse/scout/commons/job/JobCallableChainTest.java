@@ -71,7 +71,7 @@ public class JobCallableChainTest {
   public void testCallableChainWithContributionsAfter() throws Exception {
     _JobManager jobManager = new _JobManager() {
       @Override
-      public <RESULT> Callable<RESULT> interceptCallable(Callable<RESULT> next, JobInput input) {
+      public <RESULT> Callable<RESULT> interceptCallable(Callable<RESULT> next, IJobInput input) {
         Callable<RESULT> p2 = new Contribution2<>(next); // executed 3th
         Callable<RESULT> p1 = new Contribution1<>(p2); // executed 2nd
         Callable<RESULT> head = super.interceptCallable(p1, input); // executed 1st
@@ -115,7 +115,7 @@ public class JobCallableChainTest {
   public void testCallableChainWithContributionsBefore() throws Exception {
     _JobManager jobManager = new _JobManager() {
       @Override
-      public <RESULT> Callable<RESULT> interceptCallable(Callable<RESULT> next, JobInput input) {
+      public <RESULT> Callable<RESULT> interceptCallable(Callable<RESULT> next, IJobInput input) {
         Callable<RESULT> p2 = super.interceptCallable(next, input); // executed 3th
         Callable<RESULT> p1 = new Contribution2<>(p2); // executed 2nd
         Callable<RESULT> head = new Contribution1<>(p1); // executed 1st
@@ -203,20 +203,15 @@ public class JobCallableChainTest {
     }
   }
 
-  private class _JobManager extends JobManager<JobInput> {
+  private class _JobManager extends JobManager<IJobInput> {
 
     public _JobManager() {
       super("scout-thread");
     }
 
     @Override
-    public <RESULT> Callable<RESULT> interceptCallable(Callable<RESULT> next, JobInput input) {
+    public <RESULT> Callable<RESULT> interceptCallable(Callable<RESULT> next, IJobInput input) {
       return super.interceptCallable(next, input);
-    }
-
-    @Override
-    protected JobInput createDefaultJobInput() {
-      return JobInput.defaults();
     }
 
     @Override
