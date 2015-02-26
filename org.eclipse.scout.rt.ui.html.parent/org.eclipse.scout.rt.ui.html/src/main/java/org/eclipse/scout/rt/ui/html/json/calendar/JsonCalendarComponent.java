@@ -1,5 +1,7 @@
 package org.eclipse.scout.rt.ui.html.json.calendar;
 
+import java.util.Date;
+
 import org.eclipse.scout.rt.client.ui.basic.calendar.CalendarComponent;
 import org.eclipse.scout.rt.ui.html.json.IJsonObject;
 import org.eclipse.scout.rt.ui.html.json.IJsonSession;
@@ -35,7 +37,11 @@ public class JsonCalendarComponent implements IJsonObject {
     JsonObjectUtility.putProperty(json, "cell", new JsonCell(getJsonSession(), m_component.getCell()).toJson());
     JsonObjectUtility.putProperty(json, "fromDate", new JsonDate(m_component.getFromDate()).asJsonString());
     JsonObjectUtility.putProperty(json, "toDate", new JsonDate(m_component.getToDate()).asJsonString());
-    JsonObjectUtility.putProperty(json, "coveredDays", JsonObjectUtility.newJSONArray(m_component.getCoveredDays()));
+    if (m_component.getCoveredDays() != null) {
+      for (Date coveredDay : m_component.getCoveredDays()) {
+        JsonObjectUtility.append(json, "coveredDays", new JsonDate(coveredDay).asJsonString());
+      }
+    }
     JsonObjectUtility.putProperty(json, "fullDay", m_component.isFullDay());
     JsonObjectUtility.putProperty(json, "draggable", m_component.getProvider().isMoveItemEnabled());
     return json;
