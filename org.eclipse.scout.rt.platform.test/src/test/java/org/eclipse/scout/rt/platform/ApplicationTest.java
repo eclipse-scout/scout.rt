@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform;
 
-import org.eclipse.scout.rt.platform.internal.TestApplication;
+import org.eclipse.scout.rt.platform.fixture.TestApplication;
 import org.eclipse.scout.rt.testing.platform.ScoutPlatformTestRunner;
 import org.junit.Assert;
 import org.junit.Test;

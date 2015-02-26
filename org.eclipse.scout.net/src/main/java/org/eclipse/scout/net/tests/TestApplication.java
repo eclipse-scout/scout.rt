@@ -14,7 +14,7 @@ import java.net.URL;
 
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
-import org.eclipse.scout.net.NetModule;
+import org.eclipse.scout.net.internal.NetModule;
 
 public class TestApplication implements IApplication {
 

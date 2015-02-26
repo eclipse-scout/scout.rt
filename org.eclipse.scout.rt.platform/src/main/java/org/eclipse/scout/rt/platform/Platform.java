@@ -16,8 +16,7 @@ import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.cdi.CDI;
-import org.eclipse.scout.rt.platform.internal.ApplicationLoader;
-import org.eclipse.scout.rt.platform.internal.ScoutServiceLoader;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.FrameworkUtil;
 
@@ -33,12 +32,10 @@ public final class Platform implements IPlatform {
 
   private State m_state = State.Stopped;
   private EventListenerList m_platformListeners = new EventListenerList();
-  private List<IModule> m_modules;
-  private List<IApplication> m_applications;
+  private List<IModule> m_startedModules;
+  private IApplication m_application;
 
   private Platform() {
-    m_modules = ScoutServiceLoader.loadServices(IModule.class);
-    m_applications = ApplicationLoader.getApplications();
   }
 
   /**
@@ -78,7 +75,8 @@ public final class Platform implements IPlatform {
   }
 
   protected void startModules() {
-    for (IModule module : m_modules) {
+    m_startedModules = CDI.getBeanContext().getInstances(IModule.class);
+    for (IModule module : m_startedModules) {
       try {
         module.start();
       }
@@ -92,13 +90,17 @@ public final class Platform implements IPlatform {
    *
    */
   private void startApplications() {
-    for (IApplication application : m_applications) {
+    m_application = OBJ.one(IApplication.class, null);
+    if (m_application != null) {
       try {
-        application.start();
+        m_application.start();
       }
       catch (Exception e) {
-        LOG.error(String.format("Could not start application '%s'.", application.getClass().getName()), e);
+        LOG.error(String.format("Could not start application '%s'.", m_application.getClass().getName()), e);
       }
+    }
+    else {
+      LOG.warn("Start platform without an application. No application has been found.");
     }
   }
 
@@ -118,18 +120,18 @@ public final class Platform implements IPlatform {
    *
    */
   protected void stopApplications() {
-    for (IApplication application : m_applications) {
+    if (m_application != null) {
       try {
-        application.stop();
+        m_application.stop();
       }
       catch (Exception e) {
-        LOG.error(String.format("Could not stop application '%s'.", application.getClass().getName()), e);
+        LOG.error(String.format("Could not stop application '%s'.", m_application.getClass().getName()), e);
       }
     }
   }
 
   protected void stopModules() {
-    for (IModule module : m_modules) {
+    for (IModule module : m_startedModules) {
       try {
         module.stop();
       }

@@ -8,18 +8,29 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.platform;
+package org.eclipse.scout.rt.platform.fixture;
 
-import org.eclipse.scout.commons.annotations.Priority;
-import org.eclipse.scout.rt.platform.cdi.IBeanContributor;
+import org.eclipse.scout.rt.platform.IApplication;
 
 /**
- * The application with the highest {@link Priority} will be launched after all {@link IModule} have been started.
- * To register an application add add it to the CDI context using {@link IBeanContributor}.
+ *
  */
-public interface IApplication {
+public class TestApplication implements IApplication {
 
-  void start();
+  private static TestApplication instance;
 
-  void stop();
+  @Override
+  public void start() {
+    instance = this;
+  }
+
+  @Override
+  public void stop() {
+    instance = null;
+  }
+
+  public static TestApplication getInstance() {
+    return instance;
+  }
+
 }

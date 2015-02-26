@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.swing;
+package org.eclipse.scout.rt.ui.swing.internal;
 
 import org.eclipse.scout.rt.platform.cdi.IBeanContext;
 import org.eclipse.scout.rt.platform.cdi.IBeanContributor;
@@ -24,6 +24,9 @@ public class SwingBeanContributor implements IBeanContributor {
   @Override
   public void contributeBeans(IBeanContext context) {
     context.registerClass(FormFieldExtensions.class);
+    context.registerClass(SwingModule.class);
+
+    // register form fields from plugin.xml
     PluginXmlParser.get().visit(new FormFieldsPluginXmlVisitor(context));
   }
 

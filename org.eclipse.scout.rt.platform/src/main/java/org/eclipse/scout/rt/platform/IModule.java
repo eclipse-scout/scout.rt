@@ -10,23 +10,21 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.platform;
 
+import org.eclipse.scout.rt.platform.cdi.IBeanContributor;
+
 /**
  * A {@link IModule} can be used to take part at the scout platform's lifecycle.
- * To register a module add an entry of the {@link IModule} subclasses qualified class name to the text file
- * META-INF/services/org.eclipse.scout.rt.platform.IModule in your pom module.
+ * To register a module add add it to the CDI context using {@link IBeanContributor}.
  */
 public interface IModule {
 
   /**
-   * will be called of the platform launcher {@link Launcher} during startup. This method is used to set up the system,
-   * configuration and dependencies.
-   * Do not use any registries e.g. service registry during module start up.
+   * Is called during startup of the {@link Platform}. The CDI context is set up and available at this time.
    */
   void start();
 
   /**
-   * Is called before the {@link Platform} shut down. This method can be used to deregister dependencies and system
-   * configurations.
+   * Is called before the {@link Platform} shut down.
    */
   void stop();
 }

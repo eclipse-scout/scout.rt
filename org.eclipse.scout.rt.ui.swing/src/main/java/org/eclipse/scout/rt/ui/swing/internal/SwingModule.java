@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.ui.swing;
+package org.eclipse.scout.rt.ui.swing.internal;
 
 import java.util.Hashtable;
 

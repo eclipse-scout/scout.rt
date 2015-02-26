@@ -3,6 +3,7 @@ package org.eclipse.scout.net;
 import java.io.IOException;
 import java.net.URL;
 
+import org.eclipse.scout.net.internal.NetModule;
 import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.junit.After;
 import org.junit.Before;

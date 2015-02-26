@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.net;
+package org.eclipse.scout.net.internal;
 
 import java.net.Authenticator;
 import java.net.CookieHandler;
@@ -17,6 +17,8 @@ import java.net.CookiePolicy;
 import java.net.ProxySelector;
 
 import org.eclipse.scout.commons.ConfigIniUtility;
+import org.eclipse.scout.net.EclipseAuthenticator;
+import org.eclipse.scout.net.EclipseProxySelector;
 import org.eclipse.scout.rt.platform.IModule;
 
 /**

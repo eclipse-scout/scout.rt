@@ -8,29 +8,19 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.platform.internal;
+package org.eclipse.scout.net.internal;
 
-import org.eclipse.scout.rt.platform.IApplication;
+import org.eclipse.scout.rt.platform.cdi.IBeanContext;
+import org.eclipse.scout.rt.platform.cdi.IBeanContributor;
 
 /**
  *
  */
-public class TestApplication implements IApplication {
-
-  private static TestApplication instance;
+public class BeanContributor implements IBeanContributor {
 
   @Override
-  public void start() {
-    instance = this;
-  }
-
-  @Override
-  public void stop() {
-    instance = null;
-  }
-
-  public static TestApplication getInstance() {
-    return instance;
+  public void contributeBeans(IBeanContext context) {
+    context.registerClass(NetModule.class);
   }
 
 }
