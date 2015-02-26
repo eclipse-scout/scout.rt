@@ -16,11 +16,11 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.osgi.BundleClassDescriptor;
 import org.eclipse.scout.rt.platform.cdi.IBean;
-import org.eclipse.scout.rt.server.internal.Activator;
 import org.eclipse.scout.rt.server.services.common.security.fixture.TestPermission1;
 import org.eclipse.scout.rt.server.services.common.security.fixture.TestPermission2;
 import org.eclipse.scout.rt.shared.services.common.security.IPermissionService;
@@ -120,7 +120,7 @@ public class PermissionServiceTest {
 
     @Override
     protected boolean acceptBundle(Bundle bundle) {
-      return super.acceptBundle(bundle) && (bundle != Activator.getDefault().getBundle());
+      return super.acceptBundle(bundle) && (bundle != Platform.getBundle("org.eclipse.scout.rt.server"));
     }
   }
 

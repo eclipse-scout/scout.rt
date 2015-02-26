@@ -46,7 +46,7 @@ public class SessionsView extends DefaultView {
 
   @Override
   public boolean isVisible() {
-    return ACCESS.check(new UpdateServiceConfigurationPermission()) && ProcessInspector.getDefault().isEnabled();
+    return ACCESS.check(new UpdateServiceConfigurationPermission()) && ProcessInspector.instance().isEnabled();
   }
 
   @Override
@@ -62,7 +62,7 @@ public class SessionsView extends DefaultView {
 
       @Override
       public void run() {
-        ProcessInspector.getDefault().clearSessionInspectors();
+        ProcessInspector.instance().clearSessionInspectors();
       }
     });
     p.p();
@@ -92,7 +92,7 @@ public class SessionsView extends DefaultView {
   }
 
   protected SessionInspector[] getSortedSessions() {
-    SessionInspector[] sessionInspectors = ProcessInspector.getDefault().getSessionInspectors();
+    SessionInspector[] sessionInspectors = ProcessInspector.instance().getSessionInspectors();
     TreeMap<CompositeObject, SessionInspector> userAndTimeToSessions = new TreeMap<CompositeObject, SessionInspector>();
     for (int i = 0; i < sessionInspectors.length; i++) {
       String user = sessionInspectors[i].getInfo().getUserId();

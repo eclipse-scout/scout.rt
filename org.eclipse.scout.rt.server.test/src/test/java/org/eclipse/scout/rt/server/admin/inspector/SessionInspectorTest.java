@@ -46,7 +46,7 @@ public class SessionInspectorTest {
   @Test
   public void testSessionInspectorWithoutServletRequest() {
     ThreadContext.putHttpServletRequest(null);
-    SessionInspector inspector = new SessionInspector(ProcessInspector.getDefault(), ThreadContext.getServerSession());
+    SessionInspector inspector = new SessionInspector(ProcessInspector.instance(), ThreadContext.getServerSession());
     assertNull(inspector.getInfo().getCreationTime());
     assertNull(inspector.getInfo().getLastAccessedTime());
   }
@@ -55,7 +55,7 @@ public class SessionInspectorTest {
   public void testSessionInspectorWithoutHttpSession() {
     HttpServletRequest servletRequest = Mockito.mock(HttpServletRequest.class);
     ThreadContext.putHttpServletRequest(servletRequest);
-    SessionInspector inspector = new SessionInspector(ProcessInspector.getDefault(), ThreadContext.getServerSession());
+    SessionInspector inspector = new SessionInspector(ProcessInspector.instance(), ThreadContext.getServerSession());
     assertNull(inspector.getInfo().getCreationTime());
     assertNull(inspector.getInfo().getLastAccessedTime());
   }
@@ -68,7 +68,7 @@ public class SessionInspectorTest {
     Mockito.when(httpSession.getCreationTime()).thenReturn(CREATION_TIME);
     Mockito.when(httpSession.getLastAccessedTime()).thenReturn(LAST_ACCESS_TIME);
     ThreadContext.putHttpServletRequest(servletRequest);
-    SessionInspector inspector = new SessionInspector(ProcessInspector.getDefault(), ThreadContext.getServerSession());
+    SessionInspector inspector = new SessionInspector(ProcessInspector.instance(), ThreadContext.getServerSession());
     assertEquals(CREATION_TIME, inspector.getInfo().getCreationTime());
     assertEquals(LAST_ACCESS_TIME, inspector.getInfo().getLastAccessedTime());
   }
@@ -76,8 +76,8 @@ public class SessionInspectorTest {
   @Test
   public void testSessionInspectorWithServerSession() {
     IServerSession serverSession = ThreadContext.getServerSession();
-    SessionInspector inspector = new SessionInspector(ProcessInspector.getDefault(), serverSession);
-    assertEquals(ProcessInspector.getDefault(), inspector.getProcessInspector());
+    SessionInspector inspector = new SessionInspector(ProcessInspector.instance(), serverSession);
+    assertEquals(ProcessInspector.instance(), inspector.getProcessInspector());
     assertEquals(serverSession, inspector.getServerSession());
     assertEquals(serverSession.getId(), inspector.getInfo().getSessionId());
     assertEquals(serverSession.getUserId(), inspector.getInfo().getUserId());

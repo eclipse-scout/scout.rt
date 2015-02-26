@@ -25,7 +25,6 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.server.admin.inspector.ProcessInspector;
 import org.eclipse.scout.service.SERVICES;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
@@ -34,25 +33,9 @@ import org.osgi.framework.SynchronousBundleListener;
 public class Activator extends Plugin {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(Activator.class);
 
-  public static final String PLUGIN_ID = "org.eclipse.scout.rt.server";
-  private static Activator plugin;
-
-  public static Activator getDefault() {
-    return plugin;
-  }
-
-  private ProcessInspector m_processInspector;
-
-  /*
-   * (non-Javadoc)
-   * @see
-   * org.eclipse.core.runtime.Plugins#start(org.osgi.framework.BundleContext)
-   */
   @Override
   public void start(final BundleContext context) throws Exception {
     super.start(context);
-    plugin = this;
-    m_processInspector = new ProcessInspector();
     // workaround for bug in serverside equinox implementation with servletbridge
     // wait until done and launch product if one exists
     context.addBundleListener(new SynchronousBundleListener() {
@@ -71,21 +54,6 @@ public class Activator extends Plugin {
         }
       }
     });
-  }
-
-  /*
-   * (non-Javadoc)
-   * @see org.eclipse.core.runtime.Plugin#stop(org.osgi.framework.BundleContext)
-   */
-  @Override
-  public void stop(BundleContext context) throws Exception {
-    m_processInspector = null;
-    plugin = null;
-    super.stop(context);
-  }
-
-  public ProcessInspector getProcessInspector() {
-    return m_processInspector;
   }
 
   private void runProduct() {

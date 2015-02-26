@@ -19,11 +19,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.osgi.BundleClassDescriptor;
 import org.eclipse.scout.rt.platform.cdi.IBean;
-import org.eclipse.scout.rt.server.internal.Activator;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationFilter;
 import org.eclipse.scout.rt.server.services.common.clientnotification.IClientNotificationService;
 import org.eclipse.scout.rt.server.services.common.code.fixture.TestCodeType1;
@@ -130,7 +130,7 @@ public class CodeServiceTest {
 
     @Override
     protected boolean acceptBundle(Bundle bundle, String classPrefix) {
-      return super.acceptBundle(bundle, classPrefix) && (bundle != Activator.getDefault().getBundle());
+      return super.acceptBundle(bundle, classPrefix) && (bundle != Platform.getBundle("org.eclipse.scout.rt.server"));
     }
   }
 

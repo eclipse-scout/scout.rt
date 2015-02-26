@@ -44,7 +44,7 @@ public class CallsView extends DefaultView {
 
   @Override
   public boolean isVisible() {
-    return ProcessInspector.getDefault().isEnabled() && getAdminSession().getTopView().getSessionsView().getSelectedSession() != null;
+    return ProcessInspector.instance().isEnabled() && getAdminSession().getTopView().getSessionsView().getSelectedSession() != null;
   }
 
   @Override

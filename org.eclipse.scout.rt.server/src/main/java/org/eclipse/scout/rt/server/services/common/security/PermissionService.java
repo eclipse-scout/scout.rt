@@ -20,7 +20,6 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.osgi.BundleClassDescriptor;
 import org.eclipse.scout.commons.runtime.BundleBrowser;
-import org.eclipse.scout.rt.server.internal.Activator;
 import org.eclipse.scout.rt.shared.services.common.security.IPermissionService;
 import org.eclipse.scout.service.AbstractService;
 import org.osgi.framework.Bundle;
@@ -46,7 +45,7 @@ public class PermissionService extends AbstractService implements IPermissionSer
       // null-check with lock (valid check)
       if (m_permissionClasses == null) {
         HashSet<BundleClassDescriptor> discoveredPermissions = new HashSet<BundleClassDescriptor>();
-        for (Bundle bundle : Activator.getDefault().getBundle().getBundleContext().getBundles()) {
+        for (Bundle bundle : Platform.getBundle("org.eclipse.scout.rt.server").getBundleContext().getBundles()) {
           // Skip uninteresting bundles
           if (!acceptBundle(bundle)) {
             continue;

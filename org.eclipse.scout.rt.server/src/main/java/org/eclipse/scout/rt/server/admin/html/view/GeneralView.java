@@ -139,7 +139,7 @@ public class GeneralView extends DefaultView {
       return null;
     }
 
-    final ProcessInspector inst = ProcessInspector.getDefault();
+    final ProcessInspector inst = ProcessInspector.instance();
     if (inst.isEnabled()) {
       p.print("Monitor is active with maximum caching of " + (inst.getTimeout() / 1000 / 60) + " minutes [ ");
       p.linkAction("cache 2 min", new P_SetTimeoutAction(2));
@@ -264,7 +264,7 @@ public class GeneralView extends DefaultView {
 
     @Override
     public void run() {
-      ProcessInspector.getDefault().setEnabled(m_enabled);
+      ProcessInspector.instance().setEnabled(m_enabled);
     }
   }
 
@@ -279,7 +279,7 @@ public class GeneralView extends DefaultView {
 
     @Override
     public void run() {
-      ProcessInspector.getDefault().setTimeout(m_minutes * 60000L);
+      ProcessInspector.instance().setTimeout(m_minutes * 60000L);
     }
   }
 

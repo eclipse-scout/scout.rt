@@ -28,13 +28,11 @@ import org.eclipse.scout.rt.server.admin.html.AdminSession;
 import org.eclipse.scout.rt.server.admin.html.widget.table.HtmlComponent;
 import org.eclipse.scout.rt.server.admin.inspector.ReflectServiceInventory;
 import org.eclipse.scout.rt.server.admin.inspector.ServiceInspector;
-import org.eclipse.scout.rt.server.internal.Activator;
 import org.eclipse.scout.rt.shared.security.UpdateServiceConfigurationPermission;
 import org.eclipse.scout.rt.shared.services.common.security.ACCESS;
+import org.eclipse.scout.service.IService;
 import org.eclipse.scout.service.SERVICES;
 import org.eclipse.scout.service.ServiceUtility;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
 
 public class ServicesView extends DefaultView {
   private static final long serialVersionUID = -3977567784149624349L;
@@ -57,33 +55,15 @@ public class ServicesView extends DefaultView {
   public void activated() {
     // read all services
     m_serviceInspectors = null;
-    Activator a = Activator.getDefault();
-    if (a != null) {
-      SERVICES.getService(String.class);
-      BundleContext context = a.getBundle().getBundleContext();
-      try {
-        ServiceReference[] refs = context.getAllServiceReferences(null, null);
-        if (refs != null) {
-          try {
-            ArrayList<ServiceInspector> list = new ArrayList<ServiceInspector>(refs.length);
-            for (ServiceReference ref : refs) {
-              Object s = context.getService(ref);
-              if (s != null) {
-                list.add(new ServiceInspector(s));
-              }
-            }
-            m_serviceInspectors = list.toArray(new ServiceInspector[list.size()]);
-          }
-          finally {
-            for (ServiceReference ref : refs) {
-              context.ungetService(ref);
-            }
-          }
-        }
+    try {
+      ArrayList<ServiceInspector> list = new ArrayList<ServiceInspector>();
+      for (IService service : SERVICES.getServices(IService.class)) {
+        list.add(new ServiceInspector(service));
       }
-      catch (Exception e) {
-        // nop
-      }
+      m_serviceInspectors = list.toArray(new ServiceInspector[list.size()]);
+    }
+    catch (Exception e) {
+      // nop
     }
   }
 

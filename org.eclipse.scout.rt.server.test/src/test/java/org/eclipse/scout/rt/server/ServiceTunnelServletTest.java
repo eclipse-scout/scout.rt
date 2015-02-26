@@ -44,7 +44,6 @@ import org.eclipse.scout.rt.platform.cdi.IBean;
 import org.eclipse.scout.rt.server.commons.cache.ICacheEntry;
 import org.eclipse.scout.rt.server.commons.cache.StickySessionCacheService;
 import org.eclipse.scout.rt.server.fixture.TestServerSession;
-import org.eclipse.scout.rt.server.internal.Activator;
 import org.eclipse.scout.rt.server.services.common.security.AbstractAccessControlService;
 import org.eclipse.scout.rt.server.services.common.session.IServerSessionRegistryService;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelRequest;
@@ -332,10 +331,10 @@ public class ServiceTunnelServletTest {
         return Status.OK_STATUS;
       }
       catch (ProcessingException e) {
-        return new Status(IStatus.ERROR, Activator.PLUGIN_ID, 0, "Error executing lookup virtual session", e);
+        return new Status(IStatus.ERROR, "org.eclipse.scout.rt.server", 0, "Error executing lookup virtual session", e);
       }
       catch (ServletException e) {
-        return new Status(IStatus.ERROR, Activator.PLUGIN_ID, 0, "Error executing lookup virtual session", e);
+        return new Status(IStatus.ERROR, "org.eclipse.scout.rt.server", 0, "Error executing lookup virtual session", e);
       }
     }
   }
@@ -366,10 +365,10 @@ public class ServiceTunnelServletTest {
         return Status.OK_STATUS;
       }
       catch (ProcessingException e) {
-        return new Status(IStatus.ERROR, Activator.PLUGIN_ID, 0, "Error executing lookup http session", e);
+        return new Status(IStatus.ERROR, "org.eclipse.scout.rt.server", 0, "Error executing lookup http session", e);
       }
       catch (ServletException e) {
-        return new Status(IStatus.ERROR, Activator.PLUGIN_ID, 0, "Error executing lookup http session", e);
+        return new Status(IStatus.ERROR, "org.eclipse.scout.rt.server", 0, "Error executing lookup http session", e);
       }
     }
   }

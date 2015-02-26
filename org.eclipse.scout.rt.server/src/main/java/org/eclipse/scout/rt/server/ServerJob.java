@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.commons.LocaleThreadLocal;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -31,7 +32,6 @@ import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.serialization.SerializationUtility;
-import org.eclipse.scout.rt.server.internal.Activator;
 import org.eclipse.scout.rt.server.transaction.BasicTransaction;
 import org.eclipse.scout.rt.server.transaction.ITransaction;
 import org.eclipse.scout.rt.server.transaction.internal.ActiveTransactionRegistry;
@@ -83,7 +83,7 @@ public abstract class ServerJob extends JobEx implements IServerSessionProvider 
 
   private boolean isUseCustomClassloader() {
     try {
-      return StringUtility.parseBoolean(Activator.getDefault().getBundle().getBundleContext().getProperty(CUSTOM_CLASSLOADER_PROPERTY));
+      return StringUtility.parseBoolean(ConfigIniUtility.getProperty(CUSTOM_CLASSLOADER_PROPERTY));
     }
     catch (Exception e) {
       return false;

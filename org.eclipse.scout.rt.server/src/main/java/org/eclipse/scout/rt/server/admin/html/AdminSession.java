@@ -62,7 +62,7 @@ public class AdminSession implements Serializable {
         emitter.setInvokedAction(action);
       }
     }
-    ProcessInspector.getDefault().update();
+    ProcessInspector.instance().update();
     m_topView.produceBody(emitter);
     setActionMap(emitter.getActionMap());
     // prepare output

@@ -14,13 +14,14 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
 
 import org.eclipse.scout.commons.TypeCastUtility;
+import org.eclipse.scout.service.IService;
 import org.eclipse.scout.service.IServiceInventory;
 
 public class ServiceInspector {
 
-  private final Object m_service;
+  private final IService m_service;
 
-  public ServiceInspector(Object service) {
+  public ServiceInspector(IService service) {
     m_service = service;
   }
 
@@ -34,7 +35,7 @@ public class ServiceInspector {
     return inv;
   }
 
-  public Object getService() {
+  public IService getService() {
     return m_service;
   }
 

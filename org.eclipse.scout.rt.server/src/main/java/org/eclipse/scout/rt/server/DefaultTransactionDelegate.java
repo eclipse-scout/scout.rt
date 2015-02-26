@@ -175,7 +175,7 @@ public class DefaultTransactionDelegate {
       notificationService.ackNotifications(consumedNotifications);
     }
     CallInspector callInspector = null;
-    SessionInspector sessionInspector = ProcessInspector.getDefault().getSessionInspector(serverSession, true);
+    SessionInspector sessionInspector = ProcessInspector.instance().getSessionInspector(serverSession, true);
     if (sessionInspector != null) {
       callInspector = sessionInspector.requestCallInspector(serviceReq);
     }

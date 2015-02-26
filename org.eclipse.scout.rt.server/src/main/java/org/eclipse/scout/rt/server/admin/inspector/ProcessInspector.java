@@ -15,16 +15,21 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.scout.commons.TTLCache;
+import org.eclipse.scout.rt.platform.cdi.ApplicationScoped;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.server.IServerSession;
-import org.eclipse.scout.rt.server.internal.Activator;
 
 /**
  * process monitor of servlet context
  */
+@ApplicationScoped
 public class ProcessInspector {
 
-  public static synchronized ProcessInspector getDefault() {
-    return Activator.getDefault().getProcessInspector();
+  /**
+   * Convenience for {@link OBJ#one(Class)}
+   */
+  public static ProcessInspector instance() {
+    return OBJ.one(ProcessInspector.class, ProcessInspector.class);
   }
 
   /**
