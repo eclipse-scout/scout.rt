@@ -124,7 +124,7 @@ public class BeanContext implements IBeanContext {
     if (bean != null) {
       return bean.get();
     }
-    else {
+    else if (defaultBeanClazz != null) {
       try {
         return defaultBeanClazz.newInstance();
       }
@@ -132,6 +132,7 @@ public class BeanContext implements IBeanContext {
         throw new RuntimeException("clazz " + defaultBeanClazz, e);
       }
     }
+    return null;
   }
 
   @Override

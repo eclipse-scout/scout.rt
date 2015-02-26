@@ -128,5 +128,4 @@ public abstract class AbstractIconProviderService extends AbstractService implem
   }
 
   protected abstract URL findResource(String relativePath);
-
 }
