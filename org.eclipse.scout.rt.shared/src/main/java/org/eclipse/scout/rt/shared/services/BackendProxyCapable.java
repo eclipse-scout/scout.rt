@@ -8,18 +8,21 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.rt.client.services;
+package org.eclipse.scout.rt.shared.services;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.eclipse.scout.service.IService;
+
 /**
- *
+ * Marks a {@link IService} interface that is capable of being called as client proxy to the back-end server if there is
+ * no real implementation available for the service
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.METHOD})
-public @interface BackendProxy {
+public @interface BackendProxyCapable {
 
 }
