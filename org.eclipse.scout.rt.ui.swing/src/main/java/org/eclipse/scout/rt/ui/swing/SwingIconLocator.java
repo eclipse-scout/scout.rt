@@ -34,7 +34,7 @@ import org.eclipse.scout.rt.ui.swing.basic.IconUtility;
 /**
  * Looks for icons and creates Swing-specific resources
  */
-public class SwingIconLocator {
+public final class SwingIconLocator {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingIconLocator.class);
 
   public static final Pattern IMAGE_WITH_STATE_PATTERN = Pattern.compile("(.*)(_active|_disabled|_mouse|_mouse_over|_open|_over|_pressed|_rollover|_selected)", Pattern.CASE_INSENSITIVE);

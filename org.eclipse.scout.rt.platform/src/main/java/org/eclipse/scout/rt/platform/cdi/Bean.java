@@ -92,7 +92,7 @@ public class Bean<T> implements IBean<T> {
   }
 
   protected T createNewInstance() {
-    return new BeanInstanceCreator<T>(this).create();
+    return BeanInstanceCreator.create(getBeanClazz());
   }
 
   public T getInstance() {

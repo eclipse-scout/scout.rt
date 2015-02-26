@@ -93,7 +93,7 @@ public class ScoutServerTestRunner extends BlockJUnit4ClassRunner {
 
   static {
     ((Platform) Platform.get()).ensureStarted();
-    s_defaultServerSessionProvider = BeanInstanceCreator.createAndInitialize(DefaultTestServerSessionProvider.class);
+    s_defaultServerSessionProvider = BeanInstanceCreator.create(DefaultTestServerSessionProvider.class);
     LOG = ScoutLogManager.getLogger(ScoutServerTestRunner.class);
     FACTORY = createServerTestEnvironmentFactory();
     BACKEND_JOB_SERVICE = SERVICES.getService(IServerJobService.class);

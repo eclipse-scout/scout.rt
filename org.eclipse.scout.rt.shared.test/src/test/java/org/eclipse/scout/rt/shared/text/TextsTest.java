@@ -43,7 +43,7 @@ public class TextsTest {
   @Before
   public void before() throws InterruptedException {
 
-    m_testTextService = TestingUtility.registerServices(5, BeanInstanceCreator.createAndInitialize(TestTextProviderService.class));
+    m_testTextService = TestingUtility.registerServices(5, BeanInstanceCreator.create(TestTextProviderService.class));
     TextsThreadLocal.set(new ScoutTexts(SERVICES.getServices(ITextProviderService.class)));
   }
 

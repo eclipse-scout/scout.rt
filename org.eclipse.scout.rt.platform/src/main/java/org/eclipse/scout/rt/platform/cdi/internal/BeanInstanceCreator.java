@@ -30,31 +30,20 @@ import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.platform.cdi.IBean;
 import org.eclipse.scout.rt.platform.cdi.Instance;
 import org.eclipse.scout.rt.platform.cdi.OBJ;
 
 /**
  *
  */
-public class BeanInstanceCreator<T> {
+public final class BeanInstanceCreator {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(BeanInstanceCreator.class);
 
-  private final IBean<T> m_bean;
+  private BeanInstanceCreator() {
 
-  public BeanInstanceCreator(IBean<T> bean) {
-    m_bean = Assertions.assertNotNull(bean);
   }
 
-  public IBean<T> getBean() {
-    return m_bean;
-  }
-
-  public T create() {
-    return createAndInitialize(getBean().getBeanClazz());
-  }
-
-  public static <T> T createAndInitialize(Class<T> beanClazz) {
+  public static <T> T create(Class<T> beanClazz) {
     T instance = null;
     try {
       instance = Assertions.assertNotNull(createInstance(beanClazz));

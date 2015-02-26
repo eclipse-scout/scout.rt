@@ -40,7 +40,7 @@ public class DefaultTestServerSessionProviderTest {
   @Ignore
   @Test
   public void testCreateServerSession() throws ProcessingException {
-    DefaultTestServerSessionProvider serverSessionProvider = BeanInstanceCreator.createAndInitialize(DefaultTestServerSessionProvider.class);
+    DefaultTestServerSessionProvider serverSessionProvider = BeanInstanceCreator.create(DefaultTestServerSessionProvider.class);
     final DefaultTestServerSessionProvider d = Mockito.spy(serverSessionProvider);
     final Subject subject = new Subject();
     final TestServerSession session = d.createServerSession(TestServerSession.class, subject);

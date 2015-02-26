@@ -10,8 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.scout.commons.Assertions;
+import org.eclipse.scout.rt.platform.cdi.CDI;
+import org.eclipse.scout.rt.platform.cdi.IBean;
+import org.eclipse.scout.rt.platform.cdi.IInterceptedBean;
 import org.eclipse.scout.rt.platform.cdi.OBJ;
 
 /**
@@ -37,15 +42,55 @@ public final class SERVICES {
    *          The interface or class name with which the service was registered.
    * @return the service with the highest ranking or <code>null</code>, if the service is not found.
    */
-  public static <T extends Object> T getService(Class<T> serviceInterfaceClass) {
-    return OBJ.one(serviceInterfaceClass);
+  public static <T extends Object> T getService(Class<T> serviceClass) {
+    if (Assertions.assertNotNull(serviceClass).isInterface()) {
+      return OBJ.one(serviceClass);
+    }
+    else {
+      // workaround since interceptors are only possible on interfaces (Proxy instances). So we try to finde the wrapped original bean and return it without interceptors.
+      return getServicesWithoutInterceptors(serviceClass, true).get(0);
+    }
   }
 
   /**
    * @return the services ordered by ranking or an empty array, if no services are found.
    */
-  public static <T extends Object> List<T> getServices(Class<T> serviceInterfaceClass) {
-    return OBJ.all(serviceInterfaceClass);
+  public static <T extends Object> List<T> getServices(Class<T> serviceClass) {
+    if (Assertions.assertNotNull(serviceClass).isInterface()) {
+      return OBJ.all(serviceClass);
+    }
+    else {
+      // workaround since interceptors are only possible on interfaces (Proxy instances). So we try to finde the wrapped original bean and return it without interceptors.
+      return getServicesWithoutInterceptors(serviceClass, false);
+    }
+  }
+
+  private static <T extends Object> List<T> getServicesWithoutInterceptors(Class<T> serviceClass, boolean onlyFirst) {
+    List<IBean<T>> beans = CDI.getBeanContext().getBeans(serviceClass);
+    List<T> services = new ArrayList<T>(onlyFirst ? 1 : beans.size());
+    for (IBean<T> bean : beans) {
+      services.add(getBeanWithoutInterceptors(bean).get());
+      if (onlyFirst) {
+        break;
+      }
+    }
+    return services;
+  }
+
+  /**
+   * potentially are asdf
+   *
+   * @param potentially
+   * @return
+   */
+  @SuppressWarnings("unchecked")
+  private static <T> IBean<T> getBeanWithoutInterceptors(IBean<T> potentiallyInterceptedBean) {
+    if (Assertions.assertNotNull(potentiallyInterceptedBean).isIntercepted()) {
+      return getBeanWithoutInterceptors(((IInterceptedBean<T>) potentiallyInterceptedBean).getInteceptedBean());
+    }
+    else {
+      return potentiallyInterceptedBean;
+    }
   }
 
 }

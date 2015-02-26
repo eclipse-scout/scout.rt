@@ -25,28 +25,29 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.platform.cdi.Bean;
 import org.eclipse.scout.rt.platform.cdi.IBean;
+import org.eclipse.scout.rt.platform.cdi.IInterceptedBean;
 import org.eclipse.scout.rt.platform.cdi.interceptor.InvocationContext;
 import org.eclipse.scout.rt.platform.cdi.interceptor.internal.SimpleInvocationContext;
 
 /**
  *
  */
-public class InterceptedBean<T> extends Bean<T> {
+public class InterceptedBean<T> extends Bean<T> implements IInterceptedBean<T> {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(InterceptedBean.class);
-  private IBean<T> m_wrappedBean;
+  private IBean<T> m_interceptedBean;
   private Object m_interceptor;
 
-  public InterceptedBean(IBean<T> wrappedBean, Object interceptor) {
-    super(wrappedBean.getBeanClazz());
-    setBeanAnnotations(wrappedBean.getBeanAnnotations());
-    m_wrappedBean = wrappedBean;
+  public InterceptedBean(IBean<T> bean, Object interceptor) {
+    super(bean.getBeanClazz());
+    setBeanAnnotations(bean.getBeanAnnotations());
+    m_interceptedBean = bean;
     m_interceptor = interceptor;
 
   }
 
   @Override
   protected T createNewInstance() {
-    T instance = getWrappedBean().get();
+    T instance = getInteceptedBean().get();
     List<Method> interceptorMethods = new ArrayList<Method>();
     // read around invoke methods
     for (Method m : getInterceptor().getClass().getDeclaredMethods()) {
@@ -67,7 +68,7 @@ public class InterceptedBean<T> extends Bean<T> {
   }
 
   @Override
-  public boolean isIntercepted() {
+  public final boolean isIntercepted() {
     return true;
   }
 
@@ -75,8 +76,9 @@ public class InterceptedBean<T> extends Bean<T> {
     return m_interceptor;
   }
 
-  public IBean<T> getWrappedBean() {
-    return m_wrappedBean;
+  @Override
+  public IBean<T> getInteceptedBean() {
+    return m_interceptedBean;
   }
 
   private class P_ProxyInvocationHandler implements InvocationHandler {

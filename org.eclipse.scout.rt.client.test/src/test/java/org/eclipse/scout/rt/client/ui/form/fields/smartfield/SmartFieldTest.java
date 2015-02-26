@@ -186,7 +186,7 @@ public class SmartFieldTest {
 
   @Before
   public void setUp() throws Throwable {
-    reg = TestingUtility.registerServices(0, BeanInstanceCreator.createAndInitialize(StyleLookupService.class));
+    reg = TestingUtility.registerServices(0, BeanInstanceCreator.create(StyleLookupService.class));
     form = new TestForm();
     form.startForm();
   }

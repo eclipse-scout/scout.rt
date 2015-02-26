@@ -33,9 +33,6 @@ public abstract class AbstractService implements IService {
   @Inject
   private Instance<IServiceInitializer> m_initializers;
 
-  public AbstractService() {
-  }
-
   /**
    * This default implementation calls the default initializer {@link DefaultServiceInitializer} which calls
    * {@link org.eclipse.scout.service.ServiceUtility#injectConfigParams}(this).
@@ -44,13 +41,20 @@ public abstract class AbstractService implements IService {
    */
   @PostConstruct
   protected void initializeService() {
-    Iterator<IServiceInitializer> it = m_initializers.iterator();
-    while (it.hasNext()) {
-      ServiceInitializerResult res = it.next().initializeService(this);
-      if (ServiceInitializerResult.STOP.equals(res)) {
-        break;
+    Instance<IServiceInitializer> initializers = getInitializers();
+    if (initializers != null) {
+      Iterator<IServiceInitializer> it = initializers.iterator();
+      while (it.hasNext()) {
+        ServiceInitializerResult res = it.next().initializeService(this);
+        if (ServiceInitializerResult.STOP.equals(res)) {
+          break;
+        }
       }
     }
+  }
+
+  protected Instance<IServiceInitializer> getInitializers() {
+    return m_initializers;
   }
 
   /**
