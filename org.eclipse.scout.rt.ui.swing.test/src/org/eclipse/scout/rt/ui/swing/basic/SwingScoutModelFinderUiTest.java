@@ -22,6 +22,7 @@ import javax.swing.SwingUtilities;
 
 import org.easymock.EasyMock;
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
@@ -52,6 +53,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.sequencebox.AbstractSequenceBo
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.treebox.AbstractTreeBox;
+import org.eclipse.scout.rt.platform.cdi.IBean;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
 import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
@@ -70,7 +73,8 @@ import org.eclipse.scout.rt.ui.swing.basic.SwingScoutModelFinderUiTest.AllFields
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutModelFinderUiTest.AllFieldsTestForm.MainBox.StringField2;
 import org.eclipse.scout.rt.ui.swing.basic.SwingScoutModelFinderUiTest.AllFieldsTestForm.MainBox.TreeBoxField;
 import org.eclipse.scout.rt.ui.swing.form.fields.ISwingScoutFormField;
-import org.junit.Assert;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -78,15 +82,23 @@ import org.junit.Test;
  */
 public class SwingScoutModelFinderUiTest {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingScoutModelFinderUiTest.class);
-  private static final IconLocator NULL_ICON_LOCATOR = new P_NullIconLocator();
+
+  private IBean<?> m_iconLocatorReg;
+
+  @Before
+  public void before() {
+    m_iconLocatorReg = OBJ.register(P_NullIconLocator.class);
+  }
+
+  @After
+  public void after() {
+    OBJ.unregisterBean(m_iconLocatorReg);
+  }
 
   @Test
   public void test() throws InterruptedException, InvocationTargetException {
     final IClientSession clientSession = EasyMock.createNiceMock(IClientSession.class);
-    Assert.assertNotNull(IconLocator.instance());
-    EasyMock.expectLastCall().andReturn(NULL_ICON_LOCATOR).anyTimes();
     EasyMock.replay(clientSession);
-
     SwingUtilities.invokeAndWait(new Runnable() {
       final ISwingEnvironment m_env = new AbstractSwingApplication() {
 
@@ -413,6 +425,7 @@ public class SwingScoutModelFinderUiTest {
   public static class PageWithNode extends AbstractPageWithNodes {
   }
 
+  @Priority(1000)
   public static class P_NullIconLocator extends IconLocator {
 
     @Override

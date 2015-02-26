@@ -26,8 +26,7 @@ import org.eclipse.scout.service.SERVICES;
 public class IconLocator {
 
   public static IconLocator instance() {
-    //TODO imo use OBJ.GET once it exists and reads all beans
-    return new IconLocator();
+    return OBJ.NEW(IconLocator.class);
   }
 
   public IconSpec getIconSpec(String name) {
