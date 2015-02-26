@@ -32,6 +32,9 @@ public final class OBJ {
 
   /**
    * This method is deleted once CDI with auto-detection of beans is in place
+   * <p>
+   * register a {@link IBeanContributor} in the file
+   * src/main/resources/META-INF/services/org.eclipse.scout.rt.platform.cdi.IBeanContributor
    */
   public static <T> T one(Class<T> beanClazz, Class<? extends T> defaultBeanClazz) {
     return CDI.getBeanContext().getInstance(beanClazz, defaultBeanClazz);
