@@ -26,7 +26,7 @@ import org.eclipse.scout.service.SERVICES;
 public class IconLocator {
 
   public static IconLocator instance() {
-    return OBJ.NEW(IconLocator.class);
+    return OBJ.NEW(IconLocator.class, new IconLocator());
   }
 
   public IconSpec getIconSpec(String name) {
