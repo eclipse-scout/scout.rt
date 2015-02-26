@@ -23,7 +23,7 @@ public class SwingBeanContributor implements IBeanContributor {
 
   @Override
   public void contributeBeans(IBeanContext context) {
-    context.register(FormFieldExtensions.class);
+    context.registerClass(FormFieldExtensions.class);
     PluginXmlParser.get().visit(new FormFieldsPluginXmlVisitor(context));
   }
 

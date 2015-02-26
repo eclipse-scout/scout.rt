@@ -50,14 +50,14 @@ public class BeanContext implements IBeanContext {
   }
 
   @Override
-  public <T> IBean<T> register(Class<T> beanClazz) {
+  public <T> IBean<T> registerClass(Class<T> beanClazz) {
     Bean<T> bean = new Bean<T>(beanClazz);
-    register(bean);
+    registerBean(bean);
     return bean;
   }
 
   @Override
-  public void register(IBean<?> bean) {
+  public void registerBean(IBean<?> bean) {
     Class[] interfacesHierarchy = BeanUtility.getInterfacesHierarchy(bean.getBeanClazz(), Object.class);
     List<Class<?>> clazzes = new ArrayList<Class<?>>(interfacesHierarchy.length + 1);
     clazzes.add(bean.getBeanClazz());
@@ -96,18 +96,6 @@ public class BeanContext implements IBeanContext {
   }
 
   @Override
-  public synchronized void unregisterBean(Class<?> clazz) {
-    for (Set<IBean<?>> beans : m_beans.values()) {
-      Iterator<IBean<?>> beanIt = beans.iterator();
-      while (beanIt.hasNext()) {
-        if (beanIt.next().getBeanClazz().equals(clazz)) {
-          beanIt.remove();
-        }
-      }
-    }
-  }
-
-  @Override
   public synchronized void unregisterBean(IBean<?> bean) {
     Assertions.assertNotNull(bean);
     for (Set<IBean<?>> beans : m_beans.values()) {
@@ -131,13 +119,18 @@ public class BeanContext implements IBeanContext {
   }
 
   @Override
-  public <T> T getInstance(Class<T> beanClazz, T defaultBean) {
+  public <T> T getInstance(Class<T> beanClazz, Class<? extends T> defaultBeanClazz) {
     IBean<T> bean = getBean(beanClazz);
     if (bean != null) {
       return bean.get();
     }
     else {
-      return defaultBean;
+      try {
+        return defaultBeanClazz.newInstance();
+      }
+      catch (Exception e) {
+        throw new RuntimeException("clazz " + defaultBeanClazz, e);
+      }
     }
   }
 
@@ -150,6 +143,7 @@ public class BeanContext implements IBeanContext {
     return bean;
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public <T> IBean<T> getBean(Class<T> beanClazz) {
     TreeSet<IBean<?>> beans = getBeansInternal(beanClazz);
@@ -159,6 +153,7 @@ public class BeanContext implements IBeanContext {
     return null;
   }
 
+  @Override
   @SuppressWarnings("unchecked")
   public <T> List<IBean<T>> getBeans(Class<T> beanClazz) {
     TreeSet<IBean<?>> beans = getBeansInternal(beanClazz);
@@ -186,6 +181,7 @@ public class BeanContext implements IBeanContext {
     return beans;
   }
 
+  @Override
   public List<IBean<?>> getAllRegisteredBeans() {
     List<IBean<?>> allBeans = new LinkedList<IBean<?>>();
     for (Set<IBean<?>> beans : m_beans.values()) {

@@ -87,7 +87,7 @@ public class SwingScoutModelFinderUiTest {
 
   @Before
   public void before() {
-    m_iconLocatorReg = OBJ.register(P_NullIconLocator.class);
+    m_iconLocatorReg = OBJ.registerClass(P_NullIconLocator.class);
   }
 
   @After

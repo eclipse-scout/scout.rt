@@ -206,14 +206,14 @@ public class BeanInstanceCreator<T> {
       else if (parameterArgTypes.length == 1) {
         // instance handling
         if (parameterizedType.getRawType().equals(Instance.class)) {
-          return (T) new InstanceImpl<T>(OBJ.ALL((Class<T>) parameterArgTypes[0]));
+          return (T) new InstanceImpl<T>(OBJ.all((Class<T>) parameterArgTypes[0]));
         }
         else {
           throw new IllegalArgumentException(String.format("Generic bindings are only allowed for Instance<Abc> injection. Type '%s' can not be found on CDI context.", type));
         }
       }
     }
-    T instance = Assertions.assertNotNull(OBJ.NEW((Class<T>) type));
+    T instance = Assertions.assertNotNull(OBJ.one((Class<T>) type));
     return instance;
   }
 

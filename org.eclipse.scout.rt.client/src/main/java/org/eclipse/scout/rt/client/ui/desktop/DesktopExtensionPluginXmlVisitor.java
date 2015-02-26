@@ -85,7 +85,7 @@ public class DesktopExtensionPluginXmlVisitor implements IPluginXmlVisitor {
         return;
       }
 
-      m_context.register(loadClass);
+      m_context.registerClass(loadClass);
     }
     catch (ClassNotFoundException ex) {
       LOG.error("Unable to load desktop extension '" + clazz + "'.", ex);

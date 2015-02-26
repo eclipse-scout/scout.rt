@@ -37,30 +37,30 @@ public class InjectInstancesTest {
 
   @BeforeClass
   public static void registerBeans() {
-    m_bean01 = OBJ.register(Bean01.class);
-    m_bean02 = OBJ.register(Bean02.class);
-    m_bean03 = OBJ.register(MyBean01.class);
-    m_bean04 = OBJ.register(MyBean02.class);
+    m_bean01 = OBJ.registerClass(Bean01.class);
+    m_bean02 = OBJ.registerClass(Bean02.class);
+    m_bean03 = OBJ.registerClass(MyBean01.class);
+    m_bean04 = OBJ.registerClass(MyBean02.class);
 
   }
 
   @Test
   public void testFieldInstanceInjection() {
-    MyBean01 myBean = OBJ.NEW(MyBean01.class);
+    MyBean01 myBean = OBJ.one(MyBean01.class);
     Assert.assertNotNull(myBean);
     List<ITestBean> testBeans = myBean.getTestBeans();
     Assert.assertEquals(testBeans.size(), 2);
-    testBeans.removeAll(CollectionUtility.arrayList(OBJ.NEW(Bean01.class), OBJ.NEW(Bean02.class)));
+    testBeans.removeAll(CollectionUtility.arrayList(OBJ.one(Bean01.class), OBJ.one(Bean02.class)));
     Assert.assertEquals(0, testBeans.size());
   }
 
   @Test
   public void testMethodInstanceInjection() {
-    MyBean02 myBean = OBJ.NEW(MyBean02.class);
+    MyBean02 myBean = OBJ.one(MyBean02.class);
     Assert.assertNotNull(myBean);
     List<ITestBean> testBeans = myBean.getTestBeans();
     Assert.assertEquals(testBeans.size(), 2);
-    testBeans.removeAll(CollectionUtility.arrayList(OBJ.NEW(Bean01.class), OBJ.NEW(Bean02.class)));
+    testBeans.removeAll(CollectionUtility.arrayList(OBJ.one(Bean01.class), OBJ.one(Bean02.class)));
     Assert.assertEquals(0, testBeans.size());
   }
 

@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.platform.cdi;
 
 import java.util.List;
 
+import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.rt.platform.cdi.internal.BeanContext;
 
 /**
@@ -22,28 +23,33 @@ public final class OBJ {
   private OBJ() {
   }
 
-  public static <T> T NEW(Class<T> beanClazz, T defaultBean) {
-    return CDI.getBeanContext().getInstance(beanClazz, defaultBean);
-  }
-
-  public static <T> T NEW(Class<T> beanClazz) {
+  /**
+   * @return the first instance of this type, the one with the highest {@link Priority}
+   */
+  public static <T> T one(Class<T> beanClazz) {
     return CDI.getBeanContext().getInstance(beanClazz);
   }
 
-  public static <T> IBean<T> register(Class<T> clazz) {
-    return CDI.getBeanContext().register(clazz);
+  /**
+   * This method is deleted once CDI with auto-detection of beans is in place
+   */
+  public static <T> T one(Class<T> beanClazz, Class<? extends T> defaultBeanClazz) {
+    return CDI.getBeanContext().getInstance(beanClazz, defaultBeanClazz);
   }
 
-  public static <T> List<T> ALL(Class<T> beanClazz) {
+  /**
+   * @return all instances of this type
+   */
+  public static <T> List<T> all(Class<T> beanClazz) {
     return CDI.getBeanContext().getInstances(beanClazz);
   }
 
-  public static void register(IBean<?> bean) {
-    CDI.getBeanContext().register(bean);
+  public static <T> IBean<T> registerClass(Class<T> clazz) {
+    return CDI.getBeanContext().registerClass(clazz);
   }
 
-  public static void unregisterBean(Class<?> clazz) {
-    CDI.getBeanContext().unregisterBean(clazz);
+  public static void registerBean(IBean<?> bean) {
+    CDI.getBeanContext().registerBean(bean);
   }
 
   public static void unregisterBean(IBean<?> bean) {

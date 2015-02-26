@@ -26,7 +26,7 @@ public class SimpleInstanceTest {
   @BeforeClass
   public static void registerBeans() {
     context = new BeanContext();
-    context.register(TestObject.class);
+    context.registerClass(TestObject.class);
   }
 
   @Test
@@ -40,7 +40,7 @@ public class SimpleInstanceTest {
 
   @AfterClass
   public static void unregisterBeans() {
-    OBJ.register(TestObject.class);
+    OBJ.registerClass(TestObject.class);
   }
 
   private static interface ITestObject {

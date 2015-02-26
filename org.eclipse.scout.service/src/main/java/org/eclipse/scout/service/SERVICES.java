@@ -38,14 +38,14 @@ public final class SERVICES {
    * @return the service with the highest ranking or <code>null</code>, if the service is not found.
    */
   public static <T extends Object> T getService(Class<T> serviceInterfaceClass) {
-    return OBJ.NEW(serviceInterfaceClass);
+    return OBJ.one(serviceInterfaceClass);
   }
 
   /**
    * @return the services ordered by ranking or an empty array, if no services are found.
    */
   public static <T extends Object> List<T> getServices(Class<T> serviceInterfaceClass) {
-    return OBJ.ALL(serviceInterfaceClass);
+    return OBJ.all(serviceInterfaceClass);
   }
 
 }

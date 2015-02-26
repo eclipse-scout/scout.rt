@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.service.SERVICES;
 
 /**
- * Get access to the current {@link IconLocator} using {@link OBJ#NEW(Class)}
+ * Get access to the current {@link IconLocator} using {@link OBJ#one(Class)}
  * <p>
  * or use the convenience {@link #instance()} method
  */
@@ -26,7 +26,7 @@ import org.eclipse.scout.service.SERVICES;
 public class IconLocator {
 
   public static IconLocator instance() {
-    return OBJ.NEW(IconLocator.class, new IconLocator());
+    return OBJ.one(IconLocator.class, IconLocator.class);
   }
 
   public IconSpec getIconSpec(String name) {

@@ -31,8 +31,8 @@ public class SamePriotrityTest {
 
   @BeforeClass
   public static void registerBeans() {
-    m_bean01 = OBJ.register(ABean.class);
-    m_bean02 = OBJ.register(BBean.class);
+    m_bean01 = OBJ.registerClass(ABean.class);
+    m_bean02 = OBJ.registerClass(BBean.class);
   }
 
   /**
@@ -40,8 +40,8 @@ public class SamePriotrityTest {
    */
   @Test
   public void testPriority() {
-    Assert.assertEquals(ABean.class, OBJ.NEW(ITestBean.class).getClass());
-    List<ITestBean> all = OBJ.ALL(ITestBean.class);
+    Assert.assertEquals(ABean.class, OBJ.one(ITestBean.class).getClass());
+    List<ITestBean> all = OBJ.all(ITestBean.class);
     Assert.assertEquals(2, all.size());
     Assert.assertEquals(ABean.class, all.get(0).getClass());
     Assert.assertEquals(BBean.class, all.get(1).getClass());

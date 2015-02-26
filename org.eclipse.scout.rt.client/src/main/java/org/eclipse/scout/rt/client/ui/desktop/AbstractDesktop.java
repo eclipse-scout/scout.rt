@@ -594,7 +594,7 @@ public abstract class AbstractDesktop extends AbstractPropertyObserver implement
    *          a live list can be modified.
    */
   protected void injectDesktopExtensions(List<IDesktopExtension> desktopExtensions) {
-    List<IDesktopExtension> extensions = OBJ.ALL(IDesktopExtension.class);
+    List<IDesktopExtension> extensions = OBJ.all(IDesktopExtension.class);
     for (IDesktopExtension e : extensions) {
       e.setCoreDesktop(this);
     }

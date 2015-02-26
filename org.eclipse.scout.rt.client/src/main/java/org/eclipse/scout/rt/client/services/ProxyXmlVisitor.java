@@ -79,7 +79,7 @@ public class ProxyXmlVisitor implements IPluginXmlVisitor {
       }
     };
     fillProxyAnnotations(bean, xmlFile, ref);
-    m_context.register(bean);
+    m_context.registerBean(bean);
   }
 
   public static void fillProxyAnnotations(Bean<?> bean, IPluginXml pluginXml, IServiceReference ref) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException, ClassNotFoundException {

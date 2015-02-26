@@ -22,9 +22,9 @@ public class BeanRegisterUnregisterTest {
   @Test
   public void test() {
     BeanContext context = new BeanContext();
-    context.register(TestObject.class);
+    IBean<?> reg = context.registerClass(TestObject.class);
     Assert.assertEquals(1, context.getAllRegisteredBeans().size());
-    context.unregisterBean(TestObject.class);
+    context.unregisterBean(reg);
     Assert.assertEquals(0, context.getAllRegisteredBeans().size());
   }
 

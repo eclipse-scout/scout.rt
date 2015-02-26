@@ -33,9 +33,9 @@ public class PostConstructTest {
 
   @BeforeClass
   public static void registerBeans() {
-    m_bean01 = OBJ.register(Bean01.class);
-    m_bean02 = OBJ.register(Bean02.class);
-    m_bean04 = OBJ.register(Bean04.class);
+    m_bean01 = OBJ.registerClass(Bean01.class);
+    m_bean02 = OBJ.registerClass(Bean02.class);
+    m_bean04 = OBJ.registerClass(Bean04.class);
 
   }
 
@@ -47,19 +47,19 @@ public class PostConstructTest {
   @Test
   public void testInitialize() {
     Assert.assertEquals(0, Bean01.m_initializedCounter.get());
-    OBJ.NEW(Bean01.class);
+    OBJ.one(Bean01.class);
     Assert.assertEquals(1, Bean01.m_initializedCounter.get());
 
-    OBJ.NEW(Bean01.class);
+    OBJ.one(Bean01.class);
     Assert.assertEquals(1, Bean01.m_initializedCounter.get());
   }
 
   @Test
   public void testInitialzeInHierarchy() {
-    Bean02 new1 = OBJ.NEW(Bean02.class);
+    Bean02 new1 = OBJ.one(Bean02.class);
     Assert.assertEquals(1, new1.getSuperInitCount());
     Assert.assertEquals(1, new1.getInitCount());
-    new1 = OBJ.NEW(Bean02.class);
+    new1 = OBJ.one(Bean02.class);
     Assert.assertEquals(1, new1.getSuperInitCount());
     Assert.assertEquals(1, new1.getInitCount());
 
@@ -67,10 +67,10 @@ public class PostConstructTest {
 
   @Test
   public void testInitializeInHierarchyWithSameMethodNames() {
-    Bean04 new1 = OBJ.NEW(Bean04.class);
+    Bean04 new1 = OBJ.one(Bean04.class);
     Assert.assertEquals(1, new1.getBean04InitCount());
     Assert.assertEquals(1, new1.getAbstractBean03InitCount());
-    new1 = OBJ.NEW(Bean04.class);
+    new1 = OBJ.one(Bean04.class);
     Assert.assertEquals(1, new1.getBean04InitCount());
     Assert.assertEquals(1, new1.getAbstractBean03InitCount());
 

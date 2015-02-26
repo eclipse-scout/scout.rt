@@ -47,7 +47,7 @@ public class SERVICESTest {
 
     Bean<? extends ITestService> bean = new Bean<ITestService>(serviceClazz);
     bean.addAnnotation(DynamicAnnotations.createPriority(priority));
-    OBJ.register(bean);
+    OBJ.registerBean(bean);
     return bean;
   }
 

@@ -38,7 +38,7 @@ public class ServiceWithSessionInterceptorTest {
   @BeforeClass
   public static void setUp() {
     serverSession = new TestServerSession();
-    OBJ.register(TestService.class);
+    OBJ.registerClass(TestService.class);
   }
 
   @AfterClass
@@ -63,7 +63,7 @@ public class ServiceWithSessionInterceptorTest {
    *
    */
   protected void runInServerJob() {
-    OBJ.NEW(ITestService.class).doit();
+    OBJ.one(ITestService.class).doit();
 
   }
 

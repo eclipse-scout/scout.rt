@@ -25,8 +25,8 @@ public class ApplicationsScopedTest {
 
   @BeforeClass
   public static void registerBeans() {
-    m_bean01 = OBJ.register(TestObject.class);
-    m_bean02 = OBJ.register(Bean02.class);
+    m_bean01 = OBJ.registerClass(TestObject.class);
+    m_bean02 = OBJ.registerClass(Bean02.class);
   }
 
   /**
@@ -34,9 +34,9 @@ public class ApplicationsScopedTest {
    */
   @Test
   public void testApplicaitonScopded() {
-    TestObject i1 = OBJ.NEW(TestObject.class);
+    TestObject i1 = OBJ.one(TestObject.class);
     Assert.assertNotNull(i1);
-    ITestObject i2 = OBJ.NEW(TestObject.class);
+    ITestObject i2 = OBJ.one(TestObject.class);
     Assert.assertNotNull(i2);
     Assert.assertEquals(i1, i2);
   }
@@ -46,9 +46,9 @@ public class ApplicationsScopedTest {
    */
   @Test
   public void testInheritedApplicaitonScopded() {
-    Bean02 i1 = OBJ.NEW(Bean02.class);
+    Bean02 i1 = OBJ.one(Bean02.class);
     Assert.assertNotNull(i1);
-    Bean02 i2 = OBJ.NEW(Bean02.class);
+    Bean02 i2 = OBJ.one(Bean02.class);
     Assert.assertNotNull(i2);
     Assert.assertEquals(i1, i2);
   }

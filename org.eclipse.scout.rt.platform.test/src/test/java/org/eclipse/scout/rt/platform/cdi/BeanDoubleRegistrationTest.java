@@ -25,10 +25,11 @@ public class BeanDoubleRegistrationTest {
   @Test
   public void testDoubleRegistration() {
     BeanContext context = new BeanContext();
-    context.register(Bean01.class);
-    context.register(Bean01.class);
+    @SuppressWarnings("unused")
+    IBean<?> reg1 = context.registerClass(Bean01.class);
+    IBean<?> reg2 = context.registerClass(Bean01.class);
     Assert.assertEquals(1, context.getAllRegisteredBeans().size());
-    context.unregisterBean(Bean01.class);
+    context.unregisterBean(reg2);
     Assert.assertEquals(0, context.getAllRegisteredBeans().size());
   }
 
