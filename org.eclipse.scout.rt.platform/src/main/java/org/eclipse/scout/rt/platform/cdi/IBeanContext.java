@@ -21,17 +21,7 @@ public interface IBeanContext {
    * @param beanClazz
    * @return
    */
-  <T> IBean<T> registerClass(Class<T> clazz);
-
-  /**
-   * @param bean
-   */
-  void registerBean(IBean<?> bean);
-
-  /**
-   * @param bean
-   */
-  void unregisterBean(IBean<?> bean);
+  <T> T getInstance(Class<T> beanClazz);
 
   /**
    * @param beanClazz
@@ -43,16 +33,7 @@ public interface IBeanContext {
    * @param beanClazz
    * @return
    */
-  <T> T getInstance(Class<T> beanClazz);
-
-  /**
-   * @param beanClazz
-   * @param defaultBeanClazz
-   * @return
-   *         <p>
-   *         TODO aho remove this method once cdi is in place
-   */
-  <T> T getInstance(Class<T> beanClazz, Class<? extends T> defaultBeanClazz);
+  <T> IBean<T> getBean(Class<T> beanClazz);
 
   /**
    * @param beanClazz
@@ -61,14 +42,24 @@ public interface IBeanContext {
   <T> List<IBean<T>> getBeans(Class<T> beanClazz);
 
   /**
-   * @param beanClazz
-   * @return
-   */
-  <T> IBean<T> getBean(Class<T> beanClazz);
-
-  /**
    * @return
    */
   List<IBean<?>> getAllRegisteredBeans();
+
+  /**
+   * @param beanClazz
+   * @return
+   */
+  <T> IBean<T> registerClass(Class<T> clazz);
+
+  /**
+   * @param bean
+   */
+  void registerBean(IBean<?> bean);
+
+  /**
+   * @param bean
+   */
+  void unregisterBean(IBean<?> bean);
 
 }

@@ -36,9 +36,6 @@ import org.eclipse.scout.rt.platform.cdi.CreateImmediately;
 import org.eclipse.scout.rt.platform.cdi.IBean;
 import org.eclipse.scout.rt.platform.cdi.IBeanContext;
 
-/**
- *
- */
 public class BeanContext implements IBeanContext {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(BeanContext.class);
   private final Map<Class<?>, TreeSet<IBean<?>>> m_beans;
@@ -47,6 +44,72 @@ public class BeanContext implements IBeanContext {
   public BeanContext() {
     m_beans = new HashMap<Class<?>, TreeSet<IBean<?>>>();
     m_interceptors = new BeansXmlParser().getInterceptors();
+  }
+
+  @Override
+  public <T> T getInstance(Class<T> beanClazz) {
+    IBean<T> bean = getBean(beanClazz);
+    if (bean != null) {
+      return bean.get();
+    }
+    return null;
+  }
+
+  @Override
+  public <T> List<T> getInstances(Class<T> beanClazz) {
+    List<IBean<T>> beans = getBeans(beanClazz);
+    List<T> instances = new ArrayList<T>(beans.size());
+    for (IBean<T> bean : beans) {
+      instances.add(bean.get());
+    }
+    return instances;
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public <T> IBean<T> getBean(Class<T> beanClazz) {
+    TreeSet<IBean<?>> beans = getBeansInternal(beanClazz);
+    if (beans != null && beans.size() > 0) {
+      return (IBean<T>) beans.first();
+    }
+    return null;
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public <T> List<IBean<T>> getBeans(Class<T> beanClazz) {
+    TreeSet<IBean<?>> beans = getBeansInternal(beanClazz);
+    List<IBean<T>> result = new ArrayList<IBean<T>>(beans.size());
+    for (IBean<?> bean : beans) {
+      result.add((IBean<T>) bean);
+    }
+    return result;
+  }
+
+  private synchronized TreeSet<IBean<?>> getBeansInternal(Class<?> beanClazz) {
+    Assertions.assertNotNull(beanClazz);
+    TreeSet<IBean<?>> beans = m_beans.get(beanClazz);
+    if (beans == null) {
+      return CollectionUtility.emptyTreeSet();
+    }
+    if (!beanClazz.isInterface()) {
+      // check no proxy
+      for (IBean<?> b : beans) {
+        if (b.isIntercepted()) {
+          throw new IllegalArgumentException(String.format("Intercepted beans can only be accessed with an interface. '%s' is not an interface.", beanClazz.getName()));
+        }
+      }
+    }
+    return beans;
+  }
+
+  @Override
+  public List<IBean<?>> getAllRegisteredBeans() {
+    List<IBean<?>> allBeans = new LinkedList<IBean<?>>();
+    for (Set<IBean<?>> beans : m_beans.values()) {
+      allBeans.addAll(beans);
+    }
+    return allBeans;
   }
 
   @Override
@@ -106,93 +169,6 @@ public class BeanContext implements IBeanContext {
         }
       }
     }
-  }
-
-  @Override
-  public <T> List<T> getInstances(Class<T> beanClazz) {
-    List<IBean<T>> beans = getBeans(beanClazz);
-    if (!beanClazz.isInterface()) {
-      // check no proxy
-      for (IBean<?> b : beans) {
-        if (b.isIntercepted()) {
-          throw new IllegalArgumentException(String.format("Intercepted beans can only be accessed with an interface. '%s' is not an interface.", beanClazz.getName()));
-        }
-      }
-    }
-    List<T> instances = new ArrayList<T>(beans.size());
-    for (IBean<T> bean : beans) {
-      instances.add(bean.get());
-    }
-    return instances;
-  }
-
-  @Override
-  public <T> T getInstance(Class<T> beanClazz, Class<? extends T> defaultBeanClazz) {
-    IBean<T> bean = getBean(beanClazz);
-    if (bean != null) {
-      if (!beanClazz.isInterface() && bean.isIntercepted()) {
-        throw new IllegalArgumentException(String.format("Intercepted beans can only be accessed with an interface. '%s' is not an interface.", beanClazz.getName()));
-      }
-      return bean.get();
-    }
-    else if (defaultBeanClazz != null) {
-      try {
-        return defaultBeanClazz.newInstance();
-      }
-      catch (Exception e) {
-        throw new RuntimeException("clazz " + defaultBeanClazz, e);
-      }
-    }
-    return null;
-  }
-
-  @Override
-  public <T> T getInstance(Class<T> beanClazz) {
-    T bean = getInstance(beanClazz, null);
-    if (bean == null) {
-      LOG.warn(String.format("No beans bound to '%s'", beanClazz), new Exception());
-    }
-    return bean;
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  public <T> IBean<T> getBean(Class<T> beanClazz) {
-    TreeSet<IBean<?>> beans = getBeansInternal(beanClazz);
-    if (beans != null && beans.size() > 0) {
-      return (IBean<T>) beans.first();
-    }
-    return null;
-  }
-
-  @Override
-  @SuppressWarnings("unchecked")
-  public <T> List<IBean<T>> getBeans(Class<T> beanClazz) {
-    TreeSet<IBean<?>> beans = getBeansInternal(beanClazz);
-    List<IBean<T>> result = new ArrayList<IBean<T>>(beans.size());
-    for (IBean<?> bean : beans) {
-      result.add((IBean<T>) bean);
-    }
-    return result;
-  }
-
-  private synchronized TreeSet<IBean<?>> getBeansInternal(Class<?> beanClazz) {
-    Assertions.assertNotNull(beanClazz);
-    TreeSet<IBean<?>> beans = m_beans.get(beanClazz);
-    if (beans == null) {
-      return CollectionUtility.emptyTreeSet();
-    }
-
-    return beans;
-  }
-
-  @Override
-  public List<IBean<?>> getAllRegisteredBeans() {
-    List<IBean<?>> allBeans = new LinkedList<IBean<?>>();
-    for (Set<IBean<?>> beans : m_beans.values()) {
-      allBeans.addAll(beans);
-    }
-    return allBeans;
   }
 
   public static <T> T createInstance(Class<T> clazz) {
