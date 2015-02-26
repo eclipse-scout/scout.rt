@@ -3,7 +3,6 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Scout Client Testing
 Bundle-SymbolicName: org.eclipse.scout.rt.testing.client
 Bundle-Version: 5.1.0.qualifier
-Bundle-Activator: org.eclipse.scout.testing.client.Activator
 Bundle-Vendor: Eclipse Scout Project
 Require-Bundle: org.eclipse.scout.rt.testing.shared;bundle-version="[5.1.0,5.2.0)";visibility:=reexport,
  org.eclipse.scout.rt.client;bundle-version="[5.1.0,5.2.0)",

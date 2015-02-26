@@ -21,19 +21,18 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.scout.rt.server.DefaultTransactionDelegate;
-import org.eclipse.scout.rt.shared.Activator;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.eclipse.scout.rt.shared.validate.IValidationStrategy;
 import org.eclipse.scout.rt.shared.validate.InputValidation;
 import org.eclipse.scout.rt.testing.server.runner.ScoutServerTestRunner;
+import org.eclipse.scout.service.IService;
+import org.eclipse.scout.service.SERVICES;
 import org.eclipse.scout.service.ServiceUtility;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.ServiceReference;
 
 /**
  * Test to find all service methods, where an input validation strategy annotation is missing. <br/>
@@ -69,11 +68,8 @@ public abstract class AbstractInputValidationStrategyTest {
 
   @Test
   public void validateServices() throws Exception {
-    final BundleContext context = Activator.getDefault().getBundle().getBundleContext();
     Set<Method> collector = new HashSet<Method>();
-    ServiceReference[] serviceRefs = context.getAllServiceReferences(null, null);
-    for (ServiceReference ref : serviceRefs) {
-      Object service = context.getService(ref);
+    for (IService service : SERVICES.getServices(IService.class)) {
       if (service == null) {
         throw new Exception("Service is null. Test started too early or some services failed to initialize.");
       }

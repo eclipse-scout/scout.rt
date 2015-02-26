@@ -57,4 +57,21 @@ public interface IBeanContext {
    */
   <T> T getInstance(Class<T> beanClazz, T defaultBean);
 
+  /**
+   * @param beanClazz
+   * @return
+   */
+  <T> List<IBean<T>> getBeans(Class<T> beanClazz);
+
+  /**
+   * @param beanClazz
+   * @return
+   */
+  <T> IBean<T> getBean(Class<T> beanClazz);
+
+  /**
+   * @return
+   */
+  List<IBean<?>> getAllRegisteredBeans();
+
 }

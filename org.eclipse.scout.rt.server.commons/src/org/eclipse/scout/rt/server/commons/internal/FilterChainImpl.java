@@ -36,6 +36,7 @@ public class FilterChainImpl implements FilterChain {
     if (m_filters.size() > 0) {
       Filter nextFilter = m_filters.remove(0);
       if (Activator.DEBUG) {
+        // TODO LOG
         Activator.getDefault().getLog().log(new Status(Status.INFO, Activator.PLUGIN_ID, "ServletFilterChain: doFilter " + nextFilter.getClass().getSimpleName()));
       }
       nextFilter.doFilter(req, res, this);

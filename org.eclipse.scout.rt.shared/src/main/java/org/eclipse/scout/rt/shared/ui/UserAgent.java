@@ -12,7 +12,7 @@ package org.eclipse.scout.rt.shared.ui;
 
 import java.io.Serializable;
 
-import org.eclipse.scout.rt.shared.Activator;
+import org.eclipse.scout.commons.ConfigIniUtility;
 
 /**
  * Holds information about the kind of user interface used on the client side like {@link IUiLayer} and
@@ -103,14 +103,8 @@ public final class UserAgent implements Serializable {
   }
 
   public static UserAgent create(IUiLayer uiLayer, IUiDeviceType uiDeviceType) {
-    // TODO NoOsgi
-    String osName = null;
-    if (Activator.getDefault() != null) {
-      osName = Activator.getDefault().getBundle().getBundleContext().getProperty("org.osgi.framework.os.name");
-    }
-    else {
-      osName = System.getProperty("os.name");
-    }
+    // TODO cgu NoOsgi
+    String osName = ConfigIniUtility.getProperty("org.osgi.framework.os.name");
     return new UserAgent(uiLayer, uiDeviceType, osName);
   }
 

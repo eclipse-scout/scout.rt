@@ -64,9 +64,10 @@ public class FilterConfigImpl implements FilterConfig {
       try {
         m_servletContext = servletContext;
         m_filter = (Filter) m_serviceElement.createExecutableExtension("class");
-        if (Activator.DEBUG) {
-          Activator.getDefault().getLog().log(new Status(Status.INFO, Activator.PLUGIN_ID, "ServletFilterConfig: init " + m_filter.getClass().getSimpleName()));
-        }
+        // TODO LOG
+//        if (Activator.DEBUG) {
+//          Activator.getDefault().getLog().log(new Status(Status.INFO, Activator.PLUGIN_ID, "ServletFilterConfig: init " + m_filter.getClass().getSimpleName()));
+//        }
         m_filter.init(this);
       }
       catch (Throwable t) {
@@ -80,6 +81,7 @@ public class FilterConfigImpl implements FilterConfig {
   public void destroy() {
     if (m_filter != null) {
       try {
+        // TODO LOG
         if (Activator.DEBUG) {
           Activator.getDefault().getLog().log(new Status(Status.INFO, Activator.PLUGIN_ID, "ServletFilterConfig: destroy " + m_filter.getClass().getSimpleName()));
         }

@@ -26,7 +26,6 @@ import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.osgi.BundleClassDescriptor;
 import org.eclipse.scout.commons.runtime.BundleBrowser;
-import org.eclipse.scout.rt.shared.Activator;
 import org.eclipse.scout.rt.shared.servicetunnel.RemoteServiceAccessDenied;
 import org.eclipse.scout.service.AbstractService;
 import org.osgi.framework.Bundle;
@@ -164,7 +163,7 @@ public class SharedCodeService extends AbstractService implements ICodeService {
       }
       //
       Set<BundleClassDescriptor> discoveredCodeTypes = new HashSet<BundleClassDescriptor>();
-      for (Bundle bundle : Activator.getDefault().getBundle().getBundleContext().getBundles()) {
+      for (Bundle bundle : Platform.getBundle("org.eclipse.scout.rt.shared").getBundleContext().getBundles()) {
         if (bundle.getSymbolicName().startsWith(classPrefix)) {
           // ok
         }
