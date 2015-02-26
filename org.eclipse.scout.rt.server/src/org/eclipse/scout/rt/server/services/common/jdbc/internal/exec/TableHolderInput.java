@@ -66,7 +66,7 @@ class TableHolderInput implements IBindInput {
   }
 
   @Override
-  public boolean isJdbcBind() {
+  public boolean isJdbcBind(ISqlStyle sqlStyle) {
     if (m_target.isPlainValue()) {
       return false;
     }

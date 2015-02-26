@@ -454,6 +454,14 @@ public interface ISqlStyle extends Serializable {
   String createNotInList(String attribute, Object array);
 
   /**
+   * Style can handle arrays as bind or as literal replacement.
+   * 
+   * @return true if calls to {@link ISqlStyle.createInList(String attribute, Object array)} or {@link
+   *         ISqlStyle.createNotInList(String attribute, Object array)} produce SQL binds.
+   */
+  boolean isCreatingInListGeneratingBind(Object array);
+
+  /**
    * <code>P.NAME dateIsToday</code>
    * <p>
    * In an Oracle implementation this could be represented as

@@ -992,6 +992,11 @@ public abstract class AbstractSqlStyle implements ISqlStyle, ISqlStyle2 {
   }
 
   @Override
+  public boolean isCreatingInListGeneratingBind(Object array) {
+    return false;
+  }
+
+  @Override
   public String getSysdateToken() {
     return "SYSDATE";
   }
