@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.shared.services.cdi;
 
+import java.lang.reflect.InvocationTargetException;
+
 import javax.interceptor.AroundInvoke;
 import javax.interceptor.Interceptor;
 
@@ -28,7 +30,7 @@ public class SessionRequiredInterceptor {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SessionRequiredInterceptor.class);
 
   @AroundInvoke
-  public Object checkSession(InvocationContext context) throws Exception {
+  public Object checkSession(InvocationContext context) throws Throwable {
     IBean<?> bean = (IBean<?>) context.getContextData().get(IBean.class.getName());
     SessionRequired annotation = bean.getBeanAnnotation(SessionRequired.class);
     Class<? extends ISession> requiredSession = annotation.value();
@@ -39,6 +41,9 @@ public class SessionRequiredInterceptor {
     if (requiredSession.isInstance(session)) {
       try {
         return context.proceed();
+      }
+      catch (InvocationTargetException e) {
+        throw e.getCause();
       }
       catch (Exception e) {
         LOG.error(String.format("Could not proceed bean '%s' from interceptor.", context.getTarget().getClass().getName()), e);

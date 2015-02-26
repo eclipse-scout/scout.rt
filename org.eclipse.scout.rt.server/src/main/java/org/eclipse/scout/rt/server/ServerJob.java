@@ -183,10 +183,10 @@ public abstract class ServerJob extends JobEx implements IServerSessionProvider 
           Throwable t = e.getCause();
           if (t instanceof ProcessingException) {
             ProcessingException pe = ((ProcessingException) t);
-            return new Status(IStatus.ERROR, null, pe.getStatus().getCode(), pe.getMessage(), t);
+            return new Status(IStatus.ERROR, "0", pe.getStatus().getCode(), pe.getMessage(), t);
           }
           else {
-            return new Status(IStatus.ERROR, null, 0, t.getMessage(), t);
+            return new Status(IStatus.ERROR, "0", 0, t.getMessage(), t);
           }
         }
       }

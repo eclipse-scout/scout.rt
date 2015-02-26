@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.platform.cdi.internal;
 
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
@@ -106,6 +107,9 @@ public class InterceptedBean<T> extends Bean<T> implements IInterceptedBean<T> {
         context.setContextData(contextData);
         try {
           return m_interceptorMethod.invoke(m_interceptor, context);
+        }
+        catch (InvocationTargetException e) {
+          throw e.getCause();
         }
         catch (Exception e) {
           Throwable toLog = e;
