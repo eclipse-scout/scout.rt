@@ -36,10 +36,11 @@ public class JsonStringField<T extends IStringField> extends JsonValueField<T> {
         return getModel().isMultilineText();
       }
     });
-    putJsonProperty(new JsonProperty<IStringField>(IStringField.PROP_VALIDATE_ON_ANY_KEY, model) {
+    // The JSON layer uses the same property for both cases
+    putJsonProperty(new JsonProperty<IStringField>(IStringField.PROP_UPDATE_DISPLAY_TEXT_ON_MODIFY, model) {
       @Override
       protected Boolean modelValue() {
-        return getModel().isValidateOnAnyKey();
+        return getModel().isUpdateDisplayTextOnModify() || getModel().isValidateOnAnyKey();
       }
     });
     putJsonProperty(new JsonProperty<IStringField>(IStringField.PROP_INPUT_MASKED, model) {
@@ -52,6 +53,11 @@ public class JsonStringField<T extends IStringField> extends JsonValueField<T> {
 
   @Override
   protected void handleUiDisplayTextChangedImpl(String displayText, boolean whileTyping) {
+    if (getModel().isUpdateDisplayTextOnModify()) {
+      getModel().getUIFacade().setDisplayTextFromUI(displayText);
+    }
+    // Note: the display text changed event is also sent, when a field loses focus. setTextFromUI
+    // also sets the value of the field, setDisplayTextFromUI does not.
     getModel().getUIFacade().setTextFromUI(displayText, whileTyping);
   }
 

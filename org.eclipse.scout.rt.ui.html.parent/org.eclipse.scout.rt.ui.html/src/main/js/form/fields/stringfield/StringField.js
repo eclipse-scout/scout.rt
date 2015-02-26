@@ -23,7 +23,7 @@ scout.StringField.prototype._render = function($parent) {
 
 scout.StringField.prototype._renderProperties = function() {
   scout.StringField.parent.prototype._renderProperties.call(this);
-  this._renderValidateOnAnyKey(this.validateOnAnyKey);
+  this._renderUpdateDisplayTextOnModify();
   this._renderInputMasked(this.inputMasked);
 };
 

@@ -3,6 +3,7 @@
  */
 scout.ValueField = function() {
   scout.ValueField.parent.call(this);
+  this._keyUpListener;
 };
 scout.inherits(scout.ValueField, scout.FormField);
 
@@ -20,14 +21,15 @@ scout.ValueField.prototype._readDisplayText = function() {
 };
 
 /**
- * "Validate on any key" does not really belong to ValueField, but is available here
+ * "Update display-text on modify" does not really belong to ValueField, but is available here
  * as a convenience for all subclasses that want to support it.
  */
-scout.ValueField.prototype._renderValidateOnAnyKey = function(validateOnAnyKey) {
-  if (validateOnAnyKey) {
-    this.$field.on('keyup', this._onFieldKeyUp.bind(this));
+scout.ValueField.prototype._renderUpdateDisplayTextOnModify = function() {
+  if (this.updateDisplayTextOnModify) {
+    this._keyUpListener = this._onFieldKeyUp.bind(this);
+    this.$field.on('keyup', this._keyUpListener);
   } else {
-    this.$field.off('keyup', this._onFieldKeyUp.bind(this));
+    this.$field.off('keyup', this._keyUpListener);
   }
 };
 
@@ -54,6 +56,7 @@ scout.ValueField.prototype._updateDisplayText = function(displayText, whileTypin
   };
 
   // Don't send when set to false (save some bytes)
+  // TODO ASA: remove whileTyping argument when validateOnAnyKey is removed
   if (whileTyping) {
     data.whileTyping = true;
   }
