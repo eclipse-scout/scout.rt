@@ -11,6 +11,7 @@
 package org.eclipse.scout.rt.client;
 
 import org.eclipse.scout.rt.client.services.ProxyXmlVisitor;
+import org.eclipse.scout.rt.client.services.common.icon.IconLocator;
 import org.eclipse.scout.rt.client.ui.desktop.DesktopExtensionPluginXmlVisitor;
 import org.eclipse.scout.rt.platform.cdi.IBeanContext;
 import org.eclipse.scout.rt.platform.cdi.IBeanContributor;
@@ -25,6 +26,7 @@ public class ClientBeanContributor implements IBeanContributor {
   public void contributeBeans(IBeanContext context) {
     PluginXmlParser.get().visit(new DesktopExtensionPluginXmlVisitor(context));
     PluginXmlParser.get().visit(new ProxyXmlVisitor(context));
+    context.registerClass(IconLocator.class);
   }
 
 }

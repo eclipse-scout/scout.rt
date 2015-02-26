@@ -29,7 +29,7 @@ public class ProcessInspector {
    * Convenience for {@link OBJ#one(Class)}
    */
   public static ProcessInspector instance() {
-    return OBJ.one(ProcessInspector.class, ProcessInspector.class);
+    return OBJ.one(ProcessInspector.class);
   }
 
   /**
