@@ -12,6 +12,8 @@ package org.eclipse.scout.rt.platform.cdi;
 
 import java.util.List;
 
+import org.eclipse.scout.commons.Assertions.AssertionException;
+
 /**
  *
  */
@@ -19,9 +21,19 @@ public interface IBeanContext {
 
   /**
    * @param beanClazz
-   * @return
+   * @return the instance of the given bean.
+   * @throws AssertionException
+   *           when no bean is registered to the given beanClazz
    */
   <T> T getInstance(Class<T> beanClazz);
+
+  /**
+   * Nullsave {@link #getInstance(Class)}
+   * 
+   * @param beanClazz
+   * @return
+   */
+  <T> T getInstanceOrNull(Class<T> beanClazz);
 
   /**
    * @param beanClazz
@@ -30,10 +42,19 @@ public interface IBeanContext {
   <T> List<T> getInstances(Class<T> beanClazz);
 
   /**
+   * @return the bean registered under the given beanClazz
+   * @throws AssertionException
+   *           when no bean is registered to the given beanClazz
+   */
+  <T> IBean<T> getBean(Class<T> beanClazz);
+
+  /**
+   * Nullsave {@link #getBean(Class)}
+   * 
    * @param beanClazz
    * @return
    */
-  <T> IBean<T> getBean(Class<T> beanClazz);
+  <T> IBean<T> getBeanOrNull(Class<T> beanClazz);
 
   /**
    * @param beanClazz

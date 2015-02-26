@@ -18,6 +18,7 @@ import org.eclipse.scout.rt.platform.cdi.CDI;
 import org.eclipse.scout.rt.platform.cdi.IBean;
 import org.eclipse.scout.rt.platform.cdi.IInterceptedBean;
 import org.eclipse.scout.rt.platform.cdi.OBJ;
+import org.eclipse.scout.rt.platform.cdi.internal.BeanContext;
 
 /**
  * Utility class for querying registered OSGi services
@@ -66,7 +67,7 @@ public final class SERVICES {
   }
 
   private static <T extends Object> List<T> getServicesWithoutInterceptors(Class<T> serviceClass, boolean onlyFirst) {
-    List<IBean<T>> beans = CDI.getBeanContext().getBeans(serviceClass);
+    List<IBean<T>> beans = ((BeanContext) CDI.getBeanContext()).getBeansWithoutInterceptionCheck(serviceClass);
     List<T> services = new ArrayList<T>(onlyFirst ? 1 : beans.size());
     for (IBean<T> bean : beans) {
       services.add(getBeanWithoutInterceptors(bean).get());

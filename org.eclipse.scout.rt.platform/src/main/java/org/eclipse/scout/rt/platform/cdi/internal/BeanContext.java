@@ -48,11 +48,13 @@ public class BeanContext implements IBeanContext {
 
   @Override
   public <T> T getInstance(Class<T> beanClazz) {
-    IBean<T> bean = getBean(beanClazz);
+    return getBean(beanClazz).get();
+  }
+
+  @Override
+  public <T> T getInstanceOrNull(Class<T> beanClazz) {
+    IBean<T> bean = getBeanInternal(beanClazz);
     if (bean != null) {
-      if (!beanClazz.isInterface() && bean.isIntercepted()) {
-        throw new IllegalArgumentException(String.format("Intercepted beans can only be accessed with an interface. '%s' is not an interface.", beanClazz.getName()));
-      }
       return bean.get();
     }
     return null;
@@ -61,14 +63,6 @@ public class BeanContext implements IBeanContext {
   @Override
   public <T> List<T> getInstances(Class<T> beanClazz) {
     List<IBean<T>> beans = getBeans(beanClazz);
-    if (!beanClazz.isInterface()) {
-      // check no proxy
-      for (IBean<?> b : beans) {
-        if (b.isIntercepted()) {
-          throw new IllegalArgumentException(String.format("Intercepted beans can only be accessed with an interface. '%s' is not an interface.", beanClazz.getName()));
-        }
-      }
-    }
     List<T> instances = new ArrayList<T>(beans.size());
     for (IBean<T> bean : beans) {
       instances.add(bean.get());
@@ -77,11 +71,24 @@ public class BeanContext implements IBeanContext {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public <T> IBean<T> getBean(Class<T> beanClazz) {
+    return Assertions.assertNotNull(getBeanInternal(beanClazz), "No beans bound to '%s'", beanClazz);
+  }
+
+  @Override
+  public <T> IBean<T> getBeanOrNull(Class<T> beanClazz) {
+    return getBeanInternal(beanClazz);
+  }
+
+  @SuppressWarnings("unchecked")
+  private <T> IBean<T> getBeanInternal(Class<T> beanClazz) {
     TreeSet<IBean<?>> beans = getBeansInternal(beanClazz);
-    if (beans != null && beans.size() > 0) {
-      return (IBean<T>) beans.first();
+    if (beans.size() > 0) {
+      IBean<T> bean = (IBean<T>) beans.first();
+      if (!beanClazz.isInterface() && bean.isIntercepted()) {
+        throw new IllegalArgumentException(String.format("Intercepted beans can only be accessed with an interface. '%s' is not an interface.", beanClazz.getName()));
+      }
+      return bean;
     }
     return null;
   }
@@ -89,6 +96,21 @@ public class BeanContext implements IBeanContext {
   @Override
   @SuppressWarnings("unchecked")
   public <T> List<IBean<T>> getBeans(Class<T> beanClazz) {
+    TreeSet<IBean<?>> beans = getBeansInternal(beanClazz);
+    List<IBean<T>> result = new ArrayList<IBean<T>>(beans.size());
+    final boolean isInterface = beanClazz.isInterface();
+    for (IBean<?> bean : beans) {
+      result.add((IBean<T>) bean);
+      if (!isInterface && bean.isIntercepted()) {
+        throw new IllegalArgumentException(String.format("Intercepted beans can only be accessed with an interface. '%s' is not an interface.", beanClazz.getName()));
+      }
+
+    }
+    return result;
+  }
+
+  @SuppressWarnings("unchecked")
+  public <T> List<IBean<T>> getBeansWithoutInterceptionCheck(Class<T> beanClazz) {
     TreeSet<IBean<?>> beans = getBeansInternal(beanClazz);
     List<IBean<T>> result = new ArrayList<IBean<T>>(beans.size());
     for (IBean<?> bean : beans) {

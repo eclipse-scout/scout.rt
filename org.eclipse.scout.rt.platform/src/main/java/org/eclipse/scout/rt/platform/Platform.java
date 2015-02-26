@@ -90,7 +90,7 @@ public final class Platform implements IPlatform {
    *
    */
   private void startApplications() {
-    m_application = OBJ.one(IApplication.class, null);
+    m_application = OBJ.oneOrNull(IApplication.class);
     if (m_application != null) {
       try {
         m_application.start();

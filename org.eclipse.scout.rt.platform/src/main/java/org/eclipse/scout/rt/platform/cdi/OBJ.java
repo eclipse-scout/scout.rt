@@ -30,6 +30,10 @@ public final class OBJ {
     return CDI.getBeanContext().getInstance(beanClazz);
   }
 
+  public static <T> T oneOrNull(Class<T> beanClazz) {
+    return CDI.getBeanContext().getInstanceOrNull(beanClazz);
+  }
+
   /**
    * @return all instances of this type
    */
