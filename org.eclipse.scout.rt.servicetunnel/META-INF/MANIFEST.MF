@@ -12,3 +12,4 @@ Bundle-Vendor: Eclipse Scout Project
 Export-Package: org.eclipse.scout.rt.servicetunnel,
  org.eclipse.scout.rt.servicetunnel.http,
  org.eclipse.scout.rt.servicetunnel.http.internal
+Bundle-Activator: org.eclipse.scout.rt.servicetunnel.Activator

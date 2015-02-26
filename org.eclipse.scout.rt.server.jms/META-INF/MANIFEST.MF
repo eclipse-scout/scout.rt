@@ -3,6 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Scout Server JMS Support
 Bundle-SymbolicName: org.eclipse.scout.rt.server.jms;singleton:=true
 Bundle-Version: 5.1.0.qualifier
+Bundle-Activator: org.eclipse.scout.rt.server.jms.internal.Activator
 Bundle-Vendor: Eclipse Scout Project
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Export-Package: org.eclipse.scout.rt.server.jms,

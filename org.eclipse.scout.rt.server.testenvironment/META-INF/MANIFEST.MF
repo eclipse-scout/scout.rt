@@ -3,6 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Environment for Server Tests
 Bundle-SymbolicName: org.eclipse.scout.rt.server.testenvironment;singleton:=true
 Bundle-Version: 5.1.0.qualifier
+Bundle-Activator: org.eclipse.scout.rt.server.testenvironment.Activator
 Bundle-Vendor: Eclipse Scout Project
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.scout.rt.testing.server;bundle-version="[5.1.0,5.2.0)",

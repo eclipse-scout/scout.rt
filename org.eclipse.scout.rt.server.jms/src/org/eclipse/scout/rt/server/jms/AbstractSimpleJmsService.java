@@ -27,6 +27,7 @@ import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.ServerJob;
+import org.eclipse.scout.rt.server.jms.internal.Activator;
 import org.eclipse.scout.rt.server.jms.transactional.AbstractTransactionalJmsService;
 import org.eclipse.scout.rt.server.transaction.ITransactionMember;
 
@@ -181,7 +182,7 @@ public abstract class AbstractSimpleJmsService<T> extends AbstractJmsService<T> 
       }
       catch (Exception e) {
         LOG.error("Unexpected exception while receiving messages from consumer.", e);
-        result = new Status(IStatus.ERROR, "org.eclipse.scout.rt.server.jms", e.getMessage());
+        result = new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage());
       }
       finally {
         LOG.trace("Stopping JMS message consumer job...");
@@ -192,7 +193,7 @@ public abstract class AbstractSimpleJmsService<T> extends AbstractJmsService<T> 
         }
         catch (Exception e) {
           LOG.error("Unexpected exception", e);
-          result = new Status(IStatus.ERROR, "org.eclipse.scout.rt.server.jms", e.getMessage());
+          result = new Status(IStatus.ERROR, Activator.PLUGIN_ID, e.getMessage());
         }
       }
       LOG.info("JMS message consumer job stopped.");

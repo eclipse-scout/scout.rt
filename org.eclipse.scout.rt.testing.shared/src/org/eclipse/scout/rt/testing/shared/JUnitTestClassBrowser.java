@@ -104,7 +104,7 @@ public class JUnitTestClassBrowser {
     }
     List<Class<?>> junitTestClasses = new ArrayList<Class<?>>();
     List<Class<?>> devClasses = new ArrayList<Class<?>>();
-    for (Bundle bundle : Platform.getBundle("org.eclipse.scout.rt.testing.shared").getBundleContext().getBundles()) {
+    for (Bundle bundle : Activator.getDefault().getBundle().getBundleContext().getBundles()) {
       // check if bundle is searched for tests
       if (!acceptBundle(bundle)) {
         continue;

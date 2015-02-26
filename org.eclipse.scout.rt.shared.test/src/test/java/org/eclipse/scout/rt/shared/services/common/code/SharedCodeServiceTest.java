@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.scout.commons.osgi.BundleClassDescriptor;
+import org.eclipse.scout.rt.shared.Activator;
 import org.junit.Test;
 
 /**
@@ -43,13 +44,13 @@ public class SharedCodeServiceTest {
     ICodeService service = new P_SharedCodeService();
     Set<BundleClassDescriptor> codeTypeClasses1 = service.getAllCodeTypeClasses("");
     assertEquals("codeTypeClasses1 size", 2, codeTypeClasses1.size());
-    assertEquals("codeTypeClasses1 contains AbcCodeType", true, codeTypeClasses1.contains(new BundleClassDescriptor("org.eclipse.scout.rt.shared", AbcCodeType.class.getName())));
-    assertEquals("codeTypeClasses1 contains ZyxCodeType", true, codeTypeClasses1.contains(new BundleClassDescriptor("org.eclipse.scout.rt.shared", ZyxCodeType.class.getName())));
+    assertEquals("codeTypeClasses1 contains AbcCodeType", true, codeTypeClasses1.contains(new BundleClassDescriptor(Activator.PLUGIN_ID, AbcCodeType.class.getName())));
+    assertEquals("codeTypeClasses1 contains ZyxCodeType", true, codeTypeClasses1.contains(new BundleClassDescriptor(Activator.PLUGIN_ID, ZyxCodeType.class.getName())));
 
     Set<BundleClassDescriptor> codeTypeClasses2 = service.getAllCodeTypeClasses("");
     assertEquals("codeTypeClasses2 size", 1, codeTypeClasses2.size());
-    assertEquals("codeTypeClasses2 contains AbcCodeType", true, codeTypeClasses2.contains(new BundleClassDescriptor("org.eclipse.scout.rt.shared", AbcCodeType.class.getName())));
-    assertEquals("codeTypeClasses2 contains ZyxCodeType", false, codeTypeClasses2.contains(new BundleClassDescriptor("org.eclipse.scout.rt.shared", ZyxCodeType.class.getName())));
+    assertEquals("codeTypeClasses2 contains AbcCodeType", true, codeTypeClasses2.contains(new BundleClassDescriptor(Activator.PLUGIN_ID, AbcCodeType.class.getName())));
+    assertEquals("codeTypeClasses2 contains ZyxCodeType", false, codeTypeClasses2.contains(new BundleClassDescriptor(Activator.PLUGIN_ID, ZyxCodeType.class.getName())));
   }
 
   /**
@@ -215,9 +216,9 @@ public class SharedCodeServiceTest {
     @Override
     public Set<BundleClassDescriptor> getAllCodeTypeClasses(String classPrefix) {
       Set<BundleClassDescriptor> result = new HashSet<BundleClassDescriptor>();
-      result.add(new BundleClassDescriptor("org.eclipse.scout.rt.shared", AbcCodeType.class.getName()));
+      result.add(new BundleClassDescriptor(Activator.PLUGIN_ID, AbcCodeType.class.getName()));
       if (m_isFirst) {
-        result.add(new BundleClassDescriptor("org.eclipse.scout.rt.shared", ZyxCodeType.class.getName()));
+        result.add(new BundleClassDescriptor(Activator.PLUGIN_ID, ZyxCodeType.class.getName()));
         m_isFirst = false;
       }
       return result;

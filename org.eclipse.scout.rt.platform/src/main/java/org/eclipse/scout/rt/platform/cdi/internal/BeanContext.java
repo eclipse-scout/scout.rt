@@ -150,7 +150,6 @@ public class BeanContext implements IBeanContext {
     return bean;
   }
 
-  @Override
   @SuppressWarnings("unchecked")
   public <T> IBean<T> getBean(Class<T> beanClazz) {
     TreeSet<IBean<?>> beans = getBeansInternal(beanClazz);
@@ -160,7 +159,6 @@ public class BeanContext implements IBeanContext {
     return null;
   }
 
-  @Override
   @SuppressWarnings("unchecked")
   public <T> List<IBean<T>> getBeans(Class<T> beanClazz) {
     TreeSet<IBean<?>> beans = getBeansInternal(beanClazz);
@@ -188,7 +186,6 @@ public class BeanContext implements IBeanContext {
     return beans;
   }
 
-  @Override
   public List<IBean<?>> getAllRegisteredBeans() {
     List<IBean<?>> allBeans = new LinkedList<IBean<?>>();
     for (Set<IBean<?>> beans : m_beans.values()) {
