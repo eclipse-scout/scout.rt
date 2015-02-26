@@ -443,41 +443,64 @@ scout.Session.prototype.areRequestsPending = function() {
 };
 
 scout.Session.prototype.setBusy = function(busy) {
-  var that = this;
   if (busy) {
     if (this._busyCounter === 0) {
-      // Don't show the busy glasspane immediately. Set a short timer instead (which may be
-      // cancelled again if the busy state returns to false in the meantime).
-      this._busyTimer = setTimeout(function() {
-        that._$busyGlasspane = scout.fields.new$Glasspane().appendTo(that.$entryPoint);
-        // Workround for Chrome: Trigger cursor change (Otherwise, the cursor is not correctly
-        // updated without moving the mouse, see https://code.google.com/p/chromium/issues/detail?id=26723)
-        that._$busyGlasspane.css('cursor', 'default');
-        setTimeout(function() {
-          that._$busyGlasspane.css('cursor', 'wait');
-        }, 0);
-        // (End workaround)
-        $('.taskbar-logo').addClass('animated');
-      }, 1000);
+      this._renderBusyGlasspane();
     }
     this._busyCounter++;
   } else {
     this._busyCounter--;
     if (this._busyCounter === 0) {
-      // Clear any pending timers
-      clearTimeout(that._busyTimer);
-      // If the timer action was executed and the glasspane is showing, we have to remove it
-      if (that._$busyGlasspane) {
-        // Workround for Chrome: Before removing the glasspane, reset the cursor. Therefore,
-        // the actual remove has to be inside setTimeout()
-        that._$busyGlasspane.css('cursor', 'default');
-        setTimeout(function() {
-          // (End workaround)
-          that._$busyGlasspane.stop().fadeOut(150, $.removeThis);
-          $('.taskbar-logo').removeClass('animated');
-        }, 0);
-      }
+      this._removeBusyGlasspane();
     }
+  }
+};
+
+scout.Session.prototype._renderBusyGlasspane = function() {
+  var that = this;
+
+  // Don't show the busy glasspane immediately. Set a short timer instead (which may be
+  // cancelled again if the busy state returns to false in the meantime).
+  this._busyGlasspaneTimer = setTimeout(function() {
+    // Create busy glasspane
+    that._$busyGlasspane = scout.fields.new$Glasspane()
+      .addClass('busy')
+      .appendTo(that.$entryPoint);
+    $('.taskbar-logo').addClass('animated');
+
+    // Workround for Chrome: Trigger cursor change (Otherwise, the cursor is not correctly
+    // updated without moving the mouse, see https://code.google.com/p/chromium/issues/detail?id=26723)
+    that._$busyGlasspane.css('cursor', 'default');
+    setTimeout(function() {
+      that._$busyGlasspane.css('cursor', 'wait');
+    }, 0);
+    // (End workaround)
+
+    if (that.desktop) {
+      that._darkBusyGlasspaneTimer = setTimeout(function() {
+        that._$busyGlasspane.addClass('dark');
+      }, 2500);
+    }
+  }, 500);
+};
+
+scout.Session.prototype._removeBusyGlasspane = function() {
+  var that = this;
+
+  // Clear any pending timers
+  clearTimeout(that._busyGlasspaneTimer);
+  clearTimeout(that._darkBusyGlasspaneTimer);
+
+  // If the timer action was executed and the glasspane is showing, we have to remove it
+  if (that._$busyGlasspane) {
+    // Workround for Chrome: Before removing the glasspane, reset the cursor. Therefore,
+    // the actual remove has to be inside setTimeout()
+    that._$busyGlasspane.css('cursor', 'default');
+    setTimeout(function() {
+      // (End workaround)
+      that._$busyGlasspane.stop().fadeOut(150, $.removeThis);
+      $('.taskbar-logo').removeClass('animated');
+    }, 0);
   }
 };
 

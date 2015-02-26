@@ -21,11 +21,11 @@
 
 @palette-cyan-background: #DDFFF9;
 @palette-cyan-disabled: #78E8D3;
-@palette-cyan-normal: #24B499;  //#3EE1C3;
-@palette-cyan-active: #1D917C;    //#24B499;
+@palette-cyan-normal: #24B499;
+@palette-cyan-active: #1D917C;
 
 @palette-bsi-background: #ECF3F7;
-@palette-bsi-disabled: #389DB6;    //#7CC1E3
+@palette-bsi-disabled: #389DB6;
 @palette-bsi-normal: #006C86;
 @palette-bsi-active: #005164;
 

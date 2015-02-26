@@ -254,7 +254,16 @@
   z-index: 9;
 
   &.busy {
-    background-color: rgba(0, 0, 0, 0.1);
+    /* Make glasspane transparent and disable animation */
+    opacity: 0.0;
+    .animation(none);
     cursor: wait;
+
+    &.dark {
+      opacity: 1.0;
+      background-color: rgba(0, 0, 0, 0.1);
+      .animation(fadeIn ease-in 1);
+      .animation-duration(0.25s);
+    }
   }
 }
