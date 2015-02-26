@@ -3,7 +3,7 @@ scout.CheckBoxColumn = function() {
 };
 scout.inherits(scout.CheckBoxColumn, scout.Column);
 
-scout.CheckBoxColumn.CHECKABLE_COLUMN_SIZE = 40;
+scout.CheckBoxColumn.CHECKABLE_COLUMN_SIZE = 30;
 
 scout.CheckBoxColumn.prototype.buildCell = function(row) {
   var cell = '<div class="table-cell checkable-col"  style="min-width:' + scout.CheckBoxColumn.CHECKABLE_COLUMN_SIZE +
