@@ -50,8 +50,8 @@ class BeanArrayHolderInput implements IBindInput {
   }
 
   @Override
-  public boolean isJdbcBind() {
-    return m_delegate.isJdbcBind();
+  public boolean isJdbcBind(ISqlStyle sqlStyle) {
+    return m_delegate.isJdbcBind(sqlStyle);
   }
 
   @Override
