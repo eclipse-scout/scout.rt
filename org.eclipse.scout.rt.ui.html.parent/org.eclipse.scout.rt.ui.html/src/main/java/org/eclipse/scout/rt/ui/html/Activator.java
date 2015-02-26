@@ -26,12 +26,7 @@ import org.osgi.framework.SynchronousBundleListener;
 
 public class Activator extends Plugin {
 
-  // The plug-in ID
-  public static final String PLUGIN_ID = "org.eclipse.scout.rt.ui.html";
-
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(Activator.class);
-  // The shared instance
-  private static Activator plugin;
 
   public Activator() {
   }
@@ -39,7 +34,6 @@ public class Activator extends Plugin {
   @Override
   public void start(BundleContext context) throws Exception {
     super.start(context);
-    plugin = this;
     // workaround for bug in serverside equinox implementation with servletbridge
     // wait until done and launch product if one exists
     context.addBundleListener(new SynchronousBundleListener() {
@@ -58,21 +52,6 @@ public class Activator extends Plugin {
         }
       }
     });
-  }
-
-  @Override
-  public void stop(BundleContext context) throws Exception {
-    plugin = null;
-    super.stop(context);
-  }
-
-  /**
-   * Returns the shared instance
-   *
-   * @return the shared instance
-   */
-  public static Activator getDefault() {
-    return plugin;
   }
 
   private void runProduct() {
