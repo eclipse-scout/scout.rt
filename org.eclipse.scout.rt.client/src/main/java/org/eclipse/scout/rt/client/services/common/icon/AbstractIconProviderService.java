@@ -11,10 +11,9 @@
 package org.eclipse.scout.rt.client.services.common.icon;
 
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.StringTokenizer;
+import java.util.HashMap;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import org.eclipse.scout.commons.Assertions;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -28,66 +27,87 @@ import org.eclipse.scout.service.AbstractService;
  */
 public abstract class AbstractIconProviderService extends AbstractService implements IIconProviderService {
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(AbstractIconProviderService.class);
+  private static final String[] DEFAULT_ICON_EXTENSIONS = new String[]{"png", "gif", "jpg"};
 
-  private String m_folderName;
-  private String m_iconExtensions = "png,gif,jpg";
-  private String[] m_iconExtensionsArray;
+  private final ReentrantReadWriteLock m_cacheLock = new ReentrantReadWriteLock();
+  private final HashMap<String, IconSpec> m_cache = new HashMap<String, IconSpec>();
 
-  public AbstractIconProviderService() {
-    setFolderName(getClass().getPackage().getName() + ".icons");
+  protected AbstractIconProviderService() {
   }
 
-  protected synchronized String[] getIconExtensionsArray() {
-    if (m_iconExtensionsArray == null) {
-      ArrayList<String> fileExtensions = new ArrayList<String>();
-      if (getIconExtensions() != null) {
-        StringTokenizer tokenizer = new StringTokenizer(getIconExtensions(), ",;");
-        while (tokenizer.hasMoreTokens()) {
-          String t = tokenizer.nextToken().trim();
-          if (t.length() > 0) {
-            fileExtensions.add(t);
-          }
-        }
-      }
-      m_iconExtensionsArray = fileExtensions.toArray(new String[fileExtensions.size()]);
+  protected boolean isCacheEnabled() {
+    return true;
+  }
+
+  protected void clearCache() {
+    m_cacheLock.writeLock().lock();
+    try {
+      m_cache.clear();
     }
-    return m_iconExtensionsArray;
+    finally {
+      m_cacheLock.writeLock().unlock();
+    }
+  }
+
+  protected String[] getIconExtensions() {
+    return DEFAULT_ICON_EXTENSIONS;
   }
 
   @Override
   public IconSpec getIconSpec(String iconName) {
-    String name = iconName;
-    if (StringUtility.isNullOrEmpty(name)) {
+    if (iconName == null) {
       return null;
     }
-    name = name.replaceAll("\\A[\\/\\\\]*", "");
-    if (!name.startsWith(getFolderName())) {
-      name = getFolderName() + "/" + iconName;
+    //check cache
+    m_cacheLock.readLock().lock();
+    try {
+      IconSpec spec = m_cache.get(iconName);
+      if (spec != null || m_cache.containsKey(iconName)) {
+        return spec;
+      }
     }
-    String[] fqns = new String[getIconExtensionsArray().length + 1];
-    String[] iconNames = new String[getIconExtensionsArray().length + 1];
-    fqns[0] = name;
+    finally {
+      m_cacheLock.readLock().unlock();
+    }
+    //fill cache
+    m_cacheLock.writeLock().lock();
+    try {
+      IconSpec spec = findIconSpec(iconName);
+      m_cache.put(iconName, spec);
+      return spec;
+    }
+    finally {
+      m_cacheLock.writeLock().unlock();
+    }
+  }
+
+  protected IconSpec findIconSpec(String iconName) {
+    String relativePathBase = iconName;
+    if (StringUtility.isNullOrEmpty(relativePathBase)) {
+      return null;
+    }
+    relativePathBase = relativePathBase.replaceAll("\\A[\\/\\\\]*", "");
+    String[] exts = getIconExtensions();
+    String[] relativePaths = new String[exts.length + 1];
+    String[] iconNames = new String[exts.length + 1];
+    relativePaths[0] = relativePathBase;
     iconNames[0] = iconName;
-    for (int i = 1; i < fqns.length; i++) {
-      fqns[i] = name + "." + getIconExtensionsArray()[i - 1];
-      iconNames[i] = iconName + "." + getIconExtensionsArray()[i - 1];
+    for (int i = 1; i < relativePaths.length; i++) {
+      relativePaths[i] = relativePathBase + "." + exts[i - 1];
+      iconNames[i] = iconName + "." + exts[i - 1];
     }
 
     IconSpec spec = null;
-    spec = findIconSpec(fqns, iconNames);
+    spec = findIconSpec(relativePaths, iconNames);
     return spec;
-
   }
 
-  protected IconSpec findIconSpec(String[] fqns, String[] iconNames) {
-    if (fqns != null && fqns.length > 0) {
-      for (int i = 0; i < fqns.length; i++) {
-        String fqn = fqns[i];
-        String iconName = "";
-        if (iconNames != null && iconNames.length > i) {
-          iconName = iconNames[i];
-        }
-        URL url = findResource(fqn);
+  protected IconSpec findIconSpec(String[] relativePaths, String[] iconNames) {
+    if (relativePaths != null && relativePaths.length > 0) {
+      for (int i = 0; i < relativePaths.length; i++) {
+        String relativePath = relativePaths[i];
+        String iconName = iconNames[i];
+        URL url = findResource(relativePath);
         if (url != null) {
           try {
             IconSpec iconSpec = new IconSpec();
@@ -107,28 +127,6 @@ public abstract class AbstractIconProviderService extends AbstractService implem
     return null;
   }
 
-  protected URL findResource(String fullPath) {
-    return getClass().getClassLoader().getResource(fullPath);
-  }
+  protected abstract URL findResource(String relativePath);
 
-  public void setFolderName(String folderName) {
-    Assertions.assertNotNullOrEmpty(folderName);
-    m_folderName = folderName.replace('.', '/');
-  }
-
-  public String getFolderName() {
-    return m_folderName;
-  }
-
-  public synchronized void setIconExtensions(String iconExtensions) {
-    m_iconExtensions = iconExtensions;
-    m_iconExtensionsArray = null;
-  }
-
-  /**
-   * @return a comma separated list of all extensions e.g. 'gif,png,jpg'
-   */
-  public String getIconExtensions() {
-    return m_iconExtensions;
-  }
 }

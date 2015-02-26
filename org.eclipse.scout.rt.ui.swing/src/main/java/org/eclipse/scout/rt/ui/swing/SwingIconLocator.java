@@ -26,8 +26,8 @@ import javax.swing.ImageIcon;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.services.common.icon.IconLocator;
 import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
-import org.eclipse.scout.rt.client.ui.IIconLocator;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.ui.swing.basic.IconUtility;
 
@@ -88,7 +88,7 @@ public class SwingIconLocator {
   }
 
   private Image createImageImpl(String name) {
-    IconSpec iconSpec = IIconLocator.INSTANCE.getIconSpec(name);
+    IconSpec iconSpec = IconLocator.instance().getIconSpec(name);
     if (iconSpec != null) {
       Image img = Toolkit.getDefaultToolkit().createImage(iconSpec.getContent());
       if (img != null) {

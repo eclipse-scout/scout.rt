@@ -10,13 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.rt.ui.swing.services.common.icon;
 
+import java.net.URL;
+
 import org.eclipse.scout.rt.client.services.common.icon.AbstractIconProviderService;
 
 public class SwingBundleIconProviderService extends AbstractIconProviderService {
 
-  public static final String FOLDER_NAME = "org.eclipse.scout.rt.ui.swing.icons";
-
-  public SwingBundleIconProviderService() {
-    setFolderName(FOLDER_NAME);
+  @Override
+  protected URL findResource(String relativePath) {
+    return org.eclipse.scout.rt.ui.swing.ResourceBase.class.getResource("icons/" + relativePath);
   }
 }

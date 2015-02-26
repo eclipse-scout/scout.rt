@@ -19,8 +19,8 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
+import org.eclipse.scout.rt.client.services.common.icon.IconLocator;
 import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
-import org.eclipse.scout.rt.client.ui.IIconLocator;
 import org.eclipse.scout.rt.shared.AbstractIcons;
 import org.eclipse.scout.rt.shared.services.common.file.RemoteFile;
 import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
@@ -172,9 +172,9 @@ public class DefaultWizardStatusHtmlProvider implements IWizardStatusHtmlProvide
       }
 
       // load icon
-      IconSpec iconSpec = IIconLocator.INSTANCE.getIconSpec(tempIconName);
+      IconSpec iconSpec = IconLocator.instance().getIconSpec(tempIconName);
       if (iconSpec == null && !tempIconName.equals(baseIconName)) {
-        iconSpec = IIconLocator.INSTANCE.getIconSpec(baseIconName);
+        iconSpec = IconLocator.instance().getIconSpec(baseIconName);
       }
 
       if (iconSpec != null) {

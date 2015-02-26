@@ -24,9 +24,9 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.nls.NlsLocale;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.services.common.icon.IconLocator;
 import org.eclipse.scout.rt.client.services.common.icon.IconSpec;
 import org.eclipse.scout.rt.client.services.common.perf.IPerformanceAnalyzerService;
-import org.eclipse.scout.rt.client.ui.IIconLocator;
 import org.eclipse.scout.rt.client.ui.form.ScoutInfoForm.MainBox.CloseButton;
 import org.eclipse.scout.rt.client.ui.form.ScoutInfoForm.MainBox.GroupBox.HtmlField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCloseButton;
@@ -158,7 +158,7 @@ public class ScoutInfoForm extends AbstractForm {
     if (f != null && !f.hasContent()) {
       // try to load bundle resource
       try {
-        IconSpec iconSpec = IIconLocator.INSTANCE.getIconSpec(AbstractIcons.ApplicationLogo);
+        IconSpec iconSpec = IconLocator.instance().getIconSpec(AbstractIcons.ApplicationLogo);
         ByteArrayInputStream is = new ByteArrayInputStream(iconSpec.getContent());
         f.readData(is);
         is.close();
