@@ -20,10 +20,13 @@ import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IRegistryEventListener;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.Status;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.osgi.framework.Bundle;
 
 public final class ServletFilterExtensionPoint {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ServletFilterExtensionPoint.class);
+
   private static Object filtersLock = new Object();
   private static List<FilterConfigImpl> filters;
 
@@ -56,8 +59,8 @@ public final class ServletFilterExtensionPoint {
           public void removed(IExtensionPoint[] extensionPoints) {
             notifyExtensionPointChanged();
           }
-        }, Activator.PLUGIN_ID + ".filters");
-        IExtensionPoint xp = reg.getExtensionPoint(Activator.PLUGIN_ID, "filters");
+        }, "org.eclipse.scout.rt.server.commons" + ".filters");
+        IExtensionPoint xp = reg.getExtensionPoint("org.eclipse.scout.rt.server.commons", "filters");
         IExtension[] extensions = xp.getExtensions();
         double index = 0;
         for (IExtension extension : extensions) {
@@ -81,7 +84,7 @@ public final class ServletFilterExtensionPoint {
               }
             }
             catch (Throwable t) {
-              Activator.getDefault().getLog().log(new Status(Status.ERROR, Activator.PLUGIN_ID, "create filter: " + className, t));
+              LOG.error("create filter: " + className, t);
             }
           }
         }

@@ -20,10 +20,13 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 
 import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.Status;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.osgi.framework.Bundle;
 
 public class FilterConfigImpl implements FilterConfig {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(FilterConfigImpl.class);
+
   private ServletContext m_servletContext;
   private final IConfigurationElement m_serviceElement;
   private final Bundle m_definingBundle;
@@ -81,15 +84,14 @@ public class FilterConfigImpl implements FilterConfig {
   public void destroy() {
     if (m_filter != null) {
       try {
-        // TODO LOG
-        if (Activator.DEBUG) {
-          Activator.getDefault().getLog().log(new Status(Status.INFO, Activator.PLUGIN_ID, "ServletFilterConfig: destroy " + m_filter.getClass().getSimpleName()));
+        if (LOG.isDebugEnabled()) {
+          LOG.debug("ServletFilterConfig: destroy " + m_filter.getClass().getSimpleName());
         }
         m_filter.destroy();
       }
       catch (Throwable t) {
         String className = m_serviceElement.getAttribute("class");
-        Activator.getDefault().getLog().log(new Status(Status.ERROR, Activator.PLUGIN_ID, "destroy " + className, t));
+        LOG.error("destroy " + className, t);
       }
       finally {
         m_filter = null;

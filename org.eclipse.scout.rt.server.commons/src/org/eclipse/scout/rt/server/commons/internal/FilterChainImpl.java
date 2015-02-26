@@ -19,10 +19,13 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
-import org.eclipse.core.runtime.Status;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.server.commons.servletfilter.ServletFilterDelegate;
 
 public class FilterChainImpl implements FilterChain {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(FilterChainImpl.class);
+
   private List<Filter> m_filters;
   private ServletFilterDelegate.IServiceCallback m_callback;
 
@@ -35,9 +38,8 @@ public class FilterChainImpl implements FilterChain {
   public void doFilter(ServletRequest req, ServletResponse res) throws IOException, ServletException {
     if (m_filters.size() > 0) {
       Filter nextFilter = m_filters.remove(0);
-      if (Activator.DEBUG) {
-        // TODO LOG
-        Activator.getDefault().getLog().log(new Status(Status.INFO, Activator.PLUGIN_ID, "ServletFilterChain: doFilter " + nextFilter.getClass().getSimpleName()));
+      if (LOG.isDebugEnabled()) {
+        LOG.debug("ServletFilterChain: doFilter " + nextFilter.getClass().getSimpleName());
       }
       nextFilter.doFilter(req, res, this);
     }
