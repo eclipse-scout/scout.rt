@@ -26,8 +26,8 @@ scout.Calendar = function() {
   this.end = new Date();
 
   // additional modes; should be stored in model
-  this.showYear = true;
-  this.showList = true;
+  this.showYear = false;
+  this.showList = false;
 };
 scout.inherits(scout.Calendar, scout.ModelAdapter);
 
@@ -35,13 +35,6 @@ scout.inherits(scout.Calendar, scout.ModelAdapter);
 scout.Calendar.prototype.init = function(model, session) {
   scout.Calendar.parent.prototype.init.call(this, model, session);
 };
-
-scout.Calendar.prototype._dateFormat = function(date, pattern) {
-  var d = new Date(date.valueOf());
-  var dateFormat = new scout.DateFormat(this.session.locale, pattern);
-  return dateFormat.format(d);
-};
-
 
 scout.Calendar.prototype._render = function($parent) {
   // basics, layout etc.
@@ -135,9 +128,6 @@ scout.Calendar.prototype._onClickDay = function(event) {
 
 
 /* --  set and render grid -------------------------------------------- */
-
-scout.Calendar.prototype._renderViewRange = function() {
-};
 
 scout.Calendar.prototype._setDisplayMode = function(mode) {
   var year = this.show.getFullYear(),
@@ -258,10 +248,11 @@ scout.Calendar.prototype.layoutSize = function() {
 };
 
 scout.Calendar.prototype.layoutLabel = function() {
-  // set range
+  // init vars
   var text,
-    that = this;
+    $selected = $('.selected', this.$grid);
 
+  // set range text
   if (this.displayMode === this.DAY) {
     text = this._dateFormat(this.start, 'd. MMMM yyyy');
   } else if (this.displayMode ===  this.WORK || this.displayMode ===  this.WEEK) {
@@ -278,27 +269,23 @@ scout.Calendar.prototype.layoutLabel = function() {
 
   $('.calendar-select', this.$range).text(text);
 
-  // set dayname
-  // todo: weekdaysShortOrdered based on shown day
-  //FIXME CRU always search inside a container, $grid?
-  var $days = $('.calendar-day-name'),
+  // set dayname (based on width of shown column)
+  var $days = $('.calendar-day-name', this.$grid),
     weekdays;
 
-  if ($days.data('new-width') > 100) {
+  if ($days.eq($selected.index() - 1).data('new-width') > 100) {
       weekdays = this.session.locale.dateFormat.symbols.weekdaysOrdered;
   } else {
       weekdays = this.session.locale.dateFormat.symbols.weekdaysShortOrdered;
   }
 
-  // set dayname
   $days.each(function (index) {
     $(this).text(weekdays[index]);
   });
 
   // set day date and mark selected one
-  var $days = $('.calendar-day');
-
-  var firstDate = new Date(this.start.valueOf());
+  var $dates = $('.calendar-day', this.$grid),
+    firstDate = new Date(this.start.valueOf());
 
   for (var offset = 0; offset < 42; offset++){
     firstDate.setDate(firstDate.getDate() - 1);
@@ -327,17 +314,15 @@ scout.Calendar.prototype.layoutLabel = function() {
         cl += ' selected';
       }
 
-      text = that._dateFormat(firstDate, 'dd');
-      $days.eq(w * 7 + d)
+      text = this._dateFormat(firstDate, 'dd');
+      $dates.eq(w * 7 + d)
         .addClass(cl)
         .attr('data-day-name', text)
         .data('date', new Date(firstDate.valueOf()));
     }
   }
 
-  // set weekname and/or day schedule
-  // todo: animate, opacity?
-
+  // set weekname or day schedule
   $('.calendar-week-axis, .calendar-week-task', this.$grid).remove();
 
   if (this.displayMode === this.MONTH ) {
@@ -349,19 +334,17 @@ scout.Calendar.prototype.layoutLabel = function() {
     });
   } else {
     $('.calendar-week-name').text('');
-    var $selected = $('.selected', this.$grid);
-    $selected.parent().appendDiv('calendar-week-axis').attr('data-axis-name', '08:00').css('top', '15%');
-    $selected.parent().appendDiv('calendar-week-axis').attr('data-axis-name', '12:00').css('top', '40%');
-    $selected.parent().appendDiv('calendar-week-axis').attr('data-axis-name', '13:00').css('top', '45%');
-    $selected.parent().appendDiv('calendar-week-axis').attr('data-axis-name', '17:00').css('top', '70%');
-    $selected.parent().appendDiv('calendar-week-task').attr('data-axis-name', 'Tasks').css('top', '85%');
+    $selected.parent().appendDiv('calendar-week-axis').attr('data-axis-name', '08:00').css('top', this._dayPosition(8));
+    $selected.parent().appendDiv('calendar-week-axis').attr('data-axis-name', '12:00').css('top', this._dayPosition(12));
+    $selected.parent().appendDiv('calendar-week-axis').attr('data-axis-name', '13:00').css('top', this._dayPosition(13));
+    $selected.parent().appendDiv('calendar-week-axis').attr('data-axis-name', '17:00').css('top', this._dayPosition(17));
+    $selected.parent().appendDiv('calendar-week-task').attr('data-axis-name', 'Tasks').css('top', this._dayPosition(-1));
   }
 
 };
 
 scout.Calendar.prototype.layoutComponents = function() {
   $('.calendar-component', this.$grid).remove();
-  $.l('start');
 
   var countTask = 5;
 
@@ -377,34 +360,35 @@ scout.Calendar.prototype.layoutComponents = function() {
 
       fromDate = scout.dates.parseJsonDate(c.fromDate);
       toDate = scout.dates.parseJsonDate(c.toDate);
-      $day = this._findDay(fromDate);
-      $component = $day.appendDiv('calendar-component', c.cell.text)
-        .hover(this._onMouseenter.bind(this), this._onMouseleave.bind(this));
 
-      if (this.displayMode !== this.MONTH) {
-        $component.addClass('component-day');
-        if (c.fullDay) {
-          $component.css('position', 'absolute');
-          $component.css('top', 'calc(85% + ' + countTask + 'px)');
-          countTask += 25;
+      for (var j = 0; j < c.coveredDays.length; j++) {
+        // var d = scout.dates.parseJsonDate(c.coveredDays[j]);
 
-        } else {
-          $component.css('position', 'absolute');
-          $component.css('top', '20%');
-          $component.css('height', '40%');
+        $day = this._findDay(fromDate);
+        $component = $day.appendDiv('calendar-component', c.cell.text)
+          .hover(this._onMouseenter.bind(this), this._onMouseleave.bind(this));
 
-         // for mouse over!
-          $component.attr('data-from', '08:45');
-          $component.attr('data-to', '16:00');
-        }
-      } else {
-        var diff = toDate.getDate() - fromDate.getDate();
-        $.l(toDate, fromDate, diff);
-        if (diff > 0) {
-          $component.css('width', '200%');
+        if (this.displayMode !== this.MONTH) {
+          $component.addClass('component-day');
+
+          if (c.fullDay) {
+            $component.css('position', 'absolute');
+            $component.css('top', 'calc(' + this._dayPosition(-1)  + ')' + countTask + 'px)');
+            countTask += 5;
+
+          } else {
+            // scout.dates.isSameDay(
+
+            $component.css('position', 'absolute');
+            $component.css('top', '20%');
+            $component.css('height', '40%');
+
+           // for mouse over!
+            $component.attr('data-from', '08:45');
+            $component.attr('data-to', '16:00');
+          }
         }
       }
-
     }
   }
 };
@@ -423,8 +407,31 @@ scout.Calendar.prototype._onMouseleave = function (date) {
 };
 
 
+/* -- helper -------------------------------------------- */
+
+scout.Calendar.prototype._dateFormat = function(date, pattern) {
+  var d = new Date(date.valueOf());
+  var dateFormat = new scout.DateFormat(this.session.locale, pattern);
+  return dateFormat.format(d);
+};
+
+scout.Calendar.prototype._dayPosition = function(hour) {
+  if (hour < 0) {
+    return '85%';
+  } else if (hour < 8) {
+    return parseInt(hour / 8 * 10 + 5, 10) + '%';
+  } else if (hour < 12) {
+    return parseInt((hour - 8) / 4 * 25 + 15, 10) + '%';
+  } else if (hour < 13) {
+    return parseInt((hour - 12) / 1 * 5 + 40, 10) + '%';
+  } else if (hour < 17) {
+    return parseInt((hour - 13 ) / 4 * 25 + 45, 10) + '%';
+  } else if (hour < 24) {
+    return parseInt((hour - 17) / 7 * 10 + 70, 10) + '%';
+  }
+};
+
 scout.Calendar.prototype._findDay = function (date) {
-  // todo: tuning!
   var $day;
 
   $('.calendar-day', this.grid)
@@ -443,21 +450,21 @@ scout.Calendar.prototype._findDay = function (date) {
 /* -----------  Scout Stuff ---------------------*/
 
 scout.Calendar.prototype._renderComponents = function() {
-  this.layoutComponents();
+  //this.layoutComponents();
 };
 
 scout.Calendar.prototype._renderLoadInProgress = function() {
 };
 
 
+scout.Calendar.prototype._renderViewRange = function() {
+};
+
 
 /*
 scout.Calendar.prototype._renderViewRange = function() {
 };
 
-scout.Calendar.prototype._renderComponents = function() {
-  this.layoutComponents();
-};
 
 scout.Calendar.prototype._renderSelectedComponent = function() {
 };
@@ -473,9 +480,6 @@ scout.Calendar.prototype._renderTitle = function() {
 
 
 scout.Calendar.prototype._renderSelectedDate = function() {
-};
-
-scout.Calendar.prototype._renderLoadInProgress = function() {
 };
 
 scout.Calendar.prototype._renderStartHour = function() {

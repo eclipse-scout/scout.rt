@@ -108,7 +108,7 @@
 
 .calendar-year {
   display: inline-block;
-  width: 20%;
+  width: 0%;
   height: calc(~"100%" - @calendar-header-height);
   background-color: #CCFFFF;
   overflow: hidden;
@@ -116,7 +116,7 @@
 
 .calendar-list {
   display: inline-block;
-  width: 20%;
+  width: 0%;
   height: calc(~"100%" - @calendar-header-height);
   background-color: #FFFFCC;
   overflow: hidden;
@@ -163,7 +163,7 @@
   }
 
   & .calendar-day {
-    padding: 6px 0px;
+    padding: 0px;
   }
 
   & .calendar-week-name {
