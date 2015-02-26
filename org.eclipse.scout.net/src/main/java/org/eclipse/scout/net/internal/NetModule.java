@@ -20,6 +20,7 @@ import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.net.EclipseAuthenticator;
 import org.eclipse.scout.net.EclipseProxySelector;
 import org.eclipse.scout.rt.platform.IModule;
+import org.eclipse.scout.rt.platform.cdi.ApplicationScoped;
 
 /**
  * Extension to the org.eclipse.core.net to support JAAS based net
@@ -40,6 +41,7 @@ import org.eclipse.scout.rt.platform.IModule;
  * <p/>
  * Use org.eclipse.scout.net.proxy.autodetect=false to disable proxy detection
  */
+@ApplicationScoped
 public final class NetModule implements IModule {
   public static boolean DEBUG;
   public static boolean PROXY_AUTODETECTION;

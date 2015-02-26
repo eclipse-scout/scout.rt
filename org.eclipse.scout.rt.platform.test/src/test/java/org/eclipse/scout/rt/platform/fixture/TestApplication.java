@@ -11,10 +11,12 @@
 package org.eclipse.scout.rt.platform.fixture;
 
 import org.eclipse.scout.rt.platform.IApplication;
+import org.eclipse.scout.rt.platform.cdi.ApplicationScoped;
 
 /**
  *
  */
+@ApplicationScoped
 public class TestApplication implements IApplication {
 
   private static TestApplication instance;

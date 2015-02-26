@@ -14,11 +14,13 @@ import java.util.Hashtable;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.rt.platform.IModule;
+import org.eclipse.scout.rt.platform.cdi.ApplicationScoped;
 import org.eclipse.scout.rt.ui.swing.login.internal.InternalNetAuthenticator;
 import org.osgi.framework.Constants;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceRegistration;
 
+@ApplicationScoped
 public class SwingModule implements IModule {
   private ServiceRegistration m_netAuthRegistration;
 

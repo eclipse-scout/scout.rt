@@ -12,10 +12,12 @@ package org.eclipse.scout.jaxws;
 
 import org.eclipse.scout.commons.ConfigIniUtility;
 import org.eclipse.scout.rt.platform.IModule;
+import org.eclipse.scout.rt.platform.cdi.ApplicationScoped;
 
 import com.sun.xml.internal.ws.fault.SOAPFaultBuilder;
 
 @SuppressWarnings("restriction")
+@ApplicationScoped
 public class JaxWs216Module implements IModule {
 
   public static final String PROP_STACKTRACE = "org.eclipse.scout.jaxws.stacktrace";
