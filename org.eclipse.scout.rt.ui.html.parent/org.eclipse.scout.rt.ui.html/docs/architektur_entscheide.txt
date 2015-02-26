@@ -514,3 +514,16 @@ Probleme mit aktuellem Ansatz:
    Vielleicht eine Anweisung im Include, dass man sie nur zur Compile-Zeit benötigt? Mit Kommentar start und Ende eines inkludierten Files markieren, dann kann man es einfacher rauslöschen.
 2. Es ist zur Zeit nötig, eine Versions-Nummer zu verwenden beim import von js oder css Dateien, die aber gar nichts bewirkt -> optional machen.
 3. Wir sollten überlegen, ob es Namespaces für Includes braucht. Oder genügt es über den Filenamen? z.B. colors.css, bsiwidgets-colors.css vs. scout/colors.css, bsiwidgets/colors.css
+
+
+Keystrokes:
+-Einzige Erweiterung im Model ist das Ein- und Ausschalten von automatischer KeyStrokezuteilung für Views.
+-Die von Chris vorgeschlagene Steuerung von TablePage und OutlineTree soll direkt im CRM implementiert werden und nicht im Scout.
+-Die von Chris vorgeschlagene Steuerung der ToolButtons, der Sichtwechsel und der Suche wird direkt im CRM implementiert.
+-ProcessButton KeyStrokes werden wie bis anhin über Mnemonics gewährleistet.
+-ProcessButtons Registrieren ihre KeyStrokes und Mnemonics immer auf dem darüberliegenden Form, dass heisst, diese werden ausgeführt wenn sich der Fokus irgendwo im Form befindet.
+-DefaultButton soll DefaultFormEnterKeyStroke ersetzen.
+-Mnemonics werden höher Priorisiert als konfigurierte Keystrokes.
+
+
+

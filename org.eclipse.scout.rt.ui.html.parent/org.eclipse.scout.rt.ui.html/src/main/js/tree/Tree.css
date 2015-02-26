@@ -61,7 +61,7 @@
   top: auto;
   left: auto;
   margin-top: -2px;
-  margin-left: -@tree-item-checkbox-size - 1px;
+  margin-left: -@tree-item-checkbox-size - 5px;
   width: @tree-item-checkbox-size;
   height: @tree-item-checkbox-size;
 
@@ -73,7 +73,7 @@
   }
 
   & label::before {
-    .checkboxLabelBefore(0px, 0px, 0px, 0px, -11px);
+    .checkboxLabelBefore(0px, 0px, 0px, 0px, -12px);
   }
 
   & input[type=checkbox] {
@@ -127,7 +127,7 @@
   cursor: pointer;
 
   /* adjust control position */
-  margin-left: -@tree-item-control-size - 1px;
+  margin-left: -@tree-item-control-size - 5px;
   margin-top: -1px;
 
   /* for good animation, ensure that the control is a square and the icon is centered */
@@ -165,7 +165,7 @@
   }
 
   &.checkable {
-    margin-left: -@tree-item-control-checkbox-size - 1px;
+    margin-left: -@tree-item-control-checkbox-size - 5px;
   }
 }
 

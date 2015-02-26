@@ -12,7 +12,7 @@ scout.Tree = function() {
   this._addAdapterProperties('menus');
 
   this._treeItemPaddingLeft = 20;
-  this._treeItemCheckBoxPaddingLeft = 20;
+  this._treeItemCheckBoxPaddingLeft = 28;
   this._treeItemPaddingLevel = 15;
 
   this.menuBar;
