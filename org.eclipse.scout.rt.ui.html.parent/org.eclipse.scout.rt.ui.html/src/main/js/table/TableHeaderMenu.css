@@ -182,7 +182,7 @@
   }
 
   &.column-add::before {
-    content: @icon-add;
+    content: @icon-plus;
   }
 
   &.column-remove::before {

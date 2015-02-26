@@ -1,12 +1,8 @@
 .proposal-field {
 
-  /* FIXME AWE: (proposal) add pencil icon to our TTF -
-   * http://fortawesome.github.io/Font-Awesome/icon/pencil/
-   */
   & input {
-    .text-field-with-icon(@icon-wand);
+    .text-field-with-icon(@icon-pencil);
   }
-
 }
 
 .smart-field {

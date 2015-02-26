@@ -104,6 +104,6 @@
   }
 
   & .plus::before{
-    content: @icon-add;
+    content: @icon-plus;
   }
 }
