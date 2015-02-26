@@ -195,12 +195,23 @@ scout.Desktop.prototype._unselectTab = function(tab) {
 scout.Desktop.prototype._renderDialog = function(dialog) {
   dialog.render(this.$parent);
   dialog.htmlComp.pixelBasedSizing = true;
-  dialog.htmlComp.pack();
 
   var prefSize = dialog.htmlComp.getPreferredSize(),
     documentSize = new scout.Dimension($(document).width(), $(document).height()),
-    marginLeft = (documentSize.width - prefSize.width) / 2,
-    marginTop = (documentSize.height - prefSize.height) / 2 - 10; // -10 for optical vertical middle
+    dialogSize = new scout.Dimension(),
+    marginLeft, marginTop, opticalMiddleOffset;
+
+  dialogSize.width = Math.min(documentSize.width, prefSize.width);
+  dialogSize.height = Math.min(documentSize.height, prefSize.height);
+
+  marginLeft = (documentSize.width - dialogSize.width) / 2;
+  marginTop = (documentSize.height - dialogSize.height) / 2;
+
+  // optical middle
+  opticalMiddleOffset = Math.min(marginTop / 5, 10);
+  marginTop -= opticalMiddleOffset;
+
+  dialog.htmlComp.setSize(dialogSize);
 
   dialog.$container
     .cssMarginLeft(marginLeft)
