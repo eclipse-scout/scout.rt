@@ -40,17 +40,20 @@ scout.init = function(options) {
         $focusContext = $glasspanes.last();
       }
 
+      // If any non-focusable element inside the $container got the focus...
       if (activeElement === $container[0]) {
-        // if any non-focusable element inside the $container got the focus...
-        if ($container[0] !== $focusContext[0]) {
-          // ...ensure that the focus is on $focusContext (and not, for example, glasspanes in the background)
+        // ...ensure that the focus is on $focusContext (and not, for example, on glasspanes in the background)
+        if ($focusContext[0] !== $container[0]) {
           $focusContext.focus();
         }
-        return;
       }
-
+      // If any non-focusable element inside the $focusContext got the focus...
+      else if (activeElement === $focusContext[0]) {
+        // ... do nothing and swallow the event
+        $.suppressEvent(event);
+      }
       // If the active element is inside or equal to the focus context...
-      if (!$focusContext[0].contains(activeElement) || $focusContext[0] === activeElement) {
+      else if (!$focusContext[0].contains(activeElement)) {
         // ...set the focus to the first focusable element inside the context element
         $.suppressEvent(event);
         $focusContext.find(':focusable').first().focus();

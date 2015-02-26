@@ -14,10 +14,9 @@ scout.graphics = {
     if ($div.length === 0) { // create dynamically
       $div = $('body').appendDiv('', '', 'StringMeasurement');
     }
+    $div.removeAttr('class');
     if (className) {
       $div.addClass(className);
-    } else {
-      $div.removeAttr('class');
     }
     $div.html(text.replace(/\s/g, "&nbsp;"));
     var dimension = new scout.Dimension($div.width(), $div.height());
