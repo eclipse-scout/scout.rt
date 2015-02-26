@@ -330,7 +330,6 @@ public class ClusterSynchronizationService extends AbstractService implements IC
   protected static class ClusterSynchronizationTransaction extends AbstractTransactionMember {
     private final List<IClusterNotificationMessage> m_messageQueue;
     private final IPublishSubscribeMessageService m_messageService;
-    private final ClusterNodeStatusInfo m_statusInfo = new ClusterNodeStatusInfo();
 
     public ClusterSynchronizationTransaction(String transactionId, IPublishSubscribeMessageService messageService) throws ProcessingException {
       super(transactionId);
@@ -357,7 +356,6 @@ public class ClusterSynchronizationService extends AbstractService implements IC
     @Override
     public synchronized void commitPhase2() {
       m_messageService.publishNotifications(new ArrayList<IClusterNotificationMessage>(m_messageQueue));
-      m_statusInfo.addSentMessageCount(m_messageQueue.size());
     }
 
     @Override
